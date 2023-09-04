@@ -9,7 +9,7 @@ import { CreateQuest, QuestLinkerActionType } from './types'
 import { CliComponents } from '../../components'
 import { createWallet } from '../../logic/account'
 import { LinkerResponse, LinkerdAppOptions, runLinkerApp } from '../../linker-dapp/api'
-import { setRoutes } from './linker-dapp/routes'
+import { setRoutes } from '../../linker-dapp/routes'
 
 async function getAddressAndSignature(
   components: CliComponents,
@@ -31,7 +31,31 @@ async function getAddressAndSignature(
     return {}
   }
 
-  const { router } = setRoutes(components, awaitResponse, info, callback)
+  const { router } = setRoutes(components, info, '/quests')
+  const { logger } = components
+
+  // We need to wait so the linker-dapp can receive the response and show a nice message.
+  const resolveLinkerPromise = () => setTimeout(() => awaitResponse.resolve(), 100)
+
+  router.post('/api/quests', async (ctx) => {
+    const value = (await ctx.request.json()) as LinkerResponse
+
+    if (!value.address || !value.signature) {
+      const errorMessage = `Invalid payload: ${Object.keys(value).join(' - ')}`
+      logger.error(errorMessage)
+      resolveLinkerPromise()
+      return { status: 400, body: { message: errorMessage } }
+    }
+
+    try {
+      await callback(value)
+      resolveLinkerPromise()
+      return {}
+    } catch (e) {
+      resolveLinkerPromise()
+      return { status: 400, body: { message: (e as Error).message } }
+    }
+  })
 
   const { program } = await runLinkerApp(components, router, { ...linkerOpts, uri: `/quests` })
 

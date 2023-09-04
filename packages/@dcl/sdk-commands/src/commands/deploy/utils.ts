@@ -10,10 +10,13 @@ import querystring from 'querystring'
 import { CliComponents } from '../../components'
 import { IFile } from '../../logic/scene-validations'
 import { runLinkerApp, LinkerResponse, LinkerdAppOptions } from '../../linker-dapp/api'
+import { setRoutes } from '../../linker-dapp/routes'
 import { createWallet } from '../../logic/account'
 import { IFuture } from 'fp-future'
 import { getEstateRegistry, getLandRegistry } from '../../logic/config'
-import { setRoutes } from './linker-dapp/routes'
+import { getObject } from '../../logic/coordinates'
+import { getPointers } from '../../logic/catalyst-requests'
+import { Router } from '@well-known-components/http-server'
 
 export async function getCatalyst(
   chainId: ChainId = ChainId.ETHEREUM_MAINNET,
@@ -84,10 +87,80 @@ export async function getAddressAndSignature(
 
   const sceneInfo = await getSceneInfo(components, scene, messageToSign, skipValidations)
   const queryParams = querystring.stringify(sceneInfo)
-  const { router } = setRoutes(components, awaitResponse, files, sceneInfo, deployCallback)
+
+  const { router: commonRouter } = setRoutes(components, sceneInfo)
+  const router = setDeployRoutes(commonRouter, components, awaitResponse, sceneInfo, files, deployCallback)
 
   const { program } = await runLinkerApp(components, router, { ...linkOptions, uri: `/?${queryParams}` })
   return { program }
+}
+
+function setDeployRoutes(
+  router: Router<object>,
+  components: CliComponents,
+  awaitResponse: IFuture<void>,
+  sceneInfo: SceneInfo,
+  files: IFile[],
+  deployCallback: (response: LinkerResponse) => Promise<void>
+): Router<object> {
+  const { logger } = components
+
+  // We need to wait so the linker-dapp can receive the response and show a nice message.
+  const resolveLinkerPromise = () => setTimeout(() => awaitResponse.resolve(), 100)
+  let linkerResponse: LinkerResponse
+
+  router.get('/api/files', async () => ({
+    body: files.map((file) => ({
+      name: file.path,
+      size: file.size
+    }))
+  }))
+
+  router.get('/api/catalyst-pointers', async () => {
+    const { x, y } = getObject(sceneInfo.baseParcel)
+    const pointer = `${x},${y}`
+    const chainId = linkerResponse?.chainId || 1
+    const network = chainId === ChainId.ETHEREUM_MAINNET ? 'mainnet' : 'sepolia'
+    const value = await getPointers(components, pointer, network)
+    const deployedToAll = new Set(value.map((c) => c.entityId)).size === 1
+
+    // Deployed to every catalyst, close the linker dapp and
+    // exit the command automatically so the user dont have to.
+    if (deployedToAll) resolveLinkerPromise()
+
+    return {
+      body: { catalysts: value }
+    }
+  })
+
+  router.post('/api/deploy', async (ctx) => {
+    const value = (await ctx.request.json()) as LinkerResponse
+
+    if (!value.address || !value.signature || !value.chainId) {
+      const errorMessage = `Invalid payload: ${Object.keys(value).join(' - ')}`
+      logger.error(errorMessage)
+      resolveLinkerPromise()
+      return { status: 400, body: { message: errorMessage } }
+    }
+
+    // Store the chainId so we can use it on the catalyst pointers.
+    linkerResponse = value
+
+    try {
+      await deployCallback(value)
+      // If its a world we dont wait for the catalyst pointers.
+      // Close the program.
+      if (sceneInfo.isWorld) {
+        resolveLinkerPromise()
+      }
+      return {}
+    } catch (e) {
+      resolveLinkerPromise()
+      return { status: 400, body: { message: (e as Error).message } }
+    }
+  })
+
+  return router
 }
 
 export function sceneHasWorldCfg(scene: Scene) {
