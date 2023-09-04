@@ -205,8 +205,6 @@ export function validateCreateQuest(quest: CreateQuest, components: Pick<CliComp
   return true
 }
 
-export { prompts }
-
 export const createQuestByPrompting = async (
   components: Pick<CliComponents, 'logger'>
 ): Promise<CreateQuest | null> => {
