@@ -98,7 +98,8 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     value: Schemas.Array(
       Schemas.Map({
         name: Schemas.String,
-        type: Schemas.EnumString<AvailableActions>(AvailableActions, AvailableActions.PLAY_ANIMATION)
+        type: Schemas.EnumString<AvailableActions>(AvailableActions, AvailableActions.PLAY_ANIMATION),
+        animation: Schemas.Optional(Schemas.String)
       })
     )
   })
