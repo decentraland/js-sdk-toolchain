@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Entity } from '@dcl/ecs'
 import { Item } from 'react-contexify'
 import { AiFillDelete as DeleteIcon, AiOutlinePlus as AddIcon, AiOutlineMinus as RemoveIcon } from 'react-icons/ai'
@@ -23,18 +23,32 @@ import './TriggerInspector.css'
 
 export default withSdk<Props>(
   withContextMenu<Props & WithSdkProps>(({ sdk, entity, contextMenuId }) => {
-    const { operations } = sdk
     const { Actions, Triggers, Name } = sdk.components
     const entitiesWithAction = useEntitiesWith((components) => components.Actions)
-    const [componentValue, setComponentValue] = useComponentValue<EditorComponentsTypes['Triggers']>(entity, Triggers)
+    const [componentValue, setComponentValue, isComponentEqual] = useComponentValue<EditorComponentsTypes['Triggers']>(
+      entity,
+      Triggers
+    )
     const { handleAction } = useContextMenu()
+    const [triggers, setTriggers] = useState<Trigger[]>(componentValue === null ? [] : componentValue.value)
     const hasTriggers = useHasComponent(entity, Triggers)
 
+    const areValidActions = useCallback(
+      (updatedTriggers: Trigger[]) =>
+        updatedTriggers.length > 0 &&
+        !updatedTriggers.some((action) => !action.type || !action?.entity || !action.action),
+      []
+    )
+
     useEffect(() => {
-      if (hasTriggers && componentValue.value.length === 0) {
-        handleAddNewTrigger()
+      if (areValidActions(triggers)) {
+        if (isComponentEqual({ value: triggers })) {
+          return
+        }
+
+        setComponentValue({ value: [...triggers] })
       }
-    }, [hasTriggers])
+    }, [triggers])
 
     const availableActions: Map<Entity, { name: string; action: Action[] }> = useMemo(() => {
       return entitiesWithAction?.reduce((actions, entity) => {
@@ -49,55 +63,64 @@ export default withSdk<Props>(
     }, [entitiesWithAction])
 
     const handleRemove = useCallback(async () => {
-      operations.removeComponent(entity, Triggers)
-      await operations.dispatch()
-    }, [operations])
+      sdk.operations.removeComponent(entity, Triggers)
+      await sdk.operations.dispatch()
+    }, [])
 
     const handleAddNewTrigger = useCallback(() => {
-      setComponentValue((prev: EditorComponentsTypes['Triggers']) => {
-        return { value: [...prev.value, { type: AvailableTriggers.ON_CLICK }] }
+      setTriggers((prev: Trigger[]) => {
+        return [...prev, { type: AvailableTriggers.ON_CLICK }]
       })
-    }, [setComponentValue])
+    }, [setTriggers])
 
     const handleChangeType = useCallback(
       ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
-        setComponentValue((prev: EditorComponentsTypes['Triggers']) => {
-          const data = [...prev.value]
-          data[idx].type = value as AvailableTriggers
-          return { value: data }
+        setTriggers((prev: Trigger[]) => {
+          const data = [...prev]
+          data[idx] = {
+            ...data[idx],
+            type: value as AvailableTriggers
+          }
+          return data
         })
       },
-      [setComponentValue]
+      [setTriggers]
     )
 
     const handleChangeEnitty = useCallback(
       ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
-        setComponentValue((prev: EditorComponentsTypes['Triggers']) => {
-          const data = [...prev.value]
-          data[idx].entity = entitiesWithAction?.find((entity) => entity.toString() === value)
-          return { value: data }
+        setTriggers((prev: Trigger[]) => {
+          const data = [...prev]
+          data[idx] = {
+            ...data[idx],
+            entity: entitiesWithAction?.find((entity) => entity.toString() === value)
+          }
+          return data
         })
       },
-      [entitiesWithAction, setComponentValue]
+      [entitiesWithAction, setTriggers]
     )
 
     const handleChangeAction = useCallback(
       ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
-        setComponentValue((prev: EditorComponentsTypes['Triggers']) => {
-          const data = [...prev.value]
-          data[idx].action = value as AvailableActions
-          return { value: data }
+        setTriggers((prev: Trigger[]) => {
+          const data = [...prev]
+          data[idx] = {
+            ...data[idx],
+            action: value as AvailableActions
+          }
+          return data
         })
       },
-      [setComponentValue]
+      [setTriggers]
     )
 
     const handleRemoveTrigger = useCallback((e: React.MouseEvent, idx: number) => {
       e.stopPropagation()
-      setComponentValue((prev: EditorComponentsTypes['Triggers']) => {
-        const data = [...prev.value]
+      setTriggers((prev: Trigger[]) => {
+        const data = [...prev]
         data.splice(idx, 1)
-        return { value: data }
+        return data
       })
     }, [])
 
@@ -112,7 +135,7 @@ export default withSdk<Props>(
             <DeleteIcon /> Delete
           </Item>
         </ContextMenu>
-        {componentValue.value.map((trigger: Trigger, idx: number) => {
+        {triggers.map((trigger: Trigger, idx: number) => {
           return (
             <Block key={`trigger-${idx}`}>
               <Dropdown
@@ -126,7 +149,7 @@ export default withSdk<Props>(
                 options={
                   availableActions
                     ? [
-                        { value: -1, text: 'Select an Entity' },
+                        { value: '', text: 'Select an Entity' },
                         ...Array.from(availableActions).map(([entity, { name }]) => {
                           return { value: entity, text: name }
                         })
@@ -142,7 +165,7 @@ export default withSdk<Props>(
                 options={
                   trigger.entity && availableActions.get(trigger.entity)?.action
                     ? [
-                        { value: -1, text: 'Select an Action' },
+                        { value: '', text: 'Select an Action' },
                         ...(availableActions.get(trigger.entity)?.action ?? []).map(({ name }) => {
                           return { value: name, text: name }
                         })
