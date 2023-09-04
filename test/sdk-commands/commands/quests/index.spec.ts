@@ -11,9 +11,21 @@ describe('quests command', () => {
   it('should throw if target parameter is not a valid URL', async () => {
     const components = await initComponents()
 
-    await expect(() => quests.main({ args: { _: [], '--target': 'localhost:4000' }, components })).rejects.toThrow(
+    await expect(() => quests.main({ args: { _: [], '--target': 'aaa' }, components })).rejects.toThrow(
       'The provided target is not a valid URL'
     )
+
+    await expect(() => quests.main({ args: { _: [], '--target': 'aaa.com' }, components })).rejects.toThrow(
+      'The provided target is not a valid URL'
+    )
+  })
+
+  it('should not throw if target parameter is a valid URL', async () => {
+    const components = await initComponents()
+
+    await expect(() =>
+      quests.main({ args: { _: [], '--target': 'http://aaa.com' }, components })
+    ).resolves.not.toThrow()
   })
 
   describe('--create-from-json', () => {
@@ -35,7 +47,7 @@ describe('quests command', () => {
       const path = resolve('./test/sdk-commands/commands/quests/invalid_quest.json')
 
       await expect(() => quests.main({ args: { _: [], '--create-from-json': path }, components })).rejects.toThrow(
-        'You provided an invalid Quest JSON. Please check the documentation'
+        "> Quest's definition must have valid connections"
       )
       expect(executeSubcommand).not.toBeCalled()
     })
@@ -79,7 +91,7 @@ describe('quests command', () => {
     it('should throw if SIGNTERM while prompting', async () => {
       const components = await initComponents()
       const existSpy = jest.spyOn(components.fs, 'fileExists')
-      const createMock = jest.spyOn(utils, 'createQuest').mockResolvedValueOnce(null)
+      const createMock = jest.spyOn(utils, 'createQuestByPrompting').mockResolvedValueOnce(null)
       const executeSubcommand = jest.spyOn(utils, 'executeSubcommand')
 
       await expect(() => quests.main({ args: { _: [], '--create': true }, components })).rejects.toThrow(
@@ -100,7 +112,7 @@ describe('quests command', () => {
           encoding: 'utf-8'
         })
       )
-      const createMock = jest.spyOn(utils, 'createQuest').mockResolvedValueOnce(quest)
+      const createMock = jest.spyOn(utils, 'createQuestByPrompting').mockResolvedValueOnce(quest)
 
       await quests.main({ args: { _: [], '--create': true }, components })
 
