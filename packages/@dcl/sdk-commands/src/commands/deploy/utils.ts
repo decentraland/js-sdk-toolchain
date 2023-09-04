@@ -5,7 +5,6 @@ import { getCatalystServersFromCache } from 'dcl-catalyst-client/dist/contracts-
 import { createFetchComponent } from '@well-known-components/fetch-component'
 import { hexToBytes } from 'eth-connect'
 import { ethSign } from '@dcl/crypto/dist/crypto'
-import querystring from 'querystring'
 
 import { CliComponents } from '../../components'
 import { IFile } from '../../logic/scene-validations'
@@ -86,7 +85,7 @@ export async function getAddressAndSignature(
   }
 
   const sceneInfo = await getSceneInfo(components, scene, messageToSign, skipValidations)
-  const queryParams = querystring.stringify(sceneInfo)
+  const queryParams = new URLSearchParams(sceneInfo as any).toString()
 
   const { router: commonRouter } = setRoutes(components, sceneInfo)
   const router = setDeployRoutes(commonRouter, components, awaitResponse, sceneInfo, files, deployCallback)
