@@ -1,11 +1,10 @@
 import { ColliderLayer, PBMeshCollider } from '@dcl/ecs'
 import { MeshColliderInput } from './types'
 import { MeshType } from '../MeshRendererInspector/types'
-import { COLLISION_LAYERS } from '../GltfInspector/utils'
 
 export const fromMeshCollider = (value: PBMeshCollider): MeshColliderInput => {
   const collisionMask = (value.collisionMask ?? ColliderLayer.CL_PHYSICS).toString()
-  switch(value.mesh?.$case) {
+  switch (value.mesh?.$case) {
     case 'sphere':
       return { collisionMask, mesh: MeshType.MT_SPHERE }
     case 'cylinder':
@@ -25,7 +24,7 @@ export const fromMeshCollider = (value: PBMeshCollider): MeshColliderInput => {
 
 export const toMeshCollider = (value: MeshColliderInput): PBMeshCollider => {
   const collisionMask = Number(value.collisionMask ?? ColliderLayer.CL_PHYSICS)
-  switch(value.mesh) {
+  switch (value.mesh) {
     case MeshType.MT_SPHERE:
       return { collisionMask, mesh: { $case: MeshType.MT_SPHERE, sphere: {} } }
     case MeshType.MT_CYLINDER:

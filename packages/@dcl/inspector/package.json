@@ -1,6 +1,9 @@
 {
   "name": "@dcl/inspector",
   "version": "0.1.0",
+  "dependencies": {
+    "earcut": "^2.2.4"
+  },
   "devDependencies": {
     "@babylonjs/core": "^6.18.0",
     "@babylonjs/gui": "^6.18.0",
@@ -63,8 +66,5 @@
     "start": "npm run copy-bin && node ./build.js --watch"
   },
   "types": "dist/tooling-entrypoint.d.ts",
-  "typings": "dist/tooling-entrypoint.d.ts",
-  "dependencies": {
-    "earcut": "^2.2.4"
-  }
+  "typings": "dist/tooling-entrypoint.d.ts"
 }

@@ -7,8 +7,9 @@ import { Props } from './types'
 import './Container.css'
 
 const Container: React.FC<React.PropsWithChildren<Props>> = (props) => {
-  const [open, setOpen] = useState<boolean>(true)
+  const [open, setOpen] = useState<boolean>(props.initialOpen ?? true)
   const Icon = open ? <IoIosArrowDown className="icon" /> : <IoIosArrowForward className="icon" />
+
   return (
     <div className={cx('Container', props.className, { open })}>
       {props.label && (

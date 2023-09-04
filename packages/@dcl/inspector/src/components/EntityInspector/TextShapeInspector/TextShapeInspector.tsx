@@ -21,13 +21,7 @@ export default withSdk<Props>(
     const { TextShape } = sdk.components
 
     const hasTextShape = useHasComponent(entity, TextShape)
-    const { getInputProps } = useComponentInput(
-      entity,
-      TextShape,
-      fromTextShape,
-      toTextShape,
-      isValidInput
-    )
+    const { getInputProps } = useComponentInput(entity, TextShape, fromTextShape, toTextShape, isValidInput)
 
     const handleRemove = useCallback(async () => {
       sdk.operations.removeComponent(entity, TextShape)

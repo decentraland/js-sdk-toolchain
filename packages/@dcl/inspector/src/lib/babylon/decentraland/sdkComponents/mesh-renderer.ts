@@ -21,7 +21,11 @@ export const putMeshRendererComponent: ComponentOperation = (entity, component) 
       mesh = MeshBuilder.CreateBox(entity.entityId.toString(), { updatable: false }, entity.getScene())
       setMeshUvs(mesh, newValue.mesh.box.uvs)
     } else if (newValue?.mesh?.$case === 'sphere') {
-      mesh = MeshBuilder.CreateSphere(entity.entityId.toString(), { diameter: 1, updatable: false, segments: 8 }, entity.getScene())
+      mesh = MeshBuilder.CreateSphere(
+        entity.entityId.toString(),
+        { diameter: 1, updatable: false, segments: 8 },
+        entity.getScene()
+      )
     } else if (newValue?.mesh?.$case === 'cylinder') {
       mesh = MeshBuilder.CreateCylinder('cone', {
         diameterTop: newValue.mesh.cylinder.radiusTop !== undefined ? newValue.mesh.cylinder.radiusTop * 2 : 1,

@@ -61,42 +61,56 @@ export function isValidInput(): boolean {
 
 // this interfaces (Font & TextAlignMode) are exported as const, thus not existing at runtime
 // maybe we could enable "preserveConstEnums" ts flag?
-export const FONTS = [{
-  value: Font.F_SANS_SERIF,
-  label: 'Sans Serif'
-}, {
-  value: Font.F_SERIF,
-  label: 'Serif'
-}, {
-  value: Font.F_MONOSPACE,
-  label: 'Monospace'
-}]
+export const FONTS = [
+  {
+    value: Font.F_SANS_SERIF,
+    label: 'Sans Serif'
+  },
+  {
+    value: Font.F_SERIF,
+    label: 'Serif'
+  },
+  {
+    value: Font.F_MONOSPACE,
+    label: 'Monospace'
+  }
+]
 
-export const TEXT_ALIGN_MODES = [{
-  value: TextAlignMode.TAM_TOP_LEFT,
-  label: 'Top left'
-}, {
-  value: TextAlignMode.TAM_TOP_CENTER,
-  label: 'Top center'
-}, {
-  value: TextAlignMode.TAM_TOP_RIGHT,
-  label: 'Top right'
-}, {
-  value: TextAlignMode.TAM_MIDDLE_LEFT,
-  label: 'Middle left'
-}, {
-  value: TextAlignMode.TAM_MIDDLE_CENTER,
-  label: 'Middle center'
-}, {
-  value: TextAlignMode.TAM_MIDDLE_RIGHT,
-  label: 'Middle right'
-}, {
-  value: TextAlignMode.TAM_BOTTOM_LEFT,
-  label: 'Bottom left'
-}, {
-  value: TextAlignMode.TAM_BOTTOM_CENTER,
-  label: 'Bottom center'
-}, {
-  value: TextAlignMode.TAM_BOTTOM_RIGHT,
-  label: 'Bottom Right'
-}]
+export const TEXT_ALIGN_MODES = [
+  {
+    value: TextAlignMode.TAM_TOP_LEFT,
+    label: 'Top left'
+  },
+  {
+    value: TextAlignMode.TAM_TOP_CENTER,
+    label: 'Top center'
+  },
+  {
+    value: TextAlignMode.TAM_TOP_RIGHT,
+    label: 'Top right'
+  },
+  {
+    value: TextAlignMode.TAM_MIDDLE_LEFT,
+    label: 'Middle left'
+  },
+  {
+    value: TextAlignMode.TAM_MIDDLE_CENTER,
+    label: 'Middle center'
+  },
+  {
+    value: TextAlignMode.TAM_MIDDLE_RIGHT,
+    label: 'Middle right'
+  },
+  {
+    value: TextAlignMode.TAM_BOTTOM_LEFT,
+    label: 'Bottom left'
+  },
+  {
+    value: TextAlignMode.TAM_BOTTOM_CENTER,
+    label: 'Bottom center'
+  },
+  {
+    value: TextAlignMode.TAM_BOTTOM_RIGHT,
+    label: 'Bottom Right'
+  }
+]

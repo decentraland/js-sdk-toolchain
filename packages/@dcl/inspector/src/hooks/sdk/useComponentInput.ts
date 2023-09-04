@@ -39,14 +39,13 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
     setInput(value)
   }, [])
 
-  const handleUpdate = (
-    path: NestedKey<InputType>,
-    getter: (event: React.ChangeEvent<HTMLInputElement>) => any = (e) => e.target.value
-  ) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (input === null) return
-    const newInputs = setValue(input, path, getter(event))
-    updateInputs(newInputs)
-  }
+  const handleUpdate =
+    (path: NestedKey<InputType>, getter: (event: React.ChangeEvent<HTMLInputElement>) => any = (e) => e.target.value) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (input === null) return
+      const newInputs = setValue(input, path, getter(event))
+      updateInputs(newInputs)
+    }
 
   const handleFocus = useCallback(() => {
     setIsFocused(true)

@@ -34,7 +34,6 @@ export default withSdk<Props>(
       await sdk.operations.dispatch()
     }, [])
 
-
     if (!hasMeshRenderer) return null
 
     const mesh = getInputProps('mesh')
@@ -51,11 +50,13 @@ export default withSdk<Props>(
         </Block>
         {mesh.value !== MeshType.MT_SPHERE && (
           <Block label="Additional fields">
-            {hasUvs(mesh.value) && (<TextField label="Uvs" type="number" {...getInputProps('uvs')} />)}
-            {mesh.value === MeshType.MT_CYLINDER && <>
-              <TextField label="Radius top" type="number" {...getInputProps('radiusTop')} />
-              <TextField label="Radius bottom" type="number" {...getInputProps('radiusBottom')} />
-            </>}
+            {hasUvs(mesh.value) && <TextField label="Uvs" type="number" {...getInputProps('uvs')} />}
+            {mesh.value === MeshType.MT_CYLINDER && (
+              <>
+                <TextField label="Radius top" type="number" {...getInputProps('radiusTop')} />
+                <TextField label="Radius bottom" type="number" {...getInputProps('radiusBottom')} />
+              </>
+            )}
           </Block>
         )}
       </Container>

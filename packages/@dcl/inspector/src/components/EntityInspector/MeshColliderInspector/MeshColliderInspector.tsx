@@ -37,7 +37,6 @@ export default withSdk<Props>(
       await sdk.operations.dispatch()
     }, [])
 
-
     if (!hasMeshCollider) return null
 
     const mesh = getInputProps('mesh')

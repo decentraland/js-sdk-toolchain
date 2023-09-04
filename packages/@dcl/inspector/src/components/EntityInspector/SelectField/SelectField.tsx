@@ -10,7 +10,9 @@ const Select: React.FC<Props> = (props) => {
     <div className="SelectField">
       {label && <label>{label}</label>}
       <select {...rest}>
-        {options.map(($, key) => <Option {...$} key={`${$.value}-${key}`} />)}
+        {options.map(($, key) => (
+          <Option {...$} key={`${$.value}-${key}`} />
+        ))}
       </select>
     </div>
   )

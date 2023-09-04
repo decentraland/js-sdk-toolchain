@@ -5,7 +5,7 @@ import { mapSelectFieldOptions } from '../SelectField/utils'
 export const fromMeshRenderer = (value: PBMeshRenderer): MeshRendererInput => {
   // uvs are not typed for box/plane
   // TODO: add types for them in @dcl/ecs
-  switch(value.mesh?.$case) {
+  switch (value.mesh?.$case) {
     case 'sphere':
       return { mesh: MeshType.MT_SPHERE }
     case 'cylinder':
@@ -23,7 +23,7 @@ export const fromMeshRenderer = (value: PBMeshRenderer): MeshRendererInput => {
 }
 
 export const toMeshRenderer = (value: MeshRendererInput): PBMeshRenderer => {
-  switch(value.mesh) {
+  switch (value.mesh) {
     case MeshType.MT_SPHERE:
       return { mesh: { $case: MeshType.MT_SPHERE, sphere: {} } }
     case MeshType.MT_CYLINDER:
@@ -50,7 +50,7 @@ export function isValidInput(): boolean {
 
 export const SHAPES = mapSelectFieldOptions(MeshType)
 
-function getUvs(value?: {} & { uvs?: number[] }) {
+function getUvs(value?: Record<string, unknown> & { uvs?: number[] }) {
   return value?.uvs || []
 }
 

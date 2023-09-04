@@ -14,7 +14,11 @@ export const putTextShapeComponent: ComponentOperation = (entity, component) => 
     dispose(entity)
 
     if (value?.text) {
-      const mesh = BABYLON.MeshBuilder.CreatePlane(entity.entityId.toString(), { width: 100, height: 100 }, entity.getScene())
+      const mesh = BABYLON.MeshBuilder.CreatePlane(
+        entity.entityId.toString(),
+        { width: 100, height: 100 },
+        entity.getScene()
+      )
       const advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(mesh)
 
       advancedTexture.addControl(createTextBlock(value))

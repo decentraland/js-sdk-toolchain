@@ -9,13 +9,15 @@ import { useChange } from '../../hooks/sdk/useChange'
 import { useAppSelector } from '../../redux/hooks'
 import { getHiddenComponents } from '../../redux/ui'
 
-import { SceneInspector } from './SceneInspector'
-import { TransformInspector } from './TransformInspector'
 import { GltfInspector } from './GltfInspector'
 import { ActionInspector } from './ActionInspector'
 import { TriggerInspector } from './TriggerInspector'
-import { TextShapeInspector } from './TextShapeInspector'
+import { MaterialInspector } from './MaterialInspector'
+import { MeshColliderInspector } from './MeshColliderInspector'
 import { MeshRendererInspector } from './MeshRendererInspector'
+import { SceneInspector } from './SceneInspector'
+import { TextShapeInspector } from './TextShapeInspector'
+import { TransformInspector } from './TransformInspector'
 
 import './EntityInspector.css'
 
@@ -47,13 +49,15 @@ export const EntityInspector = withSdk(({ sdk }) => {
 
   const inspectors = useMemo(
     () => [
-      { name: sdk.components.Scene.componentName, component: SceneInspector },
-      { name: sdk.components.Transform.componentName, component: TransformInspector },
-      { name: sdk.components.GltfContainer.componentName, component: GltfInspector },
       { name: sdk.components.Actions.componentName, component: ActionInspector },
-      { name: sdk.components.Triggers.componentName, component: TriggerInspector },
+      { name: sdk.components.GltfContainer.componentName, component: GltfInspector },
+      { name: sdk.components.Material.componentName, component: MaterialInspector },
+      { name: sdk.components.MeshCollider.componentName, component: MeshColliderInspector },
+      { name: sdk.components.MeshRenderer.componentName, component: MeshRendererInspector },
+      { name: sdk.components.Scene.componentName, component: SceneInspector },
       { name: sdk.components.TextShape.componentName, component: TextShapeInspector },
-      { name: sdk.components.MeshRenderer.componentName, component: MeshRendererInspector }
+      { name: sdk.components.Transform.componentName, component: TransformInspector },
+      { name: sdk.components.Triggers.componentName, component: TriggerInspector }
     ],
     [sdk]
   )

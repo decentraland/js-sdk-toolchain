@@ -86,8 +86,16 @@ export default withSdk<Props>(
           <TextField type="text" {...getInputProps('src')} />
         </Block>
         <Block label="Collision">
-          <SelectField label="Visible layer" options={COLLISION_LAYERS} {...getInputProps('visibleMeshesCollisionMask')} />
-          <SelectField label="Invisible layer" options={COLLISION_LAYERS} {...getInputProps('invisibleMeshesCollisionMask')} />
+          <SelectField
+            label="Visible layer"
+            options={COLLISION_LAYERS}
+            {...getInputProps('visibleMeshesCollisionMask')}
+          />
+          <SelectField
+            label="Invisible layer"
+            options={COLLISION_LAYERS}
+            {...getInputProps('invisibleMeshesCollisionMask')}
+          />
         </Block>
       </Container>
     )
