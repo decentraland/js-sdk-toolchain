@@ -12,7 +12,7 @@ export function isLastWriteWinComponent<T = unknown>(
   return !!(component as LastWriteWinElementSetComponentDefinition<unknown>).createOrReplace
 }
 
-const getComponentValue = <T>(entity: Entity, component: Component<T>): DeepReadonly<T> =>
+export const getComponentValue = <T>(entity: Entity, component: Component<T>): DeepReadonly<T> =>
   (isLastWriteWinComponent(component)
     ? component.getOrNull(entity) || component.schema.create()
     : component.get(entity)) as DeepReadonly<T>

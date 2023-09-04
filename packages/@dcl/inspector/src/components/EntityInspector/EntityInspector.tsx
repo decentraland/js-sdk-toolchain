@@ -12,6 +12,8 @@ import { getHiddenComponents } from '../../redux/ui'
 import { SceneInspector } from './SceneInspector'
 import { TransformInspector } from './TransformInspector'
 import { GltfInspector } from './GltfInspector'
+import { ActionInspector } from './ActionInspector'
+import { TriggerInspector } from './TriggerInspector'
 import './EntityInspector.css'
 
 const getLabel = (sdk: SdkContextValue, entity: Entity | null) => {
@@ -44,7 +46,9 @@ export const EntityInspector = withSdk(({ sdk }) => {
     () => [
       { name: sdk.components.Scene.componentName, component: SceneInspector },
       { name: sdk.components.Transform.componentName, component: TransformInspector },
-      { name: sdk.components.GltfContainer.componentName, component: GltfInspector }
+      { name: sdk.components.GltfContainer.componentName, component: GltfInspector },
+      { name: sdk.components.Actions.componentName, component: ActionInspector },
+      { name: sdk.components.Triggers.componentName, component: TriggerInspector }
     ],
     [sdk]
   )

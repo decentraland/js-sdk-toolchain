@@ -5,6 +5,7 @@ const { future } = require('fp-future')
 const { builtinModules } = require('module')
 const path = require('path')
 const fs = require('fs')
+const dotenv = require('dotenv')
 
 const WATCH_MODE = process.argv.includes('--watch')
 const PRODUCTION = process.argv.includes('--production')
@@ -33,7 +34,8 @@ async function main() {
     banner: {
       // prepend hot-reload script to the bundle when in development mode
       js: PRODUCTION ? '' : `;(() => {${fs.readFileSync(path.resolve(__dirname, './hot-reload.js'), 'utf-8')}})();`
-    }
+    },
+    define: {...getEnvVars()}
   })
 
   if (WATCH_MODE) {
@@ -128,4 +130,15 @@ function getNotBundledModules() {
   // now remove the ESM dependencies
   const esmModulesToBundle = ['@dcl/sdk', '@dcl/ecs', '@dcl/mini-rpc']
   return Array.from(externalModules).concat(builtinModules).filter($ => !esmModulesToBundle.includes($))
+}
+
+function getEnvVars() {
+  const envVars = {}
+  dotenv.config()
+
+  for (const env in process.env) {
+    envVars[`process.env.${env}`] = JSON.stringify(process.env[env] ?? true)
+  }
+
+  return envVars
 }

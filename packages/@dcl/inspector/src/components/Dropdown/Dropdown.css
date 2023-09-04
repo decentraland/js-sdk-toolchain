@@ -1,0 +1,19 @@
+.DropdownContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.DropdownContainer label {
+  margin: 0px 0px 2px 0px;
+  color: var(--sub-text);
+  font-size: 12px;
+}
+
+.DropdownContainer .Dropdown {
+  padding: 2px 3px;
+  border: 1px solid var(--border-gray);
+  display: flex;
+  border-radius: 1.6px;
+  font-size: 12px;
+  height: 25px;
+}

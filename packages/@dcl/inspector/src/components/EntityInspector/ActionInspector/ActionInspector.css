@@ -1,0 +1,29 @@
+.ActionInspector > .content {
+  display: flex;
+  flex-direction: column;
+}
+
+.ActionInspector .content .AddButton {
+  align-self: flex-end;
+  margin-top: 10px;
+}
+
+.ActionInspector .content .RemoveButton {
+  height: 100%;
+  background-color: transparent;
+  border-color: transparent;
+  color: white;
+}
+
+.ActionInspector .content .Block .content {
+  gap: 15px;
+  align-items: flex-end;
+}
+
+.ActionInspector .content .Block .content .TextField {
+  height: 25px;
+}
+
+.ActionInspector .content .Block .content .DropdownContainer {
+  flex: 1;
+}
