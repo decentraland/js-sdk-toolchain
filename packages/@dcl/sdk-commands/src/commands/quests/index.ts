@@ -1,5 +1,4 @@
 import { Result } from 'arg'
-import fetch from 'node-fetch'
 import { isAddress } from 'eth-connect'
 import { validate } from 'uuid'
 import { declareArgs } from '../../logic/args'
@@ -9,6 +8,7 @@ import { CreateQuest } from './types'
 import { colors } from '../../components/log'
 import { CliError } from '../../logic/error'
 import { LinkerdAppOptions } from '../../linker-dapp/api'
+import { printError, printSuccess } from '../../logic/beautiful-logs'
 
 interface Options {
   args: Result<typeof args>
@@ -137,7 +137,7 @@ async function executeCreateSubcommand(
     },
     async (authchainHeaders) => {
       try {
-        const res = await fetch(createURL, {
+        const res = await components.fetch.fetch(createURL, {
           method: 'POST',
           headers: {
             ...authchainHeaders,
@@ -145,14 +145,10 @@ async function executeCreateSubcommand(
           },
           body: JSON.stringify(quest)
         })
-        const questsId: { id: string } = await res.json()
-        logger.log(' ')
-        logger.log(
-          `${colors.greenBright(`> Your Quest: ${quest!.name} was created successfully - ID:`)} ${questsId.id}`
-        )
-        logger.log(' ')
+        const questsId = (await res.json()) as { id: string }
+        printSuccess(logger, `> Your Quest: ${quest!.name} was created successfully - ID: ${questsId.id}`, '')
       } catch (error) {
-        logger.error('> Error returned by Quests Server: ', error as any)
+        printError(logger, '> Error returned by Quests Server: ', error as any)
       }
     }
   )
@@ -178,23 +174,22 @@ async function executeListSubcommand(
     { url: getQuests, method: 'GET', metadata: {}, actionType: 'list' },
     async (authchainHeaders) => {
       try {
-        const res = await fetch(getQuests, {
+        const res = await components.fetch.fetch(getQuests, {
           method: 'GET',
           headers: {
             ...authchainHeaders,
             'Content-Type': 'application/json'
           }
         })
-        const { quests }: { quests: { id: string; name: string }[] } = await res.json()
-        logger.log(' ')
-        logger.log(colors.greenBright("Your request has been processed successfully. Your Quests' list is below: "))
+        const { quests } = (await res.json()) as { quests: { id: string; name: string }[] }
+        printSuccess(logger, "Your request has been processed successfully. Your Quests' list is below: ", '')
         quests.forEach((quest) => {
           logger.log(' ')
           logger.log(`${colors.greenBright('ID: ')} ${quest.id} - ${colors.greenBright('Name: ')} ${quest.name}`)
         })
         logger.log(' ')
       } catch (error) {
-        logger.error('> Error returned by Quests Server: ', error as any)
+        printError(logger, '> Error returned by Quests Server: ', error as any)
       }
     }
   )
@@ -220,7 +215,7 @@ async function executeActivateSubcommand(
     { url: activateQuest, method: 'PUT', metadata: {}, actionType: 'activate', extraData: { questId } },
     async (authchainHeaders) => {
       try {
-        const res = await fetch(activateQuest, {
+        const res = await components.fetch.fetch(activateQuest, {
           method: 'PUT',
           headers: {
             ...authchainHeaders,
@@ -228,12 +223,10 @@ async function executeActivateSubcommand(
           }
         })
         if (res.status === 202) {
-          logger.log(' ')
-          logger.log(colors.greenBright('Your Quest is active again!'))
+          printSuccess(logger, 'Your Quest is active again!', '')
         }
-        logger.log(' ')
       } catch (error) {
-        logger.error('> Error returned by Quests Server: ', error as any)
+        printError(logger, '> Error returned by Quests Server: ', error as any)
       }
     }
   )
@@ -259,7 +252,7 @@ async function executeDeactivateSubcommand(
     { url: deactivateQuest, method: 'DELETE', metadata: {}, actionType: 'deactivate', extraData: { questId } },
     async (authchainHeaders) => {
       try {
-        const res = await fetch(deactivateQuest, {
+        const res = await components.fetch.fetch(deactivateQuest, {
           method: 'DELETE',
           headers: {
             ...authchainHeaders,
@@ -267,12 +260,10 @@ async function executeDeactivateSubcommand(
           }
         })
         if (res.status === 202) {
-          logger.log(' ')
-          logger.log(colors.yellowBright('Your Quest was deactivated'))
+          printSuccess(logger, 'Your Quest was deactivated', '')
         }
-        logger.log(' ')
       } catch (error) {
-        logger.error('> Error returned by Quests Server: ', error as any)
+        printError(logger, '> Error returned by Quests Server: ', error as any)
       }
     }
   )
