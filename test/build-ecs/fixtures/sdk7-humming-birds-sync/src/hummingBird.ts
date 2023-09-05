@@ -18,14 +18,6 @@ import { NetworkEntityFactory } from '@dcl/sdk/network-transport/types'
 
 export const Bird = engine.defineComponent('bird', {})
 
-engine.addSystem(() => {
-  for (const [entity] of engine.getEntitiesWith(Bird, PointerEvents)) {
-    if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity)) {
-      engine.removeEntity(entity)
-    }
-  }
-})
-
 export function createHummingBird(engine: NetworkEntityFactory) {
   const bird = engine.addEntity()
   Bird.create(bird)
@@ -76,9 +68,25 @@ export function createHummingBird(engine: NetworkEntityFactory) {
       { eventType: PointerEventType.PET_DOWN, eventInfo: { button: InputAction.IA_POINTER, hoverText: 'KILL' } }
     ]
   })
+}
 
-  // fly pattern
-  utils.timers.setInterval(() => {
+// System to shoot birds
+export function shootBirds() {
+  for (const [entity] of engine.getEntitiesWith(Bird, PointerEvents)) {
+    if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity)) {
+      engine.removeEntity(entity)
+    }
+  }
+}
+
+// System to move birds
+let birdsTime = 0
+export function moveHummingBirds(dt: number) {
+  birdsTime += dt
+  if (birdsTime <= 4) return
+  birdsTime = 0
+  console.log('Running move')
+  for (const [bird] of engine.getEntitiesWith(Bird)) {
     const birdTransform = Transform.getMutableOrNull(bird)
     if (!birdTransform) return
 
@@ -107,7 +115,7 @@ export function createHummingBird(engine: NetworkEntityFactory) {
       () => randomHeadMovement(bird),
       2500 // after rotation and translation + pause
     )
-  }, 4000) // loop every 4 seconds
+  }
 }
 
 // Randomly determine if any head moving animations are played

@@ -36,7 +36,10 @@ export function setupUi() {
               src: 'images/scene-thumbnail.png'
             }
           }}
-          uiText={{ value: 'HummingBirds Sync', fontSize: 18 }}
+          uiText={{
+            value: `HummingBirds Sync`,
+            fontSize: 18
+          }}
         />
         <Label
           value={`# Birds: ${[...engine.getEntitiesWith(Bird, PointerEvents)].length}`}

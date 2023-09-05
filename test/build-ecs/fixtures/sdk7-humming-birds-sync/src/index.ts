@@ -11,14 +11,24 @@ import {
 import { getRealm } from '~system/Runtime'
 import { createNetworkTransport } from '@dcl/sdk/network-transport'
 
-import { createHummingBird } from './hummingBird'
+import { createHummingBird, moveHummingBirds, shootBirds } from './hummingBird'
 import { setupUi } from './ui'
+import { isServer } from '~system/EngineApi'
 
 export async function main() {
   const realm = await getRealm({})
-  const serverUrl = realm.realmInfo?.isPreview ? 'ws://127.0.0.1:3000/ws' : 'wss://scene-state-server.decentraland.org/ws'
+  const server = isServer && !!(await isServer({})).isServer
+  const serverUrl = realm.realmInfo?.isPreview
+    ? 'ws://127.0.0.1:3000/ws'
+    : 'wss://scene-state-server.decentraland.org/ws'
   const networkEntityFactory = await createNetworkTransport(serverUrl)
   setupUi()
+
+  if (server) {
+    engine.addSystem(moveHummingBirds)
+  } else {
+    engine.addSystem(shootBirds)
+  }
 
   const ground = engine.addEntity()
 
