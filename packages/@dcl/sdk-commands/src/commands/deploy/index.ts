@@ -2,6 +2,7 @@ import { resolve } from 'path'
 import { EntityType, ChainId, getChainName } from '@dcl/schemas'
 import { Authenticator } from '@dcl/crypto'
 import { DeploymentBuilder } from 'dcl-catalyst-client'
+import future from 'fp-future'
 
 import { CliComponents } from '../../components'
 import { getBaseCoords, getFiles, getValidSceneJson, validateFilesSizes } from '../../logic/scene-validations'
@@ -14,8 +15,7 @@ import { Result } from 'arg'
 import { getAddressAndSignature, getCatalyst, sceneHasWorldCfg } from './utils'
 import { buildScene } from '../build'
 import { getValidWorkspace } from '../../logic/workspace-validations'
-import { LinkerResponse } from './linker-dapp/api'
-import future from 'fp-future'
+import { LinkerResponse } from '../../linker-dapp/api'
 
 interface Options {
   args: Result<typeof args>
@@ -129,12 +129,11 @@ export async function main(options: Options) {
     messageToSign,
     sceneJson,
     files,
+    !!options.args['--skip-validations'] || !!options.args['--target'] || !!options.args['--target-content'],
     {
       openBrowser,
       linkerPort,
-      isHttps: !!options.args['--https'],
-      skipValidations:
-        !!options.args['--skip-validations'] || !!options.args['--target'] || !!options.args['--target-content']
+      isHttps: !!options.args['--https']
     },
     deployEntity
   )
