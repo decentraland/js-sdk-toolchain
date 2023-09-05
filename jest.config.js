@@ -32,22 +32,10 @@ module.exports = {
       lines: 0,
       statements: 0,
     },
-    "packages/@dcl/sdk-commands/src/commands/deploy/utils.ts": {
-      branches: 0,
-      functions: 0,
-      lines: 0,
-      statements: 0,
-    },
     "packages/@dcl/sdk-commands/src/commands/export-static": {
       branches: 80,
     },
     "packages/@dcl/sdk-commands/src/commands/start": {
-      branches: 0,
-      functions: 0,
-      lines: 0,
-      statements: 0,
-    },
-    "packages/@dcl/sdk-commands/src/commands/quest": {
       branches: 0,
       functions: 0,
       lines: 0,
