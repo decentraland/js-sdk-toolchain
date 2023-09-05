@@ -6,7 +6,8 @@ import {
   RESERVED_STATIC_ENTITIES,
   RESERVED_LOCAL_ENTITIES,
   SyncEntity,
-  CrdtMessageType
+  CrdtMessageType,
+  EntityUtils
 } from '@dcl/ecs'
 import { MessageType } from './types'
 import { connected } from '.'
@@ -35,14 +36,17 @@ export function syncFilter(message: Omit<TransportMessage, 'messageBuffer'>) {
     return false
   }
 
+  const [entityId] = EntityUtils.fromEntityId(message.entityId)
+
   // filter messages from reserved entities.
-  if (message.entityId <= RESERVED_STATIC_ENTITIES) {
+  if (entityId <= RESERVED_STATIC_ENTITIES) {
     return false
   }
 
-  if (message.entityId <= RESERVED_LOCAL_ENTITIES) {
+  if (entityId <= RESERVED_LOCAL_ENTITIES) {
     return false
   }
+
   // Network Entity Always
   if (message.type === CrdtMessageType.DELETE_ENTITY) {
     return true

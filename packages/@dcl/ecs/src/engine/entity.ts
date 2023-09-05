@@ -46,7 +46,7 @@ export const RESERVED_STATIC_ENTITIES = 512
 export let RESERVED_LOCAL_ENTITIES = MAX_ENTITY_NUMBER
 
 /**
- * @internal
+ * @public
  */
 export namespace EntityUtils {
   /**
@@ -159,7 +159,7 @@ export function EntityContainer(): EntityContainer {
     }
 
     // If all entities until `entityCounter` are being used, we need to generate another one
-    if (usedEntities.size + RESERVED_STATIC_ENTITIES >= entityCounter) {
+    if (!networked && usedEntities.size + RESERVED_STATIC_ENTITIES >= entityCounter) {
       return generateNewEntity(networked)
     }
 
@@ -178,7 +178,7 @@ export function EntityContainer(): EntityContainer {
       }
     }
 
-    return generateNewEntity()
+    return generateNewEntity(networked)
   }
 
   function removeEntity(entity: Entity) {
