@@ -38,7 +38,7 @@ module.exports = isE2E ? {
   testMatch: ["**/*.spec.(ts)"],
   testEnvironment: "jsdom",
   transformIgnorePatterns: [
-    `/node_modules/(?!(@babylonjs)|(@dcl/ecs-math))`,
+    `/node_modules/(?!(@babylonjs)|(@dcl/ecs-math)|(@dcl/asset-packs)|(@dcl/sdk)|(@dcl/ecs))`,
     ],
     setupFiles: ['./test/setup.ts']
 }
