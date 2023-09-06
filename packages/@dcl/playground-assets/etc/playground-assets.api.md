@@ -916,6 +916,14 @@ export enum EntityState {
     UsedEntity = 1
 }
 
+// @public (undocumented)
+export namespace EntityUtils {
+    // (undocumented)
+    export function fromEntityId(entityId: Entity): [number, number];
+    // (undocumented)
+    export function toEntityId(entityNumber: number, entityVersion: number): Entity;
+}
+
 // @public
 export const Epsilon = 0.000001;
 
