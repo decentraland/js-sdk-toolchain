@@ -10,3 +10,8 @@ input[type=number] {
   -moz-appearance: textfield;
   appearance: none;
 }
+
+.ui.popup,
+.ui.inverted.popup {
+  height: auto;
+}
