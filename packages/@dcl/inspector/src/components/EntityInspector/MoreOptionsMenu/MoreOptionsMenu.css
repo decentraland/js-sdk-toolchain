@@ -3,11 +3,12 @@
   width: auto;
 }
 
-.MoreOptionsMenu .MoreOptionsButton {
+.MoreOptionsMenu .MoreOptionsButton.Button {
   background-color: transparent;
   border-color: transparent;
   color: white;
   transform: rotate(90deg);
+  padding: 0;
 }
 
 .MoreOptionsMenu .MoreOptionsButton.Button:hover:not(:disabled) {
