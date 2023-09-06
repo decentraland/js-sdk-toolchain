@@ -39,11 +39,11 @@ export function syncFilter(message: Omit<TransportMessage, 'messageBuffer'>) {
   const [entityId] = EntityUtils.fromEntityId(message.entityId)
 
   // filter messages from reserved entities.
-  if (entityId <= RESERVED_STATIC_ENTITIES) {
+  if (entityId < RESERVED_STATIC_ENTITIES) {
     return false
   }
 
-  if (entityId <= RESERVED_LOCAL_ENTITIES) {
+  if (entityId < RESERVED_LOCAL_ENTITIES) {
     return false
   }
 
