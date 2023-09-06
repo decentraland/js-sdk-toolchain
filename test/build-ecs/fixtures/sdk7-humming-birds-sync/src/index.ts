@@ -6,6 +6,8 @@ import {
   GltfContainer,
   InputAction,
   pointerEventsSystem,
+  Schemas,
+  SyncEntity,
   Transform
 } from '@dcl/sdk/ecs'
 import { getRealm } from '~system/Runtime'
@@ -14,7 +16,16 @@ import { createNetworkTransport } from '@dcl/sdk/network-transport'
 import { createHummingBird, moveHummingBirds, shootBirds } from './hummingBird'
 import { setupUi } from './ui'
 import { isServer } from '~system/EngineApi'
-import userIdentity from '~system/UserIdentity'
+import { getUserData } from '~system/UserIdentity'
+import { NetworkEntityFactory } from '@dcl/sdk/network-transport/types'
+
+export const GameStatus = engine.defineComponent('game-status', { paused: Schemas.Boolean })
+
+function gameStatusServer(networkEntityFactory: NetworkEntityFactory) {
+  const gameEntity = networkEntityFactory.addEntity()
+  GameStatus.create(gameEntity, { paused: false })
+  SyncEntity.create(gameEntity, { componentIds: [GameStatus.componentId] })
+}
 
 export async function main() {
   const realm = await getRealm({})
@@ -23,13 +34,14 @@ export async function main() {
     ? 'ws://127.0.0.1:3000/ws/localScene'
     : 'wss://scene-state-server.decentraland.org/ws/boedo.dcl.eth'
   const networkEntityFactory = await createNetworkTransport(serverUrl)
+  const userId = (await getUserData({})).data?.userId ?? ''
 
-  setupUi()
+  setupUi(userId)
 
   if (server) {
     engine.addSystem(moveHummingBirds)
+    gameStatusServer(networkEntityFactory)
   } else {
-    const userId = (userIdentity?.getUserData && (await userIdentity.getUserData({})).data?.userId) || ''
     engine.addSystem(shootBirds(userId))
   }
 
