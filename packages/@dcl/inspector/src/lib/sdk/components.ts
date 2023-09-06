@@ -8,8 +8,7 @@ import {
   TransformComponentExtended
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
-import { Action, Actions as AvailableActions } from '../../components/EntityInspector/ActionInspector/types'
-import { Trigger, Triggers as AvailableTriggers } from '../../components/EntityInspector/TriggerInspector/types'
+import { Action, ComponentName, Trigger, createComponents as createAssetPacksComponents } from '@dcl/asset-packs'
 import { Layout } from '../utils/layout'
 import { GizmoType } from '../utils/gizmo'
 
@@ -20,8 +19,8 @@ export enum EditorComponentNames {
   Selection = 'inspector::Selection',
   Scene = 'inspector::Scene',
   Nodes = 'inspector::Nodes',
-  Actions = 'inspector::Actions',
-  Triggers = 'inspector::Triggers'
+  Actions = ComponentName.ACTIONS,
+  Triggers = ComponentName.TRIGGERS
 }
 
 export type EditorComponentsTypes = {
@@ -94,25 +93,13 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     )
   })
 
-  const Actions = engine.defineComponent(EditorComponentNames.Actions, {
-    value: Schemas.Array(
-      Schemas.Map({
-        name: Schemas.String,
-        type: Schemas.EnumString<AvailableActions>(AvailableActions, AvailableActions.PLAY_ANIMATION),
-        animation: Schemas.Optional(Schemas.String)
-      })
-    )
-  })
+  const { Actions, Triggers } = createAssetPacksComponents(engine as any)
 
-  const Triggers = engine.defineComponent(EditorComponentNames.Triggers, {
-    value: Schemas.Array(
-      Schemas.Map({
-        type: Schemas.EnumString<AvailableTriggers>(AvailableTriggers, AvailableTriggers.ON_CLICK),
-        entity: Schemas.Optional(Schemas.Entity),
-        action: Schemas.Optional(Schemas.String)
-      })
-    )
-  })
-
-  return { Selection, Scene, Nodes, Actions, Triggers }
+  return {
+    Selection,
+    Scene,
+    Nodes,
+    Actions: Actions as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Actions']>,
+    Triggers: Triggers as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Triggers']>
+  }
 }

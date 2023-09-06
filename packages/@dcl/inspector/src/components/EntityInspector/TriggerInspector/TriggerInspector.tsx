@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Entity } from '@dcl/ecs'
 import { Item } from 'react-contexify'
 import { AiFillDelete as DeleteIcon, AiOutlinePlus as AddIcon, AiOutlineMinus as RemoveIcon } from 'react-icons/ai'
+import { Action, Trigger, TriggerType } from '@dcl/asset-packs'
 
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { withContextMenu } from '../../../hoc/withContextMenu'
@@ -16,8 +17,7 @@ import { Container } from '../../Container'
 import { ContextMenu } from '../../ContexMenu'
 import { Dropdown } from '../../Dropdown'
 
-import { Action, Actions as AvailableActions } from '../ActionInspector/types'
-import { Trigger, Triggers as AvailableTriggers, Props } from './types'
+import { Props } from './types'
 
 import './TriggerInspector.css'
 
@@ -69,7 +69,7 @@ export default withSdk<Props>(
 
     const handleAddNewTrigger = useCallback(() => {
       setTriggers((prev: Trigger[]) => {
-        return [...prev, { type: AvailableTriggers.ON_CLICK }]
+        return [...prev, { type: TriggerType.ON_CLICK }]
       })
     }, [setTriggers])
 
@@ -79,7 +79,7 @@ export default withSdk<Props>(
           const data = [...prev]
           data[idx] = {
             ...data[idx],
-            type: value as AvailableTriggers
+            type: value as TriggerType
           }
           return data
         })
@@ -107,7 +107,7 @@ export default withSdk<Props>(
           const data = [...prev]
           data[idx] = {
             ...data[idx],
-            action: value as AvailableActions
+            action: value as TriggerType
           }
           return data
         })
@@ -140,7 +140,7 @@ export default withSdk<Props>(
             <Block key={`trigger-${idx}`}>
               <Dropdown
                 label={'Interaction'}
-                options={Object.values(AvailableTriggers).filter((v) => isNaN(Number(v))) as string[]}
+                options={Object.values(TriggerType).filter((v) => isNaN(Number(v))) as string[]}
                 value={trigger.type}
                 onChange={(e) => handleChangeType(e, idx)}
               />

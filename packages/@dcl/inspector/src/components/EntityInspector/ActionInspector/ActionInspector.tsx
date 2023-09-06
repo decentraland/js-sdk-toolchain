@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Item } from 'react-contexify'
 import { AiFillDelete as DeleteIcon, AiOutlinePlus as AddIcon, AiOutlineMinus as RemoveIcon } from 'react-icons/ai'
+import { Action, ActionType } from '@dcl/asset-packs'
 
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { withContextMenu } from '../../../hoc/withContextMenu'
@@ -15,7 +16,7 @@ import { ContextMenu } from '../../ContexMenu'
 import { Dropdown } from '../../Dropdown'
 import { TextField } from '../TextField'
 
-import { Action, Actions as AvailableActions, Props } from './types'
+import { Props } from './types'
 
 import './ActionInspector.css'
 
@@ -54,9 +55,9 @@ export default withSdk<Props>(
     }, [sdk.sceneContext.getEntityOrNull(entity)?.gltfAssetContainer])
 
     const availableActions: string[] = useMemo(() => {
-      return Object.values(AvailableActions).filter(
+      return Object.values(ActionType).filter(
         (action) =>
-          isNaN(Number(action)) && (entityAnimations.length === 0 ? action !== AvailableActions.PLAY_ANIMATION : true)
+          isNaN(Number(action)) && (entityAnimations.length === 0 ? action !== ActionType.PLAY_ANIMATION : true)
       )
     }, [entityAnimations])
 
@@ -67,7 +68,7 @@ export default withSdk<Props>(
 
     const handleAddNewAction = useCallback(() => {
       setActions((prev: Action[]) => {
-        return [...prev, { type: AvailableActions.PLAY_ANIMATION, name: '' }]
+        return [...prev, { type: ActionType.PLAY_ANIMATION, name: '' }]
       })
     }, [setActions])
 
@@ -91,7 +92,7 @@ export default withSdk<Props>(
           const data = [...prev]
           data[idx] = {
             ...data[idx],
-            type: value as AvailableActions
+            type: value as ActionType
           }
           return data
         })
@@ -159,7 +160,7 @@ export default withSdk<Props>(
                 value={action.type}
                 onChange={(e) => handleChangeType(e, idx)}
               />
-              {action.type === AvailableActions.PLAY_ANIMATION && entityAnimations.length > 0 ? (
+              {action.type === ActionType.PLAY_ANIMATION && entityAnimations.length > 0 ? (
                 <Dropdown
                   label={'Animations'}
                   options={[
