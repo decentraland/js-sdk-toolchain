@@ -8,7 +8,7 @@ export interface SyncType {
 
 function defineSyncComponent(engine: Pick<IEngine, 'defineComponent'>) {
   const Sync = engine.defineComponent('core-schema::Sync', {
-    componentIds: Schemas.Array(Schemas.Number)
+    componentIds: Schemas.Array(Schemas.Int64)
   })
   return Sync
 }
