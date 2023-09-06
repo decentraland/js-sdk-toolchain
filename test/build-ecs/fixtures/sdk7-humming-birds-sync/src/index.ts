@@ -20,8 +20,8 @@ export async function main() {
   const realm = await getRealm({})
   const server = isServer && !!(await isServer({})).isServer
   const serverUrl = realm.realmInfo?.isPreview
-    ? 'ws://127.0.0.1:3000/ws'
-    : 'wss://scene-state-server.decentraland.org/ws'
+    ? 'ws://127.0.0.1:3000/ws/localScene'
+    : 'wss://scene-state-server.decentraland.org/ws/boedo.dcl.eth'
   const networkEntityFactory = await createNetworkTransport(serverUrl)
 
   setupUi()
