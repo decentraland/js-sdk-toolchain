@@ -5,17 +5,21 @@ import { getHeaders } from '~system/SignedFetch'
 
 import { MessageType, NetworkEntityFactory, Socket } from './types'
 
-export async function createClientTransport(url: string): Promise<NetworkEntityFactory> {
+export type ClientTransportConfig = {
+  serverUrl: string
+}
+
+export async function createClientTransport({ serverUrl }: ClientTransportConfig): Promise<NetworkEntityFactory> {
   const messagesToProcess: Uint8Array[] = []
 
   return new Promise<NetworkEntityFactory>((resolve, reject) => {
     try {
-      const ws = new WebSocket(url) as Socket
+      const ws = new WebSocket(serverUrl) as Socket
       ws.binaryType = 'arraybuffer'
 
       ws.onopen = async () => {
         console.log('WS Server Sync connected')
-        const { headers } = await getHeaders({ url, init: { headers: {} } })
+        const { headers } = await getHeaders({ url: serverUrl, init: { headers: {} } })
         ws.send(craftMessage(MessageType.Auth, encodeString(JSON.stringify(headers))))
 
         const transport: Transport = {

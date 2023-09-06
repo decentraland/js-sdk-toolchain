@@ -2,12 +2,11 @@ import { engine, SyncEntity, Transport } from '@dcl/ecs'
 import { serializeCrdtMessages } from '../internal/transports/logger'
 import { engineToCrdt } from './state'
 import { syncFilter, createNetworkEntityFactory } from './utils'
-import { NetworkEntityFactory } from './types'
+import { NetworkEntityFactory, ServerTransportConfig } from './types'
 import { PlayersConnected } from '.'
 
-const connectedClients = new Set<string>()
-
-export async function createServerTransport(): Promise<NetworkEntityFactory> {
+export async function createServerTransport(config: ServerTransportConfig): Promise<NetworkEntityFactory> {
+  const connectedClients = new Set<string>()
   engine.addTransport({
     send: async (message) => {
       if (message.byteLength) {
@@ -16,7 +15,7 @@ export async function createServerTransport(): Promise<NetworkEntityFactory> {
     },
     filter: syncFilter
   })
-  globalThis.registerClientObserver((event) => {
+  globalThis.registerScene(config, (event) => {
     const { type } = event
     if (type === 'open') {
       const { clientId, client } = event
@@ -54,9 +53,10 @@ export async function createServerTransport(): Promise<NetworkEntityFactory> {
     PlayersConnected.createOrReplace(players, { usersId: [...connectedClients.values()].map(String) })
   })
 
-  // TODO: add this to the server context?
-  // This numbers should be fetched by the server
-  const networkEntityFactory = createNetworkEntityFactory(2560, [2561, 2560 + 512])
+  const networkEntityFactory = createNetworkEntityFactory(config.reservedLocalEntities, [
+    config.reservedLocalEntities,
+    config.reservedLocalEntities + config.networkEntitiesLimit.serverLimit
+  ])
   const players = networkEntityFactory.addEntity()
   SyncEntity.create(players, { componentIds: [PlayersConnected.componentId] })
   return networkEntityFactory
