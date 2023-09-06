@@ -1,4 +1,4 @@
-import { engine, PointerEvents } from '@dcl/sdk/ecs'
+import { engine, PointerEvents, Transform } from '@dcl/sdk/ecs'
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { Label, ReactEcsRenderer, UiEntity } from '@dcl/sdk/react-ecs'
 import { Bird, BirdKilled } from './hummingBird'
@@ -68,7 +68,6 @@ export function setupUi() {
               fontSize: 18
             }}
           />
-          {/* <Label value={`# Birds Created: `} fontSize={18} uiTransform={{ width: '100%', height: 40 }} /> */}
           <Label
             value={`# Birds Killed: ${[...engine.getEntitiesWith(BirdKilled)].length} / ${
               [...engine.getEntitiesWith(Bird, PointerEvents)].length

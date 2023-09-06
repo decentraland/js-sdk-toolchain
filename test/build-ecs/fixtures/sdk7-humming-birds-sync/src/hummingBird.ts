@@ -107,9 +107,9 @@ export function moveHummingBirds(dt: number) {
 
     // next target
     const nextPos = {
-      x: Math.random() * 24 + 2,
+      x: Math.random() * 40 + 2,
       y: Math.random() * 3 + 1,
-      z: Math.random() * 24 + 2
+      z: Math.random() * 40 + 2
     }
 
     const nextRot = Quaternion.fromLookAt(birdTransform.position, nextPos)
@@ -124,7 +124,7 @@ export function moveHummingBirds(dt: number) {
           birdEntity,
           birdTransform.position,
           nextPos,
-          2,
+          3.7,
           utils.InterpolationType.EASEINEXPO
         )
       },
