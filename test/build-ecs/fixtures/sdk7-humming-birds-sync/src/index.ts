@@ -30,15 +30,15 @@ export async function main() {
     engine.addSystem(moveHummingBirds)
   } else {
     const userId = (userIdentity?.getUserData && (await userIdentity.getUserData({})).data?.userId) || ''
-    engine.addSystem(shootBirds('userId'))
+    engine.addSystem(shootBirds(userId))
   }
 
   const ground = engine.addEntity()
 
   Transform.create(ground, {
-    position: { x: 8, y: 0, z: 8 },
+    position: { x: 24, y: 0, z: 24 },
     rotation: { x: 0, y: 0, z: 0, w: 0 },
-    scale: { x: 1.6, y: 1.6, z: 1.6 }
+    scale: { x: 4.8, y: 1.6, z: 4.8 }
   })
 
   GltfContainer.create(ground, {

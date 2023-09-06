@@ -11,7 +11,6 @@ import {
   SyncEntity,
   Transform,
   VisibilityComponent,
-  componentDefinitionByName,
   engine,
   inputSystem
 } from '@dcl/sdk/ecs'
@@ -108,9 +107,9 @@ export function moveHummingBirds(dt: number) {
 
     // next target
     const nextPos = {
-      x: Math.random() * 12 + 2,
+      x: Math.random() * 24 + 2,
       y: Math.random() * 3 + 1,
-      z: Math.random() * 12 + 2
+      z: Math.random() * 24 + 2
     }
 
     const nextRot = Quaternion.fromLookAt(birdTransform.position, nextPos)

@@ -44,14 +44,22 @@
     "ALLOW_TO_MOVE_PLAYER_INSIDE_SCENE"
   ],
   "featureToggles": {},
-  "scene": {
-    "base": "76,-9",
-    "parcels": [
-      "76,-9"
-    ]
-  },
   "name": "Hummingbirds",
-  "worldConfiguration" : {
+  "worldConfiguration": {
     "name": "boedo.dcl.eth"
+  },
+  "scene": {
+    "parcels": [
+      "0,0",
+      "0,1",
+      "0,2",
+      "1,0",
+      "1,1",
+      "1,2",
+      "2,0",
+      "2,1",
+      "2,2"
+    ],
+    "base": "0,0"
   }
 }

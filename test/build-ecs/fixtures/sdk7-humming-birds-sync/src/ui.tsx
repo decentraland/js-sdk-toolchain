@@ -2,14 +2,24 @@ import { engine, PointerEvents } from '@dcl/sdk/ecs'
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { Label, ReactEcsRenderer, UiEntity } from '@dcl/sdk/react-ecs'
 import { Bird, BirdKilled } from './hummingBird'
+import { PlayersConnected } from '@dcl/sdk/network-transport'
 
 let scoreBoard: [string, number][] = []
 let scoreInterval = 0
+let playersConnected: number
+
 engine.addSystem((dt: number) => {
   scoreInterval += dt
   if (scoreInterval <= 1) return
   scoreInterval = 0
   const internalScoreBoard = new Map<string, number>()
+
+  // Look for the players connected
+  for (const [_, players] of engine.getEntitiesWith(PlayersConnected)) {
+    playersConnected = players.usersId.length
+  }
+
+  // Create the score board for the birds killed
   for (const [_, bird] of engine.getEntitiesWith(BirdKilled)) {
     internalScoreBoard.set(bird.userId, (internalScoreBoard.get(bird.userId) ?? 0) + 1)
   }
@@ -54,7 +64,7 @@ export function setupUi() {
               }
             }}
             uiText={{
-              value: `HummingBirds Sync`,
+              value: `Players: ${playersConnected ?? 0}`,
               fontSize: 18
             }}
           />
