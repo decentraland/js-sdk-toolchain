@@ -12,7 +12,7 @@
     "name": "Lean",
     "email": ""
   },
-  "main": "bin/game.js",
+  "main": "bin/index.js",
   "tags": [],
   "spawnPoints": [
     {
