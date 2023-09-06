@@ -1,0 +1,31 @@
+.MoreOptionsMenu {
+  position: relative;
+  width: auto;
+}
+
+.MoreOptionsMenu .MoreOptionsButton {
+  background-color: transparent;
+  border-color: transparent;
+  color: white;
+  transform: rotate(90deg);
+}
+
+.MoreOptionsMenu .MoreOptionsButton.Button:hover:not(:disabled) {
+  background-color: transparent;
+}
+
+.MoreOptionsMenu .MoreOptionsContent {
+  position: absolute;
+  right: 0;
+  padding: 8px 0px;
+  border-radius: 2px;
+  background: #3c3c3c;
+  min-width: 175px;
+  z-index: 1;
+}
+
+.MoreOptionsMenu .MoreOptionsContent .RemoveButton {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
