@@ -1,6 +1,5 @@
 import type { Entity } from '@dcl/ecs'
-import type { Action } from '../../ActionInspector/types'
-import type { TriggerAction } from '../types'
+import type { Action, TriggerAction } from '@dcl/asset-packs'
 
 export type Props = {
   action: TriggerAction

@@ -1,4 +1,4 @@
-import type { Trigger } from '../types'
+import type { Trigger } from '@dcl/asset-packs'
 
 export type Props = {
   trigger: Trigger

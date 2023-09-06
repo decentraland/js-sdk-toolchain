@@ -1,4 +1,5 @@
 import React from 'react'
+import { TriggerType } from '@dcl/asset-packs'
 import { VscAdd as AddIcon, VscTrash as RemoveIcon } from 'react-icons/vsc'
 
 import { Block } from '../../../Block'
@@ -6,7 +7,6 @@ import Button from '../../../Button'
 import { Dropdown } from '../../../Dropdown'
 import MoreOptionsMenu from '../../MoreOptionsMenu'
 
-import { Triggers as AvailableTriggers } from '../types'
 import type { Props } from './types'
 
 import './TriggerEvent.css'
@@ -31,7 +31,7 @@ export const TriggerEvent = ({
         </div>
       </div>
       <Dropdown
-        options={Object.values(AvailableTriggers).filter((v) => isNaN(Number(v))) as string[]}
+        options={Object.values(TriggerType).filter((v) => isNaN(Number(v))) as string[]}
         value={trigger.type}
         onChange={onChangeTriggerType}
       />
