@@ -7,8 +7,11 @@ import {
   MeshCollider,
   PointerEventType,
   PointerEvents,
+  Schemas,
   SyncEntity,
   Transform,
+  VisibilityComponent,
+  componentDefinitionByName,
   engine,
   inputSystem
 } from '@dcl/sdk/ecs'
@@ -18,10 +21,16 @@ import { NetworkEntityFactory } from '@dcl/sdk/network-transport/types'
 
 export const Bird = engine.defineComponent('bird', {})
 
+// TODO: this BirdKilled should be added by the server but its not part of this POC
+export const BirdKilled = engine.defineComponent('bird-killed', { userId: Schemas.String })
+
 export function createHummingBird(engine: NetworkEntityFactory) {
   const bird = engine.addEntity()
   Bird.create(bird)
-  SyncEntity.create(bird, { componentIds: [Transform.componentId, Animator.componentId] })
+  SyncEntity.create(bird, {
+    componentIds: [Transform.componentId, Animator.componentId, VisibilityComponent.componentId, BirdKilled.componentId]
+  })
+  VisibilityComponent.create(bird, { visible: true })
   Transform.create(bird, {
     position: { x: 13, y: 3.5, z: 5 },
     rotation: { x: 0, y: 0, z: 0, w: 1 },
@@ -71,10 +80,17 @@ export function createHummingBird(engine: NetworkEntityFactory) {
 }
 
 // System to shoot birds
-export function shootBirds() {
-  for (const [entity] of engine.getEntitiesWith(Bird, PointerEvents)) {
-    if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity)) {
-      engine.removeEntity(entity)
+export function shootBirds(userId: string) {
+  return function () {
+    for (const [entity, _bird, visibleComponent] of engine.getEntitiesWith(Bird, VisibilityComponent, PointerEvents)) {
+      if (
+        inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity) &&
+        visibleComponent.visible &&
+        !BirdKilled.has(entity)
+      ) {
+        VisibilityComponent.getMutable(entity).visible = false
+        BirdKilled.create(entity, { userId })
+      }
     }
   }
 }
@@ -85,10 +101,10 @@ export function moveHummingBirds(dt: number) {
   birdsTime += dt
   if (birdsTime <= 4) return
   birdsTime = 0
-  console.log('Running move')
-  for (const [bird] of engine.getEntitiesWith(Bird)) {
-    const birdTransform = Transform.getMutableOrNull(bird)
-    if (!birdTransform) return
+
+  for (const [birdEntity, _bird, visibleComponent] of engine.getEntitiesWith(Bird, VisibilityComponent)) {
+    const birdTransform = Transform.getMutableOrNull(birdEntity)
+    if (!birdTransform || !visibleComponent.visible) continue
 
     // next target
     const nextPos = {
@@ -100,19 +116,25 @@ export function moveHummingBirds(dt: number) {
     const nextRot = Quaternion.fromLookAt(birdTransform.position, nextPos)
 
     // face new pos
-    utils.tweens.startRotation(bird, birdTransform.rotation, nextRot, 0.3, utils.InterpolationType.EASEINSINE)
+    utils.tweens.startRotation(birdEntity, birdTransform.rotation, nextRot, 0.3, utils.InterpolationType.EASEINSINE)
 
     // move to next pos (after rotating)
     utils.timers.setTimeout(
       () => {
-        utils.tweens.startTranslation(bird, birdTransform.position, nextPos, 2, utils.InterpolationType.EASEINEXPO)
+        utils.tweens.startTranslation(
+          birdEntity,
+          birdTransform.position,
+          nextPos,
+          2,
+          utils.InterpolationType.EASEINEXPO
+        )
       },
       300 // after rotation is over
     )
 
     // randomly play head animation
     utils.timers.setTimeout(
-      () => randomHeadMovement(bird),
+      () => randomHeadMovement(birdEntity),
       2500 // after rotation and translation + pause
     )
   }
