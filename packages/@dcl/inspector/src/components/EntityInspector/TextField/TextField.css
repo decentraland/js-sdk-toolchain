@@ -1,9 +1,10 @@
 .TextField {
   padding: 2px 3px;
-  border: 1px solid var(--border-gray);
+  background-color: var(--background-gray);
+  border: 1px solid var(--background-gray);
   display: flex;
   margin-right: 8px;
-  border-radius: 1.6px;
+  border-radius: 5px;
   flex-grow: 1;
   width: 0;
   font-size: 12px;
@@ -13,13 +14,13 @@
   border-color: var(--border-focused);
 }
 
-.TextField>label {
+.TextField > label {
   color: var(--secondary-text);
   display: block;
   margin-right: 8px;
 }
 
-.TextField>input {
+.TextField > input {
   width: 100%;
   color: var(--text);
   background-color: var(--transparent);
