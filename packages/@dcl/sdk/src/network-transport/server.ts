@@ -1,8 +1,9 @@
-import { engine, Transport } from '@dcl/ecs'
+import { engine, SyncEntity, Transport } from '@dcl/ecs'
 import { serializeCrdtMessages } from '../internal/transports/logger'
 import { engineToCrdt } from './state'
 import { syncFilter, createNetworkEntityFactory } from './utils'
 import { NetworkEntityFactory } from './types'
+import { PlayersConnected } from '.'
 
 const connectedClients = new Set<string>()
 
@@ -50,9 +51,13 @@ export async function createServerTransport(): Promise<NetworkEntityFactory> {
     } else if (type === 'close') {
       connectedClients.delete(event.clientId)
     }
+    PlayersConnected.createOrReplace(players, { usersId: [...connectedClients.values()].map(String) })
   })
 
   // TODO: add this to the server context?
   // This numbers should be fetched by the server
-  return createNetworkEntityFactory(2560, [2560, 2560 + 512])
+  const networkEntityFactory = createNetworkEntityFactory(2560, [2561, 2560 + 512])
+  const players = networkEntityFactory.addEntity()
+  SyncEntity.create(players, { componentIds: [PlayersConnected.componentId] })
+  return networkEntityFactory
 }
