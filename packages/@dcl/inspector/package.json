@@ -24,7 +24,7 @@
     "@vscode/webview-ui-toolkit": "^1.2.2",
     "@well-known-components/pushable-channel": "^1.0.3",
     "classnames": "^2.3.2",
-    "decentraland-ui": "^3.87.2",
+    "decentraland-ui": "^4.10.0",
     "dotenv": "^16.3.1",
     "esbuild": "^0.18.17",
     "fp-future": "^1.0.1",
