@@ -136,19 +136,24 @@ async function executeCreateSubcommand(
       extraData: { questName: quest.name, createQuest: quest }
     },
     async (authchainHeaders) => {
-      try {
-        const res = await components.fetch.fetch(createURL, {
-          method: 'POST',
-          headers: {
-            ...authchainHeaders,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(quest)
-        })
+      const res = await components.fetch.fetch(createURL, {
+        method: 'POST',
+        headers: {
+          ...authchainHeaders,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(quest)
+      })
+      if (res.status === 201) {
         const questsId = (await res.json()) as { id: string }
         printSuccess(logger, `> Your Quest: ${quest!.name} was created successfully - ID: ${questsId.id}`, '')
-      } catch (error) {
-        printError(logger, '> Error returned by Quests Server: ', error as any)
+      } else {
+        const error = (await res.json()) as { code: number; message: string }
+        printError(
+          logger,
+          `> Error returned by Quests Server: `,
+          new Error(`Status Code: ${error.code} - Message: "${error.message}"`)
+        )
       }
     }
   )
@@ -173,23 +178,32 @@ async function executeListSubcommand(
     linkerOpts,
     { url: getQuests, method: 'GET', metadata: {}, actionType: 'list' },
     async (authchainHeaders) => {
-      try {
-        const res = await components.fetch.fetch(getQuests, {
-          method: 'GET',
-          headers: {
-            ...authchainHeaders,
-            'Content-Type': 'application/json'
-          }
-        })
+      const res = await components.fetch.fetch(getQuests, {
+        method: 'GET',
+        headers: {
+          ...authchainHeaders,
+          'Content-Type': 'application/json'
+        }
+      })
+      if (res.status === 200) {
         const { quests } = (await res.json()) as { quests: { id: string; name: string }[] }
-        printSuccess(logger, "Your request has been processed successfully. Your Quests' list is below: ", '')
-        quests.forEach((quest) => {
+        if (quests.length) {
+          printSuccess(logger, "Your request has been processed successfully. Your Quests' list is below: ", '')
+          quests.forEach((quest) => {
+            logger.log(' ')
+            logger.log(`${colors.greenBright('ID: ')} ${quest.id} - ${colors.greenBright('Name: ')} ${quest.name}`)
+          })
           logger.log(' ')
-          logger.log(`${colors.greenBright('ID: ')} ${quest.id} - ${colors.greenBright('Name: ')} ${quest.name}`)
-        })
-        logger.log(' ')
-      } catch (error) {
-        printError(logger, '> Error returned by Quests Server: ', error as any)
+        } else {
+          printSuccess(logger, `No Quest was created by ${address}`, '')
+        }
+      } else {
+        const error = (await res.json()) as { code: number; message: string }
+        printError(
+          logger,
+          `> Error returned by Quests Server: `,
+          new Error(`Status Code: ${error.code} - Message: "${error.message}"`)
+        )
       }
     }
   )
@@ -214,19 +228,22 @@ async function executeActivateSubcommand(
     linkerOpts,
     { url: activateQuest, method: 'PUT', metadata: {}, actionType: 'activate', extraData: { questId } },
     async (authchainHeaders) => {
-      try {
-        const res = await components.fetch.fetch(activateQuest, {
-          method: 'PUT',
-          headers: {
-            ...authchainHeaders,
-            'Content-Type': 'application/json'
-          }
-        })
-        if (res.status === 202) {
-          printSuccess(logger, 'Your Quest is active again!', '')
+      const res = await components.fetch.fetch(activateQuest, {
+        method: 'PUT',
+        headers: {
+          ...authchainHeaders,
+          'Content-Type': 'application/json'
         }
-      } catch (error) {
-        printError(logger, '> Error returned by Quests Server: ', error as any)
+      })
+      if (res.status === 202) {
+        printSuccess(logger, 'Your Quest is active again!', '')
+      } else {
+        const error = (await res.json()) as { code: number; message: string }
+        printError(
+          logger,
+          `> Error returned by Quests Server: `,
+          new Error(`Status Code: ${error.code} - Message: "${error.message}"`)
+        )
       }
     }
   )
@@ -251,19 +268,23 @@ async function executeDeactivateSubcommand(
     linkerOpts,
     { url: deactivateQuest, method: 'DELETE', metadata: {}, actionType: 'deactivate', extraData: { questId } },
     async (authchainHeaders) => {
-      try {
-        const res = await components.fetch.fetch(deactivateQuest, {
-          method: 'DELETE',
-          headers: {
-            ...authchainHeaders,
-            'Content-Type': 'application/json'
-          }
-        })
-        if (res.status === 202) {
-          printSuccess(logger, 'Your Quest was deactivated', '')
+      const res = await components.fetch.fetch(deactivateQuest, {
+        method: 'DELETE',
+        headers: {
+          ...authchainHeaders,
+          'Content-Type': 'application/json'
         }
-      } catch (error) {
-        printError(logger, '> Error returned by Quests Server: ', error as any)
+      })
+
+      if (res.status === 202) {
+        printSuccess(logger, 'Your Quest was deactivated', '')
+      } else {
+        const error = (await res.json()) as { code: number; message: string }
+        printError(
+          logger,
+          `> Error returned by Quests Server: `,
+          new Error(`Status Code: ${error.code} - Message: "${error.message}"`)
+        )
       }
     }
   )
