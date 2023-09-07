@@ -32,8 +32,7 @@ export type MaterialInput = {
   specularIntensity?: string
   emissiveIntensity?: string
   directIntensity?: string
+  albedoColor?: string
+  emissiveColor?: string
+  reflectivityColor?: string
 }
-
-// albedoColor?: Color4
-// emissiveColor?: Color3
-// reflectivityColor?: Color3

@@ -5,7 +5,7 @@ import type { ComponentOperation } from '../component-operations'
 import { EcsEntity } from '../EcsEntity'
 import { memoize } from '../../../logic/once'
 
-export const putBillboardComponent: ComponentOperation = (entity, component) => {
+export const putMaterialComponent: ComponentOperation = (entity, component) => {
   if (component.componentType === ComponentType.LastWriteWinElementSet) {
     const newValue = component.getOrNull(entity.entityId) as PBMaterial | null
 
@@ -24,10 +24,10 @@ export const putBillboardComponent: ComponentOperation = (entity, component) => 
       entity.material = undefined
       switch (newMaterialType) {
         case 'pbr':
-          entity.material = new PBRMaterial('sdk material', entity.getScene())
+          entity.material = new PBRMaterial(entity.entityId.toString(), entity.getScene())
           break
         case 'unlit':
-          entity.material = new StandardMaterial('sdk material', entity.getScene())
+          entity.material = new StandardMaterial(entity.entityId.toString(), entity.getScene())
           break
       }
     }
@@ -37,10 +37,10 @@ export const putBillboardComponent: ComponentOperation = (entity, component) => 
 
       entity.material.atomicMaterialsUpdate((m) => {
         if (pbr.albedoColor) {
-          m.albedoColor.set(pbr.albedoColor.r, pbr.albedoColor.g, pbr.albedoColor.b) // pbr.albedoColor.a?
+          m.albedoColor.set(pbr.albedoColor.r, pbr.albedoColor.g, pbr.albedoColor.b)
           m.alpha = pbr.albedoColor.a
         } else {
-          m.albedoColor.set(1, 1, 1) // pbr.albedoColor.a?
+          m.albedoColor.set(1, 1, 1)
           m.alpha = 1
         }
 
@@ -58,9 +58,9 @@ export const putBillboardComponent: ComponentOperation = (entity, component) => 
           m.transparencyMode = 3
         }
 
+
         m.metallic = pbr.metallic ?? 0.5
         m.roughness = pbr.roughness ?? 0.5
-        // m.glossiness = pbr.glossiness ?? 0.5
 
         m.specularIntensity = pbr.specularIntensity ?? 1
         m.emissiveIntensity = pbr.emissiveIntensity ?? 2

@@ -50,22 +50,37 @@ export default withSdk<Props>(
           <TextField label="Alpha test" {...getInputProps('alphaTest')} />
           <TextField label="Cast shadows" type="checkbox" checked={!!castShadows.value} {...castShadows} />
         </Block>
-        <Block>
-          <ColorField label="Diffuse color" {...getInputProps('diffuseColor')}/>
-        </Block>
-        <Block>
-          <SelectField label="Transparency mode" options={TRANSPARENCY_MODES} {...getInputProps('transparencyMode')} />
-        </Block>
-        <Block>
-          <TextField label="Metallic" type="number" {...getInputProps('metallic')} />
-          <TextField label="Roughness" type="number" {...getInputProps('roughness')} />
-        </Block>
-        <Block label="Intensity">
-          <TextField label="Specular" type="number" {...getInputProps('specularIntensity')} />
-          <TextField label="Emissive" type="number" {...getInputProps('emissiveIntensity')} />
-          <TextField label="Direct" type="number" {...getInputProps('directIntensity')} />
-        </Block>
+        {materialType.value === MaterialType.MT_UNLIT && (
+          <Block label="Diffuse color">
+            <ColorField {...getInputProps('diffuseColor')}/>
+          </Block>
+        )}
+        {materialType.value === MaterialType.MT_PBR && (<>
+          <Block>
+            <SelectField label="Transparency mode" options={TRANSPARENCY_MODES} {...getInputProps('transparencyMode')} />
+          </Block>
+          <Block>
+            <TextField label="Metallic" type="number" {...getInputProps('metallic')} />
+            <TextField label="Roughness" type="number" {...getInputProps('roughness')} />
+          </Block>
+          <Block label="Intensity">
+            <TextField label="Specular" type="number" {...getInputProps('specularIntensity')} />
+            <TextField label="Emissive" type="number" {...getInputProps('emissiveIntensity')} />
+            <TextField label="Direct" type="number" {...getInputProps('directIntensity')} />
+          </Block>
+          <Block label="Albedo color">
+            <ColorField {...getInputProps('albedoColor')}/>
+          </Block>
+          <Block label="Emissive color">
+            <ColorField {...getInputProps('emissiveColor')}/>
+          </Block>
+          <Block label="Reflectivity color">
+            <ColorField {...getInputProps('reflectivityColor')}/>
+          </Block>
+        </>)}
+
         <Texture label="Texture" texture={TextureType.TT_TEXTURE} getInputProps={getTextureProps} />
+
         {materialType.value === MaterialType.MT_PBR && (<>
           <Texture label="Alpha texture" texture={TextureType.TT_ALPHA_TEXTURE} getInputProps={getTextureProps} />
           <Texture label="Bump texture" texture={TextureType.TT_BUMP_TEXTURE} getInputProps={getTextureProps} />

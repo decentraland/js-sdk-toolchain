@@ -23,7 +23,7 @@ export type TextShapeInput = {
   outlineWidth: string
   lineSpacing: string
   lineCount: string
-  // shadowColor: string
-  // outlineColor: string
-  // textColor: string
+  shadowColor: string
+  outlineColor: string
+  textColor: string
 }

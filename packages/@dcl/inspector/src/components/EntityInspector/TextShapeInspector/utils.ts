@@ -1,6 +1,7 @@
 import { PBTextShape, Font, TextAlignMode } from '@dcl/ecs'
 
 import { TextShapeInput } from './types'
+import { toColor3, toColor4, toHex } from '../ColorField/utils'
 
 const toNumber = (value: string, min?: number) => {
   const num = Number(value) || 0
@@ -28,7 +29,10 @@ export const fromTextShape = (value: PBTextShape): TextShapeInput => {
     shadowOffsetY: toString(value.shadowOffsetY, 0),
     outlineWidth: toString(value.outlineWidth, 0),
     lineSpacing: toString(value.lineSpacing, 0),
-    lineCount: toString(value.lineCount, 1)
+    lineCount: toString(value.lineCount, 1),
+    shadowColor: toHex(value.shadowColor),
+    outlineColor: toHex(value.outlineColor),
+    textColor: toHex(value.textColor)
   }
 }
 
@@ -51,7 +55,10 @@ export const toTextShape = (value: TextShapeInput): PBTextShape => {
     shadowOffsetY: toNumber(value.shadowOffsetY, 0),
     outlineWidth: toNumber(value.outlineWidth, 0),
     lineSpacing: toNumber(value.lineSpacing, 0),
-    lineCount: toNumber(value.lineCount, 1)
+    lineCount: toNumber(value.lineCount, 1),
+    shadowColor: toColor3(value.shadowColor),
+    outlineColor: toColor3(value.outlineColor),
+    textColor: toColor4(value.textColor)
   }
 }
 

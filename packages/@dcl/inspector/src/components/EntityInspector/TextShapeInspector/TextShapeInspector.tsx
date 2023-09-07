@@ -14,6 +14,7 @@ import { SelectField } from '../SelectField'
 import { TextField } from '../TextField'
 import { Props } from './types'
 import { fromTextShape, toTextShape, isValidInput, FONTS, TEXT_ALIGN_MODES } from './utils'
+import { ColorField } from '../ColorField'
 
 export default withSdk<Props>(
   withContextMenu<WithSdkProps & Props>(({ sdk, entity, contextMenuId }) => {
@@ -54,6 +55,9 @@ export default withSdk<Props>(
           <SelectField label="Align" options={TEXT_ALIGN_MODES} {...getInputProps('textAlign')} />
           <TextField label="Wrapping" type="checkbox" {...getInputProps('textWrapping', (e) => e.target.checked)} />
         </Block>
+        <Block label="Color">
+          <ColorField {...getInputProps('textColor')}/>
+        </Block>
         <Block label="Padding">
           <TextField label="↑" type="number" {...getInputProps('paddingTop')} />
           <TextField label="→" type="number" {...getInputProps('paddingRight')} />
@@ -65,14 +69,18 @@ export default withSdk<Props>(
           <TextField label="Count" type="number" {...getInputProps('lineCount')} />
         </Block>
         <Block label="Outline">
-          {/* TBD <TextField label="Color" type="number" {...getInputProps('outlineColor')} /> */}
           <TextField label="Width" type="number" {...getInputProps('outlineWidth')} />
+        </Block>
+        <Block label="Outline color">
+          <ColorField {...getInputProps('outlineColor')}/>
         </Block>
         <Block label="Shadow">
           <TextField label="Blur" type="number" {...getInputProps('shadowBlur')} />
-          {/* <TextField label="Color" type="number" {...getInputProps('shadowColor')} /> */}
           <TextField label="Offset X" type="number" {...getInputProps('shadowOffsetX')} />
           <TextField label="Offset Y" type="number" {...getInputProps('shadowOffsetY')} />
+        </Block>
+        <Block label="Shadow color">
+          <ColorField {...getInputProps('shadowColor')}/>
         </Block>
       </Container>
     )

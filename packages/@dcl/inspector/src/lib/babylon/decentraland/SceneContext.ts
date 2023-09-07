@@ -17,6 +17,7 @@ import { putSceneComponent } from './editorComponents/scene'
 import { createOperations } from '../../sdk/operations'
 import { createGizmoManager } from './gizmo-manager'
 import { getDataLayerInterface } from '../../../redux/data-layer'
+import { putMaterialComponent } from './sdkComponents/material'
 
 export type LoadableScene = {
   readonly entity: Readonly<Omit<Schemas.Entity, 'id'>>
@@ -56,6 +57,7 @@ export class SceneContext {
   readonly componentPutOperations: Record<number, ComponentOperation> = {
     [this.Transform.componentId]: putTransformComponent,
     [this.MeshRenderer.componentId]: putMeshRendererComponent,
+    [this.Material.componentId]: putMaterialComponent,
     [this.Billboard.componentId]: putBillboardComponent,
     [this.GltfContainer.componentId]: putGltfContainerComponent,
     [this.TextShape.componentId]: putTextShapeComponent,

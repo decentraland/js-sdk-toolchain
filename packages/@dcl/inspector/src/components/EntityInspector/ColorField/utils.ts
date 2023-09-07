@@ -1,3 +1,5 @@
+import { Color4, Color3 } from '@dcl/ecs-math'
+
 export enum Options {
   PICK,
   CUSTOM
@@ -33,3 +35,18 @@ export const COLORS = [{
   value: '#00FF00',
   label: 'Green'
 }]
+
+export function toHex(value?: Color4 | Color3): string {
+  if (!value) return COLORS[0].value
+  return Color3.toHexString(value)
+}
+
+export function toColor4(value?: string) {
+  if (!value) return Color4.fromHexString(COLORS[0].value)
+  return Color4.fromHexString(value)
+}
+
+export function toColor3(value?: string) {
+  if (!value) return Color3.fromHexString(COLORS[0].value)
+  return Color3.fromHexString(value)
+}

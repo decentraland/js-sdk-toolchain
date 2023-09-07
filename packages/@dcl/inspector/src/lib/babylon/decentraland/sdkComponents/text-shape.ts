@@ -5,6 +5,7 @@ import { PBTextShape, ComponentType } from '@dcl/ecs'
 import type { ComponentOperation } from '../component-operations'
 import { EcsEntity } from '../EcsEntity'
 import { FONTS, TEXT_ALIGN_MODES } from '../../../../components/EntityInspector/TextShapeInspector/utils'
+import { toHex } from '../../../../components/EntityInspector/ColorField/utils'
 
 export const putTextShapeComponent: ComponentOperation = (entity, component) => {
   if (component.componentType === ComponentType.LastWriteWinElementSet) {
@@ -73,11 +74,11 @@ function createTextBlock(value: PBTextShape) {
   tb.shadowOffsetY = value.shadowOffsetY ?? 0
   tb.outlineWidth = value.outlineWidth ?? 0
   tb.lineSpacing = value.lineSpacing ?? 0
+  tb.color = toHex(value.textColor)
+  tb.shadowColor = toHex(value.shadowColor)
+  tb.outlineColor = toHex(value.outlineColor)
 
-  // textColor
   // fontAutoSize
-  // shadowColor
-  // outlineColor
   // lineCount ?? 1
 
   return tb

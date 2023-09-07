@@ -1,25 +1,11 @@
 import { MaterialTransparencyMode, PBMaterial } from '@dcl/ecs'
-import { Color4, Color3 } from '@dcl/ecs-math'
 
 import { MaterialInput, MaterialType } from './types'
 import { mapSelectFieldOptions } from '../SelectField/utils'
 import { fromTexture, toTexture } from './Texture/utils'
-import { COLORS } from '../ColorField/utils'
-
-const toNumber = (value: string, min?: number) => {
-  const num = Number(value) || 0
-  return min ? Math.min(num, min) : num
-}
+import { toColor3, toColor4, toHex } from '../ColorField/utils'
 
 const toString = (value: unknown, def: number = 0) => (value ?? def).toString()
-
-const isColor4 = (value: Color4 | Color3): value is Color4 => !!(value as Color4).a
-
-const toHex = (value?: Color4 | Color3): string => {
-  if (!value) return COLORS[0].value
-  if (isColor4(value)) return Color4.toHexString(value)
-  return Color4.toHexString(Color4.fromColor3(value))
-}
 
 export const fromMaterial = (value: PBMaterial): MaterialInput => {
   switch (value.material?.$case) {
@@ -43,6 +29,9 @@ export const fromMaterial = (value: PBMaterial): MaterialInput => {
         specularIntensity: toString(value.material?.pbr.specularIntensity ?? 1),
         emissiveIntensity: toString(value.material?.pbr.emissiveIntensity ?? 2),
         directIntensity: toString(value.material?.pbr.directIntensity ?? 1),
+        albedoColor: toHex(value.material?.pbr.albedoColor),
+        emissiveColor: toHex(value.material?.pbr.emissiveColor),
+        reflectivityColor: toHex(value.material?.pbr.reflectivityColor),
         texture: fromTexture(value.material?.pbr.texture ?? {}),
         alphaTexture: fromTexture(value.material?.pbr.alphaTexture ?? {}),
         bumpTexture: fromTexture(value.material?.pbr.bumpTexture ?? {}),
@@ -60,7 +49,7 @@ export const toMaterial = (value: MaterialInput): PBMaterial => {
           unlit: {
             alphaTest: Number(value.alphaTest ?? 0.5),
             castShadows: !!(value.castShadows ?? true),
-            diffuseColor: Color4.fromHexString(value.diffuseColor ?? COLORS[0].value),
+            diffuseColor: toColor4(value.diffuseColor),
             texture: toTexture(value.texture)
           }
         }
@@ -79,6 +68,9 @@ export const toMaterial = (value: MaterialInput): PBMaterial => {
             specularIntensity: Number(value.specularIntensity || 1),
             emissiveIntensity: Number(value.emissiveIntensity || 2),
             directIntensity: Number(value.directIntensity || 1),
+            albedoColor: toColor4(value.albedoColor),
+            emissiveColor: toColor3(value.emissiveColor),
+            reflectivityColor: toColor3(value.reflectivityColor),
             texture: toTexture(value.texture),
             alphaTexture: toTexture(value.alphaTexture),
             bumpTexture: toTexture(value.bumpTexture),
