@@ -1,7 +1,7 @@
 import fs from 'fs'
 import { resolve } from 'path'
 
-console.log('Copying "@dcl/asset-packs/bin/index.js" into "public/scene.js"...')
+console.log('Copying "@dcl/asset-packs/bin/index.js" into "public/bin/index.js"...')
 const binDirPath = resolve(__dirname, '../public/bin')
 if (!fs.existsSync(binDirPath)) {
   fs.mkdirSync(binDirPath)
