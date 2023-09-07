@@ -157,6 +157,8 @@ export default withSdk<Props>(
           trigger={<QuestionIcon size={16} />}
           position="right center"
           on="hover"
+          hideOnScroll
+          hoverable
         />
       )
     }
@@ -172,6 +174,8 @@ export default withSdk<Props>(
           trigger={<InfoIcon size={16} />}
           position="top center"
           on="hover"
+          hideOnScroll
+          hoverable
         />
       )
     }

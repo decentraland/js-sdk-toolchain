@@ -205,6 +205,8 @@ export default withSdk<Props>(
           trigger={<QuestionIcon size={16} />}
           position="right center"
           on="hover"
+          hideOnScroll
+          hoverable
         />
       )
     }
