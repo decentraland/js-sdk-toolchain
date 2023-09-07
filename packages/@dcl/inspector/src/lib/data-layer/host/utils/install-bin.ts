@@ -1,9 +1,10 @@
 import fetch from 'node-fetch'
 import { FileSystemInterface } from '../../types'
+import { getConfig } from '../../../logic/config'
 
 export async function installBin(fs: FileSystemInterface) {
-  const params = new URLSearchParams(location.search)
-  if (params.has('DISABLE_INSTALL_BIN') || process.env.NODE_ENV === 'test') {
+  const config = getConfig()
+  if (config.disableInstallBinJs || process.env.NODE_ENV === 'test') {
     return
   }
 

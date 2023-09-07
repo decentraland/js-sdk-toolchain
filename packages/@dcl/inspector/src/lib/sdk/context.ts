@@ -12,9 +12,9 @@ import { createOperations } from './operations'
 import { Gizmos } from '../babylon/decentraland/gizmo-manager'
 import { CameraManager } from '../babylon/decentraland/camera'
 import { InspectorPreferences } from '../logic/preferences/types'
-import { getParentUrl } from '../../redux/data-layer/sagas/connect'
 import { CameraServer } from '../rpc/camera/server'
 import { AssetPack } from '../../components/AssetsCatalog/types'
+import { getConfig } from '../logic/config'
 
 export type SdkContextEvents = {
   change: { entity: Entity; operation: CrdtMessageType; component?: ComponentDefinition<any>; value?: any }
@@ -59,9 +59,9 @@ export async function createSdkContext(
   Object.assign(globalThis, { inspectorEngine: engine })
 
   // if there is a parent, initialize rpc servers
-  const parentUrl = getParentUrl()
-  if (parentUrl) {
-    const tranport = new MessageTransport(window, window.parent, parentUrl)
+  const config = getConfig()
+  if (config.dataLayerRpcParentUrl) {
+    const tranport = new MessageTransport(window, window.parent, config.dataLayerRpcParentUrl)
     new CameraServer(tranport, renderer.engine, renderer.editorCamera.getCamera())
   }
 
