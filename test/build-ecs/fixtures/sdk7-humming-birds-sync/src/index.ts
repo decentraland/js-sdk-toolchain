@@ -33,7 +33,7 @@ export async function main() {
   const serverUrl = realm.realmInfo?.isPreview
     ? 'ws://127.0.0.1:3000/ws/localScene'
     : 'wss://scene-state-server.decentraland.org/ws/boedo.dcl.eth'
-  const networkEntityFactory = await createNetworkTransport(serverUrl)
+  const networkEntityFactory = await createNetworkTransport({ serverUrl })
   const userId = (await getUserData({})).data?.userId ?? ''
 
   setupUi(userId)
