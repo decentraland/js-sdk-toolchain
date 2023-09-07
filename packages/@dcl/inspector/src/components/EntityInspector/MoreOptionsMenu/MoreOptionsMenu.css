@@ -18,15 +18,24 @@
 .MoreOptionsMenu .MoreOptionsContent {
   position: absolute;
   right: 0;
-  padding: 8px 0px;
+  padding: 8px;
   border-radius: 2px;
   background: #3c3c3c;
-  min-width: 175px;
+  min-width: 185px;
   z-index: 1;
 }
 
-.MoreOptionsMenu .MoreOptionsContent .RemoveButton {
+.MoreOptionsMenu .MoreOptionsContent .Button {
   display: flex;
   align-items: center;
   gap: 4px;
+  padding: 4px;
+}
+
+.MoreOptionsMenu .MoreOptionsContent .Button:not(:hover) {
+  background-color: transparent;
+}
+
+.MoreOptionsMenu .MoreOptionsContent .Button:hover:not(:disabled) {
+  background-color: #454545;
 }
