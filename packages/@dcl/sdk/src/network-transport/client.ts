@@ -30,8 +30,8 @@ export async function createClientTransport({ serverUrl }: ClientTransportConfig
               if (transport.onmessage) {
                 for (const byteArray of messagesToProcess) {
                   // Log messages
-                  const logMessages = Array.from(serializeCrdtMessages('RecievedMessages', byteArray, engine))
-                  if (logMessages.length) console.log(logMessages)
+                  // const logMessages = Array.from(serializeCrdtMessages('RecievedMessages', byteArray, engine))
+                  // if (logMessages.length) console.log(logMessages)
                   // Log messages
                   transport.onmessage(byteArray)
                 }

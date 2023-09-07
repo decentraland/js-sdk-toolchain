@@ -1,4 +1,4 @@
-import { engine, Entity, getComponentEntityTree, PointerEvents, RESERVED_LOCAL_ENTITIES, Schemas } from '@dcl/sdk/ecs'
+import { engine, Entity, PointerEvents } from '@dcl/sdk/ecs'
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { Button, Label, ReactEcsRenderer, UiEntity } from '@dcl/sdk/react-ecs'
 import { Bird, BirdKilled } from './hummingBird'
@@ -38,6 +38,7 @@ engine.addSystem((dt: number) => {
 })
 
 const ADMIN_USERS = new Set(['0xB8c4df381C6C305758F806c3aA71F37AaBbcBD92'.toLocaleLowerCase()])
+
 export function setupUi(userId: string) {
   const isAdmin = ADMIN_USERS.has(userId.toLocaleLowerCase())
 
