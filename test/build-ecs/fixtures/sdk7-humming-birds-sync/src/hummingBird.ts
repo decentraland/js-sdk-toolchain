@@ -14,6 +14,7 @@ import {
   engine,
   inputSystem
 } from '@dcl/sdk/ecs'
+
 import { Quaternion } from '@dcl/sdk/math'
 import * as utils from '@dcl-sdk/utils'
 import { NetworkEntityFactory } from '@dcl/sdk/network-transport/types'
