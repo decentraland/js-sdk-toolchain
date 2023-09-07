@@ -15,6 +15,14 @@ export enum MessageType {
   Crdt = 3
 }
 
+export type ServerTransportConfig = {
+  reservedLocalEntities: number
+  networkEntitiesLimit: {
+    serverLimit: number
+    clientLimit: number
+  }
+}
+
 declare global {
   type ClientEvent =
     | {
@@ -29,5 +37,5 @@ declare global {
   // eslint-disable-next-line no-var
   var updateCRDTState: (crdt: Uint8Array) => void
   // eslint-disable-next-line no-var
-  var registerClientObserver: (fn: (event: ClientEvent) => void) => void
+  var registerScene: (serverConfig: ServerTransportConfig, fn: (event: ClientEvent) => void) => void
 }
