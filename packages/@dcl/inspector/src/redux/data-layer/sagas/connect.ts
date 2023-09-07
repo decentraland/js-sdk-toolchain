@@ -10,20 +10,7 @@ import { createLocalDataLayerRpcClient } from '../../../lib/data-layer/client/lo
 import { DataServiceDefinition } from '../../..//lib/data-layer/proto/gen/data-layer.gen'
 import { DataLayerRpcClient } from '../../../lib/data-layer/types'
 import { createIframeDataLayerRpcClient } from '../../../lib/data-layer/client/iframe-data-layer'
-
-export function getWsUrl() {
-  const dataLayerWsByQueryParams = new URLSearchParams(window.location.search).get('ws')
-  const dataLayerWsByGlobalThis = ((globalThis as any).InspectorConfig?.dataLayerRpcWsUrl as string) || null
-
-  return dataLayerWsByQueryParams || dataLayerWsByGlobalThis || null
-}
-
-export function getParentUrl() {
-  const dataLayerParentByQueryParams = new URLSearchParams(window.location.search).get('parent')
-  const dataLayerParentByGlobalThis = ((globalThis as any).InspectorConfig?.dataLayerRpcParentUrl as string) || null
-
-  return dataLayerParentByQueryParams || dataLayerParentByGlobalThis || null
-}
+import { getConfig, InspectorConfig } from '../../../lib/logic/config'
 
 export function createWebSocketConnection(url: string): WebSocket {
   return new WebSocket(url)
@@ -54,20 +41,19 @@ export type WsActions =
     }
 
 export function* connectSaga() {
-  const wsUrl: string | undefined = yield call(getWsUrl)
+  const config: InspectorConfig = yield call(getConfig)
 
-  if (!wsUrl) {
-    const parentUrl: string | null = yield call(getParentUrl)
-    if (!parentUrl) {
+  if (!config.dataLayerRpcWsUrl) {
+    if (!config.dataLayerRpcParentUrl) {
       const dataLayer: IDataLayer = yield call(createLocalDataLayerRpcClient)
       yield put(connected({ dataLayer }))
       return
     }
-    const dataLayer: IDataLayer = yield call(createIframeDataLayerRpcClient, parentUrl)
+    const dataLayer: IDataLayer = yield call(createIframeDataLayerRpcClient, config.dataLayerRpcParentUrl)
     yield put(connected({ dataLayer }))
     return
   }
-  const ws: WebSocket = yield call(createWebSocketConnection, wsUrl)
+  const ws: WebSocket = yield call(createWebSocketConnection, config.dataLayerRpcWsUrl)
   const socketChannel: EventChannel<WsActions> = yield call(createSocketChannel, ws)
   try {
     while (true) {

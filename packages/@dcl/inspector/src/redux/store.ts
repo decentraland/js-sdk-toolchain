@@ -6,9 +6,9 @@ import appStateReducer from './app'
 import dataLayerReducer from './data-layer'
 import sdkReducer from './sdk'
 import uiReducer from './ui'
-import { getParentUrl } from './data-layer/sagas/connect'
 import { UiServer } from '../lib/rpc/ui/server'
 import sagas from './root-saga'
+import { getConfig } from '../lib/logic/config'
 
 const sagaMiddleware = createSagaMiddleware()
 
@@ -25,9 +25,9 @@ export const store = configureStore({
 })
 
 // if there is a parent, initialize rpc servers
-const parentUrl = getParentUrl()
-if (parentUrl) {
-  const tranport = new MessageTransport(window, window.parent, parentUrl)
+const config = getConfig()
+if (config.dataLayerRpcParentUrl) {
+  const tranport = new MessageTransport(window, window.parent, config.dataLayerRpcParentUrl)
   new UiServer(tranport, store)
 }
 

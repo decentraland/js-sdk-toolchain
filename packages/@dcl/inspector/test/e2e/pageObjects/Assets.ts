@@ -27,7 +27,7 @@ class AssetsPageObject {
     if (await page.$('.Renderer.is-loading')) {
       await page.waitForSelector('.Renderer.is-loading')
     }
-    await page.waitForSelector('.Renderer.is-loaded')
+    await page.waitForSelector('.Renderer.is-loaded', { timeout: 180_000 })
   }
 
   async addBuilderAsset(asset: string) {

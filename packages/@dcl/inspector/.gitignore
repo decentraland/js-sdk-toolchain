@@ -23,6 +23,7 @@ yarn-debug.log*
 yarn-error.log*
 
 public/bundle*
+public/bin
 
 src/lib/data-layer/proto/gen
 

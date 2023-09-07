@@ -2,12 +2,13 @@
 import { expectSaga, testSaga } from 'redux-saga-test-plan'
 import * as codegen from '@dcl/rpc/dist/codegen'
 
-import { connectSaga, createSocketChannel, createWebSocketConnection, getWsUrl } from './connect'
+import { connectSaga, createSocketChannel, createWebSocketConnection } from './connect'
 import { WebSocketTransport } from '@dcl/rpc/dist/transports/WebSocket'
 import { RpcClient, RpcClientPort, Transport, createRpcClient } from '@dcl/rpc'
 import { DataLayerRpcClient } from '../../../lib/data-layer/types'
 import reducer, { connected, getDataLayerInterface, reconnect } from '..'
 import { createLocalDataLayerRpcClient } from '../../../lib/data-layer/client/local-data-layer'
+import { getConfig } from '../../../lib/logic/config'
 import { call } from 'redux-saga/effects'
 
 describe('WebSocket Connection Saga', () => {
@@ -17,7 +18,7 @@ describe('WebSocket Connection Saga', () => {
     await expectSaga(connectSaga)
       .withReducer(reducer)
       .provide([
-        [call(getWsUrl), undefined],
+        [call(getConfig), { dataLayerRpcWsUrl: null }],
         [call(createLocalDataLayerRpcClient), dataLayer]
       ])
       .put(connected({ dataLayer }))
@@ -42,8 +43,8 @@ describe('WebSocket Connection Saga', () => {
 
     testSaga(connectSaga)
       .next()
-      .call(getWsUrl)
-      .next(url)
+      .call(getConfig)
+      .next({ dataLayerRpcWsUrl: url })
       .call(createWebSocketConnection, url)
       .next(ws)
       .call(createSocketChannel, ws)

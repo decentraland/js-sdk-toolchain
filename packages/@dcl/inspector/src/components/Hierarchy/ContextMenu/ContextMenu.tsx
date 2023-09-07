@@ -4,12 +4,15 @@ import { Entity } from '@dcl/ecs'
 import { ROOT } from '../../../lib/sdk/tree'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { useEntityComponent } from '../../../hooks/sdk/useEntityComponent'
+import { getConfig } from '../../../lib/logic/config'
 
 // TODO: enumerate better the components we want to show...
 const getEnabledComponents = () => {
   const components = new Set(['core::Transform', 'core::GltfContainer'])
 
-  if (JSON.parse(process.env.ENABLE_INSPECTOR_COMPONENTS || 'false')) {
+  const config = getConfig()
+
+  if (!config.disableSmartItems) {
     for (const component of ['inspector::Actions', 'inspector::Triggers']) {
       components.add(component)
     }
