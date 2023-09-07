@@ -1,4 +1,4 @@
-.ActionInspector > .title {
+.ActionInspector:is(.open) > .title {
   border-bottom: 1px solid var(--border-gray);
   padding-bottom: 12px;
 }
@@ -92,5 +92,5 @@
 }
 
 .ActionInspector .content .Block .content .MoreOptionsMenu .MoreOptionsContent {
-  min-width: 125px;
+  min-width: 140px;
 }

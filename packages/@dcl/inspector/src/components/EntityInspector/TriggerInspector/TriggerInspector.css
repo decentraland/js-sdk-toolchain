@@ -1,4 +1,4 @@
-.TriggerInspector > .title {
+.TriggerInspector:is(.open) > .title {
   border-bottom: 1px solid var(--border-gray);
   padding-bottom: 12px;
 }
@@ -15,13 +15,6 @@
 
 .TriggerInspector .content .Block .content .DropdownContainer {
   flex: 1;
-}
-
-.TriggerInspector .content .RemoveButton {
-  height: 100%;
-  background-color: transparent;
-  border-color: transparent;
-  color: white;
 }
 
 .TriggerInspector .content > .AddButton {
