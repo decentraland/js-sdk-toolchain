@@ -55,9 +55,9 @@
     "directory": "packages/@dcl/inspector"
   },
   "scripts": {
-    "build": "node ./build.js",
-    "postinstall": "ts-node --project ./scripts/tsconfig.json ./scripts/postinstall.ts",
-    "start": "node ./build.js --watch"
+    "build": "npm run copy-bin && node ./build.js",
+    "copy-bin": "ts-node --project ./scripts/tsconfig.json ./scripts/copy-bin.ts",
+    "start": "npm run copy-bin && node ./build.js --watch"
   },
   "types": "dist/tooling-entrypoint.d.ts",
   "typings": "dist/tooling-entrypoint.d.ts"
