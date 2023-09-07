@@ -3,7 +3,7 @@
   "description": "ECS7 ",
   "version": "1.0.0",
   "dependencies": {
-    "@dcl-sdk/utils": "next",
+    "@dcl-sdk/utils": "^1.1.3-20230616162048.commit-15063f2",
     "@dcl/ecs": "file:../../../../packages/@dcl/ecs",
     "@dcl/js-runtime": "file:../../../../packages/@dcl/js-runtime",
     "@dcl/sdk": "file:../../../../packages/@dcl/sdk",

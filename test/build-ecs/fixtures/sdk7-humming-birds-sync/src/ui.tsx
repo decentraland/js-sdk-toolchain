@@ -1,4 +1,4 @@
-import { engine, Entity, PointerEvents } from '@dcl/sdk/ecs'
+import { engine, Entity, PointerEvents, Transform } from '@dcl/sdk/ecs'
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { Button, Label, ReactEcsRenderer, UiEntity } from '@dcl/sdk/react-ecs'
 import { Bird, BirdKilled } from './hummingBird'
@@ -37,7 +37,7 @@ engine.addSystem((dt: number) => {
     .slice(0, 5)
 })
 
-const ADMIN_USERS = new Set(['0xB8c4df381C6C305758F806c3aA71F37AaBbcBD92'.toLocaleLowerCase()])
+export const ADMIN_USERS = new Set(['0xB8c4df381C6C305758F806c3aA71F37AaBbcBD92'.toLocaleLowerCase()])
 
 export function setupUi(userId: string) {
   const isAdmin = ADMIN_USERS.has(userId.toLocaleLowerCase())
@@ -105,7 +105,7 @@ export function setupUi(userId: string) {
               }
             }}
             uiText={{
-              value: `Players: ${playersConnected ?? 0}`,
+              value: `Players: ${playersConnected ?? 0} ${getPlayerPosition()}`,
               fontSize: 18
             }}
           />
@@ -135,4 +135,11 @@ export function formatAddress(address: string) {
   const body = address.slice(-4)
   const formattedAddress = `${prefix}...${body}`
   return formattedAddress
+}
+
+function getPlayerPosition() {
+  const playerPosition = Transform.getOrNull(engine.PlayerEntity)
+  if (!playerPosition) return ' no data yet'
+  const { x, y, z } = playerPosition.position
+  return `{X: ${x.toFixed(2)}, Y: ${y.toFixed(2)}, z: ${z.toFixed(2)} }`
 }
