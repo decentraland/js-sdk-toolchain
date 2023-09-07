@@ -1,11 +1,68 @@
-.ActionInspector > .content {
+.ActionInspector:is(.open) > .title {
+  border-bottom: 1px solid var(--border-gray);
+  padding-bottom: 12px;
+}
+
+.ActionInspector > .content > .Block > .content {
   display: flex;
   flex-direction: column;
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: 4px;
+  border: 1px solid #303031;
+  background: var(--tree-bg-color);
+}
+
+.ActionInspector > .content > .Block > .content .row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  gap: 4px;
+}
+
+.ActionInspector > .content > .Block > .content .row .field {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.ActionInspector > .content > .Block > .content .row .DropdownContainer label,
+.ActionInspector > .content > .Block > .content .row .field label {
+  margin: 0px 0px 6px 0px;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.ActionInspector > .content > .Block > .content .row .field label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
+
+.ActionInspector > .content > .Block > .content .row .field .TextField {
+  width: 100%;
 }
 
 .ActionInspector .content .AddButton {
-  align-self: flex-end;
-  margin-top: 10px;
+  margin-top: 16px;
+  border: 1px solid #3a3d41;
+  background: #1e1e1e;
+  display: flex;
+  padding: 4px;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  align-self: stretch;
+  color: #ccc;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  width: 100%;
 }
 
 .ActionInspector .content .RemoveButton {
@@ -26,4 +83,14 @@
 
 .ActionInspector .content .Block .content .DropdownContainer {
   flex: 1;
+}
+
+.ActionInspector .content .Block .content .MoreOptionsMenu {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.ActionInspector .content .Block .content .MoreOptionsMenu .MoreOptionsContent {
+  min-width: 140px;
 }

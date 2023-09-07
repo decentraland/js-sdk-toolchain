@@ -1,0 +1,41 @@
+.MoreOptionsMenu {
+  position: relative;
+  width: auto;
+}
+
+.MoreOptionsMenu .MoreOptionsButton.Button {
+  background-color: transparent;
+  border-color: transparent;
+  color: white;
+  transform: rotate(90deg);
+  padding: 0;
+}
+
+.MoreOptionsMenu .MoreOptionsButton.Button:hover:not(:disabled) {
+  background-color: transparent;
+}
+
+.MoreOptionsMenu .MoreOptionsContent {
+  position: absolute;
+  right: 0;
+  padding: 8px;
+  border-radius: 2px;
+  background: #3c3c3c;
+  min-width: 185px;
+  z-index: 1;
+}
+
+.MoreOptionsMenu .MoreOptionsContent .Button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+}
+
+.MoreOptionsMenu .MoreOptionsContent .Button:not(:hover) {
+  background-color: transparent;
+}
+
+.MoreOptionsMenu .MoreOptionsContent .Button:hover:not(:disabled) {
+  background-color: #454545;
+}

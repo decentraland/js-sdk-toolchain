@@ -10,10 +10,12 @@
 }
 
 .DropdownContainer .Dropdown {
-  padding: 2px 3px;
-  border: 1px solid var(--border-gray);
   display: flex;
-  border-radius: 1.6px;
+  border: 1px solid var(--background-gray);
+  border-radius: 5px;
+  padding: 2px 3px;
   font-size: 12px;
   height: 25px;
+  background: var(--background-gray);
+  color: var(--text);
 }

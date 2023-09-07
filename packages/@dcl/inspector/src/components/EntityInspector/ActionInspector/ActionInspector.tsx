@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Item } from 'react-contexify'
-import { AiFillDelete as DeleteIcon, AiOutlinePlus as AddIcon, AiOutlineMinus as RemoveIcon } from 'react-icons/ai'
 import { Action, ActionType } from '@dcl/asset-packs'
+import { Item } from 'react-contexify'
+import { AiFillDelete as DeleteIcon, AiOutlinePlus as AddIcon } from 'react-icons/ai'
+import { VscQuestion as QuestionIcon, VscTrash as RemoveIcon, VscInfo as InfoIcon } from 'react-icons/vsc'
+import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
 
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { withContextMenu } from '../../../hoc/withContextMenu'
@@ -19,6 +21,8 @@ import { TextField } from '../TextField'
 import { Props } from './types'
 
 import './ActionInspector.css'
+import MoreOptionsMenu from '../MoreOptionsMenu'
+import Button from '../../Button'
 
 export default withSdk<Props>(
   withContextMenu<Props & WithSdkProps>(({ sdk, entity, contextMenuId }) => {
@@ -142,8 +146,42 @@ export default withSdk<Props>(
       return null
     }
 
+    const renderMoreInfo = () => {
+      return (
+        <Popup
+          content={
+            <>
+              Learn more about this feature in the <a href="">docs</a>.
+            </>
+          }
+          trigger={<QuestionIcon size={16} />}
+          position="right center"
+          on="hover"
+          hideOnScroll
+          hoverable
+        />
+      )
+    }
+
+    const renderSelectAnimationMoreInfo = () => {
+      return (
+        <Popup
+          content={
+            <>
+              Learn more about animations in the <a href="">docs</a>.
+            </>
+          }
+          trigger={<InfoIcon size={16} />}
+          position="top center"
+          on="hover"
+          hideOnScroll
+          hoverable
+        />
+      )
+    }
+
     return (
-      <Container label="Action" className="ActionInspector">
+      <Container label="Action" className="ActionInspector" rightContent={renderMoreInfo()}>
         <ContextMenu id={contextMenuId}>
           <Item id="delete" onClick={handleAction(handleRemove)}>
             <DeleteIcon /> Delete
@@ -153,41 +191,51 @@ export default withSdk<Props>(
         {actions.map((action: Action, idx: number) => {
           return (
             <Block key={`action-${idx}`}>
-              <Dropdown
-                label={'Action'}
-                disabled={availableActions.length === 0}
-                options={availableActions}
-                value={action.type}
-                onChange={(e) => handleChangeType(e, idx)}
-              />
-              {action.type === ActionType.PLAY_ANIMATION && entityAnimations.length > 0 ? (
+              <div className="row">
+                <div className="field">
+                  <label>Name</label>
+                  <TextField
+                    type="text"
+                    value={action.name}
+                    onChange={(e) => handleChangeName(e, idx)}
+                    onFocus={handleFocusInput}
+                    onBlur={handleFocusInput}
+                  />
+                </div>
                 <Dropdown
-                  label={'Animations'}
-                  options={[
-                    { value: '', text: 'Select an Animation' },
-                    ...entityAnimations.map((animation) => ({ text: animation.name, value: animation.name }))
-                  ]}
-                  value={action.animation}
-                  onChange={(e) => handleChangeAnimation(e, idx)}
+                  label={'Select Action'}
+                  disabled={availableActions.length === 0}
+                  options={availableActions}
+                  value={action.type}
+                  onChange={(e) => handleChangeType(e, idx)}
                 />
+                <MoreOptionsMenu>
+                  <Button className="RemoveButton" onClick={(e) => handleRemoveAction(e, idx)}>
+                    <RemoveIcon /> Remove Action
+                  </Button>
+                </MoreOptionsMenu>
+              </div>
+              {action.type === ActionType.PLAY_ANIMATION && entityAnimations.length > 0 ? (
+                <div className="row">
+                  <div className="field">
+                    <label>Select Animation {renderSelectAnimationMoreInfo()}</label>
+                    <Dropdown
+                      options={[
+                        { value: '', text: 'Select an Animation' },
+                        ...entityAnimations.map((animation) => ({ text: animation.name, value: animation.name }))
+                      ]}
+                      value={action.animation}
+                      onChange={(e) => handleChangeAnimation(e, idx)}
+                    />
+                  </div>
+                </div>
               ) : null}
-              <TextField
-                label="Name"
-                type="text"
-                value={action.name}
-                onChange={(e) => handleChangeName(e, idx)}
-                onFocus={handleFocusInput}
-                onBlur={handleFocusInput}
-              />
-              <button className="RemoveButton" onClick={(e) => handleRemoveAction(e, idx)}>
-                <RemoveIcon />
-              </button>
             </Block>
           )
         })}
 
         <button className="AddButton" onClick={handleAddNewAction}>
-          <AddIcon />
+          <AddIcon /> Add New Action
         </button>
       </Container>
     )

@@ -19,7 +19,7 @@
   user-select: none;
 }
 
-.Container .title svg {
+.Container .title svg.icon {
   width: 14px;
   height: 14px;
   margin-right: 4px;
@@ -30,4 +30,10 @@
   color: var(--text);
   font-size: 13px;
   cursor: pointer;
+}
+
+.Container .title .right-content {
+  display: flex;
+  flex-grow: 1;
+  justify-content: flex-end;
 }

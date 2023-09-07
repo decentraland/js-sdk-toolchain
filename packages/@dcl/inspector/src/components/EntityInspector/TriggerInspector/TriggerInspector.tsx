@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Entity } from '@dcl/ecs'
+import { Action, Trigger, TriggerType, TriggerAction } from '@dcl/asset-packs'
 import { Item } from 'react-contexify'
-import { AiFillDelete as DeleteIcon, AiOutlinePlus as AddIcon, AiOutlineMinus as RemoveIcon } from 'react-icons/ai'
-import { Action, Trigger, TriggerType } from '@dcl/asset-packs'
+import { AiFillDelete as DeleteIcon, AiOutlinePlus as AddIcon } from 'react-icons/ai'
+import { VscQuestion as QuestionIcon } from 'react-icons/vsc'
+import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
 
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { withContextMenu } from '../../../hoc/withContextMenu'
@@ -12,12 +14,13 @@ import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { useEntitiesWith } from '../../../hooks/sdk/useEntitiesWith'
 import { EditorComponentsTypes } from '../../../lib/sdk/components'
 
-import { Block } from '../../Block'
 import { Container } from '../../Container'
 import { ContextMenu } from '../../ContexMenu'
-import { Dropdown } from '../../Dropdown'
 
-import { Props } from './types'
+import TriggerEvent from './TriggerEvent'
+import TriggerActionContainer from './TriggerAction'
+
+import type { Props } from './types'
 
 import './TriggerInspector.css'
 
@@ -33,15 +36,21 @@ export default withSdk<Props>(
     const [triggers, setTriggers] = useState<Trigger[]>(componentValue === null ? [] : componentValue.value)
     const hasTriggers = useHasComponent(entity, Triggers)
 
-    const areValidActions = useCallback(
+    const areValidAction = useCallback(
+      (updatedActions: TriggerAction[]) =>
+        updatedActions.length > 0 && !updatedActions.some((action) => !action.entity || !action.name),
+      []
+    )
+
+    const areValidTriggers = useCallback(
       (updatedTriggers: Trigger[]) =>
         updatedTriggers.length > 0 &&
-        !updatedTriggers.some((action) => !action.type || !action?.entity || !action.action),
+        !updatedTriggers.some((trigger) => !trigger.type || !areValidAction(trigger.actions as TriggerAction[])),
       []
     )
 
     useEffect(() => {
-      if (areValidActions(triggers)) {
+      if (areValidTriggers(triggers)) {
         if (isComponentEqual({ value: triggers })) {
           return
         }
@@ -67,11 +76,40 @@ export default withSdk<Props>(
       await sdk.operations.dispatch()
     }, [])
 
-    const handleAddNewTrigger = useCallback(() => {
-      setTriggers((prev: Trigger[]) => {
-        return [...prev, { type: TriggerType.ON_CLICK }]
-      })
-    }, [setTriggers])
+    const handleAddNewTrigger = useCallback(
+      (e: React.MouseEvent) => {
+        e.stopPropagation()
+        setTriggers((prev: Trigger[]) => {
+          return [
+            ...prev,
+            {
+              type: TriggerType.ON_CLICK,
+              actions: [
+                {
+                  entity: undefined,
+                  name: ''
+                }
+              ]
+            }
+          ]
+        })
+      },
+      [setTriggers]
+    )
+
+    const handleAddNewTriggerAction = useCallback(
+      (e: React.MouseEvent, idx: number) => {
+        setTriggers((prev: Trigger[]) => {
+          const data = [...prev]
+          data[idx] = {
+            ...data[idx],
+            actions: [...data[idx].actions, { entity: undefined, name: '' }]
+          }
+          return data
+        })
+      },
+      [setTriggers]
+    )
 
     const handleChangeType = useCallback(
       ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
@@ -88,13 +126,21 @@ export default withSdk<Props>(
     )
 
     const handleChangeEnitty = useCallback(
-      ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
+      ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, triggerIdx: number, actionIdx: number) => {
         setTriggers((prev: Trigger[]) => {
           const data = [...prev]
-          data[idx] = {
-            ...data[idx],
+          const actions = [...data[triggerIdx].actions]
+
+          actions[actionIdx] = {
+            ...actions[actionIdx],
             entity: entitiesWithAction?.find((entity) => entity.toString() === value)
           }
+
+          data[triggerIdx] = {
+            ...data[triggerIdx],
+            actions: [...actions]
+          }
+
           return data
         })
       },
@@ -102,13 +148,21 @@ export default withSdk<Props>(
     )
 
     const handleChangeAction = useCallback(
-      ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
+      ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, triggerIdx: number, actionIdx: number) => {
         setTriggers((prev: Trigger[]) => {
           const data = [...prev]
-          data[idx] = {
-            ...data[idx],
-            action: value as TriggerType
+          const actions = [...data[triggerIdx].actions]
+
+          actions[actionIdx] = {
+            ...actions[actionIdx],
+            name: value
           }
+
+          data[triggerIdx] = {
+            ...data[triggerIdx],
+            actions: [...actions]
+          }
+
           return data
         })
       },
@@ -124,66 +178,70 @@ export default withSdk<Props>(
       })
     }, [])
 
+    const handleRemoveTriggerAction = useCallback((e: React.MouseEvent, triggerIdx: number, actionIdx: number) => {
+      e.stopPropagation()
+      setTriggers((prev: Trigger[]) => {
+        const data = [...prev]
+        data[triggerIdx] = {
+          ...data[triggerIdx],
+          actions: [...data[triggerIdx].actions.slice(0, actionIdx)]
+        }
+        return data
+      })
+    }, [])
+
     if (!hasTriggers) {
       return null
     }
 
+    const renderMoreInfo = () => {
+      return (
+        <Popup
+          content={
+            <>
+              Learn more about this feature in the <a href="">docs</a>.
+            </>
+          }
+          trigger={<QuestionIcon size={16} />}
+          position="right center"
+          on="hover"
+          hideOnScroll
+          hoverable
+        />
+      )
+    }
+
     return (
-      <Container label="Trigger" className="TriggerInspector">
+      <Container label="Trigger" className="TriggerInspector" rightContent={renderMoreInfo()}>
         <ContextMenu id={contextMenuId}>
           <Item id="delete" onClick={handleAction(handleRemove)}>
             <DeleteIcon /> Delete
           </Item>
         </ContextMenu>
-        {triggers.map((trigger: Trigger, idx: number) => {
+        {triggers.map((trigger: Trigger, triggerIdx: number) => {
           return (
-            <Block key={`trigger-${idx}`}>
-              <Dropdown
-                label={'Interaction'}
-                options={Object.values(TriggerType).filter((v) => isNaN(Number(v))) as string[]}
-                value={trigger.type}
-                onChange={(e) => handleChangeType(e, idx)}
-              />
-              <Dropdown
-                label={'Entity'}
-                options={
-                  availableActions
-                    ? [
-                        { value: '', text: 'Select an Entity' },
-                        ...Array.from(availableActions).map(([entity, { name }]) => {
-                          return { value: entity, text: name }
-                        })
-                      ]
-                    : []
-                }
-                value={trigger.entity}
-                onChange={(e) => handleChangeEnitty(e, idx)}
-              />
-              <Dropdown
-                label={'Action'}
-                disabled={!trigger.entity || !availableActions.get(trigger.entity)}
-                options={
-                  trigger.entity && availableActions.get(trigger.entity)?.action
-                    ? [
-                        { value: '', text: 'Select an Action' },
-                        ...(availableActions.get(trigger.entity)?.action ?? []).map(({ name }) => {
-                          return { value: name, text: name }
-                        })
-                      ]
-                    : []
-                }
-                value={trigger.action}
-                onChange={(e) => handleChangeAction(e, idx)}
-              />
-              <button className="RemoveButton" onClick={(e) => handleRemoveTrigger(e, idx)}>
-                <RemoveIcon />
-              </button>
-            </Block>
+            <TriggerEvent
+              trigger={trigger}
+              onChangeTriggerType={(e) => handleChangeType(e, triggerIdx)}
+              onAddNewTriggerAction={(e) => handleAddNewTriggerAction(e, triggerIdx)}
+              onRemoveTriggerEvent={(e) => handleRemoveTrigger(e, triggerIdx)}
+            >
+              {trigger.actions.map((action, actionIdx) => {
+                return (
+                  <TriggerActionContainer
+                    action={action}
+                    availableActions={availableActions}
+                    onChangeEntity={(e) => handleChangeEnitty(e, triggerIdx, actionIdx)}
+                    onChangeAction={(e) => handleChangeAction(e, triggerIdx, actionIdx)}
+                    onRemoveTriggerAction={(e) => handleRemoveTriggerAction(e, triggerIdx, actionIdx)}
+                  />
+                )
+              })}
+            </TriggerEvent>
           )
         })}
-
         <button className="AddButton" onClick={handleAddNewTrigger}>
-          <AddIcon />
+          <AddIcon size={16} /> Add New Trigger Event
         </button>
       </Container>
     )

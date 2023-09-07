@@ -1,25 +1,35 @@
+.TriggerInspector:is(.open) > .title {
+  border-bottom: 1px solid var(--border-gray);
+  padding-bottom: 12px;
+}
+
 .TriggerInspector > .content {
   display: flex;
   flex-direction: column;
 }
 
-.TriggerInspector .content .AddButton {
-  align-self: flex-end;
-  margin-top: 10px;
-}
-
-.TriggerInspector .content .RemoveButton {
-  height: 100%;
-  background-color: transparent;
-  border-color: transparent;
-  color: white;
-}
-
-.TriggerInspector .content .Block .content {
-  gap: 15px;
-  align-items: flex-end;
+.TriggerInspector > .content > .Block > .content {
+  display: flex;
+  flex-direction: column;
 }
 
 .TriggerInspector .content .Block .content .DropdownContainer {
   flex: 1;
+}
+
+.TriggerInspector .content > .AddButton {
+  margin-top: 16px;
+  border: 1px solid #3a3d41;
+  background: #1e1e1e;
+  display: flex;
+  padding: 4px;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  align-self: stretch;
+  color: #ccc;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
 }
