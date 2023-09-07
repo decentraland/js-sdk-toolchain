@@ -1,7 +1,7 @@
 export type InspectorConfig = {
   dataLayerRpcWsUrl: string | null
   dataLayerRpcParentUrl: string | null
-  disableInstallBinJs: boolean
+  binIndexJsUrl: string | null
   disableSmartItems: boolean
 }
 
@@ -16,7 +16,7 @@ export function getConfig(): InspectorConfig {
     dataLayerRpcWsUrl: params.get('ws') || params.get('dataLayerRpcWsUrl') || config?.dataLayerRpcWsUrl || null,
     dataLayerRpcParentUrl:
       params.get('parent') || params.get('dataLayerRpcParentUrl') || config?.dataLayerRpcParentUrl || null,
-    disableInstallBinJs: params.has('disableInstallBinJs') || !!config?.disableInstallBinJs,
+    binIndexJsUrl: params.get('binIndexJsUrl') || config?.binIndexJsUrl || null,
     disableSmartItems: params.has('disableSmartItems') || !!config?.disableSmartItems
   }
 }
