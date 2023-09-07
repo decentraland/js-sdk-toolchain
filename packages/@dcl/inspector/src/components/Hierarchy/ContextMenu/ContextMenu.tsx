@@ -9,7 +9,9 @@ import { useEntityComponent } from '../../../hooks/sdk/useEntityComponent'
 const getEnabledComponents = () => {
   const components = new Set(['core::Transform', 'core::GltfContainer'])
 
-  if (JSON.parse(process.env.ENABLE_INSPECTOR_COMPONENTS || 'false')) {
+  const params = new URLSearchParams(location.search)
+
+  if (!params.has('DISABLE_SMART_ITEMS')) {
     for (const component of ['inspector::Actions', 'inspector::Triggers']) {
       components.add(component)
     }

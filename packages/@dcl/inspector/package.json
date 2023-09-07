@@ -7,7 +7,7 @@
     "@babylonjs/inspector": "^5.48.0",
     "@babylonjs/loaders": "^5.48.0",
     "@babylonjs/materials": "^5.48.0",
-    "@dcl/asset-packs": "^0.0.0-20230906220135.commit-6800ff7",
+    "@dcl/asset-packs": "^0.0.0-20230907152229.commit-44510c4",
     "@dcl/ecs": "file:../ecs",
     "@dcl/ecs-math": "2.0.2",
     "@dcl/mini-rpc": "^1.0.7",
@@ -42,6 +42,7 @@
     "react-resizable-panels": "^0.0.48",
     "redux-saga": "^1.2.3",
     "redux-saga-test-plan": "^4.0.6",
+    "ts-node": "^10.9.1",
     "typescript": "^5.0.2"
   },
   "files": [
@@ -55,6 +56,7 @@
   },
   "scripts": {
     "build": "node ./build.js",
+    "postinstall": "ts-node --project ./scripts/tsconfig.json ./scripts/postinstall.ts",
     "start": "node ./build.js --watch"
   },
   "types": "dist/tooling-entrypoint.d.ts",

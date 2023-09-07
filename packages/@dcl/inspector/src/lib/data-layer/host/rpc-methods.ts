@@ -1,5 +1,4 @@
 import { IEngine, OnChangeFunction } from '@dcl/ecs'
-
 import { DataLayerRpcServer, FileSystemInterface } from '../types'
 import { EXTENSIONS, getCurrentCompositePath, getFilesInDirectory, withAssetDir } from './fs-utils'
 import { stream } from './stream'
@@ -8,6 +7,7 @@ import upsertAsset from './upsert-asset'
 import { initSceneProvider } from './scene'
 import { readPreferencesFromFile, serializeInspectorPreferences } from '../../logic/preferences/io'
 import { compositeAndDirty } from './utils/composite-dirty'
+import { installBin } from './utils/install-bin'
 
 const INSPECTOR_PREFERENCES_PATH = 'inspector-preferences.json'
 
@@ -38,6 +38,9 @@ export async function initRpcMethods(
 
   // Dirty Save Logic
   onChanges.push(compositeManager.onChange)
+
+  // install bin
+  await installBin(fs)
 
   return {
     async redo() {

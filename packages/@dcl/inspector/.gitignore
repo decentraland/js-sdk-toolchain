@@ -23,6 +23,7 @@ yarn-debug.log*
 yarn-error.log*
 
 public/bundle*
+public/scene.js
 
 src/lib/data-layer/proto/gen
 
