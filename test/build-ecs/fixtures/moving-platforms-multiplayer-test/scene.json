@@ -1,0 +1,42 @@
+{
+  "ecs7": true,
+  "runtimeVersion": "7",
+  "display": {
+    "title": "moving-platforms",
+    "favicon": "favicon_asset"
+  },
+  "contact": {
+    "name": "decentraland",
+    "email": ""
+  },
+  "owner": "",
+  "scene": {
+    "parcels": [
+      "77,-5"
+    ],
+    "base": "77,-5"
+  },
+  "requiredPermissions": [],
+  "main": "bin/game.js",
+  "tags": [],
+  "spawnPoints": [
+    {
+      "name": "spawn1",
+      "default": true,
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "cameraTarget": {
+        "x": 8,
+        "y": 1,
+        "z": 8
+      }
+    }
+  ],
+  "name": "moving-platforms",
+	"worldConfiguration" : {
+		"name": "MaximoCossetti.dcl.eth"
+	}
+}
