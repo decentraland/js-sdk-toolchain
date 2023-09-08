@@ -5,12 +5,12 @@ export type InspectorConfig = {
   disableSmartItems: boolean
 }
 
-export type WindowWithConfig = {
+export type GlobalWithConfig = typeof globalThis & {
   InspectorConfig?: Partial<InspectorConfig>
 }
 
 export function getConfig(): InspectorConfig {
-  const config = (window as WindowWithConfig).InspectorConfig
+  const config = (globalThis as GlobalWithConfig).InspectorConfig
   const params = new URLSearchParams(location.search)
   return {
     dataLayerRpcWsUrl: params.get('ws') || params.get('dataLayerRpcWsUrl') || config?.dataLayerRpcWsUrl || null,
