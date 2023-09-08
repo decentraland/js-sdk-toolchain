@@ -1,12 +1,12 @@
-import { Entity } from '@dcl/ecs'
+import { Entity, engine } from '@dcl/ecs'
 
 export type Socket = WebSocket & {
   binaryType: string
   send(data: string | Uint8Array): void
 }
 
-export type NetworkEntityFactory = {
-  addEntity(): Entity
+export type NetworkManager = {
+  addEntity(theEngine: typeof engine): Entity
 }
 
 export enum MessageType {

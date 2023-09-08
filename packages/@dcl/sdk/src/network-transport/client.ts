@@ -1,18 +1,17 @@
-import { serializeCrdtMessages } from '../internal/transports/logger'
-import { craftMessage, createNetworkEntityFactory, encodeString, syncFilter } from './utils'
+import { craftMessage, createNetworkManager, encodeString, syncFilter } from './utils'
 import { Transport, engine } from '@dcl/ecs'
 import { getHeaders } from '~system/SignedFetch'
 
-import { MessageType, NetworkEntityFactory, Socket } from './types'
+import { MessageType, NetworkManager, Socket } from './types'
 
 export type ClientTransportConfig = {
   serverUrl: string
 }
 
-export async function createClientTransport({ serverUrl }: ClientTransportConfig): Promise<NetworkEntityFactory> {
+export async function createClientTransport({ serverUrl }: ClientTransportConfig): Promise<NetworkManager> {
   const messagesToProcess: Uint8Array[] = []
 
-  return new Promise<NetworkEntityFactory>((resolve, reject) => {
+  return new Promise<NetworkManager>((resolve, reject) => {
     try {
       const ws = new WebSocket(serverUrl) as Socket
       ws.binaryType = 'arraybuffer'
@@ -60,7 +59,7 @@ export async function createClientTransport({ serverUrl }: ClientTransportConfig
             offset += 4
             const localEntitiesReserved = view.getUint32(offset)
             offset += 4
-            resolve(createNetworkEntityFactory(localEntitiesReserved, [start, start + size]))
+            resolve(createNetworkManager(localEntitiesReserved, [start, start + size]))
             messagesToProcess.push(r.subarray(offset))
           }
         }
