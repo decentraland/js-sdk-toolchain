@@ -1,0 +1,17 @@
+{
+  "name": "moving-platforms",
+  "description": "Moving Platforms",
+  "version": "1.0.0",
+  "dependencies": {
+    "@dcl-sdk/utils": "next",
+    "@dcl/ecs": "file:../../../../packages/@dcl/ecs",
+    "@dcl/js-runtime": "file:../../../../packages/@dcl/js-runtime",
+    "@dcl/sdk": "file:../../../../packages/@dcl/sdk",
+    "@dcl/sdk-commands": "file:../../../../packages/@dcl/sdk-commands"
+  },
+  "scripts": {
+    "build": "sdk-commands build --skip-install",
+    "deploy": "sdk-commands deploy",
+    "start": "sdk-commands start"
+  }
+}
