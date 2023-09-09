@@ -11,7 +11,7 @@ export type GlobalWithConfig = typeof globalThis & {
 
 export function getConfig(): InspectorConfig {
   const config = (globalThis as GlobalWithConfig).InspectorConfig
-  const params = new URLSearchParams(location ? location.search : '')
+  const params = new URLSearchParams(globalThis?.location?.search || '')
   return {
     dataLayerRpcWsUrl: params.get('ws') || params.get('dataLayerRpcWsUrl') || config?.dataLayerRpcWsUrl || null,
     dataLayerRpcParentUrl:
