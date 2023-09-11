@@ -25,7 +25,7 @@ export function craftMessage(msgType: MessageType, payload: Uint8Array): Uint8Ar
   return msg
 }
 
-export function createNetworkEntityFactory(reservedLocalEntities: number, range: [number, number]) {
+export function createNetworkManager(reservedLocalEntities: number, range: [number, number]) {
   return engine.addNetworkManager(reservedLocalEntities, range)
 }
 

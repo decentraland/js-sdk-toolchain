@@ -1,11 +1,11 @@
 import { engine, SyncEntity, Transport } from '@dcl/ecs'
 import { serializeCrdtMessages } from '../internal/transports/logger'
 import { engineToCrdt } from './state'
-import { syncFilter, createNetworkEntityFactory } from './utils'
-import { NetworkEntityFactory, ServerTransportConfig } from './types'
+import { syncFilter, createNetworkManager } from './utils'
+import { NetworkManager, ServerTransportConfig } from './types'
 import { PlayersConnected } from '.'
 
-export async function createServerTransport(config: ServerTransportConfig): Promise<NetworkEntityFactory> {
+export async function createServerTransport(config: ServerTransportConfig): Promise<NetworkManager> {
   const connectedClients = new Set<string>()
   engine.addTransport({
     send: async (message) => {
@@ -53,7 +53,7 @@ export async function createServerTransport(config: ServerTransportConfig): Prom
     PlayersConnected.createOrReplace(players, { usersId: [...connectedClients.values()].map(String) })
   })
 
-  const networkEntityFactory = createNetworkEntityFactory(config.reservedLocalEntities, [
+  const networkEntityFactory = createNetworkManager(config.reservedLocalEntities, [
     config.reservedLocalEntities,
     config.reservedLocalEntities + config.networkEntitiesLimit.serverLimit
   ])

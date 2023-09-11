@@ -3,7 +3,7 @@ import { Vector3 } from '@dcl/sdk/math'
 import { createCoin } from './modules/coin'
 import * as utils from '@dcl-sdk/utils'
 import { getRealm } from '~system/Runtime'
-import { createNetworkTransport } from '@dcl/sdk/network-transport'
+import { createNetworkManager } from '@dcl/sdk/network-transport'
 import { isServer } from '~system/EngineApi'
 
 // TODO: this could (or should?) be added as part of the networkTransport in the sdk package.
@@ -28,7 +28,7 @@ export async function main() {
   const serverUrl = realm.realmInfo?.isPreview
     ? 'ws://127.0.0.1:3000/ws/localScene'
     : 'wss://scene-state-server.decentraland.org/ws/MaximoCossetti.dcl.eth'
-  const networkedEntityFactory = await createNetworkTransport({ serverUrl })
+  const networkManager = await createNetworkManager({ serverUrl })
 
   const inAServer = isServer && (await isServer({})).isServer
 
@@ -67,7 +67,7 @@ export async function main() {
 
   if (inAServer) {
     //// triggerable platform
-    const platform3 = networkedEntityFactory.addEntity()
+    const platform3 = networkManager.addEntity(engine)
     GltfContainer.create(platform3, {
       src: 'models/triggerPlatform.glb'
     })
@@ -80,7 +80,7 @@ export async function main() {
     // Instantiate moving platforms
 
     //// only horizontal
-    const platform1 = networkedEntityFactory.addEntity()
+    const platform1 = networkManager.addEntity(engine)
     GltfContainer.create(platform1, {
       src: 'models/movingPlatform.glb'
     })
@@ -90,7 +90,7 @@ export async function main() {
     SyncEntity.create(platform1, { componentIds: [Transform.componentId] })
 
     //// only vertical
-    const platform2 = networkedEntityFactory.addEntity()
+    const platform2 = networkManager.addEntity(engine)
     GltfContainer.create(platform2, {
       src: 'models/movingPlatform.glb'
     })
@@ -100,7 +100,7 @@ export async function main() {
     SyncEntity.create(platform2, { componentIds: [Transform.componentId] })
 
     //// path with many waypoints
-    const platform4 = networkedEntityFactory.addEntity()
+    const platform4 = networkManager.addEntity(engine)
     GltfContainer.create(platform4, {
       src: 'models/movingPlatform.glb'
     })
