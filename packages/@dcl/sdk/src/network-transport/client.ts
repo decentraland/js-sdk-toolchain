@@ -24,7 +24,9 @@ export async function createClientTransport({ serverUrl }: ClientTransportConfig
         const transport: Transport = {
           filter: syncFilter,
           send: async (message: Uint8Array) => {
-            ws.send(craftMessage(MessageType.Crdt, message))
+            if (ws.readyState === WebSocket.OPEN) {
+              ws.send(craftMessage(MessageType.Crdt, message))
+            }
             if (messagesToProcess && messagesToProcess.length) {
               if (transport.onmessage) {
                 for (const byteArray of messagesToProcess) {
