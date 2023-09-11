@@ -5,6 +5,8 @@ import { Schemas, engine } from '@dcl/ecs'
 import { createServerTransport } from './server'
 import { ClientTransportConfig, createClientTransport } from './client'
 
+export { NetworkManager } from './types'
+
 export type NetworkTransportConfig = ClientTransportConfig & Partial<ServerTransportConfig>
 
 export let connected = false
