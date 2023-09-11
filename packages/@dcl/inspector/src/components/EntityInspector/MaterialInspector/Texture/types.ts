@@ -3,10 +3,12 @@ import { TextureFilterMode, TextureWrapMode } from "@dcl/ecs"
 import { mapSelectFieldOptions } from "../../SelectField/utils"
 import { useComponentInput } from "../../../../hooks/sdk/useComponentInput"
 import { TextureType } from "../types"
+import { AssetCatalogResponse } from "../../../../lib/data-layer/remote-data-layer"
 
 export type Props = {
   label: string
   texture: TextureType
+  files?: AssetCatalogResponse
   getInputProps: ReturnType<typeof useComponentInput>['getInputProps']
 }
 

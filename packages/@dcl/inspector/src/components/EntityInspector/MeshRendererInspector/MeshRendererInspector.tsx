@@ -45,7 +45,7 @@ export default withSdk<Props>(
             <DeleteIcon /> Delete
           </Item>
         </Menu>
-        <Block label="MeshCollider">
+        <Block>
           <SelectField label="Shape" options={SHAPES} {...mesh} />
         </Block>
         {mesh.value !== MeshType.MT_SPHERE && (

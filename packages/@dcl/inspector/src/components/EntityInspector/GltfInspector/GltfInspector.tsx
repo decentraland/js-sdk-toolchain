@@ -10,13 +10,13 @@ import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
-import { ProjectAssetDrop } from '../../../lib/sdk/drag-drop'
+import { ProjectAssetDrop, getModel } from '../../../lib/sdk/drag-drop'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
 import { SelectField } from '../SelectField'
 import { TextField } from '../TextField'
 import { Props } from './types'
-import { fromGltf, toGltf, isValidInput, getModel, COLLISION_LAYERS } from './utils'
+import { fromGltf, toGltf, isValidInput, COLLISION_LAYERS, isModel } from './utils'
 import { withAssetDir } from '../../../lib/data-layer/host/fs-utils'
 import { useAppSelector } from '../../../redux/hooks'
 import { selectAssetCatalog } from '../../../redux/app'
@@ -59,12 +59,12 @@ export default withSdk<Props>(
         drop: ({ value, context }: ProjectAssetDrop, monitor) => {
           if (monitor.didDrop()) return
           const node = context.tree.get(value)!
-          const model = getModel(node, context.tree)
+          const model = getModel(node, context.tree, isModel)
           if (model) void handleDrop(withAssetDir(model.asset.src))
         },
         canDrop: ({ value, context }: ProjectAssetDrop) => {
           const node = context.tree.get(value)!
-          return !!getModel(node, context.tree)
+          return !!getModel(node, context.tree, isModel)
         },
         collect: (monitor) => ({
           isHover: monitor.canDrop() && monitor.isOver()

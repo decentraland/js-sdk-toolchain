@@ -21,7 +21,7 @@ export type EcsComponents = Partial<{
   textShape: PBTextShape
   transform: TransformType
 }>
-;``
+
 export class EcsEntity extends BABYLON.TransformNode {
   readonly isDCLEntity = true
   usedComponents = new Map<number, ComponentDefinition<unknown>>()
@@ -29,7 +29,7 @@ export class EcsEntity extends BABYLON.TransformNode {
   gltfContainer?: BABYLON.AbstractMesh
   gltfAssetContainer?: BABYLON.AssetContainer
   textShape?: BABYLON.Mesh
-  material?: BABYLON.Material
+  material?: BABYLON.StandardMaterial | BABYLON.PBRMaterial
 
   #gltfPathLoading?: IFuture<string>
 

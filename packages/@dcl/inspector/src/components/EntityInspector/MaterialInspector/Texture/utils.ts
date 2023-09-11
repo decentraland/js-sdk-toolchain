@@ -1,5 +1,12 @@
 import { TextureUnion, TextureFilterMode, TextureWrapMode } from '@dcl/ecs'
+
 import { Texture, TextureInput } from './types'
+import { TreeNode } from '../../../ProjectAssetExplorer/ProjectView'
+import { AssetNodeItem } from '../../../ProjectAssetExplorer/types'
+import { isAssetNode } from '../../../ProjectAssetExplorer/utils'
+import { AssetCatalogResponse } from '../../../../lib/data-layer/remote-data-layer'
+import { isValidInput } from '../../GltfInspector/utils'
+import { removeBasePath } from '../../../../lib/logic/remove-base-path'
 
 const toNumber = (value?: string, def?: number) => {
   const num = Number(value)
@@ -8,7 +15,7 @@ const toNumber = (value?: string, def?: number) => {
 
 const toString = (value: unknown, def: string = '') => (value ?? def).toString()
 
-export const fromTexture = (value: TextureUnion): TextureInput => {
+export const fromTexture = (base: string, value: TextureUnion): TextureInput => {
   switch (value.tex?.$case) {
     case 'avatarTexture':
       return {
@@ -28,14 +35,14 @@ export const fromTexture = (value: TextureUnion): TextureInput => {
     default:
       return {
         type: Texture.TT_TEXTURE,
-        src: toString(value?.tex?.texture.src),
+        src: toString(removeBasePath(base, value?.tex?.texture.src ?? '')),
         wrapMode: toString(value?.tex?.texture.wrapMode),
         filterMode: toString(value?.tex?.texture.filterMode)
       }
   }
 }
 
-export const toTexture = (value?: TextureInput): TextureUnion => {
+export const toTexture = (base: string, value?: TextureInput): TextureUnion => {
   switch (value?.type) {
     case Texture.TT_AVATAR_TEXTURE:
       return {
@@ -64,7 +71,7 @@ export const toTexture = (value?: TextureInput): TextureUnion => {
         tex: {
           $case: 'texture',
           texture: {
-            src: toString(value?.src),
+            src: value?.src ? toString(base ? base + '/' + value.src : value.src) : '',
             wrapMode: toNumber(value?.wrapMode, TextureWrapMode.TWM_REPEAT),
             filterMode: toNumber(value?.filterMode, TextureFilterMode.TFM_POINT)
           }
@@ -73,6 +80,10 @@ export const toTexture = (value?: TextureInput): TextureUnion => {
   }
 }
 
-export function isValidInput(): boolean {
-  return true
+export const isTexture = (value: string): boolean => value.endsWith('.png')
+export const isModel = (node: TreeNode): node is AssetNodeItem => isAssetNode(node) && isTexture(node.name)
+
+export function isValidTexture(value: any, files?: AssetCatalogResponse): boolean {
+  if (typeof value === 'string' && files) return isValidInput(files, value)
+  return false
 }

@@ -8,22 +8,31 @@ import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
+import { useAppSelector } from '../../../redux/hooks'
+import { selectAssetCatalog } from '../../../redux/app'
 import { Block } from '../../Block'
 import { SelectField } from '../SelectField'
 import { TextField } from '../TextField'
 import { Container } from '../../Container'
 import { Texture, Props as TextureProps } from './Texture'
-import { Props, MaterialType, TextureType } from './types'
-import { fromMaterial, toMaterial, isValidInput, MATERIAL_TYPES, TRANSPARENCY_MODES } from './utils'
 import { ColorField } from '../ColorField'
+import { Props, MaterialType, TextureType } from './types'
+import { fromMaterial, toMaterial, isValidMaterial, MATERIAL_TYPES, TRANSPARENCY_MODES } from './utils'
 
 export default withSdk<Props>(
   withContextMenu<WithSdkProps & Props>(({ sdk, entity, contextMenuId }) => {
     const { handleAction } = useContextMenu()
+    const files = useAppSelector(selectAssetCatalog)
     const { Material } = sdk.components
 
     const hasMaterial = useHasComponent(entity, Material)
-    const { getInputProps, isValid } = useComponentInput(entity, Material, fromMaterial, toMaterial, isValidInput)
+    const { getInputProps} = useComponentInput(
+      entity,
+      Material,
+      fromMaterial(files?.basePath ?? ''),
+      toMaterial(files?.basePath ?? ''),
+      isValidMaterial
+    )
 
     const handleRemove = useCallback(async () => {
       sdk.operations.removeComponent(entity, Material)
@@ -79,12 +88,12 @@ export default withSdk<Props>(
           </Block>
         </>)}
 
-        <Texture label="Texture" texture={TextureType.TT_TEXTURE} getInputProps={getTextureProps} />
+        <Texture label="Texture" texture={TextureType.TT_TEXTURE} files={files} getInputProps={getTextureProps} />
 
         {materialType.value === MaterialType.MT_PBR && (<>
-          <Texture label="Alpha texture" texture={TextureType.TT_ALPHA_TEXTURE} getInputProps={getTextureProps} />
-          <Texture label="Bump texture" texture={TextureType.TT_BUMP_TEXTURE} getInputProps={getTextureProps} />
-          <Texture label="Emissive texture" texture={TextureType.TT_EMISSIVE_TEXTURE} getInputProps={getTextureProps} />
+          <Texture label="Alpha texture" texture={TextureType.TT_ALPHA_TEXTURE} files={files} getInputProps={getTextureProps} />
+          <Texture label="Bump texture" texture={TextureType.TT_BUMP_TEXTURE} files={files} getInputProps={getTextureProps} />
+          <Texture label="Emissive texture" texture={TextureType.TT_EMISSIVE_TEXTURE} files={files} getInputProps={getTextureProps} />
         </>)}
       </Container>
     )

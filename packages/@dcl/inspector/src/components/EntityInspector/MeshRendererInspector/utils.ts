@@ -37,10 +37,10 @@ export const toMeshRenderer = (value: MeshRendererInput): PBMeshRenderer => {
         }
       }
     case MeshType.MT_PLANE:
-      return { mesh: { $case: MeshType.MT_PLANE, plane: { uvs: (value.uvs ?? '').split(' ').map(Number) } } }
+      return { mesh: { $case: MeshType.MT_PLANE, plane: { uvs: [] || (value.uvs ?? '').split(' ').map(Number) } } }
     case MeshType.MT_BOX:
     default:
-      return { mesh: { $case: MeshType.MT_BOX, box: { uvs: (value.uvs ?? '').split(' ').map(Number) } } }
+      return { mesh: { $case: MeshType.MT_BOX, box: { uvs: [] || (value.uvs ?? '').split(' ').map(Number) } } }
   }
 }
 

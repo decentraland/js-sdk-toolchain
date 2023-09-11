@@ -48,7 +48,7 @@ export default withSdk<Props>(
             <DeleteIcon /> Delete
           </Item>
         </Menu>
-        <Block label="MeshCollider">
+        <Block>
           <SelectField label="Shape" options={SHAPES} {...mesh} />
           <SelectField label="Collision layer" options={COLLISION_LAYERS} {...getInputProps('collisionMask')} />
         </Block>
