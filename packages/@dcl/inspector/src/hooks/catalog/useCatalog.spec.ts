@@ -1,5 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
-import { CATALOG_URL, useCatalog } from './useCatalog'
+import { getConfig } from '../../lib/logic/config'
+import { useCatalog } from './useCatalog'
 
 let fetchMock: jest.MockedFn<typeof global.fetch>
 
@@ -36,10 +37,11 @@ describe('useCatalog', () => {
       fetchMock.mockReset()
     })
     it('should fetch the catalog from the builder server', () => {
+      const config = getConfig()
       act(() => {
         renderHook(() => useCatalog())
       })
-      expect(fetchMock).toHaveBeenCalledWith(CATALOG_URL)
+      expect(fetchMock).toHaveBeenCalledWith(config.catalogUrl + '/catalog.json')
     })
     it('should start with an empty catalog, null error and true isLoading', () => {
       const { result } = renderHook(() => useCatalog())
