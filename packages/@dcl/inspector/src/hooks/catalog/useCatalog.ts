@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react'
+import { getConfig } from '../../lib/logic/config'
 import { AssetPack } from '../../components/AssetsCatalog/types'
-
-export const CATALOG_URL = 'https://builder-items.decentraland.org/catalog.json'
 
 export const useCatalog = () => {
   const [catalog, setCatalog] = useState<AssetPack[]>([])
   const [error, setError] = useState<Error | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
+  const config = getConfig()
+
   useEffect(() => {
     setIsLoading(true)
-    fetch(CATALOG_URL)
+    fetch(`${config.catalogUrl}/catalog.json`)
       .then((res) => res.json())
       .then((json) => {
         const assetPacks = json.assetPacks as AssetPack[]

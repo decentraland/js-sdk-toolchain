@@ -1,7 +1,9 @@
+import { getConfig } from '../../lib/logic/config'
 import { Asset, CATEGORIES } from './types'
 
 export function getContentsUrl(hash: string) {
-  return `https://builder-items.decentraland.org/contents/${hash}`
+  const config = getConfig()
+  return `${config.catalogUrl}/contents/${hash}`
 }
 
 export function getAssetsByCategory(assets: Asset[]) {
