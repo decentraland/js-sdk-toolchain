@@ -67,7 +67,7 @@ const Renderer: React.FC = () => {
   const addAsset = async (asset: AssetNodeItem, position: Vector3) => {
     if (!sdk) return
     const { operations } = sdk
-    operations.addAsset(ROOT, withAssetDir(asset.asset.src), asset.name, position)
+    operations.addAsset(ROOT, withAssetDir(asset.asset.src), asset.name, position, asset.components)
     await operations.dispatch()
   }
 
@@ -113,7 +113,8 @@ const Renderer: React.FC = () => {
       type: 'asset',
       name: asset.name,
       parent: null,
-      asset: { type: 'gltf', src: `${destFolder}/${assetPackageName}/${path}` }
+      asset: { type: 'gltf', src: `${destFolder}/${assetPackageName}/${path}` },
+      components: asset.components
     }
     await addAsset(model, position)
   }
