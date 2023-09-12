@@ -1,3 +1,6 @@
+import { ComponentName } from '@dcl/asset-packs'
+import { EditorComponentsTypes } from '../../lib/sdk/components'
+
 export interface Props {
   catalog: AssetPack[]
   error: Error | null
@@ -30,7 +33,7 @@ export type Asset = {
   category: string
   tags: string[]
   contents: Record<string, string>
-  components: Record<string, any>
+  components: Partial<Record<ComponentName, EditorComponentsTypes['Actions'] | EditorComponentsTypes['Triggers']>>
 }
 
 export interface ThemeProps {

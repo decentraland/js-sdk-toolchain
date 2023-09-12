@@ -1,9 +1,12 @@
+import { getConfig } from '../../logic/config'
+
 export async function downloadAssets(mappings: Record<string, string>) {
   const fileContent: Record<string, Buffer> = {}
 
   async function downloadAndAssignAsset([path, contentHash]: [string, string]) {
+    const config = getConfig()
     try {
-      const url = `https://builder-items.decentraland.org/contents/${contentHash}`
+      const url = `${config.catalogUrl}/contents/${contentHash}`
       const request = await fetch(url)
       const content = await request.arrayBuffer()
       fileContent[path] = Buffer.from(content)

@@ -1,4 +1,5 @@
 import { Engine, Entity, IEngine, getComponentEntityTree } from '@dcl/ecs'
+import { ActionType, ComponentName, TriggerType } from '@dcl/asset-packs'
 
 import { EditorComponents, SdkComponents, createComponents, createEditorComponents } from './components'
 import { getEmptyTree, getTreeFromEngine, ROOT } from './tree'
@@ -159,6 +160,67 @@ describe('getTreeFromEngine', () => {
           })
         })
       })
+    })
+  })
+  describe('when getting a tree from an engine with an entity with an Action component', () => {
+    let A: Entity
+    beforeEach(() => {
+      A = operations.addChild(ROOT, 'A', {
+        [ComponentName.ACTIONS]: {
+          value: [
+            {
+              name: 'Open',
+              type: ActionType.PLAY_ANIMATION,
+              animation: 'Open'
+            }
+          ]
+        }
+      })
+    })
+    it('should return a tree with entity A with an Action component as children of ROOT', () => {
+      const tree = getTreeFromEngine(engine, Nodes)
+      /**
+       * ROOT
+       * └─> A
+       */
+      expect(tree.get(ROOT)).toEqual(new Set([A]))
+    })
+  })
+  describe('when getting a tree from an engine with an entity with an Trigger component', () => {
+    let A: Entity
+    beforeEach(() => {
+      A = operations.addChild(ROOT, 'A', {
+        [ComponentName.TRIGGERS]: {
+          value: [
+            {
+              type: TriggerType.ON_CLICK,
+              actions: [
+                {
+                  entity: '{selfEntity}' as any,
+                  name: 'Open'
+                }
+              ]
+            },
+            {
+              type: TriggerType.ON_CLICK,
+              actions: [
+                {
+                  entity: ROOT as Entity,
+                  name: 'Open'
+                }
+              ]
+            }
+          ]
+        }
+      })
+    })
+    it('should return a tree with entity A with an Trigger component as children of ROOT', () => {
+      const tree = getTreeFromEngine(engine, Nodes)
+      /**
+       * ROOT
+       * └─> A
+       */
+      expect(tree.get(ROOT)).toEqual(new Set([A]))
     })
   })
 })
