@@ -25,16 +25,17 @@ import type { Props } from './types'
 import './TriggerInspector.css'
 
 export default withSdk<Props>(
-  withContextMenu<Props & WithSdkProps>(({ sdk, entity, contextMenuId }) => {
+  withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId, contextMenuId }) => {
     const { Actions, Triggers, Name } = sdk.components
     const entitiesWithAction = useEntitiesWith((components) => components.Actions)
     const [componentValue, setComponentValue, isComponentEqual] = useComponentValue<EditorComponentsTypes['Triggers']>(
-      entity,
+      entityId,
       Triggers
     )
     const { handleAction } = useContextMenu()
     const [triggers, setTriggers] = useState<Trigger[]>(componentValue === null ? [] : componentValue.value)
-    const hasTriggers = useHasComponent(entity, Triggers)
+
+    const hasTriggers = useHasComponent(entityId, Triggers)
 
     const areValidAction = useCallback(
       (updatedActions: TriggerAction[]) =>
@@ -60,11 +61,11 @@ export default withSdk<Props>(
     }, [triggers])
 
     const availableActions: Map<Entity, { name: string; action: Action[] }> = useMemo(() => {
-      return entitiesWithAction?.reduce((actions, entity) => {
-        const action = getComponentValue(entity, Actions)
-        const name = Name.get(entity)
+      return entitiesWithAction?.reduce((actions, entityWithAction) => {
+        const action = getComponentValue(entityWithAction, Actions)
+        const name = Name.get(entityWithAction)
         if (action.value.length > 0) {
-          actions.set(entity, { name: name.value, action: action.value as Action[] })
+          actions.set(entityWithAction, { name: name.value, action: action.value as Action[] })
         }
 
         return actions
@@ -72,7 +73,7 @@ export default withSdk<Props>(
     }, [entitiesWithAction])
 
     const handleRemove = useCallback(async () => {
-      sdk.operations.removeComponent(entity, Triggers)
+      sdk.operations.removeComponent(entityId, Triggers)
       await sdk.operations.dispatch()
     }, [])
 
@@ -133,7 +134,7 @@ export default withSdk<Props>(
 
           actions[actionIdx] = {
             ...actions[actionIdx],
-            entity: entitiesWithAction?.find((entity) => entity.toString() === value)
+            entity: entitiesWithAction?.find((entityWithAction) => entityWithAction.toString() === value)
           }
 
           data[triggerIdx] = {
@@ -221,6 +222,7 @@ export default withSdk<Props>(
         {triggers.map((trigger: Trigger, triggerIdx: number) => {
           return (
             <TriggerEvent
+              key={`trigger-${triggerIdx}`}
               trigger={trigger}
               onChangeTriggerType={(e) => handleChangeType(e, triggerIdx)}
               onAddNewTriggerAction={(e) => handleAddNewTriggerAction(e, triggerIdx)}
@@ -229,6 +231,7 @@ export default withSdk<Props>(
               {trigger.actions.map((action, actionIdx) => {
                 return (
                   <TriggerActionContainer
+                    key={`trigger-${triggerIdx}-action-${actionIdx}`}
                     action={action}
                     availableActions={availableActions}
                     onChangeEntity={(e) => handleChangeEnitty(e, triggerIdx, actionIdx)}
