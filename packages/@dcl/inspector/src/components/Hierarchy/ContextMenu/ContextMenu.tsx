@@ -1,10 +1,11 @@
 import { Item, Submenu, Separator } from 'react-contexify'
 import { Entity } from '@dcl/ecs'
+import { ComponentName } from '@dcl/asset-packs'
 
+import { getConfig } from '../../../lib/logic/config'
 import { ROOT } from '../../../lib/sdk/tree'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { useEntityComponent } from '../../../hooks/sdk/useEntityComponent'
-import { getConfig } from '../../../lib/logic/config'
 
 // TODO: enumerate better the components we want to show...
 const getEnabledComponents = () => {
@@ -13,7 +14,7 @@ const getEnabledComponents = () => {
   const config = getConfig()
 
   if (!config.disableSmartItems) {
-    for (const component of ['inspector::Actions', 'inspector::Triggers']) {
+    for (const component of Object.values(ComponentName)) {
       components.add(component)
     }
   }
