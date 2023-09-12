@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Entity } from '@dcl/ecs'
-import { Action, Trigger, TriggerType, TriggerAction } from '@dcl/asset-packs'
+import { Action, Trigger, TriggerType, TriggerAction, TriggerConditionOperation } from '@dcl/asset-packs'
 import { Item } from 'react-contexify'
 import { AiFillDelete as DeleteIcon, AiOutlinePlus as AddIcon } from 'react-icons/ai'
 import { VscQuestion as QuestionIcon } from 'react-icons/vsc'
@@ -85,6 +85,8 @@ export default withSdk<Props>(
             ...prev,
             {
               type: TriggerType.ON_CLICK,
+              conditions: [],
+              operation: TriggerConditionOperation.AND,
               actions: [
                 {
                   entity: undefined,
