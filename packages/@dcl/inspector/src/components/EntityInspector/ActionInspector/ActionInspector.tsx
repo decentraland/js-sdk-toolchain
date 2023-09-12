@@ -25,17 +25,19 @@ import MoreOptionsMenu from '../MoreOptionsMenu'
 import Button from '../../Button'
 
 export default withSdk<Props>(
-  withContextMenu<Props & WithSdkProps>(({ sdk, entity, contextMenuId }) => {
+  withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId, contextMenuId }) => {
     const { Actions } = sdk.components
     const [componentValue, setComponentValue, isComponentEqual] = useComponentValue<EditorComponentsTypes['Actions']>(
-      entity,
+      entityId,
       Actions
     )
+    const entity = sdk.sceneContext.getEntityOrNull(entityId)
     const { handleAction } = useContextMenu()
     const [actions, setActions] = useState<Action[]>(componentValue === null ? [] : componentValue.value)
     const [isFocused, setIsFocused] = useState(false)
+    const [isLoaded, setIsLoaded] = useState(false)
 
-    const hasActions = useHasComponent(entity, Actions)
+    const hasActions = useHasComponent(entityId, Actions)
 
     const areValidActions = useCallback(
       (updatedActions: Action[]) =>
@@ -54,9 +56,24 @@ export default withSdk<Props>(
       }
     }, [actions, isFocused])
 
+    useEffect(() => {
+      if (entity?.isGltfPathLoading()) {
+        entity
+          ?.getGltfPathLoading()
+          ?.then((_value) => {
+            setIsLoaded(true)
+          })
+          .catch((_e) => {
+            setIsLoaded(false)
+          })
+      } else {
+        setIsLoaded(true)
+      }
+    }, [])
+
     const entityAnimations = useMemo(() => {
-      return sdk.sceneContext.getEntityOrNull(entity)?.gltfAssetContainer?.animationGroups || []
-    }, [sdk.sceneContext.getEntityOrNull(entity)?.gltfAssetContainer])
+      return entity?.gltfAssetContainer?.animationGroups || []
+    }, [entity?.gltfAssetContainer?.animationGroups])
 
     const availableActions: string[] = useMemo(() => {
       return Object.values(ActionType).filter(
@@ -66,7 +83,7 @@ export default withSdk<Props>(
     }, [entityAnimations])
 
     const handleRemove = useCallback(async () => {
-      sdk.operations.removeComponent(entity, Actions)
+      sdk.operations.removeComponent(entityId, Actions)
       await sdk.operations.dispatch()
     }, [])
 
@@ -142,7 +159,7 @@ export default withSdk<Props>(
       [setActions]
     )
 
-    if (!hasActions) {
+    if (!hasActions || !isLoaded) {
       return null
     }
 
