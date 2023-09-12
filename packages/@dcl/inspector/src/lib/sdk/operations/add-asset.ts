@@ -1,4 +1,5 @@
 import { Entity, IEngine, Transform as TransformEngine, GltfContainer as GltfEngine, Vector3Type } from '@dcl/ecs'
+import { ComponentName } from '@dcl/asset-packs'
 import { EditorComponentsTypes } from '../components'
 import updateSelectedEntity from './update-selected-entity'
 import { addChild } from './add-child'
@@ -9,7 +10,7 @@ export function addAsset(engine: IEngine) {
     src: string,
     name: string,
     position: Vector3Type,
-    components?: EditorComponentsTypes
+    components?: Partial<Record<ComponentName, EditorComponentsTypes['Actions'] | EditorComponentsTypes['Triggers']>>
   ): Entity {
     const child = addChild(engine)(parent, name, components)
     const Transform = engine.getComponent(TransformEngine.componentId) as typeof TransformEngine
