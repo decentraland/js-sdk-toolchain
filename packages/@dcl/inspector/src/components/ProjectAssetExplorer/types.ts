@@ -1,3 +1,4 @@
+import { ComponentName } from '@dcl/asset-packs'
 import { EditorComponentsTypes } from '../../lib/sdk/components'
 
 export interface IAsset {
@@ -19,7 +20,7 @@ export interface AssetCellProp {
 export type AssetNodeBase = {
   name: string
   parent: AssetNodeFolder | null
-  components?: EditorComponentsTypes
+  components?: Partial<Record<ComponentName, EditorComponentsTypes['Actions'] | EditorComponentsTypes['Triggers']>>
 }
 
 export type AssetNodeItem = AssetNodeBase & {
