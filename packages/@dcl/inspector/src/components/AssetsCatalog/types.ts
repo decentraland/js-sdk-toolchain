@@ -1,3 +1,5 @@
+import { EditorComponentsTypes } from '../../lib/sdk/components'
+
 export interface Props {
   catalog: AssetPack[]
   error: Error | null
@@ -30,7 +32,7 @@ export type Asset = {
   category: string
   tags: string[]
   contents: Record<string, string>
-  components: Record<string, any>
+  components: EditorComponentsTypes
 }
 
 export interface ThemeProps {

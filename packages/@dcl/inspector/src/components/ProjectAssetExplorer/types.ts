@@ -1,3 +1,5 @@
+import { EditorComponentsTypes } from '../../lib/sdk/components'
+
 export interface IAsset {
   src: string
   type: 'unknown' | 'gltf' | 'composite'
@@ -17,6 +19,7 @@ export interface AssetCellProp {
 export type AssetNodeBase = {
   name: string
   parent: AssetNodeFolder | null
+  components?: EditorComponentsTypes
 }
 
 export type AssetNodeItem = AssetNodeBase & {
