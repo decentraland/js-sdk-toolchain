@@ -8,7 +8,7 @@ import {
   PointerEventType,
   PointerEvents,
   Schemas,
-  SyncEntity,
+  SyncComponents,
   Transform,
   VisibilityComponent,
   engine,
@@ -28,7 +28,7 @@ export const BirdKilled = engine.defineComponent('bird-killed', { userId: Schema
 export function createHummingBird(networkManager: NetworkManager) {
   const bird = networkManager.addEntity(engine)
   Bird.create(bird)
-  SyncEntity.create(bird, {
+  SyncComponents.create(bird, {
     componentIds: [Transform.componentId, Animator.componentId, VisibilityComponent.componentId, BirdKilled.componentId]
   })
   VisibilityComponent.create(bird, { visible: true })

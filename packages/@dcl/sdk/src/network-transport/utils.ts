@@ -5,7 +5,7 @@ import {
   PointerEventsResult,
   RESERVED_STATIC_ENTITIES,
   RESERVED_LOCAL_ENTITIES,
-  SyncEntity,
+  SyncComponents,
   CrdtMessageType,
   EntityUtils
 } from '@dcl/ecs'
@@ -57,7 +57,7 @@ export function syncFilter(message: Omit<TransportMessage, 'messageBuffer'>) {
     return true
   }
 
-  const sync = SyncEntity.getOrNull(message.entityId)
+  const sync = SyncComponents.getOrNull(message.entityId)
   if (!sync) return false
 
   if ((message as any).componentId && sync.componentIds.includes((message as any).componentId)) {

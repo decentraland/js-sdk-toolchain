@@ -1,4 +1,4 @@
-import { engine, SyncEntity, Transport } from '@dcl/ecs'
+import { engine, SyncComponents, Transport } from '@dcl/ecs'
 import { serializeCrdtMessages } from '../internal/transports/logger'
 import { engineToCrdt } from './state'
 import { syncFilter, createNetworkManager } from './utils'
@@ -58,6 +58,6 @@ export async function createServerTransport(config: ServerTransportConfig): Prom
     config.reservedLocalEntities + config.networkEntitiesLimit.serverLimit
   ])
   const players = networkEntityFactory.addEntity()
-  SyncEntity.create(players, { componentIds: [PlayersConnected.componentId] })
+  SyncComponents.create(players, { componentIds: [PlayersConnected.componentId] })
   return networkEntityFactory
 }

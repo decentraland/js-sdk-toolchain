@@ -6,11 +6,6 @@
 
 import _m0 from 'protobufjs/minimal';
 
-// Warning: (ae-missing-release-tag) "addCommsTransport" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export function addCommsTransport(): void;
-
 // @public (undocumented)
 export type AlignType = 'auto' | 'flex-start' | 'center' | 'flex-end' | 'stretch' | 'baseline' | 'space-between' | 'space-around';
 
@@ -1388,6 +1383,19 @@ export interface ISchema<T = any> {
 //
 // @public
 export function isEqual(p1: Coords, p2: Coords): boolean;
+
+// Warning: (ae-missing-release-tag) "ISyncComponents" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type ISyncComponents = LastWriteWinElementSetComponentDefinition<ISyncComponentsType>;
+
+// Warning: (ae-missing-release-tag) "ISyncComponentsType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface ISyncComponentsType {
+    // (undocumented)
+    componentIds: number[];
+}
 
 // @public (undocumented)
 export type JsonArray = Array<JsonPrimitive | JsonMap | JsonArray>;
@@ -3462,23 +3470,10 @@ export interface Spec {
     [key: string]: ISchema;
 }
 
-// Warning: (ae-missing-release-tag) "SyncComponent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+// Warning: (ae-missing-release-tag) "SyncComponents" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export type SyncComponent = LastWriteWinElementSetComponentDefinition<SyncType>;
-
-// Warning: (ae-missing-release-tag) "SyncEntity" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const SyncEntity: SyncComponent;
-
-// Warning: (ae-missing-release-tag) "SyncType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export interface SyncType {
-    // (undocumented)
-    componentIds: number[];
-}
+export const SyncComponents: ISyncComponents;
 
 // @public (undocumented)
 export type SystemFn = (dt: number) => void;

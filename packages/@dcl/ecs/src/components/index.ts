@@ -6,7 +6,7 @@ import { defineMeshColliderComponent, MeshColliderComponentDefinitionExtended } 
 import { defineMeshRendererComponent, MeshRendererComponentDefinitionExtended } from './extended/MeshRenderer'
 import { LwwComponentGetter, GSetComponentGetter } from './generated/index.gen'
 import defineNameComponent, { NameType } from './manual/Name'
-import defineSyncComponent, { SyncType } from './manual/Sync'
+import defineSyncComponent, { ISyncComponentsType } from './manual/SyncComponents'
 import { defineTransformComponent, TransformComponentExtended } from './manual/Transform'
 
 export * from './generated/index.gen'
@@ -49,6 +49,6 @@ export const Name: (engine: Pick<IEngine, 'defineComponent'>) => LastWriteWinEle
  * @alpha
  */
 /* @__PURE__ */
-export const SyncEntity: (
+export const SyncComponents: (
   engine: Pick<IEngine, 'defineComponent'>
-) => LastWriteWinElementSetComponentDefinition<SyncType> = (engine) => defineSyncComponent(engine)
+) => LastWriteWinElementSetComponentDefinition<ISyncComponentsType> = (engine) => defineSyncComponent(engine)

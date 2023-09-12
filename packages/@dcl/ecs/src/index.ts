@@ -25,7 +25,7 @@ import {
   MeshRendererComponentDefinitionExtended,
   TransformComponentExtended,
   AnimatorComponentDefinitionExtended,
-  SyncComponent
+  ISyncComponents
 } from './components/types'
 import { NameComponent } from './components/manual/Name'
 
@@ -36,7 +36,7 @@ export const Material: MaterialComponentDefinitionExtended = /* @__PURE__*/ comp
 export const MeshRenderer: MeshRendererComponentDefinitionExtended = /* @__PURE__*/ components.MeshRenderer(engine)
 export const MeshCollider: MeshColliderComponentDefinitionExtended = /* @__PURE__*/ components.MeshCollider(engine)
 export const Name: NameComponent = components.Name(engine)
-export const SyncEntity: SyncComponent = components.SyncEntity(engine)
+export const SyncComponents: ISyncComponents = components.SyncComponents(engine)
 
 // export components for global engine
 export * from './components/generated/global.gen'

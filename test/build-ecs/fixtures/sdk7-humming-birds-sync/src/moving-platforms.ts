@@ -1,4 +1,4 @@
-import { GltfContainer, Transform, SyncEntity, Entity } from '@dcl/ecs'
+import { GltfContainer, Transform, SyncComponents, Entity } from '@dcl/ecs'
 import * as utils from '@dcl-sdk/utils'
 import { Vector3 } from '@dcl/sdk/math'
 import { NetworkEntityFactory } from '@dcl/sdk/network-transport/types'
@@ -14,7 +14,7 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkEntityFacto
   Transform.create(platform1, {
     position: Vector3.create(2, 1.5, 8)
   })
-  SyncEntity.create(platform1, { componentIds: [Transform.componentId] })
+  SyncComponents.create(platform1, { componentIds: [Transform.componentId] })
   //// only vertical
   const platform2 = networkedEntityFactory.addEntity()
   GltfContainer.create(platform2, {
@@ -23,7 +23,7 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkEntityFacto
   Transform.create(platform2, {
     position: Vector3.create(4, 1.5, 14)
   })
-  SyncEntity.create(platform2, { componentIds: [Transform.componentId] })
+  SyncComponents.create(platform2, { componentIds: [Transform.componentId] })
 
   //// path with many waypoints
   const platform4 = networkedEntityFactory.addEntity()
@@ -33,7 +33,7 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkEntityFacto
   Transform.create(platform4, {
     position: Vector3.create(6.5, 7, 4)
   })
-  SyncEntity.create(platform4, { componentIds: [Transform.componentId] })
+  SyncComponents.create(platform4, { componentIds: [Transform.componentId] })
 
   const platform3 = networkedEntityFactory.addEntity()
   GltfContainer.create(platform3, {
@@ -42,7 +42,7 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkEntityFacto
   Transform.create(platform3, {
     position: Vector3.create(14, 4, 12)
   })
-  SyncEntity.create(platform3, { componentIds: [Transform.componentId] })
+  SyncComponents.create(platform3, { componentIds: [Transform.componentId] })
   startPath(platform3, [Vector3.create(14, 4, 12), Vector3.create(14, 4, 4), Vector3.create(14, 4, 12)], 3, false, true)
 
   startPath(

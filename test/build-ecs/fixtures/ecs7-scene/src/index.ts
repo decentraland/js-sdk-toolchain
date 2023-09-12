@@ -6,7 +6,7 @@ import {
   MeshRenderer,
   Transform,
   pointerEventsSystem,
-  SyncEntity,
+  SyncComponents,
   Schemas,
   Material,
   PointerEvents,
@@ -49,7 +49,7 @@ function createCube(x: number, y: number, z: number): Entity {
 
   Door.create(meshEntity, { open: false })
 
-  SyncEntity.create(meshEntity, { componentIds: [Door.componentId, Material.componentId] })
+  SyncComponents.create(meshEntity, { componentIds: [Door.componentId, Material.componentId] })
 
   PointerEvents.create(meshEntity, {
     pointerEvents: [

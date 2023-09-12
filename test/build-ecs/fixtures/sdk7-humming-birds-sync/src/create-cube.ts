@@ -4,7 +4,7 @@ import {
   MeshRenderer,
   MeshCollider,
   Material,
-  SyncEntity,
+  SyncComponents,
   PointerEvents,
   PointerEventType,
   InputAction,
@@ -27,7 +27,7 @@ export function createCube(entityFactory: NetworkEntityFactory, x: number, y: nu
   MeshCollider.setBox(entity)
   Material.setPbrMaterial(entity, { albedoColor: Color4.fromHexString(getRandomHexColor()) })
 
-  SyncEntity.create(entity, { componentIds: [Material.componentId] })
+  SyncComponents.create(entity, { componentIds: [Material.componentId] })
 
   PointerEvents.create(entity, {
     pointerEvents: [

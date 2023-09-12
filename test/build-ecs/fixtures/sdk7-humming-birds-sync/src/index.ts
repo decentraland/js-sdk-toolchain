@@ -7,7 +7,7 @@ import {
   InputAction,
   pointerEventsSystem,
   Schemas,
-  SyncEntity,
+  SyncComponents,
   Transform
 } from '@dcl/sdk/ecs'
 import { getRealm } from '~system/Runtime'
@@ -26,7 +26,7 @@ export const GameStatus = engine.defineComponent('game-status', { paused: Schema
 function gameStatusServer(networkManager: NetworkManager) {
   const gameEntity = networkManager.addEntity(engine)
   GameStatus.create(gameEntity, { paused: false })
-  SyncEntity.create(gameEntity, { componentIds: [GameStatus.componentId] })
+  SyncComponents.create(gameEntity, { componentIds: [GameStatus.componentId] })
 }
 
 export async function main() {
