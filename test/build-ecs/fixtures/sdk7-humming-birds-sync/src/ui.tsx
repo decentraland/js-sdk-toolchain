@@ -105,7 +105,7 @@ export function setupUi(userId: string) {
               }
             }}
             uiText={{
-              value: `Players: ${playersConnected ?? 0} ${getPlayerPosition()}`,
+              value: `Players: ${playersConnected ?? 0}`,
               fontSize: 18
             }}
           />

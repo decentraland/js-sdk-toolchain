@@ -15,29 +15,6 @@
   "main": "bin/index.js",
   "tags": [],
   "spawnPoints": [
-    {
-      "name": "spawn1",
-      "default": true,
-      "position": {
-        "x": [
-          0,
-          3
-        ],
-        "y": [
-          0,
-          0
-        ],
-        "z": [
-          0,
-          3
-        ]
-      },
-      "cameraTarget": {
-        "x": 8,
-        "y": 1,
-        "z": 8
-      }
-    }
   ],
   "requiredPermissions": [
     "ALLOW_TO_TRIGGER_AVATAR_EMOTE",
