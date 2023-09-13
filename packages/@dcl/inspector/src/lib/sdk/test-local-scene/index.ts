@@ -1,4 +1,4 @@
-import { AssetPack } from '../../../components/AssetsCatalog/types'
+import { AssetPack } from '../../logic/catalog'
 import { LoadableScene } from '../../babylon/decentraland/SceneContext'
 
 // this was taken verbatim from my deployed world at menduz.dcl.eth

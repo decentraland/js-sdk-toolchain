@@ -14,6 +14,7 @@ import { snapPosition } from '../../lib/babylon/decentraland/snap-manager'
 import { loadGltf, removeGltf } from '../../lib/babylon/decentraland/sdkComponents/gltf-container'
 import { getConfig } from '../../lib/logic/config'
 import { ROOT } from '../../lib/sdk/tree'
+import { Asset } from '../../lib/logic/catalog'
 import { selectAssetCatalog } from '../../redux/app'
 import { areGizmosDisabled } from '../../redux/ui'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
@@ -22,7 +23,6 @@ import { getModel, isAsset } from '../EntityInspector/GltfInspector/utils'
 import { useIsMounted } from '../../hooks/useIsMounted'
 import { Warnings } from '../Warnings'
 import { CameraSpeed } from './CameraSpeed'
-import { Asset } from '../AssetsCatalog/types'
 
 import './Renderer.css'
 
@@ -69,7 +69,7 @@ const Renderer: React.FC = () => {
   const addAsset = async (asset: AssetNodeItem, position: Vector3) => {
     if (!sdk) return
     const { operations } = sdk
-    operations.addAsset(ROOT, withAssetDir(asset.asset.src), asset.name, position, asset.components)
+    operations.addAsset(ROOT, withAssetDir(asset.asset.src), asset.name, position, asset.components as any)
     await operations.dispatch()
   }
 
@@ -89,7 +89,7 @@ const Renderer: React.FC = () => {
     await Promise.all(
       Object.entries(asset.contents).map(async ([path, contentHash]) => {
         try {
-          const url = `${config.catalogUrl}/contents/${contentHash}`
+          const url = `${config.contentUrl}/contents/${contentHash}`
           const content = await (await fetch(url)).arrayBuffer()
           fileContent[path] = new Uint8Array(content)
         } catch (err) {

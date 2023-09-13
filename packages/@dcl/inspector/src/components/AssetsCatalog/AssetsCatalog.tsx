@@ -1,28 +1,14 @@
 import { useMemo, useState } from 'react'
 import { useDrag } from 'react-dnd'
 
-import { Loading } from '../Loading'
-
-import { AssetProps, CategoriesProps, AssetPack, Props, ThemeProps } from './types'
-import { getContentsUrl, getAssetsByCategory } from './utils'
+import { AssetProps, CategoriesProps, Props, ThemeProps } from './types'
+import { AssetPack, getAssetsByCategory, getContentsUrl } from '../../lib/logic/catalog'
 
 import './AssetsCatalog.css'
 
-export function AssetsCatalog({ catalog, error, isLoading }: Props) {
+export function AssetsCatalog({ catalog }: Props) {
   const [selectedTheme, setSelectedTheme] = useState<AssetPack>()
   const handleThemeChange = (value?: AssetPack) => setSelectedTheme(value)
-
-  if (error) {
-    return (
-      <div className="assets-catalog">
-        <div className="error">{error.message}</div>
-      </div>
-    )
-  }
-
-  if (isLoading) {
-    return <Loading dimmer={false} />
-  }
 
   if (!catalog) {
     return null

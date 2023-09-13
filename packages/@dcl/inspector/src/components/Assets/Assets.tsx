@@ -4,18 +4,17 @@ import cx from 'classnames'
 import { FolderOpen } from '../Icons/Folder'
 import { MdImageSearch } from 'react-icons/md'
 import { HiOutlinePlus } from 'react-icons/hi'
-import { useCatalog } from '../../hooks/catalog/useCatalog'
 import { AssetsCatalog } from '../AssetsCatalog'
-import { ProjectAssetExplorer } from '../ProjectAssetExplorer'
-import ImportAsset from '../ImportAsset'
-import { AssetsTab } from '../../redux/ui/types'
-
-import './Assets.css'
+import { catalog } from '../../lib/logic/catalog'
 import { getSelectedAssetsTab, selectAssetsTab } from '../../redux/ui'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
+import { AssetsTab } from '../../redux/ui/types'
+import { ProjectAssetExplorer } from '../ProjectAssetExplorer'
+import ImportAsset from '../ImportAsset'
+
+import './Assets.css'
 
 function Assets() {
-  const [catalog, catalogError, isCatalogLoading] = useCatalog()
   const dispatch = useAppDispatch()
   const tab = useAppSelector(getSelectedAssetsTab)
 
@@ -48,9 +47,7 @@ function Assets() {
         </div>
       </div>
       <div className="Assets-content">
-        {tab === AssetsTab.AssetsPack && (
-          <AssetsCatalog catalog={catalog} error={catalogError} isLoading={isCatalogLoading} />
-        )}
+        {tab === AssetsTab.AssetsPack && <AssetsCatalog catalog={catalog} />}
         {tab === AssetsTab.FileSystem && <ProjectAssetExplorer />}
         {tab === AssetsTab.Import && <ImportAsset onSave={handleTabClick(AssetsTab.FileSystem)} />}
       </div>

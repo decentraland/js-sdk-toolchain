@@ -3,7 +3,7 @@ export type InspectorConfig = {
   dataLayerRpcParentUrl: string | null
   binIndexJsUrl: string | null
   disableSmartItems: boolean
-  catalogUrl: string
+  contentUrl: string
 }
 
 export type GlobalWithConfig = typeof globalThis & {
@@ -21,6 +21,6 @@ export function getConfig(): InspectorConfig {
       params.get('parent') || params.get('dataLayerRpcParentUrl') || config?.dataLayerRpcParentUrl || null,
     binIndexJsUrl: params.get('binIndexJsUrl') || config?.binIndexJsUrl || null,
     disableSmartItems: params.has('disableSmartItems') || !!config?.disableSmartItems,
-    catalogUrl: params.get('catalogUrl') || config?.catalogUrl || CATALOG_URL
+    contentUrl: params.get('contentUrl') || config?.contentUrl || CATALOG_URL
   }
 }

@@ -1,6 +1,5 @@
 import { Identifier } from 'dnd-core'
-
-import { Asset } from '../../components/AssetsCatalog/types'
+import { Asset } from '../../lib/logic/catalog'
 import { TreeNode } from '../../components/ProjectAssetExplorer/ProjectView'
 
 interface Drop<T, K = object> {

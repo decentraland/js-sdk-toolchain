@@ -4,11 +4,7 @@ import { EditorComponentNames, EditorComponents, EditorComponentsTypes } from '.
 import { pushChild } from '../nodes'
 
 export function addChild(engine: IEngine) {
-  return function addChild(
-    parent: Entity,
-    name: string,
-    components?: Partial<Record<ComponentName, EditorComponentsTypes['Actions'] | EditorComponentsTypes['Triggers']>>
-  ): Entity {
+  return function addChild(parent: Entity, name: string, components?: Partial<Record<ComponentName, any>>): Entity {
     const child = engine.addEntity()
     const Transform = engine.getComponent(TransformEngine.componentId) as typeof TransformEngine
     const Nodes = engine.getComponent(EditorComponentNames.Nodes) as EditorComponents['Nodes']

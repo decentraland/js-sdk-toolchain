@@ -8,7 +8,13 @@ import {
   TransformComponentExtended
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
-import { Action, ComponentName, Trigger, createComponents as createAssetPacksComponents } from '@dcl/asset-packs'
+import {
+  Action,
+  ComponentName,
+  States,
+  Trigger,
+  createComponents as createAssetPacksComponents
+} from '@dcl/asset-packs'
 import { Layout } from '../utils/layout'
 import { GizmoType } from '../utils/gizmo'
 
@@ -29,6 +35,7 @@ export type EditorComponentsTypes = {
   Nodes: { value: Node[] }
   Actions: { value: Action[] }
   Triggers: { value: Trigger[] }
+  States: States
 }
 
 export type EditorComponents = {
