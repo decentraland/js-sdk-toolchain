@@ -39,10 +39,24 @@ export default withSdk<Props>(
 
     const hasActions = useHasComponent(entityId, Actions)
 
+    const isValidAction = useCallback((action: Action) => {
+      if (!action.type || !action.name) {
+        return false
+      }
+      switch (action.type) {
+        case ActionType.PLAY_ANIMATION: {
+          return !!action.payload.playAnimation?.animation
+        }
+        case ActionType.SET_STATE: {
+          return !!action.payload.setState?.state
+        }
+        default:
+          return false
+      }
+    }, [])
+
     const areValidActions = useCallback(
-      (updatedActions: Action[]) =>
-        updatedActions.length > 0 &&
-        !updatedActions.some((action) => !action.type || !action?.animation || !action.name),
+      (updatedActions: Action[]) => updatedActions.length > 0 && updatedActions.every(isValidAction),
       []
     )
 
@@ -89,7 +103,7 @@ export default withSdk<Props>(
 
     const handleAddNewAction = useCallback(() => {
       setActions((prev: Action[]) => {
-        return [...prev, { type: ActionType.PLAY_ANIMATION, name: '' }]
+        return [...prev, { type: ActionType.PLAY_ANIMATION, name: '', payload: {} }]
       })
     }, [setActions])
 
@@ -99,7 +113,11 @@ export default withSdk<Props>(
           const data = [...prev]
           data[idx] = {
             ...data[idx],
-            animation: value
+            payload: {
+              playAnimation: {
+                animation: value
+              }
+            }
           }
           return data
         })
@@ -241,7 +259,7 @@ export default withSdk<Props>(
                         { value: '', text: 'Select an Animation' },
                         ...entityAnimations.map((animation) => ({ text: animation.name, value: animation.name }))
                       ]}
-                      value={action.animation}
+                      value={action.payload.playAnimation?.animation}
                       onChange={(e) => handleChangeAnimation(e, idx)}
                     />
                   </div>
