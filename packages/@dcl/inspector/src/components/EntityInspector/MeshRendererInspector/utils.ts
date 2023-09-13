@@ -15,10 +15,10 @@ export const fromMeshRenderer = (value: PBMeshRenderer): MeshRendererInput => {
         radiusBottom: String(value.mesh.cylinder.radiusBottom ?? 0.5)
       }
     case 'plane':
-      return { mesh: MeshType.MT_PLANE, uvs: getUvs(value.mesh.plane).join(' ') }
+      return { mesh: MeshType.MT_PLANE, uvs: getUvs(value.mesh.plane) }
     case 'box':
     default:
-      return { mesh: MeshType.MT_BOX, uvs: getUvs(value.mesh?.box).join(' ') }
+      return { mesh: MeshType.MT_BOX, uvs: getUvs(value.mesh?.box) }
   }
 }
 
@@ -37,10 +37,10 @@ export const toMeshRenderer = (value: MeshRendererInput): PBMeshRenderer => {
         }
       }
     case MeshType.MT_PLANE:
-      return { mesh: { $case: MeshType.MT_PLANE, plane: { uvs: [] || (value.uvs ?? '').split(' ').map(Number) } } }
+      return { mesh: { $case: MeshType.MT_PLANE, plane: { uvs: [] || (value.uvs ?? '').split(',').map(Number) } } }
     case MeshType.MT_BOX:
     default:
-      return { mesh: { $case: MeshType.MT_BOX, box: { uvs: [] || (value.uvs ?? '').split(' ').map(Number) } } }
+      return { mesh: { $case: MeshType.MT_BOX, box: { uvs: [] || (value.uvs ?? '').split(',').map(Number) } } }
   }
 }
 
@@ -51,7 +51,7 @@ export function isValidInput(): boolean {
 export const SHAPES = mapSelectFieldOptions(MeshType)
 
 function getUvs(value?: Record<string, unknown> & { uvs?: number[] }) {
-  return value?.uvs || []
+  return (value?.uvs || []).join(',')
 }
 
 export function hasUvs(value: unknown) {

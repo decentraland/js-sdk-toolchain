@@ -5,11 +5,11 @@ import { Props } from './types'
 
 import './ColorField.css'
 import { OPTIONS, COLORS, Options } from './utils'
-import { TextField } from '../TextField'
 
 const ColorField: React.FC<Props> = (props) => {
-  const isCustomColor = !COLORS.find(($) => $.value === props.value)
-  const initialOption = isCustomColor ? Options.CUSTOM : Options.PICK
+  const stockColor = COLORS.find(($) => $.value === props.value)?.value
+  const isStockColor = !!stockColor
+  const initialOption = isStockColor ? Options.PICK : Options.CUSTOM
   const [selectedOption, setSelectedOption] = useState(initialOption)
   const { label, onChange } = props
 
@@ -17,13 +17,23 @@ const ColorField: React.FC<Props> = (props) => {
     setSelectedOption(Number(e.target.value))
   }, [])
 
+  const shouldRenderStockColors = selectedOption === Options.PICK || (isStockColor && selectedOption !== Options.CUSTOM)
+
   return (
     <div className="ColorField">
       {label && <label>{label}</label>}
-      <SelectField options={OPTIONS} value={selectedOption} onChange={handleOptionChange}/>
-      {selectedOption === Options.PICK && !isCustomColor && <SelectField options={COLORS} onChange={onChange} />}
-      {(selectedOption === Options.CUSTOM || isCustomColor) && <TextField value={props.value} onChange={onChange} />}
-      <div className="preview-color" style={{ backgroundColor: `${props.value}` }}></div>
+      <SelectField options={OPTIONS} value={selectedOption} onChange={handleOptionChange} />
+      {shouldRenderStockColors ? (
+        <>
+          <SelectField value={stockColor} options={COLORS} onChange={onChange} />
+          <div className="preview-color" style={{ backgroundColor: stockColor || COLORS[0].value }} />
+        </>
+      ) : (
+        <>
+          <input type="color" value={props.value} onChange={onChange} />
+          <div className="preview-hex">{props.value?.toString().toUpperCase()}</div>
+        </>
+      )}
     </div>
   )
 }

@@ -60,7 +60,6 @@ export const putMaterialComponent: ComponentOperation = (entity, component) => {
           m.transparencyMode = 3
         }
 
-
         m.metallic = pbr.metallic ?? 0.5
         m.roughness = pbr.roughness ?? 0.5
 
@@ -69,10 +68,10 @@ export const putMaterialComponent: ComponentOperation = (entity, component) => {
         m.directIntensity = pbr.directIntensity ?? 1
         m.alphaCutOff = pbr.alphaTest ?? 0.5
 
-        loadTexture(entity, pbr.texture?.tex).then((texture) => m.albedoTexture = texture)
-        loadTexture(entity, pbr.alphaTexture?.tex).then((texture) => m.opacityTexture = texture)
-        loadTexture(entity, pbr.bumpTexture?.tex).then((texture) => m.bumpTexture = texture)
-        loadTexture(entity, pbr.emissiveTexture?.tex).then((texture) => m.emissiveTexture = texture)
+        void loadTexture(entity, pbr.texture?.tex).then((texture) => (m.albedoTexture = texture))
+        void loadTexture(entity, pbr.alphaTexture?.tex).then((texture) => (m.opacityTexture = texture))
+        void loadTexture(entity, pbr.bumpTexture?.tex).then((texture) => (m.bumpTexture = texture))
+        void loadTexture(entity, pbr.emissiveTexture?.tex).then((texture) => (m.emissiveTexture = texture))
       })
     } else if (entity.material instanceof StandardMaterial && newValue?.material?.$case === 'unlit') {
       const { unlit } = newValue.material
@@ -80,9 +79,8 @@ export const putMaterialComponent: ComponentOperation = (entity, component) => {
       entity.material.atomicMaterialsUpdate((m) => {
         m.alphaCutOff = unlit.alphaTest ?? 0.5
         unlit.diffuseColor && m.diffuseColor.set(unlit.diffuseColor.r, unlit.diffuseColor.g, unlit.diffuseColor.b) // unlit.albedoColor.a?
-        loadTexture(entity, unlit.texture?.tex).then((texture) => m.diffuseTexture = texture)
+        void loadTexture(entity, unlit.texture?.tex).then((texture) => (m.diffuseTexture = texture))
       })
-
     }
 
     if (newValue) {
@@ -109,12 +107,15 @@ export function setMeshRendererMaterial(entity: EcsEntity) {
 async function loadTexture(entity: EcsEntity, tx?: TextureUnion['tex']): Promise<Texture | null> {
   if (!tx) return null
   if (tx.$case === 'texture') {
-    return entity.context.deref()!.getFile(tx.texture.src).then((content) => {
-      if (!content) return null
-      const textureBlob = new Blob([content])
-      const textureUrl = URL.createObjectURL(textureBlob)
-      return new Texture(textureUrl, entity.getScene(), true, false)
-    })
+    return entity.context
+      .deref()!
+      .getFile(tx.texture.src)
+      .then((content) => {
+        if (!content) return null
+        const textureBlob = new Blob([content])
+        const textureUrl = URL.createObjectURL(textureBlob)
+        return new Texture(textureUrl, entity.getScene(), true, false)
+      })
   }
 
   return null

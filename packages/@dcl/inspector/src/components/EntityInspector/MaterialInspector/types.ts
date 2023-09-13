@@ -1,4 +1,4 @@
-import { Entity, MaterialTransparencyMode } from '@dcl/ecs'
+import { Entity } from '@dcl/ecs'
 import { TextureInput } from './Texture/types'
 
 export interface Props {

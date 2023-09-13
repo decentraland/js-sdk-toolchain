@@ -16,13 +16,13 @@ const DROP_TYPES = ['project-asset-gltf']
 function TextureInspector({ label, texture, files, getInputProps }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const changeValue = useCallback(((value: AssetNodeItem) => {
+  const changeValue = useCallback((value: AssetNodeItem) => {
     const set = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set
     const inputEvent = new Event('input', { bubbles: true })
 
     set?.call(inputRef.current, value.asset.src)
     inputRef.current?.dispatchEvent(inputEvent)
-  }), [])
+  }, [])
 
   const [{ isHover }, drop] = useDrop(
     () => ({

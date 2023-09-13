@@ -1,5 +1,6 @@
 import { TextureUnion, TextureFilterMode, TextureWrapMode } from '@dcl/ecs'
 
+import { toNumber, toString } from '../../utils'
 import { Texture, TextureInput } from './types'
 import { TreeNode } from '../../../ProjectAssetExplorer/ProjectView'
 import { AssetNodeItem } from '../../../ProjectAssetExplorer/types'
@@ -7,13 +8,6 @@ import { isAssetNode } from '../../../ProjectAssetExplorer/utils'
 import { AssetCatalogResponse } from '../../../../lib/data-layer/remote-data-layer'
 import { isValidInput } from '../../GltfInspector/utils'
 import { removeBasePath } from '../../../../lib/logic/remove-base-path'
-
-const toNumber = (value?: string, def?: number) => {
-  const num = Number(value)
-  return isNaN(num) ? def : num
-}
-
-const toString = (value: unknown, def: string = '') => (value ?? def).toString()
 
 export const fromTexture = (base: string, value: TextureUnion): TextureInput => {
   switch (value.tex?.$case) {
@@ -60,7 +54,7 @@ export const toTexture = (base: string, value?: TextureInput): TextureUnion => {
         tex: {
           $case: 'videoTexture',
           videoTexture: {
-            videoPlayerEntity: toNumber(value.videoPlayerEntity)!,
+            videoPlayerEntity: toNumber(value.videoPlayerEntity ?? '')!,
             wrapMode: toNumber(value.wrapMode, TextureWrapMode.TWM_REPEAT),
             filterMode: toNumber(value.filterMode, TextureFilterMode.TFM_POINT)
           }
@@ -72,8 +66,8 @@ export const toTexture = (base: string, value?: TextureInput): TextureUnion => {
           $case: 'texture',
           texture: {
             src: value?.src ? toString(base ? base + '/' + value.src : value.src) : '',
-            wrapMode: toNumber(value?.wrapMode, TextureWrapMode.TWM_REPEAT),
-            filterMode: toNumber(value?.filterMode, TextureFilterMode.TFM_POINT)
+            wrapMode: toNumber(value?.wrapMode ?? '0', TextureWrapMode.TWM_REPEAT),
+            filterMode: toNumber(value?.filterMode ?? '0', TextureFilterMode.TFM_POINT)
           }
         }
       }

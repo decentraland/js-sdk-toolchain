@@ -56,7 +56,7 @@ export default withSdk<Props>(
           <TextField label="Wrapping" type="checkbox" {...getInputProps('textWrapping', (e) => e.target.checked)} />
         </Block>
         <Block label="Color">
-          <ColorField {...getInputProps('textColor')}/>
+          <ColorField {...getInputProps('textColor')} />
         </Block>
         <Block label="Padding">
           <TextField label="↑" type="number" {...getInputProps('paddingTop')} />
@@ -72,7 +72,7 @@ export default withSdk<Props>(
           <TextField label="Width" type="number" {...getInputProps('outlineWidth')} />
         </Block>
         <Block label="Outline color">
-          <ColorField {...getInputProps('outlineColor')}/>
+          <ColorField {...getInputProps('outlineColor')} />
         </Block>
         <Block label="Shadow">
           <TextField label="Blur" type="number" {...getInputProps('shadowBlur')} />
@@ -80,7 +80,7 @@ export default withSdk<Props>(
           <TextField label="Offset Y" type="number" {...getInputProps('shadowOffsetY')} />
         </Block>
         <Block label="Shadow color">
-          <ColorField {...getInputProps('shadowColor')}/>
+          <ColorField {...getInputProps('shadowColor')} />
         </Block>
       </Container>
     )

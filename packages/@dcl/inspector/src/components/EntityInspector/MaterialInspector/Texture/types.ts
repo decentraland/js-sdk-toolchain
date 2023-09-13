@@ -1,9 +1,9 @@
-import { TextureFilterMode, TextureWrapMode } from "@dcl/ecs"
+import { TextureFilterMode, TextureWrapMode } from '@dcl/ecs'
 
-import { mapSelectFieldOptions } from "../../SelectField/utils"
-import { useComponentInput } from "../../../../hooks/sdk/useComponentInput"
-import { TextureType } from "../types"
-import { AssetCatalogResponse } from "../../../../lib/data-layer/remote-data-layer"
+import { mapSelectFieldOptions } from '../../SelectField/utils'
+import { useComponentInput } from '../../../../hooks/sdk/useComponentInput'
+import { TextureType } from '../types'
+import { AssetCatalogResponse } from '../../../../lib/data-layer/remote-data-layer'
 
 export type Props = {
   label: string
@@ -27,26 +27,34 @@ export type TextureInput = {
   filterMode: string
 }
 
-export const WRAP_MODES = [{
-  value: TextureWrapMode.TWM_REPEAT,
-  label: 'Repeat'
-}, {
-  value: TextureWrapMode.TWM_CLAMP,
-  label: 'Clamp'
-}, {
-  value: TextureWrapMode.TWM_MIRROR,
-  label: 'Mirror'
-}]
+export const WRAP_MODES = [
+  {
+    value: TextureWrapMode.TWM_REPEAT,
+    label: 'Repeat'
+  },
+  {
+    value: TextureWrapMode.TWM_CLAMP,
+    label: 'Clamp'
+  },
+  {
+    value: TextureWrapMode.TWM_MIRROR,
+    label: 'Mirror'
+  }
+]
 
-export const FILTER_MODES = [{
-  value: TextureFilterMode.TFM_POINT,
-  label: 'Point'
-}, {
-  value: TextureFilterMode.TFM_BILINEAR,
-  label: 'Bilinear'
-}, {
-  value: TextureFilterMode.TFM_TRILINEAR,
-  label: 'Trilinear'
-}]
+export const FILTER_MODES = [
+  {
+    value: TextureFilterMode.TFM_POINT,
+    label: 'Point'
+  },
+  {
+    value: TextureFilterMode.TFM_BILINEAR,
+    label: 'Bilinear'
+  },
+  {
+    value: TextureFilterMode.TFM_TRILINEAR,
+    label: 'Trilinear'
+  }
+]
 
-export const TEXTURE_TYPES = mapSelectFieldOptions(Texture)
+export const TEXTURE_TYPES = mapSelectFieldOptions({ TT_TEXTURE: 'texture' })

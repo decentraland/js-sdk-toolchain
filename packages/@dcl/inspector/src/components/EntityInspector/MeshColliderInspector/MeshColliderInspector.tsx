@@ -24,13 +24,7 @@ export default withSdk<Props>(
     const { MeshCollider } = sdk.components
 
     const hasMeshCollider = useHasComponent(entity, MeshCollider)
-    const { getInputProps, isValid } = useComponentInput(
-      entity,
-      MeshCollider,
-      fromMeshCollider,
-      toMeshCollider,
-      isValidInput
-    )
+    const { getInputProps } = useComponentInput(entity, MeshCollider, fromMeshCollider, toMeshCollider, isValidInput)
 
     const handleRemove = useCallback(async () => {
       sdk.operations.removeComponent(entity, MeshCollider)

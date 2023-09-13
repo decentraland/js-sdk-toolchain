@@ -1,5 +1,6 @@
 import { PBTextShape, Font, TextAlignMode } from '@dcl/ecs'
 
+import { toString } from '../utils'
 import { TextShapeInput } from './types'
 import { toColor3, toColor4, toHex } from '../ColorField/utils'
 
@@ -7,8 +8,6 @@ const toNumber = (value: string, min?: number) => {
   const num = Number(value) || 0
   return min ? Math.min(num, min) : num
 }
-
-const toString = (value: unknown, def: number = 0) => (value ?? def).toString()
 
 export const fromTextShape = (value: PBTextShape): TextShapeInput => {
   return {

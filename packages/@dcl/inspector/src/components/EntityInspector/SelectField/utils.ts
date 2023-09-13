@@ -3,5 +3,5 @@ export function capitalize(value: string) {
 }
 
 export function mapSelectFieldOptions<T extends object>(value: T) {
-  return Object.entries(value).map(([_, type], i) => ({ value: type, label: capitalize(type) }))
+  return Object.entries(value).map(([_, type]) => ({ value: type, label: capitalize(type) }))
 }

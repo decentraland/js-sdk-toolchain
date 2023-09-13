@@ -1,18 +1,12 @@
 import { ColliderLayer, PBGltfContainer } from '@dcl/ecs'
 
+import { toNumber, toString } from '../utils'
 import { TreeNode } from '../../ProjectAssetExplorer/ProjectView'
 import { isAssetNode } from '../../ProjectAssetExplorer/utils'
 import { AssetNodeItem } from '../../ProjectAssetExplorer/types'
 import { AssetCatalogResponse } from '../../../tooling-entrypoint'
 import { removeBasePath } from '../../../lib/logic/remove-base-path'
 import { GltfContainerInput } from './types'
-
-const toNumber = (value: string, def?: ColliderLayer) => {
-  const num = Number(value)
-  return isNaN(num) ? def : num
-}
-
-const toString = (value: unknown, def: number = 0) => (value ?? def).toString()
 
 export const fromGltf =
   (base: string) =>
