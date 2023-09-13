@@ -24,7 +24,6 @@
     "typescript": "^5.0.2"
   },
   "devDependencies": {
-    "@dcl/asset-packs": "^0.0.0-20230913161419.commit-562cd5d",
     "@dcl/eslint-config": "^1.0.6-20220629202434.commit-44f87f0",
     "@types/node": "^18.11.18",
     "syncpack": "^9.8.4",
