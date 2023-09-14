@@ -1,9 +1,6 @@
 {
   "name": "@dcl/inspector",
   "version": "0.1.0",
-  "dependencies": {
-    "earcut": "^2.2.4"
-  },
   "devDependencies": {
     "@babylonjs/core": "^6.18.0",
     "@babylonjs/gui": "^6.18.0",
@@ -18,7 +15,6 @@
     "@dcl/schemas": "^8.2.3-20230718182824.commit-356025c",
     "@reduxjs/toolkit": "^1.9.5",
     "@testing-library/react": "^14.0.0",
-    "@types/earcut": "^2.1.1",
     "@types/jest-environment-puppeteer": "^5.0.3",
     "@types/node": "^18.11.18",
     "@types/node-fetch": "^2.6.4",

@@ -69,7 +69,8 @@ export const useTree = () => {
   const addChild = useCallback(
     async (parent: Entity, label: string) => {
       if (!sdk) return
-      sdk.operations.addChild(parent, label)
+      const child = sdk.operations.addChild(parent, label)
+      sdk.operations.updateSelectedEntity(child)
       await sdk.operations.dispatch()
       handleUpdate()
     },
