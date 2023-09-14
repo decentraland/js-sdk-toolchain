@@ -41,7 +41,7 @@ function TextureInspector({ label, texture, files, getInputProps }: Props) {
         isHover: monitor.canDrop() && monitor.isOver()
       })
     }),
-    []
+    [files]
   )
 
   const type = getInputProps(`${texture}.type`)

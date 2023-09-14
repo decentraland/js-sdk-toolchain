@@ -35,8 +35,8 @@ export function initTestEngine(loadableScene: Readonly<LoadableScene>) {
     })
 
     const scene = new BABYLON.Scene(engine)
-    sceneCtx = new SceneContext(engine, scene, loadableScene, dataLayer)
-    inspector = createInspectorEngine(dataLayer)
+    sceneCtx = new SceneContext(engine, scene, loadableScene)
+    inspector = createInspectorEngine()
     connectCrdtToEngine(sceneCtx.engine, dataLayer.crdtStream, 'renderer')
     connectCrdtToEngine(inspector.engine, dataLayer.crdtStream, 'inspector')
   })
