@@ -122,7 +122,6 @@ async function executeCreateSubcommand(
       throw new CliError('Quest creation was cancelled')
     }
   }
-
   const createURL = `${baseURL}/api/quests`
 
   await executeSubcommand(
@@ -145,14 +144,16 @@ async function executeCreateSubcommand(
         body: JSON.stringify(quest)
       })
       if (res.status === 201) {
-        const questsId = (await res.json()) as { id: string }
-        printSuccess(logger, `> Your Quest: ${quest!.name} was created successfully - ID: ${questsId.id}`, '')
+        const { id: questId } = (await res.json()) as { id: string }
+        components.analytics.track('Quest Created Success', { questId, questName: quest!.name })
+        printSuccess(logger, `> Your Quest: ${quest!.name} was created successfully - ID: ${questId}`, '')
       } else {
-        const error = (await res.json()) as { code: number; message: string }
+        const { code, message } = (await res.json()) as { code: number; message: string }
+        components.analytics.track('Quest Created Failure', { code })
         printError(
           logger,
           `> Error returned by Quests Server: `,
-          new Error(`Status Code: ${error.code} - Message: "${error.message}"`)
+          new Error(`Status Code: ${code} - Message: "${message}"`)
         )
       }
     }
@@ -188,7 +189,7 @@ async function executeListSubcommand(
       if (res.status === 200) {
         const { quests } = (await res.json()) as { quests: { id: string; name: string }[] }
         if (quests.length) {
-          printSuccess(logger, "Your request has been processed successfully. Your Quests' list is below: ", '')
+          printSuccess(logger, "Your request has been processed successfully. The Quests' list is below: ", '')
           quests.forEach((quest) => {
             logger.log(' ')
             logger.log(`${colors.greenBright('ID: ')} ${quest.id} - ${colors.greenBright('Name: ')} ${quest.name}`)
@@ -197,12 +198,14 @@ async function executeListSubcommand(
         } else {
           printSuccess(logger, `No Quest was created by ${address}`, '')
         }
+        components.analytics.track('Quest List Success', { creatorAddress: address })
       } else {
-        const error = (await res.json()) as { code: number; message: string }
+        const { code, message } = (await res.json()) as { code: number; message: string }
+        components.analytics.track('Quest List Failure', { code, creatorAddress: address })
         printError(
           logger,
           `> Error returned by Quests Server: `,
-          new Error(`Status Code: ${error.code} - Message: "${error.message}"`)
+          new Error(`Status Code: ${code} - Message: "${message}"`)
         )
       }
     }
@@ -236,13 +239,15 @@ async function executeActivateSubcommand(
         }
       })
       if (res.status === 202) {
+        components.analytics.track('Quest Activated Success', { questId })
         printSuccess(logger, 'Your Quest is active again!', '')
       } else {
-        const error = (await res.json()) as { code: number; message: string }
+        const { code, message } = (await res.json()) as { code: number; message: string }
+        components.analytics.track('Quest Activated Failure', { questId, code })
         printError(
           logger,
           `> Error returned by Quests Server: `,
-          new Error(`Status Code: ${error.code} - Message: "${error.message}"`)
+          new Error(`Status Code: ${code} - Message: "${message}"`)
         )
       }
     }
@@ -277,13 +282,15 @@ async function executeDeactivateSubcommand(
       })
 
       if (res.status === 202) {
+        components.analytics.track('Quest Deactivated Success', { questId })
         printSuccess(logger, 'Your Quest was deactivated', '')
       } else {
-        const error = (await res.json()) as { code: number; message: string }
+        const { code, message } = (await res.json()) as { code: number; message: string }
+        components.analytics.track('Quest Deactivated Failure', { questId, code })
         printError(
           logger,
           `> Error returned by Quests Server: `,
-          new Error(`Status Code: ${error.code} - Message: "${error.message}"`)
+          new Error(`Status Code: ${code} - Message: "${message}"`)
         )
       }
     }
