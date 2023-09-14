@@ -62,14 +62,12 @@ export type Events = {
     questName: string
   }
   'Quest Created Failure': {
-    message: string
     code: number
   }
   'Quest Deactivated Success': {
     questId: string
   }
   'Quest Deactivated Failure': {
-    message: string
     code: number
     questId: string
   }
@@ -77,7 +75,6 @@ export type Events = {
     questId: string
   }
   'Quest Activated Failure': {
-    message: string
     code: number
     questId: string
   }
@@ -85,7 +82,6 @@ export type Events = {
     creatorAddress: string
   }
   'Quest List Failure': {
-    message: string
     code: number
     creatorAddress: string
   }

@@ -149,7 +149,7 @@ async function executeCreateSubcommand(
         printSuccess(logger, `> Your Quest: ${quest!.name} was created successfully - ID: ${questId}`, '')
       } else {
         const { code, message } = (await res.json()) as { code: number; message: string }
-        components.analytics.track('Quest Created Failure', { code, message })
+        components.analytics.track('Quest Created Failure', { code })
         printError(
           logger,
           `> Error returned by Quests Server: `,
@@ -201,7 +201,7 @@ async function executeListSubcommand(
         components.analytics.track('Quest List Success', { creatorAddress: address })
       } else {
         const { code, message } = (await res.json()) as { code: number; message: string }
-        components.analytics.track('Quest List Failure', { code, message, creatorAddress: address })
+        components.analytics.track('Quest List Failure', { code, creatorAddress: address })
         printError(
           logger,
           `> Error returned by Quests Server: `,
@@ -243,7 +243,7 @@ async function executeActivateSubcommand(
         printSuccess(logger, 'Your Quest is active again!', '')
       } else {
         const { code, message } = (await res.json()) as { code: number; message: string }
-        components.analytics.track('Quest Activated Failure', { questId, code, message })
+        components.analytics.track('Quest Activated Failure', { questId, code })
         printError(
           logger,
           `> Error returned by Quests Server: `,
@@ -286,7 +286,7 @@ async function executeDeactivateSubcommand(
         printSuccess(logger, 'Your Quest was deactivated', '')
       } else {
         const { code, message } = (await res.json()) as { code: number; message: string }
-        components.analytics.track('Quest Deactivated Failure', { questId, code, message })
+        components.analytics.track('Quest Deactivated Failure', { questId, code })
         printError(
           logger,
           `> Error returned by Quests Server: `,
