@@ -57,6 +57,38 @@ export type Events = {
   'Pack smart wearable': {
     projectHash: string
   }
+  'Quest Created Success': {
+    questId: string
+    questName: string
+  }
+  'Quest Created Failure': {
+    message: string
+    code: number
+  }
+  'Quest Deactivated Success': {
+    questId: string
+  }
+  'Quest Deactivated Failure': {
+    message: string
+    code: number
+    questId: string
+  }
+  'Quest Activated Success': {
+    questId: string
+  }
+  'Quest Activated Failure': {
+    message: string
+    code: number
+    questId: string
+  }
+  'Quest List Success': {
+    creatorAddress: string
+  }
+  'Quest List Failure': {
+    message: string
+    code: number
+    creatorAddress: string
+  }
 }
 
 const noopAnalytics: IAnalyticsComponent = {
