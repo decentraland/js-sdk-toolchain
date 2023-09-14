@@ -1,5 +1,5 @@
 import { ISchema } from '../schemas'
-import { ByteBuffer, ReadWriteByteBuffer } from '../serialization/ByteBuffer'
+import { ReadWriteByteBuffer } from '../serialization/ByteBuffer'
 import { AppendValueMessageBody, AppendValueOperation, CrdtMessageType } from '../serialization/crdt'
 import { ComponentType, GrowOnlyValueSetComponentDefinition } from './component'
 import { __DEV__ } from '../runtime/invariant'

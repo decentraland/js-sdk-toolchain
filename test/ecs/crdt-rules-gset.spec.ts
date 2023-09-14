@@ -348,4 +348,22 @@ describe('When dumping the CRDT state of a component', () => {
       new Uint8Array([28, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 3, 0, 0, 0])
     )
   })
+
+  it('should concat the binary data for the entities that are filtered into the byte buffer provided', () => {
+    const component = createValueSetComponentDefinitionFromSchema('test', 1, Schemas.Int, {
+      maxElements: 10,
+      timestampFunction(value) {
+        return value
+      }
+    })
+    const entityId = 0 as Entity
+    const entityId2 = 1 as Entity
+    component.addValue(entityId, 3)
+    component.addValue(entityId2, 8)
+    const messages: ByteBuffer = new ReadWriteByteBuffer()
+    component.dumpCrdtStateToBuffer(messages, (entity) => entity === 0)
+    expect(messages.toBinary()).toEqual(
+      new Uint8Array([28, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 3, 0, 0, 0])
+    )
+  })
 })

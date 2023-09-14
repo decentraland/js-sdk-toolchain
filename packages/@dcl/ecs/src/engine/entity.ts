@@ -43,7 +43,7 @@ export const MAX_ENTITY_NUMBER = MAX_U16
 export const RESERVED_STATIC_ENTITIES = 512
 
 // Max amount of local entities that can be created
-export let RESERVED_LOCAL_ENTITIES = MAX_ENTITY_NUMBER
+export const RESERVED_LOCAL_ENTITIES = MAX_ENTITY_NUMBER
 
 /**
  * @public
@@ -101,7 +101,6 @@ export type EntityContainer = {
   updateUsedEntity(entity: Entity): boolean
 
   setNetworkEntitiesRange(reservedLocalEntities: number, range: [number, number]): void
-  getConfig(): { reservedLocalEntities: number; reservedStaticEntities: number }
 }
 
 /**
@@ -112,16 +111,16 @@ export function EntityContainer(): EntityContainer {
   let entityCounter = RESERVED_STATIC_ENTITIES
   // Network entities counter
   let networkEntityCounter: number
-
   // Network entities range that can be created by the user
   let networkedEntitiesRange: [number, number]
-  const usedEntities: Set<Entity> = new Set()
 
+  const usedEntities: Set<Entity> = new Set()
   let toRemoveEntities: Entity[] = []
   const removedEntities = createVersionGSet()
+  let localEntitiesAvailable = RESERVED_LOCAL_ENTITIES
 
   function setNetworkEntitiesRange(reservedLocalEntities: number, range: [number, number]) {
-    RESERVED_LOCAL_ENTITIES = reservedLocalEntities
+    localEntitiesAvailable = reservedLocalEntities
     networkedEntitiesRange = range
     networkEntityCounter = range[0]
   }
@@ -131,12 +130,12 @@ export function EntityContainer(): EntityContainer {
       throw new Error(`It fails trying to generate an entity out of range ${MAX_ENTITY_NUMBER}.`)
     }
 
-    if (networked && networkEntityCounter >= networkedEntitiesRange[1]) {
-      throw new Error('Max amount of network entities reached')
+    if (networked && networkEntityCounter > networkedEntitiesRange[1]) {
+      throw new Error(`Max amount of network entities reached ${networkedEntitiesRange[1]} `)
     }
 
-    if (!networked && networkedEntitiesRange && entityCounter >= RESERVED_LOCAL_ENTITIES) {
-      throw new Error(`Max amount of local entities reached ${RESERVED_LOCAL_ENTITIES} - ${entityCounter}`)
+    if (!networked && entityCounter >= localEntitiesAvailable) {
+      throw new Error(`Max amount of local entities reached ${localEntitiesAvailable}`)
     }
 
     const entityNumber = networked ? networkEntityCounter++ : entityCounter++
@@ -157,17 +156,29 @@ export function EntityContainer(): EntityContainer {
     if (networked && !networkedEntitiesRange) {
       throw new Error('Network entities ranged not initialized. Connect to a CRDT Server')
     }
+    const usedNetworkSize =
+      (networkedEntitiesRange &&
+        [...usedEntities.values()].filter(($) => {
+          const [entityId] = EntityUtils.fromEntityId($)
+          return entityId >= networkedEntitiesRange[0] && entityId <= networkedEntitiesRange[1]
+        }).length) ??
+      0
+    const usedSize = usedEntities.size - usedNetworkSize
 
     // If all entities until `entityCounter` are being used, we need to generate another one
-    if (!networked && usedEntities.size + RESERVED_STATIC_ENTITIES >= entityCounter) {
+    if (!networked && usedSize + RESERVED_STATIC_ENTITIES >= entityCounter) {
+      return generateNewEntity(networked)
+    }
+
+    // If all entities until `entityCounter` are being used, we need to generate another one
+    if (networked && usedNetworkSize + networkedEntitiesRange[0] >= networkEntityCounter) {
       return generateNewEntity(networked)
     }
 
     for (const [number, version] of removedEntities.getMap()) {
       if (version < MAX_U16) {
-        if (networked && (number <= networkedEntitiesRange[0] || number >= networkedEntitiesRange[1])) continue
-        if (!networked && number >= RESERVED_LOCAL_ENTITIES) continue
-
+        if (networked && (number < networkedEntitiesRange[0] || number > networkedEntitiesRange[1])) continue
+        if (!networked && number >= localEntitiesAvailable) continue
         const entity = EntityUtils.toEntityId(number, version + 1)
         // If the entity is not being used, we can re-use it
         // If the entity was removed in this tick, we're not counting for the usedEntities, but we have it in the toRemoveEntityArray
@@ -269,10 +280,6 @@ export function EntityContainer(): EntityContainer {
     releaseRemovedEntities,
 
     updateRemovedEntity,
-    updateUsedEntity,
-    getConfig: () => ({
-      reservedLocalEntities: RESERVED_LOCAL_ENTITIES,
-      reservedStaticEntities: RESERVED_STATIC_ENTITIES
-    })
+    updateUsedEntity
   }
 }

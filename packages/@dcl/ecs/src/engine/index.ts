@@ -46,8 +46,7 @@ function preEngine(): PreEngine {
   function addNetworkManager(reservedLocalEntities: number, range: [number, number]) {
     entityContainer.setNetworkEntitiesRange(reservedLocalEntities, range)
     networkManager = {
-      addEntity: () => entityContainer.generateEntity(true),
-      getConfig: () => entityContainer.getConfig()
+      addEntity: () => entityContainer.generateEntity(true)
     }
     return networkManager
   }

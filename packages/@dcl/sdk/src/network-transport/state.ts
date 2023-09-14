@@ -1,7 +1,7 @@
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
-import { SyncComponents, engine } from '@dcl/ecs'
+import { IEngine, SyncComponents } from '@dcl/ecs'
 
-export function engineToCrdt(): Uint8Array {
+export function engineToCrdt(engine: IEngine): Uint8Array {
   const crdtBuffer = new ReadWriteByteBuffer()
   const syncEntities = new Set(Array.from(engine.getEntitiesWith(SyncComponents)).map(($) => $[0]))
 

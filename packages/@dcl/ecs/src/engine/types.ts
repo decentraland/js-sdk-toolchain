@@ -301,10 +301,7 @@ export interface IEngine {
    */
   entityContainer: EntityContainer
 
-  addNetworkManager(
-    reservedLocalEntities: number,
-    range: [number, number]
-  ): { addEntity: IEngine['addEntity']; getConfig: EntityContainer['getConfig'] }
+  addNetworkManager(reservedLocalEntities: number, range: [number, number]): { addEntity: IEngine['addEntity'] }
 
   getNetworkManager(): ReturnType<IEngine['addNetworkManager']>
 }

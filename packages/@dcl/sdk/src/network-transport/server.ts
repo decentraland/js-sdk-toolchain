@@ -1,5 +1,4 @@
 import { engine, SyncComponents, Transport } from '@dcl/ecs'
-import { serializeCrdtMessages } from '../internal/transports/logger'
 import { engineToCrdt } from './state'
 import { syncFilter, createNetworkManager } from './utils'
 import { NetworkManager, ServerTransportConfig } from './types'
@@ -10,7 +9,7 @@ export async function createServerTransport(config: ServerTransportConfig): Prom
   engine.addTransport({
     send: async (message) => {
       if (message.byteLength) {
-        globalThis.updateCRDTState(engineToCrdt())
+        globalThis.updateCRDTState(engineToCrdt(engine))
       }
     },
     filter: syncFilter
@@ -32,13 +31,6 @@ export async function createServerTransport(config: ServerTransportConfig): Prom
           if (transport.onmessage) {
             const messages = client.getMessages()
             for (const byteArray of messages) {
-              // Log messages
-              const logMessages = Array.from(serializeCrdtMessages('RecievedMessages', byteArray, engine))
-              if (logMessages.length) {
-                console.log(logMessages)
-              }
-              // Log messages
-
               transport.onmessage(byteArray)
             }
           }

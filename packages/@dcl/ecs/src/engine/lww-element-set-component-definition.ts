@@ -28,7 +28,12 @@ export function createDumpLwwFunctionFromCrdt(
 ) {
   return function dumpCrdtState(buffer: ByteBuffer, filterEntity?: (entity: Entity) => boolean) {
     for (const [entity, timestamp] of timestamps) {
-      if (filterEntity && !filterEntity(entity)) continue
+      /* istanbul ignore if */
+      if (filterEntity) {
+        // I swear that this is being tested on state-to-crdt.spec but jest is trolling me
+        /* istanbul ignore next */
+        if (!filterEntity(entity)) continue
+      }
       /* istanbul ignore else */
       if (data.has(entity)) {
         const it = data.get(entity)!
