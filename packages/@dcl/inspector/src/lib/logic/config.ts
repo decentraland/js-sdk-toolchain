@@ -1,3 +1,5 @@
+import { version } from '@dcl/asset-packs/package.json'
+
 export type InspectorConfig = {
   dataLayerRpcWsUrl: string | null
   dataLayerRpcParentUrl: string | null
@@ -10,7 +12,9 @@ export type GlobalWithConfig = typeof globalThis & {
   InspectorConfig?: Partial<InspectorConfig>
 }
 
-export const CONTENT_URL = 'https://builder-items.decentraland.org'
+export const CONTENT_URL = version.includes('commit')
+  ? 'https://builder-items.decentraland.zone'
+  : 'https://builder-items.decentraland.org'
 
 export function getConfig(): InspectorConfig {
   const config = (globalThis as GlobalWithConfig).InspectorConfig
