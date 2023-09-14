@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { createSdkContext, SdkContextValue } from '../../lib/sdk/context'
-import { useCatalog } from '../catalog/useCatalog'
+import { catalog } from '../../lib/logic/catalog'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
 import { connect as connectDataLayer } from '../../redux/data-layer'
 import { addEngines } from '../../redux/sdk'
@@ -15,7 +15,6 @@ export const useSdkContext = () => {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null)
   const [sdk, setSdk] = useState<SdkContextValue | null>(null)
   const [error, setError] = useState<Error | null>(null)
-  const [catalog] = useCatalog()
   const dispatch = useAppDispatch()
   let sdkInitialized = false
 

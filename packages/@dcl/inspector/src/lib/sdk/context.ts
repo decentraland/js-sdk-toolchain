@@ -13,8 +13,8 @@ import { Gizmos } from '../babylon/decentraland/gizmo-manager'
 import { CameraManager } from '../babylon/decentraland/camera'
 import { InspectorPreferences } from '../logic/preferences/types'
 import { CameraServer } from '../rpc/camera/server'
-import { AssetPack } from '../../components/AssetsCatalog/types'
 import { getConfig } from '../logic/config'
+import { AssetPack } from '../logic/catalog'
 
 export type SdkContextEvents = {
   change: { entity: Entity; operation: CrdtMessageType; component?: ComponentDefinition<any>; value?: any }

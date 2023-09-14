@@ -6,7 +6,7 @@ export async function downloadAssets(mappings: Record<string, string>) {
   async function downloadAndAssignAsset([path, contentHash]: [string, string]) {
     const config = getConfig()
     try {
-      const url = `${config.catalogUrl}/contents/${contentHash}`
+      const url = `${config.contentUrl}/contents/${contentHash}`
       const request = await fetch(url)
       const content = await request.arrayBuffer()
       fileContent[path] = Buffer.from(content)

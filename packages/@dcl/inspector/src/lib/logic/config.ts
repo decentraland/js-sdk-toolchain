@@ -1,16 +1,20 @@
+import { version } from '@dcl/asset-packs/package.json'
+
 export type InspectorConfig = {
   dataLayerRpcWsUrl: string | null
   dataLayerRpcParentUrl: string | null
   binIndexJsUrl: string | null
   disableSmartItems: boolean
-  catalogUrl: string
+  contentUrl: string
 }
 
 export type GlobalWithConfig = typeof globalThis & {
   InspectorConfig?: Partial<InspectorConfig>
 }
 
-export const CATALOG_URL = 'https://builder-items.decentraland.org'
+export const CONTENT_URL = version.includes('commit')
+  ? 'https://builder-items.decentraland.zone'
+  : 'https://builder-items.decentraland.org'
 
 export function getConfig(): InspectorConfig {
   const config = (globalThis as GlobalWithConfig).InspectorConfig
@@ -21,6 +25,6 @@ export function getConfig(): InspectorConfig {
       params.get('parent') || params.get('dataLayerRpcParentUrl') || config?.dataLayerRpcParentUrl || null,
     binIndexJsUrl: params.get('binIndexJsUrl') || config?.binIndexJsUrl || null,
     disableSmartItems: params.has('disableSmartItems') || !!config?.disableSmartItems,
-    catalogUrl: params.get('catalogUrl') || config?.catalogUrl || CATALOG_URL
+    contentUrl: params.get('contentUrl') || config?.contentUrl || CONTENT_URL
   }
 }
