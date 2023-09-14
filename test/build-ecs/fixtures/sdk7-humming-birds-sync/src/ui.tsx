@@ -137,7 +137,7 @@ export function formatAddress(address: string) {
   return formattedAddress
 }
 
-function getPlayerPosition() {
+export function getPlayerPosition() {
   const playerPosition = Transform.getOrNull(engine.PlayerEntity)
   if (!playerPosition) return ' no data yet'
   const { x, y, z } = playerPosition.position

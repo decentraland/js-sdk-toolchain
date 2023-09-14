@@ -35,7 +35,7 @@ export async function main() {
   const serverUrl = realm.realmInfo?.isPreview
     ? 'ws://127.0.0.1:3000/ws/localScene'
     : 'wss://scene-state-server.decentraland.org/ws/boedo.dcl.eth'
-  const networkManager = await createNetworkTransport({
+  const networkManager = await createNetworkManager({
     serverUrl,
     networkEntitiesLimit: { serverLimit: 500, clientLimit: 15 }
   })

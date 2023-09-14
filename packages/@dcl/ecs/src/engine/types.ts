@@ -301,7 +301,14 @@ export interface IEngine {
    */
   entityContainer: EntityContainer
 
+  /**
+   * @alpha
+   * Initialize network manager
+   */
   addNetworkManager(reservedLocalEntities: number, range: [number, number]): { addEntity: IEngine['addEntity'] }
-
+  /**
+   * @alpha
+   * Get netowrk manager to create entities.
+   */
   getNetworkManager(): ReturnType<IEngine['addNetworkManager']>
 }

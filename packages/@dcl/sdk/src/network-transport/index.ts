@@ -15,6 +15,10 @@ const DEFAULT_NETWORK_ENTITY_LIMIT_SERVER = 512
 const DEFAULT_NETWORK_ENTITY_LIMIT_CLIENT = 100
 const DEFAULT_RESERVED_LOCAL_ENTITIES = 2560
 
+/**
+ * @alpha
+ * Connect to CRDT server
+ */
 export async function createNetworkManager(config: NetworkTransportConfig): Promise<NetworkManager> {
   if (connected) {
     throw new Error('Transport is already created')

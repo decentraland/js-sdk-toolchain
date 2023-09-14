@@ -866,10 +866,6 @@ export type EntityContainer = {
     updateRemovedEntity(entity: Entity): boolean;
     updateUsedEntity(entity: Entity): boolean;
     setNetworkEntitiesRange(reservedLocalEntities: number, range: [number, number]): void;
-    getConfig(): {
-        reservedLocalEntities: number;
-        reservedStaticEntities: number;
-    };
 };
 
 // @public (undocumented)
@@ -1030,10 +1026,9 @@ export type GSetComponentGetter<T extends GrowOnlyValueSetComponentDefinition<an
 // @public (undocumented)
 export interface IEngine {
     addEntity(): Entity;
-    // (undocumented)
+    // @alpha
     addNetworkManager(reservedLocalEntities: number, range: [number, number]): {
         addEntity: IEngine['addEntity'];
-        getConfig: EntityContainer['getConfig'];
     };
     addSystem(system: SystemFn, priority?: number, name?: string): void;
     // @alpha (undocumented)
@@ -1049,7 +1044,7 @@ export interface IEngine {
     // @alpha
     getEntityOrNullByName(label: string): Entity | null;
     getEntityState(entity: Entity): EntityState;
-    // (undocumented)
+    // @alpha
     getNetworkManager(): ReturnType<IEngine['addNetworkManager']>;
     readonly PlayerEntity: Entity;
     registerComponentDefinition<T>(componentName: string, componentDefinition: ComponentDefinition<T>): ComponentDefinition<T>;
@@ -3267,7 +3262,7 @@ export function removeEntityWithChildren(engine: Pick<IEngine, 'getEntitiesWith'
 // Warning: (ae-missing-release-tag) "RESERVED_LOCAL_ENTITIES" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export let RESERVED_LOCAL_ENTITIES: number;
+export const RESERVED_LOCAL_ENTITIES = 65535;
 
 // Warning: (ae-missing-release-tag) "RESERVED_STATIC_ENTITIES" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -3371,9 +3366,7 @@ export interface Spec {
     [key: string]: ISchema;
 }
 
-// Warning: (ae-missing-release-tag) "SyncComponents" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @alpha
 export const SyncComponents: ISyncComponents;
 
 // @public (undocumented)
