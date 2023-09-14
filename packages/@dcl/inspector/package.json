@@ -57,7 +57,7 @@
     "directory": "packages/@dcl/inspector"
   },
   "scripts": {
-    "build": "npm run copy-bin && node ./build.js",
+    "build": "npm run copy-bin && node ./build.js --production",
     "copy-bin": "ts-node --project ./scripts/tsconfig.json ./scripts/copy-bin.ts",
     "start": "npm run copy-bin && node ./build.js --watch"
   },
