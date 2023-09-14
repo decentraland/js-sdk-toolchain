@@ -9,11 +9,24 @@ export async function createServerTransport(config: ServerTransportConfig): Prom
   engine.addTransport({
     send: async (message) => {
       if (message.byteLength) {
+        console.log('calling this')
         globalThis.updateCRDTState(engineToCrdt(engine))
       }
     },
     filter: syncFilter
   })
+
+  let time = 0
+  function initialCrdtState(dt: number) {
+    time += dt
+    if (time >= 1) {
+      console.log('updating crdt system')
+      globalThis.updateCRDTState(engineToCrdt(engine))
+      engine.removeSystem(initialCrdtState)
+    }
+  }
+
+  engine.addSystem(initialCrdtState)
   globalThis.registerScene(config, (event) => {
     const { type } = event
     if (type === 'open') {

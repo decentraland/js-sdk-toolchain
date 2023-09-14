@@ -15,6 +15,7 @@ const DEFAULT_NETWORK_ENTITY_LIMIT_SERVER = 512
 const DEFAULT_NETWORK_ENTITY_LIMIT_CLIENT = 100
 const DEFAULT_RESERVED_LOCAL_ENTITIES = 2560
 
+export let reservedLocalEntities: number
 /**
  * @alpha
  * Connect to CRDT server
@@ -31,6 +32,7 @@ export async function createNetworkManager(config: NetworkTransportConfig): Prom
     },
     reservedLocalEntities: config.reservedLocalEntities || DEFAULT_RESERVED_LOCAL_ENTITIES
   }
+  reservedLocalEntities = serverConfig.reservedLocalEntities
 
   const networkFactory =
     isServer && (await isServer({})).isServer ? createServerTransport(serverConfig) : createClientTransport(config)

@@ -4,13 +4,13 @@ import {
   TransportMessage,
   PointerEventsResult,
   RESERVED_STATIC_ENTITIES,
-  RESERVED_LOCAL_ENTITIES,
   SyncComponents,
   CrdtMessageType,
-  EntityUtils
+  EntityUtils,
+  GltfContainerLoadingState
 } from '@dcl/ecs'
 import { MessageType } from './types'
-import { connected } from '.'
+import { connected, reservedLocalEntities } from '.'
 
 export function encodeString(s: string): Uint8Array {
   const buffer = new ReadWriteByteBuffer()
@@ -31,19 +31,18 @@ export function createNetworkManager(reservedLocalEntities: number, range: [numb
 
 export function syncFilter(message: Omit<TransportMessage, 'messageBuffer'>) {
   if (!connected) return false
-
-  if ((message as any).componentId === PointerEventsResult.componentId) {
+  const componentId = (message as any).componentId
+  if ([PointerEventsResult.componentId, GltfContainerLoadingState.componentId].includes(componentId)) {
     return false
   }
 
   const [entityId] = EntityUtils.fromEntityId(message.entityId)
-
   // filter messages from reserved entities.
   if (entityId < RESERVED_STATIC_ENTITIES) {
     return false
   }
 
-  if (entityId < RESERVED_LOCAL_ENTITIES) {
+  if (entityId < reservedLocalEntities) {
     return false
   }
 
