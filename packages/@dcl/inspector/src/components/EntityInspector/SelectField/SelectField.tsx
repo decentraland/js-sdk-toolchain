@@ -7,10 +7,13 @@ import './SelectField.css'
 const Select: React.FC<Props> = (props) => {
   const { label, options = [], onChange, ...rest } = props
 
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    e.target.blur()
-    if (props.onChange) props.onChange(e)
-  }, [])
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      e.target.blur()
+      if (props.onChange) props.onChange(e)
+    },
+    [onChange]
+  )
 
   return (
     <div className="SelectField">

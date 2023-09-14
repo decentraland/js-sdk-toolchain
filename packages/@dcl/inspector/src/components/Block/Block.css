@@ -19,6 +19,6 @@
 
 .Block.error {
   border: 1px var(--primary) dashed;
-  padding: 0 5px 8px 5px;
+  padding: 5px;
   border-radius: 2px;
 }

@@ -7,10 +7,7 @@ import { EcsEntity } from '../EcsEntity'
 import { FONTS, TEXT_ALIGN_MODES } from '../../../../components/EntityInspector/TextShapeInspector/utils'
 import { toHex } from '../../../../components/EntityInspector/ColorField/utils'
 
-// some defaults...we should check this
-const WIDTH = 1280
-const HEIGHT = 720
-const ratio = 3
+const ratio = 33
 
 export const putTextShapeComponent: ComponentOperation = (entity, component) => {
   if (component.componentType === ComponentType.LastWriteWinElementSet) {
@@ -22,10 +19,11 @@ export const putTextShapeComponent: ComponentOperation = (entity, component) => 
     if (value?.text) {
       const mesh = BABYLON.MeshBuilder.CreatePlane(
         entity.entityId.toString(),
-        { width: 100, height: 100 },
+        { width: (value.width ?? 0) / ratio, height: (value.height ?? 0) / ratio },
         entity.getScene()
       )
-      const advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(mesh, WIDTH * ratio, HEIGHT * ratio)
+
+      const advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(mesh, value.width, value.height)
 
       advancedTexture.addControl(createTextBlock(value))
       mesh.parent = entity

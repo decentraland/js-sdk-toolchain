@@ -6,6 +6,7 @@
   flex-grow: 1;
   width: 0;
   font-size: 12px;
+  margin-right: 8px;
 }
 
 .SelectField:focus-within {
