@@ -5,6 +5,7 @@ import { ComponentType, PBMeshRenderer } from '@dcl/ecs'
 import type { ComponentOperation } from '../component-operations'
 import { EcsEntity } from '../EcsEntity'
 import { setMeshRendererMaterial } from './material'
+import { toggleSelection } from '../editorComponents/selection'
 
 export const putMeshRendererComponent: ComponentOperation = (entity, component) => {
   if (component.componentType === ComponentType.LastWriteWinElementSet) {
@@ -57,8 +58,10 @@ export const putMeshRendererComponent: ComponentOperation = (entity, component) 
     // make the renderer interactable only if the entity is Pickable
     if (entity.meshRenderer) {
       entity.meshRenderer.isPickable = true
-      entity.meshRenderer.showBoundingBox =
+      toggleSelection(
+        entity.meshRenderer,
         entity.context.deref()?.editorComponents.Selection.has(entity.entityId) || false
+      )
     }
 
     setMeshRendererMaterial(entity)
