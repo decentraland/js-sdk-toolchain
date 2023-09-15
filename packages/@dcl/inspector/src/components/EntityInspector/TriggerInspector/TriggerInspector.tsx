@@ -25,7 +25,6 @@ import { EditorComponentsTypes } from '../../../lib/sdk/components'
 
 import { Container } from '../../Container'
 import { ContextMenu } from '../../ContexMenu'
-import { AddButton } from '../AddButton'
 
 import TriggerEvent from './TriggerEvent'
 import TriggerConditionContainer from './TriggerCondition'
@@ -49,26 +48,28 @@ export default withSdk<Props>(
 
     const hasTriggers = useHasComponent(entityId, Triggers)
 
-    const areValidAction = useCallback(
+    const areValidActions = useCallback(
       (updatedActions: TriggerAction[]) =>
-        updatedActions.length > 0 && !updatedActions.every((action) => !action.entity || !action.name),
+        updatedActions.length > 0 && updatedActions.every((action) => action.entity && action.name),
       []
     )
 
-    const areValidCondition = useCallback(
-      (updatedConditions: TriggerCondition[]) =>
-        updatedConditions.length > 0 && !updatedConditions.every((condition) => !condition.entity || !condition.value),
+    const areValidConditions = useCallback(
+      (updatedConditions: TriggerCondition[] | undefined) =>
+        updatedConditions
+          ? updatedConditions.length > 0 && updatedConditions.every((condition) => condition.entity && condition.value)
+          : true,
       []
     )
 
     const areValidTriggers = useCallback(
       (updatedTriggers: Trigger[]) =>
         updatedTriggers.length > 0 &&
-        !updatedTriggers.every(
+        updatedTriggers.every(
           (trigger) =>
-            !trigger.type ||
-            !areValidAction(trigger.actions as TriggerAction[]) ||
-            !areValidCondition((trigger.conditions ?? []) as TriggerCondition[])
+            trigger.type &&
+            areValidActions(trigger.actions as TriggerAction[]) &&
+            areValidConditions(trigger.conditions as TriggerCondition[] | undefined)
         ),
       []
     )
@@ -366,52 +367,32 @@ export default withSdk<Props>(
             >
               <>
                 {trigger.conditions && trigger.conditions.length > 0 ? (
-                  <div className="TriggerConditionsContainer">
-                    <div className="TriggerConditionsTitle">
-                      <span>Trigger Condition</span>
-                      <div className="RightContent">
-                        <Button className="AddButton" onClick={(e) => handleAddNewTriggerConditions(e, triggerIdx)}>
-                          <AddIcon size={16} />
-                        </Button>
-                      </div>
-                    </div>
-                    {trigger.conditions.map((condition, conditionIdx) => {
-                      return (
-                        <TriggerConditionContainer
-                          key={`trigger-${triggerIdx}-condition-${conditionIdx}`}
-                          condition={condition}
-                          availableStates={availableStates}
-                          onChangeEntity={(e) => handleChangeTriggerConditionsEntity(e, triggerIdx, conditionIdx)}
-                          onChangeConditionType={(e) => handleChangeTriggerConditionType(e, triggerIdx, conditionIdx)}
-                          onChangeConditionValue={(e) => handleChangeTriggerConditionValue(e, triggerIdx, conditionIdx)}
-                          onRemoveTriggerCondition={(e) => handleRemoveTriggerCondition(e, triggerIdx, conditionIdx)}
-                        />
-                      )
-                    })}
-                  </div>
+                  <TriggerConditionContainer
+                    trigger={trigger}
+                    availableStates={availableStates}
+                    onChangeEntity={(e, conditionIdx) =>
+                      handleChangeTriggerConditionsEntity(e, triggerIdx, conditionIdx)
+                    }
+                    onChangeConditionType={(e, conditionIdx) =>
+                      handleChangeTriggerConditionType(e, triggerIdx, conditionIdx)
+                    }
+                    onChangeConditionValue={(e, conditionIdx) =>
+                      handleChangeTriggerConditionValue(e, triggerIdx, conditionIdx)
+                    }
+                    onAddTriggerCondition={(e) => handleAddNewTriggerConditions(e, triggerIdx)}
+                    onRemoveTriggerCondition={(e, conditionIdx) =>
+                      handleRemoveTriggerCondition(e, triggerIdx, conditionIdx)
+                    }
+                  />
                 ) : null}
-                <div className="TriggerActionsContainer">
-                  <div className="TriggerActionsTitle">
-                    <span>Assigned Actions</span>
-                    <div className="RightContent">
-                      <Button className="AddButton" onClick={(e) => handleAddNewTriggerAction(e, triggerIdx)}>
-                        <AddIcon size={16} />
-                      </Button>
-                    </div>
-                  </div>
-                  {trigger.actions.map((action, actionIdx) => {
-                    return (
-                      <TriggerActionContainer
-                        key={`trigger-${triggerIdx}-action-${actionIdx}`}
-                        action={action}
-                        availableActions={availableActions}
-                        onChangeEntity={(e) => handleChangeTriggerActionEnitty(e, triggerIdx, actionIdx)}
-                        onChangeAction={(e) => handleChangeTriggerAction(e, triggerIdx, actionIdx)}
-                        onRemoveTriggerAction={(e) => handleRemoveTriggerAction(e, triggerIdx, actionIdx)}
-                      />
-                    )
-                  })}
-                </div>
+                <TriggerActionContainer
+                  trigger={trigger}
+                  availableActions={availableActions}
+                  onChangeEntity={(e, actionIdx) => handleChangeTriggerActionEnitty(e, triggerIdx, actionIdx)}
+                  onChangeAction={(e, actionIdx) => handleChangeTriggerAction(e, triggerIdx, actionIdx)}
+                  onAddTriggerAction={(e) => handleAddNewTriggerAction(e, triggerIdx)}
+                  onRemoveTriggerAction={(e, actionIdx) => handleRemoveTriggerAction(e, triggerIdx, actionIdx)}
+                />
               </>
             </TriggerEvent>
           )

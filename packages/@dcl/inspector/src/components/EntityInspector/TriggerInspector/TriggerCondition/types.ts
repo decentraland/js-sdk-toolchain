@@ -1,11 +1,12 @@
 import type { Entity } from '@dcl/ecs'
-import type { States, TriggerCondition } from '@dcl/asset-packs'
+import type { States, Trigger } from '@dcl/asset-packs'
 
 export type Props = {
-  condition: TriggerCondition
+  trigger: Trigger
   availableStates: Map<Entity, { name: string; state: States }>
-  onChangeEntity: React.ChangeEventHandler<HTMLSelectElement>
-  onChangeConditionType: React.ChangeEventHandler<HTMLSelectElement>
-  onChangeConditionValue: React.ChangeEventHandler<HTMLSelectElement>
-  onRemoveTriggerCondition: React.MouseEventHandler<HTMLButtonElement>
+  onChangeEntity: (e: React.ChangeEvent<HTMLSelectElement>, condtionId: number) => void
+  onChangeConditionType: (e: React.ChangeEvent<HTMLSelectElement>, condtionId: number) => void
+  onChangeConditionValue: (e: React.ChangeEvent<HTMLSelectElement>, condtionId: number) => void
+  onAddTriggerCondition: React.MouseEventHandler<HTMLButtonElement>
+  onRemoveTriggerCondition: (e: React.MouseEvent<HTMLButtonElement>, conditionId: number) => void
 }

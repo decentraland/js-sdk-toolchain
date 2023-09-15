@@ -1,10 +1,38 @@
-.TriggerCondition {
+.TriggerConditionsContainer {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+  gap: 8px;
+}
+
+.TriggerConditionsContainer > .TriggerConditionsTitle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  border-bottom: 1px solid var(--border-gray);
+  padding-bottom: 4px;
+}
+
+.TriggerConditionsContainer > .TriggerConditionsTitle span {
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.TriggerConditionsContainer > .TriggerConditionsTitle .RightContent .AddButton {
+  background-color: transparent;
+  border-color: transparent;
+  color: white;
+}
+
+.TriggerConditionsContainer > .TriggerCondition {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 4px;
 }
 
-.TriggerCondition .MoreOptionsMenu .MoreOptionsContent {
+.TriggerConditionsContainer > .TriggerCondition .MoreOptionsMenu .MoreOptionsContent {
   min-width: 205px;
 }
