@@ -24,10 +24,11 @@ export const putEntitySelectedComponent: ComponentOperation = (entity, component
     const componentValue = component.getOrNull(entity.entityId) as { gizmo: number } | null
     const scene = entity.context.deref()!.scene
 
-    if (!addedCameraObservable) {
-      scene.activeCamera!.onViewMatrixChangedObservable.add(() => {
+    if (!addedCameraObservable && scene.activeCamera) {
+      scene.activeCamera.onViewMatrixChangedObservable.add(() => {
+        if (!scene.activeCamera) return
         for (const mesh of highlightedMeshes) {
-          const distance = Vector3.Distance(scene.activeCamera!.position, mesh.position)
+          const distance = Vector3.Distance(scene.activeCamera.position, mesh.position)
           mesh.outlineWidth = distance / 500
         }
       })
