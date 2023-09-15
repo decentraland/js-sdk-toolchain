@@ -30,6 +30,7 @@ describe('[UNDO] Inspector<->DataLayer<->Babylon', () => {
     const { inspectorEngine, dataLayerEngine, inspectorOperations, tick } = context
     const Transform = getTransform(inspectorEngine)
     const entity = (cachedEntity = inspectorEngine.addEntity())
+    inspectorOperations.addComponent(entity, Transform.componentId)
     inspectorOperations.updateValue(Transform, entity, { position: { x: 8, y: 8, z: 8 } })
 
     await inspectorOperations.dispatch()
@@ -70,8 +71,10 @@ describe('[UNDO] Inspector<->DataLayer<->Babylon', () => {
 
   it('generates a new component', async () => {
     const { inspectorEngine, inspectorOperations, tick } = context
+    const Transform = getTransform(inspectorEngine)
     const entity = inspectorEngine.addEntity()
-    inspectorOperations.updateValue(getTransform(inspectorEngine), entity, { position: { x: 9, y: 8, z: 8 } })
+    inspectorOperations.addComponent(entity, Transform.componentId)
+    inspectorOperations.updateValue(Transform, entity, { position: { x: 9, y: 8, z: 8 } })
     await inspectorOperations.dispatch()
     await tick()
   })

@@ -9,7 +9,14 @@ import { useEntityComponent } from '../../../hooks/sdk/useEntityComponent'
 
 // TODO: enumerate better the components we want to show...
 const getEnabledComponents = () => {
-  const components = new Set(['core::Transform', 'core::GltfContainer'])
+  const components = new Set([
+    'core::GltfContainer',
+    'core::TextShape',
+    'core::Transform',
+    'core::Material',
+    'core::MeshCollider',
+    'core::MeshRenderer'
+  ])
 
   const config = getConfig()
 

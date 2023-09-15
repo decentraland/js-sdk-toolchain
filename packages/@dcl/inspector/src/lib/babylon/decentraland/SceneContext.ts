@@ -12,10 +12,12 @@ import { putBillboardComponent } from './sdkComponents/billboard'
 import { putGltfContainerComponent } from './sdkComponents/gltf-container'
 import { putMeshRendererComponent } from './sdkComponents/mesh-renderer'
 import { putTransformComponent } from './sdkComponents/transform'
+import { putTextShapeComponent } from './sdkComponents/text-shape'
 import { putSceneComponent } from './editorComponents/scene'
 import { createOperations } from '../../sdk/operations'
 import { createGizmoManager } from './gizmo-manager'
 import { getDataLayerInterface } from '../../../redux/data-layer'
+import { putMaterialComponent } from './sdkComponents/material'
 
 export type LoadableScene = {
   readonly entity: Readonly<Omit<Schemas.Entity, 'id'>>
@@ -55,8 +57,10 @@ export class SceneContext {
   readonly componentPutOperations: Record<number, ComponentOperation> = {
     [this.Transform.componentId]: putTransformComponent,
     [this.MeshRenderer.componentId]: putMeshRendererComponent,
+    [this.Material.componentId]: putMaterialComponent,
     [this.Billboard.componentId]: putBillboardComponent,
     [this.GltfContainer.componentId]: putGltfContainerComponent,
+    [this.TextShape.componentId]: putTextShapeComponent,
     [this.editorComponents.Selection.componentId]: putEntitySelectedComponent,
     [this.editorComponents.Scene.componentId]: putSceneComponent
   }

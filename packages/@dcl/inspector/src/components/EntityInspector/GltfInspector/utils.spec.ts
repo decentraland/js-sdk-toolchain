@@ -1,18 +1,35 @@
-import * as utils from './utils'
+import { getModel } from '../../../lib/sdk/drag-drop'
 import { TreeNode } from '../../ProjectAssetExplorer/ProjectView'
 import { AssetNodeItem } from '../../ProjectAssetExplorer/types'
+import * as utils from './utils'
 
 describe('GltfInspector/utils', () => {
   describe('fromGltf', () => {
     it('should return a "PBGltfContainer" schema', () => {
-      const result = { src: 'some-path' }
-      expect(utils.fromGltf('')(result)).toStrictEqual(result)
+      const result = {
+        src: 'some-path',
+        invisibleMeshesCollisionMask: 2,
+        visibleMeshesCollisionMask: 0
+      }
+      expect(utils.fromGltf('')(result)).toStrictEqual({
+        src: 'some-path',
+        invisibleMeshesCollisionMask: '2',
+        visibleMeshesCollisionMask: '0'
+      })
     })
   })
   describe('toGltf', () => {
     it('should return a "PBGltfContainer" schema', () => {
-      const result = { src: 'some-path' }
-      expect(utils.fromGltf('')(result)).toStrictEqual(result)
+      const result = {
+        src: 'some-path',
+        invisibleMeshesCollisionMask: '2',
+        visibleMeshesCollisionMask: '0'
+      }
+      expect(utils.toGltf('')(result)).toStrictEqual({
+        src: 'some-path',
+        invisibleMeshesCollisionMask: 2,
+        visibleMeshesCollisionMask: 0
+      })
     })
   })
   describe('isValidInput', () => {
@@ -95,11 +112,11 @@ describe('GltfInspector/utils', () => {
         ['folder', folder]
       ])
 
-      expect(utils.getModel(root, tree)).toBe(null)
-      expect(utils.getModel(folder, tree)).toBe(asset)
-      expect(utils.getModel(asset, tree)).toBe(asset)
+      expect(getModel(root, tree, utils.isModel)).toBe(null)
+      expect(getModel(folder, tree, utils.isModel)).toBe(asset)
+      expect(getModel(asset, tree, utils.isModel)).toBe(asset)
       // need to create a new object since we are memoizing this function...
-      expect(utils.getModel({ ...folder }, incompleteTree)).toBe(null)
+      expect(getModel({ ...folder }, incompleteTree, utils.isModel)).toBe(null)
     })
   })
 })

@@ -1,14 +1,25 @@
 import * as BABYLON from '@babylonjs/core'
-import { ComponentDefinition, Entity, PBGltfContainer, PBMeshRenderer, PBPointerEvents, TransformType } from '@dcl/ecs'
+import {
+  ComponentDefinition,
+  Entity,
+  PBGltfContainer,
+  PBMeshRenderer,
+  PBPointerEvents,
+  PBTextShape,
+  TransformType,
+  PBMaterial
+} from '@dcl/ecs'
 import future, { IFuture } from 'fp-future'
 import { SceneContext } from './SceneContext'
 import { createDefaultTransform } from './sdkComponents/transform'
 
 export type EcsComponents = Partial<{
-  transform: TransformType
+  gltfContainer: PBGltfContainer
+  material: PBMaterial
   meshRenderer: PBMeshRenderer
   pointerEvents: PBPointerEvents
-  gltfContainer: PBGltfContainer
+  textShape: PBTextShape
+  transform: TransformType
 }>
 
 export class EcsEntity extends BABYLON.TransformNode {
@@ -17,6 +28,8 @@ export class EcsEntity extends BABYLON.TransformNode {
   meshRenderer?: BABYLON.AbstractMesh
   gltfContainer?: BABYLON.AbstractMesh
   gltfAssetContainer?: BABYLON.AssetContainer
+  textShape?: BABYLON.Mesh
+  material?: BABYLON.StandardMaterial | BABYLON.PBRMaterial
 
   #gltfPathLoading?: IFuture<string>
 

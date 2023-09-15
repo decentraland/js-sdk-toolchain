@@ -6,7 +6,8 @@ export function updateValue(_engine: IEngine) {
     entity: Entity,
     data: Partial<T>
   ) {
-    const value = component.getOrCreateMutable(entity)
+    const value = component.getMutableOrNull(entity)
+    if (value === null) return
     for (const key in data) {
       ;(value as any)[key] = data[key]
     }
