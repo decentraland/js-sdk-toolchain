@@ -1,11 +1,15 @@
-.States .states-list .content {
+.StatesInspector .states-list .content {
   flex-direction: column;
 }
 
-.States .states-list .content .TextField {
+.StatesInspector .states-list .content .TextField {
   width: 100%
 }
 
-.States .states-list .content .TextField+.TextField {
+.StatesInspector .states-list .content .TextField+.TextField {
   margin-top: 4px;
+}
+.StatesInspector:is(.open)>.title {
+  border-bottom: 1px solid var(--border-gray);
+  padding-bottom: 12px;
 }

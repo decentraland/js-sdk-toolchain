@@ -23,23 +23,23 @@ export function addChild(engine: IEngine) {
       for (const [name, component] of Object.entries(components)) {
         switch (name) {
           case ComponentName.ACTIONS: {
-            Actions.createOrReplace(child, { value: (component as EditorComponentsTypes['Actions']).value })
+            Actions.createOrReplace(child, component as EditorComponentsTypes['Actions'])
             break
           }
           case ComponentName.TRIGGERS: {
-            const triggersValue = (component as EditorComponentsTypes['Triggers']).value
-            const updatedTriggers = triggersValue.map((trigger) => ({
+            const triggers = component as EditorComponentsTypes['Triggers']
+            const updatedValue = triggers.value.map((trigger) => ({
               ...trigger,
               actions: trigger.actions.map((action) => ({
                 ...action,
                 entity: (action.entity as any) === '{selfEntity}' ? child : action.entity
               }))
             }))
-            Triggers.createOrReplace(child, { value: updatedTriggers })
+            Triggers.createOrReplace(child, { ...triggers, value: updatedValue })
             break
           }
           case ComponentName.STATES: {
-            States.createOrReplace(child, { value: (component as EditorComponentsTypes['States']).value })
+            States.createOrReplace(child, component as EditorComponentsTypes['States'])
             break
           }
         }

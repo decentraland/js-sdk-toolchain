@@ -56,7 +56,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
   }
 
   return (
-    <Container label="States" className="States">
+    <Container label="States" className="StatesInspector">
       {states.value.length > 0 ? (
         <Block label="State Name" className="states-list">
           {input.value.map((state, index) => (
