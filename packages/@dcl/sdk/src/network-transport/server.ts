@@ -9,7 +9,6 @@ export async function createServerTransport(config: ServerTransportConfig): Prom
   engine.addTransport({
     send: async (message) => {
       if (message.byteLength) {
-        console.log('calling this')
         globalThis.updateCRDTState(engineToCrdt(engine))
       }
     },
@@ -20,7 +19,6 @@ export async function createServerTransport(config: ServerTransportConfig): Prom
   function initialCrdtState(dt: number) {
     time += dt
     if (time >= 1) {
-      console.log('updating crdt system')
       globalThis.updateCRDTState(engineToCrdt(engine))
       engine.removeSystem(initialCrdtState)
     }
