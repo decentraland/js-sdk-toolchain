@@ -5,7 +5,8 @@ import { FolderOpen } from '../Icons/Folder'
 import { MdImageSearch } from 'react-icons/md'
 import { HiOutlinePlus } from 'react-icons/hi'
 import { AssetsCatalog } from '../AssetsCatalog'
-import { catalog } from '../../lib/logic/catalog'
+import { AssetPack, catalog, isSmart } from '../../lib/logic/catalog'
+import { getConfig } from '../../lib/logic/config'
 import { getSelectedAssetsTab, selectAssetsTab } from '../../redux/ui'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
 import { AssetsTab } from '../../redux/ui/types'
@@ -13,6 +14,13 @@ import { ProjectAssetExplorer } from '../ProjectAssetExplorer'
 import ImportAsset from '../ImportAsset'
 
 import './Assets.css'
+
+function removeSmartItems(assetPack: AssetPack) {
+  return {
+    ...assetPack,
+    assets: assetPack.assets.filter((asset) => !isSmart(asset))
+  }
+}
 
 function Assets() {
   const dispatch = useAppDispatch()
@@ -24,6 +32,11 @@ function Assets() {
     },
     []
   )
+
+  const config = getConfig()
+  const filteredCatalog = config.disableSmartItems
+    ? catalog.map(removeSmartItems).filter((assetPack) => assetPack.assets.length > 0)
+    : catalog
 
   return (
     <div className="Assets">
@@ -47,7 +60,7 @@ function Assets() {
         </div>
       </div>
       <div className="Assets-content">
-        {tab === AssetsTab.AssetsPack && <AssetsCatalog catalog={catalog} />}
+        {tab === AssetsTab.AssetsPack && <AssetsCatalog catalog={filteredCatalog} />}
         {tab === AssetsTab.FileSystem && <ProjectAssetExplorer />}
         {tab === AssetsTab.Import && <ImportAsset onSave={handleTabClick(AssetsTab.FileSystem)} />}
       </div>

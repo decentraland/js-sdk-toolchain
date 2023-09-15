@@ -46,3 +46,8 @@ export function getAssetsByCategory(assets: Asset[]) {
 
   return categories
 }
+
+export function isSmart(asset: Asset) {
+  const components = Object.keys(asset.components)
+  return components.length > 1 || (components.length === 1 && components[0] !== 'core::GltfContainer')
+}
