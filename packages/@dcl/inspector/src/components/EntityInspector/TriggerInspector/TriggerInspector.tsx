@@ -96,16 +96,16 @@ export default withSdk<Props>(
       }, new Map<Entity, { name: string; action: Action[] }>())
     }, [entitiesWithAction])
 
-    const availableStates: any = useMemo(() => {
+    const availableStates: Map<Entity, { name: string; states: States['value'] }> = useMemo(() => {
       return entitiesWithState?.reduce((states, entityWithState) => {
         const state = getComponentValue(entityWithState, States)
         const name = Name.get(entityWithState)
         if (state.value.length > 0) {
-          states.set(entityWithState, { name: name.value, state: state.value } as States)
+          states.set(entityWithState, { name: name.value, states: (state as States).value })
         }
 
         return states
-      }, new Map<Entity, { name: string; state: States }>())
+      }, new Map<Entity, { name: string; states: States['value'] }>())
     }, [entitiesWithState])
 
     const handleRemove = useCallback(async () => {
@@ -254,7 +254,7 @@ export default withSdk<Props>(
 
           conditions[conditionIdx] = {
             ...conditions[conditionIdx],
-            entity: entitiesWithAction?.find((entityWithAction) => entityWithAction.toString() === value)
+            entity: entitiesWithState?.find((entityWithState) => entityWithState.toString() === value)
           }
 
           data[triggerIdx] = {
@@ -265,7 +265,7 @@ export default withSdk<Props>(
           return data
         })
       },
-      [entitiesWithAction, setTriggers]
+      [entitiesWithState, setTriggers]
     )
 
     const handleChangeTriggerConditionType = useCallback(

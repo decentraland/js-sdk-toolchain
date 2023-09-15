@@ -63,7 +63,7 @@ export const TriggerCondition = ({
                   ? [
                       { value: '', text: 'Select state' },
                       ...Array.from(
-                        (availableStates.get(condition.entity)?.state.value ?? []).map((state) => ({
+                        (availableStates.get(condition.entity)?.states ?? []).map((state) => ({
                           value: state,
                           text: state
                         }))
