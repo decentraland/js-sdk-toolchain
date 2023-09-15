@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=375k bytes
+SCENE_COMPILED_JS_SIZE_PROD=390.1k bytes
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -10,9 +10,9 @@ EVAL test/snapshots/development-bundles/static-scene.test.js
   REQUIRE: ~system/Testing
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-  OPCODES ~= 35k
-  MALLOC_COUNT = 10117
-  ALIVE_OBJS_DELTA ~= 1.89k
+  OPCODES ~= 42k
+  MALLOC_COUNT = 10733
+  ALIVE_OBJS_DELTA ~= 2.03k
 CALL onStart()
   main.crdt: PUT_COMPONENT e=0x200 c=1 t=0 data={"position":{"x":5.880000114440918,"y":2.7916901111602783,"z":7.380000114440918},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   main.crdt: PUT_COMPONENT e=0x202 c=1 t=0 data={"position":{"x":4,"y":0.800000011920929,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
@@ -53,7 +53,7 @@ CALL onUpdate(0.1)
   LOG: ["🧪 Running test ensure that cubes are in the scene on the first frame"]
   LOG: ["🟢 Test passed ensure that cubes are in the scene on the first frame"]
   ~system/Testing: logTestResult {"name":"ensure that cubes are in the scene on the first frame","ok":true,"totalFrames":0,"totalTime":0}
-  OPCODES ~= 2k
+  OPCODES ~= 3k
   MALLOC_COUNT = -3
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 987.25k bytes
+  MEMORY_USAGE_COUNT ~= 1023.05k bytes

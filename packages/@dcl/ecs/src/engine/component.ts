@@ -51,7 +51,7 @@ export interface BaseComponent<T> {
    * This function writes the whole state of the component into a ByteBuffer
    * @public
    */
-  dumpCrdtStateToBuffer(buffer: ByteBuffer): void
+  dumpCrdtStateToBuffer(buffer: ByteBuffer, filterEntity?: (entity: Entity) => boolean): void
 
   /**
    * @public

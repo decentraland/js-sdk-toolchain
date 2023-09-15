@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "strict": true
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "extends": "@dcl/sdk/types/tsconfig.ecs7.json"
+}

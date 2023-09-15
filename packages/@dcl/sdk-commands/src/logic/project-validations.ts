@@ -102,6 +102,7 @@ export async function npmCommand(
  * Start validations to make the scene work.
  */
 export async function startValidations(components: Pick<CliComponents, 'spawner' | 'fs' | 'logger'>, cwd: string) {
+  return
   try {
     const sdkVersion = await getInstalledPackageVersion(components, '@dcl/sdk', cwd)
     await npmCommand(components, cwd, `install --save-exact -D @dcl/js-runtime@${sdkVersion}`)

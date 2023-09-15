@@ -26,6 +26,7 @@ function preEngine(): PreEngine {
   const entityContainer = EntityContainer()
   const componentsDefinition = new Map<number, ComponentDefinition<unknown>>()
   const systems = SystemContainer()
+  let networkManager: ReturnType<IEngine['addNetworkManager']>
 
   let sealed = false
 
@@ -35,6 +36,19 @@ function preEngine(): PreEngine {
 
   function removeSystem(selector: string | SystemFn) {
     return systems.remove(selector)
+  }
+
+  function getNetworkManager() {
+    if (!networkManager) throw new Error('Network manager not initialized. Start CRDT Server')
+    return networkManager
+  }
+
+  function addNetworkManager(reservedLocalEntities: number, range: [number, number]) {
+    entityContainer.setNetworkEntitiesRange(reservedLocalEntities, range)
+    networkManager = {
+      addEntity: () => entityContainer.generateEntity(true)
+    }
+    return networkManager
   }
 
   function addEntity() {
@@ -239,7 +253,9 @@ function preEngine(): PreEngine {
     registerComponentDefinition,
     entityContainer,
     componentsIter,
-    seal
+    seal,
+    addNetworkManager,
+    getNetworkManager
   }
 }
 
@@ -296,6 +312,8 @@ export function Engine(options?: IEngineOptions): IEngine {
     getEntityState: partialEngine.entityContainer.getEntityState,
     addTransport: crdtSystem.addTransport,
 
-    entityContainer: partialEngine.entityContainer
+    entityContainer: partialEngine.entityContainer,
+    addNetworkManager: partialEngine.addNetworkManager,
+    getNetworkManager: partialEngine.getNetworkManager
   }
 }
