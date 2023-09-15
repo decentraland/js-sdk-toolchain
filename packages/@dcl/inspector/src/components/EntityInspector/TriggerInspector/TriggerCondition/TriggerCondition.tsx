@@ -20,6 +20,10 @@ export const TriggerCondition = ({
   onAddTriggerCondition,
   onRemoveTriggerCondition
 }: Props) => {
+  const conditionTypeOptions = [
+    { value: TriggerConditionType.WHEN_STATE_IS, text: 'is' },
+    { value: TriggerConditionType.WHEN_STATE_IS_NOT, text: 'is not' }
+  ]
   return (
     <div className="TriggerConditionsContainer">
       <div className="TriggerConditionsTitle">
@@ -48,7 +52,7 @@ export const TriggerCondition = ({
             />
             <Dropdown
               disabled={isDisabled}
-              options={Object.values(TriggerConditionType)}
+              options={conditionTypeOptions}
               value={condition.type}
               onChange={(e) => onChangeConditionType(e, idx)}
             />
