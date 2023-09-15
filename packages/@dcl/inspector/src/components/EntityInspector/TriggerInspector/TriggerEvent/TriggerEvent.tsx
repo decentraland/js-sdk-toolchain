@@ -38,7 +38,7 @@ export const TriggerEvent = ({
       <div className="TriggerActionsTitle">
         <span>Assigned Actions</span>
         <div className="RightContent">
-          <Button className="AddButton" onClick={onAddNewTriggerAction}>
+          <Button className="AddActionButton" onClick={onAddNewTriggerAction}>
             <AddIcon size={16} />
           </Button>
         </div>

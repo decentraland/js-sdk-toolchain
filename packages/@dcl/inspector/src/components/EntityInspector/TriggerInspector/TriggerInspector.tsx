@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Entity } from '@dcl/ecs'
 import { Action, Trigger, TriggerType, TriggerAction, TriggerConditionOperation } from '@dcl/asset-packs'
 import { Item } from 'react-contexify'
-import { AiFillDelete as DeleteIcon, AiOutlinePlus as AddIcon } from 'react-icons/ai'
+import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 import { VscQuestion as QuestionIcon } from 'react-icons/vsc'
 import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
 
@@ -16,6 +16,7 @@ import { EditorComponentsTypes } from '../../../lib/sdk/components'
 
 import { Container } from '../../Container'
 import { ContextMenu } from '../../ContexMenu'
+import { AddButton } from '../AddButton'
 
 import TriggerEvent from './TriggerEvent'
 import TriggerActionContainer from './TriggerAction'
@@ -245,9 +246,7 @@ export default withSdk<Props>(
             </TriggerEvent>
           )
         })}
-        <button className="AddButton" onClick={handleAddNewTrigger}>
-          <AddIcon size={16} /> Add New Trigger Event
-        </button>
+        <AddButton onClick={handleAddNewTrigger}>Add New Trigger Event</AddButton>
       </Container>
     )
   })

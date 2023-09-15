@@ -5,12 +5,16 @@ import { Component } from '../../lib/sdk/components'
 import { useComponentValue } from './useComponentValue'
 
 type Input = {
-  [key: string]: string | Input | boolean
+  [key: string]: string | string[] | Record<string, string | string[] | Input>
 }
 
 export function isValidNumericInput(input: Input[keyof Input]): boolean {
   if (typeof input === 'object') {
-    return Object.values(input).every((value) => isValidNumericInput(value))
+    if (Array.isArray(input)) {
+      return Object.values(input).every((value) => isValidNumericInput(value))
+    } else {
+      return Object.values(input).every((value) => isValidNumericInput(value))
+    }
   }
   if (typeof input === 'boolean') {
     return !!input

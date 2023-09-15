@@ -1,0 +1,11 @@
+.States .states-list .content {
+  flex-direction: column;
+}
+
+.States .states-list .content .TextField {
+  width: 100%
+}
+
+.States .states-list .content .TextField+.TextField {
+  margin-top: 4px;
+}

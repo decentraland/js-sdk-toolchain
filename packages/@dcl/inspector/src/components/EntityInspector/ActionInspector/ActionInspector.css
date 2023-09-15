@@ -47,24 +47,6 @@
   width: 100%;
 }
 
-.ActionInspector .content .AddButton {
-  margin-top: 16px;
-  border: 1px solid #3a3d41;
-  background: #1e1e1e;
-  display: flex;
-  padding: 4px;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-  align-self: stretch;
-  color: #ccc;
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
-  width: 100%;
-}
-
 .ActionInspector .content .RemoveButton {
   height: 100%;
   background-color: transparent;

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Action, ActionType } from '@dcl/asset-packs'
 import { Item } from 'react-contexify'
-import { AiFillDelete as DeleteIcon, AiOutlinePlus as AddIcon } from 'react-icons/ai'
+import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 import { VscQuestion as QuestionIcon, VscTrash as RemoveIcon, VscInfo as InfoIcon } from 'react-icons/vsc'
 import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
 
@@ -17,12 +17,13 @@ import { Container } from '../../Container'
 import { ContextMenu } from '../../ContexMenu'
 import { Dropdown } from '../../Dropdown'
 import { TextField } from '../TextField'
+import MoreOptionsMenu from '../MoreOptionsMenu'
+import { AddButton } from '../AddButton'
+import Button from '../../Button'
 
 import { Props } from './types'
 
 import './ActionInspector.css'
-import MoreOptionsMenu from '../MoreOptionsMenu'
-import Button from '../../Button'
 
 export default withSdk<Props>(
   withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId, contextMenuId }) => {
@@ -268,10 +269,7 @@ export default withSdk<Props>(
             </Block>
           )
         })}
-
-        <button className="AddButton" onClick={handleAddNewAction}>
-          <AddIcon /> Add New Action
-        </button>
+        <AddButton onClick={handleAddNewAction}>Add New Action</AddButton>
       </Container>
     )
   })

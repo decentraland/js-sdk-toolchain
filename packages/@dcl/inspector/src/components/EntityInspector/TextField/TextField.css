@@ -15,7 +15,7 @@
 }
 
 .TextField > label {
-  color: var(--secondary-text);
+  color: #aaaaaa;
   display: block;
   margin-right: 8px;
   flex-shrink: 0;
@@ -33,6 +33,13 @@
   margin-right: 0px;
 }
 
+
 .TextField > input[type=checkbox] {
   width: auto;
 }
+
+
+.TextField.error {
+  border-color: red;
+}
+
