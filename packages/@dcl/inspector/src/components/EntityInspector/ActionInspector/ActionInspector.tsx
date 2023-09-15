@@ -19,7 +19,7 @@ import { Dropdown } from '../../Dropdown'
 import { TextField } from '../TextField'
 import MoreOptionsMenu from '../MoreOptionsMenu'
 import { AddButton } from '../AddButton'
-import Button from '../../Button'
+import { Button } from '../../Button'
 
 import { Props } from './types'
 

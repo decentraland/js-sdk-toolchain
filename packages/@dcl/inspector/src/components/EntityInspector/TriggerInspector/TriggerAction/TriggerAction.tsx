@@ -1,7 +1,7 @@
 import React from 'react'
 import { VscTrash as RemoveIcon } from 'react-icons/vsc'
 
-import Button from '../../../Button'
+import { Button } from '../../../Button'
 import { Dropdown } from '../../../Dropdown'
 import MoreOptionsMenu from '../../MoreOptionsMenu'
 

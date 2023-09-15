@@ -3,7 +3,7 @@ import { TriggerType } from '@dcl/asset-packs'
 import { VscAdd as AddIcon, VscTrash as RemoveIcon } from 'react-icons/vsc'
 
 import { Block } from '../../../Block'
-import Button from '../../../Button'
+import { Button } from '../../../Button'
 import { Dropdown } from '../../../Dropdown'
 import MoreOptionsMenu from '../../MoreOptionsMenu'
 

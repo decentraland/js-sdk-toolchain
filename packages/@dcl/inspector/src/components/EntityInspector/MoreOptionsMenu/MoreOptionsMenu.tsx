@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import { VscEllipsis as EllipsisIcon } from 'react-icons/vsc'
-import Button from '../../Button'
+import { Button } from '../../Button'
 import { useOutsideClick } from '../../../hooks/useOutsideClick'
 
 import './MoreOptionsMenu.css'

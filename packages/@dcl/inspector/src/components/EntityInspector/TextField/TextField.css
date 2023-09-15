@@ -8,6 +8,7 @@
   flex-grow: 1;
   width: 0;
   font-size: 12px;
+  min-height: 26px;
 }
 
 .TextField:focus-within {

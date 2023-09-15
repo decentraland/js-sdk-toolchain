@@ -7,7 +7,7 @@ import FileInput from '../FileInput'
 import { Container } from '../Container'
 import { TextField } from '../EntityInspector/TextField'
 import { Block } from '../Block'
-import Button from '../Button'
+import { Button } from '../Button'
 import { removeBasePath } from '../../lib/logic/remove-base-path'
 
 import { GLTFValidation } from '@babylonjs/loaders'
