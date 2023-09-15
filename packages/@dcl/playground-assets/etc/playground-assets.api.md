@@ -114,7 +114,7 @@ export interface BaseComponent<T> {
     readonly componentName: string;
     // (undocumented)
     readonly componentType: ComponentType;
-    dumpCrdtStateToBuffer(buffer: ByteBuffer): void;
+    dumpCrdtStateToBuffer(buffer: ByteBuffer, filterEntity?: (entity: Entity) => boolean): void;
     entityDeleted(entity: Entity, markAsDirty: boolean): void;
     get(entity: Entity): any;
     getCrdtUpdates(): Iterable<CrdtMessageBody>;
@@ -858,13 +858,14 @@ export type EntityComponents = {
 //
 // @public (undocumented)
 export type EntityContainer = {
-    generateEntity(): Entity;
+    generateEntity(networked?: boolean): Entity;
     removeEntity(entity: Entity): boolean;
     getEntityState(entity: Entity): EntityState;
     getExistingEntities(): Set<Entity>;
     releaseRemovedEntities(): Entity[];
     updateRemovedEntity(entity: Entity): boolean;
     updateUsedEntity(entity: Entity): boolean;
+    setNetworkEntitiesRange(reservedLocalEntities: number, range: [number, number]): void;
 };
 
 // @public (undocumented)
@@ -891,6 +892,14 @@ export enum EntityState {
     // (undocumented)
     Unknown = 0,
     UsedEntity = 1
+}
+
+// @public (undocumented)
+export namespace EntityUtils {
+    // (undocumented)
+    export function fromEntityId(entityId: Entity): [number, number];
+    // (undocumented)
+    export function toEntityId(entityNumber: number, entityVersion: number): Entity;
 }
 
 // @public
@@ -1016,7 +1025,11 @@ export type GSetComponentGetter<T extends GrowOnlyValueSetComponentDefinition<an
 
 // @public (undocumented)
 export interface IEngine {
-    addEntity(dynamic?: boolean): Entity;
+    addEntity(): Entity;
+    // @alpha
+    addNetworkManager(reservedLocalEntities: number, range: [number, number]): {
+        addEntity: IEngine['addEntity'];
+    };
     addSystem(system: SystemFn, priority?: number, name?: string): void;
     // @alpha (undocumented)
     addTransport(transport: Transport): void;
@@ -1031,6 +1044,8 @@ export interface IEngine {
     // @alpha
     getEntityOrNullByName(label: string): Entity | null;
     getEntityState(entity: Entity): EntityState;
+    // @alpha
+    getNetworkManager(): ReturnType<IEngine['addNetworkManager']>;
     readonly PlayerEntity: Entity;
     registerComponentDefinition<T>(componentName: string, componentDefinition: ComponentDefinition<T>): ComponentDefinition<T>;
     // (undocumented)
@@ -1350,6 +1365,19 @@ export interface ISchema<T = any> {
 //
 // @public
 export function isEqual(p1: Coords, p2: Coords): boolean;
+
+// Warning: (ae-missing-release-tag) "ISyncComponents" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type ISyncComponents = LastWriteWinElementSetComponentDefinition<ISyncComponentsType>;
+
+// Warning: (ae-missing-release-tag) "ISyncComponentsType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface ISyncComponentsType {
+    // (undocumented)
+    componentIds: number[];
+}
 
 // @public (undocumented)
 export type JsonArray = Array<JsonPrimitive | JsonMap | JsonArray>;
@@ -3231,6 +3259,16 @@ export namespace Rect {
 // @public
 export function removeEntityWithChildren(engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema' | 'removeEntity'>, entity: Entity): void;
 
+// Warning: (ae-missing-release-tag) "RESERVED_LOCAL_ENTITIES" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const RESERVED_LOCAL_ENTITIES = 65535;
+
+// Warning: (ae-missing-release-tag) "RESERVED_STATIC_ENTITIES" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export const RESERVED_STATIC_ENTITIES = 512;
+
 // Warning: (ae-missing-release-tag) "RPCSendableMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -3327,6 +3365,9 @@ export interface Spec {
     // (undocumented)
     [key: string]: ISchema;
 }
+
+// @alpha
+export const SyncComponents: ISyncComponents;
 
 // @public (undocumented)
 export type SystemFn = (dt: number) => void;

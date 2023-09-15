@@ -78,7 +78,6 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
             transportId,
             messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
           })
-
           // Unknown message, we skip it
         } else {
           // consume the message
@@ -110,6 +109,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
     for (const msg of messagesToProcess) {
       if (msg.type === CrdtMessageType.DELETE_ENTITY) {
         entitiesShouldBeCleaned.push(msg.entityId)
+        broadcastMessages.push(msg)
       } else {
         const entityState = engine.entityContainer.getEntityState(msg.entityId)
 
@@ -158,7 +158,6 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         }
       }
     }
-
     // the last stage of the syncrhonization is to delete the entities
     for (const entity of entitiesShouldBeCleaned) {
       // If we tried to resend outdated message and the entity was deleted before, we avoid sending them.
@@ -167,9 +166,9 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
           outdatedMessages.splice(i, 1)
         }
       }
-
       for (const definition of engine.componentsIter()) {
-        definition.entityDeleted(entity, false)
+        // TODO: check this with pato/pravus
+        definition.entityDeleted(entity, true)
       }
 
       engine.entityContainer.updateRemovedEntity(entity)

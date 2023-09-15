@@ -4,7 +4,7 @@ export * from '@dcl/sdk'
 // My cube generator
 function createCube(x: number, y: number, z: number) {
   // Dynamic entity because we aren't loading static entities out of this scene code
-  const myEntity = engine.addEntity(true)
+  const myEntity = engine.addEntity()
 
   Transform.create(myEntity, {
     position: { x, y, z }
@@ -56,7 +56,7 @@ function spawnCubes() {
     position: { x: -10, y: 0, z: -2 }
   })
 
-  const sign = engine.addEntity(true)
+  const sign = engine.addEntity()
   Transform.create(sign, {
     position: { x: 8, y: 6, z: 8 }
   })

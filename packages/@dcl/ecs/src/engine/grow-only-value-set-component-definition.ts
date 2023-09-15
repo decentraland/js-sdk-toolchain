@@ -1,5 +1,5 @@
 import { ISchema } from '../schemas'
-import { ByteBuffer, ReadWriteByteBuffer } from '../serialization/ByteBuffer'
+import { ReadWriteByteBuffer } from '../serialization/ByteBuffer'
 import { AppendValueMessageBody, AppendValueOperation, CrdtMessageType } from '../serialization/crdt'
 import { ComponentType, GrowOnlyValueSetComponentDefinition } from './component'
 import { __DEV__ } from '../runtime/invariant'
@@ -157,8 +157,9 @@ export function createValueSetComponentDefinitionFromSchema<T>(
       }
       return [null, undefined]
     },
-    dumpCrdtStateToBuffer: function (buffer: ByteBuffer): void {
+    dumpCrdtStateToBuffer: function (buffer, filterEntity): void {
       for (const [entity, { raw }] of data) {
+        if (filterEntity && !filterEntity(entity)) continue
         for (const it of raw) {
           const buf = new ReadWriteByteBuffer()
           schema.serialize(it.value, buf)

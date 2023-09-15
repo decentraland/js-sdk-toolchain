@@ -64,10 +64,17 @@ module.exports = {
     "packages/@dcl/inspector",
     "packages/@dcl/playground-assets",
     "packages/@dcl/ecs/src/components/generated/pb",
+    "packages/@dcl/ecs/src/components/generated/AvatarBase.gen.ts",
+
+    // TODO: this are auto-generated from the proto but not exported to the sdk. Remove when we create this components
+    "packages/@dcl/ecs/src/components/generated/AvatarEmoteCommand.gen.ts",
+    "packages/@dcl/ecs/src/components/generated/AvatarEquippedData.gen.ts",
+    "packages/@dcl/ecs/src/components/generated/PlayerIdentityData.gen.ts",
     "packages/@dcl/ecs/src/composite/proto/gen",
     "packages/@dcl/ecs/src/components/generated/index.gen.ts",
     "packages/@dcl/sdk/src/internal",
-    "packages/@dcl/sdk/src/testing"
+    "packages/@dcl/sdk/src/testing",
+    "packages/@dcl/sdk/src/network-transport"
   ],
   verbose: true,
   testMatch: ["**/*.spec.(ts|tsx)"],

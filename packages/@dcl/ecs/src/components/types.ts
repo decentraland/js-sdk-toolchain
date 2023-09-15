@@ -4,3 +4,4 @@ export type { MeshColliderComponentDefinitionExtended } from './extended/MeshCol
 export type { TextureHelper, MaterialComponentDefinitionExtended } from './extended/Material'
 export type { TransformComponentExtended, TransformTypeWithOptionals } from './manual/Transform'
 export type { NameComponent, NameType } from './manual/Name'
+export type { ISyncComponents, ISyncComponentsType } from './manual/SyncComponents'

@@ -7,7 +7,7 @@ import { CrdtMessageProtocol, CrdtMessageType } from './../../packages/@dcl/ecs/
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { components, Schemas } from '../../packages/@dcl/ecs/src'
 
-export function createNetworkTransport(): Transport {
+export function createNetworkManager(): Transport {
   async function send(..._args: any[]) {}
 
   return {
@@ -44,7 +44,7 @@ export namespace SandBox {
 
   export function createEngines({ length }: { length: number }) {
     const clients = Array.from({ length }).map((_, index) => {
-      const clientTransport = createNetworkTransport()
+      const clientTransport = createNetworkManager()
       const operations: {
         entity: Entity
         operation: CrdtMessageType
@@ -150,7 +150,7 @@ export namespace SandBox {
    */
   export function create({ length }: { length: number }) {
     const clients = Array.from({ length }).map((_, index) => {
-      const clientTransport = createNetworkTransport()
+      const clientTransport = createNetworkManager()
       const operations: {
         entity: Entity
         value: unknown
