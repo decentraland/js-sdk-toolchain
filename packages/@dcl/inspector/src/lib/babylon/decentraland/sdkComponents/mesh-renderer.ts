@@ -1,9 +1,9 @@
-import * as BABYLON from '@babylonjs/core'
-import { MeshBuilder, VertexBuffer } from '@babylonjs/core'
+import { Mesh, MeshBuilder, VertexBuffer } from '@babylonjs/core'
 import { ComponentType, PBMeshRenderer } from '@dcl/ecs'
 
 import type { ComponentOperation } from '../component-operations'
 import { EcsEntity } from '../EcsEntity'
+import { toggleSelection } from '../editorComponents/selection'
 import { setMeshRendererMaterial } from './material'
 
 export const putMeshRendererComponent: ComponentOperation = (entity, component) => {
@@ -15,7 +15,7 @@ export const putMeshRendererComponent: ComponentOperation = (entity, component) 
     // this is not optimal for production code, re-using when possible is RECOMMENDED
     removeMeshRenderer(entity)
 
-    let mesh: BABYLON.Mesh | undefined = undefined
+    let mesh: Mesh | undefined = undefined
 
     // then proceed to create the desired MeshRenderer
     if (newValue?.mesh?.$case === 'box') {
@@ -57,8 +57,10 @@ export const putMeshRendererComponent: ComponentOperation = (entity, component) 
     // make the renderer interactable only if the entity is Pickable
     if (entity.meshRenderer) {
       entity.meshRenderer.isPickable = true
-      entity.meshRenderer.showBoundingBox =
+      toggleSelection(
+        entity.meshRenderer,
         entity.context.deref()?.editorComponents.Selection.has(entity.entityId) || false
+      )
     }
 
     setMeshRendererMaterial(entity)
@@ -74,7 +76,7 @@ function removeMeshRenderer(entity: EcsEntity) {
   }
 }
 
-function setMeshUvs(mesh: BABYLON.Mesh, uvs: number[] = []) {
+function setMeshUvs(mesh: Mesh, uvs: number[] = []) {
   if (!uvs.length) {
     mesh.updateVerticesData(VertexBuffer.UVKind, [0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0])
   } else {
