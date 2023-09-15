@@ -88,10 +88,10 @@ export function generateMainComposite({ engine, components }: TempEngine) {
   })
   components.Material.setPbrMaterial(entity, {
     albedoColor: {
-      r: 1.0,
-      g: 0.85,
-      b: 0.42,
-      a: 1.0
+      r: 1,
+      g: 1,
+      b: 1,
+      a: 1
     }
   })
   components.Name.create(entity, { value: 'Magic Cube' })

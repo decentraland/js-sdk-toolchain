@@ -1,0 +1,29 @@
+.SelectField {
+  padding: 2px 3px;
+  border: 1px solid var(--border-gray);
+  display: flex;
+  border-radius: 1.6px;
+  flex-grow: 1;
+  width: 0;
+  font-size: 12px;
+  margin-right: 8px;
+}
+
+.SelectField:focus-within {
+  border-color: var(--border-focused);
+}
+
+.SelectField>label {
+  color: var(--secondary-text);
+  display: block;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.SelectField>select {
+  width: 100%;
+  color: var(--text);
+  background-color: var(--transparent);
+  outline: none;
+  border: none;
+}

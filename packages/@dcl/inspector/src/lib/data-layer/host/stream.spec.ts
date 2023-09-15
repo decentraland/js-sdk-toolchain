@@ -20,7 +20,7 @@ describe('Inspector<->DataLayer<->Babylon. [Stream]', () => {
     const { inspectorEngine, dataLayerEngine, rendererEngine, inspectorOperations, tick } = context
     const entity = inspectorEngine.addEntity()
     const Transform = components.Transform(inspectorEngine)
-    inspectorOperations.updateValue(Transform, entity, {})
+    inspectorOperations.addComponent(entity, Transform.componentId)
     await inspectorOperations.dispatch()
     await tick()
     expect(dataLayerEngine.getComponent(Transform.componentId).get(entity)).toBeDefined()
@@ -29,14 +29,16 @@ describe('Inspector<->DataLayer<->Babylon. [Stream]', () => {
 
   it('[New entity & component] Renderer -> Inspector', async () => {
     const { inspectorEngine, dataLayerEngine, rendererEngine, rendererOperations, tick } = context
-    const Transform = components.Transform(inspectorEngine)
+    const inspectorTransform = components.Transform(inspectorEngine)
+    const rendererTransform = components.Transform(rendererEngine)
     const entity = rendererEngine.addEntity()
-    rendererOperations.updateValue(components.Transform(rendererEngine), entity, {})
+    rendererOperations.addComponent(entity, rendererTransform.componentId)
+    rendererOperations.updateValue(rendererTransform, entity, {})
 
     await rendererOperations.dispatch()
     await tick()
-    expect(dataLayerEngine.getComponent(Transform.componentId).get(entity)).toBeDefined()
-    expect(rendererEngine.getComponent(Transform.componentId).get(entity)).toBeDefined()
-    expect(inspectorEngine.getComponent(Transform.componentId).get(entity)).toBeDefined()
+    expect(dataLayerEngine.getComponent(inspectorTransform.componentId).get(entity)).toBeDefined()
+    expect(rendererEngine.getComponent(inspectorTransform.componentId).get(entity)).toBeDefined()
+    expect(inspectorEngine.getComponent(inspectorTransform.componentId).get(entity)).toBeDefined()
   })
 })
