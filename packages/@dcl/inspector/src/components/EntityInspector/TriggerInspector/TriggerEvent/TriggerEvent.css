@@ -23,7 +23,7 @@
   margin-bottom: 6px;
 }
 
-.TriggerEventContainer > .content > .TriggerActionsTitle {
+.TriggerEventContainer > .content > .TriggerActionsContainer > .TriggerActionsTitle {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -32,7 +32,7 @@
   padding-bottom: 4px;
 }
 
-.TriggerEventContainer > .content > .TriggerActionsTitle span {
+.TriggerEventContainer > .content > .TriggerActionsContainer > .TriggerActionsTitle span {
   color: var(--text);
   font-size: 11px;
   font-weight: 500;
@@ -44,7 +44,7 @@
   justify-content: flex-end;
 }
 
-.TriggerEventContainer>.content>.TriggerActionsTitle .RightContent .AddActionButton {
+.TriggerEventContainer > .content > .TriggerActionsContainer > .TriggerActionsTitle .RightContent .AddActionButton {
   background-color: transparent;
   border-color: transparent;
   color: white;
@@ -55,6 +55,78 @@
   flex-direction: column;
   margin-top: 8px;
   gap: 8px;
+}
+
+.TriggerEventContainer > .content > .TriggerConditionsContainer > .TriggerConditionsTitle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  border-bottom: 1px solid var(--border-gray);
+  padding-bottom: 4px;
+}
+
+.TriggerEventContainer > .content > .TriggerConditionsContainer > .TriggerConditionsTitle span {
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.TriggerEventContainer .RightContent {
+  display: flex;
+  flex-grow: 1;
+  justify-content: flex-end;
+}
+
+.TriggerEventContainer > .content > .TriggerConditionsContainer > .TriggerConditionsTitle .RightContent .AddButton {
+  background-color: transparent;
+  border-color: transparent;
+  color: white;
+}
+
+.TriggerEventContainer > .content > .TriggerConditionsContainer {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+  gap: 8px;
+}
+
+.TriggerEventContainer > .content > .TriggerConditionsContainer > .TriggerConditionsTitle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  border-bottom: 1px solid var(--border-gray);
+  padding-bottom: 4px;
+}
+
+.TriggerEventContainer > .content > .TriggerConditionsContainer > .TriggerConditionsTitle span {
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.TriggerEventContainer .RightContent {
+  display: flex;
+  flex-grow: 1;
+  justify-content: flex-end;
+}
+
+.TriggerEventContainer > .content > .TriggerConditionsContainer > .TriggerConditionsTitle .RightContent .AddButton {
+  background-color: transparent;
+  border-color: transparent;
+  color: white;
+}
+
+.TriggerEventContainer > .content > .TriggerConditionsContainer {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+  gap: 8px;
+}
+
+.TriggerEventContainer .MoreOptionsContent {
+  min-width: 200px;
 }
 
 .TriggerEventContainer .MoreOptionsContent {

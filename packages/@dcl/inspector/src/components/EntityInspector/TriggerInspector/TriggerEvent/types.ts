@@ -4,6 +4,7 @@ export type Props = {
   trigger: Trigger
   onChangeTriggerType: React.ChangeEventHandler<HTMLSelectElement>
   onAddNewTriggerAction: React.MouseEventHandler<HTMLButtonElement>
+  onAddNewTriggerCondition: React.MouseEventHandler<HTMLButtonElement>
   onRemoveTriggerEvent: React.MouseEventHandler<HTMLButtonElement>
   children: JSX.Element | JSX.Element[]
 }
