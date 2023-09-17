@@ -14,6 +14,7 @@
     "@dcl/linker-dapp": "^0.11.0",
     "@dcl/mini-comms": "1.0.1-20230216163137.commit-a4c75be",
     "@dcl/protocol": "1.0.0-6200210039.commit-75f18e8",
+    "@dcl/quests-manager": "next",
     "@dcl/rpc": "^1.1.1",
     "@dcl/schemas": "^8.2.3-20230718182824.commit-356025c",
     "@segment/analytics-node": "^1.0.0-beta.22",
