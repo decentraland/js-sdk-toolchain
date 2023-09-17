@@ -2,7 +2,7 @@ import { dirname, resolve } from 'path'
 import { Router } from '@well-known-components/http-server'
 
 import { CliComponents } from '../components'
-import { getContentType } from '../linker-dapp/api'
+import { ChainId } from '@dcl/schemas'
 
 /**
  * Set common routes to use on Linker dApp
@@ -42,4 +42,22 @@ export function setRoutes<T extends { [key: string]: any }>(
   }))
 
   return { router }
+}
+
+function getContentType(type: string) {
+  switch (type) {
+    case 'css':
+      return 'text/css'
+    case 'js':
+      return 'application/js'
+    case 'media':
+    default:
+      return 'text/plain'
+  }
+}
+
+export interface LinkerResponse {
+  address: string
+  signature: string
+  chainId?: ChainId
 }

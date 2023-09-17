@@ -8,7 +8,7 @@ import { ethSign } from '@dcl/crypto/dist/crypto'
 
 import { CliComponents } from '../../components'
 import { IFile } from '../../logic/scene-validations'
-import { runLinkerApp, LinkerResponse, LinkerdAppOptions } from '../../linker-dapp/api'
+import { LinkerResponse } from '../../linker-dapp/routes'
 import { setRoutes } from '../../linker-dapp/routes'
 import { createWallet } from '../../logic/account'
 import { IFuture } from 'fp-future'
@@ -16,6 +16,7 @@ import { getEstateRegistry, getLandRegistry } from '../../logic/config'
 import { getObject } from '../../logic/coordinates'
 import { getPointers } from '../../logic/catalyst-requests'
 import { Router } from '@well-known-components/http-server'
+import { dAppOptions, runDapp } from '../../run-dapp'
 
 export async function getCatalyst(
   chainId: ChainId = ChainId.ETHEREUM_MAINNET,
@@ -72,7 +73,7 @@ export async function getAddressAndSignature(
   scene: Scene,
   files: IFile[],
   skipValidations: boolean,
-  linkOptions: Omit<LinkerdAppOptions, 'uri'>,
+  linkOptions: Omit<dAppOptions, 'uri'>,
   deployCallback: (response: LinkerResponse) => Promise<void>
 ): Promise<{ program?: Lifecycle.ComponentBasedProgram<unknown> }> {
   if (process.env.DCL_PRIVATE_KEY) {
@@ -88,7 +89,8 @@ export async function getAddressAndSignature(
   const { router: commonRouter } = setRoutes(components, sceneInfo)
   const router = setDeployRoutes(commonRouter, components, awaitResponse, sceneInfo, files, deployCallback)
 
-  const { program } = await runLinkerApp(components, router, { ...linkOptions, uri: `/` })
+  components.logger.info('You need to sign the content before the deployment:')
+  const { program } = await runDapp(components, router, { ...linkOptions, uri: `/` })
   return { program }
 }
 
