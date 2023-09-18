@@ -10,6 +10,7 @@ import { withContextMenu } from '../../../hoc/withContextMenu'
 import { useComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
+import { useChange } from '../../../hooks/sdk/useChange'
 import { EditorComponentsTypes } from '../../../lib/sdk/components'
 
 import { Block } from '../../Block'
@@ -25,6 +26,10 @@ import { Props } from './types'
 
 import './ActionInspector.css'
 
+function isStates(maybeStates: any): maybeStates is EditorComponentsTypes['States'] {
+  return !!maybeStates && 'value' in maybeStates && Array.isArray(maybeStates.value)
+}
+
 export default withSdk<Props>(
   withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId, contextMenuId }) => {
     const { Actions, States } = sdk.components
@@ -32,14 +37,30 @@ export default withSdk<Props>(
       entityId,
       Actions
     )
+
     const entity = sdk.sceneContext.getEntityOrNull(entityId)
     const { handleAction } = useContextMenu()
     const [actions, setActions] = useState<Action[]>(componentValue === null ? [] : componentValue.value)
     const [isFocused, setIsFocused] = useState(false)
     const [isLoaded, setIsLoaded] = useState(false)
+    const [states, setStates] = useState<string[]>(States.getOrNull(entityId)?.value || [])
 
     const hasActions = useHasComponent(entityId, Actions)
     const hasStates = useHasComponent(entityId, States)
+
+    useChange(
+      (event, sdk) => {
+        if (
+          event.entity === entityId &&
+          event.component?.componentId === sdk.components.States.componentId &&
+          isStates(event.value)
+        ) {
+          const states = event.value
+          setStates(states.value)
+        }
+      },
+      [entityId]
+    )
 
     const isValidAction = useCallback((action: Action) => {
       if (!action.type || !action.name) {
@@ -94,15 +115,6 @@ export default withSdk<Props>(
     const hasAnimations = useMemo(() => {
       return animations.length > 0
     }, [animations])
-
-    const states = useMemo(() => {
-      if (hasStates) {
-        return States.get(entityId).value
-      } else {
-        return []
-      }
-      States.get
-    }, [hasStates, States, entityId])
 
     // actions that may only be available under certain circumstances
     const conditionalActions: Partial<Record<ActionType, () => boolean>> = useMemo(
