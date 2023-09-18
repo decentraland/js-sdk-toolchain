@@ -12,6 +12,7 @@
 
 .StatesInspector .states-list .content .row {
   display: flex;
+  align-items: center;
 }
 
 .StatesInspector .states-list .content .row+.row {
