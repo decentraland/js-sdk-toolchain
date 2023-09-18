@@ -5,7 +5,7 @@ import { Component } from '../../lib/sdk/components'
 import { useComponentValue } from './useComponentValue'
 
 type Input = {
-  [key: string]: string | string[] | Record<string, string | string[] | Input>
+  [key: string]: boolean | string | string[] | Record<string, boolean | string | string[] | Input>
 }
 
 export function isValidNumericInput(input: Input[keyof Input]): boolean {
