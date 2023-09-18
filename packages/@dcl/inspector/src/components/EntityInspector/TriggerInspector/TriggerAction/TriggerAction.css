@@ -4,3 +4,7 @@
   align-items: center;
   gap: 4px;
 }
+
+.TriggerAction .MoreOptionsContent {
+  min-width: 180px;
+}
