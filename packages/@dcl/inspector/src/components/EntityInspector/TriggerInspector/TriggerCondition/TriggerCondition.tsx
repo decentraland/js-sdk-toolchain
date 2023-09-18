@@ -34,7 +34,7 @@ export const TriggerCondition = ({
           </Button>
         </div>
       </div>
-      {trigger.conditions!.map((condition, idx) => {
+      {(trigger.conditions ?? []).map((condition, idx) => {
         const isDisabled = !condition.entity || !availableStates.get(condition.entity)
         return (
           <div className="TriggerCondition" key={`trigger-condition-${idx}`}>
