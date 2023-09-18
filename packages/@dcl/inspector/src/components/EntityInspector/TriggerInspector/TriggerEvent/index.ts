@@ -1,2 +1,2 @@
 import { TriggerEvent } from './TriggerEvent'
-export default TriggerEvent
+export { TriggerEvent }

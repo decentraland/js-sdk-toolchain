@@ -1,2 +1,2 @@
-import { TriggerCondition } from './TriggerCondition'
-export default TriggerCondition
+import TriggerConditionContainer from './TriggerCondition'
+export { TriggerConditionContainer }
