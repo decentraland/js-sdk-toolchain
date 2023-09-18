@@ -10,11 +10,7 @@ type Input = {
 
 export function isValidNumericInput(input: Input[keyof Input]): boolean {
   if (typeof input === 'object') {
-    if (Array.isArray(input)) {
-      return Object.values(input).every((value) => isValidNumericInput(value))
-    } else {
-      return Object.values(input).every((value) => isValidNumericInput(value))
-    }
+    return Object.values(input).every((value) => isValidNumericInput(value))
   }
   if (typeof input === 'boolean') {
     return !!input
