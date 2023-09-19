@@ -26,6 +26,7 @@ import { EditorComponentsTypes } from '../../../lib/sdk/components'
 
 import { Container } from '../../Container'
 import { ContextMenu } from '../../ContexMenu'
+import { AddButton } from '../AddButton'
 
 import { TriggerEvent } from './TriggerEvent'
 import { TriggerConditionContainer } from './TriggerCondition'
@@ -197,6 +198,16 @@ export default withSdk<Props>(
       [triggers, modifyTrigger]
     )
 
+    const handleChangeOperation = useCallback(
+      ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
+        modifyTrigger(idx, {
+          ...triggers[idx],
+          operation: value as TriggerConditionOperation
+        })
+      },
+      [triggers, modifyTrigger]
+    )
+
     if (!hasTriggers) {
       return null
     }
@@ -240,6 +251,7 @@ export default withSdk<Props>(
                   <TriggerConditionContainer
                     trigger={trigger}
                     availableStates={availableStates}
+                    onChangeOperation={(e) => handleChangeOperation(e, triggerIdx)}
                     onUpdateConditions={(conditions: TriggerCondition[]) =>
                       handleUpdateConditions(conditions, triggerIdx)
                     }

@@ -1,19 +1,28 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
-import { AiOutlinePlus as AddIcon } from 'react-icons/ai'
+import React, { useCallback, useEffect } from 'react'
 import { VscTrash as RemoveIcon } from 'react-icons/vsc'
 import { Entity } from '@dcl/ecs'
-import { TriggerCondition, TriggerConditionType } from '@dcl/asset-packs'
-import Button from '../../../Button'
-import { Dropdown } from '../../../Dropdown'
-import MoreOptionsMenu from '../../MoreOptionsMenu'
+import { TriggerCondition, TriggerConditionOperation, TriggerConditionType } from '@dcl/asset-packs'
 import { useArrayState } from '../../../../hooks/useArrayState'
+import { Button } from '../../../Button'
+import { Dropdown } from '../../../Dropdown'
+import { AddButton } from '../../AddButton'
+import MoreOptionsMenu from '../../MoreOptionsMenu'
 import type { Props } from './types'
 import './TriggerCondition.css'
 
-export const TriggerConditionContainer = ({ trigger, availableStates, onUpdateConditions }: Props) => {
+export const TriggerConditionContainer = ({
+  trigger,
+  availableStates,
+  onChangeOperation,
+  onUpdateConditions
+}: Props) => {
   const [conditions, addCondition, modifyCondition, removeCondition] = useArrayState<TriggerCondition>(
     trigger.conditions as TriggerCondition[]
   )
+  const conditionOperation = [
+    { value: TriggerConditionOperation.AND, text: 'All Conditions should be Met (AND)' },
+    { value: TriggerConditionOperation.OR, text: 'Any Condition can be Met (OR)' }
+  ]
   const conditionTypeOptions = [
     { value: TriggerConditionType.WHEN_STATE_IS, text: 'is' },
     { value: TriggerConditionType.WHEN_STATE_IS_NOT, text: 'is not' }
@@ -72,10 +81,18 @@ export const TriggerConditionContainer = ({ trigger, availableStates, onUpdateCo
       <div className="TriggerConditionsTitle">
         <span>Trigger Condition</span>
         <div className="RightContent">
-          <Button className="AddButton" onClick={handleAddNewCondition}>
-            <AddIcon size={16} />
-          </Button>
+          <AddButton onClick={handleAddNewCondition} />
         </div>
+      </div>
+      <div className="TriggerOperation">
+        <Dropdown
+          options={[
+            { value: '', text: 'Select an operation type' },
+            ...Array.from(conditionOperation).map(({ value, text }) => ({ value, text }))
+          ]}
+          value={trigger.operation}
+          onChange={onChangeOperation}
+        />
       </div>
       {conditions.map((condition, idx) => {
         const isDisabled = !condition.entity || !availableStates.get(condition.entity)
