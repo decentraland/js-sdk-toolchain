@@ -1,2 +1,2 @@
-import StatesInpector from './StatesInpesctor'
-export { StatesInpector }
+import StatesInspector from './StatesInspector'
+export { StatesInspector }

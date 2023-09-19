@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { States } from '@dcl/asset-packs'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { withSdk } from '../../../hoc/withSdk'
@@ -7,12 +8,11 @@ import { Button } from '../../Button'
 import { Container } from '../../Container'
 import { TextField } from '../TextField'
 import { AddButton } from '../AddButton'
+import MoreOptionsMenu from '../MoreOptionsMenu'
 import { Props } from './types'
 import { getUniqueState, isRepeated, isValidInput } from './utils'
 
 import './StatesInspector.css'
-import { States } from '@dcl/asset-packs'
-import MoreOptionsMenu from '../MoreOptionsMenu'
 
 export default withSdk<Props>(({ sdk, entity }) => {
   const { States } = sdk.components

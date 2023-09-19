@@ -18,9 +18,9 @@ import { MeshRendererInspector } from './MeshRendererInspector'
 import { SceneInspector } from './SceneInspector'
 import { TextShapeInspector } from './TextShapeInspector'
 import { TransformInspector } from './TransformInspector'
+import { StatesInspector } from './StatesInspector'
 
 import './EntityInspector.css'
-import { StatesInpector } from './StatesInspector'
 
 const getLabel = (sdk: SdkContextValue, entity: Entity | null) => {
   if (entity === null) return null
@@ -59,7 +59,7 @@ export const EntityInspector = withSdk(({ sdk }) => {
       { name: sdk.components.Transform.componentName, component: TransformInspector },
       { name: sdk.components.Actions.componentName, component: ActionInspector },
       { name: sdk.components.Triggers.componentName, component: TriggerInspector },
-      { name: sdk.components.States.componentName, component: StatesInpector }
+      { name: sdk.components.States.componentName, component: StatesInspector }
     ],
     [sdk]
   )
