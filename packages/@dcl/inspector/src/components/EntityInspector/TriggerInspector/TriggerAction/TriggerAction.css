@@ -23,6 +23,14 @@
   background-color: transparent;
   border-color: transparent;
   color: white;
+  justify-content: right;
+  margin: 0;
+  width: 26px;
+}
+
+.TriggerActionsContainer > .TriggerActionsTitle .RightContent .AddButton svg {
+  width: 16px;
+  height: 16px;
 }
 
 .TriggerActionsContainer > .TriggerAction {
@@ -32,6 +40,6 @@
   gap: 4px;
 }
 
-.TriggerAction .MoreOptionsContent {
-  min-width: 180px;
+.TriggerActionsContainer > .TriggerAction .MoreOptionsMenu .MoreOptionsContent {
+  min-width: 185px;
 }

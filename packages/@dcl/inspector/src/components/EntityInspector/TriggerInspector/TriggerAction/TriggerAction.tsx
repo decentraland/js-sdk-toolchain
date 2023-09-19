@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect } from 'react'
-import { AiOutlinePlus as AddIcon } from 'react-icons/ai'
 import { VscTrash as RemoveIcon } from 'react-icons/vsc'
 import { Entity } from '@dcl/ecs'
 import { TriggerAction } from '@dcl/asset-packs'
@@ -8,6 +7,7 @@ import { useArrayState } from '../../../../hooks/useArrayState'
 
 import { Button } from '../../../Button'
 import { Dropdown } from '../../../Dropdown'
+import { AddButton } from '../../AddButton'
 import MoreOptionsMenu from '../../MoreOptionsMenu'
 
 import type { Props } from './types'
@@ -62,9 +62,7 @@ export const TriggerActionContainer = ({ trigger, availableActions, onUpdateActi
       <div className="TriggerActionsTitle">
         <span>Assigned Actions</span>
         <div className="RightContent">
-          <Button className="AddButton" onClick={handleAddNewAction}>
-            <AddIcon size={16} />
-          </Button>
+          <AddButton onClick={handleAddNewAction} />
         </div>
       </div>
       {actions.map((action, idx) => {

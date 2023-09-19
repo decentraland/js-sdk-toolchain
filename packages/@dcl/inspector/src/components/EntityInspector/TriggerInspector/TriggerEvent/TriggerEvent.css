@@ -28,3 +28,7 @@
   flex-grow: 1;
   justify-content: flex-end;
 }
+
+.TriggerEventContainer .TriggerEventTitle .RightContent .MoreOptionsMenu .MoreOptionsContent {
+  min-width: 185px;
+}

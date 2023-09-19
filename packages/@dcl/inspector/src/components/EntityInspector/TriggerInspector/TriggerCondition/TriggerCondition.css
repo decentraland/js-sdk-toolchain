@@ -24,6 +24,14 @@
   background-color: transparent;
   border-color: transparent;
   color: white;
+  justify-content: right;
+  margin: 0;
+  width: 26px;
+}
+
+.TriggerConditionsContainer > .TriggerConditionsTitle .RightContent .AddButton svg {
+  width: 16px;
+  height: 16px;
 }
 
 .TriggerConditionsContainer > .TriggerCondition {
