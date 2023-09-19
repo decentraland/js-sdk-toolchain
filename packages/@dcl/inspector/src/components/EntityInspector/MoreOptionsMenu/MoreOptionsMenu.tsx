@@ -26,7 +26,11 @@ export const MoreOptionsMenu = ({ children }: { children: JSX.Element | JSX.Elem
       <Button className="MoreOptionsButton" onClick={handleShowMoreOptions}>
         <EllipsisIcon size={16} />
       </Button>
-      {showMoreOptions && <div className="MoreOptionsContent">{children}</div>}
+      {showMoreOptions && (
+        <div className="MoreOptionsContent" onClick={handleClosePanel}>
+          {children}
+        </div>
+      )}
     </div>
   )
 }

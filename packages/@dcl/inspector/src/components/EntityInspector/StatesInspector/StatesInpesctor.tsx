@@ -20,7 +20,6 @@ export default withSdk<Props>(({ sdk, entity }) => {
   const hasStates = useHasComponent(entity, States)
   const [states, setStates, isComponentEqual] = useComponentValue(entity, States)
   const [input, setInput] = useState<States>(states)
-  const [nonce, setNonce] = useState(0)
 
   useEffect(() => {
     setInput({ ...states })
@@ -59,8 +58,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
     return null
   }
 
-  const handleRemove = (state: string) => (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation()
+  const handleRemove = (state: string) => () => {
     const newValue = input.value.filter(($) => $ !== state)
     const defaultValue = input.defaultValue && newValue.includes(input.defaultValue) ? input.defaultValue : newValue[0]
     setInput({
@@ -68,7 +66,6 @@ export default withSdk<Props>(({ sdk, entity }) => {
       value: newValue,
       defaultValue
     })
-    setNonce((nonce) => nonce + 1)
   }
 
   const handleDefault = (state: string) => () => {
@@ -76,7 +73,6 @@ export default withSdk<Props>(({ sdk, entity }) => {
       ...input,
       defaultValue: state
     })
-    setNonce((nonce) => nonce + 1)
   }
 
   return (
@@ -84,7 +80,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
       {states.value.length > 0 ? (
         <Block label="State Name" className="states-list">
           {input.value.map((state, index) => (
-            <div className="row" key={`${index}-${nonce}`}>
+            <div className="row" key={index}>
               <TextField
                 rightLabel={states.defaultValue === state && !isRepeated(state, input.value) ? 'Default' : ' '}
                 value={state}
