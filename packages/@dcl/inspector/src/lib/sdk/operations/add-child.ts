@@ -11,6 +11,7 @@ export function addChild(engine: IEngine) {
     const Name = engine.getComponent(NameEngine.componentId) as typeof NameEngine
     const Actions = engine.getComponent(EditorComponentNames.Actions) as EditorComponents['Actions']
     const Triggers = engine.getComponent(EditorComponentNames.Triggers) as EditorComponents['Triggers']
+    const States = engine.getComponent(EditorComponentNames.States) as EditorComponents['States']
 
     // create new child components
     Name.create(child, { value: name })
@@ -20,18 +21,27 @@ export function addChild(engine: IEngine) {
 
     if (components && Object.values(components).length > 0) {
       for (const [name, component] of Object.entries(components)) {
-        if (name === ComponentName.ACTIONS) {
-          Actions.createOrReplace(child, { value: (component as EditorComponentsTypes['Actions']).value })
-        } else if (name === ComponentName.TRIGGERS) {
-          const triggersValue = (component as EditorComponentsTypes['Triggers']).value
-          const updatedTriggers = triggersValue.map((trigger) => ({
-            ...trigger,
-            actions: trigger.actions.map((action) => ({
-              ...action,
-              entity: (action.entity as any) === '{selfEntity}' ? child : action.entity
+        switch (name) {
+          case ComponentName.ACTIONS: {
+            Actions.createOrReplace(child, component as EditorComponentsTypes['Actions'])
+            break
+          }
+          case ComponentName.TRIGGERS: {
+            const triggers = component as EditorComponentsTypes['Triggers']
+            const updatedValue = triggers.value.map((trigger) => ({
+              ...trigger,
+              actions: trigger.actions.map((action) => ({
+                ...action,
+                entity: (action.entity as any) === '{selfEntity}' ? child : action.entity
+              }))
             }))
-          }))
-          Triggers.createOrReplace(child, { value: updatedTriggers })
+            Triggers.createOrReplace(child, { ...triggers, value: updatedValue })
+            break
+          }
+          case ComponentName.STATES: {
+            States.createOrReplace(child, component as EditorComponentsTypes['States'])
+            break
+          }
         }
       }
     }

@@ -18,7 +18,8 @@ export enum EditorComponentNames {
   Scene = 'inspector::Scene',
   Nodes = 'inspector::Nodes',
   Actions = ComponentName.ACTIONS,
-  Triggers = ComponentName.TRIGGERS
+  Triggers = ComponentName.TRIGGERS,
+  States = ComponentName.STATES
 }
 
 export type EditorComponentsTypes = {
@@ -36,6 +37,7 @@ export type EditorComponents = {
   Nodes: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Nodes']>
   Actions: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Actions']>
   Triggers: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Triggers']>
+  States: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['States']>
 }
 
 export type SdkComponents = {
@@ -98,13 +100,14 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     )
   })
 
-  const { Actions, Triggers } = createAssetPacksComponents(engine as any)
+  const { Actions, Triggers, States } = createAssetPacksComponents(engine as any)
 
   return {
     Selection,
     Scene,
     Nodes,
     Actions: Actions as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Actions']>,
-    Triggers: Triggers as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Triggers']>
+    Triggers: Triggers as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Triggers']>,
+    States: States as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['States']>
   }
 }

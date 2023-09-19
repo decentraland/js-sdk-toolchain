@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import { VscEllipsis as EllipsisIcon } from 'react-icons/vsc'
-import Button from '../../Button'
+import { Button } from '../../Button'
 import { useOutsideClick } from '../../../hooks/useOutsideClick'
 
 import './MoreOptionsMenu.css'
@@ -26,7 +26,11 @@ export const MoreOptionsMenu = ({ children }: { children: JSX.Element | JSX.Elem
       <Button className="MoreOptionsButton" onClick={handleShowMoreOptions}>
         <EllipsisIcon size={16} />
       </Button>
-      {showMoreOptions && <div className="MoreOptionsContent">{children}</div>}
+      {showMoreOptions && (
+        <div className="MoreOptionsContent" onClick={handleClosePanel}>
+          {children}
+        </div>
+      )}
     </div>
   )
 }

@@ -21,7 +21,7 @@
   padding: 8px;
   border-radius: 2px;
   background: #3c3c3c;
-  min-width: 185px;
+  min-width: 140px;
   z-index: 1;
 }
 
@@ -30,6 +30,7 @@
   align-items: center;
   gap: 4px;
   padding: 4px;
+  width: 100%;
 }
 
 .MoreOptionsMenu .MoreOptionsContent .Button:not(:hover) {

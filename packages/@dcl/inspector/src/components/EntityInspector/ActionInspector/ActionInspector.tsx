@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Action, ActionType } from '@dcl/asset-packs'
 import { Item } from 'react-contexify'
-import { AiFillDelete as DeleteIcon, AiOutlinePlus as AddIcon } from 'react-icons/ai'
+import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 import { VscQuestion as QuestionIcon, VscTrash as RemoveIcon, VscInfo as InfoIcon } from 'react-icons/vsc'
 import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
 
@@ -10,6 +10,7 @@ import { withContextMenu } from '../../../hoc/withContextMenu'
 import { useComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
+import { useChange } from '../../../hooks/sdk/useChange'
 import { EditorComponentsTypes } from '../../../lib/sdk/components'
 
 import { Block } from '../../Block'
@@ -17,27 +18,49 @@ import { Container } from '../../Container'
 import { ContextMenu } from '../../ContexMenu'
 import { Dropdown } from '../../Dropdown'
 import { TextField } from '../TextField'
+import MoreOptionsMenu from '../MoreOptionsMenu'
+import { AddButton } from '../AddButton'
+import { Button } from '../../Button'
 
 import { Props } from './types'
 
 import './ActionInspector.css'
-import MoreOptionsMenu from '../MoreOptionsMenu'
-import Button from '../../Button'
+
+function isStates(maybeStates: any): maybeStates is EditorComponentsTypes['States'] {
+  return !!maybeStates && 'value' in maybeStates && Array.isArray(maybeStates.value)
+}
 
 export default withSdk<Props>(
   withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId, contextMenuId }) => {
-    const { Actions } = sdk.components
+    const { Actions, States } = sdk.components
     const [componentValue, setComponentValue, isComponentEqual] = useComponentValue<EditorComponentsTypes['Actions']>(
       entityId,
       Actions
     )
+
     const entity = sdk.sceneContext.getEntityOrNull(entityId)
     const { handleAction } = useContextMenu()
     const [actions, setActions] = useState<Action[]>(componentValue === null ? [] : componentValue.value)
     const [isFocused, setIsFocused] = useState(false)
     const [isLoaded, setIsLoaded] = useState(false)
+    const [states, setStates] = useState<string[]>(States.getOrNull(entityId)?.value || [])
 
     const hasActions = useHasComponent(entityId, Actions)
+    const hasStates = useHasComponent(entityId, States)
+
+    useChange(
+      (event, sdk) => {
+        if (
+          event.entity === entityId &&
+          event.component?.componentId === sdk.components.States.componentId &&
+          isStates(event.value)
+        ) {
+          const states = event.value
+          setStates(states.value)
+        }
+      },
+      [entityId]
+    )
 
     const isValidAction = useCallback((action: Action) => {
       if (!action.type || !action.name) {
@@ -85,16 +108,36 @@ export default withSdk<Props>(
       }
     }, [])
 
-    const entityAnimations = useMemo(() => {
+    const animations = useMemo(() => {
       return entity?.gltfAssetContainer?.animationGroups || []
     }, [entity?.gltfAssetContainer?.animationGroups])
 
-    const availableActions: string[] = useMemo(() => {
-      return Object.values(ActionType).filter(
-        (action) =>
-          isNaN(Number(action)) && (entityAnimations.length === 0 ? action !== ActionType.PLAY_ANIMATION : true)
-      )
-    }, [entityAnimations])
+    const hasAnimations = useMemo(() => {
+      return animations.length > 0
+    }, [animations])
+
+    // actions that may only be available under certain circumstances
+    const conditionalActions: Partial<Record<ActionType, () => boolean>> = useMemo(
+      () => ({
+        [ActionType.PLAY_ANIMATION]: () => hasAnimations,
+        [ActionType.SET_STATE]: () => hasStates
+      }),
+      [hasAnimations, hasStates]
+    )
+
+    const allActions = useMemo(() => {
+      return Object.values(ActionType).filter((action) => typeof action === 'string') as ActionType[]
+    }, [])
+
+    const availableActions: ActionType[] = useMemo(() => {
+      return allActions.filter((action) => {
+        if (action in conditionalActions) {
+          const isAvailable = conditionalActions[action]!
+          return isAvailable()
+        }
+        return true
+      })
+    }, [conditionalActions, allActions])
 
     const handleRemove = useCallback(async () => {
       sdk.operations.removeComponent(entityId, Actions)
@@ -116,6 +159,24 @@ export default withSdk<Props>(
             payload: {
               playAnimation: {
                 animation: value
+              }
+            }
+          }
+          return data
+        })
+      },
+      [setActions]
+    )
+
+    const handleChangeState = useCallback(
+      ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
+        setActions((prev: Action[]) => {
+          const data = [...prev]
+          data[idx] = {
+            ...data[idx],
+            payload: {
+              setState: {
+                state: value
               }
             }
           }
@@ -250,14 +311,14 @@ export default withSdk<Props>(
                   </Button>
                 </MoreOptionsMenu>
               </div>
-              {action.type === ActionType.PLAY_ANIMATION && entityAnimations.length > 0 ? (
+              {action.type === ActionType.PLAY_ANIMATION && hasAnimations ? (
                 <div className="row">
                   <div className="field">
                     <label>Select Animation {renderSelectAnimationMoreInfo()}</label>
                     <Dropdown
                       options={[
                         { value: '', text: 'Select an Animation' },
-                        ...entityAnimations.map((animation) => ({ text: animation.name, value: animation.name }))
+                        ...animations.map((animation) => ({ text: animation.name, value: animation.name }))
                       ]}
                       value={action.payload.playAnimation?.animation}
                       onChange={(e) => handleChangeAnimation(e, idx)}
@@ -265,13 +326,25 @@ export default withSdk<Props>(
                   </div>
                 </div>
               ) : null}
+              {action.type === ActionType.SET_STATE && hasStates ? (
+                <div className="row">
+                  <div className="field">
+                    <label>Select State</label>
+                    <Dropdown
+                      options={[
+                        { value: '', text: 'Select a State' },
+                        ...states.map((state) => ({ text: state, value: state }))
+                      ]}
+                      value={action.payload.playAnimation?.animation}
+                      onChange={(e) => handleChangeState(e, idx)}
+                    />
+                  </div>
+                </div>
+              ) : null}
             </Block>
           )
         })}
-
-        <button className="AddButton" onClick={handleAddNewAction}>
-          <AddIcon /> Add New Action
-        </button>
+        <AddButton onClick={handleAddNewAction}>Add New Action</AddButton>
       </Container>
     )
   })

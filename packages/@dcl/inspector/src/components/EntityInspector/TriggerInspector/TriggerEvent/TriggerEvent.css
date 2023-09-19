@@ -44,7 +44,7 @@
   justify-content: flex-end;
 }
 
-.TriggerEventContainer > .content > .TriggerActionsTitle .RightContent .AddButton {
+.TriggerEventContainer>.content>.TriggerActionsTitle .RightContent .AddActionButton {
   background-color: transparent;
   border-color: transparent;
   color: white;
@@ -55,4 +55,8 @@
   flex-direction: column;
   margin-top: 8px;
   gap: 8px;
+}
+
+.TriggerEventContainer .MoreOptionsContent {
+  min-width: 200px;
 }
