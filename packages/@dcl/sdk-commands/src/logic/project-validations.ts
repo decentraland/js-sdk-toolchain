@@ -7,6 +7,7 @@ import { CliError } from './error'
 import { getSceneFilePath, getValidSceneJson } from './scene-validations'
 import { getInstalledPackageVersion } from './config'
 import { getSmartWearableFile, getValidWearableJson } from './portable-experience-sw-validations'
+import { getPackageJson } from './project-files'
 
 export type BaseProject = { workingDirectory: string }
 export type SceneProject = { kind: 'scene'; scene: Scene } & BaseProject
@@ -100,13 +101,31 @@ export async function npmCommand(
 
 /**
  * Start validations to make the scene work.
+ * Addd js-runtime package, so you can auto-import all the ~system modules.
  */
 export async function startValidations(components: Pick<CliComponents, 'spawner' | 'fs' | 'logger'>, cwd: string) {
-  return
   try {
     const sdkVersion = await getInstalledPackageVersion(components, '@dcl/sdk', cwd)
-    await npmCommand(components, cwd, `install --save-exact -D @dcl/js-runtime@${sdkVersion}`)
-  } catch (_) {
-    components.logger.error('Failed to run scene validations')
+    // Ignore relative or s3 versions
+    if (sdkVersion.startsWith('https://') || sdkVersion.startsWith('file://') || sdkVersion === '7.0.0') return
+    const packageJsonPath = path.resolve(cwd, 'package.json')
+
+    if (!(await components.fs.fileExists(packageJsonPath))) {
+      return
+    }
+
+    const packageJson = await getPackageJson(components, cwd)
+    if (
+      packageJson.dependencies &&
+      (packageJson.dependencies['@dcl/js-runtime'] || packageJson.dependencies['@dcl/sdk'])
+    ) {
+      packageJson.dependencies['@dcl/js-runtime'] = sdkVersion
+      delete packageJson.devDependencies['@dcl/js-runtime']
+    } else {
+      packageJson.devDependencies['@dcl/js-runtime'] = sdkVersion
+    }
+    await components.fs.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf-8')
+  } catch (e) {
+    components.logger.error('Failed to run scene validations', e as any)
   }
 }

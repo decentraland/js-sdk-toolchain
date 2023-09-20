@@ -12,12 +12,12 @@ import {
   inputSystem
 } from '@dcl/ecs'
 import { Color4 } from '@dcl/sdk/math'
-import { NetworkEntityFactory } from '@dcl/sdk/network-transport/types'
+import { NetworkManager } from '@dcl/sdk/network-transport/types'
 
 // Cube factory
 export const Cube = engine.defineComponent('cube', {})
-export function createCube(entityFactory: NetworkEntityFactory, x: number, y: number, z: number): Entity {
-  const entity = entityFactory.addEntity()
+export function createCube(entityFactory: NetworkManager, x: number, y: number, z: number): Entity {
+  const entity = entityFactory.addEntity(engine)
   // Used to track the cubes
   Cube.create(entity)
 

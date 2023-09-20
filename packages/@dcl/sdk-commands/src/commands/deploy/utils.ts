@@ -85,12 +85,10 @@ export async function getAddressAndSignature(
   }
 
   const sceneInfo = await getSceneInfo(components, scene, messageToSign, skipValidations)
-  const queryParams = new URLSearchParams(sceneInfo as any).toString()
-
   const { router: commonRouter } = setRoutes(components, sceneInfo)
   const router = setDeployRoutes(commonRouter, components, awaitResponse, sceneInfo, files, deployCallback)
 
-  const { program } = await runLinkerApp(components, router, { ...linkOptions, uri: `/?${queryParams}` })
+  const { program } = await runLinkerApp(components, router, { ...linkOptions, uri: `/` })
   return { program }
 }
 
