@@ -1,7 +1,7 @@
 import React from 'react'
 import { TriggerType } from '@dcl/asset-packs'
-import { VscAdd as AddIcon, VscTrash as RemoveIcon } from 'react-icons/vsc'
-
+import { VscTrash as RemoveIcon } from 'react-icons/vsc'
+import { IoIosGitBranch as ConditionalIcon } from 'react-icons/io'
 import { Block } from '../../../Block'
 import { Button } from '../../../Button'
 import { Dropdown } from '../../../Dropdown'
@@ -14,7 +14,7 @@ import './TriggerEvent.css'
 export const TriggerEvent = ({
   trigger,
   onChangeTriggerType,
-  onAddNewTriggerAction,
+  onAddNewTriggerCondition,
   onRemoveTriggerEvent,
   children
 }: Props) => {
@@ -24,6 +24,9 @@ export const TriggerEvent = ({
         <span>Trigger Event</span>
         <div className="RightContent">
           <MoreOptionsMenu>
+            <Button className="AddTriggerConditionButton" onClick={onAddNewTriggerCondition}>
+              <ConditionalIcon /> Add Trigger Condition
+            </Button>
             <Button className="RemoveButton" onClick={onRemoveTriggerEvent}>
               <RemoveIcon /> Remove Trigger Event
             </Button>
@@ -35,15 +38,7 @@ export const TriggerEvent = ({
         value={trigger.type}
         onChange={onChangeTriggerType}
       />
-      <div className="TriggerActionsTitle">
-        <span>Assigned Actions</span>
-        <div className="RightContent">
-          <Button className="AddActionButton" onClick={onAddNewTriggerAction}>
-            <AddIcon size={16} />
-          </Button>
-        </div>
-      </div>
-      <div className="TriggerActionsContainer">{children}</div>
+      {children}
     </Block>
   )
 }

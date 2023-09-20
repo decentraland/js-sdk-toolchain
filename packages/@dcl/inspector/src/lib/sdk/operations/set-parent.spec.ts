@@ -2,7 +2,7 @@ import { IEngine, Engine, TransformComponentExtended } from '@dcl/ecs'
 import { Quaternion } from '@dcl/ecs-math'
 
 import { areSRTMatrixesEqualWithEpsilon, getWorldMatrix } from '../../logic/math'
-import { EditorComponents, createEditorComponents } from '../components'
+import { CoreComponents, EditorComponents, createEditorComponents } from '../components'
 import { setParent } from './set-parent'
 
 const getNodesInitialValue = (engine: IEngine) => ({
@@ -16,7 +16,7 @@ describe('setParent', () => {
 
   beforeEach(() => {
     engine = Engine()
-    Transform = engine.getComponent('core::Transform') as TransformComponentExtended
+    Transform = engine.getComponent(CoreComponents.TRANSFORM) as TransformComponentExtended
     Nodes = createEditorComponents(engine).Nodes
     Nodes.create(engine.RootEntity, getNodesInitialValue(engine))
   })

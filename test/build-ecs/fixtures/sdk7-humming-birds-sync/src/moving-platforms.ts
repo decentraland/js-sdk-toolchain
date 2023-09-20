@@ -1,13 +1,14 @@
 import { GltfContainer, Transform, SyncComponents, Entity } from '@dcl/ecs'
 import * as utils from '@dcl-sdk/utils'
 import { Vector3 } from '@dcl/sdk/math'
-import { NetworkEntityFactory } from '@dcl/sdk/network-transport/types'
+import { engine } from '@dcl/sdk/ecs'
+import { NetworkManager } from '@dcl/sdk/network-transport/types'
 
-export function createMovingPlatforms(networkedEntityFactory: NetworkEntityFactory) {
+export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
   //// triggerable platform
 
   //// only horizontal
-  const platform1 = networkedEntityFactory.addEntity()
+  const platform1 = networkedEntityFactory.addEntity(engine)
   GltfContainer.create(platform1, {
     src: 'models/movingPlatform.glb'
   })
@@ -16,7 +17,7 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkEntityFacto
   })
   SyncComponents.create(platform1, { componentIds: [Transform.componentId] })
   //// only vertical
-  const platform2 = networkedEntityFactory.addEntity()
+  const platform2 = networkedEntityFactory.addEntity(engine)
   GltfContainer.create(platform2, {
     src: 'models/movingPlatform.glb'
   })
@@ -26,7 +27,7 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkEntityFacto
   SyncComponents.create(platform2, { componentIds: [Transform.componentId] })
 
   //// path with many waypoints
-  const platform4 = networkedEntityFactory.addEntity()
+  const platform4 = networkedEntityFactory.addEntity(engine)
   GltfContainer.create(platform4, {
     src: 'models/movingPlatform.glb'
   })
@@ -35,7 +36,7 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkEntityFacto
   })
   SyncComponents.create(platform4, { componentIds: [Transform.componentId] })
 
-  const platform3 = networkedEntityFactory.addEntity()
+  const platform3 = networkedEntityFactory.addEntity(engine)
   GltfContainer.create(platform3, {
     src: 'models/movingPlatform.glb'
   })
