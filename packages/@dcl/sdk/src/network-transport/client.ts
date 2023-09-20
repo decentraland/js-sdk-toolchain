@@ -67,6 +67,9 @@ export async function createClientTransport({ serverUrl }: ClientTransportConfig
         console.error(e)
         reject(e)
       }
+      ws.onclose = () => {
+        reject(new Error('socket closed'))
+      }
     } catch (err) {
       reject(err)
     }
