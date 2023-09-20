@@ -44,8 +44,6 @@ export function addAsset(engine: IEngine) {
       }
     }
 
-    console.log(gltfContainerOptions)
-
     GltfContainer.create(child, gltfContainerOptions)
     updateSelectedEntity(engine)(child)
 
