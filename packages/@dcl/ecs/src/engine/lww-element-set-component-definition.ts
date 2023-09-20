@@ -51,7 +51,8 @@ export function createUpdateLwwFromCrdt(
   componentId: number,
   timestamps: Map<Entity, number>,
   schema: Pick<ISchema<any>, 'serialize' | 'deserialize'>,
-  data: Map<Entity, unknown>
+  data: Map<Entity, unknown>,
+  updatedFromCrdtIterator: Set<Entity>
 ) {
   /**
    * Process the received message only if the lamport number recieved is higher
@@ -126,6 +127,7 @@ export function createUpdateLwwFromCrdt(
         } else {
           data.delete(entity)
         }
+        updatedFromCrdtIterator.add(entity)
 
         return [null, data.get(entity)]
       }
@@ -168,7 +170,8 @@ export function createGetCrdtMessagesForLww(
   timestamps: Map<Entity, number>,
   dirtyIterator: Set<Entity>,
   schema: Pick<ISchema<any>, 'serialize'>,
-  data: Map<Entity, unknown>
+  data: Map<Entity, unknown>,
+  updatedFromCrdtIterator: Set<Entity>
 ) {
   return function* () {
     for (const entity of dirtyIterator) {
@@ -198,6 +201,7 @@ export function createGetCrdtMessagesForLww(
       }
     }
     dirtyIterator.clear()
+    updatedFromCrdtIterator.clear()
   }
 }
 
@@ -211,6 +215,7 @@ export function createComponentDefinitionFromSchema<T>(
 ): LastWriteWinElementSetComponentDefinition<T> {
   const data = new Map<Entity, T>()
   const dirtyIterator = new Set<Entity>()
+  const updatedFromCrdtIterator = new Set<Entity>()
   const timestamps = new Map<Entity, number>()
 
   return {
@@ -303,8 +308,20 @@ export function createComponentDefinitionFromSchema<T>(
         yield entity
       }
     },
-    getCrdtUpdates: createGetCrdtMessagesForLww(componentId, timestamps, dirtyIterator, schema, data),
-    updateFromCrdt: createUpdateLwwFromCrdt(componentId, timestamps, schema, data),
+    *updatedFromCrdtIterator(): Iterable<Entity> {
+      for (const entity of updatedFromCrdtIterator) {
+        yield entity
+      }
+    },
+    getCrdtUpdates: createGetCrdtMessagesForLww(
+      componentId,
+      timestamps,
+      dirtyIterator,
+      schema,
+      data,
+      updatedFromCrdtIterator
+    ),
+    updateFromCrdt: createUpdateLwwFromCrdt(componentId, timestamps, schema, data, updatedFromCrdtIterator),
     dumpCrdtStateToBuffer: createDumpLwwFunctionFromCrdt(componentId, timestamps, schema, data)
   }
 }

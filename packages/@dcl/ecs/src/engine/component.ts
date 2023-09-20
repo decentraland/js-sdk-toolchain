@@ -169,6 +169,11 @@ export interface LastWriteWinElementSetComponentDefinition<T> extends BaseCompon
    * @param val - The initial value if it doesn't exist
    */
   getOrCreateMutable(entity: Entity, initialValue?: T): T
+
+  /**
+   * @internal
+   */
+  updatedFromCrdtIterator(): Iterable<Entity>
 }
 /**
  * @public
@@ -199,6 +204,11 @@ export interface GrowOnlyValueSetComponentDefinition<T> extends BaseComponent<T>
    * @returns
    */
   get(entity: Entity): DeepReadonlySet<T>
+
+  /**
+   * @internal
+   */
+  updatedFromCrdtIterator(): Iterable<[Entity, number]>
 }
 
 /**

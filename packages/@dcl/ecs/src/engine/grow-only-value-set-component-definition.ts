@@ -48,6 +48,7 @@ export function createValueSetComponentDefinitionFromSchema<T>(
   }
   const data = new Map<Entity, InternalDatastructure>()
   const dirtyIterator = new Set<Entity>()
+  const updatedFromCrdtIterator = new Map<Entity, number>()
   const queuedCommands: AppendValueMessageBody[] = []
 
   // only sort the array if the latest (N) element has a timestamp <= N-1
@@ -148,12 +149,15 @@ export function createValueSetComponentDefinitionFromSchema<T>(
     getCrdtUpdates() {
       // return a copy of the commands, and then clear the local copy
       dirtyIterator.clear()
+      updatedFromCrdtIterator.clear()
       return queuedCommands.splice(0, queuedCommands.length)
     },
     updateFromCrdt(_body) {
       if (_body.type === CrdtMessageType.APPEND_VALUE) {
         const buf = new ReadWriteByteBuffer(_body.data)
         append(_body.entityId, schema.deserialize(buf) as DeepReadonly<T>)
+
+        updatedFromCrdtIterator.set(_body.entityId, (updatedFromCrdtIterator.get(_body.entityId) || 0) + 1)
       }
       return [null, undefined]
     },
@@ -165,6 +169,11 @@ export function createValueSetComponentDefinitionFromSchema<T>(
           schema.serialize(it.value, buf)
           AppendValueOperation.write(entity, 0, componentId, buf.toBinary(), buffer)
         }
+      }
+    },
+    *updatedFromCrdtIterator(): Iterable<[Entity, number]> {
+      for (const [entity, newOnesCount] of updatedFromCrdtIterator) {
+        yield [entity, newOnesCount]
       }
     }
   }
