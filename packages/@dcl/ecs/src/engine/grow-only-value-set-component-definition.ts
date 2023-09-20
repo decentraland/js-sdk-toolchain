@@ -171,10 +171,8 @@ export function createValueSetComponentDefinitionFromSchema<T>(
         }
       }
     },
-    *updatedFromCrdtIterator(): Iterable<[Entity, number]> {
-      for (const [entity, newOnesCount] of updatedFromCrdtIterator) {
-        yield [entity, newOnesCount]
-      }
+    getEntitiesUpdatedFromCrdt(): Map<Entity, number> {
+      return updatedFromCrdtIterator
     }
   }
 

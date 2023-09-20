@@ -172,8 +172,9 @@ export interface LastWriteWinElementSetComponentDefinition<T> extends BaseCompon
 
   /**
    * @internal
+   * @returns a set with entities changed
    */
-  updatedFromCrdtIterator(): Iterable<Entity>
+  getEntitiesUpdatedFromCrdt(): Set<Entity>
 }
 /**
  * @public
@@ -207,8 +208,9 @@ export interface GrowOnlyValueSetComponentDefinition<T> extends BaseComponent<T>
 
   /**
    * @internal
+   * @returns a map with entities as key and how many values was appended to the set as value
    */
-  updatedFromCrdtIterator(): Iterable<[Entity, number]>
+  getEntitiesUpdatedFromCrdt(): Map<Entity, number>
 }
 
 /**

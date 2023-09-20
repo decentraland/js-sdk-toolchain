@@ -308,10 +308,8 @@ export function createComponentDefinitionFromSchema<T>(
         yield entity
       }
     },
-    *updatedFromCrdtIterator(): Iterable<Entity> {
-      for (const entity of updatedFromCrdtIterator) {
-        yield entity
-      }
+    getEntitiesUpdatedFromCrdt(): Set<Entity> {
+      return updatedFromCrdtIterator
     },
     getCrdtUpdates: createGetCrdtMessagesForLww(
       componentId,

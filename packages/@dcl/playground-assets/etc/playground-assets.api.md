@@ -72,6 +72,15 @@ export const enum AvatarAnchorPointType {
 export const AvatarAttach: LastWriteWinElementSetComponentDefinition<PBAvatarAttach>;
 
 // @public (undocumented)
+export const AvatarBase: LastWriteWinElementSetComponentDefinition<PBAvatarBase>;
+
+// @public (undocumented)
+export const AvatarEmoteCommand: LastWriteWinElementSetComponentDefinition<PBAvatarEmoteCommand>;
+
+// @public (undocumented)
+export const AvatarEquippedData: LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>;
+
+// @public (undocumented)
 export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>;
 
 // @public (undocumented)
@@ -514,6 +523,9 @@ export const componentDefinitionByName: {
     "core::AudioSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioSource>>;
     "core::AudioStream": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioStream>>;
     "core::AvatarAttach": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarAttach>>;
+    "core::AvatarBase": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarBase>>;
+    "core::AvatarEmoteCommand": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarEmoteCommand>>;
+    "core::AvatarEquippedData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>>;
     "core::AvatarModifierArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>>;
     "core::AvatarShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarShape>>;
     "core::Billboard": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBBillboard>>;
@@ -526,6 +538,7 @@ export const componentDefinitionByName: {
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
     "core::NftShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBNftShape>>;
+    "core::PlayerIdentityData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>>;
     "core::PointerEvents": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerEvents>>;
     "core::PointerEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBPointerEventsResult>>;
     "core::PointerLock": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerLock>>;
@@ -819,14 +832,6 @@ export function Engine(options?: IEngineOptions): IEngine;
 // @public
 export const engine: IEngine;
 
-// Warning: (ae-missing-release-tag) "EngineEvent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type EngineEvent<T extends IEventNames = IEventNames, V = IEvents[T]> = {
-    type: T;
-    data: Readonly<V>;
-};
-
 // @public (undocumented)
 export const EngineInfo: LastWriteWinElementSetComponentDefinition<PBEngineInfo>;
 
@@ -951,28 +956,6 @@ export function getComponentEntityTree<T>(engine: Pick<IEngine, 'getEntitiesWith
 // @public @deprecated (undocumented)
 export function getCompositeRootComponent(engine: IEngine): LastWriteWinElementSetComponentDefinition<CompositeRootType>;
 
-// Warning: (ae-missing-release-tag) "GizmoDragEndEvent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type GizmoDragEndEvent = {
-    type: 'gizmoDragEnded';
-    transforms: Array<{
-        position: Vector3Type;
-        rotation: QuaternionType;
-        scale: Vector3Type;
-        entityId: unknown;
-    }>;
-};
-
-// Warning: (ae-missing-release-tag) "GizmoSelectedEvent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type GizmoSelectedEvent = {
-    type: 'gizmoSelected';
-    gizmoType: 'MOVE' | 'ROTATE' | 'SCALE' | 'NONE';
-    entities: string[];
-};
-
 // Warning: (ae-missing-release-tag) "GlobalDirectionRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -983,13 +966,6 @@ export type GlobalDirectionRaycastOptions = RaycastSystemOptions & GlobalDirecti
 // @public (undocumented)
 export type GlobalDirectionRaycastSystemOptions = {
     direction?: PBVector3;
-};
-
-// Warning: (ae-missing-release-tag) "GlobalInputEventResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type GlobalInputEventResult = InputEventResult & {
-    type: 0 | 1;
 };
 
 // Warning: (ae-missing-release-tag) "GlobalTargetRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -1075,96 +1051,17 @@ export type IEventNames = keyof IEvents;
 // @public (undocumented)
 export interface IEvents {
     // (undocumented)
-    actionButtonEvent: GlobalInputEventResult;
-    // (undocumented)
-    builderSceneStart: unknown;
-    // (undocumented)
-    builderSceneUnloaded: unknown;
-    // (undocumented)
-    cameraModeChanged: {
-        cameraMode: 0 | 1 | 2;
-    };
-    // (undocumented)
-    chatMessage: {
-        id: string;
-        sender: string;
-        message: string;
-        isCommand: boolean;
-    };
-    // (undocumented)
     comms: {
         sender: string;
         message: string;
     };
     // (undocumented)
-    entitiesOutOfBoundaries: {
-        entities: string[];
-    };
-    // (undocumented)
-    entityBackInScene: {
-        entityId: unknown;
-    };
-    // (undocumented)
-    entityOutOfScene: {
-        entityId: unknown;
-    };
-    // (undocumented)
-    externalAction: {
-        type: string;
-        [key: string]: any;
-    };
-    // (undocumented)
-    gizmoEvent: GizmoDragEndEvent | GizmoSelectedEvent;
-    // (undocumented)
-    idleStateChanged: {
-        isIdle: boolean;
-    };
-    // (undocumented)
-    limitsExceeded: {
-        given: Record<string, number>;
-        limit: Record<string, number>;
-    };
-    // (undocumented)
-    metricsUpdate: {
-        given: Record<string, number>;
-        limit: Record<string, number>;
-    };
-    // (undocumented)
-    onAnimationEnd: {
-        clipName: string;
-    };
-    // (undocumented)
-    onBlur: {
-        entityId: unknown;
-        pointerId: number;
-    };
-    // (undocumented)
-    onChange: {
-        value?: any;
-        pointerId?: number;
-    };
-    // (undocumented)
-    onClick: {
-        entityId: unknown;
-    };
-    // (undocumented)
-    onEnter: unknown;
-    // (undocumented)
     onEnterScene: {
         userId: string;
     };
     // (undocumented)
-    onFocus: {
-        entityId: unknown;
-        pointerId: number;
-    };
-    // (undocumented)
     onLeaveScene: {
         userId: string;
-    };
-    // (undocumented)
-    onPointerLock: {
-        locked?: boolean;
     };
     // (undocumented)
     onRealmChanged: {
@@ -1172,10 +1069,6 @@ export interface IEvents {
         room: string;
         serverName: string;
         displayName: string;
-    };
-    // (undocumented)
-    onTextSubmit: {
-        text: string;
     };
     // (undocumented)
     playerClicked: {
@@ -1199,52 +1092,9 @@ export interface IEvents {
         expressionId: string;
     };
     // (undocumented)
-    pointerDown: InputEventResult;
-    // (undocumented)
-    pointerEvent: GlobalInputEventResult;
-    // (undocumented)
-    pointerHoverEnter: unknown;
-    // (undocumented)
-    pointerHoverExit: unknown;
-    // (undocumented)
-    pointerUp: InputEventResult;
-    // (undocumented)
-    positionChanged: {
-        position: Vector3Type;
-        cameraPosition: Vector3Type;
-        playerHeight: number;
-    };
-    // (undocumented)
     profileChanged: {
         ethAddress: string;
         version: number;
-    };
-    // (undocumented)
-    raycastResponse: RaycastResponsePayload<any>;
-    // (undocumented)
-    rotationChanged: {
-        rotation: Vector3Type;
-        quaternion: QuaternionType;
-    };
-    // (undocumented)
-    sceneStart: unknown;
-    // (undocumented)
-    stateEvent: {
-        type: string;
-        payload: any;
-    };
-    // (undocumented)
-    uuidEvent: {
-        uuid: string;
-        payload: any;
-    };
-    // (undocumented)
-    videoEvent: {
-        componentId: string;
-        videoClipId: string;
-        videoStatus: number;
-        currentOffset: number;
-        totalVideoLength: number;
     };
 }
 
@@ -1313,23 +1163,6 @@ export const enum InputAction {
     // (undocumented)
     IA_WALK = 9
 }
-
-// Warning: (ae-missing-release-tag) "InputEventResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type InputEventResult = {
-    origin: Vector3Type;
-    direction: Vector3Type;
-    buttonId: number;
-    hit?: {
-        length: number;
-        hitPoint: Vector3Type;
-        meshName: string;
-        normal: Vector3Type;
-        worldNormal: Vector3Type;
-        entityId: unknown;
-    };
-};
 
 // @public
 export const inputSystem: IInputSystem;
@@ -1919,26 +1752,10 @@ export const onRealmChangedObservable: Observable<{
     displayName: string;
 }>;
 
-// Warning: (ae-missing-release-tag) "onSceneReadyObservable" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const onSceneReadyObservable: Observable<unknown>;
-
 // Warning: (ae-missing-release-tag) "onUpdate" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
 export function onUpdate(deltaTime: number): Promise<void>;
-
-// Warning: (ae-missing-release-tag) "onVideoEvent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const onVideoEvent: Observable<{
-    componentId: string;
-    videoClipId: string;
-    videoStatus: number;
-    currentOffset: number;
-    totalVideoLength: number;
-}>;
 
 // @public
 export type OverflowType = 'hidden' | 'scroll' | 'visible';
@@ -2019,6 +1836,74 @@ export namespace PBAvatarAttach {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarAttach;
     // (undocumented)
     export function encode(message: PBAvatarAttach, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAvatarBase {
+    // (undocumented)
+    bodyShapeUrn: string;
+    // (undocumented)
+    eyesColor: PBColor3 | undefined;
+    // (undocumented)
+    hairColor: PBColor3 | undefined;
+    // (undocumented)
+    name: string;
+    // (undocumented)
+    skinColor: PBColor3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBAvatarBase {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarBase;
+    // (undocumented)
+    export function encode(message: PBAvatarBase, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAvatarEmoteCommand {
+    // (undocumented)
+    emoteCommand: PBAvatarEmoteCommand_EmoteCommand | undefined;
+}
+
+// @public (undocumented)
+export namespace PBAvatarEmoteCommand {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarEmoteCommand;
+    // (undocumented)
+    export function encode(message: PBAvatarEmoteCommand, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAvatarEmoteCommand_EmoteCommand {
+    // (undocumented)
+    emoteUrn: string;
+    // (undocumented)
+    loop: boolean;
+}
+
+// @public (undocumented)
+export namespace PBAvatarEmoteCommand_EmoteCommand {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarEmoteCommand_EmoteCommand;
+    // (undocumented)
+    export function encode(message: PBAvatarEmoteCommand_EmoteCommand, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAvatarEquippedData {
+    // (undocumented)
+    emotesUrns: string[];
+    // (undocumented)
+    wearableUrns: string[];
+}
+
+// @public (undocumented)
+export namespace PBAvatarEquippedData {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarEquippedData;
+    // (undocumented)
+    export function encode(message: PBAvatarEquippedData, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2412,6 +2297,21 @@ export namespace PBNftShape {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBNftShape;
     // (undocumented)
     export function encode(message: PBNftShape, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBPlayerIdentityData {
+    address: string;
+    // (undocumented)
+    isGuest: boolean;
+}
+
+// @public (undocumented)
+export namespace PBPlayerIdentityData {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPlayerIdentityData;
+    // (undocumented)
+    export function encode(message: PBPlayerIdentityData, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2923,6 +2823,9 @@ export namespace Plane {
 }
 
 // @public (undocumented)
+export const PlayerIdentityData: LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>;
+
+// @public (undocumented)
 export const PointerEvents: LastWriteWinElementSetComponentDefinition<PBPointerEvents>;
 
 // @public (undocumented)
@@ -3125,15 +3028,6 @@ export const enum RaycastQueryType {
     RQT_NONE = 2,
     RQT_QUERY_ALL = 1
 }
-
-// Warning: (ae-missing-release-tag) "RaycastResponsePayload" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type RaycastResponsePayload<T> = {
-    queryId: string;
-    queryType: string;
-    payload: T;
-};
 
 // @public (undocumented)
 export const RaycastResult: LastWriteWinElementSetComponentDefinition<PBRaycastResult>;

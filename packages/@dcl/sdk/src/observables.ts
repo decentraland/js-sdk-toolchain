@@ -1,5 +1,5 @@
 import { Observable } from './internal/Observable'
-import { Vector3Type, engine } from '@dcl/ecs'
+import { Vector3Type, engine, PlayerIdentityData, Transform } from '@dcl/ecs'
 import { ManyEntityAction, SendBatchResponse, subscribe } from '~system/EngineApi'
 
 let subscribeFunction: typeof subscribe = subscribe
@@ -244,7 +244,14 @@ function createSdk7Subscriber() {
   }
 
   function processLeaveEnterScene(dt: number) {
-    PlayerIdentityData
+    // const transformUpdated = (Transform as any).getEntitiesChangedFromCrdt()
+    // for (const [entityId, data] of engine.getEntitiesWith(PlayerIdentityData)) {
+    //   if (transformUpdated.has(entityId)) {
+    //     if (Transform.getOrNull(entityId) === null) {
+    //     } else {
+    //     }
+    //   }
+    // }
   }
 
   function system(dt: number) {
