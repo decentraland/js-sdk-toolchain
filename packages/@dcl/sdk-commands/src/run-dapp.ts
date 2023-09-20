@@ -3,28 +3,22 @@ import { Lifecycle } from '@well-known-components/interfaces'
 import { createRecordConfigComponent } from '@well-known-components/env-config-provider'
 import { createConsoleLogComponent } from '@well-known-components/logger'
 import { resolve } from 'path'
-import { ChainId } from '@dcl/schemas'
 import open from 'open'
 
-import { getPort } from '../logic/get-free-port'
-import { CliComponents } from '../components'
+import { getPort } from './logic/get-free-port'
+import { CliComponents } from './components'
 
-export interface LinkerdAppOptions {
+export interface dAppOptions {
   openBrowser: boolean
   linkerPort?: number
   isHttps: boolean
   uri: string
 }
-export interface LinkerResponse {
-  address: string
-  signature: string
-  chainId?: ChainId
-}
 
-export async function runLinkerApp(
+export async function runDapp(
   cliComponents: Pick<CliComponents, 'fs' | 'logger' | 'fetch' | 'config'>,
   router: Router<object>,
-  { isHttps, openBrowser, uri, linkerPort }: LinkerdAppOptions
+  { isHttps, openBrowser, uri, linkerPort }: dAppOptions
 ) {
   const resolvedPort = await getPort(linkerPort!)
   const protocol = isHttps ? 'https' : 'http'
@@ -58,8 +52,6 @@ export async function runLinkerApp(
 }
 
 async function browse({ logger }: Pick<CliComponents, 'logger'>, url: string) {
-  logger.info('You need to sign the content before the deployment:')
-
   setTimeout(async () => {
     try {
       await open(`${url}`)
@@ -68,23 +60,11 @@ async function browse({ logger }: Pick<CliComponents, 'logger'>, url: string) {
     }
   }, 5000)
 
-  logger.info(`Signing app ready at ${url}`)
+  logger.info(`App ready at ${url}`)
 }
 
 async function getCredentials({ fs }: Pick<CliComponents, 'fs' | 'logger'>) {
   const privateKey = await fs.readFile(resolve(__dirname, '../../../certs/localhost.key'), 'utf-8')
   const certificate = await fs.readFile(resolve(__dirname, '../../../certs/localhost.crt'), 'utf-8')
   return { key: privateKey, cert: certificate }
-}
-
-export function getContentType(type: string) {
-  switch (type) {
-    case 'css':
-      return 'text/css'
-    case 'js':
-      return 'application/js'
-    case 'media':
-    default:
-      return 'text/plain'
-  }
 }

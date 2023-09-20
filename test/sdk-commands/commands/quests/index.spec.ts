@@ -45,7 +45,7 @@ describe('quests command', () => {
       const path = resolve('./test/sdk-commands/commands/quests/invalid_quest.json')
 
       await expect(() => quests.main({ args: { _: [], '--create-from-json': path }, components })).rejects.toThrow(
-        "> Quest's definition must have valid connections"
+        'You provided an invalid Quest JSON. Please check the documentation'
       )
       expect(executeSubcommand).not.toBeCalled()
     })

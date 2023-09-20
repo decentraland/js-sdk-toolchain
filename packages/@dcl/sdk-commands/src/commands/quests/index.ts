@@ -1,13 +1,15 @@
 import { Result } from 'arg'
 import { isAddress } from 'eth-connect'
 import { validate } from 'uuid'
+import { validateCreateQuest } from '@dcl/quests-client/dist/utils'
+
 import { declareArgs } from '../../logic/args'
 import { CliComponents } from '../../components'
-import { createQuestByPrompting, executeSubcommand, urlRegex, validateCreateQuest } from './utils'
+import { createQuestByPrompting, executeSubcommand, setUpManager, urlRegex } from './utils'
 import { CreateQuest } from './types'
 import { colors } from '../../components/log'
 import { CliError } from '../../logic/error'
-import { LinkerdAppOptions } from '../../linker-dapp/api'
+import { dAppOptions, runDapp } from '../../run-dapp'
 import { printError, printSuccess } from '../../logic/beautiful-logs'
 
 interface Options {
@@ -30,7 +32,9 @@ export const args = declareArgs({
   '--create': Boolean,
   '--create-from-json': String,
   '--deactivate': String,
-  '--activate': String
+  '--activate': String,
+  '--manager': Boolean,
+  '-m': '--manager'
 })
 
 export function help(options: Options) {
@@ -38,6 +42,7 @@ export function help(options: Options) {
     Usage: 'sdk-commands quests [options]'
       Options:
         -h,  --help                                                   Displays complete help
+        -m, --manager                                                 Open up Quests Manager
         --create                                                      Creates a new Quest by prompts
         --create-from-json   [path]                                   Create a new Quest from absolute path to a JSON file
         -l, --list           [your_eth_address]                       Lists all of your quests. 
@@ -90,12 +95,14 @@ export async function main(options: Options) {
     await executeActivateSubcommand(options.components, linkerOpts, baseURL, options.args['--activate'])
   } else if (options.args['--deactivate']?.length) {
     await executeDeactivateSubcommand(options.components, linkerOpts, baseURL, options.args['--deactivate'])
+  } else if (options.args['--manager']) {
+    await executeManagerSubcommand(options.components, linkerOpts, baseURL)
   }
 }
 
 async function executeCreateSubcommand(
   components: CliComponents,
-  linkerOpts: Omit<LinkerdAppOptions, 'uri'>,
+  linkerOpts: Omit<dAppOptions, 'uri'>,
   baseURL: string,
   path?: string
 ) {
@@ -110,7 +117,10 @@ async function executeCreateSubcommand(
         throw new CliError(`${path} doesn't contain a valid JSON`)
       }
 
-      if (!validateCreateQuest(quest, { logger })) {
+      try {
+        validateCreateQuest(quest)
+      } catch (error) {
+        logger.error(error as Error)
         throw new CliError('You provided an invalid Quest JSON. Please check the documentation')
       }
     } else {
@@ -162,7 +172,7 @@ async function executeCreateSubcommand(
 
 async function executeListSubcommand(
   components: CliComponents,
-  linkerOpts: Omit<LinkerdAppOptions, 'uri'>,
+  linkerOpts: Omit<dAppOptions, 'uri'>,
   baseURL: string,
   address: string
 ) {
@@ -214,7 +224,7 @@ async function executeListSubcommand(
 
 async function executeActivateSubcommand(
   components: CliComponents,
-  linkerOpts: Omit<LinkerdAppOptions, 'uri'>,
+  linkerOpts: Omit<dAppOptions, 'uri'>,
   baseURL: string,
   questId: string
 ) {
@@ -256,7 +266,7 @@ async function executeActivateSubcommand(
 
 async function executeDeactivateSubcommand(
   components: CliComponents,
-  linkerOpts: Omit<LinkerdAppOptions, 'uri'>,
+  linkerOpts: Omit<dAppOptions, 'uri'>,
   baseURL: string,
   questId: string
 ) {
@@ -295,4 +305,33 @@ async function executeDeactivateSubcommand(
       }
     }
   )
+}
+
+async function executeManagerSubcommand(
+  components: CliComponents,
+  linkerOpts: Omit<dAppOptions, 'uri'>,
+  baseUrl: string
+) {
+  const { router } = setUpManager(components)
+
+  let env: 'dev' | 'prod' | ''
+  if (baseUrl.includes('quests.decentraland.org')) {
+    env = 'prod'
+  } else if (baseUrl.includes('quests.decentraland.zone')) {
+    env = 'dev'
+  } else {
+    env = ''
+  }
+
+  components.logger.info('Opening up the Quests Manager:')
+  const { program } = await runDapp(components, router, { ...linkerOpts, uri: `/?env=${env}` })
+
+  const p = new Promise((resolve) => {
+    process.on('SIGINT', async function () {
+      void program.stop()
+      resolve(true)
+    })
+  })
+
+  await p
 }
