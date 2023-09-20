@@ -4,19 +4,13 @@ import { ComponentName } from '@dcl/asset-packs'
 
 import { getConfig } from '../../../lib/logic/config'
 import { ROOT } from '../../../lib/sdk/tree'
+import { CoreComponents } from '../../../lib/sdk/components'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { useEntityComponent } from '../../../hooks/sdk/useEntityComponent'
 
 // TODO: enumerate better the components we want to show...
 const getEnabledComponents = () => {
-  const components = new Set([
-    'core::GltfContainer',
-    'core::TextShape',
-    'core::Transform',
-    'core::Material',
-    'core::MeshCollider',
-    'core::MeshRenderer'
-  ])
+  const components: Set<string> = new Set(Object.values(CoreComponents))
 
   const config = getConfig()
 

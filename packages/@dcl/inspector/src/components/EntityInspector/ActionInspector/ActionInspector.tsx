@@ -335,7 +335,7 @@ export default withSdk<Props>(
                         { value: '', text: 'Select a State' },
                         ...states.map((state) => ({ text: state, value: state }))
                       ]}
-                      value={action.payload.playAnimation?.animation}
+                      value={action.payload.setState?.state}
                       onChange={(e) => handleChangeState(e, idx)}
                     />
                   </div>

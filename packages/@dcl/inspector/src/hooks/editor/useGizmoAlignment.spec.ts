@@ -1,4 +1,5 @@
 import { SdkContextValue } from '../../lib/sdk/context'
+import { CoreComponents } from '../../lib/sdk/components'
 import { useGizmoAlignment } from './useGizmoAlignment'
 
 // gizmoManager mock
@@ -28,7 +29,7 @@ jest.mock('../sdk/useSdk')
 const useSdkMock = useSdk as jest.MockedFunction<typeof useSdk>
 const sdkMock = {
   scene: {},
-  components: { Transform: { componentId: 'core::Transform' } },
+  components: { Transform: { componentId: CoreComponents.TRANSFORM } },
   gizmos: gizmoManagerMock
 } as unknown as SdkContextValue
 useSdkMock.mockImplementation((cb) => {

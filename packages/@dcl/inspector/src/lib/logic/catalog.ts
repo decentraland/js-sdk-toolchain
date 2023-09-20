@@ -1,5 +1,6 @@
 import { ComponentName } from '@dcl/asset-packs'
 import * as _catalog from '@dcl/asset-packs/catalog.json'
+import { CoreComponents } from '../sdk/components'
 import { getConfig } from './config'
 
 export const catalog = _catalog.assetPacks as unknown as AssetPack[]
@@ -49,5 +50,5 @@ export function getAssetsByCategory(assets: Asset[]) {
 
 export function isSmart(asset: Asset) {
   const components = Object.keys(asset.components)
-  return components.length > 1 || (components.length === 1 && components[0] !== 'core::GltfContainer')
+  return components.length > 1 || (components.length === 1 && components[0] !== CoreComponents.GLTF_CONTAINER)
 }

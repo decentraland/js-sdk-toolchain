@@ -1,5 +1,6 @@
 import { AbstractMesh, Color3, Vector3 } from '@babylonjs/core'
 import { ComponentType } from '@dcl/ecs'
+import { CoreComponents } from '../../../sdk/components'
 import { EcsEntity } from '../EcsEntity'
 import type { ComponentOperation } from '../component-operations'
 
@@ -54,7 +55,7 @@ const updateGizmoManager = (entity: EcsEntity, value: { gizmo: number } | null) 
   const context = entity.context.deref()!
   let processedSomeEntity = false
 
-  const Transform = context.engine.getComponent('core::Transform')
+  const Transform = context.engine.getComponent(CoreComponents.TRANSFORM)
 
   for (const [_entity] of context.engine.getEntitiesWith(context.editorComponents.Selection)) {
     processedSomeEntity = true
