@@ -120,12 +120,15 @@ export async function startValidations(components: Pick<CliComponents, 'spawner'
       (packageJson.dependencies['@dcl/js-runtime'] || packageJson.dependencies['@dcl/sdk'])
     ) {
       packageJson.dependencies['@dcl/js-runtime'] = sdkVersion
-      delete packageJson.devDependencies['@dcl/js-runtime']
+      if (packageJson.devDependencies && packageJson.devDependencies['@dcl/js-runtime']) {
+        delete packageJson.devDependencies['@dcl/js-runtime']
+      }
     } else {
+      packageJson.devDependencies = packageJson.devDependencies || {}
       packageJson.devDependencies['@dcl/js-runtime'] = sdkVersion
     }
     await components.fs.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf-8')
   } catch (e) {
-    components.logger.error('Failed to run scene validations', e as any)
+    components.logger.error('Failed to run scene validations')
   }
 }
