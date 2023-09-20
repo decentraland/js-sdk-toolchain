@@ -2,13 +2,14 @@ import { IEngine, Engine, TransformComponentExtended } from '@dcl/ecs'
 import { Quaternion } from '@dcl/ecs-math'
 import { areSRTMatrixesEqualWithEpsilon, getWorldMatrix } from './math'
 import { Matrix } from '@dcl/ecs-math/dist/Matrix'
+import { CoreComponents } from '../sdk/components'
 
 describe('getWorldMatrix', () => {
   let engine: IEngine
   let transform: TransformComponentExtended
   beforeEach(() => {
     engine = Engine()
-    transform = engine.getComponent('core::Transform') as TransformComponentExtended
+    transform = engine.getComponent(CoreComponents.TRANSFORM) as TransformComponentExtended
   })
   it('should correctly compute world matrixes of entities at the first three levels of hierarchy', () => {
     const e1 = engine.addEntity()

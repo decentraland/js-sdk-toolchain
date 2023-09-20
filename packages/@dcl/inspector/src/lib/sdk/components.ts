@@ -13,6 +13,15 @@ import { GizmoType } from '../utils/gizmo'
 export type Component<T = unknown> = ComponentDefinition<T>
 export type Node = { entity: Entity; children: Entity[] }
 
+export enum CoreComponents {
+  GLTF_CONTAINER = 'core::GltfContainer',
+  TEXT_SHAPE = 'core::TextShape',
+  TRANSFORM = 'core::Transform',
+  MATERIAL = 'core::Material',
+  MESH_COLLIDER = 'core::MeshCollider',
+  MESH_RENDERER = 'core::MeshRenderer'
+}
+
 export enum EditorComponentNames {
   Selection = 'inspector::Selection',
   Scene = 'inspector::Scene',

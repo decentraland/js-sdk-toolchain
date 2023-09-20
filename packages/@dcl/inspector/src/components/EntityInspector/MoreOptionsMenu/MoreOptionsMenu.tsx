@@ -5,7 +5,7 @@ import { useOutsideClick } from '../../../hooks/useOutsideClick'
 
 import './MoreOptionsMenu.css'
 
-export const MoreOptionsMenu = ({ children }: { children: JSX.Element | JSX.Element[] }) => {
+export const MoreOptionsMenu = ({ children, icon }: { children: JSX.Element | JSX.Element[]; icon?: JSX.Element }) => {
   const [showMoreOptions, setShowMoreOptions] = useState<boolean>(false)
 
   const handleShowMoreOptions = useCallback(
@@ -24,7 +24,7 @@ export const MoreOptionsMenu = ({ children }: { children: JSX.Element | JSX.Elem
   return (
     <div className="MoreOptionsMenu" ref={ref}>
       <Button className="MoreOptionsButton" onClick={handleShowMoreOptions}>
-        <EllipsisIcon size={16} />
+        {icon ?? <EllipsisIcon size={16} />}
       </Button>
       {showMoreOptions && (
         <div className="MoreOptionsContent" onClick={handleClosePanel}>

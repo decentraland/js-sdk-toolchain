@@ -1,6 +1,15 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { Entity } from '@dcl/ecs'
-import { Action, Trigger, TriggerType, TriggerAction, TriggerConditionOperation } from '@dcl/asset-packs'
+import {
+  Action,
+  Trigger,
+  TriggerType,
+  TriggerAction,
+  TriggerConditionOperation,
+  TriggerConditionType,
+  States,
+  TriggerCondition
+} from '@dcl/asset-packs'
 import { Item } from 'react-contexify'
 import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 import { VscQuestion as QuestionIcon } from 'react-icons/vsc'
@@ -8,6 +17,7 @@ import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
 
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { withContextMenu } from '../../../hoc/withContextMenu'
+import { useArrayState } from '../../../hooks/useArrayState'
 import { getComponentValue, useComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
@@ -18,8 +28,9 @@ import { Container } from '../../Container'
 import { ContextMenu } from '../../ContexMenu'
 import { AddButton } from '../AddButton'
 
-import TriggerEvent from './TriggerEvent'
-import TriggerActionContainer from './TriggerAction'
+import { TriggerEvent } from './TriggerEvent'
+import { TriggerConditionContainer } from './TriggerCondition'
+import { TriggerActionContainer } from './TriggerAction'
 
 import type { Props } from './types'
 
@@ -27,27 +38,44 @@ import './TriggerInspector.css'
 
 export default withSdk<Props>(
   withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId, contextMenuId }) => {
-    const { Actions, Triggers, Name } = sdk.components
-    const entitiesWithAction = useEntitiesWith((components) => components.Actions)
+    const { Actions, Triggers, Name, States } = sdk.components
+    const entitiesWithAction: Entity[] = useEntitiesWith((components) => components.Actions)
+    const entitiesWithState: Entity[] = useEntitiesWith((components) => components.States)
     const [componentValue, setComponentValue, isComponentEqual] = useComponentValue<EditorComponentsTypes['Triggers']>(
       entityId,
       Triggers
     )
     const { handleAction } = useContextMenu()
-    const [triggers, setTriggers] = useState<Trigger[]>(componentValue === null ? [] : componentValue.value)
+
+    const [triggers, addTrigger, modifyTrigger, removeTrigger] = useArrayState<Trigger>(
+      componentValue === null ? [] : componentValue.value
+    )
 
     const hasTriggers = useHasComponent(entityId, Triggers)
 
-    const areValidAction = useCallback(
+    const areValidActions = useCallback(
       (updatedActions: TriggerAction[]) =>
-        updatedActions.length > 0 && !updatedActions.some((action) => !action.entity || !action.name),
+        updatedActions.length > 0 && updatedActions.every((action) => action.entity && action.name),
+      []
+    )
+
+    const areValidConditions = useCallback(
+      (updatedConditions: TriggerCondition[] | undefined) =>
+        updatedConditions && updatedConditions.length > 0
+          ? updatedConditions.every((condition) => condition.entity && condition.value)
+          : true,
       []
     )
 
     const areValidTriggers = useCallback(
       (updatedTriggers: Trigger[]) =>
         updatedTriggers.length > 0 &&
-        !updatedTriggers.some((trigger) => !trigger.type || !areValidAction(trigger.actions as TriggerAction[])),
+        updatedTriggers.every(
+          (trigger) =>
+            trigger.type &&
+            areValidActions(trigger.actions as TriggerAction[]) &&
+            areValidConditions(trigger.conditions as TriggerCondition[] | undefined)
+        ),
       []
     )
 
@@ -73,6 +101,18 @@ export default withSdk<Props>(
       }, new Map<Entity, { name: string; action: Action[] }>())
     }, [entitiesWithAction])
 
+    const availableStates: Map<Entity, { name: string; states: States['value'] }> = useMemo(() => {
+      return entitiesWithState?.reduce((states, entityWithState) => {
+        const state = getComponentValue(entityWithState, States)
+        const name = Name.get(entityWithState)
+        if (state.value.length > 0) {
+          states.set(entityWithState, { name: name.value, states: (state as States).value })
+        }
+
+        return states
+      }, new Map<Entity, { name: string; states: States['value'] }>())
+    }, [entitiesWithState])
+
     const handleRemove = useCallback(async () => {
       sdk.operations.removeComponent(entityId, Triggers)
       await sdk.operations.dispatch()
@@ -81,118 +121,92 @@ export default withSdk<Props>(
     const handleAddNewTrigger = useCallback(
       (e: React.MouseEvent) => {
         e.stopPropagation()
-        setTriggers((prev: Trigger[]) => {
-          return [
-            ...prev,
+        addTrigger({
+          type: TriggerType.ON_CLICK,
+          conditions: [],
+          operation: TriggerConditionOperation.AND,
+          actions: [
             {
-              type: TriggerType.ON_CLICK,
-              conditions: [],
-              operation: TriggerConditionOperation.AND,
-              actions: [
-                {
-                  entity: undefined,
-                  name: ''
-                }
-              ]
+              entity: undefined,
+              name: ''
             }
           ]
         })
       },
-      [setTriggers]
+      [addTrigger]
     )
 
-    const handleAddNewTriggerAction = useCallback(
+    const handleRemoveTrigger = useCallback(
       (e: React.MouseEvent, idx: number) => {
-        setTriggers((prev: Trigger[]) => {
-          const data = [...prev]
-          data[idx] = {
-            ...data[idx],
-            actions: [...data[idx].actions, { entity: undefined, name: '' }]
-          }
-          return data
-        })
+        e.stopPropagation()
+        removeTrigger(idx)
       },
-      [setTriggers]
+      [removeTrigger]
     )
 
     const handleChangeType = useCallback(
       ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
-        setTriggers((prev: Trigger[]) => {
-          const data = [...prev]
-          data[idx] = {
-            ...data[idx],
-            type: value as TriggerType
-          }
-          return data
+        modifyTrigger(idx, {
+          ...triggers[idx],
+          type: value as TriggerType
         })
       },
-      [setTriggers]
+      [triggers, modifyTrigger]
     )
 
-    const handleChangeEnitty = useCallback(
-      ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, triggerIdx: number, actionIdx: number) => {
-        setTriggers((prev: Trigger[]) => {
-          const data = [...prev]
-          const actions = [...data[triggerIdx].actions]
-
-          actions[actionIdx] = {
-            ...actions[actionIdx],
-            entity: entitiesWithAction?.find((entityWithAction) => entityWithAction.toString() === value)
-          }
-
-          data[triggerIdx] = {
-            ...data[triggerIdx],
-            actions: [...actions]
-          }
-
-          return data
+    const handleAddNewTriggerAction = useCallback(
+      (e: React.MouseEvent, idx: number) => {
+        e.stopPropagation()
+        modifyTrigger(idx, {
+          ...triggers[idx],
+          actions: [...triggers[idx].actions, { entity: undefined, name: '' }]
         })
       },
-      [entitiesWithAction, setTriggers]
+      [triggers, modifyTrigger]
     )
 
-    const handleChangeAction = useCallback(
-      ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, triggerIdx: number, actionIdx: number) => {
-        setTriggers((prev: Trigger[]) => {
-          const data = [...prev]
-          const actions = [...data[triggerIdx].actions]
-
-          actions[actionIdx] = {
-            ...actions[actionIdx],
-            name: value
-          }
-
-          data[triggerIdx] = {
-            ...data[triggerIdx],
-            actions: [...actions]
-          }
-
-          return data
+    const handleUpdateActions = useCallback(
+      (actions: TriggerAction[], triggerIdx: number) => {
+        modifyTrigger(triggerIdx, {
+          ...triggers[triggerIdx],
+          actions
         })
       },
-      [setTriggers]
+      [triggers, modifyTrigger]
     )
 
-    const handleRemoveTrigger = useCallback((e: React.MouseEvent, idx: number) => {
-      e.stopPropagation()
-      setTriggers((prev: Trigger[]) => {
-        const data = [...prev]
-        data.splice(idx, 1)
-        return data
-      })
-    }, [])
+    const handleAddNewTriggerCondition = useCallback(
+      (e: React.MouseEvent, idx: number) => {
+        modifyTrigger(idx, {
+          ...triggers[idx],
+          conditions: [
+            ...(triggers[idx].conditions ?? []),
+            { entity: undefined, type: TriggerConditionType.WHEN_STATE_IS, value: '' }
+          ]
+        })
+      },
+      [triggers, modifyTrigger]
+    )
 
-    const handleRemoveTriggerAction = useCallback((e: React.MouseEvent, triggerIdx: number, actionIdx: number) => {
-      e.stopPropagation()
-      setTriggers((prev: Trigger[]) => {
-        const data = [...prev]
-        data[triggerIdx] = {
-          ...data[triggerIdx],
-          actions: [...data[triggerIdx].actions.slice(0, actionIdx)]
-        }
-        return data
-      })
-    }, [])
+    const handleUpdateConditions = useCallback(
+      (conditions: TriggerCondition[], triggerIdx: number) => {
+        modifyTrigger(triggerIdx, {
+          ...triggers[triggerIdx],
+          conditions
+        })
+      },
+      [triggers, modifyTrigger]
+    )
+
+    const handleChangeOperation = useCallback(
+      ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
+        modifyTrigger(idx, {
+          ...triggers[idx],
+          operation: value as TriggerConditionOperation
+        })
+      },
+      [triggers, modifyTrigger]
+    )
 
     if (!hasTriggers) {
       return null
@@ -229,20 +243,26 @@ export default withSdk<Props>(
               trigger={trigger}
               onChangeTriggerType={(e) => handleChangeType(e, triggerIdx)}
               onAddNewTriggerAction={(e) => handleAddNewTriggerAction(e, triggerIdx)}
+              onAddNewTriggerCondition={(e) => handleAddNewTriggerCondition(e, triggerIdx)}
               onRemoveTriggerEvent={(e) => handleRemoveTrigger(e, triggerIdx)}
             >
-              {trigger.actions.map((action, actionIdx) => {
-                return (
-                  <TriggerActionContainer
-                    key={`trigger-${triggerIdx}-action-${actionIdx}`}
-                    action={action}
-                    availableActions={availableActions}
-                    onChangeEntity={(e) => handleChangeEnitty(e, triggerIdx, actionIdx)}
-                    onChangeAction={(e) => handleChangeAction(e, triggerIdx, actionIdx)}
-                    onRemoveTriggerAction={(e) => handleRemoveTriggerAction(e, triggerIdx, actionIdx)}
+              <>
+                {trigger.conditions && trigger.conditions.length > 0 ? (
+                  <TriggerConditionContainer
+                    trigger={trigger}
+                    availableStates={availableStates}
+                    onChangeOperation={(e) => handleChangeOperation(e, triggerIdx)}
+                    onUpdateConditions={(conditions: TriggerCondition[]) =>
+                      handleUpdateConditions(conditions, triggerIdx)
+                    }
                   />
-                )
-              })}
+                ) : null}
+                <TriggerActionContainer
+                  trigger={trigger}
+                  availableActions={availableActions}
+                  onUpdateActions={(actions: TriggerAction[]) => handleUpdateActions(actions, triggerIdx)}
+                />
+              </>
             </TriggerEvent>
           )
         })}

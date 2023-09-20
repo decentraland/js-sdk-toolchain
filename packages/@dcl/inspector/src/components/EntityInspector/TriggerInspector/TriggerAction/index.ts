@@ -1,2 +1,2 @@
-import { TriggerAction } from './TriggerAction'
-export default TriggerAction
+import { TriggerActionContainer } from './TriggerAction'
+export { TriggerActionContainer }

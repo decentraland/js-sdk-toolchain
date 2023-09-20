@@ -23,40 +23,12 @@
   margin-bottom: 6px;
 }
 
-.TriggerEventContainer > .content > .TriggerActionsTitle {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-
-  border-bottom: 1px solid var(--border-gray);
-  padding-bottom: 4px;
-}
-
-.TriggerEventContainer > .content > .TriggerActionsTitle span {
-  color: var(--text);
-  font-size: 11px;
-  font-weight: 500;
-}
-
 .TriggerEventContainer .RightContent {
   display: flex;
   flex-grow: 1;
   justify-content: flex-end;
 }
 
-.TriggerEventContainer>.content>.TriggerActionsTitle .RightContent .AddActionButton {
-  background-color: transparent;
-  border-color: transparent;
-  color: white;
-}
-
-.TriggerEventContainer > .content > .TriggerActionsContainer {
-  display: flex;
-  flex-direction: column;
-  margin-top: 8px;
-  gap: 8px;
-}
-
-.TriggerEventContainer .MoreOptionsContent {
-  min-width: 200px;
+.TriggerEventContainer .TriggerEventTitle .RightContent .MoreOptionsMenu .MoreOptionsContent {
+  min-width: 185px;
 }

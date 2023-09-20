@@ -1,25 +1,26 @@
-.TriggerActionsContainer {
+.TriggerConditionsContainer {
   display: flex;
   flex-direction: column;
   margin-top: 8px;
   gap: 8px;
 }
 
-.TriggerActionsContainer > .TriggerActionsTitle {
+.TriggerConditionsContainer > .TriggerConditionsTitle {
   display: flex;
   flex-direction: row;
   align-items: center;
+
   border-bottom: 1px solid var(--border-gray);
   padding-bottom: 4px;
 }
 
-.TriggerActionsContainer > .TriggerActionsTitle span {
+.TriggerConditionsContainer > .TriggerConditionsTitle span {
   color: var(--text);
   font-size: 11px;
   font-weight: 500;
 }
 
-.TriggerActionsContainer > .TriggerActionsTitle .RightContent .AddButton {
+.TriggerConditionsContainer > .TriggerConditionsTitle .RightContent .AddButton {
   background-color: transparent;
   border-color: transparent;
   color: white;
@@ -28,18 +29,18 @@
   width: 26px;
 }
 
-.TriggerActionsContainer > .TriggerActionsTitle .RightContent .AddButton svg {
+.TriggerConditionsContainer > .TriggerConditionsTitle .RightContent .AddButton svg {
   width: 16px;
   height: 16px;
 }
 
-.TriggerActionsContainer > .TriggerAction {
+.TriggerConditionsContainer > .TriggerCondition {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 4px;
 }
 
-.TriggerActionsContainer > .TriggerAction .MoreOptionsMenu .MoreOptionsContent {
-  min-width: 185px;
+.TriggerConditionsContainer > .TriggerCondition .MoreOptionsMenu .MoreOptionsContent {
+  min-width: 205px;
 }
