@@ -33,7 +33,7 @@ export const TriggerConditionContainer = ({
   }, [conditions])
 
   const handleAddNewCondition = useCallback(
-    (e: React.MouseEvent) => {
+    (_event: React.MouseEvent) => {
       addCondition({ entity: undefined, type: TriggerConditionType.WHEN_STATE_IS, value: '' })
     },
     [addCondition]
@@ -84,16 +84,18 @@ export const TriggerConditionContainer = ({
           <AddButton onClick={handleAddNewCondition} />
         </div>
       </div>
-      <div className="TriggerOperation">
-        <Dropdown
-          options={[
-            { value: '', text: 'Select an operation type' },
-            ...Array.from(conditionOperation).map(({ value, text }) => ({ value, text }))
-          ]}
-          value={trigger.operation}
-          onChange={onChangeOperation}
-        />
-      </div>
+      {conditions.length >= 2 ? (
+        <div className="TriggerOperation">
+          <Dropdown
+            options={[
+              { value: '', text: 'Select an operation type' },
+              ...Array.from(conditionOperation).map(({ value, text }) => ({ value, text }))
+            ]}
+            value={trigger.operation}
+            onChange={onChangeOperation}
+          />
+        </div>
+      ) : null}
       {conditions.map((condition, idx) => {
         const isDisabled = !condition.entity || !availableStates.get(condition.entity)
         return (

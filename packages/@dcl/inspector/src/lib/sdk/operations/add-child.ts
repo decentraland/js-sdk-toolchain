@@ -30,6 +30,10 @@ export function addChild(engine: IEngine) {
             const triggers = component as EditorComponentsTypes['Triggers']
             const updatedValue = triggers.value.map((trigger) => ({
               ...trigger,
+              conditions: (trigger.conditions || []).map((condition) => ({
+                ...condition,
+                entity: (condition.entity as any) === '{selfEntity}' ? child : condition.entity
+              })),
               actions: trigger.actions.map((action) => ({
                 ...action,
                 entity: (action.entity as any) === '{selfEntity}' ? child : action.entity
