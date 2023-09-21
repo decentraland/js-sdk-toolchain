@@ -22,6 +22,14 @@ type ProtoServiceDefinition = {
   >
 }
 
+const deprecatedApiMethods: Record<string, string[]> = {
+  CommunicationsController: ['send'],
+  EngineApi: ['sendBatch', 'subscribe', 'unsubscribe'],
+  EthereumController: ['requirePayment', 'signMessage', 'convertMessageToObject', 'getUserAccount'],
+  Players: ['getPlayerData', 'getPlayersInScene', 'getConnectedPlayers'],
+  UserIdentity: ['getUserPublicKey']
+}
+
 export async function compileProtoApi() {
   try {
     await internalCompile()
@@ -37,7 +45,10 @@ const NON_EXPOSED_LIST_NAMES: string[] = [
   'Permissions',
   'DevTools',
   'Permissions',
-  'ParcelIdentity'
+  'ParcelIdentity',
+  'EnvironmentApi',
+  'Scene',
+  'UserActionModule'
 ]
 
 async function internalCompile() {
@@ -54,9 +65,12 @@ async function internalCompile() {
     if (NON_EXPOSED_LIST_NAMES.includes(api.name)) continue
     const types: Set<string> = new Set()
     const functions: string[] = []
+    const deprecatedMethods = deprecatedApiMethods[api.name] || []
+
     for (const [methodName, method] of Object.entries(api.def.methods)) {
       types.add(method.requestType)
       types.add(method.responseType)
+
       functions.push(
         `export declare function ${method.requestStream ? '*' : ''}${methodName}(body: ${
           method.requestType
@@ -85,7 +99,7 @@ async function internalCompile() {
     rmSync(path.resolve(apiModuleDirPath, 'index.gen.ts'))
 
     const moduleDTsPath = path.resolve(apiModuleDirPath, 'index.d.ts')
-    processDeclarations(api.name, moduleDTsPath)
+    processDeclarations(api.name, moduleDTsPath, deprecatedMethods)
 
     apisDTsContent += `
 /**
@@ -94,7 +108,7 @@ async function internalCompile() {
 `
     apisDTsContent += readFileSync(moduleDTsPath).toString()
 
-    rmSync(apiModuleDirPath, { recursive: true, force: true })
+    // rmSync(apiModuleDirPath, { recursive: true, force: true })
   }
 
   writeFileSync(path.resolve(outModulesPath, 'index.d.ts'), apisDTsContent)
@@ -141,7 +155,7 @@ async function preprocessProtoGeneration(protoPath: string) {
   return apis
 }
 
-function processDeclarations(apiName: string, filePath: string) {
+function processDeclarations(apiName: string, filePath: string, deprecatedMethods: string[]) {
   const decFile = readFileSync(filePath).toString()
 
   const blocks: string[] = []
@@ -161,6 +175,20 @@ function processDeclarations(apiName: string, filePath: string) {
     where += 'declare module'.length
   } while (where)
 
-  const content = blocks.join('\n\t// Function declaration section').replace(/import(.*)\n/g, '')
+  let content = blocks.join('\n\t// Function declaration section').replace(/import(.*)\n/g, '')
+
+  const deprecatedString = `  /**\n   * @deprecated\n   **/ \n`
+  for (const methodName of deprecatedMethods) {
+    let searchMethodText = `    export function ${methodName}`
+    if (content.indexOf(searchMethodText) === -1) {
+      searchMethodText = `    export function *${methodName}`
+      if (content.indexOf(searchMethodText) === -1) {
+        continue
+      }
+    }
+
+    content = content.replace(searchMethodText, `${deprecatedString}${searchMethodText}`)
+  }
+
   writeFileSync(filePath, `declare module "~system/${apiName}" {\n${content}\n}`)
 }
