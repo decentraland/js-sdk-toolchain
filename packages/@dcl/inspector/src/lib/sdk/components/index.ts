@@ -7,8 +7,9 @@ import {
   Trigger,
   createComponents as createAssetPacksComponents
 } from '@dcl/asset-packs'
-import { Layout } from '../utils/layout'
-import { GizmoType } from '../utils/gizmo'
+import { Layout } from '../../utils/layout'
+import { GizmoType } from '../../utils/gizmo'
+import { TransformConfig } from './TransformConfig'
 
 export type Component<T = unknown> = ComponentDefinition<T>
 export type Node = { entity: Entity; children: Entity[] }
@@ -28,13 +29,15 @@ export enum EditorComponentNames {
   Nodes = 'inspector::Nodes',
   Actions = ComponentName.ACTIONS,
   Triggers = ComponentName.TRIGGERS,
-  States = ComponentName.STATES
+  States = ComponentName.STATES,
+  TransformConfig = 'inspector::TransformConfig'
 }
 
 export type EditorComponentsTypes = {
   Selection: { gizmo: GizmoType }
   Scene: { layout: Layout }
   Nodes: { value: Node[] }
+  TransformConfig: TransformConfig
   Actions: { value: Action[] }
   Triggers: { value: Trigger[] }
   States: States
@@ -44,6 +47,7 @@ export type EditorComponents = {
   Selection: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Selection']>
   Scene: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Scene']>
   Nodes: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Nodes']>
+  TransformConfig: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['TransformConfig']>
   Actions: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Actions']>
   Triggers: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Triggers']>
   States: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['States']>
@@ -111,10 +115,15 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
 
   const { Actions, Triggers, States } = createAssetPacksComponents(engine as any)
 
+  const TransformConfig = engine.defineComponent(EditorComponentNames.TransformConfig, {
+    porportionalScaling: Schemas.Optional(Schemas.Boolean)
+  })
+
   return {
     Selection,
     Scene,
     Nodes,
+    TransformConfig,
     Actions: Actions as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Actions']>,
     Triggers: Triggers as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Triggers']>,
     States: States as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['States']>

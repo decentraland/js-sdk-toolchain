@@ -30,7 +30,7 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
   const [input, setInput] = useState<InputType | null>(
     componentValue === null ? null : fromComponentValueToInput(componentValue)
   )
-  const [isFocused, setIsFocused] = useState(false)
+  const [focusedOn, setFocusedOn] = useState<string | null>(null)
   const skipSyncRef = useRef(false)
   const [isValid, setIsValid] = useState(false)
 
@@ -47,13 +47,16 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
       updateInputs(newInputs)
     }
 
-  const handleFocus = useCallback(() => {
-    setIsFocused(true)
-  }, [])
+  const handleFocus = useCallback(
+    (path: NestedKey<InputType>) => () => {
+      setFocusedOn(path)
+    },
+    []
+  )
 
   const handleBlur = useCallback(() => {
     if (componentValue === null) return
-    setIsFocused(false)
+    setFocusedOn(null)
     updateInputs(fromComponentValueToInput(componentValue))
   }, [componentValue])
 
@@ -78,12 +81,13 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
   // sync engine -> inputs
   useEffect(() => {
     if (componentValue === null) return
-    if (isFocused) {
-      // skip sync from state while editing, to avoid overriding the user input
-      return
-    }
 
-    const newInputs = fromComponentValueToInput(componentValue)
+    let newInputs = fromComponentValueToInput(componentValue) as any
+    if (focusedOn) {
+      // skip sync from state while editing, to avoid overriding the user input
+      const current = getValue(input, focusedOn)
+      newInputs = setValue(newInputs, focusedOn, current)
+    }
     // set "skipSync" to avoid cyclic component value change
     updateInputs(newInputs, true)
   }, [componentValue, ...deps])
@@ -102,7 +106,7 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
       return {
         value: value.toString(),
         onChange: handleUpdate(path, getter),
-        onFocus: handleFocus,
+        onFocus: handleFocus(path),
         onBlur: handleBlur
       }
     },

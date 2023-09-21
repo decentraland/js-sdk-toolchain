@@ -1,5 +1,7 @@
-import { TransformType } from '@dcl/ecs'
+import { TransformType, Vector3Type } from '@dcl/ecs'
 import { Quaternion } from '@babylonjs/core'
+
+import { TransformConfig } from '../../../lib/sdk/components/TransformConfig'
 import { TransformInput } from './types'
 
 export function fromTransform(value: TransformType): TransformInput {
@@ -28,28 +30,67 @@ function formatAngle(angle: number) {
   return value === '360.00' ? '0.00' : value
 }
 
-export function toTransform(inputs: TransformInput): TransformType {
-  const quaternion = Quaternion.RotationYawPitchRoll(
-    (Number(inputs.rotation.y) * Math.PI) / 180,
-    (Number(inputs.rotation.x) * Math.PI) / 180,
-    (Number(inputs.rotation.z) * Math.PI) / 180
-  )
-  return {
-    position: {
-      x: Number(inputs.position.x),
-      y: Number(inputs.position.y),
-      z: Number(inputs.position.z)
-    },
-    scale: {
-      x: Number(inputs.scale.x),
-      y: Number(inputs.scale.y),
-      z: Number(inputs.scale.z)
-    },
-    rotation: {
-      x: quaternion.x,
-      y: quaternion.y,
-      z: quaternion.z,
-      w: quaternion.w
+export function toTransform(currentValue?: TransformType, config?: TransformConfig) {
+  return (inputs: TransformInput): TransformType => {
+    const quaternion = Quaternion.RotationYawPitchRoll(
+      (Number(inputs.rotation.y) * Math.PI) / 180,
+      (Number(inputs.rotation.x) * Math.PI) / 180,
+      (Number(inputs.rotation.z) * Math.PI) / 180
+    )
+    const scale = mapToNumber(inputs.scale)
+
+    return {
+      position: mapToNumber(inputs.position),
+      scale: currentValue ? getScale(currentValue.scale, scale, !!config?.porportionalScaling) : scale,
+      rotation: {
+        x: quaternion.x,
+        y: quaternion.y,
+        z: quaternion.z,
+        w: quaternion.w
+      }
     }
+  }
+}
+
+export const mapToNumber = <T extends Record<string, unknown>>(input: T): { [key in keyof T]: number } => {
+  const res: any = {}
+  for (const key in input) {
+    const value = Number(input[key])
+    res[key] = isNaN(value) ? 0 : value
+  }
+  return res
+}
+
+export const getScale = (oldValue: Vector3Type, value: Vector3Type, maintainPorportion: boolean) => {
+  if (!maintainPorportion) return value
+
+  let changedFactor: keyof Vector3Type | undefined = undefined
+
+  for (const factor in value) {
+    const key = factor as keyof Vector3Type
+    if (oldValue[key] !== value[key]) {
+      changedFactor = key
+      break
+    }
+  }
+
+  if (changedFactor === undefined) return value
+
+  const vector = { ...value }
+
+  for (const factor in vector) {
+    const key = factor as keyof Vector3Type
+    if (changedFactor === key) continue
+    const div = oldValue[changedFactor] || 1
+    const sign = Math.sign(value[changedFactor])
+    vector[key] = Math.abs((value[changedFactor] / div) * (value[key] || value[changedFactor])) * sign
+  }
+
+  return vector
+}
+
+export function fromTransformConfig(value: TransformConfig) {
+  return {
+    porportionalScaling: !!value.porportionalScaling
   }
 }
