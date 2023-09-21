@@ -196,7 +196,7 @@ export interface GrowOnlyValueSetComponentDefinition<T> extends BaseComponent<T>
    * @param val - The final value. The Set will freeze the value, it won't be editable from
    * the script.
    */
-  addValue(entity: Entity, val: DeepReadonly<T>): DeepReadonlySet<T>
+  addValue(entity: Entity, val: DeepReadonly<T>, ts: number): DeepReadonlySet<T>
 
   /**
    * Get the readonly component of the entity (to mutate it, use getMutable instead),

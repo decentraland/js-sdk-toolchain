@@ -28,7 +28,7 @@ function sortByTimestamp(a: { timestamp: number }, b: { timestamp: number }) {
  */
 export type ValueSetOptions<T> = {
   // function that returns a timestamp from the value
-  timestampFunction: (value: DeepReadonly<T>) => number
+  timestampFunction?: (value: DeepReadonly<T>) => number
   // max elements to store in memory, ordered by timestamp
   maxElements: number
 }
@@ -79,14 +79,14 @@ export function createValueSetComponentDefinitionFromSchema<T>(
     }
   }
 
-  function append(entity: Entity, value: DeepReadonly<T>) {
+  function append(entity: Entity, value: DeepReadonly<T>, ts: number) {
     let row = data.get(entity)
     if (!row) {
       row = { raw: [], frozenSet: emptyReadonlySet as any }
       data.set(entity, row)
     }
     const usedValue = schema.extend ? (schema.extend(value) as DeepReadonly<T>) : value
-    const timestamp = options.timestampFunction(usedValue as any)
+    const timestamp = options.timestampFunction ? options.timestampFunction(usedValue as any) : ts
     if (__DEV__) {
       // only freeze the objects in dev mode to warn the developers because
       // it is an expensive operation
@@ -122,8 +122,8 @@ export function createValueSetComponentDefinitionFromSchema<T>(
         return emptyReadonlySet as any
       }
     },
-    addValue(entity: Entity, rawValue: DeepReadonly<T>) {
-      const { set, value } = append(entity, rawValue)
+    addValue(entity: Entity, rawValue: DeepReadonly<T>, ts: number) {
+      const { set, value } = append(entity, rawValue, ts)
       dirtyIterator.add(entity)
       const buf = new ReadWriteByteBuffer()
       schema.serialize(value, buf)
@@ -155,7 +155,7 @@ export function createValueSetComponentDefinitionFromSchema<T>(
     updateFromCrdt(_body) {
       if (_body.type === CrdtMessageType.APPEND_VALUE) {
         const buf = new ReadWriteByteBuffer(_body.data)
-        append(_body.entityId, schema.deserialize(buf) as DeepReadonly<T>)
+        append(_body.entityId, schema.deserialize(buf) as DeepReadonly<T>, _body.timestamp)
 
         updatedFromCrdtIterator.set(_body.entityId, (updatedFromCrdtIterator.get(_body.entityId) || 0) + 1)
       }

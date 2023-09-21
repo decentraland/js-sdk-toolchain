@@ -75,7 +75,7 @@ export const AvatarAttach: LastWriteWinElementSetComponentDefinition<PBAvatarAtt
 export const AvatarBase: LastWriteWinElementSetComponentDefinition<PBAvatarBase>;
 
 // @public (undocumented)
-export const AvatarEmoteCommand: LastWriteWinElementSetComponentDefinition<PBAvatarEmoteCommand>;
+export const AvatarEmoteCommand: GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>;
 
 // @public (undocumented)
 export const AvatarEquippedData: LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>;
@@ -524,7 +524,7 @@ export const componentDefinitionByName: {
     "core::AudioStream": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioStream>>;
     "core::AvatarAttach": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarAttach>>;
     "core::AvatarBase": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarBase>>;
-    "core::AvatarEmoteCommand": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarEmoteCommand>>;
+    "core::AvatarEmoteCommand": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>>;
     "core::AvatarEquippedData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>>;
     "core::AvatarModifierArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>>;
     "core::AvatarShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarShape>>;
@@ -988,7 +988,7 @@ export const GltfContainerLoadingState: LastWriteWinElementSetComponentDefinitio
 
 // @public (undocumented)
 export interface GrowOnlyValueSetComponentDefinition<T> extends BaseComponent<T> {
-    addValue(entity: Entity, val: DeepReadonly<T>): DeepReadonlySet<T>;
+    addValue(entity: Entity, val: DeepReadonly<T>, ts: number): DeepReadonlySet<T>;
     // (undocumented)
     readonly componentType: ComponentType.GrowOnlyValueSet;
     get(entity: Entity): DeepReadonlySet<T>;
@@ -3595,7 +3595,7 @@ export type Unpacked<T> = T extends (infer U)[] ? U : T;
 
 // @public (undocumented)
 export type ValueSetOptions<T> = {
-    timestampFunction: (value: DeepReadonly<T>) => number;
+    timestampFunction?: (value: DeepReadonly<T>) => number;
     maxElements: number;
 };
 

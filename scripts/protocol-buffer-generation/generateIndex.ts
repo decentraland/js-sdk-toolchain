@@ -3,6 +3,17 @@ import * as path from 'path'
 import { Component } from './generateComponent'
 import generateExportedTypes from './generateExportedTypes'
 
+type GrowOnlySetOptions = {
+  maxElements: number
+  timestampFunctionStr: string
+}
+
+const growOnlySets: Record<string, GrowOnlySetOptions> = {
+  PointerEventsResult: { timestampFunctionStr: `(t) => t.timestamp`, maxElements: 100 },
+  VideoEvent: { timestampFunctionStr: `(t) => t.timestamp`, maxElements: 100 },
+  AvatarEmoteCommand: { timestampFunctionStr: `undefined`, maxElements: 100 }
+}
+
 function importComponent(component: Component) {
   return `import { ${component.componentPascalName}Schema } from './${component.componentPascalName}.gen'; import { PB${component.componentPascalName} } from './pb/decentraland/sdk/components/${component.componentFile}.gen'`
 }
@@ -15,18 +26,15 @@ function exportComponent(component: Component) {
   return `export * from './pb/decentraland/sdk/components/${component.componentFile}.gen'`
 }
 
-function isGrowOnlyValueSet(component: Component): boolean {
-  return component.componentPascalName === 'PointerEventsResult' || component.componentPascalName === 'VideoEvent'
-}
-
 function defineComponentDecl(component: Component) {
-  if (isGrowOnlyValueSet(component)) {
+  if (component.componentPascalName in growOnlySets) {
+    const growOnlySetProps = growOnlySets[component.componentPascalName]
     return `/** @public */ export const ${component.componentPascalName}: GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PB${component.componentPascalName}>> = (
       engine
     ) => /* @__PURE__ */
       engine.defineValueSetComponentFromSchema("core::${component.componentPascalName}", ${component.componentPascalName}Schema, {
-        timestampFunction: (t) => t.timestamp,
-        maxElements: 100
+        timestampFunction: ${growOnlySetProps.timestampFunctionStr},
+        maxElements: ${growOnlySetProps.maxElements}
       })`.trim()
   } else {
     return `/** @public */ export const ${component.componentPascalName}: LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PB${component.componentPascalName}>> = engine =>
@@ -38,7 +46,7 @@ function defineComponentDecl(component: Component) {
 const skipExposeGlobally: string[] = ['Animator', 'MeshRenderer', 'MeshCollider', 'Material']
 function defineGlobalComponentDecl(component: Component) {
   if (skipExposeGlobally.includes(component.componentPascalName)) return ''
-  if (isGrowOnlyValueSet(component)) {
+  if (component.componentPascalName in growOnlySets) {
     return `/** @public */ export const ${component.componentPascalName}: GrowOnlyValueSetComponentDefinition<PB${component.componentPascalName}> = /* @__PURE__ */ components.${component.componentPascalName}(engine)`.trim()
   } else {
     return `/** @public */ export const ${component.componentPascalName}: LastWriteWinElementSetComponentDefinition<PB${component.componentPascalName}> = /* @__PURE__ */ components.${component.componentPascalName}(engine)`.trim()
