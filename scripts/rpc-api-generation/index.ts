@@ -108,7 +108,7 @@ async function internalCompile() {
 `
     apisDTsContent += readFileSync(moduleDTsPath).toString()
 
-    // rmSync(apiModuleDirPath, { recursive: true, force: true })
+    rmSync(apiModuleDirPath, { recursive: true, force: true })
   }
 
   writeFileSync(path.resolve(outModulesPath, 'index.d.ts'), apisDTsContent)
