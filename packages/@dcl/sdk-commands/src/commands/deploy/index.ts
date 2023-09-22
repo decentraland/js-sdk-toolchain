@@ -15,7 +15,7 @@ import { Result } from 'arg'
 import { getAddressAndSignature, getCatalyst, sceneHasWorldCfg } from './utils'
 import { buildScene } from '../build'
 import { getValidWorkspace } from '../../logic/workspace-validations'
-import { LinkerResponse } from '../../linker-dapp/api'
+import { LinkerResponse } from '../../linker-dapp/routes'
 
 interface Options {
   args: Result<typeof args>

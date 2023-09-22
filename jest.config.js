@@ -7,7 +7,7 @@ module.exports = {
     }]
   },
   transformIgnorePatterns: [
-    "node_modules/(?!(@dcl/ecs-math)/)"
+    "node_modules/(?!(@dcl/(ecs-math|quests-client))/)"
   ],
   modulePathIgnorePatterns: [
     "packages/@dcl/inspector"

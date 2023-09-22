@@ -3,18 +3,21 @@ import { ethSign } from '@dcl/crypto/dist/crypto'
 import { hexToBytes } from 'eth-connect'
 import { Lifecycle } from '@well-known-components/interfaces'
 import { Authenticator } from '@dcl/crypto'
+import { dirname, resolve } from 'path'
+import { Router } from '@well-known-components/http-server'
 import prompts from 'prompts'
+import { validateStepsAndConnections } from '@dcl/quests-client/dist/utils'
 
 import { CreateQuest, QuestLinkerActionType } from './types'
 import { CliComponents } from '../../components'
 import { createWallet } from '../../logic/account'
-import { LinkerResponse, LinkerdAppOptions, runLinkerApp } from '../../linker-dapp/api'
+import { LinkerResponse } from '../../linker-dapp/routes'
+import { dAppOptions, runDapp } from '../../run-dapp'
 import { setRoutes } from '../../linker-dapp/routes'
-import { CliError } from '../../logic/error'
 
 async function getAddressAndSignature(
   components: CliComponents,
-  linkerOpts: Omit<LinkerdAppOptions, 'uri'>,
+  linkerOpts: Omit<dAppOptions, 'uri'>,
   awaitResponse: IFuture<void>,
   info: {
     messageToSign: string
@@ -58,14 +61,15 @@ async function getAddressAndSignature(
     }
   })
 
-  const { program } = await runLinkerApp(components, router, { ...linkerOpts, uri: `/quests` })
+  logger.info('You need to sign the request to continue:')
+  const { program } = await runDapp(components, router, { ...linkerOpts, uri: `/quests` })
 
   return { program }
 }
 
 export async function executeSubcommand(
   components: CliComponents,
-  linkerOps: Omit<LinkerdAppOptions, 'uri'>,
+  linkerOps: Omit<dAppOptions, 'uri'>,
   commandData: {
     url: string
     method: 'GET' | 'POST' | 'PUT' | 'DELETE'
@@ -116,97 +120,8 @@ export async function executeSubcommand(
 export const urlRegex =
   /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/gm
 
-function validateStepsAndConnections(
-  quest: Pick<CreateQuest, 'definition'>,
-  _components: Pick<CliComponents, 'logger'>
-): boolean {
-  if (!quest.definition) {
-    throw new CliError('> Quest must have a definition')
-  }
-
-  if (!quest.definition.connections?.length || !Array.isArray(quest.definition.connections)) {
-    throw new CliError("> Quest's definition must have its connections defined")
-  }
-
-  if (!quest.definition.connections.every((connection) => connection.stepFrom?.length && connection.stepTo?.length)) {
-    throw new CliError("> Quest's definition must have valid connections")
-  }
-
-  if (!quest.definition.steps?.length || !Array.isArray(quest.definition.steps)) {
-    throw new CliError("> Quest's definition must have its steps defined")
-  }
-
-  if (
-    !quest.definition.steps.every(
-      (step) =>
-        step.tasks?.length &&
-        Array.isArray(step.tasks) &&
-        step.tasks?.every(
-          (task) =>
-            task.actionItems?.length &&
-            Array.isArray(task.actionItems) &&
-            task.actionItems?.every(
-              (at) =>
-                (at.type === 'CUSTOM' || at.type === 'LOCATION' || at.type === 'EMOTE' || at.type === 'JUMP') &&
-                Object.keys(at.parameters || {}).length >= 1
-            ) &&
-            task.description?.length >= 0 &&
-            task.id?.length
-        ) &&
-        step.id?.length &&
-        step.description?.length >= 0
-    )
-  ) {
-    throw new CliError("> Quest definition's steps must be valid")
-  }
-
-  return true
-}
-
-export function validateCreateQuest(quest: CreateQuest, components: Pick<CliComponents, 'logger'>): boolean {
-  if (!(quest.name.length >= 5)) {
-    throw new CliError("> Quest's name must be at least 5 chars")
-  }
-
-  if (!(quest.description.length >= 5)) {
-    throw new CliError("> Quest's description must be at least 5 chars")
-  }
-
-  if (!quest.imageUrl?.length || !new RegExp(urlRegex).test(quest.imageUrl)) {
-    throw new CliError("> Quest's image URL must be a valid URL")
-  }
-
-  validateStepsAndConnections(quest, components)
-
-  if (quest.reward) {
-    if (!quest.reward.hook) {
-      throw new CliError("> Quest's reward must have its webhook defined")
-    } else {
-      if (
-        !quest.reward.hook.webhookUrl ||
-        !quest.reward.hook.webhookUrl?.length ||
-        !new RegExp(urlRegex).test(quest.reward.hook.webhookUrl)
-      ) {
-        throw new CliError("> Quest's reward must have a valid Webhook URL")
-      }
-    }
-
-    if (!quest.reward.items || !quest.reward.items?.length || !Array.isArray(quest.reward.items)) {
-      throw new CliError("> Quest's reward must have its items defined")
-    }
-
-    if (
-      !quest.reward.items.every((item) => new RegExp(urlRegex).test(item.imageLink || '') && item.name?.length >= 3)
-    ) {
-      throw new CliError("> Quest's reward must have valid items")
-    }
-  }
-
-  return true
-}
-
 export const createQuestByPrompting = async (
-  components: Pick<CliComponents, 'logger'>
+  _components: Pick<CliComponents, 'logger'>
 ): Promise<CreateQuest | null> => {
   let cancelled = false
 
@@ -258,10 +173,8 @@ export const createQuestByPrompting = async (
       validate: (def) => {
         try {
           const input = JSON.parse(def)
-          if (validateStepsAndConnections({ definition: input }, { logger: components.logger })) {
-            return true
-          }
-          return false
+          validateStepsAndConnections({ definition: input })
+          return true
         } catch (error) {
           return false
         }
@@ -411,4 +324,45 @@ function createAuthchainHeaders(
   headers[AUTH_METADATA_HEADER] = metadata
 
   return headers
+}
+
+export const setUpManager = (components: Pick<CliComponents, 'fs' | 'logger' | 'fetch' | 'config'>) => {
+  const { fs } = components
+  const router = new Router()
+  const questsManager = dirname(require.resolve('@dcl/quests-manager/package.json'))
+
+  router.get('/', async () => {
+    return {
+      headers: { 'Content-Type': 'text/html' },
+      body: fs.createReadStream(resolve(questsManager, 'index.html'))
+    }
+  })
+
+  router.get('/design/create', async () => ({
+    headers: { 'Content-Type': 'text/html' },
+    body: fs.createReadStream(resolve(questsManager, 'index.html'))
+  }))
+
+  router.get('/quests/:id', async () => ({
+    headers: { 'Content-Type': 'text/html' },
+    body: fs.createReadStream(resolve(questsManager, 'index.html'))
+  }))
+
+  router.get('/quests/drafts/:id', async () => ({
+    headers: { 'Content-Type': 'text/html' },
+    body: fs.createReadStream(resolve(questsManager, 'index.html'))
+  }))
+
+  router.get('/quests/old/:id', async () => ({
+    headers: { 'Content-Type': 'text/html' },
+    body: fs.createReadStream(resolve(questsManager, 'index.html'))
+  }))
+
+  router.get('/:path*', async (ctx) => {
+    return {
+      body: fs.createReadStream(resolve(questsManager, ctx.params.path! as unknown as string))
+    }
+  })
+
+  return { router }
 }
