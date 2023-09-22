@@ -22,14 +22,6 @@ type ProtoServiceDefinition = {
   >
 }
 
-const deprecatedApiMethods: Record<string, string[]> = {
-  CommunicationsController: ['send'],
-  EngineApi: ['sendBatch', 'subscribe', 'unsubscribe'],
-  EthereumController: ['requirePayment', 'signMessage', 'convertMessageToObject', 'getUserAccount'],
-  Players: ['getPlayerData', 'getPlayersInScene', 'getConnectedPlayers'],
-  UserIdentity: ['getUserPublicKey']
-}
-
 export async function compileProtoApi() {
   try {
     await internalCompile()
@@ -45,10 +37,7 @@ const NON_EXPOSED_LIST_NAMES: string[] = [
   'Permissions',
   'DevTools',
   'Permissions',
-  'ParcelIdentity',
-  'EnvironmentApi',
-  'Scene',
-  'UserActionModule'
+  'ParcelIdentity'
 ]
 
 async function internalCompile() {
@@ -65,14 +54,12 @@ async function internalCompile() {
     if (NON_EXPOSED_LIST_NAMES.includes(api.name)) continue
     const types: Set<string> = new Set()
     const functions: string[] = []
-    const deprecatedMethods = deprecatedApiMethods[api.name] || []
-
     for (const [methodName, method] of Object.entries(api.def.methods)) {
       types.add(method.requestType)
       types.add(method.responseType)
-
       functions.push(
-        `export declare function ${method.requestStream ? '*' : ''}${methodName}(body: ${method.requestType
+        `export declare function ${method.requestStream ? '*' : ''}${methodName}(body: ${
+          method.requestType
         }): Promise<${method.responseType}>`
       )
     }
@@ -81,8 +68,9 @@ async function internalCompile() {
     mkdirSync(path.resolve(apiModuleDirPath))
 
     let indexContent = ''
-    indexContent += `import type {${Array.from(types).join(', ')}} from './../../proto/decentraland/kernel/apis/${api.fileName
-      }.gen'\n`
+    indexContent += `import type {${Array.from(types).join(', ')}} from './../../proto/decentraland/kernel/apis/${
+      api.fileName
+    }.gen'\n`
     indexContent += functions.join('\n')
 
     writeFileSync(path.resolve(apiModuleDirPath, `index.gen.ts`), indexContent)
@@ -97,7 +85,7 @@ async function internalCompile() {
     rmSync(path.resolve(apiModuleDirPath, 'index.gen.ts'))
 
     const moduleDTsPath = path.resolve(apiModuleDirPath, 'index.d.ts')
-    processDeclarations(api.name, moduleDTsPath, deprecatedMethods)
+    processDeclarations(api.name, moduleDTsPath)
 
     apisDTsContent += `
 /**
@@ -106,7 +94,7 @@ async function internalCompile() {
 `
     apisDTsContent += readFileSync(moduleDTsPath).toString()
 
-    // rmSync(apiModuleDirPath, { recursive: true, force: true })
+    rmSync(apiModuleDirPath, { recursive: true, force: true })
   }
 
   writeFileSync(path.resolve(outModulesPath, 'index.d.ts'), apisDTsContent)
@@ -153,7 +141,7 @@ async function preprocessProtoGeneration(protoPath: string) {
   return apis
 }
 
-function processDeclarations(apiName: string, filePath: string, deprecatedMethods: string[]) {
+function processDeclarations(apiName: string, filePath: string) {
   const decFile = readFileSync(filePath).toString()
 
   const blocks: string[] = []
@@ -173,20 +161,6 @@ function processDeclarations(apiName: string, filePath: string, deprecatedMethod
     where += 'declare module'.length
   } while (where)
 
-  let content = blocks.join('\n\t// Function declaration section').replace(/import(.*)\n/g, '')
-
-  const deprecatedString = `  /**\n   * @deprecated\n   **/ \n`
-  for (const methodName of deprecatedMethods) {
-    let searchMethodText = `    export function ${methodName}`
-    if (content.indexOf(searchMethodText) === -1) {
-      searchMethodText = `    export function *${methodName}`
-      if (content.indexOf(searchMethodText) === -1) {
-        continue
-      }
-    }
-
-    content = content.replace(searchMethodText, `${deprecatedString}${searchMethodText}`)
-  }
-
+  const content = blocks.join('\n\t// Function declaration section').replace(/import(.*)\n/g, '')
   writeFileSync(filePath, `declare module "~system/${apiName}" {\n${content}\n}`)
 }
