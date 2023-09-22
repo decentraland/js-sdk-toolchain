@@ -70,7 +70,6 @@ async function internalCompile() {
     for (const [methodName, method] of Object.entries(api.def.methods)) {
       types.add(method.requestType)
       types.add(method.responseType)
-
       functions.push(
         `export declare function ${method.requestStream ? '*' : ''}${methodName}(body: ${
           method.requestType
