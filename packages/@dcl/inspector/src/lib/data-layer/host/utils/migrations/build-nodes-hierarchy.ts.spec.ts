@@ -35,6 +35,6 @@ describe('Migration: Build Node component hierarchy', () => {
   it('should build hierarchy with RootEntity as only node', () => {
     const { engine } = engineCtx
     const hierarchy = buildNodesHierarchy(engineCtx.engine)
-    expect(hierarchy).toEqual([{ entity: engine.RootEntity, children: [] }])
+    expect(hierarchy).toEqual([{ entity: engine.RootEntity, open: true, children: [] }])
   })
 })

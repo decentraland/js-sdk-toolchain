@@ -27,7 +27,6 @@ export const useTree = () => {
   }, [sdk])
 
   const [tree, setTree] = useState(getTree())
-  const entitiesToggle = new Set<Entity>([ROOT])
 
   useEffect(() => {
     setTree(getTree())
@@ -57,7 +56,9 @@ export const useTree = () => {
 
   const isOpen = useCallback(
     (entity: Entity) => {
-      return entitiesToggle.has(entity)
+      if (!sdk) return false
+      const entities = sdk.components.Nodes.get(ROOT).value
+      return !!entities.find(($) => $.entity === entity)?.open
     },
     [sdk]
   )
@@ -149,7 +150,17 @@ export const useTree = () => {
 
   const setOpen = useCallback(
     async (entity: Entity, open: boolean) => {
-      open ? entitiesToggle.add(entity) : entitiesToggle.delete(entity)
+      if (!sdk) return
+
+      const { Nodes } = sdk.components
+      const nodes = Nodes.getMutable(ROOT).value
+      const node = nodes.find(($) => $.entity === entity)
+
+      if (!node) return
+
+      node.open = open // mutate collapsed prop
+      sdk.operations.updateValue(Nodes, ROOT, { value: nodes })
+      await sdk.operations.dispatch()
       handleUpdate()
     },
     [sdk, handleUpdate]

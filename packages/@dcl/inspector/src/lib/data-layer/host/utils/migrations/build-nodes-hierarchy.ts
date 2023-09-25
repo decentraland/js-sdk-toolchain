@@ -8,7 +8,9 @@ import { cleanPush } from '../../../../utils/array'
  * @param engine engine to build upon
  */
 export function buildNodesHierarchy(engine: IEngine): Node[] {
-  const hierarchy = new Map<Entity, Node>([[engine.RootEntity, { entity: engine.RootEntity, children: [] }]])
+  const hierarchy = new Map<Entity, Node>([
+    [engine.RootEntity, { entity: engine.RootEntity, open: true, children: [] }]
+  ])
 
   // Set all engine's entities in hierarchy (entities without component are unretrievable)
   for (const component of engine.componentsIter()) {
@@ -27,7 +29,7 @@ export function buildNodesHierarchy(engine: IEngine): Node[] {
       hierarchy.set(parent, { entity: parent, children: cleanPush(children, entity) })
     } else {
       const children = hierarchy.get(engine.RootEntity)!.children
-      hierarchy.set(engine.RootEntity, { entity: engine.RootEntity, children: cleanPush(children, entity) })
+      hierarchy.set(engine.RootEntity, { entity: engine.RootEntity, open: true, children: cleanPush(children, entity) })
     }
   }
 

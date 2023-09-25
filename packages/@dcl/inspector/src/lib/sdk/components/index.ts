@@ -13,7 +13,7 @@ import { GizmoType } from '../../utils/gizmo'
 import { TransformConfig } from './TransformConfig'
 
 export type Component<T = unknown> = ComponentDefinition<T>
-export type Node = { entity: Entity; children: Entity[] }
+export type Node = { entity: Entity; open?: boolean; children: Entity[] }
 
 export enum CoreComponents {
   GLTF_CONTAINER = 'core::GltfContainer',
@@ -112,6 +112,7 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     value: Schemas.Array(
       Schemas.Map({
         entity: Schemas.Entity,
+        open: Schemas.Optional(Schemas.Boolean),
         children: Schemas.Array(Schemas.Entity)
       })
     )
