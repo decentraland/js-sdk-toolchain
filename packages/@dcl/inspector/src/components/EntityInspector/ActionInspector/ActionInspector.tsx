@@ -301,6 +301,49 @@ export default withSdk<Props>(
       )
     }
 
+    const renderAction = (action: Action, idx: number) => {
+      switch (action.type) {
+        case ActionType.PLAY_ANIMATION: {
+          return hasAnimations ? (
+            <div className="row">
+              <div className="field">
+                <label>Select Animation {renderSelectAnimationMoreInfo()}</label>
+                <Dropdown
+                  options={[
+                    { value: '', text: 'Select an Animation' },
+                    ...animations.map((animation) => ({ text: animation.name, value: animation.name }))
+                  ]}
+                  value={getPartialPayload<ActionType.PLAY_ANIMATION>(action)?.animation}
+                  onChange={(e) => handleChangeAnimation(e, idx)}
+                />
+              </div>
+            </div>
+          ) : null
+        }
+        case ActionType.SET_STATE: {
+          return hasStates ? (
+            <div className="row">
+              <div className="field">
+                <label>Select State</label>
+                <Dropdown
+                  options={[
+                    { value: '', text: 'Select a State' },
+                    ...states.map((state) => ({ text: state, value: state }))
+                  ]}
+                  value={getPartialPayload<ActionType.SET_STATE>(action)?.state}
+                  onChange={(e) => handleChangeState(e, idx)}
+                />
+              </div>
+            </div>
+          ) : null
+        }
+        default: {
+          // TODO: handle generic schemas with something like <JsonSchemaField/>
+          return null
+        }
+      }
+    }
+
     return (
       <Container label="Action" className="ActionInspector" rightContent={renderMoreInfo()}>
         <ContextMenu id={contextMenuId}>
@@ -336,36 +379,7 @@ export default withSdk<Props>(
                   </Button>
                 </MoreOptionsMenu>
               </div>
-              {action.type === ActionType.PLAY_ANIMATION && hasAnimations ? (
-                <div className="row">
-                  <div className="field">
-                    <label>Select Animation {renderSelectAnimationMoreInfo()}</label>
-                    <Dropdown
-                      options={[
-                        { value: '', text: 'Select an Animation' },
-                        ...animations.map((animation) => ({ text: animation.name, value: animation.name }))
-                      ]}
-                      value={getPartialPayload<ActionType.PLAY_ANIMATION>(action)?.animation}
-                      onChange={(e) => handleChangeAnimation(e, idx)}
-                    />
-                  </div>
-                </div>
-              ) : null}
-              {action.type === ActionType.SET_STATE && hasStates ? (
-                <div className="row">
-                  <div className="field">
-                    <label>Select State</label>
-                    <Dropdown
-                      options={[
-                        { value: '', text: 'Select a State' },
-                        ...states.map((state) => ({ text: state, value: state }))
-                      ]}
-                      value={getPartialPayload<ActionType.SET_STATE>(action)?.state}
-                      onChange={(e) => handleChangeState(e, idx)}
-                    />
-                  </div>
-                </div>
-              ) : null}
+              {renderAction(action, idx)}
             </Block>
           )
         })}
