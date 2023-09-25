@@ -24,7 +24,7 @@ export const TriggerActionContainer = ({ trigger, availableActions, onUpdateActi
   }, [actions])
 
   const handleAddNewAction = useCallback(
-    (e: React.MouseEvent) => {
+    (_: React.MouseEvent) => {
       addActions({ entity: undefined, name: '' })
     },
     [addActions]
@@ -51,7 +51,7 @@ export const TriggerActionContainer = ({ trigger, availableActions, onUpdateActi
   )
 
   const handleRemoveAction = useCallback(
-    (e: React.MouseEvent, idx: number) => {
+    (_: React.MouseEvent, idx: number) => {
       removeActions(idx)
     },
     [removeActions]
