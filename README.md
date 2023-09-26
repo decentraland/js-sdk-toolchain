@@ -41,3 +41,4 @@ To re-create these golden files, run `make build update-snapshots`. In some case
 ## Copyright info
 
 This repository is protected with a standard Apache 2 license. See the terms and conditions in the LICENSE file.
+

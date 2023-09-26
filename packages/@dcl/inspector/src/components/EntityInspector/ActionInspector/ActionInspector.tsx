@@ -1,8 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Action, ActionType } from '@dcl/asset-packs'
 import { Item } from 'react-contexify'
 import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 import { VscQuestion as QuestionIcon, VscTrash as RemoveIcon, VscInfo as InfoIcon } from 'react-icons/vsc'
+import {
+  Action,
+  ActionType,
+  getActionTypes,
+  getPayload,
+  getJson,
+  ActionPayload,
+  getActionSchema
+} from '@dcl/asset-packs'
+import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
 
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
@@ -28,6 +37,10 @@ import './ActionInspector.css'
 
 function isStates(maybeStates: any): maybeStates is EditorComponentsTypes['States'] {
   return !!maybeStates && 'value' in maybeStates && Array.isArray(maybeStates.value)
+}
+
+function getPartialPayload<T extends ActionType>(action: Action) {
+  return getPayload<T>(action) as Partial<ActionPayload<T>>
 }
 
 export default withSdk<Props>(
@@ -62,21 +75,36 @@ export default withSdk<Props>(
       [entityId]
     )
 
-    const isValidAction = useCallback((action: Action) => {
-      if (!action.type || !action.name) {
-        return false
-      }
-      switch (action.type) {
-        case ActionType.PLAY_ANIMATION: {
-          return !!action.payload.playAnimation?.animation
-        }
-        case ActionType.SET_STATE: {
-          return !!action.payload.setState?.state
-        }
-        default:
+    const isValidAction = useCallback(
+      (action: Action) => {
+        if (!action.type || !action.name) {
           return false
-      }
-    }, [])
+        }
+        switch (action.type) {
+          case ActionType.PLAY_ANIMATION: {
+            const payload = getPartialPayload<ActionType.PLAY_ANIMATION>(action)
+            return !!payload.animation
+          }
+          case ActionType.SET_STATE: {
+            const payload = getPartialPayload<ActionType.SET_STATE>(action)
+            return !!payload.state
+          }
+          default: {
+            try {
+              const payload = getPartialPayload(action)
+              const schema = getActionSchema(sdk.engine as any, action.type)
+              const buffer = new ReadWriteByteBuffer()
+              schema.serialize(payload, buffer)
+              schema.deserialize(buffer)
+              return true
+            } catch (error) {
+              return false
+            }
+          }
+        }
+      },
+      [sdk]
+    )
 
     const areValidActions = useCallback(
       (updatedActions: Action[]) => updatedActions.length > 0 && updatedActions.every(isValidAction),
@@ -117,7 +145,7 @@ export default withSdk<Props>(
     }, [animations])
 
     // actions that may only be available under certain circumstances
-    const conditionalActions: Partial<Record<ActionType, () => boolean>> = useMemo(
+    const conditionalActions: Partial<Record<string, () => boolean>> = useMemo(
       () => ({
         [ActionType.PLAY_ANIMATION]: () => hasAnimations,
         [ActionType.SET_STATE]: () => hasStates
@@ -126,10 +154,11 @@ export default withSdk<Props>(
     )
 
     const allActions = useMemo(() => {
-      return Object.values(ActionType).filter((action) => typeof action === 'string') as ActionType[]
-    }, [])
+      const actions = getActionTypes(sdk.engine as any)
+      return actions
+    }, [sdk])
 
-    const availableActions: ActionType[] = useMemo(() => {
+    const availableActions = useMemo(() => {
       return allActions.filter((action) => {
         if (action in conditionalActions) {
           const isAvailable = conditionalActions[action]!
@@ -146,7 +175,7 @@ export default withSdk<Props>(
 
     const handleAddNewAction = useCallback(() => {
       setActions((prev: Action[]) => {
-        return [...prev, { type: ActionType.PLAY_ANIMATION, name: '', payload: {} }]
+        return [...prev, { type: '', name: '', jsonPayload: '{}' }]
       })
     }, [setActions])
 
@@ -156,11 +185,9 @@ export default withSdk<Props>(
           const data = [...prev]
           data[idx] = {
             ...data[idx],
-            payload: {
-              playAnimation: {
-                animation: value
-              }
-            }
+            jsonPayload: getJson<ActionType.PLAY_ANIMATION>({
+              animation: value
+            })
           }
           return data
         })
@@ -174,11 +201,9 @@ export default withSdk<Props>(
           const data = [...prev]
           data[idx] = {
             ...data[idx],
-            payload: {
-              setState: {
-                state: value
-              }
-            }
+            jsonPayload: getJson<ActionType.SET_STATE>({
+              state: value
+            })
           }
           return data
         })
@@ -192,7 +217,7 @@ export default withSdk<Props>(
           const data = [...prev]
           data[idx] = {
             ...data[idx],
-            type: value as ActionType
+            type: value
           }
           return data
         })
@@ -276,6 +301,49 @@ export default withSdk<Props>(
       )
     }
 
+    const renderAction = (action: Action, idx: number) => {
+      switch (action.type) {
+        case ActionType.PLAY_ANIMATION: {
+          return hasAnimations ? (
+            <div className="row">
+              <div className="field">
+                <label>Select Animation {renderSelectAnimationMoreInfo()}</label>
+                <Dropdown
+                  options={[
+                    { value: '', text: 'Select an Animation' },
+                    ...animations.map((animation) => ({ text: animation.name, value: animation.name }))
+                  ]}
+                  value={getPartialPayload<ActionType.PLAY_ANIMATION>(action)?.animation}
+                  onChange={(e) => handleChangeAnimation(e, idx)}
+                />
+              </div>
+            </div>
+          ) : null
+        }
+        case ActionType.SET_STATE: {
+          return hasStates ? (
+            <div className="row">
+              <div className="field">
+                <label>Select State</label>
+                <Dropdown
+                  options={[
+                    { value: '', text: 'Select a State' },
+                    ...states.map((state) => ({ text: state, value: state }))
+                  ]}
+                  value={getPartialPayload<ActionType.SET_STATE>(action)?.state}
+                  onChange={(e) => handleChangeState(e, idx)}
+                />
+              </div>
+            </div>
+          ) : null
+        }
+        default: {
+          // TODO: handle generic schemas with something like <JsonSchemaField/>
+          return null
+        }
+      }
+    }
+
     return (
       <Container label="Action" className="ActionInspector" rightContent={renderMoreInfo()}>
         <ContextMenu id={contextMenuId}>
@@ -311,36 +379,7 @@ export default withSdk<Props>(
                   </Button>
                 </MoreOptionsMenu>
               </div>
-              {action.type === ActionType.PLAY_ANIMATION && hasAnimations ? (
-                <div className="row">
-                  <div className="field">
-                    <label>Select Animation {renderSelectAnimationMoreInfo()}</label>
-                    <Dropdown
-                      options={[
-                        { value: '', text: 'Select an Animation' },
-                        ...animations.map((animation) => ({ text: animation.name, value: animation.name }))
-                      ]}
-                      value={action.payload.playAnimation?.animation}
-                      onChange={(e) => handleChangeAnimation(e, idx)}
-                    />
-                  </div>
-                </div>
-              ) : null}
-              {action.type === ActionType.SET_STATE && hasStates ? (
-                <div className="row">
-                  <div className="field">
-                    <label>Select State</label>
-                    <Dropdown
-                      options={[
-                        { value: '', text: 'Select a State' },
-                        ...states.map((state) => ({ text: state, value: state }))
-                      ]}
-                      value={action.payload.setState?.state}
-                      onChange={(e) => handleChangeState(e, idx)}
-                    />
-                  </div>
-                </div>
-              ) : null}
+              {renderAction(action, idx)}
             </Block>
           )
         })}
