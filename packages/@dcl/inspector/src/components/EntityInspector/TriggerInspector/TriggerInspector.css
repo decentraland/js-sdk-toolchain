@@ -11,9 +11,9 @@
 .TriggerInspector > .content > .Block > .content {
   display: flex;
   flex-direction: column;
+  align-items: normal;
 }
 
 .TriggerInspector .content .Block .content .DropdownContainer {
   flex: 1;
 }
-

@@ -2,6 +2,7 @@ import * as BABYLON from '@babylonjs/core'
 import { EcsEntity } from '../decentraland/EcsEntity'
 import { snapManager } from '../decentraland/snap-manager'
 import { keyState, Keys } from '../decentraland/keys'
+import { getAncestors, isAncestor, mapNodes } from '../../sdk/nodes'
 
 let isSnapEnabled = snapManager.isEnabled()
 
@@ -68,7 +69,11 @@ export function interactWithScene(
 
   if (entity && pointerEvent === 'pointerDown') {
     const context = entity.context.deref()!
-    context.operations.updateSelectedEntity(entity.entityId)
-    void context.operations.dispatch()
+    const { operations, engine, editorComponents } = context
+    const ancestors = getAncestors(engine, entity.entityId)
+    const nodes = mapNodes(engine, (node) => (isAncestor(ancestors, node.entity) ? { ...node, open: true } : node))
+    operations.updateValue(editorComponents.Nodes, engine.RootEntity, { value: nodes })
+    operations.updateSelectedEntity(entity.entityId)
+    void operations.dispatch()
   }
 }

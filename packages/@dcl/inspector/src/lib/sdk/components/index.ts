@@ -5,6 +5,7 @@ import {
   ComponentName,
   States,
   Trigger,
+  ActionTypes,
   createComponents as createAssetPacksComponents
 } from '@dcl/asset-packs'
 import { Layout } from '../../utils/layout'
@@ -12,7 +13,7 @@ import { GizmoType } from '../../utils/gizmo'
 import { TransformConfig } from './TransformConfig'
 
 export type Component<T = unknown> = ComponentDefinition<T>
-export type Node = { entity: Entity; children: Entity[] }
+export type Node = { entity: Entity; open?: boolean; children: Entity[] }
 
 export enum CoreComponents {
   GLTF_CONTAINER = 'core::GltfContainer',
@@ -27,6 +28,7 @@ export enum EditorComponentNames {
   Selection = 'inspector::Selection',
   Scene = 'inspector::Scene',
   Nodes = 'inspector::Nodes',
+  ActionTypes = ComponentName.ACTION_TYPES,
   Actions = ComponentName.ACTIONS,
   Triggers = ComponentName.TRIGGERS,
   States = ComponentName.STATES,
@@ -41,6 +43,7 @@ export type EditorComponentsTypes = {
   Actions: { value: Action[] }
   Triggers: { value: Trigger[] }
   States: States
+  ActionTypes: ActionTypes
 }
 
 export type EditorComponents = {
@@ -48,6 +51,7 @@ export type EditorComponents = {
   Scene: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Scene']>
   Nodes: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Nodes']>
   TransformConfig: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['TransformConfig']>
+  ActionTypes: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['ActionTypes']>
   Actions: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Actions']>
   Triggers: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Triggers']>
   States: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['States']>
@@ -108,12 +112,13 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     value: Schemas.Array(
       Schemas.Map({
         entity: Schemas.Entity,
+        open: Schemas.Optional(Schemas.Boolean),
         children: Schemas.Array(Schemas.Entity)
       })
     )
   })
 
-  const { Actions, Triggers, States } = createAssetPacksComponents(engine as any)
+  const { ActionTypes, Actions, Triggers, States } = createAssetPacksComponents(engine as any)
 
   const TransformConfig = engine.defineComponent(EditorComponentNames.TransformConfig, {
     porportionalScaling: Schemas.Optional(Schemas.Boolean)
@@ -124,6 +129,9 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     Scene,
     Nodes,
     TransformConfig,
+    ActionTypes: ActionTypes as unknown as LastWriteWinElementSetComponentDefinition<
+      EditorComponentsTypes['ActionTypes']
+    >,
     Actions: Actions as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Actions']>,
     Triggers: Triggers as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Triggers']>,
     States: States as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['States']>
