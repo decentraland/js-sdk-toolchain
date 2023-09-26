@@ -17,23 +17,23 @@ export interface QuestDefinition {
   connections: Connection[]
 }
 
-interface Connection {
+export interface Connection {
   stepFrom: string
   stepTo: string
 }
 
-interface Step {
+export interface Step {
   id: string
   description: string
   tasks: Task[]
 }
 
-interface Action {
+export interface Action {
   type: string
   parameters: { [key: string]: string }
 }
 
-interface Task {
+export interface Task {
   id: string
   description: string
   actionItems: Action[]
