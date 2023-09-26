@@ -13,7 +13,7 @@
     "@dcl/inspector": "file:../inspector",
     "@dcl/linker-dapp": "^0.11.0",
     "@dcl/mini-comms": "1.0.1-20230216163137.commit-a4c75be",
-    "@dcl/protocol": "1.0.0-6200210039.commit-75f18e8",
+    "@dcl/protocol": "1.0.0-6314457636.commit-a9a962a",
     "@dcl/quests-client": "^1.0.0",
     "@dcl/quests-manager": "^0.1.2",
     "@dcl/rpc": "^1.1.1",
