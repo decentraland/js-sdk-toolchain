@@ -22,7 +22,7 @@ export interface AnimatorComponentDefinitionExtended extends LastWriteWinElement
    *
    * Get a `mutable` version of animator clip
    * @param entity - entity with Animator component
-   * @param clipName - the field `name` of the component
+   * @param clipName - the field `clip` of the component
    * @returns the clip or null if it isn't found
    */
   getClipOrNull(entity: Entity, clipName: string): PBAnimationState | null
