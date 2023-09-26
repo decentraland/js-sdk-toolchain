@@ -12,6 +12,7 @@ export function addChild(engine: IEngine) {
     const Actions = engine.getComponent(EditorComponentNames.Actions) as EditorComponents['Actions']
     const Triggers = engine.getComponent(EditorComponentNames.Triggers) as EditorComponents['Triggers']
     const States = engine.getComponent(EditorComponentNames.States) as EditorComponents['States']
+    const Tweens = engine.getComponent(EditorComponentNames.Tweens) as EditorComponents['Tweens']
 
     // create new child components
     Name.create(child, { value: name })
@@ -44,6 +45,10 @@ export function addChild(engine: IEngine) {
           }
           case ComponentName.STATES: {
             States.createOrReplace(child, component as EditorComponentsTypes['States'])
+            break
+          }
+          case ComponentName.TWEENS: {
+            Tweens.createOrReplace(child, component as EditorComponentsTypes['Tweens'])
             break
           }
         }
