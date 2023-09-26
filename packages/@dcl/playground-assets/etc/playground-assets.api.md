@@ -16,9 +16,9 @@ export const Animator: AnimatorComponentDefinitionExtended;
 
 // @public (undocumented)
 export interface AnimatorComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBAnimator> {
-    getClip(entity: Entity, name: string): PBAnimationState;
-    getClipOrNull(entity: Entity, name: string): PBAnimationState | null;
-    playSingleAnimation(entity: Entity, name: string, resetCursor?: boolean): boolean;
+    getClip(entity: Entity, clipName: string): PBAnimationState;
+    getClipOrNull(entity: Entity, clipName: string): PBAnimationState | null;
+    playSingleAnimation(entity: Entity, clipName: string, resetCursor?: boolean): boolean;
     stopAllAnimations(entity: Entity, resetCursor?: boolean): boolean;
 }
 
@@ -1947,7 +1947,6 @@ export type OverflowType = 'hidden' | 'scroll' | 'visible';
 export interface PBAnimationState {
     clip: string;
     loop?: boolean | undefined;
-    name: string;
     playing?: boolean | undefined;
     shouldReset?: boolean | undefined;
     speed?: number | undefined;

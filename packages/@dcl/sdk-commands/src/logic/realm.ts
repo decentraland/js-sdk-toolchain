@@ -1,4 +1,4 @@
-import { AboutResponse } from '@dcl/protocol/out-js/decentraland/bff/http_endpoints.gen'
+import { AboutResponse } from '@dcl/protocol/out-ts/decentraland/realm/about.gen'
 import { CliComponents } from '../components'
 import { getCatalystBaseUrl } from './config'
 
