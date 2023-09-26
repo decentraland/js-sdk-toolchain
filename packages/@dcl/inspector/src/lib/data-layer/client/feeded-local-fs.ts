@@ -37,7 +37,7 @@ export function generateMinimalComposite({ engine, components }: TempEngine) {
   // nodes
   components.Nodes.create(engine.RootEntity, {
     value: [
-      { entity: engine.RootEntity, children: [entity] },
+      { entity: engine.RootEntity, children: [entity], open: true },
       { entity, children: [] }
     ]
   })
@@ -110,7 +110,7 @@ export function generateMainComposite({ engine, components }: TempEngine) {
   // nodes
   components.Nodes.create(engine.RootEntity, {
     value: [
-      { entity: engine.RootEntity, children: [entity, gltfEntity] },
+      { entity: engine.RootEntity, children: [entity, gltfEntity], open: true },
       { entity, children: [] },
       { entity: gltfEntity, children: [] }
     ]

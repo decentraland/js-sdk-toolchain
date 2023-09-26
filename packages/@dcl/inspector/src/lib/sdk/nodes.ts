@@ -1,11 +1,15 @@
-import { Entity, IEngine } from '@dcl/ecs'
+import { DeepReadonlyObject, Entity, IEngine } from '@dcl/ecs'
 
 import { EditorComponentNames, EditorComponents, Node } from './components'
 import { cleanPush } from '../utils/array'
 
-export function removeNode(engine: IEngine, entity: Entity): Node[] {
+function getNodes(engine: IEngine): readonly DeepReadonlyObject<Node>[] {
   const Nodes = engine.getComponent(EditorComponentNames.Nodes) as EditorComponents['Nodes']
-  const nodes = Nodes.get(engine.RootEntity).value
+  return Nodes.get(engine.RootEntity).value
+}
+
+export function removeNode(engine: IEngine, entity: Entity): Node[] {
+  const nodes = getNodes(engine)
   const newValue: Node[] = []
 
   for (const $ of nodes) {
@@ -17,8 +21,7 @@ export function removeNode(engine: IEngine, entity: Entity): Node[] {
 }
 
 export function addNode(engine: IEngine, entity: Entity): Node[] {
-  const Nodes = engine.getComponent(EditorComponentNames.Nodes) as EditorComponents['Nodes']
-  const nodes = Array.from(Nodes.get(engine.RootEntity).value)
+  const nodes = Array.from(getNodes(engine))
 
   const alreadyNode = nodes.find(($) => $.entity === entity)
   if (!alreadyNode) nodes.push({ entity, children: [] })
@@ -27,14 +30,13 @@ export function addNode(engine: IEngine, entity: Entity): Node[] {
 }
 
 export function pushChild(engine: IEngine, parent: Entity, child: Entity): Node[] {
-  const Nodes = engine.getComponent(EditorComponentNames.Nodes) as EditorComponents['Nodes']
-  const nodes = Nodes.get(engine.RootEntity).value
+  const nodes = getNodes(engine)
   const newValue: Node[] = []
   let alreadyInNodes = false
 
   for (const $ of nodes) {
     if ($.entity === parent) {
-      newValue.push({ entity: $.entity, children: cleanPush($.children, child) })
+      newValue.push({ ...$, children: cleanPush($.children, child) })
     } else {
       newValue.push($)
     }
@@ -45,8 +47,7 @@ export function pushChild(engine: IEngine, parent: Entity, child: Entity): Node[
 }
 
 export function removeChild(engine: IEngine, parent: Entity, child: Entity): Node[] {
-  const Nodes = engine.getComponent(EditorComponentNames.Nodes) as EditorComponents['Nodes']
-  const nodes = Nodes.get(engine.RootEntity).value
+  const nodes = getNodes(engine)
   const newValue: Node[] = []
 
   for (const $ of nodes) {
@@ -60,9 +61,46 @@ export function removeChild(engine: IEngine, parent: Entity, child: Entity): Nod
   return newValue
 }
 
-export function filterChild({ entity, children }: Node, child: Entity): Node {
+export function filterChild(parent: Node, child: Entity): Node {
   return {
-    entity,
-    children: children.filter(($) => $ !== child)
+    ...parent,
+    children: parent.children.filter(($) => $ !== child)
   }
+}
+
+export function getAncestors(engine: IEngine, entity: Entity): Set<Entity> {
+  const nodes = getNodes(engine)
+  const map = new Map<Entity, Entity>()
+  const ancestors = new Set<Entity>()
+
+  // map of child -> parent
+  for (const node of nodes) {
+    node.children.forEach(($) => map.set($, node.entity))
+  }
+
+  let current = entity
+
+  while (map.has(current)) {
+    const ancestor = map.get(current)!
+    ancestors.add(ancestor)
+    current = ancestor
+  }
+
+  return ancestors
+}
+
+// just syntax sugar
+export function isAncestor(ancestors: Set<Entity>, entity: Entity): boolean {
+  return ancestors.has(entity)
+}
+
+export function mapNodes(engine: IEngine, fn: (node: Node) => Node) {
+  const nodes = getNodes(engine)
+  const newValue: Node[] = []
+
+  for (const node of nodes) {
+    newValue.push(fn(node))
+  }
+
+  return newValue
 }

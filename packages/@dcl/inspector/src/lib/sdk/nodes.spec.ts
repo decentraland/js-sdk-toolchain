@@ -1,6 +1,6 @@
 import { IEngine, Engine } from '@dcl/ecs'
 import { EditorComponents, createEditorComponents } from './components'
-import { pushChild, removeNode, removeChild, filterChild } from './nodes'
+import { pushChild, removeNode, removeChild, filterChild, getAncestors, isAncestor, mapNodes } from './nodes'
 
 describe('Node Operations', () => {
   let engine: IEngine
@@ -151,6 +151,108 @@ describe('Node Operations', () => {
       const result = filterChild(parentNode, childToRemove)
 
       expect(result).toEqual(parentNode)
+    })
+  })
+  describe('getAncestors', () => {
+    it('should return an empty set when there are no ancestors', () => {
+      const entity = engine.addEntity()
+      const entity2 = engine.addEntity()
+      Nodes.create(engine.RootEntity, {
+        value: [
+          { entity: engine.RootEntity, children: [entity] },
+          { entity: entity, children: [] },
+          { entity: entity2, children: [] }
+        ]
+      })
+      const ancestors = getAncestors(engine, entity2)
+
+      expect(ancestors.size).toBe(0)
+    })
+
+    it('should return the correct ancestors', () => {
+      const entity1 = engine.addEntity()
+      const entity2 = engine.addEntity()
+      const entity3 = engine.addEntity()
+      Nodes.create(engine.RootEntity, {
+        value: [
+          { entity: engine.RootEntity, children: [entity1] },
+          { entity: entity1, children: [entity2, entity3] },
+          { entity: entity2, children: [] },
+          { entity: entity3, children: [] }
+        ]
+      })
+
+      const ancestors = getAncestors(engine, entity2)
+
+      expect(ancestors.size).toBe(2)
+      expect(ancestors.has(entity1)).toBe(true)
+      expect(ancestors.has(engine.RootEntity)).toBe(true)
+    })
+
+    it('should return an empty set when the entity does not exist', () => {
+      const entity1 = engine.addEntity()
+      const entity2 = engine.addEntity()
+      const entity3 = engine.addEntity()
+      Nodes.create(engine.RootEntity, {
+        value: [
+          { entity: engine.RootEntity, children: [entity1] },
+          { entity: entity1, children: [entity2, entity3] },
+          { entity: entity2, children: [] },
+          { entity: entity3, children: [] }
+        ]
+      })
+
+      const ancestors = getAncestors(engine, engine.addEntity())
+
+      expect(ancestors.size).toBe(0)
+    })
+  })
+
+  describe('isAncestor', () => {
+    it('should return true when the entity is an ancestor', () => {
+      const entity1 = engine.addEntity()
+      const entity2 = engine.addEntity()
+      const entity3 = engine.addEntity()
+      const ancestors = new Set([entity1, entity2, entity3])
+
+      const result = isAncestor(ancestors, entity2)
+
+      expect(result).toBe(true)
+    })
+
+    it('should return false when the entity is not an ancestor', () => {
+      const entity1 = engine.addEntity()
+      const entity2 = engine.addEntity()
+      const entity3 = engine.addEntity()
+      const ancestors = new Set([entity1, entity3])
+
+      const result = isAncestor(ancestors, entity2)
+
+      expect(result).toBe(false)
+    })
+  })
+
+  describe('mapNodes', () => {
+    it('should map nodes using the provided function', () => {
+      const entity1 = engine.addEntity()
+      const entity2 = engine.addEntity()
+      const entity3 = engine.addEntity()
+      Nodes.create(engine.RootEntity, {
+        value: [
+          { entity: engine.RootEntity, children: [entity1] },
+          { entity: entity1, children: [entity2, entity3] },
+          { entity: entity2, children: [] },
+          { entity: entity3, children: [] }
+        ]
+      })
+
+      const mappedNodes = mapNodes(engine, (node) => ({ ...node, open: true }))
+
+      expect(mappedNodes.length).toBe(4)
+      expect(mappedNodes[0]).toEqual({ entity: engine.RootEntity, children: [entity1], open: true })
+      expect(mappedNodes[1]).toEqual({ entity: entity1, children: [entity2, entity3], open: true })
+      expect(mappedNodes[2]).toEqual({ entity: entity2, children: [], open: true })
+      expect(mappedNodes[3]).toEqual({ entity: entity3, children: [], open: true })
     })
   })
 })
