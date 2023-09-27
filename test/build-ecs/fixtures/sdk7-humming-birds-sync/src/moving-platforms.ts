@@ -1,5 +1,15 @@
-import { GltfContainer, Transform, SyncComponents, Entity } from '@dcl/ecs'
-import * as utils from '@dcl-sdk/utils'
+import {
+  GltfContainer,
+  Transform,
+  SyncComponents,
+  Tween,
+  EasingFunction,
+  TweenState,
+  TweenStateStatus,
+  PBTween,
+  Entity,
+  Schemas
+} from '@dcl/ecs'
 import { Vector3 } from '@dcl/sdk/math'
 import { engine } from '@dcl/sdk/ecs'
 import { NetworkManager } from '@dcl/sdk/network-transport/types'
@@ -7,7 +17,7 @@ import { NetworkManager } from '@dcl/sdk/network-transport/types'
 export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
   //// triggerable platform
 
-  //// only horizontal
+  // only horizontal
   const platform1 = networkedEntityFactory.addEntity(engine)
   GltfContainer.create(platform1, {
     src: 'models/movingPlatform.glb'
@@ -15,26 +25,28 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
   Transform.create(platform1, {
     position: Vector3.create(2, 1.5, 8)
   })
-  SyncComponents.create(platform1, { componentIds: [Transform.componentId] })
-  //// only vertical
+  SyncComponents.create(platform1, { componentIds: [Tween.componentId, TweenHelper.componentId] })
+  Tween.create(platform1, {
+    move: { start: Vector3.create(2, 1.5, 6.5), end: Vector3.create(2, 1.5, 12) },
+    duration: 4000,
+    tweenFunction: EasingFunction.TF_LINEAR
+  })
+  TweenHelper.create(platform1, { loop: true })
+
+  // // only vertical
   const platform2 = networkedEntityFactory.addEntity(engine)
   GltfContainer.create(platform2, {
     src: 'models/movingPlatform.glb'
   })
-  Transform.create(platform2, {
-    position: Vector3.create(4, 1.5, 14)
-  })
-  SyncComponents.create(platform2, { componentIds: [Transform.componentId] })
 
-  //// path with many waypoints
-  const platform4 = networkedEntityFactory.addEntity(engine)
-  GltfContainer.create(platform4, {
-    src: 'models/movingPlatform.glb'
+  Transform.create(platform2, { position: Vector3.create(4, 1.5, 14) })
+  SyncComponents.create(platform2, { componentIds: [Tween.componentId] })
+  Tween.create(platform2, {
+    move: { start: Vector3.create(4, 1.5, 14), end: Vector3.create(4, 4, 14) },
+    duration: 4000,
+    tweenFunction: EasingFunction.TF_LINEAR
   })
-  Transform.create(platform4, {
-    position: Vector3.create(6.5, 7, 4)
-  })
-  SyncComponents.create(platform4, { componentIds: [Transform.componentId] })
+  TweenHelper.create(platform2, { loop: true })
 
   const platform3 = networkedEntityFactory.addEntity(engine)
   GltfContainer.create(platform3, {
@@ -43,43 +55,90 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
   Transform.create(platform3, {
     position: Vector3.create(14, 4, 12)
   })
-  SyncComponents.create(platform3, { componentIds: [Transform.componentId] })
-  startPath(platform3, [Vector3.create(14, 4, 12), Vector3.create(14, 4, 4), Vector3.create(14, 4, 12)], 3, false, true)
+  SyncComponents.create(platform3, { componentIds: [Tween.componentId] })
+  Tween.create(platform3, {
+    move: { start: Vector3.create(14, 4, 12), end: Vector3.create(14, 4, 4) },
+    duration: 5000,
+    tweenFunction: EasingFunction.TF_LINEAR
+  })
+  TweenHelper.create(platform3, { loop: true })
 
-  startPath(
-    platform1,
-    [Vector3.create(2, 1.5, 8), Vector3.create(2, 1.5, 10), Vector3.create(2, 1.5, 8)],
-    3,
-    false,
-    true
-  )
+  // //// path with many waypoints
+  const platform4 = networkedEntityFactory.addEntity(engine)
+  GltfContainer.create(platform4, {
+    src: 'models/movingPlatform.glb'
+  })
+  Transform.create(platform4, {
+    position: Vector3.create(6.5, 7, 4)
+  })
+  SyncComponents.create(platform4, { componentIds: [Tween.componentId, TweenHelper.componentId] })
+  const tween = Tween.create(platform4, {
+    duration: 4000,
+    tweenFunction: EasingFunction.TF_LINEAR,
+    move: { start: Vector3.create(6.5, 7, 4), end: Vector3.create(6.5, 7, 12) }
+  })
 
-  startPath(
-    platform2,
-    [Vector3.create(4, 1.5, 14), Vector3.create(4, 4, 14), Vector3.create(4, 1.5, 14)],
-    2,
-    false,
-    true
-  )
-
-  startPath(
-    platform4,
-    [
-      Vector3.create(6.5, 7, 4),
-      Vector3.create(6.5, 7, 12),
-      Vector3.create(6.5, 10.5, 12),
-      Vector3.create(6.5, 10.5, 4),
-      Vector3.create(6.5, 7, 4)
+  TweenHelper.create(platform4, {
+    sequenceTweens: [
+      { ...tween, move: { start: tween.move!.end!, end: Vector3.create(6.5, 10.5, 12) } },
+      { ...tween, move: { start: Vector3.create(6.5, 10.5, 12), end: Vector3.create(6.5, 10.5, 4) } },
+      { ...tween, move: { start: Vector3.create(6.5, 10.5, 4), end: tween.move!.start! } }
     ],
-    40,
-    false,
-    true
-  )
-}
-
-// function to make path following recursive
-function startPath(entity: Entity, path: Vector3[], duration: number, facePath?: boolean, loop?: boolean) {
-  utils.paths.startStraightPath(entity, path, duration, false, function () {
-    if (loop) startPath(entity, path, duration, facePath, loop)
+    loop: true
   })
 }
+
+const TweenSchema = Schemas.Map({
+  move: Schemas.Optional(Schemas.Map({ start: Schemas.Vector3, end: Schemas.Vector3 })),
+  duration: Schemas.Number,
+  tweenFunction: Schemas.Number
+})
+
+export const TweenHelper = engine.defineComponent('chore:tween-helper', {
+  // Tween is a protobuf component
+  sequenceTweens: Schemas.Optional(Schemas.Array(TweenSchema)),
+  loop: Schemas.Optional(Schemas.Boolean)
+})
+
+const cacheTween = new Map<Entity, PBTween>()
+const tweenFrames = new Map<Entity, number>()
+// Tween Helpers
+engine.addSystem(() => {
+  for (const [entity, tweenHelper, tween, tweenState] of engine.getEntitiesWith(TweenHelper, Tween, TweenState)) {
+    const prevTween = cacheTween.get(entity)
+    const sameTween = JSON.stringify(prevTween) === JSON.stringify(tween)
+    const frame = tweenFrames.get(entity) || tweenFrames.set(entity, 0).get(entity)!
+    tweenFrames.set(entity, frame + 1)
+
+    if (!sameTween) {
+      cacheTween.set(entity, tween)
+      tweenFrames.set(entity, 0)
+      continue // 0,99
+    }
+
+    if (
+      sameTween &&
+      tweenState.state === TweenStateStatus.TS_COMPLETED &&
+      tween.move &&
+      // TODO: hackishhhhhhh
+      tweenFrames.get(entity)! > 10
+    ) {
+      tweenFrames.set(entity, 0)
+      const { sequenceTweens } = tweenHelper
+      if (sequenceTweens && sequenceTweens.length) {
+        const [nextTween, ...otherTweens] = sequenceTweens
+        Tween.createOrReplace(entity, nextTween as PBTween)
+        const mutableTweenHelper = TweenHelper.getMutable(entity)
+        mutableTweenHelper.sequenceTweens = otherTweens
+        if (tweenHelper.loop) {
+          mutableTweenHelper.sequenceTweens.push(tween as any)
+        }
+      } else if (tweenHelper.loop) {
+        const start = tween.move.end!
+        const end = tween.move.start!
+        const tweenMutable = Tween.getMutable(entity)
+        tweenMutable.move = { start, end }
+      }
+    }
+  }
+})

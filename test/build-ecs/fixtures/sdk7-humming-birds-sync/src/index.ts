@@ -8,18 +8,19 @@ import {
   pointerEventsSystem,
   Schemas,
   SyncComponents,
-  Transform
+  Transform,
+  Tween
 } from '@dcl/sdk/ecs'
 import { getRealm } from '~system/Runtime'
 import { createNetworkManager } from '@dcl/sdk/network-transport'
 
-import { createHummingBird, moveHummingBirds, shootBirds } from './hummingBird'
+import { createHummingBird, shootBirds } from './hummingBird'
 import { ADMIN_USERS, setupUi } from './ui'
 import { isServer } from '~system/EngineApi'
 import { getUserData } from '~system/UserIdentity'
 import { NetworkManager } from '@dcl/sdk/network-transport/types'
 import { createMovingPlatforms } from './moving-platforms'
-import { changeColorSystem, createCube } from './create-cube'
+import { changeColorSystem } from './create-cube'
 
 export const GameStatus = engine.defineComponent('game-status', { paused: Schemas.Boolean })
 
@@ -42,23 +43,24 @@ export async function main() {
   const userId = (await getUserData({})).data?.userId ?? ''
 
   setupUi(userId)
-
+  console.log(Tween.componentId)
   if (server) {
-    engine.addSystem(moveHummingBirds)
-    gameStatusServer(networkManager)
+    // engine.addSystem(moveHummingBirds)
+    // gameStatusServer(networkManager)
     createMovingPlatforms(networkManager)
-    for (const [x, y, z] of [
-      [44, 1, 26],
-      [36, 2, 37],
-      [20, 3, 40],
-      [19, 1, 23],
-      [31, 5, 8],
-      [43, 4, 6],
-      [37, 3, 24],
-      [5, 8, 2]
-    ]) {
-      createCube(networkManager, x, y, z)
-    }
+    // for (const [x, y, z] of [
+    //   [44, 1, 26],
+    //   [36, 2, 37],
+    //   [20, 3, 40],
+    //   [19, 1, 23],
+    //   [31, 5, 8],
+    //   [43, 4, 6],
+    //   [37, 3, 24],
+    //   [5, 8, 2]
+    // ]) {
+    //   createCube(networkManager, x, y, z)
+    // }
+    return
   } else {
     engine.addSystem(changeColorSystem)
     engine.addSystem(shootBirds(userId))
@@ -89,6 +91,7 @@ export async function main() {
     rotation: { x: 0, y: 0, z: 0, w: 0 },
     scale: { x: 1.6, y: 1.6, z: 1.6 }
   })
+
   GltfContainer.create(tree, {
     src: 'models/Tree.gltf',
     visibleMeshesCollisionMask: ColliderLayer.CL_POINTER | ColliderLayer.CL_PHYSICS,

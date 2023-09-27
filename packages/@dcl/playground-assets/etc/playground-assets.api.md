@@ -532,6 +532,8 @@ export const componentDefinitionByName: {
     "core::Raycast": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycast>>;
     "core::RaycastResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycastResult>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
+    "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
+    "core::TweenState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenState>>;
     "core::UiBackground": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiBackground>>;
     "core::UiCanvasInformation": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiCanvasInformation>>;
     "core::UiDropdown": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdown>>;
@@ -799,6 +801,71 @@ export type DisplayType = 'flex' | 'none';
 //
 // @public
 export function Dropdown(props: UiDropdownProps): ReactEcs.JSX.Element;
+
+// @public (undocumented)
+export const enum EasingFunction {
+    // (undocumented)
+    TF_EASEBACK = 30,
+    // (undocumented)
+    TF_EASEBOUNCE = 15,
+    // (undocumented)
+    TF_EASECIRC = 27,
+    // (undocumented)
+    TF_EASECUBIC = 18,
+    // (undocumented)
+    TF_EASEELASTIC = 12,
+    // (undocumented)
+    TF_EASEEXPO = 9,
+    // (undocumented)
+    TF_EASEINBACK = 28,
+    // (undocumented)
+    TF_EASEINBOUNCE = 13,
+    // (undocumented)
+    TF_EASEINCIRC = 25,
+    // (undocumented)
+    TF_EASEINCUBIC = 16,
+    // (undocumented)
+    TF_EASEINELASTIC = 10,
+    // (undocumented)
+    TF_EASEINEXPO = 7,
+    // (undocumented)
+    TF_EASEINQUAD = 1,
+    // (undocumented)
+    TF_EASEINQUART = 19,
+    // (undocumented)
+    TF_EASEINQUINT = 22,
+    // (undocumented)
+    TF_EASEINSINE = 4,
+    // (undocumented)
+    TF_EASEOUTBACK = 29,
+    // (undocumented)
+    TF_EASEOUTBOUNCE = 14,
+    // (undocumented)
+    TF_EASEOUTCIRC = 26,
+    // (undocumented)
+    TF_EASEOUTCUBIC = 17,
+    // (undocumented)
+    TF_EASEOUTELASTIC = 11,
+    // (undocumented)
+    TF_EASEOUTEXPO = 8,
+    // (undocumented)
+    TF_EASEOUTQUAD = 2,
+    // (undocumented)
+    TF_EASEOUTQUART = 20,
+    // (undocumented)
+    TF_EASEOUTQUINT = 23,
+    // (undocumented)
+    TF_EASEOUTSINE = 5,
+    // (undocumented)
+    TF_EASEQUAD = 3,
+    // (undocumented)
+    TF_EASEQUART = 21,
+    // (undocumented)
+    TF_EASEQUINT = 24,
+    // (undocumented)
+    TF_EASESINE = 6,
+    TF_LINEAR = 0
+}
 
 // @public (undocumented)
 export interface EcsElements {
@@ -1689,6 +1756,22 @@ export class MessageBus {
     emit(message: string, payload: Record<any, any>): void;
     // (undocumented)
     on(message: string, callback: (value: any, sender: string) => void): Observer<IEvents['comms']>;
+}
+
+// @public (undocumented)
+export interface Move {
+    // (undocumented)
+    end: PBVector3 | undefined;
+    // (undocumented)
+    start: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace Move {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): Move;
+    // (undocumented)
+    export function encode(message: Move, writer?: _m0.Writer): _m0.Writer;
 }
 
 // Warning: (ae-missing-release-tag) "Name" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -2590,6 +2673,49 @@ export namespace PBTextShape {
 }
 
 // @public (undocumented)
+export interface PBTween {
+    currentTime?: number | undefined;
+    duration: number;
+    // (undocumented)
+    mode?: {
+        $case: "move";
+        move: Move;
+    } | {
+        $case: "rotate";
+        rotate: Rotate;
+    } | {
+        $case: "scale";
+        scale: Scale;
+    } | undefined;
+    playing?: boolean | undefined;
+    // (undocumented)
+    tweenFunction: EasingFunction;
+}
+
+// @public (undocumented)
+export namespace PBTween {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTween;
+    // (undocumented)
+    export function encode(message: PBTween, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBTweenState {
+    currentTime: number;
+    // (undocumented)
+    state: TweenStateStatus;
+}
+
+// @public (undocumented)
+export namespace PBTweenState {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTweenState;
+    // (undocumented)
+    export function encode(message: PBTweenState, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBUiBackground {
     color?: PBColor4 | undefined;
     // (undocumented)
@@ -3268,6 +3394,24 @@ export const RESERVED_LOCAL_ENTITIES = 65535;
 // @public
 export const RESERVED_STATIC_ENTITIES = 512;
 
+// @public (undocumented)
+export interface Rotate {
+    // (undocumented)
+    end: Quaternion_2 | undefined;
+    // Warning: (ae-forgotten-export) The symbol "Quaternion_2" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    start: Quaternion_2 | undefined;
+}
+
+// @public (undocumented)
+export namespace Rotate {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): Rotate;
+    // (undocumented)
+    export function encode(message: Rotate, writer?: _m0.Writer): _m0.Writer;
+}
+
 // Warning: (ae-missing-release-tag) "RPCSendableMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -3302,6 +3446,22 @@ export namespace Scalar {
     export function smoothStep(from: number, to: number, tx: number): number;
     export function toHex(i: number): string;
     export function withinEpsilon(a: number, b: number, epsilon?: number): boolean;
+}
+
+// @public (undocumented)
+export interface Scale {
+    // (undocumented)
+    end: PBVector3 | undefined;
+    // (undocumented)
+    start: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace Scale {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): Scale;
+    // (undocumented)
+    export function encode(message: Scale, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3566,6 +3726,22 @@ export type Transport = {
 
 // @public (undocumented)
 export type TransportMessage = Omit<ReceiveMessage, 'data'>;
+
+// @public (undocumented)
+export const Tween: LastWriteWinElementSetComponentDefinition<PBTween>;
+
+// @public (undocumented)
+export const TweenState: LastWriteWinElementSetComponentDefinition<PBTweenState>;
+
+// @public (undocumented)
+export const enum TweenStateStatus {
+    // (undocumented)
+    TS_ACTIVE = 0,
+    // (undocumented)
+    TS_COMPLETED = 1,
+    // (undocumented)
+    TS_PAUSED = 2
+}
 
 // @public
 export interface UiAvatarTexture {

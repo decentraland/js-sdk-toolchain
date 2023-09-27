@@ -24,7 +24,6 @@ export function* serializeCrdtMessages(prefix: string, data: Uint8Array, engine:
 
       try {
         const c = engine.getComponent(componentId)
-
         yield `${preface} c=${c.componentName} t=${timestamp} data=${JSON.stringify(
           (data && c.schema.deserialize(new ReadWriteByteBuffer(data))) || null
         )}`
