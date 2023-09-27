@@ -7,10 +7,12 @@ import { getDefaultInspectorPreferences } from '../../logic/preferences/types'
 describe('When setting up the engine', () => {
   let engine: Engine
   let resetMockXMLHttpRequest: () => void
+  let canvas: HTMLCanvasElement
 
   beforeEach(() => {
     engine = new NullEngine()
     resetMockXMLHttpRequest = mockXMLHttpRequest()
+    canvas = document.createElement('canvas')
   })
 
   afterEach(() => {
@@ -19,7 +21,7 @@ describe('When setting up the engine', () => {
   })
 
   it('should create a scene', () => {
-    const { scene } = setupEngine(engine, null as unknown as HTMLCanvasElement, getDefaultInspectorPreferences())
+    const { scene } = setupEngine(engine, canvas, getDefaultInspectorPreferences())
     expect(scene).toBeDefined()
   })
 })

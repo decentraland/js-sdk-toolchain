@@ -35,7 +35,7 @@ export class CameraManager {
 
   constructor(
     scene: BABYLON.Scene,
-    inputSource: HTMLCanvasElement,
+    public inputSource: HTMLCanvasElement,
     speeds: Array<number>,
     initialSpeedIndex: number,
     minY: number,
@@ -55,6 +55,19 @@ export class CameraManager {
     scene.activeCamera?.detachControl()
     scene.activeCamera = this.camera
     scene.activeCamera.attachControl(inputSource, true)
+
+    // There is a bug when holding RMB and moving out of the window
+    // that prevents Babylon to release the button event
+    // Seems to only occur under specific conditions (OSX + Chromium based browsers)
+    // https://forum.babylonjs.com/t/camera-sticks-to-pointerdown-when-going-out-of-the-screen/20395
+    //
+    window.addEventListener('mouseout', () => this.reattachControl())
+    inputSource.addEventListener('mouseout', () => this.reattachControl())
+  }
+
+  reattachControl() {
+    this.camera.detachControl()
+    this.camera.attachControl(this.inputSource, true)
   }
 
   getCamera() {
@@ -114,7 +127,7 @@ export class CameraManager {
   private createCamera(scene: BABYLON.Scene) {
     const center = new BABYLON.Vector3(PARCEL_SIZE / 2, 0, PARCEL_SIZE / 2)
     const size = center.length()
-    const camera = new BABYLON.FreeCamera('editorCamera', center.subtractFromFloats(size, -size * 1.5, size * 2))
+    const camera = new BABYLON.FreeCamera('editorCamera', center.subtractFromFloats(size, -size * 1.5, size * 2), scene)
     camera.target = center
 
     camera.inertia = 0
