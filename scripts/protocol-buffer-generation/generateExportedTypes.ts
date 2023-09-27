@@ -4,7 +4,7 @@ import { snakeToPascal } from '../utils/snakeToPascal'
 
 function generateIndex(files: { name: string; path: string }[]) {
   return `
-  export type { Position as PBPosition, Vector2 as PBVector2, Vector3 as PBVector3 } from './pb/decentraland/common/vectors.gen';
+  export type { Position as PBPosition, Vector2 as PBVector2, Vector3 as PBVector3, Quaternion as PBQuaternion } from './pb/decentraland/common/vectors.gen';
   export type { Color3 as PBColor3, Color4 as PBColor4 } from './pb/decentraland/common/colors.gen';
   ${files
     .map(

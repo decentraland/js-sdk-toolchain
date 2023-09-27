@@ -27,7 +27,7 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
   })
   SyncComponents.create(platform1, { componentIds: [Tween.componentId, TweenHelper.componentId] })
   Tween.create(platform1, {
-    move: { start: Vector3.create(2, 1.5, 6.5), end: Vector3.create(2, 1.5, 12) },
+    mode: { $case: 'move', move: { start: Vector3.create(2, 1.5, 6.5), end: Vector3.create(2, 1.5, 12) } },
     duration: 4000,
     tweenFunction: EasingFunction.TF_LINEAR
   })
@@ -42,7 +42,7 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
   Transform.create(platform2, { position: Vector3.create(4, 1.5, 14) })
   SyncComponents.create(platform2, { componentIds: [Tween.componentId] })
   Tween.create(platform2, {
-    move: { start: Vector3.create(4, 1.5, 14), end: Vector3.create(4, 4, 14) },
+    mode: { $case: 'move', move: { start: Vector3.create(4, 1.5, 14), end: Vector3.create(4, 4, 14) } },
     duration: 4000,
     tweenFunction: EasingFunction.TF_LINEAR
   })
@@ -57,7 +57,7 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
   })
   SyncComponents.create(platform3, { componentIds: [Tween.componentId] })
   Tween.create(platform3, {
-    move: { start: Vector3.create(14, 4, 12), end: Vector3.create(14, 4, 4) },
+    mode: { $case: 'move', move: { start: Vector3.create(14, 4, 12), end: Vector3.create(14, 4, 4) } },
     duration: 5000,
     tweenFunction: EasingFunction.TF_LINEAR
   })
@@ -75,14 +75,14 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
   const tween = Tween.create(platform4, {
     duration: 4000,
     tweenFunction: EasingFunction.TF_LINEAR,
-    move: { start: Vector3.create(6.5, 7, 4), end: Vector3.create(6.5, 7, 12) }
+    mode: { $case: 'move', move: { start: Vector3.create(6.5, 7, 4), end: Vector3.create(6.5, 7, 12) } }
   })
 
   TweenHelper.create(platform4, {
     sequenceTweens: [
-      { ...tween, move: { start: tween.move!.end!, end: Vector3.create(6.5, 10.5, 12) } },
+      { ...tween, move: { start: Vector3.create(6.5, 7, 12), end: Vector3.create(6.5, 10.5, 12) } },
       { ...tween, move: { start: Vector3.create(6.5, 10.5, 12), end: Vector3.create(6.5, 10.5, 4) } },
-      { ...tween, move: { start: Vector3.create(6.5, 10.5, 4), end: tween.move!.start! } }
+      { ...tween, move: { start: Vector3.create(6.5, 10.5, 4), end: Vector3.create(6.5, 7, 4) } }
     ],
     loop: true
   })
@@ -119,25 +119,30 @@ engine.addSystem(() => {
     if (
       sameTween &&
       tweenState.state === TweenStateStatus.TS_COMPLETED &&
-      tween.move &&
+      tween.mode?.$case === 'move' &&
       // TODO: hackishhhhhhh
       tweenFrames.get(entity)! > 10
     ) {
       tweenFrames.set(entity, 0)
       const { sequenceTweens } = tweenHelper
       if (sequenceTweens && sequenceTweens.length) {
-        const [nextTween, ...otherTweens] = sequenceTweens
-        Tween.createOrReplace(entity, nextTween as PBTween)
+        const [nextTweenSequence, ...otherTweens] = sequenceTweens
+        const nextTween: PBTween = {
+          duration: nextTweenSequence.duration,
+          tweenFunction: nextTweenSequence.tweenFunction,
+          mode: { $case: 'move', move: tween.mode.move! }
+        }
+        Tween.createOrReplace(entity, nextTween)
         const mutableTweenHelper = TweenHelper.getMutable(entity)
         mutableTweenHelper.sequenceTweens = otherTweens
         if (tweenHelper.loop) {
-          mutableTweenHelper.sequenceTweens.push(tween as any)
+          mutableTweenHelper.sequenceTweens.push(tween)
         }
       } else if (tweenHelper.loop) {
-        const start = tween.move.end!
-        const end = tween.move.start!
+        const start = tween.mode.move.end!
+        const end = tween.mode.move.start!
         const tweenMutable = Tween.getMutable(entity)
-        tweenMutable.move = { start, end }
+        tweenMutable.mode = { $case: 'move', move: { start, end } }
       }
     }
   }

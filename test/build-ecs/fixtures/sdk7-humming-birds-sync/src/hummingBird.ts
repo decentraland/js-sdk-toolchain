@@ -53,22 +53,19 @@ export function createHummingBird(networkManager: NetworkManager) {
         loop: true,
         playing: true,
         shouldReset: false,
-        speed: 2,
-        name: 'fly'
+        speed: 2
       },
       {
         clip: 'look',
         loop: false,
         playing: false,
-        shouldReset: false,
-        name: 'look'
+        shouldReset: false
       },
       {
         clip: 'shake',
         loop: false,
         playing: false,
-        shouldReset: false,
-        name: 'shake'
+        shouldReset: false
       }
     ]
   })

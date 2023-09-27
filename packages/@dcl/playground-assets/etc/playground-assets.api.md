@@ -2591,6 +2591,26 @@ export namespace PBPosition {
 }
 
 // @public (undocumented)
+export interface PBQuaternion {
+    // (undocumented)
+    w: number;
+    // (undocumented)
+    x: number;
+    // (undocumented)
+    y: number;
+    // (undocumented)
+    z: number;
+}
+
+// @public (undocumented)
+export namespace PBQuaternion {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBQuaternion;
+    // (undocumented)
+    export function encode(message: PBQuaternion, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBRaycast {
     collisionMask?: number | undefined;
     continuous?: boolean | undefined;
@@ -3397,11 +3417,9 @@ export const RESERVED_STATIC_ENTITIES = 512;
 // @public (undocumented)
 export interface Rotate {
     // (undocumented)
-    end: Quaternion_2 | undefined;
-    // Warning: (ae-forgotten-export) The symbol "Quaternion_2" needs to be exported by the entry point index.d.ts
-    //
+    end: PBQuaternion | undefined;
     // (undocumented)
-    start: Quaternion_2 | undefined;
+    start: PBQuaternion | undefined;
 }
 
 // @public (undocumented)
