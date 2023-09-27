@@ -72,7 +72,7 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
     position: Vector3.create(6.5, 7, 4)
   })
   SyncComponents.create(platform4, { componentIds: [Tween.componentId, TweenHelper.componentId] })
-  const tween = Tween.create(platform4, {
+  Tween.create(platform4, {
     duration: 4000,
     tweenFunction: EasingFunction.TF_LINEAR,
     mode: { $case: 'move', move: { start: Vector3.create(6.5, 7, 4), end: Vector3.create(6.5, 7, 12) } }
@@ -80,9 +80,21 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
 
   TweenHelper.create(platform4, {
     sequenceTweens: [
-      { ...tween, move: { start: Vector3.create(6.5, 7, 12), end: Vector3.create(6.5, 10.5, 12) } },
-      { ...tween, move: { start: Vector3.create(6.5, 10.5, 12), end: Vector3.create(6.5, 10.5, 4) } },
-      { ...tween, move: { start: Vector3.create(6.5, 10.5, 4), end: Vector3.create(6.5, 7, 4) } }
+      {
+        duration: 4000,
+        tweenFunction: EasingFunction.TF_LINEAR,
+        move: { start: Vector3.create(6.5, 7, 12), end: Vector3.create(6.5, 10.5, 12) }
+      },
+      {
+        duration: 4000,
+        tweenFunction: EasingFunction.TF_LINEAR,
+        move: { start: Vector3.create(6.5, 10.5, 12), end: Vector3.create(6.5, 10.5, 4) }
+      },
+      {
+        duration: 4000,
+        tweenFunction: EasingFunction.TF_LINEAR,
+        move: { start: Vector3.create(6.5, 10.5, 4), end: Vector3.create(6.5, 7, 4) }
+      }
     ],
     loop: true
   })
@@ -130,13 +142,17 @@ engine.addSystem(() => {
         const nextTween: PBTween = {
           duration: nextTweenSequence.duration,
           tweenFunction: nextTweenSequence.tweenFunction,
-          mode: { $case: 'move', move: tween.mode.move! }
+          mode: { $case: 'move', move: nextTweenSequence.move! }
         }
         Tween.createOrReplace(entity, nextTween)
         const mutableTweenHelper = TweenHelper.getMutable(entity)
         mutableTweenHelper.sequenceTweens = otherTweens
         if (tweenHelper.loop) {
-          mutableTweenHelper.sequenceTweens.push(tween)
+          mutableTweenHelper.sequenceTweens.push({
+            duration: tween.duration,
+            tweenFunction: tween.tweenFunction,
+            move: tween.mode.move! as any
+          })
         }
       } else if (tweenHelper.loop) {
         const start = tween.mode.move.end!
