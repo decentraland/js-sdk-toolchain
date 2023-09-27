@@ -533,6 +533,7 @@ export const componentDefinitionByName: {
     "core::RaycastResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycastResult>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
+    "core::TweenSequence": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenSequence>>;
     "core::TweenState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenState>>;
     "core::UiBackground": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiBackground>>;
     "core::UiCanvasInformation": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiCanvasInformation>>;
@@ -2721,6 +2722,22 @@ export namespace PBTween {
 }
 
 // @public (undocumented)
+export interface PBTweenSequence {
+    // (undocumented)
+    loop: boolean;
+    // (undocumented)
+    sequence: PBTween[];
+}
+
+// @public (undocumented)
+export namespace PBTweenSequence {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTweenSequence;
+    // (undocumented)
+    export function encode(message: PBTweenSequence, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBTweenState {
     currentTime: number;
     // (undocumented)
@@ -3747,6 +3764,9 @@ export type TransportMessage = Omit<ReceiveMessage, 'data'>;
 
 // @public (undocumented)
 export const Tween: LastWriteWinElementSetComponentDefinition<PBTween>;
+
+// @public (undocumented)
+export const TweenSequence: LastWriteWinElementSetComponentDefinition<PBTweenSequence>;
 
 // @public (undocumented)
 export const TweenState: LastWriteWinElementSetComponentDefinition<PBTweenState>;
