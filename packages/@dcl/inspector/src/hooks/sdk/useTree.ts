@@ -57,7 +57,7 @@ export const useTree = () => {
   const isOpen = useCallback(
     (entity: Entity) => {
       if (!sdk) return false
-      const entities = sdk.components.Nodes.get(ROOT).value
+      const entities = sdk.components.Nodes.getOrNull(ROOT)?.value || []
       return !!entities.find(($) => $.entity === entity)?.open
     },
     [sdk]

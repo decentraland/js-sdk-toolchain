@@ -5,7 +5,7 @@ import { cleanPush } from '../utils/array'
 
 function getNodes(engine: IEngine): readonly DeepReadonlyObject<Node>[] {
   const Nodes = engine.getComponent(EditorComponentNames.Nodes) as EditorComponents['Nodes']
-  return Nodes.get(engine.RootEntity).value
+  return Nodes.getOrNull(engine.RootEntity)?.value || []
 }
 
 export function removeNode(engine: IEngine, entity: Entity): Node[] {
