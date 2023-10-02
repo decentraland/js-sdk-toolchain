@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import { HiOutlineUpload } from 'react-icons/hi'
-import { RxCross2 } from 'react-icons/rx'
+import { RxCross2, RxReload } from 'react-icons/rx'
 import { IoIosImage } from 'react-icons/io'
 
 import FileInput from '../FileInput'
@@ -18,9 +18,14 @@ import { DIRECTORY, withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { importAsset } from '../../redux/data-layer'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
 import { selectAssetCatalog } from '../../redux/app'
+import { getRandomMnemonic } from './utils'
 
 const ONE_MB_IN_BYTES = 1_048_576
 const ONE_GB_IN_BYTES = ONE_MB_IN_BYTES * 1024
+const ACCEPTED_FILE_TYPES = {
+  'model/gltf-binary': ['.gltf', '.glb'],
+  'image/png': ['.png']
+}
 
 interface PropTypes {
   onSave(): void
@@ -61,6 +66,20 @@ async function validateGltf(data: ArrayBuffer): Promise<ValidationError> {
   }
 }
 
+async function validateAsset(extension: string, data: ArrayBuffer): Promise<ValidationError> {
+  switch (extension) {
+    case 'glb':
+    case 'gltf':
+      return validateGltf(data)
+    // add validators for .png/.ktx2?
+    case 'png':
+    case 'ktx2':
+      return null
+    default:
+      return `Invalid asset format ".${extension}"`
+  }
+}
+
 const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
   // TODO: multiple files
   const dispatch = useAppDispatch()
@@ -96,9 +115,9 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
         return
       }
 
-      const gltfValidationError = await validateGltf(binary)
-      if (gltfValidationError !== null) {
-        setValidationError(gltfValidationError)
+      const validationError = await validateAsset(assetExtension, binary)
+      if (validationError !== null) {
+        setValidationError(validationError)
         return
       }
 
@@ -127,22 +146,34 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
     setAssetName(event.target.value)
   }, [])
 
-  const invalidName = !!assets.find((asset) => {
-    const [packageName, otherAssetName] = removeBasePath(basePath, asset.path).split('/')
-    if (packageName === 'builder') return false
-    else return otherAssetName?.toLocaleLowerCase() === assetName?.toLocaleLowerCase() + '.' + assetExtension
-  })
+  const isValidName = useCallback((name: string, ext: string) => {
+    return !assets.find((asset) => {
+      const [packageName, otherAssetName] = removeBasePath(basePath, asset.path).split('/')
+      if (packageName === 'builder') return false
+      return otherAssetName?.toLocaleLowerCase() === name?.toLocaleLowerCase() + '.' + ext
+    })
+  }, [])
+
+  const invalidName = !isValidName(assetName, assetExtension)
+
+  const generateAssetName = useCallback(() => {
+    let name: string = assetName
+    while (!isValidName(name, assetExtension)) {
+      name = getRandomMnemonic()
+    }
+    setAssetName(name)
+  }, [assetName])
 
   return (
     <div className="ImportAsset">
-      <FileInput disabled={!!file} onDrop={handleDrop} accept={{ 'model/gltf-binary': ['.gltf', '.glb'] }}>
+      <FileInput disabled={!!file} onDrop={handleDrop} accept={ACCEPTED_FILE_TYPES}>
         {!file && (
           <>
             <div className="upload-icon">
               <HiOutlineUpload />
             </div>
             <span>
-              To import an asset drag and drop a single GLB or GLTF file
+              To import an asset drag and drop a single GLB/GLTF/PNG file
               <br /> or click to select a file.
             </span>
           </>
@@ -156,9 +187,14 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
               <IoIosImage />
               <div className="file-title">{file.name}</div>
             </Container>
-            <div className={classNames({ error: !!invalidName })}>
+            <div className={classNames({ error: invalidName })}>
               <Block label="Asset name">
-                <TextField label="" value={assetName} onChange={handleNameChange} />
+                <TextField value={assetName} onChange={handleNameChange} />
+                {invalidName && (
+                  <div onClick={generateAssetName}>
+                    <RxReload />
+                  </div>
+                )}
               </Block>
               <Button disabled={invalidName || !!validationError} onClick={handleSave}>
                 Import

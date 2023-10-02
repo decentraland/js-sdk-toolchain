@@ -6,7 +6,7 @@ import { PropTypes } from './types'
 function parseAccept(accept: PropTypes['accept']) {
   let value = ''
   for (const [key, values] of Object.entries(accept ?? {})) {
-    value += `${key},${values.join(',')}`
+    value += `${key},${values.join(',')},`
   }
   return value
 }

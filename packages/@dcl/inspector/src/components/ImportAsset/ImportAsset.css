@@ -79,6 +79,7 @@
   overflow: hidden;
   white-space: nowrap;
   width: inherit;
+  text-align: center;
 }
 
 .ImportAsset .file-container {
