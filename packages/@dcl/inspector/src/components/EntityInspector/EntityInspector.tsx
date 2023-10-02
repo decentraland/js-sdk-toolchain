@@ -19,7 +19,6 @@ import { SceneInspector } from './SceneInspector'
 import { TextShapeInspector } from './TextShapeInspector'
 import { TransformInspector } from './TransformInspector'
 import { StatesInspector } from './StatesInspector'
-import { TweenInspector } from './TweenInspector'
 
 import './EntityInspector.css'
 
@@ -60,8 +59,7 @@ export const EntityInspector = withSdk(({ sdk }) => {
       { name: sdk.components.Transform.componentName, component: TransformInspector },
       { name: sdk.components.Actions.componentName, component: ActionInspector },
       { name: sdk.components.Triggers.componentName, component: TriggerInspector },
-      { name: sdk.components.States.componentName, component: StatesInspector },
-      { name: sdk.components.Tweens.componentName, component: TweenInspector }
+      { name: sdk.components.States.componentName, component: StatesInspector }
     ],
     [sdk]
   )

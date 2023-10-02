@@ -6,8 +6,7 @@ import {
   States,
   Trigger,
   ActionTypes,
-  createComponents as createAssetPacksComponents,
-  Tween
+  createComponents as createAssetPacksComponents
 } from '@dcl/asset-packs'
 import { Layout } from '../../utils/layout'
 import { GizmoType } from '../../utils/gizmo'
@@ -33,7 +32,6 @@ export enum EditorComponentNames {
   Actions = ComponentName.ACTIONS,
   Triggers = ComponentName.TRIGGERS,
   States = ComponentName.STATES,
-  Tweens = ComponentName.TWEENS,
   TransformConfig = 'inspector::TransformConfig'
 }
 
@@ -46,7 +44,6 @@ export type EditorComponentsTypes = {
   Triggers: { value: Trigger[] }
   States: States
   ActionTypes: ActionTypes
-  Tweens: { value: Tween[] }
 }
 
 export type EditorComponents = {
@@ -58,7 +55,6 @@ export type EditorComponents = {
   Actions: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Actions']>
   Triggers: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Triggers']>
   States: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['States']>
-  Tweens: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Tweens']>
 }
 
 export type SdkComponents = {
@@ -122,7 +118,7 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     )
   })
 
-  const { ActionTypes, Actions, Triggers, States, Tweens } = createAssetPacksComponents(engine as any)
+  const { ActionTypes, Actions, Triggers, States } = createAssetPacksComponents(engine as any)
 
   const TransformConfig = engine.defineComponent(EditorComponentNames.TransformConfig, {
     porportionalScaling: Schemas.Optional(Schemas.Boolean)
@@ -138,7 +134,6 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     >,
     Actions: Actions as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Actions']>,
     Triggers: Triggers as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Triggers']>,
-    States: States as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['States']>,
-    Tweens: Tweens as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Tweens']>
+    States: States as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['States']>
   }
 }
