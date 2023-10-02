@@ -14,7 +14,7 @@ export type BuilderAsset = Drop<Asset>
 export type IDrop = ProjectAssetDrop | BuilderAsset
 
 export enum DropTypesEnum {
-  ProjectAsset = 'project-asset-gltf',
+  ProjectAsset = 'project-asset',
   BuilderAsset = 'builder-asset'
 }
 
@@ -26,7 +26,7 @@ export function isDropType<T extends IDrop>(_: IDrop, identifier: Identifier | n
 
 export const DROP_TYPES = Object.values(DropTypesEnum)
 
-export const getModel = (
+export const getNode = (
   node: TreeNode,
   tree: Map<string, TreeNode>,
   isFn: (node: TreeNode) => node is AssetNodeItem

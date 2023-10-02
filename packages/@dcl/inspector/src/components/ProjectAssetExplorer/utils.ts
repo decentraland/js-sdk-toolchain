@@ -12,6 +12,8 @@ export function buildAssetTree(paths: string[]): AssetNodeFolder {
     const parts = path.split('/').filter((item) => item.length > 0)
     let currentNode = root
 
+    console.log('paths', paths)
+
     for (let i = 0; i < parts.length; i++) {
       let childNode = currentNode.children.find((child) => child.name === parts[i])
       if (!childNode) {
@@ -22,7 +24,12 @@ export function buildAssetTree(paths: string[]): AssetNodeFolder {
           currentNode = childNode
         } else {
           const lowerPath = path.toLowerCase()
-          const assetType = lowerPath.endsWith('.gltf') || lowerPath.endsWith('.glb') ? 'gltf' : 'unknown'
+          const assetType =
+            lowerPath.endsWith('.gltf') || lowerPath.endsWith('.glb')
+              ? 'gltf'
+              : lowerPath.endsWith('.mp3') || lowerPath.endsWith('.ogg') || lowerPath.endsWith('.wav')
+              ? 'audio'
+              : 'unknown'
           childNode = {
             name: parts[i],
             parent: currentNode,

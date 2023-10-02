@@ -7,11 +7,11 @@ import { SelectField } from '../../SelectField'
 import { TextField } from '../../TextField'
 import { Container } from '../../../Container'
 import { Props, Texture, TEXTURE_TYPES, WRAP_MODES, FILTER_MODES } from './types'
-import { ProjectAssetDrop, getModel } from '../../../../lib/sdk/drag-drop'
+import { ProjectAssetDrop, getNode } from '../../../../lib/sdk/drag-drop'
 import { AssetNodeItem } from '../../../ProjectAssetExplorer/types'
 import { isModel, isValidTexture } from './utils'
 
-const DROP_TYPES = ['project-asset-gltf']
+const DROP_TYPES = ['project-asset']
 
 function TextureInspector({ label, texture, files, getInputProps }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
@@ -30,12 +30,12 @@ function TextureInspector({ label, texture, files, getInputProps }: Props) {
       drop: ({ value, context }: ProjectAssetDrop, monitor) => {
         if (monitor.didDrop()) return
         const node = context.tree.get(value)!
-        const model = getModel(node, context.tree, isModel)
+        const model = getNode(node, context.tree, isModel)
         if (model) changeValue(model)
       },
       canDrop: ({ value, context }: ProjectAssetDrop) => {
         const node = context.tree.get(value)!
-        return !!getModel(node, context.tree, isModel)
+        return !!getNode(node, context.tree, isModel)
       },
       collect: (monitor) => ({
         isHover: monitor.canDrop() && monitor.isOver()

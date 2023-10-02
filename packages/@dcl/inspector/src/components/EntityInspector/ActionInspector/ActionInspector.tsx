@@ -47,7 +47,7 @@ function getPartialPayload<T extends ActionType>(action: Action) {
 
 export default withSdk<Props>(
   withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId, contextMenuId }) => {
-    const { Actions, States, Counter } = sdk.components
+    const { Actions, States, Counter, AudioSource } = sdk.components
     const [componentValue, setComponentValue, isComponentEqual] = useComponentValue<EditorComponentsTypes['Actions']>(
       entityId,
       Actions
@@ -63,6 +63,7 @@ export default withSdk<Props>(
     const hasActions = useHasComponent(entityId, Actions)
     const hasStates = useHasComponent(entityId, States)
     const hasCounter = useHasComponent(entityId, Counter)
+    const hasAudioSource = useHasComponent(entityId, AudioSource)
 
     useChange(
       (event, sdk) => {
@@ -171,7 +172,8 @@ export default withSdk<Props>(
         [ActionType.SET_STATE]: () => hasStates,
         [ActionType.INCREMENT_COUNTER]: () => hasCounter,
         [ActionType.DECREASE_COUNTER]: () => hasCounter,
-        [ActionType.SET_COUNTER]: () => hasCounter
+        [ActionType.SET_COUNTER]: () => hasCounter,
+        [ActionType.PLAY_SOUND]: () => hasAudioSource
       }),
       [hasAnimations, hasStates]
     )

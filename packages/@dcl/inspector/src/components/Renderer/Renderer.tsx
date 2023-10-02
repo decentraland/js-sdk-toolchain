@@ -6,7 +6,7 @@ import { Vector3 } from '@babylonjs/core'
 import { withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
 import { importAsset } from '../../redux/data-layer'
-import { getModel, BuilderAsset, DROP_TYPES, IDrop, ProjectAssetDrop, isDropType } from '../../lib/sdk/drag-drop'
+import { getNode, BuilderAsset, DROP_TYPES, IDrop, ProjectAssetDrop, isDropType } from '../../lib/sdk/drag-drop'
 import { useRenderer } from '../../hooks/sdk/useRenderer'
 import { useSdk } from '../../hooks/sdk/useSdk'
 import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
@@ -133,9 +133,9 @@ const Renderer: React.FC = () => {
           return
         }
 
-        if (isDropType<ProjectAssetDrop>(item, itemType, 'project-asset-gltf')) {
+        if (isDropType<ProjectAssetDrop>(item, itemType, 'project-asset')) {
           const node = item.context.tree.get(item.value)!
-          const model = getModel(node, item.context.tree, isModel)
+          const model = getNode(node, item.context.tree, isModel)
           if (model) {
             const position = await getDropPosition()
             await addAsset(model, position)

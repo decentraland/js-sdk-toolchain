@@ -2,7 +2,7 @@ import { ComponentName } from '@dcl/asset-packs'
 
 export interface IAsset {
   src: string
-  type: 'unknown' | 'gltf' | 'composite'
+  type: 'unknown' | 'gltf' | 'composite' | 'audio'
   thumbnail?: string
 }
 
