@@ -27,13 +27,14 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
     position: Vector3.create(2, 1.5, 8)
   })
   SyncComponents.create(platform1, { componentIds: [Tween.componentId] })
+
   Tween.create(platform1, {
-    mode: { $case: 'move', move: { start: Vector3.create(2, 1.5, 6.5), end: Vector3.create(2, 1.5, 12) } },
+    mode: Tween.Mode.Move({ start: Vector3.create(2, 1.5, 6.5), end: Vector3.create(2, 1.5, 12) }),
     duration: 4000,
     tweenFunction: EasingFunction.TF_LINEAR
   })
-  TweenSequence.create(platform1, { loop: true, sequence: [] })
 
+  TweenSequence.create(platform1, { loop: true, sequence: [] })
   // // only vertical
   const platform2 = networkedEntityFactory.addEntity(engine)
   GltfContainer.create(platform2, {
@@ -43,7 +44,7 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
   Transform.create(platform2, { position: Vector3.create(4, 1.5, 14) })
   SyncComponents.create(platform2, { componentIds: [Tween.componentId] })
   Tween.create(platform2, {
-    mode: { $case: 'move', move: { start: Vector3.create(4, 1.5, 14), end: Vector3.create(4, 4, 14) } },
+    mode: Tween.Mode.Move({ start: Vector3.create(4, 1.5, 14), end: Vector3.create(4, 4, 14) }),
     duration: 4000,
     tweenFunction: EasingFunction.TF_LINEAR
   })
@@ -58,7 +59,7 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
   })
   SyncComponents.create(platform3, { componentIds: [Tween.componentId] })
   Tween.create(platform3, {
-    mode: { $case: 'move', move: { start: Vector3.create(14, 4, 12), end: Vector3.create(14, 4, 4) } },
+    mode: Tween.Mode.Move({ start: Vector3.create(14, 4, 12), end: Vector3.create(14, 4, 4) }),
     duration: 5000,
     tweenFunction: EasingFunction.TF_LINEAR
   })
@@ -77,22 +78,22 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
   const tween = Tween.create(platform4, {
     duration: 4000,
     tweenFunction: EasingFunction.TF_LINEAR,
-    mode: { $case: 'move', move: { start: Vector3.create(6.5, 7, 4), end: Vector3.create(6.5, 7, 12) } }
+    mode: Tween.Mode.Move({ start: Vector3.create(6.5, 7, 4), end: Vector3.create(6.5, 7, 12) })
   })
 
   TweenSequence.create(platform4, {
     sequence: [
       {
         ...tween,
-        mode: { $case: 'move', move: { start: Vector3.create(6.5, 7, 12), end: Vector3.create(6.5, 10.5, 12) } }
+        mode: Tween.Mode.Move({ start: Vector3.create(6.5, 7, 12), end: Vector3.create(6.5, 10.5, 12) })
       },
       {
         ...tween,
-        mode: { $case: 'move', move: { start: Vector3.create(6.5, 10.5, 12), end: Vector3.create(6.5, 10.5, 4) } }
+        mode: Tween.Mode.Move({ start: Vector3.create(6.5, 10.5, 12), end: Vector3.create(6.5, 10.5, 4) })
       },
       {
         ...tween,
-        mode: { $case: 'move', move: { start: Vector3.create(6.5, 10.5, 4), end: Vector3.create(6.5, 7, 4) } }
+        mode: Tween.Mode.Move({ start: Vector3.create(6.5, 10.5, 4), end: Vector3.create(6.5, 7, 4) })
       }
     ],
     loop: true
@@ -106,10 +107,10 @@ void isServer({}).then(({ isServer }) => {
 
 function testingSystem() {
   for (const [entity, _tween] of engine.getEntitiesWith(Tween)) {
-    if (tweenUtils.tweenCompleted(entity)) {
+    if (tweenSystem.tweenCompleted(entity)) {
       console.log('[TestingSystem]: tween completed', entity)
     }
-    if (tweenUtils.tweenChanged(entity)) {
+    if (tweenSystem.tweenChanged(entity)) {
       console.log('[TestingSystem]: tween changed', entity)
     }
   }
@@ -117,9 +118,9 @@ function testingSystem() {
 
 // 2- Helpers TweenMove, TweenRotate
 // 3- Perpetual motion
-const tweenUtils = TweenUtils()
+const tweenSystem = TweenSystem()
 
-function TweenUtils() {
+function TweenSystem() {
   // Used to detect new tweens for the same entity and reset the frames & completed values
   const cacheTween = new Map<Entity, PBTween>()
 
@@ -197,7 +198,10 @@ function TweenUtils() {
 
   function backwardsTween(tween: PBTween): PBTween {
     if (tween.mode?.$case === 'move' && tween.mode.move) {
-      return { ...tween, mode: { ...tween.mode, move: { start: tween.mode.move.end, end: tween.mode.move.start } } }
+      return {
+        ...tween,
+        mode: { ...tween.mode, move: { start: tween.mode.move.end, end: tween.mode.move.start } }
+      }
     }
     if (tween.mode?.$case === 'rotate' && tween.mode.rotate) {
       return {

@@ -3762,8 +3762,25 @@ export type Transport = {
 // @public (undocumented)
 export type TransportMessage = Omit<ReceiveMessage, 'data'>;
 
+// Warning: (ae-missing-release-tag) "Tween" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const Tween: LastWriteWinElementSetComponentDefinition<PBTween>;
+export const Tween: TweenComponentDefinitionExtended;
+
+// @public (undocumented)
+export interface TweenComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBTween> {
+    Mode: TweenHelper;
+}
+
+// @public (undocumented)
+export interface TweenHelper {
+    // (undocumented)
+    Move: (move: Move) => PBTween['mode'];
+    // (undocumented)
+    Rotate: (rotate: Rotate) => PBTween['mode'];
+    // (undocumented)
+    Scale: (scale: Scale) => PBTween['mode'];
+}
 
 // @public (undocumented)
 export const TweenSequence: LastWriteWinElementSetComponentDefinition<PBTweenSequence>;
