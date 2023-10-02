@@ -15,7 +15,12 @@ const getEnabledComponents = () => {
   const config = getConfig()
 
   if (!config.disableSmartItems) {
-    for (const component of [ComponentName.STATES, ComponentName.ACTIONS, ComponentName.TRIGGERS]) {
+    for (const component of [
+      ComponentName.STATES,
+      ComponentName.ACTIONS,
+      ComponentName.TRIGGERS,
+      ComponentName.TWEENS
+    ]) {
       components.add(component)
     }
   }
