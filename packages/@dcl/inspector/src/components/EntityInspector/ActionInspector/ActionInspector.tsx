@@ -9,8 +9,7 @@ import {
   getPayload,
   getJson,
   ActionPayload,
-  getActionSchema,
-  Tween
+  getActionSchema
 } from '@dcl/asset-packs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
@@ -32,6 +31,7 @@ import MoreOptionsMenu from '../MoreOptionsMenu'
 import { AddButton } from '../AddButton'
 import { Button } from '../../Button'
 
+import { TweenAction } from './TweenAction'
 import { Props } from './types'
 
 import './ActionInspector.css'
@@ -46,7 +46,7 @@ function getPartialPayload<T extends ActionType>(action: Action) {
 
 export default withSdk<Props>(
   withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId, contextMenuId }) => {
-    const { Actions, States, Tweens } = sdk.components
+    const { Actions, States } = sdk.components
     const [componentValue, setComponentValue, isComponentEqual] = useComponentValue<EditorComponentsTypes['Actions']>(
       entityId,
       Actions
@@ -58,11 +58,9 @@ export default withSdk<Props>(
     const [isFocused, setIsFocused] = useState(false)
     const [isLoaded, setIsLoaded] = useState(false)
     const [states, setStates] = useState<string[]>(States.getOrNull(entityId)?.value || [])
-    const [tweens] = useState<Tween[]>((Tweens.getOrNull(entityId)?.value as Tween[]) || [])
 
     const hasActions = useHasComponent(entityId, Actions)
     const hasStates = useHasComponent(entityId, States)
-    const hasTweens = useHasComponent(entityId, Tweens)
 
     useChange(
       (event, sdk) => {
@@ -91,6 +89,10 @@ export default withSdk<Props>(
           case ActionType.SET_STATE: {
             const payload = getPartialPayload<ActionType.SET_STATE>(action)
             return !!payload.state
+          }
+          case ActionType.START_TWEEN: {
+            const payload = getPartialPayload<ActionType.START_TWEEN>(action)
+            return !!payload
           }
           default: {
             try {
@@ -146,6 +148,10 @@ export default withSdk<Props>(
     const hasAnimations = useMemo(() => {
       return animations.length > 0
     }, [animations])
+
+    const hasTweens = useMemo(() => {
+      return actions.some((action) => action.type === ActionType.START_TWEEN)
+    }, [actions])
 
     // actions that may only be available under certain circumstances
     const conditionalActions: Partial<Record<string, () => boolean>> = useMemo(
@@ -216,14 +222,12 @@ export default withSdk<Props>(
     )
 
     const handleChangeTween = useCallback(
-      ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
+      (tween: ActionPayload['start_tween'], idx: number) => {
         setActions((prev: Action[]) => {
           const data = [...prev]
           data[idx] = {
             ...data[idx],
-            jsonPayload: getJson<ActionType.START_TWEEN>({
-              tween: value
-            })
+            jsonPayload: getJson<ActionType.START_TWEEN>(tween)
           }
           return data
         })
@@ -359,19 +363,10 @@ export default withSdk<Props>(
         }
         case ActionType.START_TWEEN: {
           return hasTweens ? (
-            <div className="row">
-              <div className="field">
-                <label>Select Tween {renderSelectAnimationMoreInfo()}</label>
-                <Dropdown
-                  options={[
-                    { value: '', text: 'Select a Tween' },
-                    ...tweens.map((tween) => ({ text: tween.name, value: tween.name }))
-                  ]}
-                  value={getPartialPayload<ActionType.START_TWEEN>(action)?.tween}
-                  onChange={(e) => handleChangeTween(e, idx)}
-                />
-              </div>
-            </div>
+            <TweenAction
+              tween={getPartialPayload<ActionType.START_TWEEN>(action)}
+              onUpdateTween={(tween: ActionPayload['start_tween']) => handleChangeTween(tween, idx)}
+            />
           ) : null
         }
         default: {

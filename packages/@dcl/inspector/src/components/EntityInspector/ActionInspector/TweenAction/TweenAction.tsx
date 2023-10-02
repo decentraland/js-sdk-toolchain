@@ -8,40 +8,41 @@ import { RangeField } from '../../RangeField'
 import { TextField } from '../../TextField'
 import type { Props } from './types'
 
-import './TweenAction.css'
-
 export const TweenAction = ({ tween, onUpdateTween }: Props) => {
   const handleChangeType = useCallback(
-    (e: any) => {
-      onUpdateTween({ ...tween, type: e.target.value })
+    ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
+      onUpdateTween({ ...tween, type: value })
     },
     [tween, onUpdateTween]
   )
 
   const handleChangeEndPosition = useCallback(
-    (e: any, axis: any) => {
-      onUpdateTween({ ...tween, end: { ...tween.end, [axis]: e.target.value } })
+    (e: React.ChangeEvent<HTMLElement>, axis: string) => {
+      const { value } = e.target as HTMLInputElement
+      onUpdateTween({ ...tween, end: { ...tween.end, [axis]: value } })
     },
     [tween, onUpdateTween]
   )
 
   const handleChangeRelative = useCallback(
-    (e: any) => {
-      onUpdateTween({ ...tween, relative: e.target.checked })
+    (e: React.ChangeEvent<HTMLElement>) => {
+      const { checked } = e.target as HTMLInputElement
+      onUpdateTween({ ...tween, relative: checked })
     },
     [tween, onUpdateTween]
   )
 
   const handleChangeInterpolationType = useCallback(
-    (e: any) => {
-      onUpdateTween({ ...tween, interpolationType: e.target.value })
+    ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
+      onUpdateTween({ ...tween, interpolationType: value })
     },
     [tween, onUpdateTween]
   )
 
   const handleChangeDuration = useCallback(
-    (e: any) => {
-      onUpdateTween({ ...tween, duration: e.target.value })
+    (e: React.ChangeEvent<HTMLElement>) => {
+      const { value } = e.target as HTMLInputElement
+      onUpdateTween({ ...tween, duration: value })
     },
     [tween, onUpdateTween]
   )
@@ -140,8 +141,10 @@ export const TweenAction = ({ tween, onUpdateTween }: Props) => {
         </div>
       </div>
       <div className="row">
-        <input type="checkbox" checked={tween.relative} onChange={handleChangeRelative} />
-        <label>Relative {renderRelativeInfo()}</label>
+        <div className="field relative">
+          <input type="checkbox" checked={tween.relative} onChange={handleChangeRelative} />
+          <label>Relative {renderRelativeInfo()}</label>
+        </div>
       </div>
       <div className="row">
         <div className="field">

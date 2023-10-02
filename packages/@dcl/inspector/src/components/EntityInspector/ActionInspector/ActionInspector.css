@@ -29,7 +29,7 @@
 }
 
 .ActionInspector > .content > .Block > .content .row .DropdownContainer label,
-.ActionInspector > .content > .Block > .content .row .field label {
+.ActionInspector > .content > .Block > .content .row .field > label {
   margin: 0px 0px 6px 0px;
   color: var(--text);
   font-size: 12px;
@@ -45,6 +45,10 @@
 
 .ActionInspector > .content > .Block > .content .row .field .TextField {
   width: 100%;
+}
+
+.ActionInspector > .content > .Block > .content .row .field.duration .TextField {
+  width: 40px;
 }
 
 .ActionInspector .content .RemoveButton {
@@ -75,4 +79,24 @@
 
 .ActionInspector .content .Block .content .MoreOptionsMenu .MoreOptionsContent {
   min-width: 140px;
+}
+
+.ActionInspector .content .Block .content > .TweenActionContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.ActionInspector > .content > .Block > .content > .TweenActionContainer > .row .field.relative {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.ActionInspector > .content > .Block > .content > .TweenActionContainer > .row .field.relative input[type='checkbox'] {
+  margin-right: 9px;
+}
+
+.ActionInspector > .content > .Block > .content > .TweenActionContainer > .row .field.relative label {
+  margin-bottom: 0;
 }
