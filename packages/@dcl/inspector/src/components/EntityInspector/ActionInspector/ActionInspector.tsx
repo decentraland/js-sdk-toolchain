@@ -44,6 +44,10 @@ function getPartialPayload<T extends ActionType>(action: Action) {
   return getPayload<T>(action) as Partial<ActionPayload<T>>
 }
 
+function isValidTween(tween: ActionPayload['start_tween']) {
+  return !!tween.type && !!tween.end && !!tween.relative && !!tween.interpolationType && !!tween.duration
+}
+
 export default withSdk<Props>(
   withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId, contextMenuId }) => {
     const { Actions, States } = sdk.components
@@ -92,7 +96,7 @@ export default withSdk<Props>(
           }
           case ActionType.START_TWEEN: {
             const payload = getPartialPayload<ActionType.START_TWEEN>(action)
-            return !!payload
+            return !!payload && isValidTween(payload)
           }
           default: {
             try {
