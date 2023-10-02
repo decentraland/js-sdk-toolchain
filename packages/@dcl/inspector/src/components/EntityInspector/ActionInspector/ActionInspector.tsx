@@ -9,7 +9,8 @@ import {
   getPayload,
   getJson,
   ActionPayload,
-  getActionSchema
+  getActionSchema,
+  Tween
 } from '@dcl/asset-packs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
@@ -45,7 +46,7 @@ function getPartialPayload<T extends ActionType>(action: Action) {
 
 export default withSdk<Props>(
   withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId, contextMenuId }) => {
-    const { Actions, States } = sdk.components
+    const { Actions, States, Tweens } = sdk.components
     const [componentValue, setComponentValue, isComponentEqual] = useComponentValue<EditorComponentsTypes['Actions']>(
       entityId,
       Actions
@@ -57,9 +58,11 @@ export default withSdk<Props>(
     const [isFocused, setIsFocused] = useState(false)
     const [isLoaded, setIsLoaded] = useState(false)
     const [states, setStates] = useState<string[]>(States.getOrNull(entityId)?.value || [])
+    const [tweens] = useState<Tween[]>((Tweens.getOrNull(entityId)?.value as Tween[]) || [])
 
     const hasActions = useHasComponent(entityId, Actions)
     const hasStates = useHasComponent(entityId, States)
+    const hasTweens = useHasComponent(entityId, Tweens)
 
     useChange(
       (event, sdk) => {
@@ -148,9 +151,10 @@ export default withSdk<Props>(
     const conditionalActions: Partial<Record<string, () => boolean>> = useMemo(
       () => ({
         [ActionType.PLAY_ANIMATION]: () => hasAnimations,
-        [ActionType.SET_STATE]: () => hasStates
+        [ActionType.SET_STATE]: () => hasStates,
+        [ActionType.START_TWEEN]: () => hasTweens
       }),
-      [hasAnimations, hasStates]
+      [hasAnimations, hasStates, hasTweens]
     )
 
     const allActions = useMemo(() => {
@@ -203,6 +207,22 @@ export default withSdk<Props>(
             ...data[idx],
             jsonPayload: getJson<ActionType.SET_STATE>({
               state: value
+            })
+          }
+          return data
+        })
+      },
+      [setActions]
+    )
+
+    const handleChangeTween = useCallback(
+      ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
+        setActions((prev: Action[]) => {
+          const data = [...prev]
+          data[idx] = {
+            ...data[idx],
+            jsonPayload: getJson<ActionType.START_TWEEN>({
+              tween: value
             })
           }
           return data
@@ -332,6 +352,23 @@ export default withSdk<Props>(
                   ]}
                   value={getPartialPayload<ActionType.SET_STATE>(action)?.state}
                   onChange={(e) => handleChangeState(e, idx)}
+                />
+              </div>
+            </div>
+          ) : null
+        }
+        case ActionType.START_TWEEN: {
+          return hasTweens ? (
+            <div className="row">
+              <div className="field">
+                <label>Select Tween {renderSelectAnimationMoreInfo()}</label>
+                <Dropdown
+                  options={[
+                    { value: '', text: 'Select a Tween' },
+                    ...tweens.map((tween) => ({ text: tween.name, value: tween.name }))
+                  ]}
+                  value={getPartialPayload<ActionType.START_TWEEN>(action)?.tween}
+                  onChange={(e) => handleChangeTween(e, idx)}
                 />
               </div>
             </div>
