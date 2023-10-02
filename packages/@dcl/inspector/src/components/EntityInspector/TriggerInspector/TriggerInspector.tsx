@@ -65,6 +65,8 @@ export default withSdk<Props>(
     )
 
     const hasTriggers = useHasComponent(entityId, Triggers)
+    const hasStates = useHasComponent(entityId, States)
+    const hasCounter = useHasComponent(entityId, Counter)
 
     const areValidActions = useCallback(
       (updatedActions: TriggerAction[]) =>
@@ -113,6 +115,17 @@ export default withSdk<Props>(
         return actions
       }, new Map<number, { name: string; actions: Action[] }>())
     }, [entitiesWithAction])
+
+    const availableTriggers = useMemo(() => {
+      const triggerTypes: TriggerType[] = [TriggerType.ON_SPAWN, TriggerType.ON_CLICK]
+      if (hasStates) {
+        triggerTypes.push(TriggerType.ON_STATE_CHANGE)
+      }
+      if (hasCounter) {
+        triggerTypes.push(TriggerType.ON_COUNTER_CHANGE)
+      }
+      return triggerTypes
+    }, [hasStates, hasCounter])
 
     const availableStates: Map<number, { name: string; states: States['value'] }> = useMemo(() => {
       return entitiesWithStates?.reduce((states, entityWithState) => {
@@ -292,6 +305,7 @@ export default withSdk<Props>(
             <TriggerEvent
               key={`trigger-${triggerIdx}`}
               trigger={trigger}
+              availableTriggers={availableTriggers}
               onChangeTriggerType={(e) => handleChangeType(e, triggerIdx)}
               onAddNewTriggerAction={(e) => handleAddNewTriggerAction(e, triggerIdx)}
               onAddNewTriggerCondition={(e) => handleAddNewTriggerCondition(e, triggerIdx)}

@@ -1,5 +1,6 @@
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
+import { ROOT } from '../../../lib/sdk/tree'
 import { withSdk } from '../../../hoc/withSdk'
 import { Container } from '../../Container'
 import { TextField } from '../TextField'
@@ -14,7 +15,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
   const hasCounter = useHasComponent(entity, Counter)
   const { getInputProps } = useComponentInput(entity, Counter, fromCounter, toCounter, isValidInput)
 
-  if (!hasCounter) {
+  if (!hasCounter || entity === ROOT) {
     return null
   }
 

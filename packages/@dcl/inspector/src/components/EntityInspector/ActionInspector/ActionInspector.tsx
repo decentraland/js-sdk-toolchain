@@ -131,8 +131,8 @@ export default withSdk<Props>(
     )
 
     useEffect(() => {
-      const current = sdk.components.Actions.get(entityId)
       if (areValidActions(actions)) {
+        const current = sdk.components.Actions.get(entityId)
         if (isComponentEqual({ ...current, value: actions }) || isFocused) {
           return
         }
@@ -168,7 +168,10 @@ export default withSdk<Props>(
     const conditionalActions: Partial<Record<string, () => boolean>> = useMemo(
       () => ({
         [ActionType.PLAY_ANIMATION]: () => hasAnimations,
-        [ActionType.SET_STATE]: () => hasStates
+        [ActionType.SET_STATE]: () => hasStates,
+        [ActionType.INCREMENT_COUNTER]: () => hasCounter,
+        [ActionType.DECREASE_COUNTER]: () => hasCounter,
+        [ActionType.SET_COUNTER]: () => hasCounter
       }),
       [hasAnimations, hasStates]
     )
