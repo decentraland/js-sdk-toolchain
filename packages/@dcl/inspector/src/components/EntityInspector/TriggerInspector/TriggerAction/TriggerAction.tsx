@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect } from 'react'
 import { VscTrash as RemoveIcon } from 'react-icons/vsc'
-import { Entity } from '@dcl/ecs'
 import { TriggerAction } from '@dcl/asset-packs'
 
 import { useArrayState } from '../../../../hooks/useArrayState'
@@ -25,7 +24,7 @@ export const TriggerActionContainer = ({ trigger, availableActions, onUpdateActi
 
   const handleAddNewAction = useCallback(
     (_: React.MouseEvent) => {
-      addActions({ entity: undefined, name: '' })
+      addActions({ id: undefined, name: '' })
     },
     [addActions]
   )
@@ -34,7 +33,7 @@ export const TriggerActionContainer = ({ trigger, availableActions, onUpdateActi
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
       modifyActions(idx, {
         ...actions[idx],
-        entity: parseInt(value) as Entity
+        id: parseInt(value)
       })
     },
     [actions, modifyActions]
@@ -66,32 +65,24 @@ export const TriggerActionContainer = ({ trigger, availableActions, onUpdateActi
         </div>
       </div>
       {actions.map((action, idx) => {
+        const entities = Array.from(availableActions).map(([entity, { name }]) => {
+          return { value: entity, text: name }
+        })
+        const actions = action.id
+          ? (availableActions.get(action.id)?.actions ?? []).map(({ name }) => ({ value: name, text: name }))
+          : []
         return (
           <div className="TriggerAction" key={`trigger-action-${idx}`}>
             <Dropdown
-              options={
-                availableActions
-                  ? [
-                      { value: '', text: 'Select an Entity' },
-                      ...Array.from(availableActions).map(([entity, { name }]) => {
-                        return { value: entity, text: name }
-                      })
-                    ]
-                  : []
-              }
-              value={action.entity}
+              options={availableActions ? [{ value: '', text: 'Select an Entity' }, ...entities] : []}
+              value={action.id}
               onChange={(e) => handleChangeEntity(e, idx)}
             />
             <Dropdown
-              disabled={!action.entity || !availableActions.get(action.entity)}
+              disabled={!action.id || !availableActions.get(action.id)}
               options={
-                action.entity && availableActions.get(action.entity)?.action
-                  ? [
-                      { value: '', text: 'Select an Action' },
-                      ...(availableActions.get(action.entity)?.action ?? []).map(({ name }) => {
-                        return { value: name, text: name }
-                      })
-                    ]
+                action.id && availableActions.get(action.id)?.actions
+                  ? [{ value: '', text: 'Select an Action' }, ...actions]
                   : []
               }
               value={action.name}
