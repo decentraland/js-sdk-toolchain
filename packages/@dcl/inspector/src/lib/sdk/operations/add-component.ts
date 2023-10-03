@@ -2,7 +2,7 @@ import { Entity, IEngine } from '@dcl/ecs'
 import { isLastWriteWinComponent } from '../../../hooks/sdk/useComponentValue'
 import { ComponentName, getNextId } from '@dcl/asset-packs'
 
-const withId: string[] = [ComponentName.ACTIONS, ComponentName.STATES, ComponentName.COUNTER]
+export const withId: string[] = [ComponentName.ACTIONS, ComponentName.STATES, ComponentName.COUNTER]
 
 export function addComponent(engine: IEngine) {
   return function addComponent(entity: Entity, componentId: number) {
