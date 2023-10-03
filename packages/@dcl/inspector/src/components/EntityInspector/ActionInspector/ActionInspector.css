@@ -101,9 +101,3 @@
 .ActionInspector > .content > .Block > .content > .TweenActionContainer > .row .field.relative label {
   margin-bottom: 0;
 }
-
-.ActionInspector>.content>.Block>.content>.PlaySoundActionContainer {
-  width: 100%;
-}
-
-.aas {}
