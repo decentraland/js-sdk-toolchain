@@ -31,6 +31,8 @@ import MoreOptionsMenu from '../MoreOptionsMenu'
 import { AddButton } from '../AddButton'
 import { Button } from '../../Button'
 
+import { TweenAction } from './TweenAction'
+import { isValidTween } from './TweenAction/utils'
 import { Props } from './types'
 
 import './ActionInspector.css'
@@ -88,6 +90,10 @@ export default withSdk<Props>(
           case ActionType.SET_STATE: {
             const payload = getPartialPayload<ActionType.SET_STATE>(action)
             return !!payload.state
+          }
+          case ActionType.START_TWEEN: {
+            const payload = getPartialPayload<ActionType.START_TWEEN>(action)
+            return !!payload && isValidTween(payload)
           }
           default: {
             try {
@@ -204,6 +210,20 @@ export default withSdk<Props>(
             jsonPayload: getJson<ActionType.SET_STATE>({
               state: value
             })
+          }
+          return data
+        })
+      },
+      [setActions]
+    )
+
+    const handleChangeTween = useCallback(
+      (tween: ActionPayload['start_tween'], idx: number) => {
+        setActions((prev: Action[]) => {
+          const data = [...prev]
+          data[idx] = {
+            ...data[idx],
+            jsonPayload: getJson<ActionType.START_TWEEN>(tween)
           }
           return data
         })
@@ -337,6 +357,14 @@ export default withSdk<Props>(
             </div>
           ) : null
         }
+        case ActionType.START_TWEEN: {
+          return (
+            <TweenAction
+              tween={getPartialPayload<ActionType.START_TWEEN>(action)}
+              onUpdateTween={(tween: ActionPayload['start_tween']) => handleChangeTween(tween, idx)}
+            />
+          )
+        }
         default: {
           // TODO: handle generic schemas with something like <JsonSchemaField/>
           return null
@@ -369,7 +397,10 @@ export default withSdk<Props>(
                 <Dropdown
                   label={'Select Action'}
                   disabled={availableActions.length === 0}
-                  options={availableActions}
+                  options={[
+                    { text: 'Select an Action', value: '' },
+                    ...availableActions.map((availableAction) => ({ text: availableAction, value: availableAction }))
+                  ]}
                   value={action.type}
                   onChange={(e) => handleChangeType(e, idx)}
                 />
