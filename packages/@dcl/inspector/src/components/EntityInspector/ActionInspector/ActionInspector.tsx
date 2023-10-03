@@ -47,7 +47,7 @@ function getPartialPayload<T extends ActionType>(action: Action) {
 
 export default withSdk<Props>(
   withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId, contextMenuId }) => {
-    const { Actions, States } = sdk.components
+    const { Actions, States, Counter } = sdk.components
     const [componentValue, setComponentValue, isComponentEqual] = useComponentValue<EditorComponentsTypes['Actions']>(
       entityId,
       Actions
@@ -62,6 +62,7 @@ export default withSdk<Props>(
 
     const hasActions = useHasComponent(entityId, Actions)
     const hasStates = useHasComponent(entityId, States)
+    const hasCounter = useHasComponent(entityId, Counter)
 
     useChange(
       (event, sdk) => {
@@ -95,6 +96,18 @@ export default withSdk<Props>(
             const payload = getPartialPayload<ActionType.START_TWEEN>(action)
             return !!payload && isValidTween(payload)
           }
+          case ActionType.SET_COUNTER: {
+            const payload = getPartialPayload<ActionType.SET_COUNTER>(action)
+            return !!payload.counter && !isNaN(payload.counter)
+          }
+          case ActionType.INCREMENT_COUNTER: {
+            const payload = getPartialPayload<ActionType.INCREMENT_COUNTER>(action)
+            return !!payload
+          }
+          case ActionType.DECREASE_COUNTER: {
+            const payload = getPartialPayload<ActionType.DECREASE_COUNTER>(action)
+            return !!payload
+          }
           default: {
             try {
               const payload = getPartialPayload(action)
@@ -119,13 +132,14 @@ export default withSdk<Props>(
 
     useEffect(() => {
       if (areValidActions(actions)) {
-        if (isComponentEqual({ value: actions }) || isFocused) {
+        const current = sdk.components.Actions.get(entityId)
+        if (isComponentEqual({ ...current, value: actions }) || isFocused) {
           return
         }
 
-        setComponentValue({ value: [...actions] })
+        setComponentValue({ ...current, value: [...actions] })
       }
-    }, [actions, isFocused])
+    }, [actions, isFocused, sdk])
 
     useEffect(() => {
       if (entity?.isGltfPathLoading()) {
@@ -154,7 +168,10 @@ export default withSdk<Props>(
     const conditionalActions: Partial<Record<string, () => boolean>> = useMemo(
       () => ({
         [ActionType.PLAY_ANIMATION]: () => hasAnimations,
-        [ActionType.SET_STATE]: () => hasStates
+        [ActionType.SET_STATE]: () => hasStates,
+        [ActionType.INCREMENT_COUNTER]: () => hasCounter,
+        [ActionType.DECREASE_COUNTER]: () => hasCounter,
+        [ActionType.SET_COUNTER]: () => hasCounter
       }),
       [hasAnimations, hasStates]
     )
@@ -224,6 +241,22 @@ export default withSdk<Props>(
           data[idx] = {
             ...data[idx],
             jsonPayload: getJson<ActionType.START_TWEEN>(tween)
+          }
+          return data
+        })
+      },
+      [setActions]
+    )
+
+    const handleChangeCounter = useCallback(
+      ({ target: { value } }: React.ChangeEvent<HTMLInputElement>, idx: number) => {
+        setActions((prev: Action[]) => {
+          const data = [...prev]
+          data[idx] = {
+            ...data[idx],
+            jsonPayload: getJson<ActionType.SET_COUNTER>({
+              counter: parseInt(value)
+            })
           }
           return data
         })
@@ -364,6 +397,20 @@ export default withSdk<Props>(
               onUpdateTween={(tween: ActionPayload['start_tween']) => handleChangeTween(tween, idx)}
             />
           )
+        }
+        case ActionType.SET_COUNTER: {
+          return hasCounter ? (
+            <div className="row">
+              <div className="field">
+                <label>Counter Value</label>
+                <TextField
+                  type="numeric"
+                  value={getPartialPayload<ActionType.SET_COUNTER>(action)?.counter}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeCounter(e, idx)}
+                />
+              </div>
+            </div>
+          ) : null
         }
         default: {
           // TODO: handle generic schemas with something like <JsonSchemaField/>

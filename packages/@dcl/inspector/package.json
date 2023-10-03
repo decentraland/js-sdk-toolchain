@@ -7,7 +7,7 @@
     "@babylonjs/inspector": "^6.18.0",
     "@babylonjs/loaders": "^6.18.0",
     "@babylonjs/materials": "^6.18.0",
-    "@dcl/asset-packs": "^0.0.0-20231003143405.commit-b7b2501",
+    "@dcl/asset-packs": "^0.0.0-20231003180441.commit-56a3910",
     "@dcl/ecs": "file:../ecs",
     "@dcl/ecs-math": "2.0.2",
     "@dcl/mini-rpc": "^1.0.7",

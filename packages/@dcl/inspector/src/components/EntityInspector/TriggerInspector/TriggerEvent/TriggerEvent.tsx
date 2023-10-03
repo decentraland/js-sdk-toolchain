@@ -1,5 +1,4 @@
 import React from 'react'
-import { TriggerType } from '@dcl/asset-packs'
 import { VscTrash as RemoveIcon } from 'react-icons/vsc'
 import { IoIosGitBranch as ConditionalIcon } from 'react-icons/io'
 import { Block } from '../../../Block'
@@ -13,6 +12,7 @@ import './TriggerEvent.css'
 
 export const TriggerEvent = ({
   trigger,
+  availableTriggers,
   onChangeTriggerType,
   onAddNewTriggerCondition,
   onRemoveTriggerEvent,
@@ -33,11 +33,7 @@ export const TriggerEvent = ({
           </MoreOptionsMenu>
         </div>
       </div>
-      <Dropdown
-        options={Object.values(TriggerType).filter((v) => isNaN(Number(v))) as string[]}
-        value={trigger.type}
-        onChange={onChangeTriggerType}
-      />
+      <Dropdown options={availableTriggers} value={trigger.type} onChange={onChangeTriggerType} />
       {children}
     </Block>
   )

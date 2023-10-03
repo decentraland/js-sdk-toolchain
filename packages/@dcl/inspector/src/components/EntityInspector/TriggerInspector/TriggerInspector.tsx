@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { useCallback, useEffect, useMemo } from 'react'
 import { Entity } from '@dcl/ecs'
 import {
@@ -36,11 +37,23 @@ import type { Props } from './types'
 
 import './TriggerInspector.css'
 
+export const statesConditionTypeOptions = [
+  { value: TriggerConditionType.WHEN_STATE_IS, text: 'state is' },
+  { value: TriggerConditionType.WHEN_STATE_IS_NOT, text: 'state is not' }
+]
+
+export const counterConditionTypeOptions = [
+  { value: TriggerConditionType.WHEN_COUNTER_EQUALS, text: 'counter equals' },
+  { value: TriggerConditionType.WHEN_COUNTER_IS_GREATER_THAN, text: 'counter is greater than' },
+  { value: TriggerConditionType.WHEN_COUNTER_IS_LESS_THAN, text: 'counter is less than' }
+]
+
 export default withSdk<Props>(
   withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId, contextMenuId }) => {
-    const { Actions, Triggers, Name, States } = sdk.components
+    const { Actions, Triggers, Name, States, Counter } = sdk.components
     const entitiesWithAction: Entity[] = useEntitiesWith((components) => components.Actions)
-    const entitiesWithState: Entity[] = useEntitiesWith((components) => components.States)
+    const entitiesWithStates: Entity[] = useEntitiesWith((components) => components.States)
+    const entitiesWithCounter: Entity[] = useEntitiesWith((components) => components.Counter)
     const [componentValue, setComponentValue, isComponentEqual] = useComponentValue<EditorComponentsTypes['Triggers']>(
       entityId,
       Triggers
@@ -52,17 +65,19 @@ export default withSdk<Props>(
     )
 
     const hasTriggers = useHasComponent(entityId, Triggers)
+    const hasStates = useHasComponent(entityId, States)
+    const hasCounter = useHasComponent(entityId, Counter)
 
     const areValidActions = useCallback(
       (updatedActions: TriggerAction[]) =>
-        updatedActions.length > 0 && updatedActions.every((action) => action.entity && action.name),
+        updatedActions.length > 0 && updatedActions.every((action) => action.id && action.name),
       []
     )
 
     const areValidConditions = useCallback(
       (updatedConditions: TriggerCondition[] | undefined) =>
         updatedConditions && updatedConditions.length > 0
-          ? updatedConditions.every((condition) => condition.entity && condition.value)
+          ? updatedConditions.every((condition) => condition.id && condition.value)
           : true,
       []
     )
@@ -89,29 +104,78 @@ export default withSdk<Props>(
       }
     }, [triggers])
 
-    const availableActions: Map<Entity, { name: string; action: Action[] }> = useMemo(() => {
+    const availableActions: Map<number, { name: string; actions: Action[] }> = useMemo(() => {
       return entitiesWithAction?.reduce((actions, entityWithAction) => {
-        const action = getComponentValue(entityWithAction, Actions)
+        const actionsComponentValue = getComponentValue(entityWithAction, Actions)
         const name = Name.get(entityWithAction)
-        if (action.value.length > 0) {
-          actions.set(entityWithAction, { name: name.value, action: action.value as Action[] })
+        if (actionsComponentValue.value.length > 0) {
+          actions.set(actionsComponentValue.id, { name: name.value, actions: actionsComponentValue.value as Action[] })
         }
 
         return actions
-      }, new Map<Entity, { name: string; action: Action[] }>())
+      }, new Map<number, { name: string; actions: Action[] }>())
     }, [entitiesWithAction])
 
-    const availableStates: Map<Entity, { name: string; states: States['value'] }> = useMemo(() => {
-      return entitiesWithState?.reduce((states, entityWithState) => {
-        const state = getComponentValue(entityWithState, States)
+    const availableTriggers = useMemo(() => {
+      const triggerTypes: TriggerType[] = [TriggerType.ON_SPAWN, TriggerType.ON_CLICK]
+      if (hasStates) {
+        triggerTypes.push(TriggerType.ON_STATE_CHANGE)
+      }
+      if (hasCounter) {
+        triggerTypes.push(TriggerType.ON_COUNTER_CHANGE)
+      }
+      return triggerTypes
+    }, [hasStates, hasCounter])
+
+    const availableStates: Map<number, { name: string; states: States['value'] }> = useMemo(() => {
+      return entitiesWithStates?.reduce((states, entityWithState) => {
+        const statesComponentValue = getComponentValue(entityWithState, States)
         const name = Name.get(entityWithState)
-        if (state.value.length > 0) {
-          states.set(entityWithState, { name: name.value, states: (state as States).value })
+        if (statesComponentValue.value.length > 0) {
+          states.set(statesComponentValue.id, { name: name.value, states: (statesComponentValue as States).value })
         }
 
         return states
-      }, new Map<Entity, { name: string; states: States['value'] }>())
-    }, [entitiesWithState])
+      }, new Map<number, { name: string; states: States['value'] }>())
+    }, [entitiesWithStates])
+
+    const availableConditions = useMemo(() => {
+      const entities = Array.from(new Set<Entity>([...entitiesWithStates, ...entitiesWithCounter])).filter(
+        (entity) => entity !== 0
+      )
+      const result = new Map<
+        Entity,
+        {
+          name: string
+          conditions: { value: { id: number; type: TriggerConditionType }; text: string }[]
+        }
+      >()
+
+      for (const entity of entities) {
+        const name = Name.getOrNull(entity)?.value || ''
+        const entityConditions: {
+          name: string
+          conditions: { value: { id: number; type: TriggerConditionType }; text: string }[]
+        } = {
+          name,
+          conditions: []
+        }
+        result.set(entity, entityConditions)
+        if (States.has(entity)) {
+          const { id } = States.get(entity)
+          for (const option of statesConditionTypeOptions) {
+            entityConditions.conditions.push({ value: { id, type: option.value }, text: option.text })
+          }
+        }
+        if (Counter.has(entity)) {
+          const { id } = Counter.get(entity)
+          for (const option of counterConditionTypeOptions) {
+            entityConditions.conditions.push({ value: { id, type: option.value }, text: option.text })
+          }
+        }
+      }
+      return result
+    }, [entitiesWithStates, entitiesWithCounter, States, Counter])
 
     const handleRemove = useCallback(async () => {
       sdk.operations.removeComponent(entityId, Triggers)
@@ -127,7 +191,7 @@ export default withSdk<Props>(
           operation: TriggerConditionOperation.AND,
           actions: [
             {
-              entity: undefined,
+              id: undefined,
               name: ''
             }
           ]
@@ -159,7 +223,7 @@ export default withSdk<Props>(
         e.stopPropagation()
         modifyTrigger(idx, {
           ...triggers[idx],
-          actions: [...triggers[idx].actions, { entity: undefined, name: '' }]
+          actions: [...triggers[idx].actions, { id: undefined, name: '' }]
         })
       },
       [triggers, modifyTrigger]
@@ -181,7 +245,7 @@ export default withSdk<Props>(
           ...triggers[idx],
           conditions: [
             ...(triggers[idx].conditions ?? []),
-            { entity: undefined, type: TriggerConditionType.WHEN_STATE_IS, value: '' }
+            { id: undefined, type: TriggerConditionType.WHEN_STATE_IS, value: '' }
           ]
         })
       },
@@ -241,6 +305,7 @@ export default withSdk<Props>(
             <TriggerEvent
               key={`trigger-${triggerIdx}`}
               trigger={trigger}
+              availableTriggers={availableTriggers}
               onChangeTriggerType={(e) => handleChangeType(e, triggerIdx)}
               onAddNewTriggerAction={(e) => handleAddNewTriggerAction(e, triggerIdx)}
               onAddNewTriggerCondition={(e) => handleAddNewTriggerCondition(e, triggerIdx)}
@@ -251,6 +316,7 @@ export default withSdk<Props>(
                   <TriggerConditionContainer
                     trigger={trigger}
                     availableStates={availableStates}
+                    availableConditions={availableConditions}
                     onChangeOperation={(e) => handleChangeOperation(e, triggerIdx)}
                     onUpdateConditions={(conditions: TriggerCondition[]) =>
                       handleUpdateConditions(conditions, triggerIdx)
