@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React from 'react'
 import cx from 'classnames'
 
 import { Props } from './types'
