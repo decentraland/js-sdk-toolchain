@@ -19,7 +19,7 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
       z: 0
     },
     relative: true,
-    interpolationType: '',
+    interpolationType: InterpolationType.LINEAR,
     duration: 1,
     ...tweenProp
   })

@@ -31,6 +31,7 @@ import MoreOptionsMenu from '../MoreOptionsMenu'
 import { AddButton } from '../AddButton'
 import { Button } from '../../Button'
 
+import { PlaySoundAction } from './PlaySoundAction'
 import { TweenAction } from './TweenAction'
 import { isValidTween } from './TweenAction/utils'
 import { Props } from './types'
@@ -47,7 +48,7 @@ function getPartialPayload<T extends ActionType>(action: Action) {
 
 export default withSdk<Props>(
   withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId, contextMenuId }) => {
-    const { Actions, States, Counter, AudioSource } = sdk.components
+    const { Actions, States, Counter } = sdk.components
     const [componentValue, setComponentValue, isComponentEqual] = useComponentValue<EditorComponentsTypes['Actions']>(
       entityId,
       Actions
@@ -63,7 +64,6 @@ export default withSdk<Props>(
     const hasActions = useHasComponent(entityId, Actions)
     const hasStates = useHasComponent(entityId, States)
     const hasCounter = useHasComponent(entityId, Counter)
-    const hasAudioSource = useHasComponent(entityId, AudioSource)
 
     useChange(
       (event, sdk) => {
@@ -172,8 +172,7 @@ export default withSdk<Props>(
         [ActionType.SET_STATE]: () => hasStates,
         [ActionType.INCREMENT_COUNTER]: () => hasCounter,
         [ActionType.DECREASE_COUNTER]: () => hasCounter,
-        [ActionType.SET_COUNTER]: () => hasCounter,
-        [ActionType.PLAY_SOUND]: () => hasAudioSource
+        [ActionType.SET_COUNTER]: () => hasCounter
       }),
       [hasAnimations, hasStates]
     )
@@ -237,12 +236,26 @@ export default withSdk<Props>(
     )
 
     const handleChangeTween = useCallback(
-      (tween: ActionPayload['start_tween'], idx: number) => {
+      (tween: ActionPayload<ActionType.START_TWEEN>, idx: number) => {
         setActions((prev: Action[]) => {
           const data = [...prev]
           data[idx] = {
             ...data[idx],
             jsonPayload: getJson<ActionType.START_TWEEN>(tween)
+          }
+          return data
+        })
+      },
+      [setActions]
+    )
+
+    const handleChangeSound = useCallback(
+      (value: ActionPayload<ActionType.PLAY_SOUND>, idx: number) => {
+        setActions((prev: Action[]) => {
+          const data = [...prev]
+          data[idx] = {
+            ...data[idx],
+            jsonPayload: getJson<ActionType.PLAY_SOUND>(value)
           }
           return data
         })
@@ -396,7 +409,7 @@ export default withSdk<Props>(
           return (
             <TweenAction
               tween={getPartialPayload<ActionType.START_TWEEN>(action)}
-              onUpdateTween={(tween: ActionPayload['start_tween']) => handleChangeTween(tween, idx)}
+              onUpdateTween={(tween: ActionPayload<ActionType.START_TWEEN>) => handleChangeTween(tween, idx)}
             />
           )
         }
@@ -413,6 +426,14 @@ export default withSdk<Props>(
               </div>
             </div>
           ) : null
+        }
+        case ActionType.PLAY_SOUND: {
+          return (
+            <PlaySoundAction
+              value={getPartialPayload<ActionType.PLAY_SOUND>(action)}
+              onUpdate={(value: ActionPayload<ActionType.PLAY_SOUND>) => handleChangeSound(value, idx)}
+            />
+          )
         }
         default: {
           // TODO: handle generic schemas with something like <JsonSchemaField/>
