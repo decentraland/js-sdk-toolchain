@@ -25,7 +25,7 @@ export function addChild(engine: IEngine) {
     if (components) {
       const getComponent = <T>(componentName: ComponentName) =>
         components[componentName] ? ({ ...components[componentName] } as T) : null
-      console.log('is smart')
+
       // component values
       const actions = getComponent<EditorComponentsTypes['Actions']>(ComponentName.ACTIONS)
       const triggers = getComponent<EditorComponentsTypes['Triggers']>(ComponentName.TRIGGERS)
