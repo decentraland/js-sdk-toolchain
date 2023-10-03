@@ -128,7 +128,7 @@ function getNotBundledModules() {
   traverseDependencies(ret)
 
   // now remove the ESM dependencies
-  const esmModulesToBundle = ['@dcl/sdk', '@dcl/ecs', '@dcl/mini-rpc', '@dcl/asset-packs']
+  const esmModulesToBundle = ['@dcl/sdk', '@dcl/ecs', '@dcl/mini-rpc', '@dcl/asset-packs', '@dcl-sdk/utils']
   return Array.from(externalModules).concat(builtinModules).filter($ => !esmModulesToBundle.includes($))
 }
 
