@@ -1,2 +1,2 @@
-import { TweenAction } from './TweenAction'
+import TweenAction from './TweenAction'
 export { TweenAction }

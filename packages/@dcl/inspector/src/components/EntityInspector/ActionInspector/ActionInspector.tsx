@@ -32,6 +32,7 @@ import { AddButton } from '../AddButton'
 import { Button } from '../../Button'
 
 import { TweenAction } from './TweenAction'
+import { isValidTween } from './TweenAction/utils'
 import { Props } from './types'
 
 import './ActionInspector.css'
@@ -42,10 +43,6 @@ function isStates(maybeStates: any): maybeStates is EditorComponentsTypes['State
 
 function getPartialPayload<T extends ActionType>(action: Action) {
   return getPayload<T>(action) as Partial<ActionPayload<T>>
-}
-
-function isValidTween(tween: ActionPayload['start_tween']) {
-  return !!tween.type && !!tween.end && !!tween.relative && !!tween.interpolationType && !!tween.duration
 }
 
 export default withSdk<Props>(
@@ -153,18 +150,13 @@ export default withSdk<Props>(
       return animations.length > 0
     }, [animations])
 
-    const hasTweens = useMemo(() => {
-      return actions.some((action) => action.type === ActionType.START_TWEEN)
-    }, [actions])
-
     // actions that may only be available under certain circumstances
     const conditionalActions: Partial<Record<string, () => boolean>> = useMemo(
       () => ({
         [ActionType.PLAY_ANIMATION]: () => hasAnimations,
-        [ActionType.SET_STATE]: () => hasStates,
-        [ActionType.START_TWEEN]: () => hasTweens
+        [ActionType.SET_STATE]: () => hasStates
       }),
-      [hasAnimations, hasStates, hasTweens]
+      [hasAnimations, hasStates]
     )
 
     const allActions = useMemo(() => {
@@ -366,12 +358,12 @@ export default withSdk<Props>(
           ) : null
         }
         case ActionType.START_TWEEN: {
-          return hasTweens ? (
+          return (
             <TweenAction
               tween={getPartialPayload<ActionType.START_TWEEN>(action)}
               onUpdateTween={(tween: ActionPayload['start_tween']) => handleChangeTween(tween, idx)}
             />
-          ) : null
+          )
         }
         default: {
           // TODO: handle generic schemas with something like <JsonSchemaField/>
@@ -405,7 +397,10 @@ export default withSdk<Props>(
                 <Dropdown
                   label={'Select Action'}
                   disabled={availableActions.length === 0}
-                  options={availableActions}
+                  options={[
+                    { text: 'Select an Action', value: '' },
+                    ...availableActions.map((availableAction) => ({ text: availableAction, value: availableAction }))
+                  ]}
                   value={action.type}
                   onChange={(e) => handleChangeType(e, idx)}
                 />

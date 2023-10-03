@@ -1,50 +1,71 @@
-import { useCallback } from 'react'
-import { TweensType, InterpolationType } from '@dcl/asset-packs'
+import React, { useCallback, useEffect, useState } from 'react'
+import { TweenType, InterpolationType } from '@dcl/asset-packs'
 import { VscQuestion as QuestionIcon } from 'react-icons/vsc'
 import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
+import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 
 import { Dropdown } from '../../../Dropdown'
 import { RangeField } from '../../RangeField'
 import { TextField } from '../../TextField'
+import { isValidTween } from './utils'
 import type { Props } from './types'
 
-export const TweenAction = ({ tween, onUpdateTween }: Props) => {
+const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props) => {
+  const [tween, setTween] = useState({
+    type: '',
+    end: {
+      x: 0,
+      y: 0,
+      z: 0
+    },
+    relative: true,
+    interpolationType: '',
+    duration: 1,
+    ...tweenProp
+  })
+
+  useEffect(() => {
+    if (!recursiveCheck(tween, tweenProp, 2) || !isValidTween(tween)) return
+    onUpdateTween(tween)
+  }, [tween, onUpdateTween])
+
   const handleChangeType = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
-      onUpdateTween({ ...tween, type: value })
+      setTween({ ...tween, type: value })
     },
-    [tween, onUpdateTween]
+    [tween, setTween]
   )
 
   const handleChangeEndPosition = useCallback(
     (e: React.ChangeEvent<HTMLElement>, axis: string) => {
       const { value } = e.target as HTMLInputElement
-      onUpdateTween({ ...tween, end: { ...tween.end, [axis]: value } })
+      const validValue = isNaN(parseInt(value)) ? '' : parseInt(value)
+      setTween({ ...tween, end: { ...tween.end, [axis]: validValue } })
     },
-    [tween, onUpdateTween]
+    [tween, setTween]
   )
 
   const handleChangeRelative = useCallback(
     (e: React.ChangeEvent<HTMLElement>) => {
       const { checked } = e.target as HTMLInputElement
-      onUpdateTween({ ...tween, relative: checked })
+      setTween({ ...tween, relative: checked })
     },
-    [tween, onUpdateTween]
+    [tween, setTween]
   )
 
   const handleChangeInterpolationType = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
-      onUpdateTween({ ...tween, interpolationType: value })
+      setTween({ ...tween, interpolationType: value })
     },
-    [tween, onUpdateTween]
+    [tween, setTween]
   )
 
   const handleChangeDuration = useCallback(
     (e: React.ChangeEvent<HTMLElement>) => {
       const { value } = e.target as HTMLInputElement
-      onUpdateTween({ ...tween, duration: value })
+      setTween({ ...tween, duration: parseInt(value) })
     },
-    [tween, onUpdateTween]
+    [tween, setTween]
   )
 
   const renderTweenInfo = () => {
@@ -123,7 +144,7 @@ export const TweenAction = ({ tween, onUpdateTween }: Props) => {
           <Dropdown
             options={[
               { value: '', text: 'Select a Tween Type' },
-              ...Object.values(TweensType).map((tweenType) => ({ text: tweenType, value: tweenType }))
+              ...Object.values(TweenType).map((tweenType) => ({ text: tweenType, value: tweenType }))
             ]}
             value={tween.type}
             onChange={handleChangeType}
@@ -134,9 +155,27 @@ export const TweenAction = ({ tween, onUpdateTween }: Props) => {
         <div className="field">
           <label>End Position</label>
           <div className="row">
-            <TextField label="X" type="number" value={tween.end.x} onChange={(e) => handleChangeEndPosition(e, 'x')} />
-            <TextField label="Y" type="number" value={tween.end.y} onChange={(e) => handleChangeEndPosition(e, 'y')} />
-            <TextField label="Z" type="number" value={tween.end.z} onChange={(e) => handleChangeEndPosition(e, 'z')} />
+            <TextField
+              label="X"
+              type="number"
+              value={tween.end.x}
+              error={isNaN(parseInt(tween.end.x))}
+              onChange={(e) => handleChangeEndPosition(e, 'x')}
+            />
+            <TextField
+              label="Y"
+              type="number"
+              value={tween.end.y}
+              error={isNaN(parseInt(tween.end.y))}
+              onChange={(e) => handleChangeEndPosition(e, 'y')}
+            />
+            <TextField
+              label="Z"
+              type="number"
+              value={tween.end.z}
+              error={isNaN(parseInt(tween.end.z))}
+              onChange={(e) => handleChangeEndPosition(e, 'z')}
+            />
           </div>
         </div>
       </div>
@@ -174,3 +213,5 @@ export const TweenAction = ({ tween, onUpdateTween }: Props) => {
     </div>
   )
 }
+
+export default React.memo(TweenAction)
