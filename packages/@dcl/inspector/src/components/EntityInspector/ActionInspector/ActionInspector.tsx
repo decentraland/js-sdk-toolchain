@@ -109,6 +109,10 @@ export default withSdk<Props>(
             const payload = getPartialPayload<ActionType.DECREASE_COUNTER>(action)
             return !!payload
           }
+          case ActionType.SET_VISIBILITY: {
+            const payload = getPartialPayload<ActionType.SET_VISIBILITY>(action)
+            return !!payload
+          }
           default: {
             try {
               const payload = getPartialPayload(action)
@@ -308,6 +312,23 @@ export default withSdk<Props>(
       [setActions]
     )
 
+    const handleSetVisible = useCallback(
+      (e: React.ChangeEvent<HTMLElement>, idx: number) => {
+        const { checked } = e.target as HTMLInputElement
+        setActions((prev: Action[]) => {
+          const data = [...prev]
+          data[idx] = {
+            ...data[idx],
+            jsonPayload: getJson<ActionType.SET_VISIBILITY>({
+              visible: checked
+            })
+          }
+          return data
+        })
+      },
+      [setActions]
+    )
+
     const handleFocusInput = useCallback(
       ({ type }: React.FocusEvent<HTMLInputElement>) => {
         if (type === 'focus') {
@@ -433,6 +454,20 @@ export default withSdk<Props>(
               value={getPartialPayload<ActionType.PLAY_SOUND>(action)}
               onUpdate={(value: ActionPayload<ActionType.PLAY_SOUND>) => handleChangeSound(value, idx)}
             />
+          )
+        }
+        case ActionType.SET_VISIBILITY: {
+          return (
+            <div className="row">
+              <div className="field inline">
+                <input
+                  type="checkbox"
+                  checked={getPartialPayload<ActionType.SET_VISIBILITY>(action)?.visible ?? true}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleSetVisible(e, idx)}
+                />
+                <label>Visible</label>
+              </div>
+            </div>
           )
         }
         default: {

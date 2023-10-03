@@ -88,16 +88,16 @@
   width: 100%;
 }
 
-.ActionInspector > .content > .Block > .content > .TweenActionContainer > .row .field.relative {
+.ActionInspector > .content > .Block > .content .row .field.inline {
   display: flex;
   flex-direction: row;
   align-items: center;
 }
 
-.ActionInspector > .content > .Block > .content > .TweenActionContainer > .row .field.relative input[type='checkbox'] {
+.ActionInspector > .content > .Block > .content .row .field.inline input[type='checkbox'] {
   margin-right: 9px;
 }
 
-.ActionInspector > .content > .Block > .content > .TweenActionContainer > .row .field.relative label {
+.ActionInspector > .content > .Block > .content .row .field.inline label {
   margin-bottom: 0;
 }
