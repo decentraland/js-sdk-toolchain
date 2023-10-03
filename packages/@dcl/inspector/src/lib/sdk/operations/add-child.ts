@@ -30,14 +30,17 @@ export function addChild(engine: IEngine) {
       const actions = getComponent<EditorComponentsTypes['Actions']>(ComponentName.ACTIONS)
       const triggers = getComponent<EditorComponentsTypes['Triggers']>(ComponentName.TRIGGERS)
       const states = getComponent<EditorComponentsTypes['States']>(ComponentName.STATES)
+      const counter = getComponent<EditorComponentsTypes['Counter']>(ComponentName.COUNTER)
 
       // assign component ids
       if (actions && isSelf(actions.id)) {
         actions.id = getNextId(engine as any)
-      } else {
       }
       if (states && isSelf(states.id)) {
         states.id = getNextId(engine as any)
+      }
+      if (counter && isSelf(counter.id)) {
+        counter.id = getNextId(engine as any)
       }
 
       // map component ids
@@ -57,6 +60,12 @@ export function addChild(engine: IEngine) {
                 case ComponentName.STATES: {
                   if (states) {
                     return states.id
+                  }
+                  break
+                }
+                case ComponentName.COUNTER: {
+                  if (counter) {
+                    return counter.id
                   }
                   break
                 }
