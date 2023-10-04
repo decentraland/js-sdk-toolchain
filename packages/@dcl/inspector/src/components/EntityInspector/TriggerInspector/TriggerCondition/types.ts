@@ -1,9 +1,16 @@
-import type { Entity } from '@dcl/ecs'
-import type { States, Trigger, TriggerCondition } from '@dcl/asset-packs'
+import { Entity } from '@dcl/ecs'
+import type { Trigger, TriggerCondition, TriggerConditionType } from '@dcl/asset-packs'
 
 export type Props = {
   trigger: Trigger
-  availableStates: Map<Entity, { name: string; states: States['value'] }>
+  availableStates: Map<number, { name: string; states: string[] }>
+  availableConditions: Map<
+    Entity,
+    {
+      name: string
+      conditions: { value: { id: number; type: TriggerConditionType }; text: string }[]
+    }
+  >
   onChangeOperation: React.ChangeEventHandler<HTMLSelectElement>
   onUpdateConditions: (conditions: TriggerCondition[]) => void
 }

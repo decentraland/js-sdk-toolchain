@@ -7,7 +7,7 @@ import {
   EntityMappingMode,
   IEngine
 } from '@dcl/ecs'
-import { addActionTypes } from '@dcl/asset-packs'
+import { initComponents } from '@dcl/asset-packs'
 import { EditorComponentNames } from '../../../sdk/components'
 import { dumpEngineToComposite, dumpEngineToCrdtCommands } from './engine-to-composite'
 import { FileSystemInterface } from '../../types'
@@ -52,7 +52,7 @@ async function instanciateComposite(fs: FileSystemInterface, engine: IEngine, pa
 
   runMigrations(engine)
 
-  addActionTypes(engine as any)
+  initComponents(engine as any)
 
   return compositeProvider
 }
