@@ -1,4 +1,4 @@
-import { AssetsTab } from '../../../src/components/Assets/types'
+import { AssetsTab } from '../../../src/redux/ui/types'
 import { dragAndDrop } from '../utils/drag-and-drop'
 import { sleep } from '../utils/sleep'
 
