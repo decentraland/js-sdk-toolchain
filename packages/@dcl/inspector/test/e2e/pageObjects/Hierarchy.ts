@@ -93,8 +93,8 @@ class HierarchyPageObject {
     const item = await this.getItem(entityId, this.getItemSelectorById)
     try {
       await item.click({ button: 'right' })
-    } catch (error) {
-      throw new Error(`Could not click on item entityId=${entityId} and label="${label}"`)
+    } catch (error: any) {
+      throw new Error(`Could not click on item entityId=${entityId} and label="${label}": ${error.message}`)
     }
     const addChild = await item.$('.contexify_item[itemid="add-child"')
     if (!addChild) {
