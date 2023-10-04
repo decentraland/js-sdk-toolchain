@@ -84,8 +84,8 @@ export default withSdk<Props>(
             <DeleteIcon /> Delete
           </Item>
         </Menu>
-        <Block label="Path" ref={drop} error={files && !isValid}>
-          <TextField type="text" {...getInputProps('audioClipUrl')} />
+        <Block label="Path" ref={drop}>
+          <TextField type="text" {...getInputProps('audioClipUrl')} error={files && !isValid} drop={isHover} />
         </Block>
         <Block label="Playback">
           <TextField label="Start playing" type="checkbox" checked={!!playing.value} {...playing} />

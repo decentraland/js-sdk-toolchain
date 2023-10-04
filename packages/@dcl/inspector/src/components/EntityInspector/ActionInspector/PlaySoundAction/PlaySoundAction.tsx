@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { ActionPayload, ActionType } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
-import cx from 'classnames'
 import { useDrop } from 'react-dnd'
 
 import { DropTypesEnum, ProjectAssetDrop, getNode } from '../../../../lib/sdk/drag-drop'
@@ -15,7 +14,6 @@ import { isValid } from './utils'
 import type { Props } from './types'
 
 import './PlaySoundAction.css'
-import { Container } from '../../../Container'
 
 enum PLAY_MODE {
   PLAY_ONCE = 'play-once',
@@ -100,11 +98,11 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
   }, [files, payload])
 
   return (
-    <Container className={cx('PlaySoundActionContainer', { hover: isHover })}>
+    <div className="PlaySoundActionContainer">
       <div className="row">
         <div className="field" ref={drop}>
           <label>Path</label>
-          <TextField value={removeBase(payload.src)} onChange={handleChangeSrc} error={error} />
+          <TextField value={removeBase(payload.src)} onChange={handleChangeSrc} error={error} drop={isHover} />
         </div>
         <div className="field">
           <label>Play Mode</label>
@@ -115,7 +113,7 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
           />
         </div>
       </div>
-    </Container>
+    </div>
   )
 }
 

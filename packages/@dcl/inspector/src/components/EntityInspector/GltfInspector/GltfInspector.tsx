@@ -2,7 +2,6 @@ import { useCallback } from 'react'
 import { Item } from 'react-contexify'
 import { useDrop } from 'react-dnd'
 import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
-import cx from 'classnames'
 
 import { ContextMenu as Menu } from '../../ContexMenu'
 import { withContextMenu } from '../../../hoc/withContextMenu'
@@ -76,14 +75,14 @@ export default withSdk<Props>(
     if (!hasGltf) return null
 
     return (
-      <Container label="GLTF" className={cx('Gltf', { hover: isHover })}>
+      <Container label="GLTF" className="GltfInspector">
         <Menu id={contextMenuId}>
           <Item id="delete" onClick={handleAction(handleRemove)}>
             <DeleteIcon /> Delete
           </Item>
         </Menu>
-        <Block label="Path" ref={drop} error={files && !isValid}>
-          <TextField type="text" {...getInputProps('src')} />
+        <Block label="Path" ref={drop}>
+          <TextField type="text" {...getInputProps('src')} drop={isHover} error={files && !isValid} />
         </Block>
         <Block label="Collision">
           <SelectField

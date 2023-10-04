@@ -6,9 +6,9 @@ import { Props } from './types'
 import './TextField.css'
 
 const Input = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
-  const { label, rightLabel, error, ...rest } = props
+  const { label, rightLabel, error, drop, ...rest } = props
   return (
-    <div className={cx('TextField', { error })}>
+    <div className={cx('TextField', { error, drop })}>
       {label && <label>{label}</label>}
       <input ref={ref} {...rest} />
       {rightLabel && <label>{rightLabel}</label>}
