@@ -29,7 +29,7 @@ interface ModalState {
 
 export const ROOT = 'File System'
 
-export const DRAG_N_DROP_ASSET_KEY = 'project-asset-gltf'
+export const DRAG_N_DROP_ASSET_KEY = 'project-asset'
 
 export type TreeNode = Omit<AssetNode, 'children'> & { children?: string[]; matches?: string[] }
 

@@ -1,4 +1,4 @@
-import { getModel } from '../../../lib/sdk/drag-drop'
+import { getNode } from '../../../lib/sdk/drag-drop'
 import { TreeNode } from '../../ProjectAssetExplorer/ProjectView'
 import { AssetNodeItem } from '../../ProjectAssetExplorer/types'
 import * as utils from './utils'
@@ -112,11 +112,11 @@ describe('GltfInspector/utils', () => {
         ['folder', folder]
       ])
 
-      expect(getModel(root, tree, utils.isModel)).toBe(null)
-      expect(getModel(folder, tree, utils.isModel)).toBe(asset)
-      expect(getModel(asset, tree, utils.isModel)).toBe(asset)
+      expect(getNode(root, tree, utils.isModel)).toBe(null)
+      expect(getNode(folder, tree, utils.isModel)).toBe(asset)
+      expect(getNode(asset, tree, utils.isModel)).toBe(asset)
       // need to create a new object since we are memoizing this function...
-      expect(getModel({ ...folder }, incompleteTree, utils.isModel)).toBe(null)
+      expect(getNode({ ...folder }, incompleteTree, utils.isModel)).toBe(null)
     })
   })
 })

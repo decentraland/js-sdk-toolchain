@@ -20,6 +20,7 @@ import { TextShapeInspector } from './TextShapeInspector'
 import { TransformInspector } from './TransformInspector'
 import { StatesInspector } from './StatesInspector'
 import { CounterInspector } from './CounterInspector'
+import { AudioSourceInspector } from './AudioSourceInspector'
 
 import './EntityInspector.css'
 
@@ -61,7 +62,8 @@ export const EntityInspector = withSdk(({ sdk }) => {
       { name: sdk.components.Actions.componentName, component: ActionInspector },
       { name: sdk.components.Triggers.componentName, component: TriggerInspector },
       { name: sdk.components.States.componentName, component: StatesInspector },
-      { name: sdk.components.Counter.componentName, component: CounterInspector }
+      { name: sdk.components.Counter.componentName, component: CounterInspector },
+      { name: sdk.components.AudioSource.componentName, component: AudioSourceInspector }
     ],
     [sdk]
   )

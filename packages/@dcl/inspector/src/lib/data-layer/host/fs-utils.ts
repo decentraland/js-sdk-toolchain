@@ -28,7 +28,7 @@ export const DIRECTORY = {
   SCENE: 'scene'
 }
 
-export const EXTENSIONS = ['.glb', '.png', '.composite', '.composite.bin', '.gltf', '.jpg']
+export const EXTENSIONS = ['.glb', '.png', '.composite', '.composite.bin', '.gltf', '.jpg', '.mp3', '.ogg', '.wav']
 
 export function withAssetDir(filePath: string = '') {
   return filePath ? `${DIRECTORY.ASSETS}/${filePath}` : DIRECTORY.ASSETS

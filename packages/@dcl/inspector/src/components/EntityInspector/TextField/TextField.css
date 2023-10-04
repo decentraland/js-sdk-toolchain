@@ -44,3 +44,7 @@
   border-color: red;
 }
 
+.TextField.drop {
+  border-color: white;
+  border-style: dashed;
+}

@@ -1,17 +1,16 @@
 import { useCallback, useRef } from 'react'
 import { useDrop } from 'react-dnd'
-import cx from 'classnames'
 
 import { Block } from '../../../Block'
 import { SelectField } from '../../SelectField'
 import { TextField } from '../../TextField'
 import { Container } from '../../../Container'
 import { Props, Texture, TEXTURE_TYPES, WRAP_MODES, FILTER_MODES } from './types'
-import { ProjectAssetDrop, getModel } from '../../../../lib/sdk/drag-drop'
+import { ProjectAssetDrop, getNode } from '../../../../lib/sdk/drag-drop'
 import { AssetNodeItem } from '../../../ProjectAssetExplorer/types'
 import { isModel, isValidTexture } from './utils'
 
-const DROP_TYPES = ['project-asset-gltf']
+const DROP_TYPES = ['project-asset']
 
 function TextureInspector({ label, texture, files, getInputProps }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
@@ -30,12 +29,12 @@ function TextureInspector({ label, texture, files, getInputProps }: Props) {
       drop: ({ value, context }: ProjectAssetDrop, monitor) => {
         if (monitor.didDrop()) return
         const node = context.tree.get(value)!
-        const model = getModel(node, context.tree, isModel)
+        const model = getNode(node, context.tree, isModel)
         if (model) changeValue(model)
       },
       canDrop: ({ value, context }: ProjectAssetDrop) => {
         const node = context.tree.get(value)!
-        return !!getModel(node, context.tree, isModel)
+        return !!getNode(node, context.tree, isModel)
       },
       collect: (monitor) => ({
         isHover: monitor.canDrop() && monitor.isOver()
@@ -49,12 +48,14 @@ function TextureInspector({ label, texture, files, getInputProps }: Props) {
   const isValid = isValidTexture(src.value, files)
 
   return (
-    <Container label={label} className={cx(label, { hover: isHover })} initialOpen={false}>
+    <Container label={label} className={label} initialOpen={false}>
       <Block>
         <SelectField label="Type" options={TEXTURE_TYPES} {...type} />
       </Block>
-      <Block ref={drop} error={!isValid}>
-        {type.value === Texture.TT_TEXTURE && <TextField ref={inputRef} label="Path" type="text" {...src} />}
+      <Block ref={drop}>
+        {type.value === Texture.TT_TEXTURE && (
+          <TextField ref={inputRef} label="Path" type="text" error={!isValid} drop={isHover} {...src} />
+        )}
         {/* {type.value === Texture.TT_AVATAR_TEXTURE && <TextField label="User ID" {...getInputProps(`${texture}.userId`)} />}
         {type.value === Texture.TT_VIDEO_TEXTURE && <TextField label="Video player entity" {...getInputProps(`${texture}.videoPlayerEntity`)} />} */}
       </Block>

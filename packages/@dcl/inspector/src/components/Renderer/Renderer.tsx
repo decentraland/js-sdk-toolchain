@@ -3,10 +3,10 @@ import { useDrop } from 'react-dnd'
 import cx from 'classnames'
 import { Vector3 } from '@babylonjs/core'
 
-import { withAssetDir } from '../../lib/data-layer/host/fs-utils'
+import { DIRECTORY, withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
 import { importAsset } from '../../redux/data-layer'
-import { getModel, BuilderAsset, DROP_TYPES, IDrop, ProjectAssetDrop, isDropType } from '../../lib/sdk/drag-drop'
+import { getNode, BuilderAsset, DROP_TYPES, IDrop, ProjectAssetDrop, isDropType } from '../../lib/sdk/drag-drop'
 import { useRenderer } from '../../hooks/sdk/useRenderer'
 import { useSdk } from '../../hooks/sdk/useSdk'
 import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
@@ -66,10 +66,10 @@ const Renderer: React.FC = () => {
     return snapPosition(new Vector3(fixedNumber(pointerCoords.x), 0, fixedNumber(pointerCoords.z)))
   }
 
-  const addAsset = async (asset: AssetNodeItem, position: Vector3) => {
+  const addAsset = async (asset: AssetNodeItem, position: Vector3, basePath: string) => {
     if (!sdk) return
     const { operations } = sdk
-    operations.addAsset(ROOT, withAssetDir(asset.asset.src), asset.name, position, asset.components as any)
+    operations.addAsset(ROOT, asset.asset.src, asset.name, position, basePath, asset.components)
     await operations.dispatch()
   }
 
@@ -115,10 +115,11 @@ const Renderer: React.FC = () => {
       type: 'asset',
       name: asset.name,
       parent: null,
-      asset: { type: 'gltf', src: `${destFolder}/${assetPackageName}/${path}` },
+      asset: { type: 'gltf', src: path },
       components: asset.components
     }
-    await addAsset(model, position)
+    const basePath = withAssetDir(`${destFolder}/${assetPackageName}`)
+    await addAsset(model, position, basePath)
   }
 
   const [, drop] = useDrop(
@@ -133,12 +134,12 @@ const Renderer: React.FC = () => {
           return
         }
 
-        if (isDropType<ProjectAssetDrop>(item, itemType, 'project-asset-gltf')) {
+        if (isDropType<ProjectAssetDrop>(item, itemType, 'project-asset')) {
           const node = item.context.tree.get(item.value)!
-          const model = getModel(node, item.context.tree, isModel)
+          const model = getNode(node, item.context.tree, isModel)
           if (model) {
             const position = await getDropPosition()
-            await addAsset(model, position)
+            await addAsset(model, position, DIRECTORY.ASSETS)
           }
         }
       }

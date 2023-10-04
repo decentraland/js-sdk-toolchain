@@ -22,7 +22,12 @@ export function buildAssetTree(paths: string[]): AssetNodeFolder {
           currentNode = childNode
         } else {
           const lowerPath = path.toLowerCase()
-          const assetType = lowerPath.endsWith('.gltf') || lowerPath.endsWith('.glb') ? 'gltf' : 'unknown'
+          const assetType =
+            lowerPath.endsWith('.gltf') || lowerPath.endsWith('.glb')
+              ? 'gltf'
+              : lowerPath.endsWith('.mp3') || lowerPath.endsWith('.ogg') || lowerPath.endsWith('.wav')
+              ? 'audio'
+              : 'unknown'
           childNode = {
             name: parts[i],
             parent: currentNode,
