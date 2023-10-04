@@ -2698,6 +2698,8 @@ export interface PBTween {
     currentTime?: number | undefined;
     duration: number;
     // (undocumented)
+    faceDirection?: boolean | undefined;
+    // (undocumented)
     mode?: {
         $case: "move";
         move: Move;
@@ -2724,7 +2726,7 @@ export namespace PBTween {
 // @public (undocumented)
 export interface PBTweenSequence {
     // (undocumented)
-    loop: boolean;
+    loop?: TweenLoop | undefined;
     // (undocumented)
     sequence: PBTween[];
 }
@@ -3780,6 +3782,14 @@ export interface TweenHelper {
     Rotate: (rotate: Rotate) => PBTween['mode'];
     // (undocumented)
     Scale: (scale: Scale) => PBTween['mode'];
+}
+
+// @public (undocumented)
+export const enum TweenLoop {
+    // (undocumented)
+    TL_RESTART = 0,
+    // (undocumented)
+    TL_YOYO = 1
 }
 
 // @public (undocumented)

@@ -43,7 +43,6 @@ export async function main() {
   const userId = (await getUserData({})).data?.userId ?? ''
 
   setupUi(userId)
-  console.log(Tween.componentId)
   if (server) {
     engine.addSystem(moveHummingBirds)
     gameStatusServer(networkManager)
@@ -60,8 +59,9 @@ export async function main() {
     ]) {
       createCube(networkManager, x, y, z)
     }
-    return
-  } else {
+    // return
+  }
+  if (!server) {
     engine.addSystem(changeColorSystem)
     engine.addSystem(shootBirds(userId))
   }
