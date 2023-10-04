@@ -34,15 +34,15 @@ const options = [
 ]
 
 const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
-  const [payload, setPayload] = useState<ActionPayload<ActionType.PLAY_SOUND>>({
+  const [payload, setPayload] = useState<Partial<ActionPayload<ActionType.PLAY_SOUND>>>({
     ...value
   })
 
   const files = useAppSelector(selectAssetCatalog)
 
   const removeBase = useCallback(
-    (path: string) => {
-      return files?.basePath ? path.replace(files.basePath + '/', '') : path
+    (path?: string) => {
+      return path ? (files?.basePath ? path.replace(files.basePath + '/', '') : path) : ''
     },
     [files]
   )
@@ -96,7 +96,10 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
   )
 
   const error = useMemo(() => {
-    return !files || !files.assets.some(($) => $.path === payload.src)
+    if (!files || !payload.src) {
+      return false
+    }
+    return !files.assets.some(($) => $.path === payload.src)
   }, [files, payload])
 
   const renderPathInfo = () => {
