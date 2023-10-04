@@ -6,6 +6,7 @@ import {
   PBGltfContainer,
   Vector3Type,
   PBAudioSource,
+  PBVisibilityComponent,
   LastWriteWinElementSetComponentDefinition
 } from '@dcl/ecs'
 import {
@@ -94,6 +95,11 @@ export function addAsset(engine: IEngine) {
           case CoreComponents.AUDIO_SOURCE: {
             const audioSource = values.get(componentName) as PBAudioSource
             values.set(componentName, { ...audioSource, src: audioSource.audioClipUrl.replace('{assetPath}', base) })
+            break
+          }
+          case CoreComponents.VISIBILITY_COMPONENT: {
+            const visibilityComponent = values.get(componentName) as PBVisibilityComponent
+            values.set(componentName, { ...visibilityComponent, visible: visibilityComponent.visible })
             break
           }
           case ComponentName.ACTIONS: {

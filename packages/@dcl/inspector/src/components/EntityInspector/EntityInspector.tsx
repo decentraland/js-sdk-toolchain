@@ -21,6 +21,7 @@ import { TransformInspector } from './TransformInspector'
 import { StatesInspector } from './StatesInspector'
 import { CounterInspector } from './CounterInspector'
 import { AudioSourceInspector } from './AudioSourceInspector'
+import { VisibilityComponentInspector } from './VisibilityComponentInspector'
 
 import './EntityInspector.css'
 
@@ -53,6 +54,7 @@ export const EntityInspector = withSdk(({ sdk }) => {
   const inspectors = useMemo(
     () => [
       { name: sdk.components.GltfContainer.componentName, component: GltfInspector },
+      { name: sdk.components.VisibilityComponent.componentName, component: VisibilityComponentInspector },
       { name: sdk.components.Material.componentName, component: MaterialInspector },
       { name: sdk.components.MeshCollider.componentName, component: MeshColliderInspector },
       { name: sdk.components.MeshRenderer.componentName, component: MeshRendererInspector },
