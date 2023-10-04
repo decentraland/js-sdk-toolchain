@@ -24,7 +24,10 @@ const ONE_MB_IN_BYTES = 1_048_576
 const ONE_GB_IN_BYTES = ONE_MB_IN_BYTES * 1024
 const ACCEPTED_FILE_TYPES = {
   'model/gltf-binary': ['.gltf', '.glb'],
-  'image/png': ['.png']
+  'image/png': ['.png'],
+  'audio/mpeg': ['.mp3'],
+  'audio/wav': ['.wav'],
+  'audio/ogg': ['.ogg']
 }
 
 interface PropTypes {
@@ -74,6 +77,9 @@ async function validateAsset(extension: string, data: ArrayBuffer): Promise<Vali
     // add validators for .png/.ktx2?
     case 'png':
     case 'ktx2':
+    case 'mp3':
+    case '.wav':
+    case '.ogg':
       return null
     default:
       return `Invalid asset format ".${extension}"`
@@ -173,7 +179,7 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
               <HiOutlineUpload />
             </div>
             <span>
-              To import an asset drag and drop a single GLB/GLTF/PNG file
+              To import an asset drag and drop a single GLB/GLTF/PNG/MP3 file
               <br /> or click to select a file.
             </span>
           </>
