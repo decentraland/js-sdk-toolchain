@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { useDrop } from 'react-dnd'
+import { VscQuestion as QuestionIcon } from 'react-icons/vsc'
+import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
 import { ActionPayload, ActionType } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
-import { useDrop } from 'react-dnd'
 
 import { DropTypesEnum, ProjectAssetDrop, getNode } from '../../../../lib/sdk/drag-drop'
 import { withAssetDir } from '../../../../lib/data-layer/host/fs-utils'
@@ -97,11 +99,24 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
     return !files || !files.assets.some(($) => $.path === payload.src)
   }, [files, payload])
 
+  const renderPathInfo = () => {
+    return (
+      <Popup
+        content={<>You can drag and drop an audio file from the Local Assets</>}
+        trigger={<QuestionIcon size={16} />}
+        position="right center"
+        on="hover"
+        hideOnScroll
+        hoverable
+      />
+    )
+  }
+
   return (
     <div className="PlaySoundActionContainer">
       <div className="row">
         <div className="field" ref={drop}>
-          <label>Path</label>
+          <label>Path {renderPathInfo()}</label>
           <TextField value={removeBase(payload.src)} onChange={handleChangeSrc} error={error} drop={isHover} />
         </div>
         <div className="field">
