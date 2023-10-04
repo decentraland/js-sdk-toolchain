@@ -117,7 +117,12 @@ export default withSdk<Props>(
     }, [entitiesWithAction])
 
     const availableTriggers = useMemo(() => {
-      const triggerTypes: TriggerType[] = [TriggerType.ON_SPAWN, TriggerType.ON_CLICK]
+      const triggerTypes: TriggerType[] = [
+        TriggerType.ON_SPAWN,
+        TriggerType.ON_CLICK,
+        TriggerType.ON_PLAYER_ENTERS_AREA,
+        TriggerType.ON_PLAYER_LEAVES_AREA
+      ]
       if (hasStates) {
         triggerTypes.push(TriggerType.ON_STATE_CHANGE)
       }
