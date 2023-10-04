@@ -78,8 +78,8 @@ async function validateAsset(extension: string, data: ArrayBuffer): Promise<Vali
     case 'png':
     case 'ktx2':
     case 'mp3':
-    case '.wav':
-    case '.ogg':
+    case 'wav':
+    case 'ogg':
       return null
     default:
       return `Invalid asset format ".${extension}"`
