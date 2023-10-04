@@ -12,8 +12,6 @@ export function buildAssetTree(paths: string[]): AssetNodeFolder {
     const parts = path.split('/').filter((item) => item.length > 0)
     let currentNode = root
 
-    console.log('paths', paths)
-
     for (let i = 0; i < parts.length; i++) {
       let childNode = currentNode.children.find((child) => child.name === parts[i])
       if (!childNode) {
