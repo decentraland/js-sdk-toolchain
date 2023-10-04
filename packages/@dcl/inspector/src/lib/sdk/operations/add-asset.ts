@@ -44,7 +44,6 @@ export function addAsset(engine: IEngine) {
     Transform.createOrReplace(child, { parent, position })
 
     if (components) {
-      debugger
       // values
       const values = new Map<string, any>()
 
