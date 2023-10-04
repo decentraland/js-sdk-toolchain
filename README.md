@@ -20,13 +20,12 @@ This repository consists of the following components, packaged for the `nodejs`/
 
 And some internal or maybe useful packages if you're digging deeper into how the Decentraland runtime works:
 * `@dcl/js-runtime`: the `js-runtime` contains the typings for the environment variables available in the sandboxed execution environment for scenes
-* `@dcl/rollup`: configuration for the [rollup](https://rollupjs.org/) bundle and packaging system for javascript projects
 * `@dcl/playground-assets`: contains the files needed by the playground. https://playground.decentraland.org/
 
 
 ### Versioning notes
 
-When `@dcl/sdk` is built, as it depends on new versions of `@dcl/rollup` and `@dcl/ecs`, these are built first and `@dcl/sdk` includes the new versions.
+When `@dcl/sdk` is built, as it depends on new versions of `@dcl/ecs`, these are built first and `@dcl/sdk` includes the new versions.
 
 ### ECS 6 dev support
 The ECS 6 lives in the `6.x.x` branch, there will no longer be new features but it's available for fixes or patches.
