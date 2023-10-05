@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Item } from 'react-contexify'
 import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
-import { VscQuestion as QuestionIcon, VscTrash as RemoveIcon, VscInfo as InfoIcon } from 'react-icons/vsc'
+import { VscQuestion as QuestionIcon, VscTrash as RemoveIcon } from 'react-icons/vsc'
 import { Action, ActionType, getActionTypes, getJson, ActionPayload, getActionSchema } from '@dcl/asset-packs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
@@ -31,6 +31,8 @@ import { getDefaultPayload, getPartialPayload, isStates } from './utils'
 import { Props } from './types'
 
 import './ActionInspector.css'
+import { AvatarAnchorPointType } from '@dcl/ecs'
+import { PlayAnimationAction } from './PlayAnimationAction'
 
 export default withSdk<Props>(
   withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId, contextMenuId }) => {
@@ -161,6 +163,7 @@ export default withSdk<Props>(
     const conditionalActions: Partial<Record<string, () => boolean>> = useMemo(
       () => ({
         [ActionType.PLAY_ANIMATION]: () => hasAnimations,
+        [ActionType.STOP_ANIMATION]: () => hasAnimations,
         [ActionType.SET_STATE]: () => hasStates,
         [ActionType.INCREMENT_COUNTER]: () => hasCounter,
         [ActionType.DECREASE_COUNTER]: () => hasCounter,
@@ -194,12 +197,10 @@ export default withSdk<Props>(
     }, [addAction])
 
     const handleChangeAnimation = useCallback(
-      ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
+      (value: ActionPayload<ActionType.PLAY_ANIMATION>, idx: number) => {
         modifyAction(idx, {
           ...actions[idx],
-          jsonPayload: getJson<ActionType.PLAY_ANIMATION>({
-            animation: value
-          })
+          jsonPayload: getJson<ActionType.PLAY_ANIMATION>(value)
         })
       },
       [modifyAction, actions]
@@ -243,6 +244,18 @@ export default withSdk<Props>(
           ...actions[idx],
           jsonPayload: getJson<ActionType.SET_COUNTER>({
             counter: parseInt(value)
+          })
+        })
+      },
+      [modifyAction, actions]
+    )
+
+    const handleChangeAnchorPoint = useCallback(
+      ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
+        modifyAction(idx, {
+          ...actions[idx],
+          jsonPayload: getJson<ActionType.ATTACH_TO_PLAYER>({
+            anchorPointId: parseInt(value)
           })
         })
       },
@@ -323,40 +336,15 @@ export default withSdk<Props>(
       )
     }
 
-    const renderSelectAnimationMoreInfo = () => {
-      return (
-        <Popup
-          content={
-            <>
-              Learn more about animations in the <a href="">docs</a>.
-            </>
-          }
-          trigger={<InfoIcon size={16} />}
-          position="top center"
-          on="hover"
-          hideOnScroll
-          hoverable
-        />
-      )
-    }
-
     const renderAction = (action: Action, idx: number) => {
       switch (action.type) {
         case ActionType.PLAY_ANIMATION: {
           return hasAnimations ? (
-            <div className="row">
-              <div className="field">
-                <label>Select Animation {renderSelectAnimationMoreInfo()}</label>
-                <Dropdown
-                  options={[
-                    { value: '', text: 'Select an Animation' },
-                    ...animations.map((animation) => ({ text: animation.name, value: animation.name }))
-                  ]}
-                  value={getPartialPayload<ActionType.PLAY_ANIMATION>(action)?.animation}
-                  onChange={(e) => handleChangeAnimation(e, idx)}
-                />
-              </div>
-            </div>
+            <PlayAnimationAction
+              value={getPartialPayload<ActionType.PLAY_ANIMATION>(action)}
+              animations={animations}
+              onUpdate={(value: ActionPayload<ActionType.PLAY_ANIMATION>) => handleChangeAnimation(value, idx)}
+            />
           ) : null
         }
         case ActionType.SET_STATE: {
@@ -418,6 +406,26 @@ export default withSdk<Props>(
                   ]}
                   value={(getPartialPayload<ActionType.SET_VISIBILITY>(action)?.visible ?? true).toString()}
                   onChange={(e) => handleSetVisible(e, idx)}
+                />
+              </div>
+            </div>
+          )
+        }
+        case ActionType.ATTACH_TO_PLAYER: {
+          return (
+            <div className="row">
+              <div className="field">
+                <label>Select Anchor Point</label>
+                <Dropdown
+                  options={[
+                    { value: '', text: 'Select an Anchor Point' },
+                    { value: AvatarAnchorPointType.AAPT_RIGHT_HAND, text: 'Right Hand' },
+                    { value: AvatarAnchorPointType.AAPT_LEFT_HAND, text: 'Left Hand' },
+                    { value: AvatarAnchorPointType.AAPT_NAME_TAG, text: 'Name Tag' },
+                    { value: AvatarAnchorPointType.AAPT_POSITION, text: 'Avatar Position' }
+                  ]}
+                  value={getPartialPayload<ActionType.ATTACH_TO_PLAYER>(action)?.anchorPointId}
+                  onChange={(e) => handleChangeAnchorPoint(e, idx)}
                 />
               </div>
             </div>

@@ -8,6 +8,6 @@ export function isValidTween(tween: ActionPayload['start_tween']) {
     !isNaN(parseInt(tween.end.z)) &&
     tween.relative !== undefined &&
     !!tween.interpolationType &&
-    !!tween.duration
+    !isNaN(Number(tween.duration))
   )
 }

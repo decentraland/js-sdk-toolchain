@@ -8,17 +8,7 @@ import {
   PBAudioSource,
   LastWriteWinElementSetComponentDefinition
 } from '@dcl/ecs'
-import {
-  ActionType,
-  Actions,
-  ComponentName,
-  Trigger,
-  TriggerType,
-  Triggers,
-  getJson,
-  getNextId,
-  getPayload
-} from '@dcl/asset-packs'
+import { ActionType, Actions, ComponentName, Triggers, getJson, getNextId, getPayload } from '@dcl/asset-packs'
 import { CoreComponents } from '../components'
 import updateSelectedEntity from './update-selected-entity'
 import { addChild } from './add-child'
@@ -80,14 +70,8 @@ export function addAsset(engine: IEngine) {
         switch (componentName) {
           case CoreComponents.GLTF_CONTAINER: {
             const gltfContainer = values.get(componentName) as PBGltfContainer
-            if (components[ComponentName.TRIGGERS]) {
-              const triggers = values.get(ComponentName.TRIGGERS) as Triggers
-              // fix collision masks if the asset has an ON_CLICK trigger
-              if (triggers.value.some((trigger: Trigger) => trigger.type === TriggerType.ON_CLICK)) {
-                gltfContainer.visibleMeshesCollisionMask ??= 1
-                gltfContainer.invisibleMeshesCollisionMask ??= 2
-              }
-            }
+            gltfContainer.visibleMeshesCollisionMask ??= 1
+            gltfContainer.invisibleMeshesCollisionMask ??= 2
             values.set(componentName, { ...gltfContainer, src: gltfContainer.src.replace('{assetPath}', base) })
             break
           }
@@ -142,7 +126,11 @@ export function addAsset(engine: IEngine) {
       }
     } else {
       // if the asset is just a path to a model, create a gltf container for it (this is the case for assets dropped from the local files tab)
-      GltfContainer.create(child, { src: `${base}/${src}` })
+      GltfContainer.create(child, {
+        src: `${base}/${src}`,
+        visibleMeshesCollisionMask: 1,
+        invisibleMeshesCollisionMask: 2
+      })
     }
 
     // update selection
