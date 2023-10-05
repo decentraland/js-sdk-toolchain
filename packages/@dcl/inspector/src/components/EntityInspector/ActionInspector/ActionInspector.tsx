@@ -410,7 +410,7 @@ export default withSdk<Props>(
           return (
             <div className="row">
               <div className="field">
-                <label>Visibility</label>
+                <label>Select Visibility</label>
                 <Dropdown
                   options={[
                     { value: 'true', text: 'Visible' },
