@@ -97,11 +97,6 @@ export function addAsset(engine: IEngine) {
             values.set(componentName, { ...audioSource, src: audioSource.audioClipUrl.replace('{assetPath}', base) })
             break
           }
-          case CoreComponents.VISIBILITY_COMPONENT: {
-            const visibilityComponent = values.get(componentName) as PBVisibilityComponent
-            values.set(componentName, { ...visibilityComponent, visible: visibilityComponent.visible })
-            break
-          }
           case ComponentName.ACTIONS: {
             const actions = values.get(componentName) as Actions
             const newValue: Actions['value'] = []
