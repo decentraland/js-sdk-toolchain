@@ -180,7 +180,7 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
         </div>
       </div>
       <div className="row">
-        <div className="field relative">
+        <div className="field inline">
           <input type="checkbox" checked={tween.relative} onChange={handleChangeRelative} />
           <label>Relative {renderRelativeInfo()}</label>
         </div>

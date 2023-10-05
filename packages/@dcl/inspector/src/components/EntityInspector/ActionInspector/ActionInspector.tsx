@@ -2,15 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Item } from 'react-contexify'
 import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 import { VscQuestion as QuestionIcon, VscTrash as RemoveIcon, VscInfo as InfoIcon } from 'react-icons/vsc'
-import {
-  Action,
-  ActionType,
-  getActionTypes,
-  getPayload,
-  getJson,
-  ActionPayload,
-  getActionSchema
-} from '@dcl/asset-packs'
+import { Action, ActionType, getActionTypes, getJson, ActionPayload, getActionSchema } from '@dcl/asset-packs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
 
@@ -20,6 +12,7 @@ import { useComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { useChange } from '../../../hooks/sdk/useChange'
+import { useArrayState } from '../../../hooks/useArrayState'
 import { EditorComponentsTypes } from '../../../lib/sdk/components'
 
 import { Block } from '../../Block'
@@ -34,17 +27,10 @@ import { Button } from '../../Button'
 import { PlaySoundAction } from './PlaySoundAction'
 import { TweenAction } from './TweenAction'
 import { isValidTween } from './TweenAction/utils'
+import { getDefaultPayload, getPartialPayload, isStates } from './utils'
 import { Props } from './types'
 
 import './ActionInspector.css'
-
-function isStates(maybeStates: any): maybeStates is EditorComponentsTypes['States'] {
-  return !!maybeStates && 'value' in maybeStates && Array.isArray(maybeStates.value)
-}
-
-function getPartialPayload<T extends ActionType>(action: Action) {
-  return getPayload<T>(action) as Partial<ActionPayload<T>>
-}
 
 export default withSdk<Props>(
   withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId, contextMenuId }) => {
@@ -56,7 +42,9 @@ export default withSdk<Props>(
 
     const entity = sdk.sceneContext.getEntityOrNull(entityId)
     const { handleAction } = useContextMenu()
-    const [actions, setActions] = useState<Action[]>(componentValue === null ? [] : componentValue.value)
+    const [actions, addAction, modifyAction, removeAction] = useArrayState<Action>(
+      componentValue === null ? [] : componentValue.value
+    )
     const [isFocused, setIsFocused] = useState(false)
     const [isLoaded, setIsLoaded] = useState(false)
     const [states, setStates] = useState<string[]>(States.getOrNull(entityId)?.value || [])
@@ -107,6 +95,10 @@ export default withSdk<Props>(
           }
           case ActionType.DECREASE_COUNTER: {
             const payload = getPartialPayload<ActionType.DECREASE_COUNTER>(action)
+            return !!payload
+          }
+          case ActionType.SET_VISIBILITY: {
+            const payload = getPartialPayload<ActionType.SET_VISIBILITY>(action)
             return !!payload
           }
           default: {
@@ -198,114 +190,97 @@ export default withSdk<Props>(
     }, [])
 
     const handleAddNewAction = useCallback(() => {
-      setActions((prev: Action[]) => {
-        return [...prev, { type: '', name: '', jsonPayload: '{}' }]
-      })
-    }, [setActions])
+      addAction({ type: '', name: '', jsonPayload: '{}' })
+    }, [addAction])
 
     const handleChangeAnimation = useCallback(
       ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
-        setActions((prev: Action[]) => {
-          const data = [...prev]
-          data[idx] = {
-            ...data[idx],
-            jsonPayload: getJson<ActionType.PLAY_ANIMATION>({
-              animation: value
-            })
-          }
-          return data
+        modifyAction(idx, {
+          ...actions[idx],
+          jsonPayload: getJson<ActionType.PLAY_ANIMATION>({
+            animation: value
+          })
         })
       },
-      [setActions]
+      [modifyAction, actions]
     )
 
     const handleChangeState = useCallback(
       ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
-        setActions((prev: Action[]) => {
-          const data = [...prev]
-          data[idx] = {
-            ...data[idx],
-            jsonPayload: getJson<ActionType.SET_STATE>({
-              state: value
-            })
-          }
-          return data
+        modifyAction(idx, {
+          ...actions[idx],
+          jsonPayload: getJson<ActionType.SET_STATE>({
+            state: value
+          })
         })
       },
-      [setActions]
+      [modifyAction, actions]
     )
 
     const handleChangeTween = useCallback(
       (tween: ActionPayload<ActionType.START_TWEEN>, idx: number) => {
-        setActions((prev: Action[]) => {
-          const data = [...prev]
-          data[idx] = {
-            ...data[idx],
-            jsonPayload: getJson<ActionType.START_TWEEN>(tween)
-          }
-          return data
+        modifyAction(idx, {
+          ...actions[idx],
+          jsonPayload: getJson<ActionType.START_TWEEN>(tween)
         })
       },
-      [setActions]
+      [modifyAction, actions]
     )
 
     const handleChangeSound = useCallback(
       (value: ActionPayload<ActionType.PLAY_SOUND>, idx: number) => {
-        setActions((prev: Action[]) => {
-          const data = [...prev]
-          data[idx] = {
-            ...data[idx],
-            jsonPayload: getJson<ActionType.PLAY_SOUND>(value)
-          }
-          return data
+        modifyAction(idx, {
+          ...actions[idx],
+          jsonPayload: getJson<ActionType.PLAY_SOUND>(value)
         })
       },
-      [setActions]
+      [modifyAction, actions]
     )
 
     const handleChangeCounter = useCallback(
       ({ target: { value } }: React.ChangeEvent<HTMLInputElement>, idx: number) => {
-        setActions((prev: Action[]) => {
-          const data = [...prev]
-          data[idx] = {
-            ...data[idx],
-            jsonPayload: getJson<ActionType.SET_COUNTER>({
-              counter: parseInt(value)
-            })
-          }
-          return data
+        modifyAction(idx, {
+          ...actions[idx],
+          jsonPayload: getJson<ActionType.SET_COUNTER>({
+            counter: parseInt(value)
+          })
         })
       },
-      [setActions]
+      [modifyAction, actions]
     )
 
     const handleChangeType = useCallback(
       ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
-        setActions((prev: Action[]) => {
-          const data = [...prev]
-          data[idx] = {
-            ...data[idx],
-            type: value
-          }
-          return data
+        modifyAction(idx, {
+          ...actions[idx],
+          type: value,
+          jsonPayload: getDefaultPayload(value)
         })
       },
-      [setActions]
+      [modifyAction, actions]
     )
 
     const handleChangeName = useCallback(
       (e: React.ChangeEvent<HTMLElement>, idx: number) => {
         const { value } = e.target as HTMLInputElement
-        setActions((prev: Action[]) => {
-          const data = [...prev]
-          data[idx] = {
-            ...data[idx],
-            name: value
-          }
-          return data
+        modifyAction(idx, {
+          ...actions[idx],
+          name: value
         })
       },
-      [setActions]
+      [modifyAction, actions]
+    )
+
+    const handleSetVisible = useCallback(
+      ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
+        modifyAction(idx, {
+          ...actions[idx],
+          jsonPayload: getJson<ActionType.SET_VISIBILITY>({
+            visible: value === 'true'
+          })
+        })
+      },
+      [modifyAction, actions]
     )
 
     const handleFocusInput = useCallback(
@@ -322,13 +297,9 @@ export default withSdk<Props>(
     const handleRemoveAction = useCallback(
       (e: React.MouseEvent, idx: number) => {
         e.stopPropagation()
-        setActions((prev: Action[]) => {
-          const data = [...prev]
-          data.splice(idx, 1)
-          return data
-        })
+        removeAction(idx)
       },
-      [setActions]
+      [removeAction]
     )
 
     if (!hasActions || !isLoaded) {
@@ -433,6 +404,23 @@ export default withSdk<Props>(
               value={getPartialPayload<ActionType.PLAY_SOUND>(action)}
               onUpdate={(value: ActionPayload<ActionType.PLAY_SOUND>) => handleChangeSound(value, idx)}
             />
+          )
+        }
+        case ActionType.SET_VISIBILITY: {
+          return (
+            <div className="row">
+              <div className="field">
+                <label>Select Visibility</label>
+                <Dropdown
+                  options={[
+                    { value: 'true', text: 'Visible' },
+                    { value: 'false', text: 'Invisible' }
+                  ]}
+                  value={(getPartialPayload<ActionType.SET_VISIBILITY>(action)?.visible ?? true).toString()}
+                  onChange={(e) => handleSetVisible(e, idx)}
+                />
+              </div>
+            </div>
           )
         }
         default: {
