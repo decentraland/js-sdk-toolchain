@@ -5,7 +5,7 @@ import {
   IEngine,
   VideoEventsSystem,
   VideoState
-} from '../../packages/@dcl/ecs/src'
+} from '../../../packages/@dcl/ecs/src'
 
 describe('Video events helper system should', () => {
   const engine: IEngine = Engine()

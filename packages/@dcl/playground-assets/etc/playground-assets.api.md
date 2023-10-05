@@ -3808,6 +3808,17 @@ export const enum TweenStateStatus {
     TS_PAUSED = 2
 }
 
+// Warning: (ae-missing-release-tag) "TweenSystem" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type TweenSystem = {
+    tweenCompleted(entity: Entity): void;
+    tweenChanged(entity: Entity): void;
+};
+
+// @public
+export const tweenSystem: TweenSystem;
+
 // @public
 export interface UiAvatarTexture {
     // (undocumented)
@@ -4062,8 +4073,6 @@ export interface VideoEventsSystem {
     removeVideoEventsEntity(entity: Entity): void;
 }
 
-// Warning: (ae-extra-release-tag) The doc comment should not contain more than one release tag
-//
 // @public
 export const videoEventsSystem: VideoEventsSystem;
 
