@@ -1,6 +1,6 @@
 import { GltfContainer, Transform, SyncComponents, Entity } from '@dcl/ecs'
 import * as utils from '@dcl-sdk/utils'
-import { Vector3 } from '@dcl/sdk/math'
+import { Quaternion, Vector3 } from '@dcl/sdk/math'
 import { engine } from '@dcl/sdk/ecs'
 import { NetworkManager } from '@dcl/sdk/network-transport/types'
 
@@ -56,8 +56,8 @@ export function createMovingPlatformsOld(networkedEntityFactory: NetworkManager)
 
   startPath(
     platform1,
-    [Vector3.create(2, 1.5, 8 + diffZ), Vector3.create(2, 1.5, 10 + diffZ), Vector3.create(2, 1.5, 8 + diffZ)],
-    3,
+    [Vector3.create(2, 1.5, 6 + diffZ), Vector3.create(2, 1.5, 12 + diffZ), Vector3.create(2, 1.5, 6 + diffZ)],
+    1,
     false,
     true
   )
@@ -83,6 +83,19 @@ export function createMovingPlatformsOld(networkedEntityFactory: NetworkManager)
     false,
     true
   )
+
+  function rotate() {
+    console.log('rotating')
+    utils.tweens.startRotation(
+      platform2,
+      Quaternion.fromEulerDegrees(0, 0, 0),
+      Quaternion.fromEulerDegrees(0, 180, 0),
+      1,
+      utils.InterpolationType.LINEAR,
+      rotate
+    )
+  }
+  rotate()
 }
 
 // function to make path following recursive

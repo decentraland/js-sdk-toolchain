@@ -21,17 +21,17 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
     src: 'models/movingPlatform.glb'
   })
   Transform.create(platform1, {
-    position: Vector3.create(2, 1.5, 8)
+    position: Vector3.create(2, 1.5, 6.5)
   })
   SyncComponents.create(platform1, { componentIds: [Tween.componentId] })
 
   Tween.create(platform1, {
     mode: Tween.Mode.Move({ start: Vector3.create(2, 1.5, 6.5), end: Vector3.create(2, 1.5, 12) }),
-    duration: 4000,
+    duration: 500,
     tweenFunction: EasingFunction.TF_LINEAR
   })
 
-  TweenSequence.create(platform1, { loop: TweenLoop.TL_RESTART, sequence: [] })
+  TweenSequence.create(platform1, { loop: TweenLoop.TL_YOYO, sequence: [] })
 
   // only vertical
   const parent = networkedEntityFactory.addEntity(engine)
@@ -60,7 +60,7 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
       start: Quaternion.fromEulerDegrees(0, 0, 0),
       end: Quaternion.fromEulerDegrees(0, 180, 0)
     }),
-    duration: 1000,
+    duration: 500,
     tweenFunction: EasingFunction.TF_LINEAR
   })
   TweenSequence.create(platform2, {
@@ -71,7 +71,7 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
           start: Quaternion.fromEulerDegrees(0, 180, 0),
           end: Quaternion.fromEulerDegrees(0, 360, 0)
         }),
-        duration: 1000,
+        duration: 500,
         tweenFunction: EasingFunction.TF_LINEAR
       }
     ]
@@ -87,7 +87,7 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
   SyncComponents.create(platform3, { componentIds: [Tween.componentId] })
   Tween.create(platform3, {
     mode: Tween.Mode.Move({ start: Vector3.create(14, 4, 12), end: Vector3.create(14, 4, 4) }),
-    duration: 5000,
+    duration: 3000,
     tweenFunction: EasingFunction.TF_LINEAR
   })
   TweenSequence.create(platform3, { loop: TweenLoop.TL_YOYO, sequence: [] })
