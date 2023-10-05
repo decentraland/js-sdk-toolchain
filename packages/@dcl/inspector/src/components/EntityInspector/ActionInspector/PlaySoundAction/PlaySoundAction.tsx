@@ -22,7 +22,7 @@ enum PLAY_MODE {
   LOOP = 'loop'
 }
 
-const options = [
+const playModeOptions = [
   {
     label: 'Play Once',
     value: PLAY_MODE.PLAY_ONCE
@@ -126,7 +126,7 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
           <label>Play Mode</label>
           <SelectField
             value={payload.loop ? PLAY_MODE.LOOP : PLAY_MODE.PLAY_ONCE}
-            options={options}
+            options={playModeOptions}
             onChange={handleChangePlayMode}
           />
         </div>
