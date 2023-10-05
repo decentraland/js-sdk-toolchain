@@ -6,7 +6,6 @@ import {
   PBGltfContainer,
   Vector3Type,
   PBAudioSource,
-  PBVisibilityComponent,
   LastWriteWinElementSetComponentDefinition
 } from '@dcl/ecs'
 import {
