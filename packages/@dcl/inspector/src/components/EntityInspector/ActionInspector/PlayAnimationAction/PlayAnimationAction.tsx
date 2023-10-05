@@ -49,7 +49,7 @@ const PlaySoundAction: React.FC<Props> = ({ value, animations, onUpdate }: Props
   )
 
   return (
-    <div className="PlaySoundActionContainer">
+    <div className="PlayAnimationActionContainer">
       <div className="row">
         <div className="field">
           <label>Select Animation</label>
