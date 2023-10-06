@@ -34,17 +34,55 @@ export function toScene(inputs: SceneInput): EditorComponentsTypes['Scene'] {
   }
 }
 
-export function isValidInput(input: SceneInput): boolean {
-  const parcels = input.layout.parcels.split(' ')
+export function toSceneAuto(inputs: SceneInput): EditorComponentsTypes['Scene'] {
+  const parcels = parseParcels(inputs.layout.parcels)
+  const points = getCoordinatesBetweenPoints(parcels[0], parcels[1])
+  return {
+    layout: {
+      base: points[0],
+      parcels: points
+    }
+  }
+}
+
+export function parseParcels(value: string): Coords[] {
+  const parcels = value.split(' ')
   const coordsList: Coords[] = []
 
   for (const parcel of parcels) {
     const coords = parcel.split(',')
     const x = parseInt(coords[0])
     const y = parseInt(coords[1])
-    if (coords.length !== 2 || isNaN(x) || isNaN(y)) return false
+    if (coords.length !== 2 || isNaN(x) || isNaN(y)) return []
     coordsList.push({ x, y })
   }
 
-  return areConnected(coordsList)
+  return coordsList
+}
+
+export function getInputValidation(auto?: boolean) {
+  return function isValidInput(input: SceneInput): boolean {
+    const parcels = parseParcels(input.layout.parcels)
+    return auto ? parcels.length === 2 : areConnected(parcels)
+  }
+}
+
+export function getCoordinatesBetweenPoints(pointA: Coords, pointB: Coords): Coords[] {
+  const coordinates: Coords[] = []
+
+  // ensure pointA is the bottom-left coord
+  if (pointA.x > pointB.x) {
+    ;[pointA.x, pointB.x] = [pointB.x, pointA.x]
+  }
+  if (pointA.y > pointB.y) {
+    ;[pointA.y, pointB.y] = [pointB.y, pointA.y]
+  }
+
+  for (let x = pointA.x; x <= pointB.x; x++) {
+    for (let y = pointA.y; y <= pointB.y; y++) {
+      coordinates.push({ x, y })
+    }
+  }
+
+  return coordinates
 }
