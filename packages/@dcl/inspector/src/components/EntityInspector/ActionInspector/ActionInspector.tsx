@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Item } from 'react-contexify'
 import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 import { VscQuestion as QuestionIcon, VscTrash as RemoveIcon } from 'react-icons/vsc'
+import { AvatarAnchorPointType } from '@dcl/ecs'
 import { Action, ActionType, getActionTypes, getJson, ActionPayload, getActionSchema } from '@dcl/asset-packs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
@@ -27,12 +28,12 @@ import { Button } from '../../Button'
 import { PlaySoundAction } from './PlaySoundAction'
 import { TweenAction } from './TweenAction'
 import { isValidTween } from './TweenAction/utils'
+import { PlayAnimationAction } from './PlayAnimationAction'
+import { SetVisibilityAction } from './SetVisibilityAction'
 import { getDefaultPayload, getPartialPayload, isStates } from './utils'
 import { Props } from './types'
 
 import './ActionInspector.css'
-import { AvatarAnchorPointType } from '@dcl/ecs'
-import { PlayAnimationAction } from './PlayAnimationAction'
 
 export default withSdk<Props>(
   withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId, contextMenuId }) => {
@@ -284,13 +285,11 @@ export default withSdk<Props>(
       [modifyAction, actions]
     )
 
-    const handleSetVisible = useCallback(
-      ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
+    const handleChangeVisibility = useCallback(
+      (value: ActionPayload<ActionType.SET_VISIBILITY>, idx: number) => {
         modifyAction(idx, {
           ...actions[idx],
-          jsonPayload: getJson<ActionType.SET_VISIBILITY>({
-            visible: value === 'true'
-          })
+          jsonPayload: getJson<ActionType.SET_VISIBILITY>(value)
         })
       },
       [modifyAction, actions]
@@ -396,19 +395,10 @@ export default withSdk<Props>(
         }
         case ActionType.SET_VISIBILITY: {
           return (
-            <div className="row">
-              <div className="field">
-                <label>Select Visibility</label>
-                <Dropdown
-                  options={[
-                    { value: 'true', text: 'Visible' },
-                    { value: 'false', text: 'Invisible' }
-                  ]}
-                  value={(getPartialPayload<ActionType.SET_VISIBILITY>(action)?.visible ?? true).toString()}
-                  onChange={(e) => handleSetVisible(e, idx)}
-                />
-              </div>
-            </div>
+            <SetVisibilityAction
+              value={getPartialPayload<ActionType.SET_VISIBILITY>(action)}
+              onUpdate={(e) => handleChangeVisibility(e, idx)}
+            />
           )
         }
         case ActionType.ATTACH_TO_PLAYER: {

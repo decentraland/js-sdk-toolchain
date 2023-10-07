@@ -43,7 +43,7 @@
   gap: 4px;
 }
 
-.ActionInspector > .content > .Block > .content .row .field .TextField {
+.ActionInspector > .content > .Block > .content .row .field > .TextField {
   width: 100%;
 }
 
