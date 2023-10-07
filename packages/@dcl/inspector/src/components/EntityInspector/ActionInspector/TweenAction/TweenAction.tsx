@@ -11,18 +11,9 @@ import { isValidTween } from './utils'
 import type { Props } from './types'
 
 const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props) => {
-  const [tween, setTween] = useState({
-    type: '',
-    end: {
-      x: 0,
-      y: 0,
-      z: 0
-    },
-    relative: true,
-    interpolationType: InterpolationType.LINEAR,
-    duration: 1,
-    ...tweenProp
-  })
+  const [tween, setTween] = useState(tweenProp)
+  const [endPosition, setEndPosition] = useState(tween.end)
+  const [duration, setDuration] = useState(tween.duration)
 
   useEffect(() => {
     if (!recursiveCheck(tween, tweenProp, 2) || !isValidTween(tween)) return
@@ -39,8 +30,17 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
   const handleChangeEndPosition = useCallback(
     (e: React.ChangeEvent<HTMLElement>, axis: string) => {
       const { value } = e.target as HTMLInputElement
-      const validValue = isNaN(parseInt(value)) ? '' : parseInt(value)
+      setEndPosition({ ...endPosition, [axis]: value })
+    },
+    [endPosition, setTween]
+  )
+
+  const handleBlurEndPosition = useCallback(
+    (e: React.ChangeEvent<HTMLElement>, axis: string) => {
+      const { value } = e.target as HTMLInputElement
+      const validValue = isNaN(parseFloat(value)) ? parseFloat('0') : parseFloat(value)
       setTween({ ...tween, end: { ...tween.end, [axis]: validValue } })
+      setEndPosition({ ...endPosition, [axis]: validValue.toFixed(2) })
     },
     [tween, setTween]
   )
@@ -63,9 +63,22 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
   const handleChangeDuration = useCallback(
     (e: React.ChangeEvent<HTMLElement>) => {
       const { value } = e.target as HTMLInputElement
-      setTween({ ...tween, duration: parseInt(value) })
+      setDuration(value)
     },
-    [tween, setTween]
+    [setDuration]
+  )
+
+  const handleChangeDurationRange = useCallback(
+    (e: React.ChangeEvent<HTMLElement>) => {
+      const { value } = e.target as HTMLInputElement
+      const parsedValue = parseInt(value)
+      if (!isNaN(parsedValue) && parsedValue >= 0) {
+        setTween({ ...tween, duration: parsedValue })
+      }
+
+      setDuration(parsedValue.toString())
+    },
+    [tween, setTween, setDuration]
   )
 
   const renderTweenInfo = () => {
@@ -158,23 +171,26 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
             <TextField
               label="X"
               type="number"
-              value={tween.end.x}
-              error={isNaN(parseInt(tween.end.x))}
+              value={endPosition.x}
+              error={isNaN(parseFloat(endPosition.x))}
               onChange={(e) => handleChangeEndPosition(e, 'x')}
+              onBlur={(e) => handleBlurEndPosition(e, 'x')}
             />
             <TextField
               label="Y"
               type="number"
-              value={tween.end.y}
-              error={isNaN(parseInt(tween.end.y))}
+              value={endPosition.y}
+              error={isNaN(parseFloat(endPosition.y))}
               onChange={(e) => handleChangeEndPosition(e, 'y')}
+              onBlur={(e) => handleBlurEndPosition(e, 'y')}
             />
             <TextField
               label="Z"
               type="number"
-              value={tween.end.z}
-              error={isNaN(parseInt(tween.end.z))}
+              value={endPosition.z}
+              error={isNaN(parseFloat(endPosition.z))}
               onChange={(e) => handleChangeEndPosition(e, 'z')}
+              onBlur={(e) => handleBlurEndPosition(e, 'z')}
             />
           </div>
         </div>
@@ -205,8 +221,14 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
         <div className="field duration">
           <label>Duration {renderDurationInfo()}</label>
           <div className="row">
-            <RangeField value={tween.duration} onChange={handleChangeDuration} />
-            <TextField type="number" value={tween.duration} onChange={handleChangeDuration} />
+            <RangeField value={duration || 0} onChange={handleChangeDuration} onBlur={handleChangeDurationRange} />
+            <TextField
+              type="number"
+              value={duration}
+              error={isNaN(parseInt(duration)) || parseInt(duration) < 0}
+              onChange={handleChangeDuration}
+              onBlur={handleChangeDurationRange}
+            />
           </div>
         </div>
       </div>
