@@ -10,7 +10,7 @@ import { withAssetDir } from '../../../../lib/data-layer/host/fs-utils'
 import { useAppSelector } from '../../../../redux/hooks'
 import { selectAssetCatalog } from '../../../../redux/app'
 
-import { isAudio, isValidVolume, volumeToAudioSource } from '../../AudioSourceInspector/utils'
+import { isAudio, isValidVolume, volumeToAudioSource, volumeFromAudioSource } from '../../AudioSourceInspector/utils'
 import { TextField } from '../../TextField'
 import { SelectField } from '../../SelectField'
 import { RangeField } from '../../RangeField'
@@ -41,7 +41,7 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
     ...value
   })
 
-  const [volume, setVolume] = useState((value.volume ?? 100).toString())
+  const [volume, setVolume] = useState(volumeFromAudioSource(value.volume))
 
   const files = useAppSelector(selectAssetCatalog)
 
