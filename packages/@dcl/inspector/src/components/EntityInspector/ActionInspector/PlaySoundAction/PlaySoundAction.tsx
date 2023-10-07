@@ -7,11 +7,14 @@ import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 
 import { DropTypesEnum, ProjectAssetDrop, getNode } from '../../../../lib/sdk/drag-drop'
 import { withAssetDir } from '../../../../lib/data-layer/host/fs-utils'
-import { isAudio } from '../../AudioSourceInspector/utils'
-import { TextField } from '../../TextField'
-import { SelectField } from '../../SelectField'
 import { useAppSelector } from '../../../../redux/hooks'
 import { selectAssetCatalog } from '../../../../redux/app'
+
+import { isAudio, isValidVolume, volumeToAudioSource } from '../../AudioSourceInspector/utils'
+import { TextField } from '../../TextField'
+import { SelectField } from '../../SelectField'
+import { RangeField } from '../../RangeField'
+
 import { isValid } from './utils'
 import type { Props } from './types'
 
@@ -37,6 +40,8 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
   const [payload, setPayload] = useState<Partial<ActionPayload<ActionType.PLAY_SOUND>>>({
     ...value
   })
+
+  const [volume, setVolume] = useState((value.volume ?? 100).toString())
 
   const files = useAppSelector(selectAssetCatalog)
 
@@ -71,6 +76,26 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
       setPayload({ ...payload, loop: value === PLAY_MODE.LOOP })
     },
     [payload, setPayload]
+  )
+
+  const handleChangeVolume = useCallback(
+    (e: React.ChangeEvent<HTMLElement>) => {
+      const { value } = e.target as HTMLInputElement
+      if (isValidVolume(value)) {
+        setPayload({ ...payload, volume: volumeToAudioSource(value) })
+      }
+      const volume = parseFloat(value) > 100 ? '100' : parseFloat(value)
+      setVolume(volume.toString())
+    },
+    [payload, setPayload, setVolume]
+  )
+
+  const handleSetVolume = useCallback(
+    (e: React.ChangeEvent<HTMLElement>) => {
+      const { value } = e.target as HTMLInputElement
+      setVolume(value)
+    },
+    [setVolume]
   )
 
   const [{ isHover }, drop] = useDrop(
@@ -129,6 +154,21 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
             options={playModeOptions}
             onChange={handleChangePlayMode}
           />
+        </div>
+      </div>
+      <div className="row">
+        <div className="field volume">
+          <label>Volume</label>
+          <div className="row">
+            <RangeField value={volume} onChange={handleChangeVolume} />
+            <TextField
+              type="number"
+              value={volume}
+              error={!isValidVolume(volume)}
+              onChange={handleSetVolume}
+              onBlur={handleChangeVolume}
+            />
+          </div>
         </div>
       </div>
     </div>

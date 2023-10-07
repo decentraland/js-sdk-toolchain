@@ -8,4 +8,5 @@ export type AudioSourceInput = {
   audioClipUrl: string
   playing?: boolean
   loop?: boolean
+  volume?: string
 }

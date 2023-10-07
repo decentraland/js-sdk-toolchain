@@ -1,4 +1,7 @@
 .PlaySoundActionContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
   width: 100%;
 }
 
@@ -12,4 +15,8 @@
 
 .PlaySoundActionContainer .field.drop {
   border: 1px solid white;
+}
+
+.PlaySoundActionContainer > .row > .field.volume > .row > .TextField {
+  width: 40px;
 }
