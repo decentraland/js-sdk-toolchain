@@ -2,7 +2,7 @@
   "name": "@dcl/inspector",
   "version": "0.1.0",
   "dependencies": {
-    "@dcl/asset-packs": "^0.0.0-20231006153500.commit-3137a9e"
+    "@dcl/asset-packs": "^0.0.0-20231007231138.commit-4ee8384"
   },
   "devDependencies": {
     "@babylonjs/core": "^6.18.0",
