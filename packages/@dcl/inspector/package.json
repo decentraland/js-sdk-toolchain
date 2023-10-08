@@ -1,13 +1,15 @@
 {
   "name": "@dcl/inspector",
   "version": "0.1.0",
+  "dependencies": {
+    "@dcl/asset-packs": "^0.0.0-20231007231138.commit-4ee8384"
+  },
   "devDependencies": {
     "@babylonjs/core": "^6.18.0",
     "@babylonjs/gui": "^6.18.0",
     "@babylonjs/inspector": "^6.18.0",
     "@babylonjs/loaders": "^6.18.0",
     "@babylonjs/materials": "^6.18.0",
-    "@dcl/asset-packs": "^0.0.0-20231005184607.commit-bcc54dd",
     "@dcl/ecs": "file:../ecs",
     "@dcl/ecs-math": "2.0.2",
     "@dcl/mini-rpc": "^1.0.7",
