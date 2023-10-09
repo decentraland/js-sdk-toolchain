@@ -2,10 +2,12 @@ import { resolve } from 'path'
 import { Scene, getWorld, isInsideWorldLimits } from '@dcl/schemas'
 import { areConnected } from '@dcl/ecs/dist-cjs'
 
+import { getMinimalSceneJson } from '../commands/init/project'
 import { CliError } from './error'
 import { getObject } from './coordinates'
 import { CliComponents } from '../components'
 import { getPublishableFiles } from './project-files'
+import { printWarning } from './beautiful-logs'
 
 export interface IFile {
   path: string
@@ -33,7 +35,18 @@ function getWorldRangesConstraintsMessage(): string {
   return str
 }
 
-export function assertValidScene(scene: Scene) {
+function checkMissingOrDefault<T extends Record<string, unknown>>(obj: T, defaults: T) {
+  const missingKeys = Object.entries(defaults).reduce((acc: string[], [key, value]) => {
+    return obj[key] && obj[key] !== value ? acc : acc.concat(key)
+  }, [])
+  return missingKeys
+}
+
+export function assertValidScene(
+  components: Pick<CliComponents, 'logger'>,
+  scene: Scene,
+  opts: { log?: boolean } = { log: false }
+) {
   if (!Scene.validate(scene)) {
     const errors: string[] = []
     if (Scene.validate.errors) {
@@ -71,6 +84,19 @@ export function assertValidScene(scene: Scene) {
   if (!scene.main?.endsWith('.js')) {
     throw new CliError(`Main scene format file (${scene.main}) is not a supported format`)
   }
+
+  const minimalScene = getMinimalSceneJson()
+  const defaults = { ...minimalScene.display, navmapThumbnail: 'images/scene-thumbnail.png' }
+  const missingKeys = checkMissingOrDefault(scene.display ?? {}, defaults)
+
+  if (missingKeys.length && opts.log) {
+    const missingKeysMsg = missingKeys.join(', ')
+    printWarning(
+      components.logger,
+      `Don't forget to update your scene.json metadata: [${missingKeysMsg}]
+https://docs.decentraland.org/creator/development-guide/scene-metadata/#scene-title-description-and-image`
+    )
+  }
 }
 
 /**
@@ -78,12 +104,13 @@ export function assertValidScene(scene: Scene) {
  */
 export async function getValidSceneJson(
   components: Pick<CliComponents, 'fs' | 'logger'>,
-  projectRoot: string
+  projectRoot: string,
+  opts?: { log?: boolean }
 ): Promise<Scene> {
   try {
     const sceneJsonRaw = await components.fs.readFile(getSceneFilePath(projectRoot), 'utf8')
     const sceneJson = JSON.parse(sceneJsonRaw) as Scene
-    assertValidScene(sceneJson)
+    assertValidScene(components, sceneJson, opts)
     return sceneJson
   } catch (err: any) {
     throw new CliError(`Error reading the scene.json file: ${err.message}`)

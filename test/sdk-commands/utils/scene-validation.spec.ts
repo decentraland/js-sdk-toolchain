@@ -6,31 +6,32 @@ import { Stats } from 'fs'
 
 describe('scene validations', () => {
   it('sanity scene validations', async () => {
-    await expect(async () => v.assertValidScene({} as any)).rejects.toThrow()
-    await expect(async () => v.assertValidScene({ base: null } as any)).rejects.toThrow()
-    await expect(async () => v.assertValidScene({ main: 'test' } as any)).rejects.toThrow()
-    await expect(async () => v.assertValidScene({ main: 'test.js', scene: null as any })).rejects.toThrow()
+    const components = await initComponents()
+    await expect(async () => v.assertValidScene(components, {} as any)).rejects.toThrow()
+    await expect(async () => v.assertValidScene(components, { base: null } as any)).rejects.toThrow()
+    await expect(async () => v.assertValidScene(components, { main: 'test' } as any)).rejects.toThrow()
+    await expect(async () => v.assertValidScene(components, { main: 'test.js', scene: null as any })).rejects.toThrow()
     await expect(async () =>
-      v.assertValidScene({ main: 'test.js', scene: { base: 'test', parcels: [] } })
+      v.assertValidScene(components, { main: 'test.js', scene: { base: 'test', parcels: [] } })
     ).rejects.toThrow()
     await expect(async () =>
-      v.assertValidScene({ main: 'test.js', scene: { base: '0,0', parcels: [] } })
+      v.assertValidScene(components, { main: 'test.js', scene: { base: '0,0', parcels: [] } })
     ).rejects.toThrow()
     await expect(async () =>
-      v.assertValidScene({ main: 'test.js', scene: { base: '0,0', parcels: ['0,0', '0,0'] } })
+      v.assertValidScene(components, { main: 'test.js', scene: { base: '0,0', parcels: ['0,0', '0,0'] } })
     ).rejects.toThrow()
     await expect(async () =>
-      v.assertValidScene({ main: 'test.js', scene: { base: '0,0', parcels: ['0,0', '3,0'] } })
+      v.assertValidScene(components, { main: 'test.js', scene: { base: '0,0', parcels: ['0,0', '3,0'] } })
     ).rejects.toThrow()
     await expect(async () =>
-      v.assertValidScene({ main: 'test.js', scene: { base: '1,0', parcels: ['0,0'] } })
+      v.assertValidScene(components, { main: 'test.js', scene: { base: '1,0', parcels: ['0,0'] } })
     ).rejects.toThrow()
     await expect(async () =>
-      v.assertValidScene({ main: 'test.js', scene: { base: '1000,0', parcels: ['1000,0'] } })
+      v.assertValidScene(components, { main: 'test.js', scene: { base: '1000,0', parcels: ['1000,0'] } })
     ).rejects.toThrow()
-    v.assertValidScene({ main: 'test.js', scene: { base: '0,0', parcels: ['0,0'] } })
+    v.assertValidScene(components, { main: 'test.js', scene: { base: '0,0', parcels: ['0,0'] } })
     await expect(async () =>
-      v.assertValidScene({ main: 'test.json', scene: { base: '1,0', parcels: ['1,0'] } })
+      v.assertValidScene(components, { main: 'test.json', scene: { base: '1,0', parcels: ['1,0'] } })
     ).rejects.toThrow()
   })
   it('validates connected parcels', () => {

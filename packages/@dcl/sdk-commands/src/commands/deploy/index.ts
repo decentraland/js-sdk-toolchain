@@ -81,7 +81,7 @@ export async function main(options: Options) {
     throw new CliError(`You can't set both the 'target' and 'target-content' arguments.`)
   }
 
-  const sceneJson = await getValidSceneJson(options.components, projectRoot)
+  const sceneJson = await getValidSceneJson(options.components, projectRoot, { log: true })
   const coords = getBaseCoords(sceneJson)
   const isWorld = sceneHasWorldCfg(sceneJson)
   const trackProps: Events['Scene deploy started'] = {
