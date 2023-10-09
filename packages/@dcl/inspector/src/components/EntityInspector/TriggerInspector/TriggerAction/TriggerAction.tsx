@@ -73,26 +73,30 @@ export const TriggerActionContainer = ({ trigger, availableActions, onUpdateActi
           : []
         return (
           <div className="TriggerAction" key={`trigger-action-${idx}`}>
-            <Dropdown
-              options={availableActions ? [{ value: '', text: 'Select an Entity' }, ...entities] : []}
-              value={action.id}
-              onChange={(e) => handleChangeEntity(e, idx)}
-            />
-            <Dropdown
-              disabled={!action.id || !availableActions.get(action.id)}
-              options={
-                action.id && availableActions.get(action.id)?.actions
-                  ? [{ value: '', text: 'Select an Action' }, ...actions]
-                  : []
-              }
-              value={action.name}
-              onChange={(e) => handleChangeAction(e, idx)}
-            />
-            <MoreOptionsMenu>
-              <Button className="RemoveButton" onClick={(e) => handleRemoveAction(e, idx)}>
-                <RemoveIcon /> Remove Trigger Action
-              </Button>
-            </MoreOptionsMenu>
+            <div className="Fields">
+              <Dropdown
+                options={availableActions ? [{ value: '', text: 'Select an Entity' }, ...entities] : []}
+                value={action.id}
+                onChange={(e) => handleChangeEntity(e, idx)}
+              />
+              <Dropdown
+                disabled={!action.id || !availableActions.get(action.id)}
+                options={
+                  action.id && availableActions.get(action.id)?.actions
+                    ? [{ value: '', text: 'Select an Action' }, ...actions]
+                    : []
+                }
+                value={action.name}
+                onChange={(e) => handleChangeAction(e, idx)}
+              />
+            </div>
+            <div className="RightMenu">
+              <MoreOptionsMenu>
+                <Button className="RemoveButton" onClick={(e) => handleRemoveAction(e, idx)}>
+                  <RemoveIcon /> Remove Trigger Action
+                </Button>
+              </MoreOptionsMenu>
+            </div>
           </div>
         )
       })}

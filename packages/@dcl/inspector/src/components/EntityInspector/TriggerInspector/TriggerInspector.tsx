@@ -189,8 +189,7 @@ export default withSdk<Props>(
     }, [])
 
     const handleAddNewTrigger = useCallback(
-      (e: React.MouseEvent) => {
-        e.stopPropagation()
+      (_e: React.MouseEvent) => {
         addTrigger({
           type: TriggerType.ON_CLICK,
           conditions: [],
@@ -207,8 +206,7 @@ export default withSdk<Props>(
     )
 
     const handleRemoveTrigger = useCallback(
-      (e: React.MouseEvent, idx: number) => {
-        e.stopPropagation()
+      (_e: React.MouseEvent, idx: number) => {
         removeTrigger(idx)
       },
       [removeTrigger]
@@ -225,8 +223,7 @@ export default withSdk<Props>(
     )
 
     const handleAddNewTriggerAction = useCallback(
-      (e: React.MouseEvent, idx: number) => {
-        e.stopPropagation()
+      (_e: React.MouseEvent, idx: number) => {
         modifyTrigger(idx, {
           ...triggers[idx],
           actions: [...triggers[idx].actions, { id: undefined, name: '' }]
@@ -246,7 +243,7 @@ export default withSdk<Props>(
     )
 
     const handleAddNewTriggerCondition = useCallback(
-      (e: React.MouseEvent, idx: number) => {
+      (_e: React.MouseEvent, idx: number) => {
         modifyTrigger(idx, {
           ...triggers[idx],
           conditions: [

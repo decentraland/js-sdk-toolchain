@@ -37,10 +37,20 @@
 .TriggerConditionsContainer > .TriggerCondition {
   display: flex;
   flex-direction: row;
+}
+
+.TriggerConditionsContainer > .TriggerCondition > .Fields {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
   align-items: center;
   gap: 4px;
 }
 
-.TriggerConditionsContainer > .TriggerCondition .MoreOptionsMenu .MoreOptionsContent {
+.TriggerConditionsContainer > .TriggerCondition > .RightMenu {
+  align-self: start;
+}
+
+.TriggerConditionsContainer > .TriggerCondition > .RightMenu > .MoreOptionsMenu .MoreOptionsContent {
   min-width: 205px;
 }
