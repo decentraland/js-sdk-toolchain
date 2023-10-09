@@ -1,15 +1,18 @@
 :root {
   --main-bg-color: var(--vscode-editor-background, var(--background));
-  --dropdown-bg-color: var(--vscode-dropdown-background, #D8D8D8);
+  --dropdown-bg-color: var(--vscode-dropdown-background, #d8d8d8);
   --dropdown-border-color: var(--vscode-dropdown-border, #b9b9b9);
   --dropdown-hover-bg-color: var(--vscode-list-hoverBackground, #e4e4e4);
-  --list-item-bg-color: var(--vscode-list-dropBackground, #36343D);
-  --list-item-hover-bg-color: var(--vscode-list-hoverBackground, #504E58);
+  --list-item-bg-color: var(--vscode-list-dropBackground, #36343d);
+  --list-item-hover-bg-color: var(--vscode-list-hoverBackground, #504e58);
+  --list-smart-item-bg-color: #472550;
+  --smart-item-icon-bg-color: #c640cd;
+  --list-smart-item-hover-bg-color: #5f326a;
   --tree-bg-color: var(--vscode-panel-background, #252526);
   --tree-border-color: var(--vscode-panel-border, #333333);
   --input-border-color: var(--vscode-input-border, #cdcccc);
   --button-color: var(--vscode-button-foreground, var(--black));
-  --title: #EEEEEF;
+  --title: #eeeeef;
   --sub-text: #ffffffcf;
   --border-focused: #127fd4;
 
@@ -17,15 +20,15 @@
   --primary: #ff2d55;
   --primary-darker: #cc2443;
   /* Color definitions */
-  --white: #FFFFFF;
-  --white-gray: #E7E7E7;
-  --background-gray: #3C3C3C;
+  --white: #ffffff;
+  --white-gray: #e7e7e7;
+  --background-gray: #3c3c3c;
   --border-gray: #454545;
   --black: #000000;
   --transparent: transparent;
   --vscode-accent-blue: #094771;
   --vscode-blue: var(--border-focused);
-  --input-bg-color: #D8D8D8;
+  --input-bg-color: #d8d8d8;
 
   /* Context menu */
   --contexify-zIndex: 999;
@@ -33,7 +36,7 @@
   --contexify-menu-padding: 6px;
   --contexify-menu-radius: 2px;
   --contexify-menu-bgColor: var(--dropdown-bg-color);
-  --contexify-menu-shadow: 2px 2px 10px 0px rgba(0, 0, 0, 0.50);
+  --contexify-menu-shadow: 2px 2px 10px 0px rgba(0, 0, 0, 0.5);
   --contexify-menu-negatePadding: var(--contexify-menu-padding);
 
   --contexify-separator-color: rgba(0, 0, 0, 0.2);
@@ -54,5 +57,5 @@
   --modal-overlay-bg-color: rgba(0, 0, 0, 0.6);
 
   /* Margins */
-  --sidebar: 314px
+  --sidebar: 314px;
 }
