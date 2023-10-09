@@ -209,13 +209,10 @@ export default withSdk<Props>(
     const handleRemoveTrigger = useCallback(
       (e: React.MouseEvent, idx: number) => {
         e.stopPropagation()
-        console.log('removing trigger', idx)
         removeTrigger(idx)
       },
       [removeTrigger]
     )
-
-    console.log(triggers)
 
     const handleChangeType = useCallback(
       ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
