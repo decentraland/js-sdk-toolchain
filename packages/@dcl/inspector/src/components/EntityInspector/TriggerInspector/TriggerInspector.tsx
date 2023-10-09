@@ -121,7 +121,8 @@ export default withSdk<Props>(
         TriggerType.ON_SPAWN,
         TriggerType.ON_CLICK,
         TriggerType.ON_PLAYER_ENTERS_AREA,
-        TriggerType.ON_PLAYER_LEAVES_AREA
+        TriggerType.ON_PLAYER_LEAVES_AREA,
+        TriggerType.ON_TWEEN_END
       ]
       if (hasStates) {
         triggerTypes.push(TriggerType.ON_STATE_CHANGE)

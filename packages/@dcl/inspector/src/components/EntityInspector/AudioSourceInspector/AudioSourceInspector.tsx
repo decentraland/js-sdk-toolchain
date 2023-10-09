@@ -17,8 +17,11 @@ import { selectAssetCatalog } from '../../../redux/app'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
 import { TextField } from '../TextField'
-import { Props } from './types'
-import { fromAudioSource, toAudioSource, isValidInput, isAudio } from './utils'
+import { RangeField } from '../RangeField'
+import { fromAudioSource, toAudioSource, isValidInput, isAudio, isValidVolume } from './utils'
+import type { Props } from './types'
+
+import './AudioSourceInspector.css'
 
 const DROP_TYPES = ['project-asset']
 
@@ -76,6 +79,7 @@ export default withSdk<Props>(
 
     const playing = getInputProps('playing', (e) => e.target.checked)
     const loop = getInputProps('loop', (e) => e.target.checked)
+    const volume = getInputProps('volume', (e) => e.target.value)
 
     return (
       <Container label="AudioSource" className={cx('AudioSource', { hover: isHover })}>
@@ -90,6 +94,10 @@ export default withSdk<Props>(
         <Block label="Playback">
           <TextField label="Start playing" type="checkbox" checked={!!playing.value} {...playing} />
           <TextField label="Loop" type="checkbox" checked={!!loop.value} {...loop} />
+        </Block>
+        <Block className="volume" label="Volume">
+          <RangeField {...volume} />
+          <TextField type="number" {...volume} error={!isValidVolume(volume.value?.toString())} />
         </Block>
       </Container>
     )
