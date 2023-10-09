@@ -121,7 +121,8 @@ export default withSdk<Props>(
         TriggerType.ON_SPAWN,
         TriggerType.ON_CLICK,
         TriggerType.ON_PLAYER_ENTERS_AREA,
-        TriggerType.ON_PLAYER_LEAVES_AREA
+        TriggerType.ON_PLAYER_LEAVES_AREA,
+        TriggerType.ON_TWEEN_END
       ]
       if (hasStates) {
         triggerTypes.push(TriggerType.ON_STATE_CHANGE)
@@ -208,10 +209,13 @@ export default withSdk<Props>(
     const handleRemoveTrigger = useCallback(
       (e: React.MouseEvent, idx: number) => {
         e.stopPropagation()
+        console.log('removing trigger', idx)
         removeTrigger(idx)
       },
       [removeTrigger]
     )
+
+    console.log(triggers)
 
     const handleChangeType = useCallback(
       ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
