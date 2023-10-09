@@ -24,7 +24,7 @@ const playModeOptions = [
   }
 ]
 
-const PlaySoundAction: React.FC<Props> = ({ value, animations, onUpdate }: Props) => {
+const PlayAnimationAction: React.FC<Props> = ({ value, animations, onUpdate }: Props) => {
   const [payload, setPayload] = useState<Partial<ActionPayload<ActionType.PLAY_ANIMATION>>>({
     ...value
   })
@@ -75,4 +75,4 @@ const PlaySoundAction: React.FC<Props> = ({ value, animations, onUpdate }: Props
   )
 }
 
-export default React.memo(PlaySoundAction)
+export default React.memo(PlayAnimationAction)
