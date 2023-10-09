@@ -88,7 +88,7 @@ function AssetCell({ value }: AssetProps) {
 
 function SmartItemIcon() {
   return (
-    <div className="smart-item-icon">
+    <div className="smart-item-badge">
       <BsFillLightningChargeFill />
     </div>
   )
