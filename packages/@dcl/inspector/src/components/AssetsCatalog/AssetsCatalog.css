@@ -118,7 +118,6 @@
 .assets-catalog .category .assets > div img {
   width: 60px;
   height: 60px;
-  position: relative;
 }
 
 .assets-catalog .category .assets > div.smart-item img + div.smart-item-icon {
