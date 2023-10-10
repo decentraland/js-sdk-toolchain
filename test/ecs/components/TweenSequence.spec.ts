@@ -12,9 +12,8 @@ describe('Generated TweenSequence ProtoBuf', () => {
           duration: 8,
           currentTime: 1,
           playing: true,
-          mode: Tween.Mode.Move({ start: { x: 0, y: 0, z: 0 }, end: { x: 8, y: 8, z: 8 } }),
-          tweenFunction: EasingFunction.TF_EASEBACK,
-          faceDirection: true
+          mode: Tween.Mode.Move({ faceDirection: true, start: { x: 0, y: 0, z: 0 }, end: { x: 8, y: 8, z: 8 } }),
+          easingFunction: EasingFunction.EF_EASEBACK
         }
       ],
       loop: TweenLoop.TL_RESTART
@@ -26,9 +25,8 @@ describe('Generated TweenSequence ProtoBuf', () => {
           duration: 8,
           currentTime: 1,
           playing: true,
-          mode: Tween.Mode.Move({ start: { x: 0, y: 0, z: 0 }, end: { x: 8, y: 8, z: 8 } }),
-          tweenFunction: EasingFunction.TF_EASEBACK,
-          faceDirection: undefined
+          mode: Tween.Mode.Scale({ start: { x: 0, y: 0, z: 0 }, end: { x: 8, y: 8, z: 8 } }),
+          easingFunction: EasingFunction.EF_EASEBACK
         }
       ],
       loop: TweenLoop.TL_YOYO

@@ -28,7 +28,7 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
   Tween.create(platform1, {
     mode: Tween.Mode.Move({ start: Vector3.create(2, 1.5, 6.5), end: Vector3.create(2, 1.5, 12) }),
     duration: 2000,
-    tweenFunction: EasingFunction.TF_LINEAR
+    easingFunction: EasingFunction.EF_LINEAR
   })
 
   TweenSequence.create(platform1, { loop: TweenLoop.TL_YOYO, sequence: [] })
@@ -51,7 +51,7 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
       end: Vector3.create(4, 4, 14)
     }),
     duration: 1000,
-    tweenFunction: EasingFunction.TF_LINEAR
+    easingFunction: EasingFunction.EF_LINEAR
   })
   TweenSequence.create(parent, { sequence: [], loop: TweenLoop.TL_YOYO })
 
@@ -61,7 +61,7 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
       end: Quaternion.fromEulerDegrees(0, 170, 0)
     }),
     duration: 700,
-    tweenFunction: EasingFunction.TF_LINEAR
+    easingFunction: EasingFunction.EF_LINEAR
   })
   TweenSequence.create(platform2, {
     loop: TweenLoop.TL_RESTART,
@@ -72,7 +72,7 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
           end: Quaternion.fromEulerDegrees(0, 360, 0)
         }),
         duration: 700,
-        tweenFunction: EasingFunction.TF_LINEAR
+        easingFunction: EasingFunction.EF_LINEAR
       }
     ]
   })
@@ -88,7 +88,7 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
   Tween.create(platform3, {
     mode: Tween.Mode.Move({ start: Vector3.create(14, 4, 12), end: Vector3.create(14, 4, 4) }),
     duration: 3000,
-    tweenFunction: EasingFunction.TF_LINEAR
+    easingFunction: EasingFunction.EF_LINEAR
   })
   TweenSequence.create(platform3, { loop: TweenLoop.TL_YOYO, sequence: [] })
 
@@ -104,7 +104,7 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
 
   Tween.create(platform4, {
     duration: 4000,
-    tweenFunction: EasingFunction.TF_LINEAR,
+    easingFunction: EasingFunction.EF_LINEAR,
     currentTime: 0,
     playing: true,
     mode: Tween.Mode.Move({ start: Vector3.create(6.5, 7, 4), end: Vector3.create(6.5, 7, 12) })
@@ -114,17 +114,17 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
     sequence: [
       {
         duration: 2000,
-        tweenFunction: EasingFunction.TF_EASEBOUNCE,
+        easingFunction: EasingFunction.EF_EASEBOUNCE,
         mode: Tween.Mode.Move({ start: Vector3.create(6.5, 7, 12), end: Vector3.create(6.5, 10.5, 12) })
       },
       {
         duration: 3000,
-        tweenFunction: EasingFunction.TF_EASEBOUNCE,
+        easingFunction: EasingFunction.EF_EASEBOUNCE,
         mode: Tween.Mode.Move({ start: Vector3.create(6.5, 10.5, 12), end: Vector3.create(6.5, 10.5, 4) })
       },
       {
         duration: 3000,
-        tweenFunction: EasingFunction.TF_LINEAR,
+        easingFunction: EasingFunction.EF_LINEAR,
         mode: Tween.Mode.Move({ start: Vector3.create(6.5, 10.5, 4), end: Vector3.create(6.5, 7, 4) })
       }
     ],

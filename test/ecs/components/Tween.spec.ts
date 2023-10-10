@@ -10,29 +10,26 @@ describe('Generated Tween ProtoBuf', () => {
 
     testComponentSerialization(Tween, {
       duration: 1,
-      tweenFunction: EasingFunction.TF_LINEAR,
-      mode: Tween.Mode.Move({ start, end }),
+      easingFunction: EasingFunction.EF_LINEAR,
+      mode: Tween.Mode.Move({ start, end, faceDirection: false }),
       playing: false,
-      currentTime: 0,
-      faceDirection: undefined
+      currentTime: 0
     })
 
     testComponentSerialization(Tween, {
       duration: 1,
-      tweenFunction: EasingFunction.TF_LINEAR,
+      easingFunction: EasingFunction.EF_LINEAR,
       mode: Tween.Mode.Scale({ start, end }),
       playing: true,
-      currentTime: 1,
-      faceDirection: true
+      currentTime: 1
     })
 
     testComponentSerialization(Tween, {
       duration: 1,
-      tweenFunction: EasingFunction.TF_LINEAR,
+      easingFunction: EasingFunction.EF_LINEAR,
       mode: Tween.Mode.Rotate({ start: { ...start, w: 0 }, end: { ...end, w: 8 } }),
       playing: false,
-      currentTime: 0,
-      faceDirection: undefined
+      currentTime: 0
     })
   })
 })

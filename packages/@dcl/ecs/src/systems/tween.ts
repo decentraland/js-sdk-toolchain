@@ -36,7 +36,7 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
     const tween = Tween.getOrNull(entity)
     const tweenCache = cache.get(entity)
     if (!tweenState || !tween) return false
-    /* istanbul ignore if */
+    /* istanbul ignore next */
     if (
       // Renderer notified that the tween is completed
       (tweenChanged(entity) || tweenState.state === TweenStateStatus.TS_COMPLETED) &&
@@ -55,6 +55,7 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
     const currentTween = Tween.getOrNull(entity)
     const prevTween = cache.get(entity)?.tween
 
+    /* istanbul ignore next */
     if ((currentTween && !prevTween) || (!currentTween && prevTween)) {
       return true
     }

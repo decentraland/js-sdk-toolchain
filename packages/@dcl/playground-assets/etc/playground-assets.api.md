@@ -806,66 +806,66 @@ export function Dropdown(props: UiDropdownProps): ReactEcs.JSX.Element;
 // @public (undocumented)
 export const enum EasingFunction {
     // (undocumented)
-    TF_EASEBACK = 30,
+    EF_EASEBACK = 30,
     // (undocumented)
-    TF_EASEBOUNCE = 15,
+    EF_EASEBOUNCE = 15,
     // (undocumented)
-    TF_EASECIRC = 27,
+    EF_EASECIRC = 27,
     // (undocumented)
-    TF_EASECUBIC = 18,
+    EF_EASECUBIC = 18,
     // (undocumented)
-    TF_EASEELASTIC = 12,
+    EF_EASEELASTIC = 12,
     // (undocumented)
-    TF_EASEEXPO = 9,
+    EF_EASEEXPO = 9,
     // (undocumented)
-    TF_EASEINBACK = 28,
+    EF_EASEINBACK = 28,
     // (undocumented)
-    TF_EASEINBOUNCE = 13,
+    EF_EASEINBOUNCE = 13,
     // (undocumented)
-    TF_EASEINCIRC = 25,
+    EF_EASEINCIRC = 25,
     // (undocumented)
-    TF_EASEINCUBIC = 16,
+    EF_EASEINCUBIC = 16,
     // (undocumented)
-    TF_EASEINELASTIC = 10,
+    EF_EASEINELASTIC = 10,
     // (undocumented)
-    TF_EASEINEXPO = 7,
+    EF_EASEINEXPO = 7,
     // (undocumented)
-    TF_EASEINQUAD = 1,
+    EF_EASEINQUAD = 1,
     // (undocumented)
-    TF_EASEINQUART = 19,
+    EF_EASEINQUART = 19,
     // (undocumented)
-    TF_EASEINQUINT = 22,
+    EF_EASEINQUINT = 22,
     // (undocumented)
-    TF_EASEINSINE = 4,
+    EF_EASEINSINE = 4,
     // (undocumented)
-    TF_EASEOUTBACK = 29,
+    EF_EASEOUTBACK = 29,
     // (undocumented)
-    TF_EASEOUTBOUNCE = 14,
+    EF_EASEOUTBOUNCE = 14,
     // (undocumented)
-    TF_EASEOUTCIRC = 26,
+    EF_EASEOUTCIRC = 26,
     // (undocumented)
-    TF_EASEOUTCUBIC = 17,
+    EF_EASEOUTCUBIC = 17,
     // (undocumented)
-    TF_EASEOUTELASTIC = 11,
+    EF_EASEOUTELASTIC = 11,
     // (undocumented)
-    TF_EASEOUTEXPO = 8,
+    EF_EASEOUTEXPO = 8,
     // (undocumented)
-    TF_EASEOUTQUAD = 2,
+    EF_EASEOUTQUAD = 2,
     // (undocumented)
-    TF_EASEOUTQUART = 20,
+    EF_EASEOUTQUART = 20,
     // (undocumented)
-    TF_EASEOUTQUINT = 23,
+    EF_EASEOUTQUINT = 23,
     // (undocumented)
-    TF_EASEOUTSINE = 5,
+    EF_EASEOUTSINE = 5,
     // (undocumented)
-    TF_EASEQUAD = 3,
+    EF_EASEQUAD = 3,
     // (undocumented)
-    TF_EASEQUART = 21,
+    EF_EASEQUART = 21,
     // (undocumented)
-    TF_EASEQUINT = 24,
+    EF_EASEQUINT = 24,
     // (undocumented)
-    TF_EASESINE = 6,
-    TF_LINEAR = 0
+    EF_EASESINE = 6,
+    EF_LINEAR = 0
 }
 
 // @public (undocumented)
@@ -1763,6 +1763,8 @@ export class MessageBus {
 export interface Move {
     // (undocumented)
     end: PBVector3 | undefined;
+    // (undocumented)
+    faceDirection?: boolean | undefined;
     // (undocumented)
     start: PBVector3 | undefined;
 }
@@ -2698,7 +2700,7 @@ export interface PBTween {
     currentTime?: number | undefined;
     duration: number;
     // (undocumented)
-    faceDirection?: boolean | undefined;
+    easingFunction: EasingFunction;
     // (undocumented)
     mode?: {
         $case: "move";
@@ -2711,8 +2713,6 @@ export interface PBTween {
         scale: Scale;
     } | undefined;
     playing?: boolean | undefined;
-    // (undocumented)
-    tweenFunction: EasingFunction;
 }
 
 // @public (undocumented)

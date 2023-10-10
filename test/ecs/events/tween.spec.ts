@@ -16,7 +16,7 @@ function mockTweenEngine(engine: IEngine, Tween: TweenComponentDefinitionExtende
   return async function (entity: Entity, mode?: PBTween['mode']) {
     const tween = Tween.createOrReplace(entity, {
       duration: 1000,
-      tweenFunction: EasingFunction.TF_EASEBACK,
+      easingFunction: EasingFunction.EF_EASEBACK,
       mode: mode || Tween.Mode.Move({ start: Vector3.create(), end: Vector3.create() })
     })
     return tween
