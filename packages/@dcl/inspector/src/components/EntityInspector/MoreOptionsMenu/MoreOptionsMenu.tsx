@@ -16,8 +16,10 @@ export const MoreOptionsMenu = ({ children, icon }: { children: JSX.Element | JS
   )
 
   const handleClosePanel = useCallback(() => {
-    setShowMoreOptions(false)
-  }, [setShowMoreOptions])
+    if (showMoreOptions) {
+      setShowMoreOptions(false)
+    }
+  }, [showMoreOptions, setShowMoreOptions])
 
   const ref = useOutsideClick(handleClosePanel)
 

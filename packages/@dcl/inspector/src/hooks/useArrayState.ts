@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react'
 
 export function useArrayState<T>(initialArray: T[] = []) {
-  const [array, setArray] = useState<T[]>(initialArray)
+  const [array, setArray] = useState<T[]>([...initialArray])
 
   // Function to add an item to the array
   const addItem = useCallback(
