@@ -3812,8 +3812,7 @@ export const enum TweenStateStatus {
 //
 // @public (undocumented)
 export type TweenSystem = {
-    tweenCompleted(entity: Entity): void;
-    tweenChanged(entity: Entity): void;
+    tweenCompleted(entity: Entity): boolean;
 };
 
 // @public
