@@ -9,7 +9,7 @@
 }
 
 .assets-catalog .theme,
-.assets-catalog .category .assets>div {
+.assets-catalog .category .assets > div {
   display: flex;
   margin-right: 1rem;
   width: 200px;
@@ -24,6 +24,10 @@
   -moz-user-select: none;
   user-select: none;
   position: relative;
+}
+
+.assets-catalog .category .assets > div.smart-item {
+  background: var(--list-smart-item-bg-color);
 }
 
 .assets-catalog .theme:last-child {
@@ -54,13 +58,14 @@
 
 .assets-catalog .theme div {
   margin-left: auto;
-  background: url(https://cdn.decentraland.org/@dcl/builder-site/6.35.0/static/media/icons.5ff54946.svg) 41.666666666666664% 21.768707482993197% no-repeat;
+  background: url(https://cdn.decentraland.org/@dcl/builder-site/6.35.0/static/media/icons.5ff54946.svg)
+    41.666666666666664% 21.768707482993197% no-repeat;
   width: 8px;
   height: 14px;
 }
 
 .assets-catalog .theme div:before {
-  content: "";
+  content: '';
 }
 
 .assets-catalog .categories {
@@ -68,7 +73,7 @@
   flex-direction: column;
 }
 
-.assets-catalog .categories>div:first-child {
+.assets-catalog .categories > div:first-child {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -97,18 +102,35 @@
   flex-wrap: wrap;
 }
 
-.assets-catalog .category .assets>div {
+.assets-catalog .category .assets > div {
   width: 80px;
   justify-content: center;
 }
 
-.assets-catalog .category .assets>div:hover {
+.assets-catalog .category .assets > div:hover {
   background: var(--list-item-hover-bg-color);
 }
 
-.assets-catalog .category .assets>div img {
+.assets-catalog .category .assets > div.smart-item:hover {
+  background: var(--list-smart-item-hover-bg-color);
+}
+
+.assets-catalog .category .assets > div img {
   width: 60px;
   height: 60px;
+}
+
+.assets-catalog .category .assets > div.smart-item img + div.smart-item-badge {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  width: 24px;
+  height: 24px;
+  bottom: 4px;
+  right: 4px;
+  background-color: var(--smart-item-icon-bg-color);
 }
 
 .assets-catalog .error {
