@@ -21,7 +21,7 @@
   font-size: 10px;
 }
 
-.Tile svg {
+.Tile svg, .Tile img {
   width: 42px;
   height: 42px;
 }

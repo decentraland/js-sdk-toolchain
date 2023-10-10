@@ -68,16 +68,34 @@ export async function initRpcMethods(
 
       throw new Error(`Couldn't find the asset ${req.path}`)
     },
+    async getFiles({ path, ignore = [] }) {
+      const filesInDir = await getFilesInDirectory(fs, path, [], true, ignore)
+      const files = await Promise.all(
+        filesInDir.map(async ($) => ({
+          path: $,
+          content: await fs.readFile($)
+        }))
+      )
+      return { files }
+    },
+    async saveFile({ path, content }) {
+      // TODO: overwrite exception?
+      await fs.writeFile(path, Buffer.from(content))
+      return {}
+    },
+    // TODO: we are calling this method in several sagas and considering
+    // that we could be using HTTP requests as data-layer mechanism
+    // this should be optimized
     async getAssetCatalog() {
       const ignore = ['.git', 'node_modules']
       const basePath = withAssetDir()
 
-      const files = (await getFilesInDirectory(fs, basePath, [], true, ignore)).filter((item) => {
+      const assets = (await getFilesInDirectory(fs, basePath, [], true, ignore)).filter((item) => {
         const itemLower = item.toLowerCase()
         return EXTENSIONS.some((ext) => itemLower.endsWith(ext))
       })
 
-      return { basePath, assets: files.map(($) => ({ path: $ })) }
+      return { basePath, assets: assets.map(($) => ({ path: $ })) }
     },
     /**
      * Import asset into the file system.

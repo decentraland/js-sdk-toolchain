@@ -5,7 +5,7 @@ import { Vector3 } from '@babylonjs/core'
 
 import { DIRECTORY, withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
-import { importAsset } from '../../redux/data-layer'
+import { importAsset, saveThumbnail } from '../../redux/data-layer'
 import { getNode, BuilderAsset, DROP_TYPES, IDrop, ProjectAssetDrop, isDropType } from '../../lib/sdk/drag-drop'
 import { useRenderer } from '../../hooks/sdk/useRenderer'
 import { useSdk } from '../../hooks/sdk/useSdk'
@@ -85,6 +85,7 @@ const Renderer: React.FC = () => {
     const destFolder = 'builder'
     const assetPackageName = asset.name.trim().replaceAll(' ', '_').toLowerCase()
     const path = Object.keys(asset.contents).find(($) => isAsset($))
+    let thumbnail: Uint8Array | undefined
 
     if (!path) {
       throw new Error('Invalid asset format: should contain at least one gltf/glb file')
@@ -96,8 +97,13 @@ const Renderer: React.FC = () => {
       Object.entries(asset.contents).map(async ([path, contentHash]) => {
         try {
           const url = `${config.contentUrl}/contents/${contentHash}`
-          const content = await (await fetch(url)).arrayBuffer()
-          fileContent[path] = new Uint8Array(content)
+          const response = await fetch(url)
+          const content = new Uint8Array(await response.arrayBuffer())
+          if (path === 'thumbnail.png') {
+            thumbnail = content
+          } else {
+            fileContent[path] = content
+          }
         } catch (err) {
           // eslint-disable-next-line no-console
           console.error('Error fetching an asset import ' + path)
@@ -113,6 +119,17 @@ const Renderer: React.FC = () => {
         assetPackageName
       })
     )
+
+    if (thumbnail) {
+      const name = path.split('/').pop() as string
+      const ext = name.split('.').pop() as string
+      dispatch(
+        saveThumbnail({
+          content: thumbnail,
+          path: `${DIRECTORY.THUMBNAILS}/${name.replace(`.${ext}`, '.png')}`
+        })
+      )
+    }
 
     if (!isMounted()) return
     setIsLoading(false)
