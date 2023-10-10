@@ -25,7 +25,8 @@ import {
   MeshRendererComponentDefinitionExtended,
   TransformComponentExtended,
   AnimatorComponentDefinitionExtended,
-  ISyncComponents
+  ISyncComponents,
+  TweenComponentDefinitionExtended
 } from './components/types'
 import { NameComponent } from './components/manual/Name'
 
@@ -36,6 +37,7 @@ export const Material: MaterialComponentDefinitionExtended = /* @__PURE__*/ comp
 export const MeshRenderer: MeshRendererComponentDefinitionExtended = /* @__PURE__*/ components.MeshRenderer(engine)
 export const MeshCollider: MeshColliderComponentDefinitionExtended = /* @__PURE__*/ components.MeshCollider(engine)
 export const Name: NameComponent = components.Name(engine)
+export const Tween: TweenComponentDefinitionExtended = /* @__PURE__*/ components.Tween(engine)
 /**
  * @alpha
  * This is going to be used for sync components through a server.

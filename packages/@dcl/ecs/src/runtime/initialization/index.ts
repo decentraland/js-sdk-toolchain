@@ -9,6 +9,7 @@ import { createPointerEventsSystem, PointerEventsSystem } from '../../systems/ev
 import { createInputSystem, IInputSystem } from './../../engine/input'
 import { createRaycastSystem, RaycastSystem } from '../../systems/raycast'
 import { createVideoEventsSystem, VideoEventsSystem } from '../../systems/videoEvents'
+import { TweenSystem, createTweenSystem } from '../../systems/tween'
 
 /**
  * @public
@@ -50,12 +51,18 @@ export const raycastSystem: RaycastSystem = /* @__PURE__ */ createRaycastSystem(
 export { RaycastSystem }
 
 /**
- * @alpha
  * @public
  * Register callback functions to a particular entity on video events.
  */
 export const videoEventsSystem: VideoEventsSystem = /* @__PURE__ */ createVideoEventsSystem(engine)
 export { VideoEventsSystem }
+
+/**
+ * @public
+ * Register callback functions to a particular entity on video events.
+ */
+export const tweenSystem: TweenSystem = createTweenSystem(engine)
+export { TweenSystem }
 
 /**
  * @public

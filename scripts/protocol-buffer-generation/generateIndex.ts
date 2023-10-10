@@ -35,7 +35,7 @@ function defineComponentDecl(component: Component) {
   }
 }
 
-const skipExposeGlobally: string[] = ['Animator', 'MeshRenderer', 'MeshCollider', 'Material']
+const skipExposeGlobally: string[] = ['Animator', 'MeshRenderer', 'MeshCollider', 'Material', 'Tween']
 function defineGlobalComponentDecl(component: Component) {
   if (skipExposeGlobally.includes(component.componentPascalName)) return ''
   if (isGrowOnlyValueSet(component)) {

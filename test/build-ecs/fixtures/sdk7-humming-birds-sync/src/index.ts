@@ -20,6 +20,7 @@ import { getUserData } from '~system/UserIdentity'
 import { NetworkManager } from '@dcl/sdk/network-transport/types'
 import { createMovingPlatforms } from './moving-platforms'
 import { changeColorSystem, createCube } from './create-cube'
+import { createMovingPlatformsOld } from './moving-platforms-old'
 
 export const GameStatus = engine.defineComponent('game-status', { paused: Schemas.Boolean })
 
@@ -35,18 +36,20 @@ export async function main() {
   const serverUrl = realm.realmInfo?.isPreview
     ? 'ws://127.0.0.1:3000/ws/localScene'
     : 'wss://scene-state-server.decentraland.org/ws/boedo.dcl.eth'
-  const networkManager = await createNetworkManager({
-    serverUrl,
-    networkEntitiesLimit: { serverLimit: 500, clientLimit: 15 }
-  })
+  const networkManager =
+    engine ||
+    (await createNetworkManager({
+      serverUrl,
+      networkEntitiesLimit: { serverLimit: 500, clientLimit: 15 }
+    }))
   const userId = (await getUserData({})).data?.userId ?? ''
 
   setupUi(userId)
-
-  if (server) {
+  if (server || true) {
     engine.addSystem(moveHummingBirds)
     gameStatusServer(networkManager)
     createMovingPlatforms(networkManager)
+    createMovingPlatformsOld(networkManager)
     for (const [x, y, z] of [
       [44, 1, 26],
       [36, 2, 37],
@@ -59,7 +62,10 @@ export async function main() {
     ]) {
       createCube(networkManager, x, y, z)
     }
-  } else {
+    // return
+  }
+
+  if (!server) {
     engine.addSystem(changeColorSystem)
     engine.addSystem(shootBirds(userId))
   }
@@ -83,12 +89,19 @@ export async function main() {
     src: 'models/staticPlatforms.glb'
   })
 
+  const staticPlatform = engine.addEntity()
+  Transform.create(staticPlatform, { position: { x: 0, y: 0, z: 20 } })
+  GltfContainer.create(staticPlatform, {
+    src: 'models/staticPlatforms.glb'
+  })
+
   const tree = engine.addEntity()
   Transform.create(tree, {
     position: { x: 20, y: 0, z: 8 },
     rotation: { x: 0, y: 0, z: 0, w: 0 },
     scale: { x: 1.6, y: 1.6, z: 1.6 }
   })
+
   GltfContainer.create(tree, {
     src: 'models/Tree.gltf',
     visibleMeshesCollisionMask: ColliderLayer.CL_POINTER | ColliderLayer.CL_PHYSICS,
@@ -107,8 +120,7 @@ export async function main() {
         clip: 'Tree_Action',
         loop: false,
         playing: false,
-        shouldReset: true,
-        name: 'Tree_Action'
+        shouldReset: true
       }
     ]
   })

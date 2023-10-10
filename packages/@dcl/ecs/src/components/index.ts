@@ -4,6 +4,7 @@ import { AnimatorComponentDefinitionExtended, defineAnimatorComponent } from './
 import { defineMaterialComponent, MaterialComponentDefinitionExtended } from './extended/Material'
 import { defineMeshColliderComponent, MeshColliderComponentDefinitionExtended } from './extended/MeshCollider'
 import { defineMeshRendererComponent, MeshRendererComponentDefinitionExtended } from './extended/MeshRenderer'
+import { defineTweenComponent, TweenComponentDefinitionExtended } from './extended/Tween'
 import { LwwComponentGetter, GSetComponentGetter } from './generated/index.gen'
 import defineNameComponent, { NameType } from './manual/Name'
 import defineSyncComponent, { ISyncComponentsType } from './manual/SyncComponents'
@@ -36,6 +37,9 @@ export const MeshRenderer: LwwComponentGetter<MeshRendererComponentDefinitionExt
 /* @__PURE__ */
 export const MeshCollider: LwwComponentGetter<MeshColliderComponentDefinitionExtended> = (engine) =>
   defineMeshColliderComponent(engine)
+
+/* @__PURE__ */
+export const Tween: LwwComponentGetter<TweenComponentDefinitionExtended> = (engine) => defineTweenComponent(engine)
 
 /**
  * @alpha

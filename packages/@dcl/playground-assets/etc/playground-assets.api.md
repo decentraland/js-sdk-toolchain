@@ -532,6 +532,9 @@ export const componentDefinitionByName: {
     "core::Raycast": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycast>>;
     "core::RaycastResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycastResult>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
+    "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
+    "core::TweenSequence": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenSequence>>;
+    "core::TweenState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenState>>;
     "core::UiBackground": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiBackground>>;
     "core::UiCanvasInformation": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiCanvasInformation>>;
     "core::UiDropdown": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdown>>;
@@ -799,6 +802,71 @@ export type DisplayType = 'flex' | 'none';
 //
 // @public
 export function Dropdown(props: UiDropdownProps): ReactEcs.JSX.Element;
+
+// @public (undocumented)
+export const enum EasingFunction {
+    // (undocumented)
+    EF_EASEBACK = 30,
+    // (undocumented)
+    EF_EASEBOUNCE = 15,
+    // (undocumented)
+    EF_EASECIRC = 27,
+    // (undocumented)
+    EF_EASECUBIC = 18,
+    // (undocumented)
+    EF_EASEELASTIC = 12,
+    // (undocumented)
+    EF_EASEEXPO = 9,
+    // (undocumented)
+    EF_EASEINBACK = 28,
+    // (undocumented)
+    EF_EASEINBOUNCE = 13,
+    // (undocumented)
+    EF_EASEINCIRC = 25,
+    // (undocumented)
+    EF_EASEINCUBIC = 16,
+    // (undocumented)
+    EF_EASEINELASTIC = 10,
+    // (undocumented)
+    EF_EASEINEXPO = 7,
+    // (undocumented)
+    EF_EASEINQUAD = 1,
+    // (undocumented)
+    EF_EASEINQUART = 19,
+    // (undocumented)
+    EF_EASEINQUINT = 22,
+    // (undocumented)
+    EF_EASEINSINE = 4,
+    // (undocumented)
+    EF_EASEOUTBACK = 29,
+    // (undocumented)
+    EF_EASEOUTBOUNCE = 14,
+    // (undocumented)
+    EF_EASEOUTCIRC = 26,
+    // (undocumented)
+    EF_EASEOUTCUBIC = 17,
+    // (undocumented)
+    EF_EASEOUTELASTIC = 11,
+    // (undocumented)
+    EF_EASEOUTEXPO = 8,
+    // (undocumented)
+    EF_EASEOUTQUAD = 2,
+    // (undocumented)
+    EF_EASEOUTQUART = 20,
+    // (undocumented)
+    EF_EASEOUTQUINT = 23,
+    // (undocumented)
+    EF_EASEOUTSINE = 5,
+    // (undocumented)
+    EF_EASEQUAD = 3,
+    // (undocumented)
+    EF_EASEQUART = 21,
+    // (undocumented)
+    EF_EASEQUINT = 24,
+    // (undocumented)
+    EF_EASESINE = 6,
+    EF_LINEAR = 0
+}
 
 // @public (undocumented)
 export interface EcsElements {
@@ -1691,6 +1759,24 @@ export class MessageBus {
     on(message: string, callback: (value: any, sender: string) => void): Observer<IEvents['comms']>;
 }
 
+// @public (undocumented)
+export interface Move {
+    // (undocumented)
+    end: PBVector3 | undefined;
+    // (undocumented)
+    faceDirection?: boolean | undefined;
+    // (undocumented)
+    start: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace Move {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): Move;
+    // (undocumented)
+    export function encode(message: Move, writer?: _m0.Writer): _m0.Writer;
+}
+
 // Warning: (ae-missing-release-tag) "Name" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -2508,6 +2594,26 @@ export namespace PBPosition {
 }
 
 // @public (undocumented)
+export interface PBQuaternion {
+    // (undocumented)
+    w: number;
+    // (undocumented)
+    x: number;
+    // (undocumented)
+    y: number;
+    // (undocumented)
+    z: number;
+}
+
+// @public (undocumented)
+export namespace PBQuaternion {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBQuaternion;
+    // (undocumented)
+    export function encode(message: PBQuaternion, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBRaycast {
     collisionMask?: number | undefined;
     continuous?: boolean | undefined;
@@ -2587,6 +2693,65 @@ export namespace PBTextShape {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTextShape;
     // (undocumented)
     export function encode(message: PBTextShape, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBTween {
+    currentTime?: number | undefined;
+    duration: number;
+    // (undocumented)
+    easingFunction: EasingFunction;
+    // (undocumented)
+    mode?: {
+        $case: "move";
+        move: Move;
+    } | {
+        $case: "rotate";
+        rotate: Rotate;
+    } | {
+        $case: "scale";
+        scale: Scale;
+    } | undefined;
+    playing?: boolean | undefined;
+}
+
+// @public (undocumented)
+export namespace PBTween {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTween;
+    // (undocumented)
+    export function encode(message: PBTween, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBTweenSequence {
+    // (undocumented)
+    loop?: TweenLoop | undefined;
+    // (undocumented)
+    sequence: PBTween[];
+}
+
+// @public (undocumented)
+export namespace PBTweenSequence {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTweenSequence;
+    // (undocumented)
+    export function encode(message: PBTweenSequence, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBTweenState {
+    currentTime: number;
+    // (undocumented)
+    state: TweenStateStatus;
+}
+
+// @public (undocumented)
+export namespace PBTweenState {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTweenState;
+    // (undocumented)
+    export function encode(message: PBTweenState, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3268,6 +3433,22 @@ export const RESERVED_LOCAL_ENTITIES = 65535;
 // @public
 export const RESERVED_STATIC_ENTITIES = 512;
 
+// @public (undocumented)
+export interface Rotate {
+    // (undocumented)
+    end: PBQuaternion | undefined;
+    // (undocumented)
+    start: PBQuaternion | undefined;
+}
+
+// @public (undocumented)
+export namespace Rotate {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): Rotate;
+    // (undocumented)
+    export function encode(message: Rotate, writer?: _m0.Writer): _m0.Writer;
+}
+
 // Warning: (ae-missing-release-tag) "RPCSendableMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -3302,6 +3483,22 @@ export namespace Scalar {
     export function smoothStep(from: number, to: number, tx: number): number;
     export function toHex(i: number): string;
     export function withinEpsilon(a: number, b: number, epsilon?: number): boolean;
+}
+
+// @public (undocumented)
+export interface Scale {
+    // (undocumented)
+    end: PBVector3 | undefined;
+    // (undocumented)
+    start: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace Scale {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): Scale;
+    // (undocumented)
+    export function encode(message: Scale, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3567,6 +3764,60 @@ export type Transport = {
 // @public (undocumented)
 export type TransportMessage = Omit<ReceiveMessage, 'data'>;
 
+// Warning: (ae-missing-release-tag) "Tween" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const Tween: TweenComponentDefinitionExtended;
+
+// @public (undocumented)
+export interface TweenComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBTween> {
+    Mode: TweenHelper;
+}
+
+// @public (undocumented)
+export interface TweenHelper {
+    // (undocumented)
+    Move: (move: Move) => PBTween['mode'];
+    // (undocumented)
+    Rotate: (rotate: Rotate) => PBTween['mode'];
+    // (undocumented)
+    Scale: (scale: Scale) => PBTween['mode'];
+}
+
+// @public (undocumented)
+export const enum TweenLoop {
+    // (undocumented)
+    TL_RESTART = 0,
+    // (undocumented)
+    TL_YOYO = 1
+}
+
+// @public (undocumented)
+export const TweenSequence: LastWriteWinElementSetComponentDefinition<PBTweenSequence>;
+
+// @public (undocumented)
+export const TweenState: LastWriteWinElementSetComponentDefinition<PBTweenState>;
+
+// @public (undocumented)
+export const enum TweenStateStatus {
+    // (undocumented)
+    TS_ACTIVE = 0,
+    // (undocumented)
+    TS_COMPLETED = 1,
+    // (undocumented)
+    TS_PAUSED = 2
+}
+
+// Warning: (ae-missing-release-tag) "TweenSystem" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type TweenSystem = {
+    tweenCompleted(entity: Entity): boolean;
+};
+
+// @public
+export const tweenSystem: TweenSystem;
+
 // @public
 export interface UiAvatarTexture {
     // (undocumented)
@@ -3821,8 +4072,6 @@ export interface VideoEventsSystem {
     removeVideoEventsEntity(entity: Entity): void;
 }
 
-// Warning: (ae-extra-release-tag) The doc comment should not contain more than one release tag
-//
 // @public
 export const videoEventsSystem: VideoEventsSystem;
 
