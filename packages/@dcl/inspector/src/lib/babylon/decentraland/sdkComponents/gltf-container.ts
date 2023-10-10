@@ -8,7 +8,7 @@ import type { ComponentOperation } from '../component-operations'
 import { EcsEntity } from '../EcsEntity'
 import { SceneContext } from '../SceneContext'
 
-const sceneContextMap = new Map<string /*sceneId*/, WeakRef<SceneContext>>()
+let sceneContext: WeakRef<SceneContext>
 
 BABYLON.SceneLoader.OnPluginActivatedObservable.add(function (plugin) {
   if (plugin instanceof GLTFFileLoader) {
@@ -32,8 +32,7 @@ BABYLON.SceneLoader.OnPluginActivatedObservable.add(function (plugin) {
       if (strParams) {
         const params = new URLSearchParams(strParams)
         const base = params.get('base') || ''
-        const sceneId = params.get('sceneId')!
-        const ctx = sceneContextMap.get(sceneId)?.deref()
+        const ctx = sceneContext.deref()
         if (ctx) {
           const filePath = base + '/' + url
           console.log(`Fetching ${filePath}`)
@@ -55,7 +54,7 @@ export const putGltfContainerComponent: ComponentOperation = (entity, component)
     const currentValue = entity.ecsComponentValues.gltfContainer
     entity.ecsComponentValues.gltfContainer = newValue || undefined
 
-    const shouldLoadGltf = newValue && currentValue?.src !== newValue?.src
+    const shouldLoadGltf = !!newValue && currentValue?.src !== newValue?.src
     const shouldRemoveGltf = !newValue || shouldLoadGltf
 
     if (shouldRemoveGltf) removeGltf(entity)
@@ -68,7 +67,9 @@ export function loadGltf(entity: EcsEntity, value: string) {
   if (!context || !!entity.gltfContainer) return
 
   // store a WeakRef to the sceneContext to enable file resolver
-  sceneContextMap.set(context.loadableScene.id, entity.context)
+  if (!sceneContext) {
+    sceneContext = entity.context
+  }
 
   tryLoadGltfAsync(context.loadableScene.id, entity, value).catch((err) => {
     console.error('Error trying to load gltf ' + value, err)
@@ -78,8 +79,6 @@ export function loadGltf(entity: EcsEntity, value: string) {
 export function removeGltf(entity: EcsEntity) {
   const context = entity.context.deref()
   if (!context) return
-
-  sceneContextMap.delete(context.loadableScene.id)
 
   if (entity.gltfContainer) {
     entity.gltfContainer.setEnabled(false)
@@ -95,7 +94,7 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
     return
   }
 
-  const contextStillAlive = sceneContextMap.get(sceneId)?.deref()
+  const contextStillAlive = sceneContext.deref()
   if (!contextStillAlive) {
     return
   }
@@ -124,6 +123,13 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
     entity.getScene(),
     (assetContainer) => {
       processGLTFAssetContainer(assetContainer, entity)
+
+      // remove old entities
+      const prevChildren = entity.getChildren()
+      for (const child of prevChildren) {
+        child.setEnabled(false)
+        child.dispose(false, true)
+      }
 
       // Fin the main mesh and add it as the BasicShape.nameInEntity component.
       assetContainer.meshes
