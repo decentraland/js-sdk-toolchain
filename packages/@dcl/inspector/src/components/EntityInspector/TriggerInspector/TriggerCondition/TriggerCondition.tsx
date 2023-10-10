@@ -58,7 +58,6 @@ export const TriggerConditionContainer = ({
   const handleChangeType = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
       const [id, type] = value.split(SEPARATOR)
-      console.log('value', value, id, type)
       modifyCondition(idx, {
         ...conditions[idx],
         id: parseInt(id),
@@ -79,7 +78,7 @@ export const TriggerConditionContainer = ({
   )
 
   const handleRemoveCondition = useCallback(
-    (e: React.MouseEvent, idx: number) => {
+    (_e: React.MouseEvent, idx: number) => {
       removeCondition(idx)
     },
     [removeCondition]
@@ -130,40 +129,44 @@ export const TriggerConditionContainer = ({
         const isCounterCondition = counterConditionTypeOptions.some(($) => $.value === condition.type)
         return (
           <div className="TriggerCondition" key={`trigger-condition-${idx}`}>
-            <Dropdown
-              options={entityOptions ? [{ value: '', text: 'Select an Entity' }, ...entityOptions] : []}
-              value={entity}
-              onChange={(e) => handleChangeEntity(e, idx)}
-            />
-            <Dropdown
-              disabled={isDisabled}
-              options={conditionOptions.map(({ text, value }) => ({
-                text,
-                value: [value.id, value.type].join(SEPARATOR)
-              }))}
-              value={type}
-              onChange={(e) => handleChangeType(e, idx)}
-            />
-            {isStatesCondition && (
+            <div className="Fields">
+              <Dropdown
+                options={entityOptions ? [{ value: '', text: 'Select an Entity' }, ...entityOptions] : []}
+                value={entity}
+                onChange={(e) => handleChangeEntity(e, idx)}
+              />
               <Dropdown
                 disabled={isDisabled}
-                options={stateOptions.length > 0 ? [{ value: '', text: 'Select state' }, ...stateOptions] : []}
-                value={condition.value}
-                onChange={(e) => handleChangeSelectValue(e, idx)}
+                options={conditionOptions.map(({ text, value }) => ({
+                  text,
+                  value: [value.id, value.type].join(SEPARATOR)
+                }))}
+                value={type}
+                onChange={(e) => handleChangeType(e, idx)}
               />
-            )}
-            {isCounterCondition && (
-              <TextField
-                disabled={isDisabled}
-                value={condition.value}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeSelectValue(e, idx)}
-              />
-            )}
-            <MoreOptionsMenu>
-              <Button className="RemoveButton" onClick={(e) => handleRemoveCondition(e, idx)}>
-                <RemoveIcon /> Remove Trigger Condition
-              </Button>
-            </MoreOptionsMenu>
+              {isStatesCondition && (
+                <Dropdown
+                  disabled={isDisabled}
+                  options={stateOptions.length > 0 ? [{ value: '', text: 'Select state' }, ...stateOptions] : []}
+                  value={condition.value}
+                  onChange={(e) => handleChangeSelectValue(e, idx)}
+                />
+              )}
+              {isCounterCondition && (
+                <TextField
+                  disabled={isDisabled}
+                  value={condition.value}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeSelectValue(e, idx)}
+                />
+              )}
+            </div>
+            <div className="RightMenu">
+              <MoreOptionsMenu>
+                <Button className="RemoveButton" onClick={(e) => handleRemoveCondition(e, idx)}>
+                  <RemoveIcon /> Remove Trigger Condition
+                </Button>
+              </MoreOptionsMenu>
+            </div>
           </div>
         )
       })}

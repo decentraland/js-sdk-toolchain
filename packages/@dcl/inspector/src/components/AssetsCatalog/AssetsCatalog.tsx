@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react'
 import { useDrag } from 'react-dnd'
+import { BsFillLightningChargeFill } from 'react-icons/bs'
+import cx from 'classnames'
 
 import { AssetProps, CategoriesProps, Props, ThemeProps } from './types'
-import { AssetPack, getAssetsByCategory, getContentsUrl } from '../../lib/logic/catalog'
+import { AssetPack, getAssetsByCategory, getContentsUrl, isSmart } from '../../lib/logic/catalog'
 
 import './AssetsCatalog.css'
 
@@ -70,10 +72,24 @@ function Categories({ onGoBack, value }: CategoriesProps) {
 
 function AssetCell({ value }: AssetProps) {
   const [, drag] = useDrag(() => ({ type: 'builder-asset', item: { value } }), [value])
-
+  const isSmartItem = isSmart(value)
   return (
-    <div className="asset" ref={drag} data-test-id={value.id} data-test-label={value.name}>
+    <div
+      className={cx('asset', { 'smart-item': isSmartItem })}
+      ref={drag}
+      data-test-id={value.id}
+      data-test-label={value.name}
+    >
       <img src={getContentsUrl(value.contents['thumbnail.png'])} alt={value.tags.join(', ')} />
+      {isSmartItem && SmartItemIcon()}
+    </div>
+  )
+}
+
+function SmartItemIcon() {
+  return (
+    <div className="smart-item-badge">
+      <BsFillLightningChargeFill />
     </div>
   )
 }

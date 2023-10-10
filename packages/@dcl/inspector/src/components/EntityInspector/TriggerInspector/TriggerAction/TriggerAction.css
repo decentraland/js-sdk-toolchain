@@ -36,10 +36,20 @@
 .TriggerActionsContainer > .TriggerAction {
   display: flex;
   flex-direction: row;
+}
+
+.TriggerActionsContainer > .TriggerAction > .Fields {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
   align-items: center;
   gap: 4px;
 }
 
-.TriggerActionsContainer > .TriggerAction .MoreOptionsMenu .MoreOptionsContent {
+.TriggerActionsContainer > .TriggerAction > .RightMenu {
+  align-self: start;
+}
+
+.TriggerActionsContainer > .TriggerAction > .RightMenu > .MoreOptionsMenu .MoreOptionsContent {
   min-width: 185px;
 }
