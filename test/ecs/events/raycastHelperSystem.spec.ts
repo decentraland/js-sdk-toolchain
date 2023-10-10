@@ -6,8 +6,8 @@ import {
   IEngine,
   RaycastSystem,
   RaycastQueryType
-} from '../../packages/@dcl/ecs/src'
-import { Vector3 } from '../../packages/@dcl/sdk/math'
+} from '../../../packages/@dcl/ecs/src'
+import { Vector3 } from '../../../packages/@dcl/sdk/math'
 
 describe('Raycast Helper System should', () => {
   const engine: IEngine = Engine()

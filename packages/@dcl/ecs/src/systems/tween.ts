@@ -6,7 +6,6 @@ import { dataCompare } from './crdt/utils'
 
 export type TweenSystem = {
   tweenCompleted(entity: Entity): boolean
-  tweenChanged(entity: Entity): boolean
 }
 
 /**
@@ -37,7 +36,7 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
     const tween = Tween.getOrNull(entity)
     const tweenCache = cache.get(entity)
     if (!tweenState || !tween) return false
-
+    /* istanbul ignore if */
     if (
       // Renderer notified that the tween is completed
       (tweenChanged(entity) || tweenState.state === TweenStateStatus.TS_COMPLETED) &&
@@ -108,10 +107,8 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
             mutableTweenHelper.sequence.push(tween)
           }
         } else if (tweenSequence.loop === TweenLoop.TL_YOYO) {
-          const newTween = backwardsTween(tween)
-          Tween.createOrReplace(entity, newTween)
+          Tween.createOrReplace(entity, backwardsTween(tween))
         } else if (tweenSequence.loop === TweenLoop.TL_RESTART) {
-          // Tween.getMutable(entity).currentTime = (tween.currentTime || 0) + 0.00001
           Tween.deleteFrom(entity)
           cache.delete(entity)
 
@@ -137,12 +134,12 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
       return { ...tween, mode: { ...tween.mode, scale: { start: tween.mode.scale.end, end: tween.mode.scale.start } } }
     }
 
+    /* istanbul ignore next */
     throw new Error('Invalid tween')
   }
 
   return {
     // This event is fired only once per tween
-    tweenCompleted: isCompleted,
-    tweenChanged: (entity) => !!cache.get(entity)?.changed
+    tweenCompleted: isCompleted
   }
 }

@@ -57,7 +57,7 @@ export function createMovingPlatformsOld(networkedEntityFactory: NetworkManager)
   startPath(
     platform1,
     [Vector3.create(2, 1.5, 6 + diffZ), Vector3.create(2, 1.5, 12 + diffZ), Vector3.create(2, 1.5, 6 + diffZ)],
-    1,
+    4,
     false,
     true
   )
@@ -85,7 +85,6 @@ export function createMovingPlatformsOld(networkedEntityFactory: NetworkManager)
   )
 
   function rotate() {
-    console.log('rotating')
     utils.tweens.startRotation(
       platform2,
       Quaternion.fromEulerDegrees(0, 0, 0),

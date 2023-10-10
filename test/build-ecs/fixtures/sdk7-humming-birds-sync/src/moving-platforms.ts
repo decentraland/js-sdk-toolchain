@@ -21,13 +21,13 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
     src: 'models/movingPlatform.glb'
   })
   Transform.create(platform1, {
-    position: Vector3.create(2, 1.5, 6.5)
+    position: Vector3.create(2, 1.5, 8)
   })
   SyncComponents.create(platform1, { componentIds: [Tween.componentId] })
 
   Tween.create(platform1, {
     mode: Tween.Mode.Move({ start: Vector3.create(2, 1.5, 6.5), end: Vector3.create(2, 1.5, 12) }),
-    duration: 500,
+    duration: 2000,
     tweenFunction: EasingFunction.TF_LINEAR
   })
 
@@ -35,22 +35,22 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
 
   // only vertical
   const parent = networkedEntityFactory.addEntity(engine)
-  Transform.create(parent, { position: Vector3.create(4, 2.5, 14) })
+  Transform.create(parent, { position: Vector3.create(3.5, 2.5, 14) })
+  SyncComponents.create(parent, { componentIds: [Tween.componentId] })
 
   const platform2 = networkedEntityFactory.addEntity(engine)
   GltfContainer.create(platform2, {
     src: 'models/movingPlatform.glb'
   })
-
   Transform.create(platform2, { parent })
-  SyncComponents.create(platform2, { componentIds: [Tween.componentId] })
+  SyncComponents.create(platform2, { componentIds: [Tween.componentId, TweenSequence.componentId] })
 
   Tween.create(parent, {
     mode: Tween.Mode.Move({
       start: Vector3.create(3.5, 2.5, 14),
       end: Vector3.create(4, 4, 14)
     }),
-    duration: 3000,
+    duration: 1000,
     tweenFunction: EasingFunction.TF_LINEAR
   })
   TweenSequence.create(parent, { sequence: [], loop: TweenLoop.TL_YOYO })
@@ -58,9 +58,9 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
   Tween.create(platform2, {
     mode: Tween.Mode.Rotate({
       start: Quaternion.fromEulerDegrees(0, 0, 0),
-      end: Quaternion.fromEulerDegrees(0, 180, 0)
+      end: Quaternion.fromEulerDegrees(0, 170, 0)
     }),
-    duration: 500,
+    duration: 700,
     tweenFunction: EasingFunction.TF_LINEAR
   })
   TweenSequence.create(platform2, {
@@ -71,7 +71,7 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
           start: Quaternion.fromEulerDegrees(0, 180, 0),
           end: Quaternion.fromEulerDegrees(0, 360, 0)
         }),
-        duration: 500,
+        duration: 700,
         tweenFunction: EasingFunction.TF_LINEAR
       }
     ]
@@ -141,10 +141,6 @@ function testingSystem() {
   for (const [entity, _tween] of engine.getEntitiesWith(Tween)) {
     if (tweenSystem.tweenCompleted(entity)) {
       console.log('[TestingSystem]: tween completed', entity)
-    }
-
-    if (tweenSystem.tweenChanged(entity)) {
-      console.log('[TestingSystem]: tween changed', entity)
     }
   }
 }
