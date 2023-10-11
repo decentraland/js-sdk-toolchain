@@ -71,10 +71,10 @@ const Renderer: React.FC = () => {
   const addAsset = async (asset: AssetNodeItem, position: Vector3, basePath: string) => {
     if (!sdk) return
     const { operations } = sdk
-    operations.addAsset(ROOT, asset.asset.src, asset.name, position, basePath, asset.components)
+    const entityId = operations.addAsset(ROOT, asset.asset.src, asset.name, position, basePath, asset.components)
     await operations.dispatch()
     track(Event.ADD_ITEM, {
-      name: asset.name,
+      entityId: entityId,
       positionX: position.x,
       positionY: position.y,
       positionZ: position.z

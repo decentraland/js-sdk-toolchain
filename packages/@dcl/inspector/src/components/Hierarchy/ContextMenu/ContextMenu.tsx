@@ -41,7 +41,7 @@ const ContextMenu = (value: Entity) => {
 
   const handleAddComponent = (id: string) => {
     addComponent(value, Number(id))
-    track(Event.ADD_COMPONENT, { type: components.get(Number(id)) as string, parentAssetPackId: value })
+    track(Event.ADD_COMPONENT, { type: components.get(Number(id)) as string, parentEntityId: value })
   }
 
   if (value === ROOT || !_components.length) return null

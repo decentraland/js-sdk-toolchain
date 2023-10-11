@@ -10,7 +10,7 @@ export enum Event {
 
 export type Events = {
   [Event.ADD_ITEM]: {
-    name: string
+    entityId: number
     positionX: number
     positionY: number
     positionZ: number
@@ -20,11 +20,11 @@ export type Events = {
   }
   [Event.ADD_COMPONENT]: {
     type: string
-    parentAssetPackId: number
+    parentEntityId: number
   }
   [Event.REMOVE_COMPONENT]: {
     type: string
-    parentAssetPackId: number
+    parentEntityId: number
   }
 }
 
