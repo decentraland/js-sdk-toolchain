@@ -7,6 +7,7 @@ import { ROOT } from '../../../lib/sdk/tree'
 import { CoreComponents } from '../../../lib/sdk/components'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { useEntityComponent } from '../../../hooks/sdk/useEntityComponent'
+import { useAnalytics, Event } from '../../../hooks/useAnalytics'
 
 // TODO: enumerate better the components we want to show...
 const getEnabledComponents = () => {
@@ -34,11 +35,13 @@ const isComponentEnabled = (value: string) => getEnabledComponents().has(value)
 const ContextMenu = (value: Entity) => {
   const { getComponents, addComponent } = useEntityComponent()
   const { handleAction } = useContextMenu()
+  const { track } = useAnalytics()
   const components = getComponents(value, true)
   const _components = Array.from(components.entries()).filter(([_, name]) => isComponentEnabled(name))
 
   const handleAddComponent = (id: string) => {
     addComponent(value, Number(id))
+    track(Event.ADD_COMPONENT, { type: components.get(Number(id)) as string, parentAssetPackId: value })
   }
 
   if (value === ROOT || !_components.length) return null
