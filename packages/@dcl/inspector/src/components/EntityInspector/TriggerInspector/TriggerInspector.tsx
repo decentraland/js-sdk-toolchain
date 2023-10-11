@@ -9,7 +9,8 @@ import {
   TriggerConditionOperation,
   TriggerConditionType,
   States,
-  TriggerCondition
+  TriggerCondition,
+  ComponentName
 } from '@dcl/asset-packs'
 import { Item } from 'react-contexify'
 import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
@@ -21,6 +22,7 @@ import { getComponentValue, useComponentValue } from '../../../hooks/sdk/useComp
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { useEntitiesWith } from '../../../hooks/sdk/useEntitiesWith'
+import { useAnalytics, Event } from '../../../hooks/useAnalytics'
 import { EditorComponentsTypes } from '../../../lib/sdk/components'
 
 import { Container } from '../../Container'
@@ -66,6 +68,7 @@ export default withSdk<Props>(
     const hasTriggers = useHasComponent(entityId, Triggers)
     const hasStates = useHasComponent(entityId, States)
     const hasCounter = useHasComponent(entityId, Counter)
+    const { track } = useAnalytics()
 
     const areValidActions = useCallback(
       (updatedActions: TriggerAction[]) =>
@@ -185,6 +188,7 @@ export default withSdk<Props>(
     const handleRemove = useCallback(async () => {
       sdk.operations.removeComponent(entityId, Triggers)
       await sdk.operations.dispatch()
+      track(Event.REMOVE_COMPONENT, { type: ComponentName.TRIGGERS, parentEntityId: entityId })
     }, [])
 
     const handleAddNewTrigger = useCallback(

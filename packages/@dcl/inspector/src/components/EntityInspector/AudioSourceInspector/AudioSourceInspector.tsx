@@ -10,6 +10,8 @@ import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
+import { useAnalytics, Event } from '../../../hooks/useAnalytics'
+import { CoreComponents } from '../../../lib/sdk/components'
 import { ProjectAssetDrop, getNode } from '../../../lib/sdk/drag-drop'
 import { withAssetDir } from '../../../lib/data-layer/host/fs-utils'
 import { useAppSelector } from '../../../redux/hooks'
@@ -44,10 +46,12 @@ export default withSdk<Props>(
       handleInputValidation,
       [files]
     )
+    const { track } = useAnalytics()
 
     const handleRemove = useCallback(async () => {
       sdk.operations.removeComponent(entity, AudioSource)
       await sdk.operations.dispatch()
+      track(Event.REMOVE_COMPONENT, { type: CoreComponents.AUDIO_SOURCE, parentEntityId: entity })
     }, [])
     const handleDrop = useCallback(async (audioClipUrl: string) => {
       const { operations } = sdk

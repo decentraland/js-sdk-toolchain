@@ -10,6 +10,8 @@ import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { useComponentValue } from '../../../hooks/sdk/useComponentValue'
+import { useAnalytics, Event } from '../../../hooks/useAnalytics'
+import { CoreComponents } from '../../../lib/sdk/components'
 import { InfoTooltip } from '../InfoTooltip'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
@@ -31,6 +33,7 @@ export default withSdk<Props>(
       entity,
       GltfContainer
     )
+    const { track } = useAnalytics()
 
     useEffect(() => {
       if (componentValue.visible === undefined) {
@@ -41,6 +44,7 @@ export default withSdk<Props>(
     const handleRemove = useCallback(async () => {
       sdk.operations.removeComponent(entity, VisibilityComponent)
       await sdk.operations.dispatch()
+      track(Event.REMOVE_COMPONENT, { type: CoreComponents.VISIBILITY_COMPONENT, parentEntityId: entity })
     }, [])
 
     const handleChangeVisibility = useCallback(

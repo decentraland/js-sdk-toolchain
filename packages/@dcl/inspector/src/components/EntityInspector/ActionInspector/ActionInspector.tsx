@@ -3,7 +3,15 @@ import { Item } from 'react-contexify'
 import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 import { VscTrash as RemoveIcon } from 'react-icons/vsc'
 import { AvatarAnchorPointType } from '@dcl/ecs'
-import { Action, ActionType, getActionTypes, getJson, ActionPayload, getActionSchema } from '@dcl/asset-packs'
+import {
+  Action,
+  ActionType,
+  getActionTypes,
+  getJson,
+  ActionPayload,
+  getActionSchema,
+  ComponentName
+} from '@dcl/asset-packs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { AnimationGroup } from '@babylonjs/core'
 
@@ -14,6 +22,7 @@ import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { useChange } from '../../../hooks/sdk/useChange'
 import { useArrayState } from '../../../hooks/useArrayState'
+import { useAnalytics, Event } from '../../../hooks/useAnalytics'
 import { EditorComponentsTypes } from '../../../lib/sdk/components'
 
 import { Block } from '../../Block'
@@ -70,6 +79,7 @@ export default withSdk<Props>(
     const hasActions = useHasComponent(entityId, Actions)
     const hasStates = useHasComponent(entityId, States)
     const hasCounter = useHasComponent(entityId, Counter)
+    const { track } = useAnalytics()
 
     useChange(
       (event, sdk) => {
@@ -198,6 +208,7 @@ export default withSdk<Props>(
     const handleRemove = useCallback(async () => {
       sdk.operations.removeComponent(entityId, Actions)
       await sdk.operations.dispatch()
+      track(Event.REMOVE_COMPONENT, { type: ComponentName.ACTIONS, parentEntityId: entityId })
     }, [])
 
     const handleAddNewAction = useCallback(() => {
