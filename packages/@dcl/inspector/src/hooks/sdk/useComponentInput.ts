@@ -32,7 +32,7 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
   )
   const [focusedOn, setFocusedOn] = useState<string | null>(null)
   const skipSyncRef = useRef(false)
-  const [isValid, setIsValid] = useState(false)
+  const [isValid, setIsValid] = useState(true)
 
   const updateInputs = useCallback((value: InputType | null, skipSync = false) => {
     skipSyncRef.current = skipSync
