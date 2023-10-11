@@ -5,6 +5,8 @@ import { VscTrash as RemoveIcon } from 'react-icons/vsc'
 import { AvatarAnchorPointType } from '@dcl/ecs'
 import { Action, ActionType, getActionTypes, getJson, ActionPayload, getActionSchema } from '@dcl/asset-packs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
+import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
+import { AnimationGroup } from '@babylonjs/core'
 
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { withContextMenu } from '../../../hoc/withContextMenu'
@@ -64,7 +66,7 @@ export default withSdk<Props>(
       componentValue === null ? [] : componentValue.value
     )
     const [isFocused, setIsFocused] = useState(false)
-    const [isLoaded, setIsLoaded] = useState(false)
+    const [animations, setAnimations] = useState<AnimationGroup[]>([])
     const [states, setStates] = useState<string[]>(States.getOrNull(entityId)?.value || [])
 
     const hasActions = useHasComponent(entityId, Actions)
@@ -153,23 +155,11 @@ export default withSdk<Props>(
     }, [actions, isFocused, sdk])
 
     useEffect(() => {
-      if (entity?.isGltfPathLoading()) {
-        entity
-          ?.getGltfPathLoading()
-          ?.then((_value) => {
-            setIsLoaded(true)
-          })
-          .catch((_e) => {
-            setIsLoaded(false)
-          })
-      } else {
-        setIsLoaded(true)
+      const animationGroups = entity?.gltfAssetContainer?.animationGroups
+      if (!!animationGroups && animationGroups.length > 0 && animations.length === 0) {
+        setAnimations([...animationGroups])
       }
-    }, [])
-
-    const animations = useMemo(() => {
-      return entity?.gltfAssetContainer?.animationGroups || []
-    }, [entity?.gltfAssetContainer?.animationGroups])
+    }, [animations, entity?.gltfAssetContainer?.animationGroups, ...Object.values(entity)])
 
     const hasAnimations = useMemo(() => {
       return animations.length > 0
@@ -329,7 +319,7 @@ export default withSdk<Props>(
       [removeAction]
     )
 
-    if (!hasActions || !isLoaded) {
+    if (!hasActions) {
       return null
     }
 
