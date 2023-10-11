@@ -19,25 +19,32 @@ describe('build: simple scene compilation', () => {
       throw new Error('scene doesn\'t include require("~system/EngineApi")')
     }
 
-    const transformComponentInclided = fileText.includes(`Transform(engine)`)
-    if (!transformComponentInclided) {
+    const transformComponentIncluded = fileText.includes(`Transform(engine)`)
+    if (!transformComponentIncluded) {
       throw new Error("scene doesn't include Transform(engine)")
+    }
+    const textEncodingLibraryIncluded = fileText.includes('text-encoding')
+    if (textEncodingLibraryIncluded) {
+      throw new Error('textEncoding is being bundled in the scene.')
     }
   })
 })
-
-describe.skip('build: side-effect-free-build', () => {
-  const cwd = resolve(__dirname, './fixtures/side-effect-free-build')
+describe('build: scene with etherum', () => {
+  const cwd = resolve(__dirname, './fixtures/ecs7-ui-ethereum')
 
   itDeletesFolder('./bin', cwd)
   itDeletesFolder('./node_modules', cwd)
 
   itExecutes('npm i --silent --no-progress', cwd)
-  itExecutes('npm run build --silent -- --production', cwd)
+  itExecutes('npm run build --silent', cwd)
 
   it('ensure files exist', () => {
     const binPath = ensureFileExists('bin/game.js', cwd)
     const fileText = readFileSync(binPath, 'utf8')
-    expect(fileText.trim()).toEqual('"use strict";')
+
+    const textEncodingLibraryIncluded = fileText.includes('text-encoding')
+    if (!textEncodingLibraryIncluded) {
+      throw new Error(`scene doesn't include textEncoding`)
+    }
   })
 })

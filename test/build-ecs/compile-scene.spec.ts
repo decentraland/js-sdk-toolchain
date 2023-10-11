@@ -41,7 +41,7 @@ describe('build-ecs: simple scene compilation, production mode', () => {
 })
 
 describe('build-ecs: scene with react', () => {
-  const cwd = resolve(__dirname, './fixtures/ecs7-ui')
+  const cwd = resolve(__dirname, './fixtures/ecs7-ui-ethereum')
 
   itDeletesFolder('./bin', cwd)
   itDeletesFolder('./node_modules', cwd)
