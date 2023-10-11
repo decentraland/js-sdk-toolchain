@@ -21,6 +21,7 @@ import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 import { Loading } from '../Loading'
 import { isModel, isAsset } from '../EntityInspector/GltfInspector/utils'
 import { useIsMounted } from '../../hooks/useIsMounted'
+import { useAnalytics, Event } from '../../hooks/useAnalytics'
 import { Warnings } from '../Warnings'
 import { CameraSpeed } from './CameraSpeed'
 
@@ -39,6 +40,7 @@ const Renderer: React.FC = () => {
   const init = !!files
   const gizmosDisabled = useAppSelector(areGizmosDisabled)
   const config = getConfig()
+  const { track } = useAnalytics()
 
   useEffect(() => {
     if (sdk && init) {
@@ -71,6 +73,12 @@ const Renderer: React.FC = () => {
     const { operations } = sdk
     operations.addAsset(ROOT, asset.asset.src, asset.name, position, basePath, asset.components)
     await operations.dispatch()
+    track(Event.ADD_ITEM, {
+      name: asset.name,
+      positionX: position.x,
+      positionY: position.y,
+      positionZ: position.z
+    })
   }
 
   const importBuilderAsset = async (asset: Asset) => {
