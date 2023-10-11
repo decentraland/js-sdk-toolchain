@@ -52,7 +52,6 @@ export const adjectives = [
   'tricky',
   'scandalous',
   'rampant',
-  'well-off',
   'abashed',
   'fallacious',
   'adventurous',
