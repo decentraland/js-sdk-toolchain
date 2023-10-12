@@ -1,10 +1,8 @@
 import { useCallback, useEffect } from 'react'
 import { Item } from 'react-contexify'
 import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
-import { VscInfo as InfoIcon } from 'react-icons/vsc'
 import cx from 'classnames'
 import { PBVisibilityComponent, PBGltfContainer } from '@dcl/ecs'
-import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
 
 import { ContextMenu as Menu } from '../../ContexMenu'
 import { withContextMenu } from '../../../hoc/withContextMenu'
@@ -12,6 +10,7 @@ import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { useComponentValue } from '../../../hooks/sdk/useComponentValue'
+import { InfoTooltip } from '../InfoTooltip'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
 import { Dropdown } from '../../Dropdown'
@@ -74,28 +73,18 @@ export default withSdk<Props>(
 
     const renderVisibilityMoreInfo = () => {
       return (
-        <Popup
-          content={
+        <InfoTooltip
+          text={
             'Use the Visibility property to hide an item during scene execution while keeping it visible in the editor.'
           }
-          trigger={<InfoIcon size={16} />}
-          position="top center"
-          on="hover"
-          hideOnScroll
-          hoverable
         />
       )
     }
 
     const renderPhysicsCollidersMoreInfo = () => {
       return (
-        <Popup
-          content={'Use the Physics Collider property to turn on or off physical interaction with this item.'}
-          trigger={<InfoIcon size={16} />}
-          position="top center"
-          on="hover"
-          hideOnScroll
-          hoverable
+        <InfoTooltip
+          text={'Use the Physics Collider property to turn on or off physical interaction with this item.'}
         />
       )
     }

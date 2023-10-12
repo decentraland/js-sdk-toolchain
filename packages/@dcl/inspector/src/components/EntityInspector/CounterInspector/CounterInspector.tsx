@@ -7,6 +7,7 @@ import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { ROOT } from '../../../lib/sdk/tree'
 import { withContextMenu } from '../../../hoc/withContextMenu'
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
+import { InfoTooltip } from '../InfoTooltip'
 import { Container } from '../../Container'
 import { TextField } from '../TextField'
 import { fromCounter, isValidInput, toCounter } from './utils'
@@ -33,7 +34,16 @@ export default withSdk<Props>(
     }
 
     return (
-      <Container label="Counter" className="CounterInspector">
+      <Container
+        label="Counter"
+        className="CounterInspector"
+        rightContent={
+          <InfoTooltip
+            text="Counter tracks numerical values that change based on player actions. Use it for conditional logic and to trigger actions when reaching certain values."
+            link="https://docs.decentraland.org/creator/smart-items/#counter"
+          />
+        }
+      >
         <Menu id={contextMenuId}>
           <Item id="delete" onClick={handleAction(handleRemove)}>
             <DeleteIcon /> Delete
