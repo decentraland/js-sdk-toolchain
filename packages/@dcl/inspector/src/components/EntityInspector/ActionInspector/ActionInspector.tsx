@@ -35,6 +35,21 @@ import { Props } from './types'
 
 import './ActionInspector.css'
 
+const ActionMapOption: Record<string, string> = {
+  [ActionType.PLAY_ANIMATION]: 'Play Animation',
+  [ActionType.STOP_ANIMATION]: 'Stop Animation',
+  [ActionType.SET_STATE]: 'Set State',
+  [ActionType.START_TWEEN]: 'Start Tween',
+  [ActionType.SET_COUNTER]: 'Set Counter',
+  [ActionType.INCREMENT_COUNTER]: 'Increment Counter',
+  [ActionType.DECREASE_COUNTER]: 'Decrease Counter',
+  [ActionType.PLAY_SOUND]: 'Play Sound',
+  [ActionType.STOP_SOUND]: 'Stop Sound',
+  [ActionType.SET_VISIBILITY]: 'Set Visibility',
+  [ActionType.ATTACH_TO_PLAYER]: 'Attach to Player',
+  [ActionType.DETACH_FROM_PLAYER]: 'Detach from Player'
+}
+
 export default withSdk<Props>(
   withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId, contextMenuId }) => {
     const { Actions, States, Counter } = sdk.components
@@ -447,7 +462,10 @@ export default withSdk<Props>(
                   disabled={availableActions.length === 0}
                   options={[
                     { text: 'Select an Action', value: '' },
-                    ...availableActions.map((availableAction) => ({ text: availableAction, value: availableAction }))
+                    ...availableActions.map((availableAction) => ({
+                      text: ActionMapOption[availableAction],
+                      value: availableAction
+                    }))
                   ]}
                   value={action.type}
                   onChange={(e) => handleChangeType(e, idx)}
