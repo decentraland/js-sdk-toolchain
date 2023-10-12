@@ -1,6 +1,7 @@
 import React from 'react'
 import { VscTrash as RemoveIcon } from 'react-icons/vsc'
 import { IoIosGitBranch as ConditionalIcon } from 'react-icons/io'
+import { TriggerType } from '@dcl/asset-packs'
 import { Block } from '../../../Block'
 import { Button } from '../../../Button'
 import { Dropdown } from '../../../Dropdown'
@@ -9,6 +10,16 @@ import MoreOptionsMenu from '../../MoreOptionsMenu'
 import type { Props } from './types'
 
 import './TriggerEvent.css'
+
+const TriggerMapOption: Record<string, string> = {
+  [TriggerType.ON_CLICK]: 'On Click',
+  [TriggerType.ON_SPAWN]: 'On Spawn',
+  [TriggerType.ON_STATE_CHANGE]: 'On State Change',
+  [TriggerType.ON_COUNTER_CHANGE]: 'On Counter Change',
+  [TriggerType.ON_TWEEN_END]: 'On Tween End',
+  [TriggerType.ON_PLAYER_ENTERS_AREA]: 'Player Enters Area',
+  [TriggerType.ON_PLAYER_LEAVES_AREA]: 'Player Leaves Area'
+}
 
 export const TriggerEvent = ({
   trigger,
@@ -33,7 +44,11 @@ export const TriggerEvent = ({
           </MoreOptionsMenu>
         </div>
       </div>
-      <Dropdown options={availableTriggers} value={trigger.type} onChange={onChangeTriggerType} />
+      <Dropdown
+        options={availableTriggers.map((availableTrigger) => TriggerMapOption[availableTrigger])}
+        value={trigger.type}
+        onChange={onChangeTriggerType}
+      />
       {children}
     </Block>
   )
