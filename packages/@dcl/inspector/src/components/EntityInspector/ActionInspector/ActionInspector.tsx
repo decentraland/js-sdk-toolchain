@@ -5,7 +5,6 @@ import { VscTrash as RemoveIcon } from 'react-icons/vsc'
 import { AvatarAnchorPointType } from '@dcl/ecs'
 import { Action, ActionType, getActionTypes, getJson, ActionPayload, getActionSchema } from '@dcl/asset-packs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
-import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
 import { AnimationGroup } from '@babylonjs/core'
 
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
