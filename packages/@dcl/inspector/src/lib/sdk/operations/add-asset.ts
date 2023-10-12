@@ -12,7 +12,7 @@ import { ActionType, Actions, ComponentName, Triggers, getJson, getNextId, getPa
 import { CoreComponents } from '../components'
 import updateSelectedEntity from './update-selected-entity'
 import { addChild } from './add-child'
-import { withId } from './add-component'
+import { COMPONENTS_WITH_ID } from './add-component'
 
 function isSelf(value: any) {
   return `${value}` === `{self}`
@@ -42,7 +42,7 @@ export function addAsset(engine: IEngine) {
       for (const componentName in components) {
         const key = componentName as keyof typeof components
         const componentValue = components[key] ? { ...components[key] } : {}
-        if (withId.includes(componentName) && isSelf(componentValue.id)) {
+        if (COMPONENTS_WITH_ID.includes(componentName) && isSelf(componentValue.id)) {
           componentValue.id = getNextId(engine as any)
           ids.set(componentName, componentValue.id)
         }
