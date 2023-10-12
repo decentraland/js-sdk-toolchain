@@ -22,7 +22,6 @@ export async function getPublishableFiles(
   const ignorePatterns = await getDCLIgnorePatterns(components, projectRoot)
 
   const ig = ignore().add(ignorePatterns)
-
   const allFiles = globSync('**/*', {
     cwd: projectRoot,
     absolute: false,
