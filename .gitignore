@@ -11,6 +11,7 @@ packages/**/*.js
 packages/@dcl/sdk/package-lock.json
 packages/@dcl/sdk/**/*.js
 packages/@dcl/sdk/**/*.d.ts
+!packages/@dcl/sdk/src/ethereum-provider/text-encoding.d.ts
 api-docs
 packages/@dcl/sdk/internal
 packages/@dcl/sdk/testing

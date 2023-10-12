@@ -10,7 +10,7 @@ describe('workspace', () => {
     expect(validWorkspace.projects).toHaveLength(2)
     expect(validWorkspace.projects.map(($) => $.workingDirectory)).toEqual([
       path.resolve('test/build-ecs/fixtures/ecs7-scene'),
-      path.resolve('test/build-ecs/fixtures/ecs7-ui')
+      path.resolve('test/build-ecs/fixtures/ecs7-ui-ethereum')
     ])
   })
 })

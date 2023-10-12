@@ -74,7 +74,8 @@ module.exports = {
     "packages/@dcl/ecs/src/components/generated/index.gen.ts",
     "packages/@dcl/sdk/src/internal",
     "packages/@dcl/sdk/src/testing",
-    "packages/@dcl/sdk/src/network-transport"
+    "packages/@dcl/sdk/src/network-transport",
+    "packages/@dcl/sdk/src/ethereum-provider"
   ],
   verbose: true,
   testMatch: ["**/*.spec.(ts|tsx)"],
