@@ -21,9 +21,6 @@ export async function getPublishableFiles(
 ): Promise<Array<string>> {
   const ignorePatterns = await getDCLIgnorePatterns(components, projectRoot)
 
-  // ensure `node_modules/**` is ignored
-  ignorePatterns.push('node_modules/**')
-
   const ig = ignore().add(ignorePatterns)
   const allFiles = globSync('**/*', {
     cwd: projectRoot,
