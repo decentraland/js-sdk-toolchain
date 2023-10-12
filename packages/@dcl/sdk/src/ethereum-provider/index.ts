@@ -15,9 +15,12 @@
  */
 
 import { sendAsync } from '~system/EthereumController'
-import { getEthereumProvider } from './internal/provider'
-export { RPCSendableMessage } from './internal/provider'
+import { getEthereumProvider } from '../internal/provider'
+import { polyfillTextEncoder } from './text-encoder'
 
 export function createEthereumProvider() {
+  polyfillTextEncoder()
   return getEthereumProvider(sendAsync)
 }
+
+export { RPCSendableMessage } from '../internal/provider'
