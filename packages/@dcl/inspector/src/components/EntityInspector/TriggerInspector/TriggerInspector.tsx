@@ -13,8 +13,6 @@ import {
 } from '@dcl/asset-packs'
 import { Item } from 'react-contexify'
 import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
-import { VscQuestion as QuestionIcon } from 'react-icons/vsc'
-import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
 
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { withContextMenu } from '../../../hoc/withContextMenu'
@@ -28,6 +26,7 @@ import { EditorComponentsTypes } from '../../../lib/sdk/components'
 import { Container } from '../../Container'
 import { ContextMenu } from '../../ContexMenu'
 import { AddButton } from '../AddButton'
+import { InfoTooltip } from '../InfoTooltip'
 
 import { TriggerEvent } from './TriggerEvent'
 import { TriggerConditionContainer } from './TriggerCondition'
@@ -279,25 +278,17 @@ export default withSdk<Props>(
       return null
     }
 
-    const renderMoreInfo = () => {
-      return (
-        <Popup
-          content={
-            <>
-              Learn more about this feature in the <a href="">docs</a>.
-            </>
-          }
-          trigger={<QuestionIcon size={16} />}
-          position="right center"
-          on="hover"
-          hideOnScroll
-          hoverable
-        />
-      )
-    }
-
     return (
-      <Container label="Trigger" className="TriggerInspector" rightContent={renderMoreInfo()}>
+      <Container
+        label="Trigger"
+        className="TriggerInspector"
+        rightContent={
+          <InfoTooltip
+            text={`Triggers activate actions based on player interactions like clicks, entering/exiting areas, or global events like "on spawn".`}
+            link="https://docs.decentraland.org/creator/smart-items/#triggers"
+          />
+        }
+      >
         <ContextMenu id={contextMenuId}>
           <Item id="delete" onClick={handleAction(handleRemove)}>
             <DeleteIcon /> Delete

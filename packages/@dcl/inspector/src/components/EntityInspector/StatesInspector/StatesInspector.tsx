@@ -13,6 +13,7 @@ import { Container } from '../../Container'
 import { TextField } from '../TextField'
 import { AddButton } from '../AddButton'
 import MoreOptionsMenu from '../MoreOptionsMenu'
+import { InfoTooltip } from '../InfoTooltip'
 import { Props } from './types'
 import { getUniqueState, isRepeated, isValidInput } from './utils'
 
@@ -89,7 +90,16 @@ export default withSdk<Props>(
     }
 
     return (
-      <Container label="States" className="StatesInspector">
+      <Container
+        label="States"
+        className="StatesInspector"
+        rightContent={
+          <InfoTooltip
+            text="States specify the status of entities. Use triggers to check or change states, and set actions accordingly."
+            link="https://docs.decentraland.org/creator/smart-items/#states"
+          />
+        }
+      >
         <Menu id={contextMenuId}>
           <Item id="delete" onClick={handleAction(handleDelete)}>
             <DeleteIcon /> Delete

@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Item } from 'react-contexify'
 import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
-import { VscQuestion as QuestionIcon, VscTrash as RemoveIcon } from 'react-icons/vsc'
+import { VscTrash as RemoveIcon } from 'react-icons/vsc'
 import { AvatarAnchorPointType } from '@dcl/ecs'
 import { Action, ActionType, getActionTypes, getJson, ActionPayload, getActionSchema } from '@dcl/asset-packs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
-import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
 
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { withContextMenu } from '../../../hoc/withContextMenu'
@@ -24,6 +23,7 @@ import { TextField } from '../TextField'
 import MoreOptionsMenu from '../MoreOptionsMenu'
 import { AddButton } from '../AddButton'
 import { Button } from '../../Button'
+import { InfoTooltip } from '../InfoTooltip'
 
 import { PlaySoundAction } from './PlaySoundAction'
 import { TweenAction } from './TweenAction'
@@ -318,23 +318,6 @@ export default withSdk<Props>(
       return null
     }
 
-    const renderMoreInfo = () => {
-      return (
-        <Popup
-          content={
-            <>
-              Learn more about this feature in the <a href="">docs</a>.
-            </>
-          }
-          trigger={<QuestionIcon size={16} />}
-          position="right center"
-          on="hover"
-          hideOnScroll
-          hoverable
-        />
-      )
-    }
-
     const renderAction = (action: Action, idx: number) => {
       switch (action.type) {
         case ActionType.PLAY_ANIMATION: {
@@ -429,7 +412,16 @@ export default withSdk<Props>(
     }
 
     return (
-      <Container label="Action" className="ActionInspector" rightContent={renderMoreInfo()}>
+      <Container
+        label="Action"
+        className="ActionInspector"
+        rightContent={
+          <InfoTooltip
+            text="Actions list the capabilities of entities, from playing animations to changing visibility. Customize or add new actions, which are activated by triggers."
+            link="https://docs.decentraland.org/creator/smart-items/#actions"
+          />
+        }
+      >
         <ContextMenu id={contextMenuId}>
           <Item id="delete" onClick={handleAction(handleRemove)}>
             <DeleteIcon /> Delete
