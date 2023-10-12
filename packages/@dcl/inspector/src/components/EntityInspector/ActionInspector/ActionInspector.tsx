@@ -159,7 +159,7 @@ export default withSdk<Props>(
       if (!!animationGroups && animationGroups.length > 0 && animations.length === 0) {
         setAnimations([...animationGroups])
       }
-    }, [animations, entity?.gltfAssetContainer?.animationGroups, ...Object.values(entity)])
+    }, [animations, entity?.gltfAssetContainer?.animationGroups, ...Object.values(entity ?? {})])
 
     const hasAnimations = useMemo(() => {
       return animations.length > 0
