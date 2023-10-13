@@ -58,7 +58,7 @@ export default withSdk<Props>(
       entityId,
       Actions
     )
-
+    const entity = sdk.sceneContext.getEntityOrNull(entityId)
     const { handleAction } = useContextMenu()
     const [actions, addAction, modifyAction, removeAction] = useArrayState<Action>(
       componentValue === null ? [] : componentValue.value
@@ -85,20 +85,16 @@ export default withSdk<Props>(
       [entityId]
     )
 
-    useChange(
-      (event, sdk) => {
-        if (event.entity === entityId) {
-          const entity = sdk.sceneContext.getEntityOrNull(entityId)
-          if (entity) {
-            const animationGroup = entity?.gltfAssetContainer?.animationGroups ?? []
-            if (animationGroup.length > 0 && animations.length === 0) {
-              setAnimations([...animationGroup])
-            }
-          }
-        }
-      },
-      [entityId, animations, setAnimations]
-    )
+    useEffect(() => {
+      if (entity) {
+        entity
+          .onGltfContainerLoaded()
+          .then((gltfAssetContainer) => {
+            setAnimations([...gltfAssetContainer.animationGroups])
+          })
+          .catch(() => {})
+      }
+    }, [entity])
 
     const isValidAction = useCallback(
       (action: Action) => {
