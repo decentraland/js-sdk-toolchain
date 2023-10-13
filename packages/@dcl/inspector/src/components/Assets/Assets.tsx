@@ -50,7 +50,7 @@ function Assets() {
         <div className="tab" onClick={handleTabClick(AssetsTab.AssetsPack)} data-test-id={AssetsTab.AssetsPack}>
           <div className={cx({ underlined: tab === AssetsTab.AssetsPack })}>
             <MdImageSearch />
-            <span>BUILDER ASSETS</span>
+            <span>ASSET PACKS</span>
           </div>
         </div>
         <div className="tab" onClick={handleTabClick(AssetsTab.Import)} data-test-id={AssetsTab.Import}>
