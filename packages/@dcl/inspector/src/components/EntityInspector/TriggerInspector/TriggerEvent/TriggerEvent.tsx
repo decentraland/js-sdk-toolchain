@@ -45,7 +45,10 @@ export const TriggerEvent = ({
         </div>
       </div>
       <Dropdown
-        options={availableTriggers.map((availableTrigger) => TriggerMapOption[availableTrigger])}
+        options={availableTriggers.map((availableTrigger) => ({
+          text: TriggerMapOption[availableTrigger],
+          value: availableTrigger
+        }))}
         value={trigger.type}
         onChange={onChangeTriggerType}
       />
