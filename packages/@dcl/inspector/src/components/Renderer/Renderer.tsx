@@ -21,7 +21,7 @@ import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 import { Loading } from '../Loading'
 import { isModel, isAsset } from '../EntityInspector/GltfInspector/utils'
 import { useIsMounted } from '../../hooks/useIsMounted'
-import { useAnalytics, Event } from '../../hooks/useAnalytics'
+import { analytics, Event } from '../../lib/logic/analytics'
 import { Warnings } from '../Warnings'
 import { CameraSpeed } from './CameraSpeed'
 
@@ -40,7 +40,6 @@ const Renderer: React.FC = () => {
   const init = !!files
   const gizmosDisabled = useAppSelector(areGizmosDisabled)
   const config = getConfig()
-  const { track } = useAnalytics()
 
   useEffect(() => {
     if (sdk && init) {
@@ -71,13 +70,11 @@ const Renderer: React.FC = () => {
   const addAsset = async (asset: AssetNodeItem, position: Vector3, basePath: string) => {
     if (!sdk) return
     const { operations } = sdk
-    const entityId = operations.addAsset(ROOT, asset.asset.src, asset.name, position, basePath, asset.components)
+    operations.addAsset(ROOT, asset.asset.src, asset.name, position, basePath, asset.components)
     await operations.dispatch()
-    track(Event.ADD_ITEM, {
-      entityId: entityId,
-      positionX: position.x,
-      positionY: position.y,
-      positionZ: position.z
+    analytics.track(Event.ADD_ITEM, {
+      itemId: asset.asset.id ?? asset.asset.src,
+      itemName: asset.name
     })
   }
 
@@ -123,7 +120,7 @@ const Renderer: React.FC = () => {
       type: 'asset',
       name: asset.name,
       parent: null,
-      asset: { type: 'gltf', src: path },
+      asset: { type: 'gltf', src: path, id: asset.id },
       components: asset.components
     }
     const basePath = withAssetDir(`${destFolder}/${assetPackageName}`)

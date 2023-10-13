@@ -5,6 +5,7 @@ export interface IAsset {
   src: string
   type: 'unknown' | 'gltf' | 'composite' | 'audio'
   thumbnail?: string
+  id?: string
 }
 
 export interface FolderCellProp {
