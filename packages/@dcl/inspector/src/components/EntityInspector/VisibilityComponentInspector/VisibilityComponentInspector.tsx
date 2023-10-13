@@ -9,8 +9,9 @@ import { withContextMenu } from '../../../hoc/withContextMenu'
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
-import { useComponentValue } from '../../../hooks/sdk/useComponentValue'
-import { useAnalytics, Event } from '../../../hooks/useAnalytics'
+import { getComponentValue, useComponentValue } from '../../../hooks/sdk/useComponentValue'
+import { analytics, Event } from '../../../lib/logic/analytics'
+import { getAssetByModel } from '../../../lib/logic/catalog'
 import { CoreComponents } from '../../../lib/sdk/components'
 import { InfoTooltip } from '../InfoTooltip'
 import { Block } from '../../Block'
@@ -33,7 +34,6 @@ export default withSdk<Props>(
       entity,
       GltfContainer
     )
-    const { track } = useAnalytics()
 
     useEffect(() => {
       if (componentValue.visible === undefined) {
@@ -44,7 +44,12 @@ export default withSdk<Props>(
     const handleRemove = useCallback(async () => {
       sdk.operations.removeComponent(entity, VisibilityComponent)
       await sdk.operations.dispatch()
-      track(Event.REMOVE_COMPONENT, { type: CoreComponents.VISIBILITY_COMPONENT, parentEntityId: entity })
+      const gltfContainer = getComponentValue(entity, GltfContainer)
+      const asset = getAssetByModel(gltfContainer.src)
+      analytics.track(Event.REMOVE_COMPONENT, {
+        componentName: CoreComponents.VISIBILITY_COMPONENT,
+        parentItemId: asset?.id || ''
+      })
     }, [])
 
     const handleChangeVisibility = useCallback(

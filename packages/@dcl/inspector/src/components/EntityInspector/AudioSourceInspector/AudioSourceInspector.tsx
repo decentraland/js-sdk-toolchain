@@ -10,7 +10,9 @@ import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
-import { useAnalytics, Event } from '../../../hooks/useAnalytics'
+import { getComponentValue } from '../../../hooks/sdk/useComponentValue'
+import { analytics, Event } from '../../../lib/logic/analytics'
+import { getAssetByModel } from '../../../lib/logic/catalog'
 import { CoreComponents } from '../../../lib/sdk/components'
 import { ProjectAssetDrop, getNode } from '../../../lib/sdk/drag-drop'
 import { withAssetDir } from '../../../lib/data-layer/host/fs-utils'
@@ -31,7 +33,7 @@ export default withSdk<Props>(
   withContextMenu<WithSdkProps & Props>(({ sdk, entity, contextMenuId }) => {
     const files = useAppSelector(selectAssetCatalog)
     const { handleAction } = useContextMenu()
-    const { AudioSource } = sdk.components
+    const { AudioSource, GltfContainer } = sdk.components
 
     const hasAudioSource = useHasComponent(entity, AudioSource)
     const handleInputValidation = useCallback(
@@ -46,12 +48,16 @@ export default withSdk<Props>(
       handleInputValidation,
       [files]
     )
-    const { track } = useAnalytics()
 
     const handleRemove = useCallback(async () => {
       sdk.operations.removeComponent(entity, AudioSource)
       await sdk.operations.dispatch()
-      track(Event.REMOVE_COMPONENT, { type: CoreComponents.AUDIO_SOURCE, parentEntityId: entity })
+      const gltfContainer = getComponentValue(entity, GltfContainer)
+      const asset = getAssetByModel(gltfContainer.src)
+      analytics.track(Event.REMOVE_COMPONENT, {
+        componentName: CoreComponents.AUDIO_SOURCE,
+        parentItemId: asset?.id || ''
+      })
     }, [])
     const handleDrop = useCallback(async (audioClipUrl: string) => {
       const { operations } = sdk

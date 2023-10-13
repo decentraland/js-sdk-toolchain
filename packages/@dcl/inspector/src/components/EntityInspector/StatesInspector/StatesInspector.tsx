@@ -3,10 +3,12 @@ import { Item, Menu } from 'react-contexify'
 import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 import { ComponentName, States } from '@dcl/asset-packs'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
-import { useComponentValue } from '../../../hooks/sdk/useComponentValue'
+import { getComponentValue, useComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { withContextMenu } from '../../../hoc/withContextMenu'
+import { analytics, Event } from '../../../lib/logic/analytics'
+import { getAssetByModel } from '../../../lib/logic/catalog'
 import { Block } from '../../Block'
 import { Button } from '../../Button'
 import { Container } from '../../Container'
@@ -18,16 +20,14 @@ import { Props } from './types'
 import { getUniqueState, isRepeated, isValidInput } from './utils'
 
 import './StatesInspector.css'
-import { useAnalytics, Event } from '../../../hooks/useAnalytics'
 
 export default withSdk<Props>(
   withContextMenu<WithSdkProps & Props>(({ sdk, entity, contextMenuId }) => {
-    const { States } = sdk.components
+    const { States, GltfContainer } = sdk.components
 
     const hasStates = useHasComponent(entity, States)
     const [states, setStates, isComponentEqual] = useComponentValue(entity, States)
     const [input, setInput] = useState<States>(states)
-    const { track } = useAnalytics()
 
     useEffect(() => {
       setInput({ ...states })
@@ -67,7 +67,9 @@ export default withSdk<Props>(
     const handleDelete = useCallback(async () => {
       sdk.operations.removeComponent(entity, States)
       await sdk.operations.dispatch()
-      track(Event.REMOVE_COMPONENT, { type: ComponentName.STATES, parentEntityId: entity })
+      const gltfContainer = getComponentValue(entity, GltfContainer)
+      const asset = getAssetByModel(gltfContainer.src)
+      analytics.track(Event.REMOVE_COMPONENT, { componentName: ComponentName.STATES, parentItemId: asset?.id || '' })
     }, [sdk])
 
     if (!hasStates) {

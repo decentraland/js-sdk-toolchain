@@ -17,13 +17,14 @@ import { AnimationGroup } from '@babylonjs/core'
 
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { withContextMenu } from '../../../hoc/withContextMenu'
-import { useComponentValue } from '../../../hooks/sdk/useComponentValue'
+import { getComponentValue, useComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { useChange } from '../../../hooks/sdk/useChange'
 import { useArrayState } from '../../../hooks/useArrayState'
-import { useAnalytics, Event } from '../../../hooks/useAnalytics'
+import { analytics, Event } from '../../../lib/logic/analytics'
 import { EditorComponentsTypes } from '../../../lib/sdk/components'
+import { getAssetByModel } from '../../../lib/logic/catalog'
 
 import { Block } from '../../Block'
 import { Container } from '../../Container'
@@ -62,7 +63,7 @@ const ActionMapOption: Record<string, string> = {
 
 export default withSdk<Props>(
   withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId, contextMenuId }) => {
-    const { Actions, States, Counter } = sdk.components
+    const { Actions, States, Counter, GltfContainer } = sdk.components
     const [componentValue, setComponentValue, isComponentEqual] = useComponentValue<EditorComponentsTypes['Actions']>(
       entityId,
       Actions
@@ -79,7 +80,6 @@ export default withSdk<Props>(
     const hasActions = useHasComponent(entityId, Actions)
     const hasStates = useHasComponent(entityId, States)
     const hasCounter = useHasComponent(entityId, Counter)
-    const { track } = useAnalytics()
 
     useChange(
       (event, sdk) => {
@@ -208,7 +208,9 @@ export default withSdk<Props>(
     const handleRemove = useCallback(async () => {
       sdk.operations.removeComponent(entityId, Actions)
       await sdk.operations.dispatch()
-      track(Event.REMOVE_COMPONENT, { type: ComponentName.ACTIONS, parentEntityId: entityId })
+      const gltfContainer = getComponentValue(entityId, GltfContainer)
+      const asset = getAssetByModel(gltfContainer.src)
+      analytics.track(Event.REMOVE_COMPONENT, { componentName: ComponentName.ACTIONS, parentItemId: asset?.id || '' })
     }, [])
 
     const handleAddNewAction = useCallback(() => {
