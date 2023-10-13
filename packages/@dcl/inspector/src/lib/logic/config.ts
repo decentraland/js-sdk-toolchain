@@ -19,10 +19,6 @@ export const CONTENT_URL = version.includes('commit')
   ? 'https://builder-items.decentraland.zone'
   : 'https://builder-items.decentraland.org'
 
-export const SEGMENT_KEY = version.includes('commit')
-  ? 'RmfAUVW7o1EEuvYJGqmVjK9q48BUpnCr'
-  : '8PrGcB0XsogabYgo02gXqfqVM20KKzva'
-
 export function getConfig(): InspectorConfig {
   const config = (globalThis as GlobalWithConfig).InspectorConfig
   const params = new URLSearchParams(globalThis?.location?.search || '')
