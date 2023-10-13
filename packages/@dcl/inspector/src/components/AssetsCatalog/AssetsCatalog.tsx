@@ -79,6 +79,7 @@ function AssetCell({ value }: AssetProps) {
       ref={drag}
       data-test-id={value.id}
       data-test-label={value.name}
+      title={value.name}
     >
       <img src={getContentsUrl(value.contents['thumbnail.png'])} alt={value.tags.join(', ')} />
       {isSmartItem && SmartItemIcon()}

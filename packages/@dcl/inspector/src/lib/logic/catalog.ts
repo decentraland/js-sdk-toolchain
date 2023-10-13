@@ -7,16 +7,22 @@ export const catalog = _catalog.assetPacks as unknown as AssetPack[]
 
 // categories obtained from "builder.decentraland.org" catalog
 export const CATEGORIES = [
+  'ground',
+  'utils',
+  'buttons',
+  'chests',
+  'levers',
+  'doors',
+  'platforms',
   'decorations',
   'structures',
   'vehicles',
   'furniture',
   'appliances',
-  'ground',
   'nature',
   'tiles',
   'year of the pig'
-].sort()
+]
 
 export type AssetPack = {
   id: string
