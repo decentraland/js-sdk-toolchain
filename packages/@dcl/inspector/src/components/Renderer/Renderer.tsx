@@ -49,13 +49,11 @@ const Renderer: React.FC = () => {
         const sceneEntity = sdk.sceneContext.getEntityOrNull(entity)
         if (!sceneEntity) continue
 
-        removeGltf(sceneEntity)
-        if (fileSet.has(value.src)) {
-          loadGltf(sceneEntity, value.src)
-        }
+        if (!fileSet.has(value.src)) removeGltf(sceneEntity)
+        else loadGltf(sceneEntity, value.src)
       }
     }
-  }, [files, init])
+  }, [files])
 
   useEffect(() => {
     if (sdk) {
