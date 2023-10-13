@@ -30,8 +30,8 @@ export class EcsEntity extends BABYLON.TransformNode {
   gltfAssetContainer?: BABYLON.AssetContainer
   textShape?: BABYLON.Mesh
   material?: BABYLON.StandardMaterial | BABYLON.PBRMaterial
-
   #gltfPathLoading?: IFuture<string>
+  #gltfAssetContainerLoading: IFuture<BABYLON.AssetContainer> = future()
 
   ecsComponentValues: EcsComponents = {}
 
@@ -103,6 +103,15 @@ export class EcsEntity extends BABYLON.TransformNode {
 
   setGltfPathLoading() {
     this.#gltfPathLoading = future()
+  }
+
+  onGltfContainerLoaded() {
+    return this.#gltfAssetContainerLoading
+  }
+
+  setGltfAssetContainer(gltfAssetContainer: BABYLON.AssetContainer) {
+    this.gltfAssetContainer = gltfAssetContainer
+    this.#gltfAssetContainerLoading.resolve(gltfAssetContainer)
   }
 }
 

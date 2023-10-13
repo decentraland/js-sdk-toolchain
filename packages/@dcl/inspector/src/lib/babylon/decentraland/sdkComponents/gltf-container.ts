@@ -139,7 +139,7 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
           entity.gltfContainer = mesh
         })
 
-      entity.gltfAssetContainer = assetContainer
+      entity.setGltfAssetContainer(assetContainer)
       entity.resolveGltfPathLoading(filePath)
     },
     null,

@@ -5,6 +5,7 @@ import { VscTrash as RemoveIcon } from 'react-icons/vsc'
 import { AvatarAnchorPointType } from '@dcl/ecs'
 import { Action, ActionType, getActionTypes, getJson, ActionPayload, getActionSchema } from '@dcl/asset-packs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
+import { AnimationGroup } from '@babylonjs/core'
 
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { withContextMenu } from '../../../hoc/withContextMenu'
@@ -57,14 +58,13 @@ export default withSdk<Props>(
       entityId,
       Actions
     )
-
     const entity = sdk.sceneContext.getEntityOrNull(entityId)
     const { handleAction } = useContextMenu()
     const [actions, addAction, modifyAction, removeAction] = useArrayState<Action>(
       componentValue === null ? [] : componentValue.value
     )
     const [isFocused, setIsFocused] = useState(false)
-    const [isLoaded, setIsLoaded] = useState(false)
+    const [animations, setAnimations] = useState<AnimationGroup[]>([])
     const [states, setStates] = useState<string[]>(States.getOrNull(entityId)?.value || [])
 
     const hasActions = useHasComponent(entityId, Actions)
@@ -84,6 +84,17 @@ export default withSdk<Props>(
       },
       [entityId]
     )
+
+    useEffect(() => {
+      if (entity) {
+        entity
+          .onGltfContainerLoaded()
+          .then((gltfAssetContainer) => {
+            setAnimations([...gltfAssetContainer.animationGroups])
+          })
+          .catch(() => {})
+      }
+    }, [entity])
 
     const isValidAction = useCallback(
       (action: Action) => {
@@ -151,25 +162,6 @@ export default withSdk<Props>(
         setComponentValue({ ...current, value: [...actions] })
       }
     }, [actions, isFocused, sdk])
-
-    useEffect(() => {
-      if (entity?.isGltfPathLoading()) {
-        entity
-          ?.getGltfPathLoading()
-          ?.then((_value) => {
-            setIsLoaded(true)
-          })
-          .catch((_e) => {
-            setIsLoaded(false)
-          })
-      } else {
-        setIsLoaded(true)
-      }
-    }, [])
-
-    const animations = useMemo(() => {
-      return entity?.gltfAssetContainer?.animationGroups || []
-    }, [entity?.gltfAssetContainer?.animationGroups])
 
     const hasAnimations = useMemo(() => {
       return animations.length > 0
@@ -329,7 +321,7 @@ export default withSdk<Props>(
       [removeAction]
     )
 
-    if (!hasActions || !isLoaded) {
+    if (!hasActions) {
       return null
     }
 
