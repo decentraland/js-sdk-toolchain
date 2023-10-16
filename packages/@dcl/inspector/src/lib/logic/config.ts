@@ -6,6 +6,9 @@ export type InspectorConfig = {
   binIndexJsUrl: string | null
   disableSmartItems: boolean
   contentUrl: string
+  segmentAppId: string | null
+  segmentUserId: string | null
+  segmentKey: string | null
 }
 
 export type GlobalWithConfig = typeof globalThis & {
@@ -25,6 +28,9 @@ export function getConfig(): InspectorConfig {
       params.get('parent') || params.get('dataLayerRpcParentUrl') || config?.dataLayerRpcParentUrl || null,
     binIndexJsUrl: params.get('binIndexJsUrl') || config?.binIndexJsUrl || null,
     disableSmartItems: params.has('disableSmartItems') || !!config?.disableSmartItems,
-    contentUrl: params.get('contentUrl') || config?.contentUrl || CONTENT_URL
+    contentUrl: params.get('contentUrl') || config?.contentUrl || CONTENT_URL,
+    segmentAppId: params.get('segmentAppId') || config?.segmentAppId || null,
+    segmentUserId: params.get('segmentUserId') || config?.segmentUserId || null,
+    segmentKey: params.get('segmentKey') || config?.segmentKey || null
   }
 }

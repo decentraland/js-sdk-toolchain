@@ -7,6 +7,10 @@ import { ROOT } from '../../../lib/sdk/tree'
 import { CoreComponents } from '../../../lib/sdk/components'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { useEntityComponent } from '../../../hooks/sdk/useEntityComponent'
+import { getComponentValue } from '../../../hooks/sdk/useComponentValue'
+import { useSdk } from '../../../hooks/sdk/useSdk'
+import { analytics, Event } from '../../../lib/logic/analytics'
+import { getAssetByModel } from '../../../lib/logic/catalog'
 
 // TODO: enumerate better the components we want to show...
 const getEnabledComponents = () => {
@@ -32,6 +36,7 @@ const getComponentName = (value: string) => (value.match(/[^:]*$/) || [])[0]
 const isComponentEnabled = (value: string) => getEnabledComponents().has(value)
 
 const ContextMenu = (value: Entity) => {
+  const sdk = useSdk()
   const { getComponents, addComponent } = useEntityComponent()
   const { handleAction } = useContextMenu()
   const components = getComponents(value, true)
@@ -39,6 +44,15 @@ const ContextMenu = (value: Entity) => {
 
   const handleAddComponent = (id: string) => {
     addComponent(value, Number(id))
+    if (sdk) {
+      const gltfContainer = getComponentValue(value, sdk.components.GltfContainer)
+      const asset = getAssetByModel(gltfContainer.src)
+      analytics.track(Event.ADD_COMPONENT, {
+        componentName: (components.get(Number(id)) ?? '').toString(),
+        itemId: asset?.id,
+        itemPath: gltfContainer.src
+      })
+    }
   }
 
   if (value === ROOT || !_components.length) return null
