@@ -190,7 +190,11 @@ export default withSdk<Props>(
       await sdk.operations.dispatch()
       const gltfContainer = getComponentValue(entityId, GltfContainer)
       const asset = getAssetByModel(gltfContainer.src)
-      analytics.track(Event.REMOVE_COMPONENT, { componentName: ComponentName.TRIGGERS, parentItemId: asset?.id || '' })
+      analytics.track(Event.REMOVE_COMPONENT, {
+        componentName: ComponentName.TRIGGERS,
+        itemId: asset?.id,
+        itemPath: gltfContainer.src
+      })
     }, [])
 
     const handleAddNewTrigger = useCallback(

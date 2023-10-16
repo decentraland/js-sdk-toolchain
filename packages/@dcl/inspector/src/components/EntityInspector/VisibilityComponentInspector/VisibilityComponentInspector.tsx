@@ -48,7 +48,8 @@ export default withSdk<Props>(
       const asset = getAssetByModel(gltfContainer.src)
       analytics.track(Event.REMOVE_COMPONENT, {
         componentName: CoreComponents.VISIBILITY_COMPONENT,
-        parentItemId: asset?.id || ''
+        itemId: asset?.id,
+        itemPath: gltfContainer.src
       })
     }, [])
 

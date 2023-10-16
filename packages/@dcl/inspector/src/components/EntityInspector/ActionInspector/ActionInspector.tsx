@@ -210,7 +210,11 @@ export default withSdk<Props>(
       await sdk.operations.dispatch()
       const gltfContainer = getComponentValue(entityId, GltfContainer)
       const asset = getAssetByModel(gltfContainer.src)
-      analytics.track(Event.REMOVE_COMPONENT, { componentName: ComponentName.ACTIONS, parentItemId: asset?.id || '' })
+      analytics.track(Event.REMOVE_COMPONENT, {
+        componentName: ComponentName.ACTIONS,
+        itemId: asset?.id,
+        itemPath: gltfContainer.src
+      })
     }, [])
 
     const handleAddNewAction = useCallback(() => {

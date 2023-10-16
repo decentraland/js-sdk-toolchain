@@ -47,12 +47,11 @@ const ContextMenu = (value: Entity) => {
     if (sdk) {
       const gltfContainer = getComponentValue(value, sdk.components.GltfContainer)
       const asset = getAssetByModel(gltfContainer.src)
-      if (asset) {
-        analytics.track(Event.ADD_COMPONENT, {
-          componentName: (components.get(Number(id)) ?? '').toString(),
-          parentItemId: asset.id
-        })
-      }
+      analytics.track(Event.ADD_COMPONENT, {
+        componentName: (components.get(Number(id)) ?? '').toString(),
+        itemId: asset?.id,
+        itemPath: gltfContainer.src
+      })
     }
   }
 

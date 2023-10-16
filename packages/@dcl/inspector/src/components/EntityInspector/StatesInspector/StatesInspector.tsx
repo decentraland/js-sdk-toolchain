@@ -69,7 +69,11 @@ export default withSdk<Props>(
       await sdk.operations.dispatch()
       const gltfContainer = getComponentValue(entity, GltfContainer)
       const asset = getAssetByModel(gltfContainer.src)
-      analytics.track(Event.REMOVE_COMPONENT, { componentName: ComponentName.STATES, parentItemId: asset?.id || '' })
+      analytics.track(Event.REMOVE_COMPONENT, {
+        componentName: ComponentName.STATES,
+        itemId: asset?.id,
+        itemPath: gltfContainer.src
+      })
     }, [sdk])
 
     if (!hasStates) {

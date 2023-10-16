@@ -56,7 +56,8 @@ export default withSdk<Props>(
       const asset = getAssetByModel(gltfContainer.src)
       analytics.track(Event.REMOVE_COMPONENT, {
         componentName: CoreComponents.AUDIO_SOURCE,
-        parentItemId: asset?.id || ''
+        itemId: asset?.id,
+        itemPath: gltfContainer.src
       })
     }, [])
     const handleDrop = useCallback(async (audioClipUrl: string) => {

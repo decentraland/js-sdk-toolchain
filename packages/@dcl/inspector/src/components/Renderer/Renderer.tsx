@@ -73,8 +73,9 @@ const Renderer: React.FC = () => {
     operations.addAsset(ROOT, asset.asset.src, asset.name, position, basePath, asset.components)
     await operations.dispatch()
     analytics.track(Event.ADD_ITEM, {
-      itemId: asset.asset.id ?? asset.asset.src,
-      itemName: asset.name
+      itemId: asset.asset.id,
+      itemName: asset.name,
+      itemPath: asset.asset.src
     })
   }
 
