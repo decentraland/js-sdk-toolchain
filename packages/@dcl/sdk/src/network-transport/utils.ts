@@ -30,7 +30,7 @@ export function createNetworkManager(reservedLocalEntities: number, range: [numb
 }
 
 export function syncFilter(message: Omit<TransportMessage, 'messageBuffer'>) {
-  if (!connected) return false
+  // if (!connected) return false
   const componentId = (message as any).componentId
   if ([PointerEventsResult.componentId, GltfContainerLoadingState.componentId].includes(componentId)) {
     return false
@@ -42,9 +42,10 @@ export function syncFilter(message: Omit<TransportMessage, 'messageBuffer'>) {
     return false
   }
 
-  if (entityId < reservedLocalEntities) {
-    return false
-  }
+  // TODO:  we dont have this for serverLess
+  // if (entityId < reservedLocalEntities) {
+  //   return false
+  // }
 
   // Network Entity Always
   if (message.type === CrdtMessageType.DELETE_ENTITY) {
@@ -60,6 +61,7 @@ export function syncFilter(message: Omit<TransportMessage, 'messageBuffer'>) {
   if (!sync) return false
 
   if ((message as any).componentId && sync.componentIds.includes((message as any).componentId)) {
+    console.log('[SYNC COMPONENT]', message)
     return true
   }
 

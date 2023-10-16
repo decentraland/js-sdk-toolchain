@@ -21,6 +21,7 @@ import { NetworkManager } from '@dcl/sdk/network-transport/types'
 import { createMovingPlatforms } from './moving-platforms'
 import { changeColorSystem, createCube } from './create-cube'
 import { createMovingPlatformsOld } from './moving-platforms-old'
+import { addSyncTransport } from './message-bus-sync'
 
 export const GameStatus = engine.defineComponent('game-status', { paused: Schemas.Boolean })
 
@@ -31,6 +32,7 @@ function gameStatusServer(networkManager: NetworkManager) {
 }
 
 export async function main() {
+  addSyncTransport()
   const realm = await getRealm({})
   const server = isServer && !!(await isServer({})).isServer
   const serverUrl = realm.realmInfo?.isPreview
@@ -49,7 +51,7 @@ export async function main() {
     engine.addSystem(moveHummingBirds)
     gameStatusServer(networkManager)
     createMovingPlatforms(networkManager)
-    createMovingPlatformsOld(networkManager)
+    // createMovingPlatformsOld(networkManager)
     for (const [x, y, z] of [
       [44, 1, 26],
       [36, 2, 37],

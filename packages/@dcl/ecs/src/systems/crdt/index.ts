@@ -142,10 +142,10 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
               DeleteComponent.write(msg.entityId, component.componentId, conflictMessage.timestamp, bufferForOutdated)
             }
 
-            outdatedMessages.push({
-              ...msg,
-              messageBuffer: bufferForOutdated.buffer().subarray(offset, bufferForOutdated.currentWriteOffset())
-            })
+            // outdatedMessages.push({
+            //   ...msg,
+            //   messageBuffer: bufferForOutdated.buffer().subarray(offset, bufferForOutdated.currentWriteOffset())
+            // })
           } else {
             // Add message to transport queue to be processed by others transports
             broadcastMessages.push(msg)
