@@ -4,27 +4,25 @@ import { getConfig } from './config'
 
 export enum Event {
   ADD_ITEM = 'Add Item',
-  REMOVE_ITEM = 'Remove Item',
   ADD_COMPONENT = 'Add Component',
   REMOVE_COMPONENT = 'Remove Component'
 }
 
 export type Events = {
   [Event.ADD_ITEM]: {
-    itemId: string
+    itemId?: string
     itemName: string
-  }
-  [Event.REMOVE_ITEM]: {
-    itemId: string
-    itemName: string
+    itemPath: string
   }
   [Event.ADD_COMPONENT]: {
     componentName: string
-    parentItemId: string
+    itemId?: string
+    itemPath: string
   }
   [Event.REMOVE_COMPONENT]: {
     componentName: string
-    parentItemId: string
+    itemId?: string
+    itemPath: string
   }
 }
 
