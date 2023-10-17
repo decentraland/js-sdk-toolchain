@@ -2757,6 +2757,7 @@ export namespace PBTweenState {
 // @public (undocumented)
 export interface PBUiBackground {
     color?: PBColor4 | undefined;
+    pointerBlocker?: boolean | undefined;
     // (undocumented)
     texture?: TextureUnion | undefined;
     // (undocumented)
@@ -2870,6 +2871,7 @@ export interface PBUiText {
     color?: PBColor4 | undefined;
     font?: Font | undefined;
     fontSize?: number | undefined;
+    pointerBlocker?: boolean | undefined;
     textAlign?: TextAlignMode | undefined;
     value: string;
 }
