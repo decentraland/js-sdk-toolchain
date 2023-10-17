@@ -14,7 +14,7 @@ const AVATAR_BASE = 1087
 const AVATAR_EMOTE_COMMAND = 1088
 const PLAYER_IDENTITY_DATA = 1089
 const AVATAR_EQUIPPED_DATA = 1091
-const NON_EXPOSED_LIST: number[] = [AVATAR_BASE, AVATAR_EMOTE_COMMAND, AVATAR_EQUIPPED_DATA, PLAYER_IDENTITY_DATA]
+const NON_EXPOSED_LIST: number[] = []
 
 /**
  * @param componentPath - Argument of execution '--component-path'
