@@ -2757,7 +2757,6 @@ export namespace PBTweenState {
 // @public (undocumented)
 export interface PBUiBackground {
     color?: PBColor4 | undefined;
-    pointerBlocker?: boolean | undefined;
     // (undocumented)
     texture?: TextureUnion | undefined;
     // (undocumented)
@@ -2871,7 +2870,6 @@ export interface PBUiText {
     color?: PBColor4 | undefined;
     font?: Font | undefined;
     fontSize?: number | undefined;
-    pointerBlocker?: boolean | undefined;
     textAlign?: TextAlignMode | undefined;
     value: string;
 }
@@ -2941,6 +2939,7 @@ export interface PBUiTransform {
     paddingTopUnit: YGUnit;
     // (undocumented)
     parent: number;
+    pointerFilter?: PointerFilterMode | undefined;
     // (undocumented)
     positionBottom: number;
     positionBottomUnit: YGUnit;
@@ -3125,6 +3124,14 @@ export const enum PointerEventType {
     PET_HOVER_LEAVE = 3,
     // (undocumented)
     PET_UP = 0
+}
+
+// @public (undocumented)
+export const enum PointerFilterMode {
+    // (undocumented)
+    PFM_BLOCK = 1,
+    // (undocumented)
+    PFM_NONE = 0
 }
 
 // @public (undocumented)
@@ -3837,6 +3844,8 @@ export const UiBackground: LastWriteWinElementSetComponentDefinition<PBUiBackgro
 export interface UiBackgroundProps {
     avatarTexture?: UiAvatarTexture;
     color?: PBColor4 | undefined;
+    // (undocumented)
+    pointerBlocker?: boolean | undefined;
     texture?: UiTexture;
     // (undocumented)
     textureMode?: TextureMode;
@@ -3902,6 +3911,8 @@ export interface UiLabelProps {
     color?: PBColor4 | undefined;
     font?: UiFontType | undefined;
     fontSize?: number | undefined;
+    // (undocumented)
+    pointerBlocker?: boolean | undefined;
     textAlign?: TextAlignType | undefined;
     value: string;
 }
