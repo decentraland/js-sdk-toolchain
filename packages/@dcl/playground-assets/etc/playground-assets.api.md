@@ -3844,8 +3844,6 @@ export const UiBackground: LastWriteWinElementSetComponentDefinition<PBUiBackgro
 export interface UiBackgroundProps {
     avatarTexture?: UiAvatarTexture;
     color?: PBColor4 | undefined;
-    // (undocumented)
-    pointerBlocker?: boolean | undefined;
     texture?: UiTexture;
     // (undocumented)
     textureMode?: TextureMode;
