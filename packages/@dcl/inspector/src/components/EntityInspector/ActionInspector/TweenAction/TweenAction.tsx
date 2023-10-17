@@ -1,14 +1,38 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { TweenType, InterpolationType } from '@dcl/asset-packs'
-import { VscQuestion as QuestionIcon } from 'react-icons/vsc'
-import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 
 import { Dropdown } from '../../../Dropdown'
 import { RangeField } from '../../RangeField'
 import { TextField } from '../../TextField'
+import { InfoTooltip } from '../../InfoTooltip'
 import { isValidTween } from './utils'
 import type { Props } from './types'
+
+const TweenMapOption: Record<string, string> = {
+  [TweenType.MOVE_ITEM]: 'Move Item',
+  [TweenType.ROTATE_ITEM]: 'Rotate Item',
+  [TweenType.SCALE_ITEM]: 'Scale Item'
+}
+
+const InterpolationMapOption: Record<string, string> = {
+  [InterpolationType.LINEAR]: 'Linear',
+  [InterpolationType.EASEINQUAD]: 'Ease in Quad',
+  [InterpolationType.EASEOUTQUAD]: 'Ease out Quad',
+  [InterpolationType.EASEQUAD]: 'Ease Quad',
+  [InterpolationType.EASEINSINE]: 'Ease in Sine',
+  [InterpolationType.EASEOUTSINE]: 'Ease out Sine',
+  [InterpolationType.EASESINE]: 'Ease in/out Sine',
+  [InterpolationType.EASEINEXPO]: 'Ease in Expo',
+  [InterpolationType.EASEOUTEXPO]: 'Ease out Expo',
+  [InterpolationType.EASEEXPO]: 'Ease in/out Expo',
+  [InterpolationType.EASEINELASTIC]: 'Ease in Elastic',
+  [InterpolationType.EASEOUTELASTIC]: 'Ease out Elastic',
+  [InterpolationType.EASEELASTIC]: 'Ease in/out Elastic',
+  [InterpolationType.EASEINBOUNCE]: 'Ease in Bounce',
+  [InterpolationType.EASEOUTEBOUNCE]: 'Ease out Bounce',
+  [InterpolationType.EASEBOUNCE]: 'Ease in/out Bounce'
+}
 
 const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props) => {
   const [tween, setTween] = useState(tweenProp)
@@ -83,70 +107,25 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
 
   const renderTweenInfo = () => {
     return (
-      <Popup
-        content={
-          <>
-            Learn more about the tweens type in the <a href="">docs</a>.
-          </>
-        }
-        trigger={<QuestionIcon size={16} />}
-        position="right center"
-        on="hover"
-        hideOnScroll
-        hoverable
+      <InfoTooltip
+        text={"Use the next tween type to change the item's position, scale, or rotation over a period of time."}
+        link="https://docs.decentraland.org/creator/smart-items/#moving-rotating-or-scaling"
       />
     )
   }
 
   const renderRelativeInfo = () => {
     return (
-      <Popup
-        content={
-          <>
-            Learn more about the relative in the <a href="">docs</a>.
-          </>
-        }
-        trigger={<QuestionIcon size={16} />}
-        position="right center"
-        on="hover"
-        hideOnScroll
-        hoverable
-      />
+      <InfoTooltip text="Relative tweens modify an item's position, scale, or rotation in relation to its current state, while absolute tweens fix them relative to the world." />
     )
   }
 
   const rendeCurveTypeInfo = () => {
-    return (
-      <Popup
-        content={
-          <>
-            Learn more about the curve type in the <a href="">docs</a>.
-          </>
-        }
-        trigger={<QuestionIcon size={16} />}
-        position="right center"
-        on="hover"
-        hideOnScroll
-        hoverable
-      />
-    )
+    return <InfoTooltip text="Tweens can follow different Curve Types that affect the rate of change over time." />
   }
 
   const renderDurationInfo = () => {
-    return (
-      <Popup
-        content={
-          <>
-            Learn more about the duration in the <a href="">docs</a>.
-          </>
-        }
-        trigger={<QuestionIcon size={16} />}
-        position="right center"
-        on="hover"
-        hideOnScroll
-        hoverable
-      />
-    )
+    return <InfoTooltip text="The duration set how long the whole movement should take in seconds." />
   }
 
   return (
@@ -157,7 +136,7 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
           <Dropdown
             options={[
               { value: '', text: 'Select a Tween Type' },
-              ...Object.values(TweenType).map((tweenType) => ({ text: tweenType, value: tweenType }))
+              ...Object.values(TweenType).map((tweenType) => ({ text: TweenMapOption[tweenType], value: tweenType }))
             ]}
             value={tween.type}
             onChange={handleChangeType}
@@ -208,7 +187,7 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
             options={[
               { value: '', text: 'Select a Curve Type' },
               ...Object.values(InterpolationType).map((interpolationType) => ({
-                text: interpolationType,
+                text: InterpolationMapOption[interpolationType],
                 value: interpolationType
               }))
             ]}
