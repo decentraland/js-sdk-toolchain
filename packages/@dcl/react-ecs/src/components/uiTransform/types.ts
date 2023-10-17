@@ -1,3 +1,5 @@
+import { PointerFilterMode } from "@dcl/ecs";
+
 /**
  * unit value specified. i.e. 1 || '100%' || '1px'
  * @public
@@ -124,4 +126,6 @@ export interface UiTransformProps {
   flexShrink?: number
   /** The overflow property controls what happens to content that is too big to fit into an area */
   overflow?: OverflowType
+  /** The pointer filter mode that specifies if the element should block the pointer or not (elements with pointer events always block the pointer regardless of this property) **/
+  pointerFilter?: PointerFilterMode | undefined
 }
