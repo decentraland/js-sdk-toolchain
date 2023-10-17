@@ -18,6 +18,7 @@ export interface UiBackgroundProps {
   avatarTexture?: UiAvatarTexture
   /** Texture for the background */
   texture?: UiTexture
+  pointerBlocker?: boolean | undefined
 }
 /**
  * Avatar Texture

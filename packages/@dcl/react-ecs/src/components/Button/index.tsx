@@ -39,7 +39,8 @@ export function Button(props: UiButtonProps) {
   const buttonProps = getButtonProps(props)
   const uiBackgroundProps = parseUiBackground({
     ...buttonProps.uiBackground,
-    ...uiBackground
+    ...uiBackground,
+    pointerBlocker: true
   })
   const { font, textAlign, ...uiTexProps } = otherProps
   const textProps: PBUiText = {
