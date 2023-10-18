@@ -1,4 +1,4 @@
-import { craftMessage, createNetworkManager, encodeString, syncFilter } from './utils'
+import { syncFilter, craftMessage, createNetworkManager, encodeString } from './utils'
 import { Transport, engine } from '@dcl/ecs'
 import { getHeaders } from '~system/SignedFetch'
 

@@ -12,6 +12,7 @@ export enum CrdtMessageType {
 
   DELETE_ENTITY = 3,
   APPEND_VALUE = 4,
+  PUT_NETWORK_COMPONENT = 5,
 
   MAX_MESSAGE_TYPE
 }
@@ -48,6 +49,15 @@ export type PutComponentMessageBody = {
   componentId: number
   timestamp: number
   data: Uint8Array
+}
+
+export type PutNetworkComponentMessageBody = {
+  type: CrdtMessageType.PUT_NETWORK_COMPONENT
+  entityId: Entity
+  componentId: number
+  timestamp: number
+  data: Uint8Array
+  networkId: number
 }
 
 /**
@@ -100,6 +110,10 @@ export type PutComponentMessage = CrdtMessageHeader & PutComponentMessageBody
 /**
  * @public
  */
+export type PutNetworkComponentMessage = CrdtMessageHeader & PutNetworkComponentMessageBody
+/**
+ * @public
+ */
 export type DeleteComponentMessage = CrdtMessageHeader & DeleteComponentMessageBody
 /**
  * @public
@@ -109,12 +123,18 @@ export type DeleteEntityMessage = CrdtMessageHeader & DeleteEntityMessageBody
 /**
  * @public
  */
-export type CrdtMessage = PutComponentMessage | DeleteComponentMessage | DeleteEntityMessage | AppendValueMessage
+export type CrdtMessage =
+  | PutComponentMessage
+  | PutNetworkComponentMessage
+  | DeleteComponentMessage
+  | DeleteEntityMessage
+  | AppendValueMessage
 
 /**
  * @public
  */
 export type CrdtMessageBody =
+  | PutNetworkComponentMessageBody
   | PutComponentMessageBody
   | DeleteComponentMessageBody
   | DeleteEntityMessageBody

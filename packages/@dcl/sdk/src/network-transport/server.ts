@@ -1,6 +1,6 @@
 import { engine, SyncComponents, Transport } from '@dcl/ecs'
 import { engineToCrdt } from './state'
-import { syncFilter, createNetworkManager } from './utils'
+import { createNetworkManager, syncFilter } from './utils'
 import { NetworkManager, ServerTransportConfig } from './types'
 import { PlayersConnected } from '.'
 

@@ -19,8 +19,7 @@ import { isServer } from '~system/EngineApi'
 import { getUserData } from '~system/UserIdentity'
 import { NetworkManager } from '@dcl/sdk/network-transport/types'
 import { createMovingPlatforms } from './moving-platforms'
-import { changeColorSystem, createCube } from './create-cube'
-import { createMovingPlatformsOld } from './moving-platforms-old'
+import { changeColorSystem, createCube, createCubes } from './create-cube'
 import { addSyncTransport } from './message-bus-sync'
 
 export const GameStatus = engine.defineComponent('game-status', { paused: Schemas.Boolean })
@@ -47,24 +46,12 @@ export async function main() {
   const userId = (await getUserData({})).data?.userId ?? ''
 
   setupUi(userId)
+
   if (server || true) {
     engine.addSystem(moveHummingBirds)
     gameStatusServer(networkManager)
     createMovingPlatforms(networkManager)
-    // createMovingPlatformsOld(networkManager)
-    for (const [x, y, z] of [
-      [44, 1, 26],
-      [36, 2, 37],
-      [20, 3, 40],
-      [19, 1, 23],
-      [31, 5, 8],
-      [43, 4, 6],
-      [37, 3, 24],
-      [5, 8, 2]
-    ]) {
-      createCube(networkManager, x, y, z)
-    }
-    // return
+    createCubes(networkManager)
   }
 
   if (!server) {

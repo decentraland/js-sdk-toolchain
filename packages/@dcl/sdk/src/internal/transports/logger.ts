@@ -16,6 +16,7 @@ export function* serializeCrdtMessages(prefix: string, data: Uint8Array, engine:
 
     if (
       message.type === CrdtMessageType.PUT_COMPONENT ||
+      message.type === CrdtMessageType.PUT_NETWORK_COMPONENT ||
       message.type === CrdtMessageType.DELETE_COMPONENT ||
       message.type === CrdtMessageType.APPEND_VALUE
     ) {

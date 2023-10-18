@@ -7,7 +7,8 @@ import {
   SyncComponents,
   CrdtMessageType,
   EntityUtils,
-  GltfContainerLoadingState
+  GltfContainerLoadingState,
+  Schemas
 } from '@dcl/ecs'
 import { MessageType } from './types'
 import { connected, reservedLocalEntities } from '.'
@@ -52,18 +53,28 @@ export function syncFilter(message: Omit<TransportMessage, 'messageBuffer'>) {
     return true
   }
 
+  const sync = SyncComponents.getOrNull(message.entityId)
+  if (!sync) return false
+
   // TBD: First component
   if ((message as any).timestamp <= 1) {
     return true
   }
 
-  const sync = SyncComponents.getOrNull(message.entityId)
-  if (!sync) return false
+  if (componentId === NetworkEntity.componentId) {
+    console.log('Message discarded', message)
+    return false
+  }
 
-  if ((message as any).componentId && sync.componentIds.includes((message as any).componentId)) {
+  if (componentId && sync.componentIds.includes(componentId)) {
     console.log('[SYNC COMPONENT]', message)
     return true
   }
 
   return false
 }
+
+export const NetworkEntity = engine.defineComponent('chore:network-entity', {
+  entityId: Schemas.Int,
+  userId: Schemas.Int
+})
