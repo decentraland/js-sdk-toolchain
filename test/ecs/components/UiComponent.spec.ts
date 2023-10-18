@@ -8,8 +8,8 @@ import {
   YGPositionType,
   YGUnit
 } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/ui_transform.gen'
-import {components, Engine} from '../../../packages/@dcl/ecs/src'
-import {testComponentSerialization} from './assertion'
+import { components, Engine } from '../../../packages/@dcl/ecs/src'
+import { testComponentSerialization } from './assertion'
 
 describe('UiTransform component', () => {
   it('should serialize', () => {
