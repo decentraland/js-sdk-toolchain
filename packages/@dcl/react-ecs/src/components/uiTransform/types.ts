@@ -1,4 +1,4 @@
-import { PointerFilterMode } from "@dcl/ecs";
+import { PointerFilterMode } from '@dcl/ecs'
 
 /**
  * unit value specified. i.e. 1 || '100%' || '1px'
