@@ -15,7 +15,6 @@ export interface UiLabelProps {
   textAlign?: TextAlignType | undefined
   /** Label font type. @defaultValue 'sans-serif' */
   font?: UiFontType | undefined
-  pointerBlocker?: boolean | undefined
 }
 
 /**

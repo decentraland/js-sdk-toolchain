@@ -3909,8 +3909,6 @@ export interface UiLabelProps {
     color?: PBColor4 | undefined;
     font?: UiFontType | undefined;
     fontSize?: number | undefined;
-    // (undocumented)
-    pointerBlocker?: boolean | undefined;
     textAlign?: TextAlignType | undefined;
     value: string;
 }
