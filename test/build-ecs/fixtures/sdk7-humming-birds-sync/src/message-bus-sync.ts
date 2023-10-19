@@ -10,7 +10,6 @@ export function addSyncTransport() {
   const transport: Transport = {
     filter: syncFilter,
     send: async (message: Uint8Array) => {
-      message.byteLength && console.log(Array.from(serializeCrdtMessages('[CRDT Send]: ', message, engine)))
       const messagesToProcess = await sendBinary({ data: message })
       if (messagesToProcess.data.length) {
         if (transport.onmessage) {
@@ -20,7 +19,8 @@ export function addSyncTransport() {
           }
         }
       }
-    }
+    },
+    type: 'network'
   }
   engine.addTransport(transport)
 }

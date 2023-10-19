@@ -6,13 +6,8 @@ import { AppendValueOperation, CrdtMessageProtocol } from '../../serialization/c
 import { DeleteComponent } from '../../serialization/crdt/deleteComponent'
 import { DeleteEntity } from '../../serialization/crdt/deleteEntity'
 import { PutComponentOperation } from '../../serialization/crdt/putComponent'
-import {
-  CrdtMessageType,
-  CrdtMessageHeader,
-  PutComponentMessageBody,
-  PutNetworkComponentMessageBody
-} from '../../serialization/crdt/types'
-import { ReceiveMessage, Transport, TransportMessage } from './types'
+import { CrdtMessageType, CrdtMessageHeader } from '../../serialization/crdt/types'
+import { ReceiveMessage, Transport } from './types'
 import { Schemas } from '../../schemas'
 import { PutNetworkComponentOperation } from '../../serialization/crdt/putComponentNetwork'
 
@@ -21,8 +16,6 @@ export const NetworkEntityEngine = (engine: Pick<IEngine, 'defineComponent'>) =>
     entityId: Schemas.Int,
     userId: Schemas.Int
   })
-
-type NetworkComponent = { entityId: number; userId: number }
 
 /**
  * @public
@@ -43,9 +36,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
   // Messages that we received at transport.onMessage waiting to be processed
   const receivedMessages: ReceiveMessage[] = []
   // Messages already processed by the engine but that we need to broadcast to other transports.
-  const broadcastMessages: TransportMessage[] = []
-  // Messages receieved by a transport that were outdated. We need to correct them
-  const outdatedMessages: TransportMessage[] = []
+  const broadcastMessages: ReceiveMessage[] = []
 
   /**
    *
@@ -119,13 +110,18 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
     return messagesToProcess
   }
 
+  /**
+   * Find the local entityId associated to the network component message.
+   * It's a mapping Network -> to Local
+   * If it's not a network message, return the entityId received by the message
+   */
   function findNetworkId(msg: ReceiveMessage): { entityId: Entity; network?: ReturnType<typeof NetworkEntity.get> } {
     if (msg.type !== CrdtMessageType.PUT_NETWORK_COMPONENT) {
       return { entityId: msg.entityId }
     }
+
     for (const [entityId, network] of engine.getEntitiesWith(NetworkEntity)) {
       if (network.userId === msg.networkId && network.entityId === msg.entityId) {
-        console.log('[NetworkId]: ', { entityId, network })
         return { entityId, network }
       }
     }
@@ -138,14 +134,13 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
    */
   async function receiveMessages() {
     const messagesToProcess = getMessages(receivedMessages)
-    // const bufferForOutdated = new ReadWriteByteBuffer()
     const entitiesShouldBeCleaned: Entity[] = []
 
     for (const msg of messagesToProcess) {
       // eslint-disable-next-line prefer-const
       let { entityId, network } = findNetworkId(msg)
+      // We receive a new Entity. Create the localEntity and map it to the NetworkEntity component
       if (msg.type === CrdtMessageType.PUT_NETWORK_COMPONENT && !network) {
-        console.log('[CRDT New] New message without network', msg)
         entityId = engine.addEntity()
         NetworkEntity.createOrReplace(entityId, { entityId: msg.entityId, userId: msg.networkId })
       }
@@ -169,28 +164,9 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         if (component) {
           const [conflictMessage, value] = component.updateFromCrdt({ ...msg, entityId })
 
-          if (conflictMessage) {
-            // const offset = bufferForOutdated.currentWriteOffset()
-            // if (conflictMessage.type === CrdtMessageType.PUT_COMPONENT) {
-            //   PutComponentOperation.write(
-            //     msg.entityId,
-            //     conflictMessage.timestamp,
-            //     conflictMessage.componentId,
-            //     conflictMessage.networkId,
-            //     conflictMessage.data,
-            //     bufferForOutdated
-            //   )
-            // } else if (conflictMessage.type === CrdtMessageType.DELETE_COMPONENT) {
-            //   DeleteComponent.write(entityId, component.componentId, conflictMessage.timestamp, bufferForOutdated)
-            // }
-            // outdatedMessages.push({
-            //   ...msg,
-            //   messageBuffer: bufferForOutdated.buffer().subarray(offset, bufferForOutdated.currentWriteOffset())
-            // })
-          } else {
+          if (!conflictMessage) {
             // Add message to transport queue to be processed by others transports
             broadcastMessages.push(msg)
-
             onProcessEntityComponentChange && onProcessEntityComponentChange(msg.entityId, msg.type, component, value)
           }
         } else {
@@ -201,19 +177,11 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
     }
     // the last stage of the syncrhonization is to delete the entities
     for (const entity of entitiesShouldBeCleaned) {
-      // If we tried to resend outdated message and the entity was deleted before, we avoid sending them.
-      for (let i = outdatedMessages.length - 1; i >= 0; i--) {
-        if (outdatedMessages[i].entityId === entity && outdatedMessages[i].type !== CrdtMessageType.DELETE_ENTITY) {
-          outdatedMessages.splice(i, 1)
-        }
-      }
       for (const definition of engine.componentsIter()) {
         // TODO: check this with pato/pravus
         definition.entityDeleted(entity, true)
       }
-
       engine.entityContainer.updateRemovedEntity(entity)
-
       onProcessEntityComponentChange && onProcessEntityComponentChange(entity, CrdtMessageType.DELETE_ENTITY)
     }
   }
@@ -223,14 +191,12 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
    */
   async function sendMessages(entitiesDeletedThisTick: Entity[]) {
     // CRDT Messages will be the merge between the recieved transport messages and the new crdt messages
-    const crdtMessages = getMessages<TransportMessage & { network?: NetworkComponent }>(broadcastMessages)
-    const outdatedMessagesBkp = getMessages(outdatedMessages)
+    const crdtMessages = getMessages(broadcastMessages)
     const buffer = new ReadWriteByteBuffer()
 
     for (const component of engine.componentsIter()) {
       for (const message of component.getCrdtUpdates()) {
         const offset = buffer.currentWriteOffset()
-        const network = NetworkEntity.getOrNull(message.entityId) || undefined
         // Avoid creating messages if there is no transport that will handle it
         if (transports.some((t) => t.filter(message))) {
           if (message.type === CrdtMessageType.PUT_COMPONENT) {
@@ -242,8 +208,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
           }
           crdtMessages.push({
             ...message,
-            messageBuffer: buffer.buffer().subarray(offset, buffer.currentWriteOffset()),
-            network
+            messageBuffer: buffer.buffer().subarray(offset, buffer.currentWriteOffset())
           })
 
           if (onProcessEntityComponentChange) {
@@ -272,65 +237,53 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
 
     // Send CRDT messages to transports
     const transportBuffer = new ReadWriteByteBuffer()
-    if (crdtMessages.find((a) => a.entityId > 500)) {
-      console.log(crdtMessages)
-    }
     for (const index in transports) {
       const transportIndex = Number(index)
       const transport = transports[transportIndex]
-      const isRendererTransport = !!(transport as any).isRenderer
+      const isRendererTransport = transport.type === 'renderer'
+      const isNetworkTransport = transport.type === 'network'
       transportBuffer.resetBuffer()
-      // First we need to send all the messages that were outdated from a transport
-      // So we can fix their crdt state
-      for (const message of outdatedMessagesBkp) {
-        if (
-          message.transportId === transportIndex &&
-          // TODO: This is an optimization, the state should converge anyway, whatever the message is sent.
-          // Avoid sending multiple messages for the same entity-componentId
-          !crdtMessages.find(
-            (m) =>
-              m.entityId === message.entityId &&
-              // TODO: as any, with multiple type of messages, it should have many checks before the check for similar messages
-              (m as any).componentId &&
-              (m as any).componentId === (message as any).componentId
-          )
-        ) {
-          transportBuffer.writeBuffer(message.messageBuffer, false)
-        }
-      }
       const buffer = new ReadWriteByteBuffer()
+
       // Then we send all the new crdtMessages that the transport needs to process
       for (const message of crdtMessages) {
-        if (message.transportId !== transportIndex && transport.filter(message)) {
-          if (isRendererTransport && message.type === CrdtMessageType.PUT_NETWORK_COMPONENT) {
-            const msg = message as any as PutNetworkComponentMessageBody
-            const { entityId } = findNetworkId(message as any)
-            const offset = buffer.currentWriteOffset()
-
-            PutComponentOperation.write(entityId, msg.timestamp, msg.componentId, msg.data, buffer)
-            transportBuffer.writeBuffer(buffer.buffer().subarray(offset, buffer.currentWriteOffset()), false)
-          } else if (!isRendererTransport && message.type === CrdtMessageType.PUT_COMPONENT && message.network) {
-            const msg = message as any as PutComponentMessageBody
+        // Avoid echo messages
+        if (message.transportId === transportIndex) continue
+        // Redundant message for the transport
+        if (!transport.filter(message)) continue
+        // If it's the renderer transport and its a NetworkMessage, we need to fix the entityId field and convert it to a known Message.
+        // PUT_NETWORK_COMPONENT -> PUT_COMPONENT
+        if (isRendererTransport && message.type === CrdtMessageType.PUT_NETWORK_COMPONENT) {
+          const { entityId } = findNetworkId(message)
+          const offset = buffer.currentWriteOffset()
+          PutComponentOperation.write(entityId, message.timestamp, message.componentId, message.data, buffer)
+          transportBuffer.writeBuffer(buffer.buffer().subarray(offset, buffer.currentWriteOffset()), false)
+          // Iterate the next message
+          continue
+        }
+        // If its a network transport and its a PUT_COMPONENT that has a NetworkEntity component, we need to send this message
+        // through comms with the EntityID and NetworkID from ther NetworkEntity so everyone can recieve this message and map to their custom entityID.
+        if (isNetworkTransport && message.type === CrdtMessageType.PUT_COMPONENT) {
+          const networkData = NetworkEntity.getOrNull(message.entityId)
+          // If it has networkData convert the message to PUT_NETWORK_COMPONENT.
+          if (networkData) {
             const offset = buffer.currentWriteOffset()
             PutNetworkComponentOperation.write(
-              message.network.entityId as Entity,
-              msg.timestamp,
-              msg.componentId,
-              message.network.userId ?? 0,
-              msg.data,
+              networkData.entityId as Entity,
+              message.timestamp,
+              message.componentId,
+              networkData.userId,
+              message.data,
               buffer
             )
             transportBuffer.writeBuffer(buffer.buffer().subarray(offset, buffer.currentWriteOffset()), false)
-          } else {
-            transportBuffer.writeBuffer(message.messageBuffer, false)
+            // Iterate the next message
+            continue
           }
         }
+        transportBuffer.writeBuffer(message.messageBuffer, false)
       }
       const message = transportBuffer.currentWriteOffset() ? transportBuffer.toBinary() : new Uint8Array([])
-      if (!isRendererTransport && message.byteLength) {
-        console.log('Sending', message)
-      }
-
       await transport.send(message)
     }
   }

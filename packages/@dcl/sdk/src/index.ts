@@ -8,7 +8,6 @@ import { compositeProvider } from './composite-provider'
 // Attach CRDT transport
 // @internal
 export const rendererTransport = createRendererTransport({ crdtSendToRenderer })
-;(rendererTransport as any).isRenderer = true
 engine.addTransport(rendererTransport)
 
 export async function onUpdate(deltaTime: number) {

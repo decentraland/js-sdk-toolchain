@@ -62,12 +62,10 @@ export function syncFilter(message: Omit<TransportMessage, 'messageBuffer'>) {
   }
 
   if (componentId === NetworkEntity.componentId) {
-    console.log('Message discarded', message)
     return false
   }
 
   if (componentId && sync.componentIds.includes(componentId)) {
-    console.log('[SYNC COMPONENT]', message)
     return true
   }
 

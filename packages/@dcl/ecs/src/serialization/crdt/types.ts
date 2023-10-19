@@ -51,12 +51,8 @@ export type PutComponentMessageBody = {
   data: Uint8Array
 }
 
-export type PutNetworkComponentMessageBody = {
+export type PutNetworkComponentMessageBody = Omit<PutComponentMessageBody, 'type'> & {
   type: CrdtMessageType.PUT_NETWORK_COMPONENT
-  entityId: Entity
-  componentId: number
-  timestamp: number
-  data: Uint8Array
   networkId: number
 }
 
