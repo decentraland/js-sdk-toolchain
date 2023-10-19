@@ -25,8 +25,8 @@ export function createTriangle(entityFactory: NetworkManager, x: number, y: numb
 
 export function createCircle(entityFactory: NetworkManager, x: number, y: number, z: number, sync: boolean = true) {
   const entity = createCube(entityFactory, x, y, z, sync)
-  MeshRenderer.setCylinder(entity, 3, 3)
-  MeshCollider.setCylinder(entity, 3, 3)
+  MeshRenderer.setCylinder(entity, 1, 1)
+  MeshCollider.setCylinder(entity, 1, 1)
   return entity
 }
 

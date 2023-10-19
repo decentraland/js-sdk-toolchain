@@ -128,9 +128,10 @@ export function setupUi(userId: string) {
             value="Create Local (Circle)"
             fontSize={18}
             uiTransform={{ width: '100%', height: 40 }}
-            onMouseDown={() =>
-              createCircle(engine, Math.random() * 24 + 23, Math.random() * 2, Math.random() * 24 + 23, false)
-            }
+            onMouseDown={() => {
+              const { x, y, z } = Transform.get(engine.PlayerEntity).position
+              createCircle(engine, x, y, z, false)
+            }}
           />
           {scoreBoard.map(($) => (
             <Label
@@ -146,7 +147,8 @@ export function setupUi(userId: string) {
 }
 
 function handleCreateTriangle() {
-  const entity = createTriangle(engine, Math.random() * 24, Math.random() * 2, Math.random() * 24)
+  const { x, y, z } = Transform.get(engine.PlayerEntity).position
+  const entity = createTriangle(engine, x, y, z)
   addNetworkEntity(entity)
 }
 
