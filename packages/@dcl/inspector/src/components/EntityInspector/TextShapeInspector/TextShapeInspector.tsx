@@ -11,7 +11,7 @@ import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
 import { SelectField } from '../SelectField'
-import { TextField } from '../TextField'
+import { TextField, CheckboxField } from '../../ui'
 import { Props } from './types'
 import { fromTextShape, toTextShape, isValidInput, FONTS, TEXT_ALIGN_MODES } from './utils'
 import { ColorField } from '../ColorField'
@@ -45,7 +45,7 @@ export default withSdk<Props>(
           <SelectField label="Font" options={FONTS} {...getInputProps('font')} />
           <TextField label="Size" type="number" {...getInputProps('fontSize')} />
           {/* TBD <TextField label="Color" {...getInputProps('color')} /> */}
-          <TextField label="Auto size" type="checkbox" {...getInputProps('fontAutoSize', (e) => e.target.checked)} />
+          <CheckboxField label="Auto size" {...getInputProps('fontAutoSize', (e) => e.target.checked)} />
         </Block>
         <Block label="Shape">
           <TextField label="Width" type="number" {...getInputProps('width')} />
@@ -53,7 +53,7 @@ export default withSdk<Props>(
         </Block>
         <Block label="Text">
           <SelectField label="Align" options={TEXT_ALIGN_MODES} {...getInputProps('textAlign')} />
-          <TextField label="Wrapping" type="checkbox" {...getInputProps('textWrapping', (e) => e.target.checked)} />
+          <CheckboxField label="Wrapping" {...getInputProps('textWrapping', (e) => e.target.checked)} />
         </Block>
         <Block label="Color">
           <ColorField {...getInputProps('textColor')} />

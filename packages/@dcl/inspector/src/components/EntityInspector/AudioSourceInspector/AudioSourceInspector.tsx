@@ -20,7 +20,7 @@ import { useAppSelector } from '../../../redux/hooks'
 import { selectAssetCatalog } from '../../../redux/app'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
-import { TextField } from '../TextField'
+import { TextField, CheckboxField } from '../../ui'
 import { RangeField } from '../RangeField'
 import { fromAudioSource, toAudioSource, isValidInput, isAudio, isValidVolume } from './utils'
 import type { Props } from './types'
@@ -103,8 +103,8 @@ export default withSdk<Props>(
           <TextField type="text" {...getInputProps('audioClipUrl')} error={files && !isValid} drop={isHover} />
         </Block>
         <Block label="Playback">
-          <TextField label="Start playing" type="checkbox" checked={!!playing.value} {...playing} />
-          <TextField label="Loop" type="checkbox" checked={!!loop.value} {...loop} />
+          <CheckboxField label="Start playing" checked={!!playing.value} {...playing} />
+          <CheckboxField label="Loop" checked={!!loop.value} {...loop} />
         </Block>
         <Block className="volume" label="Volume">
           <RangeField {...volume} />

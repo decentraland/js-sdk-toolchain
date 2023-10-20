@@ -5,7 +5,7 @@ import { IoIosImage } from 'react-icons/io'
 
 import FileInput from '../FileInput'
 import { Container } from '../Container'
-import { TextField } from '../EntityInspector/TextField'
+import { TextField } from '../ui/TextField'
 import { Block } from '../Block'
 import { Button } from '../Button'
 import { removeBasePath } from '../../lib/logic/remove-base-path'

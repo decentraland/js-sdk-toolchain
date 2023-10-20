@@ -3,7 +3,7 @@ import { useDrop } from 'react-dnd'
 
 import { Block } from '../../../Block'
 import { SelectField } from '../../SelectField'
-import { TextField } from '../../TextField'
+import { TextField } from '../../../ui/TextField'
 import { Container } from '../../../Container'
 import { Props, Texture, TEXTURE_TYPES, WRAP_MODES, FILTER_MODES } from './types'
 import { ProjectAssetDrop, getNode } from '../../../../lib/sdk/drag-drop'
