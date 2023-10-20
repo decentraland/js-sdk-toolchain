@@ -64,7 +64,7 @@
   justify-content: center;
   top: -12px;
   right: -12px;
-  background-color: var(--primary);
+  background-color: var(--primary-main);
   border-radius: 50%;
 }
 
@@ -107,9 +107,9 @@
 }
 
 .ImportAsset .file-container > div:nth-child(2) button {
-  background-color: var(--primary);
+  background-color: var(--primary-main);
 }
 
 .ImportAsset .file-container .error {
-  color: var(--primary);
+  color: var(--primary-main);
 }
