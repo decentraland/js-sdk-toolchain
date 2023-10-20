@@ -3134,6 +3134,9 @@ export const enum PointerFilterMode {
     PFM_NONE = 0
 }
 
+// @public
+export type PointerFilterType = 'none' | 'block';
+
 // @public (undocumented)
 export const PointerLock: LastWriteWinElementSetComponentDefinition<PBPointerLock>;
 
@@ -3950,7 +3953,7 @@ export interface UiTransformProps {
     minWidth?: PositionUnit;
     overflow?: OverflowType;
     padding?: Partial<Position> | PositionShorthand;
-    pointerFilter?: PointerFilterMode | undefined;
+    pointerFilter?: PointerFilterType;
     position?: Partial<Position> | PositionShorthand;
     positionType?: PositionType;
     width?: PositionUnit;

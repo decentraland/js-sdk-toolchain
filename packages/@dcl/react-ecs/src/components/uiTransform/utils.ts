@@ -1,4 +1,14 @@
-import { YGAlign, YGDisplay, YGFlexDirection, YGJustify, YGOverflow, YGPositionType, YGUnit, YGWrap } from '@dcl/ecs'
+import {
+  YGAlign,
+  YGDisplay,
+  YGFlexDirection,
+  YGJustify,
+  YGOverflow,
+  YGPositionType,
+  YGUnit,
+  YGWrap,
+  PointerFilterMode
+} from '@dcl/ecs'
 import {
   AlignType,
   FlexDirectionType,
@@ -9,7 +19,8 @@ import {
   Position,
   PositionType,
   PositionUnit,
-  PositionShorthand
+  PositionShorthand,
+  PointerFilterType
 } from './types'
 
 function capitalize<T extends string>(value: T): Capitalize<T> {
@@ -211,7 +222,7 @@ const parseOverflow: Readonly<Record<OverflowType, YGOverflow>> = {
 /**
  * @internal
  */
-export function getPoistionType(position: PositionType | undefined): Record<'positionType', YGPositionType> {
+export function getPositionType(position: PositionType | undefined): Record<'positionType', YGPositionType> {
   const value: YGPositionType = position ? parsePositionType[position] : YGPositionType.YGPT_RELATIVE
   return { positionType: value }
 }
@@ -219,4 +230,17 @@ export function getPoistionType(position: PositionType | undefined): Record<'pos
 const parsePositionType: Readonly<Record<PositionType, YGPositionType>> = {
   relative: YGPositionType.YGPT_RELATIVE,
   absolute: YGPositionType.YGPT_ABSOLUTE
+}
+
+/**
+ * @internal
+ */
+export function getPointerFilter(pointerFilter: PointerFilterType | undefined): Record<'pointerFilter', PointerFilterMode> {
+  const value: PointerFilterMode = pointerFilter ? parsePointerFilter[pointerFilter] : PointerFilterMode.PFM_NONE
+  return { pointerFilter: value }
+}
+
+const parsePointerFilter: Readonly<Record<PointerFilterType, PointerFilterMode>> = {
+  none: PointerFilterMode.PFM_NONE,
+  block: PointerFilterMode.PFM_BLOCK
 }

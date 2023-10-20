@@ -67,7 +67,7 @@ export type FlexWrapType = 'wrap' | 'nowrap' | 'wrap-reverse'
 
 /**
  * @public
- * The overflow property controls what happens to content that is too big to fit into an area.
+ * The overflow property controls what happens to content that is too big to fit into an area
  */
 export type OverflowType = 'hidden' | 'scroll' | 'visible'
 
@@ -76,6 +76,12 @@ export type OverflowType = 'hidden' | 'scroll' | 'visible'
  * The position property specifies the type of positioning method used for an element
  */
 export type PositionType = 'absolute' | 'relative'
+
+/**
+ * @public
+ * The pointer filter property determines if the ui element blocks the pointer or not (elements with pointer events always block the pointer regardless of this property)
+ */
+export type PointerFilterType = 'none' | 'block'
 
 /**
  * Layout props to position things in the canvas
@@ -126,6 +132,6 @@ export interface UiTransformProps {
   flexShrink?: number
   /** The overflow property controls what happens to content that is too big to fit into an area */
   overflow?: OverflowType
-  /** The pointer filter mode that specifies if the element should block the pointer or not (elements with pointer events always block the pointer regardless of this property) **/
-  pointerFilter?: PointerFilterMode | undefined
+  /** The pointer filter property determines if the ui element blocks the pointer or not (elements with pointer events always block the pointer regardless of this property) **/
+  pointerFilter?: PointerFilterType
 }
