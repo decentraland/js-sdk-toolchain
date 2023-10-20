@@ -235,7 +235,9 @@ const parsePositionType: Readonly<Record<PositionType, YGPositionType>> = {
 /**
  * @internal
  */
-export function getPointerFilter(pointerFilter: PointerFilterType | undefined): Record<'pointerFilter', PointerFilterMode> {
+export function getPointerFilter(
+  pointerFilter: PointerFilterType | undefined
+  ): Record<'pointerFilter', PointerFilterMode> {
   const value: PointerFilterMode = pointerFilter ? parsePointerFilter[pointerFilter] : PointerFilterMode.PFM_NONE
   return { pointerFilter: value }
 }
