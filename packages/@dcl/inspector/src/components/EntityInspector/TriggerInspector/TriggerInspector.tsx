@@ -9,7 +9,8 @@ import {
   TriggerConditionOperation,
   TriggerConditionType,
   States,
-  TriggerCondition
+  TriggerCondition,
+  ComponentName
 } from '@dcl/asset-packs'
 import { Item } from 'react-contexify'
 import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
@@ -21,6 +22,8 @@ import { getComponentValue, useComponentValue } from '../../../hooks/sdk/useComp
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { useEntitiesWith } from '../../../hooks/sdk/useEntitiesWith'
+import { analytics, Event } from '../../../lib/logic/analytics'
+import { getAssetByModel } from '../../../lib/logic/catalog'
 import { EditorComponentsTypes } from '../../../lib/sdk/components'
 
 import { Container } from '../../Container'
@@ -49,7 +52,7 @@ export const counterConditionTypeOptions = [
 
 export default withSdk<Props>(
   withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId, contextMenuId }) => {
-    const { Actions, Triggers, Name, States, Counter } = sdk.components
+    const { Actions, Triggers, Name, States, Counter, GltfContainer } = sdk.components
     const entitiesWithAction: Entity[] = useEntitiesWith((components) => components.Actions)
     const entitiesWithStates: Entity[] = useEntitiesWith((components) => components.States)
     const entitiesWithCounter: Entity[] = useEntitiesWith((components) => components.Counter)
@@ -185,6 +188,13 @@ export default withSdk<Props>(
     const handleRemove = useCallback(async () => {
       sdk.operations.removeComponent(entityId, Triggers)
       await sdk.operations.dispatch()
+      const gltfContainer = getComponentValue(entityId, GltfContainer)
+      const asset = getAssetByModel(gltfContainer.src)
+      analytics.track(Event.REMOVE_COMPONENT, {
+        componentName: ComponentName.TRIGGERS,
+        itemId: asset?.id,
+        itemPath: gltfContainer.src
+      })
     }, [])
 
     const handleAddNewTrigger = useCallback(

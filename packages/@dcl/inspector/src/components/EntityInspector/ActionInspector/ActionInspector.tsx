@@ -3,18 +3,28 @@ import { Item } from 'react-contexify'
 import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 import { VscTrash as RemoveIcon } from 'react-icons/vsc'
 import { AvatarAnchorPointType } from '@dcl/ecs'
-import { Action, ActionType, getActionTypes, getJson, ActionPayload, getActionSchema } from '@dcl/asset-packs'
+import {
+  Action,
+  ActionType,
+  getActionTypes,
+  getJson,
+  ActionPayload,
+  getActionSchema,
+  ComponentName
+} from '@dcl/asset-packs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { AnimationGroup } from '@babylonjs/core'
 
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { withContextMenu } from '../../../hoc/withContextMenu'
-import { useComponentValue } from '../../../hooks/sdk/useComponentValue'
+import { getComponentValue, useComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { useChange } from '../../../hooks/sdk/useChange'
 import { useArrayState } from '../../../hooks/useArrayState'
+import { analytics, Event } from '../../../lib/logic/analytics'
 import { EditorComponentsTypes } from '../../../lib/sdk/components'
+import { getAssetByModel } from '../../../lib/logic/catalog'
 
 import { Block } from '../../Block'
 import { Container } from '../../Container'
@@ -53,7 +63,7 @@ const ActionMapOption: Record<string, string> = {
 
 export default withSdk<Props>(
   withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId, contextMenuId }) => {
-    const { Actions, States, Counter } = sdk.components
+    const { Actions, States, Counter, GltfContainer } = sdk.components
     const [componentValue, setComponentValue, isComponentEqual] = useComponentValue<EditorComponentsTypes['Actions']>(
       entityId,
       Actions
@@ -198,6 +208,13 @@ export default withSdk<Props>(
     const handleRemove = useCallback(async () => {
       sdk.operations.removeComponent(entityId, Actions)
       await sdk.operations.dispatch()
+      const gltfContainer = getComponentValue(entityId, GltfContainer)
+      const asset = getAssetByModel(gltfContainer.src)
+      analytics.track(Event.REMOVE_COMPONENT, {
+        componentName: ComponentName.ACTIONS,
+        itemId: asset?.id,
+        itemPath: gltfContainer.src
+      })
     }, [])
 
     const handleAddNewAction = useCallback(() => {

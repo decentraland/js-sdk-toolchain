@@ -58,3 +58,19 @@ export function isSmart(asset: Asset) {
   const components = Object.keys(asset.components)
   return components.length > 1 || (components.length === 1 && components[0] !== CoreComponents.GLTF_CONTAINER)
 }
+
+export function getAssetByModel(path: string) {
+  // Validates the path is a model and cames from the catalog
+  if (path.endsWith('.glb') && path.split('/').length === 4) {
+    const [model, name, _] = path.split('/').reverse()
+    for (const assetPack of catalog) {
+      for (const asset of assetPack.assets) {
+        if (!!asset.contents[model] && asset.name.trim().replaceAll(' ', '_').toLowerCase() === name.toLowerCase()) {
+          return asset
+        }
+      }
+    }
+  }
+
+  return null
+}
