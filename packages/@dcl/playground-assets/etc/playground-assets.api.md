@@ -676,10 +676,10 @@ export type Coords = {
 export const CRDT_MESSAGE_HEADER_LENGTH = 8;
 
 // @public (undocumented)
-export type CrdtMessage = PutComponentMessage | DeleteComponentMessage | DeleteEntityMessage | AppendValueMessage;
+export type CrdtMessage = PutComponentMessage | PutNetworkComponentMessage | DeleteComponentMessage | DeleteEntityMessage | AppendValueMessage;
 
 // @public (undocumented)
-export type CrdtMessageBody = PutComponentMessageBody | DeleteComponentMessageBody | DeleteEntityMessageBody | AppendValueMessageBody;
+export type CrdtMessageBody = PutNetworkComponentMessageBody | PutComponentMessageBody | DeleteComponentMessageBody | DeleteEntityMessageBody | AppendValueMessageBody;
 
 // @public
 export type CrdtMessageHeader = {
@@ -704,9 +704,11 @@ export enum CrdtMessageType {
     // (undocumented)
     DELETE_ENTITY = 3,
     // (undocumented)
-    MAX_MESSAGE_TYPE = 5,
+    MAX_MESSAGE_TYPE = 6,
     // (undocumented)
     PUT_COMPONENT = 1,
+    // (undocumented)
+    PUT_NETWORK_COMPONENT = 5,
     // (undocumented)
     RESERVED = 0
 }
@@ -3199,6 +3201,17 @@ export namespace PutComponentOperation {
     export function write(entity: Entity, timestamp: number, componentId: number, data: Uint8Array, buf: ByteBuffer): void;
 }
 
+// @public (undocumented)
+export type PutNetworkComponentMessage = CrdtMessageHeader & PutNetworkComponentMessageBody;
+
+// Warning: (ae-missing-release-tag) "PutNetworkComponentMessageBody" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type PutNetworkComponentMessageBody = Omit<PutComponentMessageBody, 'type'> & {
+    type: CrdtMessageType.PUT_NETWORK_COMPONENT;
+    networkId: number;
+};
+
 // @public
 export type Quaternion = Quaternion.ReadonlyQuaternion;
 
@@ -3759,6 +3772,7 @@ export type Transport = {
     send(message: Uint8Array): Promise<void>;
     onmessage?(message: Uint8Array): void;
     filter(message: Omit<TransportMessage, 'messageBuffer'>): boolean;
+    type?: string;
 };
 
 // @public (undocumented)
