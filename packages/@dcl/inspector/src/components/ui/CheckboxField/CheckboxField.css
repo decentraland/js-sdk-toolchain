@@ -2,6 +2,15 @@
   align-items: flex-start;
 }
 
+.CheckboxField {
+  flex-grow: 1;
+  margin-right: 8px;
+}
+
+.CheckboxField:last-child {
+  margin-right: 0px;
+}
+
 .CheckboxField .input-container {
   display: flex;
   align-items: center;
