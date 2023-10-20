@@ -9,7 +9,10 @@ import { withContextMenu } from '../../../hoc/withContextMenu'
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
-import { useComponentValue } from '../../../hooks/sdk/useComponentValue'
+import { getComponentValue, useComponentValue } from '../../../hooks/sdk/useComponentValue'
+import { analytics, Event } from '../../../lib/logic/analytics'
+import { getAssetByModel } from '../../../lib/logic/catalog'
+import { CoreComponents } from '../../../lib/sdk/components'
 import { InfoTooltip } from '../InfoTooltip'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
@@ -41,6 +44,13 @@ export default withSdk<Props>(
     const handleRemove = useCallback(async () => {
       sdk.operations.removeComponent(entity, VisibilityComponent)
       await sdk.operations.dispatch()
+      const gltfContainer = getComponentValue(entity, GltfContainer)
+      const asset = getAssetByModel(gltfContainer.src)
+      analytics.track(Event.REMOVE_COMPONENT, {
+        componentName: CoreComponents.VISIBILITY_COMPONENT,
+        itemId: asset?.id,
+        itemPath: gltfContainer.src
+      })
     }, [])
 
     const handleChangeVisibility = useCallback(

@@ -21,6 +21,7 @@ import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 import { Loading } from '../Loading'
 import { isModel, isAsset } from '../EntityInspector/GltfInspector/utils'
 import { useIsMounted } from '../../hooks/useIsMounted'
+import { analytics, Event } from '../../lib/logic/analytics'
 import { Warnings } from '../Warnings'
 import { CameraSpeed } from './CameraSpeed'
 
@@ -71,6 +72,11 @@ const Renderer: React.FC = () => {
     const { operations } = sdk
     operations.addAsset(ROOT, asset.asset.src, asset.name, position, basePath, asset.components)
     await operations.dispatch()
+    analytics.track(Event.ADD_ITEM, {
+      itemId: asset.asset.id,
+      itemName: asset.name,
+      itemPath: asset.asset.src
+    })
   }
 
   const importBuilderAsset = async (asset: Asset) => {
@@ -115,7 +121,7 @@ const Renderer: React.FC = () => {
       type: 'asset',
       name: asset.name,
       parent: null,
-      asset: { type: 'gltf', src: path },
+      asset: { type: 'gltf', src: path, id: asset.id },
       components: asset.components
     }
     const basePath = withAssetDir(`${destFolder}/${assetPackageName}`)
