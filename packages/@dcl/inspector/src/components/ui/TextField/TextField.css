@@ -25,33 +25,33 @@
 }
 
 .TextField .input-container.disabled {
-  background-color: var(--base-base-12, #606060);
-  border-color: var(--base-base-12, #606060);
+  background-color: var(--base-12);
+  border-color: var(--base-12);
 }
 
 .TextField .input-container.disabled input {
-  color: var(--base-base-09, #a0a0a0);
+  color: var(--base-09);
 }
 
 .TextField .input-container.focused {
-  border-color: var(--base-base-01, #fff);
+  border-color: var(--base-01);
 }
 
-.TextField .input-container.hovered:not(.focused) {
-  border-color: var(--base-base-09, #a0a0a0);
+.TextField .input-container.hovered:not(.focused):not(.error) {
+  border-color: var(--base-09);
 }
 
 .TextField .input-container.error {
-  border-color: var(--error-main, #f44336);
+  border-color: var(--error-main);
 }
 
 .TextField .input-container.hovered.error,
 .TextField .input-container.focused.error {
-  border-color: #ff6d62;
+  border-color: var(--error-light);
 }
 
 .TextField .input-container input {
-  width: 100%;
+  flex: 1;
   color: var(--text);
   background-color: var(--transparent);
   outline: none;
@@ -79,7 +79,7 @@
 .TextField .input-container .left-content .input-label,
 .TextField .input-container .right-content .input-label {
   display: block;
-  color: #aaaaaa;
+  color: var(--base-09);
   flex-shrink: 0;
 }
 
@@ -97,7 +97,7 @@
 .TextField .error-message {
   display: flex;
   align-items: center;
-  color: var(--error-main, #f44336);
+  color: var(--error-main);
   font-size: 12px;
   font-style: normal;
   font-weight: 400;

@@ -9,5 +9,5 @@ export type Props = React.InputHTMLAttributes<HTMLElement> & {
   rightLabel?: React.ReactNode
   error?: string | boolean
   className?: string
-  isDisabled?: boolean
+  disabled?: boolean
 }

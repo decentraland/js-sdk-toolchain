@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import cx from 'classnames'
 import { IoAlertCircleOutline as AlertIcon } from 'react-icons/io5'
 
@@ -7,7 +7,7 @@ import { Props } from './types'
 import './TextField.css'
 
 function isErrorMessage(error?: boolean | string): boolean {
-  return !!error && (typeof error === 'boolean' || typeof error === 'string')
+  return !!error && typeof error === 'string'
 }
 
 const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
