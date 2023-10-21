@@ -6,3 +6,4 @@ export type { TweenHelper, TweenComponentDefinitionExtended } from './extended/T
 export type { TransformComponentExtended, TransformTypeWithOptionals } from './manual/Transform'
 export type { NameComponent, NameType } from './manual/Name'
 export type { ISyncComponents, ISyncComponentsType } from './manual/SyncComponents'
+export type { INetowrkEntity, INetowrkEntityType } from './manual/NetworkEntity'

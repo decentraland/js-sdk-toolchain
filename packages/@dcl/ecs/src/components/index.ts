@@ -8,6 +8,7 @@ import { defineTweenComponent, TweenComponentDefinitionExtended } from './extend
 import { LwwComponentGetter, GSetComponentGetter } from './generated/index.gen'
 import defineNameComponent, { NameType } from './manual/Name'
 import defineSyncComponent, { ISyncComponentsType } from './manual/SyncComponents'
+import defineEntityNetwork, { INetowrkEntityType } from './manual/NetworkEntity'
 import { defineTransformComponent, TransformComponentExtended } from './manual/Transform'
 
 export * from './generated/index.gen'
@@ -56,3 +57,11 @@ export const Name: (engine: Pick<IEngine, 'defineComponent'>) => LastWriteWinEle
 export const SyncComponents: (
   engine: Pick<IEngine, 'defineComponent'>
 ) => LastWriteWinElementSetComponentDefinition<ISyncComponentsType> = (engine) => defineSyncComponent(engine)
+
+/**
+ * @alpha
+ */
+/* @__PURE__ */
+export const NetworkEntity: (
+  engine: Pick<IEngine, 'defineComponent'>
+) => LastWriteWinElementSetComponentDefinition<INetowrkEntityType> = (engine) => defineEntityNetwork(engine)

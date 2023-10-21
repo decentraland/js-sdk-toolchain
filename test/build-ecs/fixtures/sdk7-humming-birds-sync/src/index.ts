@@ -50,7 +50,7 @@ export async function main() {
   if (server || true) {
     engine.addSystem(moveHummingBirds)
     gameStatusServer(networkManager)
-    createMovingPlatforms(networkManager)
+    // createMovingPlatforms(networkManager)
     createCubes(networkManager)
   }
 

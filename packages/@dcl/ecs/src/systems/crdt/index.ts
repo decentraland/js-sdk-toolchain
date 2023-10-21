@@ -1,6 +1,6 @@
 import { Entity, EntityState } from '../../engine/entity'
 import type { ComponentDefinition } from '../../engine'
-import type { IEngine, PreEngine } from '../../engine/types'
+import type { PreEngine } from '../../engine/types'
 import { ReadWriteByteBuffer } from '../../serialization/ByteBuffer'
 import { AppendValueOperation, CrdtMessageProtocol } from '../../serialization/crdt'
 import { DeleteComponent } from '../../serialization/crdt/deleteComponent'
@@ -8,14 +8,8 @@ import { DeleteEntity } from '../../serialization/crdt/deleteEntity'
 import { PutComponentOperation } from '../../serialization/crdt/putComponent'
 import { CrdtMessageType, CrdtMessageHeader } from '../../serialization/crdt/types'
 import { ReceiveMessage, Transport } from './types'
-import { Schemas } from '../../schemas'
 import { PutNetworkComponentOperation } from '../../serialization/crdt/putComponentNetwork'
-
-export const NetworkEntityEngine = (engine: Pick<IEngine, 'defineComponent'>) =>
-  engine.defineComponent('chore:network-entity', {
-    entityId: Schemas.Int,
-    userId: Schemas.Int
-  })
+import { NetworkEntity as defineNetworkEntity } from '../../components'
 
 /**
  * @public
@@ -32,7 +26,7 @@ export type OnChangeFunction = (
  */
 export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChange: OnChangeFunction | null) {
   const transports: Transport[] = []
-  const NetworkEntity = NetworkEntityEngine(engine)
+  const NetworkEntity = defineNetworkEntity(engine)
   // Messages that we received at transport.onMessage waiting to be processed
   const receivedMessages: ReceiveMessage[] = []
   // Messages already processed by the engine but that we need to broadcast to other transports.
@@ -121,7 +115,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
     }
 
     for (const [entityId, network] of engine.getEntitiesWith(NetworkEntity)) {
-      if (network.userId === msg.networkId && network.entityId === msg.entityId) {
+      if (network.networkId === msg.networkId && network.entityId === msg.entityId) {
         return { entityId, network }
       }
     }
@@ -142,7 +136,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
       // We receive a new Entity. Create the localEntity and map it to the NetworkEntity component
       if (msg.type === CrdtMessageType.PUT_NETWORK_COMPONENT && !network) {
         entityId = engine.addEntity()
-        NetworkEntity.createOrReplace(entityId, { entityId: msg.entityId, userId: msg.networkId })
+        NetworkEntity.createOrReplace(entityId, { entityId: msg.entityId, networkId: msg.networkId })
       }
       if (msg.type === CrdtMessageType.DELETE_ENTITY) {
         entitiesShouldBeCleaned.push(entityId)
@@ -269,10 +263,10 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
           if (networkData) {
             const offset = buffer.currentWriteOffset()
             PutNetworkComponentOperation.write(
-              networkData.entityId as Entity,
+              networkData.entityId,
               message.timestamp,
               message.componentId,
-              networkData.userId,
+              networkData.networkId,
               message.data,
               buffer
             )

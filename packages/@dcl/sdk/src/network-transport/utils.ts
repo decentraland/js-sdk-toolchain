@@ -8,7 +8,7 @@ import {
   CrdtMessageType,
   EntityUtils,
   GltfContainerLoadingState,
-  Schemas
+  NetworkEntity
 } from '@dcl/ecs'
 import { MessageType } from './types'
 import { connected, reservedLocalEntities } from '.'
@@ -71,8 +71,3 @@ export function syncFilter(message: Omit<TransportMessage, 'messageBuffer'>) {
 
   return false
 }
-
-export const NetworkEntity = engine.defineComponent('chore:network-entity', {
-  entityId: Schemas.Int,
-  userId: Schemas.Int
-})

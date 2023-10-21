@@ -26,7 +26,8 @@ import {
   TransformComponentExtended,
   AnimatorComponentDefinitionExtended,
   ISyncComponents,
-  TweenComponentDefinitionExtended
+  TweenComponentDefinitionExtended,
+  INetowrkEntity
 } from './components/types'
 import { NameComponent } from './components/manual/Name'
 
@@ -44,6 +45,11 @@ export const Tween: TweenComponentDefinitionExtended = /* @__PURE__*/ components
  * Can be modified in the future since it's still in research
  */
 export const SyncComponents: ISyncComponents = /* @__PURE__*/ components.SyncComponents(engine)
+/**
+ * @alpha
+ * Tag a entity to be syncronized through comms
+ */
+export const NetworkEntity: INetowrkEntity = /* @__PURE__*/ components.NetworkEntity(engine)
 
 // export components for global engine
 export * from './components/generated/global.gen'

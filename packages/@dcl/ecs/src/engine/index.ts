@@ -258,7 +258,6 @@ function preEngine(): PreEngine {
     getNetworkManager
   }
 }
-
 /**
  * Internal constructor of new engines, this is an internal API
  * @public

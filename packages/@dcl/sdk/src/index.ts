@@ -43,4 +43,5 @@ export async function onStart() {
       }
     }
   }
+  console.log('[onStart]: Finished', response.data)
 }

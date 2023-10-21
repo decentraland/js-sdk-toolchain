@@ -140,7 +140,7 @@ void isServer({}).then(({ isServer }) => {
 function testingSystem() {
   for (const [entity, _tween] of engine.getEntitiesWith(Tween)) {
     if (tweenSystem.tweenCompleted(entity)) {
-      console.log('[TestingSystem]: tween completed', entity)
+      // console.log('[TestingSystem]: tween completed', entity)
     }
   }
 }
