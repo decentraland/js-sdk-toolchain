@@ -61,6 +61,8 @@
   font-style: normal;
   font-weight: 500;
   line-height: normal;
+  width: 100%;
+  min-width: 60px;
 }
 
 .TextField .input-container:has(.left-content),
