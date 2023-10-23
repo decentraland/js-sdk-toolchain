@@ -1,16 +1,26 @@
 import {
   getAlign,
-  getFlexDirection,
   getDisplay,
+  getFlexDirection,
   getFlexWrap,
   getJustify,
   getOverflow,
-  getPoistionType,
+  getPointerFilter,
+  getPositionType,
   parsePosition,
   parseSize
 } from './utils'
 import { UiTransformProps } from './types'
-import { YGAlign, YGDisplay, YGFlexDirection, YGJustify, YGOverflow, YGPositionType, YGUnit } from '@dcl/ecs'
+import {
+  PointerFilterMode,
+  YGAlign,
+  YGDisplay,
+  YGFlexDirection,
+  YGJustify,
+  YGOverflow,
+  YGPositionType,
+  YGUnit
+} from '@dcl/ecs'
 import { PBUiTransform } from '@dcl/ecs/dist/components'
 
 /**
@@ -65,7 +75,8 @@ const defaultUiTransform: PBUiTransform = {
   positionTopUnit: YGUnit.YGU_UNDEFINED,
   flexBasisUnit: YGUnit.YGU_UNDEFINED,
   widthUnit: YGUnit.YGU_UNDEFINED,
-  heightUnit: YGUnit.YGU_UNDEFINED
+  heightUnit: YGUnit.YGU_UNDEFINED,
+  pointerFilter: PointerFilterMode.PFM_NONE
 }
 
 /**
@@ -92,7 +103,8 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     ...getJustify(props.justifyContent),
     ...getFlexDirection(props.flexDirection),
     ...getOverflow(props.overflow),
-    ...getPoistionType(props.positionType),
+    ...getPointerFilter(props.pointerFilter),
+    ...getPositionType(props.positionType),
     // Optional values
     ...(alignContent && getAlign('alignContent', alignContent)),
     ...(alignItems && getAlign('alignItems', alignItems)),
