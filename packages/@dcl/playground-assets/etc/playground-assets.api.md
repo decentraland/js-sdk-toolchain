@@ -2939,6 +2939,7 @@ export interface PBUiTransform {
     paddingTopUnit: YGUnit;
     // (undocumented)
     parent: number;
+    pointerFilter?: PointerFilterMode | undefined;
     // (undocumented)
     positionBottom: number;
     positionBottomUnit: YGUnit;
@@ -3123,6 +3124,14 @@ export const enum PointerEventType {
     PET_HOVER_LEAVE = 3,
     // (undocumented)
     PET_UP = 0
+}
+
+// @public (undocumented)
+export const enum PointerFilterMode {
+    // (undocumented)
+    PFM_BLOCK = 1,
+    // (undocumented)
+    PFM_NONE = 0
 }
 
 // @public (undocumented)
