@@ -2939,7 +2939,6 @@ export interface PBUiTransform {
     paddingTopUnit: YGUnit;
     // (undocumented)
     parent: number;
-    pointerFilter?: PointerFilterMode | undefined;
     // (undocumented)
     positionBottom: number;
     positionBottomUnit: YGUnit;
@@ -3125,17 +3124,6 @@ export const enum PointerEventType {
     // (undocumented)
     PET_UP = 0
 }
-
-// @public (undocumented)
-export const enum PointerFilterMode {
-    // (undocumented)
-    PFM_BLOCK = 1,
-    // (undocumented)
-    PFM_NONE = 0
-}
-
-// @public
-export type PointerFilterType = 'none' | 'block';
 
 // @public (undocumented)
 export const PointerLock: LastWriteWinElementSetComponentDefinition<PBPointerLock>;
@@ -3953,7 +3941,6 @@ export interface UiTransformProps {
     minWidth?: PositionUnit;
     overflow?: OverflowType;
     padding?: Partial<Position> | PositionShorthand;
-    pointerFilter?: PointerFilterType;
     position?: Partial<Position> | PositionShorthand;
     positionType?: PositionType;
     width?: PositionUnit;

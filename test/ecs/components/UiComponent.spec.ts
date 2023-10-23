@@ -1,5 +1,4 @@
 import {
-  PointerFilterMode,
   YGAlign,
   YGDisplay,
   YGFlexDirection,
@@ -7,8 +6,9 @@ import {
   YGOverflow,
   YGPositionType,
   YGUnit
+  // YGUnit
 } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/ui_transform.gen'
-import { components, Engine } from '../../../packages/@dcl/ecs/src'
+import { Engine, components } from '../../../packages/@dcl/ecs/src'
 import { testComponentSerialization } from './assertion'
 
 describe('UiTransform component', () => {
@@ -66,8 +66,7 @@ describe('UiTransform component', () => {
       positionTopUnit: YGUnit.YGU_POINT,
       positionType: YGPositionType.YGPT_RELATIVE,
       width: 1,
-      widthUnit: YGUnit.YGU_POINT,
-      pointerFilter: PointerFilterMode.PFM_NONE
+      widthUnit: YGUnit.YGU_POINT
     })
   })
 })
