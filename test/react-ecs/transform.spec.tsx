@@ -335,8 +335,8 @@ describe('UiTransform React Ecs', () => {
     uiRenderer.setUiRenderer(ui)
     await engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
-      width: YGUnit.YGU_AUTO,
-      height: YGUnit.YGU_AUTO
+      widthUnit: YGUnit.YGU_AUTO,
+      heightUnit: YGUnit.YGU_AUTO
     })
   })
 })
