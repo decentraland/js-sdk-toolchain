@@ -7,7 +7,8 @@ import {
   YGAlign,
   YGDisplay,
   YGPositionType,
-  YGJustify
+  YGJustify,
+  PointerFilterMode
 } from '../../packages/@dcl/ecs'
 import { components } from '../../packages/@dcl/ecs/src'
 import { Position, PositionUnit, ReactEcs, UiEntity, UiTransformProps } from '../../packages/@dcl/react-ecs/src'
@@ -290,6 +291,28 @@ describe('UiTransform React Ecs', () => {
       marginLeftUnit: YGUnit.YGU_POINT,
       marginRightUnit: YGUnit.YGU_POINT,
       marginBottomUnit: YGUnit.YGU_POINT
+    })
+  })
+
+  it('should parse pointerFilter correctly', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+    const ui = () => (
+      <UiEntity
+        uiTransform={{
+          pointerFilter: 'block'
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      pointerFilter: PointerFilterMode.PFM_BLOCK
     })
   })
 })
