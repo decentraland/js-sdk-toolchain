@@ -53,7 +53,7 @@ function parsePositionUnit(val?: PositionUnit | 'auto'): [number | undefined, YG
   }
 
   if (val === 'auto') {
-    return [undefined, YGUnit.YGU_AUTO]
+    return [0, YGUnit.YGU_AUTO]
   }
 
   if (typeof val === 'number' || (typeof val === 'string' && !isNaN(Number(val)))) {
