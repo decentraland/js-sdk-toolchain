@@ -14,7 +14,9 @@ const mapError = {
   [ErrorType.Undo]: 'Undo failed.',
   [ErrorType.Redo]: 'Redo failed.',
   [ErrorType.ImportAsset]: 'Failed to import new asset.',
-  [ErrorType.RemoveAsset]: 'Failed to remove asset.'
+  [ErrorType.RemoveAsset]: 'Failed to remove asset.',
+  [ErrorType.SaveThumbnail]: 'Failed to save thumbnail.',
+  [ErrorType.GetThumbnails]: 'Failed to get thumbnails.'
 }
 
 const SocketConnection: React.FC = () => {

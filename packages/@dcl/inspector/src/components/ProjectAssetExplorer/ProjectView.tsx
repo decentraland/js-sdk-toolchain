@@ -19,6 +19,7 @@ function noop() {}
 
 type Props = {
   folders: AssetNodeFolder[]
+  thumbnails: { path: string; content: Uint8Array }[]
 }
 
 interface ModalState {
@@ -35,7 +36,7 @@ export type TreeNode = Omit<AssetNode, 'children'> & { children?: string[]; matc
 
 const FilesTree = Tree<string>()
 
-function ProjectView({ folders }: Props) {
+function ProjectView({ folders, thumbnails }: Props) {
   const sdk = useSdk()
   const dispatch = useAppDispatch()
   const [open, setOpen] = useState(new Set<string>())
@@ -178,6 +179,15 @@ function ProjectView({ folders }: Props) {
     [tree, search]
   )
 
+  const getThumbnail = useCallback(
+    (value: string) => {
+      const [name] = value.split('.')
+      const thumbnail = thumbnails.find(($) => $.path.endsWith(name + '.png'))
+      return thumbnail?.content
+    },
+    [thumbnails]
+  )
+
   return (
     <>
       <Modal isOpen={!!modal?.isOpen} onRequestClose={handleModalClose} className="RemoveAsset">
@@ -236,6 +246,7 @@ function ProjectView({ folders }: Props) {
                   getDragContext={handleDragContext}
                   onSelect={handleClickFolder($)}
                   onRemove={handleRemove}
+                  getThumbnail={getThumbnail}
                   dndType={DRAG_N_DROP_ASSET_KEY}
                 />
               ))
@@ -247,6 +258,7 @@ function ProjectView({ folders }: Props) {
                   getDragContext={handleDragContext}
                   onSelect={handleClickFolder(selectedTreeNode.name)}
                   onRemove={handleRemove}
+                  getThumbnail={getThumbnail}
                   dndType={DRAG_N_DROP_ASSET_KEY}
                 />
               )}

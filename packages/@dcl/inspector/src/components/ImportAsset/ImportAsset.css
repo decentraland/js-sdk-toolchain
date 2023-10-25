@@ -113,3 +113,8 @@
 .ImportAsset .file-container .error {
   color: var(--primary);
 }
+
+.ImportAsset .file-container .AssetPreview {
+  width: 100px;
+  height: 100px;
+}
