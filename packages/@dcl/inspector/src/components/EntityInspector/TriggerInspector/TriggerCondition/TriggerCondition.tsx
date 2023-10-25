@@ -9,7 +9,7 @@ import { AddButton } from '../../AddButton'
 import MoreOptionsMenu from '../../MoreOptionsMenu'
 import type { Props } from './types'
 import './TriggerCondition.css'
-import { TextField } from '../../TextField'
+import { TextField } from '../../../ui/TextField'
 import { Entity } from '@dcl/ecs'
 import { counterConditionTypeOptions, statesConditionTypeOptions } from '../TriggerInspector'
 

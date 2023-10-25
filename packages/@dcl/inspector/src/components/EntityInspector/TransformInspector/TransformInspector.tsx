@@ -13,7 +13,7 @@ import { Props } from './types'
 import { fromTransform, toTransform, fromTransformConfig } from './utils'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
-import { TextField } from '../TextField'
+import { TextField } from '../../ui/TextField'
 import { Link, Props as LinkProps } from './Link'
 
 import './TransformInspector.css'

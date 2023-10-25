@@ -4,7 +4,7 @@ import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 
 import { Dropdown } from '../../../Dropdown'
 import { RangeField } from '../../RangeField'
-import { TextField } from '../../TextField'
+import { TextField } from '../../../ui/TextField'
 import { InfoTooltip } from '../../InfoTooltip'
 import { isValidTween } from './utils'
 import type { Props } from './types'

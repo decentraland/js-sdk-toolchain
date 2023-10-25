@@ -30,7 +30,7 @@ import { Block } from '../../Block'
 import { Container } from '../../Container'
 import { ContextMenu } from '../../ContexMenu'
 import { Dropdown } from '../../Dropdown'
-import { TextField } from '../TextField'
+import { TextField } from '../../ui/TextField'
 import MoreOptionsMenu from '../MoreOptionsMenu'
 import { AddButton } from '../AddButton'
 import { Button } from '../../Button'
@@ -384,7 +384,7 @@ export default withSdk<Props>(
               <div className="field">
                 <label>Counter Value</label>
                 <TextField
-                  type="numeric"
+                  type="number"
                   value={getPartialPayload<ActionType.SET_COUNTER>(action)?.counter}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeCounter(e, idx)}
                 />
