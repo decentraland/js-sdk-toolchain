@@ -1330,6 +1330,21 @@ export type IncludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? P : never;
 }[keyof T];
 
+// Warning: (ae-missing-release-tag) "INetowrkEntity" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type INetowrkEntity = LastWriteWinElementSetComponentDefinition<INetowrkEntityType>;
+
+// Warning: (ae-missing-release-tag) "INetowrkEntityType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface INetowrkEntityType {
+    // (undocumented)
+    entityId: Entity;
+    // (undocumented)
+    networkId: number;
+}
+
 // Warning: (tsdoc-html-tag-missing-string) The HTML element has an invalid attribute: Expecting an HTML string starting with a single-quote or double-quote character
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
 // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
@@ -1796,6 +1811,9 @@ export interface NameType {
     // (undocumented)
     value: string;
 }
+
+// @alpha
+export const NetworkEntity: INetowrkEntity;
 
 // @public (undocumented)
 export const enum NftFrameType {
@@ -2941,6 +2959,7 @@ export interface PBUiTransform {
     paddingTopUnit: YGUnit;
     // (undocumented)
     parent: number;
+    pointerFilter?: PointerFilterMode | undefined;
     // (undocumented)
     positionBottom: number;
     positionBottomUnit: YGUnit;
@@ -3125,6 +3144,14 @@ export const enum PointerEventType {
     PET_HOVER_LEAVE = 3,
     // (undocumented)
     PET_UP = 0
+}
+
+// @public (undocumented)
+export const enum PointerFilterMode {
+    // (undocumented)
+    PFM_BLOCK = 1,
+    // (undocumented)
+    PFM_NONE = 0
 }
 
 // @public (undocumented)
