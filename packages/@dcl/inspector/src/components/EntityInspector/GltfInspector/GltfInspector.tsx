@@ -69,12 +69,7 @@ export default withSdk<Props>(
           />
         </Block>
         <Block label="Collision">
-          <Dropdown
-            label="Visible layer"
-            options={COLLISION_LAYERS}
-            {...getInputProps('visibleMeshesCollisionMask')}
-            error={'saquese palla'}
-          />
+          <Dropdown label="Visible layer" options={COLLISION_LAYERS} {...getInputProps('visibleMeshesCollisionMask')} />
           <Dropdown
             label="Invisible layer"
             options={COLLISION_LAYERS}

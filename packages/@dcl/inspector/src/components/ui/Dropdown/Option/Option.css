@@ -66,6 +66,10 @@
   width: 16px;
 }
 
+.OptionContainer.error .RightContent .RightIcon {
+  color: var(--error-main);
+}
+
 .OptionContainer .Description {
   font-size: 11px;
   font-weight: 400;

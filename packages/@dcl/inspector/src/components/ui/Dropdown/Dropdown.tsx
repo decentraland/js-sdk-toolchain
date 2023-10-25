@@ -54,7 +54,11 @@ const Dropdown: React.FC<Props> = (props) => {
     <div className="DropdownContainer" ref={ref}>
       {label ? <label className="DropdownLabel">{label}</label> : null}
       <div
-        className={cx('Dropdown', className, { focused: isFocused, disabled: !!disabled, open: !!showOptions })}
+        className={cx('Dropdown', className, {
+          focused: isFocused,
+          disabled: !!disabled,
+          open: !!showOptions
+        })}
         onClick={handleClick}
       >
         {placeholder && value === undefined ? (

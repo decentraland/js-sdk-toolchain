@@ -39,10 +39,6 @@
   pointer-events: none;
 }
 
-.DropdownContainer .Dropdown.error {
-  color: var(--error-main, #f44336);
-}
-
 .DropdownContainer .Dropdown .DropdownArrow {
   height: 14px;
   width: 14px;
