@@ -4,16 +4,10 @@ import { componentNumberFromName } from '@dcl/ecs/dist/components/component-numb
 import { syncFilter } from '@dcl/sdk/network-transport/utils'
 import { engineToCrdt } from '@dcl/sdk/network-transport/state'
 import { serializeCrdtMessages } from '@dcl/sdk/internal/transports/logger'
-import { MessageBus } from '@dcl/sdk/message-bus'
 import { sendBinary } from '~system/CommunicationsController'
 import { getUserData } from '~system/UserIdentity'
 import { getPlayersInScene, getConnectedPlayers } from '~system/Players'
-
-enum CommsMessage {
-  CRDT = 1,
-  REQ_CRDT_STATE = 2,
-  RES_CRDT_STATE = 3
-}
+import { BinaryMessageBus, CommsMessage, encodeString } from './binary-message-bus'
 
 // We use this flag to avoid sending over the wire all the initial messages that the engine add's to the rendererTransport
 // INITIAL_CRDT_MESSAGES that are being processed on the onStart loop, before the onUpdate.
@@ -30,7 +24,7 @@ function syncTransportIsReady() {
 
 // List of MessageBuss messsages to be sent on every frame to comms
 const pendingMessageBusMessagesToSend: Uint8Array[] = []
-const binaryMessageBus = BinaryMessageBus()
+const binaryMessageBus = BinaryMessageBus((message) => pendingMessageBusMessagesToSend.push(message))
 function getMessagesToSend() {
   const messages = [...pendingMessageBusMessagesToSend]
   pendingMessageBusMessagesToSend.length = 0
@@ -38,11 +32,11 @@ function getMessagesToSend() {
 }
 
 // user that we asked for the inital crdt state
-let userIdRequestInitState: string
+let REQ_CRDT_STATE_USER_ID: string
 export function addSyncTransport() {
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, (value, sender) => {
     console.log(Array.from(serializeCrdtMessages('[binaryMessageBus]: ', value, engine)))
-    if (sender.toLocaleLowerCase() === userIdRequestInitState.toLocaleLowerCase()) {
+    if (sender === REQ_CRDT_STATE_USER_ID) {
       transport.onmessage!(value)
     }
   })
@@ -66,11 +60,11 @@ export function addSyncTransport() {
   const transport: Transport = {
     filter: syncFilter,
     send: async (message: Uint8Array) => {
-      const messages = getMessagesToSend()
       if (syncTransportIsReady() && message.byteLength) {
         console.log(Array.from(serializeCrdtMessages('[CRDT  Send]: ', message, engine)))
-        messages.push(craftMessage(CommsMessage.CRDT, message))
+        binaryMessageBus.emit(CommsMessage.CRDT, message)
       }
+      const messages = getMessagesToSend()
       const response = await sendBinary({ data: messages })
       binaryMessageBus.__processMessages(response.data)
     },
@@ -80,21 +74,27 @@ export function addSyncTransport() {
 }
 
 // UTILS
+let myProfile: { networkId: number; userId: string }
+
 async function enterScene() {
   const { players } = await getPlayersInScene({})
 
   if (players.length) {
-    userIdRequestInitState = players[0].userId
+    REQ_CRDT_STATE_USER_ID = players[0].userId
   } else {
     const connected = await getConnectedPlayers({})
-    userIdRequestInitState = connected.players[0].userId
+    REQ_CRDT_STATE_USER_ID = connected.players[0].userId
   }
-  const userIdBuffer = encodeString(userIdRequestInitState)
+
+  // There is no user connected, then there is no state.
+  if (!REQ_CRDT_STATE_USER_ID) return
+
+  const userIdBuffer = encodeString(REQ_CRDT_STATE_USER_ID)
   binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, userIdBuffer)
 }
 void enterScene()
 
-let myProfile: { networkId: number; userId: string }
+// Retrieve userId so we can start sending this info as the networkId
 async function getUser() {
   const data = await getUserData({})
   if (data.data?.userId) {
@@ -105,79 +105,10 @@ async function getUser() {
 }
 void getUser()
 
+// TODO: move this to sdk|ecs
 export const addNetworkEntity = (entity: Entity) => {
   if (!myProfile.networkId) {
     throw new Error('Invalid user address')
   }
   NetworkEntity.create(entity, { entityId: entity, networkId: myProfile.networkId })
 }
-
-function BinaryMessageBus<T extends CommsMessage>() {
-  const mapping: Map<T, (value: Uint8Array, sender: string) => void> = new Map()
-  return {
-    on: <K extends T>(message: K, callback: (value: Uint8Array, sender: string) => void) => {
-      mapping.set(message, callback)
-    },
-    emit: <K extends T>(message: K, value: Uint8Array) => {
-      console.log('[EMIT]: ', message)
-      pendingMessageBusMessagesToSend.push(craftMessage<T>(message, value))
-    },
-    __processMessages: (messages: Uint8Array[]) => {
-      for (const message of messages) {
-        const commsMsg = decodeMessage<T>(message)
-        if (!commsMsg) continue
-        const { sender, messageType, data } = commsMsg
-        const fn = mapping.get(messageType)
-        if (fn) fn(data, sender), sender
-      }
-    }
-  }
-}
-
-export function craftMessage<T extends CommsMessage>(messageType: T, payload: Uint8Array): Uint8Array {
-  const msg = new Uint8Array(payload.byteLength + 1)
-  msg.set([messageType])
-  msg.set(payload, 1)
-  return msg
-}
-
-export function decodeMessage<T extends CommsMessage>(
-  data: Uint8Array
-): { sender: string; messageType: T; data: Uint8Array } | undefined {
-  try {
-    let offset = 0
-    const r = new Uint8Array(data)
-    const view = new DataView(r.buffer)
-    const senderLength = view.getUint8(offset)
-    offset += 1
-    const sender = decodeString(data.subarray(1, senderLength + 1))
-    offset += senderLength
-    const messageType = view.getUint8(offset) as T
-    offset += 1
-    const message = r.subarray(offset)
-
-    return {
-      sender,
-      messageType,
-      data: message
-    }
-  } catch (e) {
-    console.error('Invalid Comms message', e)
-  }
-}
-
-export function decodeString(data: Uint8Array): string {
-  const buffer = new ReadWriteByteBuffer()
-  buffer.writeBuffer(data, true)
-  return buffer.readUtf8String()
-}
-
-export function encodeString(s: string): Uint8Array {
-  const buffer = new ReadWriteByteBuffer()
-  buffer.writeUtf8String(s)
-  return buffer.readBuffer()
-}
-
-const messageBus = new MessageBus()
-messageBus.on('hola', (value, sender) => console.log({ value, sender }))
-messageBus.emit('hola', { boedo: 'casla ' })
