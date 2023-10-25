@@ -16,10 +16,12 @@
 .ActionInspector > .content > .Block > .content .row {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
   width: 100%;
   position: relative;
-  gap: 4px;
+  column-gap: 4px;
+  row-gap: 15px;
 }
 
 .ActionInspector > .content > .Block > .content .row .field {

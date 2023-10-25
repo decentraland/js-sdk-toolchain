@@ -1,0 +1,118 @@
+.Block .content:has(.TextField .error-message) {
+  align-items: baseline;
+}
+
+.TextField {
+  flex-grow: 1;
+  margin-right: 8px;
+}
+
+.TextField:last-child {
+  margin-right: 0px;
+}
+
+.TextField .input-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  min-height: 26px;
+  padding: 0px;
+  background-color: var(--background-gray);
+  border-radius: 4px;
+  border: 1px solid var(--background-gray);
+  font-size: 12px;
+}
+
+.TextField .input-container.disabled {
+  background-color: var(--base-12);
+  border-color: var(--base-12);
+}
+
+.TextField .input-container.disabled input {
+  color: var(--base-09);
+}
+
+.TextField .input-container.focused {
+  border-color: var(--base-01);
+}
+
+.TextField .input-container.hovered:not(.focused):not(.error) {
+  border-color: var(--base-09);
+}
+
+.TextField .input-container.error {
+  border-color: var(--error-main);
+}
+
+.TextField .input-container.hovered.error,
+.TextField .input-container.focused.error {
+  border-color: var(--error-light);
+}
+
+.TextField .input-container input {
+  flex: 1;
+  color: var(--text);
+  background-color: var(--transparent);
+  outline: none;
+  border: none;
+  padding: 4px 9px;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  width: 100%;
+  min-width: 60px;
+}
+
+.TextField .input-container:has(.left-content),
+.TextField .input-container:has(.right-content) {
+  padding: 0px 8px;
+}
+
+.TextField .input-container .left-content,
+.TextField .input-container .right-content {
+  display: flex;
+  align-items: center;
+  min-width: 12px;
+  line-height: normal;
+}
+
+.TextField .input-container .left-content .input-label,
+.TextField .input-container .right-content .input-label {
+  display: block;
+  color: var(--base-09);
+  flex-shrink: 0;
+}
+
+.TextField .input-container .left-content .left-icon,
+.TextField .input-container .right-content .right-icon {
+  display: inline-flex;
+  position: relative;
+}
+
+.TextField .input-container .left-content .left-icon svg,
+.TextField .input-container .right-content .right-icon svg {
+  margin: 0;
+}
+
+.TextField .error-message {
+  display: flex;
+  align-items: center;
+  color: var(--error-main);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 100%;
+  min-height: 16px;
+  gap: 2px;
+}
+
+.TextField .error-message svg {
+  margin: 0 !important;
+}
+
+.TextField.drop {
+  border-color: white;
+  border-style: dashed;
+}

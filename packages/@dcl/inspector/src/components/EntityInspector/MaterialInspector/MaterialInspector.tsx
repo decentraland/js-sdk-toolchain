@@ -12,7 +12,7 @@ import { useAppSelector } from '../../../redux/hooks'
 import { selectAssetCatalog } from '../../../redux/app'
 import { Block } from '../../Block'
 import { SelectField } from '../SelectField'
-import { TextField } from '../TextField'
+import { TextField, CheckboxField } from '../../ui'
 import { Container } from '../../Container'
 import { Texture, Props as TextureProps } from './Texture'
 import { ColorField } from '../ColorField'
@@ -57,7 +57,7 @@ export default withSdk<Props>(
         </Block>
         <Block>
           <TextField label="Alpha test" {...getInputProps('alphaTest')} />
-          <TextField label="Cast shadows" type="checkbox" checked={!!castShadows.value} {...castShadows} />
+          <CheckboxField label="Cast shadows" checked={!!castShadows.value} {...castShadows} />
         </Block>
         {materialType.value === MaterialType.MT_UNLIT && (
           <Block label="Diffuse color">
