@@ -10,8 +10,7 @@ import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
-import { SelectField } from '../SelectField'
-import { FileUploadField } from '../../ui'
+import { FileUploadField, Dropdown } from '../../ui'
 import { Props } from './types'
 import { fromGltf, toGltf, isValidInput, COLLISION_LAYERS, isModel } from './utils'
 import { useAppSelector } from '../../../redux/hooks'
@@ -66,12 +65,13 @@ export default withSdk<Props>(
           />
         </Block>
         <Block label="Collision">
-          <SelectField
+          <Dropdown
             label="Visible layer"
             options={COLLISION_LAYERS}
             {...getInputProps('visibleMeshesCollisionMask')}
+            error={'saquese palla'}
           />
-          <SelectField
+          <Dropdown
             label="Invisible layer"
             options={COLLISION_LAYERS}
             {...getInputProps('invisibleMeshesCollisionMask')}

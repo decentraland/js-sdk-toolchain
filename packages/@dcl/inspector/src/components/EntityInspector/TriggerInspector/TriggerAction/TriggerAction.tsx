@@ -5,7 +5,7 @@ import { TriggerAction } from '@dcl/asset-packs'
 import { useArrayState } from '../../../../hooks/useArrayState'
 
 import { Button } from '../../../Button'
-import { Dropdown } from '../../../Dropdown'
+import { Dropdown } from '../../../ui/Dropdown'
 import { AddButton } from '../../AddButton'
 import MoreOptionsMenu from '../../MoreOptionsMenu'
 
@@ -66,16 +66,16 @@ export const TriggerActionContainer = ({ trigger, availableActions, onUpdateActi
       </div>
       {actions.map((action, idx) => {
         const entities = Array.from(availableActions).map(([entity, { name }]) => {
-          return { value: entity, text: name }
+          return { value: entity, label: name }
         })
         const actions = action.id
-          ? (availableActions.get(action.id)?.actions ?? []).map(({ name }) => ({ value: name, text: name }))
+          ? (availableActions.get(action.id)?.actions ?? []).map(({ name }) => ({ value: name, label: name }))
           : []
         return (
           <div className="TriggerAction" key={`trigger-action-${idx}`}>
             <div className="Fields">
               <Dropdown
-                options={availableActions ? [{ value: '', text: 'Select an Entity' }, ...entities] : []}
+                options={availableActions ? [{ value: '', label: 'Select an Entity' }, ...entities] : []}
                 value={action.id}
                 onChange={(e) => handleChangeEntity(e, idx)}
               />
@@ -83,7 +83,7 @@ export const TriggerActionContainer = ({ trigger, availableActions, onUpdateActi
                 disabled={!action.id || !availableActions.get(action.id)}
                 options={
                   action.id && availableActions.get(action.id)?.actions
-                    ? [{ value: '', text: 'Select an Action' }, ...actions]
+                    ? [{ value: '', label: 'Select an Action' }, ...actions]
                     : []
                 }
                 value={action.name}
