@@ -7,6 +7,10 @@ import type { Props as OptionProp } from './Option/types'
 import type { Props } from './types'
 import './Dropdown.css'
 
+function isOptionSelected(currentValue?: any, optionValue?: any) {
+  return currentValue?.toString() === optionValue?.toString()
+}
+
 const Dropdown: React.FC<Props> = (props) => {
   const { className, disabled, label, options, placeholder, value, onChange } = props
   const [showOptions, setShowOptions] = useState(false)
@@ -46,8 +50,8 @@ const Dropdown: React.FC<Props> = (props) => {
     [setShowOptions, onChange]
   )
 
-  const selectedLabel = useMemo(() => {
-    return options.find((option) => option.value?.toString() === value?.toString())?.label
+  const selectedValue = useMemo(() => {
+    return options.find((option) => isOptionSelected(value, option.value))
   }, [options, value])
 
   return (
@@ -64,12 +68,17 @@ const Dropdown: React.FC<Props> = (props) => {
         {placeholder && value === undefined ? (
           <div className="DropdownPlaceholder">{placeholder}</div>
         ) : (
-          <Option value={value} label={selectedLabel} className="DropdownSelection" />
+          <Option {...selectedValue} className="DropdownSelection" />
         )}
         {showOptions ? (
           <div className="DropdownOptions">
             {options.map((option, idx) => (
-              <Option key={idx} {...option} onClick={handleSelectOption} selected={value === option.value} />
+              <Option
+                key={idx}
+                {...option}
+                onClick={handleSelectOption}
+                selected={isOptionSelected(value, option.value)}
+              />
             ))}
           </div>
         ) : null}
