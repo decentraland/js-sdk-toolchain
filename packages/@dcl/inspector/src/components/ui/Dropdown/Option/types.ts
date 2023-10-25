@@ -1,5 +1,5 @@
 export type Props = {
-  value?: string | number
+  value?: string | number | readonly string[]
   label?: string
   leftIcon?: React.ReactNode
   rightIcon?: React.ReactNode
