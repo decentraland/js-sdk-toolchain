@@ -13,7 +13,7 @@ import { withContextMenu } from '../../../hoc/withContextMenu'
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { InfoTooltip } from '../InfoTooltip'
 import { Container } from '../../Container'
-import { TextField } from '../TextField'
+import { TextField } from '../../ui/TextField'
 import { fromCounter, isValidInput, toCounter } from './utils'
 import { Props } from './types'
 
@@ -60,7 +60,7 @@ export default withSdk<Props>(
             <DeleteIcon /> Delete
           </Item>
         </Menu>
-        <TextField label="Value" type="numeric" {...getInputProps('value')} />
+        <TextField label="Value" type="number" {...getInputProps('value')} />
       </Container>
     )
   })

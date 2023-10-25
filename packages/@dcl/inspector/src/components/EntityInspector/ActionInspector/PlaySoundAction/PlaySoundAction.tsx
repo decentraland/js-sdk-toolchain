@@ -11,7 +11,7 @@ import { useAppSelector } from '../../../../redux/hooks'
 import { selectAssetCatalog } from '../../../../redux/app'
 
 import { isAudio, isValidVolume, volumeToAudioSource, volumeFromAudioSource } from '../../AudioSourceInspector/utils'
-import { TextField } from '../../TextField'
+import { TextField } from '../../../ui/TextField'
 import { SelectField } from '../../SelectField'
 import { RangeField } from '../../RangeField'
 
