@@ -6,7 +6,7 @@ import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { withSdk } from '../../../hoc/withSdk'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
-import { TextField } from '../TextField'
+import { TextField } from '../../ui/TextField'
 import { Props } from './types'
 import { fromScene, toScene, toSceneAuto, getInputValidation } from './utils'
 
