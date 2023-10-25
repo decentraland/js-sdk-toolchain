@@ -7,7 +7,7 @@ import { serializeCrdtMessages } from '@dcl/sdk/internal/transports/logger'
 import { MessageBus } from '@dcl/sdk/message-bus'
 import { sendBinary } from '~system/CommunicationsController'
 import { getUserData } from '~system/UserIdentity'
-import { getPlayersInScene } from '~system/Players'
+import { getPlayersInScene, getConnectedPlayers } from '~system/Players'
 
 enum CommsMessage {
   CRDT = 1,
@@ -82,8 +82,13 @@ export function addSyncTransport() {
 // UTILS
 async function enterScene() {
   const { players } = await getPlayersInScene({})
-  if (!players.length) return
-  userIdRequestInitState = players[0].userId
+
+  if (players.length) {
+    userIdRequestInitState = players[0].userId
+  } else {
+    const connected = await getConnectedPlayers({})
+    userIdRequestInitState = connected.players[0].userId
+  }
   const userIdBuffer = encodeString(userIdRequestInitState)
   binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, userIdBuffer)
 }
