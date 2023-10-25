@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '../../redux/store'
 import { DataLayerRpcClient } from '../../lib/data-layer/types'
 import { InspectorPreferences } from '../../lib/logic/preferences/types'
-import { Asset, ImportAssetRequest } from '../../lib/data-layer/remote-data-layer'
+import { Asset, ImportAssetRequest, SaveFileRequest } from '../../lib/data-layer/remote-data-layer'
 
 export enum ErrorType {
   Disconnected = 'disconnected',
@@ -14,7 +14,9 @@ export enum ErrorType {
   Undo = 'undo',
   Redo = 'redo',
   ImportAsset = 'import-asset',
-  RemoveAsset = 'remove-asset'
+  RemoveAsset = 'remove-asset',
+  SaveThumbnail = 'save-thumbnail',
+  GetThumbnails = 'get-thumbnails'
 }
 
 let dataLayerInterface: DataLayerRpcClient | undefined
@@ -65,7 +67,9 @@ export const dataLayer = createSlice({
     undo: () => {},
     redo: () => {},
     importAsset: (_state, _payload: PayloadAction<ImportAssetRequest>) => {},
-    removeAsset: (_state, _payload: PayloadAction<Asset>) => {}
+    removeAsset: (_state, _payload: PayloadAction<Asset>) => {},
+    saveThumbnail: (_state, _payload: PayloadAction<SaveFileRequest>) => {},
+    getThumbnails: () => {}
   }
 })
 
@@ -82,7 +86,9 @@ export const {
   undo,
   redo,
   importAsset,
-  removeAsset
+  removeAsset,
+  saveThumbnail,
+  getThumbnails
 } = dataLayer.actions
 
 // Selectors

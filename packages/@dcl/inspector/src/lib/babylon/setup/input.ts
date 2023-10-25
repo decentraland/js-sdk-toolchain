@@ -1,4 +1,5 @@
 import * as BABYLON from '@babylonjs/core'
+
 import { EcsEntity } from '../decentraland/EcsEntity'
 import { snapManager } from '../decentraland/snap-manager'
 import { keyState, Keys } from '../decentraland/keys'
