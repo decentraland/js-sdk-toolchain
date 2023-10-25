@@ -6,4 +6,5 @@ export type Props = React.SelectHTMLAttributes<HTMLSelectElement> & {
   error?: string | boolean
   className?: string
   disabled?: boolean
+  value?: string | number
 }

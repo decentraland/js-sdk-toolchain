@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import cx from 'classnames'
 import { VscChevronDown as DownArrow } from 'react-icons/vsc'
 import { useOutsideClick } from '../../../hooks/useOutsideClick'
@@ -8,8 +8,7 @@ import type { Props } from './types'
 import './Dropdown.css'
 
 const Dropdown: React.FC<Props> = (props) => {
-  const { className, label, options, disabled, placeholder, onChange } = props
-  const [selectedValue, setSelectedValue] = useState<OptionProp>(options[0] ?? '')
+  const { className, disabled, label, options, placeholder, value, onChange } = props
   const [showOptions, setShowOptions] = useState(false)
   const [isFocused, setFocus] = useState(false)
 
@@ -32,13 +31,24 @@ const Dropdown: React.FC<Props> = (props) => {
 
   const handleSelectOption = useCallback(
     (e: any, option: OptionProp) => {
-      setSelectedValue(option)
       setShowOptions(false)
-      e.target.value = option?.value
-      onChange && onChange(e)
+      if (option.value) {
+        onChange &&
+          onChange({
+            ...e,
+            target: {
+              ...e?.target,
+              value: option.value.toString()
+            }
+          })
+      }
     },
-    [setSelectedValue, setShowOptions, onChange]
+    [setShowOptions, onChange]
   )
+
+  const selectedLabel = useMemo(() => {
+    return options.find((option) => option.value?.toString() === value?.toString())?.label
+  }, [options, value])
 
   return (
     <div className="DropdownContainer" ref={ref}>
@@ -47,20 +57,15 @@ const Dropdown: React.FC<Props> = (props) => {
         className={cx('Dropdown', className, { focused: isFocused, disabled: !!disabled, open: !!showOptions })}
         onClick={handleClick}
       >
-        {selectedValue.value === undefined ? (
+        {placeholder && value === undefined ? (
           <div className="DropdownPlaceholder">{placeholder}</div>
         ) : (
-          <Option {...selectedValue} className="DropdownSelection" />
+          <Option value={value} label={selectedLabel} className="DropdownSelection" />
         )}
         {showOptions ? (
           <div className="DropdownOptions">
             {options.map((option, idx) => (
-              <Option
-                key={idx}
-                {...option}
-                onClick={handleSelectOption}
-                selected={selectedValue.value === option.value}
-              />
+              <Option key={idx} {...option} onClick={handleSelectOption} selected={value === option.value} />
             ))}
           </div>
         ) : null}

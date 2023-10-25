@@ -39,7 +39,7 @@
 
 .DropdownOptions .OptionContainer.selected {
   background: var(--base-02);
-  border: 1px solid var(--base-01);
+  border-color: var(--base-01);
   color: var(--text-primary);
 }
 

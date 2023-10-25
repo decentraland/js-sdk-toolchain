@@ -28,10 +28,6 @@
   cursor: pointer;
 }
 
-.DropdownContainer .Dropdown .OptionContainer.selected {
-  flex: 1;
-}
-
 .DropdownContainer .Dropdown:hover {
   border: 1px solid var(--base-09);
 }
@@ -73,5 +69,7 @@
   left: 0;
   width: 100%;
   background: var(--base-14);
-  z-index: 1;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  z-index: 5;
 }
