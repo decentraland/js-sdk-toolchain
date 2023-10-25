@@ -3,15 +3,10 @@
   flex-direction: column;
   flex-grow: 1;
   gap: 2px;
-  margin-right: 8px;
-}
-
-.DropdownContainer:last-child {
-  margin-right: 0px;
 }
 
 .DropdownContainer .DropdownLabel {
-  color: var(--sub-text);
+  color: var(--white);
   font-size: 12px;
 }
 

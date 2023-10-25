@@ -4,11 +4,6 @@
 
 .TextField {
   flex-grow: 1;
-  margin-right: 8px;
-}
-
-.TextField:last-child {
-  margin-right: 0px;
 }
 
 .TextField .input-container {
