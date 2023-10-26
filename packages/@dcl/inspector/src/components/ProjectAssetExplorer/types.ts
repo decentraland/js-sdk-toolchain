@@ -4,7 +4,6 @@ import { CoreComponents } from '../../lib/sdk/components'
 export interface IAsset {
   src: string
   type: 'unknown' | 'gltf' | 'composite' | 'audio'
-  thumbnail?: string
   id?: string
 }
 

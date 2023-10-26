@@ -7,4 +7,5 @@ export interface Props {
   onSelect: () => void
   onRemove: (value: string) => void
   dndType: string
+  getThumbnail: (value: string) => Uint8Array | undefined
 }

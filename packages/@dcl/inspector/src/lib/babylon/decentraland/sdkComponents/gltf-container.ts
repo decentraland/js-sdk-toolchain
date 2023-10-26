@@ -117,12 +117,11 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
   const file = new File([content], finalSrc)
   const extension = filePath.toLowerCase().endsWith('.gltf') ? '.gltf' : '.glb'
 
-  BABYLON.SceneLoader.LoadAssetContainer(
-    '',
+  loadAssetContainer(
     file,
     entity.getScene(),
     (assetContainer) => {
-      processGLTFAssetContainer(assetContainer, entity)
+      processGLTFAssetContainer(assetContainer)
 
       // remove old entities
       const prevChildren = entity.getChildren()
@@ -131,7 +130,7 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
         child.dispose(false, true)
       }
 
-      // Fin the main mesh and add it as the BasicShape.nameInEntity component.
+      // Find the main mesh and add it as the BasicShape.nameInEntity component.
       assetContainer.meshes
         .filter(($) => $.name === '__root__')
         .forEach((mesh) => {
@@ -142,7 +141,7 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
       entity.setGltfAssetContainer(assetContainer)
       entity.resolveGltfPathLoading(filePath)
     },
-    null,
+    undefined,
     (_scene, _message, _exception) => {
       console.error('Error while calling LoadAssetContainer: ', _message, _exception)
       entity.resolveGltfPathLoading(filePath)
@@ -157,7 +156,19 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
   )
 }
 
-export function processGLTFAssetContainer(assetContainer: BABYLON.AssetContainer, entity: EcsEntity) {
+export function loadAssetContainer(
+  file: File,
+  scene: BABYLON.Scene,
+  onSuccess?: (assetContainer: BABYLON.AssetContainer) => void,
+  onProgress?: (event: BABYLON.ISceneLoaderProgressEvent) => void,
+  onError?: (scene: BABYLON.Scene, message: string, exception?: any) => void,
+  pluginExtension?: string,
+  name?: string
+) {
+  BABYLON.SceneLoader.LoadAssetContainer('', file, scene, onSuccess, onProgress, onError, pluginExtension, name)
+}
+
+export function processGLTFAssetContainer(assetContainer: BABYLON.AssetContainer) {
   assetContainer.meshes.forEach((mesh) => {
     if (mesh instanceof BABYLON.Mesh) {
       if (mesh.geometry && !assetContainer.geometries.includes(mesh.geometry)) {
@@ -178,7 +189,7 @@ export function processGLTFAssetContainer(assetContainer: BABYLON.AssetContainer
       })
   })
 
-  processColliders(assetContainer, entity)
+  processColliders(assetContainer)
 
   // Find all the materials from all the meshes and add to $.materials
   assetContainer.meshes.forEach((mesh) => {
@@ -280,7 +291,7 @@ export function cleanupAssetContainer(scene: BABYLON.Scene, $: BABYLON.AssetCont
   }
 }
 
-function processColliders($: BABYLON.AssetContainer, _entity: EcsEntity) {
+function processColliders($: BABYLON.AssetContainer) {
   for (let i = 0; i < $.meshes.length; i++) {
     const mesh = $.meshes[i]
 

@@ -15,12 +15,30 @@ message AssetData {
   bytes data = 1;
 }
 
+message GetFilesRequest {
+  string path = 1;
+  repeated string ignore = 2;
+}
+
+message GetFilesResponse {
+  message File {
+    string path = 1;
+    bytes content = 2;
+  }
+  repeated File files = 1;
+}
+
+message SaveFileRequest {
+  string path = 1;
+  bytes content = 2;
+}
+
 message Asset {
   string path = 1;
 }
 
 message AssetCatalogResponse {
-  string base_path = 1;
+  string basePath = 1;
   repeated Asset assets = 2;
 }
 
@@ -40,6 +58,8 @@ service DataService {
   rpc Undo(Empty) returns (UndoRedoResponse) {}
   rpc Redo(Empty) returns (UndoRedoResponse) {}
 
+  rpc getFiles(GetFilesRequest) returns (GetFilesResponse) {}
+  rpc saveFile(SaveFileRequest) returns (Empty) {}
   rpc GetAssetCatalog(Empty) returns (AssetCatalogResponse) {}
   rpc GetAssetData(Asset) returns (AssetData) {}
   rpc ImportAsset(ImportAssetRequest) returns (Empty) {}
