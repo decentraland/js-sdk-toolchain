@@ -3944,7 +3944,7 @@ export interface UiTransformProps {
     flexGrow?: number;
     flexShrink?: number;
     flexWrap?: FlexWrapType;
-    height?: PositionUnit;
+    height?: PositionUnit | 'auto';
     justifyContent?: JustifyType;
     margin?: Partial<Position> | PositionShorthand;
     maxHeight?: PositionUnit;
@@ -3956,7 +3956,7 @@ export interface UiTransformProps {
     pointerFilter?: PointerFilterType;
     position?: Partial<Position> | PositionShorthand;
     positionType?: PositionType;
-    width?: PositionUnit;
+    width?: PositionUnit | 'auto';
 }
 
 // @public (undocumented)

@@ -315,4 +315,28 @@ describe('UiTransform React Ecs', () => {
       pointerFilter: PointerFilterMode.PFM_BLOCK
     })
   })
+
+  it('should parse auto size correctly', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+    const ui = () => (
+      <UiEntity
+        uiTransform={{
+          width: 'auto',
+          height: 'auto'
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      widthUnit: YGUnit.YGU_AUTO,
+      heightUnit: YGUnit.YGU_AUTO
+    })
+  })
 })

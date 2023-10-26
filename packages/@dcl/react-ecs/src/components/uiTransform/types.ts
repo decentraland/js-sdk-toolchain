@@ -108,10 +108,10 @@ export interface UiTransformProps {
   padding?: Partial<Position> | PositionShorthand
   /** The margin shorthand property sets the margin area on all four sides of an element. */
   margin?: Partial<Position> | PositionShorthand
-  /** The width property specifies the width of an element. */
-  width?: PositionUnit
-  /** The height property specifies the height of an element. */
-  height?: PositionUnit
+  /** The width property specifies the width of an element. Using 'auto' as value makes it adapt to its content. */
+  width?: PositionUnit | 'auto'
+  /** The height property specifies the height of an element. Using 'auto' as value makes it adapt to its content. */
+  height?: PositionUnit | 'auto'
   /** The min-width property sets the minimum width of an element. */
   minWidth?: PositionUnit
   /** The max-width property sets the maximum width of an element. */

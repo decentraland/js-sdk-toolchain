@@ -43,13 +43,17 @@ function isPoint(val: PositionUnit) {
   return typeof val === 'string' && val.endsWith('px')
 }
 
-function parsePositionUnit(val?: PositionUnit): [number | undefined, YGUnit] {
+function parsePositionUnit(val?: PositionUnit | 'auto'): [number | undefined, YGUnit] {
   function getValue(key: 'px' | '%', value: string) {
     return Number(value.slice(0, value.indexOf(key)))
   }
 
   if (val === undefined || val === null) {
     return [undefined, YGUnit.YGU_UNDEFINED]
+  }
+
+  if (val === 'auto') {
+    return [0, YGUnit.YGU_AUTO]
   }
 
   if (typeof val === 'number' || (typeof val === 'string' && !isNaN(Number(val)))) {
@@ -115,7 +119,7 @@ type SizePropKeyUnit = `${SizePropName}Unit`
 type SizeReturnType = {
   [key in SizePropName]: number
 } & { [key in SizePropKeyUnit]: YGUnit }
-export function parseSize(val: PositionUnit | undefined, key: SizePropName): Partial<SizeReturnType> {
+export function parseSize(val: PositionUnit | 'auto' | undefined, key: SizePropName): Partial<SizeReturnType> {
   const unitKey: SizePropKeyUnit = `${key}Unit`
   const [value, unit] = parsePositionUnit(val)
 
