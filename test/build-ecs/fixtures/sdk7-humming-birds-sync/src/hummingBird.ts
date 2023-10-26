@@ -20,7 +20,7 @@ import { Quaternion } from '@dcl/sdk/math'
 import * as utils from '@dcl-sdk/utils'
 import { NetworkManager } from '@dcl/sdk/network-transport/types'
 import { gamePaused } from './ui'
-import { myProfile } from './message-bus-sync'
+import { addNetworkEntity, myProfile } from './message-bus-sync'
 
 export const Bird = engine.defineComponent('bird', {})
 
@@ -29,6 +29,7 @@ export const BirdKilled = engine.defineComponent('bird-killed', { userId: Schema
 
 export function createHummingBird(networkManager: NetworkManager) {
   const bird = networkManager.addEntity(engine)
+  addNetworkEntity(bird)
   Bird.create(bird)
   SyncComponents.create(bird, {
     componentIds: [Transform.componentId, Animator.componentId, VisibilityComponent.componentId, BirdKilled.componentId]
