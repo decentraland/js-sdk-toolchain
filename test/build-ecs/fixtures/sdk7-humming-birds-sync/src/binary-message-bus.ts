@@ -21,6 +21,7 @@ export function BinaryMessageBus<T extends CommsMessage>(send: (message: Uint8Ar
         const commsMsg = decodeMessage<T>(message)
         if (!commsMsg) continue
         const { sender, messageType, data } = commsMsg
+        console.log('[ON]: ', messageType, { sender })
         const fn = mapping.get(messageType)
         if (fn) fn(data, sender), sender
       }

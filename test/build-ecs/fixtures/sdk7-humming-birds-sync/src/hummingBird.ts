@@ -5,6 +5,7 @@ import {
   GltfContainer,
   InputAction,
   MeshCollider,
+  NetworkEntity,
   PointerEventType,
   PointerEvents,
   Schemas,
@@ -19,6 +20,7 @@ import { Quaternion } from '@dcl/sdk/math'
 import * as utils from '@dcl-sdk/utils'
 import { NetworkManager } from '@dcl/sdk/network-transport/types'
 import { gamePaused } from './ui'
+import { myProfile } from './message-bus-sync'
 
 export const Bird = engine.defineComponent('bird', {})
 
@@ -101,9 +103,16 @@ export function moveHummingBirds(dt: number) {
   if (birdsTime <= 4) return
   birdsTime = 0
 
-  for (const [birdEntity, _bird, visibleComponent] of engine.getEntitiesWith(Bird, VisibilityComponent)) {
+  for (const [birdEntity, _bird, visibleComponent, networkEntity] of engine.getEntitiesWith(
+    Bird,
+    VisibilityComponent,
+    NetworkEntity
+  )) {
+    if (!visibleComponent.visible) continue
+    if (networkEntity.networkId !== myProfile.networkId) continue
+
     const birdTransform = Transform.getMutableOrNull(birdEntity)
-    if (!birdTransform || !visibleComponent.visible) continue
+    if (!birdTransform) continue
 
     // next target
     const nextPos = {

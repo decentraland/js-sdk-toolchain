@@ -10,16 +10,13 @@ import {
   SyncComponents,
   Transform
 } from '@dcl/sdk/ecs'
-import { getRealm } from '~system/Runtime'
-import { createNetworkManager } from '@dcl/sdk/network-transport'
 
 import { createHummingBird, moveHummingBirds, shootBirds } from './hummingBird'
-import { ADMIN_USERS, setupUi } from './ui'
-import { isServer } from '~system/EngineApi'
+import { setupUi } from './ui'
 import { getUserData } from '~system/UserIdentity'
 import { NetworkManager } from '@dcl/sdk/network-transport/types'
 import { createMovingPlatforms } from './moving-platforms'
-import { changeColorSystem, createCube, createCubes } from './create-cube'
+import { changeColorSystem, createCubes } from './create-cube'
 import { addSyncTransport } from './message-bus-sync'
 
 export const GameStatus = engine.defineComponent('game-status', { paused: Schemas.Boolean })
@@ -31,34 +28,20 @@ function gameStatusServer(networkManager: NetworkManager) {
 }
 
 export async function main() {
-  addSyncTransport()
-  const realm = await getRealm({})
-  const server = isServer && !!(await isServer({})).isServer
-  const serverUrl = realm.realmInfo?.isPreview
-    ? 'ws://127.0.0.1:3000/ws/localScene'
-    : 'wss://scene-state-server.decentraland.org/ws/boedo.dcl.eth'
-  const networkManager =
-    engine ||
-    (await createNetworkManager({
-      serverUrl,
-      networkEntitiesLimit: { serverLimit: 500, clientLimit: 15 }
-    }))
   const userId = (await getUserData({})).data?.userId ?? ''
 
+  addSyncTransport()
   setupUi(userId)
 
-  if (server || true) {
-    engine.addSystem(moveHummingBirds)
-    gameStatusServer(networkManager)
-    // createMovingPlatforms(networkManager)
-    createCubes(networkManager)
-  }
+  engine.addSystem(moveHummingBirds)
+  gameStatusServer(engine)
+  createMovingPlatforms(engine)
+  createCubes(engine)
 
-  if (!server) {
-    engine.addSystem(changeColorSystem)
-    engine.addSystem(shootBirds(userId))
-  }
+  engine.addSystem(changeColorSystem)
+  engine.addSystem(shootBirds(userId))
 
+  // Instantiate base models. Floor & Tree
   const ground = engine.addEntity()
   Transform.create(ground, {
     position: { x: 24, y: 0.1, z: 24 },
@@ -69,8 +52,6 @@ export async function main() {
     src: 'models/Ground.gltf',
     visibleMeshesCollisionMask: ColliderLayer.CL_PHYSICS
   })
-
-  // Instantiate base models
   GltfContainer.create(engine.addEntity(), {
     src: 'models/baseLight.glb'
   })
@@ -123,9 +104,7 @@ export async function main() {
       }
     },
     function () {
-      birdsCreated++
-      if (birdsCreated >= 10 && !ADMIN_USERS.has(userId)) return
-      createHummingBird(networkManager)
+      createHummingBird(engine)
       const anim = Animator.getMutable(tree)
       anim.states[0].playing = true
       const audioSource = AudioSource.getMutable(tree)
@@ -133,4 +112,3 @@ export async function main() {
     }
   )
 }
-let birdsCreated = 0
