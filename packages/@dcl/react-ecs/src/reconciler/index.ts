@@ -33,8 +33,10 @@ function getPointerEnum(pointerKey: keyof Listeners): PointerEventType {
 }
 
 type OnChangeState<T = string | number> = {
-  fn?: (val?: T) => void
+  fn?: (val?: T, isSubmit?: boolean) => void
+  // fn?: (val?: T) => void
   value?: T
+  isSubmit?: boolean
 }
 export function createReconciler(
   engine: Pick<
@@ -196,7 +198,8 @@ export function createReconciler(
     const oldState = event.get(componentId)
     const fn = state?.fn
     const value = state?.value ?? oldState?.value
-    event.set(componentId, { fn, value })
+    const isSubmit = state?.isSubmit ?? oldState?.isSubmit
+    event.set(componentId, { fn, value, isSubmit })
   }
 
   const hostConfig: HostConfig<
@@ -311,7 +314,7 @@ export function createReconciler(
 
   // Maybe this could be something similar to Input system, but since we
   // are going to use this only here, i prefer to scope it here.
-  function handleOnChange(componentId: number, resultComponent: typeof UiInputResult | typeof UiDropdownResult) {
+  function handleUiDropdownOnChange(componentId: number, resultComponent: typeof UiDropdownResult) {
     for (const [entity, Result] of engine.getEntitiesWith(resultComponent)) {
       const entityState = changeEvents.get(entity)?.get(componentId)
       if (entityState?.fn && Result.value !== entityState.value) {
@@ -325,11 +328,26 @@ export function createReconciler(
     }
   }
 
+  function handleUiInputOnChange(componentId: number, resultComponent: typeof UiInputResult) {
+    for (const [entity, Result] of engine.getEntitiesWith(resultComponent)) {
+      const entityState = changeEvents.get(entity)?.get(componentId)
+      if (entityState?.fn && (Result.value !== entityState.value || Result.isSubmit !== entityState.isSubmit)) {
+        // Call onChange callback and update internal timestamp
+        entityState.fn(Result.value, Result.isSubmit)
+        updateOnChange(entity, componentId, {
+          fn: entityState.fn,
+          value: Result.value,
+          isSubmit: Result.isSubmit
+        })
+      }
+    }
+  }
+
   return {
     update: function (component: ReactEcs.JSX.Element) {
       if (changeEvents.size) {
-        handleOnChange(UiInput.componentId, UiInputResult)
-        handleOnChange(UiDropdown.componentId, UiDropdownResult)
+        handleUiInputOnChange(UiInput.componentId, UiInputResult)
+        handleUiDropdownOnChange(UiDropdown.componentId, UiDropdownResult)
       }
       return reconciler.updateContainer(component as any, root, null)
     },

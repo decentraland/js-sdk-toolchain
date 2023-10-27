@@ -3900,7 +3900,7 @@ export const UiInput: LastWriteWinElementSetComponentDefinition<PBUiInput>;
 export interface UiInputProps extends Omit<PBUiInput, 'font' | 'textAlign'> {
     // (undocumented)
     font?: UiFontType;
-    onChange?(value: string): void;
+    onChange?(value: string, isSubmit: boolean): void;
     // (undocumented)
     textAlign?: TextAlignType;
 }

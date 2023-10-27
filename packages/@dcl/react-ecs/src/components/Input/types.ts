@@ -6,7 +6,7 @@ import { TextAlignType, UiFontType } from '../Label/types'
  */
 export interface UiInputProps extends Omit<PBUiInput, 'font' | 'textAlign'> {
   /** function to be called on value change  */
-  onChange?(value: string): void
+  onChange?(value: string, isSubmit: boolean): void
   font?: UiFontType
   textAlign?: TextAlignType
 }
