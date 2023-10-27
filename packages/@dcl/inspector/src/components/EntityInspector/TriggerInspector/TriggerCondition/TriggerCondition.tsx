@@ -4,10 +4,12 @@ import { VscTrash as RemoveIcon } from 'react-icons/vsc'
 import { Entity } from '@dcl/ecs'
 import { TriggerCondition, TriggerConditionOperation, TriggerConditionType } from '@dcl/asset-packs'
 import { useArrayState } from '../../../../hooks/useArrayState'
+import { useSdk } from '../../../../hooks/sdk/useSdk'
+import { Component } from '../../../../lib/sdk/components'
 import { Button } from '../../../Button'
 import { AddButton } from '../../AddButton'
 import MoreOptionsMenu from '../../MoreOptionsMenu'
-import { Dropdown, TextField } from '../../../ui'
+import { Dropdown, EntityField, TextField } from '../../../ui'
 import { counterConditionTypeOptions, statesConditionTypeOptions } from '../TriggerInspector'
 import type { Props } from './types'
 import './TriggerCondition.css'
@@ -21,6 +23,7 @@ export const TriggerConditionContainer = ({
   onChangeOperation,
   onUpdateConditions
 }: Props) => {
+  const sdk = useSdk()
   const [conditions, addCondition, modifyCondition, removeCondition] = useArrayState<TriggerCondition>(
     trigger.conditions as TriggerCondition[]
   )
@@ -114,10 +117,6 @@ export const TriggerConditionContainer = ({
             }
           }
         }
-        const entityOptions = Array.from(availableConditions).map(([entityId, { name }]) => ({
-          value: entityId,
-          label: name
-        }))
         const conditionOptions = (entity && availableConditions.get(entity)?.conditions) || []
         const stateOptions = ((condition.id && availableStates.get(condition.id)?.states) || []).map((state) => ({
           value: state,
@@ -129,9 +128,8 @@ export const TriggerConditionContainer = ({
         return (
           <div className="TriggerCondition" key={`trigger-condition-${idx}`}>
             <div className="Fields">
-              <Dropdown
-                placeholder="triggerCondition"
-                options={entityOptions ? [{ value: '', label: 'Select an Entity' }, ...entityOptions] : []}
+              <EntityField
+                components={[sdk?.components.States, sdk?.components.Counter] as Component[]}
                 value={entity}
                 onChange={(e) => handleChangeEntity(e, idx)}
               />
