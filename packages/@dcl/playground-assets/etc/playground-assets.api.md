@@ -2853,6 +2853,7 @@ export namespace PBUiInput {
 
 // @public (undocumented)
 export interface PBUiInputResult {
+    isSubmit?: boolean | undefined;
     // (undocumented)
     value: string;
 }
