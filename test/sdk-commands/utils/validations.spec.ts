@@ -34,8 +34,12 @@ describe('build:helpers', () => {
     jest.spyOn(projectValidation, 'assertValidProjectFolder')
 
     const res = await projectValidation.assertValidProjectFolder(components, 'some/path')
+    const expectedScene = {
+      ...scene,
+      requiredPermissions: ['ALLOW_TO_MOVE_PLAYER_INSIDE_SCENE', 'ALLOW_TO_TRIGGER_AVATAR_EMOTE']
+    }
 
-    expect(res).toEqual({ kind: 'scene', scene, workingDirectory: 'some/path' })
+    expect(res).toEqual({ kind: 'scene', scene: expectedScene, workingDirectory: 'some/path' })
     expect(fileExists).toBeCalledWith(path.resolve('some/path/package.json'))
     expect(readFile).toBeCalledWith(path.resolve('some/path/scene.json'), 'utf8')
   })

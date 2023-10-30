@@ -46,7 +46,7 @@ export function assertValidScene(
   components: Pick<CliComponents, 'logger'>,
   scene: Scene,
   opts: { log?: boolean } = { log: false }
-) {
+): Scene {
   if (!Scene.validate(scene)) {
     const errors: string[] = []
     if (Scene.validate.errors) {
@@ -97,6 +97,25 @@ export function assertValidScene(
 https://docs.decentraland.org/creator/development-guide/scene-metadata/#scene-title-description-and-image`
     )
   }
+
+  return scene
+}
+
+// TMP HACK: we should do this in unity-renderer, but for now we can patch it here...
+// remove when not needed and everything should be fine
+function patchSceneJson(scene: Scene): Scene {
+  if (!scene.isPortableExperience) {
+    const requiredPermissions = Array.from(
+      new Set([
+        ...(scene.requiredPermissions || []),
+        'ALLOW_TO_MOVE_PLAYER_INSIDE_SCENE',
+        'ALLOW_TO_TRIGGER_AVATAR_EMOTE'
+      ])
+    )
+    return { ...scene, requiredPermissions }
+  }
+
+  return scene
 }
 
 /**
@@ -111,7 +130,7 @@ export async function getValidSceneJson(
     const sceneJsonRaw = await components.fs.readFile(getSceneFilePath(projectRoot), 'utf8')
     const sceneJson = JSON.parse(sceneJsonRaw) as Scene
     assertValidScene(components, sceneJson, opts)
-    return sceneJson
+    return patchSceneJson(sceneJson)
   } catch (err: any) {
     throw new CliError(`Error reading the scene.json file: ${err.message}`)
   }
@@ -140,7 +159,12 @@ export async function getFiles(components: Pick<CliComponents, 'fs' | 'logger'>,
     const filePath = resolve(dir, file)
     const stat = await components.fs.stat(filePath)
 
-    const content = await components.fs.readFile(filePath)
+    let content = await components.fs.readFile(filePath)
+
+    if (file === SCENE_FILE) {
+      const patchedSceneJson = patchSceneJson(JSON.parse(content.toString()))
+      content = Buffer.from(JSON.stringify(patchedSceneJson))
+    }
 
     data.push({
       path: file.replace(/\\/g, '/'),

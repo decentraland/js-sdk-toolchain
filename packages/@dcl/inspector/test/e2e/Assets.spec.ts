@@ -13,17 +13,17 @@ describe('Assets', () => {
   }, 100_000)
 
   test('Drag asset from file system into renderer', async () => {
-    // There should not be an entity in the Hierarchy tree with the name casla.glb at the start
-    await expect(Hierarchy.getId('casla-glb.glb')).rejects.toThrow()
+    // There should not be an entity in the Hierarchy tree with the name example.glb at the start
+    await expect(Hierarchy.getId('example.glb')).rejects.toThrow()
 
     await Assets.selectTab(AssetsTab.FileSystem)
     await Assets.openFolder('scene')
-    await Assets.openFolder('scene/models2')
+    await Assets.openFolder('scene/models')
 
-    await Assets.addFileSystemAsset('scene/models2/casla-glb.glb')
+    await Assets.addFileSystemAsset('scene/models/example.glb')
 
-    // There should be an entity in the Hierarchy tree with the name Pebbles
-    await expect(Hierarchy.getId('casla-glb.glb')).resolves.toBeGreaterThanOrEqual(152)
+    // There should be an entity in the Hierarchy tree with the name example.glb
+    await expect(Hierarchy.getId('example.glb')).resolves.toBeGreaterThanOrEqual(152)
   }, 100_000)
 
   test('Drag asset from Builder into renderer', async () => {
