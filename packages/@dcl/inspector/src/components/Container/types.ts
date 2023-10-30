@@ -3,4 +3,5 @@ export type Props = {
   className?: string
   rightContent?: JSX.Element
   initialOpen?: boolean
+  indicator?: boolean | string | JSX.Element
 }
