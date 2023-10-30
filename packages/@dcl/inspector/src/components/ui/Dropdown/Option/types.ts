@@ -10,5 +10,6 @@ export type Props = {
   disabled?: boolean
   className?: string
   header?: string
+  minWidth?: number
   onClick?: (event: any, value: any) => void
 }

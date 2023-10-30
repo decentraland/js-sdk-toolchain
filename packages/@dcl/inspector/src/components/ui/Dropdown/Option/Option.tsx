@@ -13,6 +13,7 @@ const Option: React.FC<Props> = (props) => {
     header,
     label,
     leftIcon,
+    minWidth,
     rightIcon,
     secondaryText,
     selected,
@@ -79,7 +80,9 @@ const Option: React.FC<Props> = (props) => {
         <>
           <div className="OptionContent">
             {renderLeftContent()}
-            <span className="Option">{label ?? value}</span>
+            <span className="Option" style={{ minWidth: minWidth }}>
+              {label ?? value}
+            </span>
             {renderRightContent()}
           </div>
           {renderDescription()}

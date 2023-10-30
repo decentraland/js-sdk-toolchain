@@ -7,12 +7,14 @@ import type { Props as OptionProp } from './Option/types'
 import type { Props } from './types'
 import './Dropdown.css'
 
+const FONT_WIDTH = 6.6
+
 function isOptionSelected(currentValue?: any, optionValue?: any) {
   return currentValue?.toString() === optionValue?.toString()
 }
 
 const Dropdown: React.FC<Props> = (props) => {
-  const { className, disabled, label, options, placeholder, value, onChange } = props
+  const { className, disabled, empty, label, options, value, onChange, placeholder = '' } = props
   const [showOptions, setShowOptions] = useState(false)
   const [isFocused, setFocus] = useState(false)
 
@@ -54,6 +56,16 @@ const Dropdown: React.FC<Props> = (props) => {
     return options.find((option) => isOptionSelected(value, option.value))
   }, [options, value])
 
+  const minWidth = useMemo(() => {
+    if (options.length > 0) {
+      return options.reduce((minWidth, option) => {
+        return Math.max(minWidth, (option.label?.length ?? option.value?.toString().length ?? 0) * FONT_WIDTH)
+      }, 0)
+    }
+
+    return (empty?.length ?? 0) * FONT_WIDTH
+  }, [options, empty])
+
   return (
     <div className="DropdownContainer" ref={ref}>
       {label ? <label className="DropdownLabel">{label}</label> : null}
@@ -65,21 +77,28 @@ const Dropdown: React.FC<Props> = (props) => {
         })}
         onClick={handleClick}
       >
-        {placeholder && value === undefined ? (
-          <div className="DropdownPlaceholder">{placeholder}</div>
+        {selectedValue ? (
+          <Option {...selectedValue} className="DropdownSelection" minWidth={minWidth} />
         ) : (
-          <Option {...selectedValue} className="DropdownSelection" />
+          <div className="DropdownPlaceholder" style={{ minWidth: minWidth }}>
+            {placeholder}
+          </div>
         )}
         {showOptions ? (
           <div className="DropdownOptions">
-            {options.map((option, idx) => (
-              <Option
-                key={idx}
-                {...option}
-                onClick={handleSelectOption}
-                selected={isOptionSelected(value, option.value)}
-              />
-            ))}
+            {options.length > 0 ? (
+              options.map((option, idx) => (
+                <Option
+                  key={idx}
+                  {...option}
+                  onClick={handleSelectOption}
+                  selected={isOptionSelected(value, option.value)}
+                  minWidth={minWidth}
+                />
+              ))
+            ) : (
+              <Option label={empty} minWidth={minWidth} />
+            )}
           </div>
         ) : null}
         <div className="DropdownArrow">
