@@ -348,15 +348,13 @@ export function createReconciler(
       if (entityState === undefined) return
 
       if (entityState?.onChangeCallback && Result.value !== entityState.value) {
-        // Call onChange callback and update internal timestamp
         entityState.onChangeCallback(Result.value)
       }
 
       if (entityState?.onSubmitCallback && Result.isSubmit && !entityState.isSubmit) {
-        // Call onSubmit callback
         entityState.onSubmitCallback(Result.value)
       }
-      
+
       // update internal timestamp
       updateOnChange(entity, componentId, {
         onChangeCallback: entityState.onChangeCallback,
