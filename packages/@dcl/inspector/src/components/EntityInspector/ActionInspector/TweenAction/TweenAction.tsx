@@ -189,12 +189,8 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
       </div>
       <div className="row">
         <div className="field duration">
-          <RangeField
-            label={<>Duration {renderDurationInfo()}</>}
-            value={tween.duration}
-            onChange={handleChangeDurationRange}
-            isValidValue={isValidDuration}
-          />
+          <label>Duration {renderDurationInfo()}</label>
+          <RangeField value={tween.duration} onChange={handleChangeDurationRange} isValidValue={isValidDuration} />
         </div>
       </div>
     </div>

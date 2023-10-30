@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import cx from 'classnames'
 
 import { TextField } from '../TextField'
@@ -26,13 +26,13 @@ const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
   const [inputValue, setInputValue] = useState(value)
 
   const completionPercentage = useMemo(() => {
-    const validValue = isValidValue && isValidValue(inputValue) ? inputValue : value
-    return Math.min(
-      ((parseInt(validValue.toString()) - parseInt(min.toString())) /
-        (parseInt(max.toString()) - parseInt(min.toString()))) *
-        100,
-      100
-    )
+    const parsedValue = parseInt(inputValue.toString(), 10) || 0
+    const parsedMin = parseInt(min.toString(), 10) || 0
+    const parsedMax = parseInt(max.toString(), 10) || 100
+
+    const normalizedValue = Math.min(Math.max(parsedValue, parsedMin), parsedMax)
+
+    return ((normalizedValue - parsedMin) / (parsedMax - parsedMin)) * 100 || 0
   }, [inputValue, min, max])
 
   // Create inline styles for the track with the completion color
@@ -43,13 +43,16 @@ const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value
-      setInputValue(value)
+
+      if (parseFloat(value) >= parseFloat(min.toString()) && parseFloat(value) <= parseFloat(max.toString())) {
+        setInputValue(value)
+      }
 
       if (isValidValue && isValidValue(value)) {
         onChange && onChange(e)
       }
     },
-    [onChange, isValidValue, setInputValue]
+    [min, max, onChange, isValidValue, setInputValue]
   )
 
   const handleChangeTextField = useCallback(
@@ -86,7 +89,7 @@ const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
             ref={ref}
             type="range"
             className="RangeInput"
-            value={value}
+            value={inputValue}
             min={min}
             max={max}
             step={step}

@@ -50,7 +50,11 @@
 }
 
 .ActionInspector > .content > .Block > .content .row .field.duration .TextField {
-  width: 45px;
+  width: 50px;
+}
+
+.ActionInspector > .content > .Block > .content .row .field.duration .TextField input {
+  min-width: 50px;
 }
 
 .ActionInspector .content .RemoveButton {
