@@ -1,7 +1,8 @@
 import React from 'react'
 
 export type Props = React.InputHTMLAttributes<Omit<HTMLElement, 'type'>> & {
-  label?: string
+  label?: string | React.ReactNode
   rightLabel?: string
-  error?: boolean
+  error?: string | boolean
+  isValidValue?: (value: any) => boolean
 }
