@@ -2,8 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { TweenType, InterpolationType } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 
-import { RangeField } from '../../RangeField'
-import { Dropdown, TextField } from '../../../ui'
+import { Dropdown, TextField, RangeField } from '../../../ui'
 import { InfoTooltip } from '../../InfoTooltip'
 import { isValidTween } from './utils'
 import type { Props } from './types'
@@ -36,7 +35,6 @@ const InterpolationMapOption: Record<string, string> = {
 const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props) => {
   const [tween, setTween] = useState(tweenProp)
   const [endPosition, setEndPosition] = useState(tween.end)
-  const [duration, setDuration] = useState(tween.duration)
 
   useEffect(() => {
     if (!recursiveCheck(tween, tweenProp, 2) || !isValidTween(tween)) return
@@ -83,25 +81,19 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
     [tween, setTween]
   )
 
-  const handleChangeDuration = useCallback(
-    (e: React.ChangeEvent<HTMLElement>) => {
-      const { value } = e.target as HTMLInputElement
-      setDuration(value)
-    },
-    [setDuration]
-  )
+  const isValidDuration = useCallback((value: string) => {
+    return !isNaN(parseInt(value.toString())) && parseInt(value.toString()) > 0
+  }, [])
 
   const handleChangeDurationRange = useCallback(
     (e: React.ChangeEvent<HTMLElement>) => {
       const { value } = e.target as HTMLInputElement
-      const parsedValue = parseInt(value)
-      if (!isNaN(parsedValue) && parsedValue >= 0) {
-        setTween({ ...tween, duration: parsedValue })
-      }
 
-      setDuration(parsedValue.toString())
+      if (isValidDuration(value)) {
+        setTween({ ...tween, duration: parseInt(value) })
+      }
     },
-    [tween, setTween, setDuration]
+    [tween, setTween, isValidDuration]
   )
 
   const renderTweenInfo = () => {
@@ -197,17 +189,12 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
       </div>
       <div className="row">
         <div className="field duration">
-          <label>Duration {renderDurationInfo()}</label>
-          <div className="row">
-            <RangeField value={duration || 0} onChange={handleChangeDuration} onBlur={handleChangeDurationRange} />
-            <TextField
-              type="number"
-              value={duration}
-              error={isNaN(parseInt(duration)) || parseInt(duration) < 0}
-              onChange={handleChangeDuration}
-              onBlur={handleChangeDurationRange}
-            />
-          </div>
+          <RangeField
+            label={<>Duration {renderDurationInfo()}</>}
+            value={tween.duration}
+            onChange={handleChangeDurationRange}
+            isValidValue={isValidDuration}
+          />
         </div>
       </div>
     </div>

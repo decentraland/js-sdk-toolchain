@@ -11,8 +11,7 @@ import { useAppSelector } from '../../../../redux/hooks'
 import { selectAssetCatalog } from '../../../../redux/app'
 
 import { isAudio, isValidVolume, volumeToAudioSource, volumeFromAudioSource } from '../../AudioSourceInspector/utils'
-import { Dropdown, TextField } from '../../../ui'
-import { RangeField } from '../../RangeField'
+import { Dropdown, TextField, RangeField } from '../../../ui'
 
 import { isValid } from './utils'
 import type { Props } from './types'
@@ -39,8 +38,6 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
   const [payload, setPayload] = useState<Partial<ActionPayload<ActionType.PLAY_SOUND>>>({
     ...value
   })
-
-  const [volume, setVolume] = useState(volumeFromAudioSource(value.volume))
 
   const files = useAppSelector(selectAssetCatalog)
 
@@ -80,21 +77,12 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
   const handleChangeVolume = useCallback(
     (e: React.ChangeEvent<HTMLElement>) => {
       const { value } = e.target as HTMLInputElement
+
       if (isValidVolume(value)) {
         setPayload({ ...payload, volume: volumeToAudioSource(value) })
       }
-      const volume = parseFloat(value) > 100 ? '100' : parseFloat(value)
-      setVolume(volume.toString())
     },
-    [payload, setPayload, setVolume]
-  )
-
-  const handleSetVolume = useCallback(
-    (e: React.ChangeEvent<HTMLElement>) => {
-      const { value } = e.target as HTMLInputElement
-      setVolume(value)
-    },
-    [setVolume]
+    [payload, setPayload]
   )
 
   const [{ isHover }, drop] = useDrop(
@@ -157,17 +145,12 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
       </div>
       <div className="row">
         <div className="field volume">
-          <label>Volume</label>
-          <div className="row">
-            <RangeField value={volume} onChange={handleChangeVolume} />
-            <TextField
-              type="number"
-              value={volume}
-              error={!isValidVolume(volume)}
-              onChange={handleSetVolume}
-              onBlur={handleChangeVolume}
-            />
-          </div>
+          <RangeField
+            label="Volume"
+            value={volumeFromAudioSource(value.volume)}
+            onChange={handleChangeVolume}
+            isValidValue={isValidVolume}
+          />
         </div>
       </div>
     </div>
