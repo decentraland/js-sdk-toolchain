@@ -7,6 +7,11 @@
   color: var(--base-02);
 }
 
+.OptionContainer:last-child {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
 .OptionContainer.DropdownSelection {
   padding: 0;
 }
