@@ -1,10 +1,12 @@
 .Container {
   display: flex;
   flex-direction: column;
-  padding: 6px;
+  padding: 12px;
   height: 100%;
   overflow-y: auto;
-  border-bottom: 1px solid var(--border-gray);
+  background: var(--base-19);
+  border-radius: 2px;
+  border-color: var(--base-19);
 }
 
 .Container.hover {
@@ -17,19 +19,26 @@
   align-items: center;
   cursor: pointer;
   user-select: none;
+  gap: 4px;
 }
 
 .Container .title svg.icon {
   width: 14px;
   height: 14px;
-  margin-right: 4px;
 }
 
 .Container .title span {
-  margin: 0px 0px 0px 0px;
+  margin: 0;
   color: var(--text);
   font-size: 13px;
   cursor: pointer;
+}
+
+.Container .title .indicator {
+  display: flex;
+  align-self: baseline;
+  font-size: 16px;
+  color: var(--warning-main);
 }
 
 .Container .title .right-content {
@@ -37,6 +46,12 @@
   flex-grow: 1;
   justify-content: flex-end;
 }
+
+.Container.open > .title {
+  border-bottom: 1px solid var(--border-gray);
+  padding-bottom: 12px;
+}
+
 .Container .content .Container:last-of-type {
   border: none;
 }
