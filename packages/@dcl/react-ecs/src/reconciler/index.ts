@@ -33,8 +33,8 @@ function getPointerEnum(pointerKey: keyof Listeners): PointerEventType {
 }
 
 type OnChangeState<T = string | number> = {
-  fn?: (val?: T, isSubmit?: boolean) => void
-  // fn?: (val?: T) => void
+  onChangeCallback?: (val?: T) => void
+  onSubmitCallback?: (val?: T) => void
   value?: T
   isSubmit?: boolean
 }
@@ -123,11 +123,23 @@ export function createReconciler(
     componentName: K
   ) {
     const componentId = getComponentId[componentName]
+
+    let onChange, onSubmit = undefined
     if ('onChange' in props) {
-      const onChange = props['onChange'] as OnChangeState['fn']
-      updateOnChange(instance.entity, componentId, { fn: onChange })
+      onChange = props['onChange'] as OnChangeState['onChangeCallback']
       delete props['onChange']
     }
+    if ('onSubmit' in props) {
+      onSubmit = props['onSubmit'] as OnChangeState['onSubmitCallback']
+      delete props['onSubmit']
+    }
+    if (onChange !== undefined || onSubmit !== undefined) {
+      updateOnChange(instance.entity, componentId, {
+        onChangeCallback: onChange,
+        onSubmitCallback: onSubmit
+      })
+    }
+
     // We check if there is any key pending to be changed to avoid updating the existing component
     if (!Object.keys(props).length) {
       return
@@ -196,10 +208,11 @@ export function createReconciler(
   function updateOnChange(entity: Entity, componentId: number, state?: OnChangeState) {
     const event = changeEvents.get(entity) || changeEvents.set(entity, new Map()).get(entity)!
     const oldState = event.get(componentId)
-    const fn = state?.fn
+    const onChangeCallback = state?.onChangeCallback
+    const onSubmitCallback = state?.onSubmitCallback
     const value = state?.value ?? oldState?.value
     const isSubmit = state?.isSubmit ?? oldState?.isSubmit
-    event.set(componentId, { fn, value, isSubmit })
+    event.set(componentId, { onChangeCallback, onSubmitCallback, value, isSubmit })
   }
 
   const hostConfig: HostConfig<
@@ -317,11 +330,11 @@ export function createReconciler(
   function handleUiDropdownOnChange(componentId: number, resultComponent: typeof UiDropdownResult) {
     for (const [entity, Result] of engine.getEntitiesWith(resultComponent)) {
       const entityState = changeEvents.get(entity)?.get(componentId)
-      if (entityState?.fn && Result.value !== entityState.value) {
+      if (entityState?.onChangeCallback && Result.value !== entityState.value) {
         // Call onChange callback and update internal timestamp
-        entityState.fn(Result.value)
+        entityState.onChangeCallback(Result.value)
         updateOnChange(entity, componentId, {
-          fn: entityState.fn,
+          onChangeCallback: entityState.onChangeCallback,
           value: Result.value
         })
       }
@@ -331,15 +344,26 @@ export function createReconciler(
   function handleUiInputOnChange(componentId: number, resultComponent: typeof UiInputResult) {
     for (const [entity, Result] of engine.getEntitiesWith(resultComponent)) {
       const entityState = changeEvents.get(entity)?.get(componentId)
-      if (entityState?.fn && (Result.value !== entityState.value || Result.isSubmit !== entityState.isSubmit)) {
+
+      if (entityState === undefined) return
+
+      if (entityState?.onChangeCallback && Result.value !== entityState.value) {
         // Call onChange callback and update internal timestamp
-        entityState.fn(Result.value, Result.isSubmit)
-        updateOnChange(entity, componentId, {
-          fn: entityState.fn,
-          value: Result.value,
-          isSubmit: Result.isSubmit
-        })
+        entityState.onChangeCallback(Result.value)
       }
+
+      if (entityState?.onSubmitCallback && Result.isSubmit && !entityState.isSubmit) {
+        // Call onSubmit callback
+        entityState.onSubmitCallback(Result.value)
+      }
+      
+      // update internal timestamp
+      updateOnChange(entity, componentId, {
+        onChangeCallback: entityState.onChangeCallback,
+        onSubmitCallback: entityState.onSubmitCallback,
+        value: Result.value,
+        isSubmit: Result.isSubmit
+      })
     }
   }
 

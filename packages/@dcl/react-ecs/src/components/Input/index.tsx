@@ -26,7 +26,10 @@ function parseUiInput(props: Partial<UiInputProps>): PBUiInput {
  * @example
     <Input
       placeholder="Please enter your email"
-      onChange={(value, isSubmit) => {
+      onChange={(value) => {
+        email = value
+      }}
+      onSubmit={(value) => {
         email = value
       }}
       uiBackground={{ color: Color4.Red() }}
