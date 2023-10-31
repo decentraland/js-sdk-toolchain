@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import cx from 'classnames'
-import { VscChevronDown as DownArrow } from 'react-icons/vsc'
+import { VscChevronDown as DownArrowIcon, VscSearch as SearchIcon } from 'react-icons/vsc'
 import { useOutsideClick } from '../../../hooks/useOutsideClick'
+import { TextField } from '../TextField'
 import { Option } from './Option'
 import type { Props as OptionProp } from './Option/types'
 import type { Props } from './types'
@@ -14,31 +15,39 @@ function isOptionSelected(currentValue?: any, optionValue?: any) {
 }
 
 const Dropdown: React.FC<Props> = (props) => {
-  const { className, disabled, empty, label, options, value, onChange, placeholder = '' } = props
+  const { className, disabled, empty, label, options, searchable, value, onChange, placeholder = '' } = props
   const [showOptions, setShowOptions] = useState(false)
   const [isFocused, setFocus] = useState(false)
+  const [search, setSearch] = useState('')
 
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       e.preventDefault()
       e.stopPropagation()
-      setShowOptions(!showOptions)
       setFocus(true)
+      if (showOptions) {
+        // Clear search text when closing the dropdown
+        setSearch('')
+        setShowOptions(false)
+      } else {
+        setShowOptions(true)
+      }
     },
-    [showOptions, setShowOptions, setFocus]
+    [showOptions, setShowOptions, setFocus, setSearch]
   )
 
   const handleCloseDropdown = useCallback(() => {
     setShowOptions(false)
     setFocus(false)
-  }, [setShowOptions, setFocus])
+    setSearch('')
+  }, [setShowOptions, setFocus, setSearch])
 
   const ref = useOutsideClick(handleCloseDropdown)
 
   const handleSelectOption = useCallback(
     (e: any, option: OptionProp) => {
       setShowOptions(false)
-      if (option.value) {
+      if (option.value !== undefined) {
         onChange &&
           onChange({
             ...e,
@@ -50,6 +59,31 @@ const Dropdown: React.FC<Props> = (props) => {
       }
     },
     [setShowOptions, onChange]
+  )
+
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearch(e.target.value)
+    },
+    [setSearch]
+  )
+
+  const handleSearchClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    // Avoid close the dropdown when clicking on the search input
+    e.preventDefault()
+    e.stopPropagation()
+  }, [])
+
+  const filterOptions = useCallback(
+    (option: OptionProp) => {
+      if (searchable && search) {
+        const value = option.label?.toLowerCase() ?? option.value?.toString().toLowerCase() ?? ''
+        return value.includes(search.toLowerCase())
+      }
+
+      return true
+    },
+    [searchable, search]
   )
 
   const selectedValue = useMemo(() => {
@@ -85,24 +119,35 @@ const Dropdown: React.FC<Props> = (props) => {
           </div>
         )}
         {showOptions ? (
-          <div className="DropdownOptions">
+          <div className={cx('DropdownOptions', { searchable })}>
+            {searchable ? (
+              <TextField
+                className="DropdownSearch"
+                placeholder="Search"
+                rightIcon={<SearchIcon />}
+                onChange={handleSearchChange}
+                onClick={handleSearchClick}
+              />
+            ) : null}
             {options.length > 0 ? (
-              options.map((option, idx) => (
-                <Option
-                  key={idx}
-                  {...option}
-                  onClick={handleSelectOption}
-                  selected={isOptionSelected(value, option.value)}
-                  minWidth={minWidth}
-                />
-              ))
+              options
+                .filter(filterOptions)
+                .map((option, idx) => (
+                  <Option
+                    key={idx}
+                    {...option}
+                    onClick={handleSelectOption}
+                    selected={isOptionSelected(value, option.value)}
+                    minWidth={minWidth}
+                  />
+                ))
             ) : (
               <Option label={empty} minWidth={minWidth} />
             )}
           </div>
         ) : null}
-        <div className="DropdownArrow">
-          <DownArrow />
+        <div className="DropIcon">
+          <DownArrowIcon />
         </div>
       </div>
     </div>

@@ -60,12 +60,23 @@
   position: absolute;
   display: flex;
   flex-direction: column;
-  top: 100%;
+  top: calc(100% + 1px);
   left: 0;
   width: 100%;
+  padding-top: 8px;
   background: var(--base-14);
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
+  border-radius: 4px;
   z-index: 5;
   user-select: none;
+}
+.DropdownContainer .Dropdown .DropdownOptions.searchable .DropdownSearch.TextField {
+  padding: 0px 7px 6px 7px;
+}
+
+.DropdownContainer
+  .Dropdown
+  .DropdownOptions.searchable
+  .DropdownSearch.TextField
+  .input-container:not(.hovered):not(.focused) {
+  border-color: var(--base-12);
 }
