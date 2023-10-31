@@ -3239,6 +3239,17 @@ export type PutNetworkComponentMessageBody = Omit<PutComponentMessageBody, 'type
     networkId: number;
 };
 
+// @public (undocumented)
+export namespace PutNetworkComponentOperation {
+    const // (undocumented)
+    MESSAGE_HEADER_LENGTH = 20;
+    // (undocumented)
+    export function read(buf: ByteBuffer): (PutComponentMessage & {
+        networkId: number;
+    }) | null;
+    export function write(entity: Entity, timestamp: number, componentId: number, networkId: number, data: Uint8Array, buf: ByteBuffer): void;
+}
+
 // @public
 export type Quaternion = Quaternion.ReadonlyQuaternion;
 
