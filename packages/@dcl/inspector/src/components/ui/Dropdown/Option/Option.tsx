@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback } from 'react'
 import cx from 'classnames'
 import { IoAlertCircleOutline as AlertIcon } from 'react-icons/io5'
 import { Props } from './types'
