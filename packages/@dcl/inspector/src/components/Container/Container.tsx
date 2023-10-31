@@ -4,7 +4,7 @@ import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io'
 import { FiAlertTriangle as AlertIcon } from 'react-icons/fi'
 import { VscTrash as RemoveIcon } from 'react-icons/vsc'
 import { Button } from '../Button'
-import { InfoTooltip } from '../EntityInspector/InfoTooltip'
+import { InfoTooltip } from '../ui/InfoTooltip'
 import MoreOptionsMenu from '../EntityInspector/MoreOptionsMenu'
 
 import { Props } from './types'

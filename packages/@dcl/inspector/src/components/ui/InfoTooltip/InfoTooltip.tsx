@@ -4,7 +4,7 @@ import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
 import { Props } from './types'
 import './InfoTooltip.css'
 
-export default memo<Props>(({ text, link, ...rest }) => {
+export default memo<Props>(({ text, link, trigger, ...rest }) => {
   return (
     <Popup
       className="InfoTooltip"
@@ -18,7 +18,7 @@ export default memo<Props>(({ text, link, ...rest }) => {
           ) : null}
         </>
       }
-      trigger={<QuestionIcon size={16} />}
+      trigger={trigger ?? <QuestionIcon size={16} />}
       position="right center"
       on="hover"
       hideOnScroll

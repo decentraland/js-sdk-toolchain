@@ -24,7 +24,7 @@ import { EditorComponentsTypes } from '../../../lib/sdk/components'
 
 import { Container } from '../../Container'
 import { AddButton } from '../AddButton'
-import { InfoTooltip } from '../InfoTooltip'
+import { InfoTooltip } from '../../ui/InfoTooltip'
 
 import { TriggerEvent } from './TriggerEvent'
 import { TriggerConditionContainer } from './TriggerCondition'

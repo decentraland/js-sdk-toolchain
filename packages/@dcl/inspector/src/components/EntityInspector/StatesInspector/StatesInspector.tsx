@@ -11,7 +11,7 @@ import { Container } from '../../Container'
 import { TextField } from '../../ui/TextField'
 import { AddButton } from '../AddButton'
 import MoreOptionsMenu from '../MoreOptionsMenu'
-import { InfoTooltip } from '../InfoTooltip'
+import { InfoTooltip } from '../../ui/InfoTooltip'
 import { Props } from './types'
 import { getUniqueState, isRepeated, isValidInput } from './utils'
 

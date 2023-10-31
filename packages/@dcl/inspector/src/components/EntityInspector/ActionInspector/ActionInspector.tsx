@@ -28,7 +28,7 @@ import { Dropdown, TextField } from '../../ui'
 import MoreOptionsMenu from '../MoreOptionsMenu'
 import { AddButton } from '../AddButton'
 import { Button } from '../../Button'
-import { InfoTooltip } from '../InfoTooltip'
+import { InfoTooltip } from '../../ui/InfoTooltip'
 
 import { PlaySoundAction } from './PlaySoundAction'
 import { TweenAction } from './TweenAction'
