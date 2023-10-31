@@ -127,13 +127,12 @@ export function createReconciler(
     let onChange, onSubmit = undefined
     if ('onChange' in props) {
       onChange = props['onChange'] as OnChangeState['onChangeCallback']
-      delete props['onChange']
     }
     if ('onSubmit' in props) {
       onSubmit = props['onSubmit'] as OnChangeState['onSubmitCallback']
-      delete props['onSubmit']
     }
-    if (onChange !== undefined || onSubmit !== undefined) {
+
+    if ('onChange' in props || 'onSubmit' in props) {
       updateOnChange(instance.entity, componentId, {
         onChangeCallback: onChange,
         onSubmitCallback: onSubmit
