@@ -1,0 +1,87 @@
+.Block .content:has(.TextArea .error-message) {
+  align-items: baseline;
+}
+
+.TextArea {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  position: relative;
+  margin-right: 8px;
+  gap: 4px;
+}
+
+.TextArea:last-child {
+  margin-right: 0px;
+}
+
+.TextArea label {
+  display: flex;
+  align-items: center;
+  color: var(--base-01);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 100%;
+  gap: 4px;
+}
+
+.TextArea textarea {
+  flex: 1;
+  min-height: 72px;
+  padding: 4px 8px;
+  color: var(--text);
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  background-color: var(--background-gray);
+  border-radius: 4px;
+  border: 1px solid var(--background-gray);
+  outline: none;
+}
+
+.TextArea textarea::placeholder {
+  color: var(--base-09);
+}
+
+.TextArea.disabled textarea {
+  background-color: var(--base-12);
+  border-color: var(--base-12);
+}
+
+.TextArea.disabled textarea {
+  color: var(--base-09);
+}
+
+.TextArea.focused textarea {
+  border-color: var(--base-01);
+}
+
+.TextArea.hovered:not(.focused):not(.error) textarea {
+  border-color: var(--base-09);
+}
+
+.TextArea.error textarea {
+  border-color: var(--error-main);
+}
+
+.TextArea.hovered.error textarea,
+.TextArea.focused.error textarea {
+  border-color: var(--error-light);
+}
+
+.TextArea .error-message {
+  display: flex;
+  align-items: center;
+  color: var(--error-main);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 100%;
+  min-height: 16px;
+  gap: 2px;
+}
+
+.TextArea .error-message svg {
+  margin: 0 !important;
+}
