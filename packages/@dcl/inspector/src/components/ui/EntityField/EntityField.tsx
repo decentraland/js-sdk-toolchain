@@ -59,9 +59,9 @@ const EntityField: React.FC<WithSdkProps & Props> = ({ sdk, ...props }) => {
   const emptyMessage = useMemo(() => {
     if (components && components.length > 0) {
       const componentsName = components.map((component) => component.componentName.split('::')[1])
-      return `No entities found with ${componentsName.join(', ')} available.`
+      return `No entities available with ${componentsName.join(', ')}.`
     } else {
-      return 'No entities found in this project.'
+      return 'No entities found.'
     }
   }, [components])
 
@@ -74,6 +74,7 @@ const EntityField: React.FC<WithSdkProps & Props> = ({ sdk, ...props }) => {
       placeholder="Select Entity"
       empty={emptyMessage}
       disabled={disabled}
+      searchable={true}
       onChange={onChange}
     />
   )
