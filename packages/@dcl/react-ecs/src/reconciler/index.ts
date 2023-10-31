@@ -132,6 +132,8 @@ export function createReconciler(
         onChangeCallback: onChange,
         onSubmitCallback: onSubmit
       })
+      delete (props as any).onChange
+      delete (props as any).onSubmit
     }
 
     // We check if there is any key pending to be changed to avoid updating the existing component
