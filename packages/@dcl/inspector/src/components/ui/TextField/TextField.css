@@ -65,6 +65,10 @@
   min-width: 60px;
 }
 
+.TextField .input-container input::placeholder {
+  color: var(--base-09);
+}
+
 .TextField .input-container:has(.left-content),
 .TextField .input-container:has(.right-content) {
   padding: 0px 8px;
