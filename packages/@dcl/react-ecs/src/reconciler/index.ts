@@ -124,15 +124,10 @@ export function createReconciler(
   ) {
     const componentId = getComponentId[componentName]
 
-    let onChange, onSubmit = undefined
-    if ('onChange' in props) {
-      onChange = props['onChange'] as OnChangeState['onChangeCallback']
-    }
-    if ('onSubmit' in props) {
-      onSubmit = props['onSubmit'] as OnChangeState['onSubmitCallback']
-    }
+    const onChange = props['onChange'] as OnChangeState['onChangeCallback'] | undefined
+    const onSubmit = props['onSubmit'] as OnChangeState['onSubmitCallback'] | undefined
 
-    if ('onChange' in props || 'onSubmit' in props) {
+    if (onChange || onSubmit) {
       updateOnChange(instance.entity, componentId, {
         onChangeCallback: onChange,
         onSubmitCallback: onSubmit
@@ -326,25 +321,9 @@ export function createReconciler(
 
   // Maybe this could be something similar to Input system, but since we
   // are going to use this only here, i prefer to scope it here.
-  function handleUiDropdownOnChange(componentId: number, resultComponent: typeof UiDropdownResult) {
+  function handleOnChange(componentId: number, resultComponent: typeof UiDropdownResult | typeof UiInputResult) {
     for (const [entity, Result] of engine.getEntitiesWith(resultComponent)) {
       const entityState = changeEvents.get(entity)?.get(componentId)
-      if (entityState?.onChangeCallback && Result.value !== entityState.value) {
-        // Call onChange callback and update internal timestamp
-        entityState.onChangeCallback(Result.value)
-        updateOnChange(entity, componentId, {
-          onChangeCallback: entityState.onChangeCallback,
-          value: Result.value
-        })
-      }
-    }
-  }
-
-  function handleUiInputOnChange(componentId: number, resultComponent: typeof UiInputResult) {
-    for (const [entity, Result] of engine.getEntitiesWith(resultComponent)) {
-      const entityState = changeEvents.get(entity)?.get(componentId)
-
-      if (entityState === undefined) return
 
       if (entityState?.onChangeCallback && Result.value !== entityState.value) {
         entityState.onChangeCallback(Result.value)
@@ -354,10 +333,9 @@ export function createReconciler(
         entityState.onSubmitCallback(Result.value)
       }
 
-      // update internal timestamp
       updateOnChange(entity, componentId, {
-        onChangeCallback: entityState.onChangeCallback,
-        onSubmitCallback: entityState.onSubmitCallback,
+        onChangeCallback: entityState?.onChangeCallback,
+        onSubmitCallback: entityState?.onSubmitCallback,
         value: Result.value,
         isSubmit: Result.isSubmit
       })
@@ -367,8 +345,8 @@ export function createReconciler(
   return {
     update: function (component: ReactEcs.JSX.Element) {
       if (changeEvents.size) {
-        handleUiInputOnChange(UiInput.componentId, UiInputResult)
-        handleUiDropdownOnChange(UiDropdown.componentId, UiDropdownResult)
+        handleOnChange(UiInput.componentId, UiInputResult)
+        handleOnChange(UiDropdown.componentId, UiDropdownResult)
       }
       return reconciler.updateContainer(component as any, root, null)
     },
