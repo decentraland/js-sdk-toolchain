@@ -124,8 +124,8 @@ export function createReconciler(
   ) {
     const componentId = getComponentId[componentName]
 
-    const onChange = props['onChange'] as OnChangeState['onChangeCallback'] | undefined
-    const onSubmit = props['onSubmit'] as OnChangeState['onSubmitCallback'] | undefined
+    const onChange = 'onChange' in props ? (props['onChange'] as OnChangeState['onChangeCallback']) : undefined
+    const onSubmit = 'onSubmit' in props ? (props['onSubmit'] as OnChangeState['onSubmitCallback']) : undefined
 
     if (onChange || onSubmit) {
       updateOnChange(instance.entity, componentId, {
@@ -324,12 +324,13 @@ export function createReconciler(
   function handleOnChange(componentId: number, resultComponent: typeof UiDropdownResult | typeof UiInputResult) {
     for (const [entity, Result] of engine.getEntitiesWith(resultComponent)) {
       const entityState = changeEvents.get(entity)?.get(componentId)
+      const isSubmit = !!(Result as any).isSubmit
 
       if (entityState?.onChangeCallback && Result.value !== entityState.value) {
         entityState.onChangeCallback(Result.value)
       }
 
-      if (entityState?.onSubmitCallback && Result.isSubmit && !entityState.isSubmit) {
+      if (entityState?.onSubmitCallback && isSubmit && !entityState.isSubmit) {
         entityState.onSubmitCallback(Result.value)
       }
 
@@ -337,7 +338,7 @@ export function createReconciler(
         onChangeCallback: entityState?.onChangeCallback,
         onSubmitCallback: entityState?.onSubmitCallback,
         value: Result.value,
-        isSubmit: Result.isSubmit
+        isSubmit
       })
     }
   }
