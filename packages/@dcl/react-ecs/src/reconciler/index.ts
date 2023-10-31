@@ -329,21 +329,26 @@ export function createReconciler(
     for (const [entity, Result] of engine.getEntitiesWith(resultComponent)) {
       const entityState = changeEvents.get(entity)?.get(componentId)
       const isSubmit = !!(Result as any).isSubmit
+      let update: boolean = false
 
       if (entityState?.onChangeCallback && Result.value !== entityState.value) {
+        update = true
         entityState.onChangeCallback(Result.value)
       }
 
       if (entityState?.onSubmitCallback && isSubmit && !entityState.isSubmit) {
+        update = true
         entityState.onSubmitCallback(Result.value)
       }
 
-      updateOnChange(entity, componentId, {
-        onChangeCallback: entityState?.onChangeCallback,
-        onSubmitCallback: entityState?.onSubmitCallback,
-        value: Result.value,
-        isSubmit
-      })
+      if (update) {
+        updateOnChange(entity, componentId, {
+          onChangeCallback: entityState?.onChangeCallback,
+          onSubmitCallback: entityState?.onSubmitCallback,
+          value: Result.value,
+          isSubmit
+        })
+      }
     }
   }
 
