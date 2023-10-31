@@ -73,6 +73,10 @@
   padding: 0px 7px 6px 7px;
 }
 
+.DropdownContainer .Dropdown .DropdownOptions.searchable {
+  gap: unset;
+}
+
 .DropdownContainer
   .Dropdown
   .DropdownOptions.searchable

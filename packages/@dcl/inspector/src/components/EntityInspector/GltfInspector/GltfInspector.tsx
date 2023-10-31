@@ -18,8 +18,6 @@ import { selectAssetCatalog } from '../../../redux/app'
 
 import './GltfInspector.css'
 
-const DROP_TYPES = ['project-asset']
-
 export default withSdk<Props>(
   withContextMenu<WithSdkProps & Props>(({ sdk, entity, contextMenuId }) => {
     const files = useAppSelector(selectAssetCatalog)

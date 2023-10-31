@@ -6,6 +6,10 @@
   flex-grow: 1;
 }
 
+*:has(> .TextField + *) {
+  gap: 4px;
+}
+
 .TextField .input-container {
   display: flex;
   align-items: center;
@@ -57,16 +61,18 @@
   font-weight: 500;
   line-height: normal;
   width: 100%;
-  min-width: 60px;
 }
 
 .TextField .input-container input::placeholder {
   color: var(--base-09);
 }
 
-.TextField .input-container:has(.left-content),
+.TextField .input-container:has(.left-content) {
+  padding: 0px 0px 0px 8px;
+}
+
 .TextField .input-container:has(.right-content) {
-  padding: 0px 8px;
+  padding: 0px 8px 0px 0px;
 }
 
 .TextField .input-container .left-content,
