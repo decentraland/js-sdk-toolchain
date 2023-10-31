@@ -1,0 +1,52 @@
+.FileUploadFieldContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 4px;
+}
+
+.FileUploadFieldContainer .FileUploadInputContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  gap: 4px;
+}
+
+.FileUploadFieldContainer .FileUploadInputContainer .TextField {
+  margin-right: 0;
+}
+
+.FileUploadFieldContainer .FileUploadInputContainer .FileUploadFieldButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  cursor: pointer;
+  background-color: transparent;
+  border-color: transparent;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 4px;
+  color: var(--base-01);
+}
+
+.FileUploadFieldContainer .FileUploadInputContainer .FileUploadFieldButton:hover {
+  border-color: var(--base-09);
+}
+
+.FileUploadFieldContainer .FileUploadInputContainer .FileUploadFieldButton:focus {
+  border-color: var(--base-01);
+}
+
+.FileUploadFieldContainer .FileUploadInputContainer.disabled .FileUploadFieldButton {
+  pointer-events: none;
+}
+
+.FileUploadFieldContainer .FileUploadInputContainer.droppeable .FileUploadFieldInput .input-container {
+  border: 1px dashed var(--base-01);
+}
+
+.FileUploadFieldContainer .FileUploadInputContainer > input {
+  display: none;
+}
