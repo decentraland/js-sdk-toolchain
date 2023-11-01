@@ -108,7 +108,7 @@ const Dropdown: React.FC<Props> = (props) => {
       }, 0)
     }
 
-    return (empty?.length ?? 0) * FONT_WIDTH
+    return ((empty?.length ?? 0) * FONT_WIDTH * FONT_WEIGHT) / WIDTH_CONST
   }, [options, empty])
 
   return (
