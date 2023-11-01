@@ -12,8 +12,13 @@
   border-bottom-right-radius: 5px;
 }
 
-.OptionContainer.DropdownSelection {
+.OptionContainer.DropdownSelection,
+.OptionContainer.DropdownPlaceholder {
   padding: 0;
+}
+
+.OptionContainer.DropdownPlaceholder {
+  color: var(--base-09);
 }
 
 .OptionContainer .OptionContent {
@@ -32,11 +37,11 @@
   text-wrap: nowrap;
 }
 
-.OptionContainer:not(.DropdownSelection):hover {
+.OptionContainer:not(.DropdownSelection):not(.DropdownPlaceholder):hover {
   background: var(--base-12);
 }
 
-.OptionContainer:not(.DropdownSelection).disabled {
+.OptionContainer:not(.DropdownSelection):not(.DropdownPlaceholder).disabled {
   background: var(--base-14);
   color: var(--base-11);
   cursor: default;

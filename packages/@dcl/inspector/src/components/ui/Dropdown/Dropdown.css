@@ -24,19 +24,23 @@
 }
 
 .DropdownContainer .Dropdown:hover {
-  border: 1px solid var(--base-09);
+  border-color: var(--base-09);
 }
 
 .DropdownContainer .Dropdown.focused {
-  border: 1px solid var(--base-01);
+  border-color: var(--base-01);
 }
 
 .DropdownContainer .Dropdown.disabled {
   background: var(--base-12);
-  border: 1px solid var(--base-12);
+  border-color: var(--base-12);
   color: var(--base-09);
   cursor: default;
   pointer-events: none;
+}
+
+.DropdownContainer .Dropdown.error {
+  border-color: var(--error-main);
 }
 
 .DropdownContainer .Dropdown .DropIcon {
@@ -54,10 +58,6 @@
   justify-content: space-between;
   width: 100%;
   padding: 10px;
-}
-
-.DropdownContainer .Dropdown .DropdownPlaceholder {
-  flex: 1;
 }
 
 .DropdownContainer .Dropdown .DropdownOptions {

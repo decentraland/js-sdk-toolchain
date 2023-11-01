@@ -1,8 +1,10 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import cx from 'classnames'
 import { VscChevronDown as DownArrowIcon, VscSearch as SearchIcon } from 'react-icons/vsc'
+import { IoAlertCircleOutline as AlertIcon } from 'react-icons/io5'
 import { useOutsideClick } from '../../../hooks/useOutsideClick'
 import { TextField } from '../TextField'
+import { isErrorMessage } from '../utils'
 import { Option } from './Option'
 import type { Props as OptionProp } from './Option/types'
 import type { Props } from './types'
@@ -18,7 +20,7 @@ function isOptionSelected(currentValue?: any, optionValue?: any) {
 }
 
 const Dropdown: React.FC<Props> = (props) => {
-  const { className, disabled, empty, label, options, searchable, value, onChange, placeholder = '' } = props
+  const { className, disabled, empty, error, label, options, searchable, value, onChange, placeholder = '' } = props
   const [showOptions, setShowOptions] = useState(false)
   const [isFocused, setFocus] = useState(false)
   const [search, setSearch] = useState('')
@@ -116,16 +118,15 @@ const Dropdown: React.FC<Props> = (props) => {
         className={cx('Dropdown', className, {
           focused: isFocused,
           disabled: !!disabled,
-          open: !!showOptions
+          open: !!showOptions,
+          error: !!error
         })}
         onClick={handleClick}
       >
         {selectedValue ? (
           <Option {...selectedValue} className="DropdownSelection" minWidth={minWidth} />
         ) : (
-          <div className="DropdownPlaceholder" style={{ minWidth: minWidth }}>
-            {placeholder}
-          </div>
+          <Option className="DropdownPlaceholder" value={placeholder} minWidth={minWidth} />
         )}
         {showOptions ? (
           <div className={cx('DropdownOptions', { searchable })}>
@@ -159,6 +160,12 @@ const Dropdown: React.FC<Props> = (props) => {
           <DownArrowIcon size={ICON_SIZE} />
         </div>
       </div>
+      {isErrorMessage(error) && (
+        <p className="error-message">
+          <AlertIcon />
+          <span>{error}</span>
+        </p>
+      )}
     </div>
   )
 }
