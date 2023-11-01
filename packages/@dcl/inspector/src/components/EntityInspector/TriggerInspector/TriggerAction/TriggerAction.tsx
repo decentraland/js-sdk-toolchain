@@ -1,11 +1,14 @@
 import React, { useCallback, useEffect } from 'react'
 import { VscTrash as RemoveIcon } from 'react-icons/vsc'
 import { TriggerAction } from '@dcl/asset-packs'
-
+import { Entity } from '@dcl/ecs'
+import { WithSdkProps, withSdk } from '../../../../hoc/withSdk'
 import { useArrayState } from '../../../../hooks/useArrayState'
-
+import { useComponentsWith } from '../../../../hooks/sdk/useComponentsWith'
+import { Component } from '../../../../lib/sdk/components'
 import { Button } from '../../../Button'
-import { Dropdown } from '../../../Dropdown'
+import { Dropdown } from '../../../ui/Dropdown'
+import { EntityField } from '../../../ui'
 import { AddButton } from '../../AddButton'
 import MoreOptionsMenu from '../../MoreOptionsMenu'
 
@@ -13,10 +16,12 @@ import type { Props } from './types'
 
 import './TriggerAction.css'
 
-export const TriggerActionContainer = ({ trigger, availableActions, onUpdateActions }: Props) => {
+const TriggerActionContainer: React.FC<WithSdkProps & Props> = ({ sdk, ...props }) => {
+  const { trigger, availableActions, onUpdateActions } = props
   const [actions, addActions, modifyActions, removeActions] = useArrayState<TriggerAction>(
     trigger.actions as TriggerAction[]
   )
+  const [_entitiesWithAction, getActionEntity, getActionValue] = useComponentsWith((components) => components.Actions)
 
   useEffect(() => {
     onUpdateActions(actions)
@@ -33,7 +38,7 @@ export const TriggerActionContainer = ({ trigger, availableActions, onUpdateActi
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
       modifyActions(idx, {
         ...actions[idx],
-        id: parseInt(value)
+        id: getActionValue(parseInt(value) as Entity)?.id
       })
     },
     [actions, modifyActions]
@@ -65,25 +70,22 @@ export const TriggerActionContainer = ({ trigger, availableActions, onUpdateActi
         </div>
       </div>
       {actions.map((action, idx) => {
-        const entities = Array.from(availableActions).map(([entity, { name }]) => {
-          return { value: entity, text: name }
-        })
         const actions = action.id
-          ? (availableActions.get(action.id)?.actions ?? []).map(({ name }) => ({ value: name, text: name }))
+          ? (availableActions.get(action.id)?.actions ?? []).map(({ name }) => ({ value: name, label: name }))
           : []
         return (
           <div className="TriggerAction" key={`trigger-action-${idx}`}>
             <div className="Fields">
-              <Dropdown
-                options={availableActions ? [{ value: '', text: 'Select an Entity' }, ...entities] : []}
-                value={action.id}
+              <EntityField
+                components={[sdk.components.Actions] as Component[]}
+                value={getActionEntity(action)}
                 onChange={(e) => handleChangeEntity(e, idx)}
               />
               <Dropdown
                 disabled={!action.id || !availableActions.get(action.id)}
                 options={
                   action.id && availableActions.get(action.id)?.actions
-                    ? [{ value: '', text: 'Select an Action' }, ...actions]
+                    ? [{ value: '', label: 'Select an Action' }, ...actions]
                     : []
                 }
                 value={action.name}
@@ -104,4 +106,4 @@ export const TriggerActionContainer = ({ trigger, availableActions, onUpdateActi
   )
 }
 
-export default React.memo(TriggerActionContainer)
+export default React.memo(withSdk(TriggerActionContainer))

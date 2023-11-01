@@ -2,9 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { TweenType, InterpolationType } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 
-import { Dropdown } from '../../../Dropdown'
 import { RangeField } from '../../RangeField'
-import { TextField } from '../../../ui/TextField'
+import { Dropdown, TextField } from '../../../ui'
 import { InfoTooltip } from '../../InfoTooltip'
 import { isValidTween } from './utils'
 import type { Props } from './types'
@@ -140,8 +139,8 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
           <label>Select Tween {renderTweenInfo()}</label>
           <Dropdown
             options={[
-              { value: '', text: 'Select a Tween Type' },
-              ...Object.values(TweenType).map((tweenType) => ({ text: TweenMapOption[tweenType], value: tweenType }))
+              { value: '', label: 'Select a Tween Type' },
+              ...Object.values(TweenType).map((tweenType) => ({ label: TweenMapOption[tweenType], value: tweenType }))
             ]}
             value={tween.type}
             onChange={handleChangeType}
@@ -190,9 +189,9 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
           <label>Curve Type {rendeCurveTypeInfo()}</label>
           <Dropdown
             options={[
-              { value: '', text: 'Select a Curve Type' },
+              { value: '', label: 'Select a Curve Type' },
               ...Object.values(InterpolationType).map((interpolationType) => ({
-                text: InterpolationMapOption[interpolationType],
+                label: InterpolationMapOption[interpolationType],
                 value: interpolationType
               }))
             ]}

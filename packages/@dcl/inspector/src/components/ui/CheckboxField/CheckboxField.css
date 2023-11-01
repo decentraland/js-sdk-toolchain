@@ -4,11 +4,9 @@
 
 .CheckboxField {
   flex-grow: 1;
-  margin-right: 8px;
 }
-
-.CheckboxField:last-child {
-  margin-right: 0px;
+*:has(> .CheckboxField + *) {
+  gap: 4px;
 }
 
 .CheckboxField .input-container {
@@ -23,7 +21,7 @@
   width: 16px;
   height: 16px;
   border-radius: 3px;
-  margin-right: 0.5em;
+  margin-right: 8px;
   border: 1px solid var(--base-14);
   background-color: var(--base-14);
   cursor: pointer;
@@ -53,6 +51,9 @@
 .CheckboxField .input-container.disabled input[type='checkbox'] {
   background: var(--base-12);
   border-color: var(--base-12);
+}
+.CheckboxField .input-container label {
+  text-wrap: nowrap;
 }
 
 .CheckboxField .input-container.disabled label {

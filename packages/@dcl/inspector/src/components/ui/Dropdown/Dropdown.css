@@ -1,0 +1,90 @@
+.DropdownContainer {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 2px;
+}
+
+.DropdownContainer .DropdownLabel {
+  color: var(--white);
+  font-size: 12px;
+}
+
+.DropdownContainer .Dropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 25px;
+  background: var(--base-14);
+  border-radius: 5px;
+  border: 1px solid var(--base-14);
+  padding: 2px 8px;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.DropdownContainer .Dropdown:hover {
+  border: 1px solid var(--base-09);
+}
+
+.DropdownContainer .Dropdown.focused {
+  border: 1px solid var(--base-01);
+}
+
+.DropdownContainer .Dropdown.disabled {
+  background: var(--base-12);
+  border: 1px solid var(--base-12);
+  color: var(--base-09);
+  cursor: default;
+  pointer-events: none;
+}
+
+.DropdownContainer .Dropdown .DropIcon {
+  line-height: 100%;
+}
+
+.DropdownContainer .Dropdown .DropIcon svg {
+  height: 16px;
+  width: 16px;
+}
+
+.DropdownContainer .Dropdown .DropdownSelectedValue {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px;
+}
+
+.DropdownContainer .Dropdown .DropdownPlaceholder {
+  flex: 1;
+}
+
+.DropdownContainer .Dropdown .DropdownOptions {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: calc(100% + 1px);
+  left: 0;
+  width: 100%;
+  padding-top: 8px;
+  background: var(--base-14);
+  border-radius: 4px;
+  z-index: 5;
+  user-select: none;
+}
+.DropdownContainer .Dropdown .DropdownOptions.searchable .DropdownSearch.TextField {
+  padding: 0px 7px 6px 7px;
+}
+
+.DropdownContainer .Dropdown .DropdownOptions.searchable {
+  gap: unset;
+}
+
+.DropdownContainer
+  .Dropdown
+  .DropdownOptions.searchable
+  .DropdownSearch.TextField
+  .input-container:not(.hovered):not(.focused) {
+  border-color: var(--base-12);
+}

@@ -4,7 +4,7 @@ import { IoIosGitBranch as ConditionalIcon } from 'react-icons/io'
 import { TriggerType } from '@dcl/asset-packs'
 import { Block } from '../../../Block'
 import { Button } from '../../../Button'
-import { Dropdown } from '../../../Dropdown'
+import { Dropdown } from '../../../ui/Dropdown'
 import MoreOptionsMenu from '../../MoreOptionsMenu'
 
 import type { Props } from './types'
@@ -46,7 +46,7 @@ export const TriggerEvent = ({
       </div>
       <Dropdown
         options={availableTriggers.map((availableTrigger) => ({
-          text: TriggerMapOption[availableTrigger],
+          label: TriggerMapOption[availableTrigger],
           value: availableTrigger
         }))}
         value={trigger.type}

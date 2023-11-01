@@ -16,7 +16,7 @@ import { CoreComponents } from '../../../lib/sdk/components'
 import { InfoTooltip } from '../InfoTooltip'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
-import { Dropdown } from '../../Dropdown'
+import { Dropdown } from '../../ui/Dropdown'
 import { Props } from './types'
 
 import './VisibilityComponentInspector.css'
@@ -114,8 +114,8 @@ export default withSdk<Props>(
               <label>Visibility {renderVisibilityMoreInfo()}</label>
               <Dropdown
                 options={[
-                  { value: 'true', text: 'Visible' },
-                  { value: 'false', text: 'Invisible' }
+                  { value: 'true', label: 'Visible' },
+                  { value: 'false', label: 'Invisible' }
                 ]}
                 value={(componentValue.visible ?? true).toString()}
                 onChange={handleChangeVisibility}
@@ -125,8 +125,8 @@ export default withSdk<Props>(
               <label>Physics Collider {renderPhysicsCollidersMoreInfo()}</label>
               <Dropdown
                 options={[
-                  { value: 'true', text: 'Enabled' },
-                  { value: 'false', text: 'Disabled' }
+                  { value: 'true', label: 'Enabled' },
+                  { value: 'false', label: 'Disabled' }
                 ]}
                 value={(collisionValue.invisibleMeshesCollisionMask === 2).toString()}
                 onChange={handleChangeCollider}
