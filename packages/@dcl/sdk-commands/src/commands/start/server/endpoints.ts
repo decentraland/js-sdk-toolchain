@@ -17,10 +17,6 @@ import { getCatalystBaseUrl } from '../../../logic/config'
 import { Workspace } from '../../../logic/workspace-validations'
 import { ProjectUnion, WearableProject } from '../../../logic/project-validations'
 
-function smartWearableNameToId(name: string) {
-  return name.toLocaleLowerCase().replace(/ /g, '-')
-}
-
 type LambdasWearable = Wearable & {
   baseUrl: string
 }
@@ -169,7 +165,7 @@ async function serveFolders(
 
       if (path.resolve(fullPath) === path.resolve(baseProject.workingDirectory)) {
         // if we are talking about the root directory, then we must return the json of the entity
-        const entity = await fakeEntityV3FromProject(components, baseProject, b64HashingFunction)
+        const entity = await fakeEntityV3FromProject(components, baseProject, async ($) => b64HashingFunction($))
 
         if (!entity) return { status: 404 }
 
@@ -245,7 +241,7 @@ async function serveFolders(
     return {
       body: {
         ok: true,
-        data: wearables.filter((wearable) => smartWearableNameToId(wearable?.name) === wearableId)
+        data: wearables.filter((wearable) => wearable.id === wearableCache.get(wearableId))
       }
     }
   })
@@ -270,7 +266,7 @@ async function getAllPreviewWearables(
   const wearablePathArray: string[] = []
 
   for (const project of workspace.projects) {
-    if (project.kind === 'wearable') {
+    if (project.kind === 'smart-wearable') {
       const wearableJsonPath = path.resolve(project.workingDirectory, 'wearable.json')
       if (await components.fs.fileExists(wearableJsonPath)) {
         wearablePathArray.push(wearableJsonPath)
@@ -281,7 +277,7 @@ async function getAllPreviewWearables(
   const ret: LambdasWearable[] = []
   for (const project of workspace.projects) {
     try {
-      if (project.kind === 'wearable') ret.push(await serveWearable(components, project, baseUrl))
+      if (project.kind === 'smart-wearable') ret.push(await serveWearable(components, project, baseUrl))
     } catch (err) {
       components.logger.error(
         `Couldn't mock the wearable ${project.workingDirectory}. Please verify the correct format and scheme.` + err
@@ -309,10 +305,8 @@ async function serveWearable(
     throw new Error(`Invalid wearable.json (${wearableJsonPath})`)
   }
 
-  const projectFiles = await getProjectPublishableFilesWithHashes(
-    components,
-    project.workingDirectory,
-    b64HashingFunction
+  const projectFiles = await getProjectPublishableFilesWithHashes(components, project.workingDirectory, async ($) =>
+    b64HashingFunction($)
   )
   const contentFiles = projectFilesToContentMappings(project.workingDirectory, projectFiles)
 
@@ -321,7 +315,7 @@ async function serveWearable(
     thumbnailFiltered.length > 0 && thumbnailFiltered[0]!.hash && `${baseUrl}/${thumbnailFiltered[0].hash}`
 
   // Set wearable ID.
-  const sceneHash = await b64HashingFunction(JSON.stringify(project.scene))
+  const sceneHash = b64HashingFunction(project.workingDirectory)
   const wearableId = wearableCache.get(sceneHash) ?? `urn:${uuidv4()}`
   wearableCache.set(sceneHash, wearableId)
 
@@ -365,7 +359,9 @@ async function getSceneJson(
   const resultEntities: Entity[] = []
 
   const allDeployments = await Promise.all(
-    workspace.projects.map((project) => fakeEntityV3FromProject(components, project, b64HashingFunction))
+    workspace.projects.map((project) =>
+      fakeEntityV3FromProject(components, project, async ($) => b64HashingFunction($))
+    )
   )
 
   for (const pointer of Array.from(requestedPointers)) {
@@ -504,7 +500,7 @@ async function fakeEntityV3FromProject(
       metadata: sceneJson,
       content: contentFiles
     }
-  } else if (project.kind === 'wearable') {
+  } else if (project.kind === 'smart-wearable') {
     const wearableJsonPath = path.resolve(project.workingDirectory, 'wearable.json')
     try {
       const wearableJson = JSON.parse(await components.fs.readFile(wearableJsonPath, 'utf-8'))

@@ -102,7 +102,7 @@ export async function getProjectPublishableFilesWithHashes(
   return ret
 }
 
-export const b64HashingFunction = async (str: string) => 'b64-' + Buffer.from(str).toString('base64')
+export const b64HashingFunction = (str: string) => 'b64-' + Buffer.from(str).toString('base64')
 // export const ipfsHashingFunction = async (str: string) => hashV1(Buffer.from(str, 'utf8'))
 
 interface PackageJson {
