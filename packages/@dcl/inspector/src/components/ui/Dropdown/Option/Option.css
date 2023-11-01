@@ -37,7 +37,7 @@
   text-wrap: nowrap;
 }
 
-.OptionContainer:not(.DropdownSelection):not(.DropdownPlaceholder):hover {
+.OptionContainer:not(.DropdownSelection):not(.DropdownPlaceholder):not(.selected):hover {
   background: var(--base-12);
 }
 
