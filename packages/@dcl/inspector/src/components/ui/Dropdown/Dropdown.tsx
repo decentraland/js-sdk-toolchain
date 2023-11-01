@@ -13,6 +13,7 @@ import './Dropdown.css'
 const FONT_WIDTH = 12
 const FONT_WEIGHT = 700
 const WIDTH_CONST = 1200
+const EMPTY_WIDTH_CONST = 1455
 const ICON_SIZE = 16
 
 function isOptionSelected(currentValue?: any, optionValue?: any) {
@@ -108,7 +109,7 @@ const Dropdown: React.FC<Props> = (props) => {
       }, 0)
     }
 
-    return ((empty?.length ?? 0) * FONT_WIDTH * FONT_WEIGHT) / WIDTH_CONST
+    return ((empty?.length ?? 0) * FONT_WIDTH * FONT_WEIGHT) / EMPTY_WIDTH_CONST
   }, [options, empty])
 
   return (
