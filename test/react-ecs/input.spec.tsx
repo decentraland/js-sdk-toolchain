@@ -10,7 +10,7 @@ describe('Ui Listeners React Ecs', () => {
     const UiInputResult = components.UiInputResult(engine)
     const uiEntity = ((engine.addEntity() as number) + 1) as Entity
     const onChange: jest.Mock | undefined = jest.fn()
-    const onSubmit: jest.Mock | undefined  = jest.fn()
+    const onSubmit: jest.Mock | undefined = jest.fn()
     const undefinedChange: jest.Mock | undefined = undefined
     let conditional = true
     let removeComponent = false
@@ -64,19 +64,14 @@ describe('Ui Listeners React Ecs', () => {
     await engine.update(1)
     expect(onChange).toBeCalledWith('Casla - ')
     onChange.mockClear()
+    expect(onSubmit).toBeCalledTimes(0)
+    UiInputResult.getMutable(uiEntity).isSubmit = true
+    await engine.update(1)
+    expect(onSubmit).toBeCalledTimes(1)
     removeComponent = true
     await engine.update(1)
     UiInputResult.create(uiEntity, { value: 'BOEDO' })
     await engine.update(1)
     expect(onChange).toBeCalledTimes(0)
-
-    onChange.mockClear()
-    removeComponent = false
-    await engine.update(1)
-    expect(onSubmit).toBeCalledTimes(0)
-    UiInputResult.getMutable(uiEntity).value = '666'
-    UiInputResult.getMutable(uiEntity).isSubmit = true
-    await engine.update(1)
-    expect(onSubmit).toBeCalledTimes(1)
   })
 })

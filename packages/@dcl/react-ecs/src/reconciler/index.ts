@@ -126,8 +126,13 @@ export function createReconciler(
 
     const onChangeExists = 'onChange' in props
     const onSubmitExists = 'onSubmit' in props
-    const onChange = onChangeExists ? (props['onChange'] as OnChangeState['onChangeCallback']) : undefined
-    const onSubmit = onSubmitExists ? (props['onSubmit'] as OnChangeState['onSubmitCallback']) : undefined
+    const entityState = changeEvents.get(instance.entity)?.get(componentId)
+    const onChange = onChangeExists
+      ? (props['onChange'] as OnChangeState['onChangeCallback'])
+      : entityState?.onChangeCallback
+    const onSubmit = onSubmitExists
+      ? (props['onSubmit'] as OnChangeState['onSubmitCallback'])
+      : entityState?.onSubmitCallback
 
     if (onChangeExists || onSubmitExists) {
       updateOnChange(instance.entity, componentId, {
@@ -329,26 +334,20 @@ export function createReconciler(
     for (const [entity, Result] of engine.getEntitiesWith(resultComponent)) {
       const entityState = changeEvents.get(entity)?.get(componentId)
       const isSubmit = !!(Result as any).isSubmit
-      let update: boolean = false
 
       if (entityState?.onChangeCallback && Result.value !== entityState.value) {
-        update = true
         entityState.onChangeCallback(Result.value)
       }
-
       if (entityState?.onSubmitCallback && isSubmit && !entityState.isSubmit) {
-        update = true
         entityState.onSubmitCallback(Result.value)
       }
 
-      if (update) {
-        updateOnChange(entity, componentId, {
-          onChangeCallback: entityState?.onChangeCallback,
-          onSubmitCallback: entityState?.onSubmitCallback,
-          value: Result.value,
-          isSubmit
-        })
-      }
+      updateOnChange(entity, componentId, {
+        onChangeCallback: entityState?.onChangeCallback,
+        onSubmitCallback: entityState?.onSubmitCallback,
+        value: Result.value,
+        isSubmit
+      })
     }
   }
 
