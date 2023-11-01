@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { useDrop } from 'react-dnd'
 import cx from 'classnames'
 import { VscFolderOpened as FolderIcon } from 'react-icons/vsc'
@@ -29,12 +29,13 @@ const FileUploadField: React.FC<Props> = ({
   disabled,
   value,
   isEnabledFileExplorer,
+  error,
   onDrop,
   isValidFile,
   accept = EXTENSIONS
 }) => {
   const [path, setPath] = useState<string | undefined>(value?.toString())
-  const [error, setError] = useState<boolean>(false)
+  const [dropError, setDropError] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const files = useAppSelector(selectAssetCatalog)
 
@@ -76,9 +77,9 @@ const FileUploadField: React.FC<Props> = ({
         const element = getNode(node, context.tree, isValid)
         if (element) {
           handleDrop(withAssetDir(element.asset.src))
-          setError(false)
+          setDropError(false)
         } else {
-          setError(true)
+          setDropError(true)
         }
       },
       canDrop: ({ value, context }: ProjectAssetDrop) => {
@@ -102,36 +103,40 @@ const FileUploadField: React.FC<Props> = ({
       const file = event.target.files?.[0]
       if (file && (isAsset(file.name) || isAudioFile(file.name))) {
         setPath(file.name)
-        setError(false)
+        setDropError(false)
       } else {
-        setError(true)
+        setDropError(true)
       }
     },
-    [setPath, setError]
+    [setPath, setDropError]
   )
 
   const handleChangeTextField = useCallback(
-    ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
+    ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
       if (value && (isAsset(value) || isAudioFile(value))) {
         setPath(addBase(value))
-        setError(false)
+        setDropError(false)
       } else {
-        setError(true)
+        setDropError(true)
       }
     },
-    [addBase, setPath, setError]
+    [addBase, setPath, setDropError]
   )
+
+  const hasError = useMemo(() => {
+    return error || dropError
+  }, [error, dropError])
 
   return (
     <div className={cx('FileUploadFieldContainer', className)}>
-      <div className={cx('FileUploadInputContainer', { error, disabled, droppeable: canDrop })}>
+      <div className={cx('FileUploadInputContainer', { error: hasError, disabled, droppeable: canDrop })}>
         <TextField
           className="FileUploadFieldInput"
           ref={drop}
           placeholder="Path File"
           onChange={handleChangeTextField}
           value={removeBase(path)}
-          error={!!error}
+          error={hasError}
           disabled={disabled}
           drop={isHover}
         />
@@ -142,7 +147,7 @@ const FileUploadField: React.FC<Props> = ({
           </button>
         )}
       </div>
-      {error && (
+      {hasError && (
         <div className="FileUploadFieldError">
           <AlertIcon size={16} />
           File not valid.
