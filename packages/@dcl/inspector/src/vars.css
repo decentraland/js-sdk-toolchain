@@ -13,6 +13,7 @@
   --input-border-color: var(--vscode-input-border, #cdcccc);
   --button-color: var(--vscode-button-foreground, var(--black));
   --title: #eeeeef;
+  --text-primary: #000000de;
   --sub-text: #ffffffcf;
   --border-focused: #127fd4;
 

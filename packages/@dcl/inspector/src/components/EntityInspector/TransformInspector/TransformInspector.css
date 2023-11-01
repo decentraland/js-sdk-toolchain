@@ -1,3 +1,7 @@
 .Container.Transform svg {
   margin-right: 5px;
 }
+
+.Container.Transform .content {
+  gap: 4px;
+}

@@ -64,7 +64,7 @@ const App = () => {
             {!hiddenPanels[PanelName.COMPONENTS] && selectedEntity !== null && (
               <>
                 <PanelResizeHandle className="horizontal-handle" />
-                <Panel defaultSize={20} minSize={15} order={3}>
+                <Panel defaultSize={25.5} minSize={25.5} order={3}>
                   <Box className="entity-inspector">
                     <EntityInspector />
                   </Box>

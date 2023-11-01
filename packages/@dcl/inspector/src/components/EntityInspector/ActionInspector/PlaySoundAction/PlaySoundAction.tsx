@@ -11,8 +11,7 @@ import { useAppSelector } from '../../../../redux/hooks'
 import { selectAssetCatalog } from '../../../../redux/app'
 
 import { isAudio, isValidVolume, volumeToAudioSource, volumeFromAudioSource } from '../../AudioSourceInspector/utils'
-import { TextField } from '../../../ui/TextField'
-import { SelectField } from '../../SelectField'
+import { Dropdown, TextField } from '../../../ui'
 import { RangeField } from '../../RangeField'
 
 import { isValid } from './utils'
@@ -148,8 +147,8 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
           <TextField value={removeBase(payload.src)} onChange={handleChangeSrc} error={error} drop={isHover} />
         </div>
         <div className="field">
-          <label>Play Mode</label>
-          <SelectField
+          <Dropdown
+            label="Play Mode"
             value={payload.loop ? PLAY_MODE.LOOP : PLAY_MODE.PLAY_ONCE}
             options={playModeOptions}
             onChange={handleChangePlayMode}
