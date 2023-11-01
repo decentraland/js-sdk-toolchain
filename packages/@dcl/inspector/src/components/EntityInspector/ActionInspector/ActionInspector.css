@@ -50,7 +50,11 @@
 }
 
 .ActionInspector > .content > .Block > .content .row .field.duration .TextField {
-  width: 40px;
+  width: 50px;
+}
+
+.ActionInspector > .content > .Block > .content .row .field.duration .TextField input {
+  min-width: 50px;
 }
 
 .ActionInspector .content .RemoveButton {
@@ -63,10 +67,6 @@
 .ActionInspector .content .Block .content {
   gap: 15px;
   align-items: flex-end;
-}
-
-.ActionInspector .content .Block .content .TextField {
-  height: 25px;
 }
 
 .ActionInspector .content .Block .content .DropdownContainer {

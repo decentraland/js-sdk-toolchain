@@ -20,3 +20,18 @@
 .PlaySoundActionContainer > .row > .field.volume > .row > .TextField {
   width: 40px;
 }
+
+.PlaySoundActionContainer > .row > .field.volume > .RangeFieldContainer .RangeField .RangeTextInput {
+  width: 40px;
+}
+
+.PlaySoundActionContainer
+  > .row
+  > .field.volume
+  > .RangeFieldContainer
+  .RangeField
+  .RangeTextInput
+  .InputContainer
+  input {
+  min-width: 40px;
+}

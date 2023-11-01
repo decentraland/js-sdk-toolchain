@@ -20,8 +20,7 @@ import { useAppSelector } from '../../../redux/hooks'
 import { selectAssetCatalog } from '../../../redux/app'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
-import { TextField, CheckboxField } from '../../ui'
-import { RangeField } from '../RangeField'
+import { TextField, CheckboxField, RangeField } from '../../ui'
 import { fromAudioSource, toAudioSource, isValidInput, isAudio, isValidVolume } from './utils'
 import type { Props } from './types'
 
@@ -107,8 +106,7 @@ export default withSdk<Props>(
           <CheckboxField label="Loop" checked={!!loop.value} {...loop} />
         </Block>
         <Block className="volume" label="Volume">
-          <RangeField {...volume} />
-          <TextField type="number" {...volume} error={!isValidVolume(volume.value?.toString())} />
+          <RangeField {...volume} isValidValue={isValidVolume} />
         </Block>
       </Container>
     )
