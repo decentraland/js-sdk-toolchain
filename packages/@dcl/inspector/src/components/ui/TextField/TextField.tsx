@@ -1,7 +1,9 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import cx from 'classnames'
 import { IoAlertCircleOutline as AlertIcon } from 'react-icons/io5'
-import { isErrorMessage } from '../utils'
+
+import { ErrorMessage } from '../ErrorMessage'
+
 import { Props } from './types'
 
 import './TextField.css'
@@ -26,6 +28,12 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
   const [inputValue, setInputValue] = useState(value)
   const [isHovered, setHovered] = useState(false)
   const [isFocused, setFocused] = useState(false)
+
+  useEffect(() => {
+    if (inputValue !== value) {
+      setInputValue(value)
+    }
+  }, [value])
 
   const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = useCallback(
     (event) => {
@@ -86,7 +94,7 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
   return (
     <div className={cx('TextField', className)}>
       <div
-        className={cx('input-container', {
+        className={cx('InputContainer', {
           hovered: isHovered,
           focused: isFocused,
           disabled: disabled,
@@ -108,12 +116,7 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
         />
         {renderRightContent()}
       </div>
-      {isErrorMessage(error) && (
-        <p className="error-message">
-          <AlertIcon />
-          <span>{error}</span>
-        </p>
-      )}
+      <ErrorMessage error={error} />
     </div>
   )
 })
