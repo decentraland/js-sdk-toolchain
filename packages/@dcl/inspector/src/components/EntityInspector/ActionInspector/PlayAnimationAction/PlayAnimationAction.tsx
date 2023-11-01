@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { ActionPayload, ActionType } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
-import { SelectField } from '../../SelectField'
-import { Dropdown } from '../../../Dropdown'
+import { Dropdown } from '../../../ui/Dropdown'
 import { isValid } from './utils'
 import type { Props } from './types'
 
@@ -52,19 +51,19 @@ const PlayAnimationAction: React.FC<Props> = ({ value, animations, onUpdate }: P
     <div className="PlayAnimationActionContainer">
       <div className="row">
         <div className="field">
-          <label>Select Animation</label>
           <Dropdown
+            label="Select Animation"
             options={[
-              { value: '', text: 'Select an Animation' },
-              ...animations.map((animation) => ({ text: animation.name, value: animation.name }))
+              { value: '', label: 'Select an Animation' },
+              ...animations.map((animation) => ({ label: animation.name, value: animation.name }))
             ]}
             value={payload.animation}
             onChange={handleChangeAnimation}
           />
         </div>
         <div className="field">
-          <label>Play Mode</label>
-          <SelectField
+          <Dropdown
+            label="Play Mode"
             value={payload.loop ? PLAY_MODE.LOOP : PLAY_MODE.PLAY_ONCE}
             options={playModeOptions}
             onChange={handleChangePlayMode}

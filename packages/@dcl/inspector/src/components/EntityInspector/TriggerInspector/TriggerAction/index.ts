@@ -1,2 +1,2 @@
-import { TriggerActionContainer } from './TriggerAction'
+import TriggerActionContainer from './TriggerAction'
 export { TriggerActionContainer }

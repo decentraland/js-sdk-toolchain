@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { ActionPayload, ActionType } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 
-import { Dropdown } from '../../../Dropdown'
+import { Dropdown } from '../../../ui/Dropdown'
 import type { Props } from './types'
 
 import './SetVisibilityAction.css'
@@ -44,8 +44,8 @@ const SetVisibilityAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
           <label>Select Visibility</label>
           <Dropdown
             options={[
-              { value: 'true', text: 'Visible' },
-              { value: 'false', text: 'Invisible' }
+              { value: 'true', label: 'Visible' },
+              { value: 'false', label: 'Invisible' }
             ]}
             value={(payload.visible ?? true).toString()}
             onChange={handleSetVisible}
@@ -57,8 +57,8 @@ const SetVisibilityAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
           <label>Select Physics Collider</label>
           <Dropdown
             options={[
-              { value: 'true', text: 'Enabled' },
-              { value: 'false', text: 'Disabled' }
+              { value: 'true', label: 'Enabled' },
+              { value: 'false', label: 'Disabled' }
             ]}
             value={(payload.physicsCollider ?? false).toString()}
             onChange={handleChangeCollider}

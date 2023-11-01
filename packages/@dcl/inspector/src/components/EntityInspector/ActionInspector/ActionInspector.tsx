@@ -29,8 +29,7 @@ import { getAssetByModel } from '../../../lib/logic/catalog'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
 import { ContextMenu } from '../../ContexMenu'
-import { Dropdown } from '../../Dropdown'
-import { TextField } from '../../ui/TextField'
+import { Dropdown, TextField } from '../../ui'
 import MoreOptionsMenu from '../MoreOptionsMenu'
 import { AddButton } from '../AddButton'
 import { Button } from '../../Button'
@@ -360,8 +359,8 @@ export default withSdk<Props>(
                 <label>Select State</label>
                 <Dropdown
                   options={[
-                    { value: '', text: 'Select a State' },
-                    ...states.map((state) => ({ text: state, value: state }))
+                    { value: '', label: 'Select a State' },
+                    ...states.map((state) => ({ label: state, value: state }))
                   ]}
                   value={getPartialPayload<ActionType.SET_STATE>(action)?.state}
                   onChange={(e) => handleChangeState(e, idx)}
@@ -415,11 +414,11 @@ export default withSdk<Props>(
                 <label>Select Anchor Point</label>
                 <Dropdown
                   options={[
-                    { value: '', text: 'Select an Anchor Point' },
-                    { value: AvatarAnchorPointType.AAPT_RIGHT_HAND, text: 'Right Hand' },
-                    { value: AvatarAnchorPointType.AAPT_LEFT_HAND, text: 'Left Hand' },
-                    { value: AvatarAnchorPointType.AAPT_NAME_TAG, text: 'Name Tag' },
-                    { value: AvatarAnchorPointType.AAPT_POSITION, text: 'Avatar Position' }
+                    { value: '', label: 'Select an Anchor Point' },
+                    { value: AvatarAnchorPointType.AAPT_RIGHT_HAND, label: 'Right Hand' },
+                    { value: AvatarAnchorPointType.AAPT_LEFT_HAND, label: 'Left Hand' },
+                    { value: AvatarAnchorPointType.AAPT_NAME_TAG, label: 'Name Tag' },
+                    { value: AvatarAnchorPointType.AAPT_POSITION, label: 'Avatar Position' }
                   ]}
                   value={getPartialPayload<ActionType.ATTACH_TO_PLAYER>(action)?.anchorPointId}
                   onChange={(e) => handleChangeAnchorPoint(e, idx)}
@@ -470,9 +469,9 @@ export default withSdk<Props>(
                   label={'Select Action'}
                   disabled={availableActions.length === 0}
                   options={[
-                    { text: 'Select an Action', value: '' },
+                    { label: 'Select an Action', value: '' },
                     ...availableActions.map((availableAction) => ({
-                      text: ActionMapOption[availableAction],
+                      label: ActionMapOption[availableAction],
                       value: availableAction
                     }))
                   ]}

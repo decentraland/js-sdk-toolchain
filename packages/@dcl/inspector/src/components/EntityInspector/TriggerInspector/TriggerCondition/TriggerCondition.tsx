@@ -1,17 +1,18 @@
 /* eslint-disable no-console */
 import React, { useCallback, useEffect } from 'react'
 import { VscTrash as RemoveIcon } from 'react-icons/vsc'
+import { Entity } from '@dcl/ecs'
 import { TriggerCondition, TriggerConditionOperation, TriggerConditionType } from '@dcl/asset-packs'
 import { useArrayState } from '../../../../hooks/useArrayState'
+import { useSdk } from '../../../../hooks/sdk/useSdk'
+import { Component } from '../../../../lib/sdk/components'
 import { Button } from '../../../Button'
-import { Dropdown } from '../../../Dropdown'
 import { AddButton } from '../../AddButton'
 import MoreOptionsMenu from '../../MoreOptionsMenu'
+import { Dropdown, EntityField, TextField } from '../../../ui'
+import { counterConditionTypeOptions, statesConditionTypeOptions } from '../TriggerInspector'
 import type { Props } from './types'
 import './TriggerCondition.css'
-import { TextField } from '../../../ui/TextField'
-import { Entity } from '@dcl/ecs'
-import { counterConditionTypeOptions, statesConditionTypeOptions } from '../TriggerInspector'
 
 const SEPARATOR = '::'
 
@@ -22,12 +23,13 @@ export const TriggerConditionContainer = ({
   onChangeOperation,
   onUpdateConditions
 }: Props) => {
+  const sdk = useSdk()
   const [conditions, addCondition, modifyCondition, removeCondition] = useArrayState<TriggerCondition>(
     trigger.conditions as TriggerCondition[]
   )
   const conditionOperation = [
-    { value: TriggerConditionOperation.AND, text: 'All Conditions should be Met (AND)' },
-    { value: TriggerConditionOperation.OR, text: 'Any Condition can be Met (OR)' }
+    { value: TriggerConditionOperation.AND, label: 'All Conditions should be Met (AND)' },
+    { value: TriggerConditionOperation.OR, label: 'Any Condition can be Met (OR)' }
   ]
 
   useEffect(() => {
@@ -96,8 +98,8 @@ export const TriggerConditionContainer = ({
         <div className="TriggerOperation">
           <Dropdown
             options={[
-              { value: '', text: 'Select an operation type' },
-              ...Array.from(conditionOperation).map(({ value, text }) => ({ value, text }))
+              { value: '', label: 'Select an operation type' },
+              ...Array.from(conditionOperation).map(({ value, label }) => ({ value, label }))
             ]}
             value={trigger.operation}
             onChange={onChangeOperation}
@@ -115,14 +117,10 @@ export const TriggerConditionContainer = ({
             }
           }
         }
-        const entityOptions = Array.from(availableConditions).map(([entityId, { name }]) => ({
-          value: entityId,
-          text: name
-        }))
         const conditionOptions = (entity && availableConditions.get(entity)?.conditions) || []
         const stateOptions = ((condition.id && availableStates.get(condition.id)?.states) || []).map((state) => ({
           value: state,
-          text: state
+          label: state
         }))
         const isDisabled = conditionOptions.length === 0
         const isStatesCondition = statesConditionTypeOptions.some(($) => $.value === condition.type)
@@ -130,15 +128,15 @@ export const TriggerConditionContainer = ({
         return (
           <div className="TriggerCondition" key={`trigger-condition-${idx}`}>
             <div className="Fields">
-              <Dropdown
-                options={entityOptions ? [{ value: '', text: 'Select an Entity' }, ...entityOptions] : []}
+              <EntityField
+                components={[sdk?.components.States, sdk?.components.Counter] as Component[]}
                 value={entity}
                 onChange={(e) => handleChangeEntity(e, idx)}
               />
               <Dropdown
                 disabled={isDisabled}
                 options={conditionOptions.map(({ text, value }) => ({
-                  text,
+                  label: text,
                   value: [value.id, value.type].join(SEPARATOR)
                 }))}
                 value={type}
@@ -147,7 +145,7 @@ export const TriggerConditionContainer = ({
               {isStatesCondition && (
                 <Dropdown
                   disabled={isDisabled}
-                  options={stateOptions.length > 0 ? [{ value: '', text: 'Select state' }, ...stateOptions] : []}
+                  options={stateOptions.length > 0 ? [{ value: '', label: 'Select state' }, ...stateOptions] : []}
                   value={condition.value}
                   onChange={(e) => handleChangeSelectValue(e, idx)}
                 />
