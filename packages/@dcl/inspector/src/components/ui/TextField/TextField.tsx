@@ -33,7 +33,7 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
     if (inputValue !== value) {
       setInputValue(value)
     }
-  }, [value, inputValue])
+  }, [value])
 
   const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = useCallback(
     (event) => {
