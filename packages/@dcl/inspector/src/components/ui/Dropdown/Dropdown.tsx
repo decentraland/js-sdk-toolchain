@@ -8,7 +8,10 @@ import type { Props as OptionProp } from './Option/types'
 import type { Props } from './types'
 import './Dropdown.css'
 
-const FONT_WIDTH = 6.6
+const FONT_WIDTH = 12
+const FONT_WEIGHT = 700
+const WIDTH_CONST = 1200
+const ICON_SIZE = 16
 
 function isOptionSelected(currentValue?: any, optionValue?: any) {
   return currentValue?.toString() === optionValue?.toString()
@@ -93,7 +96,13 @@ const Dropdown: React.FC<Props> = (props) => {
   const minWidth = useMemo(() => {
     if (options.length > 0) {
       return options.reduce((minWidth, option) => {
-        return Math.max(minWidth, (option.label?.length ?? option.value?.toString().length ?? 0) * FONT_WIDTH)
+        const label = option.label ?? option.value?.toString() ?? ''
+        const leftIconWidth = option.leftIcon ? ICON_SIZE + 4 : 0
+        const rightIconWidth = option.rightIcon ? ICON_SIZE + 4 : 0
+        return Math.max(
+          minWidth,
+          (label.length * FONT_WIDTH * FONT_WEIGHT + leftIconWidth + rightIconWidth) / WIDTH_CONST
+        )
       }, 0)
     }
 
@@ -147,7 +156,7 @@ const Dropdown: React.FC<Props> = (props) => {
           </div>
         ) : null}
         <div className="DropIcon">
-          <DownArrowIcon />
+          <DownArrowIcon size={ICON_SIZE} />
         </div>
       </div>
     </div>
