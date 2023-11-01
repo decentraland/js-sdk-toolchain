@@ -5,6 +5,7 @@
   width: 100%;
   padding: 4px 8px;
   color: var(--base-02);
+  cursor: pointer;
 }
 
 .OptionContainer:last-child {
@@ -26,7 +27,6 @@
   align-items: center;
   height: 100%;
   gap: 4px;
-  cursor: pointer;
 }
 
 .OptionContainer .Option {

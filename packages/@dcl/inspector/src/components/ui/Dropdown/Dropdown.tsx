@@ -153,7 +153,7 @@ const Dropdown: React.FC<Props> = (props) => {
                   />
                 ))
             ) : (
-              <Option label={empty} minWidth={minWidth} />
+              <Option label={empty} minWidth={minWidth} disabled />
             )}
           </div>
         ) : null}

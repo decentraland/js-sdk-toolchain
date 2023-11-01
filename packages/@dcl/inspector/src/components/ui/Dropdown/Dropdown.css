@@ -72,6 +72,9 @@
   border-radius: 4px;
   z-index: 5;
   user-select: none;
+  max-height: 132px;
+  overflow-y: auto;
+  cursor: initial;
 }
 .DropdownContainer .Dropdown .DropdownOptions.searchable .DropdownSearch.TextField {
   padding: 0px 7px 6px 7px;
@@ -85,6 +88,6 @@
   .Dropdown
   .DropdownOptions.searchable
   .DropdownSearch.TextField
-  .input-container:not(.hovered):not(.focused) {
+  .InputContainer:not(.hovered):not(.focused) {
   border-color: var(--base-12);
 }
