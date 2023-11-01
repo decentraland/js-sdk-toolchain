@@ -1,0 +1,180 @@
+.RangeFieldContainer {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 6px;
+}
+
+.RangeFieldContainer label {
+  color: var(--sub-text);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.RangeFieldContainer .RangeField {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+}
+
+.RangeFieldContainer .RangeField .RangeInputContainer {
+  position: relative;
+  display: flex;
+  width: 100%;
+  left: 10px;
+}
+
+.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput {
+  width: calc(100% - 20px);
+  appearance: none;
+  position: relative;
+  background-color: transparent;
+}
+
+.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::before,
+.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+}
+
+.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::before {
+  left: -10px;
+  background: var(--accent-blue-04);
+}
+
+.RangeFieldContainer .RangeField.disabled .RangeInputContainer .RangeInput::before {
+  background: var(--base-12);
+}
+
+.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::after {
+  right: -10px;
+  background: var(--base-11);
+}
+
+.RangeFieldContainer .RangeField.disabled .RangeInputContainer .RangeInput::after {
+  background: var(--base-11);
+}
+
+.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::-webkit-slider-runnable-track {
+  height: 10px;
+  appearance: none;
+  margin-top: -1px;
+  background: linear-gradient(
+    90deg,
+    var(--accent-blue-04) var(--completionPercentage, 0%),
+    var(--base-10) var(--completionPercentage, 0%)
+  );
+}
+
+.RangeFieldContainer .RangeField.disabled .RangeInputContainer .RangeInput::-webkit-slider-runnable-track {
+  background: linear-gradient(90deg, var(--base-12) 50%, var(--base-11) 50%);
+}
+
+.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::-moz-range-track {
+  height: 10px;
+  appearance: none;
+  margin-top: -1px;
+  background: linear-gradient(
+    90deg,
+    var(--accent-blue-04) var(--completionPercentage, 0%),
+    var(--base-10) var(--completionPercentage, 0%)
+  );
+}
+
+.RangeFieldContainer .RangeField.disabled .RangeInputContainer .RangeInput::-moz-range-track {
+  background: linear-gradient(90deg, var(--base-12) 50%, var(--base-11) 50%);
+}
+
+.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::-ms-track {
+  height: 10px;
+  appearance: none;
+  margin-top: -1px;
+  background: linear-gradient(
+    90deg,
+    var(--accent-blue-04) var(--completionPercentage, 0%),
+    var(--base-10) var(--completionPercentage, 0%)
+  );
+}
+
+.RangeFieldContainer .RangeField.disabled .RangeInputContainer .RangeInput::-ms-track {
+  background: linear-gradient(90deg, var(--base-12) 50%, var(--base-11) 50%);
+}
+
+.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--accent-blue-04);
+  filter: drop-shadow(0px 2px 16px rgba(0, 0, 0, 0.36));
+  border-radius: 50%;
+  cursor: pointer;
+  top: -5px;
+  position: absolute;
+  left: calc(var(--completionPercentage) - 10px);
+  z-index: 1;
+}
+
+.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput:focus-visible {
+  outline: none;
+}
+
+.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput:focus::-webkit-slider-thumb {
+  border: 1px solid var(--base-01);
+}
+
+.RangeFieldContainer .RangeField.disabled .RangeInputContainer .RangeInput::-webkit-slider-thumb {
+  background: var(--base-12);
+  left: calc(50% - 10px);
+}
+
+.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::-moz-range-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--accent-blue-04);
+  filter: drop-shadow(0px 2px 16px rgba(0, 0, 0, 0.36));
+  border-radius: 50%;
+  cursor: pointer;
+  top: -5px;
+  position: absolute;
+  left: calc(var(--completionPercentage) - 10px);
+  z-index: 1;
+}
+
+.RangeFieldContainer .RangeField.disabled .RangeInputContainer .RangeInput:focus::-moz-range-thumb {
+  border: 1px solid var(--base-01);
+}
+
+.RangeFieldContainer .RangeField.disabled .RangeInputContainer .RangeInput::-moz-range-thumb {
+  background: var(--base-12);
+  left: calc(50% - 10px);
+}
+
+.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::-ms-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--accent-blue-04);
+  filter: drop-shadow(0px 2px 16px rgba(0, 0, 0, 0.36));
+  border-radius: 50%;
+  cursor: pointer;
+  top: -5px;
+  position: absolute;
+  left: calc(var(--completionPercentage) - 10px);
+  z-index: 1;
+}
+
+.RangeFieldContainer .RangeField.disabled .RangeInputContainer .RangeInput:focus::-ms-thumb {
+  border: 1px solid var(--base-01);
+}
+
+.RangeFieldContainer .RangeField.disabled .RangeInputContainer .RangeInput::-ms-thumb {
+  background: var(--base-12);
+  left: calc(50% - 10px);
+}
