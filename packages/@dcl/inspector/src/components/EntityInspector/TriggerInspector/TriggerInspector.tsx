@@ -71,16 +71,13 @@ export default withSdk<Props>(
     const hasCounter = useHasComponent(entityId, Counter)
 
     const areValidActions = useCallback(
-      (updatedActions: TriggerAction[]) =>
-        updatedActions.length > 0 && updatedActions.every((action) => action.id && action.name),
+      (updatedActions: TriggerAction[]) => updatedActions.every((action) => action.id && action.name),
       []
     )
 
     const areValidConditions = useCallback(
-      (updatedConditions: TriggerCondition[] | undefined) =>
-        updatedConditions && updatedConditions.length > 0
-          ? updatedConditions.every((condition) => condition.id && condition.value)
-          : true,
+      (updatedConditions: TriggerCondition[] = []) =>
+        updatedConditions.every((condition) => condition.id && condition.value),
       []
     )
 
