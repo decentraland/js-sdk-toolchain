@@ -1334,6 +1334,11 @@ export type IncludeUndefined<T> = {
 // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
 // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
 // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
 // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
 // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
 // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
@@ -2853,6 +2858,7 @@ export namespace PBUiInput {
 
 // @public (undocumented)
 export interface PBUiInputResult {
+    isSubmit?: boolean | undefined;
     // (undocumented)
     value: string;
 }
@@ -3900,6 +3906,7 @@ export interface UiInputProps extends Omit<PBUiInput, 'font' | 'textAlign'> {
     // (undocumented)
     font?: UiFontType;
     onChange?(value: string): void;
+    onSubmit?(value: string): void;
     // (undocumented)
     textAlign?: TextAlignType;
 }

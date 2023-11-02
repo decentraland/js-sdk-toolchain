@@ -7,7 +7,8 @@ describe('UiInputResult component', () => {
     const UiInputResult = components.UiInputResult(newEngine)
 
     testComponentSerialization(UiInputResult, {
-      value: 'Boedo its carnaval'
+      value: 'Boedo its carnaval',
+      isSubmit: false
     })
   })
 })
