@@ -1,3 +1,7 @@
+.HybridField > .InputContainer:has(.TextField .ErrorMessage) {
+  align-items: flex-start;
+}
+
 .HybridField {
   display: flex;
   flex-direction: column;
@@ -10,11 +14,4 @@
   align-items: center;
   flex-grow: 1;
   gap: 4px;
-}
-
-.HybridField .ErrorMessage {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: var(--error-main);
 }
