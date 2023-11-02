@@ -1,12 +1,11 @@
 {
-  "name": "Hummingbirds",
-  "description": "ECS7 ",
+  "name": "hummingbirds",
+  "description": "SDK7 ",
   "version": "1.0.0",
   "dependencies": {
     "@dcl-sdk/utils": "^1.1.3-20230616162048.commit-15063f2",
     "@dcl/ecs": "file:../../../../packages/@dcl/ecs",
     "@dcl/js-runtime": "file:../../../../packages/@dcl/js-runtime",
-    "@dcl/protocol": "https://sdk-team-cdn.decentraland.org/@dcl/protocol/branch//dcl-protocol-1.0.0-6275575148.commit-562da7d.tgz",
     "@dcl/sdk": "file:../../../../packages/@dcl/sdk",
     "@dcl/sdk-commands": "file:../../../../packages/@dcl/sdk-commands"
   },

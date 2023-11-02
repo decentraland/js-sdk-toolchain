@@ -4,7 +4,6 @@ import {
   MeshRenderer,
   MeshCollider,
   Material,
-  SyncComponents,
   PointerEvents,
   PointerEventType,
   InputAction,
@@ -12,32 +11,27 @@ import {
   inputSystem
 } from '@dcl/ecs'
 import { Color4 } from '@dcl/sdk/math'
-import { NetworkManager } from '@dcl/sdk/network-transport/types'
+import { syncEntity } from './message-bus-sync'
+import { SyncEntities } from './sync-enum'
 
 // Cube factory
 export const Cube = engine.defineComponent('cube', {})
-export function createTriangle(entityFactory: NetworkManager, x: number, y: number, z: number, sync: boolean = true) {
-  const entity = createCube(entityFactory, x, y, z, sync)
+export function createTriangle(x: number, y: number, z: number, sync: boolean = true) {
+  const entity = createCube(x, y, z, sync)
   MeshRenderer.setCylinder(entity, 1, 0)
   MeshCollider.setCylinder(entity, 1, 0)
   return entity
 }
 
-export function createCircle(entityFactory: NetworkManager, x: number, y: number, z: number, sync: boolean = true) {
-  const entity = createCube(entityFactory, x, y, z, sync)
+export function createCircle(x: number, y: number, z: number, sync: boolean = true) {
+  const entity = createCube(x, y, z, sync)
   MeshRenderer.setCylinder(entity, 1, 1)
   MeshCollider.setCylinder(entity, 1, 1)
   return entity
 }
 
-export function createCube(
-  entityFactory: NetworkManager,
-  x: number,
-  y: number,
-  z: number,
-  sync: boolean = true
-): Entity {
-  const entity = entityFactory.addEntity(engine)
+export function createCube(x: number, y: number, z: number, sync: boolean = true, syncId?: number): Entity {
+  const entity = engine.addEntity()
   // Used to track the cubes
   Cube.create(entity)
 
@@ -46,7 +40,9 @@ export function createCube(
   MeshRenderer.setBox(entity)
   MeshCollider.setBox(entity)
 
-  sync && SyncComponents.create(entity, { componentIds: [Material.componentId] })
+  if (sync) {
+    syncEntity(entity, [Material.componentId], syncId)
+  }
 
   PointerEvents.create(entity, {
     pointerEvents: [
@@ -74,17 +70,8 @@ export function changeColorSystem() {
   }
 }
 
-export function createCubes(networkManager: NetworkManager) {
-  for (const [x, y, z] of [
-    [44, 1, 26],
-    [36, 2, 37],
-    [20, 3, 40],
-    [19, 1, 23],
-    [31, 5, 8],
-    [43, 4, 6],
-    [37, 3, 24],
-    [5, 8, 2]
-  ]) {
-    createCube(networkManager, x, y, z)
-  }
+export function createCubes() {
+  createCube(44, 1, 26, true, SyncEntities.CUBE_1)
+  createCube(36, 2, 37, true, SyncEntities.CUBE_2)
+  createCube(20, 3, 40, true, SyncEntities.CUBE_3)
 }

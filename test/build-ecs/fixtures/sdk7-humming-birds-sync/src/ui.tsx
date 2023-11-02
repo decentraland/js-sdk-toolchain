@@ -4,8 +4,7 @@ import ReactEcs, { Button, Label, ReactEcsRenderer, UiEntity } from '@dcl/sdk/re
 import { Bird, BirdKilled } from './hummingBird'
 import { PlayersConnected } from '@dcl/sdk/network-transport'
 import { GameStatus } from '.'
-import { createCircle, createCube, createTriangle } from './create-cube'
-import { addNetworkEntity } from './message-bus-sync'
+import { createCircle, createTriangle } from './create-cube'
 
 let scoreBoard: [string, number][] = []
 let scoreInterval = 0
@@ -130,7 +129,7 @@ export function setupUi(userId: string) {
             uiTransform={{ width: '100%', height: 40 }}
             onMouseDown={() => {
               const { x, y, z } = Transform.get(engine.PlayerEntity).position
-              createCircle(engine, x, y, z, false)
+              createCircle(x, y, z, false)
             }}
           />
           {scoreBoard.map(($) => (
@@ -148,8 +147,7 @@ export function setupUi(userId: string) {
 
 function handleCreateTriangle() {
   const { x, y, z } = Transform.get(engine.PlayerEntity).position
-  const entity = createTriangle(engine, x, y, z)
-  addNetworkEntity(entity)
+  createTriangle(x, y, z)
 }
 
 export function formatAddress(address: string) {

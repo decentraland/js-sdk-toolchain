@@ -20,20 +20,22 @@ import { Quaternion } from '@dcl/sdk/math'
 import * as utils from '@dcl-sdk/utils'
 import { NetworkManager } from '@dcl/sdk/network-transport/types'
 import { gamePaused } from './ui'
-import { addNetworkEntity, myProfile } from './message-bus-sync'
+import { myProfile, syncEntity } from './message-bus-sync'
 
 export const Bird = engine.defineComponent('bird', {})
 
 // TODO: this BirdKilled should be added by the server but its not part of this POC
 export const BirdKilled = engine.defineComponent('bird-killed', { userId: Schemas.String })
 
-export function createHummingBird(networkManager: NetworkManager) {
-  const bird = networkManager.addEntity(engine)
-  addNetworkEntity(bird)
+export function createHummingBird() {
+  const bird = engine.addEntity()
+  syncEntity(bird, [
+    Transform.componentId,
+    Animator.componentId,
+    VisibilityComponent.componentId,
+    BirdKilled.componentId
+  ])
   Bird.create(bird)
-  SyncComponents.create(bird, {
-    componentIds: [Transform.componentId, Animator.componentId, VisibilityComponent.componentId, BirdKilled.componentId]
-  })
   VisibilityComponent.create(bird, { visible: true })
   Transform.create(bird, {
     position: { x: 13, y: 3.5, z: 5 },

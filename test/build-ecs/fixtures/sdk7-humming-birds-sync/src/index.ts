@@ -7,24 +7,23 @@ import {
   InputAction,
   pointerEventsSystem,
   Schemas,
-  SyncComponents,
   Transform
 } from '@dcl/sdk/ecs'
 
 import { createHummingBird, moveHummingBirds, shootBirds } from './hummingBird'
 import { setupUi } from './ui'
 import { getUserData } from '~system/UserIdentity'
-import { NetworkManager } from '@dcl/sdk/network-transport/types'
 import { createMovingPlatforms } from './moving-platforms'
 import { changeColorSystem, createCubes } from './create-cube'
-import { addSyncTransport } from './message-bus-sync'
+import { addSyncTransport, syncEntity } from './message-bus-sync'
+import { SyncEntities } from './sync-enum'
 
 export const GameStatus = engine.defineComponent('game-status', { paused: Schemas.Boolean })
 
-function gameStatusServer(networkManager: NetworkManager) {
-  const gameEntity = networkManager.addEntity(engine)
+function gameStatusServer() {
+  const gameEntity = engine.addEntity()
   GameStatus.create(gameEntity, { paused: false })
-  SyncComponents.create(gameEntity, { componentIds: [GameStatus.componentId] })
+  syncEntity(gameEntity, [GameStatus.componentId], SyncEntities.GAME_STATUS)
 }
 
 export async function main() {
@@ -34,9 +33,9 @@ export async function main() {
   setupUi(userId)
 
   engine.addSystem(moveHummingBirds)
-  gameStatusServer(engine)
-  createMovingPlatforms(engine)
-  createCubes(engine)
+  gameStatusServer()
+  createMovingPlatforms()
+  createCubes()
 
   engine.addSystem(changeColorSystem)
   engine.addSystem(shootBirds(userId))
@@ -104,7 +103,7 @@ export async function main() {
       }
     },
     function () {
-      createHummingBird(engine)
+      createHummingBird()
       const anim = Animator.getMutable(tree)
       anim.states[0].playing = true
       const audioSource = AudioSource.getMutable(tree)
