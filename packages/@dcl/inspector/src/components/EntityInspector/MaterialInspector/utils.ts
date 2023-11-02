@@ -3,7 +3,7 @@ import { MaterialTransparencyMode, PBMaterial } from '@dcl/ecs'
 import { toString } from '../utils'
 import { mapSelectFieldOptions } from '../SelectField/utils'
 import { fromTexture, toTexture } from './Texture/utils'
-import { toColor3, toColor4, toHex } from '../ColorField/utils'
+import { toColor3, toColor4, toHex } from '../../ui/ColorField/utils'
 import { MaterialInput, MaterialType } from './types'
 
 export const fromMaterial =
