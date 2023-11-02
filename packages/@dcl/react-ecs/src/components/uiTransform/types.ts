@@ -65,7 +65,7 @@ export type FlexWrapType = 'wrap' | 'nowrap' | 'wrap-reverse'
 
 /**
  * @public
- * The overflow property controls what happens to content that is too big to fit into an area.
+ * The overflow property controls what happens to content that is too big to fit into an area
  */
 export type OverflowType = 'hidden' | 'scroll' | 'visible'
 
@@ -74,6 +74,12 @@ export type OverflowType = 'hidden' | 'scroll' | 'visible'
  * The position property specifies the type of positioning method used for an element
  */
 export type PositionType = 'absolute' | 'relative'
+
+/**
+ * @public
+ * The pointer filter property determines if the ui element blocks the pointer or not (elements with pointer events always block the pointer regardless of this property)
+ */
+export type PointerFilterType = 'none' | 'block'
 
 /**
  * Layout props to position things in the canvas
@@ -102,10 +108,10 @@ export interface UiTransformProps {
   padding?: Partial<Position> | PositionShorthand
   /** The margin shorthand property sets the margin area on all four sides of an element. */
   margin?: Partial<Position> | PositionShorthand
-  /** The width property specifies the width of an element. */
-  width?: PositionUnit
-  /** The height property specifies the height of an element. */
-  height?: PositionUnit
+  /** The width property specifies the width of an element. Using 'auto' as value makes it adapt to its content. */
+  width?: PositionUnit | 'auto'
+  /** The height property specifies the height of an element. Using 'auto' as value makes it adapt to its content. */
+  height?: PositionUnit | 'auto'
   /** The min-width property sets the minimum width of an element. */
   minWidth?: PositionUnit
   /** The max-width property sets the maximum width of an element. */
@@ -124,4 +130,6 @@ export interface UiTransformProps {
   flexShrink?: number
   /** The overflow property controls what happens to content that is too big to fit into an area */
   overflow?: OverflowType
+  /** The pointer filter property determines if the ui element blocks the pointer or not (elements with pointer events always block the pointer regardless of this property) **/
+  pointerFilter?: PointerFilterType
 }

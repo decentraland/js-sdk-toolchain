@@ -1,7 +1,8 @@
+import { GLTFValidation } from '@babylonjs/loaders'
 import React, { useCallback, useState } from 'react'
 import { HiOutlineUpload } from 'react-icons/hi'
 import { RxCross2, RxReload } from 'react-icons/rx'
-import { IoIosImage } from 'react-icons/io'
+import classNames from 'classnames'
 
 import FileInput from '../FileInput'
 import { Container } from '../Container'
@@ -9,16 +10,14 @@ import { TextField } from '../EntityInspector/TextField'
 import { Block } from '../Block'
 import { Button } from '../Button'
 import { removeBasePath } from '../../lib/logic/remove-base-path'
-
-import { GLTFValidation } from '@babylonjs/loaders'
-
-import './ImportAsset.css'
-import classNames from 'classnames'
-import { DIRECTORY, withAssetDir } from '../../lib/data-layer/host/fs-utils'
-import { importAsset } from '../../redux/data-layer'
+import { DIRECTORY, transformBase64ResourceToBinary, withAssetDir } from '../../lib/data-layer/host/fs-utils'
+import { importAsset, saveThumbnail } from '../../redux/data-layer'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
 import { selectAssetCatalog } from '../../redux/app'
 import { getRandomMnemonic } from './utils'
+import { AssetPreview } from '../AssetPreview'
+
+import './ImportAsset.css'
 
 const ONE_MB_IN_BYTES = 1_048_576
 const ONE_GB_IN_BYTES = ONE_MB_IN_BYTES * 1024
@@ -92,17 +91,19 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
   const files = useAppSelector(selectAssetCatalog)
 
   const [file, setFile] = useState<File>()
+  const [thumbnail, setThumbnail] = useState<string | null>(null)
   const [validationError, setValidationError] = useState<ValidationError>(null)
   const [assetName, setAssetName] = useState<string>('')
   const [assetExtension, setAssetExtension] = useState<string>('')
   const { basePath, assets } = files ?? { basePath: '', assets: [] }
 
-  const handleDrop = async (acceptedFiles: File[]) => {
+  const handleDrop = (acceptedFiles: File[]) => {
     // TODO: handle zip file. GLB with multiple external image references
     const file = acceptedFiles[0]
     if (!file) return
     setFile(file)
     setValidationError(null)
+    setThumbnail(null)
     const normalizedName = file.name.trim().replaceAll(' ', '_').toLowerCase()
     const splitName = normalizedName.split('.')
     const extensionName = splitName.pop()
@@ -127,16 +128,27 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
         return
       }
 
+      const basePath = withAssetDir(DIRECTORY.SCENE)
       const content: Map<string, Uint8Array> = new Map()
-      content.set(assetName + '.' + assetExtension, new Uint8Array(binary))
+      const fullName = assetName + '.' + assetExtension
+      content.set(fullName, new Uint8Array(binary))
 
       dispatch(
         importAsset({
           content,
-          basePath: withAssetDir(DIRECTORY.SCENE),
+          basePath,
           assetPackageName: ''
         })
       )
+
+      if (thumbnail) {
+        dispatch(
+          saveThumbnail({
+            content: transformBase64ResourceToBinary(thumbnail),
+            path: `${DIRECTORY.THUMBNAILS}/${assetName}.png`
+          })
+        )
+      }
       onSave()
     }
     reader.readAsArrayBuffer(file)
@@ -146,6 +158,7 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
     e.stopPropagation()
     setFile(undefined)
     setValidationError(null)
+    setThumbnail(null)
   }
 
   const handleNameChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -170,6 +183,13 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
     setAssetName(name)
   }, [assetName])
 
+  const handleScreenshot = useCallback(
+    (value: string) => {
+      setThumbnail(value)
+    },
+    [file]
+  )
+
   return (
     <div className="ImportAsset">
       <FileInput disabled={!!file} onDrop={handleDrop} accept={ACCEPTED_FILE_TYPES}>
@@ -190,7 +210,7 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
               <div className="remove-icon" onClick={removeFile}>
                 <RxCross2 />
               </div>
-              <IoIosImage />
+              <AssetPreview value={file} onScreenshot={handleScreenshot} />
               <div className="file-title">{file.name}</div>
             </Container>
             <div className={classNames({ error: invalidName })}>

@@ -1347,6 +1347,11 @@ export type IncludeUndefined<T> = {
 // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
 // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
 // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
 // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
 // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
 // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
@@ -2949,6 +2954,7 @@ export namespace PBUiInput {
 
 // @public (undocumented)
 export interface PBUiInputResult {
+    isSubmit?: boolean | undefined;
     // (undocumented)
     value: string;
 }
@@ -3035,6 +3041,7 @@ export interface PBUiTransform {
     paddingTopUnit: YGUnit;
     // (undocumented)
     parent: number;
+    pointerFilter?: PointerFilterMode | undefined;
     // (undocumented)
     positionBottom: number;
     positionBottomUnit: YGUnit;
@@ -3223,6 +3230,17 @@ export const enum PointerEventType {
     // (undocumented)
     PET_UP = 0
 }
+
+// @public (undocumented)
+export const enum PointerFilterMode {
+    // (undocumented)
+    PFM_BLOCK = 1,
+    // (undocumented)
+    PFM_NONE = 0
+}
+
+// @public
+export type PointerFilterType = 'none' | 'block';
 
 // @public (undocumented)
 export const PointerLock: LastWriteWinElementSetComponentDefinition<PBPointerLock>;
@@ -3987,6 +4005,7 @@ export interface UiInputProps extends Omit<PBUiInput, 'font' | 'textAlign'> {
     // (undocumented)
     font?: UiFontType;
     onChange?(value: string): void;
+    onSubmit?(value: string): void;
     // (undocumented)
     textAlign?: TextAlignType;
 }
@@ -4031,7 +4050,7 @@ export interface UiTransformProps {
     flexGrow?: number;
     flexShrink?: number;
     flexWrap?: FlexWrapType;
-    height?: PositionUnit;
+    height?: PositionUnit | 'auto';
     justifyContent?: JustifyType;
     margin?: Partial<Position> | PositionShorthand;
     maxHeight?: PositionUnit;
@@ -4040,9 +4059,10 @@ export interface UiTransformProps {
     minWidth?: PositionUnit;
     overflow?: OverflowType;
     padding?: Partial<Position> | PositionShorthand;
+    pointerFilter?: PointerFilterType;
     position?: Partial<Position> | PositionShorthand;
     positionType?: PositionType;
-    width?: PositionUnit;
+    width?: PositionUnit | 'auto';
 }
 
 // @public (undocumented)

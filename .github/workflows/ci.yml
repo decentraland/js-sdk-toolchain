@@ -165,6 +165,7 @@ jobs:
           provenance: true
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
+          s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/js-runtime'
         env:
           BRANCH_NAME: ${{ github.head_ref }}
@@ -187,6 +188,7 @@ jobs:
           provenance: true
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
+          s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/ecs'
         env:
           BRANCH_NAME: ${{ github.head_ref }}
@@ -221,6 +223,7 @@ jobs:
           provenance: true
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
+          s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/react-ecs'
         env:
           BRANCH_NAME: ${{ github.head_ref }}
@@ -243,6 +246,7 @@ jobs:
           provenance: true
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
+          s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/inspector'
         env:
           BRANCH_NAME: ${{ github.head_ref }}
@@ -279,6 +283,7 @@ jobs:
           provenance: true
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
+          s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
         env:
           BRANCH_NAME: ${{ github.head_ref }}
@@ -322,6 +327,7 @@ jobs:
           provenance: true
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
+          s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
         env:
           BRANCH_NAME: ${{ github.head_ref }}
@@ -350,6 +356,7 @@ jobs:
           provenance: true
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
+          s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
         env:
           BRANCH_NAME: ${{ github.head_ref }}

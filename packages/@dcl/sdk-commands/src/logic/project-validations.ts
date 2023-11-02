@@ -11,7 +11,7 @@ import { getPackageJson } from './project-files'
 
 export type BaseProject = { workingDirectory: string }
 export type SceneProject = { kind: 'scene'; scene: Scene } & BaseProject
-export type WearableProject = { kind: 'wearable'; scene: Scene } & BaseProject
+export type WearableProject = { kind: 'smart-wearable'; scene: Scene } & BaseProject
 export type ProjectUnion = SceneProject | WearableProject
 
 /**
@@ -29,7 +29,7 @@ export async function assertValidProjectFolder(
   switch (true) {
     case await components.fs.fileExists(getSmartWearableFile(workingDirectory)): {
       await getValidWearableJson(components, workingDirectory)
-      return { kind: 'wearable', scene: await getValidSceneJson(components, workingDirectory), workingDirectory }
+      return { kind: 'smart-wearable', scene: await getValidSceneJson(components, workingDirectory), workingDirectory }
     }
 
     case await components.fs.fileExists(getSceneFilePath(workingDirectory)): {

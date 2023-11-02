@@ -6,26 +6,31 @@ export async function getFilesInDirectory(
   files: string[],
   recursive: boolean = true,
   ignore: string[] = [] // This functionality can be extended, now only 'absolute' path can be ignored
-) {
-  const currentDirFiles = await fs.readdir(dirPath)
-  for (const currentPath of currentDirFiles) {
-    if (ignore.includes(currentPath.name)) continue
+): Promise<string[]> {
+  try {
+    const currentDirFiles = await fs.readdir(dirPath)
+    for (const currentPath of currentDirFiles) {
+      if (ignore.includes(currentPath.name)) continue
 
-    const slashIfRequire = (dirPath.length && !dirPath.endsWith('/') && '/') || ''
-    const fullPath = dirPath + slashIfRequire + currentPath.name
+      const slashIfRequire = (dirPath.length && !dirPath.endsWith('/') && '/') || ''
+      const fullPath = dirPath + slashIfRequire + currentPath.name
 
-    if (currentPath.isDirectory && recursive) {
-      await getFilesInDirectory(fs, fullPath, files, recursive)
-    } else {
-      files.push(fullPath)
+      if (currentPath.isDirectory && recursive) {
+        await getFilesInDirectory(fs, fullPath, files, recursive)
+      } else {
+        files.push(fullPath)
+      }
     }
+    return files
+  } catch (_) {
+    return []
   }
-  return files
 }
 
 export const DIRECTORY = {
   ASSETS: 'assets',
-  SCENE: 'scene'
+  SCENE: 'scene',
+  THUMBNAILS: 'thumbnails'
 }
 
 export const EXTENSIONS = ['.glb', '.png', '.composite', '.composite.bin', '.gltf', '.jpg', '.mp3', '.ogg', '.wav']
@@ -41,4 +46,13 @@ export function getFileName(fileName: string, ext: string) {
 
 export function getCurrentCompositePath() {
   return withAssetDir(`${DIRECTORY.SCENE}/main.composite`)
+}
+
+export function transformBinaryToBase64Resource(content: Uint8Array): string {
+  return `data:image/png;base64,${Buffer.from(content).toString('base64')}`
+}
+
+export function transformBase64ResourceToBinary(base64Resource: string): Buffer {
+  const header = 'data:image/png;base64,'
+  return Buffer.from(base64Resource.slice(header.length), 'base64')
 }

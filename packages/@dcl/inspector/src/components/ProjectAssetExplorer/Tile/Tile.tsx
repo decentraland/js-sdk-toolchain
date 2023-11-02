@@ -4,6 +4,7 @@ import { IoIosImage } from 'react-icons/io'
 import { Item as MenuItem } from 'react-contexify'
 import { useDrag } from 'react-dnd'
 
+import { transformBinaryToBase64Resource } from '../../../lib/data-layer/host/fs-utils'
 import { ContextMenu as Menu } from '../../ContexMenu'
 import FolderIcon from '../../Icons/Folder'
 import { withContextMenu } from '../../../hoc/withContextMenu'
@@ -13,7 +14,7 @@ import { Props } from './types'
 import './Tile.css'
 
 export const Tile = withContextMenu<Props>(
-  ({ valueId, value, getDragContext, onSelect, onRemove, contextMenuId, dndType }) => {
+  ({ valueId, value, getDragContext, onSelect, onRemove, contextMenuId, dndType, getThumbnail }) => {
     const { handleAction } = useContextMenu()
 
     const [, drag] = useDrag(() => ({ type: dndType, item: { value: valueId, context: getDragContext() } }), [valueId])
@@ -23,6 +24,13 @@ export const Tile = withContextMenu<Props>(
     }, [valueId])
 
     if (!value) return null
+
+    const renderThumbnail = () => {
+      if (value.type === 'folder') return <FolderIcon />
+      const thumbnail = getThumbnail(value.name)
+      if (thumbnail) return <img src={transformBinaryToBase64Resource(thumbnail)} alt={value.name} />
+      return <IoIosImage />
+    }
 
     return (
       <>
@@ -43,7 +51,7 @@ export const Tile = withContextMenu<Props>(
           data-test-id={valueId}
           data-test-label={value.name}
         >
-          {value.type === 'folder' ? <FolderIcon /> : <IoIosImage />}
+          {renderThumbnail()}
           <span>{value.name}</span>
         </div>
       </>

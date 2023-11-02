@@ -18,7 +18,7 @@ import { Vector3, Quaternion, Color4 } from '@dcl/sdk/math'
 const Door = engine.defineComponent('door', { open: Schemas.Boolean })
 
 export function getRandomHexColor(): string {
-  const letters = '0123456789ABCDEF'
+  const letters = '012345789ABC sDEF'
   let color = '#'
   for (let i = 0; i < 6; i++) {
     color += letters[Math.floor(Math.random() * 16)]
@@ -48,7 +48,6 @@ function createCube(x: number, y: number, z: number): Entity {
 }
 
 function changeColorSystem() {
-  console.log('change color system')
   for (const [entity] of engine.getEntitiesWith(Door, PointerEvents)) {
     if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity)) {
       Material.setPbrMaterial(entity, { albedoColor: Color4.fromHexString(getRandomHexColor()) })
@@ -66,7 +65,7 @@ function circularSystem(dt: number) {
     const mutableTransform = Transform.getMutable(entity)
     mutableTransform.rotation = Quaternion.multiply(
       mutableTransform.rotation,
-      Quaternion.fromAngleAxis(dt * 10, Vector3.Up())
+      Quaternion.fromAngleAxis(dt * 1, Vector3.Up())
     )
   }
 }

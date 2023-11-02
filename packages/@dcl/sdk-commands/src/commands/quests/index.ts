@@ -1,10 +1,11 @@
 import { Result } from 'arg'
 import { isAddress } from 'eth-connect'
 import { validate } from 'uuid'
+import { validateCreateQuest } from '@dcl/quests-client/dist-cjs/utils'
 
 import { declareArgs } from '../../logic/args'
 import { CliComponents } from '../../components'
-import { createQuestByPrompting, executeSubcommand, setUpManager, urlRegex, validateCreateQuest } from './utils'
+import { createQuestByPrompting, executeSubcommand, setUpManager, urlRegex } from './utils'
 import { CreateQuest } from './types'
 import { colors } from '../../components/log'
 import { CliError } from '../../logic/error'

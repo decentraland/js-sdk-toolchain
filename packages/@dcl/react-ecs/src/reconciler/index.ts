@@ -33,8 +33,10 @@ function getPointerEnum(pointerKey: keyof Listeners): PointerEventType {
 }
 
 type OnChangeState<T = string | number> = {
-  fn?: (val?: T) => void
+  onChangeCallback?: (val?: T) => void
+  onSubmitCallback?: (val?: T) => void
   value?: T
+  isSubmit?: boolean
 }
 export function createReconciler(
   engine: Pick<
@@ -121,11 +123,26 @@ export function createReconciler(
     componentName: K
   ) {
     const componentId = getComponentId[componentName]
-    if ('onChange' in props) {
-      const onChange = props['onChange'] as OnChangeState['fn']
-      updateOnChange(instance.entity, componentId, { fn: onChange })
-      delete props['onChange']
+
+    const onChangeExists = 'onChange' in props
+    const onSubmitExists = 'onSubmit' in props
+    const entityState = changeEvents.get(instance.entity)?.get(componentId)
+    const onChange = onChangeExists
+      ? (props['onChange'] as OnChangeState['onChangeCallback'])
+      : entityState?.onChangeCallback
+    const onSubmit = onSubmitExists
+      ? (props['onSubmit'] as OnChangeState['onSubmitCallback'])
+      : entityState?.onSubmitCallback
+
+    if (onChangeExists || onSubmitExists) {
+      updateOnChange(instance.entity, componentId, {
+        onChangeCallback: onChange,
+        onSubmitCallback: onSubmit
+      })
+      delete (props as any).onChange
+      delete (props as any).onSubmit
     }
+
     // We check if there is any key pending to be changed to avoid updating the existing component
     if (!Object.keys(props).length) {
       return
@@ -194,9 +211,11 @@ export function createReconciler(
   function updateOnChange(entity: Entity, componentId: number, state?: OnChangeState) {
     const event = changeEvents.get(entity) || changeEvents.set(entity, new Map()).get(entity)!
     const oldState = event.get(componentId)
-    const fn = state?.fn
+    const onChangeCallback = state?.onChangeCallback
+    const onSubmitCallback = state?.onSubmitCallback
     const value = state?.value ?? oldState?.value
-    event.set(componentId, { fn, value })
+    const isSubmit = state?.isSubmit ?? oldState?.isSubmit
+    event.set(componentId, { onChangeCallback, onSubmitCallback, value, isSubmit })
   }
 
   const hostConfig: HostConfig<
@@ -311,17 +330,23 @@ export function createReconciler(
 
   // Maybe this could be something similar to Input system, but since we
   // are going to use this only here, i prefer to scope it here.
-  function handleOnChange(componentId: number, resultComponent: typeof UiInputResult | typeof UiDropdownResult) {
+  function handleOnChange(componentId: number, resultComponent: typeof UiDropdownResult | typeof UiInputResult) {
     for (const [entity, Result] of engine.getEntitiesWith(resultComponent)) {
       const entityState = changeEvents.get(entity)?.get(componentId)
-      if (entityState?.fn && Result.value !== entityState.value) {
-        // Call onChange callback and update internal timestamp
-        entityState.fn(Result.value)
-        updateOnChange(entity, componentId, {
-          fn: entityState.fn,
-          value: Result.value
-        })
+      const isSubmit = !!(Result as any).isSubmit
+      if (entityState?.onChangeCallback && Result.value !== entityState.value) {
+        entityState.onChangeCallback(Result.value)
       }
+      if (entityState?.onSubmitCallback && isSubmit && !entityState.isSubmit) {
+        entityState.onSubmitCallback(Result.value)
+      }
+
+      updateOnChange(entity, componentId, {
+        onChangeCallback: entityState?.onChangeCallback,
+        onSubmitCallback: entityState?.onSubmitCallback,
+        value: Result.value,
+        isSubmit
+      })
     }
   }
 

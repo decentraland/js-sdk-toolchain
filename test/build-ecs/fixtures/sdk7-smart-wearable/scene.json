@@ -1,0 +1,25 @@
+{
+  "ecs7": true,
+  "runtimeVersion": "7",
+  "isPortableExperience": true,
+  "display": {
+    "title": "SDK7 Smart Wearable",
+    "description": "SDK7 Smart Wearable description here",
+    "navmapThumbnail": "images/thumbnail.png",
+    "favicon": "favicon_asset"
+  },
+  "owner": "",
+  "contact": {
+    "name": "SDK",
+    "email": ""
+  },
+  "main": "bin/game.js",
+  "scene": {
+    "parcels": [
+      "0,0"
+    ],
+    "base": "0,0"
+  },
+  "requiredPermissions": [],
+  "featureToggles": {}
+}
