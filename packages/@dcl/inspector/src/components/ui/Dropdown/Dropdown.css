@@ -24,19 +24,23 @@
 }
 
 .DropdownContainer .Dropdown:hover {
-  border: 1px solid var(--base-09);
+  border-color: var(--base-09);
 }
 
 .DropdownContainer .Dropdown.focused {
-  border: 1px solid var(--base-01);
+  border-color: var(--base-01);
 }
 
 .DropdownContainer .Dropdown.disabled {
   background: var(--base-12);
-  border: 1px solid var(--base-12);
+  border-color: var(--base-12);
   color: var(--base-09);
   cursor: default;
   pointer-events: none;
+}
+
+.DropdownContainer .Dropdown.error {
+  border-color: var(--error-main);
 }
 
 .DropdownContainer .Dropdown .DropIcon {
@@ -56,10 +60,6 @@
   padding: 10px;
 }
 
-.DropdownContainer .Dropdown .DropdownPlaceholder {
-  flex: 1;
-}
-
 .DropdownContainer .Dropdown .DropdownOptions {
   position: absolute;
   display: flex;
@@ -72,6 +72,9 @@
   border-radius: 4px;
   z-index: 5;
   user-select: none;
+  max-height: 132px;
+  overflow-y: auto;
+  cursor: initial;
 }
 .DropdownContainer .Dropdown .DropdownOptions.searchable .DropdownSearch.TextField {
   padding: 0px 7px 6px 7px;
@@ -85,6 +88,6 @@
   .Dropdown
   .DropdownOptions.searchable
   .DropdownSearch.TextField
-  .input-container:not(.hovered):not(.focused) {
+  .InputContainer:not(.hovered):not(.focused) {
   border-color: var(--base-12);
 }

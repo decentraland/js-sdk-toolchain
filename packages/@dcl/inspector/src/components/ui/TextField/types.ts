@@ -1,6 +1,6 @@
 import React from 'react'
 
-export type Props = React.InputHTMLAttributes<HTMLElement> & {
+export type Props = React.InputHTMLAttributes<HTMLInputElement> & {
   drop?: boolean
   type?: 'text' | 'password' | 'email' | 'number'
   label?: React.ReactNode

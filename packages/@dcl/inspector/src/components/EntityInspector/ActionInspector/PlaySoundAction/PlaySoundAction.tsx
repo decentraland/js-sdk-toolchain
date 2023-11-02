@@ -61,7 +61,7 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
   }, [payload, onUpdate])
 
   const handleChangeSrc = useCallback(
-    ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
+    ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
       setPayload({ ...payload, src: addBase(value) })
     },
     [payload, setPayload]
