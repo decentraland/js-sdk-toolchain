@@ -100,8 +100,8 @@ export async function main(options: Options) {
     printWarning(options.components.logger, 'Support for multiple projects is still experimental.')
 
   for (const project of workspace.projects) {
-    if (project.kind === 'wearable') hasSmartWearable = true
-    if (project.kind === 'scene' || project.kind === 'wearable') {
+    if (project.kind === 'smart-wearable') hasSmartWearable = true
+    if (project.kind === 'scene' || project.kind === 'smart-wearable') {
       printCurrentProjectStarting(options.components.logger, project, workspace)
 
       // first run `npm run build`, this can be disabled with --skip-build
@@ -170,7 +170,7 @@ export async function main(options: Options) {
       await wireRouter(components, workspace, dataLayer)
       if (watch) {
         for (const project of workspace.projects) {
-          await wireFileWatcherToWebSockets(components, project.workingDirectory)
+          await wireFileWatcherToWebSockets(components, project.workingDirectory, project.kind)
         }
       }
       await startComponents()
