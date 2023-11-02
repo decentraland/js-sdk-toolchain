@@ -1,14 +1,14 @@
 import { Color4, Color3 } from '@dcl/ecs-math'
 
 export enum Options {
-  PICK,
+  BASICS,
   CUSTOM
 }
 
 export const OPTIONS = [
   {
-    value: Options.PICK,
-    label: 'Pick color'
+    value: Options.BASICS,
+    label: 'Basics'
   },
   {
     value: Options.CUSTOM,

@@ -1,7 +1,8 @@
 .ColorPickerContainer {
   display: flex;
-  gap: 0;
   position: relative;
+  flex-grow: 1;
+  gap: 0;
 }
 
 .ColorPickerContainer > .ColorPickerInput {

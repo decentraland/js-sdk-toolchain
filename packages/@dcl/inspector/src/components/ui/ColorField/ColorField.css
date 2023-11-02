@@ -1,0 +1,19 @@
+.ColorField {
+  display: flex;
+  flex: 1;
+}
+
+.ColorField > .HybridField > .InputContainer > .DropdownContainer:first-of-type {
+  flex-grow: 0;
+  width: 90px;
+}
+
+.ColorField > .HybridField > .InputContainer > *:last-child {
+  flex: 1;
+}
+
+.ColorField .ColorPreview {
+  height: 14px;
+  width: 14px;
+  border-radius: 50%;
+}
