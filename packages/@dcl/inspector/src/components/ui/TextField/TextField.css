@@ -15,7 +15,7 @@
   align-items: center;
   position: relative;
   width: 100%;
-  min-height: 26px;
+  height: 25px;
   padding: 0px;
   background-color: var(--background-gray);
   border-radius: 4px;

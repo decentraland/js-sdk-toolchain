@@ -1,0 +1,20 @@
+.HybridField {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 4px;
+}
+
+.HybridField .InputContainer {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  gap: 4px;
+}
+
+.HybridField .ErrorMessage {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--error-main);
+}
