@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import cx from 'classnames'
-import { IoAlertCircleOutline as AlertIcon } from 'react-icons/io5'
 
 import { ErrorMessage } from '../ErrorMessage'
 
@@ -19,6 +18,7 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
     rightIcon,
     value,
     disabled,
+    leftContent,
     onChange,
     onFocus,
     onBlur,
@@ -76,8 +76,10 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
           <span className="left-icon">{leftIcon}</span>
         </div>
       )
+    } else if (leftContent) {
+      return <div className="left-content">{leftContent}</div>
     }
-  }, [label, leftIcon])
+  }, [label, leftIcon, leftContent])
 
   const renderRightContent = useCallback(() => {
     if (rightLabel) {
