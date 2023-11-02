@@ -8,4 +8,5 @@ export type Props = React.SelectHTMLAttributes<HTMLSelectElement> & {
   label?: string
   value?: string | number | readonly string[]
   searchable?: boolean
+  error?: string | boolean
 }
