@@ -35,6 +35,7 @@
   appearance: none;
   position: relative;
   background-color: transparent;
+  outline: none;
 }
 
 .RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::before,
