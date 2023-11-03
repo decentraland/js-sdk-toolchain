@@ -1,6 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Item } from 'react-contexify'
-import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 import { VscTrash as RemoveIcon } from 'react-icons/vsc'
 import { AvatarAnchorPointType } from '@dcl/ecs'
 import {
@@ -19,7 +17,6 @@ import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { withContextMenu } from '../../../hoc/withContextMenu'
 import { getComponentValue, useComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
-import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { useChange } from '../../../hooks/sdk/useChange'
 import { useArrayState } from '../../../hooks/useArrayState'
 import { analytics, Event } from '../../../lib/logic/analytics'
@@ -28,7 +25,6 @@ import { getAssetByModel } from '../../../lib/logic/catalog'
 
 import { Block } from '../../Block'
 import { Container } from '../../Container'
-import { ContextMenu } from '../../ContexMenu'
 import { Dropdown, TextField } from '../../ui'
 import MoreOptionsMenu from '../MoreOptionsMenu'
 import { AddButton } from '../AddButton'
@@ -61,14 +57,13 @@ const ActionMapOption: Record<string, string> = {
 }
 
 export default withSdk<Props>(
-  withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId, contextMenuId }) => {
+  withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId }) => {
     const { Actions, States, Counter, GltfContainer } = sdk.components
     const [componentValue, setComponentValue, isComponentEqual] = useComponentValue<EditorComponentsTypes['Actions']>(
       entityId,
       Actions
     )
     const entity = sdk.sceneContext.getEntityOrNull(entityId)
-    const { handleAction } = useContextMenu()
     const [actions, addAction, modifyAction, removeAction] = useArrayState<Action>(
       componentValue === null ? [] : componentValue.value
     )
@@ -330,8 +325,7 @@ export default withSdk<Props>(
     )
 
     const handleRemoveAction = useCallback(
-      (e: React.MouseEvent, idx: number) => {
-        e.stopPropagation()
+      (_e: React.MouseEvent, idx: number) => {
         removeAction(idx)
       },
       [removeAction]
@@ -444,13 +438,8 @@ export default withSdk<Props>(
             link="https://docs.decentraland.org/creator/smart-items/#actions"
           />
         }
+        onRemoveContainer={handleRemove}
       >
-        <ContextMenu id={contextMenuId}>
-          <Item id="delete" onClick={handleAction(handleRemove)}>
-            <DeleteIcon /> Delete
-          </Item>
-        </ContextMenu>
-
         {actions.map((action: Action, idx: number) => {
           return (
             <Block key={`action-${idx}`}>

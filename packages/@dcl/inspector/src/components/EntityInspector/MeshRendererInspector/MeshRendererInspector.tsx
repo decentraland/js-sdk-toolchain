@@ -1,13 +1,9 @@
 import { useCallback } from 'react'
-import { Item } from 'react-contexify'
-import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 
-import { ContextMenu as Menu } from '../../ContexMenu'
 import { withContextMenu } from '../../../hoc/withContextMenu'
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
-import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { Block } from '../../Block'
 import { SelectField } from '../SelectField'
 import { TextField } from '../../ui/TextField'
@@ -16,8 +12,7 @@ import { Props, MeshType } from './types'
 import { fromMeshRenderer, toMeshRenderer, isValidInput, SHAPES } from './utils'
 
 export default withSdk<Props>(
-  withContextMenu<WithSdkProps & Props>(({ sdk, entity, contextMenuId }) => {
-    const { handleAction } = useContextMenu()
+  withContextMenu<WithSdkProps & Props>(({ sdk, entity }) => {
     const { MeshRenderer } = sdk.components
 
     const hasMeshRenderer = useHasComponent(entity, MeshRenderer)
@@ -33,12 +28,7 @@ export default withSdk<Props>(
     const mesh = getInputProps('mesh')
 
     return (
-      <Container label="MeshRenderer" className="MeshRenderer">
-        <Menu id={contextMenuId}>
-          <Item id="delete" onClick={handleAction(handleRemove)}>
-            <DeleteIcon /> Delete
-          </Item>
-        </Menu>
+      <Container label="MeshRenderer" className="MeshRenderer" onRemoveContainer={handleRemove}>
         <Block>
           <SelectField label="Shape" options={SHAPES} {...mesh} />
         </Block>

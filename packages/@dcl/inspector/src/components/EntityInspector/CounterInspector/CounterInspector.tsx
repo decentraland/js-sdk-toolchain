@@ -1,10 +1,8 @@
 import { useCallback } from 'react'
-import { Item, Menu } from 'react-contexify'
-import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
+
 import { ComponentName } from '@dcl/asset-packs'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
-import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { getComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { analytics, Event } from '../../../lib/logic/analytics'
 import { getAssetByModel } from '../../../lib/logic/catalog'
@@ -20,13 +18,11 @@ import { Props } from './types'
 import './CounterInspector.css'
 
 export default withSdk<Props>(
-  withContextMenu<WithSdkProps & Props>(({ sdk, entity, contextMenuId }) => {
+  withContextMenu<WithSdkProps & Props>(({ sdk, entity }) => {
     const { Counter, GltfContainer } = sdk.components
 
     const hasCounter = useHasComponent(entity, Counter)
     const { getInputProps } = useComponentInput(entity, Counter, fromCounter, toCounter, isValidInput)
-
-    const { handleAction } = useContextMenu()
 
     const handleRemove = useCallback(async () => {
       sdk.operations.removeComponent(entity, Counter)
@@ -54,12 +50,8 @@ export default withSdk<Props>(
             link="https://docs.decentraland.org/creator/smart-items/#counter"
           />
         }
+        onRemoveContainer={handleRemove}
       >
-        <Menu id={contextMenuId}>
-          <Item id="delete" onClick={handleAction(handleRemove)}>
-            <DeleteIcon /> Delete
-          </Item>
-        </Menu>
         <TextField label="Value" type="number" {...getInputProps('value')} />
       </Container>
     )

@@ -1,13 +1,9 @@
 import { useCallback } from 'react'
-import { Item } from 'react-contexify'
-import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 
-import { ContextMenu as Menu } from '../../ContexMenu'
 import { withContextMenu } from '../../../hoc/withContextMenu'
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
-import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
 import { FileUploadField, Dropdown } from '../../ui'
@@ -19,9 +15,8 @@ import { selectAssetCatalog } from '../../../redux/app'
 import './GltfInspector.css'
 
 export default withSdk<Props>(
-  withContextMenu<WithSdkProps & Props>(({ sdk, entity, contextMenuId }) => {
+  withContextMenu<WithSdkProps & Props>(({ sdk, entity }) => {
     const files = useAppSelector(selectAssetCatalog)
-    const { handleAction } = useContextMenu()
     const { GltfContainer } = sdk.components
 
     const hasGltf = useHasComponent(entity, GltfContainer)
@@ -52,12 +47,7 @@ export default withSdk<Props>(
     if (!hasGltf) return null
 
     return (
-      <Container label="GLTF" className="GltfInspector">
-        <Menu id={contextMenuId}>
-          <Item id="delete" onClick={handleAction(handleRemove)}>
-            <DeleteIcon /> Delete
-          </Item>
-        </Menu>
+      <Container label="GLTF" className="GltfInspector" onRemoveContainer={handleRemove}>
         <Block label="Path">
           <FileUploadField
             {...getInputProps('src')}

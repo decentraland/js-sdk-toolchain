@@ -1,13 +1,9 @@
 import { useCallback, useEffect } from 'react'
-import { Item } from 'react-contexify'
-import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 
-import { ContextMenu as Menu } from '../../ContexMenu'
 import { isValidNumericInput, useComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { withContextMenu } from '../../../hoc/withContextMenu'
-import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 
 import { Props } from './types'
 import { fromTransform, toTransform, fromTransformConfig } from './utils'
@@ -19,7 +15,7 @@ import { Link, Props as LinkProps } from './Link'
 import './TransformInspector.css'
 
 export default withSdk<Props>(
-  withContextMenu<WithSdkProps & Props>(({ sdk, entity, contextMenuId }) => {
+  withContextMenu<WithSdkProps & Props>(({ sdk, entity }) => {
     const { Transform, TransformConfig } = sdk.components
 
     const hasTransform = useHasComponent(entity, Transform)
@@ -38,7 +34,6 @@ export default withSdk<Props>(
       fromTransformConfig,
       fromTransformConfig
     )
-    const { handleAction } = useContextMenu()
 
     useEffect(() => {
       if (!hasTransform) return
@@ -58,12 +53,7 @@ export default withSdk<Props>(
     if (!hasTransform) return null
 
     return (
-      <Container label="Transform" className="Transform">
-        <Menu id={contextMenuId}>
-          <Item id="delete" onClick={handleAction(handleRemove)}>
-            <DeleteIcon /> Delete
-          </Item>
-        </Menu>
+      <Container label="Transform" className="Transform" onRemoveContainer={handleRemove}>
         <Block label="Position">
           <TextField label="X" type="number" {...getInputProps('position.x')} />
           <TextField label="Y" type="number" {...getInputProps('position.y')} />

@@ -1,15 +1,11 @@
 import { useCallback } from 'react'
-import { Item } from 'react-contexify'
 import { useDrop } from 'react-dnd'
-import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 import cx from 'classnames'
 
-import { ContextMenu as Menu } from '../../ContexMenu'
 import { withContextMenu } from '../../../hoc/withContextMenu'
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
-import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { getComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { analytics, Event } from '../../../lib/logic/analytics'
 import { getAssetByModel } from '../../../lib/logic/catalog'
@@ -29,9 +25,8 @@ import './AudioSourceInspector.css'
 const DROP_TYPES = ['project-asset']
 
 export default withSdk<Props>(
-  withContextMenu<WithSdkProps & Props>(({ sdk, entity, contextMenuId }) => {
+  withContextMenu<WithSdkProps & Props>(({ sdk, entity }) => {
     const files = useAppSelector(selectAssetCatalog)
-    const { handleAction } = useContextMenu()
     const { AudioSource, GltfContainer } = sdk.components
 
     const hasAudioSource = useHasComponent(entity, AudioSource)
@@ -92,12 +87,7 @@ export default withSdk<Props>(
     const volume = getInputProps('volume', (e) => e.target.value)
 
     return (
-      <Container label="AudioSource" className={cx('AudioSource', { hover: isHover })}>
-        <Menu id={contextMenuId}>
-          <Item id="delete" onClick={handleAction(handleRemove)}>
-            <DeleteIcon /> Delete
-          </Item>
-        </Menu>
+      <Container label="AudioSource" className={cx('AudioSource', { hover: isHover })} onRemoveContainer={handleRemove}>
         <Block label="Path" ref={drop}>
           <TextField type="text" {...getInputProps('audioClipUrl')} error={files && !isValid} drop={isHover} />
         </Block>

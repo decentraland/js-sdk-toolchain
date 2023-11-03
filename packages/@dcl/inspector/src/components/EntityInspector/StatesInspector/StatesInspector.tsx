@@ -1,11 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Item, Menu } from 'react-contexify'
-import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 import { ComponentName, States } from '@dcl/asset-packs'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { getComponentValue, useComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
-import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { withContextMenu } from '../../../hoc/withContextMenu'
 import { analytics, Event } from '../../../lib/logic/analytics'
 import { getAssetByModel } from '../../../lib/logic/catalog'
@@ -22,7 +19,7 @@ import { getUniqueState, isRepeated, isValidInput } from './utils'
 import './StatesInspector.css'
 
 export default withSdk<Props>(
-  withContextMenu<WithSdkProps & Props>(({ sdk, entity, contextMenuId }) => {
+  withContextMenu<WithSdkProps & Props>(({ sdk, entity }) => {
     const { States, GltfContainer } = sdk.components
 
     const hasStates = useHasComponent(entity, States)
@@ -61,8 +58,6 @@ export default withSdk<Props>(
         defaultValue
       })
     }
-
-    const { handleAction } = useContextMenu()
 
     const handleDelete = useCallback(async () => {
       sdk.operations.removeComponent(entity, States)
@@ -108,12 +103,8 @@ export default withSdk<Props>(
             link="https://docs.decentraland.org/creator/smart-items/#states"
           />
         }
+        onRemoveContainer={handleDelete}
       >
-        <Menu id={contextMenuId}>
-          <Item id="delete" onClick={handleAction(handleDelete)}>
-            <DeleteIcon /> Delete
-          </Item>
-        </Menu>
         {states.value.length > 0 ? (
           <Block label="State Name" className="states-list">
             {input.value.map((state, index) => (

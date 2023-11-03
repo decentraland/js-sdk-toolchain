@@ -1,14 +1,10 @@
 import { useCallback, useEffect } from 'react'
-import { Item } from 'react-contexify'
-import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 import cx from 'classnames'
 import { PBVisibilityComponent, PBGltfContainer } from '@dcl/ecs'
 
-import { ContextMenu as Menu } from '../../ContexMenu'
 import { withContextMenu } from '../../../hoc/withContextMenu'
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
-import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { getComponentValue, useComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { analytics, Event } from '../../../lib/logic/analytics'
 import { getAssetByModel } from '../../../lib/logic/catalog'
@@ -22,9 +18,8 @@ import { Props } from './types'
 import './VisibilityComponentInspector.css'
 
 export default withSdk<Props>(
-  withContextMenu<WithSdkProps & Props>(({ sdk, entity, contextMenuId }) => {
+  withContextMenu<WithSdkProps & Props>(({ sdk, entity }) => {
     const { VisibilityComponent, GltfContainer } = sdk.components
-    const { handleAction } = useContextMenu()
     const hasVisibilityComponent = useHasComponent(entity, VisibilityComponent)
     const [componentValue, setComponentValue, isComponentEqual] = useComponentValue<PBVisibilityComponent>(
       entity,
@@ -102,12 +97,7 @@ export default withSdk<Props>(
     if (!hasVisibilityComponent) return null
 
     return (
-      <Container label="Visibility" className={cx('VisibilityContainer')}>
-        <Menu id={contextMenuId}>
-          <Item id="delete" onClick={handleAction(handleRemove)}>
-            <DeleteIcon /> Delete
-          </Item>
-        </Menu>
+      <Container label="Visibility" className={cx('VisibilityContainer')} onRemoveContainer={handleRemove}>
         <Block>
           <div className="row">
             <div className="field">

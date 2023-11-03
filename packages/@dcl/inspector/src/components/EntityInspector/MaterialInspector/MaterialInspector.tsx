@@ -1,13 +1,9 @@
 import { useCallback } from 'react'
-import { Item } from 'react-contexify'
-import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 
-import { ContextMenu as Menu } from '../../ContexMenu'
 import { withContextMenu } from '../../../hoc/withContextMenu'
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
-import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { useAppSelector } from '../../../redux/hooks'
 import { selectAssetCatalog } from '../../../redux/app'
 import { Block } from '../../Block'
@@ -20,8 +16,7 @@ import { Props, MaterialType, TextureType } from './types'
 import { fromMaterial, toMaterial, isValidMaterial, MATERIAL_TYPES, TRANSPARENCY_MODES } from './utils'
 
 export default withSdk<Props>(
-  withContextMenu<WithSdkProps & Props>(({ sdk, entity, contextMenuId }) => {
-    const { handleAction } = useContextMenu()
+  withContextMenu<WithSdkProps & Props>(({ sdk, entity }) => {
     const files = useAppSelector(selectAssetCatalog)
     const { Material } = sdk.components
 
@@ -46,12 +41,7 @@ export default withSdk<Props>(
     const getTextureProps = getInputProps as TextureProps['getInputProps']
 
     return (
-      <Container label="Material" className="Material">
-        <Menu id={contextMenuId}>
-          <Item id="delete" onClick={handleAction(handleRemove)}>
-            <DeleteIcon /> Delete
-          </Item>
-        </Menu>
+      <Container label="Material" className="Material" onRemoveContainer={handleRemove}>
         <Block label="Material">
           <SelectField label="Type" options={MATERIAL_TYPES} {...materialType} />
         </Block>

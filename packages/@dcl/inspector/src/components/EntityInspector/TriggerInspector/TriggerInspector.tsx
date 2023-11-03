@@ -12,22 +12,18 @@ import {
   TriggerCondition,
   ComponentName
 } from '@dcl/asset-packs'
-import { Item } from 'react-contexify'
-import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { withContextMenu } from '../../../hoc/withContextMenu'
 import { useArrayState } from '../../../hooks/useArrayState'
 import { getComponentValue, useComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
-import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { useEntitiesWith } from '../../../hooks/sdk/useEntitiesWith'
 import { analytics, Event } from '../../../lib/logic/analytics'
 import { getAssetByModel } from '../../../lib/logic/catalog'
 import { EditorComponentsTypes } from '../../../lib/sdk/components'
 
 import { Container } from '../../Container'
-import { ContextMenu } from '../../ContexMenu'
 import { AddButton } from '../AddButton'
 import { InfoTooltip } from '../InfoTooltip'
 
@@ -51,7 +47,7 @@ export const counterConditionTypeOptions = [
 ]
 
 export default withSdk<Props>(
-  withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId, contextMenuId }) => {
+  withContextMenu<Props & WithSdkProps>(({ sdk, entity: entityId }) => {
     const { Actions, Triggers, Name, States, Counter, GltfContainer } = sdk.components
     const entitiesWithAction: Entity[] = useEntitiesWith((components) => components.Actions)
     const entitiesWithStates: Entity[] = useEntitiesWith((components) => components.States)
@@ -60,7 +56,6 @@ export default withSdk<Props>(
       entityId,
       Triggers
     )
-    const { handleAction } = useContextMenu()
 
     const [triggers, addTrigger, modifyTrigger, removeTrigger] = useArrayState<Trigger>(
       componentValue === null ? [] : componentValue.value
@@ -298,12 +293,8 @@ export default withSdk<Props>(
             link="https://docs.decentraland.org/creator/smart-items/#triggers"
           />
         }
+        onRemoveContainer={handleRemove}
       >
-        <ContextMenu id={contextMenuId}>
-          <Item id="delete" onClick={handleAction(handleRemove)}>
-            <DeleteIcon /> Delete
-          </Item>
-        </ContextMenu>
         {triggers.map((trigger: Trigger, triggerIdx: number) => {
           return (
             <TriggerEvent
