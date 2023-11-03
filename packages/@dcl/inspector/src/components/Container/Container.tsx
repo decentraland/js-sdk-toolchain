@@ -37,7 +37,7 @@ const Container: React.FC<React.PropsWithChildren<Props>> = (props) => {
           {Icon}
           <span>{props.label}</span>
           {renderIndicator()}
-          {props.rightContent && <span className="right-content">{props.rightContent}</span>}
+          {props.rightContent && <div className="RightContent">{props.rightContent}</div>}
         </div>
       )}
       {open && <div className="content">{props.children}</div>}

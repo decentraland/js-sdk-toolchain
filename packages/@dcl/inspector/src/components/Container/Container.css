@@ -39,10 +39,11 @@
   color: var(--warning-main);
 }
 
-.Container .title .right-content {
+.Container .title .RightContent {
   display: flex;
   flex-grow: 1;
   justify-content: flex-end;
+  align-items: center;
 }
 
 .Container.open > .title {
@@ -57,4 +58,8 @@
 
 .Container .content .Container:last-of-type {
   border: none;
+}
+
+.Container > .title > .RightContent > .MoreOptionsMenu > .MoreOptionsContent {
+  min-width: 175px;
 }
