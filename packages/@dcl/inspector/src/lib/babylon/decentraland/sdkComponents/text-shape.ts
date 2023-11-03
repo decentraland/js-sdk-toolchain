@@ -5,7 +5,7 @@ import { PBTextShape, ComponentType } from '@dcl/ecs'
 import type { ComponentOperation } from '../component-operations'
 import { EcsEntity } from '../EcsEntity'
 import { FONTS, TEXT_ALIGN_MODES } from '../../../../components/EntityInspector/TextShapeInspector/utils'
-import { toHex } from '../../../../components/EntityInspector/ColorField/utils'
+import { toHex } from '../../../../components/ui/ColorField/utils'
 
 const ratio = 33
 

@@ -10,4 +10,5 @@ export type Props = React.InputHTMLAttributes<HTMLInputElement> & {
   error?: string | boolean
   className?: string
   disabled?: boolean
+  leftContent?: React.ReactNode
 }

@@ -11,10 +11,9 @@ import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
 import { SelectField } from '../SelectField'
-import { TextField, CheckboxField } from '../../ui'
+import { TextField, CheckboxField, ColorField } from '../../ui'
 import { Props } from './types'
 import { fromTextShape, toTextShape, isValidInput, FONTS, TEXT_ALIGN_MODES } from './utils'
-import { ColorField } from '../ColorField'
 
 export default withSdk<Props>(
   withContextMenu<WithSdkProps & Props>(({ sdk, entity, contextMenuId }) => {

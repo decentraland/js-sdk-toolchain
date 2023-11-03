@@ -1,19 +1,27 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import cx from 'classnames'
-import { IoAlertCircleOutline as AlertIcon } from 'react-icons/io5'
 
 import { Dropdown } from '../Dropdown'
 import { TextField } from '../TextField'
-
-import type { Props, Field } from './types'
+import { ErrorMessage } from '../ErrorMessage'
+import { ColorPicker } from '../ColorPicker'
+import type { Props as TextFieldProps } from '../TextField/types'
+import { type Props, type Field, FieldType } from './types'
 
 import './HybridField.css'
-import { isErrorMessage } from '../utils'
+
+function isSecondaryValueTextFieldProp(value?: Field['secondaryValue']): value is TextFieldProps {
+  if (value && typeof value === 'object' && 'value' in value) {
+    return true
+  }
+
+  return false
+}
 
 const HybridField: React.FC<Props> = ({
   options,
   placeholder,
-  secondaryOptions,
+  secondaryOptions = [],
   value,
   secondaryValue,
   secondaryPlaceholder,
@@ -24,45 +32,37 @@ const HybridField: React.FC<Props> = ({
   secondaryError,
   disabled,
   secondaryDisabled,
-  onChange
+  secondaryType = FieldType.DROPDOWN,
+  onChange,
+  onChangeSecondary
 }) => {
-  const [fieldValue, setFieldValue] = useState<Field>({ mainValue: value ?? '', secondaryValue: secondaryValue ?? '' })
+  const [fieldMainValue, setMainValue] = useState<Field['mainValue']>(value ?? '')
+  const [fieldSecondaryValue, setSecondaryValue] = useState<Field['secondaryValue']>(secondaryValue ?? '')
 
   useEffect(() => {
-    if (value !== fieldValue.mainValue || secondaryValue !== fieldValue.secondaryValue) {
-      let newValue = { ...fieldValue }
-      if (value !== undefined) {
-        newValue = { ...newValue, mainValue: value }
-      }
-      if (secondaryValue !== undefined) {
-        newValue = { ...newValue, secondaryValue }
-      }
-      setFieldValue(newValue)
+    if (value !== fieldMainValue) {
+      setMainValue(value)
+    }
+
+    if (secondaryValue !== fieldSecondaryValue) {
+      setSecondaryValue(secondaryValue)
     }
   }, [value, secondaryValue])
 
   const handleChangeMainOption = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const newValue = {
-        ...fieldValue,
-        mainValue: e.target.value
-      }
-      setFieldValue(newValue)
-      onChange && onChange(newValue)
+      setMainValue(e.target.value)
+      onChange && onChange(e)
     },
-    [fieldValue, setFieldValue, onChange]
+    [setMainValue, onChange]
   )
 
   const handleChangeSecondaryOption = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement> | React.FocusEvent<HTMLInputElement>) => {
-      const newValue = {
-        ...fieldValue,
-        secondaryValue: e.target.value
-      }
-      setFieldValue(newValue)
-      onChange && onChange(newValue)
+    (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement> | React.FocusEvent<HTMLInputElement>) => {
+      setSecondaryValue(e.target.value)
+      onChangeSecondary && onChangeSecondary(e)
     },
-    [fieldValue, setFieldValue, onChange]
+    [setSecondaryValue, onChangeSecondary]
   )
 
   return (
@@ -70,17 +70,24 @@ const HybridField: React.FC<Props> = ({
       <div className="InputContainer">
         <Dropdown
           options={options}
-          value={fieldValue.mainValue}
+          value={fieldMainValue}
           placeholder={placeholder}
           onChange={handleChangeMainOption}
           error={!!error}
           disabled={disabled}
         />
-        {secondaryOptions ? (
+        {secondaryType === FieldType.DROPDOWN ? (
           <Dropdown
             placeholder={secondaryPlaceholder}
             options={secondaryOptions}
-            value={fieldValue.secondaryValue}
+            value={fieldSecondaryValue as React.OptionHTMLAttributes<HTMLElement>['value']}
+            onChange={handleChangeSecondaryOption}
+            error={!!secondaryError}
+            disabled={secondaryDisabled}
+          />
+        ) : secondaryType === FieldType.COLOR_PICKER ? (
+          <ColorPicker
+            value={fieldSecondaryValue as HTMLInputElement['value']}
             onChange={handleChangeSecondaryOption}
             error={!!secondaryError}
             disabled={secondaryDisabled}
@@ -88,21 +95,18 @@ const HybridField: React.FC<Props> = ({
         ) : (
           <TextField
             placeholder={secondaryPlaceholder}
-            value={fieldValue.secondaryValue}
-            onBlur={handleChangeSecondaryOption}
             leftIcon={leftIcon}
             rightIcon={rightIcon}
+            {...(isSecondaryValueTextFieldProp(fieldSecondaryValue)
+              ? fieldSecondaryValue
+              : { value: fieldSecondaryValue })}
+            onBlur={handleChangeSecondaryOption}
             error={!!secondaryError}
             disabled={secondaryDisabled}
           />
         )}
       </div>
-      {isErrorMessage(error ?? secondaryError) && (
-        <p className="ErrorMessage">
-          <AlertIcon />
-          <span>{error ?? secondaryError}</span>
-        </p>
-      )}
+      <ErrorMessage error={error ?? secondaryError} />
     </div>
   )
 }

@@ -11,5 +11,6 @@ export type Props = {
   className?: string
   header?: string
   minWidth?: number
+  leftContent?: React.ReactNode
   onClick?: (event: any, value: any) => void
 }

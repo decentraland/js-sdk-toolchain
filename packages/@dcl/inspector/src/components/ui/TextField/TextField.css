@@ -1,4 +1,4 @@
-.Block .content:has(.TextField .error-message) {
+.Block .content:has(.TextField .ErrorMessage) {
   align-items: baseline;
 }
 

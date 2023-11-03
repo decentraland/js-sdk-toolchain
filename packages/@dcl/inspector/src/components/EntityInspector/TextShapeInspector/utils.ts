@@ -1,8 +1,8 @@
 import { PBTextShape, Font, TextAlignMode } from '@dcl/ecs'
 
+import { toColor3, toColor4, toHex } from '../../ui/ColorField/utils'
 import { toString } from '../utils'
 import { TextShapeInput } from './types'
-import { toColor3, toColor4, toHex } from '../ColorField/utils'
 
 const toNumber = (value: string, min?: number) => {
   const num = Number(value) || 0
