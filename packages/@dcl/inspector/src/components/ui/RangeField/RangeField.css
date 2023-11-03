@@ -1,3 +1,7 @@
+:root {
+  --slider-track-height: 8px;
+}
+
 .RangeFieldContainer {
   display: flex;
   flex-direction: column;
@@ -23,28 +27,29 @@
   position: relative;
   display: flex;
   width: 100%;
-  left: 10px;
+  left: 5px;
 }
 
 .RangeFieldContainer .RangeField .RangeInputContainer .RangeInput {
-  width: calc(100% - 20px);
+  width: calc(100% - 15px);
   appearance: none;
   position: relative;
   background-color: transparent;
+  outline: none;
 }
 
 .RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::before,
 .RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::after {
   content: '';
   position: absolute;
-  top: -3px;
-  width: 15px;
-  height: 15px;
+  top: -1px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
 }
 
 .RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::before {
-  left: -10px;
+  left: -5px;
   background: var(--accent-blue-04);
 }
 
@@ -53,7 +58,7 @@
 }
 
 .RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::after {
-  right: -10px;
+  right: -5px;
   background: var(--base-11);
 }
 
@@ -62,9 +67,8 @@
 }
 
 .RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::-webkit-slider-runnable-track {
-  height: 10px;
+  height: var(--slider-track-height);
   appearance: none;
-  margin-top: -1px;
   background: linear-gradient(
     90deg,
     var(--accent-blue-04) var(--completionPercentage, 0%),
@@ -77,7 +81,7 @@
 }
 
 .RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::-moz-range-track {
-  height: 10px;
+  height: var(--slider-track-height);
   appearance: none;
   margin-top: -1px;
   background: linear-gradient(
@@ -92,7 +96,7 @@
 }
 
 .RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::-ms-track {
-  height: 10px;
+  height: var(--slider-track-height);
   appearance: none;
   margin-top: -1px;
   background: linear-gradient(
@@ -111,10 +115,9 @@
   width: 20px;
   height: 20px;
   background: var(--accent-blue-04);
-  filter: drop-shadow(0px 2px 16px rgba(0, 0, 0, 0.36));
   border-radius: 50%;
   cursor: pointer;
-  top: -5px;
+  top: -6px;
   position: absolute;
   left: calc(var(--completionPercentage) - 10px);
   z-index: 1;
@@ -131,6 +134,7 @@
 .RangeFieldContainer .RangeField.disabled .RangeInputContainer .RangeInput::-webkit-slider-thumb {
   background: var(--base-12);
   left: calc(50% - 10px);
+  cursor: default;
 }
 
 .RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::-moz-range-thumb {
@@ -138,10 +142,9 @@
   width: 20px;
   height: 20px;
   background: var(--accent-blue-04);
-  filter: drop-shadow(0px 2px 16px rgba(0, 0, 0, 0.36));
   border-radius: 50%;
   cursor: pointer;
-  top: -5px;
+  top: -6px;
   position: absolute;
   left: calc(var(--completionPercentage) - 10px);
   z-index: 1;
@@ -154,6 +157,7 @@
 .RangeFieldContainer .RangeField.disabled .RangeInputContainer .RangeInput::-moz-range-thumb {
   background: var(--base-12);
   left: calc(50% - 10px);
+  cursor: default;
 }
 
 .RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::-ms-thumb {
@@ -161,10 +165,9 @@
   width: 20px;
   height: 20px;
   background: var(--accent-blue-04);
-  filter: drop-shadow(0px 2px 16px rgba(0, 0, 0, 0.36));
   border-radius: 50%;
   cursor: pointer;
-  top: -5px;
+  top: -6px;
   position: absolute;
   left: calc(var(--completionPercentage) - 10px);
   z-index: 1;
@@ -177,4 +180,9 @@
 .RangeFieldContainer .RangeField.disabled .RangeInputContainer .RangeInput::-ms-thumb {
   background: var(--base-12);
   left: calc(50% - 10px);
+  cursor: default;
+}
+
+.RangeFieldContainer .RangeField .RangeTextInput {
+  width: 50px;
 }
