@@ -15,7 +15,7 @@ import { SelectField } from '../SelectField'
 import { TextField, CheckboxField } from '../../ui'
 import { Container } from '../../Container'
 import { Texture, Props as TextureProps } from './Texture'
-import { ColorField } from '../ColorField'
+import { ColorField } from '../../ui/ColorField'
 import { Props, MaterialType, TextureType } from './types'
 import { fromMaterial, toMaterial, isValidMaterial, MATERIAL_TYPES, TRANSPARENCY_MODES } from './utils'
 

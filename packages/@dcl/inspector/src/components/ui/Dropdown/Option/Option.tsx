@@ -13,6 +13,7 @@ const Option: React.FC<Props> = (props) => {
     header,
     label,
     leftIcon,
+    leftContent,
     minWidth,
     rightIcon,
     secondaryText,
@@ -28,8 +29,10 @@ const Option: React.FC<Props> = (props) => {
           <span className="LeftIcon">{leftIcon}</span>
         </div>
       )
+    } else if (leftContent) {
+      return <div className="LeftContent">{leftContent}</div>
     }
-  }, [leftIcon])
+  }, [leftIcon, leftContent])
 
   const renderRightContent = useCallback(() => {
     if (error) {
