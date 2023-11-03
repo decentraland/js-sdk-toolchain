@@ -108,8 +108,6 @@ const Dropdown: React.FC<Props> = (props) => {
         )
       }, 0)
     }
-
-    return ((empty?.length ?? 0) * FONT_WIDTH * FONT_WEIGHT) / EMPTY_WIDTH_CONST
   }, [options, empty])
 
   return (
@@ -153,7 +151,7 @@ const Dropdown: React.FC<Props> = (props) => {
                   />
                 ))
             ) : (
-              <Option label={empty} minWidth={minWidth} disabled />
+              <Option className="DropdownEmptyOption" label={empty} disabled />
             )}
           </div>
         ) : null}
