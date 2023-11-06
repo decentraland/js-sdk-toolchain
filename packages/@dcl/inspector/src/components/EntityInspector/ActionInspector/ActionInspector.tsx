@@ -434,6 +434,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
         <InfoTooltip
           text="Actions list the capabilities of entities, from playing animations to changing visibility. Customize or add new actions, which are activated by triggers."
           link="https://docs.decentraland.org/creator/smart-items/#actions"
+          type="help"
         />
       }
       onRemoveContainer={handleRemove}

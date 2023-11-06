@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDrop } from 'react-dnd'
-import { VscQuestion as QuestionIcon } from 'react-icons/vsc'
-import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
 import { ActionPayload, ActionType } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 
@@ -11,7 +9,7 @@ import { useAppSelector } from '../../../../redux/hooks'
 import { selectAssetCatalog } from '../../../../redux/app'
 
 import { isAudio, isValidVolume, volumeToAudioSource, volumeFromAudioSource } from '../../AudioSourceInspector/utils'
-import { Dropdown, TextField, RangeField } from '../../../ui'
+import { Dropdown, TextField, RangeField, InfoTooltip } from '../../../ui'
 
 import { isValid } from './utils'
 import type { Props } from './types'
@@ -116,13 +114,10 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
 
   const renderPathInfo = () => {
     return (
-      <Popup
-        content={<>You can drag and drop an audio file from the Local Assets</>}
-        trigger={<QuestionIcon size={16} />}
+      <InfoTooltip
+        text="You can drag and drop an audio file from the Local Assets"
+        type="help"
         position="right center"
-        on="hover"
-        hideOnScroll
-        hoverable
       />
     )
   }

@@ -45,6 +45,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
         <InfoTooltip
           text="Counter tracks numerical values that change based on player actions. Use it for conditional logic and to trigger actions when reaching certain values."
           link="https://docs.decentraland.org/creator/smart-items/#counter"
+          type="help"
         />
       }
       onRemoveContainer={handleRemove}

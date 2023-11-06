@@ -98,6 +98,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
         <InfoTooltip
           text="States specify the status of entities. Use triggers to check or change states, and set actions accordingly."
           link="https://docs.decentraland.org/creator/smart-items/#states"
+          type="help"
         />
       }
       onRemoveContainer={handleDelete}

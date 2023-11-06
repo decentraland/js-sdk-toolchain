@@ -63,7 +63,7 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
     }
 
     if (typeof moreInfo === 'string') {
-      return <InfoTooltip text={moreInfo} position="top center" trigger={<InfoIcon size={16} />} />
+      return <InfoTooltip text={moreInfo} position="top center" />
     }
 
     return moreInfo
