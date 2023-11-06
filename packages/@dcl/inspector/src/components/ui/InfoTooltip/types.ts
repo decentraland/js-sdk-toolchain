@@ -4,4 +4,5 @@ export type Props = {
   text: React.ReactNode
   link?: string
   trigger?: React.ReactNode
+  type?: 'info' | 'help' | 'warning' | 'error'
 } & PopupProps
