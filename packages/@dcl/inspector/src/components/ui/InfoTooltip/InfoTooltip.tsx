@@ -55,7 +55,6 @@ export default memo<Props>(({ text, link, trigger, type = 'info', onOpen, onClos
       }
       position="right center"
       on="hover"
-      open={true}
       hideOnScroll
       hoverable
       onOpen={handleOpen}

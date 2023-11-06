@@ -113,13 +113,7 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
   }, [files, payload])
 
   const renderPathInfo = () => {
-    return (
-      <InfoTooltip
-        text="You can drag and drop an audio file from the Local Assets"
-        type="help"
-        position="right center"
-      />
-    )
+    return <InfoTooltip text="You can drag and drop an audio file from the Local Assets" position="right center" />
   }
 
   return (
