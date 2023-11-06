@@ -1,4 +1,5 @@
-import { memo, useCallback } from 'react'
+import { memo, useCallback, useState } from 'react'
+import cx from 'classnames'
 import { VscQuestion as QuestionIcon } from 'react-icons/vsc'
 import { AiOutlineInfoCircle as InfoIcon } from 'react-icons/ai'
 import { FiAlertTriangle as WarningIcon } from 'react-icons/fi'
@@ -6,7 +7,25 @@ import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
 import { Props } from './types'
 import './InfoTooltip.css'
 
-export default memo<Props>(({ text, link, trigger, type = 'info', ...rest }) => {
+export default memo<Props>(({ text, link, trigger, type = 'info', onOpen, onClose, ...rest }) => {
+  const [isHovered, setIsHovered] = useState(false)
+
+  const handleOpen = useCallback(
+    (event: React.MouseEvent<HTMLElement>, data: Props['data']) => {
+      setIsHovered(true)
+      onOpen && onOpen(event, data)
+    },
+    [setIsHovered, onOpen]
+  )
+
+  const handleClose = useCallback(
+    (event: React.MouseEvent<HTMLElement>, data: Props['data']) => {
+      setIsHovered(false)
+      onClose && onClose(event, data)
+    },
+    [setIsHovered, onClose]
+  )
+
   const renderIconTrigger = useCallback(() => {
     switch (type) {
       case 'info':
@@ -31,11 +50,16 @@ export default memo<Props>(({ text, link, trigger, type = 'info', ...rest }) => 
           ) : null}
         </>
       }
-      trigger={trigger ?? renderIconTrigger()}
+      trigger={
+        <span className={cx('InfoTooltipTrigger', { hovered: isHovered })}>{trigger ?? renderIconTrigger()}</span>
+      }
       position="right center"
       on="hover"
+      open={true}
       hideOnScroll
       hoverable
+      onOpen={handleOpen}
+      onClose={handleClose}
       {...rest}
     />
   )
