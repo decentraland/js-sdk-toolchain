@@ -91,3 +91,7 @@
   .InputContainer:not(.hovered):not(.focused) {
   border-color: var(--base-12);
 }
+
+.DropdownContainer > .Dropdown > .DropdownOptions > .OptionContainer.DropdownEmptyOption > .OptionContent > .Option {
+  text-wrap: pretty;
+}
