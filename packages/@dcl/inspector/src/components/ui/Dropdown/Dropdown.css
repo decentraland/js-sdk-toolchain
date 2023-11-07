@@ -8,6 +8,7 @@
 .DropdownContainer .DropdownLabel {
   color: var(--white);
   font-size: 12px;
+  font-weight: 400;
 }
 
 .DropdownContainer .Dropdown {
