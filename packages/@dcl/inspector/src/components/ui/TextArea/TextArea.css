@@ -1,21 +1,16 @@
-.Block .content:has(.TextArea .ErrorMessage) {
+.Block .content:has(.TextArea.Field .ErrorMessage) {
   align-items: baseline;
 }
 
-.TextArea {
+.TextArea.Field {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
   position: relative;
-  margin-right: 8px;
   gap: 4px;
 }
 
-.TextArea:last-child {
-  margin-right: 0px;
-}
-
-.TextArea label {
+.TextArea.Field label {
   display: flex;
   align-items: center;
   color: var(--base-01);
@@ -25,7 +20,7 @@
   gap: 4px;
 }
 
-.TextArea textarea {
+.TextArea.Field textarea {
   flex: 1;
   min-height: 72px;
   padding: 4px 8px;
@@ -40,32 +35,32 @@
   outline: none;
 }
 
-.TextArea textarea::placeholder {
+.TextArea.Field textarea::placeholder {
   color: var(--base-09);
 }
 
-.TextArea.disabled textarea {
+.TextArea.Field.disabled textarea {
   background-color: var(--base-12);
   border-color: var(--base-12);
 }
 
-.TextArea.disabled textarea {
+.TextArea.Field.disabled textarea {
   color: var(--base-09);
 }
 
-.TextArea.focused textarea {
+.TextArea.Field.focused textarea {
   border-color: var(--base-01);
 }
 
-.TextArea.hovered:not(.focused):not(.error) textarea {
+.TextArea.Field.hovered:not(.focused):not(.error) textarea {
   border-color: var(--base-09);
 }
 
-.TextArea.error textarea {
+.TextArea.Field.error textarea {
   border-color: var(--error-main);
 }
 
-.TextArea.hovered.error textarea,
-.TextArea.focused.error textarea {
+.TextArea.Field.hovered.error textarea,
+.TextArea.Field.focused.error textarea {
   border-color: var(--error-light);
 }

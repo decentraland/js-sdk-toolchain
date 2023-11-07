@@ -66,7 +66,7 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
 
   return (
     <div
-      className={cx('TextArea', className, {
+      className={cx('TextArea Field', className, {
         hovered: isHovered,
         focused: isFocused,
         disabled: disabled,
