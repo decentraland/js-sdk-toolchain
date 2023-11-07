@@ -1,20 +1,17 @@
-.Block .content:has(.CheckboxField .error-message) {
+.Block .content:has(.Checkbox.Field .ErrorMessage) {
   align-items: flex-start;
 }
 
-.CheckboxField {
+.Checkbox.Field {
   flex-grow: 1;
 }
-*:has(> .CheckboxField + *) {
-  gap: 4px;
-}
 
-.CheckboxField .input-container {
+.Checkbox.Field .InputContainer {
   display: flex;
   align-items: center;
 }
 
-.CheckboxField .input-container input[type='checkbox'] {
+.Checkbox.Field .InputContainer input[type='checkbox'] {
   -webkit-appearance: none;
   appearance: none;
   outline: none;
@@ -27,11 +24,11 @@
   cursor: pointer;
 }
 
-.CheckboxField .input-container input[type='checkbox']:checked {
+.Checkbox.Field .InputContainer input[type='checkbox']:checked {
   position: relative;
 }
 
-.CheckboxField .input-container input[type='checkbox']:checked::before {
+.Checkbox.Field .InputContainer input[type='checkbox']:checked::before {
   content: url('data:image/svg+xml;utf8,<svg width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.6467 0.893333L4.22667 9.66667L3.52667 9.62L0.586667 5.46667L1.28667 4.95333L3.9 8.64L10.9467 0.333333L11.6467 0.893333Z" fill="white"/></svg>');
   font-size: 14px;
   color: var(--base-01);
@@ -40,38 +37,26 @@
   top: -1px;
 }
 
-.CheckboxField .input-container input[type='checkbox']:focus {
+.Checkbox.Field .InputContainer input[type='checkbox']:focus {
   border-color: var(--base-01);
 }
 
-.CheckboxField .input-container:not(.error):not(.disabled) input[type='checkbox']:hover:not(:focus) {
+.Checkbox.Field .InputContainer:not(.error):not(.disabled) input[type='checkbox']:hover:not(:focus) {
   border-color: var(--base-09);
 }
 
-.CheckboxField .input-container.disabled input[type='checkbox'] {
+.Checkbox.Field .InputContainer.disabled input[type='checkbox'] {
   background: var(--base-12);
   border-color: var(--base-12);
 }
-.CheckboxField .input-container label {
+.Checkbox.Field .InputContainer label {
   text-wrap: nowrap;
 }
 
-.CheckboxField .input-container.disabled label {
+.Checkbox.Field .InputContainer.disabled label {
   color: var(--base-09);
 }
 
-.CheckboxField .input-container.error input[type='checkbox'] {
+.Checkbox.Field .InputContainer.error input[type='checkbox'] {
   border-color: var(--error-main);
-}
-
-.CheckboxField .error-message {
-  display: flex;
-  align-items: center;
-  color: var(--error-main);
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 100%;
-  min-height: 16px;
-  gap: 2px;
 }

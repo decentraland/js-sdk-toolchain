@@ -1,17 +1,17 @@
-.DropdownContainer {
+.Dropdown.Field {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  gap: 2px;
+  gap: 6px;
 }
 
-.DropdownContainer .DropdownLabel {
+.Dropdown.Field .DropdownLabel {
   color: var(--white);
   font-size: 12px;
   font-weight: 400;
 }
 
-.DropdownContainer .Dropdown {
+.Dropdown.Field .DropdownContainer {
   position: relative;
   display: flex;
   align-items: center;
@@ -24,15 +24,15 @@
   cursor: pointer;
 }
 
-.DropdownContainer .Dropdown:hover {
+.Dropdown.Field .DropdownContainer:hover {
   border-color: var(--base-09);
 }
 
-.DropdownContainer .Dropdown.focused {
+.Dropdown.Field .DropdownContainer.focused {
   border-color: var(--base-01);
 }
 
-.DropdownContainer .Dropdown.disabled {
+.Dropdown.Field .DropdownContainer.disabled {
   background: var(--base-12);
   border-color: var(--base-12);
   color: var(--base-09);
@@ -40,20 +40,20 @@
   pointer-events: none;
 }
 
-.DropdownContainer .Dropdown.error {
+.Dropdown.Field .DropdownContainer.error {
   border-color: var(--error-main);
 }
 
-.DropdownContainer .Dropdown .DropIcon {
+.Dropdown.Field .DropdownContainer .DropIcon {
   line-height: 100%;
 }
 
-.DropdownContainer .Dropdown .DropIcon svg {
+.Dropdown.Field .DropdownContainer .DropIcon svg {
   height: 16px;
   width: 16px;
 }
 
-.DropdownContainer .Dropdown .DropdownSelectedValue {
+.Dropdown.Field .DropdownContainer .DropdownSelectedValue {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -61,7 +61,7 @@
   padding: 10px;
 }
 
-.DropdownContainer .Dropdown .DropdownOptions {
+.Dropdown.Field .DropdownContainer .DropdownOptions {
   position: absolute;
   display: flex;
   flex-direction: column;
@@ -79,22 +79,27 @@
   box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.4);
 }
 
-.DropdownContainer .Dropdown .DropdownOptions.searchable .DropdownSearch.TextField {
+.Dropdown.Field .DropdownContainer .DropdownOptions.searchable .DropdownSearch.Text.Field {
   padding: 0px 7px 6px 7px;
 }
 
-.DropdownContainer .Dropdown .DropdownOptions.searchable {
+.Dropdown.Field .DropdownContainer .DropdownOptions.searchable {
   gap: unset;
 }
 
-.DropdownContainer
-  .Dropdown
+.Dropdown.Field
+  .DropdownContainer
   .DropdownOptions.searchable
-  .DropdownSearch.TextField
+  .DropdownSearch.Text.Field
   .InputContainer:not(.hovered):not(.focused) {
   border-color: var(--base-12);
 }
 
-.DropdownContainer > .Dropdown > .DropdownOptions > .OptionContainer.DropdownEmptyOption > .OptionContent > .Option {
+.Dropdown.Field
+  > .DropdownContainer
+  > .DropdownOptions
+  > .OptionContainer.DropdownEmptyOption
+  > .OptionContent
+  > .Option {
   text-wrap: pretty;
 }

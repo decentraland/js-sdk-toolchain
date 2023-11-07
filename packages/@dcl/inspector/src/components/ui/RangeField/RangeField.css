@@ -2,20 +2,20 @@
   --slider-track-height: 8px;
 }
 
-.RangeFieldContainer {
+.Range.Field {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
   gap: 6px;
 }
 
-.RangeFieldContainer label {
+.Range.Field label {
   color: var(--sub-text);
   font-size: 11px;
   font-weight: 400;
 }
 
-.RangeFieldContainer .RangeField {
+.Range.Field .RangeContainer {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -23,14 +23,14 @@
   gap: 8px;
 }
 
-.RangeFieldContainer .RangeField .RangeInputContainer {
+.Range.Field .RangeContainer .InputContainer {
   position: relative;
   display: flex;
   width: 100%;
   left: 5px;
 }
 
-.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput {
+.Range.Field .RangeContainer .InputContainer .RangeInput {
   width: calc(100% - 15px);
   appearance: none;
   position: relative;
@@ -38,8 +38,8 @@
   outline: none;
 }
 
-.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::before,
-.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::after {
+.Range.Field .RangeContainer .InputContainer .RangeInput::before,
+.Range.Field .RangeContainer .InputContainer .RangeInput::after {
   content: '';
   position: absolute;
   top: -1px;
@@ -48,25 +48,25 @@
   border-radius: 50%;
 }
 
-.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::before {
+.Range.Field .RangeContainer .InputContainer .RangeInput::before {
   left: -5px;
   background: var(--accent-blue-04);
 }
 
-.RangeFieldContainer .RangeField.disabled .RangeInputContainer .RangeInput::before {
+.Range.Field .RangeContainer.disabled .InputContainer .RangeInput::before {
   background: var(--base-12);
 }
 
-.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::after {
+.Range.Field .RangeContainer .InputContainer .RangeInput::after {
   right: -5px;
   background: var(--base-11);
 }
 
-.RangeFieldContainer .RangeField.disabled .RangeInputContainer .RangeInput::after {
+.Range.Field .RangeContainer.disabled .InputContainer .RangeInput::after {
   background: var(--base-11);
 }
 
-.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::-webkit-slider-runnable-track {
+.Range.Field .RangeContainer .InputContainer .RangeInput::-webkit-slider-runnable-track {
   height: var(--slider-track-height);
   appearance: none;
   background: linear-gradient(
@@ -76,26 +76,11 @@
   );
 }
 
-.RangeFieldContainer .RangeField.disabled .RangeInputContainer .RangeInput::-webkit-slider-runnable-track {
+.Range.Field .RangeContainer.disabled .InputContainer .RangeInput::-webkit-slider-runnable-track {
   background: linear-gradient(90deg, var(--base-12) 50%, var(--base-11) 50%);
 }
 
-.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::-moz-range-track {
-  height: var(--slider-track-height);
-  appearance: none;
-  margin-top: -1px;
-  background: linear-gradient(
-    90deg,
-    var(--accent-blue-04) var(--completionPercentage, 0%),
-    var(--base-10) var(--completionPercentage, 0%)
-  );
-}
-
-.RangeFieldContainer .RangeField.disabled .RangeInputContainer .RangeInput::-moz-range-track {
-  background: linear-gradient(90deg, var(--base-12) 50%, var(--base-11) 50%);
-}
-
-.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::-ms-track {
+.Range.Field .RangeContainer .InputContainer .RangeInput::-moz-range-track {
   height: var(--slider-track-height);
   appearance: none;
   margin-top: -1px;
@@ -106,11 +91,26 @@
   );
 }
 
-.RangeFieldContainer .RangeField.disabled .RangeInputContainer .RangeInput::-ms-track {
+.Range.Field .RangeContainer.disabled .InputContainer .RangeInput::-moz-range-track {
   background: linear-gradient(90deg, var(--base-12) 50%, var(--base-11) 50%);
 }
 
-.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::-webkit-slider-thumb {
+.Range.Field .RangeContainer .InputContainer .RangeInput::-ms-track {
+  height: var(--slider-track-height);
+  appearance: none;
+  margin-top: -1px;
+  background: linear-gradient(
+    90deg,
+    var(--accent-blue-04) var(--completionPercentage, 0%),
+    var(--base-10) var(--completionPercentage, 0%)
+  );
+}
+
+.Range.Field .RangeContainer.disabled .InputContainer .RangeInput::-ms-track {
+  background: linear-gradient(90deg, var(--base-12) 50%, var(--base-11) 50%);
+}
+
+.Range.Field .RangeContainer .InputContainer .RangeInput::-webkit-slider-thumb {
   appearance: none;
   width: 20px;
   height: 20px;
@@ -123,21 +123,21 @@
   z-index: 1;
 }
 
-.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput:focus-visible {
+.Range.Field .RangeContainer .InputContainer .RangeInput:focus-visible {
   outline: none;
 }
 
-.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput:focus::-webkit-slider-thumb {
+.Range.Field .RangeContainer .InputContainer .RangeInput:focus::-webkit-slider-thumb {
   border: 1px solid var(--base-01);
 }
 
-.RangeFieldContainer .RangeField.disabled .RangeInputContainer .RangeInput::-webkit-slider-thumb {
+.Range.Field .RangeContainer.disabled .InputContainer .RangeInput::-webkit-slider-thumb {
   background: var(--base-12);
   left: calc(50% - 10px);
   cursor: default;
 }
 
-.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::-moz-range-thumb {
+.Range.Field .RangeContainer .InputContainer .RangeInput::-moz-range-thumb {
   appearance: none;
   width: 20px;
   height: 20px;
@@ -150,17 +150,17 @@
   z-index: 1;
 }
 
-.RangeFieldContainer .RangeField.disabled .RangeInputContainer .RangeInput:focus::-moz-range-thumb {
+.Range.Field .RangeContainer.disabled .InputContainer .RangeInput:focus::-moz-range-thumb {
   border: 1px solid var(--base-01);
 }
 
-.RangeFieldContainer .RangeField.disabled .RangeInputContainer .RangeInput::-moz-range-thumb {
+.Range.Field .RangeContainer.disabled .InputContainer .RangeInput::-moz-range-thumb {
   background: var(--base-12);
   left: calc(50% - 10px);
   cursor: default;
 }
 
-.RangeFieldContainer .RangeField .RangeInputContainer .RangeInput::-ms-thumb {
+.Range.Field .RangeContainer .InputContainer .RangeInput::-ms-thumb {
   appearance: none;
   width: 20px;
   height: 20px;
@@ -173,16 +173,16 @@
   z-index: 1;
 }
 
-.RangeFieldContainer .RangeField.disabled .RangeInputContainer .RangeInput:focus::-ms-thumb {
+.Range.Field .RangeContainer.disabled .InputContainer .RangeInput:focus::-ms-thumb {
   border: 1px solid var(--base-01);
 }
 
-.RangeFieldContainer .RangeField.disabled .RangeInputContainer .RangeInput::-ms-thumb {
+.Range.Field .RangeContainer.disabled .InputContainer .RangeInput::-ms-thumb {
   background: var(--base-12);
   left: calc(50% - 10px);
   cursor: default;
 }
 
-.RangeFieldContainer .RangeField .RangeTextInput {
+.Range.Field .RangeContainer .RangeTextInput > .InputContainer input {
   width: 50px;
 }

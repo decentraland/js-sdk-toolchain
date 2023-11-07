@@ -1,16 +1,12 @@
-.Block .content:has(.TextField .ErrorMessage) {
+.Block .content:has(.Text.Field .ErrorMessage) {
   align-items: baseline;
 }
 
-.TextField {
+.Text.Field {
   flex-grow: 1;
 }
 
-*:has(> .TextField + *) {
-  gap: 4px;
-}
-
-.TextField .InputContainer {
+.Text.Field .InputContainer {
   display: flex;
   align-items: center;
   position: relative;
@@ -23,33 +19,33 @@
   font-size: 12px;
 }
 
-.TextField .InputContainer.disabled {
+.Text.Field .InputContainer.disabled {
   background-color: var(--base-12);
   border-color: var(--base-12);
 }
 
-.TextField .InputContainer.disabled input {
+.Text.Field .InputContainer.disabled input {
   color: var(--base-09);
 }
 
-.TextField .InputContainer.focused {
+.Text.Field .InputContainer.focused {
   border-color: var(--base-01);
 }
 
-.TextField .InputContainer.hovered:not(.focused):not(.error) {
+.Text.Field .InputContainer.hovered:not(.focused):not(.error) {
   border-color: var(--base-09);
 }
 
-.TextField .InputContainer.error {
+.Text.Field .InputContainer.error {
   border-color: var(--error-main);
 }
 
-.TextField .InputContainer.hovered.error,
-.TextField .InputContainer.focused.error {
+.Text.Field .InputContainer.hovered.error,
+.Text.Field .InputContainer.focused.error {
   border-color: var(--error-light);
 }
 
-.TextField .InputContainer input {
+.Text.Field .InputContainer input {
   flex: 1;
   color: var(--text);
   background-color: var(--transparent);
@@ -63,45 +59,45 @@
   width: 100%;
 }
 
-.TextField .InputContainer input::placeholder {
+.Text.Field .InputContainer input::placeholder {
   color: var(--base-09);
 }
 
-.TextField .InputContainer:has(.left-content) {
+.Text.Field .InputContainer:has(.left-content) {
   padding: 0px 0px 0px 8px;
 }
 
-.TextField .InputContainer:has(.right-content) {
+.Text.Field .InputContainer:has(.right-content) {
   padding: 0px 8px 0px 0px;
 }
 
-.TextField .InputContainer .left-content,
-.TextField .InputContainer .right-content {
+.Text.Field .InputContainer .left-content,
+.Text.Field .InputContainer .right-content {
   display: flex;
   align-items: center;
   min-width: 12px;
   line-height: normal;
 }
 
-.TextField .InputContainer .left-content .input-label,
-.TextField .InputContainer .right-content .input-label {
+.Text.Field .InputContainer .left-content .input-label,
+.Text.Field .InputContainer .right-content .input-label {
   display: block;
   color: var(--base-09);
   flex-shrink: 0;
 }
 
-.TextField .InputContainer .left-content .left-icon,
-.TextField .InputContainer .right-content .right-icon {
+.Text.Field .InputContainer .left-content .left-icon,
+.Text.Field .InputContainer .right-content .right-icon {
   display: inline-flex;
   position: relative;
 }
 
-.TextField .InputContainer .left-content .left-icon svg,
-.TextField .InputContainer .right-content .right-icon svg {
+.Text.Field .InputContainer .left-content .left-icon svg,
+.Text.Field .InputContainer .right-content .right-icon svg {
   margin: 0;
 }
 
-.TextField.drop {
+.Text.Field.drop {
   border-color: white;
   border-style: dashed;
 }

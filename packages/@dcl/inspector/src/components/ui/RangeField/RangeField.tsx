@@ -81,10 +81,10 @@ const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
   }, [inputValue, isValidValue])
 
   return (
-    <div className="RangeFieldContainer">
+    <div className="Range Field">
       {label ? <label>{label}</label> : null}
-      <div className={cx('RangeField', { error, disabled })}>
-        <div className="RangeInputContainer">
+      <div className={cx('RangeContainer', { error, disabled })}>
+        <div className="InputContainer">
           <input
             ref={ref}
             type="range"

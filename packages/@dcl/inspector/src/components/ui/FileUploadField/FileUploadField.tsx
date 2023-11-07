@@ -2,7 +2,6 @@ import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { useDrop } from 'react-dnd'
 import cx from 'classnames'
 import { VscFolderOpened as FolderIcon } from 'react-icons/vsc'
-import { IoAlertCircleOutline as AlertIcon } from 'react-icons/io5'
 
 import { selectAssetCatalog } from '../../../redux/app'
 import { useAppSelector } from '../../../redux/hooks'
@@ -15,6 +14,7 @@ import { TreeNode } from '../../ProjectAssetExplorer/ProjectView'
 import { AssetNodeItem } from '../../ProjectAssetExplorer/types'
 
 import { TextField } from '../TextField'
+import { ErrorMessage } from '../ErrorMessage'
 
 import { type Props } from './types'
 
@@ -128,10 +128,10 @@ const FileUploadField: React.FC<Props> = ({
   }, [error, dropError])
 
   return (
-    <div className={cx('FileUploadFieldContainer', className)}>
-      <div className={cx('FileUploadInputContainer', { error: hasError, disabled, droppeable: canDrop })}>
+    <div className={cx('FileUpload Field', className)}>
+      <div className={cx('FileUploadContainer', { error: hasError, disabled, droppeable: canDrop })}>
         <TextField
-          className="FileUploadFieldInput"
+          className="FileUploadInput"
           ref={drop}
           placeholder="Path File"
           onChange={handleChangeTextField}
@@ -142,17 +142,12 @@ const FileUploadField: React.FC<Props> = ({
         />
         <input type="file" ref={inputRef} onChange={handleChange} accept={parseAccept(accept)} />
         {isEnabledFileExplorer && (
-          <button className="FileUploadFieldButton" onClick={handleClick} disabled={disabled}>
+          <button className="FileUploadButton" onClick={handleClick} disabled={disabled}>
             <FolderIcon size={16} />
           </button>
         )}
       </div>
-      {hasError && (
-        <div className="FileUploadFieldError">
-          <AlertIcon size={16} />
-          File not valid.
-        </div>
-      )}
+      {hasError && <ErrorMessage error={'File not valid.'} />}
     </div>
   )
 }
