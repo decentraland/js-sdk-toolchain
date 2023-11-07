@@ -2,7 +2,7 @@
   "name": "@dcl/inspector",
   "version": "0.1.0",
   "dependencies": {
-    "@dcl/asset-packs": "^1.2.5"
+    "@dcl/asset-packs": "^1.2.8"
   },
   "devDependencies": {
     "@babylonjs/core": "^6.18.0",
