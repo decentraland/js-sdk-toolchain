@@ -34,10 +34,15 @@ const InterpolationMapOption: Record<string, string> = {
   [InterpolationType.EASEBOUNCE]: 'Ease in/out Bounce'
 }
 
+function parseDuration(value: string | number): string {
+  const duration = Number(value)
+  return duration > 0 ? duration.toFixed(2) : duration.toString()
+}
+
 const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props) => {
   const [tween, setTween] = useState(tweenProp)
   const [endPosition, setEndPosition] = useState(tween.end)
-  const [duration, setDuration] = useState(tween.duration)
+  const [duration, setDuration] = useState(parseDuration(tween.duration))
 
   useEffect(() => {
     if (!recursiveCheck(tween, tweenProp, 2) || !isValidTween(tween)) return
@@ -95,12 +100,12 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
   const handleChangeDurationRange = useCallback(
     (e: React.ChangeEvent<HTMLElement>) => {
       const { value } = e.target as HTMLInputElement
-      const parsedValue = parseInt(value)
+      const parsedValue = parseFloat(value)
       if (!isNaN(parsedValue) && parsedValue >= 0) {
         setTween({ ...tween, duration: parsedValue })
       }
 
-      setDuration(parsedValue.toString())
+      setDuration(parseDuration(parsedValue))
     },
     [tween, setTween, setDuration]
   )
@@ -200,7 +205,12 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
         <div className="field duration">
           <label>Duration {renderDurationInfo()}</label>
           <div className="row">
-            <RangeField value={duration || 0} onChange={handleChangeDuration} onBlur={handleChangeDurationRange} />
+            <RangeField
+              value={duration || 0}
+              onChange={handleChangeDuration}
+              onBlur={handleChangeDurationRange}
+              step={0.25}
+            />
             <TextField
               type="number"
               value={duration}
