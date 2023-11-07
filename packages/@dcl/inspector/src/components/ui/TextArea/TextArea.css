@@ -1,4 +1,4 @@
-.Block .content:has(.TextArea .error-message) {
+.Block .content:has(.TextArea .ErrorMessage) {
   align-items: baseline;
 }
 
@@ -68,20 +68,4 @@
 .TextArea.hovered.error textarea,
 .TextArea.focused.error textarea {
   border-color: var(--error-light);
-}
-
-.TextArea .error-message {
-  display: flex;
-  align-items: center;
-  color: var(--error-main);
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 100%;
-  min-height: 16px;
-  gap: 2px;
-}
-
-.TextArea .error-message svg {
-  margin: 0 !important;
 }

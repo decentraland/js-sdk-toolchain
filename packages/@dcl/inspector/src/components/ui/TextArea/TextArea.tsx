@@ -1,17 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import cx from 'classnames'
-import { IoAlertCircleOutline as AlertIcon } from 'react-icons/io5'
-import { VscInfo as InfoIcon } from 'react-icons/vsc'
 
 import { InfoTooltip } from '../InfoTooltip'
+import { ErrorMessage } from '../ErrorMessage'
 
 import { Props } from './types'
 
 import './TextArea.css'
-
-function isErrorMessage(error?: boolean | string): boolean {
-  return !!error && typeof error === 'string'
-}
 
 const TextArea = React.forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
   const { className, disabled, error, label, moreInfo, value, onChange, onFocus, onBlur, ...rest } = props
@@ -95,12 +90,7 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
       >
         {inputValue}
       </textarea>
-      {isErrorMessage(error) && (
-        <p className="error-message">
-          <AlertIcon />
-          <span>{error}</span>
-        </p>
-      )}
+      <ErrorMessage error={error} />
     </div>
   )
 })
