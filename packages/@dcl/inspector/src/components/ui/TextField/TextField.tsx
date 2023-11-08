@@ -94,7 +94,7 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
   }, [rightLabel, rightIcon])
 
   return (
-    <div className={cx('TextField', className)}>
+    <div className={cx('Text Field', className)}>
       <div
         className={cx('InputContainer', {
           hovered: isHovered,

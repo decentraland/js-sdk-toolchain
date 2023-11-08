@@ -31,9 +31,9 @@
 
 .OptionContainer .Option {
   flex: 1;
-  font-size: 12px;
+  font-size: 13px;
   font-style: normal;
-  font-weight: 700;
+  font-weight: 500;
   text-wrap: nowrap;
 }
 

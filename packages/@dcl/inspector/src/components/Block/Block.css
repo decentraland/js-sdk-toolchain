@@ -23,3 +23,11 @@
   padding: 5px;
   border-radius: 2px;
 }
+
+.Block:has(.content > .Field):not(:first-child) {
+  margin-top: 0;
+}
+
+.Block .content:has(.Field) {
+  column-gap: 8px;
+}

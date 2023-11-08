@@ -63,3 +63,9 @@
 .Container > .title > .RightContent > .MoreOptionsMenu > .MoreOptionsContent {
   min-width: 175px;
 }
+
+.Container .content:has(.Block > .content > .Field) {
+  display: flex;
+  flex-direction: column;
+  row-gap: 12px;
+}

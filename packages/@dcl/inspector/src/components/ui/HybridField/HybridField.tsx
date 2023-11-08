@@ -66,7 +66,7 @@ const HybridField: React.FC<Props> = ({
   )
 
   return (
-    <div className={cx('HybridField', className)}>
+    <div className={cx('Hybrid Field', className)}>
       <div className="InputContainer">
         <Dropdown
           options={options}

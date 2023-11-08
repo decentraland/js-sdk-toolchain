@@ -15,7 +15,7 @@
   align-items: center;
   width: 100%;
   position: relative;
-  gap: 4px;
+  gap: 12px 8px;
 }
 
 .VisibilityContainer > .content > .Block > .content .row .field {

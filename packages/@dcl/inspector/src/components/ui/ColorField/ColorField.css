@@ -1,18 +1,18 @@
-.ColorField {
+.Color.Field {
   display: flex;
   flex: 1;
 }
 
-.ColorField > .HybridField > .InputContainer > .DropdownContainer:first-of-type {
+.Color.Field > .HybridField > .InputContainer > .DropdownContainer:first-of-type {
   flex-grow: 0;
   width: 90px;
 }
 
-.ColorField > .HybridField > .InputContainer > *:last-child {
+.Color.Field > .HybridField > .InputContainer > *:last-child {
   flex: 1;
 }
 
-.ColorField .ColorPreview {
+.Color.Field .ColorPreview {
   height: 14px;
   width: 14px;
   border-radius: 50%;

@@ -1,11 +1,11 @@
-.FileUploadFieldContainer {
+.FileUpload.Field {
   display: flex;
   flex-direction: column;
   width: 100%;
   gap: 4px;
 }
 
-.FileUploadFieldContainer .FileUploadInputContainer {
+.FileUpload.Field .FileUploadContainer {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -13,11 +13,11 @@
   gap: 4px;
 }
 
-.FileUploadFieldContainer .FileUploadInputContainer .TextField {
+.FileUpload.Field .FileUploadContainer .FileUploadInput {
   margin-right: 0;
 }
 
-.FileUploadFieldContainer .FileUploadInputContainer .FileUploadFieldButton {
+.FileUpload.Field .FileUploadContainer .FileUploadButton {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -31,22 +31,22 @@
   color: var(--base-01);
 }
 
-.FileUploadFieldContainer .FileUploadInputContainer .FileUploadFieldButton:hover {
+.FileUpload.Field .FileUploadContainer .FileUploadButton:hover {
   border-color: var(--base-09);
 }
 
-.FileUploadFieldContainer .FileUploadInputContainer .FileUploadFieldButton:focus {
+.FileUpload.Field .FileUploadContainer .FileUploadButton:focus {
   border-color: var(--base-01);
 }
 
-.FileUploadFieldContainer .FileUploadInputContainer.disabled .FileUploadFieldButton {
+.FileUpload.Field .FileUploadContainer.disabled .FileUploadButton {
   pointer-events: none;
 }
 
-.FileUploadFieldContainer .FileUploadInputContainer.droppeable .FileUploadFieldInput .input-container {
+.FileUpload.Field .FileUploadContainer.droppeable .FileUploadFieldInput .input-container {
   border: 1px dashed var(--base-01);
 }
 
-.FileUploadFieldContainer .FileUploadInputContainer > input {
+.FileUpload.Field .FileUploadContainer > input {
   display: none;
 }

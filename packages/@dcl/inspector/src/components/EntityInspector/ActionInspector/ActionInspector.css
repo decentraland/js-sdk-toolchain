@@ -20,8 +20,8 @@
   align-items: center;
   width: 100%;
   position: relative;
-  column-gap: 4px;
-  row-gap: 15px;
+  column-gap: 8px;
+  row-gap: 12px;
 }
 
 .ActionInspector > .content > .Block > .content .row .field {
@@ -45,15 +45,15 @@
   gap: 4px;
 }
 
-.ActionInspector > .content > .Block > .content .row .field > .TextField {
+.ActionInspector > .content > .Block > .content .row .field > .Text.Field {
   width: 100%;
 }
 
-.ActionInspector > .content > .Block > .content .row .field.duration .TextField {
+.ActionInspector > .content > .Block > .content .row .field.duration .Text.Field {
   width: 50px;
 }
 
-.ActionInspector > .content > .Block > .content .row .field.duration .TextField input {
+.ActionInspector > .content > .Block > .content .row .field.duration .Text.Field input {
   min-width: 50px;
 }
 

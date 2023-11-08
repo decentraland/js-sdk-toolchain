@@ -1,14 +1,9 @@
 import React, { useCallback, useState } from 'react'
 import cx from 'classnames'
-import { IoAlertCircleOutline as AlertIcon } from 'react-icons/io5'
-
+import { ErrorMessage } from '../ErrorMessage'
 import { Props } from './types'
 
 import './CheckboxField.css'
-
-function isErrorMessage(error?: boolean | string): boolean {
-  return !!error && typeof error === 'string'
-}
 
 const CheckboxField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
   const { className, checked, label, error, disabled, onChange, type = 'checkbox', ...rest } = props
@@ -23,9 +18,9 @@ const CheckboxField = React.forwardRef<HTMLInputElement, Props>((props, ref) => 
   )
 
   return (
-    <div className={cx('CheckboxField', className, { disabled: disabled })}>
+    <div className={cx('Checkbox Field', className, { disabled: disabled })}>
       <div
-        className={cx('input-container', {
+        className={cx('InputContainer', {
           disabled: disabled,
           error: !!error
         })}
@@ -40,12 +35,7 @@ const CheckboxField = React.forwardRef<HTMLInputElement, Props>((props, ref) => 
         />
         <label>{label}</label>
       </div>
-      {isErrorMessage(error) && (
-        <p className="error-message">
-          <AlertIcon />
-          <span>{error}</span>
-        </p>
-      )}
+      <ErrorMessage error={error} />
     </div>
   )
 })
