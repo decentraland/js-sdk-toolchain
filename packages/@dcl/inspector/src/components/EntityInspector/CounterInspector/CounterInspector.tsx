@@ -8,9 +8,8 @@ import { analytics, Event } from '../../../lib/logic/analytics'
 import { getAssetByModel } from '../../../lib/logic/catalog'
 import { ROOT } from '../../../lib/sdk/tree'
 import { withSdk } from '../../../hoc/withSdk'
-import { InfoTooltip } from '../InfoTooltip'
 import { Container } from '../../Container'
-import { TextField } from '../../ui/TextField'
+import { TextField, InfoTooltip } from '../../ui'
 import { fromCounter, isValidInput, toCounter } from './utils'
 import { Props } from './types'
 
@@ -46,6 +45,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
         <InfoTooltip
           text="Counter tracks numerical values that change based on player actions. Use it for conditional logic and to trigger actions when reaching certain values."
           link="https://docs.decentraland.org/creator/smart-items/#counter"
+          type="help"
         />
       }
       onRemoveContainer={handleRemove}

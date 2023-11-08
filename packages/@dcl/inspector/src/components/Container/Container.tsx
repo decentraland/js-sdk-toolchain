@@ -1,10 +1,10 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import cx from 'classnames'
 import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io'
-import { FiAlertTriangle as AlertIcon } from 'react-icons/fi'
+import { FiAlertTriangle as WarningIcon } from 'react-icons/fi'
 import { VscTrash as RemoveIcon } from 'react-icons/vsc'
 import { Button } from '../Button'
-import { InfoTooltip } from '../EntityInspector/InfoTooltip'
+import { InfoTooltip } from '../ui/InfoTooltip'
 import MoreOptionsMenu from '../EntityInspector/MoreOptionsMenu'
 
 import { Props } from './types'
@@ -20,9 +20,9 @@ const Container: React.FC<React.PropsWithChildren<Props>> = (props) => {
       return (
         <span className="indicator">
           {typeof props.indicator === 'boolean' ? (
-            <AlertIcon />
+            <WarningIcon />
           ) : typeof props.indicator === 'string' ? (
-            <InfoTooltip text={props.indicator} trigger={<AlertIcon size={16} />} position="top center" />
+            <InfoTooltip text={props.indicator} type="warning" position="top center" />
           ) : (
             props.indicator
           )}

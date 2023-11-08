@@ -28,7 +28,7 @@ import { Dropdown, TextField } from '../../ui'
 import MoreOptionsMenu from '../MoreOptionsMenu'
 import { AddButton } from '../AddButton'
 import { Button } from '../../Button'
-import { InfoTooltip } from '../InfoTooltip'
+import { InfoTooltip } from '../../ui/InfoTooltip'
 
 import { PlaySoundAction } from './PlaySoundAction'
 import { TweenAction } from './TweenAction'
@@ -434,6 +434,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
         <InfoTooltip
           text="Actions list the capabilities of entities, from playing animations to changing visibility. Customize or add new actions, which are activated by triggers."
           link="https://docs.decentraland.org/creator/smart-items/#actions"
+          type="help"
         />
       }
       onRemoveContainer={handleRemove}

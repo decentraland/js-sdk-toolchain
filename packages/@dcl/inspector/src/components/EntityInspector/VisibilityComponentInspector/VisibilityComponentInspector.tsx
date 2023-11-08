@@ -8,7 +8,7 @@ import { getComponentValue, useComponentValue } from '../../../hooks/sdk/useComp
 import { analytics, Event } from '../../../lib/logic/analytics'
 import { getAssetByModel } from '../../../lib/logic/catalog'
 import { CoreComponents } from '../../../lib/sdk/components'
-import { InfoTooltip } from '../InfoTooltip'
+import { InfoTooltip } from '../../ui/InfoTooltip'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
 import { Dropdown } from '../../ui/Dropdown'

@@ -1,0 +1,66 @@
+.Block .content:has(.TextArea.Field .ErrorMessage) {
+  align-items: baseline;
+}
+
+.TextArea.Field {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  position: relative;
+  gap: 4px;
+}
+
+.TextArea.Field label {
+  display: flex;
+  align-items: center;
+  color: var(--base-01);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 100%;
+  gap: 4px;
+}
+
+.TextArea.Field textarea {
+  flex: 1;
+  min-height: 72px;
+  padding: 4px 8px;
+  color: var(--text);
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  background-color: var(--background-gray);
+  border-radius: 4px;
+  border: 1px solid var(--background-gray);
+  outline: none;
+}
+
+.TextArea.Field textarea::placeholder {
+  color: var(--base-09);
+}
+
+.TextArea.Field.disabled textarea {
+  background-color: var(--base-12);
+  border-color: var(--base-12);
+}
+
+.TextArea.Field.disabled textarea {
+  color: var(--base-09);
+}
+
+.TextArea.Field.focused textarea {
+  border-color: var(--base-01);
+}
+
+.TextArea.Field.hovered:not(.focused):not(.error) textarea {
+  border-color: var(--base-09);
+}
+
+.TextArea.Field.error textarea {
+  border-color: var(--error-main);
+}
+
+.TextArea.Field.hovered.error textarea,
+.TextArea.Field.focused.error textarea {
+  border-color: var(--error-light);
+}

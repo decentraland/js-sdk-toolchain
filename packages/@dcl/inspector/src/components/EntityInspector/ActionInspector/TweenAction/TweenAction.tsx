@@ -2,8 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { TweenType, InterpolationType } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 
-import { Dropdown, TextField, RangeField } from '../../../ui'
-import { InfoTooltip } from '../../InfoTooltip'
+import { Dropdown, TextField, RangeField, InfoTooltip } from '../../../ui'
 import { isValidTween } from './utils'
 import type { Props } from './types'
 

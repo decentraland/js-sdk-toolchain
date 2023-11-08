@@ -24,7 +24,7 @@ import { EditorComponentsTypes } from '../../../lib/sdk/components'
 
 import { Container } from '../../Container'
 import { AddButton } from '../AddButton'
-import { InfoTooltip } from '../InfoTooltip'
+import { InfoTooltip } from '../../ui/InfoTooltip'
 
 import { TriggerEvent } from './TriggerEvent'
 import { TriggerConditionContainer } from './TriggerCondition'
@@ -289,6 +289,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
         <InfoTooltip
           text={`Triggers activate actions based on player interactions like clicks, entering/exiting areas, or global events like "on spawn".`}
           link="https://docs.decentraland.org/creator/smart-items/#triggers"
+          type="help"
         />
       }
       onRemoveContainer={handleRemove}
