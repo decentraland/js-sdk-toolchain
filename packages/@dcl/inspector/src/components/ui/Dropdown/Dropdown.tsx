@@ -1,19 +1,17 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import cx from 'classnames'
 import { VscChevronDown as DownArrowIcon, VscSearch as SearchIcon } from 'react-icons/vsc'
-import { IoAlertCircleOutline as AlertIcon } from 'react-icons/io5'
 import { useOutsideClick } from '../../../hooks/useOutsideClick'
 import { TextField } from '../TextField'
-import { isErrorMessage } from '../utils'
+import { ErrorMessage } from '../ErrorMessage'
 import { Option } from './Option'
 import type { Props as OptionProp } from './Option/types'
 import type { Props } from './types'
 import './Dropdown.css'
 
-const FONT_WIDTH = 12
+const FONT_SIZE = 13
 const FONT_WEIGHT = 700
 const WIDTH_CONST = 1200
-const EMPTY_WIDTH_CONST = 1455
 const ICON_SIZE = 16
 
 function isOptionSelected(currentValue?: any, optionValue?: any) {
@@ -104,17 +102,17 @@ const Dropdown: React.FC<Props> = (props) => {
         const rightIconWidth = option.rightIcon ? ICON_SIZE + 4 : 0
         return Math.max(
           minWidth,
-          (label.length * FONT_WIDTH * FONT_WEIGHT + leftIconWidth + rightIconWidth) / WIDTH_CONST
+          (label.length * FONT_SIZE * FONT_WEIGHT + leftIconWidth + rightIconWidth) / WIDTH_CONST
         )
       }, 0)
     }
   }, [options, empty])
 
   return (
-    <div className="DropdownContainer" ref={ref}>
+    <div className="Dropdown Field" ref={ref}>
       {label ? <label className="DropdownLabel">{label}</label> : null}
       <div
-        className={cx('Dropdown', className, {
+        className={cx('DropdownContainer', className, {
           focused: isFocused,
           disabled: !!disabled,
           open: !!showOptions,
@@ -159,12 +157,7 @@ const Dropdown: React.FC<Props> = (props) => {
           <DownArrowIcon size={ICON_SIZE} />
         </div>
       </div>
-      {isErrorMessage(error) && (
-        <p className="error-message">
-          <AlertIcon />
-          <span>{error}</span>
-        </p>
-      )}
+      <ErrorMessage error={error} />
     </div>
   )
 }

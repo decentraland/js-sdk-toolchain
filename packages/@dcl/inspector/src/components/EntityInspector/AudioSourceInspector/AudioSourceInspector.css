@@ -1,7 +1,0 @@
-.AudioSource > .content > .Block.volume > .content {
-  gap: 4px;
-}
-
-.AudioSource > .content > .Block.volume > .content > .TextField {
-  width: 40px;
-}

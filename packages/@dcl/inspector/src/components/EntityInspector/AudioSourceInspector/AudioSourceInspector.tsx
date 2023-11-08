@@ -19,8 +19,6 @@ import { TextField, CheckboxField, RangeField } from '../../ui'
 import { fromAudioSource, toAudioSource, isValidInput, isAudio, isValidVolume } from './utils'
 import type { Props } from './types'
 
-import './AudioSourceInspector.css'
-
 const DROP_TYPES = ['project-asset']
 
 export default withSdk<Props>(({ sdk, entity }) => {

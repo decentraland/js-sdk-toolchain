@@ -22,7 +22,7 @@ const ColorField: React.FC<Props> = ({ label, value, onChange }) => {
     selectedOption === Options.BASICS || (isStockColor && selectedOption !== Options.CUSTOM)
 
   return (
-    <div className="ColorField">
+    <div className="Color Field">
       {label && <label>{label}</label>}
       <HybridField
         options={OPTIONS}

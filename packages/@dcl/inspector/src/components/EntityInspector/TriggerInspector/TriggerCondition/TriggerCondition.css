@@ -43,7 +43,7 @@
   flex: 1;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px;
+  gap: 12px 8px;
 }
 
 .TriggerConditionsContainer > .TriggerCondition > .RightMenu {

@@ -11,8 +11,6 @@ import { fromGltf, toGltf, isValidInput, COLLISION_LAYERS, isModel } from './uti
 import { useAppSelector } from '../../../redux/hooks'
 import { selectAssetCatalog } from '../../../redux/app'
 
-import './GltfInspector.css'
-
 export default withSdk<Props>(({ sdk, entity }) => {
   const files = useAppSelector(selectAssetCatalog)
   const { GltfContainer } = sdk.components

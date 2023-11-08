@@ -91,12 +91,12 @@
   width: 120px;
 }
 
-.ImportAsset .file-container .TextField {
+.ImportAsset .file-container .Text.Field {
   width: auto;
   height: 24px;
 }
 
-.ImportAsset .file-container .error .TextField {
+.ImportAsset .file-container .error .Text.Field {
   border-color: red;
 }
 
