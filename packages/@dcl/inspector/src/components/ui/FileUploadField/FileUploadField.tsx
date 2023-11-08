@@ -1,10 +1,12 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDrop } from 'react-dnd'
 import cx from 'classnames'
 import { VscFolderOpened as FolderIcon } from 'react-icons/vsc'
 
-import { selectAssetCatalog } from '../../../redux/app'
-import { useAppSelector } from '../../../redux/hooks'
+import { selectAssetCatalog, selectUploadFile, updateUploadFile } from '../../../redux/app'
+import { selectAssetsTab } from '../../../redux/ui'
+import { AssetsTab } from '../../../redux/ui/types'
+import { useAppDispatch, useAppSelector } from '../../../redux/hooks'
 import { DropTypesEnum, ProjectAssetDrop, getNode } from '../../../lib/sdk/drag-drop'
 import { EXTENSIONS, withAssetDir } from '../../../lib/data-layer/host/fs-utils'
 
@@ -28,7 +30,7 @@ const FileUploadField: React.FC<Props> = ({
   className,
   disabled,
   value,
-  isEnabledFileExplorer,
+  isEnabledFileExplorer = true,
   error,
   onDrop,
   isValidFile,
@@ -38,6 +40,16 @@ const FileUploadField: React.FC<Props> = ({
   const [dropError, setDropError] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const files = useAppSelector(selectAssetCatalog)
+  const uploadFile = useAppSelector(selectUploadFile)
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    if (path && uploadFile && typeof uploadFile === 'string' && path !== uploadFile) {
+      setPath(uploadFile)
+      dispatch(updateUploadFile(undefined))
+      onDrop && onDrop(uploadFile)
+    }
+  }, [uploadFile, onDrop])
 
   const removeBase = useCallback(
     (path?: string) => {
@@ -102,8 +114,9 @@ const FileUploadField: React.FC<Props> = ({
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0]
       if (file && (isAsset(file.name) || isAudioFile(file.name))) {
-        setPath(file.name)
         setDropError(false)
+        dispatch(selectAssetsTab({ tab: AssetsTab.Import }))
+        dispatch(updateUploadFile(file))
       } else {
         setDropError(true)
       }
