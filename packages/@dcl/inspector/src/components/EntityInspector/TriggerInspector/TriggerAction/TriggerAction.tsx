@@ -81,12 +81,9 @@ const TriggerActionContainer: React.FC<WithSdkProps & Props> = ({ sdk, ...props 
                 onChange={(e) => handleChangeEntity(e, idx)}
               />
               <Dropdown
+                placeholder="Select an Action"
                 disabled={!action.id || !availableActions.get(action.id)}
-                options={
-                  action.id && availableActions.get(action.id)?.actions
-                    ? [{ value: '', label: 'Select an Action' }, ...actions]
-                    : []
-                }
+                options={action.id && availableActions.get(action.id)?.actions ? [...actions] : []}
                 value={action.name}
                 onChange={(e) => handleChangeAction(e, idx)}
               />

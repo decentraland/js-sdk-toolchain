@@ -53,10 +53,8 @@ const PlayAnimationAction: React.FC<Props> = ({ value, animations, onUpdate }: P
         <div className="field">
           <Dropdown
             label="Select Animation"
-            options={[
-              { value: '', label: 'Select an Animation' },
-              ...animations.map((animation) => ({ label: animation.name, value: animation.name }))
-            ]}
+            placeholder="Select an Animation"
+            options={[...animations.map((animation) => ({ label: animation.name, value: animation.name }))]}
             value={payload.animation}
             onChange={handleChangeAnimation}
           />

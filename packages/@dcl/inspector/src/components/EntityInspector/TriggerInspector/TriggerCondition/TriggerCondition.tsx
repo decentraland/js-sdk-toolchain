@@ -97,10 +97,8 @@ export const TriggerConditionContainer = ({
       {conditions.length >= 2 ? (
         <div className="TriggerOperation">
           <Dropdown
-            options={[
-              { value: '', label: 'Select an operation type' },
-              ...Array.from(conditionOperation).map(({ value, label }) => ({ value, label }))
-            ]}
+            placeholder="Select an operation type"
+            options={[...Array.from(conditionOperation).map(({ value, label }) => ({ value, label }))]}
             value={trigger.operation}
             onChange={onChangeOperation}
           />
@@ -144,8 +142,9 @@ export const TriggerConditionContainer = ({
               />
               {isStatesCondition && (
                 <Dropdown
+                  placeholder="Select a State"
                   disabled={isDisabled}
-                  options={stateOptions.length > 0 ? [{ value: '', label: 'Select state' }, ...stateOptions] : []}
+                  options={stateOptions.length > 0 ? [...stateOptions] : []}
                   value={condition.value}
                   onChange={(e) => handleChangeSelectValue(e, idx)}
                 />

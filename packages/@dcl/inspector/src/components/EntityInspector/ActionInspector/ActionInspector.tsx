@@ -350,10 +350,8 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
             <div className="field">
               <label>Select State</label>
               <Dropdown
-                options={[
-                  { value: '', label: 'Select a State' },
-                  ...states.map((state) => ({ label: state, value: state }))
-                ]}
+                placeholder="Select a State"
+                options={[...states.map((state) => ({ label: state, value: state }))]}
                 value={getPartialPayload<ActionType.SET_STATE>(action)?.state}
                 onChange={(e) => handleChangeState(e, idx)}
               />
@@ -405,8 +403,8 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
             <div className="field">
               <label>Select Anchor Point</label>
               <Dropdown
+                placeholder="Select an Anchor Point"
                 options={[
-                  { value: '', label: 'Select an Anchor Point' },
                   { value: AvatarAnchorPointType.AAPT_RIGHT_HAND, label: 'Right Hand' },
                   { value: AvatarAnchorPointType.AAPT_LEFT_HAND, label: 'Left Hand' },
                   { value: AvatarAnchorPointType.AAPT_NAME_TAG, label: 'Name Tag' },
@@ -455,10 +453,10 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
               </div>
               <div className="field">
                 <Dropdown
-                  label={'Select Action'}
+                  label={'Select an Action'}
+                  placeholder="Select an Action"
                   disabled={availableActions.length === 0}
                   options={[
-                    { label: 'Select an Action', value: '' },
                     ...availableActions.map((availableAction) => ({
                       label: ActionMapOption[availableAction],
                       value: availableAction

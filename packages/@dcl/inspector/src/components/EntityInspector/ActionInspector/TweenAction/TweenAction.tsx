@@ -129,8 +129,8 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
         <div className="field">
           <label>Select Tween {renderTweenInfo()}</label>
           <Dropdown
+            placeholder="Select a Tween Type"
             options={[
-              { value: '', label: 'Select a Tween Type' },
               ...Object.values(TweenType).map((tweenType) => ({ label: TweenMapOption[tweenType], value: tweenType }))
             ]}
             value={tween.type}
@@ -179,8 +179,8 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
         <div className="field">
           <label>Curve Type {rendeCurveTypeInfo()}</label>
           <Dropdown
+            placeholder="Select a Curve Type"
             options={[
-              { value: '', label: 'Select a Curve Type' },
               ...Object.values(InterpolationType).map((interpolationType) => ({
                 label: InterpolationMapOption[interpolationType],
                 value: interpolationType
