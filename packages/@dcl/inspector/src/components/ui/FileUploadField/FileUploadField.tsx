@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDrop } from 'react-dnd'
 import cx from 'classnames'
+import { v4 as uuidv4 } from 'uuid'
 import { VscFolderOpened as FolderIcon } from 'react-icons/vsc'
 
 import { selectAssetCatalog, selectUploadFile, updateUploadFile } from '../../../redux/app'
@@ -42,12 +43,16 @@ const FileUploadField: React.FC<Props> = ({
   const files = useAppSelector(selectAssetCatalog)
   const uploadFile = useAppSelector(selectUploadFile)
   const dispatch = useAppDispatch()
+  const id = useRef(uuidv4())
 
   useEffect(() => {
-    if (path && uploadFile && typeof uploadFile === 'string' && path !== uploadFile) {
-      setPath(uploadFile)
-      dispatch(updateUploadFile(undefined))
-      onDrop && onDrop(uploadFile)
+    if (uploadFile[id.current] && typeof uploadFile[id.current] === 'string' && path !== uploadFile[id.current]) {
+      const uploadFilePath = uploadFile[id.current] as string
+      setPath(uploadFilePath)
+      const cleanUpdateUploadFile = { ...uploadFile }
+      delete cleanUpdateUploadFile[id.current]
+      dispatch(updateUploadFile(cleanUpdateUploadFile))
+      onDrop && onDrop(uploadFilePath)
     }
   }, [uploadFile, onDrop])
 
@@ -114,9 +119,12 @@ const FileUploadField: React.FC<Props> = ({
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0]
       if (file && (isAsset(file.name) || isAudioFile(file.name))) {
+        console.log('paso por aki?')
         setDropError(false)
         dispatch(selectAssetsTab({ tab: AssetsTab.Import }))
-        dispatch(updateUploadFile(file))
+        const newUploadFile = { ...uploadFile }
+        newUploadFile[id.current] = file
+        dispatch(updateUploadFile(newUploadFile))
       } else {
         setDropError(true)
       }
@@ -144,6 +152,7 @@ const FileUploadField: React.FC<Props> = ({
     <div className={cx('FileUpload Field', className)}>
       <div className={cx('FileUploadContainer', { error: hasError, disabled, droppeable: canDrop })}>
         <TextField
+          id={id.current}
           className="FileUploadInput"
           ref={drop}
           placeholder="Path File"

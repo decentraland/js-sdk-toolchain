@@ -8,7 +8,7 @@ export interface AppState {
   preferences: InspectorPreferences | undefined
   assetsCatalog: AssetCatalogResponse | undefined
   thumbnails: GetFilesResponse['files']
-  uploadFile: File | string | undefined
+  uploadFile: Record<string, File | string | undefined>
 }
 
 export const initialState: AppState = {
@@ -17,7 +17,7 @@ export const initialState: AppState = {
   preferences: undefined,
   assetsCatalog: undefined,
   thumbnails: [],
-  uploadFile: undefined
+  uploadFile: {}
 }
 
 export const appState = createSlice({

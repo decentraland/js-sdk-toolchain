@@ -1,15 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { useDrop } from 'react-dnd'
 import { ActionPayload, ActionType } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 
-import { DropTypesEnum, ProjectAssetDrop, getNode } from '../../../../lib/sdk/drag-drop'
-import { withAssetDir } from '../../../../lib/data-layer/host/fs-utils'
 import { useAppSelector } from '../../../../redux/hooks'
 import { selectAssetCatalog } from '../../../../redux/app'
 
 import { isAudio, isValidVolume, volumeToAudioSource, volumeFromAudioSource } from '../../AudioSourceInspector/utils'
-import { Dropdown, TextField, RangeField, InfoTooltip } from '../../../ui'
+import { Dropdown, RangeField, InfoTooltip, FileUploadField } from '../../../ui'
+import { ACCEPTED_FILE_TYPES } from '../../../ui/FileUploadField/types'
 
 import { isValid } from './utils'
 import type { Props } from './types'
@@ -39,28 +37,15 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
 
   const files = useAppSelector(selectAssetCatalog)
 
-  const removeBase = useCallback(
-    (path?: string) => {
-      return path ? (files?.basePath ? path.replace(files.basePath + '/', '') : path) : ''
-    },
-    [files]
-  )
-
-  const addBase = useCallback(
-    (path: string) => {
-      return files?.basePath ? `${files.basePath}/${path}` : path
-    },
-    [files]
-  )
-
   useEffect(() => {
     if (!recursiveCheck(payload, value, 2) || !isValid(payload)) return
     onUpdate(payload)
   }, [payload, onUpdate])
 
-  const handleChangeSrc = useCallback(
-    ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
-      setPayload({ ...payload, src: addBase(value) })
+  const handleDrop = useCallback(
+    (src: string) => {
+      console.log('fileupload playsound', src)
+      setPayload({ ...payload, src })
     },
     [payload, setPayload]
   )
@@ -83,28 +68,6 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
     [payload, setPayload]
   )
 
-  const [{ isHover }, drop] = useDrop(
-    () => ({
-      accept: [DropTypesEnum.ProjectAsset],
-      drop: ({ value, context }: ProjectAssetDrop, monitor) => {
-        if (monitor.didDrop()) return
-        const node = context.tree.get(value)!
-        const audio = getNode(node, context.tree, isAudio)
-        if (audio) {
-          setPayload({ ...payload, src: withAssetDir(audio.asset.src) })
-        }
-      },
-      canDrop: ({ value, context }: ProjectAssetDrop) => {
-        const node = context.tree.get(value)!
-        return !!getNode(node, context.tree, isAudio)
-      },
-      collect: (monitor) => ({
-        isHover: monitor.canDrop() && monitor.isOver()
-      })
-    }),
-    [files]
-  )
-
   const error = useMemo(() => {
     if (!files || !payload.src) {
       return false
@@ -119,9 +82,15 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
   return (
     <div className="PlaySoundActionContainer">
       <div className="row">
-        <div className="field" ref={drop}>
+        <div className="field">
           <label>Path {renderPathInfo()}</label>
-          <TextField value={removeBase(payload.src)} onChange={handleChangeSrc} error={error} drop={isHover} />
+          <FileUploadField
+            value={payload.src}
+            accept={ACCEPTED_FILE_TYPES['audio']}
+            onDrop={handleDrop}
+            error={files && (!isValid || error)}
+            isValidFile={isAudio}
+          />
         </div>
         <div className="field">
           <Dropdown

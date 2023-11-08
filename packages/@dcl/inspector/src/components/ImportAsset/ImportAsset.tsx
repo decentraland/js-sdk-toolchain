@@ -100,7 +100,7 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
 
   useEffect(() => {
     if (uploadFile && typeof uploadFile !== 'string' && (!file || (file && uploadFile.name !== file.name))) {
-      handleDrop([uploadFile])
+      handleDrop([Object.values(uploadFile!)[0] as File])
     }
   }, [uploadFile])
 
@@ -158,7 +158,11 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
       }
 
       // Clear uploaded file from the FileUploadField
-      dispatch(updateUploadFile(`${basePath}/${fullName}`))
+      const newUploadFile = { ...uploadFile }
+      for (const key in newUploadFile) {
+        newUploadFile[key] = `${basePath}/${fullName}`
+      }
+      dispatch(updateUploadFile(newUploadFile))
       setFile(undefined)
 
       onSave()

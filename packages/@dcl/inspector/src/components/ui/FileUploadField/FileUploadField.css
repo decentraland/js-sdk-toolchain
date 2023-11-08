@@ -43,7 +43,7 @@
   pointer-events: none;
 }
 
-.FileUpload.Field .FileUploadContainer.droppeable .FileUploadFieldInput .InputContainer {
+.FileUpload.Field .FileUploadContainer.droppeable .FileUploadInput .InputContainer {
   border: 1px dashed var(--base-01);
 }
 
