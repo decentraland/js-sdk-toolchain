@@ -6,6 +6,7 @@ import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
 import { FileUploadField, Dropdown } from '../../ui'
+import { ACCEPTED_FILE_TYPES } from '../../ui/FileUploadField/types'
 import { Props } from './types'
 import { fromGltf, toGltf, isValidInput, COLLISION_LAYERS, isModel } from './utils'
 import { useAppSelector } from '../../../redux/hooks'
@@ -44,6 +45,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
       <Block label="Path">
         <FileUploadField
           {...getInputProps('src')}
+          accept={ACCEPTED_FILE_TYPES['model']}
           onDrop={handleDrop}
           error={files && !isValid}
           isValidFile={isModel}

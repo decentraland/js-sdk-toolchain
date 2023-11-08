@@ -7,3 +7,9 @@ export type Props = Omit<TextFieldProps, 'accept' | 'type' | 'onDrop'> & {
   onDrop?: (path: string) => void | Promise<void>
   isValidFile?: (node: TreeNode) => boolean
 }
+
+export const ACCEPTED_FILE_TYPES = {
+  model: ['.gltf', '.glb'],
+  image: ['.png'],
+  audio: ['.mp3', '.wav', '.ogg']
+}
