@@ -90,6 +90,20 @@ const Dropdown: React.FC<Props> = (props) => {
     [searchable, search]
   )
 
+  const filteredOptiones = useMemo(() => {
+    return options.filter(filterOptions)
+  }, [options, filterOptions])
+
+  const renderEmptyMessage = useCallback(() => {
+    if (options.length > 0 && filteredOptiones.length === 0) {
+      return 'There are no results for this search.'
+    }
+
+    if (options.length === 0) {
+      return empty || 'No options available.'
+    }
+  }, [empty, options, filteredOptiones])
+
   const selectedValue = useMemo(() => {
     return options.find((option) => isOptionSelected(value, option.value))
   }, [options, value])
@@ -127,7 +141,7 @@ const Dropdown: React.FC<Props> = (props) => {
         )}
         {showOptions ? (
           <div className={cx('DropdownOptions', { searchable })}>
-            {searchable ? (
+            {searchable && options.length > 0 ? (
               <TextField
                 className="DropdownSearch"
                 placeholder="Search"
@@ -136,20 +150,18 @@ const Dropdown: React.FC<Props> = (props) => {
                 onClick={handleSearchClick}
               />
             ) : null}
-            {options.length > 0 ? (
-              options
-                .filter(filterOptions)
-                .map((option, idx) => (
-                  <Option
-                    key={idx}
-                    {...option}
-                    onClick={handleSelectOption}
-                    selected={isOptionSelected(value, option.value)}
-                    minWidth={minWidth}
-                  />
-                ))
+            {filteredOptiones.length > 0 ? (
+              filteredOptiones.map((option, idx) => (
+                <Option
+                  key={idx}
+                  {...option}
+                  onClick={handleSelectOption}
+                  selected={isOptionSelected(value, option.value)}
+                  minWidth={minWidth}
+                />
+              ))
             ) : (
-              <Option className="DropdownEmptyOption" label={empty} disabled />
+              <Option className="DropdownEmptyOption" label={renderEmptyMessage()} disabled />
             )}
           </div>
         ) : null}
