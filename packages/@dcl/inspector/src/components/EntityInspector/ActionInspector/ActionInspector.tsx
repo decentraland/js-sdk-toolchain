@@ -453,19 +453,21 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
                   onBlur={handleFocusInput}
                 />
               </div>
-              <Dropdown
-                label={'Select Action'}
-                disabled={availableActions.length === 0}
-                options={[
-                  { label: 'Select an Action', value: '' },
-                  ...availableActions.map((availableAction) => ({
-                    label: ActionMapOption[availableAction],
-                    value: availableAction
-                  }))
-                ]}
-                value={action.type}
-                onChange={(e) => handleChangeType(e, idx)}
-              />
+              <div className="field">
+                <Dropdown
+                  label={'Select Action'}
+                  disabled={availableActions.length === 0}
+                  options={[
+                    { label: 'Select an Action', value: '' },
+                    ...availableActions.map((availableAction) => ({
+                      label: ActionMapOption[availableAction],
+                      value: availableAction
+                    }))
+                  ]}
+                  value={action.type}
+                  onChange={(e) => handleChangeType(e, idx)}
+                />
+              </div>
               <MoreOptionsMenu>
                 <Button className="RemoveButton" onClick={(e) => handleRemoveAction(e, idx)}>
                   <RemoveIcon /> Remove Action

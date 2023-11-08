@@ -3,7 +3,7 @@
 }
 
 .Text.Field {
-  flex-grow: 1;
+  flex: 1;
 }
 
 .Text.Field .InputContainer {
