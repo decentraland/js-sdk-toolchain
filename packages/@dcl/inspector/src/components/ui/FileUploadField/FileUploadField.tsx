@@ -33,6 +33,7 @@ const FileUploadField: React.FC<Props> = ({
   value,
   isEnabledFileExplorer = true,
   error,
+  label,
   onDrop,
   isValidFile,
   accept = EXTENSIONS
@@ -154,7 +155,8 @@ const FileUploadField: React.FC<Props> = ({
           id={id.current}
           className="FileUploadInput"
           ref={drop}
-          placeholder="Path File"
+          placeholder="File Path"
+          label={label}
           onChange={handleChangeTextField}
           value={removeBase(path)}
           error={hasError}
