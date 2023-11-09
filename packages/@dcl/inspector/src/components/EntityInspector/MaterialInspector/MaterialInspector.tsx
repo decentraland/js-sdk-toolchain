@@ -6,8 +6,7 @@ import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { useAppSelector } from '../../../redux/hooks'
 import { selectAssetCatalog } from '../../../redux/app'
 import { Block } from '../../Block'
-import { SelectField } from '../SelectField'
-import { TextField, CheckboxField } from '../../ui'
+import { CheckboxField, Dropdown, RangeField } from '../../ui'
 import { Container } from '../../Container'
 import { Texture, Props as TextureProps } from './Texture'
 import { ColorField } from '../../ui/ColorField'
@@ -40,11 +39,13 @@ export default withSdk<Props>(({ sdk, entity }) => {
 
   return (
     <Container label="Material" className="Material" onRemoveContainer={handleRemove}>
-      <Block label="Material">
-        <SelectField label="Type" options={MATERIAL_TYPES} {...materialType} />
+      <Block>
+        <Dropdown label="Material" options={MATERIAL_TYPES} {...materialType} />
       </Block>
       <Block>
-        <TextField leftLabel="Alpha test" {...getInputProps('alphaTest')} />
+        <RangeField label="Alpha test" max={1} step={0.1} {...getInputProps('alphaTest')} />
+      </Block>
+      <Block>
         <CheckboxField label="Cast shadows" checked={!!castShadows.value} {...castShadows} />
       </Block>
       {materialType.value === MaterialType.MT_UNLIT && (
@@ -55,30 +56,28 @@ export default withSdk<Props>(({ sdk, entity }) => {
       {materialType.value === MaterialType.MT_PBR && (
         <>
           <Block>
-            <SelectField
-              label="Transparency mode"
-              options={TRANSPARENCY_MODES}
-              {...getInputProps('transparencyMode')}
-            />
+            <Dropdown label="Transparency mode" options={TRANSPARENCY_MODES} {...getInputProps('transparencyMode')} />
           </Block>
           <Block>
-            <TextField leftLabel="Metallic" type="number" {...getInputProps('metallic')} />
-            <TextField leftLabel="Roughness" type="number" {...getInputProps('roughness')} />
+            <RangeField label="Metallic" max={1} step={0.1} {...getInputProps('metallic')} />
           </Block>
-          <Block label="Intensity">
-            <TextField leftLabel="Specular" type="number" {...getInputProps('specularIntensity')} />
-            <TextField leftLabel="Emissive" type="number" {...getInputProps('emissiveIntensity')} />
-            <TextField leftLabel="Direct" type="number" {...getInputProps('directIntensity')} />
+          <Block>
+            <RangeField label="Roughness" max={1} step={0.1} {...getInputProps('roughness')} />
           </Block>
-          <Block label="Albedo color">
-            <ColorField {...getInputProps('albedoColor')} />
+          <Block>
+            <ColorField label="Albedo color" {...getInputProps('albedoColor')} />
           </Block>
-          <Block label="Emissive color">
-            <ColorField {...getInputProps('emissiveColor')} />
+          <Block>
+            <ColorField label="Emissive color" {...getInputProps('emissiveColor')} />
           </Block>
-          <Block label="Reflectivity color">
-            <ColorField {...getInputProps('reflectivityColor')} />
+          <Block>
+            <ColorField label="Reflectivity color" {...getInputProps('reflectivityColor')} />
           </Block>
+          <Container label="Intensity" borderer>
+            <RangeField label="Specular" max={1} step={0.1} {...getInputProps('specularIntensity')} />
+            <RangeField label="Emissive" max={1} step={0.1} {...getInputProps('emissiveIntensity')} />
+            <RangeField label="Direct" max={1} step={0.1} {...getInputProps('directIntensity')} />
+          </Container>
         </>
       )}
 
