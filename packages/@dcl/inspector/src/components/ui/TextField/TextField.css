@@ -3,7 +3,9 @@
 }
 
 .Text.Field {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 .Text.Field .InputContainer {
@@ -63,37 +65,37 @@
   color: var(--base-09);
 }
 
-.Text.Field .InputContainer:has(.left-content) {
+.Text.Field .InputContainer:has(.LeftContent) {
   padding: 0px 0px 0px 8px;
 }
 
-.Text.Field .InputContainer:has(.right-content) {
+.Text.Field .InputContainer:has(.RightContent) {
   padding: 0px 8px 0px 0px;
 }
 
-.Text.Field .InputContainer .left-content,
-.Text.Field .InputContainer .right-content {
+.Text.Field .InputContainer .LeftContent,
+.Text.Field .InputContainer .RightContent {
   display: flex;
   align-items: center;
   min-width: 12px;
   line-height: normal;
 }
 
-.Text.Field .InputContainer .left-content .input-label,
-.Text.Field .InputContainer .right-content .input-label {
+.Text.Field .InputContainer .LeftContent .InputLabel,
+.Text.Field .InputContainer .RightContent .InputLabel {
   display: block;
   color: var(--base-09);
   flex-shrink: 0;
 }
 
-.Text.Field .InputContainer .left-content .left-icon,
-.Text.Field .InputContainer .right-content .right-icon {
+.Text.Field .InputContainer .LeftContent .LeftIcon,
+.Text.Field .InputContainer .RightContent .RightIcon {
   display: inline-flex;
   position: relative;
 }
 
-.Text.Field .InputContainer .left-content .left-icon svg,
-.Text.Field .InputContainer .right-content .right-icon svg {
+.Text.Field .InputContainer .LeftContent .LeftIcon svg,
+.Text.Field .InputContainer .RightContent .RightIcon svg {
   margin: 0;
 }
 
