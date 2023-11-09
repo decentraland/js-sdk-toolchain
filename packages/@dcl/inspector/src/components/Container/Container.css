@@ -51,15 +51,6 @@
   padding-bottom: 12px;
 }
 
-.Container .content .Container {
-  padding: 6px 0;
-  border-bottom: 1px solid var(--base-12);
-}
-
-.Container .content .Container:last-of-type {
-  border: none;
-}
-
 .Container > .title > .RightContent > .MoreOptionsMenu > .MoreOptionsContent {
   min-width: 175px;
 }
@@ -72,4 +63,9 @@
 
 .Container .title + .content {
   margin-top: 16px;
+}
+
+.Container.borderer {
+  border-radius: 4px;
+  border: 1px solid var(--base-14);
 }
