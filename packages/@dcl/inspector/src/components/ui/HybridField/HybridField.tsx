@@ -5,6 +5,7 @@ import { Dropdown } from '../Dropdown'
 import { TextField } from '../TextField'
 import { ErrorMessage } from '../ErrorMessage'
 import { ColorPicker } from '../ColorPicker'
+import { Label } from '../Label'
 import type { Props as TextFieldProps } from '../TextField/types'
 import { type Props, type Field, FieldType } from './types'
 
@@ -28,6 +29,7 @@ const HybridField: React.FC<Props> = ({
   className,
   leftIcon,
   rightIcon,
+  label,
   error,
   secondaryError,
   disabled,
@@ -67,6 +69,7 @@ const HybridField: React.FC<Props> = ({
 
   return (
     <div className={cx('Hybrid Field', className)}>
+      <Label text={label} />
       <div className="InputContainer">
         <Dropdown
           options={options}
