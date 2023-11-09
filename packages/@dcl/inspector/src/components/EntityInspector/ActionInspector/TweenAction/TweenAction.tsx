@@ -2,10 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { TweenType, InterpolationType } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 
-import { Dropdown } from '../../../Dropdown'
-import { RangeField } from '../../RangeField'
-import { TextField } from '../../TextField'
-import { InfoTooltip } from '../../InfoTooltip'
+import { Dropdown, TextField, RangeField, InfoTooltip } from '../../../ui'
 import { isValidTween } from './utils'
 import type { Props } from './types'
 
@@ -42,7 +39,6 @@ function parseDuration(value: string | number): string {
 const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props) => {
   const [tween, setTween] = useState(tweenProp)
   const [endPosition, setEndPosition] = useState(tween.end)
-  const [duration, setDuration] = useState(parseDuration(tween.duration))
 
   useEffect(() => {
     if (!recursiveCheck(tween, tweenProp, 2) || !isValidTween(tween)) return
@@ -89,25 +85,19 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
     [tween, setTween]
   )
 
-  const handleChangeDuration = useCallback(
-    (e: React.ChangeEvent<HTMLElement>) => {
-      const { value } = e.target as HTMLInputElement
-      setDuration(value)
-    },
-    [setDuration]
-  )
+  const isValidDuration = useCallback((value: string) => {
+    return !isNaN(parseInt(value.toString())) && parseFloat(value.toString()) > 0
+  }, [])
 
   const handleChangeDurationRange = useCallback(
     (e: React.ChangeEvent<HTMLElement>) => {
       const { value } = e.target as HTMLInputElement
-      const parsedValue = parseFloat(value)
-      if (!isNaN(parsedValue) && parsedValue >= 0) {
-        setTween({ ...tween, duration: parsedValue })
-      }
 
-      setDuration(parseDuration(parsedValue))
+      if (isValidDuration(value)) {
+        setTween({ ...tween, duration: parseDuration(value) })
+      }
     },
-    [tween, setTween, setDuration]
+    [tween, setTween, isValidDuration]
   )
 
   const renderTweenInfo = () => {
@@ -139,9 +129,9 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
         <div className="field">
           <label>Select Tween {renderTweenInfo()}</label>
           <Dropdown
+            placeholder="Select a Tween Type"
             options={[
-              { value: '', text: 'Select a Tween Type' },
-              ...Object.values(TweenType).map((tweenType) => ({ text: TweenMapOption[tweenType], value: tweenType }))
+              ...Object.values(TweenType).map((tweenType) => ({ label: TweenMapOption[tweenType], value: tweenType }))
             ]}
             value={tween.type}
             onChange={handleChangeType}
@@ -189,10 +179,10 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
         <div className="field">
           <label>Curve Type {rendeCurveTypeInfo()}</label>
           <Dropdown
+            placeholder="Select a Curve Type"
             options={[
-              { value: '', text: 'Select a Curve Type' },
               ...Object.values(InterpolationType).map((interpolationType) => ({
-                text: InterpolationMapOption[interpolationType],
+                label: InterpolationMapOption[interpolationType],
                 value: interpolationType
               }))
             ]}
@@ -204,21 +194,12 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
       <div className="row">
         <div className="field duration">
           <label>Duration {renderDurationInfo()}</label>
-          <div className="row">
-            <RangeField
-              value={duration || 0}
-              onChange={handleChangeDuration}
-              onBlur={handleChangeDurationRange}
-              step={0.25}
-            />
-            <TextField
-              type="number"
-              value={duration}
-              error={isNaN(parseInt(duration)) || parseInt(duration) < 0}
-              onChange={handleChangeDuration}
-              onBlur={handleChangeDurationRange}
-            />
-          </div>
+          <RangeField
+            value={tween.duration}
+            onChange={handleChangeDurationRange}
+            isValidValue={isValidDuration}
+            step={0.25}
+          />
         </div>
       </div>
     </div>

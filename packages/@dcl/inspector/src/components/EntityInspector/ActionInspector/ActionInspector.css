@@ -16,10 +16,12 @@
 .ActionInspector > .content > .Block > .content .row {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
   width: 100%;
   position: relative;
-  gap: 4px;
+  column-gap: 8px;
+  row-gap: 12px;
 }
 
 .ActionInspector > .content > .Block > .content .row .field {
@@ -43,12 +45,16 @@
   gap: 4px;
 }
 
-.ActionInspector > .content > .Block > .content .row .field > .TextField {
+.ActionInspector > .content > .Block > .content .row .field > .Text.Field {
   width: 100%;
 }
 
-.ActionInspector > .content > .Block > .content .row .field.duration .TextField {
+.ActionInspector > .content > .Block > .content .row .field.duration .Text.Field {
   width: 50px;
+}
+
+.ActionInspector > .content > .Block > .content .row .field.duration .Text.Field input {
+  min-width: 50px;
 }
 
 .ActionInspector .content .RemoveButton {
@@ -61,10 +67,6 @@
 .ActionInspector .content .Block .content {
   gap: 15px;
   align-items: flex-end;
-}
-
-.ActionInspector .content .Block .content .TextField {
-  height: 25px;
 }
 
 .ActionInspector .content .Block .content .DropdownContainer {

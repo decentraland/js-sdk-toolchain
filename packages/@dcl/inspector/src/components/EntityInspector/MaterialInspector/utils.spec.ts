@@ -1,8 +1,8 @@
 import { PBMaterial, PBMaterial_PbrMaterial, PBMaterial_UnlitMaterial } from '@dcl/ecs'
 import { MaterialInput, MaterialType } from './types'
 import { fromMaterial, toMaterial, isValidMaterial } from './utils'
-import { COLORS } from '../ColorField/utils'
 import { Texture } from './Texture/types'
+import { COLORS } from '../../ui/ColorField/utils'
 
 describe('fromMaterial', () => {
   it('should convert from unlit material', () => {

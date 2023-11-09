@@ -19,7 +19,15 @@
 }
 
 .Block.error {
-  border: 1px var(--primary) dashed;
+  border: 1px var(--primary-main) dashed;
   padding: 5px;
   border-radius: 2px;
+}
+
+.Block:has(.content > .Field):not(:first-child) {
+  margin-top: 0;
+}
+
+.Block .content:has(.Field) {
+  column-gap: 8px;
 }

@@ -39,7 +39,7 @@ const App = () => {
           <PanelGroup direction="horizontal" autoSaveId="horizontal">
             {!hiddenPanels[PanelName.ENTITIES] && (
               <>
-                <Panel defaultSize={20} minSize={12} order={1}>
+                <Panel defaultSize={15} minSize={15} order={1}>
                   <Box className="composite-inspector">
                     <Hierarchy />
                   </Box>
@@ -64,7 +64,7 @@ const App = () => {
             {!hiddenPanels[PanelName.COMPONENTS] && selectedEntity !== null && (
               <>
                 <PanelResizeHandle className="horizontal-handle" />
-                <Panel defaultSize={20} minSize={15} order={3}>
+                <Panel defaultSize={25.5} minSize={20} order={3}>
                   <Box className="entity-inspector">
                     <EntityInspector />
                   </Box>
