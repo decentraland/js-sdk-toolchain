@@ -54,7 +54,7 @@ function TextureInspector({ label, texture, files, getInputProps }: Props) {
       </Block>
       <Block ref={drop}>
         {type.value === Texture.TT_TEXTURE && (
-          <TextField ref={inputRef} label="Path" type="text" error={!isValid} drop={isHover} {...src} />
+          <TextField ref={inputRef} leftLabel="Path" type="text" error={!isValid} drop={isHover} {...src} />
         )}
         {/* {type.value === Texture.TT_AVATAR_TEXTURE && <TextField label="User ID" {...getInputProps(`${texture}.userId`)} />}
         {type.value === Texture.TT_VIDEO_TEXTURE && <TextField label="Video player entity" {...getInputProps(`${texture}.videoPlayerEntity`)} />} */}

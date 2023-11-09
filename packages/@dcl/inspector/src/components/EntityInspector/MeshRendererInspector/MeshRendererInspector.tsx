@@ -35,8 +35,8 @@ export default withSdk<Props>(({ sdk, entity }) => {
           {/* {hasUvs(mesh.value) && <TextField label="Uvs" type="text" {...getInputProps('uvs')} />} */}
           {mesh.value === MeshType.MT_CYLINDER && (
             <>
-              <TextField label="Radius top" type="number" {...getInputProps('radiusTop')} />
-              <TextField label="Radius bottom" type="number" {...getInputProps('radiusBottom')} />
+              <TextField leftLabel="Radius top" type="number" {...getInputProps('radiusTop')} />
+              <TextField leftLabel="Radius bottom" type="number" {...getInputProps('radiusBottom')} />
             </>
           )}
         </Block>

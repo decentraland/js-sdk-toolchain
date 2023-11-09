@@ -44,7 +44,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
         <SelectField label="Type" options={MATERIAL_TYPES} {...materialType} />
       </Block>
       <Block>
-        <TextField label="Alpha test" {...getInputProps('alphaTest')} />
+        <TextField leftLabel="Alpha test" {...getInputProps('alphaTest')} />
         <CheckboxField label="Cast shadows" checked={!!castShadows.value} {...castShadows} />
       </Block>
       {materialType.value === MaterialType.MT_UNLIT && (
@@ -62,13 +62,13 @@ export default withSdk<Props>(({ sdk, entity }) => {
             />
           </Block>
           <Block>
-            <TextField label="Metallic" type="number" {...getInputProps('metallic')} />
-            <TextField label="Roughness" type="number" {...getInputProps('roughness')} />
+            <TextField leftLabel="Metallic" type="number" {...getInputProps('metallic')} />
+            <TextField leftLabel="Roughness" type="number" {...getInputProps('roughness')} />
           </Block>
           <Block label="Intensity">
-            <TextField label="Specular" type="number" {...getInputProps('specularIntensity')} />
-            <TextField label="Emissive" type="number" {...getInputProps('emissiveIntensity')} />
-            <TextField label="Direct" type="number" {...getInputProps('directIntensity')} />
+            <TextField leftLabel="Specular" type="number" {...getInputProps('specularIntensity')} />
+            <TextField leftLabel="Emissive" type="number" {...getInputProps('emissiveIntensity')} />
+            <TextField leftLabel="Direct" type="number" {...getInputProps('directIntensity')} />
           </Block>
           <Block label="Albedo color">
             <ColorField {...getInputProps('albedoColor')} />
