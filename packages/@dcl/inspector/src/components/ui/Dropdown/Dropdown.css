@@ -1,8 +1,11 @@
+.Block .content:has(.Dropdown.Field .ErrorMessage) {
+  align-items: flex-start;
+}
+
 .Dropdown.Field {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  gap: 6px;
 }
 
 .Dropdown.Field .DropdownLabel {

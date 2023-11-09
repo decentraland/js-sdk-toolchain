@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import cx from 'classnames'
 import { VscChevronDown as DownArrowIcon, VscSearch as SearchIcon } from 'react-icons/vsc'
 import { useOutsideClick } from '../../../hooks/useOutsideClick'
+import { Label } from '../Label'
 import { TextField } from '../TextField'
 import { ErrorMessage } from '../ErrorMessage'
 import { Option } from './Option'
@@ -124,7 +125,7 @@ const Dropdown: React.FC<Props> = (props) => {
 
   return (
     <div className="Dropdown Field" ref={ref}>
-      {label ? <label className="DropdownLabel">{label}</label> : null}
+      <Label text={label} />
       <div
         className={cx('DropdownContainer', className, {
           focused: isFocused,
