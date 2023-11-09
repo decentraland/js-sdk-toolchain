@@ -119,7 +119,6 @@ const FileUploadField: React.FC<Props> = ({
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0]
       if (file && (isAsset(file.name) || isAudioFile(file.name))) {
-        console.log('paso por aki?')
         setDropError(false)
         dispatch(selectAssetsTab({ tab: AssetsTab.Import }))
         const newUploadFile = { ...uploadFile }

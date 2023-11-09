@@ -44,7 +44,6 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
 
   const handleDrop = useCallback(
     (src: string) => {
-      console.log('fileupload playsound', src)
       setPayload({ ...payload, src })
     },
     [payload, setPayload]
