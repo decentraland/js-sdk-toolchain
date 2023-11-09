@@ -127,8 +127,11 @@ const FileUploadField: React.FC<Props> = ({
       } else {
         setDropError(true)
       }
+
+      // Clear input value
+      if (inputRef.current) inputRef.current.value = ''
     },
-    [setPath, setDropError]
+    [inputRef, setPath, setDropError]
   )
 
   const handleChangeTextField = useCallback(
