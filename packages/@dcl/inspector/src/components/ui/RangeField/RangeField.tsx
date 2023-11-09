@@ -26,9 +26,9 @@ const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
   const [inputValue, setInputValue] = useState(value)
 
   const completionPercentage = useMemo(() => {
-    const parsedValue = parseInt(inputValue.toString(), 10) || 0
-    const parsedMin = parseInt(min.toString(), 10) || 0
-    const parsedMax = parseInt(max.toString(), 10) || 100
+    const parsedValue = parseFloat(inputValue.toString()) || 0
+    const parsedMin = parseFloat(min.toString()) || 0
+    const parsedMax = parseFloat(max.toString()) || 100
 
     const normalizedValue = Math.min(Math.max(parsedValue, parsedMin), parsedMax)
 
@@ -40,6 +40,13 @@ const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
     '--completionPercentage': `${completionPercentage}%`
   } as any
 
+  const isValid = useCallback(
+    (value: Props['value']) => {
+      return isValidValue ? isValidValue(value) : true
+    },
+    [isValidValue]
+  )
+
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value
@@ -48,11 +55,11 @@ const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
         setInputValue(value)
       }
 
-      if (isValidValue && isValidValue(value)) {
+      if (isValid(value)) {
         onChange && onChange(e)
       }
     },
-    [min, max, onChange, isValidValue, setInputValue]
+    [min, max, onChange, isValid, setInputValue]
   )
 
   const handleChangeTextField = useCallback(
