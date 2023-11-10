@@ -4,5 +4,6 @@ export type Props = {
   rightContent?: JSX.Element
   initialOpen?: boolean
   indicator?: boolean | string | JSX.Element
+  borderer?: boolean
   onRemoveContainer?: () => void
 }

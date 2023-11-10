@@ -8,6 +8,10 @@ import { Props } from './types'
 
 import './RangeField.css'
 
+function isFloat(value: any) {
+  return Number.isFinite(value) && !Number.isInteger(value)
+}
+
 const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
   const {
     label,
@@ -26,9 +30,9 @@ const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
   const [inputValue, setInputValue] = useState(value)
 
   const completionPercentage = useMemo(() => {
-    const parsedValue = parseInt(inputValue.toString(), 10) || 0
-    const parsedMin = parseInt(min.toString(), 10) || 0
-    const parsedMax = parseInt(max.toString(), 10) || 100
+    const parsedValue = parseFloat(inputValue.toString()) || 0
+    const parsedMin = parseFloat(min.toString()) || 0
+    const parsedMax = parseFloat(max.toString()) || 100
 
     const normalizedValue = Math.min(Math.max(parsedValue, parsedMin), parsedMax)
 
@@ -40,6 +44,21 @@ const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
     '--completionPercentage': `${completionPercentage}%`
   } as any
 
+  const isValid = useCallback(
+    (value: Props['value']) => {
+      return isValidValue ? isValidValue(value) : true
+    },
+    [isValidValue]
+  )
+
+  const formatInput = useCallback(
+    (value: Props['value'] = 0) => {
+      const decimals = isFloat(step) ? 2 : 0
+      return parseFloat(value.toString()).toFixed(decimals)
+    },
+    [step]
+  )
+
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value
@@ -48,11 +67,11 @@ const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
         setInputValue(value)
       }
 
-      if (isValidValue && isValidValue(value)) {
+      if (isValid(value)) {
         onChange && onChange(e)
       }
     },
-    [min, max, onChange, isValidValue, setInputValue]
+    [min, max, onChange, isValid, setInputValue]
   )
 
   const handleChangeTextField = useCallback(
@@ -65,20 +84,20 @@ const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
 
   const handleOnBlur: React.FocusEventHandler<HTMLInputElement> = useCallback(
     (event) => {
-      if (isValidValue && isValidValue(inputValue)) {
+      if (isValid(inputValue)) {
         onChange &&
           onChange({ ...event, target: { ...event.target, value: inputValue } } as React.ChangeEvent<HTMLInputElement>)
       }
     },
-    [inputValue, onChange, isValidValue]
+    [inputValue, onChange, isValid]
   )
 
   const errorMessage = useMemo(() => {
-    if (isValidValue && !isValidValue(inputValue)) {
+    if (!isValid(inputValue)) {
       return 'Invalid value'
     }
     return undefined
-  }, [inputValue, isValidValue])
+  }, [inputValue, isValid])
 
   return (
     <div className="Range Field">
@@ -102,7 +121,7 @@ const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
         <TextField
           className="RangeTextInput"
           type="number"
-          value={inputValue}
+          value={formatInput(inputValue)}
           error={!!errorMessage}
           disabled={disabled}
           onChange={handleChangeTextField}

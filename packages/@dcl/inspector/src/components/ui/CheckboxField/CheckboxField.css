@@ -49,11 +49,12 @@
   background: var(--base-12);
   border-color: var(--base-12);
 }
-.Checkbox.Field .InputContainer label {
+
+.Checkbox.Field .InputContainer .Label {
   text-wrap: nowrap;
 }
 
-.Checkbox.Field .InputContainer.disabled label {
+.Checkbox.Field .InputContainer.disabled .Label {
   color: var(--base-09);
 }
 
