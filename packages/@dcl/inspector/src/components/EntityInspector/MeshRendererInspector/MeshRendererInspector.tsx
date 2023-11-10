@@ -1,14 +1,14 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import { withSdk } from '../../../hoc/withSdk'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { Block } from '../../Block'
-import { SelectField } from '../SelectField'
-import { TextField } from '../../ui/TextField'
 import { Container } from '../../Container'
-import { Props, MeshType } from './types'
+import { TextField, Dropdown } from '../../ui'
 import { fromMeshRenderer, toMeshRenderer, isValidInput, SHAPES } from './utils'
+
+import { Props, MeshType } from './types'
 
 export default withSdk<Props>(({ sdk, entity }) => {
   const { MeshRenderer } = sdk.components
@@ -23,24 +23,34 @@ export default withSdk<Props>(({ sdk, entity }) => {
 
   if (!hasMeshRenderer) return null
 
-  const mesh = getInputProps('mesh')
+  const mesh = useMemo(() => getInputProps('mesh'), [getInputProps])
+
+  const renderComponent = useCallback(() => {
+    switch (mesh.value) {
+      case MeshType.MT_CYLINDER: {
+        return (
+          <Block label="Radius">
+            <TextField leftLabel="Rop" type="number" {...getInputProps('radiusTop')} />
+            <TextField leftLabel="Bottom" type="number" {...getInputProps('radiusBottom')} />
+          </Block>
+        )
+      }
+      case MeshType.MT_SPHERE:
+      default: {
+        {
+          /* {hasUvs(mesh.value) && <TextField label="Uvs" type="text" {...getInputProps('uvs')} />} */
+        }
+        return null
+      }
+    }
+  }, [mesh, getInputProps])
 
   return (
     <Container label="MeshRenderer" className="MeshRenderer" onRemoveContainer={handleRemove}>
       <Block>
-        <SelectField label="Shape" options={SHAPES} {...mesh} />
+        <Dropdown label="Shape" options={SHAPES} {...mesh} />
       </Block>
-      {mesh.value !== MeshType.MT_SPHERE && (
-        <Block label="Additional fields">
-          {/* {hasUvs(mesh.value) && <TextField label="Uvs" type="text" {...getInputProps('uvs')} />} */}
-          {mesh.value === MeshType.MT_CYLINDER && (
-            <>
-              <TextField leftLabel="Radius top" type="number" {...getInputProps('radiusTop')} />
-              <TextField leftLabel="Radius bottom" type="number" {...getInputProps('radiusBottom')} />
-            </>
-          )}
-        </Block>
-      )}
+      {renderComponent()}
     </Container>
   )
 })
