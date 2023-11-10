@@ -23,8 +23,8 @@ const ColorField: React.FC<Props> = ({ label, value, onChange }) => {
 
   return (
     <div className="Color Field">
-      {label && <label>{label}</label>}
       <HybridField
+        label={label}
         options={OPTIONS}
         value={selectedOption}
         secondaryType={

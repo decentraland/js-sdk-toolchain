@@ -11,8 +11,9 @@ import { useAppDispatch, useAppSelector } from '../../../redux/hooks'
 import { DropTypesEnum, ProjectAssetDrop, getNode } from '../../../lib/sdk/drag-drop'
 import { EXTENSIONS, withAssetDir } from '../../../lib/data-layer/host/fs-utils'
 
-import { isAsset, isModel } from '../../EntityInspector/GltfInspector/utils'
-import { isAudio, isAudioFile } from '../../EntityInspector/AudioSourceInspector/utils'
+import { isModel } from '../../EntityInspector/GltfInspector/utils'
+import { isAudio } from '../../EntityInspector/AudioSourceInspector/utils'
+import { isModel as isTexture } from '../../EntityInspector/MaterialInspector/Texture/utils'
 import { TreeNode } from '../../ProjectAssetExplorer/ProjectView'
 import { AssetNodeItem } from '../../ProjectAssetExplorer/types'
 
@@ -33,6 +34,7 @@ const FileUploadField: React.FC<Props> = ({
   value,
   isEnabledFileExplorer = true,
   error,
+  label,
   onDrop,
   isValidFile,
   accept = EXTENSIONS
@@ -80,9 +82,16 @@ const FileUploadField: React.FC<Props> = ({
 
   const isValid = useCallback(
     (node: TreeNode): node is AssetNodeItem => {
-      return isValidFile ? isValidFile(node) : isModel(node) || isAudio(node)
+      return isValidFile ? isValidFile(node) : isModel(node) || isAudio(node) || isTexture(node)
     },
     [isValidFile]
+  )
+
+  const isValidFileName = useCallback(
+    (fileName: string = '') => {
+      return accept.find((ext) => fileName.endsWith(ext))
+    },
+    [accept]
   )
 
   const [{ isHover, canDrop }, drop] = useDrop(
@@ -118,7 +127,7 @@ const FileUploadField: React.FC<Props> = ({
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0]
-      if (file && (isAsset(file.name) || isAudioFile(file.name))) {
+      if (file && isValidFileName(file.name)) {
         setDropError(false)
         dispatch(selectAssetsTab({ tab: AssetsTab.Import }))
         const newUploadFile = { ...uploadFile }
@@ -136,7 +145,7 @@ const FileUploadField: React.FC<Props> = ({
 
   const handleChangeTextField = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
-      if (value && (isAsset(value) || isAudioFile(value))) {
+      if (value && isValidFileName(value)) {
         setPath(addBase(value))
         setDropError(false)
       } else {
@@ -157,7 +166,8 @@ const FileUploadField: React.FC<Props> = ({
           id={id.current}
           className="FileUploadInput"
           ref={drop}
-          placeholder="Path File"
+          placeholder="File Path"
+          label={label}
           onChange={handleChangeTextField}
           value={removeBase(path)}
           error={hasError}

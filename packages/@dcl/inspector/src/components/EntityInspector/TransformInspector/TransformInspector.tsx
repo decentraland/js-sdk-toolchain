@@ -53,20 +53,20 @@ export default withSdk<Props>(({ sdk, entity }) => {
   return (
     <Container label="Transform" className="Transform" onRemoveContainer={handleRemove}>
       <Block label="Position">
-        <TextField label="X" type="number" {...getInputProps('position.x')} />
-        <TextField label="Y" type="number" {...getInputProps('position.y')} />
-        <TextField label="Z" type="number" {...getInputProps('position.z')} />
+        <TextField leftLabel="X" type="number" {...getInputProps('position.x')} />
+        <TextField leftLabel="Y" type="number" {...getInputProps('position.y')} />
+        <TextField leftLabel="Z" type="number" {...getInputProps('position.z')} />
       </Block>
       <Block label="Scale">
-        <TextField label="X" type="number" {...getInputProps('scale.x')} />
-        <TextField label="Y" type="number" {...getInputProps('scale.y')} />
-        <TextField label="Z" type="number" {...getInputProps('scale.z')} />
+        <TextField leftLabel="X" type="number" {...getInputProps('scale.x')} />
+        <TextField leftLabel="Y" type="number" {...getInputProps('scale.y')} />
+        <TextField leftLabel="Z" type="number" {...getInputProps('scale.z')} />
         <Link field="porportionalScaling" getInputProps={_getConfigProps} />
       </Block>
       <Block label="Rotation">
-        <TextField label="X" type="number" {...getInputProps('rotation.x')} />
-        <TextField label="Y" type="number" {...getInputProps('rotation.y')} />
-        <TextField label="Z" type="number" {...getInputProps('rotation.z')} />
+        <TextField leftLabel="X" type="number" {...getInputProps('rotation.x')} />
+        <TextField leftLabel="Y" type="number" {...getInputProps('rotation.y')} />
+        <TextField leftLabel="Z" type="number" {...getInputProps('rotation.z')} />
       </Block>
     </Container>
   )
