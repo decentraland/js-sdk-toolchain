@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-
+import { removeBasePath } from '../../../../lib/logic/remove-base-path'
 import { Block } from '../../../Block'
 import { Container } from '../../../Container'
 import { Dropdown, FileUploadField } from '../../../ui'
@@ -12,9 +12,15 @@ function TextureInspector({ label, texture, files, getInputProps }: Props) {
   const handleDrop = useCallback(
     (src: string) => {
       const srcInput = getInputProps(`${texture}.src`)
-      srcInput?.onChange && srcInput.onChange({ target: { value: src } } as React.ChangeEvent<HTMLInputElement>)
+      // The src comes with the basePath, so we need to remove it before setting the value because the utils fromTexture is adding it again
+      // TODO: Refactor EntityInspector/MaterialInspector/Texture/utils.ts::fromTexture util to not remove the basePath
+      const value = removeBasePath(files?.basePath ?? '', src)
+      srcInput?.onChange &&
+        srcInput.onChange({
+          target: { value }
+        } as React.ChangeEvent<HTMLInputElement>)
     },
-    [texture, getInputProps]
+    [files, texture, getInputProps]
   )
 
   const type = getInputProps(`${texture}.type`)

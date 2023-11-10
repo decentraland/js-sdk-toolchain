@@ -65,7 +65,7 @@ export const toTexture = (base: string, value?: TextureInput): TextureUnion => {
         tex: {
           $case: 'texture',
           texture: {
-            src: value?.src ?? '',
+            src: value?.src ? toString(base ? base + '/' + value.src : value.src) : '',
             wrapMode: toNumber(value?.wrapMode ?? '0', TextureWrapMode.TWM_REPEAT),
             filterMode: toNumber(value?.filterMode ?? '0', TextureFilterMode.TFM_POINT)
           }
