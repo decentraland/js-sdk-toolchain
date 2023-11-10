@@ -4,14 +4,13 @@ import { withSdk } from '../../../hoc/withSdk'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { Block } from '../../Block'
-import { SelectField } from '../SelectField'
-import { TextField } from '../../ui/TextField'
 import { Container } from '../../Container'
-import { Props } from './types'
-import { fromMeshCollider, toMeshCollider, isValidInput } from './utils'
+import { TextField, Dropdown } from '../../ui'
 import { SHAPES } from '../MeshRendererInspector/utils'
 import { MeshType } from '../MeshRendererInspector/types'
 import { COLLISION_LAYERS } from '../GltfInspector/utils'
+import { fromMeshCollider, toMeshCollider, isValidInput } from './utils'
+import { Props } from './types'
 
 export default withSdk<Props>(({ sdk, entity }) => {
   const { MeshCollider } = sdk.components
@@ -31,13 +30,13 @@ export default withSdk<Props>(({ sdk, entity }) => {
   return (
     <Container label="MeshCollider" className="MeshCollider" onRemoveContainer={handleRemove}>
       <Block>
-        <SelectField label="Shape" options={SHAPES} {...mesh} />
-        <SelectField label="Collision layer" options={COLLISION_LAYERS} {...getInputProps('collisionMask')} />
+        <Dropdown label="Shape" options={SHAPES} {...mesh} />
+        <Dropdown label="Collision layer" options={COLLISION_LAYERS} {...getInputProps('collisionMask')} />
       </Block>
       {mesh.value === MeshType.MT_CYLINDER && (
-        <Block label="Additional fields">
-          <TextField leftLabel="Radius top" type="number" {...getInputProps('radiusTop')} />
-          <TextField leftLabel="Radius bottom" type="number" {...getInputProps('radiusBottom')} />
+        <Block label="Radius">
+          <TextField leftLabel="Top" type="number" {...getInputProps('radiusTop')} />
+          <TextField leftLabel="Bottom" type="number" {...getInputProps('radiusBottom')} />
         </Block>
       )}
     </Container>
