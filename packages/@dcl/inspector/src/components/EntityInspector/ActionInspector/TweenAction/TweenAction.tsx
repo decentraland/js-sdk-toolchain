@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { TweenType, InterpolationType } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 
-import { Dropdown, TextField, RangeField, InfoTooltip } from '../../../ui'
+import { Block } from '../../../Block'
+import { Dropdown, TextField, RangeField, InfoTooltip, CheckboxField } from '../../../ui'
 import { isValidTween } from './utils'
 import type { Props } from './types'
 
@@ -126,81 +127,71 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
   return (
     <div className="TweenActionContainer">
       <div className="row">
-        <div className="field">
-          <label>Select Tween {renderTweenInfo()}</label>
-          <Dropdown
-            placeholder="Select a Tween Type"
-            options={[
-              ...Object.values(TweenType).map((tweenType) => ({ label: TweenMapOption[tweenType], value: tweenType }))
-            ]}
-            value={tween.type}
-            onChange={handleChangeType}
-          />
-        </div>
+        <Dropdown
+          label={<>Select Tween {renderTweenInfo()}</>}
+          placeholder="Select a Tween Type"
+          options={[
+            ...Object.values(TweenType).map((tweenType) => ({ label: TweenMapOption[tweenType], value: tweenType }))
+          ]}
+          value={tween.type}
+          onChange={handleChangeType}
+        />
+      </div>
+      <Block label="End Position">
+        <TextField
+          leftLabel="X"
+          type="number"
+          value={endPosition.x}
+          error={isNaN(parseFloat(endPosition.x))}
+          onChange={(e) => handleChangeEndPosition(e, 'x')}
+          onBlur={(e) => handleBlurEndPosition(e, 'x')}
+        />
+        <TextField
+          leftLabel="Y"
+          type="number"
+          value={endPosition.y}
+          error={isNaN(parseFloat(endPosition.y))}
+          onChange={(e) => handleChangeEndPosition(e, 'y')}
+          onBlur={(e) => handleBlurEndPosition(e, 'y')}
+        />
+        <TextField
+          leftLabel="Z"
+          type="number"
+          value={endPosition.z}
+          error={isNaN(parseFloat(endPosition.z))}
+          onChange={(e) => handleChangeEndPosition(e, 'z')}
+          onBlur={(e) => handleBlurEndPosition(e, 'z')}
+        />
+      </Block>
+      <div className="row">
+        <CheckboxField
+          checked={tween.relative}
+          label={<>Relative {renderRelativeInfo()}</>}
+          onChange={handleChangeRelative}
+        />
       </div>
       <div className="row">
-        <div className="field">
-          <label>End Position</label>
-          <div className="row">
-            <TextField
-              label="X"
-              type="number"
-              value={endPosition.x}
-              error={isNaN(parseFloat(endPosition.x))}
-              onChange={(e) => handleChangeEndPosition(e, 'x')}
-              onBlur={(e) => handleBlurEndPosition(e, 'x')}
-            />
-            <TextField
-              label="Y"
-              type="number"
-              value={endPosition.y}
-              error={isNaN(parseFloat(endPosition.y))}
-              onChange={(e) => handleChangeEndPosition(e, 'y')}
-              onBlur={(e) => handleBlurEndPosition(e, 'y')}
-            />
-            <TextField
-              label="Z"
-              type="number"
-              value={endPosition.z}
-              error={isNaN(parseFloat(endPosition.z))}
-              onChange={(e) => handleChangeEndPosition(e, 'z')}
-              onBlur={(e) => handleBlurEndPosition(e, 'z')}
-            />
-          </div>
-        </div>
+        <Dropdown
+          label={<>Curve Type {rendeCurveTypeInfo()}</>}
+          placeholder="Select a Curve Type"
+          options={[
+            ...Object.values(InterpolationType).map((interpolationType) => ({
+              label: InterpolationMapOption[interpolationType],
+              value: interpolationType
+            }))
+          ]}
+          value={tween.interpolationType}
+          onChange={handleChangeInterpolationType}
+        />
       </div>
       <div className="row">
-        <div className="field inline">
-          <input type="checkbox" checked={tween.relative} onChange={handleChangeRelative} />
-          <label>Relative {renderRelativeInfo()}</label>
-        </div>
-      </div>
-      <div className="row">
-        <div className="field">
-          <label>Curve Type {rendeCurveTypeInfo()}</label>
-          <Dropdown
-            placeholder="Select a Curve Type"
-            options={[
-              ...Object.values(InterpolationType).map((interpolationType) => ({
-                label: InterpolationMapOption[interpolationType],
-                value: interpolationType
-              }))
-            ]}
-            value={tween.interpolationType}
-            onChange={handleChangeInterpolationType}
-          />
-        </div>
-      </div>
-      <div className="row">
-        <div className="field duration">
-          <label>Duration {renderDurationInfo()}</label>
-          <RangeField
-            value={tween.duration}
-            onChange={handleChangeDurationRange}
-            isValidValue={isValidDuration}
-            step={0.25}
-          />
-        </div>
+        <RangeField
+          label={<>Duration {renderDurationInfo()}</>}
+          value={tween.duration}
+          onChange={handleChangeDurationRange}
+          isValidValue={isValidDuration}
+          step={0.25}
+        />
       </div>
     </div>
   )
