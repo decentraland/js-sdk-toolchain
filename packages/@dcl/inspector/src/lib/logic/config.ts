@@ -9,6 +9,7 @@ export type InspectorConfig = {
   segmentAppId: string | null
   segmentUserId: string | null
   segmentKey: string | null
+  projectId: string | null
 }
 
 export type GlobalWithConfig = typeof globalThis & {
@@ -31,6 +32,7 @@ export function getConfig(): InspectorConfig {
     contentUrl: params.get('contentUrl') || config?.contentUrl || CONTENT_URL,
     segmentAppId: params.get('segmentAppId') || config?.segmentAppId || null,
     segmentUserId: params.get('segmentUserId') || config?.segmentUserId || null,
-    segmentKey: params.get('segmentKey') || config?.segmentKey || null
+    segmentKey: params.get('segmentKey') || config?.segmentKey || null,
+    projectId: params.get('projectId') || config?.projectId || null
   }
 }
