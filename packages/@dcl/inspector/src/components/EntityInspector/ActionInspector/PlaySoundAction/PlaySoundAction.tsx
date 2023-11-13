@@ -82,8 +82,8 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
     <div className="PlaySoundActionContainer">
       <div className="row">
         <div className="field">
-          <label>Path {renderPathInfo()}</label>
           <FileUploadField
+            label={<>Path {renderPathInfo()}</>}
             value={payload.src}
             accept={ACCEPTED_FILE_TYPES['audio']}
             onDrop={handleDrop}
@@ -102,8 +102,8 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
       </div>
       <div className="row">
         <div className="field volume">
-          <label>Volume</label>
           <RangeField
+            label="Volume"
             value={volumeFromAudioSource(value.volume)}
             onChange={handleChangeVolume}
             isValidValue={isValidVolume}

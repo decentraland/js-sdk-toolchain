@@ -348,8 +348,8 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
         return hasStates ? (
           <div className="row">
             <div className="field">
-              <label>Select State</label>
               <Dropdown
+                label="Select State"
                 placeholder="Select a State"
                 options={[...states.map((state) => ({ label: state, value: state }))]}
                 value={getPartialPayload<ActionType.SET_STATE>(action)?.state}
@@ -371,8 +371,8 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
         return hasCounter ? (
           <div className="row">
             <div className="field">
-              <label>Counter Value</label>
               <TextField
+                label="Counter Value"
                 type="number"
                 value={getPartialPayload<ActionType.SET_COUNTER>(action)?.counter}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeCounter(e, idx)}
@@ -401,8 +401,8 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
         return (
           <div className="row">
             <div className="field">
-              <label>Select Anchor Point</label>
               <Dropdown
+                label="Select an Anchor Point"
                 placeholder="Select an Anchor Point"
                 options={[
                   { value: AvatarAnchorPointType.AAPT_RIGHT_HAND, label: 'Right Hand' },
@@ -441,38 +441,34 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
         return (
           <Block key={`action-${idx}`}>
             <div className="row">
-              <div className="field">
-                <label>Name</label>
-                <TextField
-                  type="text"
-                  value={action.name}
-                  onChange={(e) => handleChangeName(e, idx)}
-                  onFocus={handleFocusInput}
-                  onBlur={handleFocusInput}
-                />
-              </div>
-              <div className="field">
-                <Dropdown
-                  label={'Select an Action'}
-                  placeholder="Select an Action"
-                  disabled={availableActions.length === 0}
-                  options={[
-                    ...availableActions.map((availableAction) => ({
-                      label: ActionMapOption[availableAction],
-                      value: availableAction
-                    }))
-                  ]}
-                  value={action.type}
-                  onChange={(e) => handleChangeType(e, idx)}
-                />
-              </div>
-              <MoreOptionsMenu>
-                <Button className="RemoveButton" onClick={(e) => handleRemoveAction(e, idx)}>
-                  <RemoveIcon /> Remove Action
-                </Button>
-              </MoreOptionsMenu>
+              <TextField
+                type="text"
+                label="Name"
+                value={action.name}
+                onChange={(e) => handleChangeName(e, idx)}
+                onFocus={handleFocusInput}
+                onBlur={handleFocusInput}
+              />
+              <Dropdown
+                label="Select an Action"
+                placeholder="Select an Action"
+                disabled={availableActions.length === 0}
+                options={[
+                  ...availableActions.map((availableAction) => ({
+                    label: ActionMapOption[availableAction],
+                    value: availableAction
+                  }))
+                ]}
+                value={action.type}
+                onChange={(e) => handleChangeType(e, idx)}
+              />
             </div>
             {renderAction(action, idx)}
+            <MoreOptionsMenu>
+              <Button className="RemoveButton" onClick={(e) => handleRemoveAction(e, idx)}>
+                <RemoveIcon /> Remove Action
+              </Button>
+            </MoreOptionsMenu>
           </Block>
         )
       })}

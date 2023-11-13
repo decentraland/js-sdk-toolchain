@@ -1,12 +1,6 @@
-.ActionInspector:is(.open) > .title {
-  border-bottom: 1px solid var(--border-gray);
-  padding-bottom: 12px;
-}
-
 .ActionInspector > .content > .Block > .content {
   display: flex;
   flex-direction: column;
-  margin-top: 16px;
   padding: 12px;
   border-radius: 4px;
   border: 1px solid #303031;
@@ -30,21 +24,6 @@
   flex: 1;
 }
 
-.ActionInspector > .content > .Block > .content .row .DropdownContainer label,
-.ActionInspector > .content > .Block > .content .row .field > label {
-  margin: 0px 0px 6px 0px;
-  color: var(--text);
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.ActionInspector > .content > .Block > .content .row .field label {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 4px;
-}
-
 .ActionInspector > .content > .Block > .content .row .field > .Text.Field {
   width: 100%;
 }
@@ -64,19 +43,10 @@
   color: white;
 }
 
-.ActionInspector .content .Block .content {
-  gap: 15px;
-  align-items: flex-end;
-}
-
-.ActionInspector .content .Block .content .DropdownContainer {
-  flex: 1;
-}
-
 .ActionInspector .content .Block .content .MoreOptionsMenu {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 5px;
+  right: 5px;
 }
 
 .ActionInspector .content .Block .content .MoreOptionsMenu .MoreOptionsContent {

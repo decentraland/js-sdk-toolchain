@@ -14,8 +14,6 @@ import { Container } from '../../Container'
 import { Dropdown } from '../../ui/Dropdown'
 import { Props } from './types'
 
-import './VisibilityComponentInspector.css'
-
 export default withSdk<Props>(({ sdk, entity }) => {
   const { VisibilityComponent, GltfContainer } = sdk.components
   const hasVisibilityComponent = useHasComponent(entity, VisibilityComponent)
@@ -95,30 +93,25 @@ export default withSdk<Props>(({ sdk, entity }) => {
   return (
     <Container label="Visibility" className={cx('VisibilityContainer')} onRemoveContainer={handleRemove}>
       <Block>
-        <div className="row">
-          <div className="field">
-            <label>Visibility {renderVisibilityMoreInfo()}</label>
-            <Dropdown
-              options={[
-                { value: 'true', label: 'Visible' },
-                { value: 'false', label: 'Invisible' }
-              ]}
-              value={(componentValue.visible ?? true).toString()}
-              onChange={handleChangeVisibility}
-            />
-          </div>
-          <div className="field">
-            <label>Physics Collider {renderPhysicsCollidersMoreInfo()}</label>
-            <Dropdown
-              options={[
-                { value: 'true', label: 'Enabled' },
-                { value: 'false', label: 'Disabled' }
-              ]}
-              value={(collisionValue.invisibleMeshesCollisionMask === 2).toString()}
-              onChange={handleChangeCollider}
-            />
-          </div>
-        </div>
+        <Dropdown
+          label={<>Visibility {renderVisibilityMoreInfo()}</>}
+          options={[
+            { value: 'true', label: 'Visible' },
+            { value: 'false', label: 'Invisible' }
+          ]}
+          value={(componentValue.visible ?? true).toString()}
+          onChange={handleChangeVisibility}
+        />
+
+        <Dropdown
+          label={<>Physics Collider {renderPhysicsCollidersMoreInfo()}</>}
+          options={[
+            { value: 'true', label: 'Enabled' },
+            { value: 'false', label: 'Disabled' }
+          ]}
+          value={(collisionValue.invisibleMeshesCollisionMask === 2).toString()}
+          onChange={handleChangeCollider}
+        />
       </Block>
     </Container>
   )

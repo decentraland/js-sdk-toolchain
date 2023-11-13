@@ -1,8 +1,9 @@
 .AddButton {
   margin-top: 12px;
-  border: 1px solid #3a3d41;
+  border: 1px solid var(--base-15);
   border-radius: 4px;
   background: #1e1e1e;
+  background: var(--base-20);
   display: flex;
   padding: 4px;
   justify-content: center;

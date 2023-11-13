@@ -1,5 +1,4 @@
 import { useCallback } from 'react'
-import { useDrop } from 'react-dnd'
 import cx from 'classnames'
 
 import { withSdk } from '../../../hoc/withSdk'
@@ -9,17 +8,14 @@ import { getComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { analytics, Event } from '../../../lib/logic/analytics'
 import { getAssetByModel } from '../../../lib/logic/catalog'
 import { CoreComponents } from '../../../lib/sdk/components'
-import { ProjectAssetDrop, getNode } from '../../../lib/sdk/drag-drop'
-import { withAssetDir } from '../../../lib/data-layer/host/fs-utils'
 import { useAppSelector } from '../../../redux/hooks'
 import { selectAssetCatalog } from '../../../redux/app'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
-import { TextField, CheckboxField, RangeField } from '../../ui'
+import { CheckboxField, RangeField, FileUploadField } from '../../ui'
+import { ACCEPTED_FILE_TYPES } from '../../ui/FileUploadField/types'
 import { fromAudioSource, toAudioSource, isValidInput, isAudio, isValidVolume } from './utils'
 import type { Props } from './types'
-
-const DROP_TYPES = ['project-asset']
 
 export default withSdk<Props>(({ sdk, entity }) => {
   const files = useAppSelector(selectAssetCatalog)
@@ -30,6 +26,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
     ({ audioClipUrl }: { audioClipUrl: string }) => !!files && isValidInput(files, audioClipUrl),
     [files]
   )
+
   const { getInputProps, isValid } = useComponentInput(
     entity,
     AudioSource,
@@ -50,31 +47,12 @@ export default withSdk<Props>(({ sdk, entity }) => {
       itemPath: gltfContainer.src
     })
   }, [])
+
   const handleDrop = useCallback(async (audioClipUrl: string) => {
     const { operations } = sdk
     operations.updateValue(AudioSource, entity, { audioClipUrl })
     await operations.dispatch()
   }, [])
-
-  const [{ isHover }, drop] = useDrop(
-    () => ({
-      accept: DROP_TYPES,
-      drop: ({ value, context }: ProjectAssetDrop, monitor) => {
-        if (monitor.didDrop()) return
-        const node = context.tree.get(value)!
-        const model = getNode(node, context.tree, isAudio)
-        if (model) void handleDrop(withAssetDir(model.asset.src))
-      },
-      canDrop: ({ value, context }: ProjectAssetDrop) => {
-        const node = context.tree.get(value)!
-        return !!getNode(node, context.tree, isAudio)
-      },
-      collect: (monitor) => ({
-        isHover: monitor.canDrop() && monitor.isOver()
-      })
-    }),
-    [files]
-  )
 
   if (!hasAudioSource) return null
 
@@ -83,16 +61,23 @@ export default withSdk<Props>(({ sdk, entity }) => {
   const volume = getInputProps('volume', (e) => e.target.value)
 
   return (
-    <Container label="AudioSource" className={cx('AudioSource', { hover: isHover })} onRemoveContainer={handleRemove}>
-      <Block label="Path" ref={drop}>
-        <TextField type="text" {...getInputProps('audioClipUrl')} error={files && !isValid} drop={isHover} />
+    <Container label="AudioSource" className={cx('AudioSource')} onRemoveContainer={handleRemove}>
+      <Block>
+        <FileUploadField
+          {...getInputProps('audioClipUrl')}
+          label="Path"
+          accept={ACCEPTED_FILE_TYPES['audio']}
+          onDrop={handleDrop}
+          error={files && !isValid}
+          isValidFile={isAudio}
+        />
       </Block>
       <Block label="Playback">
         <CheckboxField label="Start playing" checked={!!playing.value} {...playing} />
         <CheckboxField label="Loop" checked={!!loop.value} {...loop} />
       </Block>
-      <Block className="volume" label="Volume">
-        <RangeField {...volume} isValidValue={isValidVolume} />
+      <Block className="volume">
+        <RangeField {...volume} label="Volume" isValidValue={isValidVolume} />
       </Block>
     </Container>
   )
