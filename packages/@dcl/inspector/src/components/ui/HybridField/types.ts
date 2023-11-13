@@ -16,7 +16,7 @@ export type Props = {
   className?: string
   leftIcon?: React.ReactNode
   rightIcon?: React.ReactNode
-  label?: string
+  label?: React.ReactNode
   onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void
   onChangeSecondary?: (
     e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement> | React.FocusEvent<HTMLInputElement>

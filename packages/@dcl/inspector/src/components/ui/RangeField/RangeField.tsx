@@ -3,6 +3,7 @@ import cx from 'classnames'
 
 import { TextField } from '../TextField'
 import { ErrorMessage } from '../ErrorMessage'
+import { Label } from '../Label'
 
 import { Props } from './types'
 
@@ -101,7 +102,7 @@ const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
 
   return (
     <div className="Range Field">
-      {label ? <label>{label}</label> : null}
+      <Label text={label} />
       <div className={cx('RangeContainer', { error, disabled })}>
         <div className="InputContainer">
           <input
