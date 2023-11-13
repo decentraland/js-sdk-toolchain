@@ -16,6 +16,8 @@
 .OptionContainer.DropdownSelection,
 .OptionContainer.DropdownPlaceholder {
   padding: 0;
+  /* width: 100% - (DropIconWidth + gap) */
+  width: calc(100% - 20px);
 }
 
 .OptionContainer.DropdownPlaceholder {
@@ -26,15 +28,19 @@
   display: flex;
   align-items: center;
   height: 100%;
+  width: 100%;
   gap: 4px;
 }
 
 .OptionContainer .Option {
-  flex: 1;
+  width: 100%;
   font-size: 13px;
   font-style: normal;
   font-weight: 500;
-  text-wrap: nowrap;
+  line-height: normal;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .OptionContainer:not(.DropdownSelection):not(.DropdownPlaceholder):not(.selected):hover {
