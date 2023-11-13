@@ -8,12 +8,6 @@
   flex-grow: 1;
 }
 
-.Range.Field label {
-  color: var(--sub-text);
-  font-size: 11px;
-  font-weight: 400;
-}
-
 .Range.Field .RangeContainer {
   display: flex;
   justify-content: center;
@@ -22,15 +16,15 @@
   gap: 8px;
 }
 
-.Range.Field .RangeContainer .InputContainer {
+.Range.Field .RangeContainer > .InputContainer {
   position: relative;
   display: flex;
   width: 100%;
-  left: 5px;
+  left: 8px;
 }
 
 .Range.Field .RangeContainer .InputContainer .RangeInput {
-  width: calc(100% - 15px);
+  width: calc(100% - 18px);
   appearance: none;
   position: relative;
   background-color: transparent;
@@ -48,7 +42,7 @@
 }
 
 .Range.Field .RangeContainer .InputContainer .RangeInput::before {
-  left: -5px;
+  left: -8px;
   background: var(--accent-blue-04);
 }
 
@@ -57,7 +51,7 @@
 }
 
 .Range.Field .RangeContainer .InputContainer .RangeInput::after {
-  right: -5px;
+  right: -8px;
   background: var(--base-11);
 }
 
@@ -183,5 +177,5 @@
 }
 
 .Range.Field .RangeContainer .RangeTextInput > .InputContainer input {
-  width: 50px;
+  width: 60px;
 }
