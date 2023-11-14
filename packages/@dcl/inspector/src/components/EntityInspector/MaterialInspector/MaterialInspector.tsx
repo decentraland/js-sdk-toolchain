@@ -42,16 +42,24 @@ export default withSdk<Props>(({ sdk, entity }) => {
       <Block>
         <Dropdown label="Material" options={MATERIAL_TYPES} {...materialType} />
       </Block>
-      <Block>
-        <CheckboxField label="Cast shadows" checked={!!castShadows.value} {...castShadows} />
-      </Block>
       {materialType.value === MaterialType.MT_UNLIT && (
-        <Block label="Diffuse color">
-          <ColorField {...getInputProps('diffuseColor')} />
-        </Block>
+        <>
+          <Block label="Diffuse color">
+            <ColorField {...getInputProps('diffuseColor')} />
+          </Block>
+          <Block>
+            <CheckboxField label="Cast shadows" checked={!!castShadows.value} {...castShadows} />
+          </Block>
+          <Block>
+            <RangeField label="Alpha test" max={1} step={0.1} {...getInputProps('alphaTest')} />
+          </Block>
+        </>
       )}
       {materialType.value === MaterialType.MT_PBR && (
         <>
+          <Block>
+            <CheckboxField label="Cast shadows" checked={!!castShadows.value} {...castShadows} />
+          </Block>
           <Block>
             <RangeField label="Metallic" max={1} step={0.1} {...getInputProps('metallic')} />
           </Block>
