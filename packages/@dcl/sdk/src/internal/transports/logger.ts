@@ -10,13 +10,14 @@ export function* serializeCrdtMessages(prefix: string, data: Uint8Array, engine:
   while ((message = readMessage(buffer))) {
     const ent = message.entityId
     const preface = `${prefix}: ${CrdtMessageType[message.type]} e=${ent}`
-    if (message.type === CrdtMessageType.DELETE_ENTITY) {
+    if (message.type === CrdtMessageType.DELETE_ENTITY || message.type === CrdtMessageType.DELETE_ENTITY_NETWORK) {
       yield `${preface}`
     }
 
     if (
       message.type === CrdtMessageType.PUT_COMPONENT ||
-      message.type === CrdtMessageType.PUT_NETWORK_COMPONENT ||
+      message.type === CrdtMessageType.PUT_COMPONENT_NETWORK ||
+      message.type === CrdtMessageType.DELETE_COMPONENT_NETWORK ||
       message.type === CrdtMessageType.DELETE_COMPONENT ||
       message.type === CrdtMessageType.APPEND_VALUE
     ) {

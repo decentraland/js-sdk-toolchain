@@ -113,7 +113,7 @@ export function createUpdateLwwFromCrdt(
     if (
       msg.type !== CrdtMessageType.PUT_COMPONENT &&
       msg.type !== CrdtMessageType.DELETE_COMPONENT &&
-      msg.type !== CrdtMessageType.PUT_NETWORK_COMPONENT
+      msg.type !== CrdtMessageType.PUT_COMPONENT_NETWORK
     )
       /* istanbul ignore next */
       return [null, data.get(msg.entityId)]
@@ -125,7 +125,7 @@ export function createUpdateLwwFromCrdt(
       case ProcessMessageResultType.StateUpdatedTimestamp: {
         timestamps.set(entity, msg.timestamp)
 
-        if (msg.type === CrdtMessageType.PUT_COMPONENT || msg.type === CrdtMessageType.PUT_NETWORK_COMPONENT) {
+        if (msg.type === CrdtMessageType.PUT_COMPONENT || msg.type === CrdtMessageType.PUT_COMPONENT_NETWORK) {
           const buf = new ReadWriteByteBuffer(msg.data!)
           data.set(entity, schema.deserialize(buf))
         } else {

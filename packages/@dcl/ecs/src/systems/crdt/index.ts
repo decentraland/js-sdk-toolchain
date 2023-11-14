@@ -8,8 +8,10 @@ import { DeleteEntity } from '../../serialization/crdt/deleteEntity'
 import { PutComponentOperation } from '../../serialization/crdt/putComponent'
 import { CrdtMessageType, CrdtMessageHeader } from '../../serialization/crdt/types'
 import { ReceiveMessage, Transport } from './types'
-import { PutNetworkComponentOperation } from '../../serialization/crdt/putComponentNetwork'
+import { PutNetworkComponentOperation } from '../../serialization/crdt/network/putComponentNetwork'
 import { NetworkEntity as defineNetworkEntity } from '../../components'
+import { INetowrkEntityType } from '../../components/types'
+import * as networkUtils from '../../serialization/crdt/network/utils'
 
 /**
  * @public
@@ -64,7 +66,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
             transportId,
             messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
           })
-        } else if (header.type === CrdtMessageType.PUT_NETWORK_COMPONENT) {
+        } else if (header.type === CrdtMessageType.PUT_COMPONENT_NETWORK) {
           const message = PutNetworkComponentOperation.read(buffer)!
           receivedMessages.push({
             ...message,
@@ -109,8 +111,8 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
    * It's a mapping Network -> to Local
    * If it's not a network message, return the entityId received by the message
    */
-  function findNetworkId(msg: ReceiveMessage): { entityId: Entity; network?: ReturnType<typeof NetworkEntity.get> } {
-    if (msg.type !== CrdtMessageType.PUT_NETWORK_COMPONENT) {
+  function findNetworkId(msg: ReceiveMessage): { entityId: Entity; network?: INetowrkEntityType } {
+    if (msg.type !== CrdtMessageType.PUT_COMPONENT_NETWORK) {
       return { entityId: msg.entityId }
     }
 
@@ -134,11 +136,11 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
       // eslint-disable-next-line prefer-const
       let { entityId, network } = findNetworkId(msg)
       // We receive a new Entity. Create the localEntity and map it to the NetworkEntity component
-      if (msg.type === CrdtMessageType.PUT_NETWORK_COMPONENT && !network) {
+      if (networkUtils.isNetworkMessage(msg) && !network) {
         entityId = engine.addEntity()
         NetworkEntity.createOrReplace(entityId, { entityId: msg.entityId, networkId: msg.networkId })
       }
-      if (msg.type === CrdtMessageType.DELETE_ENTITY) {
+      if (msg.type === CrdtMessageType.DELETE_ENTITY || msg.type === CrdtMessageType.DELETE_ENTITY_NETWORK) {
         entitiesShouldBeCleaned.push(entityId)
         broadcastMessages.push(msg)
       } else {
@@ -243,38 +245,32 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
       for (const message of crdtMessages) {
         // Avoid echo messages
         if (message.transportId === transportIndex) continue
+
         // Redundant message for the transport
         if (!transport.filter(message)) continue
+
         // If it's the renderer transport and its a NetworkMessage, we need to fix the entityId field and convert it to a known Message.
         // PUT_NETWORK_COMPONENT -> PUT_COMPONENT
-        if (isRendererTransport && message.type === CrdtMessageType.PUT_NETWORK_COMPONENT) {
+        if (isRendererTransport && networkUtils.isNetworkMessage(message)) {
           const { entityId } = findNetworkId(message)
-          const offset = buffer.currentWriteOffset()
-          PutComponentOperation.write(entityId, message.timestamp, message.componentId, message.data, buffer)
-          transportBuffer.writeBuffer(buffer.buffer().subarray(offset, buffer.currentWriteOffset()), false)
+          networkUtils.networkMessageToLocal(message, entityId, buffer, transportBuffer)
           // Iterate the next message
           continue
         }
+
         // If its a network transport and its a PUT_COMPONENT that has a NetworkEntity component, we need to send this message
         // through comms with the EntityID and NetworkID from ther NetworkEntity so everyone can recieve this message and map to their custom entityID.
-        if (isNetworkTransport && message.type === CrdtMessageType.PUT_COMPONENT) {
+        if (isNetworkTransport && !networkUtils.isNetworkMessage(message)) {
           const networkData = NetworkEntity.getOrNull(message.entityId)
           // If it has networkData convert the message to PUT_NETWORK_COMPONENT.
           if (networkData) {
-            const offset = buffer.currentWriteOffset()
-            PutNetworkComponentOperation.write(
-              networkData.entityId,
-              message.timestamp,
-              message.componentId,
-              networkData.networkId,
-              message.data,
-              buffer
-            )
-            transportBuffer.writeBuffer(buffer.buffer().subarray(offset, buffer.currentWriteOffset()), false)
+            networkUtils.localMessageToNetwork(message, networkData, buffer, transportBuffer)
             // Iterate the next message
             continue
           }
         }
+
+        // Common message
         transportBuffer.writeBuffer(message.messageBuffer, false)
       }
       const message = transportBuffer.currentWriteOffset() ? transportBuffer.toBinary() : new Uint8Array([])
