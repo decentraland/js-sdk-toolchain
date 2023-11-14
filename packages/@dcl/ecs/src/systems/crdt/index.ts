@@ -2,11 +2,16 @@ import { Entity, EntityState } from '../../engine/entity'
 import type { ComponentDefinition } from '../../engine'
 import type { PreEngine } from '../../engine/types'
 import { ReadWriteByteBuffer } from '../../serialization/ByteBuffer'
-import { AppendValueOperation, CrdtMessageProtocol } from '../../serialization/crdt'
+import {
+  AppendValueOperation,
+  CrdtMessageProtocol,
+  DeleteComponentNetwork,
+  DeleteEntityNetwork
+} from '../../serialization/crdt'
 import { DeleteComponent } from '../../serialization/crdt/deleteComponent'
 import { DeleteEntity } from '../../serialization/crdt/deleteEntity'
 import { PutComponentOperation } from '../../serialization/crdt/putComponent'
-import { CrdtMessageType, CrdtMessageHeader } from '../../serialization/crdt/types'
+import { CrdtMessageType, CrdtMessageHeader, CrdtMessage } from '../../serialization/crdt/types'
 import { ReceiveMessage, Transport } from './types'
 import { PutNetworkComponentOperation } from '../../serialization/crdt/network/putComponentNetwork'
 import { NetworkEntity as defineNetworkEntity } from '../../components'
@@ -51,49 +56,34 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
       let header: CrdtMessageHeader | null
       while ((header = CrdtMessageProtocol.getHeader(buffer))) {
         const offset = buffer.currentReadOffset()
-
+        let message: CrdtMessage | undefined = undefined
         if (header.type === CrdtMessageType.DELETE_COMPONENT) {
-          const message = DeleteComponent.read(buffer)!
-          receivedMessages.push({
-            ...message,
-            transportId,
-            messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
-          })
+          message = DeleteComponent.read(buffer)!
+        } else if (header.type === CrdtMessageType.DELETE_COMPONENT_NETWORK) {
+          message = DeleteComponentNetwork.read(buffer)!
         } else if (header.type === CrdtMessageType.PUT_COMPONENT) {
-          const message = PutComponentOperation.read(buffer)!
-          receivedMessages.push({
-            ...message,
-            transportId,
-            messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
-          })
+          message = PutComponentOperation.read(buffer)!
         } else if (header.type === CrdtMessageType.PUT_COMPONENT_NETWORK) {
-          const message = PutNetworkComponentOperation.read(buffer)!
-          receivedMessages.push({
-            ...message,
-            transportId,
-            messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
-          })
+          message = PutNetworkComponentOperation.read(buffer)!
         } else if (header.type === CrdtMessageType.DELETE_ENTITY) {
-          const message = DeleteEntity.read(buffer)!
-          receivedMessages.push({
-            ...message,
-            transportId,
-            messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
-          })
+          message = DeleteEntity.read(buffer)!
+        } else if (header.type === CrdtMessageType.DELETE_ENTITY_NETWORK) {
+          message = DeleteEntityNetwork.read(buffer)!
         } else if (header.type === CrdtMessageType.APPEND_VALUE) {
-          const message = AppendValueOperation.read(buffer)!
-          receivedMessages.push({
-            ...message,
-            transportId,
-            messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
-          })
+          message = AppendValueOperation.read(buffer)!
           // Unknown message, we skip it
         } else {
           // consume the message
           buffer.incrementReadOffset(header.length)
         }
+        if (message) {
+          receivedMessages.push({
+            ...message,
+            transportId,
+            messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
+          })
+        }
       }
-      // TODO: do something if buffler.len>0
     }
   }
 
@@ -112,7 +102,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
    * If it's not a network message, return the entityId received by the message
    */
   function findNetworkId(msg: ReceiveMessage): { entityId: Entity; network?: INetowrkEntityType } {
-    if (msg.type !== CrdtMessageType.PUT_COMPONENT_NETWORK) {
+    if (!networkUtils.isNetworkMessage(msg)) {
       return { entityId: msg.entityId }
     }
 
