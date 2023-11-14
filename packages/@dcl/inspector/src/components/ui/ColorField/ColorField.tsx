@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { HybridField, Types as HybridFieldTypes } from '../HybridField'
 import { OPTIONS, COLORS, Options } from './utils'
 import { Props } from './types'
@@ -10,6 +10,12 @@ const ColorField: React.FC<Props> = ({ label, value, onChange }) => {
   const isStockColor = !!stockColor
   const initialOption = isStockColor ? Options.BASICS : Options.CUSTOM
   const [selectedOption, setSelectedOption] = useState(initialOption)
+
+  useEffect(() => {
+    if (initialOption !== selectedOption) {
+      setSelectedOption(initialOption)
+    }
+  }, [value])
 
   const handleOptionChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {

@@ -42,21 +42,23 @@ export default withSdk<Props>(({ sdk, entity }) => {
       <Block>
         <Dropdown label="Material" options={MATERIAL_TYPES} {...materialType} />
       </Block>
-      <Block>
-        <RangeField label="Alpha test" max={1} step={0.1} {...getInputProps('alphaTest')} />
-      </Block>
-      <Block>
-        <CheckboxField label="Cast shadows" checked={!!castShadows.value} {...castShadows} />
-      </Block>
       {materialType.value === MaterialType.MT_UNLIT && (
-        <Block label="Diffuse color">
-          <ColorField {...getInputProps('diffuseColor')} />
-        </Block>
+        <>
+          <Block label="Diffuse color">
+            <ColorField {...getInputProps('diffuseColor')} />
+          </Block>
+          <Block>
+            <CheckboxField label="Cast shadows" checked={!!castShadows.value} {...castShadows} />
+          </Block>
+          <Block>
+            <RangeField label="Alpha test" max={1} step={0.1} {...getInputProps('alphaTest')} />
+          </Block>
+        </>
       )}
       {materialType.value === MaterialType.MT_PBR && (
         <>
           <Block>
-            <Dropdown label="Transparency mode" options={TRANSPARENCY_MODES} {...getInputProps('transparencyMode')} />
+            <CheckboxField label="Cast shadows" checked={!!castShadows.value} {...castShadows} />
           </Block>
           <Block>
             <RangeField label="Metallic" max={1} step={0.1} {...getInputProps('metallic')} />
@@ -65,19 +67,11 @@ export default withSdk<Props>(({ sdk, entity }) => {
             <RangeField label="Roughness" max={1} step={0.1} {...getInputProps('roughness')} />
           </Block>
           <Block>
-            <ColorField label="Albedo color" {...getInputProps('albedoColor')} />
-          </Block>
-          <Block>
-            <ColorField label="Emissive color" {...getInputProps('emissiveColor')} />
+            <ColorField label="Color" {...getInputProps('albedoColor')} />
           </Block>
           <Block>
             <ColorField label="Reflectivity color" {...getInputProps('reflectivityColor')} />
           </Block>
-          <Container label="Intensity" borderer>
-            <RangeField label="Specular" max={1} step={0.1} {...getInputProps('specularIntensity')} />
-            <RangeField label="Emissive" max={1} step={0.1} {...getInputProps('emissiveIntensity')} />
-            <RangeField label="Direct" max={1} step={0.1} {...getInputProps('directIntensity')} />
-          </Container>
         </>
       )}
 
@@ -85,21 +79,44 @@ export default withSdk<Props>(({ sdk, entity }) => {
 
       {materialType.value === MaterialType.MT_PBR && (
         <>
-          <Texture
-            label="Alpha texture"
-            texture={TextureType.TT_ALPHA_TEXTURE}
-            files={files}
-            getInputProps={getTextureProps}
-          />
+          <Container label="Intensity" borderer>
+            <RangeField label="Specular" max={1} step={0.1} {...getInputProps('specularIntensity')} />
+            <RangeField label="Direct" max={1} step={0.1} {...getInputProps('directIntensity')} />
+          </Container>
+
+          <Container label="Transparency" borderer>
+            <Block>
+              <Dropdown label="Transparency Mode" options={TRANSPARENCY_MODES} {...getInputProps('transparencyMode')} />
+            </Block>
+            <Block>
+              <RangeField label="Alpha test" max={1} step={0.1} {...getInputProps('alphaTest')} />
+            </Block>
+            <Texture
+              label="Alpha texture"
+              texture={TextureType.TT_ALPHA_TEXTURE}
+              files={files}
+              getInputProps={getTextureProps}
+            />
+          </Container>
+
+          <Container label="Emissive" borderer>
+            <Block>
+              <RangeField label="Emissive Intensity" max={1} step={0.1} {...getInputProps('emissiveIntensity')} />
+            </Block>
+            <Block>
+              <ColorField label="Emissive color" {...getInputProps('emissiveColor')} />
+            </Block>
+            <Texture
+              label="Emissive texture"
+              texture={TextureType.TT_EMISSIVE_TEXTURE}
+              files={files}
+              getInputProps={getTextureProps}
+            />
+          </Container>
+
           <Texture
             label="Bump texture"
             texture={TextureType.TT_BUMP_TEXTURE}
-            files={files}
-            getInputProps={getTextureProps}
-          />
-          <Texture
-            label="Emissive texture"
-            texture={TextureType.TT_EMISSIVE_TEXTURE}
             files={files}
             getInputProps={getTextureProps}
           />
