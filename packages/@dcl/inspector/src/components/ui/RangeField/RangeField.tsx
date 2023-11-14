@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import cx from 'classnames'
 
 import { TextField } from '../TextField'
@@ -28,6 +28,12 @@ const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
     ...rest
   } = props
   const [inputValue, setInputValue] = useState(value)
+
+  useEffect(() => {
+    if (value !== inputValue) {
+      setInputValue(value)
+    }
+  }, [value])
 
   const completionPercentage = useMemo(() => {
     const parsedValue = parseFloat(inputValue.toString()) || 0
@@ -85,11 +91,16 @@ const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
   const handleOnBlur: React.FocusEventHandler<HTMLInputElement> = useCallback(
     (event) => {
       if (isValid(inputValue)) {
+        const formattedValue = formatInput(inputValue)
         onChange &&
-          onChange({ ...event, target: { ...event.target, value: inputValue } } as React.ChangeEvent<HTMLInputElement>)
+          onChange({
+            ...event,
+            target: { ...event.target, value: formattedValue }
+          } as React.ChangeEvent<HTMLInputElement>)
+        setInputValue(formattedValue)
       }
     },
-    [inputValue, onChange, isValid]
+    [inputValue, setInputValue, formatInput, onChange, isValid]
   )
 
   const errorMessage = useMemo(() => {
@@ -121,7 +132,7 @@ const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
         <TextField
           className="RangeTextInput"
           type="number"
-          value={formatInput(inputValue)}
+          value={inputValue}
           error={!!errorMessage}
           disabled={disabled}
           onChange={handleChangeTextField}
