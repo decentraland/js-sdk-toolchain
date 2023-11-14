@@ -1,4 +1,14 @@
-import { YGAlign, YGDisplay, YGFlexDirection, YGJustify, YGOverflow, YGPositionType, YGUnit, YGWrap } from '@dcl/ecs'
+import {
+  YGAlign,
+  YGDisplay,
+  YGFlexDirection,
+  YGJustify,
+  YGOverflow,
+  YGPositionType,
+  YGUnit,
+  YGWrap,
+  PointerFilterMode
+} from '@dcl/ecs'
 import {
   AlignType,
   FlexDirectionType,
@@ -9,7 +19,8 @@ import {
   Position,
   PositionType,
   PositionUnit,
-  PositionShorthand
+  PositionShorthand,
+  PointerFilterType
 } from './types'
 
 function capitalize<T extends string>(value: T): Capitalize<T> {
@@ -32,13 +43,17 @@ function isPoint(val: PositionUnit) {
   return typeof val === 'string' && val.endsWith('px')
 }
 
-function parsePositionUnit(val?: PositionUnit): [number | undefined, YGUnit] {
+function parsePositionUnit(val?: PositionUnit | 'auto'): [number | undefined, YGUnit] {
   function getValue(key: 'px' | '%', value: string) {
     return Number(value.slice(0, value.indexOf(key)))
   }
 
   if (val === undefined || val === null) {
     return [undefined, YGUnit.YGU_UNDEFINED]
+  }
+
+  if (val === 'auto') {
+    return [0, YGUnit.YGU_AUTO]
   }
 
   if (typeof val === 'number' || (typeof val === 'string' && !isNaN(Number(val)))) {
@@ -104,7 +119,7 @@ type SizePropKeyUnit = `${SizePropName}Unit`
 type SizeReturnType = {
   [key in SizePropName]: number
 } & { [key in SizePropKeyUnit]: YGUnit }
-export function parseSize(val: PositionUnit | undefined, key: SizePropName): Partial<SizeReturnType> {
+export function parseSize(val: PositionUnit | 'auto' | undefined, key: SizePropName): Partial<SizeReturnType> {
   const unitKey: SizePropKeyUnit = `${key}Unit`
   const [value, unit] = parsePositionUnit(val)
 
@@ -211,7 +226,7 @@ const parseOverflow: Readonly<Record<OverflowType, YGOverflow>> = {
 /**
  * @internal
  */
-export function getPoistionType(position: PositionType | undefined): Record<'positionType', YGPositionType> {
+export function getPositionType(position: PositionType | undefined): Record<'positionType', YGPositionType> {
   const value: YGPositionType = position ? parsePositionType[position] : YGPositionType.YGPT_RELATIVE
   return { positionType: value }
 }
@@ -219,4 +234,19 @@ export function getPoistionType(position: PositionType | undefined): Record<'pos
 const parsePositionType: Readonly<Record<PositionType, YGPositionType>> = {
   relative: YGPositionType.YGPT_RELATIVE,
   absolute: YGPositionType.YGPT_ABSOLUTE
+}
+
+/**
+ * @internal
+ */
+export function getPointerFilter(
+  pointerFilter: PointerFilterType | undefined
+): Record<'pointerFilter', PointerFilterMode> {
+  const value: PointerFilterMode = pointerFilter ? parsePointerFilter[pointerFilter] : PointerFilterMode.PFM_NONE
+  return { pointerFilter: value }
+}
+
+const parsePointerFilter: Readonly<Record<PointerFilterType, PointerFilterMode>> = {
+  none: PointerFilterMode.PFM_NONE,
+  block: PointerFilterMode.PFM_BLOCK
 }

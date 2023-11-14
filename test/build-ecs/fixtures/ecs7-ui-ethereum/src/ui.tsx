@@ -60,6 +60,7 @@ const uiComponent = () => (
       onChange={(value) => {
         console.log({ value })
       }}
+      onSubmit={(value) => console.log('onSubmit', value)}
       uiBackground={{
         color: Color4.Red()
       }}

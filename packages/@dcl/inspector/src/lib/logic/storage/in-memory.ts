@@ -40,6 +40,7 @@ export function createInMemoryStorage(initialFs: Record<string, Buffer> = {}): S
           files.push({ name: fileName, isDirectory: false })
         }
       }
+
       return files
     }
   }

@@ -1,0 +1,9 @@
+.AssetPreview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.AssetPreview canvas {
+  width: 100%;
+}

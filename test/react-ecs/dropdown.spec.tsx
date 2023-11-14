@@ -80,14 +80,13 @@ describe('UiDropdown React ECS', () => {
   it('put the conditional en true, so we have the onChange fn again', async () => {
     conditional = true
     await engine.update(1)
+    expect(onChange).toBeCalledTimes(0)
   })
 
-  it('should call the fn because the previuos store value was 1 and now it has 2', async () => {
+  it('should call the fn only if there is a new change on it', async () => {
+    UiDropdownResult.getMutable(uiEntity).value = 4
     await engine.update(1)
-    expect(onChange).toBeCalledTimes(1)
-    UiDropdownResult.getMutable(uiEntity).value = 2
-    await engine.update(1)
-    expect(onChange).toBeCalledWith(2)
+    expect(onChange).toBeCalledWith(4)
     onChange.mockClear()
   })
 

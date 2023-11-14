@@ -1,0 +1,105 @@
+.Dropdown.Field {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 6px;
+}
+
+.Dropdown.Field .DropdownLabel {
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.Dropdown.Field .DropdownContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 25px;
+  background: var(--base-14);
+  border-radius: 5px;
+  border: 1px solid var(--base-14);
+  padding: 2px 8px;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.Dropdown.Field .DropdownContainer:hover {
+  border-color: var(--base-09);
+}
+
+.Dropdown.Field .DropdownContainer.focused {
+  border-color: var(--base-01);
+}
+
+.Dropdown.Field .DropdownContainer.disabled {
+  background: var(--base-12);
+  border-color: var(--base-12);
+  color: var(--base-09);
+  cursor: default;
+  pointer-events: none;
+}
+
+.Dropdown.Field .DropdownContainer.error {
+  border-color: var(--error-main);
+}
+
+.Dropdown.Field .DropdownContainer .DropIcon {
+  line-height: 100%;
+}
+
+.Dropdown.Field .DropdownContainer .DropIcon svg {
+  height: 16px;
+  width: 16px;
+}
+
+.Dropdown.Field .DropdownContainer .DropdownSelectedValue {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px;
+}
+
+.Dropdown.Field .DropdownContainer .DropdownOptions {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: calc(100% + 1px);
+  left: 0;
+  width: 100%;
+  padding-top: 8px;
+  background: var(--base-14);
+  border-radius: 4px;
+  z-index: 5;
+  user-select: none;
+  max-height: 132px;
+  overflow-y: auto;
+  cursor: initial;
+  box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.4);
+}
+
+.Dropdown.Field .DropdownContainer .DropdownOptions.searchable .DropdownSearch.Text.Field {
+  padding: 0px 7px 6px 7px;
+}
+
+.Dropdown.Field .DropdownContainer .DropdownOptions.searchable {
+  gap: unset;
+}
+
+.Dropdown.Field
+  .DropdownContainer
+  .DropdownOptions.searchable
+  .DropdownSearch.Text.Field
+  .InputContainer:not(.hovered):not(.focused) {
+  border-color: var(--base-12);
+}
+
+.Dropdown.Field
+  > .DropdownContainer
+  > .DropdownOptions
+  > .OptionContainer.DropdownEmptyOption
+  > .OptionContent
+  > .Option {
+  text-wrap: pretty;
+}

@@ -2,7 +2,7 @@
   height: auto;
 }
 
-.CounterInspector .content .TextField {
+.CounterInspector .content .Text.Field {
   margin-top: 8px;
-  width: 100%
+  width: 100%;
 }

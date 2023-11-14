@@ -676,10 +676,10 @@ export type Coords = {
 export const CRDT_MESSAGE_HEADER_LENGTH = 8;
 
 // @public (undocumented)
-export type CrdtMessage = PutComponentMessage | PutNetworkComponentMessage | DeleteComponentMessage | DeleteEntityMessage | AppendValueMessage;
+export type CrdtMessage = PutComponentMessage | DeleteComponentMessage | AppendValueMessage | DeleteEntityMessage | PutNetworkComponentMessage | DeleteComponentNetworkMessage | DeleteEntityNetworkMessage;
 
 // @public (undocumented)
-export type CrdtMessageBody = PutNetworkComponentMessageBody | PutComponentMessageBody | DeleteComponentMessageBody | DeleteEntityMessageBody | AppendValueMessageBody;
+export type CrdtMessageBody = PutComponentMessageBody | DeleteComponentMessageBody | DeleteEntityMessageBody | AppendValueMessageBody | CrdtNetworkMessageBody;
 
 // @public
 export type CrdtMessageHeader = {
@@ -702,16 +702,23 @@ export enum CrdtMessageType {
     // (undocumented)
     DELETE_COMPONENT = 2,
     // (undocumented)
+    DELETE_COMPONENT_NETWORK = 6,
+    // (undocumented)
     DELETE_ENTITY = 3,
     // (undocumented)
-    MAX_MESSAGE_TYPE = 6,
+    DELETE_ENTITY_NETWORK = 7,
+    // (undocumented)
+    MAX_MESSAGE_TYPE = 8,
     // (undocumented)
     PUT_COMPONENT = 1,
     // (undocumented)
-    PUT_NETWORK_COMPONENT = 5,
+    PUT_COMPONENT_NETWORK = 5,
     // (undocumented)
     RESERVED = 0
 }
+
+// @public (undocumented)
+export type CrdtNetworkMessageBody = PutNetworkComponentMessageBody | DeleteComponentNetworkMessageBody | DeleteEntityNetworkMessageBody;
 
 // Warning: (ae-missing-release-tag) "createEthereumProvider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -766,6 +773,27 @@ export type DeleteComponentMessageBody = {
 };
 
 // @public (undocumented)
+export namespace DeleteComponentNetwork {
+    const // (undocumented)
+    MESSAGE_HEADER_LENGTH = 16;
+    // (undocumented)
+    export function read(buf: ByteBuffer): DeleteComponentNetworkMessage | null;
+    export function write(entity: Entity, componentId: number, timestamp: number, networkId: number, buf: ByteBuffer): void;
+}
+
+// @public (undocumented)
+export type DeleteComponentNetworkMessage = CrdtMessageHeader & DeleteComponentNetworkMessageBody;
+
+// @public (undocumented)
+export type DeleteComponentNetworkMessageBody = {
+    type: CrdtMessageType.DELETE_COMPONENT_NETWORK;
+    entityId: Entity;
+    componentId: number;
+    timestamp: number;
+    networkId: number;
+};
+
+// @public (undocumented)
 export namespace DeleteEntity {
     const // (undocumented)
     MESSAGE_HEADER_LENGTH = 4;
@@ -782,6 +810,26 @@ export type DeleteEntityMessage = CrdtMessageHeader & DeleteEntityMessageBody;
 export type DeleteEntityMessageBody = {
     type: CrdtMessageType.DELETE_ENTITY;
     entityId: Entity;
+};
+
+// @public (undocumented)
+export namespace DeleteEntityNetwork {
+    const // (undocumented)
+    MESSAGE_HEADER_LENGTH = 8;
+    // (undocumented)
+    export function read(buf: ByteBuffer): DeleteEntityNetworkMessage | null;
+    // (undocumented)
+    export function write(entity: Entity, networkId: number, buf: ByteBuffer): void;
+}
+
+// @public (undocumented)
+export type DeleteEntityNetworkMessage = CrdtMessageHeader & DeleteEntityNetworkMessageBody;
+
+// @public (undocumented)
+export type DeleteEntityNetworkMessageBody = {
+    type: CrdtMessageType.DELETE_ENTITY_NETWORK;
+    entityId: Entity;
+    networkId: number;
 };
 
 // @public (undocumented)
@@ -1346,6 +1394,11 @@ export interface INetowrkEntityType {
 }
 
 // Warning: (tsdoc-html-tag-missing-string) The HTML element has an invalid attribute: Expecting an HTML string starting with a single-quote or double-quote character
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
 // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
 // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
@@ -3154,6 +3207,9 @@ export const enum PointerFilterMode {
     PFM_NONE = 0
 }
 
+// @public
+export type PointerFilterType = 'none' | 'block';
+
 // @public (undocumented)
 export const PointerLock: LastWriteWinElementSetComponentDefinition<PBPointerLock>;
 
@@ -3235,7 +3291,7 @@ export type PutNetworkComponentMessage = CrdtMessageHeader & PutNetworkComponent
 //
 // @public (undocumented)
 export type PutNetworkComponentMessageBody = Omit<PutComponentMessageBody, 'type'> & {
-    type: CrdtMessageType.PUT_NETWORK_COMPONENT;
+    type: CrdtMessageType.PUT_COMPONENT_NETWORK;
     networkId: number;
 };
 
@@ -3940,6 +3996,7 @@ export interface UiInputProps extends Omit<PBUiInput, 'font' | 'textAlign'> {
     // (undocumented)
     font?: UiFontType;
     onChange?(value: string): void;
+    onSubmit?(value: string): void;
     // (undocumented)
     textAlign?: TextAlignType;
 }
@@ -3984,7 +4041,7 @@ export interface UiTransformProps {
     flexGrow?: number;
     flexShrink?: number;
     flexWrap?: FlexWrapType;
-    height?: PositionUnit;
+    height?: PositionUnit | 'auto';
     justifyContent?: JustifyType;
     margin?: Partial<Position> | PositionShorthand;
     maxHeight?: PositionUnit;
@@ -3993,9 +4050,10 @@ export interface UiTransformProps {
     minWidth?: PositionUnit;
     overflow?: OverflowType;
     padding?: Partial<Position> | PositionShorthand;
+    pointerFilter?: PointerFilterType;
     position?: Partial<Position> | PositionShorthand;
     positionType?: PositionType;
-    width?: PositionUnit;
+    width?: PositionUnit | 'auto';
 }
 
 // @public (undocumented)

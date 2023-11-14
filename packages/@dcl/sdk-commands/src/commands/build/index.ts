@@ -50,7 +50,7 @@ export async function main(options: Options) {
 
   for (const project of workspace.projects) {
     printCurrentProjectStarting(options.components.logger, project, workspace)
-    if (project.kind === 'scene' || project.kind === 'wearable') {
+    if (project.kind === 'scene' || project.kind === 'smart-wearable') {
       await buildScene(options, project)
     }
   }

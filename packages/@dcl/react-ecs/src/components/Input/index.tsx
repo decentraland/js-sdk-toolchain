@@ -29,6 +29,9 @@ function parseUiInput(props: Partial<UiInputProps>): PBUiInput {
       onChange={(value) => {
         email = value
       }}
+      onSubmit={(value) => {
+        email = value
+      }}
       uiBackground={{ color: Color4.Red() }}
       uiTransform={{ width: 200, height: 36 }}
       value={textValue}

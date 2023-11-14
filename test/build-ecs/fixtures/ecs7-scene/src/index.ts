@@ -15,19 +15,6 @@ import {
 } from '@dcl/ecs'
 import { Vector3, Quaternion, Color4 } from '@dcl/sdk/math'
 
-// // import { isServer } from '~system/runtime'
-// import { createServerTransport } from '@dcl/sdk/crdt-server'
-
-// if (!isServer()) {
-//   createServerTransport('ws://boedo.com')
-// }
-
-// // if (isServer) {
-
-// // }
-
-export * from '@dcl/sdk'
-
 const Door = engine.defineComponent('door', { open: Schemas.Boolean })
 
 export function getRandomHexColor(): string {
@@ -84,15 +71,16 @@ function circularSystem(dt: number) {
   }
 }
 
-// Init
-const initEntity = createCube(8, 1, 8)
+export function main() {
+  const initEntity = createCube(8, 1, 8)
 
-pointerEventsSystem.onPointerDown(
-  { entity: initEntity, opts: { button: InputAction.IA_POINTER, hoverText: 'CASLA' } },
-  function () {
-    createCube(1 + Math.random() * 8, Math.random() * 8, 1 + Math.random() * 8)
-  }
-)
+  pointerEventsSystem.onPointerDown(
+    { entity: initEntity, opts: { button: InputAction.IA_POINTER, hoverText: 'CASLA' } },
+    function () {
+      createCube(1 + Math.random() * 8, Math.random() * 8, 1 + Math.random() * 8)
+    }
+  )
 
-engine.addSystem(circularSystem)
-engine.addSystem(changeColorSystem)
+  engine.addSystem(circularSystem)
+  engine.addSystem(changeColorSystem)
+}

@@ -34,6 +34,7 @@ class Analytics {
   private static instance: Analytics | null = null
   private analytics: SegmentAnalytics | { track(): void } = noopAnalytics
   private userId: string = uuidv4()
+  private appId: string | undefined = undefined
 
   constructor() {
     if (Analytics.instance) {
@@ -49,20 +50,13 @@ class Analytics {
         this.userId = config.segmentUserId
       }
 
-      let traits: Record<string, unknown> = {
-        createdAt: new Date()
-      }
-
       if (config.segmentAppId) {
-        traits = {
-          ...traits,
-          appId: config.segmentAppId
-        }
+        this.appId = config.segmentAppId
       }
 
       this.analytics.identify({
         userId: this.userId,
-        traits
+        traits: this.getTraits()
       })
     }
 
@@ -73,11 +67,25 @@ class Analytics {
     return this.analytics
   }
 
+  getTraits() {
+    let traits: Record<string, unknown> = {}
+
+    if (this.appId) {
+      traits = {
+        ...traits,
+        appId: this.appId
+      }
+    }
+
+    return traits
+  }
+
   track<T extends keyof Events>(eventName: T, eventProps: Events[T]) {
     const trackInfo = {
       event: eventName,
       userId: this.userId,
       properties: {
+        ...this.getTraits(),
         ...eventProps
       }
     }

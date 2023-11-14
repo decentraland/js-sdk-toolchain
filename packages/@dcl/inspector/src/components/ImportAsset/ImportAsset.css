@@ -64,7 +64,7 @@
   justify-content: center;
   top: -12px;
   right: -12px;
-  background-color: var(--primary);
+  background-color: var(--primary-main);
   border-radius: 50%;
 }
 
@@ -91,12 +91,12 @@
   width: 120px;
 }
 
-.ImportAsset .file-container .TextField {
+.ImportAsset .file-container .Text.Field {
   width: auto;
   height: 24px;
 }
 
-.ImportAsset .file-container .error .TextField {
+.ImportAsset .file-container .error .Text.Field {
   border-color: red;
 }
 
@@ -107,9 +107,14 @@
 }
 
 .ImportAsset .file-container > div:nth-child(2) button {
-  background-color: var(--primary);
+  background-color: var(--primary-main);
 }
 
 .ImportAsset .file-container .error {
-  color: var(--primary);
+  color: var(--primary-main);
+}
+
+.ImportAsset .file-container .AssetPreview {
+  width: 100px;
+  height: 100px;
 }

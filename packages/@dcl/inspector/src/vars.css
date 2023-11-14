@@ -13,12 +13,15 @@
   --input-border-color: var(--vscode-input-border, #cdcccc);
   --button-color: var(--vscode-button-foreground, var(--black));
   --title: #eeeeef;
+  --text-primary: #000000de;
   --sub-text: #ffffffcf;
   --border-focused: #127fd4;
 
   /* DCL Colors */
-  --primary: #ff2d55;
-  --primary-darker: #cc2443;
+  --primary-main: #ff2d54;
+  --primary-dark: #f70038;
+  --secondary-main: #ff7439;
+  --secondary-dark: #e65002;
   /* Color definitions */
   --white: #ffffff;
   --white-gray: #e7e7e7;
@@ -29,6 +32,58 @@
   --vscode-accent-blue: #094771;
   --vscode-blue: var(--border-focused);
   --input-bg-color: #d8d8d8;
+  --yellow: #ffc95b;
+  --melon: #ffa25a;
+  --lavender: #c640cd;
+  --violet: #a524b3;
+  --purple: #691fa9;
+  --gray-0: #43404a;
+
+  /* Neutrals Colors */
+  --base-01: #ffffff;
+  --base-02: #f0f0f0;
+  --base-03: #e7e7e7;
+  --base-04: #e5e5e5;
+  --base-05: #d4d4d4;
+  --base-06: #ccc;
+  --base-07: #c6c6c6;
+  --base-08: #bbb;
+  --base-09: #a0a0a0;
+  --base-10: #808080;
+  --base-11: #7f7f7f;
+  --base-12: #606060;
+  --base-13: #454545;
+  --base-14: #3c3c3c;
+  --base-15: #3a3d41;
+  --base-16: #333;
+  --base-17: #303031;
+  --base-18: #292929;
+  --base-19: #252526;
+  --base-20: #1e1e1e;
+  --base-21: #000;
+
+  /* VS Code Colors */
+  --accent-blue-01: #75beff;
+  --accent-blue-02: #40a6ff;
+  --accent-blue-03: #39c;
+  --accent-blue-04: #3794ff;
+  --accent-blue-05: #0097fb;
+  --accent-blue-06: #007acc;
+  --accent-blue-07: #0e639c;
+  --accent-blue-08: #264f78;
+  --accent-blue-09: #094771;
+  --accent-blue-10: #062f4a;
+
+  /* Status Colors */
+  --success-main: #4caf50;
+  --success-dark: #388e3c;
+  --success-light: #66bb6a;
+  --error-main: #f44336;
+  --error-dark: #d32f2f;
+  --error-light: #ef5350;
+  --warning-main: #f57c00;
+  --warning-dark: #ef6c00;
+  --secondary-light: #ff8d5e;
 
   /* Context menu */
   --contexify-zIndex: 999;
