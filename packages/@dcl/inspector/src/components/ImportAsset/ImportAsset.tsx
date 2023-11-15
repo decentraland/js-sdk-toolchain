@@ -26,7 +26,8 @@ const ACCEPTED_FILE_TYPES = {
   'image/png': ['.png'],
   'audio/mpeg': ['.mp3'],
   'audio/wav': ['.wav'],
-  'audio/ogg': ['.ogg']
+  'audio/ogg': ['.ogg'],
+  'video/mp4': ['.mp4']
 }
 
 interface PropTypes {
@@ -79,6 +80,7 @@ async function validateAsset(extension: string, data: ArrayBuffer): Promise<Vali
     case 'mp3':
     case 'wav':
     case 'ogg':
+    case 'mp4':
       return null
     default:
       return `Invalid asset format ".${extension}"`
@@ -215,7 +217,7 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
               <HiOutlineUpload />
             </div>
             <span>
-              To import an asset drag and drop a single GLB/GLTF/PNG/MP3 file
+              To import an asset drag and drop a single GLB/GLTF/PNG/MP3/MP4 file
               <br /> or click to select a file.
             </span>
           </>

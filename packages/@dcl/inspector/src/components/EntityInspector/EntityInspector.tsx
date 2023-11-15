@@ -22,6 +22,7 @@ import { StatesInspector } from './StatesInspector'
 import { CounterInspector } from './CounterInspector'
 import { AudioSourceInspector } from './AudioSourceInspector'
 import { VisibilityComponentInspector } from './VisibilityComponentInspector'
+import { VideoPlayerInspector } from './VideoPlayerInspector'
 
 import './EntityInspector.css'
 
@@ -65,7 +66,8 @@ export const EntityInspector = withSdk(({ sdk }) => {
       { name: sdk.components.Triggers.componentName, component: TriggerInspector },
       { name: sdk.components.States.componentName, component: StatesInspector },
       { name: sdk.components.Counter.componentName, component: CounterInspector },
-      { name: sdk.components.AudioSource.componentName, component: AudioSourceInspector }
+      { name: sdk.components.AudioSource.componentName, component: AudioSourceInspector },
+      { name: sdk.components.VideoPlayer.componentName, component: VideoPlayerInspector }
     ],
     [sdk]
   )

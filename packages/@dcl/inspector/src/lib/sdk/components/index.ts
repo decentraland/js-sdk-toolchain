@@ -24,7 +24,8 @@ export enum CoreComponents {
   MESH_COLLIDER = 'core::MeshCollider',
   MESH_RENDERER = 'core::MeshRenderer',
   AUDIO_SOURCE = 'core::AudioSource',
-  VISIBILITY_COMPONENT = 'core::VisibilityComponent'
+  VISIBILITY_COMPONENT = 'core::VisibilityComponent',
+  VIDEO_PLAYER = 'core::VideoPlayer'
 }
 
 export enum EditorComponentNames {
@@ -74,6 +75,7 @@ export type SdkComponents = {
   Transform: ReturnType<typeof components.Transform>
   AudioSource: ReturnType<typeof components.AudioSource>
   VisibilityComponent: ReturnType<typeof components.VisibilityComponent>
+  VideoPlayer: ReturnType<typeof components.VideoPlayer>
 }
 
 export function createComponents(engine: IEngine): SdkComponents {
@@ -87,6 +89,7 @@ export function createComponents(engine: IEngine): SdkComponents {
   const Transform = components.Transform(engine)
   const AudioSource = components.AudioSource(engine)
   const VisibilityComponent = components.VisibilityComponent(engine)
+  const VideoPlayer = components.VideoPlayer(engine)
 
   return {
     Billboard,
@@ -98,7 +101,8 @@ export function createComponents(engine: IEngine): SdkComponents {
     TextShape,
     Transform,
     AudioSource,
-    VisibilityComponent
+    VisibilityComponent,
+    VideoPlayer
   }
 }
 
