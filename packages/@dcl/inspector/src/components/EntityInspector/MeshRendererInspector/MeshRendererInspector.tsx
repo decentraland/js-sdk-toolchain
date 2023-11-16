@@ -21,8 +21,6 @@ export default withSdk<Props>(({ sdk, entity }) => {
     await sdk.operations.dispatch()
   }, [])
 
-  if (!hasMeshRenderer) return null
-
   const mesh = useMemo(() => getInputProps('mesh'), [getInputProps])
 
   const renderComponent = useCallback(() => {
@@ -44,6 +42,8 @@ export default withSdk<Props>(({ sdk, entity }) => {
       }
     }
   }, [mesh, getInputProps])
+
+  if (!hasMeshRenderer) return null
 
   return (
     <Container label="MeshRenderer" className="MeshRenderer" onRemoveContainer={handleRemove}>
