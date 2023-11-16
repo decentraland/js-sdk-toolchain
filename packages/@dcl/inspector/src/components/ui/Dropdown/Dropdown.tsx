@@ -2,6 +2,8 @@ import React, { useCallback, useMemo, useState } from 'react'
 import cx from 'classnames'
 import { VscChevronDown as DownArrowIcon, VscSearch as SearchIcon } from 'react-icons/vsc'
 import { useOutsideClick } from '../../../hooks/useOutsideClick'
+import { useContainerSize } from '../../../hooks/useContainerSize'
+import { Label } from '../Label'
 import { TextField } from '../TextField'
 import { ErrorMessage } from '../ErrorMessage'
 import { Option } from './Option'
@@ -47,6 +49,7 @@ const Dropdown: React.FC<Props> = (props) => {
   }, [setShowOptions, setFocus, setSearch])
 
   const ref = useOutsideClick(handleCloseDropdown)
+  const containerSize = useContainerSize(ref)
 
   const handleSelectOption = useCallback(
     (e: any, option: OptionProp) => {
@@ -110,21 +113,30 @@ const Dropdown: React.FC<Props> = (props) => {
 
   const minWidth = useMemo(() => {
     if (options.length > 0) {
-      return options.reduce((minWidth, option) => {
+      const iconWidth = ICON_SIZE + 4
+      let leftIconWidth = 0
+      let rightIconWidth = 0
+      const _minWidth = options.reduce((width, option) => {
         const label = option.label ?? option.value?.toString() ?? ''
-        const leftIconWidth = option.leftIcon ? ICON_SIZE + 4 : 0
-        const rightIconWidth = option.rightIcon ? ICON_SIZE + 4 : 0
-        return Math.max(
-          minWidth,
-          (label.length * FONT_SIZE * FONT_WEIGHT + leftIconWidth + rightIconWidth) / WIDTH_CONST
-        )
+        const labelWidth = label.length * FONT_SIZE * FONT_WEIGHT
+        leftIconWidth = Math.max(leftIconWidth, option.leftIcon ? iconWidth : 0)
+        rightIconWidth = Math.max(rightIconWidth, option.rightIcon ? iconWidth : 0)
+        return Math.max(width, (labelWidth + leftIconWidth + rightIconWidth) / WIDTH_CONST)
       }, 0)
+
+      // To calculate the option's max width, we need to substract the drop icon width, the horizontal padding and the left and right icon width
+      const horizontalPadding = 16
+      const maxWidth = containerSize.width
+        ? containerSize.width - (iconWidth + leftIconWidth + rightIconWidth + horizontalPadding)
+        : Number.MAX_SAFE_INTEGER
+
+      return Math.min(_minWidth, maxWidth)
     }
-  }, [options, empty])
+  }, [options, empty, containerSize])
 
   return (
     <div className="Dropdown Field" ref={ref}>
-      {label ? <label className="DropdownLabel">{label}</label> : null}
+      <Label text={label} />
       <div
         className={cx('DropdownContainer', className, {
           focused: isFocused,

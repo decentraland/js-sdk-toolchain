@@ -5,7 +5,7 @@ export type Props = React.SelectHTMLAttributes<HTMLSelectElement> & {
   className?: string
   disabled?: boolean
   empty?: string
-  label?: string
+  label?: React.ReactNode
   value?: string | number | readonly string[]
   searchable?: boolean
   error?: string | boolean

@@ -1,5 +1,5 @@
 .ui.popup.InfoTooltip {
-  border-color: var(--base-13);
+  border-color: var(--gray-0);
   background-color: var(--gray-0);
   color: var(--base05);
   font-size: 11px;

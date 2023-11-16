@@ -1,5 +1,5 @@
 export type Props = {
-  label?: React.ReactNode
-  error?: boolean
+  text: React.ReactNode
   className?: string
+  header?: boolean
 }

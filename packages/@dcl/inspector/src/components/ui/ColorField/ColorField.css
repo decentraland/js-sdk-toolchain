@@ -3,12 +3,12 @@
   flex: 1;
 }
 
-.Color.Field > .HybridField > .InputContainer > .DropdownContainer:first-of-type {
+.Color.Field > .Hybrid.Field > .InputContainer > .Dropdown.Field:first-of-type {
   flex-grow: 0;
   width: 90px;
 }
 
-.Color.Field > .HybridField > .InputContainer > *:last-child {
+.Color.Field > .Hybrid.Field > .InputContainer > *:last-child {
   flex: 1;
 }
 

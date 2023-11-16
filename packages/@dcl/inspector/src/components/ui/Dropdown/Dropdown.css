@@ -1,27 +1,30 @@
+.Block .content:has(.Dropdown.Field .ErrorMessage) {
+  align-items: flex-start;
+}
+
+.Dropdown {
+  --drop-icon-width: 16px;
+}
+
 .Dropdown.Field {
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
-  gap: 6px;
-}
-
-.Dropdown.Field .DropdownLabel {
-  color: var(--white);
-  font-size: 12px;
-  font-weight: 400;
+  flex: 1;
+  width: 100%;
 }
 
 .Dropdown.Field .DropdownContainer {
-  position: relative;
   display: flex;
   align-items: center;
-  height: 25px;
+  position: relative;
+  height: 24px;
   background: var(--base-14);
-  border-radius: 5px;
+  border-radius: 4px;
   border: 1px solid var(--base-14);
-  padding: 2px 8px;
+  padding: 3px 8px;
   gap: 4px;
   cursor: pointer;
+  width: 100%;
 }
 
 .Dropdown.Field .DropdownContainer:hover {
@@ -45,7 +48,12 @@
 }
 
 .Dropdown.Field .DropdownContainer .DropIcon {
-  line-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: normal;
+  height: 16px;
+  width: 16px;
 }
 
 .Dropdown.Field .DropdownContainer .DropIcon svg {
