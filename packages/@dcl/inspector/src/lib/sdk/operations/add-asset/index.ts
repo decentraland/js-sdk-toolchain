@@ -9,7 +9,8 @@ import {
   LastWriteWinElementSetComponentDefinition,
   PBVideoPlayer,
   PBMaterial,
-  PBMeshRenderer
+  PBMeshRenderer,
+  PBVisibilityComponent
 } from '@dcl/ecs'
 import { ActionType, Actions, ComponentName, Triggers, getJson, getNextId, getPayload } from '@dcl/asset-packs'
 import { CoreComponents } from '../../components'
@@ -93,6 +94,11 @@ export function addAsset(engine: IEngine) {
           case CoreComponents.MESH_RENDERER: {
             const mesh = values.get(componentName) as PBMeshRenderer
             values.set(componentName, mesh)
+            break
+          }
+          case CoreComponents.VISIBILITY_COMPONENT: {
+            const visibility = values.get(componentName) as PBVisibilityComponent
+            values.set(componentName, visibility)
             break
           }
           case ComponentName.ACTIONS: {
