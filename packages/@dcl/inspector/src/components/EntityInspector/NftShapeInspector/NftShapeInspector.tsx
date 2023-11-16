@@ -10,25 +10,27 @@ import { getAssetByModel } from '../../../lib/logic/catalog'
 import { CoreComponents } from '../../../lib/sdk/components'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
-import { TextField, CheckboxField, RangeField } from '../../ui'
-import { fromAudioStream, toAudioStream, isValidInput, isValidVolume } from './utils'
+import { TextField } from '../../ui/TextField'
+import { ColorField } from '../../ui/ColorField'
+import { SelectField } from '../SelectField'
+import { fromNftShape, toNftShape, isValidInput, NFT_STYLES } from './utils'
 import type { Props } from './types'
 
 export default withSdk<Props>(({ sdk, entity }) => {
-  const { AudioStream, GltfContainer } = sdk.components
+  const { NftShape, GltfContainer } = sdk.components
 
-  const hasAudioStream = useHasComponent(entity, AudioStream)
-  const handleInputValidation = useCallback(({ url }: { url: string }) => isValidInput(url), [])
+  const hasNftShape = useHasComponent(entity, NftShape)
+  const handleInputValidation = useCallback(({ urn }: { urn: string }) => isValidInput(urn), [])
   const { getInputProps, isValid } = useComponentInput(
     entity,
-    AudioStream,
-    fromAudioStream,
-    toAudioStream,
+    NftShape,
+    fromNftShape,
+    toNftShape,
     handleInputValidation,
   )
 
   const handleRemove = useCallback(async () => {
-    sdk.operations.removeComponent(entity, AudioStream)
+    sdk.operations.removeComponent(entity, NftShape)
     await sdk.operations.dispatch()
     const gltfContainer = getComponentValue(entity, GltfContainer)
     const asset = getAssetByModel(gltfContainer.src)
@@ -39,22 +41,22 @@ export default withSdk<Props>(({ sdk, entity }) => {
     })
   }, [])
 
-  if (!hasAudioStream) return null
+  if (!hasNftShape) return null
 
-  const url = getInputProps('url')
-  const playing = getInputProps('playing', (e) => e.target.checked)
-  const volume = getInputProps('volume', (e) => e.target.value)
+  const urn = getInputProps('urn')
+  const color = getInputProps('color')
+  const style = getInputProps('style')
 
   return (
-    <Container label="AudioStream" className={cx('AudioStream')} onRemoveContainer={handleRemove}>
-      <Block label="Url">
-        <TextField type="text" {...url} error={!isValid} />
+    <Container label="NftShape" className={cx('NftShape')} onRemoveContainer={handleRemove}>
+      <Block label="Urn">
+        <TextField type="text" {...urn} error={!isValid} />
       </Block>
-      <Block label="Playback">
-        <CheckboxField label="Start playing" checked={!!playing.value} {...playing} />
+      <Block label="Color">
+        <ColorField {...color} />
       </Block>
-      <Block className="volume" label="Volume">
-        <RangeField {...volume} isValidValue={isValidVolume} />
+      <Block label="Style">
+        <SelectField options={NFT_STYLES} {...style} />
       </Block>
     </Container>
   )
