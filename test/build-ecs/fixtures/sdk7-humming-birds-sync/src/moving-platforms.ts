@@ -2,7 +2,7 @@ import { GltfContainer, Transform, Tween, EasingFunction, TweenSequence, TweenLo
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
 import { engine } from '@dcl/sdk/ecs'
 import { isServer } from '~system/EngineApi'
-import { syncEntity } from './message-bus-sync'
+import { syncEntity } from './network/sync-entity'
 import { SyncEntities } from './sync-enum'
 
 export function createMovingPlatforms() {
@@ -27,7 +27,7 @@ export function createMovingPlatforms() {
 
   // only vertical
   // const parent = engine.addEntity()
-  // Transform.create(parent, { position: Vector3.create(3.5, 2.5, 14) })
+  // Transform.create(parent // 512, { position: Vector3.create(3.5, 2.5, 14) })
   // syncEntity(parent, [Tween.componentId], SyncEntities.PLATFORM_2_PARENT)
 
   const platform2 = engine.addEntity()

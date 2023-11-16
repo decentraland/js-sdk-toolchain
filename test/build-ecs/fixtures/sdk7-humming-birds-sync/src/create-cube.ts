@@ -11,7 +11,7 @@ import {
   inputSystem
 } from '@dcl/ecs'
 import { Color4 } from '@dcl/sdk/math'
-import { syncEntity } from './message-bus-sync'
+import { syncEntity } from './network'
 import { SyncEntities } from './sync-enum'
 
 // Cube factory

@@ -13,7 +13,7 @@ export function BinaryMessageBus<T extends CommsMessage>(send: (message: Uint8Ar
       mapping.set(message, callback)
     },
     emit: <K extends T>(message: K, value: Uint8Array) => {
-      // console.log('[EMIT]: ', message)
+      console.log('[EMIT]: ', message, value)
       send(craftMessage<T>(message, value))
     },
     __processMessages: (messages: Uint8Array[]) => {
@@ -21,7 +21,7 @@ export function BinaryMessageBus<T extends CommsMessage>(send: (message: Uint8Ar
         const commsMsg = decodeMessage<T>(message)
         if (!commsMsg) continue
         const { sender, messageType, data } = commsMsg
-        // console.log('[ON]: ', messageType, { sender })
+        console.log('[ON]: ', messageType, { sender })
         const fn = mapping.get(messageType)
         if (fn) fn(data, sender), sender
       }

@@ -15,7 +15,7 @@ import { setupUi } from './ui'
 import { getUserData } from '~system/UserIdentity'
 import { createMovingPlatforms } from './moving-platforms'
 import { changeColorSystem, createCubes } from './create-cube'
-import { addSyncTransport, syncEntity } from './message-bus-sync'
+import { addSyncTransport, syncEntity } from './network'
 import { SyncEntities } from './sync-enum'
 
 export const GameStatus = engine.defineComponent('game-status', { paused: Schemas.Boolean })
@@ -29,9 +29,8 @@ function gameStatusServer() {
 export async function main() {
   const userId = (await getUserData({})).data?.userId ?? ''
 
-  addSyncTransport()
+  await addSyncTransport()
   setupUi(userId)
-
   engine.addSystem(moveHummingBirds)
   gameStatusServer()
   createMovingPlatforms()
