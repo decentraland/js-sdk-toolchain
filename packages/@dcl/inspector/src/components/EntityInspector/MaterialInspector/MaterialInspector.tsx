@@ -79,12 +79,12 @@ export default withSdk<Props>(({ sdk, entity }) => {
 
       {materialType.value === MaterialType.MT_PBR && (
         <>
-          <Container label="Intensity" borderer>
+          <Container label="Intensity" border>
             <RangeField label="Specular" max={1} step={0.1} {...getInputProps('specularIntensity')} />
             <RangeField label="Direct" max={1} step={0.1} {...getInputProps('directIntensity')} />
           </Container>
 
-          <Container label="Transparency" borderer>
+          <Container label="Transparency" border>
             <Block>
               <Dropdown label="Transparency Mode" options={TRANSPARENCY_MODES} {...getInputProps('transparencyMode')} />
             </Block>
@@ -99,7 +99,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
             />
           </Container>
 
-          <Container label="Emissive" borderer>
+          <Container label="Emissive" border>
             <Block>
               <RangeField label="Emissive Intensity" max={1} step={0.1} {...getInputProps('emissiveIntensity')} />
             </Block>

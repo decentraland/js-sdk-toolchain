@@ -28,7 +28,7 @@ function TextureInspector({ label, texture, files, getInputProps }: Props) {
   const isValid = isValidTexture(src.value, files)
 
   return (
-    <Container label={label} className={label} initialOpen={false} borderer>
+    <Container label={label} className={label} initialOpen={false} border>
       <Block>
         <Dropdown label="Type" options={TEXTURE_TYPES} {...type} />
       </Block>
