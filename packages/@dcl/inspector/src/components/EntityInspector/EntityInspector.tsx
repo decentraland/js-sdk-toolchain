@@ -24,6 +24,7 @@ import { AudioSourceInspector } from './AudioSourceInspector'
 import { VisibilityComponentInspector } from './VisibilityComponentInspector'
 import { VideoPlayerInspector } from './VideoPlayerInspector'
 import { AudioStreamInspector } from './AudioStreamInspector'
+import { NftShapeInspector } from './NftShapeInspector'
 
 import './EntityInspector.css'
 
@@ -70,6 +71,7 @@ export const EntityInspector = withSdk(({ sdk }) => {
       { name: sdk.components.AudioSource.componentName, component: AudioSourceInspector },
       { name: sdk.components.VideoPlayer.componentName, component: VideoPlayerInspector },
       { name: sdk.components.AudioStream.componentName, component: AudioStreamInspector },
+      { name: sdk.components.NftShape.componentName, component: NftShapeInspector }
     ],
     [sdk]
   )

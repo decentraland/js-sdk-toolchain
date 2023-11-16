@@ -10,7 +10,9 @@ import {
   PBVideoPlayer,
   PBMaterial,
   PBMeshRenderer,
-  PBVisibilityComponent
+  PBVisibilityComponent,
+  PBNftShape,
+  PBAudioStream
 } from '@dcl/ecs'
 import { ActionType, Actions, ComponentName, Triggers, getJson, getNextId, getPayload } from '@dcl/asset-packs'
 import { CoreComponents } from '../../components'
@@ -99,6 +101,16 @@ export function addAsset(engine: IEngine) {
           case CoreComponents.VISIBILITY_COMPONENT: {
             const visibility = values.get(componentName) as PBVisibilityComponent
             values.set(componentName, visibility)
+            break
+          }
+          case CoreComponents.AUDIO_STREAM: {
+            const audioStream = values.get(componentName) as PBAudioStream
+            values.set(componentName, audioStream)
+            break
+          }
+          case CoreComponents.NFT_SHAPE: {
+            const nft = values.get(componentName) as PBNftShape
+            values.set(componentName, nft)
             break
           }
           case ComponentName.ACTIONS: {
