@@ -40,6 +40,7 @@ import { Props } from './types'
 
 import './ActionInspector.css'
 import { TeleportPlayerAction } from './TeleportPlayerAction'
+import { MovePlayerAction } from './MovePlayerAction'
 
 const ActionMapOption: Record<string, string> = {
   [ActionType.PLAY_ANIMATION]: 'Play Animation',
@@ -141,6 +142,18 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
             !isNaN(payload.y)
           )
         }
+        case ActionType.MOVE_PLAYER: {
+          const payload = getPartialPayload<ActionType.MOVE_PLAYER>(action)
+          return (
+            !!payload &&
+            typeof payload.position?.x === 'number' &&
+            !isNaN(payload.position?.x) &&
+            typeof payload.position?.y === 'number' &&
+            !isNaN(payload.position?.y) &&
+            typeof payload.position?.z === 'number' &&
+            !isNaN(payload.position?.z)
+          )
+        }
         default: {
           try {
             const payload = getPartialPayload(action)
@@ -186,7 +199,8 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
       [ActionType.SET_STATE]: () => hasStates,
       [ActionType.INCREMENT_COUNTER]: () => hasCounter,
       [ActionType.DECREASE_COUNTER]: () => hasCounter,
-      [ActionType.SET_COUNTER]: () => hasCounter
+      [ActionType.SET_COUNTER]: () => hasCounter,
+      [ActionType.MOVE_PLAYER]: () => false // disabling this for now since it's not working as expected
     }),
     [hasAnimations, hasStates]
   )
@@ -293,6 +307,16 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
       modifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.TELEPORT_PLAYER>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangeMovePlayer = useCallback(
+    (value: ActionPayload<ActionType.MOVE_PLAYER>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.MOVE_PLAYER>(value)
       })
     },
     [modifyAction, actions]
@@ -441,6 +465,14 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
           <TeleportPlayerAction
             value={getPartialPayload<ActionType.TELEPORT_PLAYER>(action)}
             onUpdate={(e) => handleChangeTeleportPlayer(e, idx)}
+          />
+        )
+      }
+      case ActionType.MOVE_PLAYER: {
+        return (
+          <MovePlayerAction
+            value={getPartialPayload<ActionType.MOVE_PLAYER>(action)}
+            onUpdate={(e) => handleChangeMovePlayer(e, idx)}
           />
         )
       }
