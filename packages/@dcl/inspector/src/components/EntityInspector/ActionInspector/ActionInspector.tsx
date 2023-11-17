@@ -35,6 +35,8 @@ import { TweenAction } from './TweenAction'
 import { isValidTween } from './TweenAction/utils'
 import { PlayAnimationAction } from './PlayAnimationAction'
 import { SetVisibilityAction } from './SetVisibilityAction'
+import { PlayVideoStreamAction } from './PlayVideoStreamAction'
+import { PlayAudioStreamAction } from './PlayAudioStreamAction'
 import { getDefaultPayload, getPartialPayload, isStates } from './utils'
 import { Props } from './types'
 
@@ -52,7 +54,11 @@ const ActionMapOption: Record<string, string> = {
   [ActionType.STOP_SOUND]: 'Stop Sound',
   [ActionType.SET_VISIBILITY]: 'Set Visibility',
   [ActionType.ATTACH_TO_PLAYER]: 'Attach to Player',
-  [ActionType.DETACH_FROM_PLAYER]: 'Detach from Player'
+  [ActionType.DETACH_FROM_PLAYER]: 'Detach from Player',
+  [ActionType.PLAY_VIDEO_STREAM]: 'Play Video Stream',
+  [ActionType.STOP_VIDEO_STREAM]: 'Stop Video Stream',
+  [ActionType.PLAY_AUDIO_STREAM]: 'Play Audio Stream',
+  [ActionType.STOP_AUDIO_STREAM]: 'Stop Audio Stream'
 }
 
 export default withSdk<Props>(({ sdk, entity: entityId }) => {
@@ -322,6 +328,26 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     [setIsFocused]
   )
 
+  const handleChangeVideo = useCallback(
+    (value: ActionPayload<ActionType.PLAY_VIDEO_STREAM>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.PLAY_VIDEO_STREAM>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangeAudio = useCallback(
+    (value: ActionPayload<ActionType.PLAY_AUDIO_STREAM>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.PLAY_AUDIO_STREAM>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
   const handleRemoveAction = useCallback(
     (_e: React.MouseEvent, idx: number) => {
       removeAction(idx)
@@ -415,6 +441,22 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
               />
             </div>
           </div>
+        )
+      }
+      case ActionType.PLAY_VIDEO_STREAM: {
+        return (
+          <PlayVideoStreamAction
+            value={getPartialPayload<ActionType.PLAY_VIDEO_STREAM>(action)}
+            onUpdate={(value: ActionPayload<ActionType.PLAY_VIDEO_STREAM>) => handleChangeVideo(value, idx)}
+          />
+        )
+      }
+      case ActionType.PLAY_AUDIO_STREAM: {
+        return (
+          <PlayAudioStreamAction
+            value={getPartialPayload<ActionType.PLAY_AUDIO_STREAM>(action)}
+            onUpdate={(value: ActionPayload<ActionType.PLAY_AUDIO_STREAM>) => handleChangeAudio(value, idx)}
+          />
         )
       }
       default: {
