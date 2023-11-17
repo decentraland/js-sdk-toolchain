@@ -9,17 +9,15 @@ import {
   PointerEventType,
   PointerEvents,
   Schemas,
-  SyncComponents,
   Transform,
   VisibilityComponent,
   engine,
   inputSystem
 } from '@dcl/sdk/ecs'
-
+import { getNetworkId, syncEntity } from '@dcl/sdk//network'
 import { Quaternion } from '@dcl/sdk/math'
 import * as utils from '@dcl-sdk/utils'
 import { gamePaused } from './ui'
-import { getNetworkId, syncEntity } from './network'
 
 export const Bird = engine.defineComponent('bird', {})
 

@@ -30,3 +30,7 @@
 // If we dont use the SyncStaticEntities for static models like the house. Then each client will create a new House, and that House will be replicated
 // on every client. So if you have 10 clients, you will have 10 houses being syncronized.
 // That's why we use the SyncStaticEntities identifier for things that you want to be created only once, and can syncronized if some component changed.
+
+
+
+// TODO: update state

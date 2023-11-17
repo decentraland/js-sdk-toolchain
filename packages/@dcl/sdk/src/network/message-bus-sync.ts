@@ -1,10 +1,19 @@
-import { Transport, engine } from '@dcl/sdk/ecs'
-import { syncFilter } from '@dcl/sdk/network-transport/utils'
-import { engineToCrdt } from '@dcl/sdk/network-transport/state'
-import { serializeCrdtMessages } from '@dcl/sdk/internal/transports/logger'
+import { Transport, engine } from '@dcl/ecs'
 import { sendBinary } from '~system/CommunicationsController'
+
+import { syncFilter } from './filter'
+import { engineToCrdt } from './state'
+import { serializeCrdtMessages } from '../internal/transports/logger'
 import { BinaryMessageBus, CommsMessage } from './binary-message-bus'
-import {addOnLeaveSceneListener, getOwnProfile, oldestUser, setInitialized, stateInitialized, stateInitializedChecker, syncTransportIsReady } from './utils'
+import {
+  addOnLeaveSceneListener,
+  getOwnProfile,
+  oldestUser,
+  setInitialized,
+  stateInitialized,
+  stateInitializedChecker,
+  syncTransportIsReady
+} from './utils'
 
 // List of MessageBuss messsages to be sent on every frame to comms
 const pendingMessageBusMessagesToSend: Uint8Array[] = []

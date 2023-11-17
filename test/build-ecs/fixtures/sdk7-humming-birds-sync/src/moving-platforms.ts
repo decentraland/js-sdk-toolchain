@@ -1,8 +1,16 @@
-import { GltfContainer, Transform, Tween, EasingFunction, TweenSequence, TweenLoop, tweenSystem } from '@dcl/ecs'
-import { Quaternion, Vector3 } from '@dcl/sdk/math'
-import { engine } from '@dcl/sdk/ecs'
+import {
+  engine,
+  GltfContainer,
+  Transform,
+  Tween,
+  EasingFunction,
+  TweenSequence,
+  TweenLoop,
+  tweenSystem
+} from '@dcl/sdk/ecs'
+import { Vector3 } from '@dcl/sdk/math'
 import { isServer } from '~system/EngineApi'
-import { syncEntity } from './network/sync-entity'
+import { syncEntity } from '@dcl/sdk/network'
 import { SyncEntities } from './sync-enum'
 
 export function createMovingPlatforms() {

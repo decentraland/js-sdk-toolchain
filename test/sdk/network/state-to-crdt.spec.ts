@@ -1,5 +1,5 @@
-import { Entity, Schemas, engine, SyncComponents } from '../../../packages/@dcl/ecs'
-import { engineToCrdt } from '../../../packages/@dcl/sdk/network-transport/state'
+import { Entity, Schemas, engine, SyncComponents } from '../../../packages/@dcl/ecs/dist'
+import { engineToCrdt } from '../../../packages/@dcl/sdk/network/state'
 import { serializeCrdtMessages } from '../../../packages/@dcl/sdk/internal/transports/logger'
 
 describe('It should dump the engine to a crdt buffer', () => {
@@ -30,13 +30,3 @@ describe('It should dump the engine to a crdt buffer', () => {
     )
   })
 })
-
-export async function pepe() {
-  const a: any[] = []
-  try {
-    await engine.update(1)
-    return a
-  } catch (e) {
-    console.log('asd')
-  }
-}

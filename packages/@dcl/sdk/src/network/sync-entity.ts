@@ -1,5 +1,5 @@
-import { Entity, NetworkEntity, SyncComponents } from "@dcl/ecs"
-import { myProfile } from "./utils"
+import { Entity, NetworkEntity, SyncComponents } from '@dcl/ecs'
+import { myProfile } from './utils'
 
 export function syncEntity(entity: Entity, components: number[], id?: number) {
   if (!myProfile?.networkId) {

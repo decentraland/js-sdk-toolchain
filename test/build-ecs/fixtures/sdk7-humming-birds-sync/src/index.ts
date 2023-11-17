@@ -9,13 +9,13 @@ import {
   Schemas,
   Transform
 } from '@dcl/sdk/ecs'
+import { addSyncTransport, syncEntity } from '@dcl/sdk/network'
+import { getUserData } from '~system/UserIdentity'
 
 import { createHummingBird, moveHummingBirds, shootBirds } from './hummingBird'
 import { setupUi } from './ui'
-import { getUserData } from '~system/UserIdentity'
 import { createMovingPlatforms } from './moving-platforms'
 import { changeColorSystem, createCubes } from './create-cube'
-import { addSyncTransport, syncEntity } from './network'
 import { SyncEntities } from './sync-enum'
 
 export const GameStatus = engine.defineComponent('game-status', { paused: Schemas.Boolean })

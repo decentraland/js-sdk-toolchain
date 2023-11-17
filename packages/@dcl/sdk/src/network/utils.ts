@@ -1,19 +1,21 @@
-import { EngineInfo, Entity, Schemas, engine } from '@dcl/sdk/ecs'
+import { EngineInfo, Entity, Schemas, engine } from '@dcl/ecs'
 import { syncEntity } from './sync-entity'
 import { componentNumberFromName } from '@dcl/ecs/dist/components/component-number'
 import { getUserData } from '~system/UserIdentity'
 import { getConnectedPlayers } from '~system/Players'
-import { onLeaveScene } from '@dcl/sdk/observables'
+import { onLeaveScene } from '../observables'
 
 // We use this component to track all the players and when they enter to the scene.
 // So we know who is in charge of sending the initial state (oldest one)
-export const PlayersInScene = engine.defineComponent('players-scene', { timestamp: Schemas.Number, userId: Schemas.Int64 })
+export const PlayersInScene = engine.defineComponent('players-scene', {
+  timestamp: Schemas.Number,
+  userId: Schemas.Int64
+})
 
 // Cache data
 export let stateInitialized = false
 export let playerSceneEntity: Entity
 export let myProfile: { networkId: number; userId: string }
-
 
 export function getNetworkId() {
   return myProfile?.networkId
@@ -113,7 +115,6 @@ export function stateInitializedChecker() {
     if (connectedPlayers.players.length) {
       return
     }
-
 
     if (!stateInitialized && playerSceneEntity) {
       // Send this data to all the players connected (new and old)
