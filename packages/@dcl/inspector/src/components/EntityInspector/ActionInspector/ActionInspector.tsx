@@ -39,6 +39,7 @@ import { getDefaultPayload, getPartialPayload, isStates } from './utils'
 import { Props } from './types'
 
 import './ActionInspector.css'
+import { TeleportPlayerAction } from './TeleportPlayerAction'
 
 const ActionMapOption: Record<string, string> = {
   [ActionType.PLAY_ANIMATION]: 'Play Animation',
@@ -52,7 +53,9 @@ const ActionMapOption: Record<string, string> = {
   [ActionType.STOP_SOUND]: 'Stop Sound',
   [ActionType.SET_VISIBILITY]: 'Set Visibility',
   [ActionType.ATTACH_TO_PLAYER]: 'Attach to Player',
-  [ActionType.DETACH_FROM_PLAYER]: 'Detach from Player'
+  [ActionType.DETACH_FROM_PLAYER]: 'Detach from Player',
+  [ActionType.TELEPORT_PLAYER]: 'Teleport Player',
+  [ActionType.MOVE_PLAYER]: 'Move Player'
 }
 
 export default withSdk<Props>(({ sdk, entity: entityId }) => {
@@ -128,9 +131,15 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
           const payload = getPartialPayload<ActionType.DECREASE_COUNTER>(action)
           return !!payload
         }
-        case ActionType.SET_VISIBILITY: {
-          const payload = getPartialPayload<ActionType.SET_VISIBILITY>(action)
-          return !!payload
+        case ActionType.TELEPORT_PLAYER: {
+          const payload = getPartialPayload<ActionType.TELEPORT_PLAYER>(action)
+          return (
+            !!payload &&
+            typeof payload.x === 'number' &&
+            !isNaN(payload.x) &&
+            typeof payload.y === 'number' &&
+            !isNaN(payload.y)
+          )
         }
         default: {
           try {
@@ -279,6 +288,16 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     [modifyAction, actions]
   )
 
+  const handleChangeTeleportPlayer = useCallback(
+    (value: ActionPayload<ActionType.TELEPORT_PLAYER>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.TELEPORT_PLAYER>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
   const handleChangeType = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
       modifyAction(idx, {
@@ -415,6 +434,14 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
               />
             </div>
           </div>
+        )
+      }
+      case ActionType.TELEPORT_PLAYER: {
+        return (
+          <TeleportPlayerAction
+            value={getPartialPayload<ActionType.TELEPORT_PLAYER>(action)}
+            onUpdate={(e) => handleChangeTeleportPlayer(e, idx)}
+          />
         )
       }
       default: {
