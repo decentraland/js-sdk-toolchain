@@ -47,7 +47,6 @@ const SetVisibilityAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
         ]}
         value={(payload.visible ?? true).toString()}
         onChange={handleSetVisible}
-        error={'some error'}
       />
 
       <Dropdown
