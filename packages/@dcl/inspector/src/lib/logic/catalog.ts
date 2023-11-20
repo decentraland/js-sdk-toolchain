@@ -57,11 +57,10 @@ export function getAssetsByCategory(assets: Asset[]) {
 export function isSmart(asset: Partial<Asset>) {
   const components = Object.keys(asset?.components ?? {})
   return (
-    (components.length > 1 &&
-      components.some((component) =>
-        [ComponentName.ACTIONS, ComponentName.TRIGGERS].find(($) => $.toString() === component)
-      )) ||
-    (components.length === 1 && components[0] !== CoreComponents.GLTF_CONTAINER)
+    components.length > 1 &&
+    components.some((component) =>
+      [ComponentName.ACTIONS, ComponentName.TRIGGERS].find(($) => $.toString() === component)
+    )
   )
 }
 
