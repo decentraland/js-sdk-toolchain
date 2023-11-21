@@ -4,7 +4,7 @@ import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 
 import { isValidVolume, volumeFromMediaSource, volumeToMediaSource } from '../../../../lib/utils/media'
 import { Block } from '../../../Block'
-import { CheckboxField, Dropdown, RangeField, TextField } from '../../../ui'
+import { Dropdown, RangeField, TextField } from '../../../ui'
 import { isValid } from './utils'
 import type { Props } from './types'
 
