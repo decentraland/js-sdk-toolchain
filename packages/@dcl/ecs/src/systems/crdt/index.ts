@@ -14,7 +14,11 @@ import { PutComponentOperation } from '../../serialization/crdt/putComponent'
 import { CrdtMessageType, CrdtMessageHeader, CrdtMessage } from '../../serialization/crdt/types'
 import { ReceiveMessage, Transport } from './types'
 import { PutNetworkComponentOperation } from '../../serialization/crdt/network/putComponentNetwork'
-import { NetworkEntity as defineNetworkEntity } from '../../components'
+import {
+  NetworkEntity as defineNetworkEntity,
+  NetworkParent as defineNetworkParent,
+  Transform as defineTransform
+} from '../../components'
 import { INetowrkEntityType } from '../../components/types'
 import * as networkUtils from '../../serialization/crdt/network/utils'
 
@@ -33,7 +37,12 @@ export type OnChangeFunction = (
  */
 export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChange: OnChangeFunction | null) {
   const transports: Transport[] = []
+
+  // Components that we used on this system
   const NetworkEntity = defineNetworkEntity(engine)
+  const NetworkParent = defineNetworkParent(engine)
+  const Transform = defineTransform(engine)
+
   // Messages that we received at transport.onMessage waiting to be processed
   const receivedMessages: ReceiveMessage[] = []
   // Messages already processed by the engine but that we need to broadcast to other transports.
@@ -101,16 +110,20 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
    * It's a mapping Network -> to Local
    * If it's not a network message, return the entityId received by the message
    */
-  function findNetworkId(msg: ReceiveMessage): { entityId: Entity; network?: INetowrkEntityType } {
-    if (!networkUtils.isNetworkMessage(msg)) {
-      return { entityId: msg.entityId }
-    }
+  function findNetworkId(msg: { entityId: Entity; networkId?: number }): {
+    entityId: Entity
+    network?: INetowrkEntityType
+  } {
+    const hasNetworkId = 'networkId' in msg
 
-    for (const [entityId, network] of engine.getEntitiesWith(NetworkEntity)) {
-      if (network.networkId === msg.networkId && network.entityId === msg.entityId) {
-        return { entityId, network }
+    if (hasNetworkId) {
+      for (const [entityId, network] of engine.getEntitiesWith(NetworkEntity)) {
+        if (network.networkId === msg.networkId && network.entityId === msg.entityId) {
+          return { entityId, network }
+        }
       }
     }
+
     return { entityId: msg.entityId }
   }
 
@@ -128,7 +141,8 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
       // We receive a new Entity. Create the localEntity and map it to the NetworkEntity component
       if (networkUtils.isNetworkMessage(msg) && !network) {
         entityId = engine.addEntity()
-        NetworkEntity.createOrReplace(entityId, { entityId: msg.entityId, networkId: msg.networkId })
+        network = { entityId: msg.entityId, networkId: msg.networkId }
+        NetworkEntity.createOrReplace(entityId, network)
       }
       if (msg.type === CrdtMessageType.DELETE_ENTITY || msg.type === CrdtMessageType.DELETE_ENTITY_NETWORK) {
         entitiesShouldBeCleaned.push(entityId)
@@ -148,8 +162,15 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
 
         /* istanbul ignore else */
         if (component) {
+          if (
+            msg.type === CrdtMessageType.PUT_COMPONENT &&
+            component.componentId === Transform.componentId &&
+            NetworkEntity.has(entityId) &&
+            NetworkParent.has(entityId)
+          ) {
+            msg.data = networkUtils.fixTransformParent(msg)
+          }
           const [conflictMessage, value] = component.updateFromCrdt({ ...msg, entityId })
-
           if (!conflictMessage) {
             // Add message to transport queue to be processed by others transports
             broadcastMessages.push(msg)
@@ -238,12 +259,39 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
 
         // Redundant message for the transport
         if (!transport.filter(message)) continue
+        const { entityId } = findNetworkId(message)
 
-        // If it's the renderer transport and its a NetworkMessage, we need to fix the entityId field and convert it to a known Message.
-        // PUT_NETWORK_COMPONENT -> PUT_COMPONENT
+        const transformNeedsFix =
+          'componentId' in message &&
+          message.componentId === Transform.componentId &&
+          Transform.has(entityId) &&
+          NetworkParent.has(entityId) &&
+          NetworkEntity.has(entityId)
+
+        // If there was a LOCAL change in the transform. Add the parent to that transform
+        if (isRendererTransport && message.type === CrdtMessageType.PUT_COMPONENT && transformNeedsFix) {
+          const parent = findNetworkId(NetworkParent.get(entityId))
+          const transformData = networkUtils.fixTransformParent(message, Transform.get(entityId), parent.entityId)
+          const offset = buffer.currentWriteOffset()
+          PutComponentOperation.write(entityId, message.timestamp, message.componentId, transformData, buffer)
+          transportBuffer.writeBuffer(buffer.buffer().subarray(offset, buffer.currentWriteOffset()), false)
+          continue
+        }
+
         if (isRendererTransport && networkUtils.isNetworkMessage(message)) {
-          const { entityId } = findNetworkId(message)
-          networkUtils.networkMessageToLocal(message, entityId, buffer, transportBuffer)
+          // If it's the renderer transport and its a NetworkMessage, we need to fix the entityId field and convert it to a known Message.
+          // PUT_NETWORK_COMPONENT -> PUT_COMPONENT
+          let transformData: Uint8Array = 'data' in message ? message.data : new Uint8Array()
+          if (transformNeedsFix) {
+            const parent = findNetworkId(NetworkParent.get(entityId))
+            transformData = networkUtils.fixTransformParent(message, Transform.get(entityId), parent.entityId)
+          }
+          networkUtils.networkMessageToLocal(
+            { ...message, data: transformData } as any,
+            entityId,
+            buffer,
+            transportBuffer
+          )
           // Iterate the next message
           continue
         }

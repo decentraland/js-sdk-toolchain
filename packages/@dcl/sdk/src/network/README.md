@@ -74,47 +74,49 @@ B creates sync entity 514 (child)
  Transform.create({ parent, position: {} })
  syncEntity(child, [Transform.componentId], SyncEntities.ChildDoor)
 
-So now client A has different raw data for the Transform with client B, because they have different parents.
+So now client A & B had different raw data for the Transform component, because they have different parents.
 Meaning that we have an inconsistent CRDT State between two clients.
 So if there is a new message comming from client C we could have conflicts for client A but maybe not for client B.
-I want to cry.
+
+Same problem would happen if a client after some interaction (i.e. a bullet) creates an entity with a parent. For the client A this could be { parent: 515, child: 516 } but for another user those entities are not going to be the same ones.
 
 Solution 1:
- What if we introduce a new ParentSync.
- This ParentSync will be in charge of syncronizing the parenting. If we have ParentSync then we should always ignore the Transform.parent property.
- The parentSync will have both entityId and networkId such as the PutNetworkMessage so we can map the entity in every client.
- ParentSync.Schema = { parent: Entity; networkId: number }.
- Being the networkId the id of the user that owns that parent entity.
- const newParent: Entity = someEntityWeWantToUpdate() // 512
- this new parent returns the entity of this client, but it may not be the client who owns this entity.
- const networkParent = NetworkEntity.getOrNull(newParent) // { entityId: 1025, networkId: random }
- ParentSync.create(child, networkParent)
+ What if we introduce a new ParentNetwork component.
+ This ParentNetwork will be in charge of syncronizing the parenting. If we have ParentNetwork then we should always ignore the Transform.parent property.
+ The ParentNetwork will have both entityId and networkId such as the PutNetworkMessage so we can map the entity in every client.
 
- Now imagine that client A want to create a new parent for a child that originally was created by Client B
+ ParentNetwork.Schema = { entityId: Entity; networkId: number }.
+
+ Being the networkId the id of the user that owns that parent entity, and the entityId the parent entityId of the user that creates that entity.
+ So with this two values, we cant map the real parent entity id on every client.
+
  ```ts
- const parent = engine.addEntity()
- Transform.create(parent, { position: somePosition })
+ import { syncEntity, parentEntity } from '@dcl/sdk/network'
+ const parentEntity = engine.addEntity()
+ Transform.create(parentEntity, { position: somePosition })
  syncEntity(parent, Transform.componentId)
- const childEntity: Entity = someEntityWeWantToUpdate()
- ParentSync.createOrReplace(childEntity, { parent, networkId: 'clientA' })
- ```
- This will generate two PUT_NETWORK_COMPONENT messages.
- One for the parent entity with the transform component ( networkId: clientA, entityId: parent )
- And another for the ParentSync of the child entity that was originally created by client B (networkId: clientB, entityId: child).
- Every client will know how to map this entity because the ParentSync has the pointers to the parent entity.
- ParentSync will point to the entity that was created on the first message.
+ const childEntity: Entity = engine.addEntity()
+ syncEntity(childEntity, Transform.componentId)
 
- But we need to fix the parenting for the renderer, so it doesnt know about this logic
- So every time we send a Transform component to the renderer, we should update the transform.parent property with the mapped Entity that we fetch from the ParentSync.
- if (isTransform(message) && isRendererTransport && ParentSync.getOrNull(message.entityId)) {
+ // create parentNetwork component. This maybe could be done in a system and use the original parent. TBD
+ parentEntity(childEntity, parentEntity)
+ ```
+ Every client will know how to map this entity because the ParentNetwork has the pointers to the parent entity. But we are still having an issue, the parent is not defined. We need to tell the renderer that the child entity has a parent property.
+
+ So every time we send a Transform component to the renderer, we should update the transform.parent property with the mapped Entity that we fetch from the ParentNetwork.
+ if (isTransform(message) && isRendererTransport && ParentNetwork.getOrNull(message.entityId)) {
    // Generate a new transform raw data with the parent property included
  }
 
  And every time we recieve a message from the renderer, we should remove the parent property to keep consistency in all CRDT state clients.
- if (isTransform(message) && message.type === CrdtMessageType.PUT_COMPONENT && ParentSync.has(message.entityId)) {
+ if (isTransform(message) && message.type === CrdtMessageType.PUT_COMPONENT && ParentNetwork.has(message.entityId)) {
  transform.parent = null
    // Generate a new transform raw data without the parent property included
  }
 
  With this approach, all the clients will have the same Transform, so we avoid the inconsistency of crdt's state.
- And when some user wants to update the transform, it has to modify the ParentSync and will update both values, the parent & the network.
+ And when some user wants to update the transform, it has to modify the ParentNetwork and will update both values, the parent & the network.
+
+I think this will work but there are some developer experience issues, like using the `parentEntity(child, parent)` function instead of the transform.parent.
+This could end up with a lot of unexepcted issues/bugs. Maybe we can have a system that iterates over every syncronized entity and when the transform.parent changes, add the parentEntity function automatically.
+First I wanna try to implement all of this and then came up with this approach to avoid inconsistencies

@@ -6,7 +6,6 @@ import { engineToCrdt } from './state'
 import { serializeCrdtMessages } from '../internal/transports/logger'
 import { BinaryMessageBus, CommsMessage } from './binary-message-bus'
 import {
-  addOnLeaveSceneListener,
   getOwnProfile,
   oldestUser,
   setInitialized,
@@ -33,6 +32,7 @@ export async function addSyncTransport() {
     filter: syncFilter,
     send: async (message: Uint8Array) => {
       if (syncTransportIsReady() && message.byteLength) {
+        console.log(Array.from(serializeCrdtMessages('[send CRDT]: ', message, engine)))
         binaryMessageBus.emit(CommsMessage.CRDT, message)
       }
       const messages = getMessagesToSend()
@@ -46,9 +46,6 @@ export async function addSyncTransport() {
 
   // Add state intialized checker
   engine.addSystem(stateInitializedChecker)
-
-  // Listener to have the oldest list up-to-date
-  addOnLeaveSceneListener()
 
   // Request initial state
   binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
@@ -71,6 +68,8 @@ export async function addSyncTransport() {
 
   // Process CRDT messages here
   binaryMessageBus.on(CommsMessage.CRDT, (value) => {
+    console.log(Array.from(serializeCrdtMessages('[CRDT on]: ', value, engine)))
+
     transport.onmessage!(value)
   })
 }

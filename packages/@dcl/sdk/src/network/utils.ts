@@ -3,13 +3,12 @@ import { syncEntity } from './sync-entity'
 import { componentNumberFromName } from '@dcl/ecs/dist/components/component-number'
 import { getUserData } from '~system/UserIdentity'
 import { getConnectedPlayers } from '~system/Players'
-import { onLeaveScene } from '../observables'
 
 // Component to track all the players and when they enter to the scene.
 // Know who is in charge of sending the initial state (oldest one)
 export const PlayersInScene = engine.defineComponent('players-scene', {
   timestamp: Schemas.Number,
-  userId: Schemas.Int64
+  userId: Schemas.String
 })
 
 // Already initialized my state. Ignore new states messages.
@@ -51,9 +50,9 @@ export async function getOwnProfile(): Promise<typeof myProfile> {
  * It's used to check who is the oldest one, to sync the state
  */
 export function createPlayerTimestampData() {
-  if (!myProfile?.networkId) return undefined
+  if (!myProfile?.userId) return undefined
   const entity = engine.addEntity()
-  PlayersInScene.create(entity, { timestamp: Date.now(), userId: myProfile.networkId })
+  PlayersInScene.create(entity, { timestamp: Date.now(), userId: myProfile.userId })
   syncEntity(entity, [PlayersInScene.componentId])
   playerSceneEntity = entity
   return playerSceneEntity
@@ -62,27 +61,17 @@ export function createPlayerTimestampData() {
 /**
  * Check if I'm the older user to send the initial state
  */
-export function oldestUser() {
+export function oldestUser(): boolean {
+  // When the user leaves the scene but it's still connected.
+  if (!PlayersInScene.has(playerSceneEntity)) {
+    createPlayerTimestampData()
+    return oldestUser()
+  }
   const { timestamp } = PlayersInScene.get(playerSceneEntity)
   for (const [_, player] of engine.getEntitiesWith(PlayersInScene)) {
     if (player.timestamp < timestamp) return false
   }
   return true
-}
-
-/**
- * Function to delete user's data that left the scene.
- * Keeps PlayersInScene up-to-date with the current players.
- */
-export function addOnLeaveSceneListener() {
-  onLeaveScene.add(({ userId }) => {
-    const networkId = componentNumberFromName(userId)
-    for (const [entity, player] of engine.getEntitiesWith(PlayersInScene)) {
-      if (player.userId === networkId) {
-        PlayersInScene.deleteFrom(entity)
-      }
-    }
-  })
 }
 
 /**
@@ -104,22 +93,29 @@ export function syncTransportIsReady() {
  * This fn should be added as a system so it runs on every tick
  */
 export function stateInitializedChecker() {
-  // Wait for comms to be ready ?? ~3000ms
-  if ((EngineInfo.getOrNull(engine.RootEntity)?.tickNumber ?? 0) > 100) {
-    setInitialized()
-    return
-  }
-
   async function enterScene() {
     if (!playerSceneEntity) {
       createPlayerTimestampData()
     }
 
-    // If we already have data from players, dont send the heartbeat messages
+    /**
+     * Keeps PlayersInScene up-to-date with the current players.
+     */
     const connectedPlayers = await getConnectedPlayers({})
-    if (connectedPlayers.players.length) {
+    for (const [entity, player] of engine.getEntitiesWith(PlayersInScene)) {
+      if (!connectedPlayers.players.find(($) => $.userId === player.userId)) {
+        PlayersInScene.deleteFrom(entity)
+      }
+    }
+
+    // Wait for comms to be ready ?? ~3000ms
+    if ((EngineInfo.getOrNull(engine.RootEntity)?.tickNumber ?? 0) > 100) {
+      setInitialized()
       return
     }
+
+    // If we already have data from players, dont send the heartbeat messages
+    if (connectedPlayers.players.length) return
 
     if (!stateInitialized && playerSceneEntity) {
       // Send this data to all the players connected (new and old)

@@ -7,3 +7,4 @@ export type { TransformComponentExtended, TransformTypeWithOptionals } from './m
 export type { NameComponent, NameType } from './manual/Name'
 export type { ISyncComponents, ISyncComponentsType } from './manual/SyncComponents'
 export type { INetowrkEntity, INetowrkEntityType } from './manual/NetworkEntity'
+export type { INetowrkParent, INetowrkParentType } from './manual/NetworkParent'

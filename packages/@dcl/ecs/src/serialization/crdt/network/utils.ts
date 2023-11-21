@@ -1,15 +1,21 @@
 import { Entity } from '../../../engine'
-import { ReceiveMessage } from '../../../runtime/types'
+import { ReceiveMessage, TransformType } from '../../../runtime/types'
 import { ReceiveNetworkMessage } from '../../../systems/crdt/types'
-import { ByteBuffer } from '../../ByteBuffer'
+import { ByteBuffer, ReadWriteByteBuffer } from '../../ByteBuffer'
 import { PutComponentOperation } from '../putComponent'
-import { CrdtMessageType } from '../types'
+import {
+  CrdtMessageType,
+  PutComponentMessageBody,
+  PutNetworkComponentMessage,
+  PutNetworkComponentMessageBody
+} from '../types'
 import { DeleteComponent } from '../deleteComponent'
 import { DeleteEntity } from '../deleteEntity'
 import { INetowrkEntityType } from '../../../components/types'
 import { PutNetworkComponentOperation } from './putComponentNetwork'
 import { DeleteComponentNetwork } from './deleteComponentNetwork'
 import { DeleteEntityNetwork } from './deleteEntityNetwork'
+import { TransformSchema } from '../../../components/manual/Transform'
 
 export function isNetworkMessage(message: ReceiveMessage): message is ReceiveNetworkMessage {
   return [
@@ -58,4 +64,25 @@ export function localMessageToNetwork(
     DeleteEntityNetwork.write(network.entityId, network.networkId, buffer)
   }
   destinationBuffer.writeBuffer(buffer.buffer().subarray(offset, buffer.currentWriteOffset()), false)
+}
+
+export function fixTransformParent(
+  message: ReceiveMessage,
+  transformValue?: TransformType,
+  parent?: Entity
+): Uint8Array {
+  let transform = transformValue
+  const buffer = new ReadWriteByteBuffer()
+  if (!transform && 'data' in message) {
+    buffer.writeBuffer(message.data)
+    transform = TransformSchema.deserialize(buffer)
+    buffer.resetBuffer()
+  }
+  if (!transform) throw new Error('Invalid parent transform')
+  // Generate new transform raw data with the parent
+  const newTransform = { ...transform, parent }
+  console.log('Fix transform', message.entityId, newTransform)
+  buffer.resetBuffer()
+  TransformSchema.serialize(newTransform, buffer)
+  return buffer.toBinary()
 }

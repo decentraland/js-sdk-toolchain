@@ -13,7 +13,7 @@ export function BinaryMessageBus<T extends CommsMessage>(send: (message: Uint8Ar
       mapping.set(message, callback)
     },
     emit: <K extends T>(message: K, value: Uint8Array) => {
-      console.log('[EMIT]: ', message, value)
+      console.log('[EMIT]: ', message)
       send(craftMessage<T>(message, value))
     },
     __processMessages: (messages: Uint8Array[]) => {
