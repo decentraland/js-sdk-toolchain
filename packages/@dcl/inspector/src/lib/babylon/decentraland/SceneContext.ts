@@ -51,6 +51,7 @@ export class SceneContext {
   GltfContainer = components.GltfContainer(this.engine)
   TextShape = components.TextShape(this.engine)
   Name = components.Name(this.engine)
+  Animator = components.Animator(this.engine)
 
   readonly editorComponents = createEditorComponents(this.engine)
 

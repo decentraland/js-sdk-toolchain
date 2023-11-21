@@ -86,6 +86,10 @@ export function removeGltf(entity: EcsEntity) {
     entity.gltfContainer.dispose(false, true)
     delete entity.gltfContainer
   }
+
+  if (entity.gltfAssetContainer) {
+    cleanupAssetContainer(context.scene, entity.gltfAssetContainer)
+  }
 }
 
 async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: string) {
@@ -145,12 +149,6 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
     (_scene, _message, _exception) => {
       console.error('Error while calling LoadAssetContainer: ', _message, _exception)
       entity.resolveGltfPathLoading(filePath)
-      // debugger
-      // const animator: Animator = entity.getBehaviorByName('animator') as Animator
-
-      // if (animator) {
-      //   animator.transformValue(animator.value!)
-      // }
     },
     extension
   )

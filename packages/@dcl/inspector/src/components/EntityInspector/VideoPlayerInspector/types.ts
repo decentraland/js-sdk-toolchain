@@ -9,5 +9,5 @@ export type VideoPlayerInput = {
   playing?: boolean
   loop?: boolean
   volume?: string
-  playbackRate?: string;
+  playbackRate?: string
 }

@@ -27,7 +27,8 @@ export enum CoreComponents {
   VISIBILITY_COMPONENT = 'core::VisibilityComponent',
   VIDEO_PLAYER = 'core::VideoPlayer',
   AUDIO_STREAM = 'core::AudioStream',
-  NFT_SHAPE = 'core::NftShape'
+  NFT_SHAPE = 'core::NftShape',
+  ANIMATOR = 'core::Animator'
 }
 
 export enum EditorComponentNames {
@@ -80,6 +81,7 @@ export type SdkComponents = {
   VideoPlayer: ReturnType<typeof components.VideoPlayer>
   AudioStream: ReturnType<typeof components.AudioStream>
   NftShape: ReturnType<typeof components.NftShape>
+  Animator: ReturnType<typeof components.Animator>
 }
 
 export function createComponents(engine: IEngine): SdkComponents {
@@ -96,6 +98,7 @@ export function createComponents(engine: IEngine): SdkComponents {
   const VideoPlayer = components.VideoPlayer(engine)
   const AudioStream = components.AudioStream(engine)
   const NftShape = components.NftShape(engine)
+  const Animator = components.Animator(engine)
 
   return {
     Billboard,
@@ -110,7 +113,8 @@ export function createComponents(engine: IEngine): SdkComponents {
     VisibilityComponent,
     VideoPlayer,
     AudioStream,
-    NftShape
+    NftShape,
+    Animator
   }
 }
 

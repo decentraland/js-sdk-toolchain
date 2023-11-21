@@ -26,10 +26,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
   const { VideoPlayer, GltfContainer } = sdk.components
 
   const hasVideoPlayer = useHasComponent(entity, VideoPlayer)
-  const handleInputValidation = useCallback(
-    ({ src }: { src: string }) => !!files && isValidInput(files, src),
-    [files]
-  )
+  const handleInputValidation = useCallback(({ src }: { src: string }) => !!files && isValidInput(files, src), [files])
   const { getInputProps, isValid } = useComponentInput(
     entity,
     VideoPlayer,

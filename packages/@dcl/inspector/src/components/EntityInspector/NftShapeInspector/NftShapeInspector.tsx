@@ -26,7 +26,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
     NftShape,
     fromNftShape,
     toNftShape,
-    handleInputValidation,
+    handleInputValidation
   )
 
   const handleRemove = useCallback(async () => {

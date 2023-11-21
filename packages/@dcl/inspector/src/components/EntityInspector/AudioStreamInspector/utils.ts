@@ -2,20 +2,20 @@ import { PBAudioStream } from '@dcl/ecs'
 import { AudioStreamInput } from './types'
 
 export const fromAudioStream = (value: PBAudioStream): AudioStreamInput => {
-    return {
-      url: value.url,
-      playing: value.playing,
-      volume: volumeFromAudioStream(value.volume)
-    }
+  return {
+    url: value.url,
+    playing: value.playing,
+    volume: volumeFromAudioStream(value.volume)
   }
+}
 
 export const toAudioStream = (value: AudioStreamInput): PBAudioStream => {
-    return {
-      url: value.url,
-      playing: value.playing,
-      volume: volumeToAudioStream(value.volume)
-    }
+  return {
+    url: value.url,
+    playing: value.playing,
+    volume: volumeToAudioStream(value.volume)
   }
+}
 
 export function volumeFromAudioStream(volume: number | undefined): string {
   const value = (volume ?? 1.0) * 100

@@ -7,7 +7,7 @@ export const fromNftShape = (value: PBNftShape): NftShapeInput => {
   return {
     urn: value.urn,
     color: value.color ? toHex(value.color) : undefined,
-    style: (value.style ?? NftFrameType.NFT_NONE).toString(),
+    style: (value.style ?? NftFrameType.NFT_NONE).toString()
   }
 }
 
@@ -27,94 +27,94 @@ export function isValidInput(urn: string): boolean {
 export const NFT_STYLES = [
   {
     value: 0,
-    label: "Classic"
+    label: 'Classic'
   },
   {
     value: 1,
-    label: "Baroque Ornament"
+    label: 'Baroque Ornament'
   },
   {
     value: 2,
-    label: "Diamond Ornament"
+    label: 'Diamond Ornament'
   },
   {
     value: 3,
-    label: "Minimal Wide"
+    label: 'Minimal Wide'
   },
   {
     value: 4,
-    label: "Minimal Grey"
+    label: 'Minimal Grey'
   },
   {
     value: 5,
-    label: "Blocky"
+    label: 'Blocky'
   },
   {
     value: 6,
-    label: "Gold Edges"
+    label: 'Gold Edges'
   },
   {
     value: 7,
-    label: "Gold Carved"
+    label: 'Gold Carved'
   },
   {
     value: 8,
-    label: "Gold Wide"
+    label: 'Gold Wide'
   },
   {
     value: 9,
-    label: "Gold Rounded"
+    label: 'Gold Rounded'
   },
   {
     value: 10,
-    label: "Metal Medium"
+    label: 'Metal Medium'
   },
   {
     value: 11,
-    label: "Metal Wide"
+    label: 'Metal Wide'
   },
   {
     value: 12,
-    label: "Metal Slim"
+    label: 'Metal Slim'
   },
   {
     value: 13,
-    label: "Metal Rounded"
+    label: 'Metal Rounded'
   },
   {
     value: 14,
-    label: "Pins"
+    label: 'Pins'
   },
   {
     value: 15,
-    label: "Minimal Black"
+    label: 'Minimal Black'
   },
   {
     value: 16,
-    label: "Minimal White"
+    label: 'Minimal White'
   },
   {
     value: 17,
-    label: "Tape"
+    label: 'Tape'
   },
   {
     value: 18,
-    label: "Wood Slim"
+    label: 'Wood Slim'
   },
   {
     value: 19,
-    label: "Wood Wide"
+    label: 'Wood Wide'
   },
   {
     value: 20,
-    label: "Wood Twigs"
+    label: 'Wood Twigs'
   },
   {
     value: 21,
-    label: "Canvas"
+    label: 'Canvas'
   },
   {
     value: 22,
-    label: "None"
+    label: 'None'
   }
 ]

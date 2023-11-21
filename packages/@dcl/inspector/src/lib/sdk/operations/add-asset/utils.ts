@@ -1,4 +1,4 @@
-import { PBMaterial, TextureUnion } from "@dcl/ecs"
+import { PBMaterial, TextureUnion } from '@dcl/ecs'
 
 export function isSelf(value: any) {
   return `${value}` === `{self}`
@@ -25,7 +25,7 @@ export function parseMaterial(base: string, material: PBMaterial): PBMaterial {
             texture: parseTexture(base, material.material.pbr.texture),
             alphaTexture: parseTexture(base, material.material.pbr.alphaTexture),
             bumpTexture: parseTexture(base, material.material.pbr.bumpTexture),
-            emissiveTexture: parseTexture(base, material.material.pbr.emissiveTexture),
+            emissiveTexture: parseTexture(base, material.material.pbr.emissiveTexture)
           }
         }
       }
@@ -41,7 +41,7 @@ export function parseTexture(base: string, texture?: TextureUnion): TextureUnion
         $case: 'texture',
         texture: {
           ...texture.tex.texture,
-          src: texture.tex.texture.src.replace('{assetPath}', base),
+          src: texture.tex.texture.src.replace('{assetPath}', base)
         }
       }
     }
