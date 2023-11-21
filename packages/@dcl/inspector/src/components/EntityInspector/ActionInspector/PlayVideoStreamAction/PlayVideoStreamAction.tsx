@@ -26,6 +26,22 @@ const playModeOptions = [
   }
 ]
 
+enum VIDEO_SOURCE {
+  DCL_CAST = 'dcl-cast',
+  URL = 'url'
+}
+
+const videoSourceOptions = [
+  {
+    label: 'DCL Cast',
+    value: VIDEO_SOURCE.DCL_CAST
+  },
+  {
+    label: 'URL',
+    value: VIDEO_SOURCE.URL
+  }
+]
+
 const PlayVideoStreamAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
   const [payload, setPayload] = useState<Partial<ActionPayload<ActionType.PLAY_VIDEO_STREAM>>>({
     ...value
@@ -36,9 +52,9 @@ const PlayVideoStreamAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
     onUpdate(payload)
   }, [payload, onUpdate])
 
-  const handleChangeDclCast = useCallback(
-    ({ target: { checked } }: React.ChangeEvent<HTMLInputElement>) => {
-      setPayload({ ...payload, dclCast: checked })
+  const handleChangeVideoSource = useCallback(
+    ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
+      setPayload({ ...payload, dclCast: value === VIDEO_SOURCE.DCL_CAST })
     },
     [payload, setPayload]
   )
@@ -71,18 +87,40 @@ const PlayVideoStreamAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
   return (
     <div className="PlayVideoStreamActionContainer">
       <Block>
-        <CheckboxField label="Decentraland Cast" checked={payload.dclCast} onChange={handleChangeDclCast} />
+        <Dropdown
+          label="Video Source"
+          value={payload.dclCast ? VIDEO_SOURCE.DCL_CAST : VIDEO_SOURCE.URL}
+          options={videoSourceOptions}
+          onChange={handleChangeVideoSource}
+          info={
+            payload.dclCast && (
+              <>
+                DCL Cast only works when your scene is deployed to a World.{' '}
+                <a
+                  href="https://docs.decentraland.org/creator/development-guide/sdk7/video-playing/#streaming-using-decentraland-cast"
+                  target="_blank"
+                >
+                  Learn More
+                </a>
+              </>
+            )
+          }
+        />
       </Block>
       {!payload.dclCast ? (
-        <Block>
-          <TextField label="URL" value={payload.src} onChange={handleChangeSrc} />
-          <Dropdown
-            label="Play Mode"
-            value={payload.loop ? PLAY_MODE.LOOP : PLAY_MODE.PLAY_ONCE}
-            options={playModeOptions}
-            onChange={handleChangePlayMode}
-          />
-        </Block>
+        <>
+          <Block>
+            <TextField label="URL" value={payload.src} onChange={handleChangeSrc} />
+          </Block>
+          <Block>
+            <Dropdown
+              label="Play Mode"
+              value={payload.loop ? PLAY_MODE.LOOP : PLAY_MODE.PLAY_ONCE}
+              options={playModeOptions}
+              onChange={handleChangePlayMode}
+            />
+          </Block>
+        </>
       ) : null}
       <Block>
         <RangeField

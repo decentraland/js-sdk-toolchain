@@ -5,7 +5,7 @@ import { useOutsideClick } from '../../../hooks/useOutsideClick'
 import { useContainerSize } from '../../../hooks/useContainerSize'
 import { Label } from '../Label'
 import { TextField } from '../TextField'
-import { ErrorMessage } from '../ErrorMessage'
+import { Message, MessageType } from '../Message'
 import { Option } from './Option'
 import type { Props as OptionProp } from './Option/types'
 import type { Props } from './types'
@@ -21,7 +21,19 @@ function isOptionSelected(currentValue?: any, optionValue?: any) {
 }
 
 const Dropdown: React.FC<Props> = (props) => {
-  const { className, disabled, empty, error, label, options, searchable, value, onChange, placeholder = '' } = props
+  const {
+    className,
+    disabled,
+    empty,
+    error,
+    info,
+    label,
+    options,
+    searchable,
+    value,
+    onChange,
+    placeholder = ''
+  } = props
   const [showOptions, setShowOptions] = useState(false)
   const [isFocused, setFocus] = useState(false)
   const [search, setSearch] = useState('')
@@ -134,6 +146,16 @@ const Dropdown: React.FC<Props> = (props) => {
     }
   }, [options, empty, containerSize])
 
+  const renderMessage = useCallback(() => {
+    if (error) {
+      return <Message text={error} type={MessageType.ERROR} />
+    } else if (info) {
+      return <Message text={info} type={MessageType.INFO} icon={false} />
+    }
+
+    return null
+  }, [error, info])
+
   return (
     <div className="Dropdown Field" ref={ref}>
       <Label text={label} />
@@ -181,7 +203,7 @@ const Dropdown: React.FC<Props> = (props) => {
           <DownArrowIcon size={ICON_SIZE} />
         </div>
       </div>
-      <ErrorMessage error={error} />
+      {renderMessage()}
     </div>
   )
 }
