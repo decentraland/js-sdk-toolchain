@@ -62,7 +62,11 @@ const ActionMapOption: Record<string, string> = {
   [ActionType.MOVE_PLAYER]: 'Move Player',
   [ActionType.PLAY_DEFAULT_EMOTE]: 'Play Emote',
   [ActionType.PLAY_CUSTOM_EMOTE]: 'Play Custom Emote',
-  [ActionType.OPEN_LINK]: 'Open Link'
+  [ActionType.OPEN_LINK]: 'Open Link',
+  [ActionType.PLAY_AUDIO_STREAM]: 'Play Audio Stream',
+  [ActionType.STOP_AUDIO_STREAM]: 'Stop Audio Stream',
+  [ActionType.PLAY_VIDEO_STREAM]: 'Play Video Stream',
+  [ActionType.STOP_VIDEO_STREAM]: 'Stop Video Stream'
 }
 
 export default withSdk<Props>(({ sdk, entity: entityId }) => {
