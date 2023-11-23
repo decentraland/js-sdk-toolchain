@@ -41,6 +41,9 @@ import { Props } from './types'
 import './ActionInspector.css'
 import { TeleportPlayerAction } from './TeleportPlayerAction'
 import { MovePlayerAction } from './MovePlayerAction'
+import { PlayDefaultEmoteAction } from './PlayDefaultEmoteAction'
+import { PlayCustomEmoteAction } from './PlayCustomEmoteAction'
+import { OpenLinkAction } from './OpenLinkAction'
 
 const ActionMapOption: Record<string, string> = {
   [ActionType.PLAY_ANIMATION]: 'Play Animation',
@@ -56,7 +59,10 @@ const ActionMapOption: Record<string, string> = {
   [ActionType.ATTACH_TO_PLAYER]: 'Attach to Player',
   [ActionType.DETACH_FROM_PLAYER]: 'Detach from Player',
   [ActionType.TELEPORT_PLAYER]: 'Teleport Player',
-  [ActionType.MOVE_PLAYER]: 'Move Player'
+  [ActionType.MOVE_PLAYER]: 'Move Player',
+  [ActionType.PLAY_DEFAULT_EMOTE]: 'Play Emote',
+  [ActionType.PLAY_CUSTOM_EMOTE]: 'Play Custom Emote',
+  [ActionType.OPEN_LINK]: 'Open Link'
 }
 
 export default withSdk<Props>(({ sdk, entity: entityId }) => {
@@ -154,6 +160,18 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
             !isNaN(payload.position?.z)
           )
         }
+        case ActionType.PLAY_DEFAULT_EMOTE: {
+          const payload = getPartialPayload<ActionType.PLAY_DEFAULT_EMOTE>(action)
+          return !!payload && typeof payload.emote === 'string' && payload.emote.length > 0
+        }
+        case ActionType.PLAY_CUSTOM_EMOTE: {
+          const payload = getPartialPayload<ActionType.PLAY_CUSTOM_EMOTE>(action)
+          return !!payload && typeof payload.src === 'string' && payload.src.length > 0
+        }
+        case ActionType.OPEN_LINK: {
+          const payload = getPartialPayload<ActionType.OPEN_LINK>(action)
+          return !!payload && typeof payload.url === 'string' && payload.url.length > 0
+        }
         default: {
           try {
             const payload = getPartialPayload(action)
@@ -200,7 +218,8 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
       [ActionType.INCREMENT_COUNTER]: () => hasCounter,
       [ActionType.DECREASE_COUNTER]: () => hasCounter,
       [ActionType.SET_COUNTER]: () => hasCounter,
-      [ActionType.MOVE_PLAYER]: () => false // disabling this for now since it's not working as expected
+      [ActionType.MOVE_PLAYER]: () => false, // disabling this for now since it's not working as expected
+      [ActionType.PLAY_CUSTOM_EMOTE]: () => false // disabling this for now since it's not working on custom realms, so it does not work on the builder preview
     }),
     [hasAnimations, hasStates]
   )
@@ -317,6 +336,36 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
       modifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.MOVE_PLAYER>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangePlayDefaultEmote = useCallback(
+    (value: ActionPayload<ActionType.PLAY_DEFAULT_EMOTE>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.PLAY_DEFAULT_EMOTE>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangePlayCustomEmote = useCallback(
+    (value: ActionPayload<ActionType.PLAY_CUSTOM_EMOTE>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.PLAY_CUSTOM_EMOTE>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangeOpenLink = useCallback(
+    (value: ActionPayload<ActionType.OPEN_LINK>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.OPEN_LINK>(value)
       })
     },
     [modifyAction, actions]
@@ -473,6 +522,30 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
           <MovePlayerAction
             value={getPartialPayload<ActionType.MOVE_PLAYER>(action)}
             onUpdate={(e) => handleChangeMovePlayer(e, idx)}
+          />
+        )
+      }
+      case ActionType.PLAY_DEFAULT_EMOTE: {
+        return (
+          <PlayDefaultEmoteAction
+            value={getPartialPayload<ActionType.PLAY_DEFAULT_EMOTE>(action)}
+            onUpdate={(e) => handleChangePlayDefaultEmote(e, idx)}
+          />
+        )
+      }
+      case ActionType.PLAY_CUSTOM_EMOTE: {
+        return (
+          <PlayCustomEmoteAction
+            value={getPartialPayload<ActionType.PLAY_CUSTOM_EMOTE>(action)}
+            onUpdate={(e) => handleChangePlayCustomEmote(e, idx)}
+          />
+        )
+      }
+      case ActionType.OPEN_LINK: {
+        return (
+          <OpenLinkAction
+            value={getPartialPayload<ActionType.OPEN_LINK>(action)}
+            onUpdate={(e) => handleChangeOpenLink(e, idx)}
           />
         )
       }
