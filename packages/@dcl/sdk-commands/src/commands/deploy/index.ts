@@ -175,7 +175,7 @@ export async function main(options: Options) {
       }
       printSuccess(options.components.logger, 'Content uploaded successfully', sceneUrl)
 
-      await options.components.analytics.track('Scene deploy success', {
+      options.components.analytics.track('Scene deploy success', {
         ...trackProps,
         sceneId: entityId,
         targetContentServer: url,

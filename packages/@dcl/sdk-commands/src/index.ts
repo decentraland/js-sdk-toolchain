@@ -6,6 +6,7 @@ import { CliError } from './logic/error'
 import { initComponents } from './components'
 import { colors, writeToStderr } from './components/log'
 import { runSdkCommand } from './run-command'
+import { printSuccess } from './logic/beautiful-logs'
 
 async function main() {
   const command = process.argv[2]
@@ -18,6 +19,8 @@ async function main() {
   } finally {
     await components.analytics.stop()
   }
+
+  printSuccess(components.logger, 'Command finished successfully. Ending execution.', '')
   // rollup watcher leaves many open FSWatcher even in build mode. we must call
   // process.exit at this point to prevent the program halting forever
   process.exit(process.exitCode || 0)
