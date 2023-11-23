@@ -23,7 +23,7 @@ export function BinaryMessageBus<T extends CommsMessage>(send: (message: Uint8Ar
         const { sender, messageType, data } = commsMsg
         console.log('[ON]: ', messageType, { sender })
         const fn = mapping.get(messageType)
-        if (fn) fn(data, sender), sender
+        if (fn) fn(data, sender)
       }
     }
   }

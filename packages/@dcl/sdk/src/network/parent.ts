@@ -1,4 +1,31 @@
-import { Entity, NetworkEntity, NetworkParent, Transform } from '@dcl/ecs'
+import { Entity, NetworkEntity, NetworkParent, Transform, engine } from '@dcl/ecs'
+
+export function* getChilds(parent: Entity): Iterable<Entity> {
+  const network = NetworkEntity.getOrNull(parent)
+  if (network) {
+    for (const [entity, parent] of engine.getEntitiesWith(NetworkParent)) {
+      if (parent.entityId === network.entityId && parent.networkId === network.networkId) {
+        yield entity
+      }
+    }
+  }
+}
+
+export function getFirstChild(parent: Entity): Entity | undefined {
+  const childs = [...getChilds(parent)]
+  return childs[0] ?? undefined
+}
+
+export function getParent(child: Entity): Entity | undefined {
+  const parent = NetworkParent.getOrNull(child)
+  if (!parent) return undefined
+  for (const [entity, network] of engine.getEntitiesWith(NetworkEntity)) {
+    if (parent.networkId === network.networkId && parent.entityId === network.entityId) {
+      return entity
+    }
+  }
+  return undefined
+}
 
 export function parentEntity(entity: Entity, parent: Entity) {
   const network = NetworkEntity.getOrNull(parent)

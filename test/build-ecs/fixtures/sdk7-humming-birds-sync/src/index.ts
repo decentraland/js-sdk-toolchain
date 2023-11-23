@@ -15,7 +15,7 @@ import { getUserData } from '~system/UserIdentity'
 import { createHummingBird, moveHummingBirds, shootBirds } from './hummingBird'
 import { setupUi } from './ui'
 import { createMovingPlatforms } from './moving-platforms'
-import { changeColorSystem, createCubes } from './create-cube'
+import { cubeSystem } from './create-cube'
 import { SyncEntities } from './sync-enum'
 
 export const GameStatus = engine.defineComponent('game-status', { paused: Schemas.Boolean })
@@ -33,10 +33,10 @@ export async function main() {
   setupUi(userId)
   engine.addSystem(moveHummingBirds)
   gameStatusServer()
-  createMovingPlatforms()
-  createCubes()
+  // createMovingPlatforms()
+  // createCubes()
 
-  engine.addSystem(changeColorSystem)
+  engine.addSystem(cubeSystem)
   engine.addSystem(shootBirds(userId))
 
   // Instantiate base models. Floor & Tree

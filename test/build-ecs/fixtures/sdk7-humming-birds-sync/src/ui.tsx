@@ -139,6 +139,7 @@ export function setupUi(userId: string) {
               uiTransform={{ width: '100%', height: 40 }}
             />
           ))}
+          <Label value={getPlayerPosition()} fontSize={18} uiTransform={{ width: '100%', height: 40 }} />
         </UiEntity>
       </UiEntity>
     ]
