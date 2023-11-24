@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { ActionPayload, ActionType } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
+import { Dropdown } from '../../../ui'
 import type { Props } from './types'
-import { SelectField } from '../../SelectField'
 
 import './PlayDefaultEmoteAction.css'
 
@@ -54,7 +54,7 @@ const PlayDefaultEmoteAction: React.FC<Props> = ({ value, onUpdate }: Props) => 
   return (
     <div className="PlayDefaultEmoteActionContainer">
       <div className="row">
-        <SelectField
+        <Dropdown
           label="Emote"
           options={emoteOptions}
           value={payload.emote}
