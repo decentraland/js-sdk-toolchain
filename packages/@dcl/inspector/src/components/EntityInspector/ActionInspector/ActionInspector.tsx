@@ -39,6 +39,11 @@ import { getDefaultPayload, getPartialPayload, isStates } from './utils'
 import { Props } from './types'
 
 import './ActionInspector.css'
+import { TeleportPlayerAction } from './TeleportPlayerAction'
+import { MovePlayerAction } from './MovePlayerAction'
+import { PlayDefaultEmoteAction } from './PlayDefaultEmoteAction'
+import { PlayCustomEmoteAction } from './PlayCustomEmoteAction'
+import { OpenLinkAction } from './OpenLinkAction'
 
 const ActionMapOption: Record<string, string> = {
   [ActionType.PLAY_ANIMATION]: 'Play Animation',
@@ -52,7 +57,16 @@ const ActionMapOption: Record<string, string> = {
   [ActionType.STOP_SOUND]: 'Stop Sound',
   [ActionType.SET_VISIBILITY]: 'Set Visibility',
   [ActionType.ATTACH_TO_PLAYER]: 'Attach to Player',
-  [ActionType.DETACH_FROM_PLAYER]: 'Detach from Player'
+  [ActionType.DETACH_FROM_PLAYER]: 'Detach from Player',
+  [ActionType.TELEPORT_PLAYER]: 'Teleport Player',
+  [ActionType.MOVE_PLAYER]: 'Move Player',
+  [ActionType.PLAY_DEFAULT_EMOTE]: 'Play Emote',
+  [ActionType.PLAY_CUSTOM_EMOTE]: 'Play Custom Emote',
+  [ActionType.OPEN_LINK]: 'Open Link',
+  [ActionType.PLAY_AUDIO_STREAM]: 'Play Audio Stream',
+  [ActionType.STOP_AUDIO_STREAM]: 'Stop Audio Stream',
+  [ActionType.PLAY_VIDEO_STREAM]: 'Play Video Stream',
+  [ActionType.STOP_VIDEO_STREAM]: 'Stop Video Stream'
 }
 
 export default withSdk<Props>(({ sdk, entity: entityId }) => {
@@ -128,9 +142,39 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
           const payload = getPartialPayload<ActionType.DECREASE_COUNTER>(action)
           return !!payload
         }
-        case ActionType.SET_VISIBILITY: {
-          const payload = getPartialPayload<ActionType.SET_VISIBILITY>(action)
-          return !!payload
+        case ActionType.TELEPORT_PLAYER: {
+          const payload = getPartialPayload<ActionType.TELEPORT_PLAYER>(action)
+          return (
+            !!payload &&
+            typeof payload.x === 'number' &&
+            !isNaN(payload.x) &&
+            typeof payload.y === 'number' &&
+            !isNaN(payload.y)
+          )
+        }
+        case ActionType.MOVE_PLAYER: {
+          const payload = getPartialPayload<ActionType.MOVE_PLAYER>(action)
+          return (
+            !!payload &&
+            typeof payload.position?.x === 'number' &&
+            !isNaN(payload.position?.x) &&
+            typeof payload.position?.y === 'number' &&
+            !isNaN(payload.position?.y) &&
+            typeof payload.position?.z === 'number' &&
+            !isNaN(payload.position?.z)
+          )
+        }
+        case ActionType.PLAY_DEFAULT_EMOTE: {
+          const payload = getPartialPayload<ActionType.PLAY_DEFAULT_EMOTE>(action)
+          return !!payload && typeof payload.emote === 'string' && payload.emote.length > 0
+        }
+        case ActionType.PLAY_CUSTOM_EMOTE: {
+          const payload = getPartialPayload<ActionType.PLAY_CUSTOM_EMOTE>(action)
+          return !!payload && typeof payload.src === 'string' && payload.src.length > 0
+        }
+        case ActionType.OPEN_LINK: {
+          const payload = getPartialPayload<ActionType.OPEN_LINK>(action)
+          return !!payload && typeof payload.url === 'string' && payload.url.length > 0
         }
         default: {
           try {
@@ -177,7 +221,9 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
       [ActionType.SET_STATE]: () => hasStates,
       [ActionType.INCREMENT_COUNTER]: () => hasCounter,
       [ActionType.DECREASE_COUNTER]: () => hasCounter,
-      [ActionType.SET_COUNTER]: () => hasCounter
+      [ActionType.SET_COUNTER]: () => hasCounter,
+      [ActionType.MOVE_PLAYER]: () => false, // disabling this for now since it's not working as expected
+      [ActionType.PLAY_CUSTOM_EMOTE]: () => false // disabling this for now since it's not working on custom realms, so it does not work on the builder preview
     }),
     [hasAnimations, hasStates]
   )
@@ -274,6 +320,56 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
         jsonPayload: getJson<ActionType.ATTACH_TO_PLAYER>({
           anchorPointId: parseInt(value)
         })
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangeTeleportPlayer = useCallback(
+    (value: ActionPayload<ActionType.TELEPORT_PLAYER>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.TELEPORT_PLAYER>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangeMovePlayer = useCallback(
+    (value: ActionPayload<ActionType.MOVE_PLAYER>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.MOVE_PLAYER>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangePlayDefaultEmote = useCallback(
+    (value: ActionPayload<ActionType.PLAY_DEFAULT_EMOTE>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.PLAY_DEFAULT_EMOTE>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangePlayCustomEmote = useCallback(
+    (value: ActionPayload<ActionType.PLAY_CUSTOM_EMOTE>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.PLAY_CUSTOM_EMOTE>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangeOpenLink = useCallback(
+    (value: ActionPayload<ActionType.OPEN_LINK>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.OPEN_LINK>(value)
       })
     },
     [modifyAction, actions]
@@ -415,6 +511,46 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
               />
             </div>
           </div>
+        )
+      }
+      case ActionType.TELEPORT_PLAYER: {
+        return (
+          <TeleportPlayerAction
+            value={getPartialPayload<ActionType.TELEPORT_PLAYER>(action)}
+            onUpdate={(e) => handleChangeTeleportPlayer(e, idx)}
+          />
+        )
+      }
+      case ActionType.MOVE_PLAYER: {
+        return (
+          <MovePlayerAction
+            value={getPartialPayload<ActionType.MOVE_PLAYER>(action)}
+            onUpdate={(e) => handleChangeMovePlayer(e, idx)}
+          />
+        )
+      }
+      case ActionType.PLAY_DEFAULT_EMOTE: {
+        return (
+          <PlayDefaultEmoteAction
+            value={getPartialPayload<ActionType.PLAY_DEFAULT_EMOTE>(action)}
+            onUpdate={(e) => handleChangePlayDefaultEmote(e, idx)}
+          />
+        )
+      }
+      case ActionType.PLAY_CUSTOM_EMOTE: {
+        return (
+          <PlayCustomEmoteAction
+            value={getPartialPayload<ActionType.PLAY_CUSTOM_EMOTE>(action)}
+            onUpdate={(e) => handleChangePlayCustomEmote(e, idx)}
+          />
+        )
+      }
+      case ActionType.OPEN_LINK: {
+        return (
+          <OpenLinkAction
+            value={getPartialPayload<ActionType.OPEN_LINK>(action)}
+            onUpdate={(e) => handleChangeOpenLink(e, idx)}
+          />
         )
       }
       default: {

@@ -29,6 +29,21 @@ export function getDefaultPayload(type: string) {
         duration: 1
       })
     }
+    case ActionType.TELEPORT_PLAYER: {
+      return getJson<ActionType.TELEPORT_PLAYER>({
+        x: 0,
+        y: 0
+      })
+    }
+    case ActionType.MOVE_PLAYER: {
+      return getJson<ActionType.MOVE_PLAYER>({
+        position: {
+          x: 0,
+          y: 0,
+          z: 0
+        }
+      })
+    }
     default: {
       return '{}'
     }

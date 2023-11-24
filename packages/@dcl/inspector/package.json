@@ -1,9 +1,6 @@
 {
   "name": "@dcl/inspector",
   "version": "0.1.0",
-  "dependencies": {
-    "@dcl/asset-packs": "^1.2.8"
-  },
   "devDependencies": {
     "@babylonjs/core": "^6.18.0",
     "@babylonjs/gui": "^6.18.0",
@@ -69,5 +66,8 @@
     "start": "npm run copy-bin && node ./build.js --watch"
   },
   "types": "dist/tooling-entrypoint.d.ts",
-  "typings": "dist/tooling-entrypoint.d.ts"
+  "typings": "dist/tooling-entrypoint.d.ts",
+  "dependencies": {
+    "@dcl/asset-packs": "^1.3.0"
+  }
 }
