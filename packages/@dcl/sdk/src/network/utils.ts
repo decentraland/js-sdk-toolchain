@@ -1,28 +1,24 @@
-import { EngineInfo, Entity, Schemas, engine } from '@dcl/ecs'
-import { syncEntity } from './sync-entity'
+import { EngineInfo, Entity, IEngine, Schemas } from '@dcl/ecs'
 import { componentNumberFromName } from '@dcl/ecs/dist/components/component-number'
+
 import { getUserData } from '~system/UserIdentity'
 import { getConnectedPlayers } from '~system/Players'
+import { SyncEntity } from './entities'
+import { IProfile } from './message-bus-sync'
 
 // Component to track all the players and when they enter to the scene.
 // Know who is in charge of sending the initial state (oldest one)
-export const PlayersInScene = engine.defineComponent('players-scene', {
-  timestamp: Schemas.Number,
-  userId: Schemas.String
-})
+export const definePlayersInScene = (engine: IEngine) =>
+  engine.defineComponent('players-scene', {
+    timestamp: Schemas.Number,
+    userId: Schemas.String
+  })
 
 // Already initialized my state. Ignore new states messages.
 export let stateInitialized = false
 
 // My player entity to check if I'm the oldest player in the scend
 export let playerSceneEntity: Entity
-
-// My profile data. UserId and NetworkId used to sync entities
-export let myProfile: { networkId: number; userId: string }
-
-export function getNetworkId() {
-  return myProfile?.networkId
-}
 
 export function setInitialized() {
   stateInitialized = true
@@ -33,26 +29,28 @@ export function setInitialized() {
 export let INITIAL_CRDT_RENDERER_MESSAGES_SENT = false
 
 // Retrieve userId to start sending this info as the networkId
-export async function getOwnProfile(): Promise<typeof myProfile> {
-  if (myProfile) return myProfile
-  const { data } = await getUserData({})
-  if (data?.userId) {
-    const userId = data.userId
-    const networkId = componentNumberFromName(data.userId)
-    myProfile = { userId, networkId }
-    return myProfile
-  }
-  return getOwnProfile()
+export function fetchProfile(myProfile: IProfile) {
+  void getUserData({}).then(({ data }) => {
+    if (data?.userId) {
+      const userId = data.userId
+      const networkId = componentNumberFromName(data.userId)
+      myProfile.networkId = networkId
+      myProfile.userId = userId
+    } else {
+      throw new Error(`Couldn't fetch profile data`)
+    }
+  })
 }
 
 /**
  * Add's the user information about when he joined the scene.
  * It's used to check who is the oldest one, to sync the state
  */
-export function createPlayerTimestampData() {
-  if (!myProfile?.userId) return undefined
+export function createPlayerTimestampData(engine: IEngine, profile: IProfile, syncEntity: SyncEntity) {
+  if (!profile?.userId) return undefined
+  const PlayersInScene = definePlayersInScene(engine)
   const entity = engine.addEntity()
-  PlayersInScene.create(entity, { timestamp: Date.now(), userId: myProfile.userId })
+  PlayersInScene.create(entity, { timestamp: Date.now(), userId: profile.userId })
   syncEntity(entity, [PlayersInScene.componentId])
   playerSceneEntity = entity
   return playerSceneEntity
@@ -61,14 +59,17 @@ export function createPlayerTimestampData() {
 /**
  * Check if I'm the older user to send the initial state
  */
-export function oldestUser(): boolean {
+export function oldestUser(engine: IEngine, profile: IProfile, syncEntity: SyncEntity): boolean {
+  console.log('[ME]: ', profile)
+  const PlayersInScene = definePlayersInScene(engine)
   // When the user leaves the scene but it's still connected.
   if (!PlayersInScene.has(playerSceneEntity)) {
-    createPlayerTimestampData()
-    return oldestUser()
+    createPlayerTimestampData(engine, profile, syncEntity)
+    return oldestUser(engine, profile, syncEntity)
   }
   const { timestamp } = PlayersInScene.get(playerSceneEntity)
   for (const [_, player] of engine.getEntitiesWith(PlayersInScene)) {
+    console.log(player)
     if (player.timestamp < timestamp) return false
   }
   return true
@@ -77,7 +78,7 @@ export function oldestUser(): boolean {
 /**
  * Ignore CRDT's initial messages from the renderer.
  */
-export function syncTransportIsReady() {
+export function syncTransportIsReady(engine: IEngine) {
   if (!INITIAL_CRDT_RENDERER_MESSAGES_SENT) {
     const engineInfo = EngineInfo.getOrNull(engine.RootEntity)
     if (engineInfo && engineInfo.tickNumber > 2) {
@@ -92,10 +93,11 @@ export function syncTransportIsReady() {
  * Add the playerSceneData component and syncronize it till we receive the state.
  * This fn should be added as a system so it runs on every tick
  */
-export function stateInitializedChecker() {
+export function stateInitializedChecker(engine: IEngine, profile: IProfile, syncEntity: SyncEntity) {
+  const PlayersInScene = definePlayersInScene(engine)
   async function enterScene() {
     if (!playerSceneEntity) {
-      createPlayerTimestampData()
+      createPlayerTimestampData(engine, profile, syncEntity)
     }
 
     /**

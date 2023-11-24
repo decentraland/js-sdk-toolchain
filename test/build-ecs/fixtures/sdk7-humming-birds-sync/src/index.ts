@@ -9,7 +9,7 @@ import {
   Schemas,
   Transform
 } from '@dcl/sdk/ecs'
-import { addSyncTransport, syncEntity } from '@dcl/sdk/network'
+import { syncEntity } from '@dcl/sdk/network'
 import { getUserData } from '~system/UserIdentity'
 
 import { createHummingBird, moveHummingBirds, shootBirds } from './hummingBird'
@@ -28,8 +28,6 @@ function gameStatusServer() {
 
 export async function main() {
   const userId = (await getUserData({})).data?.userId ?? ''
-
-  await addSyncTransport()
   setupUi(userId)
   engine.addSystem(moveHummingBirds)
   gameStatusServer()

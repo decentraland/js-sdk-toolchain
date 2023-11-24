@@ -15,8 +15,7 @@ import {
   ColliderLayer
 } from '@dcl/ecs'
 import { Color4 } from '@dcl/sdk/math'
-import { parentEntity, syncEntity, getFirstChild, getParent } from '@dcl/sdk/network'
-import { myProfile } from '@dcl/sdk/network/utils'
+import { parentEntity, syncEntity, getFirstChild, getParent, myProfile } from '@dcl/sdk/network'
 
 const Grabbed = engine.defineComponent('grabbed', { userId: Schemas.String })
 

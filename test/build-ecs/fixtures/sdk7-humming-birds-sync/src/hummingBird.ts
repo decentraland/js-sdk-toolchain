@@ -14,7 +14,7 @@ import {
   engine,
   inputSystem
 } from '@dcl/sdk/ecs'
-import { getNetworkId, syncEntity } from '@dcl/sdk//network'
+import { myProfile, syncEntity } from '@dcl/sdk//network'
 import { Quaternion } from '@dcl/sdk/math'
 import * as utils from '@dcl-sdk/utils'
 import { gamePaused } from './ui'
@@ -109,7 +109,7 @@ export function moveHummingBirds(dt: number) {
     NetworkEntity
   )) {
     if (!visibleComponent.visible) continue
-    if (networkEntity?.networkId !== getNetworkId()) continue
+    if (networkEntity?.networkId !== myProfile.networkId) continue
 
     const birdTransform = Transform.getMutableOrNull(birdEntity)
     if (!birdTransform) continue

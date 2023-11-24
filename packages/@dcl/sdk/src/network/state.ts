@@ -6,13 +6,17 @@ import {
   IEngine,
   PutComponentOperation,
   PutNetworkComponentOperation,
-  SyncComponents,
-  NetworkEntity
+  SyncComponents as _SyncComponents,
+  NetworkEntity as _NetworkEntity,
+  ISyncComponents,
+  INetowrkEntity
 } from '@dcl/ecs'
 
 export function engineToCrdt(engine: IEngine): Uint8Array {
   const crdtBuffer = new ReadWriteByteBuffer()
   const networkBuffer = new ReadWriteByteBuffer()
+  const SyncComponents = engine.getComponent(_SyncComponents.componentId) as ISyncComponents
+  const NetworkEntity = engine.getComponent(_NetworkEntity.componentId) as INetowrkEntity
   const syncEntities = new Set(Array.from(engine.getEntitiesWith(SyncComponents)).map(($) => $[0]))
 
   for (const itComponentDefinition of engine.componentsIter()) {

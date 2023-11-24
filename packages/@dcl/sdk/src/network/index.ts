@@ -1,6 +1,7 @@
-import { syncEntity } from './sync-entity'
+import { engine } from '@dcl/ecs'
 import { addSyncTransport } from './message-bus-sync'
-import { getNetworkId } from './utils'
-import { parentEntity, getParent, getChilds, getFirstChild } from './parent'
 
-export { syncEntity, addSyncTransport, getNetworkId, parentEntity, getParent, getChilds, getFirstChild }
+// initialize sync transport for sdk engine
+const { getChilds, getFirstChild, syncEntity, parentEntity, getParent, myProfile } = addSyncTransport(engine)
+
+export { getChilds, getFirstChild, syncEntity, parentEntity, getParent, myProfile }
