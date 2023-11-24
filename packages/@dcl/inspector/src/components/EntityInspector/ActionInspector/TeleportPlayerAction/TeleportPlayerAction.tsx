@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { ActionPayload, ActionType } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 import { TextField } from '../../../ui'
+import { Block } from '../../../Block'
 import type { Props } from './types'
 
 import './TeleportPlayerAction.css'
@@ -38,20 +39,20 @@ const TeleportPlayerAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
 
   return (
     <div className="TeleportPlayerActionContainer">
-      <div className="row">
+      <Block label="Coordinates">
         <TextField
-          label="X"
+          leftLabel="X"
           type="number"
           value={payload.x}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeX(e)}
         />
         <TextField
-          label="Y"
+          leftLabel="Y"
           type="number"
           value={payload.y}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeY(e)}
         />
-      </div>
+      </Block>
     </div>
   )
 }

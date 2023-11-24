@@ -56,6 +56,7 @@ const PlayDefaultEmoteAction: React.FC<Props> = ({ value, onUpdate }: Props) => 
       <div className="row">
         <Dropdown
           label="Emote"
+          placeholder="Select an Emote"
           options={emoteOptions}
           value={payload.emote}
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleChangeEmote(e)}

@@ -30,7 +30,6 @@ const PlayCustomEmoteAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
 
   const handleChangeSrc = useCallback(
     (path: string) => {
-      debugger
       setPayload({
         ...payload,
         src: path
