@@ -1,7 +1,7 @@
 import { CrdtMessageProtocol } from '../crdtMessageProtocol'
 import { Entity } from '../../../engine/entity'
 import { ByteBuffer } from '../../ByteBuffer'
-import { CrdtMessageType, CRDT_MESSAGE_HEADER_LENGTH, PutComponentMessage } from '../types'
+import { CrdtMessageType, CRDT_MESSAGE_HEADER_LENGTH, PutComponentMessage, PutNetworkComponentMessage } from '../types'
 
 /**
  * @public
@@ -37,11 +37,11 @@ export namespace PutNetworkComponentOperation {
     buf.setUint32(startMessageOffset + 12, componentId)
     buf.setUint32(startMessageOffset + 16, timestamp)
     buf.setUint32(startMessageOffset + 20, networkId)
-    const newLocal = messageLength - MESSAGE_HEADER_LENGTH - CRDT_MESSAGE_HEADER_LENGTH
-    buf.setUint32(startMessageOffset + 24, newLocal)
+    const dataLength = messageLength - MESSAGE_HEADER_LENGTH - CRDT_MESSAGE_HEADER_LENGTH
+    buf.setUint32(startMessageOffset + 24, dataLength)
   }
 
-  export function read(buf: ByteBuffer): (PutComponentMessage & { networkId: number }) | null {
+  export function read(buf: ByteBuffer): PutNetworkComponentMessage | null {
     const header = CrdtMessageProtocol.readHeader(buf)
 
     if (!header) {

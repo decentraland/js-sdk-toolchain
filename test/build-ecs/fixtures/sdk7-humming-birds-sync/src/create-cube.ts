@@ -124,12 +124,15 @@ export function cubeSystem() {
   for (const [entity, grabbed] of engine.getEntitiesWith(Grabbed)) {
     if (grabbed.userId === myProfile.userId) {
       if (inputSystem.isTriggered(InputAction.IA_JUMP, PointerEventType.PET_DOWN)) {
-        Grabbed.getMutable(entity).userId = ''
+        // Grabbed.getMutable(entity).userId = ''
         // TODO: Fix deleteFrom not working.
-        // Grabbed.deleteFrom(entity)
+        Grabbed.deleteFrom(entity)
         continue
       }
       const { x, y, z } = Transform.get(engine.PlayerEntity).position
+      if (JSON.stringify(Transform.get(entity).position) === JSON.stringify({ x, y, z })) {
+        continue
+      }
       Transform.getMutable(entity).position = { x, y, z }
       const textEntity = getFirstChild(entity)!
       TextShape.getMutable(textEntity).text = `${x.toFixed(1)}, ${y.toFixed(1)}, ${z.toFixed(1)}`

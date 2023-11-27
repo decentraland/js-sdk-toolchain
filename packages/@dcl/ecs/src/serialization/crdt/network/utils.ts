@@ -81,7 +81,6 @@ export function fixTransformParent(
   if (!transform) throw new Error('Invalid parent transform')
   // Generate new transform raw data with the parent
   const newTransform = { ...transform, parent }
-  console.log('Fix transform', message.entityId, newTransform)
   buffer.resetBuffer()
   TransformSchema.serialize(newTransform, buffer)
   return buffer.toBinary()

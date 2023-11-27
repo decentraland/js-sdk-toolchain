@@ -1393,6 +1393,21 @@ export interface INetowrkEntityType {
     networkId: number;
 }
 
+// Warning: (ae-missing-release-tag) "INetowrkParent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type INetowrkParent = LastWriteWinElementSetComponentDefinition<INetowrkParentType>;
+
+// Warning: (ae-missing-release-tag) "INetowrkParentType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface INetowrkParentType {
+    // (undocumented)
+    entityId: Entity;
+    // (undocumented)
+    networkId: number;
+}
+
 // Warning: (tsdoc-html-tag-missing-string) The HTML element has an invalid attribute: Expecting an HTML string starting with a single-quote or double-quote character
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
 // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
@@ -1867,6 +1882,9 @@ export interface NameType {
 
 // @alpha
 export const NetworkEntity: INetowrkEntity;
+
+// @alpha
+export const NetworkParent: INetowrkParent;
 
 // @public (undocumented)
 export const enum NftFrameType {
@@ -3300,9 +3318,7 @@ export namespace PutNetworkComponentOperation {
     const // (undocumented)
     MESSAGE_HEADER_LENGTH = 20;
     // (undocumented)
-    export function read(buf: ByteBuffer): (PutComponentMessage & {
-        networkId: number;
-    }) | null;
+    export function read(buf: ByteBuffer): PutNetworkComponentMessage | null;
     export function write(entity: Entity, timestamp: number, componentId: number, networkId: number, data: Uint8Array, buf: ByteBuffer): void;
 }
 

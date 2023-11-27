@@ -5,8 +5,9 @@ import {
   EntityUtils,
   RESERVED_STATIC_ENTITIES,
   CrdtMessageType,
-  SyncComponents,
-  NetworkEntity
+  SyncComponents as _SyncComponents,
+  NetworkEntity as _NetworkEntity,
+  engine
 } from '@dcl/ecs'
 
 export function syncFilter(message: Omit<TransportMessage, 'messageBuffer'>) {
@@ -23,11 +24,16 @@ export function syncFilter(message: Omit<TransportMessage, 'messageBuffer'>) {
     return false
   }
 
-  // Network Entity Always
-  if (message.type === CrdtMessageType.DELETE_ENTITY) {
+  const NetworkEntity = engine.getComponent(_NetworkEntity.componentId) as typeof _NetworkEntity
+  const network = NetworkEntity.getOrNull(message.entityId)
+  // Delete Network Entity Always
+  if (
+    message.type === CrdtMessageType.DELETE_ENTITY_NETWORK ||
+    (network && message.type === CrdtMessageType.DELETE_ENTITY)
+  ) {
     return true
   }
-
+  const SyncComponents = engine.getComponent(_SyncComponents.componentId) as typeof _SyncComponents
   const sync = SyncComponents.getOrNull(message.entityId)
   if (!sync) return false
 

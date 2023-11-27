@@ -8,7 +8,7 @@ import { BinaryMessageBus, CommsMessage } from './binary-message-bus'
 import {
   definePlayersInScene,
   fetchProfile,
-  oldestUser,
+  oldestUser as _oldestUser,
   setInitialized,
   stateInitialized,
   stateInitializedChecker,

@@ -40,14 +40,12 @@ export namespace DeleteComponentNetwork {
       throw new Error('DeleteComponentOperation tried to read another message type.')
     }
 
-    const msg = {
+    return {
       ...header,
       entityId: buf.readUint32() as Entity,
       componentId: buf.readUint32(),
       timestamp: buf.readUint32(),
       networkId: buf.readUint32()
     }
-
-    return msg
   }
 }

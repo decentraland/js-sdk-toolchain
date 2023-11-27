@@ -30,7 +30,7 @@ export async function main() {
   const userId = (await getUserData({})).data?.userId ?? ''
   setupUi(userId)
   engine.addSystem(moveHummingBirds)
-  gameStatusServer()
+  // gameStatusServer()
   // createMovingPlatforms()
   // createCubes()
 

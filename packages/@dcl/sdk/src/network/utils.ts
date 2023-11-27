@@ -1,8 +1,15 @@
-import { EngineInfo, Entity, IEngine, Schemas } from '@dcl/ecs'
+import {
+  EngineInfo as _EngineInfo,
+  Entity,
+  IEngine,
+  NetworkEntity as _NetworkEntity,
+  Schemas,
+  LastWriteWinElementSetComponentDefinition,
+  PBEngineInfo
+} from '@dcl/ecs'
 import { componentNumberFromName } from '@dcl/ecs/dist/components/component-number'
 
 import { getUserData } from '~system/UserIdentity'
-import { getConnectedPlayers } from '~system/Players'
 import { SyncEntity } from './entities'
 import { IProfile } from './message-bus-sync'
 
@@ -60,7 +67,6 @@ export function createPlayerTimestampData(engine: IEngine, profile: IProfile, sy
  * Check if I'm the older user to send the initial state
  */
 export function oldestUser(engine: IEngine, profile: IProfile, syncEntity: SyncEntity): boolean {
-  console.log('[ME]: ', profile)
   const PlayersInScene = definePlayersInScene(engine)
   // When the user leaves the scene but it's still connected.
   if (!PlayersInScene.has(playerSceneEntity)) {
@@ -69,7 +75,6 @@ export function oldestUser(engine: IEngine, profile: IProfile, syncEntity: SyncE
   }
   const { timestamp } = PlayersInScene.get(playerSceneEntity)
   for (const [_, player] of engine.getEntitiesWith(PlayersInScene)) {
-    console.log(player)
     if (player.timestamp < timestamp) return false
   }
   return true
@@ -79,6 +84,9 @@ export function oldestUser(engine: IEngine, profile: IProfile, syncEntity: SyncE
  * Ignore CRDT's initial messages from the renderer.
  */
 export function syncTransportIsReady(engine: IEngine) {
+  const EngineInfo = engine.getComponent(
+    _EngineInfo.componentId
+  ) as LastWriteWinElementSetComponentDefinition<PBEngineInfo>
   if (!INITIAL_CRDT_RENDERER_MESSAGES_SENT) {
     const engineInfo = EngineInfo.getOrNull(engine.RootEntity)
     if (engineInfo && engineInfo.tickNumber > 2) {
@@ -93,22 +101,26 @@ export function syncTransportIsReady(engine: IEngine) {
  * Add the playerSceneData component and syncronize it till we receive the state.
  * This fn should be added as a system so it runs on every tick
  */
-export function stateInitializedChecker(engine: IEngine, profile: IProfile, syncEntity: SyncEntity) {
-  const PlayersInScene = definePlayersInScene(engine)
+// TODO: Had to comment all the logic because getConnectedPlayers was not working as expected
+// A lot of raise conditions. For now we will go with the approach that every client that it's initialized will send his crdt state.
+export function stateInitializedChecker(engine: IEngine, _profile: IProfile, _syncEntity: SyncEntity) {
+  // const PlayersInScene = definePlayersInScene(engine)
+  const EngineInfo = engine.getComponent(_EngineInfo.componentId) as typeof _EngineInfo
+  // const NetworkEntity = engine.getComponent(_NetworkEntity.componentId) as INetowrkEntity
   async function enterScene() {
-    if (!playerSceneEntity) {
-      createPlayerTimestampData(engine, profile, syncEntity)
-    }
+    // if (!playerSceneEntity) {
+    //   createPlayerTimestampData(engine, profile, syncEntity)
+    // }
 
     /**
      * Keeps PlayersInScene up-to-date with the current players.
      */
-    const connectedPlayers = await getConnectedPlayers({})
-    for (const [entity, player] of engine.getEntitiesWith(PlayersInScene)) {
-      if (!connectedPlayers.players.find(($) => $.userId === player.userId)) {
-        PlayersInScene.deleteFrom(entity)
-      }
-    }
+    // const connectedPlayers = await getConnectedPlayers({})
+    // for (const [entity, player] of engine.getEntitiesWith(PlayersInScene)) {
+    //   if (!connectedPlayers.players.find(($) => $.userId === player.userId)) {
+    //     PlayersInScene.deleteFrom(entity)
+    //   }
+    // }
 
     // Wait for comms to be ready ?? ~3000ms
     if ((EngineInfo.getOrNull(engine.RootEntity)?.tickNumber ?? 0) > 100) {
@@ -117,14 +129,14 @@ export function stateInitializedChecker(engine: IEngine, profile: IProfile, sync
     }
 
     // If we already have data from players, dont send the heartbeat messages
-    if (connectedPlayers.players.length) return
+    // if (connectedPlayers.players.length) return
 
-    if (!stateInitialized && playerSceneEntity) {
-      // Send this data to all the players connected (new and old)
-      // So everyone can decide if it's the oldest one or no.
-      // It's for the case that multiple users enters ~ at the same time.
-      PlayersInScene.getMutable(playerSceneEntity)
-    }
+    // if (!stateInitialized && playerSceneEntity) {
+    //   // Send this data to all the players connected (new and old)
+    //   // So everyone can decide if it's the oldest one or no.
+    //   // It's for the case that multiple users enters ~ at the same time.
+    //   PlayersInScene.getMutable(playerSceneEntity)
+    // }
   }
   void enterScene()
 }

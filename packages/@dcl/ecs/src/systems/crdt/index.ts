@@ -307,7 +307,6 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
             continue
           }
         }
-
         // Common message
         transportBuffer.writeBuffer(message.messageBuffer, false)
       }
