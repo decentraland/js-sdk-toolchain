@@ -1,4 +1,4 @@
-import { AnimationGroup, AssetContainer } from '@babylonjs/core'
+import { AnimationGroup } from '@babylonjs/core'
 import { Animator, Entity, PBAnimationState, PBAnimator } from '@dcl/ecs'
 
 import { SdkContextValue } from '../../../lib/sdk/context'
@@ -21,7 +21,11 @@ export function isValidSpeed(speed: string | undefined): boolean {
   return !isNaN(parseFloat(value)) && parseFloat(value) >= 0 && parseFloat(value) <= 200
 }
 
-export async function initializeAnimatorComponent(sdk: SdkContextValue, entity: Entity, animations: AnimationGroup[]): Promise<PBAnimator> {
+export async function initializeAnimatorComponent(
+  sdk: SdkContextValue,
+  entity: Entity,
+  animations: AnimationGroup[]
+): Promise<PBAnimator> {
   const states: PBAnimationState[] = animations.map(($) => ({
     clip: $.name,
     playing: false,

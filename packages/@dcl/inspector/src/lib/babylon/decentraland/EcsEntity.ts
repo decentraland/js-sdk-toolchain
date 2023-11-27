@@ -12,7 +12,6 @@ import {
 import future, { IFuture } from 'fp-future'
 import { SceneContext } from './SceneContext'
 import { createDefaultTransform } from './sdkComponents/transform'
-import { initializeAnimatorComponent } from './sdkComponents/animator'
 
 export type EcsComponents = Partial<{
   gltfContainer: PBGltfContainer

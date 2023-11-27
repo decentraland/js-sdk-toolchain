@@ -19,7 +19,7 @@ export const toNftShape = (value: NftShapeInput): PBNftShape => {
   }
 }
 
-export function isValidInput(urn: string): boolean {
+export function isValidInput(_: string): boolean {
   // validate urn
   return true
 }

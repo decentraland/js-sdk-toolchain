@@ -35,7 +35,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
     const gltfContainer = getComponentValue(entity, GltfContainer)
     const asset = getAssetByModel(gltfContainer.src)
     analytics.track(Event.REMOVE_COMPONENT, {
-      componentName: CoreComponents.AUDIO_SOURCE,
+      componentName: CoreComponents.NFT_SHAPE,
       itemId: asset?.id,
       itemPath: gltfContainer.src
     })

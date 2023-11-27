@@ -12,7 +12,6 @@ import { useSdk } from '../../../hooks/sdk/useSdk'
 import { analytics, Event } from '../../../lib/logic/analytics'
 import { getAssetByModel } from '../../../lib/logic/catalog'
 
-// TODO: enumerate better the components we want to show...
 const getEnabledComponents = () => {
   const components: Set<string> = new Set(Object.values(CoreComponents))
 

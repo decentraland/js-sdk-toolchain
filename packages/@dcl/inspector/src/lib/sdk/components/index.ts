@@ -25,6 +25,7 @@ export enum CoreComponents {
   MESH_RENDERER = 'core::MeshRenderer',
   AUDIO_SOURCE = 'core::AudioSource',
   VISIBILITY_COMPONENT = 'core::VisibilityComponent',
+  POINTER_EVENTS = 'core::PointerEvents',
   VIDEO_PLAYER = 'core::VideoPlayer',
   AUDIO_STREAM = 'core::AudioStream',
   NFT_SHAPE = 'core::NftShape',
@@ -82,6 +83,7 @@ export type SdkComponents = {
   AudioStream: ReturnType<typeof components.AudioStream>
   NftShape: ReturnType<typeof components.NftShape>
   Animator: ReturnType<typeof components.Animator>
+  PointerEvents: ReturnType<typeof components.PointerEvents>
 }
 
 export function createComponents(engine: IEngine): SdkComponents {
@@ -99,6 +101,7 @@ export function createComponents(engine: IEngine): SdkComponents {
   const AudioStream = components.AudioStream(engine)
   const NftShape = components.NftShape(engine)
   const Animator = components.Animator(engine)
+  const PointerEvents = components.PointerEvents(engine)
 
   return {
     Billboard,
@@ -114,7 +117,8 @@ export function createComponents(engine: IEngine): SdkComponents {
     VideoPlayer,
     AudioStream,
     NftShape,
-    Animator
+    Animator,
+    PointerEvents
   }
 }
 

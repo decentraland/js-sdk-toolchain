@@ -27,7 +27,7 @@ export function volumeToAudioStream(volume: string | undefined): number {
   return parseFloat((value / 100).toFixed(2))
 }
 
-export function isValidInput(url: string): boolean {
+export function isValidInput(_: string): boolean {
   // validate url
   return true
 }

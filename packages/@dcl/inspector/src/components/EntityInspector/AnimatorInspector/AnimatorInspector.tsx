@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect } from 'react'
+import { PBAnimationState, PBAnimator } from '@dcl/ecs'
 import cx from 'classnames'
 
 import { withSdk } from '../../../hoc/withSdk'
@@ -13,7 +14,6 @@ import { TextField, CheckboxField, RangeField } from '../../ui'
 import { fromNumber, toNumber, isValidSpeed, isValidWeight, initializeAnimatorComponent } from './utils'
 import type { Props } from './types'
 import { useArrayState } from '../../../hooks/useArrayState'
-import { PBAnimationState, PBAnimator } from '@dcl/ecs'
 
 type ChangeEvt = React.ChangeEvent<HTMLInputElement>
 
@@ -53,7 +53,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     const gltfContainer = getComponentValue(entityId, GltfContainer)
     const asset = getAssetByModel(gltfContainer.src)
     analytics.track(Event.REMOVE_COMPONENT, {
-      componentName: CoreComponents.AUDIO_SOURCE,
+      componentName: CoreComponents.ANIMATOR,
       itemId: asset?.id,
       itemPath: gltfContainer.src
     })
