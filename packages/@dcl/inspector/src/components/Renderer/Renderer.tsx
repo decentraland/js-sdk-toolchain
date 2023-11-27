@@ -13,6 +13,7 @@ import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
 import { snapPosition } from '../../lib/babylon/decentraland/snap-manager'
 import { loadGltf, removeGltf } from '../../lib/babylon/decentraland/sdkComponents/gltf-container'
 import { getConfig } from '../../lib/logic/config'
+import { CoreComponents } from '../../lib/sdk/components'
 import { ROOT } from '../../lib/sdk/tree'
 import { Asset, isSmart } from '../../lib/logic/catalog'
 import { selectAssetCatalog } from '../../redux/app'
@@ -88,8 +89,8 @@ const Renderer: React.FC = () => {
     const path = Object.keys(asset.contents).find(($) => isAsset($))
     let thumbnail: Uint8Array | undefined
 
-    if (!path) {
-      throw new Error('Invalid asset format: should contain at least one gltf/glb file')
+    if (!path && !asset.components[CoreComponents.MESH_RENDERER]) {
+      throw new Error('Invalid asset format: should contain at least one gltf/glb file or a mesh renderer component')
     }
 
     setIsLoading(true)
@@ -122,7 +123,7 @@ const Renderer: React.FC = () => {
     )
 
     if (thumbnail) {
-      const name = path.split('/').pop() as string
+      const name = path ? (path.split('/').pop() as string) : asset.name
       const ext = name.split('.').pop() as string
       dispatch(
         saveThumbnail({
@@ -139,7 +140,7 @@ const Renderer: React.FC = () => {
       type: 'asset',
       name: asset.name,
       parent: null,
-      asset: { type: 'gltf', src: path, id: asset.id },
+      asset: { type: path ? 'gltf' : 'unknown', src: path ?? '', id: asset.id },
       components: asset.components
     }
     const basePath = withAssetDir(`${destFolder}/${assetPackageName}`)

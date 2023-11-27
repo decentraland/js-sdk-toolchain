@@ -36,7 +36,7 @@ export type Asset = {
   category: string
   tags: string[]
   contents: Record<string, string>
-  components: Partial<Record<ComponentName, any>>
+  components: Partial<Record<ComponentName | CoreComponents, any>>
 }
 
 export function getContentsUrl(hash: string) {

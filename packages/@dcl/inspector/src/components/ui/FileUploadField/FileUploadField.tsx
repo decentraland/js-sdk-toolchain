@@ -18,7 +18,7 @@ import { TreeNode } from '../../ProjectAssetExplorer/ProjectView'
 import { AssetNodeItem } from '../../ProjectAssetExplorer/types'
 
 import { TextField } from '../TextField'
-import { ErrorMessage } from '../ErrorMessage'
+import { Message, MessageType } from '../Message'
 
 import { type Props } from './types'
 
@@ -181,7 +181,7 @@ const FileUploadField: React.FC<Props> = ({
           </button>
         )}
       </div>
-      {hasError && <ErrorMessage error={'File not valid.'} />}
+      {hasError && <Message text="File not valid." type={MessageType.ERROR} />}
     </div>
   )
 }

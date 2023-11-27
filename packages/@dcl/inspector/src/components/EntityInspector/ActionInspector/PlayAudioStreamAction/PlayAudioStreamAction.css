@@ -1,0 +1,10 @@
+.PlayAudioStreamActionContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  row-gap: 12px;
+}
+
+.PlayAudioStreamActionContainer .Block {
+  margin: 0;
+}
