@@ -13,11 +13,17 @@ export type Listeners = {
   onMouseDown?: Callback
   /** triggered on mouse up event */
   onMouseUp?: Callback
+  /** triggered on mouse hover enter event */
+  onHoverEnter?: Callback
+  /** triggered on mouse hover leave event */
+  onHoverLeave?: Callback
 }
 
 const listeners: Listeners = {
   onMouseDown: undefined,
-  onMouseUp: undefined
+  onMouseUp: undefined,
+  onHoverEnter: undefined,
+  onHoverLeave: undefined
 }
 const listenersKey = Object.keys(listeners)
 

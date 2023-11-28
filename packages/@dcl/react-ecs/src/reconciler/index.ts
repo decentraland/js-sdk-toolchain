@@ -27,7 +27,9 @@ import { componentKeys, isNotUndefined, noopConfig, propsChanged } from './utils
 function getPointerEnum(pointerKey: keyof Listeners): PointerEventType {
   const pointers: { [key in keyof Required<Listeners>]: PointerEventType } = {
     onMouseDown: PointerEventType.PET_DOWN,
-    onMouseUp: PointerEventType.PET_UP
+    onMouseUp: PointerEventType.PET_UP,
+    onHoverEnter: PointerEventType.PET_HOVER_ENTER,
+    onHoverLeave: PointerEventType.PET_HOVER_LEAVE,
   }
   return pointers[pointerKey]
 }
@@ -80,13 +82,17 @@ export function createReconciler(
     upsertComponent(instance, props as { rightOf: number; parent: number }, 'uiTransform')
   }
 
-  function upsertListener(instance: Instance, update: Changes<keyof Pick<Listeners, 'onMouseDown' | 'onMouseUp'>>) {
+  function upsertListener(instance: Instance, update: Changes<keyof Pick<Listeners, 'onMouseDown' | 'onMouseUp' | 'onHoverEnter' | 'onHoverLeave'>>) {
     if (update.type === 'delete' || !update.props) {
       clickEvents.get(instance.entity)?.delete(getPointerEnum(update.component))
       if (update.component === 'onMouseDown') {
         pointerEvents.removeOnPointerDown(instance.entity)
       } else if (update.component === 'onMouseUp') {
         pointerEvents.removeOnPointerUp(instance.entity)
+      } else if (update.component === 'onHoverEnter') {
+        pointerEvents.removeOnHoverEnter(instance.entity)
+      } else if (update.component === 'onHoverLeave') {
+        pointerEvents.removeOnHoverLeave(instance.entity)
       }
       return
     }
@@ -100,13 +106,27 @@ export function createReconciler(
 
       if (alreadyHasPointerEvent) return
 
-      const pointerEventSystem =
-        update.component === 'onMouseDown' ? pointerEvents.onPointerDown : pointerEvents.onPointerUp
+      // const pointerEventSystem =
+      //   update.component === 'onMouseDown' ? pointerEvents.onPointerDown : pointerEvents.onPointerUp
+      let pointerEventSystem
+      let showFeedback = false
+      if (update.component === 'onMouseDown') {
+        pointerEventSystem = pointerEvents.onPointerDown
+        showFeedback = true
+      } else if (update.component === 'onHoverEnter') {
+        pointerEventSystem = pointerEvents.onHoverEnter
+      } else if (update.component === 'onHoverLeave') {
+        pointerEventSystem = pointerEvents.onHoverLeave
+      } else {
+        pointerEventSystem = pointerEvents.onPointerUp
+        showFeedback = true
+      }
+
       pointerEventSystem(instance.entity, () => pointerEventCallback(instance.entity, pointerEvent), {
         button: InputAction.IA_POINTER,
         // We add this showFeedBack so the pointerEventSystem creates a PointerEvent component with our entity
         // This is needed for the renderer to know which entities are clickeables
-        showFeedback: true
+        showFeedback
       })
     }
   }

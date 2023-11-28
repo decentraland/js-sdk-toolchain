@@ -32,6 +32,7 @@ export interface PointerEventsSystem {
    * @param entity - Entity where the callback was attached
    */
   removeOnClick(entity: Entity): void
+
   /**
    * @public
    * Remove the callback for onPointerDown event
@@ -45,6 +46,20 @@ export interface PointerEventsSystem {
    * @param entity - Entity where the callback was attached
    */
   removeOnPointerUp(entity: Entity): void
+
+  /**
+   * @public
+   * Remove the callback for onHoverEnter event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnHoverEnter(entity: Entity): void
+
+  /**
+   * @public
+   * Remove the callback for onHoverLeave event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnHoverLeave(entity: Entity): void
 
   /**
    * @internal
@@ -82,6 +97,16 @@ export interface PointerEventsSystem {
    * @param opts - Opts to trigger Feedback and Button
    */
   onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void
+  /**
+   * @param entity - Entity to attach the callback
+   * @param cb - Function to execute when event fires
+   */
+  onHoverEnter(entity: Entity, cb: EventSystemCallback): void
+  /**
+   * @param entity - Entity to attach the callback
+   * @param cb - Function to execute when event fires
+   */
+  onHoverLeave(entity: Entity, cb: EventSystemCallback): void
 }
 
 /**
@@ -93,7 +118,9 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
   enum EventType {
     Click,
     Down,
-    Up
+    Up,
+    HoverEnter,
+    HoverLeave
   }
   type EventMapType = Map<EventType, { cb: EventSystemCallback; opts: EventSystemOptions }>
 
@@ -199,6 +226,30 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     setPointerEvent(entity, PointerEventType.PET_UP, options)
   }
 
+  const onHoverEnter: PointerEventsSystem['onHoverEnter'] = (...args) => {
+    const [data, cb] = args
+    if (typeof data === 'number') {
+      return onHoverEnter(data, cb)
+    }
+    const { entity, opts } = data
+    const options = getDefaultOpts(opts)
+    removeEvent(entity, EventType.HoverEnter)
+    getEvent(entity).set(EventType.HoverEnter, { cb, opts: options })
+    setPointerEvent(entity, PointerEventType.PET_HOVER_ENTER, options)
+  }
+
+  const onHoverLeave: PointerEventsSystem['onHoverLeave'] = (...args) => {
+    const [data, cb] = args
+    if (typeof data === 'number') {
+      return onHoverLeave(data, cb)
+    }
+    const { entity, opts } = data
+    const options = getDefaultOpts(opts)
+    removeEvent(entity, EventType.HoverLeave)
+    getEvent(entity).set(EventType.HoverLeave, { cb, opts: options })
+    setPointerEvent(entity, PointerEventType.PET_HOVER_LEAVE, options)
+  }
+
   return {
     removeOnClick(entity: Entity) {
       removeEvent(entity, EventType.Click)
@@ -210,6 +261,14 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
 
     removeOnPointerUp(entity: Entity) {
       removeEvent(entity, EventType.Up)
+    },
+
+    removeOnHoverEnter(entity: Entity) {
+      removeEvent(entity, EventType.HoverEnter)
+    },
+
+    removeOnHoverLeave(entity: Entity) {
+      removeEvent(entity, EventType.HoverLeave)
     },
 
     onClick(value, cb) {
@@ -224,6 +283,8 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     },
 
     onPointerDown,
-    onPointerUp
+    onPointerUp,
+    onHoverEnter,
+    onHoverLeave
   }
 }

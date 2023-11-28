@@ -21,6 +21,8 @@ export type EntityComponents = {
   uiDropdown: PBUiDropdown
   onMouseDown: Callback
   onMouseUp: Callback
+  onHoverEnter: Callback
+  onHoverLeave: Callback
 }
 
 /**

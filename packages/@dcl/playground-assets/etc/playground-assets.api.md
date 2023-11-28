@@ -919,6 +919,8 @@ export type EntityComponents = {
     uiDropdown: PBUiDropdown;
     onMouseDown: Callback;
     onMouseUp: Callback;
+    onHoverEnter: Callback;
+    onHoverLeave: Callback;
 };
 
 // Warning: (tsdoc-undefined-tag) The TSDoc tag "@intenral" is not defined in this configuration
@@ -1520,6 +1522,8 @@ export interface LastWriteWinElementSetComponentDefinition<T> extends BaseCompon
 export type Listeners = {
     onMouseDown?: Callback;
     onMouseUp?: Callback;
+    onHoverEnter?: Callback;
+    onHoverLeave?: Callback;
 };
 
 // @public (undocumented)
@@ -3101,6 +3105,10 @@ export const PointerEventsResult: GrowOnlyValueSetComponentDefinition<PBPointerE
 
 // @public (undocumented)
 export interface PointerEventsSystem {
+    // (undocumented)
+    onHoverEnter(entity: Entity, cb: EventSystemCallback): void;
+    // (undocumented)
+    onHoverLeave(entity: Entity, cb: EventSystemCallback): void;
     onPointerDown(pointerData: {
         entity: Entity;
         opts?: Partial<EventSystemOptions>;
@@ -3113,6 +3121,8 @@ export interface PointerEventsSystem {
     }, cb: EventSystemCallback): void;
     // @deprecated (undocumented)
     onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
+    removeOnHoverEnter(entity: Entity): void;
+    removeOnHoverLeave(entity: Entity): void;
     removeOnPointerDown(entity: Entity): void;
     removeOnPointerUp(entity: Entity): void;
 }
