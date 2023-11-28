@@ -6,6 +6,7 @@ import {
   ActionType,
   getActionTypes,
   getJson,
+  getPayload,
   ActionPayload,
   getActionSchema,
   ComponentName
@@ -35,6 +36,9 @@ import { TweenAction } from './TweenAction'
 import { isValidTween } from './TweenAction/utils'
 import { PlayAnimationAction } from './PlayAnimationAction'
 import { SetVisibilityAction } from './SetVisibilityAction'
+import { ShowTextAction } from './ShowTextAction'
+import { DelayAction } from './DelayAction'
+import { LoopAction } from './LoopAction'
 import { getDefaultPayload, getPartialPayload, isStates } from './utils'
 import { Props } from './types'
 
@@ -66,7 +70,13 @@ const ActionMapOption: Record<string, string> = {
   [ActionType.PLAY_AUDIO_STREAM]: 'Play Audio Stream',
   [ActionType.STOP_AUDIO_STREAM]: 'Stop Audio Stream',
   [ActionType.PLAY_VIDEO_STREAM]: 'Play Video Stream',
-  [ActionType.STOP_VIDEO_STREAM]: 'Stop Video Stream'
+  [ActionType.STOP_VIDEO_STREAM]: 'Stop Video Stream',
+  [ActionType.SHOW_TEXT]: 'Show Text',
+  [ActionType.HIDE_TEXT]: 'Hide Text',
+  [ActionType.START_DELAY]: 'Start Delay',
+  [ActionType.STOP_DELAY]: 'Stop Delay',
+  [ActionType.START_LOOP]: 'Start Loop',
+  [ActionType.STOP_LOOP]: 'Stop Loop'
 }
 
 export default withSdk<Props>(({ sdk, entity: entityId }) => {
@@ -375,6 +385,39 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     [modifyAction, actions]
   )
 
+  const handleChangeText = useCallback(
+    (value: ActionPayload<ActionType.SHOW_TEXT>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.SHOW_TEXT>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangeDelayAction = useCallback(
+    (value: ActionPayload<ActionType.START_DELAY | ActionType.STOP_DELAY>, idx: number) => {
+      const payload =
+        'actions' in value ? getJson<ActionType.START_DELAY>(value) : getJson<ActionType.STOP_DELAY>(value)
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: payload
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangeLoopAction = useCallback(
+    (value: ActionPayload<ActionType.START_LOOP | ActionType.STOP_LOOP>, idx: number) => {
+      const payload = 'actions' in value ? getJson<ActionType.START_LOOP>(value) : getJson<ActionType.STOP_LOOP>(value)
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: payload
+      })
+    },
+    [modifyAction, actions]
+  )
+
   const handleChangeType = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
       modifyAction(idx, {
@@ -550,6 +593,34 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
           <OpenLinkAction
             value={getPartialPayload<ActionType.OPEN_LINK>(action)}
             onUpdate={(e) => handleChangeOpenLink(e, idx)}
+          />
+        )
+      }
+      case ActionType.SHOW_TEXT: {
+        return (
+          <ShowTextAction
+            value={getPartialPayload<ActionType.SHOW_TEXT>(action)}
+            onUpdate={(e) => handleChangeText(e, idx)}
+          />
+        )
+      }
+      case ActionType.START_DELAY:
+      case ActionType.STOP_DELAY: {
+        return (
+          <DelayAction<ActionPayload<typeof action.type>>
+            availableActions={actions}
+            value={getPayload<typeof action.type>(action)}
+            onUpdate={(e) => handleChangeDelayAction(e, idx)}
+          />
+        )
+      }
+      case ActionType.START_LOOP:
+      case ActionType.STOP_LOOP: {
+        return (
+          <LoopAction<ActionPayload<typeof action.type>>
+            availableActions={actions}
+            value={getPayload<typeof action.type>(action)}
+            onUpdate={(e) => handleChangeLoopAction(e, idx)}
           />
         )
       }
