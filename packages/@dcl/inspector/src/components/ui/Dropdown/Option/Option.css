@@ -63,6 +63,7 @@
 .OptionContainer .SelectedContent {
   height: 16px;
   width: 16px;
+  min-width: 16px;
 }
 
 .OptionContainer.DropdownPlaceholder .SelectedContent {
