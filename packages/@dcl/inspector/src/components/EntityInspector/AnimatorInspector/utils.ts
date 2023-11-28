@@ -31,7 +31,7 @@ export async function initializeAnimatorComponent(
     playing: false,
     weight: 1,
     speed: 1,
-    loop: true,
+    loop: false,
     shouldReset: false
   }))
 

@@ -67,7 +67,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
       <Block label="Color">
         <ColorField {...color} />
       </Block>
-      <Block label="Style">
+      <Block label="Frame style">
         <SelectField options={NFT_STYLES} {...style} />
       </Block>
     </Container>

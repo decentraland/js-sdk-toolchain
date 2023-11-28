@@ -17,19 +17,19 @@ export type Component<T = unknown> = ComponentDefinition<T>
 export type Node = { entity: Entity; open?: boolean; children: Entity[] }
 
 export enum CoreComponents {
+  ANIMATOR = 'core::Animator',
+  AUDIO_SOURCE = 'core::AudioSource',
+  AUDIO_STREAM = 'core::AudioStream',
   GLTF_CONTAINER = 'core::GltfContainer',
-  TEXT_SHAPE = 'core::TextShape',
-  TRANSFORM = 'core::Transform',
   MATERIAL = 'core::Material',
   MESH_COLLIDER = 'core::MeshCollider',
   MESH_RENDERER = 'core::MeshRenderer',
-  AUDIO_SOURCE = 'core::AudioSource',
-  VISIBILITY_COMPONENT = 'core::VisibilityComponent',
-  POINTER_EVENTS = 'core::PointerEvents',
-  VIDEO_PLAYER = 'core::VideoPlayer',
-  AUDIO_STREAM = 'core::AudioStream',
   NFT_SHAPE = 'core::NftShape',
-  ANIMATOR = 'core::Animator'
+  POINTER_EVENTS = 'core::PointerEvents',
+  TEXT_SHAPE = 'core::TextShape',
+  TRANSFORM = 'core::Transform',
+  VIDEO_PLAYER = 'core::VideoPlayer',
+  VISIBILITY_COMPONENT = 'core::VisibilityComponent'
 }
 
 export enum EditorComponentNames {

@@ -44,8 +44,8 @@ export function isValidInput({ basePath, assets }: AssetCatalogResponse, src: st
   return isValidHttpsUrl(src) || !!assets.find(($) => (basePath ? basePath + '/' + src : src) === $.path)
 }
 
-export const isAudioFile = (value: string): boolean => value.endsWith('.mp4')
-export const isAudio = (node: TreeNode): node is AssetNodeItem => isAssetNode(node) && isAudioFile(node.name)
+export const isVideoFile = (value: string): boolean => value.endsWith('.mp4')
+export const isVideo = (node: TreeNode): node is AssetNodeItem => isAssetNode(node) && isVideoFile(node.name)
 
 export function isValidVolume(volume: string | undefined): boolean {
   const value = (volume ?? 0).toString()

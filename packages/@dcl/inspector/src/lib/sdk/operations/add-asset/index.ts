@@ -8,11 +8,7 @@ import {
   PBAudioSource,
   LastWriteWinElementSetComponentDefinition,
   PBVideoPlayer,
-  PBMaterial,
-  PBMeshRenderer,
-  PBVisibilityComponent,
-  PBNftShape,
-  PBAudioStream
+  PBMaterial
 } from '@dcl/ecs'
 import { ActionType, Actions, ComponentName, Triggers, getJson, getNextId, getPayload } from '@dcl/asset-packs'
 import { CoreComponents } from '../../components'

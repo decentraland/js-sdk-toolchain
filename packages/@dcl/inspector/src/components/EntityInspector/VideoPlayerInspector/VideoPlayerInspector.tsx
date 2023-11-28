@@ -16,7 +16,7 @@ import { selectAssetCatalog } from '../../../redux/app'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
 import { TextField, CheckboxField, RangeField, InfoTooltip } from '../../ui'
-import { fromVideoPlayer, toVideoPlayer, isValidInput, isAudio, isValidVolume } from './utils'
+import { fromVideoPlayer, toVideoPlayer, isValidInput, isVideo, isValidVolume } from './utils'
 import type { Props } from './types'
 
 const DROP_TYPES = ['project-asset']
@@ -59,12 +59,12 @@ export default withSdk<Props>(({ sdk, entity }) => {
       drop: ({ value, context }: ProjectAssetDrop, monitor) => {
         if (monitor.didDrop()) return
         const node = context.tree.get(value)!
-        const model = getNode(node, context.tree, isAudio)
+        const model = getNode(node, context.tree, isVideo)
         if (model) void handleDrop(withAssetDir(model.asset.src))
       },
       canDrop: ({ value, context }: ProjectAssetDrop) => {
         const node = context.tree.get(value)!
-        return !!getNode(node, context.tree, isAudio)
+        return !!getNode(node, context.tree, isVideo)
       },
       collect: (monitor) => ({
         isHover: monitor.canDrop() && monitor.isOver()
