@@ -1,4 +1,4 @@
-import { IEngine, CrdtMessage, CrdtMessageType } from '@dcl/ecs'
+import { IEngine, CrdtMessage, CrdtMessageType, CRDT_MESSAGE_HEADER_LENGTH } from '@dcl/ecs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { readMessage } from '@dcl/ecs/dist/serialization/crdt/message'
 
@@ -32,7 +32,10 @@ export function* serializeCrdtMessages(prefix: string, data: Uint8Array, engine:
       } catch {
         yield `${preface} c=${componentId} t=${timestamp} data=?`
       }
-    } else if (message.type === CrdtMessageType.DELETE_ENTITY) {
+    } else if (
+      message.type === CrdtMessageType.DELETE_ENTITY ||
+      message.type === CrdtMessageType.DELETE_ENTITY_NETWORK
+    ) {
       yield preface
     } else {
       yield `${preface} Unknown CrdtMessageType`

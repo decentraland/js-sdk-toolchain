@@ -234,11 +234,13 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
     for (const entityId of entitiesDeletedThisTick) {
       const offset = buffer.currentWriteOffset()
       DeleteEntity.write(entityId, buffer)
+
       crdtMessages.push({
         type: CrdtMessageType.DELETE_ENTITY,
         entityId,
         messageBuffer: buffer.buffer().subarray(offset, buffer.currentWriteOffset())
       })
+
       onProcessEntityComponentChange && onProcessEntityComponentChange(entityId, CrdtMessageType.DELETE_ENTITY)
     }
 

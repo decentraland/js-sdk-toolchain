@@ -1,6 +1,7 @@
 import * as components from '../../components'
-import { Entity } from '../../engine/entity'
+import { Entity, EntityState } from '../../engine/entity'
 import { ComponentDefinition, IEngine } from '../../engine'
+import { NetworkParent } from '../..'
 
 function* genEntityTree<T>(entity: Entity, entities: Map<Entity, T & { parent?: Entity }>): Generator<Entity> {
   // This avoid infinite loop when there is a cyclic parenting
@@ -45,6 +46,28 @@ export function getComponentEntityTree<T>(
   return genEntityTree(entity, entities)
 }
 
+function removeNetworkEntityChildrens(
+  engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema' | 'removeEntity' | 'defineComponent'>,
+  parent: Entity
+): void {
+  const NetworkParent = components.NetworkParent(engine)
+  const NetworkEntity = components.NetworkEntity(engine)
+
+  // Remove parent
+  engine.removeEntity(parent)
+
+  // Remove childs
+  const network = NetworkEntity.getOrNull(parent)
+  if (network) {
+    for (const [entity, parent] of engine.getEntitiesWith(NetworkParent)) {
+      if (parent.entityId === network.entityId && parent.networkId === network.networkId) {
+        removeNetworkEntityChildrens(engine, entity)
+      }
+    }
+  }
+  return
+}
+
 /**
  * Remove all components of each entity in the tree made with Transform parenting
  * @param engine - the engine running the entities
@@ -52,11 +75,17 @@ export function getComponentEntityTree<T>(
  * @public
  */
 export function removeEntityWithChildren(
-  engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema' | 'removeEntity'>,
+  engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema' | 'removeEntity' | 'defineComponent'>,
   entity: Entity
 ) {
   const Transform = components.Transform(engine)
-  for (const _entity of getComponentEntityTree(engine, entity, Transform)) {
-    engine.removeEntity(_entity)
+  const NetworkEntity = components.NetworkEntity(engine)
+
+  if (NetworkEntity.has(entity)) {
+    return removeNetworkEntityChildrens(engine, entity)
+  }
+
+  for (const ent of getComponentEntityTree(engine, entity, Transform)) {
+    engine.removeEntity(ent)
   }
 }

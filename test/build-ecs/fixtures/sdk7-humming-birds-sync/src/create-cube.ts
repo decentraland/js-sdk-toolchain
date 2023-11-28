@@ -58,7 +58,11 @@ export function createCube(x: number, y: number, z: number, sync: boolean = true
         eventType: PointerEventType.PET_DOWN,
         eventInfo: { button: InputAction.IA_POINTER, hoverText: 'Change Color' }
       },
-      { eventType: PointerEventType.PET_DOWN, eventInfo: { button: InputAction.IA_PRIMARY, hoverText: 'Grab Cube' } }
+      { eventType: PointerEventType.PET_DOWN, eventInfo: { button: InputAction.IA_PRIMARY, hoverText: 'Grab Cube' } },
+      {
+        eventType: PointerEventType.PET_DOWN,
+        eventInfo: { button: InputAction.IA_SECONDARY, hoverText: 'Remove Cube' }
+      }
     ]
   })
 
@@ -113,6 +117,9 @@ export function cubeSystem() {
   for (const [entity] of engine.getEntitiesWith(Cube, PointerEvents)) {
     if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity)) {
       Material.setPbrMaterial(entity, { albedoColor: Color4.fromHexString(getRandomHexColor()) })
+    }
+    if (inputSystem.isTriggered(InputAction.IA_SECONDARY, PointerEventType.PET_DOWN, entity)) {
+      engine.removeEntityWithChildren(entity)
     }
     if (
       inputSystem.isTriggered(InputAction.IA_PRIMARY, PointerEventType.PET_DOWN, entity) &&

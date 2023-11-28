@@ -17,6 +17,7 @@ import {
   ValueSetOptions
 } from './grow-only-value-set-component-definition'
 import { removeEntityWithChildren as removeEntityWithChildrenEngine } from '../runtime/helpers/tree'
+import { NetworkEntity } from '..'
 export * from './input'
 export * from './readonly'
 export * from './types'
@@ -26,7 +27,6 @@ function preEngine(): PreEngine {
   const entityContainer = EntityContainer()
   const componentsDefinition = new Map<number, ComponentDefinition<unknown>>()
   const systems = SystemContainer()
-  let networkManager: ReturnType<IEngine['addNetworkManager']>
 
   let sealed = false
 
@@ -38,19 +38,6 @@ function preEngine(): PreEngine {
     return systems.remove(selector)
   }
 
-  function getNetworkManager() {
-    if (!networkManager) throw new Error('Network manager not initialized. Start CRDT Server')
-    return networkManager
-  }
-
-  function addNetworkManager(reservedLocalEntities: number, range: [number, number]) {
-    entityContainer.setNetworkEntitiesRange(reservedLocalEntities, range)
-    networkManager = {
-      addEntity: () => entityContainer.generateEntity(true)
-    }
-    return networkManager
-  }
-
   function addEntity() {
     const entity = entityContainer.generateEntity()
     return entity
@@ -58,6 +45,9 @@ function preEngine(): PreEngine {
 
   function removeEntity(entity: Entity) {
     for (const [, component] of componentsDefinition) {
+      // TODO: hack for the moment. It should be enough to delete the entity, but the renderer is not cleaning the components.
+      // So we still need the NetworkEntity to forward this message to the SyncTransport.
+      if (component.componentId === NetworkEntity.componentId) continue
       component.entityDeleted(entity, true)
     }
 
@@ -65,7 +55,10 @@ function preEngine(): PreEngine {
   }
 
   function removeEntityWithChildren(entity: Entity) {
-    return removeEntityWithChildrenEngine({ removeEntity, defineComponentFromSchema, getEntitiesWith }, entity)
+    return removeEntityWithChildrenEngine(
+      { removeEntity, defineComponentFromSchema, getEntitiesWith, defineComponent },
+      entity
+    )
   }
 
   function registerComponentDefinition(
@@ -253,9 +246,7 @@ function preEngine(): PreEngine {
     registerComponentDefinition,
     entityContainer,
     componentsIter,
-    seal,
-    addNetworkManager,
-    getNetworkManager
+    seal
   }
 }
 /**
@@ -311,8 +302,6 @@ export function Engine(options?: IEngineOptions): IEngine {
     getEntityState: partialEngine.entityContainer.getEntityState,
     addTransport: crdtSystem.addTransport,
 
-    entityContainer: partialEngine.entityContainer,
-    addNetworkManager: partialEngine.addNetworkManager,
-    getNetworkManager: partialEngine.getNetworkManager
+    entityContainer: partialEngine.entityContainer
   }
 }
