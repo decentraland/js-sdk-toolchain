@@ -1,10 +1,12 @@
 import { PBVideoPlayer } from '@dcl/ecs'
+
 import { removeBasePath } from '../../../lib/logic/remove-base-path'
 import { AssetCatalogResponse } from '../../../tooling-entrypoint'
 import { TreeNode } from '../../ProjectAssetExplorer/ProjectView'
 import { isAssetNode } from '../../ProjectAssetExplorer/utils'
 import { AssetNodeItem } from '../../ProjectAssetExplorer/types'
 import { VideoPlayerInput } from './types'
+import { isValidHttpsUrl } from '../../../lib/utils/url'
 
 export const fromVideoPlayer =
   (base: string) =>
@@ -39,7 +41,7 @@ export function volumeToVideoPlayer(volume: string | undefined): number {
 }
 
 export function isValidInput({ basePath, assets }: AssetCatalogResponse, src: string): boolean {
-  return !!assets.find(($) => (basePath ? basePath + '/' + src : src) === $.path)
+  return isValidHttpsUrl(src) || !!assets.find(($) => (basePath ? basePath + '/' + src : src) === $.path)
 }
 
 export const isAudioFile = (value: string): boolean => value.endsWith('.mp4')

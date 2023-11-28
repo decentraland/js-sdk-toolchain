@@ -15,7 +15,7 @@ import { useAppSelector } from '../../../redux/hooks'
 import { selectAssetCatalog } from '../../../redux/app'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
-import { TextField, CheckboxField, RangeField } from '../../ui'
+import { TextField, CheckboxField, RangeField, InfoTooltip } from '../../ui'
 import { fromVideoPlayer, toVideoPlayer, isValidInput, isAudio, isValidVolume } from './utils'
 import type { Props } from './types'
 
@@ -80,8 +80,19 @@ export default withSdk<Props>(({ sdk, entity }) => {
   const volume = getInputProps('volume', (e) => e.target.value)
 
   return (
-    <Container label="VideoPlayer" className={cx('VideoPlayer', { hover: isHover })} onRemoveContainer={handleRemove}>
-      <Block label="Path" ref={drop}>
+    <Container
+      label="VideoPlayer"
+      className={cx('VideoPlayer', { hover: isHover })}
+      rightContent={
+        <InfoTooltip
+          text="In case of using an URL, it must be an https URL (http URLs aren’t supported), and the source should have CORS policies (Cross Origin Resource Sharing) that permit externally accessing it"
+          link="https://docs.decentraland.org/creator/development-guide/sdk7/audio-streaming"
+          type="help"
+        />
+      }
+      onRemoveContainer={handleRemove}
+    >
+      <Block label="Path/URL" ref={drop}>
         <TextField type="text" {...getInputProps('src')} error={files && !isValid} drop={isHover} />
       </Block>
       <Block label="Playback">

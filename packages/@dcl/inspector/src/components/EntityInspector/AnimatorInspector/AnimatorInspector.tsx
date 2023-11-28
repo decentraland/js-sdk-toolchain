@@ -10,7 +10,7 @@ import { getAssetByModel } from '../../../lib/logic/catalog'
 import { CoreComponents } from '../../../lib/sdk/components'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
-import { TextField, CheckboxField, RangeField } from '../../ui'
+import { TextField, CheckboxField, RangeField, InfoTooltip } from '../../ui'
 import { fromNumber, toNumber, isValidSpeed, isValidWeight, initializeAnimatorComponent } from './utils'
 import type { Props } from './types'
 import { useArrayState } from '../../../hooks/useArrayState'
@@ -69,7 +69,18 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
   if (!hasAnimator || !states.length) return null
 
   return (
-    <Container label="Animator" className={cx('Animator')} onRemoveContainer={handleRemove}>
+    <Container
+      label="Animator"
+      className={cx('Animator')}
+      rightContent={
+        <InfoTooltip
+          text="The weight value of all active animations in an entity should add up to 100 at all times. If it adds up to less than 100, the weighted average will be using the default position of the armature for the remaining part of the calculation"
+          link="https://docs.decentraland.org/creator/development-guide/sdk7/3d-model-animations"
+          type="help"
+        />
+      }
+      onRemoveContainer={handleRemove}
+    >
       {states.map(($, idx) => (
         <React.Fragment key={idx}>
           <Block label="Clip">

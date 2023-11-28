@@ -19,9 +19,15 @@ export const toNftShape = (value: NftShapeInput): PBNftShape => {
   }
 }
 
-export function isValidInput(_: string): boolean {
-  // validate urn
-  return true
+export function isValidUrn(urn: string): boolean {
+  const regex = new RegExp(
+    /^urn:([a-z0-9][a-z0-9-]{1,31}):((?:[-a-z0-9()+,.:=@;$_!*'&~\/]|%[0-9a-f]{2})+)(?:(\?\+)((?:(?!\?=)(?:[-a-z0-9()+,.:=@;$_!*'&~\/\?]|%[0-9a-f]{2}))*))(?:(\?=)((?:(?!#).)*))?(?:(#)((?:[-a-z0-9()+,.:=@;$_!*'&~\/\?]|%[0-9a-f]{2})*))?$/
+  )
+  return !!urn.match(regex)
+}
+
+export function isValidInput(urn: string): boolean {
+  return isValidUrn(urn)
 }
 
 export const NFT_STYLES = [

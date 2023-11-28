@@ -10,7 +10,7 @@ import { getAssetByModel } from '../../../lib/logic/catalog'
 import { CoreComponents } from '../../../lib/sdk/components'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
-import { TextField, CheckboxField, RangeField } from '../../ui'
+import { TextField, CheckboxField, RangeField, InfoTooltip } from '../../ui'
 import { fromAudioStream, toAudioStream, isValidInput, isValidVolume } from './utils'
 import type { Props } from './types'
 
@@ -46,7 +46,18 @@ export default withSdk<Props>(({ sdk, entity }) => {
   const volume = getInputProps('volume', (e) => e.target.value)
 
   return (
-    <Container label="AudioStream" className={cx('AudioStream')} onRemoveContainer={handleRemove}>
+    <Container
+      label="AudioStream"
+      className={cx('AudioStream')}
+      rightContent={
+        <InfoTooltip
+          text="The audio in the source must be in one of the following formats: .mp3, ogg, or aac. The source must also be an https URL (http URLs aren’t supported), and the source should have CORS policies (Cross Origin Resource Sharing) that permit externally accessing it"
+          link="https://docs.decentraland.org/creator/development-guide/sdk7/audio-streaming"
+          type="help"
+        />
+      }
+      onRemoveContainer={handleRemove}
+    >
       <Block label="Url">
         <TextField type="text" {...url} error={!isValid} />
       </Block>

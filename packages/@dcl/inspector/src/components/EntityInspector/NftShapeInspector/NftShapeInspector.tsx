@@ -15,6 +15,7 @@ import { ColorField } from '../../ui/ColorField'
 import { SelectField } from '../SelectField'
 import { fromNftShape, toNftShape, isValidInput, NFT_STYLES } from './utils'
 import type { Props } from './types'
+import { InfoTooltip } from '../../ui'
 
 export default withSdk<Props>(({ sdk, entity }) => {
   const { NftShape, GltfContainer } = sdk.components
@@ -48,7 +49,18 @@ export default withSdk<Props>(({ sdk, entity }) => {
   const style = getInputProps('style')
 
   return (
-    <Container label="NftShape" className={cx('NftShape')} onRemoveContainer={handleRemove}>
+    <Container
+      label="NftShape"
+      className={cx('NftShape')}
+      rightContent={
+        <InfoTooltip
+          text="URN structure: urn:decentraland:<CHAIN>:<CONTRACT_STANDARD>:<CONTRACT_ADDRESS>:<TOKEN_ID>"
+          link="https://docs.decentraland.org/creator/development-guide/sdk7/display-a-certified-nft/#add-an-nft"
+          type="help"
+        />
+      }
+      onRemoveContainer={handleRemove}
+    >
       <Block label="Urn">
         <TextField type="text" {...urn} error={!isValid} />
       </Block>

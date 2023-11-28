@@ -93,26 +93,6 @@ export function addAsset(engine: IEngine) {
             values.set(componentName, parseMaterial(base, material))
             break
           }
-          case CoreComponents.MESH_RENDERER: {
-            const mesh = values.get(componentName) as PBMeshRenderer
-            values.set(componentName, mesh)
-            break
-          }
-          case CoreComponents.VISIBILITY_COMPONENT: {
-            const visibility = values.get(componentName) as PBVisibilityComponent
-            values.set(componentName, visibility)
-            break
-          }
-          case CoreComponents.AUDIO_STREAM: {
-            const audioStream = values.get(componentName) as PBAudioStream
-            values.set(componentName, audioStream)
-            break
-          }
-          case CoreComponents.NFT_SHAPE: {
-            const nft = values.get(componentName) as PBNftShape
-            values.set(componentName, nft)
-            break
-          }
           case ComponentName.ACTIONS: {
             const actions = values.get(componentName) as Actions
             const newValue: Actions['value'] = []
