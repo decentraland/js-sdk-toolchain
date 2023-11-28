@@ -1,0 +1,26 @@
+.Pill {
+  display: flex;
+  align-items: center;
+  padding: 0px 4px;
+  background: var(--base-02);
+  border-radius: 20px;
+}
+
+.Pill > .Content {
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  white-space: nowrap;
+  overflow: hidden;
+  color: var(--base-21);
+}
+
+.Pill > .CloseIcon {
+  cursor: pointer;
+  color: var(--base-12);
+}
+
+.Pill > .CloseIcon:hover {
+  color: var(--base-16);
+}
