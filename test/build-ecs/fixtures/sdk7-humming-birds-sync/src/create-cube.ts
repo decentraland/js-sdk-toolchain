@@ -121,18 +121,14 @@ export function cubeSystem() {
     if (inputSystem.isTriggered(InputAction.IA_SECONDARY, PointerEventType.PET_DOWN, entity)) {
       engine.removeEntityWithChildren(entity)
     }
-    if (
-      inputSystem.isTriggered(InputAction.IA_PRIMARY, PointerEventType.PET_DOWN, entity) &&
-      !Grabbed.getOrNull(entity)?.userId
-    ) {
+    if (inputSystem.isTriggered(InputAction.IA_PRIMARY, PointerEventType.PET_DOWN, entity)) {
+      console.log(Grabbed.getOrNull(entity))
       Grabbed.createOrReplace(entity, { userId: myProfile.userId })
     }
   }
   for (const [entity, grabbed] of engine.getEntitiesWith(Grabbed)) {
     if (grabbed.userId === myProfile.userId) {
       if (inputSystem.isTriggered(InputAction.IA_JUMP, PointerEventType.PET_DOWN)) {
-        // Grabbed.getMutable(entity).userId = ''
-        // TODO: Fix deleteFrom not working.
         Grabbed.deleteFrom(entity)
         continue
       }

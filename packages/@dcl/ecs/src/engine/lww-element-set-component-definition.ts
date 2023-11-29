@@ -8,7 +8,8 @@ import {
   CrdtMessageBody,
   PutComponentOperation,
   DeleteComponent,
-  PutNetworkComponentMessageBody
+  PutNetworkComponentMessageBody,
+  DeleteComponentNetworkMessageBody
 } from '../serialization/crdt'
 import { dataCompare } from '../systems/crdt/utils'
 import { LastWriteWinElementSetComponentDefinition, ComponentType } from './component'
@@ -64,7 +65,11 @@ export function createUpdateLwwFromCrdt(
     * @public
     */
   function crdtRuleForCurrentState(
-    message: PutComponentMessageBody | DeleteComponentMessageBody | PutNetworkComponentMessageBody
+    message:
+      | PutComponentMessageBody
+      | DeleteComponentMessageBody
+      | PutNetworkComponentMessageBody
+      | DeleteComponentNetworkMessageBody
   ): ProcessMessageResultType {
     const { entityId, timestamp } = message
     const currentTimestamp = timestamps.get(entityId as Entity)
@@ -112,8 +117,9 @@ export function createUpdateLwwFromCrdt(
     /* istanbul ignore next */
     if (
       msg.type !== CrdtMessageType.PUT_COMPONENT &&
+      msg.type !== CrdtMessageType.PUT_COMPONENT_NETWORK &&
       msg.type !== CrdtMessageType.DELETE_COMPONENT &&
-      msg.type !== CrdtMessageType.PUT_COMPONENT_NETWORK
+      msg.type !== CrdtMessageType.DELETE_COMPONENT_NETWORK
     )
       /* istanbul ignore next */
       return [null, data.get(msg.entityId)]

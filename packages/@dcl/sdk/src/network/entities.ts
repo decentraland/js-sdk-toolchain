@@ -68,6 +68,10 @@ export function entityUtils(engine: IEngine, profile: IProfile) {
     }
   }
 
+  function getFirstChild(entity: Entity) {
+    return Array.from(getChildren(entity))[0]
+  }
+
   /**
    * Returns the parent entity of the given entity.
    */
@@ -119,6 +123,7 @@ export function entityUtils(engine: IEngine, profile: IProfile) {
     getChildren,
     getParent,
     parentEntity,
-    removeParent
+    removeParent,
+    getFirstChild
   }
 }
