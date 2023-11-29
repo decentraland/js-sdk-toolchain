@@ -1,0 +1,181 @@
+:root {
+  --slider-track-height: 8px;
+}
+
+.Range.Field {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.Range.Field .RangeContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+}
+
+.Range.Field .RangeContainer > .InputContainer {
+  position: relative;
+  display: flex;
+  width: 100%;
+  left: 8px;
+}
+
+.Range.Field .RangeContainer .InputContainer .RangeInput {
+  width: calc(100% - 18px);
+  appearance: none;
+  position: relative;
+  background-color: transparent;
+  outline: none;
+}
+
+.Range.Field .RangeContainer .InputContainer .RangeInput::before,
+.Range.Field .RangeContainer .InputContainer .RangeInput::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.Range.Field .RangeContainer .InputContainer .RangeInput::before {
+  left: -8px;
+  background: var(--accent-blue-04);
+}
+
+.Range.Field .RangeContainer.disabled .InputContainer .RangeInput::before {
+  background: var(--base-12);
+}
+
+.Range.Field .RangeContainer .InputContainer .RangeInput::after {
+  right: -8px;
+  background: var(--base-11);
+}
+
+.Range.Field .RangeContainer.disabled .InputContainer .RangeInput::after {
+  background: var(--base-11);
+}
+
+.Range.Field .RangeContainer .InputContainer .RangeInput::-webkit-slider-runnable-track {
+  height: var(--slider-track-height);
+  appearance: none;
+  background: linear-gradient(
+    90deg,
+    var(--accent-blue-04) var(--completionPercentage, 0%),
+    var(--base-10) var(--completionPercentage, 0%)
+  );
+}
+
+.Range.Field .RangeContainer.disabled .InputContainer .RangeInput::-webkit-slider-runnable-track {
+  background: linear-gradient(90deg, var(--base-12) 50%, var(--base-11) 50%);
+}
+
+.Range.Field .RangeContainer .InputContainer .RangeInput::-moz-range-track {
+  height: var(--slider-track-height);
+  appearance: none;
+  margin-top: -1px;
+  background: linear-gradient(
+    90deg,
+    var(--accent-blue-04) var(--completionPercentage, 0%),
+    var(--base-10) var(--completionPercentage, 0%)
+  );
+}
+
+.Range.Field .RangeContainer.disabled .InputContainer .RangeInput::-moz-range-track {
+  background: linear-gradient(90deg, var(--base-12) 50%, var(--base-11) 50%);
+}
+
+.Range.Field .RangeContainer .InputContainer .RangeInput::-ms-track {
+  height: var(--slider-track-height);
+  appearance: none;
+  margin-top: -1px;
+  background: linear-gradient(
+    90deg,
+    var(--accent-blue-04) var(--completionPercentage, 0%),
+    var(--base-10) var(--completionPercentage, 0%)
+  );
+}
+
+.Range.Field .RangeContainer.disabled .InputContainer .RangeInput::-ms-track {
+  background: linear-gradient(90deg, var(--base-12) 50%, var(--base-11) 50%);
+}
+
+.Range.Field .RangeContainer .InputContainer .RangeInput::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--accent-blue-04);
+  border-radius: 50%;
+  cursor: pointer;
+  top: -6px;
+  position: absolute;
+  left: calc(var(--completionPercentage) - 10px);
+  z-index: 1;
+}
+
+.Range.Field .RangeContainer .InputContainer .RangeInput:focus-visible {
+  outline: none;
+}
+
+.Range.Field .RangeContainer .InputContainer .RangeInput:focus::-webkit-slider-thumb {
+  border: 1px solid var(--base-01);
+}
+
+.Range.Field .RangeContainer.disabled .InputContainer .RangeInput::-webkit-slider-thumb {
+  background: var(--base-12);
+  left: calc(50% - 10px);
+  cursor: default;
+}
+
+.Range.Field .RangeContainer .InputContainer .RangeInput::-moz-range-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--accent-blue-04);
+  border-radius: 50%;
+  cursor: pointer;
+  top: -6px;
+  position: absolute;
+  left: calc(var(--completionPercentage) - 10px);
+  z-index: 1;
+}
+
+.Range.Field .RangeContainer.disabled .InputContainer .RangeInput:focus::-moz-range-thumb {
+  border: 1px solid var(--base-01);
+}
+
+.Range.Field .RangeContainer.disabled .InputContainer .RangeInput::-moz-range-thumb {
+  background: var(--base-12);
+  left: calc(50% - 10px);
+  cursor: default;
+}
+
+.Range.Field .RangeContainer .InputContainer .RangeInput::-ms-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--accent-blue-04);
+  border-radius: 50%;
+  cursor: pointer;
+  top: -6px;
+  position: absolute;
+  left: calc(var(--completionPercentage) - 10px);
+  z-index: 1;
+}
+
+.Range.Field .RangeContainer.disabled .InputContainer .RangeInput:focus::-ms-thumb {
+  border: 1px solid var(--base-01);
+}
+
+.Range.Field .RangeContainer.disabled .InputContainer .RangeInput::-ms-thumb {
+  background: var(--base-12);
+  left: calc(50% - 10px);
+  cursor: default;
+}
+
+.Range.Field .RangeContainer .RangeTextInput > .InputContainer input {
+  width: 60px;
+}

@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { BiUndo, BiRedo, BiSave, BiBadgeCheck } from 'react-icons/bi'
 import { RiListSettingsLine } from 'react-icons/ri'
+import { useHotkeys } from 'react-hotkeys-hook'
 
 import { withSdk } from '../../hoc/withSdk'
 import { Gizmos } from './Gizmos'
@@ -28,6 +29,10 @@ const Toolbar = withSdk(({ sdk }) => {
   const handleSaveClick = useCallback(() => dispatch(save()), [])
   const handleUndo = useCallback(() => dispatch(undo()), [])
   const handleRedo = useCallback(() => dispatch(redo()), [])
+
+  useHotkeys('mod+s', handleSaveClick, { preventDefault: true }, [])
+  useHotkeys('mod+z', handleUndo, { preventDefault: true }, [])
+  useHotkeys('mod+y', handleRedo, { preventDefault: true }, [])
 
   return (
     <div className="Toolbar">

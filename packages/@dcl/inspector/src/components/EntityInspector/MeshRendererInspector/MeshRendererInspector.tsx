@@ -1,59 +1,56 @@
-import { useCallback } from 'react'
-import { Item } from 'react-contexify'
-import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
+import { useCallback, useMemo } from 'react'
 
-import { ContextMenu as Menu } from '../../ContexMenu'
-import { withContextMenu } from '../../../hoc/withContextMenu'
-import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
+import { withSdk } from '../../../hoc/withSdk'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
-import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { Block } from '../../Block'
-import { SelectField } from '../SelectField'
-import { TextField } from '../TextField'
 import { Container } from '../../Container'
-import { Props, MeshType } from './types'
+import { TextField, Dropdown } from '../../ui'
 import { fromMeshRenderer, toMeshRenderer, isValidInput, SHAPES } from './utils'
 
-export default withSdk<Props>(
-  withContextMenu<WithSdkProps & Props>(({ sdk, entity, contextMenuId }) => {
-    const { handleAction } = useContextMenu()
-    const { MeshRenderer } = sdk.components
+import { Props, MeshType } from './types'
 
-    const hasMeshRenderer = useHasComponent(entity, MeshRenderer)
-    const { getInputProps } = useComponentInput(entity, MeshRenderer, fromMeshRenderer, toMeshRenderer, isValidInput)
+export default withSdk<Props>(({ sdk, entity }) => {
+  const { MeshRenderer } = sdk.components
 
-    const handleRemove = useCallback(async () => {
-      sdk.operations.removeComponent(entity, MeshRenderer)
-      await sdk.operations.dispatch()
-    }, [])
+  const hasMeshRenderer = useHasComponent(entity, MeshRenderer)
+  const { getInputProps } = useComponentInput(entity, MeshRenderer, fromMeshRenderer, toMeshRenderer, isValidInput)
 
-    if (!hasMeshRenderer) return null
+  const handleRemove = useCallback(async () => {
+    sdk.operations.removeComponent(entity, MeshRenderer)
+    await sdk.operations.dispatch()
+  }, [])
 
-    const mesh = getInputProps('mesh')
+  const mesh = useMemo(() => getInputProps('mesh'), [getInputProps])
 
-    return (
-      <Container label="MeshRenderer" className="MeshRenderer">
-        <Menu id={contextMenuId}>
-          <Item id="delete" onClick={handleAction(handleRemove)}>
-            <DeleteIcon /> Delete
-          </Item>
-        </Menu>
-        <Block>
-          <SelectField label="Shape" options={SHAPES} {...mesh} />
-        </Block>
-        {mesh.value !== MeshType.MT_SPHERE && (
-          <Block label="Additional fields">
-            {/* {hasUvs(mesh.value) && <TextField label="Uvs" type="text" {...getInputProps('uvs')} />} */}
-            {mesh.value === MeshType.MT_CYLINDER && (
-              <>
-                <TextField label="Radius top" type="number" {...getInputProps('radiusTop')} />
-                <TextField label="Radius bottom" type="number" {...getInputProps('radiusBottom')} />
-              </>
-            )}
+  const renderComponent = useCallback(() => {
+    switch (mesh.value) {
+      case MeshType.MT_CYLINDER: {
+        return (
+          <Block label="Radius">
+            <TextField leftLabel="Top" type="number" {...getInputProps('radiusTop')} />
+            <TextField leftLabel="Bottom" type="number" {...getInputProps('radiusBottom')} />
           </Block>
-        )}
-      </Container>
-    )
-  })
-)
+        )
+      }
+      case MeshType.MT_SPHERE:
+      default: {
+        {
+          /* {hasUvs(mesh.value) && <TextField label="Uvs" type="text" {...getInputProps('uvs')} />} */
+        }
+        return null
+      }
+    }
+  }, [mesh, getInputProps])
+
+  if (!hasMeshRenderer) return null
+
+  return (
+    <Container label="MeshRenderer" className="MeshRenderer" onRemoveContainer={handleRemove}>
+      <Block>
+        <Dropdown label="Shape" options={SHAPES} {...mesh} />
+      </Block>
+      {renderComponent()}
+    </Container>
+  )
+})

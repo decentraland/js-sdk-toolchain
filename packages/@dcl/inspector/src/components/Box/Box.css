@@ -2,18 +2,14 @@
   height: calc(100% - 4.8px);
 }
 
-.Box.with-border {
+.Box {
   margin: 1.2px;
   padding: 1.2px;
   border-radius: 2.4px;
   background: #21262f;
 }
 
-.Box.with-border>.content:hover {
-  border: 1px solid var(--border-focused);
-}
-
-.Box.with-border>.content {
+.Box > .content {
   border: 1px solid var(--main-bg-color);
   background: var(--main-bg-color);
   width: 100%;

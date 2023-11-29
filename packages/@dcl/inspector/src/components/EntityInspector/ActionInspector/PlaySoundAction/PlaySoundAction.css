@@ -16,7 +16,3 @@
 .PlaySoundActionContainer .field.drop {
   border: 1px solid white;
 }
-
-.PlaySoundActionContainer > .row > .field.volume > .row > .TextField {
-  width: 40px;
-}

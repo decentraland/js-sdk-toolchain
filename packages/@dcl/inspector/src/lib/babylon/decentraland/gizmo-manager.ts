@@ -1,5 +1,5 @@
 import mitt from 'mitt'
-import { Quaternion } from '@babylonjs/core'
+import { IAxisDragGizmo, PickingInfo, Quaternion } from '@babylonjs/core'
 import { EcsEntity } from './EcsEntity'
 import { Entity, TransformType } from '@dcl/ecs'
 import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manager'
@@ -7,6 +7,18 @@ import { SceneContext } from './SceneContext'
 import { GizmoType } from '../../utils/gizmo'
 import { PatchedGizmoManager } from './gizmo-patch'
 import { Vector3 as DclVector3, Quaternion as DclQuaternion } from '@dcl/ecs-math'
+
+interface GizmoAxis {
+  xGizmo: IAxisDragGizmo
+  yGizmo: IAxisDragGizmo
+  zGizmo: IAxisDragGizmo
+}
+
+function releaseDragFromGizmo({ xGizmo, yGizmo, zGizmo }: GizmoAxis) {
+  xGizmo.dragBehavior.releaseDrag()
+  yGizmo.dragBehavior.releaseDrag()
+  zGizmo.dragBehavior.releaseDrag()
+}
 
 function areProportional(a: number, b: number) {
   // this leeway is here to account for rounding errors due to serializing/deserializing floating point numbers
@@ -142,19 +154,43 @@ export function createGizmoManager(context: SceneContext) {
     events.emit('change')
   }
 
+  function setEnabled(value: boolean) {
+    if (value !== isEnabled) {
+      isEnabled = value
+      if (!isEnabled && lastEntity) {
+        unsetEntity()
+      }
+    }
+  }
+
+  let movingNode: PickingInfo | null = null
+
+  const canvas = context.babylon.getRenderingCanvas()
+
+  context.scene.onPointerObservable.add(({ event: e, pickInfo }) => {
+    if (e.type === 'pointermove') {
+      movingNode = pickInfo
+    } else {
+      movingNode = null
+    }
+  })
+
+  if (canvas) {
+    canvas.addEventListener('pointerenter', () => {
+      if (movingNode) {
+        releaseDragFromGizmo(gizmoManager.gizmos.positionGizmo!)
+        releaseDragFromGizmo(gizmoManager.gizmos.rotationGizmo!)
+        releaseDragFromGizmo(gizmoManager.gizmos.scaleGizmo!)
+      }
+    })
+  }
+
   return {
     gizmoManager,
     isEnabled() {
       return isEnabled
     },
-    setEnabled(value: boolean) {
-      if (value !== isEnabled) {
-        isEnabled = value
-        if (!isEnabled && lastEntity) {
-          unsetEntity()
-        }
-      }
-    },
+    setEnabled,
     setEntity(entity: EcsEntity | null) {
       if (entity === lastEntity || !isEnabled) return
       gizmoManager.attachToNode(entity)

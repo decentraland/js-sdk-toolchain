@@ -1,15 +1,17 @@
 .TriggerConditionsContainer {
   display: flex;
   flex-direction: column;
+  width: 100%;
   margin-top: 8px;
   gap: 8px;
+  /* Local vars */
+  --right-menu-width: 16px;
 }
 
 .TriggerConditionsContainer > .TriggerConditionsTitle {
   display: flex;
   flex-direction: row;
   align-items: center;
-
   border-bottom: 1px solid var(--border-gray);
   padding-bottom: 4px;
 }
@@ -37,18 +39,20 @@
 .TriggerConditionsContainer > .TriggerCondition {
   display: flex;
   flex-direction: row;
+  width: 100%;
 }
 
 .TriggerConditionsContainer > .TriggerCondition > .Fields {
   display: flex;
-  flex: 1;
+  width: calc(100% - var(--right-menu-width));
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px;
+  gap: 12px 8px;
 }
 
 .TriggerConditionsContainer > .TriggerCondition > .RightMenu {
   align-self: start;
+  width: var(--right-menu-width);
 }
 
 .TriggerConditionsContainer > .TriggerCondition > .RightMenu > .MoreOptionsMenu .MoreOptionsContent {

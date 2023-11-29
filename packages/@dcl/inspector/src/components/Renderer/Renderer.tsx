@@ -14,7 +14,7 @@ import { snapPosition } from '../../lib/babylon/decentraland/snap-manager'
 import { loadGltf, removeGltf } from '../../lib/babylon/decentraland/sdkComponents/gltf-container'
 import { getConfig } from '../../lib/logic/config'
 import { ROOT } from '../../lib/sdk/tree'
-import { Asset } from '../../lib/logic/catalog'
+import { Asset, isSmart } from '../../lib/logic/catalog'
 import { selectAssetCatalog } from '../../redux/app'
 import { areGizmosDisabled } from '../../redux/ui'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
@@ -75,7 +75,8 @@ const Renderer: React.FC = () => {
     analytics.track(Event.ADD_ITEM, {
       itemId: asset.asset.id,
       itemName: asset.name,
-      itemPath: asset.asset.src
+      itemPath: asset.asset.src,
+      isSmart: isSmart(asset)
     })
   }
 

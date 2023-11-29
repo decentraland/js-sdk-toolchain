@@ -1,8 +1,11 @@
 .TriggerActionsContainer {
   display: flex;
   flex-direction: column;
+  width: 100%;
   margin-top: 8px;
   gap: 8px;
+  /* Local vars */
+  --right-menu-width: 16px;
 }
 
 .TriggerActionsContainer > .TriggerActionsTitle {
@@ -36,18 +39,20 @@
 .TriggerActionsContainer > .TriggerAction {
   display: flex;
   flex-direction: row;
+  width: 100%;
 }
 
 .TriggerActionsContainer > .TriggerAction > .Fields {
   display: flex;
-  flex: 1;
+  width: calc(100% - var(--right-menu-width));
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px;
+  gap: 12px 8px;
 }
 
 .TriggerActionsContainer > .TriggerAction > .RightMenu {
   align-self: start;
+  width: var(--right-menu-width);
 }
 
 .TriggerActionsContainer > .TriggerAction > .RightMenu > .MoreOptionsMenu .MoreOptionsContent {

@@ -13,6 +13,7 @@ export type Events = {
     itemId?: string
     itemName: string
     itemPath: string
+    isSmart: boolean
   }
   [Event.ADD_COMPONENT]: {
     componentName: string
@@ -80,12 +81,28 @@ class Analytics {
     return traits
   }
 
+  getBaseProperties() {
+    const config = getConfig()
+
+    let baseProperties = {}
+
+    if (config.projectId) {
+      baseProperties = {
+        ...baseProperties,
+        projectId: config.projectId
+      }
+    }
+
+    return baseProperties
+  }
+
   track<T extends keyof Events>(eventName: T, eventProps: Events[T]) {
     const trackInfo = {
       event: eventName,
       userId: this.userId,
       properties: {
         ...this.getTraits(),
+        ...this.getBaseProperties(),
         ...eventProps
       }
     }

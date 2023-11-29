@@ -1,0 +1,36 @@
+.ui.popup.InfoTooltip {
+  border-color: var(--gray-0);
+  background-color: var(--gray-0);
+  color: var(--base05);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.ui.popup.InfoTooltip::before {
+  display: none !important;
+}
+
+.InfoTooltip a {
+  color: var(--base-01);
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+.InfoTooltip a:hover {
+  color: var(--base-01);
+  text-decoration: none;
+}
+
+.InfoTooltipTrigger {
+  display: flex;
+  align-items: center;
+}
+
+.InfoTooltipTrigger > svg {
+  color: var(--base-09);
+}
+
+.InfoTooltipTrigger.hovered > svg {
+  color: var(--base-01);
+}

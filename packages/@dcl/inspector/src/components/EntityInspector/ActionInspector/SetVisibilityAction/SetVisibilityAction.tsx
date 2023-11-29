@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { ActionPayload, ActionType } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
-
-import { Dropdown } from '../../../Dropdown'
+import { Block } from '../../../Block'
+import { Dropdown } from '../../../ui/Dropdown'
 import type { Props } from './types'
 
 import './SetVisibilityAction.css'
@@ -38,34 +38,27 @@ const SetVisibilityAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
   )
 
   return (
-    <div className="SetVisibilityActionContainer">
-      <div className="row">
-        <div className="field">
-          <label>Select Visibility</label>
-          <Dropdown
-            options={[
-              { value: 'true', text: 'Visible' },
-              { value: 'false', text: 'Invisible' }
-            ]}
-            value={(payload.visible ?? true).toString()}
-            onChange={handleSetVisible}
-          />
-        </div>
-      </div>
-      <div className="row">
-        <div className="field">
-          <label>Select Physics Collider</label>
-          <Dropdown
-            options={[
-              { value: 'true', text: 'Enabled' },
-              { value: 'false', text: 'Disabled' }
-            ]}
-            value={(payload.physicsCollider ?? false).toString()}
-            onChange={handleChangeCollider}
-          />
-        </div>
-      </div>
-    </div>
+    <Block className="SetVisibilityActionContainer">
+      <Dropdown
+        label="Select Visibility"
+        options={[
+          { value: 'true', label: 'Visible' },
+          { value: 'false', label: 'Invisible' }
+        ]}
+        value={(payload.visible ?? true).toString()}
+        onChange={handleSetVisible}
+      />
+
+      <Dropdown
+        label="Select Physics Collider"
+        options={[
+          { value: 'true', label: 'Enabled' },
+          { value: 'false', label: 'Disabled' }
+        ]}
+        value={(payload.physicsCollider ?? false).toString()}
+        onChange={handleChangeCollider}
+      />
+    </Block>
   )
 }
 

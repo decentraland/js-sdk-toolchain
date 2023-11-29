@@ -1,46 +1,26 @@
-import { useCallback, useRef } from 'react'
-import { useDrop } from 'react-dnd'
-
+import { useCallback } from 'react'
+import { removeBasePath } from '../../../../lib/logic/remove-base-path'
 import { Block } from '../../../Block'
-import { SelectField } from '../../SelectField'
-import { TextField } from '../../TextField'
 import { Container } from '../../../Container'
-import { Props, Texture, TEXTURE_TYPES, WRAP_MODES, FILTER_MODES } from './types'
-import { ProjectAssetDrop, getNode } from '../../../../lib/sdk/drag-drop'
-import { AssetNodeItem } from '../../../ProjectAssetExplorer/types'
+import { Dropdown, FileUploadField } from '../../../ui'
+import { ACCEPTED_FILE_TYPES } from '../../../ui/FileUploadField/types'
 import { isModel, isValidTexture } from './utils'
 
-const DROP_TYPES = ['project-asset']
+import { Props, Texture, TEXTURE_TYPES, WRAP_MODES, FILTER_MODES } from './types'
 
 function TextureInspector({ label, texture, files, getInputProps }: Props) {
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  const changeValue = useCallback((value: AssetNodeItem) => {
-    const set = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set
-    const inputEvent = new Event('input', { bubbles: true })
-
-    set?.call(inputRef.current, value.asset.src)
-    inputRef.current?.dispatchEvent(inputEvent)
-  }, [])
-
-  const [{ isHover }, drop] = useDrop(
-    () => ({
-      accept: DROP_TYPES,
-      drop: ({ value, context }: ProjectAssetDrop, monitor) => {
-        if (monitor.didDrop()) return
-        const node = context.tree.get(value)!
-        const model = getNode(node, context.tree, isModel)
-        if (model) changeValue(model)
-      },
-      canDrop: ({ value, context }: ProjectAssetDrop) => {
-        const node = context.tree.get(value)!
-        return !!getNode(node, context.tree, isModel)
-      },
-      collect: (monitor) => ({
-        isHover: monitor.canDrop() && monitor.isOver()
-      })
-    }),
-    [files]
+  const handleDrop = useCallback(
+    (src: string) => {
+      const srcInput = getInputProps(`${texture}.src`)
+      // The src comes with the basePath, so we need to remove it before setting the value because the utils fromTexture is adding it again
+      // TODO: Refactor EntityInspector/MaterialInspector/Texture/utils.ts::fromTexture util to not remove the basePath
+      const value = removeBasePath(files?.basePath ?? '', src)
+      srcInput?.onChange &&
+        srcInput.onChange({
+          target: { value }
+        } as React.ChangeEvent<HTMLInputElement>)
+    },
+    [files, texture, getInputProps]
   )
 
   const type = getInputProps(`${texture}.type`)
@@ -48,22 +28,27 @@ function TextureInspector({ label, texture, files, getInputProps }: Props) {
   const isValid = isValidTexture(src.value, files)
 
   return (
-    <Container label={label} className={label} initialOpen={false}>
+    <Container label={label} className={label} initialOpen={false} border>
       <Block>
-        <SelectField label="Type" options={TEXTURE_TYPES} {...type} />
+        <Dropdown label="Type" options={TEXTURE_TYPES} {...type} />
       </Block>
-      <Block ref={drop}>
+      <Block>
         {type.value === Texture.TT_TEXTURE && (
-          <TextField ref={inputRef} label="Path" type="text" error={!isValid} drop={isHover} {...src} />
+          <FileUploadField
+            {...src}
+            label="Path"
+            accept={ACCEPTED_FILE_TYPES['image']}
+            onDrop={handleDrop}
+            error={!!src.value && files && !isValid}
+            isValidFile={isModel}
+          />
         )}
         {/* {type.value === Texture.TT_AVATAR_TEXTURE && <TextField label="User ID" {...getInputProps(`${texture}.userId`)} />}
         {type.value === Texture.TT_VIDEO_TEXTURE && <TextField label="Video player entity" {...getInputProps(`${texture}.videoPlayerEntity`)} />} */}
       </Block>
       <Block>
-        <SelectField label="Wrap mode" options={WRAP_MODES} {...getInputProps(`${texture}.wrapMode`)} />
-      </Block>
-      <Block>
-        <SelectField label="Filter node" options={FILTER_MODES} {...getInputProps(`${texture}.filterMode`)} />
+        <Dropdown label="Wrap mode" options={WRAP_MODES} {...getInputProps(`${texture}.wrapMode`)} />
+        <Dropdown label="Filter node" options={FILTER_MODES} {...getInputProps(`${texture}.filterMode`)} />
       </Block>
     </Container>
   )

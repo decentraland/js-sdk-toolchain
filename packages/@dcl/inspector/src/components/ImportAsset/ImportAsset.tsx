@@ -1,19 +1,19 @@
 import { GLTFValidation } from '@babylonjs/loaders'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { HiOutlineUpload } from 'react-icons/hi'
 import { RxCross2, RxReload } from 'react-icons/rx'
 import classNames from 'classnames'
 
 import FileInput from '../FileInput'
 import { Container } from '../Container'
-import { TextField } from '../EntityInspector/TextField'
+import { TextField } from '../ui/TextField'
 import { Block } from '../Block'
 import { Button } from '../Button'
 import { removeBasePath } from '../../lib/logic/remove-base-path'
 import { DIRECTORY, transformBase64ResourceToBinary, withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { importAsset, saveThumbnail } from '../../redux/data-layer'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
-import { selectAssetCatalog } from '../../redux/app'
+import { selectAssetCatalog, selectUploadFile, updateUploadFile } from '../../redux/app'
 import { getRandomMnemonic } from './utils'
 import { AssetPreview } from '../AssetPreview'
 
@@ -89,6 +89,7 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
   // TODO: multiple files
   const dispatch = useAppDispatch()
   const files = useAppSelector(selectAssetCatalog)
+  const uploadFile = useAppSelector(selectUploadFile)
 
   const [file, setFile] = useState<File>()
   const [thumbnail, setThumbnail] = useState<string | null>(null)
@@ -96,6 +97,12 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
   const [assetName, setAssetName] = useState<string>('')
   const [assetExtension, setAssetExtension] = useState<string>('')
   const { basePath, assets } = files ?? { basePath: '', assets: [] }
+
+  useEffect(() => {
+    if (uploadFile && typeof uploadFile !== 'string' && (!file || (file && uploadFile.name !== file.name))) {
+      handleDrop([Object.values(uploadFile!)[0] as File])
+    }
+  }, [uploadFile])
 
   const handleDrop = (acceptedFiles: File[]) => {
     // TODO: handle zip file. GLB with multiple external image references
@@ -149,6 +156,15 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
           })
         )
       }
+
+      // Clear uploaded file from the FileUploadField
+      const newUploadFile = { ...uploadFile }
+      for (const key in newUploadFile) {
+        newUploadFile[key] = `${basePath}/${fullName}`
+      }
+      dispatch(updateUploadFile(newUploadFile))
+      setFile(undefined)
+
       onSave()
     }
     reader.readAsArrayBuffer(file)
