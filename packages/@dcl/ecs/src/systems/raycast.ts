@@ -245,15 +245,18 @@ export function createRaycastSystem(engine: IEngine): RaycastSystem {
     raycastValue: RaycastSystemOptions,
     callback: RaycastSystemCallback
   ) {
-    const raycast = Raycast.getOrCreateMutable(entity)
-    raycast.maxDistance = raycastValue.maxDistance
-    raycast.originOffset = raycastValue.originOffset
-    raycast.collisionMask = raycastValue.collisionMask
-    raycast.direction = raycastValue.directionRawValue
-    raycast.continuous = raycastValue.continuous
-    raycast.queryType = raycastValue.queryType
+    const onNextTick = () => {
+      const raycast = Raycast.createOrReplace(entity)
+      raycast.maxDistance = raycastValue.maxDistance
+      raycast.originOffset = raycastValue.originOffset
+      raycast.collisionMask = raycastValue.collisionMask
+      raycast.direction = raycastValue.directionRawValue
+      raycast.continuous = raycastValue.continuous
+      raycast.queryType = raycastValue.queryType
 
-    entitiesCallbackResultMap.set(entity, { callback: callback })
+      entitiesCallbackResultMap.set(entity, { callback: callback })
+    }
+    nextTickRaycasts.push(onNextTick)
   }
 
   function removeRaycast(entity: Entity) {
@@ -262,8 +265,15 @@ export function createRaycastSystem(engine: IEngine): RaycastSystem {
     entitiesCallbackResultMap.delete(entity)
   }
 
+  const nextTickRaycasts: (() => void)[] = []
+
   // @internal
   engine.addSystem(function EventSystem() {
+    for (const addMissingRaycast of nextTickRaycasts) {
+      addMissingRaycast()
+    }
+    nextTickRaycasts.length = 0
+
     for (const [entity, data] of entitiesCallbackResultMap) {
       const raycast = Raycast.getOrNull(entity)
       if (engine.getEntityState(entity) === EntityState.Removed || !raycast) {
