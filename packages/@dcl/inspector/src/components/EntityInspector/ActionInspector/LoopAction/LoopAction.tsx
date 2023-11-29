@@ -16,10 +16,18 @@ function isStartLoopAction(
 
 function isValid(payload: ActionPayload<ActionType.START_LOOP | ActionType.STOP_LOOP>) {
   if (isStartLoopAction(payload)) {
-    return payload.actions !== undefined && payload.actions.length > 0 && payload.interval !== undefined
+    return (
+      payload.actions !== undefined &&
+      payload.actions.length > 0 &&
+      payload.interval !== undefined &&
+      payload.interval > 0
+    )
   }
 
-  return (payload as ActionPayload<ActionType.STOP_LOOP>).action !== undefined
+  return (
+    (payload as ActionPayload<ActionType.STOP_LOOP>).action !== undefined &&
+    (payload as ActionPayload<ActionType.STOP_LOOP>).action !== ''
+  )
 }
 
 const LoopAction = <T extends ActionPayload<ActionType.START_LOOP | ActionType.STOP_LOOP>>({
@@ -30,6 +38,12 @@ const LoopAction = <T extends ActionPayload<ActionType.START_LOOP | ActionType.S
   const [payload, setPayload] = useState<T>({
     ...value
   })
+
+  useEffect(() => {
+    if (isStartLoopAction(payload) !== isStartLoopAction(value)) {
+      setPayload({ ...value })
+    }
+  }, [value, payload])
 
   useEffect(() => {
     if (!recursiveCheck(payload, value, 2) || !isValid(payload)) return

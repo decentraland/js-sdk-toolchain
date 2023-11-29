@@ -16,10 +16,18 @@ function isStartDelayAction(
 
 function isValid(payload: ActionPayload<ActionType.START_DELAY | ActionType.STOP_DELAY>) {
   if (isStartDelayAction(payload)) {
-    return payload.actions !== undefined && payload.actions.length > 0 && payload.timeout !== undefined
+    return (
+      payload.actions !== undefined &&
+      payload.actions.length > 0 &&
+      payload.timeout !== undefined &&
+      payload.timeout > 0
+    )
   }
 
-  return (payload as ActionPayload<ActionType.STOP_DELAY>).action !== undefined
+  return (
+    (payload as ActionPayload<ActionType.STOP_DELAY>).action !== undefined &&
+    (payload as ActionPayload<ActionType.STOP_DELAY>).action !== ''
+  )
 }
 
 const DelayAction = <T extends ActionPayload<ActionType.START_DELAY | ActionType.STOP_DELAY>>({
@@ -30,6 +38,12 @@ const DelayAction = <T extends ActionPayload<ActionType.START_DELAY | ActionType
   const [payload, setPayload] = useState<T>({
     ...value
   })
+
+  useEffect(() => {
+    if (isStartDelayAction(payload) !== isStartDelayAction(value)) {
+      setPayload({ ...value })
+    }
+  }, [value, payload])
 
   useEffect(() => {
     if (!recursiveCheck(payload, value, 2) || !isValid(payload)) return
