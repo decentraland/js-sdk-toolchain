@@ -41,7 +41,7 @@ export function entityUtils(engine: IEngine, profile: IProfile) {
 
       // Check if this enum is already used
       for (const [_, network] of engine.getEntitiesWith(NetworkEntity)) {
-        if (network.networkId === networkValue.networkId && networkValue.entityId === networkValue.entityId) {
+        if (network.networkId === networkValue.networkId && network.entityId === networkValue.entityId) {
           throw new Error('syncEntity failed because the id provided is already in use')
         }
       }
