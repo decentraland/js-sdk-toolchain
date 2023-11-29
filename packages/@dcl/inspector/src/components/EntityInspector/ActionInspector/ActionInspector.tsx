@@ -36,18 +36,19 @@ import { TweenAction } from './TweenAction'
 import { isValidTween } from './TweenAction/utils'
 import { PlayAnimationAction } from './PlayAnimationAction'
 import { SetVisibilityAction } from './SetVisibilityAction'
-import { ShowTextAction } from './ShowTextAction'
-import { DelayAction } from './DelayAction'
-import { LoopAction } from './LoopAction'
-import { getDefaultPayload, getPartialPayload, isStates } from './utils'
-import { Props } from './types'
-
-import './ActionInspector.css'
 import { TeleportPlayerAction } from './TeleportPlayerAction'
 import { MovePlayerAction } from './MovePlayerAction'
 import { PlayDefaultEmoteAction } from './PlayDefaultEmoteAction'
 import { PlayCustomEmoteAction } from './PlayCustomEmoteAction'
 import { OpenLinkAction } from './OpenLinkAction'
+import { ShowTextAction } from './ShowTextAction'
+import { DelayAction } from './DelayAction'
+import { LoopAction } from './LoopAction'
+import { CloneEntityAction } from './CloneEntityAction'
+import { getDefaultPayload, getPartialPayload, isStates } from './utils'
+import { Props } from './types'
+
+import './ActionInspector.css'
 
 const ActionMapOption: Record<string, string> = {
   [ActionType.PLAY_ANIMATION]: 'Play Animation',
@@ -76,7 +77,9 @@ const ActionMapOption: Record<string, string> = {
   [ActionType.START_DELAY]: 'Start Delay',
   [ActionType.STOP_DELAY]: 'Stop Delay',
   [ActionType.START_LOOP]: 'Start Loop',
-  [ActionType.STOP_LOOP]: 'Stop Loop'
+  [ActionType.STOP_LOOP]: 'Stop Loop',
+  [ActionType.CLONE_ENTITY]: 'Clone',
+  [ActionType.REMOVE_ENTITY]: 'Remove'
 }
 
 export default withSdk<Props>(({ sdk, entity: entityId }) => {
@@ -185,6 +188,18 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
         case ActionType.OPEN_LINK: {
           const payload = getPartialPayload<ActionType.OPEN_LINK>(action)
           return !!payload && typeof payload.url === 'string' && payload.url.length > 0
+        }
+        case ActionType.CLONE_ENTITY: {
+          const payload = getPartialPayload<ActionType.CLONE_ENTITY>(action)
+          return (
+            !!payload &&
+            typeof payload.position?.x === 'number' &&
+            !isNaN(payload.position?.x) &&
+            typeof payload.position?.y === 'number' &&
+            !isNaN(payload.position?.y) &&
+            typeof payload.position?.z === 'number' &&
+            !isNaN(payload.position?.z)
+          )
         }
         default: {
           try {
@@ -418,6 +433,16 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     [modifyAction, actions]
   )
 
+  const handleChangeCloneEntity = useCallback(
+    (value: ActionPayload<ActionType.CLONE_ENTITY>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.CLONE_ENTITY>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
   const handleChangeType = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
       modifyAction(idx, {
@@ -621,6 +646,14 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
             availableActions={actions}
             value={getPayload<typeof action.type>(action)}
             onUpdate={(e) => handleChangeLoopAction(e, idx)}
+          />
+        )
+      }
+      case ActionType.CLONE_ENTITY: {
+        return (
+          <CloneEntityAction
+            value={getPartialPayload<ActionType.CLONE_ENTITY>(action)}
+            onUpdate={(e) => handleChangeCloneEntity(e, idx)}
           />
         )
       }
