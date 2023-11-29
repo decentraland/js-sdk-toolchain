@@ -13,7 +13,7 @@ import { Container } from '../../Container'
 import { TextField, CheckboxField, RangeField, Dropdown } from '../../ui'
 import type { Props } from './types'
 import { useArrayState } from '../../../hooks/useArrayState'
-import { DEFAULTS, INPUT_ACTIONS, getDefaultPointerEvent, mapValueToInputAction } from './utils'
+import { DEFAULTS, INPUT_ACTIONS, POINTER_EVENTS_TYPES, getDefaultPointerEvent, mapValueToInputAction, mapValueToPointerEvent } from './utils'
 import { AddButton } from '../AddButton'
 
 type ChangeEvt = React.ChangeEvent<HTMLInputElement>
@@ -27,7 +27,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     PointerEvents
   )
 
-  const [pointerEvents, addPointerEvent, updatePointerEvents] = useArrayState<PBPointerEvents_Entry>(
+  const [pointerEvents, addPointerEvent, updatePointerEvents, removePointerEvent] = useArrayState<PBPointerEvents_Entry>(
     componentValue === null ? [] : componentValue.pointerEvents
   )
 
@@ -36,7 +36,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     setComponentValue({ pointerEvents })
   }, [pointerEvents])
 
-  const handleRemove = useCallback(async () => {
+  const handleRemoveComponent = useCallback(async () => {
     sdk.operations.removeComponent(entityId, PointerEvents)
     await sdk.operations.dispatch()
     const gltfContainer = getComponentValue(entityId, GltfContainer)
@@ -66,12 +66,23 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     addPointerEvent(getDefaultPointerEvent())
   }, [])
 
+  const handleRemove = useCallback((idx: number) => {
+    removePointerEvent(idx)
+  }, [])
+
   if (!hasPointerEvents) return null
 
   return (
-    <Container label="PointerEvents" className={cx('PointerEvents')} onRemoveContainer={handleRemove}>
+    <Container label="PointerEvents" className={cx('PointerEvents')} onRemoveContainer={handleRemoveComponent}>
       {pointerEvents.map(($, idx) => (
         <React.Fragment key={idx}>
+          <Block label="Type">
+            <Dropdown
+              options={POINTER_EVENTS_TYPES}
+              value={$.eventType ?? DEFAULTS.eventType}
+              onChange={(e) => handleStateChange({ eventType: mapValueToPointerEvent(e.target.value) }, idx)}
+            />
+          </Block>
           <Block label="Button">
             <Dropdown
               options={INPUT_ACTIONS}
@@ -98,6 +109,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
               onChange={(e) => handleEventInfoChange({ showFeedback: !!e.target.checked }, idx)}
             />
           </Block>
+          <AddButton onClick={() => handleRemove(idx)}>Remove Pointer Event</AddButton>
         </React.Fragment>
       ))}
       <AddButton onClick={handleAdd}>Add Pointer Event</AddButton>

@@ -1,5 +1,9 @@
 import { InputAction, PBPointerEvents_Entry, PBPointerEvents_Info, PointerEventType } from '@dcl/ecs'
 
+export function mapValueToPointerEvent(value: string): PointerEventType | undefined {
+  return POINTER_EVENTS_TYPES.find(($) => $.value === Number(value))?.value
+}
+
 export function mapValueToInputAction(value: string): InputAction | undefined {
   return INPUT_ACTIONS.find(($) => $.value === Number(value))?.value
 }
@@ -8,7 +12,7 @@ export function getDefaultPointerEvent(
   def?: Partial<PBPointerEvents_Entry>
 ): PBPointerEvents_Entry & { eventInfo: Required<PBPointerEvents_Info> } {
   return {
-    eventType: def?.eventType ?? PointerEventType.PET_UP,
+    eventType: def?.eventType ?? PointerEventType.PET_DOWN,
     eventInfo: {
       button: InputAction.IA_ANY,
       hoverText: 'Interact',

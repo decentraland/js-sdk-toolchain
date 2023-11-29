@@ -51,15 +51,19 @@ BABYLON.SceneLoader.OnPluginActivatedObservable.add(function (plugin) {
 export const putGltfContainerComponent: ComponentOperation = (entity, component) => {
   if (component.componentType === ComponentType.LastWriteWinElementSet) {
     const newValue = component.getOrNull(entity.entityId) as PBGltfContainer | null
-    const currentValue = entity.ecsComponentValues.gltfContainer
-    entity.ecsComponentValues.gltfContainer = newValue || undefined
-
-    const shouldLoadGltf = !!newValue && currentValue?.src !== newValue?.src
-    const shouldRemoveGltf = !newValue || shouldLoadGltf
-
-    if (shouldRemoveGltf) removeGltf(entity)
-    if (shouldLoadGltf) loadGltf(entity, newValue.src)
+    updateGltfForEntity(entity, newValue)
   }
+}
+
+export const updateGltfForEntity = (entity: EcsEntity, newValue: PBGltfContainer | null) => {
+  const currentValue = entity.ecsComponentValues.gltfContainer
+  entity.ecsComponentValues.gltfContainer = newValue || undefined
+
+  const shouldLoadGltf = !!newValue && currentValue?.src !== newValue?.src
+  const shouldRemoveGltf = !newValue || shouldLoadGltf
+
+  if (shouldRemoveGltf) removeGltf(entity)
+  if (shouldLoadGltf) loadGltf(entity, newValue.src)
 }
 
 export function loadGltf(entity: EcsEntity, value: string) {

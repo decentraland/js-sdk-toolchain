@@ -1,9 +1,10 @@
-import { PBRMaterial, Scene, StandardMaterial, Texture } from '@babylonjs/core'
+import { DynamicTexture, PBRMaterial, Scene, StandardMaterial, Texture } from '@babylonjs/core'
 import { PBMaterial, ComponentType, MaterialTransparencyMode, TextureUnion } from '@dcl/ecs'
 
 import type { ComponentOperation } from '../component-operations'
 import { EcsEntity } from '../EcsEntity'
 import { memoize } from '../../../logic/once'
+import { SceneContext } from '../SceneContext'
 
 export const putMaterialComponent: ComponentOperation = (entity, component) => {
   if (component.componentType === ComponentType.LastWriteWinElementSet) {
@@ -33,6 +34,8 @@ export const putMaterialComponent: ComponentOperation = (entity, component) => {
 
     // need to optimize this...
     disposeTextures(entity.material)
+
+    const scene = entity.context.deref()!
 
     if (entity.material instanceof PBRMaterial && newValue?.material?.$case === 'pbr') {
       const { pbr } = newValue.material
@@ -68,10 +71,10 @@ export const putMaterialComponent: ComponentOperation = (entity, component) => {
         m.directIntensity = pbr.directIntensity ?? 1
         m.alphaCutOff = pbr.alphaTest ?? 0.5
 
-        void loadTexture(entity, pbr.texture?.tex).then((texture) => (m.albedoTexture = texture))
-        void loadTexture(entity, pbr.alphaTexture?.tex).then((texture) => (m.opacityTexture = texture))
-        void loadTexture(entity, pbr.bumpTexture?.tex).then((texture) => (m.bumpTexture = texture))
-        void loadTexture(entity, pbr.emissiveTexture?.tex).then((texture) => (m.emissiveTexture = texture))
+        void loadTexture(entity, scene, pbr.texture?.tex).then((texture) => (m.albedoTexture = texture))
+        void loadTexture(entity, scene, pbr.alphaTexture?.tex).then((texture) => (m.opacityTexture = texture))
+        void loadTexture(entity, scene, pbr.bumpTexture?.tex).then((texture) => (m.bumpTexture = texture))
+        void loadTexture(entity, scene, pbr.emissiveTexture?.tex).then((texture) => (m.emissiveTexture = texture))
       })
     } else if (entity.material instanceof StandardMaterial && newValue?.material?.$case === 'unlit') {
       const { unlit } = newValue.material
@@ -79,7 +82,7 @@ export const putMaterialComponent: ComponentOperation = (entity, component) => {
       entity.material.atomicMaterialsUpdate((m) => {
         m.alphaCutOff = unlit.alphaTest ?? 0.5
         unlit.diffuseColor && m.diffuseColor.set(unlit.diffuseColor.r, unlit.diffuseColor.g, unlit.diffuseColor.b) // unlit.albedoColor.a?
-        void loadTexture(entity, unlit.texture?.tex).then((texture) => (m.diffuseTexture = texture))
+        void loadTexture(entity, scene, unlit.texture?.tex).then((texture) => (m.diffuseTexture = texture))
       })
     }
 
@@ -104,7 +107,7 @@ export function setMeshRendererMaterial(entity: EcsEntity) {
   if (mesh) mesh.material = material
 }
 
-async function loadTexture(entity: EcsEntity, tx?: TextureUnion['tex']): Promise<Texture | null> {
+async function loadTexture(entity: EcsEntity, { scene }: SceneContext, tx: TextureUnion['tex']): Promise<Texture | null> {
   if (!tx) return null
   if (tx.$case === 'texture') {
     return entity.context
@@ -116,6 +119,14 @@ async function loadTexture(entity: EcsEntity, tx?: TextureUnion['tex']): Promise
         const textureUrl = URL.createObjectURL(textureBlob)
         return new Texture(textureUrl, entity.getScene(), true, false)
       })
+  }
+
+  if (tx.$case === 'videoTexture') {
+    const name = entity.entityId.toString()
+    const texture = new DynamicTexture(name, { width: 120, height: 120 }, scene)
+    const font = "bold 40px Arial"
+    texture.drawText("Video", null, null, font, "white", "black");
+    return texture
   }
 
   return null
