@@ -92,16 +92,10 @@ describe('Raycast Helper System should', () => {
   it('run callback on raycast result for LocalDirection', async () => {
     const raycastEntity = engine.addEntity()
     const fn = jest.fn()
-    raycastHelperSystem.registerLocalDirectionRaycast(
-      {
-        entity: raycastEntity,
-        opts: {
-          direction: Vector3.Forward(),
-          queryType: RaycastQueryType.RQT_HIT_FIRST
-        }
-      },
-      fn
-    )
+    raycastHelperSystem.registerLocalDirectionRaycast(raycastEntity, fn, {
+      direction: Vector3.Forward(),
+      queryType: RaycastQueryType.RQT_HIT_FIRST
+    })
 
     // Simulate client-side result attachment
     raycastResultComponent.create(raycastEntity, {
@@ -118,16 +112,10 @@ describe('Raycast Helper System should', () => {
   it('run callback on raycast result for GlobalDirection', async () => {
     const raycastEntity = engine.addEntity()
     const fn = jest.fn()
-    raycastHelperSystem.registerGlobalDirectionRaycast(
-      {
-        entity: raycastEntity,
-        opts: {
-          direction: Vector3.Forward(),
-          queryType: RaycastQueryType.RQT_HIT_FIRST
-        }
-      },
-      fn
-    )
+    raycastHelperSystem.registerGlobalDirectionRaycast(raycastEntity, fn, {
+      direction: Vector3.Forward(),
+      queryType: RaycastQueryType.RQT_HIT_FIRST
+    })
 
     // Simulate client-side result attachment
     raycastResultComponent.create(raycastEntity, {
@@ -144,16 +132,10 @@ describe('Raycast Helper System should', () => {
   it('run callback on raycast result for GlobalTarget', async () => {
     const raycastEntity = engine.addEntity()
     const fn = jest.fn()
-    raycastHelperSystem.registerGlobalTargetRaycast(
-      {
-        entity: raycastEntity,
-        opts: {
-          target: Vector3.create(10, 10, 10),
-          queryType: RaycastQueryType.RQT_HIT_FIRST
-        }
-      },
-      fn
-    )
+    raycastHelperSystem.registerGlobalTargetRaycast(raycastEntity, fn, {
+      target: Vector3.create(10, 10, 10),
+      queryType: RaycastQueryType.RQT_HIT_FIRST
+    })
 
     // Simulate client-side result attachment
     raycastResultComponent.create(raycastEntity, {
@@ -172,16 +154,10 @@ describe('Raycast Helper System should', () => {
     const targetEntity = engine.addEntity()
 
     const fn = jest.fn()
-    raycastHelperSystem.registerTargetEntityRaycast(
-      {
-        entity: raycastEntity,
-        opts: {
-          targetEntity: targetEntity,
-          queryType: RaycastQueryType.RQT_HIT_FIRST
-        }
-      },
-      fn
-    )
+    raycastHelperSystem.registerTargetEntityRaycast(raycastEntity, fn, {
+      targetEntity: targetEntity,
+      queryType: RaycastQueryType.RQT_HIT_FIRST
+    })
 
     // Simulate client-side result attachment
     raycastResultComponent.create(raycastEntity, {
@@ -198,30 +174,18 @@ describe('Raycast Helper System should', () => {
   it('remove raycast and raycastResult of non-continuous raycast entity', async () => {
     const continuousRaycastEntity = engine.addEntity()
     const fn = jest.fn()
-    raycastHelperSystem.registerLocalDirectionRaycast(
-      {
-        entity: continuousRaycastEntity,
-        opts: {
-          direction: Vector3.Forward(),
-          queryType: RaycastQueryType.RQT_HIT_FIRST,
-          continuous: true
-        }
-      },
-      fn
-    )
+    raycastHelperSystem.registerLocalDirectionRaycast(continuousRaycastEntity, fn, {
+      direction: Vector3.Forward(),
+      queryType: RaycastQueryType.RQT_HIT_FIRST,
+      continuous: true
+    })
 
     const nonContinuousRaycastEntity = engine.addEntity()
-    raycastHelperSystem.registerLocalDirectionRaycast(
-      {
-        entity: nonContinuousRaycastEntity,
-        opts: {
-          direction: Vector3.Forward(),
-          queryType: RaycastQueryType.RQT_HIT_FIRST,
-          continuous: false
-        }
-      },
-      (_result) => {}
-    )
+    raycastHelperSystem.registerLocalDirectionRaycast(nonContinuousRaycastEntity, (_result) => {}, {
+      direction: Vector3.Forward(),
+      queryType: RaycastQueryType.RQT_HIT_FIRST,
+      continuous: false
+    })
 
     // Simulate client-side result attachment
     raycastResultComponent.create(continuousRaycastEntity, {
@@ -255,17 +219,11 @@ describe('Raycast Helper System should', () => {
     const raycastEntity = engine.addEntity()
 
     const fn = jest.fn()
-    raycastHelperSystem.registerLocalDirectionRaycast(
-      {
-        entity: raycastEntity,
-        opts: {
-          direction: Vector3.Zero(),
-          queryType: RaycastQueryType.RQT_HIT_FIRST,
-          continuous: true
-        }
-      },
-      fn
-    )
+    raycastHelperSystem.registerLocalDirectionRaycast(raycastEntity, fn, {
+      direction: Vector3.Zero(),
+      queryType: RaycastQueryType.RQT_HIT_FIRST,
+      continuous: true
+    })
 
     // Simulate client-side result attachment
     raycastResultComponent.create(raycastEntity, {
@@ -293,17 +251,11 @@ describe('Raycast Helper System should', () => {
     const raycastEntity = engine.addEntity()
 
     const fn = jest.fn()
-    raycastHelperSystem.registerLocalDirectionRaycast(
-      {
-        entity: raycastEntity,
-        opts: {
-          direction: Vector3.Zero(),
-          queryType: RaycastQueryType.RQT_HIT_FIRST,
-          continuous: true
-        }
-      },
-      fn
-    )
+    raycastHelperSystem.registerLocalDirectionRaycast(raycastEntity, fn, {
+      direction: Vector3.Zero(),
+      queryType: RaycastQueryType.RQT_HIT_FIRST,
+      continuous: true
+    })
 
     // Simulate client-side result attachment
     raycastResultComponent.create(raycastEntity, {
@@ -329,16 +281,10 @@ describe('Raycast Helper System should', () => {
 
   it('create default values correctly for LocalDirection', async () => {
     const raycastEntity = engine.addEntity()
-    raycastHelperSystem.registerLocalDirectionRaycast(
-      {
-        entity: raycastEntity,
-        opts: {
-          direction: Vector3.Forward(),
-          queryType: RaycastQueryType.RQT_QUERY_ALL
-        }
-      },
-      (_result) => {}
-    )
+    raycastHelperSystem.registerLocalDirectionRaycast(raycastEntity, (_result) => {}, {
+      direction: Vector3.Forward(),
+      queryType: RaycastQueryType.RQT_QUERY_ALL
+    })
 
     await engine.update(1)
 
@@ -356,7 +302,7 @@ describe('Raycast Helper System should', () => {
 
   it('create default values correctly for LocalDirection without opts', async () => {
     const raycastEntity = engine.addEntity()
-    raycastHelperSystem.registerLocalDirectionRaycast({ entity: raycastEntity }, (_result) => {})
+    raycastHelperSystem.registerLocalDirectionRaycast(raycastEntity, (_result) => {})
 
     await engine.update(1)
 
@@ -374,16 +320,10 @@ describe('Raycast Helper System should', () => {
 
   it('create default values correctly for GlobalDirection', async () => {
     const raycastEntity = engine.addEntity()
-    raycastHelperSystem.registerGlobalDirectionRaycast(
-      {
-        entity: raycastEntity,
-        opts: {
-          direction: Vector3.Forward(),
-          queryType: RaycastQueryType.RQT_QUERY_ALL
-        }
-      },
-      (_result) => {}
-    )
+    raycastHelperSystem.registerGlobalDirectionRaycast(raycastEntity, (_result) => {}, {
+      direction: Vector3.Forward(),
+      queryType: RaycastQueryType.RQT_QUERY_ALL
+    })
 
     await engine.update(1)
 
@@ -401,7 +341,7 @@ describe('Raycast Helper System should', () => {
 
   it('create default values correctly for GlobalDirection without opts', async () => {
     const raycastEntity = engine.addEntity()
-    raycastHelperSystem.registerGlobalDirectionRaycast({ entity: raycastEntity }, (_result) => {})
+    raycastHelperSystem.registerGlobalDirectionRaycast(raycastEntity, (_result) => {})
 
     await engine.update(1)
 
@@ -420,16 +360,10 @@ describe('Raycast Helper System should', () => {
   it('create default values correctly for GlobalTarget', async () => {
     const raycastEntity = engine.addEntity()
     const globalTarget: Vector3 = Vector3.create(15, 8, 6)
-    raycastHelperSystem.registerGlobalTargetRaycast(
-      {
-        entity: raycastEntity,
-        opts: {
-          target: globalTarget,
-          queryType: RaycastQueryType.RQT_QUERY_ALL
-        }
-      },
-      (_result) => {}
-    )
+    raycastHelperSystem.registerGlobalTargetRaycast(raycastEntity, (_result) => {}, {
+      target: globalTarget,
+      queryType: RaycastQueryType.RQT_QUERY_ALL
+    })
 
     await engine.update(1)
 
@@ -447,7 +381,7 @@ describe('Raycast Helper System should', () => {
 
   it('create default values correctly for GlobalTarget without opts', async () => {
     const raycastEntity = engine.addEntity()
-    raycastHelperSystem.registerGlobalTargetRaycast({ entity: raycastEntity }, (_result) => {})
+    raycastHelperSystem.registerGlobalTargetRaycast(raycastEntity, (_result) => {})
 
     await engine.update(1)
 
@@ -466,16 +400,10 @@ describe('Raycast Helper System should', () => {
   it('create default values correctly for TargetEntity', async () => {
     const raycastEntity = engine.addEntity()
     const targetEntity = engine.addEntity()
-    raycastHelperSystem.registerTargetEntityRaycast(
-      {
-        entity: raycastEntity,
-        opts: {
-          targetEntity: targetEntity,
-          queryType: RaycastQueryType.RQT_QUERY_ALL
-        }
-      },
-      (_result) => {}
-    )
+    raycastHelperSystem.registerTargetEntityRaycast(raycastEntity, (_result) => {}, {
+      targetEntity: targetEntity,
+      queryType: RaycastQueryType.RQT_QUERY_ALL
+    })
 
     await engine.update(1)
 
@@ -493,7 +421,7 @@ describe('Raycast Helper System should', () => {
 
   it('create default values correctly for TargetEntity without opts', async () => {
     const raycastEntity = engine.addEntity()
-    raycastHelperSystem.registerTargetEntityRaycast({ entity: raycastEntity }, (_result) => {})
+    raycastHelperSystem.registerTargetEntityRaycast(raycastEntity, (_result) => {})
 
     await engine.update(1)
 
@@ -512,16 +440,10 @@ describe('Raycast Helper System should', () => {
   it('wait until entity has raycastResult to run callback', async () => {
     const raycastEntity = engine.addEntity()
     const fn = jest.fn()
-    raycastHelperSystem.registerLocalDirectionRaycast(
-      {
-        entity: raycastEntity,
-        opts: {
-          direction: Vector3.Forward(),
-          queryType: RaycastQueryType.RQT_HIT_FIRST
-        }
-      },
-      fn
-    )
+    raycastHelperSystem.registerLocalDirectionRaycast(raycastEntity, fn, {
+      direction: Vector3.Forward(),
+      queryType: RaycastQueryType.RQT_HIT_FIRST
+    })
 
     // update without raycastResult attachment
     await engine.update(1)
