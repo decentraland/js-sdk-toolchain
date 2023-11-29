@@ -239,16 +239,16 @@ describe('Raycast Helper System should', () => {
 
     await engine.update(1)
 
-    expect(raycastResultComponent.getOrNull(continuousRaycastEntity)).toBeDefined()
-    expect(raycastComponent.getOrNull(continuousRaycastEntity)).toBeDefined()
+    expect(raycastResultComponent.getOrNull(continuousRaycastEntity)).not.toBeNull()
+    expect(raycastComponent.getOrNull(continuousRaycastEntity)).not.toBeNull()
     expect(raycastResultComponent.getOrNull(nonContinuousRaycastEntity)).toBeNull()
     expect(raycastComponent.getOrNull(nonContinuousRaycastEntity)).toBeNull()
 
     await engine.update(1)
 
     expect(fn).toHaveBeenCalledTimes(2)
-    expect(raycastResultComponent.getOrNull(continuousRaycastEntity)).toBeDefined()
-    expect(raycastComponent.getOrNull(continuousRaycastEntity)).toBeDefined()
+    expect(raycastResultComponent.getOrNull(continuousRaycastEntity)).not.toBeNull()
+    expect(raycastComponent.getOrNull(continuousRaycastEntity)).not.toBeNull()
   })
 
   it('remove raycast entity correctly', async () => {
@@ -544,10 +544,10 @@ describe('Raycast Helper System should', () => {
     const raycastEntity = engine.addEntity()
     raycastHelperSystem.registerGlobalDirectionRaycast({ entity: raycastEntity }, (_result) => {})
 
-    expect(raycastComponent.getOrNull(raycastEntity)).toBeUndefined()
+    expect(raycastComponent.getOrNull(raycastEntity)).toBeNull()
 
     await engine.update(1)
 
-    expect(raycastComponent.getOrNull(raycastEntity)).toBeDefined()
+    expect(raycastComponent.getOrNull(raycastEntity)).not.toBeNull()
   })
 })
