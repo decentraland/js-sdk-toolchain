@@ -63,6 +63,24 @@ export function getDefaultPayload(type: string) {
         textAlign: TextAlignMode.TAM_MIDDLE_CENTER
       })
     }
+    case ActionType.START_DELAY: {
+      return getJson<ActionType.START_DELAY>({
+        actions: [],
+        timeout: 5
+      })
+    }
+    case ActionType.START_LOOP: {
+      return getJson<ActionType.START_LOOP>({
+        actions: [],
+        interval: 5
+      })
+    }
+    case ActionType.STOP_DELAY:
+    case ActionType.STOP_LOOP: {
+      return getJson<typeof type>({
+        action: ''
+      })
+    }
     default: {
       return '{}'
     }
