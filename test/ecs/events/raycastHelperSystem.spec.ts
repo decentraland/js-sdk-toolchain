@@ -115,6 +115,26 @@ describe('Raycast Helper System should', () => {
     expect(fn).toHaveBeenCalled()
   })
 
+  it('run callback on raycast result for LocalDirection (deprecated symbol)', async () => {
+    const raycastEntity = engine.addEntity()
+    const fn = jest.fn()
+    raycastHelperSystem.registerLocalDirectionRaycast(raycastEntity, fn, {
+      direction: Vector3.Forward(),
+      queryType: RaycastQueryType.RQT_HIT_FIRST
+    })
+
+    // Simulate client-side result attachment
+    raycastResultComponent.create(raycastEntity, {
+      hits: [],
+      direction: Vector3.Zero(),
+      globalOrigin: Vector3.Zero(),
+      tickNumber: 0
+    })
+
+    await engine.update(1)
+    expect(fn).toHaveBeenCalled()
+  })
+
   it('run callback on raycast result for GlobalDirection', async () => {
     const raycastEntity = engine.addEntity()
     const fn = jest.fn()
@@ -128,6 +148,26 @@ describe('Raycast Helper System should', () => {
       },
       fn
     )
+
+    // Simulate client-side result attachment
+    raycastResultComponent.create(raycastEntity, {
+      hits: [],
+      direction: Vector3.Zero(),
+      globalOrigin: Vector3.Zero(),
+      tickNumber: 0
+    })
+
+    await engine.update(1)
+    expect(fn).toHaveBeenCalled()
+  })
+
+  it('run callback on raycast result for GlobalDirection (deprecated symbol)', async () => {
+    const raycastEntity = engine.addEntity()
+    const fn = jest.fn()
+    raycastHelperSystem.registerGlobalDirectionRaycast(raycastEntity, fn, {
+      direction: Vector3.Forward(),
+      queryType: RaycastQueryType.RQT_HIT_FIRST
+    })
 
     // Simulate client-side result attachment
     raycastResultComponent.create(raycastEntity, {
@@ -167,6 +207,26 @@ describe('Raycast Helper System should', () => {
     expect(fn).toHaveBeenCalled()
   })
 
+  it('run callback on raycast result for GlobalTarget (deprecated symbol)', async () => {
+    const raycastEntity = engine.addEntity()
+    const fn = jest.fn()
+    raycastHelperSystem.registerGlobalTargetRaycast(raycastEntity, fn, {
+      target: Vector3.create(10, 10, 10),
+      queryType: RaycastQueryType.RQT_HIT_FIRST
+    })
+
+    // Simulate client-side result attachment
+    raycastResultComponent.create(raycastEntity, {
+      hits: [],
+      direction: Vector3.Zero(),
+      globalOrigin: Vector3.Zero(),
+      tickNumber: 0
+    })
+
+    await engine.update(1)
+    expect(fn).toHaveBeenCalled()
+  })
+
   it('run callback on raycast result for TargetEntity', async () => {
     const raycastEntity = engine.addEntity()
     const targetEntity = engine.addEntity()
@@ -182,6 +242,28 @@ describe('Raycast Helper System should', () => {
       },
       fn
     )
+
+    // Simulate client-side result attachment
+    raycastResultComponent.create(raycastEntity, {
+      hits: [],
+      direction: Vector3.Zero(),
+      globalOrigin: Vector3.Zero(),
+      tickNumber: 0
+    })
+
+    await engine.update(1)
+    expect(fn).toHaveBeenCalled()
+  })
+
+  it('run callback on raycast result for TargetEntity (deprecated symbol)', async () => {
+    const raycastEntity = engine.addEntity()
+    const targetEntity = engine.addEntity()
+
+    const fn = jest.fn()
+    raycastHelperSystem.registerTargetEntityRaycast(raycastEntity, fn, {
+      targetEntity: targetEntity,
+      queryType: RaycastQueryType.RQT_HIT_FIRST
+    })
 
     // Simulate client-side result attachment
     raycastResultComponent.create(raycastEntity, {
