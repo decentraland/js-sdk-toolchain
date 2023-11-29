@@ -26,10 +26,10 @@
 }
 
 .Button.danger {
-  background-color: var(--primary);
+  background-color: var(--primary-main);
 }
 
 .Button.danger:hover,
 .Button.danger.active {
-  background-color: var(--primary-darker);
+  background-color: var(--primary-main-darker);
 }

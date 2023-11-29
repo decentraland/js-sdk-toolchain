@@ -1,8 +1,3 @@
-.TriggerInspector:is(.open) > .title {
-  border-bottom: 1px solid var(--border-gray);
-  padding-bottom: 12px;
-}
-
 .TriggerInspector > .content {
   display: flex;
   flex-direction: column;
@@ -12,8 +7,4 @@
   display: flex;
   flex-direction: column;
   align-items: normal;
-}
-
-.TriggerInspector .content .Block .content .DropdownContainer {
-  flex: 1;
 }

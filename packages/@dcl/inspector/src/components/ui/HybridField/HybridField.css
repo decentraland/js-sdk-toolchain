@@ -1,0 +1,16 @@
+.Hybrid.Field > .InputContainer:has(.Text.Field .ErrorMessage) {
+  align-items: flex-start;
+}
+
+.Hybrid.Field {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.Hybrid.Field .InputContainer {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  gap: 4px;
+}

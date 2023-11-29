@@ -1,0 +1,28 @@
+.ColorPickerContainer {
+  display: flex;
+  position: relative;
+  flex-grow: 1;
+  gap: 0;
+}
+
+.ColorPickerContainer > .ColorPickerInput {
+  visibility: hidden;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  height: 0;
+  width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.ColorPickerContainer > .ColorPickerTextField > .ColorPreview {
+  height: 14px;
+  width: 14px;
+  border-radius: 50%;
+}
+
+.Dropdown > .DropdownOptions > .OptionContainer.selected > .OptionContent > .LeftContent > .ColorPreview {
+  border: 0.5px solid var(--base-14);
+}

@@ -1,17 +1,14 @@
 .StatesInspector.Container {
   height: auto;
 }
-.StatesInspector:is(.open)>.title {
-  border-bottom: 1px solid var(--border-gray);
-  padding-bottom: 12px;
-}
+
 .StatesInspector .states-list .content {
   flex-direction: column;
   align-items: normal;
 }
 
-.StatesInspector .states-list .content .TextField {
-  width: 100%
+.StatesInspector .states-list .content .Text.Field {
+  width: 100%;
 }
 
 .StatesInspector .states-list .content .row {
@@ -19,6 +16,6 @@
   align-items: center;
 }
 
-.StatesInspector .states-list .content .row+.row {
+.StatesInspector .states-list .content .row + .row {
   margin-top: 4px;
 }

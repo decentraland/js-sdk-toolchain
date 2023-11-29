@@ -1,4 +1,5 @@
 import React from 'react'
+import cx from 'classnames'
 import './Box.css'
 
 interface Props {
@@ -7,7 +8,7 @@ interface Props {
 
 function Box({ children, className }: React.PropsWithChildren<Props>) {
   return (
-    <div className={`Box with-border ${className ?? ''}`}>
+    <div className={cx('Box', className)}>
       <div className="content">{children}</div>
     </div>
   )
