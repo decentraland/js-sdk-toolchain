@@ -16,4 +16,4 @@ For faster development experience, we are faking the file-system for the data-la
 
 ## Build
 
-The `make build` in the repo root builds all the necessary for package publishment. 
+The `make build` in the repo root builds all the necessary for package publishment.
