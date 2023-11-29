@@ -340,6 +340,8 @@ describe('Raycast Helper System should', () => {
       (_result) => {}
     )
 
+    await engine.update(1)
+
     const attachedRaycast = raycastComponent.get(raycastEntity)
     expect(attachedRaycast.continuous).toBe(false)
     expect(attachedRaycast.direction).toEqual({
@@ -355,6 +357,8 @@ describe('Raycast Helper System should', () => {
   it('create default values correctly for LocalDirection without opts', async () => {
     const raycastEntity = engine.addEntity()
     raycastHelperSystem.registerLocalDirectionRaycast({ entity: raycastEntity }, (_result) => {})
+
+    await engine.update(1)
 
     const attachedRaycast = raycastComponent.get(raycastEntity)
     expect(attachedRaycast.continuous).toBe(false)
@@ -381,6 +385,8 @@ describe('Raycast Helper System should', () => {
       (_result) => {}
     )
 
+    await engine.update(1)
+
     const attachedRaycast = raycastComponent.get(raycastEntity)
     expect(attachedRaycast.continuous).toBe(false)
     expect(attachedRaycast.direction).toEqual({
@@ -396,6 +402,8 @@ describe('Raycast Helper System should', () => {
   it('create default values correctly for GlobalDirection without opts', async () => {
     const raycastEntity = engine.addEntity()
     raycastHelperSystem.registerGlobalDirectionRaycast({ entity: raycastEntity }, (_result) => {})
+
+    await engine.update(1)
 
     const attachedRaycast = raycastComponent.get(raycastEntity)
     expect(attachedRaycast.continuous).toBe(false)
@@ -423,6 +431,8 @@ describe('Raycast Helper System should', () => {
       (_result) => {}
     )
 
+    await engine.update(1)
+
     const attachedRaycast = raycastComponent.get(raycastEntity)
     expect(attachedRaycast.continuous).toBe(false)
     expect(attachedRaycast.direction).toEqual({
@@ -438,6 +448,8 @@ describe('Raycast Helper System should', () => {
   it('create default values correctly for GlobalTarget without opts', async () => {
     const raycastEntity = engine.addEntity()
     raycastHelperSystem.registerGlobalTargetRaycast({ entity: raycastEntity }, (_result) => {})
+
+    await engine.update(1)
 
     const attachedRaycast = raycastComponent.get(raycastEntity)
     expect(attachedRaycast.continuous).toBe(false)
@@ -465,6 +477,8 @@ describe('Raycast Helper System should', () => {
       (_result) => {}
     )
 
+    await engine.update(1)
+
     const attachedRaycast = raycastComponent.get(raycastEntity)
     expect(attachedRaycast.continuous).toBe(false)
     expect(attachedRaycast.direction).toEqual({
@@ -480,6 +494,8 @@ describe('Raycast Helper System should', () => {
   it('create default values correctly for TargetEntity without opts', async () => {
     const raycastEntity = engine.addEntity()
     raycastHelperSystem.registerTargetEntityRaycast({ entity: raycastEntity }, (_result) => {})
+
+    await engine.update(1)
 
     const attachedRaycast = raycastComponent.get(raycastEntity)
     expect(attachedRaycast.continuous).toBe(false)
