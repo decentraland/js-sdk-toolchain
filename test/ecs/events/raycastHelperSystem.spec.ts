@@ -333,8 +333,8 @@ describe('Raycast Helper System should', () => {
       {
         entity: raycastEntity,
         opts: {
-            direction: Vector3.Forward(),
-            queryType: RaycastQueryType.RQT_QUERY_ALL
+          direction: Vector3.Forward(),
+          queryType: RaycastQueryType.RQT_QUERY_ALL
         }
       },
       (_result) => {}
@@ -525,6 +525,7 @@ describe('Raycast Helper System should', () => {
 
     // update without raycastResult attachment
     await engine.update(1)
+    await engine.update(1)
     expect(fn).toHaveBeenCalledTimes(0)
 
     // Simulate client-side result attachment
@@ -537,5 +538,16 @@ describe('Raycast Helper System should', () => {
 
     await engine.update(1)
     expect(fn).toHaveBeenCalled()
+  })
+
+  it('attach raycast component after 1 frame', async () => {
+    const raycastEntity = engine.addEntity()
+    raycastHelperSystem.registerGlobalDirectionRaycast({ entity: raycastEntity }, (_result) => {})
+
+    expect(raycastComponent.getOrNull(raycastEntity)).toBeUndefined()
+
+    await engine.update(1)
+
+    expect(raycastComponent.getOrNull(raycastEntity)).toBeDefined()
   })
 })
