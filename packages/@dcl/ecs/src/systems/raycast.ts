@@ -240,11 +240,14 @@ export function createRaycastSystem(engine: IEngine): RaycastSystem {
     }
   })
 
+  const nextTickRaycasts: (() => void)[] = []
   function registerRaycastWithCallback(
     entity: Entity,
     raycastValue: RaycastSystemOptions,
     callback: RaycastSystemCallback
   ) {
+    // Raycasts registration is delayed 1 frame to avoid same-frame raycast
+    // removal/adding (the client never receives the removal on those situations)
     const onNextTick = () => {
       const raycast = Raycast.createOrReplace(entity)
       raycast.maxDistance = raycastValue.maxDistance
@@ -264,8 +267,6 @@ export function createRaycastSystem(engine: IEngine): RaycastSystem {
     RaycastResult.deleteFrom(entity)
     entitiesCallbackResultMap.delete(entity)
   }
-
-  const nextTickRaycasts: (() => void)[] = []
 
   // @internal
   engine.addSystem(function EventSystem() {
