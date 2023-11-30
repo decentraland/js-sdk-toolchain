@@ -69,5 +69,5 @@
     "start": "npm run copy-bin && node ./build.js --watch"
   },
   "types": "dist/tooling-entrypoint.d.ts",
-  "typings": "dist/tooling-entrypoint.d.ts",
+  "typings": "dist/tooling-entrypoint.d.ts"
 }
