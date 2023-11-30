@@ -5,7 +5,7 @@ import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 import { TextField } from '../../../ui'
 import type { Props } from './types'
 
-import './MovePlayerAction.css'
+import './CloneEntityAction.css'
 
 function isNumeric(value?: number) {
   return value !== undefined && !isNaN(value)
@@ -31,7 +31,7 @@ function isValid(
   return false
 }
 
-const MovePlayerAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
+const CloneEntityAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
   const [payload, setPayload] = useState<Partial<ActionPayload<ActionType.MOVE_PLAYER>>>({
     ...value
   })
@@ -84,7 +84,7 @@ const MovePlayerAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
   )
 
   return (
-    <div className="MovePlayerActionContainer">
+    <div className="CloneEntityActionContainer">
       <div className="row">
         <TextField
           label="X"
@@ -109,4 +109,4 @@ const MovePlayerAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
   )
 }
 
-export default React.memo(MovePlayerAction)
+export default React.memo(CloneEntityAction)

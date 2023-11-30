@@ -20,7 +20,8 @@ const TriggerMapOption: Record<string, string> = {
   [TriggerType.ON_PLAYER_ENTERS_AREA]: 'Player Enters Area',
   [TriggerType.ON_PLAYER_LEAVES_AREA]: 'Player Leaves Area',
   [TriggerType.ON_DELAY]: 'On Delay',
-  [TriggerType.ON_LOOP]: 'On Loop'
+  [TriggerType.ON_LOOP]: 'On Loop',
+  [TriggerType.ON_CLONE]: 'On Clone'
 }
 
 export const TriggerEvent = ({
