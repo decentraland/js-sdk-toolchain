@@ -7,7 +7,8 @@ import {
   CrdtMessageType,
   SyncComponents as _SyncComponents,
   NetworkEntity as _NetworkEntity,
-  engine
+  engine,
+  NetworkParent as _NetworkParent
 } from '@dcl/ecs'
 
 export function syncFilter(message: Omit<TransportMessage, 'messageBuffer'>) {
@@ -44,6 +45,11 @@ export function syncFilter(message: Omit<TransportMessage, 'messageBuffer'>) {
 
   if (componentId === NetworkEntity.componentId) {
     return false
+  }
+
+  // If there is a change in the network parent or syncComponents we should always sync
+  if (componentId === _NetworkParent.componentId || componentId === SyncComponents.componentId) {
+    return true
   }
 
   if (componentId && sync.componentIds.includes(componentId)) {
