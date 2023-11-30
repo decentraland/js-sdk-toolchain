@@ -43,11 +43,12 @@ const CloneEntityAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
 
   const handleChangePositionX = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
+      if (!value) return
       setPayload({
         ...payload,
         position: {
           ...(payload.position as Vector3),
-          x: parseInt(value)
+          x: parseFloat(value)
         }
       })
     },
@@ -56,11 +57,12 @@ const CloneEntityAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
 
   const handleChangePositionY = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
+      if (!value) return
       setPayload({
         ...payload,
         position: {
           ...(payload.position as Vector3),
-          y: parseInt(value)
+          y: parseFloat(value)
         }
       })
     },
@@ -69,11 +71,12 @@ const CloneEntityAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
 
   const handleChangePositionZ = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
+      if (!value) return
       setPayload({
         ...payload,
         position: {
           ...(payload.position as Vector3),
-          z: parseInt(value)
+          z: parseFloat(value)
         }
       })
     },
