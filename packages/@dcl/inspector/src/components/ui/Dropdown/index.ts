@@ -1,2 +1,3 @@
 import Dropdown from './Dropdown'
-export { Dropdown }
+import { DropdownChangeEvent } from './types'
+export { Dropdown, DropdownChangeEvent }
