@@ -18,7 +18,7 @@ describe('InputUtils', () => {
     it('returns default pointer event', () => {
       const result = getDefaultPointerEvent()
       const expected = {
-        eventType: PointerEventType.PET_UP,
+        eventType: PointerEventType.PET_DOWN,
         eventInfo: {
           button: InputAction.IA_ANY,
           hoverText: 'Interact',
@@ -63,7 +63,7 @@ describe('InputUtils', () => {
 
     it('DEFAULTS has correct values', () => {
       const expected = {
-        eventType: PointerEventType.PET_UP,
+        eventType: PointerEventType.PET_DOWN,
         eventInfo: {
           button: InputAction.IA_ANY,
           hoverText: 'Interact',

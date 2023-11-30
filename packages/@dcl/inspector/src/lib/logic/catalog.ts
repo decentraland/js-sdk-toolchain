@@ -1,6 +1,5 @@
 import { ComponentName } from '@dcl/asset-packs'
 import * as _catalog from '@dcl/asset-packs/catalog.json'
-import { CoreComponents } from '../sdk/components'
 import { getConfig } from './config'
 
 export const catalog = _catalog.assetPacks as unknown as AssetPack[]

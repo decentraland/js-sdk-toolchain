@@ -12,18 +12,30 @@ import { useSdk } from '../../../hooks/sdk/useSdk'
 import { analytics, Event } from '../../../lib/logic/analytics'
 import { getAssetByModel } from '../../../lib/logic/catalog'
 
+const DISABLED_COMPONENTS = [
+  CoreComponents.ANIMATOR,
+  CoreComponents.AUDIO_STREAM,
+  CoreComponents.NFT_SHAPE,
+  CoreComponents.VIDEO_PLAYER
+]
+
+const SMART_ITEM_COMPONENTS = [
+  ComponentName.STATES,
+  ComponentName.ACTIONS,
+  ComponentName.TRIGGERS,
+  ComponentName.COUNTER
+]
+
 const getEnabledComponents = () => {
   const components: Set<string> = new Set(Object.values(CoreComponents))
-
   const config = getConfig()
 
+  for (const component of DISABLED_COMPONENTS) {
+    components.delete(component)
+  }
+
   if (!config.disableSmartItems) {
-    for (const component of [
-      ComponentName.STATES,
-      ComponentName.ACTIONS,
-      ComponentName.TRIGGERS,
-      ComponentName.COUNTER
-    ]) {
+    for (const component of SMART_ITEM_COMPONENTS) {
       components.add(component)
     }
   }

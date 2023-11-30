@@ -71,7 +71,7 @@ describe('NumberUtils', () => {
       const result = await initializeAnimatorComponent(sdk as any as SdkContextValue, entity, animations)
 
       expect(result).toEqual({
-        states: [{ clip: 'animation', playing: false, weight: 1, speed: 1, loop: true, shouldReset: false }]
+        states: [{ clip: 'animation', playing: false, weight: 1, speed: 1, loop: false, shouldReset: false }]
       })
       expect(sdk.operations.addComponent).toHaveBeenCalledWith(entity, Animator.componentId)
       expect(sdk.operations.updateValue).toHaveBeenCalledWith(Animator, entity, result)

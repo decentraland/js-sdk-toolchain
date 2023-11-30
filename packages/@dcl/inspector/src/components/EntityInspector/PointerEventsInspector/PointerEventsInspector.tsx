@@ -13,7 +13,14 @@ import { Container } from '../../Container'
 import { TextField, CheckboxField, RangeField, Dropdown } from '../../ui'
 import type { Props } from './types'
 import { useArrayState } from '../../../hooks/useArrayState'
-import { DEFAULTS, INPUT_ACTIONS, POINTER_EVENTS_TYPES, getDefaultPointerEvent, mapValueToInputAction, mapValueToPointerEvent } from './utils'
+import {
+  DEFAULTS,
+  INPUT_ACTIONS,
+  POINTER_EVENTS_TYPES,
+  getDefaultPointerEvent,
+  mapValueToInputAction,
+  mapValueToPointerEvent
+} from './utils'
 import { AddButton } from '../AddButton'
 
 type ChangeEvt = React.ChangeEvent<HTMLInputElement>
@@ -27,9 +34,8 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     PointerEvents
   )
 
-  const [pointerEvents, addPointerEvent, updatePointerEvents, removePointerEvent] = useArrayState<PBPointerEvents_Entry>(
-    componentValue === null ? [] : componentValue.pointerEvents
-  )
+  const [pointerEvents, addPointerEvent, updatePointerEvents, removePointerEvent] =
+    useArrayState<PBPointerEvents_Entry>(componentValue === null ? [] : componentValue.pointerEvents)
 
   useEffect(() => {
     if (isComponentEqual({ pointerEvents })) return
