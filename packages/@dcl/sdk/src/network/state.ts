@@ -17,10 +17,20 @@ export function engineToCrdt(engine: IEngine): Uint8Array {
   const networkBuffer = new ReadWriteByteBuffer()
   const SyncComponents = engine.getComponent(_SyncComponents.componentId) as ISyncComponents
   const NetworkEntity = engine.getComponent(_NetworkEntity.componentId) as INetowrkEntity
-  const syncEntities = new Set(Array.from(engine.getEntitiesWith(SyncComponents)).map(($) => $[0]))
 
   for (const itComponentDefinition of engine.componentsIter()) {
-    itComponentDefinition.dumpCrdtStateToBuffer(crdtBuffer, (entity) => syncEntities.has(entity))
+    itComponentDefinition.dumpCrdtStateToBuffer(crdtBuffer, (entity) => {
+      const isNetworkEntity = NetworkEntity.has(entity)
+      if (!isNetworkEntity) {
+        return false
+      }
+      const isDynamicEntity = NetworkEntity.get(entity).networkId
+      if (isDynamicEntity) {
+        return true
+      }
+      // For the static entities we only send the updates of the SyncComponents
+      return SyncComponents.get(entity).componentIds.includes(itComponentDefinition.componentId)
+    })
   }
 
   let header: CrdtMessageHeader | null
