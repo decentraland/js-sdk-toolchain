@@ -43,7 +43,7 @@ export const EXTENSIONS = [
   '.mp3',
   '.ogg',
   '.wav',
-  'mp4'
+  '.mp4'
 ]
 
 export function withAssetDir(filePath: string = '') {

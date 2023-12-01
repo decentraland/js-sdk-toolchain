@@ -8,6 +8,8 @@ import { AssetNodeItem } from '../../ProjectAssetExplorer/types'
 import { VideoPlayerInput } from './types'
 import { isValidHttpsUrl } from '../../../lib/utils/url'
 
+const getPath = (base: string, src: string) => (base ? base + '/' + src : src)
+
 export const fromVideoPlayer =
   (base: string) =>
   (value: PBVideoPlayer): VideoPlayerInput => {
@@ -23,7 +25,7 @@ export const toVideoPlayer =
   (base: string) =>
   (value: VideoPlayerInput): PBVideoPlayer => {
     return {
-      src: base ? base + '/' + value.src : value.src,
+      src: isValidHttpsUrl(value.src) ? value.src : getPath(base, value.src),
       loop: value.loop,
       playing: value.playing,
       volume: volumeToVideoPlayer(value.volume)
