@@ -51,15 +51,19 @@ BABYLON.SceneLoader.OnPluginActivatedObservable.add(function (plugin) {
 export const putGltfContainerComponent: ComponentOperation = (entity, component) => {
   if (component.componentType === ComponentType.LastWriteWinElementSet) {
     const newValue = component.getOrNull(entity.entityId) as PBGltfContainer | null
-    const currentValue = entity.ecsComponentValues.gltfContainer
-    entity.ecsComponentValues.gltfContainer = newValue || undefined
-
-    const shouldLoadGltf = !!newValue && currentValue?.src !== newValue?.src
-    const shouldRemoveGltf = !newValue || shouldLoadGltf
-
-    if (shouldRemoveGltf) removeGltf(entity)
-    if (shouldLoadGltf) loadGltf(entity, newValue.src)
+    updateGltfForEntity(entity, newValue)
   }
+}
+
+export const updateGltfForEntity = (entity: EcsEntity, newValue: PBGltfContainer | null) => {
+  const currentValue = entity.ecsComponentValues.gltfContainer
+  entity.ecsComponentValues.gltfContainer = newValue || undefined
+
+  const shouldLoadGltf = !!newValue && currentValue?.src !== newValue?.src
+  const shouldRemoveGltf = !newValue || shouldLoadGltf
+
+  if (shouldRemoveGltf) removeGltf(entity)
+  if (shouldLoadGltf) loadGltf(entity, newValue.src)
 }
 
 export function loadGltf(entity: EcsEntity, value: string) {
@@ -85,6 +89,10 @@ export function removeGltf(entity: EcsEntity) {
     entity.gltfContainer.parent = null
     entity.gltfContainer.dispose(false, true)
     delete entity.gltfContainer
+  }
+
+  if (entity.gltfAssetContainer) {
+    cleanupAssetContainer(context.scene, entity.gltfAssetContainer)
   }
 }
 
@@ -145,12 +153,6 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
     (_scene, _message, _exception) => {
       console.error('Error while calling LoadAssetContainer: ', _message, _exception)
       entity.resolveGltfPathLoading(filePath)
-      // debugger
-      // const animator: Animator = entity.getBehaviorByName('animator') as Animator
-
-      // if (animator) {
-      //   animator.transformValue(animator.value!)
-      // }
     },
     extension
   )

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import cx from 'classnames'
 
-import { ErrorMessage } from '../ErrorMessage'
+import { Message, MessageType } from '../Message'
 import { Label } from '../Label'
 
 import { Props } from './types'
@@ -129,7 +129,7 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
         />
         {renderRightContent()}
       </div>
-      <ErrorMessage error={error} />
+      <Message text={error} type={MessageType.ERROR} />
     </div>
   )
 })

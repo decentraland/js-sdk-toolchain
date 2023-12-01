@@ -35,5 +35,5 @@ export function useArrayState<T>(initialArray: T[] = []) {
     [setArray]
   )
 
-  return [array, addItem, modifyItem, removeItem] as const
+  return [array, addItem, modifyItem, removeItem, setArray] as const
 }

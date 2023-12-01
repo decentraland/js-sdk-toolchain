@@ -4,7 +4,7 @@ import { VscChevronDown as DownArrowIcon } from 'react-icons/vsc'
 import { useOutsideClick } from '../../../hooks/useOutsideClick'
 import { useContainerSize } from '../../../hooks/useContainerSize'
 import { Label } from '../Label'
-import { ErrorMessage } from '../ErrorMessage'
+import { Message, MessageType } from '../Message'
 import { Option } from './Option'
 import { OptionList } from './OptionList'
 import { SelectedOption } from './SelectedOption'
@@ -19,6 +19,7 @@ const Dropdown: React.FC<Props> = (props) => {
     disabled,
     empty,
     error,
+    info,
     label,
     options,
     searchable,
@@ -102,6 +103,16 @@ const Dropdown: React.FC<Props> = (props) => {
     }
   }, [options, empty, containerSize])
 
+  const renderMessage = useCallback(() => {
+    if (error) {
+      return <Message text={error} type={MessageType.ERROR} />
+    } else if (info) {
+      return <Message text={info} type={MessageType.INFO} icon={false} />
+    }
+
+    return null
+  }, [error, info])
+
   return (
     <div className="Dropdown Field" ref={ref}>
       <Label text={label} />
@@ -137,7 +148,7 @@ const Dropdown: React.FC<Props> = (props) => {
           <DownArrowIcon size={ICON_SIZE} />
         </div>
       </div>
-      <ErrorMessage error={error} />
+      {renderMessage()}
     </div>
   )
 }

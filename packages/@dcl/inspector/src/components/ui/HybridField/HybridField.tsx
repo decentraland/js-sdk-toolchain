@@ -3,7 +3,7 @@ import cx from 'classnames'
 
 import { Dropdown } from '../Dropdown'
 import { TextField } from '../TextField'
-import { ErrorMessage } from '../ErrorMessage'
+import { Message, MessageType } from '../Message'
 import { ColorPicker } from '../ColorPicker'
 import { Label } from '../Label'
 import type { Props as TextFieldProps } from '../TextField/types'
@@ -109,7 +109,7 @@ const HybridField: React.FC<Props> = ({
           />
         )}
       </div>
-      <ErrorMessage error={error ?? secondaryError} />
+      <Message text={error ?? secondaryError} type={MessageType.ERROR} />
     </div>
   )
 }

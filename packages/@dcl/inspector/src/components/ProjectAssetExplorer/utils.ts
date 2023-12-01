@@ -27,6 +27,8 @@ export function buildAssetTree(paths: string[]): AssetNodeFolder {
               ? 'gltf'
               : lowerPath.endsWith('.mp3') || lowerPath.endsWith('.ogg') || lowerPath.endsWith('.wav')
               ? 'audio'
+              : lowerPath.endsWith('.mp4')
+              ? 'video'
               : 'unknown'
           childNode = {
             name: parts[i],

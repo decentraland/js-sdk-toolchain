@@ -36,6 +36,8 @@ import { TweenAction } from './TweenAction'
 import { isValidTween } from './TweenAction/utils'
 import { PlayAnimationAction } from './PlayAnimationAction'
 import { SetVisibilityAction } from './SetVisibilityAction'
+import { PlayVideoStreamAction } from './PlayVideoStreamAction'
+import { PlayAudioStreamAction } from './PlayAudioStreamAction'
 import { TeleportPlayerAction } from './TeleportPlayerAction'
 import { MovePlayerAction } from './MovePlayerAction'
 import { PlayDefaultEmoteAction } from './PlayDefaultEmoteAction'
@@ -486,6 +488,26 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     [setIsFocused]
   )
 
+  const handleChangeVideo = useCallback(
+    (value: ActionPayload<ActionType.PLAY_VIDEO_STREAM>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.PLAY_VIDEO_STREAM>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangeAudio = useCallback(
+    (value: ActionPayload<ActionType.PLAY_AUDIO_STREAM>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.PLAY_AUDIO_STREAM>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
   const handleRemoveAction = useCallback(
     (_e: React.MouseEvent, idx: number) => {
       removeAction(idx)
@@ -618,6 +640,22 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
           <OpenLinkAction
             value={getPartialPayload<ActionType.OPEN_LINK>(action)}
             onUpdate={(e) => handleChangeOpenLink(e, idx)}
+          />
+        )
+      }
+      case ActionType.PLAY_VIDEO_STREAM: {
+        return (
+          <PlayVideoStreamAction
+            value={getPartialPayload<ActionType.PLAY_VIDEO_STREAM>(action)}
+            onUpdate={(value: ActionPayload<ActionType.PLAY_VIDEO_STREAM>) => handleChangeVideo(value, idx)}
+          />
+        )
+      }
+      case ActionType.PLAY_AUDIO_STREAM: {
+        return (
+          <PlayAudioStreamAction
+            value={getPartialPayload<ActionType.PLAY_AUDIO_STREAM>(action)}
+            onUpdate={(value: ActionPayload<ActionType.PLAY_AUDIO_STREAM>) => handleChangeAudio(value, idx)}
           />
         )
       }
