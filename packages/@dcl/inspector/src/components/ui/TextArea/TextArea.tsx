@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import cx from 'classnames'
 
 import { InfoTooltip } from '../InfoTooltip'
-import { ErrorMessage } from '../ErrorMessage'
+import { Message, MessageType } from '../Message'
 
 import { Props } from './types'
 
@@ -90,7 +90,7 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
       >
         {inputValue}
       </textarea>
-      <ErrorMessage error={error} />
+      <Message text={error} type={MessageType.ERROR} />
     </div>
   )
 })

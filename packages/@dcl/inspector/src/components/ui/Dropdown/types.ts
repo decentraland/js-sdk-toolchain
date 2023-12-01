@@ -16,6 +16,7 @@ export type Props = React.SelectHTMLAttributes<HTMLSelectElement> & {
   value?: string | number | readonly string[] | any[]
   searchable?: boolean
   error?: string | boolean
+  info?: React.ReactNode
   multiple?: boolean
   clearable?: boolean
 }

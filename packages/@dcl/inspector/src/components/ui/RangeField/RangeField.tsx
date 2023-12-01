@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import cx from 'classnames'
 
 import { TextField } from '../TextField'
-import { ErrorMessage } from '../ErrorMessage'
+import { Message, MessageType } from '../Message'
 import { Label } from '../Label'
 
 import { Props } from './types'
@@ -140,7 +140,7 @@ const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
           onBlur={handleOnBlur}
         />
       </div>
-      <ErrorMessage error={errorMessage} />
+      <Message text={errorMessage} type={MessageType.ERROR} />
     </div>
   )
 })

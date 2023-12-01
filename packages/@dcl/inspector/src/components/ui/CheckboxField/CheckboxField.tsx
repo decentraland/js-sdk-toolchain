@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import cx from 'classnames'
-import { ErrorMessage } from '../ErrorMessage'
+import { Message, MessageType } from '../Message'
 import { Label } from '../Label'
 import { Props } from './types'
 
@@ -36,7 +36,7 @@ const CheckboxField = React.forwardRef<HTMLInputElement, Props>((props, ref) => 
         />
         <Label text={label} />
       </div>
-      <ErrorMessage error={error} />
+      <Message text={error} type={MessageType.ERROR} />
     </div>
   )
 })
