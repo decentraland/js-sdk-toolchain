@@ -4,7 +4,7 @@ import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 import { useAppSelector } from '../../../../redux/hooks'
 import { selectAssetCatalog } from '../../../../redux/app'
 import { Block } from '../../../Block'
-import { Dropdown, FileUploadField, RangeField, TextArea, TextField } from '../../../ui'
+import { Dropdown, FileUploadField, InfoTooltip, RangeField, TextArea, TextField } from '../../../ui'
 import { ACCEPTED_FILE_TYPES } from '../../../ui/FileUploadField/types'
 import { TEXT_ALIGN_MODES as ALIGN_MODES } from '../../TextShapeInspector/utils'
 import { isModel } from '../../MaterialInspector/Texture/utils'
@@ -114,10 +114,18 @@ const ShowImageAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
       </Block>
       <Block>
         <RangeField
-          label="Hide After Seconds"
+          label={
+            <>
+              Hide After Seconds{' '}
+              <InfoTooltip
+                text="The image will automatically disappear after the specified number of seconds. Enter 0 to keep the image visible indefinitely."
+                type="info"
+                position="top center"
+              />
+            </>
+          }
           value={payload.hideAfterSeconds}
           onChange={handleChangeHideAfterSeconds}
-          info="The image will automatically disappear after the specified number of seconds. Enter 0 to keep the image visible indefinitely."
         />
       </Block>
       <Block>
