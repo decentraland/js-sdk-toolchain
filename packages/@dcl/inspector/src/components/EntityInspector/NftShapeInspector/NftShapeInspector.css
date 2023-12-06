@@ -1,0 +1,4 @@
+.Container.NftShape .urn .content {
+  flex-direction: column;
+  align-items: inherit;
+}
