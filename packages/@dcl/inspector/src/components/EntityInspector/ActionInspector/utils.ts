@@ -7,7 +7,7 @@ import {
   getJson,
   getPayload,
   Font,
-  TextAlignMode
+  AlignMode
 } from '@dcl/asset-packs'
 import { EditorComponentsTypes } from '../../../lib/sdk/components'
 
@@ -60,7 +60,7 @@ export function getDefaultPayload(type: string) {
         hideAfterSeconds: 5,
         font: Font.F_SANS_SERIF,
         fontSize: 10,
-        textAlign: TextAlignMode.TAM_MIDDLE_CENTER
+        textAlign: AlignMode.TAM_MIDDLE_CENTER
       })
     }
     case ActionType.START_DELAY: {
