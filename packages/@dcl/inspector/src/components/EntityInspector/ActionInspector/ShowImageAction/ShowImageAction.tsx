@@ -4,9 +4,9 @@ import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 import { useAppSelector } from '../../../../redux/hooks'
 import { selectAssetCatalog } from '../../../../redux/app'
 import { Block } from '../../../Block'
-import { Dropdown, FileUploadField, RangeField, TextField } from '../../../ui'
+import { Dropdown, FileUploadField, RangeField, TextArea, TextField } from '../../../ui'
 import { ACCEPTED_FILE_TYPES } from '../../../ui/FileUploadField/types'
-import { TEXT_ALIGN_MODES } from '../../TextShapeInspector/utils'
+import { TEXT_ALIGN_MODES as ALIGN_MODES } from '../../TextShapeInspector/utils'
 import { isModel } from '../../MaterialInspector/Texture/utils'
 import type { Props } from './types'
 
@@ -15,7 +15,7 @@ import './ShowImageAction.css'
 function isValid(
   payload: Partial<ActionPayload<ActionType.SHOW_IMAGE>>
 ): payload is ActionPayload<ActionType.SHOW_IMAGE> {
-  return payload.text !== '' && !!payload.hideAfterSeconds && payload.hideAfterSeconds > 0
+  return payload.src !== undefined && payload.src !== '' && payload.height !== undefined && payload.width !== undefined
 }
 
 const ShowImageAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
@@ -38,7 +38,7 @@ const ShowImageAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
   )
 
   const handleChangeText = useCallback(
-    ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
+    ({ target: { value } }: React.ChangeEvent<HTMLTextAreaElement>) => {
       setPayload({ ...payload, text: value })
     },
     [payload, setPayload]
@@ -74,9 +74,9 @@ const ShowImageAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
     [payload, setPayload]
   )
 
-  const handleChangeTextAlign = useCallback(
+  const handleChangeAlign = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
-      setPayload({ ...payload, textAlign: parseInt(value) })
+      setPayload({ ...payload, align: parseInt(value) })
     },
     [payload, setPayload]
   )
@@ -100,31 +100,31 @@ const ShowImageAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
           isValidFile={isModel}
         />
       </Block>
-      <Block>
-        <TextField label="Text" type="text" value={payload.text} onChange={handleChangeText} />
-      </Block>
       <Block label="Size">
         <TextField leftLabel="Height" type="number" value={payload.height} onChange={handleChangeHeight} />
         <TextField leftLabel="Width" type="number" value={payload.width} onChange={handleChangeWidth} />
+      </Block>
+      <Block label="Align Image">
+        <Dropdown
+          placeholder="Select an Align Mode"
+          options={ALIGN_MODES}
+          value={payload.align}
+          onChange={handleChangeAlign}
+        />
       </Block>
       <Block>
         <RangeField
           label="Hide After Seconds"
           value={payload.hideAfterSeconds}
           onChange={handleChangeHideAfterSeconds}
-          isValidValue={(value) => value > 0}
+          info="The image will automatically disappear after the specified number of seconds. Enter 0 to keep the image visible indefinitely."
         />
+      </Block>
+      <Block>
+        <TextArea label="Text" value={payload.text} onChange={handleChangeText} />
       </Block>
       <Block label="Font Size">
         <TextField type="number" value={payload.fontSize} onChange={handleChangeFontSize} />
-      </Block>
-      <Block label="Text Align">
-        <Dropdown
-          placeholder="Select a Text Align Mode"
-          options={TEXT_ALIGN_MODES}
-          value={payload.textAlign}
-          onChange={handleChangeTextAlign}
-        />
       </Block>
     </div>
   )
