@@ -10,11 +10,19 @@ import {
   PBVideoPlayer,
   PBMaterial
 } from '@dcl/ecs'
-import { ActionType, Actions, ComponentName, Triggers, getJson, getNextId, getPayload } from '@dcl/asset-packs'
+import {
+  ActionType,
+  Actions,
+  COMPONENTS_WITH_ID,
+  ComponentName,
+  Triggers,
+  getJson,
+  getNextId,
+  getPayload
+} from '@dcl/asset-packs'
 import { CoreComponents } from '../../components'
 import updateSelectedEntity from '../update-selected-entity'
 import { addChild } from '../add-child'
-import { COMPONENTS_WITH_ID } from '../add-component'
 import { isSelf, parseMaterial } from './utils'
 
 export function addAsset(engine: IEngine) {
