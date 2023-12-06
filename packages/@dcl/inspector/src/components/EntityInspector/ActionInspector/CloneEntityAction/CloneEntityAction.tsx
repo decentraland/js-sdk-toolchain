@@ -87,19 +87,19 @@ const CloneEntityAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
     <div className="CloneEntityActionContainer">
       <div className="row">
         <TextField
-          label="X"
+          leftLabel="X"
           type="number"
           value={payload.position?.x}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangePositionX(e)}
         />
         <TextField
-          label="Y"
+          leftLabel="Y"
           type="number"
           value={payload.position?.y}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangePositionY(e)}
         />
         <TextField
-          label="Z"
+          leftLabel="Z"
           type="number"
           value={payload.position?.z}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangePositionZ(e)}
