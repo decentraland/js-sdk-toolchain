@@ -13,7 +13,6 @@ import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
 import { snapPosition } from '../../lib/babylon/decentraland/snap-manager'
 import { loadGltf, removeGltf } from '../../lib/babylon/decentraland/sdkComponents/gltf-container'
 import { getConfig } from '../../lib/logic/config'
-import { CoreComponents } from '../../lib/sdk/components'
 import { ROOT } from '../../lib/sdk/tree'
 import { Asset, isSmart } from '../../lib/logic/catalog'
 import { selectAssetCatalog } from '../../redux/app'
@@ -89,10 +88,6 @@ const Renderer: React.FC = () => {
     const path = Object.keys(asset.contents).find(($) => isAsset($))
     let thumbnail: Uint8Array | undefined
 
-    if (!path && !asset.components[CoreComponents.MESH_RENDERER]) {
-      throw new Error('Invalid asset format: should contain at least one gltf/glb file or a mesh renderer component')
-    }
-
     setIsLoading(true)
 
     await Promise.all(
@@ -114,13 +109,16 @@ const Renderer: React.FC = () => {
     )
 
     // TODO: review this async/await
-    dispatch(
-      importAsset({
-        content: new Map(Object.entries(fileContent)),
-        basePath: withAssetDir(destFolder),
-        assetPackageName
-      })
-    )
+    const content = new Map(Object.entries(fileContent))
+    if (content.size > 0) {
+      dispatch(
+        importAsset({
+          content,
+          basePath: withAssetDir(destFolder),
+          assetPackageName
+        })
+      )
+    }
 
     if (thumbnail) {
       const name = path ? (path.split('/').pop() as string) : asset.name
