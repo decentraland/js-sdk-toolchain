@@ -10,7 +10,7 @@ export interface INetowrkEntityType {
 export type INetowrkEntity = LastWriteWinElementSetComponentDefinition<INetowrkEntityType>
 
 function defineNetworkEntityComponent(engine: Pick<IEngine, 'defineComponent'>) {
-  const EntityNetwork = engine.defineComponent('core-schema::Entity-Network', {
+  const EntityNetwork = engine.defineComponent('core-schema::Network-Entity', {
     networkId: Schemas.Int64,
     entityId: Schemas.Entity
   })
