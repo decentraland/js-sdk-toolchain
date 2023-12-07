@@ -1,0 +1,26 @@
+.Label {
+  display: flex;
+  align-items: end;
+  color: var(--white);
+  font-size: 11px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: normal;
+  text-wrap: nowrap;
+  gap: 2px;
+}
+
+.Label.Header {
+  border-bottom: 1px solid var(--base-14);
+  padding-bottom: 12px;
+  margin-bottom: 8px;
+}
+
+.Label > .InfoTooltipTrigger > svg {
+  width: 12px;
+  height: 12px;
+}
+
+.Field > .Label {
+  margin-bottom: 4.5px;
+}

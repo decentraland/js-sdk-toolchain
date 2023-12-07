@@ -6,6 +6,7 @@ import {
   ActionType,
   getActionTypes,
   getJson,
+  getPayload,
   ActionPayload,
   getActionSchema,
   ComponentName
@@ -35,6 +36,18 @@ import { TweenAction } from './TweenAction'
 import { isValidTween } from './TweenAction/utils'
 import { PlayAnimationAction } from './PlayAnimationAction'
 import { SetVisibilityAction } from './SetVisibilityAction'
+import { PlayVideoStreamAction } from './PlayVideoStreamAction'
+import { PlayAudioStreamAction } from './PlayAudioStreamAction'
+import { TeleportPlayerAction } from './TeleportPlayerAction'
+import { MovePlayerAction } from './MovePlayerAction'
+import { PlayDefaultEmoteAction } from './PlayDefaultEmoteAction'
+import { PlayCustomEmoteAction } from './PlayCustomEmoteAction'
+import { OpenLinkAction } from './OpenLinkAction'
+import { ShowTextAction } from './ShowTextAction'
+import { DelayAction } from './DelayAction'
+import { LoopAction } from './LoopAction'
+import { CloneEntityAction } from './CloneEntityAction'
+import { ShowImageAction } from './ShowImageAction'
 import { getDefaultPayload, getPartialPayload, isStates } from './utils'
 import { Props } from './types'
 
@@ -52,7 +65,26 @@ const ActionMapOption: Record<string, string> = {
   [ActionType.STOP_SOUND]: 'Stop Sound',
   [ActionType.SET_VISIBILITY]: 'Set Visibility',
   [ActionType.ATTACH_TO_PLAYER]: 'Attach to Player',
-  [ActionType.DETACH_FROM_PLAYER]: 'Detach from Player'
+  [ActionType.DETACH_FROM_PLAYER]: 'Detach from Player',
+  [ActionType.TELEPORT_PLAYER]: 'Teleport Player',
+  [ActionType.MOVE_PLAYER]: 'Move Player',
+  [ActionType.PLAY_DEFAULT_EMOTE]: 'Play Emote',
+  [ActionType.PLAY_CUSTOM_EMOTE]: 'Play Custom Emote',
+  [ActionType.OPEN_LINK]: 'Open Link',
+  [ActionType.PLAY_AUDIO_STREAM]: 'Play Audio Stream',
+  [ActionType.STOP_AUDIO_STREAM]: 'Stop Audio Stream',
+  [ActionType.PLAY_VIDEO_STREAM]: 'Play Video Stream',
+  [ActionType.STOP_VIDEO_STREAM]: 'Stop Video Stream',
+  [ActionType.SHOW_TEXT]: 'Show Text',
+  [ActionType.HIDE_TEXT]: 'Hide Text',
+  [ActionType.START_DELAY]: 'Start Delay',
+  [ActionType.STOP_DELAY]: 'Stop Delay',
+  [ActionType.START_LOOP]: 'Start Loop',
+  [ActionType.STOP_LOOP]: 'Stop Loop',
+  [ActionType.CLONE_ENTITY]: 'Clone',
+  [ActionType.REMOVE_ENTITY]: 'Remove',
+  [ActionType.SHOW_IMAGE]: 'Show Image',
+  [ActionType.HIDE_IMAGE]: 'Hide Image'
 }
 
 export default withSdk<Props>(({ sdk, entity: entityId }) => {
@@ -128,9 +160,51 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
           const payload = getPartialPayload<ActionType.DECREASE_COUNTER>(action)
           return !!payload
         }
-        case ActionType.SET_VISIBILITY: {
-          const payload = getPartialPayload<ActionType.SET_VISIBILITY>(action)
-          return !!payload
+        case ActionType.TELEPORT_PLAYER: {
+          const payload = getPartialPayload<ActionType.TELEPORT_PLAYER>(action)
+          return (
+            !!payload &&
+            typeof payload.x === 'number' &&
+            !isNaN(payload.x) &&
+            typeof payload.y === 'number' &&
+            !isNaN(payload.y)
+          )
+        }
+        case ActionType.MOVE_PLAYER: {
+          const payload = getPartialPayload<ActionType.MOVE_PLAYER>(action)
+          return (
+            !!payload &&
+            typeof payload.position?.x === 'number' &&
+            !isNaN(payload.position?.x) &&
+            typeof payload.position?.y === 'number' &&
+            !isNaN(payload.position?.y) &&
+            typeof payload.position?.z === 'number' &&
+            !isNaN(payload.position?.z)
+          )
+        }
+        case ActionType.PLAY_DEFAULT_EMOTE: {
+          const payload = getPartialPayload<ActionType.PLAY_DEFAULT_EMOTE>(action)
+          return !!payload && typeof payload.emote === 'string' && payload.emote.length > 0
+        }
+        case ActionType.PLAY_CUSTOM_EMOTE: {
+          const payload = getPartialPayload<ActionType.PLAY_CUSTOM_EMOTE>(action)
+          return !!payload && typeof payload.src === 'string' && payload.src.length > 0
+        }
+        case ActionType.OPEN_LINK: {
+          const payload = getPartialPayload<ActionType.OPEN_LINK>(action)
+          return !!payload && typeof payload.url === 'string' && payload.url.length > 0
+        }
+        case ActionType.CLONE_ENTITY: {
+          const payload = getPartialPayload<ActionType.CLONE_ENTITY>(action)
+          return (
+            !!payload &&
+            typeof payload.position?.x === 'number' &&
+            !isNaN(payload.position?.x) &&
+            typeof payload.position?.y === 'number' &&
+            !isNaN(payload.position?.y) &&
+            typeof payload.position?.z === 'number' &&
+            !isNaN(payload.position?.z)
+          )
         }
         default: {
           try {
@@ -177,7 +251,9 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
       [ActionType.SET_STATE]: () => hasStates,
       [ActionType.INCREMENT_COUNTER]: () => hasCounter,
       [ActionType.DECREASE_COUNTER]: () => hasCounter,
-      [ActionType.SET_COUNTER]: () => hasCounter
+      [ActionType.SET_COUNTER]: () => hasCounter,
+      [ActionType.MOVE_PLAYER]: () => false, // disabling this for now since it's not working as expected
+      [ActionType.PLAY_CUSTOM_EMOTE]: () => false // disabling this for now since it's not working on custom realms, so it does not work on the builder preview
     }),
     [hasAnimations, hasStates]
   )
@@ -279,6 +355,99 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     [modifyAction, actions]
   )
 
+  const handleChangeTeleportPlayer = useCallback(
+    (value: ActionPayload<ActionType.TELEPORT_PLAYER>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.TELEPORT_PLAYER>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangeMovePlayer = useCallback(
+    (value: ActionPayload<ActionType.MOVE_PLAYER>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.MOVE_PLAYER>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangePlayDefaultEmote = useCallback(
+    (value: ActionPayload<ActionType.PLAY_DEFAULT_EMOTE>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.PLAY_DEFAULT_EMOTE>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangePlayCustomEmote = useCallback(
+    (value: ActionPayload<ActionType.PLAY_CUSTOM_EMOTE>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.PLAY_CUSTOM_EMOTE>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangeOpenLink = useCallback(
+    (value: ActionPayload<ActionType.OPEN_LINK>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.OPEN_LINK>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangeText = useCallback(
+    (value: ActionPayload<ActionType.SHOW_TEXT>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.SHOW_TEXT>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangeDelayAction = useCallback(
+    (value: ActionPayload<ActionType.START_DELAY | ActionType.STOP_DELAY>, idx: number) => {
+      const payload =
+        'actions' in value ? getJson<ActionType.START_DELAY>(value) : getJson<ActionType.STOP_DELAY>(value)
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: payload
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangeLoopAction = useCallback(
+    (value: ActionPayload<ActionType.START_LOOP | ActionType.STOP_LOOP>, idx: number) => {
+      const payload = 'actions' in value ? getJson<ActionType.START_LOOP>(value) : getJson<ActionType.STOP_LOOP>(value)
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: payload
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangeCloneEntity = useCallback(
+    (value: ActionPayload<ActionType.CLONE_ENTITY>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.CLONE_ENTITY>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
   const handleChangeType = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
       modifyAction(idx, {
@@ -311,6 +480,16 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     [modifyAction, actions]
   )
 
+  const handleChangeImage = useCallback(
+    (value: ActionPayload<ActionType.SHOW_IMAGE>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.SHOW_IMAGE>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
   const handleFocusInput = useCallback(
     ({ type }: React.FocusEvent<HTMLInputElement>) => {
       if (type === 'focus') {
@@ -320,6 +499,26 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
       }
     },
     [setIsFocused]
+  )
+
+  const handleChangeVideo = useCallback(
+    (value: ActionPayload<ActionType.PLAY_VIDEO_STREAM>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.PLAY_VIDEO_STREAM>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangeAudio = useCallback(
+    (value: ActionPayload<ActionType.PLAY_AUDIO_STREAM>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.PLAY_AUDIO_STREAM>(value)
+      })
+    },
+    [modifyAction, actions]
   )
 
   const handleRemoveAction = useCallback(
@@ -348,8 +547,8 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
         return hasStates ? (
           <div className="row">
             <div className="field">
-              <label>Select State</label>
               <Dropdown
+                label="Select State"
                 placeholder="Select a State"
                 options={[...states.map((state) => ({ label: state, value: state }))]}
                 value={getPartialPayload<ActionType.SET_STATE>(action)?.state}
@@ -371,8 +570,8 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
         return hasCounter ? (
           <div className="row">
             <div className="field">
-              <label>Counter Value</label>
               <TextField
+                label="Counter Value"
                 type="number"
                 value={getPartialPayload<ActionType.SET_COUNTER>(action)?.counter}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeCounter(e, idx)}
@@ -401,8 +600,8 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
         return (
           <div className="row">
             <div className="field">
-              <label>Select Anchor Point</label>
               <Dropdown
+                label="Select an Anchor Point"
                 placeholder="Select an Anchor Point"
                 options={[
                   { value: AvatarAnchorPointType.AAPT_RIGHT_HAND, label: 'Right Hand' },
@@ -415,6 +614,106 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
               />
             </div>
           </div>
+        )
+      }
+      case ActionType.TELEPORT_PLAYER: {
+        return (
+          <TeleportPlayerAction
+            value={getPartialPayload<ActionType.TELEPORT_PLAYER>(action)}
+            onUpdate={(e) => handleChangeTeleportPlayer(e, idx)}
+          />
+        )
+      }
+      case ActionType.MOVE_PLAYER: {
+        return (
+          <MovePlayerAction
+            value={getPartialPayload<ActionType.MOVE_PLAYER>(action)}
+            onUpdate={(e) => handleChangeMovePlayer(e, idx)}
+          />
+        )
+      }
+      case ActionType.PLAY_DEFAULT_EMOTE: {
+        return (
+          <PlayDefaultEmoteAction
+            value={getPartialPayload<ActionType.PLAY_DEFAULT_EMOTE>(action)}
+            onUpdate={(e) => handleChangePlayDefaultEmote(e, idx)}
+          />
+        )
+      }
+      case ActionType.PLAY_CUSTOM_EMOTE: {
+        return (
+          <PlayCustomEmoteAction
+            value={getPartialPayload<ActionType.PLAY_CUSTOM_EMOTE>(action)}
+            onUpdate={(e) => handleChangePlayCustomEmote(e, idx)}
+          />
+        )
+      }
+      case ActionType.OPEN_LINK: {
+        return (
+          <OpenLinkAction
+            value={getPartialPayload<ActionType.OPEN_LINK>(action)}
+            onUpdate={(e) => handleChangeOpenLink(e, idx)}
+          />
+        )
+      }
+      case ActionType.PLAY_VIDEO_STREAM: {
+        return (
+          <PlayVideoStreamAction
+            value={getPartialPayload<ActionType.PLAY_VIDEO_STREAM>(action)}
+            onUpdate={(value: ActionPayload<ActionType.PLAY_VIDEO_STREAM>) => handleChangeVideo(value, idx)}
+          />
+        )
+      }
+      case ActionType.PLAY_AUDIO_STREAM: {
+        return (
+          <PlayAudioStreamAction
+            value={getPartialPayload<ActionType.PLAY_AUDIO_STREAM>(action)}
+            onUpdate={(value: ActionPayload<ActionType.PLAY_AUDIO_STREAM>) => handleChangeAudio(value, idx)}
+          />
+        )
+      }
+      case ActionType.SHOW_TEXT: {
+        return (
+          <ShowTextAction
+            value={getPartialPayload<ActionType.SHOW_TEXT>(action)}
+            onUpdate={(e) => handleChangeText(e, idx)}
+          />
+        )
+      }
+      case ActionType.START_DELAY:
+      case ActionType.STOP_DELAY: {
+        return (
+          <DelayAction<ActionPayload<typeof action.type>>
+            availableActions={actions}
+            value={getPayload<typeof action.type>(action)}
+            onUpdate={(e) => handleChangeDelayAction(e, idx)}
+          />
+        )
+      }
+      case ActionType.START_LOOP:
+      case ActionType.STOP_LOOP: {
+        return (
+          <LoopAction<ActionPayload<typeof action.type>>
+            availableActions={actions}
+            value={getPayload<typeof action.type>(action)}
+            onUpdate={(e) => handleChangeLoopAction(e, idx)}
+          />
+        )
+      }
+      case ActionType.CLONE_ENTITY: {
+        return (
+          <CloneEntityAction
+            value={getPartialPayload<ActionType.CLONE_ENTITY>(action)}
+            onUpdate={(e) => handleChangeCloneEntity(e, idx)}
+          />
+        )
+      }
+      case ActionType.SHOW_IMAGE: {
+        return (
+          <ShowImageAction
+            value={getPartialPayload<ActionType.SHOW_IMAGE>(action)}
+            onUpdate={(e) => handleChangeImage(e, idx)}
+          />
         )
       }
       default: {
@@ -441,38 +740,34 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
         return (
           <Block key={`action-${idx}`}>
             <div className="row">
-              <div className="field">
-                <label>Name</label>
-                <TextField
-                  type="text"
-                  value={action.name}
-                  onChange={(e) => handleChangeName(e, idx)}
-                  onFocus={handleFocusInput}
-                  onBlur={handleFocusInput}
-                />
-              </div>
-              <div className="field">
-                <Dropdown
-                  label={'Select an Action'}
-                  placeholder="Select an Action"
-                  disabled={availableActions.length === 0}
-                  options={[
-                    ...availableActions.map((availableAction) => ({
-                      label: ActionMapOption[availableAction],
-                      value: availableAction
-                    }))
-                  ]}
-                  value={action.type}
-                  onChange={(e) => handleChangeType(e, idx)}
-                />
-              </div>
-              <MoreOptionsMenu>
-                <Button className="RemoveButton" onClick={(e) => handleRemoveAction(e, idx)}>
-                  <RemoveIcon /> Remove Action
-                </Button>
-              </MoreOptionsMenu>
+              <TextField
+                type="text"
+                label="Name"
+                value={action.name}
+                onChange={(e) => handleChangeName(e, idx)}
+                onFocus={handleFocusInput}
+                onBlur={handleFocusInput}
+              />
+              <Dropdown
+                label="Select an Action"
+                placeholder="Select an Action"
+                disabled={availableActions.length === 0}
+                options={[
+                  ...availableActions.map((availableAction) => ({
+                    label: ActionMapOption[availableAction],
+                    value: availableAction
+                  }))
+                ]}
+                value={action.type}
+                onChange={(e) => handleChangeType(e, idx)}
+              />
             </div>
             {renderAction(action, idx)}
+            <MoreOptionsMenu>
+              <Button className="RemoveButton" onClick={(e) => handleRemoveAction(e, idx)}>
+                <RemoveIcon /> Remove Action
+              </Button>
+            </MoreOptionsMenu>
           </Block>
         )
       })}

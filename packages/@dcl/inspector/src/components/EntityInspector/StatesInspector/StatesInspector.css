@@ -1,10 +1,7 @@
 .StatesInspector.Container {
   height: auto;
 }
-.StatesInspector:is(.open) > .title {
-  border-bottom: 1px solid var(--border-gray);
-  padding-bottom: 12px;
-}
+
 .StatesInspector .states-list .content {
   flex-direction: column;
   align-items: normal;

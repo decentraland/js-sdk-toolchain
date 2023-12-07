@@ -1,4 +1,14 @@
-import { Action, ActionPayload, ActionType, InterpolationType, TweenType, getJson, getPayload } from '@dcl/asset-packs'
+import {
+  Action,
+  ActionPayload,
+  ActionType,
+  InterpolationType,
+  TweenType,
+  getJson,
+  getPayload,
+  Font,
+  AlignMode
+} from '@dcl/asset-packs'
 import { EditorComponentsTypes } from '../../../lib/sdk/components'
 
 export function isStates(maybeStates: any): maybeStates is EditorComponentsTypes['States'] {
@@ -27,6 +37,48 @@ export function getDefaultPayload(type: string) {
         relative: true,
         interpolationType: InterpolationType.LINEAR,
         duration: 1
+      })
+    }
+    case ActionType.TELEPORT_PLAYER: {
+      return getJson<ActionType.TELEPORT_PLAYER>({
+        x: 0,
+        y: 0
+      })
+    }
+    case ActionType.MOVE_PLAYER: {
+      return getJson<ActionType.MOVE_PLAYER>({
+        position: {
+          x: 0,
+          y: 0,
+          z: 0
+        }
+      })
+    }
+    case ActionType.SHOW_TEXT: {
+      return getJson<ActionType.SHOW_TEXT>({
+        text: '',
+        hideAfterSeconds: 5,
+        font: Font.F_SANS_SERIF,
+        fontSize: 10,
+        textAlign: AlignMode.TAM_MIDDLE_CENTER
+      })
+    }
+    case ActionType.START_DELAY: {
+      return getJson<ActionType.START_DELAY>({
+        actions: [],
+        timeout: 5
+      })
+    }
+    case ActionType.START_LOOP: {
+      return getJson<ActionType.START_LOOP>({
+        actions: [],
+        interval: 5
+      })
+    }
+    case ActionType.STOP_DELAY:
+    case ActionType.STOP_LOOP: {
+      return getJson<typeof type>({
+        action: ''
       })
     }
     default: {

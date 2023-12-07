@@ -53,7 +53,7 @@ const Container: React.FC<React.PropsWithChildren<Props>> = (props) => {
   }, [props])
 
   return (
-    <div className={cx('Container', props.className, { open })}>
+    <div className={cx('Container', props.className, { open, border: props.border })}>
       {props.label && (
         <div className="title" onClick={() => setOpen(!open)}>
           {Icon}

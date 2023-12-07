@@ -6,17 +6,24 @@ import {
   PBGltfContainer,
   Vector3Type,
   PBAudioSource,
-  LastWriteWinElementSetComponentDefinition
+  LastWriteWinElementSetComponentDefinition,
+  PBVideoPlayer,
+  PBMaterial
 } from '@dcl/ecs'
-import { ActionType, Actions, ComponentName, Triggers, getJson, getNextId, getPayload } from '@dcl/asset-packs'
-import { CoreComponents } from '../components'
-import updateSelectedEntity from './update-selected-entity'
-import { addChild } from './add-child'
-import { COMPONENTS_WITH_ID } from './add-component'
-
-function isSelf(value: any) {
-  return `${value}` === `{self}`
-}
+import {
+  ActionType,
+  Actions,
+  COMPONENTS_WITH_ID,
+  ComponentName,
+  Triggers,
+  getJson,
+  getNextId,
+  getPayload
+} from '@dcl/asset-packs'
+import { CoreComponents } from '../../components'
+import updateSelectedEntity from '../update-selected-entity'
+import { addChild } from '../add-child'
+import { isSelf, parseMaterial } from './utils'
 
 export function addAsset(engine: IEngine) {
   return function addAsset(
@@ -78,6 +85,16 @@ export function addAsset(engine: IEngine) {
           case CoreComponents.AUDIO_SOURCE: {
             const audioSource = values.get(componentName) as PBAudioSource
             values.set(componentName, { ...audioSource, src: audioSource.audioClipUrl.replace('{assetPath}', base) })
+            break
+          }
+          case CoreComponents.VIDEO_PLAYER: {
+            const videoPlayer = values.get(componentName) as PBVideoPlayer
+            values.set(componentName, { ...videoPlayer, src: videoPlayer.src.replace('{assetPath}', base) })
+            break
+          }
+          case CoreComponents.MATERIAL: {
+            const material = values.get(componentName) as PBMaterial
+            values.set(componentName, parseMaterial(base, material))
             break
           }
           case ComponentName.ACTIONS: {

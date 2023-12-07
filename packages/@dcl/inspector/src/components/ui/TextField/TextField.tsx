@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import cx from 'classnames'
 
-import { ErrorMessage } from '../ErrorMessage'
+import { Message, MessageType } from '../Message'
+import { Label } from '../Label'
 
 import { Props } from './types'
 
@@ -13,6 +14,7 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
     className,
     error,
     label,
+    leftLabel,
     leftIcon,
     rightLabel,
     rightIcon,
@@ -68,26 +70,34 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
   }, [setHovered])
 
   const renderLeftContent = useCallback(() => {
-    if (label) {
-      return <div className="left-content">{<label className="input-label">{label}</label>}</div>
+    if (leftLabel) {
+      return (
+        <div className="LeftContent">
+          <Label className="InputLabel" text={leftLabel} />
+        </div>
+      )
     } else if (leftIcon) {
       return (
-        <div className="left-content">
-          <span className="left-icon">{leftIcon}</span>
+        <div className="LeftContent">
+          <span className="LeftIcon">{leftIcon}</span>
         </div>
       )
     } else if (leftContent) {
-      return <div className="left-content">{leftContent}</div>
+      return <div className="LeftContent">{leftContent}</div>
     }
-  }, [label, leftIcon, leftContent])
+  }, [leftLabel, leftIcon, leftContent])
 
   const renderRightContent = useCallback(() => {
     if (rightLabel) {
-      return <div className="right-content">{<label className="input-label">{rightLabel}</label>}</div>
+      return (
+        <div className="RightContent">
+          <Label className="InputLabel" text={rightLabel} />
+        </div>
+      )
     } else if (rightIcon) {
       return (
-        <div className="right-content">
-          <span className="right-icon">{rightIcon}</span>
+        <div className="RightContent">
+          <span className="RightIcon">{rightIcon}</span>
         </div>
       )
     }
@@ -95,6 +105,7 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
 
   return (
     <div className={cx('Text Field', className)}>
+      <Label text={label} />
       <div
         className={cx('InputContainer', {
           hovered: isHovered,
@@ -118,7 +129,7 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
         />
         {renderRightContent()}
       </div>
-      <ErrorMessage error={error} />
+      <Message text={error} type={MessageType.ERROR} />
     </div>
   )
 })

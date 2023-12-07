@@ -5,8 +5,7 @@ import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
-import { SelectField } from '../SelectField'
-import { TextField, CheckboxField, ColorField } from '../../ui'
+import { TextField, CheckboxField, ColorField, Dropdown } from '../../ui'
 import { Props } from './types'
 import { fromTextShape, toTextShape, isValidInput, FONTS, TEXT_ALIGN_MODES } from './utils'
 
@@ -26,48 +25,49 @@ export default withSdk<Props>(({ sdk, entity }) => {
   return (
     <Container label="TextShape" className="TextShape" onRemoveContainer={handleRemove}>
       <Block>
-        <TextField label="Value" type="text" {...getInputProps('text')} />
+        <TextField label="Text" type="text" {...getInputProps('text')} />
       </Block>
-      <Block label="Font">
-        <SelectField label="Font" options={FONTS} {...getInputProps('font')} />
-        <TextField label="Size" type="number" {...getInputProps('fontSize')} />
-        {/* TBD <TextField label="Color" {...getInputProps('color')} /> */}
-        <CheckboxField label="Auto size" {...getInputProps('fontAutoSize', (e) => e.target.checked)} />
+      <Block>
+        <Dropdown label="Font" options={FONTS} {...getInputProps('font')} />
+      </Block>
+      <Block>
+        <ColorField label="Text Color" {...getInputProps('textColor')} />
+      </Block>
+      <Block label="Font Size">
+        <TextField type="number" {...getInputProps('fontSize')} />
+        <CheckboxField label="Font Auto-Size" {...getInputProps('fontAutoSize', (e) => e.target.checked)} />
       </Block>
       <Block label="Shape">
-        <TextField label="Width" type="number" {...getInputProps('width')} />
-        <TextField label="Height" type="number" {...getInputProps('height')} />
+        <TextField leftLabel="Width" type="number" {...getInputProps('width')} />
+        <TextField leftLabel="Height" type="number" {...getInputProps('height')} />
       </Block>
-      <Block label="Text">
-        <SelectField label="Align" options={TEXT_ALIGN_MODES} {...getInputProps('textAlign')} />
-        <CheckboxField label="Wrapping" {...getInputProps('textWrapping', (e) => e.target.checked)} />
-      </Block>
-      <Block label="Color">
-        <ColorField {...getInputProps('textColor')} />
+      <Block label="Text Align">
+        <Dropdown options={TEXT_ALIGN_MODES} {...getInputProps('textAlign')} />
+        <CheckboxField label="Text-Wrapping" {...getInputProps('textWrapping', (e) => e.target.checked)} />
       </Block>
       <Block label="Padding">
-        <TextField label="↑" type="number" {...getInputProps('paddingTop')} />
-        <TextField label="→" type="number" {...getInputProps('paddingRight')} />
-        <TextField label="↓" type="number" {...getInputProps('paddingBottom')} />
-        <TextField label="←" type="number" {...getInputProps('paddingLeft')} />
+        <TextField leftLabel="↑" type="number" {...getInputProps('paddingTop')} />
+        <TextField leftLabel="→" type="number" {...getInputProps('paddingRight')} />
+        <TextField leftLabel="↓" type="number" {...getInputProps('paddingBottom')} />
+        <TextField leftLabel="←" type="number" {...getInputProps('paddingLeft')} />
       </Block>
       <Block label="Line">
-        <TextField label="Spacing" type="number" {...getInputProps('lineSpacing')} />
-        <TextField label="Count" type="number" {...getInputProps('lineCount')} />
+        <TextField leftLabel="Spacing" type="number" {...getInputProps('lineSpacing')} />
+        <TextField leftLabel="Count" type="number" {...getInputProps('lineCount')} />
       </Block>
-      <Block label="Outline">
-        <TextField label="Width" type="number" {...getInputProps('outlineWidth')} />
+      <Block>
+        <TextField label="Outline Width" type="number" {...getInputProps('outlineWidth')} />
       </Block>
-      <Block label="Outline color">
-        <ColorField {...getInputProps('outlineColor')} />
+      <Block>
+        <ColorField label="Outline color" {...getInputProps('outlineColor')} />
       </Block>
       <Block label="Shadow">
-        <TextField label="Blur" type="number" {...getInputProps('shadowBlur')} />
-        <TextField label="Offset X" type="number" {...getInputProps('shadowOffsetX')} />
-        <TextField label="Offset Y" type="number" {...getInputProps('shadowOffsetY')} />
+        <TextField leftLabel="Blur" type="number" {...getInputProps('shadowBlur')} />
+        <TextField leftLabel="Offset X" type="number" {...getInputProps('shadowOffsetX')} />
+        <TextField leftLabel="Offset Y" type="number" {...getInputProps('shadowOffsetY')} />
       </Block>
-      <Block label="Shadow color">
-        <ColorField {...getInputProps('shadowColor')} />
+      <Block>
+        <ColorField label="Shadow color" {...getInputProps('shadowColor')} />
       </Block>
     </Container>
   )

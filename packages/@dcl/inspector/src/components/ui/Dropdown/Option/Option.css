@@ -13,9 +13,11 @@
   border-bottom-right-radius: 5px;
 }
 
-.OptionContainer.DropdownSelection,
+.OptionContainer.SelectedOption,
 .OptionContainer.DropdownPlaceholder {
   padding: 0;
+  /* width: 100% - (DropIconWidth + gap) */
+  width: calc(100% - 20px);
 }
 
 .OptionContainer.DropdownPlaceholder {
@@ -26,22 +28,26 @@
   display: flex;
   align-items: center;
   height: 100%;
+  width: 100%;
   gap: 4px;
 }
 
 .OptionContainer .Option {
-  flex: 1;
+  width: 100%;
   font-size: 13px;
   font-style: normal;
   font-weight: 500;
-  text-wrap: nowrap;
+  line-height: normal;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.OptionContainer:not(.DropdownSelection):not(.DropdownPlaceholder):not(.selected):hover {
+.OptionContainer:not(.SelectedOption):not(.DropdownPlaceholder):hover {
   background: var(--base-12);
 }
 
-.OptionContainer:not(.DropdownSelection):not(.DropdownPlaceholder).disabled {
+.OptionContainer:not(.SelectedOption):not(.DropdownPlaceholder).disabled {
   background: var(--base-14);
   color: var(--base-11);
   cursor: default;
@@ -52,6 +58,16 @@
   background: var(--base-02);
   border-color: var(--base-01);
   color: var(--text-primary);
+}
+
+.OptionContainer .SelectedContent {
+  height: 16px;
+  width: 16px;
+  min-width: 16px;
+}
+
+.OptionContainer.DropdownPlaceholder .SelectedContent {
+  display: none;
 }
 
 .OptionContainer .LeftContent .LeftIcon {
@@ -90,8 +106,8 @@
   color: var(--base-08, #bbb);
 }
 
-.OptionContainer.DropdownSelection .Description,
-.OptionContainer.DropdownSelection .RightContent {
+.OptionContainer.SelectedOption .Description,
+.OptionContainer.SelectedOption .RightContent {
   display: none;
 }
 

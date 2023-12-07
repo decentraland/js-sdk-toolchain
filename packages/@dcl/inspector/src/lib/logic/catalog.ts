@@ -37,7 +37,7 @@ export type Asset = {
   category: string
   tags: string[]
   contents: Record<string, string>
-  components: Partial<Record<ComponentName, any>>
+  components: Partial<Record<ComponentName | CoreComponents, any>>
 }
 
 export function getContentsUrl(hash: string) {
@@ -54,9 +54,14 @@ export function getAssetsByCategory(assets: Asset[]) {
   return categories
 }
 
-export function isSmart(asset: Asset) {
-  const components = Object.keys(asset.components)
-  return components.length > 1 || (components.length === 1 && components[0] !== CoreComponents.GLTF_CONTAINER)
+export function isSmart(asset: Partial<Asset>) {
+  const components = Object.keys(asset?.components ?? {})
+  return (
+    components.length > 1 &&
+    components.some((component) =>
+      [ComponentName.ACTIONS, ComponentName.TRIGGERS].find(($) => $.toString() === component)
+    )
+  )
 }
 
 export function getAssetByModel(path: string) {
