@@ -117,7 +117,8 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
       TriggerType.ON_TWEEN_END,
       TriggerType.ON_DELAY,
       TriggerType.ON_LOOP,
-      TriggerType.ON_CLONE
+      TriggerType.ON_CLONE,
+      TriggerType.ON_CLICK_IMAGE
     ]
     if (hasStates) {
       triggerTypes.push(TriggerType.ON_STATE_CHANGE)

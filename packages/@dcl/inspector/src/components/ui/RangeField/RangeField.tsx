@@ -19,6 +19,7 @@ const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
     rightLabel,
     error,
     disabled,
+    info,
     value = 0,
     min = 0,
     max = 100,
@@ -111,6 +112,16 @@ const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
     return undefined
   }, [inputValue, isValid])
 
+  const renderMessage = useCallback(() => {
+    if (errorMessage) {
+      return <Message text={errorMessage} type={MessageType.ERROR} />
+    } else if (info) {
+      return <Message text={info} type={MessageType.INFO} icon={false} />
+    }
+
+    return null
+  }, [errorMessage, info])
+
   return (
     <div className="Range Field">
       <Label text={label} />
@@ -140,7 +151,7 @@ const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
           onBlur={handleOnBlur}
         />
       </div>
-      <Message text={errorMessage} type={MessageType.ERROR} />
+      {renderMessage()}
     </div>
   )
 })

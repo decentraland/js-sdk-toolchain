@@ -21,7 +21,8 @@ const TriggerMapOption: Record<string, string> = {
   [TriggerType.ON_PLAYER_LEAVES_AREA]: 'Player Leaves Area',
   [TriggerType.ON_DELAY]: 'On Delay',
   [TriggerType.ON_LOOP]: 'On Loop',
-  [TriggerType.ON_CLONE]: 'On Clone'
+  [TriggerType.ON_CLONE]: 'On Clone',
+  [TriggerType.ON_CLICK_IMAGE]: 'On Click Image'
 }
 
 export const TriggerEvent = ({

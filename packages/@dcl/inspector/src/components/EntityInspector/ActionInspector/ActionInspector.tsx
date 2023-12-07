@@ -47,6 +47,7 @@ import { ShowTextAction } from './ShowTextAction'
 import { DelayAction } from './DelayAction'
 import { LoopAction } from './LoopAction'
 import { CloneEntityAction } from './CloneEntityAction'
+import { ShowImageAction } from './ShowImageAction'
 import { getDefaultPayload, getPartialPayload, isStates } from './utils'
 import { Props } from './types'
 
@@ -81,7 +82,9 @@ const ActionMapOption: Record<string, string> = {
   [ActionType.START_LOOP]: 'Start Loop',
   [ActionType.STOP_LOOP]: 'Stop Loop',
   [ActionType.CLONE_ENTITY]: 'Clone',
-  [ActionType.REMOVE_ENTITY]: 'Remove'
+  [ActionType.REMOVE_ENTITY]: 'Remove',
+  [ActionType.SHOW_IMAGE]: 'Show Image',
+  [ActionType.HIDE_IMAGE]: 'Hide Image'
 }
 
 export default withSdk<Props>(({ sdk, entity: entityId }) => {
@@ -477,6 +480,16 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     [modifyAction, actions]
   )
 
+  const handleChangeImage = useCallback(
+    (value: ActionPayload<ActionType.SHOW_IMAGE>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.SHOW_IMAGE>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
   const handleFocusInput = useCallback(
     ({ type }: React.FocusEvent<HTMLInputElement>) => {
       if (type === 'focus') {
@@ -692,6 +705,14 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
           <CloneEntityAction
             value={getPartialPayload<ActionType.CLONE_ENTITY>(action)}
             onUpdate={(e) => handleChangeCloneEntity(e, idx)}
+          />
+        )
+      }
+      case ActionType.SHOW_IMAGE: {
+        return (
+          <ShowImageAction
+            value={getPartialPayload<ActionType.SHOW_IMAGE>(action)}
+            onUpdate={(e) => handleChangeImage(e, idx)}
           />
         )
       }
