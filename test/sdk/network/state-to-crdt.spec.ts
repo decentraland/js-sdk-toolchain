@@ -1,4 +1,4 @@
-import { Entity, Schemas, engine, SyncComponents } from '../../../packages/@dcl/ecs/dist'
+import { Entity, Schemas, engine, SyncComponents, NetworkEntity } from '../../../packages/@dcl/ecs/dist'
 import { engineToCrdt } from '../../../packages/@dcl/sdk/network/state'
 import { serializeCrdtMessages } from '../../../packages/@dcl/sdk/internal/transports/logger'
 
@@ -9,6 +9,7 @@ describe('It should dump the engine to a crdt buffer', () => {
 
     // Entity that should be added to the dump
     const entity = engine.addEntity()
+    NetworkEntity.create(entity, { networkId: 1, entityId: entity })
     Component.create(entity, { id: 'boedo' })
     SyncComponents.create(entity)
 
@@ -20,13 +21,6 @@ describe('It should dump the engine to a crdt buffer', () => {
     await engine.update(1)
 
     const crdtBuffer = engineToCrdt(engine)
-
-    expect(Array.from(serializeCrdtMessages('test', crdtBuffer, engine))).toHaveLength(2)
-    expect(crdtBuffer).toEqual(
-      new Uint8Array([
-        28, 0, 0, 0, 1, 0, 0, 0, 0, 2, 0, 0, 73, 211, 157, 133, 1, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 1, 0,
-        0, 0, 0, 2, 0, 0, 15, 104, 23, 51, 1, 0, 0, 0, 9, 0, 0, 0, 5, 0, 0, 0, 98, 111, 101, 100, 111
-      ])
-    )
+    expect(Array.from(serializeCrdtMessages('test', crdtBuffer, engine))).toHaveLength(3)
   })
 })

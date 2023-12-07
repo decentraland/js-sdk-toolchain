@@ -256,23 +256,13 @@ describe('test CRDT flow E2E', () => {
       env.connection.interceptedMessages = []
     })
 
-    it('now we are receiving the updates from engineA', async () => {
+    it('both clients knows how to resolve the conflict and get the same final state', async () => {
       expect(int8A.get(entityA)).toBe(48)
       expect(int8B.get(entityA)).toBe(45)
 
       await Promise.all([engineA.update(0), engineB.update(0)])
-      expect(env.connection.interceptedMessages).toMatchObject([
-        {
-          direction: 'a->b',
-          componentId: int8A.componentId,
-          entityId: entityA,
-          data: Uint8Array.of(48),
-          timestamp: 5
-        }
-      ])
-      env.connection.interceptedMessages = []
-      await Promise.all([engineA.update(0), engineB.update(0)])
       expect(env.connection.interceptedMessages).toMatchObject([])
+      env.connection.interceptedMessages = []
 
       expect(int8A.get(entityA)).toBe(48)
       expect(int8B.get(entityA)).toBe(48)

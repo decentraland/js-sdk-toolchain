@@ -17,7 +17,6 @@ import {
   ValueSetOptions
 } from './grow-only-value-set-component-definition'
 import { removeEntityWithChildren as removeEntityWithChildrenEngine } from '../runtime/helpers/tree'
-import { NetworkEntity } from '..'
 export * from './input'
 export * from './readonly'
 export * from './types'
@@ -42,12 +41,11 @@ function preEngine(): PreEngine {
     const entity = entityContainer.generateEntity()
     return entity
   }
-
   function removeEntity(entity: Entity) {
     for (const [, component] of componentsDefinition) {
       // TODO: hack for the moment. It should be enough to delete the entity, but the renderer is not cleaning the components.
       // So we still need the NetworkEntity to forward this message to the SyncTransport.
-      if (component.componentId === NetworkEntity.componentId) continue
+      if (component.componentName === 'core-schema::Network-Entity') continue
       component.entityDeleted(entity, true)
     }
 
