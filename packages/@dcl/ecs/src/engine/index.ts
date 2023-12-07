@@ -155,7 +155,7 @@ function preEngine(): PreEngine {
     const component = componentsDefinition.get(componentId)
     if (!component) {
       throw new Error(
-        `Component ${componentId} not found. You need to declare the components at the beginnig of the engine declaration`
+        `Component ${componentIdOrName} not found. You need to declare the components at the beginnig of the engine declaration`
       )
     }
     return component as ComponentDefinition<T>

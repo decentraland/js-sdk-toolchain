@@ -102,6 +102,9 @@ export function entityUtils(engine: IEngine, profile: IProfile) {
     // If we dont have a transform for this entity, create an empty one to send it to the renderer
     if (!Transform.getOrNull(entity)) {
       Transform.create(entity)
+    } else {
+      // We force to send a tick update of the transform so we can send the NEW parent to the renderer
+      Transform.getMutable(entity)
     }
   }
 

@@ -9,7 +9,7 @@ import {
 } from '@dcl/ecs'
 import { componentNumberFromName } from '@dcl/ecs/dist/components/component-number'
 
-import { getUserData } from '~system/UserIdentity'
+import type { GetUserDataRequest, GetUserDataResponse } from '~system/UserIdentity'
 import { SyncEntity } from './entities'
 import { IProfile } from './message-bus-sync'
 
@@ -36,7 +36,10 @@ export function setInitialized() {
 export let INITIAL_CRDT_RENDERER_MESSAGES_SENT = false
 
 // Retrieve userId to start sending this info as the networkId
-export function fetchProfile(myProfile: IProfile) {
+export function fetchProfile(
+  myProfile: IProfile,
+  getUserData: (value: GetUserDataRequest) => Promise<GetUserDataResponse>
+) {
   void getUserData({}).then(({ data }) => {
     if (data?.userId) {
       const userId = data.userId

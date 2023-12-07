@@ -1,5 +1,5 @@
 import { IEngine, Transport } from '@dcl/ecs'
-import { sendBinary } from '~system/CommunicationsController'
+import type { SendBinaryRequest, SendBinaryResponse } from '~system/CommunicationsController'
 
 import { syncFilter } from './filter'
 import { engineToCrdt } from './state'
@@ -15,14 +15,19 @@ import {
   syncTransportIsReady
 } from './utils'
 import { entityUtils } from './entities'
+import { GetUserDataRequest, GetUserDataResponse } from '~system/UserIdentity'
 
 export type IProfile = { networkId: number; userId: string }
 // user that we asked for the inital crdt state
-export function addSyncTransport(engine: IEngine) {
+export function addSyncTransport(
+  engine: IEngine,
+  sendBinary: (msg: SendBinaryRequest) => Promise<SendBinaryResponse>,
+  getUserData: (value: GetUserDataRequest) => Promise<GetUserDataResponse>
+) {
   definePlayersInScene(engine)
   // Profile Info
   const myProfile: IProfile = {} as IProfile
-  fetchProfile(myProfile!)
+  fetchProfile(myProfile!, getUserData)
 
   // Entity utils
   const entityDefinitions = entityUtils(engine, myProfile)
@@ -38,10 +43,10 @@ export function addSyncTransport(engine: IEngine) {
 
   // Add Sync Transport
   const transport: Transport = {
-    filter: syncFilter,
+    filter: syncFilter(engine),
     send: async (message: Uint8Array) => {
       if (syncTransportIsReady(engine) && message.byteLength) {
-        console.log(Array.from(serializeCrdtMessages('[send CRDT]: ', message, engine)))
+        // console.log(Array.from(serializeCrdtMessages('[send CRDT]: ', message, engine)))
         binaryMessageBus.emit(CommsMessage.CRDT, message)
       }
       const messages = getMessagesToSend()
@@ -61,7 +66,7 @@ export function addSyncTransport(engine: IEngine) {
 
   // If we dont have any state initialized, and recieve a state message.
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, (value) => {
-    console.log(Array.from(serializeCrdtMessages('[binaryMessageBus]: ', value, engine)))
+    // console.log(Array.from(serializeCrdtMessages('[binaryMessageBus]: ', value, engine)))
     if (!stateInitialized) {
       setInitialized()
       transport.onmessage!(value)
@@ -80,7 +85,7 @@ export function addSyncTransport(engine: IEngine) {
 
   // Process CRDT messages here
   binaryMessageBus.on(CommsMessage.CRDT, (value) => {
-    console.log(Array.from(serializeCrdtMessages('[CRDT on]: ', value, engine)))
+    // console.log(Array.from(serializeCrdtMessages('[CRDT on]: ', value, engine)))
 
     transport.onmessage!(value)
   })
