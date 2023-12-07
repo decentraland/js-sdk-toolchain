@@ -12,7 +12,18 @@ import { Block } from '../../Block'
 import { Container } from '../../Container'
 import { TextField } from '../../ui/TextField'
 import { ColorField } from '../../ui/ColorField'
-import { fromNftShape, toNftShape, isValidInput, NFT_STYLES, NETWORKS, isValidUrn, buildTokens, UrnTokens, getUrn, DEFAULT_NETWORK } from './utils'
+import {
+  fromNftShape,
+  toNftShape,
+  isValidInput,
+  NFT_STYLES,
+  NETWORKS,
+  isValidUrn,
+  buildTokens,
+  UrnTokens,
+  getUrn,
+  DEFAULT_NETWORK
+} from './utils'
 import type { Props } from './types'
 import { Dropdown, InfoTooltip } from '../../ui'
 
@@ -24,13 +35,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
 
   const hasNftShape = useHasComponent(entity, NftShape)
   const handleInputValidation = useCallback(({ urn }: { urn: string }) => isValidInput(urn), [])
-  const { getInputProps } = useComponentInput(
-    entity,
-    NftShape,
-    fromNftShape,
-    toNftShape,
-    handleInputValidation
-  )
+  const { getInputProps } = useComponentInput(entity, NftShape, fromNftShape, toNftShape, handleInputValidation)
 
   const handleRemove = useCallback(async () => {
     sdk.operations.removeComponent(entity, NftShape)
@@ -49,15 +54,18 @@ export default withSdk<Props>(({ sdk, entity }) => {
   const color = getInputProps('color')
   const style = getInputProps('style')
 
-  const handleUrnTokenChange = useCallback(async (tokens: UrnTokens) => {
-    const newTokens = { ...urnTokens, ...tokens }
-    const urn = getUrn(newTokens)
-    if (isValidUrn(urn)) {
-      sdk.operations.updateValue(NftShape, entity, { ...NftShape.get(entity), urn })
-      await sdk.operations.dispatch()
-    }
-    setUrnTokens(newTokens)
-  }, [urnTokens])
+  const handleUrnTokenChange = useCallback(
+    async (tokens: UrnTokens) => {
+      const newTokens = { ...urnTokens, ...tokens }
+      const urn = getUrn(newTokens)
+      if (isValidUrn(urn)) {
+        sdk.operations.updateValue(NftShape, entity, { ...NftShape.get(entity), urn })
+        await sdk.operations.dispatch()
+      }
+      setUrnTokens(newTokens)
+    },
+    [urnTokens]
+  )
 
   return (
     <Container
