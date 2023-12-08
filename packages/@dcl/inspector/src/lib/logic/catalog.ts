@@ -14,6 +14,7 @@ export const CATEGORIES = [
   'levers',
   'doors',
   'platforms',
+  'social',
   'decorations',
   'structures',
   'vehicles',
