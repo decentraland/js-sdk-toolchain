@@ -6,6 +6,7 @@ import {
   NetworkParent,
   SyncComponents,
   EngineInfo,
+  GltfContainer,
   CrdtMessage,
   CrdtMessageType,
   Entity
@@ -16,6 +17,7 @@ import { CommsMessage, encodeString } from '../../../packages/@dcl/sdk/network/b
 import { createRendererTransport } from '../../../packages/@dcl/sdk/internal/transports/rendererTransport'
 import { ReadWriteByteBuffer } from '../../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { readMessage } from '../../../packages/@dcl/ecs/src/serialization/crdt/message'
+import { EntityState, PutNetworkComponentOperation } from '../../../packages/@dcl/ecs/src'
 
 function defineComponents(engine: IEngine) {
   return {
@@ -23,7 +25,8 @@ function defineComponents(engine: IEngine) {
     NetworkEntity: components.NetworkEntity(engine as any) as any as typeof NetworkEntity,
     NetworkParent: components.NetworkParent(engine as any) as any as typeof NetworkParent,
     SyncComponents: components.SyncComponents(engine as any) as any as typeof SyncComponents,
-    EngineInfo: components.EngineInfo(engine as any) as any as typeof EngineInfo
+    EngineInfo: components.EngineInfo(engine as any) as any as typeof EngineInfo,
+    GltfContainer: components.GltfContainer(engine as any) as any as typeof GltfContainer
   }
 }
 
@@ -384,5 +387,128 @@ describe('Network Parenting', () => {
     ])
     interceptedMessages.length = 0
     await tick()
+  })
+  it('should create a component so then we can remove it', async () => {
+    componentsA.GltfContainer.create(entityCache, { src: 'boedo' })
+    componentsA.SyncComponents.getMutable(entityCache).componentIds = [
+      componentsA.Transform.componentId,
+      componentsA.GltfContainer.componentId
+    ]
+    await tick()
+  })
+  it('should receive the gltf container', async () => {
+    await tick()
+    const [childEntity] = Array.from(engineB.getEntitiesWith(componentsB.Transform))[0]
+    expect(componentsB.GltfContainer.get(childEntity).src).toBe('boedo')
+    interceptedMessages.length = 0
+  })
+  it('should remove the component on B', async () => {
+    const [childEntity] = Array.from(engineB.getEntitiesWith(componentsB.Transform))[0]
+    componentsB.GltfContainer.deleteFrom(childEntity)
+    await tick()
+    expect(interceptedMessages).toMatchObject([
+      {
+        direction: 'b->renderer',
+        componentId: componentsB.GltfContainer.componentId,
+        timestamp: 2,
+        type: CrdtMessageType.DELETE_COMPONENT,
+        entityId: childEntity
+      },
+      {
+        direction: 'b->a',
+        componentId: componentsB.GltfContainer.componentId,
+        timestamp: 2,
+        type: CrdtMessageType.DELETE_COMPONENT_NETWORK,
+        entityId: entityCache,
+        networkId: syncA.myProfile.networkId
+      }
+    ])
+    interceptedMessages.length = 0
+    await tick()
+  })
+  it('should remove the gltf container on A', async () => {
+    await tick()
+    expect(componentsA.GltfContainer.getOrNull(entityCache)).toBe(null)
+    interceptedMessages.length = 0
+  })
+  it('should serialize PutComponentNetwork', async () => {
+    componentsA.Transform.getMutable(entityCache).position.y = 88
+    buffer.resetBuffer()
+    componentsA.Transform.schema.serialize(
+      {
+        position: { x: 88, y: 88, z: 8 },
+        scale: { x: 1, y: 1, z: 1 },
+        rotation: { x: 0, y: 0, z: 0, w: 1 },
+        parent: 0 as Entity
+      },
+      buffer
+    )
+    const transformData = buffer.toCopiedBinary()
+    buffer.resetBuffer()
+    PutNetworkComponentOperation.write(
+      entityCache,
+      4,
+      componentsA.Transform.componentId,
+      syncA.myProfile.networkId,
+      transformData,
+      buffer
+    )
+    await tick()
+    expect(interceptedMessages[1]).toMatchObject(readMessage(buffer)!)
+    await tick()
+    interceptedMessages.length = 0
+  })
+  it('should remove the parent with the childrens', async () => {
+    const parentEntity = (entityCache + 1) as Entity
+    engineA.removeEntityWithChildren(parentEntity)
+    await tick()
+    expect(interceptedMessages).toMatchObject([
+      {
+        direction: 'a->renderer',
+        type: CrdtMessageType.DELETE_COMPONENT,
+        componentId: componentsA.Transform.componentId,
+        timestamp: 2,
+        entityId: parentEntity
+      },
+      {
+        direction: 'a->renderer',
+        type: CrdtMessageType.DELETE_COMPONENT,
+        componentId: componentsA.Transform.componentId,
+        timestamp: 5,
+        entityId: entityCache
+      },
+      {
+        direction: 'a->renderer',
+        type: CrdtMessageType.DELETE_ENTITY,
+        entityId: parentEntity
+      },
+      {
+        direction: 'a->renderer',
+        type: CrdtMessageType.DELETE_ENTITY,
+        entityId: entityCache
+      },
+      {
+        direction: 'a->b',
+        type: CrdtMessageType.DELETE_ENTITY_NETWORK,
+        entityId: componentsA.NetworkEntity.get(parentEntity).entityId,
+        networkId: syncB.myProfile.networkId
+      },
+      {
+        direction: 'a->b',
+        type: CrdtMessageType.DELETE_ENTITY_NETWORK,
+        entityId: entityCache,
+        networkId: syncA.myProfile.networkId
+      }
+    ])
+    interceptedMessages.length = 0
+  })
+  it('should remove the entities on engine B', async () => {
+    const transformEntities = Array.from(engineB.getEntitiesWith(componentsB.Transform))
+    const [childEntity] = transformEntities[0]
+    const [parentEntity] = transformEntities[1]
+    await tick()
+    expect(engineB.getEntityState(childEntity)).toBe(EntityState.Removed)
+    expect(engineB.getEntityState(parentEntity)).toBe(EntityState.Removed)
+    interceptedMessages.length = 0
   })
 })

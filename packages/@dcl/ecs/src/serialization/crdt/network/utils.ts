@@ -3,12 +3,7 @@ import { ReceiveMessage, TransformType } from '../../../runtime/types'
 import { ReceiveNetworkMessage } from '../../../systems/crdt/types'
 import { ByteBuffer, ReadWriteByteBuffer } from '../../ByteBuffer'
 import { PutComponentOperation } from '../putComponent'
-import {
-  CrdtMessageType,
-  PutComponentMessageBody,
-  PutNetworkComponentMessage,
-  PutNetworkComponentMessageBody
-} from '../types'
+import { CrdtMessageType } from '../types'
 import { DeleteComponent } from '../deleteComponent'
 import { DeleteEntity } from '../deleteEntity'
 import { INetowrkEntityType } from '../../../components/types'

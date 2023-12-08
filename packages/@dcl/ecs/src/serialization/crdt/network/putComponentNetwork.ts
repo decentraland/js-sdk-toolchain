@@ -1,7 +1,7 @@
 import { CrdtMessageProtocol } from '../crdtMessageProtocol'
 import { Entity } from '../../../engine/entity'
 import { ByteBuffer } from '../../ByteBuffer'
-import { CrdtMessageType, CRDT_MESSAGE_HEADER_LENGTH, PutComponentMessage, PutNetworkComponentMessage } from '../types'
+import { CrdtMessageType, CRDT_MESSAGE_HEADER_LENGTH, PutNetworkComponentMessage } from '../types'
 
 /**
  * @public
@@ -47,9 +47,8 @@ export namespace PutNetworkComponentOperation {
     if (!header) {
       return null
     }
-
     if (header.type !== CrdtMessageType.PUT_COMPONENT_NETWORK) {
-      throw new Error('PutComponentOperation tried to read another message type.')
+      throw new Error('PutComponentNetworkOperation tried to read another message type.')
     }
 
     return {

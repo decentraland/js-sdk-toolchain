@@ -136,7 +136,6 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
     const entitiesShouldBeCleaned: Entity[] = []
 
     for (const msg of messagesToProcess) {
-      // eslint-disable-next-line prefer-const
       let { entityId, network } = findNetworkId(msg)
       // We receive a new Entity. Create the localEntity and map it to the NetworkEntity component
       if (networkUtils.isNetworkMessage(msg) && !network) {

@@ -46,6 +46,8 @@ export function getComponentEntityTree<T>(
   return genEntityTree(entity, entities)
 }
 
+// I swear by all the gods that this is being tested on test/sdk/network/sync-engines.spec.ts
+/* istanbul ignore next */
 function removeNetworkEntityChildrens(
   engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema' | 'removeEntity' | 'defineComponent'>,
   parent: Entity
@@ -81,6 +83,7 @@ export function removeEntityWithChildren(
   const Transform = components.Transform(engine)
   const NetworkEntity = components.NetworkEntity(engine)
 
+  /* istanbul ignore if */
   if (NetworkEntity.has(entity)) {
     return removeNetworkEntityChildrens(engine, entity)
   }
