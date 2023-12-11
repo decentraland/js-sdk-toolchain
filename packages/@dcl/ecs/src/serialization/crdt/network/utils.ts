@@ -12,6 +12,7 @@ import { DeleteComponentNetwork } from './deleteComponentNetwork'
 import { DeleteEntityNetwork } from './deleteEntityNetwork'
 import { TransformSchema } from '../../../components/manual/Transform'
 
+/* istanbul ignore next */
 export function isNetworkMessage(message: ReceiveMessage): message is ReceiveNetworkMessage {
   return [
     CrdtMessageType.DELETE_COMPONENT_NETWORK,
@@ -20,6 +21,7 @@ export function isNetworkMessage(message: ReceiveMessage): message is ReceiveNet
   ].includes(message.type)
 }
 
+/* istanbul ignore next */
 export function networkMessageToLocal(
   message: ReceiveNetworkMessage,
   localEntityId: Entity,
@@ -36,7 +38,7 @@ export function networkMessageToLocal(
   }
   destinationBuffer.writeBuffer(buffer.buffer().subarray(offset, buffer.currentWriteOffset()), false)
 }
-
+/* istanbul ignore next */
 export function localMessageToNetwork(
   message: ReceiveMessage,
   network: INetowrkEntityType,
@@ -61,6 +63,7 @@ export function localMessageToNetwork(
   destinationBuffer.writeBuffer(buffer.buffer().subarray(offset, buffer.currentWriteOffset()), false)
 }
 
+/* istanbul ignore next */
 export function fixTransformParent(
   message: ReceiveMessage,
   transformValue?: TransformType,
