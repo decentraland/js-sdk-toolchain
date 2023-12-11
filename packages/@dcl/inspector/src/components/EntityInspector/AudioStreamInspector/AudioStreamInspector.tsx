@@ -51,7 +51,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
       className={cx('AudioStream')}
       rightContent={
         <InfoTooltip
-          text="The audio in the source must be in one of the following formats: .mp3, ogg, or aac. The source must also be an https URL (http URLs aren’t supported), and the source should have CORS policies (Cross Origin Resource Sharing) that permit externally accessing it"
+          text="The audio in the source must be in one of the following formats: .mp3, ogg, or aac. The source must also be an https URL (http URLs aren’t supported), and the source should have CORS policies (Cross Origin Resource Sharing) that permit externally accessing it."
           link="https://docs.decentraland.org/creator/development-guide/sdk7/audio-streaming"
           type="help"
         />
