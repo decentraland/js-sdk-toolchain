@@ -7,69 +7,36 @@ import {
   InputAction,
   pointerEventsSystem,
   Schemas,
-  SyncComponents,
   Transform
 } from '@dcl/sdk/ecs'
-import { getRealm } from '~system/Runtime'
-import { createNetworkManager } from '@dcl/sdk/network-transport'
+import { syncEntity } from '@dcl/sdk/network'
+import { getUserData } from '~system/UserIdentity'
 
 import { createHummingBird, moveHummingBirds, shootBirds } from './hummingBird'
-import { ADMIN_USERS, setupUi } from './ui'
-import { isServer } from '~system/EngineApi'
-import { getUserData } from '~system/UserIdentity'
-import { NetworkManager } from '@dcl/sdk/network-transport/types'
+import { setupUi } from './ui'
 import { createMovingPlatforms } from './moving-platforms'
-import { changeColorSystem, createCube } from './create-cube'
-import { createMovingPlatformsOld } from './moving-platforms-old'
+import { cubeSystem, createCube } from './create-cube'
+import { SyncEntities } from './sync-enum'
 
 export const GameStatus = engine.defineComponent('game-status', { paused: Schemas.Boolean })
 
-function gameStatusServer(networkManager: NetworkManager) {
-  const gameEntity = networkManager.addEntity(engine)
+function gameStatusServer() {
+  const gameEntity = engine.addEntity()
   GameStatus.create(gameEntity, { paused: false })
-  SyncComponents.create(gameEntity, { componentIds: [GameStatus.componentId] })
+  syncEntity(gameEntity, [GameStatus.componentId], SyncEntities.GAME_STATUS)
 }
 
 export async function main() {
-  const realm = await getRealm({})
-  const server = isServer && !!(await isServer({})).isServer
-  const serverUrl = realm.realmInfo?.isPreview
-    ? 'ws://127.0.0.1:3000/ws/localScene'
-    : 'wss://scene-state-server.decentraland.org/ws/boedo.dcl.eth'
-  const networkManager =
-    engine ||
-    (await createNetworkManager({
-      serverUrl,
-      networkEntitiesLimit: { serverLimit: 500, clientLimit: 15 }
-    }))
   const userId = (await getUserData({})).data?.userId ?? ''
-
   setupUi(userId)
-  if (server || true) {
-    engine.addSystem(moveHummingBirds)
-    gameStatusServer(networkManager)
-    createMovingPlatforms(networkManager)
-    createMovingPlatformsOld(networkManager)
-    for (const [x, y, z] of [
-      [44, 1, 26],
-      [36, 2, 37],
-      [20, 3, 40],
-      [19, 1, 23],
-      [31, 5, 8],
-      [43, 4, 6],
-      [37, 3, 24],
-      [5, 8, 2]
-    ]) {
-      createCube(networkManager, x, y, z)
-    }
-    // return
-  }
+  engine.addSystem(moveHummingBirds)
+  // gameStatusServer()
+  createMovingPlatforms()
 
-  if (!server) {
-    engine.addSystem(changeColorSystem)
-    engine.addSystem(shootBirds(userId))
-  }
-
+  engine.addSystem(cubeSystem)
+  engine.addSystem(shootBirds(userId))
+  createCube(5, 1, 5, true, SyncEntities.CUBE_1)
+  // Instantiate base models. Floor & Tree
   const ground = engine.addEntity()
   Transform.create(ground, {
     position: { x: 24, y: 0.1, z: 24 },
@@ -80,8 +47,6 @@ export async function main() {
     src: 'models/Ground.gltf',
     visibleMeshesCollisionMask: ColliderLayer.CL_PHYSICS
   })
-
-  // Instantiate base models
   GltfContainer.create(engine.addEntity(), {
     src: 'models/baseLight.glb'
   })
@@ -134,9 +99,7 @@ export async function main() {
       }
     },
     function () {
-      birdsCreated++
-      if (birdsCreated >= 10 && !ADMIN_USERS.has(userId)) return
-      createHummingBird(networkManager)
+      createHummingBird()
       const anim = Animator.getMutable(tree)
       anim.states[0].playing = true
       const audioSource = AudioSource.getMutable(tree)
@@ -144,4 +107,3 @@ export async function main() {
     }
   )
 }
-let birdsCreated = 0

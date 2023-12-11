@@ -14,11 +14,13 @@ export class MessageBus {
 
   on(message: string, callback: (value: any, sender: string) => void): Observer<IEvents['comms']> {
     return onCommsMessage.add((e) => {
-      const m = JSON.parse(e.message)
+      try {
+        const m = JSON.parse(e.message)
 
-      if (m.message === message) {
-        callback(m.payload, e.sender)
-      }
+        if (m.message === message) {
+          callback(m.payload, e.sender)
+        }
+      } catch (_) {}
     })!
   }
 
@@ -28,7 +30,6 @@ export class MessageBus {
 
     this.flush()
   }
-
   emit(message: string, payload: Record<any, any>) {
     const messageToSend = JSON.stringify({ message, payload })
     this.sendRaw(messageToSend)
@@ -36,13 +37,10 @@ export class MessageBus {
   }
 
   private flush() {
-    if (this.messageQueue.length === 0) return
+    if (!this.messageQueue.length) return
     if (this.flushing) return
 
     const message = this.messageQueue.shift()!
-
-    this.flushing = true
-
     communicationsController.send({ message }).then(
       (_) => {
         this.flushing = false

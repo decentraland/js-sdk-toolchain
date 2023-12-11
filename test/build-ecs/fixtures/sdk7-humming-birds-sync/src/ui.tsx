@@ -2,12 +2,11 @@ import { engine, Entity, PointerEvents, Transform } from '@dcl/sdk/ecs'
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { Button, Label, ReactEcsRenderer, UiEntity } from '@dcl/sdk/react-ecs'
 import { Bird, BirdKilled } from './hummingBird'
-import { PlayersConnected } from '@dcl/sdk/network-transport'
 import { GameStatus } from '.'
+import { createCircle, createTriangle } from './create-cube'
 
 let scoreBoard: [string, number][] = []
 let scoreInterval = 0
-let playersConnected: number
 export let gamePaused = false
 let gameStatusEntity: Entity
 
@@ -22,11 +21,6 @@ engine.addSystem((dt: number) => {
   // Game status info
   gameStatusEntity = gameStatusEntity ?? (Array.from(engine.getEntitiesWith(GameStatus))[0] || [])[0]
   gamePaused = GameStatus.getOrNull(gameStatusEntity)?.paused ?? false
-
-  // Look for the players connected
-  for (const [_, players] of engine.getEntitiesWith(PlayersConnected)) {
-    playersConnected = players.usersId.length
-  }
 
   // Create the score board for the birds killed
   for (const [_, bird] of engine.getEntitiesWith(BirdKilled)) {
@@ -92,29 +86,27 @@ export function setupUi(userId: string) {
           }}
           uiBackground={{ color: Color4.fromHexString('#70ac76ff') }}
         >
-          <UiEntity
-            uiTransform={{
-              width: '100%',
-              height: 50,
-              margin: '8px 0'
-            }}
-            uiBackground={{
-              textureMode: 'center',
-              texture: {
-                src: 'images/scene-thumbnail.png'
-              }
-            }}
-            uiText={{
-              value: `Players: ${playersConnected ?? 0}`,
-              fontSize: 18
-            }}
-          />
           <Label
             value={`# Birds Killed: ${[...engine.getEntitiesWith(BirdKilled)].length} / ${
               [...engine.getEntitiesWith(Bird, PointerEvents)].length
             }`}
             fontSize={18}
             uiTransform={{ width: '100%', height: 40 }}
+          />
+          <Button
+            value="Create Sync (Triangle)"
+            fontSize={18}
+            uiTransform={{ width: '100%', height: 40 }}
+            onMouseDown={handleCreateTriangle}
+          />
+          <Button
+            value="Create Local (Circle)"
+            fontSize={18}
+            uiTransform={{ width: '100%', height: 40 }}
+            onMouseDown={() => {
+              const { x, y, z } = Transform.get(engine.PlayerEntity).position
+              createCircle(x, y, z, false)
+            }}
           />
           {scoreBoard.map(($) => (
             <Label
@@ -123,10 +115,16 @@ export function setupUi(userId: string) {
               uiTransform={{ width: '100%', height: 40 }}
             />
           ))}
+          <Label value={getPlayerPosition()} fontSize={18} uiTransform={{ width: '100%', height: 40 }} />
         </UiEntity>
       </UiEntity>
     ]
   })
+}
+
+function handleCreateTriangle() {
+  const { x, y, z } = Transform.get(engine.PlayerEntity).position
+  createTriangle(x, y, z)
 }
 
 export function formatAddress(address: string) {

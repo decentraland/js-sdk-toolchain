@@ -5,19 +5,18 @@ import {
   GltfContainer,
   InputAction,
   MeshCollider,
+  NetworkEntity,
   PointerEventType,
   PointerEvents,
   Schemas,
-  SyncComponents,
   Transform,
   VisibilityComponent,
   engine,
   inputSystem
 } from '@dcl/sdk/ecs'
-
+import { myProfile, syncEntity } from '@dcl/sdk//network'
 import { Quaternion } from '@dcl/sdk/math'
 import * as utils from '@dcl-sdk/utils'
-import { NetworkManager } from '@dcl/sdk/network-transport/types'
 import { gamePaused } from './ui'
 
 export const Bird = engine.defineComponent('bird', {})
@@ -25,12 +24,15 @@ export const Bird = engine.defineComponent('bird', {})
 // TODO: this BirdKilled should be added by the server but its not part of this POC
 export const BirdKilled = engine.defineComponent('bird-killed', { userId: Schemas.String })
 
-export function createHummingBird(networkManager: NetworkManager) {
-  const bird = networkManager.addEntity(engine)
+export function createHummingBird() {
+  const bird = engine.addEntity()
+  syncEntity(bird, [
+    Transform.componentId,
+    Animator.componentId,
+    VisibilityComponent.componentId,
+    BirdKilled.componentId
+  ])
   Bird.create(bird)
-  SyncComponents.create(bird, {
-    componentIds: [Transform.componentId, Animator.componentId, VisibilityComponent.componentId, BirdKilled.componentId]
-  })
   VisibilityComponent.create(bird, { visible: true })
   Transform.create(bird, {
     position: { x: 13, y: 3.5, z: 5 },
@@ -101,9 +103,16 @@ export function moveHummingBirds(dt: number) {
   if (birdsTime <= 4) return
   birdsTime = 0
 
-  for (const [birdEntity, _bird, visibleComponent] of engine.getEntitiesWith(Bird, VisibilityComponent)) {
+  for (const [birdEntity, _bird, visibleComponent, networkEntity] of engine.getEntitiesWith(
+    Bird,
+    VisibilityComponent,
+    NetworkEntity
+  )) {
+    if (!visibleComponent.visible) continue
+    if (networkEntity?.networkId !== myProfile.networkId) continue
+
     const birdTransform = Transform.getMutableOrNull(birdEntity)
-    if (!birdTransform || !visibleComponent.visible) continue
+    if (!birdTransform) continue
 
     // next target
     const nextPos = {
