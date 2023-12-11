@@ -30,6 +30,37 @@ export function isValidInput(urn: string): boolean {
   return isValidUrn(urn)
 }
 
+export const NETWORKS = [
+  {
+    value: 0,
+    label: 'ethereum'
+  },
+  {
+    value: 1,
+    label: 'kovan'
+  },
+  {
+    value: 2,
+    label: 'rinkeby'
+  },
+  {
+    value: 3,
+    label: 'goerli'
+  },
+  {
+    value: 4,
+    label: 'sepolia'
+  },
+  {
+    value: 5,
+    label: 'matic'
+  },
+  {
+    value: 6,
+    label: 'mumbai'
+  }
+]
+
 export const NFT_STYLES = [
   {
     value: 0,
@@ -124,3 +155,26 @@ export const NFT_STYLES = [
     label: 'None'
   }
 ]
+
+export type UrnTokens = {
+  network?: number
+  contract?: string
+  token?: string
+}
+
+export const DEFAULT_NETWORK = NETWORKS[0]
+
+export function getUrn({ network, contract, token }: UrnTokens): string {
+  const _network = NETWORKS.find(($) => $.value === network)?.label || DEFAULT_NETWORK.label
+  return `urn:decentraland:${_network}:erc721:${contract}:${token}`
+}
+
+export function buildTokens(nft: PBNftShape | null) {
+  const urn = nft?.urn || ''
+  const [_, _2, network, _3, contract, ...rest] = urn.split(':')
+  return {
+    network: NETWORKS.find(($) => $.label === network)?.value || DEFAULT_NETWORK.value,
+    contract: contract ?? '',
+    token: rest.join(':')
+  }
+}
