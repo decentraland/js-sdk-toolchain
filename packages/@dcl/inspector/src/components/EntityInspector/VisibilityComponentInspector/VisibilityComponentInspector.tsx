@@ -1,6 +1,6 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import cx from 'classnames'
-import { PBVisibilityComponent, PBGltfContainer } from '@dcl/ecs'
+import { PBVisibilityComponent, PBGltfContainer, PBMeshCollider } from '@dcl/ecs'
 
 import { withSdk } from '../../../hoc/withSdk'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
@@ -12,19 +12,27 @@ import { InfoTooltip } from '../../ui/InfoTooltip'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
 import { Dropdown } from '../../ui/Dropdown'
+import { COLLISION_LAYERS } from '../GltfInspector/utils'
 import { Props } from './types'
 
 export default withSdk<Props>(({ sdk, entity }) => {
-  const { VisibilityComponent, GltfContainer } = sdk.components
+  const { VisibilityComponent, GltfContainer, MeshCollider } = sdk.components
   const hasVisibilityComponent = useHasComponent(entity, VisibilityComponent)
-  const [componentValue, setComponentValue, isComponentEqual] = useComponentValue<PBVisibilityComponent>(
-    entity,
-    VisibilityComponent
-  )
-  const [collisionValue, setCollisionValue, isCollisionEqual] = useComponentValue<PBGltfContainer>(
+  const hasGltfContainer = useHasComponent(entity, GltfContainer)
+  const hasMeshCollider = useHasComponent(entity, MeshCollider)
+  const [componentValue, setComponentValue] = useComponentValue<PBVisibilityComponent>(entity, VisibilityComponent)
+  const [gltfComponentValue, setGltfComponentValue, isGltfComponentEqual] = useComponentValue<PBGltfContainer>(
     entity,
     GltfContainer
   )
+  const [meshColliderValue, setMeshColliderValue, isMeshColliderEqual] = useComponentValue<PBMeshCollider>(
+    entity,
+    MeshCollider
+  )
+
+  const colliderValue = useMemo(() => {
+    return gltfComponentValue.invisibleMeshesCollisionMask ?? meshColliderValue.collisionMask ?? 0
+  }, [gltfComponentValue, meshColliderValue])
 
   useEffect(() => {
     if (componentValue.visible === undefined) {
@@ -46,33 +54,35 @@ export default withSdk<Props>(({ sdk, entity }) => {
 
   const handleChangeVisibility = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
-      const current = sdk.components.VisibilityComponent.get(entity)
-      const visible = value === 'true'
-
-      if (isComponentEqual({ ...current, visible })) {
-        return
-      }
-
-      setComponentValue({ ...current, visible })
+      setComponentValue({ ...componentValue, visible: value === 'true' })
     },
-    [entity]
+    [entity, componentValue]
   )
 
   const handleChangeCollider = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
-      const current = sdk.components.GltfContainer.get(entity)
-      const invisibleMeshesCollisionMask = value === 'true' ? 2 : 0
+      const currentGltfContainer = GltfContainer.getOrNull(entity)
+      const currentMeshCollider = MeshCollider.getOrNull(entity)
+      const invisibleMeshesCollisionMask = parseInt(value, 10)
 
-      if (isCollisionEqual({ ...current, invisibleMeshesCollisionMask })) {
-        return
+      if (currentGltfContainer) {
+        if (isGltfComponentEqual({ ...currentGltfContainer, invisibleMeshesCollisionMask })) {
+          return
+        }
+
+        setGltfComponentValue({ ...currentGltfContainer, invisibleMeshesCollisionMask })
+      } else if (currentMeshCollider) {
+        if (isMeshColliderEqual({ ...currentMeshCollider, collisionMask: invisibleMeshesCollisionMask })) {
+          return
+        }
+
+        setMeshColliderValue({ ...currentMeshCollider, collisionMask: invisibleMeshesCollisionMask })
       }
-
-      setCollisionValue({ ...current, invisibleMeshesCollisionMask })
     },
-    [entity]
+    [entity, gltfComponentValue, meshColliderValue]
   )
 
-  const renderVisibilityMoreInfo = () => {
+  const renderVisibilityMoreInfo = useCallback(() => {
     return (
       <InfoTooltip
         text={
@@ -80,15 +90,17 @@ export default withSdk<Props>(({ sdk, entity }) => {
         }
       />
     )
-  }
+  }, [])
 
-  const renderPhysicsCollidersMoreInfo = () => {
+  const renderPhysicsCollidersMoreInfo = useCallback(() => {
     return (
-      <InfoTooltip text={'Use the Physics Collider property to turn on or off physical interaction with this item.'} />
+      <InfoTooltip
+        text={'Use the Collider property to turn on or off physical or clickable interaction with this item.'}
+      />
     )
-  }
+  }, [])
 
-  if (!hasVisibilityComponent) return null
+  if (!hasVisibilityComponent || (!hasGltfContainer && !hasMeshCollider)) return null
 
   return (
     <Container label="Visibility" className={cx('VisibilityContainer')} onRemoveContainer={handleRemove}>
@@ -104,12 +116,9 @@ export default withSdk<Props>(({ sdk, entity }) => {
         />
 
         <Dropdown
-          label={<>Physics Collider {renderPhysicsCollidersMoreInfo()}</>}
-          options={[
-            { value: 'true', label: 'Enabled' },
-            { value: 'false', label: 'Disabled' }
-          ]}
-          value={(collisionValue.invisibleMeshesCollisionMask === 2).toString()}
+          label={<>Collider {renderPhysicsCollidersMoreInfo()}</>}
+          options={COLLISION_LAYERS}
+          value={colliderValue}
           onChange={handleChangeCollider}
         />
       </Block>

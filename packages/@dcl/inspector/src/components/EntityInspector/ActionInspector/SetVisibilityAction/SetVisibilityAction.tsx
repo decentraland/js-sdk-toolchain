@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { ActionPayload, ActionType } from '@dcl/asset-packs'
+import { ActionPayload, ActionType, Colliders } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 import { Block } from '../../../Block'
-import { Dropdown } from '../../../ui/Dropdown'
+import { Dropdown, InfoTooltip } from '../../../ui'
+import { COLLISION_LAYERS } from '../../GltfInspector/utils'
 import type { Props } from './types'
 
 import './SetVisibilityAction.css'
@@ -25,17 +26,30 @@ const SetVisibilityAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
 
   const handleSetVisible = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
-      setPayload({ ...payload, visible: value === 'true' })
+      const visible = value === 'true'
+      setPayload({
+        ...payload,
+        visible,
+        collider: visible ? payload.collider : Colliders.CL_NONE
+      })
     },
     [payload, setPayload]
   )
 
   const handleChangeCollider = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
-      setPayload({ ...payload, physicsCollider: value === 'true' })
+      setPayload({ ...payload, collider: parseInt(value, 10) })
     },
     [payload, setPayload]
   )
+
+  const renderPhysicsCollidersMoreInfo = useCallback(() => {
+    return (
+      <InfoTooltip
+        text={'Use the Collider property to turn on or off physical or clickable interaction with this item.'}
+      />
+    )
+  }, [])
 
   return (
     <Block className="SetVisibilityActionContainer">
@@ -50,12 +64,10 @@ const SetVisibilityAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
       />
 
       <Dropdown
-        label="Select Physics Collider"
-        options={[
-          { value: 'true', label: 'Enabled' },
-          { value: 'false', label: 'Disabled' }
-        ]}
-        value={(payload.physicsCollider ?? false).toString()}
+        label={<>Collider {renderPhysicsCollidersMoreInfo()}</>}
+        placeholder="Select Collider"
+        options={COLLISION_LAYERS}
+        value={payload.collider}
         onChange={handleChangeCollider}
       />
     </Block>
