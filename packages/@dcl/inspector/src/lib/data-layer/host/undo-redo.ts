@@ -10,7 +10,7 @@ import upsertAsset from './upsert-asset'
 import { FileSystemInterface } from '../types'
 import { findPrevValue } from './utils/component'
 import { UndoRedoArray } from './utils/undo-redo-array'
-import { withAssetDir } from './fs-utils'
+import { isFileInAssetDir, withAssetDir } from './fs-utils'
 
 export type UndoRedoCrdt = { $case: 'crdt'; operations: CrdtOperation[] }
 export type UndoRedoFile = { $case: 'file'; operations: FileOperation[] }
@@ -85,7 +85,11 @@ export function initUndoRedo(fs: FileSystemInterface, engine: IEngine, getCompos
       }
     } else if (message.$case === 'file') {
       for (const operation of message.operations) {
-        await upsertAsset(fs, withAssetDir(operation.path), getValue(operation))
+        await upsertAsset(
+          fs,
+          isFileInAssetDir(operation.path) ? operation.path : withAssetDir(operation.path),
+          getValue(operation)
+        )
       }
     }
   }

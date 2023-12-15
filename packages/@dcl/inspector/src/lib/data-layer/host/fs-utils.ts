@@ -50,6 +50,10 @@ export function withAssetDir(filePath: string = '') {
   return filePath ? `${DIRECTORY.ASSETS}/${filePath}` : DIRECTORY.ASSETS
 }
 
+export function isFileInAssetDir(filePath: string = '') {
+  return filePath.startsWith(DIRECTORY.ASSETS)
+}
+
 export function getFileName(fileName: string, ext: string) {
   if (EXTENSIONS.some(($) => fileName.endsWith($))) return fileName
   return `${fileName}.${ext}`
