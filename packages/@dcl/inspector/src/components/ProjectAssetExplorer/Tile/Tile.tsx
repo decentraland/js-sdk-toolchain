@@ -1,11 +1,13 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 import { IoIosImage } from 'react-icons/io'
 import { Item as MenuItem } from 'react-contexify'
 import { useDrag } from 'react-dnd'
 import { Loader } from 'decentraland-ui/dist/components/Loader/Loader'
 
-import { transformBinaryToBase64Resource } from '../../../lib/data-layer/host/fs-utils'
+import { transformBinaryToBase64Resource, withAssetDir } from '../../../lib/data-layer/host/fs-utils'
+import { useAppSelector } from '../../../redux/hooks'
+import { selectDataLayerRemovingAsset } from '../../../redux/data-layer'
 import { ContextMenu as Menu } from '../../ContexMenu'
 import FolderIcon from '../../Icons/Folder'
 import { withContextMenu } from '../../../hoc/withContextMenu'
@@ -17,16 +19,16 @@ import './Tile.css'
 export const Tile = withContextMenu<Props>(
   ({ valueId, value, getDragContext, onSelect, onRemove, contextMenuId, dndType, getThumbnail }) => {
     const { handleAction } = useContextMenu()
-    const [isRemoving, setIsRemoving] = useState(false)
+    const isRemovingAsset = useAppSelector(selectDataLayerRemovingAsset)
 
     const isLoading = useMemo(() => {
-      return isRemoving
-    }, [isRemoving])
+      const path = withAssetDir(valueId)
+      return !!isRemovingAsset[path]
+    }, [valueId, isRemovingAsset])
 
     const [, drag] = useDrag(() => ({ type: dndType, item: { value: valueId, context: getDragContext() } }), [valueId])
 
     const handleRemove = useCallback(() => {
-      setIsRemoving(true)
       onRemove(valueId)
     }, [valueId])
 
