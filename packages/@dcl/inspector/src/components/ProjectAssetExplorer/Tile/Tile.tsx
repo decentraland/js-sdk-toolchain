@@ -1,8 +1,9 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
 import { IoIosImage } from 'react-icons/io'
 import { Item as MenuItem } from 'react-contexify'
 import { useDrag } from 'react-dnd'
+import { Loader } from 'decentraland-ui/dist/components/Loader/Loader'
 
 import { transformBinaryToBase64Resource } from '../../../lib/data-layer/host/fs-utils'
 import { ContextMenu as Menu } from '../../ContexMenu'
@@ -16,21 +17,39 @@ import './Tile.css'
 export const Tile = withContextMenu<Props>(
   ({ valueId, value, getDragContext, onSelect, onRemove, contextMenuId, dndType, getThumbnail }) => {
     const { handleAction } = useContextMenu()
+    const [isRemoving, setIsRemoving] = useState(false)
+
+    const isLoading = useMemo(() => {
+      return isRemoving
+    }, [isRemoving])
 
     const [, drag] = useDrag(() => ({ type: dndType, item: { value: valueId, context: getDragContext() } }), [valueId])
 
     const handleRemove = useCallback(() => {
+      setIsRemoving(true)
       onRemove(valueId)
     }, [valueId])
 
     if (!value) return null
 
-    const renderThumbnail = () => {
+    const renderThumbnail = useCallback(() => {
       if (value.type === 'folder') return <FolderIcon />
       const thumbnail = getThumbnail(value.name)
       if (thumbnail) return <img src={transformBinaryToBase64Resource(thumbnail)} alt={value.name} />
       return <IoIosImage />
-    }
+    }, [])
+
+    const renderOverlayLoading = useCallback(() => {
+      if (isLoading) {
+        return (
+          <div className="overlay">
+            <Loader active />
+          </div>
+        )
+      }
+
+      return null
+    }, [isLoading])
 
     return (
       <>
@@ -51,6 +70,7 @@ export const Tile = withContextMenu<Props>(
           data-test-id={valueId}
           data-test-label={value.name}
         >
+          {renderOverlayLoading()}
           {renderThumbnail()}
           <span>{value.name}</span>
         </div>
