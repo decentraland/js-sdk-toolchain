@@ -24,7 +24,8 @@ describe('WebSocket Connection Saga', () => {
       .put(connected({ dataLayer }))
       .hasFinalState({
         error: undefined,
-        reconnectAttempts: 0
+        reconnectAttempts: 0,
+        removingAsset: {}
       })
       .run()
     expect(getDataLayerInterface()).toBe(dataLayer)
