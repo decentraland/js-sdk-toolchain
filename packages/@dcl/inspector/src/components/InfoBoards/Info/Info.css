@@ -1,0 +1,15 @@
+.Info {
+  color: var(--white);
+  background-color: var(--tree-bg-color);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.Info .icon {
+  color: var(--border-focused);
+  margin-right: 4px;
+  width: 16px;
+  height: 16px;
+}

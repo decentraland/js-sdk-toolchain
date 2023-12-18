@@ -1,8 +1,10 @@
-.Warnings {
+.InfoBoards {
+  flex-direction: column;
   position: absolute;
   bottom: 5px;
+  right: 5px;
   z-index: 1;
   display: flex;
   justify-content: center;
-  width: 100%;
+  row-gap: 5px;
 }

@@ -2,16 +2,18 @@ import React from 'react'
 
 import { RotationGizmoLocalAlignmentDisabled } from './RotationGizmoLocalAlignmentDisabled'
 import { SocketConnection } from './SocketConnection'
+import { Participants } from './Participants'
 
-import './Warnings.css'
+import './InfoBoards.css'
 
-const Warnings: React.FC = () => {
+const InfoBoards: React.FC = () => {
   return (
-    <div className="Warnings">
+    <div className="InfoBoards">
       <RotationGizmoLocalAlignmentDisabled />
       <SocketConnection />
+      <Participants />
     </div>
   )
 }
 
-export default React.memo(Warnings)
+export default React.memo(InfoBoards)

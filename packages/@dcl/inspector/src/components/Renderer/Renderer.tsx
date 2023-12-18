@@ -22,7 +22,7 @@ import { Loading } from '../Loading'
 import { isModel, isAsset } from '../EntityInspector/GltfInspector/utils'
 import { useIsMounted } from '../../hooks/useIsMounted'
 import { analytics, Event } from '../../lib/logic/analytics'
-import { Warnings } from '../Warnings'
+import { InfoBoards } from '../InfoBoards'
 import { CameraSpeed } from './CameraSpeed'
 
 import './Renderer.css'
@@ -173,12 +173,10 @@ const Renderer: React.FC = () => {
 
   drop(canvasRef)
 
-  console.log('SESSION: ', session)
-
   return (
     <div className={cx('Renderer', { 'is-loaded': !isLoading, 'is-loading': isLoading })}>
       {isLoading && <Loading />}
-      <Warnings />
+      <InfoBoards />
       <CameraSpeed />
       <canvas ref={canvasRef} id="canvas" touch-action="none" />
     </div>
