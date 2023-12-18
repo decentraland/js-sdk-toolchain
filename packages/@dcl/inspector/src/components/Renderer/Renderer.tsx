@@ -15,7 +15,7 @@ import { loadGltf, removeGltf } from '../../lib/babylon/decentraland/sdkComponen
 import { getConfig } from '../../lib/logic/config'
 import { ROOT } from '../../lib/sdk/tree'
 import { Asset, isSmart } from '../../lib/logic/catalog'
-import { selectAssetCatalog } from '../../redux/app'
+import { selectAssetCatalog, selectSession } from '../../redux/app'
 import { areGizmosDisabled } from '../../redux/ui'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 import { Loading } from '../Loading'
@@ -37,6 +37,7 @@ const Renderer: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   const isMounted = useIsMounted()
   const files = useAppSelector(selectAssetCatalog)
+  const session = useAppSelector(selectSession)
   const init = !!files
   const gizmosDisabled = useAppSelector(areGizmosDisabled)
   const config = getConfig()
@@ -171,6 +172,8 @@ const Renderer: React.FC = () => {
   )
 
   drop(canvasRef)
+
+  console.log('SESSION: ', session)
 
   return (
     <div className={cx('Renderer', { 'is-loaded': !isLoading, 'is-loading': isLoading })}>

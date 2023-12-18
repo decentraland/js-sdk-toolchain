@@ -1,7 +1,16 @@
+import { Entity } from '@dcl/ecs'
+
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../store'
 import { InspectorPreferences } from '../../lib/logic/preferences/types'
 import { AssetCatalogResponse, GetFilesResponse } from '../../lib/data-layer/remote-data-layer'
+
+export interface Session {
+  participants: {
+    address: string
+    selectedEntity?: Entity
+  }[]
+}
 
 export interface AppState {
   canSave: boolean
@@ -9,6 +18,7 @@ export interface AppState {
   assetsCatalog: AssetCatalogResponse | undefined
   thumbnails: GetFilesResponse['files']
   uploadFile: Record<string, File | string | undefined>
+  session: Session
 }
 
 export const initialState: AppState = {
@@ -17,7 +27,8 @@ export const initialState: AppState = {
   preferences: undefined,
   assetsCatalog: undefined,
   thumbnails: [],
-  uploadFile: {}
+  uploadFile: {},
+  session: { participants: [] }
 }
 
 export const appState = createSlice({
@@ -40,12 +51,15 @@ export const appState = createSlice({
     },
     updateUploadFile: (state, { payload }: PayloadAction<AppState['uploadFile']>) => {
       state.uploadFile = payload
+    },
+    updateSession: (state, { payload }: PayloadAction<AppState['session']>) => {
+      state.session = payload
     }
   }
 })
 
 // Actions
-export const { updateCanSave, updatePreferences, updateAssetCatalog, updateThumbnails, updateUploadFile } =
+export const { updateCanSave, updatePreferences, updateAssetCatalog, updateThumbnails, updateUploadFile, updateSession } =
   appState.actions
 
 // Selectors
@@ -56,6 +70,7 @@ export const selectInspectorPreferences = (state: RootState): InspectorPreferenc
 export const selectAssetCatalog = (state: RootState) => state.app.assetsCatalog
 export const selectThumbnails = (state: RootState) => state.app.thumbnails
 export const selectUploadFile = (state: RootState) => state.app.uploadFile
+export const selectSession = (state: RootState) => state.app.session
 
 // Reducer
 export default appState.reducer

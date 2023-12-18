@@ -1,7 +1,7 @@
 import { IEngine, OnChangeFunction } from '@dcl/ecs'
 import { DataLayerRpcServer, FileSystemInterface } from '../types'
 import { EXTENSIONS, getCurrentCompositePath, getFilesInDirectory, withAssetDir } from './fs-utils'
-import { Stream, initCollaborativeEditor, stream } from './stream'
+import { Stream, stream } from './stream'
 import { FileOperation, initUndoRedo } from './undo-redo'
 import upsertAsset from './upsert-asset'
 import { initSceneProvider } from './scene'
@@ -42,15 +42,7 @@ export async function initRpcMethods(
   // install bin
   await installBin(fs)
 
-  const dataLayerStreams: Stream[] = []
-
-  // TODO: move this below as a RPC method
-  // initCollaborativeEditor(dataLayerStreams, { engine })
-
   return {
-    // connectExternalStream({ url }) {
-    //   dataLayerStreams.forEach(($) => addWsTransport(url, $, { engine }))
-    // },
     async redo() {
       const type = await undoRedoManager.redo()
       return type
@@ -64,9 +56,7 @@ export async function initRpcMethods(
      * It adds the undo's operations of the components changed (grouped) on every tick
      */
     crdtStream(iter) {
-      const newStream = stream(iter, { engine }, () => undoRedoManager?.addUndoCrdt())
-      dataLayerStreams.push(newStream)
-      return newStream
+      return stream(iter, { engine }, () => undoRedoManager?.addUndoCrdt())
     },
     async getAssetData(req) {
       if (!req.path) throw new Error('Invalid path')
