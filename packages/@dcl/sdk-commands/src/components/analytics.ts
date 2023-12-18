@@ -47,6 +47,7 @@ export type Events = {
     targetContentServer: string
     worldName: string | undefined
     isPortableExperience: boolean
+    serverlessMultiplayer: boolean
   }
   'Scene deploy failure': {
     projectHash: string
