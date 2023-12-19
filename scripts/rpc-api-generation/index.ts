@@ -4,7 +4,7 @@ import { TSC } from '../common'
 import { runCommand } from '../helpers'
 import { getFilePathsSync } from '../utils/getFilePathsSync'
 import { snakeToPascal } from '../utils/snakeToPascal'
-import { getBlock } from '../utils/stringParser'
+import { getBlock, getCommentBeforeAt, parseFileLines } from '../utils/stringParser'
 
 type ProtoServiceDefinition = {
   name: string
@@ -18,6 +18,7 @@ type ProtoServiceDefinition = {
       responseType: string
       responseStream: boolean
       options: any
+      comment?: string
     }
   >
 }
@@ -57,10 +58,14 @@ async function internalCompile() {
     for (const [methodName, method] of Object.entries(api.def.methods)) {
       types.add(method.requestType)
       types.add(method.responseType)
+
+      if (method.comment) {
+        functions.push(method.comment)
+      }
       functions.push(
         `export declare function ${method.requestStream ? '*' : ''}${methodName}(body: ${
           method.requestType
-        }): Promise<${method.responseType}>`
+        }): Promise<${method.responseType}>\n`
       )
     }
 
@@ -87,11 +92,15 @@ async function internalCompile() {
     const moduleDTsPath = path.resolve(apiModuleDirPath, 'index.d.ts')
     processDeclarations(api.name, moduleDTsPath)
 
-    apisDTsContent += `
+    if (api.blockComments) {
+      apisDTsContent += api.blockComments
+    } else {
+      apisDTsContent += `
 /**
   * ${api.name}
   */
 `
+    }
     apisDTsContent += readFileSync(moduleDTsPath).toString()
 
     rmSync(apiModuleDirPath, { recursive: true, force: true })
@@ -121,6 +130,8 @@ async function preprocessProtoGeneration(protoPath: string) {
     const item = snakeToPascal(fileName)
 
     const defBlock = getBlock(textContent, textContent.indexOf(`export const ${item}ServiceDefinition`))
+    const fileLines = parseFileLines(textContent)
+    const blockComments = getCommentBeforeAt(fileLines, textContent.indexOf(`export const ${item}ServiceDefinition`))
 
     const cleanContent = textContent
       .replace(`export type ${item}ServiceDefinition`, '//')
@@ -131,11 +142,21 @@ async function preprocessProtoGeneration(protoPath: string) {
 
     writeFileSync(filePath, cleanContent)
 
+    const def = content[`${item}ServiceDefinition`] as ProtoServiceDefinition
+
+    for (const methodName in def.methods) {
+      const methodComments = getCommentBeforeAt(fileLines, textContent.indexOf(`${methodName}: {`))
+      if (methodComments) {
+        def.methods[methodName].comment = methodComments
+      }
+    }
+
     apis.push({
       name: item,
-      def: content[`${item}ServiceDefinition`] as ProtoServiceDefinition,
+      def,
       content,
-      fileName
+      fileName,
+      blockComments
     })
   }
   return apis
