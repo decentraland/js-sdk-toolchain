@@ -4,7 +4,7 @@ import { AsyncQueue } from '@well-known-components/pushable-channel'
 import { CrdtStreamMessage } from '../data-layer/remote-data-layer'
 import { DataLayerRpcClient } from '../data-layer/types'
 import { consumeAllMessagesInto } from '../logic/consume-stream'
-import { serializeCrdtMessages } from './crdt-logger'
+import { deserializeCrdtMessage, logCrdtMessages } from './crdt-logger'
 
 export function connectCrdtToEngine(
   engine: IEngine,
@@ -22,7 +22,7 @@ export function connectCrdtToEngine(
       if (outgoingMessagesStream.closed) return
       outgoingMessagesStream.enqueue({ data: message })
       if (message.byteLength) {
-        Array.from(serializeCrdtMessages(`${engineKey}>Datalayer`, message, engine)).forEach(($) => console.log($))
+        logCrdtMessages(`${engineKey}>Datalayer`, deserializeCrdtMessage(message, engine))
       }
     }
   }
@@ -31,7 +31,7 @@ export function connectCrdtToEngine(
 
   function onMessage(message: Uint8Array) {
     if (message.byteLength) {
-      Array.from(serializeCrdtMessages(`DataLayer>${engineKey}`, message, engine)).forEach(($) => console.log($))
+      logCrdtMessages(`DataLayer>${engineKey}`, deserializeCrdtMessage(message, engine))
     }
     transport.onmessage!(message)
     void engine.update(1)

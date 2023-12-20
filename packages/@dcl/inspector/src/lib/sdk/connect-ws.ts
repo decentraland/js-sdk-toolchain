@@ -1,11 +1,13 @@
-import { IEngine } from "@dcl/ecs"
-import { DataLayerRpcClient } from "../data-layer/types"
+import { Entity, IEngine } from "@dcl/ecs"
 import { AsyncQueue } from "@well-known-components/pushable-channel"
-import { CrdtStreamMessage } from "../data-layer/remote-data-layer"
-import { serializeCrdtMessages } from "./crdt-logger"
-import { consumeAllMessagesInto } from "../logic/consume-stream"
+
 import { store } from "../../redux/store"
 import { updateSession } from "../../redux/app"
+import { consumeAllMessagesInto } from "../logic/consume-stream"
+import { DataLayerRpcClient } from "../data-layer/types"
+import { CrdtStreamMessage } from "../data-layer/remote-data-layer"
+import { DeserializedCrdtMessage, deserializeCrdtMessage, isDeleteComponentMessage, isPutComponentMessage, getPutComponentFromMessage, logCrdtMessages, getDeleteComponentFromMessage, readMessage2 } from "./crdt-logger"
+import { EditorComponentNames, EditorComponentsTypes } from "./components"
 
 export enum MessageType {
   Init = 1,
@@ -19,6 +21,7 @@ export enum MessageType {
 
 export type OnMessageFunction = (type: MessageType, data: Uint8Array) => void
 
+const encoder = new TextEncoder()
 const decoder = new TextDecoder()
 
 function craftMessage(msgType: MessageType, payload: Uint8Array): Uint8Array {
@@ -32,15 +35,19 @@ function decode(data: Uint8Array) {
   return JSON.parse(decoder.decode(data))
 }
 
-export function addWs(
-  url: string,
-  engine: IEngine,
-  queue: AsyncQueue<CrdtStreamMessage>,
-  dataLayerStream: DataLayerRpcClient['crdtStream']
-) {
+function encode(data: Record<string, unknown>) {
+  return encoder.encode(JSON.stringify(data))
+}
+
+export function addWs(url: string) {
   const ws = new WebSocket(url)
   ws.binaryType = 'arraybuffer'
   const onMessageFns: OnMessageFunction[] = []
+  const onOpenFns: (() => void)[] = []
+
+  function onOpen(fn: () => void) {
+    onOpenFns.push(fn)
+  }
 
   function onMessage(fn: OnMessageFunction) {
     onMessageFns.push(fn)
@@ -50,19 +57,9 @@ export function addWs(
     ws.send(craftMessage(type, payload))
   }
 
-  function cb(message: Uint8Array) {
-    if (!message.byteLength) return
-
-    Array.from(serializeCrdtMessages('DataLayer>Network', message, engine)).forEach(($) => console.log($))
-    sendMessage(MessageType.Crdt, message)
-  }
-
   ws.onopen = () => {
     console.log('WS connected', url)
-    consumeAllMessagesInto(dataLayerStream(queue), cb).catch((e) => {
-      console.error('WS consumeAllMessagesInto failed: ', e)
-      queue.close()
-    })
+    onOpenFns.forEach(($) => $())
   }
 
   ws.onmessage = (event) => {
@@ -83,17 +80,40 @@ export function addWs(
     console.log('WS closed')
   }
 
-  return { onMessage, sendMessage }
+  return { onOpen, onMessage, sendMessage }
 }
 
-export function initCollaborativeEditor(engine: IEngine, dataLayerStream: DataLayerRpcClient['crdtStream']) {
+export function initCollaborativeEditor(engine: IEngine, dataLayerStreamGenerator: DataLayerRpcClient['crdtStream']) {
   const url = `ws://localhost:3000/iws/mariano?address=0xC67c60cD6d82Fcb2fC6a9a58eA62F80443E3268${Math.ceil(Math.random() * 50)}`
   const queue = new AsyncQueue<CrdtStreamMessage>((_, _action) => {})
-  const ws = addWs(url, engine, queue, dataLayerStream)
+  const ws = addWs(url)
+  const dataLayerStream = dataLayerStreamGenerator(queue)
+
+  ws.onOpen(() => {
+    consumeAllMessagesInto(dataLayerStream, (message: Uint8Array) => {
+      if (!message.byteLength) return
+
+      const crdtMessages = deserializeCrdtMessage(message, engine)
+      logCrdtMessages('DataLayer>Network', crdtMessages)
+
+      // we always send Crdt messages through the wire...
+      ws.sendMessage(MessageType.Crdt, message)
+
+      for (const msg of crdtMessages) {
+        processCrdtMessage(msg).forEach(({ type, message }) => {
+          ws.sendMessage(type, encode(message))
+        })
+      }
+    })
+    .catch((e) => {
+      console.error('WS consumeAllMessagesInto failed: ', e)
+      queue.close()
+    })
+  })
 
   ws.onMessage((msgType: MessageType, data: Uint8Array) => {
     if (msgType === MessageType.Crdt) {
-      Array.from(serializeCrdtMessages('Network>DataLayer', data, engine)).forEach(($) => console.log($))
+      logCrdtMessages('Network>DataLayer', deserializeCrdtMessage(data, engine))
       queue.enqueue({ data })
     } else {
       execSessionMessage(msgType, data)
@@ -145,4 +165,27 @@ function execSessionMessage(msgType: MessageType, data: Uint8Array): void {
   if (is(msgType, MessageType.ParticipantUnselectedEntity, message)) {
     console.log('Session Message: ParticipantUnselectedEntity', message)
   }
+}
+
+type ProcessedMessages<T = Record<string, unknown>> = { type: MessageType, message: T }
+type SelectionComponentMessage = ProcessedMessages<{ entityId: Entity }>
+
+function processCrdtMessage(message: DeserializedCrdtMessage): ProcessedMessages[] {
+  const messages: ProcessedMessages[] = [
+    ...selectionComponentMessages(message)
+  ]
+
+  return messages
+}
+
+function selectionComponentMessages(message: DeserializedCrdtMessage): SelectionComponentMessage[] {
+  if (getPutComponentFromMessage<EditorComponentsTypes['Selection']>(message, EditorComponentNames.Selection)) {
+    return [{ type: MessageType.ParticipantSelectedEntity, message: { entityId: message.entityId } }]
+  }
+
+  if (getDeleteComponentFromMessage(message, EditorComponentNames.Selection)) {
+    return [{ type: MessageType.ParticipantUnselectedEntity, message: { entityId: message.entityId } }]
+  }
+
+  return []
 }

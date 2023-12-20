@@ -1,69 +1,167 @@
-import { IEngine, CrdtMessage, CrdtMessageType } from '@dcl/ecs'
+import { IEngine, CrdtMessage, CrdtMessageType, PutComponentMessageBody, PutComponentMessage, DeleteComponentMessage, DeleteComponentMessageBody, AppendValueMessage, AppendValueMessageBody, DeleteEntityMessage, DeleteEntityMessageBody, Entity, CrdtMessageProtocol, PutComponentOperation, CrdtMessageHeader, DeleteComponent, AppendValueOperation, DeleteEntity } from '@dcl/ecs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { readMessage } from '@dcl/ecs/dist/serialization/crdt/message'
+import { CoreComponents, EditorComponentNames } from './components'
 
-const VALID_MESSAGE_TYPES = [
-  CrdtMessageType.DELETE_COMPONENT,
-  CrdtMessageType.DELETE_ENTITY,
-  CrdtMessageType.PUT_COMPONENT,
-  CrdtMessageType.APPEND_VALUE
-]
+type Components = CoreComponents | EditorComponentNames
 
-export function* serializeCrdtMessages(prefix: string, data: Uint8Array, engine: IEngine) {
-  for (const m of deserializeCrdtMessage(data, engine)) {
-    const ent = `0x${m.entityId.toString(16)}`
-    const preface = `${prefix}: ${CrdtMessageType[m.type]} e=${ent}`
+export function logCrdtMessages(prefix: string, messages: DeserializedCrdtMessage[]) {
+  for (const m of messages) {
+    logCrdtMessage(prefix, m)
+  }
+}
 
-    if (!VALID_MESSAGE_TYPES.includes(m.type)) {
-      yield `${preface} Unknown CrdtMessageType`
-    } else if (m.componentName && m.body) {
-      yield `${preface} c=${m.componentName} t=${m.timestamp} data=${JSON.stringify(m.body)}`
-    } else if (m.componentId) {
-      yield `${preface} c=${m.componentId} t=${m.timestamp} data=?`
-    } else {
-      yield preface
+export function logCrdtMessage(prefix: string, message: DeserializedCrdtMessage) {
+  const ent = `0x${message.entityId.toString(16)}`
+  const preface = `${prefix}: ${CrdtMessageType[message.type]} e=${ent}`
+
+  if (isPutComponentMessage(message) || isAppendValueComponentMessage(message)) {
+    console.log(`${preface} c=${message.componentName} t=${message.timestamp} data=${JSON.stringify(message.data)}`)
+  } else if (isDeleteComponentMessage(message)) {
+    console.log(`${preface} c=${message.componentId} t=${message.timestamp} data=?`)
+  } else {
+    console.log(preface)
+  }
+}
+
+export type BaseCrdtMessage = { type: CrdtMessageType, entityId: Entity }
+export type DeserializedPutComponentMessage<T = Record<string, unknown>> = Omit<PutComponentMessageBody, 'data'> & { componentName: string, data: T }
+export type DeserializedDeleteComponentMessage = DeleteComponentMessageBody & { componentName: string }
+export type DeserializedAppendValueComponentMessage<T = Set<unknown>> = Omit<AppendValueMessageBody, 'data'> & { componentName: string, data: T }
+export type DeserializedCrdtMessage = DeserializedPutComponentMessage | DeleteComponentMessageBody | DeserializedAppendValueComponentMessage | DeleteEntityMessageBody | BaseCrdtMessage
+
+// Base type-guard
+export function is<T extends DeserializedCrdtMessage>(typeA: CrdtMessageType, typeB: CrdtMessageType, _: DeserializedCrdtMessage): _ is T {
+  return typeA === typeB
+}
+
+// Message's type type-guards
+export function isPutComponentMessage<T>(message: DeserializedCrdtMessage): message is DeserializedPutComponentMessage<T> {
+  return is<DeserializedPutComponentMessage>(CrdtMessageType.PUT_COMPONENT, message.type, message)
+}
+
+export function isAppendValueComponentMessage(message: DeserializedCrdtMessage): message is DeserializedAppendValueComponentMessage {
+  return is<DeserializedAppendValueComponentMessage>(CrdtMessageType.APPEND_VALUE, message.type, message)
+}
+
+export function isDeleteComponentMessage(message: DeserializedCrdtMessage): message is DeserializedDeleteComponentMessage {
+  return is<DeserializedDeleteComponentMessage>(CrdtMessageType.DELETE_COMPONENT, message.type, message)
+}
+
+// Component's type-guards
+export function getPutComponentFromMessage<T>(message: DeserializedCrdtMessage, componentName: Components): message is DeserializedPutComponentMessage<T> {
+  return isPutComponentMessage(message) && message.componentName === componentName
+}
+
+export function getDeleteComponentFromMessage(message: DeserializedCrdtMessage, componentName: Components): message is DeserializedDeleteComponentMessage {
+  return isDeleteComponentMessage(message) && message.componentName === componentName
+}
+
+export function buildPutComponentCrdtMessage(message: PutComponentMessage, engine: IEngine): DeserializedPutComponentMessage {
+  try {
+    const component = engine.getComponent(message.componentId)
+    const data = component.schema.deserialize(new ReadWriteByteBuffer(message.data)) as Record<string, unknown>
+    return {
+      type: CrdtMessageType.PUT_COMPONENT,
+      entityId: message.entityId,
+      timestamp: message.timestamp,
+      componentId: message.componentId,
+      componentName: component.componentName,
+      data
+    }
+  } catch {
+    console.log(`Deserialize PUT_COMPONENT: Component with ID "${message.componentId}" for entity "${message.entityId}" not found on engine.`)
+    return {
+      type: CrdtMessageType.PUT_COMPONENT,
+      entityId: message.entityId,
+      timestamp: message.timestamp,
+      componentId: message.componentId,
+      componentName: '?',
+      data: {}
     }
   }
 }
 
-interface SerializedCrdtMessage {
-  entityId: number,
-  type: CrdtMessageType,
-  timestamp: number
-  componentId?: number
-  componentName?: string
-  body?: Record<string, unknown>
+export function buildDeleteComponentCrdtMessage(message: DeleteComponentMessage, engine: IEngine): DeserializedDeleteComponentMessage {
+  try {
+    const component = engine.getComponent(message.componentId)
+    return {
+      type: CrdtMessageType.DELETE_COMPONENT,
+      entityId: message.entityId,
+      timestamp: message.timestamp,
+      componentId: message.componentId,
+      componentName: component.componentName
+    }
+  } catch {
+    console.log(`Deserialize DELETE_COMPONENT: Component with ID "${message.componentId}" for entity "${message.entityId}" not found on engine.`)
+    return {
+      type: CrdtMessageType.DELETE_COMPONENT,
+      entityId: message.entityId,
+      timestamp: message.timestamp,
+      componentId: message.componentId,
+      componentName: '?'
+    }
+  }
 }
 
-export function* deserializeCrdtMessage(data: Uint8Array, engine: IEngine): Generator<SerializedCrdtMessage> {
+export function buildAppendValueComponentCrdtMessage(message: AppendValueMessage, engine: IEngine): DeserializedAppendValueComponentMessage {
+  try {
+    const component = engine.getComponent(message.componentId)
+    const data = component.schema.deserialize(new ReadWriteByteBuffer(message.data)) as Set<unknown>
+    return {
+      type: CrdtMessageType.APPEND_VALUE,
+      entityId: message.entityId,
+      timestamp: message.timestamp,
+      componentId: message.componentId,
+      componentName: component.componentName,
+      data
+    }
+  } catch {
+    console.log(`Deserialize PUT_COMPONENT: Component with ID "${message.componentId}" for entity "${message.entityId}" not found on engine.`)
+    return {
+      type: CrdtMessageType.APPEND_VALUE,
+      entityId: message.entityId,
+      timestamp: message.timestamp,
+      componentId: message.componentId,
+      componentName: '?',
+      data: new Set()
+    }
+  }
+}
+
+export function buildDeleteEntityCrdtMessage(message: DeleteEntityMessage): DeleteEntityMessageBody {
+  return {
+    type: CrdtMessageType.DELETE_ENTITY,
+    entityId: message.entityId
+  }
+}
+
+export function buildBaseCrdtMessage(message: CrdtMessage): BaseCrdtMessage {
+  return {
+    type: message.type,
+    entityId: message.entityId
+  }
+}
+
+export function deserializeCrdtMessage(data: Uint8Array, engine: IEngine): DeserializedCrdtMessage[] {
+  const messages: DeserializedCrdtMessage[] = []
   const buffer = new ReadWriteByteBuffer(data)
 
   let message: CrdtMessage | null
 
   while ((message = readMessage(buffer))) {
-    if (
-      message.type === CrdtMessageType.PUT_COMPONENT ||
-      message.type === CrdtMessageType.DELETE_COMPONENT ||
-      message.type === CrdtMessageType.APPEND_VALUE
-    ) {
-
-      const props = {
-        entityId: message.entityId,
-        type: message.type,
-        timestamp: message.timestamp
-      }
-
-      const data = 'data' in message ? message.data : undefined
-
-      try {
-        const component = engine.getComponent(message.componentId)
-        const body = data ? component.schema.deserialize(new ReadWriteByteBuffer(data)) as Record<string, unknown> : undefined
-        yield { ...props, componentName: component.componentName, componentId: component.componentId, body }
-      } catch {
-        yield props
-      }
+    if (message.type === CrdtMessageType.PUT_COMPONENT) {
+      messages.push(buildPutComponentCrdtMessage(message, engine))
+    } else if (message.type === CrdtMessageType.DELETE_COMPONENT) {
+      messages.push(buildDeleteComponentCrdtMessage(message, engine))
+    } else if (message.type === CrdtMessageType.APPEND_VALUE) {
+      messages.push(buildAppendValueComponentCrdtMessage(message, engine))
+    } else if (message.type === CrdtMessageType.DELETE_ENTITY) {
+      messages.push(buildDeleteEntityCrdtMessage(message))
     } else {
-      yield { entityId: message.entityId, type: message.type, timestamp: 0 }
+      messages.push(buildBaseCrdtMessage(message))
     }
   }
+
+  return messages
 }
