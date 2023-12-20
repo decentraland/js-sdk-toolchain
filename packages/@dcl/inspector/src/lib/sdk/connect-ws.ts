@@ -8,18 +8,18 @@ import { store } from "../../redux/store"
 import { updateSession } from "../../redux/app"
 
 export enum MessageType {
-  // Only send by this server
   Init = 1,
   ParticipantJoined = 2,
   ParticipantLeft = 3,
-
-  // Just stored and forwarded
   ParticipantSelectedEntity = 4,
   ParticipantUnselectedEntity = 5,
-  Crdt = 6
+  Crdt = 6,
+  FS = 7
 }
 
 export type OnMessageFunction = (type: MessageType, data: Uint8Array) => void
+
+const decoder = new TextDecoder()
 
 function craftMessage(msgType: MessageType, payload: Uint8Array): Uint8Array {
   const msg = new Uint8Array(payload.byteLength + 1)
@@ -29,31 +29,38 @@ function craftMessage(msgType: MessageType, payload: Uint8Array): Uint8Array {
 }
 
 function decode(data: Uint8Array) {
-  const decoder = new TextDecoder()
   return JSON.parse(decoder.decode(data))
 }
 
 export function addWs(
   url: string,
   engine: IEngine,
+  queue: AsyncQueue<CrdtStreamMessage>,
   dataLayerStream: DataLayerRpcClient['crdtStream']
 ) {
   const ws = new WebSocket(url)
   ws.binaryType = 'arraybuffer'
   const onMessageFns: OnMessageFunction[] = []
-  const queue = new AsyncQueue<CrdtStreamMessage>((_, _action) => {})
+
+  function onMessage(fn: OnMessageFunction) {
+    onMessageFns.push(fn)
+  }
+
+  function sendMessage(type: MessageType, payload: Uint8Array) {
+    ws.send(craftMessage(type, payload))
+  }
 
   function cb(message: Uint8Array) {
     if (!message.byteLength) return
 
-    Array.from(serializeCrdtMessages(`DataLayer>Network`, message, engine)).forEach(($) => console.log($))
-    ws.send(craftMessage(MessageType.Crdt, message))
+    Array.from(serializeCrdtMessages('DataLayer>Network', message, engine)).forEach(($) => console.log($))
+    sendMessage(MessageType.Crdt, message)
   }
 
-  ws.onopen = async () => {
+  ws.onopen = () => {
     console.log('WS connected', url)
     consumeAllMessagesInto(dataLayerStream(queue), cb).catch((e) => {
-      console.error(`WS consumeAllMessagesInto failed: `, e)
+      console.error('WS consumeAllMessagesInto failed: ', e)
       queue.close()
     })
   }
@@ -76,31 +83,25 @@ export function addWs(
     console.log('WS closed')
   }
 
-  function onMessage(fn: OnMessageFunction) {
-    onMessageFns.push(fn)
-  }
-
-  return { onMessage, queue }
+  return { onMessage, sendMessage }
 }
 
-export function initCollaborativeEditor(
-  engine: IEngine,
-  dataLayerStream: DataLayerRpcClient['crdtStream']
-) {
+export function initCollaborativeEditor(engine: IEngine, dataLayerStream: DataLayerRpcClient['crdtStream']) {
   const url = `ws://localhost:3000/iws/mariano?address=0xC67c60cD6d82Fcb2fC6a9a58eA62F80443E3268${Math.ceil(Math.random() * 50)}`
-  const ws = addWs(url, engine, dataLayerStream)
+  const queue = new AsyncQueue<CrdtStreamMessage>((_, _action) => {})
+  const ws = addWs(url, engine, queue, dataLayerStream)
 
   ws.onMessage((msgType: MessageType, data: Uint8Array) => {
     if (msgType === MessageType.Crdt) {
-      Array.from(serializeCrdtMessages(`Network>DataLayer`, data, engine)).forEach(($) => console.log($))
-      ws.queue.enqueue({ data })
+      Array.from(serializeCrdtMessages('Network>DataLayer', data, engine)).forEach(($) => console.log($))
+      queue.enqueue({ data })
     } else {
       execSessionMessage(msgType, data)
     }
   })
 }
 
-function is<T>(typeA: MessageType, typeB: MessageType, message: T): message is T {
+function is<T>(typeA: MessageType, typeB: MessageType, _: T): _ is T {
   return typeA === typeB
 }
 
