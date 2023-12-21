@@ -245,7 +245,7 @@ describe('CRDT tests', () => {
     expect(() => Transform.getMutable(123 as Entity)).toThrow()
   })
 
-  it('should resend a crdt message if its outdated', async () => {
+  it('should not resend a crdt message if its outdated', async () => {
     const [{ engine, transports, spySend }] = SandBox.create({ length: 1 })
     const entity = engine.addEntity()
     const Transform = components.Transform(engine)
@@ -261,31 +261,7 @@ describe('CRDT tests', () => {
     transports[0].onmessage!(buffer.toBinary())
     await engine.update(1)
 
-    const outdatedBuffer = new ReadWriteByteBuffer()
-    const tmpBuffer = new ReadWriteByteBuffer()
-    Transform.schema.serialize(Transform.get(entity), tmpBuffer)
-    PutComponentOperation.write(entity, 2, Transform.componentId, tmpBuffer.toBinary(), outdatedBuffer)
-    expect(spySend).toBeCalledWith(outdatedBuffer.toBinary())
-  })
-
-  it('should resend a crdt delete message if its outdated', async () => {
-    const [{ engine, transports, spySend }] = SandBox.create({ length: 1 })
-    const entity = engine.addEntity()
-    const Transform = components.Transform(engine)
-    Transform.create(entity, SandBox.DEFAULT_POSITION)
-    await engine.update(1)
-    const buffer = new ReadWriteByteBuffer()
-    const tmpBuffer = new ReadWriteByteBuffer()
-    Transform.schema.serialize(Transform.get(entity), tmpBuffer)
-    PutComponentOperation.write(entity, 0, Transform.componentId, tmpBuffer.toBinary(), buffer)
-    Transform.deleteFrom(entity)
-    await engine.update(1)
-    jest.resetAllMocks()
-    transports[0].onmessage!(buffer.toBinary())
-    await engine.update(1)
-    const outdatedBuffer = new ReadWriteByteBuffer()
-    DeleteComponent.write(entity, Transform.componentId, 2, outdatedBuffer)
-    expect(spySend).toBeCalledWith(outdatedBuffer.toBinary())
+    expect(spySend).toBeCalledWith(new Uint8Array([]))
   })
 
   it('should remove a component if we receive a DELETE_COMPONENT operation message', async () => {

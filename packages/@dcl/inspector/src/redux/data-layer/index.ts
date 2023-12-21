@@ -30,11 +30,13 @@ export function getDataLayerInterface(): IDataLayer {
 export interface DataLayerState {
   reconnectAttempts: number
   error: ErrorType | undefined
+  removingAsset: Record<string, boolean>
 }
 
 export const initialState: DataLayerState = {
   reconnectAttempts: 0,
-  error: undefined
+  error: undefined,
+  removingAsset: {}
 }
 
 export const dataLayer = createSlice({
@@ -67,7 +69,12 @@ export const dataLayer = createSlice({
     undo: () => {},
     redo: () => {},
     importAsset: (_state, _payload: PayloadAction<ImportAssetRequest>) => {},
-    removeAsset: (_state, _payload: PayloadAction<Asset>) => {},
+    removeAsset: (state, payload: PayloadAction<Asset>) => {
+      state.removingAsset[payload.payload.path] = true
+    },
+    clearRemoveAsset: (state, payload: PayloadAction<Asset>) => {
+      delete state.removingAsset[payload.payload.path]
+    },
     saveThumbnail: (_state, _payload: PayloadAction<SaveFileRequest>) => {},
     getThumbnails: () => {}
   }
@@ -87,6 +94,7 @@ export const {
   redo,
   importAsset,
   removeAsset,
+  clearRemoveAsset,
   saveThumbnail,
   getThumbnails
 } = dataLayer.actions
@@ -94,6 +102,7 @@ export const {
 // Selectors
 export const selectDataLayerError = (state: RootState) => state.dataLayer.error
 export const selectDataLayerReconnectAttempts = (state: RootState) => state.dataLayer.reconnectAttempts
+export const selectDataLayerRemovingAsset = (state: RootState) => state.dataLayer.removingAsset
 
 // Reducer
 export default dataLayer.reducer

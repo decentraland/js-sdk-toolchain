@@ -1,29 +1,29 @@
 import {
+  engine,
   GltfContainer,
   Transform,
-  SyncComponents,
   Tween,
   EasingFunction,
   TweenSequence,
   TweenLoop,
   tweenSystem
-} from '@dcl/ecs'
-import { Quaternion, Vector3 } from '@dcl/sdk/math'
-import { engine } from '@dcl/sdk/ecs'
-import { NetworkManager } from '@dcl/sdk/network-transport/types'
+} from '@dcl/sdk/ecs'
+import { Vector3 } from '@dcl/sdk/math'
 import { isServer } from '~system/EngineApi'
+import { syncEntity } from '@dcl/sdk/network'
+import { SyncEntities } from './sync-enum'
 
-export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
-  //// triggerable platform
+export function createMovingPlatforms() {
+  // triggerable platform
   // only horizontal
-  const platform1 = networkedEntityFactory.addEntity(engine)
+  const platform1 = engine.addEntity()
   GltfContainer.create(platform1, {
     src: 'models/movingPlatform.glb'
   })
   Transform.create(platform1, {
     position: Vector3.create(2, 1.5, 8)
   })
-  SyncComponents.create(platform1, { componentIds: [Tween.componentId] })
+  syncEntity(platform1, [Tween.componentId], SyncEntities.PLATFORM_1)
 
   Tween.create(platform1, {
     mode: Tween.Mode.Move({ start: Vector3.create(2, 1.5, 6.5), end: Vector3.create(2, 1.5, 12) }),
@@ -34,18 +34,17 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
   TweenSequence.create(platform1, { loop: TweenLoop.TL_YOYO, sequence: [] })
 
   // only vertical
-  const parent = networkedEntityFactory.addEntity(engine)
-  Transform.create(parent, { position: Vector3.create(3.5, 2.5, 14) })
-  SyncComponents.create(parent, { componentIds: [Tween.componentId] })
+  // const parent = engine.addEntity()
+  // Transform.create(parent // 512, { position: Vector3.create(3.5, 2.5, 14) })
+  // syncEntity(parent, [Tween.componentId], SyncEntities.PLATFORM_2_PARENT)
 
-  const platform2 = networkedEntityFactory.addEntity(engine)
+  const platform2 = engine.addEntity()
   GltfContainer.create(platform2, {
     src: 'models/movingPlatform.glb'
   })
-  Transform.create(platform2, { parent })
-  SyncComponents.create(platform2, { componentIds: [Tween.componentId, TweenSequence.componentId] })
-
-  Tween.create(parent, {
+  Transform.create(platform2, { position: Vector3.create(3.5, 2.5, 14) })
+  syncEntity(platform2, [Tween.componentId, TweenSequence.componentId], SyncEntities.PLATFORM_2)
+  Tween.create(platform2, {
     mode: Tween.Mode.Move({
       start: Vector3.create(3.5, 2.5, 14),
       end: Vector3.create(4, 4, 14)
@@ -53,38 +52,16 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
     duration: 1000,
     easingFunction: EasingFunction.EF_LINEAR
   })
-  TweenSequence.create(parent, { sequence: [], loop: TweenLoop.TL_YOYO })
-
-  Tween.create(platform2, {
-    mode: Tween.Mode.Rotate({
-      start: Quaternion.fromEulerDegrees(0, 0, 0),
-      end: Quaternion.fromEulerDegrees(0, 170, 0)
-    }),
-    duration: 700,
-    easingFunction: EasingFunction.EF_LINEAR
-  })
-  TweenSequence.create(platform2, {
-    loop: TweenLoop.TL_RESTART,
-    sequence: [
-      {
-        mode: Tween.Mode.Rotate({
-          start: Quaternion.fromEulerDegrees(0, 180, 0),
-          end: Quaternion.fromEulerDegrees(0, 360, 0)
-        }),
-        duration: 700,
-        easingFunction: EasingFunction.EF_LINEAR
-      }
-    ]
-  })
-
-  const platform3 = networkedEntityFactory.addEntity(engine)
+  TweenSequence.create(platform2, { sequence: [], loop: TweenLoop.TL_YOYO })
+  const platform3 = engine.addEntity()
   GltfContainer.create(platform3, {
     src: 'models/movingPlatform.glb'
   })
   Transform.create(platform3, {
     position: Vector3.create(14, 4, 12)
   })
-  SyncComponents.create(platform3, { componentIds: [Tween.componentId] })
+  syncEntity(platform3, [Tween.componentId], SyncEntities.PLATFORM_3)
+
   Tween.create(platform3, {
     mode: Tween.Mode.Move({ start: Vector3.create(14, 4, 12), end: Vector3.create(14, 4, 4) }),
     duration: 3000,
@@ -93,14 +70,14 @@ export function createMovingPlatforms(networkedEntityFactory: NetworkManager) {
   TweenSequence.create(platform3, { loop: TweenLoop.TL_YOYO, sequence: [] })
 
   // //// path with many waypoints
-  const platform4 = networkedEntityFactory.addEntity(engine)
+  const platform4 = engine.addEntity()
   GltfContainer.create(platform4, {
     src: 'models/movingPlatform.glb'
   })
   Transform.create(platform4, {
     position: Vector3.create(6.5, 7, 4)
   })
-  SyncComponents.create(platform4, { componentIds: [Tween.componentId, TweenSequence.componentId] })
+  syncEntity(platform4, [Tween.componentId, TweenSequence.componentId], SyncEntities.PLATFORM_4)
 
   Tween.create(platform4, {
     duration: 4000,
@@ -140,7 +117,7 @@ void isServer({}).then(({ isServer }) => {
 function testingSystem() {
   for (const [entity, _tween] of engine.getEntitiesWith(Tween)) {
     if (tweenSystem.tweenCompleted(entity)) {
-      console.log('[TestingSystem]: tween completed', entity)
+      // console.log('[TestingSystem]: tween completed', entity)
     }
   }
 }

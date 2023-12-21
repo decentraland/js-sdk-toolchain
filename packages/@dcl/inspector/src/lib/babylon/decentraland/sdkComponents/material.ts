@@ -104,7 +104,7 @@ export function setMeshRendererMaterial(entity: EcsEntity) {
   if (mesh) mesh.material = material
 }
 
-async function loadTexture(entity: EcsEntity, tx?: TextureUnion['tex']): Promise<Texture | null> {
+async function loadTexture(entity: EcsEntity, tx: TextureUnion['tex']): Promise<Texture | null> {
   if (!tx) return null
   if (tx.$case === 'texture') {
     return entity.context

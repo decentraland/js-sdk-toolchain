@@ -16,6 +16,7 @@ import { getAddressAndSignature, getCatalyst, sceneHasWorldCfg } from './utils'
 import { buildScene } from '../build'
 import { getValidWorkspace } from '../../logic/workspace-validations'
 import { LinkerResponse } from '../../linker-dapp/routes'
+import { analyticsFeatures } from './analytics-features'
 
 interface Options {
   args: Result<typeof args>
@@ -105,10 +106,10 @@ export async function main(options: Options) {
 
   // Obtain list of files to deploy
   const files = await getFiles(options.components, projectRoot)
-
   validateFilesSizes(files)
 
   const contentFiles = new Map(files.map((file) => [file.path, file.content]))
+  const trackFeatures = await analyticsFeatures(options.components, sceneJson.main)
 
   const { entityId, files: entityFiles } = await DeploymentBuilder.buildEntity({
     type: EntityType.SCENE,
@@ -174,14 +175,14 @@ export async function main(options: Options) {
         printProgressInfo(options.components.logger, response.message)
       }
       printSuccess(options.components.logger, 'Content uploaded successfully', sceneUrl)
-
       options.components.analytics.track('Scene deploy success', {
         ...trackProps,
         sceneId: entityId,
         targetContentServer: url,
         worldName: sceneJson.worldConfiguration?.name,
         isPortableExperience: !!sceneJson.isPortableExperience,
-        dependencies
+        dependencies,
+        serverlessMultiplayer: trackFeatures.serverlessMultiplayer
       })
 
       if (!isWorld) {

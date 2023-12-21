@@ -1,4 +1,4 @@
-import { IEngine, CrdtMessage, CrdtMessageType } from '@dcl/ecs'
+import { IEngine, CrdtMessage, CrdtMessageType, CRDT_MESSAGE_HEADER_LENGTH } from '@dcl/ecs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { readMessage } from '@dcl/ecs/dist/serialization/crdt/message'
 
@@ -8,14 +8,16 @@ export function* serializeCrdtMessages(prefix: string, data: Uint8Array, engine:
   let message: CrdtMessage | null
 
   while ((message = readMessage(buffer))) {
-    const ent = `0x${message.entityId.toString(16)}`
+    const ent = message.entityId
     const preface = `${prefix}: ${CrdtMessageType[message.type]} e=${ent}`
-    if (message.type === CrdtMessageType.DELETE_ENTITY) {
+    if (message.type === CrdtMessageType.DELETE_ENTITY || message.type === CrdtMessageType.DELETE_ENTITY_NETWORK) {
       yield `${preface}`
     }
 
     if (
       message.type === CrdtMessageType.PUT_COMPONENT ||
+      message.type === CrdtMessageType.PUT_COMPONENT_NETWORK ||
+      message.type === CrdtMessageType.DELETE_COMPONENT_NETWORK ||
       message.type === CrdtMessageType.DELETE_COMPONENT ||
       message.type === CrdtMessageType.APPEND_VALUE
     ) {
@@ -30,7 +32,10 @@ export function* serializeCrdtMessages(prefix: string, data: Uint8Array, engine:
       } catch {
         yield `${preface} c=${componentId} t=${timestamp} data=?`
       }
-    } else if (message.type === CrdtMessageType.DELETE_ENTITY) {
+    } else if (
+      message.type === CrdtMessageType.DELETE_ENTITY ||
+      message.type === CrdtMessageType.DELETE_ENTITY_NETWORK
+    ) {
       yield preface
     } else {
       yield `${preface} Unknown CrdtMessageType`

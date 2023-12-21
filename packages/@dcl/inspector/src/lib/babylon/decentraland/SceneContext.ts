@@ -18,6 +18,8 @@ import { createOperations } from '../../sdk/operations'
 import { createGizmoManager } from './gizmo-manager'
 import { getDataLayerInterface } from '../../../redux/data-layer'
 import { putMaterialComponent } from './sdkComponents/material'
+import { putNftShapeComponent } from './sdkComponents/nft'
+import { putVideoPlayerComponent } from './sdkComponents/video-player'
 
 export type LoadableScene = {
   readonly entity: Readonly<Omit<Schemas.Entity, 'id'>>
@@ -51,6 +53,9 @@ export class SceneContext {
   GltfContainer = components.GltfContainer(this.engine)
   TextShape = components.TextShape(this.engine)
   Name = components.Name(this.engine)
+  Animator = components.Animator(this.engine)
+  NftShape = components.NftShape(this.engine)
+  VideoPlayer = components.VideoPlayer(this.engine)
 
   readonly editorComponents = createEditorComponents(this.engine)
 
@@ -61,6 +66,8 @@ export class SceneContext {
     [this.Billboard.componentId]: putBillboardComponent,
     [this.GltfContainer.componentId]: putGltfContainerComponent,
     [this.TextShape.componentId]: putTextShapeComponent,
+    [this.NftShape.componentId]: putNftShapeComponent,
+    [this.VideoPlayer.componentId]: putVideoPlayerComponent,
     [this.editorComponents.Selection.componentId]: putEntitySelectedComponent,
     [this.editorComponents.Scene.componentId]: putSceneComponent
   }

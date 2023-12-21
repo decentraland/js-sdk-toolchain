@@ -6,6 +6,7 @@ import {
   ActionType,
   getActionTypes,
   getJson,
+  getPayload,
   ActionPayload,
   getActionSchema,
   ComponentName
@@ -35,15 +36,22 @@ import { TweenAction } from './TweenAction'
 import { isValidTween } from './TweenAction/utils'
 import { PlayAnimationAction } from './PlayAnimationAction'
 import { SetVisibilityAction } from './SetVisibilityAction'
-import { getDefaultPayload, getPartialPayload, isStates } from './utils'
-import { Props } from './types'
-
-import './ActionInspector.css'
+import { PlayVideoStreamAction } from './PlayVideoStreamAction'
+import { PlayAudioStreamAction } from './PlayAudioStreamAction'
 import { TeleportPlayerAction } from './TeleportPlayerAction'
 import { MovePlayerAction } from './MovePlayerAction'
 import { PlayDefaultEmoteAction } from './PlayDefaultEmoteAction'
 import { PlayCustomEmoteAction } from './PlayCustomEmoteAction'
 import { OpenLinkAction } from './OpenLinkAction'
+import { ShowTextAction } from './ShowTextAction'
+import { DelayAction } from './DelayAction'
+import { LoopAction } from './LoopAction'
+import { CloneEntityAction } from './CloneEntityAction'
+import { ShowImageAction } from './ShowImageAction'
+import { getDefaultPayload, getPartialPayload, isStates } from './utils'
+import { Props } from './types'
+
+import './ActionInspector.css'
 
 const ActionMapOption: Record<string, string> = {
   [ActionType.PLAY_ANIMATION]: 'Play Animation',
@@ -66,7 +74,17 @@ const ActionMapOption: Record<string, string> = {
   [ActionType.PLAY_AUDIO_STREAM]: 'Play Audio Stream',
   [ActionType.STOP_AUDIO_STREAM]: 'Stop Audio Stream',
   [ActionType.PLAY_VIDEO_STREAM]: 'Play Video Stream',
-  [ActionType.STOP_VIDEO_STREAM]: 'Stop Video Stream'
+  [ActionType.STOP_VIDEO_STREAM]: 'Stop Video Stream',
+  [ActionType.SHOW_TEXT]: 'Show Text',
+  [ActionType.HIDE_TEXT]: 'Hide Text',
+  [ActionType.START_DELAY]: 'Start Delay',
+  [ActionType.STOP_DELAY]: 'Stop Delay',
+  [ActionType.START_LOOP]: 'Start Loop',
+  [ActionType.STOP_LOOP]: 'Stop Loop',
+  [ActionType.CLONE_ENTITY]: 'Clone',
+  [ActionType.REMOVE_ENTITY]: 'Remove',
+  [ActionType.SHOW_IMAGE]: 'Show Image',
+  [ActionType.HIDE_IMAGE]: 'Hide Image'
 }
 
 export default withSdk<Props>(({ sdk, entity: entityId }) => {
@@ -175,6 +193,18 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
         case ActionType.OPEN_LINK: {
           const payload = getPartialPayload<ActionType.OPEN_LINK>(action)
           return !!payload && typeof payload.url === 'string' && payload.url.length > 0
+        }
+        case ActionType.CLONE_ENTITY: {
+          const payload = getPartialPayload<ActionType.CLONE_ENTITY>(action)
+          return (
+            !!payload &&
+            typeof payload.position?.x === 'number' &&
+            !isNaN(payload.position?.x) &&
+            typeof payload.position?.y === 'number' &&
+            !isNaN(payload.position?.y) &&
+            typeof payload.position?.z === 'number' &&
+            !isNaN(payload.position?.z)
+          )
         }
         default: {
           try {
@@ -375,6 +405,49 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     [modifyAction, actions]
   )
 
+  const handleChangeText = useCallback(
+    (value: ActionPayload<ActionType.SHOW_TEXT>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.SHOW_TEXT>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangeDelayAction = useCallback(
+    (value: ActionPayload<ActionType.START_DELAY | ActionType.STOP_DELAY>, idx: number) => {
+      const payload =
+        'actions' in value ? getJson<ActionType.START_DELAY>(value) : getJson<ActionType.STOP_DELAY>(value)
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: payload
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangeLoopAction = useCallback(
+    (value: ActionPayload<ActionType.START_LOOP | ActionType.STOP_LOOP>, idx: number) => {
+      const payload = 'actions' in value ? getJson<ActionType.START_LOOP>(value) : getJson<ActionType.STOP_LOOP>(value)
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: payload
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangeCloneEntity = useCallback(
+    (value: ActionPayload<ActionType.CLONE_ENTITY>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.CLONE_ENTITY>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
   const handleChangeType = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
       modifyAction(idx, {
@@ -407,6 +480,16 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     [modifyAction, actions]
   )
 
+  const handleChangeImage = useCallback(
+    (value: ActionPayload<ActionType.SHOW_IMAGE>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.SHOW_IMAGE>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
   const handleFocusInput = useCallback(
     ({ type }: React.FocusEvent<HTMLInputElement>) => {
       if (type === 'focus') {
@@ -416,6 +499,26 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
       }
     },
     [setIsFocused]
+  )
+
+  const handleChangeVideo = useCallback(
+    (value: ActionPayload<ActionType.PLAY_VIDEO_STREAM>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.PLAY_VIDEO_STREAM>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangeAudio = useCallback(
+    (value: ActionPayload<ActionType.PLAY_AUDIO_STREAM>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.PLAY_AUDIO_STREAM>(value)
+      })
+    },
+    [modifyAction, actions]
   )
 
   const handleRemoveAction = useCallback(
@@ -550,6 +653,66 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
           <OpenLinkAction
             value={getPartialPayload<ActionType.OPEN_LINK>(action)}
             onUpdate={(e) => handleChangeOpenLink(e, idx)}
+          />
+        )
+      }
+      case ActionType.PLAY_VIDEO_STREAM: {
+        return (
+          <PlayVideoStreamAction
+            value={getPartialPayload<ActionType.PLAY_VIDEO_STREAM>(action)}
+            onUpdate={(value: ActionPayload<ActionType.PLAY_VIDEO_STREAM>) => handleChangeVideo(value, idx)}
+          />
+        )
+      }
+      case ActionType.PLAY_AUDIO_STREAM: {
+        return (
+          <PlayAudioStreamAction
+            value={getPartialPayload<ActionType.PLAY_AUDIO_STREAM>(action)}
+            onUpdate={(value: ActionPayload<ActionType.PLAY_AUDIO_STREAM>) => handleChangeAudio(value, idx)}
+          />
+        )
+      }
+      case ActionType.SHOW_TEXT: {
+        return (
+          <ShowTextAction
+            value={getPartialPayload<ActionType.SHOW_TEXT>(action)}
+            onUpdate={(e) => handleChangeText(e, idx)}
+          />
+        )
+      }
+      case ActionType.START_DELAY:
+      case ActionType.STOP_DELAY: {
+        return (
+          <DelayAction<ActionPayload<typeof action.type>>
+            availableActions={actions}
+            value={getPayload<typeof action.type>(action)}
+            onUpdate={(e) => handleChangeDelayAction(e, idx)}
+          />
+        )
+      }
+      case ActionType.START_LOOP:
+      case ActionType.STOP_LOOP: {
+        return (
+          <LoopAction<ActionPayload<typeof action.type>>
+            availableActions={actions}
+            value={getPayload<typeof action.type>(action)}
+            onUpdate={(e) => handleChangeLoopAction(e, idx)}
+          />
+        )
+      }
+      case ActionType.CLONE_ENTITY: {
+        return (
+          <CloneEntityAction
+            value={getPartialPayload<ActionType.CLONE_ENTITY>(action)}
+            onUpdate={(e) => handleChangeCloneEntity(e, idx)}
+          />
+        )
+      }
+      case ActionType.SHOW_IMAGE: {
+        return (
+          <ShowImageAction
+            value={getPartialPayload<ActionType.SHOW_IMAGE>(action)}
+            onUpdate={(e) => handleChangeImage(e, idx)}
           />
         )
       }

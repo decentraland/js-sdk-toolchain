@@ -88,10 +88,6 @@ const Renderer: React.FC = () => {
     const path = Object.keys(asset.contents).find(($) => isAsset($))
     let thumbnail: Uint8Array | undefined
 
-    if (!path) {
-      throw new Error('Invalid asset format: should contain at least one gltf/glb file')
-    }
-
     setIsLoading(true)
 
     await Promise.all(
@@ -113,16 +109,19 @@ const Renderer: React.FC = () => {
     )
 
     // TODO: review this async/await
-    dispatch(
-      importAsset({
-        content: new Map(Object.entries(fileContent)),
-        basePath: withAssetDir(destFolder),
-        assetPackageName
-      })
-    )
+    const content = new Map(Object.entries(fileContent))
+    if (content.size > 0) {
+      dispatch(
+        importAsset({
+          content,
+          basePath: withAssetDir(destFolder),
+          assetPackageName
+        })
+      )
+    }
 
     if (thumbnail) {
-      const name = path.split('/').pop() as string
+      const name = path ? (path.split('/').pop() as string) : asset.name
       const ext = name.split('.').pop() as string
       dispatch(
         saveThumbnail({
@@ -139,7 +138,7 @@ const Renderer: React.FC = () => {
       type: 'asset',
       name: asset.name,
       parent: null,
-      asset: { type: 'gltf', src: path, id: asset.id },
+      asset: { type: path ? 'gltf' : 'unknown', src: path ?? '', id: asset.id },
       components: asset.components
     }
     const basePath = withAssetDir(`${destFolder}/${assetPackageName}`)

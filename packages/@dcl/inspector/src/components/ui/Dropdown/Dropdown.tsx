@@ -1,30 +1,35 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import cx from 'classnames'
-import { VscChevronDown as DownArrowIcon, VscSearch as SearchIcon } from 'react-icons/vsc'
+import { VscChevronDown as DownArrowIcon } from 'react-icons/vsc'
 import { useOutsideClick } from '../../../hooks/useOutsideClick'
 import { useContainerSize } from '../../../hooks/useContainerSize'
 import { Label } from '../Label'
-import { TextField } from '../TextField'
-import { ErrorMessage } from '../ErrorMessage'
+import { Message, MessageType } from '../Message'
 import { Option } from './Option'
+import { OptionList } from './OptionList'
+import { SelectedOption } from './SelectedOption'
 import type { Props as OptionProp } from './Option/types'
+import { FONT_SIZE, FONT_WEIGHT, WIDTH_CONST, ICON_SIZE, isMultipleOptionSelected, isOptionSelected } from './utils'
 import type { Props } from './types'
 import './Dropdown.css'
 
-const FONT_SIZE = 13
-const FONT_WEIGHT = 700
-const WIDTH_CONST = 1200
-const ICON_SIZE = 16
-
-function isOptionSelected(currentValue?: any, optionValue?: any) {
-  return currentValue?.toString() === optionValue?.toString()
-}
-
 const Dropdown: React.FC<Props> = (props) => {
-  const { className, disabled, empty, error, label, options, searchable, value, onChange, placeholder = '' } = props
+  const {
+    className,
+    disabled,
+    empty,
+    error,
+    info,
+    label,
+    options,
+    searchable,
+    value,
+    multiple,
+    onChange,
+    placeholder = ''
+  } = props
   const [showOptions, setShowOptions] = useState(false)
   const [isFocused, setFocus] = useState(false)
-  const [search, setSearch] = useState('')
 
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -33,87 +38,51 @@ const Dropdown: React.FC<Props> = (props) => {
       setFocus(true)
       if (showOptions) {
         // Clear search text when closing the dropdown
-        setSearch('')
         setShowOptions(false)
       } else {
         setShowOptions(true)
       }
     },
-    [showOptions, setShowOptions, setFocus, setSearch]
+    [showOptions, setShowOptions, setFocus]
   )
 
   const handleCloseDropdown = useCallback(() => {
     setShowOptions(false)
     setFocus(false)
-    setSearch('')
-  }, [setShowOptions, setFocus, setSearch])
+  }, [setShowOptions, setFocus])
 
   const ref = useOutsideClick(handleCloseDropdown)
   const containerSize = useContainerSize(ref)
 
-  const handleSelectOption = useCallback(
-    (e: any, option: OptionProp) => {
-      setShowOptions(false)
-      if (option.value !== undefined) {
+  const handleRemoveOption = useCallback(
+    (e: any, option: Partial<OptionProp>) => {
+      if (option !== undefined) {
+        const optionValue = (value as any[]).filter((v) => v !== option.value)
         onChange &&
           onChange({
             ...e,
             target: {
               ...e?.target,
-              value: option.value.toString()
+              value: optionValue
             }
           })
       }
     },
-    [setShowOptions, onChange]
+    [multiple, value, onChange]
   )
-
-  const handleSearchChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setSearch(e.target.value)
-    },
-    [setSearch]
-  )
-
-  const handleSearchClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    // Avoid close the dropdown when clicking on the search input
-    e.preventDefault()
-    e.stopPropagation()
-  }, [])
-
-  const filterOptions = useCallback(
-    (option: OptionProp) => {
-      if (searchable && search) {
-        const value = option.label?.toLowerCase() ?? option.value?.toString().toLowerCase() ?? ''
-        return value.includes(search.toLowerCase())
-      }
-
-      return true
-    },
-    [searchable, search]
-  )
-
-  const filteredOptiones = useMemo(() => {
-    return options.filter(filterOptions)
-  }, [options, filterOptions])
-
-  const renderEmptyMessage = useCallback(() => {
-    if (options.length > 0 && filteredOptiones.length === 0) {
-      return 'There are no results for this search.'
-    }
-
-    if (options.length === 0) {
-      return empty || 'No options available.'
-    }
-  }, [empty, options, filteredOptiones])
 
   const selectedValue = useMemo(() => {
-    return options.find((option) => isOptionSelected(value, option.value))
-  }, [options, value])
+    if (multiple) {
+      return options.filter((option) => isMultipleOptionSelected(value as any[], option.value))
+    } else {
+      return options.find((option) => isOptionSelected(value, option.value))
+    }
+  }, [options, value, multiple])
 
   const minWidth = useMemo(() => {
     if (options.length > 0) {
       const iconWidth = ICON_SIZE + 4
+      const selectedIconWidth = iconWidth
       let leftIconWidth = 0
       let rightIconWidth = 0
       const _minWidth = options.reduce((width, option) => {
@@ -121,7 +90,7 @@ const Dropdown: React.FC<Props> = (props) => {
         const labelWidth = label.length * FONT_SIZE * FONT_WEIGHT
         leftIconWidth = Math.max(leftIconWidth, option.leftIcon ? iconWidth : 0)
         rightIconWidth = Math.max(rightIconWidth, option.rightIcon ? iconWidth : 0)
-        return Math.max(width, (labelWidth + leftIconWidth + rightIconWidth) / WIDTH_CONST)
+        return Math.max(width, (labelWidth + selectedIconWidth + leftIconWidth + rightIconWidth) / WIDTH_CONST)
       }, 0)
 
       // To calculate the option's max width, we need to substract the drop icon width, the horizontal padding and the left and right icon width
@@ -133,6 +102,16 @@ const Dropdown: React.FC<Props> = (props) => {
       return Math.min(_minWidth, maxWidth)
     }
   }, [options, empty, containerSize])
+
+  const renderMessage = useCallback(() => {
+    if (error) {
+      return <Message text={error} type={MessageType.ERROR} />
+    } else if (info) {
+      return <Message text={info} type={MessageType.INFO} icon={false} />
+    }
+
+    return null
+  }, [error, info])
 
   return (
     <div className="Dropdown Field" ref={ref}>
@@ -147,41 +126,29 @@ const Dropdown: React.FC<Props> = (props) => {
         onClick={handleClick}
       >
         {selectedValue ? (
-          <Option {...selectedValue} className="DropdownSelection" minWidth={minWidth} />
+          <SelectedOption
+            selectedValue={selectedValue}
+            minWidth={minWidth}
+            multiple={multiple}
+            onRemove={handleRemoveOption}
+          />
         ) : (
           <Option className="DropdownPlaceholder" value={placeholder} minWidth={minWidth} />
         )}
         {showOptions ? (
-          <div className={cx('DropdownOptions', { searchable })}>
-            {searchable && options.length > 0 ? (
-              <TextField
-                className="DropdownSearch"
-                placeholder="Search"
-                rightIcon={<SearchIcon />}
-                onChange={handleSearchChange}
-                onClick={handleSearchClick}
-              />
-            ) : null}
-            {filteredOptiones.length > 0 ? (
-              filteredOptiones.map((option, idx) => (
-                <Option
-                  key={idx}
-                  {...option}
-                  onClick={handleSelectOption}
-                  selected={isOptionSelected(value, option.value)}
-                  minWidth={minWidth}
-                />
-              ))
-            ) : (
-              <Option className="DropdownEmptyOption" label={renderEmptyMessage()} disabled />
-            )}
-          </div>
+          <OptionList
+            options={options}
+            searchable={searchable}
+            selectedValue={selectedValue}
+            multiple={multiple}
+            onChange={onChange}
+          />
         ) : null}
         <div className="DropIcon">
           <DownArrowIcon size={ICON_SIZE} />
         </div>
       </div>
-      <ErrorMessage error={error} />
+      {renderMessage()}
     </div>
   )
 }

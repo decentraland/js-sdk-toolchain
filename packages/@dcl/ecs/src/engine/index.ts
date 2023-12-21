@@ -26,7 +26,6 @@ function preEngine(): PreEngine {
   const entityContainer = EntityContainer()
   const componentsDefinition = new Map<number, ComponentDefinition<unknown>>()
   const systems = SystemContainer()
-  let networkManager: ReturnType<IEngine['addNetworkManager']>
 
   let sealed = false
 
@@ -38,26 +37,15 @@ function preEngine(): PreEngine {
     return systems.remove(selector)
   }
 
-  function getNetworkManager() {
-    if (!networkManager) throw new Error('Network manager not initialized. Start CRDT Server')
-    return networkManager
-  }
-
-  function addNetworkManager(reservedLocalEntities: number, range: [number, number]) {
-    entityContainer.setNetworkEntitiesRange(reservedLocalEntities, range)
-    networkManager = {
-      addEntity: () => entityContainer.generateEntity(true)
-    }
-    return networkManager
-  }
-
   function addEntity() {
     const entity = entityContainer.generateEntity()
     return entity
   }
-
   function removeEntity(entity: Entity) {
     for (const [, component] of componentsDefinition) {
+      // TODO: hack for the moment. It should be enough to delete the entity, but the renderer is not cleaning the components.
+      // So we still need the NetworkEntity to forward this message to the SyncTransport.
+      if (component.componentName === 'core-schema::Network-Entity') continue
       component.entityDeleted(entity, true)
     }
 
@@ -65,7 +53,10 @@ function preEngine(): PreEngine {
   }
 
   function removeEntityWithChildren(entity: Entity) {
-    return removeEntityWithChildrenEngine({ removeEntity, defineComponentFromSchema, getEntitiesWith }, entity)
+    return removeEntityWithChildrenEngine(
+      { removeEntity, defineComponentFromSchema, getEntitiesWith, defineComponent },
+      entity
+    )
   }
 
   function registerComponentDefinition(
@@ -162,7 +153,7 @@ function preEngine(): PreEngine {
     const component = componentsDefinition.get(componentId)
     if (!component) {
       throw new Error(
-        `Component ${componentId} not found. You need to declare the components at the beginnig of the engine declaration`
+        `Component ${componentIdOrName} not found. You need to declare the components at the beginnig of the engine declaration`
       )
     }
     return component as ComponentDefinition<T>
@@ -253,12 +244,9 @@ function preEngine(): PreEngine {
     registerComponentDefinition,
     entityContainer,
     componentsIter,
-    seal,
-    addNetworkManager,
-    getNetworkManager
+    seal
   }
 }
-
 /**
  * Internal constructor of new engines, this is an internal API
  * @public
@@ -312,8 +300,6 @@ export function Engine(options?: IEngineOptions): IEngine {
     getEntityState: partialEngine.entityContainer.getEntityState,
     addTransport: crdtSystem.addTransport,
 
-    entityContainer: partialEngine.entityContainer,
-    addNetworkManager: partialEngine.addNetworkManager,
-    getNetworkManager: partialEngine.getNetworkManager
+    entityContainer: partialEngine.entityContainer
   }
 }

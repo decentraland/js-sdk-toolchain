@@ -1,0 +1,11 @@
+.ShowImageActionContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  row-gap: 12px;
+}
+
+.ShowImageActionContainer > .Block > .content:has(.Text.Field) {
+  flex-wrap: wrap;
+  row-gap: 12px;
+}

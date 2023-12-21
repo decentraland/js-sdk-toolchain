@@ -22,6 +22,11 @@ import { StatesInspector } from './StatesInspector'
 import { CounterInspector } from './CounterInspector'
 import { AudioSourceInspector } from './AudioSourceInspector'
 import { VisibilityComponentInspector } from './VisibilityComponentInspector'
+import { VideoPlayerInspector } from './VideoPlayerInspector'
+import { AudioStreamInspector } from './AudioStreamInspector'
+import { NftShapeInspector } from './NftShapeInspector'
+import { AnimatorInspector } from './AnimatorInspector'
+import { PointerEventsInspector } from './PointerEventsInspector'
 
 import './EntityInspector.css'
 
@@ -65,7 +70,12 @@ export const EntityInspector = withSdk(({ sdk }) => {
       { name: sdk.components.Triggers.componentName, component: TriggerInspector },
       { name: sdk.components.States.componentName, component: StatesInspector },
       { name: sdk.components.Counter.componentName, component: CounterInspector },
-      { name: sdk.components.AudioSource.componentName, component: AudioSourceInspector }
+      { name: sdk.components.AudioSource.componentName, component: AudioSourceInspector },
+      { name: sdk.components.VideoPlayer.componentName, component: VideoPlayerInspector },
+      { name: sdk.components.AudioStream.componentName, component: AudioStreamInspector },
+      { name: sdk.components.NftShape.componentName, component: NftShapeInspector },
+      { name: sdk.components.Animator.componentName, component: AnimatorInspector },
+      { name: sdk.components.PointerEvents.componentName, component: PointerEventsInspector }
     ],
     [sdk]
   )

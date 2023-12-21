@@ -1,0 +1,16 @@
+.SelectedOptionContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+  /* width: 100% - (DropIconWidth + gap) */
+  width: calc(100% - 20px);
+}
+
+.Dropdown.Field .DropdownContainer:has(.SelectedOptionContainer > .MultipleOptionContainer) {
+  height: 100%;
+}
+
+.SelectedOptionContainer > .OptionContainer.SelectedOption > .OptionContent > .SelectedContent {
+  display: none;
+}

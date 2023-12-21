@@ -1,0 +1,11 @@
+export enum SyncEntities {
+  PLATFORM_1,
+  PLATFORM_2,
+  PLATFORM_2_PARENT,
+  PLATFORM_3,
+  PLATFORM_4,
+  GAME_STATUS,
+  CUBE_1,
+  CUBE_2,
+  CUBE_3
+}

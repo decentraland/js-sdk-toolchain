@@ -62,8 +62,6 @@ export type PreEngine = Pick<
   | 'seal'
   | 'entityContainer'
   | 'getEntityOrNullByName'
-  | 'addNetworkManager'
-  | 'getNetworkManager'
 > & {
   getSystems: () => SystemItem[]
 }
@@ -300,15 +298,4 @@ export interface IEngine {
    * Entity container with custom methods to update their state.
    */
   entityContainer: EntityContainer
-
-  /**
-   * @alpha
-   * Initialize network manager
-   */
-  addNetworkManager(reservedLocalEntities: number, range: [number, number]): { addEntity: IEngine['addEntity'] }
-  /**
-   * @alpha
-   * Get netowrk manager to create entities.
-   */
-  getNetworkManager(): ReturnType<IEngine['addNetworkManager']>
 }

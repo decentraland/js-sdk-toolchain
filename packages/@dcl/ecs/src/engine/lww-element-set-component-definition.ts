@@ -7,7 +7,9 @@ import {
   CrdtMessageType,
   CrdtMessageBody,
   PutComponentOperation,
-  DeleteComponent
+  DeleteComponent,
+  PutNetworkComponentMessageBody,
+  DeleteComponentNetworkMessageBody
 } from '../serialization/crdt'
 import { dataCompare } from '../systems/crdt/utils'
 import { LastWriteWinElementSetComponentDefinition, ComponentType } from './component'
@@ -63,7 +65,11 @@ export function createUpdateLwwFromCrdt(
     * @public
     */
   function crdtRuleForCurrentState(
-    message: PutComponentMessageBody | DeleteComponentMessageBody
+    message:
+      | PutComponentMessageBody
+      | DeleteComponentMessageBody
+      | PutNetworkComponentMessageBody
+      | DeleteComponentNetworkMessageBody
   ): ProcessMessageResultType {
     const { entityId, timestamp } = message
     const currentTimestamp = timestamps.get(entityId as Entity)
@@ -109,7 +115,12 @@ export function createUpdateLwwFromCrdt(
 
   return (msg: CrdtMessageBody): [null | PutComponentMessageBody | DeleteComponentMessageBody, any] => {
     /* istanbul ignore next */
-    if (msg.type !== CrdtMessageType.PUT_COMPONENT && msg.type !== CrdtMessageType.DELETE_COMPONENT)
+    if (
+      msg.type !== CrdtMessageType.PUT_COMPONENT &&
+      msg.type !== CrdtMessageType.PUT_COMPONENT_NETWORK &&
+      msg.type !== CrdtMessageType.DELETE_COMPONENT &&
+      msg.type !== CrdtMessageType.DELETE_COMPONENT_NETWORK
+    )
       /* istanbul ignore next */
       return [null, data.get(msg.entityId)]
 
@@ -120,7 +131,7 @@ export function createUpdateLwwFromCrdt(
       case ProcessMessageResultType.StateUpdatedTimestamp: {
         timestamps.set(entity, msg.timestamp)
 
-        if (msg.type === CrdtMessageType.PUT_COMPONENT) {
+        if (msg.type === CrdtMessageType.PUT_COMPONENT || msg.type === CrdtMessageType.PUT_COMPONENT_NETWORK) {
           const buf = new ReadWriteByteBuffer(msg.data!)
           data.set(entity, schema.deserialize(buf))
         } else {

@@ -57,4 +57,7 @@ export const FILTER_MODES = [
   }
 ]
 
-export const TEXTURE_TYPES = mapSelectFieldOptions({ TT_TEXTURE: 'texture' })
+export const TEXTURE_TYPES = mapSelectFieldOptions({
+  TT_TEXTURE: 'texture',
+  TT_VIDEO_TEXTURE: 'videoTexture'
+})

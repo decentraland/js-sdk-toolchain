@@ -1,5 +1,7 @@
 {
   "core::Transform": {},
+  "core-schema::Network-Entity": {},
+  "core-schema::Network-Parent": {},
   "composite::root": {
     "512": {
       "src": "empty.composite",
