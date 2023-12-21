@@ -1,4 +1,17 @@
-import { IEngine, CrdtMessage, CrdtMessageType, PutComponentMessageBody, PutComponentMessage, DeleteComponentMessage, DeleteComponentMessageBody, AppendValueMessage, AppendValueMessageBody, DeleteEntityMessage, DeleteEntityMessageBody, Entity, CrdtMessageProtocol, PutComponentOperation, CrdtMessageHeader, DeleteComponent, AppendValueOperation, DeleteEntity } from '@dcl/ecs'
+import {
+  IEngine,
+  CrdtMessage,
+  CrdtMessageType,
+  PutComponentMessageBody,
+  PutComponentMessage,
+  DeleteComponentMessage,
+  DeleteComponentMessageBody,
+  AppendValueMessage,
+  AppendValueMessageBody,
+  DeleteEntityMessage,
+  DeleteEntityMessageBody,
+  Entity
+} from '@dcl/ecs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { readMessage } from '@dcl/ecs/dist/serialization/crdt/message'
 import { CoreComponents, EditorComponentNames } from './components'
@@ -24,40 +37,70 @@ export function logCrdtMessage(prefix: string, message: DeserializedCrdtMessage)
   }
 }
 
-export type BaseCrdtMessage = { type: CrdtMessageType, entityId: Entity }
-export type DeserializedPutComponentMessage<T = Record<string, unknown>> = Omit<PutComponentMessageBody, 'data'> & { componentName: string, data: T }
+export type BaseCrdtMessage = { type: CrdtMessageType; entityId: Entity }
+export type DeserializedPutComponentMessage<T = Record<string, unknown>> = Omit<PutComponentMessageBody, 'data'> & {
+  componentName: string
+  data: T
+}
 export type DeserializedDeleteComponentMessage = DeleteComponentMessageBody & { componentName: string }
-export type DeserializedAppendValueComponentMessage<T = Set<unknown>> = Omit<AppendValueMessageBody, 'data'> & { componentName: string, data: T }
-export type DeserializedCrdtMessage = DeserializedPutComponentMessage | DeleteComponentMessageBody | DeserializedAppendValueComponentMessage | DeleteEntityMessageBody | BaseCrdtMessage
+export type DeserializedAppendValueComponentMessage<T = Set<unknown>> = Omit<AppendValueMessageBody, 'data'> & {
+  componentName: string
+  data: T
+}
+export type DeserializedCrdtMessage =
+  | DeserializedPutComponentMessage
+  | DeleteComponentMessageBody
+  | DeserializedAppendValueComponentMessage
+  | DeleteEntityMessageBody
+  | BaseCrdtMessage
 
 // Base type-guard
-export function is<T extends DeserializedCrdtMessage>(typeA: CrdtMessageType, typeB: CrdtMessageType, _: DeserializedCrdtMessage): _ is T {
+export function is<T extends DeserializedCrdtMessage>(
+  typeA: CrdtMessageType,
+  typeB: CrdtMessageType,
+  _: DeserializedCrdtMessage
+): _ is T {
   return typeA === typeB
 }
 
 // Message's type type-guards
-export function isPutComponentMessage<T>(message: DeserializedCrdtMessage): message is DeserializedPutComponentMessage<T> {
+export function isPutComponentMessage<T>(
+  message: DeserializedCrdtMessage
+): message is DeserializedPutComponentMessage<T> {
   return is<DeserializedPutComponentMessage>(CrdtMessageType.PUT_COMPONENT, message.type, message)
 }
 
-export function isAppendValueComponentMessage(message: DeserializedCrdtMessage): message is DeserializedAppendValueComponentMessage {
+export function isAppendValueComponentMessage(
+  message: DeserializedCrdtMessage
+): message is DeserializedAppendValueComponentMessage {
   return is<DeserializedAppendValueComponentMessage>(CrdtMessageType.APPEND_VALUE, message.type, message)
 }
 
-export function isDeleteComponentMessage(message: DeserializedCrdtMessage): message is DeserializedDeleteComponentMessage {
+export function isDeleteComponentMessage(
+  message: DeserializedCrdtMessage
+): message is DeserializedDeleteComponentMessage {
   return is<DeserializedDeleteComponentMessage>(CrdtMessageType.DELETE_COMPONENT, message.type, message)
 }
 
 // Component's type-guards
-export function getPutComponentFromMessage<T>(message: DeserializedCrdtMessage, componentName: Components): message is DeserializedPutComponentMessage<T> {
+export function getPutComponentFromMessage<T>(
+  message: DeserializedCrdtMessage,
+  componentName: Components
+): message is DeserializedPutComponentMessage<T> {
   return isPutComponentMessage(message) && message.componentName === componentName
 }
 
-export function getDeleteComponentFromMessage(message: DeserializedCrdtMessage, componentName: Components): message is DeserializedDeleteComponentMessage {
+export function getDeleteComponentFromMessage(
+  message: DeserializedCrdtMessage,
+  componentName: Components
+): message is DeserializedDeleteComponentMessage {
   return isDeleteComponentMessage(message) && message.componentName === componentName
 }
 
-export function buildPutComponentCrdtMessage(message: PutComponentMessage, engine: IEngine): DeserializedPutComponentMessage {
+export function buildPutComponentCrdtMessage(
+  message: PutComponentMessage,
+  engine: IEngine
+): DeserializedPutComponentMessage {
   try {
     const component = engine.getComponent(message.componentId)
     const data = component.schema.deserialize(new ReadWriteByteBuffer(message.data)) as Record<string, unknown>
@@ -70,7 +113,9 @@ export function buildPutComponentCrdtMessage(message: PutComponentMessage, engin
       data
     }
   } catch {
-    console.log(`Deserialize PUT_COMPONENT: Component with ID "${message.componentId}" for entity "${message.entityId}" not found on engine.`)
+    console.log(
+      `Deserialize PUT_COMPONENT: Component with ID "${message.componentId}" for entity "${message.entityId}" not found on engine.`
+    )
     return {
       type: CrdtMessageType.PUT_COMPONENT,
       entityId: message.entityId,
@@ -82,7 +127,10 @@ export function buildPutComponentCrdtMessage(message: PutComponentMessage, engin
   }
 }
 
-export function buildDeleteComponentCrdtMessage(message: DeleteComponentMessage, engine: IEngine): DeserializedDeleteComponentMessage {
+export function buildDeleteComponentCrdtMessage(
+  message: DeleteComponentMessage,
+  engine: IEngine
+): DeserializedDeleteComponentMessage {
   try {
     const component = engine.getComponent(message.componentId)
     return {
@@ -93,7 +141,9 @@ export function buildDeleteComponentCrdtMessage(message: DeleteComponentMessage,
       componentName: component.componentName
     }
   } catch {
-    console.log(`Deserialize DELETE_COMPONENT: Component with ID "${message.componentId}" for entity "${message.entityId}" not found on engine.`)
+    console.log(
+      `Deserialize DELETE_COMPONENT: Component with ID "${message.componentId}" for entity "${message.entityId}" not found on engine.`
+    )
     return {
       type: CrdtMessageType.DELETE_COMPONENT,
       entityId: message.entityId,
@@ -104,7 +154,10 @@ export function buildDeleteComponentCrdtMessage(message: DeleteComponentMessage,
   }
 }
 
-export function buildAppendValueComponentCrdtMessage(message: AppendValueMessage, engine: IEngine): DeserializedAppendValueComponentMessage {
+export function buildAppendValueComponentCrdtMessage(
+  message: AppendValueMessage,
+  engine: IEngine
+): DeserializedAppendValueComponentMessage {
   try {
     const component = engine.getComponent(message.componentId)
     const data = component.schema.deserialize(new ReadWriteByteBuffer(message.data)) as Set<unknown>
@@ -117,7 +170,9 @@ export function buildAppendValueComponentCrdtMessage(message: AppendValueMessage
       data
     }
   } catch {
-    console.log(`Deserialize PUT_COMPONENT: Component with ID "${message.componentId}" for entity "${message.entityId}" not found on engine.`)
+    console.log(
+      `Deserialize PUT_COMPONENT: Component with ID "${message.componentId}" for entity "${message.entityId}" not found on engine.`
+    )
     return {
       type: CrdtMessageType.APPEND_VALUE,
       entityId: message.entityId,
@@ -143,24 +198,28 @@ export function buildBaseCrdtMessage(message: CrdtMessage): BaseCrdtMessage {
   }
 }
 
-export function deserializeCrdtMessage(data: Uint8Array, engine: IEngine): DeserializedCrdtMessage[] {
+export function getDeserializedCrdtMessage(message: CrdtMessage, engine: IEngine): DeserializedCrdtMessage {
+  if (message.type === CrdtMessageType.PUT_COMPONENT) {
+    return buildPutComponentCrdtMessage(message, engine)
+  } else if (message.type === CrdtMessageType.DELETE_COMPONENT) {
+    return buildDeleteComponentCrdtMessage(message, engine)
+  } else if (message.type === CrdtMessageType.APPEND_VALUE) {
+    return buildAppendValueComponentCrdtMessage(message, engine)
+  } else if (message.type === CrdtMessageType.DELETE_ENTITY) {
+    return buildDeleteEntityCrdtMessage(message)
+  } else {
+    return buildBaseCrdtMessage(message)
+  }
+}
+
+export function deserializeCrdtMessages(data: Uint8Array, engine: IEngine): DeserializedCrdtMessage[] {
   const messages: DeserializedCrdtMessage[] = []
   const buffer = new ReadWriteByteBuffer(data)
 
   let message: CrdtMessage | null
 
   while ((message = readMessage(buffer))) {
-    if (message.type === CrdtMessageType.PUT_COMPONENT) {
-      messages.push(buildPutComponentCrdtMessage(message, engine))
-    } else if (message.type === CrdtMessageType.DELETE_COMPONENT) {
-      messages.push(buildDeleteComponentCrdtMessage(message, engine))
-    } else if (message.type === CrdtMessageType.APPEND_VALUE) {
-      messages.push(buildAppendValueComponentCrdtMessage(message, engine))
-    } else if (message.type === CrdtMessageType.DELETE_ENTITY) {
-      messages.push(buildDeleteEntityCrdtMessage(message))
-    } else {
-      messages.push(buildBaseCrdtMessage(message))
-    }
+    messages.push(getDeserializedCrdtMessage(message, engine))
   }
 
   return messages

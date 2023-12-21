@@ -211,7 +211,7 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
     if (code === 0) {
       printProgressInfo(components.logger, `Type checking completed without errors`)
     } else {
-      typeCheckerFuture.reject(new CliError(`Typechecker exited with code ${code}.`))
+      typeCheckerFuture.reject(new CliError(`asd exited with code ${code}.`))
       return
     }
 

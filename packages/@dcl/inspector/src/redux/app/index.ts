@@ -59,8 +59,14 @@ export const appState = createSlice({
 })
 
 // Actions
-export const { updateCanSave, updatePreferences, updateAssetCatalog, updateThumbnails, updateUploadFile, updateSession } =
-  appState.actions
+export const {
+  updateCanSave,
+  updatePreferences,
+  updateAssetCatalog,
+  updateThumbnails,
+  updateUploadFile,
+  updateSession
+} = appState.actions
 
 // Selectors
 export const selectCanSave = (state: RootState): boolean => state.app.canSave

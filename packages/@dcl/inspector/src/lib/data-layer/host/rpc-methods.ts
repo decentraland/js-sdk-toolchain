@@ -8,6 +8,7 @@ import { initSceneProvider } from './scene'
 import { readPreferencesFromFile, serializeInspectorPreferences } from '../../logic/preferences/io'
 import { compositeAndDirty } from './utils/composite-dirty'
 import { installBin } from './utils/install-bin'
+import { wsStream } from './ws'
 
 const INSPECTOR_PREFERENCES_PATH = 'inspector-preferences.json'
 
@@ -57,6 +58,9 @@ export async function initRpcMethods(
      */
     crdtStream(iter) {
       return stream(iter, { engine }, () => undoRedoManager?.addUndoCrdt())
+    },
+    wsStream(iter) {
+      return wsStream(iter, engine)
     },
     async getAssetData(req) {
       if (!req.path) throw new Error('Invalid path')

@@ -11,6 +11,11 @@ message CrdtStreamMessage {
   bytes data = 1;
 }
 
+message WsStreamMessage {
+  int32 type = 1;
+  bytes data = 2;
+}
+
 message AssetData {
   bytes data = 1;
 }
@@ -55,6 +60,7 @@ message InspectorPreferencesMessage {
 
 service DataService {
   rpc CrdtStream(stream CrdtStreamMessage) returns (stream CrdtStreamMessage) {}
+  rpc WsStream(stream WsStreamMessage) returns (stream WsStreamMessage) {}
   rpc Undo(Empty) returns (UndoRedoResponse) {}
   rpc Redo(Empty) returns (UndoRedoResponse) {}
 
