@@ -33,10 +33,25 @@ export const DIRECTORY = {
   THUMBNAILS: 'thumbnails'
 }
 
-export const EXTENSIONS = ['.glb', '.png', '.composite', '.composite.bin', '.gltf', '.jpg', '.mp3', '.ogg', '.wav']
+export const EXTENSIONS = [
+  '.glb',
+  '.png',
+  '.composite',
+  '.composite.bin',
+  '.gltf',
+  '.jpg',
+  '.mp3',
+  '.ogg',
+  '.wav',
+  '.mp4'
+]
 
 export function withAssetDir(filePath: string = '') {
   return filePath ? `${DIRECTORY.ASSETS}/${filePath}` : DIRECTORY.ASSETS
+}
+
+export function isFileInAssetDir(filePath: string = '') {
+  return filePath.startsWith(DIRECTORY.ASSETS)
 }
 
 export function getFileName(fileName: string, ext: string) {

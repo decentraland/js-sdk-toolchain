@@ -203,16 +203,16 @@ describe('Raycast Helper System should', () => {
 
     await engine.update(1)
 
-    expect(raycastResultComponent.getOrNull(continuousRaycastEntity)).toBeDefined()
-    expect(raycastComponent.getOrNull(continuousRaycastEntity)).toBeDefined()
+    expect(raycastResultComponent.getOrNull(continuousRaycastEntity)).not.toBeNull()
+    expect(raycastComponent.getOrNull(continuousRaycastEntity)).not.toBeNull()
     expect(raycastResultComponent.getOrNull(nonContinuousRaycastEntity)).toBeNull()
     expect(raycastComponent.getOrNull(nonContinuousRaycastEntity)).toBeNull()
 
     await engine.update(1)
 
     expect(fn).toHaveBeenCalledTimes(2)
-    expect(raycastResultComponent.getOrNull(continuousRaycastEntity)).toBeDefined()
-    expect(raycastComponent.getOrNull(continuousRaycastEntity)).toBeDefined()
+    expect(raycastResultComponent.getOrNull(continuousRaycastEntity)).not.toBeNull()
+    expect(raycastComponent.getOrNull(continuousRaycastEntity)).not.toBeNull()
   })
 
   it('remove raycast entity correctly', async () => {
@@ -286,6 +286,8 @@ describe('Raycast Helper System should', () => {
       queryType: RaycastQueryType.RQT_QUERY_ALL
     })
 
+    await engine.update(1)
+
     const attachedRaycast = raycastComponent.get(raycastEntity)
     expect(attachedRaycast.continuous).toBe(false)
     expect(attachedRaycast.direction).toEqual({
@@ -301,6 +303,8 @@ describe('Raycast Helper System should', () => {
   it('create default values correctly for LocalDirection without opts', async () => {
     const raycastEntity = engine.addEntity()
     raycastHelperSystem.registerLocalDirectionRaycast(raycastEntity, (_result) => {})
+
+    await engine.update(1)
 
     const attachedRaycast = raycastComponent.get(raycastEntity)
     expect(attachedRaycast.continuous).toBe(false)
@@ -321,6 +325,8 @@ describe('Raycast Helper System should', () => {
       queryType: RaycastQueryType.RQT_QUERY_ALL
     })
 
+    await engine.update(1)
+
     const attachedRaycast = raycastComponent.get(raycastEntity)
     expect(attachedRaycast.continuous).toBe(false)
     expect(attachedRaycast.direction).toEqual({
@@ -336,6 +342,8 @@ describe('Raycast Helper System should', () => {
   it('create default values correctly for GlobalDirection without opts', async () => {
     const raycastEntity = engine.addEntity()
     raycastHelperSystem.registerGlobalDirectionRaycast(raycastEntity, (_result) => {})
+
+    await engine.update(1)
 
     const attachedRaycast = raycastComponent.get(raycastEntity)
     expect(attachedRaycast.continuous).toBe(false)
@@ -357,6 +365,8 @@ describe('Raycast Helper System should', () => {
       queryType: RaycastQueryType.RQT_QUERY_ALL
     })
 
+    await engine.update(1)
+
     const attachedRaycast = raycastComponent.get(raycastEntity)
     expect(attachedRaycast.continuous).toBe(false)
     expect(attachedRaycast.direction).toEqual({
@@ -372,6 +382,8 @@ describe('Raycast Helper System should', () => {
   it('create default values correctly for GlobalTarget without opts', async () => {
     const raycastEntity = engine.addEntity()
     raycastHelperSystem.registerGlobalTargetRaycast(raycastEntity, (_result) => {})
+
+    await engine.update(1)
 
     const attachedRaycast = raycastComponent.get(raycastEntity)
     expect(attachedRaycast.continuous).toBe(false)
@@ -393,6 +405,8 @@ describe('Raycast Helper System should', () => {
       queryType: RaycastQueryType.RQT_QUERY_ALL
     })
 
+    await engine.update(1)
+
     const attachedRaycast = raycastComponent.get(raycastEntity)
     expect(attachedRaycast.continuous).toBe(false)
     expect(attachedRaycast.direction).toEqual({
@@ -408,6 +422,8 @@ describe('Raycast Helper System should', () => {
   it('create default values correctly for TargetEntity without opts', async () => {
     const raycastEntity = engine.addEntity()
     raycastHelperSystem.registerTargetEntityRaycast(raycastEntity, (_result) => {})
+
+    await engine.update(1)
 
     const attachedRaycast = raycastComponent.get(raycastEntity)
     expect(attachedRaycast.continuous).toBe(false)
@@ -431,6 +447,7 @@ describe('Raycast Helper System should', () => {
 
     // update without raycastResult attachment
     await engine.update(1)
+    await engine.update(1)
     expect(fn).toHaveBeenCalledTimes(0)
 
     // Simulate client-side result attachment
@@ -443,5 +460,16 @@ describe('Raycast Helper System should', () => {
 
     await engine.update(1)
     expect(fn).toHaveBeenCalled()
+  })
+
+  it('attach raycast component after 1 frame', async () => {
+    const raycastEntity = engine.addEntity()
+    raycastHelperSystem.registerGlobalDirectionRaycast({ entity: raycastEntity }, (_result) => {})
+
+    expect(raycastComponent.getOrNull(raycastEntity)).toBeNull()
+
+    await engine.update(1)
+
+    expect(raycastComponent.getOrNull(raycastEntity)).not.toBeNull()
   })
 })

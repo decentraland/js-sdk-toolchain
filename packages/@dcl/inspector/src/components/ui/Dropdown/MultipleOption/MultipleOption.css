@@ -1,0 +1,13 @@
+.MultipleOptionContainer {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.MultipleOptionContainer > .Pill > .Content {
+  padding-bottom: 2px;
+  text-overflow: ellipsis;
+}

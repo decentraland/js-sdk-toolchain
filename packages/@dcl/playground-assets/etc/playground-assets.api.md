@@ -689,10 +689,10 @@ export type Coords = {
 export const CRDT_MESSAGE_HEADER_LENGTH = 8;
 
 // @public (undocumented)
-export type CrdtMessage = PutComponentMessage | DeleteComponentMessage | DeleteEntityMessage | AppendValueMessage;
+export type CrdtMessage = PutComponentMessage | DeleteComponentMessage | AppendValueMessage | DeleteEntityMessage | PutNetworkComponentMessage | DeleteComponentNetworkMessage | DeleteEntityNetworkMessage;
 
 // @public (undocumented)
-export type CrdtMessageBody = PutComponentMessageBody | DeleteComponentMessageBody | DeleteEntityMessageBody | AppendValueMessageBody;
+export type CrdtMessageBody = PutComponentMessageBody | DeleteComponentMessageBody | DeleteEntityMessageBody | AppendValueMessageBody | CrdtNetworkMessageBody;
 
 // @public
 export type CrdtMessageHeader = {
@@ -715,14 +715,23 @@ export enum CrdtMessageType {
     // (undocumented)
     DELETE_COMPONENT = 2,
     // (undocumented)
+    DELETE_COMPONENT_NETWORK = 6,
+    // (undocumented)
     DELETE_ENTITY = 3,
     // (undocumented)
-    MAX_MESSAGE_TYPE = 5,
+    DELETE_ENTITY_NETWORK = 7,
+    // (undocumented)
+    MAX_MESSAGE_TYPE = 8,
     // (undocumented)
     PUT_COMPONENT = 1,
     // (undocumented)
+    PUT_COMPONENT_NETWORK = 5,
+    // (undocumented)
     RESERVED = 0
 }
+
+// @public (undocumented)
+export type CrdtNetworkMessageBody = PutNetworkComponentMessageBody | DeleteComponentNetworkMessageBody | DeleteEntityNetworkMessageBody;
 
 // Warning: (ae-missing-release-tag) "createEthereumProvider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -777,6 +786,27 @@ export type DeleteComponentMessageBody = {
 };
 
 // @public (undocumented)
+export namespace DeleteComponentNetwork {
+    const // (undocumented)
+    MESSAGE_HEADER_LENGTH = 16;
+    // (undocumented)
+    export function read(buf: ByteBuffer): DeleteComponentNetworkMessage | null;
+    export function write(entity: Entity, componentId: number, timestamp: number, networkId: number, buf: ByteBuffer): void;
+}
+
+// @public (undocumented)
+export type DeleteComponentNetworkMessage = CrdtMessageHeader & DeleteComponentNetworkMessageBody;
+
+// @public (undocumented)
+export type DeleteComponentNetworkMessageBody = {
+    type: CrdtMessageType.DELETE_COMPONENT_NETWORK;
+    entityId: Entity;
+    componentId: number;
+    timestamp: number;
+    networkId: number;
+};
+
+// @public (undocumented)
 export namespace DeleteEntity {
     const // (undocumented)
     MESSAGE_HEADER_LENGTH = 4;
@@ -793,6 +823,26 @@ export type DeleteEntityMessage = CrdtMessageHeader & DeleteEntityMessageBody;
 export type DeleteEntityMessageBody = {
     type: CrdtMessageType.DELETE_ENTITY;
     entityId: Entity;
+};
+
+// @public (undocumented)
+export namespace DeleteEntityNetwork {
+    const // (undocumented)
+    MESSAGE_HEADER_LENGTH = 8;
+    // (undocumented)
+    export function read(buf: ByteBuffer): DeleteEntityNetworkMessage | null;
+    // (undocumented)
+    export function write(entity: Entity, networkId: number, buf: ByteBuffer): void;
+}
+
+// @public (undocumented)
+export type DeleteEntityNetworkMessage = CrdtMessageHeader & DeleteEntityNetworkMessageBody;
+
+// @public (undocumented)
+export type DeleteEntityNetworkMessageBody = {
+    type: CrdtMessageType.DELETE_ENTITY_NETWORK;
+    entityId: Entity;
+    networkId: number;
 };
 
 // @public (undocumented)
@@ -1107,10 +1157,6 @@ export type GSetComponentGetter<T extends GrowOnlyValueSetComponentDefinition<an
 // @public (undocumented)
 export interface IEngine {
     addEntity(): Entity;
-    // @alpha
-    addNetworkManager(reservedLocalEntities: number, range: [number, number]): {
-        addEntity: IEngine['addEntity'];
-    };
     addSystem(system: SystemFn, priority?: number, name?: string): void;
     // @alpha (undocumented)
     addTransport(transport: Transport): void;
@@ -1125,8 +1171,6 @@ export interface IEngine {
     // @alpha
     getEntityOrNullByName(label: string): Entity | null;
     getEntityState(entity: Entity): EntityState;
-    // @alpha
-    getNetworkManager(): ReturnType<IEngine['addNetworkManager']>;
     readonly PlayerEntity: Entity;
     registerComponentDefinition<T>(componentName: string, componentDefinition: ComponentDefinition<T>): ComponentDefinition<T>;
     // (undocumented)
@@ -1340,6 +1384,36 @@ export type IInputSystem = {
 export type IncludeUndefined<T> = {
     [P in keyof T]: undefined extends T[P] ? P : never;
 }[keyof T];
+
+// Warning: (ae-missing-release-tag) "INetowrkEntity" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type INetowrkEntity = LastWriteWinElementSetComponentDefinition<INetowrkEntityType>;
+
+// Warning: (ae-missing-release-tag) "INetowrkEntityType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface INetowrkEntityType {
+    // (undocumented)
+    entityId: Entity;
+    // (undocumented)
+    networkId: number;
+}
+
+// Warning: (ae-missing-release-tag) "INetowrkParent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type INetowrkParent = LastWriteWinElementSetComponentDefinition<INetowrkParentType>;
+
+// Warning: (ae-missing-release-tag) "INetowrkParentType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface INetowrkParentType {
+    // (undocumented)
+    entityId: Entity;
+    // (undocumented)
+    networkId: number;
+}
 
 // Warning: (tsdoc-html-tag-missing-string) The HTML element has an invalid attribute: Expecting an HTML string starting with a single-quote or double-quote character
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
@@ -1812,6 +1886,12 @@ export interface NameType {
     // (undocumented)
     value: string;
 }
+
+// @alpha
+export const NetworkEntity: INetowrkEntity;
+
+// @alpha
+export const NetworkParent: INetowrkParent;
 
 // @public (undocumented)
 export const enum NftFrameType {
@@ -3316,6 +3396,26 @@ export namespace PutComponentOperation {
     export function write(entity: Entity, timestamp: number, componentId: number, data: Uint8Array, buf: ByteBuffer): void;
 }
 
+// @public (undocumented)
+export type PutNetworkComponentMessage = CrdtMessageHeader & PutNetworkComponentMessageBody;
+
+// Warning: (ae-missing-release-tag) "PutNetworkComponentMessageBody" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type PutNetworkComponentMessageBody = Omit<PutComponentMessageBody, 'type'> & {
+    type: CrdtMessageType.PUT_COMPONENT_NETWORK;
+    networkId: number;
+};
+
+// @public (undocumented)
+export namespace PutNetworkComponentOperation {
+    const // (undocumented)
+    MESSAGE_HEADER_LENGTH = 20;
+    // (undocumented)
+    export function read(buf: ByteBuffer): PutNetworkComponentMessage | null;
+    export function write(entity: Entity, timestamp: number, componentId: number, networkId: number, data: Uint8Array, buf: ByteBuffer): void;
+}
+
 // @public
 export type Quaternion = Quaternion.ReadonlyQuaternion;
 
@@ -3538,7 +3638,7 @@ export namespace Rect {
 }
 
 // @public
-export function removeEntityWithChildren(engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema' | 'removeEntity'>, entity: Entity): void;
+export function removeEntityWithChildren(engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema' | 'removeEntity' | 'defineComponent'>, entity: Entity): void;
 
 // Warning: (ae-missing-release-tag) "RESERVED_LOCAL_ENTITIES" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -3876,6 +3976,7 @@ export type Transport = {
     send(message: Uint8Array): Promise<void>;
     onmessage?(message: Uint8Array): void;
     filter(message: Omit<TransportMessage, 'messageBuffer'>): boolean;
+    type?: string;
 };
 
 // @public (undocumented)

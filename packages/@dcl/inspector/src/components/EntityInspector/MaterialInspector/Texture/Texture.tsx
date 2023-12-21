@@ -43,8 +43,7 @@ function TextureInspector({ label, texture, files, getInputProps }: Props) {
             isValidFile={isModel}
           />
         )}
-        {/* {type.value === Texture.TT_AVATAR_TEXTURE && <TextField label="User ID" {...getInputProps(`${texture}.userId`)} />}
-        {type.value === Texture.TT_VIDEO_TEXTURE && <TextField label="Video player entity" {...getInputProps(`${texture}.videoPlayerEntity`)} />} */}
+        {/* {type.value === Texture.TT_AVATAR_TEXTURE && <TextField label="User ID" {...getInputProps(`${texture}.userId`)} />}*/}
       </Block>
       <Block>
         <Dropdown label="Wrap mode" options={WRAP_MODES} {...getInputProps(`${texture}.wrapMode`)} />

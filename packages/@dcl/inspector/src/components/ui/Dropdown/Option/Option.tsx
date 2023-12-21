@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import cx from 'classnames'
-import { IoAlertCircleOutline as AlertIcon } from 'react-icons/io5'
+import { IoAlertCircleOutline as AlertIcon, IoCheckmark as CheckIcon } from 'react-icons/io5'
 import { Props } from './types'
 import './Option.css'
 
@@ -21,6 +21,10 @@ const Option: React.FC<Props> = (props) => {
     value,
     onClick
   } = props
+
+  const renderSelectedOption = useCallback(() => {
+    return <div className="SelectedContent">{selected && <CheckIcon className="SelectedIcon" size={16} />}</div>
+  }, [selected])
 
   const renderLeftContent = useCallback(() => {
     if (leftIcon) {
@@ -82,6 +86,7 @@ const Option: React.FC<Props> = (props) => {
       ) : (
         <>
           <div className="OptionContent">
+            {renderSelectedOption()}
             {renderLeftContent()}
             <span className="Option" style={{ minWidth: minWidth }}>
               {label ?? value}

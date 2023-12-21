@@ -115,6 +115,8 @@
       "parent": 523
     }
   },
+  "core-schema::Network-Entity": {},
+  "core-schema::Network-Parent": {},
   "composite::root": {
     "512": {
       "src": "relative/with-references.composite",

@@ -1,0 +1,33 @@
+.OptionList {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: calc(100% + 1px);
+  left: 0;
+  width: 100%;
+  padding-top: 8px;
+  background: var(--base-14);
+  border-radius: 4px;
+  z-index: 5;
+  user-select: none;
+  max-height: 132px;
+  overflow-y: auto;
+  cursor: initial;
+  box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.4);
+}
+
+.OptionList.searchable {
+  gap: unset;
+}
+
+.OptionList.searchable > .OptionListSearch.Text.Field {
+  padding: 0px 7px 6px 7px;
+}
+
+.OptionList.searchable > .OptionListSearch.Text.Field > .InputContainer:not(.hovered):not(.focused) {
+  border-color: var(--base-12);
+}
+
+.OptionList > .OptionListEmpty.OptionContainer > .OptionContent > .Option {
+  text-wrap: pretty;
+}

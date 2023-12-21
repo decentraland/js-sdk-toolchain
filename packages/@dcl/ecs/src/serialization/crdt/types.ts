@@ -12,6 +12,10 @@ export enum CrdtMessageType {
 
   DELETE_ENTITY = 3,
   APPEND_VALUE = 4,
+  // Network operations
+  PUT_COMPONENT_NETWORK = 5,
+  DELETE_COMPONENT_NETWORK = 6,
+  DELETE_ENTITY_NETWORK = 7,
 
   MAX_MESSAGE_TYPE
 }
@@ -50,6 +54,11 @@ export type PutComponentMessageBody = {
   data: Uint8Array
 }
 
+export type PutNetworkComponentMessageBody = Omit<PutComponentMessageBody, 'type'> & {
+  type: CrdtMessageType.PUT_COMPONENT_NETWORK
+  networkId: number
+}
+
 /**
  * Min. length = header (8 bytes) + 16 bytes = 24 bytes
  *
@@ -81,12 +90,36 @@ export type DeleteComponentMessageBody = {
 }
 
 /**
+ * @param entity - Uint32 number of the entity
+ * @param componentId - Uint32 number of id
+ * @param timestamp - Uint32 Lamport timestamp
+ * @param networkId - Uint32 user network id
+ * @public
+ */
+export type DeleteComponentNetworkMessageBody = {
+  type: CrdtMessageType.DELETE_COMPONENT_NETWORK
+  entityId: Entity
+  componentId: number
+  timestamp: number
+  networkId: number
+}
+
+/**
  * @param entity - uint32 number of the entity
  * @public
  */
 export type DeleteEntityMessageBody = {
   type: CrdtMessageType.DELETE_ENTITY
   entityId: Entity
+}
+
+/**
+ * @public
+ */
+export type DeleteEntityNetworkMessageBody = {
+  type: CrdtMessageType.DELETE_ENTITY_NETWORK
+  entityId: Entity
+  networkId: number
 }
 
 /**
@@ -100,16 +133,44 @@ export type PutComponentMessage = CrdtMessageHeader & PutComponentMessageBody
 /**
  * @public
  */
+export type PutNetworkComponentMessage = CrdtMessageHeader & PutNetworkComponentMessageBody
+/**
+ * @public
+ */
 export type DeleteComponentMessage = CrdtMessageHeader & DeleteComponentMessageBody
 /**
  * @public
  */
+export type DeleteComponentNetworkMessage = CrdtMessageHeader & DeleteComponentNetworkMessageBody
+/**
+ * @public
+ */
 export type DeleteEntityMessage = CrdtMessageHeader & DeleteEntityMessageBody
+/**
+ * @public
+ */
+export type DeleteEntityNetworkMessage = CrdtMessageHeader & DeleteEntityNetworkMessageBody
 
 /**
  * @public
  */
-export type CrdtMessage = PutComponentMessage | DeleteComponentMessage | DeleteEntityMessage | AppendValueMessage
+export type CrdtMessage =
+  | PutComponentMessage
+  | DeleteComponentMessage
+  | AppendValueMessage
+  | DeleteEntityMessage
+  // Network messages
+  | PutNetworkComponentMessage
+  | DeleteComponentNetworkMessage
+  | DeleteEntityNetworkMessage
+
+/**
+ * @public
+ */
+export type CrdtNetworkMessageBody =
+  | PutNetworkComponentMessageBody
+  | DeleteComponentNetworkMessageBody
+  | DeleteEntityNetworkMessageBody
 
 /**
  * @public
@@ -119,6 +180,7 @@ export type CrdtMessageBody =
   | DeleteComponentMessageBody
   | DeleteEntityMessageBody
   | AppendValueMessageBody
+  | CrdtNetworkMessageBody
 
 export enum ProcessMessageResultType {
   /**

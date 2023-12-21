@@ -3,7 +3,7 @@ import { CoreComponents } from '../../lib/sdk/components'
 
 export interface IAsset {
   src: string
-  type: 'unknown' | 'gltf' | 'composite' | 'audio'
+  type: 'unknown' | 'gltf' | 'composite' | 'audio' | 'video'
   id?: string
 }
 

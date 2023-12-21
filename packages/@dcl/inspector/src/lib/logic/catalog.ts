@@ -14,6 +14,7 @@ export const CATEGORIES = [
   'levers',
   'doors',
   'platforms',
+  'social',
   'decorations',
   'structures',
   'vehicles',
@@ -37,7 +38,7 @@ export type Asset = {
   category: string
   tags: string[]
   contents: Record<string, string>
-  components: Partial<Record<ComponentName, any>>
+  components: Partial<Record<ComponentName | CoreComponents, any>>
 }
 
 export function getContentsUrl(hash: string) {
@@ -56,12 +57,15 @@ export function getAssetsByCategory(assets: Asset[]) {
 
 export function isSmart(asset: Partial<Asset>) {
   const components = Object.keys(asset?.components ?? {})
-  return (
-    components.length > 1 &&
-    components.some((component) =>
-      [ComponentName.ACTIONS, ComponentName.TRIGGERS].find(($) => $.toString() === component)
-    )
-  )
+  // when the item has more than one component, it is smart
+  if (components.length > 1) {
+    return true
+    // when the item has a single component but it's not a GltfContainer, then it's also smart (NFTShape, TextShape, MeshRenderers, etc...)
+  } else if (components.length === 1 && components[0] !== CoreComponents.GLTF_CONTAINER) {
+    return true
+  }
+  // when the item only has a GltfContainer then it's not smart
+  return false
 }
 
 export function getAssetByModel(path: string) {
