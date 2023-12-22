@@ -1,8 +1,9 @@
 import { CrdtMessage, IEngine, Transport } from '@dcl/ecs'
 import { AsyncQueue } from '@well-known-components/pushable-channel'
 
-import { deserializeCrdtMessages, getDeserializedCrdtMessage, logCrdtMessages } from '../../../sdk/crdt-logger'
 import { addWs } from './connect'
+import { deserializeCrdtMessages, logCrdtMessages } from '../../../sdk/crdt-logger'
+import { processCrdtMessage } from './filter'
 
 export enum MessageType {
   Init = 1,
@@ -14,7 +15,7 @@ export enum MessageType {
   FS = 7
 }
 
-export type Stream = { type: MessageType; data: Uint8Array }
+export type WsMessage = { type: MessageType; data: Uint8Array }
 
 const encoder = new TextEncoder()
 const decoder = new TextDecoder()
@@ -23,21 +24,23 @@ export function decode(data: Uint8Array) {
   return JSON.parse(decoder.decode(data))
 }
 
-export function encode(data: Record<string, unknown>) {
+export function encode(data: Record<string, unknown>): Uint8Array {
   return encoder.encode(JSON.stringify(data))
 }
 
-export function wsStream(stream: AsyncIterable<Stream>, engine: IEngine) {
+export function wsStream(stream: AsyncIterable<WsMessage>, engine: IEngine) {
   const url = `ws://localhost:3000/iws/mariano?address=0xC67c60cD6d82Fcb2fC6a9a58eA62F80443E3268${Math.ceil(
     Math.random() * 50
   )}`
-  const queue = new AsyncQueue<Stream>((_, _action) => {})
+  const queue = new AsyncQueue<WsMessage>((_, _action) => {})
   const ws = addWs(url)
 
   const transport: Transport = {
     filter(message: CrdtMessage) {
-      console.log('Filter:', getDeserializedCrdtMessage(message, engine))
-      return !queue.closed
+      if (queue.closed) return false
+      const { filter, messages } = processCrdtMessage(message, engine)
+      messages.forEach(({ type, data }) => ws.sendMessage(type, data))
+      return filter
     },
     async send(message) {
       if (queue.closed || !message.byteLength) return
