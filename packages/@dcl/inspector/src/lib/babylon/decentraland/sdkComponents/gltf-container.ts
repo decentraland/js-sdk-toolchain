@@ -297,7 +297,7 @@ function processColliders($: BABYLON.AssetContainer) {
   for (let i = 0; i < $.meshes.length; i++) {
     const mesh = $.meshes[i]
 
-    if (mesh.name.toLowerCase().endsWith('collider')) {
+    if (mesh.name.toLowerCase().includes('collider')) {
       mesh.checkCollisions = true
       mesh.visibility = 0
       mesh.isPickable = false
