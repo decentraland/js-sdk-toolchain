@@ -1,14 +1,24 @@
+import { v4 as uuid } from 'uuid'
 import { AsyncQueue } from '@well-known-components/pushable-channel'
 
 import { store } from '../../redux/store'
 import { updateSession } from '../../redux/app'
 import { MessageType, WsMessage, decode } from '../data-layer/host/ws'
 import { DataLayerRpcClient } from '../data-layer/types'
+import { getRandomMnemonic } from '../../components/ImportAsset/utils'
 
-export async function initCollaborativeEditor(dataLayerWsStream: DataLayerRpcClient['wsStream']) {
+export async function initCollaborativeEditor(
+  saveWsStreamConf: DataLayerRpcClient['saveWsStreamConf'],
+  wsStream: DataLayerRpcClient['wsStream']
+) {
+  const url = 'localhost:3000/iws'
+  const room = 'test-room' || uuid()
+  const address = getRandomMnemonic()
   const queue = new AsyncQueue<WsMessage>((_, _action) => {})
 
-  for await (const { type, data } of dataLayerWsStream(queue)) {
+  await saveWsStreamConf({ url, room, address })
+
+  for await (const { type, data } of wsStream(queue)) {
     processMessage(type, data)
   }
 }

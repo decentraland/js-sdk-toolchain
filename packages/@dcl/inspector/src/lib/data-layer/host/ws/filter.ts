@@ -6,21 +6,25 @@ import { EditorComponentNames, EditorComponentsTypes } from "../../../sdk/compon
 
 type FilterMessage = { filter: boolean; messages: WsMessage[] }
 
-export function processCrdtMessage(crdtMessage: CrdtMessage, engine: IEngine): FilterMessage {
+export function processCrdtMessage(address: string, crdtMessage: CrdtMessage, engine: IEngine): FilterMessage {
   const message = getDeserializedCrdtMessage(crdtMessage, engine)
 
   if (getPutComponentFromMessage<EditorComponentsTypes['Selection']>(message, EditorComponentNames.Selection)) {
     return {
       filter: false,
-      messages: [{ type: MessageType.ParticipantSelectedEntity, data: encode({ entityId: message.entityId })  }]
+      messages: [{ type: MessageType.ParticipantSelectedEntity, data: encode({ address, entityId: message.entityId })  }]
     }
   }
 
   if (getDeleteComponentFromMessage(message, EditorComponentNames.Selection)) {
     return {
       filter: false,
-      messages: [{ type: MessageType.ParticipantUnselectedEntity, data: encode({ entityId: message.entityId }) }]
+      messages: [{ type: MessageType.ParticipantUnselectedEntity, data: encode({ address, entityId: message.entityId }) }]
     }
+  }
+
+  if (getPutComponentFromMessage<EditorComponentsTypes['Nodes']>(message, EditorComponentNames.Nodes)) {
+    return { filter: false, messages: [] }
   }
 
   return { filter: true, messages: [] }

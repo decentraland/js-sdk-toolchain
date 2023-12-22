@@ -4,6 +4,7 @@ import { AsyncQueue } from '@well-known-components/pushable-channel'
 import { addWs } from './connect'
 import { deserializeCrdtMessages, logCrdtMessages } from '../../../sdk/crdt-logger'
 import { processCrdtMessage } from './filter'
+import { DataLayerRpcClient } from '../../types'
 
 export enum MessageType {
   Init = 1,
@@ -15,6 +16,7 @@ export enum MessageType {
   FS = 7
 }
 
+export type WsStreamConf = { url: string; room: string; address: string; }
 export type WsMessage = { type: MessageType; data: Uint8Array }
 
 const encoder = new TextEncoder()
@@ -28,21 +30,23 @@ export function encode(data: Record<string, unknown>): Uint8Array {
   return encoder.encode(JSON.stringify(data))
 }
 
-export function wsStream(stream: AsyncIterable<WsMessage>, engine: IEngine) {
-  const url = `ws://localhost:3000/iws/mariano?address=0xC67c60cD6d82Fcb2fC6a9a58eA62F80443E3268${Math.ceil(
-    Math.random() * 50
-  )}`
+export function initWsStream(
+  { url, room, address }: WsStreamConf,
+  stream: AsyncIterable<WsMessage>,
+  engine: IEngine
+) {
+  const wsUrl = `ws://${url}/${room}?address=${address}`
   const queue = new AsyncQueue<WsMessage>((_, _action) => {})
-  const ws = addWs(url)
+  const ws = addWs(wsUrl)
 
   const transport: Transport = {
     filter(message: CrdtMessage) {
       if (queue.closed) return false
-      const { filter, messages } = processCrdtMessage(message, engine)
+      const { filter, messages } = processCrdtMessage(address, message, engine)
       messages.forEach(({ type, data }) => ws.sendMessage(type, data))
       return filter
     },
-    async send(message) {
+    async send(message: Uint8Array) {
       if (queue.closed || !message.byteLength) return
       const crdtMessages = deserializeCrdtMessages(message, engine)
       logCrdtMessages('DataLayer>Network', crdtMessages)

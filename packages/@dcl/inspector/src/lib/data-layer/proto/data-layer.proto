@@ -11,6 +11,12 @@ message CrdtStreamMessage {
   bytes data = 1;
 }
 
+message WsStreamConf {
+  string url = 1;
+  string room = 2;
+  string address = 3;
+}
+
 message WsStreamMessage {
   int32 type = 1;
   bytes data = 2;
@@ -58,9 +64,12 @@ message InspectorPreferencesMessage {
   bool autosave_enabled = 2;
 }
 
+message Asd {}
+
 service DataService {
   rpc CrdtStream(stream CrdtStreamMessage) returns (stream CrdtStreamMessage) {}
   rpc WsStream(stream WsStreamMessage) returns (stream WsStreamMessage) {}
+  rpc saveWsStreamConf(WsStreamConf) returns (Empty) {}
   rpc Undo(Empty) returns (UndoRedoResponse) {}
   rpc Redo(Empty) returns (UndoRedoResponse) {}
 

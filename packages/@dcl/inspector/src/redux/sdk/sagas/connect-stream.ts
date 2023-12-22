@@ -13,5 +13,5 @@ export function* connectStream() {
 
   yield call(connectCrdtToEngine, engines.inspector, dataLayer.crdtStream, 'Inspector')
   yield call(connectCrdtToEngine, engines.renderer, dataLayer.crdtStream, 'Renderer')
-  yield call(initCollaborativeEditor, dataLayer.wsStream)
+  yield call(initCollaborativeEditor, dataLayer.saveWsStreamConf, dataLayer.wsStream)
 }

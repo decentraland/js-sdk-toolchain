@@ -1,14 +1,14 @@
 import { IEngine, OnChangeFunction } from '@dcl/ecs'
-import { DataLayerRpcServer, FileSystemInterface } from '../types'
+import { DataLayerRpcClient, DataLayerRpcServer, FileSystemInterface } from '../types'
 import { EXTENSIONS, getCurrentCompositePath, getFilesInDirectory, withAssetDir } from './fs-utils'
-import { Stream, stream } from './stream'
+import { stream } from './stream'
 import { FileOperation, initUndoRedo } from './undo-redo'
 import upsertAsset from './upsert-asset'
 import { initSceneProvider } from './scene'
 import { readPreferencesFromFile, serializeInspectorPreferences } from '../../logic/preferences/io'
 import { compositeAndDirty } from './utils/composite-dirty'
 import { installBin } from './utils/install-bin'
-import { wsStream } from './ws'
+import { WsStreamConf, initWsStream } from './ws'
 
 const INSPECTOR_PREFERENCES_PATH = 'inspector-preferences.json'
 
@@ -43,6 +43,8 @@ export async function initRpcMethods(
   // install bin
   await installBin(fs)
 
+  let wsStreamConf: WsStreamConf | undefined = undefined
+
   return {
     async redo() {
       const type = await undoRedoManager.redo()
@@ -59,8 +61,13 @@ export async function initRpcMethods(
     crdtStream(iter) {
       return stream(iter, { engine }, () => undoRedoManager?.addUndoCrdt())
     },
+    async saveWsStreamConf({ url, room, address }) {
+      wsStreamConf = { url, room, address }
+      return {}
+    },
     wsStream(iter) {
-      return wsStream(iter, engine)
+      if (!wsStreamConf) throw new Error ('No WS configuration found')
+      return initWsStream(wsStreamConf, iter, engine)
     },
     async getAssetData(req) {
       if (!req.path) throw new Error('Invalid path')
