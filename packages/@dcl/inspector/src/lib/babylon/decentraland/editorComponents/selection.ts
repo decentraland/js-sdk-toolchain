@@ -7,16 +7,29 @@ import type { ComponentOperation } from '../component-operations'
 let addedCameraObservable = false
 const highlightedMeshes = new Set<AbstractMesh>()
 
-export function toggleSelection(mesh: AbstractMesh, value: boolean) {
+export function toggleSelection(mesh: AbstractMesh, value: boolean, color = Color3.White()) {
   mesh.renderOutline = value
-  mesh.outlineColor = Color3.White()
+  mesh.outlineColor = color
   mesh.renderOverlay = value
-  mesh.overlayColor = Color3.White()
-  mesh.overlayAlpha = 0.1
+  mesh.overlayColor = color
+  mesh.overlayAlpha = 0.5
   if (value) {
     highlightedMeshes.add(mesh)
   } else {
     highlightedMeshes.delete(mesh)
+  }
+}
+
+export function toggleEntitySelection(entity: EcsEntity, toggle: boolean, color = Color3.White()) {
+  if (entity.meshRenderer) {
+    toggleSelection(entity.meshRenderer, toggle, color)
+  }
+
+  if (entity.gltfContainer) {
+    for (const mesh of entity.gltfContainer.getChildMeshes()) {
+      if (mesh.name.includes('collider')) continue
+      toggleSelection(mesh, toggle, color)
+    }
   }
 }
 
@@ -36,17 +49,7 @@ export const putEntitySelectedComponent: ComponentOperation = (entity, component
       addedCameraObservable = true
     }
 
-    if (entity.meshRenderer) {
-      toggleSelection(entity.meshRenderer, !!componentValue)
-    }
-
-    if (entity.gltfContainer) {
-      for (const mesh of entity.gltfContainer.getChildMeshes()) {
-        if (mesh.name.includes('collider')) continue
-        toggleSelection(mesh, !!componentValue)
-      }
-    }
-
+    toggleEntitySelection(entity, !!componentValue)
     updateGizmoManager(entity, componentValue)
   }
 }

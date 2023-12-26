@@ -37,7 +37,6 @@ const Renderer: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   const isMounted = useIsMounted()
   const files = useAppSelector(selectAssetCatalog)
-  const session = useAppSelector(selectSession)
   const init = !!files
   const gizmosDisabled = useAppSelector(areGizmosDisabled)
   const config = getConfig()

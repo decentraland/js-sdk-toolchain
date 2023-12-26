@@ -7,7 +7,7 @@ import future from 'fp-future'
 import { createEditorComponents } from '../../sdk/components'
 import { ComponentOperation } from './component-operations'
 import { EcsEntity } from './EcsEntity'
-import { putEntitySelectedComponent } from './editorComponents/selection'
+import { putEntitySelectedComponent, toggleEntitySelection } from './editorComponents/selection'
 import { putBillboardComponent } from './sdkComponents/billboard'
 import { putGltfContainerComponent } from './sdkComponents/gltf-container'
 import { putMeshRendererComponent } from './sdkComponents/mesh-renderer'
@@ -20,6 +20,7 @@ import { getDataLayerInterface } from '../../../redux/data-layer'
 import { putMaterialComponent } from './sdkComponents/material'
 import { putNftShapeComponent } from './sdkComponents/nft'
 import { putVideoPlayerComponent } from './sdkComponents/video-player'
+import { store } from '../../../redux/store'
 
 export type LoadableScene = {
   readonly entity: Readonly<Omit<Schemas.Entity, 'id'>>
@@ -78,6 +79,24 @@ export class SceneContext {
   constructor(public babylon: BABYLON.Engine, public scene: BABYLON.Scene, public loadableScene: LoadableScene) {
     this.rootNode = new EcsEntity(0 as Entity, this.#weakThis, scene)
     Object.assign(globalThis, { babylon: this.engine })
+    store.subscribe(() => {
+      const { session } = store.getState().app
+
+      // turn off all selected entities...
+      for (const [entity, ecsEntity] of this.#entities) {
+        if (!this.editorComponents.Selection.has(entity)) {
+          toggleEntitySelection(ecsEntity, false)
+        }
+      }
+
+      // turn on all selected entities...
+      for (const { selectedEntity, color } of session.participants) {
+        if (selectedEntity && color) {
+          const entity = this.getOrCreateEntity(selectedEntity)
+          toggleEntitySelection(entity, true, BABYLON.Color3.FromHexString(color))
+        }
+      }
+    })
   }
 
   private processEcsChange(entityId: Entity, op: CrdtMessageType, component?: ComponentDefinition<any>) {

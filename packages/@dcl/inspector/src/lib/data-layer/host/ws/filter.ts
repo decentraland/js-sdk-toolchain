@@ -12,14 +12,14 @@ export function processCrdtMessage(address: string, crdtMessage: CrdtMessage, en
   if (getPutComponentFromMessage<EditorComponentsTypes['Selection']>(message, EditorComponentNames.Selection)) {
     return {
       filter: false,
-      messages: [{ type: MessageType.ParticipantSelectedEntity, data: encode({ address, entityId: message.entityId })  }]
+      messages: [{ type: MessageType.ParticipantSelectedEntity, data: encode({ participant: address, entityId: message.entityId })  }]
     }
   }
 
   if (getDeleteComponentFromMessage(message, EditorComponentNames.Selection)) {
     return {
       filter: false,
-      messages: [{ type: MessageType.ParticipantUnselectedEntity, data: encode({ address, entityId: message.entityId }) }]
+      messages: [{ type: MessageType.ParticipantUnselectedEntity, data: encode({ participant: address, entityId: message.entityId }) }]
     }
   }
 

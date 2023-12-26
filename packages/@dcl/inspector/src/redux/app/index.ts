@@ -9,6 +9,7 @@ export interface Session {
   participants: {
     address: string
     selectedEntity?: Entity
+    color?: string
   }[]
 }
 
