@@ -28,6 +28,7 @@ type Props<T> = {
   canDuplicate?: (value: T) => boolean
   canDrag?: (value: T) => boolean
   canReorder?: (source: T, target: T, type: DropType) => boolean
+  canSelect?: (value: T) => boolean
   onSetOpen: (value: T, isOpen: boolean) => void
   onSelect: (value: T) => void
   onDoubleSelect?: (value: T) => void
@@ -37,6 +38,7 @@ type Props<T> = {
   onRemove: (value: T) => void
   onDuplicate: (value: T) => void
   getDragContext?: () => unknown
+  getHoverColor?: (value: T) => string | undefined
   dndType?: string
   tree?: unknown
 }
@@ -71,6 +73,7 @@ export function Tree<T>() {
         canDuplicate,
         canDrag,
         canReorder,
+        canSelect,
         onRename,
         onAddChild,
         onRemove,
@@ -78,6 +81,7 @@ export function Tree<T>() {
         onDoubleSelect,
         onSetOpen,
         getDragContext = () => ({}),
+        getHoverColor,
         dndType = 'tree'
       } = props
       const ref = useRef<HTMLDivElement>(null)
@@ -92,6 +96,8 @@ export function Tree<T>() {
       const enableOpen = getChildren(value).length > 0
       const enableDuplicate = canDuplicate ? canDuplicate(value) : true
       const enableDrag = canDrag ? canDrag(value) : true
+      const enableSelect = canSelect ? canSelect(value) : true
+      const hoverColor = getHoverColor ? getHoverColor(value) : undefined
       const extraContextMenu = getExtraContextMenu ? getExtraContextMenu(value) : null
       const [editMode, setEditMode] = useState(false)
       const [insertMode, setInsertMode] = useState(false)
@@ -149,6 +155,7 @@ export function Tree<T>() {
       const quitInsertMode = () => setInsertMode(false)
 
       const handleSelect = (event: React.MouseEvent) => {
+        if (!enableSelect) return
         onSelect(value)
         if (event.detail > 1 && onDoubleSelect) onDoubleSelect(value)
       }
@@ -206,9 +213,15 @@ export function Tree<T>() {
         [dropType]: isHover && dropType
       })
 
+      const itemStyles = {
+        ...getLevelStyles(level),
+        backgroundColor: hoverColor,
+        cursor: !enableSelect ? 'not-allowed' : undefined
+      }
+
       return (
         <div className={treeClassNames} data-test-id={id} data-test-label={label}>
-          <div style={getLevelStyles(level)} className={cx({ selected, item: true, hidden })}>
+          <div style={itemStyles} className={cx({ selected, item: true, hidden })}>
             <ContextMenu {...controlsProps} />
             <div ref={ref} style={getEditModeStyles(editMode)} className="item-area">
               <DisclosureWidget enabled={enableOpen} isOpen={open} onOpen={handleOpen} />

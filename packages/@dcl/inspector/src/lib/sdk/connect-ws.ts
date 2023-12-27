@@ -7,15 +7,21 @@ import { MessageType, WsMessage, decode } from '../data-layer/host/ws'
 import { DataLayerRpcClient } from '../data-layer/types'
 import { getRandomMnemonic } from '../../components/ImportAsset/utils'
 import { Entity } from '@dcl/ecs'
+import { getAssetCatalog, getThumbnails } from '../../redux/data-layer'
+
+export const queue = new AsyncQueue<WsMessage>((_, _action) => {})
 
 export async function initCollaborativeEditor(
   saveWsStreamConf: DataLayerRpcClient['saveWsStreamConf'],
   wsStream: DataLayerRpcClient['wsStream']
 ) {
-  const url = 'localhost:3000/iws'
+  const url = 'collaborative-editor-server.decentraland.zone/iws' || 'localhost:3000/iws'
   const room = 'test-room' || uuid()
   const address = getRandomMnemonic()
-  const queue = new AsyncQueue<WsMessage>((_, _action) => {})
+
+  // DEMO: random stuff just for demo...
+  const canvas = document.getElementById('canvas')!
+  canvas.style.border = `1px solid ${stringToHex(address)}`
 
   await saveWsStreamConf({ url, room, address })
 
@@ -52,6 +58,8 @@ interface ParticipantUnselectedEntity {
   color: string
 }
 
+interface FsUpdate {}
+
 function processMessage(msgType: MessageType, data: Uint8Array): void {
   const message = decode(data)
   const { session } = store.getState().app
@@ -87,9 +95,14 @@ function processMessage(msgType: MessageType, data: Uint8Array): void {
     }))
     store.dispatch(updateSession({ participants }))
   }
+
+  if (is<FsUpdate>(msgType, MessageType.FS, message)) {
+    store.dispatch(getAssetCatalog())
+    store.dispatch(getThumbnails())
+  }
 }
 
-// random stuff just for demo...
+// DEMO: random stuff just for demo...
 function stringToHex(str: string) {
   let hex = ''
   for (let i = 0; i < str.length; i++) {

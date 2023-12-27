@@ -38,6 +38,8 @@ const Hierarchy: React.FC = () => {
     canDuplicate,
     canDrag,
     canReorder,
+    canSelect,
+    getHoverColor,
     centerViewOnEntity
   } = useTree()
   const selectedEntity = useSelectedEntity()
@@ -73,6 +75,8 @@ const Hierarchy: React.FC = () => {
         canDuplicate={canDuplicate}
         canDrag={canDrag}
         canReorder={canReorder}
+        canSelect={canSelect}
+        getHoverColor={getHoverColor}
       />
     </div>
   )

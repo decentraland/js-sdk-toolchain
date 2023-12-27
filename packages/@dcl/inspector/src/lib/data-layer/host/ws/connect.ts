@@ -1,3 +1,4 @@
+import WebSocket from 'ws'
 import { MessageType } from '.'
 
 export type OnMessageFunction = (type: MessageType, data: Uint8Array) => void
@@ -33,7 +34,7 @@ export function addWs(url: string) {
   }
 
   ws.onmessage = (event) => {
-    if (event.data.byteLength) {
+    if (event.data instanceof ArrayBuffer && event.data.byteLength) {
       let offset = 0
       const r = new Uint8Array(event.data)
       const view = new DataView(r.buffer)

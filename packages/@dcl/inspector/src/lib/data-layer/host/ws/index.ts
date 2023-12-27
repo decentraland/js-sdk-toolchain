@@ -4,7 +4,6 @@ import { AsyncQueue } from '@well-known-components/pushable-channel'
 import { addWs } from './connect'
 import { deserializeCrdtMessages, logCrdtMessages } from '../../../sdk/crdt-logger'
 import { processCrdtMessage } from './filter'
-import { DataLayerRpcClient } from '../../types'
 
 export enum MessageType {
   Init = 1,
@@ -57,11 +56,16 @@ export function initWsStream(
 
   ws.onOpen(async () => {
     engine.addTransport(transport)
-    for await (const { type, data } of stream) {
-      if (data.byteLength) {
-        console.log('DataLayer>Network', MessageType[type], decode(data))
-        ws.sendMessage(type, data)
+    // try/catch this...
+    try {
+      for await (const { type, data } of stream) {
+        if (data.byteLength) {
+          console.log('DataLayer>Network', MessageType[type], decode(data))
+          ws.sendMessage(type, data)
+        }
       }
+    } catch (e) {
+
     }
   })
 

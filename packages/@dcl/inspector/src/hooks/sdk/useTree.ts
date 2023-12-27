@@ -5,6 +5,7 @@ import { findParent, getEmptyTree, getTreeFromEngine, ROOT } from '../../lib/sdk
 import { useChange } from './useChange'
 import { useSdk } from './useSdk'
 import { DropType } from '../../components/Tree/utils'
+import { store } from '../../redux/store'
 
 /**
  * Used to get a tree and the functions to work with it
@@ -193,6 +194,18 @@ export const useTree = () => {
     [tree]
   )
 
+  const canSelect = useCallback((entity: Entity) => {
+    const { session } = store.getState().app
+    const isSelectedByPeer = session.participants.find(($) => $.selectedEntity === entity)
+    return !isSelectedByPeer
+  }, [tree])
+
+  const getHoverColor = useCallback((entity: Entity) => {
+    const { session } = store.getState().app
+    const color = session.participants.find(($) => $.selectedEntity === entity)?.color
+    return color
+  }, [tree])
+
   return {
     tree,
     addChild,
@@ -212,6 +225,8 @@ export const useTree = () => {
     canDuplicate,
     canDrag,
     canReorder,
+    canSelect,
+    getHoverColor,
     centerViewOnEntity
   }
 }

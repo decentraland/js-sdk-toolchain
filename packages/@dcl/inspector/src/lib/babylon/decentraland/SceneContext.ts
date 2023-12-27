@@ -79,6 +79,7 @@ export class SceneContext {
   constructor(public babylon: BABYLON.Engine, public scene: BABYLON.Scene, public loadableScene: LoadableScene) {
     this.rootNode = new EcsEntity(0 as Entity, this.#weakThis, scene)
     Object.assign(globalThis, { babylon: this.engine })
+    // DEMO: random stuff just for demo...
     store.subscribe(() => {
       const { session } = store.getState().app
 
