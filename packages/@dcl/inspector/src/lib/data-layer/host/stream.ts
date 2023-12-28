@@ -30,10 +30,12 @@ export function stream(
   Object.assign(transport, { name: 'DataLayerHost' })
   ctx.engine.addTransport(transport)
 
-  function processMessage(message: Uint8Array) {
-    transport.onmessage!(message)
-    void ctx.engine.update(1)
-    cb()
+  function processMessage({ data }: { data: Uint8Array }) {
+    if (data.byteLength) {
+      transport.onmessage!(data)
+      void ctx.engine.update(1)
+      cb()
+    }
   }
 
   // and lastly wire the new messages from engines

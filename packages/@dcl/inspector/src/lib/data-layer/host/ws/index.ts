@@ -4,6 +4,7 @@ import { AsyncQueue } from '@well-known-components/pushable-channel'
 import { addWs } from './connect'
 import { deserializeCrdtMessages, logCrdtMessages } from '../../../sdk/crdt-logger'
 import { processCrdtMessage } from './filter'
+import { consumeAllMessagesInto } from '../../../logic/consume-stream'
 
 export enum MessageType {
   Init = 1,
@@ -54,19 +55,17 @@ export function initWsStream(
   }
   Object.assign(transport, { name: 'DataLayerHost' })
 
-  ws.onOpen(async () => {
+  ws.onOpen(() => {
     engine.addTransport(transport)
-    // try/catch this...
-    try {
-      for await (const { type, data } of stream) {
-        if (data.byteLength) {
-          console.log('DataLayer>Network', MessageType[type], decode(data))
-          ws.sendMessage(type, data)
-        }
+    consumeAllMessagesInto(stream, ({ type, data }) => {
+      if (data.byteLength) {
+        console.log('DataLayer>Network', MessageType[type], decode(data))
+        ws.sendMessage(type, data)
       }
-    } catch (e) {
-
-    }
+    }).catch((err) => {
+      console.error('Failed to consume stream from WS data layer ', err)
+      queue.close()
+    })
   })
 
   ws.onMessage((msgType: MessageType, data: Uint8Array) => {

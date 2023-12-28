@@ -8,6 +8,7 @@ import { DataLayerRpcClient } from '../data-layer/types'
 import { getRandomMnemonic } from '../../components/ImportAsset/utils'
 import { Entity } from '@dcl/ecs'
 import { getAssetCatalog, getThumbnails } from '../../redux/data-layer'
+import { consumeAllMessagesInto } from '../logic/consume-stream'
 
 export const queue = new AsyncQueue<WsMessage>((_, _action) => {})
 
@@ -25,9 +26,12 @@ export async function initCollaborativeEditor(
 
   await saveWsStreamConf({ url, room, address })
 
-  for await (const { type, data } of wsStream(queue)) {
-    processMessage(type, data)
-  }
+  consumeAllMessagesInto(wsStream(queue), ({ type, data }) => {
+    if (data.byteLength) processMessage(type, data)
+  }).catch((err) => {
+    console.error('Failed to consume stream from WS ', err)
+    queue.close()
+  })
 }
 
 function is<T>(typeA: MessageType, typeB: MessageType, _: T): _ is T {

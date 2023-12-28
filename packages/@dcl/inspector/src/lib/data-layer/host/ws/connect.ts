@@ -1,4 +1,4 @@
-import WebSocket from 'ws'
+import WebSocketPolyfill from 'ws'
 import { MessageType } from '.'
 
 export type OnMessageFunction = (type: MessageType, data: Uint8Array) => void
@@ -11,7 +11,7 @@ function craftMessage(msgType: MessageType, payload: Uint8Array): Uint8Array {
 }
 
 export function addWs(url: string) {
-  const ws = new WebSocket(url)
+  const ws = typeof window === "object" ? new WebSocket(url) : new WebSocketPolyfill(url)
   ws.binaryType = 'arraybuffer'
   const onMessageFns: OnMessageFunction[] = []
   const onOpenFns: (() => void)[] = []
@@ -33,7 +33,7 @@ export function addWs(url: string) {
     onOpenFns.forEach(($) => $())
   }
 
-  ws.onmessage = (event) => {
+  ws.onmessage = (event: any) => {
     if (event.data instanceof ArrayBuffer && event.data.byteLength) {
       let offset = 0
       const r = new Uint8Array(event.data)
@@ -44,7 +44,7 @@ export function addWs(url: string) {
     }
   }
 
-  ws.onerror = (e) => {
+  ws.onerror = (e: any) => {
     console.error('WS error: ', e)
   }
   ws.onclose = () => {

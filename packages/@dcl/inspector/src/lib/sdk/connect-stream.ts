@@ -29,12 +29,12 @@ export function connectCrdtToEngine(
   Object.assign(transport, { name: `${engineKey}TransportClient` })
   engine.addTransport(transport)
 
-  function onMessage(message: Uint8Array) {
-    if (message.byteLength) {
-      logCrdtMessages(`DataLayer>${engineKey}`, deserializeCrdtMessages(message, engine))
+  function onMessage({ data }: { data: Uint8Array }) {
+    if (data.byteLength) {
+      logCrdtMessages(`DataLayer>${engineKey}`, deserializeCrdtMessages(data, engine))
+      transport.onmessage!(data)
+      void engine.update(1)
     }
-    transport.onmessage!(message)
-    void engine.update(1)
   }
 
   consumeAllMessagesInto(dataLayerStream(outgoingMessagesStream), onMessage).catch((e) => {
