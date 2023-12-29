@@ -115,7 +115,7 @@ export function Tree<T>() {
       const [, drag] = useDrag(
         () => ({
           type: dndType,
-          canDrag: enableDrag,
+          canDrag: false && enableDrag,
           item: { value, context: getDragContext() }
         }),
         [value]
@@ -222,7 +222,7 @@ export function Tree<T>() {
       return (
         <div className={treeClassNames} data-test-id={id} data-test-label={label}>
           <div style={itemStyles} className={cx({ selected, item: true, hidden })}>
-            <ContextMenu {...controlsProps} />
+            {false && <ContextMenu {...controlsProps} />}
             <div ref={ref} style={getEditModeStyles(editMode)} className="item-area">
               <DisclosureWidget enabled={enableOpen} isOpen={open} onOpen={handleOpen} />
               <div onClick={handleSelect} className="selectable-area">

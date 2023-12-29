@@ -43,10 +43,10 @@ const Toolbar = withSdk(({ sdk }) => {
       >
         {canSave ? <BiSave /> : <BiBadgeCheck />}
       </ToolbarButton>
-      <ToolbarButton className="undo" title="Undo" onClick={handleUndo}>
+      <ToolbarButton disabled className="undo" title="Undo" onClick={handleUndo}>
         <BiUndo />
       </ToolbarButton>
-      <ToolbarButton className="redo" title="Redo" onClick={handleRedo}>
+      <ToolbarButton disabled className="redo" title="Redo" onClick={handleRedo}>
         <BiRedo />
       </ToolbarButton>
       <Gizmos />

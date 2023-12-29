@@ -73,7 +73,7 @@ const App = () => {
             )}
           </PanelGroup>
         </Panel>
-        {!hiddenPanels[PanelName.ASSETS] && (
+        {!hiddenPanels[PanelName.ASSETS] && false && (
           <>
             <PanelResizeHandle className="vertical-handle" />
             <Panel minSize={footerMin} defaultSize={30}>

@@ -28,10 +28,20 @@ export const useTree = () => {
   }, [sdk])
 
   const [tree, setTree] = useState(getTree())
+  const [session, setSession] = useState(store.getState().app.session)
 
   useEffect(() => {
     setTree(getTree())
   }, [sdk])
+
+  // DEMO: random stuff just for demo...
+  store.subscribe(() => {
+    const newSession = store.getState().app.session
+    if (newSession !== session) {
+      setSession(newSession)
+      handleUpdate()
+    }
+  })
 
   const handleUpdate = useCallback(() => setTree(getTree()), [setTree, getTree])
   useChange(handleUpdate)

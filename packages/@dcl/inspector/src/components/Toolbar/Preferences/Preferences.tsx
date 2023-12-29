@@ -50,7 +50,7 @@ export const Preferences = withSdk(({ sdk }) => {
         </div>
         <div className="preference-row">
           <label>Enable autosave</label>
-          <AutosaveEnabledIcon className="icon" onClick={toggleAutosaveEnabled} />
+          <AutosaveEnabledIcon className="icon" />
         </div>
       </div>
     </div>
