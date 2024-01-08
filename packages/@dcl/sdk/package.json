@@ -6,7 +6,7 @@
   "dependencies": {
     "@dcl/ecs": "file:../ecs",
     "@dcl/ecs-math": "2.0.2",
-    "@dcl/explorer": "1.0.157998-20231218124551.commit-d1de041",
+    "@dcl/explorer": "1.0.158673-20240108154501.commit-9c66afc",
     "@dcl/js-runtime": "file:../js-runtime",
     "@dcl/react-ecs": "file:../react-ecs",
     "@dcl/sdk-commands": "file:../sdk-commands",
