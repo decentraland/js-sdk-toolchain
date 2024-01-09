@@ -72,6 +72,15 @@ export const enum AvatarAnchorPointType {
 export const AvatarAttach: LastWriteWinElementSetComponentDefinition<PBAvatarAttach>;
 
 // @public (undocumented)
+export const AvatarBase: LastWriteWinElementSetComponentDefinition<PBAvatarBase>;
+
+// @public (undocumented)
+export const AvatarEmoteCommand: LastWriteWinElementSetComponentDefinition<PBAvatarEmoteCommand>;
+
+// @public (undocumented)
+export const AvatarEquippedData: LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>;
+
+// @public (undocumented)
 export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>;
 
 // @public (undocumented)
@@ -514,6 +523,9 @@ export const componentDefinitionByName: {
     "core::AudioSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioSource>>;
     "core::AudioStream": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioStream>>;
     "core::AvatarAttach": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarAttach>>;
+    "core::AvatarBase": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarBase>>;
+    "core::AvatarEmoteCommand": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarEmoteCommand>>;
+    "core::AvatarEquippedData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>>;
     "core::AvatarModifierArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>>;
     "core::AvatarShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarShape>>;
     "core::Billboard": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBBillboard>>;
@@ -526,6 +538,7 @@ export const componentDefinitionByName: {
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
     "core::NftShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBNftShape>>;
+    "core::PlayerIdentityData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>>;
     "core::PointerEvents": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerEvents>>;
     "core::PointerEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBPointerEventsResult>>;
     "core::PointerLock": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerLock>>;
@@ -2192,6 +2205,74 @@ export namespace PBAvatarAttach {
 }
 
 // @public (undocumented)
+export interface PBAvatarBase {
+    // (undocumented)
+    bodyShapeUrn: string;
+    // (undocumented)
+    eyesColor: PBColor3 | undefined;
+    // (undocumented)
+    hairColor: PBColor3 | undefined;
+    // (undocumented)
+    name: string;
+    // (undocumented)
+    skinColor: PBColor3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBAvatarBase {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarBase;
+    // (undocumented)
+    export function encode(message: PBAvatarBase, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAvatarEmoteCommand {
+    // (undocumented)
+    emoteCommand: PBAvatarEmoteCommand_EmoteCommand | undefined;
+}
+
+// @public (undocumented)
+export namespace PBAvatarEmoteCommand {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarEmoteCommand;
+    // (undocumented)
+    export function encode(message: PBAvatarEmoteCommand, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAvatarEmoteCommand_EmoteCommand {
+    // (undocumented)
+    emoteUrn: string;
+    // (undocumented)
+    loop: boolean;
+}
+
+// @public (undocumented)
+export namespace PBAvatarEmoteCommand_EmoteCommand {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarEmoteCommand_EmoteCommand;
+    // (undocumented)
+    export function encode(message: PBAvatarEmoteCommand_EmoteCommand, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAvatarEquippedData {
+    // (undocumented)
+    emotesUrns: string[];
+    // (undocumented)
+    wearableUrns: string[];
+}
+
+// @public (undocumented)
+export namespace PBAvatarEquippedData {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarEquippedData;
+    // (undocumented)
+    export function encode(message: PBAvatarEquippedData, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBAvatarModifierArea {
     area: PBVector3 | undefined;
     excludeIds: string[];
@@ -2582,6 +2663,21 @@ export namespace PBNftShape {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBNftShape;
     // (undocumented)
     export function encode(message: PBNftShape, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBPlayerIdentityData {
+    address: string;
+    // (undocumented)
+    isGuest: boolean;
+}
+
+// @public (undocumented)
+export namespace PBPlayerIdentityData {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPlayerIdentityData;
+    // (undocumented)
+    export function encode(message: PBPlayerIdentityData, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3172,6 +3268,9 @@ export namespace Plane {
     export function signedDistanceToPlaneFromPositionAndNormal(origin: Vector3.ReadonlyVector3, normal: Vector3.ReadonlyVector3, point: Vector3.ReadonlyVector3): number;
     export function transform(plane: ReadonlyPlane, transformation: Matrix.ReadonlyMatrix): MutablePlane;
 }
+
+// @public (undocumented)
+export const PlayerIdentityData: LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>;
 
 // @public (undocumented)
 export const PointerEvents: LastWriteWinElementSetComponentDefinition<PBPointerEvents>;
