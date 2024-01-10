@@ -71,6 +71,7 @@ export type PreEngine = Pick<
  */
 export interface IEngineOptions {
   onChangeFunction: OnChangeFunction
+  entityContainer?: EntityContainer
 }
 
 /**

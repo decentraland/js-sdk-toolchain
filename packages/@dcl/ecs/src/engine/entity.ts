@@ -84,7 +84,7 @@ export enum EntityState {
 }
 
 /**
- * @intenral
+ * @public
  */
 export type EntityContainer = {
   generateEntity(networked?: boolean): Entity
@@ -99,11 +99,12 @@ export type EntityContainer = {
 }
 
 /**
- * @internal
+ * @public
  */
-export function EntityContainer(): EntityContainer {
+export function EntityContainer(opts?: { reservedStaticEntities: number }): EntityContainer {
+  const reservedStaticEntities = opts?.reservedStaticEntities ?? RESERVED_STATIC_ENTITIES
   // Local entities counter
-  let entityCounter = RESERVED_STATIC_ENTITIES
+  let entityCounter = reservedStaticEntities
 
   const usedEntities: Set<Entity> = new Set()
   let toRemoveEntities: Entity[] = []
@@ -132,7 +133,7 @@ export function EntityContainer(): EntityContainer {
     const usedSize = usedEntities.size
 
     // If all entities until `entityCounter` are being used, we need to generate another one
-    if (usedSize + RESERVED_STATIC_ENTITIES >= entityCounter) {
+    if (usedSize + reservedStaticEntities >= entityCounter) {
       return generateNewEntity()
     }
 
@@ -153,7 +154,7 @@ export function EntityContainer(): EntityContainer {
   }
 
   function removeEntity(entity: Entity) {
-    if (entity < RESERVED_STATIC_ENTITIES) return false
+    if (entity < reservedStaticEntities) return false
 
     if (usedEntities.has(entity)) {
       usedEntities.delete(entity)
@@ -212,7 +213,7 @@ export function EntityContainer(): EntityContainer {
 
   function getEntityState(entity: Entity): EntityState {
     const [n, v] = EntityUtils.fromEntityId(entity)
-    if (n < RESERVED_STATIC_ENTITIES) {
+    if (n < reservedStaticEntities) {
       return EntityState.Reserved
     }
 

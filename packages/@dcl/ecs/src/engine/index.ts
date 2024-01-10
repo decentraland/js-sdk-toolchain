@@ -22,8 +22,8 @@ export * from './readonly'
 export * from './types'
 export { Entity, ByteBuffer, SystemItem, OnChangeFunction }
 
-function preEngine(): PreEngine {
-  const entityContainer = EntityContainer()
+function preEngine(options?: IEngineOptions): PreEngine {
+  const entityContainer = options?.entityContainer ?? EntityContainer()
   const componentsDefinition = new Map<number, ComponentDefinition<unknown>>()
   const systems = SystemContainer()
 
@@ -253,7 +253,7 @@ function preEngine(): PreEngine {
  * @deprecated Prevent manual usage prefer "engine" for scene development
  */
 export function Engine(options?: IEngineOptions): IEngine {
-  const partialEngine = preEngine()
+  const partialEngine = preEngine(options)
   const crdtSystem = crdtSceneSystem(partialEngine, options?.onChangeFunction || null)
 
   async function update(dt: number) {
