@@ -1,0 +1,5 @@
+.SyncComponents .Block .content {
+  flex-direction: column;
+  align-items: flex-start;
+  row-gap: 8px;
+}

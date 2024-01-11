@@ -8,7 +8,9 @@ import {
   PBAudioSource,
   LastWriteWinElementSetComponentDefinition,
   PBVideoPlayer,
-  PBMaterial
+  PBMaterial,
+  NetworkEntity as NetworkEntityEngine,
+  SyncComponents as SyncComponentsEngine
 } from '@dcl/ecs'
 import {
   ActionType,
@@ -37,6 +39,8 @@ export function addAsset(engine: IEngine) {
     const child = addChild(engine)(parent, name)
     const Transform = engine.getComponent(TransformEngine.componentId) as typeof TransformEngine
     const GltfContainer = engine.getComponent(GltfEngine.componentId) as typeof GltfEngine
+    const NetworkEntity = engine.getComponent(NetworkEntityEngine.componentId) as typeof NetworkEntityEngine
+    const SyncComponents = engine.getComponent(SyncComponentsEngine.componentId) as typeof SyncComponentsEngine
 
     Transform.createOrReplace(child, { parent, position })
 
@@ -136,11 +140,16 @@ export function addAsset(engine: IEngine) {
         }
       }
 
+      const componentIds: number[] = [Transform.componentId]
       // create components
       for (const [componentName, componentValue] of values) {
         const Component = engine.getComponent(componentName) as LastWriteWinElementSetComponentDefinition<unknown>
         Component.create(child, componentValue)
+        componentIds.push(Component.componentId)
       }
+      // create network components
+      NetworkEntity.createOrReplace(child, { entityId: child, networkId: 0 })
+      SyncComponents.createOrReplace(child, { componentIds })
     } else {
       // if the asset is just a path to a model, create a gltf container for it (this is the case for assets dropped from the local files tab)
       GltfContainer.create(child, {

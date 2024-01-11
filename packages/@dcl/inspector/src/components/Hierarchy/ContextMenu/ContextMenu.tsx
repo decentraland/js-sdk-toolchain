@@ -12,27 +12,24 @@ import { useSdk } from '../../../hooks/sdk/useSdk'
 import { analytics, Event } from '../../../lib/logic/analytics'
 import { getAssetByModel } from '../../../lib/logic/catalog'
 
-const DISABLED_COMPONENTS = [
+const DISABLED_COMPONENTS: string[] = [
   CoreComponents.ANIMATOR,
   CoreComponents.AUDIO_STREAM,
   CoreComponents.NFT_SHAPE,
-  CoreComponents.VIDEO_PLAYER
+  CoreComponents.VIDEO_PLAYER,
+  CoreComponents.NETWORK_ENTITY
 ]
 
-const SMART_ITEM_COMPONENTS = [
+const SMART_ITEM_COMPONENTS: string[] = [
   ComponentName.STATES,
   ComponentName.ACTIONS,
   ComponentName.TRIGGERS,
   ComponentName.COUNTER
 ]
 
-const getEnabledComponents = () => {
+export const getEnabledComponents = (blacklist = DISABLED_COMPONENTS) => {
   const components: Set<string> = new Set(Object.values(CoreComponents))
   const config = getConfig()
-
-  for (const component of DISABLED_COMPONENTS) {
-    components.delete(component)
-  }
 
   if (!config.disableSmartItems) {
     for (const component of SMART_ITEM_COMPONENTS) {
@@ -40,18 +37,34 @@ const getEnabledComponents = () => {
     }
   }
 
+  for (const component of blacklist) {
+    components.delete(component)
+  }
+
   return components
 }
 
-const getComponentName = (value: string) => (value.match(/[^:]*$/) || [])[0]
-const isComponentEnabled = (value: string) => getEnabledComponents().has(value)
+export const enabledComponents = getEnabledComponents()
+export const transformComponentName = (value: string): string => {
+  switch (value) {
+    case CoreComponents.SYNC_COMPONENTS:
+      return 'Multiplayer'
+    default:
+      return value
+  }
+}
+export const getComponentName = (value: string) => (transformComponentName(value).match(/[^:]*$/) || [])[0] || '?'
+export const isComponentEnabled = (value: string) => enabledComponents.has(value)
 
 const ContextMenu = (value: Entity) => {
   const sdk = useSdk()
   const { getComponents, addComponent } = useEntityComponent()
   const { handleAction } = useContextMenu()
   const components = getComponents(value, true)
-  const _components = Array.from(components.entries()).filter(([_, name]) => isComponentEnabled(name))
+  const _components = Array.from(components.entries())
+    .filter(([_, name]) => isComponentEnabled(name))
+    .map(([id, name]) => ({ id, name: getComponentName(name) }))
+    .sort((a, b) => a.name.localeCompare(b.name))
 
   const handleAddComponent = (id: string) => {
     addComponent(value, Number(id))
@@ -72,9 +85,9 @@ const ContextMenu = (value: Entity) => {
     <>
       <Separator />
       <Submenu label="Add component" itemID="add-component">
-        {_components.map(([id, name]) => (
-          <Item key={id} id={id.toString()} itemID={getComponentName(name)} onClick={handleAction(handleAddComponent)}>
-            {getComponentName(name)}
+        {_components.map(({ id, name }) => (
+          <Item key={id} id={id.toString()} itemID={name} onClick={handleAction(handleAddComponent)}>
+            {name}
           </Item>
         ))}
       </Submenu>

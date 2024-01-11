@@ -1,4 +1,4 @@
-import { Entity, IEngine, getComponentEntityTree, Transform as TransformEngine } from '@dcl/ecs'
+import { Entity, IEngine, getComponentEntityTree, Transform as TransformEngine, NetworkEntity as NetworkEntityEngine } from '@dcl/ecs'
 import { clone } from '@dcl/asset-packs'
 import { EditorComponentNames, EditorComponents } from '../components'
 import { addNode, pushChild } from '../nodes'
@@ -10,11 +10,15 @@ export function duplicateEntity(engine: IEngine) {
     const Transform = engine.getComponent(TransformEngine.componentId) as typeof TransformEngine
     const Nodes = engine.getComponent(EditorComponentNames.Nodes) as EditorComponents['Nodes']
     const Triggers = engine.getComponent(EditorComponentNames.Triggers) as EditorComponents['Triggers']
+    const NetworkEntity = engine.getComponent(NetworkEntityEngine.componentId) as typeof NetworkEntityEngine
 
     for (const original of getComponentEntityTree(engine, entity, Transform)) {
       const duplicate = clone(original, engine as any, Triggers as any)
       originalToDuplicate.set(original, duplicate)
       Nodes.createOrReplace(engine.RootEntity, { value: addNode(engine, duplicate) })
+      if (NetworkEntity.has(original)) {
+        NetworkEntity.createOrReplace(duplicate, { entityId: duplicate, networkId: 0 })
+      }
     }
 
     // if Transform points to an entity within subtree being duplicated, re-direct it to duplicated entity
