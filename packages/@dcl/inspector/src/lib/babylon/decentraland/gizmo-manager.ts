@@ -66,19 +66,31 @@ export function createGizmoManager(context: SceneContext) {
     }
   }
 
-  function getTransform(): TransformType {
-    if (lastEntity) {
-      const parent = context.Transform.getOrNull(lastEntity.entityId)?.parent || (0 as Entity)
+  function getTransform(entity?: EcsEntity): TransformType {
+    const _entity = entity ?? lastEntity
+    if (_entity) {
+      const parent = context.Transform.getOrNull(_entity.entityId)?.parent || (0 as Entity)
       const value = {
-        position: snapPosition(lastEntity.position),
-        scale: snapScale(lastEntity.scaling),
-        rotation: lastEntity.rotationQuaternion ? snapRotation(lastEntity.rotationQuaternion) : Quaternion.Zero(),
+        position: snapPosition(_entity.position),
+        scale: snapScale(_entity.scaling),
+        rotation: _entity.rotationQuaternion ? snapRotation(_entity.rotationQuaternion) : Quaternion.Zero(),
         parent
       }
       return value
     } else {
       throw new Error('No entity selected')
     }
+  }
+
+  function updateEntityTransform(entity: Entity, newTransform: TransformType) {
+    const { position, scale, rotation, parent } = newTransform
+    context.operations.updateValue(context.Transform, entity, {
+      position: DclVector3.create(position.x, position.y, position.z),
+      rotation: DclQuaternion.create(rotation.x, rotation.y, rotation.z, rotation.w),
+      scale: DclVector3.create(scale.x, scale.y, scale.z),
+      parent: parent
+    })
+    void context.operations.dispatch()
   }
 
   function updateTransform() {
@@ -92,14 +104,49 @@ export function createGizmoManager(context: SceneContext) {
       areQuaternionsEqual(newTransform.rotation, oldTransform.rotation)
     )
       return
-    const { position, scale, rotation, parent } = newTransform
-    context.operations.updateValue(context.Transform, lastEntity.entityId, {
-      position: DclVector3.create(position.x, position.y, position.z),
-      rotation: DclQuaternion.create(rotation.x, rotation.y, rotation.z, rotation.w),
-      scale: DclVector3.create(scale.x, scale.y, scale.z),
-      parent: parent
-    })
-    void context.operations.dispatch()
+    // Update last selected entity transform
+    updateEntityTransform(lastEntity.entityId, newTransform)
+
+    // When moving multiple entities, we need to calculate the new transform for each selected entity
+    if (Array.from(context.engine.getEntitiesWith(context.editorComponents.Selection)).length > 1) {
+      for (const [entityId] of context.engine.getEntitiesWith(context.editorComponents.Selection)) {
+        if (lastEntity.entityId === entityId) {
+          continue
+        }
+        const entity = context.getEntityOrNull(entityId)!
+        const transform = getTransform(entity)
+        // Get the selected lastEntity rotated value
+        const lastEntityRotation = new Quaternion(
+          oldTransform.rotation.x,
+          oldTransform.rotation.y,
+          oldTransform.rotation.z,
+          oldTransform.rotation.w
+        )
+          .conjugate()
+          .multiply(
+            new Quaternion(
+              newTransform.rotation.x,
+              newTransform.rotation.y,
+              newTransform.rotation.z,
+              newTransform.rotation.w
+            )
+          )
+        updateEntityTransform(entityId, {
+          ...transform,
+          position: DclVector3.add(
+            transform.position,
+            DclVector3.subtract(newTransform.position, oldTransform.position)
+          ),
+          scale: DclVector3.add(transform.scale, DclVector3.subtract(newTransform.scale, oldTransform.scale)),
+          rotation: new Quaternion(
+            transform.rotation.x,
+            transform.rotation.y,
+            transform.rotation.z,
+            transform.rotation.w
+          ).multiply(lastEntityRotation)
+        })
+      }
+    }
   }
 
   gizmoManager.gizmos.scaleGizmo?.onDragEndObservable.add(updateTransform)
