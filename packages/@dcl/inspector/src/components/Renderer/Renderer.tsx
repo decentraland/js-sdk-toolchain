@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDrop } from 'react-dnd'
+import { KeyHandler } from 'hotkeys-js'
 import cx from 'classnames'
 import { Vector3 } from '@babylonjs/core'
+import { Entity } from '@dcl/ecs'
 
 import { DIRECTORY, withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
@@ -21,6 +23,7 @@ import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 import { Loading } from '../Loading'
 import { isModel, isAsset } from '../EntityInspector/GltfInspector/utils'
 import { useIsMounted } from '../../hooks/useIsMounted'
+import { useKeyPress, BACKSPACE, DELETE, COPY, PASTE, COPY_ALT, PASTE_ALT } from '../../hooks/useKeyPress'
 import { analytics, Event } from '../../lib/logic/analytics'
 import { Warnings } from '../Warnings'
 import { CameraSpeed } from './CameraSpeed'
@@ -40,6 +43,7 @@ const Renderer: React.FC = () => {
   const init = !!files
   const gizmosDisabled = useAppSelector(areGizmosDisabled)
   const config = getConfig()
+  const [copyEntities, setCopyEntities] = useState<Entity[]>([])
 
   useEffect(() => {
     if (sdk && init) {
@@ -61,6 +65,48 @@ const Renderer: React.FC = () => {
       sdk.gizmos.setEnabled(!gizmosDisabled)
     }
   }, [sdk, gizmosDisabled])
+
+  const deleteSelectedEntities = useCallback(() => {
+    if (!sdk) return
+    const selectedEntitites = sdk.sceneContext.operations.getSelectedEntities()
+    selectedEntitites.forEach((entity) => sdk.sceneContext.operations.removeEntity(entity))
+  }, [sdk])
+
+  const copySelectedEntities = useCallback(() => {
+    if (!sdk) return
+    const selectedEntitites = sdk.sceneContext.operations.getSelectedEntities()
+    setCopyEntities([...selectedEntitites])
+  }, [sdk, setCopyEntities])
+
+  const pastSelectedEntities = useCallback(() => {
+    if (!sdk) return
+    copyEntities.forEach((entity) => sdk.sceneContext.operations.duplicateEntity(entity))
+  }, [sdk, copyEntities])
+
+  const canvasHotkeys = useMemo<Record<string, () => void>>(
+    () => ({
+      [BACKSPACE]: deleteSelectedEntities,
+      [DELETE]: deleteSelectedEntities,
+      [COPY]: copySelectedEntities,
+      [COPY_ALT]: copySelectedEntities,
+      [PASTE]: pastSelectedEntities,
+      [PASTE_ALT]: pastSelectedEntities
+    }),
+    [sdk, copyEntities, deleteSelectedEntities, copySelectedEntities, pastSelectedEntities, setCopyEntities]
+  )
+
+  const onCanvasHotkeys = useCallback<KeyHandler>(
+    (_event, handler) => {
+      if (!sdk) return
+      if (canvasHotkeys.hasOwnProperty(handler.shortcut)) {
+        canvasHotkeys[handler.shortcut]()
+        void sdk.sceneContext.operations.dispatch()
+      }
+    },
+    [sdk, copyEntities]
+  )
+
+  useKeyPress(Object.keys(canvasHotkeys), onCanvasHotkeys, canvasRef?.current)
 
   const getDropPosition = async () => {
     const pointerCoords = await getPointerCoords(sdk!.scene)
