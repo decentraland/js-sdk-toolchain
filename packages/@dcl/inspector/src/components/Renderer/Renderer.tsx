@@ -23,13 +23,26 @@ import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 import { Loading } from '../Loading'
 import { isModel, isAsset } from '../EntityInspector/GltfInspector/utils'
 import { useIsMounted } from '../../hooks/useIsMounted'
-import { useKeyPress, BACKSPACE, DELETE, COPY, PASTE, COPY_ALT, PASTE_ALT } from '../../hooks/useKeyPress'
+import {
+  useKeyPress,
+  BACKSPACE,
+  DELETE,
+  COPY,
+  PASTE,
+  COPY_ALT,
+  PASTE_ALT,
+  ZOOM_IN,
+  ZOOM_IN_ALT,
+  ZOOM_OUT_ALT,
+  ZOOM_OUT
+} from '../../hooks/useKeyPress'
 import { analytics, Event } from '../../lib/logic/analytics'
 import { Warnings } from '../Warnings'
 import { CameraSpeed } from './CameraSpeed'
 
 import './Renderer.css'
 
+const ZOOM_DELTA = new Vector3(0, 0, 1)
 const fixedNumber = (val: number) => Math.round(val * 1e2) / 1e2
 
 const Renderer: React.FC = () => {
@@ -78,10 +91,24 @@ const Renderer: React.FC = () => {
     setCopyEntities([...selectedEntitites])
   }, [sdk, setCopyEntities])
 
-  const pastSelectedEntities = useCallback(() => {
+  const pasteSelectedEntities = useCallback(() => {
     if (!sdk) return
     copyEntities.forEach((entity) => sdk.sceneContext.operations.duplicateEntity(entity))
   }, [sdk, copyEntities])
+
+  const zoomIn = useCallback(() => {
+    if (!sdk) return
+    const camera = sdk.scene.activeCamera!
+    const dir = camera.getDirection(ZOOM_DELTA)
+    camera.position.addInPlace(dir)
+  }, [sdk])
+
+  const zoomOut = useCallback(() => {
+    if (!sdk) return
+    const camera = sdk.scene.activeCamera!
+    const dir = camera.getDirection(ZOOM_DELTA).negate()
+    camera.position.addInPlace(dir)
+  }, [sdk])
 
   const canvasHotkeys = useMemo<Record<string, () => void>>(
     () => ({
@@ -89,10 +116,23 @@ const Renderer: React.FC = () => {
       [DELETE]: deleteSelectedEntities,
       [COPY]: copySelectedEntities,
       [COPY_ALT]: copySelectedEntities,
-      [PASTE]: pastSelectedEntities,
-      [PASTE_ALT]: pastSelectedEntities
+      [PASTE]: pasteSelectedEntities,
+      [PASTE_ALT]: pasteSelectedEntities,
+      [ZOOM_IN]: zoomIn,
+      [ZOOM_IN_ALT]: zoomIn,
+      [ZOOM_OUT]: zoomOut,
+      [ZOOM_OUT_ALT]: zoomOut
     }),
-    [sdk, copyEntities, deleteSelectedEntities, copySelectedEntities, pastSelectedEntities, setCopyEntities]
+    [
+      sdk,
+      copyEntities,
+      deleteSelectedEntities,
+      copySelectedEntities,
+      pasteSelectedEntities,
+      setCopyEntities,
+      zoomIn,
+      zoomOut
+    ]
   )
 
   const onCanvasHotkeys = useCallback<KeyHandler>(

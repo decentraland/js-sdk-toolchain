@@ -11,6 +11,10 @@ export const COPY = `${CTRL}+c`
 export const COPY_ALT = `${COMMAND}+c`
 export const PASTE = `${CTRL}+v`
 export const PASTE_ALT = `${COMMAND}+v`
+export const ZOOM_IN = `=`
+export const ZOOM_IN_ALT = '+'
+export const ZOOM_OUT = `-`
+export const ZOOM_OUT_ALT = `_`
 
 /**
  * Hook that listens for key presses and triggers a callback function when the specified keys are pressed.
