@@ -15,6 +15,7 @@ export const ZOOM_IN = `=`
 export const ZOOM_IN_ALT = '+'
 export const ZOOM_OUT = `-`
 export const ZOOM_OUT_ALT = `_`
+export const RESET_CAMERA = 'space'
 
 /**
  * Hook that listens for key presses and triggers a callback function when the specified keys are pressed.

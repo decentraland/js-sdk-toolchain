@@ -34,7 +34,8 @@ import {
   ZOOM_IN,
   ZOOM_IN_ALT,
   ZOOM_OUT_ALT,
-  ZOOM_OUT
+  ZOOM_OUT,
+  RESET_CAMERA
 } from '../../hooks/useKeyPress'
 import { analytics, Event } from '../../lib/logic/analytics'
 import { Warnings } from '../Warnings'
@@ -42,7 +43,7 @@ import { CameraSpeed } from './CameraSpeed'
 
 import './Renderer.css'
 
-const ZOOM_DELTA = new Vector3(0, 0, 1)
+const ZOOM_DELTA = new Vector3(0, 0, 1.1)
 const fixedNumber = (val: number) => Math.round(val * 1e2) / 1e2
 
 const Renderer: React.FC = () => {
@@ -98,16 +99,21 @@ const Renderer: React.FC = () => {
 
   const zoomIn = useCallback(() => {
     if (!sdk) return
-    const camera = sdk.scene.activeCamera!
+    const camera = sdk.editorCamera.getCamera()
     const dir = camera.getDirection(ZOOM_DELTA)
     camera.position.addInPlace(dir)
   }, [sdk])
 
   const zoomOut = useCallback(() => {
     if (!sdk) return
-    const camera = sdk.scene.activeCamera!
+    const camera = sdk.editorCamera.getCamera()
     const dir = camera.getDirection(ZOOM_DELTA).negate()
     camera.position.addInPlace(dir)
+  }, [sdk])
+
+  const resetCamera = useCallback(() => {
+    if (!sdk) return
+    sdk.editorCamera.resetCamera()
   }, [sdk])
 
   const canvasHotkeys = useMemo<Record<string, () => void>>(
@@ -121,7 +127,8 @@ const Renderer: React.FC = () => {
       [ZOOM_IN]: zoomIn,
       [ZOOM_IN_ALT]: zoomIn,
       [ZOOM_OUT]: zoomOut,
-      [ZOOM_OUT_ALT]: zoomOut
+      [ZOOM_OUT_ALT]: zoomOut,
+      [RESET_CAMERA]: resetCamera
     }),
     [
       sdk,
@@ -131,7 +138,8 @@ const Renderer: React.FC = () => {
       pasteSelectedEntities,
       setCopyEntities,
       zoomIn,
-      zoomOut
+      zoomOut,
+      resetCamera
     ]
   )
 
