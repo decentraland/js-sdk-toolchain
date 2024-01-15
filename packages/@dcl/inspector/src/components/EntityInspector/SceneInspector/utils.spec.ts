@@ -1,9 +1,9 @@
-import { EditorComponentsTypes } from '../../../lib/sdk/components'
-import { Coords } from '../../../lib/utils/layout'
+import { EditorComponentsTypes, SceneAgeRating, SceneCategories } from '../../../lib/sdk/components'
+import { Coords, Layout } from '../../../lib/utils/layout'
 import { SceneInput } from './types'
 import { fromScene, getCoordinatesBetweenPoints, getInputValidation, parseParcels, toScene, toSceneAuto } from './utils'
 
-function getInput(parcels: string) {
+function getInput(parcels: string): SceneInput {
   const input: SceneInput = {
     name: 'name',
     description: 'description',
@@ -23,26 +23,38 @@ function getInput(parcels: string) {
   return input
 }
 
+function getScene(layout: Layout): EditorComponentsTypes['Scene'] {
+  const scene: EditorComponentsTypes['Scene'] = {
+    name: 'name',
+    description: 'description',
+    thumbnail: 'assets/scene/thumbnail.png',
+    ageRating: SceneAgeRating.Teen,
+    categories: [SceneCategories.GAME],
+    tags: ['tag1', 'tag2'],
+    silenceVoiceChat: false,
+    disablePortableExperiences: false,
+    spawnPoints: [],
+    author: 'John Doe',
+    email: 'johndoe@gmail.com',
+    layout
+  }
+  return scene
+}
+
 describe('SceneInspector/utils', () => {
   describe('fromScene', () => {
     it('should convert a Scene to a SceneInput', () => {
-      const scene: EditorComponentsTypes['Scene'] = {
-        layout: {
-          base: { x: 1, y: 1 },
-          parcels: [
-            { x: 1, y: 1 },
-            { x: 2, y: 2 }
-          ]
-        }
-      }
+      const scene = getScene({
+        base: { x: 1, y: 1 },
+        parcels: [
+          { x: 1, y: 1 },
+          { x: 2, y: 2 }
+        ]
+      })
 
       const result = fromScene(scene)
 
-      expect(result).toEqual({
-        layout: {
-          parcels: '1,1 2,2'
-        }
-      })
+      expect(result).toEqual(getInput('1,1 2,2'))
     })
   })
 
@@ -52,15 +64,15 @@ describe('SceneInspector/utils', () => {
 
       const result = toScene(input)
 
-      expect(result).toEqual({
-        layout: {
+      expect(result).toEqual(
+        getScene({
           base: { x: 1, y: 1 },
           parcels: [
             { x: 1, y: 1 },
             { x: 2, y: 2 }
           ]
-        }
-      })
+        })
+      )
     })
   })
 
@@ -70,8 +82,8 @@ describe('SceneInspector/utils', () => {
 
       const result = toSceneAuto(input)
 
-      expect(result).toEqual({
-        layout: {
+      expect(result).toEqual(
+        getScene({
           base: { x: 1, y: 1 },
           parcels: [
             { x: 1, y: 1 },
@@ -79,8 +91,8 @@ describe('SceneInspector/utils', () => {
             { x: 2, y: 1 },
             { x: 2, y: 2 }
           ]
-        }
-      })
+        })
+      )
     })
   })
 
