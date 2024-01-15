@@ -1,3 +1,19 @@
 .Container.Scene .content svg {
   cursor: pointer;
 }
+
+.Container.Scene .Block.underlined {
+  border-bottom: 1px solid var(--base-14);
+}
+
+.Container.Scene .Block.underlined .Label {
+  font-size: 14px;
+}
+
+.Container.Scene .SpawnPointContainer > .content {
+  padding: 12px;
+  border-radius: 4px;
+  border: 1px solid #303031;
+  background: var(--tree-bg-color);
+  align-items: stretch;
+}

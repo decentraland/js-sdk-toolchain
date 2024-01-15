@@ -46,9 +46,58 @@ export enum EditorComponentNames {
   Lock = 'inspector::Lock'
 }
 
+export enum SceneAgeRating {
+  Teen = 'T',
+  Adult = 'A'
+}
+
+export type SceneSpawnPoint = {
+  name: string
+  default?: boolean
+  position: {
+    x: number | [number, number]
+    y: number | [number, number]
+    z: number | [number, number]
+  }
+  cameraTarget?: {
+    x: number
+    y: number
+    z: number
+  }
+}
+
+export type SceneComponent = {
+  name?: string
+  description?: string
+  thumbnail?: string
+  ageRating?: SceneAgeRating
+  categories?: SceneCategories[]
+  author?: string
+  email?: string
+  tags?: string[]
+  layout: Layout
+  silenceVoiceChat?: boolean
+  disablePortableExperiences?: boolean
+  spawnPoints?: SceneSpawnPoint[]
+}
+
+export enum SceneCategories {
+  ART = 'art',
+  GAME = 'game',
+  CASINO = 'casino',
+  SOCIAL = 'social',
+  MUSIC = 'music',
+  FASHION = 'fashion',
+  CRYPTO = 'crypto',
+  EDUCATION = 'education',
+  SHOP = 'shop',
+  BUSINESS = 'business',
+  SPORTS = 'sports'
+}
+
 export type EditorComponentsTypes = {
   Selection: { gizmo: GizmoType }
-  Scene: { layout: Layout }
+  Scene: SceneComponent
   Nodes: { value: Node[] }
   TransformConfig: TransformConfig
   ActionTypes: ActionTypes
@@ -140,6 +189,15 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
   })
 
   const Scene = engine.defineComponent(EditorComponentNames.Scene, {
+    // everything but layout is set as optional for retrocompat purposes
+    name: Schemas.Optional(Schemas.String),
+    description: Schemas.Optional(Schemas.String),
+    thumbnail: Schemas.Optional(Schemas.String),
+    ageRating: Schemas.Optional(Schemas.EnumString(SceneAgeRating, SceneAgeRating.Teen)),
+    categories: Schemas.Optional(Schemas.Array(Schemas.EnumString(SceneCategories, SceneCategories.GAME))),
+    author: Schemas.Optional(Schemas.String),
+    email: Schemas.Optional(Schemas.String),
+    tags: Schemas.Optional(Schemas.Array(Schemas.String)),
     layout: Schemas.Map({
       base: Coords,
       parcels: Schemas.Array(Coords)

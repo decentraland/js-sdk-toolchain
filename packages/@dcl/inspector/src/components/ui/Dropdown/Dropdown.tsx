@@ -59,7 +59,8 @@ const Dropdown: React.FC<Props> = (props) => {
   const handleRemoveOption = useCallback(
     (e: any, option: Partial<OptionProp>) => {
       if (option !== undefined) {
-        const optionValue = (value as any[]).filter((v) => v !== option.value)
+        const values = typeof value === 'string' ? value.split(',') : (value as any[])
+        const optionValue = values.filter((v) => v !== option.value)
         onChange &&
           onChange({
             ...e,

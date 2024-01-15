@@ -6,6 +6,7 @@ export type Props = Omit<TextFieldProps, 'accept' | 'type' | 'onDrop'> & {
   isEnabledFileExplorer?: boolean
   onDrop?: (path: string) => void | Promise<void>
   isValidFile?: (node: TreeNode) => boolean
+  showPreview?: boolean
 }
 
 export const ACCEPTED_FILE_TYPES = {

@@ -8,6 +8,8 @@ import { createFileSystemInterface } from '../../logic/file-system-interface'
 import { createEngineContext } from '../host/utils/engine'
 import { createInMemoryStorage } from '../../logic/storage/in-memory'
 import { downloadAssets } from './builder-utils'
+import { SceneAgeRating } from '../../sdk/components'
+import { THUMBNAIL } from './constants'
 
 export function createTempEngineContext() {
   const { engine, components } = createEngineContext()
@@ -44,6 +46,14 @@ export function generateMinimalComposite({ engine, components }: TempEngine) {
 
   // scene
   components.Scene.create(engine.RootEntity, {
+    name: 'Test Scene',
+    description: 'This is a test scene',
+    thumbnail: 'assets/scene/thumbnail.png',
+    ageRating: SceneAgeRating.Teen,
+    categories: [],
+    author: '',
+    email: '',
+    tags: [],
     layout: {
       base: {
         x: 0,
@@ -118,6 +128,7 @@ export function generateMainComposite({ engine, components }: TempEngine) {
 
   // scene
   components.Scene.create(engine.RootEntity, {
+    name: 'Test Scene',
     layout: {
       base: {
         x: 0,
@@ -164,6 +175,8 @@ export async function feededFileSystem(mappings: Record<string, string> = builde
   const storage = createInMemoryStorage({
     ...assets,
     'assets/scene/main.composite': Buffer.from(JSON.stringify(composite), 'utf-8'),
+    'thumbnails/scene/thumbnail.png': Buffer.from(THUMBNAIL, 'base64'),
+    'assets/scene/thumbnail.png': Buffer.from(THUMBNAIL, 'base64'),
     'scene.json': Buffer.from(JSON.stringify(scene), 'utf-8')
   })
 

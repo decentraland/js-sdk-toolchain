@@ -3,6 +3,26 @@ import { Coords } from '../../../lib/utils/layout'
 import { SceneInput } from './types'
 import { fromScene, getCoordinatesBetweenPoints, getInputValidation, parseParcels, toScene, toSceneAuto } from './utils'
 
+function getInput(parcels: string) {
+  const input: SceneInput = {
+    name: 'name',
+    description: 'description',
+    thumbnail: 'assets/scene/thumbnail.png',
+    ageRating: 'T',
+    categories: ['game'],
+    tags: 'tag1, tag2',
+    silenceVoiceChat: false,
+    disablePortableExperiences: false,
+    spawnPoints: [],
+    author: 'John Doe',
+    email: 'johndoe@gmail.com',
+    layout: {
+      parcels
+    }
+  }
+  return input
+}
+
 describe('SceneInspector/utils', () => {
   describe('fromScene', () => {
     it('should convert a Scene to a SceneInput', () => {
@@ -28,11 +48,7 @@ describe('SceneInspector/utils', () => {
 
   describe('toScene', () => {
     it('should convert a SceneInput to a Scene', () => {
-      const input: SceneInput = {
-        layout: {
-          parcels: '1,1 2,2'
-        }
-      }
+      const input = getInput('1,1 2,2')
 
       const result = toScene(input)
 
@@ -50,11 +66,7 @@ describe('SceneInspector/utils', () => {
 
   describe('toSceneAuto', () => {
     it('should convert a SceneInput to a Scene with auto-generated base and parcels', () => {
-      const input: SceneInput = {
-        layout: {
-          parcels: '1,1 2,2'
-        }
-      }
+      const input = getInput('1,1 2,2')
 
       const result = toSceneAuto(input)
 
@@ -97,16 +109,8 @@ describe('SceneInspector/utils', () => {
   describe('getInputValidation', () => {
     it('should return a validation function that checks for connected parcels', () => {
       const inputValidation = getInputValidation(false)
-      const validInput: SceneInput = {
-        layout: {
-          parcels: '1,1 1,2'
-        }
-      }
-      const invalidInput: SceneInput = {
-        layout: {
-          parcels: '1,1 2,2'
-        }
-      }
+      const validInput = getInput('1,1 1,2')
+      const invalidInput = getInput('1,1 2,2')
 
       const isValidValidInput = inputValidation(validInput)
       const isValidInvalidInput = inputValidation(invalidInput)
@@ -117,16 +121,8 @@ describe('SceneInspector/utils', () => {
 
     it('should return a validation function that checks for auto-generated parcels', () => {
       const inputValidation = getInputValidation(true)
-      const validInput: SceneInput = {
-        layout: {
-          parcels: '1,1 2,2'
-        }
-      }
-      const invalidInput: SceneInput = {
-        layout: {
-          parcels: '1,1 1,2 1,3'
-        }
-      }
+      const validInput = getInput('1,1 2,2')
+      const invalidInput = getInput('1,1 1,2 1,3')
 
       const isValidValidInput = inputValidation(validInput)
       const isValidInvalidInput = inputValidation(invalidInput)
