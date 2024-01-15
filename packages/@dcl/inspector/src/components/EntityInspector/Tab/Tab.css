@@ -1,0 +1,18 @@
+.Tab {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid transparent;
+  cursor: default;
+  text-transform: uppercase;
+  padding-bottom: 8px;
+}
+
+.Tab.active {
+  border-bottom: 1px solid white;
+}
+
+.Tab:not(.active):hover {
+  cursor: pointer;
+}

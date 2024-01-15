@@ -1,6 +1,6 @@
 import { RPC, Transport } from '@dcl/mini-rpc'
 import { UiRPC } from './types'
-import { AssetsTab, PanelName } from '../../../redux/ui/types'
+import { AssetsTab, PanelName, SceneInspectorTab } from '../../../redux/ui/types'
 
 export class UiClient extends RPC<UiRPC.Method, UiRPC.Params, UiRPC.Result> {
   constructor(transport: Transport) {
@@ -21,5 +21,13 @@ export class UiClient extends RPC<UiRPC.Method, UiRPC.Params, UiRPC.Result> {
 
   selectAssetsTab = (tab: `${AssetsTab}`) => {
     return this.request('select_assets_tab', { tab })
+  }
+
+  selectSceneInspectorTab = (tab: `${SceneInspectorTab}`) => {
+    return this.request('select_scene_inspector_tab', { tab })
+  }
+
+  toggleSceneInspectorTab = (tab: `${SceneInspectorTab}`, enabled: boolean) => {
+    return this.request('toggle_scene_inspector_tab', { tab, enabled })
   }
 }

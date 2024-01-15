@@ -24,10 +24,15 @@ import {
 import './SceneInspector.css'
 import { EditorComponentsTypes, SceneAgeRating, SceneCategories, SceneSpawnPoint } from '../../../lib/sdk/components'
 import { Dropdown } from '../../ui/Dropdown'
+import { Tabs } from '../Tabs'
 import { CheckboxField } from '../../ui/CheckboxField'
 import { useComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { useArrayState } from '../../../hooks/useArrayState'
 import { AddButton } from '../AddButton'
+import { useAppDispatch, useAppSelector } from '../../../redux/hooks'
+import { getHiddenSceneInspectorTabs, getSelectedSceneInspectorTab, selectSceneInspectorTab } from '../../../redux/ui'
+import { SceneInspectorTab } from '../../../redux/ui/types'
+import { Tab } from '../Tab'
 
 const AGE_RATING_OPTIONS = [
   {
@@ -289,8 +294,48 @@ export default withSdk<Props>(({ sdk, entity }) => {
     [modifySpawnPoint, removeSpawnPoint]
   )
 
+  const hiddenSceneInspectorTabs = useAppSelector(getHiddenSceneInspectorTabs)
+  const selectedSceneInspectorTab = useAppSelector(getSelectedSceneInspectorTab)
+  const dispatch = useAppDispatch()
+
+  const handleSelectTab = useCallback(
+    (tab: SceneInspectorTab) => {
+      if (tab === selectedSceneInspectorTab) {
+        return
+      }
+      dispatch(selectSceneInspectorTab({ tab }))
+    },
+    [selectedSceneInspectorTab, dispatch]
+  )
+
   return (
-    <Container label="Settings" className="Scene">
+    <Container className="Scene">
+      <Tabs>
+        {hiddenSceneInspectorTabs[SceneInspectorTab.DETAILS] ? null : (
+          <Tab
+            active={selectedSceneInspectorTab === SceneInspectorTab.DETAILS}
+            onClick={() => handleSelectTab(SceneInspectorTab.DETAILS)}
+          >
+            Details
+          </Tab>
+        )}
+        {hiddenSceneInspectorTabs[SceneInspectorTab.LAYOUT] ? null : (
+          <Tab
+            active={selectedSceneInspectorTab === SceneInspectorTab.LAYOUT}
+            onClick={() => handleSelectTab(SceneInspectorTab.LAYOUT)}
+          >
+            Layout
+          </Tab>
+        )}
+        {hiddenSceneInspectorTabs[SceneInspectorTab.SETTINGS] ? null : (
+          <Tab
+            active={selectedSceneInspectorTab === SceneInspectorTab.SETTINGS}
+            onClick={() => handleSelectTab(SceneInspectorTab.SETTINGS)}
+          >
+            Settings
+          </Tab>
+        )}
+      </Tabs>
       <TextField label="Name" {...nameProps} />
       <TextField type="textarea" label="Description" {...descriptionProps} />
       <FileUploadField

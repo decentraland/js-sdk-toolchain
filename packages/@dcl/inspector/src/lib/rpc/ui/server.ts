@@ -19,8 +19,15 @@ export class UiServer extends RPC<UiRPC.Method, UiRPC.Params, UiRPC.Result> {
     })
 
     this.handle('select_assets_tab', async ({ tab }) => {
-      console.log('tabsss', tab)
       store.dispatch({ type: 'ui/selectAssetsTab', payload: { tab } })
+    })
+
+    this.handle('select_scene_inspector_tab', async ({ tab }) => {
+      store.dispatch({ type: 'ui/selectSceneInspectorTab', payload: { tab } })
+    })
+
+    this.handle('toggle_scene_inspector_tab', async ({ tab, enabled }) => {
+      store.dispatch({ type: 'ui/toggleSceneInspectorTab', payload: { tab, enabled } })
     })
   }
 }

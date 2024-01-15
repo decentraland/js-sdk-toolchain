@@ -10,3 +10,9 @@ export enum PanelName {
   ASSETS = 'assets',
   TOOLBAR = 'toolbar'
 }
+
+export enum SceneInspectorTab {
+  DETAILS = 'details',
+  LAYOUT = 'layout',
+  SETTINGS = 'settings'
+}
