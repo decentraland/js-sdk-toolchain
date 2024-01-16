@@ -154,7 +154,7 @@ const Renderer: React.FC = () => {
     [sdk, copyEntities]
   )
 
-  useKeyPress(Object.keys(canvasHotkeys), onCanvasHotkeys, canvasRef?.current)
+  useKeyPress(Object.keys(canvasHotkeys), onCanvasHotkeys, canvasRef.current)
 
   const getDropPosition = async () => {
     const pointerCoords = await getPointerCoords(sdk!.scene)

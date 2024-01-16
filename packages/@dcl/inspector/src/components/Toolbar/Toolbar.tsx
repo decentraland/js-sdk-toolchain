@@ -1,7 +1,6 @@
 import { useCallback } from 'react'
 import { BiUndo, BiRedo, BiSave, BiBadgeCheck } from 'react-icons/bi'
 import { RiListSettingsLine } from 'react-icons/ri'
-import { useHotkeys } from 'react-hotkeys-hook'
 
 import { withSdk } from '../../hoc/withSdk'
 import { Gizmos } from './Gizmos'
@@ -11,6 +10,17 @@ import './Toolbar.css'
 import { save, undo, redo } from '../../redux/data-layer'
 import { selectCanSave } from '../../redux/app'
 import { useAppSelector, useAppDispatch } from '../../redux/hooks'
+import {
+  REDO,
+  REDO_2,
+  REDO_ALT,
+  REDO_ALT_2,
+  SAVE,
+  SAVE_ALT,
+  UNDO,
+  UNDO_ALT,
+  useKeyPress
+} from '../../hooks/useKeyPress'
 
 const Toolbar = withSdk(({ sdk }) => {
   const canSave = useAppSelector(selectCanSave)
@@ -30,9 +40,9 @@ const Toolbar = withSdk(({ sdk }) => {
   const handleUndo = useCallback(() => dispatch(undo()), [])
   const handleRedo = useCallback(() => dispatch(redo()), [])
 
-  useHotkeys('mod+s', handleSaveClick, { preventDefault: true }, [])
-  useHotkeys('mod+z', handleUndo, { preventDefault: true }, [])
-  useHotkeys('mod+y', handleRedo, { preventDefault: true }, [])
+  useKeyPress([SAVE, SAVE_ALT], handleSaveClick)
+  useKeyPress([UNDO, UNDO_ALT], handleUndo)
+  useKeyPress([REDO, REDO_2, REDO_ALT, REDO_ALT_2], handleRedo)
 
   return (
     <div className="Toolbar">
