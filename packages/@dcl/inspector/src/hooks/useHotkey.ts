@@ -32,7 +32,7 @@ export const SAVE_ALT = `${COMMAND}+s`
  * @param callback - The callback function to be executed when the specified keys are pressed.
  * @param node - The target DOM node to attach the event listener to. If not provided, the listener will be attached to the entire document.
  */
-export const useKeyPress = (keys: string | string[], callback: KeyHandler | (() => void), node: any = undefined) => {
+export const useHotkey = (keys: string | string[], callback: KeyHandler | (() => void), node: any = undefined) => {
   const callbackRef = useRef(callback)
   useLayoutEffect(() => {
     callbackRef.current = callback

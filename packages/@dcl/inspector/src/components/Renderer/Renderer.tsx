@@ -24,7 +24,7 @@ import { Loading } from '../Loading'
 import { isModel, isAsset } from '../EntityInspector/GltfInspector/utils'
 import { useIsMounted } from '../../hooks/useIsMounted'
 import {
-  useKeyPress,
+  useHotkey,
   BACKSPACE,
   DELETE,
   COPY,
@@ -36,7 +36,7 @@ import {
   ZOOM_OUT_ALT,
   ZOOM_OUT,
   RESET_CAMERA
-} from '../../hooks/useKeyPress'
+} from '../../hooks/useHotkey'
 import { analytics, Event } from '../../lib/logic/analytics'
 import { Warnings } from '../Warnings'
 import { CameraSpeed } from './CameraSpeed'
@@ -154,7 +154,7 @@ const Renderer: React.FC = () => {
     [sdk, copyEntities]
   )
 
-  useKeyPress(Object.keys(canvasHotkeys), onCanvasHotkeys, canvasRef.current)
+  useHotkey(Object.keys(canvasHotkeys), onCanvasHotkeys, canvasRef.current)
 
   const getDropPosition = async () => {
     const pointerCoords = await getPointerCoords(sdk!.scene)

@@ -10,17 +10,7 @@ import './Toolbar.css'
 import { save, undo, redo } from '../../redux/data-layer'
 import { selectCanSave } from '../../redux/app'
 import { useAppSelector, useAppDispatch } from '../../redux/hooks'
-import {
-  REDO,
-  REDO_2,
-  REDO_ALT,
-  REDO_ALT_2,
-  SAVE,
-  SAVE_ALT,
-  UNDO,
-  UNDO_ALT,
-  useKeyPress
-} from '../../hooks/useKeyPress'
+import { REDO, REDO_2, REDO_ALT, REDO_ALT_2, SAVE, SAVE_ALT, UNDO, UNDO_ALT, useHotkey } from '../../hooks/useHotkey'
 
 const Toolbar = withSdk(({ sdk }) => {
   const canSave = useAppSelector(selectCanSave)
@@ -40,9 +30,9 @@ const Toolbar = withSdk(({ sdk }) => {
   const handleUndo = useCallback(() => dispatch(undo()), [])
   const handleRedo = useCallback(() => dispatch(redo()), [])
 
-  useKeyPress([SAVE, SAVE_ALT], handleSaveClick)
-  useKeyPress([UNDO, UNDO_ALT], handleUndo)
-  useKeyPress([REDO, REDO_2, REDO_ALT, REDO_ALT_2], handleRedo)
+  useHotkey([SAVE, SAVE_ALT], handleSaveClick)
+  useHotkey([UNDO, UNDO_ALT], handleUndo)
+  useHotkey([REDO, REDO_2, REDO_ALT, REDO_ALT_2], handleRedo)
 
   return (
     <div className="Toolbar">

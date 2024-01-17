@@ -1,10 +1,10 @@
 import { act, renderHook } from '@testing-library/react'
-import { useKeyPress } from './useKeyPress'
+import { useHotkey } from './useHotkey'
 
-describe('useKeyPress', () => {
+describe('useHotkey', () => {
   it('calls the callback when a key is pressed', () => {
     const callback = jest.fn()
-    renderHook(() => useKeyPress(['Enter'], callback))
+    renderHook(() => useHotkey(['Enter'], callback))
 
     act(() => {
       const event = new KeyboardEvent('keydown', { key: 'Enter' })
@@ -16,7 +16,7 @@ describe('useKeyPress', () => {
 
   it('does not call the callback when a different key is pressed', () => {
     const callback = jest.fn()
-    renderHook(() => useKeyPress(['Enter'], callback))
+    renderHook(() => useHotkey(['Enter'], callback))
 
     act(() => {
       const event = new KeyboardEvent('keydown', { key: 'Escape' })
@@ -28,7 +28,7 @@ describe('useKeyPress', () => {
 
   it('calls the callback when any of the specified keys are pressed', () => {
     const callback = jest.fn()
-    renderHook(() => useKeyPress(['Enter', 'Space'], callback))
+    renderHook(() => useHotkey(['Enter', 'Space'], callback))
 
     act(() => {
       const enterEvent = new KeyboardEvent('keydown', { key: 'Enter' })
@@ -43,7 +43,7 @@ describe('useKeyPress', () => {
 
   it('does not call the callback when no key is pressed', () => {
     const callback = jest.fn()
-    renderHook(() => useKeyPress(['Enter'], callback))
+    renderHook(() => useHotkey(['Enter'], callback))
 
     expect(callback).not.toHaveBeenCalled()
   })
