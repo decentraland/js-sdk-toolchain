@@ -33,6 +33,9 @@ import { useAppDispatch, useAppSelector } from '../../../redux/hooks'
 import { getHiddenSceneInspectorTabs, getSelectedSceneInspectorTab, selectSceneInspectorTab } from '../../../redux/ui'
 import { SceneInspectorTab } from '../../../redux/ui/types'
 import { Tab } from '../Tab'
+import { transformBinaryToBase64Resource } from '../../../lib/data-layer/host/fs-utils'
+import { IoIosImage } from 'react-icons/io'
+import { selectThumbnails } from '../../../redux/app'
 
 const AGE_RATING_OPTIONS = [
   {
@@ -298,6 +301,29 @@ export default withSdk<Props>(({ sdk, entity }) => {
   const selectedSceneInspectorTab = useAppSelector(getSelectedSceneInspectorTab)
   const dispatch = useAppDispatch()
 
+  const thumbnails = useAppSelector(selectThumbnails)
+  const getThumbnail = useCallback(
+    (value: string) => {
+      const [name] = value.split('.')
+      const thumbnail = thumbnails.find(($) => $.path.endsWith(name + '.png'))
+      if (thumbnail) {
+        return thumbnail?.content
+      }
+    },
+    [thumbnails]
+  )
+
+  const renderThumbnail = useCallback(() => {
+    const filename = thumbnailProps.value ? (thumbnailProps.value as unknown as string).split('/').pop() : null
+    if (filename) {
+      const thumbnail = getThumbnail(filename)
+      if (thumbnail) {
+        return <img src={transformBinaryToBase64Resource(thumbnail)} alt={filename} />
+      }
+    }
+    return <IoIosImage />
+  }, [thumbnailProps.value, getThumbnail])
+
   const handleSelectTab = useCallback(
     (tab: SceneInspectorTab) => {
       if (tab === selectedSceneInspectorTab) {
@@ -343,14 +369,17 @@ export default withSdk<Props>(({ sdk, entity }) => {
         <>
           <TextField label="Name" {...nameProps} />
           <TextField type="textarea" label="Description" {...descriptionProps} />
-          <FileUploadField
-            {...thumbnailProps}
-            label="Thumbnail"
-            accept={ACCEPTED_FILE_TYPES['image']}
-            onDrop={handleDrop}
-            isValidFile={isImage}
-            showPreview
-          />
+          <span className="ThumbnailRow">
+            <div className="thumbnail">{renderThumbnail()}</div>
+            <FileUploadField
+              {...thumbnailProps}
+              label="Thumbnail"
+              accept={ACCEPTED_FILE_TYPES['image']}
+              onDrop={handleDrop}
+              isValidFile={isImage}
+              showPreview
+            />
+          </span>
           <Dropdown label="Age Rating" options={AGE_RATING_OPTIONS} {...ageRatingProps} />
           <Dropdown label="Categories" options={CATEGORIES_OPTIONS} multiple {...categoriesProps} />
           <TextField label="Author (optional)" {...authorProps} />
