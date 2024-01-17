@@ -309,14 +309,15 @@ export default withSdk<Props>(({ sdk, entity }) => {
   )
 
   return (
-    <Container className="Scene">
-      <Tabs>
+    <Container className="Scene" gap>
+      <Tabs className="SceneTabs">
         {hiddenSceneInspectorTabs[SceneInspectorTab.DETAILS] ? null : (
           <Tab
             active={selectedSceneInspectorTab === SceneInspectorTab.DETAILS}
             onClick={() => handleSelectTab(SceneInspectorTab.DETAILS)}
           >
-            Details
+            <i className="icon details" />
+            &nbsp;Details
           </Tab>
         )}
         {hiddenSceneInspectorTabs[SceneInspectorTab.LAYOUT] ? null : (
@@ -324,7 +325,8 @@ export default withSdk<Props>(({ sdk, entity }) => {
             active={selectedSceneInspectorTab === SceneInspectorTab.LAYOUT}
             onClick={() => handleSelectTab(SceneInspectorTab.LAYOUT)}
           >
-            Layout
+            <i className="icon layout" />
+            &nbsp;Layout
           </Tab>
         )}
         {hiddenSceneInspectorTabs[SceneInspectorTab.SETTINGS] ? null : (
@@ -332,39 +334,56 @@ export default withSdk<Props>(({ sdk, entity }) => {
             active={selectedSceneInspectorTab === SceneInspectorTab.SETTINGS}
             onClick={() => handleSelectTab(SceneInspectorTab.SETTINGS)}
           >
-            Settings
+            <i className="icon settings" />
+            &nbsp;Settings
           </Tab>
         )}
       </Tabs>
-      <TextField label="Name" {...nameProps} />
-      <TextField type="textarea" label="Description" {...descriptionProps} />
-      <FileUploadField
-        {...thumbnailProps}
-        label="Thumbnail"
-        accept={ACCEPTED_FILE_TYPES['image']}
-        onDrop={handleDrop}
-        isValidFile={isImage}
-        showPreview
-      />
-      <Dropdown label="Age Rating" options={AGE_RATING_OPTIONS} {...ageRatingProps} />
-      <Dropdown label="Categories" options={CATEGORIES_OPTIONS} multiple {...categoriesProps} />
-      <TextField label="Author (optional)" {...authorProps} />
-      <TextField label="Email (optional)" {...emailProps} />
-      <TextField label="Tags (optional)" {...tagsProps} />
-      <Block label="Parcels">
-        <TextField {...parcelsProps} />
-        <RxBorderAll onClick={handleClick} style={{ opacity: auto ? 1 : 0.3 }} />
-      </Block>
-      <Block label="Scene Restrictions" className="underlined"></Block>
-      <CheckboxField label="Silence Voice Chat" checked={componentValue.silenceVoiceChat} {...silenceVoiceChatProps} />
-      <CheckboxField
-        label="Disable Portable Experiences"
-        checked={componentValue.disablePortableExperiences}
-        {...disablePortableExperiencesProps}
-      />
-      <Block label="Spawn Settings" className="underlined"></Block>
-      {spawnPoints.map((spawnPoint, index) => renderSpawnPoint(spawnPoint, index))}
-      <AddButton onClick={handleAddSpawnPoint}>Add Spawn Point</AddButton>
+      {selectedSceneInspectorTab === SceneInspectorTab.DETAILS ? (
+        <>
+          <TextField label="Name" {...nameProps} />
+          <TextField type="textarea" label="Description" {...descriptionProps} />
+          <FileUploadField
+            {...thumbnailProps}
+            label="Thumbnail"
+            accept={ACCEPTED_FILE_TYPES['image']}
+            onDrop={handleDrop}
+            isValidFile={isImage}
+            showPreview
+          />
+          <Dropdown label="Age Rating" options={AGE_RATING_OPTIONS} {...ageRatingProps} />
+          <Dropdown label="Categories" options={CATEGORIES_OPTIONS} multiple {...categoriesProps} />
+          <TextField label="Author (optional)" {...authorProps} />
+          <TextField label="Email (optional)" {...emailProps} />
+          <TextField label="Tags (optional)" {...tagsProps} />
+        </>
+      ) : null}
+
+      {selectedSceneInspectorTab === SceneInspectorTab.LAYOUT ? (
+        <Block label="Parcels">
+          <TextField {...parcelsProps} />
+          <RxBorderAll onClick={handleClick} style={{ opacity: auto ? 1 : 0.3 }} />
+        </Block>
+      ) : null}
+
+      {selectedSceneInspectorTab === SceneInspectorTab.SETTINGS ? (
+        <>
+          <Block label="Scene Restrictions" className="underlined"></Block>
+          <CheckboxField
+            label="Silence Voice Chat"
+            checked={componentValue.silenceVoiceChat}
+            {...silenceVoiceChatProps}
+          />
+          <CheckboxField
+            label="Disable Portable Experiences"
+            checked={componentValue.disablePortableExperiences}
+            {...disablePortableExperiencesProps}
+          />
+          <Block label="Spawn Settings" className="underlined"></Block>
+          {spawnPoints.map((spawnPoint, index) => renderSpawnPoint(spawnPoint, index))}
+          <AddButton onClick={handleAddSpawnPoint}>Add Spawn Point</AddButton>
+        </>
+      ) : null}
     </Container>
   )
 })

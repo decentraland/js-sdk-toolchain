@@ -17,3 +17,27 @@
   background: var(--tree-bg-color);
   align-items: stretch;
 }
+
+.Container.Scene .Tabs.SceneTabs .icon {
+  width: 16px;
+  height: 16px;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.Container.Scene .Tabs.SceneTabs .icon.details {
+  background-image: url(./icons/details.svg);
+}
+
+.Container.Scene .Tabs.SceneTabs .icon.layout {
+  background-image: url(./icons/layout.svg);
+}
+
+.Container.Scene .Tabs.SceneTabs .icon.settings {
+  background-image: url(./icons/settings.svg);
+}
+
+.a {
+  color: rgb(187, 77, 77);
+}
