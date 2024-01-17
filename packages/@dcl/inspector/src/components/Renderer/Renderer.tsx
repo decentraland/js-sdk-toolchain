@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useDrop } from 'react-dnd'
-import { KeyHandler } from 'hotkeys-js'
 import cx from 'classnames'
 import { Vector3 } from '@babylonjs/core'
 import { Entity } from '@dcl/ecs'
@@ -84,6 +83,7 @@ const Renderer: React.FC = () => {
     if (!sdk) return
     const selectedEntitites = sdk.sceneContext.operations.getSelectedEntities()
     selectedEntitites.forEach((entity) => sdk.sceneContext.operations.removeEntity(entity))
+    void sdk.sceneContext.operations.dispatch()
   }, [sdk])
 
   const copySelectedEntities = useCallback(() => {
@@ -95,6 +95,7 @@ const Renderer: React.FC = () => {
   const pasteSelectedEntities = useCallback(() => {
     if (!sdk) return
     copyEntities.forEach((entity) => sdk.sceneContext.operations.duplicateEntity(entity))
+    void sdk.sceneContext.operations.dispatch()
   }, [sdk, copyEntities])
 
   const zoomIn = useCallback(() => {
@@ -116,45 +117,12 @@ const Renderer: React.FC = () => {
     sdk.editorCamera.resetCamera()
   }, [sdk])
 
-  const canvasHotkeys = useMemo<Record<string, () => void>>(
-    () => ({
-      [BACKSPACE]: deleteSelectedEntities,
-      [DELETE]: deleteSelectedEntities,
-      [COPY]: copySelectedEntities,
-      [COPY_ALT]: copySelectedEntities,
-      [PASTE]: pasteSelectedEntities,
-      [PASTE_ALT]: pasteSelectedEntities,
-      [ZOOM_IN]: zoomIn,
-      [ZOOM_IN_ALT]: zoomIn,
-      [ZOOM_OUT]: zoomOut,
-      [ZOOM_OUT_ALT]: zoomOut,
-      [RESET_CAMERA]: resetCamera
-    }),
-    [
-      sdk,
-      copyEntities,
-      deleteSelectedEntities,
-      copySelectedEntities,
-      pasteSelectedEntities,
-      setCopyEntities,
-      zoomIn,
-      zoomOut,
-      resetCamera
-    ]
-  )
-
-  const onCanvasHotkeys = useCallback<KeyHandler>(
-    (_event, handler) => {
-      if (!sdk) return
-      if (canvasHotkeys.hasOwnProperty(handler.shortcut)) {
-        canvasHotkeys[handler.shortcut]()
-        void sdk.sceneContext.operations.dispatch()
-      }
-    },
-    [sdk, copyEntities]
-  )
-
-  useHotkey(Object.keys(canvasHotkeys), onCanvasHotkeys, canvasRef.current)
+  useHotkey([DELETE, BACKSPACE], deleteSelectedEntities, canvasRef.current)
+  useHotkey([COPY, COPY_ALT], copySelectedEntities, canvasRef.current)
+  useHotkey([PASTE, PASTE_ALT], pasteSelectedEntities, canvasRef.current)
+  useHotkey([ZOOM_IN, ZOOM_IN_ALT], zoomIn, canvasRef.current)
+  useHotkey([ZOOM_OUT, ZOOM_OUT_ALT], zoomOut, canvasRef.current)
+  useHotkey([RESET_CAMERA], resetCamera, canvasRef.current)
 
   const getDropPosition = async () => {
     const pointerCoords = await getPointerCoords(sdk!.scene)
