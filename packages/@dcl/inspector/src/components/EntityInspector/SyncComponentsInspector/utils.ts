@@ -1,11 +1,12 @@
 import { ComponentDefinition, Entity, IEngine } from '@dcl/ecs'
-
-import { getComponentName, getEnabledComponents } from '../../Hierarchy/ContextMenu/ContextMenu'
-import { CoreComponents } from '../../../lib/sdk/components'
 import { ComponentName } from '@dcl/asset-packs'
 
+import { CoreComponents } from '../../../lib/sdk/components'
+import { getComponentName, getEnabledComponents } from '../../Hierarchy/ContextMenu/ContextMenu'
+
 const DISABLED_COMPONENTS: string[] = [
-  CoreComponents.TRANSFORM,
+  ComponentName.ACTIONS,
+  ComponentName.TRIGGERS,
   CoreComponents.NETWORK_ENTITY,
   CoreComponents.SYNC_COMPONENTS,
   CoreComponents.TWEEN
@@ -14,20 +15,31 @@ const DISABLED_COMPONENTS: string[] = [
 export type Component = {
   id: number
   name: string
+  potential?: boolean
 }
 
 export const ENABLED_COMPONENTS = getEnabledComponents(DISABLED_COMPONENTS)
-export const POTENTIAL_COMPONENTS = [CoreComponents.ANIMATOR, CoreComponents.AUDIO_SOURCE, CoreComponents.TWEEN]
+export const POTENTIAL_COMPONENTS: string[] = [
+  CoreComponents.ANIMATOR,
+  CoreComponents.AUDIO_SOURCE,
+  CoreComponents.AUDIO_STREAM,
+  CoreComponents.VIDEO_PLAYER,
+  CoreComponents.VISIBILITY_COMPONENT,
+]
 
 export function getComponents(entity: Entity, engine: IEngine) {
+  const Action = engine.getComponent(ComponentName.ACTIONS)
   const entityComponents: Component[] = []
   const availableComponents: Component[] = []
+  const hasAction = Action.has(entity)
 
   for (const component of engine.componentsIter()) {
     if (!ENABLED_COMPONENTS.has(component.componentName)) continue
     const data = { id: component.componentId, name: getComponentName(component.componentName) }
     if (component.has(entity)) {
       entityComponents.push(data)
+    } else if (hasAction && POTENTIAL_COMPONENTS.includes(component.componentName)) {
+      entityComponents.push({ ...data, potential: true })
     } else {
       availableComponents.push(data)
     }
@@ -37,18 +49,6 @@ export function getComponents(entity: Entity, engine: IEngine) {
     entityComponents.sort((a, b) => a.name.localeCompare(b.name)),
     availableComponents.sort((a, b) => a.name.localeCompare(b.name))
   ]
-}
-
-export function getPotentialComponents(entity: Entity, engine: IEngine): Component[] {
-  const Action = engine.getComponent(ComponentName.ACTIONS)
-  if (!Action.has(entity)) return []
-
-  return POTENTIAL_COMPONENTS.reduce((acc: Component[], $) => {
-    const component = engine.getComponent($)
-    if (component.has(entity)) return acc
-    acc.push({ id: component.componentId, name: getComponentName(component.componentName) })
-    return acc
-  }, [])
 }
 
 export function putComponentIds(engine: IEngine, ids: number[], component: ComponentDefinition<any>): number[] {

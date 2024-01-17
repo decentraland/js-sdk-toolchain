@@ -57,7 +57,9 @@ export function parseSyncComponents(engine: IEngine, componentNames: string[]): 
       const component = engine.getComponent($)
       return [...acc, component.componentId]
     }
-    catch (e) { console.log(`Component ${$} does not exist in engine`) }
-    finally { return acc }
+    catch (e) {
+      console.error(`Component ${$} does not exist in engine`)
+      return acc
+    }
   }, [])
 }

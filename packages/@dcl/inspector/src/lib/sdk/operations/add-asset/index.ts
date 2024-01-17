@@ -40,7 +40,6 @@ export function addAsset(engine: IEngine) {
     const Transform = engine.getComponent(TransformEngine.componentId) as typeof TransformEngine
     const GltfContainer = engine.getComponent(GltfEngine.componentId) as typeof GltfEngine
     const NetworkEntity = engine.getComponent(NetworkEntityEngine.componentId) as typeof NetworkEntityEngine
-    const SyncComponents = engine.getComponent(SyncComponentsEngine.componentId) as typeof SyncComponentsEngine
 
     Transform.createOrReplace(child, { parent, position })
 
@@ -139,7 +138,7 @@ export function addAsset(engine: IEngine) {
           }
           case CoreComponents.SYNC_COMPONENTS: {
             const componentNames = values.get(componentName) as { value: string[] }
-            const componentIds = parseSyncComponents(engine, componentNames.value).concat(Transform.componentId)
+            const componentIds = parseSyncComponents(engine, componentNames.value)
             values.set(componentName, { componentIds })
             values.set(NetworkEntity.componentName, { entityId: child, networkId: 0 })
           }

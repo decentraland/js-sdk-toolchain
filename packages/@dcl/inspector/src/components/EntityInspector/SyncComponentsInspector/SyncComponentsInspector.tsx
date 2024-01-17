@@ -31,26 +31,18 @@ export default withSdk<Props>(({ sdk, entity }) => {
 
     const { componentIds } = componentValue
 
-    if (operation === CrdtMessageType.PUT_COMPONENT) {
-      console.log('ASD PUT', componentIds, component.componentName)
+    const isNewComponent =
+      operation === CrdtMessageType.PUT_COMPONENT &&
+      !entityComponents.find(($) => $.id === component.componentId && !$.potential)
+
+    if (isNewComponent) {
       setComponentValue({ componentIds: putComponentIds(sdk.engine, componentIds, component) })
     }
 
     if (operation === CrdtMessageType.DELETE_COMPONENT) {
-      console.log('ASD DELETE', component.componentName)
       setComponentValue({ componentIds: deleteComponentIds(sdk.engine, entity, componentIds, component) })
     }
   }, [])
-
-  useEffect(() => {
-    // TODO: add case for when there already is an Action component and then we add the Multiplayer component...
-    // TODO: only run this if there is entityComponents.length
-    if (hasSyncComponents) {
-      const componentIds = entityComponents.map(($) => $.id)
-      console.log('ASD YES', entity, componentIds)
-      setComponentValue({ componentIds })
-    }
-  }, [entity])
 
   const handleRemove = useCallback(async () => {
     sdk.operations.removeComponent(entity, NetworkEntity)
@@ -91,10 +83,10 @@ export default withSdk<Props>(({ sdk, entity }) => {
       Select the components of this item to sync so all users see the same changes in the scene.
       <Container label="Added components">
         <Block>
-          {entityComponents.map(({ id, name }) => (
+          {entityComponents.map(({ id, name, potential }) => (
             <CheckboxField
               key={id}
-              label={name}
+              label={name + (potential ? ' (through Action)' : '')}
               checked={componentValue.componentIds.includes(id)}
               onChange={() => handleChange(id)}
             />
@@ -103,6 +95,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
       </Container>
       <Container
         label="Other components"
+        initialOpen={false}
         rightContent={
           <InfoTooltip
             text="All this components can by synced, but you need to add them to this item before selecting to sync"
