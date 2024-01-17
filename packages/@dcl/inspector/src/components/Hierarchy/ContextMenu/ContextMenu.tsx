@@ -17,7 +17,8 @@ const DISABLED_COMPONENTS: string[] = [
   CoreComponents.AUDIO_STREAM,
   CoreComponents.NFT_SHAPE,
   CoreComponents.VIDEO_PLAYER,
-  CoreComponents.NETWORK_ENTITY
+  CoreComponents.NETWORK_ENTITY,
+  CoreComponents.TWEEN
 ]
 
 const SMART_ITEM_COMPONENTS: string[] = [

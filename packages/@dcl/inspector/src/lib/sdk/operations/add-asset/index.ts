@@ -25,7 +25,7 @@ import {
 import { CoreComponents } from '../../components'
 import updateSelectedEntity from '../update-selected-entity'
 import { addChild } from '../add-child'
-import { isSelf, parseMaterial } from './utils'
+import { isSelf, parseMaterial, parseSyncComponents } from './utils'
 
 export function addAsset(engine: IEngine) {
   return function addAsset(
@@ -137,19 +137,20 @@ export function addAsset(engine: IEngine) {
             values.set(componentName, { ...triggers, value: newValue })
             break
           }
+          case CoreComponents.SYNC_COMPONENTS: {
+            const componentNames = values.get(componentName) as { value: string[] }
+            const componentIds = parseSyncComponents(engine, componentNames.value).concat(Transform.componentId)
+            values.set(componentName, { componentIds })
+            values.set(NetworkEntity.componentName, { entityId: child, networkId: 0 })
+          }
         }
       }
 
-      const componentIds: number[] = [Transform.componentId]
       // create components
       for (const [componentName, componentValue] of values) {
         const Component = engine.getComponent(componentName) as LastWriteWinElementSetComponentDefinition<unknown>
         Component.create(child, componentValue)
-        componentIds.push(Component.componentId)
       }
-      // create network components
-      NetworkEntity.createOrReplace(child, { entityId: child, networkId: 0 })
-      SyncComponents.createOrReplace(child, { componentIds })
     } else {
       // if the asset is just a path to a model, create a gltf container for it (this is the case for assets dropped from the local files tab)
       GltfContainer.create(child, {

@@ -12,7 +12,7 @@ import { CoreComponents } from '../../../lib/sdk/components'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
 import { CheckboxField, InfoTooltip } from '../../ui'
-import { ENABLED_COMPONENTS, getSynchronizableComponents, getPotentialComponents, putComponentIds, deleteComponentIds } from './utils'
+import { ENABLED_COMPONENTS, getComponents, putComponentIds, deleteComponentIds } from './utils'
 import { cleanPush } from '../../../lib/utils/array'
 import type { Props } from './types'
 
@@ -23,8 +23,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
 
   const hasSyncComponents = useHasComponent(entity, SyncComponents)
   const [componentValue, setComponentValue] = useComponentValue<ISyncComponentsType>(entity, SyncComponents)
-  const entityComponents = getSynchronizableComponents(entity, sdk.engine)
-  const potentialComponents = getPotentialComponents(entity, sdk.engine)
+  const [entityComponents, availableComponents] = getComponents(entity, sdk.engine)
 
   useChange(({ entity: eventEntity, component, operation }) => {
     if (!hasSyncComponents) return
@@ -33,18 +32,25 @@ export default withSdk<Props>(({ sdk, entity }) => {
     const { componentIds } = componentValue
 
     if (operation === CrdtMessageType.PUT_COMPONENT) {
+      console.log('ASD PUT', componentIds, component.componentName)
       setComponentValue({ componentIds: putComponentIds(sdk.engine, componentIds, component) })
     }
 
     if (operation === CrdtMessageType.DELETE_COMPONENT) {
+      console.log('ASD DELETE', component.componentName)
       setComponentValue({ componentIds: deleteComponentIds(sdk.engine, entity, componentIds, component) })
     }
-  }, [componentValue])
+  }, [])
 
   useEffect(() => {
-    const componentIds = [...entityComponents.map(($) => $.id), ...potentialComponents.map(($) => $.id)]
-    setComponentValue({ componentIds })
-  }, [hasSyncComponents])
+    // TODO: add case for when there already is an Action component and then we add the Multiplayer component...
+    // TODO: only run this if there is entityComponents.length
+    if (hasSyncComponents) {
+      const componentIds = entityComponents.map(($) => $.id)
+      console.log('ASD YES', entity, componentIds)
+      setComponentValue({ componentIds })
+    }
+  }, [entity])
 
   const handleRemove = useCallback(async () => {
     sdk.operations.removeComponent(entity, NetworkEntity)
@@ -67,8 +73,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
     }
   }, [componentValue])
 
-  const noComponents = !entityComponents.length && !potentialComponents.length
-  if (!hasSyncComponents || noComponents) return null
+  if (!hasSyncComponents || !entityComponents.length) return null
 
   return (
     <Container
@@ -83,29 +88,39 @@ export default withSdk<Props>(({ sdk, entity }) => {
       }
       onRemoveContainer={handleRemove}
     >
-      <Block>
-        {entityComponents.map(({ id, name }) => (
-          <CheckboxField
-            key={id}
-            label={name}
-            checked={componentValue.componentIds.includes(id)}
-            onChange={() => handleChange(id)}
+      Select the components of this item to sync so all users see the same changes in the scene.
+      <Container label="Added components">
+        <Block>
+          {entityComponents.map(({ id, name }) => (
+            <CheckboxField
+              key={id}
+              label={name}
+              checked={componentValue.componentIds.includes(id)}
+              onChange={() => handleChange(id)}
+            />
+          ))}
+        </Block>
+      </Container>
+      <Container
+        label="Other components"
+        rightContent={
+          <InfoTooltip
+            text="All this components can by synced, but you need to add them to this item before selecting to sync"
+            type="help"
           />
-        ))}
-        {potentialComponents.length > 0 && (
-          <>
-            <span>Potential</span>
-            {potentialComponents.map(({ id, name }) => (
-              <CheckboxField
-                key={id}
-                label={name}
-                checked={componentValue.componentIds.includes(id)}
-                onChange={() => handleChange(id)}
-              />
-            ))}
-          </>
-        )}
-      </Block>
+        }
+      >
+        <Block>
+          {availableComponents.map(({ id, name }) => (
+            <CheckboxField
+              key={id}
+              label={name}
+              checked
+              disabled
+            />
+          ))}
+        </Block>
+      </Container>
     </Container>
   )
 })

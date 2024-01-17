@@ -1,4 +1,4 @@
-import { PBMaterial, TextureUnion } from '@dcl/ecs'
+import { IEngine, PBMaterial, TextureUnion } from '@dcl/ecs'
 
 export function isSelf(value: any) {
   return `${value}` === `{self}`
@@ -48,4 +48,16 @@ export function parseTexture(base: string, texture?: TextureUnion): TextureUnion
   }
 
   return texture
+}
+
+export function parseSyncComponents(engine: IEngine, componentNames: string[]): number[] {
+  return componentNames.reduce((acc: number[], $) => {
+    // try/catch it since the component might not exist in engine...
+    try {
+      const component = engine.getComponent($)
+      return [...acc, component.componentId]
+    }
+    catch (e) { console.log(`Component ${$} does not exist in engine`) }
+    finally { return acc }
+  }, [])
 }

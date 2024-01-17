@@ -7,7 +7,8 @@ import { ComponentName } from '@dcl/asset-packs'
 const DISABLED_COMPONENTS: string[] = [
   CoreComponents.TRANSFORM,
   CoreComponents.NETWORK_ENTITY,
-  CoreComponents.SYNC_COMPONENTS
+  CoreComponents.SYNC_COMPONENTS,
+  CoreComponents.TWEEN
 ]
 
 export type Component = {
@@ -18,17 +19,24 @@ export type Component = {
 export const ENABLED_COMPONENTS = getEnabledComponents(DISABLED_COMPONENTS)
 export const POTENTIAL_COMPONENTS = [CoreComponents.ANIMATOR, CoreComponents.AUDIO_SOURCE, CoreComponents.TWEEN]
 
-export function getSynchronizableComponents(entity: Entity, engine: IEngine): Component[] {
-  const components: Component[] = []
+export function getComponents(entity: Entity, engine: IEngine) {
+  const entityComponents: Component[] = []
+  const availableComponents: Component[] = []
 
   for (const component of engine.componentsIter()) {
     if (!ENABLED_COMPONENTS.has(component.componentName)) continue
+    const data = { id: component.componentId, name: getComponentName(component.componentName) }
     if (component.has(entity)) {
-      components.push({ id: component.componentId, name: getComponentName(component.componentName) })
+      entityComponents.push(data)
+    } else {
+      availableComponents.push(data)
     }
   }
 
-  return components.sort((a, b) => a.name.localeCompare(b.name))
+  return [
+    entityComponents.sort((a, b) => a.name.localeCompare(b.name)),
+    availableComponents.sort((a, b) => a.name.localeCompare(b.name))
+  ]
 }
 
 export function getPotentialComponents(entity: Entity, engine: IEngine): Component[] {
@@ -57,7 +65,7 @@ export function putComponentIds(engine: IEngine, ids: number[], component: Compo
     }
     default:
       componentIds.add(component.componentId)
-  }
+    }
 
   return Array.from(componentIds)
 }

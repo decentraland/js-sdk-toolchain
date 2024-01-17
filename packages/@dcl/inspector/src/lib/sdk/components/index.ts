@@ -30,6 +30,7 @@ export enum CoreComponents {
   SYNC_COMPONENTS = 'core-schema::Sync-Components',
   TEXT_SHAPE = 'core::TextShape',
   TRANSFORM = 'core::Transform',
+  TWEEN = 'core::Tween',
   VIDEO_PLAYER = 'core::VideoPlayer',
   VISIBILITY_COMPONENT = 'core::VisibilityComponent'
 }
@@ -144,6 +145,7 @@ export type SdkComponents = {
   SyncComponents: ReturnType<typeof components.SyncComponents>
   TextShape: ReturnType<typeof components.TextShape>
   Transform: ReturnType<typeof components.Transform>
+  Tween: ReturnType<typeof components.Tween>
   VideoPlayer: ReturnType<typeof components.VideoPlayer>
   VisibilityComponent: ReturnType<typeof components.VisibilityComponent>
 }
@@ -164,6 +166,7 @@ export function createComponents(engine: IEngine): SdkComponents {
   const SyncComponents = components.SyncComponents(engine)
   const TextShape = components.TextShape(engine)
   const Transform = components.Transform(engine)
+  const Tween = components.Tween(engine)
   const VideoPlayer = components.VideoPlayer(engine)
   const VisibilityComponent = components.VisibilityComponent(engine)
 
@@ -183,6 +186,7 @@ export function createComponents(engine: IEngine): SdkComponents {
     SyncComponents,
     TextShape,
     Transform,
+    Tween,
     VideoPlayer,
     VisibilityComponent,
   }
