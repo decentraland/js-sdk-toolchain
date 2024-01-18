@@ -74,7 +74,7 @@ export function interactWithScene(
     const ancestors = getAncestors(engine, entity.entityId)
     const nodes = mapNodes(engine, (node) => (isAncestor(ancestors, node.entity) ? { ...node, open: true } : node))
     operations.updateValue(editorComponents.Nodes, engine.RootEntity, { value: nodes })
-    operations.updateSelectedEntity(entity.entityId, !!keyState[Keys.KEY_CTRL])
-    void operations.dispatch()
+    const operationResult = operations.updateSelectedEntity(entity.entityId, !!keyState[Keys.KEY_CTRL])
+    void operations.dispatch(operationResult)
   }
 }

@@ -14,9 +14,15 @@ import removeComponent from './remove-component'
 import duplicateEntity from './duplicate-entity'
 import { updateCanSave } from '../../../redux/app'
 import { store } from '../../../redux/store'
+import {
+  error as sdkOperationErrorAction,
+  clearError as sdkOperationClearErrorAction,
+  ErrorType
+} from '../../../redux/sdk'
 
 export interface Dispatch {
   dirty?: boolean
+  error?: ErrorType
 }
 
 export function createOperations(engine: IEngine) {
@@ -32,8 +38,13 @@ export function createOperations(engine: IEngine) {
     updateSelectedEntity: updateSelectedEntity(engine),
     removeSelectedEntities: removeSelectedEntities(engine),
     duplicateEntity: duplicateEntity(engine),
-    dispatch: async ({ dirty = true }: Dispatch = {}) => {
+    dispatch: async ({ dirty = true, error = undefined }: Dispatch = {}) => {
       store.dispatch(updateCanSave({ dirty }))
+      if (error) {
+        store.dispatch(sdkOperationErrorAction({ error }))
+      } else if (store.getState().sdk.error) {
+        store.dispatch(sdkOperationClearErrorAction())
+      }
       await engine.update(1)
     },
     getSelectedEntities: getSelectedEntities(engine)
