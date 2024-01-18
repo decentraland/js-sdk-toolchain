@@ -342,7 +342,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
             active={selectedSceneInspectorTab === SceneInspectorTab.DETAILS}
             onClick={() => handleSelectTab(SceneInspectorTab.DETAILS)}
           >
-            <i className="icon details" />
+            <i className="TabIcon details-icon" />
             &nbsp;Details
           </Tab>
         )}
@@ -351,7 +351,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
             active={selectedSceneInspectorTab === SceneInspectorTab.LAYOUT}
             onClick={() => handleSelectTab(SceneInspectorTab.LAYOUT)}
           >
-            <i className="icon layout" />
+            <i className="TabIcon layout-icon" />
             &nbsp;Layout
           </Tab>
         )}
@@ -360,7 +360,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
             active={selectedSceneInspectorTab === SceneInspectorTab.SETTINGS}
             onClick={() => handleSelectTab(SceneInspectorTab.SETTINGS)}
           >
-            <i className="icon settings" />
+            <i className="TabIcon cog-icon" />
             &nbsp;Settings
           </Tab>
         )}

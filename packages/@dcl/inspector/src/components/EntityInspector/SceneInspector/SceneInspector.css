@@ -18,23 +18,23 @@
   align-items: stretch;
 }
 
-.Container.Scene .Tabs.SceneTabs .icon {
+.Container.Scene .Tabs.SceneTabs .TabIcon {
   width: 16px;
   height: 16px;
   background-position: center;
   background-size: contain;
-  background-repeat: no-repeat;
+  background-repeat: repeat;
 }
 
-.Container.Scene .Tabs.SceneTabs .icon.details {
+.Container.Scene .Tabs.SceneTabs .TabIcon.details-icon {
   background-image: url(./icons/details.svg);
 }
 
-.Container.Scene .Tabs.SceneTabs .icon.layout {
+.Container.Scene .Tabs.SceneTabs .TabIcon.layout-icon {
   background-image: url(./icons/layout.svg);
 }
 
-.Container.Scene .Tabs.SceneTabs .icon.settings {
+.Container.Scene .Tabs.SceneTabs .TabIcon.cog-icon {
   background-image: url(./icons/settings.svg);
 }
 
