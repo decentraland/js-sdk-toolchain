@@ -22,6 +22,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
   const { NetworkEntity, SyncComponents, GltfContainer } = sdk.components
 
   const hasSyncComponents = useHasComponent(entity, SyncComponents)
+  const hasNetworkEntity = useHasComponent(entity, NetworkEntity)
   const [componentValue, setComponentValue] = useComponentValue<ISyncComponentsType>(entity, SyncComponents)
   const [entityComponents, availableComponents] = getComponents(entity, sdk.engine)
 
@@ -43,6 +44,14 @@ export default withSdk<Props>(({ sdk, entity }) => {
       setComponentValue({ componentIds: deleteComponentIds(sdk.engine, entity, componentIds, component) })
     }
   }, [])
+
+  useEffect(() => {
+    if (!hasNetworkEntity && hasSyncComponents) {
+      sdk.operations.addComponent(entity, NetworkEntity.componentId)
+      sdk.operations.updateValue(NetworkEntity, entity, { entityId: sdk.enumEntity.getNextEnumEntityId(), networkId: 0  })
+      void sdk.operations.dispatch()
+    }
+  }, [entity, hasSyncComponents])
 
   const handleRemove = useCallback(async () => {
     sdk.operations.removeComponent(entity, NetworkEntity)

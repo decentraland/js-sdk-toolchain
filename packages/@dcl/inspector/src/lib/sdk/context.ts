@@ -15,6 +15,7 @@ import { InspectorPreferences } from '../logic/preferences/types'
 import { CameraServer } from '../rpc/camera/server'
 import { getConfig } from '../logic/config'
 import { AssetPack } from '../logic/catalog'
+import { EnumEntity, createEnumEntityId } from './enum-entity'
 
 export type SdkContextEvents = {
   change: { entity: Entity; operation: CrdtMessageType; component?: ComponentDefinition<any>; value?: any }
@@ -30,7 +31,8 @@ export type SdkContextValue = {
   dispose(): void
   operations: ReturnType<typeof createOperations>
   gizmos: Gizmos
-  editorCamera: CameraManager
+  editorCamera: CameraManager,
+  enumEntity: EnumEntity
 }
 
 export async function createSdkContext(
@@ -74,6 +76,7 @@ export async function createSdkContext(
     dispose,
     operations: createOperations(engine),
     gizmos: ctx.gizmos,
-    editorCamera: renderer.editorCamera
+    editorCamera: renderer.editorCamera,
+    enumEntity: createEnumEntityId(engine)
   }
 }

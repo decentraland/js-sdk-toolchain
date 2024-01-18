@@ -9,8 +9,7 @@ import {
   LastWriteWinElementSetComponentDefinition,
   PBVideoPlayer,
   PBMaterial,
-  NetworkEntity as NetworkEntityEngine,
-  SyncComponents as SyncComponentsEngine
+  NetworkEntity as NetworkEntityEngine
 } from '@dcl/ecs'
 import {
   ActionType,
@@ -22,10 +21,12 @@ import {
   getNextId,
   getPayload
 } from '@dcl/asset-packs'
+
 import { CoreComponents } from '../../components'
 import updateSelectedEntity from '../update-selected-entity'
 import { addChild } from '../add-child'
 import { isSelf, parseMaterial, parseSyncComponents } from './utils'
+import { EnumEntity } from '../../enum-entity'
 
 export function addAsset(engine: IEngine) {
   return function addAsset(
@@ -34,6 +35,7 @@ export function addAsset(engine: IEngine) {
     name: string,
     position: Vector3Type,
     base: string,
+    enumEntityId: EnumEntity,
     components?: Partial<Record<CoreComponents | ComponentName, any>>
   ): Entity {
     const child = addChild(engine)(parent, name)
@@ -140,7 +142,7 @@ export function addAsset(engine: IEngine) {
             const componentNames = values.get(componentName) as { value: string[] }
             const componentIds = parseSyncComponents(engine, componentNames.value)
             values.set(componentName, { componentIds })
-            values.set(NetworkEntity.componentName, { entityId: child, networkId: 0 })
+            values.set(NetworkEntity.componentName, { entityId: enumEntityId.getNextEnumEntityId(), networkId: 0 })
           }
         }
       }

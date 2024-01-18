@@ -93,7 +93,7 @@ describe('[UNDO] Inspector<->DataLayer<->Babylon', () => {
       x: 8,
       y: 8,
       z: 8
-    }))
+    }, '', {} as any))
     await inspectorOperations.dispatch()
     await tick()
     expect(getTransform(dataLayerEngine).get(entity).position).toMatchObject({ x: 8, y: 8, z: 8 })
