@@ -1,12 +1,12 @@
 import mitt from 'mitt'
-import { IAxisDragGizmo, PickingInfo, Quaternion, Vector3 } from '@babylonjs/core'
-import { EcsEntity } from './EcsEntity'
+import { IAxisDragGizmo, PickingInfo, Quaternion, Node } from '@babylonjs/core'
 import { Entity, TransformType } from '@dcl/ecs'
+import { Vector3 as DclVector3, Quaternion as DclQuaternion } from '@dcl/ecs-math'
+import { GizmoType } from '../../utils/gizmo'
+import { EcsEntity } from './EcsEntity'
 import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manager'
 import { SceneContext } from './SceneContext'
-import { GizmoType } from '../../utils/gizmo'
 import { PatchedGizmoManager } from './gizmo-patch'
-import { Vector3 as DclVector3, Quaternion as DclQuaternion } from '@dcl/ecs-math'
 
 interface GizmoAxis {
   xGizmo: IAxisDragGizmo
@@ -50,6 +50,7 @@ export function createGizmoManager(context: SceneContext) {
   let rotationGizmoAlignmentDisabled = false
   let shouldRestorRotationGizmoAlignment = false
   let isEnabled = true
+  const parentMapper: Map<Entity, Node> = new Map()
 
   function areMultipleEntitiesSelected() {
     return context.operations.getSelectedEntities().length > 1
@@ -112,106 +113,37 @@ export function createGizmoManager(context: SceneContext) {
     updateEntityTransform(lastEntity.entityId, newTransform)
 
     // Update entity transform for all the selected entities
-    if (areMultipleEntitiesSelected()) {
+    if (areMultipleEntitiesSelected() && parentMapper.size > 0) {
       for (const entityId of context.operations.getSelectedEntities()) {
-        if (lastEntity.entityId === entityId) {
-          continue
-        }
+        if (entityId === lastEntity.entityId) continue
         const entity = context.getEntityOrNull(entityId)!
+        entity.setParent(parentMapper.get(entityId)!)
+        parentMapper.delete(entityId)
         const transform = getTransform(entity)
         updateEntityTransform(entityId, transform)
       }
     }
   }
 
+  function initTransform() {
+    if (lastEntity === null) return
+    if (areMultipleEntitiesSelected()) {
+      for (const entityId of context.operations.getSelectedEntities()) {
+        if (entityId === lastEntity.entityId) continue
+        const entity = context.getEntityOrNull(entityId)!
+        parentMapper.set(entityId, entity.parent!)
+        entity.setParent(lastEntity)
+      }
+    }
+  }
+
+  gizmoManager.gizmos.scaleGizmo?.onDragStartObservable.add(initTransform)
+  gizmoManager.gizmos.positionGizmo?.onDragStartObservable.add(initTransform)
+  gizmoManager.gizmos.rotationGizmo?.onDragStartObservable.add(initTransform)
+
   gizmoManager.gizmos.scaleGizmo?.onDragEndObservable.add(updateTransform)
   gizmoManager.gizmos.positionGizmo?.onDragEndObservable.add(updateTransform)
   gizmoManager.gizmos.rotationGizmo?.onDragEndObservable.add(updateTransform)
-
-  function updateSelectedEntitiesPosition() {
-    if (lastEntity === null) return
-
-    const oldTransform = context.Transform.get(lastEntity.entityId)
-    const newTransform = getTransform()
-    const positionDelta = DclVector3.subtract(newTransform.position, oldTransform.position)
-
-    for (const entityId of context.operations.getSelectedEntities()) {
-      if (lastEntity.entityId === entityId) {
-        continue
-      }
-
-      const entity = context.getEntityOrNull(entityId)!
-      const entityTransform = context.Transform.get(entity.entityId)
-      const newPosition = DclVector3.add(entityTransform.position, positionDelta)
-      entity.position = new Vector3(newPosition.x, newPosition.y, newPosition.z)
-    }
-  }
-
-  function updateSelectedEntitiesRotation() {
-    if (lastEntity === null) return
-
-    const oldTransform = context.Transform.get(lastEntity.entityId)
-    const newTransform = getTransform()
-    const roationDelta = new Quaternion(
-      newTransform.rotation.x,
-      newTransform.rotation.y,
-      newTransform.rotation.z,
-      newTransform.rotation.w
-    ).multiply(
-      new Quaternion(
-        oldTransform.rotation.x,
-        oldTransform.rotation.y,
-        oldTransform.rotation.z,
-        oldTransform.rotation.w
-      ).conjugate()
-    )
-
-    for (const entityId of context.operations.getSelectedEntities()) {
-      if (lastEntity.entityId === entityId) {
-        continue
-      }
-
-      const entity = context.getEntityOrNull(entityId)!
-      const entityTransform = context.Transform.get(entity.entityId)
-      const newRotation = new Quaternion(
-        entityTransform.rotation.x,
-        entityTransform.rotation.y,
-        entityTransform.rotation.z,
-        entityTransform.rotation.w
-      ).multiply(roationDelta)
-      entity.rotationQuaternion = newRotation
-    }
-  }
-
-  function updateSelectedEntitiesScale() {
-    if (lastEntity === null) return
-
-    const oldTransform = context.Transform.get(lastEntity.entityId)
-    const newTransform = getTransform()
-    const scaleDelta = DclVector3.subtract(newTransform.scale, oldTransform.scale)
-
-    for (const entityId of context.operations.getSelectedEntities()) {
-      if (lastEntity.entityId === entityId) {
-        continue
-      }
-
-      const entity = context.getEntityOrNull(entityId)!
-      const entityTransform = context.Transform.get(entity.entityId)
-      const newScale = DclVector3.add(entityTransform.scale, scaleDelta)
-      entity.scaling = new Vector3(newScale.x, newScale.y, newScale.z)
-    }
-  }
-
-  // Observe the position/rotation/scale gizmo drag events
-  gizmoManager.gizmos.positionGizmo?.xGizmo.dragBehavior.onDragObservable.add(updateSelectedEntitiesPosition)
-  gizmoManager.gizmos.positionGizmo?.yGizmo.dragBehavior.onDragObservable.add(updateSelectedEntitiesPosition)
-  gizmoManager.gizmos.positionGizmo?.zGizmo.dragBehavior.onDragObservable.add(updateSelectedEntitiesPosition)
-  gizmoManager.gizmos.rotationGizmo?.xGizmo.dragBehavior.onDragObservable.add(updateSelectedEntitiesRotation)
-  gizmoManager.gizmos.rotationGizmo?.yGizmo.dragBehavior.onDragObservable.add(updateSelectedEntitiesRotation)
-  gizmoManager.gizmos.rotationGizmo?.zGizmo.dragBehavior.onDragObservable.add(updateSelectedEntitiesRotation)
-  gizmoManager.gizmos.scaleGizmo?.xGizmo.dragBehavior.onDragObservable.add(updateSelectedEntitiesScale)
-  gizmoManager.gizmos.scaleGizmo?.yGizmo.dragBehavior.onDragObservable.add(updateSelectedEntitiesScale)
-  gizmoManager.gizmos.scaleGizmo?.zGizmo.dragBehavior.onDragObservable.add(updateSelectedEntitiesScale)
 
   // snap
   function updateSnap() {
@@ -299,7 +231,7 @@ export function createGizmoManager(context: SceneContext) {
     },
     setEnabled,
     setEntity(entity: EcsEntity | null) {
-      if (entity === lastEntity || !isEnabled) return
+      if (entity === lastEntity || !isEnabled || areMultipleEntitiesSelected()) return
       gizmoManager.attachToNode(entity)
       lastEntity = entity
       // fix gizmo rotation if necessary
