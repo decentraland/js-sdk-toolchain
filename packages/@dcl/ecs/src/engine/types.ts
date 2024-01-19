@@ -7,7 +7,7 @@ import {
   GrowOnlyValueSetComponentDefinition,
   LastWriteWinElementSetComponentDefinition
 } from './component'
-import { Entity, EntityContainer, EntityState } from './entity'
+import { Entity, IEntityContainer, EntityState } from './entity'
 import { ValueSetOptions } from './grow-only-value-set-component-definition'
 import { ReadonlyComponentSchema } from './readonly'
 import { SystemFn, SystemItem } from './systems'
@@ -71,7 +71,7 @@ export type PreEngine = Pick<
  */
 export interface IEngineOptions {
   onChangeFunction: OnChangeFunction
-  entityContainer?: EntityContainer
+  entityContainer?: IEntityContainer
 }
 
 /**
@@ -298,5 +298,5 @@ export interface IEngine {
    * @internal
    * Entity container with custom methods to update their state.
    */
-  entityContainer: EntityContainer
+  entityContainer: IEntityContainer
 }

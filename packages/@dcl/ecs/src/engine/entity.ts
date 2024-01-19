@@ -86,7 +86,7 @@ export enum EntityState {
 /**
  * @public
  */
-export type EntityContainer = {
+export type IEntityContainer = {
   generateEntity(networked?: boolean): Entity
   removeEntity(entity: Entity): boolean
   getEntityState(entity: Entity): EntityState
@@ -101,7 +101,7 @@ export type EntityContainer = {
 /**
  * @public
  */
-export function EntityContainer(opts?: { reservedStaticEntities: number }): EntityContainer {
+export function EntityContainer(opts?: { reservedStaticEntities: number }): IEntityContainer {
   const reservedStaticEntities = opts?.reservedStaticEntities ?? RESERVED_STATIC_ENTITIES
   // Local entities counter
   let entityCounter = reservedStaticEntities
