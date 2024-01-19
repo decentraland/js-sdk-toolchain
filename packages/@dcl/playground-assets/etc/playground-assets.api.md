@@ -984,9 +984,11 @@ export type EntityComponents = {
     onMouseUp: Callback;
 };
 
-// Warning: (tsdoc-undefined-tag) The TSDoc tag "@intenral" is not defined in this configuration
-// Warning: (ae-missing-release-tag) "EntityContainer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
+// @public (undocumented)
+export function EntityContainer(opts?: {
+    reservedStaticEntities: number;
+}): EntityContainer;
+
 // @public (undocumented)
 export type EntityContainer = {
     generateEntity(networked?: boolean): Entity;
@@ -996,7 +998,6 @@ export type EntityContainer = {
     releaseRemovedEntities(): Entity[];
     updateRemovedEntity(entity: Entity): boolean;
     updateUsedEntity(entity: Entity): boolean;
-    setNetworkEntitiesRange(reservedLocalEntities: number, range: [number, number]): void;
 };
 
 // @public (undocumented)
@@ -1186,6 +1187,8 @@ export interface IEngine {
 
 // @public (undocumented)
 export interface IEngineOptions {
+    // (undocumented)
+    entityContainer?: EntityContainer;
     // (undocumented)
     onChangeFunction: OnChangeFunction;
 }
@@ -3639,11 +3642,6 @@ export namespace Rect {
 
 // @public
 export function removeEntityWithChildren(engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema' | 'removeEntity' | 'defineComponent'>, entity: Entity): void;
-
-// Warning: (ae-missing-release-tag) "RESERVED_LOCAL_ENTITIES" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const RESERVED_LOCAL_ENTITIES = 65535;
 
 // Warning: (ae-missing-release-tag) "RESERVED_STATIC_ENTITIES" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
