@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useDrop } from 'react-dnd'
 import cx from 'classnames'
 import { Vector3 } from '@babylonjs/core'
+import { Entity } from '@dcl/ecs'
 
 import { DIRECTORY, withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
@@ -21,12 +22,27 @@ import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 import { Loading } from '../Loading'
 import { isModel, isAsset } from '../EntityInspector/GltfInspector/utils'
 import { useIsMounted } from '../../hooks/useIsMounted'
+import {
+  useHotkey,
+  BACKSPACE,
+  DELETE,
+  COPY,
+  PASTE,
+  COPY_ALT,
+  PASTE_ALT,
+  ZOOM_IN,
+  ZOOM_IN_ALT,
+  ZOOM_OUT_ALT,
+  ZOOM_OUT,
+  RESET_CAMERA
+} from '../../hooks/useHotkey'
 import { analytics, Event } from '../../lib/logic/analytics'
 import { Warnings } from '../Warnings'
 import { CameraSpeed } from './CameraSpeed'
 
 import './Renderer.css'
 
+const ZOOM_DELTA = new Vector3(0, 0, 1.1)
 const fixedNumber = (val: number) => Math.round(val * 1e2) / 1e2
 
 const Renderer: React.FC = () => {
@@ -40,6 +56,7 @@ const Renderer: React.FC = () => {
   const init = !!files
   const gizmosDisabled = useAppSelector(areGizmosDisabled)
   const config = getConfig()
+  const [copyEntities, setCopyEntities] = useState<Entity[]>([])
 
   useEffect(() => {
     if (sdk && init) {
@@ -61,6 +78,51 @@ const Renderer: React.FC = () => {
       sdk.gizmos.setEnabled(!gizmosDisabled)
     }
   }, [sdk, gizmosDisabled])
+
+  const deleteSelectedEntities = useCallback(() => {
+    if (!sdk) return
+    const selectedEntitites = sdk.sceneContext.operations.getSelectedEntities()
+    selectedEntitites.forEach((entity) => sdk.sceneContext.operations.removeEntity(entity))
+    void sdk.sceneContext.operations.dispatch()
+  }, [sdk])
+
+  const copySelectedEntities = useCallback(() => {
+    if (!sdk) return
+    const selectedEntitites = sdk.sceneContext.operations.getSelectedEntities()
+    setCopyEntities([...selectedEntitites])
+  }, [sdk, setCopyEntities])
+
+  const pasteSelectedEntities = useCallback(() => {
+    if (!sdk) return
+    copyEntities.forEach((entity) => sdk.sceneContext.operations.duplicateEntity(entity))
+    void sdk.sceneContext.operations.dispatch()
+  }, [sdk, copyEntities])
+
+  const zoomIn = useCallback(() => {
+    if (!sdk) return
+    const camera = sdk.editorCamera.getCamera()
+    const dir = camera.getDirection(ZOOM_DELTA)
+    camera.position.addInPlace(dir)
+  }, [sdk])
+
+  const zoomOut = useCallback(() => {
+    if (!sdk) return
+    const camera = sdk.editorCamera.getCamera()
+    const dir = camera.getDirection(ZOOM_DELTA).negate()
+    camera.position.addInPlace(dir)
+  }, [sdk])
+
+  const resetCamera = useCallback(() => {
+    if (!sdk) return
+    sdk.editorCamera.resetCamera()
+  }, [sdk])
+
+  useHotkey([DELETE, BACKSPACE], deleteSelectedEntities, canvasRef.current)
+  useHotkey([COPY, COPY_ALT], copySelectedEntities, canvasRef.current)
+  useHotkey([PASTE, PASTE_ALT], pasteSelectedEntities, canvasRef.current)
+  useHotkey([ZOOM_IN, ZOOM_IN_ALT], zoomIn, canvasRef.current)
+  useHotkey([ZOOM_OUT, ZOOM_OUT_ALT], zoomOut, canvasRef.current)
+  useHotkey([RESET_CAMERA], resetCamera, canvasRef.current)
 
   const getDropPosition = async () => {
     const pointerCoords = await getPointerCoords(sdk!.scene)

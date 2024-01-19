@@ -129,9 +129,9 @@ export const useTree = () => {
   )
 
   const select = useCallback(
-    async (entity: Entity) => {
+    async (entity: Entity, multiple?: boolean) => {
       if (!sdk) return
-      sdk.operations.updateSelectedEntity(entity)
+      sdk.operations.updateSelectedEntity(entity, !!multiple)
       await sdk.operations.dispatch()
       handleUpdate()
     },

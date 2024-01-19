@@ -1,12 +1,12 @@
 import mitt from 'mitt'
-import { IAxisDragGizmo, PickingInfo, Quaternion } from '@babylonjs/core'
-import { EcsEntity } from './EcsEntity'
+import { IAxisDragGizmo, PickingInfo, Quaternion, Node, Vector3 } from '@babylonjs/core'
 import { Entity, TransformType } from '@dcl/ecs'
+import { Vector3 as DclVector3, Quaternion as DclQuaternion } from '@dcl/ecs-math'
+import { GizmoType } from '../../utils/gizmo'
+import { EcsEntity } from './EcsEntity'
 import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manager'
 import { SceneContext } from './SceneContext'
-import { GizmoType } from '../../utils/gizmo'
 import { PatchedGizmoManager } from './gizmo-patch'
-import { Vector3 as DclVector3, Quaternion as DclQuaternion } from '@dcl/ecs-math'
 
 interface GizmoAxis {
   xGizmo: IAxisDragGizmo
@@ -48,8 +48,15 @@ export function createGizmoManager(context: SceneContext) {
 
   let lastEntity: EcsEntity | null = null
   let rotationGizmoAlignmentDisabled = false
+  let positionGizmoAlignmentDisabled = false
   let shouldRestorRotationGizmoAlignment = false
+  let shouldRestorPositionGizmoAlignment = false
   let isEnabled = true
+  const parentMapper: Map<Entity, Node> = new Map()
+
+  function areMultipleEntitiesSelected() {
+    return context.operations.getSelectedEntities().length > 1
+  }
 
   function fixRotationGizmoAlignment(value: TransformType) {
     const isProportional =
@@ -66,13 +73,29 @@ export function createGizmoManager(context: SceneContext) {
     }
   }
 
-  function getTransform(): TransformType {
-    if (lastEntity) {
-      const parent = context.Transform.getOrNull(lastEntity.entityId)?.parent || (0 as Entity)
+  function fixPositionGizmoAlignment(value: TransformType) {
+    const isProportional =
+      areProportional(value.scale.x, value.scale.y) && areProportional(value.scale.y, value.scale.z)
+    positionGizmoAlignmentDisabled = !isProportional
+    if (!isProportional && !isPositionGizmoWorldAligned()) {
+      setPositionGizmoWorldAligned(true) // set to world
+      shouldRestorPositionGizmoAlignment = true
+    } else if (shouldRestorPositionGizmoAlignment && isProportional) {
+      setPositionGizmoWorldAligned(false) // restore to local
+      shouldRestorPositionGizmoAlignment = false
+    } else {
+      events.emit('change')
+    }
+  }
+
+  function getTransform(entity?: EcsEntity): TransformType {
+    const _entity = entity ?? lastEntity
+    if (_entity) {
+      const parent = context.Transform.getOrNull(_entity.entityId)?.parent || (0 as Entity)
       const value = {
-        position: snapPosition(lastEntity.position),
-        scale: snapScale(lastEntity.scaling),
-        rotation: lastEntity.rotationQuaternion ? snapRotation(lastEntity.rotationQuaternion) : Quaternion.Zero(),
+        position: snapPosition(_entity.position),
+        scale: snapScale(_entity.scaling),
+        rotation: _entity.rotationQuaternion ? snapRotation(_entity.rotationQuaternion) : Quaternion.Zero(),
         parent
       }
       return value
@@ -81,19 +104,9 @@ export function createGizmoManager(context: SceneContext) {
     }
   }
 
-  function updateTransform() {
-    if (lastEntity === null) return
-    const oldTransform = context.Transform.get(lastEntity.entityId)
-    const newTransform = getTransform()
-    fixRotationGizmoAlignment(newTransform)
-    if (
-      DclVector3.equals(newTransform.position, oldTransform.position) &&
-      DclVector3.equals(newTransform.scale, oldTransform.scale) &&
-      areQuaternionsEqual(newTransform.rotation, oldTransform.rotation)
-    )
-      return
+  function updateEntityTransform(entity: Entity, newTransform: TransformType) {
     const { position, scale, rotation, parent } = newTransform
-    context.operations.updateValue(context.Transform, lastEntity.entityId, {
+    context.operations.updateValue(context.Transform, entity, {
       position: DclVector3.create(position.x, position.y, position.z),
       rotation: DclQuaternion.create(rotation.x, rotation.y, rotation.z, rotation.w),
       scale: DclVector3.create(scale.x, scale.y, scale.z),
@@ -101,6 +114,58 @@ export function createGizmoManager(context: SceneContext) {
     })
     void context.operations.dispatch()
   }
+
+  function updateTransform() {
+    if (lastEntity === null) return
+    const oldTransform = context.Transform.get(lastEntity.entityId)
+    const newTransform = getTransform()
+    fixRotationGizmoAlignment(newTransform)
+
+    // Remap all selected entities to the original parent
+    parentMapper.forEach((value, key, map) => {
+      if (key === lastEntity!.entityId) return
+      const entity = context.getEntityOrNull(key)
+      if (entity) {
+        entity.setParent(value)
+        map.delete(key)
+      }
+    })
+
+    if (
+      DclVector3.equals(newTransform.position, oldTransform.position) &&
+      DclVector3.equals(newTransform.scale, oldTransform.scale) &&
+      areQuaternionsEqual(newTransform.rotation, oldTransform.rotation)
+    )
+      return
+    // Update last selected entity transform
+    updateEntityTransform(lastEntity.entityId, newTransform)
+
+    // Update entity transform for all the selected entities
+    if (areMultipleEntitiesSelected()) {
+      for (const entityId of context.operations.getSelectedEntities()) {
+        if (entityId === lastEntity.entityId) continue
+        const entity = context.getEntityOrNull(entityId)!
+        const transform = getTransform(entity)
+        updateEntityTransform(entityId, transform)
+      }
+    }
+  }
+
+  function initTransform() {
+    if (lastEntity === null) return
+    if (areMultipleEntitiesSelected()) {
+      for (const entityId of context.operations.getSelectedEntities()) {
+        if (entityId === lastEntity.entityId) continue
+        const entity = context.getEntityOrNull(entityId)!
+        parentMapper.set(entityId, entity.parent!)
+        entity.setParent(lastEntity)
+      }
+    }
+  }
+
+  gizmoManager.gizmos.scaleGizmo?.onDragStartObservable.add(initTransform)
+  gizmoManager.gizmos.positionGizmo?.onDragStartObservable.add(initTransform)
+  gizmoManager.gizmos.rotationGizmo?.onDragStartObservable.add(initTransform)
 
   gizmoManager.gizmos.scaleGizmo?.onDragEndObservable.add(updateTransform)
   gizmoManager.gizmos.positionGizmo?.onDragEndObservable.add(updateTransform)
@@ -134,9 +199,19 @@ export function createGizmoManager(context: SceneContext) {
     return rotationGizmoAlignmentDisabled
   }
 
+  function isPositionGizmoAlignmentDisabled() {
+    return positionGizmoAlignmentDisabled
+  }
+
   function safeSetRotationGizmoWorldAligned(worldAligned: boolean) {
     if (!isRotationGizmoAlignmentDisabled()) {
       setRotationGizmoWorldAligned(worldAligned)
+    }
+  }
+
+  function safeSetPositionGizmoWorldAligned(worldAligned: boolean) {
+    if (!isPositionGizmoAlignmentDisabled()) {
+      setPositionGizmoWorldAligned(worldAligned)
     }
   }
 
@@ -192,12 +267,13 @@ export function createGizmoManager(context: SceneContext) {
     },
     setEnabled,
     setEntity(entity: EcsEntity | null) {
-      if (entity === lastEntity || !isEnabled) return
+      if (entity === lastEntity || !isEnabled || areMultipleEntitiesSelected()) return
       gizmoManager.attachToNode(entity)
       lastEntity = entity
-      // fix gizmo rotation if necessary
+      // fix gizmo rotation/position if necessary
       const transform = getTransform()
       fixRotationGizmoAlignment(transform)
+      fixPositionGizmoAlignment(transform)
       events.emit('change')
     },
     getEntity() {
@@ -216,7 +292,9 @@ export function createGizmoManager(context: SceneContext) {
       events.emit('change')
     },
     isPositionGizmoWorldAligned,
-    setPositionGizmoWorldAligned,
+    setPositionGizmoWorldAligned: safeSetPositionGizmoWorldAligned,
+    fixPositionGizmoAlignment,
+    isPositionGizmoAlignmentDisabled,
     isRotationGizmoWorldAligned,
     setRotationGizmoWorldAligned: safeSetRotationGizmoWorldAligned,
     fixRotationGizmoAlignment,

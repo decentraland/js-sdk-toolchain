@@ -7,6 +7,7 @@ import { Gizmos } from '../../lib/babylon/decentraland/gizmo-manager'
 export const useGizmoAlignment = () => {
   const gizmosRef = useRef<Gizmos | null>(null)
   const [isPositionGizmoWorldAligned, setPositionGizmoWorldAligned] = useState(false)
+  const [isPositionGizmoAlignmentDisabled, setIsPositionGizmoAlignmentDisabled] = useState(false)
   const [isRotationGizmoWorldAligned, setRotationGizmoWorldAligned] = useState(false)
   const [isRotationGizmoAlignmentDisabled, setIsRotationGizmoAlignmentDisabled] = useState(false)
 
@@ -18,6 +19,16 @@ export const useGizmoAlignment = () => {
       }
     },
     [isRotationGizmoAlignmentDisabled]
+  )
+
+  // update position gizmo alignment only if is not disabled
+  const safeSetPositionGizmoWorldAligned = useCallback(
+    (value: boolean) => {
+      if (!isPositionGizmoAlignmentDisabled) {
+        setPositionGizmoWorldAligned(value)
+      }
+    },
+    [isPositionGizmoAlignmentDisabled]
   )
 
   // sync from renderer to hook state
@@ -33,8 +44,16 @@ export const useGizmoAlignment = () => {
       if (isRotationGizmoAlignmentDisabled !== gizmos.isRotationGizmoAlignmentDisabled()) {
         setIsRotationGizmoAlignmentDisabled(gizmos.isRotationGizmoAlignmentDisabled())
       }
+      if (isPositionGizmoAlignmentDisabled !== gizmos.isPositionGizmoAlignmentDisabled()) {
+        setIsPositionGizmoAlignmentDisabled(gizmos.isPositionGizmoAlignmentDisabled())
+      }
     }
-  }, [isPositionGizmoWorldAligned, isRotationGizmoWorldAligned, isRotationGizmoAlignmentDisabled])
+  }, [
+    isPositionGizmoWorldAligned,
+    isRotationGizmoWorldAligned,
+    isRotationGizmoAlignmentDisabled,
+    isPositionGizmoAlignmentDisabled
+  ])
 
   // listen to changes in the engine, fix the rotation gizmo alignment if necessary
   useChange((event, sdk) => {
@@ -46,6 +65,7 @@ export const useGizmoAlignment = () => {
       const isDeleteOperation = event.operation === CrdtMessageType.DELETE_COMPONENT
       if (isSelectedEntity && isTransformComponent && !isDeleteOperation) {
         gizmos.fixRotationGizmoAlignment(event.value)
+        gizmos.fixPositionGizmoAlignment(event.value)
       }
     }
   }, [])
@@ -83,8 +103,9 @@ export const useGizmoAlignment = () => {
   return {
     isPositionGizmoWorldAligned,
     isRotationGizmoWorldAligned,
-    setPositionGizmoWorldAligned,
+    setPositionGizmoWorldAligned: safeSetPositionGizmoWorldAligned,
     setRotationGizmoWorldAligned: safeSetRotationGizmoWorldAligned,
-    isRotationGizmoAlignmentDisabled
+    isRotationGizmoAlignmentDisabled,
+    isPositionGizmoAlignmentDisabled
   }
 }

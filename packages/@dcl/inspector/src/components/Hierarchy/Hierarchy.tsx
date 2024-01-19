@@ -3,7 +3,7 @@ import { Entity } from '@dcl/ecs'
 import { FiHexagon } from 'react-icons/fi'
 
 import { ROOT } from '../../lib/sdk/tree'
-import { useSelectedEntity } from '../../hooks/sdk/useSelectedEntity'
+import { useEntitiesWith } from '../../hooks/sdk/useEntitiesWith'
 import { useTree } from '../../hooks/sdk/useTree'
 import { Tree } from '../Tree'
 import { ContextMenu } from './ContextMenu'
@@ -40,13 +40,13 @@ const Hierarchy: React.FC = () => {
     canReorder,
     centerViewOnEntity
   } = useTree()
-  const selectedEntity = useSelectedEntity()
+  const selectedEntities = useEntitiesWith((components) => components.Selection)
 
   const isSelected = useCallback(
     (entity: Entity) => {
-      return selectedEntity === entity
+      return selectedEntities.includes(entity)
     },
-    [selectedEntity]
+    [selectedEntities]
   )
   return (
     <div className="Hierarchy">

@@ -27,7 +27,8 @@ describe('GizmoManager', () => {
     )
     context.operations = {
       updateValue: jest.fn(),
-      dispatch: jest.fn()
+      dispatch: jest.fn(),
+      getSelectedEntities: jest.fn(() => [])
     } as unknown as Operations
   })
   describe('When creating a new gizmo manager', () => {
