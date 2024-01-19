@@ -5,7 +5,7 @@ import { ErrorType, selectSdkOperationError } from '../../../redux/sdk'
 import { Warning } from '../Warning'
 
 const mapError = {
-  [ErrorType.AncestorSelected]: 'An ancestor of this entity is already selected.'
+  [ErrorType.AncestorSelected]: "You can't select an ancestor of an already selected entity"
 }
 
 const SdkOperation: React.FC = () => {
