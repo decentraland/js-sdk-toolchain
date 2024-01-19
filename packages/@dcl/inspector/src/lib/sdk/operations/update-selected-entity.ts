@@ -1,5 +1,6 @@
 import { Entity, IEngine } from '@dcl/ecs'
-import { ErrorType } from '../../../redux/sdk'
+import { store } from '../../../redux/store'
+import { clearError, error, ErrorType } from '../../../redux/sdk'
 import { GizmoType } from '../../utils/gizmo'
 import { EditorComponentNames, EditorComponents, Node } from '../components'
 
@@ -19,10 +20,7 @@ function isAncestorOf(ancestorId: Entity, targetId: Entity, nodes: Node[]): bool
 }
 
 export function updateSelectedEntity(engine: IEngine) {
-  return function updateSelectedEntity(
-    entity: Entity,
-    multiple: boolean = false
-  ): { success: boolean; error?: ErrorType } {
+  return function updateSelectedEntity(entity: Entity, multiple: boolean = false) {
     let gizmo = GizmoType.POSITION
     let deletedSelection = false
 
@@ -34,7 +32,12 @@ export function updateSelectedEntity(engine: IEngine) {
 
     for (const [currentlySelectedEntity] of engine.getEntitiesWith(Selection)) {
       if (multiple && isAncestorOf(entity, currentlySelectedEntity, nodes as Node[])) {
-        return { success: false, error: ErrorType.AncestorSelected }
+        store.dispatch(
+          error({
+            error: ErrorType.AncestorSelected
+          })
+        )
+        return
       }
 
       if (currentlySelectedEntity !== entity) {
@@ -51,7 +54,7 @@ export function updateSelectedEntity(engine: IEngine) {
       Selection.createOrReplace(entity, { gizmo })
     }
 
-    return { success: true }
+    store.dispatch(clearError())
   }
 }
 
