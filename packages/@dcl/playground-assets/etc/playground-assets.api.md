@@ -733,6 +733,11 @@ export enum CrdtMessageType {
 // @public (undocumented)
 export type CrdtNetworkMessageBody = PutNetworkComponentMessageBody | DeleteComponentNetworkMessageBody | DeleteEntityNetworkMessageBody;
 
+// @public (undocumented)
+export function createEntityContainer(opts?: {
+    reservedStaticEntities: number;
+}): IEntityContainer;
+
 // Warning: (ae-missing-release-tag) "createEthereumProvider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -985,22 +990,6 @@ export type EntityComponents = {
 };
 
 // @public (undocumented)
-export function EntityContainer(opts?: {
-    reservedStaticEntities: number;
-}): EntityContainer;
-
-// @public (undocumented)
-export type EntityContainer = {
-    generateEntity(networked?: boolean): Entity;
-    removeEntity(entity: Entity): boolean;
-    getEntityState(entity: Entity): EntityState;
-    getExistingEntities(): Set<Entity>;
-    releaseRemovedEntities(): Entity[];
-    updateRemovedEntity(entity: Entity): boolean;
-    updateUsedEntity(entity: Entity): boolean;
-};
-
-// @public (undocumented)
 export enum EntityMappingMode {
     // (undocumented)
     EMM_DIRECT_MAPPING = 2,
@@ -1188,10 +1177,21 @@ export interface IEngine {
 // @public (undocumented)
 export interface IEngineOptions {
     // (undocumented)
-    entityContainer?: EntityContainer;
+    entityContainer?: IEntityContainer;
     // (undocumented)
     onChangeFunction: OnChangeFunction;
 }
+
+// @public (undocumented)
+export type IEntityContainer = {
+    generateEntity(networked?: boolean): Entity;
+    removeEntity(entity: Entity): boolean;
+    getEntityState(entity: Entity): EntityState;
+    getExistingEntities(): Set<Entity>;
+    releaseRemovedEntities(): Entity[];
+    updateRemovedEntity(entity: Entity): boolean;
+    updateUsedEntity(entity: Entity): boolean;
+};
 
 // Warning: (ae-missing-release-tag) "IEventNames" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

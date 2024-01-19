@@ -8,7 +8,7 @@ import { ByteBuffer } from '../serialization/ByteBuffer'
 import { crdtSceneSystem, OnChangeFunction } from '../systems/crdt'
 import { ComponentDefinition } from './component'
 import { createComponentDefinitionFromSchema } from './lww-element-set-component-definition'
-import { Entity, IEntityContainer } from './entity'
+import { Entity, createEntityContainer } from './entity'
 import { ReadonlyComponentSchema } from './readonly'
 import { SystemItem, SystemContainer, SystemFn, SYSTEMS_REGULAR_PRIORITY } from './systems'
 import type { IEngine, IEngineOptions, MapComponentDefinition, PreEngine } from './types'
@@ -23,7 +23,7 @@ export * from './types'
 export { Entity, ByteBuffer, SystemItem, OnChangeFunction }
 
 function preEngine(options?: IEngineOptions): PreEngine {
-  const entityContainer = options?.entityContainer ?? EntityContainer()
+  const entityContainer = options?.entityContainer ?? createEntityContainer()
   const componentsDefinition = new Map<number, ComponentDefinition<unknown>>()
   const systems = SystemContainer()
 

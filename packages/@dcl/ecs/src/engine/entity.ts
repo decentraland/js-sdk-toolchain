@@ -101,7 +101,7 @@ export type IEntityContainer = {
 /**
  * @public
  */
-export function EntityContainer(opts?: { reservedStaticEntities: number }): IEntityContainer {
+export function createEntityContainer(opts?: { reservedStaticEntities: number }): IEntityContainer {
   const reservedStaticEntities = opts?.reservedStaticEntities ?? RESERVED_STATIC_ENTITIES
   // Local entities counter
   let entityCounter = reservedStaticEntities
