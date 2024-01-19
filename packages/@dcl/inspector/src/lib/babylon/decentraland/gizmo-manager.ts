@@ -141,7 +141,7 @@ export function createGizmoManager(context: SceneContext) {
     updateEntityTransform(lastEntity.entityId, newTransform)
 
     // Update entity transform for all the selected entities
-    if (areMultipleEntitiesSelected() && parentMapper.size > 0) {
+    if (areMultipleEntitiesSelected()) {
       for (const entityId of context.operations.getSelectedEntities()) {
         if (entityId === lastEntity.entityId) continue
         const entity = context.getEntityOrNull(entityId)!
