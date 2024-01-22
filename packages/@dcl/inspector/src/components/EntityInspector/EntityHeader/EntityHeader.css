@@ -1,0 +1,33 @@
+.EntityHeader {
+  font-size: 16px;
+  padding-bottom: 12px;
+  font-weight: 600;
+  text-align: left;
+  border-bottom: 1px solid var(--border-gray);
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
+
+.EntityHeader > .RightContent {
+  display: flex;
+  flex-grow: 1;
+  justify-content: flex-end;
+  align-items: center;
+  font-size: 14px;
+}
+
+.EntityHeader > .RightContent > .Dropdown.Trigger > .DropdownContainer.AddComponent > .OptionList {
+  min-width: 155px;
+  white-space: nowrap;
+  right: 0;
+  left: unset;
+  max-height: max-content;
+}
+
+.EntityHeader > .RightContent > .Dropdown.Trigger > .DropdownContainer.AddComponent {
+  background-color: transparent;
+  border-color: transparent;
+}
