@@ -1,6 +1,6 @@
 import { PBMeshRenderer } from '@dcl/ecs'
 import { MeshRendererInput, MeshType } from './types'
-import { mapSelectFieldOptions } from '../SelectField/utils'
+import { mapSelectFieldOptions } from '../../ui/Dropdown/utils'
 
 export const fromMeshRenderer = (value: PBMeshRenderer): MeshRendererInput => {
   // uvs are not typed for box/plane
