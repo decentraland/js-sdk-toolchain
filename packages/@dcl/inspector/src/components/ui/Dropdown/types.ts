@@ -19,4 +19,5 @@ export type Props = React.SelectHTMLAttributes<HTMLSelectElement> & {
   info?: React.ReactNode
   multiple?: boolean
   clearable?: boolean
+  trigger?: React.ReactNode
 }

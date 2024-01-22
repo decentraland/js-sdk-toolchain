@@ -2,14 +2,20 @@ import React, { useCallback, useMemo, useState } from 'react'
 import cx from 'classnames'
 import { VscSearch as SearchIcon } from 'react-icons/vsc'
 import { TextField } from '../../TextField'
+import { InfoTooltip } from '../../InfoTooltip'
+import { Props as TooltipProps } from '../../InfoTooltip/types'
 import { Option } from '../Option'
 import { Props as OptionProp } from '../Option/types'
 import { isMultipleOptionSelected, isOptionSelected } from '../utils'
 import { Props } from './types'
 import './OptionList.css'
 
+const isTooltipText = (tooltip: string | TooltipProps | undefined | null): tooltip is string => {
+  return tooltip !== undefined && tooltip !== null && (typeof tooltip === 'string' || tooltip instanceof String)
+}
+
 const OptionList: React.FC<Props> = (props) => {
-  const { empty, minWidth, multiple, options, searchable, selectedValue, onChange } = props
+  const { empty, minWidth, multiple, options, searchable, selectedValue, isField, onChange } = props
   const [search, setSearch] = useState('')
 
   const filterOptions = useCallback(
@@ -84,6 +90,22 @@ const OptionList: React.FC<Props> = (props) => {
     }
   }, [empty, options, filteredOptions])
 
+  const renderOption = useCallback(
+    (key: React.Key, optionProps: OptionProp) => {
+      return (
+        <Option
+          key={key}
+          {...optionProps}
+          onClick={optionProps.onClick ?? handleSelectOption}
+          selected={isSelected(optionProps)}
+          isField={isField}
+          minWidth={minWidth}
+        />
+      )
+    },
+    [minWidth, isField, isSelected, handleSelectOption]
+  )
+
   return (
     <div className={cx('OptionList', { searchable })}>
       {searchable && options.length > 0 ? (
@@ -96,15 +118,18 @@ const OptionList: React.FC<Props> = (props) => {
         />
       ) : null}
       {filteredOptions.length > 0 ? (
-        filteredOptions.map((option, idx) => (
-          <Option
-            key={idx}
-            {...option}
-            onClick={handleSelectOption}
-            selected={isSelected(option)}
-            minWidth={minWidth}
-          />
-        ))
+        filteredOptions.map((option, idx) =>
+          option.tooltip ? (
+            <InfoTooltip
+              key={idx}
+              trigger={renderOption(idx, option)}
+              position="left center"
+              {...(isTooltipText(option.tooltip) ? { text: option.tooltip } : option.tooltip)}
+            />
+          ) : (
+            renderOption(idx, option)
+          )
+        )
       ) : (
         <Option className="OptionListEmpty" label={renderEmptyMessage()} disabled />
       )}
