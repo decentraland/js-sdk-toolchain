@@ -1,4 +1,10 @@
-import { Entity, IEngine, getComponentEntityTree, Transform as TransformEngine, NetworkEntity as NetworkEntityEngine } from '@dcl/ecs'
+import {
+  Entity,
+  IEngine,
+  getComponentEntityTree,
+  Transform as TransformEngine,
+  NetworkEntity as NetworkEntityEngine
+} from '@dcl/ecs'
 import { clone } from '@dcl/asset-packs'
 import { EditorComponentNames, EditorComponents } from '../components'
 import { addNode, pushChild } from '../nodes'

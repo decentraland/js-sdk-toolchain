@@ -52,7 +52,7 @@ export const EntityInspector = withSdk(({ sdk }) => {
       { name: sdk.components.NftShape.componentName, component: NftShapeInspector },
       { name: sdk.components.Animator.componentName, component: AnimatorInspector },
       { name: sdk.components.PointerEvents.componentName, component: PointerEventsInspector },
-      { name: sdk.components.SyncComponents.componentName, component: SyncComponentsInspector },
+      { name: sdk.components.SyncComponents.componentName, component: SyncComponentsInspector }
     ],
     [sdk]
   )

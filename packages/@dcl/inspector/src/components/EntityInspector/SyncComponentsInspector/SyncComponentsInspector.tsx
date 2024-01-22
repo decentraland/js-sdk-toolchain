@@ -48,7 +48,10 @@ export default withSdk<Props>(({ sdk, entity }) => {
   useEffect(() => {
     if (!hasNetworkEntity && hasSyncComponents) {
       sdk.operations.addComponent(entity, NetworkEntity.componentId)
-      sdk.operations.updateValue(NetworkEntity, entity, { entityId: sdk.enumEntity.getNextEnumEntityId(), networkId: 0  })
+      sdk.operations.updateValue(NetworkEntity, entity, {
+        entityId: sdk.enumEntity.getNextEnumEntityId(),
+        networkId: 0
+      })
       void sdk.operations.dispatch()
     }
   }, [entity, hasSyncComponents])
@@ -66,13 +69,16 @@ export default withSdk<Props>(({ sdk, entity }) => {
     })
   }, [])
 
-  const handleChange = useCallback((componentId: number) => {
-    if (componentValue.componentIds.includes(componentId)) {
-      setComponentValue({ componentIds: componentValue.componentIds.filter(($) => $ !== componentId) })
-    } else {
-      setComponentValue({ componentIds: cleanPush(componentValue.componentIds, componentId) })
-    }
-  }, [componentValue])
+  const handleChange = useCallback(
+    (componentId: number) => {
+      if (componentValue.componentIds.includes(componentId)) {
+        setComponentValue({ componentIds: componentValue.componentIds.filter(($) => $ !== componentId) })
+      } else {
+        setComponentValue({ componentIds: cleanPush(componentValue.componentIds, componentId) })
+      }
+    },
+    [componentValue]
+  )
 
   if (!hasSyncComponents || !entityComponents.length) return null
 
@@ -114,12 +120,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
       >
         <Block>
           {availableComponents.map(({ id, name }) => (
-            <CheckboxField
-              key={id}
-              label={name}
-              checked
-              disabled
-            />
+            <CheckboxField key={id} label={name} checked disabled />
           ))}
         </Block>
       </Container>

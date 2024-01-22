@@ -1,7 +1,6 @@
 import * as components from '../../components'
-import { Entity, EntityState } from '../../engine/entity'
+import { Entity } from '../../engine/entity'
 import { ComponentDefinition, IEngine } from '../../engine'
-import { NetworkParent } from '../..'
 
 function* genEntityTree<T>(entity: Entity, entities: Map<Entity, T & { parent?: Entity }>): Generator<Entity> {
   // This avoid infinite loop when there is a cyclic parenting

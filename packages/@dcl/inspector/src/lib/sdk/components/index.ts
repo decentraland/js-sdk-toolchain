@@ -188,7 +188,7 @@ export function createComponents(engine: IEngine): SdkComponents {
     Transform,
     Tween,
     VideoPlayer,
-    VisibilityComponent,
+    VisibilityComponent
   }
 }
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 
 import { isValidNumericInput, useComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
@@ -40,11 +40,6 @@ export default withSdk<Props>(({ sdk, entity }) => {
       void sdk.operations.dispatch()
     }
   }, [hasTransform])
-
-  const handleRemove = useCallback(async () => {
-    sdk.operations.removeComponent(entity, Transform)
-    await sdk.operations.dispatch()
-  }, [])
 
   const _getConfigProps = getConfigProps as LinkProps['getInputProps']
 

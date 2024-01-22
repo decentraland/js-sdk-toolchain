@@ -24,7 +24,7 @@ export const POTENTIAL_COMPONENTS: string[] = [
   CoreComponents.AUDIO_SOURCE,
   CoreComponents.AUDIO_STREAM,
   CoreComponents.VIDEO_PLAYER,
-  CoreComponents.VISIBILITY_COMPONENT,
+  CoreComponents.VISIBILITY_COMPONENT
 ]
 
 export function getComponents(entity: Entity, engine: IEngine) {
@@ -65,12 +65,17 @@ export function putComponentIds(engine: IEngine, ids: number[], component: Compo
     }
     default:
       componentIds.add(component.componentId)
-    }
+  }
 
   return Array.from(componentIds)
 }
 
-export function deleteComponentIds(engine: IEngine, entity: Entity, ids: number[], component: ComponentDefinition<any>): number[] {
+export function deleteComponentIds(
+  engine: IEngine,
+  entity: Entity,
+  ids: number[],
+  component: ComponentDefinition<any>
+): number[] {
   const componentIds = new Set(ids)
 
   switch (component.componentName) {

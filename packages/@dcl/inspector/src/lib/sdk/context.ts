@@ -31,7 +31,7 @@ export type SdkContextValue = {
   dispose(): void
   operations: ReturnType<typeof createOperations>
   gizmos: Gizmos
-  editorCamera: CameraManager,
+  editorCamera: CameraManager
   enumEntity: EnumEntity
 }
 

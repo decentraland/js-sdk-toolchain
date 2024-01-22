@@ -89,11 +89,18 @@ describe('[UNDO] Inspector<->DataLayer<->Babylon', () => {
   })
   it('should create an entity with multiple components', async () => {
     const { inspectorEngine, dataLayerEngine, rendererEngine, inspectorOperations, tick } = context
-    const entity = (cachedEntity = inspectorOperations.addAsset(0 as Entity, 'boedo/casla', 'boedo', {
-      x: 8,
-      y: 8,
-      z: 8
-    }, '', {} as any))
+    const entity = (cachedEntity = inspectorOperations.addAsset(
+      0 as Entity,
+      'boedo/casla',
+      'boedo',
+      {
+        x: 8,
+        y: 8,
+        z: 8
+      },
+      '',
+      {} as any
+    ))
     await inspectorOperations.dispatch()
     await tick()
     expect(getTransform(dataLayerEngine).get(entity).position).toMatchObject({ x: 8, y: 8, z: 8 })
