@@ -58,7 +58,7 @@
   outline: var(--input-border-color);
   border-radius: 3px;
   width: 100%;
-  color: var(--black)
+  color: var(--black);
 }
 
 .Tree .item > div > svg:only-child {
@@ -88,6 +88,37 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.Tree .item .selectable-area .action-area {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: flex-end;
+  column-gap: 4px;
+  visibility: hidden;
+}
+
+.Tree .item:hover:not(:has(input)) .selectable-area .action-area svg {
+  visibility: visible;
+}
+
+.Tree .item .selectable-area .action-area .unlock-icon > path:last-of-type,
+.Tree .item .selectable-area .action-area .visible-icon > circle,
+.Tree .item .selectable-area .action-area .visible-icon > path,
+.Tree .item .selectable-area .action-area .invisible-icon > circle,
+.Tree .item .selectable-area .action-area .invisible-icon > path {
+  color: var(--base-02);
+}
+
+.Tree .item:not(:has(input)) .selectable-area .action-area.item-locked .lock-icon,
+.Tree .item:not(:has(input)) .selectable-area .action-area.item-hidden .invisible-icon {
+  visibility: visible;
+}
+
+.Tree .item .selectable-area:has(.action-area.item-hidden),
+.Tree .item .selectable-area .action-area .invisible-icon > path {
+  color: var(--base-06);
 }
 
 .Tree .contexify svg {

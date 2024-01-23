@@ -1,9 +1,15 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { XYCoord, useDrag, useDrop } from 'react-dnd'
 import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io'
+import { IoEyeOutline as VisibleIcon, IoEyeOffOutline as InvisibleIcon } from 'react-icons/io5'
+import { MdOutlineLock as LockIcon, MdOutlineLockOpen as UnlockIcon } from 'react-icons/md'
 import cx from 'classnames'
+import { Entity } from '@dcl/ecs'
 
+import { ROOT } from '../../lib/sdk/tree'
 import { withContextMenu } from '../../hoc/withContextMenu'
+import { useSdk } from '../../hooks/sdk/useSdk'
+import { useEntityComponent } from '../../hooks/sdk/useEntityComponent'
 import { Input } from '../Input'
 import { ContextMenu } from './ContextMenu'
 import { ClickType, DropType, calculateDropType } from './utils'
@@ -80,6 +86,8 @@ export function Tree<T>() {
         getDragContext = () => ({}),
         dndType = 'tree'
       } = props
+      const sdk = useSdk()
+      const { addComponent, removeComponent } = useEntityComponent()
       const ref = useRef<HTMLDivElement>(null)
       const id = getId(value)
       const label = getLabel(value)
@@ -96,6 +104,7 @@ export function Tree<T>() {
       const [editMode, setEditMode] = useState(false)
       const [insertMode, setInsertMode] = useState(false)
       const [dropType, setDropType] = useState<DropType | EmptyString>('')
+      const [isHovered, setIsHover] = useState(false)
       // we need this ref just for the e2e tests to work since it's caching "dropType" value for some reason...
       const dropTypeRef = useRef<DropType | EmptyString>('')
       const canDrop = useCallback(
@@ -189,6 +198,53 @@ export function Tree<T>() {
         onDuplicate(value)
       }
 
+      const handleOnHover = useCallback(
+        ({ type: eventType }: React.MouseEvent<HTMLDivElement>) => {
+          if (eventType === 'mouseenter') {
+            setIsHover(true)
+          } else if (eventType === 'mouseleave') {
+            setIsHover(false)
+          }
+        },
+        [sdk, setIsHover]
+      )
+
+      const isEntity = useMemo(() => {
+        return typeof value !== 'string' && (value as Entity) !== ROOT
+      }, [value])
+
+      const isEntityLocked = useMemo(() => {
+        if (!sdk || value === ROOT) return false
+        const entity = value as Entity
+        return sdk.components.Lock.getOrNull(entity) !== null
+      }, [value, sdk])
+
+      const isEntityHidden = useMemo(() => {
+        if (!sdk || value === ROOT) return false
+        const entity = value as Entity
+        return sdk.components.Hide.getOrNull(entity) !== null
+      }, [value, sdk])
+
+      const handleToggleHideComponent = useCallback(() => {
+        if (!sdk || value === ROOT) return
+        const entity = value as Entity
+        if (isEntityHidden) {
+          removeComponent(entity, sdk.components.Hide as any)
+        } else {
+          addComponent(entity, sdk.components.Hide.componentId, { value: true })
+        }
+      }, [value, sdk, isEntityHidden])
+
+      const handleToggleLockComponent = useCallback(() => {
+        if (!sdk || value === ROOT) return
+        const entity = value as Entity
+        if (isEntityLocked) {
+          removeComponent(entity, sdk.components.Lock as any)
+        } else {
+          addComponent(entity, sdk.components.Lock.componentId, { value: true })
+        }
+      }, [sdk, isEntityLocked])
+
       drag(drop(ref))
 
       const controlsProps = {
@@ -212,13 +268,32 @@ export function Tree<T>() {
 
       return (
         <div className={treeClassNames} data-test-id={id} data-test-label={label}>
-          <div style={getLevelStyles(level)} className={cx({ selected, item: true, hidden })}>
+          <div
+            style={getLevelStyles(level)}
+            className={cx({ selected, item: true, hidden })}
+            onMouseEnter={handleOnHover}
+            onMouseLeave={handleOnHover}
+          >
             <ContextMenu {...controlsProps} />
             <div ref={ref} style={getEditModeStyles(editMode)} className="item-area">
               <DisclosureWidget enabled={enableOpen} isOpen={open} onOpen={handleOpen} />
               <div onClick={handleSelect} onContextMenu={handleSelect} className="selectable-area">
                 {props.getIcon ? props.getIcon(value) : <></>}
                 <div>{label || id}</div>
+                {isEntity && (
+                  <div className={cx('action-area', { 'item-locked': isEntityLocked, 'item-hidden': isEntityHidden })}>
+                    {isEntityLocked ? (
+                      <LockIcon className="lock-icon" size={16} onClick={handleToggleLockComponent} />
+                    ) : (
+                      <UnlockIcon className="unlock-icon" size={16} onClick={handleToggleLockComponent} />
+                    )}
+                    {isEntityHidden ? (
+                      <InvisibleIcon className="invisible-icon" size={16} onClick={handleToggleHideComponent} />
+                    ) : (
+                      <VisibleIcon className="visible-icon" size={16} onClick={handleToggleHideComponent} />
+                    )}
+                  </div>
+                )}
               </div>
             </div>
             {editMode && typeof label === 'string' && (
