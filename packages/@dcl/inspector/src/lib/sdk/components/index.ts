@@ -41,7 +41,9 @@ export enum EditorComponentNames {
   Counter = ComponentName.COUNTER,
   Triggers = ComponentName.TRIGGERS,
   States = ComponentName.STATES,
-  TransformConfig = 'inspector::TransformConfig'
+  TransformConfig = 'inspector::TransformConfig',
+  Hide = 'inspector::Hide',
+  Lock = 'inspector::Lock'
 }
 
 export type EditorComponentsTypes = {
@@ -54,6 +56,8 @@ export type EditorComponentsTypes = {
   Triggers: Triggers
   States: States
   Counter: Counter
+  Hide: { value: boolean }
+  Lock: { value: boolean }
 }
 
 export type EditorComponents = {
@@ -66,6 +70,8 @@ export type EditorComponents = {
   Counter: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Counter']>
   Triggers: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Triggers']>
   States: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['States']>
+  Hide: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Hide']>
+  Lock: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Lock']>
 }
 
 export type SdkComponents = {
@@ -156,11 +162,21 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     porportionalScaling: Schemas.Optional(Schemas.Boolean)
   })
 
+  const Hide = engine.defineComponent(EditorComponentNames.Hide, {
+    value: Schemas.Boolean
+  })
+
+  const Lock = engine.defineComponent(EditorComponentNames.Lock, {
+    value: Schemas.Boolean
+  })
+
   return {
     Selection,
     Scene,
     Nodes,
     TransformConfig,
+    Hide,
+    Lock,
     ActionTypes: ActionTypes as unknown as LastWriteWinElementSetComponentDefinition<
       EditorComponentsTypes['ActionTypes']
     >,

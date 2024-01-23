@@ -51,7 +51,7 @@ export const putEntitySelectedComponent: ComponentOperation = (entity, component
   }
 }
 
-const updateGizmoManager = (entity: EcsEntity, value: { gizmo: number } | null) => {
+export const updateGizmoManager = (entity: EcsEntity, value: { gizmo: number } | null) => {
   const context = entity.context.deref()!
   let processedSomeEntity = false
 
