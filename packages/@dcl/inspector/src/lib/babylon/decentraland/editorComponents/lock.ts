@@ -5,7 +5,7 @@ import { updateGizmoManager } from './selection'
 export const putLockComponent: ComponentOperation = (entity, component) => {
   if (component.componentType === ComponentType.LastWriteWinElementSet) {
     const context = entity.context.deref()!
-    const isLocked = component.getOrNull(entity.entityId)
+    const { value: isLocked } = (component.getOrNull(entity.entityId) as { value: boolean } | null) ?? {}
     entity.setLock(!!isLocked)
     if (isLocked) {
       context.gizmos.unsetEntity()
