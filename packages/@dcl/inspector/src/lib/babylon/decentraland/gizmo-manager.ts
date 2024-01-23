@@ -1,5 +1,5 @@
 import mitt from 'mitt'
-import { IAxisDragGizmo, PickingInfo, Quaternion, Node, Vector3 } from '@babylonjs/core'
+import { IAxisDragGizmo, PickingInfo, Quaternion, Node } from '@babylonjs/core'
 import { Entity, TransformType } from '@dcl/ecs'
 import { Vector3 as DclVector3, Quaternion as DclQuaternion } from '@dcl/ecs-math'
 import { GizmoType } from '../../utils/gizmo'

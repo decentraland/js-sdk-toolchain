@@ -28,7 +28,7 @@ const SMART_ITEM_COMPONENTS: string[] = [
   ComponentName.COUNTER
 ]
 
-export const getEnabledComponents = (blacklist = DISABLED_COMPONENTS) => {
+export const getEnabledComponents = (disabledComponents = DISABLED_COMPONENTS) => {
   const components: Set<string> = new Set(Object.values(CoreComponents))
   const config = getConfig()
 
@@ -38,7 +38,7 @@ export const getEnabledComponents = (blacklist = DISABLED_COMPONENTS) => {
     }
   }
 
-  for (const component of blacklist) {
+  for (const component of disabledComponents) {
     components.delete(component)
   }
 

@@ -18,7 +18,7 @@ export type Component = {
   potential?: boolean
 }
 
-export const ENABLED_COMPONENTS = getEnabledComponents(DISABLED_COMPONENTS)
+export const ENABLED_COMPONENTS: Set<string> = getEnabledComponents(DISABLED_COMPONENTS)
 export const POTENTIAL_COMPONENTS: string[] = [
   CoreComponents.ANIMATOR,
   CoreComponents.AUDIO_SOURCE,
@@ -27,7 +27,7 @@ export const POTENTIAL_COMPONENTS: string[] = [
   CoreComponents.VISIBILITY_COMPONENT
 ]
 
-export function getComponents(entity: Entity, engine: IEngine) {
+export function getComponents(entity: Entity, engine: IEngine): Component[][] {
   const Action = engine.getComponent(ComponentName.ACTIONS)
   const entityComponents: Component[] = []
   const availableComponents: Component[] = []

@@ -1,66 +1,160 @@
-import { PBAudioStream } from '@dcl/ecs'
+import { ComponentDefinition, Entity, IEngine } from '@dcl/ecs'
+import { ComponentName } from '@dcl/asset-packs'
 
-import {
-  fromAudioStream,
-  toAudioStream,
-  volumeFromAudioStream,
-  volumeToAudioStream,
-  isValidInput,
-  isValidVolume
-} from './utils'
+import { CoreComponents } from '../../../lib/sdk/components'
+import { getComponents, putComponentIds, deleteComponentIds, POTENTIAL_COMPONENTS } from './utils'
+import { getComponentName } from '../../Hierarchy/ContextMenu/ContextMenu'
 
-describe('AudioStreamUtils', () => {
-  describe('fromAudioStream', () => {
-    it('converts PBAudioStream to AudioStreamInput', () => {
-      const audioStream: PBAudioStream = { url: 'audio.mp3', playing: false, volume: 0.5 }
-      const result = fromAudioStream(audioStream)
-      expect(result).toEqual({ url: 'audio.mp3', playing: false, volume: '50' })
+describe('getComponents', () => {
+  it('returns sorted entity components and available components', () => {
+    const engineMock: IEngine = {
+      getComponent: jest.fn(),
+      componentsIter: jest.fn()
+    } as any as IEngine
+
+    const mockActionComponent = () => ({
+      has: jest.fn(() => true)
     })
+
+    const mockComponent = (name: string, id: number, has = () => false) => ({
+      componentName: name,
+      componentId: id,
+      has: jest.fn(has)
+    })
+
+    const componentsIterMock = [
+      mockComponent(CoreComponents.VIDEO_PLAYER, 3, () => true),
+      mockComponent(CoreComponents.ANIMATOR, 1, () => true),
+      mockComponent(CoreComponents.MESH_COLLIDER, 6),
+      mockComponent(CoreComponents.GLTF_CONTAINER, 4),
+      mockComponent(ComponentName.ACTIONS, 5),
+      mockComponent(CoreComponents.AUDIO_SOURCE, 2)
+    ]
+
+    ;(engineMock.getComponent as jest.Mock).mockImplementation(mockActionComponent)
+    ;(engineMock.componentsIter as jest.Mock).mockReturnValue(componentsIterMock)
+
+    const [entityComponents, availableComponents] = getComponents(123 as Entity, engineMock)
+
+    expect(entityComponents).toEqual([
+      {
+        name: getComponentName(CoreComponents.ANIMATOR),
+        id: 1,
+        potential: undefined
+      },
+      {
+        name: getComponentName(CoreComponents.AUDIO_SOURCE),
+        id: 2,
+        potential: true
+      },
+      {
+        name: getComponentName(CoreComponents.VIDEO_PLAYER),
+        id: 3,
+        potential: undefined
+      }
+    ])
+    expect(availableComponents).toEqual([
+      {
+        name: getComponentName(CoreComponents.GLTF_CONTAINER),
+        id: 4,
+        potential: undefined
+      },
+      {
+        name: getComponentName(CoreComponents.MESH_COLLIDER),
+        id: 6,
+        potential: undefined
+      }
+    ])
+  })
+})
+
+describe('putComponentIds', () => {
+  it('adds component ids for ACTIONS component', () => {
+    const mockComponent = (name: string, id: number) =>
+      ({
+        componentName: name,
+        componentId: id
+      } as any as ComponentDefinition<unknown>)
+
+    const componentsIterMock = POTENTIAL_COMPONENTS.map(($, id) => mockComponent($, id))
+
+    const engineMock: IEngine = {
+      getComponent: jest.fn((name: string) => {
+        return componentsIterMock.find(($) => $.componentName === name)
+      })
+    } as any as IEngine
+
+    const actionsComponent = mockComponent(ComponentName.ACTIONS, 10)
+
+    const result = putComponentIds(engineMock, [11, 12], actionsComponent)
+
+    expect(result).toEqual([11, 12, ...componentsIterMock.map(($) => $.componentId), 10])
   })
 
-  describe('toAudioStream', () => {
-    it('converts AudioStreamInput to PBAudioStream', () => {
-      const audioStreamInput = { url: 'audio.mp3', playing: false, volume: '50' }
-      const result = toAudioStream(audioStreamInput)
-      expect(result).toEqual({ url: 'audio.mp3', playing: false, volume: 0.5 })
-    })
+  it('adds component ids for other components', () => {
+    const engineMock: IEngine = {
+      getComponent: jest.fn()
+    } as any as IEngine
+
+    const mockComponent = (name: string, id: number) =>
+      ({
+        componentName: name,
+        componentId: id
+      } as any as ComponentDefinition<unknown>)
+
+    const otherComponent = mockComponent('OTHER_COMPONENT', 1)
+    ;(engineMock.getComponent as jest.Mock).mockReturnValue(otherComponent)
+
+    const result = putComponentIds(engineMock, [2, 3], otherComponent)
+
+    expect(result).toEqual([2, 3, 1])
+  })
+})
+
+describe('deleteComponentIds', () => {
+  it('deletes component ids for ACTIONS component', () => {
+    const mockComponent = (name: string, id: number, has = () => false) =>
+      ({
+        componentName: name,
+        componentId: id,
+        has: jest.fn(has)
+      } as any as ComponentDefinition<unknown>)
+
+    // component CoreComponents.ANIMATOR is potential and also is applied to the entity...
+    const componentsIterMock = POTENTIAL_COMPONENTS.map(($, id) =>
+      mockComponent($, $ === CoreComponents.ANIMATOR ? 999 : id, () => $ === CoreComponents.ANIMATOR)
+    )
+
+    const engineMock: IEngine = {
+      getComponent: jest.fn((name: string) => {
+        return componentsIterMock.find(($) => $.componentName === name)
+      })
+    } as any as IEngine
+
+    const actionsComponent = mockComponent(ComponentName.ACTIONS, 10)
+
+    const ids = [11, 12, 999, ...componentsIterMock.map(($) => $.componentId)]
+    const result = deleteComponentIds(engineMock, 123 as Entity, ids, actionsComponent)
+
+    expect(result).toEqual([11, 12, 999])
   })
 
-  describe('volumeFromAudioStream', () => {
-    it('converts volume from AudioStream to string', () => {
-      const result = volumeFromAudioStream(0.75)
-      expect(result).toBe('75')
-    })
-  })
+  it('deletes component ids for other components', () => {
+    const engineMock: IEngine = {
+      getComponent: jest.fn()
+    } as any as IEngine
 
-  describe('volumeToAudioStream', () => {
-    it('converts volume from string to AudioStream', () => {
-      const result = volumeToAudioStream('50')
-      expect(result).toBe(0.5)
-    })
-  })
+    const mockComponent = (name: string, id: number) =>
+      ({
+        componentName: name,
+        componentId: id
+      } as any as ComponentDefinition<unknown>)
 
-  describe('isValidInput', () => {
-    it('returns true for a valid input', () => {
-      const result = isValidInput('https://example.com/audio.mp3')
-      expect(result).toBe(true)
-    })
+    const otherComponent = mockComponent('OTHER_COMPONENT', 1)
+    ;(engineMock.getComponent as jest.Mock).mockReturnValue(otherComponent)
 
-    it('returns false for an invalid input', () => {
-      const result = isValidInput('invalid')
-      expect(result).toBe(false)
-    })
-  })
+    const result = deleteComponentIds(engineMock, 123 as Entity, [1, 2, 3], otherComponent)
 
-  describe('isValidVolume', () => {
-    it('returns true for a valid volume', () => {
-      const result = isValidVolume('50')
-      expect(result).toBe(true)
-    })
-
-    it('returns false for an invalid volume', () => {
-      const result = isValidVolume('invalid')
-      expect(result).toBe(false)
-    })
+    expect(result).toEqual([2, 3])
   })
 })
