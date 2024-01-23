@@ -116,7 +116,8 @@ export class EcsEntity extends BABYLON.TransformNode {
   }
 
   isHidden() {
-    return !this.isEnabled(false)
+    const container = this.gltfContainer ?? this.meshRenderer
+    return container ? !container.isEnabled(false) : false
   }
 
   isLocked() {

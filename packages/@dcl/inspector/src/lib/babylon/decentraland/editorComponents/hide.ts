@@ -3,12 +3,13 @@ import type { ComponentOperation } from '../component-operations'
 import { updateGizmoManager } from './selection'
 
 export const putHideComponent: ComponentOperation = (entity, component) => {
-  if (!entity.meshRenderer) return
+  const container = entity.gltfContainer ?? entity.meshRenderer
+  if (!container) return
 
   if (component.componentType === ComponentType.LastWriteWinElementSet) {
     const context = entity.context.deref()!
     const { value: isHidden } = (component.getOrNull(entity.entityId) as { value: boolean } | null) ?? {}
-    entity.meshRenderer.visibility = isHidden ? 0 : 1
+    container.setEnabled(!isHidden)
     if (isHidden) {
       context.gizmos.unsetEntity()
     } else {
