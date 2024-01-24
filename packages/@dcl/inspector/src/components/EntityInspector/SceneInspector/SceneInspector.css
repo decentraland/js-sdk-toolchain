@@ -68,3 +68,13 @@
   width: 32px;
   height: 32px;
 }
+
+.Container.Scene .SpawnPointContainer {
+  position: relative;
+}
+
+.Container.Scene .SpawnPointContainer .RightContent {
+  position: absolute;
+  right: 8px;
+  top: 4px;
+}

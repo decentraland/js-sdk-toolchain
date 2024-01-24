@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
 import { useCallback, useEffect, useState } from 'react'
 import { RxBorderAll } from 'react-icons/rx'
+import { VscTrash as RemoveIcon } from 'react-icons/vsc'
+import { IoIosImage } from 'react-icons/io'
 
 import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
@@ -29,12 +31,13 @@ import { CheckboxField } from '../../ui/CheckboxField'
 import { useComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { useArrayState } from '../../../hooks/useArrayState'
 import { AddButton } from '../AddButton'
+import MoreOptionsMenu from '../MoreOptionsMenu'
+import { Button } from '../../Button'
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks'
 import { getHiddenSceneInspectorTabs, getSelectedSceneInspectorTab, selectSceneInspectorTab } from '../../../redux/ui'
 import { SceneInspectorTab } from '../../../redux/ui/types'
 import { Tab } from '../Tab'
 import { transformBinaryToBase64Resource } from '../../../lib/data-layer/host/fs-utils'
-import { IoIosImage } from 'react-icons/io'
 import { selectThumbnails } from '../../../redux/app'
 
 const AGE_RATING_OPTIONS = [
@@ -148,7 +151,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
       default: true,
       position: {
         x: { $case: 'range', value: [0, 3] },
-        y: { $case: 'single', value: 0 },
+        y: { $case: 'range', value: [0, 0] },
         z: { $case: 'range', value: [0, 3] }
       },
       cameraTarget: { x: 8, y: 1, z: 8 }
@@ -185,6 +188,13 @@ export default withSdk<Props>(({ sdk, entity }) => {
       const input = fromSceneSpawnPoint(spawnPoint)
       return (
         <Block className="SpawnPointContainer" key={spawnPoint.name}>
+          <Block className="RightContent">
+            <MoreOptionsMenu>
+              <Button className="RemoveButton" onClick={() => removeSpawnPoint(index)}>
+                Delete
+              </Button>
+            </MoreOptionsMenu>
+          </Block>
           <Block label="Position">
             <TextField
               leftLabel="X"

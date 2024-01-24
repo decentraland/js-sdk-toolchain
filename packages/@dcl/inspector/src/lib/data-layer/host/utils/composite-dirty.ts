@@ -48,7 +48,7 @@ async function instanciateComposite(fs: FileSystemInterface, engine: IEngine, pa
   const mainComposite = compositeProvider.getCompositeOrNull(path)
   if (!mainComposite) throw new Error('Invalid composite')
 
-  console.log('Instanciating composite...', mainComposite)
+  console.log('Instanciating composite...')
 
   Composite.instance(engine, mainComposite, compositeProvider, {
     entityMapping: {
