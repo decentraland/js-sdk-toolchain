@@ -2,8 +2,7 @@
   "name": "@dcl/inspector",
   "version": "0.1.0",
   "dependencies": {
-    "@dcl/asset-packs": "^1.8.0",
-    "ts-deepmerge": "^6.2.0"
+    "@dcl/asset-packs": "^1.8.0"
   },
   "devDependencies": {
     "@babylonjs/core": "^6.18.0",
@@ -51,6 +50,7 @@
     "react-resizable-panels": "^0.0.48",
     "redux-saga": "^1.2.3",
     "redux-saga-test-plan": "^4.0.6",
+    "ts-deepmerge": "^7.0.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.2",
     "uuid": "^9.0.1"

@@ -26,7 +26,7 @@ export function createTempEngineContext() {
 
 type TempEngine = ReturnType<typeof createTempEngineContext>
 
-export function generateMinimalComposite({ engine, components }: TempEngine, scene?: Scene) {
+export function generateMinimalComposite({ engine, components }: TempEngine) {
   // custom component
   const cubeIdComponent = engine.defineComponent('cube-id', {})
 
@@ -46,33 +46,28 @@ export function generateMinimalComposite({ engine, components }: TempEngine, sce
   })
 
   // scene
-  components.Scene.create(
-    engine.RootEntity,
-    scene
-      ? toSceneComponent(scene)
-      : {
-          name: 'Test Scene',
-          description: 'This is a test scene',
-          thumbnail: 'assets/scene/thumbnail.png',
-          ageRating: SceneAgeRating.Teen,
-          categories: [],
-          author: '',
-          email: '',
-          tags: [],
-          layout: {
-            base: {
-              x: 0,
-              y: 0
-            },
-            parcels: [
-              {
-                x: 0,
-                y: 0
-              }
-            ]
-          }
+  components.Scene.create(engine.RootEntity, {
+    name: 'Test Scene',
+    description: 'This is a test scene',
+    thumbnail: 'assets/scene/thumbnail.png',
+    ageRating: SceneAgeRating.Teen,
+    categories: [],
+    author: '',
+    email: '',
+    tags: [],
+    layout: {
+      base: {
+        x: 0,
+        y: 0
+      },
+      parcels: [
+        {
+          x: 0,
+          y: 0
         }
-  )
+      ]
+    }
+  })
 
   const composite = dumpEngineToComposite(engine, 'json')
   return Composite.toJson(composite)
@@ -139,7 +134,7 @@ export function generateFeededComposite({ engine, components }: TempEngine, scen
   return Composite.toJson(composite)
 }
 
-export const getMinimalComposite = (scene?: Scene) => generateMinimalComposite(createTempEngineContext(), scene)
+export const getMinimalComposite = () => generateMinimalComposite(createTempEngineContext())
 
 const builderMappings: Record<string, string> = {
   'assets/scene/models/example.glb': 'bafkreibzw3d2aziiw2yhq7eoihytxthsulbihbr2ds2zegmsreaycy4h7e'

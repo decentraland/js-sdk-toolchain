@@ -2,7 +2,7 @@ import { ComponentDefinition, CompositeDefinition, DeepReadonlyObject, Entity } 
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { dataCompare } from '@dcl/ecs/dist/systems/crdt/utils'
 
-import { EditorComponentsTypes, SceneCategory } from '../../../sdk/components'
+import { EditorComponentsTypes, SceneAgeRating, SceneCategory, SceneComponent } from '../../../sdk/components'
 import { Scene } from '@dcl/schemas'
 
 export function isEqual(component: ComponentDefinition<unknown>, prevValue: unknown, newValue: unknown) {
@@ -29,15 +29,18 @@ const parseCoords = (coords: string) => {
   return { x: parseInt(x), y: parseInt(y) }
 }
 
+type SceneWithRating = Scene & { rating: SceneAgeRating }
+
 export function fromSceneComponent(value: DeepReadonlyObject<EditorComponentsTypes['Scene']>): Partial<Scene> {
   const tags: string[] = []
   for (const category of value.categories || []) {
     tags.push(category)
   }
   for (const tag of value.tags || []) {
-    if (!tags.includes(tag)) tags.push(tag)
+    const sanitizedTag = tag.trim()
+    if (sanitizedTag && !tags.includes(sanitizedTag)) tags.push(sanitizedTag)
   }
-  const scene: Partial<Scene> = {
+  const scene: Partial<SceneWithRating> = {
     display: {
       title: value.name || '',
       description: value.description || '',
@@ -64,13 +67,11 @@ export function fromSceneComponent(value: DeepReadonlyObject<EditorComponentsTyp
           cameraTarget: spawnPoint.cameraTarget
         }))
       : [],
-    featureToggles: {}
-  }
-  if (typeof value.silenceVoiceChat !== 'undefined') {
-    scene.featureToggles!.voiceChat = value.silenceVoiceChat ? 'disabled' : 'enabled'
-  }
-  if (typeof value.disablePortableExperiences !== 'undefined') {
-    scene.featureToggles!.portableExperiences = value.disablePortableExperiences ? 'disabled' : 'enabled'
+    featureToggles: {
+      voiceChat: value.silenceVoiceChat ? 'disabled' : 'enabled',
+      portableExperiences: value.disablePortableExperiences ? 'disabled' : 'enabled'
+    },
+    rating: value.ageRating
   }
 
   return scene
@@ -88,7 +89,7 @@ export function toSceneComponent(value: Scene): EditorComponentsTypes['Scene'] {
     }
   }
 
-  return {
+  const scene: SceneComponent = {
     name: value.display?.title || '',
     description: value.display?.description || '',
     thumbnail: value.display?.navmapThumbnail || '',
@@ -102,6 +103,7 @@ export function toSceneComponent(value: Scene): EditorComponentsTypes['Scene'] {
     tags,
     silenceVoiceChat: value.featureToggles?.voiceChat === 'disabled',
     disablePortableExperiences: value.featureToggles?.portableExperiences === 'disabled',
+    ageRating: (value as SceneWithRating).rating,
     spawnPoints: value.spawnPoints?.map((spawnPoint, index) => ({
       name: spawnPoint.name || `Spawn Point ${index + 1}`,
       default: spawnPoint.default,
@@ -119,4 +121,6 @@ export function toSceneComponent(value: Scene): EditorComponentsTypes['Scene'] {
       cameraTarget: spawnPoint.cameraTarget
     }))
   }
+
+  return scene
 }

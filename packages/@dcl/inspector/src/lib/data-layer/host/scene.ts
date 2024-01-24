@@ -1,4 +1,4 @@
-import merge from 'ts-deepmerge'
+import { merge } from 'ts-deepmerge'
 import { CrdtMessageType, OnChangeFunction } from '@dcl/ecs'
 import { Scene } from '@dcl/schemas'
 
@@ -53,12 +53,9 @@ export async function initSceneProvider(fs: FileSystemInterface): Promise<SceneP
   return {
     onChange(_, operation, component, componentValue) {
       if (operation === CrdtMessageType.PUT_COMPONENT && component?.componentName === EditorComponentNames.Scene) {
-        console.log('componenet', componentValue)
         const partialScene = fromSceneComponent(componentValue as EditorComponentsTypes['Scene'])
-        console.log('partialScene', partialScene)
         const merged = merge.withOptions({ mergeArrays: false }, scene, partialScene) as Scene
         scene = augmentDefaults(fs, merged)
-        console.log('Saving scene...', scene)
         fs.writeFile('scene.json', sceneToBuffer(scene)).catch((err) =>
           console.error('Failed saving scene.json: ', err)
         )

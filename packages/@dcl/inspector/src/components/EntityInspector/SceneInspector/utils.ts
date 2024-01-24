@@ -22,15 +22,10 @@ function getOffset(value: number | number[]) {
 }
 
 function toValue(value: number, offset: number): SceneSpawnPointCoord {
-  return offset
-    ? {
-        $case: 'range',
-        value: [value - offset, value + offset]
-      }
-    : {
-        $case: 'single',
-        value: value
-      }
+  return {
+    $case: 'range',
+    value: [value - offset, value + offset]
+  }
 }
 
 export function fromSceneSpawnPoint(spawnPoint: SceneSpawnPoint): SpawnPointInput {
