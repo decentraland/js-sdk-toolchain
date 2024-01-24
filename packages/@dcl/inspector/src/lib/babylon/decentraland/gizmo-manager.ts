@@ -250,6 +250,48 @@ export function createGizmoManager(context: SceneContext) {
     }
   })
 
+  // Variables for planar movement
+  let isDragging = false
+  let startingPoint: any
+
+  // Events
+  context.scene.onPointerDown = function (evt, pickResult) {
+    if (!lastEntity) return
+    if (pickResult.hit && pickResult.pickedMesh?.isDescendantOf(lastEntity)) {
+      isDragging = true
+      startingPoint = {
+        x: evt.clientX,
+        y: evt.clientY
+      }
+    }
+  }
+
+  context.scene.onPointerUp = function () {
+    isDragging = false
+    context.scene.activeCamera?.attachControl(canvas, true)
+  }
+
+  context.scene.onPointerMove = function (evt) {
+    if (isDragging && lastEntity) {
+      context.scene.activeCamera?.detachControl(canvas)
+      const deltaX = evt.clientX - startingPoint.x
+      const deltaY = evt.clientY - startingPoint.y
+
+      // Use the movement as displacement for planar movement
+      const speed = 0.075
+      const displacement = new Vector3(deltaX * speed, 0, -deltaY * speed)
+
+      // Move the clickableBox
+      lastEntity.position.addInPlace(displacement)
+
+      // Update starting point for the next frame
+      startingPoint = {
+        x: evt.clientX,
+        y: evt.clientY
+      }
+    }
+  }
+
   if (canvas) {
     canvas.addEventListener('pointerenter', () => {
       if (movingNode) {
@@ -291,7 +333,7 @@ export function createGizmoManager(context: SceneContext) {
       unsetEntity()
     },
     getGizmoTypes() {
-      return [GizmoType.POSITION, GizmoType.ROTATION, GizmoType.SCALE] as const
+      return [GizmoType.POSITION, GizmoType.ROTATION, GizmoType.SCALE, GizmoType.FREE] as const
     },
     setGizmoType(type: GizmoType) {
       gizmoManager.positionGizmoEnabled = type === GizmoType.POSITION
