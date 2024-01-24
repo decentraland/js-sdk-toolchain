@@ -59,13 +59,13 @@ export const EntityInspector = withSdk(({ sdk }) => {
   const inspectors = useMemo(
     () => [
       { name: sdk.components.GltfContainer.componentName, component: GltfInspector },
+      { name: sdk.components.Transform.componentName, component: TransformInspector },
       { name: sdk.components.VisibilityComponent.componentName, component: VisibilityComponentInspector },
       { name: sdk.components.Material.componentName, component: MaterialInspector },
       { name: sdk.components.MeshCollider.componentName, component: MeshColliderInspector },
       { name: sdk.components.MeshRenderer.componentName, component: MeshRendererInspector },
       { name: sdk.components.Scene.componentName, component: SceneInspector },
       { name: sdk.components.TextShape.componentName, component: TextShapeInspector },
-      { name: sdk.components.Transform.componentName, component: TransformInspector },
       { name: sdk.components.Actions.componentName, component: ActionInspector },
       { name: sdk.components.Triggers.componentName, component: TriggerInspector },
       { name: sdk.components.States.componentName, component: StatesInspector },

@@ -1,6 +1,7 @@
-import { Entity } from '@dcl/ecs'
+import { Entity, LastWriteWinElementSetComponentDefinition } from '@dcl/ecs'
 import { useCallback } from 'react'
 
+import { SdkContextValue } from '../../lib/sdk/context'
 import { useSdk } from './useSdk'
 
 export const useEntityComponent = () => {
@@ -26,14 +27,24 @@ export const useEntityComponent = () => {
   )
 
   const addComponent = useCallback(
-    (entity: Entity, componentId: number) => {
+    (entity: Entity, componentId: number, value?: any) => {
       if (!sdk) return
-      sdk.operations.addComponent(entity, componentId)
+      sdk.operations.addComponent(entity, componentId, value)
       sdk.operations.updateSelectedEntity(entity)
       void sdk.operations.dispatch()
     },
     [sdk]
   )
 
-  return { getComponents, addComponent }
+  const removeComponent = useCallback(
+    (entity: Entity, component: LastWriteWinElementSetComponentDefinition<SdkContextValue['components']>) => {
+      if (!sdk) return
+      sdk.operations.removeComponent(entity, component)
+      sdk.operations.updateSelectedEntity(entity)
+      void sdk.operations.dispatch()
+    },
+    [sdk]
+  )
+
+  return { getComponents, addComponent, removeComponent }
 }

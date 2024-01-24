@@ -1,11 +1,14 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { XYCoord, useDrag, useDrop } from 'react-dnd'
 import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io'
 import cx from 'classnames'
+import { Entity } from '@dcl/ecs'
 
+import { ROOT } from '../../lib/sdk/tree'
 import { withContextMenu } from '../../hoc/withContextMenu'
 import { Input } from '../Input'
 import { ContextMenu } from './ContextMenu'
+import { ActionArea } from './ActionArea'
 import { ClickType, DropType, calculateDropType } from './utils'
 
 import './Tree.css'
@@ -189,6 +192,10 @@ export function Tree<T>() {
         onDuplicate(value)
       }
 
+      const isEntity = useMemo(() => {
+        return typeof value !== 'string' && (value as Entity) !== ROOT
+      }, [value])
+
       drag(drop(ref))
 
       const controlsProps = {
@@ -219,6 +226,7 @@ export function Tree<T>() {
               <div onClick={handleSelect} onContextMenu={handleSelect} className="selectable-area">
                 {props.getIcon ? props.getIcon(value) : <></>}
                 <div>{label || id}</div>
+                {isEntity && <ActionArea entity={value as Entity} />}
               </div>
             </div>
             {editMode && typeof label === 'string' && (

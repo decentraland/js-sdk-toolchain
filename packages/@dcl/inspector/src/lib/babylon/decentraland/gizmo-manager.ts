@@ -267,7 +267,15 @@ export function createGizmoManager(context: SceneContext) {
     },
     setEnabled,
     setEntity(entity: EcsEntity | null) {
-      if (entity === lastEntity || !isEnabled || areMultipleEntitiesSelected()) return
+      if (
+        entity === lastEntity ||
+        !isEnabled ||
+        areMultipleEntitiesSelected() ||
+        entity?.isHidden() ||
+        entity?.isLocked()
+      ) {
+        return
+      }
       gizmoManager.attachToNode(entity)
       lastEntity = entity
       // fix gizmo rotation/position if necessary

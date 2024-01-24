@@ -58,7 +58,7 @@
   outline: var(--input-border-color);
   border-radius: 3px;
   width: 100%;
-  color: var(--black)
+  color: var(--black);
 }
 
 .Tree .item > div > svg:only-child {

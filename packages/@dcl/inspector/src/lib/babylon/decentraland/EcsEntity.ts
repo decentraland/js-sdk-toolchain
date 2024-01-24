@@ -32,6 +32,7 @@ export class EcsEntity extends BABYLON.TransformNode {
   material?: BABYLON.StandardMaterial | BABYLON.PBRMaterial
   #gltfPathLoading?: IFuture<string>
   #gltfAssetContainerLoading: IFuture<BABYLON.AssetContainer> = future()
+  #isLocked?: boolean = false
 
   ecsComponentValues: EcsComponents = {}
 
@@ -112,6 +113,19 @@ export class EcsEntity extends BABYLON.TransformNode {
   setGltfAssetContainer(gltfAssetContainer: BABYLON.AssetContainer) {
     this.gltfAssetContainer = gltfAssetContainer
     this.#gltfAssetContainerLoading.resolve(gltfAssetContainer)
+  }
+
+  isHidden() {
+    const container = this.gltfContainer ?? this.meshRenderer
+    return container ? !container.isEnabled(false) : false
+  }
+
+  isLocked() {
+    return this.#isLocked
+  }
+
+  setLock(lock: boolean) {
+    this.#isLocked = lock
   }
 }
 
