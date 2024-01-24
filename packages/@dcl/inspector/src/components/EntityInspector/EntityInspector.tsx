@@ -57,7 +57,7 @@ export const EntityInspector = withSdk(({ sdk }) => {
 
   return (
     <div className="EntityInspector" key={entity}>
-      <EntityHeader />
+      {entity !== null && <EntityHeader entity={entity} />}
       {inspectors.map(
         ({ name, component: Inspector }, index) =>
           entity !== null && !hiddenComponents[name] && <Inspector key={index} entity={entity} />

@@ -3,10 +3,10 @@ import { AiOutlinePlus as AddIcon } from 'react-icons/ai'
 import { VscTrash as RemoveIcon } from 'react-icons/vsc'
 import { Entity } from '@dcl/ecs'
 
-import { withSdk } from '../../../hoc/withSdk'
+import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { useChange } from '../../../hooks/sdk/useChange'
 import { useEntityComponent } from '../../../hooks/sdk/useEntityComponent'
-import { useSelectedEntity } from '../../../hooks/sdk/useSelectedEntity'
+import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { ROOT } from '../../../lib/sdk/tree'
 import { getAssetByModel } from '../../../lib/logic/catalog'
 import { analytics, Event } from '../../../lib/logic/analytics'
@@ -19,10 +19,9 @@ import MoreOptionsMenu from '../MoreOptionsMenu'
 
 import './EntityHeader.css'
 
-const getLabel = (sdk: SdkContextValue, entity: Entity | null) => {
-  if (entity === null) return null
+const getLabel = (sdk: SdkContextValue, entity: Entity) => {
   const nameComponent = sdk.components.Name.getOrNull(entity)
-  return entity === 0
+  return entity === ROOT
     ? 'Scene'
     : nameComponent && nameComponent.value.length > 0
     ? nameComponent.value
@@ -30,8 +29,7 @@ const getLabel = (sdk: SdkContextValue, entity: Entity | null) => {
 }
 
 export default React.memo(
-  withSdk(({ sdk }) => {
-    const entity = useSelectedEntity()
+  withSdk<WithSdkProps & { entity: Entity }>(({ sdk, entity }) => {
     const { addComponent } = useEntityComponent()
     const [label, setLabel] = useState<string | null>()
 
@@ -47,20 +45,34 @@ export default React.memo(
 
     useChange(handleUpdate, [entity])
 
+    const hasGltfContainer = useHasComponent(entity, sdk.components.GltfContainer)
+    const hasMeshCollider = useHasComponent(entity, sdk.components.MeshCollider)
+
     const handleAddComponent = useCallback(
       (component: Component) => {
-        if (entity) {
-          addComponent(entity, component.componentId)
-          const { src: gltfSrc } = sdk.components.GltfContainer.getOrNull(entity) ?? { src: '' }
-          const asset = getAssetByModel(gltfSrc)
-          analytics.track(Event.ADD_COMPONENT, {
-            componentName: component.componentName,
-            itemId: asset?.id,
-            itemPath: gltfSrc
-          })
-        }
+        addComponent(entity, component.componentId)
+        const { src: gltfSrc } = sdk.components.GltfContainer.getOrNull(entity) ?? { src: '' }
+        const asset = getAssetByModel(gltfSrc)
+        analytics.track(Event.ADD_COMPONENT, {
+          componentName: component.componentName,
+          itemId: asset?.id,
+          itemPath: gltfSrc
+        })
       },
       [entity]
+    )
+
+    const isComponentDisabled = useCallback(
+      (component: string) => {
+        switch (component) {
+          case 'Visibility': {
+            return !hasGltfContainer && !hasMeshCollider
+          }
+          default:
+            return false
+        }
+      },
+      [entity, hasGltfContainer, hasMeshCollider]
     )
 
     const componentOptions = useMemo(() => {
@@ -85,8 +97,19 @@ export default React.memo(
           value: 'Visibility',
           onClick: () => handleAddComponent(sdk.components.VisibilityComponent),
           tooltip: {
-            text: 'Visibility controls whether an object is visible or not to the player. Items marked as invisible are shown on the editor, but not to players running the scene'
-          }
+            text: (
+              <span>
+                Visibility controls whether an object is visible or not to the player. Items marked as invisible are
+                shown on the editor, but not to players running the scene.
+                {isComponentDisabled('Visibility') && (
+                  <p style={{ color: 'var(--secondary-dark)' }}>
+                    You must have either a GLTF Container or a Mesh Collider component to use this component.
+                  </p>
+                )}
+              </span>
+            )
+          },
+          disabled: isComponentDisabled('Visibility')
         },
         {
           value: 'Mesh Renderer',
@@ -154,10 +177,9 @@ export default React.memo(
           }
         }
       ]
-    }, [sdk, handleAddComponent])
+    }, [sdk, isComponentDisabled, handleAddComponent])
 
     const handleRemoveEntity = useCallback(async () => {
-      if (entity === null || entity === ROOT) return
       sdk.operations.removeEntity(entity)
       await sdk.operations.dispatch()
     }, [entity, sdk])
@@ -165,14 +187,16 @@ export default React.memo(
     return (
       <div className="EntityHeader">
         {label}
-        <div className="RightContent">
-          <Dropdown className="AddComponent" options={componentOptions} trigger={<AddIcon />} />
-          <MoreOptionsMenu>
-            <Button className="RemoveButton" onClick={handleRemoveEntity}>
-              <RemoveIcon /> Delete Entity
-            </Button>
-          </MoreOptionsMenu>
-        </div>
+        {entity !== ROOT && (
+          <div className="RightContent">
+            <Dropdown className="AddComponent" options={componentOptions} trigger={<AddIcon />} />
+            <MoreOptionsMenu>
+              <Button className="RemoveButton" onClick={handleRemoveEntity}>
+                <RemoveIcon /> Delete Entity
+              </Button>
+            </MoreOptionsMenu>
+          </div>
+        )}
       </div>
     )
   })
