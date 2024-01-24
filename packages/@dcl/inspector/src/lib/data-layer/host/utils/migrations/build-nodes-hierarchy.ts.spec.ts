@@ -1,6 +1,6 @@
 import {
   createTempEngineContext,
-  generateMainComposite,
+  generateFeededComposite,
   generateMinimalComposite
 } from '../../../client/feeded-local-fs'
 import { buildNodesHierarchy } from './build-nodes-hierarchy'
@@ -11,7 +11,7 @@ describe('Migration: Build Node component hierarchy', () => {
     engineCtx = createTempEngineContext()
   })
   it('should build same hierarchy as in main composite', () => {
-    generateMainComposite(engineCtx) // create entities & components
+    generateFeededComposite(engineCtx) // create entities & components
 
     const { engine, components } = engineCtx
 

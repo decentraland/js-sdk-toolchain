@@ -34,7 +34,7 @@ export enum CoreComponents {
 
 export enum EditorComponentNames {
   Selection = 'inspector::Selection',
-  Scene = 'inspector::Scene',
+  Scene = 'inspector::SceneMetadata',
   Nodes = 'inspector::Nodes',
   ActionTypes = ComponentName.ACTION_TYPES,
   Actions = ComponentName.ACTIONS,
@@ -51,13 +51,15 @@ export enum SceneAgeRating {
   Adult = 'A'
 }
 
+export type SceneSpawnPointCoord = { $case: 'single'; value: number } | { $case: 'range'; value: number[] }
+
 export type SceneSpawnPoint = {
   name: string
   default?: boolean
   position: {
-    x: number | [number, number]
-    y: number | [number, number]
-    z: number | [number, number]
+    x: SceneSpawnPointCoord
+    y: SceneSpawnPointCoord
+    z: SceneSpawnPointCoord
   }
   cameraTarget?: {
     x: number
@@ -71,7 +73,8 @@ export type SceneComponent = {
   description?: string
   thumbnail?: string
   ageRating?: SceneAgeRating
-  categories?: SceneCategories[]
+  main?: string
+  categories?: SceneCategory[]
   author?: string
   email?: string
   tags?: string[]
@@ -81,7 +84,7 @@ export type SceneComponent = {
   spawnPoints?: SceneSpawnPoint[]
 }
 
-export enum SceneCategories {
+export enum SceneCategory {
   ART = 'art',
   GAME = 'game',
   CASINO = 'casino',
@@ -194,14 +197,45 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     description: Schemas.Optional(Schemas.String),
     thumbnail: Schemas.Optional(Schemas.String),
     ageRating: Schemas.Optional(Schemas.EnumString(SceneAgeRating, SceneAgeRating.Teen)),
-    categories: Schemas.Optional(Schemas.Array(Schemas.EnumString(SceneCategories, SceneCategories.GAME))),
+    categories: Schemas.Optional(Schemas.Array(Schemas.EnumString(SceneCategory, SceneCategory.GAME))),
     author: Schemas.Optional(Schemas.String),
     email: Schemas.Optional(Schemas.String),
     tags: Schemas.Optional(Schemas.Array(Schemas.String)),
     layout: Schemas.Map({
       base: Coords,
       parcels: Schemas.Array(Coords)
-    })
+    }),
+    silenceVoiceChat: Schemas.Optional(Schemas.Boolean),
+    disablePortableExperiences: Schemas.Optional(Schemas.Boolean),
+    spawnPoints: Schemas.Optional(
+      Schemas.Array(
+        Schemas.Map({
+          name: Schemas.String,
+          default: Schemas.Optional(Schemas.Boolean),
+          position: Schemas.Map({
+            x: Schemas.OneOf({
+              single: Schemas.Int,
+              range: Schemas.Array(Schemas.Int)
+            }),
+            y: Schemas.OneOf({
+              single: Schemas.Int,
+              range: Schemas.Array(Schemas.Int)
+            }),
+            z: Schemas.OneOf({
+              single: Schemas.Int,
+              range: Schemas.Array(Schemas.Int)
+            })
+          }),
+          cameraTarget: Schemas.Optional(
+            Schemas.Map({
+              x: Schemas.Int,
+              y: Schemas.Int,
+              z: Schemas.Int
+            })
+          )
+        })
+      )
+    )
   })
 
   const Nodes = engine.defineComponent(EditorComponentNames.Nodes, {

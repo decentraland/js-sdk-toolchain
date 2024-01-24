@@ -1,4 +1,4 @@
-import { EditorComponentsTypes, SceneAgeRating, SceneCategories } from '../../../lib/sdk/components'
+import { EditorComponentsTypes, SceneAgeRating, SceneCategory } from '../../../lib/sdk/components'
 import { Coords, Layout } from '../../../lib/utils/layout'
 import { SceneInput } from './types'
 import { fromScene, getCoordinatesBetweenPoints, getInputValidation, parseParcels, toScene, toSceneAuto } from './utils'
@@ -29,7 +29,7 @@ function getScene(layout: Layout): EditorComponentsTypes['Scene'] {
     description: 'description',
     thumbnail: 'assets/scene/thumbnail.png',
     ageRating: SceneAgeRating.Teen,
-    categories: [SceneCategories.GAME],
+    categories: [SceneCategory.GAME],
     tags: ['tag1', 'tag2'],
     silenceVoiceChat: false,
     disablePortableExperiences: false,

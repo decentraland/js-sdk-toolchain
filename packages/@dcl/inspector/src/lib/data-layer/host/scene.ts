@@ -1,8 +1,9 @@
+import merge from 'ts-deepmerge'
 import { CrdtMessageType, OnChangeFunction } from '@dcl/ecs'
 import { Scene } from '@dcl/schemas'
 
 import { FileSystemInterface } from '../types'
-import { parseSceneFromComponent } from './utils/component'
+import { fromSceneComponent } from './utils/component'
 import { EditorComponentNames, EditorComponentsTypes } from '../../sdk/components'
 
 type SceneWithDefaults = Scene & {
@@ -16,19 +17,12 @@ export interface SceneProvider {
   getScene: () => SceneWithDefaults
 }
 
-function bufferToScene(sceneBuffer: Buffer): Scene {
+export function bufferToScene(sceneBuffer: Buffer): Scene {
   return JSON.parse(new TextDecoder().decode(sceneBuffer))
 }
 
-function sceneToBuffer(scene: Scene): Buffer {
+export function sceneToBuffer(scene: Scene): Buffer {
   return Buffer.from(JSON.stringify(scene, null, 2), 'utf-8')
-}
-
-function updateScene(scene: Scene, value: EditorComponentsTypes['Scene']): Scene {
-  return {
-    ...scene,
-    ...parseSceneFromComponent(value)
-  }
 }
 
 async function getScene(fs: FileSystemInterface): Promise<SceneWithDefaults> {
@@ -59,8 +53,12 @@ export async function initSceneProvider(fs: FileSystemInterface): Promise<SceneP
   return {
     onChange(_, operation, component, componentValue) {
       if (operation === CrdtMessageType.PUT_COMPONENT && component?.componentName === EditorComponentNames.Scene) {
-        const updatedScene = updateScene(scene, componentValue as EditorComponentsTypes['Scene'])
-        scene = augmentDefaults(fs, updatedScene)
+        console.log('componenet', componentValue)
+        const partialScene = fromSceneComponent(componentValue as EditorComponentsTypes['Scene'])
+        console.log('partialScene', partialScene)
+        const merged = merge.withOptions({ mergeArrays: false }, scene, partialScene) as Scene
+        scene = augmentDefaults(fs, merged)
+        console.log('Saving scene...', scene)
         fs.writeFile('scene.json', sceneToBuffer(scene)).catch((err) =>
           console.error('Failed saving scene.json: ', err)
         )

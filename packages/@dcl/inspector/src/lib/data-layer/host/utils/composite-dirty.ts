@@ -16,6 +16,7 @@ import { getMinimalComposite } from '../../client/feeded-local-fs'
 import { InspectorPreferences } from '../../../logic/preferences/types'
 import { buildNodesHierarchyIfNotExists } from '../utils/migrations/build-nodes-hierarchy'
 import { removeLegacyEntityNodeComponents } from '../utils/migrations/legacy-entity-node'
+import { bufferToScene } from '../scene'
 
 enum DirtyEnum {
   // No changes
@@ -36,12 +37,23 @@ function runMigrations(engine: IEngine) {
 
 async function instanciateComposite(fs: FileSystemInterface, engine: IEngine, path: string): Promise<CompositeManager> {
   if (!(await fs.existFile(path))) {
-    await fs.writeFile(path, Buffer.from(JSON.stringify(getMinimalComposite(), null, 2), 'utf-8'))
+    console.log('Main composite does not exists!')
+    if (await fs.existFile('scene.json')) {
+      const sceneJsonBuffer = await fs.readFile('scene.json')
+      const sceneJson = bufferToScene(sceneJsonBuffer)
+      await fs.writeFile(path, Buffer.from(JSON.stringify(getMinimalComposite(sceneJson), null, 2), 'utf-8'))
+    } else {
+      await fs.writeFile(path, Buffer.from(JSON.stringify(getMinimalComposite(), null, 2), 'utf-8'))
+    }
+  } else {
+    console.log('Main composite exists!')
   }
 
   const compositeProvider = await createFsCompositeProvider(fs)
   const mainComposite = compositeProvider.getCompositeOrNull(path)
   if (!mainComposite) throw new Error('Invalid composite')
+
+  console.log('Instanciating composite...', mainComposite)
 
   Composite.instance(engine, mainComposite, compositeProvider, {
     entityMapping: {

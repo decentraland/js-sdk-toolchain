@@ -1,26 +1,40 @@
 import { areConnected } from '@dcl/ecs'
 import { SceneInput, SpawnPointInput } from './types'
-import { EditorComponentsTypes, SceneAgeRating, SceneCategories, SceneSpawnPoint } from '../../../lib/sdk/components'
+import {
+  EditorComponentsTypes,
+  SceneAgeRating,
+  SceneCategory,
+  SceneSpawnPoint,
+  SceneSpawnPointCoord
+} from '../../../lib/sdk/components'
 import { Coords } from '../../../lib/utils/layout'
 import { TreeNode } from '../../ProjectAssetExplorer/ProjectView'
 import { AssetNodeItem } from '../../ProjectAssetExplorer/types'
 import { isAssetNode } from '../../ProjectAssetExplorer/utils'
 import { ACCEPTED_FILE_TYPES } from '../../ui/FileUploadField/types'
 
-function getValue(value: number | [number, number]) {
-  return Array.isArray(value) ? (value[0] + value[1]) / 2 : value
+function getValue(coord: SceneSpawnPointCoord) {
+  return coord.$case === 'range' ? (coord.value[0] + coord.value[1]) / 2 : coord.value
 }
 
-function getOffset(value: number | [number, number]) {
+function getOffset(value: number | number[]) {
   return Array.isArray(value) ? (value[1] - value[0]) / 2 : 0
 }
 
-function toValue(value: number, offset: number): number | [number, number] {
-  return offset ? [value - offset, value + offset] : value
+function toValue(value: number, offset: number): SceneSpawnPointCoord {
+  return offset
+    ? {
+        $case: 'range',
+        value: [value - offset, value + offset]
+      }
+    : {
+        $case: 'single',
+        value: value
+      }
 }
 
 export function fromSceneSpawnPoint(spawnPoint: SceneSpawnPoint): SpawnPointInput {
-  const axes = [spawnPoint.position.x, spawnPoint.position.y, spawnPoint.position.z]
+  const axes = [spawnPoint.position.x.value, spawnPoint.position.y.value, spawnPoint.position.z.value]
   const randomOffset = axes.some(Array.isArray)
   return {
     position: {
@@ -44,7 +58,7 @@ export function toSceneSpawnPoint(name: string, spawnPointInput: SpawnPointInput
     default: true,
     position: {
       x: toValue(spawnPointInput.position.x, spawnPointInput.maxOffset),
-      y: spawnPointInput.position.y,
+      y: toValue(spawnPointInput.position.y, 0),
       z: toValue(spawnPointInput.position.z, spawnPointInput.maxOffset)
     },
     cameraTarget: spawnPointInput.cameraTarget
@@ -93,7 +107,7 @@ export function toScene(inputs: SceneInput): EditorComponentsTypes['Scene'] {
     description: inputs.description,
     thumbnail: inputs.thumbnail,
     ageRating: inputs.ageRating as SceneAgeRating,
-    categories: inputs.categories as SceneCategories[],
+    categories: inputs.categories as SceneCategory[],
     tags: inputs.tags.split(',').map((tag) => tag.trim()),
     author: inputs.author,
     email: inputs.email,

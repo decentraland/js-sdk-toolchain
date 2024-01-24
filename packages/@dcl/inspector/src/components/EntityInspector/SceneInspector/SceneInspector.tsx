@@ -22,7 +22,7 @@ import {
 } from './utils'
 
 import './SceneInspector.css'
-import { EditorComponentsTypes, SceneAgeRating, SceneCategories, SceneSpawnPoint } from '../../../lib/sdk/components'
+import { EditorComponentsTypes, SceneAgeRating, SceneCategory, SceneSpawnPoint } from '../../../lib/sdk/components'
 import { Dropdown } from '../../ui/Dropdown'
 import { Tabs } from '../Tabs'
 import { CheckboxField } from '../../ui/CheckboxField'
@@ -50,47 +50,47 @@ const AGE_RATING_OPTIONS = [
 
 const CATEGORIES_OPTIONS = [
   {
-    value: SceneCategories.ART,
+    value: SceneCategory.ART,
     label: '🎨 Art'
   },
   {
-    value: SceneCategories.GAME,
+    value: SceneCategory.GAME,
     label: '🕹️ Game'
   },
   {
-    value: SceneCategories.CASINO,
+    value: SceneCategory.CASINO,
     label: '🃏 Casino'
   },
   {
-    value: SceneCategories.SOCIAL,
+    value: SceneCategory.SOCIAL,
     label: '👥 Social'
   },
   {
-    value: SceneCategories.MUSIC,
+    value: SceneCategory.MUSIC,
     label: '🎶 Music'
   },
   {
-    value: SceneCategories.FASHION,
+    value: SceneCategory.FASHION,
     label: '👠 Fashion'
   },
   {
-    value: SceneCategories.CRYPTO,
+    value: SceneCategory.CRYPTO,
     label: '🪙 Crypto'
   },
   {
-    value: SceneCategories.EDUCATION,
+    value: SceneCategory.EDUCATION,
     label: '📚 Education'
   },
   {
-    value: SceneCategories.SHOP,
+    value: SceneCategory.SHOP,
     label: '🛍️ Shop'
   },
   {
-    value: SceneCategories.BUSINESS,
+    value: SceneCategory.BUSINESS,
     label: '🏢 Business'
   },
   {
-    value: SceneCategories.SPORTS,
+    value: SceneCategory.SPORTS,
     label: '🏅 Sports'
   }
 ]
@@ -146,7 +146,11 @@ export default withSdk<Props>(({ sdk, entity }) => {
     addSpawnPoint({
       name: `Spawn Point ${spawnPoints.length + 1}`,
       default: true,
-      position: { x: [0, 3], y: 0, z: [0, 3] },
+      position: {
+        x: { $case: 'range', value: [0, 3] },
+        y: { $case: 'single', value: 0 },
+        z: { $case: 'range', value: [0, 3] }
+      },
       cameraTarget: { x: 8, y: 1, z: 8 }
     })
   }, [spawnPoints, addSpawnPoint])
