@@ -97,14 +97,15 @@ export default React.memo(
           value: 'Visibility',
           onClick: () => handleAddComponent(sdk.components.VisibilityComponent),
           tooltip: {
+            className: 'EntityHeader',
             text: (
-              <span>
+              <span className="VisibilityComponentTooltip">
                 Visibility controls whether an object is visible or not to the player. Items marked as invisible are
                 shown on the editor, but not to players running the scene.
                 {isComponentDisabled('Visibility') && (
-                  <p style={{ color: 'var(--secondary-dark)' }}>
+                  <span className="ErrorMessage">
                     You must have either a GLTF Container or a Mesh Collider component to use this component.
-                  </p>
+                  </span>
                 )}
               </span>
             )

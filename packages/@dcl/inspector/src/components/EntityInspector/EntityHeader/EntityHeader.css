@@ -31,3 +31,13 @@
   background-color: transparent;
   border-color: transparent;
 }
+
+.InfoTooltip > .VisibilityComponentTooltip {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.InfoTooltip > .VisibilityComponentTooltip > .ErrorMessage {
+  color: var(--warning-main);
+}
