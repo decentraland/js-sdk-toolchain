@@ -11,7 +11,13 @@ import { createComponentDefinitionFromSchema } from './lww-element-set-component
 import { Entity, createEntityContainer } from './entity'
 import { ReadonlyComponentSchema } from './readonly'
 import { SystemItem, SystemContainer, SystemFn, SYSTEMS_REGULAR_PRIORITY } from './systems'
-import type { IEngine, IEngineOptions, MapComponentDefinition, PreEngine } from './types'
+import type {
+  IEngine,
+  IEngineOptions,
+  LastWriteWinElementSetComponentDefinition,
+  MapComponentDefinition,
+  PreEngine
+} from './types'
 import {
   createValueSetComponentDefinitionFromSchema,
   ValueSetOptions
@@ -43,8 +49,9 @@ function preEngine(options?: IEngineOptions): PreEngine {
   }
   function removeEntity(entity: Entity) {
     for (const [, component] of componentsDefinition) {
-      // TODO: hack for the moment. It should be enough to delete the entity, but the renderer is not cleaning the components.
-      // So we still need the NetworkEntity to forward this message to the SyncTransport.
+      // TODO: hack for the moment.
+      // We still need the NetworkEntity to forward this message to the SyncTransport.
+      // If we remove it then we can't notify the other users which entity was deleted.
       if (component.componentName === 'core-schema::Network-Entity') continue
       component.entityDeleted(entity, true)
     }
@@ -95,7 +102,11 @@ function preEngine(options?: IEngineOptions): PreEngine {
     }
     /* istanbul ignore next */
     if (sealed) throw new Error('Engine is already sealed. No components can be added at this stage')
-    const newComponent = createComponentDefinitionFromSchema<T>(componentName, componentId, schema)
+    const newComponent: LastWriteWinElementSetComponentDefinition<T> = createComponentDefinitionFromSchema<T>(
+      componentName,
+      componentId,
+      schema
+    )
     componentsDefinition.set(componentId, newComponent)
     return newComponent as components.LastWriteWinElementSetComponentDefinition<T>
   }
@@ -178,8 +189,8 @@ function preEngine(options?: IEngineOptions): PreEngine {
   }
 
   function getEntityOrNullByName(value: string) {
-    const LabelComponent = components.Name({ defineComponent })
-    for (const [entity, name] of getEntitiesWith(LabelComponent)) {
+    const NameComponent = components.Name({ defineComponent })
+    for (const [entity, name] of getEntitiesWith(NameComponent)) {
       if (name.value === value) return entity
     }
     return null
@@ -254,7 +265,14 @@ function preEngine(options?: IEngineOptions): PreEngine {
  */
 export function Engine(options?: IEngineOptions): IEngine {
   const partialEngine = preEngine(options)
-  const crdtSystem = crdtSceneSystem(partialEngine, options?.onChangeFunction || null)
+  const onChangeFunction: OnChangeFunction = (entity, operation, component, componentValue) => {
+    const onChange = component?.onchangeCallbacks(entity)
+    if (onChange) {
+      onChange(componentValue)
+    }
+    return options?.onChangeFunction(entity, operation, component, componentValue)
+  }
+  const crdtSystem = crdtSceneSystem(partialEngine, onChangeFunction)
 
   async function update(dt: number) {
     await crdtSystem.receiveMessages()

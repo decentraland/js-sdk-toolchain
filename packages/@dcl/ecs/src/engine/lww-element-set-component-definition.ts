@@ -223,6 +223,7 @@ export function createComponentDefinitionFromSchema<T>(
   const data = new Map<Entity, T>()
   const dirtyIterator = new Set<Entity>()
   const timestamps = new Map<Entity, number>()
+  const onChangeCallbacks = new Map<Entity, (data: T | undefined) => void>()
 
   return {
     get componentId() {
@@ -316,6 +317,12 @@ export function createComponentDefinitionFromSchema<T>(
     },
     getCrdtUpdates: createGetCrdtMessagesForLww(componentId, timestamps, dirtyIterator, schema, data),
     updateFromCrdt: createUpdateLwwFromCrdt(componentId, timestamps, schema, data),
-    dumpCrdtStateToBuffer: createDumpLwwFunctionFromCrdt(componentId, timestamps, schema, data)
+    dumpCrdtStateToBuffer: createDumpLwwFunctionFromCrdt(componentId, timestamps, schema, data),
+    onChange(entity, cb) {
+      onChangeCallbacks.set(entity, cb)
+    },
+    onchangeCallbacks(entity) {
+      return onChangeCallbacks.get(entity)
+    }
   }
 }

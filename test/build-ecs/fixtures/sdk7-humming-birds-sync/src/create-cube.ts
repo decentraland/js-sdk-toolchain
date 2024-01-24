@@ -12,7 +12,7 @@ import {
   TextShape,
   AvatarAttach,
   Schemas,
-  ColliderLayer
+  ColliderLayer,
 } from '@dcl/ecs'
 import { Color4 } from '@dcl/sdk/math'
 import { parentEntity, syncEntity, getFirstChild, getParent, myProfile } from '@dcl/sdk/network'
@@ -39,6 +39,11 @@ export function createCube(x: number, y: number, z: number, sync: boolean = true
   Cube.create(entity)
 
   Transform.create(entity, { position: { x, y, z } })
+
+  Material.onChange(entity, (value) => {
+    console.log('[Material has changed]', { entity, value })
+  })
+
   // set how the cube looks and collides
   MeshRenderer.setBox(entity)
   MeshCollider.setBox(entity)

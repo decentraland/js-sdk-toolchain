@@ -92,6 +92,18 @@ export interface BaseComponent<T> {
    * @internal
    */
   dirtyIterator(): Iterable<Entity>
+  /**
+   *
+   * @internal
+   */
+  onchangeCallbacks(entity: Entity): ((value: any) => void) | undefined
+
+  /**
+   * @public
+   * Triggers the callback if the entity has changed on the last tick.
+   * If the value is undefined, the component was deleted.
+   */
+  onChange(entity: Entity, cb: (value: T | undefined) => void): void
 }
 
 /**

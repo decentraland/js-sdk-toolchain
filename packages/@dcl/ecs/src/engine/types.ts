@@ -9,7 +9,7 @@ import {
 } from './component'
 import { Entity, IEntityContainer, EntityState } from './entity'
 import { ValueSetOptions } from './grow-only-value-set-component-definition'
-import { ReadonlyComponentSchema } from './readonly'
+import { DeepReadonly, ReadonlyComponentSchema } from './readonly'
 import { SystemFn, SystemItem } from './systems'
 export * from './component'
 export { ValueSetOptions }
