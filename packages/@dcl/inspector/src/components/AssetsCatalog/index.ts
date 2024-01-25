@@ -1,2 +1,2 @@
-import { AssetsCatalog } from './AssetsCatalog'
+import AssetsCatalog from './AssetsCatalog'
 export { AssetsCatalog }
