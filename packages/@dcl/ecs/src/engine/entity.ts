@@ -139,7 +139,6 @@ export function createEntityContainer(opts?: { reservedStaticEntities: number })
 
     for (const [number, version] of removedEntities.getMap()) {
       if (version < MAX_U16) {
-        if (number >= MAX_ENTITY_NUMBER) continue
         const entity = EntityUtils.toEntityId(number, version + 1)
         // If the entity is not being used, we can re-use it
         // If the entity was removed in this tick, we're not counting for the usedEntities, but we have it in the toRemoveEntityArray

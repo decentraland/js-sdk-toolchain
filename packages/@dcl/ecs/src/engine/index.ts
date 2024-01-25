@@ -23,6 +23,7 @@ import {
   ValueSetOptions
 } from './grow-only-value-set-component-definition'
 import { removeEntityWithChildren as removeEntityWithChildrenEngine } from '../runtime/helpers/tree'
+import { CrdtMessageType } from '../serialization/crdt'
 export * from './input'
 export * from './readonly'
 export * from './types'
@@ -266,9 +267,18 @@ function preEngine(options?: IEngineOptions): PreEngine {
 export function Engine(options?: IEngineOptions): IEngine {
   const partialEngine = preEngine(options)
   const onChangeFunction: OnChangeFunction = (entity, operation, component, componentValue) => {
-    const onChange = component?.onchangeCallbacks(entity)
-    if (onChange) {
-      onChange(componentValue)
+    if (operation === CrdtMessageType.DELETE_ENTITY) {
+      for (const component of partialEngine.componentsIter()) {
+        const onChange = component?.onchangeCallbacks(entity)
+        if (onChange) {
+          onChange(undefined)
+        }
+      }
+    } else {
+      const onChange = component?.onchangeCallbacks(entity)
+      if (onChange) {
+        onChange(componentValue)
+      }
     }
     return options?.onChangeFunction(entity, operation, component, componentValue)
   }
