@@ -12,7 +12,7 @@ import { CoreComponents } from '../../../lib/sdk/components'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
 import { CheckboxField, InfoTooltip } from '../../ui'
-import { ENABLED_COMPONENTS, getComponents, putComponentIds, deleteComponentIds } from './utils'
+import { ENABLED_COMPONENTS, getComponents, putComponentIds, deleteComponentIds, getThroughActionName } from './utils'
 import { cleanPush } from '../../../lib/utils/array'
 import type { Props } from './types'
 
@@ -98,10 +98,10 @@ export default withSdk<Props>(({ sdk, entity }) => {
       Select the components of this item to sync so all users see the same changes in the scene.
       <Container label="Added components">
         <Block>
-          {entityComponents.map(({ id, name, potential }) => (
+          {entityComponents.map(({ id, name, displayName, potential }) => (
             <CheckboxField
               key={id}
-              label={name + (potential ? ' (through Action)' : '')}
+              label={displayName + (potential ? ` ${getThroughActionName(name)}` : '')}
               checked={componentValue.componentIds.includes(id)}
               onChange={() => handleChange(id)}
             />

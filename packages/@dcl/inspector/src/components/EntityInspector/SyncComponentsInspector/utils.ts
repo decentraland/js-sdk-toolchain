@@ -15,6 +15,7 @@ const DISABLED_COMPONENTS: string[] = [
 export type Component = {
   id: number
   name: string
+  displayName: string
   potential?: boolean
 }
 
@@ -35,7 +36,11 @@ export function getComponents(entity: Entity, engine: IEngine): Component[][] {
 
   for (const component of engine.componentsIter()) {
     if (!ENABLED_COMPONENTS.has(component.componentName)) continue
-    const data = { id: component.componentId, name: getComponentName(component.componentName) }
+    const data = {
+      id: component.componentId,
+      name: component.componentName,
+      displayName: getComponentName(component.componentName)
+    }
     if (component.has(entity)) {
       entityComponents.push(data)
     } else if (hasAction && POTENTIAL_COMPONENTS.includes(component.componentName)) {
@@ -46,8 +51,8 @@ export function getComponents(entity: Entity, engine: IEngine): Component[][] {
   }
 
   return [
-    entityComponents.sort((a, b) => a.name.localeCompare(b.name)),
-    availableComponents.sort((a, b) => a.name.localeCompare(b.name))
+    entityComponents.sort((a, b) => a.displayName.localeCompare(b.displayName)),
+    availableComponents.sort((a, b) => a.displayName.localeCompare(b.displayName))
   ]
 }
 
@@ -92,4 +97,21 @@ export function deleteComponentIds(
   }
 
   return Array.from(componentIds)
+}
+
+export function getThroughActionName(name: string): string {
+  switch (name) {
+    case CoreComponents.ANIMATOR:
+      return '([Play Emote] Action)'
+    case CoreComponents.AUDIO_SOURCE:
+      return '([Play/Stop Sound] Action)'
+    case CoreComponents.AUDIO_STREAM:
+      return '([Play/Stop Audio Stream] Action)'
+    case CoreComponents.VIDEO_PLAYER:
+      return '([Play/Stop Video Stream] Action)'
+    case CoreComponents.VISIBILITY_COMPONENT:
+      return '([Set Visibility] Action)'
+    default:
+      return '(through Action)'
+  }
 }
