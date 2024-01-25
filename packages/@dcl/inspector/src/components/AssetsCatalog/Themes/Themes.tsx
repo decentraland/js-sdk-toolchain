@@ -5,7 +5,7 @@ import './Themes.css'
 
 const Themes: React.FC<Props> = ({ catalog, onClick }) => {
   return (
-    <div className="asset-catalog-theme-container">
+    <div className="asset-catalog-themes">
       {catalog.map((value) => (
         <div onClick={() => onClick(value)} className="theme" data-test-id={value.id} data-test-label={value.name}>
           <img src={getContentsUrl(value.thumbnail)} alt={value.name} />

@@ -32,3 +32,9 @@
   text-decoration-line: underline;
   cursor: pointer;
 }
+
+.assets-catalog .assets-catalog-theme-container {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}

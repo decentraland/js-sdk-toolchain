@@ -92,7 +92,9 @@ const AssetsCatalog: React.FC<Props> = ({ catalog }) => {
       ) : selectedTheme ? (
         <Categories onGoBack={handleThemeChange} value={selectedTheme} />
       ) : (
-        <Themes catalog={catalog} onClick={handleThemeChange} />
+        <div className="assets-catalog-theme-container">
+          <Themes catalog={catalog} onClick={handleThemeChange} />
+        </div>
       )}
     </div>
   )

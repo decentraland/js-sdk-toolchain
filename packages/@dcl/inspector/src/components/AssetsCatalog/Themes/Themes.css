@@ -1,24 +1,21 @@
-.asset-catalog-theme-container {
+.asset-catalog-themes {
   display: grid;
   margin: 0 auto;
   max-width: 1440px;
   width: 100%;
-  height: 100vh;
-  overflow: scroll;
-  overflow-y: auto;
-  overflow-x: hidden;
+  height: 100%;
   grid-template-columns: repeat(6, 1fr);
   grid-template-rows: max-content;
   gap: 12px;
 }
 
-@media (max-width: 1180px) {
-  .asset-catalog-theme-container {
+@media (max-width: 1300px) {
+  .asset-catalog-themes {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
 }
 
-.asset-catalog-theme-container .theme {
+.asset-catalog-themes .theme {
   display: flex;
   min-width: 200px;
   padding: 4px 8px;
@@ -34,17 +31,17 @@
   position: relative;
 }
 
-.asset-catalog-theme-container .theme:hover {
+.asset-catalog-themes .theme:hover {
   background: var(--list-item-hover-bg-color);
 }
 
-.asset-catalog-theme-container .theme img {
+.asset-catalog-themes .theme img {
   width: 48px;
   height: 48px;
   border-radius: 8px;
 }
 
-.asset-catalog-theme-container .theme .theme-info {
+.asset-catalog-themes .theme .theme-info {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -52,7 +49,7 @@
   gap: 4px;
 }
 
-.asset-catalog-theme-container .theme .theme-info h4.theme-info-name {
+.asset-catalog-themes .theme .theme-info h4.theme-info-name {
   margin-top: 0;
   margin-bottom: 0;
   color: var(--base-01);
@@ -63,7 +60,7 @@
   text-transform: capitalize;
 }
 
-.asset-catalog-theme-container .theme .theme-info .theme-info-items {
+.asset-catalog-themes .theme .theme-info .theme-info-items {
   color: var(--base-06);
   font-size: 11px;
   font-style: normal;
@@ -71,7 +68,7 @@
   line-height: normal;
 }
 
-.asset-catalog-theme-container .theme::after {
+.asset-catalog-themes .theme::after {
   content: '';
   margin-left: auto;
   background: url(https://cdn.decentraland.org/@dcl/builder-site/6.35.0/static/media/icons.5ff54946.svg)
