@@ -34,7 +34,7 @@ export enum CoreComponents {
 
 export enum EditorComponentNames {
   Selection = 'inspector::Selection',
-  Scene = 'inspector::Scene',
+  Scene = 'inspector::SceneMetadata',
   Nodes = 'inspector::Nodes',
   ActionTypes = ComponentName.ACTION_TYPES,
   Actions = ComponentName.ACTIONS,
@@ -46,9 +46,61 @@ export enum EditorComponentNames {
   Lock = 'inspector::Lock'
 }
 
+export enum SceneAgeRating {
+  Teen = 'T',
+  Adult = 'A'
+}
+
+export type SceneSpawnPointCoord = { $case: 'single'; value: number } | { $case: 'range'; value: number[] }
+
+export type SceneSpawnPoint = {
+  name: string
+  default?: boolean
+  position: {
+    x: SceneSpawnPointCoord
+    y: SceneSpawnPointCoord
+    z: SceneSpawnPointCoord
+  }
+  cameraTarget?: {
+    x: number
+    y: number
+    z: number
+  }
+}
+
+export type SceneComponent = {
+  name?: string
+  description?: string
+  thumbnail?: string
+  ageRating?: SceneAgeRating
+  main?: string
+  categories?: SceneCategory[]
+  author?: string
+  email?: string
+  tags?: string[]
+  layout: Layout
+  silenceVoiceChat?: boolean
+  disablePortableExperiences?: boolean
+  spawnPoints?: SceneSpawnPoint[]
+}
+
+export enum SceneCategory {
+  ART = 'art',
+  GAME = 'game',
+  CASINO = 'casino',
+  SOCIAL = 'social',
+  MUSIC = 'music',
+  FASHION = 'fashion',
+  CRYPTO = 'crypto',
+  EDUCATION = 'education',
+  SHOP = 'shop',
+  BUSINESS = 'business',
+  SPORTS = 'sports'
+}
+
 export type EditorComponentsTypes = {
   Selection: { gizmo: GizmoType }
-  Scene: { layout: Layout }
+  Scene: SceneComponent
   Nodes: { value: Node[] }
   TransformConfig: TransformConfig
   ActionTypes: ActionTypes
@@ -140,10 +192,50 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
   })
 
   const Scene = engine.defineComponent(EditorComponentNames.Scene, {
+    // everything but layout is set as optional for retrocompat purposes
+    name: Schemas.Optional(Schemas.String),
+    description: Schemas.Optional(Schemas.String),
+    thumbnail: Schemas.Optional(Schemas.String),
+    ageRating: Schemas.Optional(Schemas.EnumString(SceneAgeRating, SceneAgeRating.Teen)),
+    categories: Schemas.Optional(Schemas.Array(Schemas.EnumString(SceneCategory, SceneCategory.GAME))),
+    author: Schemas.Optional(Schemas.String),
+    email: Schemas.Optional(Schemas.String),
+    tags: Schemas.Optional(Schemas.Array(Schemas.String)),
     layout: Schemas.Map({
       base: Coords,
       parcels: Schemas.Array(Coords)
-    })
+    }),
+    silenceVoiceChat: Schemas.Optional(Schemas.Boolean),
+    disablePortableExperiences: Schemas.Optional(Schemas.Boolean),
+    spawnPoints: Schemas.Optional(
+      Schemas.Array(
+        Schemas.Map({
+          name: Schemas.String,
+          default: Schemas.Optional(Schemas.Boolean),
+          position: Schemas.Map({
+            x: Schemas.OneOf({
+              single: Schemas.Int,
+              range: Schemas.Array(Schemas.Int)
+            }),
+            y: Schemas.OneOf({
+              single: Schemas.Int,
+              range: Schemas.Array(Schemas.Int)
+            }),
+            z: Schemas.OneOf({
+              single: Schemas.Int,
+              range: Schemas.Array(Schemas.Int)
+            })
+          }),
+          cameraTarget: Schemas.Optional(
+            Schemas.Map({
+              x: Schemas.Int,
+              y: Schemas.Int,
+              z: Schemas.Int
+            })
+          )
+        })
+      )
+    )
   })
 
   const Nodes = engine.defineComponent(EditorComponentNames.Nodes, {

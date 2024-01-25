@@ -1,3 +1,80 @@
 .Container.Scene .content svg {
   cursor: pointer;
 }
+
+.Container.Scene .Block.underlined {
+  border-bottom: 1px solid var(--base-14);
+}
+
+.Container.Scene .Block.underlined .Label {
+  font-size: 14px;
+}
+
+.Container.Scene .SpawnPointContainer > .content {
+  padding: 12px;
+  border-radius: 4px;
+  border: 1px solid #303031;
+  background: var(--tree-bg-color);
+  align-items: stretch;
+}
+
+.Container.Scene .Tabs.SceneTabs .TabIcon {
+  width: 16px;
+  height: 16px;
+  background-position: center;
+  background-size: contain;
+  background-repeat: repeat;
+}
+
+.Container.Scene .Tabs.SceneTabs .TabIcon.details-icon {
+  background-image: url(./icons/details.svg);
+}
+
+.Container.Scene .Tabs.SceneTabs .TabIcon.layout-icon {
+  background-image: url(./icons/layout.svg);
+}
+
+.Container.Scene .Tabs.SceneTabs .TabIcon.cog-icon {
+  background-image: url(./icons/settings.svg);
+}
+
+.Container.Scene .thumbnail {
+  width: 76px;
+  height: 54px;
+  border-radius: 4px;
+  border: 1px solid var(--base-14);
+  background-color: var(--base-14);
+  color: var(--base-14);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Container.Scene .ThumbnailRow {
+  display: flex;
+}
+
+.Container.Scene .thumbnail {
+  margin-right: 8px;
+}
+
+.Container.Scene .thumbnail img {
+  width: 100%;
+}
+
+.Container.Scene .thumbnail svg {
+  color: white;
+  width: 32px;
+  height: 32px;
+}
+
+.Container.Scene .SpawnPointContainer {
+  position: relative;
+}
+
+.Container.Scene .SpawnPointContainer .RightContent {
+  position: absolute;
+  right: 8px;
+  top: 4px;
+}

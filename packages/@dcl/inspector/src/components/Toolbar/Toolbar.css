@@ -29,3 +29,16 @@
   height: 18px;
   transform: translateY(2px);
 }
+
+.Toolbar .edit-scene svg {
+  width: 18px;
+  height: 18px;
+  transform: translateY(2px);
+}
+
+.Toolbar .RightContent {
+  display: flex;
+  flex-grow: 1;
+  justify-content: flex-end;
+  align-items: center;
+}

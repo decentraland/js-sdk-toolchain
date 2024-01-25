@@ -7,8 +7,9 @@ export function isOptionSelected(currentValue?: any, optionValue?: any) {
   return currentValue?.toString() === optionValue?.toString()
 }
 
-export function isMultipleOptionSelected(currentValue?: any[], optionValue?: any) {
-  return (currentValue ?? []).find((value) => value?.toString() === optionValue?.toString())
+export function isMultipleOptionSelected(currentValue?: string | any[], optionValue?: any) {
+  const values = typeof currentValue === 'string' ? currentValue.split(',') : currentValue ?? []
+  return values.find((value) => value?.toString() === optionValue?.toString())
 }
 
 export function capitalize(value: string) {

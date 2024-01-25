@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { useCallback, useEffect, useMemo } from 'react'
 import { Entity } from '@dcl/ecs'
 import {

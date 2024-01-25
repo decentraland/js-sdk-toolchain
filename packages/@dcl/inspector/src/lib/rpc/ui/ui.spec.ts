@@ -1,8 +1,15 @@
 import { InMemoryTransport } from '@dcl/mini-rpc'
 import { UiClient } from './client'
 import { UiServer } from './server'
-import { selectAssetsTab, toggleComponent, toggleGizmos, togglePanel } from '../../../redux/ui'
-import { AssetsTab, PanelName } from '../../../redux/ui/types'
+import {
+  selectAssetsTab,
+  selectSceneInspectorTab,
+  toggleComponent,
+  toggleGizmos,
+  togglePanel,
+  toggleSceneInspectorTab
+} from '../../../redux/ui'
+import { AssetsTab, PanelName, SceneInspectorTab } from '../../../redux/ui/types'
 
 describe('UiRPC', () => {
   const parent = new InMemoryTransport()
@@ -45,6 +52,22 @@ describe('UiRPC', () => {
     it('should send a ui/selectAssetsTab action in the server', async () => {
       await expect(client.selectAssetsTab('AssetsPack')).resolves.not.toThrow()
       expect(store.dispatch).toHaveBeenCalledWith(selectAssetsTab({ tab: AssetsTab.AssetsPack }))
+    })
+  })
+
+  describe('When using the selectSceneInspectorTab method of the client', () => {
+    it('should send a ui/selectSceneInspectorTab action in the server', async () => {
+      await expect(client.selectSceneInspectorTab('details')).resolves.not.toThrow()
+      expect(store.dispatch).toHaveBeenCalledWith(selectSceneInspectorTab({ tab: SceneInspectorTab.DETAILS }))
+    })
+  })
+
+  describe('When using the toggleSceneInspectorTab method of the client', () => {
+    it('should send a ui/toggleSceneInspectorTab action in the server', async () => {
+      await expect(client.toggleSceneInspectorTab('details', false)).resolves.not.toThrow()
+      expect(store.dispatch).toHaveBeenCalledWith(
+        toggleSceneInspectorTab({ tab: SceneInspectorTab.DETAILS, enabled: false })
+      )
     })
   })
 })

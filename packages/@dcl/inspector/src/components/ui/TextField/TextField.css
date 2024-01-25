@@ -26,7 +26,7 @@
   border-color: var(--base-12);
 }
 
-.Text.Field .InputContainer.disabled input {
+.Text.Field .InputContainer.disabled .input {
   color: var(--base-09);
 }
 
@@ -47,7 +47,7 @@
   border-color: var(--error-light);
 }
 
-.Text.Field .InputContainer input {
+.Text.Field .InputContainer .input {
   flex: 1;
   color: var(--text);
   background-color: var(--transparent);
@@ -62,7 +62,7 @@
   width: 100%;
 }
 
-.Text.Field .InputContainer input::placeholder {
+.Text.Field .InputContainer .input::placeholder {
   color: var(--base-09);
 }
 

@@ -61,11 +61,11 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
     [setFocused, onBlur]
   )
 
-  const handleMouseEnter: React.MouseEventHandler<HTMLInputElement> = useCallback(() => {
+  const handleMouseEnter: React.MouseEventHandler = useCallback(() => {
     setHovered(true)
   }, [setHovered])
 
-  const handleMouseLeave: React.MouseEventHandler<HTMLInputElement> = useCallback(() => {
+  const handleMouseLeave: React.MouseEventHandler = useCallback(() => {
     setHovered(false)
   }, [setHovered])
 
@@ -104,7 +104,7 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
   }, [rightLabel, rightIcon])
 
   return (
-    <div className={cx('Text Field', className)}>
+    <div className={cx('Text Field', className, type)}>
       <Label text={label} />
       <div
         className={cx('InputContainer', {
@@ -116,6 +116,7 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
       >
         {renderLeftContent()}
         <input
+          className="input"
           ref={ref}
           type={type}
           value={inputValue}
