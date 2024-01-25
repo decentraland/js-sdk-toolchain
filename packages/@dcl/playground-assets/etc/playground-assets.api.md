@@ -128,6 +128,7 @@ export interface BaseComponent<T> {
     get(entity: Entity): any;
     getCrdtUpdates(): Iterable<CrdtMessageBody>;
     has(entity: Entity): boolean;
+    onChange(entity: Entity, cb: (value: T | undefined) => void): void;
     // (undocumented)
     readonly schema: ISchema<T>;
     updateFromCrdt(body: CrdtMessageBody): [null | ConflictResolutionMessage, T | undefined];
