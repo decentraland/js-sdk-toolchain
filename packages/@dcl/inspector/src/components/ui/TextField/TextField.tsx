@@ -3,7 +3,7 @@ import cx from 'classnames'
 
 import { Message, MessageType } from '../Message'
 import { Label } from '../Label'
-
+import { debounce } from '../utils'
 import { Props } from './types'
 
 import './TextField.css'
@@ -21,6 +21,7 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
     value,
     disabled,
     leftContent,
+    debounceTime,
     onChange,
     onFocus,
     onBlur,
@@ -37,12 +38,14 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
     }
   }, [value])
 
+  const debounceChange = useCallback(debounce(onChange ?? (() => {}), debounceTime ?? 0), [debounceTime, onChange])
+
   const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = useCallback(
     (event) => {
       setInputValue(event.target.value)
-      onChange && onChange(event)
+      debounceChange(event)
     },
-    [setInputValue, onChange]
+    [setInputValue, debounceChange]
   )
 
   const handleInputFocus: React.FocusEventHandler<HTMLInputElement> = useCallback(

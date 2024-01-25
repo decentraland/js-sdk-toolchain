@@ -6,6 +6,7 @@
   height: 100vh;
   overflow: scroll;
   overflow-y: auto;
+  overflow-x: hidden;
   grid-template-columns: repeat(6, 1fr);
   grid-template-rows: max-content;
   gap: 12px;

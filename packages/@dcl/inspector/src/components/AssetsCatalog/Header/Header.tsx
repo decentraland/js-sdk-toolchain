@@ -11,7 +11,7 @@ const Header: React.FC<Props> = ({ selectedTheme, onChangeTheme, onSearch }) => 
 
   useEffect(() => {
     onSearch && onSearch(search)
-  }, [search])
+  }, [search, onSearch])
 
   const handleSearchAssets = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,7 +46,7 @@ const Header: React.FC<Props> = ({ selectedTheme, onChangeTheme, onSearch }) => 
     return <BackIcon className="back-button" size={24} onClick={handleGoBack} />
   }, [search, selectedTheme, handleGoBack])
 
-  const searchPlaceholder = selectedTheme ? `Search ${selectedTheme.name}` : 'Search asset packs'
+  const searchPlaceholder = selectedTheme ? `Search ${selectedTheme.name}` : 'Search Asset Packs'
 
   return (
     <div className="assets-catalog-header">
@@ -60,6 +60,7 @@ const Header: React.FC<Props> = ({ selectedTheme, onChangeTheme, onSearch }) => 
           placeholder={searchPlaceholder}
           leftIcon={<SearchIcon />}
           onChange={handleSearchAssets}
+          debounceTime={300}
         />
       </div>
     </div>
