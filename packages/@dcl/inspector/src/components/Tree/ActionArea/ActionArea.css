@@ -7,6 +7,10 @@
   visibility: hidden;
 }
 
+.Tree .item .selectable-area .action-area {
+  padding-right: 4px;
+}
+
 .Tree .item:hover:not(:has(input)) .selectable-area .action-area .action-button {
   visibility: visible;
 }
@@ -27,4 +31,10 @@
 .Tree .item .selectable-area:has(.action-area .action-button .invisible-icon),
 .Tree .item .selectable-area .action-area .action-button .invisible-icon > path {
   color: var(--base-06);
+}
+
+.action-area .action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
