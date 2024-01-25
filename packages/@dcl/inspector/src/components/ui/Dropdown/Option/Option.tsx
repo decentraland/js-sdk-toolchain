@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import cx from 'classnames'
 import { IoAlertCircleOutline as AlertIcon, IoCheckmark as CheckIcon } from 'react-icons/io5'
 import { Props } from './types'
@@ -19,12 +19,15 @@ const Option: React.FC<Props> = (props) => {
     secondaryText,
     selected,
     value,
+    isField,
     onClick
   } = props
 
   const renderSelectedOption = useCallback(() => {
-    return <div className="SelectedContent">{selected && <CheckIcon className="SelectedIcon" size={16} />}</div>
-  }, [selected])
+    return (
+      isField && <div className="SelectedContent">{selected && <CheckIcon className="SelectedIcon" size={16} />}</div>
+    )
+  }, [selected, isField])
 
   const renderLeftContent = useCallback(() => {
     if (leftIcon) {

@@ -7,7 +7,7 @@ import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
 import { Props } from './types'
 import './InfoTooltip.css'
 
-export default memo<Props>(({ text, link, trigger, type = 'info', onOpen, onClose, ...rest }) => {
+export default memo<Props>(({ className, text, link, trigger, type = 'info', onOpen, onClose, ...rest }) => {
   const [isHovered, setIsHovered] = useState(false)
 
   const handleOpen = useCallback(
@@ -39,7 +39,7 @@ export default memo<Props>(({ text, link, trigger, type = 'info', onOpen, onClos
 
   return (
     <Popup
-      className="InfoTooltip"
+      className={cx('InfoTooltip', className)}
       content={
         <>
           {text}{' '}

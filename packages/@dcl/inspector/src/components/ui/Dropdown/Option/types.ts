@@ -1,3 +1,5 @@
+import type { Props as TooltipProps } from '../..//InfoTooltip/types'
+
 export type Props = {
   value?: string | number | readonly string[]
   label?: string
@@ -12,5 +14,7 @@ export type Props = {
   header?: string
   minWidth?: number
   leftContent?: React.ReactNode
+  isField?: boolean
+  tooltip?: TooltipProps | string
   onClick?: (event: any, value: any) => void
 }

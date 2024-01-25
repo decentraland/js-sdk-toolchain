@@ -8,11 +8,6 @@
   cursor: pointer;
 }
 
-.OptionContainer:last-child {
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
-}
-
 .OptionContainer.SelectedOption,
 .OptionContainer.DropdownPlaceholder {
   padding: 0;

@@ -28,7 +28,7 @@ export const useEntityComponent = () => {
 
   const addComponent = useCallback(
     (entity: Entity, componentId: number, value?: any) => {
-      if (!sdk) return
+      if (!sdk || sdk.engine.getComponentOrNull(componentId)?.has(entity)) return
       sdk.operations.addComponent(entity, componentId, value)
       sdk.operations.updateSelectedEntity(entity)
       void sdk.operations.dispatch()
