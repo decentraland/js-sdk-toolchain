@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 import { useCallback, useEffect, useState } from 'react'
 import { RxBorderAll } from 'react-icons/rx'
-import { VscTrash as RemoveIcon } from 'react-icons/vsc'
 import { IoIosImage } from 'react-icons/io'
 
 import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
@@ -26,6 +25,7 @@ import {
 import './SceneInspector.css'
 import { EditorComponentsTypes, SceneAgeRating, SceneCategory, SceneSpawnPoint } from '../../../lib/sdk/components'
 import { Dropdown } from '../../ui/Dropdown'
+import { TextArea } from '../../ui'
 import { Tabs } from '../Tabs'
 import { CheckboxField } from '../../ui/CheckboxField'
 import { useComponentValue } from '../../../hooks/sdk/useComponentValue'
@@ -382,7 +382,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
       {selectedSceneInspectorTab === SceneInspectorTab.DETAILS ? (
         <>
           <TextField label="Name" {...nameProps} />
-          <TextField type="textarea" label="Description" {...descriptionProps} />
+          <TextArea label="Description" {...descriptionProps} />
           <span className="ThumbnailRow">
             <div className="thumbnail">{renderThumbnail()}</div>
             <FileUploadField

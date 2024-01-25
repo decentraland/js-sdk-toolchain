@@ -45,34 +45,10 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
     [setInputValue, onChange]
   )
 
-  const handleTextAreaChange: React.ChangeEventHandler<HTMLTextAreaElement> = useCallback(
-    (event) => {
-      setInputValue(event.target.value)
-      onChange && onChange(event as unknown as React.ChangeEvent<HTMLInputElement>)
-    },
-    [setInputValue, onChange]
-  )
-
   const handleInputFocus: React.FocusEventHandler<HTMLInputElement> = useCallback(
     (event) => {
       setFocused(true)
       onFocus && onFocus(event)
-    },
-    [setFocused, onFocus]
-  )
-
-  const handleTextAreaBlur: React.FocusEventHandler<HTMLTextAreaElement> = useCallback(
-    (event) => {
-      setFocused(false)
-      onBlur && onBlur(event as unknown as React.FocusEvent<HTMLInputElement>)
-    },
-    [setFocused, onBlur]
-  )
-
-  const handleTextAreaFocus: React.FocusEventHandler<HTMLTextAreaElement> = useCallback(
-    (event) => {
-      setFocused(true)
-      onFocus && onFocus(event as unknown as React.FocusEvent<HTMLInputElement>)
     },
     [setFocused, onFocus]
   )
@@ -139,33 +115,19 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
         })}
       >
         {renderLeftContent()}
-        {type === 'textarea' ? (
-          <textarea
-            className="input"
-            value={inputValue}
-            onChange={handleTextAreaChange}
-            onFocus={handleTextAreaFocus}
-            onBlur={handleTextAreaBlur}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            disabled={disabled}
-            {...(rest as unknown as React.InputHTMLAttributes<HTMLTextAreaElement>)}
-          />
-        ) : (
-          <input
-            className="input"
-            ref={ref}
-            type={type}
-            value={inputValue}
-            onChange={handleInputChange}
-            onFocus={handleInputFocus}
-            onBlur={handleInputBlur}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            disabled={disabled}
-            {...rest}
-          />
-        )}
+        <input
+          className="input"
+          ref={ref}
+          type={type}
+          value={inputValue}
+          onChange={handleInputChange}
+          onFocus={handleInputFocus}
+          onBlur={handleInputBlur}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          disabled={disabled}
+          {...rest}
+        />
         {renderRightContent()}
       </div>
       <Message text={error} type={MessageType.ERROR} />

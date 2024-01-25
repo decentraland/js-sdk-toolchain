@@ -2,7 +2,7 @@ import React from 'react'
 
 export type Props = React.InputHTMLAttributes<HTMLInputElement> & {
   drop?: boolean
-  type?: 'text' | 'password' | 'email' | 'number' | 'textarea'
+  type?: 'text' | 'password' | 'email' | 'number'
   label?: React.ReactNode
   leftLabel?: React.ReactNode
   leftIcon?: React.ReactNode

@@ -21,14 +21,6 @@
   font-size: 13px;
 }
 
-.Text.Field.textarea .InputContainer {
-  height: 72px;
-}
-
-.Text.Field.textarea .input {
-  height: 72px;
-}
-
 .Text.Field .InputContainer.disabled {
   background-color: var(--base-12);
   border-color: var(--base-12);
