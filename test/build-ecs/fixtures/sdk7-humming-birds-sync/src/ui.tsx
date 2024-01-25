@@ -1,4 +1,4 @@
-import { engine, Entity, PointerEvents, Transform } from '@dcl/sdk/ecs'
+import { engine, PointerEvents, Transform } from '@dcl/sdk/ecs'
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { Button, Label, ReactEcsRenderer, UiEntity } from '@dcl/sdk/react-ecs'
 import { Bird, BirdKilled } from './hummingBird'
@@ -6,8 +6,6 @@ import { createCircle, createTriangle } from './create-cube'
 
 let scoreBoard: [string, number][] = []
 let scoreInterval = 0
-export let gamePaused = false
-let gameStatusEntity: Entity
 
 // System used to avoid checking this info on every tick.
 // Instead we do all this logic every 1s
@@ -36,10 +34,9 @@ export function setupUi(userId: string) {
       !!isAdmin && (
         <UiEntity
           key="admin-pannel"
-          uiBackground={{ color: Color4.fromHexString(gamePaused ? '#94909045' : '#00000000') }}
+          uiBackground={{ color: Color4.fromHexString('#00000000') }}
           uiTransform={{ width: 100, height: '100%' }}
-        >
-        </UiEntity>
+        ></UiEntity>
       ),
       <UiEntity
         key="scoreboard"

@@ -12,7 +12,7 @@ import {
   TextShape,
   AvatarAttach,
   Schemas,
-  ColliderLayer,
+  ColliderLayer
 } from '@dcl/ecs'
 import { Color4 } from '@dcl/sdk/math'
 import { parentEntity, syncEntity, getFirstChild, getParent, myProfile } from '@dcl/sdk/network'
