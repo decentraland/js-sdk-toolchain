@@ -75,7 +75,7 @@ export const AvatarAttach: LastWriteWinElementSetComponentDefinition<PBAvatarAtt
 export const AvatarBase: LastWriteWinElementSetComponentDefinition<PBAvatarBase>;
 
 // @public (undocumented)
-export const AvatarEmoteCommand: LastWriteWinElementSetComponentDefinition<PBAvatarEmoteCommand>;
+export const AvatarEmoteCommand: GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>;
 
 // @public (undocumented)
 export const AvatarEquippedData: LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>;
@@ -525,7 +525,7 @@ export const componentDefinitionByName: {
     "core::AudioStream": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioStream>>;
     "core::AvatarAttach": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarAttach>>;
     "core::AvatarBase": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarBase>>;
-    "core::AvatarEmoteCommand": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarEmoteCommand>>;
+    "core::AvatarEmoteCommand": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>>;
     "core::AvatarEquippedData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>>;
     "core::AvatarModifierArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>>;
     "core::AvatarShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarShape>>;
@@ -2233,7 +2233,10 @@ export namespace PBAvatarBase {
 // @public (undocumented)
 export interface PBAvatarEmoteCommand {
     // (undocumented)
-    emoteCommand: PBAvatarEmoteCommand_EmoteCommand | undefined;
+    emoteUrn: string;
+    // (undocumented)
+    loop: boolean;
+    timestamp: number;
 }
 
 // @public (undocumented)
@@ -2242,22 +2245,6 @@ export namespace PBAvatarEmoteCommand {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarEmoteCommand;
     // (undocumented)
     export function encode(message: PBAvatarEmoteCommand, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
-export interface PBAvatarEmoteCommand_EmoteCommand {
-    // (undocumented)
-    emoteUrn: string;
-    // (undocumented)
-    loop: boolean;
-}
-
-// @public (undocumented)
-export namespace PBAvatarEmoteCommand_EmoteCommand {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarEmoteCommand_EmoteCommand;
-    // (undocumented)
-    export function encode(message: PBAvatarEmoteCommand_EmoteCommand, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
