@@ -7,14 +7,15 @@ import { withSdk } from '../../../hoc/withSdk'
 import { useComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { useSelectedEntity } from '../../../hooks/sdk/useSelectedEntity'
 import { useOutsideClick } from '../../../hooks/useOutsideClick'
+import { useHotkey } from '../../../hooks/useHotkey'
 import { useSnapToggle } from '../../../hooks/editor/useSnap'
+import { useGizmoAlignment } from '../../../hooks/editor/useGizmoAlignment'
 import { ROOT } from '../../../lib/sdk/tree'
 import { GizmoType } from '../../../lib/utils/gizmo'
 import { ToolbarButton } from '../ToolbarButton'
 import { Snap } from './Snap'
 
 import './Gizmos.css'
-import { useGizmoAlignment } from '../../../hooks/editor/useGizmoAlignment'
 
 export const Gizmos = withSdk(({ sdk }) => {
   const [showPanel, setShowPanel] = useState(false)
@@ -39,6 +40,10 @@ export const Gizmos = withSdk(({ sdk }) => {
     () => setSelection({ gizmo: selection.gizmo !== GizmoType.SCALE ? GizmoType.SCALE : GizmoType.FREE }),
     [selection, setSelection]
   )
+
+  useHotkey(['M'], handlePositionGizmo)
+  useHotkey(['R'], handleRotationGizmo)
+  useHotkey(['X'], handleScaleGizmo)
 
   const {
     isPositionGizmoWorldAligned,
