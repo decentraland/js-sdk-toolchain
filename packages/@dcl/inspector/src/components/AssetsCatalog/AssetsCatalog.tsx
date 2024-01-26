@@ -34,18 +34,22 @@ const AssetsCatalog: React.FC<Props> = ({ catalog }) => {
   )
 
   const filteredCatalog = useMemo(() => {
-    let results: AssetPack['assets'] = []
+    if (!search) return []
 
-    if (search) {
-      const assets = selectedTheme ? selectedTheme.assets : catalog.flatMap((theme) => theme.assets)
-      results = assets.filter((asset) => asset.name.toLowerCase().startsWith(search.toLowerCase()))
+    const searchLower = search.toLowerCase()
+    const assets = selectedTheme ? selectedTheme.assets : catalog.flatMap((theme) => theme.assets)
 
-      if (results.length === 0) {
-        results = assets.filter((asset) => asset.name.toLowerCase().includes(search.toLowerCase()))
-      }
-    }
+    const { starts, includes } = assets.reduce(
+      (results: { starts: AssetPack['assets']; includes: AssetPack['assets'] }, asset) => {
+        const name = asset.name.toLowerCase()
+        if (name.startsWith(searchLower)) results.starts.push(asset)
+        if (name.includes(searchLower)) results.includes.push(asset)
+        return results
+      },
+      { starts: [], includes: [] }
+    )
 
-    return results
+    return starts.length ? starts : includes
   }, [catalog, selectedTheme, search])
 
   useEffect(() => {
