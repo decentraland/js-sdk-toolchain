@@ -1,6 +1,7 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { AssetPack } from '../../lib/logic/catalog'
+import { analytics, Event } from '../../lib/logic/analytics'
 import { useAppDispatch } from '../../redux/hooks'
 import { selectAssetsTab } from '../../redux/ui'
 import { AssetsTab } from '../../redux/ui/types'
@@ -33,27 +34,33 @@ const AssetsCatalog: React.FC<Props> = ({ catalog }) => {
   )
 
   const filteredCatalog = useMemo(() => {
-    const results = []
-    if (search) {
-      if (selectedTheme) {
-        for (const asset of selectedTheme.assets) {
-          if (asset.name.toLowerCase().includes(search.toLowerCase())) {
-            results.push(asset)
-          }
-        }
-      } else {
-        for (const theme of catalog) {
-          for (const asset of theme.assets) {
-            if (asset.name.toLowerCase().includes(search.toLowerCase())) {
-              results.push(asset)
-            }
-          }
-        }
-      }
-    }
+    if (!search) return []
 
-    return results
+    const searchLower = search.toLowerCase()
+    const assets = selectedTheme ? selectedTheme.assets : catalog.flatMap((theme) => theme.assets)
+
+    const { starts, includes } = assets.reduce(
+      (results: { starts: AssetPack['assets']; includes: AssetPack['assets'] }, asset) => {
+        const name = asset.name.toLowerCase()
+        if (name.startsWith(searchLower)) results.starts.push(asset)
+        if (name.includes(searchLower)) results.includes.push(asset)
+        return results
+      },
+      { starts: [], includes: [] }
+    )
+
+    return starts.length ? starts : includes
   }, [catalog, selectedTheme, search])
+
+  useEffect(() => {
+    if (search) {
+      analytics.track(Event.SEARCH_ITEM, {
+        keyword: search,
+        itemsFound: filteredCatalog.length,
+        category: selectedTheme?.name
+      })
+    }
+  }, [search, filteredCatalog])
 
   const renderEmptySearch = useCallback(() => {
     const ctaMethod = selectedTheme ? handleThemeChange : handleUploadAsset
@@ -86,7 +93,12 @@ const AssetsCatalog: React.FC<Props> = ({ catalog }) => {
 
   return (
     <div className="assets-catalog">
-      <Header selectedTheme={selectedTheme} onChangeTheme={handleThemeChange} onSearch={handleSearchAssets} />
+      <Header
+        search={search}
+        selectedTheme={selectedTheme}
+        onChangeTheme={handleThemeChange}
+        onSearch={handleSearchAssets}
+      />
       {search ? (
         renderAssets()
       ) : selectedTheme ? (

@@ -7,7 +7,13 @@ const Themes: React.FC<Props> = ({ catalog, onClick }) => {
   return (
     <div className="asset-catalog-themes">
       {catalog.map((value) => (
-        <div onClick={() => onClick(value)} className="theme" data-test-id={value.id} data-test-label={value.name}>
+        <div
+          key={value.id}
+          className="theme"
+          data-test-id={value.id}
+          data-test-label={value.name}
+          onClick={() => onClick(value)}
+        >
           <img src={getContentsUrl(value.thumbnail)} alt={value.name} />
           <div className="theme-info">
             <h4 className="theme-info-name">{value.name}</h4>
