@@ -251,7 +251,12 @@ const Renderer: React.FC = () => {
   drop(canvasRef)
 
   return (
-    <div className={cx('Renderer', { 'is-loaded': !isLoading, 'is-loading': isLoading })}>
+    <div
+      className={cx('Renderer', {
+        'is-loaded': !isLoading,
+        'is-loading': isLoading
+      })}
+    >
       {isLoading && <Loading />}
       <Warnings />
       <CameraSpeed />
