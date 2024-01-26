@@ -34,11 +34,14 @@ import {
   ZOOM_IN_ALT,
   ZOOM_OUT_ALT,
   ZOOM_OUT,
-  RESET_CAMERA
+  RESET_CAMERA,
+  DUPLICATE,
+  DUPLICATE_ALT
 } from '../../hooks/useHotkey'
 import { analytics, Event } from '../../lib/logic/analytics'
 import { Warnings } from '../Warnings'
 import { CameraSpeed } from './CameraSpeed'
+import { Shortcuts } from './Shortcuts'
 
 import './Renderer.css'
 
@@ -86,6 +89,13 @@ const Renderer: React.FC = () => {
     void sdk.sceneContext.operations.dispatch()
   }, [sdk])
 
+  const duplicateSelectedEntities = useCallback(() => {
+    if (!sdk) return
+    const selectedEntitites = sdk.sceneContext.operations.getSelectedEntities()
+    selectedEntitites.forEach((entity) => sdk.sceneContext.operations.duplicateEntity(entity))
+    void sdk.sceneContext.operations.dispatch()
+  }, [sdk])
+
   const copySelectedEntities = useCallback(() => {
     if (!sdk) return
     const selectedEntitites = sdk.sceneContext.operations.getSelectedEntities()
@@ -123,6 +133,7 @@ const Renderer: React.FC = () => {
   useHotkey([ZOOM_IN, ZOOM_IN_ALT], zoomIn, canvasRef.current)
   useHotkey([ZOOM_OUT, ZOOM_OUT_ALT], zoomOut, canvasRef.current)
   useHotkey([RESET_CAMERA], resetCamera, canvasRef.current)
+  useHotkey([DUPLICATE, DUPLICATE_ALT], duplicateSelectedEntities, canvasRef.current)
 
   const getDropPosition = async () => {
     const pointerCoords = await getPointerCoords(sdk!.scene)
@@ -239,6 +250,7 @@ const Renderer: React.FC = () => {
       {isLoading && <Loading />}
       <Warnings />
       <CameraSpeed />
+      <Shortcuts canvas={canvasRef} onResetCamera={resetCamera} onZoomIn={zoomIn} onZoomOut={zoomOut} />
       <canvas ref={canvasRef} id="canvas" touch-action="none" />
     </div>
   )
