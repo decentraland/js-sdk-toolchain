@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback } from 'react'
 import { AiOutlineSearch as SearchIcon } from 'react-icons/ai'
 import { VscChevronLeft as BackIcon } from 'react-icons/vsc'
 import { TextField } from '../../ui'
@@ -6,27 +6,21 @@ import { Props } from './types'
 
 import './Header.css'
 
-const Header: React.FC<Props> = ({ selectedTheme, onChangeTheme, onSearch }) => {
-  const [search, setSearch] = useState<string>('')
-
-  useEffect(() => {
-    onSearch && onSearch(search)
-  }, [search, onSearch])
-
+const Header: React.FC<Props> = ({ selectedTheme, search, onChangeTheme, onSearch }) => {
   const handleSearchAssets = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
-      setSearch(value)
+      onSearch && onSearch(value)
     },
-    [setSearch]
+    [onSearch]
   )
 
   const handleGoBack = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation()
-      setSearch('')
+      onSearch('')
       onChangeTheme()
     },
-    [setSearch, onChangeTheme]
+    [onSearch, onChangeTheme]
   )
 
   const renderHeaderTitle = useCallback(() => {
@@ -60,7 +54,7 @@ const Header: React.FC<Props> = ({ selectedTheme, onChangeTheme, onSearch }) => 
           placeholder={searchPlaceholder}
           leftIcon={<SearchIcon />}
           onChange={handleSearchAssets}
-          debounceTime={300}
+          debounceTime={500}
         />
       </div>
     </div>
