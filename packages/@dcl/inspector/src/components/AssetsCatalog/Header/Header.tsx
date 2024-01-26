@@ -9,7 +9,7 @@ import './Header.css'
 const Header: React.FC<Props> = ({ selectedTheme, search, onChangeTheme, onSearch }) => {
   const handleSearchAssets = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
-      onSearch && onSearch(value)
+      onSearch(value)
     },
     [onSearch]
   )
