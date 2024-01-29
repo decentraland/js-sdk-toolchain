@@ -132,7 +132,7 @@ const Renderer: React.FC = () => {
   const addAsset = async (asset: AssetNodeItem, position: Vector3, basePath: string) => {
     if (!sdk) return
     const { operations } = sdk
-    operations.addAsset(ROOT, asset.asset.src, asset.name, position, basePath, asset.components)
+    operations.addAsset(ROOT, asset.asset.src, asset.name, position, basePath, sdk.enumEntity, asset.components)
     await operations.dispatch()
     analytics.track(Event.ADD_ITEM, {
       itemId: asset.asset.id,

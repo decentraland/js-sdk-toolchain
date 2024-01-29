@@ -21,13 +21,16 @@ export enum CoreComponents {
   AUDIO_SOURCE = 'core::AudioSource',
   AUDIO_STREAM = 'core::AudioStream',
   GLTF_CONTAINER = 'core::GltfContainer',
+  NETWORK_ENTITY = 'core-schema::Network-Entity',
   MATERIAL = 'core::Material',
   MESH_COLLIDER = 'core::MeshCollider',
   MESH_RENDERER = 'core::MeshRenderer',
   NFT_SHAPE = 'core::NftShape',
   POINTER_EVENTS = 'core::PointerEvents',
+  SYNC_COMPONENTS = 'core-schema::Sync-Components',
   TEXT_SHAPE = 'core::TextShape',
   TRANSFORM = 'core::Transform',
+  TWEEN = 'core::Tween',
   VIDEO_PLAYER = 'core::VideoPlayer',
   VISIBILITY_COMPONENT = 'core::VisibilityComponent'
 }
@@ -127,56 +130,65 @@ export type EditorComponents = {
 }
 
 export type SdkComponents = {
+  Animator: ReturnType<typeof components.Animator>
+  AudioSource: ReturnType<typeof components.AudioSource>
+  AudioStream: ReturnType<typeof components.AudioStream>
   Billboard: ReturnType<typeof components.Billboard>
   GltfContainer: ReturnType<typeof components.GltfContainer>
   Material: ReturnType<typeof components.Material>
-  MeshRenderer: ReturnType<typeof components.MeshRenderer>
   MeshCollider: ReturnType<typeof components.MeshCollider>
+  MeshRenderer: ReturnType<typeof components.MeshRenderer>
   Name: ReturnType<typeof components.Name>
+  NetworkEntity: ReturnType<typeof components.NetworkEntity>
+  NftShape: ReturnType<typeof components.NftShape>
+  PointerEvents: ReturnType<typeof components.PointerEvents>
+  SyncComponents: ReturnType<typeof components.SyncComponents>
   TextShape: ReturnType<typeof components.TextShape>
   Transform: ReturnType<typeof components.Transform>
-  AudioSource: ReturnType<typeof components.AudioSource>
-  VisibilityComponent: ReturnType<typeof components.VisibilityComponent>
+  Tween: ReturnType<typeof components.Tween>
   VideoPlayer: ReturnType<typeof components.VideoPlayer>
-  AudioStream: ReturnType<typeof components.AudioStream>
-  NftShape: ReturnType<typeof components.NftShape>
-  Animator: ReturnType<typeof components.Animator>
-  PointerEvents: ReturnType<typeof components.PointerEvents>
+  VisibilityComponent: ReturnType<typeof components.VisibilityComponent>
 }
 
 export function createComponents(engine: IEngine): SdkComponents {
-  const GltfContainer = components.GltfContainer(engine)
+  const Animator = components.Animator(engine)
+  const AudioSource = components.AudioSource(engine)
+  const AudioStream = components.AudioStream(engine)
   const Billboard = components.Billboard(engine)
+  const GltfContainer = components.GltfContainer(engine)
   const Material = components.Material(engine)
-  const MeshRenderer = components.MeshRenderer(engine)
   const MeshCollider = components.MeshCollider(engine)
+  const MeshRenderer = components.MeshRenderer(engine)
   const Name = components.Name(engine)
+  const NetworkEntity = components.NetworkEntity(engine)
+  const NftShape = components.NftShape(engine)
+  const PointerEvents = components.PointerEvents(engine)
+  const SyncComponents = components.SyncComponents(engine)
   const TextShape = components.TextShape(engine)
   const Transform = components.Transform(engine)
-  const AudioSource = components.AudioSource(engine)
-  const VisibilityComponent = components.VisibilityComponent(engine)
+  const Tween = components.Tween(engine)
   const VideoPlayer = components.VideoPlayer(engine)
-  const AudioStream = components.AudioStream(engine)
-  const NftShape = components.NftShape(engine)
-  const Animator = components.Animator(engine)
-  const PointerEvents = components.PointerEvents(engine)
+  const VisibilityComponent = components.VisibilityComponent(engine)
 
   return {
+    Animator,
+    AudioSource,
+    AudioStream,
     Billboard,
     GltfContainer,
     Material,
-    MeshRenderer,
     MeshCollider,
+    MeshRenderer,
     Name,
+    NetworkEntity,
+    NftShape,
+    PointerEvents,
+    SyncComponents,
     TextShape,
     Transform,
-    AudioSource,
-    VisibilityComponent,
+    Tween,
     VideoPlayer,
-    AudioStream,
-    NftShape,
-    Animator,
-    PointerEvents
+    VisibilityComponent
   }
 }
 

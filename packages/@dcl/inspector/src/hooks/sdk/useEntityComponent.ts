@@ -11,10 +11,7 @@ export const useEntityComponent = () => {
     (entity: Entity, missing?: boolean): Map<number, string> => {
       const components = new Map<number, string>()
       if (sdk) {
-        const engineComponents = Array.from(sdk.engine.componentsIter()).sort((a, b) =>
-          a.componentName.localeCompare(b.componentName)
-        )
-        for (const component of engineComponents) {
+        for (const component of sdk.engine.componentsIter()) {
           if (missing ? !component.has(entity) : component.has(entity)) {
             components.set(component.componentId, component.componentName)
           }

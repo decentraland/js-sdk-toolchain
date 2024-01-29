@@ -20,7 +20,7 @@ import { SyncEntities } from './sync-enum'
 
 export const GameStatus = engine.defineComponent('game-status', { paused: Schemas.Boolean })
 
-function gameStatusServer() {
+export function gameStatusServer() {
   const gameEntity = engine.addEntity()
   GameStatus.create(gameEntity, { paused: false })
   syncEntity(gameEntity, [GameStatus.componentId], SyncEntities.GAME_STATUS)

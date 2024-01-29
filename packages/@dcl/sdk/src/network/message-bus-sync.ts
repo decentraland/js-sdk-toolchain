@@ -3,7 +3,6 @@ import type { SendBinaryRequest, SendBinaryResponse } from '~system/Communicatio
 
 import { syncFilter } from './filter'
 import { engineToCrdt } from './state'
-import { serializeCrdtMessages } from '../internal/transports/logger'
 import { BinaryMessageBus, CommsMessage } from './binary-message-bus'
 import {
   definePlayersInScene,
