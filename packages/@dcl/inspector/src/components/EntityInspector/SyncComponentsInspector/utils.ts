@@ -8,8 +8,7 @@ const DISABLED_COMPONENTS: string[] = [
   ComponentName.ACTIONS,
   ComponentName.TRIGGERS,
   CoreComponents.NETWORK_ENTITY,
-  CoreComponents.SYNC_COMPONENTS,
-  CoreComponents.TWEEN
+  CoreComponents.SYNC_COMPONENTS
 ]
 
 export type Component = {
@@ -24,6 +23,8 @@ export const POTENTIAL_COMPONENTS: string[] = [
   CoreComponents.ANIMATOR,
   CoreComponents.AUDIO_SOURCE,
   CoreComponents.AUDIO_STREAM,
+  ComponentName.STATES,
+  CoreComponents.TWEEN,
   CoreComponents.VIDEO_PLAYER,
   CoreComponents.VISIBILITY_COMPONENT
 ]
@@ -107,6 +108,10 @@ export function getThroughActionName(name: string): string {
       return '([Play/Stop Sound] Action)'
     case CoreComponents.AUDIO_STREAM:
       return '([Play/Stop Audio Stream] Action)'
+    case CoreComponents.TWEEN:
+      return '([Start Tween] Action)'
+    case ComponentName.STATES:
+      return '([Set State] Action)'
     case CoreComponents.VIDEO_PLAYER:
       return '([Play/Stop Video Stream] Action)'
     case CoreComponents.VISIBILITY_COMPONENT:
