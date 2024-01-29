@@ -38,29 +38,34 @@ describe('getComponents', () => {
 
     expect(entityComponents).toEqual([
       {
-        name: getComponentName(CoreComponents.ANIMATOR),
+        name: CoreComponents.ANIMATOR,
+        displayName: getComponentName(CoreComponents.ANIMATOR),
         id: 1,
         potential: undefined
       },
       {
-        name: getComponentName(CoreComponents.AUDIO_SOURCE),
+        name: CoreComponents.AUDIO_SOURCE,
+        displayName: getComponentName(CoreComponents.AUDIO_SOURCE),
         id: 2,
         potential: true
       },
       {
-        name: getComponentName(CoreComponents.VIDEO_PLAYER),
+        name: CoreComponents.VIDEO_PLAYER,
+        displayName: getComponentName(CoreComponents.VIDEO_PLAYER),
         id: 3,
         potential: undefined
       }
     ])
     expect(availableComponents).toEqual([
       {
-        name: getComponentName(CoreComponents.GLTF_CONTAINER),
+        name: CoreComponents.GLTF_CONTAINER,
+        displayName: getComponentName(CoreComponents.GLTF_CONTAINER),
         id: 4,
         potential: undefined
       },
       {
-        name: getComponentName(CoreComponents.MESH_COLLIDER),
+        name: CoreComponents.MESH_COLLIDER,
+        displayName: getComponentName(CoreComponents.MESH_COLLIDER),
         id: 6,
         potential: undefined
       }
