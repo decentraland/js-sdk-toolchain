@@ -6,6 +6,7 @@ import { GizmoType } from '../../lib/utils/gizmo'
 function getSnapValue(gizmo: GizmoType) {
   switch (gizmo) {
     case GizmoType.POSITION:
+    case GizmoType.FREE:
       return snapManager.getPositionSnap()
     case GizmoType.ROTATION:
       return Math.round(snapManager.getRotationSnap() * (180 / Math.PI))
