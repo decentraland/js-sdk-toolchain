@@ -18,7 +18,7 @@ type GetPlayerDataRes = {
   userId: string
   avatar?: PBAvatarBase
   wearables: PBAvatarEquippedData['wearableUrns']
-  emotes: PBAvatarEquippedData['emotesUrns']
+  emotes: PBAvatarEquippedData['emoteUrns']
   position: TransformType['position'] | undefined
 }
 
@@ -92,7 +92,7 @@ function definePlayerHelper(engine: IEngine) {
         userId: playerData?.address ?? '',
         avatar: avatarData ?? undefined,
         wearables: wearablesData?.wearableUrns ?? [],
-        emotes: wearablesData?.emotesUrns ?? [],
+        emotes: wearablesData?.emoteUrns ?? [],
         position: Transform.getOrNull(userEntity)?.position
       }
     }

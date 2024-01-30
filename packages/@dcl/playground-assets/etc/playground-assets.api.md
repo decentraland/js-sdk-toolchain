@@ -2250,7 +2250,7 @@ export namespace PBAvatarEmoteCommand {
 // @public (undocumented)
 export interface PBAvatarEquippedData {
     // (undocumented)
-    emotesUrns: string[];
+    emoteUrns: string[];
     // (undocumented)
     wearableUrns: string[];
 }
