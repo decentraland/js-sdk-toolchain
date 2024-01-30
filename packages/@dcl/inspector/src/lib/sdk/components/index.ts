@@ -203,6 +203,15 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     y: Schemas.Int
   })
 
+  // legacy component
+  // we define the schema of the legacy component for retrocompat purposes
+  engine.defineComponent('inspector::Scene', {
+    layout: Schemas.Map({
+      base: Coords,
+      parcels: Schemas.Array(Coords)
+    })
+  })
+
   const Scene = engine.defineComponent(EditorComponentNames.Scene, {
     // everything but layout is set as optional for retrocompat purposes
     name: Schemas.Optional(Schemas.String),
