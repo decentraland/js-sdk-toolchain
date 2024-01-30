@@ -8,22 +8,29 @@ import { ByteBuffer } from '../serialization/ByteBuffer'
 import { crdtSceneSystem, OnChangeFunction } from '../systems/crdt'
 import { ComponentDefinition } from './component'
 import { createComponentDefinitionFromSchema } from './lww-element-set-component-definition'
-import { Entity, EntityContainer } from './entity'
+import { Entity, createEntityContainer } from './entity'
 import { ReadonlyComponentSchema } from './readonly'
 import { SystemItem, SystemContainer, SystemFn, SYSTEMS_REGULAR_PRIORITY } from './systems'
-import type { IEngine, IEngineOptions, MapComponentDefinition, PreEngine } from './types'
+import type {
+  IEngine,
+  IEngineOptions,
+  LastWriteWinElementSetComponentDefinition,
+  MapComponentDefinition,
+  PreEngine
+} from './types'
 import {
   createValueSetComponentDefinitionFromSchema,
   ValueSetOptions
 } from './grow-only-value-set-component-definition'
 import { removeEntityWithChildren as removeEntityWithChildrenEngine } from '../runtime/helpers/tree'
+import { CrdtMessageType } from '../serialization/crdt'
 export * from './input'
 export * from './readonly'
 export * from './types'
 export { Entity, ByteBuffer, SystemItem, OnChangeFunction }
 
-function preEngine(): PreEngine {
-  const entityContainer = EntityContainer()
+function preEngine(options?: IEngineOptions): PreEngine {
+  const entityContainer = options?.entityContainer ?? createEntityContainer()
   const componentsDefinition = new Map<number, ComponentDefinition<unknown>>()
   const systems = SystemContainer()
 
@@ -43,8 +50,9 @@ function preEngine(): PreEngine {
   }
   function removeEntity(entity: Entity) {
     for (const [, component] of componentsDefinition) {
-      // TODO: hack for the moment. It should be enough to delete the entity, but the renderer is not cleaning the components.
-      // So we still need the NetworkEntity to forward this message to the SyncTransport.
+      // TODO: hack for the moment.
+      // We still need the NetworkEntity to forward this message to the SyncTransport.
+      // If we remove it then we can't notify the other users which entity was deleted.
       if (component.componentName === 'core-schema::Network-Entity') continue
       component.entityDeleted(entity, true)
     }
@@ -95,7 +103,11 @@ function preEngine(): PreEngine {
     }
     /* istanbul ignore next */
     if (sealed) throw new Error('Engine is already sealed. No components can be added at this stage')
-    const newComponent = createComponentDefinitionFromSchema<T>(componentName, componentId, schema)
+    const newComponent: LastWriteWinElementSetComponentDefinition<T> = createComponentDefinitionFromSchema<T>(
+      componentName,
+      componentId,
+      schema
+    )
     componentsDefinition.set(componentId, newComponent)
     return newComponent as components.LastWriteWinElementSetComponentDefinition<T>
   }
@@ -178,8 +190,8 @@ function preEngine(): PreEngine {
   }
 
   function getEntityOrNullByName(value: string) {
-    const LabelComponent = components.Name({ defineComponent })
-    for (const [entity, name] of getEntitiesWith(LabelComponent)) {
+    const NameComponent = components.Name({ defineComponent })
+    for (const [entity, name] of getEntitiesWith(NameComponent)) {
       if (name.value === value) return entity
     }
     return null
@@ -253,8 +265,24 @@ function preEngine(): PreEngine {
  * @deprecated Prevent manual usage prefer "engine" for scene development
  */
 export function Engine(options?: IEngineOptions): IEngine {
-  const partialEngine = preEngine()
-  const crdtSystem = crdtSceneSystem(partialEngine, options?.onChangeFunction || null)
+  const partialEngine = preEngine(options)
+  const onChangeFunction: OnChangeFunction = (entity, operation, component, componentValue) => {
+    if (operation === CrdtMessageType.DELETE_ENTITY) {
+      for (const component of partialEngine.componentsIter()) {
+        const onChange = component?.__onChangeCallbacks(entity)
+        if (onChange) {
+          onChange(undefined)
+        }
+      }
+    } else {
+      const onChange = component?.__onChangeCallbacks(entity)
+      if (onChange) {
+        onChange(componentValue)
+      }
+    }
+    return options?.onChangeFunction(entity, operation, component, componentValue)
+  }
+  const crdtSystem = crdtSceneSystem(partialEngine, onChangeFunction)
 
   async function update(dt: number) {
     await crdtSystem.receiveMessages()

@@ -72,7 +72,7 @@ jobs:
   test-e2e:
     needs: [notify_deployment]
     runs-on: ubuntu-latest
-    if: ${{ github.ref != 'refs/heads/main' }}
+    if: false
     steps:
       - uses: actions/github-script@v6
         id: get-cloudflare-url

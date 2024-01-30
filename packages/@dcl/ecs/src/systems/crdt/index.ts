@@ -173,7 +173,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
           if (!conflictMessage) {
             // Add message to transport queue to be processed by others transports
             broadcastMessages.push(msg)
-            onProcessEntityComponentChange && onProcessEntityComponentChange(msg.entityId, msg.type, component, value)
+            onProcessEntityComponentChange && onProcessEntityComponentChange(entityId, msg.type, component, value)
           }
         } else {
           // TODO: test this line, it is fundammental to make the editor work
