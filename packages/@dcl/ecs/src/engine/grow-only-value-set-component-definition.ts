@@ -154,7 +154,8 @@ export function createValueSetComponentDefinitionFromSchema<T>(
     updateFromCrdt(_body) {
       if (_body.type === CrdtMessageType.APPEND_VALUE) {
         const buf = new ReadWriteByteBuffer(_body.data)
-        append(_body.entityId, schema.deserialize(buf) as DeepReadonly<T>)
+        const { value } = append(_body.entityId, schema.deserialize(buf) as DeepReadonly<T>)
+        return [null, value as T]
       }
       return [null, undefined]
     },

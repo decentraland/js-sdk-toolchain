@@ -11,6 +11,7 @@ type GetPlayerDataReq = {
   userId: string
 }
 type GetPlayerDataRes = {
+  entity: Entity
   name: string
   isGuest: boolean
   userId: string
@@ -37,7 +38,7 @@ function definePlayerHelper(engine: IEngine) {
 
         // Call onEnter callback
         if (onEnterSceneCb) {
-          onEnterSceneCb(getPlayerData({ userId: identity.address })!)
+          onEnterSceneCb(getPlayer({ userId: identity.address })!)
         }
 
         // Check for changes/remove callbacks
@@ -61,7 +62,7 @@ function definePlayerHelper(engine: IEngine) {
     /**
      * Returns the info of the player if it's in the scene.
      */
-    getPlayerData(user?: GetPlayerDataReq): GetPlayerDataRes | null {
+    getPlayer(user?: GetPlayerDataReq): GetPlayerDataRes | null {
       function getEntity() {
         if (!user?.userId) return engine.PlayerEntity
         for (const [entity, data] of engine.getEntitiesWith(PlayerIdentityData)) {
@@ -82,6 +83,7 @@ function definePlayerHelper(engine: IEngine) {
       if (!playerData && !avatarData && !wearablesData) return null
 
       return {
+        entity: userEntity,
         name: avatarData?.name ?? '',
         isGuest: !!playerData?.isGuest ?? false,
         userId: playerData?.address ?? '',
@@ -94,7 +96,7 @@ function definePlayerHelper(engine: IEngine) {
 }
 
 const players = definePlayerHelper(engine)
-const { getPlayerData, onEnterScene, onLeaveScene } = players
+const { getPlayer, onEnterScene, onLeaveScene } = players
 
-export { getPlayerData, onEnterScene, onLeaveScene }
+export { getPlayer, onEnterScene, onLeaveScene }
 export default players
