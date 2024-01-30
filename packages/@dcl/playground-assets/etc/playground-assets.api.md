@@ -72,6 +72,15 @@ export const enum AvatarAnchorPointType {
 export const AvatarAttach: LastWriteWinElementSetComponentDefinition<PBAvatarAttach>;
 
 // @public (undocumented)
+export const AvatarBase: LastWriteWinElementSetComponentDefinition<PBAvatarBase>;
+
+// @public (undocumented)
+export const AvatarEmoteCommand: GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>;
+
+// @public (undocumented)
+export const AvatarEquippedData: LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>;
+
+// @public (undocumented)
 export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>;
 
 // @public (undocumented)
@@ -119,6 +128,7 @@ export interface BaseComponent<T> {
     get(entity: Entity): any;
     getCrdtUpdates(): Iterable<CrdtMessageBody>;
     has(entity: Entity): boolean;
+    onChange(entity: Entity, cb: (value: T | undefined) => void): void;
     // (undocumented)
     readonly schema: ISchema<T>;
     updateFromCrdt(body: CrdtMessageBody): [null | ConflictResolutionMessage, T | undefined];
@@ -514,6 +524,9 @@ export const componentDefinitionByName: {
     "core::AudioSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioSource>>;
     "core::AudioStream": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioStream>>;
     "core::AvatarAttach": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarAttach>>;
+    "core::AvatarBase": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarBase>>;
+    "core::AvatarEmoteCommand": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>>;
+    "core::AvatarEquippedData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>>;
     "core::AvatarModifierArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>>;
     "core::AvatarShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarShape>>;
     "core::Billboard": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBBillboard>>;
@@ -526,6 +539,7 @@ export const componentDefinitionByName: {
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
     "core::NftShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBNftShape>>;
+    "core::PlayerIdentityData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>>;
     "core::PointerEvents": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerEvents>>;
     "core::PointerEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBPointerEventsResult>>;
     "core::PointerLock": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerLock>>;
@@ -719,6 +733,11 @@ export enum CrdtMessageType {
 
 // @public (undocumented)
 export type CrdtNetworkMessageBody = PutNetworkComponentMessageBody | DeleteComponentNetworkMessageBody | DeleteEntityNetworkMessageBody;
+
+// @public (undocumented)
+export function createEntityContainer(opts?: {
+    reservedStaticEntities: number;
+}): IEntityContainer;
 
 // Warning: (ae-missing-release-tag) "createEthereumProvider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -971,21 +990,6 @@ export type EntityComponents = {
     onMouseUp: Callback;
 };
 
-// Warning: (tsdoc-undefined-tag) The TSDoc tag "@intenral" is not defined in this configuration
-// Warning: (ae-missing-release-tag) "EntityContainer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type EntityContainer = {
-    generateEntity(networked?: boolean): Entity;
-    removeEntity(entity: Entity): boolean;
-    getEntityState(entity: Entity): EntityState;
-    getExistingEntities(): Set<Entity>;
-    releaseRemovedEntities(): Entity[];
-    updateRemovedEntity(entity: Entity): boolean;
-    updateUsedEntity(entity: Entity): boolean;
-    setNetworkEntitiesRange(reservedLocalEntities: number, range: [number, number]): void;
-};
-
 // @public (undocumented)
 export enum EntityMappingMode {
     // (undocumented)
@@ -1174,8 +1178,21 @@ export interface IEngine {
 // @public (undocumented)
 export interface IEngineOptions {
     // (undocumented)
+    entityContainer?: IEntityContainer;
+    // (undocumented)
     onChangeFunction: OnChangeFunction;
 }
+
+// @public (undocumented)
+export type IEntityContainer = {
+    generateEntity(networked?: boolean): Entity;
+    removeEntity(entity: Entity): boolean;
+    getEntityState(entity: Entity): EntityState;
+    getExistingEntities(): Set<Entity>;
+    releaseRemovedEntities(): Entity[];
+    updateRemovedEntity(entity: Entity): boolean;
+    updateUsedEntity(entity: Entity): boolean;
+};
 
 // Warning: (ae-missing-release-tag) "IEventNames" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2192,6 +2209,61 @@ export namespace PBAvatarAttach {
 }
 
 // @public (undocumented)
+export interface PBAvatarBase {
+    // (undocumented)
+    bodyShapeUrn: string;
+    // (undocumented)
+    eyesColor: PBColor3 | undefined;
+    // (undocumented)
+    hairColor: PBColor3 | undefined;
+    // (undocumented)
+    name: string;
+    // (undocumented)
+    skinColor: PBColor3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBAvatarBase {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarBase;
+    // (undocumented)
+    export function encode(message: PBAvatarBase, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAvatarEmoteCommand {
+    // (undocumented)
+    emoteUrn: string;
+    // (undocumented)
+    loop: boolean;
+    timestamp: number;
+}
+
+// @public (undocumented)
+export namespace PBAvatarEmoteCommand {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarEmoteCommand;
+    // (undocumented)
+    export function encode(message: PBAvatarEmoteCommand, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAvatarEquippedData {
+    // (undocumented)
+    emoteUrns: string[];
+    // (undocumented)
+    wearableUrns: string[];
+}
+
+// @public (undocumented)
+export namespace PBAvatarEquippedData {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarEquippedData;
+    // (undocumented)
+    export function encode(message: PBAvatarEquippedData, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBAvatarModifierArea {
     area: PBVector3 | undefined;
     excludeIds: string[];
@@ -2582,6 +2654,21 @@ export namespace PBNftShape {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBNftShape;
     // (undocumented)
     export function encode(message: PBNftShape, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBPlayerIdentityData {
+    address: string;
+    // (undocumented)
+    isGuest: boolean;
+}
+
+// @public (undocumented)
+export namespace PBPlayerIdentityData {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPlayerIdentityData;
+    // (undocumented)
+    export function encode(message: PBPlayerIdentityData, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3174,6 +3261,9 @@ export namespace Plane {
 }
 
 // @public (undocumented)
+export const PlayerIdentityData: LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>;
+
+// @public (undocumented)
 export const PointerEvents: LastWriteWinElementSetComponentDefinition<PBPointerEvents>;
 
 // @public (undocumented)
@@ -3540,11 +3630,6 @@ export namespace Rect {
 
 // @public
 export function removeEntityWithChildren(engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema' | 'removeEntity' | 'defineComponent'>, entity: Entity): void;
-
-// Warning: (ae-missing-release-tag) "RESERVED_LOCAL_ENTITIES" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export const RESERVED_LOCAL_ENTITIES = 65535;
 
 // Warning: (ae-missing-release-tag) "RESERVED_STATIC_ENTITIES" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

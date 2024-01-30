@@ -6,7 +6,7 @@
   "bugs": "https://github.com/decentraland/js-sdk-toolchain/issues",
   "dependencies": {
     "@actions/core": "^1.10.0",
-    "@dcl/protocol": "1.0.0-7117237552.commit-82dc93b",
+    "@dcl/protocol": "1.0.0-7716486147.commit-7433b10",
     "@dcl/quickjs-emscripten": "^0.21.0-3680274614.commit-1808aa1",
     "@dcl/ts-proto": "1.153.0",
     "@types/fs-extra": "^9.0.12",

@@ -93,18 +93,29 @@ describe('Conflict resolution rules for GrowOnlyValueSet based components', () =
       },
       buf
     )
-
-    component.updateFromCrdt({
+    const [_conflict, value] = component.updateFromCrdt({
       componentId: 1,
       data: buf.toBinary(),
       entityId,
       timestamp: 0,
       type: CrdtMessageType.APPEND_VALUE
     })
+    expect(value).toMatchObject({
+      text: 'asd',
+      timestamp: 2
+    })
 
     // append operations do not generate a dirty state
     expect(Array.from(component.dirtyIterator())).toEqual([])
     expect(Array.from(component.getCrdtUpdates())).toMatchObject([])
+    const [noValue] = component.updateFromCrdt({
+      componentId: 1,
+      entityId,
+      timestamp: 0,
+      data: buf.toBinary(),
+      type: CrdtMessageType.PUT_COMPONENT
+    })
+    expect(noValue).toBe(null)
   })
 
   it('GET also includes APPEND(ed) message', () => {
