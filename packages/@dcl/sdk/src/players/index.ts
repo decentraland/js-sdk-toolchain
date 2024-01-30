@@ -1,10 +1,11 @@
-import { Entity, IEngine, engine } from '@dcl/ecs'
+import { Entity, IEngine, TransformType, engine } from '@dcl/ecs'
 import {
   PlayerIdentityData as definePlayerIdenityData,
   AvatarBase as defineAvatarBase,
   AvatarEquippedData as defineAvatarEquippedData,
   PBAvatarBase,
-  PBAvatarEquippedData
+  PBAvatarEquippedData,
+  Transform as defineTransform
 } from '@dcl/ecs/dist/components'
 
 type GetPlayerDataReq = {
@@ -18,9 +19,11 @@ type GetPlayerDataRes = {
   avatar?: PBAvatarBase
   wearables: PBAvatarEquippedData['wearableUrns']
   emotes: PBAvatarEquippedData['emotesUrns']
+  position: TransformType['position'] | undefined
 }
 
 function definePlayerHelper(engine: IEngine) {
+  const Transform = defineTransform(engine)
   const PlayerIdentityData = definePlayerIdenityData(engine)
   const AvatarEquippedData = defineAvatarEquippedData(engine)
   const AvatarBase = defineAvatarBase(engine)
@@ -29,7 +32,7 @@ function definePlayerHelper(engine: IEngine) {
   let onLeaveSceneCb: ((userId: string) => void) | undefined = undefined
 
   engine.addSystem(() => {
-    const players = Array.from(engine.getEntitiesWith(PlayerIdentityData))
+    const players = Array.from(engine.getEntitiesWith(PlayerIdentityData, AvatarBase))
     if (players.length === playerEntities.size) return
 
     for (const [entity, identity] of players) {
@@ -42,8 +45,8 @@ function definePlayerHelper(engine: IEngine) {
         }
 
         // Check for changes/remove callbacks
-        PlayerIdentityData.onChange(entity, (value) => {
-          if (!value && onLeaveSceneCb) {
+        AvatarBase.onChange(entity, (value) => {
+          if (!value && onLeaveSceneCb && playerEntities.get(entity)) {
             onLeaveSceneCb(playerEntities.get(entity)!)
             playerEntities.delete(entity)
           }
@@ -89,7 +92,8 @@ function definePlayerHelper(engine: IEngine) {
         userId: playerData?.address ?? '',
         avatar: avatarData ?? undefined,
         wearables: wearablesData?.wearableUrns ?? [],
-        emotes: wearablesData?.emotesUrns ?? []
+        emotes: wearablesData?.emotesUrns ?? [],
+        position: Transform.getOrNull(userEntity)?.position
       }
     }
   }
