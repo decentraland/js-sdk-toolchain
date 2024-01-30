@@ -269,13 +269,13 @@ export function Engine(options?: IEngineOptions): IEngine {
   const onChangeFunction: OnChangeFunction = (entity, operation, component, componentValue) => {
     if (operation === CrdtMessageType.DELETE_ENTITY) {
       for (const component of partialEngine.componentsIter()) {
-        const onChange = component?.onchangeCallbacks(entity)
+        const onChange = component?.__onChangeCallbacks(entity)
         if (onChange) {
           onChange(undefined)
         }
       }
     } else {
-      const onChange = component?.onchangeCallbacks(entity)
+      const onChange = component?.__onChangeCallbacks(entity)
       if (onChange) {
         onChange(componentValue)
       }

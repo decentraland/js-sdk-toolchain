@@ -96,7 +96,7 @@ export interface BaseComponent<T> {
    *
    * @internal
    */
-  onchangeCallbacks(entity: Entity): ((value: any) => void) | undefined
+  __onChangeCallbacks(entity: Entity): ((value: any) => void) | undefined
 
   /**
    * @public

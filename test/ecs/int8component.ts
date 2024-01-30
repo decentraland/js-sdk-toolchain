@@ -94,7 +94,7 @@ export const int8Component = (engine: IEngine) => {
     },
     dumpCrdtStateToBuffer: createDumpLwwFunctionFromCrdt(ID, timestamps, schema, data),
     onChange: () => {},
-    onchangeCallbacks() {
+    __onChangeCallbacks() {
       return undefined
     }
   }

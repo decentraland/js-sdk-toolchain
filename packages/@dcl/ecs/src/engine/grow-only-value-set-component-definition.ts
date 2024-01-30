@@ -172,7 +172,7 @@ export function createValueSetComponentDefinitionFromSchema<T>(
     onChange(entity, cb) {
       onChangeCallbacks.set(entity, cb)
     },
-    onchangeCallbacks(entity) {
+    __onChangeCallbacks(entity) {
       return onChangeCallbacks.get(entity)
     }
   }
