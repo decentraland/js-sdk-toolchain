@@ -45,6 +45,10 @@ export const Gizmos = withSdk(({ sdk }) => {
   useHotkey(['R'], handleRotationGizmo)
   useHotkey(['X'], handleScaleGizmo)
 
+  useHotkey(['M'], handlePositionGizmo)
+  useHotkey(['R'], handleRotationGizmo)
+  useHotkey(['X'], handleScaleGizmo)
+
   const {
     isPositionGizmoWorldAligned,
     isRotationGizmoWorldAligned,

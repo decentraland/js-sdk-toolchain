@@ -75,9 +75,15 @@ export function loadGltf(entity: EcsEntity, value: string) {
     sceneContext = entity.context
   }
 
-  tryLoadGltfAsync(context.loadableScene.id, entity, value).catch((err) => {
-    console.error('Error trying to load gltf ' + value, err)
-  })
+  const loadingSpinner = createLoadingSpinner(entity, context.scene)
+
+  tryLoadGltfAsync(context.loadableScene.id, entity, value)
+    .catch((err) => {
+      console.error('Error trying to load gltf ' + value, err)
+    })
+    .finally(() => {
+      loadingSpinner.dispose(false, true)
+    })
 }
 
 export function removeGltf(entity: EcsEntity) {
@@ -306,4 +312,120 @@ function processColliders($: BABYLON.AssetContainer) {
       mesh.isPickable = true
     }
   }
+}
+
+function createSemiTorus(
+  radius: number,
+  tube: number,
+  radialSegments: number,
+  tubularSegments: number,
+  arc: number,
+  color: BABYLON.Color3,
+  scene: BABYLON.Scene
+): BABYLON.Mesh {
+  const positions = []
+  const indices = []
+
+  const angleStep = arc / radialSegments
+  const radiusStep = tube / tubularSegments
+
+  for (let i = 0; i <= radialSegments; i++) {
+    const angle = i * angleStep
+    const cosAngle = Math.cos(angle)
+    const sinAngle = Math.sin(angle)
+
+    for (let j = 0; j <= tubularSegments; j++) {
+      const currentRadius = radius + j * radiusStep
+      const x = currentRadius * cosAngle
+      const y = currentRadius * sinAngle
+      const z = 0
+
+      positions.push(x, y, z)
+
+      if (i < radialSegments && j < tubularSegments) {
+        const nextRow = tubularSegments + 1
+        const nextIndex = i * nextRow + j
+
+        indices.push(nextIndex, nextIndex + nextRow, nextIndex + 1)
+        indices.push(nextIndex + nextRow, nextIndex + nextRow + 1, nextIndex + 1)
+      }
+    }
+  }
+
+  const semiTorus = new BABYLON.Mesh('semiTorus', scene)
+  const vertexData = new BABYLON.VertexData()
+
+  vertexData.positions = positions
+  vertexData.indices = indices
+
+  vertexData.applyToMesh(semiTorus)
+
+  const material = new BABYLON.StandardMaterial('semiTorusMaterial', scene)
+  material.diffuseColor = color
+
+  semiTorus.material = material
+
+  return semiTorus
+}
+
+/**
+ * Creates a loading spinner mesh.
+ * @param entity - The entity to attach the loading spinner to.
+ * @param scene - The BABYLON.Scene instance.
+ * @param radius - The radius of the loading spinner.
+ * @param tube - The tube diameter of the loading spinner.
+ * @param radialSegments - The number of radial segments of the loading spinner.
+ * @param tubularSegments - The number of tubular segments of the loading spinner.
+ * @returns The created loading spinner mesh.
+ */
+function createLoadingSpinner(
+  entity: EcsEntity,
+  scene: BABYLON.Scene,
+  radius: number = 0.15,
+  tube: number = 0.05,
+  radialSegments: number = 32,
+  tubularSegments: number = 16
+): BABYLON.Mesh {
+  const CIRCLE = Math.PI * 2
+  const LIGHT_GRAY = new BABYLON.Color3(0.9, 0.9, 0.9)
+  const torusOutline = createSemiTorus(radius, tube, radialSegments, tubularSegments, CIRCLE, LIGHT_GRAY, scene)
+  torusOutline.position.copyFrom(entity.position)
+  torusOutline.position.y += 1
+  torusOutline.rotation.x = Math.PI
+  torusOutline.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL
+
+  const LIGHT_RED = new BABYLON.Color3(1, 0.5, 0.5)
+  const semiTorus = createSemiTorus(radius, tube, radialSegments, tubularSegments, CIRCLE / 4, LIGHT_RED, scene)
+  semiTorus.position.z += 0.001
+  semiTorus.parent = torusOutline
+
+  const rotationAnimation = new BABYLON.Animation(
+    'semiTorusRotation',
+    'rotation.z',
+    30,
+    BABYLON.Animation.ANIMATIONTYPE_FLOAT,
+    BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE
+  )
+
+  rotationAnimation.setKeys([
+    { frame: 0, value: 0 },
+    { frame: 100, value: CIRCLE }
+  ])
+
+  const animationGroup = new BABYLON.AnimationGroup('loadingSpinnerAnimation')
+  animationGroup.addTargetedAnimation(rotationAnimation, semiTorus)
+  animationGroup.play(true)
+
+  torusOutline.onDisposeObservable.add(() => {
+    animationGroup.dispose()
+    if (torusOutline.material) {
+      torusOutline.material.dispose()
+    }
+    if (semiTorus.material) {
+      semiTorus.material.dispose()
+    }
+    semiTorus.dispose(false, true)
+  })
+
+  return torusOutline
 }
