@@ -91,9 +91,14 @@ const Renderer: React.FC = () => {
 
   const duplicateSelectedEntities = useCallback(() => {
     if (!sdk) return
+    const camera = sdk.scene.activeCamera!
+    camera.detachControl()
     const selectedEntitites = sdk.sceneContext.operations.getSelectedEntities()
     selectedEntitites.forEach((entity) => sdk.sceneContext.operations.duplicateEntity(entity))
     void sdk.sceneContext.operations.dispatch()
+    setTimeout(() => {
+      camera.attachControl(canvasRef.current, true)
+    }, 100)
   }, [sdk])
 
   const copySelectedEntities = useCallback(() => {
