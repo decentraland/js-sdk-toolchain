@@ -104,7 +104,6 @@ const Renderer: React.FC = () => {
   const copySelectedEntities = useCallback(() => {
     if (!sdk) return
     const selectedEntitites = sdk.sceneContext.operations.getSelectedEntities()
-    console.log('copySelectedEntities', selectedEntitites)
     setCopyEntities([...selectedEntitites])
   }, [sdk, setCopyEntities])
 
