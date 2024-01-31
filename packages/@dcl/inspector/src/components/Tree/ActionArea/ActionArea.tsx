@@ -6,6 +6,9 @@ import { Entity, LastWriteWinElementSetComponentDefinition } from '@dcl/ecs'
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { useEntityComponent } from '../../../hooks/sdk/useEntityComponent'
 import { SdkContextValue } from '../../../lib/sdk/context'
+import { analytics, Event } from '../../../lib/logic/analytics'
+import { getAssetByModel } from '../../../lib/logic/catalog'
+
 import './ActionArea.css'
 
 type Props = {
@@ -14,10 +17,12 @@ type Props = {
 
 const ActionArea: React.FC<WithSdkProps & Props> = ({ sdk, ...props }) => {
   const {
-    components: { Lock, Hide }
+    components: { Lock, Hide, GltfContainer }
   } = sdk
   const { entity } = props
   const { addComponent, removeComponent } = useEntityComponent()
+  const { src: gltfSrc } = GltfContainer.getOrNull(entity) ?? { src: '' }
+  const asset = getAssetByModel(gltfSrc)
 
   const isEntityLocked = useMemo(() => {
     return Lock.getOrNull(entity) !== null
@@ -33,8 +38,18 @@ const ActionArea: React.FC<WithSdkProps & Props> = ({ sdk, ...props }) => {
         entity,
         Hide as unknown as LastWriteWinElementSetComponentDefinition<SdkContextValue['components']>
       )
+      analytics.track(Event.REMOVE_COMPONENT, {
+        componentName: Hide.componentName,
+        itemId: asset?.id,
+        itemPath: gltfSrc
+      })
     } else {
       addComponent(entity, Hide.componentId, { value: true })
+      analytics.track(Event.ADD_COMPONENT, {
+        componentName: Hide.componentName,
+        itemId: asset?.id,
+        itemPath: gltfSrc
+      })
     }
   }, [entity, sdk, isEntityHidden])
 
@@ -44,8 +59,18 @@ const ActionArea: React.FC<WithSdkProps & Props> = ({ sdk, ...props }) => {
         entity,
         Lock as unknown as LastWriteWinElementSetComponentDefinition<SdkContextValue['components']>
       )
+      analytics.track(Event.REMOVE_COMPONENT, {
+        componentName: Lock.componentName,
+        itemId: asset?.id,
+        itemPath: gltfSrc
+      })
     } else {
       addComponent(entity, Lock.componentId, { value: true })
+      analytics.track(Event.ADD_COMPONENT, {
+        componentName: Lock.componentName,
+        itemId: asset?.id,
+        itemPath: gltfSrc
+      })
     }
   }, [sdk, isEntityLocked])
 
