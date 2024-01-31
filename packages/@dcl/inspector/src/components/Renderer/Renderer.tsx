@@ -156,6 +156,7 @@ const Renderer: React.FC = () => {
       itemPath: asset.asset.src,
       isSmart: isSmart(asset)
     })
+    canvasRef.current?.focus()
   }
 
   const importBuilderAsset = async (asset: Asset) => {
