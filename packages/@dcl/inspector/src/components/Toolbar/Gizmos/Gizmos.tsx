@@ -27,9 +27,18 @@ export const Gizmos = withSdk(({ sdk }) => {
 
   const [selection, setSelection] = useComponentValue(entity || ROOT, sdk.components.Selection)
 
-  const handlePositionGizmo = useCallback(() => setSelection({ gizmo: GizmoType.POSITION }), [setSelection])
-  const handleRotationGizmo = useCallback(() => setSelection({ gizmo: GizmoType.ROTATION }), [setSelection])
-  const handleScaleGizmo = useCallback(() => setSelection({ gizmo: GizmoType.SCALE }), [setSelection])
+  const handlePositionGizmo = useCallback(
+    () => setSelection({ gizmo: selection.gizmo !== GizmoType.POSITION ? GizmoType.POSITION : GizmoType.FREE }),
+    [selection, setSelection]
+  )
+  const handleRotationGizmo = useCallback(
+    () => setSelection({ gizmo: selection.gizmo !== GizmoType.ROTATION ? GizmoType.ROTATION : GizmoType.FREE }),
+    [selection, setSelection]
+  )
+  const handleScaleGizmo = useCallback(
+    () => setSelection({ gizmo: selection.gizmo !== GizmoType.SCALE ? GizmoType.SCALE : GizmoType.FREE }),
+    [selection, setSelection]
+  )
 
   const {
     isPositionGizmoWorldAligned,

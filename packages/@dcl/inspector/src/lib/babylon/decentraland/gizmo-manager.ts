@@ -1,5 +1,13 @@
 import mitt from 'mitt'
-import { IAxisDragGizmo, PickingInfo, Quaternion, Node } from '@babylonjs/core'
+import {
+  IAxisDragGizmo,
+  PickingInfo,
+  Quaternion,
+  Node,
+  Vector3,
+  PointerDragBehavior,
+  AbstractMesh
+} from '@babylonjs/core'
 import { Entity, TransformType } from '@dcl/ecs'
 import { Vector3 as DclVector3, Quaternion as DclQuaternion } from '@dcl/ecs-math'
 import { GizmoType } from '../../utils/gizmo'
@@ -54,8 +62,12 @@ export function createGizmoManager(context: SceneContext) {
   let isEnabled = true
   const parentMapper: Map<Entity, Node> = new Map()
 
+  function getSelectedEntities() {
+    return context.operations.getSelectedEntities()
+  }
+
   function areMultipleEntitiesSelected() {
-    return context.operations.getSelectedEntities().length > 1
+    return getSelectedEntities().length > 1
   }
 
   function fixRotationGizmoAlignment(value: TransformType) {
@@ -142,7 +154,7 @@ export function createGizmoManager(context: SceneContext) {
 
     // Update entity transform for all the selected entities
     if (areMultipleEntitiesSelected()) {
-      for (const entityId of context.operations.getSelectedEntities()) {
+      for (const entityId of getSelectedEntities()) {
         if (entityId === lastEntity.entityId) continue
         const entity = context.getEntityOrNull(entityId)!
         const transform = getTransform(entity)
@@ -154,7 +166,7 @@ export function createGizmoManager(context: SceneContext) {
   function initTransform() {
     if (lastEntity === null) return
     if (areMultipleEntitiesSelected()) {
-      for (const entityId of context.operations.getSelectedEntities()) {
+      for (const entityId of getSelectedEntities()) {
         if (entityId === lastEntity.entityId) continue
         const entity = context.getEntityOrNull(entityId)!
         parentMapper.set(entityId, entity.parent!)
@@ -250,6 +262,25 @@ export function createGizmoManager(context: SceneContext) {
     }
   })
 
+  const meshPointerDragBehavior = new PointerDragBehavior({
+    dragPlaneNormal: new Vector3(0, 1, 0)
+  })
+
+  context.scene.onPointerDown = function (_e, pickResult) {
+    if (lastEntity === null || pickResult.pickedMesh === null || !gizmoManager.freeGizmoEnabled) return
+    const selectedEntities = getSelectedEntities().map((entityId) => context.getEntityOrNull(entityId)!)
+    if (selectedEntities.some((entity) => pickResult.pickedMesh!.isDescendantOf(entity))) {
+      initTransform()
+      meshPointerDragBehavior.attach(lastEntity as unknown as AbstractMesh)
+    }
+  }
+
+  context.scene.onPointerUp = function () {
+    if (lastEntity === null || !gizmoManager.freeGizmoEnabled) return
+    updateTransform()
+    meshPointerDragBehavior.detach()
+  }
+
   if (canvas) {
     canvas.addEventListener('pointerenter', () => {
       if (movingNode) {
@@ -291,12 +322,13 @@ export function createGizmoManager(context: SceneContext) {
       unsetEntity()
     },
     getGizmoTypes() {
-      return [GizmoType.POSITION, GizmoType.ROTATION, GizmoType.SCALE] as const
+      return [GizmoType.POSITION, GizmoType.ROTATION, GizmoType.SCALE, GizmoType.FREE] as const
     },
     setGizmoType(type: GizmoType) {
       gizmoManager.positionGizmoEnabled = type === GizmoType.POSITION
       gizmoManager.rotationGizmoEnabled = type === GizmoType.ROTATION
       gizmoManager.scaleGizmoEnabled = type === GizmoType.SCALE
+      gizmoManager.freeGizmoEnabled = type === GizmoType.FREE
       events.emit('change')
     },
     isPositionGizmoWorldAligned,
