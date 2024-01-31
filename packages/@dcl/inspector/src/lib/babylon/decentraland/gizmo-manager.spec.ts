@@ -159,7 +159,12 @@ describe('GizmoManager', () => {
     })
     describe('When getting the gizmo types', () => {
       it('should return the gizmo types', () => {
-        expect(gizmos.getGizmoTypes()).toEqual([GizmoType.POSITION, GizmoType.ROTATION, GizmoType.SCALE])
+        expect(gizmos.getGizmoTypes()).toEqual([
+          GizmoType.POSITION,
+          GizmoType.ROTATION,
+          GizmoType.SCALE,
+          GizmoType.FREE
+        ])
       })
     })
     describe('When setting the gizmo type', () => {
