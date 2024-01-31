@@ -24,6 +24,8 @@ export const ZOOM_OUT_ALT = `_`
 export const RESET_CAMERA = 'space'
 export const SAVE = `${CTRL}+s`
 export const SAVE_ALT = `${COMMAND}+s`
+export const DUPLICATE = `${CTRL}+d`
+export const DUPLICATE_ALT = `${COMMAND}+d`
 
 /**
  * Hook that listens for key presses and triggers a callback function when the specified keys are pressed.
