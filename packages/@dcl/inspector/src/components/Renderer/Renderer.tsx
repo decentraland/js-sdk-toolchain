@@ -104,6 +104,7 @@ const Renderer: React.FC = () => {
   const copySelectedEntities = useCallback(() => {
     if (!sdk) return
     const selectedEntitites = sdk.sceneContext.operations.getSelectedEntities()
+    console.log('copySelectedEntities', selectedEntitites)
     setCopyEntities([...selectedEntitites])
   }, [sdk, setCopyEntities])
 
@@ -156,6 +157,7 @@ const Renderer: React.FC = () => {
       itemPath: asset.asset.src,
       isSmart: isSmart(asset)
     })
+    canvasRef.current?.focus()
   }
 
   const importBuilderAsset = async (asset: Asset) => {
