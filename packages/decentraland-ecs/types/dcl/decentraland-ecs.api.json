@@ -14546,7 +14546,7 @@
               "canonicalReference": "@dcl/legacy-ecs!Engine:class"
             }
           ],
-          "fileUrlPath": "dist/0.6289080540469796index.d.ts",
+          "fileUrlPath": "dist/0.16640530207844217index.d.ts",
           "isReadonly": true,
           "releaseTag": "Public",
           "name": "engine",

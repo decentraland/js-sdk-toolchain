@@ -2,6 +2,7 @@ import resolve from '@rollup/plugin-node-resolve'
 import { RollupOptions } from 'rollup'
 import typescript from '@rollup/plugin-typescript'
 import commonjs from '@rollup/plugin-commonjs'
+import terser from '@rollup/plugin-terser'
 import { sys } from 'typescript'
 import { apiExtractor } from './api-extractor'
 
@@ -42,6 +43,15 @@ const config: RollupOptions = {
       name: 'self',
       extend: true,
       sourcemap: 'inline'
+    },
+    {
+      file: packageJson.main.replace(/\.js$/, '.min.js'),
+      format: 'iife',
+      name: 'self',
+      extend: true,
+      sourcemap: 'hidden',
+      compact: true,
+      plugins: [terser({})]
     }
   ]
 }
