@@ -118,7 +118,6 @@ export default withSdk<Props>(({ sdk, entity }) => {
   const categoriesProps = getInputProps('categories')
   const authorProps = getInputProps('author')
   const emailProps = getInputProps('email')
-  const tagsProps = getInputProps('tags')
   const silenceVoiceChatProps = getInputProps('silenceVoiceChat', (e) => e.target.checked)
   const disablePortableExperiencesProps = getInputProps('disablePortableExperiences', (e) => e.target.checked)
 
@@ -395,10 +394,20 @@ export default withSdk<Props>(({ sdk, entity }) => {
             />
           </span>
           <Dropdown label="Age Rating" options={AGE_RATING_OPTIONS} {...ageRatingProps} />
-          <Dropdown label="Categories" options={CATEGORIES_OPTIONS} multiple {...categoriesProps} />
+          <Dropdown
+            label="Categories"
+            options={CATEGORIES_OPTIONS}
+            multiple
+            {...categoriesProps}
+            onChange={(event) => {
+              if ((event.target.value as unknown as string[]).length > 3) {
+                return
+              }
+              categoriesProps.onChange!(event)
+            }}
+          />
           <TextField label="Author (optional)" {...authorProps} />
           <TextField label="Email (optional)" {...emailProps} />
-          <TextField label="Tags (optional)" {...tagsProps} />
         </>
       ) : null}
 
