@@ -133,7 +133,7 @@ export class MultiObserver<T> {
     result._observers = new Array<Observer<T>>()
     result._observables = observables
 
-    for (const observable of observables) {
+    for (const observable of observables as any) {
       const observer = observable.add(callback, mask, false, scope)
       if (observer) {
         result._observers.push(observer)
@@ -303,7 +303,7 @@ export class Observable<T> {
     state.skipNextObservers = false
     state.lastReturnValue = eventData
 
-    for (const obs of this._observers) {
+    for (const obs of this._observers as any) {
       if (obs._willBeUnregistered) {
         continue
       }
@@ -446,7 +446,7 @@ export class Observable<T> {
    * @returns whether or not one observer registered with the given mask is handeled
    */
   public hasSpecificMask(mask: number = -1): boolean {
-    for (const obs of this._observers) {
+    for (const obs of this._observers as any) {
       if (obs.mask & mask || obs.mask === mask) {
         return true
       }

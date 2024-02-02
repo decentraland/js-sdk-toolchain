@@ -113,7 +113,7 @@ export function Component(componentName: string, classId?: number) {
 
     const RegisteredComponent: any = function RegisteredComponent() {
       // eslint-disable-next-line prefer-rest-params
-      const args = Array.prototype.slice.call(arguments)
+      const args: any = Array.prototype.slice.call(arguments)
       const ret = new extendedClass(...args)
 
       Object.defineProperty(ret, componentSymbol, {
@@ -295,9 +295,7 @@ export type ObservableComponentSubscription = (
  * @public
  */
 export class ObservableComponent {
-  // @internal
   dirty: boolean = false
-  // @internal
   data: any = {}
   private subscriptions: Array<ObservableComponentSubscription> = []
 
