@@ -32,6 +32,7 @@ export const LEGACY_ECS_PATH = resolve(
   process.cwd(),
   './packages/@dcl/legacy-ecs'
 )
+export const SCRIPTS_PATH = resolve(process.cwd(), './scripts')
 
 export function commonChecks() {
   test('tooling is installed', () => {
