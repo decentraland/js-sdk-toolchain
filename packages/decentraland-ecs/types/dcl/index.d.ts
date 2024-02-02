@@ -2999,6 +2999,8 @@ declare class Observable<T> {
  * @public
  */
 declare class ObservableComponent {
+    dirty: boolean;
+    data: any;
     private subscriptions;
     static component(target: ObservableComponent, propertyKey: string): void;
     static field(target: ObservableComponent, propertyKey: string): void;
@@ -4533,6 +4535,12 @@ declare class Size implements ISize {
      * @returns a new Size set as the subtraction result of  the given one from the current Size.
      */
     subtract(otherSize: Size): Size;
+}
+
+/**
+ * @public
+ */
+declare class SmartItem extends ObservableComponent {
 }
 
 /**
