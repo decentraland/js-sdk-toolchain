@@ -77,6 +77,12 @@ const Shortcuts: React.FC<Props> = ({ canvas, onResetCamera, onZoomIn, onZoomOut
               </div>
             </div>
             <div className="Item">
+              <div className="Title">Rotate Camera</div>
+              <div className="Description">
+                <span className="Key">Left Mouse Button</span>+<span className="Key">Drag</span>
+              </div>
+            </div>
+            <div className="Item">
               <div className="Title">Select Multiple Items</div>
               <div className="Description">
                 Hold<span className="Key">ctrl</span>and click
@@ -154,7 +160,8 @@ const Shortcuts: React.FC<Props> = ({ canvas, onResetCamera, onZoomIn, onZoomOut
             <div className="Item">
               <div className="Title">Delete</div>
               <div className="Description">
-                <span className="Key">del</span>or<span className="Key">backspace</span>
+                <span className="Key">del</span>or
+                <span className="Key">backspace</span>
               </div>
             </div>
           </div>
