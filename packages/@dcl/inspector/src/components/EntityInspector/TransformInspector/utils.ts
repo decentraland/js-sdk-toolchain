@@ -26,7 +26,8 @@ export function fromTransform(value: TransformType): TransformInput {
 }
 
 function formatAngle(angle: number) {
-  const value = angle.toFixed(2)
+  const sanitizedAngle = angle < 0 ? 360 + angle : angle
+  const value = sanitizedAngle.toFixed(2)
   return value === '360.00' ? '0.00' : value
 }
 
