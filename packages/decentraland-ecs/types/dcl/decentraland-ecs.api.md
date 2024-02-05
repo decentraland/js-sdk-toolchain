@@ -1313,6 +1313,10 @@ export class ObservableComponent {
     // (undocumented)
     static component(target: ObservableComponent, propertyKey: string): void;
     // (undocumented)
+    data: any;
+    // (undocumented)
+    dirty: boolean;
+    // (undocumented)
     static field(target: ObservableComponent, propertyKey: string): void;
     // (undocumented)
     onChange(fn: ObservableComponentSubscription): this;
@@ -1973,6 +1977,10 @@ export class Size implements ISize {
     toString(): string;
     width: number;
     static Zero(): Size;
+}
+
+// @public (undocumented)
+export class SmartItem extends ObservableComponent {
 }
 
 // @public

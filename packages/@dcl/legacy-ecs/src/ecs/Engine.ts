@@ -338,7 +338,7 @@ export class Engine implements IEngine {
     }
 
     // Otherwise create and store it
-    componentGroup = new ComponentGroup(...requires)
+    componentGroup = new ComponentGroup(...(requires as any))
 
     componentGroup.active = true
 

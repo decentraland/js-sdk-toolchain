@@ -1,3 +1,4 @@
+import { copySync } from 'fs-extra'
 import {
   flow,
   commonChecks,
@@ -5,7 +6,8 @@ import {
   BUILD_ECS_PATH,
   DECENTRALAND_AMD_PATH,
   ROLLUP_CONFIG_PATH,
-  LEGACY_ECS_PATH
+  LEGACY_ECS_PATH,
+  SCRIPTS_PATH
 } from './common'
 import {
   itExecutes,
@@ -25,6 +27,9 @@ flow('build-all', () => {
   })
 
   flow('pack every package', () => {
+    copySync(`${SCRIPTS_PATH}/resources/artifacts`, `${ECS_PATH}/artifacts`, {
+      recursive: true
+    })
     itExecutes('npm pack', ECS_PATH)
     itExecutes('npm pack', LEGACY_ECS_PATH)
     itExecutes('npm pack', DECENTRALAND_AMD_PATH)
