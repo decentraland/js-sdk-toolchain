@@ -42,7 +42,7 @@ const AssetsCatalog: React.FC<Props> = ({ catalog }) => {
     const { starts, includes } = assets.reduce(
       (results: { starts: AssetPack['assets']; includes: AssetPack['assets'] }, asset) => {
         const name = asset.name.toLowerCase()
-        if (name.startsWith(searchLower)) results.starts.push(asset)
+        if (name.split(' ').some((word) => word.startsWith(searchLower))) results.starts.push(asset)
         if (name.includes(searchLower)) results.includes.push(asset)
         return results
       },
