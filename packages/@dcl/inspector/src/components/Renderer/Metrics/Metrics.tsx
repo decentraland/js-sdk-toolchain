@@ -57,9 +57,12 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
 
   useChange(
     ({ operation, component }) => {
-      if (operation === CrdtMessageType.PUT_COMPONENT && component?.componentId === sdk.components.Nodes.componentId) {
-        handleUpdateMetrics()
-        handleUpdateSceneLayout()
+      if (operation === CrdtMessageType.PUT_COMPONENT) {
+        if (component?.componentId === sdk.components.Nodes.componentId) {
+          handleUpdateMetrics()
+        } else if (component?.componentId === sdk.components.Scene.componentId) {
+          handleUpdateSceneLayout()
+        }
       }
     },
     [handleUpdateMetrics, handleUpdateSceneLayout]
