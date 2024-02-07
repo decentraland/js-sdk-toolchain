@@ -42,6 +42,7 @@ import { analytics, Event } from '../../lib/logic/analytics'
 import { Warnings } from '../Warnings'
 import { CameraSpeed } from './CameraSpeed'
 import { Shortcuts } from './Shortcuts'
+import { Metrics } from './Metrics'
 
 import './Renderer.css'
 
@@ -261,6 +262,7 @@ const Renderer: React.FC = () => {
       {isLoading && <Loading />}
       <Warnings />
       <CameraSpeed />
+      <Metrics />
       <Shortcuts canvas={canvasRef} onResetCamera={resetCamera} onZoomIn={zoomIn} onZoomOut={zoomOut} />
       <canvas ref={canvasRef} id="canvas" touch-action="none" />
     </div>
