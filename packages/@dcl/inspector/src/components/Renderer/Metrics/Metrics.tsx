@@ -15,6 +15,25 @@ import './Metrics.css'
 
 const ICON_SIZE = 18
 const PARCEL_SIZE = 16
+const IGNORE_MATERIALS = [
+  'layout_grid',
+  'grid',
+  'BackgroundSkyboxMaterial',
+  'BackgroundPlaneMaterial',
+  '__GLTFLoader._default'
+]
+const IGNORE_TEXTURES = [
+  'EffectLayerMainRTT',
+  'HighlightLayerBlurRTT',
+  'https://assets.babylonjs.com/environments/backgroundGround.png',
+  'https://assets.babylonjs.com/environments/backgroundSkybox.dds',
+  'https://assets.babylonjs.com/environments/environmentSpecular.env',
+  'data:EnvironmentBRDFTexture0',
+  'GlowLayerBlurRTT',
+  'GlowLayerBlurRTT2'
+]
+const IGNORE_MESHES = ['BackgroundHelper', 'BackgroundPlane', 'BackgroundSkybox']
+const GROUND_MESH_PREFIX = 'ground_plane_'
 
 const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
   const ROOT = sdk.engine.RootEntity
@@ -32,16 +51,25 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
   })
 
   const handleUpdateMetrics = useCallback(() => {
-    const triangles = sdk.scene.meshes.reduce((acc, mesh) => acc + mesh.getTotalVertices(), 0)
+    const meshes = sdk.scene.meshes.filter(
+      (mesh) => !(IGNORE_MESHES.includes(mesh.id) || mesh.id.startsWith(GROUND_MESH_PREFIX))
+    )
+    const triangles = meshes.reduce((acc, mesh) => acc + mesh.getTotalVertices(), 0)
     const entities = (sdk.components.Nodes.getOrNull(ROOT)?.value ?? [ROOT]).length - 1
-    const uniqueTextures = new Set(sdk.scene.textures.map((texture) => texture.getInternalTexture()!.uniqueId))
-    const uniqueMaterials = new Set(sdk.scene.materials.map((material) => material.id))
+    const uniqueTextures = new Set(
+      sdk.scene.textures
+        .filter((texture) => !IGNORE_TEXTURES.includes(texture.name))
+        .map((texture) => texture.getInternalTexture()!.uniqueId)
+    )
+    const uniqueMaterials = new Set(
+      sdk.scene.materials.map((material) => material.id).filter((id) => !IGNORE_MATERIALS.includes(id))
+    )
     setMetrics({
       triangles: triangles,
       entities: entities,
-      bodies: sdk.scene.meshes.length,
-      materials: uniqueTextures.size,
-      textures: uniqueMaterials.size
+      bodies: meshes.length,
+      materials: uniqueMaterials.size,
+      textures: uniqueTextures.size
     })
   }, [sdk])
 
@@ -51,21 +79,21 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
   }, [sdk, setSceneLayout])
 
   useEffect(() => {
-    handleUpdateMetrics()
+    sdk.scene.onDataLoadedObservable.add(handleUpdateMetrics)
     handleUpdateSceneLayout()
+
+    return () => {
+      sdk.scene.onDataLoadedObservable.removeCallback(handleUpdateMetrics)
+    }
   }, [])
 
   useChange(
     ({ operation, component }) => {
-      if (operation === CrdtMessageType.PUT_COMPONENT) {
-        if (component?.componentId === sdk.components.Nodes.componentId) {
-          handleUpdateMetrics()
-        } else if (component?.componentId === sdk.components.Scene.componentId) {
-          handleUpdateSceneLayout()
-        }
+      if (operation === CrdtMessageType.PUT_COMPONENT && component?.componentId === sdk.components.Scene.componentId) {
+        handleUpdateSceneLayout()
       }
     },
-    [handleUpdateMetrics, handleUpdateSceneLayout]
+    [handleUpdateSceneLayout]
   )
 
   const limits = useMemo<Metrics>(() => {
