@@ -15,13 +15,7 @@ import type { Metrics } from './types'
 import './Metrics.css'
 
 const ICON_SIZE = 18
-const IGNORE_MATERIALS = [
-  'layout_grid',
-  'grid',
-  'BackgroundSkyboxMaterial',
-  'BackgroundPlaneMaterial',
-  '__GLTFLoader._default'
-]
+const IGNORE_MATERIALS = ['layout_grid', 'grid', 'base-box', 'BackgroundSkyboxMaterial', 'BackgroundPlaneMaterial']
 const IGNORE_TEXTURES = [
   'EffectLayerMainRTT',
   'HighlightLayerBlurRTT',
