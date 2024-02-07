@@ -7,6 +7,7 @@ import { withSdk, WithSdkProps } from '../../../hoc/withSdk'
 import { useChange } from '../../../hooks/sdk/useChange'
 import { useOutsideClick } from '../../../hooks/useOutsideClick'
 import type { Layout } from '../../../lib/utils/layout'
+import { GROUND_MESH_PREFIX, PARCEL_SIZE } from '../../../lib/utils/scene'
 import { Button } from '../../Button'
 import { getSceneLimits } from './utils'
 import type { Metrics } from './types'
@@ -14,7 +15,6 @@ import type { Metrics } from './types'
 import './Metrics.css'
 
 const ICON_SIZE = 18
-const PARCEL_SIZE = 16
 const IGNORE_MATERIALS = [
   'layout_grid',
   'grid',
@@ -33,7 +33,6 @@ const IGNORE_TEXTURES = [
   'GlowLayerBlurRTT2'
 ]
 const IGNORE_MESHES = ['BackgroundHelper', 'BackgroundPlane', 'BackgroundSkybox']
-const GROUND_MESH_PREFIX = 'ground_plane_'
 
 const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
   const ROOT = sdk.engine.RootEntity
@@ -80,10 +79,12 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
 
   useEffect(() => {
     sdk.scene.onDataLoadedObservable.add(handleUpdateMetrics)
+    sdk.scene.onMeshRemovedObservable.add(handleUpdateMetrics)
     handleUpdateSceneLayout()
 
     return () => {
       sdk.scene.onDataLoadedObservable.removeCallback(handleUpdateMetrics)
+      sdk.scene.onMeshRemovedObservable.removeCallback(handleUpdateMetrics)
     }
   }, [])
 
