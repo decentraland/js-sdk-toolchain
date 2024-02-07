@@ -19,6 +19,10 @@ export class UiClient extends RPC<UiRPC.Method, UiRPC.Params, UiRPC.Result> {
     return this.request('toggle_gizmos', { enabled })
   }
 
+  toggleGroundGrid = (enabled: boolean) => {
+    return this.request('toggle_ground_grid', { enabled })
+  }
+
   selectAssetsTab = (tab: `${AssetsTab}`) => {
     return this.request('select_assets_tab', { tab })
   }
