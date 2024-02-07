@@ -15,7 +15,7 @@ import {
 import { memoize } from '../../logic/once'
 import { Layout } from '../../utils/layout'
 import { GridMaterial } from '@babylonjs/materials'
-import { PARCEL_SIZE } from '../../utils/scene'
+import { PARCEL_SIZE, GROUND_MESH_PREFIX } from '../../utils/scene'
 
 function disableGizmo(gizmo: IAxisDragGizmo) {
   gizmo.dragBehavior.detach()
@@ -104,7 +104,7 @@ export const getLayoutManager = memoize((scene: Scene) => {
       const x = parcel.x - base.x
       const y = parcel.y - base.y
 
-      const plane = MeshBuilder.CreatePlane(`ground_plane_${x}_${y}`, { size: PARCEL_SIZE }, scene)
+      const plane = MeshBuilder.CreatePlane(`${GROUND_MESH_PREFIX}_${x}_${y}`, { size: PARCEL_SIZE }, scene)
       plane.parent = layoutNode
       plane.position.x = x * PARCEL_SIZE
       plane.position.z = y * PARCEL_SIZE
