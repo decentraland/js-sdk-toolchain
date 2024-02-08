@@ -17,7 +17,7 @@ import { getConfig } from '../../lib/logic/config'
 import { ROOT } from '../../lib/sdk/tree'
 import { Asset, isSmart } from '../../lib/logic/catalog'
 import { selectAssetCatalog } from '../../redux/app'
-import { areGizmosDisabled, isGroundGridDisabled } from '../../redux/ui'
+import { areGizmosDisabled, getHiddenPanels, isGroundGridDisabled } from '../../redux/ui'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 import { Loading } from '../Loading'
 import { isModel, isAsset } from '../EntityInspector/GltfInspector/utils'
@@ -45,6 +45,7 @@ import { Shortcuts } from './Shortcuts'
 import { Metrics } from './Metrics'
 
 import './Renderer.css'
+import { PanelName } from '../../redux/ui/types'
 
 const ZOOM_DELTA = new Vector3(0, 0, 1.1)
 const fixedNumber = (val: number) => Math.round(val * 1e2) / 1e2
@@ -62,6 +63,7 @@ const Renderer: React.FC = () => {
   const groundGridDisabled = useAppSelector(isGroundGridDisabled)
   const config = getConfig()
   const [copyEntities, setCopyEntities] = useState<Entity[]>([])
+  const hiddenPanels = useAppSelector(getHiddenPanels)
 
   useEffect(() => {
     if (sdk && init) {
@@ -273,7 +275,9 @@ const Renderer: React.FC = () => {
       <Warnings />
       <CameraSpeed />
       <Metrics />
-      <Shortcuts canvas={canvasRef} onResetCamera={resetCamera} onZoomIn={zoomIn} onZoomOut={zoomOut} />
+      {!hiddenPanels[PanelName.SHORTCUTS] && (
+        <Shortcuts canvas={canvasRef} onResetCamera={resetCamera} onZoomIn={zoomIn} onZoomOut={zoomOut} />
+      )}
       <canvas ref={canvasRef} id="canvas" touch-action="none" />
     </div>
   )
