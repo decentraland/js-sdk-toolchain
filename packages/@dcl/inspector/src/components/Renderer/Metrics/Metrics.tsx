@@ -15,14 +15,28 @@ import type { Metrics } from './types'
 import './Metrics.css'
 
 const ICON_SIZE = 18
-const IGNORE_MATERIALS = ['layout_grid', 'grid', 'base-box', 'BackgroundSkyboxMaterial', 'BackgroundPlaneMaterial']
+const IGNORE_MATERIALS = [
+  // Babylon default materials
+  'BackgroundSkyboxMaterial',
+  'BackgroundPlaneMaterial',
+  // Utils Materials
+  'entityOutsideLayoutMaterial',
+  'layout_grid',
+  'grid',
+  'base-box',
+  'collider-material',
+  'skyBox',
+  '__GLTFLoader._default'
+]
 const IGNORE_TEXTURES = [
-  'EffectLayerMainRTT',
-  'HighlightLayerBlurRTT',
+  // Babylon default textures
   'https://assets.babylonjs.com/environments/backgroundGround.png',
   'https://assets.babylonjs.com/environments/backgroundSkybox.dds',
   'https://assets.babylonjs.com/environments/environmentSpecular.env',
+  'EffectLayerMainRTT',
+  'HighlightLayerBlurRTT',
   'data:EnvironmentBRDFTexture0',
+  // Utils Textures
   'GlowLayerBlurRTT',
   'GlowLayerBlurRTT2'
 ]
