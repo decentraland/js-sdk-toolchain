@@ -34,3 +34,15 @@ export type TextAlignType =
   | 'bottom-left'
   | 'bottom-center'
   | 'bottom-right'
+
+/**
+ * unit value type. i.e. 'vw' || 'vh'
+ * @public
+ */
+export type ScaleUnit = 'vw' | 'vh'
+
+/**
+ * unit value specified. i.e. 10 || '10vw' || '10vh'
+ * @public
+ */
+export type FontSizeScaleUnit = `${number}${ScaleUnit}` | number

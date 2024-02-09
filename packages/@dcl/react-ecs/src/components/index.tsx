@@ -16,7 +16,7 @@ export * from './Button/types'
 
 export { Dropdown } from './Dropdown'
 export { Input } from './Input'
-export { Label } from './Label'
+export { Label, scaleFontSize } from './Label'
 export { Button } from './Button'
 
 /**

@@ -5,6 +5,9 @@ import { ReactEcs } from '../../react-ecs'
 import { EntityPropTypes } from '../types'
 import { UiLabelProps } from './types'
 import { getFont, getTextAlign } from './utils'
+
+export { scaleFontSize } from './utils'
+
 /**
  *
  * @public

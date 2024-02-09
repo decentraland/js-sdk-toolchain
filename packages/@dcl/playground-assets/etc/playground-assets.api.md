@@ -1066,6 +1066,9 @@ export const enum Font {
 }
 
 // @public
+export type FontSizeScaleUnit = `${number}${ScaleUnit}` | number;
+
+// @public
 export function getComponentEntityTree<T>(engine: Pick<IEngine, 'getEntitiesWith'>, entity: Entity, component: ComponentDefinition<T & {
     parent?: Entity;
 }>): Generator<Entity>;
@@ -3703,6 +3706,15 @@ export namespace Scale {
     // (undocumented)
     export function encode(message: Scale, writer?: _m0.Writer): _m0.Writer;
 }
+
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+//
+// @public
+export function scaleFontSize(fontSize: number, scaleUnit?: FontSizeScaleUnit): number;
+
+// @public
+export type ScaleUnit = 'vw' | 'vh';
 
 // @public (undocumented)
 export namespace Schemas {
