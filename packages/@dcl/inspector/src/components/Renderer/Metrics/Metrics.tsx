@@ -19,13 +19,15 @@ const IGNORE_MATERIALS = [
   // Babylon default materials
   'BackgroundSkyboxMaterial',
   'BackgroundPlaneMaterial',
+  'colorShader',
+  'colorShaderOccQuery',
+  'skyBox',
   // Utils Materials
   'entityOutsideLayoutMaterial',
   'layout_grid',
   'grid',
   'base-box',
   'collider-material',
-  'skyBox',
   '__GLTFLoader._default'
 ]
 const IGNORE_TEXTURES = [
@@ -103,8 +105,12 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
       if (operation === CrdtMessageType.PUT_COMPONENT && component?.componentId === sdk.components.Scene.componentId) {
         handleUpdateSceneLayout()
       }
+      const uniqueMaterials = new Set(
+        sdk.scene.materials.map((material) => material.id).filter((id) => !IGNORE_MATERIALS.includes(id))
+      )
+      console.log('[remove materials]', { uniqueMaterials })
     },
-    [handleUpdateSceneLayout]
+    [sdk, handleUpdateSceneLayout]
   )
 
   const limits = useMemo<Metrics>(() => {
