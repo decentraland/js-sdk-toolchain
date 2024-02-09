@@ -105,10 +105,6 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
       if (operation === CrdtMessageType.PUT_COMPONENT && component?.componentId === sdk.components.Scene.componentId) {
         handleUpdateSceneLayout()
       }
-      const uniqueMaterials = new Set(
-        sdk.scene.materials.map((material) => material.id).filter((id) => !IGNORE_MATERIALS.includes(id))
-      )
-      console.log('[remove materials]', { uniqueMaterials })
     },
     [sdk, handleUpdateSceneLayout]
   )
