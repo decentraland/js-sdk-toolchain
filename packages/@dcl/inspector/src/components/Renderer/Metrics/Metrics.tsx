@@ -106,7 +106,7 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
         handleUpdateSceneLayout()
       }
     },
-    [sdk, handleUpdateSceneLayout]
+    [handleUpdateSceneLayout]
   )
 
   const limits = useMemo<Metrics>(() => {
