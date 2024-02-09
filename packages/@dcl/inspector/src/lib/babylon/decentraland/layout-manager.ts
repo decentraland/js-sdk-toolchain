@@ -121,7 +121,7 @@ export const getLayoutManager = memoize((scene: Scene) => {
       plane.setBoundingInfo(
         new BoundingInfo(
           plane.getBoundingInfo().boundingBox.minimum.add(new Vector3(0, 0, -Math.log2(parcels.length + 1) * 20)),
-          plane.getBoundingInfo().boundingBox.maximum.add(new Vector3(0, 0, 0.1))
+          plane.getBoundingInfo().boundingBox.maximum
         )
       )
       planes.push(plane)
@@ -153,9 +153,10 @@ export const getLayoutManager = memoize((scene: Scene) => {
         new Vector3(vertexData[i], vertexData[i + 1], vertexData[i + 2]),
         worldMatrix
       )
+      const sanitizedVertex = new Vector3(vertex.x, Math.max(0, vertex.y), vertex.z)
 
       // Check if the vertex lies outside the combined bounding box
-      if (!combinedBoundingBox.intersectsPoint(vertex)) {
+      if (!combinedBoundingBox.intersectsPoint(sanitizedVertex)) {
         return true // Entity is partially or completely outside the combined plane
       }
     }

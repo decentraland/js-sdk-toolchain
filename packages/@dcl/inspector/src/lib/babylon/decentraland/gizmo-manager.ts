@@ -218,11 +218,13 @@ export function createGizmoManager(context: SceneContext) {
   }
 
   function entityOutsideLayout() {
-    if (lastEntity === null || !lastEntity.getMesh()) return
+    if (lastEntity === null) return
 
     for (const entity of getSelectedEntities()) {
-      const entityMesh = context.getEntityOrNull(entity)!.getMesh()!
-      _entityOutsideLayout(entityMesh)
+      const entityMesh = context.getEntityOrNull(entity)?.getPickableMesh()
+      if (entityMesh) {
+        _entityOutsideLayout(entityMesh)
+      }
     }
   }
 
