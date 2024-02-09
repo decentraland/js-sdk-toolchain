@@ -6,7 +6,10 @@ import {
   Node,
   Vector3,
   PointerDragBehavior,
-  AbstractMesh
+  AbstractMesh,
+  Color3,
+  StandardMaterial,
+  MultiMaterial
 } from '@babylonjs/core'
 import { Entity, TransformType } from '@dcl/ecs'
 import { Vector3 as DclVector3, Quaternion as DclQuaternion } from '@dcl/ecs-math'
@@ -15,6 +18,7 @@ import { EcsEntity } from './EcsEntity'
 import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manager'
 import { SceneContext } from './SceneContext'
 import { PatchedGizmoManager } from './gizmo-patch'
+import { getLayoutManager } from './layout-manager'
 
 interface GizmoAxis {
   xGizmo: IAxisDragGizmo
@@ -61,6 +65,13 @@ export function createGizmoManager(context: SceneContext) {
   let shouldRestorPositionGizmoAlignment = false
   let isEnabled = true
   const parentMapper: Map<Entity, Node> = new Map()
+
+  // Init material for entity outside layout
+  const entityOutsideLayoutMaterial = new StandardMaterial('entityOutsideLayoutMaterial', context.scene)
+  entityOutsideLayoutMaterial.diffuseColor = new Color3(1, 0, 0)
+  // Set bounding box color
+  context.scene.getBoundingBoxRenderer().frontColor.set(1, 0, 0)
+  context.scene.getBoundingBoxRenderer().backColor.set(1, 0, 0)
 
   function getSelectedEntities() {
     return context.operations.getSelectedEntities()
@@ -183,6 +194,42 @@ export function createGizmoManager(context: SceneContext) {
   gizmoManager.gizmos.positionGizmo?.onDragEndObservable.add(updateTransform)
   gizmoManager.gizmos.rotationGizmo?.onDragEndObservable.add(updateTransform)
 
+  function _entityOutsideLayout(entityMesh: AbstractMesh) {
+    const { isEntityOutsideLayout } = getLayoutManager(context.scene)
+
+    if (isEntityOutsideLayout(entityMesh)) {
+      if (!(entityMesh.material instanceof MultiMaterial)) {
+        const multiMaterial = new MultiMaterial('multiMaterial', context.scene)
+        multiMaterial.subMaterials = [entityOutsideLayoutMaterial, entityMesh.material]
+        entityMesh.material = multiMaterial
+      }
+      entityMesh.showBoundingBox = true
+    } else {
+      if (
+        entityMesh.material instanceof MultiMaterial &&
+        entityMesh.material.subMaterials.some((material) => material === entityOutsideLayoutMaterial)
+      ) {
+        const multiMaterial = entityMesh.material
+        entityMesh.material = multiMaterial.subMaterials[1]
+        multiMaterial.dispose()
+      }
+      entityMesh.showBoundingBox = false
+    }
+  }
+
+  function entityOutsideLayout() {
+    if (lastEntity === null || !lastEntity.getMesh()) return
+
+    for (const entity of getSelectedEntities()) {
+      const entityMesh = context.getEntityOrNull(entity)!.getMesh()!
+      _entityOutsideLayout(entityMesh)
+    }
+  }
+
+  gizmoManager.gizmos.positionGizmo?.xGizmo.dragBehavior.onDragObservable.add(entityOutsideLayout)
+  gizmoManager.gizmos.positionGizmo?.yGizmo.dragBehavior.onDragObservable.add(entityOutsideLayout)
+  gizmoManager.gizmos.positionGizmo?.zGizmo.dragBehavior.onDragObservable.add(entityOutsideLayout)
+
   // snap
   function updateSnap() {
     gizmoManager.gizmos.positionGizmo!.snapDistance = snapManager.isEnabled() ? snapManager.getPositionSnap() : 0
@@ -287,6 +334,8 @@ export function createGizmoManager(context: SceneContext) {
     updateTransform()
     meshPointerDragBehavior.detach()
   }
+
+  meshPointerDragBehavior.onDragObservable.add(entityOutsideLayout)
 
   if (canvas) {
     canvas.addEventListener('pointerenter', () => {

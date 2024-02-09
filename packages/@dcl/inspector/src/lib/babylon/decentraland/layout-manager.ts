@@ -1,6 +1,9 @@
 import {
+  AbstractMesh,
   ArcRotateCamera,
   Axis,
+  BoundingBox,
+  BoundingInfo,
   Color3,
   IAxisDragGizmo,
   Mesh,
@@ -10,7 +13,8 @@ import {
   Space,
   StandardMaterial,
   TransformNode,
-  Vector3
+  Vector3,
+  VertexBuffer
 } from '@babylonjs/core'
 import { memoize } from '../../logic/once'
 import { Layout } from '../../utils/layout'
@@ -114,12 +118,55 @@ export const getLayoutManager = memoize((scene: Scene) => {
       plane.translate(Axis.Z, PARCEL_SIZE / 2, Space.WORLD)
       plane.isPickable = false
       plane.material = grid
+      plane.setBoundingInfo(
+        new BoundingInfo(
+          plane.getBoundingInfo().boundingBox.minimum.add(new Vector3(0, 0, -Math.log2(parcels.length + 1) * 20)),
+          plane.getBoundingInfo().boundingBox.maximum.add(new Vector3(0, 0, 0.1))
+        )
+      )
       planes.push(plane)
     }
   }
 
+  function isEntityOutsideLayout(entity: AbstractMesh) {
+    // Combine all planes' bounding boxes into a single bounding box
+    const combinedMin = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE)
+    const combinedMax = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE)
+
+    for (const plane of planes) {
+      const planeBoundingBox = plane.getBoundingInfo().boundingBox
+      combinedMin.minimizeInPlace(planeBoundingBox.minimumWorld)
+      combinedMax.maximizeInPlace(planeBoundingBox.maximumWorld)
+      planeBoundingBox.dispose()
+    }
+
+    const combinedBoundingBox = new BoundingBox(combinedMin, combinedMax)
+
+    // Get the vertices of the entity
+    const vertexData = entity.getVerticesData(VertexBuffer.PositionKind) || []
+    const worldMatrix = entity.getWorldMatrix()
+
+    // Check each vertex of the entity
+    for (let i = 0; i < vertexData.length; i += 3) {
+      // Transform the vertex to world space
+      const vertex = Vector3.TransformCoordinates(
+        new Vector3(vertexData[i], vertexData[i + 1], vertexData[i + 2]),
+        worldMatrix
+      )
+
+      // Check if the vertex lies outside the combined bounding box
+      if (!combinedBoundingBox.intersectsPoint(vertex)) {
+        return true // Entity is partially or completely outside the combined plane
+      }
+    }
+
+    // If we reach here, all vertices are inside the combined bounding box
+    return false // Entity is completely inside the combined plane
+  }
+
   return {
     getLayout,
-    setLayout
+    setLayout,
+    isEntityOutsideLayout
   }
 })
