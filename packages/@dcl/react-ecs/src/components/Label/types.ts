@@ -36,13 +36,19 @@ export type TextAlignType =
   | 'bottom-right'
 
 /**
- * unit value type. i.e. 'vw' || 'vh'
+ * unit value type. i.e. 'w' || 'h'
  * @public
  */
-export type ScaleUnit = 'vw' | 'vh'
+export type ScaleUnit = 'w' | 'h'
 
 /**
- * unit value specified. i.e. 10 || '10vw' || '10vh'
+ * unit value specified. i.e. 10 || '10w' || '10h'
  * @public
  */
 export type FontSizeScaleUnit = `${number}${ScaleUnit}` | number
+
+/**
+ * context for applying a scale
+ * @public
+ */
+export type ScaleContext = { width: number; height: number; ratio: number }

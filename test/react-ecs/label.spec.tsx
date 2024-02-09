@@ -1,6 +1,7 @@
-import { Entity, TextAlignMode, Font } from '../../packages/@dcl/ecs'
+import { Entity, TextAlignMode, Font, IEngine } from '../../packages/@dcl/ecs'
 import { components } from '../../packages/@dcl/ecs/src'
-import { ReactEcs, Label, UiFontType, TextAlignType } from '../../packages/@dcl/react-ecs/src'
+import { ReactEcs, Label, UiFontType, TextAlignType, scaleFontSize } from '../../packages/@dcl/react-ecs/src'
+import { getScaleCtx } from '../../packages/@dcl/react-ecs/src/components/Label/utils'
 import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
 import { Color4 } from '../../packages/@dcl/sdk/math'
 import { setupEngine } from './utils'
@@ -51,5 +52,60 @@ describe('UiText React Ecs', () => {
       textAlign: undefined
     })
     await engine.update(1)
+  })
+
+  describe('scaleFontSize', () => {
+    const scaleCtx = {
+      height: 600,
+      width: 800,
+      ratio: 2
+    }
+
+    it('should return the same font size when canvas information is not available', () => {
+      expect(scaleFontSize(16, undefined, undefined)).toBe(16)
+    })
+
+    it('should scale font size using viewport width by default', () => {
+      expect(scaleFontSize(16, undefined, scaleCtx)).toBeCloseTo(17.56)
+    })
+
+    it('should scale font size using viewport height when scale unit is "h"', () => {
+      expect(scaleFontSize(16, '10h', scaleCtx)).toBeCloseTo(46)
+    })
+
+    it('should scale font size correctly when scale unit is "w"', () => {
+      expect(scaleFontSize(16, '10w', scaleCtx)).toBeCloseTo(56)
+    })
+
+    it('should handle scaling with a numeric value', () => {
+      expect(scaleFontSize(16, 10, scaleCtx)).toBeCloseTo(56)
+    })
+
+    it('should handle scaling with a numeric value and unit "w"', () => {
+      expect(scaleFontSize(16, '10.5w', scaleCtx)).toBeCloseTo(58)
+    })
+  })
+
+  describe('getScaleCtx', () => {
+    it('should return undefined when "UiCanvasInformation" component is not found', () => {
+      const engine = {
+        getComponent: () => ({
+          getOrNull: () => null
+        })
+      } as any as IEngine
+
+      expect(getScaleCtx(engine)).toBe(undefined)
+    })
+
+    it('should return props when "UiCanvasInformation" component is found', () => {
+      const canvasProps = { width: 10, height: 10, devicePixelRatio: 1 }
+      const engine = {
+        getComponent: () => ({
+          getOrNull: () => canvasProps
+        })
+      } as any as IEngine
+
+      expect(getScaleCtx(engine)).toStrictEqual({ width: 10, height: 10, ratio: 1 })
+    })
   })
 })

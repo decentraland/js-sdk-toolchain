@@ -3707,14 +3707,29 @@ export namespace Scale {
     export function encode(message: Scale, writer?: _m0.Writer): _m0.Writer;
 }
 
+// @public
+export type ScaleContext = {
+    width: number;
+    height: number;
+    ratio: number;
+};
+
 // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (tsdoc-param-tag-with-invalid-type) The @param block should not include a JSDoc-style '{type}'
 // Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (tsdoc-param-tag-with-invalid-optional-name) The @param should not include a JSDoc-style optional name; it must not be enclosed in '[ ]' brackets.
+// Warning: (tsdoc-param-tag-with-invalid-type) The @param block should not include a JSDoc-style '{type}'
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (tsdoc-param-tag-with-invalid-optional-name) The @param should not include a JSDoc-style optional name; it must not be enclosed in '[ ]' brackets.
+// Warning: (tsdoc-param-tag-with-invalid-type) The @param block should not include a JSDoc-style '{type}'
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
 //
 // @public
-export function scaleFontSize(fontSize: number, scaleUnit?: FontSizeScaleUnit): number;
+export function scaleFontSize(fontSize: number, scaleUnit?: FontSizeScaleUnit, ctx?: ScaleContext | undefined): number;
 
 // @public
-export type ScaleUnit = 'vw' | 'vh';
+export type ScaleUnit = 'w' | 'h';
 
 // @public (undocumented)
 export namespace Schemas {

@@ -1,5 +1,13 @@
-import { engine, Font, TextAlignMode, UiCanvasInformation } from '@dcl/ecs'
-import { FontSizeScaleUnit, ScaleUnit, TextAlignType, UiFontType } from './types'
+import {
+  engine,
+  IEngine,
+  UiCanvasInformation as engineUiCanvasInformation,
+  PBUiCanvasInformation,
+  Font,
+  TextAlignMode,
+  LastWriteWinElementSetComponentDefinition
+} from '@dcl/ecs'
+import { FontSizeScaleUnit, ScaleContext, ScaleUnit, TextAlignType, UiFontType } from './types'
 
 const parseFont: Readonly<Record<UiFontType, Font>> = {
   'sans-serif': Font.F_SANS_SERIF,
@@ -25,6 +33,7 @@ const parseTextAlign: Readonly<Record<TextAlignType, TextAlignMode>> = {
   'bottom-center': TextAlignMode.TAM_BOTTOM_CENTER,
   'bottom-right': TextAlignMode.TAM_BOTTOM_RIGHT
 }
+
 /**
  * @internal
  */
@@ -33,38 +42,60 @@ export function getTextAlign(textAlign: TextAlignType | undefined): Record<'text
   return { textAlign: parseTextAlign[textAlign] }
 }
 
-function parseFontSizeScale(value: FontSizeScaleUnit): [number, ScaleUnit] {
-  if (typeof value === 'number') {
-    return [value, 'vw']
+/**
+ * @internal
+ */
+function parseFontSizeScale(scaleUnit: FontSizeScaleUnit): [number, ScaleUnit] {
+  if (typeof scaleUnit === 'number') {
+    return [scaleUnit, 'w']
   }
 
-  const _value = Number(value.slice(0, -2))
-  const unit = value.slice(-2) as ScaleUnit
-  return [_value, unit]
+  const value = Number(scaleUnit.slice(0, -1))
+  const unit = scaleUnit.slice(-1) as ScaleUnit
+  return [value, unit]
 }
 
+/**
+ * @internal
+ */
 function calculateScaledFontSize(fontSize: number, scale: number, dim: number, pxRatio: number): number {
   return fontSize + (dim / 100) * (scale / pxRatio)
 }
 
 /**
- * Scales a font size depending on viewport width/height
- * @param fontSize size of the font to scale
- * @param scaleUnit the scaling factor + an optional unit (vw/vh) - default: 0.39vw
- * @returns the fontSize scaled
+ * @internal
+ */
+export function getScaleCtx(_engine: IEngine = engine): ScaleContext | undefined {
+  const UiCanvasInformation = _engine.getComponent(
+    engineUiCanvasInformation.componentId
+  ) as LastWriteWinElementSetComponentDefinition<PBUiCanvasInformation>
+  const canvasInfo = UiCanvasInformation.getOrNull(_engine.RootEntity)
+  if (!canvasInfo) return undefined
+  const { width, height, devicePixelRatio } = canvasInfo
+  return { width, height, ratio: devicePixelRatio }
+}
+
+/**
+ * Scales a font size depending on a context's width/height
+ * @param {number} fontSize size of the font to scale
+ * @param {FontSizeScaleUnit} [scaleUnit=0.39] the scaling unit (uses "width" as unit if a number is supplied)
+ * @param {ScaleContext} [ctx=viewport] the context where to apply the scaling
+ * @returns {number} the fontSize scaled
  * @see https://matthewjamestaylor.com/responsive-font-size#fluid
  * @public
  */
-export function scaleFontSize(fontSize: number, scaleUnit: FontSizeScaleUnit = 0.39): number {
-  const canvasInfo = UiCanvasInformation.getOrNull(engine.RootEntity)
-  // it shouldn't be null, but just in case...
-  if (!canvasInfo) return fontSize
+export function scaleFontSize(
+  fontSize: number,
+  scaleUnit: FontSizeScaleUnit = 0.39,
+  ctx: ScaleContext | undefined = getScaleCtx()
+): number {
+  if (!ctx) return fontSize
 
-  const { height, width, devicePixelRatio } = canvasInfo
+  const { height, width, ratio } = ctx
   const [scale, unit] = parseFontSizeScale(scaleUnit)
 
-  if (unit === 'vh') return calculateScaledFontSize(fontSize, scale, height, devicePixelRatio)
+  if (unit === 'h') return calculateScaledFontSize(fontSize, scale, height, ratio)
 
-  // by default, we scale by 'vw' (canvas width)
-  return calculateScaledFontSize(fontSize, scale, width, devicePixelRatio)
+  // by default, we scale by 'w' (width)
+  return calculateScaledFontSize(fontSize, scale, width, ratio)
 }
