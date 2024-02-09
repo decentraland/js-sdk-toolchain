@@ -229,6 +229,12 @@ export function createGizmoManager(context: SceneContext) {
   gizmoManager.gizmos.positionGizmo?.xGizmo.dragBehavior.onDragObservable.add(entityOutsideLayout)
   gizmoManager.gizmos.positionGizmo?.yGizmo.dragBehavior.onDragObservable.add(entityOutsideLayout)
   gizmoManager.gizmos.positionGizmo?.zGizmo.dragBehavior.onDragObservable.add(entityOutsideLayout)
+  gizmoManager.gizmos.rotationGizmo?.xGizmo.dragBehavior.onDragObservable.add(entityOutsideLayout)
+  gizmoManager.gizmos.rotationGizmo?.yGizmo.dragBehavior.onDragObservable.add(entityOutsideLayout)
+  gizmoManager.gizmos.rotationGizmo?.zGizmo.dragBehavior.onDragObservable.add(entityOutsideLayout)
+  gizmoManager.gizmos.scaleGizmo?.xGizmo.dragBehavior.onDragObservable.add(entityOutsideLayout)
+  gizmoManager.gizmos.scaleGizmo?.yGizmo.dragBehavior.onDragObservable.add(entityOutsideLayout)
+  gizmoManager.gizmos.scaleGizmo?.zGizmo.dragBehavior.onDragObservable.add(entityOutsideLayout)
 
   // snap
   function updateSnap() {
