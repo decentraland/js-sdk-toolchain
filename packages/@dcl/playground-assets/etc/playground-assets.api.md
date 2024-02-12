@@ -1066,9 +1066,6 @@ export const enum Font {
 }
 
 // @public
-export type FontSizeScaleUnit = `${number}${ScaleUnit}` | number;
-
-// @public
 export function getComponentEntityTree<T>(engine: Pick<IEngine, 'getEntitiesWith'>, entity: Entity, component: ComponentDefinition<T & {
     parent?: Entity;
 }>): Generator<Entity>;
@@ -3338,7 +3335,7 @@ export type PositionShorthand = PositionUnit | `${PositionUnit} ${PositionUnit}`
 export type PositionType = 'absolute' | 'relative';
 
 // @public
-export type PositionUnit = `${number}px` | `${number}%` | number | `${number}`;
+export type PositionUnit = `${number}px` | `${number}%` | number | `${number}` | ScaleUnit;
 
 // Warning: (ae-missing-release-tag) "ProcessMessageResultType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -3726,10 +3723,13 @@ export type ScaleContext = {
 // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
 //
 // @public
-export function scaleFontSize(fontSize: number, scaleUnit?: FontSizeScaleUnit, ctx?: ScaleContext | undefined): number;
+export function scaleFontSize(fontSize: number, scaleUnit?: ScaleUnit, ctx?: ScaleContext | undefined): number;
 
 // @public
-export type ScaleUnit = 'w' | 'h';
+export type ScaleUnit = `${number}${ScaleUnits}` | number;
+
+// @public
+export type ScaleUnits = 'vw' | 'vh';
 
 // @public (undocumented)
 export namespace Schemas {
@@ -4089,9 +4089,11 @@ export type UiComponent = () => ReactEcs.JSX.Element;
 export const UiDropdown: LastWriteWinElementSetComponentDefinition<PBUiDropdown>;
 
 // @public
-export interface UiDropdownProps extends EntityPropTypes, Omit<Partial<PBUiDropdown>, 'textAlign' | 'font'> {
+export interface UiDropdownProps extends EntityPropTypes, Omit<Partial<PBUiDropdown>, 'textAlign' | 'font' | 'fontSize'> {
     // (undocumented)
     font?: UiFontType;
+    // (undocumented)
+    fontSize?: ScaleUnit;
     // (undocumented)
     onChange?(value: number): void;
     // (undocumented)
@@ -4115,9 +4117,11 @@ export type UiFontType = 'sans-serif' | 'serif' | 'monospace';
 export const UiInput: LastWriteWinElementSetComponentDefinition<PBUiInput>;
 
 // @public (undocumented)
-export interface UiInputProps extends Omit<PBUiInput, 'font' | 'textAlign'> {
+export interface UiInputProps extends Omit<PBUiInput, 'font' | 'textAlign' | 'fontSize'> {
     // (undocumented)
     font?: UiFontType;
+    // (undocumented)
+    fontSize?: ScaleUnit;
     onChange?(value: string): void;
     onSubmit?(value: string): void;
     // (undocumented)
@@ -4131,7 +4135,7 @@ export const UiInputResult: LastWriteWinElementSetComponentDefinition<PBUiInputR
 export interface UiLabelProps {
     color?: PBColor4 | undefined;
     font?: UiFontType | undefined;
-    fontSize?: number | undefined;
+    fontSize?: ScaleUnit | undefined;
     textAlign?: TextAlignType | undefined;
     value: string;
 }

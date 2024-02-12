@@ -1,10 +1,11 @@
 import { Entity, TextAlignMode, Font, IEngine } from '../../packages/@dcl/ecs'
 import { components } from '../../packages/@dcl/ecs/src'
 import { ReactEcs, Label, UiFontType, TextAlignType, scaleFontSize } from '../../packages/@dcl/react-ecs/src'
-import { getScaleCtx } from '../../packages/@dcl/react-ecs/src/components/Label/utils'
+import { getScaleCtx } from '../../packages/@dcl/react-ecs/src/components/utils'
 import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
 import { Color4 } from '../../packages/@dcl/sdk/math'
 import { setupEngine } from './utils'
+import { getFontSize } from '../../packages/@dcl/react-ecs/src/components/Label/utils'
 
 describe('UiText React Ecs', () => {
   it('should generate a UI and update the width of a div', async () => {
@@ -69,20 +70,20 @@ describe('UiText React Ecs', () => {
       expect(scaleFontSize(16, undefined, scaleCtx)).toBeCloseTo(17.56)
     })
 
-    it('should scale font size using viewport height when scale unit is "h"', () => {
-      expect(scaleFontSize(16, '10h', scaleCtx)).toBeCloseTo(46)
+    it('should scale font size using viewport height when scale unit is "vh"', () => {
+      expect(scaleFontSize(16, '10vh', scaleCtx)).toBeCloseTo(46)
     })
 
-    it('should scale font size correctly when scale unit is "w"', () => {
-      expect(scaleFontSize(16, '10w', scaleCtx)).toBeCloseTo(56)
+    it('should scale font size correctly when scale unit is "vw"', () => {
+      expect(scaleFontSize(16, '10vw', scaleCtx)).toBeCloseTo(56)
     })
 
     it('should handle scaling with a numeric value', () => {
       expect(scaleFontSize(16, 10, scaleCtx)).toBeCloseTo(56)
     })
 
-    it('should handle scaling with a numeric value and unit "w"', () => {
-      expect(scaleFontSize(16, '10.5w', scaleCtx)).toBeCloseTo(58)
+    it('should handle scaling with a numeric value and unit "vw"', () => {
+      expect(scaleFontSize(16, '10.5vw', scaleCtx)).toBeCloseTo(58)
     })
   })
 
@@ -106,6 +107,20 @@ describe('UiText React Ecs', () => {
       } as any as IEngine
 
       expect(getScaleCtx(engine)).toStrictEqual({ width: 10, height: 10, ratio: 1 })
+    })
+  })
+
+  describe('getFontSize', () => {
+    it('should return undefined if no value is provided', () => {
+      expect(getFontSize(undefined)).toBe(undefined)
+    })
+
+    it('should return an updated value depending on viewport', () => {
+      expect(getFontSize('10vw')).toStrictEqual({ fontSize: 10 })
+    })
+
+    it('should return the same value provided', () => {
+      expect(getFontSize(10)).toStrictEqual({ fontSize: 10 })
     })
   })
 })

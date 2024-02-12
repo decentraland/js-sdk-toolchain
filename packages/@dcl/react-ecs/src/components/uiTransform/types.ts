@@ -1,8 +1,10 @@
+import { ScaleUnit } from '../types'
+
 /**
- * unit value specified. i.e. 1 || '100%' || '1px'
+ * unit value specified. i.e. 1 || '100%' || '1px' || '10vw'
  * @public
  */
-export type PositionUnit = `${number}px` | `${number}%` | number | `${number}`
+export type PositionUnit = `${number}px` | `${number}%` | number | `${number}` | ScaleUnit
 
 /**
  * The values are in clockwise order, beginning at the top: top, right, bottom, then left
