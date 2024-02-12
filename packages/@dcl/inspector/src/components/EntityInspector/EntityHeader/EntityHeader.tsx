@@ -7,7 +7,7 @@ import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
 import { useChange } from '../../../hooks/sdk/useChange'
 import { useEntityComponent } from '../../../hooks/sdk/useEntityComponent'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
-import { ROOT } from '../../../lib/sdk/tree'
+import { CAMERA, PLAYER, ROOT } from '../../../lib/sdk/tree'
 import { getAssetByModel } from '../../../lib/logic/catalog'
 import { analytics, Event } from '../../../lib/logic/analytics'
 import { Component } from '../../../lib/sdk/components'
@@ -21,11 +21,20 @@ import './EntityHeader.css'
 
 const getLabel = (sdk: SdkContextValue, entity: Entity) => {
   const nameComponent = sdk.components.Name.getOrNull(entity)
-  return entity === ROOT
-    ? 'Scene'
-    : nameComponent && nameComponent.value.length > 0
-    ? nameComponent.value
-    : entity.toString()
+  switch (entity) {
+    case ROOT:
+      return 'Scene'
+    case PLAYER:
+      return 'Player'
+    case CAMERA:
+      return 'Camera'
+    default:
+      return nameComponent && nameComponent.value.length > 0
+        ? nameComponent.value
+        : entity
+        ? entity.toString()
+        : 'Unknown'
+  }
 }
 
 export default React.memo(

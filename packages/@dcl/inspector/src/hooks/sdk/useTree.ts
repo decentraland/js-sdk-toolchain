@@ -1,7 +1,7 @@
 import { useCallback, useState, useEffect } from 'react'
 import { Entity } from '@dcl/ecs'
 
-import { findParent, getEmptyTree, getTreeFromEngine, ROOT } from '../../lib/sdk/tree'
+import { CAMERA, findParent, getEmptyTree, getTreeFromEngine, PLAYER, ROOT } from '../../lib/sdk/tree'
 import { debounce } from '../../lib/utils/debounce'
 import { DropType } from '../../components/Tree/utils'
 import { useChange } from './useChange'
@@ -49,6 +49,8 @@ export const useTree = () => {
   const getLabel = useCallback(
     (entity: Entity) => {
       if (entity === ROOT) return 'Scene'
+      if (entity === PLAYER) return 'Player'
+      if (entity === CAMERA) return 'Camera'
       if (!sdk) return entity.toString()
       const { Name } = sdk.components
       return Name.has(entity) ? Name.get(entity).value : entity.toString()
