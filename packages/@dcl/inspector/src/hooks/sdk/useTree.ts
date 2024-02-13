@@ -2,9 +2,10 @@ import { useCallback, useState, useEffect } from 'react'
 import { Entity } from '@dcl/ecs'
 
 import { findParent, getEmptyTree, getTreeFromEngine, ROOT } from '../../lib/sdk/tree'
+import { debounce } from '../../lib/utils/debounce'
+import { DropType } from '../../components/Tree/utils'
 import { useChange } from './useChange'
 import { useSdk } from './useSdk'
-import { DropType } from '../../components/Tree/utils'
 
 /**
  * Used to get a tree and the functions to work with it
@@ -33,7 +34,8 @@ export const useTree = () => {
   }, [sdk])
 
   const handleUpdate = useCallback(() => setTree(getTree()), [setTree, getTree])
-  useChange(handleUpdate)
+  const debounceHandleUpdate = useCallback(debounce(handleUpdate, 10), [handleUpdate])
+  useChange(debounceHandleUpdate)
 
   const getId = useCallback((entity: Entity) => entity.toString(), [])
 
