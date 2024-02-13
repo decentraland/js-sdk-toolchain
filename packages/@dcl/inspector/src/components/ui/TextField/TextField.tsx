@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import cx from 'classnames'
 
+import { debounce } from '../../../lib/utils/debounce'
 import { Message, MessageType } from '../Message'
 import { Label } from '../Label'
-import { debounce } from '../utils'
 import { Props } from './types'
 
 import './TextField.css'
