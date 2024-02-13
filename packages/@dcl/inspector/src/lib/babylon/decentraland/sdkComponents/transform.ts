@@ -1,7 +1,9 @@
 import { Quaternion } from '@babylonjs/core'
-import { ComponentType, Entity, TransformType } from '@dcl/ecs'
+import { ComponentType, DeepReadonlyObject, Entity, TransformType } from '@dcl/ecs'
 import type { ComponentOperation } from '../component-operations'
 import { EcsEntity } from '../EcsEntity'
+import { CAMERA, PLAYER, ROOT } from '../../../sdk/tree'
+import { Node } from '../../../sdk/components'
 
 export const putTransformComponent: ComponentOperation = (entity, component) => {
   if (component.componentType === ComponentType.LastWriteWinElementSet) {
@@ -67,6 +69,27 @@ export function createDefaultTransform(entity: EcsEntity) {
   }
 }
 
+function getParent(entity: Entity, nodes: DeepReadonlyObject<Node[]>) {
+  if (isRoot(entity)) return entity
+  const node = nodes.find(($) => $.children.includes(entity))
+  if (node) {
+    return node.entity
+  }
+  return ROOT
+}
+
+function isRoot(entity: Entity) {
+  return entity === ROOT || entity === PLAYER || entity === CAMERA
+}
+
+function getRoot(entity: Entity, nodes: DeepReadonlyObject<Node[]>) {
+  let root = getParent(entity, nodes)
+  while (!isRoot(root)) {
+    root = getParent(root, nodes)
+  }
+  return root
+}
+
 /**
  * This function parents an entity with another one. It implements a queuing logic
  * to create "synthetic" entities if the selected parent doesn't exist yet. This case
@@ -75,6 +98,26 @@ export function createDefaultTransform(entity: EcsEntity) {
 function reparentEntity(entity: EcsEntity) {
   const context = entity.context.deref()
   const parentEntityId: Entity | undefined = entity.ecsComponentValues.transform?.parent
+
+  // when changing the root of the entity, we need to enable/disable the mesh if the root is the player or the camera
+  const nodes = context?.editorComponents.Nodes.getOrNull(ROOT)?.value || []
+  if (nodes.length > 0) {
+    const oldRoot = getRoot(entity.entityId, nodes)
+    const newRoot = getRoot(parentEntityId || ROOT, nodes)
+    if (newRoot !== oldRoot) {
+      const container = entity.gltfContainer ?? entity.meshRenderer
+      if (container) {
+        const isSceneRoot = newRoot === ROOT
+        if (!isSceneRoot) {
+          container.setEnabled(false)
+          entity.context.deref()?.gizmos.unsetEntity()
+        } else {
+          container.setEnabled(true)
+          entity.context.deref()?.gizmos.setEntity(entity)
+        }
+      }
+    }
+  }
 
   if (context) {
     if (entity.parent && (entity.parent as EcsEntity).entityId === parentEntityId) return

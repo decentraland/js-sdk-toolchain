@@ -178,8 +178,8 @@ export const useTree = () => {
     },
     [sdk]
   )
-
-  const isNotRoot = useCallback((entity: Entity) => entity !== ROOT, [])
+  const isRoot = useCallback((entity: Entity) => entity === ROOT || entity === PLAYER || entity === CAMERA, [])
+  const isNotRoot = useCallback((entity: Entity) => !isRoot(entity), [])
   const canRename = isNotRoot
   const canRemove = isNotRoot
   const canDuplicate = isNotRoot
@@ -187,9 +187,9 @@ export const useTree = () => {
   const canReorder = useCallback(
     (source: Entity, target: Entity, type: DropType) => {
       // can't reorder ROOT entity
-      if (source === ROOT) return false
+      if (isRoot(source)) return false
       // can't reorder an entity before the ROOT entity
-      if (target === ROOT && type === 'before') return false
+      if (isRoot(target) && type === 'before') return false
       // can't reorder entity in target "inside" target
       if (findParent(tree, source) === target && type === 'inside') return false
       return true
