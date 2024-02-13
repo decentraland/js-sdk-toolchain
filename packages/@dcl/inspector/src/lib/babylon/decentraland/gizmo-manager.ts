@@ -267,7 +267,13 @@ export function createGizmoManager(context: SceneContext) {
   })
 
   context.scene.onPointerDown = function (_e, pickResult) {
-    if (lastEntity === null || pickResult.pickedMesh === null || !gizmoManager.freeGizmoEnabled) return
+    if (
+      lastEntity === null ||
+      pickResult.pickedMesh === null ||
+      !gizmoManager.freeGizmoEnabled ||
+      !context.Transform.getOrNull(lastEntity.entityId)
+    )
+      return
     const selectedEntities = getSelectedEntities().map((entityId) => context.getEntityOrNull(entityId)!)
     if (selectedEntities.some((entity) => pickResult.pickedMesh!.isDescendantOf(entity))) {
       initTransform()
@@ -276,7 +282,8 @@ export function createGizmoManager(context: SceneContext) {
   }
 
   context.scene.onPointerUp = function () {
-    if (lastEntity === null || !gizmoManager.freeGizmoEnabled) return
+    if (lastEntity === null || !gizmoManager.freeGizmoEnabled || !context.Transform.getOrNull(lastEntity.entityId))
+      return
     updateTransform()
     meshPointerDragBehavior.detach()
   }
