@@ -67,8 +67,10 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
   }, [sdk])
 
   const handleUpdateSceneLayout = useCallback(() => {
-    const scene = sdk.components.Scene.get(ROOT)
-    setSceneLayout({ ...(scene.layout as Layout) })
+    const scene = sdk.components.Scene.getOrNull(ROOT)
+    if (scene) {
+      setSceneLayout({ ...(scene.layout as Layout) })
+    }
   }, [sdk, setSceneLayout])
 
   useEffect(() => {
