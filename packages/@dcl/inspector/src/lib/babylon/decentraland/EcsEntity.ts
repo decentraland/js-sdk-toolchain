@@ -10,7 +10,6 @@ import {
   PBMaterial
 } from '@dcl/ecs'
 import future, { IFuture } from 'fp-future'
-import { ROOT } from '../../sdk/tree'
 import { SceneContext } from './SceneContext'
 import { createDefaultTransform } from './sdkComponents/transform'
 import { getLayoutManager } from './layout-manager'
@@ -136,7 +135,7 @@ export class EcsEntity extends BABYLON.TransformNode {
   }
 
   initEventHandlers(entity: EcsEntity) {
-    if (entity.entityId !== ROOT) {
+    if (entity.entityId !== this.context.deref()!.rootNode.entityId) {
       // Initialize this event to handle the entity's position update
       entity.onAfterWorldMatrixUpdateObservable.addOnce((eventData, eventState) => {
         void entity.validateEntityIsOutsideLayout(eventData as EcsEntity, eventState)
