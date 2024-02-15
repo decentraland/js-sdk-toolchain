@@ -6,23 +6,19 @@ import {
   BoundingInfo,
   Color3,
   IAxisDragGizmo,
-  Matrix,
   Mesh,
   MeshBuilder,
-  Plane,
   PositionGizmo,
   Scene,
   Space,
   StandardMaterial,
   TransformNode,
-  Vector3,
-  VertexBuffer
+  Vector3
 } from '@babylonjs/core'
 import { memoize } from '../../logic/once'
 import { Layout } from '../../utils/layout'
 import { GridMaterial } from '@babylonjs/materials'
 import { PARCEL_SIZE, GROUND_MESH_PREFIX } from '../../utils/scene'
-import { EcsEntity } from './EcsEntity'
 
 function disableGizmo(gizmo: IAxisDragGizmo) {
   gizmo.dragBehavior.detach()
