@@ -40,7 +40,7 @@ export class EcsEntity extends BABYLON.TransformNode {
   constructor(public entityId: Entity, public context: WeakRef<SceneContext>, public scene: BABYLON.Scene) {
     super(`ecs-${entityId.toString(16)}`, scene)
     createDefaultTransform(this)
-    this.initEventHandlers(this)
+    this.initEventHandlers()
   }
 
   putComponent(component: ComponentDefinition<unknown>) {
@@ -134,11 +134,11 @@ export class EcsEntity extends BABYLON.TransformNode {
     this.#isLocked = lock
   }
 
-  initEventHandlers(entity: EcsEntity) {
-    if (entity.entityId !== entity.context.deref()!.engine.RootEntity) {
+  initEventHandlers() {
+    if (this.entityId !== this.context.deref()!.engine.RootEntity) {
       // Initialize this event to handle the entity's position update
-      entity.onAfterWorldMatrixUpdateObservable.addOnce((eventData, eventState) => {
-        void entity.validateEntityIsOutsideLayout(eventData as EcsEntity, eventState)
+      this.onAfterWorldMatrixUpdateObservable.addOnce((eventData, eventState) => {
+        void this.validateEntityIsOutsideLayout(eventData as EcsEntity, eventState)
       })
     }
   }
