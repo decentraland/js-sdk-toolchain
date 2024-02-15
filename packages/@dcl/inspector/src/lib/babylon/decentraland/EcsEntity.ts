@@ -135,7 +135,7 @@ export class EcsEntity extends BABYLON.TransformNode {
   }
 
   initEventHandlers(entity: EcsEntity) {
-    if (entity.entityId !== this.context.deref()!.rootNode.entityId) {
+    if (entity.entityId !== entity.context.deref()!.engine.RootEntity) {
       // Initialize this event to handle the entity's position update
       entity.onAfterWorldMatrixUpdateObservable.addOnce((eventData, eventState) => {
         void entity.validateEntityIsOutsideLayout(eventData as EcsEntity, eventState)
