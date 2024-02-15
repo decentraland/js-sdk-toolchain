@@ -26,14 +26,16 @@ export function parseProps(props: EntityPropTypes) {
 /**
  * @internal
  */
-function getScaleAndUnit(scaleUnit: ScaleUnit): [number, ScaleUnits] {
+export function getScaleAndUnit(scaleUnit: ScaleUnit): [number, ScaleUnits] {
   if (typeof scaleUnit === 'number') {
     return [scaleUnit, 'vw']
   }
 
-  // the following regex would match any valid CSS unit (i.e: 7rem || 7% || 7vw)
-  const [_, value, unit] = scaleUnit.match(/(-?[\d.]+)([a-z%]*)/) as [string, number, ScaleUnits]
-  return [Number(value), unit]
+  const value = Number(scaleUnit.slice(0, -2))
+  if (scaleUnit.endsWith('vh')) return [value, 'vh']
+  if (scaleUnit.endsWith('vw')) return [value, 'vw']
+
+  return [NaN, 'vw']
 }
 
 /**

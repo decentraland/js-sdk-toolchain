@@ -1,7 +1,7 @@
 import { Entity, TextAlignMode, Font, IEngine } from '../../packages/@dcl/ecs'
 import { components } from '../../packages/@dcl/ecs/src'
 import { ReactEcs, Label, UiFontType, TextAlignType, scaleFontSize } from '../../packages/@dcl/react-ecs/src'
-import { getScaleCtx } from '../../packages/@dcl/react-ecs/src/components/utils'
+import { getScaleAndUnit, getScaleCtx } from '../../packages/@dcl/react-ecs/src/components/utils'
 import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
 import { Color4 } from '../../packages/@dcl/sdk/math'
 import { setupEngine } from './utils'
@@ -121,6 +121,40 @@ describe('UiText React Ecs', () => {
 
     it('should return the same value provided', () => {
       expect(getFontSize(10)).toStrictEqual({ fontSize: 10 })
+    })
+  })
+
+  describe('getScaleAndUnit', () => {
+    it('should return scale and unit when scale unit is a number', () => {
+      expect(getScaleAndUnit(10)).toEqual([10, 'vw'])
+    })
+
+    it('should return scale and unit correctly when scale unit ends with "vw"', () => {
+      expect(getScaleAndUnit('15vw')).toEqual([15, 'vw'])
+    })
+
+    it('should return scale and unit correctly when scale unit ends with "vh"', () => {
+      expect(getScaleAndUnit('20vh')).toEqual([20, 'vh'])
+    })
+
+    it('should default to "vw" unit when scale unit is invalid', () => {
+      expect(getScaleAndUnit('30' as any)).toEqual([NaN, 'vw'])
+    })
+
+    it('should handle numeric scale unit correctly', () => {
+      expect(getScaleAndUnit(25)).toEqual([25, 'vw'])
+    })
+
+    it('should handle negative numeric scale unit correctly', () => {
+      expect(getScaleAndUnit(-25)).toEqual([-25, 'vw'])
+    })
+
+    it('should handle negative scale unit string correctly', () => {
+      expect(getScaleAndUnit('-25vw')).toEqual([-25, 'vw'])
+    })
+
+    it('should handle zero as scale unit correctly', () => {
+      expect(getScaleAndUnit(0)).toEqual([0, 'vw'])
     })
   })
 })
