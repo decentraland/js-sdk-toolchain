@@ -23,7 +23,8 @@ const IGNORE_MATERIALS = [
   'colorShaderOccQuery',
   'skyBox',
   // Utils Materials
-  'entityOutsideLayoutMaterial',
+  'entity_outside_layout',
+  'entity_outside_layout_multimaterial',
   'layout_grid',
   'grid',
   'base-box',
