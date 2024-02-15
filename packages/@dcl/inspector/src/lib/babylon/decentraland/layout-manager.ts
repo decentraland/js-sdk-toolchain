@@ -6,8 +6,10 @@ import {
   BoundingInfo,
   Color3,
   IAxisDragGizmo,
+  Matrix,
   Mesh,
   MeshBuilder,
+  Plane,
   PositionGizmo,
   Scene,
   Space,
@@ -20,6 +22,7 @@ import { memoize } from '../../logic/once'
 import { Layout } from '../../utils/layout'
 import { GridMaterial } from '@babylonjs/materials'
 import { PARCEL_SIZE, GROUND_MESH_PREFIX } from '../../utils/scene'
+import { EcsEntity } from './EcsEntity'
 
 function disableGizmo(gizmo: IAxisDragGizmo) {
   gizmo.dragBehavior.detach()
@@ -128,7 +131,7 @@ export const getLayoutManager = memoize((scene: Scene) => {
     }
   }
 
-  function isEntityOutsideLayout(entity: AbstractMesh) {
+  function getLayoutBoundingBox() {
     // Combine all planes' bounding boxes into a single bounding box
     const combinedMin = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE)
     const combinedMax = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE)
@@ -142,32 +145,43 @@ export const getLayoutManager = memoize((scene: Scene) => {
 
     const combinedBoundingBox = new BoundingBox(combinedMin, combinedMax)
 
-    // Get the vertices of the entity
-    const vertexData = entity.getVerticesData(VertexBuffer.PositionKind) || []
-    const worldMatrix = entity.getWorldMatrix()
+    return combinedBoundingBox
+  }
 
-    // Check each vertex of the entity
-    for (let i = 0; i < vertexData.length; i += 3) {
-      // Transform the vertex to world space
-      const vertex = Vector3.TransformCoordinates(
-        new Vector3(vertexData[i], vertexData[i + 1], vertexData[i + 2]),
-        worldMatrix
-      )
-      const sanitizedVertex = new Vector3(vertex.x, Math.max(0, vertex.y), vertex.z)
+  function isEntityOutsideLayout(mesh: AbstractMesh) {
+    const layoutBoundingBox = getLayoutBoundingBox()
+    const meshBoundingBox = mesh.getBoundingInfo().boundingBox
 
-      // Check if the vertex lies outside the combined bounding box
-      if (!combinedBoundingBox.intersectsPoint(sanitizedVertex)) {
-        return true // Entity is partially or completely outside the combined plane
+    const boundingBoxCorners = [
+      meshBoundingBox.minimumWorld,
+      new Vector3(meshBoundingBox.minimumWorld.x, meshBoundingBox.minimumWorld.y, meshBoundingBox.maximumWorld.z),
+      new Vector3(meshBoundingBox.minimumWorld.x, meshBoundingBox.maximumWorld.y, meshBoundingBox.minimumWorld.z),
+      new Vector3(meshBoundingBox.minimumWorld.x, meshBoundingBox.maximumWorld.y, meshBoundingBox.maximumWorld.z),
+      new Vector3(meshBoundingBox.maximumWorld.x, meshBoundingBox.minimumWorld.y, meshBoundingBox.minimumWorld.z),
+      new Vector3(meshBoundingBox.maximumWorld.x, meshBoundingBox.minimumWorld.y, meshBoundingBox.maximumWorld.z),
+      new Vector3(meshBoundingBox.maximumWorld.x, meshBoundingBox.maximumWorld.y, meshBoundingBox.minimumWorld.z),
+      meshBoundingBox.maximumWorld
+    ]
+
+    // Check each corner against the layout bounding box
+    for (const corner of boundingBoxCorners) {
+      // Ensure the corner is at least at y = 0
+      const sanitizedVertex = new Vector3(corner.x, Math.max(0, corner.y), corner.z)
+
+      // Check if the sanitized corner intersects with the layout bounding box
+      if (!layoutBoundingBox.intersectsPoint(sanitizedVertex)) {
+        return true // Entity is partially or completely outside the layout bounding box
       }
     }
 
-    // If we reach here, all vertices are inside the combined bounding box
-    return false // Entity is completely inside the combined plane
+    // If we reach here, all vertices are inside the layout bounding box
+    return false // Entity is completely inside the layout bounding box
   }
 
   return {
     getLayout,
     setLayout,
+    getLayoutBoundingBox,
     isEntityOutsideLayout
   }
 })
