@@ -8,6 +8,9 @@ import { SceneContext } from './SceneContext'
 const getContext = () => ({
   componentPutOperations: {
     [Transform.componentId]: jest.fn()
+  },
+  engine: {
+    RootEntity: 0 as Entity
   }
 })
 

@@ -12,6 +12,7 @@ import {
 import future, { IFuture } from 'fp-future'
 import { SceneContext } from './SceneContext'
 import { createDefaultTransform } from './sdkComponents/transform'
+import { getLayoutManager } from './layout-manager'
 
 export type EcsComponents = Partial<{
   gltfContainer: PBGltfContainer
@@ -39,6 +40,7 @@ export class EcsEntity extends BABYLON.TransformNode {
   constructor(public entityId: Entity, public context: WeakRef<SceneContext>, public scene: BABYLON.Scene) {
     super(`ecs-${entityId.toString(16)}`, scene)
     createDefaultTransform(this)
+    this.initEventHandlers()
   }
 
   putComponent(component: ComponentDefinition<unknown>) {
@@ -120,12 +122,25 @@ export class EcsEntity extends BABYLON.TransformNode {
     return container ? !container.isEnabled(false) : false
   }
 
+  getPickableMesh() {
+    return this.getChildMeshes(false).find((mesh) => !!mesh.isPickable)
+  }
+
   isLocked() {
     return this.#isLocked
   }
 
   setLock(lock: boolean) {
     this.#isLocked = lock
+  }
+
+  initEventHandlers() {
+    if (this.entityId !== this.context.deref()!.engine.RootEntity) {
+      // Initialize this event to handle the entity's position update
+      this.onAfterWorldMatrixUpdateObservable.addOnce((eventData) => {
+        void validateEntityIsOutsideLayout(eventData as EcsEntity)
+      })
+    }
   }
 }
 
@@ -157,4 +172,59 @@ export function findParentEntityOfType<T extends EcsEntity>(
   }
 
   return (parent as any as T) || null
+}
+
+async function validateEntityIsOutsideLayout(eventData: EcsEntity) {
+  // When dropping a new entity, waits until the gltf is loaded
+  if (eventData.isGltfPathLoading()) {
+    await eventData.onGltfContainerLoaded()
+  }
+  // Get the entity's pickable mesh
+  const mesh = eventData.getPickableMesh()
+  if (mesh) {
+    // Update the mesh's bounding box visibility
+    const meshBoundingBox = eventData.getMeshesBoundingBox()
+    mesh.setBoundingInfo(
+      new BABYLON.BoundingInfo(meshBoundingBox.minimum, meshBoundingBox.maximum, eventData.getWorldMatrix())
+    )
+    mesh.onAfterWorldMatrixUpdateObservable.add((eventMeshData) =>
+      updateMeshBoundingBoxVisibility(eventData, eventMeshData as BABYLON.AbstractMesh)
+    )
+  }
+}
+
+function updateMeshBoundingBoxVisibility(entity: EcsEntity, mesh: BABYLON.AbstractMesh) {
+  const scene = mesh.getScene()
+  const { isEntityOutsideLayout } = getLayoutManager(scene)
+
+  if (isEntityOutsideLayout(mesh)) {
+    for (const childMesh of entity.getChildMeshes(false)) {
+      addOutsideLayoutMaterial(childMesh, scene)
+    }
+    mesh.showBoundingBox = true
+  } else {
+    for (const childMesh of entity.getChildMeshes(false)) {
+      removeOutsideLayoutMaterial(childMesh)
+    }
+    mesh.showBoundingBox = false
+  }
+}
+
+function addOutsideLayoutMaterial(mesh: BABYLON.AbstractMesh, scene: BABYLON.Scene) {
+  if (!(mesh.material instanceof BABYLON.MultiMaterial)) {
+    const multiMaterial = new BABYLON.MultiMaterial('entity_outside_layout_multimaterial', scene)
+    multiMaterial.subMaterials = [scene.getMaterialByName('entity_outside_layout'), mesh.material]
+    mesh.material = multiMaterial
+  }
+}
+
+function removeOutsideLayoutMaterial(mesh: BABYLON.AbstractMesh) {
+  if (
+    mesh.material instanceof BABYLON.MultiMaterial &&
+    mesh.material.subMaterials.some((material) => material?.name === 'entity_outside_layout')
+  ) {
+    const multiMaterial = mesh.material
+    mesh.material = multiMaterial.subMaterials[1]
+    multiMaterial.dispose()
+  }
 }
