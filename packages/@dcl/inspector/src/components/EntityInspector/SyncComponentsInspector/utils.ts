@@ -2,7 +2,7 @@ import { ComponentDefinition, Entity, IEngine } from '@dcl/ecs'
 import { ComponentName } from '@dcl/asset-packs'
 
 import { CoreComponents } from '../../../lib/sdk/components'
-import { getComponentName, getEnabledComponents } from '../../Hierarchy/ContextMenu/ContextMenu'
+import { getComponentName, getEnabledComponents } from '../../../hooks/sdk/useEntityComponent'
 
 const DISABLED_COMPONENTS: string[] = [
   ComponentName.ACTIONS,
