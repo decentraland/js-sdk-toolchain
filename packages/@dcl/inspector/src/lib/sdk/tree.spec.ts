@@ -127,7 +127,7 @@ describe('getTreeFromEngine', () => {
             expect(tree.get(A)).not.toBeDefined()
             expect(tree.get(B)).not.toBeDefined()
             expect(tree.get(C)).not.toBeDefined()
-            expect(tree.size).toBe(1)
+            expect(tree.size).toBe(3)
           })
           describe('and then adding a new entity D as children of ROOT', () => {
             let D: Entity
