@@ -55,6 +55,8 @@ const transformComponentName = (value: string): string => {
   switch (value) {
     case CoreComponents.SYNC_COMPONENTS:
       return 'Multiplayer'
+    case CoreComponents.GLTF_CONTAINER:
+      return 'GLTF'
     default:
       return value
   }
