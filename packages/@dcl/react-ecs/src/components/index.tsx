@@ -1,7 +1,7 @@
 import { PBUiText } from '@dcl/ecs'
 import { ReactEcs } from '../react-ecs'
 import { UiLabelProps } from './Label/types'
-import { getFont, getTextAlign } from './Label/utils'
+import { getFont, getFontSize, getTextAlign } from './Label/utils'
 import { EntityPropTypes } from './types'
 import { parseProps } from './utils'
 
@@ -16,7 +16,7 @@ export * from './Button/types'
 
 export { Dropdown } from './Dropdown'
 export { Input } from './Input'
-export { Label } from './Label'
+export { Label, scaleFontSize } from './Label'
 export { Button } from './Button'
 
 /**
@@ -29,7 +29,8 @@ export function UiEntity(props: EntityPropTypes & { uiText?: UiLabelProps }) {
     uiText: {
       ...props.uiText,
       ...getFont(props.uiText.font),
-      ...getTextAlign(props.uiText.textAlign)
+      ...getTextAlign(props.uiText.textAlign),
+      ...getFontSize(props.uiText.fontSize)
     } as PBUiText
   }
 

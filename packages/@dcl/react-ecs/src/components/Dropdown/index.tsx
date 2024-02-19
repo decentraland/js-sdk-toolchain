@@ -3,10 +3,10 @@ import { PBUiDropdown } from '@dcl/ecs'
 import { parseProps } from '../utils'
 import { ReactEcs } from '../../react-ecs'
 import { UiDropdownProps } from './types'
-import { getFont, getTextAlign } from '../Label/utils'
+import { getFont, getFontSize, getTextAlign } from '../Label/utils'
 
 function parseUiDropdown(props: UiDropdownProps): PBUiDropdown {
-  const { textAlign, font, ...otherProps } = props
+  const { textAlign, font, fontSize, ...otherProps } = props
   return {
     acceptEmpty: false,
     options: [],
@@ -14,7 +14,8 @@ function parseUiDropdown(props: UiDropdownProps): PBUiDropdown {
     disabled: false,
     ...otherProps,
     ...getTextAlign(textAlign),
-    ...getFont(font)
+    ...getFont(font),
+    ...getFontSize(fontSize)
   }
 }
 

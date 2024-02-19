@@ -3335,7 +3335,7 @@ export type PositionShorthand = PositionUnit | `${PositionUnit} ${PositionUnit}`
 export type PositionType = 'absolute' | 'relative';
 
 // @public
-export type PositionUnit = `${number}px` | `${number}%` | number | `${number}`;
+export type PositionUnit = `${number}px` | `${number}%` | number | `${number}` | ScaleUnit;
 
 // Warning: (ae-missing-release-tag) "ProcessMessageResultType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -3704,6 +3704,33 @@ export namespace Scale {
     export function encode(message: Scale, writer?: _m0.Writer): _m0.Writer;
 }
 
+// @public
+export type ScaleContext = {
+    width: number;
+    height: number;
+    ratio: number;
+};
+
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (tsdoc-param-tag-with-invalid-type) The @param block should not include a JSDoc-style '{type}'
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (tsdoc-param-tag-with-invalid-optional-name) The @param should not include a JSDoc-style optional name; it must not be enclosed in '[ ]' brackets.
+// Warning: (tsdoc-param-tag-with-invalid-type) The @param block should not include a JSDoc-style '{type}'
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (tsdoc-param-tag-with-invalid-optional-name) The @param should not include a JSDoc-style optional name; it must not be enclosed in '[ ]' brackets.
+// Warning: (tsdoc-param-tag-with-invalid-type) The @param block should not include a JSDoc-style '{type}'
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+//
+// @public
+export function scaleFontSize(fontSize: number, scaleUnit?: ScaleUnit, ctx?: ScaleContext | undefined): number;
+
+// @public
+export type ScaleUnit = `${number}${ScaleUnits}` | number;
+
+// @public
+export type ScaleUnits = 'vw' | 'vh';
+
 // @public (undocumented)
 export namespace Schemas {
     // (undocumented)
@@ -4062,9 +4089,11 @@ export type UiComponent = () => ReactEcs.JSX.Element;
 export const UiDropdown: LastWriteWinElementSetComponentDefinition<PBUiDropdown>;
 
 // @public
-export interface UiDropdownProps extends EntityPropTypes, Omit<Partial<PBUiDropdown>, 'textAlign' | 'font'> {
+export interface UiDropdownProps extends EntityPropTypes, Omit<Partial<PBUiDropdown>, 'textAlign' | 'font' | 'fontSize'> {
     // (undocumented)
     font?: UiFontType;
+    // (undocumented)
+    fontSize?: ScaleUnit;
     // (undocumented)
     onChange?(value: number): void;
     // (undocumented)
@@ -4088,9 +4117,11 @@ export type UiFontType = 'sans-serif' | 'serif' | 'monospace';
 export const UiInput: LastWriteWinElementSetComponentDefinition<PBUiInput>;
 
 // @public (undocumented)
-export interface UiInputProps extends Omit<PBUiInput, 'font' | 'textAlign'> {
+export interface UiInputProps extends Omit<PBUiInput, 'font' | 'textAlign' | 'fontSize'> {
     // (undocumented)
     font?: UiFontType;
+    // (undocumented)
+    fontSize?: ScaleUnit;
     onChange?(value: string): void;
     onSubmit?(value: string): void;
     // (undocumented)
@@ -4104,7 +4135,7 @@ export const UiInputResult: LastWriteWinElementSetComponentDefinition<PBUiInputR
 export interface UiLabelProps {
     color?: PBColor4 | undefined;
     font?: UiFontType | undefined;
-    fontSize?: number | undefined;
+    fontSize?: ScaleUnit | undefined;
     textAlign?: TextAlignType | undefined;
     value: string;
 }
