@@ -1,9 +1,9 @@
 import { Quaternion } from '@babylonjs/core'
-import { ComponentType, DeepReadonlyObject, Entity, TransformType } from '@dcl/ecs'
+import { ComponentType, Entity, TransformType } from '@dcl/ecs'
 import type { ComponentOperation } from '../component-operations'
 import { EcsEntity } from '../EcsEntity'
-import { CAMERA, PLAYER, ROOT } from '../../../sdk/tree'
-import { Node } from '../../../sdk/components'
+import { ROOT } from '../../../sdk/tree'
+import { getRoot } from '../../../sdk/nodes'
 
 export const putTransformComponent: ComponentOperation = (entity, component) => {
   if (component.componentType === ComponentType.LastWriteWinElementSet) {
@@ -67,27 +67,6 @@ export function createDefaultTransform(entity: EcsEntity) {
       reparentQueue.clear()
     }
   }
-}
-
-function getParent(entity: Entity, nodes: DeepReadonlyObject<Node[]>) {
-  if (isRoot(entity)) return entity
-  const node = nodes.find(($) => $.children.includes(entity))
-  if (node) {
-    return node.entity
-  }
-  return ROOT
-}
-
-function isRoot(entity: Entity) {
-  return entity === ROOT || entity === PLAYER || entity === CAMERA
-}
-
-function getRoot(entity: Entity, nodes: DeepReadonlyObject<Node[]>) {
-  let root = getParent(entity, nodes)
-  while (!isRoot(root)) {
-    root = getParent(root, nodes)
-  }
-  return root
 }
 
 /**

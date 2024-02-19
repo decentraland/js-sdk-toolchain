@@ -2,6 +2,28 @@ import { DeepReadonlyObject, Entity, IEngine } from '@dcl/ecs'
 
 import { EditorComponentNames, EditorComponents, Node } from './components'
 import { cleanPush } from '../utils/array'
+import { CAMERA, PLAYER, ROOT } from './tree'
+
+export function getParent(entity: Entity, nodes: DeepReadonlyObject<Node[]>) {
+  if (isRoot(entity)) return entity
+  const node = nodes.find(($) => $.children.includes(entity))
+  if (node) {
+    return node.entity
+  }
+  return ROOT
+}
+
+export function isRoot(entity: Entity) {
+  return entity === ROOT || entity === PLAYER || entity === CAMERA
+}
+
+export function getRoot(entity: Entity, nodes: DeepReadonlyObject<Node[]>) {
+  let root = getParent(entity, nodes)
+  while (!isRoot(root)) {
+    root = getParent(root, nodes)
+  }
+  return root
+}
 
 function getNodes(engine: IEngine): readonly DeepReadonlyObject<Node>[] {
   const Nodes = engine.getComponent(EditorComponentNames.Nodes) as EditorComponents['Nodes']

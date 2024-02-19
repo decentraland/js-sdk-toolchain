@@ -3,6 +3,7 @@ import { Entity } from '@dcl/ecs'
 
 import { CAMERA, findParent, getEmptyTree, getTreeFromEngine, PLAYER, ROOT } from '../../lib/sdk/tree'
 import { debounce } from '../../lib/utils/debounce'
+import { getRoot } from '../../lib/sdk/nodes'
 import { DropType } from '../../components/Tree/utils'
 import { useChange } from './useChange'
 import { useSdk } from './useSdk'
@@ -75,7 +76,11 @@ export const useTree = () => {
     async (parent: Entity, label: string) => {
       if (!sdk) return
       const child = sdk.operations.addChild(parent, label)
-      sdk.operations.updateSelectedEntity(child)
+      const nodes = sdk.components.Nodes.getOrNull(parent)?.value || []
+      const root = getRoot(parent, nodes)
+      if (root === ROOT) {
+        sdk.operations.updateSelectedEntity(child)
+      }
       await sdk.operations.dispatch()
       handleUpdate()
     },
