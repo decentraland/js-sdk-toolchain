@@ -127,7 +127,6 @@ export class EcsEntity extends BABYLON.TransformNode {
     const ctx = this.context.deref()
     const nodes = ctx?.editorComponents.Nodes.getOrNull(ctx.engine.RootEntity)?.value || []
     const root = getRoot(this.entityId, nodes)
-    console.log('root', this.entityId, root)
     return root
   }
 
