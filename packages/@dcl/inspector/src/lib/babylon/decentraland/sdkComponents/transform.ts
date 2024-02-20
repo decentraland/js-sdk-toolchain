@@ -85,15 +85,17 @@ function reparentEntity(entity: EcsEntity) {
     const newRoot = getRoot(parentEntityId || ROOT, nodes)
     if (newRoot !== oldRoot) {
       const container = entity.gltfContainer ?? entity.meshRenderer
-      if (container) {
-        const isSceneRoot = newRoot === ROOT
-        if (!isSceneRoot) {
+      const isSceneRoot = newRoot === ROOT
+      if (!isSceneRoot) {
+        if (container) {
           container.setEnabled(false)
-          entity.context.deref()?.gizmos.unsetEntity()
-        } else {
-          container.setEnabled(true)
-          entity.context.deref()?.gizmos.setEntity(entity)
         }
+        entity.context.deref()?.gizmos.unsetEntity()
+      } else {
+        if (container) {
+          container.setEnabled(true)
+        }
+        entity.context.deref()?.gizmos.setEntity(entity)
       }
     }
   }
