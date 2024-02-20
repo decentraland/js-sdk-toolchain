@@ -251,9 +251,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
       [ActionType.SET_STATE]: () => hasStates,
       [ActionType.INCREMENT_COUNTER]: () => hasCounter,
       [ActionType.DECREASE_COUNTER]: () => hasCounter,
-      [ActionType.SET_COUNTER]: () => hasCounter,
-      [ActionType.MOVE_PLAYER]: () => false, // disabling this for now since it's not working as expected
-      [ActionType.PLAY_CUSTOM_EMOTE]: () => false // disabling this for now since it's not working on custom realms, so it does not work on the builder preview
+      [ActionType.SET_COUNTER]: () => hasCounter
     }),
     [hasAnimations, hasStates]
   )

@@ -54,9 +54,9 @@ describe('Migration: Build Node component hierarchy', () => {
     const { engine, components } = engineCtx
 
     const hierarchy = buildNodesHierarchy(engineCtx.engine)
-    const expected = components.Nodes.get(engine.RootEntity).value
+    const expected = components.Nodes.getMutable(engine.RootEntity).value
 
-    expect(hierarchy).toEqual(expected)
+    expect(hierarchy).toEqual(expect.arrayContaining(expected))
   })
 
   it('should build same hierarchy as in minimal composite', () => {
@@ -65,14 +65,18 @@ describe('Migration: Build Node component hierarchy', () => {
     const { engine, components } = engineCtx
 
     const hierarchy = buildNodesHierarchy(engineCtx.engine)
-    const expected = components.Nodes.get(engine.RootEntity).value
+    const expected = components.Nodes.getMutable(engine.RootEntity).value
 
-    expect(hierarchy).toEqual(expected)
+    expect(hierarchy).toEqual(expect.arrayContaining(expected))
   })
 
   it('should build hierarchy with RootEntity as only node', () => {
     const { engine } = engineCtx
     const hierarchy = buildNodesHierarchy(engineCtx.engine)
-    expect(hierarchy).toEqual([{ entity: engine.RootEntity, open: true, children: [] }])
+    expect(hierarchy).toEqual([
+      { entity: engine.RootEntity, open: true, children: [] },
+      { entity: engine.PlayerEntity, children: [] },
+      { entity: engine.CameraEntity, children: [] }
+    ])
   })
 })

@@ -13,6 +13,7 @@ import future, { IFuture } from 'fp-future'
 import { SceneContext } from './SceneContext'
 import { createDefaultTransform } from './sdkComponents/transform'
 import { getLayoutManager } from './layout-manager'
+import { getRoot } from '../../sdk/nodes'
 
 export type EcsComponents = Partial<{
   gltfContainer: PBGltfContainer
@@ -120,6 +121,23 @@ export class EcsEntity extends BABYLON.TransformNode {
   isHidden() {
     const container = this.gltfContainer ?? this.meshRenderer
     return container ? !container.isEnabled(false) : false
+  }
+
+  getRoot() {
+    const ctx = this.context.deref()
+    const nodes = ctx?.editorComponents.Nodes.getOrNull(ctx.engine.RootEntity)?.value || []
+    const root = getRoot(this.entityId, nodes)
+    return root
+  }
+
+  setVisibility(enabled: boolean) {
+    const container = this.gltfContainer ?? this.meshRenderer
+    if (container) {
+      container.setEnabled(enabled)
+    }
+    for (const child of this.childrenEntities()) {
+      child.setVisibility(enabled)
+    }
   }
 
   getPickableMesh() {

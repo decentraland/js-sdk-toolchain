@@ -41,6 +41,8 @@ export function generateMinimalComposite({ engine, components }: TempEngine) {
   components.Nodes.create(engine.RootEntity, {
     value: [
       { entity: engine.RootEntity, children: [entity], open: true },
+      { entity: engine.PlayerEntity, children: [] },
+      { entity: engine.CameraEntity, children: [] },
       { entity, children: [] }
     ]
   })
@@ -122,6 +124,8 @@ export function generateFeededComposite({ engine, components }: TempEngine, scen
   components.Nodes.create(engine.RootEntity, {
     value: [
       { entity: engine.RootEntity, children: [entity, gltfEntity], open: true },
+      { entity: engine.PlayerEntity, children: [] },
+      { entity: engine.CameraEntity, children: [] },
       { entity, children: [] },
       { entity: gltfEntity, children: [] }
     ]

@@ -29,5 +29,9 @@ export class UiServer extends RPC<UiRPC.Method, UiRPC.Params, UiRPC.Result> {
     this.handle('toggle_scene_inspector_tab', async ({ tab, enabled }) => {
       store.dispatch({ type: 'ui/toggleSceneInspectorTab', payload: { tab, enabled } })
     })
+
+    this.handle('toggle_ground_grid', async ({ enabled }) => {
+      store.dispatch({ type: 'ui/toggleGroundGrid', payload: { enabled } })
+    })
   }
 }
