@@ -84,17 +84,12 @@ function reparentEntity(entity: EcsEntity) {
     const oldRoot = getRoot(entity.entityId, nodes)
     const newRoot = getRoot(parentEntityId || ROOT, nodes)
     if (newRoot !== oldRoot) {
-      const container = entity.gltfContainer ?? entity.meshRenderer
       const isSceneRoot = newRoot === ROOT
       if (!isSceneRoot) {
-        if (container) {
-          container.setEnabled(false)
-        }
+        entity.setVisibility(false)
         entity.context.deref()?.gizmos.unsetEntity()
       } else {
-        if (container) {
-          container.setEnabled(true)
-        }
+        entity.setVisibility(true)
         entity.context.deref()?.gizmos.setEntity(entity)
       }
     }

@@ -130,6 +130,16 @@ export class EcsEntity extends BABYLON.TransformNode {
     return root
   }
 
+  setVisibility(enabled: boolean) {
+    const container = this.gltfContainer ?? this.meshRenderer
+    if (container) {
+      container.setEnabled(enabled)
+    }
+    for (const child of this.childrenEntities()) {
+      child.setVisibility(enabled)
+    }
+  }
+
   getPickableMesh() {
     return this.getChildMeshes(false).find((mesh) => !!mesh.isPickable)
   }
