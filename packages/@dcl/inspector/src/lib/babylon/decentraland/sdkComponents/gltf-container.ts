@@ -195,12 +195,8 @@ export function processGLTFAssetContainer(assetContainer: BABYLON.AssetContainer
           }
         }
       })
-  })
 
-  processColliders(assetContainer)
-
-  // Find all the materials from all the meshes and add to $.materials
-  assetContainer.meshes.forEach((mesh) => {
+    // Find all the materials from all the meshes and add to $.materials
     mesh.cullingStrategy = BABYLON.AbstractMesh.CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY
     if (mesh.material) {
       if (!assetContainer.materials.includes(mesh.material)) {
@@ -208,6 +204,8 @@ export function processGLTFAssetContainer(assetContainer: BABYLON.AssetContainer
       }
     }
   })
+
+  processColliders(assetContainer)
 
   // Find the textures in the materials that share the same domain as the context
   // then add the textures to the $.textures
