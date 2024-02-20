@@ -18,6 +18,7 @@ import { buildNodesHierarchyIfNotExists } from '../utils/migrations/build-nodes-
 import { removeLegacyEntityNodeComponents } from '../utils/migrations/legacy-entity-node'
 import { bufferToScene } from '../scene'
 import { toSceneComponent } from './component'
+import { addNodesComponentsToPlayerAndCamera } from './migrations/add-nodes-to-player-and-camera'
 
 enum DirtyEnum {
   // No changes
@@ -34,6 +35,8 @@ function runMigrations(engine: IEngine) {
   removeLegacyEntityNodeComponents(engine)
   // Build Nodes component value if not exists
   buildNodesHierarchyIfNotExists(engine)
+  // Add Nodes component to PlayerEntity and CameraEntity if not exists
+  addNodesComponentsToPlayerAndCamera(engine)
 }
 
 async function instanciateComposite(fs: FileSystemInterface, engine: IEngine, path: string): Promise<CompositeManager> {

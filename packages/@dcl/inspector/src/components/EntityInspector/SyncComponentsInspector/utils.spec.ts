@@ -3,7 +3,7 @@ import { ComponentName } from '@dcl/asset-packs'
 
 import { CoreComponents } from '../../../lib/sdk/components'
 import { getComponents, putComponentIds, deleteComponentIds, POTENTIAL_COMPONENTS } from './utils'
-import { getComponentName } from '../../Hierarchy/ContextMenu/ContextMenu'
+import { getComponentName } from '../../../hooks/sdk/useEntityComponent'
 
 describe('getComponents', () => {
   it('returns sorted entity components and available components', () => {

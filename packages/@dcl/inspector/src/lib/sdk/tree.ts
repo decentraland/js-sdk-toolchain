@@ -2,6 +2,8 @@ import { Entity, engine, IEngine } from '@dcl/ecs'
 import { EditorComponents } from './components'
 
 export const ROOT = engine.RootEntity
+export const PLAYER = engine.PlayerEntity
+export const CAMERA = engine.CameraEntity
 
 /**
  * Returns a tree in the shape of Map<Entity, Set<Entity>> where the key is the parent and the value is the children
@@ -9,9 +11,9 @@ export const ROOT = engine.RootEntity
  */
 export const getTreeFromEngine = (engine: IEngine, Nodes: EditorComponents['Nodes']): Map<Entity, Set<Entity>> => {
   const tree = getEmptyTree()
-  const rootChildren = Nodes.getOrNull(engine.RootEntity)?.value || []
+  const nodes = Nodes.getOrNull(engine.RootEntity)?.value || []
 
-  for (const { entity, children } of rootChildren) {
+  for (const { entity, children } of nodes) {
     tree.set(entity, new Set(children))
   }
 
@@ -25,6 +27,8 @@ export const getTreeFromEngine = (engine: IEngine, Nodes: EditorComponents['Node
 export function getEmptyTree() {
   const tree = new Map<Entity, Set<Entity>>()
   tree.set(ROOT, new Set<Entity>())
+  tree.set(PLAYER, new Set<Entity>())
+  tree.set(CAMERA, new Set<Entity>())
   return tree
 }
 

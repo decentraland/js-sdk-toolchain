@@ -1,8 +1,9 @@
 import { useCallback, useState, useEffect } from 'react'
 import { Entity } from '@dcl/ecs'
 
-import { findParent, getEmptyTree, getTreeFromEngine, ROOT } from '../../lib/sdk/tree'
+import { CAMERA, findParent, getEmptyTree, getTreeFromEngine, PLAYER, ROOT } from '../../lib/sdk/tree'
 import { debounce } from '../../lib/utils/debounce'
+import { getRoot } from '../../lib/sdk/nodes'
 import { DropType } from '../../components/Tree/utils'
 import { useChange } from './useChange'
 import { useSdk } from './useSdk'
@@ -49,6 +50,8 @@ export const useTree = () => {
   const getLabel = useCallback(
     (entity: Entity) => {
       if (entity === ROOT) return 'Scene'
+      if (entity === PLAYER) return 'Player'
+      if (entity === CAMERA) return 'Camera'
       if (!sdk) return entity.toString()
       const { Name } = sdk.components
       return Name.has(entity) ? Name.get(entity).value : entity.toString()
@@ -73,7 +76,11 @@ export const useTree = () => {
     async (parent: Entity, label: string) => {
       if (!sdk) return
       const child = sdk.operations.addChild(parent, label)
-      sdk.operations.updateSelectedEntity(child)
+      const nodes = sdk.components.Nodes.getOrNull(parent)?.value || []
+      const root = getRoot(parent, nodes)
+      if (root === ROOT) {
+        sdk.operations.updateSelectedEntity(child)
+      }
       await sdk.operations.dispatch()
       handleUpdate()
     },
@@ -176,8 +183,8 @@ export const useTree = () => {
     },
     [sdk]
   )
-
-  const isNotRoot = useCallback((entity: Entity) => entity !== ROOT, [])
+  const isRoot = useCallback((entity: Entity) => entity === ROOT || entity === PLAYER || entity === CAMERA, [])
+  const isNotRoot = useCallback((entity: Entity) => !isRoot(entity), [])
   const canRename = isNotRoot
   const canRemove = isNotRoot
   const canDuplicate = isNotRoot
@@ -185,9 +192,9 @@ export const useTree = () => {
   const canReorder = useCallback(
     (source: Entity, target: Entity, type: DropType) => {
       // can't reorder ROOT entity
-      if (source === ROOT) return false
+      if (isRoot(source)) return false
       // can't reorder an entity before the ROOT entity
-      if (target === ROOT && type === 'before') return false
+      if (isRoot(target) && type === 'before') return false
       // can't reorder entity in target "inside" target
       if (findParent(tree, source) === target && type === 'inside') return false
       return true

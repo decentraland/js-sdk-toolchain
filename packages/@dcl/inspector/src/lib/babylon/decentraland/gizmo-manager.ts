@@ -15,6 +15,7 @@ import { EcsEntity } from './EcsEntity'
 import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manager'
 import { SceneContext } from './SceneContext'
 import { PatchedGizmoManager } from './gizmo-patch'
+import { ROOT } from '../../sdk/tree'
 
 interface GizmoAxis {
   xGizmo: IAxisDragGizmo
@@ -310,7 +311,8 @@ export function createGizmoManager(context: SceneContext) {
         !isEnabled ||
         areMultipleEntitiesSelected() ||
         entity?.isHidden() ||
-        entity?.isLocked()
+        entity?.isLocked() ||
+        entity?.getRoot() !== ROOT
       ) {
         return
       }
