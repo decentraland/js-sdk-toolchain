@@ -739,9 +739,10 @@ export function createEntityContainer(opts?: {
     reservedStaticEntities: number;
 }): IEntityContainer;
 
+// Warning: (tsdoc-undefined-tag) The TSDoc tag "@module" is not defined in this configuration
 // Warning: (ae-missing-release-tag) "createEthereumProvider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
-// @public (undocumented)
+// @public
 export function createEthereumProvider(): {
     send(message: RPCSendableMessage, callback?: ((error: Error | null, result?: any) => void) | undefined): void;
     sendAsync(message: RPCSendableMessage, callback: (error: Error | null, result?: any) => void): void;
@@ -956,8 +957,6 @@ export function Engine(options?: IEngineOptions): IEngine;
 // @public
 export const engine: IEngine;
 
-// Warning: (ae-missing-release-tag) "EngineEvent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type EngineEvent<T extends IEventNames = IEventNames, V = IEvents[T]> = {
     type: T;
@@ -1073,8 +1072,6 @@ export function getComponentEntityTree<T>(engine: Pick<IEngine, 'getEntitiesWith
 // @public @deprecated (undocumented)
 export function getCompositeRootComponent(engine: IEngine): LastWriteWinElementSetComponentDefinition<CompositeRootType>;
 
-// Warning: (ae-missing-release-tag) "GizmoDragEndEvent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type GizmoDragEndEvent = {
     type: 'gizmoDragEnded';
@@ -1086,8 +1083,6 @@ export type GizmoDragEndEvent = {
     }>;
 };
 
-// Warning: (ae-missing-release-tag) "GizmoSelectedEvent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type GizmoSelectedEvent = {
     type: 'gizmoSelected';
@@ -1107,8 +1102,6 @@ export type GlobalDirectionRaycastSystemOptions = {
     direction?: PBVector3;
 };
 
-// Warning: (ae-missing-release-tag) "GlobalInputEventResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type GlobalInputEventResult = InputEventResult & {
     type: 0 | 1;
@@ -1194,46 +1187,33 @@ export type IEntityContainer = {
     updateUsedEntity(entity: Entity): boolean;
 };
 
-// Warning: (ae-missing-release-tag) "IEventNames" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type IEventNames = keyof IEvents;
 
-// Warning: (ae-missing-release-tag) "IEvents" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public
 export interface IEvents {
-    // (undocumented)
     actionButtonEvent: GlobalInputEventResult;
-    // (undocumented)
     builderSceneStart: unknown;
-    // (undocumented)
     builderSceneUnloaded: unknown;
-    // (undocumented)
     cameraModeChanged: {
         cameraMode: 0 | 1 | 2;
     };
-    // (undocumented)
     chatMessage: {
         id: string;
         sender: string;
         message: string;
         isCommand: boolean;
     };
-    // (undocumented)
     comms: {
         sender: string;
         message: string;
     };
-    // (undocumented)
     entitiesOutOfBoundaries: {
         entities: string[];
     };
-    // (undocumented)
     entityBackInScene: {
         entityId: unknown;
     };
-    // (undocumented)
     entityOutOfScene: {
         entityId: unknown;
     };
@@ -1242,9 +1222,7 @@ export interface IEvents {
         type: string;
         [key: string]: any;
     };
-    // (undocumented)
     gizmoEvent: GizmoDragEndEvent | GizmoSelectedEvent;
-    // (undocumented)
     idleStateChanged: {
         isIdle: boolean;
     };
@@ -1258,44 +1236,34 @@ export interface IEvents {
         given: Record<string, number>;
         limit: Record<string, number>;
     };
-    // (undocumented)
     onAnimationEnd: {
         clipName: string;
     };
-    // (undocumented)
     onBlur: {
         entityId: unknown;
         pointerId: number;
     };
-    // (undocumented)
     onChange: {
         value?: any;
         pointerId?: number;
     };
-    // (undocumented)
     onClick: {
         entityId: unknown;
     };
-    // (undocumented)
     onEnter: unknown;
-    // (undocumented)
     onEnterScene: {
         userId: string;
     };
-    // (undocumented)
     onFocus: {
         entityId: unknown;
         pointerId: number;
     };
-    // (undocumented)
     onLeaveScene: {
         userId: string;
     };
-    // (undocumented)
     onPointerLock: {
         locked?: boolean;
     };
-    // (undocumented)
     onRealmChanged: {
         domain: string;
         room: string;
@@ -1306,7 +1274,6 @@ export interface IEvents {
     onTextSubmit: {
         text: string;
     };
-    // (undocumented)
     playerClicked: {
         userId: string;
         ray: {
@@ -1315,11 +1282,9 @@ export interface IEvents {
             distance: number;
         };
     };
-    // (undocumented)
     playerConnected: {
         userId: string;
     };
-    // (undocumented)
     playerDisconnected: {
         userId: string;
     };
@@ -1327,35 +1292,26 @@ export interface IEvents {
     playerExpression: {
         expressionId: string;
     };
-    // (undocumented)
     pointerDown: InputEventResult;
-    // (undocumented)
+    // @deprecated
     pointerEvent: GlobalInputEventResult;
-    // (undocumented)
     pointerHoverEnter: unknown;
-    // (undocumented)
     pointerHoverExit: unknown;
-    // (undocumented)
     pointerUp: InputEventResult;
-    // (undocumented)
     positionChanged: {
         position: Vector3Type;
         cameraPosition: Vector3Type;
         playerHeight: number;
     };
-    // (undocumented)
     profileChanged: {
         ethAddress: string;
         version: number;
     };
-    // (undocumented)
     raycastResponse: RaycastResponsePayload<any>;
-    // (undocumented)
     rotationChanged: {
         rotation: Vector3Type;
         quaternion: QuaternionType;
     };
-    // (undocumented)
     sceneStart: unknown;
     // (undocumented)
     stateEvent: {
@@ -1367,7 +1323,6 @@ export interface IEvents {
         uuid: string;
         payload: any;
     };
-    // (undocumented)
     videoEvent: {
         componentId: string;
         videoClipId: string;
@@ -1478,8 +1433,6 @@ export const enum InputAction {
     IA_WALK = 9
 }
 
-// Warning: (ae-missing-release-tag) "InputEventResult" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type InputEventResult = {
     origin: Vector3Type;
@@ -1844,9 +1797,7 @@ export interface MeshRendererComponentDefinitionExtended extends LastWriteWinEle
     setSphere(entity: Entity): void;
 }
 
-// Warning: (ae-missing-release-tag) "MessageBus" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @alpha @deprecated (undocumented)
 export class MessageBus {
     constructor();
     // (undocumented)
@@ -1952,96 +1903,69 @@ export const NftShape: LastWriteWinElementSetComponentDefinition<PBNftShape>;
 
 // Warning: (ae-missing-release-tag) "Observable" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
-// @public (undocumented)
+// @public @deprecated
 export class Observable<T> {
     constructor(onObserverAdded?: (observer: Observer<T>) => void);
-    // (undocumented)
     add(callback: (eventData: T, eventState: ObserverEventState) => void, mask?: number, insertFirst?: boolean, scope?: any, unregisterOnFirstCall?: boolean): null | Observer<T>;
-    // (undocumented)
     addOnce(callback: (eventData: T, eventState: ObserverEventState) => void): null | Observer<T>;
-    // (undocumented)
     clear(): void;
-    // (undocumented)
     clone(): Observable<T>;
-    // (undocumented)
     hasObservers(): boolean;
-    // (undocumented)
     hasSpecificMask(mask?: number): boolean;
-    // (undocumented)
     notifyObserver(observer: Observer<T>, eventData: T, mask?: number): void;
-    // (undocumented)
     notifyObservers(eventData: T, mask?: number, target?: any, currentTarget?: any): boolean;
-    // (undocumented)
     notifyObserversWithPromise(eventData: T, mask?: number, target?: any, currentTarget?: any): Promise<T>;
-    // (undocumented)
     remove(observer: null | Observer<T>): boolean;
-    // (undocumented)
     removeCallback(callback: (eventData: T, eventState: ObserverEventState) => void, scope?: any): boolean;
 }
 
 // Warning: (ae-missing-release-tag) "Observer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
-// @public (undocumented)
+// @public @deprecated
 export class Observer<T> {
-    constructor(callback: (eventData: T, eventState: ObserverEventState) => void, mask: number, scope?: any);
-    // (undocumented)
+    constructor(
+    callback: (eventData: T, eventState: ObserverEventState) => void,
+    mask: number,
+    scope?: any);
     callback: (eventData: T, eventState: ObserverEventState) => void;
-    // (undocumented)
     mask: number;
-    // (undocumented)
     scope: any;
-    // (undocumented)
     unregisterOnNextCall: boolean;
-    // (undocumented)
     _willBeUnregistered: boolean;
 }
 
 // Warning: (ae-missing-release-tag) "ObserverEventState" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
-// @public (undocumented)
+// @public @deprecated
 export class ObserverEventState {
     constructor(mask: number, skipNextObservers?: boolean, target?: any, currentTarget?: any);
-    // (undocumented)
     currentTarget?: any;
-    // (undocumented)
     initalize(mask: number, skipNextObservers?: boolean, target?: any, currentTarget?: any): ObserverEventState;
-    // (undocumented)
     lastReturnValue?: any;
-    // (undocumented)
     mask: number;
-    // (undocumented)
     skipNextObservers: boolean;
-    // (undocumented)
     target?: any;
 }
 
 // @public (undocumented)
 export type OnChangeFunction = (entity: Entity, operation: CrdtMessageType, component?: ComponentDefinition<any>, componentValue?: any) => void;
 
-// Warning: (ae-missing-release-tag) "onEnterScene" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export const onEnterScene: Observable<{
     userId: string;
 }>;
 
-// Warning: (ae-missing-release-tag) "onEnterSceneObservable" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public @deprecated
 export const onEnterSceneObservable: Observable<{
     userId: string;
 }>;
 
-// Warning: (ae-missing-release-tag) "onLeaveScene" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export const onLeaveScene: Observable<{
     userId: string;
 }>;
 
-// Warning: (ae-missing-release-tag) "onLeaveSceneObservable" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public @deprecated
 export const onLeaveSceneObservable: Observable<{
     userId: string;
 }>;
@@ -2056,9 +1980,7 @@ export type OnlyOptionalUndefinedTypes<T> = {
     [K in IncludeUndefined<T>]?: T[K];
 };
 
-// Warning: (ae-missing-release-tag) "onPlayerClickedObservable" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export const onPlayerClickedObservable: Observable<{
     userId: string;
     ray: {
@@ -2068,38 +1990,28 @@ export const onPlayerClickedObservable: Observable<{
     };
 }>;
 
-// Warning: (ae-missing-release-tag) "onPlayerConnectedObservable" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export const onPlayerConnectedObservable: Observable<{
     userId: string;
 }>;
 
-// Warning: (ae-missing-release-tag) "onPlayerDisconnectedObservable" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export const onPlayerDisconnectedObservable: Observable<{
     userId: string;
 }>;
 
-// Warning: (ae-missing-release-tag) "onPlayerExpressionObservable" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export const onPlayerExpressionObservable: Observable<{
     expressionId: string;
 }>;
 
-// Warning: (ae-missing-release-tag) "onProfileChanged" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export const onProfileChanged: Observable<{
     ethAddress: string;
     version: number;
 }>;
 
-// Warning: (ae-missing-release-tag) "onRealmChangedObservable" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export const onRealmChangedObservable: Observable<{
     domain: string;
     room: string;
@@ -2107,9 +2019,7 @@ export const onRealmChangedObservable: Observable<{
     displayName: string;
 }>;
 
-// Warning: (ae-missing-release-tag) "onSceneReadyObservable" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public @deprecated
 export const onSceneReadyObservable: Observable<unknown>;
 
 // Warning: (ae-missing-release-tag) "onUpdate" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -2117,9 +2027,7 @@ export const onSceneReadyObservable: Observable<unknown>;
 // @public (undocumented)
 export function onUpdate(deltaTime: number): Promise<void>;
 
-// Warning: (ae-missing-release-tag) "onVideoEvent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export const onVideoEvent: Observable<{
     componentId: string;
     videoClipId: string;
@@ -3498,8 +3406,6 @@ export const enum RaycastQueryType {
     RQT_QUERY_ALL = 1
 }
 
-// Warning: (ae-missing-release-tag) "RaycastResponsePayload" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type RaycastResponsePayload<T> = {
     queryId: string;
