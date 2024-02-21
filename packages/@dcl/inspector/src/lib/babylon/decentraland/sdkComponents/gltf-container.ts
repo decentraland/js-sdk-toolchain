@@ -149,8 +149,13 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
         .filter(($) => $.name === '__root__')
         .forEach((mesh) => {
           mesh.parent = entity
-          entity.gltfContainer = mesh
+          entity.setGltfContainer(mesh)
         })
+
+      const boundingLimits = entity.getMeshesBoundingBox()
+      entity.gltfContainer!.setBoundingInfo(
+        new BABYLON.BoundingInfo(boundingLimits.minimum, boundingLimits.maximum, entity.gltfContainer!._worldMatrix)
+      )
 
       entity.setGltfAssetContainer(assetContainer)
       entity.resolveGltfPathLoading(filePath)

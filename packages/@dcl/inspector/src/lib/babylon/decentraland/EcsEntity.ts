@@ -35,6 +35,7 @@ export class EcsEntity extends BABYLON.TransformNode {
   #gltfPathLoading?: IFuture<string>
   #gltfAssetContainerLoading: IFuture<BABYLON.AssetContainer> = future()
   #isLocked?: boolean = false
+  #assetLoading: IFuture<BABYLON.AbstractMesh> = future()
 
   ecsComponentValues: EcsComponents = {}
 
@@ -78,7 +79,7 @@ export class EcsEntity extends BABYLON.TransformNode {
   }
 
   getMeshesBoundingBox() {
-    const children = this.getChildMeshes(false)
+    const children = this.gltfContainer!.getChildMeshes(false)
     let boundingInfo = children[0].getBoundingInfo()
     let min = boundingInfo.boundingBox.minimumWorld
     let max = boundingInfo.boundingBox.maximumWorld
@@ -118,6 +119,20 @@ export class EcsEntity extends BABYLON.TransformNode {
     this.#gltfAssetContainerLoading.resolve(gltfAssetContainer)
   }
 
+  setGltfContainer(mesh: BABYLON.AbstractMesh) {
+    this.gltfContainer = mesh
+    this.#assetLoading.resolve(mesh)
+  }
+
+  setMeshRenderer(mesh: BABYLON.AbstractMesh) {
+    this.meshRenderer = mesh
+    this.#assetLoading.resolve(mesh)
+  }
+
+  onAssetLoaded() {
+    return this.#assetLoading
+  }
+
   isHidden() {
     const container = this.gltfContainer ?? this.meshRenderer
     return container ? !container.isEnabled(false) : false
@@ -155,7 +170,7 @@ export class EcsEntity extends BABYLON.TransformNode {
   initEventHandlers() {
     if (this.entityId !== this.context.deref()!.engine.RootEntity) {
       // Initialize this event to handle the entity's position update
-      this.onAfterWorldMatrixUpdateObservable.addOnce((eventData) => {
+      this.onAfterWorldMatrixUpdateObservable.add((eventData) => {
         void validateEntityIsOutsideLayout(eventData as EcsEntity)
       })
     }
@@ -193,21 +208,11 @@ export function findParentEntityOfType<T extends EcsEntity>(
 }
 
 async function validateEntityIsOutsideLayout(eventData: EcsEntity) {
-  // When dropping a new entity, waits until the gltf is loaded
-  if (eventData.isGltfPathLoading()) {
-    await eventData.onGltfContainerLoaded()
-  }
   // Get the entity's pickable mesh
+  await eventData.onAssetLoaded()
   const mesh = eventData.getPickableMesh()
   if (mesh) {
-    // Update the mesh's bounding box visibility
-    const meshBoundingBox = eventData.getMeshesBoundingBox()
-    mesh.setBoundingInfo(
-      new BABYLON.BoundingInfo(meshBoundingBox.minimum, meshBoundingBox.maximum, eventData.getWorldMatrix())
-    )
-    mesh.onAfterWorldMatrixUpdateObservable.add((eventMeshData) =>
-      updateMeshBoundingBoxVisibility(eventData, eventMeshData as BABYLON.AbstractMesh)
-    )
+    updateMeshBoundingBoxVisibility(eventData, mesh)
   }
 }
 
