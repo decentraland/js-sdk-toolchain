@@ -18,6 +18,10 @@ import { sendAsync } from '~system/EthereumController'
 import { getEthereumProvider } from '../internal/provider'
 import { polyfillTextEncoder } from './text-encoder'
 
+/**
+ * Etherum Provider
+ * @public
+ */
 export function createEthereumProvider() {
   polyfillTextEncoder()
   return getEthereumProvider(sendAsync)

@@ -739,9 +739,6 @@ export function createEntityContainer(opts?: {
     reservedStaticEntities: number;
 }): IEntityContainer;
 
-// Warning: (tsdoc-undefined-tag) The TSDoc tag "@module" is not defined in this configuration
-// Warning: (ae-missing-release-tag) "createEthereumProvider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public
 export function createEthereumProvider(): {
     send(message: RPCSendableMessage, callback?: ((error: Error | null, result?: any) => void) | undefined): void;
@@ -1901,8 +1898,6 @@ export const enum NftFrameType {
 // @public (undocumented)
 export const NftShape: LastWriteWinElementSetComponentDefinition<PBNftShape>;
 
-// Warning: (ae-missing-release-tag) "Observable" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public @deprecated
 export class Observable<T> {
     constructor(onObserverAdded?: (observer: Observer<T>) => void);
@@ -1919,8 +1914,6 @@ export class Observable<T> {
     removeCallback(callback: (eventData: T, eventState: ObserverEventState) => void, scope?: any): boolean;
 }
 
-// Warning: (ae-missing-release-tag) "Observer" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public @deprecated
 export class Observer<T> {
     constructor(
@@ -1934,8 +1927,6 @@ export class Observer<T> {
     _willBeUnregistered: boolean;
 }
 
-// Warning: (ae-missing-release-tag) "ObserverEventState" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public @deprecated
 export class ObserverEventState {
     constructor(mask: number, skipNextObservers?: boolean, target?: any, currentTarget?: any);
