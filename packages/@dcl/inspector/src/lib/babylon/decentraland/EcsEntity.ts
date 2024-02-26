@@ -173,9 +173,7 @@ export class EcsEntity extends BABYLON.TransformNode {
     const meshesBoundingBox = this.getMeshesBoundingBox()
 
     this.boundingInfoMesh = new BABYLON.Mesh(`BoundingMesh-${this.id}`)
-    this.boundingInfoMesh.position = this.absolutePosition
-    this.boundingInfoMesh.rotationQuaternion = this.absoluteRotationQuaternion
-    this.boundingInfoMesh.scaling = this.absoluteScaling
+    this.boundingInfoMesh.parent = this
 
     this.boundingInfoMesh.setBoundingInfo(
       new BABYLON.BoundingInfo(meshesBoundingBox.minimum, meshesBoundingBox.maximum, this.getWorldMatrix())
@@ -187,15 +185,6 @@ export class EcsEntity extends BABYLON.TransformNode {
       // Initialize this event to handle the entity's position update
       this.onAfterWorldMatrixUpdateObservable.addOnce((eventData) => {
         void validateEntityIsOutsideLayout(eventData as EcsEntity)
-      })
-
-      // Updates the boundingInfoMesh position, rotation and scaling
-      this.onAfterWorldMatrixUpdateObservable.add((eventData) => {
-        if (this.boundingInfoMesh) {
-          this.boundingInfoMesh.position = eventData.absolutePosition
-          this.boundingInfoMesh.rotationQuaternion = eventData.absoluteRotationQuaternion
-          this.boundingInfoMesh.scaling = eventData.absoluteScaling
-        }
       })
     }
   }
