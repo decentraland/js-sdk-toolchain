@@ -97,6 +97,7 @@ export function setupEngine(engine: BABYLON.Engine, canvas: HTMLCanvasElement, p
   // Material for entity outside layout
   const entityOutsideLayoutMaterial = new BABYLON.StandardMaterial('entity_outside_layout', scene)
   entityOutsideLayoutMaterial.diffuseColor = new BABYLON.Color3(1, 0, 0)
+  entityOutsideLayoutMaterial.backFaceCulling = false
 
   BABYLON.Database.IDBStorageEnabled = true
   engine.enableOfflineSupport = true

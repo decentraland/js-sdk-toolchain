@@ -47,6 +47,8 @@ const IGNORE_MESHES = ['BackgroundHelper', 'BackgroundPlane', 'BackgroundSkybox'
 
 const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
   const ROOT = sdk.engine.RootEntity
+  const PLAYER_ROOT = sdk.engine.PlayerEntity
+  const CAMERA_ROOT = sdk.engine.CameraEntity
   const [showMetrics, setShowMetrics] = React.useState(false)
   const [metrics, setMetrics] = React.useState<Metrics>({
     triangles: 0,
@@ -62,10 +64,20 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
 
   const handleUpdateMetrics = useCallback(() => {
     const meshes = sdk.scene.meshes.filter(
-      (mesh) => !(IGNORE_MESHES.includes(mesh.id) || mesh.id.startsWith(GROUND_MESH_PREFIX))
+      (mesh) =>
+        !(
+          IGNORE_MESHES.includes(mesh.id) ||
+          mesh.id.startsWith(GROUND_MESH_PREFIX) ||
+          mesh.id.startsWith('BoundingMesh')
+        )
     )
     const triangles = meshes.reduce((acc, mesh) => acc + mesh.getTotalVertices(), 0)
-    const entities = (sdk.components.Nodes.getOrNull(ROOT)?.value ?? [ROOT]).length - 1
+    const entities =
+      (
+        sdk.components.Nodes.getOrNull(ROOT)?.value.filter(
+          (node) => ![PLAYER_ROOT, CAMERA_ROOT].includes(node.entity)
+        ) ?? [ROOT]
+      ).length - 1
     const uniqueTextures = new Set(
       sdk.scene.textures
         .filter((texture) => !IGNORE_TEXTURES.includes(texture.name))

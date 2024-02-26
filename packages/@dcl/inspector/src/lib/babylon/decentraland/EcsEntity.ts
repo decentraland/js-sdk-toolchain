@@ -29,12 +29,14 @@ export class EcsEntity extends BABYLON.TransformNode {
   usedComponents = new Map<number, ComponentDefinition<unknown>>()
   meshRenderer?: BABYLON.AbstractMesh
   gltfContainer?: BABYLON.AbstractMesh
+  boundingInfoMesh?: BABYLON.AbstractMesh
   gltfAssetContainer?: BABYLON.AssetContainer
   textShape?: BABYLON.Mesh
   material?: BABYLON.StandardMaterial | BABYLON.PBRMaterial
   #gltfPathLoading?: IFuture<string>
   #gltfAssetContainerLoading: IFuture<BABYLON.AssetContainer> = future()
   #isLocked?: boolean = false
+  #assetLoading: IFuture<BABYLON.AbstractMesh> = future()
 
   ecsComponentValues: EcsComponents = {}
 
@@ -72,6 +74,9 @@ export class EcsEntity extends BABYLON.TransformNode {
     for (const [_, component] of this.usedComponents) {
       this.deleteComponent(component)
     }
+
+    // then dispose the boundingInfoMesh if exists
+    this.boundingInfoMesh?.dispose()
 
     // and then proceed with the native engine disposal
     super.dispose(true, false)
@@ -118,6 +123,20 @@ export class EcsEntity extends BABYLON.TransformNode {
     this.#gltfAssetContainerLoading.resolve(gltfAssetContainer)
   }
 
+  setGltfContainer(mesh: BABYLON.AbstractMesh) {
+    this.gltfContainer = mesh
+    this.#assetLoading.resolve(mesh)
+  }
+
+  setMeshRenderer(mesh: BABYLON.AbstractMesh) {
+    this.meshRenderer = mesh
+    this.#assetLoading.resolve(mesh)
+  }
+
+  onAssetLoaded() {
+    return this.#assetLoading
+  }
+
   isHidden() {
     const container = this.gltfContainer ?? this.meshRenderer
     return container ? !container.isEnabled(false) : false
@@ -140,16 +159,25 @@ export class EcsEntity extends BABYLON.TransformNode {
     }
   }
 
-  getPickableMesh() {
-    return this.getChildMeshes(false).find((mesh) => !!mesh.isPickable)
-  }
-
   isLocked() {
     return this.#isLocked
   }
 
   setLock(lock: boolean) {
     this.#isLocked = lock
+  }
+
+  generateBoundingBox() {
+    if (this.boundingInfoMesh) return
+
+    const meshesBoundingBox = this.getMeshesBoundingBox()
+
+    this.boundingInfoMesh = new BABYLON.Mesh(`BoundingMesh-${this.id}`)
+    this.boundingInfoMesh.parent = this
+
+    this.boundingInfoMesh.setBoundingInfo(
+      new BABYLON.BoundingInfo(meshesBoundingBox.minimum, meshesBoundingBox.maximum, this.getWorldMatrix())
+    )
   }
 
   initEventHandlers() {
@@ -192,22 +220,14 @@ export function findParentEntityOfType<T extends EcsEntity>(
   return (parent as any as T) || null
 }
 
-async function validateEntityIsOutsideLayout(eventData: EcsEntity) {
-  // When dropping a new entity, waits until the gltf is loaded
-  if (eventData.isGltfPathLoading()) {
-    await eventData.onGltfContainerLoaded()
-  }
-  // Get the entity's pickable mesh
-  const mesh = eventData.getPickableMesh()
+async function validateEntityIsOutsideLayout(entity: EcsEntity) {
+  // Waits until the asset is loaded
+  await entity.onAssetLoaded()
+  const mesh = entity.boundingInfoMesh
   if (mesh) {
-    // Update the mesh's bounding box visibility
-    const meshBoundingBox = eventData.getMeshesBoundingBox()
-    mesh.setBoundingInfo(
-      new BABYLON.BoundingInfo(meshBoundingBox.minimum, meshBoundingBox.maximum, eventData.getWorldMatrix())
-    )
-    mesh.onAfterWorldMatrixUpdateObservable.add((eventMeshData) =>
-      updateMeshBoundingBoxVisibility(eventData, eventMeshData as BABYLON.AbstractMesh)
-    )
+    mesh.onAfterWorldMatrixUpdateObservable.add(() => {
+      updateMeshBoundingBoxVisibility(entity, mesh)
+    })
   }
 }
 
@@ -216,11 +236,15 @@ function updateMeshBoundingBoxVisibility(entity: EcsEntity, mesh: BABYLON.Abstra
   const { isEntityOutsideLayout } = getLayoutManager(scene)
 
   if (isEntityOutsideLayout(mesh)) {
+    if (mesh.showBoundingBox) return
+
     for (const childMesh of entity.getChildMeshes(false)) {
       addOutsideLayoutMaterial(childMesh, scene)
     }
     mesh.showBoundingBox = true
   } else {
+    if (!mesh.showBoundingBox) return
+
     for (const childMesh of entity.getChildMeshes(false)) {
       removeOutsideLayoutMaterial(childMesh)
     }
