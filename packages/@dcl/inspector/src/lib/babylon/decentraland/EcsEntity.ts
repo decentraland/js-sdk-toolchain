@@ -199,6 +199,10 @@ export class EcsEntity extends BABYLON.TransformNode {
       })
     }
   }
+
+  isOutOfBoundaries() {
+    return !!this.boundingInfoMesh?.showBoundingBox
+  }
 }
 
 /**
@@ -250,18 +254,16 @@ function updateMeshBoundingBoxVisibility(entity: EcsEntity, mesh: BABYLON.Abstra
 
   if (isEntityOutsideLayout(mesh)) {
     if (mesh.showBoundingBox) return
-
+    mesh.showBoundingBox = true
     for (const childMesh of entity.getChildMeshes(false)) {
       addOutsideLayoutMaterial(childMesh, scene)
     }
-    mesh.showBoundingBox = true
   } else {
     if (!mesh.showBoundingBox) return
-
+    mesh.showBoundingBox = false
     for (const childMesh of entity.getChildMeshes(false)) {
       removeOutsideLayoutMaterial(childMesh)
     }
-    mesh.showBoundingBox = false
   }
 }
 
