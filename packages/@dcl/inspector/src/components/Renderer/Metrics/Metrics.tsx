@@ -61,6 +61,13 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
     parcels: []
   })
 
+  const getNodes = useCallback(
+    () =>
+      sdk.components.Nodes.getOrNull(ROOT)?.value.filter((node) => ![PLAYER_ROOT, CAMERA_ROOT].includes(node.entity)) ??
+      [],
+    [sdk]
+  )
+
   const handleUpdateMetrics = useCallback(() => {
     const meshes = sdk.scene.meshes.filter(
       (mesh) =>
@@ -69,9 +76,6 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
         !mesh.id.startsWith('BoundingMesh')
     )
     const triangles = meshes.reduce((acc, mesh) => acc + mesh.getTotalVertices(), 0)
-    const nodes =
-      sdk.components.Nodes.getOrNull(ROOT)?.value.filter((node) => ![PLAYER_ROOT, CAMERA_ROOT].includes(node.entity)) ??
-      []
     const uniqueTextures = new Set(
       sdk.scene.textures
         .filter((texture) => !IGNORE_TEXTURES.includes(texture.name))
@@ -84,13 +88,13 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
     dispatch(
       setMetrics({
         triangles,
-        entities: nodes.length,
+        entities: getNodes().length,
         bodies: meshes.length,
         materials: uniqueMaterials.size,
         textures: uniqueTextures.size
       })
     )
-  }, [sdk, dispatch, setMetrics])
+  }, [sdk, dispatch, getNodes, setMetrics])
 
   const handleUpdateSceneLayout = useCallback(() => {
     const scene = sdk.components.Scene.getOrNull(ROOT)
@@ -101,16 +105,14 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
   }, [sdk, setSceneLayout])
 
   const handleSceneChange = useCallback(() => {
-    const nodes =
-      sdk.components.Nodes.getOrNull(ROOT)?.value.filter((node) => ![PLAYER_ROOT, CAMERA_ROOT].includes(node.entity)) ??
-      []
+    const nodes = getNodes()
     const entitiesOutOfBoundaries = nodes.reduce((count, node) => {
       const entity = sdk.sceneContext.getEntityOrNull(node.entity)
       return entity && entity.isOutOfBoundaries() ? count + 1 : count
     }, 0)
 
     dispatch(setEntitiesOutOfBoundaries(entitiesOutOfBoundaries))
-  }, [sdk, dispatch, setEntitiesOutOfBoundaries])
+  }, [sdk, dispatch, getNodes, setEntitiesOutOfBoundaries])
 
   useEffect(() => {
     const handleOutsideMaterialChange = (material: Material) => {
