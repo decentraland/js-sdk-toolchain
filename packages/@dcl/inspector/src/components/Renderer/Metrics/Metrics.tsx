@@ -1,16 +1,19 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 import cx from 'classnames'
 import { IoGridOutline as SquaresGridIcon, IoAlertCircleOutline as AlertIcon } from 'react-icons/io5'
+import { Material } from '@babylonjs/core'
 import { CrdtMessageType } from '@dcl/ecs'
 
 import { withSdk, WithSdkProps } from '../../../hoc/withSdk'
 import { useChange } from '../../../hooks/sdk/useChange'
 import { useOutsideClick } from '../../../hooks/useOutsideClick'
+import { useAppDispatch, useAppSelector } from '../../../redux/hooks'
+import { getMetrics, getLimits, setEntitiesOutOfBoundaries, setMetrics, setLimits } from '../../../redux/scene-metrics'
+import { SceneMetrics } from '../../../redux/scene-metrics/types'
 import type { Layout } from '../../../lib/utils/layout'
 import { GROUND_MESH_PREFIX, PARCEL_SIZE } from '../../../lib/utils/scene'
 import { Button } from '../../Button'
 import { getSceneLimits } from './utils'
-import type { Metrics } from './types'
 
 import './Metrics.css'
 
@@ -49,14 +52,10 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
   const ROOT = sdk.engine.RootEntity
   const PLAYER_ROOT = sdk.engine.PlayerEntity
   const CAMERA_ROOT = sdk.engine.CameraEntity
+  const dispatch = useAppDispatch()
+  const metrics = useAppSelector(getMetrics)
+  const limits = useAppSelector(getLimits)
   const [showMetrics, setShowMetrics] = React.useState(false)
-  const [metrics, setMetrics] = React.useState<Metrics>({
-    triangles: 0,
-    entities: 0,
-    bodies: 0,
-    materials: 0,
-    textures: 0
-  })
   const [sceneLayout, setSceneLayout] = React.useState<Layout>({
     base: { x: 0, y: 0 },
     parcels: []
@@ -65,19 +64,14 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
   const handleUpdateMetrics = useCallback(() => {
     const meshes = sdk.scene.meshes.filter(
       (mesh) =>
-        !(
-          IGNORE_MESHES.includes(mesh.id) ||
-          mesh.id.startsWith(GROUND_MESH_PREFIX) ||
-          mesh.id.startsWith('BoundingMesh')
-        )
+        !IGNORE_MESHES.includes(mesh.id) &&
+        !mesh.id.startsWith(GROUND_MESH_PREFIX) &&
+        !mesh.id.startsWith('BoundingMesh')
     )
     const triangles = meshes.reduce((acc, mesh) => acc + mesh.getTotalVertices(), 0)
-    const entities =
-      (
-        sdk.components.Nodes.getOrNull(ROOT)?.value.filter(
-          (node) => ![PLAYER_ROOT, CAMERA_ROOT].includes(node.entity)
-        ) ?? [ROOT]
-      ).length - 1
+    const nodes =
+      sdk.components.Nodes.getOrNull(ROOT)?.value.filter((node) => ![PLAYER_ROOT, CAMERA_ROOT].includes(node.entity)) ??
+      []
     const uniqueTextures = new Set(
       sdk.scene.textures
         .filter((texture) => !IGNORE_TEXTURES.includes(texture.name))
@@ -86,30 +80,58 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
     const uniqueMaterials = new Set(
       sdk.scene.materials.map((material) => material.id).filter((id) => !IGNORE_MATERIALS.includes(id))
     )
-    setMetrics({
-      triangles: triangles,
-      entities: entities,
-      bodies: meshes.length,
-      materials: uniqueMaterials.size,
-      textures: uniqueTextures.size
-    })
-  }, [sdk])
+
+    dispatch(
+      setMetrics({
+        triangles,
+        entities: nodes.length,
+        bodies: meshes.length,
+        materials: uniqueMaterials.size,
+        textures: uniqueTextures.size
+      })
+    )
+  }, [sdk, dispatch, setMetrics])
 
   const handleUpdateSceneLayout = useCallback(() => {
     const scene = sdk.components.Scene.getOrNull(ROOT)
     if (scene) {
-      setSceneLayout({ ...(scene.layout as Layout) })
+      setSceneLayout(scene.layout as Layout)
+      dispatch(setLimits(getSceneLimits(scene.layout.parcels.length)))
     }
   }, [sdk, setSceneLayout])
 
+  const handleSceneChange = useCallback(() => {
+    const nodes =
+      sdk.components.Nodes.getOrNull(ROOT)?.value.filter((node) => ![PLAYER_ROOT, CAMERA_ROOT].includes(node.entity)) ??
+      []
+    const entitiesOutOfBoundaries = nodes.reduce((count, node) => {
+      const entity = sdk.sceneContext.getEntityOrNull(node.entity)
+      return entity && entity.isOutOfBoundaries() ? count + 1 : count
+    }, 0)
+
+    dispatch(setEntitiesOutOfBoundaries(entitiesOutOfBoundaries))
+  }, [sdk, dispatch, setEntitiesOutOfBoundaries])
+
   useEffect(() => {
+    const handleOutsideMaterialChange = (material: Material) => {
+      if (material.name === 'entity_outside_layout_multimaterial') {
+        handleSceneChange()
+      }
+    }
+
+    const addOutsideMaterialObservable = sdk.scene.onNewMultiMaterialAddedObservable.add(handleOutsideMaterialChange)
+    const removeOutsideMaterialObservable = sdk.scene.onMaterialRemovedObservable.add(handleOutsideMaterialChange)
+
     sdk.scene.onDataLoadedObservable.add(handleUpdateMetrics)
     sdk.scene.onMeshRemovedObservable.add(handleUpdateMetrics)
+
     handleUpdateSceneLayout()
 
     return () => {
       sdk.scene.onDataLoadedObservable.removeCallback(handleUpdateMetrics)
       sdk.scene.onMeshRemovedObservable.removeCallback(handleUpdateMetrics)
+      sdk.scene.onNewMultiMaterialAddedObservable.remove(addOutsideMaterialObservable)
+      sdk.scene.onMaterialRemovedObservable.remove(removeOutsideMaterialObservable)
     }
   }, [])
 
@@ -122,15 +144,10 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
     [handleUpdateSceneLayout]
   )
 
-  const limits = useMemo<Metrics>(() => {
-    const parcels = sceneLayout.parcels.length
-    return getSceneLimits(parcels)
-  }, [sceneLayout])
-
   const limitsExceeded = useMemo<Record<string, boolean>>(() => {
     return Object.fromEntries(
       Object.entries(metrics)
-        .map(([key, value]) => [key, value > limits[key as keyof Metrics]])
+        .map(([key, value]) => [key, value > limits[key as keyof SceneMetrics]])
         .filter(([, value]) => value)
     )
   }, [metrics, limits])
@@ -177,7 +194,7 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
                 <div className={cx('Description', { LimitExceeded: limitsExceeded[key] })}>
                   <span className="primary">{value}</span>
                   {'/'}
-                  <span className="secondary">{limits[key as keyof Metrics]}</span>
+                  <span className="secondary">{limits[key as keyof SceneMetrics]}</span>
                 </div>
               </div>
             ))}
