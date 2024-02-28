@@ -1,5 +1,4 @@
 import { InMemoryTransport } from '@dcl/mini-rpc'
-import { RootState } from '../../../redux/store'
 import { SceneMetricsClient } from './client'
 import { SceneMetricsServer } from './server'
 
