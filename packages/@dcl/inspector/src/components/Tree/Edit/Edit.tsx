@@ -33,19 +33,19 @@ export function Edit({ value, onCancel, onSubmit }: Props) {
     <>
       <Modal isOpen={isOpen} onRequestClose={handleModalClose} className="EditTree">
         <h2>⚠️ Rename</h2>
-        <span>Do you want to rename "{value}" to "{tmpValue}"</span>
+        <span>
+          Do you want to rename "{value}" to "{tmpValue}"
+        </span>
         <div>
-          <Button type="danger" size="big" onClick={handleConfirm}>Yes</Button>
-          <Button size="big" onClick={handleModalClose}>Cancel</Button>
+          <Button type="danger" size="big" onClick={handleConfirm}>
+            Yes
+          </Button>
+          <Button size="big" onClick={handleModalClose}>
+            Cancel
+          </Button>
         </div>
       </Modal>
-      <Input
-        value={value}
-        onCancel={onCancel}
-        onSubmit={onSubmit}
-        onChange={handleChange}
-        onBlur={handleBlur}
-      />
+      <Input value={value} onCancel={onCancel} onSubmit={onSubmit} onChange={handleChange} onBlur={handleBlur} />
     </>
   )
 }
