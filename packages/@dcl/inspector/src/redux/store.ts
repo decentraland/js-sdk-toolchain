@@ -6,7 +6,9 @@ import appStateReducer from './app'
 import dataLayerReducer from './data-layer'
 import sdkReducer from './sdk'
 import uiReducer from './ui'
+import sceneMetricsReducer from './scene-metrics'
 import { UiServer } from '../lib/rpc/ui/server'
+import { SceneMetricsServer } from '../lib/rpc/scene-metrics/server'
 import sagas from './root-saga'
 import { getConfig } from '../lib/logic/config'
 
@@ -17,7 +19,8 @@ export const store = configureStore({
     dataLayer: dataLayerReducer,
     sdk: sdkReducer,
     app: appStateReducer,
-    ui: uiReducer
+    ui: uiReducer,
+    sceneMetrics: sceneMetricsReducer
   },
   middleware: (getDefaultMiddleware) => {
     return getDefaultMiddleware({ thunk: false, serializableCheck: false }).concat(sagaMiddleware)
@@ -29,6 +32,7 @@ const config = getConfig()
 if (config.dataLayerRpcParentUrl) {
   const tranport = new MessageTransport(window, window.parent, config.dataLayerRpcParentUrl)
   new UiServer(tranport, store)
+  new SceneMetricsServer(tranport, store)
 }
 
 sagaMiddleware.run(sagas)
