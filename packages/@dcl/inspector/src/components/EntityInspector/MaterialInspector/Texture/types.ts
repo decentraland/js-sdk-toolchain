@@ -1,6 +1,6 @@
 import { TextureFilterMode, TextureWrapMode } from '@dcl/ecs'
 
-import { mapSelectFieldOptions } from '../../SelectField/utils'
+import { mapSelectFieldOptions } from '../../../ui/Dropdown/utils'
 import { useComponentInput } from '../../../../hooks/sdk/useComponentInput'
 import { TextureType } from '../types'
 import { AssetCatalogResponse } from '../../../../lib/data-layer/remote-data-layer'

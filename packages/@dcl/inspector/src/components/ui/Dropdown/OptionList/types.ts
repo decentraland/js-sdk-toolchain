@@ -7,5 +7,6 @@ export interface Props {
   searchable?: boolean
   selectedValue?: Option | Option[]
   minWidth?: number
+  isField?: boolean
   onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void
 }

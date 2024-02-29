@@ -20,6 +20,7 @@ describe('addComponent', () => {
     describe('and then passing the entity and the component id to the addComponent operation', () => {
       let entity: Entity
       let componentId: number
+      let defaultValue: any
       let addComponentOperation: ReturnType<typeof addComponent>
       const createMock = jest.fn()
       const componentMock = {
@@ -37,8 +38,8 @@ describe('addComponent', () => {
         createMock.mockReset()
       })
       it('should add the component to the entity', () => {
-        addComponentOperation(entity, componentId)
-        expect(createMock).toHaveBeenCalledWith(entity)
+        addComponentOperation(entity, componentId, defaultValue)
+        expect(createMock).toHaveBeenCalledWith(entity, defaultValue)
       })
       describe('and the component is not an LWW component', () => {
         beforeEach(() => {
@@ -48,7 +49,7 @@ describe('addComponent', () => {
           getComponentMock.mockReset()
         })
         it('should throw an error', () => {
-          expect(() => addComponentOperation(entity, componentId)).toThrowError()
+          expect(() => addComponentOperation(entity, componentId, defaultValue)).toThrowError()
         })
       })
     })

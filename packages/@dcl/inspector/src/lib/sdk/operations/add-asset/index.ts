@@ -8,7 +8,8 @@ import {
   PBAudioSource,
   LastWriteWinElementSetComponentDefinition,
   PBVideoPlayer,
-  PBMaterial
+  PBMaterial,
+  NetworkEntity as NetworkEntityEngine
 } from '@dcl/ecs'
 import {
   ActionType,
@@ -20,10 +21,12 @@ import {
   getNextId,
   getPayload
 } from '@dcl/asset-packs'
+
 import { CoreComponents } from '../../components'
 import updateSelectedEntity from '../update-selected-entity'
 import { addChild } from '../add-child'
-import { isSelf, parseMaterial } from './utils'
+import { isSelf, parseMaterial, parseSyncComponents } from './utils'
+import { EnumEntity } from '../../enum-entity'
 
 export function addAsset(engine: IEngine) {
   return function addAsset(
@@ -32,11 +35,13 @@ export function addAsset(engine: IEngine) {
     name: string,
     position: Vector3Type,
     base: string,
+    enumEntityId: EnumEntity,
     components?: Partial<Record<CoreComponents | ComponentName, any>>
   ): Entity {
     const child = addChild(engine)(parent, name)
     const Transform = engine.getComponent(TransformEngine.componentId) as typeof TransformEngine
     const GltfContainer = engine.getComponent(GltfEngine.componentId) as typeof GltfEngine
+    const NetworkEntity = engine.getComponent(NetworkEntityEngine.componentId) as typeof NetworkEntityEngine
 
     Transform.createOrReplace(child, { parent, position })
 
@@ -132,6 +137,12 @@ export function addAsset(engine: IEngine) {
             }))
             values.set(componentName, { ...triggers, value: newValue })
             break
+          }
+          case CoreComponents.SYNC_COMPONENTS: {
+            const componentNames = values.get(componentName) as { value: string[] }
+            const componentIds = parseSyncComponents(engine, componentNames.value)
+            values.set(componentName, { componentIds })
+            values.set(NetworkEntity.componentName, { entityId: enumEntityId.getNextEnumEntityId(), networkId: 0 })
           }
         }
       }

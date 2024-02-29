@@ -10,10 +10,6 @@ import fs from 'fs-extra'
 import { FileDescriptorStandardOption, runCommand } from '../utils/shellCommand'
 import { PROTO_COMPILER_PATH, TS_PROTO_PLUGIN_PATH } from './protoConst'
 
-const AVATAR_BASE = 1087
-const AVATAR_EMOTE_COMMAND = 1088
-const PLAYER_IDENTITY_DATA = 1089
-const AVATAR_EQUIPPED_DATA = 1091
 const NON_EXPOSED_LIST: number[] = []
 
 /**

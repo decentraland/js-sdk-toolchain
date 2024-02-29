@@ -1,0 +1,138 @@
+.Shortcuts {
+  --shortcuts-bottom: 8px;
+  --shortcuts-right: 8px;
+  --shortcuts-button-height: 30px;
+  --shortcuts-button-width: 30px;
+
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  z-index: 1;
+}
+
+.Shortcuts .Buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+
+.Shortcuts .Buttons .Button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  width: 30px;
+  padding: 5px;
+  border-radius: 4px;
+  background-color: var(--base-16);
+}
+
+.Shortcuts .Buttons .Button:hover {
+  background-color: var(--base-17);
+}
+
+.Shortcuts .Buttons .Button.Active {
+  background-color: var(--base-02);
+}
+
+.Shortcuts .Buttons .Button.Active svg {
+  color: var(--base-21);
+}
+
+.Shortcuts .Buttons .Button svg {
+  color: var(--base-02);
+}
+
+.Shortcuts .Buttons .ZoomButtons {
+  display: flex;
+}
+
+.Shortcuts .Buttons .ZoomButtons .Button:first-of-type {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right: 1.5px solid var(--base-19);
+}
+
+.Shortcuts .Buttons .ZoomButtons .Button:last-of-type {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: 1.5px solid var(--base-19);
+}
+
+.Shortcuts > .Overlay {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  width: 350px;
+  overflow-y: auto;
+  right: 0;
+  bottom: calc(var(--shortcuts-bottom) + var(--shortcuts-button-height) + 8px);
+  background-color: var(--base-19);
+  padding: 13px 12px;
+  border-radius: 4px;
+  gap: 16px;
+}
+
+.Shortcuts > .Overlay h2.Header {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 17px;
+  color: var(--base-01);
+  margin-bottom: 0;
+}
+
+.Shortcuts > .Overlay h5.SubHeader,
+.Shortcuts > .Overlay .Item .Title,
+.Shortcuts > .Overlay .Item .Description,
+.Shortcuts > .Overlay .Item .Description .Key {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--base-01);
+  margin-bottom: 0;
+}
+
+.Shortcuts > .Overlay h5.SubHeader {
+  color: var(--base-09);
+  text-transform: uppercase;
+}
+
+.Shortcuts > .Overlay .Items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.Shortcuts > .Overlay .Items .Item {
+  display: flex;
+  gap: 4px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--base-18);
+}
+
+.Shortcuts > .Overlay .Items .Item:last-of-type {
+  border-bottom: none;
+}
+
+.Shortcuts > .Overlay .Item .Title {
+  display: flex;
+  flex: 1;
+  align-items: center;
+}
+
+.Shortcuts > .Overlay .Item .Description {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 4px;
+  line-height: 14px;
+}
+
+.Shortcuts > .Overlay .Item .Description .Key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  height: 18px;
+  border-radius: 4px;
+  background-color: var(--base-13);
+}

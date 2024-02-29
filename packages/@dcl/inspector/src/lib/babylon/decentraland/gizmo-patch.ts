@@ -362,6 +362,20 @@ export class PatchedRotationGizmo extends RotationGizmo {
 }
 
 export class PatchedGizmoManager extends GizmoManager {
+  protected _gizmosEnabled: {
+    positionGizmo: boolean
+    rotationGizmo: boolean
+    scaleGizmo: boolean
+    boundingBoxGizmo: boolean
+    freeGizmo: boolean
+  } = {
+    positionGizmo: false,
+    rotationGizmo: false,
+    scaleGizmo: false,
+    boundingBoxGizmo: false,
+    freeGizmo: false
+  }
+
   set rotationGizmoEnabled(value: boolean) {
     if (value) {
       if (!this.gizmos.rotationGizmo) {
@@ -387,5 +401,13 @@ export class PatchedGizmoManager extends GizmoManager {
 
   get rotationGizmoEnabled() {
     return this._gizmosEnabled.rotationGizmo
+  }
+
+  set freeGizmoEnabled(value: boolean) {
+    this._gizmosEnabled.freeGizmo = value
+  }
+
+  get freeGizmoEnabled(): boolean {
+    return this._gizmosEnabled.freeGizmo
   }
 }

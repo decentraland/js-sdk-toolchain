@@ -12,6 +12,9 @@ const getContext = () => ({
   },
   loadableScene: {
     id: 'some-id'
+  },
+  engine: {
+    RootEntity: 0 as Entity
   }
 })
 

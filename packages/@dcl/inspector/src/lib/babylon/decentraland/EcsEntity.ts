@@ -12,6 +12,8 @@ import {
 import future, { IFuture } from 'fp-future'
 import { SceneContext } from './SceneContext'
 import { createDefaultTransform } from './sdkComponents/transform'
+import { getLayoutManager } from './layout-manager'
+import { getRoot } from '../../sdk/nodes'
 
 export type EcsComponents = Partial<{
   gltfContainer: PBGltfContainer
@@ -27,17 +29,21 @@ export class EcsEntity extends BABYLON.TransformNode {
   usedComponents = new Map<number, ComponentDefinition<unknown>>()
   meshRenderer?: BABYLON.AbstractMesh
   gltfContainer?: BABYLON.AbstractMesh
+  boundingInfoMesh?: BABYLON.AbstractMesh
   gltfAssetContainer?: BABYLON.AssetContainer
   textShape?: BABYLON.Mesh
   material?: BABYLON.StandardMaterial | BABYLON.PBRMaterial
   #gltfPathLoading?: IFuture<string>
   #gltfAssetContainerLoading: IFuture<BABYLON.AssetContainer> = future()
+  #isLocked?: boolean = false
+  #assetLoading: IFuture<BABYLON.AbstractMesh> = future()
 
   ecsComponentValues: EcsComponents = {}
 
   constructor(public entityId: Entity, public context: WeakRef<SceneContext>, public scene: BABYLON.Scene) {
     super(`ecs-${entityId.toString(16)}`, scene)
     createDefaultTransform(this)
+    this.initEventHandlers()
   }
 
   putComponent(component: ComponentDefinition<unknown>) {
@@ -68,6 +74,9 @@ export class EcsEntity extends BABYLON.TransformNode {
     for (const [_, component] of this.usedComponents) {
       this.deleteComponent(component)
     }
+
+    // then dispose the boundingInfoMesh if exists
+    this.boundingInfoMesh?.dispose()
 
     // and then proceed with the native engine disposal
     super.dispose(true, false)
@@ -113,6 +122,83 @@ export class EcsEntity extends BABYLON.TransformNode {
     this.gltfAssetContainer = gltfAssetContainer
     this.#gltfAssetContainerLoading.resolve(gltfAssetContainer)
   }
+
+  setGltfContainer(mesh: BABYLON.AbstractMesh) {
+    this.gltfContainer = mesh
+    this.#assetLoading.resolve(mesh)
+  }
+
+  setMeshRenderer(mesh: BABYLON.AbstractMesh) {
+    this.meshRenderer = mesh
+    this.#assetLoading.resolve(mesh)
+  }
+
+  onAssetLoaded() {
+    return this.#assetLoading
+  }
+
+  isHidden() {
+    const container = this.gltfContainer ?? this.meshRenderer
+    return container ? !container.isEnabled(false) : false
+  }
+
+  getRoot() {
+    const ctx = this.context.deref()
+    const nodes = ctx?.editorComponents.Nodes.getOrNull(ctx.engine.RootEntity)?.value || []
+    const root = getRoot(this.entityId, nodes)
+    return root
+  }
+
+  setVisibility(enabled: boolean) {
+    const container = this.gltfContainer ?? this.meshRenderer
+    if (container) {
+      container.setEnabled(enabled)
+    }
+    for (const child of this.childrenEntities()) {
+      child.setVisibility(enabled)
+    }
+  }
+
+  isLocked() {
+    return this.#isLocked
+  }
+
+  setLock(lock: boolean) {
+    this.#isLocked = lock
+  }
+
+  generateBoundingBox() {
+    if (this.boundingInfoMesh) return
+
+    const meshesBoundingBox = this.getMeshesBoundingBox()
+
+    this.boundingInfoMesh = new BABYLON.Mesh(`BoundingMesh-${this.id}`)
+    this.boundingInfoMesh.position = this.absolutePosition
+    this.boundingInfoMesh.rotationQuaternion = this.absoluteRotationQuaternion
+    this.boundingInfoMesh.scaling = this.absoluteScaling
+
+    this.boundingInfoMesh.setBoundingInfo(
+      new BABYLON.BoundingInfo(meshesBoundingBox.minimum, meshesBoundingBox.maximum, this.getWorldMatrix())
+    )
+  }
+
+  initEventHandlers() {
+    if (this.entityId !== this.context.deref()!.engine.RootEntity) {
+      // Initialize this event to handle the entity's position update
+      this.onAfterWorldMatrixUpdateObservable.addOnce((eventData) => {
+        void validateEntityIsOutsideLayout(eventData as EcsEntity)
+      })
+
+      // Updates the boundingInfoMesh position, rotation and scaling
+      this.onAfterWorldMatrixUpdateObservable.add((eventData) => {
+        if (this.boundingInfoMesh) {
+          this.boundingInfoMesh.position = eventData.absolutePosition
+          this.boundingInfoMesh.rotationQuaternion = eventData.absoluteRotationQuaternion
+          this.boundingInfoMesh.scaling = eventData.absoluteScaling
+        }
+      })
+    }
+  }
 }
 
 /**
@@ -143,4 +229,55 @@ export function findParentEntityOfType<T extends EcsEntity>(
   }
 
   return (parent as any as T) || null
+}
+
+async function validateEntityIsOutsideLayout(entity: EcsEntity) {
+  // Waits until the asset is loaded
+  await entity.onAssetLoaded()
+  const mesh = entity.boundingInfoMesh
+  if (mesh) {
+    mesh.onAfterWorldMatrixUpdateObservable.add(() => {
+      updateMeshBoundingBoxVisibility(entity, mesh)
+    })
+  }
+}
+
+function updateMeshBoundingBoxVisibility(entity: EcsEntity, mesh: BABYLON.AbstractMesh) {
+  const scene = mesh.getScene()
+  const { isEntityOutsideLayout } = getLayoutManager(scene)
+
+  if (isEntityOutsideLayout(mesh)) {
+    if (mesh.showBoundingBox) return
+
+    for (const childMesh of entity.getChildMeshes(false)) {
+      addOutsideLayoutMaterial(childMesh, scene)
+    }
+    mesh.showBoundingBox = true
+  } else {
+    if (!mesh.showBoundingBox) return
+
+    for (const childMesh of entity.getChildMeshes(false)) {
+      removeOutsideLayoutMaterial(childMesh)
+    }
+    mesh.showBoundingBox = false
+  }
+}
+
+function addOutsideLayoutMaterial(mesh: BABYLON.AbstractMesh, scene: BABYLON.Scene) {
+  if (!(mesh.material instanceof BABYLON.MultiMaterial)) {
+    const multiMaterial = new BABYLON.MultiMaterial('entity_outside_layout_multimaterial', scene)
+    multiMaterial.subMaterials = [scene.getMaterialByName('entity_outside_layout'), mesh.material]
+    mesh.material = multiMaterial
+  }
+}
+
+function removeOutsideLayoutMaterial(mesh: BABYLON.AbstractMesh) {
+  if (
+    mesh.material instanceof BABYLON.MultiMaterial &&
+    mesh.material.subMaterials.some((material) => material?.name === 'entity_outside_layout')
+  ) {
+    const multiMaterial = mesh.material
+    mesh.material = multiMaterial.subMaterials[1]
+    multiMaterial.dispose()
+  }
 }

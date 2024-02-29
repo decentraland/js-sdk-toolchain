@@ -7,6 +7,7 @@ import updateSelectedEntity from './update-selected-entity'
 import setParent from './set-parent'
 import { reorder } from './reorder'
 import removeSelectedEntities from './remove-selected-entities'
+import getSelectedEntities from './get-selected-entities'
 import addAsset from './add-asset'
 import addComponent from './add-component'
 import removeComponent from './remove-component'
@@ -34,7 +35,8 @@ export function createOperations(engine: IEngine) {
     dispatch: async ({ dirty = true }: Dispatch = {}) => {
       store.dispatch(updateCanSave({ dirty }))
       await engine.update(1)
-    }
+    },
+    getSelectedEntities: getSelectedEntities(engine)
   }
 }
 

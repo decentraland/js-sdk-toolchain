@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useDrop } from 'react-dnd'
 import cx from 'classnames'
 import { Vector3 } from '@babylonjs/core'
+import { Entity } from '@dcl/ecs'
 
 import { DIRECTORY, withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
@@ -16,17 +17,37 @@ import { getConfig } from '../../lib/logic/config'
 import { ROOT } from '../../lib/sdk/tree'
 import { Asset, isSmart } from '../../lib/logic/catalog'
 import { selectAssetCatalog } from '../../redux/app'
-import { areGizmosDisabled } from '../../redux/ui'
+import { areGizmosDisabled, getHiddenPanels, isGroundGridDisabled } from '../../redux/ui'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 import { Loading } from '../Loading'
 import { isModel, isAsset } from '../EntityInspector/GltfInspector/utils'
 import { useIsMounted } from '../../hooks/useIsMounted'
+import {
+  useHotkey,
+  BACKSPACE,
+  DELETE,
+  COPY,
+  PASTE,
+  COPY_ALT,
+  PASTE_ALT,
+  ZOOM_IN,
+  ZOOM_IN_ALT,
+  ZOOM_OUT_ALT,
+  ZOOM_OUT,
+  RESET_CAMERA,
+  DUPLICATE,
+  DUPLICATE_ALT
+} from '../../hooks/useHotkey'
 import { analytics, Event } from '../../lib/logic/analytics'
 import { Warnings } from '../Warnings'
 import { CameraSpeed } from './CameraSpeed'
+import { Shortcuts } from './Shortcuts'
+import { Metrics } from './Metrics'
 
 import './Renderer.css'
+import { PanelName } from '../../redux/ui/types'
 
+const ZOOM_DELTA = new Vector3(0, 0, 1.1)
 const fixedNumber = (val: number) => Math.round(val * 1e2) / 1e2
 
 const Renderer: React.FC = () => {
@@ -39,7 +60,10 @@ const Renderer: React.FC = () => {
   const files = useAppSelector(selectAssetCatalog)
   const init = !!files
   const gizmosDisabled = useAppSelector(areGizmosDisabled)
+  const groundGridDisabled = useAppSelector(isGroundGridDisabled)
   const config = getConfig()
+  const [copyEntities, setCopyEntities] = useState<Entity[]>([])
+  const hiddenPanels = useAppSelector(getHiddenPanels)
 
   useEffect(() => {
     if (sdk && init) {
@@ -62,6 +86,73 @@ const Renderer: React.FC = () => {
     }
   }, [sdk, gizmosDisabled])
 
+  useEffect(() => {
+    if (sdk) {
+      const layout = sdk.scene.getNodeByName('layout')
+      if (layout) {
+        layout.setEnabled(!groundGridDisabled)
+      }
+    }
+  }, [sdk, groundGridDisabled])
+
+  const deleteSelectedEntities = useCallback(() => {
+    if (!sdk) return
+    const selectedEntitites = sdk.sceneContext.operations.getSelectedEntities()
+    selectedEntitites.forEach((entity) => sdk.sceneContext.operations.removeEntity(entity))
+    void sdk.sceneContext.operations.dispatch()
+  }, [sdk])
+
+  const duplicateSelectedEntities = useCallback(() => {
+    if (!sdk) return
+    const camera = sdk.scene.activeCamera!
+    camera.detachControl()
+    const selectedEntitites = sdk.sceneContext.operations.getSelectedEntities()
+    selectedEntitites.forEach((entity) => sdk.sceneContext.operations.duplicateEntity(entity))
+    void sdk.sceneContext.operations.dispatch()
+    setTimeout(() => {
+      camera.attachControl(canvasRef.current, true)
+    }, 100)
+  }, [sdk])
+
+  const copySelectedEntities = useCallback(() => {
+    if (!sdk) return
+    const selectedEntitites = sdk.sceneContext.operations.getSelectedEntities()
+    setCopyEntities([...selectedEntitites])
+  }, [sdk, setCopyEntities])
+
+  const pasteSelectedEntities = useCallback(() => {
+    if (!sdk) return
+    copyEntities.forEach((entity) => sdk.sceneContext.operations.duplicateEntity(entity))
+    void sdk.sceneContext.operations.dispatch()
+  }, [sdk, copyEntities])
+
+  const zoomIn = useCallback(() => {
+    if (!sdk) return
+    const camera = sdk.editorCamera.getCamera()
+    const dir = camera.getDirection(ZOOM_DELTA)
+    camera.position.addInPlace(dir)
+  }, [sdk])
+
+  const zoomOut = useCallback(() => {
+    if (!sdk) return
+    const camera = sdk.editorCamera.getCamera()
+    const dir = camera.getDirection(ZOOM_DELTA).negate()
+    camera.position.addInPlace(dir)
+  }, [sdk])
+
+  const resetCamera = useCallback(() => {
+    if (!sdk) return
+    sdk.editorCamera.resetCamera()
+  }, [sdk])
+
+  useHotkey([DELETE, BACKSPACE], deleteSelectedEntities, canvasRef.current)
+  useHotkey([COPY, COPY_ALT], copySelectedEntities, canvasRef.current)
+  useHotkey([PASTE, PASTE_ALT], pasteSelectedEntities, canvasRef.current)
+  useHotkey([ZOOM_IN, ZOOM_IN_ALT], zoomIn, canvasRef.current)
+  useHotkey([ZOOM_OUT, ZOOM_OUT_ALT], zoomOut, canvasRef.current)
+  useHotkey([RESET_CAMERA], resetCamera, canvasRef.current)
+  useHotkey([DUPLICATE, DUPLICATE_ALT], duplicateSelectedEntities, canvasRef.current)
+
   const getDropPosition = async () => {
     const pointerCoords = await getPointerCoords(sdk!.scene)
     return snapPosition(new Vector3(fixedNumber(pointerCoords.x), 0, fixedNumber(pointerCoords.z)))
@@ -70,7 +161,7 @@ const Renderer: React.FC = () => {
   const addAsset = async (asset: AssetNodeItem, position: Vector3, basePath: string) => {
     if (!sdk) return
     const { operations } = sdk
-    operations.addAsset(ROOT, asset.asset.src, asset.name, position, basePath, asset.components)
+    operations.addAsset(ROOT, asset.asset.src, asset.name, position, basePath, sdk.enumEntity, asset.components)
     await operations.dispatch()
     analytics.track(Event.ADD_ITEM, {
       itemId: asset.asset.id,
@@ -78,6 +169,7 @@ const Renderer: React.FC = () => {
       itemPath: asset.asset.src,
       isSmart: isSmart(asset)
     })
+    canvasRef.current?.focus()
   }
 
   const importBuilderAsset = async (asset: Asset) => {
@@ -173,10 +265,19 @@ const Renderer: React.FC = () => {
   drop(canvasRef)
 
   return (
-    <div className={cx('Renderer', { 'is-loaded': !isLoading, 'is-loading': isLoading })}>
+    <div
+      className={cx('Renderer', {
+        'is-loaded': !isLoading,
+        'is-loading': isLoading
+      })}
+    >
       {isLoading && <Loading />}
       <Warnings />
       <CameraSpeed />
+      <Metrics />
+      {!hiddenPanels[PanelName.SHORTCUTS] && (
+        <Shortcuts canvas={canvasRef} onResetCamera={resetCamera} onZoomIn={zoomIn} onZoomOut={zoomOut} />
+      )}
       <canvas ref={canvasRef} id="canvas" touch-action="none" />
     </div>
   )

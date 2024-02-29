@@ -15,8 +15,9 @@ function exportComponent(component: Component) {
   return `export * from './pb/decentraland/sdk/components/${component.componentFile}.gen'`
 }
 
+const GROWN_ONLY_COMPONENTS = ['PointerEventsResult', 'VideoEvent', 'AvatarEmoteCommand']
 function isGrowOnlyValueSet(component: Component): boolean {
-  return component.componentPascalName === 'PointerEventsResult' || component.componentPascalName === 'VideoEvent'
+  return GROWN_ONLY_COMPONENTS.includes(component.componentPascalName)
 }
 
 function defineComponentDecl(component: Component) {

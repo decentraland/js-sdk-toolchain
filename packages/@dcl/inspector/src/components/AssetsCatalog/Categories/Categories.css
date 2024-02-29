@@ -1,0 +1,27 @@
+.assets-catalog-categories {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: scroll;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 24px;
+  gap: 16px;
+}
+
+.assets-catalog-category {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.assets-catalog-category h4.category-name {
+  margin-top: 0;
+  margin-bottom: 0;
+  color: var(--base-01);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  text-transform: uppercase;
+}

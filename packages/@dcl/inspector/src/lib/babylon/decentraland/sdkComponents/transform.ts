@@ -2,6 +2,8 @@ import { Quaternion } from '@babylonjs/core'
 import { ComponentType, Entity, TransformType } from '@dcl/ecs'
 import type { ComponentOperation } from '../component-operations'
 import { EcsEntity } from '../EcsEntity'
+import { ROOT } from '../../../sdk/tree'
+import { getRoot } from '../../../sdk/nodes'
 
 export const putTransformComponent: ComponentOperation = (entity, component) => {
   if (component.componentType === ComponentType.LastWriteWinElementSet) {
@@ -75,6 +77,23 @@ export function createDefaultTransform(entity: EcsEntity) {
 function reparentEntity(entity: EcsEntity) {
   const context = entity.context.deref()
   const parentEntityId: Entity | undefined = entity.ecsComponentValues.transform?.parent
+
+  // when changing the root of the entity, we need to enable/disable the mesh if the root is the player or the camera
+  const nodes = context?.editorComponents.Nodes.getOrNull(ROOT)?.value || []
+  if (nodes.length > 0) {
+    const oldRoot = getRoot(entity.entityId, nodes)
+    const newRoot = getRoot(parentEntityId || ROOT, nodes)
+    if (newRoot !== oldRoot) {
+      const isSceneRoot = newRoot === ROOT
+      if (!isSceneRoot) {
+        entity.setVisibility(false)
+        entity.context.deref()?.gizmos.unsetEntity()
+      } else {
+        entity.setVisibility(true)
+        entity.context.deref()?.gizmos.setEntity(entity)
+      }
+    }
+  }
 
   if (context) {
     if (entity.parent && (entity.parent as EcsEntity).entityId === parentEntityId) return

@@ -8,5 +8,12 @@ export enum PanelName {
   ENTITIES = 'entities',
   COMPONENTS = 'components',
   ASSETS = 'assets',
-  TOOLBAR = 'toolbar'
+  TOOLBAR = 'toolbar',
+  SHORTCUTS = 'shortcuts'
+}
+
+export enum SceneInspectorTab {
+  DETAILS = 'details',
+  LAYOUT = 'layout',
+  SETTINGS = 'settings'
 }

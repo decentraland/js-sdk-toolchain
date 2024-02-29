@@ -22,6 +22,8 @@ import {
   PositionShorthand,
   PointerFilterType
 } from './types'
+import { calcOnViewport } from '../utils'
+import { ScaleUnit } from '../types'
 
 function capitalize<T extends string>(value: T): Capitalize<T> {
   return `${value[0].toUpperCase()}${value.slice(1, value.length)}` as Capitalize<T>
@@ -39,12 +41,21 @@ type PositionParsed = {
 function isPercent(val: PositionUnit) {
   return typeof val === 'string' && val.endsWith('%')
 }
+
 function isPoint(val: PositionUnit) {
   return typeof val === 'string' && val.endsWith('px')
 }
 
+function isVw(val: PositionUnit): val is ScaleUnit {
+  return typeof val === 'string' && val.endsWith('vw')
+}
+
+function isVh(val: PositionUnit): val is ScaleUnit {
+  return typeof val === 'string' && val.endsWith('vh')
+}
+
 function parsePositionUnit(val?: PositionUnit | 'auto'): [number | undefined, YGUnit] {
-  function getValue(key: 'px' | '%', value: string) {
+  function getValue(key: 'px' | '%' | 'vw' | 'vh', value: string) {
     return Number(value.slice(0, value.indexOf(key)))
   }
 
@@ -66,6 +77,10 @@ function parsePositionUnit(val?: PositionUnit | 'auto'): [number | undefined, YG
 
   if (isPoint(val)) {
     return [getValue('px', val), YGUnit.YGU_POINT]
+  }
+
+  if (isVw(val) || isVh(val)) {
+    return [calcOnViewport(val), YGUnit.YGU_POINT]
   }
 
   return [undefined, YGUnit.YGU_UNDEFINED]

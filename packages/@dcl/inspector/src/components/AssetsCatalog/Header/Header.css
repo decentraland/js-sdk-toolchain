@@ -1,0 +1,32 @@
+.assets-catalog-header {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+}
+
+.assets-catalog-header h2.assets-catalog-header-title {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  color: var(--base-01);
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  margin-bottom: 0;
+}
+
+.assets-catalog-header .assets-catalog-header-title .back-button {
+  cursor: pointer;
+  color: var(--base-06);
+}
+
+.assets-catalog-header .assets-catalog-header-search {
+  display: flex;
+  min-width: 360px;
+}
+
+.assets-catalog-header .assets-catalog-header-search .Text.Field .InputContainer input::placeholder {
+  color: var(--base-01);
+}

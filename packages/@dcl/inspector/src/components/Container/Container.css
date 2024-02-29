@@ -55,7 +55,8 @@
   min-width: 175px;
 }
 
-.Container .content:has(.Block > .content > .Field) {
+.Container .content:has(.Block > .content > .Field),
+.Container.with-gap > .content {
   display: flex;
   flex-direction: column;
   row-gap: 12px;

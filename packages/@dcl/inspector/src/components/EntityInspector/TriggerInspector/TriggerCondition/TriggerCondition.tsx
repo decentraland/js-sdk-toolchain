@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React, { useCallback, useEffect } from 'react'
 import { VscTrash as RemoveIcon } from 'react-icons/vsc'
 import { Entity } from '@dcl/ecs'

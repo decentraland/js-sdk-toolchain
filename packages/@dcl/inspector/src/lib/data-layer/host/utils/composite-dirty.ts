@@ -8,7 +8,7 @@ import {
   IEngine
 } from '@dcl/ecs'
 import { initComponents } from '@dcl/asset-packs'
-import { EditorComponentNames } from '../../../sdk/components'
+import { EditorComponentNames, EditorComponents } from '../../../sdk/components'
 import { dumpEngineToComposite, dumpEngineToCrdtCommands } from './engine-to-composite'
 import { FileSystemInterface } from '../../types'
 import { CompositeManager, createFsCompositeProvider } from './fs-composite-provider'
@@ -16,6 +16,9 @@ import { getMinimalComposite } from '../../client/feeded-local-fs'
 import { InspectorPreferences } from '../../../logic/preferences/types'
 import { buildNodesHierarchyIfNotExists } from '../utils/migrations/build-nodes-hierarchy'
 import { removeLegacyEntityNodeComponents } from '../utils/migrations/legacy-entity-node'
+import { bufferToScene } from '../scene'
+import { toSceneComponent } from './component'
+import { addNodesComponentsToPlayerAndCamera } from './migrations/add-nodes-to-player-and-camera'
 
 enum DirtyEnum {
   // No changes
@@ -32,16 +35,23 @@ function runMigrations(engine: IEngine) {
   removeLegacyEntityNodeComponents(engine)
   // Build Nodes component value if not exists
   buildNodesHierarchyIfNotExists(engine)
+  // Add Nodes component to PlayerEntity and CameraEntity if not exists
+  addNodesComponentsToPlayerAndCamera(engine)
 }
 
 async function instanciateComposite(fs: FileSystemInterface, engine: IEngine, path: string): Promise<CompositeManager> {
   if (!(await fs.existFile(path))) {
+    console.log('Main composite does not exists!')
     await fs.writeFile(path, Buffer.from(JSON.stringify(getMinimalComposite(), null, 2), 'utf-8'))
+  } else {
+    console.log('Main composite exists!')
   }
 
   const compositeProvider = await createFsCompositeProvider(fs)
   const mainComposite = compositeProvider.getCompositeOrNull(path)
   if (!mainComposite) throw new Error('Invalid composite')
+
+  console.log('Instanciating composite...')
 
   Composite.instance(engine, mainComposite, compositeProvider, {
     entityMapping: {
@@ -49,6 +59,15 @@ async function instanciateComposite(fs: FileSystemInterface, engine: IEngine, pa
       getCompositeEntity: (entity: number | Entity) => entity as Entity
     }
   })
+
+  // override SceneMetadata with scene.json
+  const SceneMetadata = engine.getComponent(EditorComponentNames.Scene) as EditorComponents['Scene']
+  if (await fs.existFile('scene.json')) {
+    console.log('Overriding SceneMetadata with scene.json')
+    const sceneJsonBuffer = await fs.readFile('scene.json')
+    const sceneJson = bufferToScene(sceneJsonBuffer)
+    SceneMetadata.createOrReplace(engine.RootEntity, toSceneComponent(sceneJson))
+  }
 
   runMigrations(engine)
 
