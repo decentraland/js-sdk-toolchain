@@ -85,7 +85,8 @@ export interface PointerEventsSystem {
 }
 
 /**
- * @internal
+ * @public
+ * ___DO NOT USE___ use pointerEventsSystem instead
  */
 export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSystem): PointerEventsSystem {
   const PointerEvents = components.PointerEvents(engine)

@@ -745,6 +745,12 @@ export function createEthereumProvider(): {
     sendAsync(message: RPCSendableMessage, callback: (error: Error | null, result?: any) => void): void;
 };
 
+// @public
+export function createInputSystem(engine: IEngine): IInputSystem;
+
+// @public
+export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSystem): PointerEventsSystem;
+
 // Warning: (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
 // Warning: (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
 // Warning: (tsdoc-undefined-tag) The TSDoc tag "@params" is not defined in this configuration
