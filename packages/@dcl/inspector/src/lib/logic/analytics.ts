@@ -5,7 +5,8 @@ import { getConfig } from './config'
 export enum Event {
   ADD_ITEM = 'Add Item',
   ADD_COMPONENT = 'Add Component',
-  REMOVE_COMPONENT = 'Remove Component'
+  REMOVE_COMPONENT = 'Remove Component',
+  SEARCH_ITEM = 'Search Item'
 }
 
 export type Events = {
@@ -24,6 +25,11 @@ export type Events = {
     componentName: string
     itemId?: string
     itemPath: string
+  }
+  [Event.SEARCH_ITEM]: {
+    keyword: string
+    itemsFound: number
+    category?: string
   }
 }
 

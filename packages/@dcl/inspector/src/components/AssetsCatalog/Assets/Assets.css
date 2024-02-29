@@ -1,0 +1,13 @@
+.assets-catalog:not(:has(.assets-catalog-categories)) .assets-catalog-assets-container {
+  height: 100%;
+  overflow: scroll;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 24px;
+}
+
+.assets-catalog-assets-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

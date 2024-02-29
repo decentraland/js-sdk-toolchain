@@ -2,8 +2,8 @@ import React, { useCallback } from 'react'
 import { Entity } from '@dcl/ecs'
 import { FiHexagon } from 'react-icons/fi'
 
-import { ROOT } from '../../lib/sdk/tree'
-import { useSelectedEntity } from '../../hooks/sdk/useSelectedEntity'
+import { CAMERA, PLAYER, ROOT } from '../../lib/sdk/tree'
+import { useEntitiesWith } from '../../hooks/sdk/useEntitiesWith'
 import { useTree } from '../../hooks/sdk/useTree'
 import { Tree } from '../Tree'
 import { ContextMenu } from './ContextMenu'
@@ -40,40 +40,44 @@ const Hierarchy: React.FC = () => {
     canReorder,
     centerViewOnEntity
   } = useTree()
-  const selectedEntity = useSelectedEntity()
+  const selectedEntities = useEntitiesWith((components) => components.Selection)
 
   const isSelected = useCallback(
     (entity: Entity) => {
-      return selectedEntity === entity
+      return selectedEntities.includes(entity)
     },
-    [selectedEntity]
+    [selectedEntities]
   )
+
+  const props = {
+    getExtraContextMenu: ContextMenu,
+    onAddChild: addChild,
+    onDrop: setParent,
+    onRemove: remove,
+    onRename: rename,
+    onSelect: select,
+    onDoubleSelect: centerViewOnEntity,
+    onSetOpen: setOpen,
+    onDuplicate: duplicate,
+    getId: getId,
+    getChildren: getChildren,
+    getLabel: getLabel,
+    getIcon: (val: Entity) => <HierarchyIcon value={val} />,
+    isOpen: isOpen,
+    isSelected: isSelected,
+    isHidden: isHidden,
+    canRename: canRename,
+    canRemove: canRemove,
+    canDuplicate: canDuplicate,
+    canDrag: canDrag,
+    canReorder: canReorder
+  }
+
   return (
     <div className="Hierarchy">
-      <EntityTree
-        value={ROOT}
-        getExtraContextMenu={ContextMenu}
-        onAddChild={addChild}
-        onDrop={setParent}
-        onRemove={remove}
-        onRename={rename}
-        onSelect={select}
-        onDoubleSelect={centerViewOnEntity}
-        onSetOpen={setOpen}
-        onDuplicate={duplicate}
-        getId={getId}
-        getChildren={getChildren}
-        getLabel={getLabel}
-        getIcon={(val: Entity) => <HierarchyIcon value={val} />}
-        isOpen={isOpen}
-        isSelected={isSelected}
-        isHidden={isHidden}
-        canRename={canRename}
-        canRemove={canRemove}
-        canDuplicate={canDuplicate}
-        canDrag={canDrag}
-        canReorder={canReorder}
-      />
+      <EntityTree value={PLAYER} {...props} />
+      <EntityTree value={CAMERA} {...props} />
+      <EntityTree value={ROOT} {...props} />
     </div>
   )
 }

@@ -124,6 +124,13 @@ export class CameraManager {
     }
   }
 
+  resetCamera() {
+    const center = new BABYLON.Vector3(PARCEL_SIZE / 2, 0, PARCEL_SIZE / 2)
+    const size = center.length()
+    this.camera.position = center.subtractFromFloats(size, -size * 1.5, size * 2)
+    this.camera.target = center
+  }
+
   private createCamera(scene: BABYLON.Scene) {
     const center = new BABYLON.Vector3(PARCEL_SIZE / 2, 0, PARCEL_SIZE / 2)
     const size = center.length()

@@ -1,0 +1,40 @@
+.action-area {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: flex-end;
+  column-gap: 4px;
+  visibility: hidden;
+}
+
+.Tree .item .selectable-area .action-area {
+  padding-right: 4px;
+}
+
+.Tree .item:hover:not(:has(input)) .selectable-area .action-area .action-button {
+  visibility: visible;
+}
+
+.action-area .action-button .unlock-icon > path:last-of-type,
+.action-area .action-button .visible-icon > circle,
+.action-area .action-button .visible-icon > path,
+.action-area .action-button .invisible-icon > circle,
+.action-area .action-button .invisible-icon > path {
+  color: var(--base-02);
+}
+
+.Tree .item:not(:has(input)) .selectable-area .action-area .action-button .lock-icon,
+.Tree .item:not(:has(input)) .selectable-area .action-area .action-button .invisible-icon {
+  visibility: visible;
+}
+
+.Tree .item .selectable-area:has(.action-area .action-button .invisible-icon),
+.Tree .item .selectable-area .action-area .action-button .invisible-icon > path {
+  color: var(--base-06);
+}
+
+.action-area .action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

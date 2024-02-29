@@ -6,6 +6,8 @@ import { keyState, Keys } from '../decentraland/keys'
 import { getAncestors, isAncestor, mapNodes } from '../../sdk/nodes'
 
 let isSnapEnabled = snapManager.isEnabled()
+let clickStartTimer: ReturnType<typeof setTimeout>
+let isDragging = false
 
 export function initKeyboard(canvas: HTMLCanvasElement, scene: BABYLON.Scene) {
   canvas.addEventListener('keydown', (e) => {
@@ -23,6 +25,17 @@ export function initKeyboard(canvas: HTMLCanvasElement, scene: BABYLON.Scene) {
     keyState[Keys.KEY_SHIFT] = e.shiftKey
     keyState[Keys.KEY_CTRL] = e.ctrlKey
     keyState[e.keyCode] = false
+  })
+
+  // When the canvas lost the focus, clear the special keys state
+  canvas.addEventListener('blur', () => {
+    keyState[Keys.KEY_SHIFT] = false
+    keyState[Keys.KEY_CTRL] = false
+  })
+
+  // Event to store the ctrlKey when the canvas has lost the focus
+  canvas.addEventListener('contextmenu', (e) => {
+    keyState[Keys.KEY_CTRL] = e.ctrlKey
   })
 
   scene.onPointerObservable.add((e) => {
@@ -69,12 +82,22 @@ export function interactWithScene(
   const entity = mesh && findParentEntity(mesh)
 
   if (entity && pointerEvent === 'pointerDown') {
+    clickStartTimer = setTimeout(() => {
+      isDragging = true
+    }, 150) // 150ms to detect if the user is dragging
+  } else if (entity && pointerEvent === 'pointerUp' && !isDragging) {
     const context = entity.context.deref()!
     const { operations, engine, editorComponents } = context
     const ancestors = getAncestors(engine, entity.entityId)
     const nodes = mapNodes(engine, (node) => (isAncestor(ancestors, node.entity) ? { ...node, open: true } : node))
     operations.updateValue(editorComponents.Nodes, engine.RootEntity, { value: nodes })
-    operations.updateSelectedEntity(entity.entityId)
+    operations.updateSelectedEntity(entity.entityId, !!keyState[Keys.KEY_CTRL])
     void operations.dispatch()
+  }
+
+  // Clear isDragging flag each pointerUp
+  if (pointerEvent === 'pointerUp') {
+    clearTimeout(clickStartTimer)
+    isDragging = false
   }
 }

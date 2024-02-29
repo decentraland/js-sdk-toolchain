@@ -22,3 +22,21 @@ export interface EntityPropTypes extends Listeners {
  */
 export type Key = number | string
 export type Children = unknown
+
+/**
+ * unit value type. i.e. 'vw' || 'vh'
+ * @public
+ */
+export type ScaleUnits = 'vw' | 'vh'
+
+/**
+ * unit value specified. i.e. 10 || '10vw' || '10vh'
+ * @public
+ */
+export type ScaleUnit = `${number}${ScaleUnits}` | number
+
+/**
+ * context for applying a scale
+ * @public
+ */
+export type ScaleContext = { width: number; height: number; ratio: number }

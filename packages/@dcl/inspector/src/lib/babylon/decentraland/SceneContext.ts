@@ -20,6 +20,8 @@ import { getDataLayerInterface } from '../../../redux/data-layer'
 import { putMaterialComponent } from './sdkComponents/material'
 import { putNftShapeComponent } from './sdkComponents/nft'
 import { putVideoPlayerComponent } from './sdkComponents/video-player'
+import { putHideComponent } from './editorComponents/hide'
+import { putLockComponent } from './editorComponents/lock'
 
 export type LoadableScene = {
   readonly entity: Readonly<Omit<Schemas.Entity, 'id'>>
@@ -69,7 +71,9 @@ export class SceneContext {
     [this.NftShape.componentId]: putNftShapeComponent,
     [this.VideoPlayer.componentId]: putVideoPlayerComponent,
     [this.editorComponents.Selection.componentId]: putEntitySelectedComponent,
-    [this.editorComponents.Scene.componentId]: putSceneComponent
+    [this.editorComponents.Scene.componentId]: putSceneComponent,
+    [this.editorComponents.Hide.componentId]: putHideComponent,
+    [this.editorComponents.Lock.componentId]: putLockComponent
   }
 
   // this future is resolved when the scene is disposed

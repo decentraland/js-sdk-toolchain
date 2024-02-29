@@ -181,9 +181,12 @@ function ProjectView({ folders, thumbnails }: Props) {
 
   const getThumbnail = useCallback(
     (value: string) => {
-      const [name] = value.split('.')
+      const [name, extension] = value.split('.')
       const thumbnail = thumbnails.find(($) => $.path.endsWith(name + '.png'))
-      return thumbnail?.content
+      if (thumbnail) {
+        return thumbnail?.content
+      } else if (extension === 'png') {
+      }
     },
     [thumbnails]
   )

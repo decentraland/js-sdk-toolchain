@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 
 import { isValidNumericInput, useComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
@@ -41,17 +41,12 @@ export default withSdk<Props>(({ sdk, entity }) => {
     }
   }, [hasTransform])
 
-  const handleRemove = useCallback(async () => {
-    sdk.operations.removeComponent(entity, Transform)
-    await sdk.operations.dispatch()
-  }, [])
-
   const _getConfigProps = getConfigProps as LinkProps['getInputProps']
 
   if (!hasTransform) return null
 
   return (
-    <Container label="Transform" className="Transform" onRemoveContainer={handleRemove}>
+    <Container label="Transform" className="Transform">
       <Block label="Position">
         <TextField leftLabel="X" type="number" {...getInputProps('position.x')} />
         <TextField leftLabel="Y" type="number" {...getInputProps('position.y')} />

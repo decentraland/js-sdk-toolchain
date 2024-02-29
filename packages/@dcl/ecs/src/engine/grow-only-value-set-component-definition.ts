@@ -49,6 +49,7 @@ export function createValueSetComponentDefinitionFromSchema<T>(
   const data = new Map<Entity, InternalDatastructure>()
   const dirtyIterator = new Set<Entity>()
   const queuedCommands: AppendValueMessageBody[] = []
+  const onChangeCallbacks = new Map<Entity, (data: T | undefined) => void>()
 
   // only sort the array if the latest (N) element has a timestamp <= N-1
   function shouldSort(row: InternalDatastructure) {
@@ -153,7 +154,8 @@ export function createValueSetComponentDefinitionFromSchema<T>(
     updateFromCrdt(_body) {
       if (_body.type === CrdtMessageType.APPEND_VALUE) {
         const buf = new ReadWriteByteBuffer(_body.data)
-        append(_body.entityId, schema.deserialize(buf) as DeepReadonly<T>)
+        const { value } = append(_body.entityId, schema.deserialize(buf) as DeepReadonly<T>)
+        return [null, value as T]
       }
       return [null, undefined]
     },
@@ -166,6 +168,12 @@ export function createValueSetComponentDefinitionFromSchema<T>(
           AppendValueOperation.write(entity, 0, componentId, buf.toBinary(), buffer)
         }
       }
+    },
+    onChange(entity, cb) {
+      onChangeCallbacks.set(entity, cb)
+    },
+    __onChangeCallbacks(entity) {
+      return onChangeCallbacks.get(entity)
     }
   }
 

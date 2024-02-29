@@ -16,9 +16,11 @@ const gizmoManagerMock = {
   isPositionGizmoWorldAligned: jest.fn().mockReturnValue(true),
   isRotationGizmoWorldAligned: jest.fn().mockReturnValue(true),
   isRotationGizmoAlignmentDisabled: jest.fn().mockReturnValue(false),
+  isPositionGizmoAlignmentDisabled: jest.fn().mockReturnValue(false),
   setPositionGizmoWorldAligned: jest.fn(),
   setRotationGizmoWorldAligned: jest.fn(),
   fixRotationGizmoAlignment: jest.fn(),
+  fixPositionGizmoAlignment: jest.fn(),
   onChange: jest.fn().mockImplementation((cb) => gizmoManagerEvents.on('*', cb))
 }
 createGizmoManagerMock.mockReturnValue(gizmoManagerMock as unknown as ReturnType<typeof createGizmoManager>)

@@ -1,16 +1,91 @@
-import { useMemo, useState } from 'react'
-import { useDrag } from 'react-dnd'
-import { BsFillLightningChargeFill } from 'react-icons/bs'
-import cx from 'classnames'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { AssetProps, CategoriesProps, Props, ThemeProps } from './types'
-import { AssetPack, getAssetsByCategory, getContentsUrl, isSmart } from '../../lib/logic/catalog'
+import { AssetPack } from '../../lib/logic/catalog'
+import { analytics, Event } from '../../lib/logic/analytics'
+import { useAppDispatch } from '../../redux/hooks'
+import { selectAssetsTab } from '../../redux/ui'
+import { AssetsTab } from '../../redux/ui/types'
+
+import { Header } from './Header'
+import { Themes } from './Themes'
+import { Categories } from './Categories'
+import { Assets } from './Assets'
+
+import { Props } from './types'
 
 import './AssetsCatalog.css'
 
-export function AssetsCatalog({ catalog }: Props) {
+const AssetsCatalog: React.FC<Props> = ({ catalog }) => {
+  const dispatch = useAppDispatch()
   const [selectedTheme, setSelectedTheme] = useState<AssetPack>()
-  const handleThemeChange = (value?: AssetPack) => setSelectedTheme(value)
+  const [search, setSearch] = useState<string>('')
+
+  const handleThemeChange = useCallback((value?: AssetPack) => setSelectedTheme(value), [setSelectedTheme])
+
+  const handleUploadAsset = useCallback(() => {
+    dispatch(selectAssetsTab({ tab: AssetsTab.Import }))
+  }, [])
+
+  const handleSearchAssets = useCallback(
+    (value: string) => {
+      setSearch(value)
+    },
+    [setSearch]
+  )
+
+  const filteredCatalog = useMemo(() => {
+    if (!search) return []
+
+    const searchLower = search.toLowerCase()
+    const assets = selectedTheme ? selectedTheme.assets : catalog.flatMap((theme) => theme.assets)
+
+    const { starts, includes } = assets.reduce(
+      (results: { starts: AssetPack['assets']; includes: AssetPack['assets'] }, asset) => {
+        const name = asset.name.toLowerCase()
+        if (name.split(' ').some((word) => word.startsWith(searchLower))) results.starts.push(asset)
+        if (name.includes(searchLower)) results.includes.push(asset)
+        return results
+      },
+      { starts: [], includes: [] }
+    )
+
+    return starts.length ? starts : includes
+  }, [catalog, selectedTheme, search])
+
+  useEffect(() => {
+    if (search) {
+      analytics.track(Event.SEARCH_ITEM, {
+        keyword: search,
+        itemsFound: filteredCatalog.length,
+        category: selectedTheme?.name
+      })
+    }
+  }, [search, filteredCatalog])
+
+  const renderEmptySearch = useCallback(() => {
+    const ctaMethod = selectedTheme ? handleThemeChange : handleUploadAsset
+    const ctaText = selectedTheme ? 'search all categories' : 'upload your own asset'
+    return (
+      <div className="empty-search">
+        <span>No results for '{search}'.</span>
+        <span>
+          Try using another words or{' '}
+          <span className="empty-search-cta" onClick={() => ctaMethod()}>
+            {ctaText}
+          </span>
+          .
+        </span>
+      </div>
+    )
+  }, [search, selectedTheme, handleThemeChange, handleUploadAsset])
+
+  const renderAssets = useCallback(() => {
+    if (filteredCatalog.length > 0) {
+      return <Assets assets={filteredCatalog} />
+    }
+
+    return renderEmptySearch()
+  }, [filteredCatalog])
 
   if (!catalog) {
     return null
@@ -18,79 +93,23 @@ export function AssetsCatalog({ catalog }: Props) {
 
   return (
     <div className="assets-catalog">
-      {!selectedTheme && catalog.map(($) => <ThemeCell key={$.id} onClick={handleThemeChange} value={$} />)}
-      {selectedTheme && <Categories onGoBack={handleThemeChange} value={selectedTheme} />}
+      <Header
+        search={search}
+        selectedTheme={selectedTheme}
+        onChangeTheme={handleThemeChange}
+        onSearch={handleSearchAssets}
+      />
+      {search ? (
+        renderAssets()
+      ) : selectedTheme ? (
+        <Categories onGoBack={handleThemeChange} value={selectedTheme} />
+      ) : (
+        <div className="assets-catalog-theme-container">
+          <Themes catalog={catalog} onClick={handleThemeChange} />
+        </div>
+      )}
     </div>
   )
 }
 
-function ThemeCell({ value, onClick }: ThemeProps) {
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    onClick(value)
-  }
-
-  return (
-    <div onClick={handleClick} className="theme" data-test-id={value.id} data-test-label={value.name}>
-      <img src={getContentsUrl(value.thumbnail)} alt={value.name} />
-      <h4>{value.name}</h4>
-      <div></div>
-    </div>
-  )
-}
-
-function Categories({ onGoBack, value }: CategoriesProps) {
-  const assetsByCategory = useMemo(() => getAssetsByCategory(value.assets), [value.id, value.assets])
-  const handleGoBack = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    onGoBack()
-  }
-
-  return (
-    <div className="categories">
-      <div>
-        <span onClick={handleGoBack}>&lt;</span>
-        <h3>{value.name}</h3>
-      </div>
-      {Array.from(assetsByCategory, ($) => {
-        const [category, assets] = $
-        if (!assets.length) return null
-        return (
-          <div className="category" key={category}>
-            <h4>{category}</h4>
-            <div className="assets">
-              {assets.map(($$) => (
-                <AssetCell key={$$.id} value={$$} />
-              ))}
-            </div>
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
-function AssetCell({ value }: AssetProps) {
-  const [, drag] = useDrag(() => ({ type: 'builder-asset', item: { value } }), [value])
-  const isSmartItem = isSmart(value)
-  return (
-    <div
-      className={cx('asset', { 'smart-item': isSmartItem })}
-      ref={drag}
-      data-test-id={value.id}
-      data-test-label={value.name}
-      title={value.name}
-    >
-      <img src={getContentsUrl(value.contents['thumbnail.png'])} alt={value.tags.join(', ')} />
-      {isSmartItem && SmartItemIcon()}
-    </div>
-  )
-}
-
-function SmartItemIcon() {
-  return (
-    <div className="smart-item-badge">
-      <BsFillLightningChargeFill />
-    </div>
-  )
-}
+export default React.memo(AssetsCatalog)

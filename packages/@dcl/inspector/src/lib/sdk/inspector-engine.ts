@@ -5,7 +5,7 @@ import { createEngineContext } from '../data-layer/host/utils/engine'
 
 export function createInspectorEngine(): Omit<
   SdkContextValue,
-  'scene' | 'sceneContext' | 'dataLayer' | 'operations' | 'gizmos' | 'editorCamera' | 'preferences'
+  'scene' | 'sceneContext' | 'dataLayer' | 'operations' | 'gizmos' | 'editorCamera' | 'preferences' | 'enumEntity'
 > {
   const events = mitt<SdkContextEvents>()
   const { engine, components } = createEngineContext({

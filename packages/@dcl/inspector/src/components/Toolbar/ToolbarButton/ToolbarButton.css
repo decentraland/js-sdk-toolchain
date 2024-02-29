@@ -8,6 +8,7 @@
   border-radius: 4px;
   cursor: pointer;
   min-width: 32px;
+  height: 30px;
 }
 
 .ToolbarButton:hover:not(:disabled) {
@@ -16,7 +17,7 @@
 
 .ToolbarButton:disabled {
   opacity: 0.5;
-  cursor: default
+  cursor: default;
 }
 
 .ToolbarButton.active {

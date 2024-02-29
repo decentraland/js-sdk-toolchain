@@ -12,4 +12,5 @@ export type Props = React.InputHTMLAttributes<HTMLInputElement> & {
   className?: string
   disabled?: boolean
   leftContent?: React.ReactNode
+  debounceTime?: number
 }

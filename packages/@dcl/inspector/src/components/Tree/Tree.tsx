@@ -1,14 +1,17 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { XYCoord, useDrag, useDrop } from 'react-dnd'
 import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io'
 import cx from 'classnames'
+import { Entity } from '@dcl/ecs'
 
+import { ROOT } from '../../lib/sdk/tree'
 import { withContextMenu } from '../../hoc/withContextMenu'
 import { Input } from '../Input'
 import { ContextMenu } from './ContextMenu'
+import { ActionArea } from './ActionArea'
+import { ClickType, DropType, calculateDropType } from './utils'
 
 import './Tree.css'
-import { DropType, calculateDropType } from './utils'
 
 type Props<T> = {
   value: T
@@ -29,7 +32,7 @@ type Props<T> = {
   canDrag?: (value: T) => boolean
   canReorder?: (source: T, target: T, type: DropType) => boolean
   onSetOpen: (value: T, isOpen: boolean) => void
-  onSelect: (value: T) => void
+  onSelect: (value: T, multiple?: boolean) => void
   onDoubleSelect?: (value: T) => void
   onDrop: (source: T, target: T, dropType: DropType) => void
   onRename: (value: T, label: string) => void
@@ -149,8 +152,12 @@ export function Tree<T>() {
       const quitInsertMode = () => setInsertMode(false)
 
       const handleSelect = (event: React.MouseEvent) => {
-        onSelect(value)
-        if (event.detail > 1 && onDoubleSelect) onDoubleSelect(value)
+        if (event.type === ClickType.CONTEXT_MENU && event.ctrlKey) {
+          onSelect(value, true)
+        } else if (event.type === ClickType.CLICK) {
+          onSelect(value)
+          if (event.detail > 1 && onDoubleSelect) onDoubleSelect(value)
+        }
       }
 
       const handleOpen = (_: React.MouseEvent) => {
@@ -185,6 +192,10 @@ export function Tree<T>() {
         onDuplicate(value)
       }
 
+      const isEntity = useMemo(() => {
+        return typeof value !== 'string' && (value as Entity) !== ROOT
+      }, [value])
+
       drag(drop(ref))
 
       const controlsProps = {
@@ -212,9 +223,10 @@ export function Tree<T>() {
             <ContextMenu {...controlsProps} />
             <div ref={ref} style={getEditModeStyles(editMode)} className="item-area">
               <DisclosureWidget enabled={enableOpen} isOpen={open} onOpen={handleOpen} />
-              <div onClick={handleSelect} className="selectable-area">
+              <div onClick={handleSelect} onContextMenu={handleSelect} className="selectable-area">
                 {props.getIcon ? props.getIcon(value) : <></>}
                 <div>{label || id}</div>
+                {isEntity && <ActionArea entity={value as Entity} />}
               </div>
             </div>
             {editMode && typeof label === 'string' && (

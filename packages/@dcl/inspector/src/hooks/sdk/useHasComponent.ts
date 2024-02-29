@@ -1,5 +1,6 @@
 import { Entity } from '@dcl/ecs'
 import { useState } from 'react'
+
 import { Component } from '../../lib/sdk/components'
 import { useChange } from './useChange'
 

@@ -5,5 +5,6 @@ export type Props = {
   initialOpen?: boolean
   indicator?: boolean | string | JSX.Element
   border?: boolean
+  gap?: boolean
   onRemoveContainer?: () => void
 }

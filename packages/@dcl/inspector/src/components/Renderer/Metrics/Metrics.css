@@ -1,0 +1,133 @@
+.Metrics {
+  --metrics-bottom: 8px;
+  --metrics-left: 8px;
+  --metrics-button-height: 30px;
+  --metrics-button-width: 30px;
+
+  display: flex;
+  align-items: center;
+  position: absolute;
+  bottom: var(--metrics-bottom);
+  left: var(--metrics-left);
+  z-index: 1;
+}
+
+.Metrics .Buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+
+.Metrics .Buttons .Button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--metrics-button-height);
+  width: var(--metrics-button-width);
+  padding: 5px;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.Metrics .Buttons .Button.Active svg {
+  color: var(--base-06);
+}
+
+.Metrics .Buttons .Button svg {
+  color: var(--base-02);
+}
+
+.Metrics > div.LimitExceeded {
+  display: flex;
+  align-items: center;
+  text-transform: uppercase;
+  cursor: default;
+}
+
+.Metrics > .Overlay {
+  display: flex;
+  flex-direction: column;
+  width: 250px;
+  position: absolute;
+  overflow-y: auto;
+  left: 0;
+  bottom: calc(var(--metrics-bottom) + var(--metrics-button-height) + 8px);
+  background-color: var(--base-19);
+  padding: 13px 12px;
+  border-radius: 4px;
+  gap: 16px;
+}
+
+.Metrics > .Overlay h2.Header {
+  display: flex;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 17px;
+  color: var(--base-01);
+  margin-bottom: 0;
+  gap: 4px;
+}
+
+.Metrics > .Overlay .Item .Title,
+.Metrics > .Overlay .Item .Description,
+.Metrics > .Overlay .Item .Description .Key {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--base-01);
+  margin-bottom: 0;
+}
+
+.Metrics > .Overlay .secondary {
+  color: var(--base-09);
+}
+
+.Metrics > .Overlay .Items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.Metrics > .Overlay .Items .Item {
+  display: flex;
+  gap: 4px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--base-18);
+}
+
+.Metrics > .Overlay .Items .Item:last-of-type {
+  border-bottom: none;
+}
+
+.Metrics > .Overlay .Item .Title {
+  display: flex;
+  flex: 1;
+  align-items: center;
+}
+
+.Metrics > .Overlay .Item .Description {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 4px;
+  line-height: 14px;
+}
+
+.Metrics > .Overlay .Item .Description .Key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  height: 18px;
+  border-radius: 4px;
+  background-color: var(--base-13);
+}
+
+.Metrics .Buttons .Button.LimitExceeded svg,
+.Metrics > .Overlay .Item .Description.LimitExceeded,
+.Metrics > .Overlay .Item .Description.LimitExceeded .secondary {
+  color: var(--error-dark);
+}
+
+.Metrics .Buttons .Button.Active.LimitExceeded svg {
+  color: var(--error-main);
+}

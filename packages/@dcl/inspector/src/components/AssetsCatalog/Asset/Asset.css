@@ -1,0 +1,45 @@
+.assets-catalog-asset {
+  display: flex;
+  height: 80px;
+  width: 80px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  border-radius: 8px;
+  background: var(--list-item-bg-color);
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  position: relative;
+}
+
+.assets-catalog-asset.smart-item {
+  background: var(--list-smart-item-bg-color);
+}
+
+.assets-catalog-asset:hover {
+  background: var(--list-item-hover-bg-color);
+}
+
+.assets-catalog-asset.smart-item:hover {
+  background: var(--list-smart-item-hover-bg-color);
+}
+
+.assets-catalog-asset img {
+  width: 60px;
+  height: 60px;
+}
+
+.assets-catalog-asset.smart-item .smart-item-badge {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  width: 24px;
+  height: 24px;
+  bottom: 4px;
+  right: 4px;
+  background-color: var(--smart-item-icon-bg-color);
+}

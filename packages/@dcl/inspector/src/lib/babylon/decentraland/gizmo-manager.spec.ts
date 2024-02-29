@@ -27,7 +27,8 @@ describe('GizmoManager', () => {
     )
     context.operations = {
       updateValue: jest.fn(),
-      dispatch: jest.fn()
+      dispatch: jest.fn(),
+      getSelectedEntities: jest.fn(() => [])
     } as unknown as Operations
   })
   describe('When creating a new gizmo manager', () => {
@@ -158,7 +159,12 @@ describe('GizmoManager', () => {
     })
     describe('When getting the gizmo types', () => {
       it('should return the gizmo types', () => {
-        expect(gizmos.getGizmoTypes()).toEqual([GizmoType.POSITION, GizmoType.ROTATION, GizmoType.SCALE])
+        expect(gizmos.getGizmoTypes()).toEqual([
+          GizmoType.POSITION,
+          GizmoType.ROTATION,
+          GizmoType.SCALE,
+          GizmoType.FREE
+        ])
       })
     })
     describe('When setting the gizmo type', () => {

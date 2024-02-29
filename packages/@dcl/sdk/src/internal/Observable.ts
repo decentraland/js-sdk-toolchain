@@ -2,6 +2,7 @@
 /**
  * A class serves as a medium between the observable and its observers
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed
+ * @public
  */
 export class ObserverEventState {
   /**
@@ -61,6 +62,7 @@ export class ObserverEventState {
 /**
  * Represent an Observer registered to a given Observable object.
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed
+ * @public
  */
 export class Observer<T> {
   /**
@@ -101,6 +103,7 @@ export class Observer<T> {
  * For instance you may have a given Observable that have four different types of notifications: Move (mask = 0x01), Stop (mask = 0x02), Turn Right (mask = 0X04), Turn Left (mask = 0X08).
  * A given observer can register itself with only Move and Stop (mask = 0x03), then it will only be notified when one of these two occurs and will never be for Turn Left/Right.
  *
+ * @public
  * @deprecated This function is an inheritance of ECS6, it's here temporary for the feature parity, please read the news and docs to know how handle when it's removed
  */
 export class Observable<T> {

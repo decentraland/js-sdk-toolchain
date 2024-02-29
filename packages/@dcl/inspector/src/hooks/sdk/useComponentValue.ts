@@ -49,7 +49,7 @@ export const useComponentValue = <ComponentValueType>(entity: Entity, component:
       if (entity === event.entity && component.componentId === event.component?.componentId && !!event.value) {
         if (event.operation === CrdtMessageType.PUT_COMPONENT) {
           // TODO: This setValue is generating a isEqual comparission.
-          // Maybe we have to use two two pure functions instead of an effect.
+          // Maybe we have to use two pure functions instead of an effect.
           // Same happens with the input & componentValue.
           setValue(event.value)
         } else {

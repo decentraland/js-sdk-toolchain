@@ -271,6 +271,19 @@ describe('UiTransform React Ecs', () => {
       marginBottomUnit: YGUnit.YGU_POINT
     })
 
+    margin = '1% 100% 4vw 3px'
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      marginTop: 1,
+      marginLeft: 3,
+      marginRight: 100,
+      marginBottom: 4,
+      marginTopUnit: YGUnit.YGU_PERCENT,
+      marginLeftUnit: YGUnit.YGU_POINT,
+      marginRightUnit: YGUnit.YGU_PERCENT,
+      marginBottomUnit: YGUnit.YGU_POINT
+    })
+
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     margin = {}

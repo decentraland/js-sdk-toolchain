@@ -1,4 +1,4 @@
-import { memo, useCallback, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import cx from 'classnames'
 import { VscQuestion as QuestionIcon } from 'react-icons/vsc'
 import { AiOutlineInfoCircle as InfoIcon } from 'react-icons/ai'
@@ -7,7 +7,8 @@ import { Popup } from 'decentraland-ui/dist/components/Popup/Popup'
 import { Props } from './types'
 import './InfoTooltip.css'
 
-export default memo<Props>(({ text, link, trigger, type = 'info', onOpen, onClose, ...rest }) => {
+// TODO: Fix tooltip re-opening each scroll with hideOnScroll={true}
+const InfoTooltip: React.FC<Props> = ({ className, text, link, trigger, type = 'info', onOpen, onClose, ...rest }) => {
   const [isHovered, setIsHovered] = useState(false)
 
   const handleOpen = useCallback(
@@ -37,22 +38,28 @@ export default memo<Props>(({ text, link, trigger, type = 'info', onOpen, onClos
     }
   }, [type])
 
+  const renderTrigger = useCallback(() => {
+    return <span className={cx('InfoTooltipTrigger', { hovered: isHovered })}>{trigger ?? renderIconTrigger()}</span>
+  }, [trigger, isHovered, renderIconTrigger])
+
+  const renderContent = useCallback(() => {
+    return (
+      <>
+        {text}{' '}
+        {link ? (
+          <a href={link} target="_blank">
+            Learn more
+          </a>
+        ) : null}
+      </>
+    )
+  }, [text, link])
+
   return (
     <Popup
-      className="InfoTooltip"
-      content={
-        <>
-          {text}{' '}
-          {link ? (
-            <a href={link} target="_blank">
-              Learn more
-            </a>
-          ) : null}
-        </>
-      }
-      trigger={
-        <span className={cx('InfoTooltipTrigger', { hovered: isHovered })}>{trigger ?? renderIconTrigger()}</span>
-      }
+      className={cx('InfoTooltip', className)}
+      content={renderContent()}
+      trigger={renderTrigger()}
       position="right center"
       on="hover"
       hideOnScroll
@@ -62,4 +69,6 @@ export default memo<Props>(({ text, link, trigger, type = 'info', onOpen, onClos
       {...rest}
     />
   )
-})
+}
+
+export default React.memo(InfoTooltip)

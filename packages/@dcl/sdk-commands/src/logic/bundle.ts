@@ -54,8 +54,22 @@ function getEntrypointCode(entrypointPath: string, forceCustomExport: boolean) {
   return `// BEGIN AUTO GENERATED CODE "~sdk/scene-entrypoint"
 "use strict";
 import * as entrypoint from '${unixEntrypointPath}'
-import { engine } from '@dcl/sdk/ecs'
+import { engine, NetworkEntity } from '@dcl/sdk/ecs'
 import * as sdk from '@dcl/sdk'
+import { compositeProvider } from '@dcl/sdk/composite-provider'
+import { compositeFromLoader } from '~sdk/all-composites'
+
+// conditionally load networking code if the NetworkEntity component is being used...
+for (const path in compositeFromLoader) {
+  const composite = compositeProvider.getCompositeOrNull(path)
+  if (composite) {
+    const { components } = composite.composite
+    const hasNetworkEntity = components.find(($) => $.name === NetworkEntity.componentName)
+    if (hasNetworkEntity) {
+      import('@dcl/sdk/network')
+    }
+  }
+}
 
 if ((entrypoint as any).main !== undefined) {
   function _INTERNAL_startup_system() {
@@ -141,7 +155,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
     target: 'es2020',
     external: ['~system/*', '@dcl/inspector', '@dcl/inspector/*' /* ban importing the inspector from the SDK */],
     // convert filesystem paths into file:// to enable VSCode debugger
-    sourceRoot: pathToFileURL(path.dirname(options.outputFile)).toString(),
+    sourceRoot: options.production ? 'dcl:///' : pathToFileURL(path.dirname(options.outputFile)).toString(),
     define: {
       document: 'undefined',
       window: 'undefined',

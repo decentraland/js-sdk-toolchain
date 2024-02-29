@@ -3,7 +3,8 @@
     "esModuleInterop": true,
     "declaration": true,
     "stripInternal": true,
-    "outDir": "."
+    "outDir": ".",
+    "removeComments": false
   },
   "include": ["src"],
   "exclude": ["dist"],

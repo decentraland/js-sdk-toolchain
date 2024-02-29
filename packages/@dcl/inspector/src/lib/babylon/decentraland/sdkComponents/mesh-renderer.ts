@@ -50,8 +50,9 @@ export const putMeshRendererComponent: ComponentOperation = (entity, component) 
     }
 
     if (mesh) {
-      entity.meshRenderer = mesh
-      entity.meshRenderer.parent = entity
+      mesh.parent = entity
+      entity.setMeshRenderer(mesh)
+      entity.generateBoundingBox()
     }
 
     // make the renderer interactable only if the entity is Pickable

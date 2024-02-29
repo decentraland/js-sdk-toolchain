@@ -25,11 +25,13 @@ const Dropdown: React.FC<Props> = (props) => {
     searchable,
     value,
     multiple,
+    trigger,
     onChange,
     placeholder = ''
   } = props
   const [showOptions, setShowOptions] = useState(false)
   const [isFocused, setFocus] = useState(false)
+  const isField = useMemo(() => !trigger, [trigger])
 
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -57,7 +59,8 @@ const Dropdown: React.FC<Props> = (props) => {
   const handleRemoveOption = useCallback(
     (e: any, option: Partial<OptionProp>) => {
       if (option !== undefined) {
-        const optionValue = (value as any[]).filter((v) => v !== option.value)
+        const values = typeof value === 'string' ? value.split(',') : (value as any[])
+        const optionValue = values.filter((v) => v !== option.value)
         onChange &&
           onChange({
             ...e,
@@ -81,12 +84,13 @@ const Dropdown: React.FC<Props> = (props) => {
 
   const minWidth = useMemo(() => {
     if (options.length > 0) {
+      const horizontalPadding = 16
       const iconWidth = ICON_SIZE + 4
       const selectedIconWidth = iconWidth
       let leftIconWidth = 0
       let rightIconWidth = 0
       const _minWidth = options.reduce((width, option) => {
-        const label = option.label ?? option.value?.toString() ?? ''
+        const label = option.label ?? option.value?.toString() ?? option.header ?? ''
         const labelWidth = label.length * FONT_SIZE * FONT_WEIGHT
         leftIconWidth = Math.max(leftIconWidth, option.leftIcon ? iconWidth : 0)
         rightIconWidth = Math.max(rightIconWidth, option.rightIcon ? iconWidth : 0)
@@ -94,14 +98,14 @@ const Dropdown: React.FC<Props> = (props) => {
       }, 0)
 
       // To calculate the option's max width, we need to substract the drop icon width, the horizontal padding and the left and right icon width
-      const horizontalPadding = 16
-      const maxWidth = containerSize.width
-        ? containerSize.width - (iconWidth + leftIconWidth + rightIconWidth + horizontalPadding)
-        : Number.MAX_SAFE_INTEGER
+      const maxWidth =
+        isField && containerSize.width
+          ? containerSize.width - (iconWidth + leftIconWidth + rightIconWidth + horizontalPadding)
+          : Number.MAX_SAFE_INTEGER
 
       return Math.min(_minWidth, maxWidth)
     }
-  }, [options, empty, containerSize])
+  }, [options, empty, containerSize, isField])
 
   const renderMessage = useCallback(() => {
     if (error) {
@@ -113,8 +117,21 @@ const Dropdown: React.FC<Props> = (props) => {
     return null
   }, [error, info])
 
+  const renderPlaceholder = useCallback(() => {
+    return selectedValue ? (
+      <SelectedOption
+        selectedValue={selectedValue}
+        minWidth={minWidth}
+        multiple={multiple}
+        onRemove={handleRemoveOption}
+      />
+    ) : (
+      <Option className="DropdownPlaceholder" value={placeholder} minWidth={minWidth} />
+    )
+  }, [selectedValue, placeholder, minWidth, multiple, handleRemoveOption])
+
   return (
-    <div className="Dropdown Field" ref={ref}>
+    <div className={cx('Dropdown', { Field: isField, Trigger: !!trigger })} ref={ref}>
       <Label text={label} />
       <div
         className={cx('DropdownContainer', className, {
@@ -125,16 +142,7 @@ const Dropdown: React.FC<Props> = (props) => {
         })}
         onClick={handleClick}
       >
-        {selectedValue ? (
-          <SelectedOption
-            selectedValue={selectedValue}
-            minWidth={minWidth}
-            multiple={multiple}
-            onRemove={handleRemoveOption}
-          />
-        ) : (
-          <Option className="DropdownPlaceholder" value={placeholder} minWidth={minWidth} />
-        )}
+        {isField ? renderPlaceholder() : trigger}
         {showOptions ? (
           <OptionList
             options={options}
@@ -142,11 +150,14 @@ const Dropdown: React.FC<Props> = (props) => {
             selectedValue={selectedValue}
             multiple={multiple}
             onChange={onChange}
+            isField={isField}
           />
         ) : null}
-        <div className="DropIcon">
-          <DownArrowIcon size={ICON_SIZE} />
-        </div>
+        {isField && (
+          <div className="DropIcon">
+            <DownArrowIcon size={ICON_SIZE} />
+          </div>
+        )}
       </div>
       {renderMessage()}
     </div>

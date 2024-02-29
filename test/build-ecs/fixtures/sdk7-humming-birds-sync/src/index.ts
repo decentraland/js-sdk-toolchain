@@ -6,10 +6,8 @@ import {
   GltfContainer,
   InputAction,
   pointerEventsSystem,
-  Schemas,
   Transform
 } from '@dcl/sdk/ecs'
-import { syncEntity } from '@dcl/sdk/network'
 import { getUserData } from '~system/UserIdentity'
 
 import { createHummingBird, moveHummingBirds, shootBirds } from './hummingBird'
@@ -18,19 +16,10 @@ import { createMovingPlatforms } from './moving-platforms'
 import { cubeSystem, createCube } from './create-cube'
 import { SyncEntities } from './sync-enum'
 
-export const GameStatus = engine.defineComponent('game-status', { paused: Schemas.Boolean })
-
-function gameStatusServer() {
-  const gameEntity = engine.addEntity()
-  GameStatus.create(gameEntity, { paused: false })
-  syncEntity(gameEntity, [GameStatus.componentId], SyncEntities.GAME_STATUS)
-}
-
 export async function main() {
   const userId = (await getUserData({})).data?.userId ?? ''
   setupUi(userId)
   engine.addSystem(moveHummingBirds)
-  // gameStatusServer()
   createMovingPlatforms()
 
   engine.addSystem(cubeSystem)

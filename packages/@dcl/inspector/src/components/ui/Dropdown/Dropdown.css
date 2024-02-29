@@ -4,16 +4,16 @@
 
 .Dropdown {
   --drop-icon-width: 16px;
+  display: flex;
+  flex-direction: column;
 }
 
 .Dropdown.Field {
-  display: flex;
-  flex-direction: column;
   flex: 1;
   width: 100%;
 }
 
-.Dropdown.Field .DropdownContainer {
+.Dropdown .DropdownContainer {
   display: flex;
   align-items: center;
   position: relative;
