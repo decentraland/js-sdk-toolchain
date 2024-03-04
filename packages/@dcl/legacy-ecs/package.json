@@ -4,7 +4,6 @@
   "description": "Decentraland ECS Legacy",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "type": "module",
   "scripts": {
     "watch": "tsc -p tsconfig.json --watch",
     "build": "tsc -p tsconfig.json",
@@ -17,7 +16,7 @@
     "dist"
   ],
   "dependencies": {
-    "@dcl/ecs-math": "1.1.0",
+    "@dcl/ecs-math": "^1.0.1-20211130194043.commit-c994f71",
     "@dcl/posix": "^1.0.4"
   }
 }
