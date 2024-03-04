@@ -1,4 +1,11 @@
-import { Vector3, Quaternion, Matrix, Color3, Color4 } from '@dcl/ecs-math'
+import {
+  Vector3,
+  Quaternion,
+  Matrix,
+  MathTmp,
+  Color3,
+  Color4
+} from '@dcl/ecs-math'
 
 import {
   Component,
@@ -154,10 +161,7 @@ export class Transform extends ObservableComponent {
    * @public
    * Rotates the transform so the forward vector points at target's current position.
    */
-  lookAt(
-    target: Vector3,
-    worldUp: Vector3 = Vector3.Up() as Readonly<Vector3>
-  ) {
+  lookAt(target: Vector3, worldUp: Vector3 = MathTmp.staticUp) {
     const result = new Matrix()
     Matrix.LookAtLHToRef(this.position, target, worldUp, result)
     result.invert()
@@ -1067,7 +1071,7 @@ export class OnAnimationEnd extends OnUUIDEvent<'onAnimationEnd'> {
 }
 
 /**
- * @public
+ * @internal
  */
 @Component('engine.smartItem', CLASS_ID.SMART_ITEM)
 export class SmartItem extends ObservableComponent {}

@@ -9,9 +9,9 @@ declare let console: any
  */
 export function log(...args: any[]) {
   if (typeof dcl !== 'undefined') {
-    dcl.log(...(args as any))
+    dcl.log(...args)
   } else {
-    console.log('DEBUG:', ...(args as any))
+    console.log('DEBUG:', ...args)
   }
 }
 

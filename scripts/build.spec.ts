@@ -89,7 +89,7 @@ flow('build-all', () => {
 
 function copyLegacyEcs() {
   it('copy legacy ecs iife to decentraland-ecs', () => {
-    const filesToCopy = ['index.js', 'index.min.js']
+    const filesToCopy = ['index.js', 'index.min.js', 'index.min.js.map']
     for (const file of filesToCopy) {
       const filePath = ensureFileExists(`dist/${file}`, LEGACY_ECS_PATH)
       copyFile(filePath, `${ECS_PATH}/dist/src/${file}`)

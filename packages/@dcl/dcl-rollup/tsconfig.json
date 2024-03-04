@@ -4,7 +4,9 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "pretty": true,
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "strictNullChecks": true,
