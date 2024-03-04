@@ -55,7 +55,7 @@ describe('build command', () => {
     try {
       await build.main({ args: { _: [], '--skip-install': true }, components })
     } catch (_) {}
-    expect(needsDependenciesSpy).toBeCalledWith(components, process.cwd())
+    expect(needsDependenciesSpy).not.toBeCalled()
     expect(installDependenciesSpy).not.toBeCalled()
   })
 
