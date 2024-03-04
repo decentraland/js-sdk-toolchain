@@ -5,6 +5,7 @@ export type Props = Omit<TextFieldProps, 'accept' | 'type' | 'onDrop'> & {
   accept?: string[]
   isEnabledFileExplorer?: boolean
   onDrop?: (path: string) => void | Promise<void>
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
   isValidFile?: (node: TreeNode) => boolean
   showPreview?: boolean
 }
