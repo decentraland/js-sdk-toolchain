@@ -2,6 +2,7 @@ import path from 'path'
 import { CliComponents } from '../components'
 import { readStringConfig } from '../components/config'
 import { readJson } from './fs'
+import { getPackageJson } from './project-files'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { version: sdkCommandsVersion } = require('../../package.json')
@@ -14,6 +15,33 @@ export async function getSdkCommandsVersion() {
 }
 
 /**
+ * Returns the installed version of a certain package that lives inside another package in the current working directory.
+ * Returns undefined if the package is not installed.
+ */
+export async function getInstalledPackageVersionInsidePackage(
+  components: Pick<CliComponents, 'fs'>,
+  packageName: string,
+  packageRootName: string,
+  workingDirectory: string
+) {
+  try {
+    const packagePath = path.dirname(
+      require.resolve(`${packageRootName}/package.json`, {
+        paths: [workingDirectory]
+      })
+    )
+    const packageJson = await getPackageJson(components, packagePath)
+
+    const version =
+      (packageJson.dependencies && packageJson.dependencies[packageName]) ||
+      (packageJson.devDependencies && packageJson.devDependencies[packageName])
+
+    return version ?? undefined
+  } catch (e) {
+    return 'unknown'
+  }
+}
+/**
  * Returns the installed version of a certain package in the current working directory.
  * Returns "unknown" if the package is not installed.
  */
@@ -23,12 +51,12 @@ export async function getInstalledPackageVersion(
   workingDirectory: string
 ) {
   try {
-    const sdkPath = path.dirname(
+    const packagePath = path.dirname(
       require.resolve(`${packageName}/package.json`, {
         paths: [workingDirectory]
       })
     )
-    const packageJson = await readJson<{ version: string }>(components, path.resolve(sdkPath, 'package.json'))
+    const packageJson = await readJson<{ version: string }>(components, path.resolve(packagePath, 'package.json'))
 
     return packageJson.version ?? /* istanbul ignore next */ 'unknown'
   } catch (e) {

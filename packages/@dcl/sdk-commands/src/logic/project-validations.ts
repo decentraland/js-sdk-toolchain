@@ -2,10 +2,10 @@ import { Scene } from '@dcl/schemas'
 import path from 'path'
 import { CliComponents } from '../components'
 import { colors } from '../components/log'
-import { printProgressInfo } from './beautiful-logs'
+import { printProgressInfo, printSuccess, printWarning } from './beautiful-logs'
 import { CliError } from './error'
 import { getSceneFilePath, getValidSceneJson } from './scene-validations'
-import { getInstalledPackageVersion } from './config'
+import { getInstalledPackageVersion, getInstalledPackageVersionInsidePackage } from './config'
 import { getSmartWearableFile, getValidWearableJson } from './portable-experience-sw-validations'
 import { getPackageJson } from './project-files'
 
@@ -74,6 +74,29 @@ export async function installDependencies(
   printProgressInfo(components.logger, colors.white('✅ Installing dependencies...'))
 }
 
+/*
+ * Runs "npm install" for desired project
+ */
+export async function installAssetPack(
+  components: Pick<CliComponents, 'logger' | 'spawner' | 'fs'>,
+  workingDirectory: string
+): Promise<void> {
+  const assetPack = '@dcl/asset-packs' as const
+  let assetPackVersion: string = ''
+  try {
+    assetPackVersion = await getInstalledPackageVersionInsidePackage(
+      components,
+      assetPack,
+      '@dcl/inspector',
+      workingDirectory
+    )
+    await components.spawner.exec(workingDirectory, npmBin, ['install', `${assetPack}@${assetPackVersion}`, '-D'])
+    printSuccess(components.logger, `${assetPack}@${assetPackVersion} installed`, '')
+  } catch (e: any) {
+    printWarning(components.logger, `Failed to install ${assetPack}@${assetPackVersion}' \n ${e.message}`)
+  }
+}
+
 /**
  * Run NPM commands
  */
@@ -106,15 +129,25 @@ export async function npmCommand(
 export async function startValidations(components: Pick<CliComponents, 'spawner' | 'fs' | 'logger'>, cwd: string) {
   try {
     const sdkVersion = await getInstalledPackageVersion(components, '@dcl/sdk', cwd)
-    // Ignore relative or s3 versions
-    if (sdkVersion.startsWith('https://') || sdkVersion.startsWith('file://') || sdkVersion === '7.0.0') return
     const packageJsonPath = path.resolve(cwd, 'package.json')
 
     if (!(await components.fs.fileExists(packageJsonPath))) {
       return
     }
-
     const packageJson = await getPackageJson(components, cwd)
+
+    // Ignore relative or s3 versions
+    const sdkPackageVersion =
+      (packageJson.dependencies && packageJson.dependencies['@dcl/sdk']) ||
+      (packageJson.devDependencies && packageJson.devDependencies['@dcl/sdk'])
+    if (
+      sdkPackageVersion?.startsWith('https://') ||
+      sdkPackageVersion?.startsWith('file://') ||
+      sdkPackageVersion === '7.0.0'
+    ) {
+      return
+    }
+
     if (
       packageJson.dependencies &&
       (packageJson.dependencies['@dcl/js-runtime'] || packageJson.dependencies['@dcl/sdk'])
@@ -128,7 +161,12 @@ export async function startValidations(components: Pick<CliComponents, 'spawner'
       packageJson.devDependencies['@dcl/js-runtime'] = sdkVersion
     }
     await components.fs.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf-8')
-  } catch (e) {
-    components.logger.error('Failed to run scene validations')
+  } catch (e: any) {
+    components.logger.error('Failed to run scene validations', e.message)
   }
+}
+
+// If there is a main.crdt file, its an editor scene. We need asset-packs package.
+export function isEditorScene(components: Pick<CliComponents, 'fs'>, workingDirectory: string) {
+  return components.fs.fileExists(path.resolve(workingDirectory, 'main.crdt'))
 }
