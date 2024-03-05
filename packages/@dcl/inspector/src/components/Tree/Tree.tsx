@@ -9,6 +9,7 @@ import { withContextMenu } from '../../hoc/withContextMenu'
 import { Input } from '../Input'
 import { ContextMenu } from './ContextMenu'
 import { ActionArea } from './ActionArea'
+import { Edit as EditInput } from './Edit'
 import { ClickType, DropType, calculateDropType } from './utils'
 
 import './Tree.css'
@@ -230,7 +231,7 @@ export function Tree<T>() {
               </div>
             </div>
             {editMode && typeof label === 'string' && (
-              <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />
+              <EditInput value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />
             )}
           </div>
           <TreeChildren {...props} />

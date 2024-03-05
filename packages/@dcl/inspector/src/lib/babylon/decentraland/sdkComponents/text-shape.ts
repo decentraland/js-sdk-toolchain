@@ -61,7 +61,7 @@ function createTextBlock(value: PBTextShape) {
 
   tb.text = value.text
   tb.fontFamily = FONTS[value.font ?? 0].label
-  tb.fontSize = (value.fontSize ?? 0) * 2
+  tb.fontSize = (value.fontSize ?? 0) * 3
   tb.width = `${value.width ?? 0}px`
   tb.height = `${value.height ?? 0}px`
   tb.textHorizontalAlignment = getAlignment(horizontalLabel)

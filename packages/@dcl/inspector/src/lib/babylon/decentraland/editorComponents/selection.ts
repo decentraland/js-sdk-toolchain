@@ -30,7 +30,7 @@ export const putEntitySelectedComponent: ComponentOperation = (entity, component
         if (!scene.activeCamera) return
         for (const mesh of highlightedMeshes) {
           const distance = Vector3.Distance(scene.activeCamera.position, mesh.position)
-          mesh.outlineWidth = distance / 500
+          mesh.outlineWidth = distance / 700
         }
       })
       addedCameraObservable = true

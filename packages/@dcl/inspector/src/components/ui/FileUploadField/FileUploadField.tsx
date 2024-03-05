@@ -36,6 +36,7 @@ const FileUploadField: React.FC<Props> = ({
   error,
   label,
   onDrop,
+  onChange,
   isValidFile,
   accept = EXTENSIONS
 }) => {
@@ -144,9 +145,11 @@ const FileUploadField: React.FC<Props> = ({
   )
 
   const handleChangeTextField = useCallback(
-    ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { value } = event.target
       if (value && isValidFileName(value)) {
         setPath(addBase(value))
+        onChange && onChange(event)
         setDropError(false)
       } else {
         setDropError(true)

@@ -31,5 +31,5 @@
 
 .Button.danger:hover,
 .Button.danger.active {
-  background-color: var(--primary-main-darker);
+  background-color: var(--primary-dark);
 }

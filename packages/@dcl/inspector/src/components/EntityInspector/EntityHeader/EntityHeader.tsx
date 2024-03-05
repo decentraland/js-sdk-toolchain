@@ -200,7 +200,7 @@ export default React.memo(
         },
         {
           id: sdk.components.PointerEvents.componentId,
-          value: 'Pointer Eventers',
+          value: 'Pointer Events',
           onClick: () =>
             handleAddComponent(sdk.components.PointerEvents.componentId, sdk.components.PointerEvents.componentName),
           tooltip: {
