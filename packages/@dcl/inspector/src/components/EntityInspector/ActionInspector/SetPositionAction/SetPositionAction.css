@@ -1,0 +1,10 @@
+.SetPositionActionContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  width: 100%;
+}
+
+.SetPositionActionContainer .Block {
+  width: 100%;
+}

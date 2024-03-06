@@ -81,6 +81,15 @@ export function getDefaultPayload(type: string) {
         action: ''
       })
     }
+    case ActionType.FOLLOW_PLAYER: {
+      return getJson<ActionType.FOLLOW_PLAYER>({
+        speed: 1,
+        x: true,
+        y: true,
+        z: true,
+        minDistance: 0.5
+      })
+    }
     default: {
       return '{}'
     }

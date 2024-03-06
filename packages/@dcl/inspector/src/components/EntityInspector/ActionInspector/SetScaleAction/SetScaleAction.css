@@ -1,0 +1,10 @@
+.SetScaleActionContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  width: 100%;
+}
+
+.SetScaleActionContainer .Block {
+  width: 100%;
+}

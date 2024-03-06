@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { VscTrash as RemoveIcon } from 'react-icons/vsc'
 import { AvatarAnchorPointType } from '@dcl/ecs'
@@ -52,6 +53,11 @@ import { getDefaultPayload, getPartialPayload, isStates } from './utils'
 import { Props } from './types'
 
 import './ActionInspector.css'
+import { FollowPlayerAction } from './FollowPlayerAction'
+import TriggerProximityAction from './TriggerProximityAction/TriggerProximityAction'
+import SetPositionAction from './SetPositionAction/SetPositionAction'
+import { SetRotationAction } from './SetRotationAction'
+import { SetScaleAction } from './SetScaleAction'
 
 const ActionMapOption: Record<string, string> = {
   [ActionType.PLAY_ANIMATION]: 'Play Animation',
@@ -84,7 +90,20 @@ const ActionMapOption: Record<string, string> = {
   [ActionType.CLONE_ENTITY]: 'Clone',
   [ActionType.REMOVE_ENTITY]: 'Remove',
   [ActionType.SHOW_IMAGE]: 'Show Image',
-  [ActionType.HIDE_IMAGE]: 'Hide Image'
+  [ActionType.HIDE_IMAGE]: 'Hide Image',
+  [ActionType.FOLLOW_PLAYER]: 'Follow Player',
+  [ActionType.STOP_FOLLOWING_PLAYER]: 'Stop Following Player',
+  [ActionType.MOVE_PLAYER_HERE]: 'Move Player Here',
+  [ActionType.TRIGGER_PROXIMITY]: 'Trigger Proximity',
+  [ActionType.PLACE_ON_PLAYER]: 'Place On Player',
+  [ActionType.ROTATE_AS_PLAYER]: 'Rotate As Player',
+  [ActionType.PLACE_ON_CAMERA]: 'Place On Camera',
+  [ActionType.ROTATE_AS_CAMERA]: 'Rotate As Camera',
+  [ActionType.SET_POSITION]: 'Set Position',
+  [ActionType.SET_ROTATION]: 'Set Rotation',
+  [ActionType.SET_SCALE]: 'Set Scale',
+  [ActionType.RANDOM]: 'Random Action',
+  [ActionType.BATCH]: 'Batch Actions'
 }
 
 export default withSdk<Props>(({ sdk, entity: entityId }) => {
@@ -488,6 +507,56 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     [modifyAction, actions]
   )
 
+  const handleChangeFollowPlayer = useCallback(
+    (value: ActionPayload<ActionType.FOLLOW_PLAYER>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.FOLLOW_PLAYER>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangeTriggerProximity = useCallback(
+    (value: ActionPayload<ActionType.TRIGGER_PROXIMITY>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.TRIGGER_PROXIMITY>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleSetPosition = useCallback(
+    (value: ActionPayload<ActionType.SET_POSITION>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.SET_POSITION>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleSetRotation = useCallback(
+    (value: ActionPayload<ActionType.SET_ROTATION>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.SET_ROTATION>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleSetScale = useCallback(
+    (value: ActionPayload<ActionType.SET_SCALE>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.SET_SCALE>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
   const handleFocusInput = useCallback(
     ({ type }: React.FocusEvent<HTMLInputElement>) => {
       if (type === 'focus') {
@@ -714,6 +783,41 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
           />
         )
       }
+      case ActionType.FOLLOW_PLAYER:
+        return (
+          <FollowPlayerAction
+            value={getPartialPayload<ActionType.FOLLOW_PLAYER>(action)}
+            onUpdate={(e) => handleChangeFollowPlayer(e, idx)}
+          />
+        )
+      case ActionType.TRIGGER_PROXIMITY:
+        return (
+          <TriggerProximityAction
+            value={getPartialPayload<ActionType.TRIGGER_PROXIMITY>(action)}
+            onUpdate={(e) => handleChangeTriggerProximity(e, idx)}
+          />
+        )
+      case ActionType.SET_POSITION:
+        return (
+          <SetPositionAction
+            value={getPartialPayload<ActionType.SET_POSITION>(action)}
+            onUpdate={(e) => handleSetPosition(e, idx)}
+          />
+        )
+      case ActionType.SET_ROTATION:
+        return (
+          <SetRotationAction
+            value={getPartialPayload<ActionType.SET_ROTATION>(action)}
+            onUpdate={(e) => handleSetRotation(e, idx)}
+          />
+        )
+      case ActionType.SET_SCALE:
+        return (
+          <SetScaleAction
+            value={getPartialPayload<ActionType.SET_SCALE>(action)}
+            onUpdate={(e) => handleSetScale(e, idx)}
+          />
+        )
       default: {
         // TODO: handle generic schemas with something like <JsonSchemaField/>
         return null

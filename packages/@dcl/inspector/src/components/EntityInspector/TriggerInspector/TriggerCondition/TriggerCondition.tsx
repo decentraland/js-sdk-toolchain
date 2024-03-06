@@ -9,7 +9,11 @@ import { Button } from '../../../Button'
 import { AddButton } from '../../AddButton'
 import MoreOptionsMenu from '../../MoreOptionsMenu'
 import { Dropdown, EntityField, TextField } from '../../../ui'
-import { counterConditionTypeOptions, statesConditionTypeOptions } from '../TriggerInspector'
+import {
+  counterConditionTypeOptions,
+  statesConditionTypeOptions,
+  actionsConditionTypeOptions
+} from '../TriggerInspector'
 import type { Props } from './types'
 import './TriggerCondition.css'
 
@@ -68,7 +72,7 @@ export const TriggerConditionContainer = ({
     [conditions, modifyCondition]
   )
 
-  const handleChangeSelectValue = useCallback(
+  const handleChangeInputValue = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>, idx: number) => {
       modifyCondition(idx, {
         ...conditions[idx],
@@ -122,11 +126,12 @@ export const TriggerConditionContainer = ({
         const isDisabled = conditionOptions.length === 0
         const isStatesCondition = statesConditionTypeOptions.some(($) => $.value === condition.type)
         const isCounterCondition = counterConditionTypeOptions.some(($) => $.value === condition.type)
+        const isActionCondition = actionsConditionTypeOptions.some(($) => $.value === condition.type)
         return (
           <div className="TriggerCondition" key={`trigger-condition-${idx}`}>
             <div className="Fields">
               <EntityField
-                components={[sdk?.components.States, sdk?.components.Counter] as Component[]}
+                components={[sdk?.components.States, sdk?.components.Counter, sdk?.components.Actions] as Component[]}
                 value={entity}
                 onChange={(e) => handleChangeEntity(e, idx)}
               />
@@ -145,14 +150,21 @@ export const TriggerConditionContainer = ({
                   disabled={isDisabled}
                   options={stateOptions.length > 0 ? [...stateOptions] : []}
                   value={condition.value}
-                  onChange={(e) => handleChangeSelectValue(e, idx)}
+                  onChange={(e) => handleChangeInputValue(e, idx)}
                 />
               )}
               {isCounterCondition && (
                 <TextField
                   disabled={isDisabled}
                   value={condition.value}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeSelectValue(e, idx)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInputValue(e, idx)}
+                />
+              )}
+              {isActionCondition && (
+                <TextField
+                  disabled={isDisabled}
+                  value={condition.value}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInputValue(e, idx)}
                 />
               )}
             </div>
