@@ -9,6 +9,7 @@ import { Result } from 'arg'
 import { installDependencies, needsDependencies } from '../../logic/project-validations'
 import { ScaffoldedProject, existScaffoldedProject, getScaffoldedProjectUrl, scaffoldedProjectOptions } from './repos'
 import { createPxSceneJson } from './project'
+import { downloadSubfolder } from './download-github-subfolder'
 
 export interface Options {
   args: Result<typeof args>
@@ -21,7 +22,8 @@ export const args = declareArgs({
   '--dir': String,
   '--skip-install': Boolean,
   '--template': String,
-  '--project': String
+  '--project': String,
+  '--github-repo': String
 })
 
 export function help(options: Options) {
@@ -33,6 +35,7 @@ export function help(options: Options) {
       --dir                     Path to directory to init
       --skip-install            Skip installing dependencies
       --template                URL to template to init
+      --github-repo             URL to github repository
       --project                 Project to init (opts: ${scaffoldedProjectOptions().join(', ')})
 
     Example:
@@ -47,6 +50,7 @@ export async function main(options: Options) {
   const yes = options.args['--yes']
   const requestedTemplateZipUrl = options.args['--template']
   const requestedProjectTemplate = options.args['--project']
+  const githubRepo = options.args['--github-repo']
 
   if (!isEmpty && !yes) {
     throw new CliError('The target directory specified is not empty. Run this command with --yes to override.')
@@ -66,12 +70,15 @@ export async function main(options: Options) {
 
   // download and extract template project
   const projectTemplate = (requestedProjectTemplate as ScaffoldedProject) || 'scene-template'
-  const url = requestedTemplateZipUrl || getScaffoldedProjectUrl(projectTemplate)
+  const url = githubRepo || requestedTemplateZipUrl || getScaffoldedProjectUrl(projectTemplate)
 
-  await downloadAndUnzipUrlContainFolder(url, dir, options)
-
-  // replace scene.json for portable experience template...
-  if (projectTemplate === 'px-template') await createPxSceneJson(dir, options.components.fs)
+  if (githubRepo) {
+    await downloadSubfolder(options.components, githubRepo, dir)
+  } else {
+    await downloadAndUnzipUrlContainFolder(url, dir, options)
+    // replace scene.json for portable experience template...
+    if (projectTemplate === 'px-template') await createPxSceneJson(dir, options.components.fs)
+  }
 
   // npm install
   const shouldInstallDeps = await needsDependencies(options.components, dir)
@@ -79,7 +86,7 @@ export async function main(options: Options) {
     await installDependencies(options.components, dir)
   }
   options.components.analytics.track('Scene created', {
-    projectType: requestedTemplateZipUrl ? 'custom-template-url' : projectTemplate,
+    projectType: githubRepo ? 'github-repo' : requestedTemplateZipUrl ? 'custom-template-url' : projectTemplate,
     url
   })
 }
