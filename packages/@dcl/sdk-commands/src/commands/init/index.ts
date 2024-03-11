@@ -9,7 +9,7 @@ import { Result } from 'arg'
 import { installDependencies, needsDependencies } from '../../logic/project-validations'
 import { ScaffoldedProject, existScaffoldedProject, getScaffoldedProjectUrl, scaffoldedProjectOptions } from './repos'
 import { createPxSceneJson } from './project'
-import { downloadSubfolder } from './download-github-subfolder'
+import { downloadGithubFolder } from './download-github-folder'
 
 export interface Options {
   args: Result<typeof args>
@@ -73,7 +73,7 @@ export async function main(options: Options) {
   const url = githubRepo || requestedTemplateZipUrl || getScaffoldedProjectUrl(projectTemplate)
 
   if (githubRepo) {
-    await downloadSubfolder(options.components, githubRepo, dir)
+    await downloadGithubFolder(options.components, githubRepo, dir)
   } else {
     await downloadAndUnzipUrlContainFolder(url, dir, options)
     // replace scene.json for portable experience template...

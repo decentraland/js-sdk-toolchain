@@ -38,7 +38,7 @@ function parseGitHubUrl(githubUrl: string) {
   throw new Error("URL doesn't match the expected GitHub format.")
 }
 
-export async function downloadSubfolder(
+export async function downloadGithubFolder(
   components: Pick<CliComponents, 'fs' | 'logger' | 'fetch'>,
   githubUrl: string,
   destination: string
@@ -64,7 +64,7 @@ export async function downloadSubfolder(
           }
           const nextUrl = `https://github.com/${owner}/${repo}/tree/${branch}/${file.path}`
 
-          await downloadSubfolder(components, nextUrl, filePath)
+          await downloadGithubFolder(components, nextUrl, filePath)
         }
       }
     } else {
