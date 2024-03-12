@@ -21,7 +21,8 @@ export const SMART_ITEM_COMPONENTS: string[] = [
   ComponentName.STATES,
   ComponentName.ACTIONS,
   ComponentName.TRIGGERS,
-  ComponentName.COUNTER
+  ComponentName.COUNTER,
+  ComponentName.COUNTER_BAR
 ]
 
 export const ROOT_COMPONENTS: Record<Entity, string[]> = {

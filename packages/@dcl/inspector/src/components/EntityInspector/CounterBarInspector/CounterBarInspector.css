@@ -1,0 +1,8 @@
+.CounterBarInspector.Container {
+  height: auto;
+}
+
+.CounterBarInspector .content .Text.Field {
+  margin-top: 8px;
+  width: 100%;
+}
