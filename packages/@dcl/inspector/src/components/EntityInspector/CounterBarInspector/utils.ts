@@ -2,13 +2,11 @@ import { CounterBar } from '@dcl/asset-packs'
 import { CounterBarInput } from './types'
 
 export function fromCounterBar(counter: CounterBar): CounterBarInput {
-  const from = {
+  return {
     primaryColor: counter.primaryColor || '#00FF00',
     secondaryColor: counter.secondaryColor || '#FF0000',
-    maxValue: counter.maxValue ? counter.maxValue.toString() : ''
+    maxValue: counter.maxValue ? counter.maxValue.toString() : '10'
   }
-  console.log('from', from)
-  return from
 }
 
 export function toCounterBar(input: CounterBarInput): CounterBar {
