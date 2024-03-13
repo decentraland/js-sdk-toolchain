@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import React, { useCallback, useEffect, useState } from 'react'
-import { ActionPayload, ActionType } from '@dcl/asset-packs'
+import { ActionPayload, ActionType, ProximityLayer } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
-import { TextField } from '../../../ui'
+import { Dropdown, TextField } from '../../../ui'
 import type { Props } from './types'
 
 import './TriggerProximityAction.css'
@@ -13,13 +13,27 @@ function isValid(
   return typeof payload.radius === 'number' && !isNaN(payload.radius)
 }
 
+const LayerOptions = [
+  {
+    value: ProximityLayer.ALL,
+    label: 'All'
+  },
+  {
+    value: ProximityLayer.PLAYER,
+    label: 'Player'
+  },
+  {
+    value: ProximityLayer.NON_PLAYER,
+    label: 'Non Player'
+  }
+]
+
 const TriggerProximityAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
   const [payload, setPayload] = useState<Partial<ActionPayload<ActionType.TRIGGER_PROXIMITY>>>({
     ...value
   })
 
   useEffect(() => {
-    console.log('payload', payload)
     if (!recursiveCheck(payload, value, 3) || !isValid(payload)) return
     onUpdate(payload)
   }, [payload, onUpdate])
@@ -31,14 +45,40 @@ const TriggerProximityAction: React.FC<Props> = ({ value, onUpdate }: Props) => 
     [payload, setPayload]
   )
 
+  const handleChangeHits = useCallback(
+    ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
+      setPayload({ ...payload, hits: parseInt(value) })
+    },
+    [payload, setPayload]
+  )
+
+  const handleChangeLayer = useCallback(
+    ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
+      setPayload({ ...payload, layer: value as ProximityLayer })
+    },
+    [payload, setPayload]
+  )
+
   return (
     <div className="TriggerProximityActionContainer">
       <div className="row">
         <TextField
           label="Radius"
-          type="text"
+          type="number"
           value={payload.radius}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeRadius(e)}
+        />
+        <TextField
+          label="Hits"
+          type="number"
+          value={payload.hits || 1}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeHits(e)}
+        />
+        <Dropdown
+          label="Layer"
+          options={LayerOptions}
+          value={payload.layer || ProximityLayer.ALL}
+          onChange={handleChangeLayer}
         />
       </div>
     </div>
