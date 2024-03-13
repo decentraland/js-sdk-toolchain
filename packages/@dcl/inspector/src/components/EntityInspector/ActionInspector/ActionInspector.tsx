@@ -58,6 +58,8 @@ import TriggerProximityAction from './TriggerProximityAction/TriggerProximityAct
 import SetPositionAction from './SetPositionAction/SetPositionAction'
 import { SetRotationAction } from './SetRotationAction'
 import { SetScaleAction } from './SetScaleAction'
+import { RandomAction } from './RandomAction'
+import { BatchAction } from './BatchAction'
 
 const ActionMapOption: Record<string, string> = {
   [ActionType.PLAY_ANIMATION]: 'Play Animation',
@@ -94,7 +96,7 @@ const ActionMapOption: Record<string, string> = {
   [ActionType.FOLLOW_PLAYER]: 'Follow Player',
   [ActionType.STOP_FOLLOWING_PLAYER]: 'Stop Following Player',
   [ActionType.MOVE_PLAYER_HERE]: 'Move Player Here',
-  [ActionType.TRIGGER_PROXIMITY]: 'Trigger Proximity',
+  [ActionType.TRIGGER_PROXIMITY]: 'Damage',
   [ActionType.PLACE_ON_PLAYER]: 'Place On Player',
   [ActionType.ROTATE_AS_PLAYER]: 'Rotate As Player',
   [ActionType.PLACE_ON_CAMERA]: 'Place On Camera',
@@ -569,6 +571,16 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     [modifyAction, actions]
   )
 
+  const handleChangeActions = useCallback(
+    (value: ActionPayload<ActionType.RANDOM | ActionType.BATCH>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.RANDOM | ActionType.BATCH>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
   const handleFocusInput = useCallback(
     ({ type }: React.FocusEvent<HTMLInputElement>) => {
       if (type === 'focus') {
@@ -856,6 +868,22 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
           <SetScaleAction
             value={getPartialPayload<ActionType.SET_SCALE>(action)}
             onUpdate={(e) => handleSetScale(e, idx)}
+          />
+        )
+      case ActionType.RANDOM:
+        return (
+          <RandomAction
+            value={getPartialPayload<ActionType.RANDOM>(action)}
+            availableActions={actions}
+            onUpdate={(e) => handleChangeActions(e, idx)}
+          />
+        )
+      case ActionType.BATCH:
+        return (
+          <BatchAction
+            value={getPartialPayload<ActionType.BATCH>(action)}
+            availableActions={actions}
+            onUpdate={(e) => handleChangeActions(e, idx)}
           />
         )
       default: {
