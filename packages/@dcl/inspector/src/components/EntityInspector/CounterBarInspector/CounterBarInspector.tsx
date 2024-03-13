@@ -12,18 +12,23 @@ import { TextField, InfoTooltip, ColorField } from '../../ui'
 import { Props } from './types'
 
 import './CounterBarInspector.css'
+import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
+import { fromCounterBar, toCounterBar, isValidInput } from './utils'
+import { Block } from '../../Block'
 
 export default withSdk<Props>(({ sdk, entity }) => {
   const { CounterBar } = sdk.components
 
-  const hasCounter = useHasComponent(entity, CounterBar)
+  const { getInputProps } = useComponentInput(entity, CounterBar, fromCounterBar, toCounterBar, isValidInput)
+
+  const hasCounterBar = useHasComponent(entity, CounterBar)
 
   const handleRemove = useCallback(async () => {
     sdk.operations.removeComponent(entity, CounterBar)
     await sdk.operations.dispatch()
   }, [sdk])
 
-  if (!hasCounter || entity === ROOT) {
+  if (!hasCounterBar || entity === ROOT) {
     return null
   }
 
@@ -40,7 +45,13 @@ export default withSdk<Props>(({ sdk, entity }) => {
       }
       onRemoveContainer={handleRemove}
     >
-      {/* <TextField leftLabel="Value" type="number" {...getInputProps('value')} /> */}
+      <TextField label="Max Value" type="number" {...getInputProps('maxValue')} />
+      <Block>
+        <ColorField label="Primary Color" {...getInputProps('primaryColor')} />
+      </Block>
+      <Block>
+        <ColorField label="Secondary Color" {...getInputProps('secondaryColor')} />
+      </Block>
     </Container>
   )
 })

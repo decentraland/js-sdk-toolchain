@@ -5,5 +5,7 @@ export interface Props {
 }
 
 export type CounterBarInput = {
-  value: string
+  primaryColor: string
+  secondaryColor: string
+  maxValue: string
 }
