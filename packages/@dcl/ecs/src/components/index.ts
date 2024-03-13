@@ -1,6 +1,7 @@
 import { GrowOnlyValueSetComponentDefinition, LastWriteWinElementSetComponentDefinition } from '../engine/component'
 import { IEngine } from '../engine/types'
 import { AnimatorComponentDefinitionExtended, defineAnimatorComponent } from './extended/Animator'
+import { AudioSourceComponentDefinitionExtended, defineAudioSourceComponent } from './extended/AudioSource'
 import { defineMaterialComponent, MaterialComponentDefinitionExtended } from './extended/Material'
 import { defineMeshColliderComponent, MeshColliderComponentDefinitionExtended } from './extended/MeshCollider'
 import { defineMeshRendererComponent, MeshRendererComponentDefinitionExtended } from './extended/MeshRenderer'
@@ -31,6 +32,10 @@ export const Material: LwwComponentGetter<MaterialComponentDefinitionExtended> =
 /* @__PURE__ */
 export const Animator: LwwComponentGetter<AnimatorComponentDefinitionExtended> = (engine) =>
   defineAnimatorComponent(engine)
+
+/* @__PURE__ */
+export const AudioSource: LwwComponentGetter<AudioSourceComponentDefinitionExtended> = (engine) =>
+  defineAudioSourceComponent(engine)
 
 /* @__PURE__ */
 export const MeshRenderer: LwwComponentGetter<MeshRendererComponentDefinitionExtended> = (engine) =>
