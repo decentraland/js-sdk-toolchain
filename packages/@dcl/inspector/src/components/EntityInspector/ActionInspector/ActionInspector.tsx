@@ -360,6 +360,18 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     [modifyAction, actions]
   )
 
+  const handleChangeAmount = useCallback(
+    ({ target: { value } }: React.ChangeEvent<HTMLInputElement>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.INCREMENT_COUNTER | ActionType.DECREASE_COUNTER>({
+          amount: parseInt(value)
+        })
+      })
+    },
+    [modifyAction, actions]
+  )
+
   const handleChangeAnchorPoint = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
       modifyAction(idx, {
@@ -642,6 +654,34 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
                 type="number"
                 value={getPartialPayload<ActionType.SET_COUNTER>(action)?.counter}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeCounter(e, idx)}
+              />
+            </div>
+          </div>
+        ) : null
+      }
+      case ActionType.INCREMENT_COUNTER: {
+        return hasCounter ? (
+          <div className="row">
+            <div className="field">
+              <TextField
+                label="Amount"
+                type="number"
+                value={getPartialPayload<ActionType.INCREMENT_COUNTER>(action)?.amount}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeAmount(e, idx)}
+              />
+            </div>
+          </div>
+        ) : null
+      }
+      case ActionType.DECREASE_COUNTER: {
+        return hasCounter ? (
+          <div className="row">
+            <div className="field">
+              <TextField
+                label="Amount"
+                type="number"
+                value={getPartialPayload<ActionType.DECREASE_COUNTER>(action)?.amount}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeAmount(e, idx)}
               />
             </div>
           </div>

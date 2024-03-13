@@ -90,6 +90,16 @@ export function getDefaultPayload(type: string) {
         minDistance: 0.5
       })
     }
+    case ActionType.INCREMENT_COUNTER: {
+      return getJson<ActionType.INCREMENT_COUNTER>({
+        amount: 1
+      })
+    }
+    case ActionType.DECREASE_COUNTER: {
+      return getJson<ActionType.DECREASE_COUNTER>({
+        amount: 1
+      })
+    }
     default: {
       return '{}'
     }
