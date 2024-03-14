@@ -27,7 +27,8 @@ const TriggerMapOption: Record<string, string> = {
   [TriggerType.ON_GLOBAL_CLICK]: 'On Global Click',
   [TriggerType.ON_GLOBAL_PRIMARY]: 'On Global Primary',
   [TriggerType.ON_GLOBAL_SECONDARY]: 'On Global Secondary',
-  [TriggerType.ON_TICK]: 'On Tick'
+  [TriggerType.ON_TICK]: 'On Tick',
+  [TriggerType.ON_HEAL_PLAYER]: 'On Heal Player'
 }
 
 export const TriggerEvent = ({

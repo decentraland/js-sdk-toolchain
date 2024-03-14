@@ -105,7 +105,8 @@ const ActionMapOption: Record<string, string> = {
   [ActionType.SET_ROTATION]: 'Set Rotation',
   [ActionType.SET_SCALE]: 'Set Scale',
   [ActionType.RANDOM]: 'Random Action',
-  [ActionType.BATCH]: 'Batch Actions'
+  [ActionType.BATCH]: 'Batch Actions',
+  [ActionType.HEAL_PLAYER]: 'Heal Player'
 }
 
 export default withSdk<Props>(({ sdk, entity: entityId }) => {
@@ -612,6 +613,16 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     [modifyAction, actions]
   )
 
+  const creataHandler = <T extends ActionType>(getPayload: (value: string) => ActionPayload<T>, idx: number) => {
+    const handler = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<T>(getPayload(value))
+      })
+    }
+    return handler
+  }
+
   const handleRemoveAction = useCallback(
     (_e: React.MouseEvent, idx: number) => {
       removeAction(idx)
@@ -886,6 +897,20 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
             onUpdate={(e) => handleChangeActions(e, idx)}
           />
         )
+      case ActionType.HEAL_PLAYER: {
+        return (
+          <div className="row">
+            <div className="field">
+              <TextField
+                label="Multiplier"
+                type="number"
+                value={getPartialPayload<ActionType.HEAL_PLAYER>(action)?.multiplier || 1}
+                onChange={creataHandler<ActionType.HEAL_PLAYER>((value) => ({ multiplier: parseInt(value) }), idx)}
+              />
+            </div>
+          </div>
+        )
+      }
       default: {
         // TODO: handle generic schemas with something like <JsonSchemaField/>
         return null

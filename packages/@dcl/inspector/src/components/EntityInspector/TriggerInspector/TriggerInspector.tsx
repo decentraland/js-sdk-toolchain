@@ -127,7 +127,8 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
       TriggerType.ON_GLOBAL_CLICK,
       TriggerType.ON_GLOBAL_PRIMARY,
       TriggerType.ON_GLOBAL_SECONDARY,
-      TriggerType.ON_TICK
+      TriggerType.ON_TICK,
+      TriggerType.ON_HEAL_PLAYER
     ]
     if (hasStates) {
       triggerTypes.push(TriggerType.ON_STATE_CHANGE)
