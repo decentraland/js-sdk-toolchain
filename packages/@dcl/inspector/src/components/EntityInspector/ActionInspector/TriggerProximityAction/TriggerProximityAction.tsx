@@ -7,9 +7,7 @@ import type { Props } from './types'
 
 import './TriggerProximityAction.css'
 
-function isValid(
-  payload: Partial<ActionPayload<ActionType.TRIGGER_PROXIMITY>>
-): payload is ActionPayload<ActionType.TRIGGER_PROXIMITY> {
+function isValid(payload: Partial<ActionPayload<ActionType.DAMAGE>>): payload is ActionPayload<ActionType.DAMAGE> {
   return typeof payload.radius === 'number' && !isNaN(payload.radius)
 }
 
@@ -29,7 +27,7 @@ const LayerOptions = [
 ]
 
 const TriggerProximityAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
-  const [payload, setPayload] = useState<Partial<ActionPayload<ActionType.TRIGGER_PROXIMITY>>>({
+  const [payload, setPayload] = useState<Partial<ActionPayload<ActionType.DAMAGE>>>({
     ...value
   })
 

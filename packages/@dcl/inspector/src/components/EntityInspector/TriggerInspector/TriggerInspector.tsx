@@ -123,7 +123,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
       TriggerType.ON_LOOP,
       TriggerType.ON_CLONE,
       TriggerType.ON_CLICK_IMAGE,
-      TriggerType.ON_PROXIMITY,
+      TriggerType.ON_DAMAGE,
       TriggerType.ON_GLOBAL_CLICK,
       TriggerType.ON_GLOBAL_PRIMARY,
       TriggerType.ON_GLOBAL_SECONDARY,

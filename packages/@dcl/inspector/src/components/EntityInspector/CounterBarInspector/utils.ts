@@ -5,7 +5,7 @@ export function fromCounterBar(counter: CounterBar): CounterBarInput {
   return {
     primaryColor: counter.primaryColor || '#00FF00',
     secondaryColor: counter.secondaryColor || '#FF0000',
-    maxValue: counter.maxValue ? counter.maxValue.toString() : '10'
+    maxValue: counter.maxValue ? counter.maxValue.toString() : '100'
   }
 }
 

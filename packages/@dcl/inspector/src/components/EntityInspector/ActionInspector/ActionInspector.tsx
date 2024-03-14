@@ -96,7 +96,7 @@ const ActionMapOption: Record<string, string> = {
   [ActionType.FOLLOW_PLAYER]: 'Follow Player',
   [ActionType.STOP_FOLLOWING_PLAYER]: 'Stop Following Player',
   [ActionType.MOVE_PLAYER_HERE]: 'Move Player Here',
-  [ActionType.TRIGGER_PROXIMITY]: 'Damage',
+  [ActionType.DAMAGE]: 'Damage',
   [ActionType.PLACE_ON_PLAYER]: 'Place On Player',
   [ActionType.ROTATE_AS_PLAYER]: 'Rotate As Player',
   [ActionType.PLACE_ON_CAMERA]: 'Place On Camera',
@@ -532,10 +532,10 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
   )
 
   const handleChangeTriggerProximity = useCallback(
-    (value: ActionPayload<ActionType.TRIGGER_PROXIMITY>, idx: number) => {
+    (value: ActionPayload<ActionType.DAMAGE>, idx: number) => {
       modifyAction(idx, {
         ...actions[idx],
-        jsonPayload: getJson<ActionType.TRIGGER_PROXIMITY>(value)
+        jsonPayload: getJson<ActionType.DAMAGE>(value)
       })
     },
     [modifyAction, actions]
@@ -842,10 +842,10 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
             onUpdate={(e) => handleChangeFollowPlayer(e, idx)}
           />
         )
-      case ActionType.TRIGGER_PROXIMITY:
+      case ActionType.DAMAGE:
         return (
           <TriggerProximityAction
-            value={getPartialPayload<ActionType.TRIGGER_PROXIMITY>(action)}
+            value={getPartialPayload<ActionType.DAMAGE>(action)}
             onUpdate={(e) => handleChangeTriggerProximity(e, idx)}
           />
         )
