@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { ActionPayload, ActionType } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
-import { TextField } from '../../../ui'
+import { CheckboxField, TextField } from '../../../ui'
 import type { Props } from './types'
 import { Block } from '../../../Block'
 
@@ -58,28 +58,45 @@ const SetRotationAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
     [payload, setPayload]
   )
 
+  const handleChangeRelative = useCallback(
+    ({ target: { checked } }: React.ChangeEvent<HTMLInputElement>) => {
+      setPayload({ ...payload, relative: checked })
+    },
+    [payload, setPayload]
+  )
+
   return (
     <div className="SetRotationActionContainer">
-      <Block label="Position">
-        <TextField
-          leftLabel="X"
-          type="number"
-          value={payload.x}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeX(e)}
-        />
-        <TextField
-          leftLabel="Y"
-          type="number"
-          value={payload.y}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeY(e)}
-        />
-        <TextField
-          leftLabel="Z"
-          type="number"
-          value={payload.z}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeZ(e)}
-        />
-      </Block>
+      <div className="row">
+        <Block label="Rotation">
+          <TextField
+            leftLabel="X"
+            type="number"
+            value={payload.x}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeX(e)}
+          />
+          <TextField
+            leftLabel="Y"
+            type="number"
+            value={payload.y}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeY(e)}
+          />
+          <TextField
+            leftLabel="Z"
+            type="number"
+            value={payload.z}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeZ(e)}
+          />
+        </Block>
+      </div>
+      <div className="row">
+        <Block label="Relative">
+          <CheckboxField
+            checked={payload.relative}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeRelative(e)}
+          />
+        </Block>
+      </div>
     </div>
   )
 }
