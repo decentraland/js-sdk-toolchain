@@ -25,7 +25,6 @@ const FollowPlayerAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
   })
 
   useEffect(() => {
-    console.log('payload', payload)
     if (!recursiveCheck(payload, value, 3) || !isValid(payload)) return
     onUpdate(payload)
   }, [payload, onUpdate])

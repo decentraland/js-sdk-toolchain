@@ -106,17 +106,32 @@ export function addAsset(engine: IEngine) {
             const actions = values.get(componentName) as Actions
             const newValue: Actions['value'] = []
             for (const action of actions.value) {
-              if (action.type === ActionType.PLAY_SOUND) {
-                const payload = getPayload<ActionType.PLAY_SOUND>(action)
-                newValue.push({
-                  ...action,
-                  jsonPayload: getJson<ActionType.PLAY_SOUND>({
-                    ...payload,
-                    src: payload.src.replace('{assetPath}', base)
+              switch (action.type) {
+                case ActionType.PLAY_SOUND: {
+                  const payload = getPayload<ActionType.PLAY_SOUND>(action)
+                  newValue.push({
+                    ...action,
+                    jsonPayload: getJson<ActionType.PLAY_SOUND>({
+                      ...payload,
+                      src: payload.src.replace('{assetPath}', base)
+                    })
                   })
-                })
-              } else {
-                newValue.push(action)
+                  break
+                }
+                case ActionType.PLAY_CUSTOM_EMOTE: {
+                  const payload = getPayload<ActionType.PLAY_CUSTOM_EMOTE>(action)
+                  newValue.push({
+                    ...action,
+                    jsonPayload: getJson<ActionType.PLAY_CUSTOM_EMOTE>({
+                      ...payload,
+                      src: payload.src.replace('{assetPath}', base)
+                    })
+                  })
+                  break
+                }
+                default:
+                  newValue.push(action)
+                  break
               }
             }
             values.set(componentName, { ...actions, value: newValue })
