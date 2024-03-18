@@ -51,8 +51,8 @@ describe('duplicateEntity', () => {
       { entity: ROOT, children: [original, originalChild, duplicate] },
       { entity: original, children: [originalChild] },
       { entity: originalChild, children: [] },
-      { entity: duplicateChild, children: [] },
-      { entity: duplicate, children: [duplicateChild] }
+      { entity: duplicate, children: [duplicateChild] },
+      { entity: duplicateChild, children: [] }
     ]
 
     expect(duplicateChild).not.toBe(null)

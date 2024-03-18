@@ -44,6 +44,11 @@ export const counterConditionTypeOptions = [
   { value: TriggerConditionType.WHEN_COUNTER_IS_LESS_THAN, text: 'counter is less than' }
 ]
 
+export const actionsConditionTypeOptions = [
+  { value: TriggerConditionType.WHEN_DISTANCE_TO_PLAYER_LESS_THAN, text: 'distance to player is less than' },
+  { value: TriggerConditionType.WHEN_DISTANCE_TO_PLAYER_GREATER_THAN, text: 'distance to player is greater than' }
+]
+
 export default withSdk<Props>(({ sdk, entity: entityId }) => {
   const { Actions, Triggers, Name, States, Counter, GltfContainer } = sdk.components
   const entitiesWithAction: Entity[] = useEntitiesWith((components) => components.Actions)
@@ -117,7 +122,13 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
       TriggerType.ON_DELAY,
       TriggerType.ON_LOOP,
       TriggerType.ON_CLONE,
-      TriggerType.ON_CLICK_IMAGE
+      TriggerType.ON_CLICK_IMAGE,
+      TriggerType.ON_DAMAGE,
+      TriggerType.ON_GLOBAL_CLICK,
+      TriggerType.ON_GLOBAL_PRIMARY,
+      TriggerType.ON_GLOBAL_SECONDARY,
+      TriggerType.ON_TICK,
+      TriggerType.ON_HEAL_PLAYER
     ]
     if (hasStates) {
       triggerTypes.push(TriggerType.ON_STATE_CHANGE)
@@ -141,9 +152,9 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
   }, [entitiesWithStates])
 
   const availableConditions = useMemo(() => {
-    const entities = Array.from(new Set<Entity>([...entitiesWithStates, ...entitiesWithCounter])).filter(
-      (entity) => entity !== 0
-    )
+    const entities = Array.from(
+      new Set<Entity>([...entitiesWithStates, ...entitiesWithCounter, ...entitiesWithAction])
+    ).filter((entity) => entity !== 0)
     const result = new Map<
       Entity,
       {
@@ -171,6 +182,12 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
       if (Counter.has(entity)) {
         const { id } = Counter.get(entity)
         for (const option of counterConditionTypeOptions) {
+          entityConditions.conditions.push({ value: { id, type: option.value }, text: option.text })
+        }
+      }
+      if (Actions.has(entity)) {
+        for (const option of actionsConditionTypeOptions) {
+          const { id } = Actions.get(entity)
           entityConditions.conditions.push({ value: { id, type: option.value }, text: option.text })
         }
       }

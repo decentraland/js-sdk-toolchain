@@ -113,6 +113,7 @@ export type EditorComponentsTypes = {
   Counter: Counter
   Hide: { value: boolean }
   Lock: { value: boolean }
+  CounterBar: { primaryColor: string; secondaryColor: string; maxValue: number }
 }
 
 export type EditorComponents = {
@@ -127,6 +128,7 @@ export type EditorComponents = {
   States: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['States']>
   Hide: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Hide']>
   Lock: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Lock']>
+  CounterBar: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['CounterBar']>
 }
 
 export type SdkComponents = {
@@ -269,7 +271,7 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     )
   })
 
-  const { ActionTypes, Actions, Counter, Triggers, States } = createAssetPacksComponents(engine as any)
+  const { ActionTypes, Actions, Counter, Triggers, States, CounterBar } = createAssetPacksComponents(engine as any)
 
   const TransformConfig = engine.defineComponent(EditorComponentNames.TransformConfig, {
     porportionalScaling: Schemas.Optional(Schemas.Boolean)
@@ -296,6 +298,7 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     Actions: Actions as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Actions']>,
     Counter: Counter as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Counter']>,
     Triggers: Triggers as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Triggers']>,
-    States: States as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['States']>
+    States: States as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['States']>,
+    CounterBar: CounterBar as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['CounterBar']>
   }
 }

@@ -22,7 +22,13 @@ const TriggerMapOption: Record<string, string> = {
   [TriggerType.ON_DELAY]: 'On Delay',
   [TriggerType.ON_LOOP]: 'On Loop',
   [TriggerType.ON_CLONE]: 'On Clone',
-  [TriggerType.ON_CLICK_IMAGE]: 'On Click Image'
+  [TriggerType.ON_CLICK_IMAGE]: 'On Click Image',
+  [TriggerType.ON_DAMAGE]: 'On Damage',
+  [TriggerType.ON_GLOBAL_CLICK]: 'On Global Click',
+  [TriggerType.ON_GLOBAL_PRIMARY]: 'On Global Primary',
+  [TriggerType.ON_GLOBAL_SECONDARY]: 'On Global Secondary',
+  [TriggerType.ON_TICK]: 'On Tick',
+  [TriggerType.ON_HEAL_PLAYER]: 'On Heal Player'
 }
 
 export const TriggerEvent = ({

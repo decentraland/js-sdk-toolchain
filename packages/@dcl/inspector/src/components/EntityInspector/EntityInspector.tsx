@@ -25,6 +25,7 @@ import { AnimatorInspector } from './AnimatorInspector'
 import { PointerEventsInspector } from './PointerEventsInspector'
 import { SyncComponentsInspector } from './SyncComponentsInspector'
 import { EntityHeader } from './EntityHeader'
+import { CounterBarInspector } from './CounterBarInspector'
 
 import './EntityInspector.css'
 
@@ -52,7 +53,8 @@ export const EntityInspector = withSdk(({ sdk }) => {
       { name: sdk.components.NftShape.componentName, component: NftShapeInspector },
       { name: sdk.components.Animator.componentName, component: AnimatorInspector },
       { name: sdk.components.PointerEvents.componentName, component: PointerEventsInspector },
-      { name: sdk.components.SyncComponents.componentName, component: SyncComponentsInspector }
+      { name: sdk.components.SyncComponents.componentName, component: SyncComponentsInspector },
+      { name: sdk.components.CounterBar.componentName, component: CounterBarInspector }
     ],
     [sdk]
   )

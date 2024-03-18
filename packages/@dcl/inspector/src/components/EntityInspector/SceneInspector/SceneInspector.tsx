@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { useCallback, useEffect, useState } from 'react'
 import { RxBorderAll } from 'react-icons/rx'
 import { IoIosImage } from 'react-icons/io'

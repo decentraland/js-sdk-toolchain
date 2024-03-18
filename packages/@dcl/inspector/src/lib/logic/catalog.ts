@@ -22,7 +22,8 @@ export const CATEGORIES = [
   'appliances',
   'nature',
   'tiles',
-  'year of the pig'
+  'year of the pig',
+  'health'
 ]
 
 export type AssetPack = {
