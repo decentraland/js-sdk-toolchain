@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { VscTrash as RemoveIcon } from 'react-icons/vsc'
 import { AvatarAnchorPointType } from '@dcl/ecs'
@@ -49,10 +48,6 @@ import { DelayAction } from './DelayAction'
 import { LoopAction } from './LoopAction'
 import { CloneEntityAction } from './CloneEntityAction'
 import { ShowImageAction } from './ShowImageAction'
-import { getDefaultPayload, getPartialPayload, isStates } from './utils'
-import { Props } from './types'
-
-import './ActionInspector.css'
 import { FollowPlayerAction } from './FollowPlayerAction'
 import TriggerProximityAction from './TriggerProximityAction/TriggerProximityAction'
 import SetPositionAction from './SetPositionAction/SetPositionAction'
@@ -60,6 +55,10 @@ import { SetRotationAction } from './SetRotationAction'
 import { SetScaleAction } from './SetScaleAction'
 import { RandomAction } from './RandomAction'
 import { BatchAction } from './BatchAction'
+import { getDefaultPayload, getPartialPayload, isStates } from './utils'
+import { Props } from './types'
+
+import './ActionInspector.css'
 
 const ActionMapOption: Record<string, string> = {
   [ActionType.PLAY_ANIMATION]: 'Play Animation',
@@ -613,7 +612,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     [modifyAction, actions]
   )
 
-  const creataHandler = <T extends ActionType>(getPayload: (value: string) => ActionPayload<T>, idx: number) => {
+  const createHandler = <T extends ActionType>(getPayload: (value: string) => ActionPayload<T>, idx: number) => {
     const handler = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
       modifyAction(idx, {
         ...actions[idx],
@@ -905,7 +904,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
                 label="Multiplier"
                 type="number"
                 value={getPartialPayload<ActionType.HEAL_PLAYER>(action)?.multiplier || 1}
-                onChange={creataHandler<ActionType.HEAL_PLAYER>((value) => ({ multiplier: parseInt(value) }), idx)}
+                onChange={createHandler<ActionType.HEAL_PLAYER>((value) => ({ multiplier: parseInt(value) }), idx)}
               />
             </div>
           </div>

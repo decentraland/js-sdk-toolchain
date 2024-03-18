@@ -1,20 +1,16 @@
 import { useCallback } from 'react'
 
-// import { ComponentName } from '@dcl/asset-packs'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
-// import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
-// import { getComponentValue } from '../../../hooks/sdk/useComponentValue'
-import { ROOT } from '../../../lib/sdk/tree'
-import { withSdk } from '../../../hoc/withSdk'
+import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { Container } from '../../Container'
+import { Block } from '../../Block'
+import { withSdk } from '../../../hoc/withSdk'
+import { ROOT } from '../../../lib/sdk/tree'
+import { fromCounterBar, toCounterBar, isValidInput } from './utils'
 import { TextField, InfoTooltip, ColorField } from '../../ui'
-// import { fromCounter, isValidInput, toCounter } from './utils'
 import { Props } from './types'
 
 import './CounterBarInspector.css'
-import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
-import { fromCounterBar, toCounterBar, isValidInput } from './utils'
-import { Block } from '../../Block'
 
 export default withSdk<Props>(({ sdk, entity }) => {
   const { CounterBar } = sdk.components
