@@ -7,6 +7,9 @@ on:
     types:
       - created
 
+env: 
+  IS_A_PR: ${{ github.event.pull_request.number != 'null' && github.head_ref != 'protocol-squad' }}
+
 name: CI
 jobs:
   lint:
@@ -108,6 +111,13 @@ jobs:
       decentraland_js_runtime_s3_bucket_key: ${{ steps.publish_dcl_js_runtime.outputs.s3-bucket-key }}
       decentraland_ecs_bucket_key: ${{ steps.publish_ecs.outputs.s3-bucket-key }}
     steps:
+      - name: (PR) Check if it's a PR
+        if: ${{ env.IS_A_PR == 'true' }}
+        run: |
+          echo "run from a PR"
+          echo "from env '${{env.IS_A_PR}}'"
+          echo "- '${{github.event.pull_request.number}}'"
+          echo "- env '${{github.head_ref}}'"
       - uses: actions/checkout@master
       - uses: actions/setup-node@v3
         with:
@@ -145,6 +155,8 @@ jobs:
         uses: menduz/oddish-action@master
         with:
           registry-url: 'https://registry.npmjs.org'
+          custom-tag: protocol-squad
+          branch-to-custom-tag: protocol-squad
           access: public
           cwd: ./packages/@dcl/js-runtime
           ## use action runId instead of current date to generate snapshot numbers
@@ -156,6 +168,7 @@ jobs:
           s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/js-runtime'
         env:
+          BRANCH_NAME: ${{ github.head_ref }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
@@ -165,6 +178,8 @@ jobs:
         id: publish_ecs
         with:
           registry-url: 'https://registry.npmjs.org'
+          custom-tag: protocol-squad
+          branch-to-custom-tag: protocol-squad
           access: public
           cwd: ./packages/@dcl/ecs
           ## use action runId instead of current date to generate snapshot numbers
@@ -176,13 +191,14 @@ jobs:
           s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/ecs'
         env:
+          BRANCH_NAME: ${{ github.head_ref }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
       - name: (PR) change @dcl/react-ecs dependencies versions to point to s3 url
         working-directory: ./packages/@dcl/react-ecs
-        if: ${{ github.event.pull_request.number }}
+        if: ${{ env.IS_A_PR == 'true' }}
         run: |
           node -e "\
             let pkg=require('./package.json');\
@@ -197,6 +213,8 @@ jobs:
         uses: menduz/oddish-action@master
         with:
           registry-url: 'https://registry.npmjs.org'
+          custom-tag: protocol-squad
+          branch-to-custom-tag: protocol-squad
           access: public
           cwd: ./packages/@dcl/react-ecs
           ## use action runId instead of current date to generate snapshot numbers
@@ -208,6 +226,7 @@ jobs:
           s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/react-ecs'
         env:
+          BRANCH_NAME: ${{ github.head_ref }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
@@ -217,6 +236,8 @@ jobs:
         id: publish_decentraland_inspector
         with:
           registry-url: 'https://registry.npmjs.org'
+          custom-tag: protocol-squad
+          branch-to-custom-tag: protocol-squad
           access: public
           cwd: ./packages/@dcl/inspector
           ## use action runId instead of current date to generate snapshot numbers
@@ -228,13 +249,14 @@ jobs:
           s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/inspector'
         env:
+          BRANCH_NAME: ${{ github.head_ref }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
       - name: (PR) change @dcl/sdk-commands dependencies versions to point to s3 url
         working-directory: ./packages/@dcl/sdk-commands
-        if: ${{ github.event.pull_request.number }}
+        if: ${{ env.IS_A_PR == 'true' }}
         run: |
           node -e "\
             let pkg=require('./package.json');\
@@ -251,6 +273,8 @@ jobs:
         id: publish_decentraland_sdk_commands
         with:
           registry-url: 'https://registry.npmjs.org'
+          custom-tag: protocol-squad
+          branch-to-custom-tag: protocol-squad
           access: public
           cwd: ./packages/@dcl/sdk-commands
           ## use action runId instead of current date to generate snapshot numbers
@@ -262,13 +286,14 @@ jobs:
           s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
         env:
+          BRANCH_NAME: ${{ github.head_ref }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
       - name: (PR) change @dcl/sdk version to s3 url
         working-directory: ./packages/@dcl/sdk
-        if: ${{ github.event.pull_request.number }}
+        if: ${{ env.IS_A_PR == 'true' }}
         run: |
           node -e "\
             let pkg=require('./package.json');\
@@ -292,6 +317,8 @@ jobs:
         id: publish_decentraland_sdk
         with:
           registry-url: 'https://registry.npmjs.org'
+          custom-tag: protocol-squad
+          branch-to-custom-tag: protocol-squad
           access: public
           cwd: ./packages/@dcl/sdk
           ## use action runId instead of current date to generate snapshot numbers
@@ -303,6 +330,7 @@ jobs:
           s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
         env:
+          BRANCH_NAME: ${{ github.head_ref }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
@@ -318,6 +346,8 @@ jobs:
         id: publish_playground_assets
         with:
           registry-url: 'https://registry.npmjs.org'
+          custom-tag: protocol-squad
+          branch-to-custom-tag: protocol-squad
           access: public
           cwd: ./packages/@dcl/playground-assets
           ## use action runId instead of current date to generate snapshot numbers
@@ -329,12 +359,13 @@ jobs:
           s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
           s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
         env:
+          BRANCH_NAME: ${{ github.head_ref }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
   notify_deployment:
     needs: [build]
-    if: ${{ github.event.pull_request.number }}
+    if: github.event.pull_request.number != 'null' && github.head_ref != 'protocol-squad'
     runs-on: ubuntu-latest
     name: Deployment Notification
     steps:
