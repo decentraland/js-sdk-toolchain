@@ -77,41 +77,37 @@ const FollowPlayerAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
 
   return (
     <div className="FollowPlayerActionContainer">
-      <div className="row">
-        <Block label="Speed">
-          <TextField
-            type="text"
-            value={payload.speed}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeSpeed(e)}
-          />
-        </Block>
-        <Block label="Min. Distance">
-          <TextField
-            type="text"
-            value={payload.minDistance}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeMinDistance(e)}
-          />
-        </Block>
-      </div>
-      <div className="row">
-        <Block label="Axes">
-          <CheckboxField
-            label="X"
-            checked={payload.x}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeX(e)}
-          />
-          <CheckboxField
-            label="Y"
-            checked={payload.y}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeY(e)}
-          />
-          <CheckboxField
-            label="Z"
-            checked={payload.z}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeZ(e)}
-          />
-        </Block>
-      </div>
+      <Block>
+        <TextField
+          label="Speed"
+          type="text"
+          value={payload.speed}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeSpeed(e)}
+        />
+        <TextField
+          label="Min. Distance"
+          type="text"
+          value={payload.minDistance}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeMinDistance(e)}
+        />
+      </Block>
+      <Block label="Axes">
+        <CheckboxField
+          label="X"
+          checked={payload.x}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeX(e)}
+        />
+        <CheckboxField
+          label="Y"
+          checked={payload.y}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeY(e)}
+        />
+        <CheckboxField
+          label="Z"
+          checked={payload.z}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeZ(e)}
+        />
+      </Block>
     </div>
   )
 }
