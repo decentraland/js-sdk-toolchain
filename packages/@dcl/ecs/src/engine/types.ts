@@ -78,6 +78,7 @@ export interface IEngineOptions {
  * @public
  */
 export interface IEngine {
+  _id: number
   /**
    * @public
    * Increment the used entity counter and return the next one.

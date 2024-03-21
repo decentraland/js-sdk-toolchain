@@ -1161,6 +1161,8 @@ export interface IEngine {
     // @alpha
     getEntityOrNullByName(label: string): Entity | null;
     getEntityState(entity: Entity): EntityState;
+    // (undocumented)
+    _id: number;
     readonly PlayerEntity: Entity;
     registerComponentDefinition<T>(componentName: string, componentDefinition: ComponentDefinition<T>): ComponentDefinition<T>;
     // (undocumented)
