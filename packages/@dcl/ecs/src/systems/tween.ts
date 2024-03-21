@@ -9,7 +9,7 @@ export type TweenSystem = {
 }
 
 /**
- * @internal
+ * @public
  * @returns tween helper to be used on the scene
  */
 export function createTweenSystem(engine: IEngine): TweenSystem {
