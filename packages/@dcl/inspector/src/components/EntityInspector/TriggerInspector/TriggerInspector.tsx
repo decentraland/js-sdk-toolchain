@@ -103,9 +103,9 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
   const availableActions: Map<number, { name: string; actions: Action[] }> = useMemo(() => {
     return entitiesWithAction?.reduce((actions, entityWithAction) => {
       const actionsComponentValue = getComponentValue(entityWithAction, Actions)
-      const name = Name.get(entityWithAction)
+      const name = Name.getOrNull(entityWithAction)?.value ?? entitiesWithAction.toString()
       if (actionsComponentValue.value.length > 0) {
-        actions.set(actionsComponentValue.id, { name: name.value, actions: actionsComponentValue.value as Action[] })
+        actions.set(actionsComponentValue.id, { name: name, actions: actionsComponentValue.value as Action[] })
       }
 
       return actions
@@ -142,9 +142,9 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
   const availableStates: Map<number, { name: string; states: States['value'] }> = useMemo(() => {
     return entitiesWithStates?.reduce((states, entityWithState) => {
       const statesComponentValue = getComponentValue(entityWithState, States)
-      const name = Name.get(entityWithState)
+      const name = Name.getOrNull(entityWithState)?.value ?? entityWithState.toString()
       if (statesComponentValue.value.length > 0) {
-        states.set(statesComponentValue.id, { name: name.value, states: (statesComponentValue as States).value })
+        states.set(statesComponentValue.id, { name: name, states: (statesComponentValue as States).value })
       }
 
       return states
@@ -164,7 +164,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     >()
 
     for (const entity of entities) {
-      const name = Name.getOrNull(entity)?.value || ''
+      const name = Name.getOrNull(entity)?.value ?? entity.toString()
       const entityConditions: {
         name: string
         conditions: { value: { id: number; type: TriggerConditionType }; text: string }[]
