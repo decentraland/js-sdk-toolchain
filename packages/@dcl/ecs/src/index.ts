@@ -10,6 +10,7 @@ export * from './systems/events'
 export * from './systems/raycast'
 export * from './systems/videoEvents'
 export * from './systems/async-task'
+export * from './systems/tween'
 export * from './engine/entity'
 export * from './components/types'
 

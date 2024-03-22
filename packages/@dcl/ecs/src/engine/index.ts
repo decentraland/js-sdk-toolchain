@@ -302,6 +302,7 @@ export function Engine(options?: IEngineOptions): IEngine {
   }
 
   return {
+    _id: Date.now(),
     addEntity: partialEngine.addEntity,
     removeEntity: partialEngine.removeEntity,
     removeEntityWithChildren: partialEngine.removeEntityWithChildren,
