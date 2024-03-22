@@ -36,7 +36,7 @@ describe('Init RPC Methods', () => {
     const methods = await initRpcMethods(mocked.fs, mocked.engine, mocked.callbackFunctions)
     expect(await methods.getInspectorPreferences({}, {} as any)).toMatchObject({
       freeCameraInvertRotation: false,
-      autosaveEnabled: false
+      autosaveEnabled: true
     })
   })
 

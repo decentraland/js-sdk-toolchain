@@ -48,13 +48,10 @@ export async function downloadGithubFolder(
 
   try {
     const data: any = await (await components.fetch.fetch(apiUrl)).json()
-    components.logger.log('[boedo]', { data })
 
     if (Array.isArray(data)) {
       for await (const file of data) {
         const filePath = path.join(destination, file.name)
-
-        components.logger.log(`Downloading ${file.path} to ${filePath}`)
 
         if (file.type === 'file') {
           await downloadFile(components, file.download_url, filePath)
