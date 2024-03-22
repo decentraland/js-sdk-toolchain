@@ -27,6 +27,7 @@ import { PointerEventsInspector } from './PointerEventsInspector'
 import { SyncComponentsInspector } from './SyncComponentsInspector'
 import { EntityHeader } from './EntityHeader'
 import { CounterBarInspector } from './CounterBarInspector'
+import { TweenInspector } from './TweenInspector'
 import { SmartItemBasicView } from './SmartItemBasicView'
 
 import './EntityInspector.css'
@@ -85,6 +86,7 @@ export const EntityInspector = withSdk(({ sdk }) => {
         name: sdk.components.TextShape.componentName,
         component: TextShapeInspector
       },
+      { name: sdk.components.Tween.componentName, component: TweenInspector },
       { sdkComponent: sdk.components.Actions, name: sdk.components.Actions.componentName, component: ActionInspector },
       {
         sdkComponent: sdk.components.Triggers,
