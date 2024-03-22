@@ -50,8 +50,16 @@ export namespace AppendValueOperation {
 // @public
 export function areConnected(parcels: Coords[]): boolean;
 
+// Warning: (ae-missing-release-tag) "AudioSource" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const AudioSource: LastWriteWinElementSetComponentDefinition<PBAudioSource>;
+export const AudioSource: AudioSourceComponentDefinitionExtended;
+
+// @public (undocumented)
+export interface AudioSourceComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBAudioSource> {
+    playSound(entity: Entity, src: string, resetCursor?: boolean): boolean;
+    stopSound(entity: Entity, resetCursor?: boolean): boolean;
+}
 
 // @public (undocumented)
 export const AudioStream: LastWriteWinElementSetComponentDefinition<PBAudioStream>;
@@ -2075,6 +2083,8 @@ export namespace PBAnimator {
 // @public (undocumented)
 export interface PBAudioSource {
     audioClipUrl: string;
+    currentTime?: number | undefined;
+    global?: boolean | undefined;
     loop?: boolean | undefined;
     pitch?: number | undefined;
     playing?: boolean | undefined;
