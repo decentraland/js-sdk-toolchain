@@ -193,7 +193,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
       }
     }
     return result
-  }, [entitiesWithStates, entitiesWithCounter, States, Counter])
+  }, [entitiesWithStates, entitiesWithCounter, Actions, States, Counter, Name])
 
   const handleRemove = useCallback(async () => {
     sdk.operations.removeComponent(entityId, Triggers)
