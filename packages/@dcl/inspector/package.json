@@ -2,7 +2,7 @@
   "name": "@dcl/inspector",
   "version": "0.1.0",
   "dependencies": {
-    "@dcl/asset-packs": "1.15.2",
+    "@dcl/asset-packs": "1.15.3-20240326191607.commit-d2d67d9",
     "ts-deepmerge": "^7.0.0"
   },
   "devDependencies": {
