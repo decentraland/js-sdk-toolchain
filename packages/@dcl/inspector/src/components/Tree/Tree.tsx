@@ -4,7 +4,6 @@ import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io'
 import cx from 'classnames'
 import { Entity } from '@dcl/ecs'
 
-import { ROOT } from '../../lib/sdk/tree'
 import { withContextMenu } from '../../hoc/withContextMenu'
 import { Input } from '../Input'
 import { ContextMenu } from './ContextMenu'
@@ -194,7 +193,7 @@ export function Tree<T>() {
       }
 
       const isEntity = useMemo(() => {
-        return typeof value !== 'string' && (value as Entity) !== ROOT
+        return typeof value !== 'string'
       }, [value])
 
       drag(drop(ref))
