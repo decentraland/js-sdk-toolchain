@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
+import { BsFillLightningChargeFill as SmartItemIcon } from 'react-icons/bs'
 import { withSdk } from '../../../hoc/withSdk'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { ConfigComponent } from '../../../lib/sdk/components'
@@ -41,6 +42,14 @@ const SmartItemBasicView = withSdk<Props>(({ sdk, entity }) => {
     [entity]
   )
 
+  const renderSmartItemIndicator = useCallback(() => {
+    return (
+      <div className="SmartItemBadge">
+        <SmartItemIcon size={12} />
+      </div>
+    )
+  }, [])
+
   if (!hasConfig) return null
 
   const config = useMemo(() => {
@@ -48,7 +57,12 @@ const SmartItemBasicView = withSdk<Props>(({ sdk, entity }) => {
   }, [entity])
 
   return (
-    <Container label={config.componentName} className="SmartItemBasicViewInspector" onRemoveContainer={handleRemove}>
+    <Container
+      label={config.componentName}
+      indicator={renderSmartItemIndicator()}
+      className="SmartItemBasicViewInspector"
+      onRemoveContainer={handleRemove}
+    >
       {config.fields.map((field, idx) => renderField(field, idx))}
     </Container>
   )
