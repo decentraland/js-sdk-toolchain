@@ -66,7 +66,11 @@ export default React.memo(
         const actionsComponentValue = getComponentValue(entityWithAction, Actions)
         const name = Name.getOrNull(entityWithAction)
         if (name && actionsComponentValue.value.length > 0) {
-          actions.set(actionsComponentValue.id, { name: name.value, actions: actionsComponentValue.value as Action[] })
+          const isBasicViewEnabled = Config.getOrNull(entityWithAction as Entity)?.isBasicViewEnabled === true
+          const _actions = actionsComponentValue.value.filter((action) =>
+            isBasicViewEnabled ? !!action.allowedInBasicView : true
+          ) as Action[]
+          actions.set(actionsComponentValue.id, { name: name.value, actions: _actions })
         }
         return actions
       }, new Map<number, { name: string; actions: Action[] }>())
@@ -139,16 +143,24 @@ export default React.memo(
         <Container label={field.name} border>
           <div className="TriggerActionContainer">
             {trigger.actions.map((action, idx) => {
-              if (!action.allowedInBasicView) return null
+              const actionId = action.id
               const actionEntity = getActionEntity(action)
               const isBasicViewEnabled = Config.getOrNull(actionEntity as Entity)?.isBasicViewEnabled === true
-              const actions = action.id
-                ? (
-                    availableActions
-                      .get(action.id)
-                      ?.actions.filter((_action) => (isBasicViewEnabled ? !!_action?.allowedInBasicView : true)) ?? []
-                  ).map(({ name }) => ({ value: name, label: name }))
+              if (
+                isBasicViewEnabled &&
+                actionId !== undefined &&
+                action.name !== '' &&
+                !availableActions.get(actionId)?.actions.find((_action) => _action.name === action.name)
+              )
+                return null
+
+              const actions = actionId
+                ? (availableActions.get(actionId)?.actions ?? []).map(({ name }) => ({
+                    value: name,
+                    label: name
+                  }))
                 : []
+
               return (
                 <div className="TriggerAction" key={`trigger-action-${idx}`}>
                   <div className="Fields">
