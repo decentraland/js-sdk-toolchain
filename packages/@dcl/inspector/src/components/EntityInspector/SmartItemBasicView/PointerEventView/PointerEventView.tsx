@@ -5,7 +5,7 @@ import { Block } from '../../../Block'
 import { TextField, Dropdown } from '../../../ui'
 import { useComponentValue } from '../../../../hooks/sdk/useComponentValue'
 import { useArrayState } from '../../../../hooks/useArrayState'
-import { POINTER_EVENTS_TYPES, mapValueToPointerEvent } from '../../PointerEventsInspector/utils'
+import { INPUT_ACTIONS, mapValueToInputAction } from '../../PointerEventsInspector/utils'
 
 export default React.memo(
   withSdk<WithSdkProps & { entity: Entity }>(({ sdk, entity }) => {
@@ -40,7 +40,10 @@ export default React.memo(
       ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
         modifyPointerEvent(0, {
           ...pointerEvents[0],
-          eventType: mapValueToPointerEvent(value)!
+          eventInfo: {
+            ...pointerEvents[0].eventInfo,
+            button: mapValueToInputAction(value)!
+          }
         })
       },
       [pointerEvents, modifyPointerEvent]
@@ -58,8 +61,8 @@ export default React.memo(
         <Block>
           <Dropdown
             label="Interaction"
-            value={pointerEvents[0]?.eventType}
-            options={POINTER_EVENTS_TYPES}
+            value={pointerEvents[0]?.eventInfo?.button}
+            options={INPUT_ACTIONS}
             onChange={handleHoverInteractionChange}
           />
         </Block>
