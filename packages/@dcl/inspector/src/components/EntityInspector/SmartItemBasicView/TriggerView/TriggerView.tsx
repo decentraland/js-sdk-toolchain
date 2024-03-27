@@ -1,13 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 import { Entity } from '@dcl/ecs'
-import {
-  Action,
-  Trigger,
-  TriggerAction,
-  TriggerCondition,
-  TriggerConditionOperation,
-  TriggerType
-} from '@dcl/asset-packs'
+import { Action, Trigger, TriggerAction, TriggerCondition } from '@dcl/asset-packs'
 import { WithSdkProps, withSdk } from '../../../../hoc/withSdk'
 import { getComponentValue, useComponentValue } from '../../../../hooks/sdk/useComponentValue'
 import { useComponentsWith } from '../../../../hooks/sdk/useComponentsWith'
@@ -26,9 +19,7 @@ export default React.memo(
     const [triggerComponent, setTriggerComponentValue, isTriggerComponentEqual] = useComponentValue<
       EditorComponentsTypes['Triggers']
     >(entity, Triggers)
-    const [triggers, addTrigger, modifyTrigger] = useArrayState<Trigger>(
-      triggerComponent === null ? [] : triggerComponent.value
-    )
+    const [triggers, , modifyTrigger] = useArrayState<Trigger>(triggerComponent === null ? [] : triggerComponent.value)
     const [_, getActionEntity, getActionValue] = useComponentsWith((components) => components.Actions)
     const entitiesWithAction: Entity[] = useEntitiesWith((components) => components.Actions)
 
@@ -65,25 +56,7 @@ export default React.memo(
     )
 
     useEffect(() => {
-      const trigger = getTrigger('trigger-when-clicked')
-      if (!trigger) {
-        addTrigger({
-          type: TriggerType.ON_CLICK,
-          conditions: [],
-          operation: TriggerConditionOperation.AND,
-          actions: [],
-          allowedInBasicView: true,
-          basicViewId: 'trigger-when-clicked'
-        })
-      }
-    }, [triggers, addTrigger, getTrigger])
-
-    useEffect(() => {
-      if (areValidTriggers(triggers)) {
-        if (isTriggerComponentEqual({ value: triggers })) {
-          return
-        }
-
+      if (areValidTriggers(triggers) && !isTriggerComponentEqual({ value: triggers })) {
         setTriggerComponentValue({ value: [...triggers] })
       }
     }, [triggers])
