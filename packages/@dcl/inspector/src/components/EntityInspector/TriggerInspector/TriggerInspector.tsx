@@ -116,6 +116,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     const triggerTypes: TriggerType[] = [
       TriggerType.ON_SPAWN,
       TriggerType.ON_CLICK,
+      TriggerType.ON_INPUT_ACTION,
       TriggerType.ON_PLAYER_ENTERS_AREA,
       TriggerType.ON_PLAYER_LEAVES_AREA,
       TriggerType.ON_TWEEN_END,
