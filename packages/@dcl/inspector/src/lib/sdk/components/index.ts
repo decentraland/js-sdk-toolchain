@@ -105,6 +105,7 @@ export type ConfigComponent = {
     jsonPayload?: string
     basicViewId?: string
   }[]
+  assetId?: string
 }
 
 export enum SceneCategory {
@@ -320,7 +321,8 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
         jsonPayload: Schemas.Optional(Schemas.String),
         basicViewId: Schemas.Optional(Schemas.String)
       })
-    )
+    ),
+    assetId: Schemas.Optional(Schemas.String)
   })
 
   return {
