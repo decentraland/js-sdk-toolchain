@@ -35,7 +35,9 @@ import './TriggerInspector.css'
 
 export const statesConditionTypeOptions = [
   { value: TriggerConditionType.WHEN_STATE_IS, text: 'state is' },
-  { value: TriggerConditionType.WHEN_STATE_IS_NOT, text: 'state is not' }
+  { value: TriggerConditionType.WHEN_STATE_IS_NOT, text: 'state is not' },
+  { value: TriggerConditionType.WHEN_PREVIOUS_STATE_IS, text: 'previous state is' },
+  { value: TriggerConditionType.WHEN_PREVIOUS_STATE_IS_NOT, text: 'previous state is not' }
 ]
 
 export const counterConditionTypeOptions = [
