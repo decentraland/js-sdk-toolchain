@@ -1,0 +1,44 @@
+.SmartItemBasicViewInspector {
+  /* Local vars */
+  --right-menu-width: 16px;
+}
+
+.SmartItemBasicViewInspector.Container .indicator {
+  align-self: center;
+}
+
+.SmartItemBasicViewInspector.Container .indicator .SmartItemBadge {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 2px;
+  padding: 2px;
+  width: 16px;
+  height: 16px;
+  background-color: var(--smart-item-icon-bg-color);
+  color: var(--white);
+}
+
+.SmartItemBasicViewInspector .TriggerActionContainer {
+  display: flex;
+  flex-direction: column;
+  row-gap: 8px;
+}
+
+.SmartItemBasicViewInspector .TriggerActionContainer .TriggerAction {
+  display: flex;
+  column-gap: 4px;
+}
+
+.SmartItemBasicViewInspector .TriggerActionContainer .TriggerAction .Fields {
+  display: flex;
+  width: calc(100% - var(--right-menu-width));
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 8px;
+}
+
+.SmartItemBasicViewInspector .TriggerActionContainer .TriggerAction .RightMenu {
+  align-self: start;
+  width: var(--right-menu-width);
+}

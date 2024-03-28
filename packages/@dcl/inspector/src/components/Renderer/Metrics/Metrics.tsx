@@ -63,8 +63,9 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
 
   const getNodes = useCallback(
     () =>
-      sdk.components.Nodes.getOrNull(ROOT)?.value.filter((node) => ![PLAYER_ROOT, CAMERA_ROOT].includes(node.entity)) ??
-      [],
+      sdk.components.Nodes.getOrNull(ROOT)?.value.filter(
+        (node) => ![ROOT, PLAYER_ROOT, CAMERA_ROOT].includes(node.entity)
+      ) ?? [],
     [sdk]
   )
 

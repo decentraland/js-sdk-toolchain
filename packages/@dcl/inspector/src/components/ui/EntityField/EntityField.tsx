@@ -25,9 +25,8 @@ const EntityField: React.FC<WithSdkProps & Props> = ({ sdk, ...props }) => {
     const uniqueEntities = new Map()
 
     const mapEntity = (entity: Entity) => {
-      const name = Name.get(entity)
       uniqueEntities.set(entity, {
-        label: name.value,
+        label: Name.getOrNull(entity)?.value ?? entity.toString(),
         value: entity,
         leftIcon: <EntityIcon />
       })
