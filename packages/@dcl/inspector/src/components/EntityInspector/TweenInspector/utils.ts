@@ -22,25 +22,24 @@ export const fromTween = (value: PBTween): TweenInput => {
       z: value.mode.move.end?.z.toFixed(2) ?? '0.00'
     }
   } else if (value.mode?.$case === 'rotate') {
+    type = TweenType.ROTATE_ITEM
     const startAngles = new Quaternion(
       value.mode.rotate.start?.x ?? 0,
       value.mode.rotate.start?.y ?? 0,
       value.mode.rotate.start?.z ?? 0,
       value.mode.rotate.start?.w ?? 0
     ).toEulerAngles()
+    start = {
+      x: formatAngle((startAngles.x * 180) / Math.PI),
+      y: formatAngle((startAngles.y * 180) / Math.PI),
+      z: formatAngle((startAngles.z * 180) / Math.PI)
+    }
     const endAngles = new Quaternion(
       value.mode.rotate.end?.x ?? 0,
       value.mode.rotate.end?.y ?? 0,
       value.mode.rotate.end?.z ?? 0,
       value.mode.rotate.end?.w ?? 0
     ).toEulerAngles()
-
-    type = TweenType.ROTATE_ITEM
-    start = {
-      x: formatAngle((startAngles.x * 180) / Math.PI),
-      y: formatAngle((startAngles.y * 180) / Math.PI),
-      z: formatAngle((startAngles.z * 180) / Math.PI)
-    }
     end = {
       x: formatAngle((endAngles.x * 180) / Math.PI),
       y: formatAngle((endAngles.y * 180) / Math.PI),
