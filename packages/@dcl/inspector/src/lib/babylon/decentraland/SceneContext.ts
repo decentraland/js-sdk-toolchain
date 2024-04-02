@@ -22,6 +22,7 @@ import { putNftShapeComponent } from './sdkComponents/nft'
 import { putVideoPlayerComponent } from './sdkComponents/video-player'
 import { putHideComponent } from './editorComponents/hide'
 import { putLockComponent } from './editorComponents/lock'
+import { ROOT } from '../../sdk/tree'
 
 export type LoadableScene = {
   readonly entity: Readonly<Omit<Schemas.Entity, 'id'>>
@@ -80,7 +81,7 @@ export class SceneContext {
   readonly stopped = future<void>()
 
   constructor(public babylon: BABYLON.Engine, public scene: BABYLON.Scene, public loadableScene: LoadableScene) {
-    this.rootNode = new EcsEntity(0 as Entity, this.#weakThis, scene)
+    this.rootNode = this.getOrCreateEntity(ROOT)
     Object.assign(globalThis, { babylon: this.engine })
   }
 

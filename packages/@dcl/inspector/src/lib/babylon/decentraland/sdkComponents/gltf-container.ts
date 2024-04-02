@@ -137,9 +137,15 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
     (assetContainer) => {
       processGLTFAssetContainer(assetContainer)
 
-      // remove old entities
+      /*
+        The purpose of this is to solve the following issue: 
+        When the scene is reloaded, the gltfs are loaded from two places, a useEffect in the Renderer.tsx component, and the CRDT messages coming from the engine.
+        That could cause GLTFs from being loaded twice in the babylon engine, so in order to avoid that, the loop below empties the entity from any previous GLTF loaded, so if it was loaded twice, the second time would clear the first load and it wouldn't end up duplicated.
+        The problem with that approach is that it would also remove any other entity that was nested onto the parent, and this would mess up the entity tree when the scene is loaded for the first time, that's why the loop needs to skip any node that is an EcsEntity, so it doesn't remove the entity from the tree.
+      */
       const prevChildren = entity.getChildren()
       for (const child of prevChildren) {
+        if (child instanceof EcsEntity) continue // skip EcsEntity nodes, only remove gltf related stuff
         child.setEnabled(false)
         child.dispose(false, true)
       }
