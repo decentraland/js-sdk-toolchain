@@ -55,7 +55,7 @@ describe('EcsEntity', () => {
     expect(entity.gltfContainer).toBeUndefined()
     expect(entity.gltfAssetContainer).toBeUndefined()
     expect(entity.ecsComponentValues).toEqual({})
-    expect(entity.name).toBe(`ecs-${entityId.toString(16)}`)
+    expect(entity.name).toBe(`ecs-${entityId}`)
     expect(scene.getTransformNodeByID(entity.id)).toBe(entity)
   })
 
