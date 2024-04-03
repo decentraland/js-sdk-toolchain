@@ -41,7 +41,7 @@ export class EcsEntity extends BABYLON.TransformNode {
   ecsComponentValues: EcsComponents = {}
 
   constructor(public entityId: Entity, public context: WeakRef<SceneContext>, public scene: BABYLON.Scene) {
-    super(`ecs-${entityId.toString(16)}`, scene)
+    super(`ecs-${entityId}`, scene)
     createDefaultTransform(this)
     this.initEventHandlers()
   }
