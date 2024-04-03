@@ -50,6 +50,9 @@ export namespace AppendValueOperation {
 // @public
 export function areConnected(parcels: Coords[]): boolean;
 
+// @public (undocumented)
+export const AudioEvent: GrowOnlyValueSetComponentDefinition<PBAudioEvent>;
+
 // Warning: (ae-missing-release-tag) "AudioSource" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -59,6 +62,26 @@ export const AudioSource: AudioSourceComponentDefinitionExtended;
 export interface AudioSourceComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBAudioSource> {
     playSound(entity: Entity, src: string, resetCursor?: boolean): boolean;
     stopSound(entity: Entity, resetCursor?: boolean): boolean;
+}
+
+// @public (undocumented)
+export const enum AudioState {
+    // (undocumented)
+    AS_BUFFERING = 5,
+    // (undocumented)
+    AS_ERROR = 2,
+    // (undocumented)
+    AS_LOADING = 4,
+    // (undocumented)
+    AS_NONE = 0,
+    // (undocumented)
+    AS_PAUSED = 7,
+    // (undocumented)
+    AS_PLAYING = 6,
+    // (undocumented)
+    AS_READY = 1,
+    // (undocumented)
+    AS_SEEKING = 3
 }
 
 // @public (undocumented)
@@ -529,6 +552,7 @@ export type ComponentDefinition<T> = LastWriteWinElementSetComponentDefinition<T
 // @public
 export const componentDefinitionByName: {
     "core::Animator": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAnimator>>;
+    "core::AudioEvent": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAudioEvent>>;
     "core::AudioSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioSource>>;
     "core::AudioStream": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioStream>>;
     "core::AvatarAttach": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarAttach>>;
@@ -2078,6 +2102,21 @@ export namespace PBAnimator {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAnimator;
     // (undocumented)
     export function encode(message: PBAnimator, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAudioEvent {
+    // (undocumented)
+    state: AudioState;
+    timestamp: number;
+}
+
+// @public (undocumented)
+export namespace PBAudioEvent {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAudioEvent;
+    // (undocumented)
+    export function encode(message: PBAudioEvent, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
