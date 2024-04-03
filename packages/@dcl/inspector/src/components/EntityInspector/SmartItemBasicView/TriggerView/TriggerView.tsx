@@ -45,7 +45,6 @@ export default React.memo(
 
     const areValidTriggers = useCallback(
       (updatedTriggers: Trigger[]) =>
-        updatedTriggers.length > 0 &&
         updatedTriggers.every(
           (trigger) =>
             trigger.type &&
@@ -82,7 +81,7 @@ export default React.memo(
         if (triggerIdx !== -1) {
           modifyTrigger(triggerIdx, {
             ...trigger,
-            actions: [...trigger.actions, { id: undefined, name: '', allowedInBasicView: true }]
+            actions: [...trigger.actions, { id: undefined, name: '' }]
           })
         }
       },
