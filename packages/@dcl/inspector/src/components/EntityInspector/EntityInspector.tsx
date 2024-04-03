@@ -61,72 +61,59 @@ export const EntityInspector = withSdk(({ sdk }) => {
     () => [
       { name: sdk.components.GltfContainer.componentName, component: GltfInspector },
       {
-        sdkComponent: sdk.components.VisibilityComponent,
         name: sdk.components.VisibilityComponent.componentName,
         component: VisibilityComponentInspector
       },
       {
-        sdkComponent: sdk.components.Material,
         name: sdk.components.Material.componentName,
         component: MaterialInspector
       },
       {
-        sdkComponent: sdk.components.MeshCollider,
         name: sdk.components.MeshCollider.componentName,
         component: MeshColliderInspector
       },
       {
-        sdkComponent: sdk.components.MeshRenderer,
         name: sdk.components.MeshRenderer.componentName,
         component: MeshRendererInspector
       },
-      { sdkComponent: sdk.components.Scene, name: sdk.components.Scene.componentName, component: SceneInspector },
+      { name: sdk.components.Scene.componentName, component: SceneInspector },
       {
-        sdkComponent: sdk.components.TextShape,
         name: sdk.components.TextShape.componentName,
         component: TextShapeInspector
       },
       { name: sdk.components.Tween.componentName, component: TweenInspector },
-      { sdkComponent: sdk.components.Actions, name: sdk.components.Actions.componentName, component: ActionInspector },
+      { name: sdk.components.Actions.componentName, component: ActionInspector },
       {
-        sdkComponent: sdk.components.Triggers,
         name: sdk.components.Triggers.componentName,
         component: TriggerInspector
       },
-      { sdkComponent: sdk.components.States, name: sdk.components.States.componentName, component: StatesInspector },
-      { sdkComponent: sdk.components.Counter, name: sdk.components.Counter.componentName, component: CounterInspector },
+      { name: sdk.components.States.componentName, component: StatesInspector },
+      { name: sdk.components.Counter.componentName, component: CounterInspector },
       {
-        sdkComponent: sdk.components.AudioSource,
         name: sdk.components.AudioSource.componentName,
         component: AudioSourceInspector
       },
       {
-        sdkComponent: sdk.components.VideoPlayer,
         name: sdk.components.VideoPlayer.componentName,
         component: VideoPlayerInspector
       },
       {
-        sdkComponent: sdk.components.AudioStream,
         name: sdk.components.AudioStream.componentName,
         component: AudioStreamInspector
       },
       {
-        sdkComponent: sdk.components.NftShape,
         name: sdk.components.NftShape.componentName,
         component: NftShapeInspector
       },
       {
-        sdkComponent: sdk.components.Animator,
         name: sdk.components.Animator.componentName,
         component: AnimatorInspector
       },
       {
-        sdkComponent: sdk.components.PointerEvents,
         name: sdk.components.PointerEvents.componentName,
         component: PointerEventsInspector
       },
       {
-        sdkComponent: sdk.components.SyncComponents,
         name: sdk.components.SyncComponents.componentName,
         component: SyncComponentsInspector
       },
