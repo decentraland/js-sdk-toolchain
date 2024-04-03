@@ -17,11 +17,6 @@ const SmartItemBasicView = withSdk<Props>(({ sdk, entity }) => {
   const { Config } = sdk.components
   const hasConfig = useHasComponent(entity, Config)
 
-  const handleRemove = useCallback(async () => {
-    sdk.operations.removeComponent(entity, Config)
-    await sdk.operations.dispatch()
-  }, [entity])
-
   const renderField = useCallback(
     (field: ConfigComponent['fields'][0], idx: number) => {
       switch (field.type) {
@@ -61,7 +56,6 @@ const SmartItemBasicView = withSdk<Props>(({ sdk, entity }) => {
       label={config.componentName}
       indicator={renderSmartItemIndicator()}
       className="SmartItemBasicViewInspector"
-      onRemoveContainer={handleRemove}
     >
       {config.fields.map((field, idx) => renderField(field, idx))}
     </Container>
