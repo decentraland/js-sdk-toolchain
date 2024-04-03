@@ -393,19 +393,10 @@ function createLoadingSpinner(
   const CIRCLE = Math.PI * 2
   const LIGHT_GRAY = new BABYLON.Color3(0.9, 0.9, 0.9)
   const torusOutline = createSemiTorus(radius, tube, radialSegments, tubularSegments, CIRCLE, LIGHT_GRAY, scene)
-  torusOutline.position.copyFrom(entity.position)
+  torusOutline.position.copyFrom(entity.getAbsolutePosition())
   torusOutline.position.y += 1
   torusOutline.rotation.x = Math.PI
   torusOutline.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL
-
-  // reposition torus if nested
-  let parent = entity.parent
-  while (parent) {
-    if (parent instanceof BABYLON.TransformNode) {
-      torusOutline.position.addInPlace(parent.position)
-    }
-    parent = parent.parent
-  }
 
   const LIGHT_RED = new BABYLON.Color3(1, 45 / 255, 85 / 255)
   const semiTorus = createSemiTorus(radius, tube, radialSegments, tubularSegments, CIRCLE / 4, LIGHT_RED, scene)
