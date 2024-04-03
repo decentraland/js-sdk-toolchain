@@ -31,7 +31,7 @@ export default React.memo(
 
     const availableTweenActions: Map<string, [number, Action]> = useMemo(() => {
       return actions.reduce((mappedActions, action, actionIdx) => {
-        if (!!action.allowedInBasicView && action.type === 'start_tween') {
+        if (action.type === 'start_tween') {
           if (action.name === 'Tween to Start') {
             mappedActions.set('start', [actionIdx, action])
           } else if (action.name === 'Tween to End') {
