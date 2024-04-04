@@ -1,16 +1,14 @@
 import React, { useCallback, useState } from 'react'
-import { Entity } from '@dcl/ecs'
+import { Entity, NftFrameType, PBNftShape } from '@dcl/ecs'
 import { withSdk, WithSdkProps } from '../../../../hoc/withSdk'
 import { useHasComponent } from '../../../../hooks/sdk/useHasComponent'
-import { useComponentInput } from '../../../../hooks/sdk/useComponentInput'
+import { useComponentValue } from '../../../../hooks/sdk/useComponentValue'
 import { Block } from '../../../Block'
-import { TextField, Dropdown, ColorField } from '../../../ui'
+import { TextField, Dropdown, ColorField, DropdownChangeEvent } from '../../../ui'
+import { toColor3, toHex } from '../../../ui/ColorField/utils'
 import {
   UrnTokens,
   buildTokens,
-  isValidInput,
-  fromNftShape,
-  toNftShape,
   getUrn,
   isValidUrn,
   NETWORKS,
@@ -21,16 +19,9 @@ import {
 export default React.memo(
   withSdk<WithSdkProps & { entity: Entity }>(({ sdk, entity }) => {
     const { NftShape } = sdk.components
-    const [urnTokens, setUrnTokens] = useState<UrnTokens>(buildTokens(NftShape.getOrNull(entity)))
-
+    const [componentValue] = useComponentValue<PBNftShape>(entity, NftShape)
     const hasNftShape = useHasComponent(entity, NftShape)
-    const handleInputValidation = useCallback(({ urn }: { urn: string }) => isValidInput(urn), [])
-    const { getInputProps } = useComponentInput(entity, NftShape, fromNftShape, toNftShape, handleInputValidation)
-
-    if (!hasNftShape) return null
-
-    const color = getInputProps('color')
-    const style = getInputProps('style')
+    const [urnTokens, setUrnTokens] = useState<UrnTokens>(buildTokens(componentValue))
 
     const handleUrnTokenChange = useCallback(
       async (tokens: UrnTokens) => {
@@ -44,6 +35,20 @@ export default React.memo(
       },
       [urnTokens]
     )
+
+    const handleColorChange = useCallback(async ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
+      const color = toColor3(value)
+      sdk.operations.updateValue(NftShape, entity, { ...NftShape.get(entity), color })
+      await sdk.operations.dispatch()
+    }, [])
+
+    const handleStyleChange = useCallback(async ({ target: { value } }: DropdownChangeEvent) => {
+      const style = Number(value) as NftFrameType
+      sdk.operations.updateValue(NftShape, entity, { ...NftShape.get(entity), style })
+      await sdk.operations.dispatch()
+    }, [])
+
+    if (!hasNftShape) return null
 
     return (
       <>
@@ -66,10 +71,14 @@ export default React.memo(
           onChange={(e) => handleUrnTokenChange({ token: e.target.value })}
         />
         <Block label="Background Color">
-          <ColorField {...color} />
+          <ColorField value={toHex(componentValue.color)} onChange={handleColorChange} />
         </Block>
         <Block label="Frame Type">
-          <Dropdown options={NFT_STYLES} {...style} />
+          <Dropdown
+            options={NFT_STYLES}
+            value={componentValue.style ?? NftFrameType.NFT_NONE}
+            onChange={handleStyleChange}
+          />
         </Block>
       </>
     )
