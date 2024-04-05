@@ -84,3 +84,15 @@ export function getAssetByModel(path: string) {
 
   return null
 }
+
+export function getAssetById(id: string) {
+  for (const assetPack of catalog) {
+    for (const asset of assetPack.assets) {
+      if (asset.id === id) {
+        return asset
+      }
+    }
+  }
+
+  return null
+}

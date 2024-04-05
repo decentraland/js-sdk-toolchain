@@ -32,6 +32,10 @@
   border-color: transparent;
 }
 
+.EntityHeader > .RightContent > .MoreOptionsMenu > .MoreOptionsContent {
+  min-width: 190px;
+}
+
 .InfoTooltip > .VisibilityComponentTooltip {
   display: flex;
   flex-direction: column;
@@ -40,4 +44,69 @@
 
 .InfoTooltip > .VisibilityComponentTooltip > .ErrorMessage {
   color: var(--warning-main);
+}
+
+.EntityHeader.ModalOverlay {
+  z-index: 1;
+}
+
+.EntityHeader.ModalOverlay .ToggleBasicViewModal {
+  display: flex;
+  flex-direction: row;
+  width: 536px;
+  padding: 24px;
+  gap: 24px;
+}
+
+.EntityHeader.ModalOverlay .ToggleBasicViewModal .ModalBody {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: fit-content;
+  gap: 32px;
+}
+
+.EntityHeader.ModalOverlay .ToggleBasicViewModal .ModalBody .CloseIcon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+}
+
+.EntityHeader.ModalOverlay .ToggleBasicViewModal .ModalBody .ModalContent h2 {
+  color: var(--base-06, #ccc);
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: -0.36px;
+}
+
+.EntityHeader.ModalOverlay .ToggleBasicViewModal .ModalBody .ModalContent p {
+  color: var(--base-06, #ccc);
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.EntityHeader.ModalOverlay .ToggleBasicViewModal .ModalBody .ModalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.EntityHeader.ModalOverlay .ToggleBasicViewModal .ModalBody .ModalActions .Button {
+  padding: 6px 11px;
+  background-color: var(--base-15);
+  color: var(--base-01);
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  border-radius: 0;
+}
+
+.EntityHeader.ModalOverlay .ToggleBasicViewModal .ModalBody .ModalActions .Button.primary {
+  background-color: var(--accent-blue-07);
 }

@@ -22,7 +22,7 @@ import {
   getPayload
 } from '@dcl/asset-packs'
 
-import { CoreComponents } from '../../components'
+import { CoreComponents, EditorComponentNames } from '../../components'
 import updateSelectedEntity from '../update-selected-entity'
 import { addChild } from '../add-child'
 import { isSelf, parseMaterial, parseSyncComponents } from './utils'
@@ -36,7 +36,8 @@ export function addAsset(engine: IEngine) {
     position: Vector3Type,
     base: string,
     enumEntityId: EnumEntity,
-    components?: Partial<Record<CoreComponents | ComponentName, any>>
+    components?: Partial<Record<CoreComponents | ComponentName | EditorComponentNames.Config, any>>,
+    assetId?: string
   ): Entity {
     const child = addChild(engine)(parent, name)
     const Transform = engine.getComponent(TransformEngine.componentId) as typeof TransformEngine
@@ -158,6 +159,11 @@ export function addAsset(engine: IEngine) {
             const componentIds = parseSyncComponents(engine, componentNames.value)
             values.set(componentName, { componentIds })
             values.set(NetworkEntity.componentName, { entityId: enumEntityId.getNextEnumEntityId(), networkId: 0 })
+            break
+          }
+          case EditorComponentNames.Config: {
+            values.set(componentName, { ...components[componentName], assetId })
+            break
           }
         }
       }

@@ -13,6 +13,7 @@ import './TriggerEvent.css'
 
 const TriggerMapOption: Record<string, string> = {
   [TriggerType.ON_CLICK]: 'On Click',
+  [TriggerType.ON_INPUT_ACTION]: 'On Input Action',
   [TriggerType.ON_SPAWN]: 'On Spawn',
   [TriggerType.ON_STATE_CHANGE]: 'On State Change',
   [TriggerType.ON_COUNTER_CHANGE]: 'On Counter Change',

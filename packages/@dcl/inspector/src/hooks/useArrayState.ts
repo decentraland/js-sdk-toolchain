@@ -1,7 +1,13 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 
 export function useArrayState<T>(initialArray: T[] = []) {
   const [array, setArray] = useState<T[]>([...initialArray])
+
+  useEffect(() => {
+    if (!recursiveCheck(initialArray, array, 2)) return
+    setArray([...initialArray])
+  }, [initialArray])
 
   // Function to add an item to the array
   const addItem = useCallback(
