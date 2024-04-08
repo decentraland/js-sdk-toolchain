@@ -12,6 +12,7 @@ import defineSyncComponent, { ISyncComponentsType } from './manual/SyncComponent
 import defineNetworkEntity, { INetowrkEntityType } from './manual/NetworkEntity'
 import defineNetworkParent, { INetowrkParentType } from './manual/NetworkParent'
 import { defineTransformComponent, TransformComponentExtended } from './manual/Transform'
+import { AudioStreamComponentDefinitionExtended, defineAudioStreamComponent } from './extended/AudioStream'
 
 export * from './generated/index.gen'
 
@@ -36,6 +37,11 @@ export const Animator: LwwComponentGetter<AnimatorComponentDefinitionExtended> =
 /* @__PURE__ */
 export const AudioSource: LwwComponentGetter<AudioSourceComponentDefinitionExtended> = (engine) =>
   defineAudioSourceComponent(engine)
+
+/* @__PURE__ */
+export const AudioStream: (
+  engine: Pick<IEngine, 'defineComponentFromSchema' | 'defineValueSetComponentFromSchema'>
+) => AudioStreamComponentDefinitionExtended = (engine) => defineAudioStreamComponent(engine)
 
 /* @__PURE__ */
 export const MeshRenderer: LwwComponentGetter<MeshRendererComponentDefinitionExtended> = (engine) =>

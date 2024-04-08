@@ -84,8 +84,15 @@ export const enum AudioState {
     AS_SEEKING = 3
 }
 
+// Warning: (ae-missing-release-tag) "AudioStream" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const AudioStream: LastWriteWinElementSetComponentDefinition<PBAudioStream>;
+export const AudioStream: AudioStreamComponentDefinitionExtended;
+
+// @public (undocumented)
+export interface AudioStreamComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBAudioStream> {
+    getAudioState(entity: Entity): PBAudioEvent | undefined;
+}
 
 // @public (undocumented)
 export const enum AvatarAnchorPointType {
