@@ -124,6 +124,17 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
     return <InfoTooltip text="The duration set how long the whole movement should take in seconds." />
   }
 
+  const getLabel = useCallback(() => {
+    switch (tween.type) {
+      case TweenType.ROTATE_ITEM:
+        return 'End Rotation'
+      case TweenType.SCALE_ITEM:
+        return 'End Scale'
+      default:
+        return 'End Position'
+    }
+  }, [tween.type])
+
   return (
     <div className="TweenActionContainer">
       <div className="row">
@@ -137,7 +148,7 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
           onChange={handleChangeType}
         />
       </div>
-      <Block label="End Position">
+      <Block label={getLabel()}>
         <TextField
           leftLabel="X"
           type="number"

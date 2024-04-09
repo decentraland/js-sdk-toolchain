@@ -6,6 +6,6 @@ export type InspectorPreferences = {
 export function getDefaultInspectorPreferences(): InspectorPreferences {
   return {
     freeCameraInvertRotation: false,
-    autosaveEnabled: false
+    autosaveEnabled: true
   }
 }

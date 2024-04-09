@@ -17,7 +17,8 @@ export const putVideoPlayerComponent: ComponentOperation = (entity, component) =
         if (entity.gltfAssetContainer) {
           // need to re-scale the model to get in sync with scale in preview...
           entity.gltfAssetContainer.meshes[0].scaling = new BABYLON.Vector3(
-            0.2 * scaleMult,
+            // why negative X coordinate? => https://forum.babylonjs.com/t/left-and-right-handed-shenanagins/17049/4
+            -0.2 * scaleMult,
             0.4 * scaleMult,
             0.1 * scaleMult
           )

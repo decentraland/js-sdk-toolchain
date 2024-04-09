@@ -1,0 +1,15 @@
+.SetRotationActionContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+}
+
+.SetPositionActionContainer .row {
+  display: flex;
+  flex-direction: row;
+}
+
+.SetRotationActionContainer .Block {
+  width: 100%;
+}

@@ -41,7 +41,7 @@ export class EcsEntity extends BABYLON.TransformNode {
   ecsComponentValues: EcsComponents = {}
 
   constructor(public entityId: Entity, public context: WeakRef<SceneContext>, public scene: BABYLON.Scene) {
-    super(`ecs-${entityId.toString(16)}`, scene)
+    super(`ecs-${entityId}`, scene)
     createDefaultTransform(this)
     this.initEventHandlers()
   }
@@ -199,6 +199,10 @@ export class EcsEntity extends BABYLON.TransformNode {
       })
     }
   }
+
+  isOutOfBoundaries() {
+    return !!this.boundingInfoMesh?.showBoundingBox
+  }
 }
 
 /**
@@ -244,22 +248,22 @@ async function validateEntityIsOutsideLayout(entity: EcsEntity) {
 
 function updateMeshBoundingBoxVisibility(entity: EcsEntity, mesh: BABYLON.AbstractMesh) {
   const scene = mesh.getScene()
+  if (scene.isLoading) return
+
   const { isEntityOutsideLayout } = getLayoutManager(scene)
 
   if (isEntityOutsideLayout(mesh)) {
     if (mesh.showBoundingBox) return
-
+    mesh.showBoundingBox = true
     for (const childMesh of entity.getChildMeshes(false)) {
       addOutsideLayoutMaterial(childMesh, scene)
     }
-    mesh.showBoundingBox = true
   } else {
     if (!mesh.showBoundingBox) return
-
+    mesh.showBoundingBox = false
     for (const childMesh of entity.getChildMeshes(false)) {
       removeOutsideLayoutMaterial(childMesh)
     }
-    mesh.showBoundingBox = false
   }
 }
 

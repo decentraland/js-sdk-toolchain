@@ -35,13 +35,20 @@ import './TriggerInspector.css'
 
 export const statesConditionTypeOptions = [
   { value: TriggerConditionType.WHEN_STATE_IS, text: 'state is' },
-  { value: TriggerConditionType.WHEN_STATE_IS_NOT, text: 'state is not' }
+  { value: TriggerConditionType.WHEN_STATE_IS_NOT, text: 'state is not' },
+  { value: TriggerConditionType.WHEN_PREVIOUS_STATE_IS, text: 'previous state is' },
+  { value: TriggerConditionType.WHEN_PREVIOUS_STATE_IS_NOT, text: 'previous state is not' }
 ]
 
 export const counterConditionTypeOptions = [
   { value: TriggerConditionType.WHEN_COUNTER_EQUALS, text: 'counter equals' },
   { value: TriggerConditionType.WHEN_COUNTER_IS_GREATER_THAN, text: 'counter is greater than' },
   { value: TriggerConditionType.WHEN_COUNTER_IS_LESS_THAN, text: 'counter is less than' }
+]
+
+export const actionsConditionTypeOptions = [
+  { value: TriggerConditionType.WHEN_DISTANCE_TO_PLAYER_LESS_THAN, text: 'distance to player is less than' },
+  { value: TriggerConditionType.WHEN_DISTANCE_TO_PLAYER_GREATER_THAN, text: 'distance to player is greater than' }
 ]
 
 export default withSdk<Props>(({ sdk, entity: entityId }) => {
@@ -98,9 +105,9 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
   const availableActions: Map<number, { name: string; actions: Action[] }> = useMemo(() => {
     return entitiesWithAction?.reduce((actions, entityWithAction) => {
       const actionsComponentValue = getComponentValue(entityWithAction, Actions)
-      const name = Name.get(entityWithAction)
+      const name = Name.getOrNull(entityWithAction)?.value ?? entitiesWithAction.toString()
       if (actionsComponentValue.value.length > 0) {
-        actions.set(actionsComponentValue.id, { name: name.value, actions: actionsComponentValue.value as Action[] })
+        actions.set(actionsComponentValue.id, { name: name, actions: actionsComponentValue.value as Action[] })
       }
 
       return actions
@@ -111,13 +118,20 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     const triggerTypes: TriggerType[] = [
       TriggerType.ON_SPAWN,
       TriggerType.ON_CLICK,
+      TriggerType.ON_INPUT_ACTION,
       TriggerType.ON_PLAYER_ENTERS_AREA,
       TriggerType.ON_PLAYER_LEAVES_AREA,
       TriggerType.ON_TWEEN_END,
       TriggerType.ON_DELAY,
       TriggerType.ON_LOOP,
       TriggerType.ON_CLONE,
-      TriggerType.ON_CLICK_IMAGE
+      TriggerType.ON_CLICK_IMAGE,
+      TriggerType.ON_DAMAGE,
+      TriggerType.ON_GLOBAL_CLICK,
+      TriggerType.ON_GLOBAL_PRIMARY,
+      TriggerType.ON_GLOBAL_SECONDARY,
+      TriggerType.ON_TICK,
+      TriggerType.ON_HEAL_PLAYER
     ]
     if (hasStates) {
       triggerTypes.push(TriggerType.ON_STATE_CHANGE)
@@ -131,9 +145,9 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
   const availableStates: Map<number, { name: string; states: States['value'] }> = useMemo(() => {
     return entitiesWithStates?.reduce((states, entityWithState) => {
       const statesComponentValue = getComponentValue(entityWithState, States)
-      const name = Name.get(entityWithState)
+      const name = Name.getOrNull(entityWithState)?.value ?? entityWithState.toString()
       if (statesComponentValue.value.length > 0) {
-        states.set(statesComponentValue.id, { name: name.value, states: (statesComponentValue as States).value })
+        states.set(statesComponentValue.id, { name: name, states: (statesComponentValue as States).value })
       }
 
       return states
@@ -141,9 +155,9 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
   }, [entitiesWithStates])
 
   const availableConditions = useMemo(() => {
-    const entities = Array.from(new Set<Entity>([...entitiesWithStates, ...entitiesWithCounter])).filter(
-      (entity) => entity !== 0
-    )
+    const entities = Array.from(
+      new Set<Entity>([...entitiesWithStates, ...entitiesWithCounter, ...entitiesWithAction])
+    ).filter((entity) => entity !== 0)
     const result = new Map<
       Entity,
       {
@@ -153,7 +167,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     >()
 
     for (const entity of entities) {
-      const name = Name.getOrNull(entity)?.value || ''
+      const name = Name.getOrNull(entity)?.value ?? entity.toString()
       const entityConditions: {
         name: string
         conditions: { value: { id: number; type: TriggerConditionType }; text: string }[]
@@ -174,9 +188,15 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
           entityConditions.conditions.push({ value: { id, type: option.value }, text: option.text })
         }
       }
+      if (Actions.has(entity)) {
+        for (const option of actionsConditionTypeOptions) {
+          const { id } = Actions.get(entity)
+          entityConditions.conditions.push({ value: { id, type: option.value }, text: option.text })
+        }
+      }
     }
     return result
-  }, [entitiesWithStates, entitiesWithCounter, States, Counter])
+  }, [entitiesWithStates, entitiesWithCounter, Actions, States, Counter, Name])
 
   const handleRemove = useCallback(async () => {
     sdk.operations.removeComponent(entityId, Triggers)

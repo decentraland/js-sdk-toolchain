@@ -87,7 +87,8 @@ export type IInputSystem = {
 const InputStateUpdateSystemPriority = 1 << 20
 
 /**
- * @internal
+ * @public
+ * ____DO NOT USE ____ use inputSystem instead
  */
 export function createInputSystem(engine: IEngine): IInputSystem {
   const PointerEventsResult = components.PointerEventsResult(engine)

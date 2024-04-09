@@ -17,7 +17,6 @@ import {
 import { myProfile, syncEntity } from '@dcl/sdk//network'
 import { Quaternion } from '@dcl/sdk/math'
 import * as utils from '@dcl-sdk/utils'
-import { gamePaused } from './ui'
 
 export const Bird = engine.defineComponent('bird', {})
 
@@ -82,7 +81,6 @@ export function createHummingBird() {
 // System to shoot birds
 export function shootBirds(userId: string) {
   return function () {
-    if (gamePaused) return
     for (const [entity, _bird, visibleComponent] of engine.getEntitiesWith(Bird, VisibilityComponent, PointerEvents)) {
       if (
         inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, entity) &&

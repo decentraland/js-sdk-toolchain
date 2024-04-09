@@ -6,7 +6,8 @@ export enum Event {
   ADD_ITEM = 'Add Item',
   ADD_COMPONENT = 'Add Component',
   REMOVE_COMPONENT = 'Remove Component',
-  SEARCH_ITEM = 'Search Item'
+  SEARCH_ITEM = 'Search Item',
+  SWITCH_BUILDER_MODE = 'Switch Builder Mode'
 }
 
 export type Events = {
@@ -30,6 +31,11 @@ export type Events = {
     keyword: string
     itemsFound: number
     category?: string
+  }
+  [Event.SWITCH_BUILDER_MODE]: {
+    itemId: string
+    itemName: string
+    isAdvancedView: boolean
   }
 }
 

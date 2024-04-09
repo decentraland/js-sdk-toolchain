@@ -103,15 +103,16 @@
 .ImportAsset .file-container > div:nth-child(2) {
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  justify-content: center;
 }
 
 .ImportAsset .file-container > div:nth-child(2) button {
   background-color: var(--primary-main);
 }
 
-.ImportAsset .file-container .error {
+.ImportAsset .error {
   color: var(--primary-main);
+  margin-top: 6px;
 }
 
 .ImportAsset .file-container .AssetPreview {
