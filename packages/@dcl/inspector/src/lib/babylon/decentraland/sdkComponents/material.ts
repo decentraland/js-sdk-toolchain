@@ -1,4 +1,4 @@
-import { PBRMaterial, Scene, StandardMaterial, Texture } from '@babylonjs/core'
+import { PBRMaterial, Scene, StandardMaterial, Texture, Vector3 } from '@babylonjs/core'
 import { PBMaterial, ComponentType, MaterialTransparencyMode, TextureUnion } from '@dcl/ecs'
 
 import type { ComponentOperation } from '../component-operations'
@@ -101,7 +101,10 @@ export const baseMaterial = memoize((scene: Scene) => {
 export function setMeshRendererMaterial(entity: EcsEntity) {
   const material = entity.material ?? baseMaterial(entity.getScene())
   const mesh = entity.meshRenderer
-  if (mesh) mesh.material = material
+  if (mesh) {
+    mesh.material = material
+    mesh.scaling = new Vector3(1, 1, -1)
+  }
 }
 
 async function loadTexture(entity: EcsEntity, tx: TextureUnion['tex']): Promise<Texture | null> {

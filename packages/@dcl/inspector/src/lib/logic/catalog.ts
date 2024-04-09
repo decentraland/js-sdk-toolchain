@@ -22,7 +22,8 @@ export const CATEGORIES = [
   'appliances',
   'nature',
   'tiles',
-  'year of the pig'
+  'year of the pig',
+  'health'
 ]
 
 export type AssetPack = {
@@ -77,6 +78,18 @@ export function getAssetByModel(path: string) {
         if (!!asset.contents[model] && asset.name.trim().replaceAll(' ', '_').toLowerCase() === name.toLowerCase()) {
           return asset
         }
+      }
+    }
+  }
+
+  return null
+}
+
+export function getAssetById(id: string) {
+  for (const assetPack of catalog) {
+    for (const asset of assetPack.assets) {
+      if (asset.id === id) {
+        return asset
       }
     }
   }

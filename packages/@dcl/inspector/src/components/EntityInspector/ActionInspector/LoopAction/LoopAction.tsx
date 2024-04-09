@@ -65,7 +65,7 @@ const LoopAction = <T extends ActionPayload<ActionType.START_LOOP | ActionType.S
     [payload, setPayload]
   )
 
-  const handleChangeHideAfterSeconds = useCallback(
+  const handleChangeInterval = useCallback(
     (e: React.ChangeEvent<HTMLElement>) => {
       const { value } = e.target as HTMLInputElement
 
@@ -88,7 +88,12 @@ const LoopAction = <T extends ActionPayload<ActionType.START_LOOP | ActionType.S
             />
           </Block>
           <Block>
-            <RangeField label="Interval in Seconds" value={payload.interval} onChange={handleChangeHideAfterSeconds} />
+            <RangeField
+              step={0.1}
+              label="Interval in Seconds"
+              value={payload.interval}
+              onChange={handleChangeInterval}
+            />
           </Block>
         </>
       ) : (

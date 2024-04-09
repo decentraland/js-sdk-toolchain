@@ -8,6 +8,8 @@ import { useEntityComponent } from '../../../hooks/sdk/useEntityComponent'
 import { SdkContextValue } from '../../../lib/sdk/context'
 import { analytics, Event } from '../../../lib/logic/analytics'
 import { getAssetByModel } from '../../../lib/logic/catalog'
+import { CAMERA, PLAYER, ROOT } from '../../../lib/sdk/tree'
+import { InfoTooltip } from '../../ui'
 
 import './ActionArea.css'
 
@@ -98,10 +100,55 @@ const ActionArea: React.FC<WithSdkProps & Props> = ({ sdk, ...props }) => {
     )
   }, [isEntityHidden, handleToggleHideComponent])
 
+  const isRoot = entity === ROOT
+  const isPlayer = entity === PLAYER
+  const isCamera = entity === CAMERA
+  const isEntity = !isPlayer && !isCamera && !isRoot
+
+  const infoTooltip = useCallback(
+    (text: string, learnMore?: string) => (
+      <div className="action-button">
+        <InfoTooltip
+          text={
+            <>
+              {text}
+              {learnMore ? (
+                <>
+                  &nbsp;
+                  <a href={learnMore} target="_blank" rel="noopener">
+                    Learn more
+                  </a>
+                </>
+              ) : null}
+            </>
+          }
+          type="info"
+          position="right center"
+        />
+      </div>
+    ),
+    []
+  )
+
   return (
     <div className="action-area">
-      {toggleLockButton()}
-      {toggleVisibleButton()}
+      {isEntity && toggleLockButton()}
+      {isEntity && toggleVisibleButton()}
+      {isPlayer &&
+        infoTooltip(
+          'The player’s avatar. Nested items are fixed to the player’s position.',
+          'https://docs.decentraland.org/creator/web-editor/#special-entities'
+        )}
+      {isCamera &&
+        infoTooltip(
+          'The player’s camera. Nested items remain fixed to the camera’s position.',
+          'https://docs.decentraland.org/creator/web-editor/#special-entities'
+        )}
+      {isRoot &&
+        infoTooltip(
+          'The root entity. All items in the scene are children of this entity. Open it to adjust the scene settings.',
+          'https://docs.decentraland.org/creator/development-guide/sdk7/scene-metadata/#metadata'
+        )}
     </div>
   )
 }

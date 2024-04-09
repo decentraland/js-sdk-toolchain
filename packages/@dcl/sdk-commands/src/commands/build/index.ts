@@ -1,7 +1,14 @@
 import path from 'path'
 import { CliComponents } from '../../components'
 import { declareArgs } from '../../logic/args'
-import { installDependencies, needsDependencies, SceneProject, WearableProject } from '../../logic/project-validations'
+import {
+  installAssetPack,
+  installDependencies,
+  isEditorScene,
+  needsDependencies,
+  SceneProject,
+  WearableProject
+} from '../../logic/project-validations'
 import { getBaseCoords } from '../../logic/scene-validations'
 import { b64HashingFunction } from '../../logic/project-files'
 import { bundleProject } from '../../logic/bundle'
@@ -57,10 +64,16 @@ export async function main(options: Options) {
 }
 
 export async function buildScene(options: Options, project: SceneProject | WearableProject) {
-  const shouldInstallDeps = await needsDependencies(options.components, project.workingDirectory)
+  const canInstall = !options.args['--skip-install']
 
-  if (shouldInstallDeps && !options.args['--skip-install']) {
-    await installDependencies(options.components, project.workingDirectory)
+  if (canInstall) {
+    if (await needsDependencies(options.components, project.workingDirectory)) {
+      await installDependencies(options.components, project.workingDirectory)
+    }
+
+    if (await isEditorScene(options.components, project.workingDirectory)) {
+      await installAssetPack(options.components, project.workingDirectory)
+    }
   }
 
   const watch = !!options.args['--watch']

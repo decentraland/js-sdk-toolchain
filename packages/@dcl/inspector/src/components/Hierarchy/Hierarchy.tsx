@@ -12,6 +12,10 @@ import './Hierarchy.css'
 function HierarchyIcon({ value }: { value: Entity }) {
   if (value === ROOT) {
     return <span style={{ marginRight: '4px' }}></span>
+  } else if (value === PLAYER) {
+    return <span className="tree-icon player-icon"></span>
+  } else if (value === CAMERA) {
+    return <span className="tree-icon camera-icon"></span>
   } else {
     return <FiHexagon style={{ marginRight: '4px' }} />
   }

@@ -21,31 +21,30 @@ const Input = ({ value, onCancel, onSubmit, onChange, onBlur, placeholder }: Pro
   const ref = useRef<HTMLInputElement>(null)
   const [stateValue, setStateValue] = useState(value)
 
+  const getValue = () => ref.current?.value || value
+
+  const onKeyUp = (e: KeyboardEvent) => {
+    if (cancelingKeys.has(e.key)) onCancel && onCancel()
+    if (submittingKeys.has(e.key)) onSubmit && onSubmit(getValue())
+  }
+
+  const onBlurCallback = (e: FocusEvent) => {
+    const relatedTarget = e.relatedTarget as HTMLElement | null
+    const { parentRole, role } = getRolesFromTarget(relatedTarget)
+    // custom fix for context menu to avoid stealing focus (thus triggering onBlur on input's)
+    // when hiding. We check if the relatedTarget's role and it's parent role is in the
+    // dismissable targets list. If it is, instead of running the onBlur cb, we focus the input.
+    // Otherwise, we run the onBlur cb...
+    if (dismissableTargets.has(role) || dismissableTargets.has(parentRole)) {
+      ref.current?.focus()
+    } else {
+      onBlur && onBlur(e)
+    }
+  }
+
   useEffect(() => {
     // force focus to input
     ref.current?.focus()
-
-    const getValue = () => ref.current?.value || value
-
-    const onKeyUp = (e: KeyboardEvent) => {
-      if (cancelingKeys.has(e.key)) onCancel && onCancel()
-      if (submittingKeys.has(e.key)) onSubmit && onSubmit(getValue())
-    }
-
-    const onBlurCallback = (e: FocusEvent) => {
-      const relatedTarget = e.relatedTarget as HTMLElement | null
-      const { parentRole, role } = getRolesFromTarget(relatedTarget)
-      // custom fix for context menu to avoid stealing focus (thus triggering onBlur on input's)
-      // when hiding. We check if the relatedTarget's role and it's parent role is in the
-      // dismissable targets list. If it is, instead of running the onBlur cb, we focus the input.
-      // Otherwise, we run the onBlur cb...
-      if (dismissableTargets.has(role) || dismissableTargets.has(parentRole)) {
-        ref.current?.focus()
-      } else {
-        onBlur && onBlur(e)
-      }
-    }
-
     ref.current?.addEventListener('keyup', onKeyUp)
     ref.current?.addEventListener('blur', onBlurCallback)
     return () => {

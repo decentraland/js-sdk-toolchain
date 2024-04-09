@@ -35,38 +35,42 @@ interface PropTypes {
 }
 
 type ValidationError = string | null
+/*
+  Severity codes are Error (0), Warning (1), Information (2), Hint (3).
+  https://github.com/KhronosGroup/glTF-Validator/blob/main/lib/src/errors.dart
+*/
+type BabylonValidationIssue = {
+  severity: number
+  code: string
+  message: string
+  pointer: string
+}
 
 async function validateGltf(data: ArrayBuffer): Promise<ValidationError> {
+  const pre = 'Invalid GLTF'
   let result
   try {
     result = await GLTFValidation.ValidateAsync(new Uint8Array(data), '', '', (_uri) => {
       throw new Error('external references are not supported yet')
     })
   } catch (error) {
-    return `Invalid GLTF: ${error}`
+    return `${pre}: ${error}`
   }
 
+  /*
+    Babylon's type declarations incorrectly state that result.issues.messages
+    is an Array<string>. In fact, it's an array of objects with useful properties.
+  */
+  const messages = result.issues.messages as unknown as BabylonValidationIssue[]
+
   if (result.issues.numErrors > 0) {
-    for (const issue of result.issues.messages) {
-      /*
-        Babylon's type declarations incorrectly state that result.issues.messages
-        is an Array<string>. In fact, it's an array of objects with useful properties.
-      */
-      type BabylonValidationIssue = { severity: number; code: string }
-      const severity = (issue as unknown as BabylonValidationIssue).severity
-      /*
-        Severity codes are Error (0), Warning (1), Information (2), Hint (3).
-        https://github.com/KhronosGroup/glTF-Validator/blob/main/lib/src/errors.dart
-      */
-      if (severity === 0) {
-        const message = (issue as unknown as BabylonValidationIssue).code
-        return `Invalid GLTF: ${message}`
-      }
+    for (const { message, pointer, severity } of messages) {
+      if (severity === 0) return `${pre}: ${message} \n Check ${pointer}`
     }
-    return 'Invalid GLTF: unknown reason'
-  } else {
-    return null
+    return `${pre}: unknown reason`
   }
+
+  return null
 }
 
 async function validateAsset(extension: string, data: ArrayBuffer): Promise<ValidationError> {
@@ -243,10 +247,10 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
               <Button disabled={invalidName || !!validationError} onClick={handleSave}>
                 Import
               </Button>
-              <span className="error">{validationError}</span>
             </div>
           </div>
         )}
+        <span className="error">{validationError}</span>
       </FileInput>
     </div>
   )

@@ -31,6 +31,7 @@ export enum CoreComponents {
   TEXT_SHAPE = 'core::TextShape',
   TRANSFORM = 'core::Transform',
   TWEEN = 'core::Tween',
+  TWEEN_SEQUENCE = 'core::TweenSequence',
   VIDEO_PLAYER = 'core::VideoPlayer',
   VISIBILITY_COMPONENT = 'core::VisibilityComponent'
 }
@@ -46,7 +47,8 @@ export enum EditorComponentNames {
   States = ComponentName.STATES,
   TransformConfig = 'inspector::TransformConfig',
   Hide = 'inspector::Hide',
-  Lock = 'inspector::Lock'
+  Lock = 'inspector::Lock',
+  Config = 'inspector::Config'
 }
 
 export enum SceneAgeRating {
@@ -87,6 +89,25 @@ export type SceneComponent = {
   spawnPoints?: SceneSpawnPoint[]
 }
 
+const AllComponents = {
+  ...CoreComponents,
+  ...EditorComponentNames
+}
+
+type AllComponentsType = CoreComponents | EditorComponentNames
+
+export type ConfigComponent = {
+  isBasicViewEnabled: boolean
+  componentName: string
+  fields: {
+    name: string
+    type: AllComponentsType
+    jsonPayload?: string
+    basicViewId?: string
+  }[]
+  assetId?: string
+}
+
 export enum SceneCategory {
   ART = 'art',
   GAME = 'game',
@@ -113,6 +134,8 @@ export type EditorComponentsTypes = {
   Counter: Counter
   Hide: { value: boolean }
   Lock: { value: boolean }
+  CounterBar: { primaryColor: string; secondaryColor: string; maxValue: number }
+  Config: ConfigComponent
 }
 
 export type EditorComponents = {
@@ -127,6 +150,8 @@ export type EditorComponents = {
   States: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['States']>
   Hide: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Hide']>
   Lock: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Lock']>
+  CounterBar: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['CounterBar']>
+  Config: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Config']>
 }
 
 export type SdkComponents = {
@@ -146,6 +171,7 @@ export type SdkComponents = {
   TextShape: ReturnType<typeof components.TextShape>
   Transform: ReturnType<typeof components.Transform>
   Tween: ReturnType<typeof components.Tween>
+  TweenSequence: ReturnType<typeof components.TweenSequence>
   VideoPlayer: ReturnType<typeof components.VideoPlayer>
   VisibilityComponent: ReturnType<typeof components.VisibilityComponent>
 }
@@ -167,6 +193,7 @@ export function createComponents(engine: IEngine): SdkComponents {
   const TextShape = components.TextShape(engine)
   const Transform = components.Transform(engine)
   const Tween = components.Tween(engine)
+  const TweenSequence = components.TweenSequence(engine)
   const VideoPlayer = components.VideoPlayer(engine)
   const VisibilityComponent = components.VisibilityComponent(engine)
 
@@ -187,6 +214,7 @@ export function createComponents(engine: IEngine): SdkComponents {
     TextShape,
     Transform,
     Tween,
+    TweenSequence,
     VideoPlayer,
     VisibilityComponent
   }
@@ -269,7 +297,7 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     )
   })
 
-  const { ActionTypes, Actions, Counter, Triggers, States } = createAssetPacksComponents(engine as any)
+  const { ActionTypes, Actions, Counter, Triggers, States, CounterBar } = createAssetPacksComponents(engine as any)
 
   const TransformConfig = engine.defineComponent(EditorComponentNames.TransformConfig, {
     porportionalScaling: Schemas.Optional(Schemas.Boolean)
@@ -283,6 +311,20 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     value: Schemas.Boolean
   })
 
+  const Config = engine.defineComponent(EditorComponentNames.Config, {
+    isBasicViewEnabled: Schemas.Boolean,
+    componentName: Schemas.String,
+    fields: Schemas.Array(
+      Schemas.Map({
+        name: Schemas.String,
+        type: Schemas.EnumString<AllComponentsType>(AllComponents, AllComponents.Actions),
+        jsonPayload: Schemas.Optional(Schemas.String),
+        basicViewId: Schemas.Optional(Schemas.String)
+      })
+    ),
+    assetId: Schemas.Optional(Schemas.String)
+  })
+
   return {
     Selection,
     Scene,
@@ -290,12 +332,14 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     TransformConfig,
     Hide,
     Lock,
+    Config,
     ActionTypes: ActionTypes as unknown as LastWriteWinElementSetComponentDefinition<
       EditorComponentsTypes['ActionTypes']
     >,
     Actions: Actions as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Actions']>,
     Counter: Counter as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Counter']>,
     Triggers: Triggers as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Triggers']>,
-    States: States as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['States']>
+    States: States as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['States']>,
+    CounterBar: CounterBar as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['CounterBar']>
   }
 }

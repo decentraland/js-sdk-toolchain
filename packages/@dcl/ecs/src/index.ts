@@ -10,6 +10,7 @@ export * from './systems/events'
 export * from './systems/raycast'
 export * from './systems/videoEvents'
 export * from './systems/async-task'
+export * from './systems/tween'
 export * from './engine/entity'
 export * from './components/types'
 
@@ -25,6 +26,7 @@ import {
   MeshRendererComponentDefinitionExtended,
   TransformComponentExtended,
   AnimatorComponentDefinitionExtended,
+  AudioSourceComponentDefinitionExtended,
   ISyncComponents,
   TweenComponentDefinitionExtended,
   INetowrkEntity,
@@ -35,6 +37,7 @@ import { NameComponent } from './components/manual/Name'
 // export components for global engine
 export const Transform: TransformComponentExtended = /* @__PURE__*/ components.Transform(engine)
 export const Animator: AnimatorComponentDefinitionExtended = /* @__PURE__*/ components.Animator(engine)
+export const AudioSource: AudioSourceComponentDefinitionExtended = /* @__PURE__*/ components.AudioSource(engine)
 export const Material: MaterialComponentDefinitionExtended = /* @__PURE__*/ components.Material(engine)
 export const MeshRenderer: MeshRendererComponentDefinitionExtended = /* @__PURE__*/ components.MeshRenderer(engine)
 export const MeshCollider: MeshColliderComponentDefinitionExtended = /* @__PURE__*/ components.MeshCollider(engine)

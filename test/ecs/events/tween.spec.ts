@@ -134,4 +134,31 @@ describe('Tween System', () => {
     expect(completed).toBeCalledTimes(2)
     expect(TweenSequence.get(entity).sequence).toMatchObject([tween, rotateTween])
   })
+
+  it('should call the createTweenSystem twice with the same engine and check if the tween system was created just once', async () => {
+    const tweenSystemAlt = createTweenSystem(engine)
+    expect(tweenSystem).toBe(tweenSystemAlt)
+    await mockTween(entity)
+
+    engine.addSystem(() => {
+      if (tweenSystem.tweenCompleted(entity)) {
+        completed()
+      }
+    })
+    expect(completed).toBeCalledTimes(0)
+  })
+
+  it('should call the createTweenSystem twice with different engines and check if both tween systems were created', async () => {
+    const engineAlt = Engine()
+    const tweenSystemAlt = createTweenSystem(engineAlt)
+    expect(tweenSystem).not.toBe(tweenSystemAlt)
+    await mockTween(entity)
+
+    engine.addSystem(() => {
+      if (tweenSystem.tweenCompleted(entity)) {
+        completed()
+      }
+    })
+    expect(completed).toBeCalledTimes(0)
+  })
 })

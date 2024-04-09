@@ -13,6 +13,7 @@ import { colors } from '../components/log'
 import { printProgressInfo, printProgressStep, printWarning } from './beautiful-logs'
 import { CliError } from './error'
 import { getAllComposites } from './composite'
+import { isEditorScene } from './project-validations'
 
 export type BundleComponents = Pick<CliComponents, 'logger' | 'fs'>
 
@@ -47,7 +48,7 @@ const MAX_STEP = 2
  * @returns the Typescript code
  */
 
-function getEntrypointCode(entrypointPath: string, forceCustomExport: boolean) {
+function getEntrypointCode(entrypointPath: string, forceCustomExport: boolean, isEditorScene: boolean = false) {
   const unixEntrypointPath = entrypointPath.replace(/(\\)/g, '/')
   if (forceCustomExport) return `;"use strict";export * from '${unixEntrypointPath}'`
 
@@ -59,6 +60,16 @@ import * as sdk from '@dcl/sdk'
 import { compositeProvider } from '@dcl/sdk/composite-provider'
 import { compositeFromLoader } from '~sdk/all-composites'
 
+${
+  isEditorScene &&
+  `
+import { initAssetPacks } from '@dcl/asset-packs/dist/scene-entrypoint'
+initAssetPacks(engine)
+
+// TODO: do we need to do this on runtime ?
+// I think we have that information at build-time and we avoid to do evaluate this on the worker.
+// Read composite.json or main.crdt => If that file has a NetowrkEntity import '@dcl/@sdk/network'
+
 // conditionally load networking code if the NetworkEntity component is being used...
 for (const path in compositeFromLoader) {
   const composite = compositeProvider.getCompositeOrNull(path)
@@ -69,6 +80,7 @@ for (const path in compositeFromLoader) {
       import('@dcl/sdk/network')
     }
   }
+}`
 }
 
 if ((entrypoint as any).main !== undefined) {
@@ -136,7 +148,7 @@ type SingleProjectOptions = CompileOptions & {
 
 export async function bundleSingleProject(components: BundleComponents, options: SingleProjectOptions) {
   printProgressStep(components.logger, `Bundling file ${colors.bold(options.entrypoint)}`, 1, MAX_STEP)
-
+  const editorScene = await isEditorScene(components, options.workingDirectory)
   const context = await esbuild.context({
     bundle: true,
     platform: 'browser',
@@ -175,7 +187,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
     },
     plugins: [compositeLoader(components, options)],
     stdin: {
-      contents: getEntrypointCode(options.entrypoint, options.customEntryPoint),
+      contents: getEntrypointCode(options.entrypoint, options.customEntryPoint, editorScene),
       resolveDir: path.dirname(options.entrypoint),
       sourcefile: path.basename(options.entrypoint) + '.entry-point.ts',
       loader: 'ts'

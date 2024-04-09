@@ -50,8 +50,16 @@ export namespace AppendValueOperation {
 // @public
 export function areConnected(parcels: Coords[]): boolean;
 
+// Warning: (ae-missing-release-tag) "AudioSource" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const AudioSource: LastWriteWinElementSetComponentDefinition<PBAudioSource>;
+export const AudioSource: AudioSourceComponentDefinitionExtended;
+
+// @public (undocumented)
+export interface AudioSourceComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBAudioSource> {
+    playSound(entity: Entity, src: string, resetCursor?: boolean): boolean;
+    stopSound(entity: Entity, resetCursor?: boolean): boolean;
+}
 
 // @public (undocumented)
 export const AudioStream: LastWriteWinElementSetComponentDefinition<PBAudioStream>;
@@ -745,6 +753,15 @@ export function createEthereumProvider(): {
     sendAsync(message: RPCSendableMessage, callback: (error: Error | null, result?: any) => void): void;
 };
 
+// @public
+export function createInputSystem(engine: IEngine): IInputSystem;
+
+// @public
+export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSystem): PointerEventsSystem;
+
+// @public (undocumented)
+export function createTweenSystem(engine: IEngine): TweenSystem;
+
 // Warning: (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence
 // Warning: (tsdoc-code-span-missing-delimiter) The code span is missing its closing backtick
 // Warning: (tsdoc-undefined-tag) The TSDoc tag "@params" is not defined in this configuration
@@ -1152,6 +1169,8 @@ export interface IEngine {
     // @alpha
     getEntityOrNullByName(label: string): Entity | null;
     getEntityState(entity: Entity): EntityState;
+    // (undocumented)
+    _id: number;
     readonly PlayerEntity: Entity;
     registerComponentDefinition<T>(componentName: string, componentDefinition: ComponentDefinition<T>): ComponentDefinition<T>;
     // (undocumented)
@@ -2064,6 +2083,8 @@ export namespace PBAnimator {
 // @public (undocumented)
 export interface PBAudioSource {
     audioClipUrl: string;
+    currentTime?: number | undefined;
+    global?: boolean | undefined;
     loop?: boolean | undefined;
     pitch?: number | undefined;
     playing?: boolean | undefined;

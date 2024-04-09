@@ -14,14 +14,16 @@ export const DISABLED_COMPONENTS: string[] = [
   CoreComponents.NFT_SHAPE,
   CoreComponents.VIDEO_PLAYER,
   CoreComponents.NETWORK_ENTITY,
-  CoreComponents.TWEEN
+  CoreComponents.TWEEN,
+  CoreComponents.TWEEN_SEQUENCE
 ]
 
 export const SMART_ITEM_COMPONENTS: string[] = [
   ComponentName.STATES,
   ComponentName.ACTIONS,
   ComponentName.TRIGGERS,
-  ComponentName.COUNTER
+  ComponentName.COUNTER,
+  ComponentName.COUNTER_BAR
 ]
 
 export const ROOT_COMPONENTS: Record<Entity, string[]> = {

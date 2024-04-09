@@ -41,7 +41,7 @@ const ColorField: React.FC<Props> = ({ label, value, onChange }) => {
           leftContent: <div className="ColorPreview" style={{ backgroundColor: color.value }} />,
           secondaryText: color.value
         }))}
-        secondaryValue={stockColor ?? COLORS[0].value}
+        secondaryValue={selectedOption === Options.BASICS ? stockColor ?? COLORS[0].value : value}
         onChange={handleOptionChange}
         onChangeSecondary={onChange}
       />

@@ -65,7 +65,7 @@ const DelayAction = <T extends ActionPayload<ActionType.START_DELAY | ActionType
     [payload, setPayload]
   )
 
-  const handleChangeHideAfterSeconds = useCallback(
+  const handleChangeDelay = useCallback(
     (e: React.ChangeEvent<HTMLElement>) => {
       const { value } = e.target as HTMLInputElement
 
@@ -88,7 +88,7 @@ const DelayAction = <T extends ActionPayload<ActionType.START_DELAY | ActionType
             />
           </Block>
           <Block>
-            <RangeField label="Delay in Seconds" value={payload.timeout} onChange={handleChangeHideAfterSeconds} />
+            <RangeField step={0.1} label="Delay in Seconds" value={payload.timeout} onChange={handleChangeDelay} />
           </Block>
         </>
       ) : (

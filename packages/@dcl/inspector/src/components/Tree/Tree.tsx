@@ -4,11 +4,11 @@ import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io'
 import cx from 'classnames'
 import { Entity } from '@dcl/ecs'
 
-import { ROOT } from '../../lib/sdk/tree'
 import { withContextMenu } from '../../hoc/withContextMenu'
 import { Input } from '../Input'
 import { ContextMenu } from './ContextMenu'
 import { ActionArea } from './ActionArea'
+import { Edit as EditInput } from './Edit'
 import { ClickType, DropType, calculateDropType } from './utils'
 
 import './Tree.css'
@@ -193,7 +193,7 @@ export function Tree<T>() {
       }
 
       const isEntity = useMemo(() => {
-        return typeof value !== 'string' && (value as Entity) !== ROOT
+        return typeof value !== 'string'
       }, [value])
 
       drag(drop(ref))
@@ -230,7 +230,7 @@ export function Tree<T>() {
               </div>
             </div>
             {editMode && typeof label === 'string' && (
-              <Input value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />
+              <EditInput value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />
             )}
           </div>
           <TreeChildren {...props} />

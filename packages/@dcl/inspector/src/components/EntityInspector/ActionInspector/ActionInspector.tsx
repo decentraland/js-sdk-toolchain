@@ -48,6 +48,13 @@ import { DelayAction } from './DelayAction'
 import { LoopAction } from './LoopAction'
 import { CloneEntityAction } from './CloneEntityAction'
 import { ShowImageAction } from './ShowImageAction'
+import { FollowPlayerAction } from './FollowPlayerAction'
+import TriggerProximityAction from './TriggerProximityAction/TriggerProximityAction'
+import SetPositionAction from './SetPositionAction/SetPositionAction'
+import { SetRotationAction } from './SetRotationAction'
+import { SetScaleAction } from './SetScaleAction'
+import { RandomAction } from './RandomAction'
+import { BatchAction } from './BatchAction'
 import { getDefaultPayload, getPartialPayload, isStates } from './utils'
 import { Props } from './types'
 
@@ -84,7 +91,21 @@ const ActionMapOption: Record<string, string> = {
   [ActionType.CLONE_ENTITY]: 'Clone',
   [ActionType.REMOVE_ENTITY]: 'Remove',
   [ActionType.SHOW_IMAGE]: 'Show Image',
-  [ActionType.HIDE_IMAGE]: 'Hide Image'
+  [ActionType.HIDE_IMAGE]: 'Hide Image',
+  [ActionType.FOLLOW_PLAYER]: 'Follow Player',
+  [ActionType.STOP_FOLLOWING_PLAYER]: 'Stop Following Player',
+  [ActionType.MOVE_PLAYER_HERE]: 'Move Player Here',
+  [ActionType.DAMAGE]: 'Damage',
+  [ActionType.PLACE_ON_PLAYER]: 'Place On Player',
+  [ActionType.ROTATE_AS_PLAYER]: 'Rotate As Player',
+  [ActionType.PLACE_ON_CAMERA]: 'Place On Camera',
+  [ActionType.ROTATE_AS_CAMERA]: 'Rotate As Camera',
+  [ActionType.SET_POSITION]: 'Set Position',
+  [ActionType.SET_ROTATION]: 'Set Rotation',
+  [ActionType.SET_SCALE]: 'Set Scale',
+  [ActionType.RANDOM]: 'Random Action',
+  [ActionType.BATCH]: 'Batch Actions',
+  [ActionType.HEAL_PLAYER]: 'Heal Player'
 }
 
 export default withSdk<Props>(({ sdk, entity: entityId }) => {
@@ -341,6 +362,18 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     [modifyAction, actions]
   )
 
+  const handleChangeAmount = useCallback(
+    ({ target: { value } }: React.ChangeEvent<HTMLInputElement>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.INCREMENT_COUNTER | ActionType.DECREASE_COUNTER>({
+          amount: parseInt(value)
+        })
+      })
+    },
+    [modifyAction, actions]
+  )
+
   const handleChangeAnchorPoint = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
       modifyAction(idx, {
@@ -488,6 +521,66 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     [modifyAction, actions]
   )
 
+  const handleChangeFollowPlayer = useCallback(
+    (value: ActionPayload<ActionType.FOLLOW_PLAYER>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.FOLLOW_PLAYER>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangeTriggerProximity = useCallback(
+    (value: ActionPayload<ActionType.DAMAGE>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.DAMAGE>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleSetPosition = useCallback(
+    (value: ActionPayload<ActionType.SET_POSITION>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.SET_POSITION>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleSetRotation = useCallback(
+    (value: ActionPayload<ActionType.SET_ROTATION>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.SET_ROTATION>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleSetScale = useCallback(
+    (value: ActionPayload<ActionType.SET_SCALE>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.SET_SCALE>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
+  const handleChangeActions = useCallback(
+    (value: ActionPayload<ActionType.RANDOM | ActionType.BATCH>, idx: number) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<ActionType.RANDOM | ActionType.BATCH>(value)
+      })
+    },
+    [modifyAction, actions]
+  )
+
   const handleFocusInput = useCallback(
     ({ type }: React.FocusEvent<HTMLInputElement>) => {
       if (type === 'focus') {
@@ -518,6 +611,16 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     },
     [modifyAction, actions]
   )
+
+  const createHandler = <T extends ActionType>(getPayload: (value: string) => ActionPayload<T>, idx: number) => {
+    const handler = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
+      modifyAction(idx, {
+        ...actions[idx],
+        jsonPayload: getJson<T>(getPayload(value))
+      })
+    }
+    return handler
+  }
 
   const handleRemoveAction = useCallback(
     (_e: React.MouseEvent, idx: number) => {
@@ -573,6 +676,34 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
                 type="number"
                 value={getPartialPayload<ActionType.SET_COUNTER>(action)?.counter}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeCounter(e, idx)}
+              />
+            </div>
+          </div>
+        ) : null
+      }
+      case ActionType.INCREMENT_COUNTER: {
+        return hasCounter ? (
+          <div className="row">
+            <div className="field">
+              <TextField
+                label="Amount"
+                type="number"
+                value={getPartialPayload<ActionType.INCREMENT_COUNTER>(action)?.amount}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeAmount(e, idx)}
+              />
+            </div>
+          </div>
+        ) : null
+      }
+      case ActionType.DECREASE_COUNTER: {
+        return hasCounter ? (
+          <div className="row">
+            <div className="field">
+              <TextField
+                label="Amount"
+                type="number"
+                value={getPartialPayload<ActionType.DECREASE_COUNTER>(action)?.amount}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeAmount(e, idx)}
               />
             </div>
           </div>
@@ -712,6 +843,71 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
             value={getPartialPayload<ActionType.SHOW_IMAGE>(action)}
             onUpdate={(e) => handleChangeImage(e, idx)}
           />
+        )
+      }
+      case ActionType.FOLLOW_PLAYER:
+        return (
+          <FollowPlayerAction
+            value={getPartialPayload<ActionType.FOLLOW_PLAYER>(action)}
+            onUpdate={(e) => handleChangeFollowPlayer(e, idx)}
+          />
+        )
+      case ActionType.DAMAGE:
+        return (
+          <TriggerProximityAction
+            value={getPartialPayload<ActionType.DAMAGE>(action)}
+            onUpdate={(e) => handleChangeTriggerProximity(e, idx)}
+          />
+        )
+      case ActionType.SET_POSITION:
+        return (
+          <SetPositionAction
+            value={getPartialPayload<ActionType.SET_POSITION>(action)}
+            onUpdate={(e) => handleSetPosition(e, idx)}
+          />
+        )
+      case ActionType.SET_ROTATION:
+        return (
+          <SetRotationAction
+            value={getPartialPayload<ActionType.SET_ROTATION>(action)}
+            onUpdate={(e) => handleSetRotation(e, idx)}
+          />
+        )
+      case ActionType.SET_SCALE:
+        return (
+          <SetScaleAction
+            value={getPartialPayload<ActionType.SET_SCALE>(action)}
+            onUpdate={(e) => handleSetScale(e, idx)}
+          />
+        )
+      case ActionType.RANDOM:
+        return (
+          <RandomAction
+            value={getPartialPayload<ActionType.RANDOM>(action)}
+            availableActions={actions}
+            onUpdate={(e) => handleChangeActions(e, idx)}
+          />
+        )
+      case ActionType.BATCH:
+        return (
+          <BatchAction
+            value={getPartialPayload<ActionType.BATCH>(action)}
+            availableActions={actions}
+            onUpdate={(e) => handleChangeActions(e, idx)}
+          />
+        )
+      case ActionType.HEAL_PLAYER: {
+        return (
+          <div className="row">
+            <div className="field">
+              <TextField
+                label="Multiplier"
+                type="number"
+                value={getPartialPayload<ActionType.HEAL_PLAYER>(action)?.multiplier || 1}
+                onChange={createHandler<ActionType.HEAL_PLAYER>((value) => ({ multiplier: parseInt(value) }), idx)}
+              />
+            </div>
+          </div>
         )
       }
       default: {
