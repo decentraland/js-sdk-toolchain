@@ -30,6 +30,8 @@ const ACCEPTED_FILE_TYPES = {
   'video/mp4': ['.mp4']
 }
 
+const IGNORED_ERROR_CODES = ['ACCESSOR_WEIGHTS_NON_NORMALIZED']
+
 interface PropTypes {
   onSave(): void
 }
@@ -61,13 +63,13 @@ async function validateGltf(data: ArrayBuffer): Promise<ValidationError> {
     Babylon's type declarations incorrectly state that result.issues.messages
     is an Array<string>. In fact, it's an array of objects with useful properties.
   */
-  const messages = result.issues.messages as unknown as BabylonValidationIssue[]
+  const issues = result.issues.messages as unknown as BabylonValidationIssue[]
 
-  if (result.issues.numErrors > 0) {
-    for (const { message, pointer, severity } of messages) {
-      if (severity === 0) return `${pre}: ${message} \n Check ${pointer}`
-    }
-    return `${pre}: unknown reason`
+  const errors = issues.filter((issue) => issue.severity === 0 && !IGNORED_ERROR_CODES.includes(issue.code))
+
+  if (errors.length > 0) {
+    const error = errors[0]
+    return `${pre}: ${error.message} \n Check ${error.pointer}`
   }
 
   return null
