@@ -28,6 +28,7 @@ function definePlayerHelper(engine: IEngine) {
   const AvatarEquippedData = defineAvatarEquippedData(engine)
   const AvatarBase = defineAvatarBase(engine)
   const playerEntities = new Map<Entity, string>()
+
   let onEnterSceneCb: ((player: GetPlayerDataRes) => void) | undefined = undefined
   let onLeaveSceneCb: ((userId: string) => void) | undefined = undefined
 
