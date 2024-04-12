@@ -558,12 +558,14 @@ export const componentDefinitionByName: {
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
     "core::NftShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBNftShape>>;
+    "core::PlayerClicked": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBPlayerClicked>>;
     "core::PlayerIdentityData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>>;
     "core::PointerEvents": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerEvents>>;
     "core::PointerEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBPointerEventsResult>>;
     "core::PointerLock": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerLock>>;
     "core::Raycast": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycast>>;
     "core::RaycastResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycastResult>>;
+    "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
     "core::TweenSequence": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenSequence>>;
@@ -983,12 +985,6 @@ export function Engine(options?: IEngineOptions): IEngine;
 export const engine: IEngine;
 
 // @public (undocumented)
-export type EngineEvent<T extends IEventNames = IEventNames, V = IEvents[T]> = {
-    type: T;
-    data: Readonly<V>;
-};
-
-// @public (undocumented)
 export const EngineInfo: LastWriteWinElementSetComponentDefinition<PBEngineInfo>;
 
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
@@ -1097,24 +1093,6 @@ export function getComponentEntityTree<T>(engine: Pick<IEngine, 'getEntitiesWith
 // @public @deprecated (undocumented)
 export function getCompositeRootComponent(engine: IEngine): LastWriteWinElementSetComponentDefinition<CompositeRootType>;
 
-// @public (undocumented)
-export type GizmoDragEndEvent = {
-    type: 'gizmoDragEnded';
-    transforms: Array<{
-        position: Vector3Type;
-        rotation: QuaternionType;
-        scale: Vector3Type;
-        entityId: unknown;
-    }>;
-};
-
-// @public (undocumented)
-export type GizmoSelectedEvent = {
-    type: 'gizmoSelected';
-    gizmoType: 'MOVE' | 'ROTATE' | 'SCALE' | 'NONE';
-    entities: string[];
-};
-
 // Warning: (ae-missing-release-tag) "GlobalDirectionRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -1125,11 +1103,6 @@ export type GlobalDirectionRaycastOptions = RaycastSystemOptions & GlobalDirecti
 // @public (undocumented)
 export type GlobalDirectionRaycastSystemOptions = {
     direction?: PBVector3;
-};
-
-// @public (undocumented)
-export type GlobalInputEventResult = InputEventResult & {
-    type: 0 | 1;
 };
 
 // Warning: (ae-missing-release-tag) "GlobalTargetRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -1219,87 +1192,21 @@ export type IEventNames = keyof IEvents;
 
 // @public
 export interface IEvents {
-    actionButtonEvent: GlobalInputEventResult;
-    builderSceneStart: unknown;
-    builderSceneUnloaded: unknown;
-    cameraModeChanged: {
-        cameraMode: 0 | 1 | 2;
-    };
-    chatMessage: {
-        id: string;
-        sender: string;
-        message: string;
-        isCommand: boolean;
-    };
     comms: {
         sender: string;
         message: string;
     };
-    entitiesOutOfBoundaries: {
-        entities: string[];
-    };
-    entityBackInScene: {
-        entityId: unknown;
-    };
-    entityOutOfScene: {
-        entityId: unknown;
-    };
-    // (undocumented)
-    externalAction: {
-        type: string;
-        [key: string]: any;
-    };
-    gizmoEvent: GizmoDragEndEvent | GizmoSelectedEvent;
-    idleStateChanged: {
-        isIdle: boolean;
-    };
-    // (undocumented)
-    limitsExceeded: {
-        given: Record<string, number>;
-        limit: Record<string, number>;
-    };
-    // (undocumented)
-    metricsUpdate: {
-        given: Record<string, number>;
-        limit: Record<string, number>;
-    };
-    onAnimationEnd: {
-        clipName: string;
-    };
-    onBlur: {
-        entityId: unknown;
-        pointerId: number;
-    };
-    onChange: {
-        value?: any;
-        pointerId?: number;
-    };
-    onClick: {
-        entityId: unknown;
-    };
-    onEnter: unknown;
     onEnterScene: {
         userId: string;
     };
-    onFocus: {
-        entityId: unknown;
-        pointerId: number;
-    };
     onLeaveScene: {
         userId: string;
-    };
-    onPointerLock: {
-        locked?: boolean;
     };
     onRealmChanged: {
         domain: string;
         room: string;
         serverName: string;
         displayName: string;
-    };
-    // (undocumented)
-    onTextSubmit: {
-        text: string;
     };
     playerClicked: {
         userId: string;
@@ -1319,37 +1226,11 @@ export interface IEvents {
     playerExpression: {
         expressionId: string;
     };
-    pointerDown: InputEventResult;
-    // @deprecated
-    pointerEvent: GlobalInputEventResult;
-    pointerHoverEnter: unknown;
-    pointerHoverExit: unknown;
-    pointerUp: InputEventResult;
-    positionChanged: {
-        position: Vector3Type;
-        cameraPosition: Vector3Type;
-        playerHeight: number;
-    };
     profileChanged: {
         ethAddress: string;
         version: number;
     };
-    raycastResponse: RaycastResponsePayload<any>;
-    rotationChanged: {
-        rotation: Vector3Type;
-        quaternion: QuaternionType;
-    };
     sceneStart: unknown;
-    // (undocumented)
-    stateEvent: {
-        type: string;
-        payload: any;
-    };
-    // (undocumented)
-    uuidEvent: {
-        uuid: string;
-        payload: any;
-    };
     videoEvent: {
         componentId: string;
         videoClipId: string;
@@ -1459,21 +1340,6 @@ export const enum InputAction {
     // (undocumented)
     IA_WALK = 9
 }
-
-// @public (undocumented)
-export type InputEventResult = {
-    origin: Vector3Type;
-    direction: Vector3Type;
-    buttonId: number;
-    hit?: {
-        length: number;
-        hitPoint: Vector3Type;
-        meshName: string;
-        normal: Vector3Type;
-        worldNormal: Vector3Type;
-        entityId: unknown;
-    };
-};
 
 // @public
 export const inputSystem: IInputSystem;
@@ -2623,6 +2489,28 @@ export namespace PBNftShape {
 }
 
 // @public (undocumented)
+export interface PBPlayerClicked {
+    // (undocumented)
+    address: string;
+    // (undocumented)
+    direction: PBVector3 | undefined;
+    // (undocumented)
+    distance: number;
+    // (undocumented)
+    origin: PBVector3 | undefined;
+    // (undocumented)
+    timestamp: number;
+}
+
+// @public (undocumented)
+export namespace PBPlayerClicked {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPlayerClicked;
+    // (undocumented)
+    export function encode(message: PBPlayerClicked, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBPlayerIdentityData {
     address: string;
     // (undocumented)
@@ -2798,6 +2686,28 @@ export namespace PBRaycastResult {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBRaycastResult;
     // (undocumented)
     export function encode(message: PBRaycastResult, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBRealmInfo {
+    // (undocumented)
+    baseUrl: string;
+    // (undocumented)
+    commsAdapter: string;
+    // (undocumented)
+    networkId: number;
+    // (undocumented)
+    realmName: string;
+    // (undocumented)
+    room: string;
+}
+
+// @public (undocumented)
+export namespace PBRealmInfo {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBRealmInfo;
+    // (undocumented)
+    export function encode(message: PBRealmInfo, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3227,6 +3137,9 @@ export namespace Plane {
 }
 
 // @public (undocumented)
+export const PlayerClicked: GrowOnlyValueSetComponentDefinition<PBPlayerClicked>;
+
+// @public (undocumented)
 export const PlayerIdentityData: LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>;
 
 // @public (undocumented)
@@ -3465,13 +3378,6 @@ export const enum RaycastQueryType {
 }
 
 // @public (undocumented)
-export type RaycastResponsePayload<T> = {
-    queryId: string;
-    queryType: string;
-    payload: T;
-};
-
-// @public (undocumented)
 export const RaycastResult: LastWriteWinElementSetComponentDefinition<PBRaycastResult>;
 
 // @public (undocumented)
@@ -3565,6 +3471,9 @@ export type ReadOnlyLastWriteWinElementSetComponentDefinition<T> = Omit<LastWrit
 
 // @public (undocumented)
 export type ReadonlyPrimitive = number | string | number[] | string[] | boolean | boolean[];
+
+// @public (undocumented)
+export const RealmInfo: LastWriteWinElementSetComponentDefinition<PBRealmInfo>;
 
 // @public (undocumented)
 export type ReceiveMessage = CrdtMessageBody & {

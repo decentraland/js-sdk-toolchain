@@ -98,7 +98,7 @@ export interface IEvents {
  */
 function createSubscriber(eventName: keyof IEvents) {
   return () => {
-    if (eventName === 'comms' || eventName === 'videoEvent') {
+    if (eventName === 'comms' || eventName === 'videoEvent' || eventName === 'playerClicked') {
       subscribe({ eventId: eventName }).catch(console.error)
     }
     SDK7Observables.subscribe(eventName)
@@ -194,6 +194,8 @@ export const onCommsMessage = new Observable<IEvents['comms']>(createSubscriber(
  * @deprecated this is an OLD API.
  * This function uses the SDK6 sendBatch to poll events from the renderer
  */
+
+// TODO: __OBSERVABLES_FALLBACK_SUPPORT flag for other clients.
 export async function pollEvents(sendBatch: (body: ManyEntityAction) => Promise<SendBatchResponse>) {
   const { events } = await sendBatch({ actions: [] })
   for (const e of events) {
