@@ -1,5 +1,17 @@
 import { Observable } from './internal/Observable'
-import { AvatarBase, AvatarEmoteCommand, AvatarEquippedData, PlayerIdentityData, Vector3Type, engine } from '@dcl/ecs'
+import {
+  AvatarBase,
+  AvatarEmoteCommand,
+  AvatarEquippedData,
+  Entity,
+  PlayerClicked,
+  PlayerIdentityData,
+  RealmInfo,
+  Vector3Type,
+  VideoEvent,
+  VideoPlayer,
+  engine
+} from '@dcl/ecs'
 import { ManyEntityAction, SendBatchResponse, subscribe } from '~system/EngineApi'
 import players from './players'
 
@@ -202,22 +214,6 @@ export async function pollEvents(sendBatch: (body: ManyEntityAction) => Promise<
     if (e.generic) {
       const data = JSON.parse(e.generic.eventData)
       switch (e.generic.eventId) {
-        case 'videoEvent': {
-          const videoData = data as IEvents['videoEvent']
-          onVideoEvent.notifyObservers(videoData)
-          break
-        }
-
-        // TBD: new components
-        case 'onRealmChanged': {
-          onRealmChangedObservable.notifyObservers(data as IEvents['onRealmChanged'])
-          break
-        }
-        case 'playerClicked': {
-          onPlayerClickedObservable.notifyObservers(data as IEvents['playerClicked'])
-          break
-        }
-
         // Only observer that we would mantain.
         case 'comms': {
           onCommsMessage.notifyObservers(data as IEvents['comms'])
@@ -235,49 +231,138 @@ function processObservables() {
 
   function subscribe(eventName: keyof IEvents) {
     if (subscriptions.has(eventName)) return
-
+    switch (eventName) {
+      case 'playerClicked': {
+        subscribePlayerClick()
+      }
+      case 'onEnterScene':
+      case 'playerConnected': {
+        subscribeEnterScene()
+      }
+      case 'onLeaveScene':
+      case 'playerDisconnected': {
+        subscribeLeaveScene()
+      }
+      case 'onRealmChanged': {
+        subscribeRealmChange()
+      }
+      case 'playerExpression': {
+        subscribePlayerExpression()
+      }
+      case 'profileChanged': {
+        subscribeProfileChange()
+      }
+      case 'videoEvent': {
+        subscribeVideoEvent()
+      }
+    }
     subscriptions.add(eventName)
   }
+  /**
+   * PLAYER ENTER/CONNECTED observable
+   */
+  function subscribeEnterScene() {
+    players.onEnterScene((player) => {
+      if (subscriptions.has('onEnterScene')) {
+        onEnterSceneObservable.notifyObservers({ userId: player.userId })
+      }
 
-  players.onEnterScene((player) => {
-    if (subscriptions.has('onEnterScene')) {
-      onEnterSceneObservable.notifyObservers({ userId: player.userId })
-    }
+      if (subscriptions.has('playerConnected')) {
+        onPlayerConnectedObservable.notifyObservers({ userId: player.userId })
+      }
+    })
+  }
+  /**
+   * PLAYER LEAVE/DISCONNECTED observable
+   */
+  function subscribeLeaveScene() {
+    players.onLeaveScene((userId) => {
+      if (subscriptions.has('onLeaveScene')) {
+        onLeaveSceneObservable.notifyObservers({ userId })
+      }
 
-    if (subscriptions.has('playerConnected')) {
-      onPlayerConnectedObservable.notifyObservers({ userId: player.userId })
-    }
-  })
+      if (subscriptions.has('playerDisconnected')) {
+        onPlayerDisconnectedObservable.notifyObservers({ userId })
+      }
+    })
+  }
+  /**
+   * REALM CHANGE observable
+   */
+  function subscribeRealmChange() {
+    RealmInfo.onChange(engine.RootEntity, (value) => {
+      if (value) {
+        onRealmChangedObservable.notifyObservers({
+          domain: value.baseUrl,
+          displayName: value.realmName,
+          room: value.room,
+          serverName: value.realmName
+        })
+      }
+    })
+  }
+  /**
+   * PLAYER/AVATAR CLICKED observable
+   */
+  function subscribePlayerClick() {
+    PlayerClicked.onChange(engine.PlayerEntity, (value) => {
+      if (value) {
+        onPlayerClickedObservable.notifyObservers({
+          userId: value.address,
+          ray: {
+            direction: value.direction!,
+            distance: value.distance,
+            origin: value.origin!
+          }
+        })
+      }
+    })
+  }
 
-  players.onLeaveScene((userId) => {
-    if (subscriptions.has('onLeaveScene')) {
-      onLeaveSceneObservable.notifyObservers({ userId })
-    }
-
-    if (subscriptions.has('playerDisconnected')) {
-      onPlayerDisconnectedObservable.notifyObservers({ userId })
-    }
-  })
-
-  AvatarEmoteCommand.onChange(engine.PlayerEntity, (value) => {
-    if (subscriptions.has('playerExpression')) {
+  /**
+   * Player expression observable
+   */
+  function subscribePlayerExpression() {
+    AvatarEmoteCommand.onChange(engine.PlayerEntity, (value) => {
       onPlayerExpressionObservable.notifyObservers({ expressionId: value?.emoteUrn ?? '' })
-    }
-  })
+    })
+  }
 
-  AvatarBase.onChange(engine.PlayerEntity, () => {
-    if (subscriptions.has('profileChanged')) {
+  /**
+   * PROFILE CHANGE observable
+   */
+  function subscribeProfileChange() {
+    AvatarBase.onChange(engine.PlayerEntity, () => {
       if (!profileAddress) return
       onProfileChanged.notifyObservers({ ethAddress: profileAddress, version: 0 })
-    }
-  })
+    })
 
-  AvatarEquippedData.onChange(engine.PlayerEntity, () => {
-    if (subscriptions.has('profileChanged')) {
+    AvatarEquippedData.onChange(engine.PlayerEntity, () => {
       if (!profileAddress) return
       onProfileChanged.notifyObservers({ ethAddress: profileAddress, version: 0 })
-    }
-  })
+    })
+  }
+
+  function subscribeVideoEvent() {
+    const videoEntities = new Set<Entity>()
+    engine.addSystem(() => {
+      for (const [entity] of engine.getEntitiesWith(VideoEvent)) {
+        if (videoEntities.has(entity)) return
+        videoEntities.add(entity)
+        VideoEvent.onChange(entity, (data) => {
+          if (!data) return
+          const video = VideoPlayer.getOrNull(entity)
+          onVideoEvent.notifyObservers({
+            videoClipId: video?.src ?? '',
+            componentId: entity.toString(),
+            videoStatus: data.state ?? 0,
+            currentOffset: data.currentOffset,
+            totalVideoLength: data.videoLength
+          })
+        })
+      }
+    })
+  }
 
   // Flag to call once the scene is initalized.
   let sceneReady = false
