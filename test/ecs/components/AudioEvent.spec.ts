@@ -1,4 +1,4 @@
-import { components, Engine, AudioState } from '../../../packages/@dcl/ecs/src'
+import { components, Engine, MediaState } from '../../../packages/@dcl/ecs/src'
 import { testSchemaSerializationIdentity } from './assertion'
 
 describe('Generated AudioEvent ProtoBuf', () => {
@@ -8,17 +8,17 @@ describe('Generated AudioEvent ProtoBuf', () => {
 
     testSchemaSerializationIdentity(AudioEvent.schema, {
       timestamp: 5,
-      state: AudioState.AS_LOADING
+      state: MediaState.MS_LOADING
     })
 
     testSchemaSerializationIdentity(AudioEvent.schema, {
       timestamp: 10,
-      state: AudioState.AS_PLAYING
+      state: MediaState.MS_PLAYING
     })
 
     testSchemaSerializationIdentity(AudioEvent.schema, {
       timestamp: 30,
-      state: AudioState.AS_PLAYING
+      state: MediaState.MS_PLAYING
     })
 
     testSchemaSerializationIdentity(AudioEvent.schema, AudioEvent.schema.create())

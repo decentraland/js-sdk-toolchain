@@ -13,6 +13,7 @@ import defineNetworkEntity, { INetowrkEntityType } from './manual/NetworkEntity'
 import defineNetworkParent, { INetowrkParentType } from './manual/NetworkParent'
 import { defineTransformComponent, TransformComponentExtended } from './manual/Transform'
 import { AudioStreamComponentDefinitionExtended, defineAudioStreamComponent } from './extended/AudioStream'
+import { MediaState } from './generated/pb/decentraland/sdk/components/common/media_state.gen'
 
 export * from './generated/index.gen'
 
@@ -85,3 +86,5 @@ export const NetworkEntity: (
 export const NetworkParent: (
   engine: Pick<IEngine, 'defineComponent'>
 ) => LastWriteWinElementSetComponentDefinition<INetowrkParentType> = (engine) => defineNetworkParent(engine)
+
+export { MediaState }

@@ -1,4 +1,4 @@
-﻿import { AudioState, Engine, components } from '../../../packages/@dcl/ecs/src'
+﻿import { MediaState, Engine, components } from '../../../packages/@dcl/ecs/src'
 import { testComponentSerialization } from './assertion'
 
 describe('Generated AudioStream ProtoBuf', () => {
@@ -38,11 +38,11 @@ describe('Generated AudioStream ProtoBuf', () => {
     expect(AudioStream.getAudioState(entity)).toBe(undefined)
 
     // add some states
-    AudioEvent.addValue(entity, { state: AudioState.AS_BUFFERING, timestamp: 1 })
-    AudioEvent.addValue(entity, { state: AudioState.AS_ERROR, timestamp: 2 })
-    AudioEvent.addValue(entity, { state: AudioState.AS_PLAYING, timestamp: 3 })
+    AudioEvent.addValue(entity, { state: MediaState.MS_BUFFERING, timestamp: 1 })
+    AudioEvent.addValue(entity, { state: MediaState.MS_ERROR, timestamp: 2 })
+    AudioEvent.addValue(entity, { state: MediaState.MS_PLAYING, timestamp: 3 })
 
     // get last state
-    expect(AudioStream.getAudioState(entity)).toStrictEqual({ state: AudioState.AS_PLAYING, timestamp: 3 })
+    expect(AudioStream.getAudioState(entity)).toStrictEqual({ state: MediaState.MS_PLAYING, timestamp: 3 })
   })
 })

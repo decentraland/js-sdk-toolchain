@@ -64,26 +64,6 @@ export interface AudioSourceComponentDefinitionExtended extends LastWriteWinElem
     stopSound(entity: Entity, resetCursor?: boolean): boolean;
 }
 
-// @public (undocumented)
-export const enum AudioState {
-    // (undocumented)
-    AS_BUFFERING = 5,
-    // (undocumented)
-    AS_ERROR = 2,
-    // (undocumented)
-    AS_LOADING = 4,
-    // (undocumented)
-    AS_NONE = 0,
-    // (undocumented)
-    AS_PAUSED = 7,
-    // (undocumented)
-    AS_PLAYING = 6,
-    // (undocumented)
-    AS_READY = 1,
-    // (undocumented)
-    AS_SEEKING = 3
-}
-
 // Warning: (ae-missing-release-tag) "AudioStream" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -1818,6 +1798,26 @@ export namespace Matrix {
     export function Zero(): MutableMatrix;
 }
 
+// @public (undocumented)
+export const enum MediaState {
+    // (undocumented)
+    MS_BUFFERING = 5,
+    // (undocumented)
+    MS_ERROR = 1,
+    // (undocumented)
+    MS_LOADING = 2,
+    // (undocumented)
+    MS_NONE = 0,
+    // (undocumented)
+    MS_PAUSED = 7,
+    // (undocumented)
+    MS_PLAYING = 4,
+    // (undocumented)
+    MS_READY = 3,
+    // (undocumented)
+    MS_SEEKING = 6
+}
+
 // Warning: (ae-missing-release-tag) "MeshCollider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -2114,7 +2114,7 @@ export namespace PBAnimator {
 // @public (undocumented)
 export interface PBAudioEvent {
     // (undocumented)
-    state: AudioState;
+    state: MediaState;
     timestamp: number;
 }
 
