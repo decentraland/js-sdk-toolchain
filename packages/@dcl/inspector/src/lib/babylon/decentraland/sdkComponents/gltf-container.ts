@@ -1,3 +1,4 @@
+import future from 'fp-future'
 import * as BABYLON from '@babylonjs/core'
 import { GLTFFileLoader, GLTFLoaderAnimationStartMode } from '@babylonjs/loaders'
 import { GLTFLoader } from '@babylonjs/loaders/glTF/2.0'
@@ -7,6 +8,7 @@ import { markAsCollider } from '../colliders-utils'
 import type { ComponentOperation } from '../component-operations'
 import { EcsEntity } from '../EcsEntity'
 import { SceneContext } from '../SceneContext'
+import { CAMERA, PLAYER } from '../../../sdk/tree'
 
 let sceneContext: WeakRef<SceneContext>
 
@@ -75,14 +77,22 @@ export function loadGltf(entity: EcsEntity, value: string) {
     sceneContext = entity.context
   }
 
-  const loadingSpinner = createLoadingSpinner(entity, context.scene)
+  const root = entity.getRoot()
+
+  const shouldHide = root === PLAYER || root === CAMERA || root === null
+
+  const loadingSpinner: BABYLON.Mesh | null = shouldHide ? null : createLoadingSpinner(entity, context.scene)
 
   tryLoadGltfAsync(context.loadableScene.id, entity, value)
     .catch((err) => {
       console.error('Error trying to load gltf ' + value, err)
     })
     .finally(() => {
-      loadingSpinner.dispose(false, true)
+      if (shouldHide) {
+        entity.setVisibility(false)
+      } else {
+        loadingSpinner?.dispose(false, true)
+      }
     })
 }
 
@@ -131,6 +141,8 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
   const file = new File([content], finalSrc)
   const extension = filePath.toLowerCase().endsWith('.gltf') ? '.gltf' : '.glb'
 
+  const loadAssetFuture = future<void>()
+
   loadAssetContainer(
     file,
     entity.getScene(),
@@ -160,14 +172,18 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
       entity.generateBoundingBox()
       entity.setGltfAssetContainer(assetContainer)
       entity.resolveGltfPathLoading(filePath)
+      loadAssetFuture.resolve()
     },
     undefined,
-    (_scene, _message, _exception) => {
-      console.error('Error while calling LoadAssetContainer: ', _message, _exception)
+    (_scene, message, _exception) => {
+      console.error('Error while calling LoadAssetContainer: ', message, _exception)
       entity.resolveGltfPathLoading(filePath)
+      loadAssetFuture.reject(new Error(message))
     },
     extension
   )
+
+  return loadAssetFuture
 }
 
 export function loadAssetContainer(
