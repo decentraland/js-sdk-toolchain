@@ -7,11 +7,19 @@ import { EntityType } from '@dcl/schemas'
 import { DataLayerRpcClient } from '../../data-layer/types'
 import { Operations } from '../../sdk/operations'
 import { Entity } from '@dcl/ecs'
+import { EditorComponents, Node } from '../../sdk/components'
+import { CAMERA, PLAYER, ROOT } from '../../sdk/tree'
 
 describe('GizmoManager', () => {
   let engine: Engine
   let scene: Scene
   let context: SceneContext
+  let entities: Entity[] = []
+  let nodes: Node[] = [
+    { entity: ROOT, children: entities },
+    { entity: CAMERA, children: [] },
+    { entity: PLAYER, children: [] }
+  ]
   beforeEach(() => {
     engine = new NullEngine()
     scene = new Scene(engine)
@@ -30,6 +38,13 @@ describe('GizmoManager', () => {
       dispatch: jest.fn(),
       getSelectedEntities: jest.fn(() => [])
     } as unknown as Operations
+    ;(context.editorComponents as any) = {
+      Nodes: {
+        getOrNull: jest.fn().mockReturnValue({
+          value: nodes
+        })
+      }
+    } as unknown as EditorComponents
   })
   describe('When creating a new gizmo manager', () => {
     let gizmos: Gizmos
@@ -51,11 +66,15 @@ describe('GizmoManager', () => {
         handler = jest.fn()
         gizmos.onChange(handler)
         gizmos.setEntity(babylonEntity)
+        entities = [dclEntity]
+        nodes.push({ entity: dclEntity, children: [] })
       })
       afterEach(() => {
         babylonEntity.dispose()
         context.engine.removeEntity(dclEntity)
         gizmos.unsetEntity()
+        entities = []
+        nodes = nodes.filter(($) => $.entity !== dclEntity)
       })
       it('should set the entity', () => {
         expect(gizmos.getEntity()).toBe(babylonEntity)
