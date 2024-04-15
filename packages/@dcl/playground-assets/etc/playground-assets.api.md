@@ -50,6 +50,9 @@ export namespace AppendValueOperation {
 // @public
 export function areConnected(parcels: Coords[]): boolean;
 
+// @public (undocumented)
+export const AudioEvent: GrowOnlyValueSetComponentDefinition<PBAudioEvent>;
+
 // Warning: (ae-missing-release-tag) "AudioSource" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -61,8 +64,15 @@ export interface AudioSourceComponentDefinitionExtended extends LastWriteWinElem
     stopSound(entity: Entity, resetCursor?: boolean): boolean;
 }
 
+// Warning: (ae-missing-release-tag) "AudioStream" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const AudioStream: LastWriteWinElementSetComponentDefinition<PBAudioStream>;
+export const AudioStream: AudioStreamComponentDefinitionExtended;
+
+// @public (undocumented)
+export interface AudioStreamComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBAudioStream> {
+    getAudioState(entity: Entity): PBAudioEvent | undefined;
+}
 
 // @public (undocumented)
 export const enum AvatarAnchorPointType {
@@ -529,6 +539,7 @@ export type ComponentDefinition<T> = LastWriteWinElementSetComponentDefinition<T
 // @public
 export const componentDefinitionByName: {
     "core::Animator": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAnimator>>;
+    "core::AudioEvent": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAudioEvent>>;
     "core::AudioSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioSource>>;
     "core::AudioStream": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioStream>>;
     "core::AvatarAttach": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarAttach>>;
@@ -1787,6 +1798,26 @@ export namespace Matrix {
     export function Zero(): MutableMatrix;
 }
 
+// @public (undocumented)
+export const enum MediaState {
+    // (undocumented)
+    MS_BUFFERING = 5,
+    // (undocumented)
+    MS_ERROR = 1,
+    // (undocumented)
+    MS_LOADING = 2,
+    // (undocumented)
+    MS_NONE = 0,
+    // (undocumented)
+    MS_PAUSED = 7,
+    // (undocumented)
+    MS_PLAYING = 4,
+    // (undocumented)
+    MS_READY = 3,
+    // (undocumented)
+    MS_SEEKING = 6
+}
+
 // Warning: (ae-missing-release-tag) "MeshCollider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -2078,6 +2109,21 @@ export namespace PBAnimator {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAnimator;
     // (undocumented)
     export function encode(message: PBAnimator, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAudioEvent {
+    // (undocumented)
+    state: MediaState;
+    timestamp: number;
+}
+
+// @public (undocumented)
+export namespace PBAudioEvent {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAudioEvent;
+    // (undocumented)
+    export function encode(message: PBAudioEvent, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)

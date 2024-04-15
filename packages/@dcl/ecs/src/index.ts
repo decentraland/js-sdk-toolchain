@@ -27,6 +27,7 @@ import {
   TransformComponentExtended,
   AnimatorComponentDefinitionExtended,
   AudioSourceComponentDefinitionExtended,
+  AudioStreamComponentDefinitionExtended,
   ISyncComponents,
   TweenComponentDefinitionExtended,
   INetowrkEntity,
@@ -38,6 +39,7 @@ import { NameComponent } from './components/manual/Name'
 export const Transform: TransformComponentExtended = /* @__PURE__*/ components.Transform(engine)
 export const Animator: AnimatorComponentDefinitionExtended = /* @__PURE__*/ components.Animator(engine)
 export const AudioSource: AudioSourceComponentDefinitionExtended = /* @__PURE__*/ components.AudioSource(engine)
+export const AudioStream: AudioStreamComponentDefinitionExtended = /* @__PURE__*/ components.AudioStream(engine)
 export const Material: MaterialComponentDefinitionExtended = /* @__PURE__*/ components.Material(engine)
 export const MeshRenderer: MeshRendererComponentDefinitionExtended = /* @__PURE__*/ components.MeshRenderer(engine)
 export const MeshCollider: MeshColliderComponentDefinitionExtended = /* @__PURE__*/ components.MeshCollider(engine)
