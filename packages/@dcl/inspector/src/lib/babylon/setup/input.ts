@@ -6,6 +6,7 @@ import { keyState, Keys } from '../decentraland/keys'
 import { getAncestors, isAncestor, mapNodes } from '../../sdk/nodes'
 
 let isSnapEnabled = snapManager.isEnabled()
+let isShiftKeyDown = false
 let clickStartTimer: ReturnType<typeof setTimeout>
 let isDragging = false
 
@@ -16,11 +17,15 @@ export function initKeyboard(canvas: HTMLCanvasElement, scene: BABYLON.Scene) {
     keyState[e.keyCode] = true
     if (e.shiftKey) {
       isSnapEnabled = snapManager.toggle()
+      isShiftKeyDown = true
     }
   })
 
   canvas.addEventListener('keyup', (e) => {
-    snapManager.setEnabled(!isSnapEnabled)
+    if (isShiftKeyDown) {
+      snapManager.setEnabled(!isSnapEnabled)
+      isShiftKeyDown = false
+    }
 
     keyState[Keys.KEY_SHIFT] = e.shiftKey
     keyState[Keys.KEY_CTRL] = e.ctrlKey
