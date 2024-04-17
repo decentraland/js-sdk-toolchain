@@ -1,15 +1,19 @@
+import future, { IFuture } from 'fp-future'
 import * as BABYLON from '@babylonjs/core'
 import * as GUI from '@babylonjs/gui'
 import { PBTextShape, ComponentType } from '@dcl/ecs'
 
 import type { ComponentOperation } from '../component-operations'
 import { EcsEntity } from '../EcsEntity'
-import { FONTS, TEXT_ALIGN_MODES } from '../../../../components/EntityInspector/TextShapeInspector/utils'
+import { TEXT_ALIGN_MODES } from '../../../../components/EntityInspector/TextShapeInspector/utils'
 import { toHex } from '../../../../components/ui/ColorField/utils'
 
 const ratio = 33
 
-export const putTextShapeComponent: ComponentOperation = (entity, component) => {
+export const putTextShapeComponent: ComponentOperation = async (entity, component) => {
+  // load font
+  await loadFont()
+
   if (component.componentType === ComponentType.LastWriteWinElementSet) {
     const value = component.getOrNull(entity.entityId) as PBTextShape | null
 
@@ -60,7 +64,7 @@ function createTextBlock(value: PBTextShape) {
   const [verticalLabel, horizontalLabel] = TEXT_ALIGN_MODES[value.textAlign ?? 0].label.split(' ')
 
   tb.text = value.text
-  tb.fontFamily = FONTS[value.font ?? 0].label
+  tb.fontFamily = 'Noto Sans'
   tb.fontSize = (value.fontSize ?? 0) * 3
   tb.width = `${value.width ?? 0}px`
   tb.height = `${value.height ?? 0}px`
@@ -79,9 +83,23 @@ function createTextBlock(value: PBTextShape) {
   tb.color = toHex(value.textColor)
   tb.shadowColor = toHex(value.shadowColor)
   tb.outlineColor = toHex(value.outlineColor)
-
   // fontAutoSize
   // lineCount ?? 1
 
   return tb
+}
+
+let fontFuture: IFuture<void> | null = null
+async function loadFont() {
+  if (!fontFuture) {
+    fontFuture = future()
+    const font = new FontFace(
+      'Noto Sans',
+      'url(https://fonts.gstatic.com/s/notosans/v36/o-0bIpQlx3QUlC5A4PNB6Ryti20_6n1iPHjc5a7du3mhPy0.woff2)' // latin
+    )
+    await font.load()
+    document.fonts.add(font)
+    fontFuture.resolve()
+  }
+  return fontFuture
 }
