@@ -255,6 +255,10 @@ export async function pollEvents(sendBatch: (body: ManyEntityAction) => Promise<
           onPlayerClickedObservable.notifyObservers(data as IEvents['playerClicked'])
           break
         }
+        case 'comms': {
+          onCommsMessage.notifyObservers(data as IEvents['comms'])
+          break
+        }
       }
     }
   }
