@@ -5,7 +5,7 @@ import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
-import { TextField, CheckboxField, ColorField, Dropdown } from '../../ui'
+import { TextField, CheckboxField, ColorField, Dropdown, TextArea } from '../../ui'
 import { Props } from './types'
 import { fromTextShape, toTextShape, isValidInput, FONTS, TEXT_ALIGN_MODES } from './utils'
 
@@ -25,7 +25,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
   return (
     <Container label="TextShape" className="TextShape" onRemoveContainer={handleRemove}>
       <Block>
-        <TextField label="Text" type="text" {...getInputProps('text')} />
+        <TextArea label="Text" {...getInputProps('text')} />
       </Block>
       <Block>
         <Dropdown label="Font" options={FONTS} {...getInputProps('font')} />
