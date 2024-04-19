@@ -64,7 +64,14 @@ function createTextBlock(value: PBTextShape) {
   const [verticalLabel, horizontalLabel] = TEXT_ALIGN_MODES[value.textAlign ?? 0].label.split(' ')
 
   const hair = String.fromCharCode(8202) // hair space
-  tb.text = value.text.split('').join(hair)
+  tb.text = value.text
+    // fix letter spacing
+    .split('')
+    .join(hair)
+    // apply lineCount
+    .split('\n')
+    .map((line, index) => (typeof value.lineCount === 'number' ? (index < value.lineCount ? line : '') : line)) // remove lines if lineCount is set
+    .join('\n')
   tb.fontFamily = 'Noto Sans'
   tb.fontSize = (value.fontSize ?? 0) * 3
   tb.width = `${value.width ?? 0}px`
