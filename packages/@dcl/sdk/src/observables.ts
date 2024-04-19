@@ -288,7 +288,7 @@ function processObservables() {
         onRealmChangedObservable.notifyObservers({
           domain: value.baseUrl,
           displayName: value.realmName,
-          room: value.room,
+          room: value.room ?? '',
           serverName: value.realmName
         })
       }

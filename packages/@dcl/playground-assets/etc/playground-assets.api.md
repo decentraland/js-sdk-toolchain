@@ -2672,11 +2672,13 @@ export interface PBRealmInfo {
     // (undocumented)
     commsAdapter: string;
     // (undocumented)
+    isPreview: boolean;
+    // (undocumented)
     networkId: number;
     // (undocumented)
     realmName: string;
     // (undocumented)
-    room: string;
+    room?: string | undefined;
 }
 
 // @public (undocumented)
