@@ -4,12 +4,10 @@ import {
   AvatarEmoteCommand,
   AvatarEquippedData,
   Entity,
-  PlayerClicked,
   PlayerIdentityData,
+  PointerEventsResult,
   RealmInfo,
   Vector3Type,
-  VideoEvent,
-  VideoPlayer,
   engine
 } from '@dcl/ecs'
 import { ManyEntityAction, SendBatchResponse, subscribe } from '~system/EngineApi'
@@ -207,7 +205,6 @@ export const onCommsMessage = new Observable<IEvents['comms']>(createSubscriber(
  * @deprecated this is an OLD API.
  * This function uses the SDK6 sendBatch to poll events from the renderer
  */
-// TODO: __OBSERVABLES_FALLBACK_SUPPORT flag for other clients.
 export async function pollEvents(sendBatch: (body: ManyEntityAction) => Promise<SendBatchResponse>) {
   const { events } = await sendBatch({ actions: [] })
   for (const e of events) {
@@ -294,9 +291,6 @@ function processObservables() {
       case 'profileChanged': {
         subscribeProfileChange()
       }
-      case 'videoEvent': {
-        subscribeVideoEvent()
-      }
     }
     subscriptions.add(eventName)
   }
@@ -347,14 +341,22 @@ function processObservables() {
    * PLAYER/AVATAR CLICKED observable
    */
   function subscribePlayerClick() {
-    PlayerClicked.onChange(engine.PlayerEntity, (value) => {
-      if (value) {
-        onPlayerClickedObservable.notifyObservers({
-          userId: value.address,
-          ray: {
-            direction: value.direction!,
-            distance: value.distance,
-            origin: value.origin!
+    const playerEntities = new Set<Entity>()
+    engine.addSystem(() => {
+      for (const [entity] of engine.getEntitiesWith(PlayerIdentityData)) {
+        if (playerEntities.has(entity)) return
+        playerEntities.add(entity)
+
+        PointerEventsResult.onChange(entity, (data) => {
+          if (data?.hit) {
+            onPlayerClickedObservable.notifyObservers({
+              userId: PlayerIdentityData.getOrNull(entity)?.address ?? '',
+              ray: {
+                direction: data.hit.direction!,
+                distance: data.hit.length,
+                origin: data.hit.globalOrigin!
+              }
+            })
           }
         })
       }
@@ -382,27 +384,6 @@ function processObservables() {
     AvatarEquippedData.onChange(engine.PlayerEntity, () => {
       if (!profileAddress) return
       onProfileChanged.notifyObservers({ ethAddress: profileAddress, version: 0 })
-    })
-  }
-
-  function subscribeVideoEvent() {
-    const videoEntities = new Set<Entity>()
-    engine.addSystem(() => {
-      for (const [entity] of engine.getEntitiesWith(VideoEvent)) {
-        if (videoEntities.has(entity)) return
-        videoEntities.add(entity)
-        VideoEvent.onChange(entity, (data) => {
-          if (!data) return
-          const video = VideoPlayer.getOrNull(entity)
-          onVideoEvent.notifyObservers({
-            videoClipId: video?.src ?? '',
-            componentId: entity.toString(),
-            videoStatus: data.state ?? 0,
-            currentOffset: data.currentOffset,
-            totalVideoLength: data.videoLength
-          })
-        })
-      }
     })
   }
 
