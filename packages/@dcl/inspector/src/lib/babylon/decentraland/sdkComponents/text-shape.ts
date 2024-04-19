@@ -91,8 +91,6 @@ function createTextBlock(value: PBTextShape) {
   tb.color = toHex(value.textColor)
   tb.shadowColor = toHex(value.shadowColor)
   tb.outlineColor = toHex(value.outlineColor)
-  // fontAutoSize
-  // lineCount ?? 1
 
   return tb
 }
