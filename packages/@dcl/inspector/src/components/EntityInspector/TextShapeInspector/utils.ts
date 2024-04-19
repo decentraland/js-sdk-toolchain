@@ -27,7 +27,7 @@ export const fromTextShape = (value: PBTextShape): TextShapeInput => {
     shadowOffsetY: toString(value.shadowOffsetY, 0),
     outlineWidth: toString(Math.floor((value.outlineWidth ?? 0) * 5)),
     lineSpacing: toString(value.lineSpacing, 0),
-    lineCount: toString(value.lineCount, 1),
+    lineCount: toString(value.lineCount, ''),
     shadowColor: toHex(value.shadowColor),
     outlineColor: toHex(value.outlineColor),
     textColor: toHex(value.textColor)
@@ -54,7 +54,8 @@ export const toTextShape = (value: TextShapeInput): PBTextShape => {
     lineSpacing: toNumber(value.lineSpacing, 0),
     shadowColor: toColor3(value.shadowColor),
     outlineColor: toColor3(value.outlineColor),
-    textColor: toColor4(value.textColor)
+    textColor: toColor4(value.textColor),
+    lineCount: value.lineCount.length > 0 ? toNumber(value.lineCount, 0) : undefined
   }
 }
 
