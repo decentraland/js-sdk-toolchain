@@ -63,7 +63,8 @@ function createTextBlock(value: PBTextShape) {
   const tb = new GUI.TextBlock()
   const [verticalLabel, horizontalLabel] = TEXT_ALIGN_MODES[value.textAlign ?? 0].label.split(' ')
 
-  tb.text = value.text
+  const hair = String.fromCharCode(8202) // hair space
+  tb.text = value.text.split('').join(hair)
   tb.fontFamily = 'Noto Sans'
   tb.fontSize = (value.fontSize ?? 0) * 3
   tb.width = `${value.width ?? 0}px`
