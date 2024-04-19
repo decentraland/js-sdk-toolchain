@@ -7,7 +7,7 @@ import { Block } from '../../Block'
 import { Container } from '../../Container'
 import { TextField, CheckboxField, ColorField, Dropdown, TextArea } from '../../ui'
 import { Props } from './types'
-import { fromTextShape, toTextShape, isValidInput, FONTS, TEXT_ALIGN_MODES } from './utils'
+import { fromTextShape, toTextShape, isValidInput, TEXT_ALIGN_MODES } from './utils'
 
 export default withSdk<Props>(({ sdk, entity }) => {
   const { TextShape } = sdk.components
@@ -26,9 +26,6 @@ export default withSdk<Props>(({ sdk, entity }) => {
     <Container label="TextShape" className="TextShape" onRemoveContainer={handleRemove}>
       <Block>
         <TextArea label="Text" {...getInputProps('text')} />
-      </Block>
-      <Block>
-        <Dropdown label="Font" options={FONTS} {...getInputProps('font')} />
       </Block>
       <Block>
         <ColorField label="Text Color" {...getInputProps('textColor')} />

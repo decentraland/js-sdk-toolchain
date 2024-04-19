@@ -12,7 +12,6 @@ const toNumber = (value: string, min?: number) => {
 export const fromTextShape = (value: PBTextShape): TextShapeInput => {
   return {
     text: value.text,
-    font: toString(value.font, Font.F_SANS_SERIF),
     fontSize: toString(value.fontSize, 10),
     fontAutoSize: !!value.fontAutoSize,
     width: toString(value.width, 100),
@@ -38,7 +37,6 @@ export const fromTextShape = (value: PBTextShape): TextShapeInput => {
 export const toTextShape = (value: TextShapeInput): PBTextShape => {
   return {
     text: value.text,
-    font: Number(value.font) || Font.F_SANS_SERIF,
     fontSize: toNumber(value.fontSize, 0),
     fontAutoSize: !!value.fontAutoSize,
     width: toNumber(value.width, 0),
@@ -54,7 +52,6 @@ export const toTextShape = (value: TextShapeInput): PBTextShape => {
     shadowOffsetY: toNumber(value.shadowOffsetY, 0),
     outlineWidth: toNumber(value.outlineWidth, 0) / 5,
     lineSpacing: toNumber(value.lineSpacing, 0),
-    lineCount: toNumber(value.lineCount),
     shadowColor: toColor3(value.shadowColor),
     outlineColor: toColor3(value.outlineColor),
     textColor: toColor4(value.textColor)
