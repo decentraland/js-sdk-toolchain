@@ -78,8 +78,9 @@ export async function loadGltf(entity: EcsEntity, value: string) {
   }
 
   let root = entity.getRoot()
+  let attempts = 0
 
-  while (root === null) {
+  while (root === null && attempts++ < 10) {
     // waiting for nodes to be loaded...
     await new Promise((resolve) => setTimeout(resolve, 100))
     root = entity.getRoot()
