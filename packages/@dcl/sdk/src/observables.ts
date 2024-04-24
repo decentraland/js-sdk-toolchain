@@ -101,6 +101,8 @@ export interface IEvents {
   }
 }
 
+// Remove this once new components/observables reaches production.
+const __OBSERVABLES_FALLBACK_SUPPORT = true
 /**
  * @internal
  * This function generates a callback that is passed to the Observable
@@ -108,7 +110,7 @@ export interface IEvents {
  */
 function createSubscriber(eventName: keyof IEvents) {
   return () => {
-    if (eventName === 'comms' || (globalThis as any).__OBSERVABLES_FALLBACK_SUPPORT) {
+    if (eventName === 'comms' || __OBSERVABLES_FALLBACK_SUPPORT) {
       subscribe({ eventId: eventName }).catch(console.error)
     } else {
       SDK7ComponentsObservable?.subscribe(eventName)
@@ -263,7 +265,7 @@ export async function pollEvents(sendBatch: (body: ManyEntityAction) => Promise<
 
 const SDK7ComponentsObservable = processObservables()
 function processObservables() {
-  if ((globalThis as any).__OBSERVABLES_FALLBACK_SUPPORT) return
+  if (__OBSERVABLES_FALLBACK_SUPPORT) return
   const subscriptions = new Set<keyof IEvents>()
 
   function subscribe(eventName: keyof IEvents) {
