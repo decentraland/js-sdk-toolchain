@@ -11,7 +11,8 @@ describe('Generated RealmInfo ProtoBuf', () => {
       commsAdapter: 'boedo-casla',
       networkId: 1,
       realmName: 'boedo',
-      room: 'casla'
+      room: 'casla',
+      isPreview: false
     })
 
     testComponentSerialization(RealmInfo, {
@@ -19,7 +20,8 @@ describe('Generated RealmInfo ProtoBuf', () => {
       commsAdapter: 'boedo-casla',
       networkId: 1,
       realmName: 'boedo',
-      room: 'casla'
+      room: 'casla',
+      isPreview: false
     })
   })
 })
