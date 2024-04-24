@@ -75,7 +75,7 @@ const Renderer: React.FC = () => {
         if (!sceneEntity) continue
 
         if (!fileSet.has(value.src)) removeGltf(sceneEntity)
-        else loadGltf(sceneEntity, value.src)
+        else void loadGltf(sceneEntity, value.src)
       }
     }
   }, [files])

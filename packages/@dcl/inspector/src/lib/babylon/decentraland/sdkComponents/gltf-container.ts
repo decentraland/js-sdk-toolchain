@@ -65,10 +65,10 @@ export const updateGltfForEntity = (entity: EcsEntity, newValue: PBGltfContainer
   const shouldRemoveGltf = !newValue || shouldLoadGltf
 
   if (shouldRemoveGltf) removeGltf(entity)
-  if (shouldLoadGltf) loadGltf(entity, newValue.src)
+  if (shouldLoadGltf) void loadGltf(entity, newValue.src)
 }
 
-export function loadGltf(entity: EcsEntity, value: string) {
+export async function loadGltf(entity: EcsEntity, value: string) {
   const context = entity.context.deref()
   if (!context || !!entity.gltfContainer) return
 
@@ -77,23 +77,30 @@ export function loadGltf(entity: EcsEntity, value: string) {
     sceneContext = entity.context
   }
 
-  const root = entity.getRoot()
+  let root = entity.getRoot()
+  let attempts = 0
 
-  const shouldHide = root === PLAYER || root === CAMERA || root === null
+  while (root === null && attempts++ < 10) {
+    // waiting for nodes to be loaded...
+    await new Promise((resolve) => setTimeout(resolve, 100))
+    root = entity.getRoot()
+  }
+
+  const shouldHide = root === PLAYER || root === CAMERA
 
   const loadingSpinner: BABYLON.Mesh | null = shouldHide ? null : createLoadingSpinner(entity, context.scene)
 
-  tryLoadGltfAsync(context.loadableScene.id, entity, value)
-    .catch((err) => {
-      console.error('Error trying to load gltf ' + value, err)
-    })
-    .finally(() => {
-      if (shouldHide) {
-        entity.setVisibility(false)
-      } else {
-        loadingSpinner?.dispose(false, true)
-      }
-    })
+  try {
+    await tryLoadGltfAsync(context.loadableScene.id, entity, value)
+  } catch (error) {
+    console.error('Error trying to load gltf ' + value, error)
+  } finally {
+    if (shouldHide) {
+      entity.setVisibility(false)
+    } else {
+      loadingSpinner?.dispose(false, true)
+    }
+  }
 }
 
 export function removeGltf(entity: EcsEntity) {
