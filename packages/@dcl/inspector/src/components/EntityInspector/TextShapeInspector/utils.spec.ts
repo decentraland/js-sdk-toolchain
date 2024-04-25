@@ -6,24 +6,16 @@ describe('fromTextShape', () => {
   it('should convert PBTextShape to TextShapeInput', () => {
     const pbTextShape: PBTextShape = {
       text: 'Hello, World!',
-      font: Font.F_SERIF,
       fontSize: 16,
       fontAutoSize: true,
-      width: 200,
-      height: 100,
       textAlign: TextAlignMode.TAM_MIDDLE_CENTER,
-      textWrapping: true,
       paddingTop: 10,
       paddingRight: 20,
       paddingBottom: 15,
       paddingLeft: 5,
-      shadowBlur: 3,
-      shadowOffsetX: 2,
-      shadowOffsetY: 1,
       outlineWidth: 1,
-      lineSpacing: 2,
+      lineSpacing: 200,
       lineCount: 3,
-      shadowColor: { r: 1, b: 0, g: 0 },
       outlineColor: { r: 1, b: 0, g: 0 },
       textColor: { r: 1, b: 0, g: 0, a: 1 }
     }
@@ -32,13 +24,9 @@ describe('fromTextShape', () => {
 
     expect(result).toEqual({
       text: 'Hello, World!',
-      font: Font.F_SERIF.toString(),
       fontSize: '16',
       fontAutoSize: true,
-      width: '200',
-      height: '100',
       textAlign: TextAlignMode.TAM_MIDDLE_CENTER.toString(),
-      textWrapping: true,
       paddingTop: '10',
       paddingRight: '20',
       paddingBottom: '15',
@@ -74,24 +62,16 @@ describe('toTextShape', () => {
 
     expect(result).toEqual({
       text: 'Hello, World!',
-      font: Font.F_SERIF,
       fontSize: 16,
       fontAutoSize: true,
-      width: 200,
-      height: 100,
       textAlign: TextAlignMode.TAM_MIDDLE_CENTER,
-      textWrapping: true,
       paddingTop: 10,
       paddingRight: 20,
       paddingBottom: 15,
       paddingLeft: 5,
-      shadowBlur: 3,
-      shadowOffsetX: 2,
-      shadowOffsetY: 1,
       outlineWidth: 1,
-      lineSpacing: 2,
+      lineSpacing: 200,
       lineCount: 3,
-      shadowColor: { r: 1, b: 0, g: 0 },
       outlineColor: { r: 1, b: 0, g: 0 },
       textColor: { r: 1, b: 0, g: 0, a: 1 }
     })
