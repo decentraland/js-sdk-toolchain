@@ -45,21 +45,12 @@ export default withSdk<Props>(({ sdk, entity }) => {
       </Block>
       <Block label="Line">
         <TextField leftLabel="Spacing" type="number" {...getInputProps('lineSpacing')} />
-        <TextField leftLabel="Count" type="number" {...getInputProps('lineCount')} />
       </Block>
       <Block>
         <TextField label="Outline Width" type="number" {...getInputProps('outlineWidth')} />
       </Block>
       <Block>
         <ColorField label="Outline color" {...getInputProps('outlineColor')} />
-      </Block>
-      <Block label="Shadow">
-        <TextField leftLabel="Blur" type="number" {...getInputProps('shadowBlur')} />
-        <TextField leftLabel="Offset X" type="number" {...getInputProps('shadowOffsetX')} />
-        <TextField leftLabel="Offset Y" type="number" {...getInputProps('shadowOffsetY')} />
-      </Block>
-      <Block>
-        <ColorField label="Shadow color" {...getInputProps('shadowColor')} />
       </Block>
     </Container>
   )

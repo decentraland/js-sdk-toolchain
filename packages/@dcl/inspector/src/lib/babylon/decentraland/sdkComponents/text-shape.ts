@@ -99,13 +99,9 @@ function createTextBlock(value: PBTextShape) {
   tb.paddingRight = (value.paddingRight ?? 0) * TEXT_SHAPE_RATIO
   tb.paddingBottom = (value.paddingBottom ?? 0) * TEXT_SHAPE_RATIO
   tb.paddingLeft = (value.paddingLeft ?? 0) * TEXT_SHAPE_RATIO
-  tb.shadowBlur = value.shadowBlur ?? 0
-  tb.shadowOffsetX = value.shadowOffsetX ?? 0
-  tb.shadowOffsetY = value.shadowOffsetY ?? 0
   tb.outlineWidth = (value.outlineWidth ?? 0) * 16
   tb.lineSpacing = (value.lineSpacing ?? 0) / 4.5
   tb.color = toHex(value.textColor)
-  tb.shadowColor = toHex(value.shadowColor)
   tb.outlineColor = toHex(value.outlineColor)
 
   return tb

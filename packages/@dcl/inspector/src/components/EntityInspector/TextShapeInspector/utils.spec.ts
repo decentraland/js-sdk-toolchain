@@ -43,13 +43,9 @@ describe('fromTextShape', () => {
       paddingRight: '20',
       paddingBottom: '15',
       paddingLeft: '5',
-      shadowBlur: '3',
-      shadowOffsetX: '2',
-      shadowOffsetY: '1',
       outlineWidth: '5',
       lineSpacing: '2',
       lineCount: '3',
-      shadowColor: '#FF0000',
       outlineColor: '#FF0000',
       textColor: '#FF0000'
     })
@@ -67,13 +63,9 @@ describe('toTextShape', () => {
       paddingRight: '20',
       paddingBottom: '15',
       paddingLeft: '5',
-      shadowBlur: '3',
-      shadowOffsetX: '2',
-      shadowOffsetY: '1',
       outlineWidth: '5',
       lineSpacing: '2',
       lineCount: '3',
-      shadowColor: '#FF0000',
       outlineColor: '#FF0000',
       textColor: '#FF0000'
     }
