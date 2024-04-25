@@ -5,7 +5,11 @@ import { PBTextShape, ComponentType } from '@dcl/ecs'
 
 import type { ComponentOperation } from '../component-operations'
 import { EcsEntity } from '../EcsEntity'
-import { TEXT_ALIGN_MODES } from '../../../../components/EntityInspector/TextShapeInspector/utils'
+import {
+  TEXT_ALIGN_MODES,
+  getBabylonGUIOffset,
+  toBabylonGUIAlignment
+} from '../../../../components/EntityInspector/TextShapeInspector/utils'
 import { toHex } from '../../../../components/ui/ColorField/utils'
 
 const ratio = 33
@@ -29,8 +33,19 @@ export const putTextShapeComponent: ComponentOperation = async (entity, componen
 
       const advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(mesh, value.width, value.height)
 
-      advancedTexture.addControl(createTextBlock(value))
+      const tb = createTextBlock(value)
+      advancedTexture.addControl(tb)
+      // const ctx = advancedTexture.getContext()
+
       mesh.parent = entity
+
+      const [vertical, horizontal] = getBabylonGUIOffset(
+        value.textAlign ?? TEXT_ALIGN_MODES[0].value,
+        value.width ?? 0,
+        value.height ?? 0
+      )
+      mesh.position.x += horizontal / ratio
+      mesh.position.y -= vertical / ratio
       entity.ecsComponentValues.textShape = value
       entity.textShape = mesh
     }
@@ -46,22 +61,9 @@ function dispose(entity: EcsEntity) {
   }
 }
 
-function getAlignment(alignment: string) {
-  switch (alignment.toLowerCase()) {
-    case 'left':
-    case 'top':
-      return GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
-    case 'right':
-    case 'bottom':
-      return GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT
-    default:
-      return GUI.Control.HORIZONTAL_ALIGNMENT_CENTER
-  }
-}
-
 function createTextBlock(value: PBTextShape) {
   const tb = new GUI.TextBlock()
-  const [verticalLabel, horizontalLabel] = TEXT_ALIGN_MODES[value.textAlign ?? 0].label.split(' ')
+  const [horizontalAlignment, verticalAlignment] = toBabylonGUIAlignment(value.textAlign ?? TEXT_ALIGN_MODES[0].value)
 
   const hair = String.fromCharCode(8202) // hair space
   tb.text = value.text
@@ -76,9 +78,9 @@ function createTextBlock(value: PBTextShape) {
   tb.fontSize = (value.fontSize ?? 0) * 3
   tb.width = `${value.width ?? 0}px`
   tb.height = `${value.height ?? 0}px`
-  tb.textHorizontalAlignment = getAlignment(horizontalLabel)
-  tb.textVerticalAlignment = getAlignment(verticalLabel)
-  tb.textWrapping = !!value.textWrapping
+  tb.textHorizontalAlignment = horizontalAlignment
+  tb.textVerticalAlignment = verticalAlignment
+  tb.textWrapping = value.textWrapping ?? false
   tb.paddingTop = value.paddingTop ?? 0
   tb.paddingRight = value.paddingRight ?? 0
   tb.paddingBottom = value.paddingBottom ?? 0

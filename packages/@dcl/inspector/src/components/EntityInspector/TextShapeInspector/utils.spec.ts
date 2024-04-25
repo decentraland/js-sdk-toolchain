@@ -60,7 +60,6 @@ describe('toTextShape', () => {
   it('should convert TextShapeInput to PBTextShape', () => {
     const textShapeInput: TextShapeInput = {
       text: 'Hello, World!',
-      font: Font.F_SERIF.toString(),
       fontSize: '16',
       fontAutoSize: true,
       width: '200',

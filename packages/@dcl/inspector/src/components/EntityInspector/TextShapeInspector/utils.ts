@@ -1,3 +1,4 @@
+import * as GUI from '@babylonjs/gui'
 import { PBTextShape, Font, TextAlignMode } from '@dcl/ecs'
 
 import { toColor3, toColor4, toHex } from '../../ui/ColorField/utils'
@@ -7,6 +8,58 @@ import { TextShapeInput } from './types'
 const toNumber = (value: string, min?: number) => {
   const num = Number(value) || 0
   return min ? Math.min(num, min) : num
+}
+
+export const toBabylonGUIAlignment = (value: TextAlignMode): [number, number] => {
+  switch (value) {
+    case TextAlignMode.TAM_TOP_LEFT:
+      return [GUI.Control.HORIZONTAL_ALIGNMENT_LEFT, GUI.Control.VERTICAL_ALIGNMENT_TOP]
+    case TextAlignMode.TAM_TOP_CENTER:
+      return [GUI.Control.HORIZONTAL_ALIGNMENT_CENTER, GUI.Control.VERTICAL_ALIGNMENT_TOP]
+    case TextAlignMode.TAM_TOP_RIGHT:
+      return [GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT, GUI.Control.VERTICAL_ALIGNMENT_TOP]
+    case TextAlignMode.TAM_MIDDLE_LEFT:
+      return [GUI.Control.HORIZONTAL_ALIGNMENT_LEFT, GUI.Control.VERTICAL_ALIGNMENT_CENTER]
+    case TextAlignMode.TAM_MIDDLE_CENTER:
+      return [GUI.Control.HORIZONTAL_ALIGNMENT_CENTER, GUI.Control.VERTICAL_ALIGNMENT_CENTER]
+    case TextAlignMode.TAM_MIDDLE_RIGHT:
+      return [GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT, GUI.Control.VERTICAL_ALIGNMENT_CENTER]
+    case TextAlignMode.TAM_BOTTOM_LEFT:
+      return [GUI.Control.HORIZONTAL_ALIGNMENT_LEFT, GUI.Control.VERTICAL_ALIGNMENT_BOTTOM]
+    case TextAlignMode.TAM_BOTTOM_CENTER:
+      return [GUI.Control.HORIZONTAL_ALIGNMENT_CENTER, GUI.Control.VERTICAL_ALIGNMENT_BOTTOM]
+    case TextAlignMode.TAM_BOTTOM_RIGHT:
+      return [GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT, GUI.Control.VERTICAL_ALIGNMENT_BOTTOM]
+  }
+}
+
+export const getBabylonGUIOffset = (value: TextAlignMode, width: number, height: number): [number, number] => {
+  const h = width / 2
+  const v = height / 2
+  const left = h
+  const right = -h
+  const top = v
+  const bottom = -v
+  switch (value) {
+    case TextAlignMode.TAM_TOP_LEFT:
+      return [top, left]
+    case TextAlignMode.TAM_TOP_CENTER:
+      return [top, 0]
+    case TextAlignMode.TAM_TOP_RIGHT:
+      return [top, right]
+    case TextAlignMode.TAM_MIDDLE_LEFT:
+      return [0, left]
+    case TextAlignMode.TAM_MIDDLE_CENTER:
+      return [0, 0]
+    case TextAlignMode.TAM_MIDDLE_RIGHT:
+      return [0, right]
+    case TextAlignMode.TAM_BOTTOM_LEFT:
+      return [bottom, left]
+    case TextAlignMode.TAM_BOTTOM_CENTER:
+      return [bottom, 0]
+    case TextAlignMode.TAM_BOTTOM_RIGHT:
+      return [bottom, right]
+  }
 }
 
 export const fromTextShape = (value: PBTextShape): TextShapeInput => {
@@ -41,7 +94,7 @@ export const toTextShape = (value: TextShapeInput): PBTextShape => {
     fontAutoSize: !!value.fontAutoSize,
     width: toNumber(value.width, 0),
     height: toNumber(value.height, 0),
-    textAlign: Number(value.textAlign) || TextAlignMode.TAM_MIDDLE_CENTER,
+    textAlign: value.textAlign ? toNumber(value.textAlign) : undefined,
     textWrapping: !!value.textWrapping,
     paddingTop: toNumber(value.paddingTop, 0),
     paddingRight: toNumber(value.paddingRight, 0),
