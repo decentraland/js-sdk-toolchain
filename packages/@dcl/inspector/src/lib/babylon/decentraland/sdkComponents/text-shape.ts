@@ -102,7 +102,7 @@ function createTextBlock(value: PBTextShape) {
   tb.shadowBlur = value.shadowBlur ?? 0
   tb.shadowOffsetX = value.shadowOffsetX ?? 0
   tb.shadowOffsetY = value.shadowOffsetY ?? 0
-  tb.outlineWidth = (value.outlineWidth ?? 0) * 8
+  tb.outlineWidth = (value.outlineWidth ?? 0) * 16
   tb.lineSpacing = (value.lineSpacing ?? 0) / 4.5
   tb.color = toHex(value.textColor)
   tb.shadowColor = toHex(value.shadowColor)
