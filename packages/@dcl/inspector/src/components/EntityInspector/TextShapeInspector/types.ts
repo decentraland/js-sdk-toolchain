@@ -8,10 +8,7 @@ export type TextShapeInput = {
   text: string
   fontSize: string
   fontAutoSize: boolean
-  width: string
-  height: string
   textAlign: string
-  textWrapping: boolean
   paddingTop: string
   paddingRight: string
   paddingBottom: string

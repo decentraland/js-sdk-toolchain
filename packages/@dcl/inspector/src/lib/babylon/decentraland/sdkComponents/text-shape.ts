@@ -12,7 +12,7 @@ import {
 } from '../../../../components/EntityInspector/TextShapeInspector/utils'
 import { toHex } from '../../../../components/ui/ColorField/utils'
 
-const ratio = 33
+export const TEXT_SHAPE_RATIO = 33
 
 export const putTextShapeComponent: ComponentOperation = async (entity, component) => {
   // load font
@@ -25,27 +25,41 @@ export const putTextShapeComponent: ComponentOperation = async (entity, componen
     dispose(entity)
 
     if (value?.text) {
+      // create a temp text block to measure the text size
+      let tb = createTextBlock(value)
+      const canvas = GUI.AdvancedDynamicTexture.CreateFullscreenUI('canvas')
+      const ctx = canvas.getContext()
+      ctx.font = `${tb.fontSizeInPixels}px ${tb.fontFamily}`
+      canvas.dispose()
+      const lines = tb.text.split('\n')
+      const longest = lines.reduce((a, b) => (a.length > b.length ? a : b))
+      const measure = ctx.measureText(longest)
+      const paddingX = parseFloat(tb.paddingLeft.toString()) + parseFloat(tb.paddingRight.toString())
+      const paddingY = parseFloat(tb.paddingTop.toString()) + parseFloat(tb.paddingBottom.toString())
+      const width = measure.width + paddingX
+      const baseLineSpace = tb.fontSizeInPixels / 2
+      const lineSpace = (typeof tb.lineSpacing === 'string' ? parseInt(tb.lineSpacing) : tb.lineSpacing) + baseLineSpace
+      const spaceBetween = (lines.length - 1) * lineSpace
+      const height = tb.fontSizeInPixels * lines.length + spaceBetween + paddingY
+
+      // create actual text block usingt the right width and height
+      tb = createTextBlock({ ...value, width, height })
+
       const mesh = BABYLON.MeshBuilder.CreatePlane(
         entity.entityId.toString(),
-        { width: (value.width ?? 0) / ratio, height: (value.height ?? 0) / ratio },
+        { width: width / TEXT_SHAPE_RATIO, height: height / TEXT_SHAPE_RATIO },
         entity.getScene()
       )
 
-      const advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(mesh, value.width, value.height)
+      const advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(mesh, width, height)
 
-      const tb = createTextBlock(value)
       advancedTexture.addControl(tb)
-      // const ctx = advancedTexture.getContext()
 
       mesh.parent = entity
 
-      const [vertical, horizontal] = getBabylonGUIOffset(
-        value.textAlign ?? TEXT_ALIGN_MODES[0].value,
-        value.width ?? 0,
-        value.height ?? 0
-      )
-      mesh.position.x += horizontal / ratio
-      mesh.position.y -= vertical / ratio
+      const [vertical, horizontal] = getBabylonGUIOffset(value.textAlign ?? TEXT_ALIGN_MODES[0].value, width, height)
+      mesh.position.x += horizontal / TEXT_SHAPE_RATIO
+      mesh.position.y -= vertical / TEXT_SHAPE_RATIO
       entity.ecsComponentValues.textShape = value
       entity.textShape = mesh
     }
@@ -80,16 +94,16 @@ function createTextBlock(value: PBTextShape) {
   tb.height = `${value.height ?? 0}px`
   tb.textHorizontalAlignment = horizontalAlignment
   tb.textVerticalAlignment = verticalAlignment
-  tb.textWrapping = value.textWrapping ?? false
-  tb.paddingTop = (value.paddingTop ?? 0) * ratio
-  tb.paddingRight = (value.paddingRight ?? 0) * ratio
-  tb.paddingBottom = (value.paddingBottom ?? 0) * ratio
-  tb.paddingLeft = (value.paddingLeft ?? 0) * ratio
+  tb.textWrapping = true
+  tb.paddingTop = (value.paddingTop ?? 0) * TEXT_SHAPE_RATIO
+  tb.paddingRight = (value.paddingRight ?? 0) * TEXT_SHAPE_RATIO
+  tb.paddingBottom = (value.paddingBottom ?? 0) * TEXT_SHAPE_RATIO
+  tb.paddingLeft = (value.paddingLeft ?? 0) * TEXT_SHAPE_RATIO
   tb.shadowBlur = value.shadowBlur ?? 0
   tb.shadowOffsetX = value.shadowOffsetX ?? 0
   tb.shadowOffsetY = value.shadowOffsetY ?? 0
   tb.outlineWidth = (value.outlineWidth ?? 0) * 8
-  tb.lineSpacing = (value.lineSpacing ?? 0) / 8
+  tb.lineSpacing = (value.lineSpacing ?? 0) / 4.5
   tb.color = toHex(value.textColor)
   tb.shadowColor = toHex(value.shadowColor)
   tb.outlineColor = toHex(value.outlineColor)

@@ -34,13 +34,8 @@ export default withSdk<Props>(({ sdk, entity }) => {
         <TextField type="number" {...getInputProps('fontSize')} />
         <CheckboxField label="Font Auto-Size" {...getInputProps('fontAutoSize', (e) => e.target.checked)} />
       </Block>
-      <Block label="Shape">
-        <TextField leftLabel="Width" type="number" {...getInputProps('width')} />
-        <TextField leftLabel="Height" type="number" {...getInputProps('height')} />
-      </Block>
       <Block label="Text Align">
         <Dropdown options={TEXT_ALIGN_MODES} {...getInputProps('textAlign')} />
-        <CheckboxField label="Text-Wrapping" {...getInputProps('textWrapping', (e) => e.target.checked)} />
       </Block>
       <Block label="Padding">
         <TextField leftLabel="↑" type="number" {...getInputProps('paddingTop')} />
