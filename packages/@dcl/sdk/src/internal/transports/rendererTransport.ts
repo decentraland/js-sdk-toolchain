@@ -11,7 +11,6 @@ export function createRendererTransport(engineApi: EngineApiForTransport): Trans
     const response = await engineApi.crdtSendToRenderer({
       data: new Uint8Array(message)
     })
-
     if (response && response.data && response.data.length) {
       if (rendererTransport.onmessage) {
         for (const byteArray of response.data) {
