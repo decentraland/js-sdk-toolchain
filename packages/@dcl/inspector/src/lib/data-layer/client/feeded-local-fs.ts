@@ -27,23 +27,12 @@ export function createTempEngineContext() {
 type TempEngine = ReturnType<typeof createTempEngineContext>
 
 export function generateMinimalComposite({ engine, components }: TempEngine) {
-  // custom component
-  const cubeIdComponent = engine.defineComponent('cube-id', {})
-
-  // main box
-  const entity = engine.addEntity()
-  components.Transform.create(entity, { position: { x: 8, y: 1, z: 8 }, parent: engine.RootEntity })
-  components.MeshRenderer.setBox(entity)
-  cubeIdComponent.create(entity)
-  components.Name.create(entity, { value: 'Magic Cube' })
-
   // nodes
   components.Nodes.create(engine.RootEntity, {
     value: [
-      { entity: engine.RootEntity, children: [entity], open: true },
+      { entity: engine.RootEntity, children: [], open: true },
       { entity: engine.PlayerEntity, children: [] },
-      { entity: engine.CameraEntity, children: [] },
-      { entity, children: [] }
+      { entity: engine.CameraEntity, children: [] }
     ]
   })
 
