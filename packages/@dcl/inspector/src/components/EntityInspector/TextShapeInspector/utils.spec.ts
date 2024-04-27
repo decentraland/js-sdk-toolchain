@@ -1,4 +1,4 @@
-import { PBTextShape, Font, TextAlignMode } from '@dcl/ecs'
+import { PBTextShape, TextAlignMode } from '@dcl/ecs'
 import { fromTextShape, toTextShape, isValidInput } from './utils'
 import { TextShapeInput } from './types'
 
