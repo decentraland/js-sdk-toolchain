@@ -3,7 +3,7 @@ import { useDrag } from 'react-dnd'
 import cx from 'classnames'
 import { BsFillLightningChargeFill as SmartItemIcon } from 'react-icons/bs'
 
-import { getContentsUrl, isSmart } from '../../../lib/logic/catalog'
+import { getContentsUrl, isSmart, isGround } from '../../../lib/logic/catalog'
 import { Asset } from '../../../lib/logic/catalog'
 
 import './Asset.css'
@@ -11,9 +11,10 @@ import './Asset.css'
 const Asset: React.FC<{ value: Asset }> = ({ value }) => {
   const [, drag] = useDrag(() => ({ type: 'builder-asset', item: { value } }), [value])
   const isSmartItem = isSmart(value)
+  const isGroundItem = isGround(value)
   return (
     <div
-      className={cx('assets-catalog-asset', { 'smart-item': isSmartItem })}
+      className={cx('assets-catalog-asset', { 'smart-item': isSmartItem, ground: isGroundItem })}
       ref={drag}
       data-test-id={value.id}
       data-test-label={value.name}
@@ -21,10 +22,11 @@ const Asset: React.FC<{ value: Asset }> = ({ value }) => {
     >
       <img src={getContentsUrl(value.contents['thumbnail.png'])} alt={value.tags.join(', ')} />
       {isSmartItem && (
-        <div className="smart-item-badge">
+        <div className="smart-item-badge item-badge">
           <SmartItemIcon />
         </div>
       )}
+      {isGroundItem && <div className="ground-badge  item-badge"></div>}
     </div>
   )
 }
