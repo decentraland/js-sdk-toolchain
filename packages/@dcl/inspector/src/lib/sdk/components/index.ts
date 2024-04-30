@@ -48,7 +48,8 @@ export enum EditorComponentNames {
   TransformConfig = 'inspector::TransformConfig',
   Hide = 'inspector::Hide',
   Lock = 'inspector::Lock',
-  Config = 'inspector::Config'
+  Config = 'inspector::Config',
+  Ground = 'inspector::Ground'
 }
 
 export enum SceneAgeRating {
@@ -108,6 +109,9 @@ export type ConfigComponent = {
   assetId?: string
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-types
+export type GroundComponent = {}
+
 export enum SceneCategory {
   ART = 'art',
   GAME = 'game',
@@ -136,6 +140,7 @@ export type EditorComponentsTypes = {
   Lock: { value: boolean }
   CounterBar: { primaryColor: string; secondaryColor: string; maxValue: number }
   Config: ConfigComponent
+  Ground: GroundComponent
 }
 
 export type EditorComponents = {
@@ -152,6 +157,7 @@ export type EditorComponents = {
   Lock: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Lock']>
   CounterBar: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['CounterBar']>
   Config: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Config']>
+  Ground: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Ground']>
 }
 
 export type SdkComponents = {
@@ -325,6 +331,8 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     assetId: Schemas.Optional(Schemas.String)
   })
 
+  const Ground = engine.defineComponent(EditorComponentNames.Ground, {})
+
   return {
     Selection,
     Scene,
@@ -340,6 +348,7 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     Counter: Counter as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Counter']>,
     Triggers: Triggers as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Triggers']>,
     States: States as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['States']>,
-    CounterBar: CounterBar as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['CounterBar']>
+    CounterBar: CounterBar as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['CounterBar']>,
+    Ground: Ground as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Ground']>
   }
 }

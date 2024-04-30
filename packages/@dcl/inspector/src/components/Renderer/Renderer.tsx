@@ -15,7 +15,7 @@ import { snapPosition } from '../../lib/babylon/decentraland/snap-manager'
 import { loadGltf, removeGltf } from '../../lib/babylon/decentraland/sdkComponents/gltf-container'
 import { getConfig } from '../../lib/logic/config'
 import { ROOT } from '../../lib/sdk/tree'
-import { Asset, isSmart } from '../../lib/logic/catalog'
+import { Asset, isGround, isSmart } from '../../lib/logic/catalog'
 import { selectAssetCatalog } from '../../redux/app'
 import { areGizmosDisabled, getHiddenPanels, isGroundGridDisabled } from '../../redux/ui'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
@@ -181,6 +181,20 @@ const Renderer: React.FC = () => {
     canvasRef.current?.focus()
   }
 
+  const setGround = async (asset: AssetNodeItem, basePath: string) => {
+    if (!sdk) return
+    const { operations } = sdk
+    const src = `${basePath}/${asset.asset.src}`
+    operations.setGround(src)
+    await operations.dispatch()
+    analytics.track(Event.SET_GROUND, {
+      itemId: asset.asset.id,
+      itemName: asset.name,
+      itemPath: asset.asset.src
+    })
+    canvasRef.current?.focus()
+  }
+
   const importBuilderAsset = async (asset: Asset) => {
     const position = await getDropPosition()
     const fileContent: Record<string, Uint8Array> = {}
@@ -243,7 +257,11 @@ const Renderer: React.FC = () => {
       components: asset.components
     }
     const basePath = withAssetDir(`${destFolder}/${assetPackageName}`)
-    await addAsset(model, position, basePath)
+    if (isGround(asset)) {
+      await setGround(model, basePath)
+    } else {
+      await addAsset(model, position, basePath)
+    }
   }
 
   const [, drop] = useDrop(

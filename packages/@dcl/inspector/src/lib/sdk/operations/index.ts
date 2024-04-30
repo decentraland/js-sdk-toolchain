@@ -14,6 +14,7 @@ import removeComponent from './remove-component'
 import duplicateEntity from './duplicate-entity'
 import { updateCanSave } from '../../../redux/app'
 import { store } from '../../../redux/store'
+import setGround from './set-ground'
 
 export interface Dispatch {
   dirty?: boolean
@@ -36,7 +37,8 @@ export function createOperations(engine: IEngine) {
       store.dispatch(updateCanSave({ dirty }))
       await engine.update(1)
     },
-    getSelectedEntities: getSelectedEntities(engine)
+    getSelectedEntities: getSelectedEntities(engine),
+    setGround: setGround(engine)
   }
 }
 
