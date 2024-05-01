@@ -90,7 +90,7 @@ export function interactWithScene(
     clickStartTimer = setTimeout(() => {
       isDragging = true
     }, 150) // 150ms to detect if the user is dragging
-  } else if (entity && pointerEvent === 'pointerUp' && !isDragging) {
+  } else if (entity && pointerEvent === 'pointerUp' && !isDragging && !entity.isLocked() && !entity.isHidden()) {
     const context = entity.context.deref()!
     const { operations, engine, editorComponents } = context
     const ancestors = getAncestors(engine, entity.entityId)
