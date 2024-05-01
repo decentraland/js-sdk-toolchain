@@ -21,3 +21,11 @@
 .Hierarchy .camera-icon {
   background-image: url(./icons/camera.svg);
 }
+
+.Hierarchy .smart-icon {
+  background-image: url(./icons/smart.svg);
+}
+
+.Hierarchy .ground-icon {
+  background-image: url(./icons/ground.svg);
+}
