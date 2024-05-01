@@ -1,0 +1,10 @@
+.Grid .row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Grid .tile:hover {
+  background-color: var(--base-10);
+  cursor: pointer;
+}

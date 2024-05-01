@@ -38,6 +38,7 @@ import { SceneInspectorTab } from '../../../redux/ui/types'
 import { Tab } from '../Tab'
 import { transformBinaryToBase64Resource } from '../../../lib/data-layer/host/fs-utils'
 import { selectThumbnails } from '../../../redux/app'
+import { Layout } from './Layout'
 
 const AGE_RATING_OPTIONS = [
   {
@@ -411,10 +412,11 @@ export default withSdk<Props>(({ sdk, entity }) => {
       ) : null}
 
       {selectedSceneInspectorTab === SceneInspectorTab.LAYOUT ? (
-        <Block label="Parcels">
-          <TextField {...parcelsProps} />
-          <RxBorderAll onClick={handleClick} style={{ opacity: auto ? 1 : 0.3 }} />
-        </Block>
+        // <Block label="Parcels">
+        //   <TextField {...parcelsProps} />
+        //   <RxBorderAll onClick={handleClick} style={{ opacity: auto ? 1 : 0.3 }} />
+        // </Block>
+        <Layout />
       ) : null}
 
       {selectedSceneInspectorTab === SceneInspectorTab.SETTINGS ? (
