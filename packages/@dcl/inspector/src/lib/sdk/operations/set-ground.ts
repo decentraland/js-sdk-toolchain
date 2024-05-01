@@ -30,7 +30,7 @@ export function setGround(engine: IEngine) {
       const position = { x: offset.x * 16 + 8, y: 0, z: offset.y * 16 + 8 }
       const tile = addChild(ground, `Tile ${++id}`)
       Transform.createOrReplace(tile, { parent: ground, position })
-      Lock.create(tile)
+      Lock.create(tile, { value: true })
       GltfContainer.create(tile, {
         src,
         visibleMeshesCollisionMask: 1,
