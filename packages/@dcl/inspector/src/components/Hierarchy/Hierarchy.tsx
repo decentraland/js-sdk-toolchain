@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
 import { Entity } from '@dcl/ecs'
-import { FiHexagon } from 'react-icons/fi'
 
 import { CAMERA, PLAYER, ROOT } from '../../lib/sdk/tree'
 import { useEntitiesWith } from '../../hooks/sdk/useEntitiesWith'
@@ -35,7 +34,7 @@ const HierarchyIcon = withSdk<{ value: Entity }>(({ sdk, value }) => {
   } else if (isGround) {
     return <span className="tree-icon ground-icon"></span>
   } else {
-    return <FiHexagon style={{ marginRight: '4px' }} />
+    return <span className="tree-icon entity-icon"></span>
   }
 })
 
