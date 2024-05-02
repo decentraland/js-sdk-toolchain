@@ -49,7 +49,8 @@ export enum EditorComponentNames {
   Hide = 'inspector::Hide',
   Lock = 'inspector::Lock',
   Config = 'inspector::Config',
-  Ground = 'inspector::Ground'
+  Ground = 'inspector::Ground',
+  Tile = 'inspector::Tile'
 }
 
 export enum SceneAgeRating {
@@ -111,6 +112,8 @@ export type ConfigComponent = {
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type GroundComponent = {}
+// eslint-disable-next-line @typescript-eslint/ban-types
+export type TileComponent = {}
 
 export enum SceneCategory {
   ART = 'art',
@@ -141,6 +144,7 @@ export type EditorComponentsTypes = {
   CounterBar: { primaryColor: string; secondaryColor: string; maxValue: number }
   Config: ConfigComponent
   Ground: GroundComponent
+  Tile: TileComponent
 }
 
 export type EditorComponents = {
@@ -158,6 +162,7 @@ export type EditorComponents = {
   CounterBar: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['CounterBar']>
   Config: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Config']>
   Ground: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Ground']>
+  Tile: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Tile']>
 }
 
 export type SdkComponents = {
@@ -332,6 +337,7 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
   })
 
   const Ground = engine.defineComponent(EditorComponentNames.Ground, {})
+  const Tile = engine.defineComponent(EditorComponentNames.Tile, {})
 
   return {
     Selection,
@@ -349,6 +355,7 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     Triggers: Triggers as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Triggers']>,
     States: States as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['States']>,
     CounterBar: CounterBar as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['CounterBar']>,
-    Ground: Ground as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Ground']>
+    Ground: Ground as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Ground']>,
+    Tile: Tile as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Tile']>
   }
 }

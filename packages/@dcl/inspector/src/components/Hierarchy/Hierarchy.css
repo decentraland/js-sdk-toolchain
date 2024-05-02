@@ -26,10 +26,14 @@
   background-image: url(./icons/smart.svg);
 }
 
-.Hierarchy .ground-icon {
-  background-image: url(./icons/ground.svg);
+.Hierarchy .tile-icon {
+  background-image: url(./icons/tile.svg);
 }
 
 .Hierarchy .entity-icon {
   background-image: url(./icons/entity.svg);
+}
+
+.Hierarchy .group-icon {
+  background-image: url(./icons/group.svg);
 }

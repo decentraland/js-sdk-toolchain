@@ -18,10 +18,16 @@ const HierarchyIcon = withSdk<{ value: Entity }>(({ sdk, value }) => {
       sdk.components.TextShape.has(value) ||
       sdk.components.NftShape.has(value) ||
       sdk.components.VisibilityComponent.has(value),
-    [sdk]
+    [sdk, value]
   )
 
-  const isGround = useMemo(() => sdk.components.Ground.has(value), [sdk])
+  const isTile = useMemo(() => sdk.components.Tile.has(value), [sdk, value])
+
+  const isGroup = useMemo(() => {
+    const nodes = sdk.components.Nodes.get(ROOT).value
+    const node = nodes.find((node) => node.entity === value)
+    return node!.children.length > 0
+  }, [value])
 
   if (value === ROOT) {
     return <span style={{ marginRight: '4px' }}></span>
@@ -31,8 +37,10 @@ const HierarchyIcon = withSdk<{ value: Entity }>(({ sdk, value }) => {
     return <span className="tree-icon camera-icon"></span>
   } else if (isSmart) {
     return <span className="tree-icon smart-icon"></span>
-  } else if (isGround) {
-    return <span className="tree-icon ground-icon"></span>
+  } else if (isTile) {
+    return <span className="tree-icon tile-icon"></span>
+  } else if (isGroup) {
+    return <span className="tree-icon group-icon"></span>
   } else {
     return <span className="tree-icon entity-icon"></span>
   }

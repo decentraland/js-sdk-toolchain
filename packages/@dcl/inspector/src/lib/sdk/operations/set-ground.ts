@@ -12,6 +12,7 @@ export function setGround(engine: IEngine) {
     const Scene = engine.getComponent(EditorComponentNames.Scene) as EditorComponents['Scene']
     const Ground = engine.getComponent(EditorComponentNames.Ground) as EditorComponents['Ground']
     const Lock = engine.getComponent(EditorComponentNames.Lock) as EditorComponents['Lock']
+    const Tile = engine.getComponent(EditorComponentNames.Tile) as EditorComponents['Tile']
 
     // remove previous ground if any
     for (const [previousGround] of engine.getEntitiesWith(Ground)) {
@@ -20,6 +21,7 @@ export function setGround(engine: IEngine) {
 
     const ground = addChild(engine.RootEntity, 'Ground')
     Ground.create(ground)
+    Lock.create(ground, { value: true })
 
     // Add one ground tile per parcel
     const { base, parcels } = Scene.get(engine.RootEntity).layout
@@ -36,6 +38,7 @@ export function setGround(engine: IEngine) {
         visibleMeshesCollisionMask: 1,
         invisibleMeshesCollisionMask: 2
       })
+      Tile.create(tile)
     }
   }
 }
