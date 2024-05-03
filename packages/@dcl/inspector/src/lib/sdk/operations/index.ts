@@ -12,9 +12,11 @@ import addAsset from './add-asset'
 import addComponent from './add-component'
 import removeComponent from './remove-component'
 import duplicateEntity from './duplicate-entity'
+import setGround from './set-ground'
+import lock from './lock'
+import hide from './hide'
 import { updateCanSave } from '../../../redux/app'
 import { store } from '../../../redux/store'
-import setGround from './set-ground'
 
 export interface Dispatch {
   dirty?: boolean
@@ -38,7 +40,9 @@ export function createOperations(engine: IEngine) {
       await engine.update(1)
     },
     getSelectedEntities: getSelectedEntities(engine),
-    setGround: setGround(engine)
+    setGround: setGround(engine),
+    lock: lock(engine),
+    hide: hide(engine)
   }
 }
 
