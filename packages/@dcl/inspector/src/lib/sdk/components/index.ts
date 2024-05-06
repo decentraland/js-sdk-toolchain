@@ -7,7 +7,8 @@ import {
   createComponents as createAssetPacksComponents,
   Actions,
   Triggers,
-  Counter
+  Counter,
+  CounterBar
 } from '@dcl/asset-packs'
 import { Layout } from '../../utils/layout'
 import { GizmoType } from '../../utils/gizmo'
@@ -43,6 +44,7 @@ export enum EditorComponentNames {
   ActionTypes = ComponentName.ACTION_TYPES,
   Actions = ComponentName.ACTIONS,
   Counter = ComponentName.COUNTER,
+  CounterBar = ComponentName.COUNTER_BAR,
   Triggers = ComponentName.TRIGGERS,
   States = ComponentName.STATES,
   TransformConfig = 'inspector::TransformConfig',
@@ -104,7 +106,7 @@ export type ConfigComponent = {
   fields: {
     name: string
     type: AllComponentsType
-    jsonPayload?: string
+    layout?: string
     basicViewId?: string
   }[]
   assetId?: string
@@ -141,7 +143,7 @@ export type EditorComponentsTypes = {
   Counter: Counter
   Hide: { value: boolean }
   Lock: { value: boolean }
-  CounterBar: { primaryColor: string; secondaryColor: string; maxValue: number }
+  CounterBar: CounterBar
   Config: ConfigComponent
   Ground: GroundComponent
   Tile: TileComponent
@@ -329,7 +331,7 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
       Schemas.Map({
         name: Schemas.String,
         type: Schemas.EnumString<AllComponentsType>(AllComponents, AllComponents.Actions),
-        jsonPayload: Schemas.Optional(Schemas.String),
+        layout: Schemas.Optional(Schemas.String),
         basicViewId: Schemas.Optional(Schemas.String)
       })
     ),
