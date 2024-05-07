@@ -20,7 +20,7 @@ const Asset: React.FC<{ value: Asset }> = ({ value }) => {
   const [previewImg, setPreviewImg] = React.useState<string>()
   const isMounted = useIsMounted()
   useEffect(() => {
-    void fetchImage(imgSrc)
+    void fetchImage(`${imgSrc}?resize`)
       .then((img) => resizeImage(img, 60, 60))
       .then((canvas) => isMounted() && setPreviewImg(canvas.toDataURL()))
   }, [imgSrc, setPreviewImg, isMounted])
