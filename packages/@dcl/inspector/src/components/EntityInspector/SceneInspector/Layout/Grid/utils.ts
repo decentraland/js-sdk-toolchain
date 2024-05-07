@@ -1,15 +1,29 @@
-import { Props } from "./types";
+import { Coords } from '@dcl/ecs'
 
+import { Props } from './types'
+
+/*
+** Get the length of the axis (x,y) on the grid
+*/
+export function getAxisLength(coords: Props['coords']): Coords {
+  const [first, last] = [coords[0], coords[coords.length - 1]]
+  return {
+    x: Math.abs(last.x - first.x) + 1, // zero-based
+    y: Math.abs(last.y - first.y) + 1  // zero-based
+  }
+}
+
+/*
+** Get's the axis with the bigger length
+*/
 export function getLargestAxis(coords: Props['coords']): number {
-  const [first, last] = [coords[0], coords[coords.length - 1]]
-  return Math.max(Math.abs(last.x - first.x), Math.abs(last.y - first.y)) + 1 // zero-based
+  const axisLength = getAxisLength(coords)
+  return Math.max(axisLength.x, axisLength.y)
 }
 
-export function getNumberOfRows(coords: Props['coords']): number {
-  const [first, last] = [coords[0], coords[coords.length - 1]]
-  return Math.max(Math.abs(last.y - first.y)) + 1 // zero-based
-}
-
+/*
+** Splits coords into chunks of specific size
+*/
 export function chunkCoords(coords: Props['coords'], chunkSize: number): Props['coords'][] {
   if (chunkSize <= 0 || chunkSize >= coords.length) return [coords]
 

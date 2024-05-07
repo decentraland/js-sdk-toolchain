@@ -1,4 +1,5 @@
 import { Coords } from "@dcl/ecs"
+import { AXIS_STEP, TILE_OPTIONS } from "./types"
 
 type ParcelInfo = {
   min: Coords
@@ -61,4 +62,13 @@ export function getCoordinatesInGridOrder(coords: Coords[]): Coords[] {
     // If y-coordinates are the same, sort by x-coordinate in ascending order
     return a.x - b.x
   })
+}
+
+export function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value))
+}
+
+export function getOption(value: number): number {
+  const idx = clamp(Math.ceil(value / AXIS_STEP) - 1, 0, TILE_OPTIONS.length - 1)
+  return TILE_OPTIONS[idx]?.value ?? 0
 }

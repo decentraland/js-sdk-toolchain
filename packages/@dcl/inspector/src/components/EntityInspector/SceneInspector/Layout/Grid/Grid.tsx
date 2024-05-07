@@ -1,4 +1,4 @@
-import { chunkCoords, getLargestAxis, getNumberOfRows } from "./utils";
+import { chunkCoords, getAxisLength, getLargestAxis } from "./utils";
 import { Props } from "./types";
 
 import './Grid.css'
@@ -15,7 +15,7 @@ function Grid({ coords, maxTileSize = 50, minTileSize = 3, visualThreshold = 10 
     margin: `${visualRatio}px`,
   }
 
-  const numberOfRows = getNumberOfRows(coords)
+  const numberOfRows = getAxisLength(coords).y
   // actually chunking the array is not necessary
   // we could just use the `numberOfRows` to render the grid
   // but it's easier to read/use `[].map` than a for-loop in React...

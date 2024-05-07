@@ -5,15 +5,17 @@ import { Block } from '../../../Block'
 import { Button } from '../../../Button'
 import { Grid, Props as GridProps } from './Grid'
 
-import { getCoordinatesBetweenPoints, getCoordinatesInGridOrder, getSceneParcelInfo } from './utils'
+import { getCoordinatesBetweenPoints, getCoordinatesInGridOrder, getOption, getSceneParcelInfo } from './utils'
 import { Props, TILE_OPTIONS } from './types'
 
 import './Layout.css'
+import { getAxisLength } from './Grid/utils'
 
 function Layout(props: Props) {
   const currentLayout = getSceneParcelInfo(props.value as string)
   const coordinates = getCoordinatesBetweenPoints(currentLayout.min, currentLayout.max)
   const orderedCoordinates = getCoordinatesInGridOrder(coordinates)
+  const axisLength = getAxisLength(orderedCoordinates)
   const [grid, setGrid] = useState<GridProps['coords']>(orderedCoordinates)
   const numberOfParcels = coordinates.length
 
@@ -52,8 +54,8 @@ function Layout(props: Props) {
 
       <Block label="Max. Grid Size">
         <Block>
-          <Dropdown label="Rows" value={2} options={TILE_OPTIONS} onChange={handleTileChange('rows')} />
-          <Dropdown label="Columns" value={2} options={TILE_OPTIONS} onChange={handleTileChange('columns')} />
+          <Dropdown label="Rows" value={getOption(axisLength.y)} options={TILE_OPTIONS} onChange={handleTileChange('rows')} />
+          <Dropdown label="Columns" value={getOption(axisLength.x)} options={TILE_OPTIONS} onChange={handleTileChange('columns')} />
         </Block>
         <Button type="dark" onClick={() => null}>Set coordinates (advanced)</Button>
         <Button type="blue" size="big" onClick={() => null}>Apply layout</Button>
