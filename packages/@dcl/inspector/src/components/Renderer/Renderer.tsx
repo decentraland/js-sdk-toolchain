@@ -64,6 +64,7 @@ const Renderer: React.FC = () => {
   const config = getConfig()
   const [copyEntities, setCopyEntities] = useState<Entity[]>([])
   const hiddenPanels = useAppSelector(getHiddenPanels)
+  const [placeSingleTile, setPlaceSingleTile] = useState(false)
 
   useEffect(() => {
     if (sdk && init) {
@@ -152,6 +153,22 @@ const Renderer: React.FC = () => {
   useHotkey([ZOOM_OUT, ZOOM_OUT_ALT], zoomOut, canvasRef.current)
   useHotkey([RESET_CAMERA], resetCamera, canvasRef.current)
   useHotkey([DUPLICATE, DUPLICATE_ALT], duplicateSelectedEntities, canvasRef.current)
+
+  // listen to ctrl key to place single tile
+  useEffect(() => {
+    const prevHandler = document.ondrag
+    function handleKeyDown(event: MouseEvent) {
+      if (event.shiftKey && !placeSingleTile) {
+        setPlaceSingleTile(true)
+      } else if (placeSingleTile && !event.shiftKey) {
+        setPlaceSingleTile(false)
+      }
+    }
+    document.ondrag = handleKeyDown
+    return () => {
+      document.ondrag = prevHandler
+    }
+  }, [placeSingleTile, setPlaceSingleTile])
 
   const getDropPosition = async () => {
     const pointerCoords = await getPointerCoords(sdk!.scene)
@@ -257,7 +274,7 @@ const Renderer: React.FC = () => {
       components: asset.components
     }
     const basePath = withAssetDir(`${destFolder}/${assetPackageName}`)
-    if (isGround(asset)) {
+    if (isGround(asset) && !placeSingleTile) {
       await setGround(model, basePath)
     } else {
       await addAsset(model, position, basePath)
