@@ -84,19 +84,9 @@ export function fromScene(value: EditorComponentsTypes['Scene']): SceneInput {
 }
 
 export function toScene(inputs: SceneInput): EditorComponentsTypes['Scene'] {
-  let base: Coords = { x: Infinity, y: Infinity }
-  const parcels = Array.from(new Set(inputs.layout.parcels.split(' '))).map((parcel) => {
-    const [x, y] = parcel.split(',').map(($) => parseInt($))
-
-    // base should be bottom-left parcel
-    // https://docs.decentraland.org/creator/development-guide/sdk7/scene-metadata/#scene-parcels
-    if (base.y >= y) {
-      base = { x: Math.min(base.x, x), y }
-    }
-
-    return { x, y }
-  })
-
+  // base should be bottom-left parcel
+  // https://docs.decentraland.org/creator/development-guide/sdk7/scene-metadata/#scene-parcels
+  const { min: base, parcels } = getLayout(inputs.layout.parcels)
   return {
     name: inputs.name,
     description: inputs.description,
@@ -111,10 +101,7 @@ export function toScene(inputs: SceneInput): EditorComponentsTypes['Scene'] {
     spawnPoints: inputs.spawnPoints.map((spawnPoint, index) =>
       toSceneSpawnPoint(`Spawn Point ${index + 1}`, spawnPoint)
     ),
-    layout: {
-      base,
-      parcels
-    }
+    layout: { base, parcels }
   }
 }
 
@@ -128,6 +115,28 @@ export function toSceneAuto(inputs: SceneInput): EditorComponentsTypes['Scene'] 
       parcels: points
     }
   }
+}
+
+export function getLayout(parcels: string) {
+  const base: { min: Coords, max: Coords } = {
+    min: { x: Infinity, y: Infinity },
+    max: { x: -Infinity, y: -Infinity }
+  }
+  const _parcels = Array.from(new Set(parcels.split(' '))).map((parcel) => {
+    const [x, y] = parcel.split(',').map(($) => parseInt($))
+
+    if (base.min.y >= y) {
+      base.min = { x: Math.min(base.min.x, x), y }
+    }
+
+    if (base.max.y <= y) {
+      base.max = { x: Math.max(base.max.x, x), y }
+    }
+
+    return { x, y }
+  })
+
+  return { min: base.min, max: base.max, parcels: _parcels }
 }
 
 export function parseParcels(value: string): Coords[] {

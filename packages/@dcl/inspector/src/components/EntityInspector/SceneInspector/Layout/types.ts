@@ -1,4 +1,8 @@
-export type Props = {
+import { useComponentInput } from "../../../../hooks/sdk/useComponentInput"
+
+type GetInputProps = ReturnType<typeof useComponentInput>['getInputProps']
+
+export type Props = ReturnType<GetInputProps> & {
 
 }
 

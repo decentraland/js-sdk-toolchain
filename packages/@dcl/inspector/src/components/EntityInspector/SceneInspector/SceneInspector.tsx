@@ -22,7 +22,7 @@ import {
 } from './utils'
 
 import './SceneInspector.css'
-import { EditorComponentsTypes, SceneAgeRating, SceneCategory, SceneSpawnPoint } from '../../../lib/sdk/components'
+import { EditorComponentsTypes, SceneAgeRating, SceneCategory, SceneComponent, SceneSpawnPoint } from '../../../lib/sdk/components'
 import { Dropdown } from '../../ui/Dropdown'
 import { TextArea } from '../../ui'
 import { Tabs } from '../Tabs'
@@ -416,7 +416,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
         //   <TextField {...parcelsProps} />
         //   <RxBorderAll onClick={handleClick} style={{ opacity: auto ? 1 : 0.3 }} />
         // </Block>
-        <Layout />
+        <Layout {...parcelsProps} />
       ) : null}
 
       {selectedSceneInspectorTab === SceneInspectorTab.SETTINGS ? (
