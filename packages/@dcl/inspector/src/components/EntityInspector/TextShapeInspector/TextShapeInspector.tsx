@@ -5,9 +5,9 @@ import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
-import { TextField, CheckboxField, ColorField, Dropdown } from '../../ui'
+import { TextField, CheckboxField, ColorField, Dropdown, TextArea } from '../../ui'
 import { Props } from './types'
-import { fromTextShape, toTextShape, isValidInput, FONTS, TEXT_ALIGN_MODES } from './utils'
+import { fromTextShape, toTextShape, isValidInput, TEXT_ALIGN_MODES } from './utils'
 
 export default withSdk<Props>(({ sdk, entity }) => {
   const { TextShape } = sdk.components
@@ -25,10 +25,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
   return (
     <Container label="TextShape" className="TextShape" onRemoveContainer={handleRemove}>
       <Block>
-        <TextField label="Text" type="text" {...getInputProps('text')} />
-      </Block>
-      <Block>
-        <Dropdown label="Font" options={FONTS} {...getInputProps('font')} />
+        <TextArea label="Text" {...getInputProps('text')} />
       </Block>
       <Block>
         <ColorField label="Text Color" {...getInputProps('textColor')} />
@@ -37,13 +34,8 @@ export default withSdk<Props>(({ sdk, entity }) => {
         <TextField type="number" {...getInputProps('fontSize')} />
         <CheckboxField label="Font Auto-Size" {...getInputProps('fontAutoSize', (e) => e.target.checked)} />
       </Block>
-      <Block label="Shape">
-        <TextField leftLabel="Width" type="number" {...getInputProps('width')} />
-        <TextField leftLabel="Height" type="number" {...getInputProps('height')} />
-      </Block>
       <Block label="Text Align">
         <Dropdown options={TEXT_ALIGN_MODES} {...getInputProps('textAlign')} />
-        <CheckboxField label="Text-Wrapping" {...getInputProps('textWrapping', (e) => e.target.checked)} />
       </Block>
       <Block label="Padding">
         <TextField leftLabel="↑" type="number" {...getInputProps('paddingTop')} />
@@ -53,21 +45,12 @@ export default withSdk<Props>(({ sdk, entity }) => {
       </Block>
       <Block label="Line">
         <TextField leftLabel="Spacing" type="number" {...getInputProps('lineSpacing')} />
-        <TextField leftLabel="Count" type="number" {...getInputProps('lineCount')} />
       </Block>
       <Block>
         <TextField label="Outline Width" type="number" {...getInputProps('outlineWidth')} />
       </Block>
       <Block>
         <ColorField label="Outline color" {...getInputProps('outlineColor')} />
-      </Block>
-      <Block label="Shadow">
-        <TextField leftLabel="Blur" type="number" {...getInputProps('shadowBlur')} />
-        <TextField leftLabel="Offset X" type="number" {...getInputProps('shadowOffsetX')} />
-        <TextField leftLabel="Offset Y" type="number" {...getInputProps('shadowOffsetY')} />
-      </Block>
-      <Block>
-        <ColorField label="Shadow color" {...getInputProps('shadowColor')} />
       </Block>
     </Container>
   )

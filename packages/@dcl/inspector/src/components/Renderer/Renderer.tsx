@@ -75,7 +75,7 @@ const Renderer: React.FC = () => {
         if (!sceneEntity) continue
 
         if (!fileSet.has(value.src)) removeGltf(sceneEntity)
-        else loadGltf(sceneEntity, value.src)
+        else void loadGltf(sceneEntity, value.src)
       }
     }
   }, [files])
@@ -97,18 +97,18 @@ const Renderer: React.FC = () => {
 
   const deleteSelectedEntities = useCallback(() => {
     if (!sdk) return
-    const selectedEntitites = sdk.sceneContext.operations.getSelectedEntities()
-    selectedEntitites.forEach((entity) => sdk.sceneContext.operations.removeEntity(entity))
-    void sdk.sceneContext.operations.dispatch()
+    const selectedEntitites = sdk.operations.getSelectedEntities()
+    selectedEntitites.forEach((entity) => sdk.operations.removeEntity(entity))
+    void sdk.operations.dispatch()
   }, [sdk])
 
   const duplicateSelectedEntities = useCallback(() => {
     if (!sdk) return
     const camera = sdk.scene.activeCamera!
     camera.detachControl()
-    const selectedEntitites = sdk.sceneContext.operations.getSelectedEntities()
-    selectedEntitites.forEach((entity) => sdk.sceneContext.operations.duplicateEntity(entity))
-    void sdk.sceneContext.operations.dispatch()
+    const selectedEntitites = sdk.operations.getSelectedEntities()
+    selectedEntitites.forEach((entity) => sdk.operations.duplicateEntity(entity))
+    void sdk.operations.dispatch()
     setTimeout(() => {
       camera.attachControl(canvasRef.current, true)
     }, 100)
@@ -116,14 +116,14 @@ const Renderer: React.FC = () => {
 
   const copySelectedEntities = useCallback(() => {
     if (!sdk) return
-    const selectedEntitites = sdk.sceneContext.operations.getSelectedEntities()
+    const selectedEntitites = sdk.operations.getSelectedEntities()
     setCopyEntities([...selectedEntitites])
   }, [sdk, setCopyEntities])
 
   const pasteSelectedEntities = useCallback(() => {
     if (!sdk) return
-    copyEntities.forEach((entity) => sdk.sceneContext.operations.duplicateEntity(entity))
-    void sdk.sceneContext.operations.dispatch()
+    copyEntities.forEach((entity) => sdk.operations.duplicateEntity(entity))
+    void sdk.operations.dispatch()
   }, [sdk, copyEntities])
 
   const zoomIn = useCallback(() => {

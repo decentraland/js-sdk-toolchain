@@ -106,9 +106,13 @@ export function createGizmoManager(context: SceneContext) {
     if (_entity) {
       const parent = context.Transform.getOrNull(_entity.entityId)?.parent || (0 as Entity)
       const value = {
-        position: snapPosition(_entity.position),
-        scale: snapScale(_entity.scaling),
-        rotation: _entity.rotationQuaternion ? snapRotation(_entity.rotationQuaternion) : Quaternion.Zero(),
+        position: gizmoManager.positionGizmoEnabled ? snapPosition(_entity.position) : _entity.position,
+        scale: gizmoManager.scaleGizmoEnabled ? snapScale(_entity.scaling) : _entity.scaling,
+        rotation: gizmoManager.rotationGizmoEnabled
+          ? _entity.rotationQuaternion
+            ? snapRotation(_entity.rotationQuaternion)
+            : Quaternion.Zero()
+          : _entity.rotationQuaternion ?? Quaternion.Zero(),
         parent
       }
       return value

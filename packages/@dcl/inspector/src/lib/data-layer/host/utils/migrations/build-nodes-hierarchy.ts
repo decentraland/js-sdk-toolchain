@@ -36,6 +36,9 @@ export function buildNodesHierarchy(engine: IEngine): Node[] {
   hierarchy.set(engine.PlayerEntity, { entity: engine.PlayerEntity, children: [] })
   hierarchy.set(engine.CameraEntity, { entity: engine.CameraEntity, children: [] })
 
+  const root = hierarchy.get(engine.RootEntity)!
+  hierarchy.set(engine.RootEntity, { ...root, open: true })
+
   return Array.from(hierarchy.values())
 }
 

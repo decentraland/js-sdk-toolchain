@@ -50,6 +50,9 @@ export namespace AppendValueOperation {
 // @public
 export function areConnected(parcels: Coords[]): boolean;
 
+// @public (undocumented)
+export const AudioEvent: GrowOnlyValueSetComponentDefinition<PBAudioEvent>;
+
 // Warning: (ae-missing-release-tag) "AudioSource" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -61,8 +64,15 @@ export interface AudioSourceComponentDefinitionExtended extends LastWriteWinElem
     stopSound(entity: Entity, resetCursor?: boolean): boolean;
 }
 
+// Warning: (ae-missing-release-tag) "AudioStream" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const AudioStream: LastWriteWinElementSetComponentDefinition<PBAudioStream>;
+export const AudioStream: AudioStreamComponentDefinitionExtended;
+
+// @public (undocumented)
+export interface AudioStreamComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBAudioStream> {
+    getAudioState(entity: Entity): PBAudioEvent | undefined;
+}
 
 // @public (undocumented)
 export const enum AvatarAnchorPointType {
@@ -529,6 +539,7 @@ export type ComponentDefinition<T> = LastWriteWinElementSetComponentDefinition<T
 // @public
 export const componentDefinitionByName: {
     "core::Animator": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAnimator>>;
+    "core::AudioEvent": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAudioEvent>>;
     "core::AudioSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioSource>>;
     "core::AudioStream": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioStream>>;
     "core::AvatarAttach": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarAttach>>;
@@ -553,6 +564,7 @@ export const componentDefinitionByName: {
     "core::PointerLock": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerLock>>;
     "core::Raycast": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycast>>;
     "core::RaycastResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycastResult>>;
+    "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
     "core::TweenSequence": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenSequence>>;
@@ -972,12 +984,6 @@ export function Engine(options?: IEngineOptions): IEngine;
 export const engine: IEngine;
 
 // @public (undocumented)
-export type EngineEvent<T extends IEventNames = IEventNames, V = IEvents[T]> = {
-    type: T;
-    data: Readonly<V>;
-};
-
-// @public (undocumented)
 export const EngineInfo: LastWriteWinElementSetComponentDefinition<PBEngineInfo>;
 
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
@@ -1086,24 +1092,6 @@ export function getComponentEntityTree<T>(engine: Pick<IEngine, 'getEntitiesWith
 // @public @deprecated (undocumented)
 export function getCompositeRootComponent(engine: IEngine): LastWriteWinElementSetComponentDefinition<CompositeRootType>;
 
-// @public (undocumented)
-export type GizmoDragEndEvent = {
-    type: 'gizmoDragEnded';
-    transforms: Array<{
-        position: Vector3Type;
-        rotation: QuaternionType;
-        scale: Vector3Type;
-        entityId: unknown;
-    }>;
-};
-
-// @public (undocumented)
-export type GizmoSelectedEvent = {
-    type: 'gizmoSelected';
-    gizmoType: 'MOVE' | 'ROTATE' | 'SCALE' | 'NONE';
-    entities: string[];
-};
-
 // Warning: (ae-missing-release-tag) "GlobalDirectionRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -1114,11 +1102,6 @@ export type GlobalDirectionRaycastOptions = RaycastSystemOptions & GlobalDirecti
 // @public (undocumented)
 export type GlobalDirectionRaycastSystemOptions = {
     direction?: PBVector3;
-};
-
-// @public (undocumented)
-export type GlobalInputEventResult = InputEventResult & {
-    type: 0 | 1;
 };
 
 // Warning: (ae-missing-release-tag) "GlobalTargetRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -1208,87 +1191,21 @@ export type IEventNames = keyof IEvents;
 
 // @public
 export interface IEvents {
-    actionButtonEvent: GlobalInputEventResult;
-    builderSceneStart: unknown;
-    builderSceneUnloaded: unknown;
-    cameraModeChanged: {
-        cameraMode: 0 | 1 | 2;
-    };
-    chatMessage: {
-        id: string;
-        sender: string;
-        message: string;
-        isCommand: boolean;
-    };
     comms: {
         sender: string;
         message: string;
     };
-    entitiesOutOfBoundaries: {
-        entities: string[];
-    };
-    entityBackInScene: {
-        entityId: unknown;
-    };
-    entityOutOfScene: {
-        entityId: unknown;
-    };
-    // (undocumented)
-    externalAction: {
-        type: string;
-        [key: string]: any;
-    };
-    gizmoEvent: GizmoDragEndEvent | GizmoSelectedEvent;
-    idleStateChanged: {
-        isIdle: boolean;
-    };
-    // (undocumented)
-    limitsExceeded: {
-        given: Record<string, number>;
-        limit: Record<string, number>;
-    };
-    // (undocumented)
-    metricsUpdate: {
-        given: Record<string, number>;
-        limit: Record<string, number>;
-    };
-    onAnimationEnd: {
-        clipName: string;
-    };
-    onBlur: {
-        entityId: unknown;
-        pointerId: number;
-    };
-    onChange: {
-        value?: any;
-        pointerId?: number;
-    };
-    onClick: {
-        entityId: unknown;
-    };
-    onEnter: unknown;
     onEnterScene: {
         userId: string;
     };
-    onFocus: {
-        entityId: unknown;
-        pointerId: number;
-    };
     onLeaveScene: {
         userId: string;
-    };
-    onPointerLock: {
-        locked?: boolean;
     };
     onRealmChanged: {
         domain: string;
         room: string;
         serverName: string;
         displayName: string;
-    };
-    // (undocumented)
-    onTextSubmit: {
-        text: string;
     };
     playerClicked: {
         userId: string;
@@ -1308,37 +1225,11 @@ export interface IEvents {
     playerExpression: {
         expressionId: string;
     };
-    pointerDown: InputEventResult;
-    // @deprecated
-    pointerEvent: GlobalInputEventResult;
-    pointerHoverEnter: unknown;
-    pointerHoverExit: unknown;
-    pointerUp: InputEventResult;
-    positionChanged: {
-        position: Vector3Type;
-        cameraPosition: Vector3Type;
-        playerHeight: number;
-    };
     profileChanged: {
         ethAddress: string;
         version: number;
     };
-    raycastResponse: RaycastResponsePayload<any>;
-    rotationChanged: {
-        rotation: Vector3Type;
-        quaternion: QuaternionType;
-    };
     sceneStart: unknown;
-    // (undocumented)
-    stateEvent: {
-        type: string;
-        payload: any;
-    };
-    // (undocumented)
-    uuidEvent: {
-        uuid: string;
-        payload: any;
-    };
     videoEvent: {
         componentId: string;
         videoClipId: string;
@@ -1448,21 +1339,6 @@ export const enum InputAction {
     // (undocumented)
     IA_WALK = 9
 }
-
-// @public (undocumented)
-export type InputEventResult = {
-    origin: Vector3Type;
-    direction: Vector3Type;
-    buttonId: number;
-    hit?: {
-        length: number;
-        hitPoint: Vector3Type;
-        meshName: string;
-        normal: Vector3Type;
-        worldNormal: Vector3Type;
-        entityId: unknown;
-    };
-};
 
 // @public
 export const inputSystem: IInputSystem;
@@ -1787,6 +1663,26 @@ export namespace Matrix {
     export function Zero(): MutableMatrix;
 }
 
+// @public (undocumented)
+export const enum MediaState {
+    // (undocumented)
+    MS_BUFFERING = 5,
+    // (undocumented)
+    MS_ERROR = 1,
+    // (undocumented)
+    MS_LOADING = 2,
+    // (undocumented)
+    MS_NONE = 0,
+    // (undocumented)
+    MS_PAUSED = 7,
+    // (undocumented)
+    MS_PLAYING = 4,
+    // (undocumented)
+    MS_READY = 3,
+    // (undocumented)
+    MS_SEEKING = 6
+}
+
 // Warning: (ae-missing-release-tag) "MeshCollider" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -2078,6 +1974,21 @@ export namespace PBAnimator {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAnimator;
     // (undocumented)
     export function encode(message: PBAnimator, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAudioEvent {
+    // (undocumented)
+    state: MediaState;
+    timestamp: number;
+}
+
+// @public (undocumented)
+export namespace PBAudioEvent {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAudioEvent;
+    // (undocumented)
+    export function encode(message: PBAudioEvent, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2755,6 +2666,30 @@ export namespace PBRaycastResult {
 }
 
 // @public (undocumented)
+export interface PBRealmInfo {
+    // (undocumented)
+    baseUrl: string;
+    // (undocumented)
+    commsAdapter: string;
+    // (undocumented)
+    isPreview: boolean;
+    // (undocumented)
+    networkId: number;
+    // (undocumented)
+    realmName: string;
+    // (undocumented)
+    room?: string | undefined;
+}
+
+// @public (undocumented)
+export namespace PBRealmInfo {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBRealmInfo;
+    // (undocumented)
+    export function encode(message: PBRealmInfo, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBTextShape {
     font?: Font | undefined;
     fontAutoSize?: boolean | undefined;
@@ -3419,13 +3354,6 @@ export const enum RaycastQueryType {
 }
 
 // @public (undocumented)
-export type RaycastResponsePayload<T> = {
-    queryId: string;
-    queryType: string;
-    payload: T;
-};
-
-// @public (undocumented)
 export const RaycastResult: LastWriteWinElementSetComponentDefinition<PBRaycastResult>;
 
 // @public (undocumented)
@@ -3519,6 +3447,9 @@ export type ReadOnlyLastWriteWinElementSetComponentDefinition<T> = Omit<LastWrit
 
 // @public (undocumented)
 export type ReadonlyPrimitive = number | string | number[] | string[] | boolean | boolean[];
+
+// @public (undocumented)
+export const RealmInfo: LastWriteWinElementSetComponentDefinition<PBRealmInfo>;
 
 // @public (undocumented)
 export type ReceiveMessage = CrdtMessageBody & {

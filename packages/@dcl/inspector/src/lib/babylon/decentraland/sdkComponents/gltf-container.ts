@@ -1,3 +1,4 @@
+import future from 'fp-future'
 import * as BABYLON from '@babylonjs/core'
 import { GLTFFileLoader, GLTFLoaderAnimationStartMode } from '@babylonjs/loaders'
 import { GLTFLoader } from '@babylonjs/loaders/glTF/2.0'
@@ -7,6 +8,7 @@ import { markAsCollider } from '../colliders-utils'
 import type { ComponentOperation } from '../component-operations'
 import { EcsEntity } from '../EcsEntity'
 import { SceneContext } from '../SceneContext'
+import { CAMERA, PLAYER } from '../../../sdk/tree'
 
 let sceneContext: WeakRef<SceneContext>
 
@@ -63,10 +65,10 @@ export const updateGltfForEntity = (entity: EcsEntity, newValue: PBGltfContainer
   const shouldRemoveGltf = !newValue || shouldLoadGltf
 
   if (shouldRemoveGltf) removeGltf(entity)
-  if (shouldLoadGltf) loadGltf(entity, newValue.src)
+  if (shouldLoadGltf) void loadGltf(entity, newValue.src)
 }
 
-export function loadGltf(entity: EcsEntity, value: string) {
+export async function loadGltf(entity: EcsEntity, value: string) {
   const context = entity.context.deref()
   if (!context || !!entity.gltfContainer) return
 
@@ -75,15 +77,30 @@ export function loadGltf(entity: EcsEntity, value: string) {
     sceneContext = entity.context
   }
 
-  const loadingSpinner = createLoadingSpinner(entity, context.scene)
+  let root = entity.getRoot()
+  let attempts = 0
 
-  tryLoadGltfAsync(context.loadableScene.id, entity, value)
-    .catch((err) => {
-      console.error('Error trying to load gltf ' + value, err)
-    })
-    .finally(() => {
-      loadingSpinner.dispose(false, true)
-    })
+  while (root === null && attempts++ < 10) {
+    // waiting for nodes to be loaded...
+    await new Promise((resolve) => setTimeout(resolve, 100))
+    root = entity.getRoot()
+  }
+
+  const shouldHide = root === PLAYER || root === CAMERA
+
+  const loadingSpinner: BABYLON.Mesh | null = shouldHide ? null : createLoadingSpinner(entity, context.scene)
+
+  try {
+    await tryLoadGltfAsync(context.loadableScene.id, entity, value)
+  } catch (error) {
+    console.error('Error trying to load gltf ' + value, error)
+  } finally {
+    if (shouldHide) {
+      entity.setVisibility(false)
+    } else {
+      loadingSpinner?.dispose(false, true)
+    }
+  }
 }
 
 export function removeGltf(entity: EcsEntity) {
@@ -131,6 +148,8 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
   const file = new File([content], finalSrc)
   const extension = filePath.toLowerCase().endsWith('.gltf') ? '.gltf' : '.glb'
 
+  const loadAssetFuture = future<void>()
+
   loadAssetContainer(
     file,
     entity.getScene(),
@@ -160,14 +179,18 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
       entity.generateBoundingBox()
       entity.setGltfAssetContainer(assetContainer)
       entity.resolveGltfPathLoading(filePath)
+      loadAssetFuture.resolve()
     },
     undefined,
-    (_scene, _message, _exception) => {
-      console.error('Error while calling LoadAssetContainer: ', _message, _exception)
+    (_scene, message, _exception) => {
+      console.error('Error while calling LoadAssetContainer: ', message, _exception)
       entity.resolveGltfPathLoading(filePath)
+      loadAssetFuture.reject(new Error(message))
     },
     extension
   )
+
+  return loadAssetFuture
 }
 
 export function loadAssetContainer(
