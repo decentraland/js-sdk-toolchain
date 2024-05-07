@@ -50,6 +50,8 @@ import { PanelName } from '../../redux/ui/types'
 const ZOOM_DELTA = new Vector3(0, 0, 1.1)
 const fixedNumber = (val: number) => Math.round(val * 1e2) / 1e2
 
+const SINGLE_TILE_HINT_OFFSET = 30
+
 const Renderer: React.FC = () => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
   useRenderer(() => canvasRef)
@@ -65,6 +67,8 @@ const Renderer: React.FC = () => {
   const [copyEntities, setCopyEntities] = useState<Entity[]>([])
   const hiddenPanels = useAppSelector(getHiddenPanels)
   const [placeSingleTile, setPlaceSingleTile] = useState(false)
+  const [showSingleTileHint, setShowSingleTileHint] = useState(false)
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
 
   useEffect(() => {
     if (sdk && init) {
@@ -156,19 +160,34 @@ const Renderer: React.FC = () => {
 
   // listen to ctrl key to place single tile
   useEffect(() => {
-    const prevHandler = document.ondrag
-    function handleKeyDown(event: MouseEvent) {
+    const prevDrag = document.ondrag
+    function handleDrag(event: MouseEvent) {
       if (event.shiftKey && !placeSingleTile) {
         setPlaceSingleTile(true)
       } else if (placeSingleTile && !event.shiftKey) {
         setPlaceSingleTile(false)
       }
+      if (!placeSingleTile && event.clientX && event.clientY) {
+        setMousePosition({ x: event.clientX, y: event.clientY })
+      }
     }
-    document.ondrag = handleKeyDown
+    document.ondrag = handleDrag
     return () => {
-      document.ondrag = prevHandler
+      document.ondrag = prevDrag
     }
   }, [placeSingleTile, setPlaceSingleTile])
+
+  // clear hint
+  useEffect(() => {
+    const prevDragEnd = document.ondragend
+    function handleDragEnd() {
+      setShowSingleTileHint(false)
+    }
+    document.ondragend = handleDragEnd
+    return () => {
+      document.ondragend = prevDragEnd
+    }
+  }, [showSingleTileHint, setShowSingleTileHint])
 
   const getDropPosition = async () => {
     const pointerCoords = await getPointerCoords(sdk!.scene)
@@ -301,9 +320,21 @@ const Renderer: React.FC = () => {
             await addAsset(model, position, DIRECTORY.ASSETS)
           }
         }
+      },
+      hover(item, monitor) {
+        if (isDropType<BuilderAsset>(item, monitor.getItemType(), 'builder-asset')) {
+          const asset = item.value
+          if (isGround(asset)) {
+            if (!showSingleTileHint) {
+              setShowSingleTileHint(true)
+            }
+          } else if (showSingleTileHint) {
+            setShowSingleTileHint(false)
+          }
+        }
       }
     }),
-    [addAsset]
+    [addAsset, showSingleTileHint, setShowSingleTileHint]
   )
 
   drop(canvasRef)
@@ -323,6 +354,12 @@ const Renderer: React.FC = () => {
         <Shortcuts canvas={canvasRef} onResetCamera={resetCamera} onZoomIn={zoomIn} onZoomOut={zoomOut} />
       )}
       <canvas ref={canvasRef} id="canvas" touch-action="none" />
+      <div
+        style={{ top: mousePosition.y + SINGLE_TILE_HINT_OFFSET, left: mousePosition.x + SINGLE_TILE_HINT_OFFSET }}
+        className={cx('single-tile-hint', { 'is-visible': !placeSingleTile && showSingleTileHint })}
+      >
+        Hold <b>SHIFT</b> to place a single tile
+      </div>
     </div>
   )
 }
