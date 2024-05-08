@@ -54,6 +54,14 @@ export function getCoordinatesBetweenPoints(pointA: Coords, pointB: Coords): Coo
   return coordinates
 }
 
+/*
+** Sorts the coordinates for grid rendering
+** This means:
+**  - X-axis => Lowest to highest
+**  - Y-axis => Highest to lowest
+** EX: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 0 }, { x: 1, y: 1 }]
+**  => [{ x: 0, y: 1 }, { x: 1, y: 1 }, { x: 0, y: 0 }, { x: 1, y: 0 }]
+*/
 export function getCoordinatesInGridOrder(coords: Coords[]): Coords[] {
   // avoid mutating original coords...
   return [...coords].sort((a, b) => {
@@ -64,11 +72,25 @@ export function getCoordinatesInGridOrder(coords: Coords[]): Coords[] {
   })
 }
 
+export function getCoordinates(min: Coords, max: Coords): Coords[] {
+  return getCoordinatesInGridOrder(getCoordinatesBetweenPoints(min, max))
+}
+
+/*
+** Gets the closest value from "TILE_OPTIONS" (rounding up in case it doesn't exist)
+*/
+export function getOption(value: number): number {
+  const idx = clamp(Math.ceil(value / AXIS_STEP), 0, TILE_OPTIONS.length - 1) - 1
+  return TILE_OPTIONS[idx]?.value ?? 0
+}
+
 export function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value))
 }
 
-export function getOption(value: number): number {
-  const idx = clamp(Math.ceil(value / AXIS_STEP) - 1, 0, TILE_OPTIONS.length - 1)
-  return TILE_OPTIONS[idx]?.value ?? 0
+export function getMinMaxFromOrderedCoords(coords: Coords[]): [Coords, Coords] {
+  return [
+    { x: coords[0].x, y: coords[coords.length - 1].y },
+    { x: coords[coords.length - 1].x, y: coords[0].y },
+  ]
 }

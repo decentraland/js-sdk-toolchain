@@ -5,34 +5,41 @@ import { Block } from '../../../Block'
 import { Button } from '../../../Button'
 import { Grid, Props as GridProps } from './Grid'
 
-import { getCoordinatesBetweenPoints, getCoordinatesInGridOrder, getOption, getSceneParcelInfo } from './utils'
+import { getCoordinates, getMinMaxFromOrderedCoords, getOption, getSceneParcelInfo } from './utils'
+import { getAxisLengths } from './Grid/utils'
 import { Props, TILE_OPTIONS } from './types'
 
 import './Layout.css'
-import { getAxisLength } from './Grid/utils'
+
+type Coords = GridProps['coords'][0]
 
 function Layout(props: Props) {
   const currentLayout = getSceneParcelInfo(props.value as string)
-  const coordinates = getCoordinatesBetweenPoints(currentLayout.min, currentLayout.max)
-  const orderedCoordinates = getCoordinatesInGridOrder(coordinates)
-  const axisLength = getAxisLength(orderedCoordinates)
-  const [grid, setGrid] = useState<GridProps['coords']>(orderedCoordinates)
-  const numberOfParcels = coordinates.length
+  const coordinates = getCoordinates(currentLayout.min, currentLayout.max)
 
-  const handleTileChange = useCallback((type: 'rows' | 'columns') => (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = Number(e.target.value)
-    // switch (type) {
-    //   case 'rows': return setGrid({ ...grid, rows: value })
-    //   case 'columns': return setGrid({ ...grid, columns: value })
-    // }
-  }, [])
+  const [grid, setGrid] = useState<Coords[]>(coordinates)
+  const [gridMin, gridMax] = getMinMaxFromOrderedCoords(grid)
+  const axisLengths = getAxisLengths(grid)
+  const numberOfParcels = grid.length
 
-  const isTileDisabled = useCallback((coord: GridProps['coords'][0]) => {
+  const handleTileChange = (type: keyof Coords) => (e: React.ChangeEvent<HTMLSelectElement>) => {
+    // all this uglyness so we can handle negative coords in parcels...
+    const num = Number(e.target.value)
+    const grixMaxAxis = gridMax[type]
+    const axisLength = axisLengths[type]
+    const sign = Math.sign(grixMaxAxis) || 1
+    const diff = Math.abs(axisLength - (num * sign))
+    const value = grixMaxAxis > num ? grixMaxAxis - diff : grixMaxAxis + diff
+    const newMax: Coords = { ...gridMax, [type]: value }
+    return setGrid(getCoordinates(gridMin, newMax))
+  }
+
+  const isTileDisabled = useCallback((coord: Coords) => {
     // TODO: disable grid coordinates that are not on the current parcels...
     return false
   }, [currentLayout])
 
-  const handleTileClick = useCallback((coord: GridProps['coords'][0]) => {
+  const handleTileClick = useCallback((coord: Coords) => {
     // TODO: add/remove coord to the current parcels list...
   }, [])
 
@@ -54,8 +61,8 @@ function Layout(props: Props) {
 
       <Block label="Max. Grid Size">
         <Block>
-          <Dropdown label="Rows" value={getOption(axisLength.y)} options={TILE_OPTIONS} onChange={handleTileChange('rows')} />
-          <Dropdown label="Columns" value={getOption(axisLength.x)} options={TILE_OPTIONS} onChange={handleTileChange('columns')} />
+          <Dropdown label="Rows" value={getOption(axisLengths.y)} options={TILE_OPTIONS} onChange={handleTileChange('y')} />
+          <Dropdown label="Columns" value={getOption(axisLengths.x)} options={TILE_OPTIONS} onChange={handleTileChange('x')} />
         </Block>
         <Button type="dark" onClick={() => null}>Set coordinates (advanced)</Button>
         <Button type="blue" size="big" onClick={() => null}>Apply layout</Button>

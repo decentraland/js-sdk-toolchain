@@ -5,11 +5,11 @@ import { Props } from './types'
 /*
 ** Get the length of the axis (x,y) on the grid
 */
-export function getAxisLength(coords: Props['coords']): Coords {
+export function getAxisLengths(coords: Props['coords']): Coords {
   const [first, last] = [coords[0], coords[coords.length - 1]]
   return {
     x: Math.abs(last.x - first.x) + 1, // zero-based
-    y: Math.abs(last.y - first.y) + 1  // zero-based
+    y: Math.abs(first.y - last.y) + 1  // zero-based
   }
 }
 
@@ -17,7 +17,7 @@ export function getAxisLength(coords: Props['coords']): Coords {
 ** Get's the axis with the bigger length
 */
 export function getLargestAxis(coords: Props['coords']): number {
-  const axisLength = getAxisLength(coords)
+  const axisLength = getAxisLengths(coords)
   return Math.max(axisLength.x, axisLength.y)
 }
 
