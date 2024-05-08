@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useMemo } from 'react'
-import { Entity, PBTween, PBTweenSequence, TransformType, TweenLoop } from '@dcl/ecs'
+import { Entity, PBTween, PBTweenSequence, TweenLoop } from '@dcl/ecs'
 import { Action, ActionPayload, ActionType, getJson } from '@dcl/asset-packs'
 import { WithSdkProps, withSdk } from '../../../../hoc/withSdk'
 import { useArrayState } from '../../../../hooks/useArrayState'
@@ -12,7 +12,6 @@ import { getPartialPayload } from '../../ActionInspector/utils'
 export default React.memo(
   withSdk<WithSdkProps & { entity: Entity }>(({ sdk, entity }) => {
     const { Actions, Config, Transform, Tween, TweenSequence } = sdk.components
-    const [transformComponent] = useComponentValue<TransformType>(entity, Transform)
     const [tweenComponent, setTweenComponentValue, isTweenComponentEqual] = useComponentValue<PBTween>(entity, Tween)
     const [tweenSequenceComponent, setTweenSequenceComponentValue] = useComponentValue<PBTweenSequence>(
       entity,
@@ -96,6 +95,7 @@ export default React.memo(
 
     useEffect(() => {
       const currentTween = Tween.get(entity)
+      const transformComponent = Transform.get(entity)
       const start = {
         x: transformComponent.position.x ?? 0,
         y: transformComponent.position.y ?? 0,
@@ -126,13 +126,14 @@ export default React.memo(
           handleUpdateActionsDistance(distance)
         }
       }
-    }, [entity, transformComponent, setTweenComponentValue, handleUpdateActionsDistance])
+    }, [entity, setTweenComponentValue, handleUpdateActionsDistance])
 
     const handleTweenChangeDistance = useCallback(
       (e: React.ChangeEvent<HTMLElement>, isHorizontal: boolean) => {
         const { value } = e.target as HTMLInputElement
         const distance = parseFloat(value)
         if (tweenComponent.mode?.$case === 'move') {
+          const transformComponent = Transform.get(entity)
           const start = {
             x: transformComponent.position.x,
             y: transformComponent.position.y,
@@ -152,7 +153,7 @@ export default React.memo(
           handleUpdateActionsDistance(distance)
         }
       },
-      [tweenComponent, transformComponent, setTweenComponentValue, handleUpdateActionsDistance]
+      [tweenComponent, setTweenComponentValue, handleUpdateActionsDistance]
     )
 
     const handleTweenChangeDuration = useCallback(

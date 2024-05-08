@@ -52,16 +52,16 @@ export default withSdk<Props>(({ sdk, entity }) => {
         <TextField leftLabel="Y" type="number" {...getInputProps('position.y')} />
         <TextField leftLabel="Z" type="number" {...getInputProps('position.z')} />
       </Block>
+      <Block label="Rotation">
+        <TextField leftLabel="X" type="number" {...getInputProps('rotation.x')} />
+        <TextField leftLabel="Y" type="number" {...getInputProps('rotation.y')} />
+        <TextField leftLabel="Z" type="number" {...getInputProps('rotation.z')} />
+      </Block>
       <Block label="Scale">
         <TextField leftLabel="X" type="number" {...getInputProps('scale.x')} />
         <TextField leftLabel="Y" type="number" {...getInputProps('scale.y')} />
         <TextField leftLabel="Z" type="number" {...getInputProps('scale.z')} />
         <Link field="porportionalScaling" getInputProps={_getConfigProps} />
-      </Block>
-      <Block label="Rotation">
-        <TextField leftLabel="X" type="number" {...getInputProps('rotation.x')} />
-        <TextField leftLabel="Y" type="number" {...getInputProps('rotation.y')} />
-        <TextField leftLabel="Z" type="number" {...getInputProps('rotation.z')} />
       </Block>
     </Container>
   )

@@ -86,10 +86,9 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         disabled={disabled}
+        value={inputValue}
         {...rest}
-      >
-        {inputValue}
-      </textarea>
+      ></textarea>
       <Message text={error} type={MessageType.ERROR} />
     </div>
   )
