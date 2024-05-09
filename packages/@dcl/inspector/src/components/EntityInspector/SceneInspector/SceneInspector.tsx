@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react'
-import { RxBorderAll } from 'react-icons/rx'
 import { IoIosImage } from 'react-icons/io'
 
 import { useComponentInput } from '../../../hooks/sdk/useComponentInput'
@@ -11,18 +10,10 @@ import { TextField } from '../../ui/TextField'
 import { FileUploadField } from '../../ui/FileUploadField'
 import { ACCEPTED_FILE_TYPES } from '../../ui/FileUploadField/types'
 import { Props } from './types'
-import {
-  fromScene,
-  toScene,
-  toSceneAuto,
-  getInputValidation,
-  isImage,
-  fromSceneSpawnPoint,
-  toSceneSpawnPoint
-} from './utils'
+import { fromScene, toScene, getInputValidation, isImage, fromSceneSpawnPoint, toSceneSpawnPoint } from './utils'
 
 import './SceneInspector.css'
-import { EditorComponentsTypes, SceneAgeRating, SceneCategory, SceneComponent, SceneSpawnPoint } from '../../../lib/sdk/components'
+import { EditorComponentsTypes, SceneAgeRating, SceneCategory, SceneSpawnPoint } from '../../../lib/sdk/components'
 import { Dropdown } from '../../ui/Dropdown'
 import { TextArea } from '../../ui'
 import { Tabs } from '../Tabs'
@@ -99,17 +90,10 @@ const CATEGORIES_OPTIONS = [
 ]
 
 export default withSdk<Props>(({ sdk, entity }) => {
-  const [auto, setAuto] = useState(false)
   const { Scene } = sdk.components
 
   const hasScene = useHasComponent(entity, Scene)
-  const { getInputProps } = useComponentInput(
-    entity,
-    Scene,
-    fromScene,
-    auto ? toSceneAuto : toScene,
-    getInputValidation(auto)
-  )
+  const { getInputProps } = useComponentInput(entity, Scene, fromScene, toScene, getInputValidation)
   const nameProps = getInputProps('name')
   const descriptionProps = getInputProps('description')
   const parcelsProps = getInputProps('layout.parcels')
@@ -135,10 +119,6 @@ export default withSdk<Props>(({ sdk, entity }) => {
     operations.updateValue(Scene, entity, { thumbnail })
     await operations.dispatch()
   }, [])
-
-  const handleClick = useCallback(() => {
-    setAuto(!auto)
-  }, [auto])
 
   if (!hasScene) {
     return null
@@ -411,9 +391,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
         </>
       ) : null}
 
-      {selectedSceneInspectorTab === SceneInspectorTab.LAYOUT ? (
-        <Layout {...parcelsProps} />
-      ) : null}
+      {selectedSceneInspectorTab === SceneInspectorTab.LAYOUT ? <Layout {...parcelsProps} /> : null}
 
       {selectedSceneInspectorTab === SceneInspectorTab.SETTINGS ? (
         <>

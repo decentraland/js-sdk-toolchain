@@ -118,7 +118,7 @@ export function toSceneAuto(inputs: SceneInput): EditorComponentsTypes['Scene'] 
 }
 
 export function getLayout(parcels: string) {
-  const base: { min: Coords, max: Coords } = {
+  const base: { min: Coords; max: Coords } = {
     min: { x: Infinity, y: Infinity },
     max: { x: -Infinity, y: -Infinity }
   }
@@ -154,11 +154,9 @@ export function parseParcels(value: string): Coords[] {
   return coordsList
 }
 
-export function getInputValidation(auto?: boolean) {
-  return function isValidInput(input: SceneInput): boolean {
-    const parcels = parseParcels(input.layout.parcels)
-    return auto ? parcels.length === 2 : areConnected(parcels)
-  }
+export function getInputValidation(input: SceneInput): boolean {
+  const parcels = parseParcels(input.layout.parcels)
+  return areConnected(parcels)
 }
 
 export function getCoordinatesBetweenPoints(pointA: Coords, pointB: Coords): Coords[] {

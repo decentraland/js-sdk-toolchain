@@ -1,5 +1,5 @@
-import { Coords } from "@dcl/ecs"
-import { AXIS_STEP, GridError, TILE_OPTIONS } from "./types"
+import { Coords } from '@dcl/ecs'
+import { AXIS_STEP, GridError, TILE_OPTIONS } from './types'
 
 type ParcelInfo = {
   min: Coords
@@ -8,12 +8,12 @@ type ParcelInfo = {
 }
 
 /* Parcels string format rules:
-** #1: each coordinate is space-separated
-** #2: each point is comma-separated
-** EX: "0,0 0,1 1,0 1,1"
-*/
+ ** #1: each coordinate is space-separated
+ ** #2: each point is comma-separated
+ ** EX: "0,0 0,1 1,0 1,1"
+ */
 export function getLayoutInfo(parcels: string): ParcelInfo {
-  const base: { min: Coords, max: Coords } = {
+  const base: { min: Coords; max: Coords } = {
     min: { x: Infinity, y: Infinity },
     max: { x: -Infinity, y: -Infinity }
   }
@@ -55,13 +55,13 @@ export function getCoordinatesBetweenPoints(pointA: Coords, pointB: Coords): Coo
 }
 
 /*
-** Sorts the coordinates for grid rendering
-** This means:
-**  - X-axis => Lowest to highest
-**  - Y-axis => Highest to lowest
-** EX: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 0 }, { x: 1, y: 1 }]
-**  => [{ x: 0, y: 1 }, { x: 1, y: 1 }, { x: 0, y: 0 }, { x: 1, y: 0 }]
-*/
+ ** Sorts the coordinates for grid rendering
+ ** This means:
+ **  - X-axis => Lowest to highest
+ **  - Y-axis => Highest to lowest
+ ** EX: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 0 }, { x: 1, y: 1 }]
+ **  => [{ x: 0, y: 1 }, { x: 1, y: 1 }, { x: 0, y: 0 }, { x: 1, y: 0 }]
+ */
 export function getCoordinatesInGridOrder(coords: Coords[]): Coords[] {
   // avoid mutating original coords...
   return [...coords].sort((a, b) => {
@@ -77,10 +77,10 @@ export function getCoordinates(min: Coords, max: Coords): Coords[] {
 }
 
 /*
-** Gets the closest value from "TILE_OPTIONS" (rounding up in case it doesn't exist)
-*/
+ ** Gets the closest value from "TILE_OPTIONS" (rounding up in case it doesn't exist)
+ */
 export function getOption(value: number): number {
-  const idx = clamp(Math.ceil(value / AXIS_STEP), 0, TILE_OPTIONS.length - 1) - 1
+  const idx = clamp(Math.ceil(value / AXIS_STEP), 0, TILE_OPTIONS.length) - 1 // zero-based
   return TILE_OPTIONS[idx]?.value ?? 0
 }
 
@@ -91,7 +91,7 @@ export function clamp(value: number, min: number, max: number): number {
 export function getMinMaxFromOrderedCoords(coords: Coords[]): [Coords, Coords] {
   return [
     { x: coords[0].x, y: coords[coords.length - 1].y },
-    { x: coords[coords.length - 1].x, y: coords[0].y },
+    { x: coords[coords.length - 1].x, y: coords[0].y }
   ]
 }
 
@@ -103,7 +103,7 @@ export function transformCoordsToValue(coords: Coords[], disabledCoords: Set<str
   return coords
     .map(($) => coordToStr($)) // map to string
     .filter(($) => !disabledCoords.has($)) // remove disabled coords
-    .join(" ")
+    .join(' ')
 }
 
 export function stringifyGridError(error: GridError): string {

@@ -1,19 +1,17 @@
-import { useComponentInput } from "../../../../hooks/sdk/useComponentInput"
+import { useComponentInput } from '../../../../hooks/sdk/useComponentInput'
 
 type GetInputProps = ReturnType<typeof useComponentInput>['getInputProps']
 
-export type Props = ReturnType<GetInputProps> & {
-
-}
+export type Props = ReturnType<GetInputProps>
 
 export enum Mode {
   GRID,
-  MANUAL,
+  MANUAL
 }
 
 export enum GridError {
   NOT_CONNECTED,
-  NUMBER_OF_PARCELS,
+  NUMBER_OF_PARCELS
 }
 
 export const MAX_AXIS_PARCELS = 32
