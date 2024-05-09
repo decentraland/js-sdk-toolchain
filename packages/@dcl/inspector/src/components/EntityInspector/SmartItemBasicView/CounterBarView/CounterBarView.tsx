@@ -30,7 +30,7 @@ export default React.memo(
       <>
         <Block>
           <TextField
-            label="Max Value"
+            label={field.name}
             type="number"
             {...(field.type === 'asset-packs::CounterBar'
               ? getCounterBarInputProps('maxValue')
