@@ -97,7 +97,10 @@ export async function main(options: Options) {
   let hasSmartWearable = false
 
   const workspace = await getValidWorkspace(options.components, workingDirectory)
-  await ensureDaoExplorer(options.components, workspace.rootWorkingDirectory)
+
+  if (experimentalDaoExplorer) {
+    await ensureDaoExplorer(options.components, workspace.rootWorkingDirectory)
+  }
 
   /* istanbul ignore if */
   if (workspace.projects.length > 1)

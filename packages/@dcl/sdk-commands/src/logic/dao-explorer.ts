@@ -82,14 +82,16 @@ export async function ensureDaoExplorer(
     throw new CliError('This platform is not supported to run the DAO Explorers.')
   }
 
-  const configFilePath = path.resolve(daoExplorerFolderPath, 'config')
-  if (await components.fs.fileExists(configFilePath)) {
-    return
+  const url = `${BEVY_BASE_URL}-${BEVY_URL_PLATFORM_SUFFIX[platform]}`
+  const versionFilePath = path.resolve(daoExplorerFolderPath, 'version')
+  if (await components.fs.fileExists(versionFilePath)) {
+    const versionContent = await components.fs.readFile(versionFilePath, 'utf-8')
+    if (versionContent === url) {
+      return
+    }
   }
 
-  const url = `${BEVY_BASE_URL}-${BEVY_URL_PLATFORM_SUFFIX[platform]}`
   const tempPackagePath = path.resolve(daoExplorerFolderPath, BEVY_URL_PLATFORM_SUFFIX[platform])
-
   printProgressInfo(components.logger, `Downloading DAO Explorer ${BEVY_URL_PLATFORM_SUFFIX[platform]} from ${url}`)
   if (await components.fs.fileExists(tempPackagePath)) {
     await components.fs.unlink(tempPackagePath)
@@ -110,7 +112,7 @@ export async function ensureDaoExplorer(
     })
   }
 
-  await components.fs.writeFile(configFilePath, 'default')
+  await components.fs.writeFile(versionFilePath, url)
 }
 
 export function runDaoExplorer(
