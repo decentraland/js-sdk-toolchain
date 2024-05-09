@@ -26,6 +26,7 @@ import { getValidWorkspace } from '../../logic/workspace-validations'
 import { printCurrentProjectStarting, printProgressInfo, printWarning } from '../../logic/beautiful-logs'
 import { Result } from 'arg'
 import { startValidations } from '../../logic/project-validations'
+import { ensureDaoExplorer, runDaoExplorer } from '../../logic/dao-explorer'
 
 interface Options {
   args: Result<typeof args>
@@ -37,7 +38,7 @@ export const args = declareArgs({
   '--help': Boolean,
   '--port': Number,
   '--no-debug': Boolean,
-  '--no-browser': Boolean,
+  '--browser': Boolean,
   '--no-watch': Boolean,
   '--ci': Boolean,
   '--skip-install': Boolean,
@@ -45,11 +46,12 @@ export const args = declareArgs({
   '-h': '--help',
   '-p': '--port',
   '-d': '--no-debug',
-  '-b': '--no-browser',
+  '-b': '--browser',
   '-w': '--no-watch',
   '--skip-build': Boolean,
-  '--desktop-client': Boolean,
-  '--data-layer': Boolean
+  '--dao-explorer': Boolean,
+  '--data-layer': Boolean,
+  '-e': '--dao-explorer'
 })
 
 export async function help(options: Options) {
@@ -61,7 +63,7 @@ export async function help(options: Options) {
       -h, --help                Displays complete help
       -p, --port        [port]  Select a custom port for the development server
       -d, --no-debug            Disable debugging panel
-      -b, --no-browser          Do not open a new browser window
+      -b, --browser             Open a new browser window
       -w, --no-watch            Do not open watch for filesystem changes
       -c, --ci                  Run the parcel previewer on a remote unix server
       --web3                    Connects preview to browser wallet to use the associated avatar and account
@@ -85,7 +87,8 @@ export async function main(options: Options) {
   const workingDirectory = path.resolve(process.cwd(), options.args['--dir'] || '.')
   const isCi = options.args['--ci'] || process.env.CI || false
   const debug = !options.args['--no-debug'] && !isCi
-  const openBrowser = !options.args['--no-browser'] && !isCi
+  const experimentalDaoExplorer = options.args['--dao-explorer'] && !isCi
+  const openBrowser = (!experimentalDaoExplorer || options.args['--browser']) && !isCi
   const build = !options.args['--skip-build']
   const watch = !options.args['--no-watch']
   const withDataLayer = options.args['--data-layer']
@@ -94,6 +97,7 @@ export async function main(options: Options) {
   let hasSmartWearable = false
 
   const workspace = await getValidWorkspace(options.components, workingDirectory)
+  await ensureDaoExplorer(options.components, workspace.rootWorkingDirectory)
 
   /* istanbul ignore if */
   if (workspace.projects.length > 1)
@@ -207,20 +211,15 @@ export async function main(options: Options) {
         components.logger.log(`    ${addr}`)
       }
 
-      if (options.args['--desktop-client']) {
-        components.logger.log('\n  Desktop client:\n')
-        for (const addr of sortedURLs) {
-          const searchParams = new URLSearchParams()
-          searchParams.append('PREVIEW-MODE', addr)
-          components.logger.log(`    dcl://${searchParams.toString()}&`)
-        }
-      }
-
       components.logger.log('\n  Details:\n')
       components.logger.log('\nPress CTRL+C to exit\n')
 
+      if (experimentalDaoExplorer && sortedURLs.length) {
+        runDaoExplorer(components, sortedURLs[0], workingDirectory)
+      }
+
       // Open preferably localhost/127.0.0.1
-      if (openBrowser && sortedURLs.length && !options.args['--desktop-client']) {
+      if (openBrowser && sortedURLs.length) {
         try {
           await open(sortedURLs[0])
         } catch (_) {
