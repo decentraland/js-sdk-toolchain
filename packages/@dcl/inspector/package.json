@@ -2,7 +2,7 @@
   "name": "@dcl/inspector",
   "version": "0.1.0",
   "dependencies": {
-    "@dcl/asset-packs": "https://sdk-team-cdn.decentraland.org/@dcl/asset-packs/branch/feat/health-items-simplified-view/dcl-asset-packs-1.17.2-9019965824.commit-130a812.tgz",
+    "@dcl/asset-packs": "https://sdk-team-cdn.decentraland.org/@dcl/asset-packs/branch/feat/health-items-simplified-view/dcl-asset-packs-1.17.2-9021474044.commit-aad938a.tgz",
     "ts-deepmerge": "^7.0.0"
   },
   "devDependencies": {
