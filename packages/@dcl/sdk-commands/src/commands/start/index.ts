@@ -38,7 +38,7 @@ export const args = declareArgs({
   '--help': Boolean,
   '--port': Number,
   '--no-debug': Boolean,
-  '--browser': Boolean,
+  '--no-browser': Boolean,
   '--no-watch': Boolean,
   '--ci': Boolean,
   '--skip-install': Boolean,
@@ -46,7 +46,7 @@ export const args = declareArgs({
   '-h': '--help',
   '-p': '--port',
   '-d': '--no-debug',
-  '-b': '--browser',
+  '-b': '--no-browser',
   '-w': '--no-watch',
   '--skip-build': Boolean,
   '--dao-explorer': Boolean,
@@ -63,7 +63,7 @@ export async function help(options: Options) {
       -h, --help                Displays complete help
       -p, --port        [port]  Select a custom port for the development server
       -d, --no-debug            Disable debugging panel
-      -b, --browser             Open a new browser window
+      -b, --no-browser          Do not open a new browser window
       -w, --no-watch            Do not open watch for filesystem changes
       -c, --ci                  Run the parcel previewer on a remote unix server
       --web3                    Connects preview to browser wallet to use the associated avatar and account
@@ -88,7 +88,7 @@ export async function main(options: Options) {
   const isCi = options.args['--ci'] || process.env.CI || false
   const debug = !options.args['--no-debug'] && !isCi
   const experimentalDaoExplorer = options.args['--dao-explorer'] && !isCi
-  const openBrowser = (!experimentalDaoExplorer || options.args['--browser']) && !isCi
+  const openBrowser = (!experimentalDaoExplorer || !options.args['--no-browser']) && !isCi && !experimentalDaoExplorer
   const build = !options.args['--skip-build']
   const watch = !options.args['--no-watch']
   const withDataLayer = options.args['--data-layer']
