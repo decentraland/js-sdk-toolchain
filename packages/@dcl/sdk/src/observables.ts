@@ -101,8 +101,6 @@ export interface IEvents {
   }
 }
 
-// Remove this once new components/observables reaches production.
-const __OBSERVABLES_FALLBACK_SUPPORT = true
 /**
  * @internal
  * This function generates a callback that is passed to the Observable
@@ -110,7 +108,7 @@ const __OBSERVABLES_FALLBACK_SUPPORT = true
  */
 function createSubscriber(eventName: keyof IEvents) {
   return () => {
-    if (eventName === 'comms' || __OBSERVABLES_FALLBACK_SUPPORT) {
+    if (eventName === 'comms') {
       subscribe({ eventId: eventName }).catch(console.error)
     } else {
       SDK7ComponentsObservable?.subscribe(eventName)
@@ -213,47 +211,6 @@ export async function pollEvents(sendBatch: (body: ManyEntityAction) => Promise<
     if (e.generic) {
       const data = JSON.parse(e.generic.eventData)
       switch (e.generic.eventId) {
-        case 'onEnterScene': {
-          onEnterSceneObservable.notifyObservers(data as IEvents['onEnterScene'])
-          break
-        }
-        case 'onLeaveScene': {
-          onLeaveSceneObservable.notifyObservers(data as IEvents['onLeaveScene'])
-          break
-        }
-        case 'sceneStart': {
-          onSceneReadyObservable.notifyObservers(data as IEvents['sceneStart'])
-          break
-        }
-        case 'playerExpression': {
-          onPlayerExpressionObservable.notifyObservers(data as IEvents['playerExpression'])
-          break
-        }
-        case 'videoEvent': {
-          const videoData = data as IEvents['videoEvent']
-          onVideoEvent.notifyObservers(videoData)
-          break
-        }
-        case 'profileChanged': {
-          onProfileChanged.notifyObservers(data as IEvents['profileChanged'])
-          break
-        }
-        case 'playerConnected': {
-          onPlayerConnectedObservable.notifyObservers(data as IEvents['playerConnected'])
-          break
-        }
-        case 'playerDisconnected': {
-          onPlayerDisconnectedObservable.notifyObservers(data as IEvents['playerDisconnected'])
-          break
-        }
-        case 'onRealmChanged': {
-          onRealmChangedObservable.notifyObservers(data as IEvents['onRealmChanged'])
-          break
-        }
-        case 'playerClicked': {
-          onPlayerClickedObservable.notifyObservers(data as IEvents['playerClicked'])
-          break
-        }
         case 'comms': {
           onCommsMessage.notifyObservers(data as IEvents['comms'])
           break
@@ -265,7 +222,6 @@ export async function pollEvents(sendBatch: (body: ManyEntityAction) => Promise<
 
 const SDK7ComponentsObservable = processObservables()
 function processObservables() {
-  if (__OBSERVABLES_FALLBACK_SUPPORT) return
   const subscriptions = new Set<keyof IEvents>()
 
   function subscribe(eventName: keyof IEvents) {
