@@ -6,7 +6,7 @@ import { removeNode } from '../nodes'
 
 export function removeEntity(engine: IEngine) {
   return function removeEntity(entity: Entity) {
-    const Transform = engine.getComponent(TransformEngine.componentId) as typeof TransformEngine
+    const Transform = engine.getComponent(TransformEngine.componentName) as typeof TransformEngine
     const Nodes = engine.getComponent(EditorComponentNames.Nodes) as EditorComponents['Nodes']
 
     for (const entityIterator of getComponentEntityTree(engine, entity, Transform)) {
