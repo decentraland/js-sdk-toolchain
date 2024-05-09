@@ -180,7 +180,7 @@ export async function main(options: Options) {
       await startComponents()
 
       const networkInterfaces = os.networkInterfaces()
-      const availableURLs: string[] = []
+      const availableURLs: { base: string; url: string }[] = []
 
       printProgressInfo(options.components.logger, 'Preview server is now running!')
       components.logger.log('Available on:\n')
@@ -189,22 +189,25 @@ export async function main(options: Options) {
         ;(networkInterfaces[dev] || []).forEach((details) => {
           if (details.family === 'IPv4') {
             const oldBackpack = 'DISABLE_backpack_editor_v2=&ENABLE_backpack_editor_v1'
-            let addr = `http://${details.address}:${port}?position=${baseCoords.x}%2C${baseCoords.y}&${oldBackpack}`
+            const baseUrl = `http://${details.address}:${port}`
+            let url = `${baseUrl}?position=${baseCoords.x}%2C${baseCoords.y}&${oldBackpack}`
             if (debug) {
-              addr = `${addr}&SCENE_DEBUG_PANEL`
+              url = `${url}&SCENE_DEBUG_PANEL`
             }
             if (enableWeb3 || hasSmartWearable) {
-              addr = `${addr}&ENABLE_WEB3`
+              url = `${url}&ENABLE_WEB3`
             }
 
-            availableURLs.push(addr)
+            availableURLs.push({ base: baseUrl, url })
           }
         })
       })
 
       // Push localhost and 127.0.0.1 at top
       const sortedURLs = availableURLs.sort((a, _b) => {
-        return a.toLowerCase().includes('localhost') || a.includes('127.0.0.1') || a.includes('0.0.0.0') ? -1 : 1
+        return a.base.toLowerCase().includes('localhost') || a.base.includes('127.0.0.1') || a.base.includes('0.0.0.0')
+          ? -1
+          : 1
       })
 
       for (const addr of sortedURLs) {
@@ -215,13 +218,13 @@ export async function main(options: Options) {
       components.logger.log('\nPress CTRL+C to exit\n')
 
       if (experimentalDaoExplorer && sortedURLs.length) {
-        runDaoExplorer(components, sortedURLs[0], `${baseCoords.x},${baseCoords.y}`, workingDirectory)
+        runDaoExplorer(components, sortedURLs[0].base, `${baseCoords.x},${baseCoords.y}`, workingDirectory)
       }
 
       // Open preferably localhost/127.0.0.1
       if (openBrowser && sortedURLs.length) {
         try {
-          await open(sortedURLs[0])
+          await open(sortedURLs[0].url)
         } catch (_) {
           components.logger.warn('Unable to open browser automatically.')
         }
