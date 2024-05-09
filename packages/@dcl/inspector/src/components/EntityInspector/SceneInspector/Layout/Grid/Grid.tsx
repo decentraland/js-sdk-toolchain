@@ -2,8 +2,16 @@ import { chunkCoords, getAxisLengths, getLargestAxis } from "./utils";
 import { Props } from "./types";
 
 import './Grid.css'
+import { useCallback } from "react";
 
-function Grid({ coords, maxTileSize = 50, minTileSize = 3, visualThreshold = 10 }: Props) {
+function Grid({
+  coords,
+  maxTileSize = 50,
+  minTileSize = 3,
+  visualThreshold = 10,
+  isTileDisabled,
+  handleTileClick,
+}: Props) {
   const largestAxis = getLargestAxis(coords)
   const tileSize = Math.max(maxTileSize / largestAxis, minTileSize) // % of parent's size to use for max/min tile size
   const visualRatio = largestAxis >= visualThreshold ? 1 : 2 // if number of rows is large, lower borders/margins/etc
@@ -23,17 +31,62 @@ function Grid({ coords, maxTileSize = 50, minTileSize = 3, visualThreshold = 10 
 
   return (
     <div className="Grid">
-      {chunks.map((row) => (
-        <div key={`${row[0].y}`} className={`row #${row[0].y}`}>
-          {row.map((col) => (
-            <div key={`${col.x}-${col.y}`} className={`tile #${col.x}`} style={gridStyles}>
-              {`${col.x},${col.y}`}
-            </div>
-          ))}
-        </div>
-      ))}
+      {chunks.map((row) =>
+        <Row
+          key={`row-${row[0].y}`}
+          row={row}
+          tileStyles={gridStyles}
+          isTileDisabled={isTileDisabled}
+          onTileClick={handleTileClick}
+        />
+      )}
     </div>
   )
+}
+
+type Row = {
+  row: Props['coords'],
+  tileStyles: React.CSSProperties
+  isTileDisabled?: Props['isTileDisabled']
+  onTileClick?: Props['handleTileClick']
+}
+function Row({ row, tileStyles,isTileDisabled, onTileClick }: Row) {
+  return (
+    <div className={`row y-${row[0].y}`}>
+      {row.map((col) => (
+        <Tile
+          key={`${col.x}-${col.y}`}
+          x={col.x}
+          y={col.y}
+          style={tileStyles}
+          isTileDisabled={isTileDisabled}
+          onTileClick={onTileClick}
+        />
+      ))}
+    </div>
+  );
+}
+
+type Tile = {
+  x: number,
+  y: number,
+  style: React.CSSProperties
+  isTileDisabled?: Props['isTileDisabled']
+  onTileClick?: Props['handleTileClick']
+}
+function Tile({ x, y, style, isTileDisabled, onTileClick }: Tile) {
+  const isDisabled = isTileDisabled && isTileDisabled({ x, y })
+  const handleClick = useCallback(() => {
+    onTileClick && onTileClick({ x, y })
+  }, [x, y])
+
+  const styles = { ...style, border: isDisabled ? 0 : style.border }
+
+  return (
+    <div className={`tile x-${x}`} style={styles} onClick={handleClick}>
+      {`${x},${y}`}
+    </div>
+  );
 }
 
 export default Grid

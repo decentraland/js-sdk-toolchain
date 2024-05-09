@@ -21,9 +21,10 @@ function Layout(props: Props) {
   const [gridMin, gridMax] = getMinMaxFromOrderedCoords(grid)
   const axisLengths = getAxisLengths(grid)
   const numberOfParcels = grid.length
+  const [disabled, setDisabled] = useState(new Set<string>())
 
   const handleTileChange = (type: keyof Coords) => (e: React.ChangeEvent<HTMLSelectElement>) => {
-    // all this uglyness so we can handle negative coords in parcels...
+    // this should also work for negative parcels...
     const num = Number(e.target.value)
     const grixMaxAxis = gridMax[type]
     const axisLength = axisLengths[type]
@@ -33,13 +34,19 @@ function Layout(props: Props) {
     return setGrid(getCoordinates(gridMin, newMax))
   }
 
-  const isTileDisabled = useCallback((coord: Coords) => {
-    // TODO: disable grid coordinates that are not on the current parcels...
-    return false
+  const isTileDisabled = useCallback(({ x, y }: Coords) => {
+    const str = `${x},${y}`
+    return disabled.has(str)
   }, [currentLayout])
 
-  const handleTileClick = useCallback((coord: Coords) => {
-    // TODO: add/remove coord to the current parcels list...
+  const handleTileClick = useCallback(({ x, y }: Coords) => {
+    const str = `${x},${y}`
+    if (disabled.has(str)) {
+      disabled.delete(str)
+    } else {
+      disabled.add(str)
+    }
+    setDisabled(new Set(disabled))
   }, [])
 
   return (

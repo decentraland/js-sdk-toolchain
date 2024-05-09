@@ -147,7 +147,7 @@ export async function feededFileSystem(mappings: Record<string, string> = builde
       navmapThumbnail: 'assets/scene/feeded-thumbnail.png'
     },
     scene: {
-      parcels: ['2,2', '2,3', '3,2', '3,3'],
+      parcels: ['-2,-2', '-2,-3', '-3,-2', '-3,-3'],
       base: '2,2'
     },
     contact: {
