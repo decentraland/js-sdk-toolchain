@@ -1,5 +1,5 @@
 import { Coords } from "@dcl/ecs"
-import { AXIS_STEP, TILE_OPTIONS } from "./types"
+import { AXIS_STEP, GridError, TILE_OPTIONS } from "./types"
 
 type ParcelInfo = {
   min: Coords
@@ -12,7 +12,7 @@ type ParcelInfo = {
 ** #2: each point is comma-separated
 ** EX: "0,0 0,1 1,0 1,1"
 */
-export function getSceneParcelInfo(parcels: string): ParcelInfo {
+export function getLayoutInfo(parcels: string): ParcelInfo {
   const base: { min: Coords, max: Coords } = {
     min: { x: Infinity, y: Infinity },
     max: { x: -Infinity, y: -Infinity }
@@ -93,4 +93,26 @@ export function getMinMaxFromOrderedCoords(coords: Coords[]): [Coords, Coords] {
     { x: coords[0].x, y: coords[coords.length - 1].y },
     { x: coords[coords.length - 1].x, y: coords[0].y },
   ]
+}
+
+export function coordToStr({ x, y }: Coords) {
+  return `${x},${y}`
+}
+
+export function transformCoordsToValue(coords: Coords[], disabledCoords: Set<string>) {
+  return coords
+    .map(($) => coordToStr($)) // map to string
+    .filter(($) => !disabledCoords.has($)) // remove disabled coords
+    .join(" ")
+}
+
+export function stringifyGridError(error: GridError): string {
+  switch (error) {
+    case GridError.NUMBER_OF_PARCELS:
+      return 'Number of parcels must be between 0 & 32'
+    case GridError.NOT_CONNECTED:
+      return 'Parcels have to be connected vertically or horizontally'
+    default:
+      return ''
+  }
 }

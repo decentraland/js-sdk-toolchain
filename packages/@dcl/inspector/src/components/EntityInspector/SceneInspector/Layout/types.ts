@@ -6,6 +6,16 @@ export type Props = ReturnType<GetInputProps> & {
 
 }
 
+export enum Mode {
+  GRID,
+  MANUAL,
+}
+
+export enum GridError {
+  NOT_CONNECTED,
+  NUMBER_OF_PARCELS,
+}
+
 export const MAX_AXIS_PARCELS = 32
 export const AXIS_STEP = 2
 export const TILE_OPTIONS = Array.from({ length: MAX_AXIS_PARCELS / AXIS_STEP }, (_, i) => ({

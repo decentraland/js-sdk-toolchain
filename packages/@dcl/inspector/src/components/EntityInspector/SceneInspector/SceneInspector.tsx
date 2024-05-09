@@ -412,10 +412,6 @@ export default withSdk<Props>(({ sdk, entity }) => {
       ) : null}
 
       {selectedSceneInspectorTab === SceneInspectorTab.LAYOUT ? (
-        // <Block label="Parcels">
-        //   <TextField {...parcelsProps} />
-        //   <RxBorderAll onClick={handleClick} style={{ opacity: auto ? 1 : 0.3 }} />
-        // </Block>
         <Layout {...parcelsProps} />
       ) : null}
 

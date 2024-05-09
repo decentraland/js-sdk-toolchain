@@ -14,13 +14,13 @@ function Grid({
 }: Props) {
   const largestAxis = getLargestAxis(coords)
   const tileSize = Math.max(maxTileSize / largestAxis, minTileSize) // % of parent's size to use for max/min tile size
-  const visualRatio = largestAxis >= visualThreshold ? 1 : 2 // if number of rows is large, lower borders/margins/etc
+  const disableEnhancements = largestAxis >= visualThreshold // disable visual enhancements when grid is large
 
   const gridStyles = {
     width: `${tileSize}%`,
     aspectRatio: '1/1',
-    border: `${visualRatio}px solid var(--base-10)`,
-    margin: `${visualRatio}px`,
+    border: `${disableEnhancements ? 1 : 2}px solid var(--base-10)`,
+    margin: `${disableEnhancements ? 1 : 2}px`,
   }
 
   const numberOfRows = coords.length / getAxisLengths(coords).y
@@ -38,6 +38,7 @@ function Grid({
           tileStyles={gridStyles}
           isTileDisabled={isTileDisabled}
           onTileClick={handleTileClick}
+          disableEnhancements={disableEnhancements}
         />
       )}
     </div>
@@ -49,8 +50,9 @@ type Row = {
   tileStyles: React.CSSProperties
   isTileDisabled?: Props['isTileDisabled']
   onTileClick?: Props['handleTileClick']
+  disableEnhancements: boolean
 }
-function Row({ row, tileStyles,isTileDisabled, onTileClick }: Row) {
+function Row({ row, tileStyles,isTileDisabled, onTileClick, disableEnhancements }: Row) {
   return (
     <div className={`row y-${row[0].y}`}>
       {row.map((col) => (
@@ -61,6 +63,7 @@ function Row({ row, tileStyles,isTileDisabled, onTileClick }: Row) {
           style={tileStyles}
           isTileDisabled={isTileDisabled}
           onTileClick={onTileClick}
+          disableEnhancements={disableEnhancements}
         />
       ))}
     </div>
@@ -73,8 +76,9 @@ type Tile = {
   style: React.CSSProperties
   isTileDisabled?: Props['isTileDisabled']
   onTileClick?: Props['handleTileClick']
+  disableEnhancements: boolean
 }
-function Tile({ x, y, style, isTileDisabled, onTileClick }: Tile) {
+function Tile({ x, y, style, isTileDisabled, onTileClick, disableEnhancements }: Tile) {
   const isDisabled = isTileDisabled && isTileDisabled({ x, y })
   const handleClick = useCallback(() => {
     onTileClick && onTileClick({ x, y })
@@ -84,7 +88,7 @@ function Tile({ x, y, style, isTileDisabled, onTileClick }: Tile) {
 
   return (
     <div className={`tile x-${x}`} style={styles} onClick={handleClick}>
-      {`${x},${y}`}
+      {disableEnhancements ? null : `${x},${y}`}
     </div>
   );
 }

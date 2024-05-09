@@ -9,6 +9,12 @@
   margin-bottom: 10px;
 }
 
+.SceneLayout .display .error {
+  color: var(--primary-main);
+  margin: 3px 0;
+  font-size: 12px;
+}
+
 .SceneLayout .display span,
 .SceneLayout .Block .limitations span {
   text-align: center;
@@ -32,11 +38,30 @@
   width: 100%;
 }
 
-.SceneLayout .Block .limitations {
+.SceneLayout .Block.manual > .content {
+  flex-direction: column;
+}
+
+.SceneLayout .Block.manual .Text {
+  width: 100%;
+}
+
+.SceneLayout .Block.manual .Block {
+  margin-top: 10px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+.SceneLayout .Block.manual .Block .content {
+  column-gap: 50%;
+}
+
+.SceneLayout .Block.limitations {
   justify-items: center;
   align-items: center;
 }
 
-.SceneLayout .Block .limitations span {
+.SceneLayout .Block.limitations span {
   margin: 0 3px 0 0;
 }
