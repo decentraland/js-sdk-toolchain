@@ -7,8 +7,8 @@ export function setGround(engine: IEngine) {
   return function setGround(src: string): void {
     const addChild = createAddChild(engine)
     const removeEntity = createRemoveEntity(engine)
-    const Transform = engine.getComponent(TransformEngine.componentId) as typeof TransformEngine
-    const GltfContainer = engine.getComponent(GltfContainerEngine.componentId) as typeof GltfContainerEngine
+    const Transform = engine.getComponent(TransformEngine.componentName) as typeof TransformEngine
+    const GltfContainer = engine.getComponent(GltfContainerEngine.componentName) as typeof GltfContainerEngine
     const Scene = engine.getComponent(EditorComponentNames.Scene) as EditorComponents['Scene']
     const Ground = engine.getComponent(EditorComponentNames.Ground) as EditorComponents['Ground']
     const Lock = engine.getComponent(EditorComponentNames.Lock) as EditorComponents['Lock']

@@ -296,6 +296,10 @@ const Renderer: React.FC = () => {
     if (isGround(asset) && !placeSingleTile) {
       await setGround(model, basePath)
     } else {
+      // place single tiles slightly above the ground
+      if (isGround(asset)) {
+        position.y += 0.25
+      }
       await addAsset(model, position, basePath)
     }
   }
