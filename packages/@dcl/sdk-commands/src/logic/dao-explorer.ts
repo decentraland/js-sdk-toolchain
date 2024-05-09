@@ -93,11 +93,8 @@ export async function ensureDaoExplorer(
 
   const tempPackagePath = path.resolve(daoExplorerFolderPath, BEVY_URL_PLATFORM_SUFFIX[platform])
   printProgressInfo(components.logger, `Downloading DAO Explorer ${BEVY_URL_PLATFORM_SUFFIX[platform]} from ${url}`)
-  if (await components.fs.fileExists(tempPackagePath)) {
-    await components.fs.unlink(tempPackagePath)
-  }
   if (await components.fs.directoryExists(daoExplorerFolderPath)) {
-    await components.fs.rmdir(daoExplorerFolderPath)
+    await components.fs.rm(daoExplorerFolderPath, { recursive: true, force: true })
   }
   await components.fs.mkdir(daoExplorerFolderPath, { recursive: true })
 

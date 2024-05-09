@@ -214,7 +214,7 @@ export async function main(options: Options) {
       })
 
       for (const addr of sortedURLs) {
-        components.logger.log(`    ${addr}`)
+        components.logger.log(`    ${addr.url}`)
       }
 
       components.logger.log('\n  Details:\n')
