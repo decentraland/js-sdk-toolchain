@@ -116,12 +116,13 @@ export async function ensureDaoExplorer(
 export function runDaoExplorer(
   components: Pick<CliComponents, 'logger' | 'fs' | 'fetch'>,
   realmUrl: string,
+  locationCoords: string,
   workingDirectory: string
 ) {
   const daoExplorerFolderPath = getDaoExplorerPath(workingDirectory)
   const executablePath = getDaoExplorerExecutablePath(workingDirectory)
   executablePath
-  const ts = child_process.spawn(executablePath, ['--server', realmUrl], {
+  const ts = child_process.spawn(executablePath, ['--server', realmUrl, '--location', locationCoords], {
     env: process.env,
     cwd: daoExplorerFolderPath
   })

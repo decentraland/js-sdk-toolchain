@@ -215,7 +215,7 @@ export async function main(options: Options) {
       components.logger.log('\nPress CTRL+C to exit\n')
 
       if (experimentalDaoExplorer && sortedURLs.length) {
-        runDaoExplorer(components, sortedURLs[0], workingDirectory)
+        runDaoExplorer(components, sortedURLs[0], `${baseCoords.x},${baseCoords.y}`, workingDirectory)
       }
 
       // Open preferably localhost/127.0.0.1
