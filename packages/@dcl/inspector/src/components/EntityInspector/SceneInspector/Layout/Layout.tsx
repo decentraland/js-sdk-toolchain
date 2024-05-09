@@ -27,9 +27,8 @@ function Layout(props: Props) {
     const num = Number(e.target.value)
     const grixMaxAxis = gridMax[type]
     const axisLength = axisLengths[type]
-    const sign = Math.sign(grixMaxAxis) || 1
-    const diff = Math.abs(axisLength - (num * sign))
-    const value = grixMaxAxis > num ? grixMaxAxis - diff : grixMaxAxis + diff
+    const diff = Math.abs(axisLength - num)
+    const value = num > axisLength ? grixMaxAxis + diff : grixMaxAxis - diff
     const newMax: Coords = { ...gridMax, [type]: value }
     return setGrid(getCoordinates(gridMin, newMax))
   }
