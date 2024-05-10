@@ -11,8 +11,12 @@ import {
   getMinMaxFromOrderedCoords,
   getOption,
   getLayoutInfo,
-  transformCoordsToValue,
-  stringifyGridError
+  stringifyGridError,
+  getLayoutInfoFromString,
+  strToCoord,
+  transformCoordsToString,
+  getEnabledCoords,
+  hasCoord
 } from './utils'
 import { getAxisLengths } from './Grid/utils'
 import { GridError, Mode, Props, TILE_OPTIONS } from './types'
@@ -22,13 +26,14 @@ import { areConnected } from '@dcl/ecs'
 
 type Coords = GridProps['coords'][0]
 
-function Layout(props: Props) {
-  const currentLayout = getLayoutInfo(props.value as string)
+function Layout({ value, onChange }: Props) {
+  const currentLayout = getLayoutInfo(value.parcels)
   const coordinates = getCoordinates(currentLayout.min, currentLayout.max)
 
   const [grid, setGrid] = useState<Coords[]>(coordinates)
   const [disabled, setDisabled] = useState(new Set<string>())
   const [mode, setMode] = useState<Mode>(Mode.GRID)
+  const [base, setBase] = useState(value.base)
 
   const [gridMin, gridMax] = getMinMaxFromOrderedCoords(grid)
   const axisLengths = getAxisLengths(grid)
@@ -45,10 +50,21 @@ function Layout(props: Props) {
     return setGrid(getCoordinates(gridMin, newMax))
   }
 
-  const handleManualChange: React.ChangeEventHandler<HTMLInputElement> = useCallback((event) => {
-    const { min, max } = getLayoutInfo(event.target.value)
-    setGrid(getCoordinates(min, max))
-  }, [grid])
+  const handleManualCoordsChange: React.ChangeEventHandler<HTMLInputElement> = useCallback(
+    (event) => {
+      const { min, max } = getLayoutInfoFromString(event.target.value)
+      setGrid(getCoordinates(min, max))
+    },
+    [grid]
+  )
+
+  const handleBaseParcelChange: React.ChangeEventHandler<HTMLInputElement> = useCallback(
+    (event) => {
+      const coord = strToCoord(event.target.value)
+      if (coord) setBase(coord)
+    },
+    [grid, base]
+  )
 
   const isTileDisabled = useCallback(
     (coord: Coords) => {
@@ -58,22 +74,32 @@ function Layout(props: Props) {
     [disabled]
   )
 
-  const handleTileClick = useCallback((coord: Coords) => {
-    const str = coordToStr(coord)
-    if (disabled.has(str)) {
-      disabled.delete(str)
-    } else {
-      disabled.add(str)
-    }
-    setDisabled(new Set(disabled))
-  }, [disabled])
+  const isTileWithError = useCallback((coord: Coords) => {}, [grid, disabled])
+
+  const isBaseTile = useCallback(
+    (coord: Coords) => {
+      return coord.x === base.x && coord.y === base.y
+    },
+    [base]
+  )
+
+  const handleTileClick = useCallback(
+    (coord: Coords) => {
+      const str = coordToStr(coord)
+      if (disabled.has(str)) {
+        disabled.delete(str)
+      } else {
+        disabled.add(str)
+      }
+      setDisabled(new Set(disabled))
+    },
+    [disabled]
+  )
 
   const handleApplyClick = useCallback(() => {
-    if (props.onChange) {
-      const value = transformCoordsToValue(grid, disabled)
-      props.onChange({ target: { value } } as React.ChangeEvent<HTMLInputElement>)
-    }
-  }, [grid, disabled])
+    const parcels = grid.filter(($) => !disabled.has(coordToStr($)))
+    onChange({ parcels, base })
+  }, [grid, disabled, base])
 
   const handleModeChange = useCallback(
     (mode: Mode) => () => {
@@ -84,14 +110,17 @@ function Layout(props: Props) {
 
   const getGridError = useCallback((): GridError | null => {
     if (numberOfCoords <= 0) return GridError.NUMBER_OF_PARCELS
-    if (!areConnected(grid.filter(($) => !disabled.has(coordToStr($))))) return GridError.NOT_CONNECTED
+
+    const coords = getEnabledCoords(grid, disabled)
+    if (!areConnected(coords)) return GridError.NOT_CONNECTED
+    if (!hasCoord(coords, base)) return GridError.MISSING_BASE_PARCEL
     return null
-  }, [grid, disabled])
+  }, [grid, base, disabled])
 
   const getTitle = useCallback(() => {
     if (mode === Mode.MANUAL) return 'Set Coordinates'
     return `${numberOfCoords} parcels`
-  }, [grid, mode])
+  }, [grid, mode, disabled])
 
   const getInstruction = useCallback(() => {
     if (mode === Mode.MANUAL) return 'Type in the layout coordinates that you want to deploy'
@@ -111,6 +140,7 @@ function Layout(props: Props) {
           coords={grid}
           isTileDisabled={isTileDisabled}
           handleTileClick={handleTileClick}
+          isBaseTile={isBaseTile}
           maxTileSize={50}
           minTileSize={3}
           visualThreshold={6}
@@ -122,44 +152,51 @@ function Layout(props: Props) {
         <Block className="manual">
           <TextField
             label="Custom coordinates"
-            value={transformCoordsToValue(grid, disabled)}
-            onChange={handleManualChange}
+            value={transformCoordsToString(grid, disabled)}
+            onChange={handleManualCoordsChange}
           />
+          <TextField label="Base parcel" value={coordToStr(base)} onChange={handleBaseParcelChange} />
           <Block>
             <Button type="dark" onClick={handleModeChange(Mode.GRID)}>
               Back
             </Button>
-            <Button type="blue" onClick={handleApplyClick}>
+            <Button type="blue" onClick={handleApplyClick} disabled={!!gridError}>
               Confirm
             </Button>
           </Block>
         </Block>
       ) : (
-        <Block label="Max. Grid Size" className="grid">
-          <Dropdown
-            label="Rows"
-            value={getOption(axisLengths.y)}
-            options={TILE_OPTIONS}
-            onChange={handleGridChange('y')}
-          />
-          <Dropdown
-            label="Columns"
-            value={getOption(axisLengths.x)}
-            options={TILE_OPTIONS}
-            onChange={handleGridChange('x')}
-          />
-          <Button type="dark" onClick={handleModeChange(Mode.MANUAL)}>
-            Set coordinates (advanced)
-          </Button>
-          <Button type="blue" size="big" onClick={handleApplyClick} disabled={!!gridError}>
-            Apply layout
-          </Button>
-        </Block>
+        <>
+          <Block label="Max. Grid Size" className="grid">
+            <Dropdown
+              label="Rows"
+              value={getOption(axisLengths.y)}
+              options={TILE_OPTIONS}
+              onChange={handleGridChange('y')}
+            />
+            <Dropdown
+              label="Columns"
+              value={getOption(axisLengths.x)}
+              options={TILE_OPTIONS}
+              onChange={handleGridChange('x')}
+            />
+            <Button type="dark" onClick={handleModeChange(Mode.MANUAL)}>
+              Set coordinates (advanced)
+            </Button>
+            <Button type="blue" size="big" onClick={handleApplyClick} disabled={!!gridError}>
+              Apply layout
+            </Button>
+          </Block>
+          <Block className="limitations">
+            <span>About scene limitations</span>
+            <InfoTooltip
+              text=""
+              link="https://docs.decentraland.org/creator/development-guide/sdk7/scene-limitations/"
+              type="help"
+            />
+          </Block>
+        </>
       )}
-      <Block className="limitations">
-        <span>About scene limitations</span>
-        <InfoTooltip text="Some text" type="help" />
-      </Block>
     </div>
   )
 }

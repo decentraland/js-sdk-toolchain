@@ -78,15 +78,13 @@ export function fromScene(value: EditorComponentsTypes['Scene']): SceneInput {
       ? value.spawnPoints.map((spawnPoint) => fromSceneSpawnPoint(spawnPoint))
       : [],
     layout: {
+      base: `${value.layout.base.x},${value.layout.base.y}`,
       parcels
     }
   }
 }
 
 export function toScene(inputs: SceneInput): EditorComponentsTypes['Scene'] {
-  // base should be bottom-left parcel
-  // https://docs.decentraland.org/creator/development-guide/sdk7/scene-metadata/#scene-parcels
-  const { min: base, parcels } = getLayout(inputs.layout.parcels)
   return {
     name: inputs.name,
     description: inputs.description,
@@ -101,18 +99,9 @@ export function toScene(inputs: SceneInput): EditorComponentsTypes['Scene'] {
     spawnPoints: inputs.spawnPoints.map((spawnPoint, index) =>
       toSceneSpawnPoint(`Spawn Point ${index + 1}`, spawnPoint)
     ),
-    layout: { base, parcels }
-  }
-}
-
-export function toSceneAuto(inputs: SceneInput): EditorComponentsTypes['Scene'] {
-  const parcels = parseParcels(inputs.layout.parcels)
-  const points = getCoordinatesBetweenPoints(parcels[0], parcels[1])
-  return {
-    ...toScene(inputs),
     layout: {
-      base: points[0],
-      parcels: points
+      base: parseParcels(inputs.layout.base)[0],
+      parcels: getLayout(inputs.layout.parcels).parcels
     }
   }
 }
@@ -156,7 +145,8 @@ export function parseParcels(value: string): Coords[] {
 
 export function getInputValidation(input: SceneInput): boolean {
   const parcels = parseParcels(input.layout.parcels)
-  return areConnected(parcels)
+  const baseList = parseParcels(input.layout.base)
+  return baseList.length === 1 && input.layout.parcels.includes(input.layout.base) && areConnected(parcels)
 }
 
 export function getCoordinatesBetweenPoints(pointA: Coords, pointB: Coords): Coords[] {

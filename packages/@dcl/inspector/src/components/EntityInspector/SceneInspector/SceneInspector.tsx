@@ -96,7 +96,6 @@ export default withSdk<Props>(({ sdk, entity }) => {
   const { getInputProps } = useComponentInput(entity, Scene, fromScene, toScene, getInputValidation)
   const nameProps = getInputProps('name')
   const descriptionProps = getInputProps('description')
-  const parcelsProps = getInputProps('layout.parcels')
   const thumbnailProps = getInputProps('thumbnail')
   const ageRatingProps = getInputProps('ageRating')
   const categoriesProps = getInputProps('categories')
@@ -327,6 +326,13 @@ export default withSdk<Props>(({ sdk, entity }) => {
     [selectedSceneInspectorTab, dispatch]
   )
 
+  const handleLayoutChange = useCallback(
+    (layout: EditorComponentsTypes['Scene']['layout']) => {
+      setComponentValue({ ...componentValue, layout })
+    },
+    [componentValue]
+  )
+
   return (
     <Container className="Scene" gap>
       <Tabs className="SceneTabs">
@@ -391,7 +397,9 @@ export default withSdk<Props>(({ sdk, entity }) => {
         </>
       ) : null}
 
-      {selectedSceneInspectorTab === SceneInspectorTab.LAYOUT ? <Layout {...parcelsProps} /> : null}
+      {selectedSceneInspectorTab === SceneInspectorTab.LAYOUT ? (
+        <Layout value={componentValue.layout} onChange={handleLayoutChange} />
+      ) : null}
 
       {selectedSceneInspectorTab === SceneInspectorTab.SETTINGS ? (
         <>

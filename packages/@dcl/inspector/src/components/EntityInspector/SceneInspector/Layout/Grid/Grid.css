@@ -16,3 +16,31 @@
   background-color: var(--base-10);
   cursor: pointer;
 }
+
+.Grid .tile .info {
+  opacity: 0;
+  position: absolute;
+  background-color: var(--base-20);
+  color: var(--base-5);
+  padding: 0 6px;
+  border: 1px solid var(--base-16);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+}
+
+.Grid .tile .info svg {
+  font-size: 15px;
+}
+
+.Grid .tile:hover .info {
+  opacity: 1;
+}
+
+.Grid .tile svg.base {
+  font-size: 15px;
+  margin-bottom: -8px;
+  margin-left: -14px;
+  z-index: 999;
+}

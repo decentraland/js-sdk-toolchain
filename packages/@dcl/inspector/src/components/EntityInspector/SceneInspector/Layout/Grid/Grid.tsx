@@ -1,3 +1,6 @@
+import { BsPlusLg } from 'react-icons/bs'
+import { IoIosPin } from 'react-icons/io'
+
 import { chunkCoords, getAxisLengths, getLargestAxis } from './utils'
 import { Props } from './types'
 
@@ -9,6 +12,7 @@ function Grid({
   maxTileSize = 50,
   minTileSize = 3,
   visualThreshold = 10,
+  isBaseTile,
   isTileDisabled,
   handleTileClick
 }: Props) {
@@ -38,7 +42,7 @@ function Grid({
           tileStyles={gridStyles}
           isTileDisabled={isTileDisabled}
           onTileClick={handleTileClick}
-          disableEnhancements={disableEnhancements}
+          isBaseTile={isBaseTile}
         />
       ))}
     </div>
@@ -48,11 +52,11 @@ function Grid({
 type Row = {
   row: Props['coords']
   tileStyles: React.CSSProperties
-  isTileDisabled?: Props['isTileDisabled']
-  onTileClick?: Props['handleTileClick']
-  disableEnhancements: boolean
+  isTileDisabled: Props['isTileDisabled']
+  onTileClick: Props['handleTileClick']
+  isBaseTile: Props['isBaseTile']
 }
-function Row({ row, tileStyles, isTileDisabled, onTileClick, disableEnhancements }: Row) {
+function Row({ row, tileStyles, isTileDisabled, onTileClick, isBaseTile }: Row) {
   return (
     <div className={`row y-${row[0].y}`}>
       {row.map((col) => (
@@ -63,7 +67,7 @@ function Row({ row, tileStyles, isTileDisabled, onTileClick, disableEnhancements
           style={tileStyles}
           isTileDisabled={isTileDisabled}
           onTileClick={onTileClick}
-          disableEnhancements={disableEnhancements}
+          isBaseTile={isBaseTile}
         />
       ))}
     </div>
@@ -74,12 +78,13 @@ type Tile = {
   x: number
   y: number
   style: React.CSSProperties
-  isTileDisabled?: Props['isTileDisabled']
-  onTileClick?: Props['handleTileClick']
-  disableEnhancements: boolean
+  isTileDisabled: Props['isTileDisabled']
+  onTileClick: Props['handleTileClick']
+  isBaseTile: Props['isBaseTile']
 }
-function Tile({ x, y, style, isTileDisabled, onTileClick, disableEnhancements }: Tile) {
+function Tile({ x, y, style, isTileDisabled, onTileClick, isBaseTile }: Tile) {
   const isDisabled = isTileDisabled && isTileDisabled({ x, y })
+  const isBase = isBaseTile && isBaseTile({ x, y })
   const handleClick = useCallback(() => {
     onTileClick && onTileClick({ x, y })
   }, [x, y])
@@ -88,7 +93,10 @@ function Tile({ x, y, style, isTileDisabled, onTileClick, disableEnhancements }:
 
   return (
     <div className={`tile x-${x}`} style={styles} onClick={handleClick}>
-      {disableEnhancements ? null : `${x},${y}`}
+      <div className="info">
+        <IoIosPin /> {`${x},${y}`}
+      </div>
+      {isBase && <BsPlusLg className="base" />}
     </div>
   )
 }

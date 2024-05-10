@@ -148,7 +148,7 @@ export async function feededFileSystem(mappings: Record<string, string> = builde
     },
     scene: {
       parcels: ['-2,-2', '-2,-3', '-3,-2', '-3,-3'],
-      base: '2,2'
+      base: '-2,-2'
     },
     contact: {
       name: 'John Doe',

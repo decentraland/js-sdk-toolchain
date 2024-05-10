@@ -1,5 +1,6 @@
 import { Coords } from '@dcl/ecs'
-import { AXIS_STEP, GridError, TILE_OPTIONS } from './types'
+import { GridError, TILE_OPTIONS } from './types'
+import { parseParcels } from '../utils'
 
 type ParcelInfo = {
   min: Coords
@@ -7,18 +8,13 @@ type ParcelInfo = {
   parcels: Coords[]
 }
 
-/* Parcels string format rules:
- ** #1: each coordinate is space-separated
- ** #2: each point is comma-separated
- ** EX: "0,0 0,1 1,0 1,1"
- */
-export function getLayoutInfo(parcels: string): ParcelInfo {
+export function getLayoutInfo(parcels: Coords[]): ParcelInfo {
   const base: { min: Coords; max: Coords } = {
     min: { x: Infinity, y: Infinity },
     max: { x: -Infinity, y: -Infinity }
   }
-  const _parcels = parcels.split(' ').map((parcel) => {
-    const [x, y] = parcel.split(',').map(($) => parseInt($))
+  parcels.forEach((parcel) => {
+    const { x, y } = parcel
 
     if (base.min.y >= y) {
       base.min = { x: Math.min(base.min.x, x), y }
@@ -31,7 +27,20 @@ export function getLayoutInfo(parcels: string): ParcelInfo {
     return { x, y }
   })
 
-  return { min: base.min, max: base.max, parcels: _parcels }
+  return { min: base.min, max: base.max, parcels }
+}
+
+/* Parcels string format rules:
+ ** #1: each coordinate is space-separated
+ ** #2: each point is comma-separated
+ ** EX: "0,0 0,1 1,0 1,1"
+ */
+export function getLayoutInfoFromString(parcels: string): ParcelInfo {
+  const _parcels = parcels.split(' ').map((parcel) => {
+    const [x, y] = parcel.split(',').map(($) => parseInt($))
+    return { x, y }
+  })
+  return getLayoutInfo(_parcels)
 }
 
 export function getCoordinatesBetweenPoints(pointA: Coords, pointB: Coords): Coords[] {
@@ -80,7 +89,7 @@ export function getCoordinates(min: Coords, max: Coords): Coords[] {
  ** Gets the closest value from "TILE_OPTIONS" (rounding up in case it doesn't exist)
  */
 export function getOption(value: number): number {
-  const idx = clamp(Math.ceil(value / AXIS_STEP), 0, TILE_OPTIONS.length) - 1 // zero-based
+  const idx = clamp(value, 0, TILE_OPTIONS.length) - 1 // zero-based
   return TILE_OPTIONS[idx]?.value ?? 0
 }
 
@@ -99,7 +108,24 @@ export function coordToStr({ x, y }: Coords) {
   return `${x},${y}`
 }
 
-export function transformCoordsToValue(coords: Coords[], disabledCoords: Set<string>) {
+export function strToCoord(coord: string) {
+  const parcels = parseParcels(coord)
+  return parcels[0]
+}
+
+export function getEnabledCoords(coords: Coords[], disabledCoords: Set<string>) {
+  return coords.filter(($) => !disabledCoords.has(coordToStr($)))
+}
+
+export function findCoord(coords: Coords[], needle: Coords) {
+  return coords.find(($) => $.x === needle.x && $.y === needle.y)
+}
+
+export function hasCoord(coords: Coords[], needle: Coords) {
+  return !!findCoord(coords, needle)
+}
+
+export function transformCoordsToString(coords: Coords[], disabledCoords: Set<string>) {
   return coords
     .map(($) => coordToStr($)) // map to string
     .filter(($) => !disabledCoords.has($)) // remove disabled coords
@@ -109,9 +135,11 @@ export function transformCoordsToValue(coords: Coords[], disabledCoords: Set<str
 export function stringifyGridError(error: GridError): string {
   switch (error) {
     case GridError.NUMBER_OF_PARCELS:
-      return 'Number of parcels must be between 0 & 32'
+      return 'Number of parcels must be between 0 and 32'
     case GridError.NOT_CONNECTED:
       return 'Parcels have to be connected vertically or horizontally'
+    case GridError.MISSING_BASE_PARCEL:
+      return 'Base parcel should be also included in parcels list'
     default:
       return ''
   }

@@ -1,8 +1,9 @@
-import { useComponentInput } from '../../../../hooks/sdk/useComponentInput'
+import { Layout } from '../../../../lib/utils/layout'
 
-type GetInputProps = ReturnType<typeof useComponentInput>['getInputProps']
-
-export type Props = ReturnType<GetInputProps>
+export type Props = {
+  value: Layout
+  onChange: (value: Layout) => void
+}
 
 export enum Mode {
   GRID,
@@ -11,11 +12,11 @@ export enum Mode {
 
 export enum GridError {
   NOT_CONNECTED,
-  NUMBER_OF_PARCELS
+  NUMBER_OF_PARCELS,
+  MISSING_BASE_PARCEL
 }
 
 export const MAX_AXIS_PARCELS = 32
-export const AXIS_STEP = 2
-export const TILE_OPTIONS = Array.from({ length: MAX_AXIS_PARCELS / AXIS_STEP }, (_, i) => ({
-  value: AXIS_STEP + AXIS_STEP * i
+export const TILE_OPTIONS = Array.from({ length: MAX_AXIS_PARCELS }, (_, i) => ({
+  value: i + 1
 }))
