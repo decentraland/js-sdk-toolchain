@@ -12,6 +12,9 @@ import addAsset from './add-asset'
 import addComponent from './add-component'
 import removeComponent from './remove-component'
 import duplicateEntity from './duplicate-entity'
+import setGround from './set-ground'
+import lock from './lock'
+import hide from './hide'
 import { updateCanSave } from '../../../redux/app'
 import { store } from '../../../redux/store'
 
@@ -36,7 +39,10 @@ export function createOperations(engine: IEngine) {
       store.dispatch(updateCanSave({ dirty }))
       await engine.update(1)
     },
-    getSelectedEntities: getSelectedEntities(engine)
+    getSelectedEntities: getSelectedEntities(engine),
+    setGround: setGround(engine),
+    lock: lock(engine),
+    hide: hide(engine)
   }
 }
 

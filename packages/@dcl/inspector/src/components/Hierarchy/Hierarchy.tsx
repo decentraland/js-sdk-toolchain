@@ -1,25 +1,50 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { Entity } from '@dcl/ecs'
-import { FiHexagon } from 'react-icons/fi'
 
 import { CAMERA, PLAYER, ROOT } from '../../lib/sdk/tree'
 import { useEntitiesWith } from '../../hooks/sdk/useEntitiesWith'
 import { useTree } from '../../hooks/sdk/useTree'
 import { Tree } from '../Tree'
 import { ContextMenu } from './ContextMenu'
+import { withSdk } from '../../hoc/withSdk'
 import './Hierarchy.css'
 
-function HierarchyIcon({ value }: { value: Entity }) {
+const HierarchyIcon = withSdk<{ value: Entity }>(({ sdk, value }) => {
+  const isSmart = useMemo(
+    () =>
+      sdk.components.Actions.has(value) ||
+      sdk.components.Triggers.has(value) ||
+      sdk.components.States.has(value) ||
+      sdk.components.TextShape.has(value) ||
+      sdk.components.NftShape.has(value) ||
+      sdk.components.VisibilityComponent.has(value),
+    [sdk, value]
+  )
+
+  const isTile = useMemo(() => sdk.components.Tile.has(value), [sdk, value])
+
+  const isGroup = useMemo(() => {
+    const nodes = sdk.components.Nodes.get(ROOT).value
+    const node = nodes.find((node) => node.entity === value)
+    return node && node.children.length > 0
+  }, [value])
+
   if (value === ROOT) {
     return <span style={{ marginRight: '4px' }}></span>
   } else if (value === PLAYER) {
     return <span className="tree-icon player-icon"></span>
   } else if (value === CAMERA) {
     return <span className="tree-icon camera-icon"></span>
+  } else if (isSmart) {
+    return <span className="tree-icon smart-icon"></span>
+  } else if (isTile) {
+    return <span className="tree-icon tile-icon"></span>
+  } else if (isGroup) {
+    return <span className="tree-icon group-icon"></span>
   } else {
-    return <FiHexagon style={{ marginRight: '4px' }} />
+    return <span className="tree-icon entity-icon"></span>
   }
-}
+})
 
 const EntityTree = Tree<Entity>()
 

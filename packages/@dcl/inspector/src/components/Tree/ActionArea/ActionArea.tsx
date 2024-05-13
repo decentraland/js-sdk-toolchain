@@ -1,17 +1,14 @@
 import React, { useCallback, useMemo } from 'react'
 import { IoEyeOutline as VisibleIcon, IoEyeOffOutline as InvisibleIcon } from 'react-icons/io5'
 import { MdOutlineLock as LockIcon, MdOutlineLockOpen as UnlockIcon } from 'react-icons/md'
-import { Entity, LastWriteWinElementSetComponentDefinition } from '@dcl/ecs'
+import { Entity } from '@dcl/ecs'
 
 import { WithSdkProps, withSdk } from '../../../hoc/withSdk'
-import { useEntityComponent } from '../../../hooks/sdk/useEntityComponent'
-import { SdkContextValue } from '../../../lib/sdk/context'
-import { analytics, Event } from '../../../lib/logic/analytics'
-import { getAssetByModel } from '../../../lib/logic/catalog'
 import { CAMERA, PLAYER, ROOT } from '../../../lib/sdk/tree'
 import { InfoTooltip } from '../../ui'
 
 import './ActionArea.css'
+import { Event, analytics } from '../../../lib/logic/analytics'
 
 type Props = {
   entity: Entity
@@ -19,12 +16,9 @@ type Props = {
 
 const ActionArea: React.FC<WithSdkProps & Props> = ({ sdk, ...props }) => {
   const {
-    components: { Lock, Hide, GltfContainer }
+    components: { Lock, Hide }
   } = sdk
   const { entity } = props
-  const { addComponent, removeComponent } = useEntityComponent()
-  const { src: gltfSrc } = GltfContainer.getOrNull(entity) ?? { src: '' }
-  const asset = getAssetByModel(gltfSrc)
 
   const isEntityLocked = useMemo(() => {
     return Lock.getOrNull(entity) !== null
@@ -34,47 +28,31 @@ const ActionArea: React.FC<WithSdkProps & Props> = ({ sdk, ...props }) => {
     return Hide.getOrNull(entity) !== null
   }, [entity, sdk])
 
+  const lock = useCallback(
+    (value: boolean) => {
+      sdk.operations.lock(entity, value)
+    },
+    [entity, sdk]
+  )
+
+  const hide = useCallback(
+    (value: boolean) => {
+      sdk.operations.hide(entity, value)
+    },
+    [entity, sdk]
+  )
+
   const handleToggleHideComponent = useCallback(() => {
-    if (isEntityHidden) {
-      removeComponent(
-        entity,
-        Hide as unknown as LastWriteWinElementSetComponentDefinition<SdkContextValue['components']>
-      )
-      analytics.track(Event.REMOVE_COMPONENT, {
-        componentName: Hide.componentName,
-        itemId: asset?.id,
-        itemPath: gltfSrc
-      })
-    } else {
-      addComponent(entity, Hide.componentId, { value: true })
-      analytics.track(Event.ADD_COMPONENT, {
-        componentName: Hide.componentName,
-        itemId: asset?.id,
-        itemPath: gltfSrc
-      })
-    }
-  }, [entity, sdk, isEntityHidden])
+    const value = !isEntityHidden
+    hide(value)
+    analytics.track(Event.HIDE, { value })
+  }, [hide, isEntityHidden])
 
   const handleToggleLockComponent = useCallback(() => {
-    if (isEntityLocked) {
-      removeComponent(
-        entity,
-        Lock as unknown as LastWriteWinElementSetComponentDefinition<SdkContextValue['components']>
-      )
-      analytics.track(Event.REMOVE_COMPONENT, {
-        componentName: Lock.componentName,
-        itemId: asset?.id,
-        itemPath: gltfSrc
-      })
-    } else {
-      addComponent(entity, Lock.componentId, { value: true })
-      analytics.track(Event.ADD_COMPONENT, {
-        componentName: Lock.componentName,
-        itemId: asset?.id,
-        itemPath: gltfSrc
-      })
-    }
-  }, [sdk, isEntityLocked])
+    const value = !isEntityLocked
+    lock(value)
+    analytics.track(Event.LOCK, { value })
+  }, [lock, isEntityLocked])
 
   const toggleLockButton = useCallback(() => {
     return (

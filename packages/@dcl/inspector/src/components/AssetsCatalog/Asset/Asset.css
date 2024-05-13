@@ -31,7 +31,7 @@
   height: 60px;
 }
 
-.assets-catalog-asset.smart-item .smart-item-badge {
+.assets-catalog-asset .item-badge {
   position: absolute;
   display: flex;
   justify-content: center;
@@ -41,5 +41,15 @@
   height: 24px;
   bottom: 4px;
   right: 4px;
+}
+
+.assets-catalog-asset.smart-item .smart-item-badge {
   background-color: var(--smart-item-icon-bg-color);
+}
+
+.assets-catalog-asset.ground .ground-badge {
+  background-size: 20px 20px;
+  background-position: center;
+  background-image: url(./icons/ground.svg);
+  background-color: var(--ground-icon-bg-color);
 }

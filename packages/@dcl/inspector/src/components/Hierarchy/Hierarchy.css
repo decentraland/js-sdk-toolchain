@@ -9,7 +9,7 @@
   width: 16px;
   height: 14px;
   margin-right: 4px;
-  background-size: cover;
+  background-size: 16px 16px;
   background-position: center;
   background-repeat: no-repeat;
 }
@@ -20,4 +20,20 @@
 
 .Hierarchy .camera-icon {
   background-image: url(./icons/camera.svg);
+}
+
+.Hierarchy .smart-icon {
+  background-image: url(./icons/smart.svg);
+}
+
+.Hierarchy .tile-icon {
+  background-image: url(./icons/tile.svg);
+}
+
+.Hierarchy .entity-icon {
+  background-image: url(./icons/entity.svg);
+}
+
+.Hierarchy .group-icon {
+  background-image: url(./icons/group.svg);
 }

@@ -69,6 +69,10 @@ export function isSmart(asset: Partial<Asset>) {
   return false
 }
 
+export function isGround(asset: Partial<Asset>) {
+  return asset.category === 'ground'
+}
+
 export function getAssetByModel(path: string) {
   // Validates the path is a model and cames from the catalog
   if (path.endsWith('.glb') && path.split('/').length === 4) {
