@@ -134,4 +134,6 @@ export interface UiTransformProps {
   overflow?: OverflowType
   /** The pointer filter property determines if the ui element blocks the pointer or not (elements with pointer events always block the pointer regardless of this property) **/
   pointerFilter?: PointerFilterType
+  /** The opacity property sets the opacity level for an element, it's accumulated across children @defaultValue 1 */
+  opacity?: number
 }

@@ -76,7 +76,8 @@ const defaultUiTransform: PBUiTransform = {
   flexBasisUnit: YGUnit.YGU_UNDEFINED,
   widthUnit: YGUnit.YGU_UNDEFINED,
   heightUnit: YGUnit.YGU_UNDEFINED,
-  pointerFilter: PointerFilterMode.PFM_NONE
+  pointerFilter: PointerFilterMode.PFM_NONE,
+  opacity: 1
 }
 
 /**

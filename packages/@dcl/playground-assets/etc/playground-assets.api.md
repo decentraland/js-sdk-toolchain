@@ -2898,6 +2898,8 @@ export interface PBUiText {
     color?: PBColor4 | undefined;
     font?: Font | undefined;
     fontSize?: number | undefined;
+    outlineColor?: PBColor4 | undefined;
+    outlineWidth?: number | undefined;
     textAlign?: TextAlignMode | undefined;
     value: string;
 }
@@ -2952,6 +2954,7 @@ export interface PBUiTransform {
     // (undocumented)
     minWidth: number;
     minWidthUnit: YGUnit;
+    opacity?: number | undefined;
     overflow: YGOverflow;
     // (undocumented)
     paddingBottom: number;
@@ -3985,6 +3988,8 @@ export interface UiLabelProps {
     color?: PBColor4 | undefined;
     font?: UiFontType | undefined;
     fontSize?: ScaleUnit | undefined;
+    outlineColor?: PBColor4 | undefined;
+    outlineWidth?: number | undefined;
     textAlign?: TextAlignType | undefined;
     value: string;
 }
@@ -4024,6 +4029,7 @@ export interface UiTransformProps {
     maxWidth?: PositionUnit;
     minHeight?: PositionUnit;
     minWidth?: PositionUnit;
+    opacity?: number;
     overflow?: OverflowType;
     padding?: Partial<Position> | PositionShorthand;
     pointerFilter?: PointerFilterType;

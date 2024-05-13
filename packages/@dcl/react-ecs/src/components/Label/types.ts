@@ -16,6 +16,10 @@ export interface UiLabelProps {
   textAlign?: TextAlignType | undefined
   /** Label font type. @defaultValue 'sans-serif' */
   font?: UiFontType | undefined
+  /** Outline width of the text. @defaultValue 0 */
+  outlineWidth?: number | undefined
+  /** Outline color of the text. @defaultValue `{ r: 0, g: 0, b: 0, a: 1 }` */
+  outlineColor?: Color4 | undefined
 }
 
 /**
