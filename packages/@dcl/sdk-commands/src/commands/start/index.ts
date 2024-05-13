@@ -49,7 +49,8 @@ export const args = declareArgs({
   '-w': '--no-watch',
   '--skip-build': Boolean,
   '--desktop-client': Boolean,
-  '--data-layer': Boolean
+  '--data-layer': Boolean,
+  '--customEntryPoint': Boolean
 })
 
 export async function help(options: Options) {
@@ -107,7 +108,18 @@ export async function main(options: Options) {
       // first run `npm run build`, this can be disabled with --skip-build
       // then start the embedded compiler, this can be disabled with --no-watch
       if (watch || build) {
-        await buildScene({ ...options, args: { '--dir': project.workingDirectory, '--watch': watch, _: [] } }, project)
+        await buildScene(
+          {
+            ...options,
+            args: {
+              '--dir': project.workingDirectory,
+              '--watch': watch,
+              '--customEntryPoint': !!options.args['--customEntryPoint'],
+              _: []
+            }
+          },
+          project
+        )
         await startValidations(options.components, project.workingDirectory)
       }
 
