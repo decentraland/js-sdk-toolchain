@@ -7,7 +7,7 @@ export type Props = {
 
 export enum Mode {
   GRID,
-  MANUAL
+  ADVANCED
 }
 
 export enum GridError {

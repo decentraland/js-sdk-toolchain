@@ -38,22 +38,22 @@
   width: 100%;
 }
 
-.SceneLayout .Block.manual > .content {
+.SceneLayout .Block.advanced > .content {
   flex-direction: column;
 }
 
-.SceneLayout .Block.manual .Text {
+.SceneLayout .Block.advanced .Text {
   width: 100%;
 }
 
-.SceneLayout .Block.manual .Block {
+.SceneLayout .Block.advanced .Block {
   margin-top: 10px;
   width: 100%;
   display: flex;
   flex-direction: row;
 }
 
-.SceneLayout .Block.manual .Block .content {
+.SceneLayout .Block.advanced .Block .content {
   column-gap: 50%;
 }
 

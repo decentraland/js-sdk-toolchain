@@ -1,3 +1,4 @@
+import { areConnected } from '@dcl/ecs'
 import { useCallback, useState } from 'react'
 
 import { Dropdown, InfoTooltip, TextField } from '../../../ui'
@@ -19,10 +20,11 @@ import {
   hasCoord
 } from './utils'
 import { getAxisLengths } from './Grid/utils'
+import { Advanced } from './ModeAdvanced'
 import { GridError, Mode, Props, TILE_OPTIONS } from './types'
+import { Value as AdvancedValue } from './ModeAdvanced/types'
 
 import './Layout.css'
-import { areConnected } from '@dcl/ecs'
 
 type Coords = GridProps['coords'][0]
 
@@ -50,18 +52,12 @@ function Layout({ value, onChange }: Props) {
     return setGrid(getCoordinates(gridMin, newMax))
   }
 
-  const handleManualCoordsChange: React.ChangeEventHandler<HTMLInputElement> = useCallback(
-    (event) => {
-      const { min, max } = getLayoutInfoFromString(event.target.value)
+  const handleAdvancedChange = useCallback(
+    (value: AdvancedValue) => {
+      const { min, max } = getLayoutInfoFromString(value.coords)
+      const base = strToCoord(value.base)
       setGrid(getCoordinates(min, max))
-    },
-    [grid]
-  )
-
-  const handleBaseParcelChange: React.ChangeEventHandler<HTMLInputElement> = useCallback(
-    (event) => {
-      const coord = strToCoord(event.target.value)
-      if (coord) setBase(coord)
+      if (base) setBase(base)
     },
     [grid, base]
   )
@@ -97,7 +93,7 @@ function Layout({ value, onChange }: Props) {
   )
 
   const handleApplyClick = useCallback(() => {
-    const parcels = grid.filter(($) => !disabled.has(coordToStr($)))
+    const parcels = getEnabledCoords(grid, disabled)
     onChange({ parcels, base })
   }, [grid, disabled, base])
 
@@ -118,12 +114,12 @@ function Layout({ value, onChange }: Props) {
   }, [grid, base, disabled])
 
   const getTitle = useCallback(() => {
-    if (mode === Mode.MANUAL) return 'Set Coordinates'
+    if (mode === Mode.ADVANCED) return 'Set Coordinates'
     return `${numberOfCoords} parcels`
   }, [grid, mode, disabled])
 
   const getInstruction = useCallback(() => {
-    if (mode === Mode.MANUAL) return 'Type in the layout coordinates that you want to deploy'
+    if (mode === Mode.ADVANCED) return 'Type in the layout coordinates that you want to deploy'
     return 'Click individual tiles to exclude/include them from the layout'
   }, [mode])
 
@@ -148,23 +144,17 @@ function Layout({ value, onChange }: Props) {
         <span className="error">{gridError !== null && stringifyGridError(gridError)}</span>
       </div>
 
-      {mode === Mode.MANUAL ? (
-        <Block className="manual">
-          <TextField
-            label="Custom coordinates"
-            value={transformCoordsToString(grid, disabled)}
-            onChange={handleManualCoordsChange}
-          />
-          <TextField label="Base parcel" value={coordToStr(base)} onChange={handleBaseParcelChange} />
-          <Block>
-            <Button type="dark" onClick={handleModeChange(Mode.GRID)}>
-              Back
-            </Button>
-            <Button type="blue" onClick={handleApplyClick} disabled={!!gridError}>
-              Confirm
-            </Button>
-          </Block>
-        </Block>
+      {mode === Mode.ADVANCED ? (
+        <Advanced
+          value={{
+            coords: transformCoordsToString(grid, disabled),
+            base: coordToStr(base)
+          }}
+          disabled={!!gridError}
+          onChange={handleAdvancedChange}
+          onSubmit={handleApplyClick}
+          onGoBack={handleModeChange(Mode.GRID)}
+        />
       ) : (
         <>
           <Block label="Max. Grid Size" className="grid">
@@ -180,7 +170,7 @@ function Layout({ value, onChange }: Props) {
               options={TILE_OPTIONS}
               onChange={handleGridChange('x')}
             />
-            <Button type="dark" onClick={handleModeChange(Mode.MANUAL)}>
+            <Button type="dark" onClick={handleModeChange(Mode.ADVANCED)}>
               Set coordinates (advanced)
             </Button>
             <Button type="blue" size="big" onClick={handleApplyClick} disabled={!!gridError}>
