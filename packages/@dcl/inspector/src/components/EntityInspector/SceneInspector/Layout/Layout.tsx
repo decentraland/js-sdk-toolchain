@@ -1,7 +1,7 @@
 import { areConnected } from '@dcl/ecs'
 import { useCallback, useState } from 'react'
 
-import { Dropdown, InfoTooltip, TextField } from '../../../ui'
+import { Dropdown, InfoTooltip } from '../../../ui'
 import { Block } from '../../../Block'
 import { Button } from '../../../Button'
 import { Grid, Props as GridProps } from './Grid'
@@ -70,7 +70,7 @@ function Layout({ value, onChange }: Props) {
     [disabled]
   )
 
-  const isTileWithError = useCallback((coord: Coords) => {}, [grid, disabled])
+  // const isTileDisconnected = useCallback((coord: Coords) => {}, [grid, disabled])
 
   const isBaseTile = useCallback(
     (coord: Coords) => {
