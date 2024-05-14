@@ -24,8 +24,8 @@ const HierarchyIcon = withSdk<{ value: Entity }>(({ sdk, value }) => {
   const isTile = useMemo(() => sdk.components.Tile.has(value), [sdk, value])
 
   const isGroup = useMemo(() => {
-    const nodes = sdk.components.Nodes.get(ROOT).value
-    const node = nodes.find((node) => node.entity === value)
+    const nodes = sdk.components.Nodes.getOrNull(ROOT)?.value
+    const node = nodes?.find((node) => node.entity === value)
     return node && node.children.length > 0
   }, [value])
 
