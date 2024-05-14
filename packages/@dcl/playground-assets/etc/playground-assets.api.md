@@ -77,13 +77,27 @@ export interface AudioStreamComponentDefinitionExtended extends LastWriteWinElem
 // @public (undocumented)
 export const enum AvatarAnchorPointType {
     // (undocumented)
+    AAPT_BACK = 5,
+    // (undocumented)
+    AAPT_HEAD = 4,
+    // (undocumented)
+    AAPT_HIP = 10,
+    // (undocumented)
+    AAPT_LEFT_FOOT = 6,
+    // (undocumented)
     AAPT_LEFT_HAND = 2,
+    // (undocumented)
+    AAPT_LEFT_SHOULDER = 8,
     // (undocumented)
     AAPT_NAME_TAG = 1,
     // (undocumented)
     AAPT_POSITION = 0,
     // (undocumented)
-    AAPT_RIGHT_HAND = 3
+    AAPT_RIGHT_FOOT = 7,
+    // (undocumented)
+    AAPT_RIGHT_HAND = 3,
+    // (undocumented)
+    AAPT_RIGHT_SHOULDER = 9
 }
 
 // @public (undocumented)
@@ -322,6 +336,13 @@ export const enum CameraType {
 //
 // @public (undocumented)
 export type Children = unknown;
+
+// @public (undocumented)
+export const enum CinematicControlType {
+    CCT_NONE = 0,
+    CCT_RELATIVE = 1,
+    CCT_TANK = 2
+}
 
 // @public (undocumented)
 export const enum ColliderLayer {
@@ -2161,6 +2182,9 @@ export namespace PBCameraMode {
 // @public (undocumented)
 export interface PBCameraModeArea {
     area: PBVector3 | undefined;
+    cimematicEntity?: number | undefined;
+    cinematicAvatarControl?: CinematicControlType | undefined;
+    cinematicCameraControl?: boolean | undefined;
     mode: CameraType;
 }
 
