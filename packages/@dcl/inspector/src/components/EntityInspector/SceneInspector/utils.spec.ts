@@ -1,9 +1,9 @@
 import { EditorComponentsTypes, SceneAgeRating, SceneCategory } from '../../../lib/sdk/components'
 import { Coords, Layout } from '../../../lib/utils/layout'
 import { SceneInput } from './types'
-import { fromScene, getCoordinatesBetweenPoints, getInputValidation, parseParcels, toScene, toSceneAuto } from './utils'
+import { fromScene, getCoordinatesBetweenPoints, isValidInput, parseParcels, toScene } from './utils'
 
-function getInput(parcels: string): SceneInput {
+function getInput(base: string, parcels: string): SceneInput {
   const input: SceneInput = {
     name: 'name',
     description: 'description',
@@ -17,6 +17,7 @@ function getInput(parcels: string): SceneInput {
     author: 'John Doe',
     email: 'johndoe@gmail.com',
     layout: {
+      base,
       parcels
     }
   }
@@ -54,13 +55,13 @@ describe('SceneInspector/utils', () => {
 
       const result = fromScene(scene)
 
-      expect(result).toEqual(getInput('1,1 2,2'))
+      expect(result).toEqual(getInput('1,1', '1,1 2,2'))
     })
   })
 
   describe('toScene', () => {
     it('should convert a SceneInput to a Scene', () => {
-      const input = getInput('1,1 2,2')
+      const input = getInput('1,1', '1,1 2,2')
 
       const result = toScene(input)
 
@@ -69,26 +70,6 @@ describe('SceneInspector/utils', () => {
           base: { x: 1, y: 1 },
           parcels: [
             { x: 1, y: 1 },
-            { x: 2, y: 2 }
-          ]
-        })
-      )
-    })
-  })
-
-  describe('toSceneAuto', () => {
-    it('should convert a SceneInput to a Scene with auto-generated base and parcels', () => {
-      const input = getInput('1,1 2,2')
-
-      const result = toSceneAuto(input)
-
-      expect(result).toEqual(
-        getScene({
-          base: { x: 1, y: 1 },
-          parcels: [
-            { x: 1, y: 1 },
-            { x: 1, y: 2 },
-            { x: 2, y: 1 },
             { x: 2, y: 2 }
           ]
         })
@@ -118,26 +99,24 @@ describe('SceneInspector/utils', () => {
     })
   })
 
-  describe('getInputValidation', () => {
-    it('should return a validation function that checks for connected parcels', () => {
-      const inputValidation = getInputValidation(false)
-      const validInput = getInput('1,1 1,2')
-      const invalidInput = getInput('1,1 2,2')
+  describe('isValidInput', () => {
+    it('should return true for connected parcels', () => {
+      const validInput = getInput('1,1', '1,1 1,2')
+      const invalidInput = getInput('1,1', '1,1 2,2')
 
-      const isValidValidInput = inputValidation(validInput)
-      const isValidInvalidInput = inputValidation(invalidInput)
+      const isValidValidInput = isValidInput(validInput)
+      const isValidInvalidInput = isValidInput(invalidInput)
 
       expect(isValidValidInput).toBe(true)
       expect(isValidInvalidInput).toBe(false)
     })
 
-    it('should return a validation function that checks for auto-generated parcels', () => {
-      const inputValidation = getInputValidation(true)
-      const validInput = getInput('1,1 2,2')
-      const invalidInput = getInput('1,1 1,2 1,3')
+    it('should return true if parcels contains base coord', () => {
+      const validInput = getInput('1,1', '1,1 1,2')
+      const invalidInput = getInput('0,1', '1,1 2,2')
 
-      const isValidValidInput = inputValidation(validInput)
-      const isValidInvalidInput = inputValidation(invalidInput)
+      const isValidValidInput = isValidInput(validInput)
+      const isValidInvalidInput = isValidInput(invalidInput)
 
       expect(isValidValidInput).toBe(true)
       expect(isValidInvalidInput).toBe(false)

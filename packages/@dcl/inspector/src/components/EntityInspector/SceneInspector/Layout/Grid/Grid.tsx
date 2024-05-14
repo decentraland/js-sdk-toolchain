@@ -87,7 +87,7 @@ function Tile({ x, y, style, isTileDisabled, onTileClick, isBaseTile }: Tile) {
   const isBase = isBaseTile && isBaseTile({ x, y })
   const handleClick = useCallback(() => {
     onTileClick && onTileClick({ x, y })
-  }, [x, y])
+  }, [x, y, isTileDisabled])
 
   const styles = { ...style, border: isDisabled ? 0 : style.border }
 

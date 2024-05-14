@@ -101,31 +101,9 @@ export function toScene(inputs: SceneInput): EditorComponentsTypes['Scene'] {
     ),
     layout: {
       base: parseParcels(inputs.layout.base)[0],
-      parcels: getLayout(inputs.layout.parcels).parcels
+      parcels: parseParcels(inputs.layout.parcels)
     }
   }
-}
-
-export function getLayout(parcels: string) {
-  const base: { min: Coords; max: Coords } = {
-    min: { x: Infinity, y: Infinity },
-    max: { x: -Infinity, y: -Infinity }
-  }
-  const _parcels = Array.from(new Set(parcels.split(' '))).map((parcel) => {
-    const [x, y] = parcel.split(',').map(($) => parseInt($))
-
-    if (base.min.y >= y) {
-      base.min = { x: Math.min(base.min.x, x), y }
-    }
-
-    if (base.max.y <= y) {
-      base.max = { x: Math.max(base.max.x, x), y }
-    }
-
-    return { x, y }
-  })
-
-  return { min: base.min, max: base.max, parcels: _parcels }
 }
 
 export function parseParcels(value: string): Coords[] {
@@ -143,7 +121,7 @@ export function parseParcels(value: string): Coords[] {
   return coordsList
 }
 
-export function getInputValidation(input: SceneInput): boolean {
+export function isValidInput(input: SceneInput): boolean {
   const parcels = parseParcels(input.layout.parcels)
   const baseList = parseParcels(input.layout.base)
   return baseList.length === 1 && input.layout.parcels.includes(input.layout.base) && areConnected(parcels)

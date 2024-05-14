@@ -81,6 +81,9 @@ export function getCoordinatesInGridOrder(coords: Coords[]): Coords[] {
   })
 }
 
+/*
+ ** Returns coordinates between "min" and "max" in grid order
+ */
 export function getCoordinates(min: Coords, max: Coords): Coords[] {
   return getCoordinatesInGridOrder(getCoordinatesBetweenPoints(min, max))
 }
@@ -97,6 +100,9 @@ export function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value))
 }
 
+/*
+ ** Gets min & max coordinates from grid-ordered coordinates
+ */
 export function getMinMaxFromOrderedCoords(coords: Coords[]): [Coords, Coords] {
   return [
     { x: coords[0].x, y: coords[coords.length - 1].y },
@@ -104,27 +110,46 @@ export function getMinMaxFromOrderedCoords(coords: Coords[]): [Coords, Coords] {
   ]
 }
 
-export function coordToStr({ x, y }: Coords) {
+/*
+ ** Transform a coordinate to it's string representation
+ */
+export function coordToStr({ x, y }: Coords): string {
   return `${x},${y}`
 }
 
-export function strToCoord(coord: string) {
+/*
+ ** Transform a coordinate in it's string representation to a Coord
+ */
+export function strToCoord(coord: string): Coords {
   const parcels = parseParcels(coord)
   return parcels[0]
 }
 
+/*
+ ** Filter out the disabled coordinates
+ */
 export function getEnabledCoords(coords: Coords[], disabledCoords: Set<string>) {
   return coords.filter(($) => !disabledCoords.has(coordToStr($)))
 }
 
+/*
+ ** Find a specific coordinate in the list of coordinates
+ */
 export function findCoord(coords: Coords[], needle: Coords) {
   return coords.find(($) => $.x === needle.x && $.y === needle.y)
 }
 
+/*
+ ** Checks if a specific coordinate is in the list of coordinates
+ */
 export function hasCoord(coords: Coords[], needle: Coords) {
   return !!findCoord(coords, needle)
 }
 
+/*
+ ** Transform list of coordinates to their string-representation form and filters the
+ ** disabled ones
+ */
 export function transformCoordsToString(coords: Coords[], disabledCoords: Set<string>) {
   return coords
     .map(($) => coordToStr($)) // map to string
@@ -132,6 +157,9 @@ export function transformCoordsToString(coords: Coords[], disabledCoords: Set<st
     .join(' ')
 }
 
+/*
+ ** Matches a GridError to a user-friendly message
+ */
 export function stringifyGridError(error: GridError): string {
   switch (error) {
     case GridError.NUMBER_OF_PARCELS:

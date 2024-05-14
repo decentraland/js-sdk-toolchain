@@ -10,7 +10,7 @@ import { TextField } from '../../ui/TextField'
 import { FileUploadField } from '../../ui/FileUploadField'
 import { ACCEPTED_FILE_TYPES } from '../../ui/FileUploadField/types'
 import { Props } from './types'
-import { fromScene, toScene, getInputValidation, isImage, fromSceneSpawnPoint, toSceneSpawnPoint } from './utils'
+import { fromScene, toScene, isValidInput, isImage, fromSceneSpawnPoint, toSceneSpawnPoint } from './utils'
 
 import './SceneInspector.css'
 import { EditorComponentsTypes, SceneAgeRating, SceneCategory, SceneSpawnPoint } from '../../../lib/sdk/components'
@@ -93,7 +93,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
   const { Scene } = sdk.components
 
   const hasScene = useHasComponent(entity, Scene)
-  const { getInputProps } = useComponentInput(entity, Scene, fromScene, toScene, getInputValidation)
+  const { getInputProps } = useComponentInput(entity, Scene, fromScene, toScene, isValidInput)
   const nameProps = getInputProps('name')
   const descriptionProps = getInputProps('description')
   const thumbnailProps = getInputProps('thumbnail')

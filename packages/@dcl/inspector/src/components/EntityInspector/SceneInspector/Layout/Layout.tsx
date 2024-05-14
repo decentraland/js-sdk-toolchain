@@ -67,7 +67,7 @@ function Layout({ value, onChange }: Props) {
       const str = coordToStr(coord)
       return disabled.has(str)
     },
-    [disabled]
+    [grid, disabled]
   )
 
   // const isTileDisconnected = useCallback((coord: Coords) => {}, [grid, disabled])
@@ -89,7 +89,7 @@ function Layout({ value, onChange }: Props) {
       }
       setDisabled(new Set(disabled))
     },
-    [disabled]
+    [grid, disabled]
   )
 
   const handleApplyClick = useCallback(() => {
