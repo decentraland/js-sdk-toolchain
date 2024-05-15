@@ -107,6 +107,13 @@ export const AvatarAttach: LastWriteWinElementSetComponentDefinition<PBAvatarAtt
 export const AvatarBase: LastWriteWinElementSetComponentDefinition<PBAvatarBase>;
 
 // @public (undocumented)
+export const enum AvatarControlType {
+    CCT_NONE = 0,
+    CCT_RELATIVE = 1,
+    CCT_TANK = 2
+}
+
+// @public (undocumented)
 export const AvatarEmoteCommand: GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>;
 
 // @public (undocumented)
@@ -119,6 +126,28 @@ export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAva
 export const enum AvatarModifierType {
     AMT_DISABLE_PASSPORTS = 1,
     AMT_HIDE_AVATARS = 0
+}
+
+// @public (undocumented)
+export interface AvatarMovementSettings {
+    allowWeightedMovement?: boolean | undefined;
+    // (undocumented)
+    controlMode?: AvatarControlType | undefined;
+    friction?: number | undefined;
+    gravity?: number | undefined;
+    jumpHeight?: number | undefined;
+    maxFallSpeed?: number | undefined;
+    runSpeed?: number | undefined;
+    turnSpeed?: number | undefined;
+    walkSpeed?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace AvatarMovementSettings {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): AvatarMovementSettings;
+    // (undocumented)
+    export function encode(message: AvatarMovementSettings, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -338,10 +367,26 @@ export const enum CameraType {
 export type Children = unknown;
 
 // @public (undocumented)
-export const enum CinematicControlType {
-    CCT_NONE = 0,
-    CCT_RELATIVE = 1,
-    CCT_TANK = 2
+export interface CinematicSettings {
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    allowManualRotation?: boolean | undefined;
+    cameraEntity: number;
+    pitchRange?: number | undefined;
+    rollRange?: number | undefined;
+    yawRange?: number | undefined;
+    zoomMax?: number | undefined;
+    zoomMin?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace CinematicSettings {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): CinematicSettings;
+    // (undocumented)
+    export function encode(message: CinematicSettings, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2120,6 +2165,8 @@ export interface PBAvatarModifierArea {
     area: PBVector3 | undefined;
     excludeIds: string[];
     modifiers: AvatarModifierType[];
+    // (undocumented)
+    movementSettings?: AvatarMovementSettings | undefined;
 }
 
 // @public (undocumented)
@@ -2182,9 +2229,8 @@ export namespace PBCameraMode {
 // @public (undocumented)
 export interface PBCameraModeArea {
     area: PBVector3 | undefined;
-    cinematicAvatarControl?: CinematicControlType | undefined;
-    cinematicCameraControl?: boolean | undefined;
-    cinematicEntity?: number | undefined;
+    // (undocumented)
+    cinematicSettings?: CinematicSettings | undefined;
     mode: CameraType;
 }
 
@@ -2922,6 +2968,8 @@ export interface PBUiText {
     color?: PBColor4 | undefined;
     font?: Font | undefined;
     fontSize?: number | undefined;
+    outlineColor?: PBColor4 | undefined;
+    outlineWidth?: number | undefined;
     textAlign?: TextAlignMode | undefined;
     value: string;
 }
@@ -2976,6 +3024,7 @@ export interface PBUiTransform {
     // (undocumented)
     minWidth: number;
     minWidthUnit: YGUnit;
+    opacity?: number | undefined;
     overflow: YGOverflow;
     // (undocumented)
     paddingBottom: number;
