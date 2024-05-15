@@ -2182,9 +2182,9 @@ export namespace PBCameraMode {
 // @public (undocumented)
 export interface PBCameraModeArea {
     area: PBVector3 | undefined;
-    cimematicEntity?: number | undefined;
     cinematicAvatarControl?: CinematicControlType | undefined;
     cinematicCameraControl?: boolean | undefined;
+    cinematicEntity?: number | undefined;
     mode: CameraType;
 }
 
