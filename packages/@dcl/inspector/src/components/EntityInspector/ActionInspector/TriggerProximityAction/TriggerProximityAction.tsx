@@ -2,28 +2,13 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { ActionPayload, ActionType, ProximityLayer } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 import { Dropdown, TextField } from '../../../ui'
-import type { Props } from './types'
+import { type Props, LayerOptions } from './types'
 
 import './TriggerProximityAction.css'
 
 function isValid(payload: Partial<ActionPayload<ActionType.DAMAGE>>): payload is ActionPayload<ActionType.DAMAGE> {
   return typeof payload.radius === 'number' && !isNaN(payload.radius)
 }
-
-const LayerOptions = [
-  {
-    value: ProximityLayer.ALL,
-    label: 'All'
-  },
-  {
-    value: ProximityLayer.PLAYER,
-    label: 'Player'
-  },
-  {
-    value: ProximityLayer.NON_PLAYER,
-    label: 'Non Player'
-  }
-]
 
 const TriggerProximityAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
   const [payload, setPayload] = useState<Partial<ActionPayload<ActionType.DAMAGE>>>({
