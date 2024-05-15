@@ -321,7 +321,7 @@ export const enum CameraType {
 // Warning: (ae-missing-release-tag) "Children" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export type Children = unknown;
+export type Children = ReactNode;
 
 // @public (undocumented)
 export const enum ColliderLayer {
@@ -968,7 +968,7 @@ export const enum EasingFunction {
 export interface EcsElements {
     // (undocumented)
     entity: Partial<EntityComponents> & {
-        children?: Children;
+        children?: ReactNode;
         key?: Key;
     };
 }
@@ -1414,10 +1414,16 @@ export namespace JSX {
     export interface Component {
     }
     // (undocumented)
-    export type Element = {} | null;
+    export interface Element extends ReactElement<any, any> {
+    }
     // (undocumented)
     export type IntrinsicElements = EcsElements;
 }
+
+// Warning: (ae-missing-release-tag) "JSXElementConstructor" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type JSXElementConstructor<P> = (props: P) => ReactElement<any, any> | null;
 
 // @public (undocumented)
 export type JustifyType = 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly';
@@ -3420,7 +3426,7 @@ export namespace ReactEcs {
         export interface Component {
         }
         // (undocumented)
-        export type Element = {} | null;
+        export type Element = ReactElement;
         export type IntrinsicElements = EcsElements;
     }
     const // (undocumented)
@@ -3433,6 +3439,23 @@ export namespace ReactEcs {
 //
 // @public
 export const ReactEcsRenderer: ReactBasedUiSystem;
+
+// Warning: (ae-missing-release-tag) "ReactElement" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface ReactElement<P = any, T extends string | JSXElementConstructor<any> = string | JSXElementConstructor<any>> {
+    // (undocumented)
+    key: Key | null;
+    // (undocumented)
+    props: P;
+    // (undocumented)
+    type: T;
+}
+
+// Warning: (ae-missing-release-tag) "ReactNode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type ReactNode = ReactElement | string | number | boolean | null | undefined;
 
 // @public (undocumented)
 export type ReadonlyComponentSchema<T extends [ComponentDefinition<unknown>, ...ComponentDefinition<unknown>[]]> = {

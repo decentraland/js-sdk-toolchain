@@ -32,7 +32,7 @@ export namespace JSX {
   export type IntrinsicElements = EcsElements
   export interface Component {}
 }
-type JSXElementConstructor<P> = (props: P) => ReactElement<any, any> | null
+export type JSXElementConstructor<P> = (props: P) => ReactElement<any, any> | null
 
 export interface ReactElement<
   P = any,
