@@ -32,11 +32,11 @@ export const INPUT_ACTIONS = [
   },
   {
     value: 1,
-    label: 'Primary'
+    label: 'Primary (E)'
   },
   {
     value: 2,
-    label: 'Secondary'
+    label: 'Secondary (F)'
   },
   {
     value: 3,
