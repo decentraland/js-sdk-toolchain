@@ -2167,6 +2167,7 @@ export interface PBAvatarModifierArea {
     modifiers: AvatarModifierType[];
     // (undocumented)
     movementSettings?: AvatarMovementSettings | undefined;
+    useColliderRange?: boolean | undefined;
 }
 
 // @public (undocumented)
@@ -2232,6 +2233,7 @@ export interface PBCameraModeArea {
     // (undocumented)
     cinematicSettings?: CinematicSettings | undefined;
     mode: CameraType;
+    useColliderRange?: boolean | undefined;
 }
 
 // @public (undocumented)
