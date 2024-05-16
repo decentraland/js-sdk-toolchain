@@ -9,7 +9,6 @@
   display: flex;
   align-items: flex-end;
   font-size: 8px;
-  padding: 0 6px;
 }
 
 .Grid .tile:hover {
@@ -39,8 +38,7 @@
 }
 
 .Grid .tile svg.base {
-  font-size: 15px;
-  margin-bottom: -8px;
-  margin-left: -14px;
+  font-size: 13px;
+  margin: 0 0 -8px -8px;
   z-index: 999;
 }

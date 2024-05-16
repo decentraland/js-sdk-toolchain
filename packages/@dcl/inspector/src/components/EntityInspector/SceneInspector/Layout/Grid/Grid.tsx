@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import { BsPlusLg } from 'react-icons/bs'
 import { IoIosPin } from 'react-icons/io'
 
@@ -5,7 +6,6 @@ import { chunkCoords, getAxisLengths, getLargestAxis } from './utils'
 import { Props } from './types'
 
 import './Grid.css'
-import { useCallback } from 'react'
 
 function Grid({
   coords,
