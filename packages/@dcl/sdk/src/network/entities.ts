@@ -8,8 +8,25 @@ import {
   SyncComponents as _SyncComponents,
   INetowrkParent,
   TransformComponent,
-  ISyncComponents
+  ISyncComponents,
+  VideoEvent,
+  TweenState,
+  AudioEvent,
+  AudioSource,
+  EngineInfo,
+  GltfContainerLoadingState,
+  PointerEventsResult,
+  RaycastResult,
+  RealmInfo,
+  VideoPlayer,
+  UiDropdown,
+  UiDropdownResult,
+  UiInput,
+  UiInputResult,
+  UiText,
+  UiTransform
 } from '@dcl/ecs'
+import { __DEV__ } from '@dcl/ecs/src/runtime/invariant'
 import { IProfile } from './message-bus-sync'
 
 export type SyncEntity = (entityId: Entity, componentIds: number[], entityEnumId?: number) => void
@@ -24,6 +41,7 @@ export function entityUtils(engine: IEngine, profile: IProfile) {
    * Create a network entity (sync) through comms, and sync the received components
    */
   function syncEntity(entityId: Entity, componentIds: number[], entityEnumId?: number) {
+    let componentsIdsMutable = [...componentIds]
     // Profile not initialized
     if (!profile?.networkId) {
       throw new Error('Profile not initialized. Called syncEntity inside the main() function.')
@@ -44,6 +62,33 @@ export function entityUtils(engine: IEngine, profile: IProfile) {
         if (network.networkId === networkValue.networkId && network.entityId === networkValue.entityId) {
           throw new Error('syncEntity failed because the id provided is already in use')
         }
+      }
+    }
+
+    if (__DEV__) {
+      const NOT_SYNC_COMPONENTS = [
+        VideoEvent,
+        VideoPlayer,
+        TweenState,
+        AudioEvent,
+        AudioSource,
+        EngineInfo,
+        GltfContainerLoadingState,
+        PointerEventsResult,
+        RaycastResult,
+        RealmInfo,
+        UiDropdown,
+        UiDropdownResult,
+        UiInput,
+        UiInputResult,
+        UiTransform,
+        UiText
+      ]
+      for (const component of NOT_SYNC_COMPONENTS) {
+        if (__DEV__ && componentsIdsMutable.includes(component.componentId)) {
+          console.log(`⚠️ ${component.componentName} can't be sync through the network!`)
+        }
+        componentsIdsMutable = componentsIdsMutable.filter(($) => $ !== component.componentId)
       }
     }
 
