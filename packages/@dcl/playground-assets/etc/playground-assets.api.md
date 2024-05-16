@@ -77,27 +77,57 @@ export interface AudioStreamComponentDefinitionExtended extends LastWriteWinElem
 // @public (undocumented)
 export const enum AvatarAnchorPointType {
     // (undocumented)
-    AAPT_BACK = 5,
-    // (undocumented)
     AAPT_HEAD = 4,
     // (undocumented)
-    AAPT_HIP = 10,
+    AAPT_HIP = 9,
     // (undocumented)
-    AAPT_LEFT_FOOT = 6,
+    AAPT_LEFT_ARM = 11,
+    // (undocumented)
+    AAPT_LEFT_FOOT = 20,
+    // (undocumented)
+    AAPT_LEFT_FOREARM = 12,
     // (undocumented)
     AAPT_LEFT_HAND = 2,
     // (undocumented)
-    AAPT_LEFT_SHOULDER = 8,
+    AAPT_LEFT_HAND_INDEX = 13,
+    // (undocumented)
+    AAPT_LEFT_LEG = 19,
+    // (undocumented)
+    AAPT_LEFT_SHOULDER = 10,
+    // (undocumented)
+    AAPT_LEFT_TOE_BASE = 21,
+    // (undocumented)
+    AAPT_LEFT_UP_LEG = 18,
     // (undocumented)
     AAPT_NAME_TAG = 1,
     // (undocumented)
+    AAPT_NECK = 5,
+    // (undocumented)
     AAPT_POSITION = 0,
     // (undocumented)
-    AAPT_RIGHT_FOOT = 7,
+    AAPT_RIGHT_ARM = 15,
+    // (undocumented)
+    AAPT_RIGHT_FOOT = 24,
+    // (undocumented)
+    AAPT_RIGHT_FOREARM = 16,
     // (undocumented)
     AAPT_RIGHT_HAND = 3,
     // (undocumented)
-    AAPT_RIGHT_SHOULDER = 9
+    AAPT_RIGHT_HAND_INDEX = 17,
+    // (undocumented)
+    AAPT_RIGHT_LEG = 23,
+    // (undocumented)
+    AAPT_RIGHT_SHOULDER = 14,
+    // (undocumented)
+    AAPT_RIGHT_TOE_BASE = 25,
+    // (undocumented)
+    AAPT_RIGHT_UP_LEG = 22,
+    // (undocumented)
+    AAPT_SPINE = 6,
+    // (undocumented)
+    AAPT_SPINE1 = 7,
+    // (undocumented)
+    AAPT_SPINE2 = 8
 }
 
 // @public (undocumented)
