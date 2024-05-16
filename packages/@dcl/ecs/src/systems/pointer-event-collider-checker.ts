@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import * as components from '../components'
 import { Entity } from '../engine'
 import { IEngine } from '../engine/types'

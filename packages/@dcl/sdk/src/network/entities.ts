@@ -26,7 +26,6 @@ import {
   UiText,
   UiTransform
 } from '@dcl/ecs'
-import { __DEV__ } from '@dcl/ecs/src/runtime/invariant'
 import { IProfile } from './message-bus-sync'
 
 export type SyncEntity = (entityId: Entity, componentIds: number[], entityEnumId?: number) => void
@@ -65,31 +64,29 @@ export function entityUtils(engine: IEngine, profile: IProfile) {
       }
     }
 
-    if (__DEV__) {
-      const NOT_SYNC_COMPONENTS = [
-        VideoEvent,
-        VideoPlayer,
-        TweenState,
-        AudioEvent,
-        AudioSource,
-        EngineInfo,
-        GltfContainerLoadingState,
-        PointerEventsResult,
-        RaycastResult,
-        RealmInfo,
-        UiDropdown,
-        UiDropdownResult,
-        UiInput,
-        UiInputResult,
-        UiTransform,
-        UiText
-      ]
-      for (const component of NOT_SYNC_COMPONENTS) {
-        if (__DEV__ && componentsIdsMutable.includes(component.componentId)) {
-          console.log(`⚠️ ${component.componentName} can't be sync through the network!`)
-        }
-        componentsIdsMutable = componentsIdsMutable.filter(($) => $ !== component.componentId)
+    const NOT_SYNC_COMPONENTS = [
+      VideoEvent,
+      VideoPlayer,
+      TweenState,
+      AudioEvent,
+      AudioSource,
+      EngineInfo,
+      GltfContainerLoadingState,
+      PointerEventsResult,
+      RaycastResult,
+      RealmInfo,
+      UiDropdown,
+      UiDropdownResult,
+      UiInput,
+      UiInputResult,
+      UiTransform,
+      UiText
+    ]
+    for (const component of NOT_SYNC_COMPONENTS) {
+      if (componentsIdsMutable.includes(component.componentId)) {
+        console.log(`⚠️ ${component.componentName} can't be sync through the network!`)
       }
+      componentsIdsMutable = componentsIdsMutable.filter(($) => $ !== component.componentId)
     }
 
     // If is not defined, then is a entity created in runtime (what we called dynamic/runtime entities).
