@@ -4006,6 +4006,7 @@ export interface UiLabelProps {
     outlineColor?: PBColor4 | undefined;
     outlineWidth?: number | undefined;
     textAlign?: TextAlignType | undefined;
+    textWrapping?: boolean | undefined;
     value: string;
 }
 
