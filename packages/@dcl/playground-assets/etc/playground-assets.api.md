@@ -1417,7 +1417,8 @@ export namespace JSX {
     export interface Element extends ReactElement<any, any> {
     }
     // (undocumented)
-    export type IntrinsicElements = EcsElements;
+    export interface IntrinsicElements extends EcsElements {
+    }
 }
 
 // Warning: (ae-missing-release-tag) "JSXElementConstructor" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -3426,8 +3427,12 @@ export namespace ReactEcs {
         export interface Component {
         }
         // (undocumented)
-        export type Element = ReactElement;
-        export type IntrinsicElements = EcsElements;
+        export interface Element extends ReactElement<any, any> {
+        }
+        export interface IntrinsicElements extends EcsElements {
+        }
+        // (undocumented)
+        export type ReactNode = ReactElement | string | number | boolean | null | undefined;
     }
     const // (undocumented)
     createElement: any;
@@ -3955,7 +3960,7 @@ export interface UiButtonProps extends UiLabelProps, EntityPropTypes {
 export const UiCanvasInformation: LastWriteWinElementSetComponentDefinition<PBUiCanvasInformation>;
 
 // @public (undocumented)
-export type UiComponent = () => ReactEcs.JSX.Element;
+export type UiComponent = () => ReactEcs.JSX.ReactNode;
 
 // @public (undocumented)
 export const UiDropdown: LastWriteWinElementSetComponentDefinition<PBUiDropdown>;

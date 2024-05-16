@@ -27,9 +27,8 @@ export type EntityComponents = {
  * @hidden
  */
 export namespace JSX {
-  // eslint-disable-next-line @typescript-eslint/ban-types
   export interface Element extends ReactElement<any, any> {}
-  export type IntrinsicElements = EcsElements
+  export interface IntrinsicElements extends EcsElements {}
   export interface Component {}
 }
 export type JSXElementConstructor<P> = (props: P) => ReactElement<any, any> | null
@@ -52,13 +51,16 @@ export namespace ReactEcs {
     /**
      * @public
      */
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    export type Element = ReactElement
+    export type ReactNode = ReactElement | string | number | boolean | null | undefined
+    /**
+     * @public
+     */
+    export interface Element extends ReactElement<any, any> {}
     /**
      * @public
      * HTML tag elements
      */
-    export type IntrinsicElements = EcsElements
+    export interface IntrinsicElements extends EcsElements {}
     /**
      * @public
      * Component empty interface
