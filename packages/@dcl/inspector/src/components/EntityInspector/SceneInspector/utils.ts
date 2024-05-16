@@ -127,26 +127,6 @@ export function isValidInput(input: SceneInput): boolean {
   return baseList.length === 1 && input.layout.parcels.includes(input.layout.base) && areConnected(parcels)
 }
 
-export function getCoordinatesBetweenPoints(pointA: Coords, pointB: Coords): Coords[] {
-  const coordinates: Coords[] = []
-
-  // ensure pointA is the bottom-left coord
-  if (pointA.x > pointB.x) {
-    ;[pointA.x, pointB.x] = [pointB.x, pointA.x]
-  }
-  if (pointA.y > pointB.y) {
-    ;[pointA.y, pointB.y] = [pointB.y, pointA.y]
-  }
-
-  for (let x = pointA.x; x <= pointB.x; x++) {
-    for (let y = pointA.y; y <= pointB.y; y++) {
-      coordinates.push({ x, y })
-    }
-  }
-
-  return coordinates
-}
-
 export const isImageFile = (value: string): boolean =>
   ACCEPTED_FILE_TYPES['image'].some((extension) => value.endsWith(extension))
 

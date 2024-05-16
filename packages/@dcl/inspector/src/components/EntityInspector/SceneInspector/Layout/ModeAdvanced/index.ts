@@ -1,3 +1,3 @@
-import { Advanced } from './Advanced'
+import { ModeAdvanced } from './ModeAdvanced'
 import { Props } from './types'
-export { Advanced, Props }
+export { ModeAdvanced, Props }

@@ -20,9 +20,9 @@ import {
   hasCoord
 } from './utils'
 import { getAxisLengths } from './Grid/utils'
-import { Advanced } from './ModeAdvanced'
-import { GridError, Mode, Props, TILE_OPTIONS } from './types'
-import { Value as AdvancedValue } from './ModeAdvanced/types'
+import { ModeAdvanced } from './ModeAdvanced'
+import { GridError, MAX_AXIS_PARCELS, Mode, Props, TILE_OPTIONS } from './types'
+import { Value as AdvancedValue, Value } from './ModeAdvanced/types'
 
 import './Layout.css'
 
@@ -51,16 +51,6 @@ function Layout({ value, onChange }: Props) {
     const newMax: Coords = { ...gridMax, [type]: value }
     return setGrid(getCoordinates(gridMin, newMax))
   }
-
-  const handleAdvancedChange = useCallback(
-    (value: AdvancedValue) => {
-      const { min, max } = getLayoutInfoFromString(value.coords)
-      const base = strToCoord(value.base)
-      setGrid(getCoordinates(min, max))
-      if (base) setBase(base)
-    },
-    [grid, base]
-  )
 
   const isTileDisabled = useCallback(
     (coord: Coords) => {
@@ -92,10 +82,22 @@ function Layout({ value, onChange }: Props) {
     [grid, disabled]
   )
 
-  const handleApplyClick = useCallback(() => {
+  const handleAdvancedConfirm = useCallback((value: AdvancedValue) => {
+    const { min, max, length } = getLayoutInfoFromString(value.coords)
+    const clampMax = {
+      x: length.x > MAX_AXIS_PARCELS ? min.x + Math.min(MAX_AXIS_PARCELS, max.x) : max.x,
+      y: length.y > MAX_AXIS_PARCELS ? min.y + Math.min(MAX_AXIS_PARCELS, max.y) : max.y
+    }
+    const parcels = getCoordinates(min, clampMax)
+    const base = strToCoord(value.base) || min
+    setGrid(parcels)
+    setBase(base)
+  }, [grid, base, disabled])
+
+  const applyCurrentState = useCallback(() => {
     const parcels = getEnabledCoords(grid, disabled)
     onChange({ parcels, base })
-  }, [grid, disabled, base])
+  }, [grid, base, disabled])
 
   const handleModeChange = useCallback(
     (mode: Mode) => () => {
@@ -141,18 +143,17 @@ function Layout({ value, onChange }: Props) {
           minTileSize={3}
           visualThreshold={6}
         />
-        <span className="error">{gridError !== null && stringifyGridError(gridError)}</span>
+        <span className="error">{gridError && stringifyGridError(gridError)}</span>
       </div>
 
       {mode === Mode.ADVANCED ? (
-        <Advanced
+        <ModeAdvanced
           value={{
             coords: transformCoordsToString(grid, disabled),
             base: coordToStr(base)
           }}
           disabled={!!gridError}
-          onChange={handleAdvancedChange}
-          onSubmit={handleApplyClick}
+          onSubmit={handleAdvancedConfirm}
           onGoBack={handleModeChange(Mode.GRID)}
         />
       ) : (
@@ -173,7 +174,7 @@ function Layout({ value, onChange }: Props) {
             <Button type="dark" onClick={handleModeChange(Mode.ADVANCED)}>
               Set coordinates (advanced)
             </Button>
-            <Button type="blue" size="big" onClick={handleApplyClick} disabled={!!gridError}>
+            <Button type="blue" size="big" onClick={applyCurrentState} disabled={!!gridError}>
               Apply layout
             </Button>
           </Block>

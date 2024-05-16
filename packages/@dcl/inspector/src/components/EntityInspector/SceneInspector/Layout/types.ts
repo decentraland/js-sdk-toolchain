@@ -11,7 +11,7 @@ export enum Mode {
 }
 
 export enum GridError {
-  NOT_CONNECTED,
+  NOT_CONNECTED = 1, // start from 1 so we can use GridError as boolean type
   NUMBER_OF_PARCELS,
   MISSING_BASE_PARCEL
 }

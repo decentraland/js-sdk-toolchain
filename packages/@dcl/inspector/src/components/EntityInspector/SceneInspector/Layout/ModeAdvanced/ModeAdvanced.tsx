@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { Button } from '../../../../Button'
 import { Block } from '../../../../Block'
@@ -6,31 +6,34 @@ import { TextField } from '../../../../ui'
 
 import { Props } from './types'
 
-export function Advanced({ value, disabled, onChange, onSubmit, onGoBack }: Props) {
+export function ModeAdvanced({ value, onSubmit, onGoBack }: Props) {
   const [coords, setCoords] = useState(value.coords)
   const [base, setBase] = useState(value.base)
 
+  useEffect(() => {
+    setCoords(value.coords)
+    setBase(value.base)
+  }, [value])
+
   const handleCoordsChange: React.ChangeEventHandler<HTMLInputElement> = useCallback(
     (e) => {
-      const newValue = e.target.value
-      setCoords(newValue)
-      onChange({ coords: newValue, base })
+      setCoords(e.target.value.trim())
     },
     [coords, value]
   )
 
   const handleBaseParcelChange: React.ChangeEventHandler<HTMLInputElement> = useCallback(
     (e) => {
-      const newValue = e.target.value
-      setBase(newValue)
-      onChange({ coords, base: newValue })
+      setBase(e.target.value.trim())
     },
     [base, value]
   )
 
   const handleSubmit = useCallback(() => {
     onSubmit({ coords, base })
-  }, [coords, base])
+  }, [value, coords, base])
+
+  const disabled = !coords.length || !base.length
 
   return (
     <Block className="advanced">

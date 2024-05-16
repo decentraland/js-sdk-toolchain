@@ -5,29 +5,49 @@ import { parseParcels } from '../utils'
 type ParcelInfo = {
   min: Coords
   max: Coords
+  length: {
+    x: number
+    y: number
+  }
   parcels: Coords[]
 }
 
+const DEFAULT_INFO: ParcelInfo = {
+  min: { x: 0, y: 0 },
+  max: { x: 0, y: 0 },
+  length: { x: 0, y: 0 },
+  parcels: []
+}
+
 export function getLayoutInfo(parcels: Coords[]): ParcelInfo {
-  const base: { min: Coords; max: Coords } = {
+  if (!parcels.length) return DEFAULT_INFO
+  const info: { min: Coords; max: Coords } = {
     min: { x: Infinity, y: Infinity },
     max: { x: -Infinity, y: -Infinity }
   }
   parcels.forEach((parcel) => {
     const { x, y } = parcel
 
-    if (base.min.y >= y) {
-      base.min = { x: Math.min(base.min.x, x), y }
+    if (info.min.y >= y) {
+      info.min = { x: Math.min(info.min.x, x), y }
     }
 
-    if (y >= base.max.y) {
-      base.max = { x: Math.max(base.max.x, x), y }
+    if (y >= info.max.y) {
+      info.max = { x: Math.max(info.max.x, x), y }
     }
 
     return { x, y }
   })
 
-  return { min: base.min, max: base.max, parcels }
+  return {
+    min: info.min,
+    max: info.max,
+    length: {
+      x: Math.abs(info.max.x) - Math.abs(info.min.x),
+      y: Math.abs(info.max.y) - Math.abs(info.min.y)
+    },
+    parcels
+  }
 }
 
 /* Parcels string format rules:
@@ -36,11 +56,7 @@ export function getLayoutInfo(parcels: Coords[]): ParcelInfo {
  ** EX: "0,0 0,1 1,0 1,1"
  */
 export function getLayoutInfoFromString(parcels: string): ParcelInfo {
-  const _parcels = parcels.split(' ').map((parcel) => {
-    const [x, y] = parcel.split(',').map(($) => parseInt($))
-    return { x, y }
-  })
-  return getLayoutInfo(_parcels)
+  return getLayoutInfo(parseParcels(parcels))
 }
 
 export function getCoordinatesBetweenPoints(pointA: Coords, pointB: Coords): Coords[] {
@@ -89,15 +105,15 @@ export function getCoordinates(min: Coords, max: Coords): Coords[] {
 }
 
 /*
- ** Gets the closest value from "TILE_OPTIONS" (rounding up in case it doesn't exist)
+ ** Gets the closest value to parcels options (rounding up in case it doesn't exist)
  */
 export function getOption(value: number): number {
-  const idx = clamp(value, 0, TILE_OPTIONS.length) - 1 // zero-based
+  const idx = clampParcels(value) - 1 // zero-based
   return TILE_OPTIONS[idx]?.value ?? 0
 }
 
-export function clamp(value: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, value))
+export function clampParcels(value: number): number {
+  return Math.max(0, Math.min(TILE_OPTIONS.length, value))
 }
 
 /*
@@ -163,7 +179,7 @@ export function transformCoordsToString(coords: Coords[], disabledCoords: Set<st
 export function stringifyGridError(error: GridError): string {
   switch (error) {
     case GridError.NUMBER_OF_PARCELS:
-      return 'Number of parcels must be between 0 and 32'
+      return 'Number of parcels must be between 1 and 32'
     case GridError.NOT_CONNECTED:
       return 'Parcels have to be connected vertically or horizontally'
     case GridError.MISSING_BASE_PARCEL:
