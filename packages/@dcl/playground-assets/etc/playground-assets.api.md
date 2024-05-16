@@ -77,13 +77,27 @@ export interface AudioStreamComponentDefinitionExtended extends LastWriteWinElem
 // @public (undocumented)
 export const enum AvatarAnchorPointType {
     // (undocumented)
+    AAPT_BACK = 5,
+    // (undocumented)
+    AAPT_HEAD = 4,
+    // (undocumented)
+    AAPT_HIP = 10,
+    // (undocumented)
+    AAPT_LEFT_FOOT = 6,
+    // (undocumented)
     AAPT_LEFT_HAND = 2,
+    // (undocumented)
+    AAPT_LEFT_SHOULDER = 8,
     // (undocumented)
     AAPT_NAME_TAG = 1,
     // (undocumented)
     AAPT_POSITION = 0,
     // (undocumented)
-    AAPT_RIGHT_HAND = 3
+    AAPT_RIGHT_FOOT = 7,
+    // (undocumented)
+    AAPT_RIGHT_HAND = 3,
+    // (undocumented)
+    AAPT_RIGHT_SHOULDER = 9
 }
 
 // @public (undocumented)
@@ -2901,6 +2915,7 @@ export interface PBUiText {
     outlineColor?: PBColor4 | undefined;
     outlineWidth?: number | undefined;
     textAlign?: TextAlignMode | undefined;
+    textWrapping?: boolean | undefined;
     value: string;
 }
 
