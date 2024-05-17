@@ -31,8 +31,14 @@ export namespace JSX {
   export interface IntrinsicElements extends EcsElements {}
   export interface Component {}
 }
+/**
+ * @public
+ */
 export type JSXElementConstructor<P> = (props: P) => ReactElement<any, any> | null
 
+/**
+ * @public
+ */
 export interface ReactElement<
   P = any,
   T extends string | JSXElementConstructor<any> = string | JSXElementConstructor<any>
@@ -42,6 +48,9 @@ export interface ReactElement<
   key: Key | null
 }
 
+/**
+ * @public
+ */
 export type ReactNode = ReactElement | string | number | boolean | null | undefined
 /**
  * @public
