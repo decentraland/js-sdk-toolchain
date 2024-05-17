@@ -65,3 +65,8 @@
 .SceneLayout .Block.limitations span {
   margin: 0 3px 0 0;
 }
+
+.SceneLayout .Block.limitations a {
+  display: flex;
+  color: #FFFFFF;
+}

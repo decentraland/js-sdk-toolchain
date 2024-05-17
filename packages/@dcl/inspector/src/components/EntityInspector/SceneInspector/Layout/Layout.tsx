@@ -1,7 +1,8 @@
 import { areConnected } from '@dcl/ecs'
 import { useCallback, useState } from 'react'
+import { AiOutlineInfoCircle as InfoIcon } from 'react-icons/ai'
 
-import { Dropdown, InfoTooltip } from '../../../ui'
+import { Dropdown } from '../../../ui'
 import { Block } from '../../../Block'
 import { Button } from '../../../Button'
 import { Grid, Props as GridProps } from './Grid'
@@ -22,7 +23,7 @@ import {
 import { getAxisLengths } from './Grid/utils'
 import { ModeAdvanced } from './ModeAdvanced'
 import { GridError, MAX_AXIS_PARCELS, Mode, Props, TILE_OPTIONS } from './types'
-import { Value as AdvancedValue, Value } from './ModeAdvanced/types'
+import { Value as ModeAdvancedValue } from './ModeAdvanced/types'
 
 import './Layout.css'
 
@@ -39,7 +40,8 @@ function Layout({ value, onChange }: Props) {
 
   const [gridMin, gridMax] = getMinMaxFromOrderedCoords(grid)
   const axisLengths = getAxisLengths(grid)
-  const numberOfCoords = grid.length - disabled.size
+  const enabledCoords = getEnabledCoords(grid, disabled)
+  const numberOfCoords = enabledCoords.length
 
   const handleGridChange = (type: keyof Coords) => (e: React.ChangeEvent<HTMLSelectElement>) => {
     // this should also work for negative parcels...
@@ -82,21 +84,23 @@ function Layout({ value, onChange }: Props) {
     [grid, disabled]
   )
 
-  const handleAdvancedConfirm = useCallback((value: AdvancedValue) => {
-    const { min, max, length } = getLayoutInfoFromString(value.coords)
-    const clampMax = {
-      x: length.x > MAX_AXIS_PARCELS ? min.x + Math.min(MAX_AXIS_PARCELS, max.x) : max.x,
-      y: length.y > MAX_AXIS_PARCELS ? min.y + Math.min(MAX_AXIS_PARCELS, max.y) : max.y
-    }
-    const parcels = getCoordinates(min, clampMax)
-    const base = strToCoord(value.base) || min
-    setGrid(parcels)
-    setBase(base)
-  }, [grid, base, disabled])
+  const handleAdvancedConfirm = useCallback(
+    (value: ModeAdvancedValue) => {
+      const { min, max, length } = getLayoutInfoFromString(value.coords)
+      const clampMax = {
+        x: length.x > MAX_AXIS_PARCELS ? min.x + Math.min(MAX_AXIS_PARCELS, max.x) : max.x,
+        y: length.y > MAX_AXIS_PARCELS ? min.y + Math.min(MAX_AXIS_PARCELS, max.y) : max.y
+      }
+      const parcels = getCoordinates(min, clampMax)
+      const base = strToCoord(value.base) || min
+      setGrid(parcels)
+      setBase(base)
+    },
+    [grid, base, disabled]
+  )
 
   const applyCurrentState = useCallback(() => {
-    const parcels = getEnabledCoords(grid, disabled)
-    onChange({ parcels, base })
+    onChange({ parcels: enabledCoords, base })
   }, [grid, base, disabled])
 
   const handleModeChange = useCallback(
@@ -108,20 +112,18 @@ function Layout({ value, onChange }: Props) {
 
   const getGridError = useCallback((): GridError | null => {
     if (numberOfCoords <= 0) return GridError.NUMBER_OF_PARCELS
-
-    const coords = getEnabledCoords(grid, disabled)
-    if (!areConnected(coords)) return GridError.NOT_CONNECTED
-    if (!hasCoord(coords, base)) return GridError.MISSING_BASE_PARCEL
+    if (!areConnected(enabledCoords)) return GridError.NOT_CONNECTED
+    if (!hasCoord(enabledCoords, base)) return GridError.MISSING_BASE_PARCEL
     return null
   }, [grid, base, disabled])
 
   const getTitle = useCallback(() => {
     if (mode === Mode.ADVANCED) return 'Set Coordinates'
-    return `${numberOfCoords} parcels`
+    return `${numberOfCoords} Parcel${numberOfCoords === 1 ? '' : 's'}`
   }, [grid, mode, disabled])
 
   const getInstruction = useCallback(() => {
-    if (mode === Mode.ADVANCED) return 'Type in the layout coordinates that you want to deploy'
+    if (mode === Mode.ADVANCED) return 'Type in the layout coordinates you want to deploy'
     return 'Click individual tiles to exclude/include them from the layout'
   }, [mode])
 
@@ -158,7 +160,7 @@ function Layout({ value, onChange }: Props) {
         />
       ) : (
         <>
-          <Block label="Max. Grid Size" className="grid">
+          <Block label="Grid Size" className="grid">
             <Dropdown
               label="Rows"
               value={getOption(axisLengths.y)}
@@ -172,19 +174,17 @@ function Layout({ value, onChange }: Props) {
               onChange={handleGridChange('x')}
             />
             <Button type="dark" onClick={handleModeChange(Mode.ADVANCED)}>
-              Set coordinates (advanced)
+              Set Coordinates (Advanced)
             </Button>
             <Button type="blue" size="big" onClick={applyCurrentState} disabled={!!gridError}>
-              Apply layout
+              Apply Layout
             </Button>
           </Block>
           <Block className="limitations">
-            <span>About scene limitations</span>
-            <InfoTooltip
-              text=""
-              link="https://docs.decentraland.org/creator/development-guide/sdk7/scene-limitations/"
-              type="help"
-            />
+            <span>About Scene Limitations</span>
+            <a href="https://docs.decentraland.org/creator/development-guide/sdk7/scene-limitations/" target="_blank">
+              <InfoIcon size={16} />
+            </a>
           </Block>
         </>
       )}

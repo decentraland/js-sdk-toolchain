@@ -21,6 +21,7 @@ describe('getLayoutInfo', () => {
     const expected = {
       min: { x: 0, y: 0 },
       max: { x: 1, y: 1 },
+      length: { x: 1, y: 1 },
       parcels: parcels
     }
     expect(getLayoutInfo(parcels)).toEqual(expected)
@@ -33,6 +34,7 @@ describe('getLayoutInfoFromString', () => {
     const expected = {
       min: { x: 0, y: 0 },
       max: { x: 1, y: 1 },
+      length: { x: 1, y: 1 },
       parcels: [
         { x: 0, y: 0 },
         { x: 0, y: 1 },

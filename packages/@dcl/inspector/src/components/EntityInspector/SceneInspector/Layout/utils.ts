@@ -179,11 +179,11 @@ export function transformCoordsToString(coords: Coords[], disabledCoords: Set<st
 export function stringifyGridError(error: GridError): string {
   switch (error) {
     case GridError.NUMBER_OF_PARCELS:
-      return 'Number of parcels must be between 1 and 32'
+      return 'At least 1 parcel must be included'
     case GridError.NOT_CONNECTED:
-      return 'Parcels have to be connected vertically or horizontally'
+      return 'Your layout cannot include isolated parcels. Parcels must be connected horizontally or vertically.'
     case GridError.MISSING_BASE_PARCEL:
-      return 'Base parcel should be also included in parcels list'
+      return 'Base parcel should be included in parcels list'
     default:
       return ''
   }

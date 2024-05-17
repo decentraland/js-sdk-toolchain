@@ -1,7 +1,7 @@
 import { EditorComponentsTypes, SceneAgeRating, SceneCategory } from '../../../lib/sdk/components'
-import { Coords, Layout } from '../../../lib/utils/layout'
+import { Layout } from '../../../lib/utils/layout'
 import { SceneInput } from './types'
-import { fromScene, getCoordinatesBetweenPoints, isValidInput, parseParcels, toScene } from './utils'
+import { fromScene, isValidInput, parseParcels, toScene } from './utils'
 
 function getInput(base: string, parcels: string): SceneInput {
   const input: SceneInput = {
@@ -120,46 +120,6 @@ describe('SceneInspector/utils', () => {
 
       expect(isValidValidInput).toBe(true)
       expect(isValidInvalidInput).toBe(false)
-    })
-  })
-
-  describe('getCoordinatesBetweenPoints', () => {
-    it('should return an array of coordinates between two points', () => {
-      const pointA: Coords = { x: 0, y: 0 }
-      const pointB: Coords = { x: 2, y: 2 }
-
-      const result = getCoordinatesBetweenPoints(pointA, pointB)
-
-      expect(result).toEqual([
-        { x: 0, y: 0 },
-        { x: 0, y: 1 },
-        { x: 0, y: 2 },
-        { x: 1, y: 0 },
-        { x: 1, y: 1 },
-        { x: 1, y: 2 },
-        { x: 2, y: 0 },
-        { x: 2, y: 1 },
-        { x: 2, y: 2 }
-      ])
-    })
-
-    it('should return an array with a single coordinate when both points are the same', () => {
-      const pointA: Coords = { x: 3, y: 3 }
-      const pointB: Coords = { x: 3, y: 3 }
-
-      const result = getCoordinatesBetweenPoints(pointA, pointB)
-
-      expect(result).toEqual([{ x: 3, y: 3 }])
-    })
-
-    it('should return the bottom-left/top-right parcel as the first & second coords', () => {
-      const pointA: Coords = { x: 9, y: 7 }
-      const pointB: Coords = { x: 5, y: 3 }
-
-      const result = getCoordinatesBetweenPoints(pointA, pointB)
-
-      expect(result[0]).toEqual({ x: 5, y: 3 })
-      expect(result[result.length - 1]).toEqual({ x: 9, y: 7 })
     })
   })
 })

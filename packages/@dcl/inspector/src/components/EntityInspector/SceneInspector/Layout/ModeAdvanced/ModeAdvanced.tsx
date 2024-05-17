@@ -37,8 +37,8 @@ export function ModeAdvanced({ value, onSubmit, onGoBack }: Props) {
 
   return (
     <Block className="advanced">
-      <TextField label="Custom coordinates" value={coords} onChange={handleCoordsChange} />
-      <TextField label="Base parcel" value={base} onChange={handleBaseParcelChange} />
+      <TextField label="Custom Coordinates" value={coords} onChange={handleCoordsChange} />
+      <TextField label="Origin Point" value={base} onChange={handleBaseParcelChange} />
       <Block>
         <Button type="dark" onClick={onGoBack}>
           Back
