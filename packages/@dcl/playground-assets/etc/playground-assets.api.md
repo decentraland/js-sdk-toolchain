@@ -1465,8 +1465,6 @@ export namespace JSX {
     }
 }
 
-// Warning: (ae-missing-release-tag) "JSXElementConstructor" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type JSXElementConstructor<P> = (props: P) => ReactElement<any, any> | null;
 
@@ -3489,8 +3487,6 @@ export namespace ReactEcs {
 // @public
 export const ReactEcsRenderer: ReactBasedUiSystem;
 
-// Warning: (ae-missing-release-tag) "ReactElement" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export interface ReactElement<P = any, T extends string | JSXElementConstructor<any> = string | JSXElementConstructor<any>> {
     // (undocumented)
@@ -3501,8 +3497,6 @@ export interface ReactElement<P = any, T extends string | JSXElementConstructor<
     type: T;
 }
 
-// Warning: (ae-missing-release-tag) "ReactNode" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type ReactNode = ReactElement | string | number | boolean | null | undefined;
 
