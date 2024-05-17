@@ -85,13 +85,13 @@ export function entityUtils(engine: IEngine, profile: IProfile) {
     for (const component of NOT_SYNC_COMPONENTS) {
       if (componentsIdsMutable.includes(component.componentId)) {
         console.log(`⚠️ ${component.componentName} can't be sync through the network!`)
+        componentsIdsMutable = componentsIdsMutable.filter(($) => $ !== component.componentId)
       }
-      componentsIdsMutable = componentsIdsMutable.filter(($) => $ !== component.componentId)
     }
 
     // If is not defined, then is a entity created in runtime (what we called dynamic/runtime entities).
     NetworkEntity.createOrReplace(entityId, networkValue)
-    SyncComponents.createOrReplace(entityId, { componentIds })
+    SyncComponents.createOrReplace(entityId, { componentIds: componentsIdsMutable })
   }
 
   /**
