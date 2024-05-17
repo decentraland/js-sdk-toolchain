@@ -353,7 +353,7 @@ const Renderer: React.FC = () => {
       {isLoading && <Loading />}
       <Warnings />
       <CameraSpeed />
-      <Metrics />
+      {!hiddenPanels[PanelName.METRICS] && <Metrics />}
       {!hiddenPanels[PanelName.SHORTCUTS] && (
         <Shortcuts canvas={canvasRef} onResetCamera={resetCamera} onZoomIn={zoomIn} onZoomOut={zoomOut} />
       )}

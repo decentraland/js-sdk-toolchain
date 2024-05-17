@@ -6,6 +6,7 @@ import {
   selectSceneInspectorTab,
   toggleComponent,
   toggleGizmos,
+  toggleGroundGrid,
   togglePanel,
   toggleSceneInspectorTab
 } from '../../../redux/ui'
@@ -68,6 +69,13 @@ describe('UiRPC', () => {
       expect(store.dispatch).toHaveBeenCalledWith(
         toggleSceneInspectorTab({ tab: SceneInspectorTab.DETAILS, enabled: false })
       )
+    })
+  })
+
+  describe('When using the toggleGroundGrid method of the client', () => {
+    it('should send a ui/toggleGroundGrid action in the server', async () => {
+      await expect(client.toggleGroundGrid(false)).resolves.not.toThrow()
+      expect(store.dispatch).toHaveBeenCalledWith(toggleGroundGrid({ enabled: false }))
     })
   })
 })
