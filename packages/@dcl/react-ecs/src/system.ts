@@ -6,7 +6,7 @@ import { createReconciler } from './reconciler'
 /**
  * @public
  */
-export type UiComponent = () => ReactEcs.JSX.Element
+export type UiComponent = () => ReactEcs.JSX.ReactNode
 
 /**
  * @public

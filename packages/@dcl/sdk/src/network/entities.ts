@@ -8,7 +8,23 @@ import {
   SyncComponents as _SyncComponents,
   INetowrkParent,
   TransformComponent,
-  ISyncComponents
+  ISyncComponents,
+  VideoEvent,
+  TweenState,
+  AudioEvent,
+  AudioSource,
+  EngineInfo,
+  GltfContainerLoadingState,
+  PointerEventsResult,
+  RaycastResult,
+  RealmInfo,
+  VideoPlayer,
+  UiDropdown,
+  UiDropdownResult,
+  UiInput,
+  UiInputResult,
+  UiText,
+  UiTransform
 } from '@dcl/ecs'
 import { IProfile } from './message-bus-sync'
 
@@ -24,6 +40,7 @@ export function entityUtils(engine: IEngine, profile: IProfile) {
    * Create a network entity (sync) through comms, and sync the received components
    */
   function syncEntity(entityId: Entity, componentIds: number[], entityEnumId?: number) {
+    let componentsIdsMutable = [...componentIds]
     // Profile not initialized
     if (!profile?.networkId) {
       throw new Error('Profile not initialized. Called syncEntity inside the main() function.')
@@ -47,9 +64,34 @@ export function entityUtils(engine: IEngine, profile: IProfile) {
       }
     }
 
+    const NOT_SYNC_COMPONENTS = [
+      VideoEvent,
+      VideoPlayer,
+      TweenState,
+      AudioEvent,
+      AudioSource,
+      EngineInfo,
+      GltfContainerLoadingState,
+      PointerEventsResult,
+      RaycastResult,
+      RealmInfo,
+      UiDropdown,
+      UiDropdownResult,
+      UiInput,
+      UiInputResult,
+      UiTransform,
+      UiText
+    ]
+    for (const component of NOT_SYNC_COMPONENTS) {
+      if (componentsIdsMutable.includes(component.componentId)) {
+        console.log(`⚠️ ${component.componentName} can't be sync through the network!`)
+        componentsIdsMutable = componentsIdsMutable.filter(($) => $ !== component.componentId)
+      }
+    }
+
     // If is not defined, then is a entity created in runtime (what we called dynamic/runtime entities).
     NetworkEntity.createOrReplace(entityId, networkValue)
-    SyncComponents.createOrReplace(entityId, { componentIds })
+    SyncComponents.createOrReplace(entityId, { componentIds: componentsIdsMutable })
   }
 
   /**
