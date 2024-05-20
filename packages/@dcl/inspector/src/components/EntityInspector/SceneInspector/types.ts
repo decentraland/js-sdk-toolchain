@@ -32,6 +32,7 @@ export type SceneInput = {
   disablePortableExperiences: boolean
   spawnPoints: SpawnPointInput[]
   layout: {
+    base: string
     parcels: string
   }
 }

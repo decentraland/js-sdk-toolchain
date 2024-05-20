@@ -1,0 +1,72 @@
+.SceneLayout .display {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.SceneLayout .display h2 {
+  margin-bottom: 10px;
+}
+
+.SceneLayout .display .error {
+  color: var(--primary-main);
+  margin: 3px 0;
+  font-size: 12px;
+}
+
+.SceneLayout .display span,
+.SceneLayout .Block .limitations span {
+  text-align: center;
+  color: var(--base-10);
+  margin-bottom: 10px;
+}
+
+.SceneLayout .Grid {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0 10px 0 10px;
+}
+
+.SceneLayout .Block {
+  display: flex;
+  width: 100%;
+}
+
+.SceneLayout .Block button {
+  width: 100%;
+}
+
+.SceneLayout .Block.advanced > .content {
+  flex-direction: column;
+}
+
+.SceneLayout .Block.advanced .Text {
+  width: 100%;
+}
+
+.SceneLayout .Block.advanced .Block {
+  margin-top: 10px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+.SceneLayout .Block.advanced .Block .content {
+  column-gap: 50%;
+}
+
+.SceneLayout .Block.limitations {
+  justify-items: center;
+  align-items: center;
+}
+
+.SceneLayout .Block.limitations span {
+  margin: 0 3px 0 0;
+}
+
+.SceneLayout .Block.limitations a {
+  display: flex;
+  color: #FFFFFF;
+}
