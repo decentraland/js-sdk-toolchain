@@ -24,9 +24,16 @@
 
 .Gizmos .gizmo.scale {
   margin-left: 1px;
+  margin-right: 0;
+  border-radius: 0;
+  background-image: url(./icons/scale.svg);
+}
+
+.Gizmos .gizmo.free {
+  margin-left: 1px;
   border-top-left-radius: 0px;
   border-bottom-left-radius: 0px;
-  background-image: url(./icons/scale.svg);
+  background-image: url(./icons/free.svg);
 }
 
 .Gizmos .open-panel {

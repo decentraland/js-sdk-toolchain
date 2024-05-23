@@ -41,13 +41,15 @@ export const Gizmos = withSdk(({ sdk }) => {
     [selection, setSelection]
   )
 
-  useHotkey(['M'], handlePositionGizmo)
-  useHotkey(['R'], handleRotationGizmo)
-  useHotkey(['X'], handleScaleGizmo)
+  const handleFreeGizmo = useCallback(
+    () => setSelection({ gizmo: GizmoType.FREE }),
+    [selection, setSelection]
+  )
 
   useHotkey(['M'], handlePositionGizmo)
   useHotkey(['R'], handleRotationGizmo)
   useHotkey(['X'], handleScaleGizmo)
+  useHotkey(['F'], handleFreeGizmo)
 
   const {
     isPositionGizmoWorldAligned,
@@ -88,6 +90,12 @@ export const Gizmos = withSdk(({ sdk }) => {
         disabled={disableGizmos}
         onClick={handleScaleGizmo}
         title="Scaling tool"
+      />
+      <ToolbarButton
+        className={cx('gizmo free', { active: selection?.gizmo === GizmoType.FREE })}
+        disabled={disableGizmos}
+        onClick={handleFreeGizmo}
+        title="Free movement tool"
       />
       <BsCaretDown className="open-panel" onClick={handleTogglePanel} />
       <div className={cx('panel', { visible: showPanel })}>
