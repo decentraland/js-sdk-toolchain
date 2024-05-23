@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useCallback, useEffect, useState } from 'react'
 import { useDrop } from 'react-dnd'
 import cx from 'classnames'
@@ -79,8 +80,11 @@ const Renderer: React.FC = () => {
         const sceneEntity = sdk.sceneContext.getEntityOrNull(entity)
         if (!sceneEntity) continue
 
-        if (!fileSet.has(value.src)) removeGltf(sceneEntity)
-        else void loadGltf(sceneEntity, value.src)
+        let shoudReload = true
+        if (!fileSet.has(value.src)) {
+          removeGltf(sceneEntity)
+          shoudReload = false
+        } else void loadGltf(sceneEntity, value.src, shoudReload)
       }
     }
   }, [files])

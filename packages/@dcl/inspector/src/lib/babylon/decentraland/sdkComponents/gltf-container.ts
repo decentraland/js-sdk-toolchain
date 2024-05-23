@@ -68,9 +68,13 @@ export const updateGltfForEntity = (entity: EcsEntity, newValue: PBGltfContainer
   if (shouldLoadGltf) void loadGltf(entity, newValue.src)
 }
 
-export async function loadGltf(entity: EcsEntity, value: string) {
+export async function loadGltf(entity: EcsEntity, value: string, reload?: boolean) {
   const context = entity.context.deref()
-  if (!context || !!entity.gltfContainer) return
+  if (!context || (!!entity.gltfContainer && !reload)) return
+
+  if (entity.gltfContainer && reload) {
+    removeGltf(entity)
+  }
 
   // store a WeakRef to the sceneContext to enable file resolver
   if (!sceneContext) {
