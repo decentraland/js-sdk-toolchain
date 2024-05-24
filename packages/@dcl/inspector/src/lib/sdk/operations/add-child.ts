@@ -21,7 +21,7 @@ export function addChild(engine: IEngine) {
 }
 
 export function generateUniqueName(engine: IEngine, Name: NameComponent, value: string): string {
-  const pattern = new RegExp(`^${value.toLowerCase()}(?:_\\d+)*$`, 'i')
+  const pattern = new RegExp(`^${value.toLowerCase()}(_\\d+)?$`, 'i')
   const nodes = getNodes(engine)
 
   let isFirst = true
@@ -42,7 +42,7 @@ export function generateUniqueName(engine: IEngine, Name: NameComponent, value: 
   return `${value}${suffix}`
 }
 
-function getSuffixDigits(name: string): number {
+export function getSuffixDigits(name: string): number {
   const underscoreIndex = name.lastIndexOf('_')
   if (underscoreIndex === -1 || underscoreIndex === name.length - 1) return -1
 

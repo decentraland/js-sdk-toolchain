@@ -41,10 +41,7 @@ export const Gizmos = withSdk(({ sdk }) => {
     [selection, setSelection]
   )
 
-  const handleFreeGizmo = useCallback(
-    () => setSelection({ gizmo: GizmoType.FREE }),
-    [selection, setSelection]
-  )
+  const handleFreeGizmo = useCallback(() => setSelection({ gizmo: GizmoType.FREE }), [selection, setSelection])
 
   useHotkey(['M'], handlePositionGizmo)
   useHotkey(['R'], handleRotationGizmo)
