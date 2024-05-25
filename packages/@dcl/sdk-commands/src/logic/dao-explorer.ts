@@ -121,7 +121,7 @@ export function runDaoExplorer(
   const daoExplorerFolderPath = getDaoExplorerPath(workingDirectory)
   const executablePath = getDaoExplorerExecutablePath(workingDirectory)
   executablePath
-  const ts = child_process.spawn(executablePath, ['--server', realmUrl, '--location', locationCoords], {
+  const ts = child_process.spawn(executablePath, ['--preview', '--server', realmUrl, '--location', locationCoords], {
     env: process.env,
     cwd: daoExplorerFolderPath
   })
