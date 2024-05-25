@@ -77,13 +77,57 @@ export interface AudioStreamComponentDefinitionExtended extends LastWriteWinElem
 // @public (undocumented)
 export const enum AvatarAnchorPointType {
     // (undocumented)
+    AAPT_HEAD = 4,
+    // (undocumented)
+    AAPT_HIP = 9,
+    // (undocumented)
+    AAPT_LEFT_ARM = 11,
+    // (undocumented)
+    AAPT_LEFT_FOOT = 20,
+    // (undocumented)
+    AAPT_LEFT_FOREARM = 12,
+    // (undocumented)
     AAPT_LEFT_HAND = 2,
+    // (undocumented)
+    AAPT_LEFT_HAND_INDEX = 13,
+    // (undocumented)
+    AAPT_LEFT_LEG = 19,
+    // (undocumented)
+    AAPT_LEFT_SHOULDER = 10,
+    // (undocumented)
+    AAPT_LEFT_TOE_BASE = 21,
+    // (undocumented)
+    AAPT_LEFT_UP_LEG = 18,
     // (undocumented)
     AAPT_NAME_TAG = 1,
     // (undocumented)
+    AAPT_NECK = 5,
+    // (undocumented)
     AAPT_POSITION = 0,
     // (undocumented)
-    AAPT_RIGHT_HAND = 3
+    AAPT_RIGHT_ARM = 15,
+    // (undocumented)
+    AAPT_RIGHT_FOOT = 24,
+    // (undocumented)
+    AAPT_RIGHT_FOREARM = 16,
+    // (undocumented)
+    AAPT_RIGHT_HAND = 3,
+    // (undocumented)
+    AAPT_RIGHT_HAND_INDEX = 17,
+    // (undocumented)
+    AAPT_RIGHT_LEG = 23,
+    // (undocumented)
+    AAPT_RIGHT_SHOULDER = 14,
+    // (undocumented)
+    AAPT_RIGHT_TOE_BASE = 25,
+    // (undocumented)
+    AAPT_RIGHT_UP_LEG = 22,
+    // (undocumented)
+    AAPT_SPINE = 6,
+    // (undocumented)
+    AAPT_SPINE1 = 7,
+    // (undocumented)
+    AAPT_SPINE2 = 8
 }
 
 // @public (undocumented)
@@ -91,6 +135,13 @@ export const AvatarAttach: LastWriteWinElementSetComponentDefinition<PBAvatarAtt
 
 // @public (undocumented)
 export const AvatarBase: LastWriteWinElementSetComponentDefinition<PBAvatarBase>;
+
+// @public (undocumented)
+export const enum AvatarControlType {
+    CCT_NONE = 0,
+    CCT_RELATIVE = 1,
+    CCT_TANK = 2
+}
 
 // @public (undocumented)
 export const AvatarEmoteCommand: GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>;
@@ -105,6 +156,28 @@ export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAva
 export const enum AvatarModifierType {
     AMT_DISABLE_PASSPORTS = 1,
     AMT_HIDE_AVATARS = 0
+}
+
+// @public (undocumented)
+export interface AvatarMovementSettings {
+    allowWeightedMovement?: boolean | undefined;
+    // (undocumented)
+    controlMode?: AvatarControlType | undefined;
+    friction?: number | undefined;
+    gravity?: number | undefined;
+    jumpHeight?: number | undefined;
+    maxFallSpeed?: number | undefined;
+    runSpeed?: number | undefined;
+    turnSpeed?: number | undefined;
+    walkSpeed?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace AvatarMovementSettings {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): AvatarMovementSettings;
+    // (undocumented)
+    export function encode(message: AvatarMovementSettings, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -322,6 +395,29 @@ export const enum CameraType {
 //
 // @public (undocumented)
 export type Children = unknown;
+
+// @public (undocumented)
+export interface CinematicSettings {
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    allowManualRotation?: boolean | undefined;
+    cameraEntity: number;
+    pitchRange?: number | undefined;
+    rollRange?: number | undefined;
+    yawRange?: number | undefined;
+    zoomMax?: number | undefined;
+    zoomMin?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace CinematicSettings {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): CinematicSettings;
+    // (undocumented)
+    export function encode(message: CinematicSettings, writer?: _m0.Writer): _m0.Writer;
+}
 
 // @public (undocumented)
 export const enum ColliderLayer {
@@ -2099,6 +2195,9 @@ export interface PBAvatarModifierArea {
     area: PBVector3 | undefined;
     excludeIds: string[];
     modifiers: AvatarModifierType[];
+    // (undocumented)
+    movementSettings?: AvatarMovementSettings | undefined;
+    useColliderRange?: boolean | undefined;
 }
 
 // @public (undocumented)
@@ -2161,7 +2260,10 @@ export namespace PBCameraMode {
 // @public (undocumented)
 export interface PBCameraModeArea {
     area: PBVector3 | undefined;
+    // (undocumented)
+    cinematicSettings?: CinematicSettings | undefined;
     mode: CameraType;
+    useColliderRange?: boolean | undefined;
 }
 
 // @public (undocumented)
@@ -2898,6 +3000,8 @@ export interface PBUiText {
     color?: PBColor4 | undefined;
     font?: Font | undefined;
     fontSize?: number | undefined;
+    outlineColor?: PBColor4 | undefined;
+    outlineWidth?: number | undefined;
     textAlign?: TextAlignMode | undefined;
     value: string;
 }
@@ -2952,6 +3056,7 @@ export interface PBUiTransform {
     // (undocumented)
     minWidth: number;
     minWidthUnit: YGUnit;
+    opacity?: number | undefined;
     overflow: YGOverflow;
     // (undocumented)
     paddingBottom: number;
