@@ -18,3 +18,27 @@
 .Renderer .loading .ui.dimmer {
   opacity: 0.5;
 }
+
+.single-tile-hint {
+  position: fixed;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background-color: var(--base-19);
+  border: 1px solid var(--base-13);
+  color: var(--base-5);
+  padding: 4px 6px;
+  font-size: 11px;
+  line-height: 13px;
+}
+
+.single-tile-hint b {
+  background-color: #3d3b43;
+  border: 1px solid #716b7c;
+  padding: 1px 2px;
+  border-radius: 4px;
+}
+
+.single-tile-hint.is-visible {
+  opacity: 1;
+  z-index: 100;
+}

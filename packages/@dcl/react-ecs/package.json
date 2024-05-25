@@ -30,7 +30,8 @@
     "directory": "packages/@dcl/react-ecs"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json",
+    "start": "tsc -p tsconfig.json --watch"
   },
   "typedoc": {
     "entryPoint": "./src/index.ts",

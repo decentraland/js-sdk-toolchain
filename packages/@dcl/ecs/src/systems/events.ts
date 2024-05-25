@@ -5,7 +5,7 @@ import * as components from '../components'
 import { IEngine } from '../engine/types'
 import { Entity, EntityState } from '../engine/entity'
 import { IInputSystem } from '../engine/input'
-import { checkNotThenable } from '../runtime/invariant'
+import { __DEV__, checkNotThenable } from '../runtime/invariant'
 
 /**
  * @public
@@ -151,7 +151,6 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     event.delete(type)
   }
 
-  // @internal
   engine.addSystem(function EventSystem() {
     for (const [entity, event] of eventsMap) {
       if (engine.getEntityState(entity) === EntityState.Removed) {

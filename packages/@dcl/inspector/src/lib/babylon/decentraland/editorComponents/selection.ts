@@ -1,18 +1,23 @@
-import { AbstractMesh, Color3, Vector3 } from '@babylonjs/core'
+import { AbstractMesh, Color3 } from '@babylonjs/core'
 import { ComponentType } from '@dcl/ecs'
 import { CoreComponents } from '../../../sdk/components'
 import { EcsEntity } from '../EcsEntity'
 import type { ComponentOperation } from '../component-operations'
 
-let addedCameraObservable = false
 const highlightedMeshes = new Set<AbstractMesh>()
 
-export function toggleSelection(mesh: AbstractMesh, value: boolean) {
-  mesh.renderOutline = value
-  mesh.outlineColor = Color3.White()
+export const putEntitySelectedComponent: ComponentOperation = (entity, component) => {
+  if (component.componentType === ComponentType.LastWriteWinElementSet) {
+    const componentValue = entity.isLocked() ? null : (component.getOrNull(entity.entityId) as { gizmo: number } | null)
+    toggleSelection(entity, !!componentValue)
+    updateGizmoManager(entity, componentValue)
+  }
+}
+
+export function toggleMeshSelection(mesh: AbstractMesh, value: boolean) {
   mesh.renderOverlay = value
   mesh.overlayColor = Color3.White()
-  mesh.overlayAlpha = 0.1
+  mesh.overlayAlpha = 0.2
   if (value) {
     highlightedMeshes.add(mesh)
   } else {
@@ -20,34 +25,16 @@ export function toggleSelection(mesh: AbstractMesh, value: boolean) {
   }
 }
 
-export const putEntitySelectedComponent: ComponentOperation = (entity, component) => {
-  if (component.componentType === ComponentType.LastWriteWinElementSet) {
-    const componentValue = component.getOrNull(entity.entityId) as { gizmo: number } | null
-    const scene = entity.context.deref()!.scene
+export const toggleSelection = (entity: EcsEntity, value: boolean) => {
+  if (entity.meshRenderer) {
+    toggleMeshSelection(entity.meshRenderer, value)
+  }
 
-    if (!addedCameraObservable && scene.activeCamera) {
-      scene.activeCamera.onViewMatrixChangedObservable.add(() => {
-        if (!scene.activeCamera) return
-        for (const mesh of highlightedMeshes) {
-          const distance = Vector3.Distance(scene.activeCamera.position, mesh.position)
-          mesh.outlineWidth = distance / 700
-        }
-      })
-      addedCameraObservable = true
+  if (entity.gltfContainer) {
+    for (const mesh of entity.gltfContainer.getChildMeshes()) {
+      if (mesh.name.includes('collider')) continue
+      toggleMeshSelection(mesh, value)
     }
-
-    if (entity.meshRenderer) {
-      toggleSelection(entity.meshRenderer, !!componentValue)
-    }
-
-    if (entity.gltfContainer) {
-      for (const mesh of entity.gltfContainer.getChildMeshes()) {
-        if (mesh.name.includes('collider')) continue
-        toggleSelection(mesh, !!componentValue)
-      }
-    }
-
-    updateGizmoManager(entity, componentValue)
   }
 }
 

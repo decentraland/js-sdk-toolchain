@@ -17,8 +17,11 @@
   margin-bottom: 0;
 }
 
-.assets-catalog-header .assets-catalog-header-title .back-button {
+.assets-catalog-header h2.assets-catalog-header-title.clickable {
   cursor: pointer;
+}
+
+.assets-catalog-header .assets-catalog-header-title .back-button {
   color: var(--base-06);
 }
 

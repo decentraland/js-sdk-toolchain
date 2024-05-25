@@ -7,7 +7,10 @@ export enum Event {
   ADD_COMPONENT = 'Add Component',
   REMOVE_COMPONENT = 'Remove Component',
   SEARCH_ITEM = 'Search Item',
-  SWITCH_BUILDER_MODE = 'Switch Builder Mode'
+  SWITCH_BUILDER_MODE = 'Switch Builder Mode',
+  SET_GROUND = 'Set Ground',
+  LOCK = 'Lock',
+  HIDE = 'Hide'
 }
 
 export type Events = {
@@ -36,6 +39,17 @@ export type Events = {
     itemId: string
     itemName: string
     isAdvancedView: boolean
+  }
+  [Event.SET_GROUND]: {
+    itemId?: string
+    itemName: string
+    itemPath: string
+  }
+  [Event.LOCK]: {
+    value: boolean
+  }
+  [Event.HIDE]: {
+    value: boolean
   }
 }
 
