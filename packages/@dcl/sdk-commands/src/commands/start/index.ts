@@ -51,7 +51,8 @@ export const args = declareArgs({
   '--skip-build': Boolean,
   '--dao-explorer': Boolean,
   '--data-layer': Boolean,
-  '-e': '--dao-explorer'
+  '-e': '--dao-explorer',
+  '--customEntryPoint': Boolean
 })
 
 export async function help(options: Options) {
@@ -114,7 +115,18 @@ export async function main(options: Options) {
       // first run `npm run build`, this can be disabled with --skip-build
       // then start the embedded compiler, this can be disabled with --no-watch
       if (watch || build) {
-        await buildScene({ ...options, args: { '--dir': project.workingDirectory, '--watch': watch, _: [] } }, project)
+        await buildScene(
+          {
+            ...options,
+            args: {
+              '--dir': project.workingDirectory,
+              '--watch': watch,
+              _: [],
+              '--customEntryPoint': !!options.args['--customEntryPoint']
+            }
+          },
+          project
+        )
         await startValidations(options.components, project.workingDirectory)
       }
 
