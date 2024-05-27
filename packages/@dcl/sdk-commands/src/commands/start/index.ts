@@ -49,9 +49,9 @@ export const args = declareArgs({
   '-b': '--no-browser',
   '-w': '--no-watch',
   '--skip-build': Boolean,
-  '--dao-explorer': Boolean,
+  '--no-dao-explorer': Boolean,
   '--data-layer': Boolean,
-  '-e': '--dao-explorer',
+  '-e': '--no-dao-explorer',
   '--customEntryPoint': Boolean
 })
 
@@ -88,7 +88,7 @@ export async function main(options: Options) {
   const workingDirectory = path.resolve(process.cwd(), options.args['--dir'] || '.')
   const isCi = options.args['--ci'] || process.env.CI || false
   const debug = !options.args['--no-debug'] && !isCi
-  const experimentalDaoExplorer = options.args['--dao-explorer'] && !isCi
+  const experimentalDaoExplorer = !options.args['--no-dao-explorer'] && !isCi
   const openBrowser = (!experimentalDaoExplorer || !options.args['--no-browser']) && !isCi && !experimentalDaoExplorer
   const build = !options.args['--skip-build']
   const watch = !options.args['--no-watch']
