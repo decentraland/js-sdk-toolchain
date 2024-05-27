@@ -351,7 +351,7 @@ export function createReconciler(
   }
 
   return {
-    update: function (component: ReactEcs.JSX.ReactNode) {
+    update: function (component: ReactEcs.JSX.Element) {
       if (changeEvents.size) {
         handleOnChange(UiInput.componentId, UiInputResult)
         handleOnChange(UiDropdown.componentId, UiDropdownResult)

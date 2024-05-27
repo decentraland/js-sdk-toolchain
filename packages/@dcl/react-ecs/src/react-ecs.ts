@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 import { PBUiBackground, PBUiText, PBUiTransform, PBUiInput, PBUiDropdown } from '@dcl/ecs'
 import React from 'react'
-import { Callback, Key } from './components'
+import { Callback, Children, Key } from './components'
 
 /**
  * @public
  */
 export interface EcsElements {
-  entity: Partial<EntityComponents> & { children?: ReactNode; key?: Key }
+  entity: Partial<EntityComponents> & { children?: Children; key?: Key }
 }
 
 /**
@@ -27,31 +27,12 @@ export type EntityComponents = {
  * @hidden
  */
 export namespace JSX {
-  export interface Element extends ReactElement<any, any> {}
-  export interface IntrinsicElements extends EcsElements {}
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  export type Element = {} | null
+  export type IntrinsicElements = EcsElements
   export interface Component {}
 }
-/**
- * @public
- */
-export type JSXElementConstructor<P> = (props: P) => ReactElement<any, any> | null
 
-/**
- * @public
- */
-export interface ReactElement<
-  P = any,
-  T extends string | JSXElementConstructor<any> = string | JSXElementConstructor<any>
-> {
-  type: T
-  props: P
-  key: Key | null
-}
-
-/**
- * @public
- */
-export type ReactNode = ReactElement | string | number | boolean | null | undefined
 /**
  * @public
  */
@@ -60,16 +41,13 @@ export namespace ReactEcs {
     /**
      * @public
      */
-    export type ReactNode = ReactElement | string | number | boolean | null | undefined
-    /**
-     * @public
-     */
-    export interface Element extends ReactElement<any, any> {}
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    export type Element = {} | null
     /**
      * @public
      * HTML tag elements
      */
-    export interface IntrinsicElements extends EcsElements {}
+    export type IntrinsicElements = EcsElements
     /**
      * @public
      * Component empty interface

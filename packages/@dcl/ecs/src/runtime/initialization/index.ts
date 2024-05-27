@@ -10,7 +10,6 @@ import { createInputSystem, IInputSystem } from './../../engine/input'
 import { createRaycastSystem, RaycastSystem } from '../../systems/raycast'
 import { createVideoEventsSystem, VideoEventsSystem } from '../../systems/videoEvents'
 import { TweenSystem, createTweenSystem } from '../../systems/tween'
-import { pointerEventColliderChecker } from '../../systems/pointer-event-collider-checker'
 
 /**
  * @public
@@ -64,11 +63,6 @@ export { VideoEventsSystem }
  */
 export const tweenSystem: TweenSystem = createTweenSystem(engine)
 export { TweenSystem }
-
-/**
- * Adds pointer event collider system only in DEV env
- */
-pointerEventColliderChecker(engine)
 
 /**
  * @public
