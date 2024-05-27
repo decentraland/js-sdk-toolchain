@@ -60,7 +60,7 @@ export namespace ReactEcs {
     /**
      * @public
      */
-    export type ReactNode = ReactElement | string | number | boolean | null | undefined
+    export type ReactNode = ReactElement | string | number | boolean | null | undefined | ReactElement[]
     /**
      * @public
      */
