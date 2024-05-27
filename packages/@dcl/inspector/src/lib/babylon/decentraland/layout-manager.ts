@@ -94,11 +94,12 @@ export const getLayoutManager = memoize((scene: Scene) => {
   }
 
   function setLayout(_layout: Layout) {
-    if (layout && isSameLayout(layout, _layout)) return
+    if (layout && isSameLayout(layout, _layout)) return false
     clear()
     layout = _layout
     fill(layout)
     center(scene, layout)
+    return true
   }
 
   function fill(layout: Layout) {

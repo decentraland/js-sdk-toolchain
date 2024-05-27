@@ -7,7 +7,8 @@ import {
   createComponents as createAssetPacksComponents,
   Actions,
   Triggers,
-  Counter
+  Counter,
+  CounterBar
 } from '@dcl/asset-packs'
 import { Layout } from '../../utils/layout'
 import { GizmoType } from '../../utils/gizmo'
@@ -43,12 +44,15 @@ export enum EditorComponentNames {
   ActionTypes = ComponentName.ACTION_TYPES,
   Actions = ComponentName.ACTIONS,
   Counter = ComponentName.COUNTER,
+  CounterBar = ComponentName.COUNTER_BAR,
   Triggers = ComponentName.TRIGGERS,
   States = ComponentName.STATES,
   TransformConfig = 'inspector::TransformConfig',
   Hide = 'inspector::Hide',
   Lock = 'inspector::Lock',
-  Config = 'inspector::Config'
+  Config = 'inspector::Config',
+  Ground = 'inspector::Ground',
+  Tile = 'inspector::Tile'
 }
 
 export enum SceneAgeRating {
@@ -102,11 +106,16 @@ export type ConfigComponent = {
   fields: {
     name: string
     type: AllComponentsType
-    jsonPayload?: string
+    layout?: string
     basicViewId?: string
   }[]
   assetId?: string
 }
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export type GroundComponent = {}
+// eslint-disable-next-line @typescript-eslint/ban-types
+export type TileComponent = {}
 
 export enum SceneCategory {
   ART = 'art',
@@ -134,8 +143,10 @@ export type EditorComponentsTypes = {
   Counter: Counter
   Hide: { value: boolean }
   Lock: { value: boolean }
-  CounterBar: { primaryColor: string; secondaryColor: string; maxValue: number }
+  CounterBar: CounterBar
   Config: ConfigComponent
+  Ground: GroundComponent
+  Tile: TileComponent
 }
 
 export type EditorComponents = {
@@ -152,6 +163,8 @@ export type EditorComponents = {
   Lock: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Lock']>
   CounterBar: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['CounterBar']>
   Config: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Config']>
+  Ground: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Ground']>
+  Tile: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Tile']>
 }
 
 export type SdkComponents = {
@@ -318,12 +331,15 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
       Schemas.Map({
         name: Schemas.String,
         type: Schemas.EnumString<AllComponentsType>(AllComponents, AllComponents.Actions),
-        jsonPayload: Schemas.Optional(Schemas.String),
+        layout: Schemas.Optional(Schemas.String),
         basicViewId: Schemas.Optional(Schemas.String)
       })
     ),
     assetId: Schemas.Optional(Schemas.String)
   })
+
+  const Ground = engine.defineComponent(EditorComponentNames.Ground, {})
+  const Tile = engine.defineComponent(EditorComponentNames.Tile, {})
 
   return {
     Selection,
@@ -340,6 +356,8 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     Counter: Counter as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Counter']>,
     Triggers: Triggers as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Triggers']>,
     States: States as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['States']>,
-    CounterBar: CounterBar as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['CounterBar']>
+    CounterBar: CounterBar as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['CounterBar']>,
+    Ground: Ground as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Ground']>,
+    Tile: Tile as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Tile']>
   }
 }

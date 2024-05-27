@@ -77,27 +77,57 @@ export interface AudioStreamComponentDefinitionExtended extends LastWriteWinElem
 // @public (undocumented)
 export const enum AvatarAnchorPointType {
     // (undocumented)
-    AAPT_BACK = 5,
-    // (undocumented)
     AAPT_HEAD = 4,
     // (undocumented)
-    AAPT_HIP = 10,
+    AAPT_HIP = 9,
     // (undocumented)
-    AAPT_LEFT_FOOT = 6,
+    AAPT_LEFT_ARM = 11,
+    // (undocumented)
+    AAPT_LEFT_FOOT = 20,
+    // (undocumented)
+    AAPT_LEFT_FOREARM = 12,
     // (undocumented)
     AAPT_LEFT_HAND = 2,
     // (undocumented)
-    AAPT_LEFT_SHOULDER = 8,
+    AAPT_LEFT_HAND_INDEX = 13,
+    // (undocumented)
+    AAPT_LEFT_LEG = 19,
+    // (undocumented)
+    AAPT_LEFT_SHOULDER = 10,
+    // (undocumented)
+    AAPT_LEFT_TOE_BASE = 21,
+    // (undocumented)
+    AAPT_LEFT_UP_LEG = 18,
     // (undocumented)
     AAPT_NAME_TAG = 1,
     // (undocumented)
+    AAPT_NECK = 5,
+    // (undocumented)
     AAPT_POSITION = 0,
     // (undocumented)
-    AAPT_RIGHT_FOOT = 7,
+    AAPT_RIGHT_ARM = 15,
+    // (undocumented)
+    AAPT_RIGHT_FOOT = 24,
+    // (undocumented)
+    AAPT_RIGHT_FOREARM = 16,
     // (undocumented)
     AAPT_RIGHT_HAND = 3,
     // (undocumented)
-    AAPT_RIGHT_SHOULDER = 9
+    AAPT_RIGHT_HAND_INDEX = 17,
+    // (undocumented)
+    AAPT_RIGHT_LEG = 23,
+    // (undocumented)
+    AAPT_RIGHT_SHOULDER = 14,
+    // (undocumented)
+    AAPT_RIGHT_TOE_BASE = 25,
+    // (undocumented)
+    AAPT_RIGHT_UP_LEG = 22,
+    // (undocumented)
+    AAPT_SPINE = 6,
+    // (undocumented)
+    AAPT_SPINE1 = 7,
+    // (undocumented)
+    AAPT_SPINE2 = 8
 }
 
 // @public (undocumented)
@@ -105,6 +135,13 @@ export const AvatarAttach: LastWriteWinElementSetComponentDefinition<PBAvatarAtt
 
 // @public (undocumented)
 export const AvatarBase: LastWriteWinElementSetComponentDefinition<PBAvatarBase>;
+
+// @public (undocumented)
+export const enum AvatarControlType {
+    CCT_NONE = 0,
+    CCT_RELATIVE = 1,
+    CCT_TANK = 2
+}
 
 // @public (undocumented)
 export const AvatarEmoteCommand: GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>;
@@ -119,6 +156,28 @@ export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAva
 export const enum AvatarModifierType {
     AMT_DISABLE_PASSPORTS = 1,
     AMT_HIDE_AVATARS = 0
+}
+
+// @public (undocumented)
+export interface AvatarMovementSettings {
+    allowWeightedMovement?: boolean | undefined;
+    // (undocumented)
+    controlMode?: AvatarControlType | undefined;
+    friction?: number | undefined;
+    gravity?: number | undefined;
+    jumpHeight?: number | undefined;
+    maxFallSpeed?: number | undefined;
+    runSpeed?: number | undefined;
+    turnSpeed?: number | undefined;
+    walkSpeed?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace AvatarMovementSettings {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): AvatarMovementSettings;
+    // (undocumented)
+    export function encode(message: AvatarMovementSettings, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -335,7 +394,30 @@ export const enum CameraType {
 // Warning: (ae-missing-release-tag) "Children" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export type Children = unknown;
+export type Children = ReactNode;
+
+// @public (undocumented)
+export interface CinematicSettings {
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    allowManualRotation?: boolean | undefined;
+    cameraEntity: number;
+    pitchRange?: number | undefined;
+    rollRange?: number | undefined;
+    yawRange?: number | undefined;
+    zoomMax?: number | undefined;
+    zoomMin?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace CinematicSettings {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): CinematicSettings;
+    // (undocumented)
+    export function encode(message: CinematicSettings, writer?: _m0.Writer): _m0.Writer;
+}
 
 // @public (undocumented)
 export const enum ColliderLayer {
@@ -982,7 +1064,7 @@ export const enum EasingFunction {
 export interface EcsElements {
     // (undocumented)
     entity: Partial<EntityComponents> & {
-        children?: Children;
+        children?: ReactNode;
         key?: Key;
     };
 }
@@ -1428,10 +1510,15 @@ export namespace JSX {
     export interface Component {
     }
     // (undocumented)
-    export type Element = {} | null;
+    export interface Element extends ReactElement<any, any> {
+    }
     // (undocumented)
-    export type IntrinsicElements = EcsElements;
+    export interface IntrinsicElements extends EcsElements {
+    }
 }
+
+// @public (undocumented)
+export type JSXElementConstructor<P> = (props: P) => ReactElement<any, any> | null;
 
 // @public (undocumented)
 export type JustifyType = 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly';
@@ -2113,6 +2200,9 @@ export interface PBAvatarModifierArea {
     area: PBVector3 | undefined;
     excludeIds: string[];
     modifiers: AvatarModifierType[];
+    // (undocumented)
+    movementSettings?: AvatarMovementSettings | undefined;
+    useColliderRange?: boolean | undefined;
 }
 
 // @public (undocumented)
@@ -2175,7 +2265,10 @@ export namespace PBCameraMode {
 // @public (undocumented)
 export interface PBCameraModeArea {
     area: PBVector3 | undefined;
+    // (undocumented)
+    cinematicSettings?: CinematicSettings | undefined;
     mode: CameraType;
+    useColliderRange?: boolean | undefined;
 }
 
 // @public (undocumented)
@@ -3438,8 +3531,12 @@ export namespace ReactEcs {
         export interface Component {
         }
         // (undocumented)
-        export type Element = {} | null;
-        export type IntrinsicElements = EcsElements;
+        export interface Element extends ReactElement<any, any> {
+        }
+        export interface IntrinsicElements extends EcsElements {
+        }
+        // (undocumented)
+        export type ReactNode = ReactElement | string | number | boolean | null | undefined;
     }
     const // (undocumented)
     createElement: any;
@@ -3451,6 +3548,19 @@ export namespace ReactEcs {
 //
 // @public
 export const ReactEcsRenderer: ReactBasedUiSystem;
+
+// @public (undocumented)
+export interface ReactElement<P = any, T extends string | JSXElementConstructor<any> = string | JSXElementConstructor<any>> {
+    // (undocumented)
+    key: Key | null;
+    // (undocumented)
+    props: P;
+    // (undocumented)
+    type: T;
+}
+
+// @public (undocumented)
+export type ReactNode = ReactElement | string | number | boolean | null | undefined;
 
 // @public (undocumented)
 export type ReadonlyComponentSchema<T extends [ComponentDefinition<unknown>, ...ComponentDefinition<unknown>[]]> = {
@@ -3950,7 +4060,7 @@ export interface UiButtonProps extends UiLabelProps, EntityPropTypes {
 export const UiCanvasInformation: LastWriteWinElementSetComponentDefinition<PBUiCanvasInformation>;
 
 // @public (undocumented)
-export type UiComponent = () => ReactEcs.JSX.Element;
+export type UiComponent = () => ReactEcs.JSX.ReactNode;
 
 // @public (undocumented)
 export const UiDropdown: LastWriteWinElementSetComponentDefinition<PBUiDropdown>;

@@ -5,9 +5,9 @@ import { pushChild } from '../nodes'
 export function addChild(engine: IEngine) {
   return function addChild(parent: Entity, name: string): Entity {
     const child = engine.addEntity()
-    const Transform = engine.getComponent(TransformEngine.componentId) as typeof TransformEngine
+    const Transform = engine.getComponent(TransformEngine.componentName) as typeof TransformEngine
     const Nodes = engine.getComponent(EditorComponentNames.Nodes) as EditorComponents['Nodes']
-    const Name = engine.getComponent(NameEngine.componentId) as typeof NameEngine
+    const Name = engine.getComponent(NameEngine.componentName) as typeof NameEngine
 
     // create new child components
     Name.create(child, { value: name })

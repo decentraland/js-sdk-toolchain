@@ -8,6 +8,7 @@
   --list-smart-item-bg-color: #472550;
   --smart-item-icon-bg-color: #c640cd;
   --list-smart-item-hover-bg-color: #5f326a;
+  --ground-icon-bg-color: #828282;
   --tree-bg-color: var(--vscode-panel-background, #252526);
   --tree-border-color: var(--vscode-panel-border, #333333);
   --input-border-color: var(--vscode-input-border, #cdcccc);

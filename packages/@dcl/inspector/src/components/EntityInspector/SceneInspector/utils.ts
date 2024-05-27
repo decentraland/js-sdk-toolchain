@@ -78,25 +78,13 @@ export function fromScene(value: EditorComponentsTypes['Scene']): SceneInput {
       ? value.spawnPoints.map((spawnPoint) => fromSceneSpawnPoint(spawnPoint))
       : [],
     layout: {
+      base: `${value.layout.base.x},${value.layout.base.y}`,
       parcels
     }
   }
 }
 
 export function toScene(inputs: SceneInput): EditorComponentsTypes['Scene'] {
-  let base: Coords = { x: Infinity, y: Infinity }
-  const parcels = Array.from(new Set(inputs.layout.parcels.split(' '))).map((parcel) => {
-    const [x, y] = parcel.split(',').map(($) => parseInt($))
-
-    // base should be bottom-left parcel
-    // https://docs.decentraland.org/creator/development-guide/sdk7/scene-metadata/#scene-parcels
-    if (base.y >= y) {
-      base = { x: Math.min(base.x, x), y }
-    }
-
-    return { x, y }
-  })
-
   return {
     name: inputs.name,
     description: inputs.description,
@@ -112,20 +100,8 @@ export function toScene(inputs: SceneInput): EditorComponentsTypes['Scene'] {
       toSceneSpawnPoint(`Spawn Point ${index + 1}`, spawnPoint)
     ),
     layout: {
-      base,
-      parcels
-    }
-  }
-}
-
-export function toSceneAuto(inputs: SceneInput): EditorComponentsTypes['Scene'] {
-  const parcels = parseParcels(inputs.layout.parcels)
-  const points = getCoordinatesBetweenPoints(parcels[0], parcels[1])
-  return {
-    ...toScene(inputs),
-    layout: {
-      base: points[0],
-      parcels: points
+      base: parseParcels(inputs.layout.base)[0],
+      parcels: parseParcels(inputs.layout.parcels)
     }
   }
 }
@@ -145,31 +121,10 @@ export function parseParcels(value: string): Coords[] {
   return coordsList
 }
 
-export function getInputValidation(auto?: boolean) {
-  return function isValidInput(input: SceneInput): boolean {
-    const parcels = parseParcels(input.layout.parcels)
-    return auto ? parcels.length === 2 : areConnected(parcels)
-  }
-}
-
-export function getCoordinatesBetweenPoints(pointA: Coords, pointB: Coords): Coords[] {
-  const coordinates: Coords[] = []
-
-  // ensure pointA is the bottom-left coord
-  if (pointA.x > pointB.x) {
-    ;[pointA.x, pointB.x] = [pointB.x, pointA.x]
-  }
-  if (pointA.y > pointB.y) {
-    ;[pointA.y, pointB.y] = [pointB.y, pointA.y]
-  }
-
-  for (let x = pointA.x; x <= pointB.x; x++) {
-    for (let y = pointA.y; y <= pointB.y; y++) {
-      coordinates.push({ x, y })
-    }
-  }
-
-  return coordinates
+export function isValidInput(input: SceneInput): boolean {
+  const parcels = parseParcels(input.layout.parcels)
+  const baseList = parseParcels(input.layout.base)
+  return baseList.length === 1 && input.layout.parcels.includes(input.layout.base) && areConnected(parcels)
 }
 
 export const isImageFile = (value: string): boolean =>

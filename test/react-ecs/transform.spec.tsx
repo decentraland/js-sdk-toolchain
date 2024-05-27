@@ -196,13 +196,13 @@ describe('UiTransform React Ecs', () => {
 
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       width: 0,
-      widthUnit: YGUnit.YGU_UNDEFINED
+      widthUnit: YGUnit.YGU_AUTO
     })
 
     width = { boedo: 'casla' } as any // Assertion
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       width: 0,
-      widthUnit: YGUnit.YGU_UNDEFINED
+      widthUnit: YGUnit.YGU_AUTO
     })
   })
 

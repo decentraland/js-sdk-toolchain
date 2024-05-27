@@ -33,3 +33,27 @@
 .Button.danger.active {
   background-color: var(--primary-dark);
 }
+
+.Button.dark {
+  background-color: var(--base-20);
+  border: 1px solid var(--base-15);
+}
+
+.Button.dark:hover,
+.Button.dark.active {
+  background-color: var(--base-15);
+}
+
+.Button.blue {
+  background-color: var(--accent-blue-05);
+  border: 0;
+}
+
+.Button.blue:hover,
+.Button.blue.active {
+  background-color: var(--accent-blue-07);
+}
+
+.Button.blue.big {
+  font-weight: 700;
+}

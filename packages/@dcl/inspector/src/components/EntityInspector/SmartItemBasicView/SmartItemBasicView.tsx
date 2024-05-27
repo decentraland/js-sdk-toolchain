@@ -6,6 +6,8 @@ import { ConfigComponent } from '../../../lib/sdk/components'
 import { Container } from '../../Container'
 import { NftView } from './NftView'
 import { PointerEventView } from './PointerEventView'
+import { CounterBarView } from './CounterBarView'
+import { ActionView } from './ActionView'
 import { TriggerView } from './TriggerView'
 import { TweenView } from './TweenView'
 import { VideoView } from './VideoView'
@@ -22,6 +24,8 @@ const SmartItemBasicView = withSdk<Props>(({ sdk, entity }) => {
       switch (field.type) {
         case 'core::PointerEvents':
           return <PointerEventView entity={entity} key={idx} />
+        case 'asset-packs::Actions':
+          return <ActionView entity={entity} field={field} key={idx} />
         case 'asset-packs::Triggers':
           return <TriggerView entity={entity} field={field} key={idx} />
         case 'core::Tween':
@@ -30,6 +34,9 @@ const SmartItemBasicView = withSdk<Props>(({ sdk, entity }) => {
           return <VideoView entity={entity} key={idx} />
         case 'core::NftShape':
           return <NftView entity={entity} key={idx} />
+        case 'asset-packs::Counter':
+        case 'asset-packs::CounterBar':
+          return <CounterBarView entity={entity} field={field} key={idx} />
         default:
           return null
       }

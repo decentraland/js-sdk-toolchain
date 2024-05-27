@@ -1,6 +1,7 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { AiOutlineSearch as SearchIcon } from 'react-icons/ai'
 import { VscChevronLeft as BackIcon } from 'react-icons/vsc'
+import cx from 'classnames'
 import { TextField } from '../../ui'
 import { Props } from './types'
 
@@ -34,17 +35,19 @@ const Header: React.FC<Props> = ({ selectedTheme, search, onChangeTheme, onSearc
     }
   }, [search, selectedTheme])
 
-  const backButton = useCallback(() => {
-    if (!search && !selectedTheme) return null
+  const isMainHeader = useMemo(() => !search && !selectedTheme, [search, selectedTheme])
 
-    return <BackIcon className="back-button" size={24} onClick={handleGoBack} />
-  }, [search, selectedTheme, handleGoBack])
+  const backButton = useCallback(() => {
+    if (isMainHeader) return null
+
+    return <BackIcon className="back-button" size={24} />
+  }, [isMainHeader])
 
   const searchPlaceholder = selectedTheme ? `Search ${selectedTheme.name}` : 'Search Asset Packs'
 
   return (
     <div className="assets-catalog-header">
-      <h2 className="assets-catalog-header-title">
+      <h2 className={cx('assets-catalog-header-title', { clickable: !isMainHeader })} onClick={handleGoBack}>
         {backButton()}
         {renderHeaderTitle()}
       </h2>
