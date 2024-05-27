@@ -3474,7 +3474,7 @@ export namespace ReactEcs {
         export interface IntrinsicElements extends EcsElements {
         }
         // (undocumented)
-        export type ReactNode = ReactElement | string | number | boolean | null | undefined;
+        export type ReactNode = ReactElement | string | number | boolean | null | undefined | ReactElement[];
     }
     const // (undocumented)
     createElement: any;
