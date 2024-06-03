@@ -68,11 +68,11 @@ export const updateGltfForEntity = (entity: EcsEntity, newValue: PBGltfContainer
   if (shouldLoadGltf) void loadGltf(entity, newValue.src)
 }
 
-export async function loadGltf(entity: EcsEntity, value: string, reload?: boolean) {
+export async function loadGltf(entity: EcsEntity, value: string) {
   const context = entity.context.deref()
-  if (!context || (!!entity.gltfContainer && !reload)) return
+  if (!context) return
 
-  if (entity.gltfContainer && reload) {
+  if (entity.gltfContainer) {
     removeGltf(entity)
   }
 

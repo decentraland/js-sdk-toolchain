@@ -7,7 +7,7 @@ import { Entity } from '@dcl/ecs'
 
 import { DIRECTORY, withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
-import { importAsset, saveThumbnail } from '../../redux/data-layer'
+import { getLastImportedAssetRequest, importAsset, saveThumbnail } from '../../redux/data-layer'
 import { getNode, BuilderAsset, DROP_TYPES, IDrop, ProjectAssetDrop, isDropType } from '../../lib/sdk/drag-drop'
 import { useRenderer } from '../../hooks/sdk/useRenderer'
 import { useSdk } from '../../hooks/sdk/useSdk'
@@ -70,6 +70,7 @@ const Renderer: React.FC = () => {
   const [placeSingleTile, setPlaceSingleTile] = useState(false)
   const [showSingleTileHint, setShowSingleTileHint] = useState(false)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const lastImportAssetRequest = useAppSelector(getLastImportedAssetRequest)
 
   useEffect(() => {
     if (sdk && init) {
@@ -79,15 +80,18 @@ const Renderer: React.FC = () => {
       for (const [entity, value] of sdk.engine.getEntitiesWith(GltfContainer)) {
         const sceneEntity = sdk.sceneContext.getEntityOrNull(entity)
         if (!sceneEntity) continue
-
-        let shoudReload = true
         if (!fileSet.has(value.src)) {
           removeGltf(sceneEntity)
-          shoudReload = false
-        } else void loadGltf(sceneEntity, value.src, shoudReload)
+        } else {
+          const paths = lastImportAssetRequest ? Array.from(lastImportAssetRequest.content.keys()) : []
+          const needsReload = paths.some((path) => value.src.includes(path))
+          if (needsReload) {
+            void loadGltf(sceneEntity, value.src)
+          }
+        }
       }
     }
-  }, [files])
+  }, [files, lastImportAssetRequest])
 
   useEffect(() => {
     if (sdk) {
