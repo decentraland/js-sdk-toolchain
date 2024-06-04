@@ -151,7 +151,8 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
         importAsset({
           content,
           basePath,
-          assetPackageName: ''
+          assetPackageName: '',
+          reload: true
         })
       )
 
