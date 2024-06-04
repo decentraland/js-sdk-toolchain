@@ -23,6 +23,7 @@ import {
   _ChildSet
 } from './types'
 import { componentKeys, isNotUndefined, noopConfig, propsChanged } from './utils'
+import { Vector2 } from '@dcl/ecs/dist/components/generated/pb/decentraland/common/vectors.gen'
 
 function getPointerEnum(pointerKey: keyof Listeners): PointerEventType {
   const pointers: { [key in keyof Required<Listeners>]: PointerEventType } = {
@@ -32,7 +33,7 @@ function getPointerEnum(pointerKey: keyof Listeners): PointerEventType {
   return pointers[pointerKey]
 }
 
-type OnChangeState<T = string | number> = {
+type OnChangeState<T = string | number | Vector2> = {
   onChangeCallback?: (val?: T) => void
   onSubmitCallback?: (val?: T) => void
   value?: T
@@ -58,6 +59,7 @@ export function createReconciler(
   const UiInputResult = components.UiInputResult(engine)
   const UiDropdown = components.UiDropdown(engine)
   const UiDropdownResult = components.UiDropdownResult(engine)
+  const UiScrollResult = components.UiScrollResult(engine)
 
   // Component ID Helper
   const getComponentId: {
@@ -330,7 +332,10 @@ export function createReconciler(
 
   // Maybe this could be something similar to Input system, but since we
   // are going to use this only here, i prefer to scope it here.
-  function handleOnChange(componentId: number, resultComponent: typeof UiDropdownResult | typeof UiInputResult) {
+  function handleOnChange(
+    componentId: number,
+    resultComponent: typeof UiDropdownResult | typeof UiInputResult | typeof UiScrollResult
+  ) {
     for (const [entity, Result] of engine.getEntitiesWith(resultComponent)) {
       const entityState = changeEvents.get(entity)?.get(componentId)
       const isSubmit = !!(Result as any).isSubmit
@@ -355,6 +360,8 @@ export function createReconciler(
       if (changeEvents.size) {
         handleOnChange(UiInput.componentId, UiInputResult)
         handleOnChange(UiDropdown.componentId, UiDropdownResult)
+        // TODO: maybe as componentId could be a virtual id since the scroll input doesn't exist
+        handleOnChange(UiTransform.componentId, UiScrollResult)
       }
       return reconciler.updateContainer(component as any, root, null)
     },

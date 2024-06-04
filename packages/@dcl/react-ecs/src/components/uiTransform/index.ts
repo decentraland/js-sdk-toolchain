@@ -1,17 +1,4 @@
 import {
-  getAlign,
-  getDisplay,
-  getFlexDirection,
-  getFlexWrap,
-  getJustify,
-  getOverflow,
-  getPointerFilter,
-  getPositionType,
-  parsePosition,
-  parseSize
-} from './utils'
-import { UiTransformProps } from './types'
-import {
   PointerFilterMode,
   YGAlign,
   YGDisplay,
@@ -22,6 +9,21 @@ import {
   YGUnit
 } from '@dcl/ecs'
 import { PBUiTransform } from '@dcl/ecs/dist/components'
+import { UiTransformProps } from './types'
+import {
+  getAlign,
+  getDisplay,
+  getFlexDirection,
+  getFlexWrap,
+  getJustify,
+  getOverflow,
+  getPointerFilter,
+  getPositionType,
+  getScrollPosition,
+  getScrollVisible,
+  parsePosition,
+  parseSize
+} from './utils'
 
 /**
  * @internal
@@ -85,8 +87,21 @@ const defaultUiTransform: PBUiTransform = {
  */
 /* @__PURE__ */
 export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
-  const { height, minHeight, maxHeight, width, minWidth, maxWidth, alignItems, alignContent, flexWrap, ...otherProps } =
-    props
+  const {
+    scrollPosition,
+    scrollVisible,
+    height,
+    minHeight,
+    maxHeight,
+    width,
+    minWidth,
+    maxWidth,
+    alignItems,
+    alignContent,
+    flexWrap,
+    ...otherProps
+  } = props
+
   return {
     ...defaultUiTransform,
     ...otherProps,
@@ -109,6 +124,8 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     // Optional values
     ...(alignContent && getAlign('alignContent', alignContent)),
     ...(alignItems && getAlign('alignItems', alignItems)),
-    ...(flexWrap && getFlexWrap(flexWrap))
+    ...(flexWrap && getFlexWrap(flexWrap)),
+    ...(scrollPosition && getScrollPosition(scrollPosition)),
+    ...(scrollVisible && getScrollVisible(scrollVisible))
   }
 }
