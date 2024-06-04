@@ -31,14 +31,14 @@ export interface DataLayerState {
   reconnectAttempts: number
   error: ErrorType | undefined
   removingAsset: Record<string, boolean>
-  reloadImportAssetRequest: ImportAssetRequest | null
+  reloadAssets: string[]
 }
 
 export const initialState: DataLayerState = {
   reconnectAttempts: 0,
   error: undefined,
   removingAsset: {},
-  reloadImportAssetRequest: null
+  reloadAssets: []
 }
 
 export const dataLayer = createSlice({
@@ -72,7 +72,7 @@ export const dataLayer = createSlice({
     redo: () => {},
     importAsset: (state, payload: PayloadAction<ImportAssetRequest & { reload?: boolean }>) => {
       const { reload, ...importAssetRequest } = payload.payload
-      state.reloadImportAssetRequest = reload ? importAssetRequest : null
+      state.reloadAssets = reload ? Array.from(importAssetRequest.content.keys()) : []
     },
     removeAsset: (state, payload: PayloadAction<Asset>) => {
       state.removingAsset[payload.payload.path] = true
@@ -108,7 +108,7 @@ export const {
 export const selectDataLayerError = (state: RootState) => state.dataLayer.error
 export const selectDataLayerReconnectAttempts = (state: RootState) => state.dataLayer.reconnectAttempts
 export const selectDataLayerRemovingAsset = (state: RootState) => state.dataLayer.removingAsset
-export const getReloadImportAssetRequest = (state: RootState) => state.dataLayer.reloadImportAssetRequest
+export const getReloadAssets = (state: RootState) => state.dataLayer.reloadAssets
 
 // Reducer
 export default dataLayer.reducer
