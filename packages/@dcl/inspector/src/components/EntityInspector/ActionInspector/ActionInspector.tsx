@@ -756,7 +756,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
                   { value: AvatarAnchorPointType.AAPT_RIGHT_UP_LEG, label: 'Right Up Leg' },
                   { value: AvatarAnchorPointType.AAPT_RIGHT_LEG, label: 'Right Leg' },
                   { value: AvatarAnchorPointType.AAPT_RIGHT_FOOT, label: 'Right Foot' },
-                  { value: AvatarAnchorPointType.AAPT_RIGHT_TOE_BASE, label: 'Right Toe Base' },
+                  { value: AvatarAnchorPointType.AAPT_RIGHT_TOE_BASE, label: 'Right Toe Base' }
                 ]}
                 value={getPartialPayload<ActionType.ATTACH_TO_PLAYER>(action)?.anchorPointId}
                 onChange={(e) => handleChangeAnchorPoint(e, idx)}
