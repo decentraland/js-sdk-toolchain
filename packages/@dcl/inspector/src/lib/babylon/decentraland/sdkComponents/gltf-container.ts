@@ -135,13 +135,7 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
   }
 
   if (entity.isGltfPathLoading()) {
-    const loadingFilePath = await entity.getGltfPathLoading()
-    if (loadingFilePath === filePath) {
-      console.warn(
-        `Asset ${filePath} for entity ${entity.entityId} is already being loaded. This call will be dismissed`
-      )
-      return
-    }
+    await entity.getGltfPathLoading()
   }
 
   entity.setGltfPathLoading()
