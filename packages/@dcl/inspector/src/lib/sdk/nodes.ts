@@ -25,7 +25,7 @@ export function getRoot(entity: Entity, nodes: DeepReadonlyObject<Node[]>) {
   return root
 }
 
-function getNodes(engine: IEngine): readonly DeepReadonlyObject<Node>[] {
+export function getNodes(engine: IEngine): readonly DeepReadonlyObject<Node>[] {
   const Nodes = engine.getComponent(EditorComponentNames.Nodes) as EditorComponents['Nodes']
   return Nodes.getOrNull(engine.RootEntity)?.value || []
 }
