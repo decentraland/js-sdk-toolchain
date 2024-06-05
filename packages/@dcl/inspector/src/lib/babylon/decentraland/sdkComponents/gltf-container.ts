@@ -70,7 +70,11 @@ export const updateGltfForEntity = (entity: EcsEntity, newValue: PBGltfContainer
 
 export async function loadGltf(entity: EcsEntity, value: string) {
   const context = entity.context.deref()
-  if (!context || !!entity.gltfContainer) return
+  if (!context) return
+
+  if (entity.gltfContainer) {
+    removeGltf(entity)
+  }
 
   // store a WeakRef to the sceneContext to enable file resolver
   if (!sceneContext) {
@@ -131,13 +135,7 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
   }
 
   if (entity.isGltfPathLoading()) {
-    const loadingFilePath = await entity.getGltfPathLoading()
-    if (loadingFilePath === filePath) {
-      console.warn(
-        `Asset ${filePath} for entity ${entity.entityId} is already being loaded. This call will be dismissed`
-      )
-      return
-    }
+    await entity.getGltfPathLoading()
   }
 
   entity.setGltfPathLoading()
