@@ -2948,6 +2948,7 @@ export interface PBUiText {
     font?: Font | undefined;
     fontSize?: number | undefined;
     textAlign?: TextAlignMode | undefined;
+    textWrap?: TextWrap | undefined;
     value: string;
 }
 
@@ -3850,6 +3851,14 @@ export const enum TextureWrapMode {
 // @public (undocumented)
 export type TextureWrapType = 'repeat' | 'clamp' | 'mirror';
 
+// @public (undocumented)
+export const enum TextWrap {
+    // (undocumented)
+    TW_NO_WRAP = 1,
+    // (undocumented)
+    TW_WRAP = 0
+}
+
 // @public
 export const ToGammaSpace: number;
 
@@ -4052,6 +4061,7 @@ export interface UiLabelProps {
     font?: UiFontType | undefined;
     fontSize?: ScaleUnit | undefined;
     textAlign?: TextAlignType | undefined;
+    textWrap?: UiTextWrapType | undefined;
     value: string;
 }
 
@@ -4067,6 +4077,9 @@ export type UiTexture = {
     wrapMode?: TextureWrapType;
     filterMode?: TextureFilterType;
 };
+
+// @public (undocumented)
+export type UiTextWrapType = 'wrap' | 'nowrap';
 
 // @public (undocumented)
 export const UiTransform: LastWriteWinElementSetComponentDefinition<PBUiTransform>;
