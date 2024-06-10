@@ -1,14 +1,22 @@
-import { Entity, IEngine, Transform as TransformEngine, NetworkEntity as NetworkEntityEngine } from '@dcl/ecs'
+import {
+  Entity,
+  IEngine,
+  Transform as TransformEngine,
+  NetworkEntity as NetworkEntityEngine,
+  Name as NameEngine
+} from '@dcl/ecs'
 import { clone } from '@dcl/asset-packs'
 import { EditorComponentNames, EditorComponents } from '../components'
 import { pushChild } from '../nodes'
 import updateSelectedEntity from './update-selected-entity'
+import { generateUniqueName } from './add-child'
 
 export function duplicateEntity(engine: IEngine) {
   return function duplicateEntity(entity: Entity) {
     const Transform = engine.getComponent(TransformEngine.componentId) as typeof TransformEngine
     const Nodes = engine.getComponent(EditorComponentNames.Nodes) as EditorComponents['Nodes']
     const Triggers = engine.getComponent(EditorComponentNames.Triggers) as EditorComponents['Triggers']
+    const Name = engine.getComponent(NameEngine.componentName) as typeof NameEngine
     const NetworkEntity = engine.getComponent(NetworkEntityEngine.componentId) as typeof NetworkEntityEngine
 
     const { entities } = clone(entity, engine as any, Transform as any, Triggers as any) as {
@@ -19,6 +27,9 @@ export function duplicateEntity(engine: IEngine) {
       if (NetworkEntity.has(original)) {
         NetworkEntity.createOrReplace(duplicate, { entityId: duplicate, networkId: 0 })
       }
+
+      const originalName = Name.getOrNull(original)?.value
+      Name.createOrReplace(duplicate, { value: generateUniqueName(engine, Name, originalName || '') })
 
       const transform = Transform.getMutableOrNull(duplicate)
       if (transform === null || !transform.parent) {
