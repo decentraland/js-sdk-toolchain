@@ -365,7 +365,7 @@ export const enum CameraType {
 // Warning: (ae-missing-release-tag) "Children" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export type Children = ReactNode;
+export type Children = ReactEcs.JSX.ReactNode;
 
 // @public (undocumented)
 export const enum ColliderLayer {
@@ -1012,7 +1012,7 @@ export const enum EasingFunction {
 export interface EcsElements {
     // (undocumented)
     entity: Partial<EntityComponents> & {
-        children?: ReactNode;
+        children?: ReactEcs.JSX.ReactNode;
         key?: Key;
     };
 }
@@ -3474,7 +3474,7 @@ export namespace ReactEcs {
         export interface IntrinsicElements extends EcsElements {
         }
         // (undocumented)
-        export type ReactNode = ReactElement | string | number | boolean | null | undefined | ReactElement[];
+        export type ReactNode = Element | ReactElement | string | number | boolean | null | undefined | ReactNode[];
     }
     const // (undocumented)
     createElement: any;
@@ -3496,9 +3496,6 @@ export interface ReactElement<P = any, T extends string | JSXElementConstructor<
     // (undocumented)
     type: T;
 }
-
-// @public (undocumented)
-export type ReactNode = ReactElement | string | number | boolean | null | undefined;
 
 // @public (undocumented)
 export type ReadonlyComponentSchema<T extends [ComponentDefinition<unknown>, ...ComponentDefinition<unknown>[]]> = {

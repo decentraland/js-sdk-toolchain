@@ -1,4 +1,4 @@
-import { ReactNode } from '../react-ecs'
+import { ReactEcs } from '../react-ecs'
 import { Listeners } from './listeners/types'
 import { UiBackgroundProps } from './uiBackground/types'
 import { UiTransformProps } from './uiTransform/types'
@@ -22,7 +22,7 @@ export interface EntityPropTypes extends Listeners {
  * @public
  */
 export type Key = number | string
-export type Children = ReactNode
+export type Children = ReactEcs.JSX.ReactNode
 
 /**
  * unit value type. i.e. 'vw' || 'vh'
