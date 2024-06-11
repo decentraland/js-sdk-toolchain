@@ -7,7 +7,7 @@ import { Callback, Key } from './components'
  * @public
  */
 export interface EcsElements {
-  entity: Partial<EntityComponents> & { children?: ReactNode; key?: Key }
+  entity: Partial<EntityComponents> & { children?: ReactEcs.JSX.ReactNode; key?: Key }
 }
 
 /**
@@ -47,11 +47,6 @@ export interface ReactElement<
   props: P
   key: Key | null
 }
-
-/**
- * @public
- */
-export type ReactNode = ReactElement | string | number | boolean | null | undefined
 /**
  * @public
  */
@@ -60,7 +55,7 @@ export namespace ReactEcs {
     /**
      * @public
      */
-    export type ReactNode = ReactElement | string | number | boolean | null | undefined | ReactElement[]
+    export type ReactNode = Element | ReactElement | string | number | boolean | null | undefined | ReactNode[]
     /**
      * @public
      */
