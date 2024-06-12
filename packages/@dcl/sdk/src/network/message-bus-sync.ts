@@ -1,18 +1,11 @@
 import { IEngine, Transport } from '@dcl/ecs'
+import { PlayerIdentityData as definePlayerIdentityData } from '@dcl/ecs/dist/components'
 import type { SendBinaryRequest, SendBinaryResponse } from '~system/CommunicationsController'
 
 import { syncFilter } from './filter'
 import { engineToCrdt } from './state'
 import { BinaryMessageBus, CommsMessage } from './binary-message-bus'
-import {
-  definePlayersInScene,
-  fetchProfile,
-  oldestUser as _oldestUser,
-  setInitialized,
-  stateInitialized,
-  stateInitializedChecker,
-  syncTransportIsReady
-} from './utils'
+import { fetchProfile, setInitialized, stateInitialized, stateInitializedChecker, syncTransportIsReady } from './utils'
 import { entityUtils } from './entities'
 import { GetUserDataRequest, GetUserDataResponse } from '~system/UserIdentity'
 
@@ -23,11 +16,11 @@ export function addSyncTransport(
   sendBinary: (msg: SendBinaryRequest) => Promise<SendBinaryResponse>,
   getUserData: (value: GetUserDataRequest) => Promise<GetUserDataResponse>
 ) {
-  definePlayersInScene(engine)
   // Profile Info
   const myProfile: IProfile = {} as IProfile
   fetchProfile(myProfile!, getUserData)
 
+  console.log({ myProfile })
   // Entity utils
   const entityDefinitions = entityUtils(engine, myProfile)
 
@@ -45,7 +38,6 @@ export function addSyncTransport(
     filter: syncFilter(engine),
     send: async (message: Uint8Array) => {
       if (syncTransportIsReady(engine) && message.byteLength) {
-        // console.log(Array.from(serializeCrdtMessages('[send CRDT]: ', message, engine)))
         binaryMessageBus.emit(CommsMessage.CRDT, message)
       }
       const messages = getMessagesToSend()
@@ -65,7 +57,6 @@ export function addSyncTransport(
 
   // If we dont have any state initialized, and recieve a state message.
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, (value) => {
-    // console.log(Array.from(serializeCrdtMessages('[binaryMessageBus]: ', value, engine)))
     if (!stateInitialized) {
       setInitialized()
       transport.onmessage!(value)
@@ -74,9 +65,6 @@ export function addSyncTransport(
 
   // If we are the oldest user and we recieve a req of a state we send it.
   binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, () => {
-    // TODO: oldest not working because connectedPlayers returns players that are not in the scene.
-    // Not working :sadcat:
-    // const oldest = oldestUser(engine, myProfile, entityDefinitions.syncEntity)
     if (stateInitialized) {
       binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, engineToCrdt(engine))
     }
@@ -84,8 +72,6 @@ export function addSyncTransport(
 
   // Process CRDT messages here
   binaryMessageBus.on(CommsMessage.CRDT, (value) => {
-    // console.log(Array.from(serializeCrdtMessages('[CRDT on]: ', value, engine)))
-
     transport.onmessage!(value)
   })
 

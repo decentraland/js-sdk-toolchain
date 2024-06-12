@@ -85,11 +85,17 @@ for (const path in compositeFromLoader) {
 
 if ((entrypoint as any).main !== undefined) {
   function _INTERNAL_startup_system() {
-    const maybePromise = (entrypoint as any).main()
-    if (maybePromise && typeof maybePromise === 'object' && typeof (maybePromise as unknown as Promise<unknown>).then === 'function') {
-      maybePromise.catch(console.error)
+    console.log('startup system')
+    try {
+      const maybePromise = (entrypoint as any).main()
+      if (maybePromise && typeof maybePromise === 'object' && typeof (maybePromise as unknown as Promise<unknown>).then === 'function') {
+        maybePromise.catch(console.error)
+      }
+    } catch (e) {
+     console.error(e)
+    } finally {
+      engine.removeSystem(_INTERNAL_startup_system)
     }
-    engine.removeSystem(_INTERNAL_startup_system)
   }
   engine.addSystem(_INTERNAL_startup_system, Infinity)
 }

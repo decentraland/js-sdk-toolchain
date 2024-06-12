@@ -29,8 +29,8 @@ function definePlayerHelper(engine: IEngine) {
   const AvatarBase = defineAvatarBase(engine)
   const playerEntities = new Map<Entity, string>()
 
-  let onEnterSceneCb: ((player: GetPlayerDataRes) => void) | undefined = undefined
-  let onLeaveSceneCb: ((userId: string) => void) | undefined = undefined
+  const onEnterSceneCb: ((player: GetPlayerDataRes) => void)[] = []
+  const onLeaveSceneCb: ((userId: string) => void)[] = []
 
   engine.addSystem(() => {
     const players = Array.from(engine.getEntitiesWith(PlayerIdentityData, AvatarBase))
@@ -41,14 +41,14 @@ function definePlayerHelper(engine: IEngine) {
         playerEntities.set(entity, identity.address)
 
         // Call onEnter callback
-        if (onEnterSceneCb) {
-          onEnterSceneCb(getPlayer({ userId: identity.address })!)
+        if (onEnterSceneCb.length) {
+          onEnterSceneCb.forEach(($) => $(getPlayer({ userId: identity.address })!))
         }
 
         // Check for changes/remove callbacks
         AvatarBase.onChange(entity, (value) => {
-          if (!value && onLeaveSceneCb && playerEntities.get(entity)) {
-            onLeaveSceneCb(playerEntities.get(entity)!)
+          if (!value && onLeaveSceneCb.length && playerEntities.get(entity)) {
+            onLeaveSceneCb.forEach(($) => $(playerEntities.get(entity)!))
             playerEntities.delete(entity)
           }
         })
@@ -58,10 +58,10 @@ function definePlayerHelper(engine: IEngine) {
 
   return {
     onEnterScene(cb: (player: GetPlayerDataRes) => void) {
-      onEnterSceneCb = cb
+      onEnterSceneCb.push(cb)
     },
     onLeaveScene(cb: (userId: string) => void) {
-      onLeaveSceneCb = cb
+      onLeaveSceneCb.push(cb)
     },
     /**
      * Returns the info of the player if it's in the scene.
