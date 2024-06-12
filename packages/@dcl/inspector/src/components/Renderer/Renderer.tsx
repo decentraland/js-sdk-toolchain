@@ -273,7 +273,8 @@ const Renderer: React.FC = () => {
         importAsset({
           content,
           basePath: withAssetDir(destFolder),
-          assetPackageName
+          assetPackageName,
+          reload: true
         })
       )
     }
