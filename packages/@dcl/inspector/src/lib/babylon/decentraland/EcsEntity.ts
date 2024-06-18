@@ -143,8 +143,8 @@ export class EcsEntity extends BABYLON.TransformNode {
       return null // No children to calculate the bounding box
     }
 
-    let groupMin = new BABYLON.Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE)
-    let groupMax = new BABYLON.Vector3(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE)
+    let groupMin = new BABYLON.Vector3(Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER)
+    let groupMax = new BABYLON.Vector3(Number.MIN_SAFE_INTEGER, Number.MIN_SAFE_INTEGER, Number.MIN_SAFE_INTEGER)
 
     for (const child of children) {
       if (!child.material) continue
