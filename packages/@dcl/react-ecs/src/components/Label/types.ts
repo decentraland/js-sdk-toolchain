@@ -16,12 +16,18 @@ export interface UiLabelProps {
   textAlign?: TextAlignType | undefined
   /** Label font type. @defaultValue 'sans-serif' */
   font?: UiFontType | undefined
+  /** Behaviour when text reached. @defaultValue 'wrap' */
+  textWrap?: UiTextWrapType | undefined
 }
 
 /**
  * @public
  */
 export type UiFontType = 'sans-serif' | 'serif' | 'monospace'
+/**
+ * @public
+ */
+export type UiTextWrapType = 'wrap' | 'nowrap'
 /**
  * @public
  */

@@ -1,7 +1,7 @@
 import { PBUiText } from '@dcl/ecs'
 
 import { ReactEcs } from '../../react-ecs'
-import { getFont, getFontSize, getTextAlign } from '../Label/utils'
+import { getFont, getFontSize, getTextAlign, getTextWrap } from '../Label/utils'
 import { parseUiBackground } from '../uiBackground'
 import { parseUiTransform } from '../uiTransform'
 import { UiButtonProps } from './types'
@@ -41,13 +41,14 @@ export function Button(props: UiButtonProps) {
     ...buttonProps.uiBackground,
     ...uiBackground
   })
-  const { font, textAlign, fontSize, ...uiTexProps } = otherProps
+  const { font, textAlign, fontSize, textWrap, ...uiTexProps } = otherProps
   const textProps: PBUiText = {
     ...buttonProps.uiText,
     ...uiTexProps,
     ...getFont(font),
     ...getTextAlign(textAlign),
-    ...getFontSize(fontSize)
+    ...getFontSize(fontSize),
+    ...getTextWrap(textWrap)
   }
   const uiTransformProps = parseUiTransform({
     height: 36,
