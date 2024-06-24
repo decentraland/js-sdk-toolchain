@@ -162,7 +162,7 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
       */
       const prevChildren = entity.getChildren()
       for (const child of prevChildren) {
-        if (child instanceof EcsEntity) continue // skip EcsEntity nodes, only remove gltf related stuff
+        if (child instanceof EcsEntity || child.id.startsWith('BoundingMesh')) continue // skip EcsEntity nodes, only remove gltf related stuff
         child.setEnabled(false)
         child.dispose(false, true)
       }
@@ -174,9 +174,10 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
           mesh.parent = entity
           entity.setGltfContainer(mesh)
         })
-      entity.generateBoundingBox()
+
       entity.setGltfAssetContainer(assetContainer)
       entity.resolveGltfPathLoading(filePath)
+      entity.generateBoundingBox()
       loadAssetFuture.resolve()
     },
     undefined,

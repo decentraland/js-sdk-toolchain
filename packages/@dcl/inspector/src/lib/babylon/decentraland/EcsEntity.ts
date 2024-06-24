@@ -43,7 +43,6 @@ export class EcsEntity extends BABYLON.TransformNode {
   constructor(public entityId: Entity, public context: WeakRef<SceneContext>, public scene: BABYLON.Scene) {
     super(`ecs-${entityId}`, scene)
     createDefaultTransform(this)
-    this.initEventHandlers()
   }
 
   putComponent(component: ComponentDefinition<unknown>) {
@@ -82,8 +81,8 @@ export class EcsEntity extends BABYLON.TransformNode {
     super.dispose(true, false)
   }
 
-  getMeshesBoundingBox() {
-    const children = this.getChildMeshes(false)
+  getMeshesBoundingBox(_children: BABYLON.AbstractMesh[] = []) {
+    const children = _children.length > 0 ? _children : this.getChildMeshes(false)
     let boundingInfo = children[0].getBoundingInfo()
     let min = boundingInfo.boundingBox.minimumWorld
     let max = boundingInfo.boundingBox.maximumWorld
@@ -97,64 +96,11 @@ export class EcsEntity extends BABYLON.TransformNode {
     return new BABYLON.BoundingInfo(min, max)
   }
 
-  getTransformedVertices(mesh: BABYLON.AbstractMesh) {
-    const positions = mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind)!
-
-    const worldVertices = []
-    const scaling = mesh.scaling
-    const rotationQuaternion = mesh.rotationQuaternion || BABYLON.Quaternion.Identity()
-    const position = mesh.position
-
-    for (let i = 0; i < positions.length; i += 3) {
-      const vertex = BABYLON.Vector3.FromArray(positions, i)
-
-      // Apply scaling
-      vertex.multiplyInPlace(scaling)
-
-      // Apply rotation
-      vertex.rotateByQuaternionToRef(rotationQuaternion, vertex)
-
-      // Apply translation
-      vertex.addInPlace(position)
-
-      worldVertices.push(vertex)
-    }
-
-    return worldVertices
-  }
-
-  computeMeshBoundingBox(mesh: BABYLON.AbstractMesh) {
-    const worldVertices = this.getTransformedVertices(mesh)
-
-    let min = new BABYLON.Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE)
-    let max = new BABYLON.Vector3(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE)
-
-    for (const vertex of worldVertices) {
-      min = BABYLON.Vector3.Minimize(min, vertex)
-      max = BABYLON.Vector3.Maximize(max, vertex)
-    }
-
-    return { min, max }
-  }
-
   getGroupMeshesBoundingBox() {
-    const children = this.getChildMeshes(false)
-    if (children.length === 0) {
-      return null // No children to calculate the bounding box
-    }
-
-    let groupMin = new BABYLON.Vector3(Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER)
-    let groupMax = new BABYLON.Vector3(Number.MIN_SAFE_INTEGER, Number.MIN_SAFE_INTEGER, Number.MIN_SAFE_INTEGER)
-
-    for (const child of children) {
-      if (!child.material) continue
-
-      const { min, max } = this.computeMeshBoundingBox(child)
-      groupMin = BABYLON.Vector3.Minimize(groupMin, min)
-      groupMax = BABYLON.Vector3.Maximize(groupMax, max)
-    }
-
-    return new BABYLON.BoundingInfo(groupMin, groupMax)
+    // This will get the GLTF contaier children if it exists, otherwise it will get the entity's children
+    const children = this.gltfContainer ? this.gltfContainer.getChildMeshes(false) : this.getChildMeshes(false)
+    if (children.length === 0) return null
+    return this.getMeshesBoundingBox(children)
   }
 
   isGltfPathLoading() {
@@ -231,29 +177,24 @@ export class EcsEntity extends BABYLON.TransformNode {
   generateBoundingBox() {
     if (!!this.boundingInfoMesh) return
 
-    const meshesBoundingBox = this.getGroupMeshesBoundingBox()
+    const boundingVectors = this.getGroupMeshesBoundingBox()
 
-    if (!meshesBoundingBox) return
+    if (!boundingVectors) return
 
-    this.boundingInfoMesh = new BABYLON.Mesh(`BoundingMesh-${this.id}`, this.getScene())
-    this.boundingInfoMesh.position = BABYLON.Vector3.Zero()
-    this.boundingInfoMesh.rotationQuaternion = BABYLON.Quaternion.Identity()
-    this.boundingInfoMesh.scaling = new BABYLON.Vector3(1, 1, 1)
+    const boundingInfoMesh = new BABYLON.Mesh(`BoundingMesh-${this.id}`, this.getScene())
+
+    boundingInfoMesh.position = BABYLON.Vector3.Zero()
+    boundingInfoMesh.rotationQuaternion = BABYLON.Quaternion.Identity()
+    boundingInfoMesh.scaling = BABYLON.Vector3.One()
+
+    boundingInfoMesh.setBoundingInfo(new BABYLON.BoundingInfo(boundingVectors.minimum, boundingVectors.maximum))
+
+    this.boundingInfoMesh = boundingInfoMesh
 
     this.boundingInfoMesh.parent = this
 
-    this.boundingInfoMesh.setBoundingInfo(
-      new BABYLON.BoundingInfo(meshesBoundingBox.minimum, meshesBoundingBox.maximum, this.getWorldMatrix())
-    )
-  }
-
-  initEventHandlers() {
-    if (this.entityId !== this.context.deref()!.engine.RootEntity) {
-      // Initialize this event to handle the entity's position update
-      this.onAfterWorldMatrixUpdateObservable.addOnce((eventData) => {
-        void validateEntityIsOutsideLayout(eventData as EcsEntity)
-      })
-    }
+    // Validate if the entity is outside the layout
+    void validateEntityIsOutsideLayout(this)
   }
 
   isOutOfBoundaries() {
@@ -296,6 +237,11 @@ async function validateEntityIsOutsideLayout(entity: EcsEntity) {
   await entity.onAssetLoaded()
   const mesh = entity.boundingInfoMesh
   if (mesh) {
+    // First run to initializate the bounding box visibility when the scene is already loaded
+    entity.getScene().onReadyObservable.addOnce(() => {
+      updateMeshBoundingBoxVisibility(entity, mesh)
+    })
+
     mesh.onAfterWorldMatrixUpdateObservable.add(() => {
       updateMeshBoundingBoxVisibility(entity, mesh)
     })
@@ -307,16 +253,18 @@ function updateMeshBoundingBoxVisibility(entity: EcsEntity, mesh: BABYLON.Abstra
 
   const { isEntityOutsideLayout } = getLayoutManager(scene)
 
+  const children = entity.gltfContainer ? entity.gltfContainer.getChildMeshes(false) : entity.getChildMeshes(true)
+
   if (isEntityOutsideLayout(mesh)) {
     if (mesh.showBoundingBox) return
     mesh.showBoundingBox = true
-    for (const childMesh of entity.getChildMeshes(false)) {
+    for (const childMesh of children) {
       addOutsideLayoutMaterial(entity, childMesh, scene)
     }
   } else {
     if (!mesh.showBoundingBox) return
     mesh.showBoundingBox = false
-    for (const childMesh of entity.getChildMeshes(false)) {
+    for (const childMesh of children) {
       removeOutsideLayoutMaterial(entity, childMesh)
     }
   }
