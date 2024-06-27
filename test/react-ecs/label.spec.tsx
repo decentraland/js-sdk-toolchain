@@ -15,6 +15,26 @@ import { setupEngine } from './utils'
 import { getFontSize } from '../../packages/@dcl/react-ecs/src/components/Label/utils'
 
 describe('UiText React Ecs', () => {
+  it('should generate a UI Label with textWrap set to TW_WRAP as default if missing said property', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiText = components.UiText(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getText = (entity: Entity) => UiText.get(entity)
+
+    const ui = () => <Label uiTransform={{ width: 100 }} value="DCLROCKS" />
+
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+
+    expect(getText(rootDivEntity)).toMatchObject({
+      value: 'DCLROCKS',
+      textWrap: TextWrap.TW_WRAP
+    })
+  })
+
   it('should generate a UI and update the width of a div', async () => {
     const { engine, uiRenderer } = setupEngine()
     const UiTransform = components.UiTransform(engine)
