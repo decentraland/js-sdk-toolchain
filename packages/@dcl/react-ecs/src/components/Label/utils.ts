@@ -70,7 +70,7 @@ const parseTextWrap: Readonly<Record<UiTextWrapType, TextWrap>> = {
 /**
  * @internal
  */
-export function getTextWrap(textWrap: UiTextWrapType | undefined): Record<'textWrap', TextWrap> | undefined {
-  if (!textWrap) return undefined
+export function getTextWrap(textWrap: UiTextWrapType | undefined): Record<'textWrap', TextWrap> {
+  if (!textWrap) return { textWrap: TextWrap.TW_WRAP }
   return { textWrap: parseTextWrap[textWrap] }
 }
