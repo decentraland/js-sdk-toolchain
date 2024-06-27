@@ -4,7 +4,7 @@ import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 
 import { isValidVolume, volumeFromMediaSource, volumeToMediaSource } from '../../../../lib/utils/media'
 import { Block } from '../../../Block'
-import { Dropdown, RangeField, TextField } from '../../../ui'
+import { Dropdown, InfoTooltip, RangeField, TextField } from '../../../ui'
 import { isValid } from './utils'
 import type { Props } from './types'
 
@@ -84,6 +84,16 @@ const PlayVideoStreamAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
     [payload, setPayload]
   )
 
+  const renderUrlInfo = useCallback(() => {
+    return (
+      <InfoTooltip
+        text="Video URL to display in the Player."
+        position="right center"
+        link="https://docs.decentraland.org/creator/development-guide/sdk7/video-playing/#about-external-streaming"
+      />
+    )
+  }, [])
+
   return (
     <div className="PlayVideoStreamActionContainer">
       <Block>
@@ -110,7 +120,7 @@ const PlayVideoStreamAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
       {!payload.dclCast ? (
         <>
           <Block>
-            <TextField label="URL" value={payload.src} onChange={handleChangeSrc} />
+            <TextField label={<>URL {renderUrlInfo()}</>} value={payload.src} onChange={handleChangeSrc} />
           </Block>
           <Block>
             <Dropdown

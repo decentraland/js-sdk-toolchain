@@ -119,3 +119,12 @@
   width: 100px;
   height: 100px;
 }
+
+.ImportAsset .warning {
+  color: var(--danger);
+  margin-top: 6px;
+}
+
+.ImportAsset .text {
+  text-align: center;
+}

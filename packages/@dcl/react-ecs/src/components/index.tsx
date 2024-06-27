@@ -1,7 +1,7 @@
 import { PBUiText } from '@dcl/ecs'
 import { ReactEcs } from '../react-ecs'
 import { UiLabelProps } from './Label/types'
-import { getFont, getFontSize, getTextAlign } from './Label/utils'
+import { getFont, getFontSize, getTextAlign, getTextWrap } from './Label/utils'
 import { EntityPropTypes } from './types'
 import { parseProps } from './utils'
 
@@ -30,7 +30,8 @@ export function UiEntity(props: EntityPropTypes & { uiText?: UiLabelProps }) {
       ...props.uiText,
       ...getFont(props.uiText.font),
       ...getTextAlign(props.uiText.textAlign),
-      ...getFontSize(props.uiText.fontSize)
+      ...getFontSize(props.uiText.fontSize),
+      ...getTextWrap(props.uiText.textWrap)
     } as PBUiText
   }
 

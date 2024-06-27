@@ -733,10 +733,30 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
                 label="Select an Anchor Point"
                 placeholder="Select an Anchor Point"
                 options={[
-                  { value: AvatarAnchorPointType.AAPT_RIGHT_HAND, label: 'Right Hand' },
-                  { value: AvatarAnchorPointType.AAPT_LEFT_HAND, label: 'Left Hand' },
+                  { value: AvatarAnchorPointType.AAPT_POSITION, label: 'Avatar Position' },
                   { value: AvatarAnchorPointType.AAPT_NAME_TAG, label: 'Name Tag' },
-                  { value: AvatarAnchorPointType.AAPT_POSITION, label: 'Avatar Position' }
+                  { value: AvatarAnchorPointType.AAPT_NECK, label: 'Neck' },
+                  { value: AvatarAnchorPointType.AAPT_SPINE, label: 'Spine' },
+                  { value: AvatarAnchorPointType.AAPT_SPINE1, label: 'Spine 1' },
+                  { value: AvatarAnchorPointType.AAPT_SPINE2, label: 'Spine 2' },
+                  { value: AvatarAnchorPointType.AAPT_HIP, label: 'Hip' },
+                  { value: AvatarAnchorPointType.AAPT_LEFT_SHOULDER, label: 'Left Shoulder' },
+                  { value: AvatarAnchorPointType.AAPT_LEFT_ARM, label: 'Left Arm' },
+                  { value: AvatarAnchorPointType.AAPT_LEFT_FOREARM, label: 'Left Forearm' },
+                  { value: AvatarAnchorPointType.AAPT_LEFT_HAND, label: 'Left Hand' },
+                  { value: AvatarAnchorPointType.AAPT_LEFT_HAND_INDEX, label: 'Left Hand Index' },
+                  { value: AvatarAnchorPointType.AAPT_RIGHT_SHOULDER, label: 'Right Shoulder' },
+                  { value: AvatarAnchorPointType.AAPT_RIGHT_ARM, label: 'Right Arm' },
+                  { value: AvatarAnchorPointType.AAPT_RIGHT_FOREARM, label: 'Right Forearm' },
+                  { value: AvatarAnchorPointType.AAPT_RIGHT_HAND, label: 'Right Hand' },
+                  { value: AvatarAnchorPointType.AAPT_LEFT_UP_LEG, label: 'Left Up Leg' },
+                  { value: AvatarAnchorPointType.AAPT_LEFT_LEG, label: 'Left Leg' },
+                  { value: AvatarAnchorPointType.AAPT_LEFT_FOOT, label: 'Left Foot' },
+                  { value: AvatarAnchorPointType.AAPT_LEFT_TOE_BASE, label: 'Left Toe Base' },
+                  { value: AvatarAnchorPointType.AAPT_RIGHT_UP_LEG, label: 'Right Up Leg' },
+                  { value: AvatarAnchorPointType.AAPT_RIGHT_LEG, label: 'Right Leg' },
+                  { value: AvatarAnchorPointType.AAPT_RIGHT_FOOT, label: 'Right Foot' },
+                  { value: AvatarAnchorPointType.AAPT_RIGHT_TOE_BASE, label: 'Right Toe Base' }
                 ]}
                 value={getPartialPayload<ActionType.ATTACH_TO_PLAYER>(action)?.anchorPointId}
                 onChange={(e) => handleChangeAnchorPoint(e, idx)}

@@ -20,14 +20,18 @@ export interface UiLabelProps {
   outlineWidth?: number | undefined
   /** Outline color of the text. @defaultValue `{ r: 0, g: 0, b: 0, a: 1 }` */
   outlineColor?: Color4 | undefined
-  /** Text wrapping. @defaultValue false */
-  textWrapping?: boolean | undefined
+  /** Behaviour when text reached. @defaultValue 'wrap' */
+  textWrap?: UiTextWrapType | undefined
 }
 
 /**
  * @public
  */
 export type UiFontType = 'sans-serif' | 'serif' | 'monospace'
+/**
+ * @public
+ */
+export type UiTextWrapType = 'wrap' | 'nowrap'
 /**
  * @public
  */

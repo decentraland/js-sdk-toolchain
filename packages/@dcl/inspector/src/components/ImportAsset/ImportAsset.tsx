@@ -1,7 +1,7 @@
 import { GLTFValidation } from '@babylonjs/loaders'
 import React, { useCallback, useEffect, useState } from 'react'
 import { HiOutlineUpload } from 'react-icons/hi'
-import { RxCross2, RxReload } from 'react-icons/rx'
+import { RxCross2 } from 'react-icons/rx'
 import classNames from 'classnames'
 
 import FileInput from '../FileInput'
@@ -14,7 +14,6 @@ import { DIRECTORY, transformBase64ResourceToBinary, withAssetDir } from '../../
 import { importAsset, saveThumbnail } from '../../redux/data-layer'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
 import { selectAssetCatalog, selectUploadFile, updateUploadFile } from '../../redux/app'
-import { getRandomMnemonic } from './utils'
 import { AssetPreview } from '../AssetPreview'
 
 import './ImportAsset.css'
@@ -152,7 +151,8 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
         importAsset({
           content,
           basePath,
-          assetPackageName: ''
+          assetPackageName: '',
+          reload: true
         })
       )
 
@@ -189,7 +189,7 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
     setAssetName(event.target.value)
   }, [])
 
-  const isValidName = useCallback((name: string, ext: string) => {
+  const isNameUnique = useCallback((name: string, ext: string) => {
     return !assets.find((asset) => {
       const [packageName, otherAssetName] = removeBasePath(basePath, asset.path).split('/')
       if (packageName === 'builder') return false
@@ -197,15 +197,7 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
     })
   }, [])
 
-  const invalidName = !isValidName(assetName, assetExtension)
-
-  const generateAssetName = useCallback(() => {
-    let name: string = assetName
-    while (!isValidName(name, assetExtension)) {
-      name = getRandomMnemonic()
-    }
-    setAssetName(name)
-  }, [assetName])
+  const isNameRepeated = !isNameUnique(assetName, assetExtension)
 
   const handleScreenshot = useCallback(
     (value: string) => {
@@ -222,7 +214,7 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
             <div className="upload-icon">
               <HiOutlineUpload />
             </div>
-            <span>
+            <span className="text">
               To import an asset drag and drop a single GLB/GLTF/PNG/MP3/MP4 file
               <br /> or click to select a file.
             </span>
@@ -237,22 +229,20 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
               <AssetPreview value={file} onScreenshot={handleScreenshot} />
               <div className="file-title">{file.name}</div>
             </Container>
-            <div className={classNames({ error: invalidName })}>
+            <div className={classNames({ error: isNameRepeated })}>
               <Block label="Asset name">
                 <TextField value={assetName} onChange={handleNameChange} />
-                {invalidName && (
-                  <div onClick={generateAssetName}>
-                    <RxReload />
-                  </div>
-                )}
               </Block>
-              <Button disabled={invalidName || !!validationError} onClick={handleSave}>
+              <Button disabled={!!validationError} onClick={handleSave}>
                 Import
               </Button>
             </div>
           </div>
         )}
         <span className="error">{validationError}</span>
+        {isNameRepeated && (
+          <span className="warning">There's a file with this name already, you will overwrite it if you continue</span>
+        )}
       </FileInput>
     </div>
   )

@@ -4,7 +4,7 @@ import { parseProps } from '../utils'
 import { ReactEcs } from '../../react-ecs'
 import { EntityPropTypes } from '../types'
 import { UiLabelProps } from './types'
-import { getFont, getFontSize, getTextAlign } from './utils'
+import { getFont, getFontSize, getTextAlign, getTextWrap } from './utils'
 
 export { scaleFontSize } from './utils'
 
@@ -31,14 +31,15 @@ export function Label(props: EntityPropTypes & UiLabelProps) {
     onMouseDown,
     onMouseUp
   })
-  const { font, textAlign, fontSize, ...textProps } = uiTextProps
+  const { font, textAlign, fontSize, textWrap, ...textProps } = uiTextProps
   const uiText: PBUiText = {
     ...textProps,
     ...getFont(font),
     ...getTextAlign(textAlign),
     ...getFontSize(fontSize),
     outlineWidth: props.outlineWidth,
-    outlineColor: props.outlineColor
+    outlineColor: props.outlineColor,
+    ...getTextWrap(textWrap)
   }
 
   return <entity {...commonProps} uiText={uiText} />
