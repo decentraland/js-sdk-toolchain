@@ -43,7 +43,6 @@ export class EcsEntity extends BABYLON.TransformNode {
   constructor(public entityId: Entity, public context: WeakRef<SceneContext>, public scene: BABYLON.Scene) {
     super(`ecs-${entityId}`, scene)
     createDefaultTransform(this)
-    this.initEventHandlers()
   }
 
   putComponent(component: ComponentDefinition<unknown>) {
@@ -82,8 +81,8 @@ export class EcsEntity extends BABYLON.TransformNode {
     super.dispose(true, false)
   }
 
-  getMeshesBoundingBox() {
-    const children = this.getChildMeshes(false)
+  getMeshesBoundingBox(_children: BABYLON.AbstractMesh[] = []) {
+    const children = _children.length > 0 ? _children : this.getChildMeshes(false)
     let boundingInfo = children[0].getBoundingInfo()
     let min = boundingInfo.boundingBox.minimumWorld
     let max = boundingInfo.boundingBox.maximumWorld
@@ -95,6 +94,13 @@ export class EcsEntity extends BABYLON.TransformNode {
       max = BABYLON.Vector3.Maximize(max, boundingInfo.boundingBox.maximumWorld)
     }
     return new BABYLON.BoundingInfo(min, max)
+  }
+
+  getGroupMeshesBoundingBox() {
+    // This will get the GLTF contaier children if it exists, otherwise it will get the entity's children
+    const children = this.gltfContainer ? this.gltfContainer.getChildMeshes(false) : this.getChildMeshes(false)
+    if (children.length === 0) return null
+    return this.getMeshesBoundingBox(children)
   }
 
   isGltfPathLoading() {
@@ -169,36 +175,26 @@ export class EcsEntity extends BABYLON.TransformNode {
   }
 
   generateBoundingBox() {
-    if (this.boundingInfoMesh) return
+    if (!!this.boundingInfoMesh) return
 
-    const meshesBoundingBox = this.getMeshesBoundingBox()
+    const boundingVectors = this.getGroupMeshesBoundingBox()
 
-    this.boundingInfoMesh = new BABYLON.Mesh(`BoundingMesh-${this.id}`)
-    this.boundingInfoMesh.position = this.absolutePosition
-    this.boundingInfoMesh.rotationQuaternion = this.absoluteRotationQuaternion
-    this.boundingInfoMesh.scaling = this.absoluteScaling
+    if (!boundingVectors) return
 
-    this.boundingInfoMesh.setBoundingInfo(
-      new BABYLON.BoundingInfo(meshesBoundingBox.minimum, meshesBoundingBox.maximum, this.getWorldMatrix())
-    )
-  }
+    const boundingInfoMesh = new BABYLON.Mesh(`BoundingMesh-${this.id}`, this.getScene())
 
-  initEventHandlers() {
-    if (this.entityId !== this.context.deref()!.engine.RootEntity) {
-      // Initialize this event to handle the entity's position update
-      this.onAfterWorldMatrixUpdateObservable.addOnce((eventData) => {
-        void validateEntityIsOutsideLayout(eventData as EcsEntity)
-      })
+    boundingInfoMesh.position = BABYLON.Vector3.Zero()
+    boundingInfoMesh.rotationQuaternion = BABYLON.Quaternion.Identity()
+    boundingInfoMesh.scaling = BABYLON.Vector3.One()
 
-      // Updates the boundingInfoMesh position, rotation and scaling
-      this.onAfterWorldMatrixUpdateObservable.add((eventData) => {
-        if (this.boundingInfoMesh) {
-          this.boundingInfoMesh.position = eventData.absolutePosition
-          this.boundingInfoMesh.rotationQuaternion = eventData.absoluteRotationQuaternion
-          this.boundingInfoMesh.scaling = eventData.absoluteScaling
-        }
-      })
-    }
+    boundingInfoMesh.setBoundingInfo(new BABYLON.BoundingInfo(boundingVectors.minimum, boundingVectors.maximum))
+
+    this.boundingInfoMesh = boundingInfoMesh
+
+    this.boundingInfoMesh.parent = this
+
+    // Validate if the entity is outside the layout
+    void validateEntityIsOutsideLayout(this)
   }
 
   isOutOfBoundaries() {
@@ -241,6 +237,11 @@ async function validateEntityIsOutsideLayout(entity: EcsEntity) {
   await entity.onAssetLoaded()
   const mesh = entity.boundingInfoMesh
   if (mesh) {
+    // First run to initializate the bounding box visibility when the scene is already loaded
+    entity.getScene().onReadyObservable.addOnce(() => {
+      updateMeshBoundingBoxVisibility(entity, mesh)
+    })
+
     mesh.onAfterWorldMatrixUpdateObservable.add(() => {
       updateMeshBoundingBoxVisibility(entity, mesh)
     })
@@ -249,40 +250,57 @@ async function validateEntityIsOutsideLayout(entity: EcsEntity) {
 
 function updateMeshBoundingBoxVisibility(entity: EcsEntity, mesh: BABYLON.AbstractMesh) {
   const scene = mesh.getScene()
-  if (scene.isLoading) return
 
   const { isEntityOutsideLayout } = getLayoutManager(scene)
+
+  const children = entity.gltfContainer ? entity.gltfContainer.getChildMeshes(false) : entity.getChildMeshes(true)
 
   if (isEntityOutsideLayout(mesh)) {
     if (mesh.showBoundingBox) return
     mesh.showBoundingBox = true
-    for (const childMesh of entity.getChildMeshes(false)) {
-      addOutsideLayoutMaterial(childMesh, scene)
+    for (const childMesh of children) {
+      addOutsideLayoutMaterial(entity, childMesh, scene)
     }
   } else {
     if (!mesh.showBoundingBox) return
     mesh.showBoundingBox = false
-    for (const childMesh of entity.getChildMeshes(false)) {
-      removeOutsideLayoutMaterial(childMesh)
+    for (const childMesh of children) {
+      removeOutsideLayoutMaterial(entity, childMesh)
     }
   }
 }
 
-function addOutsideLayoutMaterial(mesh: BABYLON.AbstractMesh, scene: BABYLON.Scene) {
+function addOutsideLayoutMaterial(entity: EcsEntity, mesh: BABYLON.AbstractMesh, scene: BABYLON.Scene) {
   if (!(mesh.material instanceof BABYLON.MultiMaterial)) {
-    const multiMaterial = new BABYLON.MultiMaterial('entity_outside_layout_multimaterial', scene)
-    multiMaterial.subMaterials = [scene.getMaterialByName('entity_outside_layout'), mesh.material]
+    const multiMaterial = new BABYLON.MultiMaterial(
+      `entity_outside_layout_multimaterial-${entity.id}-${mesh.uniqueId}`,
+      scene
+    )
+    multiMaterial.subMaterials = [getEntityOutsideLayoutMaterial(scene), mesh.material]
     mesh.material = multiMaterial
   }
 }
 
-function removeOutsideLayoutMaterial(mesh: BABYLON.AbstractMesh) {
+function removeOutsideLayoutMaterial(entity: EcsEntity, mesh: BABYLON.AbstractMesh) {
   if (
     mesh.material instanceof BABYLON.MultiMaterial &&
-    mesh.material.subMaterials.some((material) => material?.name === 'entity_outside_layout')
+    mesh.material.name === `entity_outside_layout_multimaterial-${entity.id}-${mesh.uniqueId}`
   ) {
     const multiMaterial = mesh.material
     mesh.material = multiMaterial.subMaterials[1]
+    multiMaterial.subMaterials = []
     multiMaterial.dispose()
   }
+}
+
+function getEntityOutsideLayoutMaterial(scene: BABYLON.Scene) {
+  let material = scene.getMaterialByName('entity_outside_layout')
+  if (material) {
+    return material
+  }
+  // Material for entity outside layout
+  material = new BABYLON.StandardMaterial('entity_outside_layout', scene)
+  ;(material as BABYLON.StandardMaterial).diffuseColor = new BABYLON.Color3(1, 0, 0)
+  material.backFaceCulling = false
+  return material
 }

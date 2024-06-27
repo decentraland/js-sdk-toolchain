@@ -70,7 +70,11 @@ export const updateGltfForEntity = (entity: EcsEntity, newValue: PBGltfContainer
 
 export async function loadGltf(entity: EcsEntity, value: string) {
   const context = entity.context.deref()
-  if (!context || !!entity.gltfContainer) return
+  if (!context) return
+
+  if (entity.gltfContainer) {
+    removeGltf(entity)
+  }
 
   // store a WeakRef to the sceneContext to enable file resolver
   if (!sceneContext) {
@@ -131,13 +135,7 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
   }
 
   if (entity.isGltfPathLoading()) {
-    const loadingFilePath = await entity.getGltfPathLoading()
-    if (loadingFilePath === filePath) {
-      console.warn(
-        `Asset ${filePath} for entity ${entity.entityId} is already being loaded. This call will be dismissed`
-      )
-      return
-    }
+    await entity.getGltfPathLoading()
   }
 
   entity.setGltfPathLoading()
@@ -164,7 +162,7 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
       */
       const prevChildren = entity.getChildren()
       for (const child of prevChildren) {
-        if (child instanceof EcsEntity) continue // skip EcsEntity nodes, only remove gltf related stuff
+        if (child instanceof EcsEntity || child.id.startsWith('BoundingMesh')) continue // skip EcsEntity nodes, only remove gltf related stuff
         child.setEnabled(false)
         child.dispose(false, true)
       }
@@ -176,9 +174,10 @@ async function tryLoadGltfAsync(sceneId: string, entity: EcsEntity, filePath: st
           mesh.parent = entity
           entity.setGltfContainer(mesh)
         })
-      entity.generateBoundingBox()
+
       entity.setGltfAssetContainer(assetContainer)
       entity.resolveGltfPathLoading(filePath)
+      entity.generateBoundingBox()
       loadAssetFuture.resolve()
     },
     undefined,

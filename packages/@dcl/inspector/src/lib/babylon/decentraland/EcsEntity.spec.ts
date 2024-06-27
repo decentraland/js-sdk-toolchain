@@ -194,14 +194,14 @@ describe('EcsEntity', () => {
     expect(entity.boundingInfoMesh).toBeDefined()
     const boundingInfoMesh = entity.boundingInfoMesh!
     expect(boundingInfoMesh.name).toBe(`BoundingMesh-${entity.id}`)
-    expect(boundingInfoMesh.position).toEqual(entity.absolutePosition)
-    expect(boundingInfoMesh.rotationQuaternion).toEqual(entity.absoluteRotationQuaternion)
-    expect(boundingInfoMesh.scaling).toEqual(entity.absoluteScaling)
+    expect(boundingInfoMesh.absolutePosition).toEqual(entity.absolutePosition)
+    expect(boundingInfoMesh.absoluteRotationQuaternion).toEqual(entity.absoluteRotationQuaternion)
+    expect(boundingInfoMesh.absoluteScaling).toEqual(entity.absoluteScaling)
     expect(boundingInfoMesh.getBoundingInfo().boundingBox.minimumWorld).toEqual(
-      mesh1.getBoundingInfo().boundingBox.minimumWorld
+      entity.getGroupMeshesBoundingBox()!.boundingBox.minimumWorld
     )
     expect(boundingInfoMesh.getBoundingInfo().boundingBox.maximumWorld).toEqual(
-      mesh2.getBoundingInfo().boundingBox.maximumWorld
+      entity.getGroupMeshesBoundingBox()!.boundingBox.maximumWorld
     )
   })
 })

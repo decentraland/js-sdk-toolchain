@@ -394,7 +394,7 @@ export const enum CameraType {
 // Warning: (ae-missing-release-tag) "Children" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export type Children = ReactNode;
+export type Children = ReactEcs.JSX.ReactNode;
 
 // @public (undocumented)
 export interface CinematicSettings {
@@ -1064,7 +1064,7 @@ export const enum EasingFunction {
 export interface EcsElements {
     // (undocumented)
     entity: Partial<EntityComponents> & {
-        children?: ReactNode;
+        children?: ReactEcs.JSX.ReactNode;
         key?: Key;
     };
 }
@@ -3008,7 +3008,7 @@ export interface PBUiText {
     outlineColor?: PBColor4 | undefined;
     outlineWidth?: number | undefined;
     textAlign?: TextAlignMode | undefined;
-    textWrapping?: boolean | undefined;
+    textWrap?: TextWrap | undefined;
     value: string;
 }
 
@@ -3536,7 +3536,7 @@ export namespace ReactEcs {
         export interface IntrinsicElements extends EcsElements {
         }
         // (undocumented)
-        export type ReactNode = ReactElement | string | number | boolean | null | undefined;
+        export type ReactNode = Element | ReactElement | string | number | boolean | null | undefined | ReactNode[];
     }
     const // (undocumented)
     createElement: any;
@@ -3558,9 +3558,6 @@ export interface ReactElement<P = any, T extends string | JSXElementConstructor<
     // (undocumented)
     type: T;
 }
-
-// @public (undocumented)
-export type ReactNode = ReactElement | string | number | boolean | null | undefined;
 
 // @public (undocumented)
 export type ReadonlyComponentSchema<T extends [ComponentDefinition<unknown>, ...ComponentDefinition<unknown>[]]> = {
@@ -3912,6 +3909,14 @@ export const enum TextureWrapMode {
 // @public (undocumented)
 export type TextureWrapType = 'repeat' | 'clamp' | 'mirror';
 
+// @public (undocumented)
+export const enum TextWrap {
+    // (undocumented)
+    TW_NO_WRAP = 1,
+    // (undocumented)
+    TW_WRAP = 0
+}
+
 // @public
 export const ToGammaSpace: number;
 
@@ -4116,7 +4121,7 @@ export interface UiLabelProps {
     outlineColor?: PBColor4 | undefined;
     outlineWidth?: number | undefined;
     textAlign?: TextAlignType | undefined;
-    textWrapping?: boolean | undefined;
+    textWrap?: UiTextWrapType | undefined;
     value: string;
 }
 
@@ -4132,6 +4137,9 @@ export type UiTexture = {
     wrapMode?: TextureWrapType;
     filterMode?: TextureFilterType;
 };
+
+// @public (undocumented)
+export type UiTextWrapType = 'wrap' | 'nowrap';
 
 // @public (undocumented)
 export const UiTransform: LastWriteWinElementSetComponentDefinition<PBUiTransform>;

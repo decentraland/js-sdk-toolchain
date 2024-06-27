@@ -1,5 +1,5 @@
-import { Font, TextAlignMode } from '@dcl/ecs'
-import { TextAlignType, UiFontType } from './types'
+import { Font, TextAlignMode, TextWrap } from '@dcl/ecs'
+import { TextAlignType, UiFontType, UiTextWrapType } from './types'
 import { calcOnViewport, getScaleCtx } from '../utils'
 import { ScaleContext, ScaleUnit } from '../types'
 
@@ -61,4 +61,16 @@ export function scaleFontSize(
 ): number {
   if (!ctx) return fontSize
   return fontSize + calcOnViewport(scaleUnit, ctx)
+}
+
+const parseTextWrap: Readonly<Record<UiTextWrapType, TextWrap>> = {
+  wrap: TextWrap.TW_WRAP,
+  nowrap: TextWrap.TW_NO_WRAP
+}
+/**
+ * @internal
+ */
+export function getTextWrap(textWrap: UiTextWrapType | undefined): Record<'textWrap', TextWrap> | undefined {
+  if (!textWrap) return undefined
+  return { textWrap: parseTextWrap[textWrap] }
 }

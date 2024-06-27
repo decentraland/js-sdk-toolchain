@@ -10,7 +10,7 @@ import { withAssetDir } from '../../../../lib/data-layer/host/fs-utils'
 import { useAppSelector } from '../../../../redux/hooks'
 import { selectAssetCatalog } from '../../../../redux/app'
 import { Block } from '../../../Block'
-import { TextField, CheckboxField, RangeField } from '../../../ui'
+import { TextField, CheckboxField, RangeField, InfoTooltip } from '../../../ui'
 import { fromVideoPlayer, toVideoPlayer, isValidInput, isVideo, isValidVolume } from '../../VideoPlayerInspector/utils'
 
 const DROP_TYPES = ['project-asset']
@@ -61,6 +61,16 @@ export default React.memo(
       [files]
     )
 
+    const renderUrlInfo = useCallback(() => {
+      return (
+        <InfoTooltip
+          text="Video URL or Video file to display in the Player."
+          position="right center"
+          link="https://docs.decentraland.org/creator/development-guide/sdk7/video-playing/"
+        />
+      )
+    }, [])
+
     if (!hasVideoPlayer) return null
 
     const playing = getInputProps('playing', (e) => e.target.checked)
@@ -69,7 +79,7 @@ export default React.memo(
 
     return (
       <div className={cx({ hover: isHover })}>
-        <Block label="Path/URL" ref={drop}>
+        <Block label={<>Path/URL {renderUrlInfo()}</>} ref={drop}>
           <TextField type="text" {...getInputProps('src')} error={files && !isValid} drop={isHover} />
         </Block>
         <Block label="Playback">
