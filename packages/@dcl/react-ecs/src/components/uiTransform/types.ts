@@ -1,3 +1,4 @@
+import { Vector2 } from '@dcl/ecs/dist/components/generated/pb/decentraland/common/vectors.gen'
 import { ScaleUnit } from '../types'
 
 /**
@@ -84,6 +85,12 @@ export type PositionType = 'absolute' | 'relative'
 export type PointerFilterType = 'none' | 'block'
 
 /**
+ * @public
+ * The scroll-visible determines if the scrollbars are shown when the scroll overflow is enabled
+ */
+export type ScrollVisibleType = 'horizontal' | 'vertical' | 'both' | 'hidden'
+
+/**
  * Layout props to position things in the canvas
  * @public
  */
@@ -136,4 +143,10 @@ export interface UiTransformProps {
   pointerFilter?: PointerFilterType
   /** The opacity property sets the opacity level for an element, it's accumulated across children @defaultValue 1 */
   opacity?: number
+  /** A reference value to identify the element, default empty */
+  elementId?: string
+  /** default position=(0,0) if it aplies, a vector or a reference-id */
+  scrollPosition?: Vector2 | string
+  /** default ShowScrollBar.SSB_BOTH */
+  scrollVisible?: ScrollVisibleType
 }
