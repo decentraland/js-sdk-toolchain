@@ -29,7 +29,7 @@ describe('UiText React Ecs', () => {
     let color: Color4 | undefined = undefined
     let font: UiFontType | undefined = 'sans-serif'
     let textAlign: TextAlignType | undefined = 'bottom-center'
-    let textWrap: UiTextWrapType | undefined = 'nowrap'
+    let textWrap: UiTextWrapType = 'nowrap'
     const ui = () => (
       <Label
         uiTransform={{ width: 100 }}
@@ -63,14 +63,14 @@ describe('UiText React Ecs', () => {
     color = { r: 1, g: 1, b: 1, a: 1 }
     font = undefined
     textAlign = undefined
-    textWrap = undefined
+    textWrap = 'nowrap'
     await engine.update(1)
     expect(getText(rootDivEntity)).toMatchObject({
       value: 'BOEDO',
       color: { r: 1, g: 1, b: 1, a: 1 },
       font: 0,
       textAlign: undefined,
-      textWrap: undefined
+      textWrap: TextWrap.TW_NO_WRAP
     })
     await engine.update(1)
   })
