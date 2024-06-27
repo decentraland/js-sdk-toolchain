@@ -4,14 +4,11 @@ import {
   IEngine,
   NetworkEntity as _NetworkEntity,
   LastWriteWinElementSetComponentDefinition,
-  PBEngineInfo,
-  PlayerIdentityData
+  PBEngineInfo
 } from '@dcl/ecs'
 import { componentNumberFromName } from '@dcl/ecs/dist/components/component-number'
-import { PlayerIdentityData as definePlayerIdentityData } from '@dcl/ecs/dist/components'
 
 import type { GetUserDataRequest, GetUserDataResponse } from '~system/UserIdentity'
-import { SyncEntity } from './entities'
 import { IProfile } from './message-bus-sync'
 
 // Already initialized my state. Ignore new states messages.
@@ -26,20 +23,28 @@ export function setInitialized() {
 export let INITIAL_CRDT_RENDERER_MESSAGES_SENT = false
 
 // Retrieve userId to start sending this info as the networkId
-export function fetchProfile(
+// This should use the PlayerIdentityData component but it's not being populated on the first frame.
+export async function fetchProfile(
+  engine: IEngine,
   myProfile: IProfile,
   getUserData: (value: GetUserDataRequest) => Promise<GetUserDataResponse>
 ) {
-  void getUserData({}).then(({ data }) => {
-    if (data?.userId) {
-      const userId = data.userId
-      const networkId = componentNumberFromName(data.userId)
-      myProfile.networkId = networkId
-      myProfile.userId = userId
-    } else {
-      throw new Error(`Couldn't fetch profile data`)
-    }
-  })
+  console.log('[fetchProfile]')
+  if (myProfile.userId) return myProfile
+  const PlayerIdentityData = engine.getComponent(_PlayerIdentityData.componentId) as typeof _PlayerIdentityData
+  const player = PlayerIdentityData.getOrNull(engine.PlayerEntity)
+  const userId = player?.address ?? (await getUserData({})).data?.userId
+
+  console.log('[fetchProfile] Finished fetching profile')
+
+  if (userId) {
+    const networkId = componentNumberFromName(userId)
+    myProfile.networkId = networkId
+    myProfile.userId = userId
+    return myProfile
+  } else {
+    throw new Error(`Couldn't fetch profile data`)
+  }
 }
 
 /**
@@ -62,19 +67,9 @@ export function syncTransportIsReady(engine: IEngine) {
  * Check if we are already initialized
  * This fn should be added as a system so it runs on every tick
  */
-export function stateInitializedChecker(engine: IEngine, myProfile: IProfile, _syncEntity: SyncEntity) {
+export function stateInitializedChecker(engine: IEngine) {
   const EngineInfo = engine.getComponent(_EngineInfo.componentId) as typeof _EngineInfo
-  const PlayerIdentityData = engine.getComponent(_PlayerIdentityData.componentId) as typeof _PlayerIdentityData
-  if (!myProfile.userId) {
-    console.log('[BOEDO player]', PlayerIdentityData.getOrNull(engine.PlayerEntity), 'asd')
-    const player = PlayerIdentityData.getOrNull(engine.PlayerEntity)
-    if (player) {
-      const userId = player.address
-      const networkId = componentNumberFromName(userId)
-      myProfile.networkId = networkId
-      myProfile.userId = userId
-    }
-  }
+
   if ((EngineInfo.getOrNull(engine.RootEntity)?.tickNumber ?? 0) > 100) {
     setInitialized()
     return

@@ -1,5 +1,4 @@
 import { IEngine, Transport } from '@dcl/ecs'
-import { PlayerIdentityData as definePlayerIdentityData } from '@dcl/ecs/dist/components'
 import type { SendBinaryRequest, SendBinaryResponse } from '~system/CommunicationsController'
 
 import { syncFilter } from './filter'
@@ -18,11 +17,9 @@ export function addSyncTransport(
 ) {
   // Profile Info
   const myProfile: IProfile = {} as IProfile
-  fetchProfile(myProfile!, getUserData)
-
-  console.log({ myProfile })
+  const myProfilePromise = fetchProfile(engine, myProfile, getUserData)
   // Entity utils
-  const entityDefinitions = entityUtils(engine, myProfile)
+  const entityDefinitions = entityUtils(engine, myProfile, myProfilePromise)
 
   // List of MessageBuss messsages to be sent on every frame to comms
   const pendingMessageBusMessagesToSend: Uint8Array[] = []
@@ -50,7 +47,7 @@ export function addSyncTransport(
   // End add sync transport
 
   // Add state intialized checker
-  engine.addSystem(() => stateInitializedChecker(engine, myProfile, entityDefinitions.syncEntity))
+  engine.addSystem(() => stateInitializedChecker(engine))
 
   // Request initial state
   binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
