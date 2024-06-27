@@ -7,7 +7,9 @@ import {
   YGPositionType,
   YGUnit,
   YGWrap,
-  PointerFilterMode
+  PointerFilterMode,
+  PBUiTransform,
+  ShowScrollBar
 } from '@dcl/ecs'
 import {
   AlignType,
@@ -20,10 +22,12 @@ import {
   PositionType,
   PositionUnit,
   PositionShorthand,
-  PointerFilterType
+  PointerFilterType,
+  ScrollVisibleType
 } from './types'
 import { calcOnViewport } from '../utils'
 import { ScaleUnit } from '../types'
+import { Vector2 } from '@dcl/ecs/dist/components/generated/pb/decentraland/common/vectors.gen'
 
 function capitalize<T extends string>(value: T): Capitalize<T> {
   return `${value[0].toUpperCase()}${value.slice(1, value.length)}` as Capitalize<T>
@@ -264,4 +268,44 @@ export function getPointerFilter(
 const parsePointerFilter: Readonly<Record<PointerFilterType, PointerFilterMode>> = {
   none: PointerFilterMode.PFM_NONE,
   block: PointerFilterMode.PFM_BLOCK
+}
+
+/**
+ * @internal
+ */
+export function getScrollPosition(scrollPosition: string | Vector2): Pick<PBUiTransform, 'scrollPosition'> {
+  if (typeof scrollPosition === 'string') {
+    return {
+      scrollPosition: {
+        value: {
+          $case: 'reference',
+          reference: scrollPosition
+        }
+      }
+    }
+  } else {
+    return {
+      scrollPosition: {
+        value: {
+          $case: 'position',
+          position: scrollPosition
+        }
+      }
+    }
+  }
+}
+
+const parseScrollVisible: Record<ScrollVisibleType, ShowScrollBar> = {
+  both: ShowScrollBar.SSB_BOTH,
+  hidden: ShowScrollBar.SSB_HIDDEN,
+  horizontal: ShowScrollBar.SSB_ONLY_HORIZONTAL,
+  vertical: ShowScrollBar.SSB_ONLY_VERTICAL
+}
+
+/**
+ * @internal
+ */
+
+export function getScrollVisible(scrollVisible: ScrollVisibleType): Pick<PBUiTransform, 'scrollVisible'> {
+  return { scrollVisible: parseScrollVisible[scrollVisible] }
 }

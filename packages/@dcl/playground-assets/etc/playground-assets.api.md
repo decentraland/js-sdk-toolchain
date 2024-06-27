@@ -671,6 +671,7 @@ export const componentDefinitionByName: {
     "core::UiDropdownResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdownResult>>;
     "core::UiInput": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInput>>;
     "core::UiInputResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInputResult>>;
+    "core::UiScrollResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiScrollResult>>;
     "core::UiText": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiText>>;
     "core::UiTransform": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiTransform>>;
     "core::VideoEvent": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBVideoEvent>>;
@@ -3001,6 +3002,20 @@ export namespace PBUiInputResult {
 }
 
 // @public (undocumented)
+export interface PBUiScrollResult {
+    // (undocumented)
+    value: PBVector2 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBUiScrollResult {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiScrollResult;
+    // (undocumented)
+    export function encode(message: PBUiScrollResult, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBUiText {
     color?: PBColor4 | undefined;
     font?: Font | undefined;
@@ -3026,6 +3041,7 @@ export interface PBUiTransform {
     alignItems?: YGAlign | undefined;
     alignSelf: YGAlign;
     display: YGDisplay;
+    elementId?: string | undefined;
     // (undocumented)
     flexBasis: number;
     flexBasisUnit: YGUnit;
@@ -3094,6 +3110,8 @@ export interface PBUiTransform {
     positionType: YGPositionType;
     // (undocumented)
     rightOf: number;
+    scrollPosition?: ScrollPositionValue | undefined;
+    scrollVisible?: ShowScrollBar | undefined;
     // (undocumented)
     width: number;
     widthUnit: YGUnit;
@@ -3761,6 +3779,41 @@ export namespace Schemas {
 }
 
 // @public (undocumented)
+export interface ScrollPositionValue {
+    // (undocumented)
+    value?: {
+        $case: "position";
+        position: PBVector2;
+    } | {
+        $case: "reference";
+        reference: string;
+    } | undefined;
+}
+
+// @public (undocumented)
+export namespace ScrollPositionValue {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): ScrollPositionValue;
+    // (undocumented)
+    export function encode(message: ScrollPositionValue, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public
+export type ScrollVisibleType = 'horizontal' | 'vertical' | 'both' | 'hidden';
+
+// @public (undocumented)
+export const enum ShowScrollBar {
+    // (undocumented)
+    SSB_BOTH = 0,
+    // (undocumented)
+    SSB_HIDDEN = 3,
+    // (undocumented)
+    SSB_ONLY_HORIZONTAL = 2,
+    // (undocumented)
+    SSB_ONLY_VERTICAL = 1
+}
+
+// @public (undocumented)
 export interface Spec {
     // (undocumented)
     [key: string]: ISchema;
@@ -4129,6 +4182,9 @@ export interface UiLabelProps {
 export type uint32 = number;
 
 // @public (undocumented)
+export const UiScrollResult: LastWriteWinElementSetComponentDefinition<PBUiScrollResult>;
+
+// @public (undocumented)
 export const UiText: LastWriteWinElementSetComponentDefinition<PBUiText>;
 
 // @public
@@ -4150,6 +4206,7 @@ export interface UiTransformProps {
     alignItems?: AlignType;
     alignSelf?: AlignType;
     display?: DisplayType;
+    elementId?: string;
     flex?: number;
     flexBasis?: number;
     flexDirection?: FlexDirectionType;
@@ -4169,6 +4226,8 @@ export interface UiTransformProps {
     pointerFilter?: PointerFilterType;
     position?: Partial<Position> | PositionShorthand;
     positionType?: PositionType;
+    scrollPosition?: PBVector2 | string;
+    scrollVisible?: ScrollVisibleType;
     width?: PositionUnit | 'auto';
 }
 
