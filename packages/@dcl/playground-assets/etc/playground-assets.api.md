@@ -650,6 +650,8 @@ export const componentDefinitionByName: {
     "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
+    "core::GltfNode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNode>>;
+    "core::GltfNodeState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNodeState>>;
     "core::Material": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMaterial>>;
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
@@ -1218,6 +1220,22 @@ export const GltfContainer: LastWriteWinElementSetComponentDefinition<PBGltfCont
 
 // @public (undocumented)
 export const GltfContainerLoadingState: LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>;
+
+// @public (undocumented)
+export const GltfNode: LastWriteWinElementSetComponentDefinition<PBGltfNode>;
+
+// @public (undocumented)
+export const GltfNodeState: LastWriteWinElementSetComponentDefinition<PBGltfNodeState>;
+
+// @public (undocumented)
+export const enum GltfNodeStateValue {
+    // (undocumented)
+    GNSV_FAILED = 1,
+    // (undocumented)
+    GNSV_PENDING = 0,
+    // (undocumented)
+    GNSV_READY = 2
+}
 
 // @public (undocumented)
 export interface GrowOnlyValueSetComponentDefinition<T> extends BaseComponent<T> {
@@ -2360,6 +2378,35 @@ export namespace PBGltfContainerLoadingState {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfContainerLoadingState;
     // (undocumented)
     export function encode(message: PBGltfContainerLoadingState, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBGltfNode {
+    name: string;
+}
+
+// @public (undocumented)
+export namespace PBGltfNode {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfNode;
+    // (undocumented)
+    export function encode(message: PBGltfNode, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBGltfNodeState {
+    // (undocumented)
+    error?: string | undefined;
+    // (undocumented)
+    state: GltfNodeStateValue;
+}
+
+// @public (undocumented)
+export namespace PBGltfNodeState {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfNodeState;
+    // (undocumented)
+    export function encode(message: PBGltfNodeState, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)

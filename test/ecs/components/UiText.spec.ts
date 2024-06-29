@@ -14,7 +14,7 @@ describe('Generated UiText ProtoBuf', () => {
       textAlign: undefined,
       textWrap: undefined,
       outlineColor: undefined,
-      outlineWidth: undefined,
+      outlineWidth: undefined
     })
 
     testComponentSerialization(UiText, {
