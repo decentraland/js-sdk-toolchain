@@ -137,6 +137,13 @@ export const AvatarAttach: LastWriteWinElementSetComponentDefinition<PBAvatarAtt
 export const AvatarBase: LastWriteWinElementSetComponentDefinition<PBAvatarBase>;
 
 // @public (undocumented)
+export const enum AvatarControlType {
+    CCT_NONE = 0,
+    CCT_RELATIVE = 1,
+    CCT_TANK = 2
+}
+
+// @public (undocumented)
 export const AvatarEmoteCommand: GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>;
 
 // @public (undocumented)
@@ -149,6 +156,28 @@ export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAva
 export const enum AvatarModifierType {
     AMT_DISABLE_PASSPORTS = 1,
     AMT_HIDE_AVATARS = 0
+}
+
+// @public (undocumented)
+export interface AvatarMovementSettings {
+    allowWeightedMovement?: boolean | undefined;
+    // (undocumented)
+    controlMode?: AvatarControlType | undefined;
+    friction?: number | undefined;
+    gravity?: number | undefined;
+    jumpHeight?: number | undefined;
+    maxFallSpeed?: number | undefined;
+    runSpeed?: number | undefined;
+    turnSpeed?: number | undefined;
+    walkSpeed?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace AvatarMovementSettings {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): AvatarMovementSettings;
+    // (undocumented)
+    export function encode(message: AvatarMovementSettings, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -366,6 +395,29 @@ export const enum CameraType {
 //
 // @public (undocumented)
 export type Children = ReactEcs.JSX.ReactNode;
+
+// @public (undocumented)
+export interface CinematicSettings {
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    allowManualRotation?: boolean | undefined;
+    cameraEntity: number;
+    pitchRange?: number | undefined;
+    rollRange?: number | undefined;
+    yawRange?: number | undefined;
+    zoomMax?: number | undefined;
+    zoomMin?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace CinematicSettings {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): CinematicSettings;
+    // (undocumented)
+    export function encode(message: CinematicSettings, writer?: _m0.Writer): _m0.Writer;
+}
 
 // @public (undocumented)
 export const enum ColliderLayer {
@@ -619,6 +671,7 @@ export const componentDefinitionByName: {
     "core::UiDropdownResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdownResult>>;
     "core::UiInput": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInput>>;
     "core::UiInputResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInputResult>>;
+    "core::UiScrollResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiScrollResult>>;
     "core::UiText": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiText>>;
     "core::UiTransform": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiTransform>>;
     "core::VideoEvent": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBVideoEvent>>;
@@ -2148,6 +2201,9 @@ export interface PBAvatarModifierArea {
     area: PBVector3 | undefined;
     excludeIds: string[];
     modifiers: AvatarModifierType[];
+    // (undocumented)
+    movementSettings?: AvatarMovementSettings | undefined;
+    useColliderRange?: boolean | undefined;
 }
 
 // @public (undocumented)
@@ -2210,7 +2266,10 @@ export namespace PBCameraMode {
 // @public (undocumented)
 export interface PBCameraModeArea {
     area: PBVector3 | undefined;
+    // (undocumented)
+    cinematicSettings?: CinematicSettings | undefined;
     mode: CameraType;
+    useColliderRange?: boolean | undefined;
 }
 
 // @public (undocumented)
@@ -2943,10 +3002,26 @@ export namespace PBUiInputResult {
 }
 
 // @public (undocumented)
+export interface PBUiScrollResult {
+    // (undocumented)
+    value: PBVector2 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBUiScrollResult {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiScrollResult;
+    // (undocumented)
+    export function encode(message: PBUiScrollResult, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBUiText {
     color?: PBColor4 | undefined;
     font?: Font | undefined;
     fontSize?: number | undefined;
+    outlineColor?: PBColor4 | undefined;
+    outlineWidth?: number | undefined;
     textAlign?: TextAlignMode | undefined;
     textWrap?: TextWrap | undefined;
     value: string;
@@ -2966,6 +3041,7 @@ export interface PBUiTransform {
     alignItems?: YGAlign | undefined;
     alignSelf: YGAlign;
     display: YGDisplay;
+    elementId?: string | undefined;
     // (undocumented)
     flexBasis: number;
     flexBasisUnit: YGUnit;
@@ -3002,6 +3078,7 @@ export interface PBUiTransform {
     // (undocumented)
     minWidth: number;
     minWidthUnit: YGUnit;
+    opacity?: number | undefined;
     overflow: YGOverflow;
     // (undocumented)
     paddingBottom: number;
@@ -3033,6 +3110,8 @@ export interface PBUiTransform {
     positionType: YGPositionType;
     // (undocumented)
     rightOf: number;
+    scrollPosition?: ScrollPositionValue | undefined;
+    scrollVisible?: ShowScrollBar | undefined;
     // (undocumented)
     width: number;
     widthUnit: YGUnit;
@@ -3700,6 +3779,41 @@ export namespace Schemas {
 }
 
 // @public (undocumented)
+export interface ScrollPositionValue {
+    // (undocumented)
+    value?: {
+        $case: "position";
+        position: PBVector2;
+    } | {
+        $case: "reference";
+        reference: string;
+    } | undefined;
+}
+
+// @public (undocumented)
+export namespace ScrollPositionValue {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): ScrollPositionValue;
+    // (undocumented)
+    export function encode(message: ScrollPositionValue, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public
+export type ScrollVisibleType = 'horizontal' | 'vertical' | 'both' | 'hidden';
+
+// @public (undocumented)
+export const enum ShowScrollBar {
+    // (undocumented)
+    SSB_BOTH = 0,
+    // (undocumented)
+    SSB_HIDDEN = 3,
+    // (undocumented)
+    SSB_ONLY_HORIZONTAL = 2,
+    // (undocumented)
+    SSB_ONLY_VERTICAL = 1
+}
+
+// @public (undocumented)
 export interface Spec {
     // (undocumented)
     [key: string]: ISchema;
@@ -4057,6 +4171,8 @@ export interface UiLabelProps {
     color?: PBColor4 | undefined;
     font?: UiFontType | undefined;
     fontSize?: ScaleUnit | undefined;
+    outlineColor?: PBColor4 | undefined;
+    outlineWidth?: number | undefined;
     textAlign?: TextAlignType | undefined;
     textWrap?: UiTextWrapType | undefined;
     value: string;
@@ -4064,6 +4180,9 @@ export interface UiLabelProps {
 
 // @public
 export type uint32 = number;
+
+// @public (undocumented)
+export const UiScrollResult: LastWriteWinElementSetComponentDefinition<PBUiScrollResult>;
 
 // @public (undocumented)
 export const UiText: LastWriteWinElementSetComponentDefinition<PBUiText>;
@@ -4087,6 +4206,7 @@ export interface UiTransformProps {
     alignItems?: AlignType;
     alignSelf?: AlignType;
     display?: DisplayType;
+    elementId?: string;
     flex?: number;
     flexBasis?: number;
     flexDirection?: FlexDirectionType;
@@ -4100,11 +4220,14 @@ export interface UiTransformProps {
     maxWidth?: PositionUnit;
     minHeight?: PositionUnit;
     minWidth?: PositionUnit;
+    opacity?: number;
     overflow?: OverflowType;
     padding?: Partial<Position> | PositionShorthand;
     pointerFilter?: PointerFilterType;
     position?: Partial<Position> | PositionShorthand;
     positionType?: PositionType;
+    scrollPosition?: PBVector2 | string;
+    scrollVisible?: ScrollVisibleType;
     width?: PositionUnit | 'auto';
 }
 
