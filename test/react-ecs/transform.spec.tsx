@@ -8,10 +8,18 @@ import {
   YGDisplay,
   YGPositionType,
   YGJustify,
-  PointerFilterMode
+  PointerFilterMode,
+  ShowScrollBar
 } from '../../packages/@dcl/ecs'
 import { components } from '../../packages/@dcl/ecs/src'
-import { Position, PositionUnit, ReactEcs, UiEntity, UiTransformProps } from '../../packages/@dcl/react-ecs/src'
+import {
+  Position,
+  PositionUnit,
+  ReactEcs,
+  ScrollVisibleType,
+  UiEntity,
+  UiTransformProps
+} from '../../packages/@dcl/react-ecs/src'
 import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
 import { setupEngine } from './utils'
 
@@ -350,6 +358,72 @@ describe('UiTransform React Ecs', () => {
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       widthUnit: YGUnit.YGU_AUTO,
       heightUnit: YGUnit.YGU_AUTO
+    })
+  })
+
+  it('should parse scroll visible, position and elementId correctly', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    let scrollVisible: ScrollVisibleType = 'both'
+    let scrollPosition: { x: number; y: number } | string | undefined = { x: 20, y: 10 }
+    let elementId: string | undefined = 'someElementIdAssigned'
+
+    const ui = () => (
+      <UiEntity
+        uiTransform={{
+          scrollPosition,
+          scrollVisible,
+          elementId
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      scrollPosition: {
+        value: {
+          $case: 'position',
+          position: { x: 20, y: 10 }
+        }
+      },
+      scrollVisible: ShowScrollBar.SSB_BOTH,
+      elementId: 'someElementIdAssigned'
+    })
+
+    elementId = undefined
+    scrollPosition = 'someElementIdTarget'
+    scrollVisible = 'hidden'
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      scrollPosition: {
+        value: {
+          $case: 'reference',
+          reference: 'someElementIdTarget'
+        }
+      },
+      scrollVisible: ShowScrollBar.SSB_HIDDEN
+    })
+
+    scrollPosition = undefined
+    scrollVisible = 'horizontal'
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      scrollVisible: ShowScrollBar.SSB_ONLY_HORIZONTAL
+    })
+
+    scrollVisible = 'vertical'
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      scrollVisible: ShowScrollBar.SSB_ONLY_VERTICAL
     })
   })
 })
