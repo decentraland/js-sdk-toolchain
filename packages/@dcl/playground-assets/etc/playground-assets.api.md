@@ -2370,6 +2370,8 @@ export namespace PBGltfContainer {
 export interface PBGltfContainerLoadingState {
     // (undocumented)
     currentState: LoadingState;
+    // (undocumented)
+    namedNodes: string[];
 }
 
 // @public (undocumented)
