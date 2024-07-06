@@ -9,7 +9,6 @@
     "@dcl/explorer": "1.0.164182-20240702173148.commit-d4a0e99",
     "@dcl/js-runtime": "file:../js-runtime",
     "@dcl/react-ecs": "file:../react-ecs",
-    "@dcl/sdk-commands": "file:../sdk-commands",
     "text-encoding": "0.7.0"
   },
   "keywords": [],
