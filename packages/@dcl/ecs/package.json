@@ -25,6 +25,9 @@
     "build": "tsc -p tsconfig.json && tsc -p tsconfig.cjs.json",
     "start": "tsc -p tsconfig.json --watch"
   },
+  "dependencies": {
+    "protobufjs": "^7.2.4"
+  },
   "typedoc": {
     "entryPoint": "./src/index.ts",
     "readmeFile": "./README.md",
