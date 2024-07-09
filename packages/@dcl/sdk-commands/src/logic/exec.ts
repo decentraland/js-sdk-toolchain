@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import type { spawn } from 'child_process'
 
 interface Options {
@@ -7,6 +8,7 @@ interface Options {
 
 export type IProcessSpawnerComponent = {
   exec(cwd: string, command: string, args: string[], options?: Partial<Options>): Promise<void>
+  // exec2(cwd: string, command: string, args: string[], options?: Partial<Options>): Promise<unknown>
 }
 
 export function createProcessSpawnerComponent(spawnFn: typeof spawn): IProcessSpawnerComponent {
@@ -35,5 +37,23 @@ export function createProcessSpawnerComponent(spawnFn: typeof spawn): IProcessSp
         })
       })
     }
+    // async exec2(cwd, command, args, { env, silent } = {}) {
+    //   const subprocess = spawnFn(command, args, { shell: true, cwd, env: { ...process.env, NODE_ENV: '', ...env } })
+    //   subprocess.on('error', (err) => {
+    //     console.log({ err })
+    //   })
+    //   subprocess.on('message', (msg) => {
+    //     console.log({ msg })
+    //   })
+    //   subprocess.on('close', (code: number) => {
+    //     if (code !== 0) {
+    //       const _ = `${command} ${args.join(' ')}`
+    //       reject(new Error(`Command "${_}" exited with code ${code}. Please try running the command manually`))
+    //       return
+    //     }
+
+    //     resolve(undefined)
+    //   })
+    // }
   }
 }

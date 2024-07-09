@@ -26,6 +26,7 @@ import { getValidWorkspace } from '../../logic/workspace-validations'
 import { printCurrentProjectStarting, printProgressInfo, printWarning } from '../../logic/beautiful-logs'
 import { Result } from 'arg'
 import { startValidations } from '../../logic/project-validations'
+import { runExplorerAlpha } from './explorer-alpha'
 
 interface Options {
   args: Result<typeof args>
@@ -99,6 +100,17 @@ export async function main(options: Options) {
   if (workspace.projects.length > 1)
     printWarning(options.components.logger, 'Support for multiple projects is still experimental.')
 
+  const EXPLORER_ALPHA = true
+  const port = await getPort(options.args['--port'] || 0)
+  const config = createRecordConfigComponent({
+    HTTP_SERVER_PORT: port.toString(),
+    HTTP_SERVER_HOST: '0.0.0.0',
+    ...process.env
+  })
+  if (EXPLORER_ALPHA) {
+    await runExplorerAlpha({ ...options.components, config }, workingDirectory)
+  }
+
   for (const project of workspace.projects) {
     if (project.kind === 'smart-wearable') hasSmartWearable = true
     if (project.kind === 'scene' || project.kind === 'smart-wearable') {
@@ -124,18 +136,24 @@ export async function main(options: Options) {
 
   printProgressInfo(options.components.logger, 'Starting preview server')
 
-  const port = await getPort(options.args['--port'] || 0)
   const program = await Lifecycle.run<PreviewComponents>({
     async initComponents(): Promise<PreviewComponents> {
       const metrics = createTestMetricsComponent(roomsMetrics)
-      const config = createRecordConfigComponent({
-        HTTP_SERVER_PORT: port.toString(),
-        HTTP_SERVER_HOST: '0.0.0.0',
-        ...process.env
-      })
+
       const logs = await createConsoleLogComponent({})
       const ws = await createWsComponent({ logs })
-      const server = await createServerComponent<PreviewComponents>({ config, logs, ws: ws.ws }, { cors: {} })
+      const fakeLog = {
+        getLogger(v: string) {
+          return {
+            log() {},
+            error() {},
+            info() {},
+            debug() {},
+            warn() {}
+          }
+        }
+      }
+      const server = await createServerComponent<PreviewComponents>({ config, ws: ws.ws, logs: fakeLog }, { cors: {} })
       const rooms = await createRoomsComponent({
         metrics,
         logs,
@@ -179,7 +197,9 @@ export async function main(options: Options) {
       const availableURLs: string[] = []
 
       printProgressInfo(options.components.logger, 'Preview server is now running!')
-      components.logger.log('Available on:\n')
+      if (!EXPLORER_ALPHA) {
+        components.logger.log('Available on:\n')
+      }
 
       Object.keys(networkInterfaces).forEach((dev) => {
         ;(networkInterfaces[dev] || []).forEach((details) => {
@@ -203,8 +223,10 @@ export async function main(options: Options) {
         return a.toLowerCase().includes('localhost') || a.includes('127.0.0.1') || a.includes('0.0.0.0') ? -1 : 1
       })
 
-      for (const addr of sortedURLs) {
-        components.logger.log(`    ${addr}`)
+      if (!EXPLORER_ALPHA) {
+        for (const addr of sortedURLs) {
+          components.logger.log(`    ${addr}`)
+        }
       }
 
       if (options.args['--desktop-client']) {
@@ -216,11 +238,13 @@ export async function main(options: Options) {
         }
       }
 
-      components.logger.log('\n  Details:\n')
+      if (!EXPLORER_ALPHA) {
+        components.logger.log('\n  Details:\n')
+      }
       components.logger.log('\nPress CTRL+C to exit\n')
 
       // Open preferably localhost/127.0.0.1
-      if (openBrowser && sortedURLs.length && !options.args['--desktop-client']) {
+      if (false && openBrowser && sortedURLs.length && !options.args['--desktop-client']) {
         try {
           await open(sortedURLs[0])
         } catch (_) {
