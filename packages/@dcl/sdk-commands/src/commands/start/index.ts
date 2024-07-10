@@ -50,7 +50,8 @@ export const args = declareArgs({
   '-w': '--no-watch',
   '--skip-build': Boolean,
   '--desktop-client': Boolean,
-  '--data-layer': Boolean
+  '--data-layer': Boolean,
+  '--explorer-alpha': Boolean
 })
 
 export async function help(options: Options) {
@@ -91,6 +92,7 @@ export async function main(options: Options) {
   const watch = !options.args['--no-watch']
   const withDataLayer = options.args['--data-layer']
   const enableWeb3 = options.args['--web3']
+  const explorerAlpha = options.args['--explorer-alpha']
 
   let hasSmartWearable = false
 
@@ -99,17 +101,6 @@ export async function main(options: Options) {
   /* istanbul ignore if */
   if (workspace.projects.length > 1)
     printWarning(options.components.logger, 'Support for multiple projects is still experimental.')
-
-  const EXPLORER_ALPHA = true
-  const port = await getPort(options.args['--port'] || 0)
-  const config = createRecordConfigComponent({
-    HTTP_SERVER_PORT: port.toString(),
-    HTTP_SERVER_HOST: '0.0.0.0',
-    ...process.env
-  })
-  if (EXPLORER_ALPHA) {
-    await runExplorerAlpha({ ...options.components, config }, workingDirectory)
-  }
 
   for (const project of workspace.projects) {
     if (project.kind === 'smart-wearable') hasSmartWearable = true
@@ -136,24 +127,18 @@ export async function main(options: Options) {
 
   printProgressInfo(options.components.logger, 'Starting preview server')
 
+  const port = await getPort(options.args['--port'] || 0)
   const program = await Lifecycle.run<PreviewComponents>({
     async initComponents(): Promise<PreviewComponents> {
       const metrics = createTestMetricsComponent(roomsMetrics)
-
+      const config = createRecordConfigComponent({
+        HTTP_SERVER_PORT: port.toString(),
+        HTTP_SERVER_HOST: '0.0.0.0',
+        ...process.env
+      })
       const logs = await createConsoleLogComponent({})
       const ws = await createWsComponent({ logs })
-      const fakeLog = {
-        getLogger(v: string) {
-          return {
-            log() {},
-            error() {},
-            info() {},
-            debug() {},
-            warn() {}
-          }
-        }
-      }
-      const server = await createServerComponent<PreviewComponents>({ config, ws: ws.ws, logs: fakeLog }, { cors: {} })
+      const server = await createServerComponent<PreviewComponents>({ config, ws: ws.ws, logs }, { cors: {} })
       const rooms = await createRoomsComponent({
         metrics,
         logs,
@@ -197,7 +182,7 @@ export async function main(options: Options) {
       const availableURLs: string[] = []
 
       printProgressInfo(options.components.logger, 'Preview server is now running!')
-      if (!EXPLORER_ALPHA) {
+      if (!explorerAlpha) {
         components.logger.log('Available on:\n')
       }
 
@@ -223,7 +208,7 @@ export async function main(options: Options) {
         return a.toLowerCase().includes('localhost') || a.includes('127.0.0.1') || a.includes('0.0.0.0') ? -1 : 1
       })
 
-      if (!EXPLORER_ALPHA) {
+      if (!explorerAlpha) {
         for (const addr of sortedURLs) {
           components.logger.log(`    ${addr}`)
         }
@@ -238,13 +223,17 @@ export async function main(options: Options) {
         }
       }
 
-      if (!EXPLORER_ALPHA) {
+      if (!explorerAlpha) {
         components.logger.log('\n  Details:\n')
       }
       components.logger.log('\nPress CTRL+C to exit\n')
 
+      if (explorerAlpha) {
+        await runExplorerAlpha(components, workingDirectory, sortedURLs[0])
+      }
+
       // Open preferably localhost/127.0.0.1
-      if (false && openBrowser && sortedURLs.length && !options.args['--desktop-client']) {
+      if (!explorerAlpha && openBrowser && sortedURLs.length && !options.args['--desktop-client']) {
         try {
           await open(sortedURLs[0])
         } catch (_) {

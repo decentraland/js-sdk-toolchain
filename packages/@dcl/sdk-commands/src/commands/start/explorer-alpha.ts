@@ -2,26 +2,27 @@ import prompts from 'prompts'
 import { CliComponents } from '../../components'
 import { writeGlobalConfig } from '../../components/config'
 
-export async function runExplorerAlpha(components: CliComponents, cwd: string) {
-  if (await runApp(components, cwd)) {
+const isWindows = /^win/.test(process.platform)
+
+export async function runExplorerAlpha(components: CliComponents, cwd: string, realm: string) {
+  if (await runApp(components, { cwd, realm })) {
     return
   }
   const path = await getExplorerAlphaPath(components)
-  if (path && (await runApp(components, cwd, path))) {
+  if (path && (await runApp(components, { cwd, realm, path }))) {
     return
   }
   components.logger.log('\n')
-  components.logger.warn('EXPLORER APP NOT FOUND. ')
+  components.logger.warn('DECENTRALAND APP NOT FOUND. ')
   components.logger.warn('Please download & install it: https://dcl.gg/explorer\n\n')
 }
 
-async function runApp(components: CliComponents, cwd: string, path?: string) {
+async function runApp(components: CliComponents, { cwd, realm, path }: { cwd: string; realm: string; path?: string }) {
   const cmd = isWindows ? 'start' : 'open'
   try {
-    //'--realm http://127.0.0.1:8000'
-    await components.spawner.exec(cwd, cmd, [path ?? 'decentraland://'], { silent: true })
+    await components.spawner.exec(cwd, cmd, [path ?? `decentraland://realm=${realm}`], { silent: true })
     if (path) {
-      await writeGlobalConfig(components, 'EXPLORER_ALPHA_PATH_2', path)
+      await writeGlobalConfig(components, 'EXPLORER_ALPHA_PATH', path)
     }
     return true
   } catch (e: any) {
@@ -30,10 +31,8 @@ async function runApp(components: CliComponents, cwd: string, path?: string) {
   }
 }
 
-const isWindows = /^win/.test(process.platform)
-
 export async function getExplorerAlphaPath(components: CliComponents): Promise<string | undefined> {
-  const path = await components.config.getString('EXPLORER_ALPHA_PATH_2')
+  const path = await components.config.getString('EXPLORER_ALPHA_PATH')
   if (path) return path
   try {
     const answer = await prompts(
