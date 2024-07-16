@@ -102,7 +102,7 @@ export const enum AvatarAnchorPointType {
     AAPT_NAME_TAG = 1,
     // (undocumented)
     AAPT_NECK = 5,
-    // (undocumented)
+    // @deprecated
     AAPT_POSITION = 0,
     // (undocumented)
     AAPT_RIGHT_ARM = 15,
