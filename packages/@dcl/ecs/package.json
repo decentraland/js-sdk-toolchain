@@ -26,6 +26,7 @@
     "start": "tsc -p tsconfig.json --watch"
   },
   "dependencies": {
+    "arg": "^5.0.0",
     "protobufjs": "^7.2.4"
   },
   "typedoc": {
