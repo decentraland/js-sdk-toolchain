@@ -11,7 +11,7 @@ import { b64HashingFunction } from '../../../logic/project-files'
 import {
   WsSceneMessage,
   UpdateModelType
-} from '@dcl/protocol/out-ts/decentraland/sdk/development/local_development.gen'
+} from '@dcl/protocol/out-js/decentraland/sdk/development/local_development.gen'
 
 function debounce<T extends (...args: any[]) => void>(callback: T, delay: number) {
   let debounceTimer: NodeJS.Timeout
@@ -101,7 +101,7 @@ function sendSceneMessage(sceneMessage: WsSceneMessage) {
  * IMPORTANT: this is a legacy protocol and needs to be revisited for SDK7
  * @deprecated old explorer
  */
-function __LEGACY__updateScene(dir: string, clients: Set<WebSocket>, projectKind: ProjectUnion['kind']): void {
+export function __LEGACY__updateScene(dir: string, clients: Set<WebSocket>, projectKind: ProjectUnion['kind']): void {
   console.log('update scene')
   for (const client of clients) {
     if (client.readyState === WebSocket.OPEN) {
