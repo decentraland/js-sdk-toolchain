@@ -4,12 +4,12 @@ import { writeGlobalConfig } from '../../components/config'
 
 const isWindows = /^win/.test(process.platform)
 
-export async function runExplorerAlpha(components: CliComponents, cwd: string, realm: string) {
+export async function runExplorerAlpha(components: CliComponents, opts: { cwd: string; realm: string; path?: string }) {
+  const { cwd, realm, path } = opts
   if (await runApp(components, { cwd, realm })) {
     return
   }
-  const path = await getExplorerAlphaPath(components)
-  if (path && (await runApp(components, { cwd, realm, path }))) {
+  if (path && (await runApp(components, { cwd, realm, path: path ?? (await getExplorerAlphaPath(components)) }))) {
     return
   }
   components.logger.log('\n')

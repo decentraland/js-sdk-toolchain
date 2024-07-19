@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import type { spawn } from 'child_process'
 
 interface Options {

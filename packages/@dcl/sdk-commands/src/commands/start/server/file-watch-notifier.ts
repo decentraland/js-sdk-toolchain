@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { sdk } from '@dcl/schemas'
 import path from 'path'
 import { WebSocket } from 'ws'
@@ -7,6 +8,10 @@ import { PreviewComponents } from '../types'
 import { sceneUpdateClients } from './routes'
 import { ProjectUnion } from '../../../logic/project-validations'
 import { b64HashingFunction } from '../../../logic/project-files'
+import {
+  WsSceneMessage,
+  UpdateModelType
+} from '@dcl/protocol/out-ts/decentraland/sdk/development/local_development.gen'
 
 function debounce<T extends (...args: any[]) => void>(callback: T, delay: number) {
   let debounceTimer: NodeJS.Timeout
@@ -27,26 +32,77 @@ export async function wireFileWatcherToWebSockets(
   projectKind: ProjectUnion['kind']
 ) {
   const ignored = await getDCLIgnorePatterns(components, projectRoot)
-
+  const sceneId = b64HashingFunction(projectRoot)
   chokidar
     .watch(path.resolve(projectRoot), {
+      atomic: false,
       ignored,
       ignoreInitial: false,
       cwd: projectRoot
     })
+    .on('unlink', (_: unknown, file: string) => {
+      return removeModel(sceneId, file)
+    })
     .on(
       'all',
-      debounce(async (_, _file) => {
+      debounce(async (a, file) => {
+        updateScene(sceneId, file)
         // TODO: accumulate changes in an array and debounce
-        return updateScene(projectRoot, sceneUpdateClients, projectKind)
+        // return __LEGACY__updateScene(projectRoot, sceneUpdateClients, projectKind)
       }, 500)
     )
 }
 
+function isGLTFModel(file: string) {
+  return file.toLowerCase().endsWith('.glb') || file.toLowerCase().endsWith('.gltf')
+}
+
+function updateScene(sceneId: string, file: string) {
+  let message: WsSceneMessage['message']
+  if (isGLTFModel(file)) {
+    message = {
+      $case: 'updateModel',
+      updateModel: { hash: b64HashingFunction(file), id: sceneId, src: file, type: UpdateModelType.UMT_CHANGE }
+    }
+  } else {
+    message = {
+      $case: 'updateScene',
+      updateScene: { id: sceneId, type: '' }
+    }
+  }
+  sendSceneMessage({ message })
+}
+
+function removeModel(sceneId: string, file: string) {
+  if (isGLTFModel(file)) {
+    const sceneMessage: WsSceneMessage = {
+      message: {
+        $case: 'updateModel',
+        updateModel: { id: sceneId, src: file, hash: b64HashingFunction(file), type: UpdateModelType.UMT_REMOVE }
+      }
+    }
+
+    sendSceneMessage(sceneMessage)
+  }
+}
+
+function sendSceneMessage(sceneMessage: WsSceneMessage) {
+  const message = WsSceneMessage.encode(sceneMessage).finish()
+  for (const client of sceneUpdateClients) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(message, { binary: true })
+    }
+  }
+}
+
 /*
- * IMPORTANT: this is a legacy protocol and needs to be revisited for SDK7
  */
-function updateScene(dir: string, clients: Set<WebSocket>, projectKind: ProjectUnion['kind']): void {
+/**
+ * IMPORTANT: this is a legacy protocol and needs to be revisited for SDK7
+ * @deprecated old explorer
+ */
+function __LEGACY__updateScene(dir: string, clients: Set<WebSocket>, projectKind: ProjectUnion['kind']): void {
+  console.log('update scene')
   for (const client of clients) {
     if (client.readyState === WebSocket.OPEN) {
       const message: sdk.SceneUpdate = {
@@ -54,8 +110,15 @@ function updateScene(dir: string, clients: Set<WebSocket>, projectKind: ProjectU
         payload: { sceneId: b64HashingFunction(dir), sceneType: projectKind }
       }
 
-      client.send(sdk.UPDATE)
+      // Old explorer
+      client.send(sdk.UPDATE, { binary: false })
       client.send(JSON.stringify(message))
+
+      // explorer @
+      const WsMessage = WsSceneMessage.encode({
+        message: { $case: 'updateScene', updateScene: { type: '', id: '' } }
+      }).finish()
+      client.send(WsMessage, { binary: true })
     }
   }
 }
