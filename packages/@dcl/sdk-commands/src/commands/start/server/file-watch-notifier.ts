@@ -29,7 +29,7 @@ function debounce<T extends (...args: any[]) => void>(callback: T, delay: number
 export async function wireFileWatcherToWebSockets(
   components: Pick<PreviewComponents, 'fs' | 'ws'>,
   projectRoot: string,
-  projectKind: ProjectUnion['kind']
+  _projectKind: ProjectUnion['kind']
 ) {
   const ignored = await getDCLIgnorePatterns(components, projectRoot)
   const sceneId = b64HashingFunction(projectRoot)
@@ -62,12 +62,12 @@ function updateScene(sceneId: string, file: string) {
   if (isGLTFModel(file)) {
     message = {
       $case: 'updateModel',
-      updateModel: { hash: b64HashingFunction(file), id: sceneId, src: file, type: UpdateModelType.UMT_CHANGE }
+      updateModel: { hash: b64HashingFunction(file), sceneId, src: file, type: UpdateModelType.UMT_CHANGE }
     }
   } else {
     message = {
       $case: 'updateScene',
-      updateScene: { id: sceneId, type: '' }
+      updateScene: { sceneId }
     }
   }
   sendSceneMessage({ message })
@@ -78,7 +78,7 @@ function removeModel(sceneId: string, file: string) {
     const sceneMessage: WsSceneMessage = {
       message: {
         $case: 'updateModel',
-        updateModel: { id: sceneId, src: file, hash: b64HashingFunction(file), type: UpdateModelType.UMT_REMOVE }
+        updateModel: { sceneId, src: file, hash: b64HashingFunction(file), type: UpdateModelType.UMT_REMOVE }
       }
     }
 
@@ -113,12 +113,6 @@ export function __LEGACY__updateScene(dir: string, clients: Set<WebSocket>, proj
       // Old explorer
       client.send(sdk.UPDATE, { binary: false })
       client.send(JSON.stringify(message))
-
-      // explorer @
-      const WsMessage = WsSceneMessage.encode({
-        message: { $case: 'updateScene', updateScene: { type: '', id: '' } }
-      }).finish()
-      client.send(WsMessage, { binary: true })
     }
   }
 }
