@@ -8,16 +8,12 @@ export async function runExplorerAlpha(
   opts: { cwd: string; realm: string; path?: string; baseCoords: { x: number; y: number } }
 ) {
   const { cwd, realm, baseCoords } = opts
+
   if (await runApp(components, { cwd, realm, baseCoords })) {
     return
   }
-  // const explorerPath = await getExplorerAlphaPath(components, path)
-  // if (explorerPath && (await runApp(components, { cwd, realm, path: explorerPath, baseCoords }))) {
-  //   return
-  // }
-  components.logger.log('\n')
-  components.logger.warn('DECENTRALAND APP NOT FOUND. ')
-  components.logger.warn('Please download & install it: https://dcl.gg/explorer\n\n')
+
+  components.logger.log('Please download & install the Decentraland Desktop Client: https://dcl.gg/explorer\n\n')
 }
 
 async function runApp(
@@ -26,15 +22,17 @@ async function runApp(
 ) {
   const cmd = isWindows ? 'start' : 'open'
   try {
-    const app = path ?? `decentraland://realm=${realm}&position=${baseCoords.x},${baseCoords.y}`
-    components.logger.log(`Running: ${app}`)
+    const params = `realm=${realm}&position=${baseCoords.x},${baseCoords.y}`
+    const app = path ?? `decentraland://"${params}"`
+
     await components.spawner.exec(cwd, cmd, [app], { silent: true })
     if (path) {
       await writeGlobalConfig(components, 'EXPLORER_ALPHA_PATH', path)
     }
+    components.logger.info(`Desktop client: decentraland://${params}\n`)
     return true
   } catch (e: any) {
-    components.logger.error('Explorer app failed with: ', e)
+    components.logger.error('Decentraland Desktop Client failed with: ', e.message)
     return false
   }
 }
