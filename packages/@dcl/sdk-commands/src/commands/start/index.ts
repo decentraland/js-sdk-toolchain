@@ -232,7 +232,7 @@ export async function main(options: Options) {
 
       if (explorerAlpha) {
         const realm = new URL(sortedURLs[0]).origin
-        await runExplorerAlpha(components, { cwd: workingDirectory, realm, path: explorerAlphaPath })
+        await runExplorerAlpha(components, { cwd: workingDirectory, realm, path: explorerAlphaPath, baseCoords })
       }
 
       // Open preferably localhost/127.0.0.1
