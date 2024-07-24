@@ -29,7 +29,8 @@ function debounce<T extends (...args: any[]) => void>(callback: T, delay: number
 export async function wireFileWatcherToWebSockets(
   components: Pick<PreviewComponents, 'fs' | 'ws'>,
   projectRoot: string,
-  _projectKind: ProjectUnion['kind']
+  projectKind: ProjectUnion['kind'],
+  desktopClient: boolean
 ) {
   const ignored = await getDCLIgnorePatterns(components, projectRoot)
   const sceneId = b64HashingFunction(projectRoot)
@@ -41,14 +42,17 @@ export async function wireFileWatcherToWebSockets(
       cwd: projectRoot
     })
     .on('unlink', (_: unknown, file: string) => {
-      return removeModel(sceneId, file)
+      if (desktopClient) {
+        return removeModel(sceneId, file)
+      }
     })
     .on(
       'all',
       debounce(async (a, file) => {
-        updateScene(sceneId, file)
-        // TODO: accumulate changes in an array and debounce
-        // return __LEGACY__updateScene(projectRoot, sceneUpdateClients, projectKind)
+        if (desktopClient) {
+          updateScene(sceneId, file)
+        }
+        return __LEGACY__updateScene(projectRoot, sceneUpdateClients, projectKind)
       }, 500)
     )
 }
@@ -98,8 +102,7 @@ function sendSceneMessage(sceneMessage: WsSceneMessage) {
 /*
  */
 /**
- * IMPORTANT: this is a legacy protocol and needs to be revisited for SDK7
- * @deprecated old explorer
+ * @deprecated old explorer (kernel)
  */
 export function __LEGACY__updateScene(dir: string, clients: Set<WebSocket>, projectKind: ProjectUnion['kind']): void {
   console.log('update scene')
@@ -112,7 +115,7 @@ export function __LEGACY__updateScene(dir: string, clients: Set<WebSocket>, proj
 
       // Old explorer
       client.send(sdk.UPDATE, { binary: false })
-      client.send(JSON.stringify(message))
+      client.send(JSON.stringify(message), { binary: false })
     }
   }
 }

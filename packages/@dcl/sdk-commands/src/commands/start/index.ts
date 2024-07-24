@@ -175,7 +175,7 @@ export async function main(options: Options) {
       await wireRouter(components, workspace, dataLayer)
       if (watch) {
         for (const project of workspace.projects) {
-          await wireFileWatcherToWebSockets(components, project.workingDirectory, project.kind)
+          await wireFileWatcherToWebSockets(components, project.workingDirectory, project.kind, !!explorerAlpha)
         }
       }
       await startComponents()
