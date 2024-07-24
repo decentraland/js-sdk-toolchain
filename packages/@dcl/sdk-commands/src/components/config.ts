@@ -11,7 +11,6 @@ export type ConfigKeys =
   | 'DCL_LAND_REGISTRY_ADDRESS' // Address of the LAND_REGISTRY smart contract
   | 'DCL_ESTATE_REGISTRY_ADDRESS' // Address of the ESTATE_REGISTRY smart contract
   | 'DCL_CATALYST' // Default catalyst
-  | 'EXPLORER_ALPHA_PATH' // Explorer alpha path to run app
 
 export const DCL_RC = '.dclrc'
 

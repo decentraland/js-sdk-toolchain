@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { sdk } from '@dcl/schemas'
 import path from 'path'
 import { WebSocket } from 'ws'
@@ -99,13 +98,10 @@ function sendSceneMessage(sceneMessage: WsSceneMessage) {
   }
 }
 
-/*
- */
 /**
  * @deprecated old explorer (kernel)
  */
 export function __LEGACY__updateScene(dir: string, clients: Set<WebSocket>, projectKind: ProjectUnion['kind']): void {
-  console.log('update scene')
   for (const client of clients) {
     if (client.readyState === WebSocket.OPEN) {
       const message: sdk.SceneUpdate = {

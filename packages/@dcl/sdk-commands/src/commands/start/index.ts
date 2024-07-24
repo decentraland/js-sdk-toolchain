@@ -51,8 +51,7 @@ export const args = declareArgs({
   '--skip-build': Boolean,
   '--desktop-client': Boolean,
   '--data-layer': Boolean,
-  '--explorer-alpha': Boolean,
-  '--explorer-path': String
+  '--explorer-alpha': Boolean
 })
 
 export async function help(options: Options) {
@@ -94,7 +93,6 @@ export async function main(options: Options) {
   const withDataLayer = options.args['--data-layer']
   const enableWeb3 = options.args['--web3']
   const explorerAlpha = options.args['--explorer-alpha']
-  const explorerAlphaPath = options.args['--explorer-path']
 
   let hasSmartWearable = false
 
@@ -232,7 +230,7 @@ export async function main(options: Options) {
 
       if (explorerAlpha) {
         const realm = new URL(sortedURLs[0]).origin
-        await runExplorerAlpha(components, { cwd: workingDirectory, realm, path: explorerAlphaPath, baseCoords })
+        await runExplorerAlpha(components, { cwd: workingDirectory, realm, baseCoords })
       }
 
       // Open preferably localhost/127.0.0.1
