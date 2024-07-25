@@ -1,5 +1,4 @@
 import { CliComponents } from '../../components'
-import { writeGlobalConfig } from '../../components/config'
 
 const isWindows = /^win/.test(process.platform)
 
