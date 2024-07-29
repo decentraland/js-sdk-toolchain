@@ -66,15 +66,14 @@ describe('setGround', () => {
       expect(deleteFromSpy).toHaveBeenCalledTimes(1)
       expect(deleteFromSpy).toHaveBeenCalledWith(previousGround)
     })
+
     it('should create a ground entity with four tiles as children', () => {
       const setGround = createSetGround(engine)
       const src = 'some-src'
-      setGround(src)
+      const ground = setGround(src)
 
       const getEntitiesWith = <T>(component: ComponentDefinition<T>) =>
         Array.from(engine.getEntitiesWith(component)).map(([entity]) => entity)
-
-      const ground = getEntitiesWith(Ground)[0]
       const tiles = getEntitiesWith(Tile)
 
       expect(tiles.length).toBe(4)
