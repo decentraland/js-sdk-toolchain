@@ -7,7 +7,7 @@ describe('Generated GltfNode ProtoBuf', () => {
     const GltfNode = components.GltfNode(newEngine)
 
     testComponentSerialization(GltfNode, {
-      name: 'someGltfNode'
+      path: 'someGltfNode'
     })
   })
 })
