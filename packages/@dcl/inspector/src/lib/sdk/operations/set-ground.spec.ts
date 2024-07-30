@@ -49,7 +49,6 @@ describe('setGround', () => {
       getComponentSpy.mockImplementation((componentName) => {
         return components[componentName]
       })
-      jest.resetAllMocks()
       jest.restoreAllMocks()
     })
     it('should remove previous ground if any', () => {
