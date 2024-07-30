@@ -1,4 +1,8 @@
-import { Transform as defineTransform, GltfContainer as defineGltfContainer } from '@dcl/ecs/dist/components'
+import {
+  Transform as defineTransform,
+  GltfContainer as defineGltfContainer,
+  Name as defineName
+} from '@dcl/ecs/dist/components'
 import { createEditorComponents } from '../components'
 import { setGround as createSetGround } from './set-ground'
 import { ComponentDefinition, Engine } from '@dcl/ecs'
@@ -8,6 +12,7 @@ describe('setGround', () => {
   const { Scene, Ground, Lock, Tile, Nodes } = createEditorComponents(engine)
   const Transform = defineTransform(engine)
   const GltfContainer = defineGltfContainer(engine)
+  defineName(engine)
 
   beforeEach(() => {
     Scene.createOrReplace(engine.RootEntity, {
