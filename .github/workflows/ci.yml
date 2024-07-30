@@ -18,10 +18,8 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
           cache: 'npm'
-      - name: install npm
-        run: npm i -g npm
       - name: install
         run: make install
       - name: lint
@@ -35,10 +33,8 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
           cache: 'npm'
-      - name: install npm
-        run: npm i -g npm
       - name: docs
         run: make docs
   test:
@@ -47,10 +43,8 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
           cache: 'npm'
-      - name: install npm
-        run: npm i -g npm
       - name: install
         run: make install
       - name: build
@@ -87,10 +81,8 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
           cache: 'npm'
-      - name: install npm
-        run: npm i -g npm
       - name: install repo
         run: npm ci
       - name: install inspector
@@ -121,11 +113,9 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
           cache: 'npm'
 
-      - name: install npm
-        run: npm i -g npm
 
       - name: install
         run: make install
@@ -426,9 +416,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
-      - name: install npm
-        run: npm i -g npm
+          node-version: 20
       - run: mkdir -p scene
       - name: npx @dcl/sdk-commands init --skip-install
         run: npx ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_commands_s3_bucket_key }} init --skip-install
