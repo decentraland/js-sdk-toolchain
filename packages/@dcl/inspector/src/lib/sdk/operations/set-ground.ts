@@ -4,7 +4,7 @@ import { addChild as createAddChild } from './add-child'
 import { removeEntity as createRemoveEntity } from './remove-entity'
 
 export function setGround(engine: IEngine) {
-  return function setGround(src: string): Entity {
+  return function setGround(src: string) {
     const addChild = createAddChild(engine)
     const removeEntity = createRemoveEntity(engine)
     const Transform = engine.getComponent(TransformEngine.componentName) as typeof TransformEngine
@@ -18,7 +18,6 @@ export function setGround(engine: IEngine) {
     for (const [previousGround] of engine.getEntitiesWith(Ground)) {
       removeEntity(previousGround)
     }
-
     const ground = addChild(engine.RootEntity, 'Ground')
     Ground.create(ground)
     Lock.create(ground, { value: true })
@@ -40,7 +39,6 @@ export function setGround(engine: IEngine) {
       })
       Tile.create(tile)
     }
-    return ground
   }
 }
 

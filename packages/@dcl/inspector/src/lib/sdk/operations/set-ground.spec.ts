@@ -7,24 +7,23 @@ import { createEditorComponents } from '../components'
 import { setGround as createSetGround } from './set-ground'
 import { ComponentDefinition, Engine } from '@dcl/ecs'
 
-const engine = Engine()
-const { Scene, Ground, Lock, Tile, Nodes } = createEditorComponents(engine)
-const Transform = defineTransform(engine)
-const GltfContainer = defineGltfContainer(engine)
-const Name = defineName(engine)
-
-const components = {
-  [Transform.componentName]: Transform,
-  [GltfContainer.componentName]: GltfContainer,
-  [Scene.componentName]: Scene,
-  [Ground.componentName]: Ground,
-  [Lock.componentName]: Lock,
-  [Tile.componentName]: Tile,
-  [Nodes.componentName]: Nodes,
-  [Name.componentName]: Name
-}
-
 describe('setGround', () => {
+  const engine = Engine()
+  const { Scene, Ground, Lock, Tile, Nodes } = createEditorComponents(engine)
+  const Transform = defineTransform(engine)
+  const GltfContainer = defineGltfContainer(engine)
+  const Name = defineName(engine)
+
+  const components = {
+    [Transform.componentName]: Transform,
+    [GltfContainer.componentName]: GltfContainer,
+    [Scene.componentName]: Scene,
+    [Ground.componentName]: Ground,
+    [Lock.componentName]: Lock,
+    [Tile.componentName]: Tile,
+    [Nodes.componentName]: Nodes,
+    [Name.componentName]: Name
+  }
   beforeEach(() => {
     Scene.createOrReplace(engine.RootEntity, {
       layout: {
@@ -50,9 +49,8 @@ describe('setGround', () => {
       getComponentSpy.mockImplementation((componentName) => {
         return components[componentName]
       })
-    })
-    afterEach(() => {
       jest.resetAllMocks()
+      jest.restoreAllMocks()
     })
     it('should remove previous ground if any', () => {
       const previousGround = engine.addEntity()
@@ -71,9 +69,9 @@ describe('setGround', () => {
       const setGround = createSetGround(engine)
       const src = 'some-src'
       const ground = setGround(src)
-
       const getEntitiesWith = <T>(component: ComponentDefinition<T>) =>
         Array.from(engine.getEntitiesWith(component)).map(([entity]) => entity)
+
       const tiles = getEntitiesWith(Tile)
 
       expect(tiles.length).toBe(4)
