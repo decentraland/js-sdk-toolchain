@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v3
         with:
-          node-version: 20.16.0
+          node-version: 20
           cache: 'npm'
       - name: install
         run: make install
