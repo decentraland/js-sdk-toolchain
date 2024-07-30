@@ -650,6 +650,8 @@ export const componentDefinitionByName: {
     "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
+    "core::GltfNode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNode>>;
+    "core::GltfNodeState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNodeState>>;
     "core::Material": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMaterial>>;
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
@@ -1218,6 +1220,22 @@ export const GltfContainer: LastWriteWinElementSetComponentDefinition<PBGltfCont
 
 // @public (undocumented)
 export const GltfContainerLoadingState: LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>;
+
+// @public (undocumented)
+export const GltfNode: LastWriteWinElementSetComponentDefinition<PBGltfNode>;
+
+// @public (undocumented)
+export const GltfNodeState: LastWriteWinElementSetComponentDefinition<PBGltfNodeState>;
+
+// @public (undocumented)
+export const enum GltfNodeStateValue {
+    // (undocumented)
+    GNSV_FAILED = 1,
+    // (undocumented)
+    GNSV_PENDING = 0,
+    // (undocumented)
+    GNSV_READY = 2
+}
 
 // @public (undocumented)
 export interface GrowOnlyValueSetComponentDefinition<T> extends BaseComponent<T> {
@@ -2350,8 +2368,13 @@ export namespace PBGltfContainer {
 
 // @public (undocumented)
 export interface PBGltfContainerLoadingState {
+    animationNames: string[];
     // (undocumented)
     currentState: LoadingState;
+    materialNames: string[];
+    meshNames: string[];
+    nodePaths: string[];
+    skinNames: string[];
 }
 
 // @public (undocumented)
@@ -2363,7 +2386,37 @@ export namespace PBGltfContainerLoadingState {
 }
 
 // @public (undocumented)
+export interface PBGltfNode {
+    path: string;
+}
+
+// @public (undocumented)
+export namespace PBGltfNode {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfNode;
+    // (undocumented)
+    export function encode(message: PBGltfNode, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBGltfNodeState {
+    // (undocumented)
+    error?: string | undefined;
+    // (undocumented)
+    state: GltfNodeStateValue;
+}
+
+// @public (undocumented)
+export namespace PBGltfNodeState {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfNodeState;
+    // (undocumented)
+    export function encode(message: PBGltfNodeState, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBMaterial {
+    gltf?: PBMaterial_GltfMaterial | undefined;
     // (undocumented)
     material?: {
         $case: "unlit";
@@ -2380,6 +2433,22 @@ export namespace PBMaterial {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMaterial;
     // (undocumented)
     export function encode(message: PBMaterial, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBMaterial_GltfMaterial {
+    // (undocumented)
+    gltfSrc: string;
+    // (undocumented)
+    name: string;
+}
+
+// @public (undocumented)
+export namespace PBMaterial_GltfMaterial {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMaterial_GltfMaterial;
+    // (undocumented)
+    export function encode(message: PBMaterial_GltfMaterial, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2441,6 +2510,9 @@ export interface PBMeshCollider {
     } | {
         $case: "plane";
         plane: PBMeshCollider_PlaneMesh;
+    } | {
+        $case: "gltf";
+        gltf: PBMeshCollider_GltfMesh;
     } | undefined;
 }
 
@@ -2476,6 +2548,20 @@ export namespace PBMeshCollider_CylinderMesh {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshCollider_CylinderMesh;
     // (undocumented)
     export function encode(message: PBMeshCollider_CylinderMesh, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBMeshCollider_GltfMesh {
+    gltfSrc: string;
+    name: string;
+}
+
+// @public (undocumented)
+export namespace PBMeshCollider_GltfMesh {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshCollider_GltfMesh;
+    // (undocumented)
+    export function encode(message: PBMeshCollider_GltfMesh, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2517,6 +2603,9 @@ export interface PBMeshRenderer {
     } | {
         $case: "plane";
         plane: PBMeshRenderer_PlaneMesh;
+    } | {
+        $case: "gltf";
+        gltf: PBMeshRenderer_GltfMesh;
     } | undefined;
 }
 
@@ -2553,6 +2642,20 @@ export namespace PBMeshRenderer_CylinderMesh {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshRenderer_CylinderMesh;
     // (undocumented)
     export function encode(message: PBMeshRenderer_CylinderMesh, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBMeshRenderer_GltfMesh {
+    gltfSrc: string;
+    name: string;
+}
+
+// @public (undocumented)
+export namespace PBMeshRenderer_GltfMesh {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshRenderer_GltfMesh;
+    // (undocumented)
+    export function encode(message: PBMeshRenderer_GltfMesh, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
