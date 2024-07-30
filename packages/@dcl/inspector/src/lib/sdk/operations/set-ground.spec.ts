@@ -1,8 +1,4 @@
-import {
-  Transform as defineTransform,
-  GltfContainer as defineGltfContainer,
-  Name as defineName
-} from '@dcl/ecs/dist/components'
+import { Transform as defineTransform, GltfContainer as defineGltfContainer } from '@dcl/ecs/dist/components'
 import { createEditorComponents } from '../components'
 import { setGround as createSetGround } from './set-ground'
 import { ComponentDefinition, Engine } from '@dcl/ecs'
@@ -12,18 +8,7 @@ describe('setGround', () => {
   const { Scene, Ground, Lock, Tile, Nodes } = createEditorComponents(engine)
   const Transform = defineTransform(engine)
   const GltfContainer = defineGltfContainer(engine)
-  const Name = defineName(engine)
 
-  const components = {
-    [Transform.componentName]: Transform,
-    [GltfContainer.componentName]: GltfContainer,
-    [Scene.componentName]: Scene,
-    [Ground.componentName]: Ground,
-    [Lock.componentName]: Lock,
-    [Tile.componentName]: Tile,
-    [Nodes.componentName]: Nodes,
-    [Name.componentName]: Name
-  }
   beforeEach(() => {
     Scene.createOrReplace(engine.RootEntity, {
       layout: {
@@ -43,12 +28,7 @@ describe('setGround', () => {
   })
 
   describe('When setting the ground', () => {
-    let getComponentSpy: jest.SpyInstance
     beforeEach(() => {
-      getComponentSpy = jest.spyOn(engine, 'getComponent')
-      getComponentSpy.mockImplementation((componentName) => {
-        return components[componentName]
-      })
       jest.restoreAllMocks()
     })
     it('should remove previous ground if any', () => {
