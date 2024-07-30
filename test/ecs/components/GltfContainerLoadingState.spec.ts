@@ -8,7 +8,11 @@ describe('Generated GltfContainerLoadingState ProtoBuf', () => {
 
     testComponentSerialization(GltfContainerLoadingState, {
       currentState: 1,
-      namedNodes: []
+      nodePaths: [],
+      meshNames: [],
+      skinNames: [],
+      materialNames: [],
+      animationNames: []
     })
   })
 })
