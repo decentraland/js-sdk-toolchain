@@ -36,7 +36,9 @@ export function stream(
 
   // and lastly wire the new messages from the renderer engine
   consumeAllMessagesInto(stream, processMessage).catch((err) => {
-    console.error('Faile to consume stream from data layer ', err)
+    if (err instanceof Error && !err.message.includes('RPC Transport closed')) {
+      console.error('Failed to consume stream from data layer ', err)
+    }
     queue.close()
   })
 
