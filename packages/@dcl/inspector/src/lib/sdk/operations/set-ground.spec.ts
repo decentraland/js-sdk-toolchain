@@ -68,6 +68,8 @@ describe('setGround', () => {
     it('should create a ground entity with four tiles as children', () => {
       const setGround = createSetGround(engine)
       const src = 'some-src'
+      setGround(src)
+
       const getEntitiesWith = <T>(component: ComponentDefinition<T>) =>
         Array.from(engine.getEntitiesWith(component)).map(([entity]) => entity)
 
