@@ -7,24 +7,13 @@ import { createEditorComponents } from '../components'
 import { setGround as createSetGround } from './set-ground'
 import { ComponentDefinition, Engine } from '@dcl/ecs'
 
-const engine = Engine()
-const { Scene, Ground, Lock, Tile, Nodes } = createEditorComponents(engine)
-const Transform = defineTransform(engine)
-const GltfContainer = defineGltfContainer(engine)
-const Name = defineName(engine)
-
-const components = {
-  [Transform.componentName]: Transform,
-  [GltfContainer.componentName]: GltfContainer,
-  [Scene.componentName]: Scene,
-  [Ground.componentName]: Ground,
-  [Lock.componentName]: Lock,
-  [Tile.componentName]: Tile,
-  [Nodes.componentName]: Nodes,
-  [Name.componentName]: Name
-}
-
 describe('setGround', () => {
+  const engine = Engine()
+  const { Scene, Ground, Lock, Tile, Nodes } = createEditorComponents(engine)
+  const Transform = defineTransform(engine)
+  const GltfContainer = defineGltfContainer(engine)
+  defineName(engine)
+
   beforeEach(() => {
     Scene.createOrReplace(engine.RootEntity, {
       layout: {
@@ -44,15 +33,8 @@ describe('setGround', () => {
   })
 
   describe('When setting the ground', () => {
-    let getComponentSpy: jest.SpyInstance
     beforeEach(() => {
-      getComponentSpy = jest.spyOn(engine, 'getComponent')
-      getComponentSpy.mockImplementation((componentName) => {
-        return components[componentName]
-      })
-    })
-    afterEach(() => {
-      jest.resetAllMocks()
+      jest.restoreAllMocks()
     })
     it('should remove previous ground if any', () => {
       const previousGround = engine.addEntity()
@@ -66,6 +48,7 @@ describe('setGround', () => {
       expect(deleteFromSpy).toHaveBeenCalledTimes(1)
       expect(deleteFromSpy).toHaveBeenCalledWith(previousGround)
     })
+
     it('should create a ground entity with four tiles as children', () => {
       const setGround = createSetGround(engine)
       const src = 'some-src'
@@ -74,9 +57,8 @@ describe('setGround', () => {
       const getEntitiesWith = <T>(component: ComponentDefinition<T>) =>
         Array.from(engine.getEntitiesWith(component)).map(([entity]) => entity)
 
-      const ground = getEntitiesWith(Ground)[0]
       const tiles = getEntitiesWith(Tile)
-
+      const ground = getEntitiesWith(Ground)[0]
       expect(tiles.length).toBe(4)
       expect(tiles.every((tile) => Transform.get(tile).parent === ground))
       expect(tiles.every((tile) => GltfContainer.get(tile).src === src))

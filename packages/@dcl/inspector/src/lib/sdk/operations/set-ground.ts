@@ -1,10 +1,10 @@
-import { IEngine, Transform as TransformEngine, GltfContainer as GltfContainerEngine } from '@dcl/ecs'
+import { IEngine, Transform as TransformEngine, GltfContainer as GltfContainerEngine, Entity } from '@dcl/ecs'
 import { EditorComponentNames, EditorComponents } from '../components'
 import { addChild as createAddChild } from './add-child'
 import { removeEntity as createRemoveEntity } from './remove-entity'
 
 export function setGround(engine: IEngine) {
-  return function setGround(src: string): void {
+  return function setGround(src: string) {
     const addChild = createAddChild(engine)
     const removeEntity = createRemoveEntity(engine)
     const Transform = engine.getComponent(TransformEngine.componentName) as typeof TransformEngine
@@ -18,7 +18,6 @@ export function setGround(engine: IEngine) {
     for (const [previousGround] of engine.getEntitiesWith(Ground)) {
       removeEntity(previousGround)
     }
-
     const ground = addChild(engine.RootEntity, 'Ground')
     Ground.create(ground)
     Lock.create(ground, { value: true })

@@ -11,6 +11,7 @@ export type Props = React.SelectHTMLAttributes<HTMLSelectElement> & {
   options: OptionProp[]
   className?: string
   disabled?: boolean
+  placeholder?: string
   empty?: string
   label?: React.ReactNode
   value?: string | number | readonly string[] | any[]
