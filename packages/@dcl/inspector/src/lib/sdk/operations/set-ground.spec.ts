@@ -68,12 +68,11 @@ describe('setGround', () => {
     it('should create a ground entity with four tiles as children', () => {
       const setGround = createSetGround(engine)
       const src = 'some-src'
-      const ground = setGround(src)
       const getEntitiesWith = <T>(component: ComponentDefinition<T>) =>
         Array.from(engine.getEntitiesWith(component)).map(([entity]) => entity)
 
       const tiles = getEntitiesWith(Tile)
-
+      const ground = getEntitiesWith(Ground)[0]
       expect(tiles.length).toBe(4)
       expect(tiles.every((tile) => Transform.get(tile).parent === ground))
       expect(tiles.every((tile) => GltfContainer.get(tile).src === src))
