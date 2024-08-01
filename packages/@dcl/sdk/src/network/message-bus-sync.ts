@@ -15,6 +15,7 @@ import {
 } from './utils'
 import { entityUtils } from './entities'
 import { GetUserDataRequest, GetUserDataResponse } from '~system/UserIdentity'
+import { serializeCrdtMessages } from '../internal/transports/logger'
 
 export type IProfile = { networkId: number; userId: string }
 // user that we asked for the inital crdt state
@@ -45,7 +46,7 @@ export function addSyncTransport(
     filter: syncFilter(engine),
     send: async (message: Uint8Array) => {
       if (syncTransportIsReady(engine) && message.byteLength) {
-        // console.log(Array.from(serializeCrdtMessages('[send CRDT]: ', message, engine)))
+        console.log(Array.from(serializeCrdtMessages('[send CRDT]: ', message, engine)))
         binaryMessageBus.emit(CommsMessage.CRDT, message)
       }
       const messages = getMessagesToSend()
@@ -65,27 +66,25 @@ export function addSyncTransport(
 
   // If we dont have any state initialized, and recieve a state message.
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, (value) => {
-    // console.log(Array.from(serializeCrdtMessages('[binaryMessageBus]: ', value, engine)))
     if (!stateInitialized) {
       setInitialized()
       transport.onmessage!(value)
     }
   })
 
-  // If we are the oldest user and we recieve a req of a state we send it.
   binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, () => {
-    // TODO: oldest not working because connectedPlayers returns players that are not in the scene.
-    // Not working :sadcat:
-    // const oldest = oldestUser(engine, myProfile, entityDefinitions.syncEntity)
-    if (stateInitialized) {
+    // TODO: test hardly this change.
+    // Why ? Basically if we send an outdated CRDT, the other clients will ignore it.
+    // But maybe, two clients enters at the same time with custom network entities
+    // and if the state was not initialized, those entities were never sent.
+    if (stateInitialized || true) {
       binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, engineToCrdt(engine))
     }
   })
 
   // Process CRDT messages here
   binaryMessageBus.on(CommsMessage.CRDT, (value) => {
-    // console.log(Array.from(serializeCrdtMessages('[CRDT on]: ', value, engine)))
-
+    console.log(Array.from(serializeCrdtMessages('[receive CRDT]: ', value, engine)))
     transport.onmessage!(value)
   })
 
