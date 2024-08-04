@@ -55,6 +55,13 @@ function getPlatform(): SupportedPlatform {
 }
 
 function getDaoExplorerPath(workingDirectory: string) {
+  // Reliable way to get the path to get the first active node_module folder
+  const sdkPath = require.resolve('@dcl/sdk')
+  if (sdkPath !== null) {
+    // SDK-path is something like /node_modules/@dcl/sdk/index.js
+    return path.resolve(sdkPath, '..', '..', '..', '.bin', 'dao-explorer')
+  }
+
   return path.resolve(workingDirectory, 'node_modules', '.bin', 'dao-explorer')
 }
 
