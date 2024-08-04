@@ -16,7 +16,7 @@ enum SupportedPlatform {
 }
 
 const BEVY_BASE_URL =
-  'https://github.com/decentraland/bevy-explorer/releases/download/alpha-2024-07-30-16-20-06/bevy-explorer-2024-07-30-16-20-06'
+  'https://github.com/decentraland/bevy-explorer/releases/download/alpha-2024-08-03-00-41-59/bevy-explorer-2024-08-03-00-41-59'
 const BEVY_URL_PLATFORM_SUFFIX: Record<SupportedPlatform, string> = {
   [SupportedPlatform.SP_LINUX_X64]: 'linux-x86_64.tar.gz',
   [SupportedPlatform.SP_MACOS_ARM64]: 'macos-m1m2.tar.gz',
