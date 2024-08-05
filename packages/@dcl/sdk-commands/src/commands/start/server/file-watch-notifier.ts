@@ -57,6 +57,7 @@ export async function wireFileWatcherToWebSockets(
 }
 
 function isGLTFModel(file: string) {
+  if (!file) return false
   return file.toLowerCase().endsWith('.glb') || file.toLowerCase().endsWith('.gltf')
 }
 
