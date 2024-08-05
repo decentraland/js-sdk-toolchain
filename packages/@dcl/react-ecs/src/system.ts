@@ -1,7 +1,7 @@
-import type { IEngine, PointerEventsSystem } from '@dcl/ecs'
+import type { Entity, IEngine, PointerEventsSystem } from '@dcl/ecs'
 
 import type { ReactEcs } from './react-ecs'
-import { createReconciler } from './reconciler'
+import { createReconciler, DclReconciler } from './reconciler'
 
 /**
  * @public
@@ -14,17 +14,22 @@ export type UiComponent = () => ReactEcs.JSX.ReactNode
 export interface ReactBasedUiSystem {
   destroy(): void
   setUiRenderer(ui: UiComponent): void
+  setTextureRenderer(entity: Entity, ui: UiComponent): void
 }
 
 /**
  * @internal
  */
 export function createReactBasedUiSystem(engine: IEngine, pointerSystem: PointerEventsSystem): ReactBasedUiSystem {
-  const renderer = createReconciler(engine, pointerSystem)
+  const renderer = createReconciler(engine, pointerSystem, undefined)
   let uiComponent: UiComponent | undefined = undefined
+  const textureRenderersAndUis: [DclReconciler, UiComponent][] = []
 
   function ReactBasedUiSystem() {
     if (uiComponent) renderer.update(uiComponent())
+    for (const [textureRenderer, ui] of textureRenderersAndUis) {
+      textureRenderer.update(ui())
+    }
   }
 
   engine.addSystem(ReactBasedUiSystem, 100e3, '@dcl/react-ecs')
@@ -35,9 +40,20 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
       for (const entity of renderer.getEntities()) {
         engine.removeEntity(entity)
       }
+      for (const [textureRenderer, _] of textureRenderersAndUis) {
+        for (const entity of textureRenderer.getEntities()) {
+          engine.removeEntity(entity)
+        }
+      }
+      for (const entity of renderer.getEntities()) {
+        engine.removeEntity(entity)
+      }
     },
     setUiRenderer(ui: UiComponent) {
       uiComponent = ui
+    },
+    setTextureRenderer(entity, ui) {
+      textureRenderersAndUis.push([createReconciler(engine, pointerSystem, entity), ui])
     }
   }
 }

@@ -652,6 +652,7 @@ export const componentDefinitionByName: {
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
     "core::GltfNode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNode>>;
     "core::GltfNodeState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNodeState>>;
+    "core::MapPin": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMapPin>>;
     "core::Material": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMaterial>>;
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
@@ -668,6 +669,7 @@ export const componentDefinitionByName: {
     "core::TweenSequence": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenSequence>>;
     "core::TweenState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenState>>;
     "core::UiBackground": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiBackground>>;
+    "core::UiCanvas": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiCanvas>>;
     "core::UiCanvasInformation": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiCanvasInformation>>;
     "core::UiDropdown": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdown>>;
     "core::UiDropdownResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdownResult>>;
@@ -1616,6 +1618,9 @@ export interface MapComponentDefinition<T> extends LastWriteWinElementSetCompone
 }
 
 // @public (undocumented)
+export const MapPin: LastWriteWinElementSetComponentDefinition<PBMapPin>;
+
+// @public (undocumented)
 export type MapResult<T extends Spec> = ToOptional<{
     [K in keyof T]: T[K] extends ISchema ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? MapResult<T[K]> : never;
 }>;
@@ -2417,6 +2422,28 @@ export namespace PBGltfNodeState {
 }
 
 // @public (undocumented)
+export interface PBMapPin {
+    // (undocumented)
+    description: string;
+    // (undocumented)
+    iconSize: number;
+    // (undocumented)
+    position: PBVector2 | undefined;
+    // (undocumented)
+    texture?: TextureUnion | undefined;
+    // (undocumented)
+    title: string;
+}
+
+// @public (undocumented)
+export namespace PBMapPin {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMapPin;
+    // (undocumented)
+    export function encode(message: PBMapPin, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBMaterial {
     gltf?: PBMaterial_GltfMaterial | undefined;
     // (undocumented)
@@ -3011,6 +3038,23 @@ export namespace PBUiBackground {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiBackground;
     // (undocumented)
     export function encode(message: PBUiBackground, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBUiCanvas {
+    color?: PBColor4 | undefined;
+    // (undocumented)
+    height: number;
+    // (undocumented)
+    width: number;
+}
+
+// @public (undocumented)
+export namespace PBUiCanvas {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiCanvas;
+    // (undocumented)
+    export function encode(message: PBUiCanvas, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3644,6 +3688,8 @@ export interface ReactBasedUiSystem {
     // (undocumented)
     destroy(): void;
     // (undocumented)
+    setTextureRenderer(entity: Entity, ui: UiComponent): void;
+    // (undocumented)
     setUiRenderer(ui: UiComponent): void;
 }
 
@@ -4043,6 +4089,9 @@ export interface TextureUnion {
     } | {
         $case: "videoTexture";
         videoTexture: VideoTexture;
+    } | {
+        $case: "uiTexture";
+        uiTexture: UiCanvasTexture;
     } | undefined;
 }
 
@@ -4220,7 +4269,26 @@ export interface UiButtonProps extends UiLabelProps, EntityPropTypes {
 }
 
 // @public (undocumented)
+export const UiCanvas: LastWriteWinElementSetComponentDefinition<PBUiCanvas>;
+
+// @public (undocumented)
 export const UiCanvasInformation: LastWriteWinElementSetComponentDefinition<PBUiCanvasInformation>;
+
+// @public (undocumented)
+export interface UiCanvasTexture {
+    filterMode?: TextureFilterMode | undefined;
+    // (undocumented)
+    uiCanvasEntity: number;
+    wrapMode?: TextureWrapMode | undefined;
+}
+
+// @public (undocumented)
+export namespace UiCanvasTexture {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): UiCanvasTexture;
+    // (undocumented)
+    export function encode(message: UiCanvasTexture, writer?: _m0.Writer): _m0.Writer;
+}
 
 // @public (undocumented)
 export type UiComponent = () => ReactEcs.JSX.ReactNode;
