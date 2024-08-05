@@ -42,7 +42,7 @@ function augmentDefaults(fs: FileSystemInterface, scene: Scene): SceneWithDefaul
     ...scene,
     display: {
       ...scene.display,
-      title: scene.display?.title || fs.cwd()
+      title: scene.display?.title || ''
     }
   }
 }
