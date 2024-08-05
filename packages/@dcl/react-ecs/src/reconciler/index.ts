@@ -39,13 +39,20 @@ type OnChangeState<T = string | number | Vector2> = {
   value?: T
   isSubmit?: boolean
 }
+
+export interface DclReconciler {
+  update: (component: ReactEcs.JSX.ReactNode) => void
+  getEntities: () => Entity[]
+}
+
 export function createReconciler(
   engine: Pick<
     IEngine,
     'getComponent' | 'addEntity' | 'removeEntity' | 'defineComponentFromSchema' | 'getEntitiesWith'
   >,
-  pointerEvents: PointerEventsSystem
-) {
+  pointerEvents: PointerEventsSystem,
+  rootEntity: Entity | undefined
+): DclReconciler {
   // Store all the entities so when we destroy the UI we can also destroy them
   const entities = new Set<Entity>()
   // Store the onChange callbacks to be runned every time a Result has changed
@@ -60,6 +67,7 @@ export function createReconciler(
   const UiDropdown = components.UiDropdown(engine)
   const UiDropdownResult = components.UiDropdownResult(engine)
   const UiScrollResult = components.UiScrollResult(engine)
+  const Transform = components.Transform(engine)
 
   // Component ID Helper
   const getComponentId: {
@@ -239,6 +247,10 @@ export function createReconciler(
 
     createInstance(type: Type, props: Props): Instance {
       const entity = engine.addEntity()
+      // set root
+      if (rootEntity !== undefined) {
+        Transform.createOrReplace(entity, { parent: rootEntity })
+      }
       entities.add(entity)
       const instance: Instance = {
         entity,
