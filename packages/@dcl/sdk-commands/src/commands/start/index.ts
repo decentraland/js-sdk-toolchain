@@ -26,6 +26,7 @@ import { getValidWorkspace } from '../../logic/workspace-validations'
 import { printCurrentProjectStarting, printProgressInfo, printWarning } from '../../logic/beautiful-logs'
 import { Result } from 'arg'
 import { startValidations } from '../../logic/project-validations'
+import { runExplorerAlpha } from './explorer-alpha'
 
 interface Options {
   args: Result<typeof args>
@@ -49,7 +50,8 @@ export const args = declareArgs({
   '-w': '--no-watch',
   '--skip-build': Boolean,
   '--desktop-client': Boolean,
-  '--data-layer': Boolean
+  '--data-layer': Boolean,
+  '--explorer-alpha': Boolean
 })
 
 export async function help(options: Options) {
@@ -90,6 +92,7 @@ export async function main(options: Options) {
   const watch = !options.args['--no-watch']
   const withDataLayer = options.args['--data-layer']
   const enableWeb3 = options.args['--web3']
+  const explorerAlpha = options.args['--explorer-alpha']
 
   let hasSmartWearable = false
 
@@ -135,7 +138,7 @@ export async function main(options: Options) {
       })
       const logs = await createConsoleLogComponent({})
       const ws = await createWsComponent({ logs })
-      const server = await createServerComponent<PreviewComponents>({ config, logs, ws: ws.ws }, { cors: {} })
+      const server = await createServerComponent<PreviewComponents>({ config, ws: ws.ws, logs }, { cors: {} })
       const rooms = await createRoomsComponent({
         metrics,
         logs,
@@ -170,7 +173,7 @@ export async function main(options: Options) {
       await wireRouter(components, workspace, dataLayer)
       if (watch) {
         for (const project of workspace.projects) {
-          await wireFileWatcherToWebSockets(components, project.workingDirectory, project.kind)
+          await wireFileWatcherToWebSockets(components, project.workingDirectory, project.kind, !!explorerAlpha)
         }
       }
       await startComponents()
@@ -179,7 +182,9 @@ export async function main(options: Options) {
       const availableURLs: string[] = []
 
       printProgressInfo(options.components.logger, 'Preview server is now running!')
-      components.logger.log('Available on:\n')
+      if (!explorerAlpha) {
+        components.logger.log('Available on:\n')
+      }
 
       Object.keys(networkInterfaces).forEach((dev) => {
         ;(networkInterfaces[dev] || []).forEach((details) => {
@@ -203,8 +208,10 @@ export async function main(options: Options) {
         return a.toLowerCase().includes('localhost') || a.includes('127.0.0.1') || a.includes('0.0.0.0') ? -1 : 1
       })
 
-      for (const addr of sortedURLs) {
-        components.logger.log(`    ${addr}`)
+      if (!explorerAlpha) {
+        for (const addr of sortedURLs) {
+          components.logger.log(`    ${addr}`)
+        }
       }
 
       if (options.args['--desktop-client']) {
@@ -216,11 +223,18 @@ export async function main(options: Options) {
         }
       }
 
-      components.logger.log('\n  Details:\n')
+      if (!explorerAlpha) {
+        components.logger.log('\n  Details:\n')
+      }
       components.logger.log('\nPress CTRL+C to exit\n')
 
+      if (explorerAlpha) {
+        const realm = new URL(sortedURLs[0]).origin
+        await runExplorerAlpha(components, { cwd: workingDirectory, realm, baseCoords })
+      }
+
       // Open preferably localhost/127.0.0.1
-      if (openBrowser && sortedURLs.length && !options.args['--desktop-client']) {
+      if (!explorerAlpha && openBrowser && sortedURLs.length && !options.args['--desktop-client']) {
         try {
           await open(sortedURLs[0])
         } catch (_) {

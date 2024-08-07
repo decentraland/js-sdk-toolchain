@@ -17,6 +17,7 @@ export async function createDataLayer(components: Pick<CliComponents, 'fs' | 'lo
     fs,
     engine: dataLayerHost.engine
   }
+
   const rpcServer = createRpcServer<DataLayerContext>({ logger: components.logger })
 
   rpcServer.setHandler(async function rpcHandler(serverPort: RpcServerPort<DataLayerContext>) {
