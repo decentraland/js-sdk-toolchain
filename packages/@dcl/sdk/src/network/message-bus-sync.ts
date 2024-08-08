@@ -15,7 +15,7 @@ import {
 } from './utils'
 import { entityUtils } from './entities'
 import { GetUserDataRequest, GetUserDataResponse } from '~system/UserIdentity'
-// import { serializeCrdtMessages } from '../internal/transports/logger'
+import { serializeCrdtMessages } from '../internal/transports/logger'
 
 export type IProfile = { networkId: number; userId: string }
 // user that we asked for the inital crdt state
@@ -46,7 +46,7 @@ export function addSyncTransport(
     filter: syncFilter(engine),
     send: async (message: Uint8Array) => {
       if (syncTransportIsReady(engine) && message.byteLength) {
-        // console.log(Array.from(serializeCrdtMessages('[send CRDT]: ', message, engine)))
+        console.log(Array.from(serializeCrdtMessages('[send CRDT]: ', message, engine)))
         binaryMessageBus.emit(CommsMessage.CRDT, message)
       }
       const messages = getMessagesToSend()
@@ -66,10 +66,11 @@ export function addSyncTransport(
 
   // If we dont have any state initialized, and recieve a state message.
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, (value) => {
-    if (!stateInitialized) {
-      setInitialized()
-      transport.onmessage!(value)
-    }
+    // if (!stateInitialized) {
+    // what if receive a state from a user that
+    setInitialized()
+    transport.onmessage!(value)
+    // }
   })
 
   binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, () => {
@@ -84,7 +85,7 @@ export function addSyncTransport(
 
   // Process CRDT messages here
   binaryMessageBus.on(CommsMessage.CRDT, (value) => {
-    // console.log(Array.from(serializeCrdtMessages('[receive CRDT]: ', value, engine)))
+    console.log(Array.from(serializeCrdtMessages('[receive CRDT]: ', value, engine)))
     transport.onmessage!(value)
   })
 
