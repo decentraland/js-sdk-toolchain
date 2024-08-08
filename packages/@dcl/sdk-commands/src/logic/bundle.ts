@@ -291,7 +291,6 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
                 'Some composites are not included because of errors while compiling them. There can be unexpected behavior in the scene, check the errors and try to fix them.'
               )
             } else if (!lastBuiltSuccessful) {
-              components.logger.log('Composites built without errors.')
             }
             lastBuiltSuccessful = !data.withErrors
           }
