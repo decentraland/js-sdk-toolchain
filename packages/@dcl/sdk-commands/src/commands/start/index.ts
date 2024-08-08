@@ -26,6 +26,7 @@ import { getValidWorkspace } from '../../logic/workspace-validations'
 import { printCurrentProjectStarting, printProgressInfo, printWarning } from '../../logic/beautiful-logs'
 import { Result } from 'arg'
 import { startValidations } from '../../logic/project-validations'
+import { ensureDaoExplorer, runDaoExplorer } from '../../logic/dao-explorer'
 import { runExplorerAlpha } from './explorer-alpha'
 
 interface Options {
@@ -49,8 +50,10 @@ export const args = declareArgs({
   '-b': '--no-browser',
   '-w': '--no-watch',
   '--skip-build': Boolean,
-  '--desktop-client': Boolean,
+  '--no-dao-explorer': Boolean,
   '--data-layer': Boolean,
+  '-e': '--no-dao-explorer',
+  '--customEntryPoint': Boolean,
   '--explorer-alpha': Boolean
 })
 
@@ -87,7 +90,8 @@ export async function main(options: Options) {
   const workingDirectory = path.resolve(process.cwd(), options.args['--dir'] || '.')
   const isCi = options.args['--ci'] || process.env.CI || false
   const debug = !options.args['--no-debug'] && !isCi
-  const openBrowser = !options.args['--no-browser'] && !isCi
+  const experimentalDaoExplorer = !options.args['--no-dao-explorer'] && !isCi
+  const openBrowser = (!experimentalDaoExplorer || !options.args['--no-browser']) && !isCi && !experimentalDaoExplorer
   const build = !options.args['--skip-build']
   const watch = !options.args['--no-watch']
   const withDataLayer = options.args['--data-layer']
@@ -97,6 +101,10 @@ export async function main(options: Options) {
   let hasSmartWearable = false
 
   const workspace = await getValidWorkspace(options.components, workingDirectory)
+
+  if (experimentalDaoExplorer) {
+    await ensureDaoExplorer(options.components, workspace.rootWorkingDirectory)
+  }
 
   /* istanbul ignore if */
   if (workspace.projects.length > 1)
@@ -110,7 +118,18 @@ export async function main(options: Options) {
       // first run `npm run build`, this can be disabled with --skip-build
       // then start the embedded compiler, this can be disabled with --no-watch
       if (watch || build) {
-        await buildScene({ ...options, args: { '--dir': project.workingDirectory, '--watch': watch, _: [] } }, project)
+        await buildScene(
+          {
+            ...options,
+            args: {
+              '--dir': project.workingDirectory,
+              '--watch': watch,
+              _: [],
+              '--customEntryPoint': !!options.args['--customEntryPoint']
+            }
+          },
+          project
+        )
         await startValidations(options.components, project.workingDirectory)
       }
 
@@ -179,7 +198,7 @@ export async function main(options: Options) {
       await startComponents()
 
       const networkInterfaces = os.networkInterfaces()
-      const availableURLs: string[] = []
+      const availableURLs: { base: string; url: string }[] = []
 
       printProgressInfo(options.components.logger, 'Preview server is now running!')
       if (!explorerAlpha) {
@@ -190,22 +209,25 @@ export async function main(options: Options) {
         ;(networkInterfaces[dev] || []).forEach((details) => {
           if (details.family === 'IPv4') {
             const oldBackpack = 'DISABLE_backpack_editor_v2=&ENABLE_backpack_editor_v1'
-            let addr = `http://${details.address}:${port}?position=${baseCoords.x}%2C${baseCoords.y}&${oldBackpack}`
+            const baseUrl = `http://${details.address}:${port}`
+            let url = `${baseUrl}?position=${baseCoords.x}%2C${baseCoords.y}&${oldBackpack}`
             if (debug) {
-              addr = `${addr}&SCENE_DEBUG_PANEL`
+              url = `${url}&SCENE_DEBUG_PANEL`
             }
             if (enableWeb3 || hasSmartWearable) {
-              addr = `${addr}&ENABLE_WEB3`
+              url = `${url}&ENABLE_WEB3`
             }
 
-            availableURLs.push(addr)
+            availableURLs.push({ base: baseUrl, url })
           }
         })
       })
 
       // Push localhost and 127.0.0.1 at top
       const sortedURLs = availableURLs.sort((a, _b) => {
-        return a.toLowerCase().includes('localhost') || a.includes('127.0.0.1') || a.includes('0.0.0.0') ? -1 : 1
+        return a.base.toLowerCase().includes('localhost') || a.base.includes('127.0.0.1') || a.base.includes('0.0.0.0')
+          ? -1
+          : 1
       })
 
       if (!explorerAlpha) {
@@ -214,29 +236,25 @@ export async function main(options: Options) {
         }
       }
 
-      if (options.args['--desktop-client']) {
-        components.logger.log('\n  Desktop client:\n')
-        for (const addr of sortedURLs) {
-          const searchParams = new URLSearchParams()
-          searchParams.append('PREVIEW-MODE', addr)
-          components.logger.log(`    dcl://${searchParams.toString()}&`)
-        }
-      }
-
       if (!explorerAlpha) {
         components.logger.log('\n  Details:\n')
       }
       components.logger.log('\nPress CTRL+C to exit\n')
 
+      if (experimentalDaoExplorer && sortedURLs.length) {
+        runDaoExplorer(components, sortedURLs[0].base, `${baseCoords.x},${baseCoords.y}`, workingDirectory)
+      }
+
+      // Open preferably localhost/127.0.0.1
       if (explorerAlpha) {
         const realm = new URL(sortedURLs[0]).origin
         await runExplorerAlpha(components, { cwd: workingDirectory, realm, baseCoords })
       }
 
       // Open preferably localhost/127.0.0.1
-      if (!explorerAlpha && openBrowser && sortedURLs.length && !options.args['--desktop-client']) {
+      if (!explorerAlpha && openBrowser && sortedURLs.length) {
         try {
-          await open(sortedURLs[0])
+          await open(sortedURLs[0].url)
         } catch (_) {
           components.logger.warn('Unable to open browser automatically.')
         }
