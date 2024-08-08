@@ -252,7 +252,7 @@ export async function main(options: Options) {
       }
 
       // Open preferably localhost/127.0.0.1
-      if (!explorerAlpha && openBrowser && sortedURLs.length && !options.args['--desktop-client']) {
+      if (!explorerAlpha && openBrowser && sortedURLs.length) {
         try {
           await open(sortedURLs[0].url)
         } catch (_) {
