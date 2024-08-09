@@ -45,7 +45,7 @@ export function addSyncTransport(
   const transport: Transport = {
     filter: syncFilter(engine),
     send: async (message: Uint8Array) => {
-      if (syncTransportIsReady(engine) && message.byteLength) {
+      if (message.byteLength) {
         // console.log(Array.from(serializeCrdtMessages('[send CRDT]: ', message, engine)))
         binaryMessageBus.emit(CommsMessage.CRDT, message)
       }
