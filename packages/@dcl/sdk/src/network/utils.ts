@@ -92,7 +92,7 @@ export function syncTransportIsReady(engine: IEngine) {
   ) as LastWriteWinElementSetComponentDefinition<PBEngineInfo>
   if (!INITIAL_CRDT_RENDERER_MESSAGES_SENT) {
     const engineInfo = EngineInfo.getOrNull(engine.RootEntity)
-    if (engineInfo && engineInfo.tickNumber > 2) {
+    if (engineInfo && engineInfo.tickNumber > 1) {
       INITIAL_CRDT_RENDERER_MESSAGES_SENT = true
     }
   }

@@ -49,7 +49,7 @@ export function createValueSetComponentDefinitionFromSchema<T>(
   const data = new Map<Entity, InternalDatastructure>()
   const dirtyIterator = new Set<Entity>()
   const queuedCommands: AppendValueMessageBody[] = []
-  const onChangeCallbacks = new Map<Entity, (data: T | undefined) => void>()
+  const onChangeCallbacks = new Map<Entity, ((data: T | undefined) => void)[]>()
 
   // only sort the array if the latest (N) element has a timestamp <= N-1
   function shouldSort(row: InternalDatastructure) {
@@ -170,10 +170,16 @@ export function createValueSetComponentDefinitionFromSchema<T>(
       }
     },
     onChange(entity, cb) {
-      onChangeCallbacks.set(entity, cb)
+      const cbs = onChangeCallbacks.get(entity) ?? []
+      cbs.push(cb)
+      onChangeCallbacks.set(entity, cbs)
     },
-    __onChangeCallbacks(entity) {
-      return onChangeCallbacks.get(entity)
+    __onChangeCallbacks(entity, value) {
+      const cbs = onChangeCallbacks.get(entity)
+      if (!cbs) return
+      for (const cb of cbs) {
+        cb(value)
+      }
     }
   }
 
