@@ -348,6 +348,9 @@ export interface ByteBuffer {
 export type Callback = () => void;
 
 // @public (undocumented)
+export const CameraDirector: LastWriteWinElementSetComponentDefinition<PBCameraDirector>;
+
+// @public (undocumented)
 export const CameraMode: LastWriteWinElementSetComponentDefinition<PBCameraMode>;
 
 // @public (undocumented)
@@ -593,11 +596,13 @@ export const componentDefinitionByName: {
     "core::AvatarModifierArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>>;
     "core::AvatarShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarShape>>;
     "core::Billboard": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBBillboard>>;
+    "core::CameraDirector": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraDirector>>;
     "core::CameraMode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraMode>>;
     "core::CameraModeArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraModeArea>>;
     "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
+    "core::MapPin": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMapPin>>;
     "core::Material": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMaterial>>;
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
@@ -623,6 +628,7 @@ export const componentDefinitionByName: {
     "core::UiTransform": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiTransform>>;
     "core::VideoEvent": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBVideoEvent>>;
     "core::VideoPlayer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBVideoPlayer>>;
+    "core::VirtualCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBVirtualCamera>>;
     "core::VisibilityComponent": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBVisibilityComponent>>;
 };
 
@@ -1545,6 +1551,9 @@ export interface MapComponentDefinition<T> extends LastWriteWinElementSetCompone
 }
 
 // @public (undocumented)
+export const MapPin: LastWriteWinElementSetComponentDefinition<PBMapPin>;
+
+// @public (undocumented)
 export type MapResult<T extends Spec> = ToOptional<{
     [K in keyof T]: T[K] extends ISchema ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? MapResult<T[K]> : never;
 }>;
@@ -2195,6 +2204,19 @@ export namespace PBBillboard {
 }
 
 // @public (undocumented)
+export interface PBCameraDirector {
+    virtualCameraEntity: number;
+}
+
+// @public (undocumented)
+export namespace PBCameraDirector {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBCameraDirector;
+    // (undocumented)
+    export function encode(message: PBCameraDirector, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBCameraMode {
     mode: CameraType;
 }
@@ -2301,6 +2323,28 @@ export namespace PBGltfContainerLoadingState {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfContainerLoadingState;
     // (undocumented)
     export function encode(message: PBGltfContainerLoadingState, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBMapPin {
+    // (undocumented)
+    description: string;
+    // (undocumented)
+    iconSize: number;
+    // (undocumented)
+    position: PBVector2 | undefined;
+    // (undocumented)
+    texture?: TextureUnion | undefined;
+    // (undocumented)
+    title: string;
+}
+
+// @public (undocumented)
+export namespace PBMapPin {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMapPin;
+    // (undocumented)
+    export function encode(message: PBMapPin, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3116,6 +3160,26 @@ export namespace PBVideoPlayer {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBVideoPlayer;
     // (undocumented)
     export function encode(message: PBVideoPlayer, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBVirtualCamera {
+    // (undocumented)
+    transition?: {
+        $case: "transitionTime";
+        transitionTime: number;
+    } | {
+        $case: "transitionSpeed";
+        transitionSpeed: number;
+    } | undefined;
+}
+
+// @public (undocumented)
+export namespace PBVirtualCamera {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBVirtualCamera;
+    // (undocumented)
+    export function encode(message: PBVirtualCamera, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -4278,6 +4342,9 @@ export namespace VideoTexture {
     // (undocumented)
     export function encode(message: VideoTexture, writer?: _m0.Writer): _m0.Writer;
 }
+
+// @public (undocumented)
+export const VirtualCamera: LastWriteWinElementSetComponentDefinition<PBVirtualCamera>;
 
 // @public (undocumented)
 export const VisibilityComponent: LastWriteWinElementSetComponentDefinition<PBVisibilityComponent>;
