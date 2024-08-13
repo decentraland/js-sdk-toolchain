@@ -9,18 +9,16 @@ import child_process from 'child_process'
 
 enum SupportedPlatform {
   SP_MACOS_ARM64,
-  SP_MACOS_X64,
   SP_LINUX_X64,
   SP_WINDOWS_X64,
   SP_UNSUPPORTED
 }
 
 const BEVY_BASE_URL =
-  'https://github.com/decentraland/bevy-explorer/releases/download/alpha-2024-08-03-00-41-59/bevy-explorer-2024-08-03-00-41-59'
+  'https://github.com/decentraland/bevy-explorer/releases/download/alpha-2024-08-08-18-58-29/bevy-explorer-2024-08-08-18-58-28'
 const BEVY_URL_PLATFORM_SUFFIX: Record<SupportedPlatform, string> = {
   [SupportedPlatform.SP_LINUX_X64]: 'linux-x86_64.tar.gz',
-  [SupportedPlatform.SP_MACOS_ARM64]: 'macos-m1m2.tar.gz',
-  [SupportedPlatform.SP_MACOS_X64]: 'macos-x86_64.tar.gz',
+  [SupportedPlatform.SP_MACOS_ARM64]: 'macos-m1m2.zip',
   [SupportedPlatform.SP_WINDOWS_X64]: 'windows-x86_64.zip',
   [SupportedPlatform.SP_UNSUPPORTED]: 'empty'
 }
@@ -31,8 +29,6 @@ function getPlatform(): SupportedPlatform {
   switch (os) {
     case 'darwin':
       if (arch === 'arm64') {
-        return SupportedPlatform.SP_MACOS_ARM64
-      } else if (arch === 'x64') {
         return SupportedPlatform.SP_MACOS_ARM64
       } else {
         return SupportedPlatform.SP_UNSUPPORTED
@@ -73,9 +69,16 @@ function getDaoExplorerExecutablePath(workingDirectory: string) {
 
   if (platform === SupportedPlatform.SP_WINDOWS_X64) {
     return path.resolve(getDaoExplorerPath(workingDirectory), 'decentra-bevy.exe')
-  } else {
-    return path.resolve(getDaoExplorerPath(workingDirectory), 'decentra-bevy')
   }
+
+  if (platform === SupportedPlatform.SP_MACOS_ARM64) {
+    return path.resolve(
+      getDaoExplorerPath(workingDirectory),
+      'DecentralandBevyExplorer.app/Contents/MacOS/DecentralandBevyExplorer'
+    )
+  }
+
+  return path.resolve(getDaoExplorerPath(workingDirectory), 'decentra-bevy')
 }
 
 export async function ensureDaoExplorer(

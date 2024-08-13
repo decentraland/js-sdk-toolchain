@@ -12,7 +12,6 @@ export type WebSocketComponent = IBaseComponent & {
  */
 export async function createWsComponent(_: Pick<PreviewComponents, 'logs'>): Promise<WebSocketComponent> {
   const ws = new WebSocketServer({ noServer: true })
-
   async function stop() {
     ws.close()
   }
