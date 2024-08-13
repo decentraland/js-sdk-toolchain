@@ -247,7 +247,7 @@ export async function main(options: Options) {
 
       // Open preferably localhost/127.0.0.1
       if (explorerAlpha) {
-        const realm = new URL(sortedURLs[0]).origin
+        const realm = new URL(sortedURLs[0].url).origin
         await runExplorerAlpha(components, { cwd: workingDirectory, realm, baseCoords })
       }
 
