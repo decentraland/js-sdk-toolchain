@@ -143,6 +143,27 @@ export const AvatarEmoteCommand: GrowOnlyValueSetComponentDefinition<PBAvatarEmo
 export const AvatarEquippedData: LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>;
 
 // @public (undocumented)
+export const AvatarFreezeMovement: LastWriteWinElementSetComponentDefinition<PBAvatarFreezeMovement>;
+
+// @public (undocumented)
+export const enum AvatarFreezeMovementType {
+    // (undocumented)
+    AFMT_ALL = 1,
+    // (undocumented)
+    AFMT_CAMERA = 32,
+    // (undocumented)
+    AFMT_EMOTE = 16,
+    // (undocumented)
+    AFMT_JUMP = 8,
+    // (undocumented)
+    AFMT_NONE = 0,
+    // (undocumented)
+    AFMT_RUN = 4,
+    // (undocumented)
+    AFMT_WALK = 2
+}
+
+// @public (undocumented)
 export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>;
 
 // @public (undocumented)
@@ -590,6 +611,7 @@ export const componentDefinitionByName: {
     "core::AvatarBase": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarBase>>;
     "core::AvatarEmoteCommand": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>>;
     "core::AvatarEquippedData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>>;
+    "core::AvatarFreezeMovement": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarFreezeMovement>>;
     "core::AvatarModifierArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>>;
     "core::AvatarShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarShape>>;
     "core::Billboard": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBBillboard>>;
@@ -598,6 +620,7 @@ export const componentDefinitionByName: {
     "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
+    "core::MapPin": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMapPin>>;
     "core::Material": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMaterial>>;
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
@@ -1545,6 +1568,9 @@ export interface MapComponentDefinition<T> extends LastWriteWinElementSetCompone
 }
 
 // @public (undocumented)
+export const MapPin: LastWriteWinElementSetComponentDefinition<PBMapPin>;
+
+// @public (undocumented)
 export type MapResult<T extends Spec> = ToOptional<{
     [K in keyof T]: T[K] extends ISchema ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? MapResult<T[K]> : never;
 }>;
@@ -2144,6 +2170,19 @@ export namespace PBAvatarEquippedData {
 }
 
 // @public (undocumented)
+export interface PBAvatarFreezeMovement {
+    freezeMask?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBAvatarFreezeMovement {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarFreezeMovement;
+    // (undocumented)
+    export function encode(message: PBAvatarFreezeMovement, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBAvatarModifierArea {
     area: PBVector3 | undefined;
     excludeIds: string[];
@@ -2301,6 +2340,28 @@ export namespace PBGltfContainerLoadingState {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfContainerLoadingState;
     // (undocumented)
     export function encode(message: PBGltfContainerLoadingState, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBMapPin {
+    // (undocumented)
+    description: string;
+    // (undocumented)
+    iconSize: number;
+    // (undocumented)
+    position: PBVector2 | undefined;
+    // (undocumented)
+    texture?: TextureUnion | undefined;
+    // (undocumented)
+    title: string;
+}
+
+// @public (undocumented)
+export namespace PBMapPin {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMapPin;
+    // (undocumented)
+    export function encode(message: PBMapPin, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
