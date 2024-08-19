@@ -626,6 +626,7 @@ export const componentDefinitionByName: {
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
     "core::NftShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBNftShape>>;
     "core::PlayerIdentityData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>>;
+    "core::PlayerInputMovement": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPlayerInputMovement>>;
     "core::PointerEvents": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerEvents>>;
     "core::PointerEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBPointerEventsResult>>;
     "core::PointerLock": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerLock>>;
@@ -2613,6 +2614,47 @@ export namespace PBPlayerIdentityData {
 }
 
 // @public (undocumented)
+export interface PBPlayerInputMovement {
+    // (undocumented)
+    mode?: {
+        $case: "standard";
+        standard: PBPlayerInputMovement_StandardMovement;
+    } | undefined;
+}
+
+// @public (undocumented)
+export namespace PBPlayerInputMovement {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPlayerInputMovement;
+    // (undocumented)
+    export function encode(message: PBPlayerInputMovement, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBPlayerInputMovement_StandardMovement {
+    // (undocumented)
+    disableAll: boolean;
+    // (undocumented)
+    disableCamera: boolean;
+    // (undocumented)
+    disableEmote: boolean;
+    // (undocumented)
+    disableJump: boolean;
+    // (undocumented)
+    disableRun: boolean;
+    // (undocumented)
+    disableWalk: boolean;
+}
+
+// @public (undocumented)
+export namespace PBPlayerInputMovement_StandardMovement {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPlayerInputMovement_StandardMovement;
+    // (undocumented)
+    export function encode(message: PBPlayerInputMovement_StandardMovement, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBPointerEvents {
     pointerEvents: PBPointerEvents_Entry[];
 }
@@ -3228,6 +3270,9 @@ export namespace Plane {
 
 // @public (undocumented)
 export const PlayerIdentityData: LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>;
+
+// @public (undocumented)
+export const PlayerInputMovement: LastWriteWinElementSetComponentDefinition<PBPlayerInputMovement>;
 
 // @public (undocumented)
 export const PointerEvents: LastWriteWinElementSetComponentDefinition<PBPointerEvents>;
