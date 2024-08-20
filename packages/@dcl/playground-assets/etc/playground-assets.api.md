@@ -348,13 +348,62 @@ export interface ByteBuffer {
 export type Callback = () => void;
 
 // @public (undocumented)
-export const CameraDirector: LastWriteWinElementSetComponentDefinition<PBCameraDirector>;
-
-// @public (undocumented)
 export const CameraMode: LastWriteWinElementSetComponentDefinition<PBCameraMode>;
 
 // @public (undocumented)
 export const CameraModeArea: LastWriteWinElementSetComponentDefinition<PBCameraModeArea>;
+
+// @public (undocumented)
+export interface CameraTransition {
+    // (undocumented)
+    fromEntity: number;
+    // (undocumented)
+    toEntity: number;
+    // (undocumented)
+    transition?: {
+        $case: "time";
+        time: CameraTransitionTime;
+    } | {
+        $case: "speed";
+        speed: CameraTransitionSpeed;
+    } | undefined;
+}
+
+// @public (undocumented)
+export namespace CameraTransition {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): CameraTransition;
+    // (undocumented)
+    export function encode(message: CameraTransition, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface CameraTransitionSpeed {
+    // (undocumented)
+    value: number;
+}
+
+// @public (undocumented)
+export namespace CameraTransitionSpeed {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): CameraTransitionSpeed;
+    // (undocumented)
+    export function encode(message: CameraTransitionSpeed, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface CameraTransitionTime {
+    // (undocumented)
+    value: number;
+}
+
+// @public (undocumented)
+export namespace CameraTransitionTime {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): CameraTransitionTime;
+    // (undocumented)
+    export function encode(message: CameraTransitionTime, writer?: _m0.Writer): _m0.Writer;
+}
 
 // @public (undocumented)
 export const enum CameraType {
@@ -596,12 +645,12 @@ export const componentDefinitionByName: {
     "core::AvatarModifierArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>>;
     "core::AvatarShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarShape>>;
     "core::Billboard": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBBillboard>>;
-    "core::CameraDirector": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraDirector>>;
     "core::CameraMode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraMode>>;
     "core::CameraModeArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraModeArea>>;
     "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
+    "core::MainCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMainCamera>>;
     "core::MapPin": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMapPin>>;
     "core::Material": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMaterial>>;
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
@@ -1544,6 +1593,9 @@ export type LocalDirectionRaycastSystemOptions = {
 // @public (undocumented)
 export type LwwComponentGetter<T extends LastWriteWinElementSetComponentDefinition<any>> = (engine: Pick<IEngine, 'defineComponentFromSchema'>) => T;
 
+// @public (undocumented)
+export const MainCamera: LastWriteWinElementSetComponentDefinition<PBMainCamera>;
+
 // @public
 export interface MapComponentDefinition<T> extends LastWriteWinElementSetComponentDefinition<T> {
     create(entity: Entity, val?: Partial<T>): T;
@@ -2204,19 +2256,6 @@ export namespace PBBillboard {
 }
 
 // @public (undocumented)
-export interface PBCameraDirector {
-    virtualCameraEntity: number;
-}
-
-// @public (undocumented)
-export namespace PBCameraDirector {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBCameraDirector;
-    // (undocumented)
-    export function encode(message: PBCameraDirector, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
 export interface PBCameraMode {
     mode: CameraType;
 }
@@ -2323,6 +2362,19 @@ export namespace PBGltfContainerLoadingState {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfContainerLoadingState;
     // (undocumented)
     export function encode(message: PBGltfContainerLoadingState, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBMainCamera {
+    virtualCameraEntity: number;
+}
+
+// @public (undocumented)
+export namespace PBMainCamera {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMainCamera;
+    // (undocumented)
+    export function encode(message: PBMainCamera, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3165,13 +3217,7 @@ export namespace PBVideoPlayer {
 // @public (undocumented)
 export interface PBVirtualCamera {
     // (undocumented)
-    transition?: {
-        $case: "transitionTime";
-        transitionTime: number;
-    } | {
-        $case: "transitionSpeed";
-        transitionSpeed: number;
-    } | undefined;
+    defaultTransition: CameraTransition | undefined;
 }
 
 // @public (undocumented)
