@@ -2633,17 +2633,17 @@ export namespace PBPlayerInputMovement {
 // @public (undocumented)
 export interface PBPlayerInputMovement_StandardMovement {
     // (undocumented)
-    disableAll: boolean;
+    disableAll?: boolean | undefined;
     // (undocumented)
-    disableCamera: boolean;
+    disableCamera?: boolean | undefined;
     // (undocumented)
-    disableEmote: boolean;
+    disableEmote?: boolean | undefined;
     // (undocumented)
-    disableJump: boolean;
+    disableJump?: boolean | undefined;
     // (undocumented)
-    disableRun: boolean;
+    disableRun?: boolean | undefined;
     // (undocumented)
-    disableWalk: boolean;
+    disableWalk?: boolean | undefined;
 }
 
 // @public (undocumented)
