@@ -2639,6 +2639,8 @@ export interface PBPlayerInputMovement_StandardMovement {
     // (undocumented)
     disableEmote?: boolean | undefined;
     // (undocumented)
+    disableJog?: boolean | undefined;
+    // (undocumented)
     disableJump?: boolean | undefined;
     // (undocumented)
     disableRun?: boolean | undefined;
