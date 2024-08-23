@@ -143,27 +143,6 @@ export const AvatarEmoteCommand: GrowOnlyValueSetComponentDefinition<PBAvatarEmo
 export const AvatarEquippedData: LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>;
 
 // @public (undocumented)
-export const AvatarFreezeMovement: LastWriteWinElementSetComponentDefinition<PBAvatarFreezeMovement>;
-
-// @public (undocumented)
-export const enum AvatarFreezeMovementType {
-    // (undocumented)
-    AFMT_ALL = 1,
-    // (undocumented)
-    AFMT_CAMERA = 32,
-    // (undocumented)
-    AFMT_EMOTE = 16,
-    // (undocumented)
-    AFMT_JUMP = 8,
-    // (undocumented)
-    AFMT_NONE = 0,
-    // (undocumented)
-    AFMT_RUN = 4,
-    // (undocumented)
-    AFMT_WALK = 2
-}
-
-// @public (undocumented)
 export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>;
 
 // @public (undocumented)
@@ -611,7 +590,6 @@ export const componentDefinitionByName: {
     "core::AvatarBase": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarBase>>;
     "core::AvatarEmoteCommand": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>>;
     "core::AvatarEquippedData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>>;
-    "core::AvatarFreezeMovement": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarFreezeMovement>>;
     "core::AvatarModifierArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>>;
     "core::AvatarShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarShape>>;
     "core::Billboard": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBBillboard>>;
@@ -620,13 +598,13 @@ export const componentDefinitionByName: {
     "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
+    "core::InputModifier": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBInputModifier>>;
     "core::MapPin": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMapPin>>;
     "core::Material": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMaterial>>;
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
     "core::NftShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBNftShape>>;
     "core::PlayerIdentityData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>>;
-    "core::PlayerInputMovement": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPlayerInputMovement>>;
     "core::PointerEvents": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerEvents>>;
     "core::PointerEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBPointerEventsResult>>;
     "core::PointerLock": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerLock>>;
@@ -1408,6 +1386,9 @@ export const enum InputAction {
     IA_WALK = 9
 }
 
+// @public (undocumented)
+export const InputModifier: LastWriteWinElementSetComponentDefinition<PBInputModifier>;
+
 // @public
 export const inputSystem: IInputSystem;
 
@@ -2171,19 +2152,6 @@ export namespace PBAvatarEquippedData {
 }
 
 // @public (undocumented)
-export interface PBAvatarFreezeMovement {
-    freezeMask?: number | undefined;
-}
-
-// @public (undocumented)
-export namespace PBAvatarFreezeMovement {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarFreezeMovement;
-    // (undocumented)
-    export function encode(message: PBAvatarFreezeMovement, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
 export interface PBAvatarModifierArea {
     area: PBVector3 | undefined;
     excludeIds: string[];
@@ -2341,6 +2309,49 @@ export namespace PBGltfContainerLoadingState {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfContainerLoadingState;
     // (undocumented)
     export function encode(message: PBGltfContainerLoadingState, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBInputModifier {
+    // (undocumented)
+    mode?: {
+        $case: "standard";
+        standard: PBInputModifier_StandardInput;
+    } | undefined;
+}
+
+// @public (undocumented)
+export namespace PBInputModifier {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBInputModifier;
+    // (undocumented)
+    export function encode(message: PBInputModifier, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBInputModifier_StandardInput {
+    // (undocumented)
+    disableAll?: boolean | undefined;
+    // (undocumented)
+    disableCamera?: boolean | undefined;
+    // (undocumented)
+    disableEmote?: boolean | undefined;
+    // (undocumented)
+    disableJog?: boolean | undefined;
+    // (undocumented)
+    disableJump?: boolean | undefined;
+    // (undocumented)
+    disableRun?: boolean | undefined;
+    // (undocumented)
+    disableWalk?: boolean | undefined;
+}
+
+// @public (undocumented)
+export namespace PBInputModifier_StandardInput {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBInputModifier_StandardInput;
+    // (undocumented)
+    export function encode(message: PBInputModifier_StandardInput, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2611,49 +2622,6 @@ export namespace PBPlayerIdentityData {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPlayerIdentityData;
     // (undocumented)
     export function encode(message: PBPlayerIdentityData, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
-export interface PBPlayerInputMovement {
-    // (undocumented)
-    mode?: {
-        $case: "standard";
-        standard: PBPlayerInputMovement_StandardMovement;
-    } | undefined;
-}
-
-// @public (undocumented)
-export namespace PBPlayerInputMovement {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPlayerInputMovement;
-    // (undocumented)
-    export function encode(message: PBPlayerInputMovement, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
-export interface PBPlayerInputMovement_StandardMovement {
-    // (undocumented)
-    disableAll?: boolean | undefined;
-    // (undocumented)
-    disableCamera?: boolean | undefined;
-    // (undocumented)
-    disableEmote?: boolean | undefined;
-    // (undocumented)
-    disableJog?: boolean | undefined;
-    // (undocumented)
-    disableJump?: boolean | undefined;
-    // (undocumented)
-    disableRun?: boolean | undefined;
-    // (undocumented)
-    disableWalk?: boolean | undefined;
-}
-
-// @public (undocumented)
-export namespace PBPlayerInputMovement_StandardMovement {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPlayerInputMovement_StandardMovement;
-    // (undocumented)
-    export function encode(message: PBPlayerInputMovement_StandardMovement, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3272,9 +3240,6 @@ export namespace Plane {
 
 // @public (undocumented)
 export const PlayerIdentityData: LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>;
-
-// @public (undocumented)
-export const PlayerInputMovement: LastWriteWinElementSetComponentDefinition<PBPlayerInputMovement>;
 
 // @public (undocumented)
 export const PointerEvents: LastWriteWinElementSetComponentDefinition<PBPointerEvents>;
