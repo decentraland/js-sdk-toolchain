@@ -356,16 +356,16 @@ export const CameraModeArea: LastWriteWinElementSetComponentDefinition<PBCameraM
 // @public (undocumented)
 export interface CameraTransition {
     // (undocumented)
-    fromEntity: number;
+    fromEntity?: number | undefined;
     // (undocumented)
-    toEntity: number;
+    toEntity?: number | undefined;
     // (undocumented)
-    transition?: {
+    transitionMode?: {
         $case: "time";
-        time: CameraTransitionTime;
+        time: number;
     } | {
         $case: "speed";
-        speed: CameraTransitionSpeed;
+        speed: number;
     } | undefined;
 }
 
@@ -375,34 +375,6 @@ export namespace CameraTransition {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): CameraTransition;
     // (undocumented)
     export function encode(message: CameraTransition, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
-export interface CameraTransitionSpeed {
-    // (undocumented)
-    value: number;
-}
-
-// @public (undocumented)
-export namespace CameraTransitionSpeed {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): CameraTransitionSpeed;
-    // (undocumented)
-    export function encode(message: CameraTransitionSpeed, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
-export interface CameraTransitionTime {
-    // (undocumented)
-    value: number;
-}
-
-// @public (undocumented)
-export namespace CameraTransitionTime {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): CameraTransitionTime;
-    // (undocumented)
-    export function encode(message: CameraTransitionTime, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3218,6 +3190,8 @@ export namespace PBVideoPlayer {
 export interface PBVirtualCamera {
     // (undocumented)
     defaultTransition: CameraTransition | undefined;
+    // (undocumented)
+    lookAtEntity?: number | undefined;
 }
 
 // @public (undocumented)
