@@ -2333,8 +2333,6 @@ export interface PBInputModifier_StandardInput {
     // (undocumented)
     disableAll?: boolean | undefined;
     // (undocumented)
-    disableCamera?: boolean | undefined;
-    // (undocumented)
     disableEmote?: boolean | undefined;
     // (undocumented)
     disableJog?: boolean | undefined;
