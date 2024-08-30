@@ -64,9 +64,16 @@ export function addSyncTransport(
 
   players.onEnterScene((player) => {
     console.log('[onEnterScene]', player.userId)
+    async function sendCRDT(userId: string) {
+      await wait(2000)
+      // if the user is still in the scene
+      if (players.getPlayer({ userId })) {
+        binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(userId, engineToCrdt(engine)))
+      }
+    }
     if (player.userId === myProfile.userId) return
     console.log('EMIT CRDT')
-    binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(player.userId, engineToCrdt(engine)))
+    void sendCRDT(player.userId)
   })
 
   players.onLeaveScene((userId) => {
@@ -81,6 +88,20 @@ export function addSyncTransport(
     console.log(Array.from(serializeCrdtMessages('[receive CRDT]: ', value, engine)))
     transport.onmessage!(value)
   })
+
+  async function wait(ms: number) {
+    return new Promise<void>((resolve) => {
+      let timer = 0
+      function timerFn(dt: number) {
+        timer += dt
+        if (timer * 1000 >= ms) {
+          resolve()
+          engine.removeSystem(timerFn)
+        }
+      }
+      engine.addSystem(timerFn)
+    })
+  }
 
   return {
     ...entityDefinitions,
