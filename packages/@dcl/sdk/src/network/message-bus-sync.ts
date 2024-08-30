@@ -1,4 +1,4 @@
-import { IEngine, Transport } from '@dcl/ecs'
+import { IEngine, PlayerIdentityData, Transport } from '@dcl/ecs'
 import type { SendBinaryRequest, SendBinaryResponse } from '~system/CommunicationsController'
 
 import { syncFilter } from './filter'
@@ -7,7 +7,7 @@ import { BinaryMessageBus, CommsMessage, decodeString, encodeString } from './bi
 import { fetchProfile, setInitialized, stateInitializedChecker } from './utils'
 import { entityUtils } from './entities'
 import { GetUserDataRequest, GetUserDataResponse } from '~system/UserIdentity'
-import players from '../players'
+import { definePlayerHelper } from '../players'
 import { serializeCrdtMessages } from '../internal/transports/logger'
 
 export type IProfile = { networkId: number; userId: string }
@@ -56,15 +56,41 @@ export function addSyncTransport(
   // If we dont have any state initialized, and recieve a state message.
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, (value) => {
     const { sender, data } = decodeCRDTState(value)
-    console.log({ sender, data })
+    console.log('[RES_CRDT_STATE]', sender, data)
     if (sender !== myProfile.userId) return
     setInitialized()
     transport.onmessage!(data)
   })
+  const players = definePlayerHelper(engine)
+
+  let connectedPlayers: Set<string> = new Set()
+
+  async function logPlayers() {
+    let dirty = false
+    const players = new Set<string>()
+    const component = engine.getComponent(PlayerIdentityData.componentId) as typeof PlayerIdentityData
+    for (const[entity, player] of engine.getEntitiesWith(component)) {
+      if (!connectedPlayers.has(player.address)) {
+        dirty = true
+      }
+      players.add(player.address)
+    }
+    if (dirty || players.size !== connectedPlayers.size) {
+      console.log(...Array.from(players))
+    }
+    connectedPlayers = players
+    await wait(1000)
+    logPlayers()
+  }
+  logPlayers()
 
   players.onEnterScene((player) => {
     console.log('[onEnterScene]', player.userId)
+
     async function sendCRDT(userId: string) {
+      // Wait till the user is connected to comms
+      // TODO: create an API or a Component to know this.
+      // Then the user when joins the scene can request de state and each player answer to that request.
       await wait(2000)
       // if the user is still in the scene
       if (players.getPlayer({ userId })) {
@@ -72,7 +98,6 @@ export function addSyncTransport(
       }
     }
     if (player.userId === myProfile.userId) return
-    console.log('EMIT CRDT')
     void sendCRDT(player.userId)
   })
 
