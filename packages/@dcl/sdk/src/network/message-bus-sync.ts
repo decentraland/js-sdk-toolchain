@@ -3,18 +3,12 @@ import type { SendBinaryRequest, SendBinaryResponse } from '~system/Communicatio
 
 import { syncFilter } from './filter'
 import { engineToCrdt } from './state'
-import { BinaryMessageBus, CommsMessage } from './binary-message-bus'
-import {
-  definePlayersInScene,
-  fetchProfile,
-  oldestUser as _oldestUser,
-  setInitialized,
-  stateInitialized,
-  stateInitializedChecker
-} from './utils'
+import { BinaryMessageBus, CommsMessage, decodeString, encodeString } from './binary-message-bus'
+import { fetchProfile, setInitialized, stateInitializedChecker } from './utils'
 import { entityUtils } from './entities'
 import { GetUserDataRequest, GetUserDataResponse } from '~system/UserIdentity'
-// import { serializeCrdtMessages } from '../internal/transports/logger'
+import players from '../players'
+import { serializeCrdtMessages } from '../internal/transports/logger'
 
 export type IProfile = { networkId: number; userId: string }
 // user that we asked for the inital crdt state
@@ -23,7 +17,6 @@ export function addSyncTransport(
   sendBinary: (msg: SendBinaryRequest) => Promise<SendBinaryResponse>,
   getUserData: (value: GetUserDataRequest) => Promise<GetUserDataResponse>
 ) {
-  definePlayersInScene(engine)
   // Profile Info
   const myProfile: IProfile = {} as IProfile
   fetchProfile(myProfile!, getUserData)
@@ -60,30 +53,32 @@ export function addSyncTransport(
   // Add state intialized checker
   engine.addSystem(() => stateInitializedChecker(engine, myProfile, entityDefinitions.syncEntity))
 
-  // Request initial state
-  binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
-
   // If we dont have any state initialized, and recieve a state message.
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, (value) => {
-    if (!stateInitialized) {
-      setInitialized()
-      transport.onmessage!(value)
-    }
+    const { sender, data } = decodeCRDTState(value)
+    console.log({ sender, data })
+    if (sender !== myProfile.userId) return
+    setInitialized()
+    transport.onmessage!(data)
   })
 
-  binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, () => {
-    // TODO: maybe remove this line ?
-    // If we send an outdated CRDT, the other clients will ignore it.
-    // But maybe, two clients enters at the same time with custom network entities
-    // and if the state was not initialized, those entities were never sent.
-    if (stateInitialized) {
-      binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, engineToCrdt(engine))
+  players.onEnterScene((player) => {
+    console.log('[onEnterScene]', player.userId)
+    if (player.userId === myProfile.userId) return
+    console.log('EMIT CRDT')
+    binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(player.userId, engineToCrdt(engine)))
+  })
+
+  players.onLeaveScene((userId) => {
+    console.log('[onLeaveScene]', userId)
+    if (userId === myProfile.userId) {
+      setInitialized(false)
     }
   })
 
   // Process CRDT messages here
   binaryMessageBus.on(CommsMessage.CRDT, (value) => {
-    // console.log(Array.from(serializeCrdtMessages('[receive CRDT]: ', value, engine)))
+    console.log(Array.from(serializeCrdtMessages('[receive CRDT]: ', value, engine)))
     transport.onmessage!(value)
   })
 
@@ -91,4 +86,37 @@ export function addSyncTransport(
     ...entityDefinitions,
     myProfile
   }
+}
+
+/**
+ * Messages Protocol Encoding
+ *
+ * CRDT: Plain Uint8Array
+ *
+ * CRDT_STATE_RES { sender: string, data: Uint8Array}
+ */
+function decodeCRDTState(data: Uint8Array) {
+  let offset = 0
+  const r = new Uint8Array(data)
+  const view = new DataView(r.buffer)
+  const senderLength = view.getUint8(offset)
+  offset += 1
+  const sender = decodeString(data.subarray(1, senderLength + 1))
+  offset += senderLength
+  const state = r.subarray(offset)
+
+  return { sender, data: state }
+}
+
+function encodeCRDTState(address: string, data: Uint8Array) {
+  // address to uint8array
+  const addressBuffer = encodeString(address)
+  const addressOffset = 1
+  const messageLength = addressOffset + addressBuffer.byteLength + data.byteLength
+
+  const serializedMessage = new Uint8Array(messageLength)
+  serializedMessage.set(new Uint8Array([addressBuffer.byteLength]), 0)
+  serializedMessage.set(addressBuffer, 1)
+  serializedMessage.set(data, addressBuffer.byteLength + 1)
+  return serializedMessage
 }
