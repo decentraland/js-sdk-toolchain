@@ -622,6 +622,7 @@ export const componentDefinitionByName: {
     "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
+    "core::InputModifier": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBInputModifier>>;
     "core::MainCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMainCamera>>;
     "core::MapPin": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMapPin>>;
     "core::Material": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMaterial>>;
@@ -1410,6 +1411,9 @@ export const enum InputAction {
     // (undocumented)
     IA_WALK = 9
 }
+
+// @public (undocumented)
+export const InputModifier: LastWriteWinElementSetComponentDefinition<PBInputModifier>;
 
 // @public
 export const inputSystem: IInputSystem;
@@ -2334,6 +2338,47 @@ export namespace PBGltfContainerLoadingState {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfContainerLoadingState;
     // (undocumented)
     export function encode(message: PBGltfContainerLoadingState, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBInputModifier {
+    // (undocumented)
+    mode?: {
+        $case: "standard";
+        standard: PBInputModifier_StandardInput;
+    } | undefined;
+}
+
+// @public (undocumented)
+export namespace PBInputModifier {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBInputModifier;
+    // (undocumented)
+    export function encode(message: PBInputModifier, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBInputModifier_StandardInput {
+    // (undocumented)
+    disableAll?: boolean | undefined;
+    // (undocumented)
+    disableEmote?: boolean | undefined;
+    // (undocumented)
+    disableJog?: boolean | undefined;
+    // (undocumented)
+    disableJump?: boolean | undefined;
+    // (undocumented)
+    disableRun?: boolean | undefined;
+    // (undocumented)
+    disableWalk?: boolean | undefined;
+}
+
+// @public (undocumented)
+export namespace PBInputModifier_StandardInput {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBInputModifier_StandardInput;
+    // (undocumented)
+    export function encode(message: PBInputModifier_StandardInput, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
