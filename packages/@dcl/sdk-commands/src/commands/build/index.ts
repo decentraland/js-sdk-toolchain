@@ -1,14 +1,7 @@
 import path from 'path'
 import { CliComponents } from '../../components'
 import { declareArgs } from '../../logic/args'
-import {
-  installAssetPack,
-  installDependencies,
-  isEditorScene,
-  needsDependencies,
-  SceneProject,
-  WearableProject
-} from '../../logic/project-validations'
+import { installDependencies, needsDependencies, SceneProject, WearableProject } from '../../logic/project-validations'
 import { getBaseCoords } from '../../logic/scene-validations'
 import { b64HashingFunction } from '../../logic/project-files'
 import { bundleProject } from '../../logic/bundle'
@@ -69,10 +62,6 @@ export async function buildScene(options: Options, project: SceneProject | Weara
   if (canInstall) {
     if (await needsDependencies(options.components, project.workingDirectory)) {
       await installDependencies(options.components, project.workingDirectory)
-    }
-
-    if (await isEditorScene(options.components, project.workingDirectory)) {
-      await installAssetPack(options.components, project.workingDirectory)
     }
   }
 
