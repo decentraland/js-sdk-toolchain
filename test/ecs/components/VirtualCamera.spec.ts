@@ -7,7 +7,7 @@ describe('VirtualCamera component', () => {
     testComponentSerialization(components.VirtualCamera(newEngine), {
       defaultTransition: {
         transitionMode: {
-          $case: "time",
+          $case: 'time',
           time: 3
         }
       },
@@ -20,7 +20,7 @@ describe('VirtualCamera component', () => {
     testComponentSerialization(components.VirtualCamera(newEngine), {
       defaultTransition: {
         transitionMode: {
-          $case: "speed",
+          $case: 'speed',
           speed: 12.8
         }
       },
