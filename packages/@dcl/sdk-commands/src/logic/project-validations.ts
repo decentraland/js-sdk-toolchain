@@ -2,10 +2,10 @@ import { Scene } from '@dcl/schemas'
 import path from 'path'
 import { CliComponents } from '../components'
 import { colors } from '../components/log'
-import { printProgressInfo, printSuccess, printWarning } from './beautiful-logs'
+import { printProgressInfo } from './beautiful-logs'
 import { CliError } from './error'
 import { getSceneFilePath, getValidSceneJson } from './scene-validations'
-import { getInstalledPackageVersion, getInstalledPackageVersionInsidePackage } from './config'
+import { getInstalledPackageVersion } from './config'
 import { getSmartWearableFile, getValidWearableJson } from './portable-experience-sw-validations'
 import { getPackageJson } from './project-files'
 
@@ -72,29 +72,6 @@ export async function installDependencies(
   // TODO: test in windows
   await components.spawner.exec(workingDirectory, npmBin, ['install'])
   printProgressInfo(components.logger, colors.white('✅ Installing dependencies...'))
-}
-
-/*
- * Runs "npm install" for desired project
- */
-export async function installAssetPack(
-  components: Pick<CliComponents, 'logger' | 'spawner' | 'fs'>,
-  workingDirectory: string
-): Promise<void> {
-  const assetPack = '@dcl/asset-packs' as const
-  let assetPackVersion: string = ''
-  try {
-    assetPackVersion = await getInstalledPackageVersionInsidePackage(
-      components,
-      assetPack,
-      '@dcl/inspector',
-      workingDirectory
-    )
-    await components.spawner.exec(workingDirectory, npmBin, ['install', `${assetPack}@${assetPackVersion}`, '-D'])
-    printSuccess(components.logger, `${assetPack}@${assetPackVersion} installed`, '')
-  } catch (e: any) {
-    printWarning(components.logger, `Failed to install ${assetPack}@${assetPackVersion}' \n ${e.message}`)
-  }
 }
 
 /**
