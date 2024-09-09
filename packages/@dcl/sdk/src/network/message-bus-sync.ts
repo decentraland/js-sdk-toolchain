@@ -63,27 +63,6 @@ export function addSyncTransport(
   })
   const players = definePlayerHelper(engine)
 
-  let connectedPlayers: Set<string> = new Set()
-
-  async function logPlayers() {
-    let dirty = false
-    const players = new Set<string>()
-    const component = engine.getComponent(PlayerIdentityData.componentId) as typeof PlayerIdentityData
-    for (const[entity, player] of engine.getEntitiesWith(component)) {
-      if (!connectedPlayers.has(player.address)) {
-        dirty = true
-      }
-      players.add(player.address)
-    }
-    if (dirty || players.size !== connectedPlayers.size) {
-      console.log(...Array.from(players))
-    }
-    connectedPlayers = players
-    await wait(1000)
-    logPlayers()
-  }
-  logPlayers()
-
   players.onEnterScene((player) => {
     console.log('[onEnterScene]', player.userId)
 
