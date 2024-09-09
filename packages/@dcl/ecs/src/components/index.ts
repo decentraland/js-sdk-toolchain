@@ -14,7 +14,7 @@ import defineNetworkParent, { INetowrkParentType } from './manual/NetworkParent'
 import { defineTransformComponent, TransformComponentExtended } from './manual/Transform'
 import { AudioStreamComponentDefinitionExtended, defineAudioStreamComponent } from './extended/AudioStream'
 import { MediaState } from './generated/pb/decentraland/sdk/components/common/media_state.gen'
-import { defineVirtualCameraComponent, VirtualCameraComponentDefinitionExtended } from './extended/VirtualCamera';
+import { defineVirtualCameraComponent, VirtualCameraComponentDefinitionExtended } from './extended/VirtualCamera'
 
 export * from './generated/index.gen'
 
@@ -57,7 +57,8 @@ export const MeshCollider: LwwComponentGetter<MeshColliderComponentDefinitionExt
 export const Tween: LwwComponentGetter<TweenComponentDefinitionExtended> = (engine) => defineTweenComponent(engine)
 
 /* @__PURE__ */
-export const VirtualCamera: LwwComponentGetter<VirtualCameraComponentDefinitionExtended> = (engine) => defineVirtualCameraComponent(engine)
+export const VirtualCamera: LwwComponentGetter<VirtualCameraComponentDefinitionExtended> =
+  (engine) => defineVirtualCameraComponent(engine)
 
 /**
  * @alpha

@@ -1,6 +1,6 @@
 import { IEngine, LastWriteWinElementSetComponentDefinition } from '../../engine'
 import { PBVirtualCamera, VirtualCamera } from '../generated/index.gen'
-import { CameraTransition } from '../generated/pb/decentraland/sdk/components/common/camera_transition.gen';
+import { CameraTransition } from '../generated/pb/decentraland/sdk/components/common/camera_transition.gen'
 
 /**
  * @public
@@ -19,7 +19,8 @@ export interface CameraTransitionHelper {
 /**
  * @public
  */
-export interface VirtualCameraComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBVirtualCamera> {
+export interface VirtualCameraComponentDefinitionExtended extends
+  LastWriteWinElementSetComponentDefinition<PBVirtualCamera> {
   /**
    * Camera transition helper for time and speed modes
    */
