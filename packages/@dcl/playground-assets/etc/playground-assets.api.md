@@ -378,6 +378,14 @@ export namespace CameraTransition {
 }
 
 // @public (undocumented)
+export interface CameraTransitionHelper {
+    // (undocumented)
+    Speed: (speed: number) => CameraTransition['transitionMode'];
+    // (undocumented)
+    Time: (time: number) => CameraTransition['transitionMode'];
+}
+
+// @public (undocumented)
 export const enum CameraType {
     CT_CINEMATIC = 2,
     // (undocumented)
@@ -4382,8 +4390,15 @@ export namespace VideoTexture {
     export function encode(message: VideoTexture, writer?: _m0.Writer): _m0.Writer;
 }
 
+// Warning: (ae-missing-release-tag) "VirtualCamera" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const VirtualCamera: LastWriteWinElementSetComponentDefinition<PBVirtualCamera>;
+export const VirtualCamera: VirtualCameraComponentDefinitionExtended;
+
+// @public (undocumented)
+export interface VirtualCameraComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBVirtualCamera> {
+    Transition: CameraTransitionHelper;
+}
 
 // @public (undocumented)
 export const VisibilityComponent: LastWriteWinElementSetComponentDefinition<PBVisibilityComponent>;
