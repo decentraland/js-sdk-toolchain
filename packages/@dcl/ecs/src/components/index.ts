@@ -57,8 +57,8 @@ export const MeshCollider: LwwComponentGetter<MeshColliderComponentDefinitionExt
 export const Tween: LwwComponentGetter<TweenComponentDefinitionExtended> = (engine) => defineTweenComponent(engine)
 
 /* @__PURE__ */
-export const VirtualCamera: LwwComponentGetter<VirtualCameraComponentDefinitionExtended> =
-  (engine) => defineVirtualCameraComponent(engine)
+export const VirtualCamera: LwwComponentGetter<VirtualCameraComponentDefinitionExtended> = (engine) =>
+  defineVirtualCameraComponent(engine)
 
 /**
  * @alpha
