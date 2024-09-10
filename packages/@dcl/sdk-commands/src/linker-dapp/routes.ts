@@ -1,8 +1,12 @@
 import { dirname, resolve } from 'path'
+import fetch from 'node-fetch'
+import https from 'https'
 import { Router } from '@well-known-components/http-server'
+import { IHttpServerComponent } from '@well-known-components/interfaces'
+import { ChainId } from '@dcl/schemas'
+import { AuthChain } from '@dcl/crypto'
 
 import { CliComponents } from '../components'
-import { ChainId } from '@dcl/schemas'
 
 /**
  * Set common routes to use on Linker dApp
@@ -32,6 +36,33 @@ export function setRoutes<T extends { [key: string]: any }>(
     }
   })
 
+  router.get('/assets/:path', async (ctx) => {
+    const contentType = getContentTypeFromPath(ctx.params.path)
+    return {
+      headers: { 'Content-Type': contentType },
+      body: fs.createReadStream(resolve(linkerDapp, 'assets', ctx.params.path))
+    }
+  })
+
+  router.get('/auth/login', async (ctx): Promise<IHttpServerComponent.IResponse> => {
+    const httpsAgent = new https.Agent({
+      rejectUnauthorized: false
+    })
+    const url = 'https://decentraland.org/auth/login'
+    const resp = await fetch(url, {
+      ...ctx.request,
+      agent: httpsAgent
+    })
+
+    resp.headers.delete('content-encoding')
+
+    return {
+      body: resp.body,
+      status: resp.status,
+      headers: resp.headers
+    }
+  })
+
   router.get('/manifest.json', async () => ({
     headers: { 'Content-Type': 'application/json' },
     body: fs.createReadStream(resolve(linkerDapp, 'manifest.json'))
@@ -56,8 +87,21 @@ function getContentType(type: string) {
   }
 }
 
+function getContentTypeFromPath(path: string) {
+  const ext = path.split('.').pop()
+  switch (ext) {
+    case 'css':
+      return 'text/css'
+    case 'js':
+      return 'application/javascript'
+    case 'media':
+    default:
+      return 'text/plain'
+  }
+}
+
 export interface LinkerResponse {
   address: string
-  signature: string
+  authChain: AuthChain
   chainId?: ChainId
 }
