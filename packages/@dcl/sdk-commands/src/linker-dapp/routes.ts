@@ -44,22 +44,39 @@ export function setRoutes<T extends { [key: string]: any }>(
     }
   })
 
+  /* This route acts as a proxy to handle the auth flow with the Decentraland auth dApp,
+   * because this latest one validates the communication be on the same domain.
+   */
   router.get('/auth/login', async (ctx): Promise<IHttpServerComponent.IResponse> => {
-    const httpsAgent = new https.Agent({
-      rejectUnauthorized: false
-    })
-    const url = 'https://decentraland.org/auth/login'
-    const resp = await fetch(url, {
-      ...ctx.request,
-      agent: httpsAgent
-    })
+    try {
+      const httpsAgent = new https.Agent({
+        rejectUnauthorized: false
+      })
 
-    resp.headers.delete('content-encoding')
+      const url = 'https://decentraland.org/auth/login'
 
-    return {
-      body: resp.body,
-      status: resp.status,
-      headers: resp.headers
+      // Forward the incoming request to the Decentraland auth endpoint.
+      const resp = await fetch(url, {
+        method: ctx.request.method, // Ensure the correct method (GET in this case).
+        headers: ctx.request.headers, // Forward headers for proper proxy behavior.
+        body: ctx.request.body, // Forward request body if necessary.
+        agent: httpsAgent // Use the insecure HTTPS agent.
+      })
+
+      // Remove content-encoding header if present to prevent issues with compressed responses.
+      resp.headers.delete('content-encoding')
+
+      // Return the proxied response, including body, status, and headers.
+      return {
+        body: resp.body,
+        status: resp.status,
+        headers: resp.headers
+      }
+    } catch (error) {
+      return {
+        status: 500,
+        body: `Proxy error: ${error instanceof Error ? error.message : error}`
+      }
     }
   })
 
