@@ -27,6 +27,7 @@ import {
   UiTransform
 } from '@dcl/ecs'
 import { IProfile } from './message-bus-sync'
+import { NOT_SYNC_COMPONENTS } from './state'
 
 export type SyncEntity = (entityId: Entity, componentIds: number[], entityEnumId?: number) => void
 
@@ -64,24 +65,6 @@ export function entityUtils(engine: IEngine, profile: IProfile) {
       }
     }
 
-    const NOT_SYNC_COMPONENTS = [
-      VideoEvent,
-      VideoPlayer,
-      TweenState,
-      AudioEvent,
-      AudioSource,
-      EngineInfo,
-      GltfContainerLoadingState,
-      PointerEventsResult,
-      RaycastResult,
-      RealmInfo,
-      UiDropdown,
-      UiDropdownResult,
-      UiInput,
-      UiInputResult,
-      UiTransform,
-      UiText
-    ]
     for (const component of NOT_SYNC_COMPONENTS) {
       if (componentsIdsMutable.includes(component.componentId)) {
         console.log(`⚠️ ${component.componentName} can't be sync through the network!`)

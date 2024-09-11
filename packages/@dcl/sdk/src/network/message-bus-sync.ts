@@ -1,4 +1,4 @@
-import { IEngine, PlayerIdentityData, Transport } from '@dcl/ecs'
+import { IEngine, Transport } from '@dcl/ecs'
 import type { SendBinaryRequest, SendBinaryResponse } from '~system/CommunicationsController'
 
 import { syncFilter } from './filter'
@@ -56,8 +56,8 @@ export function addSyncTransport(
   // If we dont have any state initialized, and recieve a state message.
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, (value) => {
     const { sender, data } = decodeCRDTState(value)
-    console.log('[RES_CRDT_STATE]', sender, data)
     if (sender !== myProfile.userId) return
+    console.log('[Received CRDT State]', data.byteLength)
     setInitialized()
     transport.onmessage!(data)
   })
@@ -73,6 +73,7 @@ export function addSyncTransport(
       await wait(2000)
       // if the user is still in the scene
       if (players.getPlayer({ userId })) {
+        console.log('[SEND CRDT STATE] to:', userId)
         binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(userId, engineToCrdt(engine)))
       }
     }
