@@ -47,18 +47,24 @@ export function setRoutes<T extends { [key: string]: any }>(
   /* This route acts as a proxy to handle the auth flow with the Decentraland auth dApp,
    * because this latest one validates the communication be on the same domain.
    */
-  router.get('/auth/login', async (ctx): Promise<IHttpServerComponent.IResponse> => {
+  router.get('/auth/(.*)', async (ctx): Promise<IHttpServerComponent.IResponse> => {
     try {
       const httpsAgent = new https.Agent({
         rejectUnauthorized: false
       })
 
-      const url = 'https://decentraland.org/auth/login'
+      const domain = 'decentraland.org'
+      const url = `https://${domain}${ctx.url.pathname}${ctx.url.search}`
 
       // Forward the incoming request to the Decentraland auth endpoint.
       const resp = await fetch(url, {
         method: ctx.request.method, // Ensure the correct method (GET in this case).
-        headers: ctx.request.headers, // Forward headers for proper proxy behavior.
+        headers: {
+          ...ctx.request.headers,
+          Host: domain,
+          Referer: url,
+          Origin: url
+        }, // Forward headers for proper proxy behavior.
         body: ctx.request.body, // Forward request body if necessary.
         agent: httpsAgent // Use the insecure HTTPS agent.
       })
