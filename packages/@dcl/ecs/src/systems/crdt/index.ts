@@ -161,14 +161,6 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
 
         /* istanbul ignore else */
         if (component) {
-          if (
-            msg.type === CrdtMessageType.PUT_COMPONENT &&
-            component.componentId === Transform.componentId &&
-            NetworkEntity.has(entityId) &&
-            NetworkParent.has(entityId)
-          ) {
-            msg.data = networkUtils.fixTransformParent(msg)
-          }
           const [conflictMessage, value] = component.updateFromCrdt({ ...msg, entityId })
           if (!conflictMessage) {
             // Add message to transport queue to be processed by others transports
