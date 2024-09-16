@@ -5,6 +5,7 @@ import { getCatalystServersFromCache } from 'dcl-catalyst-client/dist/contracts-
 import { createFetchComponent } from '@well-known-components/fetch-component'
 import { hexToBytes } from 'eth-connect'
 import { ethSign } from '@dcl/crypto/dist/crypto'
+import { Authenticator } from '@dcl/crypto'
 
 import { CliComponents } from '../../components'
 import { IFile } from '../../logic/scene-validations'
@@ -78,8 +79,12 @@ export async function getAddressAndSignature(
 ): Promise<{ program?: Lifecycle.ComponentBasedProgram<unknown> }> {
   if (process.env.DCL_PRIVATE_KEY) {
     const wallet = createWallet(process.env.DCL_PRIVATE_KEY)
-    const signature = ethSign(hexToBytes(wallet.privateKey), messageToSign)
-    const linkerResponse = { signature, address: wallet.address }
+    const authChain = Authenticator.createSimpleAuthChain(
+      messageToSign,
+      wallet.address,
+      ethSign(hexToBytes(wallet.privateKey), messageToSign)
+    )
+    const linkerResponse = { authChain, address: wallet.address }
     await deployCallback(linkerResponse)
     awaitResponse.resolve()
     return {}
@@ -135,7 +140,7 @@ function setDeployRoutes(
   router.post('/api/deploy', async (ctx) => {
     const value = (await ctx.request.json()) as LinkerResponse
 
-    if (!value.address || !value.signature || !value.chainId) {
+    if (!value.address || !value.authChain || !value.chainId) {
       const errorMessage = `Invalid payload: ${Object.keys(value).join(' - ')}`
       logger.error(errorMessage)
       resolveLinkerPromise()
