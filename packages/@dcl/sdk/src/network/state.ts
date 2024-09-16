@@ -69,6 +69,7 @@ export function engineToCrdt(engine: IEngine): Uint8Array {
         return true
       }
       // For the static entities we only send the updates of the SyncComponents
+      // TODO: what about static entities that are created on runtime ?
       return SyncComponents.get(entity).componentIds.includes(itComponentDefinition.componentId)
     })
   }
