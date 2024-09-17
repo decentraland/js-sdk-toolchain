@@ -356,10 +356,6 @@ export const CameraModeArea: LastWriteWinElementSetComponentDefinition<PBCameraM
 // @public (undocumented)
 export interface CameraTransition {
     // (undocumented)
-    fromEntity?: number | undefined;
-    // (undocumented)
-    toEntity?: number | undefined;
-    // (undocumented)
     transitionMode?: {
         $case: "time";
         time: number;
@@ -2391,7 +2387,7 @@ export namespace PBInputModifier_StandardInput {
 
 // @public (undocumented)
 export interface PBMainCamera {
-    virtualCameraEntity: number;
+    virtualCameraEntity?: number | undefined;
 }
 
 // @public (undocumented)
@@ -3242,7 +3238,7 @@ export namespace PBVideoPlayer {
 // @public (undocumented)
 export interface PBVirtualCamera {
     // (undocumented)
-    defaultTransition: CameraTransition | undefined;
+    defaultTransition?: CameraTransition | undefined;
     // (undocumented)
     lookAtEntity?: number | undefined;
 }
