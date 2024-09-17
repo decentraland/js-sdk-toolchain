@@ -10,8 +10,7 @@ import {
   oldestUser as _oldestUser,
   setInitialized,
   stateInitialized,
-  stateInitializedChecker,
-  syncTransportIsReady
+  stateInitializedChecker
 } from './utils'
 import { entityUtils } from './entities'
 import { GetUserDataRequest, GetUserDataResponse } from '~system/UserIdentity'
