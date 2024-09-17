@@ -9,9 +9,7 @@ describe('VirtualCamera component', () => {
         transitionMode: {
           $case: 'time',
           time: 3
-        },
-        fromEntity: 6,
-        toEntity: 66
+        }
       },
       lookAtEntity: 35
     })
@@ -22,9 +20,7 @@ describe('VirtualCamera component', () => {
     const vCamera = components.VirtualCamera(newEngine)
     testComponentSerialization(vCamera, {
       defaultTransition: {
-        transitionMode: vCamera.Transition.Time(6),
-        fromEntity: 9,
-        toEntity: 99
+        transitionMode: vCamera.Transition.Time(6)
       },
       lookAtEntity: 86
     })
@@ -37,9 +33,7 @@ describe('VirtualCamera component', () => {
         transitionMode: {
           $case: 'speed',
           speed: 13
-        },
-        fromEntity: 9,
-        toEntity: 99
+        }
       },
       lookAtEntity: 86
     })
@@ -50,9 +44,7 @@ describe('VirtualCamera component', () => {
     const vCamera = components.VirtualCamera(newEngine)
     testComponentSerialization(vCamera, {
       defaultTransition: {
-        transitionMode: vCamera.Transition.Speed(15),
-        fromEntity: 9,
-        toEntity: 99
+        transitionMode: vCamera.Transition.Speed(15)
       },
       lookAtEntity: 86
     })
