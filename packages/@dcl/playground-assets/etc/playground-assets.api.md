@@ -632,6 +632,7 @@ export const componentDefinitionByName: {
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
     "core::InputModifier": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBInputModifier>>;
     "core::MainCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMainCamera>>;
+    "core::MapPin": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMapPin>>;
     "core::Material": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMaterial>>;
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
@@ -1586,6 +1587,9 @@ export interface MapComponentDefinition<T> extends LastWriteWinElementSetCompone
 }
 
 // @public (undocumented)
+export const MapPin: LastWriteWinElementSetComponentDefinition<PBMapPin>;
+
+// @public (undocumented)
 export type MapResult<T extends Spec> = ToOptional<{
     [K in keyof T]: T[K] extends ISchema ? ReturnType<T[K]['deserialize']> : T[K] extends Spec ? MapResult<T[K]> : never;
 }>;
@@ -2396,6 +2400,28 @@ export namespace PBMainCamera {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMainCamera;
     // (undocumented)
     export function encode(message: PBMainCamera, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBMapPin {
+    // (undocumented)
+    description: string;
+    // (undocumented)
+    iconSize: number;
+    // (undocumented)
+    position: PBVector2 | undefined;
+    // (undocumented)
+    texture?: TextureUnion | undefined;
+    // (undocumented)
+    title: string;
+}
+
+// @public (undocumented)
+export namespace PBMapPin {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMapPin;
+    // (undocumented)
+    export function encode(message: PBMapPin, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
