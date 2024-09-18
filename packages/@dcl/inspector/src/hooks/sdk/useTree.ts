@@ -150,6 +150,7 @@ export const useTree = () => {
   const duplicate = useCallback(
     async (entity: Entity) => {
       if (entity === ROOT || !sdk) return
+      sdk.operations.removeSelectedEntities()
       sdk.operations.duplicateEntity(entity)
       await sdk.operations.dispatch()
       handleUpdate()

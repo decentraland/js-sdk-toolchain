@@ -19,8 +19,9 @@ export function duplicateEntity(engine: IEngine) {
     const Name = engine.getComponent(NameEngine.componentName) as typeof NameEngine
     const NetworkEntity = engine.getComponent(NetworkEntityEngine.componentId) as typeof NetworkEntityEngine
 
-    const { entities } = clone(entity, engine as any, Transform as any, Triggers as any) as {
+    const { entities, cloned } = clone(entity, engine as any, Transform as any, Triggers as any) as {
       entities: Map<Entity, Entity>
+      cloned: Entity
     }
 
     for (const [original, duplicate] of Array.from(entities.entries()).reverse()) {
@@ -40,9 +41,8 @@ export function duplicateEntity(engine: IEngine) {
       }
     }
 
-    const duplicate = entities.get(entity)!
-    updateSelectedEntity(engine)(duplicate)
-    return duplicate
+    updateSelectedEntity(engine)(cloned)
+    return cloned
   }
 }
 

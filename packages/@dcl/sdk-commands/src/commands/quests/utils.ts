@@ -2,7 +2,7 @@ import future, { IFuture } from 'fp-future'
 import { ethSign } from '@dcl/crypto/dist/crypto'
 import { hexToBytes } from 'eth-connect'
 import { Lifecycle } from '@well-known-components/interfaces'
-import { Authenticator } from '@dcl/crypto'
+import { Authenticator, AuthChain } from '@dcl/crypto'
 import { dirname, resolve } from 'path'
 import { Router } from '@well-known-components/http-server'
 import { validateStepsAndConnections } from '@dcl/quests-client/dist-cjs/utils'
@@ -28,8 +28,12 @@ async function getAddressAndSignature(
 ): Promise<{ program?: Lifecycle.ComponentBasedProgram<unknown> }> {
   if (process.env.DCL_PRIVATE_KEY) {
     const wallet = createWallet(process.env.DCL_PRIVATE_KEY)
-    const signature = ethSign(hexToBytes(wallet.privateKey), info.messageToSign)
-    const linkerResponse = { signature, address: wallet.address }
+    const authChain = Authenticator.createSimpleAuthChain(
+      info.messageToSign,
+      wallet.address,
+      ethSign(hexToBytes(wallet.privateKey), info.messageToSign)
+    )
+    const linkerResponse = { authChain, address: wallet.address }
     await callback(linkerResponse)
     awaitResponse.resolve()
     return {}
@@ -44,7 +48,7 @@ async function getAddressAndSignature(
   router.post('/api/quests', async (ctx) => {
     const value = (await ctx.request.json()) as LinkerResponse
 
-    if (!value.address || !value.signature) {
+    if (!value.address || !value.authChain) {
       const errorMessage = `Invalid payload: ${Object.keys(value).join(' - ')}`
       logger.error(errorMessage)
       resolveLinkerPromise()
@@ -101,7 +105,7 @@ export async function executeSubcommand(
       await commandCallback(
         createAuthchainHeaders(
           linkerResponse.address,
-          linkerResponse.signature,
+          linkerResponse.authChain,
           payload,
           timestamp,
           JSON.stringify(commandData.metadata)
@@ -310,12 +314,11 @@ const AUTH_METADATA_HEADER = 'x-identity-metadata'
 
 function createAuthchainHeaders(
   address: string,
-  signature: string,
+  authchain: AuthChain,
   payload: string,
   timestamp: string,
   metadata: string
 ): Record<string, string> {
-  const authchain = Authenticator.createSimpleAuthChain(payload, address, signature)
   const headers: Record<string, string> = {}
   authchain.forEach((link, i) => {
     headers[AUTH_CHAIN_HEADER_PREFIX + i] = JSON.stringify(link)
