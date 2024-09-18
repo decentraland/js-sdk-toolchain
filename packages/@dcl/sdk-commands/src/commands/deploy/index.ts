@@ -1,6 +1,5 @@
 import { resolve } from 'path'
 import { EntityType, ChainId, getChainName } from '@dcl/schemas'
-import { Authenticator } from '@dcl/crypto'
 import { DeploymentBuilder } from 'dcl-catalyst-client'
 import future from 'fp-future'
 
@@ -147,8 +146,7 @@ export async function main(options: Options) {
   }
 
   async function deployEntity(linkerResponse: LinkerResponse) {
-    const { address, signature, chainId } = linkerResponse
-    const authChain = Authenticator.createSimpleAuthChain(entityId, address, signature)
+    const { authChain, chainId } = linkerResponse
 
     // Uploading data
     const { client, url } = await getCatalyst(chainId, options.args['--target'], options.args['--target-content'])
@@ -165,7 +163,7 @@ export async function main(options: Options) {
 
     try {
       options.components.logger.info(`Address: ${linkerResponse.address}`)
-      options.components.logger.info(`Signature: ${linkerResponse.signature}`)
+      options.components.logger.info(`AuthChain: ${linkerResponse.authChain}`)
       options.components.logger.info(`Network: ${getChainName(linkerResponse.chainId!)}`)
 
       const response = (await client.deploy(deployData, {

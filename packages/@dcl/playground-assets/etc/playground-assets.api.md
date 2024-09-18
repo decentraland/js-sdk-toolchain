@@ -383,6 +383,34 @@ export const CameraMode: LastWriteWinElementSetComponentDefinition<PBCameraMode>
 export const CameraModeArea: LastWriteWinElementSetComponentDefinition<PBCameraModeArea>;
 
 // @public (undocumented)
+export interface CameraTransition {
+    // (undocumented)
+    transitionMode?: {
+        $case: "time";
+        time: number;
+    } | {
+        $case: "speed";
+        speed: number;
+    } | undefined;
+}
+
+// @public (undocumented)
+export namespace CameraTransition {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): CameraTransition;
+    // (undocumented)
+    export function encode(message: CameraTransition, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface CameraTransitionHelper {
+    // (undocumented)
+    Speed: (speed: number) => CameraTransition['transitionMode'];
+    // (undocumented)
+    Time: (time: number) => CameraTransition['transitionMode'];
+}
+
+// @public (undocumented)
 export const enum CameraType {
     CT_CINEMATIC = 2,
     // (undocumented)
@@ -653,6 +681,8 @@ export const componentDefinitionByName: {
     "core::GltfNode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNode>>;
     "core::GltfNodeState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNodeState>>;
     "core::MapPin": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMapPin>>;
+    "core::InputModifier": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBInputModifier>>;
+    "core::MainCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMainCamera>>;
     "core::Material": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMaterial>>;
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
@@ -680,6 +710,7 @@ export const componentDefinitionByName: {
     "core::UiTransform": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiTransform>>;
     "core::VideoEvent": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBVideoEvent>>;
     "core::VideoPlayer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBVideoPlayer>>;
+    "core::VirtualCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBVirtualCamera>>;
     "core::VisibilityComponent": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBVisibilityComponent>>;
 };
 
@@ -1457,6 +1488,9 @@ export const enum InputAction {
     IA_WALK = 9
 }
 
+// @public (undocumented)
+export const InputModifier: LastWriteWinElementSetComponentDefinition<PBInputModifier>;
+
 // @public
 export const inputSystem: IInputSystem;
 
@@ -1610,6 +1644,9 @@ export type LocalDirectionRaycastSystemOptions = {
 //
 // @public (undocumented)
 export type LwwComponentGetter<T extends LastWriteWinElementSetComponentDefinition<any>> = (engine: Pick<IEngine, 'defineComponentFromSchema'>) => T;
+
+// @public (undocumented)
+export const MainCamera: LastWriteWinElementSetComponentDefinition<PBMainCamera>;
 
 // @public
 export interface MapComponentDefinition<T> extends LastWriteWinElementSetComponentDefinition<T> {
@@ -2419,6 +2456,58 @@ export namespace PBGltfNodeState {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfNodeState;
     // (undocumented)
     export function encode(message: PBGltfNodeState, writer?: _m0.Writer): _m0.Writer;
+
+export interface PBInputModifier {
+    // (undocumented)
+    mode?: {
+        $case: "standard";
+        standard: PBInputModifier_StandardInput;
+    } | undefined;
+}
+
+// @public (undocumented)
+export namespace PBInputModifier {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBInputModifier;
+    // (undocumented)
+    export function encode(message: PBInputModifier, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBInputModifier_StandardInput {
+    // (undocumented)
+    disableAll?: boolean | undefined;
+    // (undocumented)
+    disableEmote?: boolean | undefined;
+    // (undocumented)
+    disableJog?: boolean | undefined;
+    // (undocumented)
+    disableJump?: boolean | undefined;
+    // (undocumented)
+    disableRun?: boolean | undefined;
+    // (undocumented)
+    disableWalk?: boolean | undefined;
+}
+
+// @public (undocumented)
+export namespace PBInputModifier_StandardInput {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBInputModifier_StandardInput;
+    // (undocumented)
+    export function encode(message: PBInputModifier_StandardInput, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBMainCamera {
+    virtualCameraEntity?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBMainCamera {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMainCamera;
+    // (undocumented)
+    export function encode(message: PBMainCamera, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3344,6 +3433,22 @@ export namespace PBVideoPlayer {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBVideoPlayer;
     // (undocumented)
     export function encode(message: PBVideoPlayer, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBVirtualCamera {
+    // (undocumented)
+    defaultTransition?: CameraTransition | undefined;
+    // (undocumented)
+    lookAtEntity?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBVirtualCamera {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBVirtualCamera;
+    // (undocumented)
+    export function encode(message: PBVirtualCamera, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -4573,6 +4678,16 @@ export namespace VideoTexture {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): VideoTexture;
     // (undocumented)
     export function encode(message: VideoTexture, writer?: _m0.Writer): _m0.Writer;
+}
+
+// Warning: (ae-missing-release-tag) "VirtualCamera" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const VirtualCamera: VirtualCameraComponentDefinitionExtended;
+
+// @public (undocumented)
+export interface VirtualCameraComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBVirtualCamera> {
+    Transition: CameraTransitionHelper;
 }
 
 // @public (undocumented)

@@ -1,8 +1,12 @@
 import { dirname, resolve } from 'path'
+import fetch from 'node-fetch'
+import https from 'https'
 import { Router } from '@well-known-components/http-server'
+import { IHttpServerComponent } from '@well-known-components/interfaces'
+import { ChainId } from '@dcl/schemas'
+import { AuthChain } from '@dcl/crypto'
 
 import { CliComponents } from '../components'
-import { ChainId } from '@dcl/schemas'
 
 /**
  * Set common routes to use on Linker dApp
@@ -32,6 +36,56 @@ export function setRoutes<T extends { [key: string]: any }>(
     }
   })
 
+  router.get('/assets/:path', async (ctx) => {
+    const contentType = getContentTypeFromPath(ctx.params.path)
+    return {
+      headers: { 'Content-Type': contentType },
+      body: fs.createReadStream(resolve(linkerDapp, 'assets', ctx.params.path))
+    }
+  })
+
+  /* This route acts as a proxy to handle the auth flow with the Decentraland auth dApp,
+   * because this latest one validates the communication be on the same domain.
+   */
+  router.get('/auth/(.*)', async (ctx): Promise<IHttpServerComponent.IResponse> => {
+    try {
+      const httpsAgent = new https.Agent({
+        rejectUnauthorized: false
+      })
+
+      const domain = 'decentraland.org'
+      const url = `https://${domain}${ctx.url.pathname}${ctx.url.search}`
+
+      // Forward the incoming request to the Decentraland auth endpoint.
+      const resp = await fetch(url, {
+        method: ctx.request.method, // Ensure the correct method (GET in this case).
+        headers: {
+          ...ctx.request.headers,
+          Host: domain,
+          Referer: url,
+          Origin: url
+        }, // Forward headers for proper proxy behavior.
+        body: ctx.request.body, // Forward request body if necessary.
+        agent: httpsAgent // Use the insecure HTTPS agent.
+      })
+
+      // Remove content-encoding header if present to prevent issues with compressed responses.
+      resp.headers.delete('content-encoding')
+
+      // Return the proxied response, including body, status, and headers.
+      return {
+        body: resp.body,
+        status: resp.status,
+        headers: resp.headers
+      }
+    } catch (error) {
+      return {
+        status: 500,
+        body: `Proxy error: ${error instanceof Error ? error.message : error}`
+      }
+    }
+  })
+
   router.get('/manifest.json', async () => ({
     headers: { 'Content-Type': 'application/json' },
     body: fs.createReadStream(resolve(linkerDapp, 'manifest.json'))
@@ -56,8 +110,21 @@ function getContentType(type: string) {
   }
 }
 
+function getContentTypeFromPath(path: string) {
+  const ext = path.split('.').pop()
+  switch (ext) {
+    case 'css':
+      return 'text/css'
+    case 'js':
+      return 'application/javascript'
+    case 'media':
+    default:
+      return 'text/plain'
+  }
+}
+
 export interface LinkerResponse {
   address: string
-  signature: string
+  authChain: AuthChain
   chainId?: ChainId
 }
