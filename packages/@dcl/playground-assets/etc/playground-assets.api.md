@@ -676,12 +676,13 @@ export const componentDefinitionByName: {
     "core::CameraMode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraMode>>;
     "core::CameraModeArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraModeArea>>;
     "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
+    "core::GlobalLight": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGlobalLight>>;
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
     "core::GltfNode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNode>>;
     "core::GltfNodeState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNodeState>>;
-    "core::MapPin": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMapPin>>;
     "core::InputModifier": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBInputModifier>>;
+    "core::Light": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBLight>>;
     "core::MainCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMainCamera>>;
     "core::Material": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMaterial>>;
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
@@ -694,6 +695,7 @@ export const componentDefinitionByName: {
     "core::Raycast": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycast>>;
     "core::RaycastResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycastResult>>;
     "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
+    "core::Spotlight": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSpotlight>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
     "core::TweenSequence": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenSequence>>;
@@ -1236,6 +1238,9 @@ export type GlobalDirectionRaycastSystemOptions = {
     direction?: PBVector3;
 };
 
+// @public (undocumented)
+export const GlobalLight: LastWriteWinElementSetComponentDefinition<PBGlobalLight>;
+
 // Warning: (ae-missing-release-tag) "GlobalTargetRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -1608,6 +1613,9 @@ export interface LastWriteWinElementSetComponentDefinition<T> extends BaseCompon
     getOrNull(entity: Entity): DeepReadonly<T> | null;
 }
 
+// @public (undocumented)
+export const Light: LastWriteWinElementSetComponentDefinition<PBLight>;
+
 // @public
 export type Listeners = {
     onMouseDown?: Callback;
@@ -1653,9 +1661,6 @@ export interface MapComponentDefinition<T> extends LastWriteWinElementSetCompone
     create(entity: Entity, val?: Partial<T>): T;
     createOrReplace(entity: Entity, val?: Partial<T>): T;
 }
-
-// @public (undocumented)
-export const MapPin: LastWriteWinElementSetComponentDefinition<PBMapPin>;
 
 // @public (undocumented)
 export type MapResult<T extends Spec> = ToOptional<{
@@ -2396,6 +2401,21 @@ export namespace PBEngineInfo {
 }
 
 // @public (undocumented)
+export interface PBGlobalLight {
+    ambientBrightness?: number | undefined;
+    ambientColor?: PBColor3 | undefined;
+    direction?: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBGlobalLight {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGlobalLight;
+    // (undocumented)
+    export function encode(message: PBGlobalLight, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBGltfContainer {
     invisibleMeshesCollisionMask?: number | undefined;
     src: string;
@@ -2456,7 +2476,9 @@ export namespace PBGltfNodeState {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfNodeState;
     // (undocumented)
     export function encode(message: PBGltfNodeState, writer?: _m0.Writer): _m0.Writer;
+}
 
+// @public (undocumented)
 export interface PBInputModifier {
     // (undocumented)
     mode?: {
@@ -2498,6 +2520,22 @@ export namespace PBInputModifier_StandardInput {
 }
 
 // @public (undocumented)
+export interface PBLight {
+    color?: PBColor3 | undefined;
+    enabled?: boolean | undefined;
+    illuminance?: number | undefined;
+    shadows?: boolean | undefined;
+}
+
+// @public (undocumented)
+export namespace PBLight {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBLight;
+    // (undocumented)
+    export function encode(message: PBLight, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBMainCamera {
     virtualCameraEntity?: number | undefined;
 }
@@ -2508,28 +2546,6 @@ export namespace PBMainCamera {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMainCamera;
     // (undocumented)
     export function encode(message: PBMainCamera, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
-export interface PBMapPin {
-    // (undocumented)
-    description: string;
-    // (undocumented)
-    iconSize: number;
-    // (undocumented)
-    position: PBVector2 | undefined;
-    // (undocumented)
-    texture?: TextureUnion | undefined;
-    // (undocumented)
-    title: string;
-}
-
-// @public (undocumented)
-export namespace PBMapPin {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMapPin;
-    // (undocumented)
-    export function encode(message: PBMapPin, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3016,6 +3032,21 @@ export namespace PBRealmInfo {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBRealmInfo;
     // (undocumented)
     export function encode(message: PBRealmInfo, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBSpotlight {
+    angle: number;
+    // Warning: (tsdoc-malformed-html-name) Invalid HTML element: Expecting an HTML name
+    innerAngle?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBSpotlight {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBSpotlight;
+    // (undocumented)
+    export function encode(message: PBSpotlight, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -4074,6 +4105,9 @@ export interface Spec {
     // (undocumented)
     [key: string]: ISchema;
 }
+
+// @public (undocumented)
+export const Spotlight: LastWriteWinElementSetComponentDefinition<PBSpotlight>;
 
 // @alpha
 export const SyncComponents: ISyncComponents;
