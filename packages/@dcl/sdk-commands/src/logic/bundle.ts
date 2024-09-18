@@ -234,7 +234,7 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
   if (options.watch) args.push('--watch')
 
   printProgressStep(components.logger, `Running type checker`, 2, MAX_STEP)
-  const ts = child_process.spawn('node', args, { env: process.env, cwd: options.workingDirectory })
+  const ts = child_process.spawn(process.execPath, args, { env: process.env, cwd: options.workingDirectory })
   const typeCheckerFuture = future<number>()
 
   ts.on('close', (code) => {

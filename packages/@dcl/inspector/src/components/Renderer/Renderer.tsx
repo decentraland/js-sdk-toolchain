@@ -134,6 +134,7 @@ const Renderer: React.FC = () => {
 
   const pasteSelectedEntities = useCallback(() => {
     if (!sdk) return
+    sdk.operations.removeSelectedEntities()
     copyEntities.forEach((entity) => sdk.operations.duplicateEntity(entity))
     void sdk.operations.dispatch()
   }, [sdk, copyEntities])
