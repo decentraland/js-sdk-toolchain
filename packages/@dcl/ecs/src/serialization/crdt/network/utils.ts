@@ -63,23 +63,25 @@ export function localMessageToNetwork(
   destinationBuffer.writeBuffer(buffer.buffer().subarray(offset, buffer.currentWriteOffset()), false)
 }
 
+const buffer = new ReadWriteByteBuffer()
 /* istanbul ignore next */
 export function fixTransformParent(
   message: ReceiveMessage,
   transformValue?: TransformType,
   parent?: Entity
 ): Uint8Array {
+  buffer.resetBuffer()
   let transform = transformValue
-  const buffer = new ReadWriteByteBuffer()
+
   if (!transform && 'data' in message) {
-    buffer.writeBuffer(message.data)
-    transform = TransformSchema.deserialize(buffer)
-    buffer.resetBuffer()
+    transform = TransformSchema.deserialize(new ReadWriteByteBuffer(message.data))
   }
+
   if (!transform) throw new Error('Invalid parent transform')
+
   // Generate new transform raw data with the parent
   const newTransform = { ...transform, parent }
-  buffer.resetBuffer()
+
   TransformSchema.serialize(newTransform, buffer)
   return buffer.toBinary()
 }

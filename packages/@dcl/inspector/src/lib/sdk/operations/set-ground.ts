@@ -1,4 +1,4 @@
-import { IEngine, Transform as TransformEngine, GltfContainer as GltfContainerEngine, Entity } from '@dcl/ecs'
+import { IEngine, Transform as TransformEngine, GltfContainer as GltfContainerEngine } from '@dcl/ecs'
 import { EditorComponentNames, EditorComponents } from '../components'
 import { addChild as createAddChild } from './add-child'
 import { removeEntity as createRemoveEntity } from './remove-entity'
