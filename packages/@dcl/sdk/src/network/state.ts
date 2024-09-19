@@ -64,13 +64,14 @@ export function engineToCrdt(engine: IEngine): Uint8Array {
       if (!isNetworkEntity) {
         return false
       }
-      const isDynamicEntity = NetworkEntity.get(entity).networkId
-      if (isDynamicEntity) {
-        return true
-      }
-      // For the static entities we only send the updates of the SyncComponents
-      // TODO: what about static entities that are created on runtime ?
-      return SyncComponents.get(entity).componentIds.includes(itComponentDefinition.componentId)
+      return true
+      // const isDynamicEntity = NetworkEntity.get(entity).networkId
+      // if (isDynamicEntity) {
+      //   return true
+      // }
+      // // For the static entities we only send the updates of the SyncComponents
+      // // TODO: what about static entities that are created on runtime ?
+      // return SyncComponents.get(entity).componentIds.includes(itComponentDefinition.componentId)
     })
   }
 

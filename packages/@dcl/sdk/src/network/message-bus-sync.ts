@@ -1,5 +1,5 @@
-import { IEngine, Transport } from '@dcl/ecs'
-import type { SendBinaryRequest, SendBinaryResponse } from '~system/CommunicationsController'
+import { IEngine, Transport, RealmInfo } from '@dcl/ecs'
+import { type SendBinaryRequest, type SendBinaryResponse } from '~system/CommunicationsController'
 
 import { syncFilter } from './filter'
 import { engineToCrdt } from './state'
@@ -61,29 +61,44 @@ export function addSyncTransport(
     setInitialized()
     transport.onmessage!(data)
   })
+
+  binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, (_, userId) => {
+    console.log('[RECIEVE REQ CRDT] from:', userId)
+    if (players.getPlayer({ userId })) {
+      binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(userId, engineToCrdt(engine)))
+    }
+  })
   const players = definePlayerHelper(engine)
 
-  players.onEnterScene((player) => {
-    console.log('[onEnterScene]', player.userId)
+  let requestCrdtStateWhenConnected = false
 
-    async function sendCRDT(userId: string) {
-      // Wait till the user is connected to comms
-      // TODO: create an API or a Component to know this.
-      // Then the user when joins the scene can request de state and each player answer to that request.
-      await wait(2000)
-      // if the user is still in the scene
-      if (players.getPlayer({ userId })) {
-        console.log('[SEND CRDT STATE] to:', userId)
-        binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(userId, engineToCrdt(engine)))
+  players.onEnterScene((player) => {
+    console.log('[onEnterScene]', player.userId, myProfile.userId)
+    if (player.userId === myProfile.userId) {
+      console.log('request CRDT state when we are connected to comms.')
+      if (RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom) {
+        console.log('Requesting state')
+        binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
+      } else {
+        console.log('Waiting to be conneted')
+        requestCrdtStateWhenConnected = true
       }
     }
-    if (player.userId === myProfile.userId) return
-    void sendCRDT(player.userId)
+  })
+
+  RealmInfo.onChange(engine.RootEntity, (value) => {
+    console.log('RealmInfo changed')
+    if (value?.isConnectedSceneRoom && requestCrdtStateWhenConnected) {
+      console.log('Conneted! Emiting req crdt state')
+      requestCrdtStateWhenConnected = false
+      binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
+    }
   })
 
   players.onLeaveScene((userId) => {
     console.log('[onLeaveScene]', userId)
     if (userId === myProfile.userId) {
+      requestCrdtStateWhenConnected = false
       setInitialized(false)
     }
   })
@@ -93,20 +108,6 @@ export function addSyncTransport(
     console.log(Array.from(serializeCrdtMessages('[receive CRDT]: ', value, engine)))
     transport.onmessage!(value)
   })
-
-  async function wait(ms: number) {
-    return new Promise<void>((resolve) => {
-      let timer = 0
-      function timerFn(dt: number) {
-        timer += dt
-        if (timer * 1000 >= ms) {
-          resolve()
-          engine.removeSystem(timerFn)
-        }
-      }
-      engine.addSystem(timerFn)
-    })
-  }
 
   return {
     ...entityDefinitions,
