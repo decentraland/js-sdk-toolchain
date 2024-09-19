@@ -7,7 +7,7 @@ import { BinaryMessageBus, CommsMessage, decodeString, encodeString } from './bi
 import { fetchProfile, setInitialized, stateInitializedChecker } from './utils'
 import { entityUtils } from './entities'
 import { GetUserDataRequest, GetUserDataResponse } from '~system/UserIdentity'
-import { definePlayerHelper } from '../players'
+import { definePlayerHelper, getPlayer } from '../players'
 import { serializeCrdtMessages } from '../internal/transports/logger'
 
 export type IProfile = { networkId: number; userId: string }
@@ -71,10 +71,14 @@ export function addSyncTransport(
   const players = definePlayerHelper(engine)
 
   let requestCrdtStateWhenConnected = false
+  const myPlayer = getPlayer()
+  if (myPlayer || myProfile.userId) {
+    console.log('Already in scene [onEnterScene]', myPlayer?.userId, 'asd', myProfile.userId)
+  }
 
   players.onEnterScene((player) => {
     console.log('[onEnterScene]', player.userId, myProfile.userId)
-    if (player.userId === myProfile.userId) {
+    if (player.userId === myProfile.userId && !requestCrdtStateWhenConnected) {
       console.log('request CRDT state when we are connected to comms.')
       if (RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom) {
         console.log('Requesting state')
@@ -87,7 +91,7 @@ export function addSyncTransport(
   })
 
   RealmInfo.onChange(engine.RootEntity, (value) => {
-    console.log('RealmInfo changed')
+    console.log('RealmInfo changed: isConnectedSceneRoom', value?.isConnectedSceneRoom)
     if (value?.isConnectedSceneRoom && requestCrdtStateWhenConnected) {
       console.log('Conneted! Emiting req crdt state')
       requestCrdtStateWhenConnected = false
