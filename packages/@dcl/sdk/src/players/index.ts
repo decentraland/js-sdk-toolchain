@@ -89,7 +89,7 @@ function definePlayerHelper(engine: IEngine) {
       return {
         entity: userEntity,
         name: avatarData?.name ?? '',
-        isGuest: !!playerData?.isGuest ?? false,
+        isGuest: !!playerData?.isGuest,
         userId: playerData?.address ?? '',
         avatar: avatarData ?? undefined,
         wearables: wearablesData?.wearableUrns ?? [],
