@@ -8,12 +8,16 @@ describe('Generated CameraModifierArea ProtoBuf', () => {
 
     testComponentSerialization(CameraModeArea, {
       area: { x: 1, y: 2, z: 3 },
-      mode: CameraType.CT_FIRST_PERSON
+      mode: CameraType.CT_FIRST_PERSON,
+      cinematicSettings: undefined,
+      useColliderRange: false
     })
 
     testComponentSerialization(CameraModeArea, {
       area: { x: 3, y: 4, z: 5 },
-      mode: CameraType.CT_THIRD_PERSON
+      mode: CameraType.CT_THIRD_PERSON,
+      cinematicSettings: undefined,
+      useColliderRange: false
     })
   })
 })

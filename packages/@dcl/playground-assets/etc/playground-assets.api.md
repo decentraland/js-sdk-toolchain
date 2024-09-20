@@ -137,6 +137,13 @@ export const AvatarAttach: LastWriteWinElementSetComponentDefinition<PBAvatarAtt
 export const AvatarBase: LastWriteWinElementSetComponentDefinition<PBAvatarBase>;
 
 // @public (undocumented)
+export const enum AvatarControlType {
+    CCT_NONE = 0,
+    CCT_RELATIVE = 1,
+    CCT_TANK = 2
+}
+
+// @public (undocumented)
 export const AvatarEmoteCommand: GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>;
 
 // @public (undocumented)
@@ -149,6 +156,28 @@ export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAva
 export const enum AvatarModifierType {
     AMT_DISABLE_PASSPORTS = 1,
     AMT_HIDE_AVATARS = 0
+}
+
+// @public (undocumented)
+export interface AvatarMovementSettings {
+    allowWeightedMovement?: boolean | undefined;
+    // (undocumented)
+    controlMode?: AvatarControlType | undefined;
+    friction?: number | undefined;
+    gravity?: number | undefined;
+    jumpHeight?: number | undefined;
+    maxFallSpeed?: number | undefined;
+    runSpeed?: number | undefined;
+    turnSpeed?: number | undefined;
+    walkSpeed?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace AvatarMovementSettings {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): AvatarMovementSettings;
+    // (undocumented)
+    export function encode(message: AvatarMovementSettings, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -396,6 +425,29 @@ export const enum CameraType {
 export type Children = ReactEcs.JSX.ReactNode;
 
 // @public (undocumented)
+export interface CinematicSettings {
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    allowManualRotation?: boolean | undefined;
+    cameraEntity: number;
+    pitchRange?: number | undefined;
+    rollRange?: number | undefined;
+    yawRange?: number | undefined;
+    zoomMax?: number | undefined;
+    zoomMin?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace CinematicSettings {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): CinematicSettings;
+    // (undocumented)
+    export function encode(message: CinematicSettings, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export const enum ColliderLayer {
     // (undocumented)
     CL_CUSTOM1 = 256,
@@ -624,9 +676,13 @@ export const componentDefinitionByName: {
     "core::CameraMode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraMode>>;
     "core::CameraModeArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraModeArea>>;
     "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
+    "core::GlobalLight": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGlobalLight>>;
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
+    "core::GltfNode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNode>>;
+    "core::GltfNodeState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNodeState>>;
     "core::InputModifier": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBInputModifier>>;
+    "core::Light": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBLight>>;
     "core::MainCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMainCamera>>;
     "core::Material": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMaterial>>;
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
@@ -639,16 +695,19 @@ export const componentDefinitionByName: {
     "core::Raycast": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycast>>;
     "core::RaycastResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycastResult>>;
     "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
+    "core::Spotlight": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSpotlight>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
     "core::TweenSequence": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenSequence>>;
     "core::TweenState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenState>>;
     "core::UiBackground": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiBackground>>;
+    "core::UiCanvas": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiCanvas>>;
     "core::UiCanvasInformation": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiCanvasInformation>>;
     "core::UiDropdown": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdown>>;
     "core::UiDropdownResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdownResult>>;
     "core::UiInput": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInput>>;
     "core::UiInputResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInputResult>>;
+    "core::UiScrollResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiScrollResult>>;
     "core::UiText": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiText>>;
     "core::UiTransform": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiTransform>>;
     "core::VideoEvent": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBVideoEvent>>;
@@ -1179,6 +1238,9 @@ export type GlobalDirectionRaycastSystemOptions = {
     direction?: PBVector3;
 };
 
+// @public (undocumented)
+export const GlobalLight: LastWriteWinElementSetComponentDefinition<PBGlobalLight>;
+
 // Warning: (ae-missing-release-tag) "GlobalTargetRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -1196,6 +1258,22 @@ export const GltfContainer: LastWriteWinElementSetComponentDefinition<PBGltfCont
 
 // @public (undocumented)
 export const GltfContainerLoadingState: LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>;
+
+// @public (undocumented)
+export const GltfNode: LastWriteWinElementSetComponentDefinition<PBGltfNode>;
+
+// @public (undocumented)
+export const GltfNodeState: LastWriteWinElementSetComponentDefinition<PBGltfNodeState>;
+
+// @public (undocumented)
+export const enum GltfNodeStateValue {
+    // (undocumented)
+    GNSV_FAILED = 1,
+    // (undocumented)
+    GNSV_PENDING = 0,
+    // (undocumented)
+    GNSV_READY = 2
+}
 
 // @public (undocumented)
 export interface GrowOnlyValueSetComponentDefinition<T> extends BaseComponent<T> {
@@ -1535,6 +1613,9 @@ export interface LastWriteWinElementSetComponentDefinition<T> extends BaseCompon
     getOrNull(entity: Entity): DeepReadonly<T> | null;
 }
 
+// @public (undocumented)
+export const Light: LastWriteWinElementSetComponentDefinition<PBLight>;
+
 // @public
 export type Listeners = {
     onMouseDown?: Callback;
@@ -1778,6 +1859,7 @@ export const MeshCollider: MeshColliderComponentDefinitionExtended;
 export interface MeshColliderComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBMeshCollider> {
     setBox(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
     setCylinder(entity: Entity, radiusBottom?: number, radiusTop?: number, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
+    setGltfMesh(entity: Entity, source: string, meshName: string, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
     setPlane(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
     setSphere(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void;
 }
@@ -1791,6 +1873,7 @@ export const MeshRenderer: MeshRendererComponentDefinitionExtended;
 export interface MeshRendererComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBMeshRenderer> {
     setBox(entity: Entity, uvs?: number[]): void;
     setCylinder(entity: Entity, radiusBottom?: number, radiusTop?: number): void;
+    setGltfMesh(entity: Entity, source: string, meshName: string): void;
     setPlane(entity: Entity, uvs?: number[]): void;
     setSphere(entity: Entity): void;
 }
@@ -2185,6 +2268,9 @@ export interface PBAvatarModifierArea {
     area: PBVector3 | undefined;
     excludeIds: string[];
     modifiers: AvatarModifierType[];
+    // (undocumented)
+    movementSettings?: AvatarMovementSettings | undefined;
+    useColliderRange?: boolean | undefined;
 }
 
 // @public (undocumented)
@@ -2247,7 +2333,10 @@ export namespace PBCameraMode {
 // @public (undocumented)
 export interface PBCameraModeArea {
     area: PBVector3 | undefined;
+    // (undocumented)
+    cinematicSettings?: CinematicSettings | undefined;
     mode: CameraType;
+    useColliderRange?: boolean | undefined;
 }
 
 // @public (undocumented)
@@ -2312,6 +2401,21 @@ export namespace PBEngineInfo {
 }
 
 // @public (undocumented)
+export interface PBGlobalLight {
+    ambientBrightness?: number | undefined;
+    ambientColor?: PBColor3 | undefined;
+    direction?: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBGlobalLight {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGlobalLight;
+    // (undocumented)
+    export function encode(message: PBGlobalLight, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBGltfContainer {
     invisibleMeshesCollisionMask?: number | undefined;
     src: string;
@@ -2328,8 +2432,13 @@ export namespace PBGltfContainer {
 
 // @public (undocumented)
 export interface PBGltfContainerLoadingState {
+    animationNames: string[];
     // (undocumented)
     currentState: LoadingState;
+    materialNames: string[];
+    meshNames: string[];
+    nodePaths: string[];
+    skinNames: string[];
 }
 
 // @public (undocumented)
@@ -2338,6 +2447,35 @@ export namespace PBGltfContainerLoadingState {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfContainerLoadingState;
     // (undocumented)
     export function encode(message: PBGltfContainerLoadingState, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBGltfNode {
+    path: string;
+}
+
+// @public (undocumented)
+export namespace PBGltfNode {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfNode;
+    // (undocumented)
+    export function encode(message: PBGltfNode, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBGltfNodeState {
+    // (undocumented)
+    error?: string | undefined;
+    // (undocumented)
+    state: GltfNodeStateValue;
+}
+
+// @public (undocumented)
+export namespace PBGltfNodeState {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfNodeState;
+    // (undocumented)
+    export function encode(message: PBGltfNodeState, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2382,6 +2520,22 @@ export namespace PBInputModifier_StandardInput {
 }
 
 // @public (undocumented)
+export interface PBLight {
+    color?: PBColor3 | undefined;
+    enabled?: boolean | undefined;
+    illuminance?: number | undefined;
+    shadows?: boolean | undefined;
+}
+
+// @public (undocumented)
+export namespace PBLight {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBLight;
+    // (undocumented)
+    export function encode(message: PBLight, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBMainCamera {
     virtualCameraEntity?: number | undefined;
 }
@@ -2396,6 +2550,7 @@ export namespace PBMainCamera {
 
 // @public (undocumented)
 export interface PBMaterial {
+    gltf?: PBMaterial_GltfMaterial | undefined;
     // (undocumented)
     material?: {
         $case: "unlit";
@@ -2412,6 +2567,22 @@ export namespace PBMaterial {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMaterial;
     // (undocumented)
     export function encode(message: PBMaterial, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBMaterial_GltfMaterial {
+    // (undocumented)
+    gltfSrc: string;
+    // (undocumented)
+    name: string;
+}
+
+// @public (undocumented)
+export namespace PBMaterial_GltfMaterial {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMaterial_GltfMaterial;
+    // (undocumented)
+    export function encode(message: PBMaterial_GltfMaterial, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2473,6 +2644,9 @@ export interface PBMeshCollider {
     } | {
         $case: "plane";
         plane: PBMeshCollider_PlaneMesh;
+    } | {
+        $case: "gltf";
+        gltf: PBMeshCollider_GltfMesh;
     } | undefined;
 }
 
@@ -2508,6 +2682,20 @@ export namespace PBMeshCollider_CylinderMesh {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshCollider_CylinderMesh;
     // (undocumented)
     export function encode(message: PBMeshCollider_CylinderMesh, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBMeshCollider_GltfMesh {
+    gltfSrc: string;
+    name: string;
+}
+
+// @public (undocumented)
+export namespace PBMeshCollider_GltfMesh {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshCollider_GltfMesh;
+    // (undocumented)
+    export function encode(message: PBMeshCollider_GltfMesh, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2549,6 +2737,9 @@ export interface PBMeshRenderer {
     } | {
         $case: "plane";
         plane: PBMeshRenderer_PlaneMesh;
+    } | {
+        $case: "gltf";
+        gltf: PBMeshRenderer_GltfMesh;
     } | undefined;
 }
 
@@ -2585,6 +2776,20 @@ export namespace PBMeshRenderer_CylinderMesh {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshRenderer_CylinderMesh;
     // (undocumented)
     export function encode(message: PBMeshRenderer_CylinderMesh, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBMeshRenderer_GltfMesh {
+    gltfSrc: string;
+    name: string;
+}
+
+// @public (undocumented)
+export namespace PBMeshRenderer_GltfMesh {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshRenderer_GltfMesh;
+    // (undocumented)
+    export function encode(message: PBMeshRenderer_GltfMesh, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2830,6 +3035,21 @@ export namespace PBRealmInfo {
 }
 
 // @public (undocumented)
+export interface PBSpotlight {
+    angle: number;
+    // Warning: (tsdoc-malformed-html-name) Invalid HTML element: Expecting an HTML name
+    innerAngle?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBSpotlight {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBSpotlight;
+    // (undocumented)
+    export function encode(message: PBSpotlight, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBTextShape {
     font?: Font | undefined;
     fontAutoSize?: boolean | undefined;
@@ -2941,6 +3161,23 @@ export namespace PBUiBackground {
 }
 
 // @public (undocumented)
+export interface PBUiCanvas {
+    color?: PBColor4 | undefined;
+    // (undocumented)
+    height: number;
+    // (undocumented)
+    width: number;
+}
+
+// @public (undocumented)
+export namespace PBUiCanvas {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiCanvas;
+    // (undocumented)
+    export function encode(message: PBUiCanvas, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBUiCanvasInformation {
     devicePixelRatio: number;
     height: number;
@@ -3034,10 +3271,26 @@ export namespace PBUiInputResult {
 }
 
 // @public (undocumented)
+export interface PBUiScrollResult {
+    // (undocumented)
+    value: PBVector2 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBUiScrollResult {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiScrollResult;
+    // (undocumented)
+    export function encode(message: PBUiScrollResult, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBUiText {
     color?: PBColor4 | undefined;
     font?: Font | undefined;
     fontSize?: number | undefined;
+    outlineColor?: PBColor4 | undefined;
+    outlineWidth?: number | undefined;
     textAlign?: TextAlignMode | undefined;
     textWrap?: TextWrap | undefined;
     value: string;
@@ -3057,6 +3310,7 @@ export interface PBUiTransform {
     alignItems?: YGAlign | undefined;
     alignSelf: YGAlign;
     display: YGDisplay;
+    elementId?: string | undefined;
     // (undocumented)
     flexBasis: number;
     flexBasisUnit: YGUnit;
@@ -3093,6 +3347,7 @@ export interface PBUiTransform {
     // (undocumented)
     minWidth: number;
     minWidthUnit: YGUnit;
+    opacity?: number | undefined;
     overflow: YGOverflow;
     // (undocumented)
     paddingBottom: number;
@@ -3124,6 +3379,8 @@ export interface PBUiTransform {
     positionType: YGPositionType;
     // (undocumented)
     rightOf: number;
+    scrollPosition?: ScrollPositionValue | undefined;
+    scrollVisible?: ShowScrollBar | undefined;
     // (undocumented)
     width: number;
     widthUnit: YGUnit;
@@ -3567,6 +3824,8 @@ export interface ReactBasedUiSystem {
     // (undocumented)
     destroy(): void;
     // (undocumented)
+    setTextureRenderer(entity: Entity, ui: UiComponent): void;
+    // (undocumented)
     setUiRenderer(ui: UiComponent): void;
 }
 
@@ -3807,10 +4066,48 @@ export namespace Schemas {
 }
 
 // @public (undocumented)
+export interface ScrollPositionValue {
+    // (undocumented)
+    value?: {
+        $case: "position";
+        position: PBVector2;
+    } | {
+        $case: "reference";
+        reference: string;
+    } | undefined;
+}
+
+// @public (undocumented)
+export namespace ScrollPositionValue {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): ScrollPositionValue;
+    // (undocumented)
+    export function encode(message: ScrollPositionValue, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public
+export type ScrollVisibleType = 'horizontal' | 'vertical' | 'both' | 'hidden';
+
+// @public (undocumented)
+export const enum ShowScrollBar {
+    // (undocumented)
+    SSB_BOTH = 0,
+    // (undocumented)
+    SSB_HIDDEN = 3,
+    // (undocumented)
+    SSB_ONLY_HORIZONTAL = 2,
+    // (undocumented)
+    SSB_ONLY_VERTICAL = 1
+}
+
+// @public (undocumented)
 export interface Spec {
     // (undocumented)
     [key: string]: ISchema;
 }
+
+// @public (undocumented)
+export const Spotlight: LastWriteWinElementSetComponentDefinition<PBSpotlight>;
 
 // @alpha
 export const SyncComponents: ISyncComponents;
@@ -3931,6 +4228,9 @@ export interface TextureUnion {
     } | {
         $case: "videoTexture";
         videoTexture: VideoTexture;
+    } | {
+        $case: "uiTexture";
+        uiTexture: UiCanvasTexture;
     } | undefined;
 }
 
@@ -4108,7 +4408,26 @@ export interface UiButtonProps extends UiLabelProps, EntityPropTypes {
 }
 
 // @public (undocumented)
+export const UiCanvas: LastWriteWinElementSetComponentDefinition<PBUiCanvas>;
+
+// @public (undocumented)
 export const UiCanvasInformation: LastWriteWinElementSetComponentDefinition<PBUiCanvasInformation>;
+
+// @public (undocumented)
+export interface UiCanvasTexture {
+    filterMode?: TextureFilterMode | undefined;
+    // (undocumented)
+    uiCanvasEntity: number;
+    wrapMode?: TextureWrapMode | undefined;
+}
+
+// @public (undocumented)
+export namespace UiCanvasTexture {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): UiCanvasTexture;
+    // (undocumented)
+    export function encode(message: UiCanvasTexture, writer?: _m0.Writer): _m0.Writer;
+}
 
 // @public (undocumented)
 export type UiComponent = () => ReactEcs.JSX.ReactNode;
@@ -4164,6 +4483,8 @@ export interface UiLabelProps {
     color?: PBColor4 | undefined;
     font?: UiFontType | undefined;
     fontSize?: ScaleUnit | undefined;
+    outlineColor?: PBColor4 | undefined;
+    outlineWidth?: number | undefined;
     textAlign?: TextAlignType | undefined;
     textWrap?: UiTextWrapType | undefined;
     value: string;
@@ -4171,6 +4492,9 @@ export interface UiLabelProps {
 
 // @public
 export type uint32 = number;
+
+// @public (undocumented)
+export const UiScrollResult: LastWriteWinElementSetComponentDefinition<PBUiScrollResult>;
 
 // @public (undocumented)
 export const UiText: LastWriteWinElementSetComponentDefinition<PBUiText>;
@@ -4194,6 +4518,7 @@ export interface UiTransformProps {
     alignItems?: AlignType;
     alignSelf?: AlignType;
     display?: DisplayType;
+    elementId?: string;
     flex?: number;
     flexBasis?: number;
     flexDirection?: FlexDirectionType;
@@ -4207,11 +4532,14 @@ export interface UiTransformProps {
     maxWidth?: PositionUnit;
     minHeight?: PositionUnit;
     minWidth?: PositionUnit;
+    opacity?: number;
     overflow?: OverflowType;
     padding?: Partial<Position> | PositionShorthand;
     pointerFilter?: PointerFilterType;
     position?: Partial<Position> | PositionShorthand;
     positionType?: PositionType;
+    scrollPosition?: PBVector2 | string;
+    scrollVisible?: ScrollVisibleType;
     width?: PositionUnit | 'auto';
 }
 
