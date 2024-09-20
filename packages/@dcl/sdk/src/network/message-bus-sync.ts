@@ -55,16 +55,18 @@ export function addSyncTransport(
 
   // If we dont have any state initialized, and recieve a state message.
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, (value) => {
+    console.log('[CommsMessage.RES_CRDT_STATE]')
     const { sender, data } = decodeCRDTState(value)
     if (sender !== myProfile.userId) return
-    console.log('[Received CRDT State]', data.byteLength)
+    console.log('[Processing CRDT State]', data.byteLength)
     setInitialized()
     transport.onmessage!(data)
   })
 
   binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, (_, userId) => {
-    console.log('[RECIEVE REQ CRDT] from:', userId)
+    console.log('CommsMessage.REQ_CRDT_STATE', userId)
     if (players.getPlayer({ userId })) {
+      console.log('[Emiting State to]', userId)
       binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(userId, engineToCrdt(engine)))
     }
   })
@@ -79,7 +81,6 @@ export function addSyncTransport(
   players.onEnterScene((player) => {
     console.log('[onEnterScene]', player.userId, myProfile.userId)
     if (player.userId === myProfile.userId && !requestCrdtStateWhenConnected) {
-      console.log('request CRDT state when we are connected to comms.')
       if (RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom) {
         console.log('Requesting state')
         binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
@@ -93,7 +94,7 @@ export function addSyncTransport(
   RealmInfo.onChange(engine.RootEntity, (value) => {
     console.log('RealmInfo changed: isConnectedSceneRoom', value?.isConnectedSceneRoom)
     if (value?.isConnectedSceneRoom && requestCrdtStateWhenConnected) {
-      console.log('Conneted! Emiting req crdt state')
+      console.log('Connected! Emiting req crdt state')
       requestCrdtStateWhenConnected = false
       binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
     }
