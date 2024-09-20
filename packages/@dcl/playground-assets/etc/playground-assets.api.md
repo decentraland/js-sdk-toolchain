@@ -676,11 +676,13 @@ export const componentDefinitionByName: {
     "core::CameraMode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraMode>>;
     "core::CameraModeArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraModeArea>>;
     "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
+    "core::GlobalLight": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGlobalLight>>;
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
     "core::GltfNode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNode>>;
     "core::GltfNodeState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNodeState>>;
     "core::InputModifier": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBInputModifier>>;
+    "core::Light": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBLight>>;
     "core::MainCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMainCamera>>;
     "core::Material": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMaterial>>;
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
@@ -693,11 +695,13 @@ export const componentDefinitionByName: {
     "core::Raycast": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycast>>;
     "core::RaycastResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycastResult>>;
     "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
+    "core::Spotlight": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSpotlight>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
     "core::TweenSequence": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenSequence>>;
     "core::TweenState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenState>>;
     "core::UiBackground": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiBackground>>;
+    "core::UiCanvas": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiCanvas>>;
     "core::UiCanvasInformation": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiCanvasInformation>>;
     "core::UiDropdown": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdown>>;
     "core::UiDropdownResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdownResult>>;
@@ -1234,6 +1238,9 @@ export type GlobalDirectionRaycastSystemOptions = {
     direction?: PBVector3;
 };
 
+// @public (undocumented)
+export const GlobalLight: LastWriteWinElementSetComponentDefinition<PBGlobalLight>;
+
 // Warning: (ae-missing-release-tag) "GlobalTargetRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -1605,6 +1612,9 @@ export interface LastWriteWinElementSetComponentDefinition<T> extends BaseCompon
     getOrCreateMutable(entity: Entity, initialValue?: T): T;
     getOrNull(entity: Entity): DeepReadonly<T> | null;
 }
+
+// @public (undocumented)
+export const Light: LastWriteWinElementSetComponentDefinition<PBLight>;
 
 // @public
 export type Listeners = {
@@ -2391,6 +2401,21 @@ export namespace PBEngineInfo {
 }
 
 // @public (undocumented)
+export interface PBGlobalLight {
+    ambientBrightness?: number | undefined;
+    ambientColor?: PBColor3 | undefined;
+    direction?: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBGlobalLight {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGlobalLight;
+    // (undocumented)
+    export function encode(message: PBGlobalLight, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBGltfContainer {
     invisibleMeshesCollisionMask?: number | undefined;
     src: string;
@@ -2451,7 +2476,9 @@ export namespace PBGltfNodeState {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfNodeState;
     // (undocumented)
     export function encode(message: PBGltfNodeState, writer?: _m0.Writer): _m0.Writer;
+}
 
+// @public (undocumented)
 export interface PBInputModifier {
     // (undocumented)
     mode?: {
@@ -2490,6 +2517,22 @@ export namespace PBInputModifier_StandardInput {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBInputModifier_StandardInput;
     // (undocumented)
     export function encode(message: PBInputModifier_StandardInput, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBLight {
+    color?: PBColor3 | undefined;
+    enabled?: boolean | undefined;
+    illuminance?: number | undefined;
+    shadows?: boolean | undefined;
+}
+
+// @public (undocumented)
+export namespace PBLight {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBLight;
+    // (undocumented)
+    export function encode(message: PBLight, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2992,6 +3035,21 @@ export namespace PBRealmInfo {
 }
 
 // @public (undocumented)
+export interface PBSpotlight {
+    angle: number;
+    // Warning: (tsdoc-malformed-html-name) Invalid HTML element: Expecting an HTML name
+    innerAngle?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBSpotlight {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBSpotlight;
+    // (undocumented)
+    export function encode(message: PBSpotlight, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBTextShape {
     font?: Font | undefined;
     fontAutoSize?: boolean | undefined;
@@ -3100,6 +3158,23 @@ export namespace PBUiBackground {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiBackground;
     // (undocumented)
     export function encode(message: PBUiBackground, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBUiCanvas {
+    color?: PBColor4 | undefined;
+    // (undocumented)
+    height: number;
+    // (undocumented)
+    width: number;
+}
+
+// @public (undocumented)
+export namespace PBUiCanvas {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiCanvas;
+    // (undocumented)
+    export function encode(message: PBUiCanvas, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3749,6 +3824,8 @@ export interface ReactBasedUiSystem {
     // (undocumented)
     destroy(): void;
     // (undocumented)
+    setTextureRenderer(entity: Entity, ui: UiComponent): void;
+    // (undocumented)
     setUiRenderer(ui: UiComponent): void;
 }
 
@@ -4029,6 +4106,9 @@ export interface Spec {
     [key: string]: ISchema;
 }
 
+// @public (undocumented)
+export const Spotlight: LastWriteWinElementSetComponentDefinition<PBSpotlight>;
+
 // @alpha
 export const SyncComponents: ISyncComponents;
 
@@ -4148,6 +4228,9 @@ export interface TextureUnion {
     } | {
         $case: "videoTexture";
         videoTexture: VideoTexture;
+    } | {
+        $case: "uiTexture";
+        uiTexture: UiCanvasTexture;
     } | undefined;
 }
 
@@ -4325,7 +4408,26 @@ export interface UiButtonProps extends UiLabelProps, EntityPropTypes {
 }
 
 // @public (undocumented)
+export const UiCanvas: LastWriteWinElementSetComponentDefinition<PBUiCanvas>;
+
+// @public (undocumented)
 export const UiCanvasInformation: LastWriteWinElementSetComponentDefinition<PBUiCanvasInformation>;
+
+// @public (undocumented)
+export interface UiCanvasTexture {
+    filterMode?: TextureFilterMode | undefined;
+    // (undocumented)
+    uiCanvasEntity: number;
+    wrapMode?: TextureWrapMode | undefined;
+}
+
+// @public (undocumented)
+export namespace UiCanvasTexture {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): UiCanvasTexture;
+    // (undocumented)
+    export function encode(message: UiCanvasTexture, writer?: _m0.Writer): _m0.Writer;
+}
 
 // @public (undocumented)
 export type UiComponent = () => ReactEcs.JSX.ReactNode;

@@ -15,7 +15,8 @@ export type Props = {
 export enum Texture {
   TT_TEXTURE = 'texture',
   TT_AVATAR_TEXTURE = 'avatarTexture',
-  TT_VIDEO_TEXTURE = 'videoTexture'
+  TT_VIDEO_TEXTURE = 'videoTexture',
+  TT_UI_TEXTURE = 'uiTexture'
 }
 
 export type TextureInput = {
