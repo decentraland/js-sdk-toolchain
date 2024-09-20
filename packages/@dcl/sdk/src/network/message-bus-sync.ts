@@ -64,12 +64,9 @@ export function addSyncTransport(
   })
 
   binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, (_, userId) => {
-    console.log('CommsMessage.REQ_CRDT_STATE', userId)
-    if (players.getPlayer({ userId })) {
-      console.log('[Emiting State to]', userId)
-      binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(userId, engineToCrdt(engine)))
-    }
+    binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(userId, engineToCrdt(engine)))
   })
+
   const players = definePlayerHelper(engine)
 
   let requestCrdtStateWhenConnected = false
