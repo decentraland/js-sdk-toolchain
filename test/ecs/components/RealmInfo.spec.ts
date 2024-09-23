@@ -12,7 +12,8 @@ describe('Generated RealmInfo ProtoBuf', () => {
       networkId: 1,
       realmName: 'boedo',
       room: 'casla',
-      isPreview: false
+      isPreview: false,
+      isConnectedSceneRoom: false
     })
 
     testComponentSerialization(RealmInfo, {
@@ -21,7 +22,8 @@ describe('Generated RealmInfo ProtoBuf', () => {
       networkId: 1,
       realmName: 'boedo',
       room: 'casla',
-      isPreview: false
+      isPreview: false,
+      isConnectedSceneRoom: false
     })
   })
 })
