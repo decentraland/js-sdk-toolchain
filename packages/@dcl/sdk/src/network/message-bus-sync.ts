@@ -4,10 +4,10 @@ import { type SendBinaryRequest, type SendBinaryResponse } from '~system/Communi
 import { syncFilter } from './filter'
 import { engineToCrdt } from './state'
 import { BinaryMessageBus, CommsMessage, decodeString, encodeString } from './binary-message-bus'
-import { fetchProfile, setInitialized, stateInitializedChecker } from './utils'
+import { fetchProfile } from './utils'
 import { entityUtils } from './entities'
 import { GetUserDataRequest, GetUserDataResponse } from '~system/UserIdentity'
-import { definePlayerHelper, getPlayer } from '../players'
+import { definePlayerHelper } from '../players'
 import { serializeCrdtMessages } from '../internal/transports/logger'
 
 export type IProfile = { networkId: number; userId: string }
@@ -27,6 +27,7 @@ export function addSyncTransport(
   // List of MessageBuss messsages to be sent on every frame to comms
   const pendingMessageBusMessagesToSend: Uint8Array[] = []
   const binaryMessageBus = BinaryMessageBus((message) => pendingMessageBusMessagesToSend.push(message))
+
   function getMessagesToSend() {
     const messages = [...pendingMessageBusMessagesToSend]
     pendingMessageBusMessagesToSend.length = 0
@@ -50,16 +51,11 @@ export function addSyncTransport(
   engine.addTransport(transport)
   // End add sync transport
 
-  // Add state intialized checker
-  engine.addSystem(() => stateInitializedChecker(engine, myProfile, entityDefinitions.syncEntity))
-
   // If we dont have any state initialized, and recieve a state message.
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, (value) => {
-    console.log('[CommsMessage.RES_CRDT_STATE]')
     const { sender, data } = decodeCRDTState(value)
     if (sender !== myProfile.userId) return
     console.log('[Processing CRDT State]', data.byteLength)
-    setInitialized()
     transport.onmessage!(data)
   })
 
@@ -70,13 +66,8 @@ export function addSyncTransport(
   const players = definePlayerHelper(engine)
 
   let requestCrdtStateWhenConnected = false
-  const myPlayer = getPlayer()
-  if (myPlayer || myProfile.userId) {
-    console.log('Already in scene [onEnterScene]', myPlayer?.userId, 'asd', myProfile.userId)
-  }
 
   players.onEnterScene((player) => {
-    console.log('[onEnterScene]', player.userId, myProfile.userId)
     if (player.userId === myProfile.userId && !requestCrdtStateWhenConnected) {
       if (RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom) {
         console.log('Requesting state')
@@ -89,25 +80,22 @@ export function addSyncTransport(
   })
 
   RealmInfo.onChange(engine.RootEntity, (value) => {
-    console.log('RealmInfo changed: isConnectedSceneRoom', value?.isConnectedSceneRoom)
     if (value?.isConnectedSceneRoom && requestCrdtStateWhenConnected) {
-      console.log('Connected! Emiting req crdt state')
+      console.log('Requesting state.')
       requestCrdtStateWhenConnected = false
       binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
     }
   })
 
   players.onLeaveScene((userId) => {
-    console.log('[onLeaveScene]', userId)
     if (userId === myProfile.userId) {
       requestCrdtStateWhenConnected = false
-      setInitialized(false)
     }
   })
 
   // Process CRDT messages here
   binaryMessageBus.on(CommsMessage.CRDT, (value) => {
-    console.log(Array.from(serializeCrdtMessages('[receive CRDT]: ', value, engine)))
+    console.log(Array.from(serializeCrdtMessages('[NetworkMessage]', value, engine)))
     transport.onmessage!(value)
   })
 

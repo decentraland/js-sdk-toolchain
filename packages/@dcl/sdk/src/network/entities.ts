@@ -8,23 +8,7 @@ import {
   SyncComponents as _SyncComponents,
   INetowrkParent,
   TransformComponent,
-  ISyncComponents,
-  VideoEvent,
-  TweenState,
-  AudioEvent,
-  AudioSource,
-  EngineInfo,
-  GltfContainerLoadingState,
-  PointerEventsResult,
-  RaycastResult,
-  RealmInfo,
-  VideoPlayer,
-  UiDropdown,
-  UiDropdownResult,
-  UiInput,
-  UiInputResult,
-  UiText,
-  UiTransform
+  ISyncComponents
 } from '@dcl/ecs'
 import { IProfile } from './message-bus-sync'
 import { NOT_SYNC_COMPONENTS } from './state'

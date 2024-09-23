@@ -8,7 +8,6 @@ import {
   PutNetworkComponentOperation,
   SyncComponents as _SyncComponents,
   NetworkEntity as _NetworkEntity,
-  ISyncComponents,
   INetowrkEntity,
   VideoEvent,
   AudioEvent,
@@ -52,7 +51,6 @@ const NOT_SYNC_COMPONENTS_IDS = NOT_SYNC_COMPONENTS.map(($) => $.componentId)
 export function engineToCrdt(engine: IEngine): Uint8Array {
   const crdtBuffer = new ReadWriteByteBuffer()
   const networkBuffer = new ReadWriteByteBuffer()
-  const SyncComponents = engine.getComponent(_SyncComponents.componentId) as ISyncComponents
   const NetworkEntity = engine.getComponent(_NetworkEntity.componentId) as INetowrkEntity
 
   for (const itComponentDefinition of engine.componentsIter()) {
@@ -61,17 +59,7 @@ export function engineToCrdt(engine: IEngine): Uint8Array {
     }
     itComponentDefinition.dumpCrdtStateToBuffer(crdtBuffer, (entity) => {
       const isNetworkEntity = NetworkEntity.has(entity)
-      if (!isNetworkEntity) {
-        return false
-      }
-      return true
-      // const isDynamicEntity = NetworkEntity.get(entity).networkId
-      // if (isDynamicEntity) {
-      //   return true
-      // }
-      // // For the static entities we only send the updates of the SyncComponents
-      // // TODO: what about static entities that are created on runtime ?
-      // return SyncComponents.get(entity).componentIds.includes(itComponentDefinition.componentId)
+      return isNetworkEntity
     })
   }
 

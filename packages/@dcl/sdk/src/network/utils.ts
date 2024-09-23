@@ -1,30 +1,8 @@
-import {
-  EngineInfo as _EngineInfo,
-  Entity,
-  IEngine,
-  NetworkEntity as _NetworkEntity,
-  LastWriteWinElementSetComponentDefinition,
-  PBEngineInfo
-} from '@dcl/ecs'
+import { EngineInfo as _EngineInfo, NetworkEntity as _NetworkEntity } from '@dcl/ecs'
 import { componentNumberFromName } from '@dcl/ecs/dist/components/component-number'
 
 import type { GetUserDataRequest, GetUserDataResponse } from '~system/UserIdentity'
-import { SyncEntity } from './entities'
 import { IProfile } from './message-bus-sync'
-
-// Already initialized my state. Ignore new states messages.
-export let stateInitialized = false
-
-// My player entity to check if I'm the oldest player in the scend
-export let playerSceneEntity: Entity
-
-export function setInitialized(value = true) {
-  stateInitialized = value
-}
-
-// Flag to avoid sending over the wire all the initial messages that the engine add's to the rendererTransport
-// INITIAL_CRDT_MESSAGES that are being processed on the onStart loop, before the onUpdate.
-export let INITIAL_CRDT_RENDERER_MESSAGES_SENT = false
 
 // Retrieve userId to start sending this info as the networkId
 export function fetchProfile(
@@ -41,41 +19,4 @@ export function fetchProfile(
       throw new Error(`Couldn't fetch profile data`)
     }
   })
-}
-
-/**
- * Ignore CRDT's initial messages from the renderer.
- */
-export function syncTransportIsReady(engine: IEngine) {
-  const EngineInfo = engine.getComponent(
-    _EngineInfo.componentId
-  ) as LastWriteWinElementSetComponentDefinition<PBEngineInfo>
-  if (!INITIAL_CRDT_RENDERER_MESSAGES_SENT) {
-    const engineInfo = EngineInfo.getOrNull(engine.RootEntity)
-    if (engineInfo && engineInfo.tickNumber > 1) {
-      INITIAL_CRDT_RENDERER_MESSAGES_SENT = true
-    }
-  }
-  return INITIAL_CRDT_RENDERER_MESSAGES_SENT
-}
-
-/**
- * Check if we are already initialized
- * Add the playerSceneData component and syncronize it till we receive the state.
- * This fn should be added as a system so it runs on every tick
- */
-// TODO: Had to comment all the logic because getConnectedPlayers was not working as expected
-// A lot of raise conditions. For now we will go with the approach that every client that it's initialized will send his crdt state.
-export function stateInitializedChecker(engine: IEngine, _profile: IProfile, _syncEntity: SyncEntity) {
-  // const PlayersInScene = definePlayersInScene(engine)
-  const EngineInfo = engine.getComponent(_EngineInfo.componentId) as typeof _EngineInfo
-  // const NetworkEntity = engine.getComponent(_NetworkEntity.componentId) as INetowrkEntity
-  async function enterScene() {
-    // Wait for comms to be ready ?? ~3000ms
-    if ((EngineInfo.getOrNull(engine.RootEntity)?.tickNumber ?? 0) > 100) {
-      setInitialized()
-      return
-    }
-  }
-  void enterScene()
 }
