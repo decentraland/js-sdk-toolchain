@@ -2812,6 +2812,8 @@ export interface PBRealmInfo {
     // (undocumented)
     commsAdapter: string;
     // (undocumented)
+    isConnectedSceneRoom?: boolean | undefined;
+    // (undocumented)
     isPreview: boolean;
     // (undocumented)
     networkId: number;

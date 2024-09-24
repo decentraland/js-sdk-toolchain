@@ -22,7 +22,7 @@ type GetPlayerDataRes = {
   position: TransformType['position'] | undefined
 }
 
-function definePlayerHelper(engine: IEngine) {
+export function definePlayerHelper(engine: IEngine) {
   const Transform = defineTransform(engine)
   const PlayerIdentityData = definePlayerIdenityData(engine)
   const AvatarEquippedData = defineAvatarEquippedData(engine)
