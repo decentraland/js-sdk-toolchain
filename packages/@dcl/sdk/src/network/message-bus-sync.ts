@@ -35,11 +35,12 @@ export function addSyncTransport(
     return messages
   }
 
+  let transportInitialzed = false
   // Add Sync Transport
   const transport: Transport = {
     filter: syncFilter(engine),
     send: async (message: Uint8Array) => {
-      if (message.byteLength) {
+      if (message.byteLength && transportInitialzed) {
         DEBUG_NETWORK_MESSAGES() &&
           console.log(...Array.from(serializeCrdtMessages('[NetworkMessage sent]:', message, engine)))
         binaryMessageBus.emit(CommsMessage.CRDT, message)
@@ -47,6 +48,7 @@ export function addSyncTransport(
       const messages = getMessagesToSend()
       const response = await sendBinary({ data: messages })
       binaryMessageBus.__processMessages(response.data)
+      transportInitialzed = true
     },
     type: 'network'
   }
@@ -61,7 +63,8 @@ export function addSyncTransport(
     transport.onmessage!(data)
   })
 
-  binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, (_, userId) => {
+  binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, (message, userId) => {
+    transport.onmessage!(message)
     binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(userId, engineToCrdt(engine)))
   })
 
@@ -73,7 +76,7 @@ export function addSyncTransport(
     if (player.userId === myProfile.userId && !requestCrdtStateWhenConnected) {
       if (RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom) {
         DEBUG_NETWORK_MESSAGES() && console.log('Requesting state')
-        binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
+        binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, engineToCrdt(engine))
       } else {
         DEBUG_NETWORK_MESSAGES() && console.log('Waiting to be conneted')
         requestCrdtStateWhenConnected = true
@@ -85,7 +88,7 @@ export function addSyncTransport(
     if (value?.isConnectedSceneRoom && requestCrdtStateWhenConnected) {
       DEBUG_NETWORK_MESSAGES() && console.log('Requesting state.')
       requestCrdtStateWhenConnected = false
-      binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
+      binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, engineToCrdt(engine))
     }
   })
 
