@@ -49,6 +49,10 @@ export const COLLISION_LAYERS = [
     label: 'Physics'
   },
   {
+    value: ColliderLayer.CL_PHYSICS | ColliderLayer.CL_POINTER,
+    label: 'Physics and Pointer'
+  },
+  {
     value: ColliderLayer.CL_CUSTOM1,
     label: 'Custom 1'
   },
