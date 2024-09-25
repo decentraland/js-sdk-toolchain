@@ -1,7 +1,5 @@
 import {
   TransportMessage,
-  PointerEventsResult,
-  GltfContainerLoadingState,
   EntityUtils,
   RESERVED_STATIC_ENTITIES,
   CrdtMessageType,
@@ -10,6 +8,7 @@ import {
   NetworkParent as _NetworkParent,
   IEngine
 } from '@dcl/ecs'
+import { NOT_SYNC_COMPONENTS_IDS } from './state'
 
 export function syncFilter(engine: IEngine) {
   const NetworkEntity = engine.getComponent(_NetworkEntity.componentId) as typeof _NetworkEntity
@@ -18,7 +17,7 @@ export function syncFilter(engine: IEngine) {
   return function (message: Omit<TransportMessage, 'messageBuffer'>) {
     const componentId = (message as any).componentId
 
-    if ([PointerEventsResult.componentId, GltfContainerLoadingState.componentId].includes(componentId)) {
+    if (NOT_SYNC_COMPONENTS_IDS.includes(componentId)) {
       return false
     }
 
