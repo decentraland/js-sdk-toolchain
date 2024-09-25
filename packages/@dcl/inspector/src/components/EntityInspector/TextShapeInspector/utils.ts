@@ -72,7 +72,7 @@ export const fromTextShape = (value: PBTextShape): TextShapeInput => {
     paddingRight: toString(value.paddingRight, 0),
     paddingBottom: toString(value.paddingBottom, 0),
     paddingLeft: toString(value.paddingLeft, 0),
-    outlineWidth: toString(Math.floor((value.outlineWidth ?? 0) * 5)),
+    outlineWidth: toString((value.outlineWidth ?? 0) * 5),
     lineSpacing: toString((value.lineSpacing ?? 0) / 100, 0),
     lineCount: toString(value.lineCount, ''),
     outlineColor: toHex(value.outlineColor),
