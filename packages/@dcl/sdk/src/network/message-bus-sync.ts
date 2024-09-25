@@ -73,6 +73,7 @@ export function addSyncTransport(
   let requestCrdtStateWhenConnected = false
 
   players.onEnterScene((player) => {
+    DEBUG_NETWORK_MESSAGES() && console.log('[onEnterScene]', player.userId)
     if (player.userId === myProfile.userId && !requestCrdtStateWhenConnected) {
       if (RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom) {
         DEBUG_NETWORK_MESSAGES() && console.log('Requesting state')
@@ -93,6 +94,7 @@ export function addSyncTransport(
   })
 
   players.onLeaveScene((userId) => {
+    DEBUG_NETWORK_MESSAGES() && console.log('[onLeaveScene]', userId)
     if (userId === myProfile.userId) {
       requestCrdtStateWhenConnected = false
     }
