@@ -6,7 +6,7 @@ import { SdkContextValue } from '../../lib/sdk/context'
 import { useSdk } from './useSdk'
 import { CoreComponents } from '../../lib/sdk/components'
 import { getConfig } from '../../lib/logic/config'
-import { CAMERA, PLAYER, ROOT } from '../../lib/sdk/tree'
+import { CAMERA, EDITOR_ENTITIES, PLAYER, ROOT } from '../../lib/sdk/tree'
 
 export const DISABLED_COMPONENTS: string[] = [
   CoreComponents.ANIMATOR,
@@ -33,7 +33,7 @@ export const ROOT_COMPONENTS: Record<Entity, string[]> = {
 }
 
 export function isRoot(entity: Entity) {
-  return entity === ROOT || entity === PLAYER || entity === CAMERA
+  return EDITOR_ENTITIES.includes(entity)
 }
 
 export function getEnabledComponents(disabledComponents = DISABLED_COMPONENTS) {
