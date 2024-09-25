@@ -46,7 +46,7 @@ export const NOT_SYNC_COMPONENTS = [
   UiText
 ]
 
-const NOT_SYNC_COMPONENTS_IDS = NOT_SYNC_COMPONENTS.map(($) => $.componentId)
+export const NOT_SYNC_COMPONENTS_IDS = NOT_SYNC_COMPONENTS.map(($) => $.componentId)
 
 export function engineToCrdt(engine: IEngine): Uint8Array {
   const crdtBuffer = new ReadWriteByteBuffer()
