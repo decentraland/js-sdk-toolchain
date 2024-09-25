@@ -17,6 +17,7 @@ export function addSyncTransport(
   sendBinary: (msg: SendBinaryRequest) => Promise<SendBinaryResponse>,
   getUserData: (value: GetUserDataRequest) => Promise<GetUserDataResponse>
 ) {
+  const DEBUG_NETWORK_MESSAGES = () => (globalThis as any).DEBUG_NETWORK_MESSAGES ?? true
   // Profile Info
   const myProfile: IProfile = {} as IProfile
   fetchProfile(myProfile!, getUserData)
@@ -34,17 +35,20 @@ export function addSyncTransport(
     return messages
   }
 
+  let transportInitialzed = false
   // Add Sync Transport
   const transport: Transport = {
     filter: syncFilter(engine),
     send: async (message: Uint8Array) => {
-      if (message.byteLength) {
-        // console.log(Array.from(serializeCrdtMessages('[send CRDT]: ', message, engine)))
+      if (message.byteLength && transportInitialzed) {
+        DEBUG_NETWORK_MESSAGES() &&
+          console.log(...Array.from(serializeCrdtMessages('[NetworkMessage sent]:', message, engine)))
         binaryMessageBus.emit(CommsMessage.CRDT, message)
       }
       const messages = getMessagesToSend()
       const response = await sendBinary({ data: messages })
       binaryMessageBus.__processMessages(response.data)
+      transportInitialzed = true
     },
     type: 'network'
   }
@@ -55,11 +59,12 @@ export function addSyncTransport(
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, (value) => {
     const { sender, data } = decodeCRDTState(value)
     if (sender !== myProfile.userId) return
-    console.log('[Processing CRDT State]', data.byteLength)
+    DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength)
     transport.onmessage!(data)
   })
 
-  binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, (_, userId) => {
+  binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, (message, userId) => {
+    transport.onmessage!(message)
     binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(userId, engineToCrdt(engine)))
   })
 
@@ -70,10 +75,10 @@ export function addSyncTransport(
   players.onEnterScene((player) => {
     if (player.userId === myProfile.userId && !requestCrdtStateWhenConnected) {
       if (RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom) {
-        console.log('Requesting state')
-        binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
+        DEBUG_NETWORK_MESSAGES() && console.log('Requesting state')
+        binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, engineToCrdt(engine))
       } else {
-        console.log('Waiting to be conneted')
+        DEBUG_NETWORK_MESSAGES() && console.log('Waiting to be conneted')
         requestCrdtStateWhenConnected = true
       }
     }
@@ -81,9 +86,9 @@ export function addSyncTransport(
 
   RealmInfo.onChange(engine.RootEntity, (value) => {
     if (value?.isConnectedSceneRoom && requestCrdtStateWhenConnected) {
-      console.log('Requesting state.')
+      DEBUG_NETWORK_MESSAGES() && console.log('Requesting state.')
       requestCrdtStateWhenConnected = false
-      binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
+      binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, engineToCrdt(engine))
     }
   })
 
@@ -95,7 +100,8 @@ export function addSyncTransport(
 
   // Process CRDT messages here
   binaryMessageBus.on(CommsMessage.CRDT, (value) => {
-    console.log(Array.from(serializeCrdtMessages('[NetworkMessage]', value, engine)))
+    DEBUG_NETWORK_MESSAGES() &&
+      console.log(Array.from(serializeCrdtMessages('[NetworkMessage received]:', value, engine)))
     transport.onmessage!(value)
   })
 
