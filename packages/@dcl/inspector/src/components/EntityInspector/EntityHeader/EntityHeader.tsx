@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { AiOutlinePlus as AddIcon } from 'react-icons/ai'
 import { VscSettings as SettingsIcon, VscDebugRestart as RevertIcon, VscClose as CloseIcon } from 'react-icons/vsc'
 import { IoMdInformationCircleOutline as InfoIcon } from 'react-icons/io'
+import { MdOutlineDriveFileRenameOutline as RenameIcon } from 'react-icons/md'
 
 import { Entity } from '@dcl/ecs'
 
@@ -16,6 +17,7 @@ import { analytics, Event } from '../../../lib/logic/analytics'
 import { EditorComponentsTypes } from '../../../lib/sdk/components'
 import { SdkContextEvents, SdkContextValue } from '../../../lib/sdk/context'
 
+import { Edit as EditInput } from '../../Tree/Edit'
 import { Button } from '../../Button'
 import { Modal } from '../../Modal'
 import { Dropdown } from '../../ui'
@@ -57,6 +59,7 @@ export default React.memo(
     )
     const [label, setLabel] = useState<string | null>()
     const [modal, setModal] = useState<ModalState>({ isOpen: false })
+    const [editMode, setEditMode] = useState(false)
 
     useEffect(() => {
       setLabel(getLabel(sdk, entity))
@@ -286,6 +289,20 @@ export default React.memo(
       return options.filter((option) => !option.id || availableIds.has(option.id))
     }, [sdk, availableComponents, isComponentDisabled, handleClickAddComponent])
 
+    const quitEditMode = useCallback(() => setEditMode(false), [])
+    const enterEditMode = useCallback(() => setEditMode(true), [])
+
+    const handleRenameEntity = useCallback(
+      async (value: string) => {
+        if (isRoot(entity)) return
+        const { Name } = sdk.components
+        sdk.operations.updateValue(Name, entity, { value })
+        await sdk.operations.dispatch()
+        quitEditMode()
+      },
+      [entity, sdk]
+    )
+
     const handleRemoveEntity = useCallback(async () => {
       sdk.operations.removeEntity(entity)
       await sdk.operations.dispatch()
@@ -402,7 +419,16 @@ export default React.memo(
 
     return (
       <div className="EntityHeader">
-        {label}
+        <div className="title">
+          {!editMode ? (
+            <>
+              {label}
+              {!editMode && !isRoot(entity) ? <RenameIcon onClick={enterEditMode} /> : null}
+            </>
+          ) : typeof label === 'string' ? (
+            <EditInput value={label} onCancel={quitEditMode} onSubmit={handleRenameEntity} />
+          ) : null}
+        </div>
         <div className="RightContent">
           {componentOptions.some((option) => !option.header) ? (
             <Dropdown className="AddComponent" options={componentOptions} trigger={<AddIcon />} />

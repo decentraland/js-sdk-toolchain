@@ -8,7 +8,7 @@ import { Props } from './types'
 import './Edit.css'
 
 export function Edit({ value, onCancel, onSubmit }: Props) {
-  const [tmpValue, setTmpValue] = useState('')
+  const [tmpValue, setTmpValue] = useState(value)
   const [isOpen, setIsOpen] = useState(false)
 
   const handleModalClose = useCallback(() => {
@@ -31,7 +31,7 @@ export function Edit({ value, onCancel, onSubmit }: Props) {
 
   return (
     <>
-      <Modal isOpen={isOpen} onRequestClose={handleModalClose} className="EditTree">
+      <Modal isOpen={isOpen && tmpValue !== value} onRequestClose={handleModalClose} className="EditTree">
         <h2>⚠️ Rename</h2>
         <span>
           Do you want to rename "{value}" to "{tmpValue}"
