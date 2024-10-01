@@ -9,11 +9,11 @@ import { upgradeWebSocketResponse } from '@well-known-components/http-server/dis
  * It runs using @dcl/mini-comms implementing RFC-5
  */
 
-export function setupRealmAndComms(components: PreviewComponents, router: Router<PreviewComponents>, occupiedParcels: string[] = []) {
+export function setupRealmAndComms(components: PreviewComponents, router: Router<PreviewComponents>, localSceneParcels: string[] = []) {
   router.get('/about', async (ctx) => {
     const host = ctx.url.host
 
-    const body: AboutResponse = {
+    const body: AboutResponse & { configurations: { localSceneParcels: string[] } } = {
       acceptingUsers: true,
       bff: { healthy: false, publicUrl: host },
       comms: {
@@ -24,8 +24,8 @@ export function setupRealmAndComms(components: PreviewComponents, router: Router
       configurations: {
         networkId: 0,
         globalScenesUrn: [],
+        localSceneParcels,
         scenesUrn: [],
-        occupiedParcels: occupiedParcels,
         realmName: 'LocalPreview'
       },
       content: {

@@ -30,15 +30,14 @@ export async function wireRouter(components: PreviewComponents, workspace: Works
     return next()
   })
 
-  // workspace.projects[0].scene.scene.parcels
-  const occupiedParcels : string[] = []
+  const localSceneParcels : string[] = []
   for (let project of workspace.projects) {
     for (let parcel of project.scene.scene.parcels) {
-      occupiedParcels.push(parcel)
+      localSceneParcels.push(parcel)
     }
   }
 
-  setupRealmAndComms(components, router, occupiedParcels)
+  setupRealmAndComms(components, router, localSceneParcels)
   await setupEcs6Endpoints(components, router, workspace)
 
   components.server.setContext(components)
