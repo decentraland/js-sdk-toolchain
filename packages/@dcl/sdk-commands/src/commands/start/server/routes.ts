@@ -30,9 +30,9 @@ export async function wireRouter(components: PreviewComponents, workspace: Works
     return next()
   })
 
-  const localSceneParcels : string[] = []
-  for (let project of workspace.projects) {
-    for (let parcel of project.scene.scene.parcels) {
+  const localSceneParcels: string[] = []
+  for (const project of workspace.projects) {
+    for (const parcel of project.scene.scene.parcels) {
       localSceneParcels.push(parcel)
     }
   }
