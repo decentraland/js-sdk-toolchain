@@ -8,6 +8,7 @@ import { isAssetNode } from '../../../ProjectAssetExplorer/utils'
 import { AssetCatalogResponse } from '../../../../lib/data-layer/remote-data-layer'
 import { isValidInput } from '../../GltfInspector/utils'
 import { removeBasePath } from '../../../../lib/logic/remove-base-path'
+import { isValidHttpsUrl } from '../../../../lib/utils/url'
 
 export const fromTexture = (base: string, value: TextureUnion): TextureInput => {
   switch (value.tex?.$case) {
@@ -27,9 +28,10 @@ export const fromTexture = (base: string, value: TextureUnion): TextureInput => 
       }
     case 'texture':
     default:
+      const src = value?.tex?.texture.src ?? ''
       return {
         type: Texture.TT_TEXTURE,
-        src: toString(removeBasePath(base, value?.tex?.texture.src ?? '')),
+        src: isValidHttpsUrl(src) ? src : removeBasePath(base, src),
         wrapMode: toString(value?.tex?.texture.wrapMode),
         filterMode: toString(value?.tex?.texture.filterMode)
       }
@@ -61,11 +63,12 @@ export const toTexture = (base: string, value?: TextureInput): TextureUnion => {
         }
       }
     default:
+      const src = value?.src || ''
       return {
         tex: {
           $case: 'texture',
           texture: {
-            src: value?.src ? toString(base ? base + '/' + value.src : value.src) : '',
+            src: isValidHttpsUrl(src) ? src : (src && base ? base + '/' : '') + src,
             wrapMode: toNumber(value?.wrapMode ?? '0', TextureWrapMode.TWM_REPEAT),
             filterMode: toNumber(value?.filterMode ?? '0', TextureFilterMode.TFM_POINT)
           }
@@ -78,6 +81,6 @@ export const isTexture = (value: string): boolean => value.endsWith('.png')
 export const isModel = (node: TreeNode): node is AssetNodeItem => isAssetNode(node) && isTexture(node.name)
 
 export function isValidTexture(value: any, files?: AssetCatalogResponse): boolean {
-  if (typeof value === 'string' && files) return isValidInput(files, value)
+  if (typeof value === 'string' && files) return isValidHttpsUrl(value) || isValidInput(files, value)
   return false
 }
