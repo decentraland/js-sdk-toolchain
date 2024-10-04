@@ -14,7 +14,7 @@ export const fromVideoPlayer =
   (base: string) =>
   (value: PBVideoPlayer): VideoPlayerInput => {
     return {
-      src: removeBasePath(base, value.src),
+      src: isValidHttpsUrl(value.src) ? value.src : removeBasePath(base, value.src),
       loop: value.loop,
       playing: value.playing,
       volume: volumeFromVideoPlayer(value.volume)
