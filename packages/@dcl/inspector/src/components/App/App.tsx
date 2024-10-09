@@ -20,14 +20,11 @@ import { PanelName } from '../../redux/ui/types'
 
 const App = () => {
   const selectedEntity = useSelectedEntity()
-  const { height } = useWindowSize()
 
   const sdkInitialized = useAppSelector(selectEngines).inspector
 
   const hiddenPanels = useAppSelector(getHiddenPanels)
 
-  // Footer's height is 48 pixels, so we need to calculate the percentage of the screen that it takes to pass as the minSize prop for the Panel
-  const footerMin = (48 / height!) * 100
   const disconnected = useAppSelector(selectDataLayerError)
   return (
     <div
@@ -35,7 +32,7 @@ const App = () => {
       style={{ pointerEvents: disconnected ? 'none' : 'auto' }}
     >
       <PanelGroup direction="vertical" autoSaveId="vertical">
-        <Panel>
+        <Panel defaultSize={70}>
           <PanelGroup direction="horizontal" autoSaveId="horizontal">
             {!hiddenPanels[PanelName.ENTITIES] && (
               <>
@@ -76,7 +73,7 @@ const App = () => {
         {!hiddenPanels[PanelName.ASSETS] && (
           <>
             <PanelResizeHandle className="vertical-handle" />
-            <Panel minSize={footerMin} defaultSize={30}>
+            <Panel defaultSize={30} style={{ minHeight: '48px' }}>
               <Box className="composite-renderer">
                 <Assets />
               </Box>
