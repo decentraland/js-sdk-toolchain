@@ -1,5 +1,5 @@
 import { areConnected } from '@dcl/ecs'
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { AiOutlineInfoCircle as InfoIcon } from 'react-icons/ai'
 
 import { Dropdown } from '../../../ui'
@@ -9,16 +9,17 @@ import { Grid, Props as GridProps } from './Grid'
 
 import {
   coordToStr,
-  getCoordinates,
   getMinMaxFromOrderedCoords,
   getOption,
-  getLayoutInfo,
   stringifyGridError,
   getLayoutInfoFromString,
   strToCoord,
   transformCoordsToString,
   getEnabledCoords,
-  hasCoord
+  hasCoord,
+  getGridInfo,
+  isCoord,
+  generateGridFrom
 } from './utils'
 import { getAxisLengths } from './Grid/utils'
 import { ModeAdvanced } from './ModeAdvanced'
@@ -30,59 +31,35 @@ import './Layout.css'
 type Coords = GridProps['coords'][0]
 
 function Layout({ value, onChange }: Props) {
-  const currentLayout = getLayoutInfo(value.parcels)
-  const coordinates = getCoordinates(currentLayout.min, currentLayout.max)
-
-  const [grid, setGrid] = useState<Coords[]>(coordinates)
-  const [disabled, setDisabled] = useState(new Set<string>())
+  const { grid: _grid } = useMemo(() => getGridInfo(value.parcels), [value.parcels])
+  const [grid, setGrid] = useState(_grid)
   const [mode, setMode] = useState<Mode>(Mode.GRID)
   const [base, setBase] = useState(value.base)
 
-  const [gridMin, gridMax] = getMinMaxFromOrderedCoords(grid)
-  const axisLengths = getAxisLengths(grid)
-  const enabledCoords = getEnabledCoords(grid, disabled)
+  const [gridMin, gridMax] = useMemo(() => getMinMaxFromOrderedCoords(grid), [grid])
+  const axisLengths = useMemo(() => getAxisLengths(grid), [grid])
+  const enabledCoords = useMemo(() => getEnabledCoords(grid), [grid])
   const numberOfCoords = enabledCoords.length
 
-  const handleGridChange = (type: keyof Coords) => (e: React.ChangeEvent<HTMLSelectElement>) => {
-    // this should also work for negative parcels...
-    const num = Number(e.target.value)
-    const grixMaxAxis = gridMax[type]
-    const axisLength = axisLengths[type]
-    const diff = Math.abs(axisLength - num)
-    const value = num > axisLength ? grixMaxAxis + diff : grixMaxAxis - diff
-    const newMax: Coords = { ...gridMax, [type]: value }
-    return setGrid(getCoordinates(gridMin, newMax))
-  }
-
-  const isTileDisabled = useCallback(
-    (coord: Coords) => {
-      const str = coordToStr(coord)
-      return disabled.has(str)
+  const handleGridChange = useCallback(
+    (type: keyof Coords) => (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const num = Number(e.target.value)
+      const axisLength = axisLengths[type]
+      const diff = Math.abs(axisLength - num)
+      const value = num > axisLength ? gridMax[type] + diff : gridMax[type] - diff
+      const newMax: Coords = { ...gridMax, [type]: value }
+      setGrid(generateGridFrom(grid, gridMin, newMax))
     },
-    [grid, disabled]
+    [grid, gridMin, gridMax, axisLengths]
   )
 
-  // const isTileDisconnected = useCallback((coord: Coords) => {}, [grid, disabled])
+  const isTileDisabled = useCallback((coord: Coords) => !hasCoord(enabledCoords, coord), [enabledCoords])
 
-  const isBaseTile = useCallback(
-    (coord: Coords) => {
-      return coord.x === base.x && coord.y === base.y
-    },
-    [base]
-  )
+  const isBaseTile = useCallback((coord: Coords) => coord.x === base.x && coord.y === base.y, [base])
 
-  const handleTileClick = useCallback(
-    (coord: Coords) => {
-      const str = coordToStr(coord)
-      if (disabled.has(str)) {
-        disabled.delete(str)
-      } else {
-        disabled.add(str)
-      }
-      setDisabled(new Set(disabled))
-    },
-    [grid, disabled]
-  )
+  const handleTileClick = useCallback((coord: Coords) => {
+    setGrid((prevGrid) => prevGrid.map(($) => (isCoord($, coord) ? { ...$, disabled: !$.disabled } : $)))
+  }, [])
 
   const handleAdvancedConfirm = useCallback(
     (value: ModeAdvancedValue) => {
@@ -91,45 +68,34 @@ function Layout({ value, onChange }: Props) {
         x: length.x > MAX_AXIS_PARCELS ? min.x + Math.min(MAX_AXIS_PARCELS, max.x) : max.x,
         y: length.y > MAX_AXIS_PARCELS ? min.y + Math.min(MAX_AXIS_PARCELS, max.y) : max.y
       }
-      const parcels = getCoordinates(min, clampMax)
-      const base = strToCoord(value.base) || min
-      setGrid(parcels)
-      setBase(base)
+      setGrid(generateGridFrom(grid, min, clampMax))
+      setBase(strToCoord(value.base) || min)
     },
-    [grid, base, disabled]
+    [grid]
   )
 
   const applyCurrentState = useCallback(() => {
     onChange({ parcels: enabledCoords, base })
-  }, [grid, base, disabled])
+  }, [enabledCoords, base])
 
-  const handleModeChange = useCallback(
-    (mode: Mode) => () => {
-      setMode(mode)
-    },
-    [mode]
-  )
+  const handleModeChange = useCallback((mode: Mode) => () => setMode(mode), [])
 
-  const getGridError = useCallback((): GridError | null => {
+  const gridError = useMemo((): GridError | null => {
     if (numberOfCoords <= 0) return GridError.NUMBER_OF_PARCELS
     if (!areConnected(enabledCoords)) return GridError.NOT_CONNECTED
     if (!hasCoord(enabledCoords, base)) return GridError.MISSING_BASE_PARCEL
     return null
-  }, [grid, base, disabled])
+  }, [numberOfCoords, enabledCoords, base])
 
-  const getTitle = useCallback(() => {
+  const title = useMemo(() => {
     if (mode === Mode.ADVANCED) return 'Set Coordinates'
     return `${numberOfCoords} Parcel${numberOfCoords === 1 ? '' : 's'}`
-  }, [grid, mode, disabled])
+  }, [numberOfCoords, mode])
 
-  const getInstruction = useCallback(() => {
+  const instruction = useMemo(() => {
     if (mode === Mode.ADVANCED) return 'Type in the layout coordinates you want to deploy'
     return 'Click individual tiles to exclude/include them from the layout'
   }, [mode])
-
-  const title = getTitle()
-  const instruction = getInstruction()
-  const gridError = getGridError()
 
   return (
     <div className="SceneLayout">
@@ -151,7 +117,7 @@ function Layout({ value, onChange }: Props) {
       {mode === Mode.ADVANCED ? (
         <ModeAdvanced
           value={{
-            coords: transformCoordsToString(grid, disabled),
+            coords: transformCoordsToString(enabledCoords),
             base: coordToStr(base)
           }}
           disabled={!!gridError}
