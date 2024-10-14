@@ -1,17 +1,16 @@
 import { MAX_AXIS_PARCELS, TILE_OPTIONS } from './types'
 import {
-  getLayoutInfo,
+  generateCoordinatesBetweenPoints,
   getLayoutInfoFromString,
-  getCoordinatesBetweenPoints,
-  getCoordinatesInGridOrder,
   getOption,
   getMinMaxFromOrderedCoords,
   coordToStr,
-  transformCoordsToString
+  transformCoordsToString,
+  getGridInfo
 } from './utils'
 
-describe('getLayoutInfo', () => {
-  it('returns correct parcel info', () => {
+describe('getGridInfo', () => {
+  it('returns correct grid info', () => {
     const parcels = [
       { x: 0, y: 0 },
       { x: 0, y: 1 },
@@ -22,9 +21,14 @@ describe('getLayoutInfo', () => {
       min: { x: 0, y: 0 },
       max: { x: 1, y: 1 },
       length: { x: 1, y: 1 },
-      parcels: parcels
+      grid: [
+        { x: 0, y: 1, disabled: false },
+        { x: 1, y: 1, disabled: false },
+        { x: 0, y: 0, disabled: false },
+        { x: 1, y: 0, disabled: false }
+      ]
     }
-    expect(getLayoutInfo(parcels)).toEqual(expected)
+    expect(getGridInfo(parcels)).toEqual(expected)
   })
 })
 
@@ -35,51 +39,33 @@ describe('getLayoutInfoFromString', () => {
       min: { x: 0, y: 0 },
       max: { x: 1, y: 1 },
       length: { x: 1, y: 1 },
-      parcels: [
-        { x: 0, y: 0 },
-        { x: 0, y: 1 },
-        { x: 1, y: 0 },
-        { x: 1, y: 1 }
+      grid: [
+        { x: 0, y: 1, disabled: false },
+        { x: 1, y: 1, disabled: false },
+        { x: 0, y: 0, disabled: false },
+        { x: 1, y: 0, disabled: false }
       ]
     }
     expect(getLayoutInfoFromString(parcelsString)).toEqual(expected)
   })
 })
 
-describe('getCoordinatesBetweenPoints', () => {
-  it('returns correct coordinates between two points', () => {
+describe('generateCoordinatesBetweenPoints', () => {
+  it('returns correct coordinates between two points sorted in grid order', () => {
     const pointA = { x: 0, y: 0 }
     const pointB = { x: 2, y: 2 }
     const expected = [
-      { x: 0, y: 0 },
-      { x: 0, y: 1 },
       { x: 0, y: 2 },
-      { x: 1, y: 0 },
-      { x: 1, y: 1 },
       { x: 1, y: 2 },
-      { x: 2, y: 0 },
-      { x: 2, y: 1 },
-      { x: 2, y: 2 }
-    ]
-    expect(getCoordinatesBetweenPoints(pointA, pointB)).toEqual(expected)
-  })
-})
-
-describe('getCoordinatesInGridOrder', () => {
-  it('returns coordinates sorted in grid order', () => {
-    const unsorted = [
-      { x: 0, y: 0 },
-      { x: 0, y: 1 },
-      { x: 1, y: 0 },
-      { x: 1, y: 1 }
-    ]
-    const expected = [
+      { x: 2, y: 2 },
       { x: 0, y: 1 },
       { x: 1, y: 1 },
+      { x: 2, y: 1 },
       { x: 0, y: 0 },
-      { x: 1, y: 0 }
+      { x: 1, y: 0 },
+      { x: 2, y: 0 }
     ]
-    expect(getCoordinatesInGridOrder(unsorted)).toEqual(expected)
+    expect(generateCoordinatesBetweenPoints(pointA, pointB)).toEqual(expected)
   })
 })
 
@@ -185,38 +171,14 @@ describe('transformCoordsToString', () => {
       { x: 1, y: 1 },
       { x: 2, y: 2 }
     ]
-    const disabledCoords = new Set<string>()
     const expected = '0,0 1,1 2,2'
-    expect(transformCoordsToString(coords, disabledCoords)).toEqual(expected)
-  })
-
-  it('filters disabled coordinates', () => {
-    const coords = [
-      { x: 0, y: 0 },
-      { x: 1, y: 1 },
-      { x: 2, y: 2 }
-    ]
-    const disabledCoords = new Set(['1,1'])
-    const expected = '0,0 2,2'
-    expect(transformCoordsToString(coords, disabledCoords)).toEqual(expected)
+    expect(transformCoordsToString(coords)).toEqual(expected)
   })
 
   it('returns empty string for empty coordinates array', () => {
     const coords = []
-    const disabledCoords = new Set<string>()
     const expected = ''
-    expect(transformCoordsToString(coords, disabledCoords)).toEqual(expected)
-  })
-
-  it('returns empty string for all coordinates disabled', () => {
-    const coords = [
-      { x: 0, y: 0 },
-      { x: 1, y: 1 },
-      { x: 2, y: 2 }
-    ]
-    const disabledCoords = new Set(['0,0', '1,1', '2,2'])
-    const expected = ''
-    expect(transformCoordsToString(coords, disabledCoords)).toEqual(expected)
+    expect(transformCoordsToString(coords)).toEqual(expected)
   })
 
   it('handles coordinates with negative values', () => {
@@ -225,9 +187,8 @@ describe('transformCoordsToString', () => {
       { x: 0, y: 0 },
       { x: 1, y: 1 }
     ]
-    const disabledCoords = new Set(['-1,-1'])
-    const expected = '0,0 1,1'
-    expect(transformCoordsToString(coords, disabledCoords)).toEqual(expected)
+    const expected = '-1,-1 0,0 1,1'
+    expect(transformCoordsToString(coords)).toEqual(expected)
   })
 
   it('handles large coordinate values', () => {
@@ -235,9 +196,8 @@ describe('transformCoordsToString', () => {
       { x: 1000000, y: 1000000 },
       { x: 2000000, y: 2000000 }
     ]
-    const disabledCoords = new Set<string>()
     const expected = '1000000,1000000 2000000,2000000'
-    expect(transformCoordsToString(coords, disabledCoords)).toEqual(expected)
+    expect(transformCoordsToString(coords)).toEqual(expected)
   })
 })
 
