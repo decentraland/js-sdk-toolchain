@@ -26,13 +26,30 @@ export function addSyncTransport(
   const entityDefinitions = entityUtils(engine, myProfile)
 
   // List of MessageBuss messsages to be sent on every frame to comms
-  const pendingMessageBusMessagesToSend: Uint8Array[] = []
-  const binaryMessageBus = BinaryMessageBus((message) => pendingMessageBusMessagesToSend.push(message))
+  const pendingMessageBusMessagesToSend: { data: Uint8Array[]; address?: string }[] = []
+  const binaryMessageBus = BinaryMessageBus((data, address) => {
+    const pendingAddressMessage = address && pendingMessageBusMessagesToSend.find(($) => $.address === address)
+    if (pendingAddressMessage) {
+      pendingAddressMessage.data.push(data)
+    } else {
+      pendingMessageBusMessagesToSend.push({ data: [data], address })
+    }
+  })
 
-  function getMessagesToSend() {
+  function getMessagesToSend(): [Uint8Array[], typeof pendingMessageBusMessagesToSend] {
     const messages = [...pendingMessageBusMessagesToSend]
     pendingMessageBusMessagesToSend.length = 0
-    return messages
+    const broadcastMessages: Uint8Array[] = []
+    const messagesToAddress: typeof pendingMessageBusMessagesToSend = []
+
+    for (const message of messages) {
+      if (!message.address) {
+        broadcastMessages.push(...message.data)
+      } else {
+        messagesToAddress.push(message)
+      }
+    }
+    return [broadcastMessages, messagesToAddress]
   }
 
   let transportInitialzed = false
@@ -45,8 +62,9 @@ export function addSyncTransport(
           console.log(...Array.from(serializeCrdtMessages('[NetworkMessage sent]:', message, engine)))
         binaryMessageBus.emit(CommsMessage.CRDT, message)
       }
-      const messages = getMessagesToSend()
-      const response = await sendBinary({ data: messages })
+      const [broadcastMessages, messagesToAddress] = getMessagesToSend()
+
+      const response = await sendBinary({ data: broadcastMessages, messagesToAddress })
       binaryMessageBus.__processMessages(response.data)
       transportInitialzed = true
     },
