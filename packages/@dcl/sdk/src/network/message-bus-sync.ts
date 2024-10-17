@@ -70,16 +70,18 @@ export function addSyncTransport(
     binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(userId, engineToCrdt(engine)))
   })
 
-  async function sleep(ms: number) {
-    let timer = 0
-    function system(dt: number) {
-      timer += dt
-      if (timer >= ms) {
-        engine.removeSystem(system)
-        return Promise.resolve()
+  function sleep(ms: number) {
+    return new Promise<void>((resolve) => {
+      let timer = 0
+      function sleepSystem(dt: number) {
+        timer += dt
+        if (timer * 1000 >= ms) {
+          engine.removeSystem(sleepSystem)
+          resolve()
+        }
       }
-    }
-    engine.addSystem(system)
+      engine.addSystem(sleepSystem)
+    })
   }
 
   const players = definePlayerHelper(engine)
