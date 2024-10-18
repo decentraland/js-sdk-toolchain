@@ -86,8 +86,8 @@ export function addSyncTransport(
     DEBUG_NETWORK_MESSAGES() && console.log(`Requesting state. Players connected: ${players.length - 1}`)
 
     if (!RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom) {
-      DEBUG_NETWORK_MESSAGES() && console.log(`Aborting Requesting state. Disconnected`)
-      return
+      DEBUG_NETWORK_MESSAGES() && console.log(`Aborting Requesting state?. Disconnected`)
+      // return
     }
 
     binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, engineToCrdt(engine))
@@ -126,6 +126,10 @@ export function addSyncTransport(
     if (!value?.isConnectedSceneRoom) {
       DEBUG_NETWORK_MESSAGES() && console.log('Disconnected from comms')
       stateIsSyncronized = false
+    }
+
+    if (value?.isConnectedSceneRoom) {
+      DEBUG_NETWORK_MESSAGES() && console.log('Connected to comms')
     }
 
     if (value?.isConnectedSceneRoom && !stateIsSyncronized) {
