@@ -121,7 +121,6 @@ export function addSyncTransport(
     // }
   })
 
-  let isConnectedSceneRoomCache = !!RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom
   // Asks for the REQ_CRDT_STATE when its connected to comms
   RealmInfo.onChange(engine.RootEntity, (value) => {
     if (!value?.isConnectedSceneRoom) {
@@ -129,13 +128,9 @@ export function addSyncTransport(
       stateIsSyncronized = false
     }
 
-    if (value?.isConnectedSceneRoom !== isConnectedSceneRoomCache) {
-      if (value?.isConnectedSceneRoom && !stateIsSyncronized) {
-        void requestState()
-      }
+    if (value?.isConnectedSceneRoom && !stateIsSyncronized) {
+      void requestState()
     }
-
-    isConnectedSceneRoomCache = !!value?.isConnectedSceneRoom
   })
 
   players.onLeaveScene((userId) => {
