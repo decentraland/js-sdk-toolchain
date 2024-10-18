@@ -87,7 +87,7 @@ export function addSyncTransport(
 
     if (!RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom) {
       DEBUG_NETWORK_MESSAGES() && console.log(`Aborting Requesting state?. Disconnected`)
-      // return
+      return
     }
 
     binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, engineToCrdt(engine))
@@ -111,14 +111,6 @@ export function addSyncTransport(
 
   players.onEnterScene((player) => {
     DEBUG_NETWORK_MESSAGES() && console.log('[onEnterScene]', player.userId)
-    // if (player.userId === myProfile.userId && !requestCrdtStateWhenConnected) {
-    //   if (RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom) {
-    //     void requestState()
-    //   } else {
-    //     DEBUG_NETWORK_MESSAGES() && console.log('Waiting to be conneted')
-    //     requestCrdtStateWhenConnected = true
-    //   }
-    // }
   })
 
   // Asks for the REQ_CRDT_STATE when its connected to comms
@@ -139,9 +131,6 @@ export function addSyncTransport(
 
   players.onLeaveScene((userId) => {
     DEBUG_NETWORK_MESSAGES() && console.log('[onLeaveScene]', userId)
-    if (userId === myProfile.userId) {
-      // stateIsSyncronized = false
-    }
   })
 
   function isStateSyncronized() {
