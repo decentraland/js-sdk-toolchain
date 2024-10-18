@@ -81,7 +81,7 @@ export function addSyncTransport(
     transport.onmessage!(value)
   })
 
-  async function requestState() {
+  async function requestState(retryCount: number = 0) {
     let players = Array.from(engine.getEntitiesWith(PlayerIdentityData))
     DEBUG_NETWORK_MESSAGES() && console.log(`Requesting state. Players connected: ${players.length - 1}`)
     binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, engineToCrdt(engine))
@@ -89,10 +89,10 @@ export function addSyncTransport(
     players = Array.from(engine.getEntitiesWith(PlayerIdentityData))
 
     if (!stateIsSyncronized) {
-      if (players.length > 1) {
+      if (players.length > 1 && retryCount <= 2) {
         DEBUG_NETWORK_MESSAGES() &&
-          console.log(`Requesting state again (no response). Players connected: ${players.length - 1}`)
-        void requestState()
+          console.log(`Requesting state again ${retryCount} (no response). Players connected: ${players.length - 1}`)
+        void requestState(retryCount + 1)
       } else {
         DEBUG_NETWORK_MESSAGES() && console.log('No active players. State syncronized')
         stateIsSyncronized = true
