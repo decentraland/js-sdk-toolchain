@@ -48,16 +48,7 @@ describe('Generated Material ProtoBuf', () => {
             }
           }
         },
-        alphaTexture: {
-          tex: {
-            $case: 'texture',
-            texture: {
-              filterMode: undefined,
-              wrapMode: undefined,
-              src: 'not-casla'
-            }
-          }
-        },
+        alphaTexture: undefined,
         castShadows: true,
         metallic: 1,
         roughness: 1,
@@ -79,16 +70,7 @@ describe('Generated Material ProtoBuf', () => {
       createPbrMaterial({
         albedoColor: { r: 0, g: 1, b: 1, a: 1 },
         alphaTest: 1,
-        alphaTexture: {
-          tex: {
-            $case: 'texture',
-            texture: {
-              wrapMode: TextureWrapMode.TWM_CLAMP,
-              filterMode: TextureFilterMode.TFM_BILINEAR,
-              src: 'not-casla'
-            }
-          }
-        },
+        alphaTexture: undefined,
         bumpTexture: {
           tex: {
             $case: 'texture',
@@ -136,6 +118,7 @@ describe('Generated Material ProtoBuf', () => {
       createUnlitMaterial({
         castShadows: true,
         diffuseColor: { r: 0, g: 1, b: 1, a: 1 },
+        alphaTexture: undefined,
         alphaTest: undefined,
         texture: undefined
       })
