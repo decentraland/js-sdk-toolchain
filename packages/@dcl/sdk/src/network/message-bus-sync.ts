@@ -81,11 +81,14 @@ export function addSyncTransport(
     transport.onmessage!(value)
   })
 
-  async function requestState(retryCount: number = 0) {
+  async function requestState(retryCount: number = 1) {
     let players = Array.from(engine.getEntitiesWith(PlayerIdentityData))
     DEBUG_NETWORK_MESSAGES() && console.log(`Requesting state. Players connected: ${players.length - 1}`)
     binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, engineToCrdt(engine))
-    await sleep(3000)
+
+    // Wait ~5s for the response.
+    await sleep(5000)
+
     players = Array.from(engine.getEntitiesWith(PlayerIdentityData))
 
     if (!stateIsSyncronized) {
