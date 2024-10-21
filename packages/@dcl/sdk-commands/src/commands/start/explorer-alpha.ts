@@ -4,11 +4,11 @@ const isWindows = /^win/.test(process.platform)
 
 export async function runExplorerAlpha(
   components: CliComponents,
-  opts: { cwd: string; realm: string; baseCoords: { x: number; y: number } }
+  opts: { cwd: string; realm: string; baseCoords: { x: number; y: number }; isHub: boolean }
 ) {
-  const { cwd, realm, baseCoords } = opts
+  const { cwd, realm, baseCoords, isHub } = opts
 
-  if (await runApp(components, { cwd, realm, baseCoords })) {
+  if (await runApp(components, { cwd, realm, baseCoords, isHub })) {
     return
   }
 
@@ -17,11 +17,16 @@ export async function runExplorerAlpha(
 
 async function runApp(
   components: CliComponents,
-  { cwd, realm, baseCoords }: { cwd: string; realm: string; baseCoords: { x: number; y: number } }
+  {
+    cwd,
+    realm,
+    baseCoords,
+    isHub
+  }: { cwd: string; realm: string; baseCoords: { x: number; y: number }; isHub: boolean }
 ) {
   const cmd = isWindows ? 'start' : 'open'
   try {
-    const params = `realm=${realm}&position=${baseCoords.x},${baseCoords.y}&local-scene=true&debug=true`
+    const params = `realm=${realm}&position=${baseCoords.x},${baseCoords.y}&local-scene=true&debug=true&hub=${isHub}`
     const app = `decentraland://"${params}"`
     await components.spawner.exec(cwd, cmd, [app], { silent: true })
     components.logger.info(`Desktop client: decentraland://${params}\n`)
