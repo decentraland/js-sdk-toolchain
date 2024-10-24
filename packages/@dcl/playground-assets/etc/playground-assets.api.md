@@ -2589,6 +2589,7 @@ export namespace PBMaterial_GltfMaterial {
 export interface PBMaterial_PbrMaterial {
     albedoColor?: PBColor4 | undefined;
     alphaTest?: number | undefined;
+    // @deprecated (undocumented)
     alphaTexture?: TextureUnion | undefined;
     bumpTexture?: TextureUnion | undefined;
     castShadows?: boolean | undefined;
@@ -2615,6 +2616,7 @@ export namespace PBMaterial_PbrMaterial {
 // @public (undocumented)
 export interface PBMaterial_UnlitMaterial {
     alphaTest?: number | undefined;
+    alphaTexture?: TextureUnion | undefined;
     castShadows?: boolean | undefined;
     diffuseColor?: PBColor4 | undefined;
     texture?: TextureUnion | undefined;
@@ -3016,6 +3018,8 @@ export interface PBRealmInfo {
     baseUrl: string;
     // (undocumented)
     commsAdapter: string;
+    // (undocumented)
+    isConnectedSceneRoom?: boolean | undefined;
     // (undocumented)
     isPreview: boolean;
     // (undocumented)

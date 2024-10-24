@@ -244,13 +244,10 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
     [sdk]
   )
 
-  const areValidActions = useCallback(
-    (updatedActions: Action[]) => updatedActions.length > 0 && updatedActions.every(isValidAction),
-    []
-  )
+  const areValidActions = useCallback((updatedActions: Action[]) => updatedActions.every(isValidAction), [])
 
   useEffect(() => {
-    if (areValidActions(actions)) {
+    if (hasActions && areValidActions(actions)) {
       const current = sdk.components.Actions.get(entityId)
       if (isComponentEqual({ ...current, value: actions }) || isFocused) {
         return

@@ -12,6 +12,7 @@ Use the Decentraland Software Development Kit v7 to create experiences for the D
 ## Repository guide
 
 This repository consists of the following components, packaged for the `nodejs`/`npm` ecosystem (find them under the respective subfolder in `packages`):
+
 * `@dcl/react-ecs`: a framework to create scenes using the [React](https://reactjs.org) framework
 * `@dcl/sdk`: contains all the packages that a scene needs to work.
 * `@dcl/ecs`: an engine used to render things on screen
@@ -19,15 +20,16 @@ This repository consists of the following components, packaged for the `nodejs`/
 * `@dcl/inspector`: Editor interface.
 
 And some internal or maybe useful packages if you're digging deeper into how the Decentraland runtime works:
-* `@dcl/js-runtime`: the `js-runtime` contains the typings for the environment variables available in the sandboxed execution environment for scenes
-* `@dcl/playground-assets`: contains the files needed by the playground. https://playground.decentraland.org/
 
+* `@dcl/js-runtime`: the `js-runtime` contains the typings for the environment variables available in the sandboxed execution environment for scenes
+* `@dcl/playground-assets`: contains the files needed by the playground. <https://playground.decentraland.org/>
 
 ### Versioning notes
 
 When `@dcl/sdk` is built, as it depends on new versions of `@dcl/ecs`, these are built first and `@dcl/sdk` includes the new versions.
 
 ### ECS 6 dev support
+
 The ECS 6 lives in the `6.x.x` branch, there will no longer be new features but it's available for fixes or patches.
 With a PR to `6.x.x`, you can test the build with the S3 publish, but it'll be necessary to create a release for propagating under `decentraland-ecs@latest`.
 
@@ -37,7 +39,12 @@ We use golden files to create snapshots for a series of test scenes. Most change
 
 To re-create these golden files, run `make build update-snapshots`. In some cases, this will generate some discrepancies with the clean environment used by the continuous integration we use (CircleCI). If you run into this issue, please run `make deep-clean-and-snapshot` to invalidate all cached calculations. **Be careful**: it will clean all local changes on your git [working tree](https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefworkingtreeaworkingtree).
 
+### Release a new SDK Version
+
+After merging a PR to the main branch, we should wait until the [actions](https://github.com/decentraland/js-sdk-toolchain/actions/workflows/ci.yml) finish the process.
+
+Once the actions completed successfuly, we have to create a new [Release](https://github.com/decentraland/js-sdk-toolchain/releases/new) from the main branch following this [version guideline](https://docs.decentraland.org/creator/releases/version-agreement/).
+
 ## Copyright info
 
 This repository is protected with a standard Apache 2 license. See the terms and conditions in the LICENSE file.
-

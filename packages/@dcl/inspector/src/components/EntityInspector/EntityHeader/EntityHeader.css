@@ -11,6 +11,17 @@
   gap: 4px;
 }
 
+.EntityHeader .title {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.EntityHeader .title > svg {
+  margin-left: 5px;
+  cursor: pointer;
+}
+
 .EntityHeader > .RightContent {
   display: flex;
   flex-grow: 1;

@@ -22,7 +22,7 @@ type GetPlayerDataRes = {
   position: TransformType['position'] | undefined
 }
 
-function definePlayerHelper(engine: IEngine) {
+export function definePlayerHelper(engine: IEngine) {
   const Transform = defineTransform(engine)
   const PlayerIdentityData = definePlayerIdenityData(engine)
   const AvatarEquippedData = defineAvatarEquippedData(engine)
@@ -89,7 +89,7 @@ function definePlayerHelper(engine: IEngine) {
       return {
         entity: userEntity,
         name: avatarData?.name ?? '',
-        isGuest: !!playerData?.isGuest ?? false,
+        isGuest: !!playerData?.isGuest,
         userId: playerData?.address ?? '',
         avatar: avatarData ?? undefined,
         wearables: wearablesData?.wearableUrns ?? [],

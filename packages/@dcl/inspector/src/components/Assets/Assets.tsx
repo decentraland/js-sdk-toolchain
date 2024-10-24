@@ -1,15 +1,15 @@
 import React, { useCallback } from 'react'
 import cx from 'classnames'
-
-import { FolderOpen } from '../Icons/Folder'
 import { MdImageSearch } from 'react-icons/md'
 import { HiOutlinePlus } from 'react-icons/hi'
-import { AssetsCatalog } from '../AssetsCatalog'
+
 import { AssetPack, catalog, isSmart } from '../../lib/logic/catalog'
 import { getConfig } from '../../lib/logic/config'
-import { getSelectedAssetsTab, selectAssetsTab } from '../../redux/ui'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
+import { getSelectedAssetsTab, selectAssetsTab } from '../../redux/ui'
 import { AssetsTab } from '../../redux/ui/types'
+import { FolderOpen } from '../Icons/Folder'
+import { AssetsCatalog } from '../AssetsCatalog'
 import { ProjectAssetExplorer } from '../ProjectAssetExplorer'
 import ImportAsset from '../ImportAsset'
 
@@ -22,7 +22,7 @@ function removeSmartItems(assetPack: AssetPack) {
   }
 }
 
-function Assets() {
+function Assets({ isAssetsPanelCollapsed }: { isAssetsPanelCollapsed: boolean }) {
   const dispatch = useAppDispatch()
   const tab = useAppSelector(getSelectedAssetsTab)
 
@@ -59,7 +59,7 @@ function Assets() {
           </div>
         </div>
       </div>
-      <div className="Assets-content">
+      <div className={cx('Assets-content', { Hide: isAssetsPanelCollapsed })}>
         {tab === AssetsTab.AssetsPack && <AssetsCatalog catalog={filteredCatalog} />}
         {tab === AssetsTab.FileSystem && <ProjectAssetExplorer />}
         {tab === AssetsTab.Import && <ImportAsset onSave={handleTabClick(AssetsTab.FileSystem)} />}

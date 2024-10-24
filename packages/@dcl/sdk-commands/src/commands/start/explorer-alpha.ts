@@ -21,7 +21,7 @@ async function runApp(
 ) {
   const cmd = isWindows ? 'start' : 'open'
   try {
-    const params = `realm=${realm}&position=${baseCoords.x},${baseCoords.y}&local-scene=true`
+    const params = `realm=${realm}&position=${baseCoords.x},${baseCoords.y}&local-scene=true&debug=true`
     const app = `decentraland://"${params}"`
     await components.spawner.exec(cwd, cmd, [app], { silent: true })
     components.logger.info(`Desktop client: decentraland://${params}\n`)

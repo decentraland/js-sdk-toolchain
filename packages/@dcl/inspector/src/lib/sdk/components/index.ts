@@ -21,6 +21,7 @@ export enum CoreComponents {
   ANIMATOR = 'core::Animator',
   AUDIO_SOURCE = 'core::AudioSource',
   AUDIO_STREAM = 'core::AudioStream',
+  AVATAR_ATTACH = 'core::AvatarAttach',
   GLTF_CONTAINER = 'core::GltfContainer',
   NETWORK_ENTITY = 'core-schema::Network-Entity',
   MATERIAL = 'core::Material',
@@ -171,6 +172,7 @@ export type SdkComponents = {
   Animator: ReturnType<typeof components.Animator>
   AudioSource: ReturnType<typeof components.AudioSource>
   AudioStream: ReturnType<typeof components.AudioStream>
+  AvatarAttach: ReturnType<typeof components.AvatarAttach>
   Billboard: ReturnType<typeof components.Billboard>
   GltfContainer: ReturnType<typeof components.GltfContainer>
   Material: ReturnType<typeof components.Material>
@@ -193,6 +195,7 @@ export function createComponents(engine: IEngine): SdkComponents {
   const Animator = components.Animator(engine)
   const AudioSource = components.AudioSource(engine)
   const AudioStream = components.AudioStream(engine)
+  const AvatarAttach = components.AvatarAttach(engine)
   const Billboard = components.Billboard(engine)
   const GltfContainer = components.GltfContainer(engine)
   const Material = components.Material(engine)
@@ -214,6 +217,7 @@ export function createComponents(engine: IEngine): SdkComponents {
     Animator,
     AudioSource,
     AudioStream,
+    AvatarAttach,
     Billboard,
     GltfContainer,
     Material,
