@@ -57,6 +57,9 @@
   "keywords": [],
   "license": "Apache-2.0",
   "minCliVersion": "3.14.1",
+  "overrides": {
+    "@dcl/protocol": "1.0.0-11502421172.commit-b32f4af"
+  },
   "repository": {
     "url": "git+https://github.com/decentraland/js-sdk-toolchain",
     "directory": "packages/@dcl/sdk-commands"
