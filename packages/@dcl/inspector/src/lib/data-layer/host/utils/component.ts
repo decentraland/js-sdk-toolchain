@@ -1,9 +1,10 @@
 import { ComponentDefinition, CompositeDefinition, DeepReadonlyObject, Entity } from '@dcl/ecs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { dataCompare } from '@dcl/ecs/dist/systems/crdt/utils'
+import { Scene } from '@dcl/schemas'
 
 import { EditorComponentsTypes, SceneAgeRating, SceneCategory, SceneComponent } from '../../../sdk/components'
-import { Scene } from '@dcl/schemas'
+import { getConfig } from '../../../logic/config'
 
 export function isEqual(component: ComponentDefinition<unknown>, prevValue: unknown, newValue: unknown) {
   if (prevValue === newValue || (!prevValue && !newValue)) return true
@@ -40,6 +41,7 @@ export function fromSceneComponent(value: DeepReadonlyObject<EditorComponentsTyp
     const sanitizedTag = tag.trim()
     if (sanitizedTag && !tags.includes(sanitizedTag)) tags.push(sanitizedTag)
   }
+  const config = getConfig()
   const scene: Partial<SceneWithRating> = {
     display: {
       title: value.name || '',
@@ -72,6 +74,14 @@ export function fromSceneComponent(value: DeepReadonlyObject<EditorComponentsTyp
       portableExperiences: value.disablePortableExperiences ? 'disabled' : 'enabled'
     },
     rating: value.ageRating
+  }
+
+  if (config.segmentAppId && config.projectId) {
+    // add analytics source
+    scene.source = {
+      origin: config.segmentAppId,
+      projectId: config.projectId
+    }
   }
 
   return scene
