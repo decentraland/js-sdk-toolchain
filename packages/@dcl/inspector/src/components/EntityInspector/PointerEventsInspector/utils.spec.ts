@@ -23,7 +23,8 @@ describe('InputUtils', () => {
           button: InputAction.IA_ANY,
           hoverText: 'Interact',
           maxDistance: 10,
-          showFeedback: true
+          showFeedback: true,
+          showHighlight: true
         }
       }
       expect(result).toEqual(expected)
@@ -36,7 +37,8 @@ describe('InputUtils', () => {
           button: InputAction.IA_PRIMARY,
           hoverText: 'Custom Interaction',
           maxDistance: 15,
-          showFeedback: false
+          showFeedback: false,
+          showHighlight: false
         }
       })
       const expected = {
@@ -45,7 +47,8 @@ describe('InputUtils', () => {
           button: InputAction.IA_PRIMARY,
           hoverText: 'Custom Interaction',
           maxDistance: 15,
-          showFeedback: false
+          showFeedback: false,
+          showHighlight: false
         }
       }
       expect(result).toEqual(expected)
@@ -68,7 +71,8 @@ describe('InputUtils', () => {
           button: InputAction.IA_ANY,
           hoverText: 'Interact',
           maxDistance: 10,
-          showFeedback: true
+          showFeedback: true,
+          showHighlight: true
         }
       }
       expect(DEFAULTS).toEqual(expected)
