@@ -1130,6 +1130,7 @@ export type EventSystemOptions = {
     hoverText?: string;
     maxDistance?: number;
     showFeedback?: boolean;
+    showHighlight?: boolean;
 };
 
 // @public

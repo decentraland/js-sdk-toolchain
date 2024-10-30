@@ -20,6 +20,7 @@ export type EventSystemOptions = {
   hoverText?: string
   maxDistance?: number
   showFeedback?: boolean
+  showHighlight?: boolean
 }
 
 /**
@@ -110,7 +111,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
   }
 
   function setPointerEvent(entity: Entity, type: PointerEventType, opts: EventSystemOptions) {
-    if (opts.hoverText || opts.showFeedback) {
+    if (opts.hoverText || opts.showFeedback || opts.showHighlight) {
       const pointerEvent = PointerEvents.getMutableOrNull(entity) || PointerEvents.create(entity)
 
       pointerEvent.pointerEvents.push({
@@ -118,6 +119,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
         eventInfo: {
           button: opts.button,
           showFeedback: opts.showFeedback,
+          showHighlight: opts.showHighlight,
           hoverText: opts.hoverText,
           maxDistance: opts.maxDistance
         }
