@@ -30,7 +30,14 @@ export async function getPublishableFiles(
     nodir: true
   })
 
-  return ig.filter(allFiles)
+  const editorFiles = globSync('.editor/**', {
+    cwd: projectRoot,
+    absolute: false,
+    dot: false,
+    nodir: true
+  })
+
+  return ig.filter(allFiles).concat(editorFiles)
 }
 
 /**
