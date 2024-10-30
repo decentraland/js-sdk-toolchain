@@ -111,20 +111,17 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
   }
 
   function setPointerEvent(entity: Entity, type: PointerEventType, opts: EventSystemOptions) {
-    if (opts.hoverText || opts.showFeedback || opts.showHighlight) {
-      const pointerEvent = PointerEvents.getMutableOrNull(entity) || PointerEvents.create(entity)
-
-      pointerEvent.pointerEvents.push({
-        eventType: type,
-        eventInfo: {
-          button: opts.button,
-          showFeedback: opts.showFeedback,
-          showHighlight: opts.showHighlight,
-          hoverText: opts.hoverText,
-          maxDistance: opts.maxDistance
-        }
-      })
-    }
+    const pointerEvent = PointerEvents.getMutableOrNull(entity) || PointerEvents.create(entity)
+    pointerEvent.pointerEvents.push({
+      eventType: type,
+      eventInfo: {
+        button: opts.button,
+        showFeedback: opts.showFeedback,
+        showHighlight: opts.showHighlight,
+        hoverText: opts.hoverText,
+        maxDistance: opts.maxDistance
+      }
+    })
   }
 
   function removePointerEvent(entity: Entity, type: PointerEventType, button: InputAction) {
