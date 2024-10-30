@@ -2677,6 +2677,7 @@ export interface PBPointerEvents_Info {
     hoverText?: string | undefined;
     maxDistance?: number | undefined;
     showFeedback?: boolean | undefined;
+    showHighlight?: boolean | undefined;
 }
 
 // @public (undocumented)
