@@ -626,6 +626,7 @@ export const componentDefinitionByName: {
     "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
+    "core::GltfNode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNode>>;
     "core::InputModifier": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBInputModifier>>;
     "core::MainCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMainCamera>>;
     "core::Material": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMaterial>>;
@@ -1202,6 +1203,9 @@ export const GltfContainer: LastWriteWinElementSetComponentDefinition<PBGltfCont
 
 // @public (undocumented)
 export const GltfContainerLoadingState: LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>;
+
+// @public (undocumented)
+export const GltfNode: LastWriteWinElementSetComponentDefinition<PBGltfNode>;
 
 // @public (undocumented)
 export interface GrowOnlyValueSetComponentDefinition<T> extends BaseComponent<T> {
@@ -2344,6 +2348,20 @@ export namespace PBGltfContainerLoadingState {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfContainerLoadingState;
     // (undocumented)
     export function encode(message: PBGltfContainerLoadingState, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBGltfNode {
+    gltfContainerEntity: number;
+    nodePath: string;
+}
+
+// @public (undocumented)
+export namespace PBGltfNode {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfNode;
+    // (undocumented)
+    export function encode(message: PBGltfNode, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3891,8 +3909,10 @@ export const TextShape: LastWriteWinElementSetComponentDefinition<PBTextShape>;
 // @public (undocumented)
 export interface Texture {
     filterMode?: TextureFilterMode | undefined;
+    offset?: PBVector2 | undefined;
     // (undocumented)
     src: string;
+    tiling?: PBVector2 | undefined;
     wrapMode?: TextureWrapMode | undefined;
 }
 
