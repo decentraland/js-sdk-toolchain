@@ -1,6 +1,6 @@
 import { Engine, Entity, IEngine, components, PointerEventType, InputAction } from '../../../packages/@dcl/ecs/src'
 import { createInputSystem } from '../../../packages/@dcl/ecs/src/engine/input'
-import { createPointerEventsSystem, PointerEventsSystem } from '../../../packages/@dcl/ecs/src/systems/events'
+import { createPointerEventsSystem, getDefaultOpts, PointerEventsSystem } from '../../../packages/@dcl/ecs/src/systems/events'
 import { createTestPointerDownCommand } from './utils'
 
 let engine: IEngine
@@ -69,7 +69,6 @@ describe('Events System', () => {
     expect(counter).toBe(1)
     const removedFeedback = PointerEvents.getOrNull(entity)?.pointerEvents
     expect(removedFeedback?.length).toBe(0)
-
     // Update tick and verify we didnt increment the counter again
     await engine.update(1)
     expect(counter).toBe(1)
@@ -83,13 +82,17 @@ describe('Events System', () => {
       entity,
       () => {
         counter += 1
-      },
-      { hoverText: '' }
+      }
     )
     fakePointer(entity, PointerEventType.PET_DOWN)
     await engine.update(1)
     expect(counter).toBe(1)
-    expect(PointerEvents.getOrNull(entity)).toBe(null)
+    expect(PointerEvents.getOrNull(entity)).toMatchObject({
+      'pointerEvents': [{
+        'eventInfo': getDefaultOpts(),
+        'eventType': 1
+      }]
+    })
   })
 
   it('should remove pointer down', async () => {

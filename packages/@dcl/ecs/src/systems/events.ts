@@ -23,6 +23,11 @@ export type EventSystemOptions = {
   showHighlight?: boolean
 }
 
+export const getDefaultOpts = (opts: Partial<EventSystemOptions> = {}): EventSystemOptions => ({
+  button: InputAction.IA_ANY,
+  ...opts
+})
+
 /**
  * @public
  */
@@ -98,11 +103,6 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     Up
   }
   type EventMapType = Map<EventType, { cb: EventSystemCallback; opts: EventSystemOptions }>
-
-  const getDefaultOpts = (opts: Partial<EventSystemOptions> = {}): EventSystemOptions => ({
-    button: InputAction.IA_ANY,
-    ...opts
-  })
 
   const eventsMap = new Map<Entity, EventMapType>()
 
