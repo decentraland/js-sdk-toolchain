@@ -1,6 +1,10 @@
 import { Engine, Entity, IEngine, components, PointerEventType, InputAction } from '../../../packages/@dcl/ecs/src'
 import { createInputSystem } from '../../../packages/@dcl/ecs/src/engine/input'
-import { createPointerEventsSystem, getDefaultOpts, PointerEventsSystem } from '../../../packages/@dcl/ecs/src/systems/events'
+import {
+  createPointerEventsSystem,
+  getDefaultOpts,
+  PointerEventsSystem
+} from '../../../packages/@dcl/ecs/src/systems/events'
 import { createTestPointerDownCommand } from './utils'
 
 let engine: IEngine
@@ -78,20 +82,19 @@ describe('Events System', () => {
     const entity = engine.addEntity()
     const PointerEvents = components.PointerEvents(engine)
     let counter = 0
-    EventsSystem.onPointerDown(
-      entity,
-      () => {
-        counter += 1
-      }
-    )
+    EventsSystem.onPointerDown(entity, () => {
+      counter += 1
+    })
     fakePointer(entity, PointerEventType.PET_DOWN)
     await engine.update(1)
     expect(counter).toBe(1)
     expect(PointerEvents.getOrNull(entity)).toMatchObject({
-      'pointerEvents': [{
-        'eventInfo': getDefaultOpts(),
-        'eventType': 1
-      }]
+      pointerEvents: [
+        {
+          eventInfo: getDefaultOpts(),
+          eventType: 1
+        }
+      ]
     })
   })
 
