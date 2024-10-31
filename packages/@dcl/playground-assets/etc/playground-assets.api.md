@@ -1130,6 +1130,7 @@ export type EventSystemOptions = {
     hoverText?: string;
     maxDistance?: number;
     showFeedback?: boolean;
+    showHighlight?: boolean;
 };
 
 // @public
@@ -1166,6 +1167,11 @@ export function getComponentEntityTree<T>(engine: Pick<IEngine, 'getEntitiesWith
 
 // @public @deprecated (undocumented)
 export function getCompositeRootComponent(engine: IEngine): LastWriteWinElementSetComponentDefinition<CompositeRootType>;
+
+// Warning: (ae-missing-release-tag) "getDefaultOpts" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const getDefaultOpts: (opts?: Partial<EventSystemOptions>) => EventSystemOptions;
 
 // Warning: (ae-missing-release-tag) "GlobalDirectionRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2677,6 +2683,7 @@ export interface PBPointerEvents_Info {
     hoverText?: string | undefined;
     maxDistance?: number | undefined;
     showFeedback?: boolean | undefined;
+    showHighlight?: boolean | undefined;
 }
 
 // @public (undocumented)
