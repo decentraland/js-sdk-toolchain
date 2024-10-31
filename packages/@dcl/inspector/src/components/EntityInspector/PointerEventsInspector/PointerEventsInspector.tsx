@@ -115,6 +115,12 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
               onChange={(e) => handleEventInfoChange({ showFeedback: !!e.target.checked }, idx)}
             />
           </Block>
+          <Block label="Show highlight">
+            <CheckboxField
+              checked={!!$.eventInfo?.showHighlight ?? DEFAULTS.eventInfo.showHighlight}
+              onChange={(e) => handleEventInfoChange({ showHighlight: !!e.target.checked }, idx)}
+            />
+          </Block>
           <AddButton onClick={() => handleRemove(idx)}>Remove Pointer Event</AddButton>
         </React.Fragment>
       ))}
