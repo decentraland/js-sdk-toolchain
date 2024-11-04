@@ -20,6 +20,6 @@
     "@dcl/sdk-commands": "file:../../../../packages/@dcl/sdk-commands"
   },
   "dependencies": {
-    "@dcl/ecs-math": "^2.0.1-20221108141807.commit-a1344cb"
+    "@dcl/ecs-math": "2.1.0"
   }
 }
