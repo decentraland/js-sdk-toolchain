@@ -12,7 +12,7 @@
     "@babylonjs/loaders": "~6.18.0",
     "@babylonjs/materials": "~6.18.0",
     "@dcl/ecs": "file:../ecs",
-    "@dcl/ecs-math": "2.0.2",
+    "@dcl/ecs-math": "2.1.0",
     "@dcl/mini-rpc": "^1.0.7",
     "@dcl/rpc": "^1.1.1",
     "@dcl/schemas": "^8.2.3-20230718182824.commit-356025c",
