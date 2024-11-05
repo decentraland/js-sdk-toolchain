@@ -1,4 +1,4 @@
-import { AbstractMesh, Color3 } from '@babylonjs/core'
+import { AbstractMesh, Color3, Gizmo } from '@babylonjs/core'
 import { ComponentType } from '@dcl/ecs'
 import { CoreComponents } from '../../../sdk/components'
 import { EcsEntity } from '../EcsEntity'
@@ -40,12 +40,11 @@ export const toggleSelection = (entity: EcsEntity, value: boolean) => {
 
 export const updateGizmoManager = (entity: EcsEntity, value: { gizmo: number } | null) => {
   const context = entity.context.deref()!
-  let processedSomeEntity = false
 
   const Transform = context.engine.getComponent(CoreComponents.TRANSFORM)
+  const selectedEntities = Array.from(context.engine.getEntitiesWith(context.editorComponents.Selection))
 
-  for (const [_entity] of context.engine.getEntitiesWith(context.editorComponents.Selection)) {
-    processedSomeEntity = true
+  for (const [_entity] of selectedEntities) {
     if (entity.entityId === _entity && Transform.has(_entity)) {
       context.gizmos.setEntity(entity)
       const types = context.gizmos.getGizmoTypes()
@@ -55,7 +54,10 @@ export const updateGizmoManager = (entity: EcsEntity, value: { gizmo: number } |
     }
   }
 
-  if (!processedSomeEntity) {
+  if (selectedEntities.length === 0) {
     context.gizmos.unsetEntity()
+  } else {
+    // TODO: this will also execute when only one entity is selected, it works but it's not optimal...
+    context.gizmos.repositionGizmoOnCentroid()
   }
 }
