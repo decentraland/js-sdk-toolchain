@@ -22,8 +22,8 @@ describe('Generated UiBackground ProtoBuf', () => {
             src: 'some-src',
             wrapMode: TextureWrapMode.TWM_CLAMP,
             filterMode: TextureFilterMode.TFM_BILINEAR,
-            offset:undefined,
-            tiling:undefined
+            offset: undefined,
+            tiling: undefined
           }
         }
       },
