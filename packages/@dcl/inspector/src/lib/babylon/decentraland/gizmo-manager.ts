@@ -18,7 +18,7 @@ import { SceneContext } from './SceneContext'
 import { PatchedGizmoManager } from './gizmo-patch'
 import { ROOT } from '../../sdk/tree'
 
-const GIZMO_DUMMY_NODE = "GIZMO_DUMMY_NODE"
+const GIZMO_DUMMY_NODE = 'GIZMO_DUMMY_NODE'
 
 interface GizmoAxis {
   xGizmo: IAxisDragGizmo
@@ -43,17 +43,14 @@ function areQuaternionsEqual(a: DclQuaternion, b: DclQuaternion) {
 }
 
 function calculateCenter(positions: Vector3[]): Vector3 {
-  if (positions.length === 0) throw new Error("No positions provided to calculate center")
+  if (positions.length === 0) throw new Error('No positions provided to calculate center')
 
-  const sum = positions.reduce(
-    (acc, pos) => {
-      acc.x += pos.x
-      acc.y += pos.y
-      acc.z += pos.z
-      return acc
-    },
-    new Vector3(0, 0, 0)
-  )
+  const sum = positions.reduce((acc, pos) => {
+    acc.x += pos.x
+    acc.y += pos.y
+    acc.z += pos.z
+    return acc
+  }, new Vector3(0, 0, 0))
 
   return sum.scale(1 / positions.length)
 }
@@ -200,7 +197,7 @@ export function createGizmoManager(context: SceneContext) {
   }
 
   // Map to store the original parent of each entity
-  const originalParents = new Map<Entity, TransformNode | null>();
+  const originalParents = new Map<Entity, TransformNode | null>()
 
   // Check if a transform node for the gizmo already exists, or create one
   function getDummyNode(): TransformNode {
@@ -375,7 +372,7 @@ export function createGizmoManager(context: SceneContext) {
       return isEnabled
     },
     setEnabled,
-    setEntity(entity: EcsEntity | null) {
+    setEntity(entity: EcsEntity | null): void {
       if (
         entity === lastEntity ||
         !isEnabled ||
@@ -387,8 +384,7 @@ export function createGizmoManager(context: SceneContext) {
       }
       restoreOriginalParents()
       if (areMultipleEntitiesSelected()) {
-        repositionGizmoOnCentroid()
-        return
+        return repositionGizmoOnCentroid()
       } else {
         gizmoManager.attachToNode(entity)
         lastEntity = entity
