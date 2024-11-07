@@ -3938,10 +3938,10 @@ export type TextureMode = 'nine-slices' | 'center' | 'stretch';
 // @public (undocumented)
 export interface TextureMove {
     // (undocumented)
-    end: PBVector3 | undefined;
+    end: PBVector2 | undefined;
     // (undocumented)
-    start: PBVector3 | undefined;
-    textureMovement?: TextureToMove | undefined;
+    start: PBVector2 | undefined;
+    textureMovement?: TextureMovement | undefined;
     textureToMove?: TextureToMove | undefined;
 }
 
