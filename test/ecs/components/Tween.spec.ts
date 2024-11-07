@@ -4,6 +4,9 @@ import { testComponentSerialization } from './assertion'
 describe('Generated Tween ProtoBuf', () => {
   const start = { x: 0, y: 0, z: 0 }
   const end = { x: 8, y: 8, z: 8 }
+  const start2d = { x: 0, y: 0 }
+  const end2d = { x: 8, y: 8 }
+
   it('should serialize/deserialize move Tween', () => {
     const newEngine = Engine()
     const Tween = components.Tween(newEngine)
@@ -36,8 +39,8 @@ describe('Generated Tween ProtoBuf', () => {
       duration: 1,
       easingFunction: EasingFunction.EF_LINEAR,
       mode: Tween.Mode.TextureMove({
-        start: { ...start },
-        end: { ...end },
+        start: { ...start2d },
+        end: { ...end2d },
         textureToMove: TextureToMove.TTM_ALBEDO,
         textureMovement: TextureMovement.TM_OFFSET_AND_TILING
       }),
