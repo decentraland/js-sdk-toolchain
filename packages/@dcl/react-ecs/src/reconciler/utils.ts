@@ -58,6 +58,8 @@ const entityComponent: EntityComponents = {
   uiTransform: undefined as any,
   onMouseDown: undefined as any,
   onMouseUp: undefined as any,
+  onMouseHover: undefined as any,
+  onMouseLeave: undefined as any,
   uiInput: undefined as any,
   uiDropdown: undefined as any
 }

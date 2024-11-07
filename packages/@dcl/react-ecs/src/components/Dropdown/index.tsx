@@ -39,13 +39,15 @@ function parseUiDropdown(props: UiDropdownProps): PBUiDropdown {
  */
 /* @__PURE__ */
 export function Dropdown(props: UiDropdownProps) {
-  const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...otherProps } = props
+  const { uiTransform, uiBackground, onMouseDown, onMouseUp, onMouseHover, onMouseLeave, ...otherProps } = props
   const dropdownProps = parseUiDropdown(otherProps)
   const commonProps = parseProps({
     uiTransform,
     uiBackground,
     onMouseDown,
-    onMouseUp
+    onMouseUp,
+    onMouseHover,
+    onMouseLeave
   })
   return <entity {...commonProps} uiDropdown={dropdownProps} />
 }

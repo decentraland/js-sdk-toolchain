@@ -23,13 +23,15 @@ export { scaleFontSize } from './utils'
 
 /* @__PURE__ */
 export function Label(props: EntityPropTypes & UiLabelProps) {
-  const { uiTransform, uiBackground, onMouseDown, onMouseUp, ...uiTextProps } = props
+  const { uiTransform, uiBackground, onMouseDown, onMouseUp, onMouseHover, onMouseLeave, ...uiTextProps } = props
 
   const commonProps = parseProps({
     uiTransform,
     uiBackground,
     onMouseDown,
-    onMouseUp
+    onMouseUp,
+    onMouseHover,
+    onMouseLeave
   })
   const { font, textAlign, fontSize, textWrap, ...textProps } = uiTextProps
   const uiText: PBUiText = {
