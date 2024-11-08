@@ -35,7 +35,7 @@ function getButtonProps(props: UiButtonProps) {
  */
 /* @__PURE__ */
 export function Button(props: UiButtonProps) {
-  const { uiTransform, uiBackground, onMouseDown, onMouseUp, onMouseHover, onMouseLeave, ...otherProps } = props
+  const { uiTransform, uiBackground, onMouseDown, onMouseUp, onMouseEnter, onMouseLeave, ...otherProps } = props
   const buttonProps = getButtonProps(props)
   const uiBackgroundProps = parseUiBackground({
     ...buttonProps.uiBackground,
@@ -64,7 +64,7 @@ export function Button(props: UiButtonProps) {
     <entity
       onMouseDown={!!props.disabled ? undefined : onMouseDown}
       onMouseUp={!!props.disabled ? undefined : onMouseUp}
-      onMouseHover={!!props.disabled ? undefined : onMouseHover}
+      onMouseEnter={!!props.disabled ? undefined : onMouseEnter}
       onMouseLeave={!!props.disabled ? undefined : onMouseLeave}
       uiTransform={uiTransformProps}
       uiText={textProps}

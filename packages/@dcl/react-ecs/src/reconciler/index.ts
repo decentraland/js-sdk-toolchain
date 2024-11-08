@@ -29,7 +29,7 @@ function getPointerEnum(pointerKey: keyof Listeners): PointerEventType {
   const pointers: { [key in keyof Required<Listeners>]: PointerEventType } = {
     onMouseDown: PointerEventType.PET_DOWN,
     onMouseUp: PointerEventType.PET_UP,
-    onMouseHover: PointerEventType.PET_HOVER_ENTER,
+    onMouseEnter: PointerEventType.PET_HOVER_ENTER,
     onMouseLeave: PointerEventType.PET_HOVER_LEAVE
   }
   return pointers[pointerKey]
@@ -94,7 +94,7 @@ export function createReconciler(
 
   function upsertListener(
     instance: Instance,
-    update: Changes<keyof Pick<Listeners, 'onMouseDown' | 'onMouseUp' | 'onMouseHover' | 'onMouseLeave'>>
+    update: Changes<keyof Pick<Listeners, 'onMouseDown' | 'onMouseUp' | 'onMouseEnter' | 'onMouseLeave'>>
   ) {
     if (update.type === 'delete' || !update.props) {
       clickEvents.get(instance.entity)?.delete(getPointerEnum(update.component))
@@ -102,7 +102,7 @@ export function createReconciler(
         pointerEvents.removeOnPointerDown(instance.entity)
       } else if (update.component === 'onMouseUp') {
         pointerEvents.removeOnPointerUp(instance.entity)
-      } else if (update.component === 'onMouseHover') {
+      } else if (update.component === 'onMouseEnter') {
         pointerEvents.removeOnPointerHoverEnter(instance.entity)
       } else if (update.component === 'onMouseLeave') {
         pointerEvents.removeOnPointerHoverLeave(instance.entity)
@@ -124,7 +124,7 @@ export function createReconciler(
           ? pointerEvents.onPointerDown
           : update.component === 'onMouseUp'
           ? pointerEvents.onPointerUp
-          : update.component === 'onMouseHover'
+          : update.component === 'onMouseEnter'
           ? pointerEvents.onPointerHoverEnter
           : update.component === 'onMouseLeave'
           ? pointerEvents.onPointerHoverLeave

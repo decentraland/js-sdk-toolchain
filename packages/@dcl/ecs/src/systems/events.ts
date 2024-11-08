@@ -259,9 +259,9 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     const [data, cb] = args
     const { entity, opts } = data
     const options = getDefaultOpts(opts)
-    removeEvent(entity, EventType.HoverEnter)
-    getEvent(entity).set(EventType.HoverEnter, { cb, opts: options })
-    setPointerEvent(entity, PointerEventType.PET_HOVER_ENTER, options)
+    removeEvent(entity, EventType.HoverLeave)
+    getEvent(entity).set(EventType.HoverLeave, { cb, opts: options })
+    setPointerEvent(entity, PointerEventType.PET_HOVER_LEAVE, options)
   }
 
   return {
