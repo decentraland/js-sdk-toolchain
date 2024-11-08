@@ -1141,7 +1141,7 @@ export type EntityComponents = {
     uiDropdown: PBUiDropdown;
     onMouseDown: Callback;
     onMouseUp: Callback;
-    onMouseHover: Callback;
+    onMouseEnter: Callback;
     onMouseLeave: Callback;
 };
 
@@ -1622,7 +1622,7 @@ export const Light: LastWriteWinElementSetComponentDefinition<PBLight>;
 export type Listeners = {
     onMouseDown?: Callback;
     onMouseUp?: Callback;
-    onMouseHover?: Callback;
+    onMouseEnter?: Callback;
     onMouseLeave?: Callback;
 };
 
