@@ -112,6 +112,9 @@ export interface BaseComponent<T> {
 export interface LastWriteWinElementSetComponentDefinition<T> extends BaseComponent<T> {
   readonly componentType: ComponentType.LastWriteWinElementSet
 
+  // @internal this is only for internal usage like extended functionality
+  readonly _data: Map<Entity, T>
+
   // <USER INTERFACE METHODS>
   /**
    * Get the readonly component of the entity (to mutate it, use getMutable instead),

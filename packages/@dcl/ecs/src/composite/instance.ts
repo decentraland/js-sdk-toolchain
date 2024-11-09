@@ -1,6 +1,6 @@
 import { componentDefinitionByName } from '../components'
 import { componentNumberFromName } from '../components/component-number'
-import { TransformType } from '../components/manual/Transform'
+import { TransformType } from '../components/manual/TransformSchema'
 import { Entity } from '../engine/entity'
 import { ComponentDefinition, IEngine, LastWriteWinElementSetComponentDefinition } from '../engine/types'
 import { Schemas } from '../schemas'

@@ -1,6 +1,6 @@
 import { Engine, Entity, components } from '../../../packages/@dcl/ecs/src'
 import { Quaternion, Vector3 } from '../../../packages/@dcl/sdk/src/math'
-import { TRANSFORM_LENGTH } from '../../../packages/@dcl/ecs/src/components/manual/Transform'
+import { TRANSFORM_LENGTH } from '../../../packages/@dcl/ecs/src/components/manual/TransformSchema'
 import { ReadWriteByteBuffer } from '../../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { testComponentSerialization } from './assertion'
 
@@ -118,5 +118,64 @@ describe('Transform component', () => {
       rotation: { x: 0, y: 0, z: 0, w: 1 },
       parent: 0
     })
+  })
+
+  it.only('should create a valid empty transform component if no value argument is passed in getOrCreate', () => {
+    const newEngine = Engine()
+    const Transform = components.Transform(newEngine)
+    const entity = newEngine.addEntity()
+
+    function createTransform(
+      parent: Entity | undefined,
+      position: Vector3,
+      scale: Vector3,
+      rotation: Quaternion
+    ): Entity {
+      const entity = newEngine.addEntity()
+
+      Transform.create(entity, {
+        position,
+        scale,
+        rotation,
+        parent
+      })
+      return entity
+    }
+
+    const firstEntity = createTransform(
+      undefined,
+      Vector3.create(4, 1, 4),
+      Vector3.create(1, 1, 1),
+      Quaternion.create(0, 0, 0, 1)
+    )
+    const entityA = createTransform(
+      firstEntity,
+      Vector3.create(2, 0, 0),
+      Vector3.create(1, 1, 1),
+      Quaternion.create(0, 0, 0, 1)
+    )
+    const entityB = createTransform(
+      firstEntity,
+      Vector3.create(2, 0, 0),
+      Vector3.create(1, 1, 1),
+      Quaternion.fromEulerDegrees(0, 45, 0)
+    )
+    const entityA1 = createTransform(
+      entityA,
+      Vector3.create(2, 0, 0),
+      Vector3.create(1, 1, 1),
+      Quaternion.fromEulerDegrees(0, 45, 0)
+    )
+    const entityB1 = createTransform(
+      entityB,
+      Vector3.create(2, 0, 0),
+      Vector3.create(1, 1, 1),
+      Quaternion.fromEulerDegrees(0, 45, 0)
+    )
+
+    console.log(Transform.getMutable(entityB1).globalPosition)
+    for (const [entity, transform] of newEngine.getEntitiesWith(Transform)) {
+      console.log(transform.globalPosition)
+    }
   })
 })

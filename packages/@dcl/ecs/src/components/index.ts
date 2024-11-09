@@ -11,10 +11,10 @@ import defineNameComponent, { NameType } from './manual/Name'
 import defineSyncComponent, { ISyncComponentsType } from './manual/SyncComponents'
 import defineNetworkEntity, { INetowrkEntityType } from './manual/NetworkEntity'
 import defineNetworkParent, { INetowrkParentType } from './manual/NetworkParent'
-import { defineTransformComponent, TransformComponentExtended } from './manual/Transform'
 import { AudioStreamComponentDefinitionExtended, defineAudioStreamComponent } from './extended/AudioStream'
 import { MediaState } from './generated/pb/decentraland/sdk/components/common/media_state.gen'
 import { defineVirtualCameraComponent, VirtualCameraComponentDefinitionExtended } from './extended/VirtualCamera'
+import { defineTransformComponent, TransformComponentExtended } from './extended/Transform'
 
 export * from './generated/index.gen'
 

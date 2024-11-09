@@ -1828,6 +1828,11 @@ export namespace Move {
     export function encode(message: Move, writer?: _m0.Writer): _m0.Writer;
 }
 
+// @public (undocumented)
+export type MutableTransform = TransformType & {
+    globalPosition: Vector3Type;
+};
+
 // Warning: (ae-missing-release-tag) "Name" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -3631,6 +3636,11 @@ export type ReadOnlyLastWriteWinElementSetComponentDefinition<T> = Omit<LastWrit
 export type ReadonlyPrimitive = number | string | number[] | string[] | boolean | boolean[];
 
 // @public (undocumented)
+export type ReadonlyTransformType = DeepReadonly<TransformType> & {
+    globalPosition: Readonly<Vector3Type>;
+};
+
+// @public (undocumented)
 export const RealmInfo: LastWriteWinElementSetComponentDefinition<PBRealmInfo>;
 
 // @public (undocumented)
@@ -3994,9 +4004,19 @@ export type TransformComponent = LastWriteWinElementSetComponentDefinition<Trans
 // @public (undocumented)
 export interface TransformComponentExtended extends TransformComponent {
     // (undocumented)
-    create(entity: Entity, val?: TransformTypeWithOptionals): TransformType;
+    create(entity: Entity, val?: TransformTypeWithOptionals): MutableTransform;
     // (undocumented)
-    createOrReplace(entity: Entity, val?: TransformTypeWithOptionals): TransformType;
+    createOrReplace(entity: Entity, val?: TransformTypeWithOptionals): MutableTransform;
+    // (undocumented)
+    get(entity: Entity): ReadonlyTransformType;
+    // (undocumented)
+    getMutable(entity: Entity): MutableTransform;
+    // (undocumented)
+    getMutableOrNull(entity: Entity): MutableTransform | null;
+    // (undocumented)
+    getOrCreateMutable(entity: Entity, initialValue?: TransformTypeWithOptionals): MutableTransform;
+    // (undocumented)
+    getOrNull(entity: Entity): ReadonlyTransformType | null;
 }
 
 // @public (undocumented)

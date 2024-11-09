@@ -1,6 +1,6 @@
 import { CrdtMessageType, Entity, Schemas } from '../../packages/@dcl/ecs/src'
 import { ByteBuffer, ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import { TransformSchema } from '../../packages/@dcl/ecs/src/components/manual/Transform'
+import { TransformSchema } from '../../packages/@dcl/ecs/src/components/manual/TransformSchema'
 import { createValueSetComponentDefinitionFromSchema } from '../../packages/@dcl/ecs/src/engine/grow-only-value-set-component-definition'
 
 declare const globalThis: any

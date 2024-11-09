@@ -329,6 +329,7 @@ export function createComponentDefinitionFromSchema<T>(
       for (const cb of cbs) {
         cb(value)
       }
-    }
+    },
+    _data: data
   }
 }

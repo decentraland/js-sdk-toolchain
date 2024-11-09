@@ -10,7 +10,7 @@ import { INetowrkEntityType } from '../../../components/types'
 import { PutNetworkComponentOperation } from './putComponentNetwork'
 import { DeleteComponentNetwork } from './deleteComponentNetwork'
 import { DeleteEntityNetwork } from './deleteEntityNetwork'
-import { TransformSchema } from '../../../components/manual/Transform'
+import { TransformSchema } from '../../../components/manual/TransformSchema'
 
 /* istanbul ignore next */
 export function isNetworkMessage(message: ReceiveMessage): message is ReceiveNetworkMessage {
