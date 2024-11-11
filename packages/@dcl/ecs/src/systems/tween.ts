@@ -142,6 +142,9 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
     if (tween.mode?.$case === 'scale' && tween.mode.scale) {
       return { ...tween, mode: { ...tween.mode, scale: { start: tween.mode.scale.end, end: tween.mode.scale.start } } }
     }
+    if (tween.mode?.$case === 'textureMove' && tween.mode.textureMove) {
+      return { ...tween, mode: { ...tween.mode, textureMove: { start: tween.mode.textureMove.end, end: tween.mode.textureMove.start } } }
+    }
 
     /* istanbul ignore next */
     throw new Error('Invalid tween')
