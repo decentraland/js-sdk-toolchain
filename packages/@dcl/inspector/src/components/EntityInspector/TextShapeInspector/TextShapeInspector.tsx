@@ -31,23 +31,23 @@ export default withSdk<Props>(({ sdk, entity }) => {
         <ColorField label="Text Color" {...getInputProps('textColor')} />
       </Block>
       <Block label="Font Size">
-        <TextField type="number" {...getInputProps('fontSize')} />
+        <TextField autoSelect type="number" {...getInputProps('fontSize')} />
         <CheckboxField label="Font Auto-Size" {...getInputProps('fontAutoSize', (e) => e.target.checked)} />
       </Block>
       <Block label="Text Align">
         <Dropdown options={TEXT_ALIGN_MODES} {...getInputProps('textAlign')} />
       </Block>
       <Block label="Padding">
-        <TextField leftLabel="↑" type="number" {...getInputProps('paddingTop')} />
-        <TextField leftLabel="→" type="number" {...getInputProps('paddingRight')} />
-        <TextField leftLabel="↓" type="number" {...getInputProps('paddingBottom')} />
-        <TextField leftLabel="←" type="number" {...getInputProps('paddingLeft')} />
+        <TextField autoSelect leftLabel="↑" type="number" {...getInputProps('paddingTop')} />
+        <TextField autoSelect leftLabel="→" type="number" {...getInputProps('paddingRight')} />
+        <TextField autoSelect leftLabel="↓" type="number" {...getInputProps('paddingBottom')} />
+        <TextField autoSelect leftLabel="←" type="number" {...getInputProps('paddingLeft')} />
       </Block>
       <Block label="Line">
-        <TextField leftLabel="Spacing" type="number" {...getInputProps('lineSpacing')} />
+        <TextField autoSelect leftLabel="Spacing" type="number" {...getInputProps('lineSpacing')} />
       </Block>
       <Block>
-        <TextField label="Outline Width" type="number" {...getInputProps('outlineWidth')} />
+        <TextField autoSelect label="Outline Width" type="number" {...getInputProps('outlineWidth')} />
       </Block>
       <Block>
         <ColorField label="Outline color" {...getInputProps('outlineColor')} />

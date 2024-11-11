@@ -122,14 +122,14 @@ export default withSdk<Props>(({ sdk, entity }) => {
         />
       </Block>
       <Block label="Start">
-        <TextField leftLabel="X" type="number" {...getTweenInputProps('start.x')} />
-        <TextField leftLabel="Y" type="number" {...getTweenInputProps('start.y')} />
-        <TextField leftLabel="Z" type="number" {...getTweenInputProps('start.z')} />
+        <TextField autoSelect leftLabel="X" type="number" {...getTweenInputProps('start.x')} />
+        <TextField autoSelect leftLabel="Y" type="number" {...getTweenInputProps('start.y')} />
+        <TextField autoSelect leftLabel="Z" type="number" {...getTweenInputProps('start.z')} />
       </Block>
       <Block label="End">
-        <TextField leftLabel="X" type="number" {...getTweenInputProps('end.x')} />
-        <TextField leftLabel="Y" type="number" {...getTweenInputProps('end.y')} />
-        <TextField leftLabel="Z" type="number" {...getTweenInputProps('end.z')} />
+        <TextField autoSelect leftLabel="X" type="number" {...getTweenInputProps('end.x')} />
+        <TextField autoSelect leftLabel="Y" type="number" {...getTweenInputProps('end.y')} />
+        <TextField autoSelect leftLabel="Z" type="number" {...getTweenInputProps('end.z')} />
       </Block>
       <Block>
         <RangeField step={0.1} label="Duration" {...getTweenInputProps('duration')} />

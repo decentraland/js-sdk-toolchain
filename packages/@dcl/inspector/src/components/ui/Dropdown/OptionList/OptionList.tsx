@@ -115,6 +115,7 @@ const OptionList: React.FC<Props> = (props) => {
           rightIcon={<SearchIcon />}
           onChange={handleSearchChange}
           onClick={handleSearchClick}
+          autoSelect
         />
       ) : null}
       {filteredOptions.length > 0 ? (
