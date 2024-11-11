@@ -392,8 +392,8 @@ export function createGizmoManager(context: SceneContext) {
         const transform = getTransform()
         fixRotationGizmoAlignment(transform)
         fixPositionGizmoAlignment(transform)
-        events.emit('change')
       }
+      events.emit('change')
     },
     repositionGizmoOnCentroid() {
       restoreOriginalParents()
