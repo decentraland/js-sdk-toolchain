@@ -330,6 +330,7 @@ export function createComponentDefinitionFromSchema<T>(
         cb(value)
       }
     },
-    _data: data
+    __data: data,
+    __dirtyIterator: dirtyIterator
   }
 }

@@ -3636,7 +3636,7 @@ export type ReadOnlyLastWriteWinElementSetComponentDefinition<T> = Omit<LastWrit
 export type ReadonlyPrimitive = number | string | number[] | string[] | boolean | boolean[];
 
 // @public (undocumented)
-export type ReadonlyTransformType = DeepReadonly<TransformType> & {
+export type ReadonlyTransform = DeepReadonly<TransformType> & {
     globalPosition: Readonly<Vector3Type>;
 };
 
@@ -4008,7 +4008,7 @@ export interface TransformComponentExtended extends TransformComponent {
     // (undocumented)
     createOrReplace(entity: Entity, val?: TransformTypeWithOptionals): MutableTransform;
     // (undocumented)
-    get(entity: Entity): ReadonlyTransformType;
+    get(entity: Entity): ReadonlyTransform;
     // (undocumented)
     getMutable(entity: Entity): MutableTransform;
     // (undocumented)
@@ -4016,7 +4016,7 @@ export interface TransformComponentExtended extends TransformComponent {
     // (undocumented)
     getOrCreateMutable(entity: Entity, initialValue?: TransformTypeWithOptionals): MutableTransform;
     // (undocumented)
-    getOrNull(entity: Entity): ReadonlyTransformType | null;
+    getOrNull(entity: Entity): ReadonlyTransform | null;
 }
 
 // @public (undocumented)

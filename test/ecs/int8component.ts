@@ -96,7 +96,9 @@ export const int8Component = (engine: IEngine) => {
     onChange: () => {},
     __onChangeCallbacks() {
       return undefined
-    }
+    },
+    __data: data,
+    __dirtyIterator: new Set()
   }
 
   return engine.registerComponentDefinition(componentName, component) as Type

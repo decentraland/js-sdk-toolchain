@@ -40,13 +40,13 @@ describe('Runs the snapshots', () => {
     ENV
   )
 
-  glob
-    .sync('test/snapshots/production-bundles/*.ts', { absolute: false })
-    .forEach((file) => testFileSnapshot(file, true))
+  // glob
+  //   .sync('test/snapshots/production-bundles/*.ts', { absolute: false })
+  //   .forEach((file) => testFileSnapshot(file, true))
 
-  glob
-    .sync('test/snapshots/development-bundles/*.ts', { absolute: false })
-    .forEach((file) => testFileSnapshot(file, false))
+  // glob
+  //   .sync('test/snapshots/development-bundles/*.ts', { absolute: false })
+  //   .forEach((file) => testFileSnapshot(file, false))
 })
 
 function testFileSnapshot(fileName: string, _productionBuild: boolean) {

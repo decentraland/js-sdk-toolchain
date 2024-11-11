@@ -113,7 +113,10 @@ export interface LastWriteWinElementSetComponentDefinition<T> extends BaseCompon
   readonly componentType: ComponentType.LastWriteWinElementSet
 
   // @internal this is only for internal usage like extended functionality
-  readonly _data: Map<Entity, T>
+  readonly __data: Map<Entity, T>
+
+  // @internal this is only for internal usage like extended functionality
+  readonly __dirtyIterator: Set<Entity>
 
   // <USER INTERFACE METHODS>
   /**

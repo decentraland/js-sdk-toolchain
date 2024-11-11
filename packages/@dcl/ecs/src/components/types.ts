@@ -10,7 +10,7 @@ export type {
   TransformComponentExtended,
   TransformTypeWithOptionals,
   MutableTransform,
-  ReadonlyTransformType
+  ReadonlyTransform
 } from './extended/Transform'
 export type { NameComponent, NameType } from './manual/Name'
 export type { ISyncComponents, ISyncComponentsType } from './manual/SyncComponents'

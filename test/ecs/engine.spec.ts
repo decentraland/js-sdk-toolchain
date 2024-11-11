@@ -208,14 +208,23 @@ describe('Engine tests', () => {
     expect(a).toStrictEqual(b)
   })
 
-  it('should return mutable obj if use component.getMutable()', async () => {
+  describe('should return mutable obj if use component.getMutable()', () => {
     const engine = Engine()
     const entity = engine.addEntity() // 0
     const COMPONENT_ID = 'COMPONENT_ID'
     const Position = engine.defineComponent(COMPONENT_ID, PositionSchema)
     Position.create(entity, { x: 10 })
-    Position.getMutable(entity).x = 8888
-    expect(Position.get(entity)).toStrictEqual({ x: 8888 })
+    it('with just created entity', () => {
+      Position.getMutable(entity).x = 8888
+      expect(Position.get(entity)).toStrictEqual({ x: 8888 })
+    })
+
+    it('with unexistent entity ', () => {
+      const entityWithoutComponent = engine.addEntity()
+      expect(() => {
+        Position.getMutable(entityWithoutComponent).x = 8888
+      }).toThrow()
+    })
   })
 
   it('should destroy an entity', async () => {
