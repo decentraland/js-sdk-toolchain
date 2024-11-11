@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=453.4k bytes
+SCENE_COMPILED_JS_SIZE_PROD=459.1k bytes
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -11,8 +11,8 @@ EVAL test/snapshots/development-bundles/testing-fw.test.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   OPCODES ~= 63k
-  MALLOC_COUNT = 14193
-  ALIVE_OBJS_DELTA ~= 2.85k
+  MALLOC_COUNT = 14508
+  ALIVE_OBJS_DELTA ~= 2.92k
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=1 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
@@ -36,7 +36,7 @@ CALL onUpdate(0.1)
   LOG: ["Adding one to position.y=1"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=4 data={"position":{"x":2,"y":1,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
   OPCODES ~= 10k
-  MALLOC_COUNT = 51
+  MALLOC_COUNT = 52
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
   LOG: ["⏱️ yield"]
@@ -44,7 +44,7 @@ CALL onUpdate(0.1)
   Scene: DELETE_COMPONENT e=0x0 c=1 t=5 data=null
   Scene: DELETE_ENTITY e=0x200
   OPCODES ~= 8k
-  MALLOC_COUNT = -46
+  MALLOC_COUNT = -48
   ALIVE_OBJS_DELTA ~= -0.02k
 CALL onUpdate(0.1)
   LOG: ["⏱️ yield"]
@@ -52,7 +52,7 @@ CALL onUpdate(0.1)
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=7 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   OPCODES ~= 7k
-  MALLOC_COUNT = 32
+  MALLOC_COUNT = 33
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
   LOG: ["✅ RootEntity has the correct position"]
@@ -62,6 +62,6 @@ CALL onUpdate(0.1)
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=8 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   OPCODES ~= 5k
-  MALLOC_COUNT = -40
+  MALLOC_COUNT = -41
   ALIVE_OBJS_DELTA ~= -0.01k
-  MEMORY_USAGE_COUNT ~= 1202.54k bytes
+  MEMORY_USAGE_COUNT ~= 1222.97k bytes
