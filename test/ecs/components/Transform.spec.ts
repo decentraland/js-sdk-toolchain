@@ -202,6 +202,10 @@ describe('Transform component', () => {
     expect(tree.entityC.globalPosition).toEqual(Vector3.create(1, 1, 1))
     expect(tree.entityD.globalPosition).toEqual(Vector3.create(0, 0, 0))
     expect(tree.entityD.position).toEqual(Vector3.create(-1, -1, -1))
+
+    tree.entityC.parent = undefined
+    tree.entityC.globalPosition = Vector3.Forward()
+    expect(tree.entityC.position).toEqual(Vector3.create(0, 0, 1))
   })
 
   it('should set a recursive (1,1,1) affecting globalPosition', () => {

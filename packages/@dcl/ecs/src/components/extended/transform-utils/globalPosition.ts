@@ -95,7 +95,7 @@ export function getGlobalPositionHelper(transformDef: LastWriteWinElementSetComp
           // TODO: should we throw an error instead?
           return
         }
-        this.position = getLocalPosition(this, value)
+        this.position = newPosition
       },
       enumerable: false
     },
