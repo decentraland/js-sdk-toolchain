@@ -74,6 +74,8 @@ const Shortcuts: React.FC<Props> = ({ canvas, onResetCamera, onZoomIn, onZoomOut
                 <span className="Key">A</span>
                 <span className="Key">S</span>
                 <span className="Key">D</span>
+                <span className="Key">Q</span>
+                <span className="Key">E</span>
               </div>
             </div>
             <div className="Item">
