@@ -145,12 +145,16 @@ export class CameraManager {
     camera.keysUp = [Keys.KEY_W, Keys.KEY_UP]
     camera.keysLeft = [Keys.KEY_A, Keys.KEY_LEFT]
     camera.keysRight = [Keys.KEY_D, Keys.KEY_RIGHT]
+    camera.keysDownward = [Keys.KEY_Q]
+    camera.keysUpward = [Keys.KEY_E]
 
     function isCameraMoving(): boolean {
       for (const key of camera.keysDown) if (keyState[key]) return true
       for (const key of camera.keysUp) if (keyState[key]) return true
       for (const key of camera.keysLeft) if (keyState[key]) return true
       for (const key of camera.keysRight) if (keyState[key]) return true
+      for (const key of camera.keysDownward) if (keyState[key]) return true
+      for (const key of camera.keysUpward) if (keyState[key]) return true
       return false
     }
 
