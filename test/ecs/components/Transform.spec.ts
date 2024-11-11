@@ -182,13 +182,26 @@ describe('Transform component', () => {
     const newEngine = Engine()
     const tree = createTree(newEngine)
     tree.entityD.globalPosition = Vector3.One()
-    tree.entityC.parent = undefined
     expect(tree.treeRoot.globalPosition).toEqual(Vector3.Zero())
     expect(tree.entityA.globalPosition).toEqual(Vector3.Zero())
     expect(tree.entityB.globalPosition).toEqual(Vector3.Zero())
     expect(tree.entityC.globalPosition).toEqual(Vector3.Zero())
     expect(tree.entityD.globalPosition).toEqual(Vector3.One())
     expect(tree.entityD.position).toEqual(Vector3.One())
+  })
+
+  it('should set/get globalPosition with undefined parents', () => {
+    const newEngine = Engine()
+    const tree = createTree(newEngine, Vector3.One())
+    tree.treeRoot.parent = undefined
+    tree.entityC.parent = undefined
+    tree.entityD.globalPosition = Vector3.Zero()
+    expect(tree.treeRoot.globalPosition).toEqual(Vector3.create(1, 1, 1))
+    expect(tree.entityA.globalPosition).toEqual(Vector3.create(2, 2, 2))
+    expect(tree.entityB.globalPosition).toEqual(Vector3.create(3, 3, 3))
+    expect(tree.entityC.globalPosition).toEqual(Vector3.create(1, 1, 1))
+    expect(tree.entityD.globalPosition).toEqual(Vector3.create(0, 0, 0))
+    expect(tree.entityD.position).toEqual(Vector3.create(-1, -1, -1))
   })
 
   it('should set a recursive (1,1,1) affecting globalPosition', () => {
