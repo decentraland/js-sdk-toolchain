@@ -35,10 +35,10 @@ export function defineInputModifierComponent(
 
   return {
     ...theComponent,
-    Mode: InputModifierHelper,
+    InputModifier: InputModifierHelper,
     addStandardModifier(entity: Entity, inputModifier: PBInputModifier_StandardInput) {
       theComponent.createOrReplace(entity, {
-        inputModifier: {
+        mode: {
           $case: 'standard',
           standard: inputModifier
         }
