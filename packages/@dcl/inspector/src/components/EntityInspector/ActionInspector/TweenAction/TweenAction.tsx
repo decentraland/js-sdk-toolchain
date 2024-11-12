@@ -156,6 +156,7 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
           error={isNaN(parseFloat(endPosition.x))}
           onChange={(e) => handleChangeEndPosition(e, 'x')}
           onBlur={(e) => handleBlurEndPosition(e, 'x')}
+          autoSelect
         />
         <TextField
           leftLabel="Y"
@@ -164,6 +165,7 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
           error={isNaN(parseFloat(endPosition.y))}
           onChange={(e) => handleChangeEndPosition(e, 'y')}
           onBlur={(e) => handleBlurEndPosition(e, 'y')}
+          autoSelect
         />
         <TextField
           leftLabel="Z"
@@ -172,6 +174,7 @@ const TweenAction: React.FC<Props> = ({ tween: tweenProp, onUpdateTween }: Props
           error={isNaN(parseFloat(endPosition.z))}
           onChange={(e) => handleChangeEndPosition(e, 'z')}
           onBlur={(e) => handleBlurEndPosition(e, 'z')}
+          autoSelect
         />
       </Block>
       <div className="row">

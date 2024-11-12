@@ -84,7 +84,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
       {states.map(($, idx) => (
         <React.Fragment key={idx}>
           <Block label="Clip">
-            <TextField type="text" disabled value={$.clip} />
+            <TextField autoSelect type="text" disabled value={$.clip} />
           </Block>
           <Block label="Playing">
             <CheckboxField

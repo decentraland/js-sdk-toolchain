@@ -45,12 +45,14 @@ const TeleportPlayerAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
           type="number"
           value={payload.x}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeX(e)}
+          autoSelect
         />
         <TextField
           leftLabel="Y"
           type="number"
           value={payload.y}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeY(e)}
+          autoSelect
         />
       </Block>
     </div>

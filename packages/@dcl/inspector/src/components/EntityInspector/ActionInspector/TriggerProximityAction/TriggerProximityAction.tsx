@@ -49,12 +49,14 @@ const TriggerProximityAction: React.FC<Props> = ({ value, onUpdate }: Props) => 
           type="number"
           value={payload.radius}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeRadius(e)}
+          autoSelect
         />
         <TextField
           label="Hits"
           type="number"
           value={payload.hits || 1}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeHits(e)}
+          autoSelect
         />
         <Dropdown
           label="Layer"

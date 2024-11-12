@@ -28,8 +28,8 @@ export default withSdk<Props>(({ sdk, entity }) => {
       case MeshType.MT_CYLINDER: {
         return (
           <Block label="Radius">
-            <TextField leftLabel="Top" type="number" {...getInputProps('radiusTop')} />
-            <TextField leftLabel="Bottom" type="number" {...getInputProps('radiusBottom')} />
+            <TextField autoSelect leftLabel="Top" type="number" {...getInputProps('radiusTop')} />
+            <TextField autoSelect leftLabel="Bottom" type="number" {...getInputProps('radiusBottom')} />
           </Block>
         )
       }
