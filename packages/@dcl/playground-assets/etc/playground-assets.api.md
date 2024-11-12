@@ -3941,6 +3941,8 @@ export interface TextureMove {
     end: PBVector2 | undefined;
     // (undocumented)
     start: PBVector2 | undefined;
+    textureMovement?: TextureMovement | undefined;
+    textureToMove?: TextureToMove | undefined;
 }
 
 // @public (undocumented)
@@ -3949,6 +3951,26 @@ export namespace TextureMove {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): TextureMove;
     // (undocumented)
     export function encode(message: TextureMove, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export const enum TextureMovement {
+    TM_OFFSET = 0,
+    // (undocumented)
+    TM_OFFSET_AND_TILING = 3,
+    // (undocumented)
+    TM_TILING = 1
+}
+
+// @public (undocumented)
+export const enum TextureToMove {
+    TTM_ALBEDO = 0,
+    // (undocumented)
+    TTM_ALPHA = 1,
+    // (undocumented)
+    TTM_BUMP = 3,
+    // (undocumented)
+    TTM_EMISSIVE = 2
 }
 
 // @public (undocumented)
