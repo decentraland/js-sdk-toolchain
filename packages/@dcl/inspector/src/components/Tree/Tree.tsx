@@ -152,10 +152,10 @@ export function Tree<T>() {
       const quitInsertMode = () => setInsertMode(false)
 
       const handleSelect = (event: React.MouseEvent) => {
-        if (event.type === ClickType.CONTEXT_MENU && (event.ctrlKey || event.shiftKey)) {
+        if (event.type === ClickType.CONTEXT_MENU && event.ctrlKey) {
           onSelect(value, true)
         } else if (event.type === ClickType.CLICK) {
-          onSelect(value)
+          onSelect(value, event.shiftKey)
           if (event.detail > 1 && onDoubleSelect) onDoubleSelect(value)
         }
       }
