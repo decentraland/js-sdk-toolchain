@@ -1,10 +1,10 @@
 import { IEngine, LastWriteWinElementSetComponentDefinition, Entity } from '../../engine'
-import { InputModifier } from '../generated/index.gen'
-import {
-  PBInputModifier_StandardInput,
-  PBInputModifier
-} from '../generated/pb/decentraland/sdk/components/input_modifier.gen'
+import { InputModifier, PBInputModifier_StandardInput, PBInputModifier } from '../generated/index.gen'
+import {} from '../generated/InputModifier.gen'
 
+/**
+ * @public
+ */
 export interface InputModifierHelper {
   /**
    * @returns a input modifier mode
@@ -12,17 +12,29 @@ export interface InputModifierHelper {
   Standard: (standard: PBInputModifier_StandardInput) => PBInputModifier['mode']
 }
 
+/**
+ * @public
+ */
 export interface InputModifierComponentDefinitionExtended
   extends LastWriteWinElementSetComponentDefinition<PBInputModifier> {
+  /**
+   *
+   */
   InputModifier: InputModifierHelper
 
+  /**
+   *
+   * @param entity
+   * @param inputModifier
+   * @returns
+   */
   addStandardModifier: (entity: Entity, inputModifier: PBInputModifier_StandardInput) => void
 }
 
 const InputModifierHelper: InputModifierHelper = {
-  Standard(standard) {
+  Standard(standard: PBInputModifier_StandardInput) {
     return {
-      $case: 'standard' as const,
+      $case: 'standard',
       standard
     }
   }
