@@ -2889,6 +2889,9 @@ export interface PBTween {
     } | {
         $case: "scale";
         scale: Scale;
+    } | {
+        $case: "textureMove";
+        textureMove: TextureMove;
     } | undefined;
     playing?: boolean | undefined;
 }
@@ -3891,8 +3894,10 @@ export const TextShape: LastWriteWinElementSetComponentDefinition<PBTextShape>;
 // @public (undocumented)
 export interface Texture {
     filterMode?: TextureFilterMode | undefined;
+    offset?: PBVector2 | undefined;
     // (undocumented)
     src: string;
+    tiling?: PBVector2 | undefined;
     wrapMode?: TextureWrapMode | undefined;
 }
 
@@ -3929,6 +3934,22 @@ export interface TextureHelper {
 
 // @public
 export type TextureMode = 'nine-slices' | 'center' | 'stretch';
+
+// @public (undocumented)
+export interface TextureMove {
+    // (undocumented)
+    end: PBVector2 | undefined;
+    // (undocumented)
+    start: PBVector2 | undefined;
+}
+
+// @public (undocumented)
+export namespace TextureMove {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): TextureMove;
+    // (undocumented)
+    export function encode(message: TextureMove, writer?: _m0.Writer): _m0.Writer;
+}
 
 // @public (undocumented)
 export interface TextureUnion {
