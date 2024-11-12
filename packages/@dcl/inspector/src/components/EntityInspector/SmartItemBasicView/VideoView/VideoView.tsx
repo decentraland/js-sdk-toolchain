@@ -80,7 +80,7 @@ export default React.memo(
     return (
       <div className={cx({ hover: isHover })}>
         <Block label={<>Path/URL {renderUrlInfo()}</>} ref={drop}>
-          <TextField type="text" {...getInputProps('src')} error={files && !isValid} drop={isHover} />
+          <TextField autoSelect type="text" {...getInputProps('src')} error={files && !isValid} drop={isHover} />
         </Block>
         <Block label="Playback">
           <CheckboxField label="Start playing" checked={!!playing.value} {...playing} />

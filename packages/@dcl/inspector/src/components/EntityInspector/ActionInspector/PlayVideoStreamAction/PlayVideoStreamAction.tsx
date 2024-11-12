@@ -120,7 +120,7 @@ const PlayVideoStreamAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
       {!payload.dclCast ? (
         <>
           <Block>
-            <TextField label={<>URL {renderUrlInfo()}</>} value={payload.src} onChange={handleChangeSrc} />
+            <TextField label={<>URL {renderUrlInfo()}</>} value={payload.src} onChange={handleChangeSrc} autoSelect />
           </Block>
           <Block>
             <Dropdown

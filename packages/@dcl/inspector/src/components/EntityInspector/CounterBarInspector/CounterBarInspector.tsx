@@ -41,7 +41,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
       }
       onRemoveContainer={handleRemove}
     >
-      <TextField label="Max Value" type="number" {...getInputProps('maxValue')} />
+      <TextField autoSelect label="Max Value" type="number" {...getInputProps('maxValue')} />
       <Block>
         <ColorField label="Primary Color" {...getInputProps('primaryColor')} />
       </Block>

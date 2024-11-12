@@ -41,7 +41,7 @@ const PlayAudioStreamAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
   return (
     <div className="PlayAudioStreamActionContainer">
       <Block>
-        <TextField label="URL" value={payload.url} onChange={handleChangeUrl} />
+        <TextField label="URL" value={payload.url} onChange={handleChangeUrl} autoSelect />
       </Block>
       <Block>
         <RangeField

@@ -112,6 +112,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
                 value={state}
                 error={isRepeated(state, input.value) || !state.trim()}
                 onChange={handleChange(index)}
+                autoSelect
               />
               <MoreOptionsMenu>
                 <Button onClick={handleRemove(state)}>Remove State</Button>
