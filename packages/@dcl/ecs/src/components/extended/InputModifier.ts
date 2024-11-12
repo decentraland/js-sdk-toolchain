@@ -18,15 +18,14 @@ export interface InputModifierHelper {
 export interface InputModifierComponentDefinitionExtended
   extends LastWriteWinElementSetComponentDefinition<PBInputModifier> {
   /**
-   *
+   * InputModifier helper with constructor
    */
   InputModifier: InputModifierHelper
 
   /**
-   *
-   * @param entity
-   * @param inputModifier
-   * @returns
+   * Create or replace the component InputModifier in the entity specified
+   * @param entity - the entity to link the component
+   * @param inputModifier - the data for this input modifier
    */
   addStandardModifier: (entity: Entity, inputModifier: PBInputModifier_StandardInput) => void
 }
