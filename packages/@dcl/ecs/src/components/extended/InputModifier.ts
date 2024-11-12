@@ -1,4 +1,4 @@
-import { ReadOnlyLastWriteWinElementSetComponentDefinition, IEngine } from '../../engine'
+import { IEngine, LastWriteWinElementSetComponentDefinition, Entity } from '../../engine'
 import { InputModifier } from '../generated/index.gen'
 import {
   PBInputModifier_StandardInput,
@@ -13,8 +13,10 @@ export interface InputModifierHelper {
 }
 
 export interface InputModifierComponentDefinitionExtended
-  extends ReadOnlyLastWriteWinElementSetComponentDefinition<PBInputModifier> {
-  Mode: InputModifierHelper
+  extends LastWriteWinElementSetComponentDefinition<PBInputModifier> {
+  InputModifier: InputModifierHelper
+
+  addStandardModifier: (entity: Entity, inputModifier: PBInputModifier_StandardInput) => void
 }
 
 const InputModifierHelper: InputModifierHelper = {
@@ -33,6 +35,14 @@ export function defineInputModifierComponent(
 
   return {
     ...theComponent,
-    Mode: InputModifierHelper
+    Mode: InputModifierHelper,
+    addStandardModifier(entity: Entity, inputModifier: PBInputModifier_StandardInput) {
+      theComponent.createOrReplace(entity, {
+        inputModifier: {
+          $case: 'standard',
+          standard: inputModifier
+        }
+      })
+    }
   }
 }
