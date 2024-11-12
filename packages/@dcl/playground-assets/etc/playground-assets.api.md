@@ -3939,9 +3939,9 @@ export type TextureMode = 'nine-slices' | 'center' | 'stretch';
 export interface TextureMove {
     // (undocumented)
     end: PBVector2 | undefined;
+    movementType?: TextureMovementType | undefined;
     // (undocumented)
     start: PBVector2 | undefined;
-    textureMovement?: TextureMovement | undefined;
     textureToMove?: TextureToMove | undefined;
 }
 
@@ -3954,23 +3954,23 @@ export namespace TextureMove {
 }
 
 // @public (undocumented)
-export const enum TextureMovement {
-    TM_OFFSET = 0,
+export const enum TextureMovementType {
+    TMT_OFFSET = 0,
     // (undocumented)
-    TM_OFFSET_AND_TILING = 3,
+    TMT_OFFSET_AND_TILING = 3,
     // (undocumented)
-    TM_TILING = 1
+    TMT_TILING = 1
 }
 
 // @public (undocumented)
 export const enum TextureToMove {
-    TTM_ALBEDO = 0,
     // (undocumented)
     TTM_ALPHA = 1,
     // (undocumented)
     TTM_BUMP = 3,
     // (undocumented)
-    TTM_EMISSIVE = 2
+    TTM_EMISSIVE = 2,
+    TTM_TEXTURE = 0
 }
 
 // @public (undocumented)
