@@ -39,6 +39,7 @@ const OpenLinkAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
           label="URL"
           value={payload.url}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeEmote(e)}
+          autoSelect
         />
       </div>
     </div>

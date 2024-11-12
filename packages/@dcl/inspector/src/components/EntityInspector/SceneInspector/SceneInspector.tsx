@@ -186,6 +186,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
                 const newInput = { ...input, position: { ...input.position, x: value } }
                 modifySpawnPoint(index, toSceneSpawnPoint(spawnPoint.name, newInput))
               }}
+              autoSelect
             />
             <TextField
               leftLabel="Y"
@@ -199,6 +200,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
                 const newInput = { ...input, position: { ...input.position, y: value } }
                 modifySpawnPoint(index, toSceneSpawnPoint(spawnPoint.name, newInput))
               }}
+              autoSelect
             />
             <TextField
               leftLabel="Z"
@@ -212,6 +214,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
                 const newInput = { ...input, position: { ...input.position, z: value } }
                 modifySpawnPoint(index, toSceneSpawnPoint(spawnPoint.name, newInput))
               }}
+              autoSelect
             />
           </Block>
           <CheckboxField
@@ -240,6 +243,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
                 const newInput = { ...input, maxOffset: value }
                 modifySpawnPoint(index, toSceneSpawnPoint(spawnPoint.name, newInput))
               }}
+              autoSelect
             />
           ) : null}
           <Block label="Camera Target">
@@ -255,6 +259,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
                 const newInput = { ...input, cameraTarget: { ...input.cameraTarget, x: value } }
                 modifySpawnPoint(index, toSceneSpawnPoint(spawnPoint.name, newInput))
               }}
+              autoSelect
             />
             <TextField
               leftLabel="Y"
@@ -268,6 +273,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
                 const newInput = { ...input, cameraTarget: { ...input.cameraTarget, y: value } }
                 modifySpawnPoint(index, toSceneSpawnPoint(spawnPoint.name, newInput))
               }}
+              autoSelect
             />
             <TextField
               leftLabel="Z"
@@ -281,6 +287,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
                 const newInput = { ...input, cameraTarget: { ...input.cameraTarget, z: value } }
                 modifySpawnPoint(index, toSceneSpawnPoint(spawnPoint.name, newInput))
               }}
+              autoSelect
             />
           </Block>
         </Block>
@@ -366,7 +373,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
       </Tabs>
       {selectedSceneInspectorTab === SceneInspectorTab.DETAILS ? (
         <>
-          <TextField label="Name" {...nameProps} />
+          <TextField autoSelect label="Name" {...nameProps} />
           <TextArea label="Description" {...descriptionProps} />
           <span className="ThumbnailRow">
             <div className="thumbnail">{renderThumbnail()}</div>
@@ -392,8 +399,8 @@ export default withSdk<Props>(({ sdk, entity }) => {
               categoriesProps.onChange!(event)
             }}
           />
-          <TextField label="Author (optional)" {...authorProps} />
-          <TextField label="Email (optional)" {...emailProps} />
+          <TextField autoSelect label="Author (optional)" {...authorProps} />
+          <TextField autoSelect label="Email (optional)" {...emailProps} />
         </>
       ) : null}
 

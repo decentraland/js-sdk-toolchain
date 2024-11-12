@@ -64,7 +64,7 @@ const ShowTextAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
   return (
     <div className="ShowTextActionContainer">
       <Block>
-        <TextField label="Text" type="text" value={payload.text} onChange={handleChangeText} />
+        <TextField autoSelect label="Text" type="text" value={payload.text} onChange={handleChangeText} />
       </Block>
       <Block>
         <RangeField
@@ -78,7 +78,7 @@ const ShowTextAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
         <Dropdown placeholder="Select a Font" options={FONTS} value={payload.font} onChange={handleChangeFont} />
       </Block>
       <Block label="Font Size">
-        <TextField type="number" value={payload.fontSize} onChange={handleChangeFontSize} />
+        <TextField autoSelect type="number" value={payload.fontSize} onChange={handleChangeFontSize} />
       </Block>
       <Block label="Text Align">
         <Dropdown
