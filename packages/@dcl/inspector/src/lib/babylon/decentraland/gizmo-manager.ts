@@ -6,7 +6,8 @@ import {
   Node,
   Vector3,
   PointerDragBehavior,
-  AbstractMesh
+  AbstractMesh,
+  TransformNode
 } from '@babylonjs/core'
 import { Entity, TransformType } from '@dcl/ecs'
 import { Vector3 as DclVector3, Quaternion as DclQuaternion } from '@dcl/ecs-math'
@@ -16,6 +17,8 @@ import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manag
 import { SceneContext } from './SceneContext'
 import { PatchedGizmoManager } from './gizmo-patch'
 import { ROOT } from '../../sdk/tree'
+
+const GIZMO_DUMMY_NODE = 'GIZMO_DUMMY_NODE'
 
 interface GizmoAxis {
   xGizmo: IAxisDragGizmo
@@ -37,6 +40,19 @@ function areProportional(a: number, b: number) {
 // should be moved to ecs-math
 function areQuaternionsEqual(a: DclQuaternion, b: DclQuaternion) {
   return a.x === b.x && a.y === b.y && a.z === b.z && a.w === b.w
+}
+
+function calculateCenter(positions: Vector3[]): Vector3 {
+  if (positions.length === 0) throw new Error('No positions provided to calculate center')
+
+  const sum = positions.reduce((acc, pos) => {
+    acc.x += pos.x
+    acc.y += pos.y
+    acc.z += pos.z
+    return acc
+  }, new Vector3(0, 0, 0))
+
+  return sum.scale(1 / positions.length)
 }
 
 export function createGizmoManager(context: SceneContext) {
@@ -180,6 +196,53 @@ export function createGizmoManager(context: SceneContext) {
     }
   }
 
+  // Map to store the original parent of each entity
+  const originalParents = new Map<Entity, TransformNode | null>()
+
+  // Check if a transform node for the gizmo already exists, or create one
+  function getDummyNode(): TransformNode {
+    let dummyNode = context.scene.getTransformNodeByName(GIZMO_DUMMY_NODE) as TransformNode
+    if (!dummyNode) dummyNode = new TransformNode(GIZMO_DUMMY_NODE, context.scene) as TransformNode
+    return dummyNode
+  }
+
+  function repositionGizmoOnCentroid() {
+    const selectedEntities = getSelectedEntities().map((entityId) => context.getEntityOrNull(entityId)!)
+    const positions = selectedEntities.map((entity) => {
+      const { x, y, z } = getTransform(entity).position
+      return new Vector3(x, y, z)
+    })
+    const centroidPosition = calculateCenter(positions)
+    const dummyNode = getDummyNode()
+
+    // Set the dummy node position on centroid. This should be the first thing to do on the dummy node
+    // so everything aligns to the right position afterwards.
+    dummyNode.position = centroidPosition
+
+    // Store the original parents and set the dummy node as parent for each selected entity
+    selectedEntities.forEach((entity) => {
+      const parent = entity.parent as TransformNode | null
+      originalParents.set(entity.entityId, parent)
+      entity.setParent(dummyNode)
+    })
+
+    // Attach the gizmo to the dummy node
+    gizmoManager.attachToNode(dummyNode)
+  }
+
+  function restoreOriginalParents() {
+    originalParents.forEach((parent, entity) => {
+      const ecsEntity = context.getEntityOrNull(entity)!
+      ecsEntity.setParent(parent)
+    })
+
+    // Clear the stored parents as they're now restored
+    originalParents.clear()
+
+    // Detach the gizmo from the dummy node if needed
+    gizmoManager.attachToNode(null)
+  }
+
   gizmoManager.gizmos.scaleGizmo?.onDragStartObservable.add(initTransform)
   gizmoManager.gizmos.positionGizmo?.onDragStartObservable.add(initTransform)
   gizmoManager.gizmos.rotationGizmo?.onDragStartObservable.add(initTransform)
@@ -309,24 +372,32 @@ export function createGizmoManager(context: SceneContext) {
       return isEnabled
     },
     setEnabled,
-    setEntity(entity: EcsEntity | null) {
+    setEntity(entity: EcsEntity | null): void {
       if (
         entity === lastEntity ||
         !isEnabled ||
-        areMultipleEntitiesSelected() ||
         entity?.isHidden() ||
         entity?.isLocked() ||
         entity?.getRoot() !== ROOT
       ) {
         return
       }
-      gizmoManager.attachToNode(entity)
-      lastEntity = entity
-      // fix gizmo rotation/position if necessary
-      const transform = getTransform()
-      fixRotationGizmoAlignment(transform)
-      fixPositionGizmoAlignment(transform)
+      restoreOriginalParents()
+      if (areMultipleEntitiesSelected()) {
+        return repositionGizmoOnCentroid()
+      } else {
+        gizmoManager.attachToNode(entity)
+        lastEntity = entity
+        // fix gizmo rotation/position if necessary
+        const transform = getTransform()
+        fixRotationGizmoAlignment(transform)
+        fixPositionGizmoAlignment(transform)
+      }
       events.emit('change')
+    },
+    repositionGizmoOnCentroid() {
+      restoreOriginalParents()
+      return repositionGizmoOnCentroid()
     },
     getEntity() {
       return lastEntity

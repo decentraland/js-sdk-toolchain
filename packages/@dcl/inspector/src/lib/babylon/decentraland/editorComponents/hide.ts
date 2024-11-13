@@ -1,6 +1,6 @@
 import { ComponentType } from '@dcl/ecs'
 import type { ComponentOperation } from '../component-operations'
-import { updateGizmoManager } from './selection'
+import { setGizmoManager, unsetGizmoManager } from './selection'
 
 export const putHideComponent: ComponentOperation = (entity, component) => {
   const container = entity.gltfContainer ?? entity.meshRenderer
@@ -11,10 +11,10 @@ export const putHideComponent: ComponentOperation = (entity, component) => {
     const { value: isHidden } = (component.getOrNull(entity.entityId) as { value: boolean } | null) ?? {}
     container.setEnabled(!isHidden)
     if (isHidden) {
-      context.gizmos.unsetEntity()
+      unsetGizmoManager(entity)
     } else {
       const selectionValue = context.editorComponents.Selection.getOrNull(entity.entityId)
-      updateGizmoManager(entity, selectionValue)
+      if (selectionValue) setGizmoManager(entity, selectionValue)
     }
   }
 }
