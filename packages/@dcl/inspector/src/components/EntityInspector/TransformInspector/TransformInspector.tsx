@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-import { isValidNumericInput, useComponentInput } from '../../../hooks/sdk/useComponentInput'
+import { isValidNumericInput, useComponentInput, useComponentInput2 } from '../../../hooks/sdk/useComponentInput'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { withSdk } from '../../../hoc/withSdk'
 
@@ -20,8 +20,8 @@ export default withSdk<Props>(({ sdk, entities }) => {
   const hasTransform = useHasComponent(entity, Transform)
   const transform = Transform.getOrNull(entity) ?? undefined
   const config = TransformConfig.getOrNull(entity) ?? undefined
-  const { getInputProps } = useComponentInput(
-    entity,
+  const { getInputProps } = useComponentInput2(
+    entities,
     Transform,
     fromTransform,
     toTransform(transform, config),

@@ -176,10 +176,9 @@ const SingleEntityInspector = withSdk<{ entity: Entity | null }>(({ sdk, entity 
             )
           )}
         </>
-        ) : null}
-      </div>
-    )
-  }
-)
+      ) : null}
+    </div>
+  )
+})
 
 export default EntityInspector
