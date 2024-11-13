@@ -28,12 +28,7 @@ export const useComponentValue = <ComponentValueType>(entity: Entity, component:
 
   // sync state -> engine
   useEffect(() => {
-    if (value === null) return
-    const isEqualValue = !recursiveCheck(getComponentValue(entity, component), value, 2)
-
-    if (isEqualValue) {
-      return
-    }
+    if (value === null || isComponentEqual(value)) return
     if (isLastWriteWinComponent(component) && sdk) {
       sdk.operations.updateValue(component, entity, value!)
       void sdk.operations.dispatch()
@@ -48,7 +43,7 @@ export const useComponentValue = <ComponentValueType>(entity: Entity, component:
     (event) => {
       if (entity === event.entity && component.componentId === event.component?.componentId && !!event.value) {
         if (event.operation === CrdtMessageType.PUT_COMPONENT) {
-          // TODO: This setValue is generating a isEqual comparission.
+          // TODO: This setValue is generating an isEqual comparission in previous effect.
           // Maybe we have to use two pure functions instead of an effect.
           // Same happens with the input & componentValue.
           setValue(event.value)

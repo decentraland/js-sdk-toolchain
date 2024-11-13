@@ -70,10 +70,8 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
     if (skipSyncRef.current) return
     if (validate(input)) {
       const newComponentValue = { ...componentValue, ...fromInputToComponentValue(input) }
+      if (isEqual(newComponentValue)) return
 
-      if (isEqual(newComponentValue)) {
-        return
-      }
       setComponentValue(newComponentValue)
     }
   }, [input])

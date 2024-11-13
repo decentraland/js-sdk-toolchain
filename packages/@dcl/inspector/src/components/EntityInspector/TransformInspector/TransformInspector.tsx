@@ -13,8 +13,9 @@ import { Link, Props as LinkProps } from './Link'
 
 import './TransformInspector.css'
 
-export default withSdk<Props>(({ sdk, entity }) => {
+export default withSdk<Props>(({ sdk, entities }) => {
   const { Transform, TransformConfig } = sdk.components
+  const entity = entities.find((entity) => Transform.has(entity)) || entities[0]
 
   const hasTransform = useHasComponent(entity, Transform)
   const transform = Transform.getOrNull(entity) ?? undefined
