@@ -3942,7 +3942,6 @@ export interface TextureMove {
     movementType?: TextureMovementType | undefined;
     // (undocumented)
     start: PBVector2 | undefined;
-    textureToMove?: TextureToMove | undefined;
 }
 
 // @public (undocumented)
@@ -3957,20 +3956,7 @@ export namespace TextureMove {
 export const enum TextureMovementType {
     TMT_OFFSET = 0,
     // (undocumented)
-    TMT_OFFSET_AND_TILING = 3,
-    // (undocumented)
     TMT_TILING = 1
-}
-
-// @public (undocumented)
-export const enum TextureToMove {
-    // (undocumented)
-    TTM_ALPHA = 1,
-    // (undocumented)
-    TTM_BUMP = 3,
-    // (undocumented)
-    TTM_EMISSIVE = 2,
-    TTM_TEXTURE = 0
 }
 
 // @public (undocumented)
