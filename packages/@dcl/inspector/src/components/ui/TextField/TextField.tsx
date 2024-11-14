@@ -123,7 +123,7 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
         <input
           className="input"
           ref={ref}
-          type={type}
+          type={inputValue === '--' ? 'text' : type}
           value={inputValue}
           onChange={handleInputChange}
           onFocus={handleInputFocus}

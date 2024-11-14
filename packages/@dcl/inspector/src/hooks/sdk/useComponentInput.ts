@@ -123,8 +123,8 @@ export const useComponentInput = <ComponentValueType extends object, InputType e
 // Helper function to recursively merge values
 const mergeValues = (values: any[]): any => {
   // Base case - if any value is not an object, compare directly
-  if (!values.every(val => val && typeof val === 'object')) {
-    return values.every(val => val === values[0]) ? values[0] : '--' // symbol?
+  if (!values.every((val) => val && typeof val === 'object')) {
+    return values.every((val) => val === values[0]) ? values[0] : '--'
   }
 
   // Get all keys from all objects
@@ -135,7 +135,7 @@ const mergeValues = (values: any[]): any => {
 
   // For each key, recursively merge values
   for (const key of allKeys) {
-    const valuesForKey = values.map(obj => obj[key])
+    const valuesForKey = values.map((obj) => obj[key])
     result[key] = mergeValues(valuesForKey)
   }
 
@@ -157,14 +157,17 @@ const mergeComponentValues = <ComponentValueType extends object, InputType exten
 
   // For each key in first input
   for (const key in firstInput) {
-    const valuesForKey = inputs.map(input => input[key])
+    const valuesForKey = inputs.map((input) => input[key])
     result[key] = mergeValues(valuesForKey)
   }
 
   return result
 }
 
-const getEntityAndComponentValue = <ComponentValueType extends object>(entities: Entity[], component: Component<ComponentValueType>): [Entity, ComponentValueType][] => {
+const getEntityAndComponentValue = <ComponentValueType extends object>(
+  entities: Entity[],
+  component: Component<ComponentValueType>
+): [Entity, ComponentValueType][] => {
   return entities.map((entity) => [entity, getComponentValue(entity, component) as ComponentValueType])
 }
 
@@ -173,7 +176,7 @@ export const useMultiComponentInput = <ComponentValueType extends object, InputT
   component: Component<ComponentValueType>,
   fromComponentValueToInput: (componentValue: ComponentValueType) => InputType,
   fromInputToComponentValue: (input: InputType) => ComponentValueType,
-  validateInput: (input: InputType) => boolean = () => true,
+  validateInput: (input: InputType) => boolean = () => true
 ) => {
   // If there's only one entity, use the single entity version just to be safe for now
   if (entities.length === 1) {
@@ -189,11 +192,12 @@ export const useMultiComponentInput = <ComponentValueType extends object, InputT
 
   // Get initial merged value from all entities
   const initialEntityValues = getEntityAndComponentValue(entities, component)
-  const initialMergedValue = useMemo(() =>
-    mergeComponentValues(
-      initialEntityValues.map(([_, component]) => component),
-      fromComponentValueToInput
-    ),
+  const initialMergedValue = useMemo(
+    () =>
+      mergeComponentValues(
+        initialEntityValues.map(([_, component]) => component),
+        fromComponentValueToInput
+      ),
     [] // only compute on mount
   )
 
@@ -204,41 +208,41 @@ export const useMultiComponentInput = <ComponentValueType extends object, InputT
   // Handle input updates
   const handleUpdate = useCallback(
     (path: NestedKey<InputType>, getter: (event: React.ChangeEvent<HTMLInputElement>) => any = (e) => e.target.value) =>
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (!value) return
+      (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (!value) return
 
-      const newValue = setValue(value, path, getter(event))
-      if (!hasDiff(value, newValue, 2)) return
+        const newValue = setValue(value, path, getter(event))
+        if (!hasDiff(value, newValue, 2)) return
 
-      // Only update if component is last-write-win and SDK exists
-      if (!isLastWriteWinComponent(component) || !sdk) {
-        setMergeValue(newValue)
-        return
-      }
-
-      // Validate and update all entities
-      const entityUpdates = getEntityAndComponentValue(entities, component).map(([entity, componentValue]) => {
-        const updatedInput = setValue(fromComponentValueToInput(componentValue as any), path, getter(event))
-        const newComponentValue = fromInputToComponentValue(updatedInput)
-        return {
-          entity,
-          value: newComponentValue,
-          isValid: validateInput(updatedInput)
+        // Only update if component is last-write-win and SDK exists
+        if (!isLastWriteWinComponent(component) || !sdk) {
+          setMergeValue(newValue)
+          return
         }
-      })
 
-      const allUpdatesValid = entityUpdates.every(({ isValid }) => isValid)
-
-      if (allUpdatesValid) {
-        entityUpdates.forEach(({ entity, value }) => {
-          sdk.operations.updateValue(component, entity, value)
+        // Validate and update all entities
+        const entityUpdates = getEntityAndComponentValue(entities, component).map(([entity, componentValue]) => {
+          const updatedInput = setValue(fromComponentValueToInput(componentValue as any), path, getter(event))
+          const newComponentValue = fromInputToComponentValue(updatedInput)
+          return {
+            entity,
+            value: newComponentValue,
+            isValid: validateInput(updatedInput)
+          }
         })
-        void sdk.operations.dispatch()
-      }
 
-      setMergeValue(newValue)
-      setIsValid(allUpdatesValid)
-    },
+        const allUpdatesValid = entityUpdates.every(({ isValid }) => isValid)
+
+        if (allUpdatesValid) {
+          entityUpdates.forEach(({ entity, value }) => {
+            sdk.operations.updateValue(component, entity, value)
+          })
+          void sdk.operations.dispatch()
+        }
+
+        setMergeValue(newValue)
+        setIsValid(allUpdatesValid)
+      },
     [value, sdk, component, entities, fromInputToComponentValue, fromComponentValueToInput, validateInput]
   )
 

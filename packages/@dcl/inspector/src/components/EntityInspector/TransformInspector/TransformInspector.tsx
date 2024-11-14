@@ -1,4 +1,3 @@
-import { Entity } from '@dcl/ecs'
 import { useEffect } from 'react'
 
 import { isValidNumericInput, useComponentInput, useMultiComponentInput } from '../../../hooks/sdk/useComponentInput'
