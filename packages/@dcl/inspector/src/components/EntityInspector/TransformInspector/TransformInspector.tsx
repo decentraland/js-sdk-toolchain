@@ -1,6 +1,7 @@
+import { Entity } from '@dcl/ecs'
 import { useEffect } from 'react'
 
-import { isValidNumericInput, useComponentInput, useComponentInput2 } from '../../../hooks/sdk/useComponentInput'
+import { isValidNumericInput, useComponentInput, useMultiComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { withSdk } from '../../../hoc/withSdk'
 
@@ -20,7 +21,7 @@ export default withSdk<Props>(({ sdk, entities }) => {
   const hasTransform = useHasComponent(entity, Transform)
   const transform = Transform.getOrNull(entity) ?? undefined
   const config = TransformConfig.getOrNull(entity) ?? undefined
-  const { getInputProps } = useComponentInput2(
+  const { getInputProps } = useMultiComponentInput(
     entities,
     Transform,
     fromTransform,

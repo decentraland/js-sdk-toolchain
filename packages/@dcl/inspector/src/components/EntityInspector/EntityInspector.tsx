@@ -63,7 +63,7 @@ const MultiEntityInspector = withSdk<{ entities: Entity[] }>(({ sdk, entities })
       </div>
       {inspectors.map(
         ({ name, component: Inspector }, index) =>
-          !hiddenComponents[name] && <Inspector key={index} entities={entities} />
+          !hiddenComponents[name] && <Inspector key={`${index}-${entities.join(',')}`} entities={entities} />
       )}
     </div>
   )
@@ -165,14 +165,14 @@ const SingleEntityInspector = withSdk<{ entity: Entity | null }>(({ sdk, entity 
           <EntityHeader entity={entity} />
           {inspectors.map(
             ({ name, component: Inspector }, index) =>
-              !hiddenComponents[name] && <Inspector key={index} entities={[entity]} />
+              !hiddenComponents[name] && <Inspector key={`${index}-${entity}`} entities={[entity]} />
           )}
           {isBasicViewEnabled ? (
             <SmartItemBasicView entity={entity} />
           ) : (
             advancedInspectorComponents.map(
               ({ name, component: Inspector }, index) =>
-                !hiddenComponents[name] && <Inspector key={index} entity={entity} />
+                !hiddenComponents[name] && <Inspector key={`${index}-${entity}`} entity={entity} />
             )
           )}
         </>
