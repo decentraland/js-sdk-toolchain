@@ -57,6 +57,7 @@ export const WalletField: React.FC<Props> = ({ className, value, onChange, ...pr
       onFocus={handleFocus}
       error={error}
       {...props}
+      autoSelect
     />
   )
 }

@@ -176,6 +176,7 @@ const FileUploadField: React.FC<Props> = ({
           error={hasError}
           disabled={disabled}
           drop={isHover}
+          autoSelect
         />
         <input type="file" ref={inputRef} onChange={handleChange} accept={parseAccept(accept)} />
         {isEnabledFileExplorer && (

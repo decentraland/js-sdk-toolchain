@@ -18,6 +18,7 @@ export function getDefaultPointerEvent(
       hoverText: 'Interact',
       maxDistance: 10,
       showFeedback: true,
+      showHighlight: true,
       ...def?.eventInfo
     }
   }

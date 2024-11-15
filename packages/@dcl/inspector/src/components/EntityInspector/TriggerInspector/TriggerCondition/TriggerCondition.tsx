@@ -158,6 +158,7 @@ export const TriggerConditionContainer = ({
                   disabled={isDisabled}
                   value={condition.value}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInputValue(e, idx)}
+                  autoSelect
                 />
               )}
               {isActionCondition && (
@@ -165,6 +166,7 @@ export const TriggerConditionContainer = ({
                   disabled={isDisabled}
                   value={condition.value}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInputValue(e, idx)}
+                  autoSelect
                 />
               )}
             </div>

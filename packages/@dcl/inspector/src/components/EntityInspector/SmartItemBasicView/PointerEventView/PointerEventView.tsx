@@ -56,6 +56,7 @@ export default React.memo(
             label="Hover Text"
             value={pointerEvents[0]?.eventInfo?.hoverText}
             onChange={handleHoverTextChange}
+            autoSelect
           />
         </Block>
         <Block>

@@ -46,13 +46,17 @@ export class EcsEntity extends BABYLON.TransformNode {
   }
 
   putComponent(component: ComponentDefinition<unknown>) {
+    const ctx = this.context.deref()!
+    const operation = ctx.componentPutOperations[component.componentId]
     this.usedComponents.set(component.componentId, component)
-    this.context.deref()!.componentPutOperations[component.componentId]?.call(null, this, component)
+    operation?.call(null, this, component)
   }
 
   deleteComponent(component: ComponentDefinition<unknown>) {
+    const ctx = this.context.deref()!
+    const operation = ctx.componentDeleteOperations[component.componentId]
     this.usedComponents.delete(component.componentId)
-    this.context.deref()!.componentPutOperations[component.componentId]?.call(null, this, component)
+    operation?.call(null, this, component)
   }
 
   /**

@@ -101,6 +101,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
               type="text"
               value={$.eventInfo?.hoverText ?? DEFAULTS.eventInfo.hoverText}
               onChange={(e) => handleEventInfoChange({ hoverText: e.target.value }, idx)}
+              autoSelect
             />
           </Block>
           <Block label="Max distance">
@@ -113,6 +114,12 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
             <CheckboxField
               checked={!!$.eventInfo?.showFeedback ?? DEFAULTS.eventInfo.showFeedback}
               onChange={(e) => handleEventInfoChange({ showFeedback: !!e.target.checked }, idx)}
+            />
+          </Block>
+          <Block label="Show highlight">
+            <CheckboxField
+              checked={!!$.eventInfo?.showHighlight ?? DEFAULTS.eventInfo.showHighlight}
+              onChange={(e) => handleEventInfoChange({ showHighlight: !!e.target.checked }, idx)}
             />
           </Block>
           <AddButton onClick={() => handleRemove(idx)}>Remove Pointer Event</AddButton>

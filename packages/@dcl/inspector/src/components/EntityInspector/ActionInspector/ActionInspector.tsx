@@ -673,6 +673,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
                 type="number"
                 value={getPartialPayload<ActionType.SET_COUNTER>(action)?.counter}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeCounter(e, idx)}
+                autoSelect
               />
             </div>
           </div>
@@ -687,6 +688,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
                 type="number"
                 value={getPartialPayload<ActionType.INCREMENT_COUNTER>(action)?.amount}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeAmount(e, idx)}
+                autoSelect
               />
             </div>
           </div>
@@ -701,6 +703,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
                 type="number"
                 value={getPartialPayload<ActionType.DECREASE_COUNTER>(action)?.amount}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeAmount(e, idx)}
+                autoSelect
               />
             </div>
           </div>
@@ -958,6 +961,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
                 onChange={(e) => handleChangeName(e, idx)}
                 onFocus={handleFocusInput}
                 onBlur={handleFocusInput}
+                autoSelect
               />
               <Dropdown
                 label="Select an Action"

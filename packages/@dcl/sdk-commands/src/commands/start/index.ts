@@ -54,7 +54,8 @@ export const args = declareArgs({
   '--data-layer': Boolean,
   '-e': '--no-dao-explorer',
   '--customEntryPoint': Boolean,
-  '--explorer-alpha': Boolean
+  '--explorer-alpha': Boolean,
+  '--hub': Boolean
 })
 
 export async function help(options: Options) {
@@ -97,6 +98,7 @@ export async function main(options: Options) {
   const withDataLayer = options.args['--data-layer']
   const enableWeb3 = options.args['--web3']
   const explorerAlpha = options.args['--explorer-alpha']
+  const isHub = !!options.args['--hub']
 
   let hasSmartWearable = false
 
@@ -248,7 +250,7 @@ export async function main(options: Options) {
       // Open preferably localhost/127.0.0.1
       if (explorerAlpha) {
         const realm = new URL(sortedURLs[0].url).origin
-        await runExplorerAlpha(components, { cwd: workingDirectory, realm, baseCoords })
+        await runExplorerAlpha(components, { cwd: workingDirectory, realm, baseCoords, isHub })
       }
 
       // Open preferably localhost/127.0.0.1

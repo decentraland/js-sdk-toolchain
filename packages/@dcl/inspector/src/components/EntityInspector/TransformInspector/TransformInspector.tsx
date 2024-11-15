@@ -48,19 +48,19 @@ export default withSdk<Props>(({ sdk, entity }) => {
   return (
     <Container label="Transform" className="Transform">
       <Block label="Position">
-        <TextField leftLabel="X" type="number" {...getInputProps('position.x')} />
-        <TextField leftLabel="Y" type="number" {...getInputProps('position.y')} />
-        <TextField leftLabel="Z" type="number" {...getInputProps('position.z')} />
+        <TextField leftLabel="X" type="number" {...getInputProps('position.x')} autoSelect />
+        <TextField leftLabel="Y" type="number" {...getInputProps('position.y')} autoSelect />
+        <TextField leftLabel="Z" type="number" {...getInputProps('position.z')} autoSelect />
       </Block>
       <Block label="Rotation">
-        <TextField leftLabel="X" type="number" {...getInputProps('rotation.x')} />
-        <TextField leftLabel="Y" type="number" {...getInputProps('rotation.y')} />
-        <TextField leftLabel="Z" type="number" {...getInputProps('rotation.z')} />
+        <TextField leftLabel="X" type="number" {...getInputProps('rotation.x')} autoSelect />
+        <TextField leftLabel="Y" type="number" {...getInputProps('rotation.y')} autoSelect />
+        <TextField leftLabel="Z" type="number" {...getInputProps('rotation.z')} autoSelect />
       </Block>
       <Block label="Scale">
-        <TextField leftLabel="X" type="number" {...getInputProps('scale.x')} />
-        <TextField leftLabel="Y" type="number" {...getInputProps('scale.y')} />
-        <TextField leftLabel="Z" type="number" {...getInputProps('scale.z')} />
+        <TextField leftLabel="X" type="number" {...getInputProps('scale.x')} autoSelect />
+        <TextField leftLabel="Y" type="number" {...getInputProps('scale.y')} autoSelect />
+        <TextField leftLabel="Z" type="number" {...getInputProps('scale.z')} autoSelect />
         <Link field="porportionalScaling" getInputProps={_getConfigProps} />
       </Block>
     </Container>
