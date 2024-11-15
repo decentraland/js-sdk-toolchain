@@ -23,6 +23,7 @@ import {
   _ChildSet
 } from './types'
 import { componentKeys, isNotUndefined, noopConfig, propsChanged } from './utils'
+import { Vector2 } from '@dcl/ecs/dist/components/generated/pb/decentraland/common/vectors.gen'
 
 function getPointerEnum(pointerKey: keyof Listeners): PointerEventType {
   const pointers: { [key in keyof Required<Listeners>]: PointerEventType } = {
@@ -32,19 +33,26 @@ function getPointerEnum(pointerKey: keyof Listeners): PointerEventType {
   return pointers[pointerKey]
 }
 
-type OnChangeState<T = string | number> = {
+type OnChangeState<T = string | number | Vector2> = {
   onChangeCallback?: (val?: T) => void
   onSubmitCallback?: (val?: T) => void
   value?: T
   isSubmit?: boolean
 }
+
+export interface DclReconciler {
+  update: (component: ReactEcs.JSX.ReactNode) => void
+  getEntities: () => Entity[]
+}
+
 export function createReconciler(
   engine: Pick<
     IEngine,
     'getComponent' | 'addEntity' | 'removeEntity' | 'defineComponentFromSchema' | 'getEntitiesWith'
   >,
-  pointerEvents: PointerEventsSystem
-) {
+  pointerEvents: PointerEventsSystem,
+  rootEntity: Entity | undefined
+): DclReconciler {
   // Store all the entities so when we destroy the UI we can also destroy them
   const entities = new Set<Entity>()
   // Store the onChange callbacks to be runned every time a Result has changed
@@ -58,6 +66,8 @@ export function createReconciler(
   const UiInputResult = components.UiInputResult(engine)
   const UiDropdown = components.UiDropdown(engine)
   const UiDropdownResult = components.UiDropdownResult(engine)
+  const UiScrollResult = components.UiScrollResult(engine)
+  const Transform = components.Transform(engine)
 
   // Component ID Helper
   const getComponentId: {
@@ -237,6 +247,10 @@ export function createReconciler(
 
     createInstance(type: Type, props: Props): Instance {
       const entity = engine.addEntity()
+      // set root
+      if (rootEntity !== undefined) {
+        Transform.createOrReplace(entity, { parent: rootEntity })
+      }
       entities.add(entity)
       const instance: Instance = {
         entity,
@@ -330,7 +344,10 @@ export function createReconciler(
 
   // Maybe this could be something similar to Input system, but since we
   // are going to use this only here, i prefer to scope it here.
-  function handleOnChange(componentId: number, resultComponent: typeof UiDropdownResult | typeof UiInputResult) {
+  function handleOnChange(
+    componentId: number,
+    resultComponent: typeof UiDropdownResult | typeof UiInputResult | typeof UiScrollResult
+  ) {
     for (const [entity, Result] of engine.getEntitiesWith(resultComponent)) {
       const entityState = changeEvents.get(entity)?.get(componentId)
       const isSubmit = !!(Result as any).isSubmit
@@ -355,6 +372,8 @@ export function createReconciler(
       if (changeEvents.size) {
         handleOnChange(UiInput.componentId, UiInputResult)
         handleOnChange(UiDropdown.componentId, UiDropdownResult)
+        // TODO: maybe as componentId could be a virtual id since the scroll input doesn't exist
+        handleOnChange(UiTransform.componentId, UiScrollResult)
       }
       return reconciler.updateContainer(component as any, root, null)
     },
