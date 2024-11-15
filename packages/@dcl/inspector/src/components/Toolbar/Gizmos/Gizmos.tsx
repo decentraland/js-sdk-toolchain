@@ -71,6 +71,12 @@ export const Gizmos = withSdk(({ sdk }) => {
   return (
     <div className="Gizmos" ref={ref}>
       <ToolbarButton
+        className={cx('gizmo free', { active: selection?.gizmo === GizmoType.FREE })}
+        disabled={disableGizmos}
+        onClick={handleFreeGizmo}
+        title="Free movement tool"
+      />
+      <ToolbarButton
         className={cx('gizmo position', { active: selection?.gizmo === GizmoType.POSITION })}
         disabled={disableGizmos}
         onClick={handlePositionGizmo}
@@ -87,12 +93,6 @@ export const Gizmos = withSdk(({ sdk }) => {
         disabled={disableGizmos}
         onClick={handleScaleGizmo}
         title="Scaling tool"
-      />
-      <ToolbarButton
-        className={cx('gizmo free', { active: selection?.gizmo === GizmoType.FREE })}
-        disabled={disableGizmos}
-        onClick={handleFreeGizmo}
-        title="Free movement tool"
       />
       <BsCaretDown className="open-panel" onClick={handleTogglePanel} />
       <div className={cx('panel', { visible: showPanel })}>
