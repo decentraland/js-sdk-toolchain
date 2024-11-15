@@ -59,7 +59,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
       onRemoveContainer={handleRemove}
     >
       <Block label="Url">
-        <TextField type="text" {...url} error={!isValid} />
+        <TextField autoSelect type="text" {...url} error={!isValid} />
       </Block>
       <Block label="Playback">
         <CheckboxField label="Start playing" checked={!!playing.value} {...playing} />

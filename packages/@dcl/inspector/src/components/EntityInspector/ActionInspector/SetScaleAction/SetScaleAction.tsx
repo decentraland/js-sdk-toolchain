@@ -73,18 +73,21 @@ const SetScaleAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
             type="number"
             value={payload.x}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeX(e)}
+            autoSelect
           />
           <TextField
             leftLabel="Y"
             type="number"
             value={payload.y}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeY(e)}
+            autoSelect
           />
           <TextField
             leftLabel="Z"
             type="number"
             value={payload.z}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeZ(e)}
+            autoSelect
           />
         </Block>
       </div>

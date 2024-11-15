@@ -90,6 +90,7 @@ export default React.memo(
                   type={field?.type ?? 'text'}
                   value={value}
                   onChange={(e) => handlePropertyChange(action, property, e)}
+                  autoSelect
                 />
               )
             }

@@ -92,6 +92,7 @@ export default React.memo(
             type="number"
             {...(isCounterBarComponent ? getCounterBarInputProps('maxValue') : getCounterInputProps('value'))}
             {...(isHealthBarComponent ? { onChange: handleUpdateHealthBarValues } : {})}
+            autoSelect
           />
         </Block>
         {isCounterBarComponent && (

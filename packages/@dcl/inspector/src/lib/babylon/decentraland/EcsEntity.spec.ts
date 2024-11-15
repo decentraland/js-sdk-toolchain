@@ -9,6 +9,9 @@ const getContext = () => ({
   componentPutOperations: {
     [Transform.componentId]: jest.fn()
   },
+  componentDeleteOperations: {
+    [Transform.componentId]: jest.fn()
+  },
   engine: {
     RootEntity: 0 as Entity
   }
@@ -71,7 +74,7 @@ describe('EcsEntity', () => {
     const Transform = components.Transform(engine)
     entity.deleteComponent(Transform)
     expect(entity.usedComponents.size).toBe(0)
-    expect(mockedContext.componentPutOperations[Transform.componentId]).toBeCalledWith(entity, Transform)
+    expect(mockedContext.componentDeleteOperations[Transform.componentId]).toBeCalledWith(entity, Transform)
   })
 
   it('components and native engine', () => {

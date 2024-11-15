@@ -91,18 +91,21 @@ const CloneEntityAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
           type="number"
           value={payload.position?.x}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangePositionX(e)}
+          autoSelect
         />
         <TextField
           leftLabel="Y"
           type="number"
           value={payload.position?.y}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangePositionY(e)}
+          autoSelect
         />
         <TextField
           leftLabel="Z"
           type="number"
           value={payload.position?.z}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangePositionZ(e)}
+          autoSelect
         />
       </div>
     </div>
