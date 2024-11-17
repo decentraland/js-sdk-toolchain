@@ -3939,6 +3939,7 @@ export type TextureMode = 'nine-slices' | 'center' | 'stretch';
 export interface TextureMove {
     // (undocumented)
     end: PBVector2 | undefined;
+    movementType?: TextureMovementType | undefined;
     // (undocumented)
     start: PBVector2 | undefined;
 }
@@ -3949,6 +3950,13 @@ export namespace TextureMove {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): TextureMove;
     // (undocumented)
     export function encode(message: TextureMove, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export const enum TextureMovementType {
+    TMT_OFFSET = 0,
+    // (undocumented)
+    TMT_TILING = 1
 }
 
 // @public (undocumented)
