@@ -101,8 +101,8 @@ const ShowImageAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
         />
       </Block>
       <Block label="Size">
-        <TextField leftLabel="Height" type="number" value={payload.height} onChange={handleChangeHeight} />
-        <TextField leftLabel="Width" type="number" value={payload.width} onChange={handleChangeWidth} />
+        <TextField autoSelect leftLabel="Height" type="number" value={payload.height} onChange={handleChangeHeight} />
+        <TextField autoSelect leftLabel="Width" type="number" value={payload.width} onChange={handleChangeWidth} />
       </Block>
       <Block label="Align Image">
         <Dropdown
@@ -132,7 +132,7 @@ const ShowImageAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
         <TextArea label="Text" value={payload.text} onChange={handleChangeText} />
       </Block>
       <Block label="Font Size">
-        <TextField type="number" value={payload.fontSize} onChange={handleChangeFontSize} />
+        <TextField autoSelect type="number" value={payload.fontSize} onChange={handleChangeFontSize} />
       </Block>
     </div>
   )

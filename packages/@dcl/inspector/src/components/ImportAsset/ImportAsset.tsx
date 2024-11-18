@@ -231,7 +231,7 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
             </Container>
             <div className={classNames({ error: isNameRepeated })}>
               <Block label="Asset name">
-                <TextField value={assetName} onChange={handleNameChange} />
+                <TextField autoSelect value={assetName} onChange={handleNameChange} />
               </Block>
               <Button disabled={!!validationError} onClick={handleSave}>
                 Import

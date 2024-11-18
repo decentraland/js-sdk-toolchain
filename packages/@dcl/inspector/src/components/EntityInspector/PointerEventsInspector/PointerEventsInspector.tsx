@@ -101,6 +101,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
               type="text"
               value={$.eventInfo?.hoverText ?? DEFAULTS.eventInfo.hoverText}
               onChange={(e) => handleEventInfoChange({ hoverText: e.target.value }, idx)}
+              autoSelect
             />
           </Block>
           <Block label="Max distance">
