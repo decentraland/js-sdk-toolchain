@@ -32,7 +32,8 @@ import {
   TweenComponentDefinitionExtended,
   INetowrkEntity,
   INetowrkParent,
-  VirtualCameraComponentDefinitionExtended
+  VirtualCameraComponentDefinitionExtended,
+  InputModifierComponentDefinitionExtended
 } from './components/types'
 import { NameComponent } from './components/manual/Name'
 
@@ -47,6 +48,8 @@ export const MeshCollider: MeshColliderComponentDefinitionExtended = /* @__PURE_
 export const Name: NameComponent = components.Name(engine)
 export const Tween: TweenComponentDefinitionExtended = /* @__PURE__*/ components.Tween(engine)
 export const VirtualCamera: VirtualCameraComponentDefinitionExtended = /* @__PURE__*/ components.VirtualCamera(engine)
+export const InputModifier: InputModifierComponentDefinitionExtended = /* @__PURE__*/ components.InputModifier(engine)
+
 /**
  * @alpha
  * This is going to be used for sync components through a server.
