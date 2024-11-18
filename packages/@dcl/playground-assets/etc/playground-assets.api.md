@@ -1429,8 +1429,13 @@ export const InputModifier: InputModifierComponentDefinitionExtended;
 // @public (undocumented)
 export interface InputModifierComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBInputModifier> {
     addStandardModifier: (entity: Entity, inputModifier: PBInputModifier_StandardInput) => void;
-    // Warning: (ae-forgotten-export) The symbol "InputModifierHelper" needs to be exported by the entry point index.d.ts
     InputModifier: InputModifierHelper;
+}
+
+// @public (undocumented)
+export interface InputModifierHelper {
+    // (undocumented)
+    Standard: (standard: PBInputModifier_StandardInput) => PBInputModifier['mode'];
 }
 
 // @public
