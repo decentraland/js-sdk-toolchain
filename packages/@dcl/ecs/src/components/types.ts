@@ -6,7 +6,12 @@ export type { MeshColliderComponentDefinitionExtended } from './extended/MeshCol
 export type { TextureHelper, MaterialComponentDefinitionExtended } from './extended/Material'
 export type { TweenHelper, TweenComponentDefinitionExtended } from './extended/Tween'
 export type { CameraTransitionHelper, VirtualCameraComponentDefinitionExtended } from './extended/VirtualCamera'
-export type { TransformComponentExtended, TransformTypeWithOptionals } from './manual/Transform'
+export type {
+  TransformComponentExtended,
+  TransformTypeWithOptionals,
+  MutableTransform,
+  ReadonlyTransform
+} from './extended/Transform'
 export type { NameComponent, NameType } from './manual/Name'
 export type { ISyncComponents, ISyncComponentsType } from './manual/SyncComponents'
 export type { INetowrkEntity, INetowrkEntityType } from './manual/NetworkEntity'

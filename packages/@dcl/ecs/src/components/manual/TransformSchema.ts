@@ -1,20 +1,6 @@
-import { LastWriteWinElementSetComponentDefinition, IEngine } from '../../engine'
 import { Entity } from '../../engine/entity'
 import type { ISchema } from '../../schemas/ISchema'
 import { ByteBuffer } from '../../serialization/ByteBuffer'
-
-/**
- * @public
- */
-export type TransformComponent = LastWriteWinElementSetComponentDefinition<TransformType>
-
-/**
- * @public
- */
-export interface TransformComponentExtended extends TransformComponent {
-  create(entity: Entity, val?: TransformTypeWithOptionals): TransformType
-  createOrReplace(entity: Entity, val?: TransformTypeWithOptionals): TransformType
-}
 
 /**
  * @internal
@@ -120,25 +106,5 @@ export const TransformSchema: ISchema<TransformType> = {
       parent: { type: 'integer' }
     },
     serializationType: 'transform'
-  }
-}
-
-/**
- * @public
- */
-export type TransformTypeWithOptionals = Partial<TransformType>
-
-export function defineTransformComponent(
-  engine: Pick<IEngine, 'defineComponentFromSchema'>
-): TransformComponentExtended {
-  const transformDef = engine.defineComponentFromSchema('core::Transform', TransformSchema)
-  return {
-    ...transformDef,
-    create(entity: Entity, val?: TransformTypeWithOptionals) {
-      return transformDef.create(entity, TransformSchema.extend!(val))
-    },
-    createOrReplace(entity: Entity, val?: TransformTypeWithOptionals) {
-      return transformDef.createOrReplace(entity, TransformSchema.extend!(val))
-    }
   }
 }

@@ -329,6 +329,8 @@ export function createComponentDefinitionFromSchema<T>(
       for (const cb of cbs) {
         cb(value)
       }
-    }
+    },
+    __data: data,
+    __dirtyIterator: dirtyIterator
   }
 }

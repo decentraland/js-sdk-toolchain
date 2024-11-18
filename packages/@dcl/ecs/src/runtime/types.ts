@@ -1,6 +1,7 @@
 export type { SystemFn, SYSTEMS_REGULAR_PRIORITY } from '../engine/systems'
 export type { TransportMessage, ReceiveMessage, Transport } from '../systems/crdt/types'
-export { TransformType, TransformComponent } from '../components/manual/Transform'
+export { TransformType } from '../components/manual/TransformSchema'
+export { TransformComponent } from '../components/extended/Transform'
 export * from '../engine/component'
 export * from '../schemas/typing'
 export type { MapResult, Spec } from '../schemas/Map'
