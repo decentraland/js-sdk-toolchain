@@ -15,6 +15,7 @@ import { defineTransformComponent, TransformComponentExtended } from './manual/T
 import { AudioStreamComponentDefinitionExtended, defineAudioStreamComponent } from './extended/AudioStream'
 import { MediaState } from './generated/pb/decentraland/sdk/components/common/media_state.gen'
 import { defineVirtualCameraComponent, VirtualCameraComponentDefinitionExtended } from './extended/VirtualCamera'
+import { defineInputModifierComponent, InputModifierComponentDefinitionExtended } from './extended/InputModifier'
 
 export * from './generated/index.gen'
 
@@ -59,6 +60,9 @@ export const Tween: LwwComponentGetter<TweenComponentDefinitionExtended> = (engi
 /* @__PURE__ */
 export const VirtualCamera: LwwComponentGetter<VirtualCameraComponentDefinitionExtended> = (engine) =>
   defineVirtualCameraComponent(engine)
+
+/* @__PURE__*/
+export const InputModifier: LwwComponentGetter<InputModifierComponentDefinitionExtended> = (engine) => defineInputModifierComponent(engine)
 
 /**
  * @alpha
