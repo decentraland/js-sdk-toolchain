@@ -20,14 +20,7 @@ export interface InputModifierComponentDefinitionExtended
   /**
    * InputModifier helper with constructor
    */
-  InputModifier: InputModifierHelper
-
-  /**
-   * Create or replace the component InputModifier in the entity specified
-   * @param entity - the entity to link the component
-   * @param inputModifier - the data for this input modifier
-   */
-  addStandardModifier: (entity: Entity, inputModifier: PBInputModifier_StandardInput) => void
+  Mode: InputModifierHelper
 }
 
 const InputModifierHelper: InputModifierHelper = {
@@ -46,14 +39,6 @@ export function defineInputModifierComponent(
 
   return {
     ...theComponent,
-    InputModifier: InputModifierHelper,
-    addStandardModifier(entity: Entity, inputModifier: PBInputModifier_StandardInput) {
-      theComponent.createOrReplace(entity, {
-        mode: {
-          $case: 'standard',
-          standard: inputModifier
-        }
-      })
-    }
+    Mode: InputModifierHelper
   }
 }
