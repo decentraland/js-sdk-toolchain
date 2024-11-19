@@ -53,28 +53,14 @@ export const setGizmoManager = (entity: EcsEntity, value: { gizmo: number }) => 
 
   toggleSelection(entity, true)
 
-  const selectedEntities = Array.from(context.engine.getEntitiesWith(context.editorComponents.Selection))
   const types = context.gizmos.getGizmoTypes()
   const type = types[value?.gizmo || 0]
   context.gizmos.setGizmoType(type)
-
-  if (selectedEntities.length === 1) {
-    context.gizmos.setEntity(entity)
-  } else if (selectedEntities.length > 1) {
-    context.gizmos.repositionGizmoOnCentroid()
-  }
+  context.gizmos.addEntity(entity)
 }
 
 export const unsetGizmoManager = (entity: EcsEntity) => {
   const context = entity.context.deref()!
-  const selectedEntities = Array.from(context.engine.getEntitiesWith(context.editorComponents.Selection))
-  const currentEntity = context.gizmos.getEntity()
-
   toggleSelection(entity, false)
-
-  if (currentEntity?.entityId === entity.entityId || selectedEntities.length === 0) {
-    context.gizmos.unsetEntity()
-  } else {
-    context.gizmos.repositionGizmoOnCentroid()
-  }
+  context.gizmos.removeEntity(entity)
 }
