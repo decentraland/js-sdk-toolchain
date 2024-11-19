@@ -1428,8 +1428,7 @@ export const InputModifier: InputModifierComponentDefinitionExtended;
 
 // @public (undocumented)
 export interface InputModifierComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBInputModifier> {
-    addStandardModifier: (entity: Entity, inputModifier: PBInputModifier_StandardInput) => void;
-    InputModifier: InputModifierHelper;
+    Mode: InputModifierHelper;
 }
 
 // @public (undocumented)
