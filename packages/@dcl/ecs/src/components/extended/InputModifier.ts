@@ -1,4 +1,4 @@
-import { IEngine, LastWriteWinElementSetComponentDefinition, Entity } from '../../engine'
+import { IEngine, LastWriteWinElementSetComponentDefinition } from '../../engine'
 import { InputModifier, PBInputModifier_StandardInput, PBInputModifier } from '../generated/index.gen'
 import {} from '../generated/InputModifier.gen'
 
