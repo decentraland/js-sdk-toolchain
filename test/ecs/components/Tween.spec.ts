@@ -1,4 +1,4 @@
-import { EasingFunction, Engine, components } from '../../../packages/@dcl/ecs/src'
+import { EasingFunction, Engine, TextureMovementType, components } from '../../../packages/@dcl/ecs/src'
 import { testComponentSerialization } from './assertion'
 
 describe('Generated Tween ProtoBuf', () => {
@@ -40,7 +40,8 @@ describe('Generated Tween ProtoBuf', () => {
       easingFunction: EasingFunction.EF_LINEAR,
       mode: Tween.Mode.TextureMove({
         start: { ...start2d },
-        end: { ...end2d }
+        end: { ...end2d },
+        movementType: TextureMovementType.TMT_OFFSET
       }),
       playing: false,
       currentTime: 0
