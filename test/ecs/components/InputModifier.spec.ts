@@ -20,4 +20,19 @@ describe('Generated InputModifier ProtoBuf', () => {
       }
     })
   })
+  it('should test Standar modifier', () => {
+    const newEngine = Engine()
+    const InputModifier = components.InputModifier(newEngine)
+
+    testComponentSerialization(InputModifier, {
+      mode: InputModifier.Mode.Standard({
+        disableAll: true,
+        disableWalk: true,
+        disableJog: true,
+        disableRun: true,
+        disableJump: true,
+        disableEmote: true
+      })
+    })
+  })
 })
