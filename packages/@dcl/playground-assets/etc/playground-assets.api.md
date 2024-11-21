@@ -1421,8 +1421,21 @@ export const enum InputAction {
     IA_WALK = 9
 }
 
+// Warning: (ae-missing-release-tag) "InputModifier" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const InputModifier: LastWriteWinElementSetComponentDefinition<PBInputModifier>;
+export const InputModifier: InputModifierComponentDefinitionExtended;
+
+// @public (undocumented)
+export interface InputModifierComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBInputModifier> {
+    Mode: InputModifierHelper;
+}
+
+// @public (undocumented)
+export interface InputModifierHelper {
+    // (undocumented)
+    Standard: (standard: PBInputModifier_StandardInput) => PBInputModifier['mode'];
+}
 
 // @public
 export const inputSystem: IInputSystem;
