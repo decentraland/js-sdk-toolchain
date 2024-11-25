@@ -21,7 +21,7 @@ function isAncestorOf(ancestorId: Entity, targetId: Entity, nodes: Node[]): bool
 
 export function updateSelectedEntity(engine: IEngine) {
   return function updateSelectedEntity(entity: Entity, multiple: boolean = false) {
-    let gizmo = GizmoType.POSITION
+    let gizmo = GizmoType.FREE
     let deletedSelection = false
 
     // clear selection
