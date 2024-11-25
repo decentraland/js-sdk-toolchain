@@ -63,24 +63,14 @@ import { compositeFromLoader } from '~sdk/all-composites'
 ${
   isEditorScene &&
   `
-import { initAssetPacks } from '@dcl/asset-packs/dist/scene-entrypoint'
-initAssetPacks(engine)
+import { syncEntity } from '@dcl/sdk/network'
+import { initAssetPacks, setSyncEntity } from '@dcl/asset-packs/dist/scene-entrypoint'
+initAssetPacks(engine, { syncEntity })
 
 // TODO: do we need to do this on runtime ?
 // I think we have that information at build-time and we avoid to do evaluate this on the worker.
 // Read composite.json or main.crdt => If that file has a NetowrkEntity import '@dcl/@sdk/network'
-
-// conditionally load networking code if the NetworkEntity component is being used...
-for (const path in compositeFromLoader) {
-  const composite = compositeProvider.getCompositeOrNull(path)
-  if (composite) {
-    const { components } = composite.composite
-    const hasNetworkEntity = components.find(($) => $.name === NetworkEntity.componentName)
-    if (hasNetworkEntity) {
-      import('@dcl/sdk/network')
-    }
-  }
-}`
+`
 }
 
 if ((entrypoint as any).main !== undefined) {
@@ -106,7 +96,6 @@ export * from '${unixEntrypointPath}'
 
 export async function bundleProject(components: BundleComponents, options: CompileOptions, sceneJson: Scene) {
   const tsconfig = path.join(options.workingDirectory, 'tsconfig.json')
-
   /* istanbul ignore if */
   if (!options.single && !sceneJson.main) {
     throw new CliError('scene.json .main must be present')
