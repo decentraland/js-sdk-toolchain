@@ -10,7 +10,7 @@ import {
   components
 } from '../../../packages/@dcl/ecs/src'
 import { createTweenSystem } from '../../../packages/@dcl/ecs/src/systems/tween'
-import { Quaternion, Vector3 } from '../../../packages/@dcl/sdk/math'
+import { Quaternion, Vector2, Vector3 } from '../../../packages/@dcl/sdk/math'
 
 function mockTweenEngine(engine: IEngine, Tween: TweenComponentDefinitionExtended) {
   return async function (entity: Entity, mode?: PBTween['mode']) {
@@ -101,6 +101,13 @@ describe('Tween System', () => {
     await mockTweenStatus(entity)
     expect(completed).toBeCalledTimes(1)
     expect(Tween.get(entity).mode).toMatchCloseTo(Tween.Mode.Scale({ end: Vector3.Left(), start: Vector3.Right() }))
+  })
+
+  it('should change to backwards the TextureMove Tween when its completed', async () => {
+    await mockTween(entity, Tween.Mode.TextureMove({ start: Vector2.Zero(), end: Vector2.One() }))
+    await mockTweenStatus(entity)
+    expect(completed).toBeCalledTimes(1)
+    expect(Tween.get(entity).mode).toMatchCloseTo(Tween.Mode.TextureMove({ end: Vector2.Zero(), start: Vector2.One() }))
   })
 
   it('should create a RESTART tweenSequence for the entity and restart the tween once its completed', async () => {
