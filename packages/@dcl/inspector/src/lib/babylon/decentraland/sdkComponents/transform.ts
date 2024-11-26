@@ -7,6 +7,8 @@ import { getRoot } from '../../../sdk/nodes'
 
 export const putTransformComponent: ComponentOperation = (entity, component) => {
   if (component.componentType === ComponentType.LastWriteWinElementSet) {
+    const gizmos = entity.context.deref()!.gizmos
+    gizmos.restoreParents()
     const newValue = component.getOrNull(entity.entityId) as TransformType | null
     const currentValue = entity.ecsComponentValues.transform
     entity.ecsComponentValues.transform = newValue || undefined
@@ -46,6 +48,8 @@ export const putTransformComponent: ComponentOperation = (entity, component) => 
     }
 
     if (needsReparenting) reparentEntity(entity)
+
+    gizmos.repositionGizmoOnCentroid()
   }
 }
 
@@ -87,10 +91,10 @@ function reparentEntity(entity: EcsEntity) {
       const isSceneRoot = newRoot === ROOT
       if (!isSceneRoot) {
         entity.setVisibility(false)
-        entity.context.deref()?.gizmos.unsetEntity()
+        entity.context.deref()?.gizmos.removeEntity(entity)
       } else {
         entity.setVisibility(true)
-        entity.context.deref()?.gizmos.setEntity(entity)
+        entity.context.deref()?.gizmos.addEntity(entity)
       }
     }
   }
