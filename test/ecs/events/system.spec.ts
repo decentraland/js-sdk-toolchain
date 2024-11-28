@@ -259,4 +259,88 @@ describe('Events System', () => {
 
     EventsSystem.removeOnPointerUp(entity)
   })
+
+  it('should run default onHoverEnter', async () => {
+    const entity = engine.addEntity()
+    const PointerEvents = components.PointerEvents(engine)
+    let counter = 0
+    EventsSystem.onPointerHoverEnter(
+      {
+        entity
+      },
+      () => {
+        counter += 1
+      }
+    )
+    fakePointer(entity, PointerEventType.PET_HOVER_ENTER)
+    await engine.update(1)
+    expect(counter).toBe(1)
+    expect(PointerEvents.getOrNull(entity)).toBe(null)
+  })
+
+  it('should remove pointer hover enter', async () => {
+    const entity = engine.addEntity()
+    const PointerEvents = components.PointerEvents(engine)
+    let counter = 0
+    EventsSystem.onPointerHoverEnter(
+      {
+        entity,
+        opts: { hoverText: 'test' }
+      },
+      () => {
+        counter += 1
+        EventsSystem.removeOnPointerHoverEnter(entity)
+      }
+    )
+    fakePointer(entity, PointerEventType.PET_HOVER_ENTER)
+    await engine.update(1)
+    expect(counter).toBe(1)
+
+    await engine.update(1)
+    expect(counter).toBe(1)
+    const feedback = PointerEvents.getOrNull(entity)?.pointerEvents
+    expect(feedback?.length).toBe(0)
+  })
+
+  it('should run default onHoverLeave', async () => {
+    const entity = engine.addEntity()
+    const PointerEvents = components.PointerEvents(engine)
+    let counter = 0
+    EventsSystem.onPointerHoverLeave(
+      {
+        entity
+      },
+      () => {
+        counter += 1
+      }
+    )
+    fakePointer(entity, PointerEventType.PET_HOVER_LEAVE)
+    await engine.update(1)
+    expect(counter).toBe(1)
+    expect(PointerEvents.getOrNull(entity)).toBe(null)
+  })
+
+  it('should remove pointer hover leave', async () => {
+    const entity = engine.addEntity()
+    const PointerEvents = components.PointerEvents(engine)
+    let counter = 0
+    EventsSystem.onPointerHoverLeave(
+      {
+        entity,
+        opts: { hoverText: 'test' }
+      },
+      () => {
+        counter += 1
+        EventsSystem.removeOnPointerHoverLeave(entity)
+      }
+    )
+    fakePointer(entity, PointerEventType.PET_HOVER_LEAVE)
+    await engine.update(1)
+    expect(counter).toBe(1)
+
+    await engine.update(1)
+    expect(counter).toBe(1)
+    const feedback = PointerEvents.getOrNull(entity)?.pointerEvents
+    expect(feedback?.length).toBe(0)
+  })
 })
