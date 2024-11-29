@@ -95,7 +95,6 @@ export function addAsset(engine: IEngine) {
       }
 
       const mapId = (id: string | number) => {
-        debugger
         if (typeof id === 'string') {
           const match = id.match(/{self:(.+)}/)
           if (match) {
@@ -185,7 +184,6 @@ export function addAsset(engine: IEngine) {
                 }))
               }))
               componentValue = { ...componentValue, value: newValue }
-              debugger
               break
             }
             case CoreComponents.SYNC_COMPONENTS: {
