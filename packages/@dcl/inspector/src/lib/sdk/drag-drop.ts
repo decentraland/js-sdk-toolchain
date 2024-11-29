@@ -8,14 +8,14 @@ interface Drop<T, K = object> {
   context: K
 }
 
-export type ProjectAssetDrop = Drop<string, { tree: Map<string, TreeNode> }>
-export type BuilderAsset = Drop<Asset>
+export type LocalAssetDrop = Drop<string, { tree: Map<string, TreeNode> }>
+export type CatalogAssetDrop = Drop<Asset>
 
-export type IDrop = ProjectAssetDrop | BuilderAsset
+export type IDrop = LocalAssetDrop | CatalogAssetDrop
 
 export enum DropTypesEnum {
-  ProjectAsset = 'project-asset',
-  BuilderAsset = 'builder-asset'
+  ProjectAsset = 'local-asset',
+  CatalogAsset = 'catalog-asset'
 }
 
 export type DropTypes = `${DropTypesEnum}`

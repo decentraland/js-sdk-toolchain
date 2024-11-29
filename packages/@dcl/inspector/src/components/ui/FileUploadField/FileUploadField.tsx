@@ -8,7 +8,7 @@ import { selectAssetCatalog, selectUploadFile, updateUploadFile } from '../../..
 import { selectAssetsTab } from '../../../redux/ui'
 import { AssetsTab } from '../../../redux/ui/types'
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks'
-import { DropTypesEnum, ProjectAssetDrop, getNode } from '../../../lib/sdk/drag-drop'
+import { DropTypesEnum, LocalAssetDrop, getNode } from '../../../lib/sdk/drag-drop'
 import { EXTENSIONS, withAssetDir } from '../../../lib/data-layer/host/fs-utils'
 
 import { isModel } from '../../EntityInspector/GltfInspector/utils'
@@ -98,7 +98,7 @@ const FileUploadField: React.FC<Props> = ({
   const [{ isHover, canDrop }, drop] = useDrop(
     () => ({
       accept: [DropTypesEnum.ProjectAsset],
-      drop: ({ value, context }: ProjectAssetDrop, monitor) => {
+      drop: ({ value, context }: LocalAssetDrop, monitor) => {
         if (monitor.didDrop()) return
         const node = context.tree.get(value)!
         const element = getNode(node, context.tree, isValid)
@@ -109,7 +109,7 @@ const FileUploadField: React.FC<Props> = ({
           setDropError(true)
         }
       },
-      canDrop: ({ value, context }: ProjectAssetDrop) => {
+      canDrop: ({ value, context }: LocalAssetDrop) => {
         const node = context.tree.get(value)!
         return !!getNode(node, context.tree, isValid)
       },
