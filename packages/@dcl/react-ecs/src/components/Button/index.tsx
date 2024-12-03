@@ -64,8 +64,8 @@ export function Button(props: UiButtonProps) {
     <entity
       onMouseDown={!!props.disabled ? undefined : onMouseDown}
       onMouseUp={!!props.disabled ? undefined : onMouseUp}
-      onMouseEnter={!!props.disabled ? undefined : onMouseEnter}
-      onMouseLeave={!!props.disabled ? undefined : onMouseLeave}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       uiTransform={uiTransformProps}
       uiText={textProps}
       uiBackground={uiBackgroundProps}
