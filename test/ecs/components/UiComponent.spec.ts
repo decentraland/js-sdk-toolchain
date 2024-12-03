@@ -71,7 +71,8 @@ describe('UiTransform component', () => {
       opacity: 1.0,
       scrollPosition: undefined,
       scrollVisible: undefined,
-      elementId: undefined
+      elementId: undefined,
+      zIndex: undefined
     })
   })
 })
