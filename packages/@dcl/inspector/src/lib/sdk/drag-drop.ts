@@ -14,7 +14,7 @@ export type CatalogAssetDrop = Drop<Asset>
 export type IDrop = LocalAssetDrop | CatalogAssetDrop
 
 export enum DropTypesEnum {
-  ProjectAsset = 'local-asset',
+  LocalAsset = 'local-asset',
   CatalogAsset = 'catalog-asset'
 }
 

@@ -97,7 +97,7 @@ const FileUploadField: React.FC<Props> = ({
 
   const [{ isHover, canDrop }, drop] = useDrop(
     () => ({
-      accept: [DropTypesEnum.ProjectAsset],
+      accept: [DropTypesEnum.LocalAsset],
       drop: ({ value, context }: LocalAssetDrop, monitor) => {
         if (monitor.didDrop()) return
         const node = context.tree.get(value)!
