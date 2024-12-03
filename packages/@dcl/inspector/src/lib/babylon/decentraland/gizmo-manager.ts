@@ -3,7 +3,6 @@ import {
   IAxisDragGizmo,
   PickingInfo,
   Quaternion,
-  Node,
   Vector3,
   PointerDragBehavior,
   AbstractMesh,
@@ -37,13 +36,8 @@ function areProportional(a: number, b: number) {
   return Math.abs(a - b) < 1e-5
 }
 
-// should be moved to ecs-math
-function areQuaternionsEqual(a: DclQuaternion, b: DclQuaternion) {
-  return a.x === b.x && a.y === b.y && a.z === b.z && a.w === b.w
-}
-
 function calculateCenter(positions: Vector3[]): Vector3 {
-  if (positions.length === 0) throw new Error('No positions provided to calculate center')
+  if (positions.length === 0) new Vector3(0, 0, 0)
 
   const sum = positions.reduce((acc, pos) => {
     acc.x += pos.x
@@ -71,21 +65,12 @@ export function createGizmoManager(context: SceneContext) {
   gizmoManager.gizmos.positionGizmo!.updateGizmoRotationToMatchAttachedMesh = false
   gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh = true
 
-  let lastEntity: EcsEntity | null = null
+  let selectedEntities: EcsEntity[] = []
   let rotationGizmoAlignmentDisabled = false
   let positionGizmoAlignmentDisabled = false
   let shouldRestorRotationGizmoAlignment = false
   let shouldRestorPositionGizmoAlignment = false
   let isEnabled = true
-  const parentMapper: Map<Entity, Node> = new Map()
-
-  function getSelectedEntities() {
-    return context.operations.getSelectedEntities()
-  }
-
-  function areMultipleEntitiesSelected() {
-    return getSelectedEntities().length > 1
-  }
 
   function fixRotationGizmoAlignment(value: TransformType) {
     const isProportional =
@@ -117,23 +102,36 @@ export function createGizmoManager(context: SceneContext) {
     }
   }
 
-  function getTransform(entity?: EcsEntity): TransformType {
-    const _entity = entity ?? lastEntity
-    if (_entity) {
-      const parent = context.Transform.getOrNull(_entity.entityId)?.parent || (0 as Entity)
-      const value = {
-        position: gizmoManager.positionGizmoEnabled ? snapPosition(_entity.position) : _entity.position,
-        scale: gizmoManager.scaleGizmoEnabled ? snapScale(_entity.scaling) : _entity.scaling,
-        rotation: gizmoManager.rotationGizmoEnabled
-          ? _entity.rotationQuaternion
-            ? snapRotation(_entity.rotationQuaternion)
-            : Quaternion.Zero()
-          : _entity.rotationQuaternion ?? Quaternion.Zero(),
-        parent
-      }
-      return value
-    } else {
-      throw new Error('No entity selected')
+  function getFirstEntity() {
+    return selectedEntities[0]
+  }
+
+  function getParent(entity: EcsEntity) {
+    return context.Transform.getOrNull(entity.entityId)?.parent || (0 as Entity)
+  }
+
+  function computeWorldTransform(entity: EcsEntity): TransformType {
+    const { positionGizmoEnabled, scaleGizmoEnabled, rotationGizmoEnabled } = gizmoManager
+    // Compute the updated transform based on the current node position
+    const worldMatrix = entity.computeWorldMatrix(true)
+    const position = new Vector3()
+    const scale = new Vector3()
+    const rotation = new Quaternion()
+    worldMatrix.decompose(scale, rotation, position)
+
+    return {
+      position: positionGizmoEnabled ? snapPosition(position) : position,
+      scale: scaleGizmoEnabled ? snapScale(scale) : scale,
+      rotation: rotationGizmoEnabled ? snapRotation(rotation) : rotation
+    }
+  }
+
+  function getTransform(entity: EcsEntity): TransformType {
+    return {
+      position: entity.position,
+      scale: entity.scaling,
+      rotation: entity.rotationQuaternion ?? Quaternion.Zero(),
+      parent: getParent(entity)
     }
   }
 
@@ -143,61 +141,39 @@ export function createGizmoManager(context: SceneContext) {
       position: DclVector3.create(position.x, position.y, position.z),
       rotation: DclQuaternion.create(rotation.x, rotation.y, rotation.z, rotation.w),
       scale: DclVector3.create(scale.x, scale.y, scale.z),
-      parent: parent
+      parent
     })
+  }
+
+  /**
+   * Updates the transform of all selected entities after a gizmo operation
+   *
+   * 1. Fixes rotation gizmo alignment based on the first selected entity's transform
+   * 2. For each selected entity:
+   *    - Gets the original parent and resolves it to a valid entity or root node
+   *    - Temporarily sets the entity's parent to handle transform calculations
+   *    - Updates the entity's transform:
+   *      - If parent is root node: Uses world space transform with snapping
+   *      - Otherwise: Uses local space transform
+   *    - Preserves the original parent relationship
+   * 3. Dispatches the transform updates to persist changes
+   */
+  function updateTransform() {
+    fixRotationGizmoAlignment(getTransform(getFirstEntity()))
+    for (const entity of selectedEntities) {
+      const originalParent = getParent(entity)
+      const parent = context.getEntityOrNull(originalParent ?? context.rootNode.entityId)
+
+      entity.setParent(parent)
+
+      updateEntityTransform(entity.entityId, {
+        ...(parent === context.rootNode ? computeWorldTransform(entity) : getTransform(entity)),
+        parent: originalParent
+      })
+    }
+
     void context.operations.dispatch()
   }
-
-  function updateTransform() {
-    if (lastEntity === null) return
-    const oldTransform = context.Transform.get(lastEntity.entityId)
-    const newTransform = getTransform()
-    fixRotationGizmoAlignment(newTransform)
-
-    // Remap all selected entities to the original parent
-    parentMapper.forEach((value, key, map) => {
-      if (key === lastEntity!.entityId) return
-      const entity = context.getEntityOrNull(key)
-      if (entity) {
-        entity.setParent(value)
-        map.delete(key)
-      }
-    })
-
-    if (
-      DclVector3.equals(newTransform.position, oldTransform.position) &&
-      DclVector3.equals(newTransform.scale, oldTransform.scale) &&
-      areQuaternionsEqual(newTransform.rotation, oldTransform.rotation)
-    )
-      return
-    // Update last selected entity transform
-    updateEntityTransform(lastEntity.entityId, newTransform)
-
-    // Update entity transform for all the selected entities
-    if (areMultipleEntitiesSelected()) {
-      for (const entityId of getSelectedEntities()) {
-        if (entityId === lastEntity.entityId) continue
-        const entity = context.getEntityOrNull(entityId)!
-        const transform = getTransform(entity)
-        updateEntityTransform(entityId, transform)
-      }
-    }
-  }
-
-  function initTransform() {
-    if (lastEntity === null) return
-    if (areMultipleEntitiesSelected()) {
-      for (const entityId of getSelectedEntities()) {
-        if (entityId === lastEntity.entityId) continue
-        const entity = context.getEntityOrNull(entityId)!
-        parentMapper.set(entityId, entity.parent!)
-        entity.setParent(lastEntity)
-      }
-    }
-  }
-
-  // Map to store the original parent of each entity
-  const originalParents = new Map<Entity, TransformNode | null>()
 
   // Check if a transform node for the gizmo already exists, or create one
   function getDummyNode(): TransformNode {
@@ -206,10 +182,17 @@ export function createGizmoManager(context: SceneContext) {
     return dummyNode
   }
 
+  function restoreParents() {
+    for (const entity of selectedEntities) {
+      const originalParent = getParent(entity)
+      const parent = context.getEntityOrNull(originalParent ?? context.rootNode.entityId)
+      entity.setParent(parent)
+    }
+  }
+
   function repositionGizmoOnCentroid() {
-    const selectedEntities = getSelectedEntities().map((entityId) => context.getEntityOrNull(entityId)!)
     const positions = selectedEntities.map((entity) => {
-      const { x, y, z } = getTransform(entity).position
+      const { x, y, z } = computeWorldTransform(entity).position
       return new Vector3(x, y, z)
     })
     const centroidPosition = calculateCenter(positions)
@@ -219,33 +202,12 @@ export function createGizmoManager(context: SceneContext) {
     // so everything aligns to the right position afterwards.
     dummyNode.position = centroidPosition
 
-    // Store the original parents and set the dummy node as parent for each selected entity
-    selectedEntities.forEach((entity) => {
-      const parent = entity.parent as TransformNode | null
-      originalParents.set(entity.entityId, parent)
+    for (const entity of selectedEntities) {
       entity.setParent(dummyNode)
-    })
+    }
 
-    // Attach the gizmo to the dummy node
     gizmoManager.attachToNode(dummyNode)
   }
-
-  function restoreOriginalParents() {
-    originalParents.forEach((parent, entity) => {
-      const ecsEntity = context.getEntityOrNull(entity)!
-      ecsEntity.setParent(parent)
-    })
-
-    // Clear the stored parents as they're now restored
-    originalParents.clear()
-
-    // Detach the gizmo from the dummy node if needed
-    gizmoManager.attachToNode(null)
-  }
-
-  gizmoManager.gizmos.scaleGizmo?.onDragStartObservable.add(initTransform)
-  gizmoManager.gizmos.positionGizmo?.onDragStartObservable.add(initTransform)
-  gizmoManager.gizmos.rotationGizmo?.onDragStartObservable.add(initTransform)
 
   gizmoManager.gizmos.scaleGizmo?.onDragEndObservable.add(updateTransform)
   gizmoManager.gizmos.positionGizmo?.onDragEndObservable.add(updateTransform)
@@ -300,9 +262,8 @@ export function createGizmoManager(context: SceneContext) {
     return () => events.off('change', cb)
   }
 
-  function unsetEntity() {
-    lastEntity = null
-    gizmoManager.attachToNode(lastEntity)
+  function removeGizmos() {
+    gizmoManager.attachToNode(null)
     gizmoManager.positionGizmoEnabled = false
     gizmoManager.rotationGizmoEnabled = false
     gizmoManager.scaleGizmoEnabled = false
@@ -312,8 +273,9 @@ export function createGizmoManager(context: SceneContext) {
   function setEnabled(value: boolean) {
     if (value !== isEnabled) {
       isEnabled = value
-      if (!isEnabled && lastEntity) {
-        unsetEntity()
+      if (!isEnabled && selectedEntities.length > 0) {
+        restoreParents()
+        removeGizmos()
       }
     }
   }
@@ -335,24 +297,23 @@ export function createGizmoManager(context: SceneContext) {
   })
 
   context.scene.onPointerDown = function (_e, pickResult) {
+    const firstEntity = getFirstEntity()
     if (
-      lastEntity === null ||
+      !firstEntity ||
       pickResult.pickedMesh === null ||
       !gizmoManager.freeGizmoEnabled ||
-      !context.Transform.getOrNull(lastEntity.entityId)
+      !context.Transform.getOrNull(firstEntity.entityId)
     )
       return
-    const selectedEntities = getSelectedEntities().map((entityId) => context.getEntityOrNull(entityId)!)
     if (selectedEntities.some((entity) => pickResult.pickedMesh!.isDescendantOf(entity))) {
-      initTransform()
-      meshPointerDragBehavior.attach(lastEntity as unknown as AbstractMesh)
+      meshPointerDragBehavior.attach(firstEntity as unknown as AbstractMesh)
     }
   }
 
   context.scene.onPointerUp = function () {
-    if (lastEntity === null || !gizmoManager.freeGizmoEnabled || !context.Transform.getOrNull(lastEntity.entityId))
-      return
-    updateTransform()
+    const firstEntity = getFirstEntity()
+    if (!firstEntity || !gizmoManager.freeGizmoEnabled || !context.Transform.getOrNull(firstEntity.entityId)) return
+    void updateTransform()
     meshPointerDragBehavior.detach()
   }
 
@@ -372,9 +333,11 @@ export function createGizmoManager(context: SceneContext) {
       return isEnabled
     },
     setEnabled,
-    setEntity(entity: EcsEntity | null): void {
+    restoreParents,
+    repositionGizmoOnCentroid,
+    addEntity(entity: EcsEntity): void {
       if (
-        entity === lastEntity ||
+        selectedEntities.includes(entity) ||
         !isEnabled ||
         entity?.isHidden() ||
         entity?.isLocked() ||
@@ -382,28 +345,23 @@ export function createGizmoManager(context: SceneContext) {
       ) {
         return
       }
-      restoreOriginalParents()
-      if (areMultipleEntitiesSelected()) {
-        return repositionGizmoOnCentroid()
-      } else {
-        gizmoManager.attachToNode(entity)
-        lastEntity = entity
-        // fix gizmo rotation/position if necessary
-        const transform = getTransform()
-        fixRotationGizmoAlignment(transform)
-        fixPositionGizmoAlignment(transform)
-      }
+      restoreParents()
+      selectedEntities.push(entity)
+      repositionGizmoOnCentroid()
+      const transform = getTransform(entity)
+      // fix gizmo rotation/position if necessary
+      fixRotationGizmoAlignment(transform)
+      fixPositionGizmoAlignment(transform)
       events.emit('change')
     },
-    repositionGizmoOnCentroid() {
-      restoreOriginalParents()
-      return repositionGizmoOnCentroid()
-    },
     getEntity() {
-      return lastEntity
+      return getFirstEntity()
     },
-    unsetEntity() {
-      unsetEntity()
+    removeEntity(entity: EcsEntity) {
+      restoreParents()
+      selectedEntities = selectedEntities.filter((e) => e.entityId !== entity.entityId)
+      if (selectedEntities.length === 0) removeGizmos()
+      else repositionGizmoOnCentroid()
     },
     getGizmoTypes() {
       return [GizmoType.POSITION, GizmoType.ROTATION, GizmoType.SCALE, GizmoType.FREE] as const

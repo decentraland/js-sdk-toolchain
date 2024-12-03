@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 import { BsFillLightningChargeFill as SmartItemIcon } from 'react-icons/bs'
 import { withSdk } from '../../../hoc/withSdk'
-import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { ConfigComponent } from '../../../lib/sdk/components'
 import { Container } from '../../Container'
 import { NftView } from './NftView'
@@ -17,7 +16,6 @@ import './SmartItemBasicView.css'
 
 const SmartItemBasicView = withSdk<Props>(({ sdk, entity }) => {
   const { Config } = sdk.components
-  const hasConfig = useHasComponent(entity, Config)
 
   const renderField = useCallback(
     (field: ConfigComponent['fields'][0], idx: number) => {
@@ -52,11 +50,11 @@ const SmartItemBasicView = withSdk<Props>(({ sdk, entity }) => {
     )
   }, [])
 
-  if (!hasConfig) return null
-
   const config = useMemo(() => {
-    return Config.get(entity)
+    return Config.getOrNull(entity)
   }, [entity])
+
+  if (!config) return null
 
   return (
     <Container

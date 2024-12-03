@@ -65,14 +65,14 @@ describe('GizmoManager', () => {
         babylonEntity.rotationQuaternion = new Quaternion(0, 0, 0, 1)
         handler = jest.fn()
         gizmos.onChange(handler)
-        gizmos.setEntity(babylonEntity)
+        gizmos.addEntity(babylonEntity)
         entities = [dclEntity]
         nodes.push({ entity: dclEntity, children: [] })
       })
       afterEach(() => {
         babylonEntity.dispose()
         context.engine.removeEntity(dclEntity)
-        gizmos.unsetEntity()
+        gizmos.removeEntity(context.getOrCreateEntity(dclEntity))
         entities = []
         nodes = nodes.filter(($) => $.entity !== dclEntity)
       })
@@ -86,16 +86,11 @@ describe('GizmoManager', () => {
         it('should skip setting the entity', () => {
           const handler = jest.fn()
           gizmos.onChange(handler)
-          gizmos.setEntity(babylonEntity)
+          gizmos.addEntity(babylonEntity)
           expect(handler).not.toHaveBeenCalled()
         })
       })
       describe('and dragging a gizmo', () => {
-        it('should not execute SDK operations if transform was not changed', () => {
-          gizmos.gizmoManager.gizmos.positionGizmo?.onDragEndObservable.notifyObservers({} as any)
-          expect(context.operations.updateValue).toBeCalledTimes(0)
-          expect(context.operations.dispatch).toBeCalledTimes(0)
-        })
         it('should execute SDK operations if transform was changed', () => {
           babylonEntity.position = new Vector3(10, 10, 10)
           gizmos.gizmoManager.gizmos.positionGizmo?.onDragEndObservable.notifyObservers({} as any)
