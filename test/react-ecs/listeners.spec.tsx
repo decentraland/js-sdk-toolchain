@@ -125,3 +125,59 @@ describe('Ui MouseUp React Ecs', () => {
     expect(counter).toBe(8888)
   })
 })
+
+describe('Ui MouseEnter React Ecs', () => {
+  const { engine, uiRenderer } = setupEngine()
+  const PointerEventsResult = components.PointerEventsResult(engine)
+  const uiEntity = ((engine.addEntity() as number) + 1) as Entity
+  let fakeCounter = 0
+  const mouseEnterEvent = () => {
+    PointerEventsResult.addValue(
+      uiEntity,
+      createTestPointerDownCommand(uiEntity, fakeCounter + 1, PointerEventType.PET_HOVER_ENTER)
+    )
+    fakeCounter += 1
+  }
+  let counter = 0
+  let onMouseEnter: (() => void) | undefined = () => {
+    counter++
+  }
+
+  const ui = () => <UiEntity uiTransform={{ width: 100 }} onMouseEnter={onMouseEnter} />
+  uiRenderer.setUiRenderer(ui)
+
+  it('the counter should be 0 at the begginning', async () => {
+    expect(counter).toBe(0)
+    await engine.update(1)
+  })
+  it('if we create a mouseDown event, then the onMouseEnter fn must be called and increment the counter by 1', async () => {
+    // Click with the current onMouseEnter
+    mouseEnterEvent()
+    await engine.update(1)
+    expect(counter).toBe(1)
+  })
+
+  it('remove onMouseEnter handler and verify that the counter is still 1', async () => {
+    // Remove onMouseEnter
+    onMouseEnter = undefined
+    await engine.update(1)
+    expect(counter).toBe(1)
+  })
+
+  it('create a mouseDown event and verify that the counter is not being incremented', async () => {
+    mouseEnterEvent()
+    await engine.update(1)
+    expect(counter).toBe(1)
+  })
+
+  it('replace onMouseEnter callback with a custom counter setter, and create an event to see if its being called', async () => {
+    // Add a new onMouseEnter
+    onMouseEnter = () => {
+      counter = 8888
+    }
+    await engine.update(1)
+    mouseEnterEvent()
+    await engine.update(1)
+    expect(counter).toBe(8888)
+  })
+})
