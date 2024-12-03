@@ -149,4 +149,6 @@ export interface UiTransformProps {
   scrollPosition?: Vector2 | string
   /** default ShowScrollBar.SSB_BOTH */
   scrollVisible?: ScrollVisibleType
+  /** default 0 */
+  zIndex?: number
 }

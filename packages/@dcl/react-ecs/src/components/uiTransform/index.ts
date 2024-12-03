@@ -79,7 +79,8 @@ const defaultUiTransform: PBUiTransform = {
   widthUnit: YGUnit.YGU_AUTO,
   heightUnit: YGUnit.YGU_UNDEFINED,
   pointerFilter: PointerFilterMode.PFM_NONE,
-  opacity: 1
+  opacity: 1,
+  zIndex: 0
 }
 
 /**
@@ -99,6 +100,7 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     alignItems,
     alignContent,
     flexWrap,
+    zIndex,
     ...otherProps
   } = props
 
@@ -126,6 +128,7 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     ...(alignItems && getAlign('alignItems', alignItems)),
     ...(flexWrap && getFlexWrap(flexWrap)),
     ...(scrollPosition && getScrollPosition(scrollPosition)),
-    ...(scrollVisible && getScrollVisible(scrollVisible))
+    ...(scrollVisible && getScrollVisible(scrollVisible)),
+    ...(zIndex && { zIndex })
   }
 }

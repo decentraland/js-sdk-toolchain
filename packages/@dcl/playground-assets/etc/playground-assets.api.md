@@ -1141,6 +1141,8 @@ export type EntityComponents = {
     uiDropdown: PBUiDropdown;
     onMouseDown: Callback;
     onMouseUp: Callback;
+    onMouseEnter: Callback;
+    onMouseLeave: Callback;
 };
 
 // @public (undocumented)
@@ -1626,6 +1628,8 @@ export const Light: LastWriteWinElementSetComponentDefinition<PBLight>;
 export type Listeners = {
     onMouseDown?: Callback;
     onMouseUp?: Callback;
+    onMouseEnter?: Callback;
+    onMouseLeave?: Callback;
 };
 
 // @public (undocumented)
@@ -3109,6 +3113,9 @@ export interface PBTween {
     } | {
         $case: "scale";
         scale: Scale;
+    } | {
+        $case: "textureMove";
+        textureMove: TextureMove;
     } | undefined;
     playing?: boolean | undefined;
 }
@@ -3395,6 +3402,7 @@ export interface PBUiTransform {
     // (undocumented)
     width: number;
     widthUnit: YGUnit;
+    zIndex?: number | undefined;
 }
 
 // @public (undocumented)
@@ -3557,6 +3565,14 @@ export interface PointerEventsSystem {
     }, cb: EventSystemCallback): void;
     // @deprecated (undocumented)
     onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
+    onPointerHoverEnter(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
+    onPointerHoverLeave(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
     onPointerUp(pointerData: {
         entity: Entity;
         opts?: Partial<EventSystemOptions>;
@@ -3564,6 +3580,8 @@ export interface PointerEventsSystem {
     // @deprecated (undocumented)
     onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
     removeOnPointerDown(entity: Entity): void;
+    removeOnPointerHoverEnter(entity: Entity): void;
+    removeOnPointerHoverLeave(entity: Entity): void;
     removeOnPointerUp(entity: Entity): void;
 }
 
@@ -4230,6 +4248,30 @@ export interface TextureHelper {
 export type TextureMode = 'nine-slices' | 'center' | 'stretch';
 
 // @public (undocumented)
+export interface TextureMove {
+    // (undocumented)
+    end: PBVector2 | undefined;
+    movementType?: TextureMovementType | undefined;
+    // (undocumented)
+    start: PBVector2 | undefined;
+}
+
+// @public (undocumented)
+export namespace TextureMove {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): TextureMove;
+    // (undocumented)
+    export function encode(message: TextureMove, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export const enum TextureMovementType {
+    TMT_OFFSET = 0,
+    // (undocumented)
+    TMT_TILING = 1
+}
+
+// @public (undocumented)
 export interface TextureUnion {
     // (undocumented)
     tex?: {
@@ -4554,6 +4596,7 @@ export interface UiTransformProps {
     scrollPosition?: PBVector2 | string;
     scrollVisible?: ScrollVisibleType;
     width?: PositionUnit | 'auto';
+    zIndex?: number;
 }
 
 // @public (undocumented)
