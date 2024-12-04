@@ -1,6 +1,6 @@
 import { IEngine, OnChangeFunction } from '@dcl/ecs'
 import { DataLayerRpcServer, FileSystemInterface } from '../types'
-import { EXTENSIONS, getCurrentCompositePath, getFilesInDirectory, withAssetDir } from './fs-utils'
+import { DIRECTORY, EXTENSIONS, getCurrentCompositePath, getFilesInDirectory, withAssetDir } from './fs-utils'
 import { stream } from './stream'
 import { FileOperation, initUndoRedo } from './undo-redo'
 import upsertAsset from './upsert-asset'
@@ -8,6 +8,7 @@ import { initSceneProvider } from './scene'
 import { readPreferencesFromFile, serializeInspectorPreferences } from '../../logic/preferences/io'
 import { compositeAndDirty } from './utils/composite-dirty'
 import { installBin } from './utils/install-bin'
+import { AssetData } from '../../logic/catalog'
 
 const INSPECTOR_PREFERENCES_PATH = 'inspector-preferences.json'
 
@@ -134,6 +135,82 @@ export async function initRpcMethods(
     async setInspectorPreferences(req) {
       inspectorPreferences = req
       await fs.writeFile(INSPECTOR_PREFERENCES_PATH, serializeInspectorPreferences(req))
+      return {}
+    },
+    async copyFile(req) {
+      const content = await fs.readFile(req.fromPath)
+      const prevValue = (await fs.existFile(req.toPath)) ? await fs.readFile(req.toPath) : null
+      await fs.writeFile(req.toPath, content)
+
+      // Add undo operation for the file copy
+      undoRedoManager.addUndoFile([{ prevValue, newValue: content, path: req.toPath }])
+
+      return {}
+    },
+    async getFile(req) {
+      const content = await fs.readFile(req.path)
+      return { content }
+    },
+    async createCustomAsset(req) {
+      const { name, composite, resources } = req
+
+      // Create a slug from the name
+      const slug = name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/(^_|_$)/g, '')
+
+      // Find a unique path by appending numbers if needed
+      const basePath = `${DIRECTORY.CUSTOM}`
+      let customAssetPath = `${basePath}/${slug}`
+      let counter = 1
+      while (await fs.existFile(customAssetPath)) {
+        customAssetPath = `${basePath}/${slug}_${++counter}`
+      }
+
+      // Check if folder already exists
+      if (await fs.existFile(customAssetPath)) {
+        throw new Error(`Custom asset "${name}" already exists`)
+      }
+
+      // Create and save data.json with metadata and composite
+      const data: Omit<AssetData, 'composite'> = {
+        id: crypto.randomUUID(),
+        name,
+        category: 'custom',
+        tags: []
+      }
+      await fs.writeFile(`${customAssetPath}/data.json`, Buffer.from(JSON.stringify(data, null, 2)) as Buffer)
+      await fs.writeFile(
+        `${customAssetPath}/composite.json`,
+        Buffer.from(JSON.stringify(JSON.parse(new TextDecoder().decode(composite)), null, 2)) // pretty print
+      )
+
+      // Copy all resources to the custom asset folder
+      const undoAcc: FileOperation[] = []
+      for (const resourcePath of resources) {
+        const fileName = resourcePath.split('/').pop()!
+        const targetPath = `${customAssetPath}/${fileName}`
+        const content = await fs.readFile(resourcePath)
+
+        undoAcc.push({
+          prevValue: null,
+          newValue: content,
+          path: targetPath
+        })
+        await fs.writeFile(targetPath, content)
+      }
+
+      // Add undo operation for the entire asset creation
+      undoRedoManager.addUndoFile([
+        ...undoAcc,
+        {
+          prevValue: null,
+          newValue: Buffer.from(JSON.stringify(data, null, 2)),
+          path: `${customAssetPath}/data.json`
+        }
+      ])
+
       return {}
     }
   }
