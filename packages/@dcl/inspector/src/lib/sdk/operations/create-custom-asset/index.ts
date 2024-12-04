@@ -5,7 +5,9 @@ import {
   PBAudioSource,
   PBGltfContainer,
   PBVideoPlayer,
-  Name
+  Name,
+  getComponentEntityTree,
+  Transform as TransformEngine
 } from '@dcl/ecs'
 import { AssetData } from '../../../logic/catalog'
 import { CoreComponents, EditorComponentNames } from '../../components'
@@ -41,7 +43,6 @@ handleResource<PBVideoPlayer>(CoreComponents.VIDEO_PLAYER, 'src')
 
 export function createCustomAsset(engine: IEngine) {
   return function createCustomAsset(entities: Entity[]): { composite: AssetData['composite']; resources: string[] } {
-    const components = engine.componentsIter()
     const resources: string[] = []
     const composite: AssetData['composite'] = {
       version: 1,
@@ -52,43 +53,60 @@ export function createCustomAsset(engine: IEngine) {
     const componentsByName: Record<string, { data: Record<string, { json: any }> }> = {}
 
     entities.forEach((entity, index) => {
-      // Determine the target entity ID based on whether we have single or multiple entities
-      const targetEntityId = entities.length === 1 ? SINGLE_ENTITY_ID.toString() : (BASE_ENTITY_ID + index).toString()
+      // Get the tree of entities with the Transform component
+      const Transform = engine.getComponent(TransformEngine.componentId) as typeof TransformEngine
+      const tree = Array.from(getComponentEntityTree(engine, entity, Transform))
 
-      // Process each component for the current entity
-      for (const component of components) {
-        const { componentId, componentName } = component
+      // Process each entity in the tree
+      tree.forEach((treeEntity, treeIndex) => {
+        // For the root entity, use the original targetEntityId logic
+        // For child entities, use incremental IDs starting from BASE_ENTITY_ID + entities.length
+        const isRoot = treeEntity === entity
+        const targetEntityId =
+          entities.length === 1 && isRoot
+            ? SINGLE_ENTITY_ID.toString()
+            : (BASE_ENTITY_ID + (isRoot ? index : entities.length + treeIndex)).toString()
 
-        // Skip editor components that are not part of asset-packs
-        if (excludeComponents.includes(componentName)) {
-          continue
+        // Process each component for the current entity
+        for (const component of engine.componentsIter()) {
+          const { componentId, componentName } = component
+
+          // Skip editor components that are not part of asset-packs
+          if (excludeComponents.includes(componentName)) {
+            continue
+          }
+
+          // Skip Transform component for root entities
+          if (isRoot && componentName === CoreComponents.TRANSFORM) {
+            continue
+          }
+
+          const Component = engine.getComponent(componentId) as LastWriteWinElementSetComponentDefinition<unknown>
+
+          if (!Component.has(treeEntity)) continue
+          const componentValue = Component.get(treeEntity)
+          if (!componentValue) continue
+
+          // Process the component value
+          const processedComponentValue: any = { ...componentValue }
+
+          // Handle special components
+          if (componentsWithResources[componentName]) {
+            const propertyName = componentsWithResources[componentName]
+            const originalValue: string = processedComponentValue[propertyName]
+            processedComponentValue[propertyName] = originalValue.replace(/^.*[/]([^/]+)$/, '{assetPath}/$1')
+            resources.push(originalValue)
+          }
+
+          // Initialize component in map if it doesn't exist
+          if (!componentsByName[componentName]) {
+            componentsByName[componentName] = { data: {} }
+          }
+
+          // Add the processed value to the component data
+          componentsByName[componentName].data[targetEntityId] = { json: processedComponentValue }
         }
-
-        const Component = engine.getComponent(componentId) as LastWriteWinElementSetComponentDefinition<unknown>
-
-        if (!Component.has(entity)) continue
-        const componentValue = Component.get(entity)
-        if (!componentValue) continue
-
-        // Process the component value
-        const processedComponentValue: any = { ...componentValue }
-
-        // Handle special components
-        if (componentsWithResources[componentName]) {
-          const propertyName = componentsWithResources[componentName]
-          const originalValue: string = processedComponentValue[propertyName]
-          processedComponentValue[propertyName] = originalValue.replace(/^.*[/]([^/]+)$/, '{assetPath}/$1')
-          resources.push(originalValue)
-        }
-
-        // Initialize component in map if it doesn't exist
-        if (!componentsByName[componentName]) {
-          componentsByName[componentName] = { data: {} }
-        }
-
-        // Add the processed value to the component data
-        componentsByName[componentName].data[targetEntityId] = { json: processedComponentValue }
-      }
+      })
     })
 
     // Convert the map to the final composite format
