@@ -3,6 +3,7 @@ import { RootState } from '../../redux/store'
 import { DataLayerRpcClient } from '../../lib/data-layer/types'
 import { InspectorPreferences } from '../../lib/logic/preferences/types'
 import { Asset, ImportAssetRequest, SaveFileRequest } from '../../lib/data-layer/remote-data-layer'
+import { AssetData } from '@dcl/asset-packs'
 
 export enum ErrorType {
   Disconnected = 'disconnected',
@@ -16,7 +17,8 @@ export enum ErrorType {
   ImportAsset = 'import-asset',
   RemoveAsset = 'remove-asset',
   SaveThumbnail = 'save-thumbnail',
-  GetThumbnails = 'get-thumbnails'
+  GetThumbnails = 'get-thumbnails',
+  CreateCustomAsset = 'create-custom-asset'
 }
 
 let dataLayerInterface: DataLayerRpcClient | undefined
@@ -32,13 +34,21 @@ export interface DataLayerState {
   error: ErrorType | undefined
   removingAsset: Record<string, boolean>
   reloadAssets: string[]
+  customAssetData: {
+    composite: AssetData['composite'] | null
+    resources: string[]
+  }
 }
 
 export const initialState: DataLayerState = {
   reconnectAttempts: 0,
   error: undefined,
   removingAsset: {},
-  reloadAssets: []
+  reloadAssets: [],
+  customAssetData: {
+    composite: null,
+    resources: []
+  }
 }
 
 export const dataLayer = createSlice({
@@ -81,7 +91,11 @@ export const dataLayer = createSlice({
       delete state.removingAsset[payload.payload.path]
     },
     saveThumbnail: (_state, _payload: PayloadAction<SaveFileRequest>) => {},
-    getThumbnails: () => {}
+    getThumbnails: () => {},
+    createCustomAsset: (state, payload: PayloadAction<{ composite: AssetData['composite']; resources: string[] }>) => {
+      state.customAssetData = payload.payload
+      console.log('Custom Asset Data:', payload.payload)
+    }
   }
 })
 
@@ -101,7 +115,8 @@ export const {
   removeAsset,
   clearRemoveAsset,
   saveThumbnail,
-  getThumbnails
+  getThumbnails,
+  createCustomAsset
 } = dataLayer.actions
 
 // Selectors
@@ -109,6 +124,7 @@ export const selectDataLayerError = (state: RootState) => state.dataLayer.error
 export const selectDataLayerReconnectAttempts = (state: RootState) => state.dataLayer.reconnectAttempts
 export const selectDataLayerRemovingAsset = (state: RootState) => state.dataLayer.removingAsset
 export const getReloadAssets = (state: RootState) => state.dataLayer.reloadAssets
+export const selectCustomAssetData = (state: RootState) => state.dataLayer.customAssetData
 
 // Reducer
 export default dataLayer.reducer

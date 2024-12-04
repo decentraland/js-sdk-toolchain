@@ -13,7 +13,8 @@ import {
   importAsset,
   removeAsset,
   getThumbnails,
-  saveThumbnail
+  saveThumbnail,
+  createCustomAsset
 } from '..'
 import { connectSaga } from './connect'
 import { reconnectSaga } from './reconnect'
@@ -27,6 +28,7 @@ import { removeAssetSaga } from './remove-asset'
 import { connectedSaga } from './connected'
 import { getThumbnailsSaga } from './get-thumbnails'
 import { saveThumbnailSaga } from './save-thumbnail'
+import { createCustomAssetSaga } from './create-custom-asset'
 
 export function* dataLayerSaga() {
   yield takeEvery(connect.type, connectSaga)
@@ -42,6 +44,7 @@ export function* dataLayerSaga() {
   yield takeEvery(removeAsset.type, removeAssetSaga)
   yield takeEvery(getThumbnails.type, getThumbnailsSaga)
   yield takeEvery(saveThumbnail.type, saveThumbnailSaga)
+  yield takeEvery(createCustomAsset.type, createCustomAssetSaga)
 }
 
 export default dataLayerSaga

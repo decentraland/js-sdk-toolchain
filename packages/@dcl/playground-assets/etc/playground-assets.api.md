@@ -3918,10 +3918,8 @@ export const TextShape: LastWriteWinElementSetComponentDefinition<PBTextShape>;
 // @public (undocumented)
 export interface Texture {
     filterMode?: TextureFilterMode | undefined;
-    offset?: PBVector2 | undefined;
     // (undocumented)
     src: string;
-    tiling?: PBVector2 | undefined;
     wrapMode?: TextureWrapMode | undefined;
 }
 
