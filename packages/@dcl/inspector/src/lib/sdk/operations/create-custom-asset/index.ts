@@ -4,13 +4,29 @@ import {
   LastWriteWinElementSetComponentDefinition,
   PBAudioSource,
   PBGltfContainer,
-  PBVideoPlayer
+  PBVideoPlayer,
+  Name
 } from '@dcl/ecs'
 import { AssetData } from '../../../logic/catalog'
-import { CoreComponents } from '../../components'
+import { CoreComponents, EditorComponentNames } from '../../components'
+import { ComponentName as AssetPackComponentNames } from '@dcl/asset-packs'
 
 const BASE_ENTITY_ID = 512
 const SINGLE_ENTITY_ID = 0
+
+const assetPackComponents = Object.values(AssetPackComponentNames) as string[]
+// Components that must be excluded from the asset
+const excludeComponents = [
+  // Editor components that are not part of asset-packs
+  ...Object.values(EditorComponentNames).filter((name) => !assetPackComponents.includes(name)),
+  // Core components that must be excluded from the asset
+  CoreComponents.NETWORK_ENTITY,
+  // Name component that must be excluded from the asset
+  Name.componentName
+]
+
+console.log(excludeComponents)
+console.log(assetPackComponents)
 
 const componentsWithResources: Record<string, string> = {}
 
@@ -42,6 +58,12 @@ export function createCustomAsset(engine: IEngine) {
       // Process each component for the current entity
       for (const component of components) {
         const { componentId, componentName } = component
+
+        // Skip editor components that are not part of asset-packs
+        if (excludeComponents.includes(componentName)) {
+          continue
+        }
+
         const Component = engine.getComponent(componentId) as LastWriteWinElementSetComponentDefinition<unknown>
 
         if (!Component.has(entity)) continue
