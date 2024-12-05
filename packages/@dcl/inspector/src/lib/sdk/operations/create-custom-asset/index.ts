@@ -11,7 +11,8 @@ import {
 } from '@dcl/ecs'
 import { AssetData } from '../../../logic/catalog'
 import { CoreComponents, EditorComponentNames } from '../../components'
-import { ComponentName as AssetPackComponentNames } from '@dcl/asset-packs'
+import { ActionType, ComponentName as AssetPackComponentNames } from '@dcl/asset-packs'
+import { Action } from '@dcl/asset-packs'
 
 const BASE_ENTITY_ID = 512
 const SINGLE_ENTITY_ID = 0
@@ -40,6 +41,9 @@ function handleResource<T>(type: string, key: keyof T) {
 handleResource<PBGltfContainer>(CoreComponents.GLTF_CONTAINER, 'src')
 handleResource<PBAudioSource>(CoreComponents.AUDIO_SOURCE, 'audioClipUrl')
 handleResource<PBVideoPlayer>(CoreComponents.VIDEO_PLAYER, 'src')
+
+// Add these action types at the top with other constants
+const RESOURCE_ACTION_TYPES = [ActionType.SHOW_IMAGE, ActionType.PLAY_CUSTOM_EMOTE, ActionType.PLAY_SOUND] as string[]
 
 export function createCustomAsset(engine: IEngine) {
   return function createCustomAsset(entities: Entity[]): { composite: AssetData['composite']; resources: string[] } {
@@ -96,6 +100,24 @@ export function createCustomAsset(engine: IEngine) {
             const originalValue: string = processedComponentValue[propertyName]
             processedComponentValue[propertyName] = originalValue.replace(/^.*[/]([^/]+)$/, '{assetPath}/$1')
             resources.push(originalValue)
+          }
+
+          // Handle Actions component resources
+          if (componentName === AssetPackComponentNames.ACTIONS) {
+            if (Array.isArray(processedComponentValue.value)) {
+              const actions = processedComponentValue.value as Action[]
+              processedComponentValue.value = actions.map((action) => {
+                if (RESOURCE_ACTION_TYPES.includes(action.type)) {
+                  debugger
+                  const payload = JSON.parse(action.jsonPayload)
+                  const originalValue: string = payload.src
+                  payload.src = originalValue.replace(/^.*[/]([^/]+)$/, '{assetPath}/$1')
+                  resources.push(originalValue)
+                  action.jsonPayload = JSON.stringify(payload)
+                }
+                return action
+              })
+            }
           }
 
           // Initialize component in map if it doesn't exist
