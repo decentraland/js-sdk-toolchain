@@ -13,6 +13,7 @@ import { AssetData } from '../../../logic/catalog'
 import { CoreComponents, EditorComponentNames } from '../../components'
 import { ActionType, ComponentName as AssetPackComponentNames } from '@dcl/asset-packs'
 import { Action } from '@dcl/asset-packs'
+import { PBMaterial } from '@dcl/ecs'
 
 const BASE_ENTITY_ID = 512
 const SINGLE_ENTITY_ID = 0
@@ -31,16 +32,21 @@ const excludeComponents = [
 console.log(excludeComponents)
 console.log(assetPackComponents)
 
-const componentsWithResources: Record<string, string> = {}
+const componentsWithResources: Record<string, string[]> = {}
 
-function handleResource<T>(type: string, key: keyof T) {
-  componentsWithResources[type] = key.toString()
+// Modified handleResource function to be strongly typed with array paths
+function handleResource<T extends object>(type: string, keys: string[]): void {
+  componentsWithResources[type] = (keys as string[]).map(String)
 }
 
-// Add resource handlers
-handleResource<PBGltfContainer>(CoreComponents.GLTF_CONTAINER, 'src')
-handleResource<PBAudioSource>(CoreComponents.AUDIO_SOURCE, 'audioClipUrl')
-handleResource<PBVideoPlayer>(CoreComponents.VIDEO_PLAYER, 'src')
+// Update the handlers to use proper typing with array paths
+handleResource<PBGltfContainer>(CoreComponents.GLTF_CONTAINER, ['src'])
+handleResource<PBAudioSource>(CoreComponents.AUDIO_SOURCE, ['audioClipUrl'])
+handleResource<PBVideoPlayer>(CoreComponents.VIDEO_PLAYER, ['src'])
+handleResource<PBMaterial>(CoreComponents.MATERIAL, ['material', 'pbr', 'texture', 'tex', 'texture', 'src'])
+handleResource<PBMaterial>(CoreComponents.MATERIAL, ['material', 'pbr', 'alphaTexture', 'tex', 'texture', 'src'])
+handleResource<PBMaterial>(CoreComponents.MATERIAL, ['material', 'pbr', 'emissiveTexture', 'tex', 'texture', 'src'])
+handleResource<PBMaterial>(CoreComponents.MATERIAL, ['material', 'pbr', 'bumpTexture', 'tex', 'texture', 'src'])
 
 // Add these action types at the top with other constants
 const RESOURCE_ACTION_TYPES = [ActionType.SHOW_IMAGE, ActionType.PLAY_CUSTOM_EMOTE, ActionType.PLAY_SOUND] as string[]
@@ -96,10 +102,24 @@ export function createCustomAsset(engine: IEngine) {
 
           // Handle special components
           if (componentsWithResources[componentName]) {
-            const propertyName = componentsWithResources[componentName]
-            const originalValue: string = processedComponentValue[propertyName]
-            processedComponentValue[propertyName] = originalValue.replace(/^.*[/]([^/]+)$/, '{assetPath}/$1')
-            resources.push(originalValue)
+            const propertyKeys = componentsWithResources[componentName]
+            let value = processedComponentValue
+
+            // Navigate through the property chain safely
+            for (let i = 0; i < propertyKeys.length - 1; i++) {
+              if (value === undefined || value === null) break
+              value = value[propertyKeys[i]]
+            }
+
+            // Only process if we have a valid value and final key
+            if (value && propertyKeys.length > 0) {
+              const finalKey = propertyKeys[propertyKeys.length - 1]
+              const originalValue: string = value[finalKey]
+              if (originalValue) {
+                value[finalKey] = originalValue.replace(/^.*[/]([^/]+)$/, '{assetPath}/$1')
+                resources.push(originalValue)
+              }
+            }
           }
 
           // Handle Actions component resources
