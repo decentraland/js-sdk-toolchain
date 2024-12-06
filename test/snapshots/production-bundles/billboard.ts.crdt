@@ -58,7 +58,7 @@ CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x201 c=1 t=2 data={"position":{"x":12,"y":3.0420734882354736,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   Scene: PUT_COMPONENT e=0x204 c=1 t=2 data={"position":{"x":12,"y":3.0420734882354736,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   Scene: PUT_COMPONENT e=0x203 c=1 t=2 data={"position":{"x":8,"y":3.0420734882354736,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
-  OPCODES ~= 9k
+  OPCODES ~= 10k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
@@ -66,7 +66,7 @@ CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x201 c=1 t=3 data={"position":{"x":12,"y":3.087538480758667,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   Scene: PUT_COMPONENT e=0x204 c=1 t=3 data={"position":{"x":12,"y":3.087538480758667,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   Scene: PUT_COMPONENT e=0x203 c=1 t=3 data={"position":{"x":8,"y":3.087538480758667,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
-  OPCODES ~= 9k
+  OPCODES ~= 10k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
@@ -74,7 +74,7 @@ CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x201 c=1 t=4 data={"position":{"x":12,"y":3.0945944786071777,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   Scene: PUT_COMPONENT e=0x204 c=1 t=4 data={"position":{"x":12,"y":3.0945944786071777,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   Scene: PUT_COMPONENT e=0x203 c=1 t=4 data={"position":{"x":8,"y":3.0945944786071777,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
-  OPCODES ~= 9k
+  OPCODES ~= 10k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
   MEMORY_USAGE_COUNT ~= 1042.09k bytes
