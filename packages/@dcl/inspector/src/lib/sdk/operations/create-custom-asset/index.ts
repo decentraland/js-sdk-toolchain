@@ -2,18 +2,14 @@ import {
   Entity,
   IEngine,
   LastWriteWinElementSetComponentDefinition,
-  PBAudioSource,
-  PBGltfContainer,
-  PBVideoPlayer,
   Name,
   getComponentEntityTree,
   Transform as TransformEngine
 } from '@dcl/ecs'
+import { Action } from '@dcl/asset-packs'
 import { AssetData } from '../../../logic/catalog'
 import { CoreComponents, EditorComponentNames } from '../../components'
-import { ActionType, ComponentName as AssetPackComponentNames } from '@dcl/asset-packs'
-import { Action } from '@dcl/asset-packs'
-import { PBMaterial } from '@dcl/ecs'
+import { ActionType, ComponentName as AssetPackComponentNames, COMPONENTS_WITH_ID } from '@dcl/asset-packs'
 
 const BASE_ENTITY_ID = 512
 const SINGLE_ENTITY_ID = 0
@@ -35,21 +31,34 @@ console.log(assetPackComponents)
 const componentsWithResources: Record<string, string[]> = {}
 
 // Modified handleResource function to be strongly typed with array paths
-function handleResource<T extends object>(type: string, keys: string[]): void {
+function handleResource(type: string, keys: string[]): void {
   componentsWithResources[type] = (keys as string[]).map(String)
 }
 
 // Update the handlers to use proper typing with array paths
-handleResource<PBGltfContainer>(CoreComponents.GLTF_CONTAINER, ['src'])
-handleResource<PBAudioSource>(CoreComponents.AUDIO_SOURCE, ['audioClipUrl'])
-handleResource<PBVideoPlayer>(CoreComponents.VIDEO_PLAYER, ['src'])
-handleResource<PBMaterial>(CoreComponents.MATERIAL, ['material', 'pbr', 'texture', 'tex', 'texture', 'src'])
-handleResource<PBMaterial>(CoreComponents.MATERIAL, ['material', 'pbr', 'alphaTexture', 'tex', 'texture', 'src'])
-handleResource<PBMaterial>(CoreComponents.MATERIAL, ['material', 'pbr', 'emissiveTexture', 'tex', 'texture', 'src'])
-handleResource<PBMaterial>(CoreComponents.MATERIAL, ['material', 'pbr', 'bumpTexture', 'tex', 'texture', 'src'])
+handleResource(CoreComponents.GLTF_CONTAINER, ['src'])
+handleResource(CoreComponents.AUDIO_SOURCE, ['audioClipUrl'])
+handleResource(CoreComponents.VIDEO_PLAYER, ['src'])
+handleResource(CoreComponents.MATERIAL, ['material', 'pbr', 'texture', 'tex', 'texture', 'src'])
+handleResource(CoreComponents.MATERIAL, ['material', 'pbr', 'alphaTexture', 'tex', 'texture', 'src'])
+handleResource(CoreComponents.MATERIAL, ['material', 'pbr', 'emissiveTexture', 'tex', 'texture', 'src'])
+handleResource(CoreComponents.MATERIAL, ['material', 'pbr', 'bumpTexture', 'tex', 'texture', 'src'])
 
 // Add these action types at the top with other constants
 const RESOURCE_ACTION_TYPES = [ActionType.SHOW_IMAGE, ActionType.PLAY_CUSTOM_EMOTE, ActionType.PLAY_SOUND] as string[]
+
+function getComponentNameById<T extends { id: number }>(engine: IEngine, id: number) {
+  const componentNames = Object.values(AssetPackComponentNames)
+  for (const componentName of componentNames) {
+    const Component = engine.getComponent(componentName) as LastWriteWinElementSetComponentDefinition<T>
+    const entities = Array.from(engine.getEntitiesWith(Component))
+    const result = entities.find(([_entity, value]) => value.id === id)
+    if (Array.isArray(result) && result.length > 0) {
+      return componentName
+    }
+  }
+  throw new Error(`Component with id ${id} not found`)
+}
 
 export function createCustomAsset(engine: IEngine) {
   return function createCustomAsset(entities: Entity[]): { composite: AssetData['composite']; resources: string[] } {
@@ -98,7 +107,7 @@ export function createCustomAsset(engine: IEngine) {
           if (!componentValue) continue
 
           // Process the component value
-          const processedComponentValue: any = { ...componentValue }
+          let processedComponentValue: any = { ...componentValue }
 
           // Handle special components
           if (componentsWithResources[componentName]) {
@@ -138,6 +147,26 @@ export function createCustomAsset(engine: IEngine) {
                 return action
               })
             }
+          }
+
+          // Replace id with {self}
+          if (COMPONENTS_WITH_ID.includes(componentName)) {
+            processedComponentValue.id = '{self}'
+          }
+
+          if (componentName === AssetPackComponentNames.TRIGGERS) {
+            const newValue = processedComponentValue.value.map((trigger: any) => ({
+              ...trigger,
+              conditions: (trigger.conditions || []).map((condition: any) => ({
+                ...condition,
+                id: `{self:${getComponentNameById(engine, condition.id)}}`
+              })),
+              actions: trigger.actions.map((action: any) => ({
+                ...action,
+                id: `{self:${getComponentNameById(engine, action.id)}}`
+              }))
+            }))
+            processedComponentValue = { ...processedComponentValue, value: newValue }
           }
 
           // Initialize component in map if it doesn't exist
