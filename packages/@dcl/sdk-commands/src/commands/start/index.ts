@@ -97,7 +97,6 @@ export async function main(options: Options) {
   const isHub = !!options.args['--hub']
 
   let hasSmartWearable = false
-
   const workspace = await getValidWorkspace(options.components, workingDirectory)
 
   /* istanbul ignore if */
@@ -232,7 +231,7 @@ export async function main(options: Options) {
 
       if (explorerAlpha) {
         const realm = new URL(sortedURLs[0]).origin
-        await runExplorerAlpha(components, { cwd: workingDirectory, realm, baseCoords, isHub })
+        await runExplorerAlpha(components, { cwd: workingDirectory, realm, baseCoords, isHub, args: options.args })
       }
 
       // Open preferably localhost/127.0.0.1

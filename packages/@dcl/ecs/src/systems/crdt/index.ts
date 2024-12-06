@@ -216,15 +216,14 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
             ...message,
             messageBuffer: buffer.buffer().subarray(offset, buffer.currentWriteOffset())
           })
+        }
+        if (onProcessEntityComponentChange) {
+          const rawValue =
+            message.type === CrdtMessageType.PUT_COMPONENT || message.type === CrdtMessageType.APPEND_VALUE
+              ? component.get(message.entityId)
+              : undefined
 
-          if (onProcessEntityComponentChange) {
-            const rawValue =
-              message.type === CrdtMessageType.PUT_COMPONENT || message.type === CrdtMessageType.APPEND_VALUE
-                ? component.get(message.entityId)
-                : undefined
-
-            onProcessEntityComponentChange(message.entityId, message.type, component, rawValue)
-          }
+          onProcessEntityComponentChange(message.entityId, message.type, component, rawValue)
         }
       }
     }
