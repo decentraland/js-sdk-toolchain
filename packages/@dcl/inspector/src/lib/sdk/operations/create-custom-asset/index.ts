@@ -106,8 +106,8 @@ export function createCustomAsset(engine: IEngine) {
           const componentValue = Component.get(treeEntity)
           if (!componentValue) continue
 
-          // Process the component value
-          let processedComponentValue: any = { ...componentValue }
+          // Process the component value with a deep copy
+          let processedComponentValue: any = JSON.parse(JSON.stringify(componentValue))
 
           // Handle special components
           if (componentsWithResources[componentName]) {
@@ -137,7 +137,6 @@ export function createCustomAsset(engine: IEngine) {
               const actions = processedComponentValue.value as Action[]
               processedComponentValue.value = actions.map((action) => {
                 if (RESOURCE_ACTION_TYPES.includes(action.type)) {
-                  debugger
                   const payload = JSON.parse(action.jsonPayload)
                   const originalValue: string = payload.src
                   payload.src = originalValue.replace(/^.*[/]([^/]+)$/, '{assetPath}/$1')
