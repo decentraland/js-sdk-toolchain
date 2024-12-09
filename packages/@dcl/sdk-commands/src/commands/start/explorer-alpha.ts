@@ -27,7 +27,7 @@ async function runApp(
   components: CliComponents,
   {
     cwd,
-    realm,
+    realm: realmValue,
     baseCoords,
     isHub,
     args
@@ -40,10 +40,14 @@ async function runApp(
   }
 ) {
   const cmd = isWindows ? 'start' : 'open'
-  // Remove (--) from the command
-  const extraArgs = args._.map(($) => $.replace(/^-+/, '')).join('&')
+  const position = args['--position'] ?? `${baseCoords.x},${baseCoords.y}`
+  const realm = args['--realm'] ?? realmValue
+  const localScene = args['--local-scene'] ?? true
+  const debug = args['--debug'] ?? true
+  const dclenv = args['--dclenv'] ?? 'org'
+
   try {
-    const params = `realm=${realm}&position=${baseCoords.x},${baseCoords.y}&local-scene=true&debug=true&hub=${isHub}&${extraArgs}`
+    const params = `realm=${realm}&position=${position}&local-scene=${localScene}&debug=${debug}&hub=${isHub}&dclenv=${dclenv}`
     const app = `decentraland://"${params}"`
     await components.spawner.exec(cwd, cmd, [app], { silent: true })
     components.logger.info(`Desktop client: decentraland://${params}\n`)

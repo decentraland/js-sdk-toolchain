@@ -52,7 +52,13 @@ export const args = declareArgs({
   '--desktop-client': Boolean,
   '--data-layer': Boolean,
   '--explorer-alpha': Boolean,
-  '--hub': Boolean
+  '--hub': Boolean,
+  // Params related to the explorer-alpha
+  '--debug': Boolean,
+  '--dclenv': String,
+  '--realm': String,
+  '--local-scene': String,
+  '--position': String
 })
 
 export async function help(options: Options) {
@@ -70,6 +76,12 @@ export async function help(options: Options) {
       --web3                    Connects preview to browser wallet to use the associated avatar and account
       --skip-build              Skip build and only serve the files in preview mode
       --desktop-client          Show URL to launch preview in the desktop client (BETA)
+      --debug                   Enables Debug panel mode inside DCL Explorer (default=true)
+      --dclenv                  Decentraland Environment. Which environment uses for the content: catalyst, asset-bundles, etc. Posible values: org, zone, today. (default=org)
+      --realm                   Realm used to serve the content. (default=Localhost)
+      --local-scene             Enable local scene development.
+      --position                Initial Position to start the explorer. (default=position defined at scene.json)
+
 
     Examples:
 
