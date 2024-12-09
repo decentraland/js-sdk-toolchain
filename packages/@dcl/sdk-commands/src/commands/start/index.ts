@@ -77,7 +77,7 @@ export async function help(options: Options) {
       --skip-build              Skip build and only serve the files in preview mode
       --desktop-client          Show URL to launch preview in the desktop client (BETA)
       --debug                   Enables Debug panel mode inside DCL Explorer (default=true)
-      --dclenv                  Decentraland Environment. Which environment uses for the content: catalyst, asset-bundles, etc. Posible values: org, zone, today. (default=org)
+      --dclenv                  Decentraland Environment. Which environment to use for the content. This determines the catalyst server used, asset-bundles, etc. Possible values: org, zone, today. (default=org)
       --realm                   Realm used to serve the content. (default=Localhost)
       --local-scene             Enable local scene development.
       --position                Initial Position to start the explorer. (default=position defined at scene.json)
