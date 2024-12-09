@@ -7,6 +7,7 @@ import { getComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { useSdk } from '../../../hooks/sdk/useSdk'
 import { analytics, Event } from '../../../lib/logic/analytics'
 import { getAssetByModel } from '../../../lib/logic/catalog'
+import CustomAssetIcon from '../../Icons/CustomAsset'
 
 const ContextMenu = (value: Entity) => {
   const sdk = useSdk()
@@ -38,7 +39,10 @@ const ContextMenu = (value: Entity) => {
 
   return (
     <>
-      <Item onClick={handleAction(handleCreateCustomAsset)}>Create Custom Asset</Item>
+      <Item onClick={handleAction(handleCreateCustomAsset)}>
+        <CustomAssetIcon />
+        Create Custom Asset
+      </Item>
       {availableComponents.length > 0 && (
         <>
           <Separator />

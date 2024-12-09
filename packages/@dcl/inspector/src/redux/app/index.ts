@@ -2,6 +2,7 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../store'
 import { InspectorPreferences } from '../../lib/logic/preferences/types'
 import { AssetCatalogResponse, GetFilesResponse } from '../../lib/data-layer/remote-data-layer'
+import { AssetData } from '../../lib/logic/catalog'
 
 export interface AppState {
   canSave: boolean
@@ -9,6 +10,7 @@ export interface AppState {
   assetsCatalog: AssetCatalogResponse | undefined
   thumbnails: GetFilesResponse['files']
   uploadFile: Record<string, File | string | undefined>
+  customAssets: AssetData[]
 }
 
 export const initialState: AppState = {
@@ -17,7 +19,8 @@ export const initialState: AppState = {
   preferences: undefined,
   assetsCatalog: undefined,
   thumbnails: [],
-  uploadFile: {}
+  uploadFile: {},
+  customAssets: []
 }
 
 export const appState = createSlice({
@@ -32,8 +35,12 @@ export const appState = createSlice({
     updatePreferences: (state, { payload }: PayloadAction<{ preferences: InspectorPreferences }>) => {
       state.preferences = payload.preferences
     },
-    updateAssetCatalog: (state, { payload }: PayloadAction<{ assets: AssetCatalogResponse }>) => {
+    updateAssetCatalog: (
+      state,
+      { payload }: PayloadAction<{ assets: AssetCatalogResponse; customAssets: AssetData[] }>
+    ) => {
       state.assetsCatalog = payload.assets
+      state.customAssets = payload.customAssets
     },
     updateThumbnails: (state, { payload }: PayloadAction<GetFilesResponse>) => {
       state.thumbnails = payload.files
@@ -56,6 +63,7 @@ export const selectInspectorPreferences = (state: RootState): InspectorPreferenc
 export const selectAssetCatalog = (state: RootState) => state.app.assetsCatalog
 export const selectThumbnails = (state: RootState) => state.app.thumbnails
 export const selectUploadFile = (state: RootState) => state.app.uploadFile
+export const selectCustomAssets = (state: RootState) => state.app.customAssets
 
 // Reducer
 export default appState.reducer
