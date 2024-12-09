@@ -13,7 +13,7 @@
         "--async-stack-traces"
       ],
       "args": [
-        "${fileBasename}",
+        "${file}",
         "--verbose",
         "--no-cache",
         "-i"
