@@ -1,0 +1,37 @@
+.custom-assets {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 16px;
+  padding: 8px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.custom-asset-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%;
+  border-radius: 8px;
+  background: var(--list-item-bg-color);
+  cursor: pointer;
+  user-select: none;
+  overflow: hidden;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.custom-asset-item:hover {
+  transform: scale(1.05);
+  background: var(--list-item-hover-bg-color);
+}
+
+.custom-asset-item img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

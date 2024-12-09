@@ -212,6 +212,34 @@ export async function initRpcMethods(
       ])
 
       return {}
+    },
+    async getCustomAssets() {
+      debugger
+      /* this lists all the files, like 
+      [
+    "custom/custom-item-name/data.json",
+    "custom/custom-item-name/composite.json",
+    "custom/custom-item-name/example.glb"
+]
+      */
+      const paths = await getFilesInDirectory(fs, `${DIRECTORY.CUSTOM}`, [], true)
+      // Get unique folder names by taking the second segment of each path
+      const folders = [...new Set(paths.map((path) => path.split('/')[1]))]
+      const assets = (
+        await Promise.all(
+          folders.map(async (path) => {
+            try {
+              const data = await fs.readFile(`${DIRECTORY.CUSTOM}/${path}/data.json`)
+              const composite = await fs.readFile(`${DIRECTORY.CUSTOM}/${path}/composite.json`)
+              const parsedData = JSON.parse(new TextDecoder().decode(data))
+              return { ...parsedData, composite: JSON.parse(new TextDecoder().decode(composite)) }
+            } catch {
+              return null
+            }
+          })
+        )
+      ).filter((asset): asset is AssetData => asset !== null)
+      return { assets: assets.map((asset) => ({ data: Buffer.from(JSON.stringify(asset)) })) }
     }
   }
 }
