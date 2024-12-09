@@ -1,9 +1,9 @@
+import { AssetData } from '@dcl/asset-packs'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '../../redux/store'
 import { DataLayerRpcClient } from '../../lib/data-layer/types'
 import { InspectorPreferences } from '../../lib/logic/preferences/types'
 import { Asset, ImportAssetRequest, SaveFileRequest } from '../../lib/data-layer/remote-data-layer'
-import { AssetData } from '@dcl/asset-packs'
 
 export enum ErrorType {
   Disconnected = 'disconnected',
@@ -34,21 +34,13 @@ export interface DataLayerState {
   error: ErrorType | undefined
   removingAsset: Record<string, boolean>
   reloadAssets: string[]
-  customAssetData: {
-    composite: AssetData['composite'] | null
-    resources: string[]
-  }
 }
 
 export const initialState: DataLayerState = {
   reconnectAttempts: 0,
   error: undefined,
   removingAsset: {},
-  reloadAssets: [],
-  customAssetData: {
-    composite: null,
-    resources: []
-  }
+  reloadAssets: []
 }
 
 export const dataLayer = createSlice({
@@ -92,10 +84,10 @@ export const dataLayer = createSlice({
     },
     saveThumbnail: (_state, _payload: PayloadAction<SaveFileRequest>) => {},
     getThumbnails: () => {},
-    createCustomAsset: (state, payload: PayloadAction<{ composite: AssetData['composite']; resources: string[] }>) => {
-      state.customAssetData = payload.payload
-      console.log('Custom Asset Data:', payload.payload)
-    }
+    createCustomAsset: (
+      _state,
+      _payload: PayloadAction<{ composite: AssetData['composite']; resources: string[] }>
+    ) => {}
   }
 })
 
@@ -124,7 +116,6 @@ export const selectDataLayerError = (state: RootState) => state.dataLayer.error
 export const selectDataLayerReconnectAttempts = (state: RootState) => state.dataLayer.reconnectAttempts
 export const selectDataLayerRemovingAsset = (state: RootState) => state.dataLayer.removingAsset
 export const getReloadAssets = (state: RootState) => state.dataLayer.reloadAssets
-export const selectCustomAssetData = (state: RootState) => state.dataLayer.customAssetData
 
 // Reducer
 export default dataLayer.reducer

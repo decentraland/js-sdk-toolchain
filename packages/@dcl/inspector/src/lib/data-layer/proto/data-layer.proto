@@ -72,6 +72,10 @@ message CreateCustomAssetRequest {
   repeated string resources = 3;
 }
 
+message GetCustomAssetsResponse {
+  repeated AssetData assets = 1;
+}
+
 
 service DataService {
   rpc CrdtStream(stream CrdtStreamMessage) returns (stream CrdtStreamMessage) {}
@@ -90,4 +94,5 @@ service DataService {
   rpc CopyFile(CopyFileRequest) returns (Empty) {}
   rpc GetFile(GetFileRequest) returns (GetFileResponse) {}
   rpc CreateCustomAsset(CreateCustomAssetRequest) returns (Empty) {}
+  rpc GetCustomAssets(Empty) returns (GetCustomAssetsResponse) {}
 }
