@@ -175,13 +175,15 @@ export function addAsset(engine: IEngine) {
       const ids = new Map<string, number>()
       for (const component of composite.components) {
         const componentName = component.name
-        for (const [_entityId, data] of Object.entries(component.data)) {
+        for (const [entityId, data] of Object.entries(component.data)) {
           const componentValue = { ...data.json }
           if (COMPONENTS_WITH_ID.includes(componentName) && isSelf(componentValue.id)) {
             ids.set(componentName, getNextId(engine as any))
             componentValue.id = ids.get(componentName)
           }
-          values.set(componentName, componentValue)
+          // Use composite key of componentName and entityId
+          const key = `${componentName}:${entityId}`
+          values.set(key, componentValue)
         }
       }
 
@@ -202,7 +204,8 @@ export function addAsset(engine: IEngine) {
         for (const [entityIdStr] of Object.entries(component.data)) {
           const entityId = Number(entityIdStr) as Entity
           const targetEntity = entities.get(entityId)!
-          let componentValue = values.get(componentName)
+          const key = `${componentName}:${entityIdStr}`
+          let componentValue = values.get(key)
 
           switch (componentName) {
             case CoreComponents.GLTF_CONTAINER: {
