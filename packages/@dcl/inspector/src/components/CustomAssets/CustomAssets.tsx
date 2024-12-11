@@ -2,19 +2,20 @@ import React from 'react'
 import { useDrag } from 'react-dnd'
 
 import './CustomAssets.css'
-import { AssetData } from '../../lib/logic/catalog'
+import { CustomAsset } from '../../lib/logic/catalog'
 import CustomAssetIcon from '../Icons/CustomAsset'
 import { useAppSelector } from '../../redux/hooks'
 import { selectCustomAssets } from '../../redux/app'
+import { DropTypesEnum } from '../../lib/sdk/drag-drop'
 
 interface CustomAssetItemProps {
-  value: AssetData
+  value: CustomAsset
 }
 
 const CustomAssetItem: React.FC<CustomAssetItemProps> = ({ value }) => {
   const [, drag] = useDrag(
     () => ({
-      type: 'custom-asset',
+      type: DropTypesEnum.CustomAsset,
       item: { value }
     }),
     [value]
