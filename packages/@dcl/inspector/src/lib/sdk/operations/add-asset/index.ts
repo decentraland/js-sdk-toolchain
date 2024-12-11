@@ -78,9 +78,6 @@ export function addAsset(engine: IEngine) {
         }
       }
 
-      console.log('roots', roots)
-      debugger
-
       // Store initial transform values
       const transformValues = new Map<Entity, TransformType>()
       if (transform) {
@@ -95,11 +92,16 @@ export function addAsset(engine: IEngine) {
       }
       let defaultParent = parent
       let mainEntity: Entity | null = null
+
+      // If multiple roots, create a new root as main entity
       if (roots.size > 1) {
         mainEntity = addChild(engine)(parent, `${name}_root`)
         Transform.createOrReplace(mainEntity, { parent, position })
         defaultParent = mainEntity
-      } else if (entityIds.size === 1) {
+      }
+
+      // If single entity, use it as root and main entity
+      if (entityIds.size === 1) {
         mainEntity = addChild(engine)(parent, name)
         Transform.createOrReplace(mainEntity, { parent, position })
         entities.set(entityIds.values().next().value, mainEntity)
@@ -157,16 +159,12 @@ export function addAsset(engine: IEngine) {
           }
         }
 
-        // Set mainEntity to the first (and only) root
-        const root = Array.from(roots)[0]
-        mainEntity = entities.get(root)!
-        Transform.createOrReplace(mainEntity, { parent, position })
-      }
-
-      for (const entityId of entityIds) {
-        const entity = entities.get(entityId)!
-        const transform = Transform.get(entity)
-        console.log('transform', entityId, entity, transform)
+        // If multiple entities but single root, use root as main entity
+        if (roots.size === 1) {
+          const root = Array.from(roots)[0]
+          mainEntity = entities.get(root)!
+          Transform.createOrReplace(mainEntity, { parent, position })
+        }
       }
 
       const values = new Map<string, any>()
@@ -176,23 +174,24 @@ export function addAsset(engine: IEngine) {
       for (const component of composite.components) {
         const componentName = component.name
         for (const [entityId, data] of Object.entries(component.data)) {
-          const componentValue = { ...data.json }
-          if (COMPONENTS_WITH_ID.includes(componentName) && isSelf(componentValue.id)) {
-            ids.set(componentName, getNextId(engine as any))
-            componentValue.id = ids.get(componentName)
-          }
           // Use composite key of componentName and entityId
           const key = `${componentName}:${entityId}`
+          const componentValue = { ...data.json }
+          if (COMPONENTS_WITH_ID.includes(componentName) && isSelf(componentValue.id)) {
+            ids.set(key, getNextId(engine as any))
+            componentValue.id = ids.get(key)
+          }
           values.set(key, componentValue)
         }
       }
 
-      const mapId = (id: string | number) => {
+      const mapId = (id: string | number, entityId: string) => {
         if (typeof id === 'string') {
           const match = id.match(/{self:(.+)}/)
           if (match) {
             const componentName = match[1]
-            return ids.get(componentName)
+            const key = `${componentName}:${entityId}`
+            return ids.get(key)
           }
         }
         return id
@@ -271,11 +270,11 @@ export function addAsset(engine: IEngine) {
                 ...trigger,
                 conditions: (trigger.conditions || []).map((condition: any) => ({
                   ...condition,
-                  id: mapId(condition.id)
+                  id: mapId(condition.id, entityIdStr)
                 })),
                 actions: trigger.actions.map((action: any) => ({
                   ...action,
-                  id: mapId(action.id)
+                  id: mapId(action.id, entityIdStr)
                 }))
               }))
               componentValue = { ...componentValue, value: newValue }
@@ -300,6 +299,10 @@ export function addAsset(engine: IEngine) {
           const Component = engine.getComponent(componentName) as LastWriteWinElementSetComponentDefinition<unknown>
           Component.create(targetEntity, componentValue)
         }
+      }
+
+      if (!mainEntity) {
+        throw new Error('No main entity found')
       }
 
       // update selection

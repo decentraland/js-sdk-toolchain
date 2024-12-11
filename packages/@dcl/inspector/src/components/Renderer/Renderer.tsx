@@ -250,7 +250,7 @@ const Renderer: React.FC = () => {
 
   const importCustomAsset = async (asset: CustomAsset) => {
     console.log('importCustomAsset', asset)
-    const destFolder = 'custom-assets'
+    const destFolder = 'custom'
     const assetPackageName = asset.name.trim().replaceAll(' ', '_').toLowerCase()
     const position = await getDropPosition()
     const content: Map<string, Uint8Array> = new Map()
