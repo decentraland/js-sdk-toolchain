@@ -7,8 +7,17 @@ import { Entity } from '@dcl/ecs'
 
 import { DIRECTORY, withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
-import { getReloadAssets, importAsset, saveThumbnail } from '../../redux/data-layer'
-import { getNode, CatalogAssetDrop, DROP_TYPES, IDrop, LocalAssetDrop, isDropType } from '../../lib/sdk/drag-drop'
+import { getDataLayerInterface, getReloadAssets, importAsset, saveThumbnail } from '../../redux/data-layer'
+import {
+  getNode,
+  CatalogAssetDrop,
+  DROP_TYPES,
+  IDrop,
+  LocalAssetDrop,
+  isDropType,
+  DropTypesEnum,
+  CustomAssetDrop
+} from '../../lib/sdk/drag-drop'
 import { useRenderer } from '../../hooks/sdk/useRenderer'
 import { useSdk } from '../../hooks/sdk/useSdk'
 import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
@@ -16,7 +25,7 @@ import { snapPosition } from '../../lib/babylon/decentraland/snap-manager'
 import { loadGltf, removeGltf } from '../../lib/babylon/decentraland/sdkComponents/gltf-container'
 import { getConfig } from '../../lib/logic/config'
 import { ROOT } from '../../lib/sdk/tree'
-import { Asset, isGround, isSmart } from '../../lib/logic/catalog'
+import { Asset, CustomAsset, isGround, isSmart } from '../../lib/logic/catalog'
 import { selectAssetCatalog } from '../../redux/app'
 import { areGizmosDisabled, getHiddenPanels, isGroundGridDisabled } from '../../redux/ui'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
@@ -239,6 +248,64 @@ const Renderer: React.FC = () => {
     canvasRef.current?.focus()
   }
 
+  const importCustomAsset = async (asset: CustomAsset) => {
+    console.log('importCustomAsset', asset)
+    const destFolder = 'custom-assets'
+    const assetPackageName = asset.name.trim().replaceAll(' ', '_').toLowerCase()
+    const position = await getDropPosition()
+    const content: Map<string, Uint8Array> = new Map()
+
+    const dataLayer = getDataLayerInterface()
+    if (!dataLayer) return
+
+    // Find the common base path from all resources
+    const customAssetBasePath = asset.resources.reduce((basePath, path) => {
+      const pathParts = path.split('/')
+      pathParts.pop() // Remove filename
+      const currentPath = pathParts.join('/')
+      if (!basePath) return currentPath
+
+      // Find common prefix between paths
+      const basePathParts = basePath.split('/')
+      const commonParts = []
+      for (let i = 0; i < basePathParts.length; i++) {
+        if (basePathParts[i] === pathParts[i]) {
+          commonParts.push(basePathParts[i])
+        } else {
+          break
+        }
+      }
+      return commonParts.join('/')
+    }, '')
+
+    const files = await Promise.all(
+      asset.resources.map(async (path) => ({
+        path: path.startsWith(customAssetBasePath) ? path.replace(customAssetBasePath, '') : path,
+        content: await dataLayer.getFile({ path }).then((res) => res.content)
+      }))
+    )
+    for (const file of files) {
+      content.set(file.path, file.content)
+    }
+    const model: AssetNodeItem = {
+      type: 'asset',
+      name: asset.name,
+      parent: null,
+      asset: { type: 'gltf', src: '', id: asset.id },
+      composite: asset.composite
+    }
+    const basePath = withAssetDir(`${destFolder}/${assetPackageName}`)
+    console.log('asset', asset)
+    console.log('files', files)
+    console.log('content', content)
+    console.log('position', position)
+    console.log('basePath', basePath)
+    console.log('model', model)
+
+    dispatch(importAsset({ content, basePath, assetPackageName: '', reload: true }))
+    await addAsset(model, position, basePath)
+  }
+
   const importCatalogAsset = async (asset: Asset) => {
     const position = await getDropPosition()
     const fileContent: Record<string, Uint8Array> = {}
@@ -320,12 +387,12 @@ const Renderer: React.FC = () => {
         if (monitor.didDrop()) return
         const itemType = monitor.getItemType()
 
-        if (isDropType<CatalogAssetDrop>(item, itemType, 'catalog-asset')) {
+        if (isDropType<CatalogAssetDrop>(item, itemType, DropTypesEnum.CatalogAsset)) {
           void importCatalogAsset(item.value)
           return
         }
 
-        if (isDropType<LocalAssetDrop>(item, itemType, 'local-asset')) {
+        if (isDropType<LocalAssetDrop>(item, itemType, DropTypesEnum.LocalAsset)) {
           const node = item.context.tree.get(item.value)!
           const model = getNode(node, item.context.tree, isModel)
           if (model) {
@@ -333,9 +400,14 @@ const Renderer: React.FC = () => {
             await addAsset(model, position, DIRECTORY.ASSETS)
           }
         }
+
+        if (isDropType<CustomAssetDrop>(item, itemType, DropTypesEnum.CustomAsset)) {
+          void importCustomAsset(item.value)
+          return
+        }
       },
       hover(item, monitor) {
-        if (isDropType<CatalogAssetDrop>(item, monitor.getItemType(), 'catalog-asset')) {
+        if (isDropType<CatalogAssetDrop>(item, monitor.getItemType(), DropTypesEnum.CatalogAsset)) {
           const asset = item.value
           if (isGround(asset)) {
             if (!showSingleTileHint) {

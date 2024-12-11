@@ -7,6 +7,10 @@ export const catalog = (_catalog as unknown as Catalog).assetPacks
 
 export { Catalog, AssetPack, Asset, AssetData }
 
+export type CustomAsset = AssetData & {
+  resources: string[]
+}
+
 // categories obtained from "builder-items.decentraland.org" catalog
 export const CATEGORIES = [
   'ground',

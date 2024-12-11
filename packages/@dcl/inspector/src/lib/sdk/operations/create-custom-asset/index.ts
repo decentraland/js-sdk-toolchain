@@ -4,15 +4,16 @@ import {
   LastWriteWinElementSetComponentDefinition,
   Name,
   getComponentEntityTree,
-  Transform as TransformEngine
+  Transform as TransformEngine,
+  TransformType
 } from '@dcl/ecs'
 import { Action } from '@dcl/asset-packs'
 import { AssetData } from '../../../logic/catalog'
 import { CoreComponents, EditorComponentNames } from '../../components'
 import { ActionType, ComponentName as AssetPackComponentNames, COMPONENTS_WITH_ID } from '@dcl/asset-packs'
 
-const BASE_ENTITY_ID = 512
-const SINGLE_ENTITY_ID = 0
+const BASE_ENTITY_ID = 512 as Entity
+const SINGLE_ENTITY_ID = 0 as Entity
 
 const assetPackComponents = Object.values(AssetPackComponentNames) as string[]
 // Components that must be excluded from the asset
@@ -71,20 +72,27 @@ export function createCustomAsset(engine: IEngine) {
     // Create a map to store components by their name
     const componentsByName: Record<string, { data: Record<string, { json: any }> }> = {}
 
+    // mappings
+    const entityIds = new Map<Entity, Entity>()
+    let entityCount = 0
+
     entities.forEach((entity, index) => {
       // Get the tree of entities with the Transform component
       const Transform = engine.getComponent(TransformEngine.componentId) as typeof TransformEngine
       const tree = Array.from(getComponentEntityTree(engine, entity, Transform))
 
       // Process each entity in the tree
-      tree.forEach((treeEntity, treeIndex) => {
+      tree.forEach((treeEntity) => {
         // For the root entity, use the original targetEntityId logic
         // For child entities, use incremental IDs starting from BASE_ENTITY_ID + entities.length
         const isRoot = treeEntity === entity
-        const targetEntityId =
+        const targetEntityId: Entity =
           entities.length === 1 && isRoot
-            ? SINGLE_ENTITY_ID.toString()
-            : (BASE_ENTITY_ID + (isRoot ? index : entities.length + treeIndex)).toString()
+            ? SINGLE_ENTITY_ID
+            : ((BASE_ENTITY_ID + (isRoot ? index : entities.length + entityCount++)) as Entity)
+
+        // set the mapping
+        entityIds.set(treeEntity, targetEntityId)
 
         // Process each component for the current entity
         for (const component of engine.componentsIter()) {
@@ -178,6 +186,21 @@ export function createCustomAsset(engine: IEngine) {
         }
       })
     })
+
+    // map the entity ids to the target entity ids
+    if (componentsByName[CoreComponents.TRANSFORM]) {
+      const transform = componentsByName[CoreComponents.TRANSFORM] as {
+        data: { [key: Entity]: { json: TransformType } }
+      }
+      for (const transformData of Object.values(transform.data)) {
+        if (transformData.json.parent) {
+          const targetEntityId = entityIds.get(transformData.json.parent)
+          if (typeof targetEntityId !== 'undefined') {
+            transformData.json.parent = targetEntityId
+          }
+        }
+      }
+    }
 
     // Convert the map to the final composite format
     composite.components = Object.entries(componentsByName).map(([name, data]) => ({
