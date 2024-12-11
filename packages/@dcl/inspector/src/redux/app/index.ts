@@ -2,7 +2,7 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../store'
 import { InspectorPreferences } from '../../lib/logic/preferences/types'
 import { AssetCatalogResponse, GetFilesResponse } from '../../lib/data-layer/remote-data-layer'
-import { AssetData } from '../../lib/logic/catalog'
+import { CustomAsset } from '../../lib/logic/catalog'
 
 export interface AppState {
   canSave: boolean
@@ -10,7 +10,7 @@ export interface AppState {
   assetsCatalog: AssetCatalogResponse | undefined
   thumbnails: GetFilesResponse['files']
   uploadFile: Record<string, File | string | undefined>
-  customAssets: AssetData[]
+  customAssets: CustomAsset[]
 }
 
 export const initialState: AppState = {
@@ -37,7 +37,7 @@ export const appState = createSlice({
     },
     updateAssetCatalog: (
       state,
-      { payload }: PayloadAction<{ assets: AssetCatalogResponse; customAssets: AssetData[] }>
+      { payload }: PayloadAction<{ assets: AssetCatalogResponse; customAssets: CustomAsset[] }>
     ) => {
       state.assetsCatalog = payload.assets
       state.customAssets = payload.customAssets

@@ -164,7 +164,7 @@ export async function initRpcMethods(
       const basePath = `${DIRECTORY.CUSTOM}`
       let customAssetPath = `${basePath}/${slug}`
       let counter = 1
-      while (await fs.existFile(customAssetPath)) {
+      while (await fs.existFile(`${customAssetPath}/data.json`)) {
         customAssetPath = `${basePath}/${slug}_${++counter}`
       }
 
@@ -214,25 +214,32 @@ export async function initRpcMethods(
       return {}
     },
     async getCustomAssets() {
-      debugger
-      /* this lists all the files, like 
-      [
-    "custom/custom-item-name/data.json",
-    "custom/custom-item-name/composite.json",
-    "custom/custom-item-name/example.glb"
-]
-      */
       const paths = await getFilesInDirectory(fs, `${DIRECTORY.CUSTOM}`, [], true)
-      // Get unique folder names by taking the second segment of each path
       const folders = [...new Set(paths.map((path) => path.split('/')[1]))]
       const assets = (
         await Promise.all(
           folders.map(async (path) => {
             try {
-              const data = await fs.readFile(`${DIRECTORY.CUSTOM}/${path}/data.json`)
-              const composite = await fs.readFile(`${DIRECTORY.CUSTOM}/${path}/composite.json`)
+              const files = await getFilesInDirectory(fs, `${DIRECTORY.CUSTOM}/${path}`, [], true)
+              let dataPath: string | null = null
+              let compositePath: string | null = null
+              const resources: string[] = []
+              for (const file of files) {
+                if (file.endsWith('data.json')) {
+                  dataPath = file
+                } else if (file.endsWith('composite.json')) {
+                  compositePath = file
+                } else {
+                  resources.push(file)
+                }
+              }
+              if (!dataPath || !compositePath) {
+                return null
+              }
+              const data = await fs.readFile(dataPath)
+              const composite = await fs.readFile(compositePath)
               const parsedData = JSON.parse(new TextDecoder().decode(data))
-              return { ...parsedData, composite: JSON.parse(new TextDecoder().decode(composite)) }
+              return { ...parsedData, composite: JSON.parse(new TextDecoder().decode(composite)), resources }
             } catch {
               return null
             }
