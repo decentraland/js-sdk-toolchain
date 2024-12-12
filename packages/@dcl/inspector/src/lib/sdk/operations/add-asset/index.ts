@@ -297,7 +297,7 @@ export function addAsset(engine: IEngine) {
           }
 
           const Component = engine.getComponent(componentName) as LastWriteWinElementSetComponentDefinition<unknown>
-          Component.create(targetEntity, componentValue)
+          Component.createOrReplace(targetEntity, componentValue)
         }
       }
 

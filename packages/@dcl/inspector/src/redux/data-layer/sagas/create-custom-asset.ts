@@ -7,13 +7,13 @@ import { selectAssetsTab } from '../../ui'
 import { AssetsTab } from '../../ui/types'
 
 export function* createCustomAssetSaga(
-  action: PayloadAction<{ composite: AssetData['composite']; resources: string[] }>
+  action: PayloadAction<{ name: string; composite: AssetData['composite']; resources: string[] }>
 ) {
   const dataLayer: IDataLayer = yield call(getDataLayerInterface)
   if (!dataLayer) return
   try {
     yield call(dataLayer.createCustomAsset, {
-      name: 'sabe',
+      name: action.payload.name,
       composite: Buffer.from(JSON.stringify(action.payload.composite)),
       resources: action.payload.resources
     })

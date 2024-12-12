@@ -86,7 +86,7 @@ export const dataLayer = createSlice({
     getThumbnails: () => {},
     createCustomAsset: (
       _state,
-      _payload: PayloadAction<{ composite: AssetData['composite']; resources: string[] }>
+      _payload: PayloadAction<{ name: string; composite: AssetData['composite']; resources: string[] }>
     ) => {}
   }
 })
