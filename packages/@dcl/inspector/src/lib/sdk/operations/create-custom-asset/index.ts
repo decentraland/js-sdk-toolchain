@@ -2,7 +2,6 @@ import {
   Entity,
   IEngine,
   LastWriteWinElementSetComponentDefinition,
-  Name,
   getComponentEntityTree,
   Transform as TransformEngine,
   TransformType
@@ -17,17 +16,12 @@ const SINGLE_ENTITY_ID = 0 as Entity
 
 const assetPackComponents = Object.values(AssetPackComponentNames) as string[]
 // Components that must be excluded from the asset
-const excludeComponents = [
+const excludeComponents: string[] = [
   // Editor components that are not part of asset-packs
   ...Object.values(EditorComponentNames).filter((name) => !assetPackComponents.includes(name)),
   // Core components that must be excluded from the asset
-  CoreComponents.NETWORK_ENTITY,
-  // Name component that must be excluded from the asset
-  Name.componentName
+  CoreComponents.NETWORK_ENTITY
 ]
-
-console.log(excludeComponents)
-console.log(assetPackComponents)
 
 const componentsWithResources: Record<string, string[]> = {}
 

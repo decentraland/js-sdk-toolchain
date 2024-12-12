@@ -19,6 +19,6 @@
     "packages/@dcl/inspector/hot-reload.js": false
   },
   "[typescript]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }
