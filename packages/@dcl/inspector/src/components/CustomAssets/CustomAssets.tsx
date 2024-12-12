@@ -23,14 +23,11 @@ const CustomAssetItem: React.FC<CustomAssetItemProps> = ({ value }) => {
 
   return (
     <>
-      <div
-        className="custom-asset-item"
-        ref={drag}
-        data-test-id={value.id}
-        data-test-label={value.name}
-        title={value.name}
-      >
-        <CustomAssetIcon /> {value.name}
+      <div className="custom-asset-item">
+        <div className="custom-asset-item-box" ref={drag} title={value.name}>
+          <CustomAssetIcon />
+        </div>
+        <span className="custom-asset-item-label">{value.name}</span>
       </div>
     </>
   )
