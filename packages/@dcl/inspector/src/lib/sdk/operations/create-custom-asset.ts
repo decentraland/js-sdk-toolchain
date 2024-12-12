@@ -7,8 +7,8 @@ import {
   TransformType
 } from '@dcl/ecs'
 import { Action } from '@dcl/asset-packs'
-import { AssetData } from '../../../logic/catalog'
-import { CoreComponents, EditorComponentNames } from '../../components'
+import { AssetData } from '../../logic/catalog'
+import { CoreComponents, EditorComponentNames } from '../components'
 import { ActionType, ComponentName as AssetPackComponentNames, COMPONENTS_WITH_ID } from '@dcl/asset-packs'
 
 const BASE_ENTITY_ID = 512 as Entity

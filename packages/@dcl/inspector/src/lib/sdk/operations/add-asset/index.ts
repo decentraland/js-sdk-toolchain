@@ -6,7 +6,8 @@ import {
   Vector3Type,
   LastWriteWinElementSetComponentDefinition,
   NetworkEntity as NetworkEntityEngine,
-  TransformType
+  TransformType,
+  Name
 } from '@dcl/ecs'
 import {
   ActionType,
@@ -51,9 +52,9 @@ export function addAsset(engine: IEngine) {
 
       // Tranform tree
       const parentOf = new Map<Entity, Entity>()
-      const transform = composite.components.find((component) => component.name === CoreComponents.TRANSFORM)
-      if (transform) {
-        for (const [entityId, transformData] of Object.entries(transform.data)) {
+      const transformComponent = composite.components.find((component) => component.name === CoreComponents.TRANSFORM)
+      if (transformComponent) {
+        for (const [entityId, transformData] of Object.entries(transformComponent.data)) {
           const entity = Number(entityId) as Entity
           entityIds.add(entity)
           if (typeof transformData.json.parent === 'number') {
@@ -62,6 +63,17 @@ export function addAsset(engine: IEngine) {
           }
         }
       }
+
+      // Store names
+      const names = new Map<Entity, string>()
+      const nameComponent = composite.components.find((component) => component.name === Name.componentName)
+      if (nameComponent) {
+        for (const [entityId, nameData] of Object.entries(nameComponent.data)) {
+          names.set(Number(entityId) as Entity, nameData.json.value)
+        }
+      }
+
+      console.log(names)
 
       // Get all entity ids
       for (const component of composite.components) {
@@ -80,8 +92,8 @@ export function addAsset(engine: IEngine) {
 
       // Store initial transform values
       const transformValues = new Map<Entity, TransformType>()
-      if (transform) {
-        for (const [entityId, transformData] of Object.entries(transform.data)) {
+      if (transformComponent) {
+        for (const [entityId, transformData] of Object.entries(transformComponent.data)) {
           const entity = Number(entityId) as Entity
           transformValues.set(entity, transformData.json)
         }
@@ -124,7 +136,7 @@ export function addAsset(engine: IEngine) {
             orphanedEntities.set(entityId, intendedParentId)
           }
 
-          const entity = addChild(engine)(parentEntity || defaultParent, `${name}_${entityId}`)
+          const entity = addChild(engine)(parentEntity || defaultParent, names.get(entityId) || `${name}_${entityId}`)
 
           // Apply transform values from composite
           const transformValue = transformValues.get(entityId)
@@ -292,7 +304,7 @@ export function addAsset(engine: IEngine) {
             }
           }
 
-          if (componentName === CoreComponents.TRANSFORM) {
+          if (componentName === CoreComponents.TRANSFORM || componentName === Name.componentName) {
             continue
           }
 
