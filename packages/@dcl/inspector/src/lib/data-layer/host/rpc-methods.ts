@@ -168,11 +168,6 @@ export async function initRpcMethods(
         customAssetPath = `${basePath}/${slug}_${++counter}`
       }
 
-      // Check if folder already exists
-      if (await fs.existFile(customAssetPath)) {
-        throw new Error(`Custom asset "${name}" already exists`)
-      }
-
       // Create and save data.json with metadata and composite
       const data: Omit<AssetData, 'composite'> = {
         id: crypto.randomUUID(),
@@ -266,7 +261,8 @@ export async function initRpcMethods(
 
             if (parsedData.id === assetId) {
               // Found the asset to delete - get all files in this folder
-              const files = await getFilesInDirectory(fs, `${DIRECTORY.CUSTOM}/${folder}`, [], true)
+              const folderPath = `${DIRECTORY.CUSTOM}/${folder}`
+              const files = await getFilesInDirectory(fs, folderPath, [], true)
 
               // Store file contents for undo operation
               for (const file of files) {
