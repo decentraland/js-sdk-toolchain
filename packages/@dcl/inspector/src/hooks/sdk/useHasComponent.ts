@@ -1,5 +1,5 @@
 import { Entity } from '@dcl/ecs'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Component } from '../../lib/sdk/components'
 import { useChange } from './useChange'
@@ -12,6 +12,10 @@ export const useHasComponent = (entity: Entity, component: Component) => {
       setHasComponent(component.has(entity))
     }
   })
+
+  useEffect(() => {
+    setHasComponent(component.has(entity))
+  }, [entity, component])
 
   return hasComponent
 }
