@@ -116,11 +116,9 @@ export function createReconciler(
           ? pointerEvents.onPointerUp
           : update.component === 'onMouseEnter'
           ? pointerEvents.onPointerHoverEnter
-          : update.component === 'onMouseLeave'
-          ? pointerEvents.onPointerHoverLeave
-          : undefined
+          : update.component === 'onMouseLeave' && pointerEvents.onPointerHoverLeave
 
-      if (pointerEventSystem !== undefined) {
+      if (pointerEventSystem) {
         pointerEventSystem(
           {
             entity: instance.entity,
