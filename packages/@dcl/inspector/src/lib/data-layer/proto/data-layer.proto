@@ -76,6 +76,9 @@ message GetCustomAssetsResponse {
   repeated AssetData assets = 1;
 }
 
+message DeleteCustomAssetRequest {
+  string asset_id = 1;
+}
 
 service DataService {
   rpc CrdtStream(stream CrdtStreamMessage) returns (stream CrdtStreamMessage) {}
@@ -95,4 +98,5 @@ service DataService {
   rpc GetFile(GetFileRequest) returns (GetFileResponse) {}
   rpc CreateCustomAsset(CreateCustomAssetRequest) returns (Empty) {}
   rpc GetCustomAssets(Empty) returns (GetCustomAssetsResponse) {}
+  rpc DeleteCustomAsset(DeleteCustomAssetRequest) returns (Empty) {}
 }

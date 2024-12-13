@@ -18,7 +18,8 @@ export enum ErrorType {
   RemoveAsset = 'remove-asset',
   SaveThumbnail = 'save-thumbnail',
   GetThumbnails = 'get-thumbnails',
-  CreateCustomAsset = 'create-custom-asset'
+  CreateCustomAsset = 'create-custom-asset',
+  DeleteCustomAsset = 'delete-custom-asset'
 }
 
 let dataLayerInterface: DataLayerRpcClient | undefined
@@ -87,7 +88,8 @@ export const dataLayer = createSlice({
     createCustomAsset: (
       _state,
       _payload: PayloadAction<{ name: string; composite: AssetData['composite']; resources: string[] }>
-    ) => {}
+    ) => {},
+    deleteCustomAsset: (_state, _payload: PayloadAction<{ assetId: string }>) => {}
   }
 })
 
@@ -108,7 +110,8 @@ export const {
   clearRemoveAsset,
   saveThumbnail,
   getThumbnails,
-  createCustomAsset
+  createCustomAsset,
+  deleteCustomAsset
 } = dataLayer.actions
 
 // Selectors

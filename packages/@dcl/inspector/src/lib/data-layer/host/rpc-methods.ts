@@ -247,6 +247,51 @@ export async function initRpcMethods(
         )
       ).filter((asset): asset is AssetData => asset !== null)
       return { assets: assets.map((asset) => ({ data: Buffer.from(JSON.stringify(asset)) })) }
+    },
+    async deleteCustomAsset(req) {
+      const { assetId } = req
+      const paths = await getFilesInDirectory(fs, `${DIRECTORY.CUSTOM}`, [], true)
+      const folders = [...new Set(paths.map((path) => path.split('/')[1]))]
+
+      // Keep track of deleted files for undo operation
+      const undoAcc: FileOperation[] = []
+
+      for (const folder of folders) {
+        const dataPath = `${DIRECTORY.CUSTOM}/${folder}/data.json`
+
+        if (await fs.existFile(dataPath)) {
+          try {
+            const data = await fs.readFile(dataPath)
+            const parsedData = JSON.parse(new TextDecoder().decode(data))
+
+            if (parsedData.id === assetId) {
+              // Found the asset to delete - get all files in this folder
+              const files = await getFilesInDirectory(fs, `${DIRECTORY.CUSTOM}/${folder}`, [], true)
+
+              // Store file contents for undo operation
+              for (const file of files) {
+                const content = await fs.readFile(file)
+                undoAcc.push({
+                  prevValue: content,
+                  newValue: null,
+                  path: file
+                })
+                await fs.rm(file)
+              }
+
+              // Add undo operation for all deleted files
+              undoRedoManager.addUndoFile(undoAcc)
+
+              return {} // Return Empty object as required by the type
+            }
+          } catch (err) {
+            // Skip folders with invalid JSON data
+            continue
+          }
+        }
+      }
+
+      throw new Error(`Custom asset with id ${assetId} not found`)
     }
   }
 }
