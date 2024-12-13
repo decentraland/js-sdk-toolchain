@@ -21,6 +21,8 @@ const HierarchyIcon = withSdk<{ value: Entity }>(({ sdk, value }) => {
     [sdk, value]
   )
 
+  const isCustom = useMemo(() => sdk.components.CustomAsset.has(value), [sdk, value])
+
   const isTile = useMemo(() => sdk.components.Tile.has(value), [sdk, value])
 
   const isGroup = useMemo(() => {
@@ -35,6 +37,8 @@ const HierarchyIcon = withSdk<{ value: Entity }>(({ sdk, value }) => {
     return <span className="tree-icon player-icon"></span>
   } else if (value === CAMERA) {
     return <span className="tree-icon camera-icon"></span>
+  } else if (isCustom) {
+    return <span className="tree-icon custom-icon"></span>
   } else if (isSmart) {
     return <span className="tree-icon smart-icon"></span>
   } else if (isTile) {

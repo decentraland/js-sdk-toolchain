@@ -36,12 +36,14 @@ export function addAsset(engine: IEngine) {
     base: string,
     enumEntityId: EnumEntity,
     composite?: AssetData['composite'],
-    assetId?: string
+    assetId?: string,
+    custom?: boolean
   ): Entity {
     const Transform = engine.getComponent(TransformEngine.componentId) as typeof TransformEngine
     const GltfContainer = engine.getComponent(GltfEngine.componentId) as typeof GltfEngine
     const NetworkEntity = engine.getComponent(NetworkEntityEngine.componentId) as typeof NetworkEntityEngine
     const Nodes = engine.getComponent(EditorComponentNames.Nodes) as EditorComponents['Nodes']
+    const CustomAsset = engine.getComponent(EditorComponentNames.CustomAsset) as EditorComponents['CustomAsset']
 
     if (composite) {
       // Get all unique entity IDs from components
@@ -315,6 +317,10 @@ export function addAsset(engine: IEngine) {
 
       if (!mainEntity) {
         throw new Error('No main entity found')
+      }
+
+      if (assetId && custom) {
+        CustomAsset.createOrReplace(mainEntity, { assetId })
       }
 
       // update selection

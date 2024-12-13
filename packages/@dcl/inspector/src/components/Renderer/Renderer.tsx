@@ -211,7 +211,7 @@ const Renderer: React.FC = () => {
     return snapPosition(new Vector3(fixedNumber(pointerCoords.x), 0, fixedNumber(pointerCoords.z)))
   }
 
-  const addAsset = async (asset: AssetNodeItem, position: Vector3, basePath: string) => {
+  const addAsset = async (asset: AssetNodeItem, position: Vector3, basePath: string, isCustom: boolean) => {
     if (!sdk) return
     const { operations } = sdk
     operations.addAsset(
@@ -222,14 +222,16 @@ const Renderer: React.FC = () => {
       basePath,
       sdk.enumEntity,
       asset.composite,
-      asset.asset.id
+      asset.asset.id,
+      isCustom
     )
     await operations.dispatch()
     analytics.track(Event.ADD_ITEM, {
       itemId: asset.asset.id,
       itemName: asset.name,
       itemPath: asset.asset.src,
-      isSmart: isSmart(asset)
+      isSmart: isSmart(asset),
+      isCustom
     })
     canvasRef.current?.focus()
   }
@@ -303,7 +305,7 @@ const Renderer: React.FC = () => {
     console.log('model', model)
 
     dispatch(importAsset({ content, basePath, assetPackageName: '', reload: true }))
-    await addAsset(model, position, basePath)
+    await addAsset(model, position, basePath, true)
   }
 
   const importCatalogAsset = async (asset: Asset) => {
@@ -376,7 +378,7 @@ const Renderer: React.FC = () => {
       if (isGround(asset)) {
         position.y += 0.25
       }
-      await addAsset(model, position, basePath)
+      await addAsset(model, position, basePath, false)
     }
   }
 
@@ -397,7 +399,7 @@ const Renderer: React.FC = () => {
           const model = getNode(node, item.context.tree, isModel)
           if (model) {
             const position = await getDropPosition()
-            await addAsset(model, position, DIRECTORY.ASSETS)
+            await addAsset(model, position, DIRECTORY.ASSETS, false)
           }
         }
 
