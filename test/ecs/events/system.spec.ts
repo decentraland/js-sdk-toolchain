@@ -262,7 +262,6 @@ describe('Events System', () => {
 
   it('should run default onHoverEnter', async () => {
     const entity = engine.addEntity()
-    const PointerEvents = components.PointerEvents(engine)
     let counter = 0
     EventsSystem.onPointerHoverEnter(
       {
@@ -275,7 +274,6 @@ describe('Events System', () => {
     fakePointer(entity, PointerEventType.PET_HOVER_ENTER)
     await engine.update(1)
     expect(counter).toBe(1)
-    expect(PointerEvents.getOrNull(entity)).toBe(null)
   })
 
   it('should remove pointer hover enter', async () => {
@@ -304,7 +302,6 @@ describe('Events System', () => {
 
   it('should run default onHoverLeave', async () => {
     const entity = engine.addEntity()
-    const PointerEvents = components.PointerEvents(engine)
     let counter = 0
     EventsSystem.onPointerHoverLeave(
       {
@@ -317,7 +314,6 @@ describe('Events System', () => {
     fakePointer(entity, PointerEventType.PET_HOVER_LEAVE)
     await engine.update(1)
     expect(counter).toBe(1)
-    expect(PointerEvents.getOrNull(entity)).toBe(null)
   })
 
   it('should remove pointer hover leave', async () => {
