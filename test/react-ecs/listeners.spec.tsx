@@ -181,3 +181,59 @@ describe('Ui MouseEnter React Ecs', () => {
     expect(counter).toBe(8888)
   })
 })
+
+describe('Ui MouseLeave React Ecs', () => {
+  const { engine, uiRenderer } = setupEngine()
+  const PointerEventsResult = components.PointerEventsResult(engine)
+  const uiEntity = ((engine.addEntity() as number) + 1) as Entity
+  let fakeCounter = 0
+  const mouseLeaveEvent = () => {
+    PointerEventsResult.addValue(
+      uiEntity,
+      createTestPointerDownCommand(uiEntity, fakeCounter + 1, PointerEventType.PET_HOVER_LEAVE)
+    )
+    fakeCounter += 1
+  }
+  let counter = 0
+  let onMouseLeave: (() => void) | undefined = () => {
+    counter++
+  }
+
+  const ui = () => <UiEntity uiTransform={{ width: 100 }} onMouseLeave={onMouseLeave} />
+  uiRenderer.setUiRenderer(ui)
+
+  it('the counter should be 0 at the begginning', async () => {
+    expect(counter).toBe(0)
+    await engine.update(1)
+  })
+  it('if we create a mouseDown event, then the onMouseLeave fn must be called and increment the counter by 1', async () => {
+    // Click with the current onMouseLeave
+    mouseLeaveEvent()
+    await engine.update(1)
+    expect(counter).toBe(1)
+  })
+
+  it('remove onMouseLeave handler and verify that the counter is still 1', async () => {
+    // Remove onMouseLeave
+    onMouseLeave = undefined
+    await engine.update(1)
+    expect(counter).toBe(1)
+  })
+
+  it('create a mouseDown event and verify that the counter is not being incremented', async () => {
+    mouseLeaveEvent()
+    await engine.update(1)
+    expect(counter).toBe(1)
+  })
+
+  it('replace onMouseLeave callback with a custom counter setter, and create an event to see if its being called', async () => {
+    // Add a new onMouseLeave
+    onMouseLeave = () => {
+      counter = 8888
+    }
+    await engine.update(1)
+    mouseLeaveEvent()
+    await engine.update(1)
+    expect(counter).toBe(8888)
+  })
+})
