@@ -1,3 +1,4 @@
+import { AssetData } from '@dcl/asset-packs'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '../../redux/store'
 import { DataLayerRpcClient } from '../../lib/data-layer/types'
@@ -16,7 +17,9 @@ export enum ErrorType {
   ImportAsset = 'import-asset',
   RemoveAsset = 'remove-asset',
   SaveThumbnail = 'save-thumbnail',
-  GetThumbnails = 'get-thumbnails'
+  GetThumbnails = 'get-thumbnails',
+  CreateCustomAsset = 'create-custom-asset',
+  DeleteCustomAsset = 'delete-custom-asset'
 }
 
 let dataLayerInterface: DataLayerRpcClient | undefined
@@ -81,7 +84,12 @@ export const dataLayer = createSlice({
       delete state.removingAsset[payload.payload.path]
     },
     saveThumbnail: (_state, _payload: PayloadAction<SaveFileRequest>) => {},
-    getThumbnails: () => {}
+    getThumbnails: () => {},
+    createCustomAsset: (
+      _state,
+      _payload: PayloadAction<{ name: string; composite: AssetData['composite']; resources: string[] }>
+    ) => {},
+    deleteCustomAsset: (_state, _payload: PayloadAction<{ assetId: string }>) => {}
   }
 })
 
@@ -101,7 +109,9 @@ export const {
   removeAsset,
   clearRemoveAsset,
   saveThumbnail,
-  getThumbnails
+  getThumbnails,
+  createCustomAsset,
+  deleteCustomAsset
 } = dataLayer.actions
 
 // Selectors

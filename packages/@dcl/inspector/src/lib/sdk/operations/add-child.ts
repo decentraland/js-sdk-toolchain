@@ -25,7 +25,7 @@ export function generateUniqueName(engine: IEngine, Name: NameComponent, value: 
   const nodes = getNodes(engine)
 
   let isFirst = true
-  let max = 0
+  let max = 1
   for (const $ of nodes) {
     const name = (Name.getOrNull($.entity)?.value || '').toLowerCase()
     if (pattern.test(name)) {

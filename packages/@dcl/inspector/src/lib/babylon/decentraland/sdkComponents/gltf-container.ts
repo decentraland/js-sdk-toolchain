@@ -12,6 +12,8 @@ import { CAMERA, PLAYER } from '../../../sdk/tree'
 
 let sceneContext: WeakRef<SceneContext>
 
+export const resourcesByPath = new Map<string, Set<string>>()
+
 BABYLON.SceneLoader.OnPluginActivatedObservable.add(function (plugin) {
   if (plugin instanceof GLTFFileLoader) {
     plugin.animationStartMode = GLTFLoaderAnimationStartMode.NONE
@@ -30,7 +32,8 @@ BABYLON.SceneLoader.OnPluginActivatedObservable.add(function (plugin) {
       //  caches all the files by their name (CIDv1)
       const loader: GLTFLoader = (plugin as any)._loader
       const file: string = (loader as any)._fileName
-      const [_gltfFilename, strParams] = file.split('?')
+      const [gltfFilename, strParams] = file.split('?')
+
       if (strParams) {
         const params = new URLSearchParams(strParams)
         const base = params.get('base') || ''
@@ -40,8 +43,14 @@ BABYLON.SceneLoader.OnPluginActivatedObservable.add(function (plugin) {
           console.log(`Fetching ${filePath}`)
           const content = await ctx.getFile(filePath)
           if (content) {
+            // This is a hack to get the resources loaded by the gltf file
+            if (!resourcesByPath.has(gltfFilename)) {
+              resourcesByPath.set(gltfFilename, new Set())
+            }
+            const resources = resourcesByPath.get(gltfFilename)!
+            resources.add(filePath)
             // TODO: this works with File, but it doesn't match the types (it requires string)
-            return new File([content], _gltfFilename) as any
+            return new File([content], gltfFilename) as any
           }
         }
       }

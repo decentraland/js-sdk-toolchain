@@ -1,5 +1,6 @@
 export enum AssetsTab {
   FileSystem = 'FileSystem',
+  CustomAssets = 'CustomAssets',
   AssetsPack = 'AssetsPack',
   Import = 'Import'
 }

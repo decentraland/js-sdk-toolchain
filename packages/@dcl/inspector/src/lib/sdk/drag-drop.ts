@@ -1,5 +1,5 @@
 import { Identifier } from 'dnd-core'
-import { Asset } from '../../lib/logic/catalog'
+import { Asset, CustomAsset } from '../../lib/logic/catalog'
 import { TreeNode } from '../../components/ProjectAssetExplorer/ProjectView'
 import { AssetNodeItem } from '../../components/ProjectAssetExplorer/types'
 
@@ -10,12 +10,13 @@ interface Drop<T, K = object> {
 
 export type LocalAssetDrop = Drop<string, { tree: Map<string, TreeNode> }>
 export type CatalogAssetDrop = Drop<Asset>
-
-export type IDrop = LocalAssetDrop | CatalogAssetDrop
+export type CustomAssetDrop = Drop<CustomAsset>
+export type IDrop = LocalAssetDrop | CatalogAssetDrop | CustomAssetDrop
 
 export enum DropTypesEnum {
   LocalAsset = 'local-asset',
-  CatalogAsset = 'catalog-asset'
+  CatalogAsset = 'catalog-asset',
+  CustomAsset = 'custom-asset'
 }
 
 export type DropTypes = `${DropTypesEnum}`

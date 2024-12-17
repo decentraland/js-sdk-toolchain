@@ -14,6 +14,8 @@ import { ProjectAssetExplorer } from '../ProjectAssetExplorer'
 import ImportAsset from '../ImportAsset'
 
 import './Assets.css'
+import { CustomAssets } from '../CustomAssets'
+import { selectCustomAssets } from '../../redux/app'
 
 function removeSmartItems(assetPack: AssetPack) {
   return {
@@ -25,6 +27,7 @@ function removeSmartItems(assetPack: AssetPack) {
 function Assets({ isAssetsPanelCollapsed }: { isAssetsPanelCollapsed: boolean }) {
   const dispatch = useAppDispatch()
   const tab = useAppSelector(getSelectedAssetsTab)
+  const customAssets = useAppSelector(selectCustomAssets)
 
   const handleTabClick = useCallback(
     (tab: AssetsTab) => () => {
@@ -47,6 +50,14 @@ function Assets({ isAssetsPanelCollapsed }: { isAssetsPanelCollapsed: boolean })
             <span>LOCAL ASSETS</span>
           </div>
         </div>
+        {customAssets.length > 0 ? (
+          <div className="tab" onClick={handleTabClick(AssetsTab.CustomAssets)} data-test-id={AssetsTab.CustomAssets}>
+            <div className={cx({ underlined: tab === AssetsTab.CustomAssets })}>
+              <i className="icon-custom-assets" />
+              <span>CUSTOM ASSETS</span>
+            </div>
+          </div>
+        ) : null}
         <div className="tab" onClick={handleTabClick(AssetsTab.AssetsPack)} data-test-id={AssetsTab.AssetsPack}>
           <div className={cx({ underlined: tab === AssetsTab.AssetsPack })}>
             <MdImageSearch />
@@ -63,6 +74,7 @@ function Assets({ isAssetsPanelCollapsed }: { isAssetsPanelCollapsed: boolean })
         {tab === AssetsTab.AssetsPack && <AssetsCatalog catalog={filteredCatalog} />}
         {tab === AssetsTab.FileSystem && <ProjectAssetExplorer />}
         {tab === AssetsTab.Import && <ImportAsset onSave={handleTabClick(AssetsTab.FileSystem)} />}
+        {tab === AssetsTab.CustomAssets && <CustomAssets />}
       </div>
     </div>
   )
