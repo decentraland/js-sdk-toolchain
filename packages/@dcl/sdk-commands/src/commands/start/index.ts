@@ -55,7 +55,13 @@ export const args = declareArgs({
   '-e': '--no-dao-explorer',
   '--customEntryPoint': Boolean,
   '--explorer-alpha': Boolean,
-  '--hub': Boolean
+  '--hub': Boolean,
+  // Params related to the explorer-alpha
+  '--debug': Boolean,
+  '--dclenv': String,
+  '--realm': String,
+  '--local-scene': String,
+  '--position': String
 })
 
 export async function help(options: Options) {
@@ -73,6 +79,12 @@ export async function help(options: Options) {
       --web3                    Connects preview to browser wallet to use the associated avatar and account
       --skip-build              Skip build and only serve the files in preview mode
       --desktop-client          Show URL to launch preview in the desktop client (BETA)
+      --debug                   Enables Debug panel mode inside DCL Explorer (default=true)
+      --dclenv                  Decentraland Environment. Which environment to use for the content. This determines the catalyst server used, asset-bundles, etc. Possible values: org, zone, today. (default=org)
+      --realm                   Realm used to serve the content. (default=Localhost)
+      --local-scene             Enable local scene development.
+      --position                Initial Position to start the explorer. (default=position defined at scene.json)
+
 
     Examples:
 
@@ -101,7 +113,6 @@ export async function main(options: Options) {
   const isHub = !!options.args['--hub']
 
   let hasSmartWearable = false
-
   const workspace = await getValidWorkspace(options.components, workingDirectory)
 
   if (experimentalDaoExplorer) {
@@ -234,7 +245,7 @@ export async function main(options: Options) {
 
       if (!explorerAlpha) {
         for (const addr of sortedURLs) {
-          components.logger.log(`    ${addr}`)
+          components.logger.log(`    ${addr.url}`)
         }
       }
 
@@ -250,7 +261,7 @@ export async function main(options: Options) {
       // Open preferably localhost/127.0.0.1
       if (explorerAlpha) {
         const realm = new URL(sortedURLs[0].url).origin
-        await runExplorerAlpha(components, { cwd: workingDirectory, realm, baseCoords, isHub })
+        await runExplorerAlpha(components, { cwd: workingDirectory, realm, baseCoords, isHub, args: options.args })
       }
 
       // Open preferably localhost/127.0.0.1

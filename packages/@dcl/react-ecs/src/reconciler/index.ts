@@ -28,7 +28,9 @@ import { Vector2 } from '@dcl/ecs/dist/components/generated/pb/decentraland/comm
 function getPointerEnum(pointerKey: keyof Listeners): PointerEventType {
   const pointers: { [key in keyof Required<Listeners>]: PointerEventType } = {
     onMouseDown: PointerEventType.PET_DOWN,
-    onMouseUp: PointerEventType.PET_UP
+    onMouseUp: PointerEventType.PET_UP,
+    onMouseEnter: PointerEventType.PET_HOVER_ENTER,
+    onMouseLeave: PointerEventType.PET_HOVER_LEAVE
   }
   return pointers[pointerKey]
 }
@@ -90,13 +92,20 @@ export function createReconciler(
     upsertComponent(instance, props as { rightOf: number; parent: number }, 'uiTransform')
   }
 
-  function upsertListener(instance: Instance, update: Changes<keyof Pick<Listeners, 'onMouseDown' | 'onMouseUp'>>) {
+  function upsertListener(
+    instance: Instance,
+    update: Changes<keyof Pick<Listeners, 'onMouseDown' | 'onMouseUp' | 'onMouseEnter' | 'onMouseLeave'>>
+  ) {
     if (update.type === 'delete' || !update.props) {
       clickEvents.get(instance.entity)?.delete(getPointerEnum(update.component))
       if (update.component === 'onMouseDown') {
         pointerEvents.removeOnPointerDown(instance.entity)
       } else if (update.component === 'onMouseUp') {
         pointerEvents.removeOnPointerUp(instance.entity)
+      } else if (update.component === 'onMouseEnter') {
+        pointerEvents.removeOnPointerHoverEnter(instance.entity)
+      } else if (update.component === 'onMouseLeave') {
+        pointerEvents.removeOnPointerHoverLeave(instance.entity)
       }
       return
     }
@@ -111,13 +120,28 @@ export function createReconciler(
       if (alreadyHasPointerEvent) return
 
       const pointerEventSystem =
-        update.component === 'onMouseDown' ? pointerEvents.onPointerDown : pointerEvents.onPointerUp
-      pointerEventSystem(instance.entity, () => pointerEventCallback(instance.entity, pointerEvent), {
-        button: InputAction.IA_POINTER,
-        // We add this showFeedBack so the pointerEventSystem creates a PointerEvent component with our entity
-        // This is needed for the renderer to know which entities are clickeables
-        showFeedback: true
-      })
+        update.component === 'onMouseDown'
+          ? pointerEvents.onPointerDown
+          : update.component === 'onMouseUp'
+          ? pointerEvents.onPointerUp
+          : update.component === 'onMouseEnter'
+          ? pointerEvents.onPointerHoverEnter
+          : update.component === 'onMouseLeave' && pointerEvents.onPointerHoverLeave
+
+      if (pointerEventSystem) {
+        pointerEventSystem(
+          {
+            entity: instance.entity,
+            opts: {
+              button: InputAction.IA_POINTER,
+              // We add this showFeedBack so the pointerEventSystem creates a PointerEvent component with our entity
+              // This is needed for the renderer to know which entities are clickeables
+              showFeedback: true
+            }
+          },
+          () => pointerEventCallback(instance.entity, pointerEvent)
+        )
+      }
     }
   }
 

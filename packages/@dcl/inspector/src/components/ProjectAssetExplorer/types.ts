@@ -1,5 +1,4 @@
-import { ComponentName } from '@dcl/asset-packs'
-import { CoreComponents } from '../../lib/sdk/components'
+import { AssetData } from '../../lib/logic/catalog'
 
 export interface IAsset {
   src: string
@@ -20,7 +19,7 @@ export interface AssetCellProp {
 export type AssetNodeBase = {
   name: string
   parent: AssetNodeFolder | null
-  components?: Partial<Record<ComponentName | CoreComponents, any>>
+  composite?: AssetData['composite']
 }
 
 export type AssetNodeItem = AssetNodeBase & {

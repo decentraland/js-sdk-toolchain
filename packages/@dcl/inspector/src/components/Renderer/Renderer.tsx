@@ -8,7 +8,7 @@ import { Entity } from '@dcl/ecs'
 import { DIRECTORY, withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
 import { getReloadAssets, importAsset, saveThumbnail } from '../../redux/data-layer'
-import { getNode, BuilderAsset, DROP_TYPES, IDrop, ProjectAssetDrop, isDropType } from '../../lib/sdk/drag-drop'
+import { getNode, CatalogAssetDrop, DROP_TYPES, IDrop, LocalAssetDrop, isDropType } from '../../lib/sdk/drag-drop'
 import { useRenderer } from '../../hooks/sdk/useRenderer'
 import { useSdk } from '../../hooks/sdk/useSdk'
 import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
@@ -212,7 +212,7 @@ const Renderer: React.FC = () => {
       position,
       basePath,
       sdk.enumEntity,
-      asset.components,
+      asset.composite,
       asset.asset.id
     )
     await operations.dispatch()
@@ -239,10 +239,10 @@ const Renderer: React.FC = () => {
     canvasRef.current?.focus()
   }
 
-  const importBuilderAsset = async (asset: Asset) => {
+  const importCatalogAsset = async (asset: Asset) => {
     const position = await getDropPosition()
     const fileContent: Record<string, Uint8Array> = {}
-    const destFolder = 'builder'
+    const destFolder = 'asset-packs'
     const assetPackageName = asset.name.trim().replaceAll(' ', '_').toLowerCase()
     const path = Object.keys(asset.contents).find(($) => isAsset($))
     let thumbnail: Uint8Array | undefined
@@ -299,7 +299,7 @@ const Renderer: React.FC = () => {
       name: asset.name,
       parent: null,
       asset: { type: path ? 'gltf' : 'unknown', src: path ?? '', id: asset.id },
-      components: asset.components
+      composite: asset.composite
     }
     const basePath = withAssetDir(`${destFolder}/${assetPackageName}`)
     if (isGround(asset) && !placeSingleTile) {
@@ -320,12 +320,12 @@ const Renderer: React.FC = () => {
         if (monitor.didDrop()) return
         const itemType = monitor.getItemType()
 
-        if (isDropType<BuilderAsset>(item, itemType, 'builder-asset')) {
-          void importBuilderAsset(item.value)
+        if (isDropType<CatalogAssetDrop>(item, itemType, 'catalog-asset')) {
+          void importCatalogAsset(item.value)
           return
         }
 
-        if (isDropType<ProjectAssetDrop>(item, itemType, 'project-asset')) {
+        if (isDropType<LocalAssetDrop>(item, itemType, 'local-asset')) {
           const node = item.context.tree.get(item.value)!
           const model = getNode(node, item.context.tree, isModel)
           if (model) {
@@ -335,7 +335,7 @@ const Renderer: React.FC = () => {
         }
       },
       hover(item, monitor) {
-        if (isDropType<BuilderAsset>(item, monitor.getItemType(), 'builder-asset')) {
+        if (isDropType<CatalogAssetDrop>(item, monitor.getItemType(), 'catalog-asset')) {
           const asset = item.value
           if (isGround(asset)) {
             if (!showSingleTileHint) {

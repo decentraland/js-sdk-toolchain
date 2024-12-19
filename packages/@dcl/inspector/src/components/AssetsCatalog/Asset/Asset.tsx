@@ -11,7 +11,7 @@ import { fetchImage, resizeImage } from '../../../lib/utils/img'
 import { useIsMounted } from '../../../hooks/useIsMounted'
 
 const Asset: React.FC<{ value: Asset }> = ({ value }) => {
-  const [, drag, preview] = useDrag(() => ({ type: 'builder-asset', item: { value } }), [value])
+  const [, drag, preview] = useDrag(() => ({ type: 'catalog-asset', item: { value } }), [value])
   const isSmartItem = isSmart(value)
   const isGroundItem = isGround(value)
   const imgSrc = getContentsUrl(value.contents['thumbnail.png'])

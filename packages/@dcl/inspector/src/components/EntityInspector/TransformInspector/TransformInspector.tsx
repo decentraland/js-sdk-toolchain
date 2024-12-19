@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-import { isValidNumericInput, useComponentInput } from '../../../hooks/sdk/useComponentInput'
+import { isValidNumericInput, useComponentInput, useMultiComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { withSdk } from '../../../hoc/withSdk'
 
@@ -13,14 +13,15 @@ import { Link, Props as LinkProps } from './Link'
 
 import './TransformInspector.css'
 
-export default withSdk<Props>(({ sdk, entity }) => {
+export default withSdk<Props>(({ sdk, entities }) => {
   const { Transform, TransformConfig } = sdk.components
+  const entity = entities.find((entity) => Transform.has(entity)) || entities[0]
 
   const hasTransform = useHasComponent(entity, Transform)
   const transform = Transform.getOrNull(entity) ?? undefined
   const config = TransformConfig.getOrNull(entity) ?? undefined
-  const { getInputProps } = useComponentInput(
-    entity,
+  const { getInputProps } = useMultiComponentInput(
+    entities,
     Transform,
     fromTransform,
     toTransform(transform, config),

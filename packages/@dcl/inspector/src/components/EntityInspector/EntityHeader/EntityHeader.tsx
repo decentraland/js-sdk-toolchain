@@ -32,7 +32,7 @@ interface ModalState {
   cb?: () => void
 }
 
-const getLabel = (sdk: SdkContextValue, entity: Entity) => {
+export const getLabel = (sdk: SdkContextValue, entity: Entity) => {
   const nameComponent = sdk.components.Name.getOrNull(entity)
   switch (entity) {
     case ROOT:

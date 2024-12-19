@@ -21,15 +21,17 @@ describe('Generated UiBackground ProtoBuf', () => {
           texture: {
             src: 'some-src',
             wrapMode: TextureWrapMode.TWM_CLAMP,
-            filterMode: TextureFilterMode.TFM_BILINEAR
+            filterMode: TextureFilterMode.TFM_BILINEAR,
+            tiling: undefined,
+            offset: undefined
           }
         }
       },
       textureSlices: {
-        top: 1 / 3,
-        left: 1 / 3,
-        right: 1 / 3,
-        bottom: 1 / 3
+        top: 2,
+        left: 2,
+        right: 2,
+        bottom: 2
       },
       uvs: []
     })

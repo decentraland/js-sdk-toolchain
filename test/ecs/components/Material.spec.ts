@@ -79,7 +79,9 @@ describe('Generated Material ProtoBuf', () => {
             texture: {
               wrapMode: TextureWrapMode.TWM_MIRROR,
               filterMode: TextureFilterMode.TFM_POINT,
-              src: 'not-casla'
+              src: 'not-casla',
+              tiling: undefined,
+              offset: undefined
             }
           }
         },
@@ -89,7 +91,9 @@ describe('Generated Material ProtoBuf', () => {
             texture: {
               wrapMode: TextureWrapMode.TWM_MIRROR,
               filterMode: TextureFilterMode.TFM_TRILINEAR,
-              src: 'not-casla'
+              src: 'not-casla',
+              tiling: undefined,
+              offset: undefined
             }
           }
         },
