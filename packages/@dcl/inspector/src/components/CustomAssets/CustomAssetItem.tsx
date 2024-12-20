@@ -4,13 +4,15 @@ import { openCustomAssetContextMenu } from './ContextMenu/ContextMenu'
 type Props = {
   assetId: string
   onDelete: (assetId: string) => void
+  onRename: (assetId: string) => void
 }
 
-export function CustomAssetItem({ assetId, onDelete }: Props) {
+export function CustomAssetItem({ assetId, onDelete, onRename }: Props) {
   const handleContextMenu = (event: React.MouseEvent) => {
     openCustomAssetContextMenu(event, {
       assetId,
-      onDelete
+      onDelete,
+      onRename
     })
   }
 

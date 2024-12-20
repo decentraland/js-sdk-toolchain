@@ -19,7 +19,8 @@ export enum ErrorType {
   SaveThumbnail = 'save-thumbnail',
   GetThumbnails = 'get-thumbnails',
   CreateCustomAsset = 'create-custom-asset',
-  DeleteCustomAsset = 'delete-custom-asset'
+  DeleteCustomAsset = 'delete-custom-asset',
+  RenameCustomAsset = 'rename-custom-asset'
 }
 
 let dataLayerInterface: DataLayerRpcClient | undefined
@@ -35,13 +36,15 @@ export interface DataLayerState {
   error: ErrorType | undefined
   removingAsset: Record<string, boolean>
   reloadAssets: string[]
+  assetToRename: { id: string; name: string } | undefined
 }
 
 export const initialState: DataLayerState = {
   reconnectAttempts: 0,
   error: undefined,
   removingAsset: {},
-  reloadAssets: []
+  reloadAssets: [],
+  assetToRename: undefined
 }
 
 export const dataLayer = createSlice({
@@ -89,7 +92,16 @@ export const dataLayer = createSlice({
       _state,
       _payload: PayloadAction<{ name: string; composite: AssetData['composite']; resources: string[] }>
     ) => {},
-    deleteCustomAsset: (_state, _payload: PayloadAction<{ assetId: string }>) => {}
+    deleteCustomAsset: (_state, _payload: PayloadAction<{ assetId: string }>) => {},
+    renameCustomAsset: (state, _payload: PayloadAction<{ assetId: string; newName: string }>) => {
+      state.assetToRename = undefined
+    },
+    setAssetToRename: (state, payload: PayloadAction<{ assetId: string; name: string }>) => {
+      state.assetToRename = { id: payload.payload.assetId, name: payload.payload.name }
+    },
+    clearAssetToRename: (state) => {
+      state.assetToRename = undefined
+    }
   }
 })
 
@@ -111,7 +123,10 @@ export const {
   saveThumbnail,
   getThumbnails,
   createCustomAsset,
-  deleteCustomAsset
+  deleteCustomAsset,
+  renameCustomAsset,
+  setAssetToRename,
+  clearAssetToRename
 } = dataLayer.actions
 
 // Selectors
@@ -119,6 +134,7 @@ export const selectDataLayerError = (state: RootState) => state.dataLayer.error
 export const selectDataLayerReconnectAttempts = (state: RootState) => state.dataLayer.reconnectAttempts
 export const selectDataLayerRemovingAsset = (state: RootState) => state.dataLayer.removingAsset
 export const getReloadAssets = (state: RootState) => state.dataLayer.reloadAssets
+export const selectAssetToRename = (state: RootState) => state.dataLayer.assetToRename
 
 // Reducer
 export default dataLayer.reducer
