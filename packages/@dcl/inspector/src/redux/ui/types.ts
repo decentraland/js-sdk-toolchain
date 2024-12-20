@@ -1,7 +1,9 @@
 export enum AssetsTab {
   FileSystem = 'FileSystem',
+  CustomAssets = 'CustomAssets',
   AssetsPack = 'AssetsPack',
-  Import = 'Import'
+  Import = 'Import',
+  RenameAsset = 'RenameAsset'
 }
 
 export enum PanelName {
