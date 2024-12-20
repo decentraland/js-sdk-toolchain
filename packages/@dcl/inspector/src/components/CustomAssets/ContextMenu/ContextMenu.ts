@@ -6,6 +6,7 @@ export const CUSTOM_ASSETS_CONTEXT_MENU_ID = 'custom-assets-context-menu'
 export type CustomAssetContextMenuProps = {
   assetId: string
   onDelete: (assetId: string) => void
+  onRename: (assetId: string) => void
 }
 
 export function openCustomAssetContextMenu(event: React.MouseEvent, props: CustomAssetContextMenuProps) {

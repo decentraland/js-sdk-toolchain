@@ -6,16 +6,18 @@ import { HiOutlinePlus } from 'react-icons/hi'
 import { AssetPack, catalog, isSmart } from '../../lib/logic/catalog'
 import { getConfig } from '../../lib/logic/config'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
+import { selectAssetToRename } from '../../redux/data-layer'
 import { getSelectedAssetsTab, selectAssetsTab } from '../../redux/ui'
 import { AssetsTab } from '../../redux/ui/types'
 import { FolderOpen } from '../Icons/Folder'
 import { AssetsCatalog } from '../AssetsCatalog'
 import { ProjectAssetExplorer } from '../ProjectAssetExplorer'
 import ImportAsset from '../ImportAsset'
-
-import './Assets.css'
 import { CustomAssets } from '../CustomAssets'
 import { selectCustomAssets } from '../../redux/app'
+import { RenameAsset } from '../RenameAsset'
+
+import './Assets.css'
 
 function removeSmartItems(assetPack: AssetPack) {
   return {
@@ -40,6 +42,8 @@ function Assets({ isAssetsPanelCollapsed }: { isAssetsPanelCollapsed: boolean })
   const filteredCatalog = config.disableSmartItems
     ? catalog.map(removeSmartItems).filter((assetPack) => assetPack.assets.length > 0)
     : catalog
+
+  const assetToRename = useAppSelector(selectAssetToRename)
 
   return (
     <div className="Assets">
@@ -75,6 +79,9 @@ function Assets({ isAssetsPanelCollapsed }: { isAssetsPanelCollapsed: boolean })
         {tab === AssetsTab.FileSystem && <ProjectAssetExplorer />}
         {tab === AssetsTab.Import && <ImportAsset onSave={handleTabClick(AssetsTab.FileSystem)} />}
         {tab === AssetsTab.CustomAssets && <CustomAssets />}
+        {tab === AssetsTab.RenameAsset && assetToRename && (
+          <RenameAsset assetId={assetToRename.id} currentName={assetToRename.name} />
+        )}
       </div>
     </div>
   )

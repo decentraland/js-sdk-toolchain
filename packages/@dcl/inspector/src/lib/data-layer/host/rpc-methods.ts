@@ -288,6 +288,43 @@ export async function initRpcMethods(
       }
 
       throw new Error(`Custom asset with id ${assetId} not found`)
+    },
+    async renameCustomAsset(req: { assetId: string; newName: string }) {
+      const { assetId, newName } = req
+      const paths = await getFilesInDirectory(fs, `${DIRECTORY.CUSTOM}`, [], true)
+      const folders = [...new Set(paths.map((path) => path.split('/')[1]))]
+
+      const undoAcc: FileOperation[] = []
+
+      for (const folder of folders) {
+        const dataPath = `${DIRECTORY.CUSTOM}/${folder}/data.json`
+
+        if (await fs.existFile(dataPath)) {
+          try {
+            const data = await fs.readFile(dataPath)
+            const parsedData = JSON.parse(new TextDecoder().decode(data))
+
+            if (parsedData.id === assetId) {
+              const updatedData = { ...parsedData, name: newName }
+              const newContent = Buffer.from(JSON.stringify(updatedData, null, 2))
+
+              undoAcc.push({
+                prevValue: data,
+                newValue: newContent,
+                path: dataPath
+              })
+
+              await fs.writeFile(dataPath, newContent)
+              undoRedoManager.addUndoFile(undoAcc)
+              return {}
+            }
+          } catch (err) {
+            continue
+          }
+        }
+      }
+
+      throw new Error(`Custom asset with id ${assetId} not found`)
     }
   }
 }

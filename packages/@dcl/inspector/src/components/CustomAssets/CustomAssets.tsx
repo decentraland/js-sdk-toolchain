@@ -9,14 +9,17 @@ import { selectCustomAssets } from '../../redux/app'
 import { DropTypesEnum } from '../../lib/sdk/drag-drop'
 import { CustomAssetContextMenu } from './ContextMenu/CustomAssetContextMenu'
 import { openCustomAssetContextMenu } from './ContextMenu/ContextMenu'
-import { deleteCustomAsset } from '../../redux/data-layer'
+import { deleteCustomAsset, setAssetToRename } from '../../redux/data-layer'
+import { AssetsTab } from '../../redux/ui/types'
+import { selectAssetsTab } from '../../redux/ui'
 
 interface CustomAssetItemProps {
   value: CustomAsset
   onDelete: (assetId: string) => void
+  onRename: (assetId: string) => void
 }
 
-const CustomAssetItem: React.FC<CustomAssetItemProps> = ({ value, onDelete }) => {
+const CustomAssetItem: React.FC<CustomAssetItemProps> = ({ value, onDelete, onRename }) => {
   const [, drag] = useDrag(
     () => ({
       type: DropTypesEnum.CustomAsset,
@@ -28,7 +31,8 @@ const CustomAssetItem: React.FC<CustomAssetItemProps> = ({ value, onDelete }) =>
   const handleContextMenu = (event: React.MouseEvent) => {
     openCustomAssetContextMenu(event, {
       assetId: value.id,
-      onDelete
+      onDelete,
+      onRename
     })
   }
 
@@ -52,11 +56,21 @@ export function CustomAssets() {
     dispatch(deleteCustomAsset({ assetId }))
   }, [])
 
+  const handleRename = useCallback(
+    (assetId: string) => {
+      const asset = customAssets.find((asset) => asset.id === assetId)
+      if (!asset) return
+      dispatch(setAssetToRename({ assetId: asset.id, name: asset.name }))
+      dispatch(selectAssetsTab({ tab: AssetsTab.RenameAsset }))
+    },
+    [customAssets, dispatch]
+  )
+
   return (
     <div className="custom-assets">
       <CustomAssetContextMenu />
       {customAssets.map((asset) => (
-        <CustomAssetItem key={asset.id} value={asset} onDelete={handleDelete} />
+        <CustomAssetItem key={asset.id} value={asset} onDelete={handleDelete} onRename={handleRename} />
       ))}
     </div>
   )

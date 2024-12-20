@@ -80,6 +80,11 @@ message DeleteCustomAssetRequest {
   string asset_id = 1;
 }
 
+message RenameCustomAssetRequest {
+  string asset_id = 1;
+  string new_name = 2;
+}
+
 service DataService {
   rpc CrdtStream(stream CrdtStreamMessage) returns (stream CrdtStreamMessage) {}
   rpc Undo(Empty) returns (UndoRedoResponse) {}
@@ -99,4 +104,5 @@ service DataService {
   rpc CreateCustomAsset(CreateCustomAssetRequest) returns (Empty) {}
   rpc GetCustomAssets(Empty) returns (GetCustomAssetsResponse) {}
   rpc DeleteCustomAsset(DeleteCustomAssetRequest) returns (Empty) {}
+  rpc RenameCustomAsset(RenameCustomAssetRequest) returns (Empty) {}
 }
