@@ -39,7 +39,9 @@ export function Label(props: EntityPropTypes & UiLabelProps) {
     ...getFont(font),
     ...getTextAlign(textAlign),
     ...getFontSize(fontSize),
-    ...getTextWrap(textWrap)
+    ...getTextWrap(textWrap),
+    outlineWidth: props.outlineWidth,
+    outlineColor: props.outlineColor
   }
 
   return <entity {...commonProps} uiText={uiText} />

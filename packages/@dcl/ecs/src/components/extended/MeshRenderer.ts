@@ -37,6 +37,15 @@ export interface MeshRendererComponentDefinitionExtended
    * @param entity - entity to create or replace the MeshRenderer component
    */
   setSphere(entity: Entity): void
+
+  /**
+   * @public
+   * Set a gltf internal mesh in the MeshRenderer component
+   * @param entity - entity to create or replace the MeshRenderer component
+   * @param source - the path to the gltf
+   * @param meshName - the name of the mesh in the gltf
+   */
+  setGltfMesh(entity: Entity, source: string, meshName: string): void
 }
 
 export function defineMeshRendererComponent(
@@ -64,6 +73,11 @@ export function defineMeshRendererComponent(
     setSphere(entity: Entity): void {
       theComponent.createOrReplace(entity, {
         mesh: { $case: 'sphere', sphere: {} }
+      })
+    },
+    setGltfMesh(entity: Entity, source: string, meshName: string): void {
+      theComponent.createOrReplace(entity, {
+        mesh: { $case: 'gltf', gltf: { gltfSrc: source, name: meshName } }
       })
     }
   }
