@@ -377,6 +377,9 @@ export interface ByteBuffer {
 export type Callback = () => void;
 
 // @public (undocumented)
+export const CameraLayers: LastWriteWinElementSetComponentDefinition<PBCameraLayers>;
+
+// @public (undocumented)
 export const CameraMode: LastWriteWinElementSetComponentDefinition<PBCameraMode>;
 
 // @public (undocumented)
@@ -673,6 +676,7 @@ export const componentDefinitionByName: {
     "core::AvatarModifierArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>>;
     "core::AvatarShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarShape>>;
     "core::Billboard": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBBillboard>>;
+    "core::CameraLayers": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraLayers>>;
     "core::CameraMode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraMode>>;
     "core::CameraModeArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraModeArea>>;
     "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
@@ -697,6 +701,7 @@ export const componentDefinitionByName: {
     "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
     "core::Spotlight": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSpotlight>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
+    "core::TextureCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextureCamera>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
     "core::TweenSequence": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenSequence>>;
     "core::TweenState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenState>>;
@@ -2341,6 +2346,20 @@ export namespace PBBillboard {
 }
 
 // @public (undocumented)
+export interface PBCameraLayers {
+    // (undocumented)
+    layers: number[];
+}
+
+// @public (undocumented)
+export namespace PBCameraLayers {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBCameraLayers;
+    // (undocumented)
+    export function encode(message: PBCameraLayers, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBCameraMode {
     mode: CameraType;
 }
@@ -3108,6 +3127,24 @@ export namespace PBTextShape {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTextShape;
     // (undocumented)
     export function encode(message: PBTextShape, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBTextureCamera {
+    // (undocumented)
+    height?: number | undefined;
+    // (undocumented)
+    layer?: number | undefined;
+    // (undocumented)
+    width?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBTextureCamera {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTextureCamera;
+    // (undocumented)
+    export function encode(message: PBTextureCamera, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -4233,6 +4270,9 @@ export namespace Texture {
     // (undocumented)
     export function encode(message: Texture, writer?: _m0.Writer): _m0.Writer;
 }
+
+// @public (undocumented)
+export const TextureCamera: LastWriteWinElementSetComponentDefinition<PBTextureCamera>;
 
 // @public (undocumented)
 export const enum TextureFilterMode {
