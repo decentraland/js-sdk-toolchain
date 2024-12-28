@@ -1,7 +1,7 @@
 /** @alpha THIS FILE INITIALIZES THE DECENTRALAND RUNTIME. WILL CHANGE SOON */
 import { Composite, engine } from '@dcl/ecs'
 import { crdtGetState, crdtSendToRenderer, sendBatch } from '~system/EngineApi'
-import { createRendererTransport } from './internal/transports/rendererTransport'
+import { createRendererTransport, EngineApiRendererInspector } from './internal/transports/rendererTransport'
 import { pollEvents } from './observables'
 import { compositeProvider } from './composite-provider'
 
@@ -21,6 +21,7 @@ export async function onUpdate(deltaTime: number) {
  * Function that is called before the first update and after the evaluation of the code.
  */
 export async function onStart() {
+  const rendererMessageInspector: EngineApiRendererInspector = (globalThis as any).rendererMessageInspector
   const response = await crdtGetState({ data: new Uint8Array() })
 
   // when this condition is true something like `main.crdt` was pre-loaded from the runtime, we don't need to instance the main.composite
@@ -38,6 +39,9 @@ export async function onStart() {
 
   if (!!rendererTransport.onmessage) {
     if (response && response.data && response.data.length) {
+      if (rendererMessageInspector) {
+        rendererMessageInspector({ message: response.data, type: 'first-receive' })
+      }
       for (const byteArray of response.data) {
         rendererTransport.onmessage(byteArray)
       }
