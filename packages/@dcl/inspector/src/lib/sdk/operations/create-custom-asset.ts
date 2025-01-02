@@ -42,17 +42,35 @@ handleResource(CoreComponents.MATERIAL, ['material', 'pbr', 'bumpTexture', 'tex'
 // Add these action types at the top with other constants
 const RESOURCE_ACTION_TYPES = [ActionType.SHOW_IMAGE, ActionType.PLAY_CUSTOM_EMOTE, ActionType.PLAY_SOUND] as string[]
 
-function getComponentNameById<T extends { id: number }>(engine: IEngine, id: number) {
+function createRef(engine: IEngine, componentId: number, currentEntity: Entity, entityIds: Map<Entity, Entity>) {
   const componentNames = Object.values(AssetPackComponentNames)
   for (const componentName of componentNames) {
-    const Component = engine.getComponent(componentName) as LastWriteWinElementSetComponentDefinition<T>
+    const Component = engine.getComponent(componentName) as LastWriteWinElementSetComponentDefinition<{
+      id: number
+    }>
     const entities = Array.from(engine.getEntitiesWith(Component))
-    const result = entities.find(([_entity, value]) => value.id === id)
+    const result = entities.find(([_entity, value]) => value.id === componentId)
     if (Array.isArray(result) && result.length > 0) {
-      return componentName
+      const [ownerEntity] = result
+      if (ownerEntity === currentEntity) {
+        return `{self:${componentName}}`
+      } else {
+        const mappedEntityId = entityIds.get(ownerEntity)
+        if (typeof mappedEntityId !== 'undefined' && mappedEntityId !== null) {
+          return `{${mappedEntityId}:${componentName}}`
+        } else {
+          throw new Error(
+            `Component with id ${componentId} not found in entity ${ownerEntity}.\nentityIds: ${JSON.stringify(
+              entityIds,
+              null,
+              2
+            )}`
+          )
+        }
+      }
     }
   }
-  throw new Error(`Component with id ${id} not found`)
+  throw new Error(`Component with id ${componentId} not found`)
 }
 
 export function createCustomAsset(engine: IEngine) {
@@ -66,122 +84,135 @@ export function createCustomAsset(engine: IEngine) {
     // Create a map to store components by their name
     const componentsByName: Record<string, { data: Record<string, { json: any }> }> = {}
 
-    // mappings
-    const entityIds = new Map<Entity, Entity>()
+    // Phase 1: Create the custom asset entities and map the scene entities to them
     let entityCount = 0
+    const entityIds = new Map<Entity, Entity>() // mappings from scene entities to custom asset entities
+    const allEntities = new Set<Entity>()
+    const roots = new Set<Entity>()
 
-    entities.forEach((entity, index) => {
-      // Get the tree of entities with the Transform component
+    for (const [index, entity] of entities.entries()) {
       const Transform = engine.getComponent(TransformEngine.componentId) as typeof TransformEngine
       const tree = Array.from(getComponentEntityTree(engine, entity, Transform))
-
-      // Process each entity in the tree
-      tree.forEach((treeEntity) => {
-        // For the root entity, use the original targetEntityId logic
-        // For child entities, use incremental IDs starting from BASE_ENTITY_ID + entities.length
-        const isRoot = treeEntity === entity
-        const targetEntityId: Entity =
+      for (const sceneEntity of tree) {
+        allEntities.add(sceneEntity)
+        const isRoot = sceneEntity === entity
+        const assetEntity: Entity =
           entities.length === 1 && isRoot
             ? SINGLE_ENTITY_ID
             : ((BASE_ENTITY_ID + (isRoot ? index : entities.length + entityCount++)) as Entity)
 
         // set the mapping
-        entityIds.set(treeEntity, targetEntityId)
-
-        // Process each component for the current entity
-        for (const component of engine.componentsIter()) {
-          const { componentId, componentName } = component
-
-          // Skip editor components that are not part of asset-packs
-          if (excludeComponents.includes(componentName)) {
-            continue
-          }
-
-          // Skip Transform component for root entities
-          if (isRoot && componentName === CoreComponents.TRANSFORM) {
-            continue
-          }
-
-          const Component = engine.getComponent(componentId) as LastWriteWinElementSetComponentDefinition<unknown>
-
-          if (!Component.has(treeEntity)) continue
-          const componentValue = Component.get(treeEntity)
-          if (!componentValue) continue
-
-          // Process the component value with a deep copy
-          let processedComponentValue: any = JSON.parse(JSON.stringify(componentValue))
-
-          // Handle special components
-          if (componentsWithResources[componentName]) {
-            const propertyKeys = componentsWithResources[componentName]
-            let value = processedComponentValue
-
-            // Navigate through the property chain safely
-            for (let i = 0; i < propertyKeys.length - 1; i++) {
-              if (value === undefined || value === null) break
-              value = value[propertyKeys[i]]
-            }
-
-            // Only process if we have a valid value and final key
-            if (value && propertyKeys.length > 0) {
-              const finalKey = propertyKeys[propertyKeys.length - 1]
-              const originalValue: string = value[finalKey]
-              if (originalValue) {
-                value[finalKey] = originalValue.replace(/^.*[/]([^/]+)$/, '{assetPath}/$1')
-                resources.push(originalValue)
-              }
-            }
-          }
-
-          // Handle Actions component resources
-          if (componentName === AssetPackComponentNames.ACTIONS) {
-            if (Array.isArray(processedComponentValue.value)) {
-              const actions = processedComponentValue.value as Action[]
-              processedComponentValue.value = actions.map((action) => {
-                if (RESOURCE_ACTION_TYPES.includes(action.type)) {
-                  const payload = JSON.parse(action.jsonPayload)
-                  const originalValue: string = payload.src
-                  payload.src = originalValue.replace(/^.*[/]([^/]+)$/, '{assetPath}/$1')
-                  resources.push(originalValue)
-                  action.jsonPayload = JSON.stringify(payload)
-                }
-                return action
-              })
-            }
-          }
-
-          // Replace id with {self}
-          if (COMPONENTS_WITH_ID.includes(componentName)) {
-            processedComponentValue.id = '{self}'
-          }
-
-          if (componentName === AssetPackComponentNames.TRIGGERS) {
-            const newValue = processedComponentValue.value.map((trigger: any) => ({
-              ...trigger,
-              conditions: (trigger.conditions || []).map((condition: any) => ({
-                ...condition,
-                id: `{self:${getComponentNameById(engine, condition.id)}}`
-              })),
-              actions: trigger.actions.map((action: any) => ({
-                ...action,
-                id: `{self:${getComponentNameById(engine, action.id)}}`
-              }))
-            }))
-            processedComponentValue = { ...processedComponentValue, value: newValue }
-          }
-
-          // Initialize component in map if it doesn't exist
-          if (!componentsByName[componentName]) {
-            componentsByName[componentName] = { data: {} }
-          }
-
-          // Add the processed value to the component data
-          componentsByName[componentName].data[targetEntityId] = { json: processedComponentValue }
+        entityIds.set(sceneEntity, assetEntity)
+        if (isRoot) {
+          roots.add(sceneEntity)
         }
-      })
-    })
+      }
+    }
 
-    // map the entity ids to the target entity ids
+    // Phase 2: Process each component for each scene entity and map it to the custom asset entity
+    for (const entity of allEntities) {
+      const isRoot = roots.has(entity)
+      const assetEntity = entityIds.get(entity)!
+
+      // Process each component for the current entity
+      for (const component of engine.componentsIter()) {
+        const { componentId, componentName } = component
+
+        // Skip editor components that are not part of asset-packs
+        if (excludeComponents.includes(componentName)) {
+          continue
+        }
+
+        // Skip Transform component for root entities
+        if (isRoot && componentName === CoreComponents.TRANSFORM) {
+          continue
+        }
+
+        const Component = engine.getComponent(componentId) as LastWriteWinElementSetComponentDefinition<unknown>
+
+        if (!Component.has(entity)) continue
+        const componentValue = Component.get(entity)
+        if (!componentValue) continue
+
+        // Process the component value with a deep copy
+        let processedComponentValue: any = JSON.parse(JSON.stringify(componentValue))
+
+        // Handle special components
+        if (componentsWithResources[componentName]) {
+          const propertyKeys = componentsWithResources[componentName]
+          let value = processedComponentValue
+
+          // Navigate through the property chain safely
+          for (let i = 0; i < propertyKeys.length - 1; i++) {
+            if (value === undefined || value === null) break
+            value = value[propertyKeys[i]]
+          }
+
+          // Only process if we have a valid value and final key
+          if (value && propertyKeys.length > 0) {
+            const finalKey = propertyKeys[propertyKeys.length - 1]
+            const originalValue: string = value[finalKey]
+            if (originalValue) {
+              value[finalKey] = originalValue.replace(/^.*[/]([^/]+)$/, '{assetPath}/$1')
+              resources.push(originalValue)
+            }
+          }
+        }
+
+        // Handle Actions component resources
+        if (componentName === AssetPackComponentNames.ACTIONS) {
+          if (Array.isArray(processedComponentValue.value)) {
+            const actions = processedComponentValue.value as Action[]
+            processedComponentValue.value = actions.map((action) => {
+              if (RESOURCE_ACTION_TYPES.includes(action.type)) {
+                const payload = JSON.parse(action.jsonPayload)
+                const originalValue: string = payload.src
+                payload.src = originalValue.replace(/^.*[/]([^/]+)$/, '{assetPath}/$1')
+                resources.push(originalValue)
+                action.jsonPayload = JSON.stringify(payload)
+              }
+              return action
+            })
+          }
+        }
+
+        // Replace id with {self}
+        if (COMPONENTS_WITH_ID.includes(componentName)) {
+          processedComponentValue.id = '{self}'
+        }
+
+        if (componentName === AssetPackComponentNames.TRIGGERS) {
+          const newValue = processedComponentValue.value.map((trigger: any) => ({
+            ...trigger,
+            conditions: (trigger.conditions || []).map((condition: any) => {
+              const ref = createRef(engine, condition.id, entity, entityIds)
+              return {
+                ...condition,
+                id: ref
+              }
+            }),
+            actions: trigger.actions.map((action: any) => {
+              const ref = createRef(engine, action.id, entity, entityIds)
+              return {
+                ...action,
+                id: ref
+              }
+            })
+          }))
+          processedComponentValue = { ...processedComponentValue, value: newValue }
+        }
+
+        // Initialize component in map if it doesn't exist
+        if (!componentsByName[componentName]) {
+          componentsByName[componentName] = { data: {} }
+        }
+
+        // Add the processed value to the component data
+        componentsByName[componentName].data[assetEntity] = { json: processedComponentValue }
+      }
+    }
+
+    // Phase 3: Map the entity ids to the target entity ids
     if (componentsByName[CoreComponents.TRANSFORM]) {
       const transform = componentsByName[CoreComponents.TRANSFORM] as {
         data: { [key: Entity]: { json: TransformType } }

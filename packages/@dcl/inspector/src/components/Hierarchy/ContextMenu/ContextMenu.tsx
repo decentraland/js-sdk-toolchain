@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import { Item, Submenu, Separator } from 'react-contexify'
 import { Entity } from '@dcl/ecs'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
@@ -17,12 +18,9 @@ const ContextMenu = (value: Entity) => {
   const components = getComponents(value, true)
   const availableComponents = getAvailableComponents(value)
 
-  const handleCreateCustomAsset = () => {
-    const asset = createCustomAsset(value)
-    // eslint-disable-next-line no-console
-    console.log('Created custom asset:', asset)
-    // TODO: Handle the created asset (e.g. save it, show a modal, etc)
-  }
+  const handleCreateCustomAsset = useCallback(() => {
+    createCustomAsset(value)
+  }, [value, createCustomAsset])
 
   const handleAddComponent = (id: string) => {
     addComponent(value, Number(id))

@@ -251,7 +251,6 @@ const Renderer: React.FC = () => {
   }
 
   const importCustomAsset = async (asset: CustomAsset) => {
-    console.log('importCustomAsset', asset)
     const destFolder = 'custom'
     const assetPackageName = asset.name.trim().replaceAll(' ', '_').toLowerCase()
     const position = await getDropPosition()
@@ -297,12 +296,6 @@ const Renderer: React.FC = () => {
       composite: asset.composite
     }
     const basePath = withAssetDir(`${destFolder}/${assetPackageName}`)
-    console.log('asset', asset)
-    console.log('files', files)
-    console.log('content', content)
-    console.log('position', position)
-    console.log('basePath', basePath)
-    console.log('model', model)
 
     dispatch(importAsset({ content, basePath, assetPackageName: '', reload: true }))
     await addAsset(model, position, basePath, true)

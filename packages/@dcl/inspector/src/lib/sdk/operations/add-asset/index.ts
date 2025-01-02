@@ -75,8 +75,6 @@ export function addAsset(engine: IEngine) {
         }
       }
 
-      console.log(names)
-
       // Get all entity ids
       for (const component of composite.components) {
         for (const id of Object.keys(component.data)) {
@@ -201,10 +199,19 @@ export function addAsset(engine: IEngine) {
 
       const mapId = (id: string | number, entityId: string) => {
         if (typeof id === 'string') {
-          const match = id.match(/{self:(.+)}/)
-          if (match) {
-            const componentName = match[1]
+          // Handle self references
+          const selfMatch = id.match(/{self:(.+)}/)
+          if (selfMatch) {
+            const componentName = selfMatch[1]
             const key = `${componentName}:${entityId}`
+            return ids.get(key)
+          }
+
+          // Handle cross-entity references
+          const crossEntityMatch = id.match(/{(\d+):(.+)}/)
+          if (crossEntityMatch) {
+            const [_, refEntityId, componentName] = crossEntityMatch
+            const key = `${componentName}:${refEntityId}`
             return ids.get(key)
           }
         }
