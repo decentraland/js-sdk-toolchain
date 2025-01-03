@@ -9,6 +9,7 @@ import { useSdk } from '../../../hooks/sdk/useSdk'
 import { analytics, Event } from '../../../lib/logic/analytics'
 import { getAssetByModel } from '../../../lib/logic/catalog'
 import CustomAssetIcon from '../../Icons/CustomAsset'
+import { useEntitiesWith } from '../../../hooks/sdk/useEntitiesWith'
 
 const ContextMenu = (value: Entity) => {
   const sdk = useSdk()
@@ -17,12 +18,18 @@ const ContextMenu = (value: Entity) => {
   const { handleAction } = useContextMenu()
   const components = getComponents(value, true)
   const availableComponents = getAvailableComponents(value)
+  const selectedEntities = useEntitiesWith((components) => components.Selection)
+  const hasMultipleSelection = selectedEntities.length > 1
 
   const handleCreateCustomAsset = useCallback(() => {
-    createCustomAsset(value)
-  }, [value, createCustomAsset])
+    // Apply to all selected entities
+    createCustomAsset(selectedEntities)
+  }, [selectedEntities, createCustomAsset])
 
   const handleAddComponent = (id: string) => {
+    // Only allow adding components when a single entity is selected
+    if (hasMultipleSelection) return
+
     addComponent(value, Number(id))
     if (sdk) {
       const gltfContainer = getComponentValue(value, sdk.components.GltfContainer)
@@ -41,7 +48,7 @@ const ContextMenu = (value: Entity) => {
         <CustomAssetIcon />
         Create Custom Asset
       </Item>
-      {availableComponents.length > 0 && (
+      {!hasMultipleSelection && availableComponents.length > 0 && (
         <>
           <Separator />
           <Submenu label="Add component" itemID="add-component">
