@@ -94,7 +94,12 @@ export const dataLayer = createSlice({
     getThumbnails: () => {},
     createCustomAsset: (
       _state,
-      _payload: PayloadAction<{ name: string; composite: AssetData['composite']; resources: string[] }>
+      _payload: PayloadAction<{
+        name: string
+        composite: AssetData['composite']
+        resources: string[]
+        thumbnail?: string
+      }>
     ) => {},
     deleteCustomAsset: (_state, _payload: PayloadAction<{ assetId: string }>) => {},
     renameCustomAsset: (state, _payload: PayloadAction<{ assetId: string; newName: string }>) => {

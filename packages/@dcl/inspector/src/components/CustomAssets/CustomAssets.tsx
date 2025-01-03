@@ -40,7 +40,7 @@ const CustomAssetItem: React.FC<CustomAssetItemProps> = ({ value, onDelete, onRe
     <>
       <div className="custom-asset-item" onContextMenu={handleContextMenu}>
         <div className="custom-asset-item-box" ref={drag} title={value.name}>
-          <CustomAssetIcon />
+          {value.thumbnail ? <img src={value.thumbnail} alt={value.name} /> : <CustomAssetIcon />}
         </div>
         <span className="custom-asset-item-label">{value.name}</span>
       </div>

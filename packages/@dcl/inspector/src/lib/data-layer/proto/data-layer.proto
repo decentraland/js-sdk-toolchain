@@ -70,6 +70,7 @@ message CreateCustomAssetRequest {
   string name = 1;
   bytes composite = 2;
   repeated string resources = 3;
+  optional bytes thumbnail = 4;
 }
 
 message GetCustomAssetsResponse {

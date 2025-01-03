@@ -22,6 +22,19 @@
   background: var(--list-item-bg-color);
 }
 
+.CreateCustomAsset .preview-container {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  background: var(--list-item-bg-color);
+  overflow: hidden;
+}
+
+.CreateCustomAsset .preview-container .AssetPreview {
+  width: 100%;
+  height: 100%;
+}
+
 .CreateCustomAsset .column {
   width: 300px;
   display: flex;

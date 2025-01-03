@@ -152,7 +152,7 @@ export async function initRpcMethods(
       return { content }
     },
     async createCustomAsset(req) {
-      const { name, composite, resources } = req
+      const { name, composite, resources, thumbnail } = req
 
       // Create a slug from the name
       const slug = name
@@ -180,6 +180,12 @@ export async function initRpcMethods(
         `${customAssetPath}/composite.json`,
         Buffer.from(JSON.stringify(JSON.parse(new TextDecoder().decode(composite)), null, 2)) // pretty print
       )
+
+      // Save thumbnail if provided
+      if (thumbnail) {
+        const thumbnailBuffer = Buffer.from(thumbnail)
+        await fs.writeFile(`${customAssetPath}/thumbnail.png`, thumbnailBuffer)
+      }
 
       // Copy all resources to the custom asset folder
       const undoAcc: FileOperation[] = []
@@ -218,12 +224,15 @@ export async function initRpcMethods(
               const files = await getFilesInDirectory(fs, `${DIRECTORY.CUSTOM}/${path}`, [], true)
               let dataPath: string | null = null
               let compositePath: string | null = null
+              let thumbnailPath: string | null = null
               const resources: string[] = []
               for (const file of files) {
                 if (file.endsWith('data.json')) {
                   dataPath = file
                 } else if (file.endsWith('composite.json')) {
                   compositePath = file
+                } else if (file.endsWith('thumbnail.png')) {
+                  thumbnailPath = file
                 } else {
                   resources.push(file)
                 }
@@ -234,13 +243,26 @@ export async function initRpcMethods(
               const data = await fs.readFile(dataPath)
               const composite = await fs.readFile(compositePath)
               const parsedData = JSON.parse(new TextDecoder().decode(data))
-              return { ...parsedData, composite: JSON.parse(new TextDecoder().decode(composite)), resources }
+              const result: AssetData & { thumbnail?: string } = {
+                ...parsedData,
+                composite: JSON.parse(new TextDecoder().decode(composite)),
+                resources
+              }
+
+              // Add thumbnail if it exists
+              if (thumbnailPath) {
+                const thumbnailData = await fs.readFile(thumbnailPath)
+                const thumbnailBuffer = Buffer.from(thumbnailData)
+                result.thumbnail = `data:image/png;base64,${thumbnailBuffer.toString('base64')}`
+              }
+
+              return result
             } catch {
               return null
             }
           })
         )
-      ).filter((asset): asset is AssetData => asset !== null)
+      ).filter((asset): asset is AssetData & { thumbnail?: string } => asset !== null)
       return { assets: assets.map((asset) => ({ data: Buffer.from(JSON.stringify(asset)) })) }
     },
     async deleteCustomAsset(req) {

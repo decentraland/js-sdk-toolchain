@@ -6,9 +6,15 @@ import { AssetData } from '../../../lib/logic/catalog'
 import { selectAssetsTab } from '../../ui'
 import { AssetsTab } from '../../ui/types'
 import { getResourcesFromModels } from '../../../lib/babylon/decentraland/get-resources'
+import { transformBase64ResourceToBinary } from '../../../lib/data-layer/host/fs-utils'
 
 export function* createCustomAssetSaga(
-  action: PayloadAction<{ name: string; composite: AssetData['composite']; resources: string[] }>
+  action: PayloadAction<{
+    name: string
+    composite: AssetData['composite']
+    resources: string[]
+    thumbnail?: string
+  }>
 ) {
   const dataLayer: IDataLayer = yield call(getDataLayerInterface)
   if (!dataLayer) return
@@ -21,7 +27,8 @@ export function* createCustomAssetSaga(
     yield call(dataLayer.createCustomAsset, {
       name: action.payload.name,
       composite: Buffer.from(JSON.stringify(action.payload.composite)),
-      resources
+      resources,
+      thumbnail: action.payload.thumbnail ? transformBase64ResourceToBinary(action.payload.thumbnail) : undefined
     })
     // Fetch asset catalog again
     yield put(getAssetCatalog())
