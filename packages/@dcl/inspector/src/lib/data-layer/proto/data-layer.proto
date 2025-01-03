@@ -53,6 +53,39 @@ message InspectorPreferencesMessage {
   bool autosave_enabled = 2;
 }
 
+message CopyFileRequest {
+  string from_path = 1;
+  string to_path = 2;
+}
+
+message GetFileRequest {
+  string path = 1;
+}
+
+message GetFileResponse {
+  bytes content = 1;
+}
+
+message CreateCustomAssetRequest {
+  string name = 1;
+  bytes composite = 2;
+  repeated string resources = 3;
+  optional bytes thumbnail = 4;
+}
+
+message GetCustomAssetsResponse {
+  repeated AssetData assets = 1;
+}
+
+message DeleteCustomAssetRequest {
+  string asset_id = 1;
+}
+
+message RenameCustomAssetRequest {
+  string asset_id = 1;
+  string new_name = 2;
+}
+
 service DataService {
   rpc CrdtStream(stream CrdtStreamMessage) returns (stream CrdtStreamMessage) {}
   rpc Undo(Empty) returns (UndoRedoResponse) {}
@@ -67,4 +100,10 @@ service DataService {
   rpc Save(Empty) returns (Empty) {}
   rpc GetInspectorPreferences(Empty) returns (InspectorPreferencesMessage) {}
   rpc SetInspectorPreferences(InspectorPreferencesMessage) returns (Empty) {}
+  rpc CopyFile(CopyFileRequest) returns (Empty) {}
+  rpc GetFile(GetFileRequest) returns (GetFileResponse) {}
+  rpc CreateCustomAsset(CreateCustomAssetRequest) returns (Empty) {}
+  rpc GetCustomAssets(Empty) returns (GetCustomAssetsResponse) {}
+  rpc DeleteCustomAsset(DeleteCustomAssetRequest) returns (Empty) {}
+  rpc RenameCustomAsset(RenameCustomAssetRequest) returns (Empty) {}
 }

@@ -22,6 +22,10 @@
   background-image: url(./icons/camera.svg);
 }
 
+.Hierarchy .custom-icon {
+  background-image: url(./icons/custom.svg);
+}
+
 .Hierarchy .smart-icon {
   background-image: url(./icons/smart.svg);
 }

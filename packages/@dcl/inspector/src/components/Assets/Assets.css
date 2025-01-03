@@ -31,6 +31,15 @@
   width: 100%;
 }
 
+.Assets .Assets-buttons .icon-custom-assets {
+  background-image: url('./custom-asset-icon.svg');
+  background-size: 16px 16px;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 16px;
+  height: 12px;
+}
+
 .Assets .Assets-buttons > div > div::after {
   content: '';
   position: absolute;

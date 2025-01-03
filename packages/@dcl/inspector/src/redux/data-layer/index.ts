@@ -1,8 +1,11 @@
+import { AssetData } from '@dcl/asset-packs'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { Entity } from '@dcl/ecs'
 import { RootState } from '../../redux/store'
 import { DataLayerRpcClient } from '../../lib/data-layer/types'
 import { InspectorPreferences } from '../../lib/logic/preferences/types'
 import { Asset, ImportAssetRequest, SaveFileRequest } from '../../lib/data-layer/remote-data-layer'
+import { AssetsTab } from '../ui/types'
 
 export enum ErrorType {
   Disconnected = 'disconnected',
@@ -16,7 +19,10 @@ export enum ErrorType {
   ImportAsset = 'import-asset',
   RemoveAsset = 'remove-asset',
   SaveThumbnail = 'save-thumbnail',
-  GetThumbnails = 'get-thumbnails'
+  GetThumbnails = 'get-thumbnails',
+  CreateCustomAsset = 'create-custom-asset',
+  DeleteCustomAsset = 'delete-custom-asset',
+  RenameCustomAsset = 'rename-custom-asset'
 }
 
 let dataLayerInterface: DataLayerRpcClient | undefined
@@ -32,13 +38,17 @@ export interface DataLayerState {
   error: ErrorType | undefined
   removingAsset: Record<string, boolean>
   reloadAssets: string[]
+  assetToRename: { id: string; name: string } | undefined
+  stagedCustomAsset: { entities: Entity[]; previousTab: AssetsTab; initialName: string } | undefined
 }
 
 export const initialState: DataLayerState = {
   reconnectAttempts: 0,
   error: undefined,
   removingAsset: {},
-  reloadAssets: []
+  reloadAssets: [],
+  assetToRename: undefined,
+  stagedCustomAsset: undefined
 }
 
 export const dataLayer = createSlice({
@@ -81,7 +91,35 @@ export const dataLayer = createSlice({
       delete state.removingAsset[payload.payload.path]
     },
     saveThumbnail: (_state, _payload: PayloadAction<SaveFileRequest>) => {},
-    getThumbnails: () => {}
+    getThumbnails: () => {},
+    createCustomAsset: (
+      _state,
+      _payload: PayloadAction<{
+        name: string
+        composite: AssetData['composite']
+        resources: string[]
+        thumbnail?: string
+      }>
+    ) => {},
+    deleteCustomAsset: (_state, _payload: PayloadAction<{ assetId: string }>) => {},
+    renameCustomAsset: (state, _payload: PayloadAction<{ assetId: string; newName: string }>) => {
+      state.assetToRename = undefined
+    },
+    setAssetToRename: (state, payload: PayloadAction<{ assetId: string; name: string }>) => {
+      state.assetToRename = { id: payload.payload.assetId, name: payload.payload.name }
+    },
+    clearAssetToRename: (state) => {
+      state.assetToRename = undefined
+    },
+    stageCustomAsset: (
+      state,
+      payload: PayloadAction<{ entities: Entity[]; previousTab: AssetsTab; initialName: string }>
+    ) => {
+      state.stagedCustomAsset = payload.payload
+    },
+    clearStagedCustomAsset: (state) => {
+      state.stagedCustomAsset = undefined
+    }
   }
 })
 
@@ -101,7 +139,14 @@ export const {
   removeAsset,
   clearRemoveAsset,
   saveThumbnail,
-  getThumbnails
+  getThumbnails,
+  createCustomAsset,
+  deleteCustomAsset,
+  renameCustomAsset,
+  setAssetToRename,
+  clearAssetToRename,
+  stageCustomAsset,
+  clearStagedCustomAsset
 } = dataLayer.actions
 
 // Selectors
@@ -109,6 +154,8 @@ export const selectDataLayerError = (state: RootState) => state.dataLayer.error
 export const selectDataLayerReconnectAttempts = (state: RootState) => state.dataLayer.reconnectAttempts
 export const selectDataLayerRemovingAsset = (state: RootState) => state.dataLayer.removingAsset
 export const getReloadAssets = (state: RootState) => state.dataLayer.reloadAssets
+export const selectAssetToRename = (state: RootState) => state.dataLayer.assetToRename
+export const selectStagedCustomAsset = (state: RootState) => state.dataLayer.stagedCustomAsset
 
 // Reducer
 export default dataLayer.reducer

@@ -15,6 +15,7 @@ import duplicateEntity from './duplicate-entity'
 import setGround from './set-ground'
 import lock from './lock'
 import hide from './hide'
+import createCustomAsset from './create-custom-asset'
 import { updateCanSave } from '../../../redux/app'
 import { store } from '../../../redux/store'
 
@@ -35,6 +36,7 @@ export function createOperations(engine: IEngine) {
     updateSelectedEntity: updateSelectedEntity(engine),
     removeSelectedEntities: removeSelectedEntities(engine),
     duplicateEntity: duplicateEntity(engine),
+    createCustomAsset: createCustomAsset(engine),
     dispatch: async ({ dirty = true }: Dispatch = {}) => {
       store.dispatch(updateCanSave({ dirty }))
       await engine.update(1)

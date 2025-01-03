@@ -13,13 +13,13 @@ import { useRef } from 'react'
 const WIDTH = 300
 const HEIGHT = 300
 
-export function AssetPreview({ value, onScreenshot }: Props) {
+export function AssetPreview({ value, onScreenshot, onLoad }: Props) {
   return (
     <div className="AssetPreview">
       {isGltf(value.name) ? (
-        <GltfPreview value={value} onScreenshot={onScreenshot} />
+        <GltfPreview value={value} onScreenshot={onScreenshot} onLoad={onLoad} />
       ) : value.name.endsWith('png') ? (
-        <PngPreview value={value} onScreenshot={onScreenshot} />
+        <PngPreview value={value} onScreenshot={onScreenshot} onLoad={onLoad} />
       ) : (
         <IoIosImage />
       )}
@@ -27,11 +27,12 @@ export function AssetPreview({ value, onScreenshot }: Props) {
   )
 }
 
-function GltfPreview({ value, onScreenshot }: Props) {
-  const onLoad = React.useCallback(() => {
+function GltfPreview({ value, onScreenshot, onLoad }: Props) {
+  const handleLoad = React.useCallback(() => {
+    onLoad?.()
     const wp = WearablePreview.createController(value.name)
     void wp.scene.getScreenshot(WIDTH, HEIGHT).then(($) => onScreenshot($))
-  }, [])
+  }, [onLoad])
 
   return (
     <WearablePreview
@@ -41,12 +42,12 @@ function GltfPreview({ value, onScreenshot }: Props) {
       disableBackground
       projection={PreviewProjection.ORTHOGRAPHIC}
       camera={PreviewCamera.STATIC}
-      onLoad={onLoad}
+      onLoad={handleLoad}
     />
   )
 }
 
-function PngPreview({ value, onScreenshot }: Props) {
+function PngPreview({ value, onScreenshot, onLoad }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   const url = URL.createObjectURL(value)
@@ -54,6 +55,7 @@ function PngPreview({ value, onScreenshot }: Props) {
   img.src = url
 
   img.onload = () => {
+    onLoad?.()
     const canvas = canvasRef.current
     const ctx = canvasRef.current?.getContext('2d')
     const canvas2 = document.createElement('canvas')

@@ -8,8 +8,11 @@ import { Tree } from '../Tree'
 import { ContextMenu } from './ContextMenu'
 import { withSdk } from '../../hoc/withSdk'
 import './Hierarchy.css'
+import { useAppSelector } from '../../redux/hooks'
+import { selectCustomAssets } from '../../redux/app'
 
 const HierarchyIcon = withSdk<{ value: Entity }>(({ sdk, value }) => {
+  const customAssets = useAppSelector(selectCustomAssets)
   const isSmart = useMemo(
     () =>
       sdk.components.Actions.has(value) ||
@@ -20,6 +23,15 @@ const HierarchyIcon = withSdk<{ value: Entity }>(({ sdk, value }) => {
       sdk.components.VisibilityComponent.has(value),
     [sdk, value]
   )
+
+  const isCustom = useMemo(() => {
+    if (sdk.components.CustomAsset.has(value)) {
+      const { assetId } = sdk.components.CustomAsset.get(value)
+      const customAsset = customAssets.find((asset) => asset.id === assetId)
+      return !!customAsset
+    }
+    return false
+  }, [sdk, value, customAssets])
 
   const isTile = useMemo(() => sdk.components.Tile.has(value), [sdk, value])
 
@@ -35,12 +47,14 @@ const HierarchyIcon = withSdk<{ value: Entity }>(({ sdk, value }) => {
     return <span className="tree-icon player-icon"></span>
   } else if (value === CAMERA) {
     return <span className="tree-icon camera-icon"></span>
+  } else if (isCustom) {
+    return <span className="tree-icon custom-icon"></span>
+  } else if (isGroup) {
+    return <span className="tree-icon group-icon"></span>
   } else if (isSmart) {
     return <span className="tree-icon smart-icon"></span>
   } else if (isTile) {
     return <span className="tree-icon tile-icon"></span>
-  } else if (isGroup) {
-    return <span className="tree-icon group-icon"></span>
   } else {
     return <span className="tree-icon entity-icon"></span>
   }

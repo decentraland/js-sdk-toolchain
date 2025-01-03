@@ -19,6 +19,7 @@ export type Events = {
     itemName: string
     itemPath: string
     isSmart: boolean
+    isCustom: boolean
   }
   [Event.ADD_COMPONENT]: {
     componentName: string

@@ -5,7 +5,9 @@ import {
   GltfContainer as GltfEngine,
   Vector3Type,
   LastWriteWinElementSetComponentDefinition,
-  NetworkEntity as NetworkEntityEngine
+  NetworkEntity as NetworkEntityEngine,
+  TransformType,
+  Name
 } from '@dcl/ecs'
 import {
   ActionType,
@@ -17,12 +19,14 @@ import {
   getPayload
 } from '@dcl/asset-packs'
 
-import { CoreComponents, EditorComponentNames } from '../../components'
+import { CoreComponents, EditorComponentNames, EditorComponents } from '../../components'
 import updateSelectedEntity from '../update-selected-entity'
 import { addChild } from '../add-child'
 import { isSelf, parseMaterial, parseSyncComponents } from './utils'
 import { EnumEntity } from '../../enum-entity'
 import { AssetData } from '../../../logic/catalog'
+import { pushChild, removeChild } from '../../nodes'
+import { ROOT } from '../../tree'
 
 export function addAsset(engine: IEngine) {
   return function addAsset(
@@ -33,48 +37,149 @@ export function addAsset(engine: IEngine) {
     base: string,
     enumEntityId: EnumEntity,
     composite?: AssetData['composite'],
-    assetId?: string
+    assetId?: string,
+    custom?: boolean
   ): Entity {
     const Transform = engine.getComponent(TransformEngine.componentId) as typeof TransformEngine
     const GltfContainer = engine.getComponent(GltfEngine.componentId) as typeof GltfEngine
     const NetworkEntity = engine.getComponent(NetworkEntityEngine.componentId) as typeof NetworkEntityEngine
+    const Nodes = engine.getComponent(EditorComponentNames.Nodes) as EditorComponents['Nodes']
+    const CustomAsset = engine.getComponent(EditorComponentNames.CustomAsset) as EditorComponents['CustomAsset']
 
     if (composite) {
       // Get all unique entity IDs from components
-      const entityIds = new Set<string>()
-      for (const component of composite.components) {
-        Object.keys(component.data).forEach((id) => entityIds.add(id))
-      }
+      const entityIds = new Set<Entity>()
 
       // Track all created entities
-      const entities = new Map<string, Entity>()
+      const entities = new Map<Entity, Entity>()
 
-      // If there's only one entity, it becomes the main entity
-      // If there are multiple entities, create a new main entity as parent
-      const mainEntity =
-        entityIds.size === 1 ? addChild(engine)(parent, name) : addChild(engine)(parent, `${name}_root`)
+      // Tranform tree
+      const parentOf = new Map<Entity, Entity>()
+      const transformComponent = composite.components.find((component) => component.name === CoreComponents.TRANSFORM)
+      if (transformComponent) {
+        for (const [entityId, transformData] of Object.entries(transformComponent.data)) {
+          const entity = Number(entityId) as Entity
+          entityIds.add(entity)
+          if (typeof transformData.json.parent === 'number') {
+            parentOf.set(entity, transformData.json.parent)
+            entityIds.add(transformData.json.parent)
+          }
+        }
+      }
 
-      Transform.createOrReplace(mainEntity, { parent, position })
+      // Store names
+      const names = new Map<Entity, string>()
+      const nameComponent = composite.components.find((component) => component.name === Name.componentName)
+      if (nameComponent) {
+        for (const [entityId, nameData] of Object.entries(nameComponent.data)) {
+          names.set(Number(entityId) as Entity, nameData.json.value)
+        }
+      }
 
-      // Set up entity hierarchy based on number of entities
-      const parentForChildren = entityIds.size === 1 ? parent : mainEntity
+      // Get all entity ids
+      for (const component of composite.components) {
+        for (const id of Object.keys(component.data)) {
+          entityIds.add(Number(id) as Entity)
+        }
+      }
 
-      // Create all entities
+      // Get all roots
+      const roots = new Set<Entity>()
       for (const entityId of entityIds) {
-        if (entityIds.size === 1) {
-          // Single entity case: use the main entity
-          entities.set(entityId, mainEntity)
-        } else {
-          // Multiple entities case: create child entities
-          const entity = entityId === '0' ? mainEntity : addChild(engine)(parentForChildren, `${name}_${entityId}`)
+        if (!parentOf.has(entityId)) {
+          roots.add(entityId)
+        }
+      }
 
-          if (entityId !== '0') {
+      // Store initial transform values
+      const transformValues = new Map<Entity, TransformType>()
+      if (transformComponent) {
+        for (const [entityId, transformData] of Object.entries(transformComponent.data)) {
+          const entity = Number(entityId) as Entity
+          transformValues.set(entity, transformData.json)
+        }
+      }
+
+      if (roots.size === 0) {
+        throw new Error('No roots found in composite')
+      }
+      let defaultParent = parent
+      let mainEntity: Entity | null = null
+
+      // If multiple roots, create a new root as main entity
+      if (roots.size > 1) {
+        mainEntity = addChild(engine)(parent, `${name}_root`)
+        Transform.createOrReplace(mainEntity, { parent, position })
+        defaultParent = mainEntity
+      }
+
+      // If single entity, use it as root and main entity
+      if (entityIds.size === 1) {
+        mainEntity = addChild(engine)(parent, name)
+        Transform.createOrReplace(mainEntity, { parent, position })
+        entities.set(entityIds.values().next().value, mainEntity)
+      } else {
+        // Track orphaned entities that need to be reparented
+        const orphanedEntities = new Map<Entity, Entity>()
+
+        // Create all entities
+        for (const entityId of entityIds) {
+          const isRoot = roots.has(entityId)
+          const intendedParentId = parentOf.get(entityId)
+          const parentEntity = isRoot
+            ? defaultParent
+            : typeof intendedParentId === 'number'
+            ? entities.get(intendedParentId)
+            : undefined
+
+          // If parent doesn't exist yet, temporarily attach to parentForChildren
+          if (!isRoot && typeof intendedParentId === 'number' && typeof parentEntity === 'undefined') {
+            orphanedEntities.set(entityId, intendedParentId)
+          }
+
+          const entity = addChild(engine)(
+            parentEntity || defaultParent,
+            names.get(entityId) || (entityId === ROOT ? name : `${name}_${entityId}`)
+          )
+
+          // Apply transform values from composite
+          const transformValue = transformValues.get(entityId)
+          if (transformValue) {
             Transform.createOrReplace(entity, {
-              parent: parentForChildren,
-              position: { x: 0, y: 0, z: 0 }
+              position: transformValue.position || { x: 0, y: 0, z: 0 },
+              rotation: transformValue.rotation || { x: 0, y: 0, z: 0, w: 1 },
+              scale: transformValue.scale || { x: 1, y: 1, z: 1 },
+              parent: parentEntity || defaultParent
             })
           }
+
           entities.set(entityId, entity)
+        }
+
+        // Reparent orphaned entities now that all entities exist
+        for (const [entityId, intendedParentId] of orphanedEntities) {
+          const entity = entities.get(entityId)!
+          const parentEntity = entities.get(intendedParentId)!
+          if (parentEntity) {
+            const transformValue = transformValues.get(entityId)
+            Transform.createOrReplace(entity, {
+              parent: parentEntity,
+              position: transformValue?.position || { x: 0, y: 0, z: 0 },
+              rotation: transformValue?.rotation || { x: 0, y: 0, z: 0, w: 1 },
+              scale: transformValue?.scale || { x: 1, y: 1, z: 1 }
+            })
+            Nodes.createOrReplace(engine.RootEntity, { value: removeChild(engine, defaultParent, entity) })
+            Nodes.createOrReplace(engine.RootEntity, { value: pushChild(engine, parentEntity, entity) })
+          } else {
+            console.warn(`Failed to reparent entity ${entityId}: parent ${intendedParentId} not found`)
+          }
+        }
+
+        // If multiple entities but single root, use root as main entity
+        if (roots.size === 1) {
+          const root = Array.from(roots)[0]
+          mainEntity = entities.get(root)!
+          Transform.createOrReplace(mainEntity, { parent, position })
         }
       }
 
@@ -84,22 +189,34 @@ export function addAsset(engine: IEngine) {
       const ids = new Map<string, number>()
       for (const component of composite.components) {
         const componentName = component.name
-        for (const [_entityId, data] of Object.entries(component.data)) {
+        for (const [entityId, data] of Object.entries(component.data)) {
+          // Use composite key of componentName and entityId
+          const key = `${componentName}:${entityId}`
           const componentValue = { ...data.json }
           if (COMPONENTS_WITH_ID.includes(componentName) && isSelf(componentValue.id)) {
-            ids.set(componentName, getNextId(engine as any))
-            componentValue.id = ids.get(componentName)
+            ids.set(key, getNextId(engine as any))
+            componentValue.id = ids.get(key)
           }
-          values.set(componentName, componentValue)
+          values.set(key, componentValue)
         }
       }
 
-      const mapId = (id: string | number) => {
+      const mapId = (id: string | number, entityId: string) => {
         if (typeof id === 'string') {
-          const match = id.match(/{self:(.+)}/)
-          if (match) {
-            const componentName = match[1]
-            return ids.get(componentName)
+          // Handle self references
+          const selfMatch = id.match(/{self:(.+)}/)
+          if (selfMatch) {
+            const componentName = selfMatch[1]
+            const key = `${componentName}:${entityId}`
+            return ids.get(key)
+          }
+
+          // Handle cross-entity references
+          const crossEntityMatch = id.match(/{(\d+):(.+)}/)
+          if (crossEntityMatch) {
+            const [_, refEntityId, componentName] = crossEntityMatch
+            const key = `${componentName}:${refEntityId}`
+            return ids.get(key)
           }
         }
         return id
@@ -108,9 +225,11 @@ export function addAsset(engine: IEngine) {
       // Process and create components for each entity
       for (const component of composite.components) {
         const componentName = component.name
-        for (const [entityId] of Object.entries(component.data)) {
+        for (const [entityIdStr] of Object.entries(component.data)) {
+          const entityId = Number(entityIdStr) as Entity
           const targetEntity = entities.get(entityId)!
-          let componentValue = values.get(componentName)
+          const key = `${componentName}:${entityIdStr}`
+          let componentValue = values.get(key)
 
           switch (componentName) {
             case CoreComponents.GLTF_CONTAINER: {
@@ -176,18 +295,18 @@ export function addAsset(engine: IEngine) {
                 ...trigger,
                 conditions: (trigger.conditions || []).map((condition: any) => ({
                   ...condition,
-                  id: mapId(condition.id)
+                  id: mapId(condition.id, entityIdStr)
                 })),
                 actions: trigger.actions.map((action: any) => ({
                   ...action,
-                  id: mapId(action.id)
+                  id: mapId(action.id, entityIdStr)
                 }))
               }))
               componentValue = { ...componentValue, value: newValue }
               break
             }
             case CoreComponents.SYNC_COMPONENTS: {
-              const componentIds = parseSyncComponents(engine, componentValue.value)
+              const componentIds = parseSyncComponents(engine, componentValue.value || componentValue.componentIds)
               componentValue = { componentIds }
               const NetworkEntityComponent = engine.getComponent(NetworkEntity.componentId) as typeof NetworkEntity
               NetworkEntityComponent.create(targetEntity, {
@@ -198,9 +317,21 @@ export function addAsset(engine: IEngine) {
             }
           }
 
+          if (componentName === CoreComponents.TRANSFORM || componentName === Name.componentName) {
+            continue
+          }
+
           const Component = engine.getComponent(componentName) as LastWriteWinElementSetComponentDefinition<unknown>
-          Component.create(targetEntity, componentValue)
+          Component.createOrReplace(targetEntity, componentValue)
         }
+      }
+
+      if (!mainEntity) {
+        throw new Error('No main entity found')
+      }
+
+      if (assetId && custom) {
+        CustomAsset.createOrReplace(mainEntity, { assetId })
       }
 
       // update selection

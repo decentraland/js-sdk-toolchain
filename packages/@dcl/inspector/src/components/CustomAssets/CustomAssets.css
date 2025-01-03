@@ -1,0 +1,50 @@
+.custom-assets {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 4px;
+  padding: 8px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.custom-asset-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.custom-asset-item-box {
+  width: 80px;
+  height: 80px;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--list-item-bg-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+}
+
+.custom-asset-item-box:hover {
+  background: var(--list-item-hover-bg-color);
+}
+
+.custom-asset-item-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.custom-asset-item-box svg {
+  width: 100%;
+  height: 100%;
+}
+
+.custom-asset-item-label {
+  font-size: 12px;
+  text-align: center;
+  word-break: break-word;
+  max-width: 100px;
+}

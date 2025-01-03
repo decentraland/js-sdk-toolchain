@@ -59,7 +59,7 @@ describe('duplicateEntity', () => {
     expect(duplicateChild).not.toBe(original)
     expect(duplicateChild).not.toBe(originalChild)
     expect(duplicateChild).not.toBe(duplicate)
-    expect(NameComponent.get(duplicateChild!).value).toBe(`${NameComponent.get(originalChild).value}_1`)
+    expect(NameComponent.get(duplicateChild!).value).toBe(`${NameComponent.get(originalChild).value}_2`)
     expect(Nodes.get(ROOT).value).toStrictEqual(nodesAfter)
   })
 })
