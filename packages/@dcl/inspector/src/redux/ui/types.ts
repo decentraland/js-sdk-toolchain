@@ -3,7 +3,8 @@ export enum AssetsTab {
   CustomAssets = 'CustomAssets',
   AssetsPack = 'AssetsPack',
   Import = 'Import',
-  RenameAsset = 'RenameAsset'
+  RenameAsset = 'RenameAsset',
+  CreateCustomAsset = 'CreateCustomAsset'
 }
 
 export enum PanelName {

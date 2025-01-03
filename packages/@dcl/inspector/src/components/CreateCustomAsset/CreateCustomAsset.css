@@ -1,0 +1,37 @@
+.CreateCustomAsset {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.CreateCustomAsset .file-container {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  align-items: flex-start;
+}
+
+.CreateCustomAsset .file-container svg {
+  width: 32px;
+  height: 32px;
+}
+
+.CreateCustomAsset .column {
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.CreateCustomAsset .button-container {
+  display: flex;
+  gap: 8px;
+}
+
+.CreateCustomAsset .create {
+  background-color: var(--primary);
+  color: var(--text-on-primary);
+}

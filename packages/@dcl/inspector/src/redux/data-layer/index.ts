@@ -1,9 +1,11 @@
 import { AssetData } from '@dcl/asset-packs'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { Entity } from '@dcl/ecs'
 import { RootState } from '../../redux/store'
 import { DataLayerRpcClient } from '../../lib/data-layer/types'
 import { InspectorPreferences } from '../../lib/logic/preferences/types'
 import { Asset, ImportAssetRequest, SaveFileRequest } from '../../lib/data-layer/remote-data-layer'
+import { AssetsTab } from '../ui/types'
 
 export enum ErrorType {
   Disconnected = 'disconnected',
@@ -37,6 +39,7 @@ export interface DataLayerState {
   removingAsset: Record<string, boolean>
   reloadAssets: string[]
   assetToRename: { id: string; name: string } | undefined
+  stagedCustomAsset: { entities: Entity[]; previousTab: AssetsTab; initialName: string } | undefined
 }
 
 export const initialState: DataLayerState = {
@@ -44,7 +47,8 @@ export const initialState: DataLayerState = {
   error: undefined,
   removingAsset: {},
   reloadAssets: [],
-  assetToRename: undefined
+  assetToRename: undefined,
+  stagedCustomAsset: undefined
 }
 
 export const dataLayer = createSlice({
@@ -101,6 +105,15 @@ export const dataLayer = createSlice({
     },
     clearAssetToRename: (state) => {
       state.assetToRename = undefined
+    },
+    stageCustomAsset: (
+      state,
+      payload: PayloadAction<{ entities: Entity[]; previousTab: AssetsTab; initialName: string }>
+    ) => {
+      state.stagedCustomAsset = payload.payload
+    },
+    clearStagedCustomAsset: (state) => {
+      state.stagedCustomAsset = undefined
     }
   }
 })
@@ -126,7 +139,9 @@ export const {
   deleteCustomAsset,
   renameCustomAsset,
   setAssetToRename,
-  clearAssetToRename
+  clearAssetToRename,
+  stageCustomAsset,
+  clearStagedCustomAsset
 } = dataLayer.actions
 
 // Selectors
@@ -135,6 +150,7 @@ export const selectDataLayerReconnectAttempts = (state: RootState) => state.data
 export const selectDataLayerRemovingAsset = (state: RootState) => state.dataLayer.removingAsset
 export const getReloadAssets = (state: RootState) => state.dataLayer.reloadAssets
 export const selectAssetToRename = (state: RootState) => state.dataLayer.assetToRename
+export const selectStagedCustomAsset = (state: RootState) => state.dataLayer.stagedCustomAsset
 
 // Reducer
 export default dataLayer.reducer

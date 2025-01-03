@@ -6,7 +6,7 @@ import { HiOutlinePlus } from 'react-icons/hi'
 import { AssetPack, catalog, isSmart } from '../../lib/logic/catalog'
 import { getConfig } from '../../lib/logic/config'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
-import { selectAssetToRename } from '../../redux/data-layer'
+import { selectAssetToRename, selectStagedCustomAsset } from '../../redux/data-layer'
 import { getSelectedAssetsTab, selectAssetsTab } from '../../redux/ui'
 import { AssetsTab } from '../../redux/ui/types'
 import { FolderOpen } from '../Icons/Folder'
@@ -16,6 +16,7 @@ import ImportAsset from '../ImportAsset'
 import { CustomAssets } from '../CustomAssets'
 import { selectCustomAssets } from '../../redux/app'
 import { RenameAsset } from '../RenameAsset'
+import { CreateCustomAsset } from '../CreateCustomAsset'
 
 import './Assets.css'
 
@@ -44,6 +45,7 @@ function Assets({ isAssetsPanelCollapsed }: { isAssetsPanelCollapsed: boolean })
     : catalog
 
   const assetToRename = useAppSelector(selectAssetToRename)
+  const stagedCustomAsset = useAppSelector(selectStagedCustomAsset)
 
   return (
     <div className="Assets">
@@ -82,6 +84,7 @@ function Assets({ isAssetsPanelCollapsed }: { isAssetsPanelCollapsed: boolean })
         {tab === AssetsTab.RenameAsset && assetToRename && (
           <RenameAsset assetId={assetToRename.id} currentName={assetToRename.name} />
         )}
+        {tab === AssetsTab.CreateCustomAsset && stagedCustomAsset && <CreateCustomAsset />}
       </div>
     </div>
   )
