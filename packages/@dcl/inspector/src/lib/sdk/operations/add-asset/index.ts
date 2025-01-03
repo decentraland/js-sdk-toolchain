@@ -26,6 +26,7 @@ import { isSelf, parseMaterial, parseSyncComponents } from './utils'
 import { EnumEntity } from '../../enum-entity'
 import { AssetData } from '../../../logic/catalog'
 import { pushChild, removeChild } from '../../nodes'
+import { ROOT } from '../../tree'
 
 export function addAsset(engine: IEngine) {
   return function addAsset(
@@ -136,7 +137,10 @@ export function addAsset(engine: IEngine) {
             orphanedEntities.set(entityId, intendedParentId)
           }
 
-          const entity = addChild(engine)(parentEntity || defaultParent, names.get(entityId) || `${name}_${entityId}`)
+          const entity = addChild(engine)(
+            parentEntity || defaultParent,
+            names.get(entityId) || (entityId === ROOT ? name : `${name}_${entityId}`)
+          )
 
           // Apply transform values from composite
           const transformValue = transformValues.get(entityId)

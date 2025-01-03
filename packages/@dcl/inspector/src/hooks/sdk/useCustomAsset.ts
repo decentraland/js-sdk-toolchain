@@ -13,7 +13,8 @@ export const useCustomAsset = () => {
     (entities: Entity | Entity[]): { composite: AssetData['composite']; resources: string[] } | undefined => {
       if (!sdk) return undefined
       const entityArray = Array.isArray(entities) ? entities : [entities]
-      const name = Array.isArray(entities) ? 'Custom Asset' : sdk.components.Name.get(entities).value
+      if (entityArray.length === 0) throw new Error('No entities to create custom asset')
+      const name = sdk.components.Name.get(entityArray[0]).value
       const asset = sdk.operations.createCustomAsset(entityArray)
       if (asset) {
         dispatch(createCustomAsset({ ...asset, name }))
