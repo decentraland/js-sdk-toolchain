@@ -15,8 +15,11 @@
 }
 
 .CreateCustomAsset .file-container svg {
-  width: 32px;
-  height: 32px;
+  width: 80px;
+  height: 80px;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--list-item-bg-color);
 }
 
 .CreateCustomAsset .column {
