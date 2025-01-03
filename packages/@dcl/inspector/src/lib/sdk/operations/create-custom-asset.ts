@@ -73,6 +73,33 @@ function createRef(engine: IEngine, componentId: number, currentEntity: Entity, 
   throw new Error(`Component with id ${componentId} not found`)
 }
 
+function calculateCentroid(
+  transformValues: Map<Entity, TransformType>,
+  roots: Set<Entity>
+): { x: number; y: number; z: number } {
+  const positions = Array.from(roots).map((entity) => {
+    const transform = transformValues.get(entity)
+    return transform?.position || { x: 0, y: 0, z: 0 }
+  })
+
+  if (positions.length === 0) return { x: 0, y: 0, z: 0 }
+
+  const sum = positions.reduce(
+    (acc, pos) => ({
+      x: acc.x + pos.x,
+      y: acc.y + pos.y,
+      z: acc.z + pos.z
+    }),
+    { x: 0, y: 0, z: 0 }
+  )
+
+  return {
+    x: sum.x / positions.length,
+    y: sum.y / positions.length,
+    z: sum.z / positions.length
+  }
+}
+
 export function createCustomAsset(engine: IEngine) {
   return function createCustomAsset(entities: Entity[]): { composite: AssetData['composite']; resources: string[] } {
     const resources: string[] = []
@@ -109,6 +136,24 @@ export function createCustomAsset(engine: IEngine) {
       }
     }
 
+    // Store transforms before processing components
+    const transformValues = new Map<Entity, TransformType>()
+    for (const entity of allEntities) {
+      const Transform = engine.getComponent(TransformEngine.componentId) as typeof TransformEngine
+      if (Transform.has(entity)) {
+        const transform = Transform.get(entity)
+        if (transform) {
+          transformValues.set(entity, transform)
+        }
+      }
+    }
+
+    // Calculate centroid for multiple roots
+    let centroid = { x: 0, y: 0, z: 0 }
+    if (roots.size > 1) {
+      centroid = calculateCentroid(transformValues, roots)
+    }
+
     // Phase 2: Process each component for each scene entity and map it to the custom asset entity
     for (const entity of allEntities) {
       const isRoot = roots.has(entity)
@@ -123,8 +168,36 @@ export function createCustomAsset(engine: IEngine) {
           continue
         }
 
-        // Skip Transform component for root entities
-        if (isRoot && componentName === CoreComponents.TRANSFORM) {
+        // Handle Transform component specially for root entities in multi-root case
+        if (componentName === CoreComponents.TRANSFORM) {
+          if (isRoot && roots.size === 1) {
+            continue // Skip transform for single root as before
+          }
+
+          const Component = engine.getComponent(componentId) as LastWriteWinElementSetComponentDefinition<TransformType>
+          if (!Component.has(entity)) continue
+          const componentValue = Component.get(entity)
+          if (!componentValue) continue
+
+          // Process the component value with a deep copy
+          const processedComponentValue: TransformType = JSON.parse(JSON.stringify(componentValue))
+
+          // Adjust position relative to centroid for root entities
+          if (isRoot && roots.size > 1) {
+            processedComponentValue.position = {
+              x: processedComponentValue.position.x - centroid.x,
+              y: processedComponentValue.position.y - centroid.y,
+              z: processedComponentValue.position.z - centroid.z
+            }
+          }
+
+          // Initialize component in map if it doesn't exist
+          if (!componentsByName[componentName]) {
+            componentsByName[componentName] = { data: {} }
+          }
+
+          // Add the processed value to the component data
+          componentsByName[componentName].data[assetEntity] = { json: processedComponentValue }
           continue
         }
 
