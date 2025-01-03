@@ -1,4 +1,5 @@
 import React, { useCallback, useState, useEffect } from 'react'
+import { Loader } from 'decentraland-ui/dist/components/Loader/Loader'
 import { Container } from '../Container'
 import { Block } from '../Block'
 import { TextField } from '../ui/TextField'
@@ -28,6 +29,7 @@ const CreateCustomAsset: React.FC = () => {
   })
   const [thumbnail, setThumbnail] = useState<string | null>(null)
   const [previewFile, setPreviewFile] = useState<File | null>(null)
+  const [isGeneratingThumbnail, setIsGeneratingThumbnail] = useState(true)
 
   useEffect(() => {
     const loadPreviewFile = async () => {
@@ -88,6 +90,7 @@ const CreateCustomAsset: React.FC = () => {
   )
 
   const handleScreenshot = useCallback((value: string) => {
+    setIsGeneratingThumbnail(false)
     setThumbnail(value)
   }, [])
 
@@ -99,6 +102,11 @@ const CreateCustomAsset: React.FC = () => {
         <div className="file-container">
           {previewFile ? (
             <div className="preview-container">
+              {isGeneratingThumbnail && (
+                <div className="loader-container">
+                  <Loader active size="small" />
+                </div>
+              )}
               <AssetPreview value={previewFile} onScreenshot={handleScreenshot} />
             </div>
           ) : (
