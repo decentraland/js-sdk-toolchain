@@ -53,6 +53,20 @@ export interface PointerEventsSystem {
   removeOnPointerUp(entity: Entity): void
 
   /**
+   * @public
+   * Remove the callback for onPointerHoverEnter event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnPointerHoverEnter(entity: Entity): void
+
+  /**
+   * @public
+   * Remove the callback for onPointerHoverLeave event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnPointerHoverLeave(entity: Entity): void
+
+  /**
    * @internal
    * Execute callback when the user clicks the entity.
    * @param entity - Entity to attach the callback - Opts to trigger Feedback and Button
@@ -88,6 +102,28 @@ export interface PointerEventsSystem {
    * @param opts - Opts to trigger Feedback and Button
    */
   onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void
+
+  /**
+   * @public
+   * Execute callback when the user place the pointer over the entity
+   * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
+   * @param cb - Function to execute when click fires
+   */
+  onPointerHoverEnter(
+    pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> },
+    cb: EventSystemCallback
+  ): void
+
+  /**
+   * @public
+   * Execute callback when the user take the pointer out of the entity
+   * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
+   * @param cb - Function to execute when click fires
+   */
+  onPointerHoverLeave(
+    pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> },
+    cb: EventSystemCallback
+  ): void
 }
 
 /**
@@ -100,7 +136,9 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
   enum EventType {
     Click,
     Down,
-    Up
+    Up,
+    HoverEnter,
+    HoverLeave
   }
   type EventMapType = Map<EventType, { cb: EventSystemCallback; opts: EventSystemOptions }>
 
@@ -135,6 +173,10 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
   function getPointerEvent(eventType: EventType) {
     if (eventType === EventType.Up) {
       return PointerEventType.PET_UP
+    } else if (eventType === EventType.HoverLeave) {
+      return PointerEventType.PET_HOVER_LEAVE
+    } else if (eventType === EventType.HoverEnter) {
+      return PointerEventType.PET_HOVER_ENTER
     }
     return PointerEventType.PET_DOWN
   }
@@ -164,7 +206,12 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
             checkNotThenable(cb(command.up), 'Click event returned a thenable. Only synchronous functions are allowed')
         }
 
-        if (eventType === EventType.Down || eventType === EventType.Up) {
+        if (
+          eventType === EventType.Down ||
+          eventType === EventType.Up ||
+          eventType === EventType.HoverEnter ||
+          eventType === EventType.HoverLeave
+        ) {
           const command = inputSystem.getInputCommand(opts.button, getPointerEvent(eventType), entity)
           if (command) {
             checkNotThenable(cb(command), 'Event handler returned a thenable. Only synchronous functions are allowed')
@@ -198,6 +245,24 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     setPointerEvent(entity, PointerEventType.PET_UP, options)
   }
 
+  const onPointerHoverEnter: PointerEventsSystem['onPointerHoverEnter'] = (...args) => {
+    const [data, cb] = args
+    const { entity, opts } = data
+    const options = getDefaultOpts(opts)
+    removeEvent(entity, EventType.HoverEnter)
+    getEvent(entity).set(EventType.HoverEnter, { cb, opts: options })
+    setPointerEvent(entity, PointerEventType.PET_HOVER_ENTER, options)
+  }
+
+  const onPointerHoverLeave: PointerEventsSystem['onPointerHoverLeave'] = (...args) => {
+    const [data, cb] = args
+    const { entity, opts } = data
+    const options = getDefaultOpts(opts)
+    removeEvent(entity, EventType.HoverLeave)
+    getEvent(entity).set(EventType.HoverLeave, { cb, opts: options })
+    setPointerEvent(entity, PointerEventType.PET_HOVER_LEAVE, options)
+  }
+
   return {
     removeOnClick(entity: Entity) {
       removeEvent(entity, EventType.Click)
@@ -209,6 +274,14 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
 
     removeOnPointerUp(entity: Entity) {
       removeEvent(entity, EventType.Up)
+    },
+
+    removeOnPointerHoverEnter(entity: Entity) {
+      removeEvent(entity, EventType.HoverEnter)
+    },
+
+    removeOnPointerHoverLeave(entity: Entity) {
+      removeEvent(entity, EventType.HoverLeave)
     },
 
     onClick(value, cb) {
@@ -223,6 +296,8 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     },
 
     onPointerDown,
-    onPointerUp
+    onPointerUp,
+    onPointerHoverEnter,
+    onPointerHoverLeave
   }
 }
