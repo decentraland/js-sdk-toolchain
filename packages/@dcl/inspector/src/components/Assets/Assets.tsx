@@ -60,7 +60,7 @@ function Assets({ isAssetsPanelCollapsed }: { isAssetsPanelCollapsed: boolean })
           <div className="tab" onClick={handleTabClick(AssetsTab.CustomAssets)} data-test-id={AssetsTab.CustomAssets}>
             <div className={cx({ underlined: tab === AssetsTab.CustomAssets })}>
               <i className="icon-custom-assets" />
-              <span>CUSTOM ASSETS</span>
+              <span>CUSTOM ITEMS</span>
             </div>
           </div>
         ) : null}

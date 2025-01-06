@@ -66,7 +66,7 @@ const ContextMenu = (value: Entity) => {
     <>
       <Item onClick={handleAction(handleCreateCustomAsset)}>
         <CustomAssetIcon />
-        Create Custom Asset
+        Create Custom Item
       </Item>
       {!hasMultipleSelection && availableComponents.length > 0 && (
         <>

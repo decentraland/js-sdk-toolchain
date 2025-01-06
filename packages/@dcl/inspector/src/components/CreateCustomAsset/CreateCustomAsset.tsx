@@ -113,7 +113,7 @@ const CreateCustomAsset: React.FC = () => {
             <CustomAssetIcon />
           )}
           <div className="column">
-            <Block label="Asset name">
+            <Block label="Item name">
               <TextField autoSelect autoFocus value={name} onChange={handleNameChange} onKeyDown={handleKeyDown} />
             </Block>
             <div className="button-container">

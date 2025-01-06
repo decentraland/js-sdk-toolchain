@@ -40,7 +40,7 @@ const RenameAsset: React.FC<PropTypes> = ({ assetId, currentName }) => {
         <div className="file-container">
           <CustomAssetIcon />
           <div className="column">
-            <Block label="Asset name">
+            <Block label="Item name">
               <TextField autoSelect value={name} onChange={handleNameChange} />
             </Block>
             <div className="button-container">
