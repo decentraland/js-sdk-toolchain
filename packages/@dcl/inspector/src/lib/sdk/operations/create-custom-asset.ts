@@ -14,11 +14,17 @@ import { ActionType, ComponentName as AssetPackComponentNames, COMPONENTS_WITH_I
 const BASE_ENTITY_ID = 512 as Entity
 const SINGLE_ENTITY_ID = 0 as Entity
 
-const assetPackComponents = Object.values(AssetPackComponentNames) as string[]
 // Components that must be excluded from the asset
 const excludeComponents: string[] = [
-  // Editor components that are not part of asset-packs
-  ...Object.values(EditorComponentNames).filter((name) => !assetPackComponents.includes(name)),
+  // Editor components that must be excluded from the asset
+  EditorComponentNames.Selection,
+  EditorComponentNames.Nodes,
+  EditorComponentNames.TransformConfig,
+  EditorComponentNames.Hide,
+  EditorComponentNames.Lock,
+  EditorComponentNames.Ground,
+  EditorComponentNames.Tile,
+  EditorComponentNames.CustomAsset,
   // Core components that must be excluded from the asset
   CoreComponents.NETWORK_ENTITY
 ]
