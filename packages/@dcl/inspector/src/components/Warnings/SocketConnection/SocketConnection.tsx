@@ -16,7 +16,10 @@ const mapError = {
   [ErrorType.ImportAsset]: 'Failed to import new asset.',
   [ErrorType.RemoveAsset]: 'Failed to remove asset.',
   [ErrorType.SaveThumbnail]: 'Failed to save thumbnail.',
-  [ErrorType.GetThumbnails]: 'Failed to get thumbnails.'
+  [ErrorType.GetThumbnails]: 'Failed to get thumbnails.',
+  [ErrorType.CreateCustomAsset]: 'Failed to create custom item.',
+  [ErrorType.DeleteCustomAsset]: 'Failed to delete custom item.',
+  [ErrorType.RenameCustomAsset]: 'Failed to rename custom item.'
 }
 
 const SocketConnection: React.FC = () => {
