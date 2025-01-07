@@ -13,11 +13,12 @@ import {
   getDataLayerInterface,
   selectStagedCustomAsset
 } from '../../redux/data-layer'
+import { getResourcesFromModels } from '../../lib/babylon/decentraland/get-resources'
 import { useSdk } from '../../hooks/sdk/useSdk'
 import { AssetPreview } from '../AssetPreview'
+import CustomAssetIcon from '../Icons/CustomAsset'
 
 import './CreateCustomAsset.css'
-import CustomAssetIcon from '../Icons/CustomAsset'
 
 const CreateCustomAsset: React.FC = () => {
   const dispatch = useAppDispatch()
@@ -29,6 +30,7 @@ const CreateCustomAsset: React.FC = () => {
   })
   const [thumbnail, setThumbnail] = useState<string | null>(null)
   const [previewFile, setPreviewFile] = useState<File | null>(null)
+  const [resources, setResources] = useState<File[] | null>(null)
   const [isGeneratingThumbnail, setIsGeneratingThumbnail] = useState(true)
 
   useEffect(() => {
@@ -47,7 +49,15 @@ const CreateCustomAsset: React.FC = () => {
         const dataLayer = getDataLayerInterface()
         if (!dataLayer) return
         const { content } = await dataLayer.getFile({ path: modelFile })
+        const resourcesFromModel = await getResourcesFromModels([modelFile])
+        const files: File[] = await Promise.all(
+          resourcesFromModel.map(async (path) => {
+            const { content } = await dataLayer.getFile({ path })
+            return new File([content], path.split('/').pop() || 'model', { type: 'model/gltf-binary' })
+          })
+        )
         setPreviewFile(new File([content], modelFile.split('/').pop() || 'model', { type: 'model/gltf-binary' }))
+        setResources(files)
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error('Failed to load preview file:', error)
@@ -100,14 +110,14 @@ const CreateCustomAsset: React.FC = () => {
     <div className="CreateCustomAsset">
       <Container>
         <div className="file-container">
-          {previewFile ? (
+          {previewFile && resources !== null ? (
             <div className="preview-container">
               {isGeneratingThumbnail && (
                 <div className="loader-container">
                   <Loader active size="small" />
                 </div>
               )}
-              <AssetPreview value={previewFile} onScreenshot={handleScreenshot} />
+              <AssetPreview value={previewFile} resources={resources} onScreenshot={handleScreenshot} />
             </div>
           ) : (
             <CustomAssetIcon />

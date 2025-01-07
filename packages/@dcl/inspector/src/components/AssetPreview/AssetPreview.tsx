@@ -13,11 +13,11 @@ import { useRef } from 'react'
 const WIDTH = 300
 const HEIGHT = 300
 
-export function AssetPreview({ value, onScreenshot, onLoad }: Props) {
+export function AssetPreview({ value, resources, onScreenshot, onLoad }: Props) {
   return (
     <div className="AssetPreview">
       {isGltf(value.name) ? (
-        <GltfPreview value={value} onScreenshot={onScreenshot} onLoad={onLoad} />
+        <GltfPreview value={value} resources={resources} onScreenshot={onScreenshot} onLoad={onLoad} />
       ) : value.name.endsWith('png') ? (
         <PngPreview value={value} onScreenshot={onScreenshot} onLoad={onLoad} />
       ) : (
@@ -27,7 +27,7 @@ export function AssetPreview({ value, onScreenshot, onLoad }: Props) {
   )
 }
 
-function GltfPreview({ value, onScreenshot, onLoad }: Props) {
+function GltfPreview({ value, resources, onScreenshot, onLoad }: Props) {
   const handleLoad = React.useCallback(() => {
     onLoad?.()
     const wp = WearablePreview.createController(value.name)
@@ -37,7 +37,7 @@ function GltfPreview({ value, onScreenshot, onLoad }: Props) {
   return (
     <WearablePreview
       id={value.name}
-      blob={toWearableWithBlobs(value)}
+      blob={toWearableWithBlobs(value, resources)}
       disableAutoRotate
       disableBackground
       projection={PreviewProjection.ORTHOGRAPHIC}
