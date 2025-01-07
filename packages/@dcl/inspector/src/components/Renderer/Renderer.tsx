@@ -167,13 +167,13 @@ const Renderer: React.FC = () => {
     sdk.editorCamera.resetCamera()
   }, [sdk])
 
-  useHotkey([DELETE, BACKSPACE], deleteSelectedEntities, canvasRef.current)
-  useHotkey([COPY, COPY_ALT], copySelectedEntities, canvasRef.current)
-  useHotkey([PASTE, PASTE_ALT], pasteSelectedEntities, canvasRef.current)
-  useHotkey([ZOOM_IN, ZOOM_IN_ALT], zoomIn, canvasRef.current)
-  useHotkey([ZOOM_OUT, ZOOM_OUT_ALT], zoomOut, canvasRef.current)
-  useHotkey([RESET_CAMERA], resetCamera, canvasRef.current)
-  useHotkey([DUPLICATE, DUPLICATE_ALT], duplicateSelectedEntities, canvasRef.current)
+  useHotkey([DELETE, BACKSPACE], deleteSelectedEntities, document.body)
+  useHotkey([COPY, COPY_ALT], copySelectedEntities, document.body)
+  useHotkey([PASTE, PASTE_ALT], pasteSelectedEntities, document.body)
+  useHotkey([ZOOM_IN, ZOOM_IN_ALT], zoomIn, document.body)
+  useHotkey([ZOOM_OUT, ZOOM_OUT_ALT], zoomOut, document.body)
+  useHotkey([RESET_CAMERA], resetCamera, document.body)
+  useHotkey([DUPLICATE, DUPLICATE_ALT], duplicateSelectedEntities, document.body)
 
   // listen to ctrl key to place single tile
   useEffect(() => {
