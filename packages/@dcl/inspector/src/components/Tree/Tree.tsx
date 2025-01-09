@@ -10,6 +10,7 @@ import { ContextMenu } from './ContextMenu'
 import { ActionArea } from './ActionArea'
 import { Edit as EditInput } from './Edit'
 import { ClickType, DropType, calculateDropType } from './utils'
+import { useSdk } from '../../hooks/sdk/useSdk'
 
 import './Tree.css'
 
@@ -155,7 +156,7 @@ export function Tree<T>() {
         if (event.type === ClickType.CONTEXT_MENU && event.ctrlKey) {
           onSelect(value, true)
         } else if (event.type === ClickType.CLICK) {
-          onSelect(value)
+          onSelect(value, event.shiftKey)
           if (event.detail > 1 && onDoubleSelect) onDoubleSelect(value)
         }
       }
@@ -184,12 +185,39 @@ export function Tree<T>() {
         onSetOpen(value, true)
       }
 
+      const sdk = useSdk()
       const handleRemove = () => {
-        onRemove(value)
+        if (isEntity && sdk) {
+          const selectedEntities = sdk.operations.getSelectedEntities()
+          if (selectedEntities.length > 1) {
+            selectedEntities.forEach((entity) => {
+              if (typeof entity === typeof value) {
+                onRemove(entity as T)
+              }
+            })
+          } else {
+            onRemove(value)
+          }
+        } else {
+          onRemove(value)
+        }
       }
 
       const handleDuplicate = () => {
-        onDuplicate(value)
+        if (isEntity && sdk) {
+          const selectedEntities = sdk.operations.getSelectedEntities()
+          if (selectedEntities.length > 1) {
+            selectedEntities.forEach((entity) => {
+              if (typeof entity === typeof value) {
+                onDuplicate(entity as T)
+              }
+            })
+          } else {
+            onDuplicate(value)
+          }
+        } else {
+          onDuplicate(value)
+        }
       }
 
       const isEntity = useMemo(() => {
@@ -201,7 +229,7 @@ export function Tree<T>() {
       const controlsProps = {
         id: contextMenuId,
         enableAdd: enableAddChild,
-        enableEdit: enableRename,
+        enableEdit: (enableRename && (!isEntity || (sdk && sdk.operations.getSelectedEntities().length < 2))) || false,
         enableRemove,
         enableDuplicate,
         onAddChild: handleNewChild,

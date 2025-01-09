@@ -83,12 +83,14 @@ const FollowPlayerAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
           type="text"
           value={payload.speed}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeSpeed(e)}
+          autoSelect
         />
         <TextField
           label="Min. Distance"
           type="text"
           value={payload.minDistance}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeMinDistance(e)}
+          autoSelect
         />
       </Block>
       <Block label="Axes">

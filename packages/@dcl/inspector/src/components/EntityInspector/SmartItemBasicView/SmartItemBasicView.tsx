@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 import { BsFillLightningChargeFill as SmartItemIcon } from 'react-icons/bs'
 import { withSdk } from '../../../hoc/withSdk'
-import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { ConfigComponent } from '../../../lib/sdk/components'
 import { Container } from '../../Container'
 import { NftView } from './NftView'
@@ -17,26 +16,25 @@ import './SmartItemBasicView.css'
 
 const SmartItemBasicView = withSdk<Props>(({ sdk, entity }) => {
   const { Config } = sdk.components
-  const hasConfig = useHasComponent(entity, Config)
 
   const renderField = useCallback(
     (field: ConfigComponent['fields'][0], idx: number) => {
       switch (field.type) {
         case 'core::PointerEvents':
-          return <PointerEventView entity={entity} key={idx} />
+          return <PointerEventView entity={entity} key={`${idx}-${entity}`} />
         case 'asset-packs::Actions':
-          return <ActionView entity={entity} field={field} key={idx} />
+          return <ActionView entity={entity} field={field} key={`${idx}-${entity}`} />
         case 'asset-packs::Triggers':
-          return <TriggerView entity={entity} field={field} key={idx} />
+          return <TriggerView entity={entity} field={field} key={`${idx}-${entity}`} />
         case 'core::Tween':
-          return <TweenView entity={entity} key={idx} />
+          return <TweenView entity={entity} key={`${idx}-${entity}`} />
         case 'core::VideoPlayer':
-          return <VideoView entity={entity} key={idx} />
+          return <VideoView entity={entity} key={`${idx}-${entity}`} />
         case 'core::NftShape':
-          return <NftView entity={entity} key={idx} />
+          return <NftView entity={entity} key={`${idx}-${entity}`} />
         case 'asset-packs::Counter':
         case 'asset-packs::CounterBar':
-          return <CounterBarView entity={entity} field={field} key={idx} />
+          return <CounterBarView entity={entity} field={field} key={`${idx}-${entity}`} />
         default:
           return null
       }
@@ -52,11 +50,11 @@ const SmartItemBasicView = withSdk<Props>(({ sdk, entity }) => {
     )
   }, [])
 
-  if (!hasConfig) return null
-
   const config = useMemo(() => {
-    return Config.get(entity)
+    return Config.getOrNull(entity)
   }, [entity])
+
+  if (!config) return null
 
   return (
     <Container

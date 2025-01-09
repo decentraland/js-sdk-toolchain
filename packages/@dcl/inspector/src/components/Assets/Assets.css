@@ -21,17 +21,26 @@
   position: relative;
 }
 
-.Assets .Assets-buttons>div>div {
+.Assets .Assets-buttons > div > div {
   display: flex;
   position: relative;
 }
 
-.Assets .Assets-buttons>div:hover>div::after,
-.Assets .Assets-buttons>div>div.underlined::after {
+.Assets .Assets-buttons > div:hover > div::after,
+.Assets .Assets-buttons > div > div.underlined::after {
   width: 100%;
 }
 
-.Assets .Assets-buttons>div>div::after {
+.Assets .Assets-buttons .icon-custom-assets {
+  background-image: url('./custom-asset-icon.svg');
+  background-size: 16px 16px;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 16px;
+  height: 12px;
+}
+
+.Assets .Assets-buttons > div > div::after {
   content: '';
   position: absolute;
   bottom: -6px;
@@ -40,11 +49,11 @@
   background: var(--white-gray);
 }
 
-.Assets .Assets-buttons>div span {
+.Assets .Assets-buttons > div span {
   margin-left: 4px;
 }
 
-.Assets .Assets-buttons>div {
+.Assets .Assets-buttons > div {
   display: flex;
   align-items: center;
   padding: 8px;
@@ -52,12 +61,12 @@
   user-select: none;
 }
 
-.Assets .Assets-buttons>div:last-child svg {
+.Assets .Assets-buttons > div:last-child svg {
   width: 16px;
   height: 16px;
 }
 
-.Assets .Assets-buttons>div:last-child {
+.Assets .Assets-buttons > div:last-child {
   position: absolute;
   right: 0px;
   margin-right: 8px;
@@ -66,4 +75,8 @@
 .Assets .Assets-content {
   background: var(--tree-bg-color) !important;
   height: calc(100% - 36px);
+}
+
+.Assets .Assets-content.Hide {
+  display: none;
 }

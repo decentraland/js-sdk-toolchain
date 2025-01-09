@@ -1,0 +1,49 @@
+.RenameAsset {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 16px;
+}
+
+.RenameAsset .Container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.RenameAsset .file-container {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+}
+
+.RenameAsset .file-container .column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.RenameAsset .Block {
+  width: 100%;
+}
+
+.RenameAsset .button-container {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-start;
+}
+
+.RenameAsset .file-container > svg {
+  grid-row: 1 / 3;
+  align-self: center;
+  width: 80px;
+  height: 80px;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--list-item-bg-color);
+}
+
+.RenameAsset .rename {
+  background: var(--primary);
+  color: var(--primary-text);
+}

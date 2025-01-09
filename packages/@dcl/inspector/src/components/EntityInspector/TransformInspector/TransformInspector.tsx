@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-import { isValidNumericInput, useComponentInput } from '../../../hooks/sdk/useComponentInput'
+import { isValidNumericInput, useComponentInput, useMultiComponentInput } from '../../../hooks/sdk/useComponentInput'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 import { withSdk } from '../../../hoc/withSdk'
 
@@ -13,14 +13,15 @@ import { Link, Props as LinkProps } from './Link'
 
 import './TransformInspector.css'
 
-export default withSdk<Props>(({ sdk, entity }) => {
+export default withSdk<Props>(({ sdk, entities }) => {
   const { Transform, TransformConfig } = sdk.components
+  const entity = entities.find((entity) => Transform.has(entity)) || entities[0]
 
   const hasTransform = useHasComponent(entity, Transform)
   const transform = Transform.getOrNull(entity) ?? undefined
   const config = TransformConfig.getOrNull(entity) ?? undefined
-  const { getInputProps } = useComponentInput(
-    entity,
+  const { getInputProps } = useMultiComponentInput(
+    entities,
     Transform,
     fromTransform,
     toTransform(transform, config),
@@ -48,19 +49,19 @@ export default withSdk<Props>(({ sdk, entity }) => {
   return (
     <Container label="Transform" className="Transform">
       <Block label="Position">
-        <TextField leftLabel="X" type="number" {...getInputProps('position.x')} />
-        <TextField leftLabel="Y" type="number" {...getInputProps('position.y')} />
-        <TextField leftLabel="Z" type="number" {...getInputProps('position.z')} />
+        <TextField leftLabel="X" type="number" {...getInputProps('position.x')} autoSelect />
+        <TextField leftLabel="Y" type="number" {...getInputProps('position.y')} autoSelect />
+        <TextField leftLabel="Z" type="number" {...getInputProps('position.z')} autoSelect />
       </Block>
       <Block label="Rotation">
-        <TextField leftLabel="X" type="number" {...getInputProps('rotation.x')} />
-        <TextField leftLabel="Y" type="number" {...getInputProps('rotation.y')} />
-        <TextField leftLabel="Z" type="number" {...getInputProps('rotation.z')} />
+        <TextField leftLabel="X" type="number" {...getInputProps('rotation.x')} autoSelect />
+        <TextField leftLabel="Y" type="number" {...getInputProps('rotation.y')} autoSelect />
+        <TextField leftLabel="Z" type="number" {...getInputProps('rotation.z')} autoSelect />
       </Block>
       <Block label="Scale">
-        <TextField leftLabel="X" type="number" {...getInputProps('scale.x')} />
-        <TextField leftLabel="Y" type="number" {...getInputProps('scale.y')} />
-        <TextField leftLabel="Z" type="number" {...getInputProps('scale.z')} />
+        <TextField leftLabel="X" type="number" {...getInputProps('scale.x')} autoSelect />
+        <TextField leftLabel="Y" type="number" {...getInputProps('scale.y')} autoSelect />
+        <TextField leftLabel="Z" type="number" {...getInputProps('scale.z')} autoSelect />
         <Link field="porportionalScaling" getInputProps={_getConfigProps} />
       </Block>
     </Container>

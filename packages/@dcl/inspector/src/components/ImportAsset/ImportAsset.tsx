@@ -29,7 +29,7 @@ const ACCEPTED_FILE_TYPES = {
   'video/mp4': ['.mp4']
 }
 
-const IGNORED_ERROR_CODES = ['ACCESSOR_WEIGHTS_NON_NORMALIZED']
+const IGNORED_ERROR_CODES = ['ACCESSOR_WEIGHTS_NON_NORMALIZED', 'MESH_PRIMITIVE_TOO_FEW_TEXCOORDS']
 
 interface PropTypes {
   onSave(): void
@@ -231,7 +231,7 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
             </Container>
             <div className={classNames({ error: isNameRepeated })}>
               <Block label="Asset name">
-                <TextField value={assetName} onChange={handleNameChange} />
+                <TextField autoSelect value={assetName} onChange={handleNameChange} />
               </Block>
               <Button disabled={!!validationError} onClick={handleSave}>
                 Import

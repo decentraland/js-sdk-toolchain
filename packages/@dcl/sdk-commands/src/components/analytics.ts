@@ -140,6 +140,8 @@ export async function createAnalyticsComponent(components: Pick<CliComponents, '
     isCI: isCI(),
     isEditor: isEditor(),
     devId: anonId,
+    projectId: process.env.ANALYTICS_PROJECT_ID || null,
+    appId: process.env.ANALYTICS_APP_ID || null,
     ecs: {
       ecsVersion: 'ecs7',
       packageVersion: sdkVersion

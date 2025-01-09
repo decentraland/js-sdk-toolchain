@@ -26,6 +26,7 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
     onFocus,
     onBlur,
     type = 'text',
+    autoSelect,
     ...rest
   } = props
   const [inputValue, setInputValue] = useState(value)
@@ -51,6 +52,7 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
   const handleInputFocus: React.FocusEventHandler<HTMLInputElement> = useCallback(
     (event) => {
       setFocused(true)
+      if (autoSelect) event.target.select()
       onFocus && onFocus(event)
     },
     [setFocused, onFocus]
@@ -121,7 +123,7 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
         <input
           className="input"
           ref={ref}
-          type={type}
+          type={inputValue === '--' ? 'text' : type}
           value={inputValue}
           onChange={handleInputChange}
           onFocus={handleInputFocus}

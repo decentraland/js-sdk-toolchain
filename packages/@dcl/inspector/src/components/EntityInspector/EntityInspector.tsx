@@ -1,10 +1,12 @@
+import { Entity } from '@dcl/ecs'
 import { useEffect, useMemo, useState } from 'react'
 
 import { withSdk } from '../../hoc/withSdk'
 import { useChange } from '../../hooks/sdk/useChange'
-import { useSelectedEntity } from '../../hooks/sdk/useSelectedEntity'
+import { useEntitiesWith } from '../../hooks/sdk/useEntitiesWith'
 import { useAppSelector } from '../../redux/hooks'
 import { getHiddenComponents } from '../../redux/ui'
+import { EDITOR_ENTITIES } from '../../lib/sdk/tree'
 
 import { GltfInspector } from './GltfInspector'
 import { ActionInspector } from './ActionInspector'
@@ -32,8 +34,42 @@ import { SmartItemBasicView } from './SmartItemBasicView'
 
 import './EntityInspector.css'
 
-export const EntityInspector = withSdk(({ sdk }) => {
-  const entity = useSelectedEntity()
+export function EntityInspector() {
+  const selectedEntities = useEntitiesWith((components) => components.Selection)
+  const ownedEntities = useMemo(
+    () => selectedEntities.filter((entity) => !EDITOR_ENTITIES.includes(entity)),
+    [selectedEntities]
+  )
+  const entity = useMemo(() => (selectedEntities.length > 0 ? selectedEntities[0] : null), [selectedEntities])
+
+  if (ownedEntities.length > 1) {
+    return <MultiEntityInspector entities={ownedEntities} />
+  }
+
+  return <SingleEntityInspector entity={entity} />
+}
+
+const MultiEntityInspector = withSdk<{ entities: Entity[] }>(({ sdk, entities }) => {
+  const hiddenComponents = useAppSelector(getHiddenComponents)
+  const inspectors = useMemo(
+    () => [{ name: sdk.components.Transform.componentName, component: TransformInspector }],
+    [sdk]
+  )
+
+  return (
+    <div className="EntityInspector">
+      <div className="EntityHeader">
+        <div className="title">{entities.length} entities selected</div>
+      </div>
+      {inspectors.map(
+        ({ name, component: Inspector }, index) =>
+          !hiddenComponents[name] && <Inspector key={`${index}-${entities.join(',')}`} entities={entities} />
+      )}
+    </div>
+  )
+})
+
+const SingleEntityInspector = withSdk<{ entity: Entity | null }>(({ sdk, entity }) => {
   const hiddenComponents = useAppSelector(getHiddenComponents)
   const [isBasicViewEnabled, setIsBasicViewEnabled] = useState(false)
 
@@ -123,20 +159,20 @@ export const EntityInspector = withSdk(({ sdk }) => {
   )
 
   return (
-    <div className="EntityInspector" key={entity}>
+    <div className="EntityInspector">
       {entity !== null ? (
         <>
           <EntityHeader entity={entity} />
           {inspectors.map(
             ({ name, component: Inspector }, index) =>
-              !hiddenComponents[name] && <Inspector key={index} entity={entity} />
+              !hiddenComponents[name] && <Inspector key={`${index}-${entity}`} entities={[entity]} />
           )}
           {isBasicViewEnabled ? (
             <SmartItemBasicView entity={entity} />
           ) : (
             advancedInspectorComponents.map(
               ({ name, component: Inspector }, index) =>
-                !hiddenComponents[name] && <Inspector key={index} entity={entity} />
+                !hiddenComponents[name] && <Inspector key={`${index}-${entity}`} entity={entity} />
             )
           )}
         </>

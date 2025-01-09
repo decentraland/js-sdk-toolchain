@@ -1,6 +1,6 @@
 import { AbstractMesh, Color3 } from '@babylonjs/core'
 import { ComponentType } from '@dcl/ecs'
-import { CoreComponents } from '../../../sdk/components'
+import { CoreComponents, EditorComponentsTypes } from '../../../sdk/components'
 import { EcsEntity } from '../EcsEntity'
 import type { ComponentOperation } from '../component-operations'
 
@@ -8,9 +8,16 @@ const highlightedMeshes = new Set<AbstractMesh>()
 
 export const putEntitySelectedComponent: ComponentOperation = (entity, component) => {
   if (component.componentType === ComponentType.LastWriteWinElementSet) {
-    const componentValue = entity.isLocked() ? null : (component.getOrNull(entity.entityId) as { gizmo: number } | null)
-    toggleSelection(entity, !!componentValue)
-    updateGizmoManager(entity, componentValue)
+    if (entity.isLocked()) return deleteEntitySelectedComponent(entity, component)
+
+    const componentValue = component.get(entity.entityId) as unknown as EditorComponentsTypes['Selection']
+    setGizmoManager(entity, componentValue)
+  }
+}
+
+export const deleteEntitySelectedComponent: ComponentOperation = (entity, component) => {
+  if (component.componentType === ComponentType.LastWriteWinElementSet) {
+    unsetGizmoManager(entity)
   }
 }
 
@@ -38,24 +45,22 @@ export const toggleSelection = (entity: EcsEntity, value: boolean) => {
   }
 }
 
-export const updateGizmoManager = (entity: EcsEntity, value: { gizmo: number } | null) => {
+export const setGizmoManager = (entity: EcsEntity, value: { gizmo: number }) => {
   const context = entity.context.deref()!
-  let processedSomeEntity = false
-
   const Transform = context.engine.getComponent(CoreComponents.TRANSFORM)
 
-  for (const [_entity] of context.engine.getEntitiesWith(context.editorComponents.Selection)) {
-    processedSomeEntity = true
-    if (entity.entityId === _entity && Transform.has(_entity)) {
-      context.gizmos.setEntity(entity)
-      const types = context.gizmos.getGizmoTypes()
-      const type = types[value?.gizmo || 0]
-      context.gizmos.setGizmoType(type)
-      return
-    }
-  }
+  if (!Transform.has(entity.entityId)) return
 
-  if (!processedSomeEntity) {
-    context.gizmos.unsetEntity()
-  }
+  toggleSelection(entity, true)
+
+  const types = context.gizmos.getGizmoTypes()
+  const type = types[value?.gizmo || 0]
+  context.gizmos.setGizmoType(type)
+  context.gizmos.addEntity(entity)
+}
+
+export const unsetGizmoManager = (entity: EcsEntity) => {
+  const context = entity.context.deref()!
+  toggleSelection(entity, false)
+  context.gizmos.removeEntity(entity)
 }

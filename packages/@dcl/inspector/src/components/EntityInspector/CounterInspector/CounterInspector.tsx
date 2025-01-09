@@ -50,7 +50,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
       }
       onRemoveContainer={handleRemove}
     >
-      <TextField leftLabel="Value" type="number" {...getInputProps('value')} />
+      <TextField autoSelect leftLabel="Value" type="number" {...getInputProps('value')} />
     </Container>
   )
 })

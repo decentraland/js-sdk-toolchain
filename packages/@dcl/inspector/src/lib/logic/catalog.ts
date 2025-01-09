@@ -1,11 +1,18 @@
-import { ComponentName } from '@dcl/asset-packs'
-import * as _catalog from '@dcl/asset-packs/catalog.json'
+import { Catalog, AssetPack, Asset, AssetData } from '@dcl/asset-packs'
 import { CoreComponents } from '../sdk/components'
 import { getConfig } from './config'
+import * as _catalog from '@dcl/asset-packs/catalog.json'
 
-export const catalog = _catalog.assetPacks as unknown as AssetPack[]
+export const catalog = (_catalog as unknown as Catalog).assetPacks
 
-// categories obtained from "builder.decentraland.org" catalog
+export { Catalog, AssetPack, Asset, AssetData }
+
+export type CustomAsset = AssetData & {
+  resources: string[]
+  thumbnail?: string
+}
+
+// categories obtained from "builder-items.decentraland.org" catalog
 export const CATEGORIES = [
   'ground',
   'utils',
@@ -26,22 +33,6 @@ export const CATEGORIES = [
   'health'
 ]
 
-export type AssetPack = {
-  id: string
-  name: string
-  thumbnail: string
-  assets: Asset[]
-}
-
-export type Asset = {
-  id: string
-  name: string
-  category: string
-  tags: string[]
-  contents: Record<string, string>
-  components: Partial<Record<ComponentName | CoreComponents, any>>
-}
-
 export function getContentsUrl(hash: string) {
   const config = getConfig()
   return `${config.contentUrl}/contents/${hash}`
@@ -57,12 +48,12 @@ export function getAssetsByCategory(assets: Asset[]) {
 }
 
 export function isSmart(asset: Partial<Asset>) {
-  const components = Object.keys(asset?.components ?? {})
+  const components = asset?.composite?.components ?? []
   // when the item has more than one component, it is smart
   if (components.length > 1) {
     return true
-    // when the item has a single component but it's not a GltfContainer, then it's also smart (NFTShape, TextShape, MeshRenderers, etc...)
-  } else if (components.length === 1 && components[0] !== CoreComponents.GLTF_CONTAINER) {
+    // when the item has a single component but it's not a GltfContainer, then it's also smart
+  } else if (components.length === 1 && components[0].name !== CoreComponents.GLTF_CONTAINER) {
     return true
   }
   // when the item only has a GltfContainer then it's not smart

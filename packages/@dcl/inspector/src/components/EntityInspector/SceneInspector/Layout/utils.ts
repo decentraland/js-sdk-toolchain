@@ -2,52 +2,106 @@ import { Coords } from '@dcl/ecs'
 import { GridError, TILE_OPTIONS } from './types'
 import { parseParcels } from '../utils'
 
-type ParcelInfo = {
+export type GridCoord = Coords & { disabled?: boolean }
+
+export type GridInfo = {
   min: Coords
   max: Coords
-  length: {
-    x: number
-    y: number
-  }
-  parcels: Coords[]
+  length: Coords
+  grid: GridCoord[]
 }
 
-const DEFAULT_INFO: ParcelInfo = {
+const DEFAULT_INFO = {
   min: { x: 0, y: 0 },
   max: { x: 0, y: 0 },
   length: { x: 0, y: 0 },
-  parcels: []
+  grid: []
 }
 
-export function getLayoutInfo(parcels: Coords[]): ParcelInfo {
+export function getGridInfo(parcels: Coords[]): GridInfo {
   if (!parcels.length) return DEFAULT_INFO
-  const info: { min: Coords; max: Coords } = {
-    min: { x: Infinity, y: Infinity },
-    max: { x: -Infinity, y: -Infinity }
-  }
+
+  const minParcel = { x: Infinity, y: Infinity }
+  const maxParcel = { x: -Infinity, y: -Infinity }
+
+  const coordSet = new Set<string>()
+
   parcels.forEach((parcel) => {
-    const { x, y } = parcel
+    // get min parcel
+    minParcel.x = Math.min(parcel.x, minParcel.x)
+    minParcel.y = Math.min(parcel.y, minParcel.y)
 
-    if (info.min.y >= y) {
-      info.min = { x: Math.min(info.min.x, x), y }
-    }
+    // get max parcel
+    maxParcel.x = Math.max(parcel.x, maxParcel.x)
+    maxParcel.y = Math.max(parcel.y, maxParcel.y)
 
-    if (y >= info.max.y) {
-      info.max = { x: Math.max(info.max.x, x), y }
-    }
-
-    return { x, y }
+    // push stringified coord to coordSet
+    coordSet.add(coordToStr(parcel))
   })
 
+  const coordinatesInOrder = generateCoordinatesBetweenPoints(minParcel, maxParcel).map(($) => ({
+    ...$,
+    disabled: !coordSet.has(coordToStr($))
+  }))
+
   return {
-    min: info.min,
-    max: info.max,
+    min: minParcel,
+    max: maxParcel,
     length: {
-      x: Math.abs(info.max.x) - Math.abs(info.min.x),
-      y: Math.abs(info.max.y) - Math.abs(info.min.y)
+      x: Math.abs(maxParcel.x) - Math.abs(minParcel.x),
+      y: Math.abs(maxParcel.y) - Math.abs(minParcel.y)
     },
-    parcels
+    grid: coordinatesInOrder
   }
+}
+
+/**
+ * Generates an array of coordinates between two points (inclusive).
+ * The coordinates are generated in grid order, from top-left to bottom-right,
+ * starting from the maximum y-value to the minimum y-value, and within each row,
+ * from the minimum x-value to the maximum x-value.
+ *
+ * @param {Coords} pointA - The first point (can be any of the two corners of the grid).
+ * @param {Coords} pointB - The second point (can be any of the two corners of the grid).
+ * @returns {Coords[]} - An array of coordinates between the two points, inclusive,
+ * ordered from top-left to bottom-right.
+ */
+export function generateCoordinatesBetweenPoints(pointA: Coords, pointB: Coords): Coords[] {
+  const coordinates: Coords[] = []
+
+  const [minX, maxX] = [Math.min(pointA.x, pointB.x), Math.max(pointA.x, pointB.x)]
+  const [minY, maxY] = [Math.min(pointA.y, pointB.y), Math.max(pointA.y, pointB.y)]
+
+  for (let y = maxY; y >= minY; y--) {
+    for (let x = minX; x <= maxX; x++) {
+      const coord = { x, y }
+      coordinates.push(coord)
+    }
+  }
+
+  return coordinates
+}
+
+/**
+ * Generates a grid of coordinates between the specified min and max points.
+ * Marks coordinates as "disabled" based on the provided grid's existing disabled coordinates.
+ *
+ * @param {GridCoord[]} grid - The existing grid of coordinates, some of which may be disabled.
+ * @param {Coords} min - The minimum coordinate point (bottom-left) to define the grid bounds.
+ * @param {Coords} max - The maximum coordinate point (top-right) to define the grid bounds.
+ * @returns {GridCoord[]} - A new grid of coordinates between the min and max points,
+ * with coordinates marked as disabled if they exist as disabled in the original grid.
+ */
+export function generateGridFrom(grid: GridCoord[], min: Coords, max: Coords): GridCoord[] {
+  const disabledCoords = new Set(grid.filter((coord) => coord.disabled).map((coord) => coordToStr(coord)))
+
+  return generateCoordinatesBetweenPoints(min, max).map((coord) => {
+    const coordStr = coordToStr(coord)
+    return {
+      ...coord,
+      disabled: disabledCoords.has(coordStr)
+    }
+  })
 }
 
 /* Parcels string format rules:
@@ -55,53 +109,8 @@ export function getLayoutInfo(parcels: Coords[]): ParcelInfo {
  ** #2: each point is comma-separated
  ** EX: "0,0 0,1 1,0 1,1"
  */
-export function getLayoutInfoFromString(parcels: string): ParcelInfo {
-  return getLayoutInfo(parseParcels(parcels))
-}
-
-export function getCoordinatesBetweenPoints(pointA: Coords, pointB: Coords): Coords[] {
-  const coordinates: Coords[] = []
-
-  // ensure pointA is the bottom-left coord
-  if (pointA.x > pointB.x) {
-    ;[pointA.x, pointB.x] = [pointB.x, pointA.x]
-  }
-  if (pointA.y > pointB.y) {
-    ;[pointA.y, pointB.y] = [pointB.y, pointA.y]
-  }
-
-  for (let x = pointA.x; x <= pointB.x; x++) {
-    for (let y = pointA.y; y <= pointB.y; y++) {
-      coordinates.push({ x, y })
-    }
-  }
-
-  return coordinates
-}
-
-/*
- ** Sorts the coordinates for grid rendering
- ** This means:
- **  - X-axis => Lowest to highest
- **  - Y-axis => Highest to lowest
- ** EX: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 0 }, { x: 1, y: 1 }]
- **  => [{ x: 0, y: 1 }, { x: 1, y: 1 }, { x: 0, y: 0 }, { x: 1, y: 0 }]
- */
-export function getCoordinatesInGridOrder(coords: Coords[]): Coords[] {
-  // avoid mutating original coords...
-  return [...coords].sort((a, b) => {
-    // first, sort by y-coordinate in descending order
-    if (a.y !== b.y) return b.y - a.y
-    // If y-coordinates are the same, sort by x-coordinate in ascending order
-    return a.x - b.x
-  })
-}
-
-/*
- ** Returns coordinates between "min" and "max" in grid order
- */
-export function getCoordinates(min: Coords, max: Coords): Coords[] {
-  return getCoordinatesInGridOrder(getCoordinatesBetweenPoints(min, max))
+export function getLayoutInfoFromString(parcels: string): GridInfo {
+  return getGridInfo(parseParcels(parcels))
 }
 
 /*
@@ -120,14 +129,25 @@ export function clampParcels(value: number): number {
  ** Gets min & max coordinates from grid-ordered coordinates
  */
 export function getMinMaxFromOrderedCoords(coords: Coords[]): [Coords, Coords] {
+  if (!coords.length) {
+    return [
+      { x: 0, y: 0 },
+      { x: 0, y: 0 }
+    ]
+  }
+
+  const first = coords[0]
+  const last = coords[coords.length - 1]
   return [
-    { x: coords[0].x, y: coords[coords.length - 1].y },
-    { x: coords[coords.length - 1].x, y: coords[0].y }
+    { x: first.x, y: last.y },
+    { x: last.x, y: first.y }
   ]
 }
 
-/*
- ** Transform a coordinate to it's string representation
+/**
+ * Converts a coordinate object to its string representation.
+ * @param {Coords} coords - The coordinate object.
+ * @returns {string} The string representation of the coordinates.
  */
 export function coordToStr({ x, y }: Coords): string {
   return `${x},${y}`
@@ -144,15 +164,22 @@ export function strToCoord(coord: string): Coords {
 /*
  ** Filter out the disabled coordinates
  */
-export function getEnabledCoords(coords: Coords[], disabledCoords: Set<string>) {
-  return coords.filter(($) => !disabledCoords.has(coordToStr($)))
+export function getEnabledCoords(coords: GridCoord[]) {
+  return coords.filter(($) => $.disabled === false)
+}
+
+/*
+ ** Returns true if the two coords are equal
+ */
+export function isCoord(coord1: Coords, coord2: Coords): boolean {
+  return coord1.x === coord2.x && coord1.y === coord2.y
 }
 
 /*
  ** Find a specific coordinate in the list of coordinates
  */
 export function findCoord(coords: Coords[], needle: Coords) {
-  return coords.find(($) => $.x === needle.x && $.y === needle.y)
+  return coords.find(($) => isCoord($, needle))
 }
 
 /*
@@ -163,13 +190,11 @@ export function hasCoord(coords: Coords[], needle: Coords) {
 }
 
 /*
- ** Transform list of coordinates to their string-representation form and filters the
- ** disabled ones
+ ** Transform list of coordinates to their string-representation form
  */
-export function transformCoordsToString(coords: Coords[], disabledCoords: Set<string>) {
+export function transformCoordsToString(coords: Coords[]) {
   return coords
     .map(($) => coordToStr($)) // map to string
-    .filter(($) => !disabledCoords.has($)) // remove disabled coords
     .join(' ')
 }
 

@@ -6,12 +6,30 @@
   border-bottom: 1px solid var(--border-gray);
 
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.EntityHeader .Title {
+  flex: auto;
+  display: flex;
   align-items: center;
   gap: 4px;
 }
 
-.EntityHeader > .RightContent {
+.EntityHeader .TitleWrapper {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.EntityHeader .Title > svg {
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+.EntityHeader .RightContent {
   display: flex;
   flex-grow: 1;
   justify-content: flex-end;
@@ -19,7 +37,7 @@
   font-size: 14px;
 }
 
-.EntityHeader > .RightContent > .Dropdown.Trigger > .DropdownContainer.AddComponent > .OptionList {
+.EntityHeader .RightContent > .Dropdown.Trigger > .DropdownContainer.AddComponent > .OptionList {
   min-width: 155px;
   white-space: nowrap;
   right: 0;
@@ -27,12 +45,12 @@
   max-height: max-content;
 }
 
-.EntityHeader > .RightContent > .Dropdown.Trigger > .DropdownContainer.AddComponent {
+.EntityHeader .RightContent > .Dropdown.Trigger > .DropdownContainer.AddComponent {
   background-color: transparent;
   border-color: transparent;
 }
 
-.EntityHeader > .RightContent > .MoreOptionsMenu > .MoreOptionsContent {
+.EntityHeader .RightContent > .MoreOptionsMenu > .MoreOptionsContent {
   min-width: 190px;
 }
 
@@ -109,4 +127,37 @@
 
 .EntityHeader.ModalOverlay .ToggleBasicViewModal .ModalBody .ModalActions .Button.primary {
   background-color: var(--accent-blue-07);
+}
+
+.EntityHeader .subtitle {
+  font-size: 12px;
+  color: #999;
+  margin-top: 2px;
+}
+
+.EntityHeader .InstanceOf {
+  width: 100%;
+  font-size: 11px;
+  font-weight: 400;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
+
+.EntityHeader .InstanceOf .content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.EntityHeader .InstanceOf .Chip {
+  font-weight: 500;
+  background-color: var(--base-14);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
 }

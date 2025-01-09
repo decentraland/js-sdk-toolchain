@@ -92,12 +92,14 @@ export default withSdk<Props>(({ sdk, entity }) => {
           label="Contract"
           value={urnTokens.contract || ''}
           onChange={(e) => handleUrnTokenChange({ contract: e.target.value })}
+          autoSelect
         />
         <TextField
           type="text"
           label="Token"
           value={urnTokens.token || ''}
           onChange={(e) => handleUrnTokenChange({ token: e.target.value })}
+          autoSelect
         />
       </Block>
       <Block label="Color">

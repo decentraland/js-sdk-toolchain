@@ -81,6 +81,8 @@ describe('Analytics Component', () => {
           isCI: isCI(),
           isEditor: false,
           devId: 'fb3f84b2-4ddc-4a7e-96bf-1e8992c294dd',
+          appId: null,
+          projectId: null,
           ecs: {
             ecsVersion: 'ecs7',
             packageVersion: 'unknown'

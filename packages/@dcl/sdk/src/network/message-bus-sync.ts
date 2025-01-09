@@ -1,4 +1,4 @@
-import { IEngine, Transport, RealmInfo } from '@dcl/ecs'
+import { IEngine, Transport, RealmInfo, PlayerIdentityData } from '@dcl/ecs'
 import { type SendBinaryRequest, type SendBinaryResponse } from '~system/CommunicationsController'
 
 import { syncFilter } from './filter'
@@ -51,8 +51,11 @@ export function addSyncTransport(
     }
     return [broadcastMessages, messagesToAddress]
   }
+  const players = definePlayerHelper(engine)
 
+  let stateIsSyncronized = false
   let transportInitialzed = false
+
   // Add Sync Transport
   const transport: Transport = {
     filter: syncFilter(engine),
@@ -73,49 +76,20 @@ export function addSyncTransport(
   engine.addTransport(transport)
   // End add sync transport
 
-  // If we dont have any state initialized, and recieve a state message.
+  // Receive & Process CRDT_STATE
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, (value) => {
     const { sender, data } = decodeCRDTState(value)
     if (sender !== myProfile.userId) return
     DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength)
     transport.onmessage!(data)
+    stateIsSyncronized = true
   })
 
-  binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, (message, userId) => {
+  // Answer to REQ_CRDT_STATE
+  binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, async (message, userId) => {
+    console.log(`Sending CRDT State to: ${userId}`)
     transport.onmessage!(message)
     binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(userId, engineToCrdt(engine)))
-  })
-
-  const players = definePlayerHelper(engine)
-
-  let requestCrdtStateWhenConnected = false
-
-  players.onEnterScene((player) => {
-    DEBUG_NETWORK_MESSAGES() && console.log('[onEnterScene]', player.userId)
-    if (player.userId === myProfile.userId && !requestCrdtStateWhenConnected) {
-      if (RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom) {
-        DEBUG_NETWORK_MESSAGES() && console.log('Requesting state')
-        binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, engineToCrdt(engine))
-      } else {
-        DEBUG_NETWORK_MESSAGES() && console.log('Waiting to be conneted')
-        requestCrdtStateWhenConnected = true
-      }
-    }
-  })
-
-  RealmInfo.onChange(engine.RootEntity, (value) => {
-    if (value?.isConnectedSceneRoom && requestCrdtStateWhenConnected) {
-      DEBUG_NETWORK_MESSAGES() && console.log('Requesting state.')
-      requestCrdtStateWhenConnected = false
-      binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, engineToCrdt(engine))
-    }
-  })
-
-  players.onLeaveScene((userId) => {
-    DEBUG_NETWORK_MESSAGES() && console.log('[onLeaveScene]', userId)
-    if (userId === myProfile.userId) {
-      requestCrdtStateWhenConnected = false
-    }
   })
 
   // Process CRDT messages here
@@ -125,9 +99,80 @@ export function addSyncTransport(
     transport.onmessage!(value)
   })
 
+  async function requestState(retryCount: number = 1) {
+    let players = Array.from(engine.getEntitiesWith(PlayerIdentityData))
+    DEBUG_NETWORK_MESSAGES() && console.log(`Requesting state. Players connected: ${players.length - 1}`)
+
+    if (!RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom) {
+      DEBUG_NETWORK_MESSAGES() && console.log(`Aborting Requesting state?. Disconnected`)
+      return
+    }
+
+    binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, engineToCrdt(engine))
+
+    // Wait ~5s for the response.
+    await sleep(5000)
+
+    players = Array.from(engine.getEntitiesWith(PlayerIdentityData))
+
+    if (!stateIsSyncronized) {
+      if (players.length > 1 && retryCount <= 2) {
+        DEBUG_NETWORK_MESSAGES() &&
+          console.log(`Requesting state again ${retryCount} (no response). Players connected: ${players.length - 1}`)
+        void requestState(retryCount + 1)
+      } else {
+        DEBUG_NETWORK_MESSAGES() && console.log('No active players. State syncronized')
+        stateIsSyncronized = true
+      }
+    }
+  }
+
+  players.onEnterScene((player) => {
+    DEBUG_NETWORK_MESSAGES() && console.log('[onEnterScene]', player.userId)
+  })
+
+  // Asks for the REQ_CRDT_STATE when its connected to comms
+  RealmInfo.onChange(engine.RootEntity, (value) => {
+    if (!value?.isConnectedSceneRoom) {
+      DEBUG_NETWORK_MESSAGES() && console.log('Disconnected from comms')
+      stateIsSyncronized = false
+    }
+
+    if (value?.isConnectedSceneRoom) {
+      DEBUG_NETWORK_MESSAGES() && console.log('Connected to comms')
+    }
+
+    if (value?.isConnectedSceneRoom && !stateIsSyncronized) {
+      void requestState()
+    }
+  })
+
+  players.onLeaveScene((userId) => {
+    DEBUG_NETWORK_MESSAGES() && console.log('[onLeaveScene]', userId)
+  })
+
+  function isStateSyncronized() {
+    return stateIsSyncronized
+  }
+
+  function sleep(ms: number) {
+    return new Promise<void>((resolve) => {
+      let timer = 0
+      function sleepSystem(dt: number) {
+        timer += dt
+        if (timer * 1000 >= ms) {
+          engine.removeSystem(sleepSystem)
+          resolve()
+        }
+      }
+      engine.addSystem(sleepSystem)
+    })
+  }
+
   return {
     ...entityDefinitions,
-    myProfile
+    myProfile,
+    isStateSyncronized
   }
 }
 

@@ -1082,6 +1082,8 @@ export type EntityComponents = {
     uiDropdown: PBUiDropdown;
     onMouseDown: Callback;
     onMouseUp: Callback;
+    onMouseEnter: Callback;
+    onMouseLeave: Callback;
 };
 
 // @public (undocumented)
@@ -1130,6 +1132,7 @@ export type EventSystemOptions = {
     hoverText?: string;
     maxDistance?: number;
     showFeedback?: boolean;
+    showHighlight?: boolean;
 };
 
 // @public
@@ -1166,6 +1169,11 @@ export function getComponentEntityTree<T>(engine: Pick<IEngine, 'getEntitiesWith
 
 // @public @deprecated (undocumented)
 export function getCompositeRootComponent(engine: IEngine): LastWriteWinElementSetComponentDefinition<CompositeRootType>;
+
+// Warning: (ae-missing-release-tag) "getDefaultOpts" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const getDefaultOpts: (opts?: Partial<EventSystemOptions>) => EventSystemOptions;
 
 // Warning: (ae-missing-release-tag) "GlobalDirectionRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -1415,8 +1423,21 @@ export const enum InputAction {
     IA_WALK = 9
 }
 
+// Warning: (ae-missing-release-tag) "InputModifier" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const InputModifier: LastWriteWinElementSetComponentDefinition<PBInputModifier>;
+export const InputModifier: InputModifierComponentDefinitionExtended;
+
+// @public (undocumented)
+export interface InputModifierComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBInputModifier> {
+    Mode: InputModifierHelper;
+}
+
+// @public (undocumented)
+export interface InputModifierHelper {
+    // (undocumented)
+    Standard: (standard: PBInputModifier_StandardInput) => PBInputModifier['mode'];
+}
 
 // @public
 export const inputSystem: IInputSystem;
@@ -1539,6 +1560,8 @@ export interface LastWriteWinElementSetComponentDefinition<T> extends BaseCompon
 export type Listeners = {
     onMouseDown?: Callback;
     onMouseUp?: Callback;
+    onMouseEnter?: Callback;
+    onMouseLeave?: Callback;
 };
 
 // @public (undocumented)
@@ -2418,6 +2441,7 @@ export namespace PBMaterial {
 export interface PBMaterial_PbrMaterial {
     albedoColor?: PBColor4 | undefined;
     alphaTest?: number | undefined;
+    // @deprecated (undocumented)
     alphaTexture?: TextureUnion | undefined;
     bumpTexture?: TextureUnion | undefined;
     castShadows?: boolean | undefined;
@@ -2444,6 +2468,7 @@ export namespace PBMaterial_PbrMaterial {
 // @public (undocumented)
 export interface PBMaterial_UnlitMaterial {
     alphaTest?: number | undefined;
+    alphaTexture?: TextureUnion | undefined;
     castShadows?: boolean | undefined;
     diffuseColor?: PBColor4 | undefined;
     texture?: TextureUnion | undefined;
@@ -2675,6 +2700,7 @@ export interface PBPointerEvents_Info {
     hoverText?: string | undefined;
     maxDistance?: number | undefined;
     showFeedback?: boolean | undefined;
+    showHighlight?: boolean | undefined;
 }
 
 // @public (undocumented)
@@ -3291,6 +3317,14 @@ export interface PointerEventsSystem {
     }, cb: EventSystemCallback): void;
     // @deprecated (undocumented)
     onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
+    onPointerHoverEnter(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
+    onPointerHoverLeave(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
     onPointerUp(pointerData: {
         entity: Entity;
         opts?: Partial<EventSystemOptions>;
@@ -3298,6 +3332,8 @@ export interface PointerEventsSystem {
     // @deprecated (undocumented)
     onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
     removeOnPointerDown(entity: Entity): void;
+    removeOnPointerHoverEnter(entity: Entity): void;
+    removeOnPointerHoverLeave(entity: Entity): void;
     removeOnPointerUp(entity: Entity): void;
 }
 
@@ -3882,8 +3918,10 @@ export const TextShape: LastWriteWinElementSetComponentDefinition<PBTextShape>;
 // @public (undocumented)
 export interface Texture {
     filterMode?: TextureFilterMode | undefined;
+    offset?: PBVector2 | undefined;
     // (undocumented)
     src: string;
+    tiling?: PBVector2 | undefined;
     wrapMode?: TextureWrapMode | undefined;
 }
 
@@ -4227,12 +4265,33 @@ export type ValueSetOptions<T> = {
 };
 
 // @public
+export type Vector2 = Vector2.ReadonlyVector2;
+
+// @public
+export namespace Vector2 {
+    export function create(
+    x?: number,
+    y?: number): MutableVector2;
+    export type Mutable = MutableVector2;
+    export type MutableVector2 = {
+        x: number;
+        y: number;
+    };
+    export function One(): MutableVector2;
+    export type ReadonlyVector2 = {
+        readonly x: number;
+        readonly y: number;
+    };
+    export function Zero(): MutableVector2;
+}
+
+// @public
 export type Vector3 = Vector3.ReadonlyVector3;
 
 // @public
 export namespace Vector3 {
     export function add(vector1: ReadonlyVector3, vector2: ReadonlyVector3): MutableVector3;
-    export function addToRef(vector1: ReadonlyVector3, vector2: ReadonlyVector3, result: MutableVector3): void;
+    export function addToRef(vectorA: ReadonlyVector3, vectorB: ReadonlyVector3, result: MutableVector3): void;
     export function applyMatrix4(vector: ReadonlyVector3, matrix: Matrix.ReadonlyMatrix): MutableVector3;
     export function applyMatrix4ToRef(vector: ReadonlyVector3, matrix: Matrix.ReadonlyMatrix, result: MutableVector3): void;
     export function Backward(): MutableVector3;
@@ -4310,7 +4369,7 @@ export namespace Vector3 {
     export function scaleToRef(vector: ReadonlyVector3, scale: number, result: MutableVector3): void;
     export function subtract(vector1: ReadonlyVector3, vector2: ReadonlyVector3): MutableVector3;
     export function subtractFromFloatsToRef(vector1: ReadonlyVector3, x: number, y: number, z: number, result: MutableVector3): void;
-    export function subtractToRef(vector1: ReadonlyVector3, vector2: ReadonlyVector3, result: MutableVector3): void;
+    export function subtractToRef(vectorA: ReadonlyVector3, vectorB: ReadonlyVector3, result: MutableVector3): void;
     export function toString(vector: ReadonlyVector3): string;
     export function transformCoordinates(vector: ReadonlyVector3, transformation: Matrix.ReadonlyMatrix): MutableVector3;
     export function transformCoordinatesFromFloatsToRef(x: number, y: number, z: number, transformation: Matrix.ReadonlyMatrix, result: MutableVector3): void;

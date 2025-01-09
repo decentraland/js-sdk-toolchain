@@ -1,6 +1,6 @@
 import { IEngine, OnChangeFunction } from '@dcl/ecs'
 import { DataLayerRpcServer, FileSystemInterface } from '../types'
-import { EXTENSIONS, getCurrentCompositePath, getFilesInDirectory, withAssetDir } from './fs-utils'
+import { DIRECTORY, EXTENSIONS, getCurrentCompositePath, getFilesInDirectory, withAssetDir } from './fs-utils'
 import { stream } from './stream'
 import { FileOperation, initUndoRedo } from './undo-redo'
 import upsertAsset from './upsert-asset'
@@ -8,6 +8,7 @@ import { initSceneProvider } from './scene'
 import { readPreferencesFromFile, serializeInspectorPreferences } from '../../logic/preferences/io'
 import { compositeAndDirty } from './utils/composite-dirty'
 import { installBin } from './utils/install-bin'
+import { AssetData } from '../../logic/catalog'
 
 const INSPECTOR_PREFERENCES_PATH = 'inspector-preferences.json'
 
@@ -135,6 +136,217 @@ export async function initRpcMethods(
       inspectorPreferences = req
       await fs.writeFile(INSPECTOR_PREFERENCES_PATH, serializeInspectorPreferences(req))
       return {}
+    },
+    async copyFile(req) {
+      const content = await fs.readFile(req.fromPath)
+      const prevValue = (await fs.existFile(req.toPath)) ? await fs.readFile(req.toPath) : null
+      await fs.writeFile(req.toPath, content)
+
+      // Add undo operation for the file copy
+      undoRedoManager.addUndoFile([{ prevValue, newValue: content, path: req.toPath }])
+
+      return {}
+    },
+    async getFile(req) {
+      const content = await fs.readFile(req.path)
+      return { content }
+    },
+    async createCustomAsset(req) {
+      const { name, composite, resources, thumbnail } = req
+
+      // Create a slug from the name
+      const slug = name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/(^_|_$)/g, '')
+
+      // Find a unique path by appending numbers if needed
+      const basePath = `${DIRECTORY.CUSTOM}`
+      let customAssetPath = `${basePath}/${slug}`
+      let counter = 1
+      while (await fs.existFile(`${customAssetPath}/data.json`)) {
+        customAssetPath = `${basePath}/${slug}_${++counter}`
+      }
+
+      // Create and save data.json with metadata and composite
+      const data: Omit<AssetData, 'composite'> = {
+        id: crypto.randomUUID(),
+        name,
+        category: 'custom',
+        tags: []
+      }
+      await fs.writeFile(`${customAssetPath}/data.json`, Buffer.from(JSON.stringify(data, null, 2)) as Buffer)
+      await fs.writeFile(
+        `${customAssetPath}/composite.json`,
+        Buffer.from(JSON.stringify(JSON.parse(new TextDecoder().decode(composite)), null, 2)) // pretty print
+      )
+
+      // Save thumbnail if provided
+      if (thumbnail) {
+        const thumbnailBuffer = Buffer.from(thumbnail)
+        await fs.writeFile(`${customAssetPath}/thumbnail.png`, thumbnailBuffer)
+      }
+
+      // Copy all resources to the custom asset folder
+      const undoAcc: FileOperation[] = []
+      for (const resourcePath of resources) {
+        const fileName = resourcePath.split('/').pop()!
+        const targetPath = `${customAssetPath}/${fileName}`
+        const content = await fs.readFile(resourcePath)
+
+        undoAcc.push({
+          prevValue: null,
+          newValue: content,
+          path: targetPath
+        })
+        await fs.writeFile(targetPath, content)
+      }
+
+      // Add undo operation for the entire asset creation
+      undoRedoManager.addUndoFile([
+        ...undoAcc,
+        {
+          prevValue: null,
+          newValue: Buffer.from(JSON.stringify(data, null, 2)),
+          path: `${customAssetPath}/data.json`
+        }
+      ])
+
+      return {}
+    },
+    async getCustomAssets() {
+      const paths = await getFilesInDirectory(fs, `${DIRECTORY.CUSTOM}`, [], true)
+      const folders = [...new Set(paths.map((path) => path.split('/')[1]))]
+      const assets = (
+        await Promise.all(
+          folders.map(async (path) => {
+            try {
+              const files = await getFilesInDirectory(fs, `${DIRECTORY.CUSTOM}/${path}`, [], true)
+              let dataPath: string | null = null
+              let compositePath: string | null = null
+              let thumbnailPath: string | null = null
+              const resources: string[] = []
+              for (const file of files) {
+                if (file.endsWith('data.json')) {
+                  dataPath = file
+                } else if (file.endsWith('composite.json')) {
+                  compositePath = file
+                } else if (file.endsWith('thumbnail.png')) {
+                  thumbnailPath = file
+                } else {
+                  resources.push(file)
+                }
+              }
+              if (!dataPath || !compositePath) {
+                return null
+              }
+              const data = await fs.readFile(dataPath)
+              const composite = await fs.readFile(compositePath)
+              const parsedData = JSON.parse(new TextDecoder().decode(data))
+              const result: AssetData & { thumbnail?: string } = {
+                ...parsedData,
+                composite: JSON.parse(new TextDecoder().decode(composite)),
+                resources
+              }
+
+              // Add thumbnail if it exists
+              if (thumbnailPath) {
+                const thumbnailData = await fs.readFile(thumbnailPath)
+                const thumbnailBuffer = Buffer.from(thumbnailData)
+                result.thumbnail = `data:image/png;base64,${thumbnailBuffer.toString('base64')}`
+              }
+
+              return result
+            } catch {
+              return null
+            }
+          })
+        )
+      ).filter((asset): asset is AssetData & { thumbnail?: string } => asset !== null)
+      return { assets: assets.map((asset) => ({ data: Buffer.from(JSON.stringify(asset)) })) }
+    },
+    async deleteCustomAsset(req) {
+      const { assetId } = req
+      const paths = await getFilesInDirectory(fs, `${DIRECTORY.CUSTOM}`, [], true)
+      const folders = [...new Set(paths.map((path) => path.split('/')[1]))]
+
+      // Keep track of deleted files for undo operation
+      const undoAcc: FileOperation[] = []
+
+      for (const folder of folders) {
+        const dataPath = `${DIRECTORY.CUSTOM}/${folder}/data.json`
+
+        if (await fs.existFile(dataPath)) {
+          try {
+            const data = await fs.readFile(dataPath)
+            const parsedData = JSON.parse(new TextDecoder().decode(data))
+
+            if (parsedData.id === assetId) {
+              // Found the asset to delete - get all files in this folder
+              const folderPath = `${DIRECTORY.CUSTOM}/${folder}`
+              const files = await getFilesInDirectory(fs, folderPath, [], true)
+
+              // Store file contents for undo operation
+              for (const file of files) {
+                const content = await fs.readFile(file)
+                undoAcc.push({
+                  prevValue: content,
+                  newValue: null,
+                  path: file
+                })
+                await fs.rm(file)
+              }
+
+              // Add undo operation for all deleted files
+              undoRedoManager.addUndoFile(undoAcc)
+
+              return {} // Return Empty object as required by the type
+            }
+          } catch (err) {
+            // Skip folders with invalid JSON data
+            continue
+          }
+        }
+      }
+
+      throw new Error(`Custom asset with id ${assetId} not found`)
+    },
+    async renameCustomAsset(req: { assetId: string; newName: string }) {
+      const { assetId, newName } = req
+      const paths = await getFilesInDirectory(fs, `${DIRECTORY.CUSTOM}`, [], true)
+      const folders = [...new Set(paths.map((path) => path.split('/')[1]))]
+
+      const undoAcc: FileOperation[] = []
+
+      for (const folder of folders) {
+        const dataPath = `${DIRECTORY.CUSTOM}/${folder}/data.json`
+
+        if (await fs.existFile(dataPath)) {
+          try {
+            const data = await fs.readFile(dataPath)
+            const parsedData = JSON.parse(new TextDecoder().decode(data))
+
+            if (parsedData.id === assetId) {
+              const updatedData = { ...parsedData, name: newName }
+              const newContent = Buffer.from(JSON.stringify(updatedData, null, 2))
+
+              undoAcc.push({
+                prevValue: data,
+                newValue: newContent,
+                path: dataPath
+              })
+
+              await fs.writeFile(dataPath, newContent)
+              undoRedoManager.addUndoFile(undoAcc)
+              return {}
+            }
+          } catch (err) {
+            continue
+          }
+        }
+      }
+
+      throw new Error(`Custom asset with id ${assetId} not found`)
     }
   }
 }

@@ -7,7 +7,7 @@ import future from 'fp-future'
 import { createEditorComponents } from '../../sdk/components'
 import { ComponentOperation } from './component-operations'
 import { EcsEntity } from './EcsEntity'
-import { putEntitySelectedComponent } from './editorComponents/selection'
+import { deleteEntitySelectedComponent, putEntitySelectedComponent } from './editorComponents/selection'
 import { putBillboardComponent } from './sdkComponents/billboard'
 import { putGltfContainerComponent } from './sdkComponents/gltf-container'
 import { putMeshRendererComponent } from './sdkComponents/mesh-renderer'
@@ -72,6 +72,21 @@ export class SceneContext {
     [this.NftShape.componentId]: putNftShapeComponent,
     [this.VideoPlayer.componentId]: putVideoPlayerComponent,
     [this.editorComponents.Selection.componentId]: putEntitySelectedComponent,
+    [this.editorComponents.Scene.componentId]: putSceneComponent,
+    [this.editorComponents.Hide.componentId]: putHideComponent,
+    [this.editorComponents.Lock.componentId]: putLockComponent
+  }
+
+  readonly componentDeleteOperations: Record<number, ComponentOperation> = {
+    [this.Transform.componentId]: putTransformComponent,
+    [this.MeshRenderer.componentId]: putMeshRendererComponent,
+    [this.Material.componentId]: putMaterialComponent,
+    [this.Billboard.componentId]: putBillboardComponent,
+    [this.GltfContainer.componentId]: putGltfContainerComponent,
+    [this.TextShape.componentId]: putTextShapeComponent,
+    [this.NftShape.componentId]: putNftShapeComponent,
+    [this.VideoPlayer.componentId]: putVideoPlayerComponent,
+    [this.editorComponents.Selection.componentId]: deleteEntitySelectedComponent,
     [this.editorComponents.Scene.componentId]: putSceneComponent,
     [this.editorComponents.Hide.componentId]: putHideComponent,
     [this.editorComponents.Lock.componentId]: putLockComponent

@@ -21,7 +21,7 @@ function isAncestorOf(ancestorId: Entity, targetId: Entity, nodes: Node[]): bool
 
 export function updateSelectedEntity(engine: IEngine) {
   return function updateSelectedEntity(entity: Entity, multiple: boolean = false) {
-    let gizmo = GizmoType.POSITION
+    let gizmo = GizmoType.FREE
     let deletedSelection = false
 
     // clear selection
@@ -49,8 +49,11 @@ export function updateSelectedEntity(engine: IEngine) {
       }
     }
 
-    // then select new entity
-    if (!Selection.has(entity) || deletedSelection) {
+    // allow deselecting from a list of selected entities...
+    if (multiple && Selection.has(entity)) {
+      Selection.deleteFrom(entity)
+    } else if (!Selection.has(entity) || deletedSelection) {
+      // then select new entity
       Selection.createOrReplace(entity, { gizmo })
     }
 

@@ -1,9 +1,9 @@
 import { Entity, engine, IEngine } from '@dcl/ecs'
 import { EditorComponents } from './components'
 
-export const ROOT = engine.RootEntity
-export const PLAYER = engine.PlayerEntity
-export const CAMERA = engine.CameraEntity
+export const EDITOR_ENTITIES = [engine.RootEntity, engine.PlayerEntity, engine.CameraEntity]
+
+export const [ROOT, PLAYER, CAMERA] = EDITOR_ENTITIES
 
 /**
  * Returns a tree in the shape of Map<Entity, Set<Entity>> where the key is the parent and the value is the children

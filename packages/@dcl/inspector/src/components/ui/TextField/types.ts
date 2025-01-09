@@ -13,4 +13,5 @@ export type Props = React.InputHTMLAttributes<HTMLInputElement> & {
   disabled?: boolean
   leftContent?: React.ReactNode
   debounceTime?: number
+  autoSelect?: boolean
 }

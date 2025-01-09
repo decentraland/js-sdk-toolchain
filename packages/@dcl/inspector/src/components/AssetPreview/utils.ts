@@ -1,6 +1,6 @@
 import { BodyShape, WearableCategory, WearableWithBlobs } from '@dcl/schemas'
 
-export function toWearableWithBlobs(file: File): WearableWithBlobs {
+export function toWearableWithBlobs(file: File, resources: File[] = []): WearableWithBlobs {
   return {
     id: file.name,
     name: '',
@@ -21,7 +21,11 @@ export function toWearableWithBlobs(file: File): WearableWithBlobs {
             {
               key: file.name,
               blob: file
-            }
+            },
+            ...resources.map((resource) => ({
+              key: resource.name,
+              blob: resource
+            }))
           ],
           overrideHides: [],
           overrideReplaces: []

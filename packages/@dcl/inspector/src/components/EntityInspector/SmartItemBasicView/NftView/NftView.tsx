@@ -67,12 +67,14 @@ export default React.memo(
           label="NFT Collection Contract"
           value={urnTokens.contract || ''}
           onChange={(e) => handleUrnTokenChange({ contract: e.target.value })}
+          autoSelect
         />
         <TextField
           type="text"
           label="Token ID"
           value={urnTokens.token || ''}
           onChange={(e) => handleUrnTokenChange({ token: e.target.value })}
+          autoSelect
         />
         <Block label="Background Color">
           <ColorField value={color} onChange={handleColorChange} />

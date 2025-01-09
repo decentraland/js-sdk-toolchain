@@ -9,7 +9,7 @@ import { getComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { analytics, Event } from '../../../lib/logic/analytics'
 import { getAssetByModel } from '../../../lib/logic/catalog'
 import { CoreComponents } from '../../../lib/sdk/components'
-import { ProjectAssetDrop, getNode } from '../../../lib/sdk/drag-drop'
+import { LocalAssetDrop, getNode } from '../../../lib/sdk/drag-drop'
 import { withAssetDir } from '../../../lib/data-layer/host/fs-utils'
 import { useAppSelector } from '../../../redux/hooks'
 import { selectAssetCatalog } from '../../../redux/app'
@@ -19,7 +19,7 @@ import { TextField, CheckboxField, RangeField, InfoTooltip } from '../../ui'
 import { fromVideoPlayer, toVideoPlayer, isValidInput, isVideo, isValidVolume } from './utils'
 import type { Props } from './types'
 
-const DROP_TYPES = ['project-asset']
+const DROP_TYPES = ['local-asset']
 
 export default withSdk<Props>(({ sdk, entity }) => {
   const files = useAppSelector(selectAssetCatalog)
@@ -56,13 +56,13 @@ export default withSdk<Props>(({ sdk, entity }) => {
   const [{ isHover }, drop] = useDrop(
     () => ({
       accept: DROP_TYPES,
-      drop: ({ value, context }: ProjectAssetDrop, monitor) => {
+      drop: ({ value, context }: LocalAssetDrop, monitor) => {
         if (monitor.didDrop()) return
         const node = context.tree.get(value)!
         const model = getNode(node, context.tree, isVideo)
         if (model) void handleDrop(withAssetDir(model.asset.src))
       },
-      canDrop: ({ value, context }: ProjectAssetDrop) => {
+      canDrop: ({ value, context }: LocalAssetDrop) => {
         const node = context.tree.get(value)!
         return !!getNode(node, context.tree, isVideo)
       },
@@ -93,7 +93,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
       onRemoveContainer={handleRemove}
     >
       <Block label="Path/URL" ref={drop}>
-        <TextField type="text" {...getInputProps('src')} error={files && !isValid} drop={isHover} />
+        <TextField autoSelect type="text" {...getInputProps('src')} error={files && !isValid} drop={isHover} />
       </Block>
       <Block label="Playback">
         <CheckboxField label="Start playing" checked={!!playing.value} {...playing} />

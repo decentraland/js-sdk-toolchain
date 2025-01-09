@@ -1,4 +1,4 @@
-import { takeEvery } from 'redux-saga/effects'
+import { takeEvery, takeLatest } from 'redux-saga/effects'
 
 import {
   connect,
@@ -13,7 +13,10 @@ import {
   importAsset,
   removeAsset,
   getThumbnails,
-  saveThumbnail
+  saveThumbnail,
+  createCustomAsset,
+  deleteCustomAsset,
+  renameCustomAsset
 } from '..'
 import { connectSaga } from './connect'
 import { reconnectSaga } from './reconnect'
@@ -27,6 +30,9 @@ import { removeAssetSaga } from './remove-asset'
 import { connectedSaga } from './connected'
 import { getThumbnailsSaga } from './get-thumbnails'
 import { saveThumbnailSaga } from './save-thumbnail'
+import { createCustomAssetSaga } from './create-custom-asset'
+import { deleteCustomAssetSaga } from './delete-custom-asset'
+import { renameCustomAssetSaga } from './rename-custom-asset'
 
 export function* dataLayerSaga() {
   yield takeEvery(connect.type, connectSaga)
@@ -42,6 +48,9 @@ export function* dataLayerSaga() {
   yield takeEvery(removeAsset.type, removeAssetSaga)
   yield takeEvery(getThumbnails.type, getThumbnailsSaga)
   yield takeEvery(saveThumbnail.type, saveThumbnailSaga)
+  yield takeEvery(createCustomAsset.type, createCustomAssetSaga)
+  yield takeLatest(deleteCustomAsset.type, deleteCustomAssetSaga)
+  yield takeEvery(renameCustomAsset.type, renameCustomAssetSaga)
 }
 
 export default dataLayerSaga

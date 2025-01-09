@@ -14,7 +14,8 @@ describe('Generated OnPointerDown ProtoBuf', () => {
             button: 1,
             hoverText: 'Tap to run',
             maxDistance: 10,
-            showFeedback: true
+            showFeedback: true,
+            showHighlight: true
           }
         }
       ]
@@ -28,7 +29,8 @@ describe('Generated OnPointerDown ProtoBuf', () => {
             button: InputAction.IA_ACTION_4,
             hoverText: 'Run to tap',
             maxDistance: 5,
-            showFeedback: false
+            showFeedback: false,
+            showHighlight: false
           }
         }
       ]
@@ -51,7 +53,8 @@ describe('Generated OnPointerDown ProtoBuf', () => {
             button: InputAction.IA_ACTION_4,
             hoverText: 'Run to tap',
             maxDistance: 5,
-            showFeedback: false
+            showFeedback: false,
+            showHighlight: false
           }
         }
       ]
