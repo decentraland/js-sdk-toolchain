@@ -26,13 +26,14 @@ export function addSyncTransport(
   const entityDefinitions = entityUtils(engine, myProfile)
 
   // List of MessageBuss messsages to be sent on every frame to comms
-  const pendingMessageBusMessagesToSend: { data: Uint8Array[]; address?: string }[] = []
+  const pendingMessageBusMessagesToSend: { data: Uint8Array[]; address: string }[] = []
+
   const binaryMessageBus = BinaryMessageBus((data, address) => {
     const pendingAddressMessage = address && pendingMessageBusMessagesToSend.find(($) => $.address === address)
     if (pendingAddressMessage) {
       pendingAddressMessage.data.push(data)
     } else {
-      pendingMessageBusMessagesToSend.push({ data: [data], address })
+      pendingMessageBusMessagesToSend.push({ data: [data], address: address ?? '' })
     }
   })
 
@@ -40,16 +41,16 @@ export function addSyncTransport(
     const messages = [...pendingMessageBusMessagesToSend]
     pendingMessageBusMessagesToSend.length = 0
     const broadcastMessages: Uint8Array[] = []
-    const messagesToAddress: typeof pendingMessageBusMessagesToSend = []
+    const peerMessages: typeof pendingMessageBusMessagesToSend = []
 
     for (const message of messages) {
       if (!message.address) {
         broadcastMessages.push(...message.data)
       } else {
-        messagesToAddress.push(message)
+        peerMessages.push(message)
       }
     }
-    return [broadcastMessages, messagesToAddress]
+    return [broadcastMessages, peerMessages]
   }
   const players = definePlayerHelper(engine)
 
@@ -65,9 +66,9 @@ export function addSyncTransport(
           console.log(...Array.from(serializeCrdtMessages('[NetworkMessage sent]:', message, engine)))
         binaryMessageBus.emit(CommsMessage.CRDT, message)
       }
-      const [broadcastMessages, messagesToAddress] = getMessagesToSend()
+      const [broadcastMessages, peerMessages] = getMessagesToSend()
 
-      const response = await sendBinary({ data: broadcastMessages, messagesToAddress })
+      const response = await sendBinary({ data: broadcastMessages, peerData: peerMessages })
       binaryMessageBus.__processMessages(response.data)
       transportInitialzed = true
     },
