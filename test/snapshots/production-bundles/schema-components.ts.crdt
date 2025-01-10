@@ -31,8 +31,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 1k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 858.12k bytes
-=======
-  MEMORY_USAGE_COUNT ~= 854.80k bytes
->>>>>>> origin
