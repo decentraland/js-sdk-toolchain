@@ -22,12 +22,12 @@ describe('generateUniqueName', () => {
     expect(result).toBe('SomeName')
   })
 
-  it('should return the base name with _1 when the base name already exists', () => {
+  it('should return the base name with _2 when the base name already exists', () => {
     _addChild(engine.RootEntity, 'SomeName')
 
     const result = generateUniqueName(engine, Name, 'SomeName')
 
-    expect(result).toBe('SomeName_1')
+    expect(result).toBe('SomeName_2')
   })
 
   it('should return the base name with the next incremented suffix', () => {

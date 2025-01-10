@@ -1082,6 +1082,8 @@ export type EntityComponents = {
     uiDropdown: PBUiDropdown;
     onMouseDown: Callback;
     onMouseUp: Callback;
+    onMouseEnter: Callback;
+    onMouseLeave: Callback;
 };
 
 // @public (undocumented)
@@ -1558,6 +1560,8 @@ export interface LastWriteWinElementSetComponentDefinition<T> extends BaseCompon
 export type Listeners = {
     onMouseDown?: Callback;
     onMouseUp?: Callback;
+    onMouseEnter?: Callback;
+    onMouseLeave?: Callback;
 };
 
 // @public (undocumented)
@@ -3316,6 +3320,14 @@ export interface PointerEventsSystem {
     }, cb: EventSystemCallback): void;
     // @deprecated (undocumented)
     onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
+    onPointerHoverEnter(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
+    onPointerHoverLeave(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
     onPointerUp(pointerData: {
         entity: Entity;
         opts?: Partial<EventSystemOptions>;
@@ -3323,6 +3335,8 @@ export interface PointerEventsSystem {
     // @deprecated (undocumented)
     onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
     removeOnPointerDown(entity: Entity): void;
+    removeOnPointerHoverEnter(entity: Entity): void;
+    removeOnPointerHoverLeave(entity: Entity): void;
     removeOnPointerUp(entity: Entity): void;
 }
 

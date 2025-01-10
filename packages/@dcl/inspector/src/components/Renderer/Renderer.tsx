@@ -7,8 +7,17 @@ import { Entity } from '@dcl/ecs'
 
 import { DIRECTORY, withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
-import { getReloadAssets, importAsset, saveThumbnail } from '../../redux/data-layer'
-import { getNode, BuilderAsset, DROP_TYPES, IDrop, ProjectAssetDrop, isDropType } from '../../lib/sdk/drag-drop'
+import { getDataLayerInterface, getReloadAssets, importAsset, saveThumbnail } from '../../redux/data-layer'
+import {
+  getNode,
+  CatalogAssetDrop,
+  DROP_TYPES,
+  IDrop,
+  LocalAssetDrop,
+  isDropType,
+  DropTypesEnum,
+  CustomAssetDrop
+} from '../../lib/sdk/drag-drop'
 import { useRenderer } from '../../hooks/sdk/useRenderer'
 import { useSdk } from '../../hooks/sdk/useSdk'
 import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
@@ -16,7 +25,7 @@ import { snapPosition } from '../../lib/babylon/decentraland/snap-manager'
 import { loadGltf, removeGltf } from '../../lib/babylon/decentraland/sdkComponents/gltf-container'
 import { getConfig } from '../../lib/logic/config'
 import { ROOT } from '../../lib/sdk/tree'
-import { Asset, isGround, isSmart } from '../../lib/logic/catalog'
+import { Asset, CustomAsset, isGround, isSmart } from '../../lib/logic/catalog'
 import { selectAssetCatalog } from '../../redux/app'
 import { areGizmosDisabled, getHiddenPanels, isGroundGridDisabled } from '../../redux/ui'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
@@ -158,13 +167,13 @@ const Renderer: React.FC = () => {
     sdk.editorCamera.resetCamera()
   }, [sdk])
 
-  useHotkey([DELETE, BACKSPACE], deleteSelectedEntities, canvasRef.current)
-  useHotkey([COPY, COPY_ALT], copySelectedEntities, canvasRef.current)
-  useHotkey([PASTE, PASTE_ALT], pasteSelectedEntities, canvasRef.current)
-  useHotkey([ZOOM_IN, ZOOM_IN_ALT], zoomIn, canvasRef.current)
-  useHotkey([ZOOM_OUT, ZOOM_OUT_ALT], zoomOut, canvasRef.current)
-  useHotkey([RESET_CAMERA], resetCamera, canvasRef.current)
-  useHotkey([DUPLICATE, DUPLICATE_ALT], duplicateSelectedEntities, canvasRef.current)
+  useHotkey([DELETE, BACKSPACE], deleteSelectedEntities, document.body)
+  useHotkey([COPY, COPY_ALT], copySelectedEntities, document.body)
+  useHotkey([PASTE, PASTE_ALT], pasteSelectedEntities, document.body)
+  useHotkey([ZOOM_IN, ZOOM_IN_ALT], zoomIn, document.body)
+  useHotkey([ZOOM_OUT, ZOOM_OUT_ALT], zoomOut, document.body)
+  useHotkey([RESET_CAMERA], resetCamera, document.body)
+  useHotkey([DUPLICATE, DUPLICATE_ALT], duplicateSelectedEntities, document.body)
 
   // listen to ctrl key to place single tile
   useEffect(() => {
@@ -202,7 +211,7 @@ const Renderer: React.FC = () => {
     return snapPosition(new Vector3(fixedNumber(pointerCoords.x), 0, fixedNumber(pointerCoords.z)))
   }
 
-  const addAsset = async (asset: AssetNodeItem, position: Vector3, basePath: string) => {
+  const addAsset = async (asset: AssetNodeItem, position: Vector3, basePath: string, isCustom: boolean) => {
     if (!sdk) return
     const { operations } = sdk
     operations.addAsset(
@@ -212,15 +221,17 @@ const Renderer: React.FC = () => {
       position,
       basePath,
       sdk.enumEntity,
-      asset.components,
-      asset.asset.id
+      asset.composite,
+      asset.asset.id,
+      isCustom
     )
     await operations.dispatch()
     analytics.track(Event.ADD_ITEM, {
       itemId: asset.asset.id,
       itemName: asset.name,
       itemPath: asset.asset.src,
-      isSmart: isSmart(asset)
+      isSmart: isSmart(asset),
+      isCustom
     })
     canvasRef.current?.focus()
   }
@@ -239,10 +250,61 @@ const Renderer: React.FC = () => {
     canvasRef.current?.focus()
   }
 
-  const importBuilderAsset = async (asset: Asset) => {
+  const importCustomAsset = async (asset: CustomAsset) => {
+    const destFolder = 'custom'
+    const assetPackageName = asset.name.trim().replaceAll(' ', '_').toLowerCase()
+    const position = await getDropPosition()
+    const content: Map<string, Uint8Array> = new Map()
+
+    const dataLayer = getDataLayerInterface()
+    if (!dataLayer) return
+
+    // Find the common base path from all resources
+    const customAssetBasePath = asset.resources.reduce((basePath, path) => {
+      const pathParts = path.split('/')
+      pathParts.pop() // Remove filename
+      const currentPath = pathParts.join('/')
+      if (!basePath) return currentPath
+
+      // Find common prefix between paths
+      const basePathParts = basePath.split('/')
+      const commonParts = []
+      for (let i = 0; i < basePathParts.length; i++) {
+        if (basePathParts[i] === pathParts[i]) {
+          commonParts.push(basePathParts[i])
+        } else {
+          break
+        }
+      }
+      return commonParts.join('/')
+    }, '')
+
+    const files = await Promise.all(
+      asset.resources.map(async (path) => ({
+        path: path.startsWith(customAssetBasePath) ? path.replace(customAssetBasePath, '') : path,
+        content: await dataLayer.getFile({ path }).then((res) => res.content)
+      }))
+    )
+    for (const file of files) {
+      content.set(file.path, file.content)
+    }
+    const model: AssetNodeItem = {
+      type: 'asset',
+      name: asset.name,
+      parent: null,
+      asset: { type: 'gltf', src: '', id: asset.id },
+      composite: asset.composite
+    }
+    const basePath = withAssetDir(`${destFolder}/${assetPackageName}`)
+
+    dispatch(importAsset({ content, basePath, assetPackageName: '', reload: true }))
+    await addAsset(model, position, basePath, true)
+  }
+
+  const importCatalogAsset = async (asset: Asset) => {
     const position = await getDropPosition()
     const fileContent: Record<string, Uint8Array> = {}
-    const destFolder = 'builder'
+    const destFolder = 'asset-packs'
     const assetPackageName = asset.name.trim().replaceAll(' ', '_').toLowerCase()
     const path = Object.keys(asset.contents).find(($) => isAsset($))
     let thumbnail: Uint8Array | undefined
@@ -299,7 +361,7 @@ const Renderer: React.FC = () => {
       name: asset.name,
       parent: null,
       asset: { type: path ? 'gltf' : 'unknown', src: path ?? '', id: asset.id },
-      components: asset.components
+      composite: asset.composite
     }
     const basePath = withAssetDir(`${destFolder}/${assetPackageName}`)
     if (isGround(asset) && !placeSingleTile) {
@@ -309,7 +371,7 @@ const Renderer: React.FC = () => {
       if (isGround(asset)) {
         position.y += 0.25
       }
-      await addAsset(model, position, basePath)
+      await addAsset(model, position, basePath, false)
     }
   }
 
@@ -320,22 +382,27 @@ const Renderer: React.FC = () => {
         if (monitor.didDrop()) return
         const itemType = monitor.getItemType()
 
-        if (isDropType<BuilderAsset>(item, itemType, 'builder-asset')) {
-          void importBuilderAsset(item.value)
+        if (isDropType<CatalogAssetDrop>(item, itemType, DropTypesEnum.CatalogAsset)) {
+          void importCatalogAsset(item.value)
           return
         }
 
-        if (isDropType<ProjectAssetDrop>(item, itemType, 'project-asset')) {
+        if (isDropType<LocalAssetDrop>(item, itemType, DropTypesEnum.LocalAsset)) {
           const node = item.context.tree.get(item.value)!
           const model = getNode(node, item.context.tree, isModel)
           if (model) {
             const position = await getDropPosition()
-            await addAsset(model, position, DIRECTORY.ASSETS)
+            await addAsset(model, position, DIRECTORY.ASSETS, false)
           }
+        }
+
+        if (isDropType<CustomAssetDrop>(item, itemType, DropTypesEnum.CustomAsset)) {
+          void importCustomAsset(item.value)
+          return
         }
       },
       hover(item, monitor) {
-        if (isDropType<BuilderAsset>(item, monitor.getItemType(), 'builder-asset')) {
+        if (isDropType<CatalogAssetDrop>(item, monitor.getItemType(), DropTypesEnum.CatalogAsset)) {
           const asset = item.value
           if (isGround(asset)) {
             if (!showSingleTileHint) {

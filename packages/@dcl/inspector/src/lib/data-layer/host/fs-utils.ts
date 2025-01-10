@@ -30,7 +30,8 @@ export async function getFilesInDirectory(
 export const DIRECTORY = {
   ASSETS: 'assets',
   SCENE: 'scene',
-  THUMBNAILS: 'thumbnails'
+  THUMBNAILS: 'thumbnails',
+  CUSTOM: 'custom'
 }
 
 export const EXTENSIONS = [
