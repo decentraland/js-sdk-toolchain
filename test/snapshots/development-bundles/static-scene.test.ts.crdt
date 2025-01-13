@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=455.7k bytes
-=======
-SCENE_COMPILED_JS_SIZE_PROD=456k bytes
->>>>>>> origin
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -15,11 +11,7 @@ EVAL test/snapshots/development-bundles/static-scene.test.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   OPCODES ~= 54k
-<<<<<<< HEAD
   MALLOC_COUNT = 13700
-=======
-  MALLOC_COUNT = 13705
->>>>>>> origin
   ALIVE_OBJS_DELTA ~= 2.70k
 CALL onStart()
   main.crdt: PUT_COMPONENT e=0x200 c=1 t=0 data={"position":{"x":5.880000114440918,"y":2.7916901111602783,"z":7.380000114440918},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
@@ -64,8 +56,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 3k
   MALLOC_COUNT = -5
   ALIVE_OBJS_DELTA ~= 0.00k
-<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 1198.40k bytes
-=======
-  MEMORY_USAGE_COUNT ~= 1199.30k bytes
->>>>>>> origin
