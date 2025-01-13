@@ -1,5 +1,5 @@
 import { IEngine, LastWriteWinElementSetComponentDefinition } from '../../engine'
-import { Tween, PBTween, Move, Rotate, Scale } from '../generated/index.gen'
+import { Tween, PBTween, Move, Rotate, Scale, TextureMove } from '../generated/index.gen'
 
 /**
  * @public
@@ -17,6 +17,11 @@ export interface TweenHelper {
    * @returns a move mode tween
    */
   Scale: (scale: Scale) => PBTween['mode']
+
+  /**
+   * @returns a texture move mode tween
+   */
+  TextureMove: (textureMove: TextureMove) => PBTween['mode']
 }
 
 /**
@@ -46,6 +51,12 @@ const TweenHelper: TweenHelper = {
     return {
       $case: 'scale',
       scale
+    }
+  },
+  TextureMove(textureMove) {
+    return {
+      $case: 'textureMove',
+      textureMove
     }
   }
 }

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=196.2k bytes
+=======
+SCENE_COMPILED_JS_SIZE_PROD=196.4k bytes
+>>>>>>> origin
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -9,7 +13,11 @@ EVAL test/snapshots/production-bundles/pointer-events.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   OPCODES ~= 56k
+<<<<<<< HEAD
   MALLOC_COUNT = 12161
+=======
+  MALLOC_COUNT = 12166
+>>>>>>> origin
   ALIVE_OBJS_DELTA ~= 2.70k
 CALL onStart()
   OPCODES ~= 0k
@@ -43,4 +51,8 @@ CALL onUpdate(0.1)
   OPCODES ~= 1k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 872.71k bytes
+=======
+  MEMORY_USAGE_COUNT ~= 873.43k bytes
+>>>>>>> origin
