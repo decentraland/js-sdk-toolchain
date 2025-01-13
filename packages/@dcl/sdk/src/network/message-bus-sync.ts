@@ -26,15 +26,10 @@ export function addSyncTransport(
   const entityDefinitions = entityUtils(engine, myProfile)
 
   // List of MessageBuss messsages to be sent on every frame to comms
-  const pendingMessageBusMessagesToSend: { data: Uint8Array[]; address: string }[] = []
+  const pendingMessageBusMessagesToSend: { data: Uint8Array[]; address: string[] }[] = []
 
   const binaryMessageBus = BinaryMessageBus((data, address) => {
-    const pendingAddressMessage = address && pendingMessageBusMessagesToSend.find(($) => $.address === address)
-    if (pendingAddressMessage) {
-      pendingAddressMessage.data.push(data)
-    } else {
-      pendingMessageBusMessagesToSend.push({ data: [data], address: address ?? '' })
-    }
+    pendingMessageBusMessagesToSend.push({ data: [data], address: address ?? [] })
   })
 
   function getMessagesToSend(): [Uint8Array[], typeof pendingMessageBusMessagesToSend] {
@@ -44,7 +39,7 @@ export function addSyncTransport(
     const peerMessages: typeof pendingMessageBusMessagesToSend = []
 
     for (const message of messages) {
-      if (!message.address) {
+      if (!message.address.length) {
         broadcastMessages.push(...message.data)
       } else {
         peerMessages.push(message)
@@ -90,7 +85,7 @@ export function addSyncTransport(
   binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, async (message, userId) => {
     console.log(`Sending CRDT State to: ${userId}`)
     transport.onmessage!(message)
-    binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(userId, engineToCrdt(engine)), userId)
+    binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(userId, engineToCrdt(engine)), [userId])
   })
 
   // Process CRDT messages here

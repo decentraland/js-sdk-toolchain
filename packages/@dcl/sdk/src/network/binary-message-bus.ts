@@ -6,13 +6,15 @@ export enum CommsMessage {
   RES_CRDT_STATE = 3
 }
 
-export function BinaryMessageBus<T extends CommsMessage>(send: (message: Uint8Array, toPeerAddress?: string) => void) {
+export function BinaryMessageBus<T extends CommsMessage>(
+  send: (message: Uint8Array, toPeerAddress?: string[]) => void
+) {
   const mapping: Map<T, (value: Uint8Array, sender: string) => void> = new Map()
   return {
     on: <K extends T>(message: K, callback: (value: Uint8Array, sender: string) => void) => {
       mapping.set(message, callback)
     },
-    emit: <K extends T>(message: K, value: Uint8Array, toPeerAddress?: string) => {
+    emit: <K extends T>(message: K, value: Uint8Array, toPeerAddress?: string[]) => {
       send(craftCommsMessage<T>(message, value), toPeerAddress)
     },
     __processMessages: (messages: Uint8Array[]) => {
