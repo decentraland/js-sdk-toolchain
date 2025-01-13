@@ -90,7 +90,7 @@ export function addSyncTransport(
   binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, async (message, userId) => {
     console.log(`Sending CRDT State to: ${userId}`)
     transport.onmessage!(message)
-    binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(userId, engineToCrdt(engine)))
+    binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(userId, engineToCrdt(engine)), userId)
   })
 
   // Process CRDT messages here
