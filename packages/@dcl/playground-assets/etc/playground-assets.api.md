@@ -2139,6 +2139,19 @@ export const onVideoEvent: Observable<{
     totalVideoLength: number;
 }>;
 
+// @public (undocumented)
+export interface Orthographic {
+    verticalRange?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace Orthographic {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): Orthographic;
+    // (undocumented)
+    export function encode(message: Orthographic, writer?: _m0.Writer): _m0.Writer;
+}
+
 // @public
 export type OverflowType = 'hidden' | 'scroll' | 'visible';
 
@@ -2447,6 +2460,7 @@ export interface PBGlobalLight {
     ambientBrightness?: number | undefined;
     ambientColor?: PBColor3 | undefined;
     direction?: PBVector3 | undefined;
+    layers: number[];
 }
 
 // @public (undocumented)
@@ -3132,10 +3146,22 @@ export namespace PBTextShape {
 // @public (undocumented)
 export interface PBTextureCamera {
     // (undocumented)
+    ambientBrightnessOverride?: number | undefined;
+    ambientColorOverride?: PBColor3 | undefined;
+    clearColor?: PBColor4 | undefined;
+    disableFog?: boolean | undefined;
+    disableSkybox?: boolean | undefined;
+    farPlane?: number | undefined;
     height?: number | undefined;
-    // (undocumented)
     layer?: number | undefined;
     // (undocumented)
+    mode?: {
+        $case: "perspective";
+        perspective: Perspective;
+    } | {
+        $case: "orthographic";
+        orthographic: Orthographic;
+    } | undefined;
     width?: number | undefined;
 }
 
@@ -3562,6 +3588,19 @@ export namespace PBVisibilityComponent {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBVisibilityComponent;
     // (undocumented)
     export function encode(message: PBVisibilityComponent, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface Perspective {
+    fieldOfView?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace Perspective {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): Perspective;
+    // (undocumented)
+    export function encode(message: Perspective, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public
