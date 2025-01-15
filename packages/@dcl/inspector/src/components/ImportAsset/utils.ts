@@ -1,3 +1,7 @@
+import { GLTFValidation } from '@babylonjs/loaders'
+
+import { FileAsset, GltfAsset, BabylonValidationIssue, ValidationError, Asset, Uri, GltfFile } from './types'
+
 const sampleIndex = (list: any[]) => Math.floor(Math.random() * list.length)
 
 export function getRandomMnemonic() {
@@ -88,3 +92,136 @@ export const adjectives = [
   'cheap',
   'absorbed'
 ]
+
+const ONE_GB_IN_BYTES = 1024 * 1024 * 1024
+const VALID_EXTENSIONS = new Set([
+  'glb', 'gltf', 'bin', 'png', 'ktx2', 'mp3', 'wav', 'ogg', 'mp4'
+])
+const IGNORED_ERROR_CODES = ['ACCESSOR_WEIGHTS_NON_NORMALIZED', 'MESH_PRIMITIVE_TOO_FEW_TEXCOORDS']
+
+async function validateGltf(gltf: GltfAsset): Promise<void> {
+  const pre = `Invalid GLTF "${gltf.blob.name}":`
+  const gltfContent = JSON.parse(await gltf.blob.text()) as GltfFile
+  const gltfBuffer = await gltf.blob.arrayBuffer()
+  const resourceMap = new Map([...gltf.buffers, ...gltf.images].map(($) => [$.blob.name, $.blob]))
+
+  // ugly hack since "GLTFValidation.ValidateAsync" runs on a new Worker and throwed errors from
+  // "getExternalResource" callback are thrown to main thread
+  // In conclusion, checking for missing files inside "getExternalResource" is not possible...
+  for (const { uri } of [...gltfContent.buffers, ...gltfContent.images]) {
+    if (!resourceMap.has(uri)) {
+      throw new Error(`${pre}: resource "${uri}" is missing`)
+    }
+  }
+
+  let result
+  try {
+    result = await GLTFValidation.ValidateAsync(new Uint8Array(gltfBuffer), '', '', (uri) => {
+      const resource = resourceMap.get(uri)
+      return resource!.arrayBuffer()
+    })
+  } catch (error) {
+    throw new Error(`${pre}: ${error}`)
+  }
+
+  /*
+    Babylon's type declarations incorrectly state that result.issues.messages
+    is an Array<string>. In fact, it's an array of objects with useful properties.
+  */
+  const issues = result.issues.messages as unknown as BabylonValidationIssue[]
+
+  const errors = issues.filter((issue) => issue.severity === 0 && !IGNORED_ERROR_CODES.includes(issue.code))
+
+  if (errors.length > 0) {
+    const error = errors[0]
+    throw new Error(`${pre}: ${error.message} \n Check ${error.pointer}`)
+  }
+}
+
+// Utility functions
+function normalizeFileName(fileName: string): string {
+  return fileName.trim().replace(/\s+/g, "_").toLowerCase()
+}
+
+function extractFileInfo(fileName: string): [string, string] {
+  const match = fileName.match(/^(.*?)(?:\.([^.]+))?$/)
+  return match ? [match[1], match[2]?.toLowerCase() || ""] : [fileName, ""]
+}
+
+function formatFileName(file: FileAsset): string {
+  return `${file.name}.${file.extension}`
+}
+
+function validateFileSize(size: number): ValidationError {
+  return size > ONE_GB_IN_BYTES ? 'Files bigger than 1GB are not accepted' : undefined
+}
+
+function validateExtension(extension: string): ValidationError {
+  return VALID_EXTENSIONS.has(extension) ?
+    undefined :
+    `Invalid asset format ".${extension}"`
+}
+
+async function processFile(file: File): Promise<FileAsset> {
+  const normalizedName = normalizeFileName(file.name)
+  const [name, extension] = extractFileInfo(normalizedName)
+
+  const extensionError = validateExtension(extension)
+  if (extensionError) {
+    return { blob: file, name, extension, error: extensionError }
+  }
+
+  const sizeError = validateFileSize(file.size)
+  if (sizeError) {
+    return { blob: file, name, extension, error: sizeError }
+  }
+
+  return { blob: file, name, extension }
+}
+
+async function validateGltfWithDependencies(gltf: GltfAsset): Promise<ValidationError> {
+  try {
+    await validateGltf(gltf)
+  } catch (error) {
+    return error instanceof Error ? error.message : 'Unknown error during GLTF validation'
+  }
+}
+
+function resolveDependencies(uris: Uri[], fileMap: Map<string, FileAsset>): FileAsset[] {
+  return uris.reduce<FileAsset[]>((acc, { uri }) => {
+    const normalizedUri = normalizeFileName(uri)
+    const file = fileMap.get(normalizedUri)
+    if (file) {
+      acc.push(file)
+      fileMap.delete(normalizedUri)
+    }
+    return acc
+  }, [])
+}
+
+async function processGltfAssets(files: FileAsset[]): Promise<Asset[]> {
+  const fileMap = new Map(files.map(file => [formatFileName(file), file]))
+
+  const gltfPromises = files
+    .filter(file => file.extension === 'gltf')
+    .map(async (gltfFile): Promise<GltfAsset> => {
+      const gltfContent = JSON.parse(await gltfFile.blob.text()) as GltfFile
+      const buffers = resolveDependencies(gltfContent.buffers, fileMap)
+      const images = resolveDependencies(gltfContent.images, fileMap)
+      const gltf: GltfAsset = { ...gltfFile, buffers, images }
+      const error = await validateGltfWithDependencies(gltf)
+
+      fileMap.delete(formatFileName(gltfFile))
+      return { ...gltf, error }
+    })
+
+  const gltfAssets = await Promise.all(gltfPromises)
+  const remainingAssets = Array.from(fileMap.values())
+
+  return [...gltfAssets, ...remainingAssets]
+}
+
+export async function processAssets(files: File[]): Promise<Asset[]> {
+  const processedFiles = await Promise.all(files.map(processFile))
+  return processGltfAssets(processedFiles)
+}
