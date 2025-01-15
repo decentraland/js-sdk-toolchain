@@ -9,6 +9,7 @@ import { selectAssetsTab } from '../../ui'
 import { AssetsTab } from '../../ui/types'
 import { getResourcesFromModels } from '../../../lib/babylon/decentraland/get-resources'
 import { transformBase64ResourceToBinary } from '../../../lib/data-layer/host/fs-utils'
+import { analytics, Event } from '../../../lib/logic/analytics'
 
 describe('createCustomAssetSaga', () => {
   const mockPayload = {
@@ -34,6 +35,12 @@ describe('createCustomAssetSaga', () => {
   it('should successfully create a custom asset', async () => {
     const mockResourcesFromModels = ['texture1.png', 'texture2.png']
     const gltfResources = mockPayload.resources.filter((r) => r.endsWith('.gltf') || r.endsWith('.glb'))
+    const mockAsset = {
+      id: 'test-id',
+      name: mockPayload.name,
+      composite: mockPayload.composite,
+      resources: [...mockPayload.resources, ...mockResourcesFromModels]
+    }
 
     return expectSaga(createCustomAssetSaga, mockAction)
       .provide([
@@ -45,6 +52,15 @@ describe('createCustomAssetSaga', () => {
             composite: Buffer.from(JSON.stringify(mockPayload.composite)),
             resources: [...mockPayload.resources, ...mockResourcesFromModels],
             thumbnail: transformBase64ResourceToBinary(mockPayload.thumbnail)
+          }),
+          { asset: { data: Buffer.from(JSON.stringify(mockAsset)) } }
+        ],
+        [
+          call([analytics, 'track'], Event.CREATE_CUSTOM_ITEM, {
+            itemId: mockAsset.id,
+            itemName: mockPayload.name,
+            resourceCount: [...mockPayload.resources, ...mockResourcesFromModels].length,
+            isSmart: false
           }),
           undefined
         ]
@@ -58,6 +74,12 @@ describe('createCustomAssetSaga', () => {
     const payloadWithoutThumbnail = { ...mockPayload, thumbnail: undefined }
     const actionWithoutThumbnail = { ...mockAction, payload: payloadWithoutThumbnail }
     const gltfResources = payloadWithoutThumbnail.resources.filter((r) => r.endsWith('.gltf') || r.endsWith('.glb'))
+    const mockAsset = {
+      id: 'test-id',
+      name: payloadWithoutThumbnail.name,
+      composite: payloadWithoutThumbnail.composite,
+      resources: payloadWithoutThumbnail.resources
+    }
 
     return expectSaga(createCustomAssetSaga, actionWithoutThumbnail)
       .provide([
@@ -69,6 +91,15 @@ describe('createCustomAssetSaga', () => {
             composite: Buffer.from(JSON.stringify(payloadWithoutThumbnail.composite)),
             resources: payloadWithoutThumbnail.resources,
             thumbnail: undefined
+          }),
+          { asset: { data: Buffer.from(JSON.stringify(mockAsset)) } }
+        ],
+        [
+          call([analytics, 'track'], Event.CREATE_CUSTOM_ITEM, {
+            itemId: mockAsset.id,
+            itemName: payloadWithoutThumbnail.name,
+            resourceCount: payloadWithoutThumbnail.resources.length,
+            isSmart: false
           }),
           undefined
         ]

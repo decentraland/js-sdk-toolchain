@@ -20,23 +20,28 @@ export function* createCustomAssetSaga(
 ) {
   const dataLayer: IDataLayer = yield call(getDataLayerInterface)
   if (!dataLayer) return
+
   try {
     const models = action.payload.resources.filter(
       (resource) => resource.endsWith('.gltf') || resource.endsWith('.glb')
     )
     const resourcesFromModels: string[] = yield call(getResourcesFromModels, models)
     const resources = [...action.payload.resources, ...resourcesFromModels]
-    const result: CreateCustomAssetResponse = yield call(dataLayer.createCustomAsset, {
+    const result: CreateCustomAssetResponse = yield call([dataLayer, 'createCustomAsset'], {
       name: action.payload.name,
       composite: Buffer.from(JSON.stringify(action.payload.composite)),
       resources,
       thumbnail: action.payload.thumbnail ? transformBase64ResourceToBinary(action.payload.thumbnail) : undefined
     })
 
-    const asset = JSON.parse(new TextDecoder().decode(result.asset?.data)) as AssetData
+    if (!result.asset?.data) {
+      throw new Error('Invalid response from createCustomAsset')
+    }
+
+    const asset = JSON.parse(new TextDecoder().decode(result.asset.data)) as AssetData
 
     // Track custom item creation
-    analytics.track(Event.CREATE_CUSTOM_ITEM, {
+    yield call([analytics, 'track'], Event.CREATE_CUSTOM_ITEM, {
       itemId: asset.id,
       itemName: action.payload.name,
       resourceCount: resources.length,
