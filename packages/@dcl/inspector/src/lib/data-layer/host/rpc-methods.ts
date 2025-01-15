@@ -212,7 +212,15 @@ export async function initRpcMethods(
         }
       ])
 
-      return {}
+      const asset: AssetData = {
+        id: data.id,
+        name: data.name,
+        category: data.category,
+        tags: data.tags,
+        composite: JSON.parse(new TextDecoder().decode(composite))
+      }
+
+      return { asset: { data: Buffer.from(JSON.stringify(asset)) } }
     },
     async getCustomAssets() {
       const paths = await getFilesInDirectory(fs, `${DIRECTORY.CUSTOM}`, [], true)
