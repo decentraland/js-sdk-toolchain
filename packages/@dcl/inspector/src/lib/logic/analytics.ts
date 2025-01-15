@@ -63,11 +63,9 @@ export type Events = {
   }
   [Event.DELETE_CUSTOM_ITEM]: {
     itemId: string
-    itemName: string
   }
   [Event.RENAME_CUSTOM_ITEM]: {
     itemId: string
-    newName: string
   }
 }
 
