@@ -14,6 +14,14 @@ export function openCustomAssetContextMenu(event: React.MouseEvent, props: Custo
   contextMenu.show({
     id: CUSTOM_ASSETS_CONTEXT_MENU_ID,
     event,
-    props
+    props: {
+      ...props,
+      onDelete: (assetId: string) => {
+        props.onDelete(assetId)
+      },
+      onRename: (assetId: string) => {
+        props.onRename(assetId)
+      }
+    }
   })
 }

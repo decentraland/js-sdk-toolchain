@@ -10,7 +10,10 @@ export enum Event {
   SWITCH_BUILDER_MODE = 'Switch Builder Mode',
   SET_GROUND = 'Set Ground',
   LOCK = 'Lock',
-  HIDE = 'Hide'
+  HIDE = 'Hide',
+  CREATE_CUSTOM_ITEM = 'Create Custom Item',
+  DELETE_CUSTOM_ITEM = 'Delete Custom Item',
+  RENAME_CUSTOM_ITEM = 'Rename Custom Item'
 }
 
 export type Events = {
@@ -51,6 +54,20 @@ export type Events = {
   }
   [Event.HIDE]: {
     value: boolean
+  }
+  [Event.CREATE_CUSTOM_ITEM]: {
+    itemId: string
+    itemName: string
+    resourceCount: number
+    isSmart: boolean
+  }
+  [Event.DELETE_CUSTOM_ITEM]: {
+    itemId: string
+    itemName: string
+  }
+  [Event.RENAME_CUSTOM_ITEM]: {
+    itemId: string
+    newName: string
   }
 }
 
