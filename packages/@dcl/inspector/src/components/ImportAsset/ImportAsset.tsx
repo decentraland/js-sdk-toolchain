@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
+import cx from 'classnames'
 import { HiOutlineUpload } from 'react-icons/hi'
 import { RxCross2 } from 'react-icons/rx'
 import classNames from 'classnames'
@@ -20,6 +21,7 @@ import { processAssets } from './utils'
 import { Asset } from './types'
 
 import './ImportAsset.css'
+import { InputRef } from '../FileInput/FileInput'
 
 const ACCEPTED_FILE_TYPES = {
   'model/gltf-binary': ['.gltf', '.glb', '.bin'],
@@ -30,16 +32,23 @@ const ACCEPTED_FILE_TYPES = {
   'video/mp4': ['.mp4']
 }
 
+const ACCEPTED_FILE_TYPES_STR = Object
+  .values(ACCEPTED_FILE_TYPES)
+  .flat().join('/')
+  .replaceAll('.', '')
+  .toUpperCase()
+
 interface PropTypes {
   onSave(): void
 }
 
-const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
+const ImportAsset = React.forwardRef<InputRef, React.PropsWithChildren<PropTypes>>(({ onSave, children }, inputRef) => {
   const dispatch = useAppDispatch()
   const catalog = useAppSelector(selectAssetCatalog)
   const uploadFile = useAppSelector(selectUploadFile)
 
   const [files, setFiles] = useState<Asset[]>([])
+  const [isHover, setIsHover] = useState(false)
   const { basePath, assets } = catalog ?? { basePath: '', assets: [] }
 
   useEffect(() => {
@@ -49,113 +58,35 @@ const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
       }
     }, [uploadFile])
 
-  const handleDrop = async (acceptedFiles: File[]) => {
+  const handleDrop = useCallback(async (acceptedFiles: File[]) => {
     const assets = await processAssets(acceptedFiles)
     console.log('assets: ', assets)
     setFiles(assets)
-  }
+  }, [])
 
-  const handleSave = () => {
-    //   const basePath = withAssetDir(DIRECTORY.SCENE)
-    //   const content: Map<string, Uint8Array> = new Map()
-    //   const fullName = assetName + '.' + assetExtension
-    //   content.set(fullName, new Uint8Array(binary))
-
-    //   dispatch(
-    //     importAsset({
-    //       content,
-    //       basePath,
-    //       assetPackageName: '',
-    //       reload: true
-    //     })
-    //   )
-
-    //   if (thumbnail) {
-    //     dispatch(
-    //       saveThumbnail({
-    //         content: transformBase64ResourceToBinary(thumbnail),
-    //         path: `${DIRECTORY.THUMBNAILS}/${assetName}.png`
-    //       })
-    //     )
-    //   }
-
-    //   // Clear uploaded file from the FileUploadField
-    //   const newUploadFile = { ...uploadFile }
-    //   for (const key in newUploadFile) {
-    //     newUploadFile[key] = `${basePath}/${fullName}`
-    //   }
-    //   dispatch(updateUploadFile(newUploadFile))
-    //   setFile(undefined)
-
-    //   onSave()
-    // }
-  }
+  const handleHover = useCallback((isHover: boolean) => {
+    setIsHover(isHover)
+  }, [])
 
   function removeAsset(asset: Asset) {
     // e.stopPropagation()
     setFiles(files.filter((file) => file.name !== asset.name))
   }
 
-  // const handleNameChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-  //   setAssetName(event.target.value)
-  // }, [])
-
-  // const isNameUnique = useCallback((name: string, ext: string) => {
-  //   return !assets.find((asset) => {
-  //     const [packageName, otherAssetName] = removeBasePath(basePath, asset.path).split('/')
-  //     if (packageName === 'builder') return false
-  //     return otherAssetName?.toLocaleLowerCase() === name?.toLocaleLowerCase() + '.' + ext
-  //   })
-  // }, [])
-
-  // const isNameRepeated = !isNameUnique(assetName, assetExtension)
-
-  // const handleScreenshot = useCallback(
-  //   (value: string) => {
-  //     setThumbnail(value)
-  //   },
-  //   [files]
-  // )
-
-  const types = useMemo(() => Object.values(ACCEPTED_FILE_TYPES).flat().join('/').replaceAll('.', '').toUpperCase(), [])
-
   return (
-    <div className="ImportAsset">
-      <FileInput disabled={!!files.length} onDrop={handleDrop} accept={ACCEPTED_FILE_TYPES}>
-        {!files.length && (
+    <div className={cx("ImportAsset", { ImportAssetHover: isHover })}>
+      <FileInput disabled={!!files.length} onDrop={handleDrop} onHover={handleHover} ref={inputRef} accept={ACCEPTED_FILE_TYPES}>
+        {!files.length && isHover ? (
           <>
             <div className="upload-icon">
               <HiOutlineUpload />
             </div>
-            <span className="text">Drop {types} files</span>
+            <span className="text">Drop {ACCEPTED_FILE_TYPES_STR} files</span>
           </>
-        )}
-        {/* {file && (
-          <div className="file-container">
-            <Container>
-              <div className="remove-icon" onClick={removeAsset}>
-                <RxCross2 />
-              </div>
-              <AssetPreview value={file} onScreenshot={handleScreenshot} />
-              <div className="file-title">{file.name}</div>
-            </Container>
-            <div className={classNames({ error: isNameRepeated })}>
-              <Block label="Asset name">
-                <TextField autoSelect value={assetName} onChange={handleNameChange} />
-              </Block>
-              <Button disabled={!!validationError} onClick={handleSave}>
-                Import
-              </Button>
-            </div>
-          </div>
-        )}
-        <span className="error">{validationError}</span>
-        {isNameRepeated && (
-          <span className="warning">There's a file with this name already, you will overwrite it if you continue</span>
-        )} */}
+        ) : children}
       </FileInput>
     </div>
   )
-}
+})
 
 export default ImportAsset
