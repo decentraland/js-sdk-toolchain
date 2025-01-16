@@ -1,6 +1,6 @@
 import { GLTFValidation } from '@babylonjs/loaders'
 
-import { FileAsset, GltfAsset, BabylonValidationIssue, ValidationError, Asset, Uri, GltfFile } from './types'
+import { FileAsset, GltfAsset, BabylonValidationIssue, ValidationError, Asset, Uri, GltfFile, isGltfAsset } from './types'
 
 const sampleIndex = (list: any[]) => Math.floor(Math.random() * list.length)
 
@@ -148,7 +148,7 @@ function extractFileInfo(fileName: string): [string, string] {
   return match ? [match[1], match[2]?.toLowerCase() || ""] : [fileName, ""]
 }
 
-function formatFileName(file: FileAsset): string {
+export function formatFileName(file: FileAsset): string {
   return `${file.name}.${file.extension}`
 }
 
@@ -224,4 +224,29 @@ async function processGltfAssets(files: FileAsset[]): Promise<Asset[]> {
 export async function processAssets(files: File[]): Promise<Asset[]> {
   const processedFiles = await Promise.all(files.map(processFile))
   return processGltfAssets(processedFiles)
+}
+
+export function normalizeBytes(bytes: number): string {
+  const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+  let value = bytes;
+  let unitIndex = 0;
+
+  while (value >= 1024 && unitIndex < units.length - 1) {
+    value /= 1024;
+    unitIndex++;
+  }
+
+  const roundedValue = Math.round(value * 100) / 100;
+  return `${roundedValue} ${units[unitIndex]}`;
+}
+
+export function getAssetSize(asset: Asset): string {
+  const resources = getAssetResources(asset)
+  const sumSize = resources.reduce((size, resource) => size + resource.size, asset.blob.size)
+  return normalizeBytes(sumSize)
+}
+
+export function getAssetResources(asset: Asset): File[] {
+  if (!isGltfAsset(asset)) return []
+  return [...asset.buffers, ...asset.images].map(($) => $.blob)
 }
