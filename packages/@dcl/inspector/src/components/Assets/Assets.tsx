@@ -18,6 +18,7 @@ import { selectCustomAssets } from '../../redux/app'
 import { RenameAsset } from '../RenameAsset'
 import { CreateCustomAsset } from '../CreateCustomAsset'
 import { InputRef } from '../FileInput/FileInput'
+import { Button } from '../Button'
 
 import './Assets.css'
 
@@ -56,7 +57,7 @@ function Assets({ isAssetsPanelCollapsed }: { isAssetsPanelCollapsed: boolean })
   return (
     <div className="Assets">
       <div className="Assets-buttons">
-        <button onClick={handleImportClick}>TOCAME BRO</button>
+        <Button onClick={handleImportClick}>IMPORT ASSETS</Button>
         <div className="tab" onClick={handleTabClick(AssetsTab.FileSystem)} data-test-id={AssetsTab.FileSystem}>
           <div className={cx({ underlined: tab === AssetsTab.FileSystem })}>
             <FolderOpen />

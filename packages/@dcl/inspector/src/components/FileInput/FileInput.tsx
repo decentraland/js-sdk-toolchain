@@ -16,7 +16,7 @@ export interface InputRef {
 }
 
 export const FileInput = React.forwardRef<InputRef, React.PropsWithChildren<PropTypes>>((props, parentRef) => {
-  const { onDrop } = props
+  const { disabled, onDrop } = props
   const acceptExtensions = Object.values(props.accept ?? []).flat()
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -27,7 +27,7 @@ export const FileInput = React.forwardRef<InputRef, React.PropsWithChildren<Prop
         if (onDrop) onDrop(item.files)
       },
       canDrop(item: { files: File[] }) {
-        return item.files.every((file) => !!acceptExtensions.find((ext) => file.name.endsWith(ext)))
+        return !disabled && item.files.every((file) => !!acceptExtensions.find((ext) => file.name.endsWith(ext)))
       },
       collect: (monitor) => ({
         isHover: monitor.canDrop() && monitor.isOver()
@@ -60,7 +60,7 @@ export const FileInput = React.forwardRef<InputRef, React.PropsWithChildren<Prop
   return (
     <div ref={drop}>
       <input
-        disabled={props.disabled}
+        disabled={disabled}
         ref={inputRef}
         accept={parseAccept(props.accept)}
         type="file"

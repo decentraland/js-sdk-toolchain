@@ -26,3 +26,8 @@ export type BabylonValidationIssue = {
   message: string
   pointer: string
 }
+
+export const isGltfAsset = (asset: Asset): asset is GltfAsset => {
+  const _asset = asset as any
+  return _asset.buffers && _asset.images
+}
