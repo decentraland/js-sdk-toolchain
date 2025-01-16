@@ -2,7 +2,7 @@ import { Engine, components } from '../../../packages/@dcl/ecs/src'
 import { testComponentSerialization } from './assertion'
 
 describe('Generated LightSource ProtoBuf', () => {
-  it.only('should serialize/deserialize Point LightSource', () => {
+  it('should serialize/deserialize Point LightSource', () => {
     const newEngine = Engine()
     const LightSource = components.LightSource(newEngine)
 
