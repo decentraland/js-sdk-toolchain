@@ -32,20 +32,10 @@ export function addSyncTransport(
     pendingMessageBusMessagesToSend.push({ data: [data], address: address ?? [] })
   })
 
-  function getMessagesToSend(): [Uint8Array[], typeof pendingMessageBusMessagesToSend] {
+  function getMessagesToSend(): typeof pendingMessageBusMessagesToSend {
     const messages = [...pendingMessageBusMessagesToSend]
     pendingMessageBusMessagesToSend.length = 0
-    const broadcastMessages: Uint8Array[] = []
-    const peerMessages: typeof pendingMessageBusMessagesToSend = []
-
-    for (const message of messages) {
-      if (!message.address.length) {
-        broadcastMessages.push(...message.data)
-      } else {
-        peerMessages.push(message)
-      }
-    }
-    return [broadcastMessages, peerMessages]
+    return messages
   }
   const players = definePlayerHelper(engine)
 
@@ -61,9 +51,9 @@ export function addSyncTransport(
           console.log(...Array.from(serializeCrdtMessages('[NetworkMessage sent]:', message, engine)))
         binaryMessageBus.emit(CommsMessage.CRDT, message)
       }
-      const [broadcastMessages, peerMessages] = getMessagesToSend()
+      const peerMessages = getMessagesToSend()
 
-      const response = await sendBinary({ data: broadcastMessages, peerData: peerMessages })
+      const response = await sendBinary({ data: [], peerData: peerMessages })
       binaryMessageBus.__processMessages(response.data)
       transportInitialzed = true
     },
