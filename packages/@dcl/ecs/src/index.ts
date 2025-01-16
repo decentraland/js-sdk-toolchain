@@ -33,7 +33,8 @@ import {
   INetowrkEntity,
   INetowrkParent,
   VirtualCameraComponentDefinitionExtended,
-  InputModifierComponentDefinitionExtended
+  InputModifierComponentDefinitionExtended,
+  LightSourceComponentDefinitionExtended
 } from './components/types'
 import { NameComponent } from './components/manual/Name'
 
@@ -49,6 +50,7 @@ export const Name: NameComponent = components.Name(engine)
 export const Tween: TweenComponentDefinitionExtended = /* @__PURE__*/ components.Tween(engine)
 export const VirtualCamera: VirtualCameraComponentDefinitionExtended = /* @__PURE__*/ components.VirtualCamera(engine)
 export const InputModifier: InputModifierComponentDefinitionExtended = /* @__PURE__*/ components.InputModifier(engine)
+export const LightSource: LightSourceComponentDefinitionExtended = /* @__PURE__*/ components.LightSource(engine)
 
 /**
  * @alpha
