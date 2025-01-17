@@ -268,7 +268,10 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
           eventType === EventType.Down ||
           eventType === EventType.Up ||
           eventType === EventType.HoverEnter ||
-          eventType === EventType.HoverLeave
+          eventType === EventType.HoverLeave ||
+          eventType === EventType.Drag ||
+          eventType === EventType.DragLocked ||
+          eventType === EventType.DragEnd
         ) {
           const command = inputSystem.getInputCommand(opts.button, getPointerEvent(eventType), entity)
           if (command) {
