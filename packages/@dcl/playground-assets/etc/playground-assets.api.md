@@ -3602,17 +3602,14 @@ export interface PointerEventsSystem {
     }, cb: EventSystemCallback): void;
     // @deprecated (undocumented)
     onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
-    // (undocumented)
     onPointerDrag(pointerData: {
         entity: Entity;
         opts?: Partial<EventSystemOptions>;
     }, cb: EventSystemCallback): void;
-    // (undocumented)
     onPointerDragEnd(pointerData: {
         entity: Entity;
         opts?: Partial<EventSystemOptions>;
     }, cb: EventSystemCallback): void;
-    // (undocumented)
     onPointerDragLocked(pointerData: {
         entity: Entity;
         opts?: Partial<EventSystemOptions>;
