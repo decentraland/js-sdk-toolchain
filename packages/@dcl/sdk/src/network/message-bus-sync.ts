@@ -53,7 +53,7 @@ export function addSyncTransport(
       }
       const peerMessages = getMessagesToSend()
 
-      const response = await sendBinary({ data: [], peerData: peerMessages })
+      const response = await sendBinary({ data: peerMessages.map(($) => $.data).flat(), peerData: peerMessages })
       binaryMessageBus.__processMessages(response.data)
       transportInitialzed = true
     },

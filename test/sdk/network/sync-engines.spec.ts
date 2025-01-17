@@ -18,6 +18,7 @@ import { createRendererTransport } from '../../../packages/@dcl/sdk/internal/tra
 import { ReadWriteByteBuffer } from '../../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { readMessage } from '../../../packages/@dcl/ecs/src/serialization/crdt/message'
 import { EntityState, PutNetworkComponentOperation } from '../../../packages/@dcl/ecs/src'
+import { SendBinaryRequest, SendBinaryResponse } from '~system/CommunicationsController'
 
 function defineComponents(engine: IEngine) {
   return {
@@ -73,15 +74,17 @@ describe('Network Parenting', () => {
   const messagesA: Uint8Array[] = []
   const messagesB: Uint8Array[] = []
 
-  const sendBinaryA = async (msg: { data: Uint8Array[] }) => {
-    for (const value of msg.data) {
-      const messageType = value.subarray(0, 1)[0]
-      if (messageType === CommsMessage.CRDT) {
-        const crdtMessage = value.subarray(1)
-        intercept(crdtMessage, 'a->b')
+  const sendBinaryA: (msg: SendBinaryRequest) => Promise<SendBinaryResponse> = async (msg) => {
+    for (const value of msg.peerData) {
+      for (const data of value.data) {
+        messagesB.push(data)
+        const messageType = data.subarray(0, 1)[0]
+        if (messageType === CommsMessage.CRDT) {
+          const crdtMessage = data.subarray(1)
+          intercept(crdtMessage, 'a->b')
+        }
       }
     }
-    messagesB.push(...msg.data)
     const messages = [...messagesA].map(($) => {
       const senderBytes = encodeString('B')
       const serializedMessage = new Uint8Array($.byteLength + senderBytes.byteLength + 1)
@@ -93,16 +96,18 @@ describe('Network Parenting', () => {
     messagesA.length = 0
     return { data: messages }
   }
-  const sendBinaryB = async (msg: { data: Uint8Array[] }) => {
-    for (const value of msg.data) {
-      const messageType = value.subarray(0, 1)[0]
-      if (messageType === CommsMessage.CRDT) {
-        const crdtMessage = value.subarray(1)
-        intercept(crdtMessage, 'b->a')
+  const sendBinaryB: (msg: SendBinaryRequest) => Promise<SendBinaryResponse> = async (msg) => {
+    for (const value of msg.peerData) {
+      for (const data of value.data) {
+        messagesA.push(data)
+        const messageType = data.subarray(0, 1)[0]
+        if (messageType === CommsMessage.CRDT) {
+          const crdtMessage = data.subarray(1)
+          intercept(crdtMessage, 'b->a')
+        }
       }
     }
 
-    messagesA.push(...msg.data)
     const messages = [...messagesB].map(($) => {
       const senderBytes = encodeString('A')
       const serializedMessage = new Uint8Array($.byteLength + senderBytes.byteLength + 1)
