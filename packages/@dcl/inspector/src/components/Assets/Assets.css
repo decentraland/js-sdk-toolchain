@@ -74,7 +74,7 @@
 
 .Assets .Assets-content {
   background: var(--tree-bg-color) !important;
-  height: calc(100% - 36px);
+  height: 100%;
 }
 
 .Assets .Assets-content.Hide {
