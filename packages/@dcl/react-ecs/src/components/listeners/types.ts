@@ -32,7 +32,7 @@ const listeners: Listeners = {
   onMouseLeave: undefined,
   onMouseDrag: undefined,
   onMouseDragLocked: undefined,
-  onMouseDragEnd: undefined,
+  onMouseDragEnd: undefined
 }
 const listenersKey = Object.keys(listeners)
 

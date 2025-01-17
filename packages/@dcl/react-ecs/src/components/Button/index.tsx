@@ -35,7 +35,18 @@ function getButtonProps(props: UiButtonProps) {
  */
 /* @__PURE__ */
 export function Button(props: UiButtonProps) {
-  const { uiTransform, uiBackground, onMouseDown, onMouseUp, onMouseEnter, onMouseLeave, onMouseDrag, onMouseDragLocked, onMouseDragEnd, ...otherProps } = props
+  const {
+    uiTransform,
+    uiBackground,
+    onMouseDown,
+    onMouseUp,
+    onMouseEnter,
+    onMouseLeave,
+    onMouseDrag,
+    onMouseDragLocked,
+    onMouseDragEnd,
+    ...otherProps
+  } = props
   const buttonProps = getButtonProps(props)
   const uiBackgroundProps = parseUiBackground({
     ...buttonProps.uiBackground,

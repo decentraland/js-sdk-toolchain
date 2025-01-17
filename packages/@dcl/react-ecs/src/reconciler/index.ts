@@ -97,7 +97,18 @@ export function createReconciler(
 
   function upsertListener(
     instance: Instance,
-    update: Changes<keyof Pick<Listeners, 'onMouseDown' | 'onMouseUp' | 'onMouseEnter' | 'onMouseLeave' | 'onMouseDrag' | 'onMouseDragLocked' | 'onMouseDragEnd'>>
+    update: Changes<
+      keyof Pick<
+        Listeners,
+        | 'onMouseDown'
+        | 'onMouseUp'
+        | 'onMouseEnter'
+        | 'onMouseLeave'
+        | 'onMouseDrag'
+        | 'onMouseDragLocked'
+        | 'onMouseDragEnd'
+      >
+    >
   ) {
     if (update.type === 'delete' || !update.props) {
       clickEvents.get(instance.entity)?.delete(getPointerEnum(update.component))
@@ -135,11 +146,11 @@ export function createReconciler(
           ? pointerEvents.onPointerUp
           : update.component === 'onMouseEnter'
           ? pointerEvents.onPointerHoverEnter
-          : update.component === 'onMouseLeave' 
+          : update.component === 'onMouseLeave'
           ? pointerEvents.onPointerHoverLeave
-          : update.component === 'onMouseDrag' 
+          : update.component === 'onMouseDrag'
           ? pointerEvents.onPointerDrag
-          : update.component === 'onMouseDragLocked' 
+          : update.component === 'onMouseDragLocked'
           ? pointerEvents.onPointerDragLocked
           : update.component === 'onMouseDragEnd' && pointerEvents.onPointerDragEnd
 

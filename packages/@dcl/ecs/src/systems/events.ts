@@ -73,14 +73,12 @@ export interface PointerEventsSystem {
    */
   removeOnPointerDrag(entity: Entity): void
 
-
   /**
    * @public
    * Remove the callback for onPointerDragLocked event
    * @param entity - Entity where the callback was attached
    */
   removeOnPointerDragLocked(entity: Entity): void
-
 
   /**
    * @public
@@ -154,14 +152,11 @@ export interface PointerEventsSystem {
    * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
    * @param cb - Function to execute when click fires
    */
-  onPointerDrag(
-    pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> },
-    cb: EventSystemCallback
-  ): void
+  onPointerDrag(pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
 
   /**
    * @public
-   * Execute callback when the user clicks and drags the pointer from inside the entity, 
+   * Execute callback when the user clicks and drags the pointer from inside the entity,
    * locking the cursor in place
    * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
    * @param cb - Function to execute when click fires
@@ -177,10 +172,7 @@ export interface PointerEventsSystem {
    * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
    * @param cb - Function to execute when click fires
    */
-  onPointerDragEnd(
-    pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> },
-    cb: EventSystemCallback
-  ): void
+  onPointerDragEnd(pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
 }
 
 /**
@@ -198,7 +190,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     HoverLeave,
     Drag,
     DragLocked,
-    DragEnd,
+    DragEnd
   }
   type EventMapType = Map<EventType, { cb: EventSystemCallback; opts: EventSystemOptions }>
 
