@@ -67,6 +67,29 @@ export interface PointerEventsSystem {
   removeOnPointerHoverLeave(entity: Entity): void
 
   /**
+   * @public
+   * Remove the callback for onPointerDrag event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnPointerDrag(entity: Entity): void
+
+
+  /**
+   * @public
+   * Remove the callback for onPointerDragLocked event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnPointerDragLocked(entity: Entity): void
+
+
+  /**
+   * @public
+   * Remove the callback for onPointerDragEnd event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnPointerDragEnd(entity: Entity): void
+
+  /**
    * @internal
    * Execute callback when the user clicks the entity.
    * @param entity - Entity to attach the callback - Opts to trigger Feedback and Button
@@ -124,6 +147,40 @@ export interface PointerEventsSystem {
     pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> },
     cb: EventSystemCallback
   ): void
+
+  /**
+   * @public
+   * Execute callback when the user clicks and drags the pointer from inside the entity
+   * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
+   * @param cb - Function to execute when click fires
+   */
+  onPointerDrag(
+    pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> },
+    cb: EventSystemCallback
+  ): void
+
+  /**
+   * @public
+   * Execute callback when the user clicks and drags the pointer from inside the entity, 
+   * locking the cursor in place
+   * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
+   * @param cb - Function to execute when click fires
+   */
+  onPointerDragLocked(
+    pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> },
+    cb: EventSystemCallback
+  ): void
+
+  /**
+   * @public
+   * Execute callback when the user releases the button after a drag
+   * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
+   * @param cb - Function to execute when click fires
+   */
+  onPointerDragEnd(
+    pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> },
+    cb: EventSystemCallback
+  ): void
 }
 
 /**
@@ -138,7 +195,10 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     Down,
     Up,
     HoverEnter,
-    HoverLeave
+    HoverLeave,
+    Drag,
+    DragLocked,
+    DragEnd,
   }
   type EventMapType = Map<EventType, { cb: EventSystemCallback; opts: EventSystemOptions }>
 
@@ -177,6 +237,12 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
       return PointerEventType.PET_HOVER_LEAVE
     } else if (eventType === EventType.HoverEnter) {
       return PointerEventType.PET_HOVER_ENTER
+    } else if (eventType === EventType.Drag) {
+      return PointerEventType.PET_DRAG
+    } else if (eventType === EventType.DragLocked) {
+      return PointerEventType.PET_DRAG_LOCKED
+    } else if (eventType === EventType.DragEnd) {
+      return PointerEventType.PET_DRAG_END
     }
     return PointerEventType.PET_DOWN
   }
@@ -263,6 +329,33 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     setPointerEvent(entity, PointerEventType.PET_HOVER_LEAVE, options)
   }
 
+  const onPointerDrag: PointerEventsSystem['onPointerDrag'] = (...args) => {
+    const [data, cb] = args
+    const { entity, opts } = data
+    const options = getDefaultOpts(opts)
+    removeEvent(entity, EventType.Drag)
+    getEvent(entity).set(EventType.Drag, { cb, opts: options })
+    setPointerEvent(entity, PointerEventType.PET_DRAG, options)
+  }
+
+  const onPointerDragLocked: PointerEventsSystem['onPointerDragLocked'] = (...args) => {
+    const [data, cb] = args
+    const { entity, opts } = data
+    const options = getDefaultOpts(opts)
+    removeEvent(entity, EventType.DragLocked)
+    getEvent(entity).set(EventType.DragLocked, { cb, opts: options })
+    setPointerEvent(entity, PointerEventType.PET_DRAG_LOCKED, options)
+  }
+
+  const onPointerDragEnd: PointerEventsSystem['onPointerDragEnd'] = (...args) => {
+    const [data, cb] = args
+    const { entity, opts } = data
+    const options = getDefaultOpts(opts)
+    removeEvent(entity, EventType.DragEnd)
+    getEvent(entity).set(EventType.DragEnd, { cb, opts: options })
+    setPointerEvent(entity, PointerEventType.PET_DRAG_END, options)
+  }
+
   return {
     removeOnClick(entity: Entity) {
       removeEvent(entity, EventType.Click)
@@ -284,6 +377,18 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
       removeEvent(entity, EventType.HoverLeave)
     },
 
+    removeOnPointerDrag(entity: Entity) {
+      removeEvent(entity, EventType.Drag)
+    },
+
+    removeOnPointerDragLocked(entity: Entity) {
+      removeEvent(entity, EventType.DragLocked)
+    },
+
+    removeOnPointerDragEnd(entity: Entity) {
+      removeEvent(entity, EventType.DragEnd)
+    },
+
     onClick(value, cb) {
       const { entity } = value
       const options = getDefaultOpts(value.opts)
@@ -298,6 +403,9 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     onPointerDown,
     onPointerUp,
     onPointerHoverEnter,
-    onPointerHoverLeave
+    onPointerHoverLeave,
+    onPointerDrag,
+    onPointerDragLocked,
+    onPointerDragEnd
   }
 }
