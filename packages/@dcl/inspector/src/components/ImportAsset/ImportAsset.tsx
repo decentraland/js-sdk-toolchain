@@ -14,11 +14,11 @@ import FileInput from '../FileInput'
 import { Container } from '../Container'
 import { TextField } from '../ui/TextField'
 import { Block } from '../Block'
-import { Button } from '../Button'
 import { AssetPreview } from '../AssetPreview'
 import { Modal } from '../Modal'
 import { Input } from '../Input'
 import { InputRef } from '../FileInput/FileInput'
+import { Slider } from './Slider'
 
 import { formatFileName, processAssets, getAssetSize, getAssetResources } from './utils'
 import { Asset } from './types'
@@ -86,6 +86,8 @@ const ImportAsset = React.forwardRef<InputRef, React.PropsWithChildren<PropTypes
     setScreenshots(new Map(map))
   }, [])
 
+  const manyFiles = files.length > 1
+
   return (
     <div className={cx("ImportAsset", { ImportAssetHover: isHover })}>
       <FileInput disabled={!!files.length} onDrop={handleDrop} onHover={handleHover} ref={inputRef} accept={ACCEPTED_FILE_TYPES}>
@@ -116,26 +118,7 @@ const ImportAsset = React.forwardRef<InputRef, React.PropsWithChildren<PropTypes
           overlayClassName="ImportAssetModalOverlay"
         >
           <h2>Import Assets</h2>
-          <div className="slider">
-            {files.length > 1 && <span className="counter">{files.length}</span>}
-            <div className="content">
-              {files.length > 1 && <span className="left"></span>}
-              <div className="slides">
-                {files.map(($, i) => {
-                  const name = formatFileName($)
-                  return (
-                    <div className="asset" key={i}>
-                      <img className="thumbnail" src={screenshots.get(name)} />
-                      <Input value={name} />
-                      <span className="size">{getAssetSize($)}</span>
-                    </div>
-                  )
-                })}
-              </div>
-              {files.length > 1 && <span className="right"></span>}
-            </div>
-          </div>
-          <Button type="danger" size="big">IMPORT ALL</Button>
+          <Slider assets={files} screenshots={screenshots} />
         </Modal>
       </FileInput>
     </div>
