@@ -30,7 +30,10 @@ function getPointerEnum(pointerKey: keyof Listeners): PointerEventType {
     onMouseDown: PointerEventType.PET_DOWN,
     onMouseUp: PointerEventType.PET_UP,
     onMouseEnter: PointerEventType.PET_HOVER_ENTER,
-    onMouseLeave: PointerEventType.PET_HOVER_LEAVE
+    onMouseLeave: PointerEventType.PET_HOVER_LEAVE,
+    onMouseDrag: PointerEventType.PET_DRAG,
+    onMouseDragLocked: PointerEventType.PET_DRAG_LOCKED,
+    onMouseDragEnd: PointerEventType.PET_DRAG_END
   }
   return pointers[pointerKey]
 }
@@ -94,7 +97,18 @@ export function createReconciler(
 
   function upsertListener(
     instance: Instance,
-    update: Changes<keyof Pick<Listeners, 'onMouseDown' | 'onMouseUp' | 'onMouseEnter' | 'onMouseLeave'>>
+    update: Changes<
+      keyof Pick<
+        Listeners,
+        | 'onMouseDown'
+        | 'onMouseUp'
+        | 'onMouseEnter'
+        | 'onMouseLeave'
+        | 'onMouseDrag'
+        | 'onMouseDragLocked'
+        | 'onMouseDragEnd'
+      >
+    >
   ) {
     if (update.type === 'delete' || !update.props) {
       clickEvents.get(instance.entity)?.delete(getPointerEnum(update.component))
@@ -106,6 +120,12 @@ export function createReconciler(
         pointerEvents.removeOnPointerHoverEnter(instance.entity)
       } else if (update.component === 'onMouseLeave') {
         pointerEvents.removeOnPointerHoverLeave(instance.entity)
+      } else if (update.component === 'onMouseDrag') {
+        pointerEvents.removeOnPointerDrag(instance.entity)
+      } else if (update.component === 'onMouseDragLocked') {
+        pointerEvents.removeOnPointerDragLocked(instance.entity)
+      } else if (update.component === 'onMouseDragEnd') {
+        pointerEvents.removeOnPointerDragEnd(instance.entity)
       }
       return
     }
@@ -126,7 +146,13 @@ export function createReconciler(
           ? pointerEvents.onPointerUp
           : update.component === 'onMouseEnter'
           ? pointerEvents.onPointerHoverEnter
-          : update.component === 'onMouseLeave' && pointerEvents.onPointerHoverLeave
+          : update.component === 'onMouseLeave'
+          ? pointerEvents.onPointerHoverLeave
+          : update.component === 'onMouseDrag'
+          ? pointerEvents.onPointerDrag
+          : update.component === 'onMouseDragLocked'
+          ? pointerEvents.onPointerDragLocked
+          : update.component === 'onMouseDragEnd' && pointerEvents.onPointerDragEnd
 
       if (pointerEventSystem) {
         pointerEventSystem(
