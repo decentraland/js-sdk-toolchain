@@ -14,11 +14,14 @@ const WIDTH = 300
 const HEIGHT = 300
 
 export function AssetPreview({ value, resources, onScreenshot, onLoad }: Props) {
+  const name = value.name
+  const isImage = name.endsWith('.jpg') || name.endsWith('.jpeg') || name.endsWith('.png')
+
   return (
     <div className="AssetPreview">
-      {isGltf(value.name) ? (
+      {isGltf(name) ? (
         <GltfPreview value={value} resources={resources} onScreenshot={onScreenshot} onLoad={onLoad} />
-      ) : value.name.endsWith('png') ? (
+      ) : isImage ? (
         <PngPreview value={value} onScreenshot={onScreenshot} onLoad={onLoad} />
       ) : (
         <IoIosImage />

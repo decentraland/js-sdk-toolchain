@@ -14,13 +14,13 @@ import FileInput from '../FileInput'
 import { Container } from '../Container'
 import { TextField } from '../ui/TextField'
 import { Block } from '../Block'
-import { Button } from '../Button'
 import { AssetPreview } from '../AssetPreview'
 import { Modal } from '../Modal'
 import { Input } from '../Input'
 import { InputRef } from '../FileInput/FileInput'
+import { Slider } from './Slider'
 
-import { formatFileName, processAssets, getAssetSize, getAssetResources } from './utils'
+import { formatFileName, processAssets } from './utils'
 import { Asset } from './types'
 
 import './ImportAsset.css'
@@ -28,6 +28,7 @@ import './ImportAsset.css'
 const ACCEPTED_FILE_TYPES = {
   'model/gltf-binary': ['.gltf', '.glb', '.bin'],
   'image/png': ['.png'],
+  'image/jpeg': ['.jpg', '.jpeg'],
   'audio/mpeg': ['.mp3'],
   'audio/wav': ['.wav'],
   'audio/ogg': ['.ogg'],
@@ -50,7 +51,7 @@ const ImportAsset = React.forwardRef<InputRef, React.PropsWithChildren<PropTypes
   const uploadFile = useAppSelector(selectUploadFile)
 
   const [files, setFiles] = useState<Asset[]>([])
-  const [screenshots, setScreenshots] = useState<Map<string, string>>(new Map())
+
   const [isHover, setIsHover] = useState(false)
   const { basePath, assets } = catalog ?? { basePath: '', assets: [] }
 
@@ -78,12 +79,10 @@ const ImportAsset = React.forwardRef<InputRef, React.PropsWithChildren<PropTypes
 
   const handleCloseModal = useCallback(() => {
     setFiles([])
-    setScreenshots(new Map())
   }, [])
 
-  const handleScreenshot = useCallback((file: Asset) => (thumbnail: string) => {
-    const map = screenshots.set(formatFileName(file), thumbnail)
-    setScreenshots(new Map(map))
+  const handleImport = useCallback(() => {
+
   }, [])
 
   return (
@@ -96,19 +95,7 @@ const ImportAsset = React.forwardRef<InputRef, React.PropsWithChildren<PropTypes
             </div>
             <span className="text">Drop {ACCEPTED_FILE_TYPES_STR} files</span>
           </>
-        ) : (
-          <>
-            {files.map(($, i) => {
-              const resources = getAssetResources($)
-              return (
-                <div key={i} style={{ display: 'none' }}>
-                  <AssetPreview value={$.blob} resources={resources} onScreenshot={handleScreenshot($)} />
-                </div>
-              )
-            })}
-            {children}
-          </>
-        )}
+        ) : children}
         <Modal
           isOpen={!!files.length}
           onRequestClose={handleCloseModal}
@@ -116,26 +103,7 @@ const ImportAsset = React.forwardRef<InputRef, React.PropsWithChildren<PropTypes
           overlayClassName="ImportAssetModalOverlay"
         >
           <h2>Import Assets</h2>
-          <div className="slider">
-            {files.length > 1 && <span className="counter">{files.length}</span>}
-            <div className="content">
-              {files.length > 1 && <span className="left"></span>}
-              <div className="slides">
-                {files.map(($, i) => {
-                  const name = formatFileName($)
-                  return (
-                    <div className="asset" key={i}>
-                      <img className="thumbnail" src={screenshots.get(name)} />
-                      <Input value={name} />
-                      <span className="size">{getAssetSize($)}</span>
-                    </div>
-                  )
-                })}
-              </div>
-              {files.length > 1 && <span className="right"></span>}
-            </div>
-          </div>
-          <Button type="danger" size="big">IMPORT ALL</Button>
+          <Slider assets={files} onSubmit={handleImport} />
         </Modal>
       </FileInput>
     </div>
