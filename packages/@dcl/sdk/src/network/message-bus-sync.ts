@@ -66,7 +66,7 @@ export function addSyncTransport(
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, (value) => {
     const { sender, data } = decodeCRDTState(value)
     if (sender !== myProfile.userId) return
-    DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength)
+    DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength / 1024, 'KB')
     transport.onmessage!(data)
     stateIsSyncronized = true
   })
