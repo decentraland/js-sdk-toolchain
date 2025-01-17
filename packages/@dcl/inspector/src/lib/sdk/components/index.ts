@@ -53,7 +53,8 @@ export enum EditorComponentNames {
   Lock = 'inspector::Lock',
   Config = 'inspector::Config',
   Ground = 'inspector::Ground',
-  Tile = 'inspector::Tile'
+  Tile = 'inspector::Tile',
+  CustomAsset = 'inspector::CustomAsset'
 }
 
 export enum SceneAgeRating {
@@ -118,6 +119,10 @@ export type GroundComponent = {}
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type TileComponent = {}
 
+export type CustomAssetComponent = {
+  assetId: string
+}
+
 export enum SceneCategory {
   ART = 'art',
   GAME = 'game',
@@ -148,6 +153,7 @@ export type EditorComponentsTypes = {
   Config: ConfigComponent
   Ground: GroundComponent
   Tile: TileComponent
+  CustomAsset: CustomAssetComponent
 }
 
 export type EditorComponents = {
@@ -166,6 +172,7 @@ export type EditorComponents = {
   Config: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Config']>
   Ground: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Ground']>
   Tile: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Tile']>
+  CustomAsset: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['CustomAsset']>
 }
 
 export type SdkComponents = {
@@ -344,6 +351,9 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
 
   const Ground = engine.defineComponent(EditorComponentNames.Ground, {})
   const Tile = engine.defineComponent(EditorComponentNames.Tile, {})
+  const CustomAsset = engine.defineComponent(EditorComponentNames.CustomAsset, {
+    assetId: Schemas.String
+  })
 
   return {
     Selection,
@@ -362,6 +372,9 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     States: States as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['States']>,
     CounterBar: CounterBar as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['CounterBar']>,
     Ground: Ground as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Ground']>,
-    Tile: Tile as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Tile']>
+    Tile: Tile as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Tile']>,
+    CustomAsset: CustomAsset as unknown as LastWriteWinElementSetComponentDefinition<
+      EditorComponentsTypes['CustomAsset']
+    >
   }
 }

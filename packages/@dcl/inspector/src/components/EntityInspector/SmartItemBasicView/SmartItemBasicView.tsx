@@ -21,20 +21,20 @@ const SmartItemBasicView = withSdk<Props>(({ sdk, entity }) => {
     (field: ConfigComponent['fields'][0], idx: number) => {
       switch (field.type) {
         case 'core::PointerEvents':
-          return <PointerEventView entity={entity} key={idx} />
+          return <PointerEventView entity={entity} key={`${idx}-${entity}`} />
         case 'asset-packs::Actions':
-          return <ActionView entity={entity} field={field} key={idx} />
+          return <ActionView entity={entity} field={field} key={`${idx}-${entity}`} />
         case 'asset-packs::Triggers':
-          return <TriggerView entity={entity} field={field} key={idx} />
+          return <TriggerView entity={entity} field={field} key={`${idx}-${entity}`} />
         case 'core::Tween':
-          return <TweenView entity={entity} key={idx} />
+          return <TweenView entity={entity} key={`${idx}-${entity}`} />
         case 'core::VideoPlayer':
-          return <VideoView entity={entity} key={idx} />
+          return <VideoView entity={entity} key={`${idx}-${entity}`} />
         case 'core::NftShape':
-          return <NftView entity={entity} key={idx} />
+          return <NftView entity={entity} key={`${idx}-${entity}`} />
         case 'asset-packs::Counter':
         case 'asset-packs::CounterBar':
-          return <CounterBarView entity={entity} field={field} key={idx} />
+          return <CounterBarView entity={entity} field={field} key={`${idx}-${entity}`} />
         default:
           return null
       }
