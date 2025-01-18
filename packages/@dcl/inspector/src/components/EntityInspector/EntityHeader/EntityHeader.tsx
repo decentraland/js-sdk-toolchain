@@ -26,6 +26,10 @@ import MoreOptionsMenu from '../MoreOptionsMenu'
 import { RemoveButton } from '../RemoveButton'
 
 import './EntityHeader.css'
+import { useAppSelector } from '../../../redux/hooks'
+import { selectCustomAssets } from '../../../redux/app'
+import CustomAssetIcon from '../../Icons/CustomAsset'
+import { Container } from '../../Container'
 
 interface ModalState {
   isOpen: boolean
@@ -60,10 +64,18 @@ export default React.memo(
     const [label, setLabel] = useState<string | null>()
     const [modal, setModal] = useState<ModalState>({ isOpen: false })
     const [editMode, setEditMode] = useState(false)
+    const [instanceOf, setInstanceOf] = useState<string | null>(null)
+    const customAssets = useAppSelector(selectCustomAssets)
 
     useEffect(() => {
       setLabel(getLabel(sdk, entity))
     }, [sdk, entity])
+
+    useEffect(() => {
+      const customAssetId = sdk.components.CustomAsset.getOrNull(entity)?.assetId || null
+      const customAsset = customAssets.find((asset) => asset.id === customAssetId)
+      setInstanceOf(customAsset?.name || null)
+    }, [customAssets, sdk, entity])
 
     const handleUpdate = (event: SdkContextEvents['change']) => {
       if (event.entity === entity && event.component === sdk.components.Name) {
@@ -419,29 +431,41 @@ export default React.memo(
 
     return (
       <div className="EntityHeader">
-        <div className="title">
-          {!editMode ? (
-            <>
-              {label}
-              {!editMode && !isRoot(entity) ? <RenameIcon onClick={enterEditMode} /> : null}
-            </>
-          ) : typeof label === 'string' ? (
-            <EditInput value={label} onCancel={quitEditMode} onSubmit={handleRenameEntity} />
-          ) : null}
+        <div className="TitleWrapper">
+          <div className="Title">
+            {instanceOf && <CustomAssetIcon />}
+            {!editMode ? (
+              <>
+                {label}
+                {!editMode && !isRoot(entity) ? <RenameIcon onClick={enterEditMode} /> : null}
+              </>
+            ) : typeof label === 'string' ? (
+              <EditInput value={label} onCancel={quitEditMode} onSubmit={handleRenameEntity} />
+            ) : null}
+          </div>
+          <div className="RightContent">
+            {componentOptions.some((option) => !option.header) ? (
+              <Dropdown className="AddComponent" options={componentOptions} trigger={<AddIcon />} />
+            ) : null}
+            {!isRoot(entity) ? (
+              <MoreOptionsMenu>
+                {hasConfigComponent ? renderToggleAdvanceMode() : <></>}
+                <RemoveButton className="RemoveButton" onClick={handleRemoveEntity}>
+                  Delete Entity
+                </RemoveButton>
+              </MoreOptionsMenu>
+            ) : null}
+          </div>
         </div>
-        <div className="RightContent">
-          {componentOptions.some((option) => !option.header) ? (
-            <Dropdown className="AddComponent" options={componentOptions} trigger={<AddIcon />} />
-          ) : null}
-          {!isRoot(entity) ? (
-            <MoreOptionsMenu>
-              {hasConfigComponent ? renderToggleAdvanceMode() : <></>}
-              <RemoveButton className="RemoveButton" onClick={handleRemoveEntity}>
-                Delete Entity
-              </RemoveButton>
-            </MoreOptionsMenu>
-          ) : null}
-        </div>
+        {instanceOf && (
+          <Container className="InstanceOf">
+            <span>Instance of:</span>
+            <span className="Chip">
+              <CustomAssetIcon />
+              {instanceOf}
+            </span>
+          </Container>
+        )}
         <Modal
           isOpen={!!modal.isOpen}
           onRequestClose={handleCloseModal}
