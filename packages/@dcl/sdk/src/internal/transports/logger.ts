@@ -6,7 +6,6 @@ export function* serializeCrdtMessages(prefix: string, data: Uint8Array, engine:
   const buffer = new ReadWriteByteBuffer(data)
 
   let message: CrdtMessage | null
-  let totalBytes = 0
 
   while ((message = readMessage(buffer))) {
     const ent = message.entityId
@@ -26,10 +25,6 @@ export function* serializeCrdtMessages(prefix: string, data: Uint8Array, engine:
       const data = 'data' in message ? message.data : undefined
       const bytes = data ? `${data.byteLength / 1024}KB` : ''
 
-      if (data?.byteLength) {
-        totalBytes += data.byteLength
-      }
-
       try {
         const c = engine.getComponent(componentId)
         yield `${preface} c=${c.componentName} t=${timestamp} ${bytes} data=${JSON.stringify(
@@ -47,5 +42,4 @@ export function* serializeCrdtMessages(prefix: string, data: Uint8Array, engine:
       yield `${preface} Unknown CrdtMessageType`
     }
   }
-  yield `Total Size: ${totalBytes / 1024} KB`
 }

@@ -45,15 +45,26 @@ export function addSyncTransport(
   // Add Sync Transport
   const transport: Transport = {
     filter: syncFilter(engine),
-    send: async (message: Uint8Array) => {
-      if (message.byteLength && transportInitialzed) {
-        DEBUG_NETWORK_MESSAGES() &&
-          console.log(...Array.from(serializeCrdtMessages('[NetworkMessage sent]:', message, engine)))
-        binaryMessageBus.emit(CommsMessage.CRDT, message)
+    send: async (messages) => {
+      for (const message of [messages].flat()) {
+        if (message.byteLength && transportInitialzed) {
+          DEBUG_NETWORK_MESSAGES() &&
+            console.log(...Array.from(serializeCrdtMessages('[NetworkMessage sent]:', message, engine)))
+          console.log('BOEDO SIZE: ', message.byteLength / 1024, 'KB')
+          binaryMessageBus.emit(CommsMessage.CRDT, message)
+        }
       }
       const peerMessages = getMessagesToSend()
-
-      const response = await sendBinary({ data: peerMessages.map(($) => $.data).flat(), peerData: peerMessages })
+      let totalSize = 0
+      for (const message of peerMessages) {
+        for (const data of message.data) {
+          totalSize += data.byteLength
+        }
+      }
+      if (totalSize) {
+        console.log('Sending network messages: ', totalSize / 1024, 'KB')
+      }
+      const response = await sendBinary({ data: [], peerData: peerMessages })
       binaryMessageBus.__processMessages(response.data)
       transportInitialzed = true
     },

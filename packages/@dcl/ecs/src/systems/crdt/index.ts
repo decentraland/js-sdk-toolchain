@@ -243,6 +243,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
     }
 
     // Send CRDT messages to transports
+    const transportBuffers: Uint8Array[] = []
     const transportBuffer = new ReadWriteByteBuffer()
     for (const index in transports) {
       const transportIndex = Number(index)
@@ -250,10 +251,15 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
       const isRendererTransport = transport.type === 'renderer'
       const isNetworkTransport = transport.type === 'network'
       transportBuffer.resetBuffer()
+      transportBuffers.length = 0
       const buffer = new ReadWriteByteBuffer()
 
       // Then we send all the new crdtMessages that the transport needs to process
       for (const message of crdtMessages) {
+        if (isNetworkTransport && transportBuffer.toBinary().byteLength / 1024 > 13) {
+          transportBuffers.push(transportBuffer.toBinary())
+          transportBuffer.resetBuffer()
+        }
         // Avoid echo messages
         if (message.transportId === transportIndex) continue
 
@@ -310,7 +316,10 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         // Common message
         transportBuffer.writeBuffer(message.messageBuffer, false)
       }
-      const message = transportBuffer.currentWriteOffset() ? transportBuffer.toBinary() : new Uint8Array([])
+      if (transportBuffer.currentWriteOffset()) {
+        transportBuffers.push(transportBuffer.toBinary())
+      }
+      const message = isNetworkTransport ? transportBuffers : transportBuffer.toBinary()
       await transport.send(message)
     }
   }
