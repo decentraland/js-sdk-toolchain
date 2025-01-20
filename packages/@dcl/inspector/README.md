@@ -197,8 +197,8 @@ make test-inspector FILES="--watch packages/@dcl/inspector/src/path/to/some-test
 
 For a deeper understanding of the architecture and design decisions:
 
-- [ADR-282: Decentraland Inspector](https://adr.decentraland.org/adr/ADR-282) - Details the Inspector's architecture, integration approaches, and technical decisions
 - [ADR-281: Items in Decentraland tooling](https://adr.decentraland.org/adr/ADR-281) - Explains the Items abstraction and how it's used in the Inspector
+- [ADR-282: Decentraland Inspector](https://adr.decentraland.org/adr/ADR-282) - Details the Inspector's architecture, integration approaches, and technical decisions
 
 ## License
 
