@@ -20,17 +20,19 @@ npm install @dcl/inspector
 1. Start the CLI server:
 
 ```bash
-npx sdk-commands start --data-layer --port 8001
+npx @dcl/sdk-commands start --data-layer --port 8001
 ```
 
 2. Serve the inspector (choose one method):
 
 ```bash
 # Method 1: Development server
+git clone https://github.com/decentraland/js-sdk-toolchain.git
 cd packages/@dcl/inspector
 npm start
 
 # Method 2: From node_modules
+npm install @dcl/inspector
 npx http-server node_modules/@dcl/inspector/public
 ```
 
@@ -39,6 +41,8 @@ npx http-server node_modules/@dcl/inspector/public
 ```
 http://localhost:3000/?dataLayerRpcWsUrl=ws://127.0.0.1:8001/data-layer
 ```
+
+Where `http://localhost:3000` is the URL of the Inspector and `ws://127.0.0.1:8001/data-layer` is the WebSocket URL of the CLI server.
 
 ## Integration
 
@@ -103,34 +107,43 @@ function InspectorComponent() {
 
 ## Configuration
 
-Configure the Inspector through URL parameters or a global object:
+Configure the Inspector through URL parameters or a global object. All configuration options can be set using either method:
 
 ```typescript
 type InspectorConfig = {
   // Data Layer Configuration
-  dataLayerRpcWsUrl: string | null
-  dataLayerRpcParentUrl: string | null
+  dataLayerRpcWsUrl: string | null // ?dataLayerRpcWsUrl=ws://...
+  dataLayerRpcParentUrl: string | null // ?dataLayerRpcParentUrl=https://...
 
   // Smart Items Configuration
-  binIndexJsUrl: string | null
-  disableSmartItems: boolean
+  binIndexJsUrl: string | null // ?binIndexJsUrl=https://...
+  disableSmartItems: boolean // ?disableSmartItems=true
 
   // Content Configuration
-  contentUrl: string
+  contentUrl: string // ?contentUrl=https://...
 
   // Analytics Configuration
-  segmentKey: string | null
-  segmentAppId: string | null
-  segmentUserId: string | null
-  projectId: string | null
+  segmentKey: string | null // ?segmentKey=...
+  segmentAppId: string | null // ?segmentAppId=...
+  segmentUserId: string | null // ?segmentUserId=...
+  projectId: string | null // ?projectId=...
 }
 
-// Global configuration
+// Method 1: Global configuration
 globalThis.InspectorConfig = {
   dataLayerRpcWsUrl: 'ws://127.0.0.1:8001/data-layer',
   contentUrl: 'https://builder-items.decentraland.org'
 }
+
+// Method 2: URL parameters
+// http://localhost:3000/?dataLayerRpcWsUrl=ws://127.0.0.1:8001/data-layer&contentUrl=https://builder-items.decentraland.org&disableSmartItems=true
 ```
+
+Configuration options are resolved in the following order:
+
+1. URL parameters (highest priority)
+2. Global object
+3. Default values (lowest priority)
 
 ## Testing
 
@@ -179,6 +192,13 @@ make test-inspector FILES="--watch packages/@dcl/inspector/src/path/to/some-test
    - Use in-memory implementation for unit tests
    - Mock RPC calls for integration testing
    - Test both WebSocket and IFrame transport
+
+## Related Architecture Decisions
+
+For a deeper understanding of the architecture and design decisions:
+
+- [ADR-282: Decentraland Inspector](https://adr.decentraland.org/adr/ADR-282) - Details the Inspector's architecture, integration approaches, and technical decisions
+- [ADR-281: Items in Decentraland tooling](https://adr.decentraland.org/adr/ADR-281) - Explains the Items abstraction and how it's used in the Inspector
 
 ## License
 
