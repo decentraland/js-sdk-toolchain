@@ -99,7 +99,8 @@ function InspectorComponent() {
   const params = new URLSearchParams({
     dataLayerRpcParentUrl: window.location.origin
   })
-  const url = `${CONTENT_URL}?${params}`
+  const inspectorUrl = `http://localhost:3000/`
+  const url = `${inspectorUrl}?${params}`
 
   return <iframe onLoad={handleIframeRef} src={url} />
 }
