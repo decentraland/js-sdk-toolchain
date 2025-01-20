@@ -64,7 +64,6 @@ const ImportAsset = React.forwardRef<InputRef, React.PropsWithChildren<PropTypes
 
   const handleDrop = useCallback(async (acceptedFiles: File[]) => {
     const assets = await processAssets(acceptedFiles)
-    console.log('assets: ', assets)
     setFiles(assets)
   }, [])
 
@@ -81,13 +80,13 @@ const ImportAsset = React.forwardRef<InputRef, React.PropsWithChildren<PropTypes
     setFiles([])
   }, [])
 
-  const handleImport = useCallback(() => {
-
+  const handleImport = useCallback((assets: Asset[]) => {
+    console.log('handleImport', assets)
   }, [])
 
   return (
     <div className={cx("ImportAsset", { ImportAssetHover: isHover })}>
-      <FileInput disabled={!!files.length} onDrop={handleDrop} onHover={handleHover} ref={inputRef} accept={ACCEPTED_FILE_TYPES}>
+      <FileInput disabled={!!files.length} onDrop={handleDrop} onHover={handleHover} ref={inputRef} accept={ACCEPTED_FILE_TYPES} multiple>
         {!files.length && isHover ? (
           <>
             <div className="upload-icon">

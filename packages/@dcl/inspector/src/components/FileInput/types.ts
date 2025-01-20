@@ -3,4 +3,5 @@ export interface PropTypes {
   onHover?(isHover: boolean): void
   accept?: Record<string, string[]>
   disabled?: boolean
+  multiple?: boolean
 }

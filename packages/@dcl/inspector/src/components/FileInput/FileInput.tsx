@@ -67,6 +67,7 @@ export const FileInput = React.forwardRef<InputRef, React.PropsWithChildren<Prop
         tabIndex={-1}
         style={{ display: 'none' }}
         onChange={handleFileSelected}
+        multiple={!!props.multiple}
       />
       {props.children}
     </div>

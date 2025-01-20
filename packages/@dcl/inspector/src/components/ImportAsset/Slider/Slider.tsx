@@ -16,14 +16,13 @@ import './Slider.css'
 export function Slider({ assets, onSubmit }: PropTypes) {
   const [slide, setSlide] = useState(0)
   const [screenshots, setScreenshots] = useState<Thumbnails>({})
-  const manyFiles = assets.length > 1
 
-  const handleScreenshot = useCallback((file: Asset) => (thumbnail: string) => {
+  const handleScreenshot = (file: Asset) => (thumbnail: string) => {
     const name = formatFileName(file)
     if (!screenshots[name]) {
-      setScreenshots({ ...screenshots, [name]: thumbnail })
+      setScreenshots((value) => ({ ...value, [name]: thumbnail }))
     }
-  }, [screenshots])
+  }
 
   const handlePrevClick = useCallback(() => {
     setSlide(Math.max(0, slide - 1))
@@ -38,18 +37,21 @@ export function Slider({ assets, onSubmit }: PropTypes) {
       ...$,
       thumbnail: screenshots[formatFileName($)]
     })))
-  }, [assets, screenshots])
+  }, [screenshots])
 
+  const manyAssets = useMemo(() => assets.length > 1, [assets])
   const countText = useMemo(() => `${slide + 1}/${assets.length}`, [slide, assets])
-  const importText = useMemo(() => `IMPORT${manyFiles ? ' ALL' : ''}`, [manyFiles])
+  const importText = useMemo(() => `IMPORT${manyAssets ? ' ALL' : ''}`, [manyAssets])
+  const leftArrowDisabled = useMemo(() => slide <= 0, [slide])
+  const rightArrowDisabled = useMemo(() => slide >= assets.length - 1, [slide, assets])
 
   if (!assets.length) return null
 
   return (
     <div className="Slider">
-      {manyFiles && <span className="counter">{countText}</span>}
+      {manyAssets && <span className="counter">{countText}</span>}
       <div className="content">
-        {manyFiles && <span className={cx("left", { disabled: slide <= 0 })} onClick={handlePrevClick}><IoIosArrowBack /></span>}
+        {manyAssets && <span className={cx("left", { disabled: leftArrowDisabled })} onClick={handlePrevClick}><IoIosArrowBack /></span>}
         <div className="slides">
           {assets.map(($, i) => (
             <div className={cx("asset", { active: slide === i })} key={i}>
@@ -61,9 +63,9 @@ export function Slider({ assets, onSubmit }: PropTypes) {
             </div>
           ))}
         </div>
-        {manyFiles && <span className={cx("right", { disabled: slide >= assets.length - 1 })} onClick={handleNextClick}><IoIosArrowForward /></span>}
+        {manyAssets && <span className={cx("right", { disabled: rightArrowDisabled })} onClick={handleNextClick}><IoIosArrowForward /></span>}
       </div>
-      <Button type="danger" size="big" onSubmit={handleSubmit}>{importText}</Button>
+      <Button type="danger" size="big" onClick={handleSubmit}>{importText}</Button>
     </div>
   )
 }
