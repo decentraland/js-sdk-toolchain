@@ -6,7 +6,7 @@ import { AssetPreview } from '../../AssetPreview'
 import { Button } from '../../Button'
 import { Input } from '../../Input'
 
-import { formatFileName, getAssetSize, getAssetResources } from '../utils'
+import { getAssetSize, getAssetResources } from '../utils'
 
 import { Asset } from '../types'
 import { PropTypes, Thumbnails } from './types'
@@ -18,12 +18,15 @@ export function Slider({ assets, onSubmit }: PropTypes) {
   const [slide, setSlide] = useState(0)
   const [screenshots, setScreenshots] = useState<Thumbnails>({})
 
-  const handleScreenshot = useCallback((file: Asset) => (thumbnail: string) => {
-    const { name } = file.blob
-    if (!screenshots[name]) {
-      setScreenshots(($) => ({ ...$, [name]: thumbnail }))
-    }
-  }, [screenshots])
+  const handleScreenshot = useCallback(
+    (file: Asset) => (thumbnail: string) => {
+      const { name } = file.blob
+      if (!screenshots[name]) {
+        setScreenshots(($) => ({ ...$, [name]: thumbnail }))
+      }
+    },
+    [screenshots]
+  )
 
   const handlePrevClick = useCallback(() => {
     setSlide(Math.max(0, slide - 1))
@@ -33,18 +36,25 @@ export function Slider({ assets, onSubmit }: PropTypes) {
     setSlide(Math.min(value.length - 1, slide + 1))
   }, [slide])
 
-  const handleNameChange = useCallback((fileIdx: number) => (newName: string) => {
-    setValue(value.map(($, i) => {
-      if (fileIdx !== i) return $
-      return { ...$, name: newName }
-    }))
-  }, [value])
+  const handleNameChange = useCallback(
+    (fileIdx: number) => (newName: string) => {
+      setValue(
+        value.map(($, i) => {
+          if (fileIdx !== i) return $
+          return { ...$, name: newName }
+        })
+      )
+    },
+    [value]
+  )
 
   const handleSubmit = useCallback(() => {
-    onSubmit(value.map(($) => ({
-      ...$,
-      thumbnail: screenshots[$.blob.name]
-    })))
+    onSubmit(
+      value.map(($) => ({
+        ...$,
+        thumbnail: screenshots[$.blob.name]
+      }))
+    )
   }, [value, screenshots])
 
   const manyAssets = useMemo(() => value.length > 1, [value])
@@ -59,10 +69,14 @@ export function Slider({ assets, onSubmit }: PropTypes) {
     <div className="Slider">
       {manyAssets && <span className="counter">{countText}</span>}
       <div className="content">
-        {manyAssets && <span className={cx("left", { disabled: leftArrowDisabled })} onClick={handlePrevClick}><IoIosArrowBack /></span>}
+        {manyAssets && (
+          <span className={cx('left', { disabled: leftArrowDisabled })} onClick={handlePrevClick}>
+            <IoIosArrowBack />
+          </span>
+        )}
         <div className="slides">
           {value.map(($, i) => (
-            <div className={cx("asset", { active: slide === i })} key={i}>
+            <div className={cx('asset', { active: slide === i })} key={i}>
               <div>
                 <AssetPreview value={$.blob} resources={getAssetResources($)} onScreenshot={handleScreenshot($)} />
                 <Input value={$.name} onChange={handleNameChange(i)} />
@@ -71,9 +85,15 @@ export function Slider({ assets, onSubmit }: PropTypes) {
             </div>
           ))}
         </div>
-        {manyAssets && <span className={cx("right", { disabled: rightArrowDisabled })} onClick={handleNextClick}><IoIosArrowForward /></span>}
+        {manyAssets && (
+          <span className={cx('right', { disabled: rightArrowDisabled })} onClick={handleNextClick}>
+            <IoIosArrowForward />
+          </span>
+        )}
       </div>
-      <Button type="danger" size="big" onClick={handleSubmit}>{importText}</Button>
+      <Button type="danger" size="big" onClick={handleSubmit}>
+        {importText}
+      </Button>
     </div>
   )
 }

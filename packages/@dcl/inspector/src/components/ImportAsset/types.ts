@@ -1,19 +1,19 @@
 export type BaseAsset = {
-  blob: File;
-  name: string;
-  extension: string;
-  error?: string;
-  thumbnail?: string;
-};
+  blob: File
+  name: string
+  extension: string
+  error?: string
+  thumbnail?: string
+}
 
 export type GltfAsset = BaseAsset & {
-  buffers: BaseAsset[];
-  images: BaseAsset[];
-};
+  buffers: BaseAsset[]
+  images: BaseAsset[]
+}
 
-export type Asset = GltfAsset | BaseAsset;
-export type Uri = { uri: string };
-export type GltfFile = { buffers: Uri[]; images: Uri[] };
+export type Asset = GltfAsset | BaseAsset
+export type Uri = { uri: string }
+export type GltfFile = { buffers: Uri[]; images: Uri[] }
 
 export type ValidationError = string | undefined
 /*

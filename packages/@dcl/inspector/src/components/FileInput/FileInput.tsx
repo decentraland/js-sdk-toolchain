@@ -12,7 +12,7 @@ function parseAccept(accept: PropTypes['accept']) {
 }
 
 export interface InputRef {
-  onClick: () => void;
+  onClick: () => void
 }
 
 export const FileInput = React.forwardRef<InputRef, React.PropsWithChildren<PropTypes>>((props, parentRef) => {
@@ -53,9 +53,13 @@ export const FileInput = React.forwardRef<InputRef, React.PropsWithChildren<Prop
     return () => props.onHover?.(false)
   }, [isHover])
 
-  useImperativeHandle(parentRef, () => ({
-    onClick: handleClick,
-  }), [handleClick]);
+  useImperativeHandle(
+    parentRef,
+    () => ({
+      onClick: handleClick
+    }),
+    [handleClick]
+  )
 
   return (
     <div ref={drop}>

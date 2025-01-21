@@ -33,7 +33,7 @@ function Assets({ isAssetsPanelCollapsed }: { isAssetsPanelCollapsed: boolean })
   const dispatch = useAppDispatch()
   const tab = useAppSelector(getSelectedAssetsTab)
   const customAssets = useAppSelector(selectCustomAssets)
-  const inputRef = useRef<InputRef>(null);
+  const inputRef = useRef<InputRef>(null)
 
   const handleTabClick = useCallback(
     (tab: AssetsTab) => () => {
@@ -57,7 +57,10 @@ function Assets({ isAssetsPanelCollapsed }: { isAssetsPanelCollapsed: boolean })
   return (
     <div className="Assets">
       <div className="Assets-buttons">
-        <Button onClick={handleImportClick}><HiOutlinePlus />IMPORT ASSETS</Button>
+        <Button onClick={handleImportClick}>
+          <HiOutlinePlus />
+          IMPORT ASSETS
+        </Button>
         <div className="tab" onClick={handleTabClick(AssetsTab.FileSystem)} data-test-id={AssetsTab.FileSystem}>
           <div className={cx({ underlined: tab === AssetsTab.FileSystem })}>
             <FolderOpen />

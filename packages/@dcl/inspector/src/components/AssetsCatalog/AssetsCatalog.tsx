@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { AssetPack } from '../../lib/logic/catalog'
 import { analytics, Event } from '../../lib/logic/analytics'
-import { useAppDispatch } from '../../redux/hooks'
 
 import { Header } from './Header'
 import { Themes } from './Themes'

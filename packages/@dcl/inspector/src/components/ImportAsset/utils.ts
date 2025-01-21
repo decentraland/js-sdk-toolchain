@@ -1,6 +1,16 @@
 import { GLTFValidation } from '@babylonjs/loaders'
 
-import { BaseAsset, GltfAsset, BabylonValidationIssue, ValidationError, Asset, Uri, GltfFile, isGltfAsset, AssetType } from './types'
+import {
+  BaseAsset,
+  GltfAsset,
+  BabylonValidationIssue,
+  ValidationError,
+  Asset,
+  Uri,
+  GltfFile,
+  isGltfAsset,
+  AssetType
+} from './types'
 
 const sampleIndex = (list: any[]) => Math.floor(Math.random() * list.length)
 
@@ -104,7 +114,11 @@ export const ACCEPTED_FILE_TYPES = {
 }
 
 const ONE_GB_IN_BYTES = 1024 * 1024 * 1024
-const VALID_EXTENSIONS = new Set(Object.values(ACCEPTED_FILE_TYPES).flat().map(($) => $.replaceAll('.', '')))
+const VALID_EXTENSIONS = new Set(
+  Object.values(ACCEPTED_FILE_TYPES)
+    .flat()
+    .map(($) => $.replaceAll('.', ''))
+)
 const IGNORED_ERROR_CODES = ['ACCESSOR_WEIGHTS_NON_NORMALIZED', 'MESH_PRIMITIVE_TOO_FEW_TEXCOORDS']
 
 async function validateGltf(gltf: GltfAsset): Promise<void> {
@@ -148,12 +162,12 @@ async function validateGltf(gltf: GltfAsset): Promise<void> {
 
 // Utility functions
 function normalizeFileName(fileName: string): string {
-  return fileName.trim().replace(/\s+/g, "_").toLowerCase()
+  return fileName.trim().replace(/\s+/g, '_').toLowerCase()
 }
 
 function extractFileInfo(fileName: string): [string, string] {
   const match = fileName.match(/^(.*?)(?:\.([^.]+))?$/)
-  return match ? [match[1], match[2]?.toLowerCase() || ""] : [fileName, ""]
+  return match ? [match[1], match[2]?.toLowerCase() || ''] : [fileName, '']
 }
 
 export function formatFileName(file: BaseAsset): string {
@@ -165,9 +179,7 @@ function validateFileSize(size: number): ValidationError {
 }
 
 function validateExtension(extension: string): ValidationError {
-  return VALID_EXTENSIONS.has(extension) ?
-    undefined :
-    `Invalid asset format ".${extension}"`
+  return VALID_EXTENSIONS.has(extension) ? undefined : `Invalid asset format ".${extension}"`
 }
 
 async function processFile(file: File): Promise<BaseAsset> {
@@ -208,10 +220,10 @@ function resolveDependencies(uris: Uri[], fileMap: Map<string, BaseAsset>): Base
 }
 
 async function processGltfAssets(files: BaseAsset[]): Promise<Asset[]> {
-  const fileMap = new Map(files.map(file => [formatFileName(file), file]))
+  const fileMap = new Map(files.map((file) => [formatFileName(file), file]))
 
   const gltfPromises = files
-    .filter(file => file.extension === 'gltf')
+    .filter((file) => file.extension === 'gltf')
     .map(async (gltfFile): Promise<GltfAsset> => {
       const gltfContent = JSON.parse(await gltfFile.blob.text()) as GltfFile
       const buffers = resolveDependencies(gltfContent.buffers, fileMap)
@@ -235,17 +247,17 @@ export async function processAssets(files: File[]): Promise<Asset[]> {
 }
 
 export function normalizeBytes(bytes: number): string {
-  const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
-  let value = bytes;
-  let unitIndex = 0;
+  const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+  let value = bytes
+  let unitIndex = 0
 
   while (value >= 1024 && unitIndex < units.length - 1) {
-    value /= 1024;
-    unitIndex++;
+    value /= 1024
+    unitIndex++
   }
 
-  const roundedValue = Math.round(value * 100) / 100;
-  return `${roundedValue} ${units[unitIndex]}`;
+  const roundedValue = Math.round(value * 100) / 100
+  return `${roundedValue} ${units[unitIndex]}`
 }
 
 export function getAssetSize(asset: Asset): string {
@@ -270,38 +282,38 @@ export function assetsAreValid(assets: Asset[]): boolean {
 }
 
 export async function convertAssetToBinary(asset: Asset): Promise<Map<string, Uint8Array>> {
-  const binaryContents: Map<string, Uint8Array> = new Map();
-  const fullName = formatFileName(asset);
-  const binary = await asset.blob.arrayBuffer();
-  binaryContents.set(fullName, new Uint8Array(binary));
+  const binaryContents: Map<string, Uint8Array> = new Map()
+  const fullName = formatFileName(asset)
+  const binary = await asset.blob.arrayBuffer()
+  binaryContents.set(fullName, new Uint8Array(binary))
 
   if (isGltfAsset(asset)) {
-    const resources = getAssetResources(asset);
+    const resources = getAssetResources(asset)
     for (const resource of resources) {
-      const resourceBinary = await resource.arrayBuffer();
-      binaryContents.set(resource.name, new Uint8Array(resourceBinary));
+      const resourceBinary = await resource.arrayBuffer()
+      binaryContents.set(resource.name, new Uint8Array(resourceBinary))
     }
   }
 
-  return binaryContents;
+  return binaryContents
 }
 
 export function determineAssetType(asset: Asset): AssetType {
   switch (asset.extension) {
-      case 'gltf':
-      case 'glb':
-        return 'models'
-      case 'png':
-      case 'jpg':
-      case 'jpeg':
-        return 'images'
-      case 'mp3':
-      case 'wav':
-      case 'ogg':
-        return 'audio'
-      case 'mp4':
-        return 'video'
-      default:
-        return 'other'
-    }
+    case 'gltf':
+    case 'glb':
+      return 'models'
+    case 'png':
+    case 'jpg':
+    case 'jpeg':
+      return 'images'
+    case 'mp3':
+    case 'wav':
+    case 'ogg':
+      return 'audio'
+    case 'mp4':
+      return 'video'
+    default:
+      return 'other'
+  }
 }

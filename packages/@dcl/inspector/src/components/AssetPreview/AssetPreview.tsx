@@ -1,9 +1,9 @@
 import { useCallback, useMemo } from 'react'
 import { PreviewCamera, PreviewProjection } from '@dcl/schemas'
 import { WearablePreview } from 'decentraland-ui'
-import { AiFillSound } from "react-icons/ai";
-import { IoVideocamOutline } from "react-icons/io5";
-import { FaFile } from "react-icons/fa";
+import { AiFillSound } from 'react-icons/ai'
+import { IoVideocamOutline } from 'react-icons/io5'
+import { FaFile } from 'react-icons/fa'
 
 import { toWearableWithBlobs } from './utils'
 import { Props } from './types'
@@ -20,19 +20,19 @@ export function AssetPreview({ value, resources, onScreenshot, onLoad }: Props) 
     switch (ext) {
       case 'gltf':
       case 'glb':
-        return <GltfPreview value={value} resources={resources} onScreenshot={onScreenshot} onLoad={onLoad} />;
+        return <GltfPreview value={value} resources={resources} onScreenshot={onScreenshot} onLoad={onLoad} />
       case 'png':
       case 'jpg':
       case 'jpeg':
-        return <PngPreview value={value} onScreenshot={onScreenshot} onLoad={onLoad} />;
+        return <PngPreview value={value} onScreenshot={onScreenshot} onLoad={onLoad} />
       case 'mp3':
       case 'wav':
       case 'ogg':
-        return <AiFillSound />;
+        return <AiFillSound />
       case 'mp4':
-        return <IoVideocamOutline />;
+        return <IoVideocamOutline />
       default:
-        return <FaFile />;
+        return <FaFile />
     }
   }, [])
 

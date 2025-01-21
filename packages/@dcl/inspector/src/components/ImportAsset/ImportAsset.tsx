@@ -2,7 +2,7 @@ import React, { PropsWithChildren, useCallback, useEffect, useState } from 'reac
 import cx from 'classnames'
 import { HiOutlineUpload } from 'react-icons/hi'
 
-import { removeBasePath } from '../../lib/logic/remove-base-path'
+// import { removeBasePath } from '../../lib/logic/remove-base-path'
 import { DIRECTORY, transformBase64ResourceToBinary, withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { importAsset, saveThumbnail } from '../../redux/data-layer'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
@@ -13,16 +13,19 @@ import { Modal } from '../Modal'
 import { InputRef } from '../FileInput/FileInput'
 import { Slider } from './Slider'
 
-import { processAssets, assetsAreValid, ACCEPTED_FILE_TYPES, formatFileName, convertAssetToBinary, determineAssetType } from './utils'
+import {
+  processAssets,
+  assetsAreValid,
+  ACCEPTED_FILE_TYPES,
+  formatFileName,
+  convertAssetToBinary,
+  determineAssetType
+} from './utils'
 import { Asset, isGltfAsset } from './types'
 
 import './ImportAsset.css'
 
-const ACCEPTED_FILE_TYPES_STR = Object
-  .values(ACCEPTED_FILE_TYPES)
-  .flat().join('/')
-  .replaceAll('.', '')
-  .toUpperCase()
+const ACCEPTED_FILE_TYPES_STR = Object.values(ACCEPTED_FILE_TYPES).flat().join('/').replaceAll('.', '').toUpperCase()
 
 interface PropTypes {
   onSave(): void
@@ -30,18 +33,18 @@ interface PropTypes {
 
 const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ onSave, children }, inputRef) => {
   const dispatch = useAppDispatch()
-  const catalog = useAppSelector(selectAssetCatalog)
+  // const catalog = useAppSelector(selectAssetCatalog)
   const uploadFile = useAppSelector(selectUploadFile)
 
   const [files, setFiles] = useState<Asset[]>([])
 
   const [isHover, setIsHover] = useState(false)
-  const { basePath, assets } = catalog ?? { basePath: '', assets: [] }
+  // const { basePath, assets } = catalog ?? { basePath: '', assets: [] }
 
   useEffect(() => {
     const isValidFile = uploadFile && 'name' in uploadFile
     if (isValidFile && !files.find(($) => $.name === uploadFile.name)) {
-      handleDrop([Object.values(uploadFile!)[0] as File])
+      void handleDrop([Object.values(uploadFile!)[0] as File])
     }
   }, [uploadFile])
 
@@ -58,46 +61,49 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
     setFiles([])
   }, [])
 
-  const handleImport = useCallback(async (assets: Asset[]) => {
-    if (!assetsAreValid(assets)) return
+  const handleImport = useCallback(
+    async (assets: Asset[]) => {
+      if (!assetsAreValid(assets)) return
 
-    const basePath = withAssetDir(DIRECTORY.SCENE)
-    // TODO: we are dispatching importAsset + saveThumbnail for every asset, refreshing the app state and UI multiple
-    // times. This can be improved by doing all the process once...
-    for (const asset of assets) {
-      const content = await convertAssetToBinary(asset)
-      const classification = determineAssetType(asset)
-      const assetPackageName = isGltfAsset(asset) ? `${classification}/${asset.name}` : classification
+      const basePath = withAssetDir(DIRECTORY.SCENE)
+      // TODO: we are dispatching importAsset + saveThumbnail for every asset, refreshing the app state and UI multiple
+      // times. This can be improved by doing all the process once...
+      for (const asset of assets) {
+        const content = await convertAssetToBinary(asset)
+        const classification = determineAssetType(asset)
+        const assetPackageName = isGltfAsset(asset) ? `${classification}/${asset.name}` : classification
 
-      dispatch(
-        importAsset({
-          content,
-          basePath,
-          assetPackageName,
-          reload: true
-        })
-      )
-
-      if (asset.thumbnail) {
         dispatch(
-          saveThumbnail({
-            content: transformBase64ResourceToBinary(asset.thumbnail),
-            path: `${DIRECTORY.THUMBNAILS}/${asset.name}.png`
+          importAsset({
+            content,
+            basePath,
+            assetPackageName,
+            reload: true
           })
         )
+
+        if (asset.thumbnail) {
+          dispatch(
+            saveThumbnail({
+              content: transformBase64ResourceToBinary(asset.thumbnail),
+              path: `${DIRECTORY.THUMBNAILS}/${asset.name}.png`
+            })
+          )
+        }
+
+        // Clear uploaded file from the FileUploadField
+        const newUploadFile = { ...uploadFile }
+        for (const key in newUploadFile) {
+          newUploadFile[key] = `${basePath}/${formatFileName(asset)}`
+        }
+        dispatch(updateUploadFile(newUploadFile))
       }
 
-      // Clear uploaded file from the FileUploadField
-      const newUploadFile = { ...uploadFile }
-      for (const key in newUploadFile) {
-        newUploadFile[key] = `${basePath}/${formatFileName(asset)}`
-      }
-      dispatch(updateUploadFile(newUploadFile))
-    }
-
-    setFiles([])
-    onSave()
-  }, [uploadFile])
+      setFiles([])
+      onSave()
+    },
+    [uploadFile]
+  )
 
   // const isNameUnique = useCallback((name: string, ext: string) => {
   //   return !assets.find((asset) => {
@@ -110,8 +116,15 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
   // const isNameRepeated = !isNameUnique(assetName, assetExtension)
 
   return (
-    <div className={cx("ImportAsset", { ImportAssetHover: isHover })}>
-      <FileInput disabled={!!files.length} onDrop={handleDrop} onHover={handleHover} ref={inputRef} accept={ACCEPTED_FILE_TYPES} multiple>
+    <div className={cx('ImportAsset', { ImportAssetHover: isHover })}>
+      <FileInput
+        disabled={!!files.length}
+        onDrop={handleDrop}
+        onHover={handleHover}
+        ref={inputRef}
+        accept={ACCEPTED_FILE_TYPES}
+        multiple
+      >
         {!files.length && isHover ? (
           <>
             <div className="upload-icon">
@@ -119,7 +132,9 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
             </div>
             <span className="text">Drop {ACCEPTED_FILE_TYPES_STR} files</span>
           </>
-        ) : children}
+        ) : (
+          children
+        )}
         <Modal
           isOpen={!!files.length}
           onRequestClose={handleCloseModal}
