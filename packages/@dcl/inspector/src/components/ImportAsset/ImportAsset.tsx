@@ -1,8 +1,6 @@
-import React, { PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
+import React, { PropsWithChildren, useCallback, useEffect, useState } from 'react'
 import cx from 'classnames'
 import { HiOutlineUpload } from 'react-icons/hi'
-import { RxCross2 } from 'react-icons/rx'
-import classNames from 'classnames'
 
 import { removeBasePath } from '../../lib/logic/remove-base-path'
 import { DIRECTORY, transformBase64ResourceToBinary, withAssetDir } from '../../lib/data-layer/host/fs-utils'
@@ -11,29 +9,14 @@ import { useAppDispatch, useAppSelector } from '../../redux/hooks'
 import { selectAssetCatalog, selectUploadFile, updateUploadFile } from '../../redux/app'
 
 import FileInput from '../FileInput'
-import { Container } from '../Container'
-import { TextField } from '../ui/TextField'
-import { Block } from '../Block'
-import { AssetPreview } from '../AssetPreview'
 import { Modal } from '../Modal'
-import { Input } from '../Input'
 import { InputRef } from '../FileInput/FileInput'
 import { Slider } from './Slider'
 
-import { formatFileName, processAssets } from './utils'
-import { Asset } from './types'
+import { processAssets, assetsAreValid, ACCEPTED_FILE_TYPES, formatFileName, transformAssetToImport } from './utils'
+import { Asset, isGltfAsset } from './types'
 
 import './ImportAsset.css'
-
-const ACCEPTED_FILE_TYPES = {
-  'model/gltf-binary': ['.gltf', '.glb', '.bin'],
-  'image/png': ['.png'],
-  'image/jpeg': ['.jpg', '.jpeg'],
-  'audio/mpeg': ['.mp3'],
-  'audio/wav': ['.wav'],
-  'audio/ogg': ['.ogg'],
-  'video/mp4': ['.mp4']
-}
 
 const ACCEPTED_FILE_TYPES_STR = Object
   .values(ACCEPTED_FILE_TYPES)
@@ -45,7 +28,7 @@ interface PropTypes {
   onSave(): void
 }
 
-const ImportAsset = React.forwardRef<InputRef, React.PropsWithChildren<PropTypes>>(({ onSave, children }, inputRef) => {
+const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ onSave, children }, inputRef) => {
   const dispatch = useAppDispatch()
   const catalog = useAppSelector(selectAssetCatalog)
   const uploadFile = useAppSelector(selectUploadFile)
@@ -71,18 +54,58 @@ const ImportAsset = React.forwardRef<InputRef, React.PropsWithChildren<PropTypes
     setIsHover(isHover)
   }, [])
 
-  const removeAsset = useCallback((asset: Asset) => {
-    // e.stopPropagation()
-    setFiles(files.filter((file) => file.name !== asset.name))
-  }, [])
-
   const handleCloseModal = useCallback(() => {
     setFiles([])
   }, [])
 
-  const handleImport = useCallback((assets: Asset[]) => {
-    console.log('handleImport', assets)
-  }, [])
+  const handleImport = useCallback(async (assets: Asset[]) => {
+    if (!assetsAreValid(assets)) return
+
+    const basePath = withAssetDir(DIRECTORY.SCENE)
+    // TODO: we are dispatching importAsset + saveThumbnail for every asset, refreshing the app state and UI multiple
+    // times. This can be improved by doing all the process once...
+    for (const asset of assets) {
+      const content = await transformAssetToImport(asset)
+
+      dispatch(
+        importAsset({
+          content,
+          basePath,
+          assetPackageName: isGltfAsset(asset) ? asset.name : '',
+          reload: true
+        })
+      )
+
+      if (asset.thumbnail) {
+        dispatch(
+          saveThumbnail({
+            content: transformBase64ResourceToBinary(asset.thumbnail),
+            path: `${DIRECTORY.THUMBNAILS}/${asset.name}.png`
+          })
+        )
+      }
+
+      // Clear uploaded file from the FileUploadField
+      const newUploadFile = { ...uploadFile }
+      for (const key in newUploadFile) {
+        newUploadFile[key] = `${basePath}/${formatFileName(asset)}`
+      }
+      dispatch(updateUploadFile(newUploadFile))
+    }
+
+    setFiles([])
+    onSave()
+  }, [uploadFile])
+
+  // const isNameUnique = useCallback((name: string, ext: string) => {
+  //   return !assets.find((asset) => {
+  //     const [packageName, otherAssetName] = removeBasePath(basePath, asset.path).split('/')
+  //     if (packageName === 'builder') return false
+  //     return otherAssetName?.toLocaleLowerCase() === name?.toLocaleLowerCase() + '.' + ext
+  //   })
+  // }, [])
+
+  // const isNameRepeated = !isNameUnique(assetName, assetExtension)
 
   return (
     <div className={cx("ImportAsset", { ImportAssetHover: isHover })}>

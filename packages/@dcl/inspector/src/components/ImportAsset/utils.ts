@@ -93,10 +93,18 @@ export const adjectives = [
   'absorbed'
 ]
 
+export const ACCEPTED_FILE_TYPES = {
+  'model/gltf-binary': ['.gltf', '.glb', '.bin'],
+  'image/png': ['.png'],
+  'image/jpeg': ['.jpg', '.jpeg'],
+  'audio/mpeg': ['.mp3'],
+  'audio/wav': ['.wav'],
+  'audio/ogg': ['.ogg'],
+  'video/mp4': ['.mp4']
+}
+
 const ONE_GB_IN_BYTES = 1024 * 1024 * 1024
-const VALID_EXTENSIONS = new Set([
-  'glb', 'gltf', 'bin', 'png', 'ktx2', 'mp3', 'wav', 'ogg', 'mp4'
-])
+const VALID_EXTENSIONS = new Set(Object.values(ACCEPTED_FILE_TYPES).flat().map(($) => $.replaceAll('.', '')))
 const IGNORED_ERROR_CODES = ['ACCESSOR_WEIGHTS_NON_NORMALIZED', 'MESH_PRIMITIVE_TOO_FEW_TEXCOORDS']
 
 async function validateGltf(gltf: GltfAsset): Promise<void> {
@@ -249,4 +257,31 @@ export function getAssetSize(asset: Asset): string {
 export function getAssetResources(asset: Asset): File[] {
   if (!isGltfAsset(asset)) return []
   return [...asset.buffers, ...asset.images].map(($) => $.blob)
+}
+
+export function assetIsValid(asset: Asset): boolean {
+  if (!asset.error) return true
+  if (isGltfAsset(asset)) return !![...asset.buffers, ...asset.images].find(($) => assetIsValid($))
+  return false
+}
+
+export function assetsAreValid(assets: Asset[]): boolean {
+  return !!assets.find(($) => assetIsValid($))
+}
+
+export async function transformAssetToImport(asset: Asset): Promise<Map<string, Uint8Array>> {
+  const content: Map<string, Uint8Array> = new Map()
+  const fullName = formatFileName(asset)
+  const binary = await asset.blob.arrayBuffer()
+  content.set(fullName, new Uint8Array(binary))
+
+  if (isGltfAsset(asset)) {
+    const resources = getAssetResources(asset)
+    for (const resource of resources) {
+      const resourceBinary = await resource.arrayBuffer()
+      content.set(resource.name, new Uint8Array(resourceBinary))
+    }
+  }
+
+  return content
 }
