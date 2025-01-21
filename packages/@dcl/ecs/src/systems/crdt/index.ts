@@ -243,21 +243,25 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
     }
 
     // Send CRDT messages to transports
-    const transportBuffers: Uint8Array[] = []
     const transportBuffer = new ReadWriteByteBuffer()
     for (const index in transports) {
+      // NetworkMessages can only have a MAX_SIZE of 13kb. So we need to send it in chunks.
+      const LIVEKIT_MAX_SIZE = 13
+      const __NetworkMessagesBuffer: Uint8Array[] = []
+
       const transportIndex = Number(index)
       const transport = transports[transportIndex]
       const isRendererTransport = transport.type === 'renderer'
       const isNetworkTransport = transport.type === 'network'
+
+      // Reset Buffer for each Transport
       transportBuffer.resetBuffer()
-      transportBuffers.length = 0
       const buffer = new ReadWriteByteBuffer()
 
       // Then we send all the new crdtMessages that the transport needs to process
       for (const message of crdtMessages) {
-        if (isNetworkTransport && transportBuffer.toBinary().byteLength / 1024 > 13) {
-          transportBuffers.push(transportBuffer.toBinary())
+        if (isNetworkTransport && transportBuffer.toBinary().byteLength / 1024 > LIVEKIT_MAX_SIZE) {
+          __NetworkMessagesBuffer.push(transportBuffer.toBinary())
           transportBuffer.resetBuffer()
         }
         // Avoid echo messages
@@ -316,10 +320,11 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         // Common message
         transportBuffer.writeBuffer(message.messageBuffer, false)
       }
-      if (transportBuffer.currentWriteOffset()) {
-        transportBuffers.push(transportBuffer.toBinary())
+
+      if (isNetworkTransport && transportBuffer.currentWriteOffset()) {
+        __NetworkMessagesBuffer.push(transportBuffer.toBinary())
       }
-      const message = isNetworkTransport ? transportBuffers : transportBuffer.toBinary()
+      const message = isNetworkTransport ? __NetworkMessagesBuffer : transportBuffer.toBinary()
       await transport.send(message)
     }
   }
