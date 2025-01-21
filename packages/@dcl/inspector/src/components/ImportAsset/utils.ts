@@ -1,6 +1,6 @@
 import { GLTFValidation } from '@babylonjs/loaders'
 
-import { FileAsset, GltfAsset, BabylonValidationIssue, ValidationError, Asset, Uri, GltfFile, isGltfAsset } from './types'
+import { BaseAsset, GltfAsset, BabylonValidationIssue, ValidationError, Asset, Uri, GltfFile, isGltfAsset, AssetType } from './types'
 
 const sampleIndex = (list: any[]) => Math.floor(Math.random() * list.length)
 
@@ -156,7 +156,7 @@ function extractFileInfo(fileName: string): [string, string] {
   return match ? [match[1], match[2]?.toLowerCase() || ""] : [fileName, ""]
 }
 
-export function formatFileName(file: FileAsset): string {
+export function formatFileName(file: BaseAsset): string {
   return `${file.name}.${file.extension}`
 }
 
@@ -170,7 +170,7 @@ function validateExtension(extension: string): ValidationError {
     `Invalid asset format ".${extension}"`
 }
 
-async function processFile(file: File): Promise<FileAsset> {
+async function processFile(file: File): Promise<BaseAsset> {
   const normalizedName = normalizeFileName(file.name)
   const [name, extension] = extractFileInfo(normalizedName)
 
@@ -195,8 +195,8 @@ async function validateGltfWithDependencies(gltf: GltfAsset): Promise<Validation
   }
 }
 
-function resolveDependencies(uris: Uri[], fileMap: Map<string, FileAsset>): FileAsset[] {
-  return uris.reduce<FileAsset[]>((acc, { uri }) => {
+function resolveDependencies(uris: Uri[], fileMap: Map<string, BaseAsset>): BaseAsset[] {
+  return uris.reduce<BaseAsset[]>((acc, { uri }) => {
     const normalizedUri = normalizeFileName(uri)
     const file = fileMap.get(normalizedUri)
     if (file) {
@@ -207,7 +207,7 @@ function resolveDependencies(uris: Uri[], fileMap: Map<string, FileAsset>): File
   }, [])
 }
 
-async function processGltfAssets(files: FileAsset[]): Promise<Asset[]> {
+async function processGltfAssets(files: BaseAsset[]): Promise<Asset[]> {
   const fileMap = new Map(files.map(file => [formatFileName(file), file]))
 
   const gltfPromises = files
@@ -269,19 +269,39 @@ export function assetsAreValid(assets: Asset[]): boolean {
   return !!assets.find(($) => assetIsValid($))
 }
 
-export async function transformAssetToImport(asset: Asset): Promise<Map<string, Uint8Array>> {
-  const content: Map<string, Uint8Array> = new Map()
-  const fullName = formatFileName(asset)
-  const binary = await asset.blob.arrayBuffer()
-  content.set(fullName, new Uint8Array(binary))
+export async function convertAssetToBinary(asset: Asset): Promise<Map<string, Uint8Array>> {
+  const binaryContents: Map<string, Uint8Array> = new Map();
+  const fullName = formatFileName(asset);
+  const binary = await asset.blob.arrayBuffer();
+  binaryContents.set(fullName, new Uint8Array(binary));
 
   if (isGltfAsset(asset)) {
-    const resources = getAssetResources(asset)
+    const resources = getAssetResources(asset);
     for (const resource of resources) {
-      const resourceBinary = await resource.arrayBuffer()
-      content.set(resource.name, new Uint8Array(resourceBinary))
+      const resourceBinary = await resource.arrayBuffer();
+      binaryContents.set(resource.name, new Uint8Array(resourceBinary));
     }
   }
 
-  return content
+  return binaryContents;
+}
+
+export function determineAssetType(asset: Asset): AssetType {
+  switch (asset.extension) {
+      case 'gltf':
+      case 'glb':
+        return 'models'
+      case 'png':
+      case 'jpg':
+      case 'jpeg':
+        return 'images'
+      case 'mp3':
+      case 'wav':
+      case 'ogg':
+        return 'audio'
+      case 'mp4':
+        return 'video'
+      default:
+        return 'other'
+    }
 }

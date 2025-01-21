@@ -13,7 +13,7 @@ import { Modal } from '../Modal'
 import { InputRef } from '../FileInput/FileInput'
 import { Slider } from './Slider'
 
-import { processAssets, assetsAreValid, ACCEPTED_FILE_TYPES, formatFileName, transformAssetToImport } from './utils'
+import { processAssets, assetsAreValid, ACCEPTED_FILE_TYPES, formatFileName, convertAssetToBinary, determineAssetType } from './utils'
 import { Asset, isGltfAsset } from './types'
 
 import './ImportAsset.css'
@@ -39,11 +39,11 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
   const { basePath, assets } = catalog ?? { basePath: '', assets: [] }
 
   useEffect(() => {
-      const isValidFile = uploadFile && 'name' in uploadFile
-      if (isValidFile && !files.find(($) => $.name === uploadFile.name)) {
-        handleDrop([Object.values(uploadFile!)[0] as File])
-      }
-    }, [uploadFile])
+    const isValidFile = uploadFile && 'name' in uploadFile
+    if (isValidFile && !files.find(($) => $.name === uploadFile.name)) {
+      handleDrop([Object.values(uploadFile!)[0] as File])
+    }
+  }, [uploadFile])
 
   const handleDrop = useCallback(async (acceptedFiles: File[]) => {
     const assets = await processAssets(acceptedFiles)
@@ -65,13 +65,15 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
     // TODO: we are dispatching importAsset + saveThumbnail for every asset, refreshing the app state and UI multiple
     // times. This can be improved by doing all the process once...
     for (const asset of assets) {
-      const content = await transformAssetToImport(asset)
+      const content = await convertAssetToBinary(asset)
+      const classification = determineAssetType(asset)
+      const assetPackageName = isGltfAsset(asset) ? `${classification}/${asset.name}` : classification
 
       dispatch(
         importAsset({
           content,
           basePath,
-          assetPackageName: isGltfAsset(asset) ? asset.name : '',
+          assetPackageName,
           reload: true
         })
       )

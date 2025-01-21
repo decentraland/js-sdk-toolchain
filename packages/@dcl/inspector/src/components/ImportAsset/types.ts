@@ -1,4 +1,4 @@
-export type FileAsset = {
+export type BaseAsset = {
   blob: File;
   name: string;
   extension: string;
@@ -6,12 +6,12 @@ export type FileAsset = {
   thumbnail?: string;
 };
 
-export type GltfAsset = FileAsset & {
-  buffers: FileAsset[];
-  images: FileAsset[];
+export type GltfAsset = BaseAsset & {
+  buffers: BaseAsset[];
+  images: BaseAsset[];
 };
 
-export type Asset = GltfAsset | FileAsset;
+export type Asset = GltfAsset | BaseAsset;
 export type Uri = { uri: string };
 export type GltfFile = { buffers: Uri[]; images: Uri[] };
 
@@ -26,6 +26,8 @@ export type BabylonValidationIssue = {
   message: string
   pointer: string
 }
+
+export type AssetType = 'models' | 'images' | 'audio' | 'video' | 'other'
 
 export const isGltfAsset = (asset: Asset): asset is GltfAsset => {
   const _asset = asset as any

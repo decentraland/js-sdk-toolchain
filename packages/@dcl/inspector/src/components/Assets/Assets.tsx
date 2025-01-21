@@ -57,7 +57,7 @@ function Assets({ isAssetsPanelCollapsed }: { isAssetsPanelCollapsed: boolean })
   return (
     <div className="Assets">
       <div className="Assets-buttons">
-        <Button onClick={handleImportClick}>IMPORT ASSETS</Button>
+        <Button onClick={handleImportClick}><HiOutlinePlus />IMPORT ASSETS</Button>
         <div className="tab" onClick={handleTabClick(AssetsTab.FileSystem)} data-test-id={AssetsTab.FileSystem}>
           <div className={cx({ underlined: tab === AssetsTab.FileSystem })}>
             <FolderOpen />
@@ -76,11 +76,6 @@ function Assets({ isAssetsPanelCollapsed }: { isAssetsPanelCollapsed: boolean })
           <div className={cx({ underlined: tab === AssetsTab.AssetsPack })}>
             <MdImageSearch />
             <span>ASSET PACKS</span>
-          </div>
-        </div>
-        <div className="tab" onClick={handleTabClick(AssetsTab.Import)} data-test-id={AssetsTab.Import}>
-          <div>
-            <HiOutlinePlus />
           </div>
         </div>
       </div>
