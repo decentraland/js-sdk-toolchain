@@ -50,7 +50,6 @@ export function addSyncTransport(
         if (message.byteLength && transportInitialzed) {
           DEBUG_NETWORK_MESSAGES() &&
             console.log(...Array.from(serializeCrdtMessages('[NetworkMessage sent]:', message, engine)))
-          console.log('BOEDO SIZE: ', message.byteLength / 1024, 'KB')
           binaryMessageBus.emit(CommsMessage.CRDT, message)
         }
       }
