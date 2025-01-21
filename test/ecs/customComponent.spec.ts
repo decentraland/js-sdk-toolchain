@@ -23,7 +23,7 @@ function connectEngines(a: IEngine, b: IEngine) {
   }
 
   const transportA: Transport = {
-    async send(data) {
+    async send(data: Uint8Array) {
       intercept(data, 'a->b')
       transportB.onmessage!(data)
     },
@@ -35,7 +35,7 @@ function connectEngines(a: IEngine, b: IEngine) {
     }
   }
   const transportB: Transport = {
-    async send(data) {
+    async send(data: Uint8Array) {
       intercept(data, 'b->a')
       transportA.onmessage!(data)
     },
