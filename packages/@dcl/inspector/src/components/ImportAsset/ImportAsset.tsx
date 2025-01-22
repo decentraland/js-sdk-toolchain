@@ -6,7 +6,7 @@ import { HiOutlineUpload } from 'react-icons/hi'
 import { DIRECTORY, transformBase64ResourceToBinary, withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { importAsset, saveThumbnail } from '../../redux/data-layer'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
-import { selectAssetCatalog, selectUploadFile, updateUploadFile } from '../../redux/app'
+import { selectUploadFile, updateUploadFile } from '../../redux/app'
 
 import FileInput from '../FileInput'
 import { Modal } from '../Modal'
@@ -21,7 +21,7 @@ import {
   convertAssetToBinary,
   determineAssetType
 } from './utils'
-import { Asset, isGltfAsset } from './types'
+import { Asset, isModelAsset } from './types'
 
 import './ImportAsset.css'
 
@@ -71,7 +71,7 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
       for (const asset of assets) {
         const content = await convertAssetToBinary(asset)
         const classification = determineAssetType(asset)
-        const assetPackageName = isGltfAsset(asset) ? `${classification}/${asset.name}` : classification
+        const assetPackageName = isModelAsset(asset) ? `${classification}/${asset.name}` : classification
 
         dispatch(
           importAsset({

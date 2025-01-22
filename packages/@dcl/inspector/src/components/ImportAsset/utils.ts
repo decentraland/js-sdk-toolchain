@@ -2,13 +2,13 @@ import { GLTFValidation } from '@babylonjs/loaders'
 
 import {
   BaseAsset,
-  GltfAsset,
+  ModelAsset,
   BabylonValidationIssue,
   ValidationError,
   Asset,
   Uri,
   GltfFile,
-  isGltfAsset,
+  isModelAsset,
   AssetType
 } from './types'
 
@@ -104,7 +104,8 @@ export const adjectives = [
 ]
 
 export const ACCEPTED_FILE_TYPES = {
-  'model/gltf-binary': ['.gltf', '.glb', '.bin'],
+  'model/gltf-binary': ['.gltf', '.glb'],
+  'application/octet-stream': ['.bin'],
   'image/png': ['.png'],
   'image/jpeg': ['.jpg', '.jpeg'],
   'audio/mpeg': ['.mp3'],
@@ -119,26 +120,33 @@ const VALID_EXTENSIONS = new Set(
     .flat()
     .map(($) => $.replaceAll('.', ''))
 )
-const IGNORED_ERROR_CODES = ['ACCESSOR_WEIGHTS_NON_NORMALIZED', 'MESH_PRIMITIVE_TOO_FEW_TEXCOORDS']
+const MODEL_EXTENSIONS = ACCEPTED_FILE_TYPES['model/gltf-binary']
+const IGNORED_ERROR_CODES = [
+  'ACCESSOR_WEIGHTS_NON_NORMALIZED',
+  'MESH_PRIMITIVE_TOO_FEW_TEXCOORDS',
+  'ACCESSOR_VECTOR3_NON_UNIT'
+]
 
-async function validateGltf(gltf: GltfAsset): Promise<void> {
-  const pre = `Invalid GLTF "${gltf.blob.name}":`
-  const gltfContent = JSON.parse(await gltf.blob.text()) as GltfFile
-  const gltfBuffer = await gltf.blob.arrayBuffer()
-  const resourceMap = new Map([...gltf.buffers, ...gltf.images].map(($) => [$.blob.name, $.blob]))
+async function validateModel(model: ModelAsset): Promise<void> {
+  const pre = `Invalid GLTF "${model.blob.name}"`
+  const buffer = await model.blob.arrayBuffer()
+  const resourcesArr: [string, File][] = [...model.buffers, ...model.images].map(($) => [$.blob.name, $.blob])
+  const resourceMap = new Map(resourcesArr)
 
   // ugly hack since "GLTFValidation.ValidateAsync" runs on a new Worker and throwed errors from
   // "getExternalResource" callback are thrown to main thread
   // In conclusion, checking for missing files inside "getExternalResource" is not possible...
-  for (const { uri } of [...gltfContent.buffers, ...gltfContent.images]) {
-    if (!resourceMap.has(uri)) {
-      throw new Error(`${pre}: resource "${uri}" is missing`)
+  for (const uri of [...model.gltf.buffers, ...model.gltf.images]) {
+    const _uri = getUri(uri)
+    if (_uri === model.name) continue // a model can include an entry with the same name as the model inside buffer resources...
+    if (!_uri || !resourceMap.has(_uri)) {
+      throw new Error(`${pre}: resource "${_uri}" is missing`)
     }
   }
 
   let result
   try {
-    result = await GLTFValidation.ValidateAsync(new Uint8Array(gltfBuffer), '', '', (uri) => {
+    result = await GLTFValidation.ValidateAsync(new Uint8Array(buffer), '', '', (uri) => {
       const resource = resourceMap.get(uri)
       return resource!.arrayBuffer()
     })
@@ -199,16 +207,22 @@ async function processFile(file: File): Promise<BaseAsset> {
   return { blob: file, name, extension }
 }
 
-async function validateGltfWithDependencies(gltf: GltfAsset): Promise<ValidationError> {
+async function validateModelWithDependencies(model: ModelAsset): Promise<ValidationError> {
   try {
-    await validateGltf(gltf)
+    await validateModel(model)
   } catch (error) {
     return error instanceof Error ? error.message : 'Unknown error during GLTF validation'
   }
 }
 
-function resolveDependencies(uris: Uri[], fileMap: Map<string, BaseAsset>): BaseAsset[] {
-  return uris.reduce<BaseAsset[]>((acc, { uri }) => {
+function getUri(uri: Uri): string | undefined {
+  return (uri as any).uri || (uri as any).name
+}
+
+function resolveDependencies(items: Uri[], fileMap: Map<string, BaseAsset>): BaseAsset[] {
+  return items.reduce<BaseAsset[]>((acc, item) => {
+    const uri = getUri(item)
+    if (!uri) return acc
     const normalizedUri = normalizeFileName(uri)
     const file = fileMap.get(normalizedUri)
     if (file) {
@@ -219,23 +233,86 @@ function resolveDependencies(uris: Uri[], fileMap: Map<string, BaseAsset>): Base
   }, [])
 }
 
-async function processGltfAssets(files: BaseAsset[]): Promise<Asset[]> {
+async function getGlbMetadata(asset: BaseAsset): Promise<GltfFile> {
+  const file = asset.blob
+  const decoder = new TextDecoder()
+  const reader = file.stream().getReader()
+  let gltf: GltfFile = { buffers: [], images: [] }
+  let buffer = ''
+  let jsonFound = false
+  let braceDepth = 0
+
+  const getEndIndex = (data: string): number => {
+    for (let i = 0; i < data.length; i++) {
+      if (data[i] === '{') braceDepth++
+      else if (data[i] === '}') {
+        braceDepth--
+        if (braceDepth === 0) {
+          return i
+        }
+      }
+    }
+    return -1
+  }
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+
+      let chunk = decoder.decode(value, { stream: true })
+
+      if (!jsonFound) {
+        const startIndex = chunk.indexOf('JSON{')
+        if (startIndex === -1) continue
+        jsonFound = true
+        buffer = chunk.slice(startIndex + 4) // +4 for "JSON" keyword
+        chunk = buffer // opmitimization for always reading from chunks when looking for "endIndex" instead of reading the whole buffer on every iteration
+      } else {
+        buffer += chunk
+      }
+
+      const endIndex = getEndIndex(chunk)
+      if (endIndex !== -1) {
+        gltf = JSON.parse(buffer.slice(0, endIndex + 1))
+        break
+      }
+    }
+  } catch (_) {
+  } finally {
+    reader.releaseLock()
+    return gltf
+  }
+}
+
+async function getModelInfo(asset: BaseAsset): Promise<GltfFile> {
+  switch (asset.extension) {
+    case 'gltf':
+      return JSON.parse(await asset.blob.text()) as GltfFile
+    case 'glb':
+      return getGlbMetadata(asset)
+  }
+
+  return { buffers: [], images: [] }
+}
+
+async function processModels(files: BaseAsset[]): Promise<Asset[]> {
   const fileMap = new Map(files.map((file) => [formatFileName(file), file]))
 
-  const gltfPromises = files
-    .filter((file) => file.extension === 'gltf')
-    .map(async (gltfFile): Promise<GltfAsset> => {
-      const gltfContent = JSON.parse(await gltfFile.blob.text()) as GltfFile
-      const buffers = resolveDependencies(gltfContent.buffers, fileMap)
-      const images = resolveDependencies(gltfContent.images, fileMap)
-      const gltf: GltfAsset = { ...gltfFile, buffers, images }
-      const error = await validateGltfWithDependencies(gltf)
+  const modelPromises = files
+    .filter((asset) => MODEL_EXTENSIONS.includes(`.${asset.extension}`))
+    .map(async (asset): Promise<ModelAsset> => {
+      const gltf = await getModelInfo(asset)
+      const buffers = resolveDependencies(gltf.buffers, fileMap)
+      const images = resolveDependencies(gltf.images, fileMap)
+      const model: ModelAsset = { ...asset, gltf, buffers, images }
+      const error = await validateModelWithDependencies(model)
 
-      fileMap.delete(formatFileName(gltfFile))
-      return { ...gltf, error }
+      fileMap.delete(formatFileName(asset))
+      return { ...model, error }
     })
 
-  const gltfAssets = await Promise.all(gltfPromises)
+  const gltfAssets = await Promise.all(modelPromises)
   const remainingAssets = Array.from(fileMap.values())
 
   return [...gltfAssets, ...remainingAssets]
@@ -243,7 +320,7 @@ async function processGltfAssets(files: BaseAsset[]): Promise<Asset[]> {
 
 export async function processAssets(files: File[]): Promise<Asset[]> {
   const processedFiles = await Promise.all(files.map(processFile))
-  return processGltfAssets(processedFiles)
+  return processModels(processedFiles)
 }
 
 export function normalizeBytes(bytes: number): string {
@@ -267,13 +344,13 @@ export function getAssetSize(asset: Asset): string {
 }
 
 export function getAssetResources(asset: Asset): File[] {
-  if (!isGltfAsset(asset)) return []
+  if (!isModelAsset(asset)) return []
   return [...asset.buffers, ...asset.images].map(($) => $.blob)
 }
 
 export function assetIsValid(asset: Asset): boolean {
   if (!asset.error) return true
-  if (isGltfAsset(asset)) return !![...asset.buffers, ...asset.images].find(($) => assetIsValid($))
+  if (isModelAsset(asset)) return !![...asset.buffers, ...asset.images].find(($) => assetIsValid($))
   return false
 }
 
@@ -287,7 +364,7 @@ export async function convertAssetToBinary(asset: Asset): Promise<Map<string, Ui
   const binary = await asset.blob.arrayBuffer()
   binaryContents.set(fullName, new Uint8Array(binary))
 
-  if (isGltfAsset(asset)) {
+  if (isModelAsset(asset)) {
     const resources = getAssetResources(asset)
     for (const resource of resources) {
       const resourceBinary = await resource.arrayBuffer()

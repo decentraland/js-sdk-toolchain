@@ -6,13 +6,14 @@ export type BaseAsset = {
   thumbnail?: string
 }
 
-export type GltfAsset = BaseAsset & {
+export type ModelAsset = BaseAsset & {
+  gltf: Record<any, any>
   buffers: BaseAsset[]
   images: BaseAsset[]
 }
 
-export type Asset = GltfAsset | BaseAsset
-export type Uri = { uri: string }
+export type Asset = ModelAsset | BaseAsset
+export type Uri = { uri: string } | { name: string }
 export type GltfFile = { buffers: Uri[]; images: Uri[] }
 
 export type ValidationError = string | undefined
@@ -29,7 +30,7 @@ export type BabylonValidationIssue = {
 
 export type AssetType = 'models' | 'images' | 'audio' | 'video' | 'other'
 
-export const isGltfAsset = (asset: Asset): asset is GltfAsset => {
+export const isModelAsset = (asset: Asset): asset is ModelAsset => {
   const _asset = asset as any
   return _asset.buffers && _asset.images
 }
