@@ -7,14 +7,12 @@ export type BaseAsset = {
 }
 
 export type ModelAsset = BaseAsset & {
-  gltf: Record<any, any>
+  gltf: Gltf
   buffers: BaseAsset[]
   images: BaseAsset[]
 }
 
 export type Asset = ModelAsset | BaseAsset
-export type Uri = { uri: string } | { name: string }
-export type GltfFile = { buffers: Uri[]; images: Uri[] }
 
 export type ValidationError =
   | {
@@ -22,20 +20,74 @@ export type ValidationError =
       message: string
     }
   | undefined
-/*
-  Severity codes are Error (0), Warning (1), Information (2), Hint (3).
-  https://github.com/KhronosGroup/glTF-Validator/blob/main/lib/src/errors.dart
-*/
-export type BabylonValidationIssue = {
-  severity: number
-  code: string
-  message: string
-  pointer: string
-}
 
 export type AssetType = 'models' | 'images' | 'audio' | 'video' | 'other'
 
 export const isModelAsset = (asset: Asset): asset is ModelAsset => {
   const _asset = asset as any
   return _asset.buffers && _asset.images
+}
+
+export interface Gltf {
+  mimeType: string
+  validatorVersion: string
+  validatedAt: Date
+  issues: GltfIssues
+  info: GltfInfo
+}
+
+export interface GltfInfo {
+  version: string
+  generator: string
+  resources: GltfResource[]
+  animationCount: number
+  materialCount: number
+  hasMorphTargets: boolean
+  hasSkins: boolean
+  hasTextures: boolean
+  hasDefaultScene: boolean
+  drawCallCount: number
+  totalVertexCount: number
+  totalTriangleCount: number
+  maxUVs: number
+  maxInfluences: number
+  maxAttributes: number
+}
+
+export interface GltfResource {
+  pointer: string
+  mimeType: string
+  storage: string
+  uri: string
+  byteLength?: number
+  image?: GltfImage
+}
+
+export interface GltfImage {
+  width: number
+  height: number
+  format: string
+  primaries: string
+  transfer: string
+  bits: number
+}
+
+export interface GltfIssues {
+  numErrors: number
+  numWarnings: number
+  numInfos: number
+  numHints: number
+  messages: GltfMessage[]
+  truncated: boolean
+}
+
+/*
+  Severity codes are Error (0), Warning (1), Information (2), Hint (3).
+  https://github.com/KhronosGroup/glTF-Validator/blob/main/lib/src/errors.dart
+*/
+export interface GltfMessage {
+  code: string
+  message: string
+  severity: number
+  pointer: string
 }
