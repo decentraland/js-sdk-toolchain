@@ -2472,9 +2472,7 @@ export const enum PBLightSource_ShadowType {
 
 // @public (undocumented)
 export interface PBLightSource_Spot {
-    // (undocumented)
     innerAngle: number;
-    // (undocumented)
     outerAngle: number;
 }
 
