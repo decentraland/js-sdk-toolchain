@@ -12,7 +12,7 @@
 
 .Slider .left,
 .Slider .right {
-  border: 1px solid var(--base-10);;
+  border: 1px solid var(--base-10);
   border-radius: 50%;
   display: flex;
   padding: 3px;

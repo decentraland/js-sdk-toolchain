@@ -24,6 +24,7 @@ import {
 import { Asset, isModelAsset } from './types'
 
 import './ImportAsset.css'
+import { Error } from './Error'
 
 const ACCEPTED_FILE_TYPES_STR = Object.values(ACCEPTED_FILE_TYPES).flat().join('/').replaceAll('.', '').toUpperCase()
 
@@ -142,7 +143,11 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
           overlayClassName="ImportAssetModalOverlay"
         >
           <h2>Import Assets</h2>
-          <Slider assets={files} onSubmit={handleImport} />
+          {assetsAreValid(files) ? (
+            <Slider assets={files} onSubmit={handleImport} />
+          ) : (
+            <Error assets={files} onSubmit={handleCloseModal} />
+          )}
         </Modal>
       </FileInput>
     </div>

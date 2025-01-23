@@ -2,7 +2,7 @@ export type BaseAsset = {
   blob: File
   name: string
   extension: string
-  error?: string
+  error?: ValidationError
   thumbnail?: string
 }
 
@@ -16,7 +16,12 @@ export type Asset = ModelAsset | BaseAsset
 export type Uri = { uri: string } | { name: string }
 export type GltfFile = { buffers: Uri[]; images: Uri[] }
 
-export type ValidationError = string | undefined
+export type ValidationError =
+  | {
+      type: 'size' | 'type' | 'name' | 'model'
+      message: string
+    }
+  | undefined
 /*
   Severity codes are Error (0), Warning (1), Information (2), Hint (3).
   https://github.com/KhronosGroup/glTF-Validator/blob/main/lib/src/errors.dart

@@ -128,7 +128,6 @@ const IGNORED_ERROR_CODES = [
 ]
 
 async function validateModel(model: ModelAsset): Promise<void> {
-  const pre = `Invalid GLTF "${model.blob.name}"`
   const buffer = await model.blob.arrayBuffer()
   const resourcesArr: [string, File][] = [...model.buffers, ...model.images].map(($) => [$.blob.name, $.blob])
   const resourceMap = new Map(resourcesArr)
@@ -140,19 +139,14 @@ async function validateModel(model: ModelAsset): Promise<void> {
     const _uri = getUri(uri)
     if (_uri === model.name) continue // a model can include an entry with the same name as the model inside buffer resources...
     if (!_uri || !resourceMap.has(_uri)) {
-      throw new Error(`${pre}: resource "${_uri}" is missing`)
+      throw new Error(`Resource "${_uri}" is missing`)
     }
   }
 
-  let result
-  try {
-    result = await GLTFValidation.ValidateAsync(new Uint8Array(buffer), '', '', (uri) => {
-      const resource = resourceMap.get(uri)
-      return resource!.arrayBuffer()
-    })
-  } catch (error) {
-    throw new Error(`${pre}: ${error}`)
-  }
+  const result = await GLTFValidation.ValidateAsync(new Uint8Array(buffer), '', '', (uri) => {
+    const resource = resourceMap.get(uri)
+    return resource!.arrayBuffer()
+  })
 
   /*
     Babylon's type declarations incorrectly state that result.issues.messages
@@ -164,7 +158,7 @@ async function validateModel(model: ModelAsset): Promise<void> {
 
   if (errors.length > 0) {
     const error = errors[0]
-    throw new Error(`${pre}: ${error.message} \n Check ${error.pointer}`)
+    throw new Error(`${error.message} \n Check ${error.pointer}`)
   }
 }
 
@@ -183,11 +177,11 @@ export function formatFileName(file: BaseAsset): string {
 }
 
 function validateFileSize(size: number): ValidationError {
-  return size > ONE_GB_IN_BYTES ? 'Files bigger than 1GB are not accepted' : undefined
+  return size <= ONE_GB_IN_BYTES ? undefined : { type: 'size', message: 'Files bigger than 1GB are not accepted' }
 }
 
 function validateExtension(extension: string): ValidationError {
-  return VALID_EXTENSIONS.has(extension) ? undefined : `Invalid asset format ".${extension}"`
+  return VALID_EXTENSIONS.has(extension) ? undefined : { type: 'type', message: `Invalid asset format ".${extension}"` }
 }
 
 async function processFile(file: File): Promise<BaseAsset> {
@@ -211,7 +205,8 @@ async function validateModelWithDependencies(model: ModelAsset): Promise<Validat
   try {
     await validateModel(model)
   } catch (error) {
-    return error instanceof Error ? error.message : 'Unknown error during GLTF validation'
+    const message = error instanceof Error ? error.message : 'Unknown error during GLTF validation'
+    return { type: 'model', message }
   }
 }
 
@@ -349,13 +344,13 @@ export function getAssetResources(asset: Asset): File[] {
 }
 
 export function assetIsValid(asset: Asset): boolean {
-  if (!asset.error) return true
-  if (isModelAsset(asset)) return !![...asset.buffers, ...asset.images].find(($) => assetIsValid($))
-  return false
+  if (!!asset.error) return false
+  if (isModelAsset(asset)) return [...asset.buffers, ...asset.images].every(($) => assetIsValid($))
+  return true
 }
 
 export function assetsAreValid(assets: Asset[]): boolean {
-  return !!assets.find(($) => assetIsValid($))
+  return assets.every(($) => assetIsValid($))
 }
 
 export async function convertAssetToBinary(asset: Asset): Promise<Map<string, Uint8Array>> {
