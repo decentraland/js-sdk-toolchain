@@ -1,0 +1,27 @@
+.CheckboxGroup {
+  width: 100%;
+}
+
+.CheckboxGroup .CheckboxContainer {
+  display: flex;
+  gap: 8px;
+}
+
+.CheckboxGroup.vertical .CheckboxContainer {
+  flex-direction: column;
+}
+
+.CheckboxGroup.horizontal .CheckboxContainer {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+/* Adjust spacing for CheckboxFields inside the group */
+.CheckboxGroup .CheckboxField {
+  margin: 0;
+}
+
+/* Ensure proper alignment in horizontal mode */
+.CheckboxGroup.horizontal .CheckboxField {
+  flex-shrink: 0;
+}
