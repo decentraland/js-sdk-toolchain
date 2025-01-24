@@ -1,10 +1,12 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { PreviewCamera, PreviewProjection } from '@dcl/schemas'
+import cx from 'classnames'
 import { WearablePreview } from 'decentraland-ui'
 import { AiFillSound } from 'react-icons/ai'
 import { IoVideocamOutline } from 'react-icons/io5'
 import { FaFile } from 'react-icons/fa'
 
+import { Loading } from '../Loading'
 import { toWearableWithBlobs } from './utils'
 import { Props } from './types'
 
@@ -40,22 +42,29 @@ export function AssetPreview({ value, resources, onScreenshot, onLoad }: Props) 
 }
 
 function GltfPreview({ value, resources, onScreenshot, onLoad }: Props) {
+  const [loading, setLoading] = useState(true)
   const handleLoad = useCallback(() => {
     onLoad?.()
     const wp = WearablePreview.createController(value.name)
     void wp.scene.getScreenshot(WIDTH, HEIGHT).then(($) => onScreenshot($))
+    setTimeout(() => setLoading(false), 1000) // ugly hack to avoid iframe flickering...
   }, [onLoad])
 
   return (
-    <WearablePreview
-      id={value.name}
-      blob={toWearableWithBlobs(value, resources)}
-      disableAutoRotate
-      background="#3c3c3c"
-      projection={PreviewProjection.ORTHOGRAPHIC}
-      camera={PreviewCamera.STATIC}
-      onLoad={handleLoad}
-    />
+    <>
+      <div className={cx("GltfPreview", { hidden: loading })}>
+        <WearablePreview
+          id={value.name}
+          blob={toWearableWithBlobs(value, resources)}
+          disableAutoRotate
+          background="#3c3c3c"
+          projection={PreviewProjection.ORTHOGRAPHIC}
+          camera={PreviewCamera.STATIC}
+          onLoad={handleLoad}
+        />
+      </div>
+      {loading && <Loading dimmer={false} />}
+    </>
   )
 }
 

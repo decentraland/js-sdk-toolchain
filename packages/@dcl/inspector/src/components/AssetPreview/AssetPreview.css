@@ -7,3 +7,11 @@
 .AssetPreview canvas {
   width: 100%;
 }
+
+.AssetPreview .GltfPreview.hidden {
+  visibility: hidden;
+}
+
+.AssetPreview > .loading {
+  position: absolute;
+}

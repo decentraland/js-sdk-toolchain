@@ -160,7 +160,7 @@ export function formatFileName(file: BaseAsset): string {
 }
 
 function validateFileSize(size: number): ValidationError {
-  return size <= ONE_GB_IN_BYTES ? undefined : { type: 'size', message: 'Files bigger than 1GB are not accepted' }
+  return size <= ONE_GB_IN_BYTES ? undefined : { type: 'size', message: 'Max file size: 1 GB' }
 }
 
 function validateExtension(extension: string): ValidationError {

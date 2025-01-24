@@ -62,6 +62,7 @@ export function Slider({ assets, onSubmit }: PropTypes) {
   const importText = useMemo(() => `IMPORT${manyAssets ? ' ALL' : ''}`, [manyAssets])
   const leftArrowDisabled = useMemo(() => slide <= 0, [slide])
   const rightArrowDisabled = useMemo(() => slide >= value.length - 1, [slide, value])
+  const allScreenshotsTaken = useMemo(() => value.length === Object.keys(screenshots).length, [value, screenshots])
 
   if (!value.length) return null
 
@@ -91,7 +92,7 @@ export function Slider({ assets, onSubmit }: PropTypes) {
           </span>
         )}
       </div>
-      <Button type="danger" size="big" onClick={handleSubmit}>
+      <Button type="danger" size="big" onClick={handleSubmit} disabled={!allScreenshotsTaken}>
         {importText}
       </Button>
     </div>
