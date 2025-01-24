@@ -18,7 +18,7 @@ export function connectCrdtToEngine(
     filter() {
       return !outgoingMessagesStream.closed
     },
-    async send(message) {
+    async send(message: Uint8Array) {
       if (outgoingMessagesStream.closed) return
       outgoingMessagesStream.enqueue({ data: message })
       if (message.byteLength) {
