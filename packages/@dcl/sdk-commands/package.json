@@ -13,7 +13,7 @@
     "@dcl/inspector": "file:../inspector",
     "@dcl/linker-dapp": "^0.14.2",
     "@dcl/mini-comms": "1.0.1-20230216163137.commit-a4c75be",
-    "@dcl/protocol": "https://sdk-team-cdn.decentraland.org/@dcl/protocol/branch//dcl-protocol-1.0.0-12769307783.commit-aa394f1.tgz",
+    "@dcl/protocol": "https://sdk-team-cdn.decentraland.org/@dcl/protocol/branch//dcl-protocol-1.0.0-12948952386.commit-71ff16c.tgz",
     "@dcl/quests-client": "^1.0.3",
     "@dcl/quests-manager": "^0.1.4",
     "@dcl/rpc": "^1.1.1",
@@ -58,7 +58,7 @@
   "license": "Apache-2.0",
   "minCliVersion": "3.14.1",
   "overrides": {
-    "@dcl/protocol": "https://sdk-team-cdn.decentraland.org/@dcl/protocol/branch//dcl-protocol-1.0.0-12769307783.commit-aa394f1.tgz"
+    "@dcl/protocol": "https://sdk-team-cdn.decentraland.org/@dcl/protocol/branch//dcl-protocol-1.0.0-12948952386.commit-71ff16c.tgz"
   },
   "repository": {
     "url": "git+https://github.com/decentraland/js-sdk-toolchain",

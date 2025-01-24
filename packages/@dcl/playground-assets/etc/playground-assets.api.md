@@ -377,6 +377,9 @@ export interface ByteBuffer {
 export type Callback = () => void;
 
 // @public (undocumented)
+export const CameraLayer: LastWriteWinElementSetComponentDefinition<PBCameraLayer>;
+
+// @public (undocumented)
 export const CameraLayers: LastWriteWinElementSetComponentDefinition<PBCameraLayers>;
 
 // @public (undocumented)
@@ -676,6 +679,7 @@ export const componentDefinitionByName: {
     "core::AvatarModifierArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>>;
     "core::AvatarShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarShape>>;
     "core::Billboard": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBBillboard>>;
+    "core::CameraLayer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraLayer>>;
     "core::CameraLayers": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraLayers>>;
     "core::CameraMode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraMode>>;
     "core::CameraModeArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraModeArea>>;
@@ -2359,6 +2363,28 @@ export namespace PBBillboard {
 }
 
 // @public (undocumented)
+export interface PBCameraLayer {
+    // (undocumented)
+    ambientBrightnessOverride?: number | undefined;
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    ambientColorOverride?: PBColor3 | undefined;
+    directionalLight?: boolean | undefined;
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    layer: number;
+    showAvatars?: boolean | undefined;
+    showFog?: boolean | undefined;
+    showSkybox?: boolean | undefined;
+}
+
+// @public (undocumented)
+export namespace PBCameraLayer {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBCameraLayer;
+    // (undocumented)
+    export function encode(message: PBCameraLayer, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBCameraLayers {
     // (undocumented)
     layers: number[];
@@ -2460,7 +2486,6 @@ export interface PBGlobalLight {
     ambientBrightness?: number | undefined;
     ambientColor?: PBColor3 | undefined;
     direction?: PBVector3 | undefined;
-    layers: number[];
 }
 
 // @public (undocumented)
@@ -3145,12 +3170,7 @@ export namespace PBTextShape {
 
 // @public (undocumented)
 export interface PBTextureCamera {
-    // (undocumented)
-    ambientBrightnessOverride?: number | undefined;
-    ambientColorOverride?: PBColor3 | undefined;
     clearColor?: PBColor4 | undefined;
-    disableFog?: boolean | undefined;
-    disableSkybox?: boolean | undefined;
     farPlane?: number | undefined;
     height?: number | undefined;
     layer?: number | undefined;
