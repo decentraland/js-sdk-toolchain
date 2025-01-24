@@ -71,7 +71,7 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
       // times. This can be improved by doing all the process once...
       for (const asset of assets) {
         const content = await convertAssetToBinary(asset)
-        const classification = determineAssetType(asset)
+        const classification = determineAssetType(asset.extension)
         const assetPackageName = isModelAsset(asset) ? `${classification}/${asset.name}` : classification
 
         dispatch(

@@ -21,7 +21,7 @@ export type ValidationError =
     }
   | undefined
 
-export type AssetType = 'models' | 'images' | 'audio' | 'video' | 'other'
+export type AssetType = '3D Model' | 'Image' | 'Audio' | 'Video' | 'Other'
 
 export const isModelAsset = (asset: Asset): asset is ModelAsset => {
   const _asset = asset as any

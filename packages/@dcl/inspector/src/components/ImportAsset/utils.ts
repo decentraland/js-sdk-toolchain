@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const validator = require('gltf-validator')
 
-import { BaseAsset, ModelAsset, ValidationError, Asset, isModelAsset, AssetType, Gltf } from './types'
+import { BaseAsset, ModelAsset, ValidationError, Asset, isModelAsset, Gltf, AssetType } from './types'
 
 const sampleIndex = (list: any[]) => Math.floor(Math.random() * list.length)
 
@@ -146,11 +146,11 @@ async function validateGltf(gltf: Gltf): Promise<void> {
 }
 
 // Utility functions
-function normalizeFileName(fileName: string): string {
+export function normalizeFileName(fileName: string): string {
   return fileName.trim().replace(/\s+/g, '_').toLowerCase()
 }
 
-function extractFileInfo(fileName: string): [string, string] {
+export function extractFileExtension(fileName: string): [string, string] {
   const match = fileName.match(/^(.*?)(?:\.([^.]+))?$/)
   return match ? [match[1], match[2]?.toLowerCase() || ''] : [fileName, '']
 }
@@ -169,7 +169,7 @@ function validateExtension(extension: string): ValidationError {
 
 async function processFile(file: File): Promise<BaseAsset> {
   const normalizedName = normalizeFileName(file.name)
-  const [name, extension] = extractFileInfo(normalizedName)
+  const [name, extension] = extractFileExtension(normalizedName)
 
   const extensionError = validateExtension(extension)
   if (extensionError) {
@@ -297,22 +297,22 @@ export async function convertAssetToBinary(asset: Asset): Promise<Map<string, Ui
   return binaryContents
 }
 
-export function determineAssetType(asset: Asset): AssetType {
-  switch (asset.extension) {
+export function determineAssetType(extension: string): AssetType {
+  switch (extension) {
     case 'gltf':
     case 'glb':
-      return 'models'
+      return '3D Model'
     case 'png':
     case 'jpg':
     case 'jpeg':
-      return 'images'
+      return 'Image'
     case 'mp3':
     case 'wav':
     case 'ogg':
-      return 'audio'
+      return 'Audio'
     case 'mp4':
-      return 'video'
+      return 'Video'
     default:
-      return 'other'
+      return 'Other'
   }
 }

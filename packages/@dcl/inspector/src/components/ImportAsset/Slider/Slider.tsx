@@ -6,7 +6,7 @@ import { AssetPreview } from '../../AssetPreview'
 import { Button } from '../../Button'
 import { Input } from '../../Input'
 
-import { getAssetSize, getAssetResources } from '../utils'
+import { getAssetSize, getAssetResources, determineAssetType } from '../utils'
 
 import { Asset } from '../types'
 import { PropTypes, Thumbnails } from './types'
@@ -62,7 +62,13 @@ export function Slider({ assets, onSubmit }: PropTypes) {
   const importText = useMemo(() => `IMPORT${manyAssets ? ' ALL' : ''}`, [manyAssets])
   const leftArrowDisabled = useMemo(() => slide <= 0, [slide])
   const rightArrowDisabled = useMemo(() => slide >= value.length - 1, [slide, value])
-  const allScreenshotsTaken = useMemo(() => value.length === Object.keys(screenshots).length, [value, screenshots])
+  const allScreenshotsTaken = useMemo(() => {
+    const neededScreenshots = value.filter(($) => {
+      const type = determineAssetType($.extension)
+      return type === '3D Model' || type === 'Image'
+    })
+    return neededScreenshots.length === Object.keys(screenshots).length
+  }, [value, screenshots])
 
   if (!value.length) return null
 

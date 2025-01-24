@@ -46,13 +46,17 @@ function GltfPreview({ value, resources, onScreenshot, onLoad }: Props) {
   const handleLoad = useCallback(() => {
     onLoad?.()
     const wp = WearablePreview.createController(value.name)
-    void wp.scene.getScreenshot(WIDTH, HEIGHT).then(($) => onScreenshot($))
-    setTimeout(() => setLoading(false), 1000) // ugly hack to avoid iframe flickering...
+    void wp.scene.getScreenshot(WIDTH, HEIGHT).then(($) => {
+      setTimeout(() => {
+        onScreenshot($)
+        setLoading(false)
+      }, 1000) // ugly hack to avoid iframe flickering...
+    })
   }, [onLoad])
 
   return (
     <>
-      <div className={cx("GltfPreview", { hidden: loading })}>
+      <div className={cx('GltfPreview', { hidden: loading })}>
         <WearablePreview
           id={value.name}
           blob={toWearableWithBlobs(value, resources)}
