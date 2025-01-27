@@ -2425,12 +2425,12 @@ export namespace PBInputModifier_StandardInput {
 
 // @public (undocumented)
 export interface PBLightSource {
-    active: boolean;
-    brightness: number;
-    color: PBColor3 | undefined;
-    cookies: Texture | undefined;
-    range: number;
-    shadow: PBLightSource_ShadowType;
+    active?: boolean | undefined;
+    brightness?: number | undefined;
+    color?: PBColor3 | undefined;
+    range?: number | undefined;
+    shadow?: PBLightSource_ShadowType | undefined;
+    shadowMaskTexture?: Texture | undefined;
     // (undocumented)
     type?: {
         $case: "point";
@@ -2463,18 +2463,15 @@ export namespace PBLightSource_Point {
 
 // @public (undocumented)
 export const enum PBLightSource_ShadowType {
-    // (undocumented)
     ST_HARD = 2,
-    // (undocumented)
     ST_NONE = 0,
-    // (undocumented)
     ST_SOFT = 1
 }
 
 // @public (undocumented)
 export interface PBLightSource_Spot {
-    innerAngle: number;
-    outerAngle: number;
+    innerAngle?: number | undefined;
+    outerAngle?: number | undefined;
 }
 
 // @public (undocumented)
