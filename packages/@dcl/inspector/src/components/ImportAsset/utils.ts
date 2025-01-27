@@ -299,11 +299,11 @@ export function determineAssetType(extension: string): AssetType {
   switch (extension) {
     case 'gltf':
     case 'glb':
-      return '3D Model'
+      return 'Models'
     case 'png':
     case 'jpg':
     case 'jpeg':
-      return 'Image'
+      return 'Images'
     case 'mp3':
     case 'wav':
     case 'ogg':

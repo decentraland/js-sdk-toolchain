@@ -65,7 +65,7 @@ export function Slider({ assets, onSubmit, isNameValid }: PropTypes) {
   const allScreenshotsTaken = useMemo(() => {
     const neededScreenshots = value.filter(($) => {
       const type = determineAssetType($.extension)
-      return type === '3D Model' || type === 'Image'
+      return type === 'Models' || type === 'Images'
     })
     return neededScreenshots.length === Object.keys(screenshots).length
   }, [value, screenshots])

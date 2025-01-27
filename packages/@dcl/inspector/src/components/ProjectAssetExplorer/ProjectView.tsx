@@ -284,9 +284,9 @@ function NodeIcon({ value }: { value?: TreeNode }) {
     const Icon = useMemo(() => {
       const classification = determineAssetType(extractFileExtension(value.name)[1])
       switch (classification) {
-        case '3D Model':
+        case 'Models':
           return ModelIcon
-        case 'Image':
+        case 'Images':
           return ImageIcon
         case 'Audio':
           return AudioIcon
