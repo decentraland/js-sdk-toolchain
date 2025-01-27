@@ -1,4 +1,4 @@
-import { BorderRect } from '@dcl/ecs'
+import { BorderRect, Entity } from '@dcl/ecs'
 import { Color4 } from '@dcl/ecs/dist/components/generated/pb/decentraland/common/colors.gen'
 
 /**
@@ -16,6 +16,8 @@ export interface UiBackgroundProps {
   uvs?: number[]
   /** AvatarTexture for the background */
   avatarTexture?: UiAvatarTexture
+  /** VideoTexture for the background */
+  videoTexture?: UiVideoTexture
   /** Texture for the background */
   texture?: UiTexture
 }
@@ -25,6 +27,16 @@ export interface UiBackgroundProps {
  */
 export interface UiAvatarTexture {
   userId: string
+  wrapMode?: TextureWrapType
+  filterMode?: TextureFilterType
+}
+
+/**
+ * Texture
+ * @public
+ */
+export interface UiVideoTexture {
+  videoPlayerEntity: Entity
   wrapMode?: TextureWrapType
   filterMode?: TextureFilterType
 }

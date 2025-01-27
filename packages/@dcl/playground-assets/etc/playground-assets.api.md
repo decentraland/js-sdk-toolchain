@@ -377,6 +377,12 @@ export interface ByteBuffer {
 export type Callback = () => void;
 
 // @public (undocumented)
+export const CameraLayer: LastWriteWinElementSetComponentDefinition<PBCameraLayer>;
+
+// @public (undocumented)
+export const CameraLayers: LastWriteWinElementSetComponentDefinition<PBCameraLayers>;
+
+// @public (undocumented)
 export const CameraMode: LastWriteWinElementSetComponentDefinition<PBCameraMode>;
 
 // @public (undocumented)
@@ -673,6 +679,8 @@ export const componentDefinitionByName: {
     "core::AvatarModifierArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>>;
     "core::AvatarShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarShape>>;
     "core::Billboard": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBBillboard>>;
+    "core::CameraLayer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraLayer>>;
+    "core::CameraLayers": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraLayers>>;
     "core::CameraMode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraMode>>;
     "core::CameraModeArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraModeArea>>;
     "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
@@ -692,12 +700,12 @@ export const componentDefinitionByName: {
     "core::PointerEvents": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerEvents>>;
     "core::PointerEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBPointerEventsResult>>;
     "core::PointerLock": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerLock>>;
-    "core::PrimaryPointerInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPrimaryPointerInfo>>;
     "core::Raycast": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycast>>;
     "core::RaycastResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycastResult>>;
     "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
     "core::Spotlight": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSpotlight>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
+    "core::TextureCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextureCamera>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
     "core::TweenSequence": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenSequence>>;
     "core::TweenState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenState>>;
@@ -2141,6 +2149,19 @@ export const onVideoEvent: Observable<{
     totalVideoLength: number;
 }>;
 
+// @public (undocumented)
+export interface Orthographic {
+    verticalRange?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace Orthographic {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): Orthographic;
+    // (undocumented)
+    export function encode(message: Orthographic, writer?: _m0.Writer): _m0.Writer;
+}
+
 // @public
 export type OverflowType = 'hidden' | 'scroll' | 'visible';
 
@@ -2345,6 +2366,42 @@ export namespace PBBillboard {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBBillboard;
     // (undocumented)
     export function encode(message: PBBillboard, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBCameraLayer {
+    // (undocumented)
+    ambientBrightnessOverride?: number | undefined;
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    ambientColorOverride?: PBColor3 | undefined;
+    directionalLight?: boolean | undefined;
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    layer: number;
+    showAvatars?: boolean | undefined;
+    showFog?: boolean | undefined;
+    showSkybox?: boolean | undefined;
+}
+
+// @public (undocumented)
+export namespace PBCameraLayer {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBCameraLayer;
+    // (undocumented)
+    export function encode(message: PBCameraLayer, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBCameraLayers {
+    // (undocumented)
+    layers: number[];
+}
+
+// @public (undocumented)
+export namespace PBCameraLayers {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBCameraLayers;
+    // (undocumented)
+    export function encode(message: PBCameraLayers, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2975,23 +3032,6 @@ export namespace PBPosition {
 }
 
 // @public (undocumented)
-export interface PBPrimaryPointerInfo {
-    // (undocumented)
-    pointerType?: PointerType | undefined;
-    screenCoordinates?: PBVector2 | undefined;
-    screenDelta?: PBVector2 | undefined;
-    worldRayDirection?: PBVector3 | undefined;
-}
-
-// @public (undocumented)
-export namespace PBPrimaryPointerInfo {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPrimaryPointerInfo;
-    // (undocumented)
-    export function encode(message: PBPrimaryPointerInfo, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
 export interface PBQuaternion {
     // (undocumented)
     w: number;
@@ -3132,6 +3172,31 @@ export namespace PBTextShape {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTextShape;
     // (undocumented)
     export function encode(message: PBTextShape, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBTextureCamera {
+    clearColor?: PBColor4 | undefined;
+    farPlane?: number | undefined;
+    height?: number | undefined;
+    layer?: number | undefined;
+    // (undocumented)
+    mode?: {
+        $case: "perspective";
+        perspective: Perspective;
+    } | {
+        $case: "orthographic";
+        orthographic: Orthographic;
+    } | undefined;
+    width?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBTextureCamera {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTextureCamera;
+    // (undocumented)
+    export function encode(message: PBTextureCamera, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3551,6 +3616,19 @@ export namespace PBVisibilityComponent {
     export function encode(message: PBVisibilityComponent, writer?: _m0.Writer): _m0.Writer;
 }
 
+// @public (undocumented)
+export interface Perspective {
+    fieldOfView?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace Perspective {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): Perspective;
+    // (undocumented)
+    export function encode(message: Perspective, writer?: _m0.Writer): _m0.Writer;
+}
+
 // @public
 export namespace Plane {
     // (undocumented)
@@ -3645,12 +3723,6 @@ export const enum PointerEventType {
     // (undocumented)
     PET_DOWN = 1,
     // (undocumented)
-    PET_DRAG = 5,
-    // (undocumented)
-    PET_DRAG_END = 6,
-    // (undocumented)
-    PET_DRAG_LOCKED = 4,
-    // (undocumented)
     PET_HOVER_ENTER = 2,
     // (undocumented)
     PET_HOVER_LEAVE = 3,
@@ -3672,20 +3744,6 @@ export type PointerFilterType = 'none' | 'block';
 // @public (undocumented)
 export const PointerLock: LastWriteWinElementSetComponentDefinition<PBPointerLock>;
 
-// @public (undocumented)
-export const enum PointerType {
-    // (undocumented)
-    POT_MOUSE = 1,
-    // (undocumented)
-    POT_NONE = 0,
-    // (undocumented)
-    POT_PAD = 2,
-    // (undocumented)
-    POT_TOUCH = 3,
-    // (undocumented)
-    POT_WAND = 4
-}
-
 // @public
 export interface Position {
     // (undocumented)
@@ -3706,9 +3764,6 @@ export type PositionType = 'absolute' | 'relative';
 
 // @public
 export type PositionUnit = `${number}px` | `${number}%` | number | `${number}` | ScaleUnit;
-
-// @public (undocumented)
-export const PrimaryPointerInfo: LastWriteWinElementSetComponentDefinition<PBPrimaryPointerInfo>;
 
 // Warning: (ae-missing-release-tag) "ProcessMessageResultType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -4297,6 +4352,9 @@ export namespace Texture {
 }
 
 // @public (undocumented)
+export const TextureCamera: LastWriteWinElementSetComponentDefinition<PBTextureCamera>;
+
+// @public (undocumented)
 export const enum TextureFilterMode {
     // (undocumented)
     TFM_BILINEAR = 1,
@@ -4531,6 +4589,7 @@ export interface UiBackgroundProps {
     textureMode?: TextureMode;
     textureSlices?: BorderRect | undefined;
     uvs?: number[];
+    videoTexture?: UiVideoTexture;
 }
 
 // @public
@@ -4674,6 +4733,16 @@ export interface UiTransformProps {
     scrollVisible?: ScrollVisibleType;
     width?: PositionUnit | 'auto';
     zIndex?: number;
+}
+
+// @public
+export interface UiVideoTexture {
+    // (undocumented)
+    filterMode?: TextureFilterType;
+    // (undocumented)
+    videoPlayerEntity: Entity;
+    // (undocumented)
+    wrapMode?: TextureWrapType;
 }
 
 // @public (undocumented)
