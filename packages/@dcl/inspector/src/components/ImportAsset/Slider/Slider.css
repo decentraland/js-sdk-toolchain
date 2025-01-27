@@ -54,6 +54,11 @@
   height: 60%;
 }
 
+.Slider .asset .name-error {
+  font-size: 12px;
+  color: var(--primary-main)
+}
+
 .Slider .asset .size {
   text-align: center;
   font-size: 12px;

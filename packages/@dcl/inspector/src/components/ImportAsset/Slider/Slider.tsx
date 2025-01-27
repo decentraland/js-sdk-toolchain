@@ -6,14 +6,14 @@ import { AssetPreview } from '../../AssetPreview'
 import { Button } from '../../Button'
 import { Input } from '../../Input'
 
-import { getAssetSize, getAssetResources, determineAssetType } from '../utils'
+import { getAssetSize, getAssetResources, determineAssetType, formatFileName } from '../utils'
 
 import { Asset } from '../types'
 import { PropTypes, Thumbnails } from './types'
 
 import './Slider.css'
 
-export function Slider({ assets, onSubmit }: PropTypes) {
+export function Slider({ assets, onSubmit, isNameValid }: PropTypes) {
   const [value, setValue] = useState(assets)
   const [slide, setSlide] = useState(0)
   const [screenshots, setScreenshots] = useState<Thumbnails>({})
@@ -70,6 +70,30 @@ export function Slider({ assets, onSubmit }: PropTypes) {
     return neededScreenshots.length === Object.keys(screenshots).length
   }, [value, screenshots])
 
+  const invalidNames = useMemo(() => {
+    const all = new Set<string>()
+    const invalid = new Set<string>()
+
+    for (const asset of value) {
+      const name = formatFileName(asset)
+      if (all.has(name) || !isNameValid(asset, name)) {
+        invalid.add(name)
+      } else {
+        all.add(name)
+      }
+    }
+
+    return invalid
+  }, [value])
+
+  const isNameUnique = useCallback(
+    (asset: Asset) => {
+      const name = formatFileName(asset)
+      return !invalidNames.has(name)
+    },
+    [invalidNames]
+  )
+
   if (!value.length) return null
 
   return (
@@ -87,6 +111,7 @@ export function Slider({ assets, onSubmit }: PropTypes) {
               <div>
                 <AssetPreview value={$.blob} resources={getAssetResources($)} onScreenshot={handleScreenshot($)} />
                 <Input value={$.name} onChange={handleNameChange(i)} />
+                {!isNameUnique($) && <span className="name-error">Filename already exists</span>}
               </div>
               <span className="size">{getAssetSize($)}</span>
             </div>
@@ -98,7 +123,7 @@ export function Slider({ assets, onSubmit }: PropTypes) {
           </span>
         )}
       </div>
-      <Button type="danger" size="big" onClick={handleSubmit} disabled={!allScreenshotsTaken}>
+      <Button type="danger" size="big" onClick={handleSubmit} disabled={!allScreenshotsTaken || invalidNames.size > 0}>
         {importText}
       </Button>
     </div>

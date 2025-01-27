@@ -2,11 +2,11 @@ import React, { PropsWithChildren, useCallback, useEffect, useState } from 'reac
 import cx from 'classnames'
 import { HiOutlineUpload } from 'react-icons/hi'
 
-// import { removeBasePath } from '../../lib/logic/remove-base-path'
+import { removeBasePath } from '../../lib/logic/remove-base-path'
 import { DIRECTORY, transformBase64ResourceToBinary, withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { importAsset, saveThumbnail } from '../../redux/data-layer'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
-import { selectUploadFile, updateUploadFile } from '../../redux/app'
+import { selectAssetCatalog, selectUploadFile, updateUploadFile } from '../../redux/app'
 
 import FileInput from '../FileInput'
 import { Modal } from '../Modal'
@@ -19,9 +19,9 @@ import {
   ACCEPTED_FILE_TYPES,
   formatFileName,
   convertAssetToBinary,
-  determineAssetType
+  buildAssetPath
 } from './utils'
-import { Asset, isModelAsset } from './types'
+import { Asset } from './types'
 
 import './ImportAsset.css'
 import { Error } from './Error'
@@ -34,13 +34,13 @@ interface PropTypes {
 
 const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ onSave, children }, inputRef) => {
   const dispatch = useAppDispatch()
-  // const catalog = useAppSelector(selectAssetCatalog)
+  const catalog = useAppSelector(selectAssetCatalog)
   const uploadFile = useAppSelector(selectUploadFile)
 
   const [files, setFiles] = useState<Asset[]>([])
 
   const [isHover, setIsHover] = useState(false)
-  // const { basePath, assets } = catalog ?? { basePath: '', assets: [] }
+  const { basePath, assets } = catalog ?? { basePath: '', assets: [] }
 
   useEffect(() => {
     const isValidFile = uploadFile && 'name' in uploadFile
@@ -71,8 +71,7 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
       // times. This can be improved by doing all the process once...
       for (const asset of assets) {
         const content = await convertAssetToBinary(asset)
-        const classification = determineAssetType(asset.extension)
-        const assetPackageName = isModelAsset(asset) ? `${classification}/${asset.name}` : classification
+        const assetPackageName = buildAssetPath(asset)
 
         dispatch(
           importAsset({
@@ -106,15 +105,17 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
     [uploadFile]
   )
 
-  // const isNameUnique = useCallback((name: string, ext: string) => {
-  //   return !assets.find((asset) => {
-  //     const [packageName, otherAssetName] = removeBasePath(basePath, asset.path).split('/')
-  //     if (packageName === 'builder') return false
-  //     return otherAssetName?.toLocaleLowerCase() === name?.toLocaleLowerCase() + '.' + ext
-  //   })
-  // }, [])
-
-  // const isNameRepeated = !isNameUnique(assetName, assetExtension)
+  const validateName = useCallback(
+    (asset: Asset, fileName: string) => {
+      return !assets.find(($) => {
+        const [packageName, ...otherAssetName] = removeBasePath(basePath, $.path).split('/')
+        if (packageName === 'builder') return false
+        const assetPath = buildAssetPath(asset)
+        return otherAssetName.join('/') === `${assetPath}/${fileName}`
+      })
+    },
+    [assets]
+  )
 
   return (
     <div className={cx('ImportAsset', { ImportAssetHover: isHover })}>
@@ -144,7 +145,7 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
         >
           <h2>Import Assets</h2>
           {assetsAreValid(files) ? (
-            <Slider assets={files} onSubmit={handleImport} />
+            <Slider assets={files} onSubmit={handleImport} isNameValid={validateName} />
           ) : (
             <Error assets={files} onSubmit={handleCloseModal} />
           )}

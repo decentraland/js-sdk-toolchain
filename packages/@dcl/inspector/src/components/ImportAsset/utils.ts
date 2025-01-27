@@ -121,7 +121,6 @@ const IGNORED_ERROR_CODES = [
 async function getGltf(file: File, getExternalResource: (uri: string) => Promise<Uint8Array>): Promise<Gltf> {
   try {
     const buffer = await file.arrayBuffer()
-    // const resourceMap = new Map([...model.buffers, ...model.images].map(($) => [$.blob.name, $.blob]))
     const result: Gltf = await validator.validateBytes(new Uint8Array(buffer), {
       ignoredIssues: IGNORED_ERROR_CODES,
       externalResourceFunction: getExternalResource
@@ -145,7 +144,6 @@ async function validateGltf(gltf: Gltf): Promise<void> {
   }
 }
 
-// Utility functions
 export function normalizeFileName(fileName: string): string {
   return fileName.trim().replace(/\s+/g, '_').toLowerCase()
 }
@@ -315,4 +313,10 @@ export function determineAssetType(extension: string): AssetType {
     default:
       return 'Other'
   }
+}
+
+export function buildAssetPath(asset: Asset): string {
+  const classification = determineAssetType(asset.extension)
+  const assetPath = isModelAsset(asset) ? `${classification}/${asset.name}` : classification
+  return assetPath
 }
