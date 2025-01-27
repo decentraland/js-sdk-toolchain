@@ -2428,6 +2428,7 @@ export interface PBLightSource {
     active: boolean;
     brightness: number;
     color: PBColor3 | undefined;
+    cookies: Texture | undefined;
     range: number;
     shadow: PBLightSource_ShadowType;
     // (undocumented)
