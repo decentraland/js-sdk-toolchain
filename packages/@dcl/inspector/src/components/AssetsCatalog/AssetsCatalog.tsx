@@ -2,9 +2,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { AssetPack } from '../../lib/logic/catalog'
 import { analytics, Event } from '../../lib/logic/analytics'
-import { useAppDispatch } from '../../redux/hooks'
-import { selectAssetsTab } from '../../redux/ui'
-import { AssetsTab } from '../../redux/ui/types'
 
 import { Header } from './Header'
 import { Themes } from './Themes'
@@ -16,15 +13,10 @@ import { Props } from './types'
 import './AssetsCatalog.css'
 
 const AssetsCatalog: React.FC<Props> = ({ catalog }) => {
-  const dispatch = useAppDispatch()
   const [selectedTheme, setSelectedTheme] = useState<AssetPack>()
   const [search, setSearch] = useState<string>('')
 
   const handleThemeChange = useCallback((value?: AssetPack) => setSelectedTheme(value), [setSelectedTheme])
-
-  const handleUploadAsset = useCallback(() => {
-    dispatch(selectAssetsTab({ tab: AssetsTab.Import }))
-  }, [])
 
   const handleSearchAssets = useCallback(
     (value: string) => {
@@ -63,8 +55,8 @@ const AssetsCatalog: React.FC<Props> = ({ catalog }) => {
   }, [search, filteredCatalog])
 
   const renderEmptySearch = useCallback(() => {
-    const ctaMethod = selectedTheme ? handleThemeChange : handleUploadAsset
-    const ctaText = selectedTheme ? 'search all categories' : 'upload your own asset'
+    const ctaMethod = selectedTheme ? handleThemeChange : () => undefined
+    const ctaText = selectedTheme ? 'search all categories' : 'upload your own asset by drag & drop'
     return (
       <div className="empty-search">
         <span>No results for '{search}'.</span>
@@ -77,7 +69,7 @@ const AssetsCatalog: React.FC<Props> = ({ catalog }) => {
         </span>
       </div>
     )
-  }, [search, selectedTheme, handleThemeChange, handleUploadAsset])
+  }, [search, selectedTheme, handleThemeChange])
 
   const renderAssets = useCallback(() => {
     if (filteredCatalog.length > 0) {
