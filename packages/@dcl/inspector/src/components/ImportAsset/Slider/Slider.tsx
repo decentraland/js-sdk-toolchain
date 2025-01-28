@@ -5,6 +5,7 @@ import cx from 'classnames'
 import { AssetPreview } from '../../AssetPreview'
 import { Button } from '../../Button'
 import { Input } from '../../Input'
+import { Loading } from '../../Loading'
 
 import { getAssetSize, getAssetResources, determineAssetType, formatFileName } from '../utils'
 
@@ -110,6 +111,11 @@ export function Slider({ assets, onSubmit, isNameValid }: PropTypes) {
             <div className={cx('asset', { active: slide === i })} key={i}>
               <div>
                 <AssetPreview value={$.blob} resources={getAssetResources($)} onScreenshot={handleScreenshot($)} />
+                {screenshots[$.blob.name] ? (
+                  <div className="thumbnail" style={{ backgroundImage: `url(${screenshots[$.blob.name]})` }}></div>
+                ) : (
+                  <Loading dimmer={false} />
+                )}
                 <Input value={$.name} onChange={handleNameChange(i)} />
                 {!isNameUnique($) && <span className="name-error">Filename already exists</span>}
               </div>

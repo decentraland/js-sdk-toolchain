@@ -38,20 +38,26 @@
 .Slider .asset > div {
   display: flex;
   flex-direction: column;
-  margin: 10px 10px 5px 10px;
+  margin: 10px;
   width: 150px;
 }
 
-.Slider .asset > div .AssetPreview {
+.Slider .asset .loading {
+  position: relative;
+}
+
+.Slider .asset .AssetPreview {
+  display: none;
+}
+
+.Slider .asset .thumbnail,
+.Slider .asset .loading {
   margin-bottom: 12px;
   width: 150px;
   height: 150px;
   background-color: var(--background-gray);
-}
-
-.Slider .asset > div .AssetPreview > svg {
-  width: 60%;
-  height: 60%;
+  background-size: cover;
+  background-position: center;
 }
 
 .Slider .asset .name-error {

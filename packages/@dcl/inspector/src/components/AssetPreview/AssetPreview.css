@@ -11,7 +11,3 @@
 .AssetPreview .GltfPreview.hidden {
   visibility: hidden;
 }
-
-.AssetPreview > .loading {
-  position: absolute;
-}

@@ -112,10 +112,12 @@ const CreateCustomAsset: React.FC = () => {
         <div className="file-container">
           {previewFile && resources !== null ? (
             <div className="preview-container">
-              {isGeneratingThumbnail && (
+              {isGeneratingThumbnail && !thumbnail ? (
                 <div className="loader-container">
                   <Loader active size="small" />
                 </div>
+              ) : (
+                <div className="thumbnail" style={{ backgroundImage: `url(${thumbnail})` }}></div>
               )}
               <AssetPreview value={previewFile} resources={resources} onScreenshot={handleScreenshot} />
             </div>

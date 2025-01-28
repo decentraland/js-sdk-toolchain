@@ -6,7 +6,6 @@ import { AiFillSound } from 'react-icons/ai'
 import { IoVideocamOutline } from 'react-icons/io5'
 import { FaFile } from 'react-icons/fa'
 
-import { Loading } from '../Loading'
 import { toWearableWithBlobs } from './utils'
 import { Props } from './types'
 
@@ -61,13 +60,12 @@ function GltfPreview({ value, resources, onScreenshot, onLoad }: Props) {
           id={value.name}
           blob={toWearableWithBlobs(value, resources)}
           disableAutoRotate
-          background="#3c3c3c"
+          disableBackground
           projection={PreviewProjection.ORTHOGRAPHIC}
           camera={PreviewCamera.STATIC}
           onLoad={handleLoad}
         />
       </div>
-      {loading && <Loading dimmer={false} />}
     </>
   )
 }
