@@ -1,5 +1,6 @@
+import { Filter } from './Filters/types'
 import { TreeNode } from './ProjectView'
-import { AssetNode, AssetNodeFolder, AssetNodeItem } from './types'
+import { AssetNode, AssetNodeFolder, AssetNodeItem, IAsset } from './types'
 
 export function AssetNodeRootNull(): AssetNodeFolder {
   return { name: '', parent: null, type: 'folder', children: [] }
@@ -29,6 +30,8 @@ export function buildAssetTree(paths: string[]): AssetNodeFolder {
               ? 'audio'
               : lowerPath.endsWith('.mp4')
               ? 'video'
+              : lowerPath.endsWith('.jpg') || lowerPath.endsWith('.jpeg') || lowerPath.endsWith('.png')
+              ? 'image'
               : 'unknown'
           childNode = {
             name: parts[i],
@@ -64,4 +67,26 @@ export function getFullNodePath(item: AssetNode | TreeNode): string {
 
 export function isAssetNode(node: AssetNode | TreeNode): node is AssetNodeItem {
   return node.type === 'asset'
+}
+
+export const DEFAULT_FILTERS: Filter[] = ['all' /*'recents' */]
+export const FILTERS_IN_ORDER: Filter[] = ['models', 'images', 'audio', 'video', 'other']
+
+export function mapAssetTypeToFilter(type: IAsset['type']): Filter | undefined {
+  switch (type) {
+    case 'gltf':
+      return 'models'
+    case 'audio':
+      return 'audio'
+    case 'image':
+      return 'images'
+    case 'video':
+      return 'video'
+    default:
+      return 'other'
+  }
+}
+
+export function getFilterFromTree(filters: Set<Filter>): Filter[] {
+  return [...DEFAULT_FILTERS, ...FILTERS_IN_ORDER.filter(($) => filters.has($))]
 }
