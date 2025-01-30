@@ -1,6 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Entity } from '@dcl/ecs'
-import { IoIosImage } from 'react-icons/io'
+import { AiOutlineSound as AudioIcon } from 'react-icons/ai'
+import { IoIosImage as ImageIcon } from 'react-icons/io'
+import { IoCubeOutline as ModelIcon, IoVideocamOutline as VideoIcon } from 'react-icons/io5'
+import { FaFile as OtherIcon } from 'react-icons/fa'
 
 import { useSdk } from '../../hooks/sdk/useSdk'
 import { Tile } from './Tile'
@@ -14,6 +17,7 @@ import Search from '../Search'
 import { withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { removeAsset } from '../../redux/data-layer'
 import { useAppDispatch } from '../../redux/hooks'
+import { determineAssetType, extractFileExtension } from '../ImportAsset/utils'
 
 function noop() {}
 
@@ -181,12 +185,9 @@ function ProjectView({ folders, thumbnails }: Props) {
 
   const getThumbnail = useCallback(
     (value: string) => {
-      const [name, extension] = value.split('.')
+      const [name] = value.split('.')
       const thumbnail = thumbnails.find(($) => $.path.endsWith(name + '.png'))
-      if (thumbnail) {
-        return thumbnail?.content
-      } else if (extension === 'png') {
-      }
+      if (thumbnail) return thumbnail.content
     },
     [thumbnails]
   )
@@ -279,13 +280,30 @@ function NodeIcon({ value }: { value?: TreeNode }) {
         <FolderIcon />
       </div>
     )
-  } else
+  } else {
+    const Icon = useMemo(() => {
+      const classification = determineAssetType(extractFileExtension(value.name)[1])
+      switch (classification) {
+        case 'Models':
+          return ModelIcon
+        case 'Images':
+          return ImageIcon
+        case 'Audio':
+          return AudioIcon
+        case 'Video':
+          return VideoIcon
+        case 'Other':
+          return OtherIcon
+      }
+    }, [])
+
     return (
       <>
         <svg style={{ width: '4px', height: '4px' }} />
-        <IoIosImage style={{ marginRight: '4px' }} />
+        <Icon style={{ marginRight: '4px' }} />
       </>
     )
+  }
 }
 
 export default React.memo(ProjectView)

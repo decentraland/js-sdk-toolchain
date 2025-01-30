@@ -1,6 +1,8 @@
 import { useCallback, useMemo } from 'react'
-import { AiFillDelete as DeleteIcon } from 'react-icons/ai'
-import { IoIosImage } from 'react-icons/io'
+import { AiFillDelete as DeleteIcon, AiOutlineSound as AudioIcon } from 'react-icons/ai'
+import { IoIosImage as ImageIcon } from 'react-icons/io'
+import { IoCubeOutline as ModelIcon, IoVideocamOutline as VideoIcon } from 'react-icons/io5'
+import { FaFile as OtherIcon } from 'react-icons/fa'
 import { Item as MenuItem } from 'react-contexify'
 import { useDrag } from 'react-dnd'
 import { Loader } from 'decentraland-ui/dist/components/Loader/Loader'
@@ -15,6 +17,7 @@ import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
 import { Props } from './types'
 
 import './Tile.css'
+import { determineAssetType, extractFileExtension } from '../../ImportAsset/utils'
 
 export const Tile = withContextMenu<Props>(
   ({ valueId, value, getDragContext, onSelect, onRemove, contextMenuId, dndType, getThumbnail }) => {
@@ -38,7 +41,19 @@ export const Tile = withContextMenu<Props>(
       if (value.type === 'folder') return <FolderIcon />
       const thumbnail = getThumbnail(value.name)
       if (thumbnail) return <img src={transformBinaryToBase64Resource(thumbnail)} alt={value.name} />
-      return <IoIosImage />
+      const classification = determineAssetType(extractFileExtension(value.name)[1])
+      switch (classification) {
+        case 'Models':
+          return <ModelIcon />
+        case 'Images':
+          return <ImageIcon />
+        case 'Audio':
+          return <AudioIcon />
+        case 'Video':
+          return <VideoIcon />
+        case 'Other':
+          return <OtherIcon />
+      }
     }, [])
 
     const renderOverlayLoading = useCallback(() => {

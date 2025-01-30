@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useRef } from 'react'
 import cx from 'classnames'
 import { MdImageSearch } from 'react-icons/md'
 import { HiOutlinePlus } from 'react-icons/hi'
@@ -17,6 +17,8 @@ import { CustomAssets } from '../CustomAssets'
 import { selectCustomAssets } from '../../redux/app'
 import { RenameAsset } from '../RenameAsset'
 import { CreateCustomAsset } from '../CreateCustomAsset'
+import { InputRef } from '../FileInput/FileInput'
+import { Button } from '../Button'
 
 import './Assets.css'
 
@@ -31,6 +33,7 @@ function Assets({ isAssetsPanelCollapsed }: { isAssetsPanelCollapsed: boolean })
   const dispatch = useAppDispatch()
   const tab = useAppSelector(getSelectedAssetsTab)
   const customAssets = useAppSelector(selectCustomAssets)
+  const inputRef = useRef<InputRef>(null)
 
   const handleTabClick = useCallback(
     (tab: AssetsTab) => () => {
@@ -47,9 +50,17 @@ function Assets({ isAssetsPanelCollapsed }: { isAssetsPanelCollapsed: boolean })
   const assetToRename = useAppSelector(selectAssetToRename)
   const stagedCustomAsset = useAppSelector(selectStagedCustomAsset)
 
+  const handleImportClick = useCallback(() => {
+    inputRef.current?.onClick()
+  }, [inputRef])
+
   return (
     <div className="Assets">
       <div className="Assets-buttons">
+        <Button onClick={handleImportClick}>
+          <HiOutlinePlus />
+          IMPORT ASSETS
+        </Button>
         <div className="tab" onClick={handleTabClick(AssetsTab.FileSystem)} data-test-id={AssetsTab.FileSystem}>
           <div className={cx({ underlined: tab === AssetsTab.FileSystem })}>
             <FolderOpen />
@@ -70,22 +81,18 @@ function Assets({ isAssetsPanelCollapsed }: { isAssetsPanelCollapsed: boolean })
             <span>ASSET PACKS</span>
           </div>
         </div>
-        <div className="tab" onClick={handleTabClick(AssetsTab.Import)} data-test-id={AssetsTab.Import}>
-          <div>
-            <HiOutlinePlus />
-          </div>
+      </div>
+      <ImportAsset onSave={handleTabClick(AssetsTab.FileSystem)} ref={inputRef}>
+        <div className={cx('Assets-content', { Hide: isAssetsPanelCollapsed })}>
+          {tab === AssetsTab.AssetsPack && <AssetsCatalog catalog={filteredCatalog} />}
+          {tab === AssetsTab.FileSystem && <ProjectAssetExplorer />}
+          {tab === AssetsTab.CustomAssets && <CustomAssets />}
+          {tab === AssetsTab.RenameAsset && assetToRename && (
+            <RenameAsset assetId={assetToRename.id} currentName={assetToRename.name} />
+          )}
+          {tab === AssetsTab.CreateCustomAsset && stagedCustomAsset && <CreateCustomAsset />}
         </div>
-      </div>
-      <div className={cx('Assets-content', { Hide: isAssetsPanelCollapsed })}>
-        {tab === AssetsTab.AssetsPack && <AssetsCatalog catalog={filteredCatalog} />}
-        {tab === AssetsTab.FileSystem && <ProjectAssetExplorer />}
-        {tab === AssetsTab.Import && <ImportAsset onSave={handleTabClick(AssetsTab.FileSystem)} />}
-        {tab === AssetsTab.CustomAssets && <CustomAssets />}
-        {tab === AssetsTab.RenameAsset && assetToRename && (
-          <RenameAsset assetId={assetToRename.id} currentName={assetToRename.name} />
-        )}
-        {tab === AssetsTab.CreateCustomAsset && stagedCustomAsset && <CreateCustomAsset />}
-      </div>
+      </ImportAsset>
     </div>
   )
 }

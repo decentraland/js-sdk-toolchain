@@ -32,8 +32,15 @@
 }
 
 .CreateCustomAsset .preview-container .AssetPreview {
+  display: none;
+}
+
+.CreateCustomAsset .preview-container .thumbnail {
   width: 100%;
   height: 100%;
+  background-color: var(--background-gray);
+  background-size: cover;
+  background-position: center;
 }
 
 .CreateCustomAsset .loader-container {

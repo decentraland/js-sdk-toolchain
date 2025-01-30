@@ -17,7 +17,7 @@ const getRolesFromTarget = (target: HTMLElement | null): Roles => {
   }
 }
 
-const Input = ({ value, onCancel, onSubmit, onChange, onBlur, placeholder }: PropTypes) => {
+const Input = ({ value, onCancel, onSubmit, onChange, onBlur, placeholder, disabled }: PropTypes) => {
   const ref = useRef<HTMLInputElement>(null)
   const [stateValue, setStateValue] = useState(value)
 
@@ -71,6 +71,7 @@ const Input = ({ value, onCancel, onSubmit, onChange, onBlur, placeholder }: Pro
       placeholder={placeholder}
       value={stateValue}
       onChange={handleTextChange}
+      disabled={disabled}
     />
   )
 }

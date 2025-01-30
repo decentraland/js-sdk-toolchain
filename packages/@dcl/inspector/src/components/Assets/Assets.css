@@ -17,8 +17,10 @@
   padding-left: 8px;
   display: flex;
   background: var(--tree-bg-color);
-  height: 36px;
+  padding: 5px 0;
   position: relative;
+  align-items: center;
+  justify-content: center;
 }
 
 .Assets .Assets-buttons > div > div {
@@ -61,20 +63,22 @@
   user-select: none;
 }
 
-.Assets .Assets-buttons > div:last-child svg {
-  width: 16px;
-  height: 16px;
+.Assets .Assets-buttons > button:first-child {
+  margin: 3px;
+  position: absolute;
+  left: 0px;
+  margin-left: 8px;
+  display: flex;
+  align-items: center;
 }
 
-.Assets .Assets-buttons > div:last-child {
-  position: absolute;
-  right: 0px;
-  margin-right: 8px;
+.Assets .Assets-buttons > button:first-child svg {
+  margin-right: 5px;
 }
 
 .Assets .Assets-content {
   background: var(--tree-bg-color) !important;
-  height: calc(100% - 36px);
+  height: 100%;
 }
 
 .Assets .Assets-content.Hide {

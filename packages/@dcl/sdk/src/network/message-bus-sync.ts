@@ -17,7 +17,7 @@ export function addSyncTransport(
   sendBinary: (msg: SendBinaryRequest) => Promise<SendBinaryResponse>,
   getUserData: (value: GetUserDataRequest) => Promise<GetUserDataResponse>
 ) {
-  const DEBUG_NETWORK_MESSAGES = () => (globalThis as any).DEBUG_NETWORK_MESSAGES ?? true
+  const DEBUG_NETWORK_MESSAGES = () => (globalThis as any).DEBUG_NETWORK_MESSAGES ?? false
   // Profile Info
   const myProfile: IProfile = {} as IProfile
   fetchProfile(myProfile!, getUserData)
@@ -26,10 +26,13 @@ export function addSyncTransport(
   const entityDefinitions = entityUtils(engine, myProfile)
 
   // List of MessageBuss messsages to be sent on every frame to comms
-  const pendingMessageBusMessagesToSend: Uint8Array[] = []
-  const binaryMessageBus = BinaryMessageBus((message) => pendingMessageBusMessagesToSend.push(message))
+  const pendingMessageBusMessagesToSend: { data: Uint8Array[]; address: string[] }[] = []
 
-  function getMessagesToSend() {
+  const binaryMessageBus = BinaryMessageBus((data, address) => {
+    pendingMessageBusMessagesToSend.push({ data: [data], address: address ?? [] })
+  })
+
+  function getMessagesToSend(): typeof pendingMessageBusMessagesToSend {
     const messages = [...pendingMessageBusMessagesToSend]
     pendingMessageBusMessagesToSend.length = 0
     return messages
@@ -42,14 +45,25 @@ export function addSyncTransport(
   // Add Sync Transport
   const transport: Transport = {
     filter: syncFilter(engine),
-    send: async (message: Uint8Array) => {
-      if (message.byteLength && transportInitialzed) {
-        DEBUG_NETWORK_MESSAGES() &&
-          console.log(...Array.from(serializeCrdtMessages('[NetworkMessage sent]:', message, engine)))
-        binaryMessageBus.emit(CommsMessage.CRDT, message)
+    send: async (messages) => {
+      for (const message of [messages].flat()) {
+        if (message.byteLength && transportInitialzed) {
+          DEBUG_NETWORK_MESSAGES() &&
+            console.log(...Array.from(serializeCrdtMessages('[NetworkMessage sent]:', message, engine)))
+          binaryMessageBus.emit(CommsMessage.CRDT, message)
+        }
       }
-      const messages = getMessagesToSend()
-      const response = await sendBinary({ data: messages })
+      const peerMessages = getMessagesToSend()
+      let totalSize = 0
+      for (const message of peerMessages) {
+        for (const data of message.data) {
+          totalSize += data.byteLength
+        }
+      }
+      if (totalSize) {
+        DEBUG_NETWORK_MESSAGES() && console.log('Sending network messages: ', totalSize / 1024, 'KB')
+      }
+      const response = await sendBinary({ data: [], peerData: peerMessages })
       binaryMessageBus.__processMessages(response.data)
       transportInitialzed = true
     },
@@ -62,7 +76,7 @@ export function addSyncTransport(
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, (value) => {
     const { sender, data } = decodeCRDTState(value)
     if (sender !== myProfile.userId) return
-    DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength)
+    DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength / 1024, 'KB')
     transport.onmessage!(data)
     stateIsSyncronized = true
   })
@@ -71,7 +85,7 @@ export function addSyncTransport(
   binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, async (message, userId) => {
     console.log(`Sending CRDT State to: ${userId}`)
     transport.onmessage!(message)
-    binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(userId, engineToCrdt(engine)))
+    binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(userId, engineToCrdt(engine)), [userId])
   })
 
   // Process CRDT messages here
