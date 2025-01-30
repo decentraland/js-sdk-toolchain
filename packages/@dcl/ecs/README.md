@@ -60,7 +60,8 @@ The ECS uses CRDTs (Conflict-free Replicated Data Types) to enable deterministic
 
 ### Network Entities
 
-For multiplayer scenes, the `NetworkEntity` component marks entities that should be synchronized across peers:
+For multiplayer scenes, the `syncEntity` method marks entities that should be synchronized across peers.
+In the background it creates a NetworkEntity and a SyncComponents components with all the info necessary to synchronise the entity through the network.
 
 ```typescript
 import { engine, NetworkEntity } from '@dcl/ecs'
