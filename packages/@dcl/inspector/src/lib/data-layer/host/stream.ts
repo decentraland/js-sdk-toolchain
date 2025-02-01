@@ -20,7 +20,7 @@ export function stream(
     filter() {
       return !queue.closed
     },
-    async send(message) {
+    async send(message: Uint8Array) {
       if (queue.closed) return
       queue.enqueue({ data: message })
     }

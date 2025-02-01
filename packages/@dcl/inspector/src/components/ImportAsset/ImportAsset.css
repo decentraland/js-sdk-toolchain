@@ -1,9 +1,20 @@
+.ImportAssetModalOverlay {
+  z-index: 2;
+}
+
 .ImportAsset {
   height: 100%;
-  padding: 8px;
 }
 
 .ImportAsset > div:first-child {
+  height: 100%;
+}
+
+.ImportAssetHover {
+  padding: 8px;
+}
+
+.ImportAssetHover > div:first-child {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -19,11 +30,11 @@
   overflow-y: auto;
 }
 
-.ImportAsset > div > span:last-of-type {
+.ImportAssetHover > div > span:last-of-type {
   text-align: center;
 }
 
-.ImportAsset .upload-icon {
+.ImportAssetHover .upload-icon {
   background-color: var(--list-item-hover-bg-color);
   width: 40px;
   height: 40px;
@@ -35,19 +46,19 @@
   flex-shrink: 0;
 }
 
-.ImportAsset .Container {
+.ImportAssetHover .Container {
   overflow: visible;
   height: unset;
   background-color: var(--list-item-hover-bg-color);
   margin-right: 20px;
 }
 
-.ImportAsset .Container svg {
+.ImportAssetHover .Container svg {
   width: 40px;
   height: 40px;
 }
 
-.ImportAsset .Container .content {
+.ImportAssetHover .Container .content {
   height: 100%;
   width: 100%;
   display: flex;
@@ -57,7 +68,7 @@
   position: relative;
 }
 
-.ImportAsset .Container .remove-icon {
+.ImportAssetHover .Container .remove-icon {
   position: absolute;
   display: flex;
   align-items: center;
@@ -68,12 +79,12 @@
   border-radius: 50%;
 }
 
-.ImportAsset .Container .remove-icon svg {
+.ImportAssetHover .Container .remove-icon svg {
   width: 14px;
   height: 14px;
 }
 
-.ImportAsset .Container .file-title {
+.ImportAssetHover .Container .file-title {
   margin-top: 8px;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -82,49 +93,53 @@
   text-align: center;
 }
 
-.ImportAsset .file-container {
+.ImportAssetHover .file-container {
   display: flex;
   flex-direction: row;
   margin-top: 16px;
 }
-.ImportAsset .file-container .Container {
+.ImportAssetHover .file-container .Container {
   width: 120px;
 }
 
-.ImportAsset .file-container .Text.Field {
+.ImportAssetHover .file-container .Text.Field {
   width: auto;
   height: 24px;
 }
 
-.ImportAsset .file-container .error .Text.Field {
+.ImportAssetHover .file-container .error .Text.Field {
   border-color: red;
 }
 
-.ImportAsset .file-container > div:nth-child(2) {
+.ImportAssetHover .file-container > div:nth-child(2) {
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
-.ImportAsset .file-container > div:nth-child(2) button {
+.ImportAssetHover .file-container > div:nth-child(2) button {
   background-color: var(--primary-main);
 }
 
-.ImportAsset .error {
+.ImportAssetHover .error {
   color: var(--primary-main);
   margin-top: 6px;
 }
 
-.ImportAsset .file-container .AssetPreview {
+.ImportAssetHover .file-container .AssetPreview {
   width: 100px;
   height: 100px;
 }
 
-.ImportAsset .warning {
+.ImportAssetHover .warning {
   color: var(--danger);
   margin-top: 6px;
 }
 
-.ImportAsset .text {
+.ImportAssetHover .text {
+  text-align: center;
+}
+
+.ImportAssetModal h2 {
   text-align: center;
 }

@@ -23,10 +23,11 @@ export function* serializeCrdtMessages(prefix: string, data: Uint8Array, engine:
     ) {
       const { componentId, timestamp } = message
       const data = 'data' in message ? message.data : undefined
+      const bytes = data ? `${data.byteLength / 1024}KB` : ''
 
       try {
         const c = engine.getComponent(componentId)
-        yield `${preface} c=${c.componentName} t=${timestamp} data=${JSON.stringify(
+        yield `${preface} c=${c.componentName} t=${timestamp} ${bytes} data=${JSON.stringify(
           (data && c.schema.deserialize(new ReadWriteByteBuffer(data))) || null
         )}`
       } catch {

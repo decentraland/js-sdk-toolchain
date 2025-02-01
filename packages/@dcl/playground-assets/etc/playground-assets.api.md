@@ -4543,7 +4543,7 @@ export type TransformTypeWithOptionals = Partial<TransformType>;
 
 // @public (undocumented)
 export type Transport = {
-    send(message: Uint8Array): Promise<void>;
+    send(message: Uint8Array | Uint8Array[]): Promise<void>;
     onmessage?(message: Uint8Array): void;
     filter(message: Omit<TransportMessage, 'messageBuffer'>): boolean;
     type?: string;

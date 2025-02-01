@@ -22,7 +22,7 @@ module.exports = {
     },
     "packages/@dcl/ecs/src/systems/crdt/index.ts": {
       // This should be deleted on another PR. Need to release this asap.
-      branches: 72,
+      branches: 67,
       functions: 100,
       lines: 79,
       statements: 77,

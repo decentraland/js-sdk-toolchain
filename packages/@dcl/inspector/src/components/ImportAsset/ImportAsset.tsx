@@ -1,251 +1,158 @@
-import { GLTFValidation } from '@babylonjs/loaders'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { PropsWithChildren, useCallback, useEffect, useState } from 'react'
+import cx from 'classnames'
 import { HiOutlineUpload } from 'react-icons/hi'
-import { RxCross2 } from 'react-icons/rx'
-import classNames from 'classnames'
 
-import FileInput from '../FileInput'
-import { Container } from '../Container'
-import { TextField } from '../ui/TextField'
-import { Block } from '../Block'
-import { Button } from '../Button'
 import { removeBasePath } from '../../lib/logic/remove-base-path'
 import { DIRECTORY, transformBase64ResourceToBinary, withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { importAsset, saveThumbnail } from '../../redux/data-layer'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
 import { selectAssetCatalog, selectUploadFile, updateUploadFile } from '../../redux/app'
-import { AssetPreview } from '../AssetPreview'
+
+import FileInput from '../FileInput'
+import { Modal } from '../Modal'
+import { InputRef } from '../FileInput/FileInput'
+import { Slider } from './Slider'
+
+import {
+  processAssets,
+  assetsAreValid,
+  ACCEPTED_FILE_TYPES,
+  formatFileName,
+  convertAssetToBinary,
+  buildAssetPath
+} from './utils'
+import { Asset } from './types'
 
 import './ImportAsset.css'
+import { Error } from './Error'
 
-const ONE_MB_IN_BYTES = 1_048_576
-const ONE_GB_IN_BYTES = ONE_MB_IN_BYTES * 1024
-const ACCEPTED_FILE_TYPES = {
-  'model/gltf-binary': ['.gltf', '.glb'],
-  'image/png': ['.png'],
-  'audio/mpeg': ['.mp3'],
-  'audio/wav': ['.wav'],
-  'audio/ogg': ['.ogg'],
-  'video/mp4': ['.mp4']
-}
-
-const IGNORED_ERROR_CODES = ['ACCESSOR_WEIGHTS_NON_NORMALIZED', 'MESH_PRIMITIVE_TOO_FEW_TEXCOORDS']
+const ACCEPTED_FILE_TYPES_STR = Object.values(ACCEPTED_FILE_TYPES).flat().join('/').replaceAll('.', '').toUpperCase()
 
 interface PropTypes {
   onSave(): void
 }
 
-type ValidationError = string | null
-/*
-  Severity codes are Error (0), Warning (1), Information (2), Hint (3).
-  https://github.com/KhronosGroup/glTF-Validator/blob/main/lib/src/errors.dart
-*/
-type BabylonValidationIssue = {
-  severity: number
-  code: string
-  message: string
-  pointer: string
-}
-
-async function validateGltf(data: ArrayBuffer): Promise<ValidationError> {
-  const pre = 'Invalid GLTF'
-  let result
-  try {
-    result = await GLTFValidation.ValidateAsync(new Uint8Array(data), '', '', (_uri) => {
-      throw new Error('external references are not supported yet')
-    })
-  } catch (error) {
-    return `${pre}: ${error}`
-  }
-
-  /*
-    Babylon's type declarations incorrectly state that result.issues.messages
-    is an Array<string>. In fact, it's an array of objects with useful properties.
-  */
-  const issues = result.issues.messages as unknown as BabylonValidationIssue[]
-
-  const errors = issues.filter((issue) => issue.severity === 0 && !IGNORED_ERROR_CODES.includes(issue.code))
-
-  if (errors.length > 0) {
-    const error = errors[0]
-    return `${pre}: ${error.message} \n Check ${error.pointer}`
-  }
-
-  return null
-}
-
-async function validateAsset(extension: string, data: ArrayBuffer): Promise<ValidationError> {
-  switch (extension) {
-    case 'glb':
-    case 'gltf':
-      return validateGltf(data)
-    // add validators for .png/.ktx2?
-    case 'png':
-    case 'ktx2':
-    case 'mp3':
-    case 'wav':
-    case 'ogg':
-    case 'mp4':
-      return null
-    default:
-      return `Invalid asset format ".${extension}"`
-  }
-}
-
-const ImportAsset: React.FC<PropTypes> = ({ onSave }) => {
-  // TODO: multiple files
+const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ onSave, children }, inputRef) => {
   const dispatch = useAppDispatch()
-  const files = useAppSelector(selectAssetCatalog)
+  const catalog = useAppSelector(selectAssetCatalog)
   const uploadFile = useAppSelector(selectUploadFile)
 
-  const [file, setFile] = useState<File>()
-  const [thumbnail, setThumbnail] = useState<string | null>(null)
-  const [validationError, setValidationError] = useState<ValidationError>(null)
-  const [assetName, setAssetName] = useState<string>('')
-  const [assetExtension, setAssetExtension] = useState<string>('')
-  const { basePath, assets } = files ?? { basePath: '', assets: [] }
+  const [files, setFiles] = useState<Asset[]>([])
+
+  const [isHover, setIsHover] = useState(false)
+  const { basePath, assets } = catalog ?? { basePath: '', assets: [] }
 
   useEffect(() => {
-    if (uploadFile && typeof uploadFile !== 'string' && (!file || (file && uploadFile.name !== file.name))) {
-      handleDrop([Object.values(uploadFile!)[0] as File])
+    const isValidFile = uploadFile && 'name' in uploadFile
+    if (isValidFile && !files.find(($) => $.name === uploadFile.name)) {
+      void handleDrop([Object.values(uploadFile!)[0] as File])
     }
   }, [uploadFile])
 
-  const handleDrop = (acceptedFiles: File[]) => {
-    // TODO: handle zip file. GLB with multiple external image references
-    const file = acceptedFiles[0]
-    if (!file) return
-    setFile(file)
-    setValidationError(null)
-    setThumbnail(null)
-    const normalizedName = file.name.trim().replaceAll(' ', '_').toLowerCase()
-    const splitName = normalizedName.split('.')
-    const extensionName = splitName.pop()
-    setAssetName(splitName.join(''))
-    setAssetExtension(extensionName ? extensionName : '')
-  }
+  const handleDrop = useCallback(async (acceptedFiles: File[]) => {
+    const assets = await processAssets(acceptedFiles)
+    setFiles(assets)
+  }, [])
 
-  const handleSave = () => {
-    const reader = new FileReader()
-    if (!file) return
-    reader.onload = async () => {
-      const binary: ArrayBuffer = reader.result as ArrayBuffer
+  const handleHover = useCallback((isHover: boolean) => {
+    setIsHover(isHover)
+  }, [])
 
-      if (binary.byteLength > ONE_GB_IN_BYTES) {
-        setValidationError('Files bigger than 1GB are not accepted')
-        return
-      }
+  const handleCloseModal = useCallback(() => {
+    setFiles([])
+  }, [])
 
-      const validationError = await validateAsset(assetExtension, binary)
-      if (validationError !== null) {
-        setValidationError(validationError)
-        return
-      }
+  const handleImport = useCallback(
+    async (assets: Asset[]) => {
+      if (!assetsAreValid(assets)) return
 
       const basePath = withAssetDir(DIRECTORY.SCENE)
-      const content: Map<string, Uint8Array> = new Map()
-      const fullName = assetName + '.' + assetExtension
-      content.set(fullName, new Uint8Array(binary))
+      // TODO: we are dispatching importAsset + saveThumbnail for every asset, refreshing the app state and UI multiple
+      // times. This can be improved by doing all the process once...
+      for (const asset of assets) {
+        const content = await convertAssetToBinary(asset)
+        const assetPackageName = buildAssetPath(asset)
 
-      dispatch(
-        importAsset({
-          content,
-          basePath,
-          assetPackageName: '',
-          reload: true
-        })
-      )
-
-      if (thumbnail) {
         dispatch(
-          saveThumbnail({
-            content: transformBase64ResourceToBinary(thumbnail),
-            path: `${DIRECTORY.THUMBNAILS}/${assetName}.png`
+          importAsset({
+            content,
+            basePath,
+            assetPackageName,
+            reload: true
           })
         )
+
+        if (asset.thumbnail) {
+          dispatch(
+            saveThumbnail({
+              content: transformBase64ResourceToBinary(asset.thumbnail),
+              path: `${DIRECTORY.THUMBNAILS}/${asset.name}.png`
+            })
+          )
+        }
+
+        // Clear uploaded file from the FileUploadField
+        const newUploadFile = { ...uploadFile }
+        for (const key in newUploadFile) {
+          newUploadFile[key] = `${basePath}/${formatFileName(asset)}`
+        }
+        dispatch(updateUploadFile(newUploadFile))
       }
 
-      // Clear uploaded file from the FileUploadField
-      const newUploadFile = { ...uploadFile }
-      for (const key in newUploadFile) {
-        newUploadFile[key] = `${basePath}/${fullName}`
-      }
-      dispatch(updateUploadFile(newUploadFile))
-      setFile(undefined)
-
+      setFiles([])
       onSave()
-    }
-    reader.readAsArrayBuffer(file)
-  }
-
-  function removeFile(e: React.MouseEvent<HTMLDivElement>) {
-    e.stopPropagation()
-    setFile(undefined)
-    setValidationError(null)
-    setThumbnail(null)
-  }
-
-  const handleNameChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setAssetName(event.target.value)
-  }, [])
-
-  const isNameUnique = useCallback((name: string, ext: string) => {
-    return !assets.find((asset) => {
-      const [packageName, otherAssetName] = removeBasePath(basePath, asset.path).split('/')
-      if (packageName === 'builder') return false
-      return otherAssetName?.toLocaleLowerCase() === name?.toLocaleLowerCase() + '.' + ext
-    })
-  }, [])
-
-  const isNameRepeated = !isNameUnique(assetName, assetExtension)
-
-  const handleScreenshot = useCallback(
-    (value: string) => {
-      setThumbnail(value)
     },
-    [file]
+    [uploadFile]
+  )
+
+  const validateName = useCallback(
+    (asset: Asset, fileName: string) => {
+      return !assets.find(($) => {
+        const [packageName, ...otherAssetName] = removeBasePath(basePath, $.path).split('/')
+        if (packageName === 'builder') return false
+        const assetPath = buildAssetPath(asset)
+        return otherAssetName.join('/') === `${assetPath}/${fileName}`
+      })
+    },
+    [assets]
   )
 
   return (
-    <div className="ImportAsset">
-      <FileInput disabled={!!file} onDrop={handleDrop} accept={ACCEPTED_FILE_TYPES}>
-        {!file && (
+    <div className={cx('ImportAsset', { ImportAssetHover: isHover })}>
+      <FileInput
+        disabled={!!files.length}
+        onDrop={handleDrop}
+        onHover={handleHover}
+        ref={inputRef}
+        accept={ACCEPTED_FILE_TYPES}
+        multiple
+      >
+        {!files.length && isHover ? (
           <>
             <div className="upload-icon">
               <HiOutlineUpload />
             </div>
-            <span className="text">
-              To import an asset drag and drop a single GLB/GLTF/PNG/MP3/MP4 file
-              <br /> or click to select a file.
-            </span>
+            <span className="text">Drop {ACCEPTED_FILE_TYPES_STR} files</span>
           </>
+        ) : (
+          children
         )}
-        {file && (
-          <div className="file-container">
-            <Container>
-              <div className="remove-icon" onClick={removeFile}>
-                <RxCross2 />
-              </div>
-              <AssetPreview value={file} onScreenshot={handleScreenshot} />
-              <div className="file-title">{file.name}</div>
-            </Container>
-            <div className={classNames({ error: isNameRepeated })}>
-              <Block label="Asset name">
-                <TextField autoSelect value={assetName} onChange={handleNameChange} />
-              </Block>
-              <Button disabled={!!validationError} onClick={handleSave}>
-                Import
-              </Button>
-            </div>
-          </div>
-        )}
-        <span className="error">{validationError}</span>
-        {isNameRepeated && (
-          <span className="warning">There's a file with this name already, you will overwrite it if you continue</span>
-        )}
+        <Modal
+          isOpen={!!files.length}
+          onRequestClose={handleCloseModal}
+          className="ImportAssetModal"
+          overlayClassName="ImportAssetModalOverlay"
+        >
+          <h2>Import Assets</h2>
+          {assetsAreValid(files) ? (
+            <Slider assets={files} onSubmit={handleImport} isNameValid={validateName} />
+          ) : (
+            <Error assets={files} onSubmit={handleCloseModal} />
+          )}
+        </Modal>
       </FileInput>
     </div>
   )
-}
+})
 
 export default ImportAsset

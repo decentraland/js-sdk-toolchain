@@ -5,8 +5,6 @@ import { v4 as uuidv4 } from 'uuid'
 import { VscFolderOpened as FolderIcon } from 'react-icons/vsc'
 
 import { selectAssetCatalog, selectUploadFile, updateUploadFile } from '../../../redux/app'
-import { selectAssetsTab } from '../../../redux/ui'
-import { AssetsTab } from '../../../redux/ui/types'
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks'
 import { DropTypesEnum, LocalAssetDrop, getNode } from '../../../lib/sdk/drag-drop'
 import { EXTENSIONS, withAssetDir } from '../../../lib/data-layer/host/fs-utils'
@@ -130,7 +128,6 @@ const FileUploadField: React.FC<Props> = ({
       const file = event.target.files?.[0]
       if (file && isValidFileName(file.name)) {
         setDropError(false)
-        dispatch(selectAssetsTab({ tab: AssetsTab.Import }))
         const newUploadFile = { ...uploadFile }
         newUploadFile[id.current] = file
         dispatch(updateUploadFile(newUploadFile))

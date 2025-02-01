@@ -1,0 +1,76 @@
+.Slider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  user-select: none;
+}
+
+.Slider .content {
+  display: flex;
+  align-items: center;
+}
+
+.Slider .left,
+.Slider .right {
+  border: 1px solid var(--base-10);
+  border-radius: 50%;
+  display: flex;
+  padding: 3px;
+  cursor: pointer;
+}
+
+.Slider .left.disabled,
+.Slider .right.disabled {
+  cursor: not-allowed;
+  opacity: 0.2;
+}
+
+.Slider .asset {
+  display: flex;
+  flex-direction: column;
+  display: none;
+}
+
+.Slider .asset.active {
+  display: flex;
+}
+
+.Slider .asset > div {
+  display: flex;
+  flex-direction: column;
+  margin: 10px;
+  width: 150px;
+}
+
+.Slider .asset .loading {
+  position: relative;
+}
+
+.Slider .asset .AssetPreview {
+  display: none;
+}
+
+.Slider .asset .thumbnail,
+.Slider .asset .loading {
+  margin-bottom: 12px;
+  width: 150px;
+  height: 150px;
+  background-color: var(--background-gray);
+  background-size: cover;
+  background-position: center;
+}
+
+.Slider .asset .name-error {
+  font-size: 12px;
+  color: var(--primary-main)
+}
+
+.Slider .asset .size {
+  text-align: center;
+  font-size: 12px;
+  color: var(--base-10);
+}
+
+.Slider button {
+  margin-top: 5px;
+}

@@ -14,7 +14,7 @@ export function withRenderer(cb: (engine: IEngine) => void) {
   const outMessages: Uint8Array[] = []
 
   const rendererTransport: Transport = {
-    async send(message) {
+    async send(message: Uint8Array) {
       outMessages.push(message)
     },
     filter() {
