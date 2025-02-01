@@ -17,6 +17,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
+      - name: (PR) Check if it's a PR
+        if: ${{ env.IS_A_PR == 'true' }}
+        run: |
+          echo "run from a PR"
+          echo "from env '${{env.IS_A_PR}}'"
+          echo "- '${{github.event.pull_request.number}}'"
+          echo "- env '${{github.ref_name}}'"
       - uses: actions/setup-node@v3
         with:
           node-version: 20
@@ -349,7 +356,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
   notify_deployment:
     needs: [build]
-    if: github.event.pull_request.number != 'null' && github.head_ref != 'protocol-squad'
+    if: github.event.pull_request.number != 'null' && github.ref_name != 'protocol-squad'
     runs-on: ubuntu-latest
     name: Deployment Notification
     steps:
