@@ -2,7 +2,6 @@ on:
   push:
     branches:
       - main
-      - protocol-squad
   pull_request:
   release:
     types:
@@ -10,7 +9,7 @@ on:
 
 env:
   BRANCH_TAG: ${{ github.ref_name == 'protocol-squad' && 'protocol-squad' || '' }}
-  IS_A_PR: ${{ github.event.pull_request.number != 'null' && github.head_ref != 'protocol-squad' }}
+  IS_A_PR: ${{ github.event.pull_request.number != 'null' && github.ref_name != 'protocol-squad' }}
 
 name: CI
 jobs:
