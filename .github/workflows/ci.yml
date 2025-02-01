@@ -8,8 +8,8 @@ on:
       - created
 
 env:
-  BRANCH_TAG: ${{ github.ref_name == 'protocol-squad' && 'protocol-squad' || '' }}
-  IS_A_PR: ${{ github.event.pull_request.number != 'null' && github.ref_name != 'protocol-squad' }}
+  BRANCH_TAG: ${{ github.head_ref == 'protocol-squad' && 'protocol-squad' || '' }}
+  IS_A_PR: ${{ github.event.pull_request.number != 'null' && github.head_ref != 'protocol-squad' }}
 
 name: CI
 jobs:
@@ -116,7 +116,7 @@ jobs:
           echo "run from a PR"
           echo "from env '${{env.IS_A_PR}}'"
           echo "- '${{github.event.pull_request.number}}'"
-          echo "- env '${{github.ref_name}}'"
+          echo "- env '${{github.head_ref}}'"
 
       - name: install
         run: make install
@@ -159,7 +159,7 @@ jobs:
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
-          BRANCH_NAME: ${{ github.ref_name }}
+          BRANCH_NAME: ${{ github.head_ref }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
@@ -182,7 +182,7 @@ jobs:
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
-          BRANCH_NAME: ${{ github.ref_name }}
+          BRANCH_NAME: ${{ github.head_ref }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
@@ -217,7 +217,7 @@ jobs:
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
-          BRANCH_NAME: ${{ github.ref_name }}
+          BRANCH_NAME: ${{ github.head_ref }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
@@ -240,7 +240,7 @@ jobs:
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
-          BRANCH_NAME: ${{ github.ref_name }}
+          BRANCH_NAME: ${{ github.head_ref }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
@@ -277,7 +277,7 @@ jobs:
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
-          BRANCH_NAME: ${{ github.ref_name }}
+          BRANCH_NAME: ${{ github.head_ref }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
@@ -321,7 +321,7 @@ jobs:
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
-          BRANCH_NAME: ${{ github.ref_name }}
+          BRANCH_NAME: ${{ github.head_ref }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
@@ -350,13 +350,13 @@ jobs:
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
-          BRANCH_NAME: ${{ github.ref_name }}
+          BRANCH_NAME: ${{ github.head_ref }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
   notify_deployment:
     needs: [build]
-    if: github.event.pull_request.number != 'null' && github.ref_name != 'protocol-squad'
+    if: github.event.pull_request.number != 'null' && github.head_ref != 'protocol-squad'
     runs-on: ubuntu-latest
     name: Deployment Notification
     steps:
