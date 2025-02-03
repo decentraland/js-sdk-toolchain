@@ -5,7 +5,7 @@ export enum Filter {
   Images = 'images',
   Video = 'video',
   Audio = 'audio',
-  Other = 'other',
+  Other = 'other'
 }
 
 export type PropTypes = {

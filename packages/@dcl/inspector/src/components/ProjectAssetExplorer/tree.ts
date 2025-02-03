@@ -144,7 +144,8 @@ export const getChildren = (
 
       if (childNode.type === 'asset') {
         const childFilter = mapAssetTypeToFilter((childNode as AssetNodeItem).asset.type)
-        const matchesFilter = activeFilter === Filter.All || activeFilter === Filter.Recents || childFilter === activeFilter
+        const matchesFilter =
+          activeFilter === Filter.All || activeFilter === Filter.Recents || childFilter === activeFilter
         const matchesSearch = !searchTerm || childPath.toLowerCase().includes(searchTerm.toLowerCase())
 
         if (matchesFilter && matchesSearch) {
@@ -186,7 +187,8 @@ export const getTiles = (
   const getAllMatchingFiles = (startNode: TreeNode): TreeNode[] => {
     if (startNode.type === 'asset') {
       const assetFilter = mapAssetTypeToFilter((startNode as AssetNodeItem).asset.type)
-      const matchesFilter = activeFilter === Filter.All || activeFilter === Filter.Recents || assetFilter === activeFilter
+      const matchesFilter =
+        activeFilter === Filter.All || activeFilter === Filter.Recents || assetFilter === activeFilter
       const matchesSearch = !searchTerm || startNode.name.toLowerCase().includes(searchTerm.toLowerCase())
 
       return matchesFilter && matchesSearch ? [startNode] : []

@@ -6,6 +6,23 @@ export function AssetNodeRootNull(): AssetNodeFolder {
   return { name: '', parent: null, type: 'folder', children: [] }
 }
 
+const validModelExtensions = ['.gltf', '.glb']
+const validAudioExtensions = ['.mp3', '.ogg', '.wav']
+const validImageExtensions = ['.jpg', '.jpeg', '.png']
+const validVideoExtensions = ['.mp4']
+
+function determineAssetType(extension: string): IAsset['type'] {
+  return validModelExtensions.some((ext) => extension.endsWith(ext))
+    ? 'gltf'
+    : validAudioExtensions.some((ext) => extension.endsWith(ext))
+    ? 'audio'
+    : validImageExtensions.some((ext) => extension.endsWith(ext))
+    ? 'image'
+    : validVideoExtensions.some((ext) => extension.endsWith(ext))
+    ? 'video'
+    : 'unknown'
+}
+
 export function buildAssetTree(paths: string[]): AssetNodeFolder {
   const root: AssetNodeFolder = AssetNodeRootNull()
 
@@ -23,16 +40,7 @@ export function buildAssetTree(paths: string[]): AssetNodeFolder {
           currentNode = childNode
         } else {
           const lowerPath = path.toLowerCase()
-          const assetType =
-            lowerPath.endsWith('.gltf') || lowerPath.endsWith('.glb')
-              ? 'gltf'
-              : lowerPath.endsWith('.mp3') || lowerPath.endsWith('.ogg') || lowerPath.endsWith('.wav')
-              ? 'audio'
-              : lowerPath.endsWith('.mp4')
-              ? 'video'
-              : lowerPath.endsWith('.jpg') || lowerPath.endsWith('.jpeg') || lowerPath.endsWith('.png')
-              ? 'image'
-              : 'unknown'
+          const assetType = determineAssetType(lowerPath)
           childNode = {
             name: parts[i],
             parent: currentNode,
@@ -70,13 +78,7 @@ export function isAssetNode(node: AssetNode | TreeNode): node is AssetNodeItem {
 }
 
 export const DEFAULT_FILTERS: Filter[] = [Filter.All /* Filter.Recents */]
-export const FILTERS_IN_ORDER: Filter[] = [
-  Filter.Models,
-  Filter.Images,
-  Filter.Audio,
-  Filter.Video,
-  Filter.Other
-]
+export const FILTERS_IN_ORDER: Filter[] = [Filter.Models, Filter.Images, Filter.Audio, Filter.Video, Filter.Other]
 
 export function mapAssetTypeToFilter(type: IAsset['type']): Filter | undefined {
   switch (type) {
