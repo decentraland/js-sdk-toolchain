@@ -2,7 +2,7 @@ import { AssetData } from '../../lib/logic/catalog'
 
 export interface IAsset {
   src: string
-  type: 'unknown' | 'gltf' | 'composite' | 'audio' | 'video'
+  type: 'unknown' | 'gltf' | 'composite' | 'audio' | 'video' | 'image'
   id?: string
 }
 

@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useCallback, useEffect, useState } from 'react'
+import React, { PropsWithChildren, useCallback, useEffect, useState, useMemo } from 'react'
 import cx from 'classnames'
 import { HiOutlineUpload } from 'react-icons/hi'
 
@@ -117,6 +117,8 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
     [assets]
   )
 
+  const isImportActive = useMemo(() => !files.length && isHover, [files, isHover])
+
   return (
     <div className={cx('ImportAsset', { ImportAssetHover: isHover })}>
       <FileInput
@@ -127,16 +129,15 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
         accept={ACCEPTED_FILE_TYPES}
         multiple
       >
-        {!files.length && isHover ? (
+        {isImportActive && (
           <>
             <div className="upload-icon">
               <HiOutlineUpload />
             </div>
             <span className="text">Drop {ACCEPTED_FILE_TYPES_STR} files</span>
           </>
-        ) : (
-          children
         )}
+        <div className={cx('children', { hidden: isImportActive })}>{children}</div>
         <Modal
           isOpen={!!files.length}
           onRequestClose={handleCloseModal}

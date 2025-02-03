@@ -115,7 +115,7 @@ jobs:
         run: make install
 
       - name: update version of packages/@dcl/sdk/package.json, this version will be used for all packages
-        uses: menduz/oddish-action@master
+        uses: decentraland/oddish-action@master
         with:
           cwd: ./packages/@dcl/sdk
           deterministic-snapshot: true
@@ -136,7 +136,7 @@ jobs:
 
       - name: publish @dcl/js-runtime package
         id: publish_dcl_js_runtime
-        uses: menduz/oddish-action@master
+        uses: decentraland/oddish-action@master
         with:
           registry-url: 'https://registry.npmjs.org'
           access: public
@@ -158,7 +158,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
       - name: publish @dcl/ecs package
-        uses: menduz/oddish-action@master
+        uses: decentraland/oddish-action@master
         id: publish_ecs
         with:
           registry-url: 'https://registry.npmjs.org'
@@ -194,7 +194,7 @@ jobs:
 
       - name: publish @dcl/react-ecs package
         id: publish_dcl_react_ecs
-        uses: menduz/oddish-action@master
+        uses: decentraland/oddish-action@master
         with:
           registry-url: 'https://registry.npmjs.org'
           access: public
@@ -216,7 +216,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
       - name: publish @dcl/inspector package
-        uses: menduz/oddish-action@master
+        uses: decentraland/oddish-action@master
         id: publish_decentraland_inspector
         with:
           registry-url: 'https://registry.npmjs.org'
@@ -253,7 +253,7 @@ jobs:
           INSPECTOR_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_decentraland_inspector.outputs.s3-bucket-key }}
 
       - name: publish @dcl/sdk-commands package
-        uses: menduz/oddish-action@master
+        uses: decentraland/oddish-action@master
         id: publish_decentraland_sdk_commands
         with:
           registry-url: 'https://registry.npmjs.org'
@@ -297,7 +297,7 @@ jobs:
           SDK_COMMANDS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_decentraland_sdk_commands.outputs.s3-bucket-key }}
 
       - name: publish @dcl/sdk package
-        uses: menduz/oddish-action@master
+        uses: decentraland/oddish-action@master
         id: publish_decentraland_sdk
         with:
           registry-url: 'https://registry.npmjs.org'
@@ -326,7 +326,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
       - name: publish @dcl/playground-assets package
-        uses: menduz/oddish-action@master
+        uses: decentraland/oddish-action@master
         id: publish_playground_assets
         with:
           registry-url: 'https://registry.npmjs.org'
