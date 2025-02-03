@@ -14,7 +14,7 @@ const hasSearchMatch = (name: string, searchTerm: string): boolean => {
 }
 
 const shouldIncludeAsset = (assetType: IAsset['type'], activeFilter: Filter): boolean => {
-  if (activeFilter === 'all' || activeFilter === 'recents') {
+  if (activeFilter === Filter.All || activeFilter === Filter.Recents) {
     return true
   }
   const assetFilter = mapAssetTypeToFilter(assetType)
@@ -33,7 +33,7 @@ export const generateAssetTree = (
   folders: AssetNodeFolder[],
   openNodes: Set<string>,
   searchTerm: string = '',
-  activeFilter: Filter = 'all'
+  activeFilter: Filter = Filter.All
 ): TreeGenerationResult => {
   const tree = new Map<string, TreeNode>()
   const foundFilters = new Set<Filter>()
@@ -129,7 +129,7 @@ export const getChildren = (
   if (!node?.children?.length) return []
 
   // For 'all' or 'recents' filters with no search term, show complete structure
-  if ((activeFilter === 'all' || activeFilter === 'recents') && !searchTerm) {
+  if ((activeFilter === Filter.All || activeFilter === Filter.Recents) && !searchTerm) {
     return node.children
   }
 
@@ -144,7 +144,7 @@ export const getChildren = (
 
       if (childNode.type === 'asset') {
         const childFilter = mapAssetTypeToFilter((childNode as AssetNodeItem).asset.type)
-        const matchesFilter = activeFilter === 'all' || activeFilter === 'recents' || childFilter === activeFilter
+        const matchesFilter = activeFilter === Filter.All || activeFilter === Filter.Recents || childFilter === activeFilter
         const matchesSearch = !searchTerm || childPath.toLowerCase().includes(searchTerm.toLowerCase())
 
         if (matchesFilter && matchesSearch) {
@@ -173,7 +173,7 @@ export const getTiles = (
   activeFilter: Filter
 ): TreeNode[] => {
   // For 'all' or 'recents' with no search, just return the children or the node itself
-  if ((activeFilter === 'all' || activeFilter === 'recents') && !searchTerm) {
+  if ((activeFilter === Filter.All || activeFilter === Filter.Recents) && !searchTerm) {
     const node = tree.get(nodeId)
     if (!node) return []
     if (node.type === 'asset') return [node]
@@ -186,7 +186,7 @@ export const getTiles = (
   const getAllMatchingFiles = (startNode: TreeNode): TreeNode[] => {
     if (startNode.type === 'asset') {
       const assetFilter = mapAssetTypeToFilter((startNode as AssetNodeItem).asset.type)
-      const matchesFilter = activeFilter === 'all' || activeFilter === 'recents' || assetFilter === activeFilter
+      const matchesFilter = activeFilter === Filter.All || activeFilter === Filter.Recents || assetFilter === activeFilter
       const matchesSearch = !searchTerm || startNode.name.toLowerCase().includes(searchTerm.toLowerCase())
 
       return matchesFilter && matchesSearch ? [startNode] : []

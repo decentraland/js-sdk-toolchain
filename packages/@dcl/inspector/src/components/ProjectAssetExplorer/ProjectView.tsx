@@ -50,7 +50,7 @@ function ProjectView({ folders, thumbnails }: Props) {
   const [search, setSearch] = useState<string>('')
   const [tree, setTree] = useState<Map<string, TreeNode>>(new Map())
   const [filters, setFilters] = useState<Filter[]>([])
-  const [activeFilter, setActiveFilter] = useState<Filter>('all')
+  const [activeFilter, setActiveFilter] = useState(Filter.All)
 
   useEffect(() => {
     const { tree, filters } = generateAssetTree(folders, open, search, activeFilter)

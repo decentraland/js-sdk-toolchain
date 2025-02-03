@@ -13,19 +13,19 @@ import './Filters.css'
 export function Filters({ filters, active, onClick }: PropTypes) {
   const getFilter = useCallback((type: Filter) => {
     switch (type) {
-      case 'all':
+      case Filter.All:
         return { title: 'All Assets', icon: AssetIcon }
-      case 'recents':
+      case Filter.Recents:
         return { title: 'Recents', icon: RecentIcon }
-      case 'models':
+      case Filter.Models:
         return { title: 'Models', icon: ModelIcon }
-      case 'images':
+      case Filter.Images:
         return { title: 'Images', icon: ImageIcon }
-      case 'audio':
+      case Filter.Audio:
         return { title: 'Audio', icon: AudioIcon }
-      case 'video':
+      case Filter.Video:
         return { title: 'Video', icon: VideoIcon }
-      case 'other':
+      default:
         return { title: 'Other', icon: AssetIcon }
     }
   }, [])

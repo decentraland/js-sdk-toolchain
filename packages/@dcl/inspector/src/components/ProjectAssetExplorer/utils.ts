@@ -69,21 +69,27 @@ export function isAssetNode(node: AssetNode | TreeNode): node is AssetNodeItem {
   return node.type === 'asset'
 }
 
-export const DEFAULT_FILTERS: Filter[] = ['all' /*'recents' */]
-export const FILTERS_IN_ORDER: Filter[] = ['models', 'images', 'audio', 'video', 'other']
+export const DEFAULT_FILTERS: Filter[] = [Filter.All /* Filter.Recents */]
+export const FILTERS_IN_ORDER: Filter[] = [
+  Filter.Models,
+  Filter.Images,
+  Filter.Audio,
+  Filter.Video,
+  Filter.Other
+]
 
 export function mapAssetTypeToFilter(type: IAsset['type']): Filter | undefined {
   switch (type) {
     case 'gltf':
-      return 'models'
+      return Filter.Models
     case 'audio':
-      return 'audio'
+      return Filter.Audio
     case 'image':
-      return 'images'
+      return Filter.Images
     case 'video':
-      return 'video'
+      return Filter.Video
     default:
-      return 'other'
+      return Filter.Other
   }
 }
 
