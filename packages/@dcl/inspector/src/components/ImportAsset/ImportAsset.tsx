@@ -121,14 +121,7 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
 
   return (
     <div className={cx('ImportAsset', { ImportAssetHover: isHover })}>
-      <FileInput
-        disabled={!!files.length}
-        onDrop={handleDrop}
-        onHover={handleHover}
-        ref={inputRef}
-        accept={ACCEPTED_FILE_TYPES}
-        multiple
-      >
+      <FileInput disabled={!!files.length} onDrop={handleDrop} onHover={handleHover} ref={inputRef} multiple>
         {isImportActive && (
           <>
             <div className="upload-icon">

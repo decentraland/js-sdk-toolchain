@@ -8,7 +8,7 @@ function parseAccept(accept: PropTypes['accept']) {
   for (const [key, values] of Object.entries(accept ?? {})) {
     value += `${key},${values.join(',')},`
   }
-  return value
+  return value || '*'
 }
 
 export interface InputRef {
@@ -27,7 +27,8 @@ export const FileInput = React.forwardRef<InputRef, React.PropsWithChildren<Prop
         if (onDrop) onDrop(item.files)
       },
       canDrop(item: { files: File[] }) {
-        return !disabled && item.files.every((file) => !!acceptExtensions.find((ext) => file.name.endsWith(ext)))
+        if (disabled || acceptExtensions.length === 0) return !disabled
+        return item.files.every((file) => !!acceptExtensions.find((ext) => file.name.endsWith(ext)))
       },
       collect: (monitor) => ({
         isHover: monitor.canDrop() && monitor.isOver()
