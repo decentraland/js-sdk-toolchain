@@ -115,7 +115,8 @@ const MODEL_EXTENSIONS = ACCEPTED_FILE_TYPES['model/gltf-binary']
 const IGNORED_ERROR_CODES = [
   'ACCESSOR_WEIGHTS_NON_NORMALIZED',
   'MESH_PRIMITIVE_TOO_FEW_TEXCOORDS',
-  'ACCESSOR_VECTOR3_NON_UNIT'
+  'ACCESSOR_VECTOR3_NON_UNIT',
+  'VALUE_NOT_IN_RANGE'
 ]
 
 async function getGltf(file: File, getExternalResource: (uri: string) => Promise<Uint8Array>): Promise<Gltf> {
