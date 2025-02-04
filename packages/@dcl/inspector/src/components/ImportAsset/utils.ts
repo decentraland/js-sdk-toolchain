@@ -105,7 +105,7 @@ export const ACCEPTED_FILE_TYPES = {
   'video/mp4': ['.mp4']
 }
 
-const ONE_GB_IN_BYTES = 1024 * 1024 * 1024
+const FIFTY_MB_IN_BYTES = 50 * 1024 * 1024
 const VALID_EXTENSIONS = new Set(
   Object.values(ACCEPTED_FILE_TYPES)
     .flat()
@@ -159,7 +159,7 @@ export function formatFileName(file: BaseAsset): string {
 }
 
 function validateFileSize(size: number): ValidationError {
-  return size <= ONE_GB_IN_BYTES ? undefined : { type: 'size', message: 'Max file size: 1 GB' }
+  return size <= FIFTY_MB_IN_BYTES ? undefined : { type: 'size', message: 'Max file size: 50 MB' }
 }
 
 function validateExtension(extension: string): ValidationError {
