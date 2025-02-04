@@ -209,32 +209,34 @@ async function getModel(asset: BaseAsset, fileMap: Map<string, BaseAsset>): Prom
   for (const resource of gltf.info.resources || []) {
     if (resource.storage === 'external') {
       const normalizedName = normalizeFileName(resource.uri)
-      const uri = fileMap.get(normalizedName)!
-      if (resource.pointer.includes('buffer')) buffers.push(uri)
-      if (resource.pointer.includes('image')) images.push(uri)
-      fileMap.delete(normalizedName)
+      const uri = fileMap.get(normalizedName)
+      if (uri) {
+        if (resource.pointer.includes('buffer')) buffers.push(uri)
+        if (resource.pointer.includes('image')) images.push(uri)
+        fileMap.delete(normalizedName)
+      }
     }
   }
 
   fileMap.delete(formatFileName(asset))
 
-  return { ...asset, gltf, buffers, images }
+  const model = { ...asset, gltf, buffers, images }
+  const error = await validateModelWithDependencies(model)
+
+  return { ...model, error }
 }
 
 async function processModels(files: BaseAsset[]): Promise<Asset[]> {
   const fileMap = new Map(files.map((file) => [formatFileName(file), file]))
 
-  const modelPromises = files
-    .filter((asset) => MODEL_EXTENSIONS.includes(`.${asset.extension}`))
-    .map(async (asset): Promise<ModelAsset> => {
-      const model = await getModel(asset, fileMap)
-      const error = await validateModelWithDependencies(model)
-      return { ...model, error }
-    })
+  const gltfAssets: ModelAsset[] = []
+  const modelAssets = files.filter((asset) => MODEL_EXTENSIONS.includes(`.${asset.extension}`))
+  // we need to run models sequentially to avoid race conditions on fileMap
+  for (const asset of modelAssets) {
+    gltfAssets.push(await getModel(asset, fileMap))
+  }
 
-  const gltfAssets = await Promise.all(modelPromises)
   const remainingAssets = Array.from(fileMap.values())
-
   return [...gltfAssets, ...remainingAssets]
 }
 
