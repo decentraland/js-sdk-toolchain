@@ -44,6 +44,8 @@ export const FileInput = React.forwardRef<InputRef, React.PropsWithChildren<Prop
     (e: React.ChangeEvent<HTMLInputElement>): void => {
       const files = Array.from(e.target.files ?? [])
       onDrop && onDrop(files)
+      // Reset the input value so the same file can be selected again
+      e.target.value = ''
     },
     [onDrop]
   )
