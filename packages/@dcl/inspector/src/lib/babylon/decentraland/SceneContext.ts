@@ -163,7 +163,7 @@ export class SceneContext {
     } catch (err) {
       if (retryCount > 0) {
         // Wait for 500ms before retrying
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise((resolve) => setTimeout(resolve, 500))
         console.log(`Retrying fetch for ${src}, attempts remaining: ${retryCount - 1}`)
         return this.getFile(src, retryCount - 1)
       }
