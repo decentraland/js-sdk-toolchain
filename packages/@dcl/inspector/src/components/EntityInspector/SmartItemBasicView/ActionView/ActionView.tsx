@@ -7,7 +7,7 @@ import { useArrayState } from '../../../../hooks/useArrayState'
 import { ConfigComponent, EditorComponentsTypes } from '../../../../lib/sdk/components'
 import { capitalize, transformPropertyToLabel } from '../../../../lib/utils/strings'
 import { Block } from '../../../Block'
-import { Dropdown, RangeField, TextField } from '../../../ui'
+import { Dropdown, RangeField, TextField, TextArea } from '../../../ui'
 
 export default React.memo(
   withSdk<WithSdkProps & { entity: Entity; field: ConfigComponent['fields'][0] }>(
@@ -81,6 +81,15 @@ export default React.memo(
                 />
               )
             }
+            case 'TextArea':
+              return (
+                <TextArea
+                  {...props}
+                  label={label}
+                  value={value}
+                  onChange={(e) => handlePropertyChange(action, property, e)}
+                />
+              )
             case 'TextField':
             default: {
               return (
