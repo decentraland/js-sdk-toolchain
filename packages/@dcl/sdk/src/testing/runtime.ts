@@ -50,7 +50,7 @@ export function createTestRuntime(testingModule: TestingModule, engine: IEngine)
   // continue to run until it reaches a yield point
   function scheduleValue(value: any, env: RunnerEnvironment) {
     if (value && typeof value === 'object' && typeof value.then === 'function') {
-      console.log('⏱️ yield promise')
+      // console.log('⏱️ yield promise')
       // if the value is a promise, schedule it to be awaited after the current frame is finished
       nextTickFuture.push(async () => {
         try {
@@ -60,14 +60,14 @@ export function createTestRuntime(testingModule: TestingModule, engine: IEngine)
         }
       })
     } else if (typeof value === 'function') {
-      console.log('⏱️ yield function')
+      // console.log('⏱️ yield function')
       // if the value is a function, schedule it to be called on the next frame
       nextTickFuture.push(() => {
         scheduleValue(value(), env)
       })
       return
     } else if (typeof value === 'undefined' || value === null) {
-      console.log('⏱️ yield')
+      // console.log('⏱️ yield')
       // if the value is undefined or null, continue processing the generator the next frame
       nextTickFuture.push(() => {
         consumeGenerator(env)
