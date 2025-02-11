@@ -32,9 +32,22 @@ install:
 	make node_modules/.bin/protobuf/bin/protoc
 
 update-protocol:
-	npm i --save-exact @dcl/protocol@next
-	cd packages/@dcl/sdk-commands; npm i --save-exact @dcl/protocol@next
+	@TARGET_PACKAGE=$(word 2,$(MAKECMDGOALS)); \
+	if [ -z "$$TARGET_PACKAGE" ]; then TARGET_PACKAGE=next; fi; \
+	if [[ "$$TARGET_PACKAGE" =~ ^[\"\'].*[\"\']$$ ]]; then \
+		TARGET_PACKAGE=$${TARGET_PACKAGE:1:$${#TARGET_PACKAGE}-2}; \
+		echo "Using exact version: $$TARGET_PACKAGE"; \
+		npm i --save-exact $$TARGET_PACKAGE; \
+		(cd packages/@dcl/sdk-commands && npm i --save-exact $$TARGET_PACKAGE); \
+	else \
+		echo "Using protocol tag: $$TARGET_PACKAGE"; \
+		npm i --save-exact @dcl/protocol@$$TARGET_PACKAGE; \
+		(cd packages/@dcl/sdk-commands && npm i --save-exact @dcl/protocol@$$TARGET_PACKAGE); \
+	fi; \
 	$(MAKE) sync-deps compile_apis
+
+%:
+	@:
 
 update-renderer:
 	cd packages/@dcl/sdk; npm i --save-exact @dcl/explorer@latest
