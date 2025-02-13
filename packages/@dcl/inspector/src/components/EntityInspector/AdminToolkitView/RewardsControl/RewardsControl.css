@@ -1,0 +1,22 @@
+.RewardsControl {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.RewardsControl .RewardItemRow .content {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.RewardItemRow .RightMenu {
+  margin-left: auto;
+}
+
+.RewardItemRow .RemoveButton {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+}
