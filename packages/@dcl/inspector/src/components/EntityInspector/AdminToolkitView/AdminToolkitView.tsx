@@ -108,7 +108,7 @@ const AdminToolkitView = withSdk<Props>(({ sdk, entity }) => {
 
   return (
     <Container label="Admin Tools" className="AdminToolkitViewInspector">
-      <Block className="DefaultAdminPermissions">
+      {/* <Block className="DefaultAdminPermissions">
         <Dropdown
           className="DefaultAdminPermissionsDropdown"
           label="Default Admin Permissions"
@@ -142,8 +142,8 @@ const AdminToolkitView = withSdk<Props>(({ sdk, entity }) => {
             ))}
           </>
         ) : null}
-      </Block>
-      <Accordion
+      </Block> */}
+      {/* <Accordion
         label="MODERATION"
         className="PanelSection"
         enabled={!!adminComponent.moderationControl.isEnabled}
@@ -155,7 +155,7 @@ const AdminToolkitView = withSdk<Props>(({ sdk, entity }) => {
           value={adminComponent.moderationControl.kickCoordinates || { x: 0, y: 0, z: 0 }}
           onChange={handleKickCoordinatesChange}
         />
-      </Accordion>
+      </Accordion> */}
 
       <Accordion
         label="TEXT ANNOUNCEMENT"
