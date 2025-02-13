@@ -16,10 +16,9 @@ export type GlobalWithConfig = typeof globalThis & {
   InspectorConfig?: Partial<InspectorConfig>
 }
 
-export const CONTENT_URL = "http://0.0.0.0:9000/asset-packs" 
-// version.includes('commit')
-//   ? 'https://builder-items.decentraland.zone'
-//   : 'https://builder-items.decentraland.org'
+export const CONTENT_URL = version.includes('commit')
+  ? 'https://builder-items.decentraland.zone'
+  : 'https://builder-items.decentraland.org'
 
 export function getConfig(): InspectorConfig {
   const config = (globalThis as GlobalWithConfig).InspectorConfig
