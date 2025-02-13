@@ -1,0 +1,16 @@
+.VideoControl {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.VideoControl .VideoPlayerRow .content {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.VideoControl .VideoPlayerRow .RightMenu .MoreOptionsContent {
+  min-width: 80px;
+}
