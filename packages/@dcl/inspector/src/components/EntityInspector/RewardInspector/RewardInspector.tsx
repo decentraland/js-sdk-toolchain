@@ -1,12 +1,17 @@
 import React, { useCallback } from 'react'
 import { Entity } from '@dcl/ecs'
 import { FiExternalLink as ExternalLinkIcon } from 'react-icons/fi'
+
 import { withSdk } from '../../../hoc/withSdk'
 import { useComponentValue } from '../../../hooks/sdk/useComponentValue'
+import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
+
 import { Container } from '../../Container'
-import { CheckboxField, TextArea, TextField } from '../../ui'
 import { Button } from '../../Button'
+import { CheckboxField, TextArea, TextField } from '../../ui'
 import './RewardInspector.css'
+
+const REWARDS_URL = 'https://rewards.decentraland.zone/rewards'
 
 type Props = {
   entity: Entity
@@ -17,9 +22,10 @@ export const RewardInspector = withSdk<Props>(({ sdk, entity }) => {
   const [rewardsComponent, setRewardsComponent] = useComponentValue(entity, Rewards)
   const [showKey, setShowKey] = React.useState(false)
 
+  const hasRewards = useHasComponent(entity, Rewards)
+
   const handleTestModeChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (!rewardsComponent) return
       setRewardsComponent({
         ...rewardsComponent,
         testMode: event.target.checked
@@ -30,8 +36,6 @@ export const RewardInspector = withSdk<Props>(({ sdk, entity }) => {
 
   const handleCampaignIdChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      console.log('handleCampaignIdChange', event.target.value, !rewardsComponent)
-      if (!rewardsComponent) return
       setRewardsComponent({
         ...rewardsComponent,
         campaignId: event.target.value
@@ -42,7 +46,6 @@ export const RewardInspector = withSdk<Props>(({ sdk, entity }) => {
 
   const handleDispenserKeyChange = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      if (!rewardsComponent) return
       setRewardsComponent({
         ...rewardsComponent,
         dispenserKey: event.target.value
@@ -55,7 +58,7 @@ export const RewardInspector = withSdk<Props>(({ sdk, entity }) => {
     setShowKey(!showKey)
   }, [showKey])
 
-  if (!rewardsComponent) return null
+  if (!hasRewards) return null
 
   return (
     <Container label="Rewards">
@@ -66,9 +69,7 @@ export const RewardInspector = withSdk<Props>(({ sdk, entity }) => {
           <TextField label="Campaign ID" value={rewardsComponent.campaignId} onChange={handleCampaignIdChange} />
           <Button
             className="text link"
-            onClick={() =>
-              window.open(`https://decentraland.zone/rewards/campaign/?id=${rewardsComponent.campaignId}`, '_blank')
-            }
+            onClick={() => window.open(`${REWARDS_URL}/campaign/?id=${rewardsComponent.campaignId}`, '_blank')}
           >
             <ExternalLinkIcon /> Campaign overview
           </Button>
@@ -87,10 +88,7 @@ export const RewardInspector = withSdk<Props>(({ sdk, entity }) => {
               {showKey ? 'Hide' : 'Show'}
             </Button>
           </div>
-          <Button
-            className="text link"
-            onClick={() => window.open('https://rewards.decentraland.org/dispensers', '_blank')}
-          >
+          <Button className="text link" onClick={() => window.open(`${REWARDS_URL}/dispensers`, '_blank')}>
             <ExternalLinkIcon /> Edit dispenser
           </Button>
         </div>
