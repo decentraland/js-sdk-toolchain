@@ -1,0 +1,44 @@
+.SmartItemControl {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 12px;
+  /* Local vars */
+  --right-menu-width: 16px;
+}
+
+.SmartItemControl .SmartItemRow {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+}
+
+.SmartItemControl .SmartItemRow > .content {
+  align-items: flex-start;
+}
+
+.SmartItemControl .SmartItemRow .Fields {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 8px;
+}
+
+.SmartItemControl .SmartItemRow .RightMenu {
+  display: flex;
+  align-items: center;
+  width: var(--right-menu-width);
+}
+
+.SmartItemControl .SmartItemRow .RightMenu .MoreOptionsMenu .MoreOptionsContent {
+  min-width: 80px;
+}
+
+.SmartItemControl .SmartItemRow .RemoveButton {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--error);
+}
