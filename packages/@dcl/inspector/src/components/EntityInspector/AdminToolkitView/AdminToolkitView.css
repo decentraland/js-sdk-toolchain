@@ -11,28 +11,6 @@
   display: none;
 }
 
-.AdminToolkitViewInspector.Container .content > .Block.DefaultAdminPermissions > .content {
-  display: flex;
-  flex-direction: row;
-  row-gap: 12px;
-  align-items: baseline;
-}
-
-.AdminToolkitViewInspector .Block.DefaultAdminPermissions .AuthorizedUsersCheckboxGroup {
-  flex: 1;
-  width: 100%;
-}
-
-.AdminToolkitViewInspector .Dropdown.Field:not(:has(+ .AuthorizedUsersCheckboxGroup)) .DefaultAdminPermissionsDropdown {
-  max-width: 146px;
-}
-
-.AdminToolkitViewInspector .Dropdown.Field .DefaultAdminPermissionsDropdown + .Message.info span {
-  display: flex;
-  align-items: flex-start;
-  gap: 4px;
-}
-
 .AdminToolkitViewInspector .Accordion.PanelSection {
   background-color: var(--background-dark);
 }
