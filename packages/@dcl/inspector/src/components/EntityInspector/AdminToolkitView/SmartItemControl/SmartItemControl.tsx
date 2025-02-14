@@ -154,8 +154,10 @@ const SmartItemControl: React.FC<WithSdkProps & Props> = ({ sdk, entity }) => {
 
         return (
           <Block key={smartItem.entity} className="SmartItemRow">
-            <div className="Fields">
+            <div className="LeftColumn">
               <span>{idx + 1}</span>
+            </div>
+            <div className="FieldsContainer">
               <EntityField
                 label="Smart Item"
                 components={[sdk.components.Actions] as Component[]}
@@ -179,7 +181,7 @@ const SmartItemControl: React.FC<WithSdkProps & Props> = ({ sdk, entity }) => {
             <div className="RightMenu">
               <MoreOptionsMenu>
                 <Button className="RemoveButton" onClick={(e) => handleRemoveSmartItemAction(e, idx)}>
-                  <RemoveIcon /> Remove Smart Item
+                  <RemoveIcon /> Remove
                 </Button>
               </MoreOptionsMenu>
             </div>

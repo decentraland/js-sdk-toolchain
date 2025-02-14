@@ -1,44 +1,75 @@
+/* Main container */
 .SmartItemControl {
   display: flex;
   flex-direction: column;
+  gap: 16px;
   width: 100%;
+}
+
+/* Checkbox group */
+.SmartItemControl .CheckboxGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Smart item row */
+.SmartItemRow {
+  position: relative;
+  width: 100%;
+  display: flex;
   gap: 12px;
-  /* Local vars */
-  --right-menu-width: 16px;
 }
 
-.SmartItemControl .SmartItemRow {
+/* Left column with number */
+.SmartItemRow .LeftColumn {
+  position: absolute;
+  top: 20px;
+  flex-shrink: 0;
+}
+
+.SmartItemRow .LeftColumn > span {
   display: flex;
-  flex-direction: row;
-  width: 100%;
   align-items: center;
+  color: var(--text);
+  font-size: 14px;
 }
 
-.SmartItemControl .SmartItemRow > .content {
-  align-items: flex-start;
-}
-
-.SmartItemControl .SmartItemRow .Fields {
+/* Fields container */
+.SmartItemRow .FieldsContainer {
   display: flex;
-  flex: 1;
   flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 12px 8px;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  padding-left: 20px; /* Space for the row number */
+  padding-right: 32px; /* Space for the menu */
 }
 
-.SmartItemControl .SmartItemRow .RightMenu {
+.SmartItemRow .FieldsContainer .EntityField,
+.SmartItemRow .FieldsContainer .TextField,
+.SmartItemRow .FieldsContainer .Dropdown {
+  flex: 1;
+  min-width: 200px; /* Minimum width before wrapping */
+}
+
+/* Right menu */
+.SmartItemRow .RightMenu {
+  position: absolute;
+  top: 20px;
+  right: 0;
+}
+
+/* Remove button */
+.SmartItemRow .RemoveButton {
   display: flex;
   align-items: center;
-  width: var(--right-menu-width);
+  gap: 8px;
+  padding: 8px;
 }
 
-.SmartItemControl .SmartItemRow .RightMenu .MoreOptionsMenu .MoreOptionsContent {
-  min-width: 80px;
-}
-
-.SmartItemControl .SmartItemRow .RemoveButton {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: var(--error);
+/* Add button */
+.SmartItemControl .AddButton {
+  width: 100%;
+  margin-top: 8px;
 }
