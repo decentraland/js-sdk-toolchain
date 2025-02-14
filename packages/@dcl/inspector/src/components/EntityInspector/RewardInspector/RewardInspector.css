@@ -1,0 +1,29 @@
+.RewardInspector {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.RewardInspector .field-with-link {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.RewardInspector .masked-field {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.RewardInspector .masked-field .TextField {
+  flex: 1;
+}
+
+.RewardInspector .Button.text.link:hover {
+  text-decoration: underline;
+}
+
+.RewardInspector .disabled {
+  color: #616161;
+}

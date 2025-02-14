@@ -57,3 +57,28 @@
 .Button.blue.big {
   font-weight: 700;
 }
+
+.Button.text {
+  background: none;
+  border: none;
+  font-weight: normal;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.Button.text:has(svg) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  line-height: 16px;
+}
+
+.Button.text:hover {
+  background: none;
+}
+
+.Button.text svg {
+  width: 16px;
+  height: 16px;
+}
