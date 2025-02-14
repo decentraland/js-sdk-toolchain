@@ -91,7 +91,7 @@ const VideoControl: React.FC<WithSdkProps & Props> = ({ sdk, entity }) => {
   )
 
   const handleBooleanChange = useCallback(
-    (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    (field: keyof typeof adminComponent.videoControl) => (event: React.ChangeEvent<HTMLInputElement>) => {
       if (!adminComponent) return
       setAdminComponent({
         ...adminComponent,
@@ -118,49 +118,55 @@ const VideoControl: React.FC<WithSdkProps & Props> = ({ sdk, entity }) => {
 
   if (!adminComponent) return null
 
+  const { videoControl } = adminComponent
+
   return (
     <div className="VideoControl">
       <CheckboxGroup>
         <CheckboxField
           label="Disable video sound"
-          checked={adminComponent.videoControl.disableVideoPlayersSound || false}
+          checked={videoControl.disableVideoPlayersSound || false}
           onChange={handleBooleanChange('disableVideoPlayersSound')}
         />
         <CheckboxField
           label="Show author on each Stream"
-          checked={adminComponent.videoControl.showAuthorOnVideoPlayers || false}
+          checked={videoControl.showAuthorOnVideoPlayers || false}
           onChange={handleBooleanChange('showAuthorOnVideoPlayers')}
         />
         <CheckboxField
           label="Link all screens by default"
-          checked={adminComponent.videoControl.linkAllVideoPlayers || false}
+          checked={videoControl.linkAllVideoPlayers || false}
           onChange={handleBooleanChange('linkAllVideoPlayers')}
         />
       </CheckboxGroup>
 
-      {adminComponent.videoControl.videoPlayers?.map((videoPlayer, idx) => {
+      {videoControl.videoPlayers?.map((videoPlayer, idx) => {
         const options = getVideoPlayerOptions().map((option) => ({
           ...option,
           disabled: option.disabled && option.value !== videoPlayer.entity
         }))
 
         return (
-          <Block key={videoPlayer.entity} className="VideoPlayerRow">
-            <span>{idx + 1}</span>
-            <Dropdown
-              label="Screen"
-              value={videoPlayer.entity}
-              options={options}
-              onChange={(e) => handleVideoPlayerChange(idx, e)}
-            />
-            <TextField
-              label="Custom Name"
-              value={videoPlayer.customName}
-              onChange={(e) => handleVideoPlayerNameChange(idx, e)}
-            />
+          <Block key={`video-player-${idx}`} className="VideoPlayerRow">
+            <div className="LeftColumn">
+              <span>{idx + 1}</span>
+            </div>
+            <div className="FieldsContainer">
+              <Dropdown
+                label="Screen"
+                value={videoPlayer.entity}
+                options={options}
+                onChange={(e) => handleVideoPlayerChange(idx, e)}
+              />
+              <TextField
+                label="Custom Name"
+                value={videoPlayer.customName}
+                onChange={(e) => handleVideoPlayerNameChange(idx, e)}
+              />
+            </div>
             <div className="RightMenu">
               <MoreOptionsMenu>
-                <Button className="RemoveButton" onClick={(_e) => handleRemoveVideoPlayer(idx)}>
+                <Button className="RemoveButton" onClick={() => handleRemoveVideoPlayer(idx)}>
                   <RemoveIcon /> Remove
                 </Button>
               </MoreOptionsMenu>
@@ -170,7 +176,7 @@ const VideoControl: React.FC<WithSdkProps & Props> = ({ sdk, entity }) => {
       })}
       <AddButton
         onClick={handleAddVideoPlayer}
-        disabled={videoPlayerEntities.length === adminComponent.videoControl.videoPlayers?.length}
+        disabled={videoPlayerEntities.length === videoControl.videoPlayers?.length}
       >
         Add a new Screen
       </AddButton>
