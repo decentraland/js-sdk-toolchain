@@ -1,22 +1,67 @@
+/* Main container */
 .RewardsControl {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+  width: 100%;
 }
 
-.RewardsControl .RewardItemRow .content {
+/* Reward item row */
+.RewardItemRow {
+  position: relative;
+  width: 100%;
   display: flex;
-  flex-direction: row;
-  align-items: flex-end;
   gap: 12px;
 }
 
-.RewardItemRow .RightMenu {
-  margin-left: auto;
+/* Left column with number */
+.RewardItemRow .LeftColumn {
+  position: absolute;
+  top: 20px;
+  flex-shrink: 0;
 }
 
+.RewardItemRow .LeftColumn > span {
+  display: flex;
+  align-items: center;
+  color: var(--text);
+  font-size: 14px;
+}
+
+/* Fields container */
+.RewardItemRow .FieldsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  padding-left: 20px; /* Space for the row number */
+  padding-right: 32px; /* Space for the menu */
+}
+
+.RewardItemRow .FieldsContainer .Dropdown,
+.RewardItemRow .FieldsContainer .TextField {
+  flex: 1;
+  min-width: 200px; /* Minimum width before wrapping */
+}
+
+/* Right menu */
+.RewardItemRow .RightMenu {
+  position: absolute;
+  top: 20px;
+  right: 0;
+}
+
+/* Remove button */
 .RewardItemRow .RemoveButton {
   display: flex;
-  align-items: flex-end;
-  gap: 4px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+}
+
+/* Add button */
+.RewardsControl .AddButton {
+  width: 100%;
+  margin-top: 8px;
 }

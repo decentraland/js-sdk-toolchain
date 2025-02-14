@@ -103,18 +103,22 @@ const RewardsControl: React.FC<WithSdkProps & Props> = ({ sdk, ...props }) => {
 
         return (
           <Block key={rewardItem.entity} className="RewardItemRow">
-            <span>{idx + 1}</span>
-            <Dropdown
-              label="Airdrop type"
-              value={rewardItem.entity}
-              options={options}
-              onChange={(e) => handleRewardItemChange(idx, e)}
-            />
-            <TextField
-              label="Custom Name"
-              value={rewardItem.customName}
-              onChange={(e) => handleRewardItemNameChange(idx, e)}
-            />
+            <div className="LeftColumn">
+              <span>{idx + 1}</span>
+            </div>
+            <div className="FieldsContainer">
+              <Dropdown
+                label="Airdrop type"
+                value={rewardItem.entity}
+                options={options}
+                onChange={(e) => handleRewardItemChange(idx, e)}
+              />
+              <TextField
+                label="Custom Name"
+                value={rewardItem.customName}
+                onChange={(e) => handleRewardItemNameChange(idx, e)}
+              />
+            </div>
             <div className="RightMenu">
               <MoreOptionsMenu>
                 <Button className="RemoveButton" onClick={() => handleRemoveRewardItem(idx)}>
