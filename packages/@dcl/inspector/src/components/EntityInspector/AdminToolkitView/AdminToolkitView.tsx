@@ -3,7 +3,7 @@ import { withSdk } from '../../../hoc/withSdk'
 import { useComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 
-import { Accordion } from '../../ui'
+import { Accordion, InfoTooltip } from '../../ui'
 import { Container } from '../../Container'
 import { Block } from '../../Block'
 
@@ -42,7 +42,17 @@ const AdminToolkitView = withSdk<Props>(({ sdk, entity }) => {
   if (!hasAdmintoolkit) return null
 
   return (
-    <Container label="Admin Tools" className="AdminToolkitViewInspector">
+    <Container
+      label="Admin Tools"
+      className="AdminToolkitViewInspector"
+      rightContent={
+        <InfoTooltip
+          text="Admin Tools enables a whole set of in-world actions for special admin users."
+          link="https://docs.decentraland.org/creator/smart-items/#admin-tools"
+          type="help"
+        />
+      }
+    >
       <Block>
         <AdminAllowListControl entity={entity} />
       </Block>
