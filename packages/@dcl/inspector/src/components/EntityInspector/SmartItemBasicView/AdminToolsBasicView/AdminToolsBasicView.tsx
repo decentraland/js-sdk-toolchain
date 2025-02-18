@@ -52,21 +52,21 @@ const AdminToolsBasicView = withSdk<Props>(({ sdk, entity }) => {
       </Block>
 
       <Accordion
-        label="TEXT ANNOUNCEMENTS"
-        className="PanelSection border"
-        enabled={!!adminComponent.textAnnouncementControl?.isEnabled}
-        onToggleEnabled={(enabled) => handleToggleEnabled('textAnnouncementControl', enabled)}
-      >
-        <TextAnnouncementControl entity={entity} />
-      </Accordion>
-
-      <Accordion
         label="VIDEO CONTROL"
         className="PanelSection border"
         enabled={!!adminComponent.videoControl?.isEnabled}
         onToggleEnabled={(enabled) => handleToggleEnabled('videoControl', enabled)}
       >
         <VideoControl entity={entity} />
+      </Accordion>
+
+      <Accordion
+        label="TEXT ANNOUNCEMENTS"
+        className="PanelSection border"
+        enabled={!!adminComponent.textAnnouncementControl?.isEnabled}
+        onToggleEnabled={(enabled) => handleToggleEnabled('textAnnouncementControl', enabled)}
+      >
+        <TextAnnouncementControl entity={entity} />
       </Accordion>
 
       <Accordion

@@ -69,6 +69,14 @@ const AdminToolkitView = withSdk<Props>(({ sdk, entity }) => {
           onChange={handleKickCoordinatesChange}
         />
       </Accordion> */}
+      <Accordion
+        label="VIDEO CONTROL"
+        className="PanelSection"
+        enabled={!!adminComponent.videoControl.isEnabled}
+        onToggleEnabled={(enabled) => handleToggleEnabled('videoControl', enabled)}
+      >
+        <VideoControl entity={entity} />
+      </Accordion>
 
       <Accordion
         label="TEXT ANNOUNCEMENTS"
@@ -77,15 +85,6 @@ const AdminToolkitView = withSdk<Props>(({ sdk, entity }) => {
         onToggleEnabled={(enabled) => handleToggleEnabled('textAnnouncementControl', enabled)}
       >
         <TextAnnouncementControl entity={entity} />
-      </Accordion>
-
-      <Accordion
-        label="VIDEO CONTROL"
-        className="PanelSection"
-        enabled={!!adminComponent.videoControl.isEnabled}
-        onToggleEnabled={(enabled) => handleToggleEnabled('videoControl', enabled)}
-      >
-        <VideoControl entity={entity} />
       </Accordion>
 
       <Accordion
