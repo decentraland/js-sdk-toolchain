@@ -329,7 +329,8 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     )
   })
 
-  const { ActionTypes, Actions, Counter, Triggers, States, CounterBar, AdminTools, Rewards } = createAssetPacksComponents(engine as any)
+  const { ActionTypes, Actions, Counter, Triggers, States, CounterBar, AdminTools, Rewards } =
+    createAssetPacksComponents(engine as any)
 
   const TransformConfig = engine.defineComponent(EditorComponentNames.TransformConfig, {
     porportionalScaling: Schemas.Optional(Schemas.Boolean)
