@@ -52,7 +52,7 @@ const AdminToolsBasicView = withSdk<Props>(({ sdk, entity }) => {
       </Block>
 
       <Accordion
-        label="TEXT ANNOUNCEMENT"
+        label="TEXT ANNOUNCEMENTS"
         className="PanelSection border"
         enabled={!!adminComponent.textAnnouncementControl?.isEnabled}
         onToggleEnabled={(enabled) => handleToggleEnabled('textAnnouncementControl', enabled)}

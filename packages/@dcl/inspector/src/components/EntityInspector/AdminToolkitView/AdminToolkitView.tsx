@@ -71,7 +71,7 @@ const AdminToolkitView = withSdk<Props>(({ sdk, entity }) => {
       </Accordion> */}
 
       <Accordion
-        label="TEXT ANNOUNCEMENT"
+        label="TEXT ANNOUNCEMENTS"
         className="PanelSection"
         enabled={!!adminComponent.textAnnouncementControl.isEnabled}
         onToggleEnabled={(enabled) => handleToggleEnabled('textAnnouncementControl', enabled)}
