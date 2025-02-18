@@ -11,6 +11,12 @@
   display: none;
 }
 
+.AdminToolkitViewInspector .content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .AdminToolkitViewInspector .Accordion.PanelSection {
   background-color: var(--background-dark);
 }
