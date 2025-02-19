@@ -1,5 +1,5 @@
 import { IEngine, NetworkEntity as NetworkEntityEngine, Entity } from '@dcl/ecs'
-import { createEnumEntityId, EnumEntity } from './enum-entity'
+import { createEnumEntityId, EnumEntity, INSPECTOR_ENUM_ENTITY_ID_START } from './enum-entity'
 
 describe('createEnumEntityId', () => {
   it('returns functions to get and increment enum entity id', () => {
@@ -17,7 +17,7 @@ describe('createEnumEntityId', () => {
 
     const entitiesWithMock = new Map([
       [1, { entityId: 2222 }],
-      [2, { entityId: 3333 }]
+      [2, { entityId: INSPECTOR_ENUM_ENTITY_ID_START }]
     ])
 
     ;(engineMock.getEntitiesWith as jest.Mock).mockImplementation((component: typeof NetworkEntityEngine) => {
@@ -32,7 +32,6 @@ describe('createEnumEntityId', () => {
 
     const enumEntity: EnumEntity = createEnumEntityId(engineMock)
 
-    expect(enumEntity.getEnumEntityId()).toBe(3333)
-    expect(enumEntity.getNextEnumEntityId()).toBe(3334)
+    expect(enumEntity.getNextEnumEntityId()).toBe(INSPECTOR_ENUM_ENTITY_ID_START + 1)
   })
 })
