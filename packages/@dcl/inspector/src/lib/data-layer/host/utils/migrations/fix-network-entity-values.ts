@@ -26,7 +26,7 @@ export function fixNetworkEntityValues(engine: IEngine) {
   if (!NetworkEntity || !needsFixing()) return
 
   let lastEntityId = INSPECTOR_ENUM_ENTITY_ID_START
-  for (const [entity, value] of engine.getEntitiesWith(NetworkEntity)) {
+  for (const [entity] of engine.getEntitiesWith(NetworkEntity)) {
     NetworkEntity.getMutable(entity).entityId = lastEntityId as Entity
     lastEntityId++
   }

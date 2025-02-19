@@ -1,4 +1,4 @@
-import { Entity, IEngine, IEntityContainer, NetworkEntity as NetworkEntityEngine } from '@dcl/ecs'
+import { Entity, IEngine, NetworkEntity as NetworkEntityEngine } from '@dcl/ecs'
 
 import { CoreComponents } from './components'
 
@@ -8,10 +8,10 @@ export function createEnumEntityId(engine: IEngine) {
 
   function getNextEnumEntityId(): Entity {
     let value: Entity = INSPECTOR_ENUM_ENTITY_ID_START
-    for (const [entity, component] of engine.getEntitiesWith(NetworkEntity)) {
+    for (const [, component] of engine.getEntitiesWith(NetworkEntity)) {
       value = Math.max(value, Number(component.entityId)) as Entity
     }
-    return value + 1 as Entity
+    return (value + 1) as Entity
   }
 
   return {
