@@ -11,7 +11,7 @@ import { CheckboxField, TextArea, TextField } from '../../ui'
 
 import './RewardsForm.css'
 
-const REWARDS_URL = 'https://decentraland.zone/rewards'
+const REWARDS_URL = 'https://decentraland.org/rewards'
 
 type Props = {
   entity: Entity
