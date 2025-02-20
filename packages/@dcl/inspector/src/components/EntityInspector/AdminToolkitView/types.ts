@@ -22,4 +22,4 @@ export type AdminToolkitData = {
   showAuthorText: boolean
   linkAllSmartItems: boolean
   smartItems: string[]
-} 
+}

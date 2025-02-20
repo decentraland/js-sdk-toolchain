@@ -1,2 +1,2 @@
-import RewardInspector from './RewardInspector' 
+import RewardInspector from './RewardInspector'
 export { RewardInspector }
