@@ -8,12 +8,15 @@ import { future } from 'fp-future'
 import { globSync } from 'glob'
 import path from 'path'
 import { pathToFileURL } from 'url'
+import chokidar from 'chokidar'
+
 import { CliComponents } from '../components'
 import { colors } from '../components/log'
-import { printProgressInfo, printProgressStep, printWarning } from './beautiful-logs'
+import { printError, printProgressInfo, printProgressStep, printWarning } from './beautiful-logs'
 import { CliError } from './error'
 import { getAllComposites } from './composite'
 import { isEditorScene } from './project-validations'
+import { getTypeScriptWatchPatterns } from './typescript'
 
 export type BundleComponents = Pick<CliComponents, 'logger' | 'fs'>
 
@@ -212,39 +215,87 @@ export async function bundleSingleProject(components: BundleComponents, options:
 }
 
 function runTypeChecker(components: BundleComponents, options: CompileOptions) {
-  const args = [
-    require.resolve('typescript/lib/tsc'),
-    '-p',
-    'tsconfig.json',
-    '--preserveWatchOutput',
-    options.emitDeclaration ? '--emitDeclarationOnly' : '--noEmit'
-  ]
-
-  /* istanbul ignore if */
-  if (options.watch) args.push('--watch')
-
-  printProgressStep(components.logger, `Running type checker`, 2, MAX_STEP)
-  const ts = child_process.spawn(process.execPath, args, { env: process.env, cwd: options.workingDirectory })
   const typeCheckerFuture = future<number>()
 
-  ts.on('close', (code) => {
-    /* istanbul ignore else */
-    if (code === 0) {
-      printProgressInfo(components.logger, `Type checking completed without errors`)
-    } else {
-      typeCheckerFuture.reject(new CliError(`Typechecker exited with code ${code}.`))
-      return
-    }
+  function runTsc() {
+    const args = [
+      require.resolve('typescript/lib/tsc'),
+      '-p',
+      'tsconfig.json',
+      options.emitDeclaration ? '--emitDeclarationOnly' : '--noEmit'
+    ]
 
-    typeCheckerFuture.resolve(code)
-  })
+    printProgressStep(components.logger, `Running type checker`, 2, MAX_STEP)
+    const ts = child_process.spawn(process.execPath, args, { env: process.env, cwd: options.workingDirectory })
 
-  ts.stdout.pipe(process.stdout)
-  ts.stderr.pipe(process.stderr)
+    return new Promise<number>((resolve, reject) => {
+      ts.on('close', (code) => {
+        if (code === 0) {
+          printProgressInfo(components.logger, `Type checking completed without errors`)
+          resolve(code)
+        } else {
+          reject(new CliError(`Typechecker exited with code ${code}.`))
+        }
+      })
 
-  /* istanbul ignore if */
+      ts.stdout.pipe(process.stdout)
+      ts.stderr.pipe(process.stderr)
+    })
+  }
+
   if (options.watch) {
-    typeCheckerFuture.resolve(-1)
+    try {
+      const watchPatterns = getTypeScriptWatchPatterns(path.join(options.workingDirectory, 'tsconfig.json'))
+
+      const watcher = chokidar.watch(watchPatterns, {
+        cwd: options.workingDirectory,
+        persistent: true
+      })
+
+      let isFirstRun = true
+      let typeCheckPromise: Promise<number> | null = null
+
+      watcher.on('ready', async () => {
+        typeCheckPromise = runTsc()
+        try {
+          if (isFirstRun) {
+            printProgressInfo(components.logger, `Watching for file changes...`)
+            isFirstRun = false
+          }
+          await typeCheckPromise
+        } catch (error) {
+          printError(components.logger, 'Error initializing type checker', error as Error)
+        }
+      })
+
+      watcher.on('change', async (changedPath) => {
+        printProgressInfo(components.logger, `File ${changedPath} changed, running type checker...`)
+
+        if (typeCheckPromise) {
+          try {
+            await typeCheckPromise
+          } catch (_) {
+            // Ignore error from previous run
+          }
+        }
+
+        typeCheckPromise = runTsc()
+        try {
+          await typeCheckPromise
+        } catch (error) {
+          printError(components.logger, 'Error running type checker', error as Error)
+        }
+      })
+
+      // Resolve immediately since we're in watch mode
+      typeCheckerFuture.resolve(-1)
+    } catch (error: any) {
+      typeCheckerFuture.reject(new CliError(`Failed to setup TypeScript watcher: ${error.message}`))
+    }
+  } else {
+    runTsc()
+      .then((code) => typeCheckerFuture.resolve(code))
+      .catch((error) => typeCheckerFuture.reject(error))
   }
 
   return typeCheckerFuture
