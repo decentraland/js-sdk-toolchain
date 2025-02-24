@@ -63,10 +63,10 @@ import { compositeFromLoader } from '~sdk/all-composites'
 ${
   isEditorScene &&
   `
-import { syncEntity, parentEntity, removeParent, getParent, getChildren } from '@dcl/sdk/network'
+import { syncEntity } from '@dcl/sdk/network'
 import players from '@dcl/sdk/players'
 import { initAssetPacks, setSyncEntity } from '@dcl/asset-packs/dist/scene-entrypoint'
-initAssetPacks(engine, { syncEntity, parentEntity, removeParent, getParent, getChildren }, players)
+initAssetPacks(engine, { syncEntity }, players)
 
 // TODO: do we need to do this on runtime ?
 // I think we have that information at build-time and we avoid to do evaluate this on the worker.
