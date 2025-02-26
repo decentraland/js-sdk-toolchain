@@ -67,8 +67,9 @@ describe('UiDropdown React ECS', () => {
   })
 
   it('remove the onchange fn, so if we change the value there is no call to the fn because there is no onChange fn', async () => {
-    expect(onChange).toBeCalledTimes(0)
+    onChange.mockClear()
     conditional = false
+    expect(onChange).toBeCalledTimes(0)
     await engine.update(1)
 
     UiDropdownResult.getMutable(uiEntity).value = 2
@@ -78,6 +79,7 @@ describe('UiDropdown React ECS', () => {
   })
 
   it('put the conditional en true, so we have the onChange fn again', async () => {
+    onChange.mockClear()
     conditional = true
     await engine.update(1)
     expect(onChange).toBeCalledTimes(0)

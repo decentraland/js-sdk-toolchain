@@ -245,14 +245,12 @@ export function createComponentDefinitionFromSchema<T>(
       if (data.delete(entity) && markAsDirty) {
         dirtyIterator.add(entity)
       }
-      onChangeCallbacks.delete(entity)
       return component || null
     },
     entityDeleted(entity: Entity, markAsDirty: boolean): void {
       if (data.delete(entity) && markAsDirty) {
         dirtyIterator.add(entity)
       }
-      onChangeCallbacks.delete(entity)
     },
     getOrNull(entity: Entity): DeepReadonly<T> | null {
       const component = data.get(entity)
@@ -324,13 +322,6 @@ export function createComponentDefinitionFromSchema<T>(
       const cbs = onChangeCallbacks.get(entity) ?? []
       cbs.push(cb)
       onChangeCallbacks.set(entity, cbs)
-    },
-    removeOnChange(entity, cb) {
-      const cbs = onChangeCallbacks.get(entity) ?? []
-      onChangeCallbacks.set(
-        entity,
-        cbs.filter(($) => $ !== cb)
-      )
     },
     __onChangeCallbacks(entity, value) {
       const cbs = onChangeCallbacks.get(entity)
