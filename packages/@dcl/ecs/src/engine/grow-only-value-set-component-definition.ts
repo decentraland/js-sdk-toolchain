@@ -113,6 +113,7 @@ export function createValueSetComponentDefinitionFromSchema<T>(
     },
     entityDeleted(entity: Entity): void {
       data.delete(entity)
+      onChangeCallbacks.delete(entity)
     },
     get(entity: Entity): DeepReadonlySet<T> {
       const values = data.get(entity)
@@ -173,6 +174,13 @@ export function createValueSetComponentDefinitionFromSchema<T>(
       const cbs = onChangeCallbacks.get(entity) ?? []
       cbs.push(cb)
       onChangeCallbacks.set(entity, cbs)
+    },
+    removeOnChange(entity, cb) {
+      const cbs = onChangeCallbacks.get(entity) ?? []
+      onChangeCallbacks.set(
+        entity,
+        cbs.filter(($) => $ !== cb)
+      )
     },
     __onChangeCallbacks(entity, value) {
       const cbs = onChangeCallbacks.get(entity)

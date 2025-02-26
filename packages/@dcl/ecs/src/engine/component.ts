@@ -104,6 +104,12 @@ export interface BaseComponent<T> {
    * If the value is undefined, the component was deleted.
    */
   onChange(entity: Entity, cb: (value: T | undefined) => void): void
+
+  /**
+   * Removes a previously registered onChange callback for the specified entity
+   * @public
+   */
+  removeOnChange(entity: Entity, cb: (value: T | undefined) => void): void
 }
 
 /**
