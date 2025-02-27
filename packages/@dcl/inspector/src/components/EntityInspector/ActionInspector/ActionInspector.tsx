@@ -105,11 +105,12 @@ const ActionMapOption: Record<string, string> = {
   [ActionType.SET_SCALE]: 'Set Scale',
   [ActionType.RANDOM]: 'Random Action',
   [ActionType.BATCH]: 'Batch Actions',
-  [ActionType.HEAL_PLAYER]: 'Heal Player'
+  [ActionType.HEAL_PLAYER]: 'Heal Player',
+  [ActionType.CLAIM_AIRDROP]: 'Claim Airdrop'
 }
 
 export default withSdk<Props>(({ sdk, entity: entityId }) => {
-  const { Actions, States, Counter, GltfContainer } = sdk.components
+  const { Actions, States, Counter, GltfContainer, Rewards } = sdk.components
   const [componentValue, setComponentValue, isComponentEqual] = useComponentValue<EditorComponentsTypes['Actions']>(
     entityId,
     Actions
@@ -125,6 +126,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
   const hasActions = useHasComponent(entityId, Actions)
   const hasStates = useHasComponent(entityId, States)
   const hasCounter = useHasComponent(entityId, Counter)
+  const hasRewards = useHasComponent(entityId, Rewards)
 
   useChange(
     (event, sdk) => {
@@ -269,7 +271,8 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
       [ActionType.SET_STATE]: () => hasStates,
       [ActionType.INCREMENT_COUNTER]: () => hasCounter,
       [ActionType.DECREASE_COUNTER]: () => hasCounter,
-      [ActionType.SET_COUNTER]: () => hasCounter
+      [ActionType.SET_COUNTER]: () => hasCounter,
+      [ActionType.CLAIM_AIRDROP]: () => hasRewards
     }),
     [hasAnimations, hasStates]
   )

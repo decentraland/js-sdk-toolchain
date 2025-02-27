@@ -41,11 +41,6 @@ const TextAnnouncementControl = withSdk<Props>(({ sdk, entity }) => {
     <div className="TextAnnouncementControl">
       <CheckboxGroup>
         <CheckboxField
-          label="Play a sound each time a new announcement is made"
-          checked={textAnnouncementControl.playSoundOnEachAnnouncement || false}
-          onChange={handleBooleanChange('playSoundOnEachAnnouncement')}
-        />
-        <CheckboxField
           label="Show author on each announcements"
           checked={textAnnouncementControl.showAuthorOnEachAnnouncement || false}
           onChange={handleBooleanChange('showAuthorOnEachAnnouncement')}
