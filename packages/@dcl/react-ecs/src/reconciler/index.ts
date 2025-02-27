@@ -250,11 +250,7 @@ export function createReconciler(
     // Create onChange callback if its the first callback event for this entity
     if (!hasEvent) {
       const resultComponentId =
-        componentId === UiDropdown.componentId
-          ? UiDropdownResult.componentId
-          : componentId === UiInput.componentId
-          ? UiInputResult.componentId
-          : undefined
+        componentId === UiDropdown.componentId ? UiDropdownResult.componentId : UiInputResult.componentId
       if (!resultComponentId) return
       engine.getComponent<PBUiInputResult | PBUiDropdownResult>(resultComponentId).onChange(entity, (value) => {
         if ((value as PBUiInputResult)?.isSubmit) {
