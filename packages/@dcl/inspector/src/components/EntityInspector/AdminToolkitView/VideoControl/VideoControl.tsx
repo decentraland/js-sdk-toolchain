@@ -128,16 +128,6 @@ const VideoControl: React.FC<WithSdkProps & Props> = ({ sdk, entity }) => {
           checked={videoControl.disableVideoPlayersSound || false}
           onChange={handleBooleanChange('disableVideoPlayersSound')}
         />
-        <CheckboxField
-          label="Show author on each Stream"
-          checked={videoControl.showAuthorOnVideoPlayers || false}
-          onChange={handleBooleanChange('showAuthorOnVideoPlayers')}
-        />
-        <CheckboxField
-          label="Link all screens by default"
-          checked={videoControl.linkAllVideoPlayers || false}
-          onChange={handleBooleanChange('linkAllVideoPlayers')}
-        />
       </CheckboxGroup>
 
       {videoControl.videoPlayers?.map((videoPlayer, idx) => {
