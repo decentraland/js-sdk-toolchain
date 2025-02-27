@@ -7,7 +7,6 @@ import { Accordion, InfoTooltip } from '../../ui'
 import { Container } from '../../Container'
 import { Block } from '../../Block'
 
-import { RewardsControl } from './RewardsControl'
 import { VideoControl } from './VideoControl'
 import { SmartItemControl } from './SmartItemControl'
 import { AdminAllowListControl } from './AdminAllowListControl'
@@ -56,19 +55,6 @@ const AdminToolkitView = withSdk<Props>(({ sdk, entity }) => {
       <Block>
         <AdminAllowListControl entity={entity} />
       </Block>
-      {/* <Accordion
-        label="MODERATION"
-        className="PanelSection"
-        enabled={!!adminComponent.moderationControl.isEnabled}
-        onToggleEnabled={(enabled) => handleToggleEnabled('moderationControl', enabled)}
-      >
-        <Vector3Field
-          label="Kick Coordinates"
-          useLeftLabels
-          value={adminComponent.moderationControl.kickCoordinates || { x: 0, y: 0, z: 0 }}
-          onChange={handleKickCoordinatesChange}
-        />
-      </Accordion> */}
       <Accordion
         label="VIDEO CONTROL"
         className="PanelSection"
@@ -85,15 +71,6 @@ const AdminToolkitView = withSdk<Props>(({ sdk, entity }) => {
         onToggleEnabled={(enabled) => handleToggleEnabled('textAnnouncementControl', enabled)}
       >
         <TextAnnouncementControl entity={entity} />
-      </Accordion>
-
-      <Accordion
-        label="AIRDROPS"
-        className="PanelSection"
-        enabled={!!adminComponent.rewardsControl.isEnabled}
-        onToggleEnabled={(enabled) => handleToggleEnabled('rewardsControl', enabled)}
-      >
-        <RewardsControl entity={entity} />
       </Accordion>
 
       <Accordion

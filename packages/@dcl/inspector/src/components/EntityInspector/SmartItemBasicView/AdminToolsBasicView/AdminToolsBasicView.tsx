@@ -70,15 +70,6 @@ const AdminToolsBasicView = withSdk<Props>(({ sdk, entity }) => {
       </Accordion>
 
       <Accordion
-        label="AIRDROPS"
-        className="PanelSection border"
-        enabled={!!adminComponent.rewardsControl?.isEnabled}
-        onToggleEnabled={(enabled) => handleToggleEnabled('rewardsControl', enabled)}
-      >
-        <RewardsControl entity={entity} />
-      </Accordion>
-
-      <Accordion
         label="SMART ITEM ACTIONS"
         className="PanelSection border"
         enabled={!!adminComponent.smartItemsControl?.isEnabled}
