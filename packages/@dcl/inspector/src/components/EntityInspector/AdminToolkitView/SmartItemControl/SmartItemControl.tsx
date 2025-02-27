@@ -6,7 +6,7 @@ import { withSdk, WithSdkProps } from '../../../../hoc/withSdk'
 import { getComponentValue, useComponentValue } from '../../../../hooks/sdk/useComponentValue'
 import { useEntitiesWith } from '../../../../hooks/sdk/useEntitiesWith'
 
-import { CheckboxField, CheckboxGroup, TextField, Dropdown, EntityField } from '../../../ui'
+import { TextField, Dropdown, EntityField } from '../../../ui'
 import { Button } from '../../../Button'
 import { AddButton } from '../../AddButton'
 import MoreOptionsMenu from '../../MoreOptionsMenu'
@@ -108,20 +108,6 @@ const SmartItemControl: React.FC<WithSdkProps & Props> = ({ sdk, entity }) => {
     [adminComponent, setAdminComponent]
   )
 
-  const handleBooleanChange = useCallback(
-    (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (!adminComponent) return
-      setAdminComponent({
-        ...adminComponent,
-        smartItemsControl: {
-          ...adminComponent.smartItemsControl,
-          [field]: event.target.checked
-        }
-      })
-    },
-    [adminComponent, setAdminComponent]
-  )
-
   const availableActions: Map<number, { actions: Action[] }> = useMemo(() => {
     return entitiesWithAction?.reduce((actions, entityWithAction) => {
       const actionsComponentValue = getComponentValue(entityWithAction, Actions)
@@ -136,14 +122,6 @@ const SmartItemControl: React.FC<WithSdkProps & Props> = ({ sdk, entity }) => {
 
   return (
     <div className="SmartItemControl">
-      <CheckboxGroup>
-        <CheckboxField
-          label="Link All Smart Items"
-          checked={adminComponent.smartItemsControl.linkAllSmartItems || false}
-          onChange={handleBooleanChange('linkAllSmartItems')}
-        />
-      </CheckboxGroup>
-
       {adminComponent.smartItemsControl.smartItems?.map((smartItem, idx) => {
         const actions = smartItem.entity
           ? (availableActions.get(smartItem.entity)?.actions ?? []).map(({ name }) => ({
