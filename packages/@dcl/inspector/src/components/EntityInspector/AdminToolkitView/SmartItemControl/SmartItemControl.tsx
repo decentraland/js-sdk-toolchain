@@ -166,7 +166,15 @@ const SmartItemControl: React.FC<WithSdkProps & Props> = ({ sdk, entity }) => {
           </Block>
         )
       })}
-      <AddButton onClick={handleAddSmartItemAction}>Add Smart Item</AddButton>
+      <AddButton
+        onClick={handleAddSmartItemAction}
+        disabled={
+          entitiesWithAction.length === 0 ||
+          entitiesWithAction.length === adminComponent.smartItemsControl.smartItems?.length
+        }
+      >
+        Add Smart Item
+      </AddButton>
     </div>
   )
 }

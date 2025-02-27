@@ -166,7 +166,7 @@ const VideoControl: React.FC<WithSdkProps & Props> = ({ sdk, entity }) => {
       })}
       <AddButton
         onClick={handleAddVideoPlayer}
-        disabled={videoPlayerEntities.length === videoControl.videoPlayers?.length}
+        disabled={videoPlayerEntities.length === 0 || videoPlayerEntities.length === videoControl.videoPlayers?.length}
       >
         Add a new Screen
       </AddButton>
