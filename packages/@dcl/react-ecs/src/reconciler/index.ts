@@ -251,7 +251,6 @@ export function createReconciler(
     if (!hasEvent) {
       const resultComponentId =
         componentId === UiDropdown.componentId ? UiDropdownResult.componentId : UiInputResult.componentId
-      if (!resultComponentId) return
       engine.getComponent<PBUiInputResult | PBUiDropdownResult>(resultComponentId).onChange(entity, (value) => {
         if ((value as PBUiInputResult)?.isSubmit) {
           const onSubmit = changeEvents.get(entity)?.get(componentId)?.onSubmitCallback
