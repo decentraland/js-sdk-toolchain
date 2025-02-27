@@ -308,7 +308,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
       rightContent={
         <InfoTooltip
           text={`Triggers activate actions based on player interactions like clicks, entering/exiting areas, or global events like "on spawn".`}
-          link="https://docs.decentraland.org/creator/smart-items/#triggers"
+          link="https://docs.decentraland.org/creator/editor/smart-items-advanced/"
           type="help"
         />
       }

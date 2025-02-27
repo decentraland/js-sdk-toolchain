@@ -944,7 +944,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
       rightContent={
         <InfoTooltip
           text="Actions list the capabilities of entities, from playing animations to changing visibility. Customize or add new actions, which are activated by triggers."
-          link="https://docs.decentraland.org/creator/smart-items/#actions"
+          link="https://docs.decentraland.org/creator/editor/smart-items-advanced/"
           type="help"
         />
       }
