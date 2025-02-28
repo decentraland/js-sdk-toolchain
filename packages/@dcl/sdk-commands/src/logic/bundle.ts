@@ -212,8 +212,8 @@ export async function bundleSingleProject(components: BundleComponents, options:
 }
 
 function runTypeChecker(components: BundleComponents, options: CompileOptions) {
+  const tsBin = require.resolve('typescript/lib/tsc')
   const args = [
-    require.resolve('typescript/lib/tsc'),
     '-p',
     'tsconfig.json',
     '--preserveWatchOutput',
@@ -224,7 +224,11 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
   if (options.watch) args.push('--watch')
 
   printProgressStep(components.logger, `Running type checker`, 2, MAX_STEP)
-  const ts = child_process.spawn(process.execPath, args, { env: process.env, cwd: options.workingDirectory })
+  const ts = child_process.fork(tsBin, args, {
+    stdio: 'pipe',
+    env: process.env,
+    cwd: options.workingDirectory
+  })
   const typeCheckerFuture = future<number>()
 
   ts.on('close', (code) => {
@@ -239,8 +243,8 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
     typeCheckerFuture.resolve(code)
   })
 
-  ts.stdout.pipe(process.stdout)
-  ts.stderr.pipe(process.stderr)
+  ts.stdout?.pipe(process.stdout)
+  ts.stderr?.pipe(process.stderr)
 
   /* istanbul ignore if */
   if (options.watch) {
