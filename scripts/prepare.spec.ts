@@ -139,12 +139,10 @@ function checkNoLocalPackages(...paths: string[]) {
       const errors: string[] = []
       for (const [key, value] of Object.entries({ ...dependencies, ...devDependencies } as Record<string, string>)) {
         if (
-          (value.startsWith('file:') ||
-            value.startsWith('http:') ||
-            value.startsWith('https:') ||
-            value.startsWith('git:')) &&
-          // TODO: Remove this once we have a published version of asset-packs
-          !value.includes('@dcl/asset-packs')
+          value.startsWith('file:') ||
+          value.startsWith('http:') ||
+          value.startsWith('https:') ||
+          value.startsWith('git:')
         ) {
           errors.push(`Dependency ${key} is not pointing to a published version: ${value}`)
         }
