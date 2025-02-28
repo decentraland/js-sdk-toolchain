@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import { Entity } from '@dcl/ecs'
 import { Action } from '@dcl/asset-packs'
 import { VscTrash as RemoveIcon } from 'react-icons/vsc'
@@ -23,6 +23,35 @@ const SmartItemControl: React.FC<WithSdkProps & Props> = ({ sdk, entity }) => {
   const { AdminTools, Actions } = sdk.components
   const [adminComponent, setAdminComponent] = useComponentValue(entity, AdminTools)
   const entitiesWithAction: Entity[] = useEntitiesWith((components) => components.Actions)
+
+  const availableActions: Map<number, { actions: Action[] }> = useMemo(() => {
+    const actions = new Map<number, { actions: Action[] }>()
+    for (const entityWithAction of entitiesWithAction) {
+      const actionsComponentValue = getComponentValue(entityWithAction, Actions)
+      if (actionsComponentValue.value.length > 0) {
+        actions.set(entityWithAction, { actions: actionsComponentValue.value as Action[] })
+      }
+    }
+    return actions
+  }, [entitiesWithAction])
+
+  useEffect(() => {
+    if (!adminComponent?.smartItemsControl.smartItems?.length) return
+
+    const validSmartItems = adminComponent.smartItemsControl.smartItems.filter(
+      (item) => item.entity === 0 || availableActions.has(item.entity)
+    )
+
+    if (validSmartItems.length !== adminComponent.smartItemsControl.smartItems.length) {
+      setAdminComponent({
+        ...adminComponent,
+        smartItemsControl: {
+          ...adminComponent.smartItemsControl,
+          smartItems: validSmartItems
+        }
+      })
+    }
+  }, [availableActions, adminComponent, setAdminComponent])
 
   const handleAddSmartItemAction = useCallback(() => {
     if (!adminComponent) return
@@ -107,16 +136,6 @@ const SmartItemControl: React.FC<WithSdkProps & Props> = ({ sdk, entity }) => {
     },
     [adminComponent, setAdminComponent]
   )
-
-  const availableActions: Map<number, { actions: Action[] }> = useMemo(() => {
-    return entitiesWithAction?.reduce((actions, entityWithAction) => {
-      const actionsComponentValue = getComponentValue(entityWithAction, Actions)
-      if (actionsComponentValue.value.length > 0) {
-        actions.set(entityWithAction, { actions: actionsComponentValue.value as Action[] })
-      }
-      return actions
-    }, new Map<number, { actions: Action[] }>())
-  }, [entitiesWithAction])
 
   if (!adminComponent) return null
 
