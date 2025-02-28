@@ -9,4 +9,5 @@ export type AudioSourceInput = {
   playing?: boolean
   loop?: boolean
   volume?: string
+  global?: boolean
 }
