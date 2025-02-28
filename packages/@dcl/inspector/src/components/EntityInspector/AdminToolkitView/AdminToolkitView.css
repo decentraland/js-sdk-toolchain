@@ -1,0 +1,29 @@
+.AdminToolkitViewInspector {
+  width: 100%;
+}
+
+.AdminToolkitViewInspector > .title .CheckboxField {
+  margin: 0;
+  padding: 0;
+}
+
+.AdminToolkitViewInspector > .title .CheckboxField label {
+  display: none;
+}
+
+.AdminToolkitViewInspector .content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.AdminToolkitViewInspector .Accordion.PanelSection {
+  background-color: var(--background-dark);
+}
+
+.AdminToolkitViewInspector .Accordion.PanelSection .Block.VideoPlayerRow .content {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 12px;
+}

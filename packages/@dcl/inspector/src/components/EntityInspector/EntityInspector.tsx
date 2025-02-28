@@ -31,6 +31,8 @@ import { EntityHeader } from './EntityHeader'
 import { CounterBarInspector } from './CounterBarInspector'
 import { TweenInspector } from './TweenInspector'
 import { SmartItemBasicView } from './SmartItemBasicView'
+import { AdminToolkitView } from './AdminToolkitView'
+import { RewardInspector } from './RewardInspector'
 
 import './EntityInspector.css'
 
@@ -153,7 +155,9 @@ const SingleEntityInspector = withSdk<{ entity: Entity | null }>(({ sdk, entity 
         name: sdk.components.SyncComponents.componentName,
         component: SyncComponentsInspector
       },
-      { name: sdk.components.CounterBar.componentName, component: CounterBarInspector }
+      { name: sdk.components.CounterBar.componentName, component: CounterBarInspector },
+      { name: sdk.components.AdminTools.componentName, component: AdminToolkitView },
+      { name: sdk.components.Rewards.componentName, component: RewardInspector }
     ],
     [sdk]
   )

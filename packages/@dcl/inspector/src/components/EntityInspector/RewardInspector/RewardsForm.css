@@ -1,0 +1,29 @@
+.RewardsForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.RewardsForm .field-with-link {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.RewardsForm .masked-field {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.RewardsForm .masked-field .TextArea {
+  flex: 1;
+}
+
+.RewardsForm .Button.text.link:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.RewardsForm .disabled {
+  color: #616161;
+}

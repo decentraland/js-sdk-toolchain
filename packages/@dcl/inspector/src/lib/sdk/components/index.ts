@@ -8,7 +8,9 @@ import {
   Actions,
   Triggers,
   Counter,
-  CounterBar
+  CounterBar,
+  AdminTools,
+  Rewards
 } from '@dcl/asset-packs'
 import { Layout } from '../../utils/layout'
 import { GizmoType } from '../../utils/gizmo'
@@ -54,7 +56,9 @@ export enum EditorComponentNames {
   Config = 'inspector::Config',
   Ground = 'inspector::Ground',
   Tile = 'inspector::Tile',
-  CustomAsset = 'inspector::CustomAsset'
+  CustomAsset = 'inspector::CustomAsset',
+  AdminTools = ComponentName.ADMIN_TOOLS,
+  Rewards = ComponentName.REWARDS
 }
 
 export enum SceneAgeRating {
@@ -154,6 +158,8 @@ export type EditorComponentsTypes = {
   Ground: GroundComponent
   Tile: TileComponent
   CustomAsset: CustomAssetComponent
+  AdminTools: AdminTools
+  Rewards: Rewards
 }
 
 export type EditorComponents = {
@@ -173,6 +179,8 @@ export type EditorComponents = {
   Ground: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Ground']>
   Tile: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Tile']>
   CustomAsset: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['CustomAsset']>
+  AdminTools: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['AdminTools']>
+  Rewards: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Rewards']>
 }
 
 export type SdkComponents = {
@@ -321,7 +329,8 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     )
   })
 
-  const { ActionTypes, Actions, Counter, Triggers, States, CounterBar } = createAssetPacksComponents(engine as any)
+  const { ActionTypes, Actions, Counter, Triggers, States, CounterBar, AdminTools, Rewards } =
+    createAssetPacksComponents(engine as any)
 
   const TransformConfig = engine.defineComponent(EditorComponentNames.TransformConfig, {
     porportionalScaling: Schemas.Optional(Schemas.Boolean)
@@ -375,6 +384,8 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     Tile: Tile as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Tile']>,
     CustomAsset: CustomAsset as unknown as LastWriteWinElementSetComponentDefinition<
       EditorComponentsTypes['CustomAsset']
-    >
+    >,
+    AdminTools: AdminTools as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['AdminTools']>,
+    Rewards: Rewards as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Rewards']>
   }
 }

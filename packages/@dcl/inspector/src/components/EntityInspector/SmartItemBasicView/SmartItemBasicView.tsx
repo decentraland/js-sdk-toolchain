@@ -10,6 +10,8 @@ import { ActionView } from './ActionView'
 import { TriggerView } from './TriggerView'
 import { TweenView } from './TweenView'
 import { VideoView } from './VideoView'
+import { AdminToolsBasicView } from './AdminToolsBasicView'
+import { RewardsBasicView } from './RewardsBasicView'
 import { type Props } from './types'
 
 import './SmartItemBasicView.css'
@@ -22,6 +24,8 @@ const SmartItemBasicView = withSdk<Props>(({ sdk, entity }) => {
       switch (field.type) {
         case 'core::PointerEvents':
           return <PointerEventView entity={entity} key={`${idx}-${entity}`} />
+        case 'asset-packs::Rewards':
+          return <RewardsBasicView entity={entity} key={`${idx}-${entity}`} />
         case 'asset-packs::Actions':
           return <ActionView entity={entity} field={field} key={`${idx}-${entity}`} />
         case 'asset-packs::Triggers':
@@ -35,6 +39,8 @@ const SmartItemBasicView = withSdk<Props>(({ sdk, entity }) => {
         case 'asset-packs::Counter':
         case 'asset-packs::CounterBar':
           return <CounterBarView entity={entity} field={field} key={`${idx}-${entity}`} />
+        case 'asset-packs::AdminTools':
+          return <AdminToolsBasicView entity={entity} key={`${idx}-${entity}`} />
         default:
           return null
       }
