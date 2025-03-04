@@ -1,0 +1,26 @@
+.TextAnnouncementControl {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.TextAnnouncementControl .CheckboxGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.TextAnnouncementControl .Checkbox.Field .InputContainer {
+  display: flex;
+  align-items: normal;
+  gap: 8px;
+}
+
+.TextAnnouncementControl .Checkbox.Field .InputContainer .Label {
+  white-space: normal;
+  line-height: 1.4;
+}
+
+.TextAnnouncementControl .Checkbox.Field .InputContainer input[type='checkbox'] {
+  margin-top: 3px; /* Align with first line of text */
+}

@@ -20,7 +20,8 @@ const HierarchyIcon = withSdk<{ value: Entity }>(({ sdk, value }) => {
       sdk.components.States.has(value) ||
       sdk.components.TextShape.has(value) ||
       sdk.components.NftShape.has(value) ||
-      sdk.components.VisibilityComponent.has(value),
+      sdk.components.VisibilityComponent.has(value) ||
+      sdk.components.AdminTools.has(value),
     [sdk, value]
   )
 

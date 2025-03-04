@@ -14,7 +14,9 @@ export const DISABLED_COMPONENTS: string[] = [
   CoreComponents.NFT_SHAPE,
   CoreComponents.VIDEO_PLAYER,
   CoreComponents.NETWORK_ENTITY,
-  CoreComponents.TWEEN_SEQUENCE
+  CoreComponents.TWEEN_SEQUENCE,
+  ComponentName.ADMIN_TOOLS,
+  ComponentName.REWARDS
 ]
 
 export const SMART_ITEM_COMPONENTS: string[] = [
