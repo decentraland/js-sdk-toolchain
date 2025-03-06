@@ -27,6 +27,7 @@
   --white: #ffffff;
   --white-gray: #e7e7e7;
   --background-gray: #3c3c3c;
+  --background-dark: #181818;
   --border-gray: #454545;
   --black: #000000;
   --transparent: transparent;
@@ -114,4 +115,5 @@
 
   /* Margins */
   --sidebar: 314px;
+  --label-margin-bottom: 4.5px;
 }

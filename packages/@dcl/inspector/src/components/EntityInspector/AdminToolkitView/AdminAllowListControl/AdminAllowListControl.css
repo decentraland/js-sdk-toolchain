@@ -1,0 +1,66 @@
+/* Main container */
+.DefaultAdminPermissionsContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: baseline;
+  width: 100%;
+  gap: 16px;
+}
+
+/* Permissions dropdown section */
+.DefaultAdminPermissions {
+  display: flex;
+  width: 100%;
+  gap: 12px;
+}
+
+.DefaultAdminPermissions .Dropdown.Field {
+  width: 140px;
+}
+
+.DefaultAdminPermissions .AuthorizedUsersCheckboxGroup {
+  flex: 1;
+  width: 100%;
+}
+
+/* Dropdown specific styles */
+.Dropdown.Field .DefaultAdminPermissionsDropdown {
+  max-width: 146px;
+}
+
+.Dropdown.Field .DefaultAdminPermissionsDropdown + .Message.info span {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+/* Allow list section */
+.AdminAllowListContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 12px;
+}
+
+/* Input and add button row */
+.AdminAllowListActions {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 12px;
+  width: 100%;
+}
+
+.AdminAllowListActions .AddButton {
+  height: 24px;
+  width: 55px;
+  align-self: unset;
+}
+
+/* Pills container */
+.AdminAllowList {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 12px;
+}
