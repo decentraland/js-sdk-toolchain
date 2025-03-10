@@ -135,7 +135,10 @@ export class CameraManager {
     const center = new BABYLON.Vector3(PARCEL_SIZE / 2, 0, PARCEL_SIZE / 2)
     const size = center.length()
     const camera = new BABYLON.FreeCamera('editorCamera', center.subtractFromFloats(size, -size * 1.5, size * 2), scene)
+    const mouseInput = camera.inputs.attached.mouse as BABYLON.FreeCameraMouseInput
     camera.target = center
+
+    mouseInput.buttons = [2] // disable all buttons except right mouse button
 
     camera.inertia = 0
     camera.speed = this.speeds[this.speedIndex]
@@ -160,10 +163,10 @@ export class CameraManager {
 
     let holdingMouseButton = false
     scene.onPointerObservable.add((ev) => {
-      if (ev.type === BABYLON.PointerEventTypes.POINTERDOWN) {
+      if (ev.type === BABYLON.PointerEventTypes.POINTERDOWN && ev.event.button === 2) {
         holdingMouseButton = true
       }
-      if (ev.type === BABYLON.PointerEventTypes.POINTERUP) {
+      if (ev.type === BABYLON.PointerEventTypes.POINTERUP && ev.event.button === 2) {
         holdingMouseButton = false
       }
       if (ev.type === BABYLON.PointerEventTypes.POINTERWHEEL) {
