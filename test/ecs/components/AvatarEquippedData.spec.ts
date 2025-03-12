@@ -8,7 +8,8 @@ describe('Generated AvatarEquippedData ProtoBuf', () => {
 
     testComponentSerialization(AvatarEquippedData, {
       wearableUrns: ['boedo', 'casla'],
-      emoteUrns: ['wave', 'ortigoaz']
+      emoteUrns: ['wave', 'ortigoaz'],
+      forceRender: []
     })
   })
 })
