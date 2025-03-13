@@ -64,3 +64,8 @@
 .TextArea.Field.focused.error textarea {
   border-color: var(--error-light);
 }
+
+.TextArea textarea.masked {
+  -webkit-text-security: disc;
+  font-family: text-security-disc;
+}

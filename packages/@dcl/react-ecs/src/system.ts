@@ -18,7 +18,7 @@ export interface ReactBasedUiSystem {
 }
 
 /**
- * @internal
+ * @public
  */
 export function createReactBasedUiSystem(engine: IEngine, pointerSystem: PointerEventsSystem): ReactBasedUiSystem {
   const renderer = createReconciler(engine, pointerSystem, undefined)

@@ -10,6 +10,14 @@
   height: 100%;
 }
 
+.ImportAsset .children {
+  height: 100%;
+}
+
+.ImportAsset .children.hidden {
+  display: none;
+}
+
 .ImportAssetHover {
   padding: 8px;
 }

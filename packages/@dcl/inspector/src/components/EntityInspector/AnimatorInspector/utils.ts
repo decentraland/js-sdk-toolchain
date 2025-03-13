@@ -21,24 +21,33 @@ export function isValidSpeed(speed: string | undefined): boolean {
   return !isNaN(parseFloat(value)) && parseFloat(value) >= 0 && parseFloat(value) <= 200
 }
 
+export function mapAnimationGroupsToStates(animations: AnimationGroup[]): PBAnimationState[] {
+  return animations.map(($) => ({
+    clip: $.name,
+    playing: !!$.isPlaying,
+    weight: $.weight ?? 1,
+    speed: $.speedRatio ?? 1,
+    loop: $.loopAnimation ?? false,
+    shouldReset: false
+  }))
+}
+
 export async function initializeAnimatorComponent(
   sdk: SdkContextValue,
   entity: Entity,
   animations: AnimationGroup[]
 ): Promise<PBAnimator> {
-  const states: PBAnimationState[] = animations.map(($) => ({
-    clip: $.name,
-    playing: false,
-    weight: 1,
-    speed: 1,
-    loop: false,
-    shouldReset: false
-  }))
-
+  const states = mapAnimationGroupsToStates(animations)
   const value: PBAnimator = { states }
-  sdk.operations.addComponent(entity, Animator.componentId)
-  sdk.operations.updateValue(Animator, entity, value)
-  await sdk.operations.dispatch()
+
+  try {
+    sdk.operations.addComponent(entity, Animator.componentId)
+    sdk.operations.updateValue(Animator, entity, value)
+    await sdk.operations.dispatch()
+  } catch (error) {
+    console.warn('Failed to initialize animator component:', error)
+    throw error
+  }
 
   return value
 }

@@ -58,6 +58,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
 
   const playing = getInputProps('playing', (e) => e.target.checked)
   const loop = getInputProps('loop', (e) => e.target.checked)
+  const global = getInputProps('global', (e) => e.target.checked)
   const volume = getInputProps('volume', (e) => e.target.value)
 
   return (
@@ -75,6 +76,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
       <Block label="Playback">
         <CheckboxField label="Start playing" checked={!!playing.value} {...playing} />
         <CheckboxField label="Loop" checked={!!loop.value} {...loop} />
+        <CheckboxField label="Global" checked={!!global.value} {...global} />
       </Block>
       <Block className="volume">
         <RangeField {...volume} label="Volume" isValidValue={isValidVolume} />

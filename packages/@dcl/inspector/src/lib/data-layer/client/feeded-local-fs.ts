@@ -105,7 +105,7 @@ export function generateFeededComposite({ engine, components }: TempEngine, scen
       z: 8
     }
   })
-  components.GltfContainer.create(gltfEntity, { src: 'assets/scene/models/example.glb' })
+  components.GltfContainer.create(gltfEntity, { src: 'assets/scene/Models/example/model.glb' })
   cubeIdComponent.create(gltfEntity)
   components.Name.create(gltfEntity, { value: 'Gltf Test' })
 
@@ -130,7 +130,7 @@ export function generateFeededComposite({ engine, components }: TempEngine, scen
 export const getMinimalComposite = () => generateMinimalComposite(createTempEngineContext())
 
 const builderMappings: Record<string, string> = {
-  'assets/scene/models/example.glb': 'bafkreibzw3d2aziiw2yhq7eoihytxthsulbihbr2ds2zegmsreaycy4h7e'
+  'assets/scene/Models/example/model.glb': 'bafkreibzw3d2aziiw2yhq7eoihytxthsulbihbr2ds2zegmsreaycy4h7e'
 }
 
 function getFeededEngineAndComposite(scene: Scene) {

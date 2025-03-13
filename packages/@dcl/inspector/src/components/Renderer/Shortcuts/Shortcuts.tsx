@@ -16,6 +16,8 @@ import { Props } from './types'
 import './Shortcuts.css'
 
 const ICON_SIZE = 18
+const isMac = /Mac|iPhone|iPod|iPad/.test(navigator.userAgent)
+const prefixKey = isMac ? '⌘' : 'ctrl'
 
 const Shortcuts: React.FC<Props> = ({ canvas, onResetCamera, onZoomIn, onZoomOut }) => {
   const [showShortcuts, setShowShortcuts] = React.useState(false)
@@ -87,37 +89,37 @@ const Shortcuts: React.FC<Props> = ({ canvas, onResetCamera, onZoomIn, onZoomOut
             <div className="Item">
               <div className="Title">Select Multiple Items</div>
               <div className="Description">
-                Hold<span className="Key">ctrl</span>and click
+                Hold<span className="Key">{prefixKey}</span>and click
               </div>
             </div>
             <div className="Item">
               <div className="Title">Save</div>
               <div className="Description">
-                <span className="Key">ctrl</span>+<span className="Key">S</span>
+                <span className="Key">{prefixKey}</span>+<span className="Key">S</span>
               </div>
             </div>
             <div className="Item">
               <div className="Title">Undo</div>
               <div className="Description">
-                <span className="Key">ctrl</span>+<span className="Key">Z</span>
+                <span className="Key">{prefixKey}</span>+<span className="Key">Z</span>
               </div>
             </div>
             <div className="Item">
               <div className="Title">Redo</div>
               <div className="Description">
-                <span className="Key">ctrl</span>+<span className="Key">Y</span>
+                <span className="Key">{prefixKey}</span>+<span className="Key">Y</span>
               </div>
             </div>
             <div className="Item">
               <div className="Title">Copy</div>
               <div className="Description">
-                <span className="Key">ctrl</span>+<span className="Key">C</span>
+                <span className="Key">{prefixKey}</span>+<span className="Key">C</span>
               </div>
             </div>
             <div className="Item">
               <div className="Title">Paste</div>
               <div className="Description">
-                <span className="Key">ctrl</span>+<span className="Key">V</span>
+                <span className="Key">{prefixKey}</span>+<span className="Key">V</span>
               </div>
             </div>
             <div className="Item">
@@ -156,7 +158,7 @@ const Shortcuts: React.FC<Props> = ({ canvas, onResetCamera, onZoomIn, onZoomOut
             <div className="Item">
               <div className="Title">Duplicate</div>
               <div className="Description">
-                <span className="Key">ctrl</span>+<span className="Key">D</span>
+                <span className="Key">{prefixKey}</span>+<span className="Key">D</span>
               </div>
             </div>
             <div className="Item">

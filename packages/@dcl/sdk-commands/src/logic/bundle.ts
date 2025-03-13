@@ -64,8 +64,9 @@ ${
   isEditorScene &&
   `
 import { syncEntity } from '@dcl/sdk/network'
+import players from '@dcl/sdk/players'
 import { initAssetPacks, setSyncEntity } from '@dcl/asset-packs/dist/scene-entrypoint'
-initAssetPacks(engine, { syncEntity })
+initAssetPacks(engine, { syncEntity }, players)
 
 // TODO: do we need to do this on runtime ?
 // I think we have that information at build-time and we avoid to do evaluate this on the worker.
@@ -211,8 +212,8 @@ export async function bundleSingleProject(components: BundleComponents, options:
 }
 
 function runTypeChecker(components: BundleComponents, options: CompileOptions) {
+  const tsBin = require.resolve('typescript/lib/tsc')
   const args = [
-    require.resolve('typescript/lib/tsc'),
     '-p',
     'tsconfig.json',
     '--preserveWatchOutput',
@@ -223,7 +224,11 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
   if (options.watch) args.push('--watch')
 
   printProgressStep(components.logger, `Running type checker`, 2, MAX_STEP)
-  const ts = child_process.spawn(process.execPath, args, { env: process.env, cwd: options.workingDirectory })
+  const ts = child_process.fork(tsBin, args, {
+    stdio: 'pipe',
+    env: process.env,
+    cwd: options.workingDirectory
+  })
   const typeCheckerFuture = future<number>()
 
   ts.on('close', (code) => {
@@ -238,8 +243,8 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
     typeCheckerFuture.resolve(code)
   })
 
-  ts.stdout.pipe(process.stdout)
-  ts.stderr.pipe(process.stderr)
+  ts.stdout?.pipe(process.stdout)
+  ts.stderr?.pipe(process.stderr)
 
   /* istanbul ignore if */
   if (options.watch) {

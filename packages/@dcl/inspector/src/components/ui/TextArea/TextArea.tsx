@@ -88,6 +88,7 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
         disabled={disabled}
         value={inputValue}
         {...rest}
+        className={props.masked && !props.showValue ? 'masked' : ''}
       ></textarea>
       <Message text={error} type={MessageType.ERROR} />
     </div>

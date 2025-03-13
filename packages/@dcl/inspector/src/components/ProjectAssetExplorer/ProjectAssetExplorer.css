@@ -4,8 +4,8 @@
 }
 
 .ProjectView > .Tree-View {
-  border-right: 0.1px solid;
-  border-color: var(--border-gray);
+  border-right: 0.1px solid var(--border-gray);
+  border-left: 0.1px solid var(--border-gray);
 }
 
 .ProjectView > .Tree-View > .with-context-menu > .editor-assets-tree {
