@@ -373,7 +373,9 @@ export interface ByteBuffer {
     writeUtf8String(value: string, writeLength?: boolean): void;
 }
 
-// @public
+// Warning: (tsdoc-missing-deprecation-message) The @deprecated block must include a deprecation message, e.g. describing the recommended alternative
+//
+// @public @deprecated
 export type Callback = () => void;
 
 // @public (undocumented)
@@ -1154,8 +1156,8 @@ export type EntityComponents = {
     uiDropdown: PBUiDropdown;
     onMouseDown: MultiCallback;
     onMouseUp: MultiCallback;
-    onMouseEnter: Callback;
-    onMouseLeave: Callback;
+    onMouseEnter: EventSystemCallback;
+    onMouseLeave: EventSystemCallback;
     onMouseDrag: MultiCallback;
     onMouseDragLocked: MultiCallback;
     onMouseDragEnd: MultiCallback;
@@ -1657,8 +1659,8 @@ export const Light: LastWriteWinElementSetComponentDefinition<PBLight>;
 export type Listeners = {
     onMouseDown?: MultiCallback;
     onMouseUp?: MultiCallback;
-    onMouseEnter?: Callback;
-    onMouseLeave?: Callback;
+    onMouseEnter?: EventSystemCallback;
+    onMouseLeave?: EventSystemCallback;
     onMouseDrag?: MultiCallback;
     onMouseDragLocked?: MultiCallback;
     onMouseDragEnd?: MultiCallback;
@@ -1947,10 +1949,8 @@ export namespace Move {
     export function encode(message: Move, writer?: _m0.Writer): _m0.Writer;
 }
 
-// Warning: (ae-missing-release-tag) "MultiCallback" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type MultiCallback = Callback | Partial<Record<InputAction, EventSystemCallback>>;
+// @public
+export type MultiCallback = EventSystemCallback | Partial<Record<InputAction, EventSystemCallback>>;
 
 // Warning: (ae-missing-release-tag) "Name" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

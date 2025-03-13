@@ -11,7 +11,7 @@ import {
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import Reconciler, { HostConfig } from 'react-reconciler'
-import { Callback, isListener, Listeners, MultiCallback } from '../components'
+import { isListener, Listeners, MultiCallback } from '../components'
 import { CANVAS_ROOT_ENTITY } from '../components/uiTransform'
 import { ReactEcs } from '../react-ecs'
 import {
@@ -98,7 +98,7 @@ export function createReconciler(
   function pointerEventCallback(entity: Entity, pointerEvent: PointerEventType, event: PBPointerEventsResult) {
     const callback = clickEvents.get(entity)?.get(pointerEvent)
     if (typeof callback === 'function') {
-      callback()
+      callback(event)
     } else if (typeof callback === 'object' && callback !== null) {
       const innerCallback = callback[event.button]
       if (typeof innerCallback === 'function') {

@@ -1,7 +1,8 @@
 import { EventSystemCallback, InputAction } from '@dcl/ecs'
 /**
- * Callback function to be triggered on a specified event
- * @public
+ * legacy Callback function
+ *
+ * @public @deprecated
  */
 export type Callback = () => void
 /**
@@ -9,7 +10,7 @@ export type Callback = () => void
  * or a map of `InputAction`s to functions.
  * @public
  */
-export type MultiCallback = Callback | Partial<Record<InputAction, EventSystemCallback>>
+export type MultiCallback = EventSystemCallback | Partial<Record<InputAction, EventSystemCallback>>
 
 /**
  * User key event Listeners
@@ -21,9 +22,9 @@ export type Listeners = {
   /** triggered on mouse up event */
   onMouseUp?: MultiCallback
   /** triggered on mouse hover event */
-  onMouseEnter?: Callback
+  onMouseEnter?: EventSystemCallback
   /** triggered on mouse leave event */
-  onMouseLeave?: Callback
+  onMouseLeave?: EventSystemCallback
   /** triggered on mouse drag event */
   onMouseDrag?: MultiCallback
   /** triggered on mouse drag event */
