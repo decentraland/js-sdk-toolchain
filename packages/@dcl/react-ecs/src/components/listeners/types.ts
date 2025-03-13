@@ -4,7 +4,12 @@ import { EventSystemCallback, InputAction } from '@dcl/ecs'
  * @public
  */
 export type Callback = () => void
-export type MultiCallback = Callback | Partial<Record<InputAction, EventSystemCallback>> 
+/**
+ * either a simple callback function to be triggered on a specified event,
+ * or a map of `InputAction`s to functions.
+ * @public
+ */
+export type MultiCallback = Callback | Partial<Record<InputAction, EventSystemCallback>>
 
 /**
  * User key event Listeners
