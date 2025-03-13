@@ -11,7 +11,7 @@ import {
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import Reconciler, { HostConfig } from 'react-reconciler'
-import { Callback, isListener, Listeners } from '../components'
+import { Callback, isListener, Listeners, MultiCallback } from '../components'
 import { CANVAS_ROOT_ENTITY } from '../components/uiTransform'
 import { ReactEcs } from '../react-ecs'
 import {
@@ -72,7 +72,7 @@ export function createReconciler(
   const entities = new Set<Entity>()
   // Store the onChange callbacks to be runned every time a Result has changed
   const changeEvents = new Map<Entity, Map<number, OnChangeState | undefined>>()
-  const clickEvents = new Map<Entity, Map<PointerEventType, Callback>>()
+  const clickEvents = new Map<Entity, Map<PointerEventType, MultiCallback>>()
   // Initialize components
   const UiTransform = components.UiTransform(engine)
   const UiText = components.UiText(engine)
@@ -152,7 +152,7 @@ export function createReconciler(
       const entityEvent =
         clickEvents.get(instance.entity) || clickEvents.set(instance.entity, new Map()).get(instance.entity)!
       const alreadyHasPointerEvent = entityEvent.get(pointerEvent)
-      entityEvent.set(pointerEvent, update.props as Callback)
+      entityEvent.set(pointerEvent, update.props as MultiCallback)
 
       if (alreadyHasPointerEvent) return
 

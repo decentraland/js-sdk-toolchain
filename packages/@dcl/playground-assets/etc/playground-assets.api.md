@@ -374,7 +374,7 @@ export interface ByteBuffer {
 }
 
 // @public
-export type Callback = (() => void) | Partial<Record<InputAction, EventSystemCallback>>;
+export type Callback = () => void;
 
 // @public (undocumented)
 export const CameraLayer: LastWriteWinElementSetComponentDefinition<PBCameraLayer>;
@@ -1152,13 +1152,13 @@ export type EntityComponents = {
     uiBackground: PBUiBackground;
     uiInput: PBUiInput;
     uiDropdown: PBUiDropdown;
-    onMouseDown: Callback;
-    onMouseUp: Callback;
+    onMouseDown: MultiCallback;
+    onMouseUp: MultiCallback;
     onMouseEnter: Callback;
     onMouseLeave: Callback;
-    onMouseDrag: Callback;
-    onMouseDragLocked: Callback;
-    onMouseDragEnd: Callback;
+    onMouseDrag: MultiCallback;
+    onMouseDragLocked: MultiCallback;
+    onMouseDragEnd: MultiCallback;
 };
 
 // @public (undocumented)
@@ -1655,13 +1655,13 @@ export const Light: LastWriteWinElementSetComponentDefinition<PBLight>;
 
 // @public
 export type Listeners = {
-    onMouseDown?: Callback;
-    onMouseUp?: Callback;
+    onMouseDown?: MultiCallback;
+    onMouseUp?: MultiCallback;
     onMouseEnter?: Callback;
     onMouseLeave?: Callback;
-    onMouseDrag?: Callback;
-    onMouseDragLocked?: Callback;
-    onMouseDragEnd?: Callback;
+    onMouseDrag?: MultiCallback;
+    onMouseDragLocked?: MultiCallback;
+    onMouseDragEnd?: MultiCallback;
 };
 
 // @public (undocumented)
@@ -1946,6 +1946,11 @@ export namespace Move {
     // (undocumented)
     export function encode(message: Move, writer?: _m0.Writer): _m0.Writer;
 }
+
+// Warning: (ae-missing-release-tag) "MultiCallback" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type MultiCallback = Callback | Partial<Record<InputAction, EventSystemCallback>>;
 
 // Warning: (ae-missing-release-tag) "Name" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

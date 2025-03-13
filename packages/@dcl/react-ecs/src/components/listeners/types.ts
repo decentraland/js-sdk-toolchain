@@ -3,7 +3,8 @@ import { EventSystemCallback, InputAction } from '@dcl/ecs'
  * Callback function to be triggered on a specified event
  * @public
  */
-export type Callback = (() => void) | Partial<Record<InputAction, EventSystemCallback>>
+export type Callback = () => void
+export type MultiCallback = Callback | Partial<Record<InputAction, EventSystemCallback>> 
 
 /**
  * User key event Listeners
@@ -11,19 +12,19 @@ export type Callback = (() => void) | Partial<Record<InputAction, EventSystemCal
  */
 export type Listeners = {
   /** triggered on mouse down event */
-  onMouseDown?: Callback
+  onMouseDown?: MultiCallback
   /** triggered on mouse up event */
-  onMouseUp?: Callback
+  onMouseUp?: MultiCallback
   /** triggered on mouse hover event */
   onMouseEnter?: Callback
   /** triggered on mouse leave event */
   onMouseLeave?: Callback
   /** triggered on mouse drag event */
-  onMouseDrag?: Callback
+  onMouseDrag?: MultiCallback
   /** triggered on mouse drag event */
-  onMouseDragLocked?: Callback
+  onMouseDragLocked?: MultiCallback
   /** triggered on mouse drag event */
-  onMouseDragEnd?: Callback
+  onMouseDragEnd?: MultiCallback
 }
 
 const listeners: Listeners = {
