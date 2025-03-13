@@ -70,10 +70,14 @@
   margin-left: 8px;
   display: flex;
   align-items: center;
+  padding: 8px 9px;
+  font-weight: 600;
+  border-radius: 6px;
 }
 
 .Assets .Assets-buttons > button:first-child svg {
   margin-right: 5px;
+  stroke-width: 3;
 }
 
 .Assets .Assets-content {

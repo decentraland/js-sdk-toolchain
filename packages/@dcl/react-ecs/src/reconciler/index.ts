@@ -1,4 +1,12 @@
-import { Entity, IEngine, InputAction, PointerEventsSystem, PointerEventType } from '@dcl/ecs'
+import {
+  Entity,
+  IEngine,
+  InputAction,
+  PointerEventsSystem,
+  PointerEventType,
+  PBUiInputResult,
+  PBUiDropdownResult
+} from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import Reconciler, { HostConfig } from 'react-reconciler'
 import { Callback, isListener, Listeners } from '../components'
@@ -143,16 +151,16 @@ export function createReconciler(
         update.component === 'onMouseDown'
           ? pointerEvents.onPointerDown
           : update.component === 'onMouseUp'
-          ? pointerEvents.onPointerUp
-          : update.component === 'onMouseEnter'
-          ? pointerEvents.onPointerHoverEnter
-          : update.component === 'onMouseLeave'
-          ? pointerEvents.onPointerHoverLeave
-          : update.component === 'onMouseDrag'
-          ? pointerEvents.onPointerDrag
-          : update.component === 'onMouseDragLocked'
-          ? pointerEvents.onPointerDragLocked
-          : update.component === 'onMouseDragEnd' && pointerEvents.onPointerDragEnd
+            ? pointerEvents.onPointerUp
+            : update.component === 'onMouseEnter'
+              ? pointerEvents.onPointerHoverEnter
+              : update.component === 'onMouseLeave'
+                ? pointerEvents.onPointerHoverLeave
+                : update.component === 'onMouseDrag'
+                  ? pointerEvents.onPointerDrag
+                  : update.component === 'onMouseDragLocked'
+                    ? pointerEvents.onPointerDragLocked
+                    : update.component === 'onMouseDragEnd' && pointerEvents.onPointerDragEnd
 
       if (pointerEventSystem) {
         pointerEventSystem(
@@ -219,6 +227,7 @@ export function createReconciler(
 
   function removeChildEntity(instance: Instance) {
     changeEvents.delete(instance.entity)
+    clickEvents.delete(instance.entity)
     engine.removeEntity(instance.entity)
     for (const child of instance._child) {
       removeChildEntity(child)
@@ -269,13 +278,24 @@ export function createReconciler(
   }
 
   function updateOnChange(entity: Entity, componentId: number, state?: OnChangeState) {
+    const hasEvent = changeEvents.has(entity)
     const event = changeEvents.get(entity) || changeEvents.set(entity, new Map()).get(entity)!
-    const oldState = event.get(componentId)
     const onChangeCallback = state?.onChangeCallback
     const onSubmitCallback = state?.onSubmitCallback
-    const value = state?.value ?? oldState?.value
-    const isSubmit = state?.isSubmit ?? oldState?.isSubmit
-    event.set(componentId, { onChangeCallback, onSubmitCallback, value, isSubmit })
+    event.set(componentId, { onChangeCallback, onSubmitCallback })
+    // Create onChange callback if its the first callback event for this entity
+    if (!hasEvent) {
+      const resultComponentId =
+        componentId === UiDropdown.componentId ? UiDropdownResult.componentId : UiInputResult.componentId
+      engine.getComponent<PBUiInputResult | PBUiDropdownResult>(resultComponentId).onChange(entity, (value) => {
+        if ((value as PBUiInputResult)?.isSubmit) {
+          const onSubmit = changeEvents.get(entity)?.get(componentId)?.onSubmitCallback
+          onSubmit && onSubmit(value?.value)
+        }
+        const onChange = changeEvents.get(entity)?.get(componentId)?.onChangeCallback
+        onChange && onChange(value?.value)
+      })
+    }
   }
 
   const hostConfig: HostConfig<
@@ -388,7 +408,7 @@ export function createReconciler(
     null,
     '',
     /* istanbul ignore next */
-    function () {},
+    function () { },
     null
   )
 

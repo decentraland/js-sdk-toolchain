@@ -916,6 +916,9 @@ export function createInputSystem(engine: IEngine): IInputSystem;
 export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSystem): PointerEventsSystem;
 
 // @public (undocumented)
+export function createReactBasedUiSystem(engine: IEngine, pointerSystem: PointerEventsSystem): ReactBasedUiSystem;
+
+// @public (undocumented)
 export function createTweenSystem(engine: IEngine): TweenSystem;
 
 // Warning: (tsdoc-code-fence-closing-syntax) Unexpected characters after closing delimiter for code fence

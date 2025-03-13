@@ -11,9 +11,7 @@ import { ValidationError } from '../types'
 
 export function Error({ assets, onSubmit }: PropTypes) {
   const getErrorMessage = useCallback((error: ValidationError): string => {
-    if (!error) return 'Unknown error'
-
-    switch (error.type) {
+    switch (error?.type) {
       case 'type':
         return 'File type not supported'
       case 'model':
@@ -30,9 +28,7 @@ export function Error({ assets, onSubmit }: PropTypes) {
       <div className="alert-icon"></div>
       <h2>Asset failed to import</h2>
       <div className="errors">
-        {assets.map(($, i) => (
-          <ErrorMessage key={i} asset={$} message={getErrorMessage($.error)} />
-        ))}
+        {assets.map(($, i) => $.error && <ErrorMessage key={i} asset={$} message={getErrorMessage($.error)} />)}
       </div>
       <Button type="danger" size="big" onClick={onSubmit}>
         OK

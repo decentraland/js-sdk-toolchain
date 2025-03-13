@@ -31,7 +31,8 @@ export const DIRECTORY = {
   ASSETS: 'assets',
   SCENE: 'scene',
   THUMBNAILS: 'thumbnails',
-  CUSTOM: 'custom'
+  CUSTOM: 'custom',
+  ASSET_PACKS: 'asset-packs'
 }
 
 export const EXTENSIONS = [
@@ -49,6 +50,10 @@ export const EXTENSIONS = [
 
 export function withAssetDir(filePath: string = '') {
   return filePath ? `${DIRECTORY.ASSETS}/${filePath}` : DIRECTORY.ASSETS
+}
+
+export function withAssetPacksDir(filePath: string) {
+  return withAssetDir(`${DIRECTORY.ASSET_PACKS}/${filePath}`)
 }
 
 export function isFileInAssetDir(filePath: string = '') {

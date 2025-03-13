@@ -22,5 +22,5 @@
 }
 
 .Field > .Label {
-  margin-bottom: 4.5px;
+  margin-bottom: var(--label-margin-bottom);
 }

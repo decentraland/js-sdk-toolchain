@@ -11,13 +11,18 @@ import { Tree } from '../Tree'
 import { Modal } from '../Modal'
 import { Button } from '../Button'
 import FolderIcon from '../Icons/Folder'
-import { AssetNode, AssetNodeFolder } from './types'
-import { getFullNodePath } from './utils'
+import { AssetNodeFolder } from './types'
+import { getFilterFromTree, getFullNodePath } from './utils'
 import Search from '../Search'
 import { withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { removeAsset } from '../../redux/data-layer'
 import { useAppDispatch } from '../../redux/hooks'
 import { determineAssetType, extractFileExtension } from '../ImportAsset/utils'
+import { generateAssetTree, getChildren as _getChildren, TreeNode, ROOT, getTiles } from './tree'
+import { Filters } from './Filters'
+import { Filter } from './Filters/types'
+
+export { TreeNode }
 
 function noop() {}
 
@@ -32,11 +37,7 @@ interface ModalState {
   entities: Entity[]
 }
 
-export const ROOT = 'File System'
-
 export const DRAG_N_DROP_ASSET_KEY = 'local-asset'
-
-export type TreeNode = Omit<AssetNode, 'children'> & { children?: string[]; matches?: string[] }
 
 const FilesTree = Tree<string>()
 
@@ -45,61 +46,17 @@ function ProjectView({ folders, thumbnails }: Props) {
   const dispatch = useAppDispatch()
   const [open, setOpen] = useState(new Set<string>())
   const [modal, setModal] = useState<ModalState | undefined>(undefined)
-  const [lastSelected, setLastSelected] = useState<string>()
+  const [lastSelected, setLastSelected] = useState<string>(ROOT)
   const [search, setSearch] = useState<string>('')
   const [tree, setTree] = useState<Map<string, TreeNode>>(new Map())
-
-  const getTree = useCallback(() => {
-    function getPath(node: string, children: string) {
-      if (!node) return children
-      return `${node}/${children}`
-    }
-    const tree = new Map<string, TreeNode>()
-    tree.set(ROOT, { children: folders.map((f) => f.name), name: ROOT, type: 'folder', parent: null })
-    open.add(ROOT)
-
-    function hasMatch(name: string) {
-      return search && name.toLocaleLowerCase().includes(search.toLocaleLowerCase())
-    }
-
-    function generateTree(node: AssetNodeFolder, parentName: string = ''): string[] {
-      const namePath = getPath(parentName, node.name)
-      const childrens = node.children.map((c) => `${namePath}/${c.name}`)
-      const matchesList: string[] = []
-      for (const children of node.children) {
-        if (children.type === 'folder') {
-          matchesList.push(...generateTree(children, namePath))
-        } else {
-          const name = getPath(namePath, children.name)
-          const matches = hasMatch(name)
-          if (matches) {
-            open.add(name)
-            matchesList.push(name)
-          }
-          tree.set(name, { ...children, matches: matches ? [name] : [], parent: node })
-        }
-      }
-      if (matchesList.length) {
-        open.add(namePath)
-      }
-      tree.set(namePath, { ...node, children: childrens, parent: null, matches: matchesList })
-      return matchesList
-    }
-
-    for (const f of folders) {
-      generateTree(f)
-    }
-    return tree
-  }, [folders, search])
+  const [filters, setFilters] = useState<Filter[]>([])
+  const [activeFilter, setActiveFilter] = useState(Filter.All)
 
   useEffect(() => {
-    setTree(getTree())
-  }, [folders, search])
-
-  /**
-   * Values
-   */
-  const selectedTreeNode = tree.get(lastSelected ?? ROOT)
+    const { tree, filters } = generateAssetTree(folders, open, search, activeFilter)
+    setTree(tree)
+    setFilters(getFilterFromTree(filters))
+  }, [folders, search, activeFilter])
 
   /**
    * Callbacks
@@ -107,6 +64,7 @@ function ProjectView({ folders, thumbnails }: Props) {
 
   const onSelect = useCallback(
     (value: string) => {
+      open.add(value)
       setLastSelected(value)
     },
     [setLastSelected]
@@ -148,7 +106,7 @@ function ProjectView({ folders, thumbnails }: Props) {
       }
       dispatch(removeAsset({ path }))
     },
-    [open, setOpen, selectedTreeNode, lastSelected]
+    [open, setOpen, lastSelected]
   )
 
   const handleConfirm = useCallback(async () => {
@@ -158,11 +116,13 @@ function ProjectView({ folders, thumbnails }: Props) {
   }, [modal, setModal])
 
   const handleModalClose = useCallback(() => setModal(undefined), [])
+
   const handleClickFolder = useCallback(
-    (val: string) => () => {
-      if (lastSelected === val) return
-      open.add(val)
-      setLastSelected(val)
+    (node: TreeNode) => () => {
+      if (node.type === 'asset') return
+      const path = getFullNodePath(node).slice(1)
+      open.add(path)
+      setLastSelected(path)
     },
     [setLastSelected]
   )
@@ -171,16 +131,10 @@ function ProjectView({ folders, thumbnails }: Props) {
 
   const getChildren = useCallback(
     (val: string) => {
-      const value = tree.get(val)
-      if (!value?.children?.length) return []
-      if (!search.length) return value.children
-
-      return value.children.filter(($) => {
-        const childrenValue = tree.get($)
-        return !!childrenValue?.matches?.length
-      })
+      const childs = _getChildren(val, tree, search, activeFilter)
+      return childs
     },
-    [tree, search]
+    [tree, search, activeFilter]
   )
 
   const getThumbnail = useCallback(
@@ -191,6 +145,12 @@ function ProjectView({ folders, thumbnails }: Props) {
     },
     [thumbnails]
   )
+
+  const handleFilterClick = useCallback((type: Filter) => {
+    setActiveFilter(type)
+  }, [])
+
+  const tiles = getTiles(lastSelected, tree, search, activeFilter)
 
   return (
     <>
@@ -206,6 +166,7 @@ function ProjectView({ folders, thumbnails }: Props) {
         </div>
       </Modal>
       <div className="ProjectView">
+        <Filters filters={filters} active={activeFilter} onClick={handleFilterClick} />
         <div className="Tree-View">
           <Search
             value={search}
@@ -241,31 +202,18 @@ function ProjectView({ folders, thumbnails }: Props) {
           />
         </div>
         <div className="FolderView">
-          {selectedTreeNode?.type === 'folder'
-            ? selectedTreeNode?.children?.map(($) => (
-                <Tile
-                  key={$}
-                  valueId={$}
-                  value={tree.get($)}
-                  getDragContext={handleDragContext}
-                  onSelect={handleClickFolder($)}
-                  onRemove={handleRemove}
-                  getThumbnail={getThumbnail}
-                  dndType={DRAG_N_DROP_ASSET_KEY}
-                />
-              ))
-            : !!selectedTreeNode &&
-              lastSelected && (
-                <Tile
-                  valueId={lastSelected}
-                  value={selectedTreeNode}
-                  getDragContext={handleDragContext}
-                  onSelect={handleClickFolder(selectedTreeNode.name)}
-                  onRemove={handleRemove}
-                  getThumbnail={getThumbnail}
-                  dndType={DRAG_N_DROP_ASSET_KEY}
-                />
-              )}
+          {tiles.map((node) => (
+            <Tile
+              key={node.name}
+              valueId={getFullNodePath(node).slice(1)}
+              value={node}
+              getDragContext={handleDragContext}
+              onSelect={handleClickFolder(node)}
+              onRemove={handleRemove}
+              getThumbnail={getThumbnail}
+              dndType={DRAG_N_DROP_ASSET_KEY}
+            />
+          ))}
         </div>
       </div>
     </>

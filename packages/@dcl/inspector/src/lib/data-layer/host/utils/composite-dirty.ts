@@ -19,6 +19,7 @@ import { removeLegacyEntityNodeComponents } from '../utils/migrations/legacy-ent
 import { bufferToScene } from '../scene'
 import { toSceneComponent } from './component'
 import { addNodesComponentsToPlayerAndCamera } from './migrations/add-nodes-to-player-and-camera'
+import { fixNetworkEntityValues } from './migrations/fix-network-entity-values'
 
 enum DirtyEnum {
   // No changes
@@ -37,6 +38,8 @@ function runMigrations(engine: IEngine) {
   buildNodesHierarchyIfNotExists(engine)
   // Add Nodes component to PlayerEntity and CameraEntity if not exists
   addNodesComponentsToPlayerAndCamera(engine)
+  // Fix NetworkEntity values
+  fixNetworkEntityValues(engine)
 }
 
 async function instanciateComposite(fs: FileSystemInterface, engine: IEngine, path: string): Promise<CompositeManager> {

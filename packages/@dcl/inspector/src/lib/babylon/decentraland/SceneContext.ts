@@ -152,7 +152,7 @@ export class SceneContext {
     return null
   }
 
-  async getFile(src: string): Promise<Uint8Array | null> {
+  async getFile(src: string, retryCount = 3): Promise<Uint8Array | null> {
     if (!src) return null
     try {
       // TODO: how we handle this with redux ?
@@ -161,6 +161,12 @@ export class SceneContext {
       const response = await dataLayer.getAssetData({ path: src })
       return response.data
     } catch (err) {
+      if (retryCount > 0) {
+        // Wait for 500ms before retrying
+        await new Promise((resolve) => setTimeout(resolve, 500))
+        console.log(`Retrying fetch for ${src}, attempts remaining: ${retryCount - 1}`)
+        return this.getFile(src, retryCount - 1)
+      }
       console.error('Error fetching file ' + src, err)
       return null
     }
