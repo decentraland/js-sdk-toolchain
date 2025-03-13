@@ -5,7 +5,9 @@ import {
   PointerEventsSystem,
   PointerEventType,
   PBUiInputResult,
-  PBUiDropdownResult
+  PBUiDropdownResult,
+  PBPointerEventsResult,
+  EventSystemCallback
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import Reconciler, { HostConfig } from 'react-reconciler'
@@ -93,9 +95,16 @@ export function createReconciler(
     uiDropdown: UiDropdown.componentId
   }
 
-  function pointerEventCallback(entity: Entity, pointerEvent: PointerEventType) {
+  function pointerEventCallback(entity: Entity, pointerEvent: PointerEventType, event: PBPointerEventsResult) {
     const callback = clickEvents.get(entity)?.get(pointerEvent)
-    if (callback) callback()
+    if (typeof callback === "function") {
+      callback()
+    } else if (typeof callback === "object" && callback !== null) {
+      const record: Record<InputAction, EventSystemCallback> = callback;
+      if (record[event.button]) {
+        (record[event.button])(event)
+      }
+    }
     return
   }
 
@@ -167,14 +176,14 @@ export function createReconciler(
           {
             entity: instance.entity,
             opts: {
-              button: InputAction.IA_POINTER,
+              button: typeof update.props === "function" ? InputAction.IA_POINTER : InputAction.IA_ANY,
               // We add this showFeedBack so the pointerEventSystem creates a PointerEvent component with our entity
               // This is needed for the renderer to know which entities are clickeables
               showFeedback: true
             }
           },
-          () => pointerEventCallback(instance.entity, pointerEvent)
-        )
+          (event: PBPointerEventsResult) => pointerEventCallback(instance.entity, pointerEvent, event)
+        )  
       }
     }
   }

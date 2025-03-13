@@ -1,8 +1,9 @@
+import { EventSystemCallback, InputAction } from '@dcl/ecs'
 /**
  * Callback function to be triggered on a specified event
  * @public
  */
-export type Callback = () => void
+export type Callback = () => void | Record<InputAction, EventSystemCallback> 
 
 /**
  * User key event Listeners
