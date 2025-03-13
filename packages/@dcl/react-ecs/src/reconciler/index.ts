@@ -384,7 +384,7 @@ export function createReconciler(
         if (update.type === 'delete') {
           removeComponent(instance, update.component)
         } else if (update.props) {
-          upsertComponent(instance, update.props, update.component)
+          upsertComponent(instance, update.props as Partial<components.PBUiBackground | components.PBUiDropdown | components.PBUiInput | components.PBUiText | components.PBUiTransform>, update.component)
         }
       }
     },
