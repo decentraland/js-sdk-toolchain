@@ -374,7 +374,7 @@ export interface ByteBuffer {
 }
 
 // @public
-export type Callback = (() => void) | Record<InputAction, EventSystemCallback>;
+export type Callback = (() => void) | Partial<Record<InputAction, EventSystemCallback>>;
 
 // @public (undocumented)
 export const CameraLayer: LastWriteWinElementSetComponentDefinition<PBCameraLayer>;

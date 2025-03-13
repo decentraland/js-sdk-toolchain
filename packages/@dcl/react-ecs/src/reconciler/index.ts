@@ -97,12 +97,12 @@ export function createReconciler(
 
   function pointerEventCallback(entity: Entity, pointerEvent: PointerEventType, event: PBPointerEventsResult) {
     const callback = clickEvents.get(entity)?.get(pointerEvent)
-    if (typeof callback === "function") {
+    if (typeof callback === 'function') {
       callback()
-    } else if (typeof callback === "object" && callback !== null) {
-      const record: Record<InputAction, EventSystemCallback> = callback;
-      if (record[event.button]) {
-        (record[event.button])(event)
+    } else if (typeof callback === 'object' && callback !== null) {
+      const innerCallback = callback[event.button]
+      if (typeof innerCallback === 'function') {
+        innerCallback(event)
       }
     }
     return
@@ -160,30 +160,30 @@ export function createReconciler(
         update.component === 'onMouseDown'
           ? pointerEvents.onPointerDown
           : update.component === 'onMouseUp'
-            ? pointerEvents.onPointerUp
-            : update.component === 'onMouseEnter'
-              ? pointerEvents.onPointerHoverEnter
-              : update.component === 'onMouseLeave'
-                ? pointerEvents.onPointerHoverLeave
-                : update.component === 'onMouseDrag'
-                  ? pointerEvents.onPointerDrag
-                  : update.component === 'onMouseDragLocked'
-                    ? pointerEvents.onPointerDragLocked
-                    : update.component === 'onMouseDragEnd' && pointerEvents.onPointerDragEnd
+          ? pointerEvents.onPointerUp
+          : update.component === 'onMouseEnter'
+          ? pointerEvents.onPointerHoverEnter
+          : update.component === 'onMouseLeave'
+          ? pointerEvents.onPointerHoverLeave
+          : update.component === 'onMouseDrag'
+          ? pointerEvents.onPointerDrag
+          : update.component === 'onMouseDragLocked'
+          ? pointerEvents.onPointerDragLocked
+          : update.component === 'onMouseDragEnd' && pointerEvents.onPointerDragEnd
 
       if (pointerEventSystem) {
         pointerEventSystem(
           {
             entity: instance.entity,
             opts: {
-              button: typeof update.props === "function" ? InputAction.IA_POINTER : InputAction.IA_ANY,
+              button: typeof update.props === 'function' ? InputAction.IA_POINTER : InputAction.IA_ANY,
               // We add this showFeedBack so the pointerEventSystem creates a PointerEvent component with our entity
               // This is needed for the renderer to know which entities are clickeables
               showFeedback: true
             }
           },
           (event: PBPointerEventsResult) => pointerEventCallback(instance.entity, pointerEvent, event)
-        )  
+        )
       }
     }
   }
@@ -384,7 +384,17 @@ export function createReconciler(
         if (update.type === 'delete') {
           removeComponent(instance, update.component)
         } else if (update.props) {
-          upsertComponent(instance, update.props as Partial<components.PBUiBackground | components.PBUiDropdown | components.PBUiInput | components.PBUiText | components.PBUiTransform>, update.component)
+          upsertComponent(
+            instance,
+            update.props as Partial<
+              | components.PBUiBackground
+              | components.PBUiDropdown
+              | components.PBUiInput
+              | components.PBUiText
+              | components.PBUiTransform
+            >,
+            update.component
+          )
         }
       }
     },
@@ -417,7 +427,7 @@ export function createReconciler(
     null,
     '',
     /* istanbul ignore next */
-    function () { },
+    function () {},
     null
   )
 
