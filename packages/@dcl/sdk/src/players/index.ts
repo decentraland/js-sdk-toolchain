@@ -95,7 +95,7 @@ export function definePlayerHelper(engine: IEngine) {
         avatar: avatarData ?? undefined,
         wearables: wearablesData?.wearableUrns ?? [],
         emotes: wearablesData?.emoteUrns ?? [],
-        forceRender: wearablesData?.forceRender ?? undefined,
+        forceRender: wearablesData?.forceRender ?? [],
         position: Transform.getOrNull(userEntity)?.position
       }
     }
