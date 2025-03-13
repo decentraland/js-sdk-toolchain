@@ -27,7 +27,8 @@ export interface TweenHelper {
 /**
  * @public
  */
-export interface TweenComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBTween> {
+export interface TweenComponentDefinitionExtended
+  extends LastWriteWinElementSetComponentDefinition<PBTween & { someOptionalField?: unknown[] }> {
   /**
    * Texture helpers with constructor
    */
@@ -61,6 +62,14 @@ const TweenHelper: TweenHelper = {
   }
 }
 
+export interface TweenComponentDefinitionExtended
+  extends LastWriteWinElementSetComponentDefinition<PBTween & { someOptionalField?: unknown[] }> {
+  /**
+   * Texture helpers with constructor
+   */
+  Mode: TweenHelper
+}
+
 export function defineTweenComponent(
   engine: Pick<IEngine, 'defineComponentFromSchema'>
 ): TweenComponentDefinitionExtended {
@@ -68,6 +77,13 @@ export function defineTweenComponent(
 
   return {
     ...theComponent,
+    create(entity, val) {
+      if (val && !val?.someOptionalField) {
+        val.someOptionalField = []
+      }
+      return theComponent.create(entity, val)
+    },
+    // ... we need to define the createOrReplace too and i dont know if another method too.
     Mode: TweenHelper
   }
 }
