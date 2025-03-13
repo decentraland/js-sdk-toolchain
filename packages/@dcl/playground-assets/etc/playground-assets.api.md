@@ -2151,6 +2151,20 @@ export const onVideoEvent: Observable<{
 }>;
 
 // @public (undocumented)
+export interface OptionalStringArray {
+    // (undocumented)
+    values: string[];
+}
+
+// @public (undocumented)
+export namespace OptionalStringArray {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): OptionalStringArray;
+    // (undocumented)
+    export function encode(message: OptionalStringArray, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface Orthographic {
     verticalRange?: number | undefined;
 }
@@ -2303,7 +2317,7 @@ export namespace PBAvatarEmoteCommand {
 export interface PBAvatarEquippedData {
     // (undocumented)
     emoteUrns: string[];
-    forceRender: string[];
+    forceRender?: OptionalStringArray | undefined;
     // (undocumented)
     wearableUrns: string[];
 }
@@ -2341,7 +2355,7 @@ export interface PBAvatarShape {
     expressionTriggerId?: string | undefined;
     expressionTriggerTimestamp?: number | undefined;
     eyeColor?: PBColor3 | undefined;
-    forceRender: string[];
+    forceRender?: OptionalStringArray | undefined;
     hairColor?: PBColor3 | undefined;
     id: string;
     name?: string | undefined;
