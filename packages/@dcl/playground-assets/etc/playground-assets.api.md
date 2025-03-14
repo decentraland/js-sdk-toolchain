@@ -146,8 +146,21 @@ export const enum AvatarControlType {
 // @public (undocumented)
 export const AvatarEmoteCommand: GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>;
 
+// Warning: (ae-missing-release-tag) "AvatarEquippedData" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const AvatarEquippedData: LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>;
+export const AvatarEquippedData: AvatarEquippedDataComponentDefinitionExtended;
+
+// @public (undocumented)
+export interface AvatarEquippedDataComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<AvatarEquippedDataType> {
+}
+
+// Warning: (ae-missing-release-tag) "AvatarEquippedDataType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type AvatarEquippedDataType = Omit<PBAvatarEquippedData, 'forceRender'> & {
+    forceRender?: string[] | undefined;
+};
 
 // @public (undocumented)
 export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>;
@@ -180,8 +193,21 @@ export namespace AvatarMovementSettings {
     export function encode(message: AvatarMovementSettings, writer?: _m0.Writer): _m0.Writer;
 }
 
+// Warning: (ae-missing-release-tag) "AvatarShape" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const AvatarShape: LastWriteWinElementSetComponentDefinition<PBAvatarShape>;
+export const AvatarShape: AvatarShapeComponentDefinitionExtended;
+
+// @public (undocumented)
+export interface AvatarShapeComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<AvatarShapeType> {
+}
+
+// Warning: (ae-missing-release-tag) "AvatarShapeType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type AvatarShapeType = Omit<PBAvatarShape, 'forceRender'> & {
+    forceRender?: string[] | undefined;
+};
 
 // @public (undocumented)
 export interface AvatarTexture {
