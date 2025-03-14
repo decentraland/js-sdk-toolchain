@@ -2,28 +2,28 @@ import { GrowOnlyValueSetComponentDefinition, LastWriteWinElementSetComponentDef
 import { IEngine } from '../engine/types'
 import { AnimatorComponentDefinitionExtended, defineAnimatorComponent } from './extended/Animator'
 import { AudioSourceComponentDefinitionExtended, defineAudioSourceComponent } from './extended/AudioSource'
+import { AudioStreamComponentDefinitionExtended, defineAudioStreamComponent } from './extended/AudioStream'
+import { AvatarEquippedDataComponentDefinitionExtended, defineAvatarEquippedDataComponent } from './extended/AvatarEquippedData'
+import { AvatarShapeComponentDefinitionExtended, defineAvatarShapeComponent } from './extended/AvatarShape'
+import { defineInputModifierComponent, InputModifierComponentDefinitionExtended } from './extended/InputModifier'
 import { defineMaterialComponent, MaterialComponentDefinitionExtended } from './extended/Material'
 import { defineMeshColliderComponent, MeshColliderComponentDefinitionExtended } from './extended/MeshCollider'
 import { defineMeshRendererComponent, MeshRendererComponentDefinitionExtended } from './extended/MeshRenderer'
 import { defineTweenComponent, TweenComponentDefinitionExtended } from './extended/Tween'
-import { LwwComponentGetter, GSetComponentGetter } from './generated/index.gen'
+import { defineVirtualCameraComponent, VirtualCameraComponentDefinitionExtended } from './extended/VirtualCamera'
+import { GSetComponentGetter, LwwComponentGetter } from './generated/index.gen'
+import { MediaState } from './generated/pb/decentraland/sdk/components/common/media_state.gen'
 import defineNameComponent, { NameType } from './manual/Name'
-import defineSyncComponent, { ISyncComponentsType } from './manual/SyncComponents'
 import defineNetworkEntity, { INetowrkEntityType } from './manual/NetworkEntity'
 import defineNetworkParent, { INetowrkParentType } from './manual/NetworkParent'
+import defineSyncComponent, { ISyncComponentsType } from './manual/SyncComponents'
 import { defineTransformComponent, TransformComponentExtended } from './manual/Transform'
-import { AudioStreamComponentDefinitionExtended, defineAudioStreamComponent } from './extended/AudioStream'
-import { MediaState } from './generated/pb/decentraland/sdk/components/common/media_state.gen'
-import { defineVirtualCameraComponent, VirtualCameraComponentDefinitionExtended } from './extended/VirtualCamera'
-import { defineInputModifierComponent, InputModifierComponentDefinitionExtended } from './extended/InputModifier'
 
 export * from './generated/index.gen'
 
 export type {
-  GrowOnlyValueSetComponentDefinition,
-  LastWriteWinElementSetComponentDefinition,
-  LwwComponentGetter,
-  GSetComponentGetter
+  GrowOnlyValueSetComponentDefinition, GSetComponentGetter, LastWriteWinElementSetComponentDefinition,
+  LwwComponentGetter
 }
 
 /* @__PURE__ */
@@ -56,6 +56,12 @@ export const MeshCollider: LwwComponentGetter<MeshColliderComponentDefinitionExt
 
 /* @__PURE__ */
 export const Tween: LwwComponentGetter<TweenComponentDefinitionExtended> = (engine) => defineTweenComponent(engine)
+
+/* @__PURE__ */
+export const AvatarShape: LwwComponentGetter<AvatarShapeComponentDefinitionExtended> = (engine) => defineAvatarShapeComponent(engine)
+
+/* @__PURE__ */
+export const AvatarEquippedData: LwwComponentGetter<AvatarEquippedDataComponentDefinitionExtended> = (engine) => defineAvatarEquippedDataComponent(engine)
 
 /* @__PURE__ */
 export const VirtualCamera: LwwComponentGetter<VirtualCameraComponentDefinitionExtended> = (engine) =>

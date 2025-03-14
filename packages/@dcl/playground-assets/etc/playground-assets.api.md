@@ -2306,6 +2306,7 @@ export namespace PBAvatarEmoteCommand {
 export interface PBAvatarEquippedData {
     // (undocumented)
     emoteUrns: string[];
+    forceRender: string[];
     // (undocumented)
     wearableUrns: string[];
 }
@@ -2343,6 +2344,7 @@ export interface PBAvatarShape {
     expressionTriggerId?: string | undefined;
     expressionTriggerTimestamp?: number | undefined;
     eyeColor?: PBColor3 | undefined;
+    forceRender: string[];
     hairColor?: PBColor3 | undefined;
     id: string;
     name?: string | undefined;
