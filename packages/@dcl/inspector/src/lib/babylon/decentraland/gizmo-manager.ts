@@ -31,6 +31,12 @@ function releaseDragFromGizmo({ xGizmo, yGizmo, zGizmo }: GizmoAxis) {
   zGizmo.dragBehavior.releaseDrag()
 }
 
+function configureGizmoButtons(gizmo: GizmoAxis, buttons: number[]) {
+  gizmo.xGizmo.dragBehavior.dragButtons = buttons
+  gizmo.yGizmo.dragBehavior.dragButtons = buttons
+  gizmo.zGizmo.dragBehavior.dragButtons = buttons
+}
+
 function areProportional(a: number, b: number) {
   // this leeway is here to account for rounding errors due to serializing/deserializing floating point numbers
   return Math.abs(a - b) < 1e-5
@@ -64,6 +70,11 @@ export function createGizmoManager(context: SceneContext) {
   gizmoManager.scaleGizmoEnabled = false
   gizmoManager.gizmos.positionGizmo!.updateGizmoRotationToMatchAttachedMesh = false
   gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh = true
+
+  // Configure all gizmos to only work with left click
+  if (gizmoManager.gizmos.positionGizmo) configureGizmoButtons(gizmoManager.gizmos.positionGizmo, [0])
+  if (gizmoManager.gizmos.rotationGizmo) configureGizmoButtons(gizmoManager.gizmos.rotationGizmo, [0])
+  if (gizmoManager.gizmos.scaleGizmo) configureGizmoButtons(gizmoManager.gizmos.scaleGizmo, [0])
 
   let selectedEntities: EcsEntity[] = []
   let rotationGizmoAlignmentDisabled = false
