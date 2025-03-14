@@ -5,11 +5,13 @@ import {
   PointerEventsSystem,
   PointerEventType,
   PBUiInputResult,
-  PBUiDropdownResult
+  PBUiDropdownResult,
+  PBPointerEventsResult,
+  EventSystemCallback
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import Reconciler, { HostConfig } from 'react-reconciler'
-import { Callback, isListener, Listeners } from '../components'
+import { isListener, Listeners, MultiCallback } from '../components'
 import { CANVAS_ROOT_ENTITY } from '../components/uiTransform'
 import { ReactEcs } from '../react-ecs'
 import {
@@ -70,7 +72,7 @@ export function createReconciler(
   const entities = new Set<Entity>()
   // Store the onChange callbacks to be runned every time a Result has changed
   const changeEvents = new Map<Entity, Map<number, OnChangeState | undefined>>()
-  const clickEvents = new Map<Entity, Map<PointerEventType, Callback>>()
+  const clickEvents = new Map<Entity, Map<PointerEventType, MultiCallback>>()
   // Initialize components
   const UiTransform = components.UiTransform(engine)
   const UiText = components.UiText(engine)
@@ -93,9 +95,16 @@ export function createReconciler(
     uiDropdown: UiDropdown.componentId
   }
 
-  function pointerEventCallback(entity: Entity, pointerEvent: PointerEventType) {
+  function pointerEventCallback(entity: Entity, pointerEvent: PointerEventType, event: PBPointerEventsResult) {
     const callback = clickEvents.get(entity)?.get(pointerEvent)
-    if (callback) callback()
+    if (typeof callback === 'function') {
+      callback(event)
+    } else if (typeof callback === 'object' && callback !== null) {
+      const innerCallback = callback[event.button]
+      if (typeof innerCallback === 'function') {
+        innerCallback(event)
+      }
+    }
     return
   }
 
@@ -143,7 +152,7 @@ export function createReconciler(
       const entityEvent =
         clickEvents.get(instance.entity) || clickEvents.set(instance.entity, new Map()).get(instance.entity)!
       const alreadyHasPointerEvent = entityEvent.get(pointerEvent)
-      entityEvent.set(pointerEvent, update.props as Callback)
+      entityEvent.set(pointerEvent, update.props as MultiCallback)
 
       if (alreadyHasPointerEvent) return
 
@@ -151,29 +160,29 @@ export function createReconciler(
         update.component === 'onMouseDown'
           ? pointerEvents.onPointerDown
           : update.component === 'onMouseUp'
-            ? pointerEvents.onPointerUp
-            : update.component === 'onMouseEnter'
-              ? pointerEvents.onPointerHoverEnter
-              : update.component === 'onMouseLeave'
-                ? pointerEvents.onPointerHoverLeave
-                : update.component === 'onMouseDrag'
-                  ? pointerEvents.onPointerDrag
-                  : update.component === 'onMouseDragLocked'
-                    ? pointerEvents.onPointerDragLocked
-                    : update.component === 'onMouseDragEnd' && pointerEvents.onPointerDragEnd
+          ? pointerEvents.onPointerUp
+          : update.component === 'onMouseEnter'
+          ? pointerEvents.onPointerHoverEnter
+          : update.component === 'onMouseLeave'
+          ? pointerEvents.onPointerHoverLeave
+          : update.component === 'onMouseDrag'
+          ? pointerEvents.onPointerDrag
+          : update.component === 'onMouseDragLocked'
+          ? pointerEvents.onPointerDragLocked
+          : update.component === 'onMouseDragEnd' && pointerEvents.onPointerDragEnd
 
       if (pointerEventSystem) {
         pointerEventSystem(
           {
             entity: instance.entity,
             opts: {
-              button: InputAction.IA_POINTER,
+              button: typeof update.props === 'function' ? InputAction.IA_POINTER : InputAction.IA_ANY,
               // We add this showFeedBack so the pointerEventSystem creates a PointerEvent component with our entity
               // This is needed for the renderer to know which entities are clickeables
               showFeedback: true
             }
           },
-          () => pointerEventCallback(instance.entity, pointerEvent)
+          (event: PBPointerEventsResult) => pointerEventCallback(instance.entity, pointerEvent, event)
         )
       }
     }
@@ -375,7 +384,17 @@ export function createReconciler(
         if (update.type === 'delete') {
           removeComponent(instance, update.component)
         } else if (update.props) {
-          upsertComponent(instance, update.props, update.component)
+          upsertComponent(
+            instance,
+            update.props as Partial<
+              | components.PBUiBackground
+              | components.PBUiDropdown
+              | components.PBUiInput
+              | components.PBUiText
+              | components.PBUiTransform
+            >,
+            update.component
+          )
         }
       }
     },
@@ -408,7 +427,7 @@ export function createReconciler(
     null,
     '',
     /* istanbul ignore next */
-    function () { },
+    function () {},
     null
   )
 
