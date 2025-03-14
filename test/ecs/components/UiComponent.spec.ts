@@ -67,7 +67,12 @@ describe('UiTransform component', () => {
       positionType: YGPositionType.YGPT_RELATIVE,
       width: 1,
       widthUnit: YGUnit.YGU_POINT,
-      pointerFilter: PointerFilterMode.PFM_NONE
+      pointerFilter: PointerFilterMode.PFM_NONE,
+      opacity: 1.0,
+      scrollPosition: undefined,
+      scrollVisible: undefined,
+      elementId: undefined,
+      zIndex: undefined
     })
   })
 })

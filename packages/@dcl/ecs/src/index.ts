@@ -36,6 +36,8 @@ import {
   InputModifierComponentDefinitionExtended
 } from './components/types'
 import { NameComponent } from './components/manual/Name'
+import { AvatarEquippedDataComponentDefinitionExtended } from './components/extended/AvatarEquippedData'
+import { AvatarShapeComponentDefinitionExtended } from './components/extended/AvatarShape'
 
 // export components for global engine
 export const Transform: TransformComponentExtended = /* @__PURE__*/ components.Transform(engine)
@@ -45,6 +47,8 @@ export const AudioStream: AudioStreamComponentDefinitionExtended = /* @__PURE__*
 export const Material: MaterialComponentDefinitionExtended = /* @__PURE__*/ components.Material(engine)
 export const MeshRenderer: MeshRendererComponentDefinitionExtended = /* @__PURE__*/ components.MeshRenderer(engine)
 export const MeshCollider: MeshColliderComponentDefinitionExtended = /* @__PURE__*/ components.MeshCollider(engine)
+export const AvatarEquippedData: AvatarEquippedDataComponentDefinitionExtended = /* @__PURE__*/ components.AvatarEquippedData(engine)
+export const AvatarShape: AvatarShapeComponentDefinitionExtended = /* @__PURE__*/ components.AvatarShape(engine)
 export const Name: NameComponent = components.Name(engine)
 export const Tween: TweenComponentDefinitionExtended = /* @__PURE__*/ components.Tween(engine)
 export const VirtualCamera: VirtualCameraComponentDefinitionExtended = /* @__PURE__*/ components.VirtualCamera(engine)

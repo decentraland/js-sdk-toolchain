@@ -26,6 +26,13 @@ export const fromTexture = (base: string, value: TextureUnion): TextureInput => 
         wrapMode: toString(value.tex.videoTexture.wrapMode),
         filterMode: toString(value.tex.videoTexture.filterMode)
       }
+    case 'uiTexture':
+      return {
+        type: Texture.TT_VIDEO_TEXTURE,
+        videoPlayerEntity: toString(value.tex.uiTexture.uiCanvasEntity),
+        wrapMode: toString(value.tex.uiTexture.wrapMode),
+        filterMode: toString(value.tex.uiTexture.filterMode)
+      }
     case 'texture':
     default:
       const src = value?.tex?.texture.src ?? ''
