@@ -6,7 +6,6 @@ import { useComponentValue } from '../../../../hooks/sdk/useComponentValue'
 import { Block } from '../../../Block'
 import { Accordion } from '../../../ui'
 
-import { RewardsControl } from '../../AdminToolkitView/RewardsControl'
 import { VideoControl } from '../../AdminToolkitView/VideoControl'
 import { SmartItemControl } from '../../AdminToolkitView/SmartItemControl'
 import { AdminAllowListControl } from '../../AdminToolkitView/AdminAllowListControl'
