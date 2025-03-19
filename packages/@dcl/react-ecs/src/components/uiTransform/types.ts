@@ -1,3 +1,4 @@
+import { Color4 } from '@dcl/ecs/dist/components/generated/pb/decentraland/common/colors.gen'
 import { ScaleUnit } from '../types'
 
 /**
@@ -134,4 +135,8 @@ export interface UiTransformProps {
   overflow?: OverflowType
   /** The pointer filter property determines if the ui element blocks the pointer or not (elements with pointer events always block the pointer regardless of this property) **/
   pointerFilter?: PointerFilterType
+
+  borderColor?: Color4 | undefined
+  borderRadius?: Partial<Position> | PositionShorthand
+  borderWidth?: Partial<Position> | PositionShorthand
 }

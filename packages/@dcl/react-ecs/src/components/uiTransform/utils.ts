@@ -29,7 +29,7 @@ function capitalize<T extends string>(value: T): Capitalize<T> {
   return `${value[0].toUpperCase()}${value.slice(1, value.length)}` as Capitalize<T>
 }
 
-type PropName = 'position' | 'margin' | 'padding'
+type PropName = 'position' | 'margin' | 'padding' | 'borderRadius' | 'borderWidth'
 type PropKey = `${PropName}${Capitalize<keyof Position>}`
 type PropKeyUnit = `${PropName}${Capitalize<keyof Position>}Unit`
 type PositionParsed = {

@@ -3090,6 +3090,31 @@ export interface PBUiTransform {
     alignContent?: YGAlign | undefined;
     alignItems?: YGAlign | undefined;
     alignSelf: YGAlign;
+    // (undocumented)
+    borderBottomLeftRadius?: number | undefined;
+    borderBottomLeftRadiusUnit?: YGUnit | undefined;
+    // (undocumented)
+    borderBottomRightRadius?: number | undefined;
+    borderBottomRightRadiusUnit?: YGUnit | undefined;
+    // (undocumented)
+    borderBottomWidth?: number | undefined;
+    borderBottomWidthUnit?: YGUnit | undefined;
+    borderColor?: PBColor4 | undefined;
+    // (undocumented)
+    borderLeftWidth?: number | undefined;
+    borderLeftWidthUnit?: YGUnit | undefined;
+    // (undocumented)
+    borderRightWidth?: number | undefined;
+    borderRightWidthUnit?: YGUnit | undefined;
+    // (undocumented)
+    borderTopLeftRadius?: number | undefined;
+    borderTopLeftRadiusUnit?: YGUnit | undefined;
+    // (undocumented)
+    borderTopRightRadius?: number | undefined;
+    borderTopRightRadiusUnit?: YGUnit | undefined;
+    // (undocumented)
+    borderTopWidth?: number | undefined;
+    borderTopWidthUnit?: YGUnit | undefined;
     display: YGDisplay;
     // (undocumented)
     flexBasis: number;
