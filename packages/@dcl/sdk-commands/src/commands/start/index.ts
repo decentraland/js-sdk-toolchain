@@ -49,7 +49,6 @@ export const args = declareArgs({
   '-b': '--no-browser',
   '-w': '--no-watch',
   '--skip-build': Boolean,
-  '--desktop-client': Boolean,
   '--data-layer': Boolean,
   '--explorer-alpha': Boolean,
   '--hub': Boolean,
@@ -75,7 +74,6 @@ export async function help(options: Options) {
       -c, --ci                  Run the parcel previewer on a remote unix server
       --web3                    Connects preview to browser wallet to use the associated avatar and account
       --skip-build              Skip build and only serve the files in preview mode
-      --desktop-client          Show URL to launch preview in the desktop client (BETA)
       --debug                   Enables Debug panel mode inside DCL Explorer (default=true)
       --dclenv                  Decentraland Environment. Which environment to use for the content. This determines the catalyst server used, asset-bundles, etc. Possible values: org, zone, today. (default=org)
       --realm                   Realm used to serve the content. (default=Localhost)
@@ -227,15 +225,6 @@ export async function main(options: Options) {
         }
       }
 
-      if (options.args['--desktop-client']) {
-        components.logger.log('\n  Desktop client:\n')
-        for (const addr of sortedURLs) {
-          const searchParams = new URLSearchParams()
-          searchParams.append('PREVIEW-MODE', addr)
-          components.logger.log(`    dcl://${searchParams.toString()}&`)
-        }
-      }
-
       if (!explorerAlpha) {
         components.logger.log('\n  Details:\n')
       }
@@ -247,7 +236,7 @@ export async function main(options: Options) {
       }
 
       // Open preferably localhost/127.0.0.1
-      if (!explorerAlpha && openBrowser && sortedURLs.length && !options.args['--desktop-client']) {
+      if (!explorerAlpha && openBrowser && sortedURLs.length) {
         try {
           await open(sortedURLs[0])
         } catch (_) {
