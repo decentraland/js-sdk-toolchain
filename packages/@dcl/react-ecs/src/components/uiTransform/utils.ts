@@ -20,7 +20,8 @@ import {
   PositionType,
   PositionUnit,
   PositionShorthand,
-  PointerFilterType
+  PointerFilterType,
+  BorderRadius
 } from './types'
 import { calcOnViewport } from '../utils'
 import { ScaleUnit } from '../types'
@@ -29,7 +30,7 @@ function capitalize<T extends string>(value: T): Capitalize<T> {
   return `${value[0].toUpperCase()}${value.slice(1, value.length)}` as Capitalize<T>
 }
 
-type PropName = 'position' | 'margin' | 'padding' | 'borderRadius' | 'borderWidth'
+type PropName = 'position' | 'margin' | 'padding' | 'borderWidth'
 type PropKey = `${PropName}${Capitalize<keyof Position>}`
 type PropKeyUnit = `${PropName}${Capitalize<keyof Position>}Unit`
 type PositionParsed = {
@@ -84,6 +85,59 @@ function parsePositionUnit(val?: PositionUnit | 'auto'): [number | undefined, YG
   }
 
   return [undefined, YGUnit.YGU_UNDEFINED]
+}
+
+type BorderProp = `border${Capitalize<keyof BorderRadius>}Radius`
+type BorderPropUnit = `${BorderProp}Unit`
+type BorderProps = {
+  [key in BorderProp]?: number
+} & {
+  [key in BorderPropUnit]?: YGUnit
+}
+export function parseBorderRadius(radius: Partial<BorderRadius> | PositionUnit): BorderProps | undefined {
+  if (typeof radius === 'object') {
+    const obj: Partial<BorderProps> = {}
+    for (const key in radius) {
+      const typedKey: keyof BorderRadius = key as keyof BorderRadius
+      const propKey: BorderProp = `border${capitalize(typedKey)}Radius`
+      const propKeyUnit: BorderPropUnit = `${propKey}Unit`
+      const [value, unit] = parsePositionUnit(radius[typedKey]!)
+      if (value === undefined) continue
+      obj[propKeyUnit] = unit
+      obj[propKey] = value
+    }
+    return obj
+  }
+
+  if (typeof radius === 'number') {
+    return parseBorderRadius({ topLeft: radius, topRight: radius, bottomLeft: radius, bottomRight: radius })
+  }
+}
+type BorderWidthProp = `border${Capitalize<keyof Position>}Width`
+type BorderWidthPropUnit = `${BorderWidthProp}Unit`
+type BorderWidthProps = {
+  [key in BorderWidthProp]?: number
+} & {
+  [key in BorderWidthPropUnit]?: YGUnit
+}
+export function parseBorderWidth(borderWidth: Partial<Position> | PositionUnit): BorderWidthProps | undefined {
+  if (typeof borderWidth === 'object') {
+    const obj: Partial<BorderWidthProps> = {}
+    for (const key in borderWidth) {
+      const typedKey: keyof Position = key as keyof Position
+      const propKey: BorderWidthProp = `border${capitalize(typedKey)}Width`
+      const propKeyUnit: BorderWidthPropUnit = `${propKey}Unit`
+      const [value, unit] = parsePositionUnit(borderWidth[typedKey]!)
+      if (value === undefined) continue
+      obj[propKeyUnit] = unit
+      obj[propKey] = value
+    }
+    return obj
+  }
+
+  if (typeof borderWidth === 'number') {
+    return parseBorderWidth({ top: borderWidth, left: borderWidth, right: borderWidth, bottom: borderWidth })
+  }
 }
 
 export function parsePosition<T extends PropName>(

@@ -8,11 +8,20 @@ import {
   YGDisplay,
   YGPositionType,
   YGJustify,
-  PointerFilterMode
+  PointerFilterMode,
+  PBUiTransform
 } from '../../packages/@dcl/ecs'
 import { components } from '../../packages/@dcl/ecs/src'
-import { Position, PositionUnit, ReactEcs, UiEntity, UiTransformProps } from '../../packages/@dcl/react-ecs/src'
+import {
+  BorderRadius,
+  Position,
+  PositionUnit,
+  ReactEcs,
+  UiEntity,
+  UiTransformProps
+} from '../../packages/@dcl/react-ecs/src'
 import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
+import { Color4 } from '../../packages/@dcl/sdk/math'
 import { setupEngine } from './utils'
 
 describe('UiTransform React Ecs', () => {
@@ -137,6 +146,99 @@ describe('UiTransform React Ecs', () => {
       positionRightUnit: YGUnit.YGU_UNDEFINED,
       positionLeft: 10,
       positionLeftUnit: YGUnit.YGU_PERCENT
+    })
+  })
+
+  it.only('should send border properties', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    const borderRadius: BorderRadius = {
+      topLeft: '1px',
+      bottomLeft: '2px',
+      bottomRight: '3%',
+      topRight: 4
+    }
+
+    const borderWidth: Position = {
+      top: '1px',
+      left: '2px',
+      right: '3%',
+      bottom: 4
+    }
+
+    const ui = () => <UiEntity uiTransform={{ width: 100, borderRadius, borderColor: Color4.Green(), borderWidth }} />
+
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+
+    const matchObject: Partial<PBUiTransform> = {
+      parent: CANVAS_ROOT_ENTITY,
+      rightOf: 0,
+      width: 100,
+      // border width
+      borderTopWidth: 1,
+      borderLeftWidth: 2,
+      borderRightWidth: 3,
+      borderBottomWidth: 4,
+      borderTopWidthUnit: YGUnit.YGU_POINT,
+      borderLeftWidthUnit: YGUnit.YGU_POINT,
+      borderRightWidthUnit: YGUnit.YGU_PERCENT,
+      borderBottomWidthUnit: YGUnit.YGU_POINT,
+      // border radius
+      borderTopLeftRadius: 1,
+      borderBottomLeftRadius: 2,
+      borderBottomRightRadius: 3,
+      borderTopRightRadius: 4,
+      borderTopLeftRadiusUnit: YGUnit.YGU_POINT,
+      borderBottomLeftRadiusUnit: YGUnit.YGU_POINT,
+      borderBottomRightRadiusUnit: YGUnit.YGU_PERCENT,
+      borderTopRightRadiusUnit: YGUnit.YGU_POINT,
+
+      // border color
+      borderColor: Color4.Green()
+    }
+    expect(getUiTransform(rootDivEntity)).toMatchObject(matchObject)
+
+    borderRadius.topLeft = '88%'
+    borderWidth.top = '10%'
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      borderTopWidth: 10,
+      borderTopWidthUnit: YGUnit.YGU_PERCENT,
+      borderTopLeftRadius: 88,
+      borderTopLeftRadiusUnit: YGUnit.YGU_PERCENT
+    })
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    delete borderRadius.bottomRight
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    delete borderWidth.left
+    await engine.update(1)
+
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      borderLeftWidth: 0,
+      borderLeftWidthUnit: YGUnit.YGU_UNDEFINED,
+      borderBottomRightRadius: 0,
+      borderBottomRightRadiusUnit: YGUnit.YGU_UNDEFINED
+    })
+
+    borderRadius.topRight = {} as any // Assertion
+    borderRadius.topLeft = '10%'
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      borderTopRightRadius: 0,
+      borderTopRightRadiusUnit: YGUnit.YGU_UNDEFINED,
+      borderTopLeftRadius: 10,
+      borderTopLeftRadiusUnit: YGUnit.YGU_PERCENT
     })
   })
 

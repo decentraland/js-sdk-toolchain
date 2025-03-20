@@ -37,6 +37,17 @@ export interface Position {
 }
 
 /**
+ * Type used for defining the border radius of the element
+ * @public
+ */
+export interface BorderRadius {
+  topLeft: PositionUnit
+  topRight: PositionUnit
+  bottomLeft: PositionUnit
+  bottomRight: PositionUnit
+}
+
+/**
  * @public
  */
 export type DisplayType = 'flex' | 'none'
@@ -137,6 +148,6 @@ export interface UiTransformProps {
   pointerFilter?: PointerFilterType
 
   borderColor?: Color4 | undefined
-  borderRadius?: Partial<Position> | PositionShorthand
-  borderWidth?: Partial<Position> | PositionShorthand
+  borderRadius?: Partial<BorderRadius> | PositionUnit
+  borderWidth?: Partial<Position> | PositionUnit
 }

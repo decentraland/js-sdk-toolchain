@@ -212,6 +212,18 @@ export const enum BillboardMode {
     BM_Z = 4
 }
 
+// @public
+export interface BorderRadius {
+    // (undocumented)
+    bottomLeft: PositionUnit;
+    // (undocumented)
+    bottomRight: PositionUnit;
+    // (undocumented)
+    topLeft: PositionUnit;
+    // (undocumented)
+    topRight: PositionUnit;
+}
+
 // @public (undocumented)
 export interface BorderRect {
     // (undocumented)
@@ -4290,6 +4302,12 @@ export interface UiTransformProps {
     alignContent?: AlignType;
     alignItems?: AlignType;
     alignSelf?: AlignType;
+    // (undocumented)
+    borderColor?: PBColor4 | undefined;
+    // (undocumented)
+    borderRadius?: Partial<BorderRadius> | PositionUnit;
+    // (undocumented)
+    borderWidth?: Partial<Position> | PositionShorthand;
     display?: DisplayType;
     flex?: number;
     flexBasis?: number;
