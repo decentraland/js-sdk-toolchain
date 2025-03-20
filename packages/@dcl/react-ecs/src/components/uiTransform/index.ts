@@ -7,6 +7,9 @@ import {
   getOverflow,
   getPointerFilter,
   getPositionType,
+  parseBorderColor,
+  parseBorderRadius,
+  parseBorderWidth,
   parsePosition,
   parseSize
 } from './utils'
@@ -84,8 +87,22 @@ const defaultUiTransform: PBUiTransform = {
  */
 /* @__PURE__ */
 export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
-  const { height, minHeight, maxHeight, width, minWidth, maxWidth, alignItems, alignContent, flexWrap, ...otherProps } =
-    props
+  const {
+    height,
+    minHeight,
+    maxHeight,
+    width,
+    minWidth,
+    maxWidth,
+    alignItems,
+    alignContent,
+    flexWrap,
+    borderRadius,
+    borderWidth,
+    borderColor,
+    ...otherProps
+  } = props
+
   return {
     ...defaultUiTransform,
     ...otherProps,
@@ -108,6 +125,9 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     // Optional values
     ...(alignContent && getAlign('alignContent', alignContent)),
     ...(alignItems && getAlign('alignItems', alignItems)),
-    ...(flexWrap && getFlexWrap(flexWrap))
+    ...(flexWrap && getFlexWrap(flexWrap)),
+    ...(borderRadius && parseBorderRadius(borderRadius)),
+    ...(borderWidth && parseBorderWidth(borderWidth)),
+    ...(borderColor && parseBorderColor(borderColor))
   }
 }

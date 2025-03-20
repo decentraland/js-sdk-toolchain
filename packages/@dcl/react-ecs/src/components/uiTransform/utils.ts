@@ -20,16 +20,19 @@ import {
   PositionType,
   PositionUnit,
   PositionShorthand,
-  PointerFilterType
+  PointerFilterType,
+  BorderRadius,
+  UiTransformProps
 } from './types'
 import { calcOnViewport } from '../utils'
 import { ScaleUnit } from '../types'
+import { Color4 } from '@dcl/ecs/dist/components/generated/pb/decentraland/common/colors.gen'
 
 function capitalize<T extends string>(value: T): Capitalize<T> {
   return `${value[0].toUpperCase()}${value.slice(1, value.length)}` as Capitalize<T>
 }
 
-type PropName = 'position' | 'margin' | 'padding'
+type PropName = 'position' | 'margin' | 'padding' | 'borderWidth'
 type PropKey = `${PropName}${Capitalize<keyof Position>}`
 type PropKeyUnit = `${PropName}${Capitalize<keyof Position>}Unit`
 type PositionParsed = {
@@ -84,6 +87,85 @@ function parsePositionUnit(val?: PositionUnit | 'auto'): [number | undefined, YG
   }
 
   return [undefined, YGUnit.YGU_UNDEFINED]
+}
+
+type BorderProp = `border${Capitalize<keyof BorderRadius>}Radius`
+type BorderPropUnit = `${BorderProp}Unit`
+type BorderProps = {
+  [key in BorderProp]?: number
+} & {
+  [key in BorderPropUnit]?: YGUnit
+}
+export function parseBorderRadius(radius: Partial<BorderRadius> | PositionUnit): BorderProps | undefined {
+  if (typeof radius === 'object') {
+    const obj: Partial<BorderProps> = {}
+    for (const key in radius) {
+      const typedKey: keyof BorderRadius = key as keyof BorderRadius
+      const propKey: BorderProp = `border${capitalize(typedKey)}Radius`
+      const propKeyUnit: BorderPropUnit = `${propKey}Unit`
+      const [value, unit] = parsePositionUnit(radius[typedKey]!)
+      if (value === undefined) continue
+      obj[propKeyUnit] = unit
+      obj[propKey] = value
+    }
+    return obj
+  }
+
+  if (typeof radius === 'number') {
+    return parseBorderRadius({ topLeft: radius, topRight: radius, bottomLeft: radius, bottomRight: radius })
+  }
+}
+
+type BorderKey = Record<keyof Position, number>
+type BorderWidthProp = `border${Capitalize<keyof BorderKey>}Width`
+type BorderWidthPropUnit = `${BorderWidthProp}Unit`
+type BorderWidthProps = {
+  [key in BorderWidthProp]?: number
+} & {
+  [key in BorderWidthPropUnit]?: YGUnit
+}
+export function parseBorderWidth(borderWidth: Partial<Position> | PositionUnit): BorderWidthProps | undefined {
+  if (typeof borderWidth === 'object') {
+    const obj: Partial<BorderWidthProps> = {}
+    for (const key in borderWidth) {
+      const typedKey: keyof Position = key as keyof Position
+      const propKey: BorderWidthProp = `border${capitalize(typedKey)}Width`
+      const propKeyUnit: BorderWidthPropUnit = `${propKey}Unit`
+      const [value, unit] = parsePositionUnit(borderWidth[typedKey]!)
+      if (value === undefined) continue
+      obj[propKeyUnit] = unit
+      obj[propKey] = value
+    }
+    return obj
+  }
+
+  if (typeof borderWidth === 'number') {
+    return parseBorderWidth({ top: borderWidth, left: borderWidth, right: borderWidth, bottom: borderWidth })
+  }
+}
+type BorderColor = Record<keyof Position, Color4>
+type BorderColorKey = `border${Capitalize<keyof BorderColor>}Color`
+
+const isColor = (v: unknown): v is Color4 => {
+  if ((v as Color4).b !== undefined) return true
+  return false
+}
+export function parseBorderColor(
+  borderColor: UiTransformProps['borderColor']
+): Record<BorderColorKey, Color4> | undefined {
+  if (isColor(borderColor)) {
+    return parseBorderColor({ top: borderColor, left: borderColor, right: borderColor, bottom: borderColor })
+  }
+
+  if (typeof borderColor === 'object') {
+    const obj: Record<BorderColorKey, Color4> = {} as Record<BorderColorKey, Color4>
+    for (const key in borderColor) {
+      const typedKey: keyof BorderColor = key as keyof BorderColor
+      const propKey: BorderColorKey = `border${capitalize(typedKey)}Color`
+      obj[propKey] = borderColor[typedKey]
+    }
+    return obj
+  }
 }
 
 export function parsePosition<T extends PropName>(
