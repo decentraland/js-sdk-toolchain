@@ -639,6 +639,7 @@ export const componentDefinitionByName: {
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
     "core::InputModifier": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBInputModifier>>;
+    "core::LightSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBLightSource>>;
     "core::MainCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMainCamera>>;
     "core::Material": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMaterial>>;
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
@@ -1571,6 +1572,9 @@ export interface LastWriteWinElementSetComponentDefinition<T> extends BaseCompon
     getOrNull(entity: Entity): DeepReadonly<T> | null;
 }
 
+// @public (undocumented)
+export const LightSource: LastWriteWinElementSetComponentDefinition<PBLightSource>;
+
 // @public
 export type Listeners = {
     onMouseDown?: Callback;
@@ -2420,6 +2424,66 @@ export namespace PBInputModifier_StandardInput {
 }
 
 // @public (undocumented)
+export interface PBLightSource {
+    active?: boolean | undefined;
+    brightness?: number | undefined;
+    color?: PBColor3 | undefined;
+    range?: number | undefined;
+    // (undocumented)
+    type?: {
+        $case: "point";
+        point: PBLightSource_Point;
+    } | {
+        $case: "spot";
+        spot: PBLightSource_Spot;
+    } | undefined;
+}
+
+// @public (undocumented)
+export namespace PBLightSource {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBLightSource;
+    // (undocumented)
+    export function encode(message: PBLightSource, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBLightSource_Point {
+    shadow?: PBLightSource_ShadowType | undefined;
+}
+
+// @public (undocumented)
+export namespace PBLightSource_Point {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBLightSource_Point;
+    // (undocumented)
+    export function encode(message: PBLightSource_Point, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export const enum PBLightSource_ShadowType {
+    ST_HARD = 2,
+    ST_NONE = 0,
+    ST_SOFT = 1
+}
+
+// @public (undocumented)
+export interface PBLightSource_Spot {
+    innerAngle?: number | undefined;
+    outerAngle?: number | undefined;
+    shadow?: PBLightSource_ShadowType | undefined;
+    shadowMaskTexture?: TextureUnion | undefined;
+}
+
+// @public (undocumented)
+export namespace PBLightSource_Spot {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBLightSource_Spot;
+    // (undocumented)
+    export function encode(message: PBLightSource_Spot, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBMainCamera {
     virtualCameraEntity?: number | undefined;
 }
@@ -3103,6 +3167,8 @@ export interface PBUiTransform {
     alignItems?: YGAlign | undefined;
     alignSelf: YGAlign;
     // (undocumented)
+    borderBottomColor?: PBColor4 | undefined;
+    // (undocumented)
     borderBottomLeftRadius?: number | undefined;
     borderBottomLeftRadiusUnit?: YGUnit | undefined;
     // (undocumented)
@@ -3111,13 +3177,17 @@ export interface PBUiTransform {
     // (undocumented)
     borderBottomWidth?: number | undefined;
     borderBottomWidthUnit?: YGUnit | undefined;
-    borderColor?: PBColor4 | undefined;
+    // (undocumented)
+    borderLeftColor?: PBColor4 | undefined;
     // (undocumented)
     borderLeftWidth?: number | undefined;
     borderLeftWidthUnit?: YGUnit | undefined;
     // (undocumented)
+    borderRightColor?: PBColor4 | undefined;
+    // (undocumented)
     borderRightWidth?: number | undefined;
     borderRightWidthUnit?: YGUnit | undefined;
+    borderTopColor?: PBColor4 | undefined;
     // (undocumented)
     borderTopLeftRadius?: number | undefined;
     borderTopLeftRadiusUnit?: YGUnit | undefined;
@@ -3284,6 +3354,7 @@ export namespace PBVideoPlayer {
 export interface PBVirtualCamera {
     // (undocumented)
     defaultTransition?: CameraTransition | undefined;
+    fov?: number | undefined;
     // (undocumented)
     lookAtEntity?: number | undefined;
 }
@@ -4303,11 +4374,11 @@ export interface UiTransformProps {
     alignItems?: AlignType;
     alignSelf?: AlignType;
     // (undocumented)
-    borderColor?: PBColor4 | undefined;
+    borderColor?: Record<keyof Partial<Position>, PBColor4> | PBColor4 | undefined;
     // (undocumented)
     borderRadius?: Partial<BorderRadius> | PositionUnit;
     // (undocumented)
-    borderWidth?: Partial<Position> | PositionShorthand;
+    borderWidth?: Partial<Position> | PositionUnit;
     display?: DisplayType;
     flex?: number;
     flexBasis?: number;

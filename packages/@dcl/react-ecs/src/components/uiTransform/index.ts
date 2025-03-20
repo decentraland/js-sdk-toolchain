@@ -7,6 +7,7 @@ import {
   getOverflow,
   getPointerFilter,
   getPositionType,
+  parseBorderColor,
   parseBorderRadius,
   parseBorderWidth,
   parsePosition,
@@ -98,10 +99,9 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     flexWrap,
     borderRadius,
     borderWidth,
+    borderColor,
     ...otherProps
   } = props
-
-  console.log('BOEDO', borderRadius && parseBorderRadius(borderRadius), borderRadius)
 
   return {
     ...defaultUiTransform,
@@ -127,6 +127,7 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     ...(alignItems && getAlign('alignItems', alignItems)),
     ...(flexWrap && getFlexWrap(flexWrap)),
     ...(borderRadius && parseBorderRadius(borderRadius)),
-    ...(borderWidth && parseBorderWidth(borderWidth))
+    ...(borderWidth && parseBorderWidth(borderWidth)),
+    ...(borderColor && parseBorderColor(borderColor))
   }
 }

@@ -149,7 +149,7 @@ describe('UiTransform React Ecs', () => {
     })
   })
 
-  it.only('should send border properties', async () => {
+  it('should send border properties', async () => {
     const { engine, uiRenderer } = setupEngine()
     const UiTransform = components.UiTransform(engine)
     const entityIndex = engine.addEntity() as number
@@ -201,7 +201,10 @@ describe('UiTransform React Ecs', () => {
       borderTopRightRadiusUnit: YGUnit.YGU_POINT,
 
       // border color
-      borderColor: Color4.Green()
+      borderTopColor: Color4.Green(),
+      borderRightColor: Color4.Green(),
+      borderLeftColor: Color4.Green(),
+      borderBottomColor: Color4.Green()
     }
     expect(getUiTransform(rootDivEntity)).toMatchObject(matchObject)
 
@@ -225,18 +228,18 @@ describe('UiTransform React Ecs', () => {
     await engine.update(1)
 
     expect(getUiTransform(rootDivEntity)).toMatchObject({
-      borderLeftWidth: 0,
-      borderLeftWidthUnit: YGUnit.YGU_UNDEFINED,
-      borderBottomRightRadius: 0,
-      borderBottomRightRadiusUnit: YGUnit.YGU_UNDEFINED
+      borderLeftWidth: undefined,
+      borderLeftWidthUnit: undefined,
+      borderBottomRightRadius: undefined,
+      borderBottomRightRadiusUnit: undefined
     })
 
     borderRadius.topRight = {} as any // Assertion
     borderRadius.topLeft = '10%'
     await engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
-      borderTopRightRadius: 0,
-      borderTopRightRadiusUnit: YGUnit.YGU_UNDEFINED,
+      borderTopRightRadius: undefined,
+      borderTopRightRadiusUnit: undefined,
       borderTopLeftRadius: 10,
       borderTopLeftRadiusUnit: YGUnit.YGU_PERCENT
     })

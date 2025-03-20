@@ -21,10 +21,12 @@ import {
   PositionUnit,
   PositionShorthand,
   PointerFilterType,
-  BorderRadius
+  BorderRadius,
+  UiTransformProps
 } from './types'
 import { calcOnViewport } from '../utils'
 import { ScaleUnit } from '../types'
+import { Color4 } from '@dcl/ecs/dist/components/generated/pb/decentraland/common/colors.gen'
 
 function capitalize<T extends string>(value: T): Capitalize<T> {
   return `${value[0].toUpperCase()}${value.slice(1, value.length)}` as Capitalize<T>
@@ -113,7 +115,9 @@ export function parseBorderRadius(radius: Partial<BorderRadius> | PositionUnit):
     return parseBorderRadius({ topLeft: radius, topRight: radius, bottomLeft: radius, bottomRight: radius })
   }
 }
-type BorderWidthProp = `border${Capitalize<keyof Position>}Width`
+
+type BorderKey = Record<keyof Position, number>
+type BorderWidthProp = `border${Capitalize<keyof BorderKey>}Width`
 type BorderWidthPropUnit = `${BorderWidthProp}Unit`
 type BorderWidthProps = {
   [key in BorderWidthProp]?: number
@@ -137,6 +141,30 @@ export function parseBorderWidth(borderWidth: Partial<Position> | PositionUnit):
 
   if (typeof borderWidth === 'number') {
     return parseBorderWidth({ top: borderWidth, left: borderWidth, right: borderWidth, bottom: borderWidth })
+  }
+}
+type BorderColor = Record<keyof Position, Color4>
+type BorderColorKey = `border${Capitalize<keyof BorderColor>}Color`
+
+const isColor = (v: unknown): v is Color4 => {
+  if ((v as Color4).b !== undefined) return true
+  return false
+}
+export function parseBorderColor(
+  borderColor: UiTransformProps['borderColor']
+): Record<BorderColorKey, Color4> | undefined {
+  if (isColor(borderColor)) {
+    return parseBorderColor({ top: borderColor, left: borderColor, right: borderColor, bottom: borderColor })
+  }
+
+  if (typeof borderColor === 'object') {
+    const obj: Record<BorderColorKey, Color4> = {} as Record<BorderColorKey, Color4>
+    for (const key in borderColor) {
+      const typedKey: keyof BorderColor = key as keyof BorderColor
+      const propKey: BorderColorKey = `border${capitalize(typedKey)}Color`
+      obj[propKey] = borderColor[typedKey]
+    }
+    return obj
   }
 }
 

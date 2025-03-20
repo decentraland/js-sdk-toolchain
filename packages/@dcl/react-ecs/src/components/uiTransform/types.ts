@@ -147,7 +147,7 @@ export interface UiTransformProps {
   /** The pointer filter property determines if the ui element blocks the pointer or not (elements with pointer events always block the pointer regardless of this property) **/
   pointerFilter?: PointerFilterType
 
-  borderColor?: Color4 | undefined
+  borderColor?: Record<keyof Partial<Position>, Color4> | Color4 | undefined
   borderRadius?: Partial<BorderRadius> | PositionUnit
   borderWidth?: Partial<Position> | PositionUnit
 }
