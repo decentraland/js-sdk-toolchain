@@ -248,6 +248,31 @@ describe('UiTransform React Ecs', () => {
       borderBottomRightRadiusUnit: YGUnit.YGU_POINT,
       borderTopRightRadiusUnit: YGUnit.YGU_POINT
     })
+
+    borderRadius = { topLeft: undefined } as any
+    borderWidth = { top: undefined } as any
+
+    await engine.update(1)
+
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      borderTopWidth: undefined,
+      borderLeftWidth: undefined,
+      borderRightWidth: undefined,
+      borderBottomWidth: undefined,
+      borderTopWidthUnit: undefined,
+      borderLeftWidthUnit: undefined,
+      borderRightWidthUnit: undefined,
+      borderBottomWidthUnit: undefined,
+
+      borderTopLeftRadius: undefined,
+      borderBottomLeftRadius: undefined,
+      borderBottomRightRadius: undefined,
+      borderTopRightRadius: undefined,
+      borderTopLeftRadiusUnit: undefined,
+      borderBottomLeftRadiusUnit: undefined,
+      borderBottomRightRadiusUnit: undefined,
+      borderTopRightRadiusUnit: undefined
+    })
   })
 
   it('should send height & width properties', async () => {
