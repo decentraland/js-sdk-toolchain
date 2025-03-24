@@ -67,7 +67,27 @@ describe('UiTransform component', () => {
       positionType: YGPositionType.YGPT_RELATIVE,
       width: 1,
       widthUnit: YGUnit.YGU_POINT,
-      pointerFilter: PointerFilterMode.PFM_NONE
+      pointerFilter: PointerFilterMode.PFM_NONE,
+      borderLeftWidthUnit: undefined,
+      borderLeftWidth: undefined,
+      borderTopWidthUnit: undefined,
+      borderTopWidth: undefined,
+      borderRightWidthUnit: undefined,
+      borderRightWidth: undefined,
+      borderBottomWidthUnit: undefined,
+      borderBottomWidth: undefined,
+      borderTopLeftRadiusUnit: undefined,
+      borderTopLeftRadius: undefined,
+      borderTopRightRadiusUnit: undefined,
+      borderTopRightRadius: undefined,
+      borderBottomLeftRadiusUnit: undefined,
+      borderBottomLeftRadius: undefined,
+      borderBottomRightRadiusUnit: undefined,
+      borderBottomRightRadius: undefined,
+      borderTopColor: undefined,
+      borderBottomColor: undefined,
+      borderLeftColor: undefined,
+      borderRightColor: undefined
     })
   })
 })
