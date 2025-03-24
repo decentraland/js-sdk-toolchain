@@ -158,14 +158,14 @@ describe('UiTransform React Ecs', () => {
     const rootDivEntity = (entityIndex + 1) as Entity
     const getUiTransform = (entity: Entity) => UiTransform.get(entity)
 
-    const borderRadius: BorderRadius = {
+    let borderRadius: BorderRadius | number = {
       topLeft: '1px',
       bottomLeft: '2px',
       bottomRight: '3%',
       topRight: 4
     }
 
-    const borderWidth: Position = {
+    let borderWidth: Position | number = {
       top: '1px',
       left: '2px',
       right: '3%',
@@ -218,30 +218,35 @@ describe('UiTransform React Ecs', () => {
       borderTopLeftRadiusUnit: YGUnit.YGU_PERCENT
     })
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    delete borderRadius.bottomRight
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    delete borderWidth.left
-    await engine.update(1)
-
-    expect(getUiTransform(rootDivEntity)).toMatchObject({
-      borderLeftWidth: undefined,
-      borderLeftWidthUnit: undefined,
-      borderBottomRightRadius: undefined,
-      borderBottomRightRadiusUnit: undefined
-    })
-
-    borderRadius.topRight = {} as any // Assertion
     borderRadius.topLeft = '10%'
     await engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
-      borderTopRightRadius: undefined,
-      borderTopRightRadiusUnit: undefined,
       borderTopLeftRadius: 10,
       borderTopLeftRadiusUnit: YGUnit.YGU_PERCENT
+    })
+
+    borderWidth = 88
+    borderRadius = 888
+    await engine.update(1)
+
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      borderTopWidth: 88,
+      borderLeftWidth: 88,
+      borderRightWidth: 88,
+      borderBottomWidth: 88,
+      borderTopWidthUnit: YGUnit.YGU_POINT,
+      borderLeftWidthUnit: YGUnit.YGU_POINT,
+      borderRightWidthUnit: YGUnit.YGU_POINT,
+      borderBottomWidthUnit: YGUnit.YGU_POINT,
+
+      borderTopLeftRadius: 888,
+      borderBottomLeftRadius: 888,
+      borderBottomRightRadius: 888,
+      borderTopRightRadius: 888,
+      borderTopLeftRadiusUnit: YGUnit.YGU_POINT,
+      borderBottomLeftRadiusUnit: YGUnit.YGU_POINT,
+      borderBottomRightRadiusUnit: YGUnit.YGU_POINT,
+      borderTopRightRadiusUnit: YGUnit.YGU_POINT
     })
   })
 
