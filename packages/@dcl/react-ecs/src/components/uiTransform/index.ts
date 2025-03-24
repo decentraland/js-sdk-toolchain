@@ -1,4 +1,22 @@
 import {
+  getAlign,
+  getDisplay,
+  getFlexDirection,
+  getFlexWrap,
+  getJustify,
+  getOverflow,
+  getPointerFilter,
+  getPositionType,
+  parseBorderColor,
+  parseBorderRadius,
+  parseBorderWidth,
+  getScrollPosition,
+  getScrollVisible,
+  parsePosition,
+  parseSize
+} from './utils'
+import { UiTransformProps } from './types'
+import {
   PointerFilterMode,
   YGAlign,
   YGDisplay,
@@ -10,20 +28,7 @@ import {
 } from '@dcl/ecs'
 import { PBUiTransform } from '@dcl/ecs/dist/components'
 import { UiTransformProps } from './types'
-import {
-  getAlign,
-  getDisplay,
-  getFlexDirection,
-  getFlexWrap,
-  getJustify,
-  getOverflow,
-  getPointerFilter,
-  getPositionType,
-  getScrollPosition,
-  getScrollVisible,
-  parsePosition,
-  parseSize
-} from './utils'
+
 
 /**
  * @internal
@@ -100,6 +105,9 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     alignItems,
     alignContent,
     flexWrap,
+    borderRadius,
+    borderWidth,
+    borderColor,
     zIndex,
     ...otherProps
   } = props
@@ -127,6 +135,9 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     ...(alignContent && getAlign('alignContent', alignContent)),
     ...(alignItems && getAlign('alignItems', alignItems)),
     ...(flexWrap && getFlexWrap(flexWrap)),
+    ...(borderRadius && parseBorderRadius(borderRadius)),
+    ...(borderWidth && parseBorderWidth(borderWidth)),
+    ...(borderColor && parseBorderColor(borderColor)),
     ...(scrollPosition && getScrollPosition(scrollPosition)),
     ...(scrollVisible && getScrollVisible(scrollVisible)),
     ...(zIndex && { zIndex })
