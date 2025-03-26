@@ -106,7 +106,7 @@ function ProjectView({ folders, thumbnails }: Props) {
       }
       dispatch(removeAsset({ path }))
     },
-    [open, setOpen, lastSelected]
+    [tree, getEntitiesWithAsset]
   )
 
   const handleConfirm = useCallback(async () => {
