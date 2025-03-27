@@ -53,6 +53,12 @@ export default withSdk<Props>(({ sdk, entity }) => {
           <Block>
             <RangeField label="Alpha test" max={1} step={0.1} {...getInputProps('alphaTest')} />
           </Block>
+          <Texture
+            label="Alpha texture"
+            texture={TextureType.TT_ALPHA_TEXTURE}
+            files={files}
+            getInputProps={getTextureProps}
+          />
         </>
       )}
       {materialType.value === MaterialType.MT_PBR && (
@@ -91,12 +97,6 @@ export default withSdk<Props>(({ sdk, entity }) => {
             <Block>
               <RangeField label="Alpha test" max={1} step={0.1} {...getInputProps('alphaTest')} />
             </Block>
-            <Texture
-              label="Alpha texture"
-              texture={TextureType.TT_ALPHA_TEXTURE}
-              files={files}
-              getInputProps={getTextureProps}
-            />
           </Container>
 
           <Container label="Emissive" border>

@@ -63,17 +63,36 @@
   user-select: none;
 }
 
-.Assets .Assets-buttons > button:first-child {
-  margin: 3px;
-  position: absolute;
-  left: 0px;
-  margin-left: 8px;
-  display: flex;
+.Assets .Assets-buttons .Assets-buttons-left {
   align-items: center;
+  padding: 8px 9px;
+  position: absolute;
+  left: 0;
 }
 
-.Assets .Assets-buttons > button:first-child svg {
+.Assets .Assets-buttons .Assets-buttons-left button {
+  margin: 3px 10px 3px 3px;
+  display: flex;
+  align-items: center;
+  padding: 8px 9px;
+  font-weight: 600;
+  border-radius: 6px;
+}
+
+.Assets .Assets-buttons .Assets-buttons-left button svg {
   margin-right: 5px;
+  stroke-width: 3;
+}
+
+.Assets .Assets-buttons .Assets-buttons-left .refresh {
+  width: 20px;
+  height: 20px;
+  padding: 2px;
+  border-radius: 6px;
+}
+
+.Assets .Assets-buttons .Assets-buttons-left .refresh:hover {
+  background-color: var(--background-gray);
 }
 
 .Assets .Assets-content {

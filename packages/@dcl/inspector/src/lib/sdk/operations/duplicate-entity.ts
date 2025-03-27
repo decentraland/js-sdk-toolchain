@@ -10,8 +10,10 @@ import { EditorComponentNames, EditorComponents } from '../components'
 import { pushChild } from '../nodes'
 import updateSelectedEntity from './update-selected-entity'
 import { generateUniqueName } from './add-child'
+import { createEnumEntityId } from '../enum-entity'
 
 export function duplicateEntity(engine: IEngine) {
+  const enumEntityId = createEnumEntityId(engine)
   return function duplicateEntity(entity: Entity) {
     const Transform = engine.getComponent(TransformEngine.componentId) as typeof TransformEngine
     const Nodes = engine.getComponent(EditorComponentNames.Nodes) as EditorComponents['Nodes']
@@ -26,7 +28,7 @@ export function duplicateEntity(engine: IEngine) {
 
     for (const [original, duplicate] of Array.from(entities.entries()).reverse()) {
       if (NetworkEntity.has(original)) {
-        NetworkEntity.createOrReplace(duplicate, { entityId: duplicate, networkId: 0 })
+        NetworkEntity.createOrReplace(duplicate, { entityId: enumEntityId.getNextEnumEntityId(), networkId: 0 })
       }
 
       const originalName = Name.getOrNull(original)?.value

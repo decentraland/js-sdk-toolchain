@@ -1,8 +1,26 @@
+import { Filter } from './Filters/types'
 import { TreeNode } from './ProjectView'
-import { AssetNode, AssetNodeFolder, AssetNodeItem } from './types'
+import { AssetNode, AssetNodeFolder, AssetNodeItem, IAsset } from './types'
 
 export function AssetNodeRootNull(): AssetNodeFolder {
   return { name: '', parent: null, type: 'folder', children: [] }
+}
+
+const validModelExtensions = ['.gltf', '.glb']
+const validAudioExtensions = ['.mp3', '.ogg', '.wav']
+const validImageExtensions = ['.jpg', '.jpeg', '.png']
+const validVideoExtensions = ['.mp4']
+
+function determineAssetType(extension: string): IAsset['type'] {
+  return validModelExtensions.some((ext) => extension.endsWith(ext))
+    ? 'gltf'
+    : validAudioExtensions.some((ext) => extension.endsWith(ext))
+    ? 'audio'
+    : validImageExtensions.some((ext) => extension.endsWith(ext))
+    ? 'image'
+    : validVideoExtensions.some((ext) => extension.endsWith(ext))
+    ? 'video'
+    : 'unknown'
 }
 
 export function buildAssetTree(paths: string[]): AssetNodeFolder {
@@ -22,14 +40,7 @@ export function buildAssetTree(paths: string[]): AssetNodeFolder {
           currentNode = childNode
         } else {
           const lowerPath = path.toLowerCase()
-          const assetType =
-            lowerPath.endsWith('.gltf') || lowerPath.endsWith('.glb')
-              ? 'gltf'
-              : lowerPath.endsWith('.mp3') || lowerPath.endsWith('.ogg') || lowerPath.endsWith('.wav')
-              ? 'audio'
-              : lowerPath.endsWith('.mp4')
-              ? 'video'
-              : 'unknown'
+          const assetType = determineAssetType(lowerPath)
           childNode = {
             name: parts[i],
             parent: currentNode,
@@ -64,4 +75,26 @@ export function getFullNodePath(item: AssetNode | TreeNode): string {
 
 export function isAssetNode(node: AssetNode | TreeNode): node is AssetNodeItem {
   return node.type === 'asset'
+}
+
+export const DEFAULT_FILTERS: Filter[] = [Filter.All /* Filter.Recents */]
+export const FILTERS_IN_ORDER: Filter[] = [Filter.Models, Filter.Images, Filter.Audio, Filter.Video, Filter.Other]
+
+export function mapAssetTypeToFilter(type: IAsset['type']): Filter | undefined {
+  switch (type) {
+    case 'gltf':
+      return Filter.Models
+    case 'audio':
+      return Filter.Audio
+    case 'image':
+      return Filter.Images
+    case 'video':
+      return Filter.Video
+    default:
+      return Filter.Other
+  }
+}
+
+export function getFilterFromTree(filters: Set<Filter>): Filter[] {
+  return [...DEFAULT_FILTERS, ...FILTERS_IN_ORDER.filter(($) => filters.has($))]
 }

@@ -1,0 +1,33 @@
+.ProjectFilters {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  height: calc(100% - 30px);
+  overflow-y: auto;
+  user-select: none;
+}
+
+.ProjectFilters .filter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  border-radius: 8px;
+}
+
+.ProjectFilters .filter:last-child {
+  margin: 0;
+}
+
+.ProjectFilters .filter:hover,
+.ProjectFilters .filter.active {
+  background-color: var(--accent-blue-07);
+}
+
+.ProjectFilters .filter svg {
+  width: 20px;
+  height: 20px;
+  margin-bottom: 4px;
+}
