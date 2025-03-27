@@ -1,4 +1,12 @@
-import { Entity, IEngine, InputAction, PointerEventsSystem, PointerEventType } from '@dcl/ecs'
+import {
+  Entity,
+  IEngine,
+  InputAction,
+  PointerEventsSystem,
+  PointerEventType,
+  PBUiInputResult,
+  PBUiDropdownResult
+} from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import Reconciler, { HostConfig } from 'react-reconciler'
 import { Callback, isListener, Listeners } from '../components'
@@ -183,6 +191,7 @@ export function createReconciler(
 
   function removeChildEntity(instance: Instance) {
     changeEvents.delete(instance.entity)
+    clickEvents.delete(instance.entity)
     engine.removeEntity(instance.entity)
     for (const child of instance._child) {
       removeChildEntity(child)
@@ -233,13 +242,24 @@ export function createReconciler(
   }
 
   function updateOnChange(entity: Entity, componentId: number, state?: OnChangeState) {
+    const hasEvent = changeEvents.has(entity)
     const event = changeEvents.get(entity) || changeEvents.set(entity, new Map()).get(entity)!
-    const oldState = event.get(componentId)
     const onChangeCallback = state?.onChangeCallback
     const onSubmitCallback = state?.onSubmitCallback
-    const value = state?.value ?? oldState?.value
-    const isSubmit = state?.isSubmit ?? oldState?.isSubmit
-    event.set(componentId, { onChangeCallback, onSubmitCallback, value, isSubmit })
+    event.set(componentId, { onChangeCallback, onSubmitCallback })
+    // Create onChange callback if its the first callback event for this entity
+    if (!hasEvent) {
+      const resultComponentId =
+        componentId === UiDropdown.componentId ? UiDropdownResult.componentId : UiInputResult.componentId
+      engine.getComponent<PBUiInputResult | PBUiDropdownResult>(resultComponentId).onChange(entity, (value) => {
+        if ((value as PBUiInputResult)?.isSubmit) {
+          const onSubmit = changeEvents.get(entity)?.get(componentId)?.onSubmitCallback
+          onSubmit && onSubmit(value?.value)
+        }
+        const onChange = changeEvents.get(entity)?.get(componentId)?.onChangeCallback
+        onChange && onChange(value?.value)
+      })
+    }
   }
 
   const hostConfig: HostConfig<
@@ -352,34 +372,8 @@ export function createReconciler(
     null
   )
 
-  // Maybe this could be something similar to Input system, but since we
-  // are going to use this only here, i prefer to scope it here.
-  function handleOnChange(componentId: number, resultComponent: typeof UiDropdownResult | typeof UiInputResult) {
-    for (const [entity, Result] of engine.getEntitiesWith(resultComponent)) {
-      const entityState = changeEvents.get(entity)?.get(componentId)
-      const isSubmit = !!(Result as any).isSubmit
-      if (entityState?.onChangeCallback && Result.value !== entityState.value) {
-        entityState.onChangeCallback(Result.value)
-      }
-      if (entityState?.onSubmitCallback && isSubmit && !entityState.isSubmit) {
-        entityState.onSubmitCallback(Result.value)
-      }
-
-      updateOnChange(entity, componentId, {
-        onChangeCallback: entityState?.onChangeCallback,
-        onSubmitCallback: entityState?.onSubmitCallback,
-        value: Result.value,
-        isSubmit
-      })
-    }
-  }
-
   return {
     update: function (component: ReactEcs.JSX.ReactNode) {
-      if (changeEvents.size) {
-        handleOnChange(UiInput.componentId, UiInputResult)
-        handleOnChange(UiDropdown.componentId, UiDropdownResult)
-      }
       return reconciler.updateContainer(component as any, root, null)
     },
     getEntities: () => Array.from(entities)

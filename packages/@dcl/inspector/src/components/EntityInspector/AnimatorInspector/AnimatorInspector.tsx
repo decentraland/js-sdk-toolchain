@@ -11,7 +11,14 @@ import { CoreComponents } from '../../../lib/sdk/components'
 import { Block } from '../../Block'
 import { Container } from '../../Container'
 import { TextField, CheckboxField, RangeField, InfoTooltip } from '../../ui'
-import { fromNumber, toNumber, isValidSpeed, isValidWeight, initializeAnimatorComponent } from './utils'
+import {
+  fromNumber,
+  toNumber,
+  isValidSpeed,
+  isValidWeight,
+  initializeAnimatorComponent,
+  mapAnimationGroupsToStates
+} from './utils'
 import type { Props } from './types'
 import { useArrayState } from '../../../hooks/useArrayState'
 
@@ -23,29 +30,52 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
   const entity = sdk.sceneContext.getEntityOrNull(entityId)
   const hasAnimator = useHasComponent(entityId, Animator)
   const [componentValue, setComponentValue, isComponentEqual] = useComponentValue<PBAnimator>(entityId, Animator)
+  const [gltfValue] = useComponentValue(entityId, GltfContainer)
 
   const [states, _, updateStates, _2, setStates] = useArrayState<PBAnimationState>(
     componentValue === null ? [] : componentValue.states
   )
 
   useEffect(() => {
-    if (isComponentEqual({ states })) return
-    setComponentValue({ states })
-  }, [states])
+    if (!entity || !gltfValue || hasAnimator) return
+
+    const initializeComponent = async () => {
+      try {
+        await initializeAnimatorComponent(sdk, entityId, [])
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.warn('Failed to initialize animator component:', error)
+      }
+    }
+
+    void initializeComponent()
+  }, [entity, gltfValue, hasAnimator])
 
   useEffect(() => {
-    if (entity) {
-      entity
-        .onGltfContainerLoaded()
-        .then(async ({ animationGroups }) => {
-          if (animationGroups.length) {
-            const { states } = await initializeAnimatorComponent(sdk, entityId, animationGroups)
-            setStates(states)
-          }
-        })
-        .catch(() => {})
+    if (!entity || !gltfValue || !hasAnimator) return
+
+    const loadAnimations = async () => {
+      try {
+        const { animationGroups } = await entity.onGltfContainerLoaded()
+        if (animationGroups.length && (!states.length || states[0].clip !== animationGroups[0].name)) {
+          const newStates = mapAnimationGroupsToStates(animationGroups)
+          setStates(newStates)
+        }
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.warn('Failed to load animations:', error)
+      }
     }
-  }, [entity])
+
+    void loadAnimations()
+  }, [entity, gltfValue, hasAnimator, states])
+
+  useEffect(() => {
+    if (isComponentEqual({ states })) {
+      return
+    }
+    setComponentValue({ states })
+  }, [states])
 
   const handleRemove = useCallback(async () => {
     sdk.operations.removeComponent(entityId, Animator)

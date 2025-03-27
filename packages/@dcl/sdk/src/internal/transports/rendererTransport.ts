@@ -39,7 +39,6 @@ export function createRendererTransport(engineApi: EngineApiForTransport): Trans
       ) {
         return false
       }
-
       return !!message
     },
     type: 'renderer'

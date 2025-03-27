@@ -105,7 +105,7 @@ export const ACCEPTED_FILE_TYPES = {
   'video/mp4': ['.mp4']
 }
 
-const ONE_GB_IN_BYTES = 1024 * 1024 * 1024
+const FIFTY_MB_IN_BYTES = 50 * 1024 * 1024
 const VALID_EXTENSIONS = new Set(
   Object.values(ACCEPTED_FILE_TYPES)
     .flat()
@@ -115,7 +115,8 @@ const MODEL_EXTENSIONS = ACCEPTED_FILE_TYPES['model/gltf-binary']
 const IGNORED_ERROR_CODES = [
   'ACCESSOR_WEIGHTS_NON_NORMALIZED',
   'MESH_PRIMITIVE_TOO_FEW_TEXCOORDS',
-  'ACCESSOR_VECTOR3_NON_UNIT'
+  'ACCESSOR_VECTOR3_NON_UNIT',
+  'VALUE_NOT_IN_RANGE'
 ]
 
 async function getGltf(file: File, getExternalResource: (uri: string) => Promise<Uint8Array>): Promise<Gltf> {
@@ -158,7 +159,7 @@ export function formatFileName(file: BaseAsset): string {
 }
 
 function validateFileSize(size: number): ValidationError {
-  return size <= ONE_GB_IN_BYTES ? undefined : { type: 'size', message: 'Max file size: 1 GB' }
+  return size <= FIFTY_MB_IN_BYTES ? undefined : { type: 'size', message: 'Max file size: 50 MB' }
 }
 
 function validateExtension(extension: string): ValidationError {
@@ -209,32 +210,34 @@ async function getModel(asset: BaseAsset, fileMap: Map<string, BaseAsset>): Prom
   for (const resource of gltf.info.resources || []) {
     if (resource.storage === 'external') {
       const normalizedName = normalizeFileName(resource.uri)
-      const uri = fileMap.get(normalizedName)!
-      if (resource.pointer.includes('buffer')) buffers.push(uri)
-      if (resource.pointer.includes('image')) images.push(uri)
-      fileMap.delete(normalizedName)
+      const uri = fileMap.get(normalizedName)
+      if (uri) {
+        if (resource.pointer.includes('buffer')) buffers.push(uri)
+        if (resource.pointer.includes('image')) images.push(uri)
+        fileMap.delete(normalizedName)
+      }
     }
   }
 
   fileMap.delete(formatFileName(asset))
 
-  return { ...asset, gltf, buffers, images }
+  const model = { ...asset, gltf, buffers, images }
+  const error = await validateModelWithDependencies(model)
+
+  return { ...model, error }
 }
 
 async function processModels(files: BaseAsset[]): Promise<Asset[]> {
   const fileMap = new Map(files.map((file) => [formatFileName(file), file]))
 
-  const modelPromises = files
-    .filter((asset) => MODEL_EXTENSIONS.includes(`.${asset.extension}`))
-    .map(async (asset): Promise<ModelAsset> => {
-      const model = await getModel(asset, fileMap)
-      const error = await validateModelWithDependencies(model)
-      return { ...model, error }
-    })
+  const gltfAssets: ModelAsset[] = []
+  const modelAssets = files.filter((asset) => MODEL_EXTENSIONS.includes(`.${asset.extension}`))
+  // we need to run models sequentially to avoid race conditions on fileMap
+  for (const asset of modelAssets) {
+    gltfAssets.push(await getModel(asset, fileMap))
+  }
 
-  const gltfAssets = await Promise.all(modelPromises)
   const remainingAssets = Array.from(fileMap.values())
-
   return [...gltfAssets, ...remainingAssets]
 }
 

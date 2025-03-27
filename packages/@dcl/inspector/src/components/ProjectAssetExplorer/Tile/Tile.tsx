@@ -14,10 +14,10 @@ import { ContextMenu as Menu } from '../../ContexMenu'
 import FolderIcon from '../../Icons/Folder'
 import { withContextMenu } from '../../../hoc/withContextMenu'
 import { useContextMenu } from '../../../hooks/sdk/useContextMenu'
+import { determineAssetType, extractFileExtension } from '../../ImportAsset/utils'
 import { Props } from './types'
 
 import './Tile.css'
-import { determineAssetType, extractFileExtension } from '../../ImportAsset/utils'
 
 export const Tile = withContextMenu<Props>(
   ({ valueId, value, getDragContext, onSelect, onRemove, contextMenuId, dndType, getThumbnail }) => {

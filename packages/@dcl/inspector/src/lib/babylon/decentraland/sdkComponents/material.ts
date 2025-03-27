@@ -69,7 +69,6 @@ export const putMaterialComponent: ComponentOperation = (entity, component) => {
         m.alphaCutOff = pbr.alphaTest ?? 0.5
 
         void loadTexture(entity, pbr.texture?.tex).then((texture) => (m.albedoTexture = texture))
-        void loadTexture(entity, pbr.alphaTexture?.tex).then((texture) => (m.opacityTexture = texture))
         void loadTexture(entity, pbr.bumpTexture?.tex).then((texture) => (m.bumpTexture = texture))
         void loadTexture(entity, pbr.emissiveTexture?.tex).then((texture) => (m.emissiveTexture = texture))
       })
@@ -80,6 +79,7 @@ export const putMaterialComponent: ComponentOperation = (entity, component) => {
         m.alphaCutOff = unlit.alphaTest ?? 0.5
         unlit.diffuseColor && m.diffuseColor.set(unlit.diffuseColor.r, unlit.diffuseColor.g, unlit.diffuseColor.b) // unlit.albedoColor.a?
         void loadTexture(entity, unlit.texture?.tex).then((texture) => (m.diffuseTexture = texture))
+        void loadTexture(entity, unlit.alphaTexture?.tex).then((texture) => (m.opacityTexture = texture))
       })
     }
 
@@ -128,13 +128,13 @@ function disposeTextures(material?: StandardMaterial | PBRMaterial) {
   if (material instanceof StandardMaterial) {
     material.diffuseTexture?.dispose()
     material.diffuseTexture = null
+    material.opacityTexture?.dispose()
+    material.opacityTexture = null
   }
 
   if (material instanceof PBRMaterial) {
     material.albedoTexture?.dispose()
     material.albedoTexture = null
-    material.opacityTexture?.dispose()
-    material.opacityTexture = null
     material.bumpTexture?.dispose()
     material.bumpTexture = null
     material.emissiveTexture?.dispose()

@@ -68,6 +68,7 @@ describe('Ui Listeners React Ecs', () => {
     UiInputResult.getMutable(uiEntity).isSubmit = true
     await engine.update(1)
     expect(onSubmit).toBeCalledTimes(1)
+    onChange.mockClear()
     removeComponent = true
     await engine.update(1)
     UiInputResult.create(uiEntity, { value: 'BOEDO' })

@@ -6,4 +6,6 @@ export type Props = React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
   error?: string | boolean
   label?: React.ReactNode
   moreInfo?: React.ReactNode
+  masked?: boolean
+  showValue?: boolean
 }

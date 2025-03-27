@@ -1,0 +1,13 @@
+.AdminToolsBasicViewInspector {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.PanelSection {
+  margin-bottom: 8px;
+}
+
+.PanelSection:last-child {
+  margin-bottom: 0;
+}

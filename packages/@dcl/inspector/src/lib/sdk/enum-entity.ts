@@ -2,24 +2,19 @@ import { Entity, IEngine, NetworkEntity as NetworkEntityEngine } from '@dcl/ecs'
 
 import { CoreComponents } from './components'
 
+export const INSPECTOR_ENUM_ENTITY_ID_START: Entity = 8001 as Entity
 export function createEnumEntityId(engine: IEngine) {
   const NetworkEntity = engine.getComponent(CoreComponents.NETWORK_ENTITY) as typeof NetworkEntityEngine
-  let enumEntityId: Entity = 3333 as Entity
-
-  for (const [_, component] of engine.getEntitiesWith(NetworkEntity)) {
-    enumEntityId = Math.max(enumEntityId, component.entityId) as Entity
-  }
-
-  function getEnumEntityId(): Entity {
-    return enumEntityId
-  }
 
   function getNextEnumEntityId(): Entity {
-    return ++enumEntityId as Entity
+    let value: Entity = INSPECTOR_ENUM_ENTITY_ID_START
+    for (const [, component] of engine.getEntitiesWith(NetworkEntity)) {
+      value = Math.max(value, Number(component.entityId)) as Entity
+    }
+    return (value + 1) as Entity
   }
 
   return {
-    getEnumEntityId,
     getNextEnumEntityId
   }
 }

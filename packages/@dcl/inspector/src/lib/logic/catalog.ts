@@ -30,7 +30,11 @@ export const CATEGORIES = [
   'nature',
   'tiles',
   'year of the pig',
-  'health'
+  'health',
+  'sounds',
+  'primitives',
+  'pillars',
+  'other'
 ]
 
 export function getContentsUrl(hash: string) {
@@ -41,7 +45,16 @@ export function getContentsUrl(hash: string) {
 export function getAssetsByCategory(assets: Asset[]) {
   const categories = new Map<Asset['category'], Asset[]>(CATEGORIES.map(($) => [$, []]))
   for (const asset of assets) {
-    categories.get(asset.category)!.push(asset)
+    const list = categories.get(asset.category)
+    if (list) {
+      list.push(asset)
+    } else {
+      if (asset.category) {
+        categories.set(asset.category, [asset])
+      } else {
+        categories.set('other', [asset])
+      }
+    }
   }
 
   return categories

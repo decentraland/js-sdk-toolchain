@@ -212,6 +212,18 @@ export const enum BillboardMode {
     BM_Z = 4
 }
 
+// @public
+export interface BorderRadius {
+    // (undocumented)
+    bottomLeft: PositionUnit;
+    // (undocumented)
+    bottomRight: PositionUnit;
+    // (undocumented)
+    topLeft: PositionUnit;
+    // (undocumented)
+    topRight: PositionUnit;
+}
+
 // @public (undocumented)
 export interface BorderRect {
     // (undocumented)
@@ -846,6 +858,9 @@ export function createInputSystem(engine: IEngine): IInputSystem;
 
 // @public
 export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSystem): PointerEventsSystem;
+
+// @public (undocumented)
+export function createReactBasedUiSystem(engine: IEngine, pointerSystem: PointerEventsSystem): ReactBasedUiSystem;
 
 // @public (undocumented)
 export function createTweenSystem(engine: IEngine): TweenSystem;
@@ -3166,6 +3181,37 @@ export interface PBUiTransform {
     alignContent?: YGAlign | undefined;
     alignItems?: YGAlign | undefined;
     alignSelf: YGAlign;
+    // (undocumented)
+    borderBottomColor?: PBColor4 | undefined;
+    // (undocumented)
+    borderBottomLeftRadius?: number | undefined;
+    borderBottomLeftRadiusUnit?: YGUnit | undefined;
+    // (undocumented)
+    borderBottomRightRadius?: number | undefined;
+    borderBottomRightRadiusUnit?: YGUnit | undefined;
+    // (undocumented)
+    borderBottomWidth?: number | undefined;
+    borderBottomWidthUnit?: YGUnit | undefined;
+    // (undocumented)
+    borderLeftColor?: PBColor4 | undefined;
+    // (undocumented)
+    borderLeftWidth?: number | undefined;
+    borderLeftWidthUnit?: YGUnit | undefined;
+    // (undocumented)
+    borderRightColor?: PBColor4 | undefined;
+    // (undocumented)
+    borderRightWidth?: number | undefined;
+    borderRightWidthUnit?: YGUnit | undefined;
+    borderTopColor?: PBColor4 | undefined;
+    // (undocumented)
+    borderTopLeftRadius?: number | undefined;
+    borderTopLeftRadiusUnit?: YGUnit | undefined;
+    // (undocumented)
+    borderTopRightRadius?: number | undefined;
+    borderTopRightRadiusUnit?: YGUnit | undefined;
+    // (undocumented)
+    borderTopWidth?: number | undefined;
+    borderTopWidthUnit?: YGUnit | undefined;
     display: YGDisplay;
     // (undocumented)
     flexBasis: number;
@@ -4342,6 +4388,12 @@ export interface UiTransformProps {
     alignContent?: AlignType;
     alignItems?: AlignType;
     alignSelf?: AlignType;
+    // (undocumented)
+    borderColor?: Record<keyof Partial<Position>, PBColor4> | PBColor4 | undefined;
+    // (undocumented)
+    borderRadius?: Partial<BorderRadius> | PositionUnit;
+    // (undocumented)
+    borderWidth?: Partial<Position> | PositionUnit;
     display?: DisplayType;
     flex?: number;
     flexBasis?: number;
