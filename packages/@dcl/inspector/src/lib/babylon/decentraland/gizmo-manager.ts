@@ -71,7 +71,7 @@ export function createGizmoManager(context: SceneContext) {
   gizmoManager.rotationGizmoEnabled = false
   gizmoManager.scaleGizmoEnabled = false
   gizmoManager.gizmos.positionGizmo!.updateGizmoRotationToMatchAttachedMesh = false
-  gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh = true
+  gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh = false
 
   // Configure all gizmos to only work with left click
   if (gizmoManager.gizmos.positionGizmo) configureGizmoButtons(gizmoManager.gizmos.positionGizmo, [LEFT_BUTTON])
@@ -236,17 +236,17 @@ export function createGizmoManager(context: SceneContext) {
   updateSnap()
 
   function isPositionGizmoWorldAligned() {
-    return !gizmoManager.gizmos.positionGizmo!.updateGizmoRotationToMatchAttachedMesh
+    return !gizmoManager.gizmos.positionGizmo!.updateGizmoPositionToMatchAttachedMesh
   }
   function setPositionGizmoWorldAligned(worldAligned: boolean) {
-    gizmoManager.gizmos.positionGizmo!.updateGizmoRotationToMatchAttachedMesh = !worldAligned
+    gizmoManager.gizmos.positionGizmo!.updateGizmoPositionToMatchAttachedMesh = !worldAligned
     events.emit('change')
   }
   function isRotationGizmoWorldAligned() {
     return !gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh
   }
   function setRotationGizmoWorldAligned(worldAligned: boolean) {
-    gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh = !worldAligned
+    // gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh = !worldAligned
     events.emit('change')
   }
 
