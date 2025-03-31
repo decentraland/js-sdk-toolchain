@@ -12,18 +12,18 @@ export function toNumber(value: string | number, div: number = 100) {
 }
 
 export function isValidWeight(weight: string | undefined): boolean {
-  const value = (weight ?? 0).toString()
+  const value = (weight ?? '').toString()
   return !isNaN(parseFloat(value)) && parseFloat(value) >= 0 && parseFloat(value) <= 100
 }
 
 export function isValidSpeed(speed: string | undefined): boolean {
-  const value = (speed ?? 0).toString()
+  const value = (speed ?? '').toString()
   return !isNaN(parseFloat(value)) && parseFloat(value) >= 0 && parseFloat(value) <= 200
 }
 
 export function mapAnimationGroupsToStates(animations: AnimationGroup[]): PBAnimationState[] {
   return animations.map(($) => {
-    const weight = isValidWeight($.weight.toString()) ? $.weight : 1
+    const weight = isValidWeight($.weight?.toString()) ? $.weight : 1
     return {
       weight,
       clip: $.name,
