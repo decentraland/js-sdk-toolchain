@@ -22,14 +22,17 @@ export function isValidSpeed(speed: string | undefined): boolean {
 }
 
 export function mapAnimationGroupsToStates(animations: AnimationGroup[]): PBAnimationState[] {
-  return animations.map(($) => ({
-    clip: $.name,
-    playing: !!$.isPlaying,
-    weight: $.weight ?? 1,
-    speed: $.speedRatio ?? 1,
-    loop: $.loopAnimation ?? false,
-    shouldReset: false
-  }))
+  return animations.map(($) => {
+    const weight = isValidWeight($.weight.toString()) ? $.weight : 1
+    return {
+      weight,
+      clip: $.name,
+      playing: !!$.isPlaying,
+      speed: $.speedRatio ?? 1,
+      loop: $.loopAnimation ?? false,
+      shouldReset: false
+    }
+  })
 }
 
 export async function initializeAnimatorComponent(
