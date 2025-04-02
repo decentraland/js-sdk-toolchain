@@ -1,8 +1,8 @@
-import * as fs from 'fs'
-import * as path from 'path'
+const fs = require('fs')
+const path = require('path')
 
 // Function to recursively find all package.json files
-function findPackageJsonFiles(dir: string, fileList: string[] = []): string[] {
+function findPackageJsonFiles(dir, fileList = []) {
   const files = fs.readdirSync(dir)
 
   for (const file of files) {
@@ -20,21 +20,22 @@ function findPackageJsonFiles(dir: string, fileList: string[] = []): string[] {
 }
 
 // Check for local package dependencies
-function checkNoLocalPackages(packageJsonPath: string): boolean {
+function checkNoLocalPackages(packageJsonPath) {
   try {
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'))
-    const errors: string[] = []
+    const errors = []
 
     // Check both dependencies and devDependencies
     for (const deps of [packageJson.dependencies, packageJson.devDependencies]) {
       if (!deps) continue
 
-      for (const [key, value] of Object.entries(deps as Record<string, string>)) {
+      for (const [key, value] of Object.entries(deps)) {
         if (
-          value.startsWith('file:') ||
-          value.startsWith('http:') ||
-          value.startsWith('https:') ||
-          value.startsWith('git:')
+          (value.startsWith('file:') ||
+            value.startsWith('http:') ||
+            value.startsWith('https:') ||
+            value.startsWith('git:')) &&
+          !value.startsWith('https://sdk-team-cdn.decentraland.org')
         ) {
           errors.push(`Dependency ${key} is not pointing to a published version: ${value}`)
         }
@@ -49,13 +50,13 @@ function checkNoLocalPackages(packageJsonPath: string): boolean {
 
     return true
   } catch (error) {
-    console.error(`Error processing ${packageJsonPath}: ${(error as Error).message}`)
+    console.error(`Error processing ${packageJsonPath}: ${error.message}`)
     return false
   }
 }
 
 // Main function
-function main(): void {
+function main() {
   console.log('Checking for local package dependencies...')
   const packageJsonFiles = findPackageJsonFiles('.')
   console.log(`Found ${packageJsonFiles.length} package.json files to check.`)

@@ -17,14 +17,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm install -g typescript ts-node
 
       - name: Check for local package dependencies
         id: dependency-check
-        run: ts-node .github/scripts/check-no-local-packages.ts
+        run: node .github/scripts/check-no-local-packages.cjs
         continue-on-error: true
 
       - name: Add PR comment if check fails
