@@ -2,7 +2,7 @@
   "name": "@dcl/inspector",
   "version": "0.1.0",
   "dependencies": {
-    "@dcl/asset-packs": "2.2.1",
+    "@dcl/asset-packs": "https://sdk-team-cdn.decentraland.org/@dcl/asset-packs/branch/fix/show-text-action/dcl-asset-packs-2.2.2-14230390563.commit-aae96e9.tgz",
     "ts-deepmerge": "^7.0.0"
   },
   "devDependencies": {
