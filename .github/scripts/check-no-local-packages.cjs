@@ -31,11 +31,10 @@ function checkNoLocalPackages(packageJsonPath) {
 
       for (const [key, value] of Object.entries(deps)) {
         if (
-          (value.startsWith('file:') ||
-            value.startsWith('http:') ||
-            value.startsWith('https:') ||
-            value.startsWith('git:')) &&
-          !value.startsWith('https://sdk-team-cdn.decentraland.org')
+          value.startsWith('file:') ||
+          value.startsWith('http:') ||
+          value.startsWith('https:') ||
+          value.startsWith('git:')
         ) {
           errors.push(`Dependency ${key} is not pointing to a published version: ${value}`)
         }
@@ -57,8 +56,11 @@ function checkNoLocalPackages(packageJsonPath) {
 
 // Main function
 function main() {
-  console.log('Checking for local package dependencies...')
-  const packageJsonFiles = findPackageJsonFiles('.')
+  // Check if a directory was passed as an argument
+  const targetDir = process.argv[2] || '.'
+
+  console.log(`Checking for local package dependencies in ${targetDir}...`)
+  const packageJsonFiles = findPackageJsonFiles(targetDir)
   console.log(`Found ${packageJsonFiles.length} package.json files to check.`)
 
   let hasErrors = false
@@ -72,11 +74,11 @@ function main() {
 
   if (hasErrors) {
     console.error(
-      '\n\nFound packages with local dependencies. Please publish these dependencies instead of using local references.'
+      `\n\nFound packages with local dependencies in ${targetDir}. Please publish these dependencies instead of using local references.`
     )
     process.exit(1)
   } else {
-    console.log('\n\nNo local dependencies found. All good!')
+    console.log(`\n\nNo local dependencies found in ${targetDir}. All good!`)
   }
 }
 
