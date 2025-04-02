@@ -1,0 +1,47 @@
+name: Check Local Package Dependencies
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  check-no-local-packages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install -g typescript ts-node
+
+      - name: Check for local package dependencies
+        id: dependency-check
+        run: ts-node .github/scripts/check-no-local-packages.ts
+        continue-on-error: true
+
+      - name: Add PR comment if check fails
+        if: ${{ github.event_name == 'pull_request' && steps.dependency-check.outcome == 'failure' }}
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '⚠️ **Local Dependencies Detected**\n\nThis PR contains package dependencies that use local paths (`file:`) or non-allowed URLs. These must be published and referenced properly before merging.\n\nReview the workflow logs for details on which dependencies need to be fixed.'
+            })
+
+      - name: Fail check if local dependencies found
+        if: steps.dependency-check.outcome == 'failure'
+        run: |
+          echo "❌ Local package dependencies detected! These must be fixed before merging."
+          exit 1

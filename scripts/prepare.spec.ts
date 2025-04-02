@@ -35,7 +35,6 @@ flow('build-all', () => {
     for (const dependency of processWithOptimisticDependencies(graph)) {
       const projectDirectory = resolveProjectPath(dependency)
       installCrossDependencies(projectDirectory)
-      checkNoLocalPackages(projectDirectory)
       itExecutes('npm pack', projectDirectory)
     }
   })
@@ -139,11 +138,10 @@ function checkNoLocalPackages(...paths: string[]) {
       const errors: string[] = []
       for (const [key, value] of Object.entries({ ...dependencies, ...devDependencies } as Record<string, string>)) {
         if (
-          (value.startsWith('file:') ||
-            value.startsWith('http:') ||
-            value.startsWith('https:') ||
-            value.startsWith('git:')) &&
-          !value.startsWith('https://sdk-team-cdn.decentraland.org')
+          value.startsWith('file:') ||
+          value.startsWith('http:') ||
+          value.startsWith('https:') ||
+          value.startsWith('git:')
         ) {
           errors.push(`Dependency ${key} is not pointing to a published version: ${value}`)
         }
