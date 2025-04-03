@@ -144,17 +144,17 @@ export function createReconciler(
 
     if (update.props) {
       const pointerEventSystem =
-        update.component === 'onMouseDown' || update.component === 'onInputDown'
+        (update.component === 'onMouseDown' || update.component === 'onInputDown')
           ? pointerEvents.onPointerDown
-          : update.component === 'onMouseUp' || update.component === 'onInputUp'
+          : (update.component === 'onMouseUp' || update.component === 'onInputUp')
           ? pointerEvents.onPointerUp
           : update.component === 'onMouseEnter'
           ? pointerEvents.onPointerHoverEnter
           : update.component === 'onMouseLeave'
           ? pointerEvents.onPointerHoverLeave
-          : update.component === 'onMouseDrag' || update.component === 'onInputDrag'
+          : (update.component === 'onMouseDrag' || update.component === 'onInputDrag')
           ? pointerEvents.onPointerDrag
-          : update.component === 'onMouseDragLocked' || update.component === 'onInputDragLocked'
+          : (update.component === 'onMouseDragLocked' || update.component === 'onInputDragLocked')
           ? pointerEvents.onPointerDragLocked
           : (update.component === 'onMouseDragEnd' || update.component === 'onInputDragEnd') && pointerEvents.onPointerDragEnd
 
