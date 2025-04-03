@@ -28,7 +28,6 @@ import {
 import { PBUiTransform } from '@dcl/ecs/dist/components'
 import { UiTransformProps } from './types'
 
-
 /**
  * @internal
  */

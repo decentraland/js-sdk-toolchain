@@ -151,16 +151,16 @@ export function createReconciler(
         update.component === 'onMouseDown'
           ? pointerEvents.onPointerDown
           : update.component === 'onMouseUp'
-            ? pointerEvents.onPointerUp
-            : update.component === 'onMouseEnter'
-              ? pointerEvents.onPointerHoverEnter
-              : update.component === 'onMouseLeave'
-                ? pointerEvents.onPointerHoverLeave
-                : update.component === 'onMouseDrag'
-                  ? pointerEvents.onPointerDrag
-                  : update.component === 'onMouseDragLocked'
-                    ? pointerEvents.onPointerDragLocked
-                    : update.component === 'onMouseDragEnd' && pointerEvents.onPointerDragEnd
+          ? pointerEvents.onPointerUp
+          : update.component === 'onMouseEnter'
+          ? pointerEvents.onPointerHoverEnter
+          : update.component === 'onMouseLeave'
+          ? pointerEvents.onPointerHoverLeave
+          : update.component === 'onMouseDrag'
+          ? pointerEvents.onPointerDrag
+          : update.component === 'onMouseDragLocked'
+          ? pointerEvents.onPointerDragLocked
+          : update.component === 'onMouseDragEnd' && pointerEvents.onPointerDragEnd
 
       if (pointerEventSystem) {
         pointerEventSystem(
@@ -408,7 +408,7 @@ export function createReconciler(
     null,
     '',
     /* istanbul ignore next */
-    function () { },
+    function () {},
     null
   )
 
