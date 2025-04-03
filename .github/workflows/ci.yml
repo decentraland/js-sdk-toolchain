@@ -481,25 +481,25 @@ jobs:
       - name: Set up artifacts for checking
         run: |
           echo "Setting up built artifacts for checking..."
-          mkdir -p extracted-packages/package
+          mkdir -p extracted-packages
 
-          # Extract one package to check its dependencies
-          for pkg in downloaded-packages/**/*.tgz; do
+          # Extract all packages to separate directories
+          find downloaded-packages -type f -name "*.tgz" | while read pkg; do
             if [ -f "$pkg" ]; then
-              echo "Extracting $pkg for dependency checking"
-              tar -xzf "$pkg" -C extracted-packages/package
-              break
+              # Get package name from the filename
+              pkg_name=$(basename "$pkg" .tgz)
+              
+              # Create directory for this package
+              mkdir -p "extracted-packages/$pkg_name"
+              
+              echo "Extracting $pkg to extracted-packages/$pkg_name"
+              tar -xzf "$pkg" -C "extracted-packages/$pkg_name"
             fi
           done
 
-          # Show what we extracted
-          if [ -f "extracted-packages/package/package.json" ]; then
-            echo "Successfully extracted package.json:"
-            cat extracted-packages/package/package.json
-          else
-            echo "ERROR: Could not find any package.json in the artifacts"
-            exit 1
-          fi
+          # List all extracted packages
+          echo "Extracted packages:"
+          find extracted-packages -name "package.json" | sort
 
       - name: Check for local package dependencies
         id: dependency-check
