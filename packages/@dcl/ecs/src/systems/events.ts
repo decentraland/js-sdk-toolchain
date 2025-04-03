@@ -387,14 +387,17 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
         optsList = o
       }
 
-      const previous = getEvent(entity)?.get(ty) ?? new Map<InputAction, EventSystemOptionsCallback>();
+      const previous = getEvent(entity).get(ty) ?? new Map<InputAction, EventSystemOptionsCallback>();
 
       const callbacks = new Map();
       for (const opts of optsList) {
-        if (previous.get(opts.button) !== opts) {
-          if (previous.has(opts.button)) {
+        const prevOpts = previous.get(opts.button)
+        if (prevOpts !== undefined) {
+          if (prevOpts.hoverText !== opts.hoverText || prevOpts.maxDistance !== opts.maxDistance || prevOpts.showFeedback !== opts.showFeedback || prevOpts.showHighlight !== opts.showHighlight) {
             removePointerEvent(entity, getPointerEvent(ty), opts.button)
+            setPointerEvent(entity, getPointerEvent(ty), opts)
           }
+        } else {
           setPointerEvent(entity, getPointerEvent(ty), opts)
         }
         callbacks.set(opts.button, opts);
