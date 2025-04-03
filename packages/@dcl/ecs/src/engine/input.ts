@@ -91,7 +91,7 @@ export type IInputSystem = {
    * @param entity - the entity to query, ignore for global
    * @returns the input command info or undefined if there is no command in the last tick-update
    */
-  getInputCommands: () => PBPointerEventsResult[]
+  getInputCommands: () => Generator<PBPointerEventsResult>
 }
 
 const InputStateUpdateSystemPriority = 1 << 20
@@ -304,8 +304,10 @@ export function createInputSystem(engine: IEngine): IInputSystem {
     return globalState.buttonState.get(inputAction)?.state === PointerEventType.PET_DOWN
   }
 
-  function getInputCommands() {
-    return globalState.thisFrameCommands
+  function *getInputCommands() {
+    for (let i = globalState.thisFrameCommands.length - 1; i >= 0; i--) {
+      yield globalState.thisFrameCommands[i];
+    }
   }
 
   return {

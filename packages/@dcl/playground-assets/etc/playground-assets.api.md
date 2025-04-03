@@ -1435,7 +1435,7 @@ export type IInputSystem = {
     isTriggered: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => boolean;
     isPressed: (inputAction: InputAction) => boolean;
     getInputCommand: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => PBPointerEventsResult | null;
-    getInputCommands: () => PBPointerEventsResult[];
+    getInputCommands: () => Generator<PBPointerEventsResult>;
 };
 
 // @public
