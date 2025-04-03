@@ -82,6 +82,16 @@ export type IInputSystem = {
     pointerEventType: PointerEventType,
     entity?: Entity
   ) => PBPointerEventsResult | null
+
+  /**
+   * @public
+   * Get the input command info if a pointer event has been emitted in the last tick-update.
+   * @param inputAction - the input action to query
+   * @param pointerEventType - the pointer event type to query
+   * @param entity - the entity to query, ignore for global
+   * @returns the input command info or undefined if there is no command in the last tick-update
+   */
+  getInputCommands: () => PBPointerEventsResult[]
 }
 
 const InputStateUpdateSystemPriority = 1 << 20
@@ -294,11 +304,16 @@ export function createInputSystem(engine: IEngine): IInputSystem {
     return globalState.buttonState.get(inputAction)?.state === PointerEventType.PET_DOWN
   }
 
+  function getInputCommands() {
+    return globalState.thisFrameCommands
+  }
+
   return {
     isPressed,
     getClick,
     getInputCommand,
     isClicked,
-    isTriggered
+    isTriggered,
+    getInputCommands
   }
 }

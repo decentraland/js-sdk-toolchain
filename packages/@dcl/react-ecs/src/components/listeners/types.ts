@@ -10,7 +10,7 @@ export type Callback = () => void
  * or a map of `InputAction`s to functions.
  * @public
  */
-export type MultiCallback = EventSystemCallback | Partial<Record<InputAction, EventSystemCallback>>
+export type MultiCallback = Partial<Record<InputAction, EventSystemCallback>>
 
 /**
  * User key event Listeners
@@ -18,19 +18,29 @@ export type MultiCallback = EventSystemCallback | Partial<Record<InputAction, Ev
  */
 export type Listeners = {
   /** triggered on mouse down event */
-  onMouseDown?: MultiCallback
+  onMouseDown?: EventSystemCallback
   /** triggered on mouse up event */
-  onMouseUp?: MultiCallback
+  onMouseUp?: EventSystemCallback
   /** triggered on mouse hover event */
   onMouseEnter?: EventSystemCallback
   /** triggered on mouse leave event */
   onMouseLeave?: EventSystemCallback
   /** triggered on mouse drag event */
-  onMouseDrag?: MultiCallback
+  onMouseDrag?: EventSystemCallback
   /** triggered on mouse drag event */
-  onMouseDragLocked?: MultiCallback
+  onMouseDragLocked?: EventSystemCallback
   /** triggered on mouse drag event */
-  onMouseDragEnd?: MultiCallback
+  onMouseDragEnd?: EventSystemCallback
+  /** triggered on input down event */
+  onInputDown?: MultiCallback,
+  /** triggered on input up event */
+  onInputUp?: MultiCallback,
+  /** triggered on input drag event */
+  onInputDrag?: MultiCallback,
+  /** triggered on input drag event */
+  onInputDragLocked?: MultiCallback,
+  /** triggered on input drag event */
+  onInputDragEnd?: MultiCallback,
 }
 
 const listeners: Listeners = {
@@ -40,7 +50,12 @@ const listeners: Listeners = {
   onMouseLeave: undefined,
   onMouseDrag: undefined,
   onMouseDragLocked: undefined,
-  onMouseDragEnd: undefined
+  onMouseDragEnd: undefined,
+  onInputDown: undefined,
+  onInputUp: undefined,
+  onInputDrag: undefined,
+  onInputDragLocked: undefined,
+  onInputDragEnd: undefined,
 }
 const listenersKey = Object.keys(listeners)
 

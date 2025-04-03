@@ -43,7 +43,12 @@ function getPointerEnum(pointerKey: keyof Listeners): PointerEventType {
     onMouseLeave: PointerEventType.PET_HOVER_LEAVE,
     onMouseDrag: PointerEventType.PET_DRAG,
     onMouseDragLocked: PointerEventType.PET_DRAG_LOCKED,
-    onMouseDragEnd: PointerEventType.PET_DRAG_END
+    onMouseDragEnd: PointerEventType.PET_DRAG_END,
+    onInputDown: PointerEventType.PET_DOWN,
+    onInputUp: PointerEventType.PET_UP,
+    onInputDrag: PointerEventType.PET_DRAG,
+    onInputDragLocked: PointerEventType.PET_DRAG_LOCKED,
+    onInputDragEnd: PointerEventType.PET_DRAG_END
   }
   return pointers[pointerKey]
 }
@@ -72,7 +77,6 @@ export function createReconciler(
   const entities = new Set<Entity>()
   // Store the onChange callbacks to be runned every time a Result has changed
   const changeEvents = new Map<Entity, Map<number, OnChangeState | undefined>>()
-  const clickEvents = new Map<Entity, Map<PointerEventType, MultiCallback>>()
   // Initialize components
   const UiTransform = components.UiTransform(engine)
   const UiText = components.UiText(engine)
@@ -95,19 +99,6 @@ export function createReconciler(
     uiDropdown: UiDropdown.componentId
   }
 
-  function pointerEventCallback(entity: Entity, pointerEvent: PointerEventType, event: PBPointerEventsResult) {
-    const callback = clickEvents.get(entity)?.get(pointerEvent)
-    if (typeof callback === 'function') {
-      callback(event)
-    } else if (typeof callback === 'object' && callback !== null) {
-      const innerCallback = callback[event.button]
-      if (typeof innerCallback === 'function') {
-        innerCallback(event)
-      }
-    }
-    return
-  }
-
   function updateTree(instance: Instance, props: Partial<{ rightOf: Entity; parent: Entity }>) {
     upsertComponent(instance, props as { rightOf: number; parent: number }, 'uiTransform')
   }
@@ -124,66 +115,77 @@ export function createReconciler(
         | 'onMouseDrag'
         | 'onMouseDragLocked'
         | 'onMouseDragEnd'
+        | 'onInputDown'
+        | 'onInputUp'
+        | 'onInputDrag'
+        | 'onInputDragLocked'
+        | 'onInputDragEnd'
       >
     >
   ) {
     if (update.type === 'delete' || !update.props) {
-      clickEvents.get(instance.entity)?.delete(getPointerEnum(update.component))
-      if (update.component === 'onMouseDown') {
+      if (update.component === 'onMouseDown' || update.component === 'onInputDown') {
         pointerEvents.removeOnPointerDown(instance.entity)
-      } else if (update.component === 'onMouseUp') {
+      } else if (update.component === 'onMouseUp' || update.component === 'onInputUp') {
         pointerEvents.removeOnPointerUp(instance.entity)
       } else if (update.component === 'onMouseEnter') {
         pointerEvents.removeOnPointerHoverEnter(instance.entity)
       } else if (update.component === 'onMouseLeave') {
         pointerEvents.removeOnPointerHoverLeave(instance.entity)
-      } else if (update.component === 'onMouseDrag') {
+      } else if (update.component === 'onMouseDrag' || update.component === 'onInputDrag') {
         pointerEvents.removeOnPointerDrag(instance.entity)
-      } else if (update.component === 'onMouseDragLocked') {
+      } else if (update.component === 'onMouseDragLocked' || update.component === 'onInputDragLocked') {
         pointerEvents.removeOnPointerDragLocked(instance.entity)
-      } else if (update.component === 'onMouseDragEnd') {
+      } else if (update.component === 'onMouseDragEnd' || update.component === 'onInputDragEnd') {
         pointerEvents.removeOnPointerDragEnd(instance.entity)
       }
       return
     }
 
     if (update.props) {
-      const pointerEvent = getPointerEnum(update.component)
-      const entityEvent =
-        clickEvents.get(instance.entity) || clickEvents.set(instance.entity, new Map()).get(instance.entity)!
-      const alreadyHasPointerEvent = entityEvent.get(pointerEvent)
-      entityEvent.set(pointerEvent, update.props as MultiCallback)
-
-      if (alreadyHasPointerEvent) return
-
       const pointerEventSystem =
-        update.component === 'onMouseDown'
+        update.component === 'onMouseDown' || update.component === 'onInputDown'
           ? pointerEvents.onPointerDown
-          : update.component === 'onMouseUp'
+          : update.component === 'onMouseUp' || update.component === 'onInputUp'
           ? pointerEvents.onPointerUp
           : update.component === 'onMouseEnter'
           ? pointerEvents.onPointerHoverEnter
           : update.component === 'onMouseLeave'
           ? pointerEvents.onPointerHoverLeave
-          : update.component === 'onMouseDrag'
+          : update.component === 'onMouseDrag' || update.component === 'onInputDrag'
           ? pointerEvents.onPointerDrag
-          : update.component === 'onMouseDragLocked'
+          : update.component === 'onMouseDragLocked' || update.component === 'onInputDragLocked'
           ? pointerEvents.onPointerDragLocked
-          : update.component === 'onMouseDragEnd' && pointerEvents.onPointerDragEnd
+          : (update.component === 'onMouseDragEnd' || update.component === 'onInputDragEnd') && pointerEvents.onPointerDragEnd
 
       if (pointerEventSystem) {
-        pointerEventSystem(
-          {
-            entity: instance.entity,
-            opts: {
-              button: typeof update.props === 'function' ? InputAction.IA_POINTER : InputAction.IA_ANY,
-              // We add this showFeedBack so the pointerEventSystem creates a PointerEvent component with our entity
-              // This is needed for the renderer to know which entities are clickeables
-              showFeedback: true
+        if (typeof update.props == 'function') {
+          pointerEventSystem(
+            {
+              entity: instance.entity,
+              opts: {
+                button: InputAction.IA_POINTER,
+                // We add this showFeedBack so the pointerEventSystem creates a PointerEvent component with our entity
+                // This is needed for the renderer to know which entities are clickeables
+                showFeedback: true
+              }
+            },
+            update.props as EventSystemCallback
+          )
+        } else {
+          // force the right overload (the single arg version doesn't exist for onPointerHoverEnter or onPointerHoverLeave, 
+          // but we don't have onInputXXX components for those)
+          (pointerEventSystem as PointerEventsSystem['onPointerDown'])(
+            {
+              entity: instance.entity,
+              optsList: Object.entries(update.props).map(([button, cb]) => ({
+                button: button as unknown as InputAction,
+                showFeedback: true,
+                cb
+              }))
             }
-          },
-          (event: PBPointerEventsResult) => pointerEventCallback(instance.entity, pointerEvent, event)
-        )
+          )
+        }
       }
     }
   }
@@ -236,7 +238,6 @@ export function createReconciler(
 
   function removeChildEntity(instance: Instance) {
     changeEvents.delete(instance.entity)
-    clickEvents.delete(instance.entity)
     engine.removeEntity(instance.entity)
     for (const child of instance._child) {
       removeChildEntity(child)

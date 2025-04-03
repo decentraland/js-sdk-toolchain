@@ -1154,13 +1154,18 @@ export type EntityComponents = {
     uiBackground: PBUiBackground;
     uiInput: PBUiInput;
     uiDropdown: PBUiDropdown;
-    onMouseDown: MultiCallback;
-    onMouseUp: MultiCallback;
+    onMouseDown: EventSystemCallback;
+    onMouseUp: EventSystemCallback;
     onMouseEnter: EventSystemCallback;
     onMouseLeave: EventSystemCallback;
-    onMouseDrag: MultiCallback;
-    onMouseDragLocked: MultiCallback;
-    onMouseDragEnd: MultiCallback;
+    onMouseDrag: EventSystemCallback;
+    onMouseDragLocked: EventSystemCallback;
+    onMouseDragEnd: EventSystemCallback;
+    onInputDown: MultiCallback;
+    onInputUp: MultiCallback;
+    onInputDrag: MultiCallback;
+    onInputDragLocked: MultiCallback;
+    onInputDragEnd: MultiCallback;
 };
 
 // @public (undocumented)
@@ -1210,6 +1215,13 @@ export type EventSystemOptions = {
     maxDistance?: number;
     showFeedback?: boolean;
     showHighlight?: boolean;
+};
+
+// Warning: (ae-missing-release-tag) "EventSystemOptionsCallback" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type EventSystemOptionsCallback = EventSystemOptions & {
+    cb: EventSystemCallback;
 };
 
 // @public
@@ -1423,6 +1435,7 @@ export type IInputSystem = {
     isTriggered: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => boolean;
     isPressed: (inputAction: InputAction) => boolean;
     getInputCommand: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => PBPointerEventsResult | null;
+    getInputCommands: () => PBPointerEventsResult[];
 };
 
 // @public
@@ -1657,13 +1670,18 @@ export const Light: LastWriteWinElementSetComponentDefinition<PBLight>;
 
 // @public
 export type Listeners = {
-    onMouseDown?: MultiCallback;
-    onMouseUp?: MultiCallback;
+    onMouseDown?: EventSystemCallback;
+    onMouseUp?: EventSystemCallback;
     onMouseEnter?: EventSystemCallback;
     onMouseLeave?: EventSystemCallback;
-    onMouseDrag?: MultiCallback;
-    onMouseDragLocked?: MultiCallback;
-    onMouseDragEnd?: MultiCallback;
+    onMouseDrag?: EventSystemCallback;
+    onMouseDragLocked?: EventSystemCallback;
+    onMouseDragEnd?: EventSystemCallback;
+    onInputDown?: MultiCallback;
+    onInputUp?: MultiCallback;
+    onInputDrag?: MultiCallback;
+    onInputDragLocked?: MultiCallback;
+    onInputDragEnd?: MultiCallback;
 };
 
 // @public (undocumented)
@@ -1950,7 +1968,7 @@ export namespace Move {
 }
 
 // @public
-export type MultiCallback = EventSystemCallback | Partial<Record<InputAction, EventSystemCallback>>;
+export type MultiCallback = Partial<Record<InputAction, EventSystemCallback>>;
 
 // Warning: (ae-missing-release-tag) "Name" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -3702,18 +3720,34 @@ export const PointerEventsResult: GrowOnlyValueSetComponentDefinition<PBPointerE
 export interface PointerEventsSystem {
     onPointerDown(pointerData: {
         entity: Entity;
+        optsList: EventSystemOptionsCallback[];
+    }): void;
+    onPointerDown(pointerData: {
+        entity: Entity;
         opts?: Partial<EventSystemOptions>;
     }, cb: EventSystemCallback): void;
     // @deprecated (undocumented)
     onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
     onPointerDrag(pointerData: {
         entity: Entity;
+        optsList: EventSystemOptionsCallback[];
+    }): void;
+    onPointerDrag(pointerData: {
+        entity: Entity;
         opts?: Partial<EventSystemOptions>;
     }, cb: EventSystemCallback): void;
     onPointerDragEnd(pointerData: {
         entity: Entity;
+        optsList: EventSystemOptionsCallback[];
+    }): void;
+    onPointerDragEnd(pointerData: {
+        entity: Entity;
         opts?: Partial<EventSystemOptions>;
     }, cb: EventSystemCallback): void;
+    onPointerDragLocked(pointerData: {
+        entity: Entity;
+        optsList: EventSystemOptionsCallback[];
+    }): void;
     onPointerDragLocked(pointerData: {
         entity: Entity;
         opts?: Partial<EventSystemOptions>;
@@ -3726,6 +3760,10 @@ export interface PointerEventsSystem {
         entity: Entity;
         opts?: Partial<EventSystemOptions>;
     }, cb: EventSystemCallback): void;
+    onPointerUp(pointerData: {
+        entity: Entity;
+        optsList: EventSystemOptionsCallback[];
+    }): void;
     onPointerUp(pointerData: {
         entity: Entity;
         opts?: Partial<EventSystemOptions>;

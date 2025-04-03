@@ -49,6 +49,11 @@ export function Dropdown(props: UiDropdownProps) {
     onMouseDrag,
     onMouseDragLocked,
     onMouseDragEnd,
+    onInputDown,
+    onInputUp,
+    onInputDrag,
+    onInputDragLocked,
+    onInputDragEnd,
     ...otherProps
   } = props
   const dropdownProps = parseUiDropdown(otherProps)
@@ -61,7 +66,12 @@ export function Dropdown(props: UiDropdownProps) {
     onMouseLeave,
     onMouseDrag,
     onMouseDragLocked,
-    onMouseDragEnd
+    onMouseDragEnd,
+    onInputDown,
+    onInputUp,
+    onInputDrag,
+    onInputDragLocked,
+    onInputDragEnd
   })
   return <entity {...commonProps} uiDropdown={dropdownProps} />
 }

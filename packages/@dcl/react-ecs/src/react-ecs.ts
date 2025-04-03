@@ -19,13 +19,18 @@ export type EntityComponents = {
   uiBackground: PBUiBackground
   uiInput: PBUiInput
   uiDropdown: PBUiDropdown
-  onMouseDown: MultiCallback
-  onMouseUp: MultiCallback
+  onMouseDown: EventSystemCallback
+  onMouseUp: EventSystemCallback
   onMouseEnter: EventSystemCallback
   onMouseLeave: EventSystemCallback
-  onMouseDrag: MultiCallback
-  onMouseDragLocked: MultiCallback
-  onMouseDragEnd: MultiCallback
+  onMouseDrag: EventSystemCallback
+  onMouseDragLocked: EventSystemCallback
+  onMouseDragEnd: EventSystemCallback
+  onInputDown: MultiCallback
+  onInputUp: MultiCallback
+  onInputDrag: MultiCallback
+  onInputDragLocked: MultiCallback
+  onInputDragEnd: MultiCallback  
 }
 
 /**
