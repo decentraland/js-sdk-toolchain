@@ -331,6 +331,11 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
         if (data) {
           checkNotThenable(data.cb(command), 'Event handler returned a thenable. Only synchronous functions are allowed')
         }
+
+        const anyData = typeMap.get(InputAction.IA_ANY)
+        if (anyData) {
+          checkNotThenable(anyData.cb(command), 'Event handler returned a thenable. Only synchronous functions are allowed')
+        }
       }
 
       // check clicks separately
@@ -341,6 +346,11 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
           if (data && inputSystem.getClick(command.button, entity)) {
             checkNotThenable(data.cb(command), 'Click event returned a thenable. Only synchronous functions are allowed')
           }
+
+          const anyData = clickMap.get(InputAction.IA_ANY)
+          if (anyData && inputSystem.getClick(command.button, entity)) {
+            checkNotThenable(anyData.cb(command), 'Event handler returned a thenable. Only synchronous functions are allowed')
+          }            
         }
       }
     }
