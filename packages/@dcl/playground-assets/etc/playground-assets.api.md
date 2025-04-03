@@ -3249,6 +3249,7 @@ export interface PBTextureCamera {
         $case: "orthographic";
         orthographic: Orthographic;
     } | undefined;
+    volume?: number | undefined;
     width?: number | undefined;
 }
 

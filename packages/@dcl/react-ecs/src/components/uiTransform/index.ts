@@ -15,7 +15,6 @@ import {
   parsePosition,
   parseSize
 } from './utils'
-import { UiTransformProps } from './types'
 import {
   PointerFilterMode,
   YGAlign,
