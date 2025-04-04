@@ -179,7 +179,7 @@ export function createReconciler(
             {
               entity: instance.entity,
               optsList: Object.entries(update.props).map(([button, cb]) => ({
-                button: button as unknown as InputAction,
+                button: Number(button) as InputAction,
                 showFeedback: true,
                 cb
               }))
