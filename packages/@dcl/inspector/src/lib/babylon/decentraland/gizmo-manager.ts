@@ -57,6 +57,20 @@ function calculateCenter(positions: Vector3[]): Vector3 {
   return sum.scale(1 / positions.length)
 }
 
+function calculateAverageRotation(rotations: Quaternion[]): Quaternion {
+  if (rotations.length === 0) return new Quaternion()
+
+  // Start with the first rotation
+  const result = rotations[0].clone()
+
+  // Average with the rest of the rotations
+  for (let i = 1; i < rotations.length; i++) {
+    Quaternion.SlerpToRef(result, rotations[i], 1 / (i + 1), result)
+  }
+
+  return result
+}
+
 export function createGizmoManager(context: SceneContext) {
   // events
   const events = mitt<{ change: void }>()
@@ -71,7 +85,7 @@ export function createGizmoManager(context: SceneContext) {
   gizmoManager.rotationGizmoEnabled = false
   gizmoManager.scaleGizmoEnabled = false
   gizmoManager.gizmos.positionGizmo!.updateGizmoRotationToMatchAttachedMesh = false
-  gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh = true
+  gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh = false
 
   // Configure all gizmos to only work with left click
   if (gizmoManager.gizmos.positionGizmo) configureGizmoButtons(gizmoManager.gizmos.positionGizmo, [LEFT_BUTTON])
@@ -81,7 +95,6 @@ export function createGizmoManager(context: SceneContext) {
   let selectedEntities: EcsEntity[] = []
   let rotationGizmoAlignmentDisabled = false
   let positionGizmoAlignmentDisabled = false
-  let shouldRestorRotationGizmoAlignment = false
   let shouldRestorPositionGizmoAlignment = false
   let isEnabled = true
 
@@ -89,15 +102,12 @@ export function createGizmoManager(context: SceneContext) {
     const isProportional =
       areProportional(value.scale.x, value.scale.y) && areProportional(value.scale.y, value.scale.z)
     rotationGizmoAlignmentDisabled = !isProportional
-    if (!isProportional && !isRotationGizmoWorldAligned()) {
+    if (!isProportional) {
       setRotationGizmoWorldAligned(true) // set to world
-      shouldRestorRotationGizmoAlignment = true
-    } else if (shouldRestorRotationGizmoAlignment && isProportional) {
-      setRotationGizmoWorldAligned(false) // restore to local
-      shouldRestorRotationGizmoAlignment = false
     } else {
-      events.emit('change')
+      setRotationGizmoWorldAligned(false) // restore to local
     }
+    events.emit('change')
   }
 
   function fixPositionGizmoAlignment(value: TransformType) {
@@ -178,11 +188,9 @@ export function createGizmoManager(context: SceneContext) {
       const parent = context.getEntityOrNull(originalParent ?? context.rootNode.entityId)
 
       entity.setParent(parent)
+      const transform = parent === context.rootNode ? computeWorldTransform(entity) : getTransform(entity)
 
-      updateEntityTransform(entity.entityId, {
-        ...(parent === context.rootNode ? computeWorldTransform(entity) : getTransform(entity)),
-        parent: originalParent
-      })
+      updateEntityTransform(entity.entityId, { ...transform, parent: originalParent })
     }
 
     void context.operations.dispatch()
@@ -208,12 +216,20 @@ export function createGizmoManager(context: SceneContext) {
       const { x, y, z } = computeWorldTransform(entity).position
       return new Vector3(x, y, z)
     })
+
+    const rotations = selectedEntities.map((entity) => {
+      const { x, y, z, w } = computeWorldTransform(entity).rotation
+      return new Quaternion(x, y, z, w)
+    })
+
     const centroidPosition = calculateCenter(positions)
+    const centroidRotation = calculateAverageRotation(rotations)
     const dummyNode = getDummyNode()
 
-    // Set the dummy node position on centroid. This should be the first thing to do on the dummy node
-    // so everything aligns to the right position afterwards.
+    // Set the dummy node transform
     dummyNode.position = centroidPosition
+    dummyNode.rotationQuaternion = centroidRotation
+    dummyNode.scaling = new Vector3(1, 1, 1)
 
     for (const entity of selectedEntities) {
       entity.setParent(dummyNode)
