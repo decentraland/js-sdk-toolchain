@@ -2,14 +2,15 @@ on:
   push:
     branches:
       - main
+      - protocol-squad
   pull_request:
   release:
     types:
       - created
 
 env:
-  BRANCH_TAG: ${{ github.head_ref == 'protocol-squad' && 'protocol-squad' || '' }}
-  IS_A_PR: ${{ github.event.pull_request.number != 'null' && github.head_ref != 'protocol-squad' }}
+  BRANCH_TAG: ${{ github.ref_name == 'protocol-squad' && 'protocol-squad' || '' }}
+  IS_A_PR: ${{ github.event.pull_request.number != 'null' && github.ref_name != 'protocol-squad' }}
 
 name: CI
 jobs:
@@ -116,7 +117,7 @@ jobs:
           echo "run from a PR"
           echo "from env '${{env.IS_A_PR}}'"
           echo "- '${{github.event.pull_request.number}}'"
-          echo "- env '${{github.head_ref}}'"
+          echo "- env '${{github.ref_name}}'"
 
       - name: install
         run: make install
@@ -159,7 +160,7 @@ jobs:
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
-          BRANCH_NAME: ${{ github.head_ref }}
+          BRANCH_NAME: ${{ github.ref_name }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
@@ -182,7 +183,7 @@ jobs:
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
-          BRANCH_NAME: ${{ github.head_ref }}
+          BRANCH_NAME: ${{ github.ref_name }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
@@ -217,10 +218,11 @@ jobs:
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
-          BRANCH_NAME: ${{ github.head_ref }}
+          BRANCH_NAME: ${{ github.ref_name }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
+
 
       - name: publish @dcl/inspector package
         uses: decentraland/oddish-action@master
@@ -240,7 +242,7 @@ jobs:
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
-          BRANCH_NAME: ${{ github.head_ref }}
+          BRANCH_NAME: ${{ github.ref_name }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
@@ -277,7 +279,7 @@ jobs:
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
-          BRANCH_NAME: ${{ github.head_ref }}
+          BRANCH_NAME: ${{ github.ref_name }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
@@ -321,7 +323,7 @@ jobs:
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
-          BRANCH_NAME: ${{ github.head_ref }}
+          BRANCH_NAME: ${{ github.ref_name }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
