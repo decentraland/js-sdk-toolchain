@@ -2,14 +2,17 @@ on:
   push:
     branches:
       - main
+      - protocol-squad
   pull_request:
   release:
     types:
       - created
 
 env:
-  BRANCH_TAG: ${{ github.head_ref == 'protocol-squad' && 'protocol-squad' || '' }}
-  IS_A_PR: ${{ github.event.pull_request.number != 'null' && github.head_ref != 'protocol-squad' }}
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+  BRANCH_TAG: ${{ (github.head_ref || github.ref_name) == 'protocol-squad' && 'protocol-squad' || '' }}
+  IS_A_PR: ${{ github.event_name == 'pull_request' && (github.head_ref || github.ref_name) != 'protocol-squad' }}
+
 
 name: CI
 jobs:
@@ -75,7 +78,7 @@ jobs:
       - uses: actions/github-script@v6
         id: get-cloudflare-url
         env:
-          BRANCH: ${{ github.head_ref || github.ref }}
+          BRANCH: ${{ env.BRANCH_NAME }}
         with:
           script: return `${process.env.BRANCH.replaceAll('/', '-').substr(0, 28)}.${context.repo.repo}.pages.dev`
           result-encoding: string
@@ -116,7 +119,7 @@ jobs:
           echo "run from a PR"
           echo "from env '${{env.IS_A_PR}}'"
           echo "- '${{github.event.pull_request.number}}'"
-          echo "- env '${{github.head_ref}}'"
+          echo "- env '${{github.ref_name}}'"
 
       - name: install
         run: make install
@@ -155,11 +158,10 @@ jobs:
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/js-runtime'
+          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ env.BRANCH_NAME }}/@dcl/js-runtime'
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
-          BRANCH_NAME: ${{ github.head_ref }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
@@ -178,11 +180,11 @@ jobs:
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/ecs'
+          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ env.BRANCH_NAME }}/@dcl/ecs'
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
-          BRANCH_NAME: ${{ github.head_ref }}
+          BRANCH_NAME: ${{ github.ref_name }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
@@ -213,14 +215,15 @@ jobs:
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/react-ecs'
+          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ env.BRANCH_NAME }}/@dcl/react-ecs'
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
-          BRANCH_NAME: ${{ github.head_ref }}
+          BRANCH_NAME: ${{ github.ref_name }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
+
 
       - name: publish @dcl/inspector package
         uses: decentraland/oddish-action@master
@@ -236,11 +239,11 @@ jobs:
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/inspector'
+          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ env.BRANCH_NAME }}/@dcl/inspector'
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
-          BRANCH_NAME: ${{ github.head_ref }}
+          BRANCH_NAME: ${{ github.ref_name }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
@@ -273,11 +276,11 @@ jobs:
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
+          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ env.BRANCH_NAME }}'
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
-          BRANCH_NAME: ${{ github.head_ref }}
+          BRANCH_NAME: ${{ github.ref_name }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
@@ -317,17 +320,17 @@ jobs:
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
+          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ env.BRANCH_NAME }}'
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
-          BRANCH_NAME: ${{ github.head_ref }}
+          BRANCH_NAME: ${{ github.ref_name }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
       - name: playground upload to s3
-        run: npx @dcl/cdn-uploader@next --bucket ${{ secrets.SDK_TEAM_S3_BUCKET }} --local-folder $(pwd)/packages/@dcl/playground-assets/dist --bucket-folder '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/playground-assets'
+        run: npx @dcl/cdn-uploader@next --bucket ${{ secrets.SDK_TEAM_S3_BUCKET }} --local-folder $(pwd)/packages/@dcl/playground-assets/dist --bucket-folder '@dcl/js-sdk-toolchain/branch/${{ env.BRANCH_NAME }}/playground-assets'
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
@@ -346,7 +349,7 @@ jobs:
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
+          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ env.BRANCH_NAME }}'
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
@@ -356,14 +359,14 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
   notify_deployment:
     needs: [build]
-    if: github.event.pull_request.number != 'null' && github.head_ref != 'protocol-squad'
+    if: github.event.pull_request.number
     runs-on: ubuntu-latest
     name: Deployment Notification
     steps:
       - uses: actions/github-script@v6
         id: get-cloudflare-url
         env:
-          BRANCH: ${{ github.head_ref || github.ref }}
+          BRANCH: ${{ env.BRANCH_NAME }}
         with:
           script: return `${process.env.BRANCH.replaceAll('/', '-').substr(0, 28)}.${context.repo.repo}.pages.dev`
           result-encoding: string
@@ -398,13 +401,13 @@ jobs:
                npm install "${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_inspector_s3_bucket_key }}"
                ```
 
-            - The `/changerealm` command to test [test in-world](https://play.decentraland.zone/?realm=${{ secrets.SDK_TEAM_S3_BASE_URL }}/ipfs/${{ github.head_ref || github.ref }}-e2e)
+            - The `/changerealm` command to test [test in-world](https://play.decentraland.zone/?realm=${{ secrets.SDK_TEAM_S3_BASE_URL }}/ipfs/${{ env.BRANCH_NAME }}-e2e)
                ```
-               /changerealm ${{ secrets.SDK_TEAM_S3_BASE_URL }}/ipfs/${{ github.head_ref || github.ref }}-e2e
+               /changerealm ${{ secrets.SDK_TEAM_S3_BASE_URL }}/ipfs/${{ env.BRANCH_NAME }}-e2e
                ```
 
             - You can preview this build entering:
-              https://playground.decentraland.org/?sdk-branch=${{ github.head_ref || github.ref }}
+              https://playground.decentraland.org/?sdk-branch=${{ env.BRANCH_NAME }}
           edit-mode: replace
       - name: Test SDK Install S3 URL
         run: mkdir -p test_sdk_s3 && cd test_sdk_s3 && npm init --yes && npm install "${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_s3_bucket_key }}"
@@ -434,7 +437,7 @@ jobs:
 
       - name: Set Realm Name
         run: |
-          modified_realm=$(echo "${{ github.head_ref || github.ref }}" | tr '/' '-' | tr -d '@')
+          modified_realm=$(echo "${{ env.BRANCH_NAME }}" | tr '/' '-' | tr -d '@')
           echo "REALM_NAME=${modified_realm}" >> $GITHUB_ENV
       - name: export-static
         run: >
