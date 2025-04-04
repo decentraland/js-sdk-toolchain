@@ -373,8 +373,6 @@ export interface ByteBuffer {
     writeUtf8String(value: string, writeLength?: boolean): void;
 }
 
-// Warning: (tsdoc-missing-deprecation-message) The @deprecated block must include a deprecation message, e.g. describing the recommended alternative
-//
 // @public @deprecated
 export type Callback = () => void;
 
@@ -1217,8 +1215,6 @@ export type EventSystemOptions = {
     showHighlight?: boolean;
 };
 
-// Warning: (ae-missing-release-tag) "EventSystemOptionsCallback" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
 export type EventSystemOptionsCallback = EventSystemOptions & {
     cb: EventSystemCallback;
@@ -1967,6 +1963,17 @@ export namespace Move {
     export function encode(message: Move, writer?: _m0.Writer): _m0.Writer;
 }
 
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+//
 // @public
 export type MultiCallback = Partial<Record<InputAction, EventSystemCallback>>;
 
