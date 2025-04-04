@@ -301,9 +301,9 @@ export function createInputSystem(engine: IEngine): IInputSystem {
     return globalState.buttonState.get(inputAction)?.state === PointerEventType.PET_DOWN
   }
 
-  function *getInputCommands() {
+  function* getInputCommands() {
     for (let i = globalState.thisFrameCommands.length - 1; i >= 0; i--) {
-      yield globalState.thisFrameCommands[i];
+      yield globalState.thisFrameCommands[i]
     }
   }
 

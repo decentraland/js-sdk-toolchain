@@ -8,7 +8,7 @@ import { EventSystemCallback, InputAction } from '@dcl/ecs'
 export type Callback = () => void
 /**
  * a record object mapping `InputAction`s to functions.
- * 
+ *
  * @example
  * onInputDown={{
  *   [InputAction.IA_PRIMARY]: (eventData) => { console.log("primary") },
@@ -62,7 +62,7 @@ const listeners: Listeners = {
   onInputUp: undefined,
   onInputDrag: undefined,
   onInputDragLocked: undefined,
-  onInputDragEnd: undefined,
+  onInputDragEnd: undefined
 }
 const listenersKey = Object.keys(listeners)
 

@@ -30,7 +30,7 @@ export type EntityComponents = {
   onInputUp: MultiCallback
   onInputDrag: MultiCallback
   onInputDragLocked: MultiCallback
-  onInputDragEnd: MultiCallback  
+  onInputDragEnd: MultiCallback
 }
 
 /**
