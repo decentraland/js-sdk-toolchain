@@ -459,6 +459,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
   check-local-deps:
+    name: Check for development dependencies
     needs: [build]
     runs-on: ubuntu-latest
     if: >
@@ -505,29 +506,14 @@ jobs:
         id: dependency-check
         continue-on-error: true
         run: |
-          # Run the check and save all output
           node .github/scripts/check-no-local-packages.cjs ./extracted-packages > check-output.txt 2>&1
           check_exit_code=$?
 
-          # Save error details regardless of exit code to debug
           echo "Full output from dependency check:"
           cat check-output.txt
 
           if [ $check_exit_code -ne 0 ]; then
-            # Find and save any lines with dependency errors
-            grep -i "dependency " check-output.txt > dependency-errors.txt || echo "No specific dependency errors found"
-            
-            # Ensure we have at least some error message
-            if [ ! -s dependency-errors.txt ]; then
-              echo "Local dependencies detected but couldn't extract specific details." > dependency-errors.txt
-            fi
-            
-            # Set the error details as an environment variable using the new approach
-            ERROR_CONTENT=$(cat dependency-errors.txt)
-            echo "error_details<<EOF" >> $GITHUB_ENV
-            echo "$ERROR_CONTENT" >> $GITHUB_ENV
-            echo "EOF" >> $GITHUB_ENV
-            
+            grep -i "dependency " check-output.txt > dependency-errors.txt || echo "No specific dependency errors found" > dependency-errors.txt
             exit 1
           fi
 
@@ -554,7 +540,7 @@ jobs:
 
             ### Not allowed dependencies:
             ```
-            ${{ env.error_details }}
+            $(cat dependency-errors.txt)
             ```
 
             Review the workflow logs for more details.
