@@ -48,19 +48,12 @@ export const Gizmos = withSdk(({ sdk }) => {
   useHotkey(['X'], handleScaleGizmo)
   useHotkey(['F'], handleFreeGizmo)
 
-  const {
-    isPositionGizmoWorldAligned,
-    isRotationGizmoWorldAligned,
-    setPositionGizmoWorldAligned,
-    setRotationGizmoWorldAligned,
-    isRotationGizmoAlignmentDisabled
-  } = useGizmoAlignment()
+  const { isPositionGizmoWorldAligned, setPositionGizmoWorldAligned } = useGizmoAlignment()
 
   const disableGizmos = !entity
 
   const SnapToggleIcon = isEnabled ? BiCheckboxChecked : BiCheckbox
   const PositionAlignmentIcon = isPositionGizmoWorldAligned ? BiCheckboxChecked : BiCheckbox
-  const RotationAlignmentIcon = isRotationGizmoWorldAligned ? BiCheckboxChecked : BiCheckbox
 
   const ref = useOutsideClick(handleClosePanel)
 
@@ -113,13 +106,6 @@ export const Gizmos = withSdk(({ sdk }) => {
           <PositionAlignmentIcon
             className="icon"
             onClick={() => setPositionGizmoWorldAligned(!isPositionGizmoWorldAligned)}
-          />
-        </div>
-        <div className={cx('alignment', { disabled: isRotationGizmoAlignmentDisabled })}>
-          <label>Rotation</label>
-          <RotationAlignmentIcon
-            className="icon"
-            onClick={() => setRotationGizmoWorldAligned(!isRotationGizmoWorldAligned)}
           />
         </div>
       </div>
