@@ -19,6 +19,6 @@
     "packages/@dcl/inspector/hot-reload.js": false
   },
   "[typescript]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features"
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   }
 }

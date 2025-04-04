@@ -2,11 +2,12 @@ import React, { useCallback, useRef } from 'react'
 import cx from 'classnames'
 import { MdImageSearch } from 'react-icons/md'
 import { HiOutlinePlus } from 'react-icons/hi'
+import { HiOutlineRefresh as RefreshIcon } from 'react-icons/hi'
 
 import { AssetPack, catalog, isSmart } from '../../lib/logic/catalog'
 import { getConfig } from '../../lib/logic/config'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
-import { selectAssetToRename, selectStagedCustomAsset } from '../../redux/data-layer'
+import { selectAssetToRename, selectStagedCustomAsset, getAssetCatalog } from '../../redux/data-layer'
 import { getSelectedAssetsTab, selectAssetsTab } from '../../redux/ui'
 import { AssetsTab } from '../../redux/ui/types'
 import { FolderOpen } from '../Icons/Folder'
@@ -54,13 +55,20 @@ function Assets({ isAssetsPanelCollapsed }: { isAssetsPanelCollapsed: boolean })
     inputRef.current?.onClick()
   }, [inputRef])
 
+  const handleRefreshClick = useCallback(() => {
+    dispatch(getAssetCatalog())
+  }, [dispatch])
+
   return (
     <div className="Assets">
       <div className="Assets-buttons">
-        <Button onClick={handleImportClick}>
-          <HiOutlinePlus />
-          IMPORT ASSETS
-        </Button>
+        <div className="Assets-buttons-left">
+          <Button onClick={handleImportClick}>
+            <HiOutlinePlus />
+            IMPORT ASSETS
+          </Button>
+          <RefreshIcon className="refresh" onClick={handleRefreshClick} />
+        </div>
         <div className="tab" onClick={handleTabClick(AssetsTab.FileSystem)} data-test-id={AssetsTab.FileSystem}>
           <div className={cx({ underlined: tab === AssetsTab.FileSystem })}>
             <FolderOpen />

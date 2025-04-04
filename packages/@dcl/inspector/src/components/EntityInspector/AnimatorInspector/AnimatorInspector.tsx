@@ -131,7 +131,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
           <Block label="Weight">
             <RangeField
               onChange={(e: ChangeEvt) => handleStateChange({ weight: toNumber(e.target.value) }, idx)}
-              value={fromNumber($.weight || 1)}
+              value={fromNumber($.weight ?? 1)}
               isValidValue={isValidWeight}
             />
           </Block>
@@ -139,7 +139,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
             <RangeField
               max={200}
               onChange={(e: ChangeEvt) => handleStateChange({ speed: toNumber(e.target.value) }, idx)}
-              value={fromNumber($.speed || 1)}
+              value={fromNumber($.speed ?? 1)}
               isValidValue={isValidSpeed}
             />
           </Block>
