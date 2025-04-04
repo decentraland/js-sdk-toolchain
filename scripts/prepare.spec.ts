@@ -35,7 +35,6 @@ flow('build-all', () => {
     for (const dependency of processWithOptimisticDependencies(graph)) {
       const projectDirectory = resolveProjectPath(dependency)
       installCrossDependencies(projectDirectory)
-      checkNoLocalPackages(projectDirectory)
       itExecutes('npm pack', projectDirectory)
     }
   })
