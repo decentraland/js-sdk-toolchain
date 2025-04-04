@@ -82,6 +82,13 @@ export type IInputSystem = {
     pointerEventType: PointerEventType,
     entity?: Entity
   ) => PBPointerEventsResult | null
+
+  /**
+   * @public
+   * Get an ordered iterator over events received within the current frame.
+   * @returns the iterator
+   */
+  getInputCommands: () => Generator<PBPointerEventsResult>
 }
 
 const InputStateUpdateSystemPriority = 1 << 20
@@ -294,11 +301,18 @@ export function createInputSystem(engine: IEngine): IInputSystem {
     return globalState.buttonState.get(inputAction)?.state === PointerEventType.PET_DOWN
   }
 
+  function* getInputCommands() {
+    for (let i = globalState.thisFrameCommands.length - 1; i >= 0; i--) {
+      yield globalState.thisFrameCommands[i]
+    }
+  }
+
   return {
     isPressed,
     getClick,
     getInputCommand,
     isClicked,
-    isTriggered
+    isTriggered,
+    getInputCommands
   }
 }

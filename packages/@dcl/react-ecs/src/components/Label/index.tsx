@@ -33,6 +33,11 @@ export function Label(props: EntityPropTypes & UiLabelProps) {
     onMouseDrag,
     onMouseDragLocked,
     onMouseDragEnd,
+    onInputDown,
+    onInputUp,
+    onInputDrag,
+    onInputDragLocked,
+    onInputDragEnd,
     ...uiTextProps
   } = props
 
@@ -45,7 +50,12 @@ export function Label(props: EntityPropTypes & UiLabelProps) {
     onMouseLeave,
     onMouseDrag,
     onMouseDragLocked,
-    onMouseDragEnd
+    onMouseDragEnd,
+    onInputDown,
+    onInputUp,
+    onInputDrag,
+    onInputDragLocked,
+    onInputDragEnd
   })
   const { font, textAlign, fontSize, textWrap, ...textProps } = uiTextProps
   const uiText: PBUiText = {
