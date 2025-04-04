@@ -2,12 +2,19 @@ import { EventSystemCallback, InputAction } from '@dcl/ecs'
 /**
  * legacy Callback function
  *
- * @public @deprecated
+ * @public @deprecated This type is no longer used in the sdk api, EventSystemCallback is
+ * used for listeners instead
  */
 export type Callback = () => void
 /**
- * either a simple callback function to be triggered on a specified event,
- * or a map of `InputAction`s to functions.
+ * a record object mapping `InputAction`s to functions.
+ * 
+ * @example
+ * onInputDown={{
+ *   [InputAction.IA_PRIMARY]: (eventData) => { console.log("primary") },
+ *   [InputAction.IA_SECONDARY]: () => { console.log("secondary") },
+ * }}
+ *
  * @public
  */
 export type MultiCallback = Partial<Record<InputAction, EventSystemCallback>>

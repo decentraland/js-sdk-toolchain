@@ -85,11 +85,8 @@ export type IInputSystem = {
 
   /**
    * @public
-   * Get the input command info if a pointer event has been emitted in the last tick-update.
-   * @param inputAction - the input action to query
-   * @param pointerEventType - the pointer event type to query
-   * @param entity - the entity to query, ignore for global
-   * @returns the input command info or undefined if there is no command in the last tick-update
+   * Get an ordered iterator over events received within the current frame.
+   * @returns the iterator
    */
   getInputCommands: () => Generator<PBPointerEventsResult>
 }

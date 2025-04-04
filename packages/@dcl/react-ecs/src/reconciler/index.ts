@@ -6,12 +6,11 @@ import {
   PointerEventType,
   PBUiInputResult,
   PBUiDropdownResult,
-  PBPointerEventsResult,
   EventSystemCallback
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import Reconciler, { HostConfig } from 'react-reconciler'
-import { isListener, Listeners, MultiCallback } from '../components'
+import { isListener, Listeners } from '../components'
 import { CANVAS_ROOT_ENTITY } from '../components/uiTransform'
 import { ReactEcs } from '../react-ecs'
 import {
@@ -34,24 +33,6 @@ import {
 } from './types'
 import { componentKeys, isNotUndefined, noopConfig, propsChanged } from './utils'
 import { Vector2 } from '@dcl/ecs/dist/components/generated/pb/decentraland/common/vectors.gen'
-
-function getPointerEnum(pointerKey: keyof Listeners): PointerEventType {
-  const pointers: { [key in keyof Required<Listeners>]: PointerEventType } = {
-    onMouseDown: PointerEventType.PET_DOWN,
-    onMouseUp: PointerEventType.PET_UP,
-    onMouseEnter: PointerEventType.PET_HOVER_ENTER,
-    onMouseLeave: PointerEventType.PET_HOVER_LEAVE,
-    onMouseDrag: PointerEventType.PET_DRAG,
-    onMouseDragLocked: PointerEventType.PET_DRAG_LOCKED,
-    onMouseDragEnd: PointerEventType.PET_DRAG_END,
-    onInputDown: PointerEventType.PET_DOWN,
-    onInputUp: PointerEventType.PET_UP,
-    onInputDrag: PointerEventType.PET_DRAG,
-    onInputDragLocked: PointerEventType.PET_DRAG_LOCKED,
-    onInputDragEnd: PointerEventType.PET_DRAG_END
-  }
-  return pointers[pointerKey]
-}
 
 type OnChangeState<T = string | number | Vector2> = {
   onChangeCallback?: (val?: T) => void

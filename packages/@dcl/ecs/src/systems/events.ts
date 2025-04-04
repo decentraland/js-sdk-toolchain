@@ -23,6 +23,9 @@ export type EventSystemOptions = {
   showHighlight?: boolean
 }
 
+/**
+ * @public
+ */
 export type EventSystemOptionsCallback = EventSystemOptions & { cb: EventSystemCallback }
 
 export const getDefaultOpts = (opts: Partial<EventSystemOptions> = {}): EventSystemOptions => ({
@@ -99,8 +102,8 @@ export interface PointerEventsSystem {
 
   /**
    * @public
-   * Execute callback when the user press the InputButton pointing at the entity
-   * @param pointerData - Entity to attach the callback, Opts to trigger Feedback and Button, callback
+   * Execute callbacks when the user presses one of the InputButtons pointing at the entity
+   * @param pointerData - Entity to attach the callbacks, list of options to trigger Feedback, Button, and Callback
    */
   onPointerDown(pointerData: { entity: Entity; optsList: EventSystemOptionsCallback[] }): void
   /**
@@ -118,8 +121,8 @@ export interface PointerEventsSystem {
   onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void
   /**
    * @public
-   * Execute callback when the user press the InputButton pointing at the entity
-   * @param pointerData - Entity to attach the callback, Opts to trigger Feedback and Button, callback
+   * Execute callbacks when the user releases one of the InputButtons pointing at the entity
+   * @param pointerData - Entity to attach the callbacks, list of options to trigger Feedback, Button, and Callback
    */
   onPointerUp(pointerData: { entity: Entity; optsList: EventSystemOptionsCallback[] }): void
   /**
@@ -161,8 +164,8 @@ export interface PointerEventsSystem {
 
   /**
    * @public
-   * Execute callback when the user press the InputButton pointing at the entity
-   * @param pointerData - Entity to attach the callback, Opts to trigger Feedback and Button, callback
+   * Execute callbacks when the user drags the pointer from inside the entity
+   * @param pointerData - Entity to attach the callbacks, list of options to trigger Feedback, Button, and Callback
    */
   onPointerDrag(pointerData: { entity: Entity; optsList: EventSystemOptionsCallback[] }): void
   /**
@@ -175,8 +178,8 @@ export interface PointerEventsSystem {
 
   /**
    * @public
-   * Execute callback when the user press the InputButton pointing at the entity
-   * @param pointerData - Entity to attach the callback, Opts to trigger Feedback and Button, callback
+   * Execute callbacks when the user drags the pointer from inside the entity, locking the cursor in place.
+   * @param pointerData - Entity to attach the callbacks, list of options to trigger Feedback, Button, and Callback
    */
   onPointerDragLocked(pointerData: { entity: Entity; optsList: EventSystemOptionsCallback[] }): void
   /**
@@ -193,8 +196,8 @@ export interface PointerEventsSystem {
 
   /**
    * @public
-   * Execute callback when the user press the InputButton pointing at the entity
-   * @param pointerData - Entity to attach the callback, Opts to trigger Feedback and Button, callback
+   * Execute callbacks when the user releases a button after a drag
+   * @param pointerData - Entity to attach the callbacks, list of options to trigger Feedback, Button, and Callback
    */
   onPointerDragEnd(pointerData: { entity: Entity; optsList: EventSystemOptionsCallback[] }): void
   /**
