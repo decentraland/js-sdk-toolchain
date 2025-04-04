@@ -503,11 +503,33 @@ jobs:
 
       - name: Check for local package dependencies
         id: dependency-check
-        # The continue-on-error ensures the build process continues
-        # but the job itself will still be marked as failed
         continue-on-error: true
         run: |
-          node .github/scripts/check-no-local-packages.cjs ./extracted-packages
+          # Run the check and save all output
+          node .github/scripts/check-no-local-packages.cjs ./extracted-packages > check-output.txt 2>&1
+          check_exit_code=$?
+
+          # Save error details regardless of exit code to debug
+          echo "Full output from dependency check:"
+          cat check-output.txt
+
+          if [ $check_exit_code -ne 0 ]; then
+            # Find and save any lines with dependency errors
+            grep -i "dependency " check-output.txt > dependency-errors.txt || echo "No specific dependency errors found"
+            
+            # Ensure we have at least some error message
+            if [ ! -s dependency-errors.txt ]; then
+              echo "Local dependencies detected but couldn't extract specific details." > dependency-errors.txt
+            fi
+            
+            # Set the error details as an environment variable using the new approach
+            ERROR_CONTENT=$(cat dependency-errors.txt)
+            echo "error_details<<EOF" >> $GITHUB_ENV
+            echo "$ERROR_CONTENT" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+            
+            exit 1
+          fi
 
       - name: Find Local Dependencies Comment if check fails
         if: ${{ github.event_name == 'pull_request' && steps.dependency-check.outcome == 'failure' }}
@@ -527,9 +549,15 @@ jobs:
           body: |
             ## ⚠️ Local Dependencies Detected
 
-            This PR contains package dependencies that use local paths (`file:`) or non-allowed URLs. These must be published and referenced properly before merging.
+            This PR contains package dependencies that use local paths (`file:`) or non-allowed URLs (`http:`, `https:`, `git:`).
+            These must be published and referenced properly before merging.
 
-            Review the workflow logs for details on which dependencies need to be fixed.
+            ### Not allowed dependencies:
+            ```
+            ${{ env.error_details }}
+            ```
+
+            Review the workflow logs for more details.
 
             > **Note:** This comment is automatically updated when the PR is updated.
           edit-mode: replace
