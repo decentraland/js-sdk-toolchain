@@ -76,7 +76,7 @@ function main() {
     console.error(
       `\n\nFound packages with local dependencies in ${targetDir}. Please publish these dependencies instead of using local references.`
     )
-    return 1
+    process.exit(1)
   } else {
     console.log(`\n\nNo local dependencies found in ${targetDir}. All good!`)
   }
