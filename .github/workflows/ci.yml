@@ -506,8 +506,10 @@ jobs:
         id: dependency-check
         continue-on-error: true
         run: |
+          set +e
           node .github/scripts/check-no-local-packages.cjs ./extracted-packages > check-output.txt 2>&1
-          check_exit_code=$? || true
+          check_exit_code=$?
+          set -e
 
           echo "Full output from dependency check:"
           cat check-output.txt
