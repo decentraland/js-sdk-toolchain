@@ -517,9 +517,22 @@ jobs:
             exit 1
           fi
 
+      - name: Generate comment content
+        if: steps.dependency-check.outcome == 'failure'
+        run: |
+          echo "## ⚠️ Local Dependencies Detected" >> dependency-check-comment.md
+          echo "This PR contains package dependencies that use local paths (\`file:\`) or non-allowed URLs (\`http:\`, \`https:\`, \`git:\`)." >> dependency-check-comment.md
+          echo "These must be published and referenced properly before merging." >> dependency-check-comment.md
+          echo "### Not allowed dependencies:" >> dependency-check-comment.md
+          echo "```" >> dependency-check-comment.md
+          cat dependency-errors.txt >> dependency-check-comment.md
+          echo "```" >> dependency-check-comment.md
+          echo "Review the workflow logs for more details." >> dependency-check-comment.md
+          echo "> **Note:** This comment is automatically updated when the PR is updated." >> dependency-check-comment.md
+
       - name: Find Local Dependencies Comment if check fails
         if: ${{ github.event_name == 'pull_request' && steps.dependency-check.outcome == 'failure' }}
-        uses: peter-evans/find-comment@v1
+        uses: peter-evans/find-comment@v3
         id: fc-local-deps
         with:
           issue-number: ${{ github.event.pull_request.number }}
@@ -528,24 +541,11 @@ jobs:
 
       - name: Create or update Local Dependencies Comment if check fails
         if: ${{ github.event_name == 'pull_request' && steps.dependency-check.outcome == 'failure' }}
-        uses: peter-evans/create-or-update-comment@v1
+        uses: peter-evans/create-or-update-comment@v4
         with:
           comment-id: ${{ steps.fc-local-deps.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            ## ⚠️ Local Dependencies Detected
-
-            This PR contains package dependencies that use local paths (`file:`) or non-allowed URLs (`http:`, `https:`, `git:`).
-            These must be published and referenced properly before merging.
-
-            ### Not allowed dependencies:
-            ```
-            $(cat dependency-errors.txt)
-            ```
-
-            Review the workflow logs for more details.
-
-            > **Note:** This comment is automatically updated when the PR is updated.
+          body-path: dependency-check-comment.md
           edit-mode: replace
 
       - name: Fail check if local dependencies found
