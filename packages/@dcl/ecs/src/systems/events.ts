@@ -296,7 +296,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     const pointerEventList = event.get(type)
 
     if (pointerEventList === undefined) {
-      return;
+      return
     }
 
     for (const button of pointerEventList.keys()) {
@@ -308,7 +308,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
 
   engine.addSystem(function EventSystem() {
     if (eventsMap.size === 0) {
-      return;
+      return
     }
 
     for (const entity of eventsMap.keys()) {
@@ -318,42 +318,54 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     }
 
     for (const command of inputSystem.getInputCommands()) {
-      const entity = command.hit?.entityId as Entity;
+      const entity = command.hit?.entityId as Entity
       if (entity === undefined) {
-        continue;
+        continue
       }
 
-      const entityMap = eventsMap.get(entity);
+      const entityMap = eventsMap.get(entity)
       if (entityMap === undefined) {
-        continue;
+        continue
       }
 
       const typeMap = entityMap.get(getEventType(command.state))
       if (typeMap) {
         const data = typeMap.get(command.button)
         if (data) {
-          checkNotThenable(data.cb(command), 'Event handler returned a thenable. Only synchronous functions are allowed')
+          checkNotThenable(
+            data.cb(command),
+            'Event handler returned a thenable. Only synchronous functions are allowed'
+          )
         }
 
         const anyData = typeMap.get(InputAction.IA_ANY)
         if (anyData) {
-          checkNotThenable(anyData.cb(command), 'Event handler returned a thenable. Only synchronous functions are allowed')
+          checkNotThenable(
+            anyData.cb(command),
+            'Event handler returned a thenable. Only synchronous functions are allowed'
+          )
         }
       }
 
       // check clicks separately
-      if (command.state == PointerEventType.PET_UP) {
+      if (command.state === PointerEventType.PET_UP) {
         const clickMap = entityMap.get(EventType.Click)
         if (clickMap) {
           const data = clickMap.get(command.button)
           if (data && inputSystem.getClick(command.button, entity)) {
-            checkNotThenable(data.cb(command), 'Click event returned a thenable. Only synchronous functions are allowed')
+            checkNotThenable(
+              data.cb(command),
+              'Click event returned a thenable. Only synchronous functions are allowed'
+            )
           }
 
           const anyData = clickMap.get(InputAction.IA_ANY)
           if (anyData && inputSystem.getClick(command.button, entity)) {
-            checkNotThenable(anyData.cb(command), 'Event handler returned a thenable. Only synchronous functions are allowed')
-          }            
+            checkNotThenable(
+              anyData.cb(command),
+              'Event handler returned a thenable. Only synchronous functions are allowed'
+            )
+          }
         }
       }
     }
@@ -364,12 +376,15 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
   // all the onPointer* declarations
   const onPointerFunction: (ty: EventType) => PointerEventsSystem['onPointerDown'] = (ty) => {
     return (
-      arg0: Entity | { entity: Entity; opts?: Partial<EventSystemOptions> } | { entity: Entity; optsList: EventSystemOptionsCallback[] },
+      arg0:
+        | Entity
+        | { entity: Entity; opts?: Partial<EventSystemOptions> }
+        | { entity: Entity; optsList: EventSystemOptionsCallback[] },
       arg1?: EventSystemCallback,
       arg2?: Partial<EventSystemOptions>
     ) => {
-      var entity: Entity;
-      var optsList: EventSystemOptionsCallback[];
+      let entity: Entity
+      let optsList: EventSystemOptionsCallback[]
 
       if (typeof arg0 === 'number') {
         // called as onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void
@@ -382,28 +397,33 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
         const { entity: e, opts } = arg0 as { entity: Entity; opts?: Partial<EventSystemOptions> }
         const cb = arg1 as EventSystemCallback
         entity = e
-        optsList = [{ cb, ...getDefaultOpts(opts)}]
+        optsList = [{ cb, ...getDefaultOpts(opts) }]
       } else {
         // called as onPointerDown(pointerData: { entity: Entity; optsList: EventSystemOptionsCallback[] }): void
-        const { entity: e, optsList: o } = arg0 as { entity: Entity, optsList: EventSystemOptionsCallback[] }
+        const { entity: e, optsList: o } = arg0 as { entity: Entity; optsList: EventSystemOptionsCallback[] }
         entity = e
         optsList = o
       }
 
-      const previous = getEvent(entity).get(ty) ?? new Map<InputAction, EventSystemOptionsCallback>();
+      const previous = getEvent(entity).get(ty) ?? new Map<InputAction, EventSystemOptionsCallback>()
 
-      const callbacks = new Map();
+      const callbacks = new Map()
       for (const opts of optsList) {
         const prevOpts = previous.get(opts.button)
         if (prevOpts !== undefined) {
-          if (prevOpts.hoverText !== opts.hoverText || prevOpts.maxDistance !== opts.maxDistance || prevOpts.showFeedback !== opts.showFeedback || prevOpts.showHighlight !== opts.showHighlight) {
+          if (
+            prevOpts.hoverText !== opts.hoverText ||
+            prevOpts.maxDistance !== opts.maxDistance ||
+            prevOpts.showFeedback !== opts.showFeedback ||
+            prevOpts.showHighlight !== opts.showHighlight
+          ) {
             removePointerEvent(entity, getPointerEvent(ty), opts.button)
             setPointerEvent(entity, getPointerEvent(ty), opts)
           }
         } else {
           setPointerEvent(entity, getPointerEvent(ty), opts)
         }
-        callbacks.set(opts.button, opts);
+        callbacks.set(opts.button, opts)
       }
 
       for (const button of previous.keys()) {

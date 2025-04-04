@@ -3,7 +3,6 @@ import {
   IEngine,
   InputAction,
   PointerEventsSystem,
-  PointerEventType,
   PBUiInputResult,
   PBUiDropdownResult,
   EventSystemCallback
@@ -125,22 +124,23 @@ export function createReconciler(
 
     if (update.props) {
       const pointerEventSystem =
-        (update.component === 'onMouseDown' || update.component === 'onInputDown')
+        update.component === 'onMouseDown' || update.component === 'onInputDown'
           ? pointerEvents.onPointerDown
-          : (update.component === 'onMouseUp' || update.component === 'onInputUp')
+          : update.component === 'onMouseUp' || update.component === 'onInputUp'
           ? pointerEvents.onPointerUp
           : update.component === 'onMouseEnter'
           ? pointerEvents.onPointerHoverEnter
           : update.component === 'onMouseLeave'
           ? pointerEvents.onPointerHoverLeave
-          : (update.component === 'onMouseDrag' || update.component === 'onInputDrag')
+          : update.component === 'onMouseDrag' || update.component === 'onInputDrag'
           ? pointerEvents.onPointerDrag
-          : (update.component === 'onMouseDragLocked' || update.component === 'onInputDragLocked')
+          : update.component === 'onMouseDragLocked' || update.component === 'onInputDragLocked'
           ? pointerEvents.onPointerDragLocked
-          : (update.component === 'onMouseDragEnd' || update.component === 'onInputDragEnd') && pointerEvents.onPointerDragEnd
+          : (update.component === 'onMouseDragEnd' || update.component === 'onInputDragEnd') &&
+            pointerEvents.onPointerDragEnd
 
       if (pointerEventSystem) {
-        if (typeof update.props == 'function') {
+        if (typeof update.props === 'function') {
           pointerEventSystem(
             {
               entity: instance.entity,
@@ -154,18 +154,16 @@ export function createReconciler(
             update.props as EventSystemCallback
           )
         } else {
-          // force the right overload (the single arg version doesn't exist for onPointerHoverEnter or onPointerHoverLeave, 
+          // force the right overload (the single arg version doesn't exist for onPointerHoverEnter or onPointerHoverLeave,
           // but we don't have onInputXXX components for those)
-          (pointerEventSystem as PointerEventsSystem['onPointerDown'])(
-            {
-              entity: instance.entity,
-              optsList: Object.entries(update.props).map(([button, cb]) => ({
-                button: Number(button) as InputAction,
-                showFeedback: true,
-                cb
-              }))
-            }
-          )
+          ;(pointerEventSystem as PointerEventsSystem['onPointerDown'])({
+            entity: instance.entity,
+            optsList: Object.entries(update.props).map(([button, cb]) => ({
+              button: Number(button) as InputAction,
+              showFeedback: true,
+              cb
+            }))
+          })
         }
       }
     }

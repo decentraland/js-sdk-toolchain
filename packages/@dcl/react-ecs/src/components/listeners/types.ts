@@ -39,15 +39,15 @@ export type Listeners = {
   /** triggered on mouse drag event */
   onMouseDragEnd?: EventSystemCallback
   /** triggered on input down event */
-  onInputDown?: MultiCallback,
+  onInputDown?: MultiCallback
   /** triggered on input up event */
-  onInputUp?: MultiCallback,
+  onInputUp?: MultiCallback
   /** triggered on input drag event */
-  onInputDrag?: MultiCallback,
+  onInputDrag?: MultiCallback
   /** triggered on input drag event */
-  onInputDragLocked?: MultiCallback,
+  onInputDragLocked?: MultiCallback
   /** triggered on input drag event */
-  onInputDragEnd?: MultiCallback,
+  onInputDragEnd?: MultiCallback
 }
 
 const listeners: Listeners = {

@@ -78,19 +78,19 @@ export function Button(props: UiButtonProps) {
 
   return (
     <entity
-    onMouseDown={!!props.disabled ? undefined : onMouseDown}
-    onMouseUp={!!props.disabled ? undefined : onMouseUp}
-    onMouseEnter={onMouseEnter}
-    onMouseLeave={onMouseLeave}
-    onMouseDrag={onMouseDrag}
-    onMouseDragLocked={onMouseDragLocked}
-    onMouseDragEnd={onMouseDragEnd}
-    onInputDown={!!props.disabled ? undefined : onInputDown}
-    onInputUp={!!props.disabled ? undefined : onInputUp}
-    onInputDrag={onInputDrag}
-    onInputDragLocked={onInputDragLocked}
-    onInputDragEnd={onInputDragEnd}
-    uiTransform={uiTransformProps}
+      onMouseDown={!!props.disabled ? undefined : onMouseDown}
+      onMouseUp={!!props.disabled ? undefined : onMouseUp}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      onMouseDrag={onMouseDrag}
+      onMouseDragLocked={onMouseDragLocked}
+      onMouseDragEnd={onMouseDragEnd}
+      onInputDown={!!props.disabled ? undefined : onInputDown}
+      onInputUp={!!props.disabled ? undefined : onInputUp}
+      onInputDrag={onInputDrag}
+      onInputDragLocked={onInputDragLocked}
+      onInputDragEnd={onInputDragEnd}
+      uiTransform={uiTransformProps}
       uiText={textProps}
       uiBackground={uiBackgroundProps}
     />
