@@ -514,6 +514,9 @@ jobs:
 
           if [ $check_exit_code -ne 0 ]; then
             grep -i "dependency " check-output.txt > dependency-errors.txt || echo "No specific dependency errors found" > dependency-errors.txt
+            if [ ! -s dependency-errors.txt ]; then
+              echo "⚠️ No specific dependency errors found" > dependency-errors.txt
+            fi
             exit 1
           fi
 
@@ -524,9 +527,9 @@ jobs:
           echo "This PR contains package dependencies that use local paths (\`file:\`) or non-allowed URLs (\`http:\`, \`https:\`, \`git:\`)." >> dependency-check-comment.md
           echo "These must be published and referenced properly before merging." >> dependency-check-comment.md
           echo "### Not allowed dependencies:" >> dependency-check-comment.md
-          echo "```" >> dependency-check-comment.md
+          echo '```' >> dependency-check-comment.md
           cat dependency-errors.txt >> dependency-check-comment.md
-          echo "```" >> dependency-check-comment.md
+          echo '```' >> dependency-check-comment.md
           echo "Review the workflow logs for more details." >> dependency-check-comment.md
           echo "> **Note:** This comment is automatically updated when the PR is updated." >> dependency-check-comment.md
 
