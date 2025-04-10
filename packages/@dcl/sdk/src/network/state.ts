@@ -23,13 +23,11 @@ import {
   UiInput,
   UiInputResult,
   UiText,
-  UiTransform,
-  VideoPlayer
+  UiTransform
 } from '@dcl/ecs'
 
 export const NOT_SYNC_COMPONENTS = [
   VideoEvent,
-  VideoPlayer,
   TweenState,
   AudioEvent,
   AudioSource,

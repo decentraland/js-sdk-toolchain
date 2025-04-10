@@ -38,35 +38,45 @@ jobs:
           cache: 'npm'
       - name: docs
         run: make docs
+
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
+
       - uses: actions/setup-node@v3
         with:
           node-version: 20
           cache: 'npm'
+
       - name: install
         run: make install
+
       - name: build
         run: make build
+
       - name: test
         env:
-          NODE_OPTIONS: "--max_old_space_size=4096"
+          NODE_OPTIONS: '--max_old_space_size=4096'
         run: make test-coverage
+
       - name: test-cli
         run: make test-cli
+
       - name: test-inspector
         env:
-          NODE_OPTIONS: "--max_old_space_size=4096"
+          NODE_OPTIONS: '--max_old_space_size=4096'
         run: make test-inspector
+
       - uses: codecov/codecov-action@v3
         if: always()
         with:
           fail_ci_if_error: false # optional (default = false)
           verbose: true # optional (default = false)
+
       - name: prepare releasable packages
         run: make prepare
+
   test-e2e:
     needs: [notify_deployment]
     runs-on: ubuntu-latest
@@ -90,8 +100,9 @@ jobs:
         run: cd packages/@dcl/inspector && npm i && cd ../../../
       - name: test-inspector E2E
         env:
-          NODE_OPTIONS: "--max_old_space_size=4096"
+          NODE_OPTIONS: '--max_old_space_size=4096'
         run: E2E_URL=https://${{steps.get-cloudflare-url.outputs.result}}/inspector make test-inspector-e2e
+
   build:
     runs-on: ubuntu-latest
     permissions:
@@ -109,7 +120,6 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-
 
       - name: install
         run: make install
@@ -447,3 +457,104 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
+
+  check-local-deps:
+    name: Check for development dependencies
+    needs: [build]
+    runs-on: ubuntu-latest
+    if: >
+      (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main') ||
+      github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Download prepared packages
+        uses: actions/download-artifact@v4
+        with:
+          name: built-artifacts
+          path: downloaded-packages
+
+      - name: Set up artifacts for checking
+        run: |
+          echo "Setting up built artifacts for checking..."
+          mkdir -p extracted-packages
+
+          # Extract all packages to separate directories
+          find downloaded-packages -type f -name "*.tgz" | while read pkg; do
+            if [ -f "$pkg" ]; then
+              # Get package name from the filename
+              pkg_name=$(basename "$pkg" .tgz)
+              
+              # Create directory for this package
+              mkdir -p "extracted-packages/$pkg_name"
+              
+              echo "Extracting $pkg to extracted-packages/$pkg_name"
+              tar -xzf "$pkg" -C "extracted-packages/$pkg_name"
+            fi
+          done
+
+          # List all extracted packages
+          echo "Extracted packages:"
+          find extracted-packages -name "package.json" | sort
+
+      - name: Check for local package dependencies
+        id: dependency-check
+        continue-on-error: true
+        run: |
+          set +e
+          node .github/scripts/check-no-local-packages.cjs ./extracted-packages > check-output.txt 2>&1
+          check_exit_code=$?
+          set -e
+
+          echo "Full output from dependency check:"
+          cat check-output.txt
+
+          if [ $check_exit_code -ne 0 ]; then
+            grep -i "dependency " check-output.txt > dependency-errors.txt || echo "No specific dependency errors found" > dependency-errors.txt
+            if [ ! -s dependency-errors.txt ]; then
+              echo "⚠️ No specific dependency errors found" > dependency-errors.txt
+            fi
+            exit 1
+          fi
+
+      - name: Generate comment content
+        if: steps.dependency-check.outcome == 'failure'
+        run: |
+          echo "## ⚠️ Local Dependencies Detected" >> dependency-check-comment.md
+          echo "This PR contains package dependencies that use local paths (\`file:\`) or non-allowed URLs (\`http:\`, \`https:\`, \`git:\`)." >> dependency-check-comment.md
+          echo "These must be published and referenced properly before merging." >> dependency-check-comment.md
+          echo "### Not allowed dependencies:" >> dependency-check-comment.md
+          echo '```' >> dependency-check-comment.md
+          cat dependency-errors.txt >> dependency-check-comment.md
+          echo '```' >> dependency-check-comment.md
+          echo "Review the workflow logs for more details." >> dependency-check-comment.md
+          echo "> **Note:** This comment is automatically updated when the PR is updated." >> dependency-check-comment.md
+
+      - name: Find Local Dependencies Comment if check fails
+        if: ${{ github.event_name == 'pull_request' && steps.dependency-check.outcome == 'failure' }}
+        uses: peter-evans/find-comment@v3
+        id: fc-local-deps
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: Local Dependencies Detected
+
+      - name: Create or update Local Dependencies Comment if check fails
+        if: ${{ github.event_name == 'pull_request' && steps.dependency-check.outcome == 'failure' }}
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.fc-local-deps.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body-path: dependency-check-comment.md
+          edit-mode: replace
+
+      - name: Fail check if local dependencies found
+        if: steps.dependency-check.outcome == 'failure'
+        run: |
+          echo "❌ Local package dependencies detected! These must be fixed before merging."
+          exit 1
