@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import cx from 'classnames'
 import { Message, MessageType } from '../Message'
 import { Label } from '../Label'
@@ -9,6 +9,10 @@ import './CheckboxField.css'
 const CheckboxField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
   const { className, checked, label, error, disabled, onChange, type = 'checkbox', ...rest } = props
   const [inputValue, setInputValue] = useState(checked)
+
+  useEffect(() => {
+    setInputValue(checked)
+  }, [checked])
 
   const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = useCallback(
     (event) => {

@@ -99,7 +99,7 @@ export type SceneComponent = {
   spawnPoints?: SceneSpawnPoint[]
 }
 
-const AllComponents = {
+export const AllComponents = {
   ...CoreComponents,
   ...EditorComponentNames
 }

@@ -12,6 +12,7 @@ import { TweenView } from './TweenView'
 import { VideoView } from './VideoView'
 import { AdminToolsBasicView } from './AdminToolsBasicView'
 import { RewardsBasicView } from './RewardsBasicView'
+import { DefaultBasicViewField } from './DefaultBasicViewField/DefaultBasicViewField'
 import { type Props } from './types'
 
 import './SmartItemBasicView.css'
@@ -42,7 +43,7 @@ const SmartItemBasicView = withSdk<Props>(({ sdk, entity }) => {
         case 'asset-packs::AdminTools':
           return <AdminToolsBasicView entity={entity} key={`${idx}-${entity}`} />
         default:
-          return null
+          return <DefaultBasicViewField entity={entity} field={field} key={`${idx}-${entity}`} />
       }
     },
     [entity]
