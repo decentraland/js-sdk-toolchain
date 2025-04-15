@@ -11,6 +11,7 @@ import { Button } from '../../../Button'
 import { AddButton } from '../../AddButton'
 import MoreOptionsMenu from '../../MoreOptionsMenu'
 import { Component } from '../../../../lib/sdk/components'
+import { addSyncComponentsToEntities } from '../../../../lib/sdk/operations/entitySyncUtils'
 import { Block } from '../../../Block'
 
 import './SmartItemControl.css'
@@ -20,9 +21,19 @@ type Props = {
 }
 
 const SmartItemControl: React.FC<WithSdkProps & Props> = ({ sdk, entity }) => {
-  const { AdminTools, Actions } = sdk.components
+  const { AdminTools, Actions, Animator, Transform, Tween, VisibilityComponent, VideoPlayer, AudioSource } =
+    sdk.components
   const [adminComponent, setAdminComponent] = useComponentValue(entity, AdminTools)
   const entitiesWithAction: Entity[] = useEntitiesWith((components) => components.Actions)
+
+  const componentIdsToSync = [
+    AudioSource.componentId,
+    Animator.componentId,
+    Transform.componentId,
+    Tween.componentId,
+    VideoPlayer.componentId,
+    VisibilityComponent.componentId
+  ]
 
   const availableActions: Map<number, { actions: Action[] }> = useMemo(() => {
     const actions = new Map<number, { actions: Action[] }>()
@@ -51,6 +62,12 @@ const SmartItemControl: React.FC<WithSdkProps & Props> = ({ sdk, entity }) => {
         }
       })
     }
+
+    addSyncComponentsToEntities(
+      sdk,
+      validSmartItems.map((item) => item.entity as Entity),
+      componentIdsToSync
+    )
   }, [availableActions, adminComponent, setAdminComponent])
 
   const handleAddSmartItemAction = useCallback(() => {
