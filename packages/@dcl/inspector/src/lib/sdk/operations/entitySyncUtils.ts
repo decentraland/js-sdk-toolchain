@@ -47,16 +47,8 @@ export function addSyncComponentsToEntities(
           case ActionType.STOP_ANIMATION:
             ids.add(sdk.components.Animator.componentId)
             break
-          case ActionType.SET_STATE:
-            ids.add(sdk.components.States.componentId)
-            break
           case ActionType.START_TWEEN:
             ids.add(sdk.components.Tween.componentId)
-            break
-          case ActionType.SET_COUNTER:
-          case ActionType.INCREMENT_COUNTER:
-          case ActionType.DECREASE_COUNTER:
-            ids.add(sdk.components.Counter.componentId)
             break
           case ActionType.PLAY_SOUND:
           case ActionType.STOP_SOUND:
