@@ -167,6 +167,75 @@ describe('entitySyncUtils', () => {
       // Dispatch should be called once
       expect(dispatchMock).toHaveBeenCalledTimes(1)
     })
+
+    it('should prioritize Tween over Transform when adding both to a new SyncComponent', () => {
+      const entity = 512 as Entity
+      // Create both Transform and Tween components
+      sdk.components.Transform.create(entity)
+      sdk.components.Tween.create(entity)
+
+      // Try to sync both components
+      const result = addSyncComponentsToEntities(
+        sdk,
+        [entity],
+        [sdk.components.Transform.componentId, sdk.components.Tween.componentId]
+      )
+
+      // Should succeed
+      expect(result[entity]).toBe(true)
+
+      // Should have added SyncComponents with Tween, but not Transform
+      expect(sdk.components.SyncComponents.has(entity)).toBe(true)
+      expect(sdk.components.SyncComponents.get(entity).componentIds).toContain(sdk.components.Tween.componentId)
+      expect(sdk.components.SyncComponents.get(entity).componentIds).not.toContain(sdk.components.Transform.componentId)
+
+      // Dispatch should be called once
+      expect(dispatchMock).toHaveBeenCalledTimes(1)
+    })
+
+    it('should not add Tween to SyncComponents that already contain Transform', () => {
+      const entity = 512 as Entity
+      // Create both Transform and Tween components
+      sdk.components.Transform.create(entity)
+      sdk.components.Tween.create(entity)
+
+      // First add Transform to SyncComponents
+      sdk.components.SyncComponents.create(entity, { componentIds: [sdk.components.Transform.componentId] })
+      sdk.components.NetworkEntity.create(entity, { entityId: sdk.enumEntity.getNextEnumEntityId(), networkId: 0 })
+
+      // Now try to add Tween
+      const result = addSyncComponentsToEntities(sdk, [entity], [sdk.components.Tween.componentId])
+
+      // Should not add Tween since Transform already exists
+      expect(result[entity]).toBe(false)
+      expect(sdk.components.SyncComponents.get(entity).componentIds).toContain(sdk.components.Transform.componentId)
+      expect(sdk.components.SyncComponents.get(entity).componentIds).not.toContain(sdk.components.Tween.componentId)
+
+      // Dispatch should not be called
+      expect(dispatchMock).not.toHaveBeenCalled()
+    })
+
+    it('should not add Transform to SyncComponents that already contain Tween', () => {
+      const entity = 512 as Entity
+      // Create both Transform and Tween components
+      sdk.components.Transform.create(entity)
+      sdk.components.Tween.create(entity)
+
+      // First add Tween to SyncComponents
+      sdk.components.SyncComponents.create(entity, { componentIds: [sdk.components.Tween.componentId] })
+      sdk.components.NetworkEntity.create(entity, { entityId: sdk.enumEntity.getNextEnumEntityId(), networkId: 0 })
+
+      // Now try to add Transform
+      const result = addSyncComponentsToEntities(sdk, [entity], [sdk.components.Transform.componentId])
+
+      // Should not add Transform since Tween already exists
+      expect(result[entity]).toBe(false)
+      expect(sdk.components.SyncComponents.get(entity).componentIds).toContain(sdk.components.Tween.componentId)
+      expect(sdk.components.SyncComponents.get(entity).componentIds).not.toContain(sdk.components.Transform.componentId)
+
+      // Dispatch should not be called
+      expect(dispatchMock).not.toHaveBeenCalled()
+    })
   })
 
   describe('removeSyncComponentsFromEntities', () => {

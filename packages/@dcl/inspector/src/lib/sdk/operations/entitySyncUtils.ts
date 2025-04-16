@@ -62,6 +62,16 @@ export function addSyncComponentsToEntities(
           case ActionType.STOP_VIDEO_STREAM:
             ids.add(sdk.components.VideoPlayer.componentId)
             break
+          case ActionType.SET_POSITION:
+          case ActionType.SET_ROTATION:
+          case ActionType.SET_SCALE:
+          case ActionType.PLACE_ON_PLAYER:
+          case ActionType.PLACE_ON_CAMERA:
+          case ActionType.ROTATE_AS_PLAYER:
+          case ActionType.ROTATE_AS_CAMERA:
+          case ActionType.FOLLOW_PLAYER:
+            ids.add(sdk.components.Transform.componentId)
+            break
         }
       }
     }
@@ -69,11 +79,19 @@ export function addSyncComponentsToEntities(
     return ids
   }
 
-  for (const entity of entities) {
-    const entityComponentIds = getEntityComponentIds(entity)
-    const validComponentIds = componentIds.filter((id) => entityComponentIds.has(id))
+  const transformId = sdk.components.Transform.componentId
+  const tweenId = sdk.components.Tween.componentId
 
-    if (entity === 0 || validComponentIds.length === 0) {
+  for (const entity of entities) {
+    if (entity === 0) {
+      results[entity] = false
+      continue
+    }
+
+    const entityComponentIds = getEntityComponentIds(entity)
+    let validComponentIds = componentIds.filter((id) => entityComponentIds.has(id))
+
+    if (validComponentIds.length === 0) {
       results[entity] = false
       continue
     }
@@ -81,6 +99,11 @@ export function addSyncComponentsToEntities(
     const hasSyncComponents = SyncComponents.has(entity)
 
     if (!hasSyncComponents) {
+      // For new sync components, ensure we don't add both Transform and Tween (priotizing Tweens)
+      if (validComponentIds.includes(transformId) && validComponentIds.includes(tweenId)) {
+        validComponentIds = validComponentIds.filter((id) => id !== transformId)
+      }
+
       operations.addComponent(entity, SyncComponents.componentId)
       operations.updateValue(SyncComponents, entity, { componentIds: validComponentIds })
       results[entity] = true
@@ -88,15 +111,27 @@ export function addSyncComponentsToEntities(
     } else {
       const currentValue = SyncComponents.get(entity)
       const currentIds = new Set(currentValue.componentIds || [])
-      const updatedIds = Array.from(currentIds)
 
+      // If Tween exists in Sync, don't add Transform
+      if (currentIds.has(tweenId) && validComponentIds.includes(transformId)) {
+        validComponentIds = validComponentIds.filter((id) => id !== transformId)
+      }
+
+      // If Transform exists in Sync, don't add Tween
+      if (currentIds.has(transformId) && validComponentIds.includes(tweenId)) {
+        validComponentIds = validComponentIds.filter((id) => id !== tweenId)
+      }
+
+      const updatedIds = Array.from(currentIds)
+      let changed = false
       for (const id of validComponentIds) {
         if (!currentIds.has(id)) {
           updatedIds.push(id)
+          changed = true
         }
       }
 
-      if (currentIds.size !== updatedIds.length) {
+      if (changed) {
         operations.updateValue(SyncComponents, entity, { componentIds: updatedIds })
         results[entity] = true
         needsDispatch = true

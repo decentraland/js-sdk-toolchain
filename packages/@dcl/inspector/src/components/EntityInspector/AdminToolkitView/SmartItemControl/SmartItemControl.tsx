@@ -21,13 +21,23 @@ type Props = {
 }
 
 const SmartItemControl: React.FC<WithSdkProps & Props> = ({ sdk, entity }) => {
-  const { AdminTools, Actions, Animator, Transform, Tween, VisibilityComponent, VideoPlayer, AudioSource } =
-    sdk.components
+  const {
+    AdminTools,
+    Actions,
+    Animator,
+    Transform,
+    Tween,
+    VisibilityComponent,
+    VideoPlayer,
+    AudioSource,
+    AudioStream
+  } = sdk.components
   const [adminComponent, setAdminComponent] = useComponentValue(entity, AdminTools)
   const entitiesWithAction: Entity[] = useEntitiesWith((components) => components.Actions)
 
   const componentIdsToSync = [
     AudioSource.componentId,
+    AudioStream.componentId,
     Animator.componentId,
     Transform.componentId,
     Tween.componentId,
