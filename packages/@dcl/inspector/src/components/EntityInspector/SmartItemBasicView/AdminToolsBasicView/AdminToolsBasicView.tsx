@@ -46,19 +46,6 @@ const AdminToolsBasicView = withSdk<Props>(({ sdk, entity }) => {
 
   return (
     <div className="AdminToolsBasicViewInspector">
-      <Block>
-        <AdminAllowListControl entity={entity} />
-      </Block>
-
-      <Accordion
-        label="VIDEO CONTROL"
-        className="PanelSection border"
-        enabled={!!adminComponent.videoControl?.isEnabled}
-        onToggleEnabled={(enabled) => handleToggleEnabled('videoControl', enabled)}
-      >
-        <VideoControl entity={entity} />
-      </Accordion>
-
       <Accordion
         label="TEXT ANNOUNCEMENTS"
         className="PanelSection border"
@@ -67,7 +54,14 @@ const AdminToolsBasicView = withSdk<Props>(({ sdk, entity }) => {
       >
         <TextAnnouncementControl entity={entity} />
       </Accordion>
-
+      <Accordion
+        label="VIDEO SCREEN"
+        className="PanelSection border"
+        enabled={!!adminComponent.videoControl?.isEnabled}
+        onToggleEnabled={(enabled) => handleToggleEnabled('videoControl', enabled)}
+      >
+        <VideoControl entity={entity} />
+      </Accordion>
       <Accordion
         label="SMART ITEM ACTIONS"
         className="PanelSection border"

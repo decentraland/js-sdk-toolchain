@@ -35,6 +35,7 @@ import { AdminToolkitView } from './AdminToolkitView'
 import { RewardInspector } from './RewardInspector'
 
 import './EntityInspector.css'
+import { VideoScreenBasicView } from './SmartItemBasicView/VideoScreenBasicView'
 
 export function EntityInspector() {
   const selectedEntities = useEntitiesWith((components) => components.Selection)
@@ -157,7 +158,8 @@ const SingleEntityInspector = withSdk<{ entity: Entity | null }>(({ sdk, entity 
       },
       { name: sdk.components.CounterBar.componentName, component: CounterBarInspector },
       { name: sdk.components.AdminTools.componentName, component: AdminToolkitView },
-      { name: sdk.components.Rewards.componentName, component: RewardInspector }
+      { name: sdk.components.Rewards.componentName, component: RewardInspector },
+      { name: sdk.components.VideoScreen.componentName, component: VideoScreenBasicView }
     ],
     [sdk]
   )

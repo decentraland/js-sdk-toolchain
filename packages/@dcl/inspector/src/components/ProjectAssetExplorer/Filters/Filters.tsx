@@ -37,7 +37,7 @@ export function Filters({ filters, active, onClick }: PropTypes) {
       {filters.map(($) => {
         const _filter = getFilter($)
         return (
-          <div className={cx('filter', { active: $ === active })} onClick={handleClick($)}>
+          <div key={_filter.title} className={cx('filter', { active: $ === active })} onClick={handleClick($)}>
             {<_filter.icon />}
             {_filter.title}
           </div>
