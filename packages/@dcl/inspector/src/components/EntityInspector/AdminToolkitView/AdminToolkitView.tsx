@@ -52,11 +52,8 @@ const AdminToolkitView = withSdk<Props>(({ sdk, entity }) => {
         />
       }
     >
-      <Block>
-        <AdminAllowListControl entity={entity} />
-      </Block>
       <Accordion
-        label="VIDEO CONTROL"
+        label="VIDEO SCREENS"
         className="PanelSection"
         enabled={!!adminComponent.videoControl.isEnabled}
         onToggleEnabled={(enabled) => handleToggleEnabled('videoControl', enabled)}

@@ -20,7 +20,7 @@ type Props = {
 const VideoControl: React.FC<WithSdkProps & Props> = ({ sdk, entity }) => {
   const { AdminTools, Name } = sdk.components
   const [adminComponent, setAdminComponent] = useComponentValue(entity, AdminTools)
-  const [videoPlayerEntities] = useComponentsWith((components) => components.VideoPlayer)
+  const [videoPlayerEntities] = useComponentsWith((components) => components.VideoScreen)
 
   const handleAddVideoPlayer = useCallback(() => {
     if (!adminComponent) return
