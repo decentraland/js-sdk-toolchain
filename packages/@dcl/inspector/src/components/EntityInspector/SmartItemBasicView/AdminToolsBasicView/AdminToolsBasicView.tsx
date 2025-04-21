@@ -3,12 +3,10 @@ import React, { useCallback, useMemo } from 'react'
 import { withSdk } from '../../../../hoc/withSdk'
 import { useComponentValue } from '../../../../hooks/sdk/useComponentValue'
 
-import { Block } from '../../../Block'
 import { Accordion } from '../../../ui'
 
 import { VideoControl } from '../../AdminToolkitView/VideoControl'
 import { SmartItemControl } from '../../AdminToolkitView/SmartItemControl'
-import { AdminAllowListControl } from '../../AdminToolkitView/AdminAllowListControl'
 import { TextAnnouncementControl } from '../../AdminToolkitView/TextAnnouncementControl'
 
 import { type Props } from '../../AdminToolkitView/types'
@@ -21,12 +19,7 @@ const AdminToolsBasicView = withSdk<Props>(({ sdk, entity }) => {
 
   const handleToggleEnabled = useCallback(
     (
-      control:
-        | 'videoControl'
-        | 'moderationControl'
-        | 'textAnnouncementControl'
-        | 'rewardsControl'
-        | 'smartItemsControl',
+      control: 'videoControl' | 'textAnnouncementControl' | 'rewardsControl' | 'smartItemsControl',
       enabled: boolean
     ) => {
       if (!adminComponent) return

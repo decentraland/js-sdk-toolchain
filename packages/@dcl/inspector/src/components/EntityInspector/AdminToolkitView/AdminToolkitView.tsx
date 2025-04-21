@@ -5,11 +5,9 @@ import { useHasComponent } from '../../../hooks/sdk/useHasComponent'
 
 import { Accordion, InfoTooltip } from '../../ui'
 import { Container } from '../../Container'
-import { Block } from '../../Block'
 
 import { VideoControl } from './VideoControl'
 import { SmartItemControl } from './SmartItemControl'
-import { AdminAllowListControl } from './AdminAllowListControl'
 import { TextAnnouncementControl } from './TextAnnouncementControl'
 import { type Props } from './types'
 import './AdminToolkitView.css'
@@ -21,12 +19,7 @@ const AdminToolkitView = withSdk<Props>(({ sdk, entity }) => {
 
   const handleToggleEnabled = useCallback(
     (
-      control:
-        | 'videoControl'
-        | 'moderationControl'
-        | 'textAnnouncementControl'
-        | 'rewardsControl'
-        | 'smartItemsControl',
+      control: 'videoControl' | 'textAnnouncementControl' | 'rewardsControl' | 'smartItemsControl',
       enabled: boolean
     ) => {
       if (!adminComponent) return
