@@ -189,7 +189,7 @@ function preEngine(options?: IEngineOptions): PreEngine {
     }
   }
 
-  function getEntityOrNullByName(value: string) {
+  function getEntityOrNullByName<T = string>(value: T) {
     const NameComponent = components.Name({ defineComponent })
     for (const [entity, name] of getEntitiesWith(NameComponent)) {
       if (name.value === value) return entity

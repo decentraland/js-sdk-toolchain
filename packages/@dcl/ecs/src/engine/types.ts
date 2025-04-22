@@ -245,7 +245,7 @@ export interface IEngine {
    * Search for the entity that matches de label string defined in the editor.
    * @param value - Name value string
    */
-  getEntityOrNullByName(label: string): Entity | null
+  getEntityOrNullByName<T = string>(label: T): Entity | null
 
   /**
    * @public
