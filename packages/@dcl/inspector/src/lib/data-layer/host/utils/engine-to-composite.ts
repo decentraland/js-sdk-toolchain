@@ -170,45 +170,47 @@ export async function generateEntityNamesType(
     // Remove duplicates
     const uniqueNames = Array.from(new Set(names))
 
-    // Generate valid TypeScript identifiers
-    const validNames = uniqueNames.map((name) => {
+    // Generate valid TypeScript identifiers and handle duplicates in a single pass
+    const validNameMap = new Map<string, string>()
+    const finalNames: Array<{ original: string; valid: string }> = []
+
+    for (const name of uniqueNames) {
       // Create a valid TypeScript identifier
-      const validName = name
+      let validName = name
         .replace(/[^a-zA-Z0-9_]/g, '_') // Replace non-alphanumeric chars with underscore
         .replace(/^[0-9]/, '_$&') // Prepend underscore if starts with number
 
-      // Ensure no duplicate keys after validation
-      return { original: name, valid: validName }
-    })
+      // Handle collision if this valid name already exists
+      if (validNameMap.has(validName)) {
+        // Add numeric suffix for uniqueness
+        let suffix = 1
+        while (validNameMap.has(`${validName}_${suffix}`)) {
+          suffix++
+        }
+        validName = `${validName}_${suffix}`
+      }
+
+      // Store the mapping and add to result
+      validNameMap.set(validName, name)
+      finalNames.push({ original: name, valid: validName })
+    }
 
     // Generate the .d.ts file content
     let fileContent = `// Auto-generated entity names from the scene\n\n`
-    fileContent += `/**\n * Union type containing all entity names in the scene.\n * Use for type-safe references to entities by name.\n */\n`
-    fileContent += `export type I${typeName} = `
-
-    if (uniqueNames.length === 0) {
-      fileContent += `never\n`
-    } else {
-      fileContent += `\n`
-      for (const key in uniqueNames) {
-        const isLast = Number(key) === uniqueNames.length - 1
-        fileContent += `  | "${uniqueNames[key]}"${isLast ? '\n' : '\n'}`
-      }
-    }
 
     // Add a constant object with name keys for IDE autocompletion
     fileContent += `\n/**\n * Object containing all entity names in the scene for autocomplete support.\n */\n`
-    fileContent += `export const ${typeName} = {\n`
+    fileContent += `export enum ${typeName} {\n`
 
-    for (const { original, valid } of validNames) {
-      fileContent += `  ${valid}: "${original}",\n`
+    for (const { original, valid } of finalNames) {
+      fileContent += `  ${valid} = "${original}",\n`
     }
 
-    fileContent += `} as const\n`
+    fileContent += `} \n`
 
     // Write to file
     await fs.writeFile(outputPath, Buffer.from(fileContent, 'utf-8'))
   } catch (e) {
-    console.error('Faield to generate entity names types', e)
+    console.error('Fail to generate entity names types', e)
   }
 }

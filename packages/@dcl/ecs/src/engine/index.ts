@@ -197,6 +197,11 @@ function preEngine(options?: IEngineOptions): PreEngine {
     return null
   }
 
+  function getEntityByName<T = never, K = T>(value: K & (T extends never ? never : string)): Entity {
+    const entity = getEntityOrNullByName(value)
+    return entity!
+  }
+
   function* getComponentDefGroup<T extends ComponentDefinition<any>[]>(...args: T): Iterable<[Entity, ...T]> {
     const [firstComponentDef, ...componentDefinitions] = args
     for (const [entity] of firstComponentDef.iterator()) {
@@ -252,6 +257,7 @@ function preEngine(options?: IEngineOptions): PreEngine {
     getComponent,
     getComponentOrNull: getComponentOrNull as IEngine['getComponentOrNull'],
     getEntityOrNullByName,
+    getEntityByName,
     removeComponentDefinition,
     registerComponentDefinition,
     entityContainer,
@@ -313,6 +319,7 @@ export function Engine(options?: IEngineOptions): IEngine {
     componentsIter: partialEngine.componentsIter,
     seal: partialEngine.seal,
     getEntityOrNullByName: partialEngine.getEntityOrNullByName,
+    getEntityByName: partialEngine.getEntityByName,
 
     update,
 

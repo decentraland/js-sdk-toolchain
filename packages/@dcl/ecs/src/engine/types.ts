@@ -62,6 +62,7 @@ export type PreEngine = Pick<
   | 'seal'
   | 'entityContainer'
   | 'getEntityOrNullByName'
+  | 'getEntityByName'
 > & {
   getSystems: () => SystemItem[]
 }
@@ -246,6 +247,14 @@ export interface IEngine {
    * @param value - Name value string
    */
   getEntityOrNullByName<T = string>(label: T): Entity | null
+
+  /**
+   * @public
+   * Search for the entity that matches de label string defined in the editor.
+   * @param value - Name value string
+   * @typeParam T - The type of the entity name value
+   */
+  getEntityByName<T = never, K = T>(value: K & (T extends never ? never : string)): Entity
 
   /**
    * @public
