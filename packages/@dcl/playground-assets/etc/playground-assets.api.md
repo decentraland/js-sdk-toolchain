@@ -1248,7 +1248,7 @@ export interface IEngine {
     getComponentOrNull<T>(componentId: number | string): ComponentDefinition<T> | null;
     getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     // @alpha
-    getEntityOrNullByName(label: string): Entity | null;
+    getEntityOrNullByName<T = string>(label: T): Entity | null;
     getEntityState(entity: Entity): EntityState;
     // (undocumented)
     _id: number;

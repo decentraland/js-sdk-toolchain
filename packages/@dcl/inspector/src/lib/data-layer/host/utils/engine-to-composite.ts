@@ -9,8 +9,7 @@ import {
   LastWriteWinElementSetComponentDefinition,
   PutComponentOperation,
   getCompositeRootComponent,
-  Name,
-  NameType
+  Name
 } from '@dcl/ecs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { FileSystemInterface } from '../../types'
