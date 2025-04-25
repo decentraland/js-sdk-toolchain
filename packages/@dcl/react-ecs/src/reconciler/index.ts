@@ -412,39 +412,8 @@ export function createReconciler(
     null
   )
 
-  // Maybe this could be something similar to Input system, but since we
-  // are going to use this only here, i prefer to scope it here.
-  function handleOnChange(
-    componentId: number,
-    resultComponent: typeof UiDropdownResult | typeof UiInputResult | typeof UiScrollResult
-  ) {
-    for (const [entity, Result] of engine.getEntitiesWith(resultComponent)) {
-      const entityState = changeEvents.get(entity)?.get(componentId)
-      const isSubmit = !!(Result as any).isSubmit
-      if (entityState?.onChangeCallback && Result.value !== entityState.value) {
-        entityState.onChangeCallback(Result.value)
-      }
-      if (entityState?.onSubmitCallback && isSubmit && !entityState.isSubmit) {
-        entityState.onSubmitCallback(Result.value)
-      }
-
-      updateOnChange(entity, componentId, {
-        onChangeCallback: entityState?.onChangeCallback,
-        onSubmitCallback: entityState?.onSubmitCallback,
-        value: Result.value,
-        isSubmit
-      })
-    }
-  }
-
   return {
     update: function (component: ReactEcs.JSX.ReactNode) {
-      if (changeEvents.size) {
-        handleOnChange(UiInput.componentId, UiInputResult)
-        handleOnChange(UiDropdown.componentId, UiDropdownResult)
-        // TODO: maybe as componentId could be a virtual id since the scroll input doesn't exist
-        handleOnChange(UiTransform.componentId, UiScrollResult)
-      }
       return reconciler.updateContainer(component as any, root, null)
     },
     getEntities: () => Array.from(entities)
