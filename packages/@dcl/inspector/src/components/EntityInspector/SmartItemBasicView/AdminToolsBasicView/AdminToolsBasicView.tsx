@@ -48,7 +48,7 @@ const AdminToolsBasicView = withSdk<Props>(({ sdk, entity }) => {
         <TextAnnouncementControl entity={entity} />
       </Accordion>
       <Accordion
-        label="VIDEO SCREEN"
+        label="VIDEO SCREENS"
         className="PanelSection border"
         enabled={!!adminComponent.videoControl?.isEnabled}
         onToggleEnabled={(enabled) => handleToggleEnabled('videoControl', enabled)}

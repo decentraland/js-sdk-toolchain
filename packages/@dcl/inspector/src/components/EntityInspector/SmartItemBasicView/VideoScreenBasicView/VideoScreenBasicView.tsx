@@ -12,6 +12,7 @@ import { Block } from '../../../Block'
 import { isValidHttpsUrl } from '../../../../lib/utils/url'
 
 import './VideoScreenBasicView.css'
+
 const VideoScreenBasicView = withSdk<Props>(({ sdk, entity }) => {
   const { VideoScreen, VideoPlayer } = sdk.components
   const [videoScreenComponent, setVideoScreenComponent] = useComponentValue(entity, VideoScreen)
@@ -61,7 +62,11 @@ const VideoScreenBasicView = withSdk<Props>(({ sdk, entity }) => {
 
   return (
     <div className="VideoScreenBasicViewInspector">
-      <Label className="Title" text="General Player Settings" />
+      <div className="Info">
+        <InfoIcon size={16} />
+        <Label text="Add the 'Admin Tools' Smart Item to your scene to modify the content and settings of this screen in-world." />
+      </div>
+      <Label className="Title" text="Default Settings" />
       <Block className="volume" label="Volume">
         <RangeField
           value={Math.round((videoPlayerComponent.volume ?? 0) * 100)}
@@ -84,7 +89,7 @@ const VideoScreenBasicView = withSdk<Props>(({ sdk, entity }) => {
         ]}
       />
       <Container label="VIDEO URL" className="PanelSection">
-        <Block label="Default video URL">
+        <Block label="Video URL - Paste a link from Vimeo">
           <TextField
             autoSelect
             type="text"
@@ -103,7 +108,7 @@ const VideoScreenBasicView = withSdk<Props>(({ sdk, entity }) => {
         </Block>
         <CheckboxGroup className="PlayBack" label="Playback">
           <CheckboxField
-            label="Start playing"
+            label="Auto play"
             checked={!!videoPlayerComponent?.playing}
             onChange={handleCheckboxChange('playing')}
           />
@@ -112,7 +117,7 @@ const VideoScreenBasicView = withSdk<Props>(({ sdk, entity }) => {
       </Container>
       <Container label="LIVE STREAM" className="PanelSection LiveStreamSection">
         <InfoIcon size={16} />
-        <Label text="Stream Keys can be generated and viewed in-world" />
+        <Label text="Stream keys are generated from the Admin Tools panel in your scene in-world. Make sure to add the 'Admin Tools' Smart Item to your scene." />
       </Container>
     </div>
   )

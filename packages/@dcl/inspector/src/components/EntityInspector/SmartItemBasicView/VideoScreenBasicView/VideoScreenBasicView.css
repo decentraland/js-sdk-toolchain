@@ -3,6 +3,17 @@
   flex-direction: column;
   gap: 16px;
 
+  .Info {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 8px;
+      label {
+        margin-left: 8px;
+        text-wrap: wrap;
+        width: 80%;
+      }
+  }
+
   .Title {
     font-size: 14px;
     font-weight: 400;
@@ -37,9 +48,9 @@
   .LiveStreamSection .content {
     display: flex;
     flex-direction: row;
-    align-items: center;
     margin-bottom: 10px;
     .Label {
+      text-wrap: wrap;
       margin-left: 8px;
       font-weight: 400;
       font-size: 11px;
