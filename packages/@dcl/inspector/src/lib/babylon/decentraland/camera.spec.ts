@@ -1,5 +1,7 @@
 import * as BABYLON from '@babylonjs/core'
+
 import { CameraManager } from './camera'
+import { MIDDLE_BUTTON, RIGHT_BUTTON } from './mouse-utils'
 
 describe('Camera manager', () => {
   let engine: BABYLON.Engine
@@ -28,15 +30,15 @@ describe('Camera manager', () => {
       cameraManager = new CameraManager(scene, document.createElement('canvas'), [0, 1, 2], 1, 1, 1)
       mouseDown = {
         type: BABYLON.PointerEventTypes.POINTERDOWN,
-        event: { pointerType: 'mouse' }
+        event: { pointerType: 'mouse', button: RIGHT_BUTTON }
       } as unknown as BABYLON.PointerInfo
       mouseWheelUp = {
         type: BABYLON.PointerEventTypes.POINTERWHEEL,
-        event: { deltaY: -240 }
+        event: { deltaY: -240, button: MIDDLE_BUTTON }
       } as unknown as BABYLON.PointerInfo
       mouseWheelDown = {
         type: BABYLON.PointerEventTypes.POINTERWHEEL,
-        event: { deltaY: 240 }
+        event: { deltaY: 240, button: MIDDLE_BUTTON }
       } as unknown as BABYLON.PointerInfo
     })
     it('should start with correct default speed', () => {

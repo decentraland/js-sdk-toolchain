@@ -10,12 +10,14 @@ import {
 } from '@babylonjs/core'
 import { Entity, TransformType } from '@dcl/ecs'
 import { Vector3 as DclVector3, Quaternion as DclQuaternion } from '@dcl/ecs-math'
+
 import { GizmoType } from '../../utils/gizmo'
 import { EcsEntity } from './EcsEntity'
 import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manager'
 import { SceneContext } from './SceneContext'
 import { PatchedGizmoManager } from './gizmo-patch'
 import { ROOT } from '../../sdk/tree'
+import { LEFT_BUTTON } from './mouse-utils'
 
 const GIZMO_DUMMY_NODE = 'GIZMO_DUMMY_NODE'
 
@@ -29,6 +31,12 @@ function releaseDragFromGizmo({ xGizmo, yGizmo, zGizmo }: GizmoAxis) {
   xGizmo.dragBehavior.releaseDrag()
   yGizmo.dragBehavior.releaseDrag()
   zGizmo.dragBehavior.releaseDrag()
+}
+
+function configureGizmoButtons(gizmo: GizmoAxis, buttons: number[]) {
+  gizmo.xGizmo.dragBehavior.dragButtons = buttons
+  gizmo.yGizmo.dragBehavior.dragButtons = buttons
+  gizmo.zGizmo.dragBehavior.dragButtons = buttons
 }
 
 function areProportional(a: number, b: number) {
@@ -64,6 +72,11 @@ export function createGizmoManager(context: SceneContext) {
   gizmoManager.scaleGizmoEnabled = false
   gizmoManager.gizmos.positionGizmo!.updateGizmoRotationToMatchAttachedMesh = false
   gizmoManager.gizmos.rotationGizmo!.updateGizmoRotationToMatchAttachedMesh = true
+
+  // Configure all gizmos to only work with left click
+  if (gizmoManager.gizmos.positionGizmo) configureGizmoButtons(gizmoManager.gizmos.positionGizmo, [LEFT_BUTTON])
+  if (gizmoManager.gizmos.rotationGizmo) configureGizmoButtons(gizmoManager.gizmos.rotationGizmo, [LEFT_BUTTON])
+  if (gizmoManager.gizmos.scaleGizmo) configureGizmoButtons(gizmoManager.gizmos.scaleGizmo, [LEFT_BUTTON])
 
   let selectedEntities: EcsEntity[] = []
   let rotationGizmoAlignmentDisabled = false

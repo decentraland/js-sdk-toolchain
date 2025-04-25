@@ -3,7 +3,10 @@ import { IEngine } from '../engine/types'
 import { AnimatorComponentDefinitionExtended, defineAnimatorComponent } from './extended/Animator'
 import { AudioSourceComponentDefinitionExtended, defineAudioSourceComponent } from './extended/AudioSource'
 import { AudioStreamComponentDefinitionExtended, defineAudioStreamComponent } from './extended/AudioStream'
-import { AvatarEquippedDataComponentDefinitionExtended, defineAvatarEquippedDataComponent } from './extended/AvatarEquippedData'
+import {
+  AvatarEquippedDataComponentDefinitionExtended,
+  defineAvatarEquippedDataComponent
+} from './extended/AvatarEquippedData'
 import { AvatarShapeComponentDefinitionExtended, defineAvatarShapeComponent } from './extended/AvatarShape'
 import { defineInputModifierComponent, InputModifierComponentDefinitionExtended } from './extended/InputModifier'
 import { defineMaterialComponent, MaterialComponentDefinitionExtended } from './extended/Material'
@@ -22,7 +25,9 @@ import { defineTransformComponent, TransformComponentExtended } from './manual/T
 export * from './generated/index.gen'
 
 export type {
-  GrowOnlyValueSetComponentDefinition, GSetComponentGetter, LastWriteWinElementSetComponentDefinition,
+  GrowOnlyValueSetComponentDefinition,
+  GSetComponentGetter,
+  LastWriteWinElementSetComponentDefinition,
   LwwComponentGetter
 }
 
@@ -58,10 +63,12 @@ export const MeshCollider: LwwComponentGetter<MeshColliderComponentDefinitionExt
 export const Tween: LwwComponentGetter<TweenComponentDefinitionExtended> = (engine) => defineTweenComponent(engine)
 
 /* @__PURE__ */
-export const AvatarShape: LwwComponentGetter<AvatarShapeComponentDefinitionExtended> = (engine) => defineAvatarShapeComponent(engine)
+export const AvatarShape: LwwComponentGetter<AvatarShapeComponentDefinitionExtended> = (engine) =>
+  defineAvatarShapeComponent(engine)
 
 /* @__PURE__ */
-export const AvatarEquippedData: LwwComponentGetter<AvatarEquippedDataComponentDefinitionExtended> = (engine) => defineAvatarEquippedDataComponent(engine)
+export const AvatarEquippedData: LwwComponentGetter<AvatarEquippedDataComponentDefinitionExtended> = (engine) =>
+  defineAvatarEquippedDataComponent(engine)
 
 /* @__PURE__ */
 export const VirtualCamera: LwwComponentGetter<VirtualCameraComponentDefinitionExtended> = (engine) =>
