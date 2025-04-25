@@ -69,7 +69,7 @@ const VideoScreenBasicView = withSdk<Props>(({ sdk, entity }) => {
       <Label className="Title" text="Default Settings" />
       <Block className="volume" label="Volume">
         <RangeField
-          value={Math.round((videoPlayerComponent.volume ?? 0) * 100)}
+          value={Math.round((videoPlayerComponent.volume ?? 1) * 100)}
           onChange={(e: any) => {
             setVideoPlayerComponent({ ...videoPlayerComponent, volume: Number(e.target.value / 100) })
           }}
