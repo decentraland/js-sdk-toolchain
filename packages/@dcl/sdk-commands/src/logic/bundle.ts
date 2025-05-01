@@ -14,6 +14,7 @@ import { printProgressInfo, printProgressStep, printWarning } from './beautiful-
 import { CliError } from './error'
 import { getAllComposites } from './composite'
 import { isEditorScene } from './project-validations'
+import fs from 'fs'
 
 export type BundleComponents = Pick<CliComponents, 'logger' | 'fs'>
 
@@ -37,6 +38,9 @@ export type CompileOptions = {
 
   ignoreComposite: boolean
   customEntryPoint: boolean
+
+  // check if scene uses syncEntity
+  checkSyncEntity?: boolean
 }
 
 const MAX_STEP = 2
@@ -55,10 +59,8 @@ function getEntrypointCode(entrypointPath: string, forceCustomExport: boolean, i
   return `// BEGIN AUTO GENERATED CODE "~sdk/scene-entrypoint"
 "use strict";
 import * as entrypoint from '${unixEntrypointPath}'
-import { engine, NetworkEntity } from '@dcl/sdk/ecs'
+import { engine } from '@dcl/sdk/ecs'
 import * as sdk from '@dcl/sdk'
-import { compositeProvider } from '@dcl/sdk/composite-provider'
-import { compositeFromLoader } from '~sdk/all-composites'
 
 ${
   isEditorScene &&
@@ -196,8 +198,28 @@ export async function bundleSingleProject(components: BundleComponents, options:
     printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
   } else {
     try {
-      await context.rebuild()
+      const result = await context.rebuild()
       printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
+
+      // Check for syncEntity in metafile if requested
+      if (options.checkSyncEntity && result.metafile) {
+        if (editorScene) {
+          // check if we have defined a NetworkComponent in the composite.json
+          function hasNetworkComponent() {
+            return true
+          }
+          if (hasNetworkComponent()) {
+            printProgressInfo(components.logger, `Creator Hub Scene IS using syncEntity from @dcl/sdk/network`)
+            return true
+          }
+        }
+
+        const usingSyncEntity = checkSyncEntityInCode(result.metafile)
+        printProgressInfo(
+          components.logger,
+          `Scene ${usingSyncEntity ? 'IS' : 'is NOT'} using syncEntity from @dcl/sdk/network`
+        )
+      }
     } catch (err: any) {
       /* istanbul ignore next */
       throw new CliError(err.toString())
@@ -209,6 +231,37 @@ export async function bundleSingleProject(components: BundleComponents, options:
   if (options.watch) printProgressInfo(components.logger, `The compiler is watching for changes`)
 
   await runTypeChecker(components, options)
+}
+
+/**
+ * Checks if the bundled scene is using syncEntity from @dcl/sdk/network
+ * @param metafile - The esbuild metafile
+ * @returns boolean indicating if syncEntity is used
+ */
+function checkSyncEntityInCode(metafile: esbuild.Metafile): boolean {
+  // Check all inputs in the metafile
+  for (const [path, info] of Object.entries(metafile.inputs)) {
+    // Check if this file imports from @dcl/sdk/network
+    const networkImport = info.imports?.find((imp) => imp.path.includes('@dcl/sdk/network'))
+
+    if (networkImport) {
+      // Check if it imports syncEntity specifically
+      try {
+        const content = fs.readFileSync(path, 'utf-8')
+        if (
+          content.includes('syncEntity') &&
+          /import.*\{.*syncEntity.*\}.*from.*['"]@dcl\/sdk\/network['"]/.test(content)
+        ) {
+          return true
+        }
+      } catch (e) {
+        // If we can't read the file, we assume it might be using syncEntity
+        return true
+      }
+    }
+  }
+
+  return false
 }
 
 function runTypeChecker(components: BundleComponents, options: CompileOptions) {

@@ -76,7 +76,9 @@ export async function buildScene(options: Options, project: SceneProject | Weara
       production: !!options.args['--production'],
       emitDeclaration: !!options.args['--emitDeclaration'],
       ignoreComposite: !!options.args['--ignoreComposite'],
-      customEntryPoint: !!options.args['--customEntryPoint']
+      customEntryPoint: !!options.args['--customEntryPoint'],
+      // TODO: update when necessary.
+      checkSyncEntity: false
     },
     project.scene
   )
