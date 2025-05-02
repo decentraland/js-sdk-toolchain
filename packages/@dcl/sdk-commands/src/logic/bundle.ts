@@ -40,7 +40,7 @@ export type CompileOptions = {
   customEntryPoint: boolean
 
   // check if scene uses syncEntity
-  checkSyncEntity?: boolean
+  checkMultiplayerScene?: boolean
 }
 
 const MAX_STEP = 2
@@ -52,27 +52,31 @@ const MAX_STEP = 2
  * @returns the Typescript code
  */
 
-function getEntrypointCode(entrypointPath: string, forceCustomExport: boolean, isEditorScene: boolean = false) {
+function getEntrypointCode(
+  entrypointPath: string,
+  forceCustomExport: boolean,
+  isEditorScene: boolean = false,
+  workingDirectory: string
+) {
   const unixEntrypointPath = entrypointPath.replace(/(\\)/g, '/')
   if (forceCustomExport) return `;"use strict";export * from '${unixEntrypointPath}'`
+
+  // Check if we need to include syncEntity
+  const needsSyncEntity = isEditorScene && hasNetworkEntity(workingDirectory)
 
   return `// BEGIN AUTO GENERATED CODE "~sdk/scene-entrypoint"
 "use strict";
 import * as entrypoint from '${unixEntrypointPath}'
 import { engine } from '@dcl/sdk/ecs'
-import * as sdk from '@dcl/sdk'
 
+// Include @dcl/asset-packs init if its an editor scene.
 ${
   isEditorScene &&
   `
-import { syncEntity } from '@dcl/sdk/network'
+${needsSyncEntity ? "import { syncEntity } from '@dcl/sdk/network'" : '// No NetworkEntity found in main.composite'}
 import players from '@dcl/sdk/players'
-import { initAssetPacks, setSyncEntity } from '@dcl/asset-packs/dist/scene-entrypoint'
-initAssetPacks(engine, { syncEntity }, players)
-
-// TODO: do we need to do this on runtime ?
-// I think we have that information at build-time and we avoid to do evaluate this on the worker.
-// Read composite.json or main.crdt => If that file has a NetowrkEntity import '@dcl/@sdk/network'
+import { initAssetPacks } from '@dcl/asset-packs/dist/scene-entrypoint'
+initAssetPacks(engine, ${needsSyncEntity ? '{ syncEntity }' : '{}'}, players)
 `
 }
 
@@ -95,6 +99,41 @@ if ((entrypoint as any).main !== undefined) {
 export * from '@dcl/sdk'
 export * from '${unixEntrypointPath}'
 `
+}
+
+// Function to check if NetworkEntity exists in main.composite
+function hasNetworkEntity(workingDirectory = process.cwd()) {
+  try {
+    // Check if main.composite exists in working directory
+    let mainCompositePath = path.join(workingDirectory, 'main.composite')
+    if (!fs.existsSync(mainCompositePath)) {
+      // Also check in the scene/assets directory which is another common location
+      const altPath = path.join(workingDirectory, 'assets', 'scene', 'main.composite')
+      if (!fs.existsSync(altPath)) {
+        return false
+      }
+      mainCompositePath = altPath
+    }
+
+    // Read and parse the composite file
+    const content = fs.readFileSync(mainCompositePath, 'utf-8')
+    const compositeJson = JSON.parse(content)
+
+    // Check if the NetworkEntity component exists
+    // The component name is 'core-schema::Network-Entity'
+    if (compositeJson && compositeJson.components) {
+      for (const component of compositeJson.components) {
+        if (component.name === 'core-schema::Network-Entity') {
+          return true
+        }
+      }
+    }
+
+    return false
+  } catch (error) {
+    // If there's any error reading or parsing the file, assume no NetworkEntity
+    return false
+  }
 }
 
 export async function bundleProject(components: BundleComponents, options: CompileOptions, sceneJson: Scene) {
@@ -184,7 +223,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
     },
     plugins: [compositeLoader(components, options)],
     stdin: {
-      contents: getEntrypointCode(options.entrypoint, options.customEntryPoint, editorScene),
+      contents: getEntrypointCode(options.entrypoint, options.customEntryPoint, editorScene, options.workingDirectory),
       resolveDir: path.dirname(options.entrypoint),
       sourcefile: path.basename(options.entrypoint) + '.entry-point.ts',
       loader: 'ts'
@@ -202,23 +241,12 @@ export async function bundleSingleProject(components: BundleComponents, options:
       printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
 
       // Check for syncEntity in metafile if requested
-      if (options.checkSyncEntity && result.metafile) {
-        if (editorScene) {
-          // check if we have defined a NetworkComponent in the composite.json
-          function hasNetworkComponent() {
-            return true
-          }
-          if (hasNetworkComponent()) {
-            printProgressInfo(components.logger, `Creator Hub Scene IS using syncEntity from @dcl/sdk/network`)
-            return true
-          }
-        }
+      if (options.checkMultiplayerScene && result.metafile) {
+        const isMultiplayer = isMultiplayerScene(result.metafile, options.workingDirectory)
+        printProgressInfo(components.logger, isMultiplayer ? 'Multiplayer Scene' : 'Single player scene')
 
-        const usingSyncEntity = checkSyncEntityInCode(result.metafile)
-        printProgressInfo(
-          components.logger,
-          `Scene ${usingSyncEntity ? 'IS' : 'is NOT'} using syncEntity from @dcl/sdk/network`
-        )
+        // Update scene.json with multiplayer property
+        await updateSceneJsonMultiplayerProperty(components, options.workingDirectory, isMultiplayer)
       }
     } catch (err: any) {
       /* istanbul ignore next */
@@ -234,12 +262,18 @@ export async function bundleSingleProject(components: BundleComponents, options:
 }
 
 /**
- * Checks if the bundled scene is using syncEntity from @dcl/sdk/network
+ * Determines if a scene is multiplayer based on code analysis and composite files
  * @param metafile - The esbuild metafile
- * @returns boolean indicating if syncEntity is used
+ * @param workingDirectory - Path to the working directory
+ * @returns boolean indicating if it's a multiplayer scene
  */
-function checkSyncEntityInCode(metafile: esbuild.Metafile): boolean {
-  // Check all inputs in the metafile
+function isMultiplayerScene(metafile: esbuild.Metafile, workingDirectory: string): boolean {
+  // First check if the scene has NetworkEntity in main.composite
+  if (hasNetworkEntity(workingDirectory)) {
+    return true
+  }
+
+  // Then check all inputs in the metafile for syncEntity imports
   for (const [path, info] of Object.entries(metafile.inputs)) {
     // Check if this file imports from @dcl/sdk/network
     const networkImport = info.imports?.find((imp) => imp.path.includes('@dcl/sdk/network'))
@@ -356,5 +390,42 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
         }
       })
     }
+  }
+}
+
+/**
+ * Updates the scene.json file with the multiplayer property
+ * @param components - CLI components
+ * @param workingDirectory - Path to the working directory
+ * @param isMultiplayer - Whether the scene is multiplayer
+ */
+async function updateSceneJsonMultiplayerProperty(
+  components: BundleComponents,
+  workingDirectory: string,
+  isMultiplayer: boolean
+): Promise<void> {
+  try {
+    const sceneJsonPath = path.join(workingDirectory, 'scene.json')
+
+    // Check if scene.json exists
+    if (await components.fs.fileExists(sceneJsonPath)) {
+      // Read current scene.json
+      const sceneJsonContent = await components.fs.readFile(sceneJsonPath)
+      const sceneJson = JSON.parse(sceneJsonContent.toString('utf-8'))
+
+      // Update multiplayer property
+      if (sceneJson.multiplayer !== isMultiplayer) {
+        sceneJson.multiplayer = isMultiplayer
+
+        // Write updated scene.json
+        await components.fs.writeFile(sceneJsonPath, Buffer.from(JSON.stringify(sceneJson, null, 2), 'utf-8'))
+
+        printProgressInfo(components.logger, `Updated scene.json with multiplayer: ${isMultiplayer}`)
+      }
+    } else {
+      printWarning(components.logger, 'Cannot update scene.json: file not found')
+    }
+  } catch (error) {
+    printWarning(components.logger, `Failed to update scene.json: ${error}`)
   }
 }
