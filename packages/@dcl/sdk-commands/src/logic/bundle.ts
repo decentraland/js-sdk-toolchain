@@ -14,7 +14,6 @@ import { printProgressInfo, printProgressStep, printWarning } from './beautiful-
 import { CliError } from './error'
 import { getAllComposites } from './composite'
 import { isEditorScene } from './project-validations'
-import fs from 'fs'
 
 export type BundleComponents = Pick<CliComponents, 'logger' | 'fs'>
 
@@ -55,14 +54,14 @@ const MAX_STEP = 2
 function getEntrypointCode(
   entrypointPath: string,
   forceCustomExport: boolean,
-  isEditorScene: boolean = false,
-  workingDirectory: string
+  isEditorScene: boolean,
+  hasNetworkComponent: boolean
 ) {
   const unixEntrypointPath = entrypointPath.replace(/(\\)/g, '/')
   if (forceCustomExport) return `;"use strict";export * from '${unixEntrypointPath}'`
 
   // Check if we need to include syncEntity
-  const needsSyncEntity = isEditorScene && hasNetworkEntity(workingDirectory)
+  const needsSyncEntity = isEditorScene && hasNetworkComponent
 
   return `// BEGIN AUTO GENERATED CODE "~sdk/scene-entrypoint"
 "use strict";
@@ -102,21 +101,21 @@ export * from '${unixEntrypointPath}'
 }
 
 // Function to check if NetworkEntity exists in main.composite
-function hasNetworkEntity(workingDirectory = process.cwd()) {
+async function hasNetworkEntity(fs: BundleComponents['fs'], workingDirectory = process.cwd()) {
   try {
     // Check if main.composite exists in working directory
     let mainCompositePath = path.join(workingDirectory, 'main.composite')
-    if (!fs.existsSync(mainCompositePath)) {
+    if (!(await fs.fileExists(mainCompositePath))) {
       // Also check in the scene/assets directory which is another common location
       const altPath = path.join(workingDirectory, 'assets', 'scene', 'main.composite')
-      if (!fs.existsSync(altPath)) {
+      if (!(await fs.fileExists(altPath))) {
         return false
       }
       mainCompositePath = altPath
     }
 
     // Read and parse the composite file
-    const content = fs.readFileSync(mainCompositePath, 'utf-8')
+    const content = await fs.readFile(mainCompositePath, 'utf-8')
     const compositeJson = JSON.parse(content)
 
     // Check if the NetworkEntity component exists
@@ -185,6 +184,8 @@ type SingleProjectOptions = CompileOptions & {
 export async function bundleSingleProject(components: BundleComponents, options: SingleProjectOptions) {
   printProgressStep(components.logger, `Bundling file ${colors.bold(options.entrypoint)}`, 1, MAX_STEP)
   const editorScene = await isEditorScene(components, options.workingDirectory)
+  const networkEntityInComposite = editorScene && (await hasNetworkEntity(components.fs, options.workingDirectory))
+
   const context = await esbuild.context({
     bundle: true,
     platform: 'browser',
@@ -223,7 +224,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
     },
     plugins: [compositeLoader(components, options)],
     stdin: {
-      contents: getEntrypointCode(options.entrypoint, options.customEntryPoint, editorScene, options.workingDirectory),
+      contents: getEntrypointCode(options.entrypoint, options.customEntryPoint, editorScene, networkEntityInComposite),
       resolveDir: path.dirname(options.entrypoint),
       sourcefile: path.basename(options.entrypoint) + '.entry-point.ts',
       loader: 'ts'
@@ -242,7 +243,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
 
       // Check for syncEntity in metafile if requested
       if (options.checkMultiplayerScene && result.metafile) {
-        const isMultiplayer = isMultiplayerScene(result.metafile, options.workingDirectory)
+        const isMultiplayer = networkEntityInComposite || (await isMultiplayerScene(components.fs, result.metafile))
         printProgressInfo(components.logger, isMultiplayer ? 'Multiplayer Scene' : 'Single player scene')
 
         // Update scene.json with multiplayer property
@@ -267,12 +268,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
  * @param workingDirectory - Path to the working directory
  * @returns boolean indicating if it's a multiplayer scene
  */
-function isMultiplayerScene(metafile: esbuild.Metafile, workingDirectory: string): boolean {
-  // First check if the scene has NetworkEntity in main.composite
-  if (hasNetworkEntity(workingDirectory)) {
-    return true
-  }
-
+async function isMultiplayerScene(fs: BundleComponents['fs'], metafile: esbuild.Metafile): Promise<boolean> {
   // Then check all inputs in the metafile for syncEntity imports
   for (const [path, info] of Object.entries(metafile.inputs)) {
     // Check if this file imports from @dcl/sdk/network
@@ -281,7 +277,7 @@ function isMultiplayerScene(metafile: esbuild.Metafile, workingDirectory: string
     if (networkImport) {
       // Check if it imports syncEntity specifically
       try {
-        const content = fs.readFileSync(path, 'utf-8')
+        const content = await fs.readFile(path, 'utf-8')
         if (
           content.includes('syncEntity') &&
           /import.*\{.*syncEntity.*\}.*from.*['"]@dcl\/sdk\/network['"]/.test(content)
