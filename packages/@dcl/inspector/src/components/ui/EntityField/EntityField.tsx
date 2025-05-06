@@ -71,7 +71,7 @@ const EntityField: React.FC<WithSdkProps & Props> = ({ sdk, ...props }) => {
     } else {
       return 'No entities found.'
     }
-  }, [components, value])
+  }, [components])
 
   return (
     <Dropdown
