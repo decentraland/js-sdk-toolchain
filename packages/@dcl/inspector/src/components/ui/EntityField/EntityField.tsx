@@ -1,11 +1,11 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import cx from 'classnames'
 import { BiCube as EntityIcon } from 'react-icons/bi'
 import { Entity } from '@dcl/ecs'
 import { withSdk, WithSdkProps } from '../../../hoc/withSdk'
+import { useSelectedEntity } from '../../../hooks/sdk/useSelectedEntity'
 import { Dropdown } from '../Dropdown'
 import type { Props } from './types'
-import { useSelectedEntity } from '../../../hooks/sdk/useSelectedEntity'
 
 function componentHasValidValue(component: any) {
   if (typeof component.value === 'number') {
