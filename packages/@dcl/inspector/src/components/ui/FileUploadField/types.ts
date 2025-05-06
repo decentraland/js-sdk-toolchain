@@ -12,8 +12,7 @@ export type Props = Omit<TextFieldProps, 'accept' | 'type' | 'onDrop'> & {
 
 export const ACCEPTED_FILE_TYPES = {
   model: ['.gltf', '.glb'],
-  image: ['.png'],
+  image: ['.png', '.jpg', '.jpeg'],
   audio: ['.mp3', '.wav', '.ogg'],
   video: ['.mp4'],
-  image_extended: ['.png', '.jpg', '.jpeg']
 }
