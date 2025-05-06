@@ -1,10 +1,11 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import cx from 'classnames'
 import { BiCube as EntityIcon } from 'react-icons/bi'
 import { Entity } from '@dcl/ecs'
 import { withSdk, WithSdkProps } from '../../../hoc/withSdk'
 import { Dropdown } from '../Dropdown'
 import type { Props } from './types'
+import { useSelectedEntity } from '../../../hooks/sdk/useSelectedEntity'
 
 function componentHasValidValue(component: any) {
   if (typeof component.value === 'number') {
@@ -12,7 +13,6 @@ function componentHasValidValue(component: any) {
   } else if (typeof component.value === 'object') {
     return component.value.length > 0
   }
-
   return false
 }
 
@@ -20,6 +20,7 @@ const EntityField: React.FC<WithSdkProps & Props> = ({ sdk, ...props }) => {
   const { engine } = sdk
   const { Name, Nodes } = sdk.components
   const { className, components, disabled, label, value, onChange } = props
+  const selectedEntity = useSelectedEntity()
 
   const options: Record<string, any>[] = useMemo(() => {
     const uniqueEntities = new Map()
@@ -30,6 +31,15 @@ const EntityField: React.FC<WithSdkProps & Props> = ({ sdk, ...props }) => {
         value: entity,
         leftIcon: <EntityIcon />
       })
+    }
+
+    const reorderEntities = (entities: Array<any>) => {
+      const selectedIndex = entities.findIndex((entity) => entity.value === selectedEntity)
+      if (selectedIndex > 0) {
+        const [selectedEntityOption] = entities.splice(selectedIndex, 1)
+        entities.unshift(selectedEntityOption)
+      }
+      return entities
     }
 
     if (components && components.length > 0) {
@@ -51,8 +61,7 @@ const EntityField: React.FC<WithSdkProps & Props> = ({ sdk, ...props }) => {
         }
       }
     }
-
-    return Array.from(uniqueEntities.values())
+    return reorderEntities(Array.from(uniqueEntities.values()))
   }, [components])
 
   const emptyMessage = useMemo(() => {
@@ -62,7 +71,7 @@ const EntityField: React.FC<WithSdkProps & Props> = ({ sdk, ...props }) => {
     } else {
       return 'No entities found.'
     }
-  }, [components])
+  }, [components, value])
 
   return (
     <Dropdown
