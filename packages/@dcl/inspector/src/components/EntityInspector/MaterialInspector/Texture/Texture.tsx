@@ -37,7 +37,7 @@ function TextureInspector({ label, texture, files, getInputProps }: Props) {
           <FileUploadField
             {...src}
             label="Path"
-            accept={ACCEPTED_FILE_TYPES['image']}
+            accept={ACCEPTED_FILE_TYPES['image_extended']}
             onDrop={handleDrop}
             error={!!src.value && files && !isValid}
             isValidFile={isModel}
