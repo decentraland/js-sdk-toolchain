@@ -1,11 +1,12 @@
 import React, { useCallback } from 'react'
 import { Entity } from '@dcl/ecs'
 import { VscTrash as RemoveIcon } from 'react-icons/vsc'
+import { AiOutlineInfoCircle as InfoIcon } from 'react-icons/ai'
+
 import { withSdk, WithSdkProps } from '../../../../hoc/withSdk'
 import { useComponentValue } from '../../../../hooks/sdk/useComponentValue'
 import { useComponentsWith } from '../../../../hooks/sdk/useComponentsWith'
-
-import { CheckboxField, CheckboxGroup, TextField, Dropdown } from '../../../ui'
+import { CheckboxField, CheckboxGroup, TextField, Dropdown, Label } from '../../../ui'
 import { Block } from '../../../Block'
 import { Button } from '../../../Button'
 import { AddButton } from '../../AddButton'
@@ -20,7 +21,7 @@ type Props = {
 const VideoControl: React.FC<WithSdkProps & Props> = ({ sdk, entity }) => {
   const { AdminTools, Name } = sdk.components
   const [adminComponent, setAdminComponent] = useComponentValue(entity, AdminTools)
-  const [videoPlayerEntities] = useComponentsWith((components) => components.VideoPlayer)
+  const [videoPlayerEntities] = useComponentsWith((components) => components.VideoScreen)
 
   const handleAddVideoPlayer = useCallback(() => {
     if (!adminComponent) return
@@ -124,11 +125,16 @@ const VideoControl: React.FC<WithSdkProps & Props> = ({ sdk, entity }) => {
     <div className="VideoControl">
       <CheckboxGroup>
         <CheckboxField
-          label="Disable video sound"
+          label="Disable sound (Only editable in Creator Hub)"
           checked={videoControl.disableVideoPlayersSound || false}
           onChange={handleBooleanChange('disableVideoPlayersSound')}
         />
       </CheckboxGroup>
+      <Label className="Title" text="Screen Steup" />
+      <div className="ScreenSetup">
+        <InfoIcon size={16} />
+        <Label text="Use the 'Video Screen' Smart Item to add screens to your scene, then select them from the drop down below to manage them through the Admin Tools panel in-world." />
+      </div>
 
       {videoControl.videoPlayers?.map((videoPlayer, idx) => {
         const options = getVideoPlayerOptions().map((option) => ({
@@ -143,7 +149,7 @@ const VideoControl: React.FC<WithSdkProps & Props> = ({ sdk, entity }) => {
             </div>
             <div className="FieldsContainer">
               <Dropdown
-                label="Screen"
+                label={`Video Screen ${idx + 1}`}
                 value={videoPlayer.entity}
                 options={options}
                 onChange={(e) => handleVideoPlayerChange(idx, e)}
@@ -168,7 +174,7 @@ const VideoControl: React.FC<WithSdkProps & Props> = ({ sdk, entity }) => {
         onClick={handleAddVideoPlayer}
         disabled={videoPlayerEntities.length === 0 || videoPlayerEntities.length === videoControl.videoPlayers?.length}
       >
-        Add a new Screen
+        Add a Screen
       </AddButton>
     </div>
   )

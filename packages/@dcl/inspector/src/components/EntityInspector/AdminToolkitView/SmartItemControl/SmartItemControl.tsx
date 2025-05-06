@@ -177,7 +177,7 @@ const SmartItemControl: React.FC<WithSdkProps & Props> = ({ sdk, entity }) => {
           : []
 
         return (
-          <Block key={smartItem.entity} className="SmartItemRow">
+          <Block key={smartItem.entity + idx} className="SmartItemRow">
             <div className="LeftColumn">
               <span>{idx + 1}</span>
             </div>
