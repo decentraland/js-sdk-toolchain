@@ -14,5 +14,5 @@ export const ACCEPTED_FILE_TYPES = {
   model: ['.gltf', '.glb'],
   image: ['.png', '.jpg', '.jpeg'],
   audio: ['.mp3', '.wav', '.ogg'],
-  video: ['.mp4'],
+  video: ['.mp4']
 }
