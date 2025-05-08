@@ -14,6 +14,7 @@ import { isAudio } from '../../EntityInspector/AudioSourceInspector/utils'
 import { isModel as isTexture } from '../../EntityInspector/MaterialInspector/Texture/utils'
 import { TreeNode } from '../../ProjectAssetExplorer/ProjectView'
 import { AssetNodeItem } from '../../ProjectAssetExplorer/types'
+import { isValidHttpsUrl } from '../../../lib/utils/url'
 
 import { TextField } from '../TextField'
 import { Message, MessageType } from '../Message'
@@ -143,8 +144,9 @@ const FileUploadField: React.FC<Props> = ({
 
   const handleChangeTextField = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
+      debugger
       const { value } = event.target
-      if (value && isValidFileName(value)) {
+      if (value && (isValidFileName(value) || isValidHttpsUrl(value))) {
         setPath(addBase(value))
         onChange && onChange(event)
         setDropError(false)
