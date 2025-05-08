@@ -37,6 +37,7 @@ const FileUploadField: React.FC<Props> = ({
   onDrop,
   onChange,
   isValidFile,
+  acceptURLs = false,
   accept = EXTENSIONS
 }) => {
   const [path, setPath] = useState<string | undefined>(value?.toString())
@@ -144,9 +145,8 @@ const FileUploadField: React.FC<Props> = ({
 
   const handleChangeTextField = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      debugger
       const { value } = event.target
-      if (value && (isValidFileName(value) || isValidHttpsUrl(value))) {
+      if (value && (isValidFileName(value) || (acceptURLs && isValidHttpsUrl(value)))) {
         setPath(addBase(value))
         onChange && onChange(event)
         setDropError(false)
@@ -154,7 +154,7 @@ const FileUploadField: React.FC<Props> = ({
         setDropError(true)
       }
     },
-    [addBase, setPath, setDropError]
+    [addBase, setPath, setDropError, acceptURLs, onChange]
   )
 
   const hasError = useMemo(() => {
@@ -168,7 +168,7 @@ const FileUploadField: React.FC<Props> = ({
           id={id.current}
           className="FileUploadInput"
           ref={drop}
-          placeholder="File Path"
+          placeholder={acceptURLs ? 'https://... or File Path' : 'File Path'}
           label={label}
           onChange={handleChangeTextField}
           value={removeBase(path)}

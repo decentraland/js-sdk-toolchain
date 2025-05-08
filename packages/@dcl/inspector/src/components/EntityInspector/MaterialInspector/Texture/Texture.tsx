@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import { removeBasePath } from '../../../../lib/logic/remove-base-path'
 import { Block } from '../../../Block'
 import { Container } from '../../../Container'
@@ -9,7 +9,6 @@ import { isModel, isValidTexture } from './utils'
 import { Props, Texture, TEXTURE_TYPES, WRAP_MODES, FILTER_MODES } from './types'
 
 function TextureInspector({ label, texture, files, getInputProps }: Props) {
-  const [isTextureError, setIsTextureError] = useState(false)
   const handleDrop = useCallback(
     (src: string) => {
       const srcInput = getInputProps(`${texture}.src`)
@@ -26,11 +25,7 @@ function TextureInspector({ label, texture, files, getInputProps }: Props) {
 
   const type = getInputProps(`${texture}.type`)
   const src = getInputProps(`${texture}.src`)
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value
-    setIsTextureError(!isValidTexture(value, files))
-  }
+  const isValid = isValidTexture(src.value, files)
 
   return (
     <Container label={label} className={label} initialOpen={false} border>
@@ -44,9 +39,9 @@ function TextureInspector({ label, texture, files, getInputProps }: Props) {
             label="Path"
             accept={ACCEPTED_FILE_TYPES['image']}
             onDrop={handleDrop}
-            error={isTextureError}
+            error={!isValid}
             isValidFile={isModel}
-            onChange={handleChange}
+            acceptURLs
           />
         )}
         {/* {type.value === Texture.TT_AVATAR_TEXTURE && <TextField label="User ID" {...getInputProps(`${texture}.userId`)} />}*/}
