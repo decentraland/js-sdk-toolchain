@@ -8,9 +8,11 @@ import {
   IEngine,
   LastWriteWinElementSetComponentDefinition,
   PutComponentOperation,
-  getCompositeRootComponent
+  getCompositeRootComponent,
+  Name
 } from '@dcl/ecs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
+import { FileSystemInterface } from '../../types'
 
 function componentToCompositeComponentData<T>(
   $case: 'json' | 'binary',
@@ -127,4 +129,88 @@ export function dumpEngineToCrdtCommands(engine: IEngine): Uint8Array {
   }
 
   return crdtBuffer.toBinary()
+}
+
+/**
+ * Generate a TypeScript declaration file with a string literal union type containing all entity names in the scene.
+ * This allows for type-safe references to entities by name in scene scripts.
+ *
+ * @param engine The ECS engine instance
+ * @param outputPath The path where the .d.ts file should be written
+ * @param typeName The name for the generated type (default: "SceneEntityNames")
+ * @param fs FileSystem interface for writing the file
+ * @returns Promise that resolves when the file has been written
+ */
+export async function generateEntityNamesType(
+  engine: IEngine,
+  outputPath: string = 'scene-entity-names.d.ts',
+  typeName: string = 'SceneEntityNames',
+  fs: FileSystemInterface
+): Promise<void> {
+  try {
+    // Find the Name component definition
+
+    const NameComponent: typeof Name = engine.getComponentOrNull(Name.componentId) as typeof Name
+
+    if (!NameComponent) {
+      throw new Error('Name component not found in engine')
+    }
+
+    // Collect all names from entities
+    const names: string[] = []
+    for (const [_, nameValue] of engine.getEntitiesWith(NameComponent)) {
+      if (nameValue.value) {
+        names.push(nameValue.value)
+      }
+    }
+
+    // Sort names for consistency
+    names.sort()
+
+    // Remove duplicates
+    const uniqueNames = Array.from(new Set(names))
+
+    // Generate valid TypeScript identifiers and handle duplicates in a single pass
+    const validNameMap = new Map<string, string>()
+    const finalNames: Array<{ original: string; valid: string }> = []
+
+    for (const name of uniqueNames) {
+      // Create a valid TypeScript identifier
+      let validName = name
+        .replace(/[^a-zA-Z0-9_]/g, '_') // Replace non-alphanumeric chars with underscore
+        .replace(/^[0-9]/, '_$&') // Prepend underscore if starts with number
+
+      // Handle collision if this valid name already exists
+      if (validNameMap.has(validName)) {
+        // Add numeric suffix for uniqueness
+        let suffix = 1
+        while (validNameMap.has(`${validName}_${suffix}`)) {
+          suffix++
+        }
+        validName = `${validName}_${suffix}`
+      }
+
+      // Store the mapping and add to result
+      validNameMap.set(validName, name)
+      finalNames.push({ original: name, valid: validName })
+    }
+
+    // Generate the .d.ts file content
+    let fileContent = `// Auto-generated entity names from the scene\n\n`
+
+    // Add a constant object with name keys for IDE autocompletion
+    fileContent += `\n/**\n * Object containing all entity names in the scene for autocomplete support.\n */\n`
+    fileContent += `export enum ${typeName} {\n`
+
+    for (const { original, valid } of finalNames) {
+      fileContent += `  ${valid} = "${original}",\n`
+    }
+
+    fileContent += `} \n`
+
+    // Write to file
+    await fs.writeFile(outputPath, Buffer.from(fileContent, 'utf-8'))
+  } catch (e) {
+    console.error('Fail to generate entity names types', e)
+  }
 }

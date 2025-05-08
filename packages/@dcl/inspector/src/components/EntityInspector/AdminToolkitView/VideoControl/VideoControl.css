@@ -4,6 +4,22 @@
   flex-direction: column;
   gap: 16px;
   width: 100%;
+
+  .Title {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--base-04);
+  }
+  .ScreenSetup {
+    display: flex;
+    flex-direction: row;
+    label {
+      margin-left: 8px;
+      text-wrap: wrap;
+      width: 80%;
+    }
+    margin-bottom: 12px;
+  }
 }
 
 /* Checkbox group */

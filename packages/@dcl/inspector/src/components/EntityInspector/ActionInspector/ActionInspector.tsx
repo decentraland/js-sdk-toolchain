@@ -977,6 +977,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
                   }))
                 ]}
                 value={action.type}
+                searchable
                 onChange={(e) => handleChangeType(e, idx)}
               />
             </div>

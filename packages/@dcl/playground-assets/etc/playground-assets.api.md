@@ -1248,8 +1248,9 @@ export interface IEngine {
     getComponent<T>(componentId: number | string): ComponentDefinition<T>;
     getComponentOrNull<T>(componentId: number | string): ComponentDefinition<T> | null;
     getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
+    getEntityByName<T = never, K = T>(value: K & (T extends never ? never : string)): Entity;
     // @alpha
-    getEntityOrNullByName(label: string): Entity | null;
+    getEntityOrNullByName<T = string>(label: T): Entity | null;
     getEntityState(entity: Entity): EntityState;
     // (undocumented)
     _id: number;
@@ -3740,6 +3741,16 @@ export interface ReactBasedUiSystem {
 // @public (undocumented)
 export namespace ReactEcs {
     // (undocumented)
+    export type DependencyList = ReadonlyArray<any>;
+    const // (undocumented)
+    createElement: any;
+    // (undocumented)
+    export type Dispatch<T> = (action: SetStateAction<T>) => void;
+    // (undocumented)
+    export type EffectCallback = () => void | (() => void | undefined);
+    // (undocumented)
+    export type EffectHook = (effect: EffectCallback, deps?: DependencyList) => void;
+    // (undocumented)
     export namespace JSX {
         export interface Component {
         }
@@ -3751,8 +3762,15 @@ export namespace ReactEcs {
         // (undocumented)
         export type ReactNode = Element | ReactElement | string | number | boolean | null | undefined | ReactNode[];
     }
+    // (undocumented)
+    export type SetStateAction<T> = T | ((prevState: T) => T);
+    // (undocumented)
+    export type StateHook = <T>(initialState: T | (() => T)) => [T, Dispatch<T>];
     const // (undocumented)
-    createElement: any;
+    useEffect: EffectHook;
+    const // (undocumented)
+    useState: StateHook;
+        {};
 }
 
 // Warning: (tsdoc-at-sign-in-word) The "@" character looks like part of a TSDoc tag; use a backslash to escape it

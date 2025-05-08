@@ -1,10 +1,10 @@
-import { AbstractMesh, Color3 } from '@babylonjs/core'
+import { AbstractMesh, Color3, HighlightLayer, Mesh } from '@babylonjs/core'
 import { ComponentType } from '@dcl/ecs'
 import { CoreComponents, EditorComponentsTypes } from '../../../sdk/components'
 import { EcsEntity } from '../EcsEntity'
 import type { ComponentOperation } from '../component-operations'
 
-const highlightedMeshes = new Set<AbstractMesh>()
+const highlightedMeshes = new Map<AbstractMesh, HighlightLayer>()
 
 export const putEntitySelectedComponent: ComponentOperation = (entity, component) => {
   if (component.componentType === ComponentType.LastWriteWinElementSet) {
@@ -25,9 +25,15 @@ export function toggleMeshSelection(mesh: AbstractMesh, value: boolean) {
   mesh.renderOverlay = value
   mesh.overlayColor = Color3.White()
   mesh.overlayAlpha = 0.2
-  if (value) {
-    highlightedMeshes.add(mesh)
-  } else {
+  const hl = highlightedMeshes.get(mesh)
+  if (value && !hl) {
+    const newHl = new HighlightLayer('hl1', mesh.getScene())
+    newHl.addMesh(mesh as Mesh, Color3.Yellow())
+    newHl.blurHorizontalSize = 0.1
+    newHl.blurVerticalSize = 0.1
+    highlightedMeshes.set(mesh, newHl)
+  } else if (!value && hl) {
+    hl.removeMesh(mesh as Mesh)
     highlightedMeshes.delete(mesh)
   }
 }
@@ -37,12 +43,14 @@ export const toggleSelection = (entity: EcsEntity, value: boolean) => {
     toggleMeshSelection(entity.meshRenderer, value)
   }
 
-  if (entity.gltfContainer) {
-    for (const mesh of entity.gltfContainer.getChildMeshes()) {
-      if (mesh.name.includes('collider')) continue
-      toggleMeshSelection(mesh, value)
+  entity.onAssetLoaded().then(() => {
+    if (entity.gltfContainer) {
+      for (const mesh of entity.gltfContainer.getChildMeshes()) {
+        if (mesh.name.includes('collider')) continue
+        toggleMeshSelection(mesh, value)
+      }
     }
-  }
+  })
 }
 
 export const setGizmoManager = (entity: EcsEntity, value: { gizmo: number }) => {

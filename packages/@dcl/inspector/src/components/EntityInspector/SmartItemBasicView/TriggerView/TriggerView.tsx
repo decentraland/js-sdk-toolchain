@@ -173,6 +173,7 @@ export default React.memo(
                       disabled={!action.id || !trigger.actions.find((_action) => _action.id === action.id)}
                       options={actions}
                       value={action.name}
+                      searchable
                       onChange={(e) => handleChangeAction(e, idx, trigger)}
                     />
                   </div>
