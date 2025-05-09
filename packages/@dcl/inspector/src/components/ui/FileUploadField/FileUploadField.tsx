@@ -154,7 +154,7 @@ const FileUploadField: React.FC<Props> = ({
       } else {
         setDropError(true)
         setErrorMessage(
-          acceptURLs && !isValidHttpsUrl(value) ? 'The URL must be valid and have a https:// prefix' : 'File not valid.'
+          acceptURLs && !isValidHttpsUrl(value) ? 'Provide a https URL or a valid file path' : 'File not valid.'
         )
       }
     },
