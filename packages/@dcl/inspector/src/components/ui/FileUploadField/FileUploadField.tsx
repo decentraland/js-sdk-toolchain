@@ -14,6 +14,7 @@ import { isAudio } from '../../EntityInspector/AudioSourceInspector/utils'
 import { isModel as isTexture } from '../../EntityInspector/MaterialInspector/Texture/utils'
 import { TreeNode } from '../../ProjectAssetExplorer/ProjectView'
 import { AssetNodeItem } from '../../ProjectAssetExplorer/types'
+import { isValidHttpsUrl } from '../../../lib/utils/url'
 
 import { TextField } from '../TextField'
 import { Message, MessageType } from '../Message'
@@ -36,9 +37,11 @@ const FileUploadField: React.FC<Props> = ({
   onDrop,
   onChange,
   isValidFile,
+  acceptURLs = false,
   accept = EXTENSIONS
 }) => {
   const [path, setPath] = useState<string | undefined>(value?.toString())
+  const [errorMessage, setErrorMessage] = useState<string | undefined>('File not valid.')
   const [dropError, setDropError] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const files = useAppSelector(selectAssetCatalog)
@@ -144,15 +147,18 @@ const FileUploadField: React.FC<Props> = ({
   const handleChangeTextField = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.target
-      if (value && isValidFileName(value)) {
+      if (value && (isValidFileName(value) || (acceptURLs && isValidHttpsUrl(value)))) {
         setPath(addBase(value))
         onChange && onChange(event)
         setDropError(false)
       } else {
         setDropError(true)
+        setErrorMessage(
+          acceptURLs && !isValidHttpsUrl(value) ? 'Provide a https URL or a valid file path' : 'File not valid.'
+        )
       }
     },
-    [addBase, setPath, setDropError]
+    [addBase, setPath, setDropError, acceptURLs, onChange]
   )
 
   const hasError = useMemo(() => {
@@ -166,7 +172,7 @@ const FileUploadField: React.FC<Props> = ({
           id={id.current}
           className="FileUploadInput"
           ref={drop}
-          placeholder="File Path"
+          placeholder={acceptURLs ? 'https://... or File Path' : 'File Path'}
           label={label}
           onChange={handleChangeTextField}
           value={removeBase(path)}
@@ -182,7 +188,7 @@ const FileUploadField: React.FC<Props> = ({
           </button>
         )}
       </div>
-      {hasError && <Message text="File not valid." type={MessageType.ERROR} />}
+      {hasError && <Message text={errorMessage} type={MessageType.ERROR} />}
     </div>
   )
 }

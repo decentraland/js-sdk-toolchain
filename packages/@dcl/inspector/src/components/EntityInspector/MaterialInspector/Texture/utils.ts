@@ -77,7 +77,8 @@ export const toTexture = (base: string, value?: TextureInput): TextureUnion => {
   }
 }
 
-export const isTexture = (value: string): boolean => value.endsWith('.png')
+export const isTexture = (value: string): boolean =>
+  value.endsWith('.png') || value.endsWith('.jpg') || value.endsWith('.jpeg')
 export const isModel = (node: TreeNode): node is AssetNodeItem => isAssetNode(node) && isTexture(node.name)
 
 export function isValidTexture(value: any, files?: AssetCatalogResponse): boolean {
