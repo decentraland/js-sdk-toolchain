@@ -39,7 +39,7 @@ function TextureInspector({ label, texture, files, getInputProps }: Props) {
             label="Path"
             accept={ACCEPTED_FILE_TYPES['image']}
             onDrop={handleDrop}
-            error={!isValid}
+            error={!!src.value && !isValid}
             isValidFile={isModel}
             acceptURLs
           />

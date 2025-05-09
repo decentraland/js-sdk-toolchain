@@ -41,6 +41,7 @@ const FileUploadField: React.FC<Props> = ({
   accept = EXTENSIONS
 }) => {
   const [path, setPath] = useState<string | undefined>(value?.toString())
+  const [errorMessage, setErrorMessage] = useState<string | undefined>('File not valid.')
   const [dropError, setDropError] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const files = useAppSelector(selectAssetCatalog)
@@ -152,6 +153,9 @@ const FileUploadField: React.FC<Props> = ({
         setDropError(false)
       } else {
         setDropError(true)
+        setErrorMessage(
+          acceptURLs && !isValidHttpsUrl(value) ? 'The URL must be valid and have a https:// prefix' : 'File not valid.'
+        )
       }
     },
     [addBase, setPath, setDropError, acceptURLs, onChange]
@@ -184,7 +188,7 @@ const FileUploadField: React.FC<Props> = ({
           </button>
         )}
       </div>
-      {hasError && <Message text="File not valid." type={MessageType.ERROR} />}
+      {hasError && <Message text={errorMessage} type={MessageType.ERROR} />}
     </div>
   )
 }
