@@ -92,7 +92,11 @@ describe('GizmoManager', () => {
       })
       describe('and dragging a gizmo', () => {
         it('should execute SDK operations if transform was changed', () => {
-          babylonEntity.position = new Vector3(10, 10, 10)
+          babylonEntity.ecsComponentValues.transform = {
+            position: new Vector3(10, 10, 10),
+            rotation: new Quaternion(0, 0, 0, 1),
+            scale: new Vector3(1, 1, 1)
+          }
           gizmos.gizmoManager.gizmos.positionGizmo?.onDragEndObservable.notifyObservers({} as any)
           expect(context.operations.updateValue).toHaveBeenCalled()
           expect(context.operations.dispatch).toHaveBeenCalled()
