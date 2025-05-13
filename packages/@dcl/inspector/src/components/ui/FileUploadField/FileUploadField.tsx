@@ -176,7 +176,7 @@ const FileUploadField: React.FC<Props> = ({
           label={label}
           onChange={handleChangeTextField}
           value={removeBase(path)}
-          error={hasError}
+          error={!!value && hasError}
           disabled={disabled}
           drop={isHover}
           autoSelect
@@ -188,7 +188,7 @@ const FileUploadField: React.FC<Props> = ({
           </button>
         )}
       </div>
-      {hasError && <Message text={errorMessage} type={MessageType.ERROR} />}
+      {!!value && hasError && <Message text={errorMessage} type={MessageType.ERROR} />}
     </div>
   )
 }
