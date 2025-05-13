@@ -9,7 +9,6 @@ import { AudioSourceInput } from './types'
 export const fromAudioSource =
   (base: string) =>
   (value: PBAudioSource): AudioSourceInput => {
-    debugger
     return {
       audioClipUrl: removeBasePath(base, value.audioClipUrl),
       loop: value.loop,
@@ -22,7 +21,6 @@ export const fromAudioSource =
 export const toAudioSource =
   (base: string) =>
   (value: AudioSourceInput): PBAudioSource => {
-    debugger
     return {
       audioClipUrl: base ? base + '/' + value.audioClipUrl : value.audioClipUrl,
       loop: value.loop,
