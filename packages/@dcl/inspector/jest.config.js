@@ -32,9 +32,8 @@ module.exports = isE2E ? {
     }
   },
   collectCoverageFrom: ["src/**/*.ts"],
-  coveragePathIgnorePatterns: ["node_modules/", "src/lib/babylon/decentraland/gizmo-patch.ts"],
   verbose: true,
-    testPathIgnorePatterns: ["e2e"],
+  testPathIgnorePatterns: ["e2e"],
   testMatch: ["**/*.spec.(ts)"],
   testEnvironment: "jsdom",
   transformIgnorePatterns: [
@@ -42,4 +41,3 @@ module.exports = isE2E ? {
     ],
     setupFiles: ['./test/setup.ts']
 }
-
