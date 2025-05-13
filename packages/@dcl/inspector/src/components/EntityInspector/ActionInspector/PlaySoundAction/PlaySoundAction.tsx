@@ -6,7 +6,7 @@ import { useAppSelector } from '../../../../redux/hooks'
 import { selectAssetCatalog } from '../../../../redux/app'
 
 import { isAudio, isValidVolume, volumeToAudioSource, volumeFromAudioSource } from '../../AudioSourceInspector/utils'
-import { Dropdown, RangeField, InfoTooltip, FileUploadField } from '../../../ui'
+import { Dropdown, RangeField, InfoTooltip, FileUploadField, CheckboxField } from '../../../ui'
 import { ACCEPTED_FILE_TYPES } from '../../../ui/FileUploadField/types'
 
 import { isValid } from './utils'
@@ -67,6 +67,13 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
     [payload, setPayload]
   )
 
+  const handleChangeGlobal = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setPayload({ ...payload, global: e.target.checked })
+    },
+    [payload, setPayload]
+  )
+
   const error = useMemo(() => {
     if (!files || !payload.src) {
       return false
@@ -108,6 +115,9 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
             onChange={handleChangeVolume}
             isValidValue={isValidVolume}
           />
+        </div>
+        <div className="row">
+          <CheckboxField label="Global" checked={!!payload.global} onChange={handleChangeGlobal} />
         </div>
       </div>
     </div>
