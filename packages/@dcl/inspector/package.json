@@ -2,7 +2,7 @@
   "name": "@dcl/inspector",
   "version": "0.1.0",
   "dependencies": {
-    "@dcl/asset-packs": "2.4.0",
+    "@dcl/asset-packs": "https://sdk-team-cdn.decentraland.org/@dcl/asset-packs/branch/fix/audio-source-global/dcl-asset-packs-2.4.1-15003858885.commit-24bc100.tgz",
     "ts-deepmerge": "^7.0.0"
   },
   "devDependencies": {

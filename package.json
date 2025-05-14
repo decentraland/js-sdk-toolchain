@@ -6,7 +6,6 @@
   "bugs": "https://github.com/decentraland/js-sdk-toolchain/issues",
   "dependencies": {
     "@actions/core": "^1.10.0",
-    "@dcl/asset-packs": "https://sdk-team-cdn.decentraland.org/@dcl/asset-packs/branch/fix/audio-source-global/dcl-asset-packs-2.4.1-15003858885.commit-24bc100.tgz",
     "@dcl/protocol": "1.0.0-14033082444.commit-84b403d",
     "@dcl/quickjs-emscripten": "^0.21.0-3680274614.commit-1808aa1",
     "@dcl/ts-proto": "1.153.0",
