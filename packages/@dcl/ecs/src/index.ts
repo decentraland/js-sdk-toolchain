@@ -30,7 +30,6 @@ import {
   AudioStreamComponentDefinitionExtended,
   ISyncComponents,
   TweenComponentDefinitionExtended,
-  INetowrkEntity,
   INetowrkParent,
   VirtualCameraComponentDefinitionExtended,
   InputModifierComponentDefinitionExtended
@@ -56,11 +55,7 @@ export const InputModifier: InputModifierComponentDefinitionExtended = /* @__PUR
  * Can be modified in the future since it's still in research
  */
 export const SyncComponents: ISyncComponents = /* @__PURE__*/ components.SyncComponents(engine)
-/**
- * @alpha
- * Tag a entity to be syncronized through comms
- */
-export const NetworkEntity: INetowrkEntity = /* @__PURE__*/ components.NetworkEntity(engine)
+
 /**
  * @alpha
  * Tag a entity to be syncronized through comms

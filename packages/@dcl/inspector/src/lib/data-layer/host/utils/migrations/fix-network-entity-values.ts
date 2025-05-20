@@ -15,10 +15,10 @@ export function fixNetworkEntityValues(engine: IEngine) {
   function needsFixing(): boolean {
     const usedEntities: Set<Entity> = new Set()
     for (const [_, value] of engine.getEntitiesWith(NetworkEntity)) {
-      if (usedEntities.has(value.entityId)) {
+      if (usedEntities.has(value.entityId as Entity)) {
         return true
       }
-      usedEntities.add(value.entityId)
+      usedEntities.add(value.entityId as Entity)
     }
     return false
   }

@@ -85,7 +85,7 @@ export const SyncComponents: (
  * @alpha
  */
 /* @__PURE__ */
-export const NetworkEntity: (
+export const NetworkEntity__deprecated: (
   engine: Pick<IEngine, 'defineComponent'>
 ) => LastWriteWinElementSetComponentDefinition<INetowrkEntityType> = (engine) => defineNetworkEntity(engine)
 
