@@ -643,6 +643,7 @@ export const componentDefinitionByName: {
     "core::Material": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMaterial>>;
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
+    "core::NetworkEntity": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBNetworkEntity>>;
     "core::NftShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBNftShape>>;
     "core::PlayerIdentityData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>>;
     "core::PointerEvents": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerEvents>>;
@@ -1880,8 +1881,8 @@ export interface NameType {
     value: string;
 }
 
-// @alpha
-export const NetworkEntity: INetowrkEntity;
+// @public (undocumented)
+export const NetworkEntity: LastWriteWinElementSetComponentDefinition<PBNetworkEntity>;
 
 // @alpha
 export const NetworkParent: INetowrkParent;
@@ -2652,6 +2653,20 @@ export namespace PBMeshRenderer_SphereMesh {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshRenderer_SphereMesh;
     // (undocumented)
     export function encode(_: PBMeshRenderer_SphereMesh, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBNetworkEntity {
+    entityId: number;
+    networkId: number;
+}
+
+// @public (undocumented)
+export namespace PBNetworkEntity {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBNetworkEntity;
+    // (undocumented)
+    export function encode(message: PBNetworkEntity, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
