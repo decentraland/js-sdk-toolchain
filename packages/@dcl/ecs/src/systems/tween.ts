@@ -131,7 +131,11 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
 
   function backwardsTween(tween: PBTween): PBTween {
     if (tween.mode?.$case === 'move' && tween.mode.move) {
-      return { ...tween, startSyncedTimestamp: undefined,  mode: { ...tween.mode, move: { start: tween.mode.move.end, end: tween.mode.move.start } } }
+      return {
+        ...tween,
+        startSyncedTimestamp: undefined,
+        mode: { ...tween.mode, move: { start: tween.mode.move.end, end: tween.mode.move.start } }
+      }
     }
     if (tween.mode?.$case === 'rotate' && tween.mode.rotate) {
       return {
@@ -141,7 +145,11 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
       }
     }
     if (tween.mode?.$case === 'scale' && tween.mode.scale) {
-      return { ...tween, startSyncedTimestamp: undefined, mode: { ...tween.mode, scale: { start: tween.mode.scale.end, end: tween.mode.scale.start } } }
+      return {
+        ...tween,
+        startSyncedTimestamp: undefined,
+        mode: { ...tween.mode, scale: { start: tween.mode.scale.end, end: tween.mode.scale.start } }
+      }
     }
     if (tween.mode?.$case === 'textureMove' && tween.mode.textureMove) {
       return {

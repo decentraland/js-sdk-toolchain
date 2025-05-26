@@ -126,7 +126,6 @@ export function addSyncTransport(
     }
   }
 
-
   // Asks for the REQ_CRDT_STATE when its connected to comms
   RealmInfo.onChange(engine.RootEntity, (value) => {
     if (!value?.isConnectedSceneRoom) {
@@ -169,7 +168,7 @@ export function addSyncTransport(
     })
   }
 
-  // add 
+  // add
   createTweenSyncSystem(engine, isStateSyncronized)
 
   return {

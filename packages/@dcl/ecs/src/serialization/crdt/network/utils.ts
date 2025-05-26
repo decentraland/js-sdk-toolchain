@@ -57,7 +57,13 @@ export function localMessageToNetwork(
       buffer
     )
   } else if (message.type === CrdtMessageType.DELETE_COMPONENT) {
-    DeleteComponentNetwork.write(network.entityId as Entity, message.componentId, message.timestamp, network.networkId, buffer)
+    DeleteComponentNetwork.write(
+      network.entityId as Entity,
+      message.componentId,
+      message.timestamp,
+      network.networkId,
+      buffer
+    )
   } else if (message.type === CrdtMessageType.DELETE_ENTITY) {
     DeleteEntityNetwork.write(network.entityId as Entity, network.networkId, buffer)
   }

@@ -3,18 +3,18 @@ import { Tween as _Tween, SyncedClock as _SyncedClock, TweenState as _TweenState
 /**
  * This system ensures that all Tween components are properly synchronized across the network
  * by setting their startSyncedTimestamp using the global SyncedClock value.
- * 
+ *
  * The system runs at the end of each frame to ensure that every tween
  * is synchronized before sending that value to the client/network
- * 
+ *
  * For tweens that have already started (have a TweenState with currentTime > 0),
  * it calculates how much time has elapsed and subtracts it from the current syncedTimestamp
  * to determine when the tween actually started.
- * 
+ *
  * The system only processes tweens when:
  * 1. The SyncedClock component exists and is synchronized (status = SS_SYNCHRONIZED)
  * 2. The scene's network communications are initialized (isStateSyncronized = true)
- * 
+ *
  * @param engine - The ECS engine instance
  * @param isStateSyncronized - Function that returns whether network comms are ready
  */
@@ -30,7 +30,8 @@ export function createTweenSyncSystem(engine: IEngine, isStateSyncronized: () =>
     const syncedClock = SyncedClock.getOrNull(engine.RootEntity)
 
     // Only process if we have a synchronized clock and comms are initialized
-    if (!syncedClock || syncedClock.status !== 2 || !isStateSyncronized()) { // 2 = SS_SYNCHRONIZED
+    if (!syncedClock || syncedClock.status !== 2 || !isStateSyncronized()) {
+      // 2 = SS_SYNCHRONIZED
       return
     }
 
@@ -45,12 +46,16 @@ export function createTweenSyncSystem(engine: IEngine, isStateSyncronized: () =>
           // Convert currentTime from normalized [0-1] to milliseconds
           const elapsedMs = tweenState.currentTime * tween.duration
           // Subtract the elapsed time from current syncedTimestamp to get the actual start time
-          console.log('Updating tween with startSyncedTimestamp - elapsedMs', (syncedClock?.syncedTimestamp ?? 0) - elapsedMs, elapsedMs)
+          console.log(
+            'Updating tween with startSyncedTimestamp - elapsedMs',
+            (syncedClock?.syncedTimestamp ?? 0) - elapsedMs,
+            elapsedMs
+          )
           Tween.getMutable(entity).startSyncedTimestamp = (syncedClock?.syncedTimestamp ?? 0) - elapsedMs
         } else {
           // If the tween hasn't started yet, just use the current syncedTimestamp
-          console.log('Updating tween with startSyncedTimestamp', (syncedClock?.syncedTimestamp ?? 0))
-          Tween.getMutable(entity).startSyncedTimestamp = (syncedClock?.syncedTimestamp ?? 0)
+          console.log('Updating tween with startSyncedTimestamp', syncedClock?.syncedTimestamp ?? 0)
+          Tween.getMutable(entity).startSyncedTimestamp = syncedClock?.syncedTimestamp ?? 0
         }
       }
     }
