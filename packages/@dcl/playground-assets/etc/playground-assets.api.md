@@ -2945,19 +2945,12 @@ export namespace PBRaycastResult {
 
 // @public (undocumented)
 export interface PBRealmInfo {
-    // (undocumented)
     baseUrl: string;
-    // (undocumented)
     commsAdapter: string;
-    // (undocumented)
     isConnectedSceneRoom?: boolean | undefined;
-    // (undocumented)
     isPreview: boolean;
-    // (undocumented)
     networkId: number;
-    // (undocumented)
     realmName: string;
-    // (undocumented)
     room?: string | undefined;
 }
 
@@ -3491,12 +3484,6 @@ export const pointerEventsSystem: PointerEventsSystem;
 export const enum PointerEventType {
     // (undocumented)
     PET_DOWN = 1,
-    // (undocumented)
-    PET_DRAG_END = 6,
-    // (undocumented)
-    PET_DRAG_LOCKED = 4,
-    // (undocumented)
-    PET_DRAG_START = 5,
     // (undocumented)
     PET_HOVER_ENTER = 2,
     // (undocumented)
