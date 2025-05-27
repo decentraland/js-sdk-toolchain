@@ -80,6 +80,7 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
   engine.addSystem(() => {
     for (const [entity, tween] of engine.getEntitiesWith(Tween)) {
       if (tweenChanged(entity)) {
+        // TOOD: check if tween has a sequence and change it if the change was because of a networkMessage
         const buffer = new ReadWriteByteBuffer()
         Tween.schema.serialize(tween, buffer)
         cache.set(entity, {

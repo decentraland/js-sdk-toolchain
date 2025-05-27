@@ -25,7 +25,7 @@ export function createTweenSyncSystem(engine: IEngine, isStateSyncronized: () =>
   const SyncedClock = engine.getComponent(_SyncedClock.componentId) as typeof _SyncedClock
   const Tween = engine.getComponent(_Tween.componentId) as typeof _Tween
   const TweenState = engine.getComponent(_TweenState.componentId) as typeof _TweenState
-
+  const DEBUG_NETWORK_MESSAGES = () => (globalThis as any).DEBUG_NETWORK_MESSAGES ?? false
   engine.addSystem(() => {
     // Get the current state of the global clock
     const syncedClock = SyncedClock.getOrNull(engine.RootEntity)
@@ -45,16 +45,18 @@ export function createTweenSyncSystem(engine: IEngine, isStateSyncronized: () =>
           // Convert currentTime from normalized [0-1] to milliseconds
           const elapsedMs = tweenState.currentTime * tween.duration
           // Subtract the elapsed time from current syncedTimestamp to get the actual start time
-          console.log(
-            'Updating tween with startSyncedTimestamp - elapsedMs',
-            (syncedClock?.syncedTimestamp ?? 0) - elapsedMs,
-            elapsedMs,
-            '-.'
-          )
+          DEBUG_NETWORK_MESSAGES() &&
+            console.log(
+              'Updating tween with startSyncedTimestamp - elapsedMs',
+              (syncedClock?.syncedTimestamp ?? 0) - elapsedMs,
+              elapsedMs,
+              '-.'
+            )
           Tween.getMutable(entity).startSyncedTimestamp = (syncedClock?.syncedTimestamp ?? 0) - elapsedMs
         } else {
           // If the tween hasn't started yet, just use the current syncedTimestamp
-          console.log('Updating tween with startSyncedTimestamp', syncedClock?.syncedTimestamp ?? 0)
+          DEBUG_NETWORK_MESSAGES() &&
+            console.log('Updating tween with startSyncedTimestamp', syncedClock?.syncedTimestamp ?? 0)
           Tween.getMutable(entity).startSyncedTimestamp = syncedClock?.syncedTimestamp ?? 0
         }
       }
