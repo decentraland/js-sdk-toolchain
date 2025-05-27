@@ -20,6 +20,7 @@ import { Tween as _Tween, SyncedClock as _SyncedClock, TweenState as _TweenState
  */
 export function createTweenSyncSystem(engine: IEngine, isStateSyncronized: () => boolean) {
   console.log('[BOEDO] createTweenSyncSystem')
+
   // Get component definitions from the engine using their componentIds
   const SyncedClock = engine.getComponent(_SyncedClock.componentId) as typeof _SyncedClock
   const Tween = engine.getComponent(_Tween.componentId) as typeof _Tween
@@ -30,11 +31,9 @@ export function createTweenSyncSystem(engine: IEngine, isStateSyncronized: () =>
     const syncedClock = SyncedClock.getOrNull(engine.RootEntity)
 
     // Only process if we have a synchronized clock and comms are initialized
-    if (!syncedClock || syncedClock.status !== 2 || !isStateSyncronized()) {
-      // 2 = SS_SYNCHRONIZED
+    if (!syncedClock || !syncedClock.syncedTimestamp || syncedClock.status !== 2 || !isStateSyncronized()) {
       return
     }
-
     // Iterate through all entities with Tween component
     for (const [entity, tween] of engine.getEntitiesWith(Tween)) {
       const tweenState = TweenState.getOrNull(entity)
@@ -49,7 +48,8 @@ export function createTweenSyncSystem(engine: IEngine, isStateSyncronized: () =>
           console.log(
             'Updating tween with startSyncedTimestamp - elapsedMs',
             (syncedClock?.syncedTimestamp ?? 0) - elapsedMs,
-            elapsedMs
+            elapsedMs,
+            '-.'
           )
           Tween.getMutable(entity).startSyncedTimestamp = (syncedClock?.syncedTimestamp ?? 0) - elapsedMs
         } else {

@@ -24,6 +24,7 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
   const Tween = components.Tween(engine)
   const TweenState = components.TweenState(engine)
   const TweenSequence = components.TweenSequence(engine)
+  const SyncedClock = components.SyncedClock(engine)
 
   const cache = new Map<
     Entity,
@@ -75,13 +76,8 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
     return equal
   }
 
-  const restartTweens: (() => void)[] = []
   // Logic for sequence tweens
   engine.addSystem(() => {
-    for (const restart of restartTweens) {
-      restart()
-    }
-    restartTweens.length = 0
     for (const [entity, tween] of engine.getEntitiesWith(Tween)) {
       if (tweenChanged(entity)) {
         const buffer = new ReadWriteByteBuffer()
@@ -118,11 +114,9 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
         } else if (tweenSequence.loop === TweenLoop.TL_YOYO) {
           Tween.createOrReplace(entity, backwardsTween(tween))
         } else if (tweenSequence.loop === TweenLoop.TL_RESTART) {
-          Tween.deleteFrom(entity)
-          cache.delete(entity)
-
-          restartTweens.push(() => {
-            Tween.createOrReplace(entity, tween)
+          Tween.createOrReplace(entity, {
+            ...tween,
+            startSyncedTimestamp: SyncedClock.getOrNull(engine.RootEntity)?.syncedTimestamp ?? Date.now()
           })
         }
       }

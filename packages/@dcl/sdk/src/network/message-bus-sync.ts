@@ -168,7 +168,6 @@ export function addSyncTransport(
     })
   }
 
-  // add
   createTweenSyncSystem(engine, isStateSyncronized)
 
   return {
