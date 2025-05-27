@@ -649,6 +649,7 @@ export const componentDefinitionByName: {
     "core::PointerEvents": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerEvents>>;
     "core::PointerEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBPointerEventsResult>>;
     "core::PointerLock": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerLock>>;
+    "core::PrimaryPointerInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPrimaryPointerInfo>>;
     "core::Raycast": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycast>>;
     "core::RaycastResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycastResult>>;
     "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
@@ -2858,6 +2859,22 @@ export namespace PBPosition {
 }
 
 // @public (undocumented)
+export interface PBPrimaryPointerInfo {
+    pointerType?: PointerType | undefined;
+    screenCoordinates?: PBVector2 | undefined;
+    screenDelta?: PBVector2 | undefined;
+    worldRayDirection?: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBPrimaryPointerInfo {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPrimaryPointerInfo;
+    // (undocumented)
+    export function encode(message: PBPrimaryPointerInfo, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBQuaternion {
     // (undocumented)
     w: number;
@@ -2928,19 +2945,12 @@ export namespace PBRaycastResult {
 
 // @public (undocumented)
 export interface PBRealmInfo {
-    // (undocumented)
     baseUrl: string;
-    // (undocumented)
     commsAdapter: string;
-    // (undocumented)
     isConnectedSceneRoom?: boolean | undefined;
-    // (undocumented)
     isPreview: boolean;
-    // (undocumented)
     networkId: number;
-    // (undocumented)
     realmName: string;
-    // (undocumented)
     room?: string | undefined;
 }
 
@@ -3496,6 +3506,12 @@ export type PointerFilterType = 'none' | 'block';
 // @public (undocumented)
 export const PointerLock: LastWriteWinElementSetComponentDefinition<PBPointerLock>;
 
+// @public (undocumented)
+export const enum PointerType {
+    POT_MOUSE = 1,
+    POT_NONE = 0
+}
+
 // @public
 export interface Position {
     // (undocumented)
@@ -3516,6 +3532,9 @@ export type PositionType = 'absolute' | 'relative';
 
 // @public
 export type PositionUnit = `${number}px` | `${number}%` | number | `${number}` | ScaleUnit;
+
+// @public (undocumented)
+export const PrimaryPointerInfo: LastWriteWinElementSetComponentDefinition<PBPrimaryPointerInfo>;
 
 // Warning: (ae-missing-release-tag) "ProcessMessageResultType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
