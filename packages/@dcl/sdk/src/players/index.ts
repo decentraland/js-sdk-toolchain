@@ -47,7 +47,7 @@ export function definePlayerHelper(engine: IEngine) {
 
         // Check for changes/remove callbacks
         AvatarBase.onChange(entity, (value) => {
-          if (!value && onLeaveSceneCb.length && playerEntities.get(entity)) {
+          if (!value && playerEntities.get(entity)) {
             onLeaveSceneCb.forEach((cb) => cb(playerEntities.get(entity)!))
             playerEntities.delete(entity)
           }
