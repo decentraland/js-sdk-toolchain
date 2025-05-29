@@ -11,6 +11,7 @@ import { PutNetworkComponentOperation } from './putComponentNetwork'
 import { DeleteComponentNetwork } from './deleteComponentNetwork'
 import { DeleteEntityNetwork } from './deleteEntityNetwork'
 import { TransformSchema } from '../../../components/manual/Transform'
+import { PBNetworkEntity } from '../../../components'
 
 /* istanbul ignore next */
 export function isNetworkMessage(message: ReceiveMessage): message is ReceiveNetworkMessage {
@@ -41,14 +42,14 @@ export function networkMessageToLocal(
 /* istanbul ignore next */
 export function localMessageToNetwork(
   message: ReceiveMessage,
-  network: INetowrkEntityType,
+  network: PBNetworkEntity,
   buffer: ByteBuffer,
   destinationBuffer: ByteBuffer
 ) {
   const offset = buffer.currentWriteOffset()
   if (message.type === CrdtMessageType.PUT_COMPONENT) {
     PutNetworkComponentOperation.write(
-      network.entityId,
+      network.entityId as Entity,
       message.timestamp,
       message.componentId,
       network.networkId,
@@ -56,9 +57,15 @@ export function localMessageToNetwork(
       buffer
     )
   } else if (message.type === CrdtMessageType.DELETE_COMPONENT) {
-    DeleteComponentNetwork.write(network.entityId, message.componentId, message.timestamp, network.networkId, buffer)
+    DeleteComponentNetwork.write(
+      network.entityId as Entity,
+      message.componentId,
+      message.timestamp,
+      network.networkId,
+      buffer
+    )
   } else if (message.type === CrdtMessageType.DELETE_ENTITY) {
-    DeleteEntityNetwork.write(network.entityId, network.networkId, buffer)
+    DeleteEntityNetwork.write(network.entityId as Entity, network.networkId, buffer)
   }
   destinationBuffer.writeBuffer(buffer.buffer().subarray(offset, buffer.currentWriteOffset()), false)
 }

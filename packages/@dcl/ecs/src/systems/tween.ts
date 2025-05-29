@@ -24,6 +24,7 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
   const Tween = components.Tween(engine)
   const TweenState = components.TweenState(engine)
   const TweenSequence = components.TweenSequence(engine)
+  const SyncedClock = components.SyncedClock(engine)
 
   const cache = new Map<
     Entity,
@@ -75,15 +76,11 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
     return equal
   }
 
-  const restartTweens: (() => void)[] = []
   // Logic for sequence tweens
   engine.addSystem(() => {
-    for (const restart of restartTweens) {
-      restart()
-    }
-    restartTweens.length = 0
     for (const [entity, tween] of engine.getEntitiesWith(Tween)) {
       if (tweenChanged(entity)) {
+        // TOOD: check if tween has a sequence and change it if the change was because of a networkMessage
         const buffer = new ReadWriteByteBuffer()
         Tween.schema.serialize(tween, buffer)
         cache.set(entity, {
@@ -118,33 +115,41 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
         } else if (tweenSequence.loop === TweenLoop.TL_YOYO) {
           Tween.createOrReplace(entity, backwardsTween(tween))
         } else if (tweenSequence.loop === TweenLoop.TL_RESTART) {
-          Tween.deleteFrom(entity)
-          cache.delete(entity)
-
-          restartTweens.push(() => {
-            Tween.createOrReplace(entity, tween)
+          Tween.createOrReplace(entity, {
+            ...tween,
+            startSyncedTimestamp: SyncedClock.getOrNull(engine.RootEntity)?.syncedTimestamp ?? Date.now()
           })
         }
       }
     }
-  }, Number.NEGATIVE_INFINITY)
+  }, -1000000)
 
   function backwardsTween(tween: PBTween): PBTween {
     if (tween.mode?.$case === 'move' && tween.mode.move) {
-      return { ...tween, mode: { ...tween.mode, move: { start: tween.mode.move.end, end: tween.mode.move.start } } }
+      return {
+        ...tween,
+        startSyncedTimestamp: undefined,
+        mode: { ...tween.mode, move: { start: tween.mode.move.end, end: tween.mode.move.start } }
+      }
     }
     if (tween.mode?.$case === 'rotate' && tween.mode.rotate) {
       return {
         ...tween,
+        startSyncedTimestamp: undefined,
         mode: { ...tween.mode, rotate: { start: tween.mode.rotate.end, end: tween.mode.rotate.start } }
       }
     }
     if (tween.mode?.$case === 'scale' && tween.mode.scale) {
-      return { ...tween, mode: { ...tween.mode, scale: { start: tween.mode.scale.end, end: tween.mode.scale.start } } }
+      return {
+        ...tween,
+        startSyncedTimestamp: undefined,
+        mode: { ...tween.mode, scale: { start: tween.mode.scale.end, end: tween.mode.scale.start } }
+      }
     }
     if (tween.mode?.$case === 'textureMove' && tween.mode.textureMove) {
       return {
         ...tween,
+        startSyncedTimestamp: undefined,
         mode: { ...tween.mode, textureMove: { start: tween.mode.textureMove.end, end: tween.mode.textureMove.start } }
       }
     }

@@ -643,6 +643,7 @@ export const componentDefinitionByName: {
     "core::Material": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMaterial>>;
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
+    "core::NetworkEntity": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBNetworkEntity>>;
     "core::NftShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBNftShape>>;
     "core::PlayerIdentityData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>>;
     "core::PointerEvents": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerEvents>>;
@@ -651,6 +652,7 @@ export const componentDefinitionByName: {
     "core::Raycast": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycast>>;
     "core::RaycastResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycastResult>>;
     "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
+    "core::SyncedClock": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSyncedClock>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
     "core::TweenSequence": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenSequence>>;
@@ -1879,8 +1881,8 @@ export interface NameType {
     value: string;
 }
 
-// @alpha
-export const NetworkEntity: INetowrkEntity;
+// @public (undocumented)
+export const NetworkEntity: LastWriteWinElementSetComponentDefinition<PBNetworkEntity>;
 
 // @alpha
 export const NetworkParent: INetowrkParent;
@@ -2654,6 +2656,20 @@ export namespace PBMeshRenderer_SphereMesh {
 }
 
 // @public (undocumented)
+export interface PBNetworkEntity {
+    entityId: number;
+    networkId: number;
+}
+
+// @public (undocumented)
+export namespace PBNetworkEntity {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBNetworkEntity;
+    // (undocumented)
+    export function encode(message: PBNetworkEntity, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBNftShape {
     color?: PBColor3 | undefined;
     style?: NftFrameType | undefined;
@@ -2849,19 +2865,12 @@ export namespace PBRaycastResult {
 
 // @public (undocumented)
 export interface PBRealmInfo {
-    // (undocumented)
     baseUrl: string;
-    // (undocumented)
     commsAdapter: string;
-    // (undocumented)
     isConnectedSceneRoom?: boolean | undefined;
-    // (undocumented)
     isPreview: boolean;
-    // (undocumented)
     networkId: number;
-    // (undocumented)
     realmName: string;
-    // (undocumented)
     room?: string | undefined;
 }
 
@@ -2871,6 +2880,20 @@ export namespace PBRealmInfo {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBRealmInfo;
     // (undocumented)
     export function encode(message: PBRealmInfo, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBSyncedClock {
+    status: SyncStatus;
+    syncedTimestamp: number;
+}
+
+// @public (undocumented)
+export namespace PBSyncedClock {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBSyncedClock;
+    // (undocumented)
+    export function encode(message: PBSyncedClock, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2927,6 +2950,7 @@ export interface PBTween {
         textureMove: TextureMove;
     } | undefined;
     playing?: boolean | undefined;
+    startSyncedTimestamp?: number | undefined;
 }
 
 // @public (undocumented)
@@ -3919,6 +3943,17 @@ export interface Spec {
 
 // @alpha
 export const SyncComponents: ISyncComponents;
+
+// @public (undocumented)
+export const SyncedClock: LastWriteWinElementSetComponentDefinition<PBSyncedClock>;
+
+// @public (undocumented)
+export const enum SyncStatus {
+    SS_ERROR = 3,
+    SS_SYNCHRONIZED = 2,
+    SS_SYNCHRONIZING = 1,
+    SS_UNINITIALIZED = 0
+}
 
 // @public (undocumented)
 export type SystemFn = (dt: number) => void;

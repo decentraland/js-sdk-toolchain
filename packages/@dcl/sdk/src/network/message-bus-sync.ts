@@ -9,6 +9,7 @@ import { entityUtils } from './entities'
 import { GetUserDataRequest, GetUserDataResponse } from '~system/UserIdentity'
 import { definePlayerHelper } from '../players'
 import { serializeCrdtMessages } from '../internal/transports/logger'
+import { createTweenSyncSystem } from './tweens'
 
 export type IProfile = { networkId: number; userId: string }
 // user that we asked for the inital crdt state
@@ -22,8 +23,15 @@ export function addSyncTransport(
   const myProfile: IProfile = {} as IProfile
   fetchProfile(myProfile!, getUserData)
 
+  // Network State
+  let stateIsSyncronized = false
+  let transportInitialzed = false
+
   // Entity utils
   const entityDefinitions = entityUtils(engine, myProfile)
+
+  // Players observables helper
+  const players = definePlayerHelper(engine)
 
   // List of MessageBuss messsages to be sent on every frame to comms
   const pendingMessageBusMessagesToSend: { data: Uint8Array[]; address: string[] }[] = []
@@ -31,16 +39,11 @@ export function addSyncTransport(
   const binaryMessageBus = BinaryMessageBus((data, address) => {
     pendingMessageBusMessagesToSend.push({ data: [data], address: address ?? [] })
   })
-
   function getMessagesToSend(): typeof pendingMessageBusMessagesToSend {
     const messages = [...pendingMessageBusMessagesToSend]
     pendingMessageBusMessagesToSend.length = 0
     return messages
   }
-  const players = definePlayerHelper(engine)
-
-  let stateIsSyncronized = false
-  let transportInitialzed = false
 
   // Add Sync Transport
   const transport: Transport = {
@@ -123,10 +126,6 @@ export function addSyncTransport(
     }
   }
 
-  players.onEnterScene((player) => {
-    DEBUG_NETWORK_MESSAGES() && console.log('[onEnterScene]', player.userId)
-  })
-
   // Asks for the REQ_CRDT_STATE when its connected to comms
   RealmInfo.onChange(engine.RootEntity, (value) => {
     if (!value?.isConnectedSceneRoom) {
@@ -143,6 +142,10 @@ export function addSyncTransport(
     }
   })
 
+  // Players log
+  players.onEnterScene((player) => {
+    DEBUG_NETWORK_MESSAGES() && console.log('[onEnterScene]', player.userId)
+  })
   players.onLeaveScene((userId) => {
     DEBUG_NETWORK_MESSAGES() && console.log('[onLeaveScene]', userId)
   })
@@ -164,6 +167,8 @@ export function addSyncTransport(
       engine.addSystem(sleepSystem)
     })
   }
+
+  createTweenSyncSystem(engine, isStateSyncronized)
 
   return {
     ...entityDefinitions,

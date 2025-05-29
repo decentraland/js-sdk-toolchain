@@ -17,7 +17,8 @@ import { PutNetworkComponentOperation } from '../../serialization/crdt/network/p
 import {
   NetworkEntity as defineNetworkEntity,
   NetworkParent as defineNetworkParent,
-  Transform as defineTransform
+  Transform as defineTransform,
+  PBNetworkEntity
 } from '../../components'
 import { INetowrkEntityType } from '../../components/types'
 import * as networkUtils from '../../serialization/crdt/network/utils'
@@ -112,7 +113,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
    */
   function findNetworkId(msg: { entityId: Entity; networkId?: number }): {
     entityId: Entity
-    network?: INetowrkEntityType
+    network?: PBNetworkEntity
   } {
     const hasNetworkId = 'networkId' in msg
 
