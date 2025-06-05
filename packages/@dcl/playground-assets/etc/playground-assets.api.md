@@ -3215,6 +3215,7 @@ export interface PBUiTransform {
     // (undocumented)
     width: number;
     widthUnit: YGUnit;
+    zIndex?: number | undefined;
 }
 
 // @public (undocumented)
