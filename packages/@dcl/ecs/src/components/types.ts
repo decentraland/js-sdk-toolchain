@@ -12,3 +12,4 @@ export type { ISyncComponents, ISyncComponentsType } from './manual/SyncComponen
 export type { INetowrkEntity, INetowrkEntityType } from './manual/NetworkEntity'
 export type { INetowrkParent, INetowrkParentType } from './manual/NetworkParent'
 export type { InputModifierHelper, InputModifierComponentDefinitionExtended } from './extended/InputModifier'
+export type { LightSourceHelper, LightSourceComponentDefinitionExtended } from './extended/LightSource'

@@ -33,7 +33,6 @@ import { TweenInspector } from './TweenInspector'
 import { SmartItemBasicView } from './SmartItemBasicView'
 import { AdminToolkitView } from './AdminToolkitView'
 import { RewardInspector } from './RewardInspector'
-import { VideoScreenBasicView } from './SmartItemBasicView/VideoScreenBasicView'
 
 import './EntityInspector.css'
 
