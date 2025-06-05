@@ -13,7 +13,7 @@
   .ScreenSetup {
     display: flex;
     flex-direction: row;
-    label {
+    .Label {
       margin-left: 8px;
       text-wrap: wrap;
       width: 80%;
