@@ -4452,6 +4452,7 @@ export interface UiTransformProps {
     position?: Partial<Position> | PositionShorthand;
     positionType?: PositionType;
     width?: PositionUnit | 'auto';
+    zIndex?: number;
 }
 
 // @public (undocumented)
