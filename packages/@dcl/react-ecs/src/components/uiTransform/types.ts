@@ -150,4 +150,7 @@ export interface UiTransformProps {
   borderColor?: Record<keyof Partial<Position>, Color4> | Color4 | undefined
   borderRadius?: Partial<BorderRadius> | PositionUnit
   borderWidth?: Partial<Position> | PositionUnit
+
+  /** default 0 */
+  zIndex?: number
 }
