@@ -4447,6 +4447,7 @@ export interface UiTransformProps {
     maxWidth?: PositionUnit;
     minHeight?: PositionUnit;
     minWidth?: PositionUnit;
+    opacity?: number;
     overflow?: OverflowType;
     padding?: Partial<Position> | PositionShorthand;
     pointerFilter?: PointerFilterType;
