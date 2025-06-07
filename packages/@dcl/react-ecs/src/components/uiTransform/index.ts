@@ -79,7 +79,9 @@ const defaultUiTransform: PBUiTransform = {
   flexBasisUnit: YGUnit.YGU_UNDEFINED,
   widthUnit: YGUnit.YGU_AUTO,
   heightUnit: YGUnit.YGU_UNDEFINED,
-  pointerFilter: PointerFilterMode.PFM_NONE
+  pointerFilter: PointerFilterMode.PFM_NONE,
+  opacity: 1,
+  zIndex: 0
 }
 
 /**
@@ -100,6 +102,7 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     borderRadius,
     borderWidth,
     borderColor,
+    zIndex,
     ...otherProps
   } = props
 
@@ -128,6 +131,7 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     ...(flexWrap && getFlexWrap(flexWrap)),
     ...(borderRadius && parseBorderRadius(borderRadius)),
     ...(borderWidth && parseBorderWidth(borderWidth)),
-    ...(borderColor && parseBorderColor(borderColor))
+    ...(borderColor && parseBorderColor(borderColor)),
+    ...(zIndex && { zIndex })
   }
 }
