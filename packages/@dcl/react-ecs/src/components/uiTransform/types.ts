@@ -151,6 +151,8 @@ export interface UiTransformProps {
   borderRadius?: Partial<BorderRadius> | PositionUnit
   borderWidth?: Partial<Position> | PositionUnit
 
+  /** The opacity property sets the opacity level for an element, it's accumulated across children @defaultValue 1 */
+  opacity?: number
   /** default 0 */
   zIndex?: number
 }
