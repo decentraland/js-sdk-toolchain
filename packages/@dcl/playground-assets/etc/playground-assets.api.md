@@ -3260,6 +3260,7 @@ export interface PBUiTransform {
     // (undocumented)
     minWidth: number;
     minWidthUnit: YGUnit;
+    opacity?: number | undefined;
     overflow: YGOverflow;
     // (undocumented)
     paddingBottom: number;
