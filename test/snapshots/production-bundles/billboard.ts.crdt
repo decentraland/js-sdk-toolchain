@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=240.9k bytes
+SCENE_COMPILED_JS_SIZE_PROD=241.1k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -9,7 +9,7 @@ EVAL test/snapshots/production-bundles/billboard.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   OPCODES ~= 67k
-  MALLOC_COUNT = 15115
+  MALLOC_COUNT = 15117
   ALIVE_OBJS_DELTA ~= 3.30k
 CALL onStart()
   OPCODES ~= 0k
@@ -77,4 +77,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 10k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1066.45k bytes
+  MEMORY_USAGE_COUNT ~= 1066.90k bytes
