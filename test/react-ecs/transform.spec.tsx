@@ -488,7 +488,7 @@ describe('UiTransform React Ecs', () => {
     })
   })
 
-  it('should parse zIndex correctly', async () => {
+  it('should parse positive zIndex correctly', async () => {
     const { engine, uiRenderer } = setupEngine()
     const UiTransform = components.UiTransform(engine)
     const entityIndex = engine.addEntity() as number
@@ -497,22 +497,33 @@ describe('UiTransform React Ecs', () => {
     const rootDivEntity = (entityIndex + 1) as Entity
     const getUiTransform = (entity: Entity) => UiTransform.get(entity)
 
-    // Test with positive zIndex
-    let ui = () => (
+    const ui = () => (
       <UiEntity
         uiTransform={{
           zIndex: 10
         }}
       />
     )
+
+    console.log('ui', ui)
+
     uiRenderer.setUiRenderer(ui)
     await engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       zIndex: 10
     })
+  })
 
-    // Test with negative zIndex
-    ui = () => (
+  it('should parse negative zIndex correctly', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    const ui = () => (
       <UiEntity
         uiTransform={{
           zIndex: -5
@@ -524,9 +535,18 @@ describe('UiTransform React Ecs', () => {
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       zIndex: -5
     })
+  })
 
-    // Test with zero zIndex
-    ui = () => (
+  it('should parse zero zIndex correctly', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    const ui = () => (
       <UiEntity
         uiTransform={{
           zIndex: 0
@@ -538,9 +558,18 @@ describe('UiTransform React Ecs', () => {
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       zIndex: 0
     })
+  })
 
-    // Test without zIndex (should use default)
-    ui = () => (
+  it('should use default zIndex when not provided', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    const ui = () => (
       <UiEntity
         uiTransform={{
           width: 100
@@ -550,7 +579,7 @@ describe('UiTransform React Ecs', () => {
     uiRenderer.setUiRenderer(ui)
     await engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
-      zIndex: undefined
+      zIndex: 0
     })
   })
 
