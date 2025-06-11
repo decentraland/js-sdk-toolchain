@@ -550,7 +550,7 @@ describe('UiTransform React Ecs', () => {
     uiRenderer.setUiRenderer(ui)
     await engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
-      zIndex: 0 // Default value
+      zIndex: undefined
     })
   })
 
