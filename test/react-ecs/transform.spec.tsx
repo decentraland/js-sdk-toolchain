@@ -487,4 +487,216 @@ describe('UiTransform React Ecs', () => {
       heightUnit: YGUnit.YGU_AUTO
     })
   })
+
+  it('should parse zIndex correctly', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    // Test with positive zIndex
+    let ui = () => (
+      <UiEntity
+        uiTransform={{
+          zIndex: 10
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      zIndex: 10
+    })
+
+    // Test with negative zIndex
+    ui = () => (
+      <UiEntity
+        uiTransform={{
+          zIndex: -5
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      zIndex: -5
+    })
+
+    // Test with zero zIndex
+    ui = () => (
+      <UiEntity
+        uiTransform={{
+          zIndex: 0
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      zIndex: 0
+    })
+
+    // Test without zIndex (should use default)
+    ui = () => (
+      <UiEntity
+        uiTransform={{
+          width: 100
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      zIndex: 0 // Default value
+    })
+  })
+
+  it('should parse opacity correctly', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    // Test with opacity value
+    let ui = () => (
+      <UiEntity
+        uiTransform={{
+          opacity: 0.5
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      opacity: 0.5
+    })
+
+    // Test with full opacity
+    ui = () => (
+      <UiEntity
+        uiTransform={{
+          opacity: 1.0
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      opacity: 1.0
+    })
+
+    // Test with zero opacity
+    ui = () => (
+      <UiEntity
+        uiTransform={{
+          opacity: 0
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      opacity: 0
+    })
+
+    // Test without opacity (should use default)
+    ui = () => (
+      <UiEntity
+        uiTransform={{
+          width: 100
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      opacity: 1 // Default value
+    })
+  })
+
+  it('should handle falsy zIndex values correctly', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    // Test with undefined zIndex (should use default from defaultUiTransform)
+    let ui = () => (
+      <UiEntity
+        uiTransform={{
+          zIndex: undefined,
+          width: 100
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      zIndex: 0 // Default value should be used
+    })
+
+    // Test with null zIndex (should use default from defaultUiTransform)
+    ui = () => (
+      <UiEntity
+        uiTransform={{
+          zIndex: null as any,
+          width: 100
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      zIndex: 0 // Default value should be used
+    })
+  })
+
+  it('should handle falsy opacity values correctly', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    // Test with undefined opacity (should use default from defaultUiTransform)
+    let ui = () => (
+      <UiEntity
+        uiTransform={{
+          opacity: undefined,
+          width: 100
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      opacity: 1 // Default value should be used
+    })
+
+    // Test with null opacity (should use default from defaultUiTransform)
+    ui = () => (
+      <UiEntity
+        uiTransform={{
+          opacity: null as any,
+          width: 100
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      opacity: 1 // Default value should be used
+    })
+  })
 })
