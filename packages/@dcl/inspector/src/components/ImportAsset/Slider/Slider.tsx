@@ -6,14 +6,16 @@ import { AssetSlides } from './AssetSlides'
 import { determineAssetType, formatFileName } from '../utils'
 
 import { Asset } from '../types'
-import { PropTypes, Thumbnails } from './types'
+import { PropTypes, Thumbnails, ImportStep } from './types'
 
 import './Slider.css'
+import { Error } from '../Error'
 
 export function Slider({ assets, onSubmit, isNameValid }: PropTypes) {
   const [uploadedAssets, setUploadedAssets] = useState(assets)
   const [slide, setSlide] = useState(0)
   const [screenshots, setScreenshots] = useState<Thumbnails>({})
+  const [step, setStep] = useState<ImportStep>(ImportStep.UPLOAD)
 
   const handleScreenshot = useCallback(
     (file: Asset) => (thumbnail: string) => {
@@ -38,6 +40,9 @@ export function Slider({ assets, onSubmit, isNameValid }: PropTypes) {
   )
 
   const handleSubmit = useCallback(() => {
+    if (invalidNames.size > 0) {
+      return setStep(ImportStep.CONFIRM)
+    }
     onSubmit(
       uploadedAssets.map(($) => ({
         ...$,
@@ -77,6 +82,17 @@ export function Slider({ assets, onSubmit, isNameValid }: PropTypes) {
     return invalid
   }, [uploadedAssets])
 
+  const getInvalidAssets = useCallback(() => {
+    return uploadedAssets
+      .filter((asset) => invalidNames.has(formatFileName(asset)))
+      .map((asset) => ({
+        ...asset,
+        error: {
+          type: 'name'
+        }
+      })) as Asset[]
+  }, [uploadedAssets, invalidNames])
+
   const isNameUnique = useCallback(
     (asset: Asset) => {
       const name = formatFileName(asset)
@@ -88,20 +104,35 @@ export function Slider({ assets, onSubmit, isNameValid }: PropTypes) {
   if (!uploadedAssets.length) return null
 
   return (
-    <div className="Slider">
-      {manyAssets && <span className="counter">{countText}</span>}
-      <AssetSlides
-        uploadedAssets={uploadedAssets}
-        currentSlide={slide}
-        screenshots={screenshots}
-        onSlideChange={setSlide}
-        onScreenshot={handleScreenshot}
-        onNameChange={handleNameChange}
-        isNameUnique={isNameUnique}
-      />
-      <Button type="danger" size="big" onClick={handleSubmit} disabled={!allScreenshotsTaken || invalidNames.size > 0}>
-        {importText}
-      </Button>
-    </div>
+    <>
+      {step === ImportStep.UPLOAD && (
+        <div className="Slider">
+          <h2>Import Assets</h2>
+          {manyAssets && <span className="counter">{countText}</span>}
+          <AssetSlides
+            uploadedAssets={uploadedAssets}
+            currentSlide={slide}
+            screenshots={screenshots}
+            onSlideChange={setSlide}
+            onScreenshot={handleScreenshot}
+            onNameChange={handleNameChange}
+            isNameUnique={isNameUnique}
+          />
+          <Button type="danger" size="big" onClick={handleSubmit} disabled={!allScreenshotsTaken}>
+            {importText}
+          </Button>
+        </div>
+      )}
+      {step === ImportStep.CONFIRM && (
+        <>
+          <h2>Replace assets?</h2>
+          <Error
+            assets={getInvalidAssets()}
+            onSubmit={() => setStep(ImportStep.UPLOAD)}
+            errorMessage="This asset already exists in your Assets folder"
+          />
+        </>
+      )}
+    </>
   )
 }
