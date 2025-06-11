@@ -137,11 +137,10 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
           className="ImportAssetModal"
           overlayClassName="ImportAssetModalOverlay"
         >
-          <h2>Import Assets</h2>
           {assetsAreValid(files) ? (
             <Slider assets={files} onSubmit={handleImport} isNameValid={validateName} />
           ) : (
-            <Error assets={files} onSubmit={handleCloseModal} />
+            <Error assets={files} onSubmit={handleCloseModal} errorMessage="Asset failed to import" />
           )}
         </Modal>
       </FileInput>

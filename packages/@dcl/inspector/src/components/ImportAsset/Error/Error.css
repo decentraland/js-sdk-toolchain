@@ -6,7 +6,7 @@
 }
 
 .ImportError .alert-icon {
-  background-image: url(./alert.svg);
+  background-image: url(../assets/alert.svg);
   background-size: 80px;
   background-repeat: no-repeat;
   background-position: center;

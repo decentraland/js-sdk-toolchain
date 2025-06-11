@@ -9,7 +9,7 @@ import { PropTypes } from './types'
 import './Error.css'
 import { ValidationError } from '../types'
 
-export function Error({ assets, onSubmit }: PropTypes) {
+export function Error({ assets, onSubmit, errorMessage }: PropTypes) {
   const getErrorMessage = useCallback((error: ValidationError): string => {
     switch (error?.type) {
       case 'type':
@@ -18,6 +18,8 @@ export function Error({ assets, onSubmit }: PropTypes) {
         return 'The model has some issues'
       case 'size':
         return 'File size is too large'
+      case 'name':
+        return ''
       default:
         return 'Unknown error'
     }
@@ -26,7 +28,7 @@ export function Error({ assets, onSubmit }: PropTypes) {
   return (
     <div className="ImportError">
       <div className="alert-icon"></div>
-      <h2>Asset failed to import</h2>
+      <h3>{errorMessage}</h3>
       <div className="errors">
         {assets.map(($, i) => $.error && <ErrorMessage key={i} asset={$} message={getErrorMessage($.error)} />)}
       </div>
@@ -41,7 +43,9 @@ function ErrorMessage({ asset, message }: { asset: PropTypes['assets'][0]; messa
   const errorMessage = asset.error?.message
   return (
     <span>
-      {formatFileName(asset)} - {message} {errorMessage && <InfoTooltip text={errorMessage} type="help" />}
+      {formatFileName(asset)}
+      {message && ` - ${message}`}
+      {errorMessage && <InfoTooltip text={errorMessage} type="help" />}
     </span>
   )
 }
