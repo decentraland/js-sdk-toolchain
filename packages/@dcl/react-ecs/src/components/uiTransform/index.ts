@@ -80,7 +80,7 @@ const defaultUiTransform: PBUiTransform = {
   widthUnit: YGUnit.YGU_AUTO,
   heightUnit: YGUnit.YGU_UNDEFINED,
   pointerFilter: PointerFilterMode.PFM_NONE,
-  opacity: 0,
+  opacity: 1,
   zIndex: 0
 }
 
