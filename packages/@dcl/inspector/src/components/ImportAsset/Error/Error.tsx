@@ -2,14 +2,16 @@ import { useCallback } from 'react'
 
 import { InfoTooltip } from '../../ui'
 import { formatFileName } from '../utils'
-import { Button } from '../../Button'
 
 import { PropTypes } from './types'
 
 import './Error.css'
 import { ValidationError } from '../types'
 
-export function Error({ assets, onSubmit, errorMessage }: PropTypes) {
+import cx from 'classnames'
+import { Button } from '../../Button'
+
+export function Error({ assets, errorMessage, primaryAction, secondaryAction }: PropTypes) {
   const getErrorMessage = useCallback((error: ValidationError): string => {
     switch (error?.type) {
       case 'type':
@@ -18,10 +20,8 @@ export function Error({ assets, onSubmit, errorMessage }: PropTypes) {
         return 'The model has some issues'
       case 'size':
         return 'File size is too large'
-      case 'name':
-        return ''
       default:
-        return 'Unknown error'
+        return ''
     }
   }, [])
 
@@ -32,9 +32,20 @@ export function Error({ assets, onSubmit, errorMessage }: PropTypes) {
       <div className="errors">
         {assets.map(($, i) => $.error && <ErrorMessage key={i} asset={$} message={getErrorMessage($.error)} />)}
       </div>
-      <Button type="danger" size="big" onClick={onSubmit}>
-        OK
-      </Button>
+      <div
+        className={cx('actions-container', {
+          'space-between': !!secondaryAction
+        })}
+      >
+        {!!secondaryAction && (
+          <Button onClick={secondaryAction.onClick} size="big">
+            {secondaryAction.name}
+          </Button>
+        )}
+        <Button onClick={primaryAction.onClick} type="danger" size="big">
+          {primaryAction.name}
+        </Button>
+      </div>
     </div>
   )
 }

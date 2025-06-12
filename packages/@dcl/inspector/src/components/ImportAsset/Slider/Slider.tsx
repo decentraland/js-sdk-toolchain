@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
 
-import { Button } from '../../Button'
 import { AssetSlides } from './AssetSlides'
 
 import { determineAssetType, formatFileName } from '../utils'
@@ -10,6 +9,7 @@ import { PropTypes, Thumbnails, ImportStep } from './types'
 
 import './Slider.css'
 import { Error } from '../Error'
+import { Button } from '../../Button'
 
 export function Slider({ assets, onSubmit, isNameValid }: PropTypes) {
   const [uploadedAssets, setUploadedAssets] = useState(assets)
@@ -128,8 +128,9 @@ export function Slider({ assets, onSubmit, isNameValid }: PropTypes) {
           <h2>Replace assets?</h2>
           <Error
             assets={getInvalidAssets()}
-            onSubmit={() => setStep(ImportStep.UPLOAD)}
             errorMessage="This asset already exists in your Assets folder"
+            primaryAction={{ name: 'Replace', onClick: handleSubmit }}
+            secondaryAction={{ name: 'Back', onClick: () => setStep(ImportStep.UPLOAD) }}
           />
         </>
       )}
