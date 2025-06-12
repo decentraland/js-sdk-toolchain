@@ -44,10 +44,13 @@ export const NOT_SYNC_COMPONENTS = [
 
 export const NOT_SYNC_COMPONENTS_IDS = NOT_SYNC_COMPONENTS.map(($) => $.componentId)
 
-export function engineToCrdt(engine: IEngine): Uint8Array {
+const LIVEKIT_MAX_SIZE = 13 // 13kb max size for network messages
+
+export function engineToCrdt(engine: IEngine): Uint8Array[] {
   const crdtBuffer = new ReadWriteByteBuffer()
   const networkBuffer = new ReadWriteByteBuffer()
   const NetworkEntity = engine.getComponent(_NetworkEntity.componentId) as INetowrkEntity
+  const chunks: Uint8Array[] = []
 
   for (const itComponentDefinition of engine.componentsIter()) {
     if (NOT_SYNC_COMPONENTS_IDS.includes(itComponentDefinition.componentId)) {
@@ -64,6 +67,13 @@ export function engineToCrdt(engine: IEngine): Uint8Array {
     if (header.type === CrdtMessageType.PUT_COMPONENT) {
       const message = PutComponentOperation.read(crdtBuffer)!
       const networkEntity = NetworkEntity.getOrNull(message.entityId)
+
+      // Check if adding this message would exceed the size limit
+      if ((networkBuffer.toBinary().byteLength + message.data.byteLength) / 1024 > LIVEKIT_MAX_SIZE) {
+        chunks.push(networkBuffer.toBinary())
+        networkBuffer.resetBuffer()
+      }
+
       if (networkEntity) {
         PutNetworkComponentOperation.write(
           networkEntity.entityId,
@@ -87,5 +97,10 @@ export function engineToCrdt(engine: IEngine): Uint8Array {
     }
   }
 
-  return networkBuffer.toBinary()
+  // Add any remaining data as the final chunk
+  if (networkBuffer.currentWriteOffset() > 0) {
+    chunks.push(networkBuffer.toBinary())
+  }
+
+  return chunks
 }
