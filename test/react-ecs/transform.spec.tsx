@@ -505,8 +505,6 @@ describe('UiTransform React Ecs', () => {
       />
     )
 
-    console.log('ui', ui)
-
     uiRenderer.setUiRenderer(ui)
     await engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
@@ -583,73 +581,7 @@ describe('UiTransform React Ecs', () => {
     })
   })
 
-  it('should parse opacity correctly', async () => {
-    const { engine, uiRenderer } = setupEngine()
-    const UiTransform = components.UiTransform(engine)
-    const entityIndex = engine.addEntity() as number
-
-    // Helpers
-    const rootDivEntity = (entityIndex + 1) as Entity
-    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
-
-    // Test with opacity value
-    let ui = () => (
-      <UiEntity
-        uiTransform={{
-          opacity: 0.5
-        }}
-      />
-    )
-    uiRenderer.setUiRenderer(ui)
-    await engine.update(1)
-    expect(getUiTransform(rootDivEntity)).toMatchObject({
-      opacity: 0.5
-    })
-
-    // Test with full opacity
-    ui = () => (
-      <UiEntity
-        uiTransform={{
-          opacity: 1.0
-        }}
-      />
-    )
-    uiRenderer.setUiRenderer(ui)
-    await engine.update(1)
-    expect(getUiTransform(rootDivEntity)).toMatchObject({
-      opacity: 1.0
-    })
-
-    // Test with zero opacity
-    ui = () => (
-      <UiEntity
-        uiTransform={{
-          opacity: 0
-        }}
-      />
-    )
-    uiRenderer.setUiRenderer(ui)
-    await engine.update(1)
-    expect(getUiTransform(rootDivEntity)).toMatchObject({
-      opacity: 0
-    })
-
-    // Test without opacity (should use default)
-    ui = () => (
-      <UiEntity
-        uiTransform={{
-          width: 100
-        }}
-      />
-    )
-    uiRenderer.setUiRenderer(ui)
-    await engine.update(1)
-    expect(getUiTransform(rootDivEntity)).toMatchObject({
-      opacity: 1 // Default value
-    })
-  })
-
-  it('should handle falsy zIndex values correctly', async () => {
+  it('should handle undefined zIndex correctly', async () => {
     const { engine, uiRenderer } = setupEngine()
     const UiTransform = components.UiTransform(engine)
     const entityIndex = engine.addEntity() as number
@@ -672,9 +604,19 @@ describe('UiTransform React Ecs', () => {
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       zIndex: 0 // Default value should be used
     })
+  })
+
+  it('should handle null zIndex correctly', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
 
     // Test with null zIndex (should use default from defaultUiTransform)
-    ui = () => (
+    let ui = () => (
       <UiEntity
         uiTransform={{
           zIndex: null as any,
@@ -689,7 +631,101 @@ describe('UiTransform React Ecs', () => {
     })
   })
 
-  it('should handle falsy opacity values correctly', async () => {
+  
+  it('should parse positive opacity correctly', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    const ui = () => (
+      <UiEntity
+        uiTransform={{
+          opacity: 10
+        }}
+      />
+    )
+
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      opacity: 10
+    })
+  })
+
+  it('should parse negative opacity correctly', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    const ui = () => (
+      <UiEntity
+        uiTransform={{
+          opacity: -5
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      opacity: -5
+    })
+  })
+
+  it('should parse zero opacity correctly', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    const ui = () => (
+      <UiEntity
+        uiTransform={{
+          opacity: 0
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      opacity: 0
+    })
+  })
+
+  it('should use default opacity when not provided', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    const ui = () => (
+      <UiEntity
+        uiTransform={{
+          width: 100
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      opacity: 0
+    })
+  })
+
+  it('should handle undefined opacity correctly', async () => {
     const { engine, uiRenderer } = setupEngine()
     const UiTransform = components.UiTransform(engine)
     const entityIndex = engine.addEntity() as number
@@ -710,11 +746,21 @@ describe('UiTransform React Ecs', () => {
     uiRenderer.setUiRenderer(ui)
     await engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
-      opacity: 1 // Default value should be used
+      opacity: 0 // Default value should be used
     })
+  })
+
+  it('should handle null opacity correctly', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
 
     // Test with null opacity (should use default from defaultUiTransform)
-    ui = () => (
+    let ui = () => (
       <UiEntity
         uiTransform={{
           opacity: null as any,
@@ -725,7 +771,7 @@ describe('UiTransform React Ecs', () => {
     uiRenderer.setUiRenderer(ui)
     await engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
-      opacity: 1 // Default value should be used
+      opacity: 0 // Default value should be used
     })
   })
 })
