@@ -133,7 +133,7 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     ...(borderRadius && parseBorderRadius(borderRadius)),
     ...(borderWidth && parseBorderWidth(borderWidth)),
     ...(borderColor && parseBorderColor(borderColor)),
-    ...(zIndex && {zIndex}),
-    ...(opacity && {opacity})
+    ...(zIndex && { zIndex }),
+    ...(opacity && { opacity })
   }
 }

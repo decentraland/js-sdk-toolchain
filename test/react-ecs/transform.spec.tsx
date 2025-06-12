@@ -591,7 +591,7 @@ describe('UiTransform React Ecs', () => {
     const getUiTransform = (entity: Entity) => UiTransform.get(entity)
 
     // Test with undefined zIndex (should use default from defaultUiTransform)
-    let ui = () => (
+    const ui = () => (
       <UiEntity
         uiTransform={{
           zIndex: undefined,
@@ -616,7 +616,7 @@ describe('UiTransform React Ecs', () => {
     const getUiTransform = (entity: Entity) => UiTransform.get(entity)
 
     // Test with null zIndex (should use default from defaultUiTransform)
-    let ui = () => (
+    const ui = () => (
       <UiEntity
         uiTransform={{
           zIndex: null as any,
@@ -631,7 +631,6 @@ describe('UiTransform React Ecs', () => {
     })
   })
 
-  
   it('should parse positive opacity correctly', async () => {
     const { engine, uiRenderer } = setupEngine()
     const UiTransform = components.UiTransform(engine)
@@ -735,7 +734,7 @@ describe('UiTransform React Ecs', () => {
     const getUiTransform = (entity: Entity) => UiTransform.get(entity)
 
     // Test with undefined opacity (should use default from defaultUiTransform)
-    let ui = () => (
+    const ui = () => (
       <UiEntity
         uiTransform={{
           opacity: undefined,
@@ -760,7 +759,7 @@ describe('UiTransform React Ecs', () => {
     const getUiTransform = (entity: Entity) => UiTransform.get(entity)
 
     // Test with null opacity (should use default from defaultUiTransform)
-    let ui = () => (
+    const ui = () => (
       <UiEntity
         uiTransform={{
           opacity: null as any,
