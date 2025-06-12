@@ -102,8 +102,6 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     borderRadius,
     borderWidth,
     borderColor,
-    zIndex,
-    opacity,
     ...otherProps
   } = props
 
@@ -132,8 +130,6 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     ...(flexWrap && getFlexWrap(flexWrap)),
     ...(borderRadius && parseBorderRadius(borderRadius)),
     ...(borderWidth && parseBorderWidth(borderWidth)),
-    ...(borderColor && parseBorderColor(borderColor)),
-    ...(zIndex && { zIndex }),
-    ...(opacity && { opacity })
+    ...(borderColor && parseBorderColor(borderColor))
   }
 }
