@@ -140,7 +140,11 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
           {assetsAreValid(files) ? (
             <Slider assets={files} onSubmit={handleImport} isNameValid={validateName} />
           ) : (
-            <Error assets={files} onSubmit={handleCloseModal} errorMessage="Asset failed to import" />
+            <Error
+              assets={files}
+              errorMessage="Asset failed to import"
+              primaryAction={{ name: 'OK', onClick: handleCloseModal }}
+            />
           )}
         </Modal>
       </FileInput>
