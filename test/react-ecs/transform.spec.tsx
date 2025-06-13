@@ -487,4 +487,190 @@ describe('UiTransform React Ecs', () => {
       heightUnit: YGUnit.YGU_AUTO
     })
   })
+
+  it('should parse positive zIndex correctly', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    const ui = () => (
+      <UiEntity
+        uiTransform={{
+          zIndex: 10
+        }}
+      />
+    )
+
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      zIndex: 10
+    })
+  })
+
+  it('should parse negative zIndex correctly', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    const ui = () => (
+      <UiEntity
+        uiTransform={{
+          zIndex: -5
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      zIndex: -5
+    })
+  })
+
+  it('should parse zero zIndex correctly', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    const ui = () => (
+      <UiEntity
+        uiTransform={{
+          zIndex: 0
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      zIndex: 0
+    })
+  })
+
+  it('should use default zIndex when not provided', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    const ui = () => (
+      <UiEntity
+        uiTransform={{
+          width: 100
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      zIndex: 0
+    })
+  })
+
+  it('should parse positive opacity correctly', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    const ui = () => (
+      <UiEntity
+        uiTransform={{
+          opacity: 10
+        }}
+      />
+    )
+
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      opacity: 10
+    })
+  })
+
+  it('should parse negative opacity correctly', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    const ui = () => (
+      <UiEntity
+        uiTransform={{
+          opacity: -5
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      opacity: -5
+    })
+  })
+
+  it('should parse zero opacity correctly', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    const ui = () => (
+      <UiEntity
+        uiTransform={{
+          opacity: 0
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      opacity: 0
+    })
+  })
+
+  it('should use default opacity when not provided', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    const ui = () => (
+      <UiEntity
+        uiTransform={{
+          width: 100
+        }}
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      opacity: 1
+    })
+  })
 })
