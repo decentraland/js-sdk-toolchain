@@ -3260,6 +3260,7 @@ export interface PBUiTransform {
     // (undocumented)
     minWidth: number;
     minWidthUnit: YGUnit;
+    opacity?: number | undefined;
     overflow: YGOverflow;
     // (undocumented)
     paddingBottom: number;
@@ -3294,6 +3295,7 @@ export interface PBUiTransform {
     // (undocumented)
     width: number;
     widthUnit: YGUnit;
+    zIndex?: number | undefined;
 }
 
 // @public (undocumented)
@@ -4445,12 +4447,14 @@ export interface UiTransformProps {
     maxWidth?: PositionUnit;
     minHeight?: PositionUnit;
     minWidth?: PositionUnit;
+    opacity?: number;
     overflow?: OverflowType;
     padding?: Partial<Position> | PositionShorthand;
     pointerFilter?: PointerFilterType;
     position?: Partial<Position> | PositionShorthand;
     positionType?: PositionType;
     width?: PositionUnit | 'auto';
+    zIndex?: number;
 }
 
 // @public (undocumented)
