@@ -99,6 +99,7 @@ function ProjectView({ folders, thumbnails }: Props) {
 
   const handleRemove = useCallback(
     async (value: string) => {
+      debugger
       const path = withAssetDir(getFullNodePath(tree.get(value)!).slice(1))
       const entitiesWithAsset = getEntitiesWithAsset(path)
       if (entitiesWithAsset.length) {
