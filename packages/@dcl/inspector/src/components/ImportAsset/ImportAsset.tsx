@@ -4,7 +4,7 @@ import { HiOutlineUpload } from 'react-icons/hi'
 
 import { removeBasePath } from '../../lib/logic/remove-base-path'
 import { DIRECTORY, transformBase64ResourceToBinary, withAssetDir } from '../../lib/data-layer/host/fs-utils'
-import { importAsset, saveThumbnail } from '../../redux/data-layer'
+import { importAsset, removeAsset, saveThumbnail } from '../../redux/data-layer'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
 import { selectAssetCatalog, selectUploadFile, updateUploadFile } from '../../redux/app'
 
@@ -26,6 +26,9 @@ import { Asset } from './types'
 import './ImportAsset.css'
 import { Error } from './Error'
 
+import { useAssetTree } from '../../hooks/catalog/useAssetTree'
+import { AssetNodeFolder } from '../ProjectAssetExplorer/types'
+
 const ACCEPTED_FILE_TYPES_STR = Object.values(ACCEPTED_FILE_TYPES).flat().join('/').replaceAll('.', '').toUpperCase()
 
 interface PropTypes {
@@ -34,11 +37,11 @@ interface PropTypes {
 
 const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ onSave, children }, inputRef) => {
   const dispatch = useAppDispatch()
-  const catalog = useAppSelector(selectAssetCatalog)
   const uploadFile = useAppSelector(selectUploadFile)
-
+  const catalog = useAppSelector(selectAssetCatalog) ?? { basePath: '', assets: [] }
+  const { tree } = useAssetTree(catalog)
+  const folders = tree.children.filter((item) => item.type === 'folder') as AssetNodeFolder[]
   const [files, setFiles] = useState<Asset[]>([])
-
   const [isHover, setIsHover] = useState(false)
   const { basePath, assets } = catalog ?? { basePath: '', assets: [] }
 
@@ -62,18 +65,33 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
     setFiles([])
   }, [])
 
+  const getPathToRemove = useCallback(
+    (fileName: string) => {
+      debugger
+      const existingAsset = assets.find(($) => {
+        const assetPath = removeBasePath(basePath, $.path)
+        return assetPath.endsWith(`/${fileName}`) && !assetPath.includes('/builder/')
+      })
+
+      return existingAsset?.path ?? null
+    },
+    [tree, assets, basePath]
+  )
+
   const handleImport = useCallback(
     async (assets: Asset[]) => {
       if (!assetsAreValid(assets)) return
       const basePath = withAssetDir(DIRECTORY.SCENE)
-      // TODO: we are dispatching importAsset + saveThumbnail for every asset, refreshing the app state and UI multiple
-      // times. This can be improved by doing all the process once...
+
       for (const asset of assets) {
         const content = await convertAssetToBinary(asset)
         const assetPackageName = buildAssetPath(asset)
-        debugger
+
         if (asset.replaceOnUpload) {
-          console.log('primero lo borro')
+          const pathToRemove = getPathToRemove(asset.blob.name)
+          if (pathToRemove) {
+            dispatch(removeAsset({ path: pathToRemove }))
+          }
         }
 
         dispatch(
@@ -94,7 +112,6 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
           )
         }
 
-        // Clear uploaded file from the FileUploadField
         const newUploadFile = { ...uploadFile }
         for (const key in newUploadFile) {
           newUploadFile[key] = `${basePath}/${formatFileName(asset)}`
@@ -105,7 +122,7 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
       setFiles([])
       onSave()
     },
-    [uploadFile]
+    [uploadFile, getPathToRemove]
   )
 
   const validateName = useCallback(
