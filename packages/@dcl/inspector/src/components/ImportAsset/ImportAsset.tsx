@@ -65,13 +65,16 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
   const handleImport = useCallback(
     async (assets: Asset[]) => {
       if (!assetsAreValid(assets)) return
-
       const basePath = withAssetDir(DIRECTORY.SCENE)
       // TODO: we are dispatching importAsset + saveThumbnail for every asset, refreshing the app state and UI multiple
       // times. This can be improved by doing all the process once...
       for (const asset of assets) {
         const content = await convertAssetToBinary(asset)
         const assetPackageName = buildAssetPath(asset)
+        debugger
+        if (asset.replaceOnUpload) {
+          console.log('primero lo borro')
+        }
 
         dispatch(
           importAsset({

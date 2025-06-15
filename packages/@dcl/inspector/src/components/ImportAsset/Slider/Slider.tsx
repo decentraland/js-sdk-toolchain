@@ -17,6 +17,40 @@ export function Slider({ assets, onSubmit, isNameValid }: PropTypes) {
   const [screenshots, setScreenshots] = useState<Thumbnails>({})
   const [step, setStep] = useState<ImportStep>(ImportStep.UPLOAD)
 
+  const invalidNames = useMemo(() => {
+    const all = new Set<string>()
+    const invalid = new Set<string>()
+
+    for (const asset of uploadedAssets) {
+      const name = formatFileName(asset)
+      if (all.has(name) || !isNameValid(asset, name)) {
+        invalid.add(name)
+      } else {
+        all.add(name)
+      }
+    }
+
+    return invalid
+  }, [uploadedAssets])
+
+  const handleSubmit = useCallback(() => {
+    onSubmit(
+      uploadedAssets.map(($) => ({
+        ...$,
+        thumbnail: screenshots[$.blob.name],
+        replaceOnUpload: invalidNames.has(formatFileName($))
+      }))
+    )
+  }, [uploadedAssets, screenshots, invalidNames, onSubmit])
+
+  const handleConfirmImport = useCallback(() => {
+    if (invalidNames.size > 0) {
+      setStep(ImportStep.CONFIRM)
+    } else {
+      handleSubmit()
+    }
+  }, [invalidNames, handleSubmit])
+
   const handleScreenshot = useCallback(
     (file: Asset) => (thumbnail: string) => {
       const { name } = file.blob
@@ -39,18 +73,6 @@ export function Slider({ assets, onSubmit, isNameValid }: PropTypes) {
     [uploadedAssets]
   )
 
-  const handleSubmit = useCallback(() => {
-    if (invalidNames.size > 0) {
-      return setStep(ImportStep.CONFIRM)
-    }
-    onSubmit(
-      uploadedAssets.map(($) => ({
-        ...$,
-        thumbnail: screenshots[$.blob.name]
-      }))
-    )
-  }, [uploadedAssets, screenshots])
-
   const manyAssets = useMemo(() => uploadedAssets.length > 1, [uploadedAssets])
   const countText = useMemo(() => `${slide + 1}/${uploadedAssets.length}`, [slide, uploadedAssets])
   const importText = useMemo(
@@ -65,22 +87,6 @@ export function Slider({ assets, onSubmit, isNameValid }: PropTypes) {
     })
     return neededScreenshots.length === Object.keys(screenshots).length
   }, [uploadedAssets, screenshots])
-
-  const invalidNames = useMemo(() => {
-    const all = new Set<string>()
-    const invalid = new Set<string>()
-
-    for (const asset of uploadedAssets) {
-      const name = formatFileName(asset)
-      if (all.has(name) || !isNameValid(asset, name)) {
-        invalid.add(name)
-      } else {
-        all.add(name)
-      }
-    }
-
-    return invalid
-  }, [uploadedAssets])
 
   const getInvalidAssets = useCallback(() => {
     return uploadedAssets
@@ -118,7 +124,7 @@ export function Slider({ assets, onSubmit, isNameValid }: PropTypes) {
             onNameChange={handleNameChange}
             isNameUnique={isNameUnique}
           />
-          <Button type="danger" size="big" onClick={handleSubmit} disabled={!allScreenshotsTaken}>
+          <Button type="danger" size="big" onClick={handleConfirmImport} disabled={!allScreenshotsTaken}>
             {importText}
           </Button>
         </div>
