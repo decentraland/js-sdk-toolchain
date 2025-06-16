@@ -4,7 +4,6 @@ export type BaseAsset = {
   extension: string
   error?: ValidationError
   thumbnail?: string
-  replaceOnUpload?: boolean
 }
 
 export type ModelAsset = BaseAsset & {

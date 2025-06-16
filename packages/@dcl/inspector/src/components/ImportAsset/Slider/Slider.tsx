@@ -38,7 +38,6 @@ export function Slider({ assets, onSubmit, isNameValid }: PropTypes) {
       uploadedAssets.map(($) => ({
         ...$,
         thumbnail: screenshots[$.blob.name],
-        replaceOnUpload: invalidNames.has(formatFileName($))
       }))
     )
   }, [uploadedAssets, screenshots, invalidNames, onSubmit])
