@@ -4,9 +4,9 @@ import { HiOutlineUpload } from 'react-icons/hi'
 
 import { removeBasePath } from '../../lib/logic/remove-base-path'
 import { DIRECTORY, transformBase64ResourceToBinary, withAssetDir } from '../../lib/data-layer/host/fs-utils'
-import { importAsset, removeAsset, saveThumbnail } from '../../redux/data-layer'
+import { importAsset, saveThumbnail } from '../../redux/data-layer'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
-import { selectAssetCatalog, selectUploadFile, updateUploadFile } from '../../redux/app'
+import { selectAssetCatalog, selectUploadFile, updateAssetCatalog, updateUploadFile } from '../../redux/app'
 
 import FileInput from '../FileInput'
 import { Modal } from '../Modal'
@@ -26,9 +26,6 @@ import { Asset } from './types'
 import './ImportAsset.css'
 import { Error } from './Error'
 
-import { useAssetTree } from '../../hooks/catalog/useAssetTree'
-import { AssetNodeFolder } from '../ProjectAssetExplorer/types'
-
 const ACCEPTED_FILE_TYPES_STR = Object.values(ACCEPTED_FILE_TYPES).flat().join('/').replaceAll('.', '').toUpperCase()
 
 interface PropTypes {
@@ -39,8 +36,7 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
   const dispatch = useAppDispatch()
   const uploadFile = useAppSelector(selectUploadFile)
   const catalog = useAppSelector(selectAssetCatalog) ?? { basePath: '', assets: [] }
-  const { tree } = useAssetTree(catalog)
-  const folders = tree.children.filter((item) => item.type === 'folder') as AssetNodeFolder[]
+
   const [files, setFiles] = useState<Asset[]>([])
   const [isHover, setIsHover] = useState(false)
   const { basePath, assets } = catalog ?? { basePath: '', assets: [] }
@@ -65,19 +61,6 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
     setFiles([])
   }, [])
 
-  const getPathToRemove = useCallback(
-    (fileName: string) => {
-      debugger
-      const existingAsset = assets.find(($) => {
-        const assetPath = removeBasePath(basePath, $.path)
-        return assetPath.endsWith(`/${fileName}`) && !assetPath.includes('/builder/')
-      })
-
-      return existingAsset?.path ?? null
-    },
-    [tree, assets, basePath]
-  )
-
   const handleImport = useCallback(
     async (assets: Asset[]) => {
       if (!assetsAreValid(assets)) return
@@ -86,13 +69,6 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
       for (const asset of assets) {
         const content = await convertAssetToBinary(asset)
         const assetPackageName = buildAssetPath(asset)
-
-        if (asset.replaceOnUpload) {
-          const pathToRemove = getPathToRemove(asset.blob.name)
-          if (pathToRemove) {
-            dispatch(removeAsset({ path: pathToRemove }))
-          }
-        }
 
         dispatch(
           importAsset({
@@ -118,11 +94,12 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
         }
         dispatch(updateUploadFile(newUploadFile))
       }
+      dispatch(updateAssetCatalog({ assets: catalog, customAssets: [] }))
 
       setFiles([])
       onSave()
     },
-    [uploadFile, getPathToRemove]
+    [uploadFile]
   )
 
   const validateName = useCallback(
