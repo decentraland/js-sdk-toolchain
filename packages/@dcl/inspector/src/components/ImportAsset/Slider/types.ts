@@ -7,8 +7,3 @@ export type PropTypes = {
 }
 
 export type Thumbnails = Record<string, string>
-
-export enum ImportStep {
-  UPLOAD = 'upload',
-  CONFIRM = 'confirm'
-}

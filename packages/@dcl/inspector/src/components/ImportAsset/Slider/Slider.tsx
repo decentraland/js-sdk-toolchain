@@ -5,11 +5,16 @@ import { AssetSlides } from './AssetSlides'
 import { determineAssetType, formatFileName } from '../utils'
 
 import { Asset } from '../types'
-import { PropTypes, Thumbnails, ImportStep } from './types'
+import { PropTypes, Thumbnails } from './types'
 
 import './Slider.css'
 import { Error } from '../Error'
 import { Button } from '../../Button'
+
+export enum ImportStep {
+  UPLOAD = 'upload',
+  CONFIRM = 'confirm'
+}
 
 export function Slider({ assets, onSubmit, isNameValid }: PropTypes) {
   const [uploadedAssets, setUploadedAssets] = useState(assets)
@@ -37,7 +42,7 @@ export function Slider({ assets, onSubmit, isNameValid }: PropTypes) {
     onSubmit(
       uploadedAssets.map(($) => ({
         ...$,
-        thumbnail: screenshots[$.blob.name],
+        thumbnail: screenshots[$.blob.name]
       }))
     )
   }, [uploadedAssets, screenshots, invalidNames, onSubmit])

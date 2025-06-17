@@ -11,7 +11,8 @@ import { ValidationError } from '../types'
 import cx from 'classnames'
 import { Button } from '../../Button'
 
-export function Error({ assets, errorMessage, primaryAction, secondaryAction }: PropTypes) {
+export function Error(props: PropTypes) {
+  const { assets, errorMessage, primaryAction, secondaryAction } = props
   const getErrorMessage = useCallback((error: ValidationError): string => {
     switch (error?.type) {
       case 'type':
@@ -34,7 +35,8 @@ export function Error({ assets, errorMessage, primaryAction, secondaryAction }: 
       </div>
       <div
         className={cx('actions-container', {
-          'space-between': !!secondaryAction
+          'space-between': !!secondaryAction,
+          'flex-end': !secondaryAction
         })}
       >
         {!!secondaryAction && (

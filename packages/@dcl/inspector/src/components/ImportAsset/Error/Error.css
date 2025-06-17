@@ -42,3 +42,7 @@
 .ImportError .actions-container.space-between {
   justify-content: space-between;
 }
+
+.ImportError .actions-container.flex-end {
+  justify-content: flex-end;
+}

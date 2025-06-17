@@ -36,7 +36,6 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
   const dispatch = useAppDispatch()
   const uploadFile = useAppSelector(selectUploadFile)
   const catalog = useAppSelector(selectAssetCatalog) ?? { basePath: '', assets: [] }
-
   const [files, setFiles] = useState<Asset[]>([])
   const [isHover, setIsHover] = useState(false)
   const { basePath, assets } = catalog ?? { basePath: '', assets: [] }
