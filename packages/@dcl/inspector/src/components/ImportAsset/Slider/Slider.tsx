@@ -11,7 +11,7 @@ import './Slider.css'
 import { Error } from '../Error'
 import { Button } from '../../Button'
 
-export enum ImportStep {
+enum ImportStep {
   UPLOAD = 'upload',
   CONFIRM = 'confirm'
 }
