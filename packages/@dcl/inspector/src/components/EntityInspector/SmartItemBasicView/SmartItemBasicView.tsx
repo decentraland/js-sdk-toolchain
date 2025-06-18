@@ -12,9 +12,11 @@ import { TweenView } from './TweenView'
 import { VideoView } from './VideoView'
 import { AdminToolsBasicView } from './AdminToolsBasicView'
 import { RewardsBasicView } from './RewardsBasicView'
+import { DefaultBasicViewField } from './DefaultBasicViewField/DefaultBasicViewField'
 import { type Props } from './types'
 
 import './SmartItemBasicView.css'
+import { VideoScreenBasicView } from './VideoScreenBasicView'
 
 const SmartItemBasicView = withSdk<Props>(({ sdk, entity }) => {
   const { Config } = sdk.components
@@ -41,8 +43,10 @@ const SmartItemBasicView = withSdk<Props>(({ sdk, entity }) => {
           return <CounterBarView entity={entity} field={field} key={`${idx}-${entity}`} />
         case 'asset-packs::AdminTools':
           return <AdminToolsBasicView entity={entity} key={`${idx}-${entity}`} />
+        case 'asset-packs::VideoScreen':
+          return <VideoScreenBasicView entity={entity} key={`${idx}-${entity}`} />
         default:
-          return null
+          return <DefaultBasicViewField entity={entity} field={field} key={`${idx}-${entity}`} />
       }
     },
     [entity]

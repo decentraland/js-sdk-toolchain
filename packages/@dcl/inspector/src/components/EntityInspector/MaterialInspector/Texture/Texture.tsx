@@ -39,8 +39,9 @@ function TextureInspector({ label, texture, files, getInputProps }: Props) {
             label="Path"
             accept={ACCEPTED_FILE_TYPES['image']}
             onDrop={handleDrop}
-            error={!!src.value && files && !isValid}
+            error={!!src.value && !isValid}
             isValidFile={isModel}
+            acceptURLs
           />
         )}
         {/* {type.value === Texture.TT_AVATAR_TEXTURE && <TextField label="User ID" {...getInputProps(`${texture}.userId`)} />}*/}

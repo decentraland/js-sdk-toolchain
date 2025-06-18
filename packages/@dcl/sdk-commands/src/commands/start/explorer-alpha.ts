@@ -45,12 +45,24 @@ async function runApp(
   const localScene = args['--local-scene'] ?? true
   const debug = args['--debug'] ?? true
   const dclenv = args['--dclenv'] ?? 'org'
+  const skipAuthScreen = args['--skip-auth-screen'] ?? true
+  const landscapeTerrainEnabled = args['--landscape-terrain-enabled'] ?? true
 
   try {
-    const params = `realm=${realm}&position=${position}&local-scene=${localScene}&debug=${debug}&hub=${isHub}&dclenv=${dclenv}`
-    const app = `decentraland://"${params}"`
+    const queryParams = [
+      `realm=${realm}`,
+      `position=${position}`,
+      `local-scene=${localScene}`,
+      `debug=${debug}`,
+      `hub=${isHub}`,
+      `dclenv=${dclenv}`,
+      `skip-auth-screen=${skipAuthScreen}`,
+      `landscape-terrain-enabled=${landscapeTerrainEnabled}`
+    ].join('&')
+
+    const app = `decentraland://"${queryParams}"`
     await components.spawner.exec(cwd, cmd, [app], { silent: true })
-    components.logger.info(`Desktop client: decentraland://${params}\n`)
+    components.logger.info(`Desktop client: decentraland://${queryParams}\n`)
     return true
   } catch (e: any) {
     components.logger.error('Decentraland Desktop Client failed with: ', e.message)

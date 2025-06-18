@@ -12,5 +12,8 @@ describe('Generated Raycast ProtoBuf', () => {
 
     expect(newEngine.getEntityOrNullByName('CASLA')).toBeDefined()
     expect(newEngine.getEntityOrNullByName('Boedo')).toBe(null)
+
+    expect(newEngine.getEntityByName<string>('CASLA')).toBeDefined()
+    expect(newEngine.getEntityByName<string>('Boedo')).toBe(null)
   })
 })

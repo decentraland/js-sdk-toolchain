@@ -1,0 +1,9 @@
+.DefaultBasicViewField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.DefaultBasicViewField .Block .Field .Label {
+  text-transform: capitalize;
+}

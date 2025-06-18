@@ -13,7 +13,8 @@ export const fromAudioSource =
       audioClipUrl: removeBasePath(base, value.audioClipUrl),
       loop: value.loop,
       playing: value.playing,
-      volume: volumeFromAudioSource(value.volume)
+      volume: volumeFromAudioSource(value.volume),
+      global: value.global
     }
   }
 
@@ -24,7 +25,8 @@ export const toAudioSource =
       audioClipUrl: base ? base + '/' + value.audioClipUrl : value.audioClipUrl,
       loop: value.loop,
       playing: value.playing,
-      volume: volumeToAudioSource(value.volume)
+      volume: volumeToAudioSource(value.volume),
+      global: value.global
     }
   }
 

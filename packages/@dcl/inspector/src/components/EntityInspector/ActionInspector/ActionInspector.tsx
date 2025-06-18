@@ -80,8 +80,8 @@ const ActionMapOption: Record<string, string> = {
   [ActionType.OPEN_LINK]: 'Open Link',
   [ActionType.PLAY_AUDIO_STREAM]: 'Play Audio Stream',
   [ActionType.STOP_AUDIO_STREAM]: 'Stop Audio Stream',
-  [ActionType.PLAY_VIDEO_STREAM]: 'Play Video Stream',
-  [ActionType.STOP_VIDEO_STREAM]: 'Stop Video Stream',
+  [ActionType.PLAY_VIDEO_STREAM]: 'Play Video',
+  [ActionType.STOP_VIDEO_STREAM]: 'Stop Video',
   [ActionType.SHOW_TEXT]: 'Show Text',
   [ActionType.HIDE_TEXT]: 'Hide Text',
   [ActionType.START_DELAY]: 'Start Delay',
@@ -977,6 +977,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
                   }))
                 ]}
                 value={action.type}
+                searchable
                 onChange={(e) => handleChangeType(e, idx)}
               />
             </div>

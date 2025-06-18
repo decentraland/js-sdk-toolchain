@@ -7,7 +7,7 @@ import { Entity } from '@dcl/ecs'
 
 import { DIRECTORY, withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
-import { getDataLayerInterface, getReloadAssets, importAsset, saveThumbnail } from '../../redux/data-layer'
+import { getDataLayerInterface, importAsset, saveThumbnail } from '../../redux/data-layer'
 import {
   getNode,
   CatalogAssetDrop,
@@ -22,11 +22,9 @@ import { useRenderer } from '../../hooks/sdk/useRenderer'
 import { useSdk } from '../../hooks/sdk/useSdk'
 import { getPointerCoords } from '../../lib/babylon/decentraland/mouse-utils'
 import { snapPosition } from '../../lib/babylon/decentraland/snap-manager'
-import { loadGltf, removeGltf } from '../../lib/babylon/decentraland/sdkComponents/gltf-container'
 import { getConfig } from '../../lib/logic/config'
 import { ROOT } from '../../lib/sdk/tree'
 import { Asset, CustomAsset, isGround, isSmart } from '../../lib/logic/catalog'
-import { selectAssetCatalog } from '../../redux/app'
 import { areGizmosDisabled, getHiddenPanels, isGroundGridDisabled } from '../../redux/ui'
 import { AssetNodeItem } from '../ProjectAssetExplorer/types'
 import { Loading } from '../Loading'
@@ -69,8 +67,6 @@ const Renderer: React.FC = () => {
   const dispatch = useAppDispatch()
   const [isLoading, setIsLoading] = useState(false)
   const isMounted = useIsMounted()
-  const files = useAppSelector(selectAssetCatalog)
-  const init = !!files
   const gizmosDisabled = useAppSelector(areGizmosDisabled)
   const groundGridDisabled = useAppSelector(isGroundGridDisabled)
   const config = getConfig()
@@ -79,27 +75,6 @@ const Renderer: React.FC = () => {
   const [placeSingleTile, setPlaceSingleTile] = useState(false)
   const [showSingleTileHint, setShowSingleTileHint] = useState(false)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
-  const reloadAssets = useAppSelector(getReloadAssets)
-
-  useEffect(() => {
-    if (sdk && init) {
-      const { GltfContainer } = sdk.components
-      const fileSet = new Set(files.assets.map(($) => $.path))
-
-      for (const [entity, value] of sdk.engine.getEntitiesWith(GltfContainer)) {
-        const sceneEntity = sdk.sceneContext.getEntityOrNull(entity)
-        if (!sceneEntity) continue
-        if (!fileSet.has(value.src)) {
-          removeGltf(sceneEntity)
-        } else {
-          const needsReload = reloadAssets.some((asset) => value.src.includes(asset))
-          if (needsReload) {
-            void loadGltf(sceneEntity, value.src)
-          }
-        }
-      }
-    }
-  }, [files, reloadAssets])
 
   useEffect(() => {
     if (sdk) {
