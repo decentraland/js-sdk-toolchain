@@ -740,4 +740,5 @@ describe('UiTransform React Ecs', () => {
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       opacity: 1
     })
+  })
 })

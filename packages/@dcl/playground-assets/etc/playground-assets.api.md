@@ -152,8 +152,7 @@ export const AvatarEmoteCommand: GrowOnlyValueSetComponentDefinition<PBAvatarEmo
 export const AvatarEquippedData: AvatarEquippedDataComponentDefinitionExtended;
 
 // @public (undocumented)
-export interface AvatarEquippedDataComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<AvatarEquippedDataType> {
-}
+export type AvatarEquippedDataComponentDefinitionExtended = LastWriteWinElementSetComponentDefinition<AvatarEquippedDataType>;
 
 // Warning: (ae-missing-release-tag) "AvatarEquippedDataType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -199,8 +198,7 @@ export namespace AvatarMovementSettings {
 export const AvatarShape: AvatarShapeComponentDefinitionExtended;
 
 // @public (undocumented)
-export interface AvatarShapeComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<AvatarShapeType> {
-}
+export type AvatarShapeComponentDefinitionExtended = LastWriteWinElementSetComponentDefinition<AvatarShapeType>;
 
 // Warning: (ae-missing-release-tag) "AvatarShapeType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -3078,7 +3076,6 @@ export namespace PBPosition {
 
 // @public (undocumented)
 export interface PBPrimaryPointerInfo {
-    // (undocumented)
     pointerType?: PointerType | undefined;
     screenCoordinates?: PBVector2 | undefined;
     screenDelta?: PBVector2 | undefined;
@@ -3839,9 +3836,7 @@ export const PointerLock: LastWriteWinElementSetComponentDefinition<PBPointerLoc
 
 // @public (undocumented)
 export const enum PointerType {
-    // (undocumented)
     POT_MOUSE = 1,
-    // (undocumented)
     POT_NONE = 0,
     // (undocumented)
     POT_PAD = 2,
