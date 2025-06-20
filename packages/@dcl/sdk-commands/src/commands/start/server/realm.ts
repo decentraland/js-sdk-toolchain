@@ -3,6 +3,7 @@ import { PreviewComponents } from '../types'
 import { AboutResponse } from '@dcl/protocol/out-ts/decentraland/realm/about.gen'
 import { Router } from '@well-known-components/http-server'
 import { upgradeWebSocketResponse } from '@well-known-components/http-server/dist/ws'
+import { getSizesByCoords } from '../../../logic/map/map-parcels'
 
 /**
  * This module handles the BFF mock and communications server for the preview mode.
@@ -12,7 +13,7 @@ import { upgradeWebSocketResponse } from '@well-known-components/http-server/dis
 export function setupRealmAndComms(
   components: PreviewComponents,
   router: Router<PreviewComponents>,
-  localSceneParcels: string[] = []
+  sceneParcels: string[][] = []
 ) {
   router.get('/about', async (ctx) => {
     const host = ctx.url.host
@@ -28,9 +29,13 @@ export function setupRealmAndComms(
       configurations: {
         networkId: 0,
         globalScenesUrn: [],
-        localSceneParcels,
+        localSceneParcels: sceneParcels.flat(),
         scenesUrn: [],
-        realmName: 'LocalPreview'
+        realmName: 'LocalPreview',
+        map: {
+          minimapEnabled: false,
+          sizes: getSizesByCoords(sceneParcels)
+        }
       },
       content: {
         healthy: true,
