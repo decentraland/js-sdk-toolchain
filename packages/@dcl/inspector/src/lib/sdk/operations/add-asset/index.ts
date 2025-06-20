@@ -234,7 +234,7 @@ export function addAsset(engine: IEngine) {
           switch (componentName) {
             case CoreComponents.GLTF_CONTAINER: {
               componentValue.visibleMeshesCollisionMask ??= 1
-              componentValue.invisibleMeshesCollisionMask ??= 2
+              componentValue.invisibleMeshesCollisionMask ??= 3
               componentValue.src = componentValue.src.replace('{assetPath}', base)
               break
             }
@@ -345,7 +345,7 @@ export function addAsset(engine: IEngine) {
       GltfContainer.create(mainEntity, {
         src: `${base}/${src}`,
         visibleMeshesCollisionMask: 1,
-        invisibleMeshesCollisionMask: 2
+        invisibleMeshesCollisionMask: 3
       })
 
       // update selection
