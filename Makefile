@@ -36,6 +36,11 @@ update-protocol:
 	cd packages/@dcl/sdk-commands; npm i --save-exact @dcl/protocol@next
 	$(MAKE) sync-deps compile_apis
 
+update-protocol-squad:
+	npm i --save-exact @dcl/protocol@protocol-squad
+	cd packages/@dcl/sdk-commands; npm i --save-exact @dcl/protocol@protocol-squad
+	$(MAKE) sync-deps compile_apis
+
 update-renderer:
 	cd packages/@dcl/sdk; npm i --save-exact @dcl/explorer@latest
 

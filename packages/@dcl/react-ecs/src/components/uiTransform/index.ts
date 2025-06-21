@@ -10,10 +10,11 @@ import {
   parseBorderColor,
   parseBorderRadius,
   parseBorderWidth,
+  getScrollPosition,
+  getScrollVisible,
   parsePosition,
   parseSize
 } from './utils'
-import { UiTransformProps } from './types'
 import {
   PointerFilterMode,
   YGAlign,
@@ -25,6 +26,7 @@ import {
   YGUnit
 } from '@dcl/ecs'
 import { PBUiTransform } from '@dcl/ecs/dist/components'
+import { UiTransformProps } from './types'
 
 /**
  * @internal
@@ -90,6 +92,8 @@ const defaultUiTransform: PBUiTransform = {
 /* @__PURE__ */
 export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
   const {
+    scrollPosition,
+    scrollVisible,
     height,
     minHeight,
     maxHeight,
@@ -102,6 +106,7 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     borderRadius,
     borderWidth,
     borderColor,
+    zIndex,
     ...otherProps
   } = props
 
@@ -130,6 +135,9 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     ...(flexWrap && getFlexWrap(flexWrap)),
     ...(borderRadius && parseBorderRadius(borderRadius)),
     ...(borderWidth && parseBorderWidth(borderWidth)),
-    ...(borderColor && parseBorderColor(borderColor))
+    ...(borderColor && parseBorderColor(borderColor)),
+    ...(scrollPosition && getScrollPosition(scrollPosition)),
+    ...(scrollVisible && getScrollVisible(scrollVisible)),
+    ...(zIndex && { zIndex })
   }
 }

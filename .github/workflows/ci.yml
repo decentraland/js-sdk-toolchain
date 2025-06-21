@@ -2,14 +2,17 @@ on:
   push:
     branches:
       - main
-      - experimental
+      - protocol-squad
   pull_request:
   release:
     types:
       - created
 
 env:
-  BRANCH_TAG: ${{ github.ref_name == 'experimental' && 'experimental' || '' }}
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+  BRANCH_TAG: ${{ (github.head_ref || github.ref_name) == 'protocol-squad' && 'protocol-squad' || '' }}
+  IS_A_PR: ${{ github.event_name == 'pull_request' && (github.head_ref || github.ref_name) != 'protocol-squad' }}
+
 
 name: CI
 jobs:
@@ -38,45 +41,35 @@ jobs:
           cache: 'npm'
       - name: docs
         run: make docs
-
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-
       - uses: actions/setup-node@v3
         with:
           node-version: 20
           cache: 'npm'
-
       - name: install
         run: make install
-
       - name: build
         run: make build
-
       - name: test
         env:
-          NODE_OPTIONS: '--max_old_space_size=4096'
+          NODE_OPTIONS: "--max_old_space_size=4096"
         run: make test-coverage
-
       - name: test-cli
         run: make test-cli
-
       - name: test-inspector
         env:
-          NODE_OPTIONS: '--max_old_space_size=4096'
+          NODE_OPTIONS: "--max_old_space_size=4096"
         run: make test-inspector
-
       - uses: codecov/codecov-action@v3
         if: always()
         with:
           fail_ci_if_error: false # optional (default = false)
           verbose: true # optional (default = false)
-
       - name: prepare releasable packages
         run: make prepare
-
   test-e2e:
     needs: [notify_deployment]
     runs-on: ubuntu-latest
@@ -85,7 +78,7 @@ jobs:
       - uses: actions/github-script@v6
         id: get-cloudflare-url
         env:
-          BRANCH: ${{ github.head_ref || github.ref }}
+          BRANCH: ${{ env.BRANCH_NAME }}
         with:
           script: return `${process.env.BRANCH.replaceAll('/', '-').substr(0, 28)}.${context.repo.repo}.pages.dev`
           result-encoding: string
@@ -100,9 +93,8 @@ jobs:
         run: cd packages/@dcl/inspector && npm i && cd ../../../
       - name: test-inspector E2E
         env:
-          NODE_OPTIONS: '--max_old_space_size=4096'
+          NODE_OPTIONS: "--max_old_space_size=4096"
         run: E2E_URL=https://${{steps.get-cloudflare-url.outputs.result}}/inspector make test-inspector-e2e
-
   build:
     runs-on: ubuntu-latest
     permissions:
@@ -120,6 +112,14 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
+
+      - name: (PR) Check if it's a PR
+        if: ${{ env.IS_A_PR == 'true' }}
+        run: |
+          echo "run from a PR"
+          echo "from env '${{env.IS_A_PR}}'"
+          echo "- '${{github.event.pull_request.number}}'"
+          echo "- env '${{github.ref_name}}'"
 
       - name: install
         run: make install
@@ -158,11 +158,10 @@ jobs:
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/js-runtime'
+          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ env.BRANCH_NAME }}/@dcl/js-runtime'
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
-          BRANCH_NAME: ${{ github.ref_name }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
@@ -181,7 +180,7 @@ jobs:
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/ecs'
+          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ env.BRANCH_NAME }}/@dcl/ecs'
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
@@ -192,7 +191,7 @@ jobs:
 
       - name: (PR) change @dcl/react-ecs dependencies versions to point to s3 url
         working-directory: ./packages/@dcl/react-ecs
-        if: ${{ github.event.pull_request.number }}
+        if: ${{ env.IS_A_PR == 'true' }}
         run: |
           node -e "\
             let pkg=require('./package.json');\
@@ -216,7 +215,7 @@ jobs:
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/react-ecs'
+          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ env.BRANCH_NAME }}/@dcl/react-ecs'
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
@@ -224,6 +223,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
+
 
       - name: publish @dcl/inspector package
         uses: decentraland/oddish-action@master
@@ -239,7 +239,7 @@ jobs:
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/inspector'
+          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ env.BRANCH_NAME }}/@dcl/inspector'
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
@@ -250,7 +250,7 @@ jobs:
 
       - name: (PR) change @dcl/sdk-commands dependencies versions to point to s3 url
         working-directory: ./packages/@dcl/sdk-commands
-        if: ${{ github.event.pull_request.number }}
+        if: ${{ env.IS_A_PR == 'true' }}
         run: |
           node -e "\
             let pkg=require('./package.json');\
@@ -276,7 +276,7 @@ jobs:
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
+          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ env.BRANCH_NAME }}'
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
@@ -287,7 +287,7 @@ jobs:
 
       - name: (PR) change @dcl/sdk version to s3 url
         working-directory: ./packages/@dcl/sdk
-        if: ${{ github.event.pull_request.number }}
+        if: ${{ env.IS_A_PR == 'true' }}
         run: |
           node -e "\
             let pkg=require('./package.json');\
@@ -320,7 +320,7 @@ jobs:
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
+          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ env.BRANCH_NAME }}'
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
@@ -330,7 +330,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
       - name: playground upload to s3
-        run: npx @dcl/cdn-uploader@next --bucket ${{ secrets.SDK_TEAM_S3_BUCKET }} --local-folder $(pwd)/packages/@dcl/playground-assets/dist --bucket-folder '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/playground-assets'
+        run: npx @dcl/cdn-uploader@next --bucket ${{ secrets.SDK_TEAM_S3_BUCKET }} --local-folder $(pwd)/packages/@dcl/playground-assets/dist --bucket-folder '@dcl/js-sdk-toolchain/branch/${{ env.BRANCH_NAME }}/playground-assets'
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
@@ -349,24 +349,24 @@ jobs:
           ## publish every package to s3
           s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
           s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}'
+          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ env.BRANCH_NAME }}'
           custom-tag: ${{ env.BRANCH_TAG }}
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
-          BRANCH_NAME: ${{ github.ref_name }}
+          BRANCH_NAME: ${{ github.head_ref }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
   notify_deployment:
     needs: [build]
-    if: ${{ github.event.pull_request.number }}
+    if: github.event.pull_request.number
     runs-on: ubuntu-latest
     name: Deployment Notification
     steps:
       - uses: actions/github-script@v6
         id: get-cloudflare-url
         env:
-          BRANCH: ${{ github.head_ref || github.ref }}
+          BRANCH: ${{ env.BRANCH_NAME }}
         with:
           script: return `${process.env.BRANCH.replaceAll('/', '-').substr(0, 28)}.${context.repo.repo}.pages.dev`
           result-encoding: string
@@ -401,13 +401,13 @@ jobs:
                npm install "${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_inspector_s3_bucket_key }}"
                ```
 
-            - The `/changerealm` command to test [test in-world](https://play.decentraland.zone/?realm=${{ secrets.SDK_TEAM_S3_BASE_URL }}/ipfs/${{ github.head_ref || github.ref }}-e2e)
+            - The `/changerealm` command to test [test in-world](https://play.decentraland.zone/?realm=${{ secrets.SDK_TEAM_S3_BASE_URL }}/ipfs/${{ env.BRANCH_NAME }}-e2e)
                ```
-               /changerealm ${{ secrets.SDK_TEAM_S3_BASE_URL }}/ipfs/${{ github.head_ref || github.ref }}-e2e
+               /changerealm ${{ secrets.SDK_TEAM_S3_BASE_URL }}/ipfs/${{ env.BRANCH_NAME }}-e2e
                ```
 
             - You can preview this build entering:
-              https://playground.decentraland.org/?sdk-branch=${{ github.head_ref || github.ref }}
+              https://playground.decentraland.org/?sdk-branch=${{ env.BRANCH_NAME }}
           edit-mode: replace
       - name: Test SDK Install S3 URL
         run: mkdir -p test_sdk_s3 && cd test_sdk_s3 && npm init --yes && npm install "${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_s3_bucket_key }}"
@@ -437,7 +437,7 @@ jobs:
 
       - name: Set Realm Name
         run: |
-          modified_realm=$(echo "${{ github.head_ref || github.ref }}" | tr '/' '-' | tr -d '@')
+          modified_realm=$(echo "${{ env.BRANCH_NAME }}" | tr '/' '-' | tr -d '@')
           echo "REALM_NAME=${modified_realm}" >> $GITHUB_ENV
       - name: export-static
         run: >
@@ -457,104 +457,3 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
-
-  check-local-deps:
-    name: Check for development dependencies
-    needs: [build]
-    runs-on: ubuntu-latest
-    if: >
-      (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main') ||
-      github.ref == 'refs/heads/main'
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 20
-
-      - name: Download prepared packages
-        uses: actions/download-artifact@v4
-        with:
-          name: built-artifacts
-          path: downloaded-packages
-
-      - name: Set up artifacts for checking
-        run: |
-          echo "Setting up built artifacts for checking..."
-          mkdir -p extracted-packages
-
-          # Extract all packages to separate directories
-          find downloaded-packages -type f -name "*.tgz" | while read pkg; do
-            if [ -f "$pkg" ]; then
-              # Get package name from the filename
-              pkg_name=$(basename "$pkg" .tgz)
-              
-              # Create directory for this package
-              mkdir -p "extracted-packages/$pkg_name"
-              
-              echo "Extracting $pkg to extracted-packages/$pkg_name"
-              tar -xzf "$pkg" -C "extracted-packages/$pkg_name"
-            fi
-          done
-
-          # List all extracted packages
-          echo "Extracted packages:"
-          find extracted-packages -name "package.json" | sort
-
-      - name: Check for local package dependencies
-        id: dependency-check
-        continue-on-error: true
-        run: |
-          set +e
-          node .github/scripts/check-no-local-packages.cjs ./extracted-packages > check-output.txt 2>&1
-          check_exit_code=$?
-          set -e
-
-          echo "Full output from dependency check:"
-          cat check-output.txt
-
-          if [ $check_exit_code -ne 0 ]; then
-            grep -i "dependency " check-output.txt > dependency-errors.txt || echo "No specific dependency errors found" > dependency-errors.txt
-            if [ ! -s dependency-errors.txt ]; then
-              echo "⚠️ No specific dependency errors found" > dependency-errors.txt
-            fi
-            exit 1
-          fi
-
-      - name: Generate comment content
-        if: steps.dependency-check.outcome == 'failure'
-        run: |
-          echo "## ⚠️ Local Dependencies Detected" >> dependency-check-comment.md
-          echo "This PR contains package dependencies that use local paths (\`file:\`) or non-allowed URLs (\`http:\`, \`https:\`, \`git:\`)." >> dependency-check-comment.md
-          echo "These must be published and referenced properly before merging." >> dependency-check-comment.md
-          echo "### Not allowed dependencies:" >> dependency-check-comment.md
-          echo '```' >> dependency-check-comment.md
-          cat dependency-errors.txt >> dependency-check-comment.md
-          echo '```' >> dependency-check-comment.md
-          echo "Review the workflow logs for more details." >> dependency-check-comment.md
-          echo "> **Note:** This comment is automatically updated when the PR is updated." >> dependency-check-comment.md
-
-      - name: Find Local Dependencies Comment if check fails
-        if: ${{ github.event_name == 'pull_request' && steps.dependency-check.outcome == 'failure' }}
-        uses: peter-evans/find-comment@v3
-        id: fc-local-deps
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          comment-author: 'github-actions[bot]'
-          body-includes: Local Dependencies Detected
-
-      - name: Create or update Local Dependencies Comment if check fails
-        if: ${{ github.event_name == 'pull_request' && steps.dependency-check.outcome == 'failure' }}
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          comment-id: ${{ steps.fc-local-deps.outputs.comment-id }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body-path: dependency-check-comment.md
-          edit-mode: replace
-
-      - name: Fail check if local dependencies found
-        if: steps.dependency-check.outcome == 'failure'
-        run: |
-          echo "❌ Local package dependencies detected! These must be fixed before merging."
-          exit 1

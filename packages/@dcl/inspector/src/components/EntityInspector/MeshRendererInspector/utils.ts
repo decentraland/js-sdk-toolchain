@@ -16,6 +16,8 @@ export const fromMeshRenderer = (value: PBMeshRenderer): MeshRendererInput => {
       }
     case 'plane':
       return { mesh: MeshType.MT_PLANE, uvs: getUvs(value.mesh.plane) }
+    case 'gltf':
+      return { mesh: MeshType.MT_SPHERE } // TODO
     case 'box':
     default:
       return { mesh: MeshType.MT_BOX, uvs: getUvs(value.mesh?.box) }
