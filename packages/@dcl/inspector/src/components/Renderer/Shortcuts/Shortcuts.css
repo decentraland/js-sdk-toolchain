@@ -136,3 +136,16 @@
   border-radius: 4px;
   background-color: var(--base-13);
 }
+
+.Shortcuts > .Overlay .Item .Description.Vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.Shortcuts > .Overlay .Item .Description.Vertical > div {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
