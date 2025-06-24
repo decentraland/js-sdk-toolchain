@@ -6,7 +6,7 @@ import { AiFillSound } from 'react-icons/ai'
 import { IoVideocamOutline } from 'react-icons/io5'
 import { FaFile } from 'react-icons/fa'
 
-import { toWearableWithBlobs } from './utils'
+import { toEmoteWithBlobs, toWearableWithBlobs } from './utils'
 import { Props } from './types'
 
 import './AssetPreview.css'
@@ -42,25 +42,43 @@ export function AssetPreview({ value, resources, onScreenshot, onLoad }: Props) 
 
 function GltfPreview({ value, resources, onScreenshot, onLoad }: Props) {
   const [loading, setLoading] = useState(true)
-  const handleLoad = useCallback(() => {
+  const handleLoad = useCallback(async () => {
     onLoad?.()
     const wp = WearablePreview.createController(value.name)
-    void wp.scene.getScreenshot(WIDTH, HEIGHT).then(($) => {
-      setTimeout(() => {
-        onScreenshot($)
-        setLoading(false)
-      }, 1000) // ugly hack to avoid iframe flickering...
+    const length = await wp.emote.getLength()
+    void wp.emote.goTo(length * 0.5).then(() => {
+      void wp.scene.getScreenshot(WIDTH, HEIGHT).then(($) => {
+        setTimeout(() => {
+          onScreenshot($)
+          setLoading(false)
+        }, 1000) // ugly hack to avoid iframe flickering...
+      })
     })
+    // void wp.scene.getScreenshot(WIDTH, HEIGHT).then(($) => {
+    //   setTimeout(() => {
+    //     onScreenshot($)
+    //     setLoading(false)
+    //   }, 1000) // ugly hack to avoid iframe flickering...
+    // })
   }, [onLoad])
+
+  const wearablePreviewExtraOptions = {
+    profile: 'default',
+    disableFace: true,
+    disableDefaultWearables: true,
+    skin: '000000',
+    wheelZoom: 2
+  }
 
   return (
     <>
       <div className={cx('GltfPreview', { hidden: loading })}>
         <WearablePreview
           id={value.name}
-          blob={toWearableWithBlobs(value, resources)}
+          blob={toEmoteWithBlobs(value, resources)}
           disableAutoRotate
           disableBackground
+          {...wearablePreviewExtraOptions}
           projection={PreviewProjection.ORTHOGRAPHIC}
           camera={PreviewCamera.STATIC}
           onLoad={handleLoad}
