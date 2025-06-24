@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState, useEffect } from 'react'
 import { PreviewCamera, PreviewProjection } from '@dcl/schemas'
 import cx from 'classnames'
 import { WearablePreview } from 'decentraland-ui'
@@ -6,7 +6,7 @@ import { AiFillSound } from 'react-icons/ai'
 import { IoVideocamOutline } from 'react-icons/io5'
 import { FaFile } from 'react-icons/fa'
 
-import { toEmoteWithBlobs, toWearableWithBlobs } from './utils'
+import { toEmoteWithBlobs, toWearableWithBlobs, isEmote } from './utils'
 import { Props } from './types'
 
 import './AssetPreview.css'
@@ -42,40 +42,57 @@ export function AssetPreview({ value, resources, onScreenshot, onLoad }: Props) 
 
 function GltfPreview({ value, resources, onScreenshot, onLoad }: Props) {
   const [loading, setLoading] = useState(true)
+  const [isEmoteFile, setIsEmoteFile] = useState(false)
+
+  useEffect(() => {
+    const checkIfEmote = async () => {
+      const isEmoteResult = await isEmote(value)
+      setIsEmoteFile(isEmoteResult)
+    }
+    void checkIfEmote()
+  }, [value])
+
+  const handleScreenshot = useCallback(
+    (screenshot: string) => {
+      setTimeout(() => {
+        onScreenshot(screenshot)
+        setLoading(false)
+      }, 1000)
+    },
+    [onScreenshot]
+  )
+
   const handleLoad = useCallback(async () => {
     onLoad?.()
     const wp = WearablePreview.createController(value.name)
-    const length = await wp.emote.getLength()
-    void wp.emote.goTo(length * 0.5).then(() => {
-      void wp.scene.getScreenshot(WIDTH, HEIGHT).then(($) => {
-        setTimeout(() => {
-          onScreenshot($)
-          setLoading(false)
-        }, 1000) // ugly hack to avoid iframe flickering...
-      })
-    })
-    // void wp.scene.getScreenshot(WIDTH, HEIGHT).then(($) => {
-    //   setTimeout(() => {
-    //     onScreenshot($)
-    //     setLoading(false)
-    //   }, 1000) // ugly hack to avoid iframe flickering...
-    // })
-  }, [onLoad])
 
-  const wearablePreviewExtraOptions = {
-    profile: 'default',
-    disableFace: true,
-    disableDefaultWearables: true,
-    skin: '000000',
-    wheelZoom: 2
-  }
+    if (isEmoteFile) {
+      const length = await wp.emote.getLength()
+      //takes a screenshot at the middle of the emote
+      void wp.emote.goTo(length * 0.5).then(() => {
+        void wp.scene.getScreenshot(WIDTH, HEIGHT).then(handleScreenshot)
+      })
+    } else {
+      void wp.scene.getScreenshot(WIDTH, HEIGHT).then(handleScreenshot)
+    }
+  }, [onLoad, value, isEmoteFile, handleScreenshot])
+
+  const wearablePreviewExtraOptions = isEmoteFile
+    ? {
+        profile: 'default',
+        disableFace: true,
+        disableDefaultWearables: true,
+        skin: '000000',
+        wheelZoom: 2
+      }
+    : {}
 
   return (
     <>
       <div className={cx('GltfPreview', { hidden: loading })}>
         <WearablePreview
           id={value.name}
-          blob={toEmoteWithBlobs(value, resources)}
+          blob={isEmoteFile ? toEmoteWithBlobs(value, resources) : toWearableWithBlobs(value, resources)}
           disableAutoRotate
           disableBackground
           {...wearablePreviewExtraOptions}
