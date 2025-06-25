@@ -33,7 +33,7 @@ describe('explorer-alpha', () => {
   })
 
   describe('boolean parameters', () => {
-    it('should include boolean parameters only when they are true', async () => {
+    it('should always include local-scene and debug parameters', async () => {
       const args: any = {
         '--local-scene': true,
         '--debug': true,
@@ -57,7 +57,7 @@ describe('explorer-alpha', () => {
       )
     })
 
-    it('should not include boolean parameters when they are false', async () => {
+    it('should always include local-scene and debug even when they are false', async () => {
       const args: any = {
         '--local-scene': false,
         '--debug': false,
@@ -76,12 +76,12 @@ describe('explorer-alpha', () => {
       expect(mockExec).toHaveBeenCalledWith(
         '/test',
         'open',
-        expect.arrayContaining([expect.not.stringContaining('local-scene')]),
+        expect.arrayContaining([expect.stringContaining('local-scene=true')]),
         { silent: true }
       )
     })
 
-    it('should not include boolean parameters when they are undefined', async () => {
+    it('should always include local-scene and debug even when they are undefined', async () => {
       const args: any = {}
 
       await runExplorerAlpha(mockComponents, {
@@ -95,7 +95,7 @@ describe('explorer-alpha', () => {
       expect(mockExec).toHaveBeenCalledWith(
         '/test',
         'open',
-        expect.arrayContaining([expect.not.stringContaining('local-scene')]),
+        expect.arrayContaining([expect.stringContaining('local-scene=true')]),
         { silent: true }
       )
     })
@@ -177,12 +177,12 @@ describe('explorer-alpha', () => {
       expect(callArgs).toContain('position=10%2C20')
       expect(callArgs).toContain('dclenv=zone')
       expect(callArgs).toContain('local-scene=true')
+      expect(callArgs).toContain('debug=true')
       expect(callArgs).toContain('hub=true')
       expect(callArgs).toContain('skip-auth-screen=true')
       expect(callArgs).toContain('open-deeplink-in-new-instance=true')
 
       // Check that false parameters are not present
-      expect(callArgs).not.toContain('debug=true')
       expect(callArgs).not.toContain('landscape-terrain-enabled=true')
     })
 
@@ -201,7 +201,9 @@ describe('explorer-alpha', () => {
         '/test',
         'open',
         expect.arrayContaining([
-          expect.stringMatching(/decentraland:\/\/.*realm=default-realm.*position=5%2C10.*dclenv=org/)
+          expect.stringMatching(
+            /decentraland:\/\/.*realm=default-realm.*position=5%2C10.*dclenv=org.*local-scene=true.*debug=true/
+          )
         ]),
         { silent: true }
       )

@@ -42,8 +42,6 @@ async function runApp(
   const cmd = isWindows ? 'start' : 'open'
   const position = args['--position'] ?? `${baseCoords.x},${baseCoords.y}`
   const realm = args['--realm'] ?? realmValue
-  const localScene = !!args['--local-scene']
-  const debug = !!args['--debug']
   const dclenv = args['--dclenv'] ?? 'org'
   const skipAuthScreen = !!args['--skip-auth-screen']
   const landscapeTerrainEnabled = !!args['--landscape-terrain-enabled']
@@ -56,12 +54,9 @@ async function runApp(
     params.set('position', position)
     params.set('dclenv', dclenv)
 
-    if (localScene) {
-      params.set('local-scene', 'true')
-    }
-    if (debug) {
-      params.set('debug', 'true')
-    }
+    params.set('local-scene', 'true')
+    params.set('debug', 'true')
+
     if (isHub) {
       params.set('hub', 'true')
     }
