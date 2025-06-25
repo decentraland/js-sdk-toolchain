@@ -53,13 +53,13 @@ export const args = declareArgs({
   '--explorer-alpha': Boolean,
   '--hub': Boolean,
   // Params related to the explorer-alpha
-  '--debug': String,
+  '--debug': Boolean,
   '--dclenv': String,
   '--realm': String,
-  '--local-scene': String,
+  '--local-scene': Boolean,
   '--position': String,
-  '--skip-auth-screen': String,
-  '--landscape-terrain-enabled': String,
+  '--skip-auth-screen': Boolean,
+  '--landscape-terrain-enabled': Boolean,
   '-n': Boolean
 })
 
