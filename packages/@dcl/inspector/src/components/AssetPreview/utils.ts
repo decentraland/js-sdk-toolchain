@@ -90,8 +90,8 @@ export async function isEmote(file: File): Promise<boolean> {
     if (!armature) return false
 
     const hasAvatarChildren = armature.getChildren().some((child) => child.name.startsWith('Avatar_'))
-
-    return hasAvatarChildren
+    const hasProp = armature.getChildren().some((child) => child.name.startsWith('Armature_Prop'))
+    return hasAvatarChildren || hasProp
   } catch (err) {
     console.error('Error checking if file is emote:', err)
     return false
