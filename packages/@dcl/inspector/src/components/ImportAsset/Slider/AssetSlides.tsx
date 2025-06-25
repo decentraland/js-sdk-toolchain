@@ -41,6 +41,10 @@ export function AssetSlides({
   const leftArrowDisabled = currentSlide <= 0
   const rightArrowDisabled = currentSlide >= uploadedAssets.length - 1
 
+  const hasEmoteName = (asset: Asset) => {
+    return asset.name.endsWith('_emote')
+  }
+
   return (
     <div className="content">
       {manyAssets && (
@@ -52,14 +56,25 @@ export function AssetSlides({
         {uploadedAssets.map(($, i) => (
           <div className={cx('asset', { active: currentSlide === i })} key={i}>
             <div>
-              <AssetPreview value={$.blob} resources={getAssetResources($)} onScreenshot={onScreenshot($)} />
+              <AssetPreview
+                value={$.blob}
+                resources={getAssetResources($)}
+                onScreenshot={onScreenshot($)}
+                isEmote={$.isEmote}
+              />
               {screenshots[$.blob.name] ? (
                 <div className="thumbnail" style={{ backgroundImage: `url(${screenshots[$.blob.name]})` }}></div>
               ) : (
                 <Loading dimmer={false} />
               )}
               <Input value={$.name} onChange={onNameChange(i)} />
-              {!isNameUnique($) && <span className="name-error">Filename already exists</span>}
+              {$.isEmote && !hasEmoteName($) ? (
+                <span className="name-error">
+                  If you’re trying to upload an emote, please make sure the file name ends in _emote
+                </span>
+              ) : !isNameUnique($) ? (
+                <span className="name-error">Filename already exists</span>
+              ) : null}
             </div>
             <span className="size">{getAssetSize($)}</span>
           </div>

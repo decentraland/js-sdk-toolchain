@@ -15,13 +15,21 @@ import { useRef } from 'react'
 const WIDTH = 300
 const HEIGHT = 300
 
-export function AssetPreview({ value, resources, onScreenshot, onLoad }: Props) {
+export function AssetPreview({ value, resources, onScreenshot, onLoad, isEmote }: Props) {
   const preview = useMemo(() => {
     const ext = value.name.split('.').pop()
     switch (ext) {
       case 'gltf':
       case 'glb':
-        return <GltfPreview value={value} resources={resources} onScreenshot={onScreenshot} onLoad={onLoad} />
+        return (
+          <GltfPreview
+            value={value}
+            resources={resources}
+            onScreenshot={onScreenshot}
+            onLoad={onLoad}
+            isEmote={isEmote}
+          />
+        )
       case 'png':
       case 'jpg':
       case 'jpeg':
