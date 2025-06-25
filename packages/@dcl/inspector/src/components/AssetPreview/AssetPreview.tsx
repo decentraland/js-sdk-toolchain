@@ -48,17 +48,8 @@ export function AssetPreview({ value, resources, onScreenshot, onLoad, isEmote }
   return <div className="AssetPreview">{preview}</div>
 }
 
-function GltfPreview({ value, resources, onScreenshot, onLoad }: Props) {
+function GltfPreview({ value, resources, onScreenshot, onLoad, isEmote }: Props) {
   const [loading, setLoading] = useState(true)
-  const [isEmoteFile, setIsEmoteFile] = useState(false)
-
-  useEffect(() => {
-    const checkIfEmote = async () => {
-      const isEmoteResult = await isEmote(value)
-      setIsEmoteFile(isEmoteResult)
-    }
-    void checkIfEmote()
-  }, [value])
 
   const handleScreenshot = useCallback(
     (screenshot: string) => {
@@ -73,8 +64,7 @@ function GltfPreview({ value, resources, onScreenshot, onLoad }: Props) {
   const handleLoad = useCallback(async () => {
     onLoad?.()
     const wp = WearablePreview.createController(value.name)
-
-    if (isEmoteFile) {
+    if (isEmote) {
       const length = await wp.emote.getLength()
       //takes a screenshot at the middle of the emote
       void wp.emote.goTo(length * 0.5).then(() => {
@@ -83,9 +73,9 @@ function GltfPreview({ value, resources, onScreenshot, onLoad }: Props) {
     } else {
       void wp.scene.getScreenshot(WIDTH, HEIGHT).then(handleScreenshot)
     }
-  }, [onLoad, value, isEmoteFile, handleScreenshot])
+  }, [onLoad, value, isEmote, handleScreenshot])
 
-  const wearablePreviewExtraOptions = isEmoteFile
+  const wearablePreviewExtraOptions = isEmote
     ? {
         profile: 'default',
         disableFace: true,
@@ -100,7 +90,7 @@ function GltfPreview({ value, resources, onScreenshot, onLoad }: Props) {
       <div className={cx('GltfPreview', { hidden: loading })}>
         <WearablePreview
           id={value.name}
-          blob={isEmoteFile ? toEmoteWithBlobs(value, resources) : toWearableWithBlobs(value, resources)}
+          blob={isEmote ? toEmoteWithBlobs(value, resources) : toWearableWithBlobs(value, resources)}
           disableAutoRotate
           disableBackground
           {...wearablePreviewExtraOptions}
