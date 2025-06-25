@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io'
 import cx from 'classnames'
 
@@ -45,6 +45,15 @@ export function AssetSlides({
     return asset.name.endsWith('_emote')
   }
 
+  useEffect(() => {
+    uploadedAssets.forEach((asset, index) => {
+      if (asset.isEmote && !hasEmoteName(asset)) {
+        const newName = `${asset.name}_emote`
+        onNameChange(index)(newName)
+      }
+    })
+  }, [])
+
   return (
     <div className="content">
       {manyAssets && (
@@ -68,13 +77,7 @@ export function AssetSlides({
                 <Loading dimmer={false} />
               )}
               <Input value={$.name} onChange={onNameChange(i)} />
-              {$.isEmote && !hasEmoteName($) ? (
-                <span className="name-error">
-                  If you’re trying to upload an emote, please make sure the file name ends in _emote
-                </span>
-              ) : !isNameUnique($) ? (
-                <span className="name-error">Filename already exists</span>
-              ) : null}
+              {!isNameUnique($) && <span className="name-error">Filename already exists</span>}
             </div>
             <span className="size">{getAssetSize($)}</span>
           </div>
