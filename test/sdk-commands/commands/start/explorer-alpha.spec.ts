@@ -32,16 +32,13 @@ describe('explorer-alpha', () => {
     jest.restoreAllMocks()
   })
 
-  describe('stringToBoolean function', () => {
-    it('should return true for "true" string', async () => {
-      // We need to test the internal stringToBoolean function
-      // Since it's not exported, we'll test it through the runExplorerAlpha function
-      // by checking the URL parameters
+  describe('boolean parameters', () => {
+    it('should include boolean parameters only when they are true', async () => {
       const args: any = {
-        '--local-scene': 'true',
-        '--debug': 'true',
-        '--skip-auth-screen': 'true',
-        '--landscape-terrain-enabled': 'true'
+        '--local-scene': true,
+        '--debug': true,
+        '--skip-auth-screen': true,
+        '--landscape-terrain-enabled': true
       }
 
       await runExplorerAlpha(mockComponents, {
@@ -60,12 +57,12 @@ describe('explorer-alpha', () => {
       )
     })
 
-    it('should return false for "false" string', async () => {
+    it('should not include boolean parameters when they are false', async () => {
       const args: any = {
-        '--local-scene': 'false',
-        '--debug': 'false',
-        '--skip-auth-screen': 'false',
-        '--landscape-terrain-enabled': 'false'
+        '--local-scene': false,
+        '--debug': false,
+        '--skip-auth-screen': false,
+        '--landscape-terrain-enabled': false
       }
 
       await runExplorerAlpha(mockComponents, {
@@ -79,12 +76,12 @@ describe('explorer-alpha', () => {
       expect(mockExec).toHaveBeenCalledWith(
         '/test',
         'open',
-        expect.arrayContaining([expect.stringContaining('local-scene=false')]),
+        expect.arrayContaining([expect.not.stringContaining('local-scene')]),
         { silent: true }
       )
     })
 
-    it('should return default value (true) for undefined values', async () => {
+    it('should not include boolean parameters when they are undefined', async () => {
       const args: any = {}
 
       await runExplorerAlpha(mockComponents, {
@@ -98,36 +95,7 @@ describe('explorer-alpha', () => {
       expect(mockExec).toHaveBeenCalledWith(
         '/test',
         'open',
-        expect.arrayContaining([expect.stringContaining('local-scene=true')]),
-        { silent: true }
-      )
-    })
-
-    it('should handle case-insensitive boolean strings', async () => {
-      const args: any = {
-        '--local-scene': 'TRUE',
-        '--debug': 'False',
-        '--skip-auth-screen': 'True',
-        '--landscape-terrain-enabled': 'FALSE'
-      }
-
-      await runExplorerAlpha(mockComponents, {
-        cwd: '/test',
-        realm: 'test-realm',
-        baseCoords: { x: 0, y: 0 },
-        isHub: false,
-        args
-      })
-
-      expect(mockExec).toHaveBeenCalledWith(
-        '/test',
-        'open',
-        expect.arrayContaining([
-          expect.stringContaining('local-scene=true'),
-          expect.stringContaining('debug=false'),
-          expect.stringContaining('skip-auth-screen=true'),
-          expect.stringContaining('landscape-terrain-enabled=false')
-        ]),
+        expect.arrayContaining([expect.not.stringContaining('local-scene')]),
         { silent: true }
       )
     })
@@ -180,11 +148,11 @@ describe('explorer-alpha', () => {
       const args: any = {
         '--position': '10,20',
         '--realm': 'custom-realm',
-        '--local-scene': 'true',
-        '--debug': 'false',
+        '--local-scene': true,
+        '--debug': false,
         '--dclenv': 'zone',
-        '--skip-auth-screen': 'true',
-        '--landscape-terrain-enabled': 'false',
+        '--skip-auth-screen': true,
+        '--landscape-terrain-enabled': false,
         '-n': true
       }
 
@@ -199,13 +167,23 @@ describe('explorer-alpha', () => {
       expect(mockExec).toHaveBeenCalledWith(
         '/test',
         'open',
-        expect.arrayContaining([
-          expect.stringMatching(
-            /decentraland:\/\/.*realm=custom-realm.*position=10%2C20.*local-scene=true.*debug=false.*hub=true.*dclenv=zone.*skip-auth-screen=true.*landscape-terrain-enabled=false.*open-deeplink-in-new-instance=true/
-          )
-        ]),
+        expect.arrayContaining([expect.stringMatching(/decentraland:\/\/".*"$/)]),
         { silent: true }
       )
+
+      // Check that all expected parameters are present
+      const callArgs = mockExec.mock.calls[0][2][0]
+      expect(callArgs).toContain('realm=custom-realm')
+      expect(callArgs).toContain('position=10%2C20')
+      expect(callArgs).toContain('dclenv=zone')
+      expect(callArgs).toContain('local-scene=true')
+      expect(callArgs).toContain('hub=true')
+      expect(callArgs).toContain('skip-auth-screen=true')
+      expect(callArgs).toContain('open-deeplink-in-new-instance=true')
+
+      // Check that false parameters are not present
+      expect(callArgs).not.toContain('debug=true')
+      expect(callArgs).not.toContain('landscape-terrain-enabled=true')
     })
 
     it('should use default values when parameters are not provided', async () => {
@@ -223,9 +201,7 @@ describe('explorer-alpha', () => {
         '/test',
         'open',
         expect.arrayContaining([
-          expect.stringMatching(
-            /decentraland:\/\/.*realm=default-realm.*position=5%2C10.*local-scene=true.*debug=true.*hub=false.*dclenv=org.*skip-auth-screen=true.*landscape-terrain-enabled=true/
-          )
+          expect.stringMatching(/decentraland:\/\/.*realm=default-realm.*position=5%2C10.*dclenv=org/)
         ]),
         { silent: true }
       )

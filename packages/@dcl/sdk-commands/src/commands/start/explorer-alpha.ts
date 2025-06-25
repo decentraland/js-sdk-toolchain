@@ -4,12 +4,6 @@ import { CliComponents } from '../../components'
 
 const isWindows = /^win/.test(process.platform)
 
-// Helper function to convert string to boolean
-function stringToBoolean(value: string | undefined, defaultValue: boolean = true): boolean {
-  if (!value) return defaultValue
-  return value.toLowerCase() === 'true'
-}
-
 export async function runExplorerAlpha(
   components: CliComponents,
   opts: {
@@ -48,27 +42,37 @@ async function runApp(
   const cmd = isWindows ? 'start' : 'open'
   const position = args['--position'] ?? `${baseCoords.x},${baseCoords.y}`
   const realm = args['--realm'] ?? realmValue
-  const localScene = stringToBoolean(args['--local-scene'], true)
-  const debug = stringToBoolean(args['--debug'], true)
+  const localScene = !!args['--local-scene']
+  const debug = !!args['--debug']
   const dclenv = args['--dclenv'] ?? 'org'
-  const skipAuthScreen = stringToBoolean(args['--skip-auth-screen'], true)
-  const landscapeTerrainEnabled = stringToBoolean(args['--landscape-terrain-enabled'], true)
-  const openDeeplinkInNewInstance = args['-n']
+  const skipAuthScreen = !!args['--skip-auth-screen']
+  const landscapeTerrainEnabled = !!args['--landscape-terrain-enabled']
+  const openDeeplinkInNewInstance = !!args['-n']
 
   try {
     const params = new URLSearchParams()
 
     params.set('realm', realm)
     params.set('position', position)
-    params.set('local-scene', localScene.toString())
-    params.set('debug', debug.toString())
-    params.set('hub', isHub.toString())
     params.set('dclenv', dclenv)
-    params.set('skip-auth-screen', skipAuthScreen.toString())
-    params.set('landscape-terrain-enabled', landscapeTerrainEnabled.toString())
 
+    if (localScene) {
+      params.set('local-scene', 'true')
+    }
+    if (debug) {
+      params.set('debug', 'true')
+    }
+    if (isHub) {
+      params.set('hub', 'true')
+    }
+    if (skipAuthScreen) {
+      params.set('skip-auth-screen', 'true')
+    }
+    if (landscapeTerrainEnabled) {
+      params.set('landscape-terrain-enabled', 'true')
+    }
     if (openDeeplinkInNewInstance) {
-      params.set('open-deeplink-in-new-instance', openDeeplinkInNewInstance.toString())
+      params.set('open-deeplink-in-new-instance', 'true')
     }
 
     const queryParams = params.toString()
