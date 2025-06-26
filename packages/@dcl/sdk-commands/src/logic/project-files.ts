@@ -87,7 +87,8 @@ export async function getProjectPublishableFilesWithHashes(
     /* istanbul ignore if */
     if (usedFilenames.has(normalizedFile)) {
       throw new CliError(
-        `DuplicatedFilenameError: the file ${file} exists with a different casing. Please manually remove one occurrence`
+        `The file ${file} exists with a different casing. Please manually remove one occurrence`,
+        'PROJECT_FILES_DUPLICATE_FILE'
       )
     }
 
@@ -117,6 +118,6 @@ export async function getPackageJson(components: Pick<CliComponents, 'fs'>, proj
     const packageJson = JSON.parse(packageJsonRaw) as PackageJson
     return packageJson
   } catch (err: any) {
-    throw new CliError(`Error reading the package.json file: ${err.message}`)
+    throw new CliError(`Error reading the package.json file: ${err.message}`, 'PROJECT_FILES_INVALID_PACKAGE_JSON')
   }
 }

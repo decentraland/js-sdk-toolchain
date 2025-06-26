@@ -55,17 +55,20 @@ export function assertValidScene(
         errors.push(`Error validating scene.json: ${errorPath} ${error.message}`)
       }
     }
-    throw new CliError('Invalid scene.json file:\n' + errors.join('\n'))
+    throw new CliError('Invalid scene.json file:\n' + errors.join('\n'), 'SCENE_VALIDATIONS_INVALID_SCENE_JSON')
   }
 
   const parcelSet = new Set(scene.scene?.parcels)
 
   if (parcelSet.size < scene.scene?.parcels?.length) {
-    throw new CliError(`There are duplicated parcels at scene.json.`)
+    throw new CliError(`There are duplicated parcels at scene.json.`, 'SCENE_VALIDATIONS_DUPLICATE_PARCELS')
   }
 
   if (!parcelSet.has(scene.scene?.base)) {
-    throw new CliError(`Your base parcel ${scene.scene?.base} should be included on parcels attribute at scene.json`)
+    throw new CliError(
+      `Your base parcel ${scene.scene?.base} should be included on parcels attribute at scene.json`,
+      'SCENE_VALIDATIONS_BASE_PARCEL_REQUIRED'
+    )
   }
 
   const objParcels = scene.scene?.parcels?.map(getObject)
@@ -74,15 +77,24 @@ export function assertValidScene(
       return
     }
     const constraints = getWorldRangesConstraintsMessage()
-    throw new CliError(`Coordinates ${x},${y} are outside of allowed limits: \n\n${constraints}`)
+    throw new CliError(
+      `Coordinates ${x},${y} are outside of allowed limits: \n\n${constraints}`,
+      'SCENE_VALIDATIONS_COORDINATES_OUTSIDE_LIMITS'
+    )
   })
 
   if (!areConnected(objParcels)) {
-    throw new CliError('Parcels described on scene.json are not connected. They should be one next to each other')
+    throw new CliError(
+      'Parcels described on scene.json are not connected. They should be one next to each other',
+      'SCENE_VALIDATIONS_PARCELS_NOT_CONNECTED'
+    )
   }
 
   if (!scene.main?.endsWith('.js')) {
-    throw new CliError(`Main scene format file (${scene.main}) is not a supported format`)
+    throw new CliError(
+      `Main scene format file (${scene.main}) is not a supported format`,
+      'SCENE_VALIDATIONS_INVALID_MAIN_FORMAT'
+    )
   }
 
   const minimalScene = getMinimalSceneJson()
@@ -113,7 +125,7 @@ export async function getValidSceneJson(
     assertValidScene(components, sceneJson, opts)
     return sceneJson
   } catch (err: any) {
-    throw new CliError(`Error reading the scene.json file: ${err.message}`)
+    throw new CliError(`Error reading the scene.json file: ${err.message}`, 'SCENE_VALIDATIONS_INVALID_SCENE_JSON')
   }
 }
 
@@ -155,7 +167,10 @@ export async function getFiles(components: Pick<CliComponents, 'fs' | 'logger'>,
 export function validateFilesSizes(files: IFile[]) {
   for (const { path, size } of files) {
     if (size > MAX_FILE_SIZE_BYTES) {
-      throw new CliError(`Maximum file size exceeded: '${path}' is larger than ${MAX_FILE_SIZE_BYTES / 1e6}MB`)
+      throw new CliError(
+        `Maximum file size exceeded: '${path}' is larger than ${MAX_FILE_SIZE_BYTES / 1e6}MB`,
+        'SCENE_VALIDATIONS_MAX_FILE_SIZE_EXCEEDED'
+      )
     }
   }
 }

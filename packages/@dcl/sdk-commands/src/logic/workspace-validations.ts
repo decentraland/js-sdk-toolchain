@@ -59,7 +59,10 @@ export function assertValidWorkspace(workspace: WorkspaceJson) {
       }
     }
     /* istanbul ignore next */
-    throw new CliError(`Invalid ${WORKSPACE_FILE} file:\n${errors.join('\n')}`)
+    throw new CliError(
+      `Invalid ${WORKSPACE_FILE} file:\n${errors.join('\n')}`,
+      'WORKSPACE_VALIDATIONS_INVALID_WORKSPACE_JSON'
+    )
   }
 }
 
@@ -111,7 +114,10 @@ export async function getValidWorkspace(
       )
     } catch (err: any) {
       /* istanbul ignore next */
-      throw new CliError(`Error reading the ${getWorkspaceFilePath(workingDirectory)} file: ${err.message}`)
+      throw new CliError(
+        `Error reading the ${getWorkspaceFilePath(workingDirectory)} file: ${err.message}`,
+        'WORKSPACE_VALIDATIONS_INVALID_WORKSPACE_JSON'
+      )
     }
   } else {
     // or generate a single-folder workspace on the fly

@@ -59,6 +59,6 @@ export async function readStringConfig(
 
 export async function requireStringConfig(components: Pick<CliComponents, 'config'>, key: ConfigKeys): Promise<string> {
   const address = await readStringConfig(components, key)
-  if (!address) throw new CliError(`configuration ${key} was not provided`)
+  if (!address) throw new CliError(`configuration ${key} was not provided`, 'CONFIG_NOT_PROVIDED')
   return address
 }

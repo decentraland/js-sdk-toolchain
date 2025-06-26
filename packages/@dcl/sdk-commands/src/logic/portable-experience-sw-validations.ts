@@ -27,7 +27,7 @@ export function assertValidSmartWearable(scene: Scene) {
         errors.push(`Error validating scene.json: ${error.message}`)
       }
     }
-    throw new CliError('Invalid scene.json file:\n' + errors.join('\n'))
+    throw new CliError('Invalid scene.json file:\n' + errors.join('\n'), 'PORTABLE_EXPERIENCE_SW_INVALID_SCENE_JSON')
   }
   // TODO
   return true
@@ -45,6 +45,9 @@ export async function getValidWearableJson(
     const wearableJson = JSON.parse(wearableJsonRaw) as Scene
     return wearableJson
   } catch (err: any) {
-    throw new CliError(`Error reading the wearable.json file: ${err.message}`)
+    throw new CliError(
+      `Error reading the wearable.json file: ${err.message}`,
+      'PORTABLE_EXPERIENCE_SW_INVALID_SCENE_JSON'
+    )
   }
 }
