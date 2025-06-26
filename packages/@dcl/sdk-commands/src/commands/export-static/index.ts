@@ -69,19 +69,22 @@ export async function main(options: Options) {
 
   /* istanbul ignore if */
   if (willCreateRealm && !options.args['--baseUrl']) {
-    throw new CliError(`--baseUrl is mandatory when --realmName is provided`)
+    throw new CliError(`--baseUrl is mandatory when --realmName is provided`, 'EXPORT_STATIC_BASE_URL_REQUIRED')
   }
 
   /* istanbul ignore if */
   if (willCreateRealm && !/^[a-z][a-z0-9-/]*$/i.test(options.args['--realmName']!)) {
-    throw new CliError(`--realmName has invalid characters`)
+    throw new CliError(`--realmName has invalid characters`, 'EXPORT_STATIC_INVALID_REALM_NAME')
   }
 
   await fs.mkdir(outputDirectory, { recursive: true })
 
   /* istanbul ignore if */
   if (!(await fs.directoryExists(outputDirectory))) {
-    throw new CliError(`The destination path ${outputDirectory} is not a directory`)
+    throw new CliError(
+      `The destination path ${outputDirectory} is not a directory`,
+      'EXPORT_STATIC_INVALID_OUTPUT_DIRECTORY'
+    )
   }
 
   const scenesUrn: string[] = []
@@ -118,7 +121,10 @@ export async function main(options: Options) {
 
     /* istanbul ignore if */
     if (!(await fs.directoryExists(realmDirectory))) {
-      throw new CliError(`The destination path ${realmDirectory} is not a directory`)
+      throw new CliError(
+        `The destination path ${realmDirectory} is not a directory`,
+        'EXPORT_STATIC_INVALID_OUTPUT_DIRECTORY'
+      )
     }
     const dst = path.join(realmDirectory, 'about')
     await fs.writeFile(dst, JSON.stringify(realm, null, 2))

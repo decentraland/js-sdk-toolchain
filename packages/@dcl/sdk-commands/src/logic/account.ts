@@ -17,7 +17,7 @@ export function createWallet(privateKey: string): Wallet {
   }
 
   if (privateKey.length !== length) {
-    throw new CliError('Addresses should be 64 characters length.')
+    throw new CliError('Addresses should be 64 characters length.', 'ACCOUNT_INVALID_PRIVATE_KEY')
   }
 
   const pk = hexToBytes(privateKey)

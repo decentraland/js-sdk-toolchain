@@ -53,18 +53,23 @@ export async function main(options: Options) {
   const githubRepo = options.args['--github-repo']
 
   if (!isEmpty && !yes) {
-    throw new CliError('The target directory specified is not empty. Run this command with --yes to override.')
+    throw new CliError(
+      'The target directory specified is not empty. Run this command with --yes to override.',
+      'INIT_DIR_NOT_EMPTY'
+    )
   }
 
   if (requestedTemplateZipUrl && requestedProjectTemplate) {
     throw new CliError(
-      `Specifying --template and --project at the same time is not allowed. Please specify only one of them.`
+      `Specifying --template and --project at the same time is not allowed. Please specify only one of them.`,
+      'INIT_INVALID_ARGUMENTS'
     )
   }
 
   if (requestedProjectTemplate && !existScaffoldedProject(requestedProjectTemplate)) {
     throw new CliError(
-      `The requested scene doesn't exist empty. Valid options are: ${scaffoldedProjectOptions().join(', ')}`
+      `The requested scene doesn't exist empty. Valid options are: ${scaffoldedProjectOptions().join(', ')}`,
+      'INIT_INVALID_PROJECT'
     )
   }
 
@@ -97,7 +102,10 @@ export async function downloadAndUnzipUrlContainFolder(url: string, dest: string
 
   const zipExtracted = await extract(zip, dest)
   if (zipExtracted.topLevelFolders.length !== 1) {
-    throw new Error('The zip downloaded has many folder on the root, make sure it has only one folder on the root.')
+    throw new CliError(
+      'The zip downloaded has many folder on the root, make sure it has only one folder on the root.',
+      'INIT_INVALID_TEMPLATE_ZIP_URL'
+    )
   }
 
   const extractedPath = path.resolve(dest, zipExtracted.topLevelFolders[0])

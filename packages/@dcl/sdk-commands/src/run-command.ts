@@ -24,10 +24,13 @@ const listCommandsStr = (commands: string[]) => commands.map(($) => `\t *sdk-com
 function asserValidCommand(fns: FileExports): fns is Required<FileExports> {
   const { help, main } = fns
   if (!help || !main) {
-    throw new CliError(`Command does not follow implementation rules:
+    throw new CliError(
+      `Command does not follow implementation rules:
       * Requires a "help" function
       * Requires a "main" function
-    `)
+    `,
+      'COMMAND_NOT_VALID'
+    )
   }
   return true
 }
@@ -45,7 +48,7 @@ export async function runSdkCommand(components: CliComponents, command: string, 
       return
     }
     /* istanbul ignore next */
-    throw new CliError(`Command ${command} is invalid. ${helpMessage(commands)}`)
+    throw new CliError(`Command ${command} is invalid. ${helpMessage(commands)}`, 'COMMAND_NOT_FOUND')
   }
 
   const cmd = await import(`./commands/${command}`)

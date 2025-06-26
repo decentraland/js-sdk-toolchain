@@ -23,7 +23,7 @@ export async function assertValidProjectFolder(
 ): Promise<ProjectUnion> {
   // no validations for now, only check that it exists
   if (!(await components.fs.fileExists(path.resolve(workingDirectory, 'package.json'))))
-    throw new CliError(`The project root doesn't have a package.json file`)
+    throw new CliError(`The project root doesn't have a package.json file`, 'PROJECT_VALIDATIONS_PACKAGE_JSON_REQUIRED')
 
   // now we will iterate over different file to evaluate the project kind
   switch (true) {
@@ -38,7 +38,8 @@ export async function assertValidProjectFolder(
 
     default: {
       throw new CliError(
-        `UnknownProjectKind: the kind of project of the folder ${workingDirectory} cannot be identified`
+        `The kind of project of the folder ${workingDirectory} cannot be identified`,
+        'PROJECT_VALIDATIONS_INVALID_PROJECT_KIND'
       )
     }
   }

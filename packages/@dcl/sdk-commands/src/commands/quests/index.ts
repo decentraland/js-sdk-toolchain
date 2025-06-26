@@ -45,7 +45,7 @@ export function help(options: Options) {
         -m, --manager                                                 Open up Quests Manager
         --create                                                      Creates a new Quest by prompts
         --create-from-json   [path]                                   Create a new Quest from absolute path to a JSON file
-        -l, --list           [your_eth_address]                       Lists all of your quests. 
+        -l, --list           [your_eth_address]                       Lists all of your quests.
         --deactivate         [quest_id]                               Deactivate a Quest that you created
         --activate           [quest_id]                               Activate your Quest that was deactivated
         -p, --port           [port]                                   Select a custom port for the development server
@@ -78,7 +78,7 @@ export async function main(options: Options) {
 
   if (options.args['--target']) {
     if (!new RegExp(urlRegex).test(options.args['--target']) && !options.args['--target'].includes('localhost')) {
-      throw new CliError('The provided target is not a valid URL')
+      throw new CliError('The provided target is not a valid URL', 'QUESTS_INVALID_TARGET')
     }
   }
   const baseURL = options.args['--target'] || 'https://quests.decentraland.org'
@@ -114,22 +114,25 @@ async function executeCreateSubcommand(
       try {
         quest = JSON.parse(createQuestJson) as CreateQuest
       } catch (error) {
-        throw new CliError(`${path} doesn't contain a valid JSON`)
+        throw new CliError(`${path} doesn't contain a valid JSON`, 'QUESTS_INVALID_JSON')
       }
 
       try {
         validateCreateQuest(quest)
       } catch (error) {
         logger.error(error as Error)
-        throw new CliError('You provided an invalid Quest JSON. Please check the documentation')
+        throw new CliError(
+          'You provided an invalid Quest JSON. Please check the documentation',
+          'QUESTS_INVALID_QUEST_JSON'
+        )
       }
     } else {
-      throw new CliError("File doesn't exist")
+      throw new CliError("File doesn't exist", 'QUESTS_FILE_DOES_NOT_EXIST')
     }
   } else {
     quest = await createQuestByPrompting({ logger })
     if (!quest) {
-      throw new CliError('Quest creation was cancelled')
+      throw new CliError('Quest creation was cancelled', 'QUESTS_CREATION_CANCELLED')
     }
   }
   const createURL = `${baseURL}/api/quests`
@@ -181,7 +184,7 @@ async function executeListSubcommand(
   const getQuests = `${baseURL}/api/creators/${address}/quests`
 
   if (!isAddress(address)) {
-    throw new CliError('You should provide a valid EVM address')
+    throw new CliError('You should provide a valid EVM address', 'QUESTS_INVALID_ADDRESS')
   }
 
   await executeSubcommand(
@@ -233,7 +236,7 @@ async function executeActivateSubcommand(
   const activateQuest = `${baseURL}/api/quests/${questId}/activate`
 
   if (!validate(questId)) {
-    throw new CliError('You should provide a valid uuid')
+    throw new CliError('You should provide a valid uuid', 'QUESTS_INVALID_UUID')
   }
 
   await executeSubcommand(
@@ -275,7 +278,7 @@ async function executeDeactivateSubcommand(
   const deactivateQuest = `${baseURL}/api/quests/${questId}`
 
   if (!validate(questId)) {
-    throw new CliError('You should provide a valid uuid')
+    throw new CliError('You should provide a valid uuid', 'QUESTS_INVALID_UUID')
   }
 
   await executeSubcommand(

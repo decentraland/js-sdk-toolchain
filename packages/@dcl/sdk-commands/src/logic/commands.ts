@@ -11,14 +11,14 @@ export async function getCommands({ fs }: Pick<CliComponents, 'fs'>): Promise<st
     const path = resolve(COMMANDS_PATH, dir)
 
     if (!(await fs.directoryExists(path))) {
-      throw new CliError('Developer: All commands must be inside a folder')
+      throw new CliError('Developer: All commands must be inside a folder', 'COMMANDS_INVALID_FOLDER')
     }
 
     try {
       require.resolve(`${path}`)
     } catch {
       /* istanbul ignore next */
-      throw new CliError('Developer: All commands must have an "index.js" file inside')
+      throw new CliError('Developer: All commands must have an "index.js" file inside', 'COMMANDS_INVALID_INDEX_FILE')
     }
 
     return dir

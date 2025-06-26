@@ -99,24 +99,25 @@ export async function bundleProject(components: BundleComponents, options: Compi
   const tsconfig = path.join(options.workingDirectory, 'tsconfig.json')
   /* istanbul ignore if */
   if (!options.single && !sceneJson.main) {
-    throw new CliError('scene.json .main must be present')
+    throw new CliError('scene.json .main must be present', 'BUNDLE_SCENE_MAIN_REQUIRED')
   }
 
   /* istanbul ignore if */
   if ((sceneJson as any).runtimeVersion !== '7') {
-    throw new CliError('scene.json `"runtimeVersion": "7"` must be present')
+    throw new CliError('scene.json `"runtimeVersion": "7"` must be present', 'BUNDLE_SCENE_RUNTIME_VERSION_REQUIRED')
   }
 
   /* istanbul ignore if */
   if (!(await components.fs.fileExists(tsconfig))) {
-    throw new CliError(`File ${tsconfig} must exist to compile the Typescript project`)
+    throw new CliError(`File ${tsconfig} must exist to compile the Typescript project`, 'BUNDLE_TSCONFIG_REQUIRED')
   }
 
   const entrypointSource = options.single ?? 'src/index.ts'
   const entrypoints = globSync(entrypointSource, { cwd: options.workingDirectory, absolute: true })
 
   /* istanbul ignore if */
-  if (!entrypoints.length) throw new CliError(`There are no input files to build: ${entrypointSource}`)
+  if (!entrypoints.length)
+    throw new CliError(`There are no input files to build: ${entrypointSource}`, 'BUNDLE_NO_INPUT_FILES')
 
   // const output = !options.single ? sceneJson.main : options.single.replace(/\.ts$/, '.js')
   // const outfile = path.join(options.workingDirectory, output)
@@ -200,7 +201,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
       printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
     } catch (err: any) {
       /* istanbul ignore next */
-      throw new CliError(err.toString())
+      throw new CliError(err.toString(), 'BUNDLE_REBUILD_FAILED')
     }
     await context.dispose()
   }
@@ -236,7 +237,7 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
     if (code === 0) {
       printProgressInfo(components.logger, `Type checking completed without errors`)
     } else {
-      typeCheckerFuture.reject(new CliError(`Typechecker exited with code ${code}.`))
+      typeCheckerFuture.reject(new CliError(`Typechecker exited with code ${code}.`, 'BUNDLE_TYPE_CHECKER_FAILED'))
       return
     }
 
