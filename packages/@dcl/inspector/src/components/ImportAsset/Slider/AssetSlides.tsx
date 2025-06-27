@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback } from 'react'
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io'
 import cx from 'classnames'
 
@@ -8,10 +8,10 @@ import { Loading } from '../../Loading'
 
 import { getAssetSize, getAssetResources } from '../utils'
 import { Asset } from '../types'
-import { Thumbnails } from './types'
+import { AssetWithEmote, Thumbnails } from './types'
 
 interface AssetSlidesProps {
-  uploadedAssets: Asset[]
+  uploadedAssets: AssetWithEmote[]
   currentSlide: number
   screenshots: Thumbnails
   onSlideChange: (newSlide: number) => void
@@ -40,19 +40,6 @@ export function AssetSlides({
   const manyAssets = uploadedAssets.length > 1
   const leftArrowDisabled = currentSlide <= 0
   const rightArrowDisabled = currentSlide >= uploadedAssets.length - 1
-
-  const hasEmoteName = (asset: Asset) => {
-    return asset.name.endsWith('_emote')
-  }
-
-  useEffect(() => {
-    uploadedAssets.forEach((asset, index) => {
-      if (asset.isEmote && !hasEmoteName(asset)) {
-        const newName = `${asset.name}_emote`
-        onNameChange(index)(newName)
-      }
-    })
-  }, [])
 
   return (
     <div className="content">
