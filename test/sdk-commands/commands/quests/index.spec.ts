@@ -2,6 +2,11 @@ import { resolve } from 'path'
 import * as quests from '../../../../packages/@dcl/sdk-commands/src/commands/quests/index'
 import * as utils from '../../../../packages/@dcl/sdk-commands/src/commands/quests/utils'
 import { initComponents } from '../../../../packages/@dcl/sdk-commands/src/components'
+import { initLanguage, Language } from '../../../../packages/@dcl/sdk-commands/src/logic/lang'
+
+beforeAll(async () => {
+  await initLanguage(Language.EN)
+})
 
 describe('quests command', () => {
   beforeEach(() => {
