@@ -10,6 +10,7 @@ import { PropTypes, Thumbnails } from './types'
 import './Slider.css'
 import { Error } from '../Error'
 import { Button } from '../../Button'
+import { useSliderAssets } from './useSliderAssets'
 
 enum ImportStep {
   UPLOAD = 'upload',
@@ -17,7 +18,7 @@ enum ImportStep {
 }
 
 export function Slider({ assets, onSubmit, isNameValid }: PropTypes) {
-  const [uploadedAssets, setUploadedAssets] = useState(assets)
+  const { assets: uploadedAssets, setAssets: setUploadedAssets } = useSliderAssets(assets)
   const [slide, setSlide] = useState(0)
   const [screenshots, setScreenshots] = useState<Thumbnails>({})
   const [step, setStep] = useState<ImportStep>(ImportStep.UPLOAD)

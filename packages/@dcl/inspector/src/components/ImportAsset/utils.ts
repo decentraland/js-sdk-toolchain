@@ -176,14 +176,11 @@ async function processFile(file: File): Promise<BaseAsset> {
     return { blob: file, name, extension, error: extensionError }
   }
 
-  const isEmoteFile = await isEmote(file)
-
   const sizeError = validateFileSize(file.size)
   if (sizeError) {
-    return { blob: file, name, extension, error: sizeError, isEmote: isEmoteFile }
+    return { blob: file, name, extension, error: sizeError }
   }
-
-  return { blob: file, name, extension, isEmote: isEmoteFile }
+  return { blob: file, name, extension }
 }
 
 async function validateModelWithDependencies(model: ModelAsset): Promise<ValidationError> {
