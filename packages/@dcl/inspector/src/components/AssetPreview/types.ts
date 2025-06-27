@@ -3,4 +3,5 @@ export interface Props {
   resources?: File[]
   onScreenshot: (value: string) => void
   onLoad?: () => void
+  isEmote?: boolean
 }

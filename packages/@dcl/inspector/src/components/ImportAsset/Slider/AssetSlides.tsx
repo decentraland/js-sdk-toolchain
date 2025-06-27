@@ -8,10 +8,10 @@ import { Loading } from '../../Loading'
 
 import { getAssetSize, getAssetResources } from '../utils'
 import { Asset } from '../types'
-import { Thumbnails } from './types'
+import { AssetWithEmote, Thumbnails } from './types'
 
 interface AssetSlidesProps {
-  uploadedAssets: Asset[]
+  uploadedAssets: AssetWithEmote[]
   currentSlide: number
   screenshots: Thumbnails
   onSlideChange: (newSlide: number) => void
@@ -52,7 +52,12 @@ export function AssetSlides({
         {uploadedAssets.map(($, i) => (
           <div className={cx('asset', { active: currentSlide === i })} key={i}>
             <div>
-              <AssetPreview value={$.blob} resources={getAssetResources($)} onScreenshot={onScreenshot($)} />
+              <AssetPreview
+                value={$.blob}
+                resources={getAssetResources($)}
+                onScreenshot={onScreenshot($)}
+                isEmote={$.isEmote}
+              />
               {screenshots[$.blob.name] ? (
                 <div className="thumbnail" style={{ backgroundImage: `url(${screenshots[$.blob.name]})` }}></div>
               ) : (
