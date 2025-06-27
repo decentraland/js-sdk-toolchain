@@ -24,6 +24,7 @@ import {
   UiText,
   UiTransform
 } from '@dcl/ecs'
+import { LIVEKIT_MAX_SIZE } from '@dcl/ecs/dist/systems/crdt'
 
 export const NOT_SYNC_COMPONENTS = [
   VideoEvent,
@@ -43,8 +44,6 @@ export const NOT_SYNC_COMPONENTS = [
 ]
 
 export const NOT_SYNC_COMPONENTS_IDS = NOT_SYNC_COMPONENTS.map(($) => $.componentId)
-
-const LIVEKIT_MAX_SIZE = 13 // 13kb max size for network messages
 
 export function engineToCrdt(engine: IEngine): Uint8Array[] {
   const crdtBuffer = new ReadWriteByteBuffer()
@@ -69,9 +68,24 @@ export function engineToCrdt(engine: IEngine): Uint8Array[] {
       const networkEntity = NetworkEntity.getOrNull(message.entityId)
 
       // Check if adding this message would exceed the size limit
-      if ((networkBuffer.toBinary().byteLength + message.data.byteLength) / 1024 > LIVEKIT_MAX_SIZE) {
-        chunks.push(networkBuffer.toBinary())
-        networkBuffer.resetBuffer()
+      const currentBufferSize = networkBuffer.toBinary().byteLength
+      const messageSize = message.data.byteLength
+
+      if ((currentBufferSize + messageSize) / 1024 > LIVEKIT_MAX_SIZE) {
+        // If the current buffer has content, save it as a chunk
+        if (currentBufferSize > 0) {
+          chunks.push(networkBuffer.toCopiedBinary())
+          networkBuffer.resetBuffer()
+        }
+
+        // If the message itself is larger than the limit, we need to handle it specially
+        // For now, we'll skip it to prevent infinite loops
+        if (messageSize / 1024 > LIVEKIT_MAX_SIZE) {
+          console.error(
+            `Message too large (${messageSize} bytes), skipping component ${message.componentId} for entity ${message.entityId}`
+          )
+          continue
+        }
       }
 
       if (networkEntity) {
@@ -80,14 +94,6 @@ export function engineToCrdt(engine: IEngine): Uint8Array[] {
           message.timestamp,
           message.componentId,
           networkEntity.networkId,
-          message.data,
-          networkBuffer
-        )
-      } else {
-        PutComponentOperation.write(
-          message.entityId,
-          message.timestamp,
-          message.componentId,
           message.data,
           networkBuffer
         )
