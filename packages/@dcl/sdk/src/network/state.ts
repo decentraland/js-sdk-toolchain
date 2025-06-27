@@ -24,6 +24,7 @@ import {
   UiText,
   UiTransform
 } from '@dcl/ecs'
+import { LIVEKIT_MAX_SIZE } from '@dcl/ecs/dist/systems/crdt'
 
 export const NOT_SYNC_COMPONENTS = [
   VideoEvent,
@@ -44,10 +45,11 @@ export const NOT_SYNC_COMPONENTS = [
 
 export const NOT_SYNC_COMPONENTS_IDS = NOT_SYNC_COMPONENTS.map(($) => $.componentId)
 
-export function engineToCrdt(engine: IEngine): Uint8Array {
+export function engineToCrdt(engine: IEngine): Uint8Array[] {
   const crdtBuffer = new ReadWriteByteBuffer()
   const networkBuffer = new ReadWriteByteBuffer()
   const NetworkEntity = engine.getComponent(_NetworkEntity.componentId) as INetowrkEntity
+  const chunks: Uint8Array[] = []
 
   for (const itComponentDefinition of engine.componentsIter()) {
     if (NOT_SYNC_COMPONENTS_IDS.includes(itComponentDefinition.componentId)) {
@@ -64,6 +66,28 @@ export function engineToCrdt(engine: IEngine): Uint8Array {
     if (header.type === CrdtMessageType.PUT_COMPONENT) {
       const message = PutComponentOperation.read(crdtBuffer)!
       const networkEntity = NetworkEntity.getOrNull(message.entityId)
+
+      // Check if adding this message would exceed the size limit
+      const currentBufferSize = networkBuffer.toBinary().byteLength
+      const messageSize = message.data.byteLength
+
+      if ((currentBufferSize + messageSize) / 1024 > LIVEKIT_MAX_SIZE) {
+        // If the current buffer has content, save it as a chunk
+        if (currentBufferSize > 0) {
+          chunks.push(networkBuffer.toCopiedBinary())
+          networkBuffer.resetBuffer()
+        }
+
+        // If the message itself is larger than the limit, we need to handle it specially
+        // For now, we'll skip it to prevent infinite loops
+        if (messageSize / 1024 > LIVEKIT_MAX_SIZE) {
+          console.error(
+            `Message too large (${messageSize} bytes), skipping component ${message.componentId} for entity ${message.entityId}`
+          )
+          continue
+        }
+      }
+
       if (networkEntity) {
         PutNetworkComponentOperation.write(
           networkEntity.entityId,
@@ -73,19 +97,16 @@ export function engineToCrdt(engine: IEngine): Uint8Array {
           message.data,
           networkBuffer
         )
-      } else {
-        PutComponentOperation.write(
-          message.entityId,
-          message.timestamp,
-          message.componentId,
-          message.data,
-          networkBuffer
-        )
       }
     } else {
       crdtBuffer.incrementReadOffset(header.length)
     }
   }
 
-  return networkBuffer.toBinary()
+  // Add any remaining data as the final chunk
+  if (networkBuffer.currentWriteOffset() > 0) {
+    chunks.push(networkBuffer.toBinary())
+  }
+
+  return chunks
 }
