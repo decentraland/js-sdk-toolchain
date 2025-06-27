@@ -2,7 +2,6 @@
 const validator = require('gltf-validator')
 
 import { BaseAsset, ModelAsset, ValidationError, Asset, isModelAsset, Gltf, AssetType } from './types'
-import { isEmote } from '../AssetPreview/utils'
 
 const sampleIndex = (list: any[]) => Math.floor(Math.random() * list.length)
 
