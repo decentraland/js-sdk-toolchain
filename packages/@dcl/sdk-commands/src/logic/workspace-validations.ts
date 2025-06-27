@@ -1,5 +1,7 @@
 import path, { resolve } from 'path'
 import { generateLazyValidator, JSONSchema, ValidateFunction } from '@dcl/schemas'
+import i18next from 'i18next'
+
 import { CliError } from './error'
 import { CliComponents } from '../components'
 import { assertValidProjectFolder, ProjectUnion } from './project-validations'
@@ -60,8 +62,8 @@ export function assertValidWorkspace(workspace: WorkspaceJson) {
     }
     /* istanbul ignore next */
     throw new CliError(
-      `Invalid ${WORKSPACE_FILE} file:\n${errors.join('\n')}`,
-      'WORKSPACE_VALIDATIONS_INVALID_WORKSPACE_JSON'
+      'WORKSPACE_VALIDATIONS_INVALID_WORKSPACE_JSON',
+      i18next.t('errors.workspace_validations.invalid_workspace_json', { errors: errors.join('\n') })
     )
   }
 }
@@ -115,8 +117,8 @@ export async function getValidWorkspace(
     } catch (err: any) {
       /* istanbul ignore next */
       throw new CliError(
-        `Error reading the ${getWorkspaceFilePath(workingDirectory)} file: ${err.message}`,
-        'WORKSPACE_VALIDATIONS_INVALID_WORKSPACE_JSON'
+        'WORKSPACE_VALIDATIONS_INVALID_WORKSPACE_JSON',
+        i18next.t('errors.workspace_validations.invalid_workspace_json', { error: err.message })
       )
     }
   } else {

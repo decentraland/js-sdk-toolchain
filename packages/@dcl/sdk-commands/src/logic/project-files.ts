@@ -3,6 +3,8 @@ import { CliComponents } from '../components'
 import { getDCLIgnorePatterns } from './dcl-ignore'
 import { sync as globSync } from 'glob'
 import ignore from 'ignore'
+import i18next from 'i18next'
+
 import path, { resolve } from 'path'
 import { CliError } from './error'
 
@@ -86,10 +88,7 @@ export async function getProjectPublishableFilesWithHashes(
 
     /* istanbul ignore if */
     if (usedFilenames.has(normalizedFile)) {
-      throw new CliError(
-        `The file ${file} exists with a different casing. Please manually remove one occurrence`,
-        'PROJECT_FILES_DUPLICATE_FILE'
-      )
+      throw new CliError('PROJECT_FILES_DUPLICATE_FILE', i18next.t('errors.project_files.duplicate_file', { file }))
     }
 
     usedFilenames.add(normalizedFile)
@@ -118,6 +117,9 @@ export async function getPackageJson(components: Pick<CliComponents, 'fs'>, proj
     const packageJson = JSON.parse(packageJsonRaw) as PackageJson
     return packageJson
   } catch (err: any) {
-    throw new CliError(`Error reading the package.json file: ${err.message}`, 'PROJECT_FILES_INVALID_PACKAGE_JSON')
+    throw new CliError(
+      'PROJECT_FILES_INVALID_PACKAGE_JSON',
+      i18next.t('errors.project_files.invalid_package_json', { error: err.message })
+    )
   }
 }

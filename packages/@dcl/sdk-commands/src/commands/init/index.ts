@@ -1,4 +1,5 @@
 import path from 'path'
+import i18next from 'i18next'
 
 import { CliComponents } from '../../components'
 import { declareArgs } from '../../logic/args'
@@ -53,23 +54,17 @@ export async function main(options: Options) {
   const githubRepo = options.args['--github-repo']
 
   if (!isEmpty && !yes) {
-    throw new CliError(
-      'The target directory specified is not empty. Run this command with --yes to override.',
-      'INIT_DIR_NOT_EMPTY'
-    )
+    throw new CliError('INIT_DIR_NOT_EMPTY', i18next.t('errors.init.dir_not_empty'))
   }
 
   if (requestedTemplateZipUrl && requestedProjectTemplate) {
-    throw new CliError(
-      `Specifying --template and --project at the same time is not allowed. Please specify only one of them.`,
-      'INIT_INVALID_ARGUMENTS'
-    )
+    throw new CliError('INIT_INVALID_ARGUMENTS', i18next.t('errors.init.invalid_arguments'))
   }
 
   if (requestedProjectTemplate && !existScaffoldedProject(requestedProjectTemplate)) {
     throw new CliError(
-      `The requested scene doesn't exist empty. Valid options are: ${scaffoldedProjectOptions().join(', ')}`,
-      'INIT_INVALID_PROJECT'
+      'INIT_INVALID_PROJECT',
+      i18next.t('errors.init.invalid_project', { options: scaffoldedProjectOptions().join(', ') })
     )
   }
 
@@ -102,10 +97,7 @@ export async function downloadAndUnzipUrlContainFolder(url: string, dest: string
 
   const zipExtracted = await extract(zip, dest)
   if (zipExtracted.topLevelFolders.length !== 1) {
-    throw new CliError(
-      'The zip downloaded has many folder on the root, make sure it has only one folder on the root.',
-      'INIT_INVALID_TEMPLATE_ZIP_URL'
-    )
+    throw new CliError('INIT_INVALID_TEMPLATE_ZIP_URL', i18next.t('errors.init.invalid_template_zip_url'))
   }
 
   const extractedPath = path.resolve(dest, zipExtracted.topLevelFolders[0])

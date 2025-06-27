@@ -58,7 +58,7 @@ export type CliErrorName =
   | 'WORKSPACE_VALIDATIONS_INVALID_WORKSPACE_JSON_READ'
 
 export class CliError<T extends CliErrorName> extends Error {
-  constructor(public message: string = '', public name: T = 'CliError' as T, public stack?: string) {
+  constructor(public name: T = 'CliError' as T, public message: string = '', public stack?: string) {
     super()
   }
 }
