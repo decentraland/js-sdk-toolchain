@@ -19,6 +19,9 @@ describe('Generated MeshRenderer ProtoBuf', () => {
       },
       {
         mesh: { $case: 'sphere', sphere: {} }
+      },
+      {
+        mesh: { $case: 'gltf', gltf: { gltfSrc: 'models/test.glb', name: 'someGltfMeshName' } }
       }
     ]
 
@@ -89,6 +92,17 @@ describe('Generated MeshRenderer ProtoBuf', () => {
         $case: 'plane',
         plane: {
           uvs: []
+        }
+      }
+    })
+
+    MeshRenderer.setGltfMesh(entity, 'models/test.glb', 'someGltfMeshName')
+    expect(MeshRenderer.get(entity)).toStrictEqual({
+      mesh: {
+        $case: 'gltf',
+        gltf: {
+          gltfSrc: 'models/test.glb',
+          name: 'someGltfMeshName'
         }
       }
     })

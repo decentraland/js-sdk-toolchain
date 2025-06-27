@@ -17,7 +17,8 @@ describe('Generated AvatarShape ProtoBuf', () => {
       expressionTriggerId: 'id',
       expressionTriggerTimestamp: 0,
       talking: true,
-      emotes: []
+      emotes: [],
+      forceRender: []
     })
 
     testComponentSerialization(AvatarShape, {
@@ -31,7 +32,8 @@ describe('Generated AvatarShape ProtoBuf', () => {
       expressionTriggerId: 'id2',
       expressionTriggerTimestamp: 1,
       talking: false,
-      emotes: []
+      emotes: [],
+      forceRender: []
     })
   })
 })
