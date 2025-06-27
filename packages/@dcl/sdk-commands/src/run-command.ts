@@ -1,8 +1,10 @@
+import i18next from 'i18next'
 import { CliComponents } from './components'
 import { Args, parseArgs } from './logic/args'
 import { printCommand } from './logic/beautiful-logs'
 import { getCommands } from './logic/commands'
 import { CliError } from './logic/error'
+import { getLanguage, initLanguage } from './logic/lang'
 
 export interface Options {
   args: ReturnType<typeof parseArgs>
@@ -24,13 +26,7 @@ const listCommandsStr = (commands: string[]) => commands.map(($) => `\t *sdk-com
 function asserValidCommand(fns: FileExports): fns is Required<FileExports> {
   const { help, main } = fns
   if (!help || !main) {
-    throw new CliError(
-      `Command does not follow implementation rules:
-      * Requires a "help" function
-      * Requires a "main" function
-    `,
-      'COMMAND_NOT_VALID'
-    )
+    throw new CliError('COMMAND_NOT_VALID', i18next.t('errors.command.not_valid'))
   }
   return true
 }
@@ -39,6 +35,10 @@ export async function runSdkCommand(components: CliComponents, command: string, 
   const helpMessage = (commands: string[]) => `Here is the list of commands:\n${listCommandsStr(commands)}`
   const needsHelp = argv.includes('--help') || argv.includes('-h')
   const needsJson = argv.includes('--json')
+  const language = getLanguage(argv)
+
+  await initLanguage(language)
+  argv = argv.filter((arg) => arg !== '--language')
 
   const commands = await getCommands(components)
 
@@ -48,7 +48,10 @@ export async function runSdkCommand(components: CliComponents, command: string, 
       return
     }
     /* istanbul ignore next */
-    throw new CliError(`Command ${command} is invalid. ${helpMessage(commands)}`, 'COMMAND_NOT_FOUND')
+    throw new CliError(
+      'COMMAND_NOT_FOUND',
+      i18next.t('errors.command.not_found', { command, help: helpMessage(commands) })
+    )
   }
 
   const cmd = await import(`./commands/${command}`)

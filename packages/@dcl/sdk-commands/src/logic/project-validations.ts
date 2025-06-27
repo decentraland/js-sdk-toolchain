@@ -1,5 +1,7 @@
 import { Scene } from '@dcl/schemas'
 import path from 'path'
+import i18next from 'i18next'
+
 import { CliComponents } from '../components'
 import { colors } from '../components/log'
 import { printProgressInfo } from './beautiful-logs'
@@ -23,7 +25,10 @@ export async function assertValidProjectFolder(
 ): Promise<ProjectUnion> {
   // no validations for now, only check that it exists
   if (!(await components.fs.fileExists(path.resolve(workingDirectory, 'package.json'))))
-    throw new CliError(`The project root doesn't have a package.json file`, 'PROJECT_VALIDATIONS_PACKAGE_JSON_REQUIRED')
+    throw new CliError(
+      'PROJECT_VALIDATIONS_PACKAGE_JSON_REQUIRED',
+      i18next.t('errors.project_validations.package_json_required')
+    )
 
   // now we will iterate over different file to evaluate the project kind
   switch (true) {
@@ -38,8 +43,8 @@ export async function assertValidProjectFolder(
 
     default: {
       throw new CliError(
-        `The kind of project of the folder ${workingDirectory} cannot be identified`,
-        'PROJECT_VALIDATIONS_INVALID_PROJECT_KIND'
+        'PROJECT_VALIDATIONS_INVALID_PROJECT_KIND',
+        i18next.t('errors.project_validations.invalid_project_kind', { workingDirectory })
       )
     }
   }

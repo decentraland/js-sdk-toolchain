@@ -1,6 +1,8 @@
 import { createDotEnvConfigComponent } from '@well-known-components/env-config-provider'
 import { homedir } from 'os'
 import path from 'path'
+import i18next from 'i18next'
+
 import { CliComponents } from '.'
 import { CliError } from '../logic/error'
 import { IFileSystemComponent } from './fs'
@@ -59,6 +61,6 @@ export async function readStringConfig(
 
 export async function requireStringConfig(components: Pick<CliComponents, 'config'>, key: ConfigKeys): Promise<string> {
   const address = await readStringConfig(components, key)
-  if (!address) throw new CliError(`configuration ${key} was not provided`, 'CONFIG_NOT_PROVIDED')
+  if (!address) throw new CliError('CONFIG_NOT_PROVIDED', i18next.t('errors.config.not_provided', { key }))
   return address
 }

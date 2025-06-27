@@ -1,6 +1,7 @@
 import { resolve } from 'path'
 import { Scene, getWorld, isInsideWorldLimits } from '@dcl/schemas'
 import { areConnected } from '@dcl/ecs/dist-cjs'
+import i18next from 'i18next'
 
 import { getMinimalSceneJson } from '../commands/init/project'
 import { CliError } from './error'
@@ -55,19 +56,23 @@ export function assertValidScene(
         errors.push(`Error validating scene.json: ${errorPath} ${error.message}`)
       }
     }
-    throw new CliError('Invalid scene.json file:\n' + errors.join('\n'), 'SCENE_VALIDATIONS_INVALID_SCENE_JSON')
+    throw new CliError(
+      'SCENE_VALIDATIONS_INVALID_SCENE_JSON',
+      i18next.t('errors.scene_validations.invalid_scene_json', { errors: errors.join('\n') })
+    )
   }
 
   const parcelSet = new Set(scene.scene?.parcels)
 
   if (parcelSet.size < scene.scene?.parcels?.length) {
-    throw new CliError(`There are duplicated parcels at scene.json.`, 'SCENE_VALIDATIONS_DUPLICATE_PARCELS')
+    throw new CliError('SCENE_VALIDATIONS_DUPLICATE_PARCELS', i18next.t('errors.scene_validations.duplicate_parcels'))
   }
 
   if (!parcelSet.has(scene.scene?.base)) {
     throw new CliError(
-      `Your base parcel ${scene.scene?.base} should be included on parcels attribute at scene.json`,
-      'SCENE_VALIDATIONS_BASE_PARCEL_REQUIRED'
+      'SCENE_VALIDATIONS_BASE_PARCEL_REQUIRED',
+      i18next.t('errors.scene_validations.base_parcel_required', { base: scene.scene?.base }),
+      scene.scene?.base
     )
   }
 
@@ -78,22 +83,23 @@ export function assertValidScene(
     }
     const constraints = getWorldRangesConstraintsMessage()
     throw new CliError(
-      `Coordinates ${x},${y} are outside of allowed limits: \n\n${constraints}`,
-      'SCENE_VALIDATIONS_COORDINATES_OUTSIDE_LIMITS'
+      'SCENE_VALIDATIONS_COORDINATES_OUTSIDE_LIMITS',
+      i18next.t('errors.scene_validations.coordinates_outside_limits', { x, y, constraints })
     )
   })
 
   if (!areConnected(objParcels)) {
     throw new CliError(
-      'Parcels described on scene.json are not connected. They should be one next to each other',
-      'SCENE_VALIDATIONS_PARCELS_NOT_CONNECTED'
+      'SCENE_VALIDATIONS_PARCELS_NOT_CONNECTED',
+      i18next.t('errors.scene_validations.parcels_not_connected')
     )
   }
 
   if (!scene.main?.endsWith('.js')) {
     throw new CliError(
-      `Main scene format file (${scene.main}) is not a supported format`,
-      'SCENE_VALIDATIONS_INVALID_MAIN_FORMAT'
+      'SCENE_VALIDATIONS_INVALID_MAIN_FORMAT',
+      i18next.t('errors.scene_validations.invalid_main_format', { main: scene.main }),
+      scene.main
     )
   }
 
@@ -125,7 +131,10 @@ export async function getValidSceneJson(
     assertValidScene(components, sceneJson, opts)
     return sceneJson
   } catch (err: any) {
-    throw new CliError(`Error reading the scene.json file: ${err.message}`, 'SCENE_VALIDATIONS_INVALID_SCENE_JSON')
+    throw new CliError(
+      'SCENE_VALIDATIONS_INVALID_SCENE_JSON',
+      i18next.t('errors.scene_validations.invalid_scene_json', { error: err.message })
+    )
   }
 }
 
@@ -167,9 +176,10 @@ export async function getFiles(components: Pick<CliComponents, 'fs' | 'logger'>,
 export function validateFilesSizes(files: IFile[]) {
   for (const { path, size } of files) {
     if (size > MAX_FILE_SIZE_BYTES) {
+      const maxSizeInMb = MAX_FILE_SIZE_BYTES / 1e6
       throw new CliError(
-        `Maximum file size exceeded: '${path}' is larger than ${MAX_FILE_SIZE_BYTES / 1e6}MB`,
-        'SCENE_VALIDATIONS_MAX_FILE_SIZE_EXCEEDED'
+        'SCENE_VALIDATIONS_MAX_FILE_SIZE_EXCEEDED',
+        i18next.t('errors.scene_validations.max_file_size_exceeded', { path, maxSizeInMb })
       )
     }
   }

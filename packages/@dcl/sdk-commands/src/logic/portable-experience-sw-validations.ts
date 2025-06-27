@@ -1,5 +1,6 @@
 import { resolve } from 'path'
 import { Scene } from '@dcl/schemas'
+import i18next from 'i18next'
 
 import { CliError } from './error'
 import { CliComponents } from '../components'
@@ -27,7 +28,10 @@ export function assertValidSmartWearable(scene: Scene) {
         errors.push(`Error validating scene.json: ${error.message}`)
       }
     }
-    throw new CliError('Invalid scene.json file:\n' + errors.join('\n'), 'PORTABLE_EXPERIENCE_SW_INVALID_SCENE_JSON')
+    throw new CliError(
+      'PORTABLE_EXPERIENCE_SW_INVALID_SCENE_JSON',
+      i18next.t('errors.portable_experience_sw_validations.invalid_scene_json', { errors: errors.join('\n') })
+    )
   }
   // TODO
   return true
@@ -46,8 +50,8 @@ export async function getValidWearableJson(
     return wearableJson
   } catch (err: any) {
     throw new CliError(
-      `Error reading the wearable.json file: ${err.message}`,
-      'PORTABLE_EXPERIENCE_SW_INVALID_SCENE_JSON'
+      'PORTABLE_EXPERIENCE_SW_INVALID_SCENE_JSON',
+      i18next.t('errors.portable_experience_sw_validations.invalid_scene_json', { errors: err.message })
     )
   }
 }

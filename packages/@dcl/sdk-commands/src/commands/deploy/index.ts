@@ -2,6 +2,7 @@ import { resolve } from 'path'
 import { EntityType, ChainId, getChainName } from '@dcl/schemas'
 import { DeploymentBuilder } from 'dcl-catalyst-client'
 import future from 'fp-future'
+import i18next from 'i18next'
 
 import { CliComponents } from '../../components'
 import { getBaseCoords, getFiles, getValidSceneJson, validateFilesSizes } from '../../logic/scene-validations'
@@ -82,13 +83,13 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
   const isProgrammatic = options.args['--programmatic']
 
   if (workspace.projects.length !== 1) {
-    throw new CliError('Workspace is not supported for deploy command.', 'DEPLOY_WORKSPACE_NOT_SUPPORTED')
+    throw new CliError('DEPLOY_WORKSPACE_NOT_SUPPORTED', i18next.t('errors.deploy.workspace_not_supported'))
   }
   if (project.kind !== 'scene') {
-    throw new CliError('You can only deploy scenes.', 'DEPLOY_INVALID_PROJECT_TYPE')
+    throw new CliError('DEPLOY_INVALID_PROJECT_TYPE', i18next.t('errors.deploy.invalid_project_type'))
   }
   if (options.args['--target'] && options.args['--target-content']) {
-    throw new CliError(`You can't set both the 'target' and 'target-content' arguments.`, 'DEPLOY_INVALID_ARGUMENTS')
+    throw new CliError('DEPLOY_INVALID_ARGUMENTS', i18next.t('errors.deploy.invalid_arguments'))
   }
 
   const sceneJson = await getValidSceneJson(options.components, projectRoot, { log: true })
@@ -214,7 +215,11 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
       options.components.logger.error('Could not upload content:')
       options.components.logger.error(e.message)
       options.components.analytics.track('Scene deploy failure', { ...trackProps, error: e.message ?? '' })
-      throw new CliError(e.message, 'DEPLOY_UPLOAD_FAILED', e.stack)
+      throw new CliError(
+        'DEPLOY_UPLOAD_FAILED',
+        i18next.t('errors.deploy.failed_to_upload', { error: e.message }),
+        e.stack
+      )
     }
   }
 }
