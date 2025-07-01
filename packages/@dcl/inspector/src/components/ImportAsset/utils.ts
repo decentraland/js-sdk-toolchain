@@ -179,7 +179,6 @@ async function processFile(file: File): Promise<BaseAsset> {
   if (sizeError) {
     return { blob: file, name, extension, error: sizeError }
   }
-
   return { blob: file, name, extension }
 }
 
