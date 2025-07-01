@@ -26,13 +26,14 @@ function debounce<T extends (...args: any[]) => void>(callback: T, delay: number
  * IMPORTANT: this is a legacy protocol and needs to be revisited for SDK7
  */
 export async function wireFileWatcherToWebSockets(
-  components: Pick<PreviewComponents, 'fs' | 'ws'>,
+  components: Pick<PreviewComponents, 'fs' | 'ws' | 'logger'>,
   projectRoot: string,
   projectKind: ProjectUnion['kind'],
   desktopClient: boolean
 ) {
   const ignored = await getDCLIgnorePatterns(components, projectRoot)
   const sceneId = b64HashingFunction(projectRoot)
+
   chokidar
     .watch(path.resolve(projectRoot), {
       atomic: false,
@@ -49,10 +50,10 @@ export async function wireFileWatcherToWebSockets(
       'all',
       debounce(async (a, file) => {
         if (desktopClient) {
-          updateScene(sceneId, file)
+          updateScene(sceneId, file, components.logger)
         }
         return __LEGACY__updateScene(projectRoot, sceneUpdateClients, projectKind)
-      }, 500)
+      }, 800)
     )
 }
 
@@ -61,7 +62,10 @@ function isGLTFModel(file: string) {
   return file.toLowerCase().endsWith('.glb') || file.toLowerCase().endsWith('.gltf')
 }
 
-function updateScene(sceneId: string, file: string) {
+type Logger = Pick<PreviewComponents, 'logger'>['logger']
+
+function updateScene(sceneId: string, file: string, logger: Logger) {
+  logger.info('[updateScene]: ', { file })
   let message: WsSceneMessage['message']
   if (isGLTFModel(file)) {
     message = {
