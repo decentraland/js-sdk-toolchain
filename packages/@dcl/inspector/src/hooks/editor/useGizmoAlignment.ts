@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { CrdtMessageType } from '@dcl/ecs'
 import { useSdk } from '../sdk/useSdk'
 import { useChange } from '../sdk/useChange'
-import { Gizmos } from '../../lib/babylon/decentraland/gizmo-manager'
+import { Gizmos } from '../../lib/babylon/decentraland/GizmoManager'
 
 export const useGizmoAlignment = () => {
   const gizmosRef = useRef<Gizmos | null>(null)
@@ -64,8 +64,8 @@ export const useGizmoAlignment = () => {
       const isTransformComponent = event.component?.componentId === sdk.components.Transform.componentId
       const isDeleteOperation = event.operation === CrdtMessageType.DELETE_COMPONENT
       if (isSelectedEntity && isTransformComponent && !isDeleteOperation) {
-        gizmos.fixRotationGizmoAlignment(event.value)
-        gizmos.fixPositionGizmoAlignment(event.value)
+        gizmos.fixRotationGizmoAlignment()
+        gizmos.fixPositionGizmoAlignment()
       }
     }
   }, [])
