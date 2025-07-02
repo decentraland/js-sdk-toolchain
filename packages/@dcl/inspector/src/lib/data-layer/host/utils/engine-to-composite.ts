@@ -141,6 +141,8 @@ export function dumpEngineToCrdtCommands(engine: IEngine): Uint8Array {
  * @param fs FileSystem interface for writing the file
  * @returns Promise that resolves when the file has been written
  */
+
+let __ENTITY_NAMES_CACHE: Set<string> = new Set()
 export async function generateEntityNamesType(
   engine: IEngine,
   outputPath: string = 'scene-entity-names.d.ts',
@@ -165,9 +167,16 @@ export async function generateEntityNamesType(
 
     // Sort names for consistency
     names.sort()
+    const namesSet = new Set(names)
+
+    if (namesSet.difference(__ENTITY_NAMES_CACHE).size === 0) {
+      return
+    }
+
+    __ENTITY_NAMES_CACHE = namesSet
 
     // Remove duplicates
-    const uniqueNames = Array.from(new Set(names))
+    const uniqueNames = Array.from(namesSet)
 
     // Generate valid TypeScript identifiers and handle duplicates in a single pass
     const validNameMap = new Map<string, string>()
@@ -220,6 +229,6 @@ export async function generateEntityNamesType(
     // Write to file only if content is different or file doesn't exist
     await fs.writeFile(outputPath, Buffer.from(fileContent, 'utf-8'))
   } catch (e) {
-    console.error('Fail to generate entity names types', e)
+    console.error(`Fail to generate entity names types: ${e}\n`)
   }
 }
