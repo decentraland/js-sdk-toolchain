@@ -170,6 +170,7 @@ export async function generateEntityNamesType(
     const namesSet = new Set(names)
 
     if (namesSet.difference(__ENTITY_NAMES_CACHE).size === 0) {
+      console.log('[BOEDO]: Same content 1')
       return
     }
 
@@ -221,6 +222,7 @@ export async function generateEntityNamesType(
     if (fileExists) {
       const existingContent = (await fs.readFile(outputPath)).toString('utf-8')
       if (existingContent === fileContent) {
+        console.log('[BOEDO]: Same content 2')
         // Content is identical, no need to write
         return
       }
