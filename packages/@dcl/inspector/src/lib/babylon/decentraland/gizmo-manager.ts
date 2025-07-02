@@ -18,6 +18,7 @@ import { SceneContext } from './SceneContext'
 import { PatchedGizmoManager } from './gizmo-patch'
 import { ROOT } from '../../sdk/tree'
 import { LEFT_BUTTON } from './mouse-utils'
+import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 
 const GIZMO_DUMMY_NODE = 'GIZMO_DUMMY_NODE'
 
@@ -160,12 +161,16 @@ export function createGizmoManager(context: SceneContext) {
 
   function updateEntityTransform(entity: Entity, newTransform: TransformType) {
     const { position, scale, rotation, parent } = newTransform
-    context.operations.updateValue(context.Transform, entity, {
+    const transform = {
       position: DclVector3.create(position.x, position.y, position.z),
       rotation: DclQuaternion.create(rotation.x, rotation.y, rotation.z, rotation.w),
       scale: DclVector3.create(scale.x, scale.y, scale.z),
       parent
-    })
+    }
+    if (!recursiveCheck(context.Transform.get(entity), transform, 2)) {
+      return
+    }
+    context.operations.updateValue(context.Transform, entity, transform)
   }
 
   /**
