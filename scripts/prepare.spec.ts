@@ -130,7 +130,7 @@ function installCrossDependencies(...paths: string[]) {
   }
 }
 
-function checkNoLocalPackages(...paths: string[]) {
+export function checkNoLocalPackages(...paths: string[]) {
   for (const path of paths) {
     const packageJson = resolve(path, 'package.json')
     it('checking ' + packageJson, async () => {
