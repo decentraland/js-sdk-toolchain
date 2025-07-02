@@ -2,10 +2,13 @@ import { Vector3, TransformNode, GizmoManager, Matrix, Quaternion } from '@babyl
 import { Entity } from '@dcl/ecs'
 import { EcsEntity } from '../EcsEntity'
 import { IGizmoTransformer } from './types'
-import { TransformUtils } from './utils'
 
 export class PositionGizmo implements IGizmoTransformer {
   private initialOffsets = new Map<Entity, Vector3>()
+  private initialPositions = new Map<Entity, Vector3>()
+  private initialScales = new Map<Entity, Vector3>()
+  private initialRotations = new Map<Entity, Quaternion>()
+  private pivotPosition: Vector3 | null = null
   private isDragging = false
   private changeHandlers: (() => void)[] = []
 
@@ -21,55 +24,90 @@ export class PositionGizmo implements IGizmoTransformer {
     if (!this.gizmoManager.gizmos.positionGizmo) return
     this.gizmoManager.positionGizmoEnabled = false
     this.initialOffsets.clear()
+    this.initialPositions.clear()
+    this.initialScales.clear()
+    this.initialRotations.clear()
+    this.pivotPosition = null
     this.isDragging = false
   }
 
   onDragStart(entities: EcsEntity[], gizmoNode: TransformNode): void {
-    console.log('[PositionGizmo] onDragStart with entities:', entities.length)
+    if (this.isDragging) return
+
     this.isDragging = true
-    const centroid = gizmoNode.position.clone()
+
+    // Calculate pivot position (centroid of all selected entities)
+    this.pivotPosition = new Vector3()
+    for (const entity of entities) {
+      const worldPosition = entity.getAbsolutePosition()
+      this.pivotPosition.addInPlace(worldPosition)
+    }
+    this.pivotPosition.scaleInPlace(1 / entities.length)
+
+    // Store initial state for all entities
     this.initialOffsets.clear()
+    this.initialPositions.clear()
+    this.initialScales.clear()
+    this.initialRotations.clear()
 
     for (const entity of entities) {
       const worldPosition = entity.getAbsolutePosition()
-      const offset = worldPosition.subtract(centroid)
+
+      // Store initial transforms
+      this.initialPositions.set(entity.entityId, entity.position.clone())
+      this.initialScales.set(entity.entityId, entity.scaling.clone())
+      this.initialRotations.set(entity.entityId, entity.rotationQuaternion?.clone() || Quaternion.Identity())
+
+      // Store offset from pivot (like Blender's relative positioning)
+      const offset = worldPosition.subtract(this.pivotPosition)
       this.initialOffsets.set(entity.entityId, offset)
     }
   }
 
   update(entities: EcsEntity[], gizmoNode: TransformNode): void {
-    if (!this.isDragging) return
+    if (!this.isDragging || !this.pivotPosition) return
 
-    console.log('[PositionGizmo] Updating entities:', entities.length)
+    // Calculate the movement delta from the gizmo
+    const movementDelta = gizmoNode.position.subtract(this.pivotPosition)
+
     for (const entity of entities) {
       const offset = this.initialOffsets.get(entity.entityId)
-      if (!offset) continue
+      const initialPosition = this.initialPositions.get(entity.entityId)
+      const initialScale = this.initialScales.get(entity.entityId)
+      const initialRotation = this.initialRotations.get(entity.entityId)
 
-      // Calculate new world position based on gizmo movement
-      const newWorldPosition = gizmoNode.position.add(offset)
+      if (!offset || !initialPosition || !initialScale || !initialRotation) continue
 
-      // Convert to local space if entity has a parent
+      // Calculate new world position: pivot + movement + offset
+      const newWorldPosition = this.pivotPosition.add(movementDelta).add(offset)
+
       const parent = entity.parent instanceof TransformNode ? entity.parent : null
+
       if (parent) {
-        // Get parent's world matrix and decompose it
+        // For child entities, convert world position to local space
         const parentWorldMatrix = parent.getWorldMatrix()
-        const parentScale = new Vector3()
-        const parentRotation = new Quaternion()
-        const parentPosition = new Vector3()
-        parentWorldMatrix.decompose(parentScale, parentRotation, parentPosition)
+        const parentWorldMatrixInverse = parentWorldMatrix.clone().invert()
 
-        // Create inverse matrix considering scale
-        const scaleMatrix = Matrix.Scaling(1 / parentScale.x, 1 / parentScale.y, 1 / parentScale.z)
-        const rotationMatrix = Matrix.FromQuaternionToRef(parentRotation.invert(), new Matrix())
-        const translationMatrix = Matrix.Translation(-parentPosition.x, -parentPosition.y, -parentPosition.z)
+        // Convert world position to local space
+        const localPosition = Vector3.TransformCoordinates(newWorldPosition, parentWorldMatrixInverse)
 
-        const worldToLocalMatrix = scaleMatrix.multiply(rotationMatrix).multiply(translationMatrix)
-
-        // Transform world position to local space
-        const localPosition = Vector3.TransformCoordinates(newWorldPosition, worldToLocalMatrix)
+        // Apply transforms
         entity.position.copyFrom(localPosition)
+        entity.scaling.copyFrom(initialScale)
+        if (!entity.rotationQuaternion) {
+          entity.rotationQuaternion = new Quaternion()
+        }
+        entity.rotationQuaternion.copyFrom(initialRotation)
+        entity.rotationQuaternion.normalize()
       } else {
+        // For entities without parent, apply world position directly
         entity.position.copyFrom(newWorldPosition)
+        entity.scaling.copyFrom(initialScale)
+        if (!entity.rotationQuaternion) {
+          entity.rotationQuaternion = new Quaternion()
+        }
+        entity.rotationQuaternion.copyFrom(initialRotation)
+        entity.rotationQuaternion.normalize()
       }
 
       // Force update world matrix
@@ -82,7 +120,11 @@ export class PositionGizmo implements IGizmoTransformer {
 
   onDragEnd(): void {
     this.isDragging = false
+    this.pivotPosition = null
     this.initialOffsets.clear()
+    this.initialPositions.clear()
+    this.initialScales.clear()
+    this.initialRotations.clear()
   }
 
   onChange(callback: () => void): () => void {
