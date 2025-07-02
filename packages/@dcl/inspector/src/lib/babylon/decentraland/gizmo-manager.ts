@@ -158,41 +158,156 @@ export function createGizmoManager(context: SceneContext) {
     }
   }
 
-  function updateEntityTransform(entity: Entity, newTransform: TransformType) {
-    const { position, scale, rotation, parent } = newTransform
-    context.operations.updateValue(context.Transform, entity, {
-      position: DclVector3.create(position.x, position.y, position.z),
-      rotation: DclQuaternion.create(rotation.x, rotation.y, rotation.z, rotation.w),
-      scale: DclVector3.create(scale.x, scale.y, scale.z),
-      parent
-    })
-  }
-
   /**
    * Updates the transform of all selected entities after a gizmo operation
    *
-   * 1. Fixes rotation gizmo alignment based on the first selected entity's transform
-   * 2. For each selected entity:
-   *    - Gets the original parent and resolves it to a valid entity or root node
-   *    - Temporarily sets the entity's parent to handle transform calculations
-   *    - Updates the entity's transform:
-   *      - If parent is root node: Uses world space transform with snapping
-   *      - Otherwise: Uses local space transform
-   *    - Preserves the original parent relationship
-   * 3. Dispatches the transform updates to persist changes
+   * This function correctly applies gizmo transformations while maintaining
+   * proper parent-child relationships and preventing scale distortion.
    */
   function updateTransform() {
-    fixRotationGizmoAlignment(getTransform(getFirstEntity()))
-    for (const entity of selectedEntities) {
-      const originalParent = getParent(entity)
-      const parent = context.getEntityOrNull(originalParent ?? context.rootNode.entityId)
+    const firstEntity = getFirstEntity()
+    if (!firstEntity) return
 
-      entity.setParent(parent)
-      const transform = parent === context.rootNode ? computeWorldTransform(entity) : getTransform(entity)
+    fixRotationGizmoAlignment(getTransform(firstEntity))
 
-      updateEntityTransform(entity.entityId, { ...transform, parent: originalParent })
+    // Get the gizmo dummy node
+    const dummyNode = getDummyNode()
+
+    // Store which gizmo is active
+    const { positionGizmoEnabled, rotationGizmoEnabled, scaleGizmoEnabled } = gizmoManager
+
+    // First measure the initial offsets when position gizmo is active
+    // This allows us to maintain relative positions of multiple selected entities
+    const initialOffsets = new Map<Entity, Vector3>()
+    const initialDummyPos = dummyNode.position.clone()
+
+    if (positionGizmoEnabled && selectedEntities.length > 1) {
+      // Calculate relative offsets from the dummy node for each entity
+      for (const entity of selectedEntities) {
+        const entityWorldPos = new Vector3()
+        const entityRot = new Quaternion()
+        const entityScale = new Vector3()
+        entity.computeWorldMatrix(true).decompose(entityScale, entityRot, entityWorldPos)
+
+        // Store the offset from dummy node center
+        initialOffsets.set(entity.entityId, entityWorldPos.subtract(initialDummyPos))
+      }
     }
 
+    // Process each selected entity
+    for (const entity of selectedEntities) {
+      const originalParent = getParent(entity)
+      const parentEntity = context.getEntityOrNull(originalParent ?? context.rootNode.entityId)
+      if (!parentEntity) continue
+
+      // Get the entity's original transform from ECS
+      const originalTransform = entity.ecsComponentValues.transform
+      if (!originalTransform) continue
+
+      // Create new transform object with original values
+      const newTransform = {
+        position: DclVector3.create(
+          originalTransform.position.x,
+          originalTransform.position.y,
+          originalTransform.position.z
+        ),
+        rotation: DclQuaternion.create(
+          originalTransform.rotation.x,
+          originalTransform.rotation.y,
+          originalTransform.rotation.z,
+          originalTransform.rotation.w
+        ),
+        scale: DclVector3.create(originalTransform.scale.x, originalTransform.scale.y, originalTransform.scale.z),
+        parent: originalParent
+      }
+
+      if (positionGizmoEnabled) {
+        // Calculate the final world position including offsets if multiple entities are selected
+        let finalWorldPos: Vector3
+
+        if (selectedEntities.length > 1 && initialOffsets.has(entity.entityId)) {
+          // For multiple entities: position = dummyNode.position + entity's offset from dummy
+          const offset = initialOffsets.get(entity.entityId)!
+          finalWorldPos = dummyNode.position.add(offset)
+        } else {
+          // For single entity: use the entity's exact world position
+          const entityWorldMatrix = entity.computeWorldMatrix(true)
+          finalWorldPos = new Vector3()
+          const entityWorldRot = new Quaternion()
+          const entityWorldScale = new Vector3()
+          entityWorldMatrix.decompose(entityWorldScale, entityWorldRot, finalWorldPos)
+        }
+
+        // Calculate parent's world matrix
+        const parentWorldMatrix = parentEntity.computeWorldMatrix(true)
+        const invParentWorld = parentWorldMatrix.clone()
+        invParentWorld.invert()
+
+        // Convert world position to local position in parent's space
+        const localPos = Vector3.TransformCoordinates(finalWorldPos, invParentWorld)
+
+        // Apply snapping
+        const snappedLocalPos = snapPosition(localPos)
+
+        // Update the position in the transform
+        newTransform.position = DclVector3.create(snappedLocalPos.x, snappedLocalPos.y, snappedLocalPos.z)
+      } else if (rotationGizmoEnabled) {
+        // For rotation, we need a more accurate approach to handle parent-child rotations
+
+        // Get the current entity's world position and world rotation after gizmo operation
+        const entityWorldMatrix = entity.computeWorldMatrix(true)
+        const entityWorldRotation = new Quaternion()
+        const entityWorldScale = new Vector3()
+        const entityWorldPos = new Vector3()
+        entityWorldMatrix.decompose(entityWorldScale, entityWorldRotation, entityWorldPos)
+
+        // Get parent's world matrix to calculate local rotation
+        const parentWorldMatrix = parentEntity.computeWorldMatrix(true)
+        const invParentMatrix = parentWorldMatrix.clone()
+        invParentMatrix.invert()
+
+        // Calculate local rotation by transforming world rotation to local space
+        const invParentRotation = new Quaternion()
+        const parentScale = new Vector3()
+        const parentPos = new Vector3()
+        invParentMatrix.decompose(parentScale, invParentRotation, parentPos)
+
+        // To get local rotation, multiply world rotation by inverse parent rotation
+        // This is equivalent to: worldRot = parentRot * localRot, so localRot = parentRot^-1 * worldRot
+        const localRotation = invParentRotation.multiply(entityWorldRotation)
+
+        // Apply snapping and update
+        const snappedLocalRot = snapRotation(localRotation)
+        newTransform.rotation = DclQuaternion.create(
+          snappedLocalRot.x,
+          snappedLocalRot.y,
+          snappedLocalRot.z,
+          snappedLocalRot.w
+        )
+      } else if (scaleGizmoEnabled) {
+        // Calculate dummy node world matrix
+        const dummyWorldMatrix = dummyNode.computeWorldMatrix(true)
+
+        // Extract entity's current scale from the world matrix
+        const worldScale = new Vector3()
+        const worldRot = new Quaternion()
+        const worldPos = new Vector3()
+        dummyWorldMatrix.decompose(worldScale, worldRot, worldPos)
+
+        // Apply snapping and update
+        const snappedScale = snapScale(worldScale)
+        newTransform.scale = DclVector3.create(snappedScale.x, snappedScale.y, snappedScale.z)
+      }
+
+      // Apply the transform update
+      context.operations.updateValue(context.Transform, entity.entityId, newTransform)
+    }
+
+    // Make sure the entities are reparented properly
+    restoreParents()
+    repositionGizmoOnCentroid()
+
+    // Dispatch all transform updates
     void context.operations.dispatch()
   }
 
