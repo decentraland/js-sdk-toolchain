@@ -149,7 +149,6 @@ export async function generateEntityNamesType(
 ): Promise<void> {
   try {
     // Find the Name component definition
-
     const NameComponent: typeof Name = engine.getComponentOrNull(Name.componentId) as typeof Name
 
     if (!NameComponent) {
@@ -208,7 +207,17 @@ export async function generateEntityNamesType(
 
     fileContent += `} \n`
 
-    // Write to file
+    // Check if file exists and compare content before writing
+    const fileExists = await fs.existFile(outputPath)
+    if (fileExists) {
+      const existingContent = (await fs.readFile(outputPath)).toString('utf-8')
+      if (existingContent === fileContent) {
+        // Content is identical, no need to write
+        return
+      }
+    }
+
+    // Write to file only if content is different or file doesn't exist
     await fs.writeFile(outputPath, Buffer.from(fileContent, 'utf-8'))
   } catch (e) {
     console.error('Fail to generate entity names types', e)
