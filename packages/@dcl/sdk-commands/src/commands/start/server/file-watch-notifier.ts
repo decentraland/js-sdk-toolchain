@@ -11,14 +11,8 @@ import {
   WsSceneMessage,
   UpdateModelType
 } from '@dcl/protocol/out-js/decentraland/sdk/development/local_development.gen'
+import { debounce } from '../../../logic/debounce'
 
-function debounce<T extends (...args: any[]) => void>(callback: T, delay: number) {
-  let debounceTimer: NodeJS.Timeout
-  return (...args: Parameters<T>) => {
-    clearTimeout(debounceTimer)
-    debounceTimer = setTimeout(() => callback(...args), delay)
-  }
-}
 /**
  * This function gets file modification events and sends them to all the connected
  * websockets, it is used to hot-reload assets of the scene.

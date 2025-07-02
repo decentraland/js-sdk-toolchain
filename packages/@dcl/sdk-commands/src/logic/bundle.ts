@@ -17,6 +17,7 @@ import { CliError } from './error'
 import { getAllComposites } from './composite'
 import { isEditorScene } from './project-validations'
 import { watch } from 'chokidar'
+import { debounce } from './debounce'
 
 export type BundleComponents = Pick<CliComponents, 'logger' | 'fs'>
 
@@ -200,20 +201,24 @@ export async function bundleSingleProject(components: BundleComponents, options:
   if (options.watch) {
     // Instead of using esbuild's watch, we create our own watcher
     const watcher = watch('**/*.{ts,tsx,js,jsx}', {
-      ignored: ['**/dist/**', '**/*.crdt', '**/*.composite', path.dirname(options.outputFile) + '/**'],
+      ignored: ['**/dist/**', path.dirname(options.outputFile) + '/**'],
       ignoreInitial: true,
       cwd: options.workingDirectory
     })
 
-    watcher.on('all', async (event, path) => {
+    const debouncedRebuild = debounce(async () => {
       try {
-        printProgressInfo(components.logger, `File ${path} changed, rebuilding...`)
         await context.rebuild()
         printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
       } catch (err: any) {
         /* istanbul ignore next */
         components.logger.error(err.toString())
       }
+    }, 100)
+
+    watcher.on('all', async (event, path) => {
+      printProgressInfo(components.logger, `File ${path} changed, rebuilding...`)
+      debouncedRebuild()
     })
 
     // Do initial build
