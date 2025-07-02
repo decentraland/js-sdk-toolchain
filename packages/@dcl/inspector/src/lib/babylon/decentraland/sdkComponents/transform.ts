@@ -7,6 +7,8 @@ import { getRoot } from '../../../sdk/nodes'
 
 export const putTransformComponent: ComponentOperation = (entity, component) => {
   if (component.componentType === ComponentType.LastWriteWinElementSet) {
+    const gizmos = entity.context.deref()!.gizmos
+    gizmos.restoreParents()
     const newValue = component.getOrNull(entity.entityId) as TransformType | null
     const currentValue = entity.ecsComponentValues.transform
     entity.ecsComponentValues.transform = newValue || undefined
@@ -14,12 +16,6 @@ export const putTransformComponent: ComponentOperation = (entity, component) => 
 
     if (!currentValue && newValue) {
       needsReparenting = true
-      // Initialize with clean rotation for new entities
-      if (!entity.rotationQuaternion) {
-        entity.rotationQuaternion = Quaternion.Identity()
-      } else {
-        entity.rotationQuaternion.set(0, 0, 0, 1)
-      }
     } else if (currentValue && !newValue) {
       // remove current value
       needsReparenting = true
@@ -34,28 +30,20 @@ export const putTransformComponent: ComponentOperation = (entity, component) => 
     if (newValue) {
       needsReparenting ||= currentValue?.parent !== newValue.parent
       entity.position.set(newValue.position.x, newValue.position.y, newValue.position.z)
-
-      // Handle rotation conversion
-      if (!entity.rotationQuaternion) {
+      if (!entity.rotationQuaternion)
         entity.rotationQuaternion = new Quaternion(
           newValue.rotation.x,
           newValue.rotation.y,
           newValue.rotation.z,
           newValue.rotation.w
         )
-      } else {
-        // Ensure we're setting the quaternion components in the right order
+      else
         entity.rotationQuaternion.set(
           newValue.rotation.x,
           newValue.rotation.y,
           newValue.rotation.z,
           newValue.rotation.w
         )
-      }
-
-      // Normalize the quaternion to ensure it's valid
-      entity.rotationQuaternion.normalize()
-
       entity.scaling.set(newValue.scale.x, newValue.scale.y, newValue.scale.z)
     }
 
@@ -110,50 +98,19 @@ function reparentEntity(entity: EcsEntity) {
   }
 
   if (context) {
-    // If already parented to the right entity, do nothing
     if (entity.parent && (entity.parent as EcsEntity).entityId === parentEntityId) return
-
-    // Handle root parenting
     if (!parentEntityId) {
+      // parent with the scene root
       entity.parent = context.rootNode
-      return
-    }
-
-    // Handle parenting to another entity
-    const parentEntity = context.getEntityOrNull(parentEntityId)
-    if (parentEntity) {
-      if (!entity.ecsComponentValues.transform) {
-        // For new entities, set clean initial transforms
-        context.operations.updateValue(context.Transform, entity.entityId, {
-          position: { x: 0, y: 0, z: 0 },
-          rotation: { x: 0, y: 0, z: 0, w: 1 },
-          scale: { x: 1, y: 1, z: 1 },
-          parent: parentEntityId
-        })
+    } else {
+      // parent with other entity
+      const parentEntity = context.getEntityOrNull(parentEntityId)
+      if (parentEntity) {
+        // happy path, the parent entity already exists
         entity.parent = parentEntity
       } else {
-        // For existing entities, preserve their current transform values
-        const currentTransform = entity.ecsComponentValues.transform
-
-        // First update the parent in the ECS component
-        context.operations.updateValue(context.Transform, entity.entityId, {
-          position: { ...currentTransform.position },
-          rotation: { ...currentTransform.rotation },
-          scale: { ...currentTransform.scale },
-          parent: parentEntityId
-        })
-
-        // Then update the Babylon.js parent relationship
-        // This ensures the entity maintains its world transform
-        entity.computeWorldMatrix(true) // Force world matrix update
-        entity.parent = parentEntity
-        entity.computeWorldMatrix(true) // Force update after parenting
-
-        // Dispatch the changes
-        void context.operations.dispatch()
+        scheduleFutureReparenting(entity, parentEntityId)
       }
-    } else {
-      scheduleFutureReparenting(entity, parentEntityId)
     }
   }
 }
