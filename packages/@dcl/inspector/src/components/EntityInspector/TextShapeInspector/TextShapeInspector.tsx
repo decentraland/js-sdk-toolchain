@@ -50,6 +50,11 @@ export default withSdk<Props>(({ sdk, entity }) => {
         <TextField autoSelect label="Outline Width" type="number" {...getInputProps('outlineWidth')} />
       </Block>
       <Block>
+        <TextField autoSelect label="Width" type="number" {...getInputProps('width')} />
+        <TextField autoSelect label="Height" type="number" {...getInputProps('height')} />
+        <CheckboxField label="Text wrapping" {...getInputProps('textWrapping', (e) => e.target.checked)} />
+      </Block>
+      <Block>
         <ColorField label="Outline color" {...getInputProps('outlineColor')} />
       </Block>
     </Container>

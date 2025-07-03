@@ -18,4 +18,7 @@ export type TextShapeInput = {
   lineCount: string
   outlineColor: string
   textColor: string
+  width: string
+  height: string
+  textWrapping: boolean
 }
