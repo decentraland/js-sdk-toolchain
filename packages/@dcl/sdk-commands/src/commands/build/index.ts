@@ -84,7 +84,7 @@ export async function buildScene(options: Options, project: SceneProject | Weara
   const coords = getBaseCoords(sceneJson)
 
   options.components.analytics.track('Build scene', {
-    projectHash: await b64HashingFunction(project.workingDirectory),
+    projectHash: b64HashingFunction(project.workingDirectory),
     coords,
     isWorkspace: inputs.length > 1,
     isPortableExperience: !!sceneJson.isPortableExperience

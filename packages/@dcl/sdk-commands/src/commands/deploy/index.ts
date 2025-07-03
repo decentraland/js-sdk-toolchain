@@ -2,6 +2,7 @@ import { resolve } from 'path'
 import { EntityType, ChainId, getChainName } from '@dcl/schemas'
 import { DeploymentBuilder } from 'dcl-catalyst-client'
 import future from 'fp-future'
+import i18next from 'i18next'
 
 import { CliComponents } from '../../components'
 import { getBaseCoords, getFiles, getValidSceneJson, validateFilesSizes } from '../../logic/scene-validations'
@@ -22,6 +23,11 @@ interface Options {
   components: CliComponents
 }
 
+interface ProgrammaticDeployResult {
+  finish: () => Promise<void>
+  stop: () => Promise<void>
+}
+
 export const args = declareArgs({
   '--dir': String,
   '--help': Boolean,
@@ -39,7 +45,8 @@ export const args = declareArgs({
   '--no-browser': Boolean,
   '-b': '--no-browser',
   '--port': Number,
-  '-p': '--port'
+  '-p': '--port',
+  '--programmatic': Boolean
 })
 
 export function help(options: Options) {
@@ -54,38 +61,42 @@ export function help(options: Options) {
       --skip-version-checks     Skip the ECS and CLI version checks, avoid the warning message and launch anyway
       --skip-build              Skip build before deploy
       --skip-validations        Skip permissions verifications on the client side when deploying content
+      --programmatic            Enable programmatic mode - returns a promise that resolves when deployment completes
 
     Example:
     - Deploy your scene:
       $ sdk-commands deploy
     - Deploy your scene to a specific content server:
       $ sdk-commands deploy --target my-favorite-catalyst-server.org:2323
+    - Deploy programmatically:
+      $ sdk-commands deploy --programmatic
 `)
 }
 
-export async function main(options: Options) {
+export async function main(options: Options): Promise<ProgrammaticDeployResult | void> {
   const projectRoot = resolve(process.cwd(), options.args['--dir'] || '.')
   const workspace = await getValidWorkspace(options.components, projectRoot)
   const project = workspace.projects[0]
   const openBrowser = !options.args['--no-browser']
   const skipBuild = options.args['--skip-build']
   const linkerPort = options.args['--port']
+  const isProgrammatic = options.args['--programmatic']
 
   if (workspace.projects.length !== 1) {
-    throw new CliError('Workspace is not supported for deploy command.')
+    throw new CliError('DEPLOY_WORKSPACE_NOT_SUPPORTED', i18next.t('errors.deploy.workspace_not_supported'))
   }
   if (project.kind !== 'scene') {
-    throw new CliError('You can only deploy scenes.')
+    throw new CliError('DEPLOY_INVALID_PROJECT_TYPE', i18next.t('errors.deploy.invalid_project_type'))
   }
   if (options.args['--target'] && options.args['--target-content']) {
-    throw new CliError(`You can't set both the 'target' and 'target-content' arguments.`)
+    throw new CliError('DEPLOY_INVALID_ARGUMENTS', i18next.t('errors.deploy.invalid_arguments'))
   }
 
   const sceneJson = await getValidSceneJson(options.components, projectRoot, { log: true })
   const coords = getBaseCoords(sceneJson)
   const isWorld = sceneHasWorldCfg(sceneJson)
   const trackProps: Events['Scene deploy started'] = {
-    projectHash: await b64HashingFunction(projectRoot),
+    projectHash: b64HashingFunction(projectRoot),
     coords,
     isWorld
   }
@@ -107,8 +118,8 @@ export async function main(options: Options) {
   const files = await getFiles(options.components, projectRoot)
   validateFilesSizes(files)
 
-  const contentFiles = new Map(files.map((file) => [file.path, file.content]))
-  const trackFeatures = await analyticsFeatures(options.components, sceneJson.main)
+  const contentFiles = new Map(files.map((file) => [file.path, new Uint8Array(file.content)]))
+  const trackFeatures = await analyticsFeatures(options.components, resolve(projectRoot, sceneJson.main))
 
   const { entityId, files: entityFiles } = await DeploymentBuilder.buildEntity({
     type: EntityType.SCENE,
@@ -137,6 +148,20 @@ export async function main(options: Options) {
     },
     deployEntity
   )
+
+  // Programmatic mode early return
+  if (isProgrammatic) {
+    return {
+      finish: async () => {
+        const result = await awaitResponse
+        void program?.stop()
+        return result
+      },
+      stop: async () => {
+        void program?.stop()
+      }
+    }
+  }
 
   try {
     // Keep the CLI live till the user signs the payload
@@ -190,7 +215,11 @@ export async function main(options: Options) {
       options.components.logger.error('Could not upload content:')
       options.components.logger.error(e.message)
       options.components.analytics.track('Scene deploy failure', { ...trackProps, error: e.message ?? '' })
-      throw e
+      throw new CliError(
+        'DEPLOY_UPLOAD_FAILED',
+        i18next.t('errors.deploy.failed_to_upload', { error: e.message }),
+        e.stack
+      )
     }
   }
 }
