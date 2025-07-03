@@ -200,10 +200,9 @@ export async function bundleSingleProject(components: BundleComponents, options:
   /* istanbul ignore if */
   if (options.watch) {
     // Instead of using esbuild's watch, we create our own watcher
-    const watcher = watch('**/*.{ts,tsx,js,jsx}', {
-      ignored: ['**/dist/**', path.dirname(options.outputFile) + '/**'],
-      ignoreInitial: true,
-      cwd: options.workingDirectory
+    const watcher = watch(path.resolve(options.workingDirectory), {
+      ignored: ['**/dist/**', '**/*.crdt', '**/*.composite', path.resolve(options.outputFile)],
+      ignoreInitial: true
     })
 
     const debouncedRebuild = debounce(async () => {
@@ -216,9 +215,12 @@ export async function bundleSingleProject(components: BundleComponents, options:
       }
     }, 100)
 
-    watcher.on('all', async (event, path) => {
-      printProgressInfo(components.logger, `File ${path} changed, rebuilding...`)
-      debouncedRebuild()
+    watcher.on('all', async (event, filePath) => {
+      // Only rebuild for TypeScript and JavaScript files
+      if (/\.(ts|tsx|js|jsx)$/.test(filePath)) {
+        printProgressInfo(components.logger, `File ${filePath} changed, rebuilding...`)
+        debouncedRebuild()
+      }
     })
 
     // Do initial build
