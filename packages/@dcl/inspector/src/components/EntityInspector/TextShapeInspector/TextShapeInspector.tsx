@@ -8,11 +8,13 @@ import { Container } from '../../Container'
 import { TextField, CheckboxField, ColorField, Dropdown, TextArea } from '../../ui'
 import { Props } from './types'
 import { fromTextShape, toTextShape, isValidInput, TEXT_ALIGN_MODES } from './utils'
+import { useComponentValue } from '../../../hooks/sdk/useComponentValue'
 
 export default withSdk<Props>(({ sdk, entity }) => {
   const { TextShape } = sdk.components
 
   const hasTextShape = useHasComponent(entity, TextShape)
+  const [componentValue, _] = useComponentValue(entity, TextShape)
   const { getInputProps } = useComponentInput(entity, TextShape, fromTextShape, toTextShape, isValidInput)
 
   const handleRemove = useCallback(async () => {
@@ -32,7 +34,11 @@ export default withSdk<Props>(({ sdk, entity }) => {
       </Block>
       <Block label="Font Size">
         <TextField autoSelect type="number" {...getInputProps('fontSize')} />
-        <CheckboxField label="Font Auto-Size" {...getInputProps('fontAutoSize', (e) => e.target.checked)} />
+        <CheckboxField
+          label="Font Auto-Size"
+          {...getInputProps('fontAutoSize', (e) => e.target.checked)}
+          checked={componentValue.fontAutoSize}
+        />
       </Block>
       <Block label="Text Align">
         <Dropdown options={TEXT_ALIGN_MODES} {...getInputProps('textAlign')} />
@@ -52,7 +58,11 @@ export default withSdk<Props>(({ sdk, entity }) => {
       <Block>
         <TextField autoSelect label="Width" type="number" {...getInputProps('width')} />
         <TextField autoSelect label="Height" type="number" {...getInputProps('height')} />
-        <CheckboxField label="Text wrapping" {...getInputProps('textWrapping', (e) => e.target.checked)} />
+        <CheckboxField
+          label="Text wrapping"
+          {...getInputProps('textWrapping', (e) => e.target.checked)}
+          checked={componentValue.textWrapping}
+        />
       </Block>
       <Block>
         <ColorField label="Outline color" {...getInputProps('outlineColor')} />
