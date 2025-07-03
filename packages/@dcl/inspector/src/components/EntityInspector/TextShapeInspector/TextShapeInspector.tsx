@@ -39,6 +39,11 @@ export default withSdk<Props>(({ sdk, entity }) => {
           {...getInputProps('fontAutoSize', (e) => e.target.checked)}
           checked={componentValue.fontAutoSize}
         />
+        <CheckboxField
+          label="Text wrapping"
+          {...getInputProps('textWrapping', (e) => e.target.checked)}
+          checked={componentValue.textWrapping}
+        />
       </Block>
       <Block label="Text Align">
         <Dropdown options={TEXT_ALIGN_MODES} {...getInputProps('textAlign')} />
@@ -58,11 +63,6 @@ export default withSdk<Props>(({ sdk, entity }) => {
       <Block>
         <TextField autoSelect label="Width" type="number" {...getInputProps('width')} />
         <TextField autoSelect label="Height" type="number" {...getInputProps('height')} />
-        <CheckboxField
-          label="Text wrapping"
-          {...getInputProps('textWrapping', (e) => e.target.checked)}
-          checked={componentValue.textWrapping}
-        />
       </Block>
       <Block>
         <ColorField label="Outline color" {...getInputProps('outlineColor')} />
