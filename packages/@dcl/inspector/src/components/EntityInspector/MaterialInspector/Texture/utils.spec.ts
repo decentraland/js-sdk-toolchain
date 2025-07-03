@@ -60,7 +60,9 @@ describe('fromTexture', () => {
         texture: {
           src: 'image.png',
           wrapMode: TextureWrapMode.TWM_REPEAT,
-          filterMode: TextureFilterMode.TFM_TRILINEAR
+          filterMode: TextureFilterMode.TFM_TRILINEAR,
+          offset: { x: 0.5, y: 0.25 },
+          tiling: { x: 2.0, y: 1.5 }
         }
       }
     }
@@ -71,10 +73,37 @@ describe('fromTexture', () => {
     expect(result.src).toBe('image.png')
     expect(result.wrapMode).toBe(String(TextureWrapMode.TWM_REPEAT))
     expect(result.filterMode).toBe(String(TextureFilterMode.TFM_TRILINEAR))
+    expect(result.offset).toEqual({ x: '0.50', y: '0.25' })
+    expect(result.tiling).toEqual({ x: '2.00', y: '1.50' })
   })
 
   it('should convert from texture without a base path', () => {
     const base = ''
+    const value: TextureUnion = {
+      tex: {
+        $case: 'texture',
+        texture: {
+          src: 'image.png',
+          wrapMode: TextureWrapMode.TWM_REPEAT,
+          filterMode: TextureFilterMode.TFM_TRILINEAR,
+          offset: { x: 0, y: 0 },
+          tiling: { x: 1, y: 1 }
+        }
+      }
+    }
+
+    const result = fromTexture(base, value)
+
+    expect(result.type).toBe(Texture.TT_TEXTURE)
+    expect(result.src).toBe('image.png')
+    expect(result.wrapMode).toBe(String(TextureWrapMode.TWM_REPEAT))
+    expect(result.filterMode).toBe(String(TextureFilterMode.TFM_TRILINEAR))
+    expect(result.offset).toEqual({ x: '0.00', y: '0.00' })
+    expect(result.tiling).toEqual({ x: '1.00', y: '1.00' })
+  })
+
+  it('should convert from texture with default offset and tiling when not provided', () => {
+    const base = 'base-path'
     const value: TextureUnion = {
       tex: {
         $case: 'texture',
@@ -92,6 +121,33 @@ describe('fromTexture', () => {
     expect(result.src).toBe('image.png')
     expect(result.wrapMode).toBe(String(TextureWrapMode.TWM_REPEAT))
     expect(result.filterMode).toBe(String(TextureFilterMode.TFM_TRILINEAR))
+    expect(result.offset).toEqual({ x: '0', y: '0' })
+    expect(result.tiling).toEqual({ x: '1', y: '1' })
+  })
+
+  it('should convert from texture with different offset and tiling values', () => {
+    const base = 'base-path'
+    const value: TextureUnion = {
+      tex: {
+        $case: 'texture',
+        texture: {
+          src: 'image.png',
+          wrapMode: TextureWrapMode.TWM_REPEAT,
+          filterMode: TextureFilterMode.TFM_TRILINEAR,
+          offset: { x: 0.1, y: 0.3 },
+          tiling: { x: 2.5, y: 3.0 }
+        }
+      }
+    }
+
+    const result = fromTexture(base, value)
+
+    expect(result.type).toBe(Texture.TT_TEXTURE)
+    expect(result.src).toBe('image.png')
+    expect(result.wrapMode).toBe(String(TextureWrapMode.TWM_REPEAT))
+    expect(result.filterMode).toBe(String(TextureFilterMode.TFM_TRILINEAR))
+    expect(result.offset).toEqual({ x: '0.10', y: '0.30' })
+    expect(result.tiling).toEqual({ x: '2.50', y: '3.00' })
   })
 })
 
@@ -130,7 +186,28 @@ describe('toTexture', () => {
     expect(result.tex.videoTexture.filterMode).toBe(TextureFilterMode.TFM_POINT)
   })
 
-  it('should convert to texture', () => {
+  it('should convert to texture with offset and tiling', () => {
+    const base = 'base-path'
+    const value: TextureInput = {
+      type: Texture.TT_TEXTURE,
+      src: 'image.png',
+      wrapMode: String(TextureWrapMode.TWM_REPEAT),
+      filterMode: String(TextureFilterMode.TFM_POINT),
+      offset: { x: '0.5', y: '0.25' },
+      tiling: { x: '2.0', y: '1.5' }
+    }
+
+    const result = toTexture(base, value) as { tex: { $case: 'texture'; texture: EcsTexture } }
+
+    expect(result.tex.$case).toBe('texture')
+    expect(result.tex.texture.src).toBe('base-path/image.png')
+    expect(result.tex.texture.wrapMode).toBe(TextureWrapMode.TWM_REPEAT)
+    expect(result.tex.texture.filterMode).toBe(TextureFilterMode.TFM_POINT)
+    expect(result.tex.texture.offset).toEqual({ x: 0.5, y: 0.25 })
+    expect(result.tex.texture.tiling).toEqual({ x: 2.0, y: 1.5 })
+  })
+
+  it('should convert to texture with default offset and tiling when not provided', () => {
     const base = 'base-path'
     const value: TextureInput = {
       type: Texture.TT_TEXTURE,
@@ -145,6 +222,29 @@ describe('toTexture', () => {
     expect(result.tex.texture.src).toBe('base-path/image.png')
     expect(result.tex.texture.wrapMode).toBe(TextureWrapMode.TWM_REPEAT)
     expect(result.tex.texture.filterMode).toBe(TextureFilterMode.TFM_POINT)
+    expect(result.tex.texture.offset).toEqual({ x: 0, y: 0 })
+    expect(result.tex.texture.tiling).toEqual({ x: 1, y: 1 })
+  })
+
+  it('should convert to texture with different offset and tiling values', () => {
+    const base = 'base-path'
+    const value: TextureInput = {
+      type: Texture.TT_TEXTURE,
+      src: 'image.png',
+      wrapMode: String(TextureWrapMode.TWM_REPEAT),
+      filterMode: String(TextureFilterMode.TFM_POINT),
+      offset: { x: '0.1', y: '0.3' },
+      tiling: { x: '2.5', y: '3.0' }
+    }
+
+    const result = toTexture(base, value) as { tex: { $case: 'texture'; texture: EcsTexture } }
+
+    expect(result.tex.$case).toBe('texture')
+    expect(result.tex.texture.src).toBe('base-path/image.png')
+    expect(result.tex.texture.wrapMode).toBe(TextureWrapMode.TWM_REPEAT)
+    expect(result.tex.texture.filterMode).toBe(TextureFilterMode.TFM_POINT)
+    expect(result.tex.texture.offset).toEqual({ x: 0.1, y: 0.3 })
+    expect(result.tex.texture.tiling).toEqual({ x: 2.5, y: 3.0 })
   })
 })
 

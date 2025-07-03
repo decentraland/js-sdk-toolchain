@@ -117,7 +117,12 @@ async function loadTexture(entity: EcsEntity, tx: TextureUnion['tex']): Promise<
         if (!content) return null
         const textureBlob = new Blob([content])
         const textureUrl = URL.createObjectURL(textureBlob)
-        return new Texture(textureUrl, entity.getScene(), true, true)
+        const texture = new Texture(textureUrl, entity.getScene(), true, true)
+        texture.uOffset = tx.texture.offset?.x ?? 0
+        texture.vOffset = tx.texture.offset?.y ?? 0
+        texture.uScale = tx.texture.tiling?.x ?? 1
+        texture.vScale = tx.texture.tiling?.y ?? 1
+        return texture
       })
   }
 
