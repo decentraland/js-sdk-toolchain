@@ -2965,7 +2965,7 @@ export namespace PBRealmInfo {
 
 // @public (undocumented)
 export interface PBSkyboxTime {
-    fixedTimeOfDay: number;
+    fixedTime: number;
     transitionMode?: TransitionMode | undefined;
 }
 
