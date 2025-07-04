@@ -11,14 +11,8 @@ import {
   WsSceneMessage,
   UpdateModelType
 } from '@dcl/protocol/out-js/decentraland/sdk/development/local_development.gen'
+import { debounce } from '../../../logic/debounce'
 
-function debounce<T extends (...args: any[]) => void>(callback: T, delay: number) {
-  let debounceTimer: NodeJS.Timeout
-  return (...args: Parameters<T>) => {
-    clearTimeout(debounceTimer)
-    debounceTimer = setTimeout(() => callback(...args), delay)
-  }
-}
 /**
  * This function gets file modification events and sends them to all the connected
  * websockets, it is used to hot-reload assets of the scene.
@@ -26,13 +20,14 @@ function debounce<T extends (...args: any[]) => void>(callback: T, delay: number
  * IMPORTANT: this is a legacy protocol and needs to be revisited for SDK7
  */
 export async function wireFileWatcherToWebSockets(
-  components: Pick<PreviewComponents, 'fs' | 'ws'>,
+  components: Pick<PreviewComponents, 'fs' | 'ws' | 'logger'>,
   projectRoot: string,
   projectKind: ProjectUnion['kind'],
   desktopClient: boolean
 ) {
   const ignored = await getDCLIgnorePatterns(components, projectRoot)
   const sceneId = b64HashingFunction(projectRoot)
+
   chokidar
     .watch(path.resolve(projectRoot), {
       atomic: false,
@@ -52,7 +47,7 @@ export async function wireFileWatcherToWebSockets(
           updateScene(sceneId, file)
         }
         return __LEGACY__updateScene(projectRoot, sceneUpdateClients, projectKind)
-      }, 500)
+      }, 800)
     )
 }
 

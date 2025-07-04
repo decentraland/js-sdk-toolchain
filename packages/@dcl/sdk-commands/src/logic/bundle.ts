@@ -16,6 +16,8 @@ import { printProgressInfo, printProgressStep, printWarning } from './beautiful-
 import { CliError } from './error'
 import { getAllComposites } from './composite'
 import { isEditorScene } from './project-validations'
+import { watch } from 'chokidar'
+import { debounce } from './debounce'
 
 export type BundleComponents = Pick<CliComponents, 'logger' | 'fs'>
 
@@ -197,9 +199,34 @@ export async function bundleSingleProject(components: BundleComponents, options:
 
   /* istanbul ignore if */
   if (options.watch) {
-    await context.watch({})
+    // Instead of using esbuild's watch, we create our own watcher
+    const watcher = watch(path.resolve(options.workingDirectory), {
+      ignored: ['**/dist/**', '**/*.crdt', '**/*.composite', path.resolve(options.outputFile)],
+      ignoreInitial: true
+    })
 
+    const debouncedRebuild = debounce(async () => {
+      try {
+        await context.rebuild()
+        printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
+      } catch (err: any) {
+        /* istanbul ignore next */
+        components.logger.error(err.toString())
+      }
+    }, 100)
+
+    watcher.on('all', async (event, filePath) => {
+      // Only rebuild for TypeScript and JavaScript files
+      if (/\.(ts|tsx|js|jsx)$/.test(filePath)) {
+        printProgressInfo(components.logger, `File ${filePath} changed, rebuilding...`)
+        debouncedRebuild()
+      }
+    })
+
+    // Do initial build
+    await context.rebuild()
     printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
+    printProgressInfo(components.logger, `The compiler is watching for changes`)
   } else {
     try {
       await context.rebuild()
