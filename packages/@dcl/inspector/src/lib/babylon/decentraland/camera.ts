@@ -4,7 +4,7 @@ import mitt, { Emitter } from 'mitt'
 
 import { Keys, keyState } from './keys'
 import { EcsEntity } from './EcsEntity'
-import { RIGHT_BUTTON } from './mouse-utils'
+import { LEFT_BUTTON, RIGHT_BUTTON } from './mouse-utils'
 import { fitSphereIntoCameraFrustum } from '../../logic/math'
 import { PARCEL_SIZE } from '../../utils/scene'
 
@@ -140,7 +140,7 @@ export class CameraManager {
     const mouseInput = camera.inputs.attached.mouse as BABYLON.FreeCameraMouseInput
     camera.target = center
 
-    mouseInput.buttons = [RIGHT_BUTTON] // disable all buttons except right mouse button
+    mouseInput.buttons = [RIGHT_BUTTON] // move camera with right mouse button only
 
     camera.inertia = 0
     camera.speed = this.speeds[this.speedIndex]
@@ -163,18 +163,30 @@ export class CameraManager {
       return false
     }
 
-    let holdingMouseButton = false
+    scene.onPreKeyboardObservable.add((ev) => {
+      const isAltKeyDown = ev.type === BABYLON.KeyboardEventTypes.KEYDOWN && ev.event.inputIndex === Keys.KEY_ALT
+
+      if (isAltKeyDown) {
+        mouseInput.buttons = [LEFT_BUTTON, RIGHT_BUTTON] // move camera with left/right mouse buttons
+      } else {
+        mouseInput.buttons = [RIGHT_BUTTON] // move camera with right mouse button only
+        // reattach control to avoid camera sticking to the pointer bug...
+        this.reattachControl()
+      }
+    })
+
+    let holdingRightMouseButton = false
     scene.onPointerObservable.add((ev) => {
       if (ev.type === BABYLON.PointerEventTypes.POINTERDOWN && ev.event.button === RIGHT_BUTTON) {
-        holdingMouseButton = true
+        holdingRightMouseButton = true
       }
       if (ev.type === BABYLON.PointerEventTypes.POINTERUP && ev.event.button === RIGHT_BUTTON) {
-        holdingMouseButton = false
+        holdingRightMouseButton = false
       }
       if (ev.type === BABYLON.PointerEventTypes.POINTERWHEEL) {
         const browserEvent = ev.event as BABYLON.IWheelEvent
 
-        if (holdingMouseButton || isCameraMoving()) {
+        if (holdingRightMouseButton || isCameraMoving()) {
           if (browserEvent.deltaY < 0) this.changeSpeed(SpeedIncrement.FASTER)
           else if (browserEvent.deltaY > 0) this.changeSpeed(SpeedIncrement.SLOWER)
         } else {

@@ -1,4 +1,9 @@
 import { createWallet } from '../../../packages/@dcl/sdk-commands/src/logic/account'
+import { initLanguage, Language } from '../../../packages/@dcl/sdk-commands/src/logic/lang'
+
+beforeAll(async () => {
+  await initLanguage(Language.EN)
+})
 
 test('creates a valid eth account without prefix', async () => {
   const w = createWallet('236297b78470821df5d5966fb14d767f8c0ad7db73ba2cdfad675dabbf72b2f0')

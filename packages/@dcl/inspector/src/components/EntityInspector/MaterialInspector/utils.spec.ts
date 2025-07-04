@@ -32,7 +32,14 @@ describe('fromMaterial', () => {
     expect(result.alphaTest).toBe('0.75')
     expect(result.castShadows).toBe(true)
     expect(result.diffuseColor).toEqual('#FF0000')
-    expect(result.texture).toEqual({ type: 'texture', src: 'some-src', wrapMode: '0', filterMode: '0' })
+    expect(result.texture).toEqual({
+      type: 'texture',
+      src: 'some-src',
+      wrapMode: '0',
+      filterMode: '0',
+      offset: { x: '0', y: '0' },
+      tiling: { x: '1', y: '1' }
+    })
   })
 
   it('should convert from pbr material', () => {
@@ -71,7 +78,14 @@ describe('fromMaterial', () => {
     expect(result.type).toBe(MaterialType.MT_PBR)
     expect(result.alphaTest).toBe('0.6')
     expect(result.castShadows).toBe(false)
-    expect(result.texture).toEqual({ type: 'texture', src: 'some-src', wrapMode: '0', filterMode: '0' })
+    expect(result.texture).toEqual({
+      type: 'texture',
+      src: 'some-src',
+      wrapMode: '0',
+      filterMode: '0',
+      offset: { x: '0', y: '0' },
+      tiling: { x: '1', y: '1' }
+    })
     expect(result.bumpTexture).toEqual({ type: 'avatarTexture', userId: 'some-id', wrapMode: '2', filterMode: '2' })
     expect(result.metallic).toBe('0.5')
     expect(result.specularIntensity).toBe('1')
@@ -108,7 +122,9 @@ describe('toMaterial', () => {
         texture: {
           src: 'base-path/some-src',
           wrapMode: 1,
-          filterMode: 1
+          filterMode: 1,
+          offset: { x: 0, y: 0 },
+          tiling: { x: 1, y: 1 }
         }
       }
     })
@@ -147,7 +163,9 @@ describe('toMaterial', () => {
         texture: {
           src: 'base-path/some-src',
           wrapMode: 1,
-          filterMode: 1
+          filterMode: 1,
+          offset: { x: 0, y: 0 },
+          tiling: { x: 1, y: 1 }
         }
       }
     })

@@ -2,14 +2,17 @@ import { useCallback } from 'react'
 
 import { InfoTooltip } from '../../ui'
 import { formatFileName } from '../utils'
-import { Button } from '../../Button'
 
 import { PropTypes } from './types'
 
 import './Error.css'
 import { ValidationError } from '../types'
 
-export function Error({ assets, onSubmit }: PropTypes) {
+import cx from 'classnames'
+import { Button } from '../../Button'
+
+export function Error(props: PropTypes) {
+  const { assets, errorMessage, primaryAction, secondaryAction } = props
   const getErrorMessage = useCallback((error: ValidationError): string => {
     switch (error?.type) {
       case 'type':
@@ -19,20 +22,32 @@ export function Error({ assets, onSubmit }: PropTypes) {
       case 'size':
         return 'File size is too large'
       default:
-        return 'Unknown error'
+        return ''
     }
   }, [])
 
   return (
     <div className="ImportError">
       <div className="alert-icon"></div>
-      <h2>Asset failed to import</h2>
+      <h3>{errorMessage}</h3>
       <div className="errors">
         {assets.map(($, i) => $.error && <ErrorMessage key={i} asset={$} message={getErrorMessage($.error)} />)}
       </div>
-      <Button type="danger" size="big" onClick={onSubmit}>
-        OK
-      </Button>
+      <div
+        className={cx('actions-container', {
+          'space-between': !!secondaryAction,
+          'flex-end': !secondaryAction
+        })}
+      >
+        {!!secondaryAction && (
+          <Button onClick={secondaryAction.onClick} size="big">
+            {secondaryAction.name}
+          </Button>
+        )}
+        <Button onClick={primaryAction.onClick} type="danger" size="big">
+          {primaryAction.name}
+        </Button>
+      </div>
     </div>
   )
 }
@@ -41,7 +56,9 @@ function ErrorMessage({ asset, message }: { asset: PropTypes['assets'][0]; messa
   const errorMessage = asset.error?.message
   return (
     <span>
-      {formatFileName(asset)} - {message} {errorMessage && <InfoTooltip text={errorMessage} type="help" />}
+      {formatFileName(asset)}
+      {message && ` - ${message}`}
+      {errorMessage && <InfoTooltip text={errorMessage} type="help" />}
     </span>
   )
 }

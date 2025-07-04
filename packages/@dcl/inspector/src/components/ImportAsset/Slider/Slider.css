@@ -62,7 +62,7 @@
 
 .Slider .asset .name-error {
   font-size: 12px;
-  color: var(--primary-main)
+  color: var(--yellow);
 }
 
 .Slider .asset .size {
