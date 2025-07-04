@@ -6,7 +6,7 @@ describe('Generated SkyboxTime ProtoBuf', () => {
     const skyboxTime = components.SkyboxTime(engine)
 
     testComponentSerialization(skyboxTime, {
-      fixedTimeOfDay: 0,
+      fixedTime: 0,
       transitionMode: TransitionMode.TM_FORWARD
     })
   })
