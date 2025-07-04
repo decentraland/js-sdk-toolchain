@@ -221,6 +221,7 @@ export function createGizmoManager(context: SceneContext) {
     if (!node.rotationQuaternion) {
       node.rotationQuaternion = Quaternion.Identity()
     }
+    // Don't reset rotation if it already exists - let the gizmo transformers handle rotation
 
     node.computeWorldMatrix(true)
     gizmoManager.attachToNode(node)
@@ -274,7 +275,7 @@ export function createGizmoManager(context: SceneContext) {
 
   const setupFreeTransformerChangeHandler = (transformer: IGizmoTransformer) => {
     transformer.onChange(() => {
-      selectedEntities.forEach(updateEntityTransform)
+      selectedEntities.forEach(updateEntityPosition)
       void context.operations.dispatch()
     })
   }
@@ -346,8 +347,6 @@ export function createGizmoManager(context: SceneContext) {
       return [GizmoType.POSITION, GizmoType.ROTATION, GizmoType.SCALE, GizmoType.FREE] as const
     },
     setGizmoType(type: GizmoType) {
-      console.log('[GizmoManager] Setting gizmo type:', type)
-
       // First clean up all observers
       cleanupAllGizmoObservers()
 
@@ -366,6 +365,7 @@ export function createGizmoManager(context: SceneContext) {
       switch (type) {
         case GizmoType.POSITION: {
           currentTransformer = positionTransformer
+          currentTransformer.setup()
           gizmoManager.positionGizmoEnabled = true
           if (gizmoManager.gizmos.positionGizmo) {
             const positionGizmo = gizmoManager.gizmos.positionGizmo
@@ -400,6 +400,7 @@ export function createGizmoManager(context: SceneContext) {
         }
         case GizmoType.ROTATION: {
           currentTransformer = rotationTransformer
+          currentTransformer.setup()
           gizmoManager.rotationGizmoEnabled = true
           if (gizmoManager.gizmos.rotationGizmo) {
             const rotationGizmo = gizmoManager.gizmos.rotationGizmo
@@ -476,6 +477,7 @@ export function createGizmoManager(context: SceneContext) {
         }
         case GizmoType.SCALE: {
           currentTransformer = scaleTransformer
+          currentTransformer.setup()
           gizmoManager.scaleGizmoEnabled = true
           if (gizmoManager.gizmos.scaleGizmo) {
             const scaleGizmo = gizmoManager.gizmos.scaleGizmo
@@ -508,14 +510,14 @@ export function createGizmoManager(context: SceneContext) {
           }
           break
         }
-        case GizmoType.FREE:
+        case GizmoType.FREE: {
           currentTransformer = freeTransformer
+          currentTransformer.setup()
+          const node = getGizmoNode()
+          currentTransformer.onDragStart(selectedEntities, node)
+          currentTransformer.update(selectedEntities, node)
           break
-      }
-
-      // Setup the new transformer
-      if (currentTransformer) {
-        currentTransformer.setup()
+        }
       }
     },
     isPositionGizmoWorldAligned() {

@@ -1,4 +1,4 @@
-import { Vector3, TransformNode, GizmoManager, Matrix, Quaternion } from '@babylonjs/core'
+import { Vector3, TransformNode, GizmoManager, Quaternion } from '@babylonjs/core'
 import { Entity } from '@dcl/ecs'
 import { EcsEntity } from '../EcsEntity'
 import { IGizmoTransformer } from './types'
