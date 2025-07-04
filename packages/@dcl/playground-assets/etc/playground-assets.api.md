@@ -653,6 +653,7 @@ export const componentDefinitionByName: {
     "core::Raycast": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycast>>;
     "core::RaycastResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycastResult>>;
     "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
+    "core::SkyboxTime": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSkyboxTime>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
     "core::TweenSequence": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenSequence>>;
@@ -2963,6 +2964,20 @@ export namespace PBRealmInfo {
 }
 
 // @public (undocumented)
+export interface PBSkyboxTime {
+    fixedTime: number;
+    transitionMode?: TransitionMode | undefined;
+}
+
+// @public (undocumented)
+export namespace PBSkyboxTime {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBSkyboxTime;
+    // (undocumented)
+    export function encode(message: PBSkyboxTime, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBTextShape {
     font?: Font | undefined;
     fontAutoSize?: boolean | undefined;
@@ -4013,6 +4028,9 @@ export namespace Schemas {
 }
 
 // @public (undocumented)
+export const SkyboxTime: LastWriteWinElementSetComponentDefinition<PBSkyboxTime>;
+
+// @public (undocumented)
 export interface Spec {
     // (undocumented)
     [key: string]: ISchema;
@@ -4243,6 +4261,12 @@ export type TransformType = {
 
 // @public (undocumented)
 export type TransformTypeWithOptionals = Partial<TransformType>;
+
+// @public (undocumented)
+export const enum TransitionMode {
+    TM_BACKWARD = 1,
+    TM_FORWARD = 0
+}
 
 // @public (undocumented)
 export type Transport = {
