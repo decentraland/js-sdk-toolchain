@@ -33,7 +33,15 @@ export const fromTexture = (base: string, value: TextureUnion): TextureInput => 
         type: Texture.TT_TEXTURE,
         src: isValidHttpsUrl(src) ? src : removeBasePath(base, src),
         wrapMode: toString(value?.tex?.texture.wrapMode),
-        filterMode: toString(value?.tex?.texture.filterMode)
+        filterMode: toString(value?.tex?.texture.filterMode),
+        offset: {
+          x: value?.tex?.texture.offset?.x?.toFixed(2) ?? '0',
+          y: value?.tex?.texture.offset?.y?.toFixed(2) ?? '0'
+        },
+        tiling: {
+          x: value?.tex?.texture.tiling?.x?.toFixed(2) ?? '1',
+          y: value?.tex?.texture.tiling?.y?.toFixed(2) ?? '1'
+        }
       }
   }
 }
@@ -70,7 +78,15 @@ export const toTexture = (base: string, value?: TextureInput): TextureUnion => {
           texture: {
             src: isValidHttpsUrl(src) ? src : (src && base ? base + '/' : '') + src,
             wrapMode: toNumber(value?.wrapMode ?? '0', TextureWrapMode.TWM_REPEAT),
-            filterMode: toNumber(value?.filterMode ?? '0', TextureFilterMode.TFM_POINT)
+            filterMode: toNumber(value?.filterMode ?? '0', TextureFilterMode.TFM_POINT),
+            offset: {
+              x: toNumber(value?.offset?.x ?? '0'),
+              y: toNumber(value?.offset?.y ?? '0')
+            },
+            tiling: {
+              x: toNumber(value?.tiling?.x ?? '1'),
+              y: toNumber(value?.tiling?.y ?? '1')
+            }
           }
         }
       }

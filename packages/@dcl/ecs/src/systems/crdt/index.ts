@@ -22,6 +22,9 @@ import {
 import { INetowrkEntityType } from '../../components/types'
 import * as networkUtils from '../../serialization/crdt/network/utils'
 
+// NetworkMessages can only have a MAX_SIZE of 12kb. So we need to send it in chunks.
+export const LIVEKIT_MAX_SIZE = 12
+
 /**
  * @public
  */
@@ -245,8 +248,6 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
     // Send CRDT messages to transports
     const transportBuffer = new ReadWriteByteBuffer()
     for (const index in transports) {
-      // NetworkMessages can only have a MAX_SIZE of 13kb. So we need to send it in chunks.
-      const LIVEKIT_MAX_SIZE = 13
       const __NetworkMessagesBuffer: Uint8Array[] = []
 
       const transportIndex = Number(index)
@@ -260,10 +261,25 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
 
       // Then we send all the new crdtMessages that the transport needs to process
       for (const message of crdtMessages) {
-        if (isNetworkTransport && transportBuffer.toBinary().byteLength / 1024 > LIVEKIT_MAX_SIZE) {
-          __NetworkMessagesBuffer.push(transportBuffer.toBinary())
-          transportBuffer.resetBuffer()
+        // Check if adding this message would exceed the size limit
+        const currentBufferSize = transportBuffer.toBinary().byteLength
+        const messageSize = message.messageBuffer.byteLength
+
+        if (isNetworkTransport && (currentBufferSize + messageSize) / 1024 > LIVEKIT_MAX_SIZE) {
+          // If the current buffer has content, save it as a chunk
+          if (currentBufferSize > 0) {
+            __NetworkMessagesBuffer.push(transportBuffer.toCopiedBinary())
+            transportBuffer.resetBuffer()
+          }
+
+          // If the message itself is larger than the limit, we need to handle it specially
+          // For now, we'll skip it to prevent infinite loops
+          if (messageSize / 1024 > LIVEKIT_MAX_SIZE) {
+            console.error(`Message too large (${messageSize} bytes), skipping message for entity ${message.entityId}`)
+            continue
+          }
         }
+
         // Avoid echo messages
         if (message.transportId === transportIndex) continue
 

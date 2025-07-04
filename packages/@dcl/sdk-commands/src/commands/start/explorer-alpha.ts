@@ -42,23 +42,35 @@ async function runApp(
   const cmd = isWindows ? 'start' : 'open'
   const position = args['--position'] ?? `${baseCoords.x},${baseCoords.y}`
   const realm = args['--realm'] ?? realmValue
-  const localScene = args['--local-scene'] ?? true
-  const debug = args['--debug'] ?? true
   const dclenv = args['--dclenv'] ?? 'org'
-  const skipAuthScreen = args['--skip-auth-screen'] ?? true
-  const landscapeTerrainEnabled = args['--landscape-terrain-enabled'] ?? true
+  const skipAuthScreen = !!args['--skip-auth-screen']
+  const landscapeTerrainEnabled = !!args['--landscape-terrain-enabled']
+  const openDeeplinkInNewInstance = !!args['-n']
 
   try {
-    const queryParams = [
-      `realm=${realm}`,
-      `position=${position}`,
-      `local-scene=${localScene}`,
-      `debug=${debug}`,
-      `hub=${isHub}`,
-      `dclenv=${dclenv}`,
-      `skip-auth-screen=${skipAuthScreen}`,
-      `landscape-terrain-enabled=${landscapeTerrainEnabled}`
-    ].join('&')
+    const params = new URLSearchParams()
+
+    params.set('realm', realm)
+    params.set('position', position)
+    params.set('dclenv', dclenv)
+
+    params.set('local-scene', 'true')
+    params.set('debug', 'true')
+
+    if (isHub) {
+      params.set('hub', 'true')
+    }
+    if (skipAuthScreen) {
+      params.set('skip-auth-screen', 'true')
+    }
+    if (landscapeTerrainEnabled) {
+      params.set('landscape-terrain-enabled', 'true')
+    }
+    if (openDeeplinkInNewInstance) {
+      params.set('open-deeplink-in-new-instance', 'true')
+    }
+
+    const queryParams = params.toString()
 
     const app = `decentraland://"${queryParams}"`
     await components.spawner.exec(cwd, cmd, [app], { silent: true })

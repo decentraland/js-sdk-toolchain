@@ -6,7 +6,7 @@ import { removeBasePath } from '../../lib/logic/remove-base-path'
 import { DIRECTORY, transformBase64ResourceToBinary, withAssetDir } from '../../lib/data-layer/host/fs-utils'
 import { importAsset, saveThumbnail } from '../../redux/data-layer'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
-import { selectAssetCatalog, selectUploadFile, updateUploadFile } from '../../redux/app'
+import { selectAssetCatalog, selectUploadFile, updateAssetCatalog, updateUploadFile } from '../../redux/app'
 
 import FileInput from '../FileInput'
 import { Modal } from '../Modal'
@@ -34,11 +34,9 @@ interface PropTypes {
 
 const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ onSave, children }, inputRef) => {
   const dispatch = useAppDispatch()
-  const catalog = useAppSelector(selectAssetCatalog)
   const uploadFile = useAppSelector(selectUploadFile)
-
+  const catalog = useAppSelector(selectAssetCatalog) ?? { basePath: '', assets: [] }
   const [files, setFiles] = useState<Asset[]>([])
-
   const [isHover, setIsHover] = useState(false)
   const { basePath, assets } = catalog ?? { basePath: '', assets: [] }
 
@@ -65,10 +63,8 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
   const handleImport = useCallback(
     async (assets: Asset[]) => {
       if (!assetsAreValid(assets)) return
-
       const basePath = withAssetDir(DIRECTORY.SCENE)
-      // TODO: we are dispatching importAsset + saveThumbnail for every asset, refreshing the app state and UI multiple
-      // times. This can be improved by doing all the process once...
+
       for (const asset of assets) {
         const content = await convertAssetToBinary(asset)
         const assetPackageName = buildAssetPath(asset)
@@ -91,13 +87,13 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
           )
         }
 
-        // Clear uploaded file from the FileUploadField
         const newUploadFile = { ...uploadFile }
         for (const key in newUploadFile) {
           newUploadFile[key] = `${basePath}/${formatFileName(asset)}`
         }
         dispatch(updateUploadFile(newUploadFile))
       }
+      dispatch(updateAssetCatalog({ assets: catalog, customAssets: [] }))
 
       setFiles([])
       onSave()
@@ -137,11 +133,14 @@ const ImportAsset = React.forwardRef<InputRef, PropsWithChildren<PropTypes>>(({ 
           className="ImportAssetModal"
           overlayClassName="ImportAssetModalOverlay"
         >
-          <h2>Import Assets</h2>
           {assetsAreValid(files) ? (
             <Slider assets={files} onSubmit={handleImport} isNameValid={validateName} />
           ) : (
-            <Error assets={files} onSubmit={handleCloseModal} />
+            <Error
+              assets={files}
+              errorMessage="Asset failed to import"
+              primaryAction={{ name: 'OK', onClick: handleCloseModal }}
+            />
           )}
         </Modal>
       </FileInput>
