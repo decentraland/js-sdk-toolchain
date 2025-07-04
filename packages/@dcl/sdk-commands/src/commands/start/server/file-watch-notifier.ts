@@ -44,7 +44,7 @@ export async function wireFileWatcherToWebSockets(
       'all',
       debounce(async (a, file) => {
         if (desktopClient) {
-          updateScene(sceneId, file, components.logger)
+          updateScene(sceneId, file)
         }
         return __LEGACY__updateScene(projectRoot, sceneUpdateClients, projectKind)
       }, 800)
@@ -56,10 +56,7 @@ function isGLTFModel(file: string) {
   return file.toLowerCase().endsWith('.glb') || file.toLowerCase().endsWith('.gltf')
 }
 
-type Logger = Pick<PreviewComponents, 'logger'>['logger']
-
-function updateScene(sceneId: string, file: string, logger: Logger) {
-  logger.info('[updateScene]: ', { file })
+function updateScene(sceneId: string, file: string) {
   let message: WsSceneMessage['message']
   if (isGLTFModel(file)) {
     message = {
