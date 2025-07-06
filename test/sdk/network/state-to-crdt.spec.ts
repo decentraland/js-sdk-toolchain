@@ -21,6 +21,6 @@ describe('It should dump the engine to a crdt buffer', () => {
     await engine.update(1)
 
     const crdtBuffer = engineToCrdt(engine)
-    expect(Array.from(serializeCrdtMessages('test', crdtBuffer, engine))).toHaveLength(3)
+    expect(Array.from(serializeCrdtMessages('test', crdtBuffer[0], engine))).toHaveLength(3)
   })
 })
