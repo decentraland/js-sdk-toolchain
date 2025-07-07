@@ -53,6 +53,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
           <Block>
             <RangeField label="Alpha test" max={1} step={0.1} {...getInputProps('alphaTest')} />
           </Block>
+          <Texture label="Texture" texture={TextureType.TT_TEXTURE} files={files} getInputProps={getTextureProps} />
           <Texture
             label="Alpha texture"
             texture={TextureType.TT_ALPHA_TEXTURE}
@@ -78,19 +79,12 @@ export default withSdk<Props>(({ sdk, entity }) => {
           <Block>
             <ColorField label="Reflectivity color" {...getInputProps('reflectivityColor')} />
           </Block>
-        </>
-      )}
-
-      <Texture label="Texture" texture={TextureType.TT_TEXTURE} files={files} getInputProps={getTextureProps} />
-
-      {materialType.value === MaterialType.MT_PBR && (
-        <>
-          <Container label="Intensity" border>
+          <Texture label="Texture" texture={TextureType.TT_TEXTURE} files={files} getInputProps={getTextureProps} />
+          <Container label="Intensity" border initialOpen={false}>
             <RangeField label="Specular" max={1} step={0.1} {...getInputProps('specularIntensity')} />
             <RangeField label="Direct" max={1} step={0.1} {...getInputProps('directIntensity')} />
           </Container>
-
-          <Container label="Transparency" border>
+          <Container label="Transparency" border initialOpen={false}>
             <Block>
               <Dropdown label="Transparency Mode" options={TRANSPARENCY_MODES} {...getInputProps('transparencyMode')} />
             </Block>
@@ -98,8 +92,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
               <RangeField label="Alpha test" max={1} step={0.1} {...getInputProps('alphaTest')} />
             </Block>
           </Container>
-
-          <Container label="Emissive" border>
+          <Container label="Emissive" border initialOpen={false}>
             <Block>
               <RangeField label="Emissive Intensity" max={1} step={0.1} {...getInputProps('emissiveIntensity')} />
             </Block>
@@ -113,7 +106,6 @@ export default withSdk<Props>(({ sdk, entity }) => {
               getInputProps={getTextureProps}
             />
           </Container>
-
           <Texture
             label="Bump texture"
             texture={TextureType.TT_BUMP_TEXTURE}
