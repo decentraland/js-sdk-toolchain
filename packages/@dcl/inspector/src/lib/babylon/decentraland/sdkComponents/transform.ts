@@ -48,8 +48,6 @@ export const putTransformComponent: ComponentOperation = (entity, component) => 
     }
 
     if (needsReparenting) reparentEntity(entity)
-
-    gizmos.repositionGizmoOnCentroid()
   }
 }
 
