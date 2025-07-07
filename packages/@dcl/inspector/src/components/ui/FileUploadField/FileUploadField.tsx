@@ -7,7 +7,7 @@ import { VscFolderOpened as FolderIcon } from 'react-icons/vsc'
 import { selectAssetCatalog, selectUploadFile, updateUploadFile } from '../../../redux/app'
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks'
 import { DropTypesEnum, LocalAssetDrop, getNode } from '../../../lib/sdk/drag-drop'
-import { EXTENSIONS, withAssetDir } from '../../../lib/data-layer/host/fs-utils'
+import { DIRECTORY, EXTENSIONS, withAssetDir } from '../../../lib/data-layer/host/fs-utils'
 
 import { isModel } from '../../EntityInspector/GltfInspector/utils'
 import { isAudio } from '../../EntityInspector/AudioSourceInspector/utils'
@@ -22,6 +22,8 @@ import { Message, MessageType } from '../Message'
 import { type Props } from './types'
 
 import './FileUploadField.css'
+import { buildAssetPath, convertAssetToBinary, processAssets } from '../../ImportAsset/utils'
+import { importAsset } from '../../../redux/data-layer'
 
 function parseAccept(accept: string[]) {
   return accept.join(',')
@@ -51,6 +53,7 @@ const FileUploadField: React.FC<Props> = ({
 
   useEffect(() => {
     if (uploadFile[id.current] && typeof uploadFile[id.current] === 'string' && path !== uploadFile[id.current]) {
+      debugger
       const uploadFilePath = uploadFile[id.current] as string
       setPath(uploadFilePath)
       const cleanUpdateUploadFile = { ...uploadFile }
@@ -123,14 +126,30 @@ const FileUploadField: React.FC<Props> = ({
   )
 
   const handleClick = useCallback(() => {
+    debugger
     inputRef.current?.click()
   }, [inputRef])
 
   const handleChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      debugger
       const file = event.target.files?.[0]
       if (file && isValidFileName(file.name)) {
         setDropError(false)
+        const basePath = withAssetDir(DIRECTORY.SCENE)
+        const [newAsset] = await processAssets([file])
+        const content = await convertAssetToBinary(newAsset)
+        const assetPackageName = buildAssetPath(newAsset)
+
+        dispatch(
+          importAsset({
+            content,
+            basePath,
+            assetPackageName,
+            reload: true
+          })
+        )
+
         const newUploadFile = { ...uploadFile }
         newUploadFile[id.current] = file
         dispatch(updateUploadFile(newUploadFile))
