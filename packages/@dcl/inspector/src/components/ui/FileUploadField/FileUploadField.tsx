@@ -156,8 +156,7 @@ const FileUploadField: React.FC<Props> = ({
         const content = await convertAssetToBinary(newAsset)
         const newUploadFile = { ...uploadFile }
         newUploadFile[id.current] = file
-        const assetPath = `${basePath}/${assetPackageName}/${file.name}`
-
+        const assetPath = `${basePath}/${assetPackageName}/${newAsset.name}.${newAsset.extension}`
         dispatch(
           importAsset({
             content,
