@@ -53,7 +53,6 @@ const FileUploadField: React.FC<Props> = ({
 
   useEffect(() => {
     if (uploadFile[id.current] && typeof uploadFile[id.current] === 'string' && path !== uploadFile[id.current]) {
-      debugger
       const uploadFilePath = uploadFile[id.current] as string
       setPath(uploadFilePath)
       const cleanUpdateUploadFile = { ...uploadFile }
@@ -126,42 +125,8 @@ const FileUploadField: React.FC<Props> = ({
   )
 
   const handleClick = useCallback(() => {
-    debugger
     inputRef.current?.click()
   }, [inputRef])
-
-  const handleChange = useCallback(
-    async (event: React.ChangeEvent<HTMLInputElement>) => {
-      debugger
-      const file = event.target.files?.[0]
-      if (file && isValidFileName(file.name)) {
-        setDropError(false)
-        const basePath = withAssetDir(DIRECTORY.SCENE)
-        const [newAsset] = await processAssets([file])
-        const content = await convertAssetToBinary(newAsset)
-        const assetPackageName = buildAssetPath(newAsset)
-
-        dispatch(
-          importAsset({
-            content,
-            basePath,
-            assetPackageName,
-            reload: true
-          })
-        )
-
-        const newUploadFile = { ...uploadFile }
-        newUploadFile[id.current] = file
-        dispatch(updateUploadFile(newUploadFile))
-      } else {
-        setDropError(true)
-      }
-
-      // Clear input value
-      if (inputRef.current) inputRef.current.value = ''
-    },
-    [inputRef, setPath, setDropError]
-  )
 
   const handleChangeTextField = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -178,6 +143,38 @@ const FileUploadField: React.FC<Props> = ({
       }
     },
     [addBase, setPath, setDropError, acceptURLs, onChange]
+  )
+
+  const handleChange = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0]
+      if (file && isValidFileName(file.name)) {
+        setDropError(false)
+        const [newAsset] = await processAssets([file])
+        const basePath = withAssetDir(DIRECTORY.SCENE)
+        const assetPackageName = buildAssetPath(newAsset)
+        const content = await convertAssetToBinary(newAsset)
+        const newUploadFile = { ...uploadFile }
+        newUploadFile[id.current] = file
+        const assetPath = `${basePath}/${assetPackageName}/${file.name}`
+
+        dispatch(
+          importAsset({
+            content,
+            basePath,
+            assetPackageName,
+            reload: true
+          })
+        )
+        dispatch(updateUploadFile(newUploadFile))
+        setPath(assetPath)
+        onDrop && onDrop(assetPath)
+      } else {
+        setDropError(true)
+      }
+      if (inputRef.current) inputRef.current.value = ''
+    },
+    [inputRef, setPath, setDropError]
   )
 
   const hasError = useMemo(() => {
