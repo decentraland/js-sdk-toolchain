@@ -6,9 +6,11 @@ import { VscFolderOpened as FolderIcon } from 'react-icons/vsc'
 
 import { selectAssetCatalog, selectUploadFile, updateUploadFile } from '../../../redux/app'
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks'
+import { importAsset } from '../../../redux/data-layer'
 import { DropTypesEnum, LocalAssetDrop, getNode } from '../../../lib/sdk/drag-drop'
 import { DIRECTORY, EXTENSIONS, withAssetDir } from '../../../lib/data-layer/host/fs-utils'
 
+import { buildAssetPath, convertAssetToBinary, processAssets } from '../../ImportAsset/utils'
 import { isModel } from '../../EntityInspector/GltfInspector/utils'
 import { isAudio } from '../../EntityInspector/AudioSourceInspector/utils'
 import { isModel as isTexture } from '../../EntityInspector/MaterialInspector/Texture/utils'
@@ -22,8 +24,6 @@ import { Message, MessageType } from '../Message'
 import { type Props } from './types'
 
 import './FileUploadField.css'
-import { buildAssetPath, convertAssetToBinary, processAssets } from '../../ImportAsset/utils'
-import { importAsset } from '../../../redux/data-layer'
 
 function parseAccept(accept: string[]) {
   return accept.join(',')
