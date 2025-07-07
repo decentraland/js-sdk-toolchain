@@ -25,6 +25,14 @@ export type TextureInput = {
   videoPlayerEntity?: string
   wrapMode: string
   filterMode: string
+  offset?: {
+    x: string
+    y: string
+  }
+  tiling?: {
+    x: string
+    y: string
+  }
 }
 
 export const WRAP_MODES = [

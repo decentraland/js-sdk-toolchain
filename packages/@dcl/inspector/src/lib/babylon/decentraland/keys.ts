@@ -21,6 +21,7 @@ export enum Keys {
   KEY_SHIFT = -1,
   KEY_CTRL = -2,
   KEY_SPACE = 32,
+  KEY_ALT = 18,
 
   KEY_E = 69,
   KEY_Q = 81

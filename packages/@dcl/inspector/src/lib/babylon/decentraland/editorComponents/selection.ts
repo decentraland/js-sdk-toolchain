@@ -43,7 +43,7 @@ export const toggleSelection = (entity: EcsEntity, value: boolean) => {
     toggleMeshSelection(entity.meshRenderer, value)
   }
 
-  entity.onAssetLoaded().then(() => {
+  void entity.onAssetLoaded().then(() => {
     if (entity.gltfContainer) {
       for (const mesh of entity.gltfContainer.getChildMeshes()) {
         if (mesh.name.includes('collider')) continue

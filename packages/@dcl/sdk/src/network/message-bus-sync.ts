@@ -82,10 +82,12 @@ export function addSyncTransport(
   })
 
   // Answer to REQ_CRDT_STATE
-  binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, async (message, userId) => {
-    console.log(`Sending CRDT State to: ${userId}`)
-    transport.onmessage!(message)
-    binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(userId, engineToCrdt(engine)), [userId])
+  binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, async (_, userId) => {
+    DEBUG_NETWORK_MESSAGES() && console.log(`Sending CRDT State to: ${userId}`)
+
+    for (const chunk of engineToCrdt(engine)) {
+      binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(userId, chunk), [userId])
+    }
   })
 
   // Process CRDT messages here
@@ -104,7 +106,7 @@ export function addSyncTransport(
       return
     }
 
-    binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, engineToCrdt(engine))
+    binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
 
     // Wait ~5s for the response.
     await sleep(5000)
