@@ -6,9 +6,11 @@ import { VscFolderOpened as FolderIcon } from 'react-icons/vsc'
 
 import { selectAssetCatalog, selectUploadFile, updateUploadFile } from '../../../redux/app'
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks'
+import { importAsset } from '../../../redux/data-layer'
 import { DropTypesEnum, LocalAssetDrop, getNode } from '../../../lib/sdk/drag-drop'
-import { EXTENSIONS, withAssetDir } from '../../../lib/data-layer/host/fs-utils'
+import { DIRECTORY, EXTENSIONS, withAssetDir } from '../../../lib/data-layer/host/fs-utils'
 
+import { buildAssetPath, convertAssetToBinary, processAssets } from '../../ImportAsset/utils'
 import { isModel } from '../../EntityInspector/GltfInspector/utils'
 import { isAudio } from '../../EntityInspector/AudioSourceInspector/utils'
 import { isModel as isTexture } from '../../EntityInspector/MaterialInspector/Texture/utils'
@@ -126,24 +128,6 @@ const FileUploadField: React.FC<Props> = ({
     inputRef.current?.click()
   }, [inputRef])
 
-  const handleChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0]
-      if (file && isValidFileName(file.name)) {
-        setDropError(false)
-        const newUploadFile = { ...uploadFile }
-        newUploadFile[id.current] = file
-        dispatch(updateUploadFile(newUploadFile))
-      } else {
-        setDropError(true)
-      }
-
-      // Clear input value
-      if (inputRef.current) inputRef.current.value = ''
-    },
-    [inputRef, setPath, setDropError]
-  )
-
   const handleChangeTextField = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.target
@@ -159,6 +143,37 @@ const FileUploadField: React.FC<Props> = ({
       }
     },
     [addBase, setPath, setDropError, acceptURLs, onChange]
+  )
+
+  const handleChange = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0]
+      if (file && isValidFileName(file.name)) {
+        setDropError(false)
+        const [newAsset] = await processAssets([file])
+        const basePath = withAssetDir(DIRECTORY.SCENE)
+        const assetPackageName = buildAssetPath(newAsset)
+        const content = await convertAssetToBinary(newAsset)
+        const newUploadFile = { ...uploadFile }
+        newUploadFile[id.current] = file
+        const assetPath = `${basePath}/${assetPackageName}/${newAsset.name}.${newAsset.extension}`
+        dispatch(
+          importAsset({
+            content,
+            basePath,
+            assetPackageName,
+            reload: true
+          })
+        )
+        dispatch(updateUploadFile(newUploadFile))
+        setPath(assetPath)
+        onDrop && onDrop(assetPath)
+      } else {
+        setDropError(true)
+      }
+      if (inputRef.current) inputRef.current.value = ''
+    },
+    [inputRef, setPath, setDropError, uploadFile, onDrop]
   )
 
   const hasError = useMemo(() => {
