@@ -173,7 +173,7 @@ const FileUploadField: React.FC<Props> = ({
       }
       if (inputRef.current) inputRef.current.value = ''
     },
-    [inputRef, setPath, setDropError]
+    [inputRef, setPath, setDropError, uploadFile, onDrop]
   )
 
   const hasError = useMemo(() => {
