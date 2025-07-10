@@ -42,13 +42,12 @@ type Props<T> = {
   onDuplicate: (value: T) => void
   getDragContext?: () => unknown
   dndType?: string
-  tree?: unknown
 }
 
 type EmptyString = ''
 
-const getDefaultLevel = () => 1
-const getLevelStyles = (level: number) => ({ paddingLeft: `${(level - 1) * 10}px` })
+const getDefaultLevel = () => 0
+const getLevelStyles = (level: number) => ({ paddingLeft: `${level * 10}px` })
 const getExpandStyles = (active: boolean) => ({ height: active ? 'auto' : '0', overflow: 'hidden', display: 'block' })
 const getEditModeStyles = (active: boolean) => ({ display: active ? 'none' : '' })
 
@@ -252,13 +251,13 @@ export function Tree<T>() {
             <div ref={ref} style={getEditModeStyles(editMode)} className="item-area">
               <DisclosureWidget enabled={enableOpen} isOpen={open} onOpen={handleOpen} />
               <div onClick={handleSelect} onContextMenu={handleSelect} className="selectable-area">
-                {props.getIcon ? props.getIcon(value) : <></>}
+                {props.getIcon && props.getIcon(value)}
                 <div>{label || id}</div>
                 {isEntity && <ActionArea entity={value as Entity} />}
               </div>
             </div>
             {editMode && typeof label === 'string' && (
-              <EditInput value={label || ''} onCancel={quitEditMode} onSubmit={onChangeEditValue} />
+              <EditInput value={label} onCancel={quitEditMode} onSubmit={onChangeEditValue} />
             )}
           </div>
           <TreeChildren {...props} />
