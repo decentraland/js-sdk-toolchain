@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { Entity } from '@dcl/ecs'
 
 import { CAMERA, PLAYER, ROOT } from '../../lib/sdk/tree'
@@ -86,6 +86,7 @@ const Hierarchy: React.FC = () => {
     centerViewOnEntity
   } = useTree()
   const selectedEntities = useEntitiesWith((components) => components.Selection)
+  const [lastSelectedItem, setLastSelectedItem] = useState<Entity | undefined>(undefined)
 
   const isSelected = useCallback(
     (entity: Entity) => {
@@ -94,13 +95,67 @@ const Hierarchy: React.FC = () => {
     [selectedEntities]
   )
 
+  const getAllVisibleEntities = useCallback(() => {
+    const entities: Entity[] = []
+
+    const traverse = (entity: Entity) => {
+      if (!isHidden(entity)) {
+        entities.push(entity)
+        if (isOpen(entity)) {
+          getChildren(entity).forEach((child) => traverse(child))
+        }
+      }
+    }
+
+    traverse(ROOT)
+
+    return entities
+  }, [getChildren, isOpen, isHidden])
+
+  const handleRangeSelection = useCallback(
+    (fromEntity: Entity, toEntity: Entity) => {
+      const allEntities = getAllVisibleEntities()
+      const fromIndex = allEntities.findIndex((e) => getId(e) === getId(fromEntity))
+      const toIndex = allEntities.findIndex((e) => getId(e) === getId(toEntity))
+
+      const startIndex = Math.min(fromIndex, toIndex)
+      const endIndex = Math.max(fromIndex, toIndex)
+
+      allEntities.forEach((entity, index) => {
+        if (index >= startIndex && index <= endIndex) {
+          void select(entity, index > startIndex) // first item replaces selection, others add to selection
+        }
+      })
+    },
+    [getAllVisibleEntities, getId, select]
+  )
+
+  const handleSelect = useCallback(
+    (entity: Entity, clickType?: 'single' | 'ctrl' | 'shift') => {
+      if (clickType === 'shift' && lastSelectedItem) {
+        handleRangeSelection(lastSelectedItem, entity)
+      } else {
+        const isMultipleSelection = clickType === 'ctrl' || clickType === 'shift'
+        void select(entity, isMultipleSelection)
+      }
+    },
+    [select, lastSelectedItem, handleRangeSelection]
+  )
+
+  const handleLastSelectedChange = useCallback(
+    (entity: Entity) => {
+      if (entity !== lastSelectedItem) setLastSelectedItem(entity)
+    },
+    [lastSelectedItem]
+  )
+
   const props = {
     getExtraContextMenu: ContextMenu,
     onAddChild: addChild,
     onDrop: setParent,
     onRemove: remove,
     onRename: rename,
-    onSelect: select,
+    onSelect: handleSelect,
     onDoubleSelect: centerViewOnEntity,
     onSetOpen: setOpen,
     onDuplicate: duplicate,
@@ -115,7 +170,8 @@ const Hierarchy: React.FC = () => {
     canRemove: canRemove,
     canDuplicate: canDuplicate,
     canDrag: canDrag,
-    canReorder: canReorder
+    canReorder: canReorder,
+    onLastSelectedChange: handleLastSelectedChange
   }
 
   return (

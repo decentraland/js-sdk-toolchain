@@ -33,7 +33,7 @@ type Props<T> = {
   canDrag?: (value: T) => boolean
   canReorder?: (source: T, target: T, type: DropType) => boolean
   onSetOpen: (value: T, isOpen: boolean) => void
-  onSelect: (value: T, multiple?: boolean) => void
+  onSelect: (value: T, clickType?: 'single' | 'ctrl' | 'shift') => void
   onDoubleSelect?: (value: T) => void
   onDrop: (source: T, target: T, dropType: DropType) => void
   onRename: (value: T, label: string) => void
@@ -42,6 +42,7 @@ type Props<T> = {
   onDuplicate: (value: T) => void
   getDragContext?: () => unknown
   dndType?: string
+  onLastSelectedChange?: (value: T) => void
 }
 
 type EmptyString = ''
@@ -81,7 +82,8 @@ export function Tree<T>() {
         onDoubleSelect,
         onSetOpen,
         getDragContext = () => ({}),
-        dndType = 'tree'
+        dndType = 'tree',
+        onLastSelectedChange
       } = props
       const ref = useRef<HTMLDivElement>(null)
       const id = getId(value)
@@ -152,12 +154,18 @@ export function Tree<T>() {
       const quitInsertMode = () => setInsertMode(false)
 
       const handleSelect = (event: React.MouseEvent) => {
-        if (event.type === ClickType.CONTEXT_MENU && event.ctrlKey) {
-          onSelect(value, true)
-        } else if (event.type === ClickType.CLICK) {
-          onSelect(value, event.shiftKey)
-          if (event.detail > 1 && onDoubleSelect) onDoubleSelect(value)
+        const isMac = /Mac|iPhone|iPod|iPad/.test(navigator.userAgent)
+        const isCtrlClick = (isMac ? event.type === ClickType.CONTEXT_MENU : event.type === ClickType.CLICK) && event.ctrlKey
+        const isShiftClick = event.type === ClickType.CLICK && event.shiftKey
+        const isDoubleClick = event.type === ClickType.CLICK && event.detail > 1 && onDoubleSelect
+        const clickType = isCtrlClick ? 'ctrl' : isShiftClick ? 'shift' : 'single'
+
+        if (clickType === 'single' && onLastSelectedChange) {
+          onLastSelectedChange(value)
         }
+
+        onSelect(value, clickType)
+        if (isDoubleClick) onDoubleSelect(value)
       }
 
       const handleOpen = (_: React.MouseEvent) => {
