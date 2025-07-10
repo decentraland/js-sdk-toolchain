@@ -14,6 +14,7 @@ export function initKeyboard(canvas: HTMLCanvasElement, scene: BABYLON.Scene) {
   canvas.addEventListener('keydown', (e) => {
     keyState[Keys.KEY_SHIFT] = e.shiftKey
     keyState[Keys.KEY_CTRL] = e.ctrlKey
+    keyState[Keys.KEY_ALT] = e.altKey
     keyState[e.keyCode] = true
     if (e.shiftKey) {
       isSnapEnabled = snapManager.toggle()
@@ -29,6 +30,7 @@ export function initKeyboard(canvas: HTMLCanvasElement, scene: BABYLON.Scene) {
 
     keyState[Keys.KEY_SHIFT] = e.shiftKey
     keyState[Keys.KEY_CTRL] = e.ctrlKey
+    keyState[Keys.KEY_ALT] = e.altKey
     keyState[e.keyCode] = false
   })
 
@@ -36,6 +38,7 @@ export function initKeyboard(canvas: HTMLCanvasElement, scene: BABYLON.Scene) {
   canvas.addEventListener('blur', () => {
     keyState[Keys.KEY_SHIFT] = false
     keyState[Keys.KEY_CTRL] = false
+    keyState[Keys.KEY_ALT] = false
   })
 
   // Event to store the ctrlKey when the canvas has lost the focus

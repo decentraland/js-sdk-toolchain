@@ -163,15 +163,25 @@ export class CameraManager {
       return false
     }
 
+    let isAltKeyDown = false
     scene.onPreKeyboardObservable.add((ev) => {
-      const isAltKeyDown = ev.type === BABYLON.KeyboardEventTypes.KEYDOWN && ev.event.inputIndex === Keys.KEY_ALT
+      const oldAltKeyState = isAltKeyDown
+      if (ev.type === BABYLON.KeyboardEventTypes.KEYDOWN && ev.event.inputIndex === Keys.KEY_ALT) {
+        isAltKeyDown = true
+      }
+
+      if (ev.type === BABYLON.KeyboardEventTypes.KEYUP && ev.event.inputIndex === Keys.KEY_ALT) {
+        isAltKeyDown = false
+      }
 
       if (isAltKeyDown) {
         mouseInput.buttons = [LEFT_BUTTON, RIGHT_BUTTON] // move camera with left/right mouse buttons
       } else {
         mouseInput.buttons = [RIGHT_BUTTON] // move camera with right mouse button only
-        // reattach control to avoid camera sticking to the pointer bug...
-        this.reattachControl()
+        if (oldAltKeyState) {
+          // reattach control to avoid camera sticking to the pointer bug...
+          this.reattachControl()
+        }
       }
     })
 
