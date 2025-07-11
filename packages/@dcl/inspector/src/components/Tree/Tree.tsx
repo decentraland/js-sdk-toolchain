@@ -23,6 +23,7 @@ type Props<T> = {
   getChildren: (value: T) => T[]
   getIcon?: (value: T) => JSX.Element
   getLabel: (value: T) => string | JSX.Element
+  getSelectedItems?: () => T[]
   isOpen: (value: T) => boolean
   isSelected: (value: T) => boolean
   isHidden: (value: T) => boolean
@@ -64,6 +65,7 @@ export function Tree<T>() {
         getId,
         getChildren,
         getLabel,
+        getSelectedItems,
         isOpen,
         isSelected,
         onSelect,
@@ -111,25 +113,53 @@ export function Tree<T>() {
         [getId, getChildren]
       )
 
-      const [, drag] = useDrag(
-        () => ({
-          type: dndType,
-          canDrag: enableDrag,
-          item: { value, context: getDragContext() }
-        }),
-        [value]
+      const canDropMultiple = useCallback(
+        (target: T, sources: T[]): boolean => {
+          if (sources.some((source) => getId(target) === getId(source))) return false
+          if (sources.some((source) => isDescendantOf(target, source))) return false
+          return getChildren(target).every(($) => canDropMultiple($, sources))
+        },
+        [getId, getChildren]
+      )
+
+      const isDescendantOf = useCallback(
+        (ancestor: T, descendant: T): boolean => {
+          const children = getChildren(ancestor)
+          if (children.some((child) => getId(child) === getId(descendant))) return true
+          return children.some((child) => isDescendantOf(child, descendant))
+        },
+        [getId, getChildren]
       )
 
       const [{ isHover }, drop] = useDrop(
         () => ({
           accept: dndType,
-          drop: ({ value: item }: { value: T }, monitor) => {
+          drop: (item: { items: T[]; context: unknown }, monitor) => {
             const dropTypeValue = dropType || dropTypeRef.current
-            if (monitor.didDrop() || !canDrop(item, value) || !dropTypeValue) return
-            onDrop(item, value, dropTypeValue)
+            if (monitor.didDrop() || !dropTypeValue) return
+
+            const { items } = item
+            const isMultipleDrag = items.length > 1
+
+            if (isMultipleDrag) {
+              if (!canDropMultiple(value, items)) return
+              items.forEach((sourceItem) => onDrop(sourceItem, value, dropTypeValue))
+            } else {
+              const sourceItem = items[0]
+              if (!canDrop(sourceItem, value)) return
+              onDrop(sourceItem, value, dropTypeValue)
+            }
           },
-          hover: ({ value: item }, monitor) => {
-            if (!ref.current || item === value) {
+          hover: (item: { items: T[]; context: unknown }, monitor) => {
+            if (!ref.current) {
+              dropTypeRef.current = ''
+              return setDropType('')
+            }
+
+            const { items } = item
+
+            // check if hovering over one of the dragged items
+            if (items.some((sourceItem) => getId(sourceItem) === getId(value))) {
               dropTypeRef.current = ''
               return setDropType('')
             }
@@ -137,7 +167,11 @@ export function Tree<T>() {
             const coords = monitor.getClientOffset() as XYCoord
             const rect = ref.current.getBoundingClientRect()
             const dropType = calculateDropType(coords.y, rect)
-            const enableReorder = canReorder ? canReorder(item, value, dropType) : true
+
+            const enableReorder = canReorder
+              ? items.every((sourceItem) => canReorder(sourceItem, value, dropType))
+              : true
+
             const newDropTypeValue = enableReorder ? dropType : ''
 
             setDropType(newDropTypeValue)
@@ -147,7 +181,7 @@ export function Tree<T>() {
             isHover: monitor.isOver({ shallow: true })
           })
         }),
-        [value, dropType, onDrop, canDrop]
+        [value, dropType, onDrop, canDrop, canDropMultiple, canReorder, getId]
       )
 
       const quitEditMode = () => setEditMode(false)
@@ -155,7 +189,8 @@ export function Tree<T>() {
 
       const handleSelect = (event: React.MouseEvent) => {
         const isMac = /Mac|iPhone|iPod|iPad/.test(navigator.userAgent)
-        const isCtrlClick = (isMac ? event.type === ClickType.CONTEXT_MENU : event.type === ClickType.CLICK) && event.ctrlKey
+        const isCtrlClick =
+          (isMac ? event.type === ClickType.CONTEXT_MENU : event.type === ClickType.CLICK) && event.ctrlKey
         const isShiftClick = event.type === ClickType.CLICK && event.shiftKey
         const isDoubleClick = event.type === ClickType.CLICK && event.detail > 1 && onDoubleSelect
         const clickType = isCtrlClick ? 'ctrl' : isShiftClick ? 'shift' : 'single'
@@ -193,6 +228,29 @@ export function Tree<T>() {
       }
 
       const sdk = useSdk()
+
+      const [, drag] = useDrag(
+        () => ({
+          type: dndType,
+          canDrag: enableDrag,
+          item: () => {
+            const selectedItems = getSelectedItems ? getSelectedItems() : []
+            // if this item is selected and there are multiple selections, drag all selected items
+            if (selectedItems.length > 1 && selectedItems.some((item) => getId(item) === getId(value))) {
+              return {
+                items: selectedItems,
+                context: getDragContext()
+              }
+            }
+            return {
+              items: [value],
+              context: getDragContext()
+            }
+          }
+        }),
+        [value, getSelectedItems, getId]
+      )
+
       const handleRemove = () => {
         if (isEntity && sdk) {
           const selectedEntities = sdk.operations.getSelectedEntities()
