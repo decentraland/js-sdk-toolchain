@@ -12,18 +12,39 @@ export class ScaleGizmo implements IGizmoTransformer {
   private initialGizmoScale: Vector3 | null = null
   private changeHandlers: (() => void)[] = []
   private isDragging = false
+  private dragStartObserver: any = null
+  private dragObserver: any = null
+  private dragEndObserver: any = null
+  private currentEntities: EcsEntity[] = []
+  private updateEntityScale: ((entity: EcsEntity) => void) | null = null
+  private dispatchOperations: (() => void) | null = null
+  private isWorldAligned = true
 
-  constructor(private gizmoManager: GizmoManager) {}
+  constructor(private gizmoManager: GizmoManager, private snapScale: (scale: Vector3) => Vector3) {}
 
   setup(): void {
     if (!this.gizmoManager.gizmos.scaleGizmo) return
     const scaleGizmo = this.gizmoManager.gizmos.scaleGizmo
-    scaleGizmo.snapDistance = 0
+    // Scale gizmo should always be locally aligned to the entity
+    scaleGizmo.updateGizmoRotationToMatchAttachedMesh = true
+
+    // Don't setup drag observables here - they will be set up when the gizmo is enabled
+  }
+
+  enable(): void {
+    if (!this.gizmoManager.gizmos.scaleGizmo) return
+
+    // Setup drag observables when the gizmo is enabled
+    this.setupDragObservables()
   }
 
   cleanup(): void {
     if (!this.gizmoManager.gizmos.scaleGizmo) return
     this.gizmoManager.scaleGizmoEnabled = false
+
+    // Clean up drag observables
+    this.cleanupDragObservables()
+
     this.initialOffsets.clear()
     this.initialScales.clear()
     this.initialRotations.clear()
@@ -31,6 +52,119 @@ export class ScaleGizmo implements IGizmoTransformer {
     this.initialGizmoScale = null
     this.pivotPosition = null
     this.isDragging = false
+    this.currentEntities = []
+  }
+
+  setEntities(entities: EcsEntity[]): void {
+    this.currentEntities = entities
+    // Sync gizmo alignment with the new entities (always local)
+    this.syncGizmoAlignment()
+  }
+
+  setUpdateCallbacks(updateEntityScale: (entity: EcsEntity) => void, dispatchOperations: () => void): void {
+    this.updateEntityScale = updateEntityScale
+    this.dispatchOperations = dispatchOperations
+  }
+
+  setWorldAligned(value: boolean): void {
+    // Scale gizmo should always be locally aligned, regardless of the parameter
+    this.isWorldAligned = false
+    if (this.gizmoManager.gizmos.scaleGizmo) {
+      this.gizmoManager.gizmos.scaleGizmo.updateGizmoRotationToMatchAttachedMesh = true
+    }
+
+    // Sync gizmo alignment with the new entities (always local)
+    this.syncGizmoAlignment()
+  }
+
+  private syncGizmoAlignment(): void {
+    if (!this.gizmoManager.attachedNode || this.currentEntities.length === 0) return
+
+    const gizmoNode = this.gizmoManager.attachedNode as TransformNode
+
+    // Scale gizmo should always be locally aligned
+    if (this.currentEntities.length === 1) {
+      const entity = this.currentEntities[0]
+      if (entity.rotationQuaternion && gizmoNode.rotationQuaternion) {
+        // If the entity has a parent, convert to world rotation
+        if (entity.parent && entity.parent instanceof TransformNode) {
+          const parent = entity.parent as TransformNode
+          const parentWorldRotation =
+            parent.rotationQuaternion || Quaternion.FromRotationMatrix(parent.getWorldMatrix())
+          const worldRotation = parentWorldRotation.multiply(entity.rotationQuaternion)
+          gizmoNode.rotationQuaternion.copyFrom(worldRotation)
+        } else {
+          // If no parent, apply directly
+          gizmoNode.rotationQuaternion.copyFrom(entity.rotationQuaternion)
+        }
+      }
+    } else {
+      // For multiple entities, always reset to identity rotation
+      // This provides a consistent reference point for scaling operations
+      if (gizmoNode.rotationQuaternion) {
+        gizmoNode.rotationQuaternion.set(0, 0, 0, 1) // Quaternion.Identity()
+      }
+    }
+
+    gizmoNode.computeWorldMatrix(true)
+  }
+
+  private setupDragObservables(): void {
+    if (!this.gizmoManager.gizmos.scaleGizmo) return
+
+    const scaleGizmo = this.gizmoManager.gizmos.scaleGizmo
+
+    // Setup drag start
+    this.dragStartObserver = scaleGizmo.onDragStartObservable.add(() => {
+      console.log('[ScaleGizmo] Scale drag start')
+      if (this.gizmoManager.attachedNode) {
+        this.onDragStart(this.currentEntities, this.gizmoManager.attachedNode as TransformNode)
+      }
+    })
+
+    // Setup drag update
+    this.dragObserver = scaleGizmo.onDragObservable.add(() => {
+      if (this.gizmoManager.attachedNode) {
+        this.update(this.currentEntities, this.gizmoManager.attachedNode as TransformNode)
+
+        // Update ECS scale on each drag update for real-time feedback
+        if (this.updateEntityScale) {
+          this.currentEntities.forEach(this.updateEntityScale)
+        }
+      }
+    })
+
+    // Setup drag end
+    this.dragEndObserver = scaleGizmo.onDragEndObservable.add(() => {
+      console.log('[ScaleGizmo] Scale drag end')
+      this.onDragEnd()
+
+      // Only dispatch operations at the end to avoid excessive ECS operations
+      if (this.dispatchOperations) {
+        this.dispatchOperations()
+      }
+    })
+  }
+
+  private cleanupDragObservables(): void {
+    if (!this.gizmoManager.gizmos.scaleGizmo) return
+
+    const scaleGizmo = this.gizmoManager.gizmos.scaleGizmo
+
+    if (this.dragStartObserver) {
+      scaleGizmo.onDragStartObservable.remove(this.dragStartObserver)
+      this.dragStartObserver = null
+    }
+
+    if (this.dragObserver) {
+      scaleGizmo.onDragObservable.remove(this.dragObserver)
+      this.dragObserver = null
+    }
+
+    if (this.dragEndObserver) {
+      scaleGizmo.onDragEndObservable.remove(this.dragEndObserver)
+      this.dragEndObserver = null
+    }
   }
 
   onDragStart(entities: EcsEntity[], gizmoNode: TransformNode): void {
@@ -119,10 +253,11 @@ export class ScaleGizmo implements IGizmoTransformer {
           initialScale.y * scaleChange.y,
           initialScale.z * scaleChange.z
         )
+        const snappedLocalScale = this.snapScale(localScale)
 
         // Apply transforms
         entity.position.copyFrom(localPosition)
-        entity.scaling.copyFrom(localScale)
+        entity.scaling.copyFrom(snappedLocalScale)
         if (!entity.rotationQuaternion) {
           entity.rotationQuaternion = new Quaternion()
         }
@@ -131,7 +266,8 @@ export class ScaleGizmo implements IGizmoTransformer {
       } else {
         // For entities without parent, apply world transforms directly
         entity.position.copyFrom(newWorldPosition)
-        entity.scaling.copyFrom(newWorldScale)
+        const snappedWorldScale = this.snapScale(newWorldScale)
+        entity.scaling.copyFrom(snappedWorldScale)
         if (!entity.rotationQuaternion) {
           entity.rotationQuaternion = new Quaternion()
         }
@@ -148,6 +284,41 @@ export class ScaleGizmo implements IGizmoTransformer {
   }
 
   onDragEnd(): void {
+    // Sync gizmo scale with the final snapped scales of entities
+    if (this.gizmoManager.attachedNode) {
+      const gizmoNode = this.gizmoManager.attachedNode as TransformNode
+
+      // Reset gizmo scale to identity after scaling is complete
+      // This ensures the gizmo doesn't accumulate scale changes
+      gizmoNode.scaling.set(1, 1, 1)
+
+      // Scale gizmo should always be locally aligned
+      if (this.currentEntities.length === 1) {
+        const entity = this.currentEntities[0]
+        if (entity.rotationQuaternion && gizmoNode.rotationQuaternion) {
+          // If the entity has a parent, convert to world rotation
+          if (entity.parent && entity.parent instanceof TransformNode) {
+            const parent = entity.parent as TransformNode
+            const parentWorldRotation =
+              parent.rotationQuaternion || Quaternion.FromRotationMatrix(parent.getWorldMatrix())
+            const worldRotation = parentWorldRotation.multiply(entity.rotationQuaternion)
+            gizmoNode.rotationQuaternion.copyFrom(worldRotation)
+          } else {
+            // If no parent, apply directly
+            gizmoNode.rotationQuaternion.copyFrom(entity.rotationQuaternion)
+          }
+        }
+      } else {
+        // For multiple entities, always reset to identity rotation
+        // This provides a consistent reference point for scaling operations
+        if (gizmoNode.rotationQuaternion) {
+          gizmoNode.rotationQuaternion.set(0, 0, 0, 1) // Quaternion.Identity()
+        }
+      }
+
+      gizmoNode.computeWorldMatrix(true)
+    }
+
     this.isDragging = false
     this.initialGizmoScale = null
     this.pivotPosition = null

@@ -10,12 +10,12 @@ import { Warning } from '../Warning'
 const MultiSelectEntities: React.FC = withSdk(({ sdk }) => {
   const selectedEntity = useSelectedEntity()
   const [selection] = useComponentValue(selectedEntity || ROOT, sdk.components.Selection)
-  const { isPositionGizmoAlignmentDisabled } = useGizmoAlignment()
+  const { isGizmoWorldAlignmentDisabled } = useGizmoAlignment()
   const areMultipleEntitiesSelected = sdk.operations.getSelectedEntities().length > 1
   if (
     selectedEntity &&
     selection.gizmo === GizmoType.POSITION &&
-    isPositionGizmoAlignmentDisabled &&
+    isGizmoWorldAlignmentDisabled &&
     areMultipleEntitiesSelected
   ) {
     return (

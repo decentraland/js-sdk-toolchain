@@ -1,19 +1,16 @@
+import mitt from 'mitt'
 import { GizmoManager as BabylonGizmoManager, Vector3, TransformNode, Quaternion } from '@babylonjs/core'
 import { Vector3 as DclVector3 } from '@dcl/ecs-math'
 import { SceneContext } from './SceneContext'
 import { EcsEntity } from './EcsEntity'
 import { GizmoType } from '../../utils/gizmo'
 import { FreeGizmo, PositionGizmo, RotationGizmo, ScaleGizmo, IGizmoTransformer } from './gizmos'
-import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manager'
-
-// Define the transform type
-interface WorldTransform {
-  position: Vector3
-  scale: Vector3
-  rotation: Quaternion
-}
+import { snapPosition, snapRotation, snapScale } from './snap-manager'
 
 export function createGizmoManager(context: SceneContext) {
+  // events
+  const events = mitt<{ change: void }>()
+
   // Initialize state
   let selectedEntities: EcsEntity[] = []
   let isEnabled = true
@@ -24,16 +21,14 @@ export function createGizmoManager(context: SceneContext) {
   gizmoManager.usePointerToAttachGizmos = false
 
   // Create transformers
-  const positionTransformer = new PositionGizmo(gizmoManager)
-  const rotationTransformer = new RotationGizmo(gizmoManager)
-  const scaleTransformer = new ScaleGizmo(gizmoManager)
+  const positionTransformer = new PositionGizmo(gizmoManager, snapPosition)
+  const rotationTransformer = new RotationGizmo(gizmoManager, snapRotation)
+  const scaleTransformer = new ScaleGizmo(gizmoManager, snapScale)
   const freeTransformer = new FreeGizmo(context.scene)
 
   // Add alignment state
-  let isPositionGizmoWorldAligned = true
-  let isRotationGizmoWorldAligned = true
-  const isPositionGizmoAlignmentDisabled = false
-  const isRotationGizmoAlignmentDisabled = false
+  let isGizmoWorldAligned = true
+  const isGizmoWorldAlignmentDisabled = false
 
   function updateEntityPosition(entity: EcsEntity) {
     const currentTransform = context.Transform.getOrNull(entity.entityId)
@@ -106,82 +101,6 @@ export function createGizmoManager(context: SceneContext) {
     })
   }
 
-  function updateEntityTransform(entity: EcsEntity) {
-    const currentTransform = context.Transform.getOrNull(entity.entityId)
-    if (!currentTransform) return
-
-    context.operations.updateValue(context.Transform, entity.entityId, {
-      ...currentTransform,
-      position: DclVector3.create(entity.position.x, entity.position.y, entity.position.z),
-      scale: DclVector3.create(entity.scaling.x, entity.scaling.y, entity.scaling.z),
-      rotation: entity.rotationQuaternion
-        ? {
-            x: entity.rotationQuaternion.x,
-            y: entity.rotationQuaternion.y,
-            z: entity.rotationQuaternion.z,
-            w: entity.rotationQuaternion.w
-          }
-        : currentTransform.rotation
-    })
-  }
-
-  function updateMultipleEntitiesRotation() {
-    console.log('=== updateMultipleEntitiesRotation ===')
-    console.log('Number of entities:', selectedEntities.length)
-
-    // Para múltiples entidades, necesitamos actualizar tanto posición como rotación
-    // porque las entidades se mueven alrededor del centroid
-    selectedEntities.forEach((entity) => {
-      const currentTransform = context.Transform.getOrNull(entity.entityId)
-      if (!currentTransform) return
-
-      console.log('--- Processing entity:', entity.entityId, '---')
-      console.log('Has parent in ECS:', !!currentTransform.parent)
-      console.log('Has parent in Babylon:', !!(entity.parent && entity.parent instanceof TransformNode))
-
-      // Obtener el padre correcto del contexto ECS
-      const parent = currentTransform.parent
-
-      // Para entidades hijas, las coordenadas ya están en espacio local
-      // porque el RotationGizmo ya las convirtió correctamente
-      const position = DclVector3.create(entity.position.x, entity.position.y, entity.position.z)
-
-      // El RotationGizmo ya aplica la rotación en coordenadas locales
-      // Solo necesitamos usar directamente la rotación de Babylon
-      const rotation = entity.rotationQuaternion
-        ? {
-            x: entity.rotationQuaternion.x,
-            y: entity.rotationQuaternion.y,
-            z: entity.rotationQuaternion.z,
-            w: entity.rotationQuaternion.w
-          }
-        : currentTransform.rotation
-
-      console.log(
-        'Current Babylon rotation:',
-        entity.rotationQuaternion
-          ? {
-              x: entity.rotationQuaternion.x,
-              y: entity.rotationQuaternion.y,
-              z: entity.rotationQuaternion.z,
-              w: entity.rotationQuaternion.w
-            }
-          : 'No rotation'
-      )
-
-      console.log('Final rotation to save:', rotation)
-      console.log('--- End entity ---')
-
-      context.operations.updateValue(context.Transform, entity.entityId, {
-        ...currentTransform,
-        position,
-        rotation
-      })
-    })
-
-    console.log('=== End updateMultipleEntitiesRotation ===')
-  }
-
   // Calculate centroid of selected entities
   function calculateCentroid(): Vector3 {
     if (selectedEntities.length === 0) return Vector3.Zero()
@@ -229,13 +148,7 @@ export function createGizmoManager(context: SceneContext) {
 
   // Clean up all gizmo observers
   function cleanupAllGizmoObservers() {
-    // Clean up position gizmo
-    if (gizmoManager.gizmos.positionGizmo) {
-      gizmoManager.gizmos.positionGizmo.onDragStartObservable.clear()
-      gizmoManager.gizmos.positionGizmo.onDragObservable.clear()
-      gizmoManager.gizmos.positionGizmo.onDragEndObservable.clear()
-    }
-
+    // Don't clean up position gizmo - it manages its own observables
     // Clean up rotation gizmo
     if (gizmoManager.gizmos.rotationGizmo) {
       gizmoManager.gizmos.rotationGizmo.onDragStartObservable.clear()
@@ -251,28 +164,6 @@ export function createGizmoManager(context: SceneContext) {
     }
   }
 
-  // Setup specific change handlers for each transformer type
-  const setupPositionTransformerChangeHandler = (transformer: IGizmoTransformer) => {
-    transformer.onChange(() => {
-      selectedEntities.forEach(updateEntityPosition)
-      void context.operations.dispatch()
-    })
-  }
-
-  const setupRotationTransformerChangeHandler = (transformer: IGizmoTransformer) => {
-    transformer.onChange(() => {
-      // No actualizar ECS durante el drag para evitar interferir con el gizmo
-      // La actualización se hará al final del drag
-    })
-  }
-
-  const setupScaleTransformerChangeHandler = (transformer: IGizmoTransformer) => {
-    transformer.onChange(() => {
-      selectedEntities.forEach(updateEntityScale)
-      void context.operations.dispatch()
-    })
-  }
-
   const setupFreeTransformerChangeHandler = (transformer: IGizmoTransformer) => {
     transformer.onChange(() => {
       selectedEntities.forEach(updateEntityPosition)
@@ -280,26 +171,7 @@ export function createGizmoManager(context: SceneContext) {
     })
   }
 
-  // Setup all transformers with appropriate handlers
-  setupPositionTransformerChangeHandler(positionTransformer)
-  setupRotationTransformerChangeHandler(rotationTransformer)
-  setupScaleTransformerChangeHandler(scaleTransformer)
   setupFreeTransformerChangeHandler(freeTransformer)
-
-  // Setup snap functionality
-  function updateSnap() {
-    if (gizmoManager.gizmos.positionGizmo) {
-      gizmoManager.gizmos.positionGizmo.snapDistance = snapManager.isEnabled() ? snapManager.getPositionSnap() : 0
-    }
-    if (gizmoManager.gizmos.scaleGizmo) {
-      gizmoManager.gizmos.scaleGizmo.snapDistance = snapManager.isEnabled() ? snapManager.getScaleSnap() : 0
-    }
-    if (gizmoManager.gizmos.rotationGizmo) {
-      gizmoManager.gizmos.rotationGizmo.snapDistance = snapManager.isEnabled() ? snapManager.getRotationSnap() : 0
-    }
-  }
-  snapManager.onChange(updateSnap)
-  updateSnap()
 
   // Parent-child relationship handling
   function restoreParents() {
@@ -320,27 +192,38 @@ export function createGizmoManager(context: SceneContext) {
     setEnabled(value: boolean) {
       isEnabled = value
       if (!isEnabled) {
-        restoreParents()
+        // restoreParents()
         gizmoManager.attachToNode(null)
       }
     },
     restoreParents,
     addEntity(entity: EcsEntity) {
       if (selectedEntities.includes(entity) || !isEnabled) return
-      restoreParents()
+      // restoreParents()
       selectedEntities.push(entity)
       updateGizmoPosition()
+
+      // Update current transformer with new entities
+      if (currentTransformer) {
+        currentTransformer.setEntities(selectedEntities)
+      }
+      events.emit('change')
     },
     getEntity() {
       return selectedEntities[0]
     },
     removeEntity(entity: EcsEntity) {
-      restoreParents()
+      // restoreParents()
       selectedEntities = selectedEntities.filter((e) => e.entityId !== entity.entityId)
       if (selectedEntities.length === 0) {
         gizmoManager.attachToNode(null)
       } else {
         updateGizmoPosition()
+      }
+
+      // Update current transformer with remaining entities
+      if (currentTransformer) {
+        currentTransformer.setEntities(selectedEntities)
       }
     },
     getGizmoTypes() {
@@ -364,207 +247,120 @@ export function createGizmoManager(context: SceneContext) {
       // Setup the new transformer based on type
       switch (type) {
         case GizmoType.POSITION: {
+          console.log('=== SET GIZMO TYPE === position')
           currentTransformer = positionTransformer
           currentTransformer.setup()
-          gizmoManager.positionGizmoEnabled = true
-          if (gizmoManager.gizmos.positionGizmo) {
-            const positionGizmo = gizmoManager.gizmos.positionGizmo
-            positionGizmo.updateGizmoRotationToMatchAttachedMesh = !isPositionGizmoWorldAligned
+          currentTransformer.setEntities(selectedEntities)
 
-            // Setup drag start
-            positionGizmo.onDragStartObservable.add(() => {
-              console.log('[GizmoManager] Position drag start')
-              if (gizmoManager.attachedNode) {
-                currentTransformer?.onDragStart(selectedEntities, gizmoManager.attachedNode as TransformNode)
-              }
-            })
-
-            // Setup drag update
-            positionGizmo.onDragObservable.add(() => {
-              if (gizmoManager.attachedNode) {
-                currentTransformer?.update(selectedEntities, gizmoManager.attachedNode as TransformNode)
-              }
-            })
-
-            // Setup drag end
-            positionGizmo.onDragEndObservable.add(() => {
-              console.log('[GizmoManager] Position drag end')
-              if (currentTransformer) {
-                currentTransformer.onDragEnd()
-                selectedEntities.forEach(updateEntityPosition)
-                void context.operations.dispatch()
-              }
-            })
+          // Set up callbacks for ECS updates
+          if ('setUpdateCallbacks' in currentTransformer) {
+            console.log('=== SET UPDATE CALLBACKS ===')
+            ;(currentTransformer as any).setUpdateCallbacks(updateEntityPosition, () => context.operations.dispatch())
           }
+
+          // Set world alignment
+          if ('setWorldAligned' in currentTransformer) {
+            ;(currentTransformer as any).setWorldAligned(isGizmoWorldAligned)
+          }
+
+          gizmoManager.positionGizmoEnabled = true
+
+          // Enable the position gizmo to set up its observables
+          if ('enable' in currentTransformer) {
+            ;(currentTransformer as any).enable()
+          }
+
           break
         }
         case GizmoType.ROTATION: {
           currentTransformer = rotationTransformer
           currentTransformer.setup()
-          gizmoManager.rotationGizmoEnabled = true
-          if (gizmoManager.gizmos.rotationGizmo) {
-            const rotationGizmo = gizmoManager.gizmos.rotationGizmo
-            rotationGizmo.updateGizmoRotationToMatchAttachedMesh = !isRotationGizmoWorldAligned
+          currentTransformer.setEntities(selectedEntities)
 
-            // Setup drag start
-            rotationGizmo.onDragStartObservable.add(() => {
-              console.log('[GizmoManager] Rotation drag start')
-              if (gizmoManager.attachedNode) {
-                currentTransformer?.onDragStart(selectedEntities, gizmoManager.attachedNode as TransformNode)
-              }
-            })
-
-            // Setup drag update
-            rotationGizmo.onDragObservable.add(() => {
-              if (gizmoManager.attachedNode) {
-                currentTransformer?.update(selectedEntities, gizmoManager.attachedNode as TransformNode)
-              }
-            })
-
-            // Setup drag end
-            rotationGizmo.onDragEndObservable.add(() => {
-              console.log('[GizmoManager] Rotation drag end')
-              if (currentTransformer) {
-                currentTransformer.onDragEnd()
-
-                console.log('=== DRAG END - Before ECS Update ===')
-                selectedEntities.forEach((entity, index) => {
-                  console.log(`Entity ${index + 1} (${entity.entityId}):`)
-                  if (entity.rotationQuaternion) {
-                    console.log('  Babylon rotation:', {
-                      x: entity.rotationQuaternion.x,
-                      y: entity.rotationQuaternion.y,
-                      z: entity.rotationQuaternion.z,
-                      w: entity.rotationQuaternion.w
-                    })
-                  } else {
-                    console.log('  Babylon rotation: No rotation')
-                  }
-
-                  const currentTransform = context.Transform.getOrNull(entity.entityId)
-                  if (currentTransform) {
-                    console.log('  ECS rotation before update:', currentTransform.rotation)
-                  }
-                })
-
-                // Actualizar ECS al final del drag
-                if (selectedEntities.length === 1) {
-                  // Para una sola entidad, solo actualizar rotación
-                  selectedEntities.forEach(updateEntityRotation)
-                } else if (selectedEntities.length > 1) {
-                  // Para múltiples entidades, actualizar posición y rotación
-                  updateMultipleEntitiesRotation()
-                  // Restaurar las relaciones padre-hijo después de la actualización
-                  restoreParents()
-                }
-
-                console.log('=== DRAG END - After ECS Update ===')
-                selectedEntities.forEach((entity, index) => {
-                  const currentTransform = context.Transform.getOrNull(entity.entityId)
-                  if (currentTransform) {
-                    console.log(
-                      `Entity ${index + 1} (${entity.entityId}) ECS rotation after update:`,
-                      currentTransform.rotation
-                    )
-                  }
-                })
-
-                void context.operations.dispatch()
-              }
-            })
+          // Set up callbacks for ECS updates
+          if ('setUpdateCallbacks' in currentTransformer) {
+            console.log('=== SET UPDATE CALLBACKS ===')
+            ;(currentTransformer as any).setUpdateCallbacks(
+              updateEntityRotation,
+              updateEntityPosition,
+              () => context.operations.dispatch(),
+              context
+            )
           }
+
+          // Set world alignment
+          if ('setWorldAligned' in currentTransformer) {
+            ;(currentTransformer as any).setWorldAligned(isGizmoWorldAligned)
+          }
+
+          gizmoManager.rotationGizmoEnabled = true
+
+          // Enable the rotation gizmo to set up its observables
+          if ('enable' in currentTransformer) {
+            ;(currentTransformer as any).enable()
+          }
+
           break
         }
         case GizmoType.SCALE: {
           currentTransformer = scaleTransformer
           currentTransformer.setup()
-          gizmoManager.scaleGizmoEnabled = true
-          if (gizmoManager.gizmos.scaleGizmo) {
-            const scaleGizmo = gizmoManager.gizmos.scaleGizmo
-            scaleGizmo.updateGizmoRotationToMatchAttachedMesh = false
+          currentTransformer.setEntities(selectedEntities)
 
-            // Setup drag start
-            scaleGizmo.onDragStartObservable.add(() => {
-              console.log('[GizmoManager] Scale drag start')
-              if (gizmoManager.attachedNode) {
-                currentTransformer?.onDragStart(selectedEntities, gizmoManager.attachedNode as TransformNode)
-              }
-            })
-
-            // Setup drag update
-            scaleGizmo.onDragObservable.add(() => {
-              if (gizmoManager.attachedNode) {
-                currentTransformer?.update(selectedEntities, gizmoManager.attachedNode as TransformNode)
-              }
-            })
-
-            // Setup drag end
-            scaleGizmo.onDragEndObservable.add(() => {
-              console.log('[GizmoManager] Scale drag end')
-              if (currentTransformer) {
-                currentTransformer.onDragEnd()
-                selectedEntities.forEach(updateEntityScale)
-                void context.operations.dispatch()
-              }
-            })
+          // Set up callbacks for ECS updates
+          if ('setUpdateCallbacks' in currentTransformer) {
+            ;(currentTransformer as any).setUpdateCallbacks(updateEntityScale, () => context.operations.dispatch())
           }
+
+          // Set world alignment
+          if ('setWorldAligned' in currentTransformer) {
+            ;(currentTransformer as any).setWorldAligned(isGizmoWorldAligned)
+          }
+
+          gizmoManager.scaleGizmoEnabled = true
+
+          // Enable the scale gizmo to set up its observables
+          if ('enable' in currentTransformer) {
+            ;(currentTransformer as any).enable()
+          }
+
           break
         }
         case GizmoType.FREE: {
           currentTransformer = freeTransformer
           currentTransformer.setup()
+          currentTransformer.setEntities(selectedEntities)
+
+          // Set up callback to update gizmo position after drag ends
+          if ('setOnDragEndCallback' in currentTransformer) {
+            ;(currentTransformer as any).setOnDragEndCallback(() => {
+              updateGizmoPosition()
+            })
+          }
+
           const node = getGizmoNode()
           currentTransformer.onDragStart(selectedEntities, node)
           currentTransformer.update(selectedEntities, node)
           break
         }
       }
+      events.emit('change')
     },
-    isPositionGizmoWorldAligned() {
-      return isPositionGizmoWorldAligned
+    isGizmoWorldAligned() {
+      return isGizmoWorldAligned
     },
-    setPositionGizmoWorldAligned(value: boolean) {
-      isPositionGizmoWorldAligned = value
-      if (gizmoManager.gizmos.positionGizmo) {
-        gizmoManager.gizmos.positionGizmo.updateGizmoRotationToMatchAttachedMesh = !value
+    setGizmoWorldAligned(value: boolean) {
+      isGizmoWorldAligned = value
+      if (currentTransformer && 'setWorldAligned' in currentTransformer) {
+        ;(currentTransformer as any).setWorldAligned(value)
       }
+      events.emit('change')
     },
-    isRotationGizmoWorldAligned() {
-      return isRotationGizmoWorldAligned
-    },
-    setRotationGizmoWorldAligned(value: boolean) {
-      isRotationGizmoWorldAligned = value
-      if (gizmoManager.gizmos.rotationGizmo) {
-        gizmoManager.gizmos.rotationGizmo.updateGizmoRotationToMatchAttachedMesh = !value
-      }
-    },
-    isRotationGizmoAlignmentDisabled() {
-      return isRotationGizmoAlignmentDisabled
-    },
-    isPositionGizmoAlignmentDisabled() {
-      return isPositionGizmoAlignmentDisabled
-    },
-    fixRotationGizmoAlignment() {
-      if (gizmoManager.gizmos.rotationGizmo && selectedEntities.length === 1) {
-        const entity = selectedEntities[0]
-        if (entity.rotationQuaternion) {
-          const node = getGizmoNode()
-          node.rotationQuaternion?.copyFrom(entity.rotationQuaternion)
-          node.computeWorldMatrix(true)
-        }
-      }
-    },
-    fixPositionGizmoAlignment() {
-      if (gizmoManager.gizmos.positionGizmo && selectedEntities.length === 1) {
-        const entity = selectedEntities[0]
-        if (entity.rotationQuaternion) {
-          const node = getGizmoNode()
-          node.rotationQuaternion?.copyFrom(entity.rotationQuaternion)
-          node.computeWorldMatrix(true)
-        }
-      }
+    isGizmoWorldAlignmentDisabled() {
+      return isGizmoWorldAlignmentDisabled
     },
     onChange(cb: () => void) {
+      events.on('change', cb)
       const disposables: (() => void)[] = []
 
       // Add observers for position gizmo
@@ -607,6 +403,7 @@ export function createGizmoManager(context: SceneContext) {
 
       return () => {
         disposables.forEach((dispose) => dispose())
+        events.off('change', cb)
       }
     }
   }

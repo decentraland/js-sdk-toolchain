@@ -19,6 +19,7 @@ export class FreeGizmo implements IGizmoTransformer {
   private pivotPosition: Vector3 | null = null
   private entityOffsets = new Map<Entity, Vector3>()
   private isDragging = false
+  private onDragEndCallback: (() => void) | null = null
 
   constructor(private scene: Scene, private utilityLayer: UtilityLayerRenderer = new UtilityLayerRenderer(scene)) {
     this.dragBehavior = new PointerDragBehavior({ dragPlaneNormal: new Vector3(0, 1, 0) })
@@ -39,6 +40,16 @@ export class FreeGizmo implements IGizmoTransformer {
     this.pivotPosition = null
     this.entityOffsets.clear()
     this.isDragging = false
+    this.onDragEndCallback = null
+  }
+
+  setEntities(entities: EcsEntity[]): void {
+    this.selectedEntities = entities
+  }
+
+  // Add method to set drag end callback
+  setOnDragEndCallback(callback: () => void): void {
+    this.onDragEndCallback = callback
   }
 
   private setupSceneObservers(): void {
@@ -81,6 +92,9 @@ export class FreeGizmo implements IGizmoTransformer {
       this.isDragging = false
       this.detachDragBehavior()
       this.notifyChange()
+      if (this.onDragEndCallback) {
+        this.onDragEndCallback()
+      }
     })
   }
 
@@ -155,6 +169,9 @@ export class FreeGizmo implements IGizmoTransformer {
     this.pivotPosition = null
     this.entityOffsets.clear()
     this.notifyChange()
+    if (this.onDragEndCallback) {
+      this.onDragEndCallback()
+    }
   }
 
   onDragStart(entities: EcsEntity[], gizmoNode: TransformNode): void {
