@@ -639,6 +639,7 @@ export const componentDefinitionByName: {
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
     "core::InputModifier": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBInputModifier>>;
+    "core::LightSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBLightSource>>;
     "core::MainCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMainCamera>>;
     "core::Material": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMaterial>>;
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
@@ -652,6 +653,7 @@ export const componentDefinitionByName: {
     "core::Raycast": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycast>>;
     "core::RaycastResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycastResult>>;
     "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
+    "core::SkyboxTime": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSkyboxTime>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
     "core::TweenSequence": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenSequence>>;
@@ -1573,6 +1575,24 @@ export interface LastWriteWinElementSetComponentDefinition<T> extends BaseCompon
     getOrNull(entity: Entity): DeepReadonly<T> | null;
 }
 
+// Warning: (ae-missing-release-tag) "LightSource" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const LightSource: LightSourceComponentDefinitionExtended;
+
+// @public (undocumented)
+export interface LightSourceComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBLightSource> {
+    Type: LightSourceHelper;
+}
+
+// @public (undocumented)
+export interface LightSourceHelper {
+    // (undocumented)
+    Point: (point: PBLightSource_Point) => PBLightSource['type'];
+    // (undocumented)
+    Spot: (spot: PBLightSource_Spot) => PBLightSource['type'];
+}
+
 // @public
 export type Listeners = {
     onMouseDown?: Callback;
@@ -2422,6 +2442,66 @@ export namespace PBInputModifier_StandardInput {
 }
 
 // @public (undocumented)
+export interface PBLightSource {
+    active?: boolean | undefined;
+    brightness?: number | undefined;
+    color?: PBColor3 | undefined;
+    range?: number | undefined;
+    // (undocumented)
+    type?: {
+        $case: "point";
+        point: PBLightSource_Point;
+    } | {
+        $case: "spot";
+        spot: PBLightSource_Spot;
+    } | undefined;
+}
+
+// @public (undocumented)
+export namespace PBLightSource {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBLightSource;
+    // (undocumented)
+    export function encode(message: PBLightSource, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBLightSource_Point {
+    shadow?: PBLightSource_ShadowType | undefined;
+}
+
+// @public (undocumented)
+export namespace PBLightSource_Point {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBLightSource_Point;
+    // (undocumented)
+    export function encode(message: PBLightSource_Point, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export const enum PBLightSource_ShadowType {
+    ST_HARD = 2,
+    ST_NONE = 0,
+    ST_SOFT = 1
+}
+
+// @public (undocumented)
+export interface PBLightSource_Spot {
+    innerAngle?: number | undefined;
+    outerAngle?: number | undefined;
+    shadow?: PBLightSource_ShadowType | undefined;
+    shadowMaskTexture?: TextureUnion | undefined;
+}
+
+// @public (undocumented)
+export namespace PBLightSource_Spot {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBLightSource_Spot;
+    // (undocumented)
+    export function encode(message: PBLightSource_Spot, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBMainCamera {
     virtualCameraEntity?: number | undefined;
 }
@@ -2884,6 +2964,20 @@ export namespace PBRealmInfo {
 }
 
 // @public (undocumented)
+export interface PBSkyboxTime {
+    fixedTime: number;
+    transitionMode?: TransitionMode | undefined;
+}
+
+// @public (undocumented)
+export namespace PBSkyboxTime {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBSkyboxTime;
+    // (undocumented)
+    export function encode(message: PBSkyboxTime, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBTextShape {
     font?: Font | undefined;
     fontAutoSize?: boolean | undefined;
@@ -3303,6 +3397,7 @@ export namespace PBVideoPlayer {
 export interface PBVirtualCamera {
     // (undocumented)
     defaultTransition?: CameraTransition | undefined;
+    fov?: number | undefined;
     // (undocumented)
     lookAtEntity?: number | undefined;
 }
@@ -3933,6 +4028,9 @@ export namespace Schemas {
 }
 
 // @public (undocumented)
+export const SkyboxTime: LastWriteWinElementSetComponentDefinition<PBSkyboxTime>;
+
+// @public (undocumented)
 export interface Spec {
     // (undocumented)
     [key: string]: ISchema;
@@ -4163,6 +4261,12 @@ export type TransformType = {
 
 // @public (undocumented)
 export type TransformTypeWithOptionals = Partial<TransformType>;
+
+// @public (undocumented)
+export const enum TransitionMode {
+    TM_BACKWARD = 1,
+    TM_FORWARD = 0
+}
 
 // @public (undocumented)
 export type Transport = {
