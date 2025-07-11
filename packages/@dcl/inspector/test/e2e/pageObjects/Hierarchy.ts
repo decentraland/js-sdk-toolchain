@@ -134,6 +134,18 @@ class HierarchyPageObject {
     }
   }
 
+  async selectMultiple(entityIds: number[]) {
+    const firstItem = await this.getItem(entityIds[0], this.getItemSelectorById)
+    await firstItem.click()
+
+    for (let i = 1; i < entityIds.length; i++) {
+      const item = await this.getItem(entityIds[i], this.getItemSelectorById)
+      await page.keyboard.down('Control')
+      await item.click()
+      await page.keyboard.up('Control')
+    }
+  }
+
   async addComponent(entityId: number, componentName: string) {
     const item = await this.getItem(entityId, this.getItemSelectorById)
     await item.click({ button: 'right' })
