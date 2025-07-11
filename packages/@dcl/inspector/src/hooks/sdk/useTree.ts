@@ -100,6 +100,11 @@ export const useTree = () => {
     [sdk, handleUpdate, tree]
   )
 
+  const getSelectedItems = useCallback((): Entity[] => {
+    if (!sdk) return []
+    return sdk.operations.getSelectedEntities()
+  }, [sdk])
+
   const setParent = useCallback(
     async (source: Entity, target: Entity, type: DropType) => {
       if (source === ROOT || !sdk) return
@@ -222,6 +227,7 @@ export const useTree = () => {
     canDuplicate,
     canDrag,
     canReorder,
-    centerViewOnEntity
+    centerViewOnEntity,
+    getSelectedItems
   }
 }
