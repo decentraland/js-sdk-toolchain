@@ -12,11 +12,14 @@ export class FreeGizmo implements IGizmoTransformer {
   private onDragEndCallback: (() => void) | null = null
   private updateEntityPosition: ((entity: EcsEntity) => void) | null = null
   private dispatchOperations: (() => void) | null = null
+  private isWorldAligned = true
+  private dragStartObserver: any = null
+  private dragObserver: any = null
+  private dragEndObserver: any = null
 
   constructor(private scene: Scene, private utilityLayer: UtilityLayerRenderer = new UtilityLayerRenderer(scene)) {
     this.dragBehavior = new PointerDragBehavior({ dragPlaneNormal: new Vector3(0, 1, 0) })
     this.dragBehavior.useObjectOrientationForDragging = false
-    this.setupDragObservers()
   }
 
   setup(): void {
@@ -24,8 +27,14 @@ export class FreeGizmo implements IGizmoTransformer {
     this.setupSceneObservers()
   }
 
+  enable(): void {
+    // Setup drag observables when the gizmo is enabled
+    this.setupDragObservers()
+  }
+
   cleanup(): void {
     this.removeSceneObservers()
+    this.cleanupDragObservers()
     this.detachDragBehavior()
     this.selectedEntities = []
     this.pivotPosition = null
@@ -43,6 +52,13 @@ export class FreeGizmo implements IGizmoTransformer {
   setUpdateCallbacks(updateEntityPosition: (entity: EcsEntity) => void, dispatchOperations: () => void): void {
     this.updateEntityPosition = updateEntityPosition
     this.dispatchOperations = dispatchOperations
+  }
+
+  setWorldAligned(value: boolean): void {
+    this.isWorldAligned = value
+    // For free gizmo, world alignment affects the drag plane orientation
+    // The drag plane normal is set in the constructor and cannot be modified after creation
+    // For now, we'll keep the world-aligned behavior consistent
   }
 
   // Add method to set drag end callback
@@ -70,10 +86,13 @@ export class FreeGizmo implements IGizmoTransformer {
   }
 
   private setupDragObservers(): void {
-    this.dragBehavior.onDragStartObservable.add(() => {
+    // Setup drag start
+    this.dragStartObserver = this.dragBehavior.onDragStartObservable.add(() => {
       this.isDragging = true
     })
-    this.dragBehavior.onDragObservable.add((eventData) => {
+
+    // Setup drag update
+    this.dragObserver = this.dragBehavior.onDragObservable.add((eventData) => {
       if (!this.isDragging || !eventData.delta || !this.pivotPosition) return
       const worldDelta = eventData.delta.clone()
       worldDelta.y = 0
@@ -90,7 +109,9 @@ export class FreeGizmo implements IGizmoTransformer {
         this.selectedEntities.forEach(this.updateEntityPosition)
       }
     })
-    this.dragBehavior.onDragEndObservable.add(() => {
+
+    // Setup drag end
+    this.dragEndObserver = this.dragBehavior.onDragEndObservable.add(() => {
       this.isDragging = false
       this.detachDragBehavior()
 
@@ -103,6 +124,23 @@ export class FreeGizmo implements IGizmoTransformer {
         this.onDragEndCallback()
       }
     })
+  }
+
+  private cleanupDragObservers(): void {
+    if (this.dragStartObserver) {
+      this.dragBehavior.onDragStartObservable.remove(this.dragStartObserver)
+      this.dragStartObserver = null
+    }
+
+    if (this.dragObserver) {
+      this.dragBehavior.onDragObservable.remove(this.dragObserver)
+      this.dragObserver = null
+    }
+
+    if (this.dragEndObserver) {
+      this.dragBehavior.onDragEndObservable.remove(this.dragEndObserver)
+      this.dragEndObserver = null
+    }
   }
 
   private detachDragBehavior(): void {
@@ -180,14 +218,14 @@ export class FreeGizmo implements IGizmoTransformer {
     }
   }
 
-  onDragStart(entities: EcsEntity[]): void {
+  onDragStart(entities: EcsEntity[], gizmoNode: TransformNode): void {
     this.selectedEntities = entities
     this.pivotPosition = null
     this.entityOffsets.clear()
     this.detachDragBehavior()
   }
 
-  update(entities: EcsEntity[], _gizmoNode: TransformNode): void {
+  update(entities: EcsEntity[], gizmoNode: TransformNode): void {
     if (entities !== this.selectedEntities) {
       this.selectedEntities = entities
       this.pivotPosition = null

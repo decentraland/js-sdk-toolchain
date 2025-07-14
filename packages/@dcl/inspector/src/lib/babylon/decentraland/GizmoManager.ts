@@ -5,7 +5,7 @@ import { SceneContext } from './SceneContext'
 import { EcsEntity } from './EcsEntity'
 import { GizmoType } from '../../utils/gizmo'
 import { FreeGizmo, PositionGizmo, RotationGizmo, ScaleGizmo, IGizmoTransformer } from './gizmos'
-import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manager'
+import { snapPosition, snapRotation, snapScale } from './snap-manager'
 
 export function createGizmoManager(context: SceneContext) {
   // events
@@ -297,6 +297,11 @@ export function createGizmoManager(context: SceneContext) {
             ;(currentTransformer as any).setUpdateCallbacks(updateEntityPosition, () => context.operations.dispatch())
           }
 
+          // Set world alignment
+          if ('setWorldAligned' in currentTransformer) {
+            ;(currentTransformer as any).setWorldAligned(isGizmoWorldAligned)
+          }
+
           // Set up callback to update gizmo position after drag ends
           if ('setOnDragEndCallback' in currentTransformer) {
             ;(currentTransformer as any).setOnDragEndCallback(() => {
@@ -304,9 +309,11 @@ export function createGizmoManager(context: SceneContext) {
             })
           }
 
-          const node = getGizmoNode()
-          currentTransformer.onDragStart(selectedEntities, node)
-          currentTransformer.update(selectedEntities, node)
+          // Enable the free gizmo to set up its observables
+          if ('enable' in currentTransformer) {
+            ;(currentTransformer as any).enable()
+          }
+
           break
         }
       }
@@ -317,8 +324,8 @@ export function createGizmoManager(context: SceneContext) {
     },
     setGizmoWorldAligned(value: boolean) {
       isGizmoWorldAligned = value
-      if (currentTransformer && 'setWorldAligned' in currentTransformer) {
-        ;(currentTransformer as any).setWorldAligned(value)
+      if (!!currentTransformer && 'setWorldAligned' in currentTransformer) {
+        currentTransformer.setWorldAligned(value)
       }
       events.emit('change')
     },

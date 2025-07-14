@@ -10,8 +10,8 @@ export interface IGizmoTransformer {
   onDragEnd(): void
   setOnDragEndCallback?(callback: () => void): void
   enable?(): void
-  setUpdateCallbacks?(...args: any[]): void
-  setWorldAligned?(value: boolean): void
+  setUpdateCallbacks(...args: any[]): void
+  setWorldAligned(value: boolean): void
 }
 
 export const enum GizmoType {
