@@ -8,10 +8,10 @@ export interface IGizmoTransformer {
   onDragStart(entities: EcsEntity[], gizmoNode: TransformNode): void
   update(entities: EcsEntity[], gizmoNode: TransformNode): void
   onDragEnd(): void
-  setOnDragEndCallback?(callback: () => void): void
-  enable?(): void
+  enable(): void
   setUpdateCallbacks(...args: any[]): void
   setWorldAligned(value: boolean): void
+  setOnDragEndCallback?(callback: () => void): void
 }
 
 export const enum GizmoType {

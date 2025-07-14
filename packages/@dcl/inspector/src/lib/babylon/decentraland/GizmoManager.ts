@@ -116,24 +116,6 @@ export function createGizmoManager(context: SceneContext) {
     gizmoManager.attachToNode(node)
   }
 
-  // Clean up all gizmo observers
-  function cleanupAllGizmoObservers() {
-    // Don't clean up position gizmo - it manages its own observables
-    // Clean up rotation gizmo
-    if (gizmoManager.gizmos.rotationGizmo) {
-      gizmoManager.gizmos.rotationGizmo.onDragStartObservable.clear()
-      gizmoManager.gizmos.rotationGizmo.onDragObservable.clear()
-      gizmoManager.gizmos.rotationGizmo.onDragEndObservable.clear()
-    }
-
-    // Clean up scale gizmo
-    if (gizmoManager.gizmos.scaleGizmo) {
-      gizmoManager.gizmos.scaleGizmo.onDragStartObservable.clear()
-      gizmoManager.gizmos.scaleGizmo.onDragObservable.clear()
-      gizmoManager.gizmos.scaleGizmo.onDragEndObservable.clear()
-    }
-  }
-
   // Parent-child relationship handling
   function restoreParents() {
     selectedEntities.forEach((entity) => {
@@ -153,14 +135,12 @@ export function createGizmoManager(context: SceneContext) {
     setEnabled(value: boolean) {
       isEnabled = value
       if (!isEnabled) {
-        // restoreParents()
         gizmoManager.attachToNode(null)
       }
     },
     restoreParents,
     addEntity(entity: EcsEntity) {
       if (selectedEntities.includes(entity) || !isEnabled) return
-      // restoreParents()
       selectedEntities.push(entity)
       updateGizmoPosition()
 
@@ -174,7 +154,6 @@ export function createGizmoManager(context: SceneContext) {
       return selectedEntities[0]
     },
     removeEntity(entity: EcsEntity) {
-      // restoreParents()
       selectedEntities = selectedEntities.filter((e) => e.entityId !== entity.entityId)
       if (selectedEntities.length === 0) {
         gizmoManager.attachToNode(null)
@@ -191,9 +170,6 @@ export function createGizmoManager(context: SceneContext) {
       return [GizmoType.POSITION, GizmoType.ROTATION, GizmoType.SCALE, GizmoType.FREE] as const
     },
     setGizmoType(type: GizmoType) {
-      // First clean up all observers
-      cleanupAllGizmoObservers()
-
       // Then disable all Babylon gizmos
       gizmoManager.positionGizmoEnabled = false
       gizmoManager.rotationGizmoEnabled = false
@@ -208,27 +184,25 @@ export function createGizmoManager(context: SceneContext) {
       // Setup the new transformer based on type
       switch (type) {
         case GizmoType.POSITION: {
-          console.log('=== SET GIZMO TYPE === position')
           currentTransformer = positionTransformer
           currentTransformer.setup()
           currentTransformer.setEntities(selectedEntities)
 
           // Set up callbacks for ECS updates
           if ('setUpdateCallbacks' in currentTransformer) {
-            console.log('=== SET UPDATE CALLBACKS ===')
-            ;(currentTransformer as any).setUpdateCallbacks(updateEntityPosition, () => context.operations.dispatch())
+            currentTransformer.setUpdateCallbacks(updateEntityPosition, () => context.operations.dispatch())
           }
 
           // Set world alignment
           if ('setWorldAligned' in currentTransformer) {
-            ;(currentTransformer as any).setWorldAligned(isGizmoWorldAligned)
+            currentTransformer.setWorldAligned(isGizmoWorldAligned)
           }
 
           gizmoManager.positionGizmoEnabled = true
 
           // Enable the position gizmo to set up its observables
           if ('enable' in currentTransformer) {
-            ;(currentTransformer as any).enable()
+            currentTransformer.enable()
           }
 
           break
@@ -240,8 +214,7 @@ export function createGizmoManager(context: SceneContext) {
 
           // Set up callbacks for ECS updates
           if ('setUpdateCallbacks' in currentTransformer) {
-            console.log('=== SET UPDATE CALLBACKS ===')
-            ;(currentTransformer as any).setUpdateCallbacks(
+            currentTransformer.setUpdateCallbacks(
               updateEntityRotation,
               updateEntityPosition,
               () => context.operations.dispatch(),
@@ -251,14 +224,14 @@ export function createGizmoManager(context: SceneContext) {
 
           // Set world alignment
           if ('setWorldAligned' in currentTransformer) {
-            ;(currentTransformer as any).setWorldAligned(isGizmoWorldAligned)
+            currentTransformer.setWorldAligned(isGizmoWorldAligned)
           }
 
           gizmoManager.rotationGizmoEnabled = true
 
           // Enable the rotation gizmo to set up its observables
           if ('enable' in currentTransformer) {
-            ;(currentTransformer as any).enable()
+            currentTransformer.enable()
           }
 
           break
@@ -270,19 +243,19 @@ export function createGizmoManager(context: SceneContext) {
 
           // Set up callbacks for ECS updates
           if ('setUpdateCallbacks' in currentTransformer) {
-            ;(currentTransformer as any).setUpdateCallbacks(updateEntityScale, () => context.operations.dispatch())
+            currentTransformer.setUpdateCallbacks(updateEntityScale, () => context.operations.dispatch())
           }
 
           // Set world alignment
           if ('setWorldAligned' in currentTransformer) {
-            ;(currentTransformer as any).setWorldAligned(isGizmoWorldAligned)
+            currentTransformer.setWorldAligned(isGizmoWorldAligned)
           }
 
           gizmoManager.scaleGizmoEnabled = true
 
           // Enable the scale gizmo to set up its observables
           if ('enable' in currentTransformer) {
-            ;(currentTransformer as any).enable()
+            currentTransformer.enable()
           }
 
           break
@@ -294,24 +267,24 @@ export function createGizmoManager(context: SceneContext) {
 
           // Set up callbacks for ECS updates
           if ('setUpdateCallbacks' in currentTransformer) {
-            ;(currentTransformer as any).setUpdateCallbacks(updateEntityPosition, () => context.operations.dispatch())
+            currentTransformer.setUpdateCallbacks(updateEntityPosition, () => context.operations.dispatch())
           }
 
           // Set world alignment
           if ('setWorldAligned' in currentTransformer) {
-            ;(currentTransformer as any).setWorldAligned(isGizmoWorldAligned)
+            currentTransformer.setWorldAligned(isGizmoWorldAligned)
           }
 
           // Set up callback to update gizmo position after drag ends
           if ('setOnDragEndCallback' in currentTransformer) {
-            ;(currentTransformer as any).setOnDragEndCallback(() => {
+            currentTransformer.setOnDragEndCallback?.(() => {
               updateGizmoPosition()
             })
           }
 
           // Enable the free gizmo to set up its observables
           if ('enable' in currentTransformer) {
-            ;(currentTransformer as any).enable()
+            currentTransformer.enable()
           }
 
           break
