@@ -372,8 +372,17 @@ export class RotationGizmo implements IGizmoTransformer {
           // Apply snapping to the gizmo rotation directly
           const snappedGizmoRotation = this.snapRotation(currentGizmoRotation)
 
-          // For local-aligned, apply the snapped gizmo rotation directly as local rotation
-          entity.rotationQuaternion.copyFrom(snappedGizmoRotation)
+          // For local-aligned, convert world rotation to local rotation for child entities
+          if (entity.parent && entity.parent instanceof TransformNode) {
+            const parent = entity.parent as TransformNode
+            const parentWorldRotation =
+              parent.rotationQuaternion || Quaternion.FromRotationMatrix(parent.getWorldMatrix())
+            const localRotation = parentWorldRotation.invert().multiply(snappedGizmoRotation)
+            entity.rotationQuaternion.copyFrom(localRotation)
+          } else {
+            // No parent, world rotation is local rotation
+            entity.rotationQuaternion.copyFrom(snappedGizmoRotation)
+          }
         }
       }
     } else {
