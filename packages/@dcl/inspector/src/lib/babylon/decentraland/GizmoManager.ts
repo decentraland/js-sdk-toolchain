@@ -5,7 +5,7 @@ import { SceneContext } from './SceneContext'
 import { EcsEntity } from './EcsEntity'
 import { GizmoType } from '../../utils/gizmo'
 import { FreeGizmo, PositionGizmo, RotationGizmo, ScaleGizmo, IGizmoTransformer } from './gizmos'
-import { snapPosition, snapRotation, snapScale } from './snap-manager'
+import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manager'
 
 export function createGizmoManager(context: SceneContext) {
   // events
@@ -44,23 +44,8 @@ export function createGizmoManager(context: SceneContext) {
     const currentTransform = context.Transform.getOrNull(entity.entityId)
     if (!currentTransform || !entity.rotationQuaternion) return
 
-    // Obtener el padre correcto del contexto ECS
-    const parent = currentTransform.parent
-
-    console.log('=== updateEntityRotation ===')
-    console.log('Entity ID:', entity.entityId)
-    console.log('Has parent in ECS:', !!parent)
-    console.log('Has parent in Babylon:', !!(entity.parent && entity.parent instanceof TransformNode))
-    console.log('Current ECS rotation:', currentTransform.rotation)
-    console.log('Current Babylon rotation:', {
-      x: entity.rotationQuaternion.x,
-      y: entity.rotationQuaternion.y,
-      z: entity.rotationQuaternion.z,
-      w: entity.rotationQuaternion.w
-    })
-
-    // El RotationGizmo ya aplica la rotación en coordenadas locales
-    // Solo necesitamos usar directamente la rotación de Babylon
+    // The RotationGizmo already applies the rotation in local coordinates
+    // We only need to use the Babylon rotation directly
     const rotation = entity.rotationQuaternion
       ? {
           x: entity.rotationQuaternion.x,
@@ -69,21 +54,6 @@ export function createGizmoManager(context: SceneContext) {
           w: entity.rotationQuaternion.w
         }
       : currentTransform.rotation
-
-    console.log(
-      'Current Babylon rotation:',
-      entity.rotationQuaternion
-        ? {
-            x: entity.rotationQuaternion.x,
-            y: entity.rotationQuaternion.y,
-            z: entity.rotationQuaternion.z,
-            w: entity.rotationQuaternion.w
-          }
-        : 'No rotation'
-    )
-
-    console.log('Final rotation to save:', rotation)
-    console.log('========================')
 
     context.operations.updateValue(context.Transform, entity.entityId, {
       ...currentTransform,
@@ -163,15 +133,6 @@ export function createGizmoManager(context: SceneContext) {
       gizmoManager.gizmos.scaleGizmo.onDragEndObservable.clear()
     }
   }
-
-  const setupFreeTransformerChangeHandler = (transformer: IGizmoTransformer) => {
-    transformer.onChange(() => {
-      selectedEntities.forEach(updateEntityPosition)
-      void context.operations.dispatch()
-    })
-  }
-
-  setupFreeTransformerChangeHandler(freeTransformer)
 
   // Parent-child relationship handling
   function restoreParents() {
@@ -331,6 +292,11 @@ export function createGizmoManager(context: SceneContext) {
           currentTransformer.setup()
           currentTransformer.setEntities(selectedEntities)
 
+          // Set up callbacks for ECS updates
+          if ('setUpdateCallbacks' in currentTransformer) {
+            ;(currentTransformer as any).setUpdateCallbacks(updateEntityPosition, () => context.operations.dispatch())
+          }
+
           // Set up callback to update gizmo position after drag ends
           if ('setOnDragEndCallback' in currentTransformer) {
             ;(currentTransformer as any).setOnDragEndCallback(() => {
@@ -361,48 +327,7 @@ export function createGizmoManager(context: SceneContext) {
     },
     onChange(cb: () => void) {
       events.on('change', cb)
-      const disposables: (() => void)[] = []
-
-      // Add observers for position gizmo
-      if (gizmoManager.gizmos.positionGizmo) {
-        const startObs = gizmoManager.gizmos.positionGizmo.onDragStartObservable.add(cb)
-        const endObs = gizmoManager.gizmos.positionGizmo.onDragEndObservable.add(cb)
-        disposables.push(
-          () => gizmoManager.gizmos.positionGizmo?.onDragStartObservable.remove(startObs),
-          () => gizmoManager.gizmos.positionGizmo?.onDragEndObservable.remove(endObs)
-        )
-      }
-
-      // Add observers for rotation gizmo
-      if (gizmoManager.gizmos.rotationGizmo) {
-        const startObs = gizmoManager.gizmos.rotationGizmo.onDragStartObservable.add(cb)
-        const endObs = gizmoManager.gizmos.rotationGizmo.onDragEndObservable.add(cb)
-        disposables.push(
-          () => gizmoManager.gizmos.rotationGizmo?.onDragStartObservable.remove(startObs),
-          () => gizmoManager.gizmos.rotationGizmo?.onDragEndObservable.remove(endObs)
-        )
-      }
-
-      // Add observers for scale gizmo
-      if (gizmoManager.gizmos.scaleGizmo) {
-        const startObs = gizmoManager.gizmos.scaleGizmo.onDragStartObservable.add(cb)
-        const endObs = gizmoManager.gizmos.scaleGizmo.onDragEndObservable.add(cb)
-        disposables.push(
-          () => gizmoManager.gizmos.scaleGizmo?.onDragStartObservable.remove(startObs),
-          () => gizmoManager.gizmos.scaleGizmo?.onDragEndObservable.remove(endObs)
-        )
-      }
-
-      // Add observers for free gizmo
-      if (currentTransformer && 'onChange' in currentTransformer) {
-        const dispose = (
-          currentTransformer as IGizmoTransformer & { onChange: (cb: () => void) => () => void }
-        ).onChange(cb)
-        disposables.push(dispose)
-      }
-
       return () => {
-        disposables.forEach((dispose) => dispose())
         events.off('change', cb)
       }
     }

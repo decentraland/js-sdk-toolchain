@@ -8,7 +8,6 @@ export interface IGizmoTransformer {
   onDragStart(entities: EcsEntity[], gizmoNode: TransformNode): void
   update(entities: EcsEntity[], gizmoNode: TransformNode): void
   onDragEnd(): void
-  onChange(callback: () => void): () => void
   setOnDragEndCallback?(callback: () => void): void
   enable?(): void
   setUpdateCallbacks?(...args: any[]): void

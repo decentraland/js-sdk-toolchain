@@ -10,7 +10,6 @@ export class PositionGizmo implements IGizmoTransformer {
   private initialRotations = new Map<Entity, Quaternion>()
   private pivotPosition: Vector3 | null = null
   private isDragging = false
-  private changeHandlers: (() => void)[] = []
   private dragStartObserver: any = null
   private dragObserver: any = null
   private dragEndObserver: any = null
@@ -241,9 +240,6 @@ export class PositionGizmo implements IGizmoTransformer {
       // Force update world matrix
       entity.computeWorldMatrix(true)
     }
-
-    // Notify change handlers
-    this.changeHandlers.forEach((handler) => handler())
   }
 
   onDragEnd(): void {
@@ -297,15 +293,5 @@ export class PositionGizmo implements IGizmoTransformer {
     this.initialPositions.clear()
     this.initialScales.clear()
     this.initialRotations.clear()
-  }
-
-  onChange(callback: () => void): () => void {
-    this.changeHandlers.push(callback)
-    return () => {
-      const index = this.changeHandlers.indexOf(callback)
-      if (index !== -1) {
-        this.changeHandlers.splice(index, 1)
-      }
-    }
   }
 }

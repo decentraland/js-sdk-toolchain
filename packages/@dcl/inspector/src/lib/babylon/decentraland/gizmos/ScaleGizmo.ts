@@ -10,7 +10,6 @@ export class ScaleGizmo implements IGizmoTransformer {
   private initialPositions = new Map<Entity, Vector3>()
   private pivotPosition: Vector3 | null = null
   private initialGizmoScale: Vector3 | null = null
-  private changeHandlers: (() => void)[] = []
   private isDragging = false
   private dragStartObserver: any = null
   private dragObserver: any = null
@@ -278,9 +277,6 @@ export class ScaleGizmo implements IGizmoTransformer {
       // Force update world matrix
       entity.computeWorldMatrix(true)
     }
-
-    // Notify change handlers
-    this.changeHandlers.forEach((handler) => handler())
   }
 
   onDragEnd(): void {
@@ -326,15 +322,5 @@ export class ScaleGizmo implements IGizmoTransformer {
     this.initialScales.clear()
     this.initialRotations.clear()
     this.initialPositions.clear()
-  }
-
-  onChange(callback: () => void): () => void {
-    this.changeHandlers.push(callback)
-    return () => {
-      const index = this.changeHandlers.indexOf(callback)
-      if (index !== -1) {
-        this.changeHandlers.splice(index, 1)
-      }
-    }
   }
 }

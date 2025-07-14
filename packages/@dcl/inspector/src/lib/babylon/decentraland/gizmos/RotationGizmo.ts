@@ -4,7 +4,6 @@ import { EcsEntity } from '../EcsEntity'
 import { IGizmoTransformer } from './types'
 
 export class RotationGizmo implements IGizmoTransformer {
-  private changeHandlers: (() => void)[] = []
   private rotationGizmo: Nullable<IRotationGizmo> = null
   private multiTransform: TransformNode | null = null
   private initialOffsets = new Map<Entity, Vector3>()
@@ -504,9 +503,6 @@ export class RotationGizmo implements IGizmoTransformer {
       }
     }
 
-    // Notificar cambios
-    this.changeHandlers.forEach((handler) => handler())
-
     // Update gizmo visual alignment during drag when not world-aligned
     if (!this.isWorldAligned && this.currentEntities.length === 1) {
       const entity = this.currentEntities[0]
@@ -543,16 +539,6 @@ export class RotationGizmo implements IGizmoTransformer {
     }
     this.initialOffsets.clear()
     this.initialRotations.clear()
-  }
-
-  onChange(callback: () => void): () => void {
-    this.changeHandlers.push(callback)
-    return () => {
-      const index = this.changeHandlers.indexOf(callback)
-      if (index !== -1) {
-        this.changeHandlers.splice(index, 1)
-      }
-    }
   }
 
   private calculateCentroid(entities: EcsEntity[]): Vector3 {

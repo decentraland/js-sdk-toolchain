@@ -1,25 +1,17 @@
-import {
-  Vector3,
-  TransformNode,
-  Scene,
-  UtilityLayerRenderer,
-  PointerDragBehavior,
-  PickingInfo,
-  AbstractMesh
-} from '@babylonjs/core'
+import { Vector3, TransformNode, Scene, UtilityLayerRenderer, PointerDragBehavior, AbstractMesh } from '@babylonjs/core'
 import { Entity } from '@dcl/ecs'
 import { EcsEntity } from '../EcsEntity'
 import { IGizmoTransformer } from './types'
 
 export class FreeGizmo implements IGizmoTransformer {
-  private changeHandlers: (() => void)[] = []
   private selectedEntities: EcsEntity[] = []
-  private gizmoNode: TransformNode | null = null
   private dragBehavior: PointerDragBehavior
   private pivotPosition: Vector3 | null = null
   private entityOffsets = new Map<Entity, Vector3>()
   private isDragging = false
   private onDragEndCallback: (() => void) | null = null
+  private updateEntityPosition: ((entity: EcsEntity) => void) | null = null
+  private dispatchOperations: (() => void) | null = null
 
   constructor(private scene: Scene, private utilityLayer: UtilityLayerRenderer = new UtilityLayerRenderer(scene)) {
     this.dragBehavior = new PointerDragBehavior({ dragPlaneNormal: new Vector3(0, 1, 0) })
@@ -36,15 +28,21 @@ export class FreeGizmo implements IGizmoTransformer {
     this.removeSceneObservers()
     this.detachDragBehavior()
     this.selectedEntities = []
-    this.gizmoNode = null
     this.pivotPosition = null
     this.entityOffsets.clear()
     this.isDragging = false
     this.onDragEndCallback = null
+    this.updateEntityPosition = null
+    this.dispatchOperations = null
   }
 
   setEntities(entities: EcsEntity[]): void {
     this.selectedEntities = entities
+  }
+
+  setUpdateCallbacks(updateEntityPosition: (entity: EcsEntity) => void, dispatchOperations: () => void): void {
+    this.updateEntityPosition = updateEntityPosition
+    this.dispatchOperations = dispatchOperations
   }
 
   // Add method to set drag end callback
@@ -74,7 +72,6 @@ export class FreeGizmo implements IGizmoTransformer {
   private setupDragObservers(): void {
     this.dragBehavior.onDragStartObservable.add(() => {
       this.isDragging = true
-      this.notifyChange()
     })
     this.dragBehavior.onDragObservable.add((eventData) => {
       if (!this.isDragging || !eventData.delta || !this.pivotPosition) return
@@ -87,11 +84,21 @@ export class FreeGizmo implements IGizmoTransformer {
         const newWorldPosition = this.pivotPosition.add(offset)
         this.applyWorldPositionToEntity(entity, newWorldPosition)
       }
+
+      // Update ECS position on each drag update for real-time feedback
+      if (this.updateEntityPosition) {
+        this.selectedEntities.forEach(this.updateEntityPosition)
+      }
     })
     this.dragBehavior.onDragEndObservable.add(() => {
       this.isDragging = false
       this.detachDragBehavior()
-      this.notifyChange()
+
+      // Only dispatch operations at the end to avoid excessive ECS operations
+      if (this.dispatchOperations) {
+        this.dispatchOperations()
+      }
+
       if (this.onDragEndCallback) {
         this.onDragEndCallback()
       }
@@ -168,37 +175,24 @@ export class FreeGizmo implements IGizmoTransformer {
     this.detachDragBehavior()
     this.pivotPosition = null
     this.entityOffsets.clear()
-    this.notifyChange()
     if (this.onDragEndCallback) {
       this.onDragEndCallback()
     }
   }
 
-  onDragStart(entities: EcsEntity[], gizmoNode: TransformNode): void {
+  onDragStart(entities: EcsEntity[]): void {
     this.selectedEntities = entities
-    this.gizmoNode = gizmoNode
     this.pivotPosition = null
     this.entityOffsets.clear()
     this.detachDragBehavior()
   }
 
-  onChange(callback: () => void): () => void {
-    this.changeHandlers.push(callback)
-    return () => {
-      const index = this.changeHandlers.indexOf(callback)
-      if (index !== -1) this.changeHandlers.splice(index, 1)
-    }
-  }
-
-  update(entities: EcsEntity[], gizmoNode: TransformNode): void {
+  update(entities: EcsEntity[], _gizmoNode: TransformNode): void {
     if (entities !== this.selectedEntities) {
       this.selectedEntities = entities
       this.pivotPosition = null
       this.entityOffsets.clear()
       this.detachDragBehavior()
-    }
-    if (gizmoNode !== this.gizmoNode) {
-      this.gizmoNode = gizmoNode
     }
   }
 
@@ -209,11 +203,5 @@ export class FreeGizmo implements IGizmoTransformer {
   dispose(): void {
     this.cleanup()
     this.utilityLayer.dispose()
-  }
-
-  private notifyChange(): void {
-    for (const handler of this.changeHandlers) {
-      handler()
-    }
   }
 }
