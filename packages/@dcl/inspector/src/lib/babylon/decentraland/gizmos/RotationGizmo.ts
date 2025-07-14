@@ -329,9 +329,12 @@ export class RotationGizmo implements IGizmoTransformer {
             // Calculate the rotation delta from drag start
             const rotationDelta = this.dragStartRotation.invert().multiply(currentGizmoRotation)
 
-            // Apply the delta to the entity's initial rotation
+            // Apply snapping to the delta rotation instead of the final rotation
+            const snappedRotationDelta = this.snapRotation(rotationDelta)
+
+            // Apply the snapped delta to the entity's initial rotation
             const initialRotation = this.initialRotations.get(entity.entityId) || Quaternion.Identity()
-            const newWorldRotation = rotationDelta.multiply(initialRotation)
+            const newWorldRotation = snappedRotationDelta.multiply(initialRotation)
 
             // Si el entity tiene un padre, necesitamos calcular la rotación local
             if (entity.parent && entity.parent instanceof TransformNode) {
@@ -342,12 +345,10 @@ export class RotationGizmo implements IGizmoTransformer {
               // Calcular la rotación local: worldRotation = parentRotation * localRotation
               // Entonces: localRotation = parentRotation.inverse() * worldRotation
               const localRotation = parentWorldRotation.invert().multiply(newWorldRotation)
-              const snappedLocalRotation = this.snapRotation(localRotation)
-              entity.rotationQuaternion.copyFrom(snappedLocalRotation)
+              entity.rotationQuaternion.copyFrom(localRotation)
             } else {
-              // Si no tiene padre, aplicar la rotación directamente con snapping
-              const snappedRotation = this.snapRotation(newWorldRotation)
-              entity.rotationQuaternion.copyFrom(snappedRotation)
+              // Si no tiene padre, aplicar la rotación directamente
+              entity.rotationQuaternion.copyFrom(newWorldRotation)
             }
           } else {
             // Gizmo hasn't rotated, keep the entity's initial rotation
@@ -365,23 +366,14 @@ export class RotationGizmo implements IGizmoTransformer {
             }
           }
         } else {
-          // For local-aligned, use the gizmo rotation directly
-          // Si el entity tiene un padre, necesitamos calcular la rotación local
-          if (entity.parent && entity.parent instanceof TransformNode) {
-            const parent = entity.parent as TransformNode
-            const parentWorldRotation =
-              parent.rotationQuaternion || Quaternion.FromRotationMatrix(parent.getWorldMatrix())
+          // For local-aligned, use the gizmo rotation directly as the target local rotation
+          const currentGizmoRotation = gizmoNode.rotationQuaternion
 
-            // Calcular la rotación local: worldRotation = parentRotation * localRotation
-            // Entonces: localRotation = parentRotation.inverse() * worldRotation
-            const localRotation = parentWorldRotation.invert().multiply(gizmoNode.rotationQuaternion)
-            const snappedLocalRotation = this.snapRotation(localRotation)
-            entity.rotationQuaternion.copyFrom(snappedLocalRotation)
-          } else {
-            // Si no tiene padre, aplicar la rotación directamente con snapping
-            const snappedRotation = this.snapRotation(gizmoNode.rotationQuaternion)
-            entity.rotationQuaternion.copyFrom(snappedRotation)
-          }
+          // Apply snapping to the gizmo rotation directly
+          const snappedGizmoRotation = this.snapRotation(currentGizmoRotation)
+
+          // For local-aligned, apply the snapped gizmo rotation directly as local rotation
+          entity.rotationQuaternion.copyFrom(snappedGizmoRotation)
         }
       }
     } else {
@@ -437,6 +429,9 @@ export class RotationGizmo implements IGizmoTransformer {
         // Calculate the rotation delta from drag start
         const rotationDelta = this.dragStartRotation.invert().multiply(currentGizmoRotation)
 
+        // Apply snapping to the delta rotation
+        const snappedRotationDelta = this.snapRotation(rotationDelta)
+
         // Aplicar la rotación del gizmo a todas las entidades
         for (const entity of entities) {
           const offset = this.initialOffsets.get(entity.entityId)
@@ -446,12 +441,12 @@ export class RotationGizmo implements IGizmoTransformer {
 
           // Calcular la nueva posición rotada
           const rotationMatrix = new Matrix()
-          rotationDelta.toRotationMatrix(rotationMatrix)
+          snappedRotationDelta.toRotationMatrix(rotationMatrix)
           const rotatedOffset = Vector3.TransformCoordinates(offset, rotationMatrix)
           const newWorldPosition = this.multiTransform.position.add(rotatedOffset)
 
-          // Aplicar la rotación compuesta: rotationDelta * initialRotation
-          const newWorldRotation = rotationDelta.multiply(initialRotation)
+          // Aplicar la rotación compuesta: snappedRotationDelta * initialRotation
+          const newWorldRotation = snappedRotationDelta.multiply(initialRotation)
 
           // Aplicar al entity considerando su padre
           if (entity.parent && entity.parent instanceof TransformNode) {
@@ -462,23 +457,21 @@ export class RotationGizmo implements IGizmoTransformer {
 
             // Convertir posición mundial a local
             const localPosition = Vector3.TransformCoordinates(newWorldPosition, parentWorldMatrixInverse)
-            // Convertir rotación mundial a local y aplicar snapping
+            // Convertir rotación mundial a local
             const localRotation = parentWorldRotation.invert().multiply(newWorldRotation)
-            const snappedLocalRotation = this.snapRotation(localRotation)
 
             entity.position.copyFrom(localPosition)
             if (!entity.rotationQuaternion) {
               entity.rotationQuaternion = new Quaternion()
             }
-            entity.rotationQuaternion.copyFrom(snappedLocalRotation)
+            entity.rotationQuaternion.copyFrom(localRotation)
           } else {
-            // Sin padre, aplicar directamente con snapping
-            const snappedWorldRotation = this.snapRotation(newWorldRotation)
+            // Sin padre, aplicar directamente
             entity.position.copyFrom(newWorldPosition)
             if (!entity.rotationQuaternion) {
               entity.rotationQuaternion = new Quaternion()
             }
-            entity.rotationQuaternion.copyFrom(snappedWorldRotation)
+            entity.rotationQuaternion.copyFrom(newWorldRotation)
           }
         }
       } else {
@@ -503,24 +496,8 @@ export class RotationGizmo implements IGizmoTransformer {
       }
     }
 
-    // Update gizmo visual alignment during drag when not world-aligned
-    if (!this.isWorldAligned && this.currentEntities.length === 1) {
-      const entity = this.currentEntities[0]
-      if (entity.rotationQuaternion && gizmoNode.rotationQuaternion) {
-        // If the entity has a parent, convert to world rotation
-        if (entity.parent && entity.parent instanceof TransformNode) {
-          const parent = entity.parent as TransformNode
-          const parentWorldRotation =
-            parent.rotationQuaternion || Quaternion.FromRotationMatrix(parent.getWorldMatrix())
-          const worldRotation = parentWorldRotation.multiply(entity.rotationQuaternion)
-          gizmoNode.rotationQuaternion.copyFrom(worldRotation)
-        } else {
-          // If no parent, apply directly
-          gizmoNode.rotationQuaternion.copyFrom(entity.rotationQuaternion)
-        }
-        gizmoNode.computeWorldMatrix(true)
-      }
-    }
+    // Don't sync gizmo during drag to avoid interference with delta calculation
+    // Gizmo will be synced at drag end
   }
 
   onDragEnd(): void {
@@ -529,7 +506,8 @@ export class RotationGizmo implements IGizmoTransformer {
       this.updateMultipleEntitiesRotation()
     }
 
-    // Sync gizmo rotation with the final snapped rotations of entities
+    // For local-aligned mode, sync gizmo rotation with the final entity rotation
+    // For world-aligned mode, sync gizmo rotation with the final snapped rotations of entities
     this.syncGizmoRotation()
 
     // Limpiar el multiTransform después del drag
