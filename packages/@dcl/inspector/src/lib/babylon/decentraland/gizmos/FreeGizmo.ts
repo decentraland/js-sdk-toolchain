@@ -12,6 +12,7 @@ export class FreeGizmo implements IGizmoTransformer {
   private onDragEndCallback: (() => void) | null = null
   private updateEntityPosition: ((entity: EcsEntity) => void) | null = null
   private dispatchOperations: (() => void) | null = null
+  // This property is not used in the free gizmo, but it is required by the IGizmoTransformer interface
   private isWorldAligned = true
   private dragStartObserver: any = null
   private dragObserver: any = null
@@ -55,10 +56,8 @@ export class FreeGizmo implements IGizmoTransformer {
   }
 
   setWorldAligned(value: boolean): void {
+    // For free gizmo, world alignment is not used
     this.isWorldAligned = value
-    // For free gizmo, world alignment affects the drag plane orientation
-    // The drag plane normal is set in the constructor and cannot be modified after creation
-    // For now, we'll keep the world-aligned behavior consistent
   }
 
   // Add method to set drag end callback
@@ -158,7 +157,7 @@ export class FreeGizmo implements IGizmoTransformer {
     )
   }
 
-  private startDrag(clickedEntity: EcsEntity, pickedMesh: AbstractMesh): void {
+  private startDrag(_clickedEntity: EcsEntity, pickedMesh: AbstractMesh): void {
     // Calculate pivot (centroid)
     this.pivotPosition = new Vector3()
     for (const entity of this.selectedEntities) {
@@ -218,14 +217,14 @@ export class FreeGizmo implements IGizmoTransformer {
     }
   }
 
-  onDragStart(entities: EcsEntity[], gizmoNode: TransformNode): void {
+  onDragStart(entities: EcsEntity[], _gizmoNode: TransformNode): void {
     this.selectedEntities = entities
     this.pivotPosition = null
     this.entityOffsets.clear()
     this.detachDragBehavior()
   }
 
-  update(entities: EcsEntity[], gizmoNode: TransformNode): void {
+  update(entities: EcsEntity[], _gizmoNode: TransformNode): void {
     if (entities !== this.selectedEntities) {
       this.selectedEntities = entities
       this.pivotPosition = null
