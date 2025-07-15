@@ -145,8 +145,15 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
   )
 
   useEffect(() => {
+    debugger
     if (entity && gltfValue) {
-      entity.resetGltfAssetContainerLoading()
+      const currentGltfSrc = entity.ecsComponentValues.gltfContainer?.src
+      const isChangingGltf = currentGltfSrc !== gltfValue.src
+
+      if (isChangingGltf) {
+        entity.resetGltfAssetContainerLoading()
+      }
+
       updateGltfForEntity(entity, gltfValue)
       entity
         .onGltfContainerLoaded()
