@@ -146,7 +146,6 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
 
   useEffect(() => {
     if (entity && gltfValue) {
-      debugger
       entity.resetGltfAssetContainerLoading()
       updateGltfForEntity(entity, gltfValue)
       entity
