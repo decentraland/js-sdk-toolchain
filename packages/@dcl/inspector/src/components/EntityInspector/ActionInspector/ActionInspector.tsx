@@ -59,6 +59,7 @@ import { getDefaultPayload, getPartialPayload, isStates } from './utils'
 import { Props } from './types'
 
 import './ActionInspector.css'
+import { updateGltfForEntity } from '../../../lib/babylon/decentraland/sdkComponents/gltf-container'
 
 const ActionMapOption: Record<string, string> = {
   [ActionType.PLAY_ANIMATION]: 'Play Animation',
@@ -127,6 +128,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
   const hasStates = useHasComponent(entityId, States)
   const hasCounter = useHasComponent(entityId, Counter)
   const hasRewards = useHasComponent(entityId, Rewards)
+  const [gltfValue] = useComponentValue(entityId, sdk.components.GltfContainer)
 
   useChange(
     (event, sdk) => {
@@ -143,15 +145,22 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
   )
 
   useEffect(() => {
-    if (entity) {
+    if (entity && gltfValue) {
+      debugger
+      entity.resetGltfAssetContainerLoading()
+      updateGltfForEntity(entity, gltfValue)
       entity
         .onGltfContainerLoaded()
         .then((gltfAssetContainer) => {
           setAnimations([...gltfAssetContainer.animationGroups])
         })
-        .catch(() => {})
+        .catch(() => {
+          setAnimations([])
+        })
+    } else {
+      setAnimations([])
     }
-  }, [entity])
+  }, [entity, gltfValue])
 
   const isValidAction = useCallback(
     (action: Action) => {
@@ -295,7 +304,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
   const handleRemove = useCallback(async () => {
     sdk.operations.removeComponent(entityId, Actions)
     await sdk.operations.dispatch()
-    const gltfContainer = getComponentValue(entityId, GltfContainer)
+    const gltfContainer = getComponentValue(entityId, sdk.components.GltfContainer)
     const asset = getAssetByModel(gltfContainer.src)
     analytics.track(Event.REMOVE_COMPONENT, {
       componentName: ComponentName.ACTIONS,
