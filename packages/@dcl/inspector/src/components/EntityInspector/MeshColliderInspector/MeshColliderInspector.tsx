@@ -23,10 +23,8 @@ export default withSdk<Props>(({ sdk, entity }) => {
     const hasGltfContainer = GltfContainer.has(entity)
     const hasVisibility = VisibilityComponent.has(entity)
 
-    // Borrar MeshCollider
     sdk.operations.removeComponent(entity, MeshCollider)
 
-    // Si se borra mesh: fijarse si hay GLTF, si NO hay borrar visibility
     if (hasVisibility && !hasGltfContainer) {
       sdk.operations.removeComponent(entity, VisibilityComponent)
     }
