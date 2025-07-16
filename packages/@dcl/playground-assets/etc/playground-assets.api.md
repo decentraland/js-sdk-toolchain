@@ -638,6 +638,7 @@ export const componentDefinitionByName: {
     "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
+    "core::GltfNodeModifiers": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNodeModifiers>>;
     "core::InputModifier": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBInputModifier>>;
     "core::LightSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBLightSource>>;
     "core::MainCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMainCamera>>;
@@ -1222,6 +1223,9 @@ export const GltfContainer: LastWriteWinElementSetComponentDefinition<PBGltfCont
 
 // @public (undocumented)
 export const GltfContainerLoadingState: LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>;
+
+// @public (undocumented)
+export const GltfNodeModifiers: LastWriteWinElementSetComponentDefinition<PBGltfNodeModifiers>;
 
 // @public (undocumented)
 export interface GrowOnlyValueSetComponentDefinition<T> extends BaseComponent<T> {
@@ -2398,6 +2402,38 @@ export namespace PBGltfContainerLoadingState {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfContainerLoadingState;
     // (undocumented)
     export function encode(message: PBGltfContainerLoadingState, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBGltfNodeModifiers {
+    // (undocumented)
+    modifiers: PBGltfNodeModifiers_GltfNodeModifier[];
+}
+
+// @public (undocumented)
+export namespace PBGltfNodeModifiers {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfNodeModifiers;
+    // (undocumented)
+    export function encode(message: PBGltfNodeModifiers, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBGltfNodeModifiers_GltfNodeModifier {
+    // (undocumented)
+    material?: PBMaterial | undefined;
+    // (undocumented)
+    overrideShadows?: boolean | undefined;
+    // (undocumented)
+    path: string;
+}
+
+// @public (undocumented)
+export namespace PBGltfNodeModifiers_GltfNodeModifier {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfNodeModifiers_GltfNodeModifier;
+    // (undocumented)
+    export function encode(message: PBGltfNodeModifiers_GltfNodeModifier, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
