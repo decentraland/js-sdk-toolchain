@@ -100,7 +100,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
     )
   }, [])
 
-  if (!hasVisibilityComponent || (!hasGltfContainer && !hasMeshCollider)) return null
+  if (!hasVisibilityComponent) return null
 
   return (
     <Container label="Visibility" className={cx('VisibilityContainer')} onRemoveContainer={handleRemove}>
