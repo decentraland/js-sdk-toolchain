@@ -15,6 +15,7 @@ export function createGizmoManager(context: SceneContext) {
   let selectedEntities: EcsEntity[] = []
   let isEnabled = true
   let currentTransformer: IGizmoTransformer | null = null
+  let isUpdatingFromGizmo = false
 
   // Create and initialize Babylon.js gizmo manager
   const gizmoManager = new BabylonGizmoManager(context.scene)
@@ -30,10 +31,54 @@ export function createGizmoManager(context: SceneContext) {
   let isGizmoWorldAligned = true
   const isGizmoWorldAlignmentDisabled = false
 
+  // Helper function to get world rotation of an entity
+  function getWorldRotation(entity: EcsEntity): Quaternion {
+    if (!entity.rotationQuaternion) return Quaternion.Identity()
+
+    if (!entity.parent || !(entity.parent instanceof TransformNode)) {
+      return entity.rotationQuaternion.clone()
+    }
+
+    const parent = entity.parent as TransformNode
+    const parentWorldRotation = parent.rotationQuaternion || Quaternion.FromRotationMatrix(parent.getWorldMatrix())
+    const entityLocalRotation = entity.rotationQuaternion || Quaternion.Identity()
+
+    return parentWorldRotation.multiply(entityLocalRotation)
+  }
+
+  // Helper function to sync gizmo rotation
+  function syncGizmoRotation(gizmoNode: TransformNode, entities: EcsEntity[], isWorldAligned: boolean): void {
+    if (entities.length === 0) return
+
+    if (isWorldAligned) {
+      // World aligned: reset to identity rotation
+      if (gizmoNode.rotationQuaternion) {
+        gizmoNode.rotationQuaternion.set(0, 0, 0, 1)
+      }
+    } else {
+      // Local aligned: sync with the first entity's rotation (if single entity)
+      if (entities.length === 1) {
+        const entity = entities[0]
+        if (entity.rotationQuaternion && gizmoNode.rotationQuaternion) {
+          const worldRotation = getWorldRotation(entity)
+          gizmoNode.rotationQuaternion.copyFrom(worldRotation)
+        }
+      } else {
+        // For multiple entities, always reset to identity rotation
+        if (gizmoNode.rotationQuaternion) {
+          gizmoNode.rotationQuaternion.set(0, 0, 0, 1)
+        }
+      }
+    }
+
+    gizmoNode.computeWorldMatrix(true)
+  }
+
   function updateEntityPosition(entity: EcsEntity) {
     const currentTransform = context.Transform.getOrNull(entity.entityId)
     if (!currentTransform) return
 
+    isUpdatingFromGizmo = true
     context.operations.updateValue(context.Transform, entity.entityId, {
       ...currentTransform,
       position: DclVector3.create(entity.position.x, entity.position.y, entity.position.z)
@@ -44,6 +89,7 @@ export function createGizmoManager(context: SceneContext) {
     const currentTransform = context.Transform.getOrNull(entity.entityId)
     if (!currentTransform || !entity.rotationQuaternion) return
 
+    isUpdatingFromGizmo = true
     // The RotationGizmo already applies the rotation in local coordinates
     // We only need to use the Babylon rotation directly
     const rotation = entity.rotationQuaternion
@@ -65,6 +111,7 @@ export function createGizmoManager(context: SceneContext) {
     const currentTransform = context.Transform.getOrNull(entity.entityId)
     if (!currentTransform) return
 
+    isUpdatingFromGizmo = true
     context.operations.updateValue(context.Transform, entity.entityId, {
       ...currentTransform,
       scale: DclVector3.create(entity.scaling.x, entity.scaling.y, entity.scaling.z)
@@ -116,6 +163,35 @@ export function createGizmoManager(context: SceneContext) {
     gizmoManager.attachToNode(node)
   }
 
+  // Update gizmo position and rotation based on current transformer type
+  function updateGizmoTransform() {
+    if (selectedEntities.length === 0) {
+      gizmoManager.attachToNode(null)
+      return
+    }
+
+    const node = getGizmoNode()
+    const centroid = calculateCentroid()
+    node.position = centroid
+
+    // Preserve rotation when switching between gizmos
+    if (!node.rotationQuaternion) {
+      node.rotationQuaternion = Quaternion.Identity()
+    }
+
+    // Update rotation based on current transformer type
+    if (gizmoManager.rotationGizmoEnabled) {
+      // For rotation gizmo, sync the rotation
+      syncGizmoRotation(node, selectedEntities, isGizmoWorldAligned)
+    } else {
+      // For non-rotation gizmos, let the transformers handle rotation
+      // Don't reset rotation if it already exists
+    }
+
+    node.computeWorldMatrix(true)
+    gizmoManager.attachToNode(node)
+  }
+
   // Parent-child relationship handling
   function restoreParents() {
     selectedEntities.forEach((entity) => {
@@ -124,6 +200,16 @@ export function createGizmoManager(context: SceneContext) {
         const parent = currentTransform.parent ? context.getEntityOrNull(currentTransform.parent) : null
         entity.setParent(parent)
       }
+    })
+  }
+
+  function setupTransformListeners() {
+    selectedEntities.forEach((entity) => {
+      context.Transform.onChange(entity.entityId, (_value) => {
+        if (!isUpdatingFromGizmo && selectedEntities.some((e) => e.entityId === entity.entityId)) {
+          setTimeout(() => updateGizmoTransform(), 0)
+        }
+      })
     })
   }
 
@@ -143,7 +229,7 @@ export function createGizmoManager(context: SceneContext) {
       if (selectedEntities.includes(entity) || !isEnabled) return
       selectedEntities.push(entity)
       updateGizmoPosition()
-
+      setupTransformListeners()
       // Update current transformer with new entities
       if (currentTransformer) {
         currentTransformer.setEntities(selectedEntities)
@@ -190,7 +276,10 @@ export function createGizmoManager(context: SceneContext) {
 
           // Set up callbacks for ECS updates
           if ('setUpdateCallbacks' in currentTransformer) {
-            currentTransformer.setUpdateCallbacks(updateEntityPosition, () => context.operations.dispatch())
+            currentTransformer.setUpdateCallbacks(updateEntityPosition, () => {
+              void context.operations.dispatch()
+              isUpdatingFromGizmo = false
+            })
           }
 
           // Set world alignment
@@ -217,7 +306,10 @@ export function createGizmoManager(context: SceneContext) {
             currentTransformer.setUpdateCallbacks(
               updateEntityRotation,
               updateEntityPosition,
-              () => context.operations.dispatch(),
+              () => {
+                void context.operations.dispatch()
+                isUpdatingFromGizmo = false
+              },
               context
             )
           }
@@ -243,7 +335,10 @@ export function createGizmoManager(context: SceneContext) {
 
           // Set up callbacks for ECS updates
           if ('setUpdateCallbacks' in currentTransformer) {
-            currentTransformer.setUpdateCallbacks(updateEntityScale, () => context.operations.dispatch())
+            currentTransformer.setUpdateCallbacks(updateEntityScale, () => {
+              void context.operations.dispatch()
+              isUpdatingFromGizmo = false
+            })
           }
 
           // Set world alignment
@@ -267,7 +362,10 @@ export function createGizmoManager(context: SceneContext) {
 
           // Set up callbacks for ECS updates
           if ('setUpdateCallbacks' in currentTransformer) {
-            currentTransformer.setUpdateCallbacks(updateEntityPosition, () => context.operations.dispatch())
+            currentTransformer.setUpdateCallbacks(updateEntityPosition, () => {
+              void context.operations.dispatch()
+              isUpdatingFromGizmo = false
+            })
           }
 
           // Set world alignment
@@ -309,6 +407,11 @@ export function createGizmoManager(context: SceneContext) {
       events.on('change', cb)
       return () => {
         events.off('change', cb)
+      }
+    },
+    forceUpdateGizmo() {
+      if (selectedEntities.length > 0) {
+        updateGizmoTransform()
       }
     }
   }
