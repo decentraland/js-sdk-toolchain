@@ -18,8 +18,6 @@ import { Props } from './types'
 export default withSdk<Props>(({ sdk, entity }) => {
   const { VisibilityComponent, GltfContainer, MeshCollider } = sdk.components
   const hasVisibilityComponent = useHasComponent(entity, VisibilityComponent)
-  const hasGltfContainer = useHasComponent(entity, GltfContainer)
-  const hasMeshCollider = useHasComponent(entity, MeshCollider)
   const [componentValue, setComponentValue] = useComponentValue<PBVisibilityComponent>(entity, VisibilityComponent)
   const [gltfComponentValue, setGltfComponentValue, isGltfComponentEqual] = useComponentValue<PBGltfContainer>(
     entity,
