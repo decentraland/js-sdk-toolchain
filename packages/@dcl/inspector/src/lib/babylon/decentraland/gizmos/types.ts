@@ -11,6 +11,7 @@ export interface IGizmoTransformer {
   enable(): void
   setUpdateCallbacks(...args: any[]): void
   setWorldAligned(value: boolean): void
+  setSnapDistance(distance: number): void
   setOnDragEndCallback?(callback: () => void): void
 }
 

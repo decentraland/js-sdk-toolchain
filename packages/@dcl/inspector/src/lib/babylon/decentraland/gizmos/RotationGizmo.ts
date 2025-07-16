@@ -246,6 +246,11 @@ export class RotationGizmo implements IGizmoTransformer {
     this.syncGizmoRotation()
   }
 
+  setSnapDistance(_distance: number): void {
+    // We handle the snap distance in the snap manager
+    return;
+  }
+
   onDragStart(entities: EcsEntity[], gizmoNode: TransformNode): void {
     const selectionChanged = this.hasSelectionChanged(entities)
     

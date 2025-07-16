@@ -5,7 +5,7 @@ import { SceneContext } from './SceneContext'
 import { EcsEntity } from './EcsEntity'
 import { GizmoType } from '../../utils/gizmo'
 import { FreeGizmo, PositionGizmo, RotationGizmo, ScaleGizmo, IGizmoTransformer } from './gizmos'
-import { snapPosition, snapRotation, snapScale } from './snap-manager'
+import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manager'
 
 export function createGizmoManager(context: SceneContext) {
   // events
@@ -213,6 +213,19 @@ export function createGizmoManager(context: SceneContext) {
     })
   }
 
+  function updateSnap() {
+    if (currentTransformer && 'setSnapDistance' in currentTransformer) {
+      if (gizmoManager.rotationGizmoEnabled) {
+        currentTransformer.setSnapDistance(snapManager.isEnabled() ? snapManager.getRotationSnap() : 0)
+      } else if (gizmoManager.scaleGizmoEnabled) {
+        currentTransformer.setSnapDistance(snapManager.isEnabled() ? snapManager.getScaleSnap() : 0)
+      } else {
+        currentTransformer.setSnapDistance(snapManager.isEnabled() ? snapManager.getPositionSnap() : 0)
+      }
+    }
+  }
+  snapManager.onChange(updateSnap)
+
   return {
     gizmoManager,
     isEnabled() {
@@ -294,6 +307,10 @@ export function createGizmoManager(context: SceneContext) {
             currentTransformer.enable()
           }
 
+          if ('setSnapDistance' in currentTransformer) {
+            currentTransformer.setSnapDistance(snapManager.isEnabled() ? snapManager.getPositionSnap() : 0)
+          }
+
           break
         }
         case GizmoType.ROTATION: {
@@ -326,6 +343,10 @@ export function createGizmoManager(context: SceneContext) {
             currentTransformer.enable()
           }
 
+          if ('setSnapDistance' in currentTransformer) {
+            currentTransformer.setSnapDistance(snapManager.isEnabled() ? snapManager.getRotationSnap() : 0)
+          }
+
           break
         }
         case GizmoType.SCALE: {
@@ -351,6 +372,10 @@ export function createGizmoManager(context: SceneContext) {
           // Enable the scale gizmo to set up its observables
           if ('enable' in currentTransformer) {
             currentTransformer.enable()
+          }
+
+          if ('setSnapDistance' in currentTransformer) {
+            currentTransformer.setSnapDistance(snapManager.isEnabled() ? snapManager.getScaleSnap() : 0)
           }
 
           break
@@ -383,6 +408,10 @@ export function createGizmoManager(context: SceneContext) {
           // Enable the free gizmo to set up its observables
           if ('enable' in currentTransformer) {
             currentTransformer.enable()
+          }
+
+          if ('setSnapDistance' in currentTransformer) {
+            currentTransformer.setSnapDistance(snapManager.isEnabled() ? snapManager.getPositionSnap() : 0)
           }
 
           break

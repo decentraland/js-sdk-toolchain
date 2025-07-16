@@ -65,7 +65,7 @@ export class ScaleGizmo implements IGizmoTransformer {
     this.dispatchOperations = dispatchOperations
   }
 
-  setWorldAligned(value: boolean): void {
+  setWorldAligned(_value: boolean): void {
     // Scale gizmo should always be locally aligned, regardless of the parameter
     this.isWorldAligned = false
     if (this.gizmoManager.gizmos.scaleGizmo) {
@@ -74,6 +74,11 @@ export class ScaleGizmo implements IGizmoTransformer {
 
     // Sync gizmo alignment with the new entities (always local)
     this.syncGizmoAlignment()
+  }
+
+  setSnapDistance(distance: number): void {
+    if (!this.gizmoManager.gizmos.scaleGizmo) return
+    this.gizmoManager.gizmos.scaleGizmo.snapDistance = distance
   }
 
   private syncGizmoAlignment(): void {

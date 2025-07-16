@@ -23,7 +23,6 @@ export class PositionGizmo implements IGizmoTransformer {
   setup(): void {
     if (!this.gizmoManager.gizmos.positionGizmo) return
     const positionGizmo = this.gizmoManager.gizmos.positionGizmo
-    positionGizmo.snapDistance = 0
     positionGizmo.updateGizmoRotationToMatchAttachedMesh = !this.isWorldAligned
 
     // Don't setup drag observables here - they will be set up when the gizmo is enabled
@@ -98,6 +97,11 @@ export class PositionGizmo implements IGizmoTransformer {
 
       gizmoNode.computeWorldMatrix(true)
     }
+  }
+
+  setSnapDistance(distance: number): void {
+    if (!this.gizmoManager.gizmos.positionGizmo) return
+    this.gizmoManager.gizmos.positionGizmo.snapDistance = distance
   }
 
   private setupDragObservables(): void {
