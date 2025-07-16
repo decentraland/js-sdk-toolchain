@@ -286,10 +286,6 @@ export class RotationGizmo implements IGizmoTransformer {
     } else {
       this.updateMultipleEntities(entities, gizmoNode)
     }
-
-    if (this.dispatchOperations) {
-      this.dispatchOperations()
-    }
   }
 
   onDragEnd(): void {
