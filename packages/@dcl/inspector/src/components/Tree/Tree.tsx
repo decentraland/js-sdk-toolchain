@@ -9,7 +9,7 @@ import { Input } from '../Input'
 import { ContextMenu } from './ContextMenu'
 import { ActionArea } from './ActionArea'
 import { Edit as EditInput } from './Edit'
-import { ClickType, DropType, calculateDropType } from './utils'
+import { DropType, calculateDropType } from './utils'
 import { useSdk } from '../../hooks/sdk/useSdk'
 
 import './Tree.css'
@@ -187,12 +187,11 @@ export function Tree<T>() {
       const quitEditMode = () => setEditMode(false)
       const quitInsertMode = () => setInsertMode(false)
 
-      const handleSelect = (event: React.MouseEvent) => {
+      const handleClick = (event: React.MouseEvent) => {
         const isMac = /Mac|iPhone|iPod|iPad/.test(navigator.userAgent)
-        const isCtrlClick =
-          (isMac ? event.type === ClickType.CONTEXT_MENU : event.type === ClickType.CLICK) && event.ctrlKey
-        const isShiftClick = event.type === ClickType.CLICK && event.shiftKey
-        const isDoubleClick = event.type === ClickType.CLICK && event.detail > 1 && onDoubleSelect
+        const isCtrlClick = isMac ? event.metaKey : event.ctrlKey
+        const isShiftClick = event.shiftKey
+        const isDoubleClick = event.detail > 1 && onDoubleSelect
         const clickType = isCtrlClick ? 'ctrl' : isShiftClick ? 'shift' : 'single'
 
         if (clickType === 'single' && onLastSelectedChange) {
@@ -316,7 +315,7 @@ export function Tree<T>() {
             <ContextMenu {...controlsProps} />
             <div ref={ref} style={getEditModeStyles(editMode)} className="item-area">
               <DisclosureWidget enabled={enableOpen} isOpen={open} onOpen={handleOpen} />
-              <div onClick={handleSelect} onContextMenu={handleSelect} className="selectable-area">
+              <div onClick={handleClick} className="selectable-area">
                 {props.getIcon && props.getIcon(value)}
                 <div>{label || id}</div>
                 {isEntity && <ActionArea entity={value as Entity} />}
