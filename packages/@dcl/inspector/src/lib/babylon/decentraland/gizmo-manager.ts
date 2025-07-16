@@ -398,7 +398,7 @@ export function createGizmoManager(context: SceneContext) {
       else repositionGizmoOnCentroid()
     },
     getGizmoTypes() {
-      return [GizmoType.POSITION, GizmoType.ROTATION, GizmoType.SCALE, GizmoType.FREE] as const
+      return [GizmoType.FREE, GizmoType.POSITION, GizmoType.ROTATION, GizmoType.SCALE] as const
     },
     setGizmoType(type: GizmoType) {
       gizmoManager.positionGizmoEnabled = type === GizmoType.POSITION
