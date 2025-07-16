@@ -17,7 +17,8 @@ export const DISABLED_COMPONENTS: string[] = [
   CoreComponents.NETWORK_ENTITY,
   CoreComponents.TWEEN_SEQUENCE,
   ComponentName.ADMIN_TOOLS,
-  ComponentName.REWARDS
+  ComponentName.REWARDS,
+  CoreComponents.AVATAR_ATTACH
 ]
 
 export const SMART_ITEM_COMPONENTS: string[] = [
@@ -62,16 +63,19 @@ const transformComponentName = (value: string): string => {
     case CoreComponents.GLTF_CONTAINER:
       return 'GLTF'
     default:
-      return value
+      return value.replace(/inspector::/, '')
   }
 }
+
 export const getComponentName = (value: string) => (transformComponentName(value).match(/[^:]*$/) || [])[0] || '?'
 
 export const useEntityComponent = () => {
   const sdk = useSdk()
-  const [availableComponentsState, setAvailableComponentsState] = useState<Array<{ id: number; name: string }> | null>(
-    null
-  )
+  const [availableComponentsState, setAvailableComponentsState] = useState<Array<{
+    id: number
+    name: string
+    isOnEntity: boolean
+  }> | null>(null)
 
   useChange(({ component, operation }) => {
     if (!component) return
@@ -140,10 +144,26 @@ export const useEntityComponent = () => {
   const getAvailableComponents = useCallback(
     (entity: Entity) => {
       if (availableComponentsState === null) {
-        const missing = getComponents(entity, true)
-        let available = Array.from(missing.entries())
+        const allSystemComponents = new Map<number, string>()
+        if (sdk) {
+          for (const component of sdk.engine.componentsIter()) {
+            debugger
+            allSystemComponents.set(component.componentId, component.componentName)
+          }
+        }
+
+        let available = Array.from(allSystemComponents.entries())
           .filter(([_, name]) => enabledComponents.has(name))
-          .map(([id, name]) => ({ id, name: getComponentName(name) }))
+          .map(([id, name]) => {
+            const component = sdk?.engine.getComponentOrNull(id)
+            const isOnEntity = component ? component.has(entity) : false
+
+            return {
+              id,
+              name: getComponentName(name),
+              isOnEntity
+            }
+          })
           .sort((a, b) => a.name.localeCompare(b.name))
 
         if (isRoot(entity)) {
@@ -160,7 +180,7 @@ export const useEntityComponent = () => {
 
       return availableComponentsState
     },
-    [getComponents, enabledComponents, availableComponentsState]
+    [getComponents, enabledComponents, availableComponentsState, sdk]
   )
 
   return { getComponents, addComponent, removeComponent, getAvailableComponents }
