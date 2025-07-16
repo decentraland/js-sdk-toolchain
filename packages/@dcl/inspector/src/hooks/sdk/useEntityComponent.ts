@@ -63,7 +63,7 @@ const transformComponentName = (value: string): string => {
     case CoreComponents.GLTF_CONTAINER:
       return 'GLTF'
     default:
-      return value.replace(/inspector::/, '')
+      return value
   }
 }
 
