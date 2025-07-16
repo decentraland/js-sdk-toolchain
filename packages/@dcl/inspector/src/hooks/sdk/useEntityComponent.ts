@@ -147,7 +147,6 @@ export const useEntityComponent = () => {
         const allSystemComponents = new Map<number, string>()
         if (sdk) {
           for (const component of sdk.engine.componentsIter()) {
-            debugger
             allSystemComponents.set(component.componentId, component.componentName)
           }
         }
