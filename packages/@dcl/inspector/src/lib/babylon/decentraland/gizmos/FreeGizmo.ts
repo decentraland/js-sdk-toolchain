@@ -60,6 +60,11 @@ export class FreeGizmo implements IGizmoTransformer {
     this.isWorldAligned = value
   }
 
+  setSnapDistance(_distance: number): void {
+    // We handle the snap distance in the snap manager
+    return
+  }
+
   // Add method to set drag end callback
   setOnDragEndCallback(callback: () => void): void {
     this.onDragEndCallback = callback
@@ -93,17 +98,22 @@ export class FreeGizmo implements IGizmoTransformer {
     // Setup drag update
     this.dragObserver = this.dragBehavior.onDragObservable.add((eventData) => {
       if (!this.isDragging || !eventData.delta || !this.pivotPosition) return
+
+      // Apply the delta directly to the pivot position
       const worldDelta = eventData.delta.clone()
-      worldDelta.y = 0
+      worldDelta.y = 0 // Keep Y position unchanged for free gizmo
       this.pivotPosition.addInPlace(worldDelta)
+
+      // Update all selected entities with their relative offsets
       for (const entity of this.selectedEntities) {
         const offset = this.entityOffsets.get(entity.entityId)
         if (!offset) continue
+
         const newWorldPosition = this.pivotPosition.add(offset)
         this.applyWorldPositionToEntity(entity, newWorldPosition)
       }
 
-      // Update ECS position on each drag update for real-time feedback
+      // Update ECS position immediately for real-time feedback
       if (this.updateEntityPosition) {
         this.selectedEntities.forEach(this.updateEntityPosition)
       }
@@ -147,14 +157,20 @@ export class FreeGizmo implements IGizmoTransformer {
   }
 
   private findClickedEntity(pickedMesh: AbstractMesh): EcsEntity | null {
-    return (
-      this.selectedEntities.find((entity) => {
-        const isDescendant = pickedMesh.isDescendantOf(entity)
-        const isMeshRenderer = entity.meshRenderer === pickedMesh
-        const isGltfContainer = entity.gltfContainer === pickedMesh
-        return isDescendant || isMeshRenderer || isGltfContainer
-      }) || null
-    )
+    // First, check if the picked mesh is a descendant of any selected entity
+    for (const entity of this.selectedEntities) {
+      if (pickedMesh.isDescendantOf(entity)) {
+        return entity
+      }
+    }
+
+    // Then, check if the picked mesh is a meshRenderer or gltfContainer of any selected entity
+    const meshEntity = this.selectedEntities.find((entity) => {
+      return entity.meshRenderer === pickedMesh || entity.gltfContainer === pickedMesh
+    })
+    if (meshEntity) return meshEntity
+
+    return null
   }
 
   private startDrag(_clickedEntity: EcsEntity, pickedMesh: AbstractMesh): void {
@@ -164,14 +180,29 @@ export class FreeGizmo implements IGizmoTransformer {
       this.pivotPosition.addInPlace(entity.getAbsolutePosition())
     }
     this.pivotPosition.scaleInPlace(1 / this.selectedEntities.length)
+
     // Store offsets
     this.entityOffsets.clear()
     for (const entity of this.selectedEntities) {
       const offset = entity.getAbsolutePosition().subtract(this.pivotPosition)
       this.entityOffsets.set(entity.entityId, offset)
     }
-    // Attach drag behavior to the picked mesh
-    this.dragBehavior.attach(pickedMesh)
+
+    // Always use the primary mesh of the clicked entity for consistent drag behavior
+    // This prevents issues when clicking on child meshes
+    let dragMesh: AbstractMesh
+
+    if (_clickedEntity.meshRenderer) {
+      dragMesh = _clickedEntity.meshRenderer
+    } else if (_clickedEntity.gltfContainer) {
+      dragMesh = _clickedEntity.gltfContainer
+    } else {
+      // Fallback: find the first child mesh of the entity
+      const childMeshes = _clickedEntity.getChildMeshes()
+      dragMesh = childMeshes.length > 0 ? childMeshes[0] : pickedMesh
+    }
+
+    this.dragBehavior.attach(dragMesh)
   }
 
   private applyWorldPositionToEntity(entity: EcsEntity, worldPosition: Vector3): void {
@@ -184,18 +215,28 @@ export class FreeGizmo implements IGizmoTransformer {
     } else {
       entity.position.copyFrom(worldPosition)
     }
+
+    // Force immediate world matrix update
     entity.computeWorldMatrix(true)
-    // Only call refreshBoundingInfo if it exists
+
+    // Update bounding info for the entity
     if (typeof (entity as any).refreshBoundingInfo === 'function') {
       ;(entity as any).refreshBoundingInfo()
     }
+
+    // Update all child meshes to ensure proper synchronization
     if (typeof entity.getChildMeshes === 'function') {
       entity.getChildMeshes().forEach((mesh) => {
         if (typeof mesh.refreshBoundingInfo === 'function') {
           mesh.refreshBoundingInfo({})
         }
+        if (typeof mesh.computeWorldMatrix === 'function') {
+          mesh.computeWorldMatrix(true)
+        }
       })
     }
+
+    // Update bounding info mesh if it exists
     if ((entity as any).boundingInfoMesh) {
       const boundingInfoMesh = (entity as any).boundingInfoMesh
       if (typeof boundingInfoMesh.refreshBoundingInfo === 'function') {
