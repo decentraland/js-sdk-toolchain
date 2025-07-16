@@ -160,7 +160,7 @@ export class PositionGizmo implements IGizmoTransformer {
     }
   }
 
-  onDragStart(entities: EcsEntity[], gizmoNode: TransformNode): void {
+  onDragStart(entities: EcsEntity[], _gizmoNode: TransformNode): void {
     if (this.isDragging) return
 
     this.isDragging = true
