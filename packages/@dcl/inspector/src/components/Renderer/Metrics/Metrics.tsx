@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 import cx from 'classnames'
 import { IoGridOutline as SquaresGridIcon } from 'react-icons/io5'
+import { FiAlertTriangle as WarningIcon } from 'react-icons/fi'
 
 import { Material } from '@babylonjs/core'
 import { CrdtMessageType } from '@dcl/ecs'
@@ -183,12 +184,14 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
       </div>
       {showMetrics && (
         <div ref={overlayRef} className="Overlay">
-          <h2 className="Header">
-            {sceneLayout.parcels.length} Parcels
-            <span className="secondary">
-              {sceneLayout.parcels.length * PARCEL_SIZE}m<sup>2</sup>
-            </span>
-          </h2>
+          <div className="Header">Scene Optimization</div>
+          <div className="ParcelsInfo">Suggested Specs per Parcel</div>
+          <div className="ParcelsInfo">
+            {sceneLayout.parcels.length} Parcels = {sceneLayout.parcels.length * PARCEL_SIZE}
+            <div>
+              m<sup>2</sup>
+            </div>
+          </div>
           <div className="Items">
             {Object.entries(metrics).map(([key, value]) => (
               <div className="Item" key={key}>
