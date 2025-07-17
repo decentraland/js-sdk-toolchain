@@ -125,9 +125,9 @@
 .Metrics .Buttons .Button.LimitExceeded svg,
 .Metrics > .Overlay .Item .Description.LimitExceeded,
 .Metrics > .Overlay .Item .Description.LimitExceeded .secondary {
-  color: var(--error-dark);
+  color: var(--warning-main);
 }
 
 .Metrics .Buttons .Button.Active.LimitExceeded svg {
-  color: var(--error-main);
+  color: var(--warning-main);
 }

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 import cx from 'classnames'
-import { IoGridOutline as SquaresGridIcon, IoAlertCircleOutline as AlertIcon } from 'react-icons/io5'
+import { IoGridOutline as SquaresGridIcon } from 'react-icons/io5'
+
 import { Material } from '@babylonjs/core'
 import { CrdtMessageType } from '@dcl/ecs'
 
@@ -155,6 +156,10 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
     )
   }, [metrics, limits])
 
+  const isTriangleLimitExceeded = (limitsExceeded: Record<string, any>): boolean => {
+    return Object.values(limitsExceeded).length > 0
+  }
+
   const handleToggleMetricsOverlay = useCallback(
     (e: React.MouseEvent<HTMLButtonElement> | MouseEvent) => {
       e.preventDefault()
@@ -170,18 +175,12 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
     <div className="Metrics">
       <div className="Buttons">
         <Button
-          className={cx({ Active: showMetrics, LimitExceeded: Object.values(limitsExceeded).length > 0 })}
+          className={cx({ Active: showMetrics, LimitExceeded: isTriangleLimitExceeded(limitsExceeded) })}
           onClick={handleToggleMetricsOverlay}
         >
           <SquaresGridIcon size={ICON_SIZE} />
         </Button>
       </div>
-      {Object.values(limitsExceeded).length > 0 && (
-        <div className="LimitExceeded">
-          <AlertIcon />
-          Too many {Object.keys(limitsExceeded)[0].toUpperCase()}
-        </div>
-      )}
       {showMetrics && (
         <div ref={overlayRef} className="Overlay">
           <h2 className="Header">

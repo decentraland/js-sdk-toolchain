@@ -260,7 +260,10 @@ function updateMeshBoundingBoxVisibility(entity: EcsEntity, mesh: BABYLON.Abstra
   const scene = mesh.getScene()
   const { isEntityOutsideLayout } = getLayoutManager(scene)
 
-  if (isEntityOutsideLayout(mesh)) {
+  const context = entity.context.deref()
+  const isSelected = context?.editorComponents.Selection.has(entity.entityId) || false
+
+  if (isEntityOutsideLayout(mesh) && isSelected) {
     if (mesh.showBoundingBox) return
     mesh.showBoundingBox = true
   } else {
