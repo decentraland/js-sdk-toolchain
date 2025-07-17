@@ -173,6 +173,21 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
 
   const overlayRef = useOutsideClick(handleToggleMetricsOverlay)
 
+  const getWarningMessages = (): string[] => {
+    const baseMessage = 'Your scene contains too many'
+    const warnings: string[] = []
+
+    Object.entries(limitsExceeded).forEach(([key, isExceeded]) => {
+      if (isExceeded) {
+        warnings.push(`${baseMessage} ${key}`)
+      }
+    })
+
+    return warnings
+  }
+
+  const warningMessages = getWarningMessages()
+
   return (
     <div className="Metrics">
       <div className="Buttons">
@@ -185,14 +200,7 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
       </div>
       {showMetrics && (
         <div ref={overlayRef} className="Overlay">
-          <div className="Header">Scene Optimization</div>
-          <div className="Description">Suggested Specs per Parcel</div>
-          <div className="Description">
-            {sceneLayout.parcels.length} Parcels = {sceneLayout.parcels.length * PARCEL_SIZE}
-            <div>
-              m<sup>2</sup>
-            </div>
-          </div>
+          <h2 className="Header">Scene Optimization</h2>
           <div className="Items">
             {Object.entries(metrics).map(([key, value]) => (
               <div className="Item" key={key}>
@@ -205,13 +213,15 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
               </div>
             ))}
           </div>
-          {isAnyLimitExceeded(limitsExceeded) && (
+          {warningMessages.length > 0 && (
             <div className="WarningsContainer">
               <div className="Description">WARNINGS</div>
-              <div className="WarningItem">
-                <WarningIcon />
-                <span className="WarningText">Your scene contains too many triangles</span>
-              </div>
+              {warningMessages.map((message, index) => (
+                <div className="WarningItem" key={index}>
+                  <WarningIcon className="WarningIcon" />
+                  <span className="WarningText">{message}</span>
+                </div>
+              ))}
             </div>
           )}
         </div>
