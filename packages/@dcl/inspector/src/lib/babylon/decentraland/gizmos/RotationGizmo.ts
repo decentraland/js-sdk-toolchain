@@ -24,33 +24,27 @@ type DragState = {
 class EntityRotationHelper {
   static getWorldRotation(entity: EcsEntity): Quaternion {
     if (!entity.rotationQuaternion) return Quaternion.Identity()
-    
+
     if (!entity.parent || !(entity.parent instanceof TransformNode)) {
       return entity.rotationQuaternion.clone()
     }
-    
+
     const parent = entity.parent as TransformNode
-    const parentWorldRotation = parent.rotationQuaternion || 
-      Quaternion.FromRotationMatrix(parent.getWorldMatrix())
+    const parentWorldRotation = parent.rotationQuaternion || Quaternion.FromRotationMatrix(parent.getWorldMatrix())
     const entityLocalRotation = entity.rotationQuaternion || Quaternion.Identity()
-    
+
     return parentWorldRotation.multiply(entityLocalRotation)
   }
 
   static getLocalRotation(worldRotation: Quaternion, parent: TransformNode | null): Quaternion {
     if (!parent) return worldRotation.clone()
-    
-    const parentWorldRotation = parent.rotationQuaternion || 
-      Quaternion.FromRotationMatrix(parent.getWorldMatrix())
-    
+
+    const parentWorldRotation = parent.rotationQuaternion || Quaternion.FromRotationMatrix(parent.getWorldMatrix())
+
     return parentWorldRotation.invert().multiply(worldRotation)
   }
 
-  static applyRotationToEntity(
-    entity: EcsEntity, 
-    rotation: Quaternion, 
-    isWorldAligned: boolean
-  ): void {
+  static applyRotationToEntity(entity: EcsEntity, rotation: Quaternion, isWorldAligned: boolean): void {
     if (!entity.rotationQuaternion) {
       entity.rotationQuaternion = new Quaternion()
     }
@@ -86,11 +80,7 @@ class MultiEntityHelper {
     return multiTransform
   }
 
-  static calculateRotatedPosition(
-    offset: Vector3, 
-    rotationDelta: Quaternion, 
-    centroid: Vector3
-  ): Vector3 {
+  static calculateRotatedPosition(offset: Vector3, rotationDelta: Quaternion, centroid: Vector3): Vector3 {
     const rotationMatrix = new Matrix()
     rotationDelta.toRotationMatrix(rotationMatrix)
     const rotatedOffset = Vector3.TransformCoordinates(offset, rotationMatrix)
@@ -100,11 +90,7 @@ class MultiEntityHelper {
 
 // Helper class for gizmo synchronization
 class GizmoSyncHelper {
-  static syncGizmoRotation(
-    gizmoNode: TransformNode, 
-    entities: EcsEntity[], 
-    isWorldAligned: boolean
-  ): void {
+  static syncGizmoRotation(gizmoNode: TransformNode, entities: EcsEntity[], isWorldAligned: boolean): void {
     if (entities.length === 0) return
 
     if (isWorldAligned) {
@@ -137,20 +123,16 @@ class SmoothSnapHelper {
   static getRotationAngle(quaternion: Quaternion): number {
     const normalized = quaternion.normalize()
     const { w } = normalized
-    
+
     // For very small rotations, return 0
     if (Math.abs(w) > 0.9999) {
       return 0
     }
-    
+
     return 2 * Math.acos(Math.abs(w))
   }
 
-  static shouldApplySnap(
-    currentAngle: number, 
-    lastAppliedAngle: number | undefined, 
-    snapThreshold: number
-  ): boolean {
+  static shouldApplySnap(currentAngle: number, lastAppliedAngle: number | undefined, snapThreshold: number): boolean {
     // If snapping is disabled, always apply rotation immediately
     if (!snapManager.isEnabled()) {
       return true
@@ -181,29 +163,26 @@ export class RotationGizmo implements IGizmoTransformer {
   private currentEntities: EcsEntity[] = []
   private currentEntityIds = new Set<Entity>()
   private dragState: DragState | null = null
-  
+
   // Observers
   private dragStartObserver: any = null
   private dragObserver: any = null
   private dragEndObserver: any = null
-  
+
   // Callbacks
   private updateEntityRotation: ((entity: EcsEntity) => void) | null = null
   private updateEntityPosition: ((entity: EcsEntity) => void) | null = null
   private dispatchOperations: (() => void) | null = null
-  
+
   // Configuration
   private isWorldAligned = true
   private sceneContext: any = null
 
-  constructor(
-    private gizmoManager: GizmoManager, 
-    private snapRotation: (rotation: Quaternion) => Quaternion
-  ) {}
+  constructor(private gizmoManager: GizmoManager, private snapRotation: (rotation: Quaternion) => Quaternion) {}
 
   setup(): void {
     if (!this.gizmoManager.gizmos.rotationGizmo) return
-    
+
     this.rotationGizmo = this.gizmoManager.gizmos.rotationGizmo
     this.rotationGizmo.updateGizmoRotationToMatchAttachedMesh = !this.isWorldAligned
   }
@@ -242,7 +221,7 @@ export class RotationGizmo implements IGizmoTransformer {
 
   setWorldAligned(value: boolean): void {
     this.isWorldAligned = value
-    
+
     if (this.gizmoManager.gizmos.rotationGizmo) {
       this.gizmoManager.gizmos.rotationGizmo.updateGizmoRotationToMatchAttachedMesh = !value
     }
@@ -252,12 +231,12 @@ export class RotationGizmo implements IGizmoTransformer {
 
   setSnapDistance(_distance: number): void {
     // We handle the snap distance in the snap manager
-    return;
+    return
   }
 
   onDragStart(entities: EcsEntity[], gizmoNode: TransformNode): void {
     const selectionChanged = this.hasSelectionChanged(entities)
-    
+
     if (selectionChanged) {
       this.clearDragState()
       this.initializeDragState(entities, gizmoNode)
@@ -278,7 +257,7 @@ export class RotationGizmo implements IGizmoTransformer {
 
   update(entities: EcsEntity[], gizmoNode: TransformNode): void {
     if (entities.length === 0) return
-    
+
     // Ensure dragState exists
     if (!this.dragState) {
       console.warn('RotationGizmo: No drag state found, initializing...')
@@ -302,7 +281,7 @@ export class RotationGizmo implements IGizmoTransformer {
     if (this.isWorldAligned) {
       this.syncGizmoRotation()
     }
-    
+
     this.clearDragState()
   }
 
@@ -383,28 +362,31 @@ export class RotationGizmo implements IGizmoTransformer {
   }
 
   private initializeSingleEntityDragState(entity: EcsEntity, transformData: Map<Entity, EntityTransformData>): void {
-    const initialRotation = this.isWorldAligned 
+    const initialRotation = this.isWorldAligned
       ? EntityRotationHelper.getWorldRotation(entity)
       : entity.rotationQuaternion?.clone() || Quaternion.Identity()
 
     transformData.set(entity.entityId, { initialRotation })
   }
 
-  private initializeMultipleEntitiesDragState(entities: EcsEntity[], transformData: Map<Entity, EntityTransformData>): void {
+  private initializeMultipleEntitiesDragState(
+    entities: EcsEntity[],
+    transformData: Map<Entity, EntityTransformData>
+  ): void {
     const centroid = MultiEntityHelper.calculateCentroid(entities)
     const multiTransform = MultiEntityHelper.createMultiTransform(centroid, entities[0].scene)
 
     for (const entity of entities) {
       const worldPosition = entity.getAbsolutePosition()
       const offset = worldPosition.subtract(centroid)
-      
-      const initialRotation = this.isWorldAligned 
+
+      const initialRotation = this.isWorldAligned
         ? EntityRotationHelper.getWorldRotation(entity)
         : entity.rotationQuaternion?.clone() || Quaternion.Identity()
 
-      transformData.set(entity.entityId, { 
-        initialRotation, 
-        offset 
+      transformData.set(entity.entityId, {
+        initialRotation,
+        offset
       })
     }
 
@@ -417,7 +399,7 @@ export class RotationGizmo implements IGizmoTransformer {
     for (const entity of entities) {
       const data = this.dragState.transformData.get(entity.entityId)
       if (data) {
-        data.initialRotation = this.isWorldAligned 
+        data.initialRotation = this.isWorldAligned
           ? EntityRotationHelper.getWorldRotation(entity)
           : entity.rotationQuaternion?.clone() || Quaternion.Identity()
       }
@@ -441,30 +423,30 @@ export class RotationGizmo implements IGizmoTransformer {
   private updateSingleEntityWorldAligned(entity: EcsEntity, gizmoNode: TransformNode, data: EntityTransformData): void {
     const currentGizmoRotation = gizmoNode.rotationQuaternion
     if (!currentGizmoRotation) return
-    
+
     const hasRotated = !currentGizmoRotation.equals(this.dragState!.startRotation)
 
     if (hasRotated) {
       const rotationDelta = this.dragState!.startRotation.invert().multiply(currentGizmoRotation)
-      
+
       // Calculate the accumulated rotation angle since drag start
       const accumulatedAngle = SmoothSnapHelper.getRotationAngle(rotationDelta)
       const snapThreshold = SmoothSnapHelper.getSnapThreshold()
-      
+
       // Check if we should apply the snap based on the accumulated angle
       const shouldApplySnap = SmoothSnapHelper.shouldApplySnap(
-        accumulatedAngle, 
-        this.dragState!.lastAppliedSnapAngle, 
+        accumulatedAngle,
+        this.dragState!.lastAppliedSnapAngle,
         snapThreshold
       )
-      
+
       if (shouldApplySnap) {
         // Apply the snapped rotation
         const snappedRotationDelta = this.snapRotation(rotationDelta)
         const newWorldRotation = snappedRotationDelta.multiply(data.initialRotation)
-        
+
         EntityRotationHelper.applyRotationToEntity(entity, newWorldRotation, this.isWorldAligned)
-        
+
         // Update the last applied snap angle to the accumulated angle
         this.dragState!.lastAppliedSnapAngle = accumulatedAngle
       }
@@ -479,39 +461,39 @@ export class RotationGizmo implements IGizmoTransformer {
   private updateSingleEntityLocalAligned(entity: EcsEntity, gizmoNode: TransformNode): void {
     const currentGizmoRotation = gizmoNode.rotationQuaternion
     if (!currentGizmoRotation) return
-    
+
     const data = this.dragState!.transformData.get(entity.entityId)
     if (!data) return
-    
+
     const hasRotated = !currentGizmoRotation.equals(this.dragState!.startRotation)
 
     if (hasRotated) {
       // Calculate the rotation delta from the start of the drag
       const rotationDelta = this.dragState!.startRotation.invert().multiply(currentGizmoRotation)
-      
+
       // Calculate the accumulated rotation angle since drag start
       const accumulatedAngle = SmoothSnapHelper.getRotationAngle(rotationDelta)
       const snapThreshold = SmoothSnapHelper.getSnapThreshold()
-      
+
       // Check if we should apply the snap based on the accumulated angle
       const shouldApplySnap = SmoothSnapHelper.shouldApplySnap(
-        accumulatedAngle, 
-        this.dragState!.lastAppliedSnapAngle, 
+        accumulatedAngle,
+        this.dragState!.lastAppliedSnapAngle,
         snapThreshold
       )
-      
+
       if (shouldApplySnap) {
         // Apply the snapped rotation
         const snappedGizmoRotation = this.snapRotation(currentGizmoRotation)
-        
+
         // For local alignment, the gizmo rotation represents the target world rotation
         // Convert it to local rotation for the entity
         if (entity.parent && entity.parent instanceof TransformNode) {
           const parent = entity.parent as TransformNode
-          const parentWorldRotation = parent.rotationQuaternion || 
-            Quaternion.FromRotationMatrix(parent.getWorldMatrix())
+          const parentWorldRotation =
+            parent.rotationQuaternion || Quaternion.FromRotationMatrix(parent.getWorldMatrix())
           const localRotation = parentWorldRotation.invert().multiply(snappedGizmoRotation)
-          
+
           if (!entity.rotationQuaternion) {
             entity.rotationQuaternion = new Quaternion()
           }
@@ -523,7 +505,7 @@ export class RotationGizmo implements IGizmoTransformer {
           }
           entity.rotationQuaternion.copyFrom(snappedGizmoRotation)
         }
-        
+
         // Update the last applied snap angle to the accumulated angle
         this.dragState!.lastAppliedSnapAngle = accumulatedAngle
       }
@@ -536,7 +518,7 @@ export class RotationGizmo implements IGizmoTransformer {
       }
       entity.rotationQuaternion.copyFrom(data.initialRotation)
     }
-    
+
     // Force update world matrix
     entity.computeWorldMatrix(true)
   }
@@ -556,24 +538,24 @@ export class RotationGizmo implements IGizmoTransformer {
 
     if (hasRotated) {
       const rotationDelta = this.dragState.startRotation.invert().multiply(currentGizmoRotation)
-      
+
       // Calculate the accumulated rotation angle since drag start
       const accumulatedAngle = SmoothSnapHelper.getRotationAngle(rotationDelta)
       const snapThreshold = SmoothSnapHelper.getSnapThreshold()
-      
+
       // Check if we should apply the snap based on the accumulated angle
       const shouldApplySnap = SmoothSnapHelper.shouldApplySnap(
-        accumulatedAngle, 
-        this.dragState.lastAppliedSnapAngle, 
+        accumulatedAngle,
+        this.dragState.lastAppliedSnapAngle,
         snapThreshold
       )
-      
+
       if (shouldApplySnap) {
         // Apply the snapped rotation
         const snappedRotationDelta = this.snapRotation(rotationDelta)
-        
+
         this.applyRotationToMultipleEntities(entities, snappedRotationDelta)
-        
+
         // Update the last applied snap angle to the accumulated angle
         this.dragState.lastAppliedSnapAngle = accumulatedAngle
       }
@@ -592,8 +574,8 @@ export class RotationGizmo implements IGizmoTransformer {
       if (!data || !data.offset) continue
 
       const newWorldPosition = MultiEntityHelper.calculateRotatedPosition(
-        data.offset, 
-        rotationDelta, 
+        data.offset,
+        rotationDelta,
         this.dragState.multiTransform!.position
       )
 
@@ -616,7 +598,7 @@ export class RotationGizmo implements IGizmoTransformer {
     if (entity.parent && entity.parent instanceof TransformNode) {
       const parent = entity.parent as TransformNode
       const parentWorldMatrixInverse = parent.getWorldMatrix().clone().invert()
-      
+
       const localPosition = Vector3.TransformCoordinates(worldPosition, parentWorldMatrixInverse)
       const localRotation = EntityRotationHelper.getLocalRotation(worldRotation, parent)
 
@@ -640,7 +622,7 @@ export class RotationGizmo implements IGizmoTransformer {
   // Private utility methods
   private hasSelectionChanged(entities: EcsEntity[]): boolean {
     const newEntityIds = new Set(entities.map((e) => e.entityId))
-    
+
     if (this.currentEntityIds.size !== newEntityIds.size) return true
 
     for (const id of newEntityIds) {
@@ -652,7 +634,7 @@ export class RotationGizmo implements IGizmoTransformer {
 
   private syncGizmoRotation(): void {
     if (!this.gizmoManager.attachedNode) return
-    
+
     const gizmoNode = this.gizmoManager.attachedNode as TransformNode
     GizmoSyncHelper.syncGizmoRotation(gizmoNode, this.currentEntities, this.isWorldAligned)
   }
