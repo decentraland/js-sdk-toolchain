@@ -10,10 +10,18 @@ import { withSdk, WithSdkProps } from '../../../hoc/withSdk'
 import { useChange } from '../../../hooks/sdk/useChange'
 import { useOutsideClick } from '../../../hooks/useOutsideClick'
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks'
-import { getMetrics, getLimits, setEntitiesOutOfBoundaries, setMetrics, setLimits } from '../../../redux/scene-metrics'
+import {
+  getMetrics,
+  getLimits,
+  getEntitiesOutOfBoundaries,
+  setEntitiesOutOfBoundaries,
+  setMetrics,
+  setLimits
+} from '../../../redux/scene-metrics'
 import { SceneMetrics } from '../../../redux/scene-metrics/types'
 import type { Layout } from '../../../lib/utils/layout'
 import { GROUND_MESH_PREFIX, PARCEL_SIZE } from '../../../lib/utils/scene'
+import { getLayoutManager } from '../../../lib/babylon/decentraland/layout-manager'
 import { Button } from '../../Button'
 import { getSceneLimits } from './utils'
 
@@ -57,6 +65,7 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
   const dispatch = useAppDispatch()
   const metrics = useAppSelector(getMetrics)
   const limits = useAppSelector(getLimits)
+  const entitiesOutOfBoundaries = useAppSelector(getEntitiesOutOfBoundaries)
   const [showMetrics, setShowMetrics] = React.useState(false)
   const [sceneLayout, setSceneLayout] = React.useState<Layout>({
     base: { x: 0, y: 0 },
@@ -109,34 +118,44 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
 
   const handleSceneChange = useCallback(() => {
     const nodes = getNodes()
+    const { isEntityOutsideLayout } = getLayoutManager(sdk.scene)
+
+    console.log('Total nodes:', nodes.length)
+    console.log('Layout manager:', !!isEntityOutsideLayout)
+
     const entitiesOutOfBoundaries = nodes.reduce((count, node) => {
       const entity = sdk.sceneContext.getEntityOrNull(node.entity)
-      return entity && entity.isOutOfBoundaries() ? count + 1 : count
+      console.log(`Entity ${node.entity}:`, {
+        hasEntity: !!entity,
+        hasBoundingMesh: !!entity?.boundingInfoMesh,
+        isOutOfBoundaries: entity?.isOutOfBoundaries()
+      })
+
+      if (entity && entity.boundingInfoMesh) {
+        const isOutside = isEntityOutsideLayout(entity.boundingInfoMesh)
+        console.log(`Entity ${node.entity} isOutside:`, isOutside)
+        return isOutside ? count + 1 : count
+      }
+      return count
     }, 0)
 
+    console.log('Final count:', entitiesOutOfBoundaries)
     dispatch(setEntitiesOutOfBoundaries(entitiesOutOfBoundaries))
   }, [sdk, dispatch, getNodes, setEntitiesOutOfBoundaries])
 
   useEffect(() => {
-    const handleOutsideMaterialChange = (material: Material) => {
-      if (material.name === 'entity_outside_layout_multimaterial') {
-        handleSceneChange()
-      }
-    }
-
-    const addOutsideMaterialObservable = sdk.scene.onNewMultiMaterialAddedObservable.add(handleOutsideMaterialChange)
-    const removeOutsideMaterialObservable = sdk.scene.onMaterialRemovedObservable.add(handleOutsideMaterialChange)
-
     sdk.scene.onDataLoadedObservable.add(handleUpdateMetrics)
     sdk.scene.onMeshRemovedObservable.add(handleUpdateMetrics)
+    sdk.scene.onNewMeshAddedObservable.add(handleSceneChange)
+    sdk.scene.onMeshRemovedObservable.add(handleSceneChange)
 
     handleUpdateSceneLayout()
 
     return () => {
       sdk.scene.onDataLoadedObservable.removeCallback(handleUpdateMetrics)
       sdk.scene.onMeshRemovedObservable.removeCallback(handleUpdateMetrics)
-      sdk.scene.onNewMultiMaterialAddedObservable.remove(addOutsideMaterialObservable)
-      sdk.scene.onMaterialRemovedObservable.remove(removeOutsideMaterialObservable)
+      sdk.scene.onNewMeshAddedObservable.removeCallback(handleSceneChange)
+      sdk.scene.onMeshRemovedObservable.removeCallback(handleSceneChange)
     }
   }, [])
 
@@ -159,7 +178,7 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
   }, [metrics, limits])
 
   const isAnyLimitExceeded = (limitsExceeded: Record<string, any>): boolean => {
-    return Object.values(limitsExceeded).length > 0
+    return Object.values(limitsExceeded).length > 0 || entitiesOutOfBoundaries > 0
   }
 
   const handleToggleMetricsOverlay = useCallback(
@@ -183,6 +202,14 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
       }
     })
 
+    if (entitiesOutOfBoundaries > 0) {
+      warnings.push(
+        `${entitiesOutOfBoundaries} entit${
+          entitiesOutOfBoundaries === 1 ? 'y is' : 'ies are'
+        } out of bounds and may not display correctly in-world.`
+      )
+    }
+
     return warnings
   }
 
@@ -201,6 +228,13 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
       {showMetrics && (
         <div ref={overlayRef} className="Overlay">
           <h2 className="Header">Scene Optimization</h2>
+          <div className="Description">Suggested Specs per Parcel</div>
+          <div className="Description">
+            {sceneLayout.parcels.length} Parcels = {sceneLayout.parcels.length * PARCEL_SIZE}
+            <div>
+              m<sup>2</sup>
+            </div>
+          </div>
           <div className="Items">
             {Object.entries(metrics).map(([key, value]) => (
               <div className="Item" key={key}>
