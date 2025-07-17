@@ -2,6 +2,8 @@ import { Vector3, TransformNode, GizmoManager, Quaternion } from '@babylonjs/cor
 import { Entity } from '@dcl/ecs'
 import { EcsEntity } from '../EcsEntity'
 import { IGizmoTransformer } from './types'
+import { LEFT_BUTTON } from '../mouse-utils'
+import { configureGizmoButtons } from './utils'
 
 export class PositionGizmo implements IGizmoTransformer {
   private initialOffsets = new Map<Entity, Vector3>()
@@ -24,8 +26,6 @@ export class PositionGizmo implements IGizmoTransformer {
     if (!this.gizmoManager.gizmos.positionGizmo) return
     const positionGizmo = this.gizmoManager.gizmos.positionGizmo
     positionGizmo.updateGizmoRotationToMatchAttachedMesh = !this.isWorldAligned
-
-    // Don't setup drag observables here - they will be set up when the gizmo is enabled
   }
 
   enable(): void {
@@ -33,6 +33,9 @@ export class PositionGizmo implements IGizmoTransformer {
 
     // Setup drag observables when the gizmo is enabled
     this.setupDragObservables()
+
+    // Configure gizmo to only work with left click
+    configureGizmoButtons(this.gizmoManager.gizmos.positionGizmo, [LEFT_BUTTON])
   }
 
   cleanup(): void {

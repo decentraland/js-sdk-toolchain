@@ -3,6 +3,8 @@ import { Entity } from '@dcl/ecs'
 import { EcsEntity } from '../EcsEntity'
 import { snapManager } from '../snap-manager'
 import { IGizmoTransformer } from './types'
+import { LEFT_BUTTON } from '../mouse-utils'
+import { configureGizmoButtons } from './utils'
 
 // Types for better type safety
 type EntityTransformData = {
@@ -209,6 +211,8 @@ export class RotationGizmo implements IGizmoTransformer {
   enable(): void {
     if (!this.gizmoManager.gizmos.rotationGizmo) return
     this.setupDragObservables()
+    // Configure gizmo to only work with left click
+    configureGizmoButtons(this.gizmoManager.gizmos.rotationGizmo, [LEFT_BUTTON])
   }
 
   cleanup(): void {

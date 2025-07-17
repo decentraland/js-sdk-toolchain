@@ -2,6 +2,7 @@ import { Vector3, TransformNode, Scene, UtilityLayerRenderer, PointerDragBehavio
 import { Entity } from '@dcl/ecs'
 import { EcsEntity } from '../EcsEntity'
 import { IGizmoTransformer } from './types'
+import { LEFT_BUTTON } from '../mouse-utils'
 
 export class FreeGizmo implements IGizmoTransformer {
   private selectedEntities: EcsEntity[] = []
@@ -21,6 +22,8 @@ export class FreeGizmo implements IGizmoTransformer {
   constructor(private scene: Scene, private utilityLayer: UtilityLayerRenderer = new UtilityLayerRenderer(scene)) {
     this.dragBehavior = new PointerDragBehavior({ dragPlaneNormal: new Vector3(0, 1, 0) })
     this.dragBehavior.useObjectOrientationForDragging = false
+    // Configure drag behavior to only work with left click
+    this.dragBehavior.dragButtons = [LEFT_BUTTON]
   }
 
   setup(): void {

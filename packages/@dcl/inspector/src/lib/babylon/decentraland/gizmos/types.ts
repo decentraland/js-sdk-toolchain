@@ -1,4 +1,4 @@
-import { TransformNode } from '@babylonjs/core'
+import { IAxisDragGizmo, TransformNode } from '@babylonjs/core'
 import { EcsEntity } from '../EcsEntity'
 
 export interface IGizmoTransformer {
@@ -23,3 +23,9 @@ export const enum GizmoType {
 }
 
 export type GizmoEventCallback = () => void
+
+export interface GizmoAxis {
+  xGizmo: IAxisDragGizmo
+  yGizmo: IAxisDragGizmo
+  zGizmo: IAxisDragGizmo
+}

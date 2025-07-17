@@ -1,5 +1,6 @@
-import { Vector3, TransformNode, Quaternion, Matrix } from '@babylonjs/core'
+import { Vector3, TransformNode, Quaternion } from '@babylonjs/core'
 import { EcsEntity } from '../EcsEntity'
+import { GizmoAxis } from './types'
 
 export const TransformUtils = {
   convertToLocalPosition(worldPosition: Vector3, parent: TransformNode | null): Vector3 {
@@ -32,5 +33,14 @@ export const TransformUtils = {
     const position = new Vector3()
     parent.getWorldMatrix().decompose(scale, rotation, position)
     return scale
+  }
+}
+
+// Helper function to configure gizmo buttons for left-click only
+export function configureGizmoButtons(gizmo: GizmoAxis, buttons: number[]) {
+  if (gizmo && gizmo.xGizmo && gizmo.yGizmo && gizmo.zGizmo) {
+    gizmo.xGizmo.dragBehavior.dragButtons = buttons
+    gizmo.yGizmo.dragBehavior.dragButtons = buttons
+    gizmo.zGizmo.dragBehavior.dragButtons = buttons
   }
 }

@@ -2,6 +2,8 @@ import { Vector3, TransformNode, GizmoManager, Quaternion } from '@babylonjs/cor
 import { Entity } from '@dcl/ecs'
 import { EcsEntity } from '../EcsEntity'
 import { IGizmoTransformer } from './types'
+import { LEFT_BUTTON } from '../mouse-utils'
+import { configureGizmoButtons } from './utils'
 
 export class ScaleGizmo implements IGizmoTransformer {
   private initialOffsets = new Map<Entity, Vector3>()
@@ -26,8 +28,6 @@ export class ScaleGizmo implements IGizmoTransformer {
     const scaleGizmo = this.gizmoManager.gizmos.scaleGizmo
     // Scale gizmo should always be locally aligned to the entity
     scaleGizmo.updateGizmoRotationToMatchAttachedMesh = true
-
-    // Don't setup drag observables here - they will be set up when the gizmo is enabled
   }
 
   enable(): void {
@@ -35,6 +35,9 @@ export class ScaleGizmo implements IGizmoTransformer {
 
     // Setup drag observables when the gizmo is enabled
     this.setupDragObservables()
+
+    // Configure gizmo to only work with left click
+    configureGizmoButtons(this.gizmoManager.gizmos.scaleGizmo, [LEFT_BUTTON])
   }
 
   cleanup(): void {
