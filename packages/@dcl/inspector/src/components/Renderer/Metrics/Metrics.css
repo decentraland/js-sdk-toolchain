@@ -55,17 +55,22 @@
   background-color: var(--base-19);
   padding: 13px 12px;
   border-radius: 4px;
-  gap: 16px;
 }
 
-.Metrics > .Overlay h2.Header {
+.Metrics > .Overlay .ParcelsInfo {
   display: flex;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
   line-height: 17px;
-  color: var(--base-01);
+  color: var(--base-09);
   margin-bottom: 0;
   gap: 4px;
+}
+
+.Metrics > .Overlay .Header {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
 }
 
 .Metrics > .Overlay .Item .Title,
