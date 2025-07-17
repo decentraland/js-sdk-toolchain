@@ -13,12 +13,9 @@ const gizmoManagerEvents = mitt()
 const mockEntity = 0 as Entity
 const gizmoManagerMock = {
   getEntity: jest.fn().mockReturnValue({ entityId: mockEntity } as EcsEntity),
-  isPositionGizmoWorldAligned: jest.fn().mockReturnValue(true),
-  isRotationGizmoWorldAligned: jest.fn().mockReturnValue(true),
-  isRotationGizmoAlignmentDisabled: jest.fn().mockReturnValue(false),
-  isPositionGizmoAlignmentDisabled: jest.fn().mockReturnValue(false),
-  setPositionGizmoWorldAligned: jest.fn(),
-  setRotationGizmoWorldAligned: jest.fn(),
+  isGizmoWorldAligned: jest.fn().mockReturnValue(true),
+  isGizmoWorldAlignmentDisabled: jest.fn().mockReturnValue(false),
+  setGizmoWorldAligned: jest.fn(),
   fixRotationGizmoAlignment: jest.fn(),
   fixPositionGizmoAlignment: jest.fn(),
   onChange: jest.fn().mockImplementation((cb) => gizmoManagerEvents.on('*', cb))
@@ -60,10 +57,9 @@ describe('useGizmoAlignment', () => {
   afterEach(() => {
     useSdkMock.mockClear()
     createGizmoManagerMock.mockClear()
-    gizmoManagerMock.isPositionGizmoWorldAligned.mockClear()
-    gizmoManagerMock.isRotationGizmoWorldAligned.mockClear()
-    gizmoManagerMock.setPositionGizmoWorldAligned.mockClear()
-    gizmoManagerMock.setRotationGizmoWorldAligned.mockClear()
+    gizmoManagerMock.isGizmoWorldAligned.mockClear()
+    gizmoManagerMock.isGizmoWorldAlignmentDisabled.mockClear()
+    gizmoManagerMock.setGizmoWorldAligned.mockClear()
     gizmoManagerMock.onChange.mockClear()
     gizmoManagerEvents.all.clear()
     engineEvents.all.clear()
@@ -71,11 +67,9 @@ describe('useGizmoAlignment', () => {
   describe('When the hook is mounted ', () => {
     it('should sync the state with the gizmo manager', () => {
       const { result } = renderHook(() => useGizmoAlignment())
-      const { isPositionGizmoWorldAligned, isRotationGizmoWorldAligned } = result.current
-      expect(isPositionGizmoWorldAligned).toBe(true)
-      expect(isRotationGizmoWorldAligned).toBe(true)
-      expect(gizmoManagerMock.isPositionGizmoWorldAligned).toHaveBeenCalled()
-      expect(gizmoManagerMock.isRotationGizmoWorldAligned).toHaveBeenCalled()
+      const { isGizmoWorldAligned } = result.current
+      expect(isGizmoWorldAligned).toBe(true)
+      expect(gizmoManagerMock.isGizmoWorldAligned).toHaveBeenCalled()
     })
     it('should add a listener for the onChange event of the gizmoManager', () => {
       renderHook(() => useGizmoAlignment())
@@ -83,39 +77,31 @@ describe('useGizmoAlignment', () => {
     })
     it('should not update the renderer', () => {
       renderHook(() => useGizmoAlignment())
-      expect(gizmoManagerMock.setPositionGizmoWorldAligned).not.toHaveBeenCalled()
-      expect(gizmoManagerMock.setRotationGizmoWorldAligned).not.toHaveBeenCalled()
+      expect(gizmoManagerMock.setGizmoWorldAligned).not.toHaveBeenCalled()
     })
   })
   describe('When the hook state is changed ', () => {
     it('should update the renderer', () => {
       const { result } = renderHook(() => useGizmoAlignment())
-      const { setPositionGizmoWorldAligned, setRotationGizmoWorldAligned } = result.current
-      expect(result.current.isPositionGizmoWorldAligned).toBe(true)
-      expect(result.current.isRotationGizmoWorldAligned).toBe(true)
-      gizmoManagerMock.isPositionGizmoWorldAligned.mockReturnValue(true)
-      gizmoManagerMock.isRotationGizmoWorldAligned.mockReturnValue(true)
+      const { setGizmoWorldAligned } = result.current
+      expect(result.current.isGizmoWorldAligned).toBe(true)
+      gizmoManagerMock.isGizmoWorldAligned.mockReturnValue(true)
       act(() => {
-        setPositionGizmoWorldAligned(false)
-        setRotationGizmoWorldAligned(false)
+        setGizmoWorldAligned(false)
       })
-      expect(result.current.isPositionGizmoWorldAligned).toBe(false)
-      expect(result.current.isRotationGizmoWorldAligned).toBe(false)
-      expect(gizmoManagerMock.setPositionGizmoWorldAligned).toHaveBeenCalledWith(false)
-      expect(gizmoManagerMock.setRotationGizmoWorldAligned).toHaveBeenCalledWith(false)
+      expect(result.current.isGizmoWorldAligned).toBe(false)
+      expect(gizmoManagerMock.setGizmoWorldAligned).toHaveBeenCalledWith(false)
     })
   })
   describe('When a change happens in the renderer', () => {
     it('should update the hook state', () => {
       renderHook(() => useGizmoAlignment())
-      gizmoManagerMock.isPositionGizmoWorldAligned.mockClear()
-      gizmoManagerMock.isRotationGizmoWorldAligned.mockClear()
-      gizmoManagerMock.isRotationGizmoAlignmentDisabled.mockReset()
-      gizmoManagerMock.isRotationGizmoAlignmentDisabled.mockReturnValue(true)
+      gizmoManagerMock.isGizmoWorldAligned.mockClear()
+      gizmoManagerMock.isGizmoWorldAlignmentDisabled.mockReset()
+      gizmoManagerMock.isGizmoWorldAlignmentDisabled.mockReturnValue(true)
       gizmoManagerEvents.emit('*')
-      expect(gizmoManagerMock.isPositionGizmoWorldAligned).toHaveBeenCalled()
-      expect(gizmoManagerMock.isRotationGizmoWorldAligned).toHaveBeenCalled()
-      expect(gizmoManagerMock.isRotationGizmoAlignmentDisabled).toHaveBeenCalled()
+      expect(gizmoManagerMock.isGizmoWorldAligned).toHaveBeenCalled()
+      expect(gizmoManagerMock.isGizmoWorldAlignmentDisabled).toHaveBeenCalled()
     })
   })
   describe('When a change happens in the engine', () => {
