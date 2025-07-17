@@ -152,6 +152,21 @@
 .Metrics > .Overlay .WarningsContainer {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   margin-top: 12px;
+}
+
+.Metrics > .Overlay .WarningIcon {
+  color: var(--warning-main);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.Metrics > .Overlay .WarningText {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--warning-main);
+  line-height: 16px;
+  margin: 0;
 }
