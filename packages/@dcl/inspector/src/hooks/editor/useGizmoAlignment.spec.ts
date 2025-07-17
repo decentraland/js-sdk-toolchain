@@ -16,8 +16,6 @@ const gizmoManagerMock = {
   isGizmoWorldAligned: jest.fn().mockReturnValue(true),
   isGizmoWorldAlignmentDisabled: jest.fn().mockReturnValue(false),
   setGizmoWorldAligned: jest.fn(),
-  fixRotationGizmoAlignment: jest.fn(),
-  fixPositionGizmoAlignment: jest.fn(),
   onChange: jest.fn().mockImplementation((cb) => gizmoManagerEvents.on('*', cb))
 }
 createGizmoManagerMock.mockReturnValue(gizmoManagerMock as unknown as ReturnType<typeof createGizmoManager>)
@@ -102,15 +100,6 @@ describe('useGizmoAlignment', () => {
       gizmoManagerEvents.emit('*')
       expect(gizmoManagerMock.isGizmoWorldAligned).toHaveBeenCalled()
       expect(gizmoManagerMock.isGizmoWorldAlignmentDisabled).toHaveBeenCalled()
-    })
-  })
-  describe('When a change happens in the engine', () => {
-    it('should update the renderer', () => {
-      engineEvents.all.clear()
-      renderHook(() => useGizmoAlignment())
-      expect(gizmoManagerMock.fixRotationGizmoAlignment).not.toHaveBeenCalled()
-      engineEvents.emit('*')
-      expect(gizmoManagerMock.fixRotationGizmoAlignment).toHaveBeenCalledWith(mockEvent.value)
     })
   })
 })
