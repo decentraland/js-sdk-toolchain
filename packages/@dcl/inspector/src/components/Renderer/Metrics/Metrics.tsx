@@ -150,6 +150,7 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
   )
 
   const limitsExceeded = useMemo<Record<string, boolean>>(() => {
+    debugger
     return Object.fromEntries(
       Object.entries(metrics)
         .map(([key, value]) => [key, value > limits[key as keyof SceneMetrics]])
@@ -157,7 +158,7 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
     )
   }, [metrics, limits])
 
-  const isTriangleLimitExceeded = (limitsExceeded: Record<string, any>): boolean => {
+  const isAnyLimitExceeded = (limitsExceeded: Record<string, any>): boolean => {
     return Object.values(limitsExceeded).length > 0
   }
 
@@ -176,7 +177,7 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
     <div className="Metrics">
       <div className="Buttons">
         <Button
-          className={cx({ Active: showMetrics, LimitExceeded: isTriangleLimitExceeded(limitsExceeded) })}
+          className={cx({ Active: showMetrics, LimitExceeded: isAnyLimitExceeded(limitsExceeded) })}
           onClick={handleToggleMetricsOverlay}
         >
           <SquaresGridIcon size={ICON_SIZE} />
@@ -185,8 +186,8 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
       {showMetrics && (
         <div ref={overlayRef} className="Overlay">
           <div className="Header">Scene Optimization</div>
-          <div className="ParcelsInfo">Suggested Specs per Parcel</div>
-          <div className="ParcelsInfo">
+          <div className="Description">Suggested Specs per Parcel</div>
+          <div className="Description">
             {sceneLayout.parcels.length} Parcels = {sceneLayout.parcels.length * PARCEL_SIZE}
             <div>
               m<sup>2</sup>
@@ -204,6 +205,15 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
               </div>
             ))}
           </div>
+          {isAnyLimitExceeded(limitsExceeded) && (
+            <div className="WarningsContainer">
+              <div className="Description">WARNINGS</div>
+              <div className="WarningItem">
+                <WarningIcon />
+                <span className="WarningText">Your scene contains too many triangles</span>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -47,7 +47,7 @@
 .Metrics > .Overlay {
   display: flex;
   flex-direction: column;
-  width: 250px;
+  width: 300px;
   position: absolute;
   overflow-y: auto;
   left: 0;
@@ -57,7 +57,7 @@
   border-radius: 4px;
 }
 
-.Metrics > .Overlay .ParcelsInfo {
+.Metrics > .Overlay .Description {
   display: flex;
   font-size: 12px;
   font-weight: 500;
@@ -117,6 +117,18 @@
   line-height: 14px;
 }
 
+.Metrics > .Overlay .WarningItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 17px;
+  color: var(--warning-main);
+  margin-bottom: 0;
+  gap: 4px;
+}
+
 .Metrics > .Overlay .Item .Description .Key {
   display: flex;
   align-items: center;
@@ -135,4 +147,11 @@
 
 .Metrics .Buttons .Button.Active.LimitExceeded svg {
   color: var(--warning-main);
+}
+
+.Metrics > .Overlay .WarningsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
 }
