@@ -13,6 +13,7 @@ describe('Generated LightSource ProtoBuf', () => {
       range: 10,
       shadowMaskTexture: undefined,
       shadow: true,
+      type: LightSource.Type.Point({}),
     })
   })
 
