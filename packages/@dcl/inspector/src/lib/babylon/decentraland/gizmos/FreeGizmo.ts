@@ -3,6 +3,7 @@ import { Entity } from '@dcl/ecs'
 import { EcsEntity } from '../EcsEntity'
 import { IGizmoTransformer } from './types'
 import { LEFT_BUTTON } from '../mouse-utils'
+import { snapVector } from '../snap-manager'
 
 export class FreeGizmo implements IGizmoTransformer {
   private selectedEntities: EcsEntity[] = []
@@ -18,12 +19,15 @@ export class FreeGizmo implements IGizmoTransformer {
   private dragStartObserver: any = null
   private dragObserver: any = null
   private dragEndObserver: any = null
+  private snapDistance = 0
+  private lastSnappedPivotPosition: Vector3 | null = null
 
   constructor(private scene: Scene, private utilityLayer: UtilityLayerRenderer = new UtilityLayerRenderer(scene)) {
     this.dragBehavior = new PointerDragBehavior({ dragPlaneNormal: new Vector3(0, 1, 0) })
     this.dragBehavior.useObjectOrientationForDragging = false
     // Configure drag behavior to only work with left click
     this.dragBehavior.dragButtons = [LEFT_BUTTON]
+    this.dragBehavior.moveAttached = false // disable object following the cursor...
   }
 
   setup(): void {
@@ -32,7 +36,6 @@ export class FreeGizmo implements IGizmoTransformer {
   }
 
   enable(): void {
-    // Setup drag observables when the gizmo is enabled
     this.setupDragObservers()
   }
 
@@ -42,6 +45,7 @@ export class FreeGizmo implements IGizmoTransformer {
     this.detachDragBehavior()
     this.selectedEntities = []
     this.pivotPosition = null
+    this.lastSnappedPivotPosition = null
     this.entityOffsets.clear()
     this.isDragging = false
     this.onDragEndCallback = null
@@ -63,12 +67,10 @@ export class FreeGizmo implements IGizmoTransformer {
     this.isWorldAligned = value
   }
 
-  setSnapDistance(_distance: number): void {
-    // We handle the snap distance in the snap manager
-    return
+  setSnapDistance(distance: number): void {
+    this.snapDistance = distance
   }
 
-  // Add method to set drag end callback
   setOnDragEndCallback(callback: () => void): void {
     this.onDragEndCallback = callback
   }
@@ -93,48 +95,25 @@ export class FreeGizmo implements IGizmoTransformer {
   }
 
   private setupDragObservers(): void {
-    // Setup drag start
     this.dragStartObserver = this.dragBehavior.onDragStartObservable.add(() => {
       this.isDragging = true
     })
 
-    // Setup drag update
     this.dragObserver = this.dragBehavior.onDragObservable.add((eventData) => {
-      if (!this.isDragging || !eventData.delta || !this.pivotPosition) return
+      if (!this.isDragging || !eventData.delta || !this.pivotPosition || !this.lastSnappedPivotPosition) return
 
-      // Apply the delta directly to the pivot position
-      const worldDelta = eventData.delta.clone()
-      worldDelta.y = 0 // Keep Y position unchanged for free gizmo
-      this.pivotPosition.addInPlace(worldDelta)
+      this.updatePivotPosition(eventData.delta)
 
-      // Update all selected entities with their relative offsets
-      for (const entity of this.selectedEntities) {
-        const offset = this.entityOffsets.get(entity.entityId)
-        if (!offset) continue
-
-        const newWorldPosition = this.pivotPosition.add(offset)
-        this.applyWorldPositionToEntity(entity, newWorldPosition)
-      }
-
-      // Update ECS position immediately for real-time feedback
-      if (this.updateEntityPosition) {
-        this.selectedEntities.forEach(this.updateEntityPosition)
+      if (this.shouldMoveEntities()) {
+        this.moveEntitiesToPivot()
       }
     })
 
-    // Setup drag end
     this.dragEndObserver = this.dragBehavior.onDragEndObservable.add(() => {
       this.isDragging = false
       this.detachDragBehavior()
-
-      // Only dispatch operations at the end to avoid excessive ECS operations
-      if (this.dispatchOperations) {
-        this.dispatchOperations()
-      }
-
-      if (this.onDragEndCallback) {
-        this.onDragEndCallback()
-      }
+      this.dispatchOperations?.()
+      this.onDragEndCallback?.()
     })
   }
 
@@ -158,16 +137,89 @@ export class FreeGizmo implements IGizmoTransformer {
   private detachDragBehavior(): void {
     this.dragBehavior.detach()
   }
+  private updatePivotPosition(delta: Vector3): void {
+    const worldDelta = delta.clone()
+    worldDelta.y = 0 // keep Y position unchanged for free gizmo
+    this.pivotPosition!.addInPlace(worldDelta)
+  }
+
+  // determines if entities should be moved based on snap distance
+  private shouldMoveEntities(): boolean {
+    if (this.snapDistance <= 0) return true
+
+    const distanceFromLastSnapped = Vector3.Distance(this.pivotPosition!, this.lastSnappedPivotPosition!)
+    return distanceFromLastSnapped >= this.snapDistance
+  }
+
+  // moves all entities to the current pivot position with snapping applied
+  private moveEntitiesToPivot(): void {
+    const finalPivotPosition = this.getSnappedPivotPosition()
+
+    for (const entity of this.selectedEntities) {
+      const offset = this.entityOffsets.get(entity.entityId)
+      if (!offset) continue
+
+      const newWorldPosition = finalPivotPosition.add(offset)
+      this.applyWorldPositionToEntity(entity, newWorldPosition)
+    }
+
+    if (this.updateEntityPosition) {
+      this.selectedEntities.forEach(this.updateEntityPosition)
+    }
+  }
+
+  private getSnappedPivotPosition(): Vector3 {
+    if (this.snapDistance <= 0) return this.pivotPosition!
+
+    const snappedPivotPosition = snapVector(this.pivotPosition!, this.snapDistance)
+    snappedPivotPosition.y = this.pivotPosition!.y // preserve Y position
+    this.lastSnappedPivotPosition = snappedPivotPosition.clone()
+
+    return snappedPivotPosition
+  }
+
+  private initializePivotPosition(): void {
+    this.pivotPosition = new Vector3()
+    for (const entity of this.selectedEntities) {
+      this.pivotPosition.addInPlace(entity.getAbsolutePosition())
+    }
+    this.pivotPosition.scaleInPlace(1 / this.selectedEntities.length)
+    this.lastSnappedPivotPosition = this.pivotPosition.clone()
+  }
+
+  // initializes entity offsets from the pivot position
+  private initializeEntityOffsets(): void {
+    this.entityOffsets.clear()
+    for (const entity of this.selectedEntities) {
+      const offset = entity.getAbsolutePosition().subtract(this.pivotPosition!)
+      this.entityOffsets.set(entity.entityId, offset)
+    }
+  }
+
+  private attachDragBehavior(clickedEntity: EcsEntity, pickedMesh: AbstractMesh): void {
+    const dragMesh = this.getDragMesh(clickedEntity, pickedMesh)
+    this.dragBehavior.attach(dragMesh)
+  }
+
+  private getDragMesh(clickedEntity: EcsEntity, pickedMesh: AbstractMesh): AbstractMesh {
+    if (clickedEntity.meshRenderer) {
+      return clickedEntity.meshRenderer
+    } else if (clickedEntity.gltfContainer) {
+      return clickedEntity.gltfContainer
+    } else {
+      // fallback: find the first child mesh of the entity
+      const childMeshes = clickedEntity.getChildMeshes()
+      return childMeshes.length > 0 ? childMeshes[0] : pickedMesh
+    }
+  }
 
   private findClickedEntity(pickedMesh: AbstractMesh): EcsEntity | null {
-    // First, check if the picked mesh is a descendant of any selected entity
     for (const entity of this.selectedEntities) {
       if (pickedMesh.isDescendantOf(entity)) {
         return entity
       }
     }
 
-    // Then, check if the picked mesh is a meshRenderer or gltfContainer of any selected entity
     const meshEntity = this.selectedEntities.find((entity) => {
       return entity.meshRenderer === pickedMesh || entity.gltfContainer === pickedMesh
     })
@@ -176,36 +228,10 @@ export class FreeGizmo implements IGizmoTransformer {
     return null
   }
 
-  private startDrag(_clickedEntity: EcsEntity, pickedMesh: AbstractMesh): void {
-    // Calculate pivot (centroid)
-    this.pivotPosition = new Vector3()
-    for (const entity of this.selectedEntities) {
-      this.pivotPosition.addInPlace(entity.getAbsolutePosition())
-    }
-    this.pivotPosition.scaleInPlace(1 / this.selectedEntities.length)
-
-    // Store offsets
-    this.entityOffsets.clear()
-    for (const entity of this.selectedEntities) {
-      const offset = entity.getAbsolutePosition().subtract(this.pivotPosition)
-      this.entityOffsets.set(entity.entityId, offset)
-    }
-
-    // Always use the primary mesh of the clicked entity for consistent drag behavior
-    // This prevents issues when clicking on child meshes
-    let dragMesh: AbstractMesh
-
-    if (_clickedEntity.meshRenderer) {
-      dragMesh = _clickedEntity.meshRenderer
-    } else if (_clickedEntity.gltfContainer) {
-      dragMesh = _clickedEntity.gltfContainer
-    } else {
-      // Fallback: find the first child mesh of the entity
-      const childMeshes = _clickedEntity.getChildMeshes()
-      dragMesh = childMeshes.length > 0 ? childMeshes[0] : pickedMesh
-    }
-
-    this.dragBehavior.attach(dragMesh)
+  private startDrag(clickedEntity: EcsEntity, pickedMesh: AbstractMesh): void {
+    this.initializePivotPosition()
+    this.initializeEntityOffsets()
+    this.attachDragBehavior(clickedEntity, pickedMesh)
   }
 
   private applyWorldPositionToEntity(entity: EcsEntity, worldPosition: Vector3): void {
