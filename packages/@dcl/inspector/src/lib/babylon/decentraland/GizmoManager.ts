@@ -220,7 +220,6 @@ export function createGizmoManager(context: SceneContext) {
       } else if (gizmoManager.scaleGizmoEnabled) {
         currentTransformer.setSnapDistance(snapManager.isEnabled() ? snapManager.getScaleSnap() : 0)
       } else {
-        // For position gizmo and free gizmo, use position snap
         currentTransformer.setSnapDistance(snapManager.isEnabled() ? snapManager.getPositionSnap() : 0)
       }
     }
@@ -385,6 +384,14 @@ export function createGizmoManager(context: SceneContext) {
           currentTransformer = freeTransformer
           currentTransformer.setup()
           currentTransformer.setEntities(selectedEntities)
+
+          // Pass GizmoManager reference to FreeGizmo for centroid calculation
+          if ('setGizmoManager' in currentTransformer) {
+            ;(currentTransformer as any).setGizmoManager({
+              calculateCentroid,
+              updateGizmoPosition
+            })
+          }
 
           // Set up callbacks for ECS updates
           if ('setUpdateCallbacks' in currentTransformer) {
