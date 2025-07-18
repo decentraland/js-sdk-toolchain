@@ -22,6 +22,7 @@ import { useArrayState } from '../../../hooks/useArrayState'
 import { analytics, Event } from '../../../lib/logic/analytics'
 import { EditorComponentsTypes } from '../../../lib/sdk/components'
 import { getAssetByModel } from '../../../lib/logic/catalog'
+import { updateGltfForEntity } from '../../../lib/babylon/decentraland/sdkComponents/gltf-container'
 
 import { Block } from '../../Block'
 import { Container } from '../../Container'
@@ -59,7 +60,6 @@ import { getDefaultPayload, getPartialPayload, isStates } from './utils'
 import { Props } from './types'
 
 import './ActionInspector.css'
-import { updateGltfForEntity } from '../../../lib/babylon/decentraland/sdkComponents/gltf-container'
 
 const ActionMapOption: Record<string, string> = {
   [ActionType.PLAY_ANIMATION]: 'Play Animation',
