@@ -259,15 +259,36 @@ async function validateEntityIsOutsideLayout(entity: EcsEntity) {
 function updateMeshBoundingBoxVisibility(entity: EcsEntity, mesh: BABYLON.AbstractMesh) {
   const scene = mesh.getScene()
   const { isEntityOutsideLayout } = getLayoutManager(scene)
+  const children = entity.gltfContainer ? entity.gltfContainer.getChildMeshes(false) : entity.getChildMeshes(true)
 
-  const context = entity.context.deref()
-  const isSelected = context?.editorComponents.Selection.has(entity.entityId) || false
-
-  if (isEntityOutsideLayout(mesh) && isSelected) {
+  if (isEntityOutsideLayout(mesh)) {
     if (mesh.showBoundingBox) return
     mesh.showBoundingBox = true
+    for (const childMesh of children) {
+      addOutsideLayoutMaterial(childMesh, scene)
+    }
   } else {
     if (!mesh.showBoundingBox) return
     mesh.showBoundingBox = false
+    for (const childMesh of children) {
+      removeOutsideLayoutMaterial(childMesh)
+    }
+  }
+}
+
+function addOutsideLayoutMaterial(mesh: BABYLON.AbstractMesh, scene: BABYLON.Scene) {
+  if (!(mesh.material instanceof BABYLON.MultiMaterial)) {
+    const multiMaterial = new BABYLON.MultiMaterial(`entity_outside_layout_multimaterial`, scene)
+    multiMaterial.subMaterials = [mesh.material]
+    mesh.material = multiMaterial
+  }
+}
+
+function removeOutsideLayoutMaterial(mesh: BABYLON.AbstractMesh) {
+  if (mesh.material instanceof BABYLON.MultiMaterial && mesh.material.name === `entity_outside_layout_multimaterial`) {
+    const multiMaterial = mesh.material
+    mesh.material = multiMaterial.subMaterials[0]
+    multiMaterial.subMaterials = []
+    multiMaterial.dispose()
   }
 }
