@@ -13,7 +13,7 @@ describe('Generated LightSource ProtoBuf', () => {
       range: 10,
       shadowMaskTexture: undefined,
       shadow: true,
-      type: LightSource.Type.Point({}),
+      type: LightSource.Type.Point({})
     })
   })
 
@@ -30,8 +30,8 @@ describe('Generated LightSource ProtoBuf', () => {
       shadow: true,
       type: LightSource.Type.Spot({
         innerAngle: 0,
-        outerAngle: 0,
-      }),
+        outerAngle: 0
+      })
     })
   })
 })
