@@ -120,42 +120,38 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
     const nodes = getNodes()
     const { isEntityOutsideLayout } = getLayoutManager(sdk.scene)
 
-    console.log('Total nodes:', nodes.length)
-    console.log('Layout manager:', !!isEntityOutsideLayout)
-
     const entitiesOutOfBoundaries = nodes.reduce((count, node) => {
       const entity = sdk.sceneContext.getEntityOrNull(node.entity)
-      console.log(`Entity ${node.entity}:`, {
-        hasEntity: !!entity,
-        hasBoundingMesh: !!entity?.boundingInfoMesh,
-        isOutOfBoundaries: entity?.isOutOfBoundaries()
-      })
-
       if (entity && entity.boundingInfoMesh) {
         const isOutside = isEntityOutsideLayout(entity.boundingInfoMesh)
-        console.log(`Entity ${node.entity} isOutside:`, isOutside)
         return isOutside ? count + 1 : count
       }
       return count
     }, 0)
 
-    console.log('Final count:', entitiesOutOfBoundaries)
     dispatch(setEntitiesOutOfBoundaries(entitiesOutOfBoundaries))
   }, [sdk, dispatch, getNodes, setEntitiesOutOfBoundaries])
 
   useEffect(() => {
+    const handleOutsideMaterialChange = (material: Material) => {
+      if (material.name === 'entity_outside_layout_multimaterial') {
+        handleSceneChange()
+      }
+    }
+
+    const addOutsideMaterialObservable = sdk.scene.onNewMultiMaterialAddedObservable.add(handleOutsideMaterialChange)
+    const removeOutsideMaterialObservable = sdk.scene.onMaterialRemovedObservable.add(handleOutsideMaterialChange)
+
     sdk.scene.onDataLoadedObservable.add(handleUpdateMetrics)
     sdk.scene.onMeshRemovedObservable.add(handleUpdateMetrics)
-    sdk.scene.onNewMeshAddedObservable.add(handleSceneChange)
-    sdk.scene.onMeshRemovedObservable.add(handleSceneChange)
 
     handleUpdateSceneLayout()
 
     return () => {
       sdk.scene.onDataLoadedObservable.removeCallback(handleUpdateMetrics)
       sdk.scene.onMeshRemovedObservable.removeCallback(handleUpdateMetrics)
-      sdk.scene.onNewMeshAddedObservable.removeCallback(handleSceneChange)
-      sdk.scene.onMeshRemovedObservable.removeCallback(handleSceneChange)
+      sdk.scene.onNewMultiMaterialAddedObservable.remove(addOutsideMaterialObservable)
+      sdk.scene.onMaterialRemovedObservable.remove(removeOutsideMaterialObservable)
     }
   }, [])
 
