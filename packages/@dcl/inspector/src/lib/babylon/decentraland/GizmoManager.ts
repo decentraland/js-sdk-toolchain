@@ -220,6 +220,7 @@ export function createGizmoManager(context: SceneContext) {
       } else if (gizmoManager.scaleGizmoEnabled) {
         currentTransformer.setSnapDistance(snapManager.isEnabled() ? snapManager.getScaleSnap() : 0)
       } else {
+        // For position gizmo and free gizmo, use position snap
         currentTransformer.setSnapDistance(snapManager.isEnabled() ? snapManager.getPositionSnap() : 0)
       }
     }
@@ -266,7 +267,7 @@ export function createGizmoManager(context: SceneContext) {
       }
     },
     getGizmoTypes() {
-      return [GizmoType.POSITION, GizmoType.ROTATION, GizmoType.SCALE, GizmoType.FREE] as const
+      return [GizmoType.FREE, GizmoType.POSITION, GizmoType.ROTATION, GizmoType.SCALE] as const
     },
     setGizmoType(type: GizmoType) {
       // Then disable all Babylon gizmos
