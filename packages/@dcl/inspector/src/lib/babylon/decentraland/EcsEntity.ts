@@ -259,9 +259,11 @@ async function validateEntityIsOutsideLayout(entity: EcsEntity) {
 function updateMeshBoundingBoxVisibility(entity: EcsEntity, mesh: BABYLON.AbstractMesh) {
   const scene = mesh.getScene()
   const { isEntityOutsideLayout } = getLayoutManager(scene)
+  const context = entity.context.deref()
+  const isSelected = context?.editorComponents.Selection.has(entity.entityId) || false
   const children = entity.gltfContainer ? entity.gltfContainer.getChildMeshes(false) : entity.getChildMeshes(true)
 
-  if (isEntityOutsideLayout(mesh)) {
+  if (isEntityOutsideLayout(mesh) && isSelected) {
     if (mesh.showBoundingBox) return
     mesh.showBoundingBox = true
     for (const childMesh of children) {
