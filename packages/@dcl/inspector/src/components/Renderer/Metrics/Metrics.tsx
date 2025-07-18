@@ -120,16 +120,19 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
     const nodes = getNodes()
     const { isEntityOutsideLayout } = getLayoutManager(sdk.scene)
 
-    const entitiesOutOfBoundaries = nodes.reduce((count, node) => {
+    const entitiesOutOfBoundariesArray: number[] = []
+
+    nodes.forEach((node) => {
       const entity = sdk.sceneContext.getEntityOrNull(node.entity)
       if (entity && entity.boundingInfoMesh) {
         const isOutside = isEntityOutsideLayout(entity.boundingInfoMesh)
-        return isOutside ? count + 1 : count
+        if (isOutside) {
+          entitiesOutOfBoundariesArray.push(node.entity)
+        }
       }
-      return count
-    }, 0)
+    })
 
-    dispatch(setEntitiesOutOfBoundaries(entitiesOutOfBoundaries))
+    dispatch(setEntitiesOutOfBoundaries(entitiesOutOfBoundariesArray))
   }, [sdk, dispatch, getNodes, setEntitiesOutOfBoundaries])
 
   useEffect(() => {
@@ -165,7 +168,6 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
   )
 
   const limitsExceeded = useMemo<Record<string, boolean>>(() => {
-    debugger
     return Object.fromEntries(
       Object.entries(metrics)
         .map(([key, value]) => [key, value > limits[key as keyof SceneMetrics]])
@@ -174,7 +176,7 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
   }, [metrics, limits])
 
   const isAnyLimitExceeded = (limitsExceeded: Record<string, any>): boolean => {
-    return Object.values(limitsExceeded).length > 0 || entitiesOutOfBoundaries > 0
+    return Object.values(limitsExceeded).length > 0 || entitiesOutOfBoundaries.length > 0
   }
 
   const handleToggleMetricsOverlay = useCallback(
@@ -198,10 +200,10 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
       }
     })
 
-    if (entitiesOutOfBoundaries > 0) {
+    if (entitiesOutOfBoundaries.length > 0) {
       warnings.push(
-        `${entitiesOutOfBoundaries} entit${
-          entitiesOutOfBoundaries === 1 ? 'y is' : 'ies are'
+        `${entitiesOutOfBoundaries.length} entit${
+          entitiesOutOfBoundaries.length === 1 ? 'y is' : 'ies are'
         } out of bounds and may not display correctly in-world.`
       )
     }

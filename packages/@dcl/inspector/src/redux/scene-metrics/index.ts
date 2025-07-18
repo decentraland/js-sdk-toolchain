@@ -5,7 +5,7 @@ import { SceneMetrics } from './types'
 export interface SceneMetricsState {
   metrics: SceneMetrics
   limits: SceneMetrics
-  entitiesOutOfBoundaries: number
+  entitiesOutOfBoundaries: number[]
 }
 
 export const initialState: SceneMetricsState = {
@@ -23,7 +23,7 @@ export const initialState: SceneMetricsState = {
     materials: 0,
     textures: 0
   },
-  entitiesOutOfBoundaries: 0
+  entitiesOutOfBoundaries: []
 }
 
 export const sceneMetrics = createSlice({
@@ -36,7 +36,7 @@ export const sceneMetrics = createSlice({
     setLimits(state, { payload }: PayloadAction<SceneMetrics>) {
       state.limits = payload
     },
-    setEntitiesOutOfBoundaries: (state, { payload }: PayloadAction<number>) => {
+    setEntitiesOutOfBoundaries: (state, { payload }: PayloadAction<number[]>) => {
       state.entitiesOutOfBoundaries = payload
     }
   }
@@ -48,7 +48,7 @@ export const { setMetrics, setEntitiesOutOfBoundaries, setLimits } = sceneMetric
 // Selectors
 export const getMetrics = (state: RootState): SceneMetrics => state.sceneMetrics.metrics
 export const getLimits = (state: RootState): SceneMetrics => state.sceneMetrics.limits
-export const getEntitiesOutOfBoundaries = (state: RootState): number => state.sceneMetrics.entitiesOutOfBoundaries
+export const getEntitiesOutOfBoundaries = (state: RootState): number[] => state.sceneMetrics.entitiesOutOfBoundaries
 
 // Reducer
 export default sceneMetrics.reducer
