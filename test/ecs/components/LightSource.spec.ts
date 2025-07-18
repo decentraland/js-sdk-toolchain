@@ -7,12 +7,10 @@ describe('Generated LightSource ProtoBuf', () => {
     const LightSource = components.LightSource(newEngine)
 
     testComponentSerialization(LightSource, {
-      type: LightSource.Type.Point({
-        shadow: components.PBLightSource_ShadowType.ST_NONE
-      }),
+      shadow: true,
       active: true,
       color: { r: 1, g: 1, b: 1 },
-      brightness: 1,
+      intensity: 1,
       range: 10
     })
   })
@@ -25,12 +23,12 @@ describe('Generated LightSource ProtoBuf', () => {
       type: LightSource.Type.Spot({
         innerAngle: 0,
         outerAngle: 0,
-        shadowMaskTexture: undefined,
-        shadow: components.PBLightSource_ShadowType.ST_NONE
       }),
+      shadow: true,
+      shadowMaskTexture: undefined,
       active: true,
       color: { r: 1, g: 1, b: 1 },
-      brightness: 1,
+      intensity: 1,
       range: 10
     })
   })
