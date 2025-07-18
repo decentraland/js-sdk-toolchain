@@ -3,6 +3,7 @@ import { XYCoord, useDrag, useDrop } from 'react-dnd'
 import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io'
 import cx from 'classnames'
 import { Entity } from '@dcl/ecs'
+import { FiAlertTriangle as WarningIcon } from 'react-icons/fi'
 
 import { withContextMenu } from '../../hoc/withContextMenu'
 import { Input } from '../Input'
@@ -11,6 +12,9 @@ import { ActionArea } from './ActionArea'
 import { Edit as EditInput } from './Edit'
 import { DropType, calculateDropType } from './utils'
 import { useSdk } from '../../hooks/sdk/useSdk'
+import { ROOT, PLAYER, CAMERA } from '../../lib/sdk/tree'
+import { useAppSelector } from '../../redux/hooks'
+import { getEntitiesOutOfBoundaries } from '../../redux/scene-metrics'
 
 import './Tree.css'
 
@@ -227,6 +231,7 @@ export function Tree<T>() {
       }
 
       const sdk = useSdk()
+      const entitiesOutOfBoundaries = useAppSelector(getEntitiesOutOfBoundaries)
 
       const [, drag] = useDrag(
         () => ({
@@ -284,9 +289,19 @@ export function Tree<T>() {
         }
       }
 
-      const isEntity = useMemo(() => {
+      const isValidEntity = useMemo(() => {
         return typeof value !== 'string'
       }, [value])
+
+      const isEntity = useMemo(() => {
+        if (typeof value === 'string') return false
+        return value !== ROOT && value !== PLAYER && value !== CAMERA
+      }, [value])
+
+      const isEntityOutOfBoundaries = useMemo(() => {
+        if (typeof value === 'string') return false
+        return entitiesOutOfBoundaries.includes(value as Entity)
+      }, [value, entitiesOutOfBoundaries])
 
       drag(drop(ref))
 
@@ -318,7 +333,8 @@ export function Tree<T>() {
               <div onClick={handleClick} className="selectable-area">
                 {props.getIcon && props.getIcon(value)}
                 <div>{label || id}</div>
-                {isEntity && <ActionArea entity={value as Entity} />}
+                {isValidEntity && <ActionArea entity={value as Entity} />}
+                {isEntity && isEntityOutOfBoundaries && <WarningIcon className="WarningIcon" />}
               </div>
             </div>
             {editMode && typeof label === 'string' && (
