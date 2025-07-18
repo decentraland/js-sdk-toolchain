@@ -22,6 +22,7 @@ import { useArrayState } from '../../../hooks/useArrayState'
 import { analytics, Event } from '../../../lib/logic/analytics'
 import { EditorComponentsTypes } from '../../../lib/sdk/components'
 import { getAssetByModel } from '../../../lib/logic/catalog'
+import { updateGltfForEntity } from '../../../lib/babylon/decentraland/sdkComponents/gltf-container'
 
 import { Block } from '../../Block'
 import { Container } from '../../Container'
@@ -127,6 +128,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
   const hasStates = useHasComponent(entityId, States)
   const hasCounter = useHasComponent(entityId, Counter)
   const hasRewards = useHasComponent(entityId, Rewards)
+  const [gltfValue] = useComponentValue(entityId, sdk.components.GltfContainer)
 
   useChange(
     (event, sdk) => {
@@ -143,15 +145,27 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
   )
 
   useEffect(() => {
-    if (entity) {
+    if (entity && gltfValue) {
+      const currentGltfSrc = entity.ecsComponentValues.gltfContainer?.src
+      const isChangingGltf = currentGltfSrc !== gltfValue.src
+
+      if (isChangingGltf) {
+        entity.resetGltfAssetContainerLoading()
+      }
+
+      updateGltfForEntity(entity, gltfValue)
       entity
         .onGltfContainerLoaded()
         .then((gltfAssetContainer) => {
           setAnimations([...gltfAssetContainer.animationGroups])
         })
-        .catch(() => {})
+        .catch(() => {
+          setAnimations([])
+        })
+    } else {
+      setAnimations([])
     }
-  }, [entity])
+  }, [entity, gltfValue])
 
   const isValidAction = useCallback(
     (action: Action) => {
@@ -295,7 +309,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
   const handleRemove = useCallback(async () => {
     sdk.operations.removeComponent(entityId, Actions)
     await sdk.operations.dispatch()
-    const gltfContainer = getComponentValue(entityId, GltfContainer)
+    const gltfContainer = getComponentValue(entityId, sdk.components.GltfContainer)
     const asset = getAssetByModel(gltfContainer.src)
     analytics.track(Event.REMOVE_COMPONENT, {
       componentName: ComponentName.ACTIONS,
