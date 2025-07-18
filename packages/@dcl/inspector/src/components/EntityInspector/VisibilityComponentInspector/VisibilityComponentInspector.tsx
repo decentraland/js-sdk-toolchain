@@ -18,8 +18,6 @@ import { Props } from './types'
 export default withSdk<Props>(({ sdk, entity }) => {
   const { VisibilityComponent, GltfContainer, MeshCollider } = sdk.components
   const hasVisibilityComponent = useHasComponent(entity, VisibilityComponent)
-  const hasGltfContainer = useHasComponent(entity, GltfContainer)
-  const hasMeshCollider = useHasComponent(entity, MeshCollider)
   const [componentValue, setComponentValue] = useComponentValue<PBVisibilityComponent>(entity, VisibilityComponent)
   const [gltfComponentValue, setGltfComponentValue, isGltfComponentEqual] = useComponentValue<PBGltfContainer>(
     entity,
@@ -100,7 +98,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
     )
   }, [])
 
-  if (!hasVisibilityComponent || (!hasGltfContainer && !hasMeshCollider)) return null
+  if (!hasVisibilityComponent) return null
 
   return (
     <Container label="Visibility" className={cx('VisibilityContainer')} onRemoveContainer={handleRemove}>

@@ -1,9 +1,10 @@
 import { ComponentName } from '@dcl/asset-packs'
-import { Entity, LastWriteWinElementSetComponentDefinition } from '@dcl/ecs'
-import { useCallback, useMemo } from 'react'
+import { Entity, LastWriteWinElementSetComponentDefinition, CrdtMessageType } from '@dcl/ecs'
+import { useCallback, useMemo, useState } from 'react'
 
 import { SdkContextValue } from '../../lib/sdk/context'
 import { useSdk } from './useSdk'
+import { useChange } from './useChange'
 import { CoreComponents } from '../../lib/sdk/components'
 import { getConfig } from '../../lib/logic/config'
 import { CAMERA, EDITOR_ENTITIES, PLAYER, ROOT } from '../../lib/sdk/tree'
@@ -16,7 +17,8 @@ export const DISABLED_COMPONENTS: string[] = [
   CoreComponents.NETWORK_ENTITY,
   CoreComponents.TWEEN_SEQUENCE,
   ComponentName.ADMIN_TOOLS,
-  ComponentName.REWARDS
+  ComponentName.REWARDS,
+  CoreComponents.AVATAR_ATTACH
 ]
 
 export const SMART_ITEM_COMPONENTS: string[] = [
@@ -64,10 +66,27 @@ const transformComponentName = (value: string): string => {
       return value
   }
 }
+
 export const getComponentName = (value: string) => (transformComponentName(value).match(/[^:]*$/) || [])[0] || '?'
 
 export const useEntityComponent = () => {
   const sdk = useSdk()
+  const [availableComponentsState, setAvailableComponentsState] = useState<Array<{
+    id: number
+    name: string
+    isOnEntity: boolean
+  }> | null>(null)
+
+  useChange(({ component, operation }) => {
+    if (!component) return
+
+    const isComponentChange =
+      operation === CrdtMessageType.PUT_COMPONENT || operation === CrdtMessageType.DELETE_COMPONENT
+
+    if (isComponentChange) {
+      setAvailableComponentsState(null)
+    }
+  })
 
   const getComponents = useCallback(
     (entity: Entity, missing?: boolean): Map<number, string> => {
@@ -120,25 +139,47 @@ export const useEntityComponent = () => {
     }
 
     return components
-  }, [DISABLED_COMPONENTS, getConfig])
+  }, [])
 
   const getAvailableComponents = useCallback(
     (entity: Entity) => {
-      const missing = getComponents(entity, true)
-      const available = Array.from(missing.entries())
-        .filter(([_, name]) => enabledComponents.has(name))
-        .map(([id, name]) => ({ id, name: getComponentName(name) }))
-        .sort((a, b) => a.name.localeCompare(b.name))
-      if (isRoot(entity)) {
-        return available.filter(
-          (component) =>
-            Array.isArray(ROOT_COMPONENTS[entity]) &&
-            ROOT_COMPONENTS[entity].map((name) => getComponentName(name)).includes(component.name)
-        )
+      if (availableComponentsState === null) {
+        const allSystemComponents = new Map<number, string>()
+        if (sdk) {
+          for (const component of sdk.engine.componentsIter()) {
+            allSystemComponents.set(component.componentId, component.componentName)
+          }
+        }
+
+        let available = Array.from(allSystemComponents.entries())
+          .filter(([_, name]) => enabledComponents.has(name))
+          .map(([id, name]) => {
+            const component = sdk?.engine.getComponentOrNull(id)
+            const isOnEntity = component ? component.has(entity) : false
+
+            return {
+              id,
+              name: getComponentName(name),
+              isOnEntity
+            }
+          })
+          .sort((a, b) => a.name.localeCompare(b.name))
+
+        if (isRoot(entity)) {
+          available = available.filter(
+            (component) =>
+              Array.isArray(ROOT_COMPONENTS[entity]) &&
+              ROOT_COMPONENTS[entity].map((name) => getComponentName(name)).includes(component.name)
+          )
+        }
+
+        setAvailableComponentsState(available)
+        return available
       }
-      return available
+
+      return availableComponentsState
     },
-    [getComponents, enabledComponents]
+    [getComponents, enabledComponents, availableComponentsState, sdk]
   )
 
   return { getComponents, addComponent, removeComponent, getAvailableComponents }

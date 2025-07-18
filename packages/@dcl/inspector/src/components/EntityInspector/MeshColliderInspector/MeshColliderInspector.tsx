@@ -19,9 +19,18 @@ export default withSdk<Props>(({ sdk, entity }) => {
   const { getInputProps } = useComponentInput(entity, MeshCollider, fromMeshCollider, toMeshCollider, isValidInput)
 
   const handleRemove = useCallback(async () => {
+    const { VisibilityComponent, GltfContainer } = sdk.components
+    const hasGltfContainer = GltfContainer.has(entity)
+    const hasVisibility = VisibilityComponent.has(entity)
+
     sdk.operations.removeComponent(entity, MeshCollider)
+
+    if (hasVisibility && !hasGltfContainer) {
+      sdk.operations.removeComponent(entity, VisibilityComponent)
+    }
+
     await sdk.operations.dispatch()
-  }, [])
+  }, [sdk, entity])
 
   if (!hasMeshCollider) return null
 
