@@ -15,6 +15,7 @@ import { useSdk } from '../../hooks/sdk/useSdk'
 import { ROOT, PLAYER, CAMERA } from '../../lib/sdk/tree'
 import { useAppSelector } from '../../redux/hooks'
 import { getEntitiesOutOfBoundaries } from '../../redux/scene-metrics'
+import { InfoTooltip } from '../ui'
 
 import './Tree.css'
 
@@ -300,8 +301,26 @@ export function Tree<T>() {
 
       const isEntityOutOfBoundaries = useMemo(() => {
         if (typeof value === 'string') return false
-        return entitiesOutOfBoundaries.includes(value as Entity)
-      }, [value, entitiesOutOfBoundaries])
+
+        if (entitiesOutOfBoundaries.includes(value as Entity)) {
+          return true
+        }
+
+        const checkChildrenOutOfBoundaries = (entity: Entity): boolean => {
+          const children = getChildren(entity as T)
+          for (const child of children) {
+            if (entitiesOutOfBoundaries.includes(child as Entity)) {
+              return true
+            }
+            if (checkChildrenOutOfBoundaries(child as Entity)) {
+              return true
+            }
+          }
+          return false
+        }
+
+        return checkChildrenOutOfBoundaries(value as Entity)
+      }, [value, entitiesOutOfBoundaries, getChildren])
 
       drag(drop(ref))
 
@@ -334,7 +353,13 @@ export function Tree<T>() {
                 {props.getIcon && props.getIcon(value)}
                 <div>{label || id}</div>
                 {isValidEntity && <ActionArea entity={value as Entity} />}
-                {isEntity && isEntityOutOfBoundaries && <WarningIcon className="WarningIcon" />}
+                {isEntity && isEntityOutOfBoundaries && (
+                  <InfoTooltip
+                    text="This entity is out of bounds and might not display correctly in-world."
+                    trigger={<WarningIcon className="WarningIcon" />}
+                    position="right center"
+                  />
+                )}
               </div>
             </div>
             {editMode && typeof label === 'string' && (
