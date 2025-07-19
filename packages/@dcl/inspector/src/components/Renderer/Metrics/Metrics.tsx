@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 import cx from 'classnames'
-import { IoGridOutline as SquaresGridIcon, IoAlertCircleOutline as AlertIcon } from 'react-icons/io5'
+import { IoGridOutline as SquaresGridIcon } from 'react-icons/io5'
+import { FiAlertTriangle as WarningIcon } from 'react-icons/fi'
+
 import { Material } from '@babylonjs/core'
 import { CrdtMessageType } from '@dcl/ecs'
 
@@ -8,10 +10,18 @@ import { withSdk, WithSdkProps } from '../../../hoc/withSdk'
 import { useChange } from '../../../hooks/sdk/useChange'
 import { useOutsideClick } from '../../../hooks/useOutsideClick'
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks'
-import { getMetrics, getLimits, setEntitiesOutOfBoundaries, setMetrics, setLimits } from '../../../redux/scene-metrics'
+import {
+  getMetrics,
+  getLimits,
+  getEntitiesOutOfBoundaries,
+  setEntitiesOutOfBoundaries,
+  setMetrics,
+  setLimits
+} from '../../../redux/scene-metrics'
 import { SceneMetrics } from '../../../redux/scene-metrics/types'
 import type { Layout } from '../../../lib/utils/layout'
 import { GROUND_MESH_PREFIX, PARCEL_SIZE } from '../../../lib/utils/scene'
+import { getLayoutManager } from '../../../lib/babylon/decentraland/layout-manager'
 import { Button } from '../../Button'
 import { getSceneLimits } from './utils'
 
@@ -55,6 +65,7 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
   const dispatch = useAppDispatch()
   const metrics = useAppSelector(getMetrics)
   const limits = useAppSelector(getLimits)
+  const entitiesOutOfBoundaries = useAppSelector(getEntitiesOutOfBoundaries)
   const [showMetrics, setShowMetrics] = React.useState(false)
   const [sceneLayout, setSceneLayout] = React.useState<Layout>({
     base: { x: 0, y: 0 },
@@ -107,12 +118,21 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
 
   const handleSceneChange = useCallback(() => {
     const nodes = getNodes()
-    const entitiesOutOfBoundaries = nodes.reduce((count, node) => {
-      const entity = sdk.sceneContext.getEntityOrNull(node.entity)
-      return entity && entity.isOutOfBoundaries() ? count + 1 : count
-    }, 0)
+    const { isEntityOutsideLayout } = getLayoutManager(sdk.scene)
 
-    dispatch(setEntitiesOutOfBoundaries(entitiesOutOfBoundaries))
+    const entitiesOutOfBoundariesArray: number[] = []
+
+    nodes.forEach((node) => {
+      const entity = sdk.sceneContext.getEntityOrNull(node.entity)
+      if (entity && entity.boundingInfoMesh) {
+        const isOutside = isEntityOutsideLayout(entity.boundingInfoMesh)
+        if (isOutside) {
+          entitiesOutOfBoundariesArray.push(node.entity)
+        }
+      }
+    })
+
+    dispatch(setEntitiesOutOfBoundaries(entitiesOutOfBoundariesArray))
   }, [sdk, dispatch, getNodes, setEntitiesOutOfBoundaries])
 
   useEffect(() => {
@@ -155,6 +175,10 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
     )
   }, [metrics, limits])
 
+  const isAnyLimitExceeded = (limitsExceeded: Record<string, any>): boolean => {
+    return Object.values(limitsExceeded).length > 0 || entitiesOutOfBoundaries.length > 0
+  }
+
   const handleToggleMetricsOverlay = useCallback(
     (e: React.MouseEvent<HTMLButtonElement> | MouseEvent) => {
       e.preventDefault()
@@ -166,30 +190,49 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
 
   const overlayRef = useOutsideClick(handleToggleMetricsOverlay)
 
+  const getWarningMessages = (): string[] => {
+    const baseMessage = 'Your scene contains too many'
+    const warnings: string[] = []
+
+    Object.entries(limitsExceeded).forEach(([key, isExceeded]) => {
+      if (isExceeded) {
+        warnings.push(`${baseMessage} ${key}`)
+      }
+    })
+
+    if (entitiesOutOfBoundaries.length > 0) {
+      warnings.push(
+        `${entitiesOutOfBoundaries.length} entit${
+          entitiesOutOfBoundaries.length === 1 ? 'y is' : 'ies are'
+        } out of bounds and may not display correctly in-world.`
+      )
+    }
+
+    return warnings
+  }
+
+  const warningMessages = getWarningMessages()
+
   return (
     <div className="Metrics">
       <div className="Buttons">
         <Button
-          className={cx({ Active: showMetrics, LimitExceeded: Object.values(limitsExceeded).length > 0 })}
+          className={cx({ Active: showMetrics, LimitExceeded: isAnyLimitExceeded(limitsExceeded) })}
           onClick={handleToggleMetricsOverlay}
         >
           <SquaresGridIcon size={ICON_SIZE} />
         </Button>
       </div>
-      {Object.values(limitsExceeded).length > 0 && (
-        <div className="LimitExceeded">
-          <AlertIcon />
-          Too many {Object.keys(limitsExceeded)[0].toUpperCase()}
-        </div>
-      )}
       {showMetrics && (
         <div ref={overlayRef} className="Overlay">
-          <h2 className="Header">
-            {sceneLayout.parcels.length} Parcels
-            <span className="secondary">
-              {sceneLayout.parcels.length * PARCEL_SIZE}m<sup>2</sup>
-            </span>
-          </h2>
+          <h2 className="Header">Scene Optimization</h2>
+          <div className="Description">Suggested Specs per Parcel</div>
+          <div className="Description">
+            {sceneLayout.parcels.length} Parcels = {sceneLayout.parcels.length * PARCEL_SIZE}
+            <div>
+              m<sup>2</sup>
+            </div>
+          </div>
           <div className="Items">
             {Object.entries(metrics).map(([key, value]) => (
               <div className="Item" key={key}>
@@ -202,6 +245,17 @@ const Metrics = withSdk<WithSdkProps>(({ sdk }) => {
               </div>
             ))}
           </div>
+          {warningMessages.length > 0 && (
+            <div className="WarningsContainer">
+              <div className="Description">WARNINGS</div>
+              {warningMessages.map((message, index) => (
+                <div className="WarningItem" key={index}>
+                  <WarningIcon className="WarningIcon" />
+                  <span className="WarningText">{message}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

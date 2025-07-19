@@ -91,9 +91,9 @@ export function setupEngine(engine: BABYLON.Engine, canvas: HTMLCanvasElement, p
     } as any
   })
 
-  // Set bounding box color = red
-  scene.getBoundingBoxRenderer().frontColor.set(1, 0, 0)
-  scene.getBoundingBoxRenderer().backColor.set(1, 0, 0)
+  // Set bounding box color = yellow warning
+  scene.getBoundingBoxRenderer().frontColor = BABYLON.Color3.Yellow()
+  scene.getBoundingBoxRenderer().backColor = BABYLON.Color3.Yellow()
 
   BABYLON.Database.IDBStorageEnabled = true
   engine.enableOfflineSupport = true

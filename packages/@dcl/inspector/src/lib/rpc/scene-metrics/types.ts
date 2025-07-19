@@ -18,6 +18,6 @@ export namespace SceneMetricsRPC {
   export type Result = {
     [Method.GET_METRICS]: SceneMetrics
     [Method.GET_LIMITS]: SceneMetrics
-    [Method.GET_ENTITIES_OUT_OF_BOUNDARIES]: number
+    [Method.GET_ENTITIES_OUT_OF_BOUNDARIES]: number[]
   }
 }
