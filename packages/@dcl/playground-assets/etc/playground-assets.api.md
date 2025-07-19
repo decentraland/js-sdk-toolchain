@@ -2421,9 +2421,9 @@ export namespace PBGltfNodeModifiers {
 // @public (undocumented)
 export interface PBGltfNodeModifiers_GltfNodeModifier {
     // (undocumented)
-    material?: PBMaterial | undefined;
+    castShadows?: boolean | undefined;
     // (undocumented)
-    overrideShadows?: boolean | undefined;
+    material?: PBMaterial | undefined;
     // (undocumented)
     path: string;
 }
