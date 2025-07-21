@@ -12,8 +12,8 @@ import { ActionArea } from './ActionArea'
 import { Edit as EditInput } from './Edit'
 import { DropType, calculateDropType } from './utils'
 import { useSdk } from '../../hooks/sdk/useSdk'
-import { ROOT, PLAYER, CAMERA } from '../../lib/sdk/tree'
 import { useAppSelector } from '../../redux/hooks'
+import { useTree } from '../../hooks/sdk/useTree'
 import { getEntitiesOutOfBoundaries } from '../../redux/scene-metrics'
 import { InfoTooltip } from '../ui'
 
@@ -108,6 +108,7 @@ export function Tree<T>() {
       const [editMode, setEditMode] = useState(false)
       const [insertMode, setInsertMode] = useState(false)
       const [dropType, setDropType] = useState<DropType | EmptyString>('')
+      const { isRoot } = useTree()
       // we need this ref just for the e2e tests to work since it's caching "dropType" value for some reason...
       const dropTypeRef = useRef<DropType | EmptyString>('')
       const canDrop = useCallback(
@@ -296,7 +297,7 @@ export function Tree<T>() {
 
       const isEntity = useMemo(() => {
         if (typeof value === 'string') return false
-        return value !== ROOT && value !== PLAYER && value !== CAMERA
+        return !isRoot(value as Entity)
       }, [value])
 
       const isEntityOutOfBoundaries = useMemo(() => {
