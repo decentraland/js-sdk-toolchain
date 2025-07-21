@@ -147,12 +147,6 @@ export default React.memo(
 
     const getComponentTooltip = useCallback(
       (componentId: number, description: string, link?: string) => {
-        const isDisabled = isComponentDisabled(componentId)
-
-        if (!isDisabled) {
-          return { text: description, ...(link && { link }) }
-        }
-
         const componentInfo = availableComponents.find((c) => c.id === componentId)
 
         if (componentInfo?.isOnEntity) {
