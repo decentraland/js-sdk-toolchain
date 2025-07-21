@@ -2249,9 +2249,9 @@ export interface PBAvatarShape {
     eyeColor?: PBColor3 | undefined;
     hairColor?: PBColor3 | undefined;
     id: string;
+    isSkinInvisible?: boolean | undefined;
     name?: string | undefined;
     skinColor?: PBColor3 | undefined;
-    skinColorAlpha?: number | undefined;
     talking?: boolean | undefined;
     wearables: string[];
 }
