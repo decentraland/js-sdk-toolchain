@@ -3,7 +3,10 @@
   components,
   PBMaterial_PbrMaterial,
   PBMaterial,
-  PBMaterial_UnlitMaterial, TextureWrapMode, TextureFilterMode, MaterialTransparencyMode
+  PBMaterial_UnlitMaterial,
+  TextureWrapMode,
+  TextureFilterMode,
+  MaterialTransparencyMode
 } from '../../../packages/@dcl/ecs/src'
 import { testComponentSerialization } from './assertion'
 
