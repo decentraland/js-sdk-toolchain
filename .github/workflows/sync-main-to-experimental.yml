@@ -34,16 +34,16 @@ jobs:
           git pull origin main
 
           git checkout --theirs .
-          git add -A
+          git add -A .
 
           # Run required update steps
-          make update-protocol experimental
+          make update-protocol 'experimental'
           make install
           make build
           make update-snapshots
 
           # Add updated files
-          git add -A
+          git add -A .
 
           # Commit if there are changes
           git commit --no-edit || echo "No changes to commit"
