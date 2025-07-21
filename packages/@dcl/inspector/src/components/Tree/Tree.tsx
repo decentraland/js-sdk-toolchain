@@ -13,7 +13,6 @@ import { Edit as EditInput } from './Edit'
 import { DropType, calculateDropType } from './utils'
 import { useSdk } from '../../hooks/sdk/useSdk'
 import { useAppSelector } from '../../redux/hooks'
-import { useTree } from '../../hooks/sdk/useTree'
 import { getEntitiesOutOfBoundaries } from '../../redux/scene-metrics'
 import { InfoTooltip } from '../ui'
 
@@ -49,6 +48,7 @@ type Props<T> = {
   getDragContext?: () => unknown
   dndType?: string
   onLastSelectedChange?: (value: T) => void
+  isRoot?: (value: T) => boolean
 }
 
 type EmptyString = ''
@@ -88,6 +88,7 @@ export function Tree<T>() {
         onDuplicate,
         onDoubleSelect,
         onSetOpen,
+        isRoot,
         getDragContext = () => ({}),
         dndType = 'tree',
         onLastSelectedChange
@@ -108,7 +109,6 @@ export function Tree<T>() {
       const [editMode, setEditMode] = useState(false)
       const [insertMode, setInsertMode] = useState(false)
       const [dropType, setDropType] = useState<DropType | EmptyString>('')
-      const { isRoot } = useTree()
       // we need this ref just for the e2e tests to work since it's caching "dropType" value for some reason...
       const dropTypeRef = useRef<DropType | EmptyString>('')
       const canDrop = useCallback(
@@ -291,13 +291,8 @@ export function Tree<T>() {
         }
       }
 
-      const isValidEntity = useMemo(() => {
-        return typeof value !== 'string'
-      }, [value])
-
       const isEntity = useMemo(() => {
-        if (typeof value === 'string') return false
-        return !isRoot(value as Entity)
+        return typeof value !== 'string'
       }, [value])
 
       const isEntityOutOfBoundaries = useMemo(() => {
@@ -353,8 +348,8 @@ export function Tree<T>() {
               <div onClick={handleClick} className="selectable-area">
                 {props.getIcon && props.getIcon(value)}
                 <div>{label || id}</div>
-                {isValidEntity && <ActionArea entity={value as Entity} />}
-                {isEntity && isEntityOutOfBoundaries && (
+                {isEntity && <ActionArea entity={value as Entity} />}
+                {!isRoot?.(value as T) && isEntityOutOfBoundaries && (
                   <InfoTooltip
                     text="This entity is out of bounds and might not display correctly in-world."
                     trigger={<WarningIcon className="WarningIcon" />}
