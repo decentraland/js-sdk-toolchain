@@ -8,7 +8,7 @@ import {
   MeshBuilder,
   StandardMaterial,
   Color3,
-  DynamicTexture
+  Mesh
 } from '@babylonjs/core'
 import { Entity } from '@dcl/ecs'
 import { EcsEntity } from '../EcsEntity'
@@ -376,112 +376,111 @@ export class FreeGizmo implements IGizmoTransformer {
   private createGizmoIndicator(): void {
     if (this.gizmoIndicator) return
 
-    this.gizmoIndicator = MeshBuilder.CreateSphere('freeGizmoIndicator', { diameter: 0.4 }, this.scene)
-    this.gizmoIndicator.material = this.createIndicatorMaterial()
+    this.gizmoIndicator = this.createCrossMesh()
     this.gizmoIndicator.renderingGroupId = 1
     this.gizmoIndicator.alwaysSelectAsActiveMesh = true
+    this.gizmoIndicator.doNotSyncBoundingInfo = true
+    this.gizmoIndicator.ignoreNonUniformScaling = true
   }
 
-  private createIndicatorMaterial(): StandardMaterial {
-    const material = new StandardMaterial('freeGizmoMaterial', this.scene)
-    material.diffuseTexture = this.createThreeColorTexture()
+  private createCrossMesh(): Mesh {
+    const crossMesh = new Mesh('freeGizmoCross', this.utilityLayer.utilityLayerScene)
+
+    const leftStick = MeshBuilder.CreateBox(
+      'leftStick',
+      {
+        width: 0.25,
+        height: 0.012,
+        depth: 0.012
+      },
+      this.utilityLayer.utilityLayerScene
+    )
+    leftStick.position.x = -0.15
+    leftStick.material = this.createRedMaterial()
+    leftStick.parent = crossMesh
+
+    const rightStick = MeshBuilder.CreateBox(
+      'rightStick',
+      {
+        width: 0.25,
+        height: 0.012,
+        depth: 0.012
+      },
+      this.utilityLayer.utilityLayerScene
+    )
+    rightStick.position.x = 0.15
+    rightStick.material = this.createRedMaterial()
+    rightStick.parent = crossMesh
+
+    const topStick = MeshBuilder.CreateBox(
+      'topStick',
+      {
+        width: 0.012,
+        height: 0.012,
+        depth: 0.25
+      },
+      this.utilityLayer.utilityLayerScene
+    )
+    topStick.position.z = -0.15
+    topStick.material = this.createBlueMaterial()
+    topStick.parent = crossMesh
+
+    const bottomStick = MeshBuilder.CreateBox(
+      'bottomStick',
+      {
+        width: 0.012,
+        height: 0.012,
+        depth: 0.25
+      },
+      this.utilityLayer.utilityLayerScene
+    )
+    bottomStick.position.z = 0.15
+    bottomStick.material = this.createBlueMaterial()
+    bottomStick.parent = crossMesh
+
+    return crossMesh
+  }
+
+  private createRedMaterial(): StandardMaterial {
+    const material = new StandardMaterial('redStickMaterial', this.utilityLayer.utilityLayerScene)
+    material.diffuseColor = new Color3(1, 0, 0)
+    material.emissiveColor = new Color3(0.8, 0, 0)
     material.alpha = 1.0
-    material.emissiveColor = new Color3(0.1, 0.1, 0.1)
+    material.zOffset = 2
+    material.forceDepthWrite = true
+    material.disableDepthWrite = false
+    material.backFaceCulling = false
     return material
   }
 
-  private createThreeColorTexture(): DynamicTexture {
-    const textureSize = 256
-    const dynamicTexture = new DynamicTexture('freeGizmoTexture', textureSize, this.scene)
-    const context = dynamicTexture.getContext()
-
-    context.fillStyle = '#000000'
-    context.fillRect(0, 0, textureSize, textureSize)
-
-    const sectionWidth = textureSize / 3
-
-    context.fillStyle = '#FF0000'
-    context.fillRect(0, 0, sectionWidth, textureSize)
-
-    context.fillStyle = '#00FF00'
-    context.fillRect(sectionWidth, 0, sectionWidth, textureSize)
-
-    context.fillStyle = '#0000FF'
-    context.fillRect(sectionWidth * 2, 0, sectionWidth, textureSize)
-
-    dynamicTexture.update()
-    return dynamicTexture
+  private createBlueMaterial(): StandardMaterial {
+    const material = new StandardMaterial('blueStickMaterial', this.utilityLayer.utilityLayerScene)
+    material.diffuseColor = new Color3(0, 0, 1)
+    material.emissiveColor = new Color3(0, 0, 0.8)
+    material.alpha = 1.0
+    material.zOffset = 2
+    material.forceDepthWrite = true
+    material.disableDepthWrite = false
+    material.backFaceCulling = false
+    return material
   }
 
   private updateGizmoIndicator(): void {
     if (!this.gizmoIndicator || this.selectedEntities.length === 0) return
-
-    const center = this.getEntityCenter()
+    const center = this.getCentroid()
     this.gizmoIndicator.position = center
-  }
-
-  private getEntityCenter(): Vector3 {
-    if (this.selectedEntities.length === 0) return Vector3.Zero()
-
-    if (this.selectedEntities.length === 1) {
-      const entity = this.selectedEntities[0]
-      const boundingInfo = this.getEntityBoundingInfo(entity)
-      if (boundingInfo) {
-        return boundingInfo.boundingBox.centerWorld
-      }
-    }
-
-    return this.calculateBoundingBoxCenter()
-  }
-
-  private calculateBoundingBoxCenter(): Vector3 {
-    let minX = Infinity,
-      minY = Infinity,
-      minZ = Infinity
-    let maxX = -Infinity,
-      maxY = -Infinity,
-      maxZ = -Infinity
-
-    for (const entity of this.selectedEntities) {
-      const boundingInfo = this.getEntityBoundingInfo(entity)
-      if (boundingInfo) {
-        const box = boundingInfo.boundingBox
-        minX = Math.min(minX, box.minimumWorld.x)
-        minY = Math.min(minY, box.minimumWorld.y)
-        minZ = Math.min(minZ, box.minimumWorld.z)
-        maxX = Math.max(maxX, box.maximumWorld.x)
-        maxY = Math.max(maxY, box.maximumWorld.y)
-        maxZ = Math.max(maxZ, box.maximumWorld.z)
-      }
-    }
-
-    return new Vector3((minX + maxX) / 2, (minY + maxY) / 2, (minZ + maxZ) / 2)
-  }
-
-  private getEntityBoundingInfo(entity: EcsEntity): any {
-    if ((entity as any).getBoundingInfo) {
-      return (entity as any).getBoundingInfo()
-    }
-
-    if (entity.meshRenderer && (entity.meshRenderer as any).getBoundingInfo) {
-      return (entity.meshRenderer as any).getBoundingInfo()
-    }
-
-    if (entity.gltfContainer && (entity.gltfContainer as any).getBoundingInfo) {
-      return (entity.gltfContainer as any).getBoundingInfo()
-    }
-
-    return {
-      boundingBox: {
-        centerWorld: entity.getAbsolutePosition(),
-        minimumWorld: entity.getAbsolutePosition().subtract(new Vector3(0.5, 0.5, 0.5)),
-        maximumWorld: entity.getAbsolutePosition().add(new Vector3(0.5, 0.5, 0.5))
-      }
-    }
   }
 
   private removeGizmoIndicator(): void {
     if (this.gizmoIndicator) {
+      const childMeshes = this.gizmoIndicator.getChildMeshes()
+      childMeshes.forEach((child) => {
+        if (child.material) {
+          child.material.dispose()
+        }
+        child.dispose()
+      })
+
       this.gizmoIndicator.dispose()
       this.gizmoIndicator = null
     }
