@@ -6,7 +6,8 @@ import {
   Vector3,
   PointerDragBehavior,
   AbstractMesh,
-  TransformNode
+  TransformNode,
+  GizmoManager
 } from '@babylonjs/core'
 import { Entity, TransformType } from '@dcl/ecs'
 import { Vector3 as DclVector3, Quaternion as DclQuaternion } from '@dcl/ecs-math'
@@ -15,7 +16,6 @@ import { GizmoType } from '../../utils/gizmo'
 import { EcsEntity } from './EcsEntity'
 import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manager'
 import { SceneContext } from './SceneContext'
-import { PatchedGizmoManager } from './gizmo-patch'
 import { ROOT } from '../../sdk/tree'
 import { LEFT_BUTTON } from './mouse-utils'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
@@ -77,7 +77,7 @@ export function createGizmoManager(context: SceneContext) {
   const events = mitt<{ change: void }>()
 
   // Create and initialize gizmo
-  const gizmoManager = new PatchedGizmoManager(context.scene)
+  const gizmoManager = new GizmoManager(context.scene)
   gizmoManager.usePointerToAttachGizmos = false
   gizmoManager.positionGizmoEnabled = true
   gizmoManager.rotationGizmoEnabled = true
@@ -335,7 +335,7 @@ export function createGizmoManager(context: SceneContext) {
     if (
       !firstEntity ||
       pickResult.pickedMesh === null ||
-      !gizmoManager.freeGizmoEnabled ||
+      // !gizmoManager.freeGizmoEnabled ||
       !context.Transform.getOrNull(firstEntity.entityId)
     )
       return
@@ -346,7 +346,7 @@ export function createGizmoManager(context: SceneContext) {
 
   context.scene.onPointerUp = function () {
     const firstEntity = getFirstEntity()
-    if (!firstEntity || !gizmoManager.freeGizmoEnabled || !context.Transform.getOrNull(firstEntity.entityId)) return
+    if (!firstEntity || !context.Transform.getOrNull(firstEntity.entityId)) return
     void updateTransform()
     meshPointerDragBehavior.detach()
   }
@@ -398,13 +398,13 @@ export function createGizmoManager(context: SceneContext) {
       else repositionGizmoOnCentroid()
     },
     getGizmoTypes() {
-      return [GizmoType.POSITION, GizmoType.ROTATION, GizmoType.SCALE, GizmoType.FREE] as const
+      return [GizmoType.FREE, GizmoType.POSITION, GizmoType.ROTATION, GizmoType.SCALE] as const
     },
     setGizmoType(type: GizmoType) {
       gizmoManager.positionGizmoEnabled = type === GizmoType.POSITION
       gizmoManager.rotationGizmoEnabled = type === GizmoType.ROTATION
       gizmoManager.scaleGizmoEnabled = type === GizmoType.SCALE
-      gizmoManager.freeGizmoEnabled = type === GizmoType.FREE
+      // gizmoManager.freeGizmoEnabled = type === GizmoType.FREE
       events.emit('change')
     },
     isPositionGizmoWorldAligned,

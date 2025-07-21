@@ -128,6 +128,10 @@ export class EcsEntity extends BABYLON.TransformNode {
     return this.#gltfAssetContainerLoading
   }
 
+  resetGltfAssetContainerLoading() {
+    this.#gltfAssetContainerLoading = future()
+  }
+
   setGltfAssetContainer(gltfAssetContainer: BABYLON.AssetContainer) {
     this.gltfAssetContainer = gltfAssetContainer
     this.#gltfAssetContainerLoading.resolve(gltfAssetContainer)
