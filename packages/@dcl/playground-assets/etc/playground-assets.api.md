@@ -638,6 +638,7 @@ export const componentDefinitionByName: {
     "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
+    "core::GltfNodeModifiers": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNodeModifiers>>;
     "core::InputModifier": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBInputModifier>>;
     "core::MainCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMainCamera>>;
     "core::Material": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMaterial>>;
@@ -652,6 +653,7 @@ export const componentDefinitionByName: {
     "core::Raycast": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycast>>;
     "core::RaycastResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycastResult>>;
     "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
+    "core::SkyboxTime": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSkyboxTime>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
     "core::TweenSequence": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenSequence>>;
@@ -1220,6 +1222,9 @@ export const GltfContainer: LastWriteWinElementSetComponentDefinition<PBGltfCont
 
 // @public (undocumented)
 export const GltfContainerLoadingState: LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>;
+
+// @public (undocumented)
+export const GltfNodeModifiers: LastWriteWinElementSetComponentDefinition<PBGltfNodeModifiers>;
 
 // @public (undocumented)
 export interface GrowOnlyValueSetComponentDefinition<T> extends BaseComponent<T> {
@@ -2381,6 +2386,35 @@ export namespace PBGltfContainerLoadingState {
 }
 
 // @public (undocumented)
+export interface PBGltfNodeModifiers {
+    // (undocumented)
+    modifiers: PBGltfNodeModifiers_GltfNodeModifier[];
+}
+
+// @public (undocumented)
+export namespace PBGltfNodeModifiers {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfNodeModifiers;
+    // (undocumented)
+    export function encode(message: PBGltfNodeModifiers, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBGltfNodeModifiers_GltfNodeModifier {
+    castShadows?: boolean | undefined;
+    material?: PBMaterial | undefined;
+    path: string;
+}
+
+// @public (undocumented)
+export namespace PBGltfNodeModifiers_GltfNodeModifier {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfNodeModifiers_GltfNodeModifier;
+    // (undocumented)
+    export function encode(message: PBGltfNodeModifiers_GltfNodeModifier, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBInputModifier {
     // (undocumented)
     mode?: {
@@ -2881,6 +2915,20 @@ export namespace PBRealmInfo {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBRealmInfo;
     // (undocumented)
     export function encode(message: PBRealmInfo, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBSkyboxTime {
+    fixedTime: number;
+    transitionMode?: TransitionMode | undefined;
+}
+
+// @public (undocumented)
+export namespace PBSkyboxTime {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBSkyboxTime;
+    // (undocumented)
+    export function encode(message: PBSkyboxTime, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3933,6 +3981,9 @@ export namespace Schemas {
 }
 
 // @public (undocumented)
+export const SkyboxTime: LastWriteWinElementSetComponentDefinition<PBSkyboxTime>;
+
+// @public (undocumented)
 export interface Spec {
     // (undocumented)
     [key: string]: ISchema;
@@ -4163,6 +4214,12 @@ export type TransformType = {
 
 // @public (undocumented)
 export type TransformTypeWithOptionals = Partial<TransformType>;
+
+// @public (undocumented)
+export const enum TransitionMode {
+    TM_BACKWARD = 1,
+    TM_FORWARD = 0
+}
 
 // @public (undocumented)
 export type Transport = {
