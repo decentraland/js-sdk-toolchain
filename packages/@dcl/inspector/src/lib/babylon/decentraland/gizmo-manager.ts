@@ -93,6 +93,11 @@ export function createGizmoManager(context: SceneContext) {
   if (gizmoManager.gizmos.rotationGizmo) configureGizmoButtons(gizmoManager.gizmos.rotationGizmo, [LEFT_BUTTON])
   if (gizmoManager.gizmos.scaleGizmo) configureGizmoButtons(gizmoManager.gizmos.scaleGizmo, [LEFT_BUTTON])
 
+  // Configure all gizmos to only work with left click
+  if (gizmoManager.gizmos.positionGizmo) configureGizmoButtons(gizmoManager.gizmos.positionGizmo, [LEFT_BUTTON])
+  if (gizmoManager.gizmos.rotationGizmo) configureGizmoButtons(gizmoManager.gizmos.rotationGizmo, [LEFT_BUTTON])
+  if (gizmoManager.gizmos.scaleGizmo) configureGizmoButtons(gizmoManager.gizmos.scaleGizmo, [LEFT_BUTTON])
+
   let selectedEntities: EcsEntity[] = []
   let rotationGizmoAlignmentDisabled = false
   let positionGizmoAlignmentDisabled = false
