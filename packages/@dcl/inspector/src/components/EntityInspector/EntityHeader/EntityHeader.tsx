@@ -104,20 +104,24 @@ export default React.memo(
       [entity]
     )
 
-    const isComponentDisabled = useCallback(
-      (component: string) => {
-        switch (component) {
-          case 'Visibility': {
-            return !hasGltfContainer && !hasMeshCollider
-          }
-          default:
-            return false
-        }
-      },
-      [entity, hasGltfContainer, hasMeshCollider]
-    )
-
     const availableComponents = getAvailableComponents(entity)
+
+    const isComponentDisabled = useCallback(
+      (componentId: number) => {
+        const componentInfo = availableComponents.find((comp) => comp.id === componentId)
+
+        if (componentInfo && componentInfo.isOnEntity) {
+          return true
+        }
+
+        if (componentId === sdk.components.VisibilityComponent.componentId) {
+          return !hasGltfContainer && !hasMeshCollider
+        }
+
+        return false
+      },
+      [availableComponents, hasGltfContainer, hasMeshCollider, sdk.components.VisibilityComponent.componentId]
+    )
 
     const handleOpenModal = useCallback(
       (cb?: () => void) => {
@@ -141,6 +145,27 @@ export default React.memo(
       [isBasicViewEnabled, handleAddComponent, handleOpenModal]
     )
 
+    const getComponentTooltip = useCallback(
+      (componentId: number, description: string, link?: string) => {
+        const componentInfo = availableComponents.find((c) => c.id === componentId)
+
+        if (componentInfo?.isOnEntity) {
+          return {
+            text: 'This component is already added. An entity can only have one copy of each component.'
+          }
+        }
+
+        if (componentId === sdk.components.VisibilityComponent.componentId) {
+          return {
+            text: 'You must have either a GLTF Container or a Mesh Collider component to use this component.'
+          }
+        }
+
+        return { text: description, ...(link && { link }) }
+      },
+      [isComponentDisabled, availableComponents, sdk.components.VisibilityComponent.componentId]
+    )
+
     const componentOptions = useMemo(() => {
       const options = [
         { header: '3D Content' },
@@ -152,19 +177,23 @@ export default React.memo(
               sdk.components.GltfContainer.componentId,
               sdk.components.GltfContainer.componentName
             ),
-          tooltip: {
-            text: "The GLTF assigns a 3D model file for the item's visible shape. It also handles collisions, to make an item clickable or block the player from walking through it."
-          }
+          disabled: isComponentDisabled(sdk.components.GltfContainer.componentId),
+          tooltip: getComponentTooltip(
+            sdk.components.GltfContainer.componentId,
+            "The GLTF assigns a 3D model file for the item's visible shape. It also handles collisions, to make an item clickable or block the player from walking through it."
+          )
         },
         {
           id: sdk.components.Material.componentId,
           value: 'Material',
           onClick: () =>
             handleClickAddComponent(sdk.components.Material.componentId, sdk.components.Material.componentName),
-          tooltip: {
-            text: 'Material determines the visual appearance of an object. It defines properties such as color, texture, and transparency',
-            link: 'https://docs.decentraland.org/creator/development-guide/sdk7/materials/'
-          }
+          disabled: isComponentDisabled(sdk.components.Material.componentId),
+          tooltip: getComponentTooltip(
+            sdk.components.Material.componentId,
+            'Material determines the visual appearance of an object. It defines properties such as color, texture, and transparency',
+            'https://docs.decentraland.org/creator/development-guide/sdk7/materials/'
+          )
         },
         {
           id: sdk.components.VisibilityComponent.componentId,
@@ -174,41 +203,35 @@ export default React.memo(
               sdk.components.VisibilityComponent.componentId,
               sdk.components.VisibilityComponent.componentName
             ),
-          tooltip: {
-            className: 'EntityHeader',
-            text: (
-              <span className="VisibilityComponentTooltip">
-                Visibility controls whether an object is visible or not to the player. Items marked as invisible are
-                shown on the editor, but not to players running the scene.
-                {isComponentDisabled('Visibility') && (
-                  <span className="ErrorMessage">
-                    You must have either a GLTF Container or a Mesh Collider component to use this component.
-                  </span>
-                )}
-              </span>
-            )
-          },
-          disabled: isComponentDisabled('Visibility')
+          disabled: isComponentDisabled(sdk.components.VisibilityComponent.componentId),
+          tooltip: getComponentTooltip(
+            sdk.components.VisibilityComponent.componentId,
+            'Visibility controls whether an object is visible or not to the player. Items marked as invisible are shown on the editor, but not to players running the scene.'
+          )
         },
         {
           id: sdk.components.MeshRenderer.componentId,
           value: 'Mesh Renderer',
           onClick: () =>
             handleClickAddComponent(sdk.components.MeshRenderer.componentId, sdk.components.MeshRenderer.componentName),
-          tooltip: {
-            text: 'Use MeshRenderer to assign a primitive 3D shape to the item. Instead of using a 3D file from GLTF, assign a simple cube, plane, sphere, or cylinder. These shapes can be used together with Materials',
-            link: 'https://docs.decentraland.org/creator/development-guide/sdk7/shape-components/'
-          }
+          disabled: isComponentDisabled(sdk.components.MeshRenderer.componentId),
+          tooltip: getComponentTooltip(
+            sdk.components.MeshRenderer.componentId,
+            'Use MeshRenderer to assign a primitive 3D shape to the item. Instead of using a 3D file from GLTF, assign a simple cube, plane, sphere, or cylinder. These shapes can be used together with Materials',
+            'https://docs.decentraland.org/creator/development-guide/sdk7/shape-components/'
+          )
         },
         {
           id: sdk.components.MeshCollider.componentId,
           value: 'Mesh Collider',
           onClick: () =>
             handleClickAddComponent(sdk.components.MeshCollider.componentId, sdk.components.MeshCollider.componentName),
-          tooltip: {
-            text: 'MeshCollider defines the collision properties of an item, based on its invisible collision geometry. Collisions serve to make an item clickable or to block the player from walking through an item',
-            link: 'https://docs.decentraland.org/creator/development-guide/sdk7/colliders/'
-          }
+          disabled: isComponentDisabled(sdk.components.MeshCollider.componentId),
+          tooltip: getComponentTooltip(
+            sdk.components.MeshCollider.componentId,
+            'MeshCollider defines the collision properties of an item, based on its invisible collision geometry. Collisions serve to make an item clickable or to block the player from walking through an item',
+            'https://docs.decentraland.org/creator/development-guide/sdk7/colliders/'
+          )
         },
         { header: 'Interaction' },
         {
@@ -216,50 +239,60 @@ export default React.memo(
           value: 'States',
           onClick: () =>
             handleClickAddComponent(sdk.components.States.componentId, sdk.components.States.componentName),
-          tooltip: {
-            text: 'States specify the status of entities. Use triggers to check or change states, and set actions accordingly.',
-            link: 'https://docs.decentraland.org/creator/smart-items/#states'
-          }
+          disabled: isComponentDisabled(sdk.components.States.componentId),
+          tooltip: getComponentTooltip(
+            sdk.components.States.componentId,
+            'States specify the status of entities. Use triggers to check or change states, and set actions accordingly.',
+            'https://docs.decentraland.org/creator/smart-items/#states'
+          )
         },
         {
           id: sdk.components.Triggers.componentId,
           value: 'Triggers',
           onClick: () =>
             handleClickAddComponent(sdk.components.Triggers.componentId, sdk.components.Triggers.componentName),
-          tooltip: {
-            text: 'Triggers activate actions based on player interactions like clicks, entering/exiting areas, or global events like "on spawn".',
-            link: 'https://docs.decentraland.org/creator/smart-items/#triggers'
-          }
+          disabled: isComponentDisabled(sdk.components.Triggers.componentId),
+          tooltip: getComponentTooltip(
+            sdk.components.Triggers.componentId,
+            'Triggers activate actions based on player interactions like clicks, entering/exiting areas, or global events like "on spawn".',
+            'https://docs.decentraland.org/creator/smart-items/#triggers'
+          )
         },
         {
           id: sdk.components.Actions.componentId,
           value: 'Actions',
           onClick: () =>
             handleClickAddComponent(sdk.components.Actions.componentId, sdk.components.Actions.componentName),
-          tooltip: {
-            text: 'Actions list the capabilities of entities, from playing animations to changing visibility. Customize or add new actions, which are activated by triggers.',
-            link: 'https://docs.decentraland.org/creator/smart-items/#actions'
-          }
+          disabled: isComponentDisabled(sdk.components.Actions.componentId),
+          tooltip: getComponentTooltip(
+            sdk.components.Actions.componentId,
+            'Actions list the capabilities of entities, from playing animations to changing visibility. Customize or add new actions, which are activated by triggers.',
+            'https://docs.decentraland.org/creator/smart-items/#actions'
+          )
         },
         {
           id: sdk.components.AudioSource.componentId,
           value: 'Audio Source',
           onClick: () =>
             handleClickAddComponent(sdk.components.AudioSource.componentId, sdk.components.AudioSource.componentName),
-          tooltip: {
-            text: 'AudioSource enables the playback of sound in your scene. The item emits sound that originates from its location, from an .mp3 file in your scene project',
-            link: 'https://docs.decentraland.org/creator/development-guide/sdk7/sounds'
-          }
+          disabled: isComponentDisabled(sdk.components.AudioSource.componentId),
+          tooltip: getComponentTooltip(
+            sdk.components.AudioSource.componentId,
+            'AudioSource enables the playback of sound in your scene. The item emits sound that originates from its location, from an .mp3 file in your scene project',
+            'https://docs.decentraland.org/creator/development-guide/sdk7/sounds'
+          )
         },
         {
           id: sdk.components.TextShape.componentId,
           value: 'Text Shape',
           onClick: () =>
             handleClickAddComponent(sdk.components.TextShape.componentId, sdk.components.TextShape.componentName),
-          tooltip: {
-            text: 'Use TextShape to display text in the 3D space',
-            link: 'https://docs.decentraland.org/creator/development-guide/sdk7/text'
-          }
+          disabled: isComponentDisabled(sdk.components.TextShape.componentId),
+          tooltip: getComponentTooltip(
+            sdk.components.TextShape.componentId,
+            'Use TextShape to display text in the 3D space',
+            'https://docs.decentraland.org/creator/development-guide/sdk7/text'
+          )
         },
         {
           id: sdk.components.PointerEvents.componentId,
@@ -269,10 +302,12 @@ export default React.memo(
               sdk.components.PointerEvents.componentId,
               sdk.components.PointerEvents.componentName
             ),
-          tooltip: {
-            text: 'Use PointerEvents to configure the hints shown to players when they hover the cursor over the item. Change the text, the button, the max distance, etc',
-            link: 'https://docs.decentraland.org/creator/development-guide/sdk7/click-events'
-          }
+          disabled: isComponentDisabled(sdk.components.PointerEvents.componentId),
+          tooltip: getComponentTooltip(
+            sdk.components.PointerEvents.componentId,
+            'Use PointerEvents to configure the hints shown to players when they hover the cursor over the item. Change the text, the button, the max distance, etc',
+            'https://docs.decentraland.org/creator/development-guide/sdk7/click-events'
+          )
         }
       ]
 
@@ -283,8 +318,6 @@ export default React.memo(
         return set
       }, new Set<number>())
 
-      const availableIds = availableComponents.reduce((set, component) => set.add(component.id), new Set<number>())
-
       if (availableComponents.some((component) => !optionIds.has(component.id))) {
         options.push({ header: 'Other' })
         for (const component of availableComponents) {
@@ -292,14 +325,16 @@ export default React.memo(
             options.push({
               id: component.id,
               value: component.name,
-              onClick: () => handleClickAddComponent(component.id, component.name)
-            } as any)
+              onClick: () => handleClickAddComponent(component.id, component.name),
+              disabled: isComponentDisabled(component.id),
+              tooltip: getComponentTooltip(component.id, `${component.name} component`)
+            })
           }
         }
       }
 
-      return options.filter((option) => !option.id || availableIds.has(option.id))
-    }, [sdk, availableComponents, isComponentDisabled, handleClickAddComponent])
+      return options
+    }, [sdk, availableComponents, isComponentDisabled, handleClickAddComponent, getComponentTooltip])
 
     const quitEditMode = useCallback(() => setEditMode(false), [])
     const enterEditMode = useCallback(() => setEditMode(true), [])
