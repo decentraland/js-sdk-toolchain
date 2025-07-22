@@ -8,7 +8,9 @@ import {
   MeshBuilder,
   StandardMaterial,
   Color3,
-  Mesh
+  Mesh,
+  Nullable,
+  Observer
 } from '@babylonjs/core'
 import { Entity } from '@dcl/ecs'
 import { EcsEntity } from '../EcsEntity'
@@ -28,9 +30,9 @@ export class FreeGizmo implements IGizmoTransformer {
   private isWorldAligned = true
 
   private dragBehavior: PointerDragBehavior
-  private dragStartObserver: any = null
-  private dragObserver: any = null
-  private dragEndObserver: any = null
+  private dragStartObserver: Nullable<Observer<any>> = null
+  private dragObserver: Nullable<Observer<any>> = null
+  private dragEndObserver: Nullable<Observer<any>> = null
 
   private pivotPosition: Vector3 | null = null
   private lastSnappedPivotPosition: Vector3 | null = null
