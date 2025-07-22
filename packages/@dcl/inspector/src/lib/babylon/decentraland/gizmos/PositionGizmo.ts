@@ -5,53 +5,50 @@ import { IGizmoTransformer } from './types'
 import { LEFT_BUTTON } from '../mouse-utils'
 import { configureGizmoButtons } from './utils'
 
+interface EntityState {
+  position: Vector3
+  scale: Vector3
+  rotation: Quaternion
+  offset: Vector3
+}
+
 export class PositionGizmo implements IGizmoTransformer {
-  private initialOffsets = new Map<Entity, Vector3>()
-  private initialPositions = new Map<Entity, Vector3>()
-  private initialScales = new Map<Entity, Vector3>()
-  private initialRotations = new Map<Entity, Quaternion>()
+  private entityStates = new Map<Entity, EntityState>()
   private pivotPosition: Vector3 | null = null
   private isDragging = false
-  private dragStartObserver: any = null
-  private dragObserver: any = null
-  private dragEndObserver: any = null
   private currentEntities: EcsEntity[] = []
   private updateEntityPosition: ((entity: EcsEntity) => void) | null = null
   private dispatchOperations: (() => void) | null = null
   private isWorldAligned = true
 
+  private dragStartObserver: any = null
+  private dragObserver: any = null
+  private dragEndObserver: any = null
+
   constructor(private gizmoManager: GizmoManager, private snapPosition: (position: Vector3) => Vector3) {}
 
   setup(): void {
-    if (!this.gizmoManager.gizmos.positionGizmo) return
-    const positionGizmo = this.gizmoManager.gizmos.positionGizmo
+    const positionGizmo = this.getPositionGizmo()
+    if (!positionGizmo) return
+
     positionGizmo.updateGizmoRotationToMatchAttachedMesh = !this.isWorldAligned
   }
 
   enable(): void {
-    if (!this.gizmoManager.gizmos.positionGizmo) return
+    const positionGizmo = this.getPositionGizmo()
+    if (!positionGizmo) return
 
-    // Setup drag observables when the gizmo is enabled
     this.setupDragObservables()
-
-    // Configure gizmo to only work with left click
-    configureGizmoButtons(this.gizmoManager.gizmos.positionGizmo, [LEFT_BUTTON])
+    configureGizmoButtons(positionGizmo, [LEFT_BUTTON])
   }
 
   cleanup(): void {
-    if (!this.gizmoManager.gizmos.positionGizmo) return
+    const positionGizmo = this.getPositionGizmo()
+    if (!positionGizmo) return
+
     this.gizmoManager.positionGizmoEnabled = false
-
-    // Clean up drag observables
     this.cleanupDragObservables()
-
-    this.initialOffsets.clear()
-    this.initialPositions.clear()
-    this.initialScales.clear()
-    this.initialRotations.clear()
-    this.pivotPosition = null
-    this.isDragging = false
-    this.currentEntities = []
+    this.resetState()
   }
 
   setEntities(entities: EcsEntity[]): void {
@@ -65,87 +62,100 @@ export class PositionGizmo implements IGizmoTransformer {
 
   setWorldAligned(value: boolean): void {
     this.isWorldAligned = value
-    if (this.gizmoManager.gizmos.positionGizmo) {
-      this.gizmoManager.gizmos.positionGizmo.updateGizmoRotationToMatchAttachedMesh = !value
-    }
-
-    // Apply the alignment to the current gizmo node
-    if (this.gizmoManager.attachedNode && this.currentEntities.length > 0) {
-      const gizmoNode = this.gizmoManager.attachedNode as TransformNode
-
-      if (value) {
-        // World aligned: reset to identity rotation
-        if (gizmoNode.rotationQuaternion) {
-          gizmoNode.rotationQuaternion.set(0, 0, 0, 1) // Quaternion.Identity()
-        }
-      } else {
-        // Local aligned: sync with the first entity's rotation (if single entity)
-        if (this.currentEntities.length === 1) {
-          const entity = this.currentEntities[0]
-          if (entity.rotationQuaternion && gizmoNode.rotationQuaternion) {
-            // If the entity has a parent, convert to world rotation
-            if (entity.parent && entity.parent instanceof TransformNode) {
-              const parent = entity.parent as TransformNode
-              const parentWorldRotation =
-                parent.rotationQuaternion || Quaternion.FromRotationMatrix(parent.getWorldMatrix())
-              const worldRotation = parentWorldRotation.multiply(entity.rotationQuaternion)
-              gizmoNode.rotationQuaternion.copyFrom(worldRotation)
-            } else {
-              // If no parent, apply directly
-              gizmoNode.rotationQuaternion.copyFrom(entity.rotationQuaternion)
-            }
-          }
-        }
-      }
-
-      gizmoNode.computeWorldMatrix(true)
-    }
+    this.updateGizmoAlignment()
   }
 
   setSnapDistance(distance: number): void {
-    if (!this.gizmoManager.gizmos.positionGizmo) return
-    this.gizmoManager.gizmos.positionGizmo.snapDistance = distance
+    const positionGizmo = this.getPositionGizmo()
+    if (!positionGizmo) return
+
+    positionGizmo.snapDistance = distance
+  }
+
+  private getPositionGizmo() {
+    return this.gizmoManager.gizmos.positionGizmo
+  }
+
+  private resetState(): void {
+    this.entityStates.clear()
+    this.pivotPosition = null
+    this.isDragging = false
+    this.currentEntities = []
+  }
+
+  private updateGizmoAlignment(): void {
+    const positionGizmo = this.getPositionGizmo()
+    if (!positionGizmo) return
+
+    positionGizmo.updateGizmoRotationToMatchAttachedMesh = !this.isWorldAligned
+
+    const gizmoNode = this.gizmoManager.attachedNode as TransformNode
+    if (!gizmoNode || this.currentEntities.length === 0) return
+
+    if (this.isWorldAligned) {
+      this.resetGizmoRotation(gizmoNode)
+    } else {
+      this.syncGizmoRotationWithEntity(gizmoNode)
+    }
+
+    gizmoNode.computeWorldMatrix(true)
+  }
+
+  private resetGizmoRotation(gizmoNode: TransformNode): void {
+    if (gizmoNode.rotationQuaternion) {
+      gizmoNode.rotationQuaternion.set(0, 0, 0, 1) // Quaternion.Identity()
+    }
+  }
+
+  private syncGizmoRotationWithEntity(gizmoNode: TransformNode): void {
+    if (this.currentEntities.length !== 1) return
+
+    const entity = this.currentEntities[0]
+    if (!entity.rotationQuaternion || !gizmoNode.rotationQuaternion) return
+
+    const worldRotation = this.getEntityWorldRotation(entity)
+    gizmoNode.rotationQuaternion.copyFrom(worldRotation)
+  }
+
+  private getEntityWorldRotation(entity: EcsEntity): Quaternion {
+    if (!entity.parent || !(entity.parent instanceof TransformNode)) {
+      return entity.rotationQuaternion!
+    }
+
+    const parent = entity.parent as TransformNode
+    const parentWorldRotation = parent.rotationQuaternion || Quaternion.FromRotationMatrix(parent.getWorldMatrix())
+
+    return parentWorldRotation.multiply(entity.rotationQuaternion!)
   }
 
   private setupDragObservables(): void {
-    if (!this.gizmoManager.gizmos.positionGizmo) return
+    const positionGizmo = this.getPositionGizmo()
+    if (!positionGizmo) return
 
-    const positionGizmo = this.gizmoManager.gizmos.positionGizmo
-
-    // Setup drag start
     this.dragStartObserver = positionGizmo.onDragStartObservable.add(() => {
-      if (this.gizmoManager.attachedNode) {
-        this.onDragStart(this.currentEntities, this.gizmoManager.attachedNode as TransformNode)
+      const gizmoNode = this.gizmoManager.attachedNode as TransformNode
+      if (gizmoNode) {
+        this.onDragStart(this.currentEntities, gizmoNode)
       }
     })
 
-    // Setup drag update
     this.dragObserver = positionGizmo.onDragObservable.add(() => {
-      if (this.gizmoManager.attachedNode) {
-        this.update(this.currentEntities, this.gizmoManager.attachedNode as TransformNode)
-
-        // Update ECS position on each drag update for real-time feedback
-        if (this.updateEntityPosition) {
-          this.currentEntities.forEach(this.updateEntityPosition)
-        }
+      const gizmoNode = this.gizmoManager.attachedNode as TransformNode
+      if (gizmoNode) {
+        this.update(this.currentEntities, gizmoNode)
+        this.updateEntitiesInRealTime()
       }
     })
 
-    // Setup drag end
     this.dragEndObserver = positionGizmo.onDragEndObservable.add(() => {
       this.onDragEnd()
-
-      // Only dispatch operations at the end to avoid excessive ECS operations
-      if (this.dispatchOperations) {
-        this.dispatchOperations()
-      }
+      this.dispatchOperations?.()
     })
   }
 
   private cleanupDragObservables(): void {
-    if (!this.gizmoManager.gizmos.positionGizmo) return
-
-    const positionGizmo = this.gizmoManager.gizmos.positionGizmo
+    const positionGizmo = this.getPositionGizmo()
+    if (!positionGizmo) return
 
     if (this.dragStartObserver) {
       positionGizmo.onDragStartObservable.remove(this.dragStartObserver)
@@ -163,155 +173,150 @@ export class PositionGizmo implements IGizmoTransformer {
     }
   }
 
+  private updateEntitiesInRealTime(): void {
+    if (!this.updateEntityPosition) return
+
+    this.currentEntities.forEach(this.updateEntityPosition)
+  }
+
   onDragStart(entities: EcsEntity[], _gizmoNode: TransformNode): void {
     if (this.isDragging) return
 
     this.isDragging = true
+    this.calculatePivotPosition(entities)
+    this.storeEntityStates(entities)
+  }
 
-    // Calculate pivot position (centroid of all selected entities)
+  private calculatePivotPosition(entities: EcsEntity[]): void {
     this.pivotPosition = new Vector3()
+
     for (const entity of entities) {
       const worldPosition = entity.getAbsolutePosition()
       this.pivotPosition.addInPlace(worldPosition)
     }
-    this.pivotPosition.scaleInPlace(1 / entities.length)
 
-    // Store initial state for all entities
-    this.initialOffsets.clear()
-    this.initialPositions.clear()
-    this.initialScales.clear()
-    this.initialRotations.clear()
+    this.pivotPosition.scaleInPlace(1 / entities.length)
+  }
+
+  private storeEntityStates(entities: EcsEntity[]): void {
+    this.entityStates.clear()
 
     for (const entity of entities) {
       const worldPosition = entity.getAbsolutePosition()
+      const offset = worldPosition.subtract(this.pivotPosition!)
 
-      // Store initial transforms
-      this.initialPositions.set(entity.entityId, entity.position.clone())
-      this.initialScales.set(entity.entityId, entity.scaling.clone())
-      this.initialRotations.set(entity.entityId, entity.rotationQuaternion?.clone() || Quaternion.Identity())
-
-      // Store offset from pivot (like Blender's relative positioning)
-      const offset = worldPosition.subtract(this.pivotPosition)
-      this.initialOffsets.set(entity.entityId, offset)
+      this.entityStates.set(entity.entityId, {
+        position: entity.position.clone(),
+        scale: entity.scaling.clone(),
+        rotation: entity.rotationQuaternion?.clone() || Quaternion.Identity(),
+        offset
+      })
     }
   }
 
   update(entities: EcsEntity[], gizmoNode: TransformNode): void {
     if (!this.isDragging || !this.pivotPosition) return
 
-    // Calculate the movement delta from the gizmo
     const movementDelta = gizmoNode.position.subtract(this.pivotPosition)
 
     for (const entity of entities) {
-      const offset = this.initialOffsets.get(entity.entityId)
-      const initialPosition = this.initialPositions.get(entity.entityId)
-      const initialScale = this.initialScales.get(entity.entityId)
-      const initialRotation = this.initialRotations.get(entity.entityId)
-
-      if (!offset || !initialPosition || !initialScale || !initialRotation) continue
-
-      // Calculate new world position: pivot + movement + offset
-      const newWorldPosition = this.pivotPosition.add(movementDelta).add(offset)
-
-      const parent = entity.parent instanceof TransformNode ? entity.parent : null
-
-      if (parent) {
-        // For child entities, convert world position to local space
-        const parentWorldMatrix = parent.getWorldMatrix()
-        const parentWorldMatrixInverse = parentWorldMatrix.clone().invert()
-
-        // Convert world position to local space and apply snapping
-        const localPosition = Vector3.TransformCoordinates(newWorldPosition, parentWorldMatrixInverse)
-
-        // Apply transforms
-        entity.position.copyFrom(localPosition)
-        entity.scaling.copyFrom(initialScale)
-        if (!entity.rotationQuaternion) {
-          entity.rotationQuaternion = new Quaternion()
-        }
-        entity.rotationQuaternion.copyFrom(initialRotation)
-        entity.rotationQuaternion.normalize()
-      } else {
-        // For entities without parent, apply world position directly with snapping
-        const snappedWorldPosition = this.snapPosition(newWorldPosition)
-        entity.position.copyFrom(snappedWorldPosition)
-        entity.scaling.copyFrom(initialScale)
-        if (!entity.rotationQuaternion) {
-          entity.rotationQuaternion = new Quaternion()
-        }
-        entity.rotationQuaternion.copyFrom(initialRotation)
-        entity.rotationQuaternion.normalize()
-      }
-
-      // Force update world matrix
-      entity.computeWorldMatrix(true)
+      this.updateEntityTransform(entity, movementDelta)
     }
 
-    if (this.gizmoManager.attachedNode) {
-      const gizmoNode = this.gizmoManager.attachedNode as TransformNode
+    this.updateGizmoPosition(entities)
+  }
 
-      const centroid = new Vector3()
-      for (const entity of entities) {
-        const worldPosition = entity.getAbsolutePosition()
-        centroid.addInPlace(worldPosition)
-      }
-      centroid.scaleInPlace(1 / entities.length)
+  private updateEntityTransform(entity: EcsEntity, movementDelta: Vector3): void {
+    const state = this.entityStates.get(entity.entityId)
+    if (!state) return
 
-      gizmoNode.position.copyFrom(centroid)
-      gizmoNode.computeWorldMatrix(true)
+    const newWorldPosition = this.pivotPosition!.add(movementDelta).add(state.offset)
+    const parent = entity.parent instanceof TransformNode ? entity.parent : null
+
+    if (parent) {
+      this.applyLocalPosition(entity, newWorldPosition, parent, state)
+    } else {
+      this.applyWorldPosition(entity, newWorldPosition, state)
     }
+
+    entity.computeWorldMatrix(true)
+  }
+
+  private applyLocalPosition(
+    entity: EcsEntity,
+    worldPosition: Vector3,
+    parent: TransformNode,
+    state: EntityState
+  ): void {
+    const parentWorldMatrix = parent.getWorldMatrix()
+    const parentWorldMatrixInverse = parentWorldMatrix.clone().invert()
+    const localPosition = Vector3.TransformCoordinates(worldPosition, parentWorldMatrixInverse)
+
+    this.applyTransforms(entity, localPosition, state)
+  }
+
+  private applyWorldPosition(entity: EcsEntity, worldPosition: Vector3, state: EntityState): void {
+    const snappedWorldPosition = this.snapPosition(worldPosition)
+    this.applyTransforms(entity, snappedWorldPosition, state)
+  }
+
+  private applyTransforms(entity: EcsEntity, position: Vector3, state: EntityState): void {
+    entity.position.copyFrom(position)
+    entity.scaling.copyFrom(state.scale)
+
+    if (!entity.rotationQuaternion) {
+      entity.rotationQuaternion = new Quaternion()
+    }
+
+    entity.rotationQuaternion.copyFrom(state.rotation)
+    entity.rotationQuaternion.normalize()
+  }
+
+  private updateGizmoPosition(entities: EcsEntity[]): void {
+    const gizmoNode = this.gizmoManager.attachedNode as TransformNode
+    if (!gizmoNode) return
+
+    const centroid = this.calculateCentroid(entities)
+    gizmoNode.position.copyFrom(centroid)
+    gizmoNode.computeWorldMatrix(true)
+  }
+
+  private calculateCentroid(entities: EcsEntity[]): Vector3 {
+    const centroid = new Vector3()
+
+    for (const entity of entities) {
+      const worldPosition = entity.getAbsolutePosition()
+      centroid.addInPlace(worldPosition)
+    }
+
+    centroid.scaleInPlace(1 / entities.length)
+    return centroid
   }
 
   onDragEnd(): void {
-    // Sync gizmo position with the final snapped positions of entities
-    if (this.gizmoManager.attachedNode && this.currentEntities.length > 0) {
-      const gizmoNode = this.gizmoManager.attachedNode as TransformNode
+    this.syncGizmoWithFinalPositions()
+    this.resetDragState()
+  }
 
-      // Calculate the centroid of all entities' current world positions
-      const centroid = new Vector3()
-      for (const entity of this.currentEntities) {
-        const worldPosition = entity.getAbsolutePosition()
-        centroid.addInPlace(worldPosition)
-      }
-      centroid.scaleInPlace(1 / this.currentEntities.length)
+  private syncGizmoWithFinalPositions(): void {
+    const gizmoNode = this.gizmoManager.attachedNode as TransformNode
+    if (!gizmoNode || this.currentEntities.length === 0) return
 
-      // Update gizmo node to match the final snapped centroid
-      gizmoNode.position.copyFrom(centroid)
+    const centroid = this.calculateCentroid(this.currentEntities)
+    gizmoNode.position.copyFrom(centroid)
 
-      // Respect the world alignment setting when syncing gizmo rotation
-      if (this.isWorldAligned) {
-        // If world aligned, reset to identity rotation
-        if (gizmoNode.rotationQuaternion) {
-          gizmoNode.rotationQuaternion.set(0, 0, 0, 1) // Quaternion.Identity()
-        }
-      } else {
-        // If not world aligned, sync with the first entity's rotation (if single entity)
-        if (this.currentEntities.length === 1) {
-          const entity = this.currentEntities[0]
-          if (entity.rotationQuaternion && gizmoNode.rotationQuaternion) {
-            // If the entity has a parent, convert to world rotation
-            if (entity.parent && entity.parent instanceof TransformNode) {
-              const parent = entity.parent as TransformNode
-              const parentWorldRotation =
-                parent.rotationQuaternion || Quaternion.FromRotationMatrix(parent.getWorldMatrix())
-              const worldRotation = parentWorldRotation.multiply(entity.rotationQuaternion)
-              gizmoNode.rotationQuaternion.copyFrom(worldRotation)
-            } else {
-              // If no parent, apply directly
-              gizmoNode.rotationQuaternion.copyFrom(entity.rotationQuaternion)
-            }
-          }
-        }
-      }
-
-      gizmoNode.computeWorldMatrix(true)
+    if (this.isWorldAligned) {
+      this.resetGizmoRotation(gizmoNode)
+    } else {
+      this.syncGizmoRotationWithEntity(gizmoNode)
     }
 
+    gizmoNode.computeWorldMatrix(true)
+  }
+
+  private resetDragState(): void {
     this.isDragging = false
     this.pivotPosition = null
-    this.initialOffsets.clear()
-    this.initialPositions.clear()
-    this.initialScales.clear()
-    this.initialRotations.clear()
+    this.entityStates.clear()
   }
 }
