@@ -222,10 +222,9 @@ export class PositionGizmo implements IGizmoTransformer {
 
         // Convert world position to local space and apply snapping
         const localPosition = Vector3.TransformCoordinates(newWorldPosition, parentWorldMatrixInverse)
-        const snappedLocalPosition = this.snapPosition(localPosition)
 
         // Apply transforms
-        entity.position.copyFrom(snappedLocalPosition)
+        entity.position.copyFrom(localPosition)
         entity.scaling.copyFrom(initialScale)
         if (!entity.rotationQuaternion) {
           entity.rotationQuaternion = new Quaternion()
@@ -246,6 +245,20 @@ export class PositionGizmo implements IGizmoTransformer {
 
       // Force update world matrix
       entity.computeWorldMatrix(true)
+    }
+
+    if (this.gizmoManager.attachedNode) {
+      const gizmoNode = this.gizmoManager.attachedNode as TransformNode
+
+      const centroid = new Vector3()
+      for (const entity of entities) {
+        const worldPosition = entity.getAbsolutePosition()
+        centroid.addInPlace(worldPosition)
+      }
+      centroid.scaleInPlace(1 / entities.length)
+
+      gizmoNode.position.copyFrom(centroid)
+      gizmoNode.computeWorldMatrix(true)
     }
   }
 
