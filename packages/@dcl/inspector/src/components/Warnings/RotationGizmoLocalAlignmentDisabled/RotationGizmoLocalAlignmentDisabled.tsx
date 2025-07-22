@@ -10,8 +10,8 @@ import { GizmoType } from '../../../lib/utils/gizmo'
 const RotationGizmoLocalAlignmentDisabled: React.FC = withSdk(({ sdk }) => {
   const selectedEntity = useSelectedEntity()
   const [selection] = useComponentValue(selectedEntity || ROOT, sdk.components.Selection)
-  const { isRotationGizmoAlignmentDisabled } = useGizmoAlignment()
-  if (selectedEntity && selection.gizmo === GizmoType.ROTATION && isRotationGizmoAlignmentDisabled) {
+  const { isGizmoWorldAlignmentDisabled } = useGizmoAlignment()
+  if (selectedEntity && selection.gizmo === GizmoType.ROTATION && isGizmoWorldAlignmentDisabled) {
     return (
       <Warning
         title={

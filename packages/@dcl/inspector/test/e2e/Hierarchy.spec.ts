@@ -119,4 +119,24 @@ describe('Hierarchy', () => {
     await expect(Hierarchy.exists(parent)).resolves.toBe(false)
     await expect(Hierarchy.exists(child)).resolves.toBe(false)
   }, 100_000)
+
+  test('drag and drop multiple selected entities', async () => {
+    await Hierarchy.addChild(ROOT, 'multi-parent')
+    await Hierarchy.addChild(ROOT, 'multi-child-1')
+    await Hierarchy.addChild(ROOT, 'multi-child-2')
+    await Hierarchy.addChild(ROOT, 'multi-child-3')
+
+    const parent = await Hierarchy.getId('multi-parent')
+    const child1 = await Hierarchy.getId('multi-child-1')
+    const child2 = await Hierarchy.getId('multi-child-2')
+    const child3 = await Hierarchy.getId('multi-child-3')
+
+    await Hierarchy.selectMultiple([child1, child2, child3])
+
+    await Hierarchy.setParent(child1, parent) // this should move all selected children
+
+    await expect(Hierarchy.isAncestor(child1, parent)).resolves.toBe(true)
+    await expect(Hierarchy.isAncestor(child2, parent)).resolves.toBe(true)
+    await expect(Hierarchy.isAncestor(child3, parent)).resolves.toBe(true)
+  }, 100_000)
 })
