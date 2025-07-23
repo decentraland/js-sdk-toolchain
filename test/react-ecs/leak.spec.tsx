@@ -1,4 +1,4 @@
-import { components, UiTransform } from '../../packages/@dcl/ecs/src'
+import { components } from '../../packages/@dcl/ecs/src'
 import { Button, Dropdown, Input, ReactEcs, UiEntity } from '../../packages/@dcl/react-ecs/src'
 import { Color4 } from '../../packages/@dcl/sdk/math'
 import { setupEngine } from './utils'
@@ -35,7 +35,7 @@ describe('UiDropdown React ECS', () => {
     await engine.update(1)
 
     // after update, there should be only one pointer event per eventType and button
-    for (const [_entity, pe] of engine.getEntitiesWith(UiTransform, PointerEvents)) {
+    for (const [_entity, pe] of engine.getEntitiesWith(PointerEvents)) {
       expect(pe).toEqual({
         pointerEvents: [
           { eventType: 1, eventInfo: { button: 0, showFeedback: true } },
