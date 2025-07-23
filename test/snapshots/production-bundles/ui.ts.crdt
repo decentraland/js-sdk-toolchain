@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=385.6k bytes
+SCENE_COMPILED_JS_SIZE_PROD=386.7k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -8,8 +8,8 @@ EVAL test/snapshots/production-bundles/ui.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-  OPCODES ~= 71k
-  MALLOC_COUNT = 20924
+  OPCODES ~= 72k
+  MALLOC_COUNT = 20922
   ALIVE_OBJS_DELTA ~= 4.20k
 CALL onStart()
   OPCODES ~= 0k
@@ -47,22 +47,22 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x202 c=1093 t=1 data={"placeholder":"SARASA","disabled":false}
   Scene: PUT_COMPONENT e=0x209 c=1093 t=1 data={"placeholder":"","disabled":false}
   Scene: PUT_COMPONENT e=0x201 c=1094 t=1 data={"acceptEmpty":false,"options":["BOEDO","CASLA"],"selectedIndex":0,"disabled":false,"color":{"r":1,"g":0,"b":0,"a":1}}
-  OPCODES ~= 146k
-  MALLOC_COUNT = 705
-  ALIVE_OBJS_DELTA ~= 0.25k
+  OPCODES ~= 144k
+  MALLOC_COUNT = 655
+  ALIVE_OBJS_DELTA ~= 0.23k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=2 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.008726535364985466,"z":0,"w":0.9999619126319885},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 69k
+  OPCODES ~= 71k
   MALLOC_COUNT = 250
   ALIVE_OBJS_DELTA ~= 0.12k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=3 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.017452405765652657,"z":0,"w":0.9998477101325989},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 68k
+  OPCODES ~= 70k
   MALLOC_COUNT = 34
   ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=4 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.026176948100328445,"z":0,"w":0.9996573328971863},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 68k
+  OPCODES ~= 70k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1796.64k bytes
+  MEMORY_USAGE_COUNT ~= 1806.73k bytes

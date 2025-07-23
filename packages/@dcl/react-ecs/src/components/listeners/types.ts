@@ -1,8 +1,23 @@
+import { EventSystemCallback, InputAction } from '@dcl/ecs'
 /**
- * Callback function to be triggered on a specified event
- * @public
+ * legacy Callback function
+ *
+ * @public @deprecated This type is no longer used in the sdk api, EventSystemCallback is
+ * used for listeners instead
  */
 export type Callback = () => void
+/**
+ * a record object mapping `InputAction`s to functions.
+ *
+ * @example
+ * onInputDown={{
+ *   [InputAction.IA_PRIMARY]: (eventData) => { console.log("primary") },
+ *   [InputAction.IA_SECONDARY]: () => { console.log("secondary") },
+ * }}
+ *
+ * @public
+ */
+export type MultiCallback = Partial<Record<InputAction, EventSystemCallback>>
 
 /**
  * User key event Listeners
@@ -10,19 +25,29 @@ export type Callback = () => void
  */
 export type Listeners = {
   /** triggered on mouse down event */
-  onMouseDown?: Callback
+  onMouseDown?: EventSystemCallback
   /** triggered on mouse up event */
-  onMouseUp?: Callback
+  onMouseUp?: EventSystemCallback
   /** triggered on mouse hover event */
-  onMouseEnter?: Callback
+  onMouseEnter?: EventSystemCallback
   /** triggered on mouse leave event */
-  onMouseLeave?: Callback
+  onMouseLeave?: EventSystemCallback
   /** triggered on mouse drag event */
-  onMouseDrag?: Callback
+  onMouseDrag?: EventSystemCallback
   /** triggered on mouse drag event */
-  onMouseDragLocked?: Callback
+  onMouseDragLocked?: EventSystemCallback
   /** triggered on mouse drag event */
-  onMouseDragEnd?: Callback
+  onMouseDragEnd?: EventSystemCallback
+  /** triggered on input down event */
+  onInputDown?: MultiCallback
+  /** triggered on input up event */
+  onInputUp?: MultiCallback
+  /** triggered on input drag event */
+  onInputDrag?: MultiCallback
+  /** triggered on input drag event */
+  onInputDragLocked?: MultiCallback
+  /** triggered on input drag event */
+  onInputDragEnd?: MultiCallback
 }
 
 const listeners: Listeners = {
@@ -32,7 +57,12 @@ const listeners: Listeners = {
   onMouseLeave: undefined,
   onMouseDrag: undefined,
   onMouseDragLocked: undefined,
-  onMouseDragEnd: undefined
+  onMouseDragEnd: undefined,
+  onInputDown: undefined,
+  onInputUp: undefined,
+  onInputDrag: undefined,
+  onInputDragLocked: undefined,
+  onInputDragEnd: undefined
 }
 const listenersKey = Object.keys(listeners)
 

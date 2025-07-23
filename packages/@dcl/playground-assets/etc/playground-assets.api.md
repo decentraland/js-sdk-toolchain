@@ -409,7 +409,7 @@ export interface ByteBuffer {
     writeUtf8String(value: string, writeLength?: boolean): void;
 }
 
-// @public
+// @public @deprecated
 export type Callback = () => void;
 
 // @public (undocumented)
@@ -1188,13 +1188,18 @@ export type EntityComponents = {
     uiBackground: PBUiBackground;
     uiInput: PBUiInput;
     uiDropdown: PBUiDropdown;
-    onMouseDown: Callback;
-    onMouseUp: Callback;
-    onMouseEnter: Callback;
-    onMouseLeave: Callback;
-    onMouseDrag: Callback;
-    onMouseDragLocked: Callback;
-    onMouseDragEnd: Callback;
+    onMouseDown: EventSystemCallback;
+    onMouseUp: EventSystemCallback;
+    onMouseEnter: EventSystemCallback;
+    onMouseLeave: EventSystemCallback;
+    onMouseDrag: EventSystemCallback;
+    onMouseDragLocked: EventSystemCallback;
+    onMouseDragEnd: EventSystemCallback;
+    onInputDown: MultiCallback;
+    onInputUp: MultiCallback;
+    onInputDrag: MultiCallback;
+    onInputDragLocked: MultiCallback;
+    onInputDragEnd: MultiCallback;
 };
 
 // @public (undocumented)
@@ -1244,6 +1249,11 @@ export type EventSystemOptions = {
     maxDistance?: number;
     showFeedback?: boolean;
     showHighlight?: boolean;
+};
+
+// @public (undocumented)
+export type EventSystemOptionsCallback = EventSystemOptions & {
+    cb: EventSystemCallback;
 };
 
 // @public
@@ -1458,6 +1468,7 @@ export type IInputSystem = {
     isTriggered: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => boolean;
     isPressed: (inputAction: InputAction) => boolean;
     getInputCommand: (inputAction: InputAction, pointerEventType: PointerEventType, entity?: Entity) => PBPointerEventsResult | null;
+    getInputCommands: () => Generator<PBPointerEventsResult>;
 };
 
 // @public
@@ -1692,13 +1703,18 @@ export const Light: LastWriteWinElementSetComponentDefinition<PBLight>;
 
 // @public
 export type Listeners = {
-    onMouseDown?: Callback;
-    onMouseUp?: Callback;
-    onMouseEnter?: Callback;
-    onMouseLeave?: Callback;
-    onMouseDrag?: Callback;
-    onMouseDragLocked?: Callback;
-    onMouseDragEnd?: Callback;
+    onMouseDown?: EventSystemCallback;
+    onMouseUp?: EventSystemCallback;
+    onMouseEnter?: EventSystemCallback;
+    onMouseLeave?: EventSystemCallback;
+    onMouseDrag?: EventSystemCallback;
+    onMouseDragLocked?: EventSystemCallback;
+    onMouseDragEnd?: EventSystemCallback;
+    onInputDown?: MultiCallback;
+    onInputUp?: MultiCallback;
+    onInputDrag?: MultiCallback;
+    onInputDragLocked?: MultiCallback;
+    onInputDragEnd?: MultiCallback;
 };
 
 // @public (undocumented)
@@ -1983,6 +1999,20 @@ export namespace Move {
     // (undocumented)
     export function encode(message: Move, writer?: _m0.Writer): _m0.Writer;
 }
+
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+//
+// @public
+export type MultiCallback = Partial<Record<InputAction, EventSystemCallback>>;
 
 // Warning: (ae-missing-release-tag) "Name" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -3760,18 +3790,34 @@ export const PointerEventsResult: GrowOnlyValueSetComponentDefinition<PBPointerE
 export interface PointerEventsSystem {
     onPointerDown(pointerData: {
         entity: Entity;
+        optsList: EventSystemOptionsCallback[];
+    }): void;
+    onPointerDown(pointerData: {
+        entity: Entity;
         opts?: Partial<EventSystemOptions>;
     }, cb: EventSystemCallback): void;
     // @deprecated (undocumented)
     onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
     onPointerDrag(pointerData: {
         entity: Entity;
+        optsList: EventSystemOptionsCallback[];
+    }): void;
+    onPointerDrag(pointerData: {
+        entity: Entity;
         opts?: Partial<EventSystemOptions>;
     }, cb: EventSystemCallback): void;
     onPointerDragEnd(pointerData: {
         entity: Entity;
+        optsList: EventSystemOptionsCallback[];
+    }): void;
+    onPointerDragEnd(pointerData: {
+        entity: Entity;
         opts?: Partial<EventSystemOptions>;
     }, cb: EventSystemCallback): void;
+    onPointerDragLocked(pointerData: {
+        entity: Entity;
+        optsList: EventSystemOptionsCallback[];
+    }): void;
     onPointerDragLocked(pointerData: {
         entity: Entity;
         opts?: Partial<EventSystemOptions>;
@@ -3784,6 +3830,10 @@ export interface PointerEventsSystem {
         entity: Entity;
         opts?: Partial<EventSystemOptions>;
     }, cb: EventSystemCallback): void;
+    onPointerUp(pointerData: {
+        entity: Entity;
+        optsList: EventSystemOptionsCallback[];
+    }): void;
     onPointerUp(pointerData: {
         entity: Entity;
         opts?: Partial<EventSystemOptions>;

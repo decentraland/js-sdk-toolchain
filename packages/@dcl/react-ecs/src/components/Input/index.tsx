@@ -51,6 +51,11 @@ export function Input(props: EntityPropTypes & Partial<UiInputProps>) {
     onMouseDrag,
     onMouseDragLocked,
     onMouseDragEnd,
+    onInputDown,
+    onInputUp,
+    onInputDrag,
+    onInputDragLocked,
+    onInputDragEnd,
     ...otherProps
   } = props
   const inputProps = parseUiInput(otherProps)
@@ -63,7 +68,12 @@ export function Input(props: EntityPropTypes & Partial<UiInputProps>) {
     onMouseLeave,
     onMouseDrag,
     onMouseDragLocked,
-    onMouseDragEnd
+    onMouseDragEnd,
+    onInputDown,
+    onInputUp,
+    onInputDrag,
+    onInputDragLocked,
+    onInputDragEnd
   })
   return <entity {...commonProps} uiInput={inputProps} />
 }

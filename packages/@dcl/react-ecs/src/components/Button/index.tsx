@@ -45,6 +45,11 @@ export function Button(props: UiButtonProps) {
     onMouseDrag,
     onMouseDragLocked,
     onMouseDragEnd,
+    onInputDown,
+    onInputUp,
+    onInputDrag,
+    onInputDragLocked,
+    onInputDragEnd,
     ...otherProps
   } = props
   const buttonProps = getButtonProps(props)
@@ -80,6 +85,11 @@ export function Button(props: UiButtonProps) {
       onMouseDrag={onMouseDrag}
       onMouseDragLocked={onMouseDragLocked}
       onMouseDragEnd={onMouseDragEnd}
+      onInputDown={!!props.disabled ? undefined : onInputDown}
+      onInputUp={!!props.disabled ? undefined : onInputUp}
+      onInputDrag={onInputDrag}
+      onInputDragLocked={onInputDragLocked}
+      onInputDragEnd={onInputDragEnd}
       uiTransform={uiTransformProps}
       uiText={textProps}
       uiBackground={uiBackgroundProps}
