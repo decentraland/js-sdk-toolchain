@@ -28,7 +28,7 @@ describe('UiDropdown React ECS', () => {
           }}
         />
         <Input onChange={() => {}} />
-        <Button uiTransform={{elementId: "ref"}} value="some value" onMouseDown={() => {}} onMouseUp={() => {}} />
+        <Button uiTransform={{ elementId: 'ref' }} value="some value" onMouseDown={() => {}} onMouseUp={() => {}} />
       </UiEntity>
     ))
 
