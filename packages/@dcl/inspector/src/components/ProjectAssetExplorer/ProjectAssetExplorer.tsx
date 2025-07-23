@@ -1,13 +1,14 @@
 import React from 'react'
 
+import { useAppSelector } from '../../redux/hooks'
+import { selectAssetCatalog, selectThumbnails } from '../../redux/app'
 import { useAssetTree } from '../../hooks/catalog/useAssetTree'
+
 import ProjectView from './ProjectView'
 
 import { AssetNodeFolder } from './types'
 
 import './ProjectAssetExplorer.css'
-import { useAppSelector } from '../../redux/hooks'
-import { selectAssetCatalog, selectThumbnails } from '../../redux/app'
 
 function ProjectAssetExplorer() {
   const files = useAppSelector(selectAssetCatalog) ?? { basePath: '', assets: [] }

@@ -26,22 +26,6 @@ const playModeOptions = [
   }
 ]
 
-enum VIDEO_SOURCE {
-  DCL_CAST = 'dcl-cast',
-  URL = 'url'
-}
-
-const videoSourceOptions = [
-  {
-    label: 'DCL Cast',
-    value: VIDEO_SOURCE.DCL_CAST
-  },
-  {
-    label: 'URL',
-    value: VIDEO_SOURCE.URL
-  }
-]
-
 const PlayVideoStreamAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
   const [payload, setPayload] = useState<Partial<ActionPayload<ActionType.PLAY_VIDEO_STREAM>>>({
     ...value
@@ -51,13 +35,6 @@ const PlayVideoStreamAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
     if (!recursiveCheck(payload, value, 2) || !isValid(payload)) return
     onUpdate(payload)
   }, [payload, onUpdate])
-
-  const handleChangeVideoSource = useCallback(
-    ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
-      setPayload({ ...payload, dclCast: value === VIDEO_SOURCE.DCL_CAST })
-    },
-    [payload, setPayload]
-  )
 
   const handleChangeSrc = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,41 +74,16 @@ const PlayVideoStreamAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
   return (
     <div className="PlayVideoStreamActionContainer">
       <Block>
+        <TextField label={<>URL {renderUrlInfo()}</>} value={payload.src} onChange={handleChangeSrc} autoSelect />
+      </Block>
+      <Block>
         <Dropdown
-          label="Video Source"
-          value={payload.dclCast ? VIDEO_SOURCE.DCL_CAST : VIDEO_SOURCE.URL}
-          options={videoSourceOptions}
-          onChange={handleChangeVideoSource}
-          info={
-            payload.dclCast && (
-              <>
-                DCL Cast only works when your scene is deployed to a World.{' '}
-                <a
-                  href="https://docs.decentraland.org/creator/development-guide/sdk7/video-playing/#streaming-using-decentraland-cast"
-                  target="_blank"
-                >
-                  Learn More
-                </a>
-              </>
-            )
-          }
+          label="Play Mode"
+          value={payload.loop ? PLAY_MODE.LOOP : PLAY_MODE.PLAY_ONCE}
+          options={playModeOptions}
+          onChange={handleChangePlayMode}
         />
       </Block>
-      {!payload.dclCast ? (
-        <>
-          <Block>
-            <TextField label={<>URL {renderUrlInfo()}</>} value={payload.src} onChange={handleChangeSrc} autoSelect />
-          </Block>
-          <Block>
-            <Dropdown
-              label="Play Mode"
-              value={payload.loop ? PLAY_MODE.LOOP : PLAY_MODE.PLAY_ONCE}
-              options={playModeOptions}
-              onChange={handleChangePlayMode}
-            />
-          </Block>
-        </>
-      ) : null}
       <Block>
         <RangeField
           label="Volume"

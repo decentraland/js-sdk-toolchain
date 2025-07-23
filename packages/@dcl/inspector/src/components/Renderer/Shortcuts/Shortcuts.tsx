@@ -83,7 +83,7 @@ const Shortcuts: React.FC<Props> = ({ canvas, onResetCamera, onZoomIn, onZoomOut
             <div className="Item">
               <div className="Title">Rotate Camera</div>
               <div className="Description">
-                <span className="Key">Left Mouse Button</span>+<span className="Key">Drag</span>
+                <span className="Key">Right Mouse Button</span>+<span className="Key">Drag</span>
               </div>
             </div>
             <div className="Item">

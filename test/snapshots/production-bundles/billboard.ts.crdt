@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=251.4k bytes
+SCENE_COMPILED_JS_SIZE_PROD=261.3k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -8,9 +8,9 @@ EVAL test/snapshots/production-bundles/billboard.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-  OPCODES ~= 71k
-  MALLOC_COUNT = 15726
-  ALIVE_OBJS_DELTA ~= 3.45k
+  OPCODES ~= 72k
+  MALLOC_COUNT = 16064
+  ALIVE_OBJS_DELTA ~= 3.52k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 4
@@ -50,7 +50,7 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x203 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
   Scene: PUT_COMPONENT e=0x204 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
   Scene: PUT_COMPONENT e=0x205 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
-  OPCODES ~= 112k
+  OPCODES ~= 113k
   MALLOC_COUNT = 57
   ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0.1)
@@ -77,4 +77,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 10k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1111.58k bytes
+  MEMORY_USAGE_COUNT ~= 1137.68k bytes

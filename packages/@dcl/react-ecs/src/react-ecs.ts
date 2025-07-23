@@ -82,4 +82,14 @@ export namespace ReactEcs {
     export interface Component {}
   }
   export const createElement = (React as any).createElement
+  type SetStateAction<T> = T | ((prevState: T) => T)
+  type Dispatch<T> = (action: SetStateAction<T>) => void
+  type StateHook = <T>(initialState: T | (() => T)) => [T, Dispatch<T>]
+
+  // Type for useEffect
+  type DependencyList = ReadonlyArray<any>
+  type EffectCallback = () => void | (() => void | undefined)
+  type EffectHook = (effect: EffectCallback, deps?: DependencyList) => void
+  export const useEffect: EffectHook = (React as any).useEffect
+  export const useState: StateHook = (React as any).useState
 }

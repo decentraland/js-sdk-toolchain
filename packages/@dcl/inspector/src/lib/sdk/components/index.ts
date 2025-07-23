@@ -10,7 +10,8 @@ import {
   Counter,
   CounterBar,
   AdminTools,
-  Rewards
+  Rewards,
+  VideoScreen
 } from '@dcl/asset-packs'
 import { Layout } from '../../utils/layout'
 import { GizmoType } from '../../utils/gizmo'
@@ -58,7 +59,8 @@ export enum EditorComponentNames {
   Tile = 'inspector::Tile',
   CustomAsset = 'inspector::CustomAsset',
   AdminTools = ComponentName.ADMIN_TOOLS,
-  Rewards = ComponentName.REWARDS
+  Rewards = ComponentName.REWARDS,
+  VideoScreen = ComponentName.VIDEO_SCREEN
 }
 
 export enum SceneAgeRating {
@@ -99,7 +101,7 @@ export type SceneComponent = {
   spawnPoints?: SceneSpawnPoint[]
 }
 
-const AllComponents = {
+export const AllComponents = {
   ...CoreComponents,
   ...EditorComponentNames
 }
@@ -159,6 +161,7 @@ export type EditorComponentsTypes = {
   Tile: TileComponent
   CustomAsset: CustomAssetComponent
   AdminTools: AdminTools
+  VideoScreen: VideoScreen
   Rewards: Rewards
 }
 
@@ -180,6 +183,7 @@ export type EditorComponents = {
   Tile: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Tile']>
   CustomAsset: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['CustomAsset']>
   AdminTools: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['AdminTools']>
+  VideoScreen: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['VideoScreen']>
   Rewards: LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Rewards']>
 }
 
@@ -329,7 +333,7 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     )
   })
 
-  const { ActionTypes, Actions, Counter, Triggers, States, CounterBar, AdminTools, Rewards } =
+  const { ActionTypes, Actions, Counter, Triggers, States, CounterBar, AdminTools, Rewards, VideoScreen } =
     createAssetPacksComponents(engine as any)
 
   const TransformConfig = engine.defineComponent(EditorComponentNames.TransformConfig, {
@@ -386,6 +390,9 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
       EditorComponentsTypes['CustomAsset']
     >,
     AdminTools: AdminTools as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['AdminTools']>,
+    VideoScreen: VideoScreen as unknown as LastWriteWinElementSetComponentDefinition<
+      EditorComponentsTypes['VideoScreen']
+    >,
     Rewards: Rewards as unknown as LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Rewards']>
   }
 }

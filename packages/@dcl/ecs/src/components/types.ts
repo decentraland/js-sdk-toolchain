@@ -3,6 +3,11 @@ export type { AudioSourceComponentDefinitionExtended } from './extended/AudioSou
 export type { AudioStreamComponentDefinitionExtended } from './extended/AudioStream'
 export type { MeshRendererComponentDefinitionExtended } from './extended/MeshRenderer'
 export type { MeshColliderComponentDefinitionExtended } from './extended/MeshCollider'
+export type {
+  AvatarEquippedDataComponentDefinitionExtended,
+  AvatarEquippedDataType
+} from './extended/AvatarEquippedData'
+export type { AvatarShapeComponentDefinitionExtended, AvatarShapeType } from './extended/AvatarShape'
 export type { TextureHelper, MaterialComponentDefinitionExtended } from './extended/Material'
 export type { TweenHelper, TweenComponentDefinitionExtended } from './extended/Tween'
 export type { CameraTransitionHelper, VirtualCameraComponentDefinitionExtended } from './extended/VirtualCamera'

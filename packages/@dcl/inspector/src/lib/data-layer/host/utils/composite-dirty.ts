@@ -9,7 +9,7 @@ import {
 } from '@dcl/ecs'
 import { initComponents } from '@dcl/asset-packs'
 import { EditorComponentNames, EditorComponents } from '../../../sdk/components'
-import { dumpEngineToComposite, dumpEngineToCrdtCommands } from './engine-to-composite'
+import { dumpEngineToComposite, dumpEngineToCrdtCommands, generateEntityNamesType } from './engine-to-composite'
 import { FileSystemInterface } from '../../types'
 import { CompositeManager, createFsCompositeProvider } from './fs-composite-provider'
 import { getMinimalComposite } from '../../client/feeded-local-fs'
@@ -20,6 +20,8 @@ import { bufferToScene } from '../scene'
 import { toSceneComponent } from './component'
 import { addNodesComponentsToPlayerAndCamera } from './migrations/add-nodes-to-player-and-camera'
 import { fixNetworkEntityValues } from './migrations/fix-network-entity-values'
+import { selectSceneEntity } from './migrations/select-scene-entity'
+import { DIRECTORY, withAssetDir } from '../fs-utils'
 
 enum DirtyEnum {
   // No changes
@@ -40,6 +42,8 @@ function runMigrations(engine: IEngine) {
   addNodesComponentsToPlayerAndCamera(engine)
   // Fix NetworkEntity values
   fixNetworkEntityValues(engine)
+  // Select Scene entity on startup
+  selectSceneEntity(engine)
 }
 
 async function instanciateComposite(fs: FileSystemInterface, engine: IEngine, path: string): Promise<CompositeManager> {
@@ -104,6 +108,9 @@ export async function compositeAndDirty(
       const mainCrdt = dumpEngineToCrdtCommands(engine)
       await fs.writeFile('main.crdt', Buffer.from(mainCrdt))
       await compositeProvider.save({ src: compositePath, composite }, 'json')
+
+      // Generate entity names type file
+      await generateEntityNamesType(engine, withAssetDir(DIRECTORY.SCENE + '/entity-names.ts'), 'EntityNames', fs)
 
       return composite
     } catch (e) {

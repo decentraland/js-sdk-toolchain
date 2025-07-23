@@ -3,13 +3,10 @@ import React, { useCallback, useMemo } from 'react'
 import { withSdk } from '../../../../hoc/withSdk'
 import { useComponentValue } from '../../../../hooks/sdk/useComponentValue'
 
-import { Block } from '../../../Block'
 import { Accordion } from '../../../ui'
 
-import { RewardsControl } from '../../AdminToolkitView/RewardsControl'
 import { VideoControl } from '../../AdminToolkitView/VideoControl'
 import { SmartItemControl } from '../../AdminToolkitView/SmartItemControl'
-import { AdminAllowListControl } from '../../AdminToolkitView/AdminAllowListControl'
 import { TextAnnouncementControl } from '../../AdminToolkitView/TextAnnouncementControl'
 
 import { type Props } from '../../AdminToolkitView/types'
@@ -22,12 +19,7 @@ const AdminToolsBasicView = withSdk<Props>(({ sdk, entity }) => {
 
   const handleToggleEnabled = useCallback(
     (
-      control:
-        | 'videoControl'
-        | 'moderationControl'
-        | 'textAnnouncementControl'
-        | 'rewardsControl'
-        | 'smartItemsControl',
+      control: 'videoControl' | 'textAnnouncementControl' | 'rewardsControl' | 'smartItemsControl',
       enabled: boolean
     ) => {
       if (!adminComponent) return
@@ -47,19 +39,6 @@ const AdminToolsBasicView = withSdk<Props>(({ sdk, entity }) => {
 
   return (
     <div className="AdminToolsBasicViewInspector">
-      <Block>
-        <AdminAllowListControl entity={entity} />
-      </Block>
-
-      <Accordion
-        label="VIDEO CONTROL"
-        className="PanelSection border"
-        enabled={!!adminComponent.videoControl?.isEnabled}
-        onToggleEnabled={(enabled) => handleToggleEnabled('videoControl', enabled)}
-      >
-        <VideoControl entity={entity} />
-      </Accordion>
-
       <Accordion
         label="TEXT ANNOUNCEMENTS"
         className="PanelSection border"
@@ -68,7 +47,14 @@ const AdminToolsBasicView = withSdk<Props>(({ sdk, entity }) => {
       >
         <TextAnnouncementControl entity={entity} />
       </Accordion>
-
+      <Accordion
+        label="VIDEO SCREENS"
+        className="PanelSection border"
+        enabled={!!adminComponent.videoControl?.isEnabled}
+        onToggleEnabled={(enabled) => handleToggleEnabled('videoControl', enabled)}
+      >
+        <VideoControl entity={entity} />
+      </Accordion>
       <Accordion
         label="SMART ITEM ACTIONS"
         className="PanelSection border"

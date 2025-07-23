@@ -146,8 +146,20 @@ export const enum AvatarControlType {
 // @public (undocumented)
 export const AvatarEmoteCommand: GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>;
 
+// Warning: (ae-missing-release-tag) "AvatarEquippedData" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const AvatarEquippedData: LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>;
+export const AvatarEquippedData: AvatarEquippedDataComponentDefinitionExtended;
+
+// @public (undocumented)
+export type AvatarEquippedDataComponentDefinitionExtended = LastWriteWinElementSetComponentDefinition<AvatarEquippedDataType>;
+
+// Warning: (ae-missing-release-tag) "AvatarEquippedDataType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type AvatarEquippedDataType = Omit<PBAvatarEquippedData, 'forceRender'> & {
+    forceRender?: string[] | undefined;
+};
 
 // @public (undocumented)
 export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>;
@@ -180,8 +192,20 @@ export namespace AvatarMovementSettings {
     export function encode(message: AvatarMovementSettings, writer?: _m0.Writer): _m0.Writer;
 }
 
+// Warning: (ae-missing-release-tag) "AvatarShape" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const AvatarShape: LastWriteWinElementSetComponentDefinition<PBAvatarShape>;
+export const AvatarShape: AvatarShapeComponentDefinitionExtended;
+
+// @public (undocumented)
+export type AvatarShapeComponentDefinitionExtended = LastWriteWinElementSetComponentDefinition<AvatarShapeType>;
+
+// Warning: (ae-missing-release-tag) "AvatarShapeType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type AvatarShapeType = Omit<PBAvatarShape, 'forceRender'> & {
+    forceRender?: string[] | undefined;
+};
 
 // @public (undocumented)
 export interface AvatarTexture {
@@ -239,6 +263,18 @@ export const enum BillboardMode {
     BM_Y = 2,
     // (undocumented)
     BM_Z = 4
+}
+
+// @public
+export interface BorderRadius {
+    // (undocumented)
+    bottomLeft: PositionUnit;
+    // (undocumented)
+    bottomRight: PositionUnit;
+    // (undocumented)
+    topLeft: PositionUnit;
+    // (undocumented)
+    topRight: PositionUnit;
 }
 
 // @public (undocumented)
@@ -1336,8 +1372,9 @@ export interface IEngine {
     getComponent<T>(componentId: number | string): ComponentDefinition<T>;
     getComponentOrNull<T>(componentId: number | string): ComponentDefinition<T> | null;
     getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
+    getEntityByName<T = never, K = T>(value: K & (T extends never ? never : string)): Entity;
     // @alpha
-    getEntityOrNullByName(label: string): Entity | null;
+    getEntityOrNullByName<T = string>(label: T): Entity | null;
     getEntityState(entity: Entity): EntityState;
     // (undocumented)
     _id: number;
@@ -2336,6 +2373,7 @@ export namespace PBAvatarEmoteCommand {
 export interface PBAvatarEquippedData {
     // (undocumented)
     emoteUrns: string[];
+    forceRender: string[];
     // (undocumented)
     wearableUrns: string[];
 }
@@ -2373,6 +2411,7 @@ export interface PBAvatarShape {
     expressionTriggerId?: string | undefined;
     expressionTriggerTimestamp?: number | undefined;
     eyeColor?: PBColor3 | undefined;
+    forceRender: string[];
     hairColor?: PBColor3 | undefined;
     id: string;
     name?: string | undefined;
@@ -3067,7 +3106,6 @@ export namespace PBPosition {
 
 // @public (undocumented)
 export interface PBPrimaryPointerInfo {
-    // (undocumented)
     pointerType?: PointerType | undefined;
     screenCoordinates?: PBVector2 | undefined;
     screenDelta?: PBVector2 | undefined;
@@ -3153,19 +3191,12 @@ export namespace PBRaycastResult {
 
 // @public (undocumented)
 export interface PBRealmInfo {
-    // (undocumented)
     baseUrl: string;
-    // (undocumented)
     commsAdapter: string;
-    // (undocumented)
     isConnectedSceneRoom?: boolean | undefined;
-    // (undocumented)
     isPreview: boolean;
-    // (undocumented)
     networkId: number;
-    // (undocumented)
     realmName: string;
-    // (undocumented)
     room?: string | undefined;
 }
 
@@ -3239,6 +3270,7 @@ export interface PBTextureCamera {
         $case: "orthographic";
         orthographic: Orthographic;
     } | undefined;
+    volume?: number | undefined;
     width?: number | undefined;
 }
 
@@ -3480,6 +3512,37 @@ export interface PBUiTransform {
     alignContent?: YGAlign | undefined;
     alignItems?: YGAlign | undefined;
     alignSelf: YGAlign;
+    // (undocumented)
+    borderBottomColor?: PBColor4 | undefined;
+    // (undocumented)
+    borderBottomLeftRadius?: number | undefined;
+    borderBottomLeftRadiusUnit?: YGUnit | undefined;
+    // (undocumented)
+    borderBottomRightRadius?: number | undefined;
+    borderBottomRightRadiusUnit?: YGUnit | undefined;
+    // (undocumented)
+    borderBottomWidth?: number | undefined;
+    borderBottomWidthUnit?: YGUnit | undefined;
+    // (undocumented)
+    borderLeftColor?: PBColor4 | undefined;
+    // (undocumented)
+    borderLeftWidth?: number | undefined;
+    borderLeftWidthUnit?: YGUnit | undefined;
+    // (undocumented)
+    borderRightColor?: PBColor4 | undefined;
+    // (undocumented)
+    borderRightWidth?: number | undefined;
+    borderRightWidthUnit?: YGUnit | undefined;
+    borderTopColor?: PBColor4 | undefined;
+    // (undocumented)
+    borderTopLeftRadius?: number | undefined;
+    borderTopLeftRadiusUnit?: YGUnit | undefined;
+    // (undocumented)
+    borderTopRightRadius?: number | undefined;
+    borderTopRightRadiusUnit?: YGUnit | undefined;
+    // (undocumented)
+    borderTopWidth?: number | undefined;
+    borderTopWidthUnit?: YGUnit | undefined;
     display: YGDisplay;
     elementId?: string | undefined;
     // (undocumented)
@@ -3823,9 +3886,7 @@ export const PointerLock: LastWriteWinElementSetComponentDefinition<PBPointerLoc
 
 // @public (undocumented)
 export const enum PointerType {
-    // (undocumented)
     POT_MOUSE = 1,
-    // (undocumented)
     POT_NONE = 0,
     // (undocumented)
     POT_PAD = 2,
@@ -4085,6 +4146,16 @@ export interface ReactBasedUiSystem {
 // @public (undocumented)
 export namespace ReactEcs {
     // (undocumented)
+    export type DependencyList = ReadonlyArray<any>;
+    const // (undocumented)
+    createElement: any;
+    // (undocumented)
+    export type Dispatch<T> = (action: SetStateAction<T>) => void;
+    // (undocumented)
+    export type EffectCallback = () => void | (() => void | undefined);
+    // (undocumented)
+    export type EffectHook = (effect: EffectCallback, deps?: DependencyList) => void;
+    // (undocumented)
     export namespace JSX {
         export interface Component {
         }
@@ -4096,8 +4167,15 @@ export namespace ReactEcs {
         // (undocumented)
         export type ReactNode = Element | ReactElement | string | number | boolean | null | undefined | ReactNode[];
     }
+    // (undocumented)
+    export type SetStateAction<T> = T | ((prevState: T) => T);
+    // (undocumented)
+    export type StateHook = <T>(initialState: T | (() => T)) => [T, Dispatch<T>];
     const // (undocumented)
-    createElement: any;
+    useEffect: EffectHook;
+    const // (undocumented)
+    useState: StateHook;
+        {};
 }
 
 // Warning: (tsdoc-at-sign-in-word) The "@" character looks like part of a TSDoc tag; use a backslash to escape it
@@ -4802,6 +4880,12 @@ export interface UiTransformProps {
     alignContent?: AlignType;
     alignItems?: AlignType;
     alignSelf?: AlignType;
+    // (undocumented)
+    borderColor?: Record<keyof Partial<Position>, PBColor4> | PBColor4 | undefined;
+    // (undocumented)
+    borderRadius?: Partial<BorderRadius> | PositionUnit;
+    // (undocumented)
+    borderWidth?: Partial<Position> | PositionUnit;
     display?: DisplayType;
     elementId?: string;
     flex?: number;

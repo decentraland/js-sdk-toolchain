@@ -8,11 +8,12 @@ export type Props = Omit<TextFieldProps, 'accept' | 'type' | 'onDrop'> & {
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
   isValidFile?: (node: TreeNode) => boolean
   showPreview?: boolean
+  acceptURLs?: boolean
 }
 
 export const ACCEPTED_FILE_TYPES = {
   model: ['.gltf', '.glb'],
-  image: ['.png'],
+  image: ['.png', '.jpg', '.jpeg'],
   audio: ['.mp3', '.wav', '.ogg'],
   video: ['.mp4']
 }

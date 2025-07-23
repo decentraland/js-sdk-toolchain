@@ -91,6 +91,7 @@ const TriggerActionContainer: React.FC<WithSdkProps & Props> = ({ sdk, ...props 
                 disabled={!action.id || !availableActions.get(action.id)}
                 options={action.id && availableActions.get(action.id)?.actions ? [...actions] : []}
                 value={action.name}
+                searchable
                 onChange={(e) => handleChangeAction(e, idx)}
               />
             </div>
