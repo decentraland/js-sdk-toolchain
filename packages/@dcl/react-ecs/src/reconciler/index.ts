@@ -324,11 +324,13 @@ export function createReconciler(
           continue
         }
         if (isListener(keyTyped)) {
-          upsertListener(instance, {
-            type: 'add',
-            props: props[keyTyped],
-            component: keyTyped
-          })
+          if (props[keyTyped] !== undefined) {
+            upsertListener(instance, {
+              type: 'add',
+              props: props[keyTyped],
+              component: keyTyped
+            })
+          }
         } else {
           upsertComponent(instance, props[keyTyped], keyTyped)
         }

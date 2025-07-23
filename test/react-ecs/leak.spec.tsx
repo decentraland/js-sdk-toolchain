@@ -28,22 +28,20 @@ describe('UiDropdown React ECS', () => {
           }}
         />
         <Input onChange={() => {}} />
-        <Button uiTransform={{ elementId: 'ref' }} value="some value" onMouseDown={() => {}} onMouseUp={() => {}} />
+        <Button value="some value" onMouseDown={() => {}} onMouseUp={() => {}} />
       </UiEntity>
     ))
 
     await engine.update(1)
 
     // after update, there should be only one pointer event per eventType and button
-    for (const [_entity, uiTransform, pe] of engine.getEntitiesWith(UiTransform, PointerEvents)) {
-      if (uiTransform.elementId === 'ref') {
-        expect(pe).toEqual({
-          pointerEvents: [
-            { eventType: 1, eventInfo: { button: 0, showFeedback: true } },
-            { eventType: 0, eventInfo: { button: 0, showFeedback: true } }
-          ]
-        })
-      }
+    for (const [_entity, pe] of engine.getEntitiesWith(UiTransform, PointerEvents)) {
+      expect(pe).toEqual({
+        pointerEvents: [
+          { eventType: 1, eventInfo: { button: 0, showFeedback: true } },
+          { eventType: 0, eventInfo: { button: 0, showFeedback: true } }
+        ]
+      })
     }
 
     // the leak happened after the second update
