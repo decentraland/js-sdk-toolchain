@@ -1,0 +1,408 @@
+import {
+  IEngine,
+  Transform,
+  NetworkEntity,
+  NetworkParent,
+  SyncComponents,
+  EngineInfo,
+  CrdtMessage,
+  Entity,
+  Engine,
+} from '../../../packages/@dcl/ecs/dist'
+import * as components from '../../../packages/@dcl/ecs/src/components'
+import { addSyncTransport } from '../../../packages/@dcl/sdk/network/message-bus-sync'
+import { CommsMessage, encodeString } from '../../../packages/@dcl/sdk/network/binary-message-bus'
+import { createRendererTransport } from '../../../packages/@dcl/sdk/internal/transports/rendererTransport'
+import { ReadWriteByteBuffer } from '../../../packages/@dcl/ecs/src/serialization/ByteBuffer'
+import { readMessage } from '../../../packages/@dcl/ecs/src/serialization/crdt/message'
+import { SendBinaryRequest, SendBinaryResponse } from '~system/CommunicationsController'
+
+function defineComponents(engine: IEngine) {
+  return {
+    Transform: components.Transform(engine as any) as any as typeof Transform,
+    NetworkEntity: components.NetworkEntity(engine as any) as any as typeof NetworkEntity,
+    NetworkParent: components.NetworkParent(engine as any) as any as typeof NetworkParent,
+    SyncComponents: components.SyncComponents(engine as any) as any as typeof SyncComponents,
+    EngineInfo: components.EngineInfo(engine as any) as any as typeof EngineInfo
+  }
+}
+
+describe('Server-Client Connectivity', () => {
+  // Create 3 engines: 2 clients + 1 server
+  const clientEngineA = Engine()
+  const clientEngineB = Engine()
+  const serverEngine = Engine()
+  
+  const interceptedMessages: any[] = []
+
+  function intercept(data: Uint8Array, direction: string) {
+    const buffer = new ReadWriteByteBuffer(data, 0)
+    let msg: CrdtMessage | null
+    while ((msg = readMessage(buffer))) {
+      interceptedMessages.push({
+        ...msg,
+        direction
+      })
+    }
+  }
+
+  async function tick() {
+    // Tick all engines together (clients + server)
+    await Promise.all([
+      clientEngineA.update(1), 
+      clientEngineB.update(1),
+      serverEngine.update(1)
+    ])
+  }
+
+  // Define components on all engines first
+  const componentsA = defineComponents(clientEngineA)
+  const componentsB = defineComponents(clientEngineB)
+  const serverComponents = defineComponents(serverEngine)
+
+  // Renderer transports (for debugging/verification)
+  const sendBatchA = {
+    crdtSendToRenderer: async (msg: { data: Uint8Array }) => {
+      intercept(msg.data, 'clientA->renderer')
+      return { data: [] }
+    }
+  }
+  const sendBatchB = {
+    crdtSendToRenderer: async (msg: { data: Uint8Array }) => {
+      intercept(msg.data, 'clientB->renderer')
+      return { data: [] }
+    }
+  }
+  clientEngineA.addTransport(createRendererTransport(sendBatchA))
+  clientEngineB.addTransport(createRendererTransport(sendBatchB))
+
+  // Message queues for each participant
+  const messageQueues = {
+    clientA: [] as Uint8Array[],
+    clientB: [] as Uint8Array[],
+    'authorative-server': [] as Uint8Array[]
+  }
+
+  // Common routing function - routes message and tags with sender info
+  function routeMessage(data: Uint8Array, addresses: string[], sender: string) {
+    console.log(`Routing message from ${sender} to addresses: [${addresses.join(', ')}]`)
+    
+    // Create message with sender information
+    const senderBytes = encodeString(sender)
+    const messageWithSender = new Uint8Array(data.byteLength + senderBytes.byteLength + 1)
+    messageWithSender.set(new Uint8Array([senderBytes.byteLength]), 0)
+    messageWithSender.set(senderBytes, 1)
+    messageWithSender.set(data, senderBytes.byteLength + 1)
+    
+    // Determine targets based on client-server architecture rules
+    let targets: string[] = []
+    
+    if (sender === 'authorative-server') {
+      // Server can send to specific clients or broadcast to all clients
+      targets = addresses.length === 0 
+        ? ['clientA', 'clientB'] // Broadcast to all clients
+        : addresses.filter(addr => addr !== 'authorative-server') // Only to specified clients, exclude server
+    } else {
+      // Clients can only send to server
+      targets = ['authorative-server']
+    }
+    
+    console.log(`Targets: [${targets.join(', ')}]`)
+    
+    // Route to all targets
+    for (const target of targets) {
+      if (target in messageQueues) {
+        messageQueues[target as keyof typeof messageQueues].push(messageWithSender)
+        
+        // Intercept for debugging
+        const messageType = data.subarray(0, 1)[0]
+        if (messageType === CommsMessage.CRDT) {
+          const crdtMessage = data.subarray(1)
+          intercept(crdtMessage, `${sender}->${target}`)
+        }
+      }
+    }
+  }
+
+  // Client A sendBinary
+  const sendBinaryClientA: (msg: SendBinaryRequest) => Promise<SendBinaryResponse> = async (msg) => {    
+    // Route A's messages using peerData addresses
+    for (const peerData of msg.peerData) {
+      for (const data of peerData.data) {
+        routeMessage(data, peerData.address, 'clientA')
+      }
+    }
+    
+    // Return messages queued for ClientA (already tagged with sender info)
+    const response = [...messageQueues.clientA]
+    messageQueues.clientA.length = 0
+    return { data: response }
+  }
+
+  // Client B sendBinary
+  const sendBinaryClientB: (msg: SendBinaryRequest) => Promise<SendBinaryResponse> = async (msg) => {
+    // Route B's messages using peerData addresses
+    for (const peerData of msg.peerData) {
+      for (const data of peerData.data) {
+        routeMessage(data, peerData.address, 'clientB')
+      }
+    }
+    
+    // Return messages queued for ClientB (already tagged with sender info)
+    const response = [...messageQueues.clientB]
+    messageQueues.clientB.length = 0
+    return { data: response }
+  }
+
+  // Server sendBinary
+  const sendBinaryServer: (msg: SendBinaryRequest) => Promise<SendBinaryResponse> = async (msg) => {
+    console.log(`Server sending`)
+    
+    // Route server's messages using peerData addresses
+    for (const peerData of msg.peerData) {
+      for (const data of peerData.data) {
+        routeMessage(data, peerData.address, 'authorative-server')
+      }
+    }
+    
+    // Return messages queued for Server (already tagged with sender info)
+    const response = [...messageQueues['authorative-server']]
+    messageQueues['authorative-server'].length = 0
+    return { data: response }
+  }
+
+  // Mock isServer functions
+  const mockIsServerClient = async () => ({ isServer: false })
+  const mockIsServerServer = async () => ({ isServer: true })
+
+  // Initialize sync transports
+  const syncA = addSyncTransport(clientEngineA, sendBinaryClientA, async () => ({
+    data: { userId: 'clientA', version: 1, displayName: 'Client A', hasConnectedWeb3: true, avatar: undefined }
+  }), mockIsServerClient, 'clientA') // clientA is not a server
+  
+  const syncB = addSyncTransport(clientEngineB, sendBinaryClientB, async () => ({
+    data: { userId: 'clientB', version: 1, displayName: 'Client B', hasConnectedWeb3: true, avatar: undefined }
+  }), mockIsServerClient, 'clientB') // clientB is not a server
+
+  // Server sync transport - configured to run in server mode
+  const syncServer = addSyncTransport(serverEngine, sendBinaryServer, async () => ({
+    data: { userId: 'authorative-server', version: 1, displayName: 'Server', hasConnectedWeb3: true, avatar: undefined }
+  }), mockIsServerServer, 'server') // server is a server
+
+  let testEntity: Entity
+
+  it('should initialize all engines', async () => {
+    // Set up engine info for all engines
+    componentsA.EngineInfo.create(clientEngineA.RootEntity, { tickNumber: 400, frameNumber: 400, totalRuntime: 1 })
+    componentsB.EngineInfo.create(clientEngineB.RootEntity, { tickNumber: 400, frameNumber: 400, totalRuntime: 1 })
+    serverComponents.EngineInfo.create(serverEngine.RootEntity, { tickNumber: 400, frameNumber: 400, totalRuntime: 1 })
+
+    // Initial sync dance
+    await tick()
+    await tick()
+    await tick()
+    
+    console.log(`After initialization: intercepted ${interceptedMessages.length} messages`)
+    console.log(`Initialized transports: clientA=${syncA.myProfile.userId}, clientB=${syncB.myProfile.userId}, server=${syncServer.myProfile.userId}`)
+    interceptedMessages.length = 0
+  })
+
+  it('should create a sync entity in Client A and propagate to Client B via server', async () => {
+    console.log('=== Testing Client A -> Server -> Client B ===')
+    
+    // Client A creates entity
+    testEntity = clientEngineA.addEntity()
+    componentsA.Transform.create(testEntity, { position: { x: 10, y: 20, z: 30 } })
+    
+    console.log(`ClientA created entity ${testEntity} with Transform at (10, 20, 30)`)
+    
+    syncA.syncEntity(testEntity, [componentsA.Transform.componentId])
+        
+    // First tick: ClientA sends messages to server
+    await tick()
+    console.log(`After first tick: intercepted ${interceptedMessages.length} messages`)
+    console.log(`MessageQueues after first tick:`, {
+      clientA: messageQueues.clientA.length,
+      clientB: messageQueues.clientB.length,
+      server: messageQueues['authorative-server'].length
+    })
+    
+    // Second tick: Server processes and forwards to ClientB
+    await tick()
+    console.log(`After second tick: intercepted ${interceptedMessages.length} messages`)
+    console.log(`MessageQueues after second tick:`, {
+      clientA: messageQueues.clientA.length,
+      clientB: messageQueues.clientB.length,
+      server: messageQueues['authorative-server'].length
+    })
+    // Third tick: ClientB processes messages
+    await tick()
+    await tick()
+    console.log(`After third tick: intercepted ${interceptedMessages.length} messages`)
+    console.log(`MessageQueues after third tick:`, {
+      clientA: messageQueues.clientA.length,
+      clientB: messageQueues.clientB.length,
+      server: messageQueues['authorative-server'].length
+    })
+    // Check that Client B received the entity
+    const transformsInB = Array.from(clientEngineB.getEntitiesWith(componentsB.Transform))
+    console.log(`ClientB has ${transformsInB.length} entities with Transform`)
+    
+    if (transformsInB.length > 0) {
+      const [entityB, transformB] = transformsInB[0] as [Entity, any]
+      console.log(`ClientB entity ${entityB} has Transform:`, transformB)
+      
+      expect(transformB.position).toMatchObject({ x: 10, y: 20, z: 30 })
+      
+      // Verify it's a network entity
+      expect(componentsB.NetworkEntity.has(entityB)).toBe(true)
+      const networkData = componentsB.NetworkEntity.get(entityB)
+      console.log(`ClientB network data:`, networkData)
+      
+      expect(networkData.entityId).toBe(testEntity)
+      expect(networkData.networkId).toBe(syncA.myProfile.networkId)
+    }
+    
+    expect(transformsInB.length).toBe(1)
+    
+    interceptedMessages.length = 0
+  })
+
+  it('should handle bidirectional communication: Client B modifies -> Client A receives', async () => {
+    console.log('=== Testing Client B -> Server -> Client A ===')
+    
+    // Get the entity in Client B
+    const [entityB] = Array.from(clientEngineB.getEntitiesWith(componentsB.Transform))[0] as [Entity, any]
+    
+    // Client B modifies the entity
+    componentsB.Transform.getMutable(entityB).position.x = 100
+    console.log(`ClientB modified entity ${entityB} position.x to 100`)
+    
+    await tick()
+    await tick()
+    await tick()
+    await tick()
+    
+    console.log(`After modification tick: intercepted ${interceptedMessages.length} messages`)
+    
+    // Check that Client A received the update
+    const transformA = componentsA.Transform.get(testEntity)
+    console.log(`ClientA entity ${testEntity} now has position:`, transformA.position)
+    
+    expect(transformA.position.x).toBe(100)
+    expect(transformA.position.y).toBe(20) // Should remain unchanged
+    expect(transformA.position.z).toBe(30) // Should remain unchanged
+  })
+
+  it('should handle server-initiated transform updates to both clients', async () => {
+    console.log('=== Testing Server -> Both Clients ===')
+    interceptedMessages.length = 0
+    
+    // Server creates and modifies an entity
+    const serverEntity = serverEngine.addEntity()
+    serverComponents.Transform.create(serverEntity, { position: { x: 500, y: 600, z: 700 } })
+    
+    console.log(`Server created entity ${serverEntity} with Transform at (500, 600, 700)`)
+    
+    // Server syncs the entity (simulating server-side entity creation)
+    syncServer.syncEntity(serverEntity, [serverComponents.Transform.componentId])
+    
+    // Let the messages propagate through the system
+    await tick() // Server sends to clients
+    await tick() // Clients process messages
+    await tick() // Final processing
+    await tick() // Extra tick for safety
+    
+    console.log(`After server update: intercepted ${interceptedMessages.length} messages`)
+    
+    // Verify Client A received the server entity
+    const transformsInA = Array.from(clientEngineA.getEntitiesWith(componentsA.Transform))
+    const serverEntityInA = transformsInA.find(([_, transform]) => 
+      transform.position.x === 500 && transform.position.y === 600 && transform.position.z === 700
+    )
+    
+    console.log(`ClientA has ${transformsInA.length} entities with Transform`)
+    if (serverEntityInA) {
+      const [entityIdA, transformA] = serverEntityInA
+      console.log(`ClientA entity ${entityIdA} has server Transform:`, transformA)
+      expect(transformA.position).toMatchObject({ x: 500, y: 600, z: 700 })
+      
+      // Verify it's recognized as a network entity
+      expect(componentsA.NetworkEntity.has(entityIdA)).toBe(true)
+      const networkDataA = componentsA.NetworkEntity.get(entityIdA)
+      expect(networkDataA.entityId).toBe(serverEntity)
+      expect(networkDataA.networkId).toBe(syncServer.myProfile.networkId)
+    }
+    
+    // Verify Client B received the server entity
+    const transformsInB = Array.from(clientEngineB.getEntitiesWith(componentsB.Transform))
+    const serverEntityInB = transformsInB.find(([_, transform]) => 
+      transform.position.x === 500 && transform.position.y === 600 && transform.position.z === 700
+    )
+    
+    console.log(`ClientB has ${transformsInB.length} entities with Transform`)
+    if (serverEntityInB) {
+      const [entityIdB, transformB] = serverEntityInB
+      console.log(`ClientB entity ${entityIdB} has server Transform:`, transformB)
+      expect(transformB.position).toMatchObject({ x: 500, y: 600, z: 700 })
+      
+      // Verify it's recognized as a network entity
+      expect(componentsB.NetworkEntity.has(entityIdB)).toBe(true)
+      const networkDataB = componentsB.NetworkEntity.get(entityIdB)
+      expect(networkDataB.entityId).toBe(serverEntity)
+      expect(networkDataB.networkId).toBe(syncServer.myProfile.networkId)
+    }
+    
+    expect(serverEntityInA).toBeTruthy()
+    expect(serverEntityInB).toBeTruthy()
+    
+    // Now server updates the transform
+    console.log('Server updating transform position...')
+    serverComponents.Transform.getMutable(serverEntity).position = { x: 800, y: 900, z: 1000 }
+    
+    // Let the update propagate
+    await tick()
+    await tick()
+    await tick()
+    await tick()
+    
+    console.log(`After server transform update: intercepted ${interceptedMessages.length} messages`)
+    
+    // Verify both clients received the update
+    if (serverEntityInA) {
+      const [entityIdA] = serverEntityInA
+      const updatedTransformA = componentsA.Transform.get(entityIdA)
+      console.log(`ClientA updated transform:`, updatedTransformA)
+      expect(updatedTransformA.position).toMatchObject({ x: 800, y: 900, z: 1000 })
+    }
+    
+    if (serverEntityInB) {
+      const [entityIdB] = serverEntityInB
+      const updatedTransformB = componentsB.Transform.get(entityIdB)
+      console.log(`ClientB updated transform:`, updatedTransformB)
+      expect(updatedTransformB.position).toMatchObject({ x: 800, y: 900, z: 1000 })
+    }
+    
+    console.log('Server transform update successfully received by both clients')
+  })
+
+  it('should verify no direct client-to-client communication', async () => {
+    console.log('=== Verifying Server-Mediated Communication ===')
+    console.log(`Server profile: ${syncServer.myProfile.userId}`)
+    
+    // All messages should go through server
+    const directMessages = interceptedMessages.filter(msg => 
+      (msg.direction === 'clientA->clientB') || (msg.direction === 'clientB->clientA')
+    )
+    
+    expect(directMessages.length).toBe(0)
+    
+    // Should have server-mediated messages
+    const serverMessages = interceptedMessages.filter(msg => 
+      msg.direction.includes('server')
+    )
+    
+    console.log(`Found ${serverMessages.length} server-mediated messages`)
+    expect(serverMessages.length).toBeGreaterThan(0)
+  })
+})
