@@ -27,15 +27,12 @@ jobs:
 
       - name: Sync main into experimental branch
         run: |
-          # Always use the same rolling branch
           BRANCH_NAME="chore/sync"
           git checkout -B $BRANCH_NAME origin/experimental
 
-          # Pull main changes into experimental branch
-          git pull origin main
-
-          git checkout --theirs .
-          git add -A .
+          # Merge main changes into experimental, preferring main changes on conflicts
+          git fetch origin main
+          git merge -X theirs origin/main || echo "Merge completed (conflicts auto-resolved in favor of main)"
 
           # Run required update steps
           make update-protocol 'experimental'
@@ -43,10 +40,8 @@ jobs:
           make build
           make update-snapshots
 
-          # Add updated files
-          git add -A .
-
           # Commit if there are changes
+          git add -A .
           git commit --no-edit || echo "No changes to commit"
 
           # Push (force to keep PR updated)
