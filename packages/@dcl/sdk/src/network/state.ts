@@ -24,7 +24,7 @@ import {
   UiText,
   UiTransform
 } from '@dcl/ecs'
-import { LIVEKIT_MAX_SIZE } from '@dcl/ecs/dist/systems/crdt'
+import { LIVEKIT_MAX_SIZE } from './server'
 
 export const NOT_SYNC_COMPONENTS = [
   VideoEvent,
