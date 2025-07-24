@@ -71,9 +71,15 @@ describe('Network Parenting', () => {
     return { data: messages }
   }
 
-  const NetworkUtils = addSyncTransport(engineA, sendBinaryA, async () => ({
-    data: { userId: 'A', version: 1, displayName: '1', hasConnectedWeb3: true, avatar: undefined }
-  }))
+  const NetworkUtils = addSyncTransport(
+    engineA,
+    sendBinaryA,
+    async () => ({
+      data: { userId: 'A', version: 1, displayName: '1', hasConnectedWeb3: true, avatar: undefined }
+    }),
+    async () => ({ isServer: false }),
+    'A'
+  )
 
   const Cube = engineA.defineComponent('cube', {})
   const CUBES_LENGTH = 320

@@ -47,6 +47,7 @@ function getBinaryCompositeFrom(globPath: string, cwd: string) {
 function getStateAsString(engine: IEngine) {
   const state: Record<string, Record<string, any>> = {}
   for (const comp of engine.componentsIter()) {
+    console.log('[BOEDO]', comp.componentName)
     const componentData: Record<string, any> = {}
     for (const [entity, value] of comp.iterator()) {
       componentData[entity] = value

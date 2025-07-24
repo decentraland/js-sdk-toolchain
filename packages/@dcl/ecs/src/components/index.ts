@@ -99,7 +99,6 @@ export const SyncComponents: (
 /**
  * @alpha
  */
-/* @__PURE__ */
 export const NetworkEntity: (
   engine: Pick<IEngine, 'defineComponent'>
 ) => LastWriteWinElementSetComponentDefinition<INetowrkEntityType> = (engine) => defineNetworkEntity(engine)
@@ -107,7 +106,6 @@ export const NetworkEntity: (
 /**
  * @alpha
  */
-/* @__PURE__ */
 export const NetworkParent: (
   engine: Pick<IEngine, 'defineComponent'>
 ) => LastWriteWinElementSetComponentDefinition<INetowrkParentType> = (engine) => defineNetworkParent(engine)

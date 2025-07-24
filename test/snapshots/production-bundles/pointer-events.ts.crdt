@@ -1,4 +1,16 @@
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=216.5k bytes
+=======
+<<<<<<< HEAD
+SCENE_COMPILED_JS_SIZE_PROD=208k bytes
+=======
+<<<<<<< HEAD
+SCENE_COMPILED_JS_SIZE_PROD=205.2k bytes
+=======
+SCENE_COMPILED_JS_SIZE_PROD=202.4k bytes
+>>>>>>> 99d394c1 (update snapshots)
+>>>>>>> c50aee8d (update snapshots)
+>>>>>>> 9f5e0f01 (update snapshots)
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -8,9 +20,26 @@ EVAL test/snapshots/production-bundles/pointer-events.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
+<<<<<<< HEAD
   OPCODES ~= 64k
   MALLOC_COUNT = 13109
   ALIVE_OBJS_DELTA ~= 2.92k
+=======
+<<<<<<< HEAD
+  OPCODES ~= 58k
+<<<<<<< HEAD
+  MALLOC_COUNT = 12603
+  ALIVE_OBJS_DELTA ~= 2.80k
+=======
+  MALLOC_COUNT = 12480
+  ALIVE_OBJS_DELTA ~= 2.77k
+=======
+  OPCODES ~= 49k
+  MALLOC_COUNT = 12135
+  ALIVE_OBJS_DELTA ~= 2.68k
+>>>>>>> 99d394c1 (update snapshots)
+>>>>>>> c50aee8d (update snapshots)
+>>>>>>> 9f5e0f01 (update snapshots)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -28,9 +57,9 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   Scene: PUT_COMPONENT e=0x201 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   Scene: PUT_COMPONENT e=0x202 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  OPCODES ~= 23k
-  MALLOC_COUNT = 37
-  ALIVE_OBJS_DELTA ~= 0.01k
+  OPCODES ~= 22k
+  MALLOC_COUNT = 39
+  ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0.1)
   OPCODES ~= 1k
   MALLOC_COUNT = 0
@@ -43,4 +72,16 @@ CALL onUpdate(0.1)
   OPCODES ~= 1k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 937.55k bytes
+=======
+<<<<<<< HEAD
+  MEMORY_USAGE_COUNT ~= 904.81k bytes
+=======
+<<<<<<< HEAD
+  MEMORY_USAGE_COUNT ~= 896.27k bytes
+=======
+  MEMORY_USAGE_COUNT ~= 870.41k bytes
+>>>>>>> 99d394c1 (update snapshots)
+>>>>>>> c50aee8d (update snapshots)
+>>>>>>> 9f5e0f01 (update snapshots)

@@ -1,4 +1,4 @@
-import future, { IFuture } from "./future"
+import future, { IFuture } from './future'
 
 // atom value wrapper like in clojure
 
@@ -24,10 +24,10 @@ class SimpleObservable<T> {
   }
 
   notifyObservers(value: T): void {
-    this.observers.forEach(observer => observer(value))
-    
+    this.observers.forEach((observer) => observer(value))
+
     if (this.onceObservers.length > 0) {
-      this.onceObservers.forEach(observer => observer(value))
+      this.onceObservers.forEach((observer) => observer(value))
       this.onceObservers.length = 0
     }
   }
@@ -49,8 +49,8 @@ export function Atom<T>(initialValue: T | EMPTY = EMPTY): Atom<T> {
   let value: T | EMPTY = initialValue
   const valueFutures: IFuture<T>[] = []
 
-  observable.addOnce(value => {
-    valueFutures.forEach($ => $.resolve(value))
+  observable.addOnce((value) => {
+    valueFutures.forEach(($) => $.resolve(value))
     valueFutures.length = 0
   })
 
@@ -92,7 +92,7 @@ export function Atom<T>(initialValue: T | EMPTY = EMPTY): Atom<T> {
         value = newValue
         observable.notifyObservers(value)
       }
-      return oldValue == EMPTY ? undefined : oldValue
+      return oldValue === EMPTY ? undefined : oldValue
     }
   }
 }
