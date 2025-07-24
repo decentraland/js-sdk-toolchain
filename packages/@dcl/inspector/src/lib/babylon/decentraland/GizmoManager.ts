@@ -266,7 +266,7 @@ export function createGizmoManager(context: SceneContext) {
       }
     },
     getGizmoTypes() {
-      return [GizmoType.POSITION, GizmoType.ROTATION, GizmoType.SCALE, GizmoType.FREE] as const
+      return [GizmoType.FREE, GizmoType.POSITION, GizmoType.ROTATION, GizmoType.SCALE] as const
     },
     setGizmoType(type: GizmoType) {
       // Then disable all Babylon gizmos
@@ -384,6 +384,14 @@ export function createGizmoManager(context: SceneContext) {
           currentTransformer = freeTransformer
           currentTransformer.setup()
           currentTransformer.setEntities(selectedEntities)
+
+          // Pass GizmoManager reference to FreeGizmo for centroid calculation
+          if ('setGizmoManager' in currentTransformer) {
+            ;(currentTransformer as any).setGizmoManager({
+              calculateCentroid,
+              updateGizmoPosition
+            })
+          }
 
           // Set up callbacks for ECS updates
           if ('setUpdateCallbacks' in currentTransformer) {
