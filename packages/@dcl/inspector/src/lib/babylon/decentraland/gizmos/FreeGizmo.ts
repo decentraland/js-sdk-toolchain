@@ -14,16 +14,16 @@ import {
 } from '@babylonjs/core'
 import { Entity } from '@dcl/ecs'
 import { EcsEntity } from '../EcsEntity'
-import { IGizmoTransformer } from './types'
+import { GizmoType, IGizmoTransformer } from './types'
 import { LEFT_BUTTON } from '../mouse-utils'
 import { snapVector } from '../snap-manager'
 
 interface GizmoManagerInterface {
   calculateCentroid: () => Vector3
-  updateGizmoPosition: () => void
 }
 
 export class FreeGizmo implements IGizmoTransformer {
+  type = GizmoType.FREE
   private selectedEntities: EcsEntity[] = []
   private isDragging = false
   private snapDistance = 0
@@ -467,7 +467,7 @@ export class FreeGizmo implements IGizmoTransformer {
     return material
   }
 
-  private updateGizmoIndicator(): void {
+  updateGizmoIndicator(): void {
     if (!this.gizmoIndicator || this.selectedEntities.length === 0) return
     const center = this.getCentroid()
     this.gizmoIndicator.position = center
