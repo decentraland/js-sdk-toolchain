@@ -10,21 +10,39 @@ EVAL test/snapshots/development-bundles/testing-fw.test.js
   REQUIRE: ~system/Testing
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
+<<<<<<< HEAD
   OPCODES ~= 70k
   MALLOC_COUNT = 15263
   ALIVE_OBJS_DELTA ~= 3.08k
+=======
+<<<<<<< HEAD
+  OPCODES ~= 65k
+  MALLOC_COUNT = 14698
+  ALIVE_OBJS_DELTA ~= 2.95k
+=======
+<<<<<<< HEAD
+  OPCODES ~= 64k
+  MALLOC_COUNT = 14564
+  ALIVE_OBJS_DELTA ~= 2.92k
+=======
+  OPCODES ~= 47k
+  MALLOC_COUNT = 13901
+  ALIVE_OBJS_DELTA ~= 2.75k
+>>>>>>> 99d394c1 (update snapshots)
+>>>>>>> c50aee8d (update snapshots)
+>>>>>>> 9f5e0f01 (update snapshots)
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=1 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
   OPCODES ~= 3k
-  MALLOC_COUNT = 48
+  MALLOC_COUNT = 52
   ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0)
    ~system/Testing: plan {"tests":[{"name":"two way communication"}]}
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=2 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
-  OPCODES ~= 5k
-  MALLOC_COUNT = 17
+  OPCODES ~= 4k
+  MALLOC_COUNT = 15
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
   LOG: ["🧪 Running test two way communication"]
@@ -35,7 +53,7 @@ CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   LOG: ["Adding one to position.y=1"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=4 data={"position":{"x":2,"y":1,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
-  OPCODES ~= 10k
+  OPCODES ~= 9k
   MALLOC_COUNT = 51
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
@@ -43,7 +61,7 @@ CALL onUpdate(0.1)
   Scene: DELETE_COMPONENT e=0x200 c=1 t=2 data=null
   Scene: DELETE_COMPONENT e=0x0 c=1 t=5 data=null
   Scene: DELETE_ENTITY e=0x200
-  OPCODES ~= 8k
+  OPCODES ~= 7k
   MALLOC_COUNT = -46
   ALIVE_OBJS_DELTA ~= -0.02k
 CALL onUpdate(0.1)
@@ -51,7 +69,7 @@ CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x0 c=1 t=6 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=7 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 7k
+  OPCODES ~= 6k
   MALLOC_COUNT = 32
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
@@ -61,7 +79,7 @@ CALL onUpdate(0.1)
   ~system/Testing: logTestResult {"name":"two way communication","ok":true,"totalFrames":3,"totalTime":0.30000000000000004}
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=8 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 5k
+  OPCODES ~= 4k
   MALLOC_COUNT = -40
   ALIVE_OBJS_DELTA ~= -0.01k
   MEMORY_USAGE_COUNT ~= 1302.36k bytes

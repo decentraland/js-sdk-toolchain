@@ -96,7 +96,6 @@ export function engineToCrdt(engine: IEngine): Uint8Array[] {
         }
 
         // If the message itself is larger than the limit, we need to handle it specially
-        // For now, we'll skip it to prevent infinite loops
         if (messageSize / 1024 > LIVEKIT_MAX_SIZE) {
           console.error(
             `Message too large (${messageSize} bytes), skipping component ${message.componentId} for entity ${message.entityId}`

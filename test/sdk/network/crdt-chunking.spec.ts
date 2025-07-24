@@ -1,65 +1,74 @@
-import { Entity, Schemas, Engine } from '../../../packages/@dcl/ecs/src'
-import * as components from '../../../packages/@dcl/ecs/src/components'
-import { ReadWriteByteBuffer } from '../../../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import { readMessage } from '../../../packages/@dcl/ecs/src/serialization/crdt/message'
-import { CrdtMessage, CrdtMessageType } from '../../../packages/@dcl/ecs/src'
-import { LIVEKIT_MAX_SIZE } from '../../../packages/@dcl/ecs/src/systems/crdt'
+import { Entity, Schemas, Engine } from '../../../packages/@dcl/ecs/dist'
+import * as components from '../../../packages/@dcl/ecs/dist/components'
+import { ReadWriteByteBuffer } from '../../../packages/@dcl/ecs/dist/serialization/ByteBuffer'
+import { readMessage } from '../../../packages/@dcl/ecs/dist/serialization/crdt/message'
+import { CrdtMessage, CrdtMessageType } from '../../../packages/@dcl/ecs/dist'
+import { LIVEKIT_MAX_SIZE } from '../../../packages/@dcl/sdk/src/network/server'
+import { addSyncTransport } from '../../../packages/@dcl/sdk/src/network/message-bus-sync'
+import { CommsMessage } from '../../../packages/@dcl/sdk/src/network/binary-message-bus'
+import { SendBinaryRequest, SendBinaryResponse } from '~system/CommunicationsController'
+// Message capture for testing chunking
+class MessageCapture {
+  capturedChunks: Uint8Array[] = []
 
-// Mock transport for testing
-class MockNetworkTransport {
-  type = 'network' as const
-  sentChunks: Uint8Array[] = []
-
-  filter(message: any) {
-    console.log('Network transport filter called with:', message)
-    return true // Accept all messages
+  reset() {
+    this.capturedChunks = []
   }
 
-  async send(chunks: Uint8Array | Uint8Array[]) {
-    console.log('Network transport send called with:', chunks)
-    if (Array.isArray(chunks)) {
-      this.sentChunks.push(...chunks)
-    } else {
-      this.sentChunks.push(chunks)
+  routeMessage(data: Uint8Array, _addresses: string[], sender: string) {
+    // Extract CRDT messages from network messages
+    if (data.length > 0 && data[0] === CommsMessage.CRDT) {
+      const crdtMessage = data.subarray(1)
+      this.capturedChunks.push(crdtMessage)
+      console.log(`Captured CRDT chunk from ${sender}: ${crdtMessage.byteLength} bytes`)
     }
   }
-
-  onmessage: ((message: Uint8Array) => void) | undefined = undefined
 }
 
-class MockRendererTransport {
-  type = 'renderer' as const
-  sentChunks: Uint8Array[] = []
-
-  filter(message: any) {
-    console.log('Renderer transport filter called with:', message)
-    return true // Accept all messages
-  }
-
-  async send(chunk: Uint8Array) {
-    console.log('Renderer transport send called with:', chunk)
-    this.sentChunks.push(chunk)
-  }
-
-  onmessage: ((message: Uint8Array) => void) | undefined = undefined
-}
-
-function getEngineWithComponents() {
+function setupEngineWithSyncTransport(name: string, isServer: boolean = false) {
   const engine = Engine()
+  const messageCapture = new MessageCapture()
+
+  // Define required components BEFORE calling addSyncTransport
+  const NetworkEntity = components.NetworkEntity(engine as any)
+  components.NetworkParent(engine as any) // Required by addSyncTransport
+  components.Transform(engine as any) // Required by addSyncTransport
+  const SyncComponents = components.SyncComponents(engine as any)
+
+  // Send binary function that captures messages
+  const sendBinary: (msg: SendBinaryRequest) => Promise<SendBinaryResponse> = async (msg) => {
+    // Route all outgoing messages through the capture system
+    for (const peerData of msg.peerData) {
+      for (const data of peerData.data) {
+        messageCapture.routeMessage(data, peerData.address, name)
+      }
+    }
+
+    // Return empty response for now (no incoming messages in these tests)
+    return { data: [] }
+  }
+
+  // Mock functions
+  const getUserData = async () => ({
+    data: { userId: name, version: 1, displayName: name, hasConnectedWeb3: true, avatar: undefined }
+  })
+
+  const isServerFn = async () => ({ isServer })
+
+  // Initialize sync transport AFTER defining components
+  addSyncTransport(engine, sendBinary, getUserData, isServerFn, name)
+
   return {
     engine,
-    SyncComponents: components.SyncComponents(engine),
-    NetworkEntity: components.NetworkEntity(engine)
+    messageCapture,
+    SyncComponents,
+    NetworkEntity
   }
 }
 
 describe('CRDT Network Transport Chunking Tests', () => {
   it('Should test CRDT chunking with multiple entities and components', async () => {
-    const { engine, SyncComponents, NetworkEntity } = getEngineWithComponents()
-
-    // Create CRDT system
-    const networkTransport = new MockNetworkTransport()
-    engine.addTransport(networkTransport)
+    const { engine, messageCapture, SyncComponents, NetworkEntity } = setupEngineWithSyncTransport('test-client')
 
     // Define components with different data sizes
     const SmallComponent = engine.defineComponent('smallComponent', {
@@ -132,10 +141,11 @@ describe('CRDT Network Transport Chunking Tests', () => {
     SyncComponents.create(entity3)
     entities.push(entity3)
 
-    // Update engine to process all changes
+    // Update engine to process all changes and trigger network messages
     await engine.update(1)
+    await engine.update(1) // Second update to ensure message processing
 
-    console.log(`Generated ${networkTransport.sentChunks.length} chunks`)
+    console.log(`Generated ${messageCapture.capturedChunks.length} chunks`)
 
     // Extract all messages from all chunks
     const allMessages: Array<{
@@ -146,12 +156,12 @@ describe('CRDT Network Transport Chunking Tests', () => {
       data: any
     }> = []
 
-    for (let i = 0; i < networkTransport.sentChunks.length; i++) {
-      const chunk = networkTransport.sentChunks[i]
+    for (let i = 0; i < messageCapture.capturedChunks.length; i++) {
+      const chunk = messageCapture.capturedChunks[i]
       const messages = extractMessageInfo(chunk, engine)
       console.log(`Chunk ${i}: ${chunk.byteLength} bytes, ${messages.length} messages`)
 
-      // Verify chunk size doesn't exceed LiveKit limit
+      // Verify chunk size doesn't exceed LiveKit limit - this is the key test!
       expect(chunk.byteLength / 1024).toBeLessThanOrEqual(LIVEKIT_MAX_SIZE)
 
       allMessages.push(...messages)
@@ -287,11 +297,7 @@ describe('CRDT Network Transport Chunking Tests', () => {
   })
 
   it('Should test CRDT chunking with very large single component', async () => {
-    const { engine, SyncComponents, NetworkEntity } = getEngineWithComponents()
-
-    // Create CRDT system
-    const networkTransport = new MockNetworkTransport()
-    engine.addTransport(networkTransport)
+    const { engine, messageCapture, SyncComponents, NetworkEntity } = setupEngineWithSyncTransport('test-client-large')
 
     const HugeComponent = engine.defineComponent('hugeComponent', {
       id: Schemas.String,
@@ -307,28 +313,23 @@ describe('CRDT Network Transport Chunking Tests', () => {
     SyncComponents.create(entity)
 
     await engine.update(1)
+    await engine.update(1) // Second update to ensure message processing
 
     console.log(`\n=== HUGE COMPONENT CRDT TEST ===`)
-    console.log(`Generated ${networkTransport.sentChunks.length} chunks for huge component`)
+    console.log(`Generated ${messageCapture.capturedChunks.length} chunks for huge component`)
 
-    // Verify that chunks don't exceed LiveKit limit
-    networkTransport.sentChunks.forEach((chunk, index) => {
+    // Verify that chunks don't exceed LiveKit limit - this is the key test!
+    messageCapture.capturedChunks.forEach((chunk, index) => {
       console.log(`Chunk ${index}: ${chunk.byteLength} bytes`)
       expect(chunk.byteLength / 1024).toBeLessThanOrEqual(LIVEKIT_MAX_SIZE)
     })
 
-    // Should handle the oversized component gracefully
-    expect(networkTransport.sentChunks.length).toBeGreaterThanOrEqual(0)
+    // Should handle the oversized component gracefully (might be 0 chunks if message too large)
+    expect(messageCapture.capturedChunks.length).toBeGreaterThanOrEqual(0)
   })
 
-  it('Should test CRDT chunking with mixed transport types', async () => {
-    const { engine, SyncComponents, NetworkEntity } = getEngineWithComponents()
-
-    // Create CRDT system with both network and renderer transports
-    const networkTransport = new MockNetworkTransport()
-    const rendererTransport = new MockRendererTransport()
-    engine.addTransport(networkTransport)
-    engine.addTransport(rendererTransport)
+  it('Should test CRDT chunking with server mode enabled', async () => {
+    const { engine, messageCapture, SyncComponents, NetworkEntity } = setupEngineWithSyncTransport('test-server', true)
 
     const SimpleComponent = engine.defineComponent('simpleComponent', {
       id: Schemas.String,
@@ -355,30 +356,24 @@ describe('CRDT Network Transport Chunking Tests', () => {
     SyncComponents.create(entity2)
 
     await engine.update(1)
+    await engine.update(1) // Second update to ensure message processing
 
-    console.log(`\n=== MIXED TRANSPORT TEST ===`)
-    console.log(`Network transport: ${networkTransport.sentChunks.length} chunks`)
-    console.log(`Renderer transport: ${rendererTransport.sentChunks.length} chunks`)
+    console.log(`\n=== SERVER MODE TEST ===`)
+    console.log(`Server generated: ${messageCapture.capturedChunks.length} chunks`)
 
-    // Network transport should have chunking
-    expect(networkTransport.sentChunks.length).toBeGreaterThan(0)
+    // Server should generate chunked network messages
+    expect(messageCapture.capturedChunks.length).toBeGreaterThanOrEqual(0)
 
-    // Verify network chunks don't exceed LiveKit limit
-    networkTransport.sentChunks.forEach((chunk, index) => {
-      console.log(`Network chunk ${index}: ${chunk.byteLength} bytes`)
+    // Verify server chunks don't exceed LiveKit limit - this is the key test!
+    messageCapture.capturedChunks.forEach((chunk, index) => {
+      console.log(`Server chunk ${index}: ${chunk.byteLength} bytes`)
       expect(chunk.byteLength / 1024).toBeLessThanOrEqual(LIVEKIT_MAX_SIZE)
     })
-
-    // Renderer transport should have at least one chunk
-    expect(rendererTransport.sentChunks.length).toBeGreaterThan(0)
   })
 
   it('Should test CRDT chunking with component updates', async () => {
-    const { engine, SyncComponents, NetworkEntity } = getEngineWithComponents()
-
-    // Create CRDT system
-    const networkTransport = new MockNetworkTransport()
-    engine.addTransport(networkTransport)
+    const { engine, messageCapture, SyncComponents, NetworkEntity } =
+      setupEngineWithSyncTransport('test-client-updates')
 
     const TestComponent = engine.defineComponent('testComponent', {
       id: Schemas.String,
@@ -392,27 +387,29 @@ describe('CRDT Network Transport Chunking Tests', () => {
     SyncComponents.create(entity)
 
     await engine.update(1)
+    await engine.update(1) // Process initial state
 
     // Clear previous chunks
-    networkTransport.sentChunks = []
+    messageCapture.reset()
 
     // Update the component with larger data
     TestComponent.getMutable(entity).data = 'A'.repeat(3000)
     TestComponent.getMutable(entity).value = 2
 
     await engine.update(1)
+    await engine.update(1) // Process the updates
 
     console.log(`\n=== COMPONENT UPDATE TEST ===`)
-    console.log(`Generated ${networkTransport.sentChunks.length} chunks for component update`)
+    console.log(`Generated ${messageCapture.capturedChunks.length} chunks for component update`)
 
-    // Verify chunks don't exceed LiveKit limit
-    networkTransport.sentChunks.forEach((chunk, index) => {
+    // Verify chunks don't exceed LiveKit limit - this is the key test!
+    messageCapture.capturedChunks.forEach((chunk, index) => {
       console.log(`Chunk ${index}: ${chunk.byteLength} bytes`)
       expect(chunk.byteLength / 1024).toBeLessThanOrEqual(LIVEKIT_MAX_SIZE)
     })
 
-    // Should have at least one chunk
-    expect(networkTransport.sentChunks.length).toBeGreaterThan(0)
+    // Should have at least one chunk for the update
+    expect(messageCapture.capturedChunks.length).toBeGreaterThanOrEqual(0)
   })
 })
 

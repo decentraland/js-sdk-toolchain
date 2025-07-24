@@ -2,16 +2,12 @@ import { Entity, EntityState } from '../../engine/entity'
 import type { ComponentDefinition } from '../../engine'
 import type { PreEngine } from '../../engine/types'
 import { ReadWriteByteBuffer } from '../../serialization/ByteBuffer'
-import {
-  AppendValueOperation,
-  CrdtMessageProtocol
-} from '../../serialization/crdt'
+import { AppendValueOperation, CrdtMessageProtocol } from '../../serialization/crdt'
 import { DeleteComponent } from '../../serialization/crdt/deleteComponent'
 import { DeleteEntity } from '../../serialization/crdt/deleteEntity'
 import { PutComponentOperation } from '../../serialization/crdt/putComponent'
 import { CrdtMessageType, CrdtMessageHeader, CrdtMessage } from '../../serialization/crdt/types'
 import { ReceiveMessage, Transport } from './types'
-
 
 /**
  * @public
@@ -86,7 +82,6 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
     return messagesToProcess
   }
 
-
   /**
    * This fn will be called on every tick.
    * Process all the messages queue received by the transport
@@ -97,7 +92,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
 
     for (const msg of messagesToProcess) {
       // Simple CRDT processing - no network logic
-      
+
       if (msg.type === CrdtMessageType.DELETE_ENTITY) {
         entitiesShouldBeCleaned.push(msg.entityId)
         broadcastMessages.push(msg)
@@ -195,11 +190,11 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
     // Simple transport broadcasting - no network-specific transforms
     for (const transport of transports) {
       const transportBuffer = new ReadWriteByteBuffer()
-      
+
       for (const message of crdtMessages) {
         // Avoid echo messages
         if (message.transportId === transports.indexOf(transport)) continue
-        
+
         // Check if transport wants this message
         if (transport.filter(message)) {
           transportBuffer.writeBuffer(message.messageBuffer, false)

@@ -8,9 +8,26 @@ EVAL test/snapshots/production-bundles/pointer-events.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
+<<<<<<< HEAD
   OPCODES ~= 64k
   MALLOC_COUNT = 13122
   ALIVE_OBJS_DELTA ~= 2.92k
+=======
+<<<<<<< HEAD
+  OPCODES ~= 58k
+<<<<<<< HEAD
+  MALLOC_COUNT = 12603
+  ALIVE_OBJS_DELTA ~= 2.80k
+=======
+  MALLOC_COUNT = 12480
+  ALIVE_OBJS_DELTA ~= 2.77k
+=======
+  OPCODES ~= 49k
+  MALLOC_COUNT = 12135
+  ALIVE_OBJS_DELTA ~= 2.68k
+>>>>>>> 99d394c1 (update snapshots)
+>>>>>>> c50aee8d (update snapshots)
+>>>>>>> 9f5e0f01 (update snapshots)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
