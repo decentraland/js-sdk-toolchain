@@ -4,26 +4,14 @@ import type { PreEngine } from '../../engine/types'
 import { ReadWriteByteBuffer } from '../../serialization/ByteBuffer'
 import {
   AppendValueOperation,
-  CrdtMessageProtocol,
-  DeleteComponentNetwork,
-  DeleteEntityNetwork
+  CrdtMessageProtocol
 } from '../../serialization/crdt'
 import { DeleteComponent } from '../../serialization/crdt/deleteComponent'
 import { DeleteEntity } from '../../serialization/crdt/deleteEntity'
 import { PutComponentOperation } from '../../serialization/crdt/putComponent'
 import { CrdtMessageType, CrdtMessageHeader, CrdtMessage } from '../../serialization/crdt/types'
 import { ReceiveMessage, Transport } from './types'
-import { PutNetworkComponentOperation } from '../../serialization/crdt/network/putComponentNetwork'
-import {
-  NetworkEntity as defineNetworkEntity,
-  NetworkParent as defineNetworkParent,
-  Transform as defineTransform
-} from '../../components'
-import { INetowrkEntityType } from '../../components/types'
-import * as networkUtils from '../../serialization/crdt/network/utils'
 
-// NetworkMessages can only have a MAX_SIZE of 12kb. So we need to send it in chunks.
-export const LIVEKIT_MAX_SIZE = 12
 
 /**
  * @public
@@ -41,10 +29,7 @@ export type OnChangeFunction = (
 export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChange: OnChangeFunction | null) {
   const transports: Transport[] = []
 
-  // Components that we used on this system
-  const NetworkEntity = defineNetworkEntity(engine)
-  const NetworkParent = defineNetworkParent(engine)
-  const Transform = defineTransform(engine)
+  // No network components needed - pure CRDT processing only
 
   // Messages that we received at transport.onMessage waiting to be processed
   const receivedMessages: ReceiveMessage[] = []
@@ -71,21 +56,14 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         let message: CrdtMessage | undefined = undefined
         if (header.type === CrdtMessageType.DELETE_COMPONENT) {
           message = DeleteComponent.read(buffer)!
-        } else if (header.type === CrdtMessageType.DELETE_COMPONENT_NETWORK) {
-          message = DeleteComponentNetwork.read(buffer)!
         } else if (header.type === CrdtMessageType.PUT_COMPONENT) {
           message = PutComponentOperation.read(buffer)!
-        } else if (header.type === CrdtMessageType.PUT_COMPONENT_NETWORK) {
-          message = PutNetworkComponentOperation.read(buffer)!
         } else if (header.type === CrdtMessageType.DELETE_ENTITY) {
           message = DeleteEntity.read(buffer)!
-        } else if (header.type === CrdtMessageType.DELETE_ENTITY_NETWORK) {
-          message = DeleteEntityNetwork.read(buffer)!
         } else if (header.type === CrdtMessageType.APPEND_VALUE) {
           message = AppendValueOperation.read(buffer)!
-          // Unknown message, we skip it
         } else {
-          // consume the message
+          // Unknown message, we skip it (including NETWORK messages)
           buffer.incrementReadOffset(header.length)
         }
         if (message) {
@@ -108,27 +86,6 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
     return messagesToProcess
   }
 
-  /**
-   * Find the local entityId associated to the network component message.
-   * It's a mapping Network -> to Local
-   * If it's not a network message, return the entityId received by the message
-   */
-  function findNetworkId(msg: { entityId: Entity; networkId?: number }): {
-    entityId: Entity
-    network?: INetowrkEntityType
-  } {
-    const hasNetworkId = 'networkId' in msg
-
-    if (hasNetworkId) {
-      for (const [entityId, network] of engine.getEntitiesWith(NetworkEntity)) {
-        if (network.networkId === msg.networkId && network.entityId === msg.entityId) {
-          return { entityId, network }
-        }
-      }
-    }
-
-    return { entityId: msg.entityId }
-  }
 
   /**
    * This fn will be called on every tick.
@@ -139,48 +96,37 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
     const entitiesShouldBeCleaned: Entity[] = []
 
     for (const msg of messagesToProcess) {
-      let { entityId, network } = findNetworkId(msg)
-      // We receive a new Entity. Create the localEntity and map it to the NetworkEntity component
-      if (networkUtils.isNetworkMessage(msg) && !network) {
-        entityId = engine.addEntity()
-        network = { entityId: msg.entityId, networkId: msg.networkId }
-        NetworkEntity.createOrReplace(entityId, network)
-      }
-      if (msg.type === CrdtMessageType.DELETE_ENTITY || msg.type === CrdtMessageType.DELETE_ENTITY_NETWORK) {
-        entitiesShouldBeCleaned.push(entityId)
+      // Simple CRDT processing - no network logic
+      
+      if (msg.type === CrdtMessageType.DELETE_ENTITY) {
+        entitiesShouldBeCleaned.push(msg.entityId)
         broadcastMessages.push(msg)
       } else {
-        const entityState = engine.entityContainer.getEntityState(entityId)
+        const entityState = engine.entityContainer.getEntityState(msg.entityId)
 
-        // Skip updates from removed entityes
+        // Skip updates from removed entities
         if (entityState === EntityState.Removed) continue
 
-        // Entities with unknown entities should update its entity state
+        // Entities with unknown state should update its entity state
         if (entityState === EntityState.Unknown) {
-          engine.entityContainer.updateUsedEntity(entityId)
+          engine.entityContainer.updateUsedEntity(msg.entityId)
         }
+        // Only process component-related messages (not DELETE_ENTITY)
+        if ('componentId' in msg) {
+          const component = engine.getComponentOrNull(msg.componentId)
 
-        const component = engine.getComponentOrNull(msg.componentId)
-
-        /* istanbul ignore else */
-        if (component) {
-          if (
-            msg.type === CrdtMessageType.PUT_COMPONENT &&
-            component.componentId === Transform.componentId &&
-            NetworkEntity.has(entityId) &&
-            NetworkParent.has(entityId)
-          ) {
-            msg.data = networkUtils.fixTransformParent(msg)
-          }
-          const [conflictMessage, value] = component.updateFromCrdt({ ...msg, entityId })
-          if (!conflictMessage) {
-            // Add message to transport queue to be processed by others transports
+          if (component) {
+            // Pure CRDT processing - no transform fixing or network logic
+            const [conflictMessage, value] = component.updateFromCrdt(msg)
+            if (!conflictMessage) {
+              // Add message to broadcast queue when no conflict
+              broadcastMessages.push(msg)
+              onProcessEntityComponentChange && onProcessEntityComponentChange(msg.entityId, msg.type, component, value)
+            }
+          } else {
+            // Component not found - still broadcast for editor compatibility
             broadcastMessages.push(msg)
-            onProcessEntityComponentChange && onProcessEntityComponentChange(entityId, msg.type, component, value)
           }
-        } else {
-          // TODO: test this line, it is fundammental to make the editor work
-          broadcastMessages.push(msg)
         }
       }
     }
@@ -196,17 +142,18 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
   }
 
   /**
-   * Iterates the dirty map and generates crdt messages to be send
+   * Simple CRDT message broadcasting - no network-specific logic
    */
   async function sendMessages(entitiesDeletedThisTick: Entity[]) {
-    // CRDT Messages will be the merge between the recieved transport messages and the new crdt messages
+    // Get messages from broadcast queue and component updates
     const crdtMessages = getMessages(broadcastMessages)
     const buffer = new ReadWriteByteBuffer()
 
+    // Generate CRDT messages from component updates
     for (const component of engine.componentsIter()) {
       for (const message of component.getCrdtUpdates()) {
         const offset = buffer.currentWriteOffset()
-        // Avoid creating messages if there is no transport that will handle it
+        // Only create messages if there's a transport that will handle it
         if (transports.some((t) => t.filter(message))) {
           if (message.type === CrdtMessageType.PUT_COMPONENT) {
             PutComponentOperation.write(message.entityId, message.timestamp, message.componentId, message.data, buffer)
@@ -231,7 +178,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
       }
     }
 
-    // After all updates, I execute the DeletedEntity messages
+    // Handle deleted entities
     for (const entityId of entitiesDeletedThisTick) {
       const offset = buffer.currentWriteOffset()
       DeleteEntity.write(entityId, buffer)
@@ -245,103 +192,21 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
       onProcessEntityComponentChange && onProcessEntityComponentChange(entityId, CrdtMessageType.DELETE_ENTITY)
     }
 
-    // Send CRDT messages to transports
-    const transportBuffer = new ReadWriteByteBuffer()
-    for (const index in transports) {
-      const __NetworkMessagesBuffer: Uint8Array[] = []
-
-      const transportIndex = Number(index)
-      const transport = transports[transportIndex]
-      const isRendererTransport = transport.type === 'renderer'
-      const isNetworkTransport = transport.type === 'network'
-
-      // Reset Buffer for each Transport
-      transportBuffer.resetBuffer()
-      const buffer = new ReadWriteByteBuffer()
-
-      // Then we send all the new crdtMessages that the transport needs to process
+    // Simple transport broadcasting - no network-specific transforms
+    for (const transport of transports) {
+      const transportBuffer = new ReadWriteByteBuffer()
+      
       for (const message of crdtMessages) {
-        // Check if adding this message would exceed the size limit
-        const currentBufferSize = transportBuffer.toBinary().byteLength
-        const messageSize = message.messageBuffer.byteLength
-
-        if (isNetworkTransport && (currentBufferSize + messageSize) / 1024 > LIVEKIT_MAX_SIZE) {
-          // If the current buffer has content, save it as a chunk
-          if (currentBufferSize > 0) {
-            __NetworkMessagesBuffer.push(transportBuffer.toCopiedBinary())
-            transportBuffer.resetBuffer()
-          }
-
-          // If the message itself is larger than the limit, we need to handle it specially
-          // For now, we'll skip it to prevent infinite loops
-          if (messageSize / 1024 > LIVEKIT_MAX_SIZE) {
-            console.error(`Message too large (${messageSize} bytes), skipping message for entity ${message.entityId}`)
-            continue
-          }
-        }
-
         // Avoid echo messages
-        if (message.transportId === transportIndex) continue
-
-        // Redundant message for the transport
-        if (!transport.filter(message)) continue
-        const { entityId } = findNetworkId(message)
-
-        const transformNeedsFix =
-          'componentId' in message &&
-          message.componentId === Transform.componentId &&
-          Transform.has(entityId) &&
-          NetworkParent.has(entityId) &&
-          NetworkEntity.has(entityId)
-
-        // If there was a LOCAL change in the transform. Add the parent to that transform
-        if (isRendererTransport && message.type === CrdtMessageType.PUT_COMPONENT && transformNeedsFix) {
-          const parent = findNetworkId(NetworkParent.get(entityId))
-          const transformData = networkUtils.fixTransformParent(message, Transform.get(entityId), parent.entityId)
-          const offset = buffer.currentWriteOffset()
-          PutComponentOperation.write(entityId, message.timestamp, message.componentId, transformData, buffer)
-          transportBuffer.writeBuffer(buffer.buffer().subarray(offset, buffer.currentWriteOffset()), false)
-          continue
+        if (message.transportId === transports.indexOf(transport)) continue
+        
+        // Check if transport wants this message
+        if (transport.filter(message)) {
+          transportBuffer.writeBuffer(message.messageBuffer, false)
         }
-
-        if (isRendererTransport && networkUtils.isNetworkMessage(message)) {
-          // If it's the renderer transport and its a NetworkMessage, we need to fix the entityId field and convert it to a known Message.
-          // PUT_NETWORK_COMPONENT -> PUT_COMPONENT
-          let transformData: Uint8Array = 'data' in message ? message.data : new Uint8Array()
-          if (transformNeedsFix) {
-            const parent = findNetworkId(NetworkParent.get(entityId))
-            transformData = networkUtils.fixTransformParent(message, Transform.get(entityId), parent.entityId)
-          }
-          networkUtils.networkMessageToLocal(
-            { ...message, data: transformData } as any,
-            entityId,
-            buffer,
-            transportBuffer
-          )
-          // Iterate the next message
-          continue
-        }
-
-        // If its a network transport and its a PUT_COMPONENT that has a NetworkEntity component, we need to send this message
-        // through comms with the EntityID and NetworkID from ther NetworkEntity so everyone can recieve this message and map to their custom entityID.
-        if (isNetworkTransport && !networkUtils.isNetworkMessage(message)) {
-          const networkData = NetworkEntity.getOrNull(message.entityId)
-          // If it has networkData convert the message to PUT_NETWORK_COMPONENT.
-          if (networkData) {
-            networkUtils.localMessageToNetwork(message, networkData, buffer, transportBuffer)
-            // Iterate the next message
-            continue
-          }
-        }
-        // Common message
-        transportBuffer.writeBuffer(message.messageBuffer, false)
       }
 
-      if (isNetworkTransport && transportBuffer.currentWriteOffset()) {
-        __NetworkMessagesBuffer.push(transportBuffer.toBinary())
-      }
-      const message = isNetworkTransport ? __NetworkMessagesBuffer : transportBuffer.toBinary()
-      await transport.send(message)
+      await transport.send(transportBuffer.toBinary())
     }
   }
 
