@@ -447,7 +447,7 @@ function createLoadingSpinner(
     { frame: 100, value: CIRCLE }
   ])
 
-  const animationGroup = new BABYLON.AnimationGroup('loadingSpinnerAnimation')
+  const animationGroup = new BABYLON.AnimationGroup('loadingSpinnerAnimation', scene)
   animationGroup.addTargetedAnimation(rotationAnimation, semiTorus)
   animationGroup.play(true)
 
