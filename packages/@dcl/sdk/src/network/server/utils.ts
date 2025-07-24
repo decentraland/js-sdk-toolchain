@@ -1,10 +1,20 @@
 import { Entity } from '@dcl/ecs/dist/engine'
 import { CrdtMessageProtocol, NetworkParent } from '@dcl/ecs'
-import { ReceiveMessage, TransformType } from '@dcl/ecs/dist/runtime/types'
+import { ReceiveMessage } from '@dcl/ecs/dist/runtime/types'
 import { ReceiveNetworkMessage } from '@dcl/ecs/dist/systems/crdt/types'
 import { ByteBuffer, ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { PutComponentOperation } from '@dcl/ecs/dist/serialization/crdt/putComponent'
-import { CrdtMessage, CrdtMessageHeader, CrdtMessageType, DeleteComponentMessage, DeleteComponentNetworkMessage, DeleteEntityMessage, DeleteEntityNetworkMessage, PutComponentMessage, PutNetworkComponentMessage } from '@dcl/ecs/dist/serialization/crdt/types'
+import {
+  CrdtMessage,
+  CrdtMessageHeader,
+  CrdtMessageType,
+  DeleteComponentMessage,
+  DeleteComponentNetworkMessage,
+  DeleteEntityMessage,
+  DeleteEntityNetworkMessage,
+  PutComponentMessage,
+  PutNetworkComponentMessage
+} from '@dcl/ecs/dist/serialization/crdt/types'
 import { DeleteComponent } from '@dcl/ecs/dist/serialization/crdt/deleteComponent'
 import { DeleteEntity } from '@dcl/ecs/dist/serialization/crdt/deleteEntity'
 import { INetowrkEntityType } from '@dcl/ecs/dist/components/types'
@@ -13,8 +23,14 @@ import { DeleteComponentNetwork } from '@dcl/ecs/dist/serialization/crdt/network
 import { DeleteEntityNetwork } from '@dcl/ecs/dist/serialization/crdt/network/deleteEntityNetwork'
 import { TransformSchema, COMPONENT_ID as TransformComponentId } from '@dcl/ecs/dist/components/manual/Transform'
 
-export type NetworkMessage = (PutNetworkComponentMessage | DeleteComponentNetworkMessage | DeleteEntityNetworkMessage) & { messageBuffer: Uint8Array }
-export type RegularMessage = (PutComponentMessage | DeleteComponentMessage | DeleteEntityMessage) & { messageBuffer: Uint8Array }
+export type NetworkMessage = (
+  | PutNetworkComponentMessage
+  | DeleteComponentNetworkMessage
+  | DeleteEntityNetworkMessage
+) & { messageBuffer: Uint8Array }
+export type RegularMessage = (PutComponentMessage | DeleteComponentMessage | DeleteEntityMessage) & {
+  messageBuffer: Uint8Array
+}
 
 export function readMessages(data: Uint8Array): (NetworkMessage | RegularMessage)[] {
   const buffer = new ReadWriteByteBuffer(data)
@@ -23,7 +39,7 @@ export function readMessages(data: Uint8Array): (NetworkMessage | RegularMessage
   while ((header = CrdtMessageProtocol.getHeader(buffer))) {
     const offset = buffer.currentReadOffset()
     let message: CrdtMessage | undefined = undefined
-    
+
     // Network messages
     if (header.type === CrdtMessageType.DELETE_COMPONENT_NETWORK) {
       message = DeleteComponentNetwork.read(buffer)!
@@ -43,7 +59,7 @@ export function readMessages(data: Uint8Array): (NetworkMessage | RegularMessage
       // consume unknown messages
       buffer.incrementReadOffset(header.length)
     }
-    
+
     if (message) {
       messages.push({
         ...message,
@@ -71,13 +87,13 @@ export function networkMessageToLocal(
 ) {
   if (message.type === CrdtMessageType.PUT_COMPONENT_NETWORK) {
     let messageData = message.data
-    
+
     // Fix transform parent if needed for Unity/engine processing
     if (message.componentId === TransformComponentId && networkParentComponent) {
       const parentNetwork = networkParentComponent.getOrNull(localEntityId)
       messageData = fixTransformParent(message, parentNetwork?.entityId)
     }
-    
+
     PutComponentOperation.write(localEntityId, message.timestamp, message.componentId, messageData, destinationBuffer)
   } else if (message.type === CrdtMessageType.DELETE_COMPONENT_NETWORK) {
     DeleteComponent.write(localEntityId, message.componentId, message.timestamp, destinationBuffer)
@@ -92,19 +108,28 @@ export function localMessageToNetwork(
   destinationBuffer: ByteBuffer
 ) {
   if (message.type === CrdtMessageType.PUT_COMPONENT) {
-    PutNetworkComponentOperation.write(network.entityId, message.timestamp, message.componentId, network.networkId, message.data, destinationBuffer)
+    PutNetworkComponentOperation.write(
+      network.entityId,
+      message.timestamp,
+      message.componentId,
+      network.networkId,
+      message.data,
+      destinationBuffer
+    )
   } else if (message.type === CrdtMessageType.DELETE_COMPONENT) {
-    DeleteComponentNetwork.write(network.entityId, message.componentId, message.timestamp, network.networkId, destinationBuffer)
+    DeleteComponentNetwork.write(
+      network.entityId,
+      message.componentId,
+      message.timestamp,
+      network.networkId,
+      destinationBuffer
+    )
   } else if (message.type === CrdtMessageType.DELETE_ENTITY) {
     DeleteEntityNetwork.write(network.entityId, network.networkId, destinationBuffer)
   }
 }
 
-
-export function fixTransformParent(
-  message: ReceiveMessage,
-  parent?: Entity
-): Uint8Array {
+export function fixTransformParent(message: ReceiveMessage, parent?: Entity): Uint8Array {
   const buffer = new ReadWriteByteBuffer()
   const transform = 'data' in message && TransformSchema.deserialize(new ReadWriteByteBuffer(message.data))
 

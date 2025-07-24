@@ -1,11 +1,10 @@
-import { MeshRenderer } from '@dcl/ecs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 
 export enum CommsMessage {
   CRDT = 1,
   REQ_CRDT_STATE = 2,
   RES_CRDT_STATE = 3,
-  CRDT_SERVER = 4,
+  CRDT_SERVER = 4
 }
 
 export function BinaryMessageBus<T extends CommsMessage>(
