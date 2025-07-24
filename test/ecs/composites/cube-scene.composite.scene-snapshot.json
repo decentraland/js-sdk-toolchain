@@ -20,9 +20,27 @@
       "parent": 512
     }
   },
+<<<<<<< HEAD
   "core-schema::Network-Entity": {},
   "core-schema::Network-Parent": {},
   "composite::root": {},
+=======
+  "composite::root": {
+    "512": {
+      "src": "cube-scene.composite",
+      "entities": [
+        {
+          "src": 0,
+          "dest": 512
+        },
+        {
+          "src": 512,
+          "dest": 513
+        }
+      ]
+    }
+  },
+>>>>>>> 67c518f0 (update snapshots)
   "core::MeshRenderer": {
     "513": {
       "mesh": {

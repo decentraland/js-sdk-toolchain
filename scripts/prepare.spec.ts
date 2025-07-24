@@ -1,6 +1,5 @@
 import { readdirSync, readFileSync } from 'fs'
 import { pathExistsSync } from 'fs-extra'
-import { readFile } from 'fs/promises'
 import { resolve } from 'path'
 import { flow, commonChecks } from './common'
 
