@@ -264,17 +264,12 @@ function updateMeshBoundingBoxVisibility(entity: EcsEntity, mesh: BABYLON.Abstra
   const isParentSelected = hasSelectedParent(entity, context)
   const children = entity.gltfContainer ? entity.gltfContainer.getChildMeshes(false) : entity.getChildMeshes(true)
 
-  const shouldShowBoundingBox =
-    (isSelected && isEntityOutsideLayout(mesh)) || (isEntityOutsideLayout(mesh) && isParentSelected)
+  const shouldShowBoundingBox = (isSelected || isParentSelected) && isEntityOutsideLayout(mesh)
 
   if (shouldShowBoundingBox) {
-    if (!mesh.showBoundingBox) {
-      mesh.showBoundingBox = true
-    }
+    mesh.showBoundingBox = true
   } else {
-    if (mesh.showBoundingBox) {
-      mesh.showBoundingBox = false
-    }
+    mesh.showBoundingBox = false
   }
 
   if (isEntityOutsideLayout(mesh)) {
@@ -297,22 +292,6 @@ function hasSelectedParent(entity: EcsEntity, context: any): boolean {
       }
     }
     parent = parent.parent
-  }
-  return false
-}
-
-function hasChildrenOutsideLayout(
-  entity: EcsEntity,
-  isEntityOutsideLayout: (mesh: BABYLON.AbstractMesh) => boolean
-): boolean {
-  for (const child of entity.childrenEntities()) {
-    if (child.boundingInfoMesh && isEntityOutsideLayout(child.boundingInfoMesh)) {
-      return true
-    }
-    // Verificar recursivamente los hijos de los hijos
-    if (hasChildrenOutsideLayout(child, isEntityOutsideLayout)) {
-      return true
-    }
   }
   return false
 }
