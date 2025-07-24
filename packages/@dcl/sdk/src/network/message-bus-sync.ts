@@ -1,4 +1,4 @@
-import { IEngine, Transport, RealmInfo, Entity } from '@dcl/ecs'
+import { IEngine, Transport, RealmInfo } from '@dcl/ecs'
 import { type SendBinaryRequest, type SendBinaryResponse } from '~system/CommunicationsController'
 
 import { syncFilter } from './filter'
@@ -29,7 +29,7 @@ export function addSyncTransport(
   fetchProfile(myProfile!, getUserData)
 
   const isServerAtom = Atom<boolean>()
-  isServerFn({}).then(($: IsServerResponse) => isServerAtom.swap(!!$.isServer))
+  void isServerFn({}).then(($: IsServerResponse) => isServerAtom.swap(!!$.isServer))
 
   // Entity utils
   const entityDefinitions = entityUtils(engine, myProfile)
@@ -57,8 +57,10 @@ export function addSyncTransport(
     send: async (messages) => {
       for (const message of [messages].flat()) {
         if (message.byteLength) {
-          DEBUG_NETWORK_MESSAGES() && console.log(...Array.from(serializeCrdtMessages('[NetworkMessage sent]:', message, engine)))
-          
+          console.log('TODO trasport initialized', transportInitialzed)
+          DEBUG_NETWORK_MESSAGES() &&
+            console.log(...Array.from(serializeCrdtMessages('[NetworkMessage sent]:', message, engine)))
+
           // Convert regular messages to network messages for broadcasting with chunking
           for (const chunk of serverValidator.convertRegularToNetworkMessage(message)) {
             binaryMessageBus.emit(CommsMessage.CRDT, chunk)
@@ -72,7 +74,7 @@ export function addSyncTransport(
     },
     type: name
   }
-  
+
   // Server validation setup
   const serverValidator = createServerValidator({
     engine,
@@ -81,7 +83,7 @@ export function addSyncTransport(
     authServerPeerId: AUTH_SERVER_PEER_ID,
     debugNetworkMessages: DEBUG_NETWORK_MESSAGES
   })
-    
+
   engine.addTransport(transport)
   // End add sync transport
 
@@ -93,10 +95,10 @@ export function addSyncTransport(
     stateIsSyncronized = true
   })
 
-
   // received message from the network
   binaryMessageBus.on(CommsMessage.CRDT, (value, sender) => {
-    DEBUG_NETWORK_MESSAGES() && console.log(transport.type, Array.from(serializeCrdtMessages('[NetworkMessage received]:', value, engine)))
+    DEBUG_NETWORK_MESSAGES() &&
+      console.log(transport.type, ...Array.from(serializeCrdtMessages('[NetworkMessage received]:', value, engine)))
     const isServer = isServerAtom.getOrNull()
     if (isServer) {
       serverValidator.processServerMessages(value, sender)
