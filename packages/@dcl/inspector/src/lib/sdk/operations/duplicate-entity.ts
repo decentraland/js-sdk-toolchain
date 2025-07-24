@@ -5,6 +5,7 @@ import {
   NetworkEntity as NetworkEntityEngine,
   Name as NameEngine
 } from '@dcl/ecs'
+import * as components from '@dcl/ecs/dist/components'
 import { clone } from '@dcl/asset-packs'
 import { EditorComponentNames, EditorComponents } from '../components'
 import { pushChild } from '../nodes'
@@ -19,7 +20,7 @@ export function duplicateEntity(engine: IEngine) {
     const Nodes = engine.getComponent(EditorComponentNames.Nodes) as EditorComponents['Nodes']
     const Triggers = engine.getComponent(EditorComponentNames.Triggers) as EditorComponents['Triggers']
     const Name = engine.getComponent(NameEngine.componentName) as typeof NameEngine
-    const NetworkEntity = engine.getComponent(NetworkEntityEngine.componentId) as typeof NetworkEntityEngine
+    const NetworkEntity = components.NetworkEntity(engine)
 
     const { entities, cloned } = clone(entity, engine as any, Transform as any, Triggers as any) as {
       entities: Map<Entity, Entity>
