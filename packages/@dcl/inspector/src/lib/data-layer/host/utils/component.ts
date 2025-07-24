@@ -32,6 +32,7 @@ const parseCoords = (coords: string) => {
 
 type SceneWithRating = Scene & { rating: SceneAgeRating }
 
+//TODO check scene init
 export function fromSceneComponent(value: DeepReadonlyObject<EditorComponentsTypes['Scene']>): Partial<Scene> {
   const tags: string[] = []
   for (const category of value.categories || []) {
@@ -73,7 +74,12 @@ export function fromSceneComponent(value: DeepReadonlyObject<EditorComponentsTyp
       voiceChat: value.silenceVoiceChat ? 'disabled' : 'enabled',
       portableExperiences: value.disablePortableExperiences ? 'disabled' : 'enabled'
     },
-    rating: value.ageRating
+    rating: value.ageRating,
+    worldConfiguration: {
+      skyboxConfig: {
+        fixedTime: 900
+      }
+    }
   }
 
   if (config.segmentAppId && config.projectId) {
@@ -114,6 +120,11 @@ export function toSceneComponent(value: Scene): EditorComponentsTypes['Scene'] {
     silenceVoiceChat: value.featureToggles?.voiceChat === 'disabled',
     disablePortableExperiences: value.featureToggles?.portableExperiences === 'disabled',
     ageRating: (value as SceneWithRating).rating,
+    worldConfiguration: {
+      skyboxConfig: {
+        fixedTime: value.worldConfiguration?.skyboxConfig?.fixedTime
+      }
+    },
     spawnPoints: value.spawnPoints?.map((spawnPoint, index) => ({
       name: spawnPoint.name || `Spawn Point ${index + 1}`,
       default: spawnPoint.default,

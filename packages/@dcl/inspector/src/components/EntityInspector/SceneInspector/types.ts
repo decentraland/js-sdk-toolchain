@@ -22,6 +22,11 @@ export type SpawnPointInput = {
 export type SceneInput = {
   name: string
   description: string
+  worldConfiguration: {
+    skyboxConfig: {
+      fixedTime: string
+    }
+  }
   thumbnail: string
   ageRating: string
   categories: string[]

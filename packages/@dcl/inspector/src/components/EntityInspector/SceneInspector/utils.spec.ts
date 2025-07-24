@@ -3,6 +3,7 @@ import { Layout } from '../../../lib/utils/layout'
 import { SceneInput } from './types'
 import { fromScene, isValidInput, parseParcels, toScene } from './utils'
 
+//TODO fix tests
 function getInput(base: string, parcels: string): SceneInput {
   const input: SceneInput = {
     name: 'name',
@@ -16,6 +17,11 @@ function getInput(base: string, parcels: string): SceneInput {
     spawnPoints: [],
     author: 'John Doe',
     email: 'johndoe@gmail.com',
+    worldConfiguration: {
+      skyboxConfig: {
+        fixedTime: '800'
+      }
+    },
     layout: {
       base,
       parcels
@@ -37,7 +43,12 @@ function getScene(layout: Layout): EditorComponentsTypes['Scene'] {
     spawnPoints: [],
     author: 'John Doe',
     email: 'johndoe@gmail.com',
-    layout
+    layout,
+    worldConfiguration: {
+      skyboxConfig: {
+        fixedTime: '800'
+      }
+    }
   }
   return scene
 }

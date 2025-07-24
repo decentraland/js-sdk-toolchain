@@ -41,9 +41,10 @@ export enum CoreComponents {
   VISIBILITY_COMPONENT = 'core::VisibilityComponent'
 }
 
+//TODO check if this is the correct name for the type
 export enum EditorComponentNames {
   Selection = 'inspector::Selection',
-  Scene = 'inspector::SceneMetadata',
+  Scene = 'inspector::SceneMetadata-v2',
   Nodes = 'inspector::Nodes',
   ActionTypes = ComponentName.ACTION_TYPES,
   Actions = ComponentName.ACTIONS,
@@ -88,6 +89,11 @@ export type SceneSpawnPoint = {
 export type SceneComponent = {
   name?: string
   description?: string
+  worldConfiguration?: {
+    skyboxConfig?: {
+      fixedTime?: number
+    }
+  }
   thumbnail?: string
   ageRating?: SceneAgeRating
   main?: string
@@ -276,6 +282,53 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     })
   })
 
+  engine.defineComponent('inspector::SceneMetadata', {
+    // everything but layout is set as optional for retrocompat purposes
+    name: Schemas.Optional(Schemas.String),
+    description: Schemas.Optional(Schemas.String),
+    thumbnail: Schemas.Optional(Schemas.String),
+    ageRating: Schemas.Optional(Schemas.EnumString(SceneAgeRating, SceneAgeRating.Teen)),
+    categories: Schemas.Optional(Schemas.Array(Schemas.EnumString(SceneCategory, SceneCategory.GAME))),
+    author: Schemas.Optional(Schemas.String),
+    email: Schemas.Optional(Schemas.String),
+    tags: Schemas.Optional(Schemas.Array(Schemas.String)),
+    layout: Schemas.Map({
+      base: Coords,
+      parcels: Schemas.Array(Coords)
+    }),
+    silenceVoiceChat: Schemas.Optional(Schemas.Boolean),
+    disablePortableExperiences: Schemas.Optional(Schemas.Boolean),
+    spawnPoints: Schemas.Optional(
+      Schemas.Array(
+        Schemas.Map({
+          name: Schemas.String,
+          default: Schemas.Optional(Schemas.Boolean),
+          position: Schemas.Map({
+            x: Schemas.OneOf({
+              single: Schemas.Int,
+              range: Schemas.Array(Schemas.Int)
+            }),
+            y: Schemas.OneOf({
+              single: Schemas.Int,
+              range: Schemas.Array(Schemas.Int)
+            }),
+            z: Schemas.OneOf({
+              single: Schemas.Int,
+              range: Schemas.Array(Schemas.Int)
+            })
+          }),
+          cameraTarget: Schemas.Optional(
+            Schemas.Map({
+              x: Schemas.Int,
+              y: Schemas.Int,
+              z: Schemas.Int
+            })
+          )
+        })
+      )
+    )
+  })
+
   const Scene = engine.defineComponent(EditorComponentNames.Scene, {
     // everything but layout is set as optional for retrocompat purposes
     name: Schemas.Optional(Schemas.String),
@@ -286,6 +339,15 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     author: Schemas.Optional(Schemas.String),
     email: Schemas.Optional(Schemas.String),
     tags: Schemas.Optional(Schemas.Array(Schemas.String)),
+    worldConfiguration: Schemas.Optional(
+      Schemas.Map({
+        skyboxConfig: Schemas.Optional(
+          Schemas.Map({
+            fixedTime: Schemas.Optional(Schemas.Int)
+          })
+        )
+      })
+    ),
     layout: Schemas.Map({
       base: Coords,
       parcels: Schemas.Array(Coords)

@@ -15,7 +15,7 @@ import { fromScene, toScene, isValidInput, isImage, fromSceneSpawnPoint, toScene
 import './SceneInspector.css'
 import { EditorComponentsTypes, SceneAgeRating, SceneCategory, SceneSpawnPoint } from '../../../lib/sdk/components'
 import { Dropdown } from '../../ui/Dropdown'
-import { TextArea } from '../../ui'
+import { RangeField, TextArea } from '../../ui'
 import { Tabs } from '../Tabs'
 import { CheckboxField } from '../../ui/CheckboxField'
 import { useComponentValue } from '../../../hooks/sdk/useComponentValue'
@@ -107,6 +107,44 @@ export default withSdk<Props>(({ sdk, entity }) => {
   const [componentValue, setComponentValue, isComponentEqual] = useComponentValue<EditorComponentsTypes['Scene']>(
     entity,
     Scene
+  )
+
+  const handleSkyboxAutoChange = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const isAuto = e.target.checked
+      const newValue = {
+        ...componentValue,
+        worldConfiguration: {
+          ...componentValue.worldConfiguration,
+          skyboxConfig: isAuto
+            ? undefined
+            : {
+                fixedTime: 12
+              }
+        }
+      }
+
+      setComponentValue(newValue)
+    },
+    [sdk, Scene, entity, componentValue, setComponentValue]
+  )
+
+  const handleSkyboxTimeChange = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { value } = e.target as HTMLInputElement
+      const newValue = {
+        ...componentValue,
+        worldConfiguration: {
+          ...componentValue.worldConfiguration,
+          skyboxConfig: {
+            fixedTime: parseInt(value)
+          }
+        }
+      }
+
+      setComponentValue(newValue)
+    },
+    [sdk, Scene, entity, componentValue, setComponentValue]
   )
 
   const [spawnPoints, addSpawnPoint, modifySpawnPoint, removeSpawnPoint] = useArrayState<SceneSpawnPoint>(
@@ -424,6 +462,21 @@ export default withSdk<Props>(({ sdk, entity }) => {
           <Block label="Spawn Settings" className="underlined"></Block>
           {spawnPoints.map((spawnPoint, index) => renderSpawnPoint(spawnPoint, index))}
           <AddButton onClick={handleAddSpawnPoint}>Add Spawn Point</AddButton>
+          <Block label="Skybox" className="underlined"></Block>
+          <CheckboxField
+            label="Auto (decentraland time)"
+            checked={!componentValue.worldConfiguration?.skyboxConfig?.fixedTime}
+            onChange={handleSkyboxAutoChange}
+          />
+          <div>{componentValue.worldConfiguration?.skyboxConfig?.fixedTime}</div>
+          <RangeField
+            value={componentValue.worldConfiguration?.skyboxConfig?.fixedTime || 12}
+            min={0}
+            max={800000000}
+            step={0.1}
+            disabled={!componentValue.worldConfiguration?.skyboxConfig?.fixedTime}
+            onChange={handleSkyboxTimeChange}
+          />
         </>
       ) : null}
     </Container>
