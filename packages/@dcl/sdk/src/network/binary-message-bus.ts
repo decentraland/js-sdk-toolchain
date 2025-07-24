@@ -1,3 +1,4 @@
+import { MeshRenderer } from '@dcl/ecs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 
 export enum CommsMessage {
