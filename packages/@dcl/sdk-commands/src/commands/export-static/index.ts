@@ -1,16 +1,10 @@
-import path from 'path'
-import { declareArgs } from '../../logic/args'
 import { hashV1 } from '@dcl/hashing'
-import { CliComponents } from '../../components'
-import { SceneProject } from '../../logic/project-validations'
-import {
-  getProjectPublishableFilesWithHashes,
-  b64HashingFunction,
-  projectFilesToContentMappings
-} from '../../logic/project-files'
-import { CliError } from '../../logic/error'
 import { Entity, EntityType } from '@dcl/schemas'
+import { Result } from 'arg'
+import path from 'path'
+import { CliComponents } from '../../components'
 import { colors } from '../../components/log'
+import { declareArgs } from '../../logic/args'
 import {
   printCurrentProjectStarting,
   printProgressInfo,
@@ -19,10 +13,16 @@ import {
   printSuccess,
   printWarning
 } from '../../logic/beautiful-logs'
+import { CliError } from '../../logic/error'
+import {
+  b64HashingFunction,
+  getProjectPublishableFilesWithHashes,
+  projectFilesToContentMappings
+} from '../../logic/project-files'
+import { SceneProject } from '../../logic/project-validations'
 import { createStaticRealm } from '../../logic/realm'
 import { getBaseCoords } from '../../logic/scene-validations'
 import { getValidWorkspace } from '../../logic/workspace-validations'
-import { Result } from 'arg'
 
 interface Options {
   args: Result<typeof args>
@@ -103,7 +103,18 @@ export async function main(options: Options) {
   if (willCreateRealm) {
     // prepare the realm object
     printProgressStep(logger, 'Creating realm file...', currentStep++, maxSteps)
-    const realm = await createStaticRealm(options.components)
+
+    const localSceneParcels: string[] = []
+    for (const project of workspace.projects) {
+      for (const parcel of project.scene.scene.parcels) {
+        localSceneParcels.push(parcel)
+      }
+    }
+
+    const realm = await createStaticRealm(
+      options.components,
+      workspace.projects.map((p) => p.scene.scene.parcels)
+    )
     const realmName = options.args['--realmName']!
 
     realm.configurations!.scenesUrn = scenesUrn
