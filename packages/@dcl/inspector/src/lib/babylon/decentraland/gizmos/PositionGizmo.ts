@@ -1,7 +1,7 @@
 import { Vector3, TransformNode, GizmoManager, Quaternion } from '@babylonjs/core'
 import { Entity } from '@dcl/ecs'
 import { EcsEntity } from '../EcsEntity'
-import { IGizmoTransformer } from './types'
+import { GizmoType, IGizmoTransformer } from './types'
 import { LEFT_BUTTON } from '../mouse-utils'
 import { configureGizmoButtons } from './utils'
 
@@ -13,6 +13,7 @@ interface EntityState {
 }
 
 export class PositionGizmo implements IGizmoTransformer {
+  type = GizmoType.POSITION
   private entityStates = new Map<Entity, EntityState>()
   private pivotPosition: Vector3 | null = null
   private isDragging = false
