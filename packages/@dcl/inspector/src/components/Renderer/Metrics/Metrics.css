@@ -47,7 +47,7 @@
 .Metrics > .Overlay {
   display: flex;
   flex-direction: column;
-  width: 250px;
+  width: 300px;
   position: absolute;
   overflow-y: auto;
   left: 0;
@@ -55,17 +55,22 @@
   background-color: var(--base-19);
   padding: 13px 12px;
   border-radius: 4px;
-  gap: 16px;
 }
 
-.Metrics > .Overlay h2.Header {
+.Metrics > .Overlay .Description {
   display: flex;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
   line-height: 17px;
-  color: var(--base-01);
+  color: var(--base-09);
   margin-bottom: 0;
   gap: 4px;
+}
+
+.Metrics > .Overlay .Header {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
 }
 
 .Metrics > .Overlay .Item .Title,
@@ -112,6 +117,18 @@
   line-height: 14px;
 }
 
+.Metrics > .Overlay .WarningItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 17px;
+  color: var(--warning-main);
+  margin-bottom: 0;
+  gap: 4px;
+}
+
 .Metrics > .Overlay .Item .Description .Key {
   display: flex;
   align-items: center;
@@ -125,9 +142,31 @@
 .Metrics .Buttons .Button.LimitExceeded svg,
 .Metrics > .Overlay .Item .Description.LimitExceeded,
 .Metrics > .Overlay .Item .Description.LimitExceeded .secondary {
-  color: var(--error-dark);
+  color: var(--warning-main);
 }
 
 .Metrics .Buttons .Button.Active.LimitExceeded svg {
-  color: var(--error-main);
+  color: var(--warning-main);
+}
+
+.Metrics > .Overlay .WarningsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.Metrics > .Overlay .WarningIcon {
+  color: var(--warning-main);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.Metrics > .Overlay .WarningText {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--warning-main);
+  line-height: 16px;
+  margin: 0;
 }
