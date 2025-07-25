@@ -199,9 +199,7 @@ describe('explorer-alpha', () => {
         '/test',
         'open',
         expect.arrayContaining([
-          expect.stringMatching(
-            /decentraland:\/\/.*realm=default-realm.*position=5%2C10.*dclenv=org.*local-scene=true/
-          )
+          expect.stringMatching(/decentraland:\/\/.*realm=default-realm.*position=5%2C10.*dclenv=org.*local-scene=true/)
         ]),
         { silent: true }
       )
