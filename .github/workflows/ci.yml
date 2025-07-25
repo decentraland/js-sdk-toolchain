@@ -16,10 +16,10 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
       - name: install
         run: make install
@@ -31,10 +31,10 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
       - name: docs
         run: make docs
@@ -42,11 +42,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: install
@@ -89,10 +89,10 @@ jobs:
         with:
           script: return `${process.env.BRANCH.replaceAll('/', '-').substr(0, 28)}.${context.repo.repo}.pages.dev`
           result-encoding: string
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
       - name: install repo
         run: npm ci
@@ -115,10 +115,10 @@ jobs:
       decentraland_js_runtime_s3_bucket_key: ${{ steps.publish_dcl_js_runtime.outputs.s3-bucket-key }}
       decentraland_ecs_bucket_key: ${{ steps.publish_ecs.outputs.s3-bucket-key }}
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: install
@@ -418,9 +418,9 @@ jobs:
     runs-on: ubuntu-latest
     name: CLI E2E
     steps:
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - run: mkdir -p scene
       - name: npx @dcl/sdk-commands init --skip-install
         run: npx ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_commands_s3_bucket_key }} init --skip-install
@@ -467,11 +467,11 @@ jobs:
       github.ref == 'refs/heads/main'
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Download prepared packages
         uses: actions/download-artifact@v4
