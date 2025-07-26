@@ -55,9 +55,8 @@ export function addSyncTransport(
   const transport: Transport = {
     filter: syncFilter(engine),
     send: async (messages) => {
-      for (const message of [messages].flat()) {
+      for (const message of transportInitialzed ? [messages].flat(): []) {
         if (message.byteLength) {
-          console.log('TODO trasport initialized', transportInitialzed)
           DEBUG_NETWORK_MESSAGES() &&
             console.log(...Array.from(serializeCrdtMessages('[NetworkMessage sent]:', message, engine)))
 
@@ -88,7 +87,14 @@ export function addSyncTransport(
   // End add sync transport
 
   // Receive & Process CRDT_STATE
+  binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, async (data, sender) => {
+    DEBUG_NETWORK_MESSAGES() && console.log('[REQ_CRDT_STATE]', sender, Date.now())
+    for (const chunk of engineToCrdt(engine)) {
+      binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, chunk, [sender])
+    }
+  })
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, async (data, sender) => {
+    requestingState = false
     if (isServerAtom.getOrNull() || sender !== AUTH_SERVER_PEER_ID) return
     DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength / 1024, 'KB')
     transport.onmessage!(serverValidator.processClientMessages(data, sender))
@@ -111,9 +117,8 @@ export function addSyncTransport(
 
   players.onEnterScene((player) => {
     DEBUG_NETWORK_MESSAGES() && console.log('[onEnterScene]', player.userId)
-    if (!isServerAtom.getOrNull()) return
-    for (const chunk of engineToCrdt(engine)) {
-      binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, chunk, [player.userId])
+    if (!isServerAtom.getOrNull() && myProfile.userId === player.userId) {
+      requestState()
     }
   })
 
@@ -124,9 +129,18 @@ export function addSyncTransport(
     }
 
     if (value?.isConnectedSceneRoom) {
-      DEBUG_NETWORK_MESSAGES() && console.log('Connected to comms')
+      requestState()
     }
   })
+  
+  let requestingState = false
+  function requestState() {
+    if (RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom && !requestingState) {
+      requestingState = true
+      DEBUG_NETWORK_MESSAGES() && console.log('Requesting state...')
+      binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
+    }
+  }
 
   players.onLeaveScene((userId) => {
     DEBUG_NETWORK_MESSAGES() && console.log('[onLeaveScene]', userId)
