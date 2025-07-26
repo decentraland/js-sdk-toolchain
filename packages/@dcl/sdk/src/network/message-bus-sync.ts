@@ -1,26 +1,35 @@
-import { IEngine, Transport, RealmInfo, PlayerIdentityData } from '@dcl/ecs'
+import { IEngine, Transport, RealmInfo } from '@dcl/ecs'
 import { type SendBinaryRequest, type SendBinaryResponse } from '~system/CommunicationsController'
 
 import { syncFilter } from './filter'
 import { engineToCrdt } from './state'
-import { BinaryMessageBus, CommsMessage, decodeString, encodeString } from './binary-message-bus'
+import { BinaryMessageBus, CommsMessage } from './binary-message-bus'
 import { fetchProfile } from './utils'
 import { entityUtils } from './entities'
+import { createServerValidator } from './server'
 import { GetUserDataRequest, GetUserDataResponse } from '~system/UserIdentity'
 import { definePlayerHelper } from '../players'
 import { serializeCrdtMessages } from '../internal/transports/logger'
+import { IsServerRequest, IsServerResponse } from '~system/EngineApi'
+import { Atom } from '../atom'
 
 export type IProfile = { networkId: number; userId: string }
 // user that we asked for the inital crdt state
 export function addSyncTransport(
   engine: IEngine,
   sendBinary: (msg: SendBinaryRequest) => Promise<SendBinaryResponse>,
-  getUserData: (value: GetUserDataRequest) => Promise<GetUserDataResponse>
+  getUserData: (value: GetUserDataRequest) => Promise<GetUserDataResponse>,
+  isServerFn: (request: IsServerRequest) => Promise<IsServerResponse>,
+  name: string
 ) {
-  const DEBUG_NETWORK_MESSAGES = () => (globalThis as any).DEBUG_NETWORK_MESSAGES ?? false
+  const AUTH_SERVER_PEER_ID = 'authorative-server'
+  const DEBUG_NETWORK_MESSAGES = () => true //(globalThis as any).DEBUG_NETWORK_MESSAGES ?? false
   // Profile Info
   const myProfile: IProfile = {} as IProfile
   fetchProfile(myProfile!, getUserData)
+
+  const isServerAtom = Atom<boolean>()
+  void isServerFn({}).then(($: IsServerResponse) => isServerAtom.swap(!!$.isServer))
 
   // Entity utils
   const entityDefinitions = entityUtils(engine, myProfile)
@@ -46,104 +55,92 @@ export function addSyncTransport(
   const transport: Transport = {
     filter: syncFilter(engine),
     send: async (messages) => {
-      for (const message of [messages].flat()) {
-        if (message.byteLength && transportInitialzed) {
+      for (const message of transportInitialzed ? [messages].flat(): []) {
+        if (message.byteLength) {
           DEBUG_NETWORK_MESSAGES() &&
             console.log(...Array.from(serializeCrdtMessages('[NetworkMessage sent]:', message, engine)))
-          binaryMessageBus.emit(CommsMessage.CRDT, message)
+
+          // Convert regular messages to network messages for broadcasting with chunking
+          for (const chunk of serverValidator.convertRegularToNetworkMessage(message)) {
+            binaryMessageBus.emit(CommsMessage.CRDT, chunk)
+          }
         }
       }
       const peerMessages = getMessagesToSend()
-      let totalSize = 0
-      for (const message of peerMessages) {
-        for (const data of message.data) {
-          totalSize += data.byteLength
-        }
-      }
-      if (totalSize) {
-        DEBUG_NETWORK_MESSAGES() && console.log('Sending network messages: ', totalSize / 1024, 'KB')
-      }
       const response = await sendBinary({ data: [], peerData: peerMessages })
       binaryMessageBus.__processMessages(response.data)
       transportInitialzed = true
     },
-    type: 'network'
+    type: name
   }
+
+  // Server validation setup
+  const serverValidator = createServerValidator({
+    engine,
+    binaryMessageBus,
+    transport,
+    authServerPeerId: AUTH_SERVER_PEER_ID,
+    debugNetworkMessages: DEBUG_NETWORK_MESSAGES
+  })
+
   engine.addTransport(transport)
   // End add sync transport
 
   // Receive & Process CRDT_STATE
-  binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, (value) => {
-    const { sender, data } = decodeCRDTState(value)
-    if (sender !== myProfile.userId) return
+  binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, async (data, sender) => {
+    DEBUG_NETWORK_MESSAGES() && console.log('[REQ_CRDT_STATE]', sender, Date.now())
+    for (const chunk of engineToCrdt(engine)) {
+      binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, chunk, [sender])
+    }
+  })
+  binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, async (data, sender) => {
+    requestingState = false
+    if (isServerAtom.getOrNull() || sender !== AUTH_SERVER_PEER_ID) return
     DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength / 1024, 'KB')
-    transport.onmessage!(data)
+    transport.onmessage!(serverValidator.processClientMessages(data, sender))
     stateIsSyncronized = true
   })
 
-  // Answer to REQ_CRDT_STATE
-  binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, async (_, userId) => {
-    DEBUG_NETWORK_MESSAGES() && console.log(`Sending CRDT State to: ${userId}`)
-
-    for (const chunk of engineToCrdt(engine)) {
-      binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(userId, chunk), [userId])
-    }
-  })
-
-  // Process CRDT messages here
-  binaryMessageBus.on(CommsMessage.CRDT, (value) => {
+  // received message from the network
+  binaryMessageBus.on(CommsMessage.CRDT, (value, sender) => {
     DEBUG_NETWORK_MESSAGES() &&
-      console.log(Array.from(serializeCrdtMessages('[NetworkMessage received]:', value, engine)))
-    transport.onmessage!(value)
+      console.log(transport.type, ...Array.from(serializeCrdtMessages('[NetworkMessage received]:', value, engine)))
+    const isServer = isServerAtom.getOrNull()
+    if (isServer) {
+      serverValidator.processServerMessages(value, sender)
+    } else {
+      if (sender !== AUTH_SERVER_PEER_ID) return
+      // Process network messages from server and convert to regular messages
+      transport.onmessage!(serverValidator.processClientMessages(value, sender))
+    }
   })
-
-  async function requestState(retryCount: number = 1) {
-    let players = Array.from(engine.getEntitiesWith(PlayerIdentityData))
-    DEBUG_NETWORK_MESSAGES() && console.log(`Requesting state. Players connected: ${players.length - 1}`)
-
-    if (!RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom) {
-      DEBUG_NETWORK_MESSAGES() && console.log(`Aborting Requesting state?. Disconnected`)
-      return
-    }
-
-    binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
-
-    // Wait ~5s for the response.
-    await sleep(5000)
-
-    players = Array.from(engine.getEntitiesWith(PlayerIdentityData))
-
-    if (!stateIsSyncronized) {
-      if (players.length > 1 && retryCount <= 2) {
-        DEBUG_NETWORK_MESSAGES() &&
-          console.log(`Requesting state again ${retryCount} (no response). Players connected: ${players.length - 1}`)
-        void requestState(retryCount + 1)
-      } else {
-        DEBUG_NETWORK_MESSAGES() && console.log('No active players. State syncronized')
-        stateIsSyncronized = true
-      }
-    }
-  }
 
   players.onEnterScene((player) => {
     DEBUG_NETWORK_MESSAGES() && console.log('[onEnterScene]', player.userId)
+    if (!isServerAtom.getOrNull() && myProfile.userId === player.userId) {
+      requestState()
+    }
   })
 
   // Asks for the REQ_CRDT_STATE when its connected to comms
   RealmInfo.onChange(engine.RootEntity, (value) => {
     if (!value?.isConnectedSceneRoom) {
       DEBUG_NETWORK_MESSAGES() && console.log('Disconnected from comms')
-      stateIsSyncronized = false
     }
 
     if (value?.isConnectedSceneRoom) {
-      DEBUG_NETWORK_MESSAGES() && console.log('Connected to comms')
-    }
-
-    if (value?.isConnectedSceneRoom && !stateIsSyncronized) {
-      void requestState()
+      requestState()
     }
   })
+  
+  let requestingState = false
+  function requestState() {
+    if (RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom && !requestingState) {
+      requestingState = true
+      DEBUG_NETWORK_MESSAGES() && console.log('Requesting state...')
+      binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
+    }
+  }
 
   players.onLeaveScene((userId) => {
     DEBUG_NETWORK_MESSAGES() && console.log('[onLeaveScene]', userId)
@@ -153,56 +150,9 @@ export function addSyncTransport(
     return stateIsSyncronized
   }
 
-  function sleep(ms: number) {
-    return new Promise<void>((resolve) => {
-      let timer = 0
-      function sleepSystem(dt: number) {
-        timer += dt
-        if (timer * 1000 >= ms) {
-          engine.removeSystem(sleepSystem)
-          resolve()
-        }
-      }
-      engine.addSystem(sleepSystem)
-    })
-  }
-
   return {
     ...entityDefinitions,
     myProfile,
     isStateSyncronized
   }
-}
-
-/**
- * Messages Protocol Encoding
- *
- * CRDT: Plain Uint8Array
- *
- * CRDT_STATE_RES { sender: string, data: Uint8Array}
- */
-function decodeCRDTState(data: Uint8Array) {
-  let offset = 0
-  const r = new Uint8Array(data)
-  const view = new DataView(r.buffer)
-  const senderLength = view.getUint8(offset)
-  offset += 1
-  const sender = decodeString(data.subarray(1, senderLength + 1))
-  offset += senderLength
-  const state = r.subarray(offset)
-
-  return { sender, data: state }
-}
-
-function encodeCRDTState(address: string, data: Uint8Array) {
-  // address to uint8array
-  const addressBuffer = encodeString(address)
-  const addressOffset = 1
-  const messageLength = addressOffset + addressBuffer.byteLength + data.byteLength
-
-  const serializedMessage = new Uint8Array(messageLength)
-  serializedMessage.set(new Uint8Array([addressBuffer.byteLength]), 0)
-  serializedMessage.set(addressBuffer, 1)
-  serializedMessage.set(data, addressBuffer.byteLength + 1)
-  return serializedMessage
 }
