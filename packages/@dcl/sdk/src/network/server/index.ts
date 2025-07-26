@@ -112,7 +112,7 @@ export function createServerValidator(config: ServerValidationConfig) {
   return {
     // transform Network messages to CRDT Common Messages.
     processClientMessages: function processClientMessages(value: Uint8Array, sender: string) {
-      console.log(`[CLIENT] Processing message from ${sender}, ${value.length} bytes`)
+      // console.log(`[CLIENT] Processing message from ${sender}, ${value.length} bytes`)
 
       // Collect all regular messages in a single buffer for batched application
       const combinedBuffer = new ReadWriteByteBuffer()
@@ -137,7 +137,7 @@ export function createServerValidator(config: ServerValidationConfig) {
     },
     // Sever Code: process message, handle permissions, and broadcast if needed.
     processServerMessages: function processServerMessages(value: Uint8Array, sender: string) {
-      console.log(`[SERVER] Processing message from ${sender}, ${value.length} bytes`)
+      // console.log(`[SERVER] Processing message from ${sender}, ${value.length} bytes`)
 
       // Collect all valid messages for batched broadcasting
       const messagesToBroadcast: utils.NetworkMessage[] = []
@@ -145,8 +145,6 @@ export function createServerValidator(config: ServerValidationConfig) {
 
       for (const message of utils.readMessages(value)) {
         try {
-          const componentId = 'componentId' in message ? message.componentId : 'N/A'
-          console.log(`[SERVER] Message type: ${message.type}, entity: ${message.entityId}, component: ${componentId}`)
           // Only process network messages in server message handler
           if (utils.isNetworkMessage(message)) {
             const networkMessage = message as utils.NetworkMessage
