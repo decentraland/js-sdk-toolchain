@@ -2477,9 +2477,11 @@ export namespace PBInputModifier_StandardInput {
 // @public (undocumented)
 export interface PBLightSource {
     active?: boolean | undefined;
-    brightness?: number | undefined;
     color?: PBColor3 | undefined;
+    intensity?: number | undefined;
     range?: number | undefined;
+    shadow?: boolean | undefined;
+    shadowMaskTexture?: TextureUnion | undefined;
     // (undocumented)
     type?: {
         $case: "point";
@@ -2500,7 +2502,6 @@ export namespace PBLightSource {
 
 // @public (undocumented)
 export interface PBLightSource_Point {
-    shadow?: PBLightSource_ShadowType | undefined;
 }
 
 // @public (undocumented)
@@ -2508,22 +2509,13 @@ export namespace PBLightSource_Point {
     // (undocumented)
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBLightSource_Point;
     // (undocumented)
-    export function encode(message: PBLightSource_Point, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
-export const enum PBLightSource_ShadowType {
-    ST_HARD = 2,
-    ST_NONE = 0,
-    ST_SOFT = 1
+    export function encode(_: PBLightSource_Point, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
 export interface PBLightSource_Spot {
     innerAngle?: number | undefined;
     outerAngle?: number | undefined;
-    shadow?: PBLightSource_ShadowType | undefined;
-    shadowMaskTexture?: TextureUnion | undefined;
 }
 
 // @public (undocumented)
