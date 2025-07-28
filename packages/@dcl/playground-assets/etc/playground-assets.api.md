@@ -2248,9 +2248,9 @@ export interface PBAvatarShape {
     expressionTriggerTimestamp?: number | undefined;
     eyeColor?: PBColor3 | undefined;
     hairColor?: PBColor3 | undefined;
-    hideBody?: boolean | undefined;
     id: string;
     name?: string | undefined;
+    showOnlyWearables?: boolean | undefined;
     skinColor?: PBColor3 | undefined;
     talking?: boolean | undefined;
     wearables: string[];
