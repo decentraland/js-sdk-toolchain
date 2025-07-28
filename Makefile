@@ -40,7 +40,7 @@ update-protocol:
 	echo "Using protocol tag: $$PROTO_TAG"; \
 	npm i --save-exact @dcl/protocol@$$PROTO_TAG; \
 	(cd packages/@dcl/sdk-commands && npm i --save-exact @dcl/protocol@$$PROTO_TAG); \
-	$(MAKE) sync-deps compile_apis
+	$(MAKE) sync-deps
 
 %:
 	@:
