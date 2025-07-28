@@ -4,6 +4,7 @@ import { Vector3 as DclVector3 } from '@dcl/ecs-math'
 import { SceneContext } from './SceneContext'
 import { EcsEntity } from './EcsEntity'
 import { GizmoType } from '../../utils/gizmo'
+import { GizmoType as TransformerType } from './gizmos/types'
 import { FreeGizmo, PositionGizmo, RotationGizmo, ScaleGizmo, IGizmoTransformer } from './gizmos'
 import { snapManager, snapPosition, snapRotation, snapScale } from './snap-manager'
 
@@ -179,11 +180,14 @@ export function createGizmoManager(context: SceneContext) {
       node.rotationQuaternion = Quaternion.Identity()
     }
 
-    // Update rotation based on current transformer type
-    if (gizmoManager.rotationGizmoEnabled) {
-      // For rotation gizmo, sync the rotation
-      syncGizmoRotation(node, selectedEntities, isGizmoWorldAligned)
-    } else {
+    if (currentTransformer) {
+      if (currentTransformer.type === TransformerType.ROTATION) {
+        // Update rotation based on current transformer type
+        syncGizmoRotation(node, selectedEntities, isGizmoWorldAligned)
+      } else if (currentTransformer.type === TransformerType.FREE) {
+        // Update free gizmo indicator with ECS updates
+        ;(currentTransformer as FreeGizmo).updateGizmoIndicator()
+      }
       // For non-rotation gizmos, let the transformers handle rotation
       // Don't reset rotation if it already exists
     }
@@ -266,7 +270,7 @@ export function createGizmoManager(context: SceneContext) {
       }
     },
     getGizmoTypes() {
-      return [GizmoType.POSITION, GizmoType.ROTATION, GizmoType.SCALE, GizmoType.FREE] as const
+      return [GizmoType.FREE, GizmoType.POSITION, GizmoType.ROTATION, GizmoType.SCALE] as const
     },
     setGizmoType(type: GizmoType) {
       // Then disable all Babylon gizmos
@@ -384,6 +388,11 @@ export function createGizmoManager(context: SceneContext) {
           currentTransformer = freeTransformer
           currentTransformer.setup()
           currentTransformer.setEntities(selectedEntities)
+
+          // Pass GizmoManager reference to FreeGizmo for centroid calculation
+          if ('setGizmoManager' in currentTransformer) {
+            ;(currentTransformer as any).setGizmoManager(calculateCentroid)
+          }
 
           // Set up callbacks for ECS updates
           if ('setUpdateCallbacks' in currentTransformer) {
