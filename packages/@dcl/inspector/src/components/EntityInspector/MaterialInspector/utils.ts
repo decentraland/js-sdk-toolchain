@@ -16,7 +16,8 @@ export const fromMaterial =
           alphaTest: String(value.material.unlit.alphaTest ?? 0.5),
           castShadows: !!(value.material.unlit.castShadows ?? true),
           diffuseColor: toHex(value.material.unlit.diffuseColor),
-          texture: fromTexture(base, value.material.unlit.texture ?? {})
+          texture: fromTexture(base, value.material.unlit.texture ?? {}),
+          alphaTexture: fromTexture(base, value.material.unlit.alphaTexture ?? {})
         }
       case 'pbr':
       default:
@@ -53,7 +54,8 @@ export const toMaterial =
               alphaTest: Number(value.alphaTest ?? 0.5),
               castShadows: !!(value.castShadows ?? true),
               diffuseColor: toColor4(value.diffuseColor),
-              texture: toTexture(base, value.texture)
+              texture: toTexture(base, value.texture),
+              alphaTexture: toTexture(base, value.alphaTexture)
             }
           }
         }

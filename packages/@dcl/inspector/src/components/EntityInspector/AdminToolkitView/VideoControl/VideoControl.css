@@ -4,22 +4,24 @@
   flex-direction: column;
   gap: 16px;
   width: 100%;
+}
 
-  .Title {
-    font-size: 14px;
-    font-weight: 400;
-    color: var(--base-04);
-  }
-  .ScreenSetup {
-    display: flex;
-    flex-direction: row;
-    .Label {
-      margin-left: 8px;
-      text-wrap: wrap;
-      width: 80%;
-    }
-    margin-bottom: 12px;
-  }
+.VideoControl .Title {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--base-04);
+}
+
+.VideoControl .ScreenSetup {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 12px;
+}
+
+.VideoControl .ScreenSetup label {
+  margin-left: 8px;
+  text-wrap: wrap;
+  width: 80%;
 }
 
 /* Checkbox group */

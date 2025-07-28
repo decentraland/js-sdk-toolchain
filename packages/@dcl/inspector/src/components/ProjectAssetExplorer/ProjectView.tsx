@@ -175,7 +175,6 @@ function ProjectView({ folders, thumbnails }: Props) {
             onCancel={() => setSearch('')}
           />
           <FilesTree
-            tree={tree}
             className="editor-assets-tree"
             value={ROOT}
             onAddChild={noop}
