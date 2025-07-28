@@ -120,6 +120,11 @@ export function removeGltf(entity: EcsEntity) {
   const context = entity.context.deref()
   if (!context) return
 
+  if (entity.boundingInfoMesh) {
+    entity.boundingInfoMesh.dispose()
+    entity.boundingInfoMesh = undefined
+  }
+
   if (entity.gltfContainer) {
     entity.gltfContainer.setEnabled(false)
     entity.gltfContainer.parent = null
