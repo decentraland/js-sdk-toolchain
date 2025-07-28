@@ -3,6 +3,7 @@ import { XYCoord, useDrag, useDrop } from 'react-dnd'
 import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io'
 import cx from 'classnames'
 import { Entity } from '@dcl/ecs'
+import { FiAlertTriangle as WarningIcon } from 'react-icons/fi'
 
 import { withContextMenu } from '../../hoc/withContextMenu'
 import { Input } from '../Input'
@@ -11,6 +12,9 @@ import { ActionArea } from './ActionArea'
 import { Edit as EditInput } from './Edit'
 import { DropType, calculateDropType } from './utils'
 import { useSdk } from '../../hooks/sdk/useSdk'
+import { useAppSelector } from '../../redux/hooks'
+import { getEntitiesOutOfBoundaries } from '../../redux/scene-metrics'
+import { InfoTooltip } from '../ui'
 
 import './Tree.css'
 
@@ -44,6 +48,7 @@ type Props<T> = {
   getDragContext?: () => unknown
   dndType?: string
   onLastSelectedChange?: (value: T) => void
+  isRoot?: (value: T) => boolean
 }
 
 type EmptyString = ''
@@ -83,6 +88,7 @@ export function Tree<T>() {
         onDuplicate,
         onDoubleSelect,
         onSetOpen,
+        isRoot,
         getDragContext = () => ({}),
         dndType = 'tree',
         onLastSelectedChange
@@ -227,6 +233,7 @@ export function Tree<T>() {
       }
 
       const sdk = useSdk()
+      const entitiesOutOfBoundaries = useAppSelector(getEntitiesOutOfBoundaries)
 
       const [, drag] = useDrag(
         () => ({
@@ -288,6 +295,29 @@ export function Tree<T>() {
         return typeof value !== 'string'
       }, [value])
 
+      const isEntityOutOfBoundaries = useMemo(() => {
+        if (typeof value === 'string') return false
+
+        if (entitiesOutOfBoundaries.includes(value as Entity)) {
+          return true
+        }
+
+        const checkChildrenOutOfBoundaries = (entity: Entity): boolean => {
+          const children = getChildren(entity as T)
+          for (const child of children) {
+            if (entitiesOutOfBoundaries.includes(child as Entity)) {
+              return true
+            }
+            if (checkChildrenOutOfBoundaries(child as Entity)) {
+              return true
+            }
+          }
+          return false
+        }
+
+        return checkChildrenOutOfBoundaries(value as Entity)
+      }, [value, entitiesOutOfBoundaries, getChildren])
+
       drag(drop(ref))
 
       const controlsProps = {
@@ -319,6 +349,13 @@ export function Tree<T>() {
                 {props.getIcon && props.getIcon(value)}
                 <div>{label || id}</div>
                 {isEntity && <ActionArea entity={value as Entity} />}
+                {!isRoot?.(value as T) && isEntityOutOfBoundaries && (
+                  <InfoTooltip
+                    text="This entity is out of bounds and might not display correctly in-world."
+                    trigger={<WarningIcon className="WarningIcon" />}
+                    position="right center"
+                  />
+                )}
               </div>
             </div>
             {editMode && typeof label === 'string' && (

@@ -149,7 +149,6 @@ describe('explorer-alpha', () => {
         '--position': '10,20',
         '--realm': 'custom-realm',
         '--local-scene': true,
-        '--debug': false,
         '--dclenv': 'zone',
         '--skip-auth-screen': true,
         '--landscape-terrain-enabled': false,
@@ -177,7 +176,6 @@ describe('explorer-alpha', () => {
       expect(callArgs).toContain('position=10%2C20')
       expect(callArgs).toContain('dclenv=zone')
       expect(callArgs).toContain('local-scene=true')
-      expect(callArgs).toContain('debug=true')
       expect(callArgs).toContain('hub=true')
       expect(callArgs).toContain('skip-auth-screen=true')
       expect(callArgs).toContain('open-deeplink-in-new-instance=true')
@@ -201,9 +199,7 @@ describe('explorer-alpha', () => {
         '/test',
         'open',
         expect.arrayContaining([
-          expect.stringMatching(
-            /decentraland:\/\/.*realm=default-realm.*position=5%2C10.*dclenv=org.*local-scene=true.*debug=true/
-          )
+          expect.stringMatching(/decentraland:\/\/.*realm=default-realm.*position=5%2C10.*dclenv=org.*local-scene=true/)
         ]),
         { silent: true }
       )

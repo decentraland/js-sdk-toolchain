@@ -98,3 +98,7 @@
 .Tree .contexify_item {
   width: 100%;
 }
+
+.Tree .WarningIcon {
+  color: var(--warning-main);
+}

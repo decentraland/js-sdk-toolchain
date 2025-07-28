@@ -221,6 +221,7 @@ export const useTree = () => {
     getLabel,
     setOpen,
     isOpen,
+    isRoot,
     isHidden,
     canRename,
     canRemove,
