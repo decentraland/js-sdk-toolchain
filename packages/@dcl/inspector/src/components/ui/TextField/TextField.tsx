@@ -8,6 +8,16 @@ import { Props } from './types'
 
 import './TextField.css'
 
+function buildBlurEvent(event: React.MouseEvent<HTMLInputElement>) {
+  return {
+    ...event,
+    type: 'blur',
+    target: event.target,
+    currentTarget: event.currentTarget,
+    relatedTarget: null
+  } as unknown as React.FocusEvent<HTMLInputElement>
+}
+
 const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
   const {
     drop,
@@ -74,6 +84,19 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
     setHovered(false)
   }, [setHovered])
 
+  const handleWheel: React.WheelEventHandler<HTMLInputElement> = useCallback(
+    (event) => {
+      if (type === 'number') {
+        event.preventDefault()
+        event.stopPropagation()
+        event.currentTarget.blur()
+        onBlur?.(buildBlurEvent(event))
+        return false
+      }
+    },
+    [type, onBlur]
+  )
+
   const renderLeftContent = useCallback(() => {
     if (leftLabel) {
       return (
@@ -130,6 +153,7 @@ const TextField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
           onBlur={handleInputBlur}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
+          onWheel={handleWheel}
           disabled={disabled}
           {...rest}
         />

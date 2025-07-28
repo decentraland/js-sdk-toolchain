@@ -84,7 +84,8 @@ const Hierarchy: React.FC = () => {
     canDuplicate,
     canDrag,
     canReorder,
-    centerViewOnEntity
+    centerViewOnEntity,
+    isRoot
   } = useTree()
   const selectedEntities = useEntitiesWith((components) => components.Selection)
   const [lastSelectedItem, setLastSelectedItem] = useState<Entity | undefined>(undefined)
@@ -173,7 +174,8 @@ const Hierarchy: React.FC = () => {
     canDuplicate: canDuplicate,
     canDrag: canDrag,
     canReorder: canReorder,
-    onLastSelectedChange: handleLastSelectedChange
+    onLastSelectedChange: handleLastSelectedChange,
+    isRoot: isRoot
   }
 
   return (

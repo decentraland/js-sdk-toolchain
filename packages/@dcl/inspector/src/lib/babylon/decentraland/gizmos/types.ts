@@ -2,6 +2,7 @@ import { IAxisDragGizmo, TransformNode } from '@babylonjs/core'
 import { EcsEntity } from '../EcsEntity'
 
 export interface IGizmoTransformer {
+  type: GizmoType
   setup(): void
   cleanup(): void
   setEntities(entities: EcsEntity[]): void

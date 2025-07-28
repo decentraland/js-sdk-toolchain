@@ -2,7 +2,7 @@ import { Vector3, TransformNode, Quaternion, Matrix, GizmoManager, Nullable, IRo
 import { Entity } from '@dcl/ecs'
 import { EcsEntity } from '../EcsEntity'
 import { snapManager } from '../snap-manager'
-import { IGizmoTransformer } from './types'
+import { GizmoType, IGizmoTransformer } from './types'
 import { LEFT_BUTTON } from '../mouse-utils'
 import { configureGizmoButtons } from './utils'
 
@@ -159,6 +159,7 @@ class SmoothSnapHelper {
 }
 
 export class RotationGizmo implements IGizmoTransformer {
+  type = GizmoType.ROTATION
   private rotationGizmo: Nullable<IRotationGizmo> = null
   private currentEntities: EcsEntity[] = []
   private currentEntityIds = new Set<Entity>()

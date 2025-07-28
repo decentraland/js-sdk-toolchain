@@ -3,11 +3,11 @@ import { CoreComponents } from '../../lib/sdk/components'
 import { useGizmoAlignment } from './useGizmoAlignment'
 
 // gizmoManager mock
-import { createGizmoManager } from '../../lib/babylon/decentraland/gizmo-manager'
+import { createGizmoManager } from '../../lib/babylon/decentraland/GizmoManager'
 import mitt from 'mitt'
 import { renderHook } from '@testing-library/react'
 import { act } from 'react-dom/test-utils'
-jest.mock('../../lib/babylon/decentraland/gizmo-manager')
+jest.mock('../../lib/babylon/decentraland/GizmoManager')
 const createGizmoManagerMock = createGizmoManager as jest.MockedFn<typeof createGizmoManager>
 const gizmoManagerEvents = mitt()
 const mockEntity = 0 as Entity

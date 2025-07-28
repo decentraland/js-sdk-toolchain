@@ -55,7 +55,6 @@ async function runApp(
     params.set('dclenv', dclenv)
 
     params.set('local-scene', 'true')
-    params.set('debug', 'true')
 
     if (isHub) {
       params.set('hub', 'true')

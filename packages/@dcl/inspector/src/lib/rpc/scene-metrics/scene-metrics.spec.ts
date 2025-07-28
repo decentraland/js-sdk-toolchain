@@ -69,10 +69,12 @@ describe('SceneMetricsRPC', () => {
   })
 
   describe('When using the getEntitiesOutOfBoundaries method of the client', () => {
+    const entitiesOutOfBoundaries = [1, 2, 3]
+
     beforeEach(() => {
       store.getState.mockReturnValueOnce({
         sceneMetrics: {
-          entitiesOutOfBoundaries: 1
+          entitiesOutOfBoundaries
         }
       })
     })
@@ -82,7 +84,7 @@ describe('SceneMetricsRPC', () => {
     })
 
     it('should get the entities out of boundaries from the sceneMetrics state in the server', async () => {
-      await expect(client.getEntitiesOutOfBoundaries()).resolves.toBe(1)
+      await expect(client.getEntitiesOutOfBoundaries()).resolves.toEqual(entitiesOutOfBoundaries)
     })
   })
 })
