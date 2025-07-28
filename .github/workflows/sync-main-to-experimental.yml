@@ -35,8 +35,9 @@ jobs:
           git merge -X theirs origin/main || echo "Merge completed (conflicts auto-resolved in favor of main)"
 
           # Run required update steps
-          make update-protocol 'experimental'
           make install
+          make build
+          make update-protocol 'experimental'
           make build
           make update-snapshots
 
