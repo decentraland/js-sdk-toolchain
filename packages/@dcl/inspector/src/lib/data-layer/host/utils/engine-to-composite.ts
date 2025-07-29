@@ -131,6 +131,12 @@ export function dumpEngineToCrdtCommands(engine: IEngine): Uint8Array {
   return crdtBuffer.toBinary()
 }
 
+// Polyfill for Set.difference
+function setDifference(set: Set<any>, other: Set<any>) {
+  if (typeof set.difference === 'function') return set.difference(other)
+  return new Set([...set].filter((x) => !other.has(x)))
+}
+
 /**
  * Generate a TypeScript declaration file with a string literal union type containing all entity names in the scene.
  * This allows for type-safe references to entities by name in scene scripts.
@@ -169,7 +175,7 @@ export async function generateEntityNamesType(
     names.sort()
     const namesSet = new Set(names)
 
-    if (namesSet.difference(__ENTITY_NAMES_CACHE).size === 0) {
+    if (setDifference(namesSet, __ENTITY_NAMES_CACHE).size === 0) {
       return
     }
 
