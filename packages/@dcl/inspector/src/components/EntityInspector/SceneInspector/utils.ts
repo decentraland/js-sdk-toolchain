@@ -73,7 +73,7 @@ export function fromScene(value: EditorComponentsTypes['Scene']): SceneInput {
     email: value.email || '',
     worldConfiguration: {
       skyboxConfig: {
-        fixedTime: String(value.worldConfiguration?.skyboxConfig?.fixedTime || 12)
+        fixedTime: String(value.worldConfiguration?.skyboxConfig?.fixedTime || MIDDAY_SECONDS)
       }
     },
     silenceVoiceChat: typeof value.silenceVoiceChat === 'boolean' ? value.silenceVoiceChat : false,
@@ -101,7 +101,7 @@ export function toScene(inputs: SceneInput): EditorComponentsTypes['Scene'] {
     email: inputs.email,
     worldConfiguration: {
       skyboxConfig: {
-        fixedTime: Number(inputs.worldConfiguration.skyboxConfig.fixedTime || '12')
+        fixedTime: Number(inputs.worldConfiguration.skyboxConfig.fixedTime || MIDDAY_SECONDS)
       }
     },
     silenceVoiceChat: inputs.silenceVoiceChat,
@@ -141,3 +141,5 @@ export const isImageFile = (value: string): boolean =>
   ACCEPTED_FILE_TYPES['image'].some((extension) => value.endsWith(extension))
 
 export const isImage = (node: TreeNode): node is AssetNodeItem => isAssetNode(node) && isImageFile(node.name)
+
+export const MIDDAY_SECONDS = 43200

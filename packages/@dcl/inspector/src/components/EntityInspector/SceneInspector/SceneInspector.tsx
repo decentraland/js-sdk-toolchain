@@ -10,7 +10,15 @@ import { TextField } from '../../ui/TextField'
 import { FileUploadField } from '../../ui/FileUploadField'
 import { ACCEPTED_FILE_TYPES } from '../../ui/FileUploadField/types'
 import { Props } from './types'
-import { fromScene, toScene, isValidInput, isImage, fromSceneSpawnPoint, toSceneSpawnPoint } from './utils'
+import {
+  fromScene,
+  toScene,
+  isValidInput,
+  isImage,
+  fromSceneSpawnPoint,
+  toSceneSpawnPoint,
+  MIDDAY_SECONDS
+} from './utils'
 
 import './SceneInspector.css'
 import { EditorComponentsTypes, SceneAgeRating, SceneCategory, SceneSpawnPoint } from '../../../lib/sdk/components'
@@ -119,7 +127,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
           skyboxConfig: isAuto
             ? undefined
             : {
-                fixedTime: 12
+                fixedTime: MIDDAY_SECONDS
               }
         }
       }
@@ -465,16 +473,16 @@ export default withSdk<Props>(({ sdk, entity }) => {
           <Block label="Skybox" className="underlined"></Block>
           <CheckboxField
             label="Auto (decentraland time)"
-            checked={!componentValue.worldConfiguration?.skyboxConfig?.fixedTime}
+            checked={componentValue.worldConfiguration?.skyboxConfig?.fixedTime === undefined}
             onChange={handleSkyboxAutoChange}
           />
           <div>{componentValue.worldConfiguration?.skyboxConfig?.fixedTime}</div>
           <RangeField
-            value={componentValue.worldConfiguration?.skyboxConfig?.fixedTime || 12}
+            value={componentValue.worldConfiguration?.skyboxConfig?.fixedTime || MIDDAY_SECONDS}
             min={0}
-            max={800000000}
-            step={0.1}
-            disabled={!componentValue.worldConfiguration?.skyboxConfig?.fixedTime}
+            max={86400}
+            step={1}
+            disabled={componentValue.worldConfiguration?.skyboxConfig?.fixedTime === undefined}
             onChange={handleSkyboxTimeChange}
           />
         </>
