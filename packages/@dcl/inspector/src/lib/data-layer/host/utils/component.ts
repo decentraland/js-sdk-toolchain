@@ -77,7 +77,7 @@ export function fromSceneComponent(value: DeepReadonlyObject<EditorComponentsTyp
     rating: value.ageRating,
     worldConfiguration: {
       skyboxConfig: {
-        fixedTime: 900
+        fixedTime: value.worldConfiguration?.skyboxConfig?.fixedTime
       }
     }
   }

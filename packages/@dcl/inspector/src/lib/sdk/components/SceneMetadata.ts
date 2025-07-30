@@ -90,7 +90,7 @@ export const SceneMetadataV1 = {
   disablePortableExperiences: Schemas.Optional(Schemas.Boolean),
   worldConfiguration: Schemas.Optional(
     Schemas.Map({
-      skybox: Schemas.Optional(
+      skyboxConfig: Schemas.Optional(
         Schemas.Map({
           fixedTime: Schemas.Optional(Schemas.Int)
         })
