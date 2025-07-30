@@ -21,6 +21,7 @@ import { toSceneComponent } from './component'
 import { addNodesComponentsToPlayerAndCamera } from './migrations/add-nodes-to-player-and-camera'
 import { fixNetworkEntityValues } from './migrations/fix-network-entity-values'
 import { selectSceneEntity } from './migrations/select-scene-entity'
+import { migrateSceneMetadata } from './migrations/migrate-scene-metadata'
 import { DIRECTORY, withAssetDir } from '../fs-utils'
 
 enum DirtyEnum {
@@ -44,6 +45,8 @@ function runMigrations(engine: IEngine) {
   fixNetworkEntityValues(engine)
   // Select Scene entity on startup
   selectSceneEntity(engine)
+  // Migrate SceneMetadata component
+  migrateSceneMetadata(engine)
 }
 
 async function instanciateComposite(fs: FileSystemInterface, engine: IEngine, path: string): Promise<CompositeManager> {
@@ -67,6 +70,10 @@ async function instanciateComposite(fs: FileSystemInterface, engine: IEngine, pa
     }
   })
 
+  runMigrations(engine)
+
+  initComponents(engine as any)
+
   // override SceneMetadata with scene.json
   const SceneMetadata = engine.getComponent(EditorComponentNames.Scene) as EditorComponents['Scene']
   if (await fs.existFile('scene.json')) {
@@ -75,10 +82,6 @@ async function instanciateComposite(fs: FileSystemInterface, engine: IEngine, pa
     const sceneJson = bufferToScene(sceneJsonBuffer)
     SceneMetadata.createOrReplace(engine.RootEntity, toSceneComponent(sceneJson))
   }
-
-  runMigrations(engine)
-
-  initComponents(engine as any)
 
   return compositeProvider
 }
