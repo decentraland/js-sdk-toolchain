@@ -1,11 +1,12 @@
 import { Vector3, TransformNode, GizmoManager, Quaternion } from '@babylonjs/core'
 import { Entity } from '@dcl/ecs'
 import { EcsEntity } from '../EcsEntity'
-import { IGizmoTransformer } from './types'
+import { GizmoType, IGizmoTransformer } from './types'
 import { LEFT_BUTTON } from '../mouse-utils'
 import { configureGizmoButtons } from './utils'
 
 export class ScaleGizmo implements IGizmoTransformer {
+  type = GizmoType.SCALE
   private initialOffsets = new Map<Entity, Vector3>()
   private initialScales = new Map<Entity, Vector3>()
   private initialRotations = new Map<Entity, Quaternion>()

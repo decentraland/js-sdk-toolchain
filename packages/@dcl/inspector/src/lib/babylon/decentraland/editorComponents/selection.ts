@@ -12,12 +12,19 @@ export const putEntitySelectedComponent: ComponentOperation = (entity, component
 
     const componentValue = component.get(entity.entityId) as unknown as EditorComponentsTypes['Selection']
     setGizmoManager(entity, componentValue)
+    if (entity.boundingInfoMesh) {
+      entity.boundingInfoMesh.onAfterWorldMatrixUpdateObservable.notifyObservers(entity.boundingInfoMesh)
+    }
   }
 }
 
 export const deleteEntitySelectedComponent: ComponentOperation = (entity, component) => {
   if (component.componentType === ComponentType.LastWriteWinElementSet) {
     unsetGizmoManager(entity)
+
+    if (entity.boundingInfoMesh) {
+      entity.boundingInfoMesh.onAfterWorldMatrixUpdateObservable.notifyObservers(entity.boundingInfoMesh)
+    }
   }
 }
 
