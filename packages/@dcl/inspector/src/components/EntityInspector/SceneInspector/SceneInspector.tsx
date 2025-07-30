@@ -38,6 +38,7 @@ import { Tab } from '../Tab'
 import { transformBinaryToBase64Resource } from '../../../lib/data-layer/host/fs-utils'
 import { selectThumbnails } from '../../../redux/app'
 import { Layout } from './Layout'
+import RangeHourField from '../../ui/RangeHourField/RangeHourField'
 
 const AGE_RATING_OPTIONS = [
   {
@@ -477,13 +478,13 @@ export default withSdk<Props>(({ sdk, entity }) => {
             onChange={handleSkyboxAutoChange}
           />
           <div>{componentValue.worldConfiguration?.skyboxConfig?.fixedTime}</div>
-          <RangeField
+          <RangeHourField
             value={componentValue.worldConfiguration?.skyboxConfig?.fixedTime || MIDDAY_SECONDS}
             min={0}
             max={86400}
-            step={1}
-            disabled={componentValue.worldConfiguration?.skyboxConfig?.fixedTime === undefined}
+            step={3600}
             onChange={handleSkyboxTimeChange}
+            disabled={componentValue.worldConfiguration?.skyboxConfig?.fixedTime === undefined}
           />
         </>
       ) : null}
