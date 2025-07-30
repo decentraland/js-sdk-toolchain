@@ -25,8 +25,8 @@ export const Coords = Schemas.Map({
   y: Schemas.Int
 })
 
-export const v0 = {
-  // everything but layout is set as optional for retrocompat purposes
+//SceneMetadata component is now versioned, to add new versions you must need to keep the previous properties and add the new ones
+export const SceneMetadataV0 = {
   name: Schemas.Optional(Schemas.String),
   description: Schemas.Optional(Schemas.String),
   thumbnail: Schemas.Optional(Schemas.String),
@@ -72,8 +72,7 @@ export const v0 = {
   )
 }
 
-export const v1 = {
-  // everything but layout is set as optional for retrocompat purposes
+export const SceneMetadataV1 = {
   version: Schemas.Optional(Schemas.Int),
   name: Schemas.Optional(Schemas.String),
   description: Schemas.Optional(Schemas.String),
@@ -89,55 +88,15 @@ export const v1 = {
   }),
   silenceVoiceChat: Schemas.Optional(Schemas.Boolean),
   disablePortableExperiences: Schemas.Optional(Schemas.Boolean),
-  spawnPoints: Schemas.Optional(
-    Schemas.Array(
-      Schemas.Map({
-        name: Schemas.String,
-        default: Schemas.Optional(Schemas.Boolean),
-        position: Schemas.Map({
-          x: Schemas.OneOf({
-            single: Schemas.Int,
-            range: Schemas.Array(Schemas.Int)
-          }),
-          y: Schemas.OneOf({
-            single: Schemas.Int,
-            range: Schemas.Array(Schemas.Int)
-          }),
-          z: Schemas.OneOf({
-            single: Schemas.Int,
-            range: Schemas.Array(Schemas.Int)
-          })
-        }),
-        cameraTarget: Schemas.Optional(
-          Schemas.Map({
-            x: Schemas.Int,
-            y: Schemas.Int,
-            z: Schemas.Int
-          })
-        )
-      })
-    )
-  )
-}
-
-export const v2 = {
-  // everything but layout is set as optional for retrocompat purposes
-  version: Schemas.Optional(Schemas.Int),
-  tuvieja: Schemas.Optional(Schemas.String),
-  name: Schemas.Optional(Schemas.String),
-  description: Schemas.Optional(Schemas.String),
-  thumbnail: Schemas.Optional(Schemas.String),
-  ageRating: Schemas.Optional(Schemas.EnumString(SceneAgeRating, SceneAgeRating.Teen)),
-  categories: Schemas.Optional(Schemas.Array(Schemas.EnumString(SceneCategory, SceneCategory.GAME))),
-  author: Schemas.Optional(Schemas.String),
-  email: Schemas.Optional(Schemas.String),
-  tags: Schemas.Optional(Schemas.Array(Schemas.String)),
-  layout: Schemas.Map({
-    base: Coords,
-    parcels: Schemas.Array(Coords)
-  }),
-  silenceVoiceChat: Schemas.Optional(Schemas.Boolean),
-  disablePortableExperiences: Schemas.Optional(Schemas.Boolean),
+  worldConfiguration: Schemas.Optional(
+    Schemas.Map({
+      skybox: Schemas.Optional(
+        Schemas.Map({
+          fixedTime: Schemas.Optional(Schemas.Int)
+        })
+      )
+    })
+  ),
   spawnPoints: Schemas.Optional(
     Schemas.Array(
       Schemas.Map({
@@ -172,9 +131,8 @@ export const v2 = {
 const SceneMetadata = 'inspector::SceneMetadata'
 
 export const VERSIONS = [
-  { key: SceneMetadata, value: v0 },
-  { key: `${SceneMetadata}-v1`, value: v1 },
-  { key: `${SceneMetadata}-v2`, value: v2 }
+  { key: SceneMetadata, value: SceneMetadataV0 },
+  { key: `${SceneMetadata}-v1`, value: SceneMetadataV1 }
 ]
 
 export function getLatestSceneComponentVersion() {
