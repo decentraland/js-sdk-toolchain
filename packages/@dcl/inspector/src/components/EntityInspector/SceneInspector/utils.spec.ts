@@ -19,7 +19,7 @@ function getInput(base: string, parcels: string): SceneInput {
     email: 'johndoe@gmail.com',
     worldConfiguration: {
       skyboxConfig: {
-        fixedTime: '800'
+        fixedTime: '36000'
       }
     },
     layout: {
@@ -46,7 +46,7 @@ function getScene(layout: Layout): EditorComponentsTypes['Scene'] {
     layout,
     worldConfiguration: {
       skyboxConfig: {
-        fixedTime: '800'
+        fixedTime: 36000
       }
     }
   }

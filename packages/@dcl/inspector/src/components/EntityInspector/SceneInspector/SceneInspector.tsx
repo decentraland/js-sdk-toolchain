@@ -477,7 +477,6 @@ export default withSdk<Props>(({ sdk, entity }) => {
             checked={componentValue.worldConfiguration?.skyboxConfig?.fixedTime === undefined}
             onChange={handleSkyboxAutoChange}
           />
-          <div>{componentValue.worldConfiguration?.skyboxConfig?.fixedTime}</div>
           <RangeHourField
             value={componentValue.worldConfiguration?.skyboxConfig?.fixedTime || MIDDAY_SECONDS}
             min={0}
