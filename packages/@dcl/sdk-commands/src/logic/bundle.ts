@@ -46,7 +46,8 @@ export type CompileOptions = {
 const MAX_STEP = 2
 
 /**
- * Generate the entry-point code for a given original entry-point
+ * Generate the entry-point code for a given original entry-point.
+ * It can be considered an "SDK Bootstrap", it runs before any scene code executes.
  * @param entrypointPath - file to be imported as original entry point
  * @param forceCustomExport
  * @returns the Typescript code
@@ -58,6 +59,28 @@ function getEntrypointCode(entrypointPath: string, forceCustomExport: boolean, i
 
   return `// BEGIN AUTO GENERATED CODE "~sdk/scene-entrypoint"
 "use strict";
+
+// Override console.log() to apply JSON.stringify wrapper
+// To avoid "Object object" on console.log(whateverObject)
+(function() {
+  const _originalConsoleLog = console.log;
+  console.log = function(...args) {
+    const stringifiedArgs = args.map(arg => {
+      if (arg === null) return 'null';
+      if (arg === undefined) return 'undefined';
+      if (typeof arg === 'string') return arg;
+      if (typeof arg === 'number' || typeof arg === 'boolean') return String(arg);
+      try {
+        return JSON.stringify(arg);
+      } catch (e) {
+        // Fallback for non-serializable objects
+        return String(arg);
+      }
+    });
+    _originalConsoleLog(...stringifiedArgs);
+  };
+})();
+
 import * as entrypoint from '${unixEntrypointPath}'
 import { engine, NetworkEntity } from '@dcl/sdk/ecs'
 import * as sdk from '@dcl/sdk'
