@@ -123,13 +123,9 @@ export default withSdk<Props>(({ sdk, entity }) => {
       const isAuto = e.target.checked
       const newValue = {
         ...componentValue,
-        worldConfiguration: {
-          ...componentValue.worldConfiguration,
-          skyboxConfig: isAuto
-            ? undefined
-            : {
-                fixedTime: MIDDAY_SECONDS
-              }
+        skyboxConfig: {
+          ...componentValue.skyboxConfig,
+          fixedTime: isAuto ? undefined : MIDDAY_SECONDS
         }
       }
 
@@ -143,11 +139,9 @@ export default withSdk<Props>(({ sdk, entity }) => {
       const { value } = e.target as HTMLInputElement
       const newValue = {
         ...componentValue,
-        worldConfiguration: {
-          ...componentValue.worldConfiguration,
-          skyboxConfig: {
-            fixedTime: parseInt(value)
-          }
+        skyboxConfig: {
+          ...componentValue.skyboxConfig,
+          fixedTime: parseInt(value)
         }
       }
 
@@ -474,16 +468,16 @@ export default withSdk<Props>(({ sdk, entity }) => {
           <Block label="Skybox" className="underlined"></Block>
           <CheckboxField
             label="Auto (decentraland time)"
-            checked={componentValue.worldConfiguration?.skyboxConfig?.fixedTime === undefined}
+            checked={componentValue.skyboxConfig?.fixedTime === undefined}
             onChange={handleSkyboxAutoChange}
           />
           <RangeHourField
-            value={componentValue.worldConfiguration?.skyboxConfig?.fixedTime || MIDDAY_SECONDS}
+            value={componentValue.skyboxConfig?.fixedTime || MIDDAY_SECONDS}
             min={0}
             max={86400}
             step={3600}
             onChange={handleSkyboxTimeChange}
-            disabled={componentValue.worldConfiguration?.skyboxConfig?.fixedTime === undefined}
+            disabled={componentValue.skyboxConfig?.fixedTime === undefined}
           />
         </>
       ) : null}

@@ -17,10 +17,8 @@ function getInput(base: string, parcels: string): SceneInput {
     spawnPoints: [],
     author: 'John Doe',
     email: 'johndoe@gmail.com',
-    worldConfiguration: {
-      skyboxConfig: {
-        fixedTime: '36000'
-      }
+    skyboxConfig: {
+      fixedTime: '36000'
     },
     layout: {
       base,
@@ -44,10 +42,8 @@ function getScene(layout: Layout): EditorComponentsTypes['Scene'] {
     author: 'John Doe',
     email: 'johndoe@gmail.com',
     layout,
-    worldConfiguration: {
-      skyboxConfig: {
-        fixedTime: 36000
-      }
+    skyboxConfig: {
+      fixedTime: 36000
     }
   }
   return scene

@@ -92,10 +92,8 @@ export type SceneSpawnPoint = {
 export type SceneComponent = {
   name?: string
   description?: string
-  worldConfiguration?: {
-    skyboxConfig?: {
-      fixedTime?: number
-    }
+  skyboxConfig?: {
+    fixedTime?: number
   }
   thumbnail?: string
   ageRating?: SceneAgeRating

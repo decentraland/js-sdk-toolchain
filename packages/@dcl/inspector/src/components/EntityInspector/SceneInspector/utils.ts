@@ -71,10 +71,8 @@ export function fromScene(value: EditorComponentsTypes['Scene']): SceneInput {
     tags: value.tags ? value.tags.join(', ') : '',
     author: value.author || '',
     email: value.email || '',
-    worldConfiguration: {
-      skyboxConfig: {
-        fixedTime: String(value.worldConfiguration?.skyboxConfig?.fixedTime || MIDDAY_SECONDS)
-      }
+    skyboxConfig: {
+      fixedTime: String(value.skyboxConfig?.fixedTime || MIDDAY_SECONDS)
     },
     silenceVoiceChat: typeof value.silenceVoiceChat === 'boolean' ? value.silenceVoiceChat : false,
     disablePortableExperiences:
@@ -99,10 +97,8 @@ export function toScene(inputs: SceneInput): EditorComponentsTypes['Scene'] {
     tags: inputs.tags.split(',').map((tag) => tag.trim()),
     author: inputs.author,
     email: inputs.email,
-    worldConfiguration: {
-      skyboxConfig: {
-        fixedTime: Number(inputs.worldConfiguration.skyboxConfig.fixedTime || MIDDAY_SECONDS)
-      }
+    skyboxConfig: {
+      fixedTime: Number(inputs.skyboxConfig.fixedTime || MIDDAY_SECONDS)
     },
     silenceVoiceChat: inputs.silenceVoiceChat,
     disablePortableExperiences: inputs.disablePortableExperiences,

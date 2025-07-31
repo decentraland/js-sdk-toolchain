@@ -74,10 +74,8 @@ export function fromSceneComponent(value: DeepReadonlyObject<EditorComponentsTyp
       portableExperiences: value.disablePortableExperiences ? 'disabled' : 'enabled'
     },
     rating: value.ageRating,
-    worldConfiguration: {
-      skyboxConfig: {
-        fixedTime: value.worldConfiguration?.skyboxConfig?.fixedTime
-      }
+    skyboxConfig: {
+      fixedTime: value.skyboxConfig?.fixedTime
     }
   }
 
@@ -119,10 +117,8 @@ export function toSceneComponent(value: Scene): EditorComponentsTypes['Scene'] {
     silenceVoiceChat: value.featureToggles?.voiceChat === 'disabled',
     disablePortableExperiences: value.featureToggles?.portableExperiences === 'disabled',
     ageRating: (value as SceneWithRating).rating,
-    worldConfiguration: {
-      skyboxConfig: {
-        fixedTime: value.worldConfiguration?.skyboxConfig?.fixedTime
-      }
+    skyboxConfig: {
+      fixedTime: value.skyboxConfig?.fixedTime
     },
     spawnPoints: value.spawnPoints?.map((spawnPoint, index) => ({
       name: spawnPoint.name || `Spawn Point ${index + 1}`,

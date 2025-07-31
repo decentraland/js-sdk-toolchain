@@ -88,15 +88,7 @@ export const SceneMetadataV1 = {
   }),
   silenceVoiceChat: Schemas.Optional(Schemas.Boolean),
   disablePortableExperiences: Schemas.Optional(Schemas.Boolean),
-  worldConfiguration: Schemas.Optional(
-    Schemas.Map({
-      skyboxConfig: Schemas.Optional(
-        Schemas.Map({
-          fixedTime: Schemas.Optional(Schemas.Int)
-        })
-      )
-    })
-  ),
+  skyboxConfig: Schemas.Optional(Schemas.Map({ fixedTime: Schemas.Optional(Schemas.Int) })),
   spawnPoints: Schemas.Optional(
     Schemas.Array(
       Schemas.Map({
