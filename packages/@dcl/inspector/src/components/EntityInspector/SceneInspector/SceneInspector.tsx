@@ -23,9 +23,10 @@ import {
 import './SceneInspector.css'
 import { EditorComponentsTypes, SceneAgeRating, SceneCategory, SceneSpawnPoint } from '../../../lib/sdk/components'
 import { Dropdown } from '../../ui/Dropdown'
-import { RangeField, TextArea } from '../../ui'
+import { TextArea } from '../../ui'
 import { Tabs } from '../Tabs'
 import { CheckboxField } from '../../ui/CheckboxField'
+import RangeHourField from '../../ui/RangeHourField/RangeHourField'
 import { useComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { useArrayState } from '../../../hooks/useArrayState'
 import { AddButton } from '../AddButton'
@@ -38,7 +39,6 @@ import { Tab } from '../Tab'
 import { transformBinaryToBase64Resource } from '../../../lib/data-layer/host/fs-utils'
 import { selectThumbnails } from '../../../redux/app'
 import { Layout } from './Layout'
-import RangeHourField from '../../ui/RangeHourField/RangeHourField'
 
 const AGE_RATING_OPTIONS = [
   {

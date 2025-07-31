@@ -32,7 +32,6 @@ const parseCoords = (coords: string) => {
 
 type SceneWithRating = Scene & { rating: SceneAgeRating }
 
-//TODO check scene init
 export function fromSceneComponent(value: DeepReadonlyObject<EditorComponentsTypes['Scene']>): Partial<Scene> {
   const tags: string[] = []
   for (const category of value.categories || []) {
