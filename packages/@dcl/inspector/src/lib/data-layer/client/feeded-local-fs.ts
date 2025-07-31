@@ -42,6 +42,11 @@ export function generateMinimalComposite({ engine, components }: TempEngine) {
     description: 'This is a test scene',
     thumbnail: 'assets/scene/thumbnail.png',
     ageRating: SceneAgeRating.Teen,
+    worldConfiguration: {
+      skyboxConfig: {
+        fixedTime: 36000
+      }
+    },
     categories: [],
     author: '',
     email: '',
