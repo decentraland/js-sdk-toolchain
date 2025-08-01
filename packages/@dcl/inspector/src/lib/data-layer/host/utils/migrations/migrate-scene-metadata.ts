@@ -1,7 +1,11 @@
 import { IEngine } from '@dcl/ecs'
 
 import { EditorComponents } from '../../../../sdk/components'
-import { VERSIONS, getLatestSceneComponentVersion } from '../../../../sdk/components/SceneMetadata'
+import {
+  removeOldSceneVersions,
+  VERSIONS,
+  getLatestSceneComponentVersion
+} from '../../../../sdk/components/SceneMetadata'
 
 /**
  * Retrieves the latest version of the Scene component from the engine.
@@ -46,10 +50,10 @@ export function migrateSceneMetadata(engine: IEngine) {
   const isRunningLatestVersion = component.componentName === latestComponentVersion.key
 
   if (isRunningLatestVersion) return
-
   const oldComponent = component
+
   oldComponent.deleteFrom(engine.RootEntity)
-  engine.removeComponentDefinition(oldComponent.componentName)
+  removeOldSceneVersions(engine, oldComponent.componentName)
 
   const SceneMetadata = engine.getComponent(latestComponentVersion.key) as EditorComponents['Scene']
   SceneMetadata.createOrReplace(engine.RootEntity, value)

@@ -148,3 +148,11 @@ export function defineSceneComponents(engine: IEngine) {
 
   return components
 }
+
+export function removeOldSceneVersions(engine: IEngine, currentSceneVersion: string) {
+  VERSIONS.forEach(({ key }) => {
+    if (key !== currentSceneVersion) {
+      engine.removeComponentDefinition(key)
+    }
+  })
+}
