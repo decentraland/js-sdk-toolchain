@@ -180,6 +180,10 @@ export const enum BackgroundTextureMode {
 // @public (undocumented)
 export interface BaseComponent<T> {
     // (undocumented)
+    __dry_run_updateFromCrdt(body: CrdtMessageBody): ProcessMessageResultType;
+    // (undocumented)
+    __run_validateBeforeChange(entity: Entity, newValue: T | undefined, senderAddress: string, createdBy: string): boolean;
+    // (undocumented)
     readonly componentId: number;
     // (undocumented)
     readonly componentName: string;
@@ -194,6 +198,10 @@ export interface BaseComponent<T> {
     // (undocumented)
     readonly schema: ISchema<T>;
     updateFromCrdt(body: CrdtMessageBody): [null | ConflictResolutionMessage, T | undefined];
+    // (undocumented)
+    validateBeforeChange(entity: Entity, cb: ValidateCallback<T>): void;
+    // (undocumented)
+    validateBeforeChange(cb: ValidateCallback<T>): void;
 }
 
 // @public (undocumented)
@@ -846,6 +854,11 @@ export enum CrdtMessageType {
 // @public (undocumented)
 export type CrdtNetworkMessageBody = PutNetworkComponentMessageBody | DeleteComponentNetworkMessageBody | DeleteEntityNetworkMessageBody;
 
+// Warning: (ae-missing-release-tag) "CreatedBy" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const CreatedBy: ICreatedBy;
+
 // @public (undocumented)
 export function createEntityContainer(opts?: {
     reservedStaticEntities: number;
@@ -1240,6 +1253,19 @@ export interface GrowOnlyValueSetComponentDefinition<T> extends BaseComponent<T>
 //
 // @public (undocumented)
 export type GSetComponentGetter<T extends GrowOnlyValueSetComponentDefinition<any>> = (engine: Pick<IEngine, 'defineValueSetComponentFromSchema'>) => T;
+
+// Warning: (ae-missing-release-tag) "ICreatedBy" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type ICreatedBy = LastWriteWinElementSetComponentDefinition<ICreatedByType>;
+
+// Warning: (ae-missing-release-tag) "ICreatedByType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface ICreatedByType {
+    // (undocumented)
+    address: string;
+}
 
 // @public (undocumented)
 export interface IEngine {
@@ -4700,6 +4726,17 @@ export interface UiTransformProps {
 
 // @public (undocumented)
 export type Unpacked<T> = T extends (infer U)[] ? U : T;
+
+// Warning: (ae-missing-release-tag) "ValidateCallback" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type ValidateCallback<T> = (value: {
+    entity: Entity;
+    currentValue: T | undefined;
+    newValue: T | undefined;
+    senderAddress: string;
+    createdBy: string;
+}) => boolean;
 
 // @public (undocumented)
 export type ValueSetOptions<T> = {

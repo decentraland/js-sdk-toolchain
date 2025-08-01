@@ -1,6 +1,9 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=252.5k bytes
 =======
+=======
+>>>>>>> f7184856 (fix tests)
 <<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=244k bytes
 =======
@@ -10,7 +13,13 @@ SCENE_COMPILED_JS_SIZE_PROD=241.1k bytes
 SCENE_COMPILED_JS_SIZE_PROD=238.4k bytes
 >>>>>>> 99d394c1 (update snapshots)
 >>>>>>> c50aee8d (update snapshots)
+<<<<<<< HEAD
 >>>>>>> 9f5e0f01 (update snapshots)
+=======
+=======
+SCENE_COMPILED_JS_SIZE_PROD=239.3k bytes
+>>>>>>> 126220f1 (fix tests)
+>>>>>>> f7184856 (fix tests)
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -21,10 +30,13 @@ EVAL test/snapshots/production-bundles/billboard.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
 <<<<<<< HEAD
+<<<<<<< HEAD
   OPCODES ~= 74k
   MALLOC_COUNT = 15806
   ALIVE_OBJS_DELTA ~= 3.47k
 =======
+=======
+>>>>>>> f7184856 (fix tests)
 <<<<<<< HEAD
   OPCODES ~= 68k
 <<<<<<< HEAD
@@ -39,7 +51,15 @@ EVAL test/snapshots/production-bundles/billboard.js
   ALIVE_OBJS_DELTA ~= 3.22k
 >>>>>>> 99d394c1 (update snapshots)
 >>>>>>> c50aee8d (update snapshots)
+<<<<<<< HEAD
 >>>>>>> 9f5e0f01 (update snapshots)
+=======
+=======
+  OPCODES ~= 60k
+  MALLOC_COUNT = 15245
+  ALIVE_OBJS_DELTA ~= 3.30k
+>>>>>>> 126220f1 (fix tests)
+>>>>>>> f7184856 (fix tests)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 4
@@ -107,8 +127,11 @@ CALL onUpdate(0.1)
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 <<<<<<< HEAD
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 1119.45k bytes
 =======
+=======
+>>>>>>> f7184856 (fix tests)
 <<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 1076.84k bytes
 =======
@@ -118,4 +141,10 @@ CALL onUpdate(0.1)
   MEMORY_USAGE_COUNT ~= 1042.50k bytes
 >>>>>>> 99d394c1 (update snapshots)
 >>>>>>> c50aee8d (update snapshots)
+<<<<<<< HEAD
 >>>>>>> 9f5e0f01 (update snapshots)
+=======
+=======
+  MEMORY_USAGE_COUNT ~= 1051.47k bytes
+>>>>>>> 126220f1 (fix tests)
+>>>>>>> f7184856 (fix tests)

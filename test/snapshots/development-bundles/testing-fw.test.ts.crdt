@@ -1,6 +1,9 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=499.9k bytes
 =======
+=======
+>>>>>>> f7184856 (fix tests)
 <<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=481.1k bytes
 =======
@@ -10,7 +13,13 @@ SCENE_COMPILED_JS_SIZE_PROD=474.7k bytes
 SCENE_COMPILED_JS_SIZE_PROD=467.7k bytes
 >>>>>>> 99d394c1 (update snapshots)
 >>>>>>> c50aee8d (update snapshots)
+<<<<<<< HEAD
 >>>>>>> 9f5e0f01 (update snapshots)
+=======
+=======
+SCENE_COMPILED_JS_SIZE_PROD=470.1k bytes
+>>>>>>> 126220f1 (fix tests)
+>>>>>>> f7184856 (fix tests)
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -23,10 +32,13 @@ EVAL test/snapshots/development-bundles/testing-fw.test.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
 <<<<<<< HEAD
+<<<<<<< HEAD
   OPCODES ~= 70k
   MALLOC_COUNT = 15246
   ALIVE_OBJS_DELTA ~= 3.08k
 =======
+=======
+>>>>>>> f7184856 (fix tests)
 <<<<<<< HEAD
   OPCODES ~= 65k
   MALLOC_COUNT = 14698
@@ -42,7 +54,15 @@ EVAL test/snapshots/development-bundles/testing-fw.test.js
   ALIVE_OBJS_DELTA ~= 2.75k
 >>>>>>> 99d394c1 (update snapshots)
 >>>>>>> c50aee8d (update snapshots)
+<<<<<<< HEAD
 >>>>>>> 9f5e0f01 (update snapshots)
+=======
+=======
+  OPCODES ~= 48k
+  MALLOC_COUNT = 14241
+  ALIVE_OBJS_DELTA ~= 2.81k
+>>>>>>> 126220f1 (fix tests)
+>>>>>>> f7184856 (fix tests)
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=1 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
@@ -95,8 +115,11 @@ CALL onUpdate(0.1)
   MALLOC_COUNT = -40
   ALIVE_OBJS_DELTA ~= -0.01k
 <<<<<<< HEAD
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 1294.77k bytes
 =======
+=======
+>>>>>>> f7184856 (fix tests)
 <<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 1250.99k bytes
 =======
@@ -106,4 +129,10 @@ CALL onUpdate(0.1)
   MEMORY_USAGE_COUNT ~= 1199.03k bytes
 >>>>>>> 99d394c1 (update snapshots)
 >>>>>>> c50aee8d (update snapshots)
+<<<<<<< HEAD
 >>>>>>> 9f5e0f01 (update snapshots)
+=======
+=======
+  MEMORY_USAGE_COUNT ~= 1209.60k bytes
+>>>>>>> 126220f1 (fix tests)
+>>>>>>> f7184856 (fix tests)
