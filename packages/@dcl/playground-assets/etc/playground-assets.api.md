@@ -640,6 +640,7 @@ export const componentDefinitionByName: {
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
     "core::GltfNodeModifiers": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNodeModifiers>>;
     "core::InputModifier": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBInputModifier>>;
+    "core::LightSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBLightSource>>;
     "core::MainCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMainCamera>>;
     "core::Material": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMaterial>>;
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
@@ -1578,6 +1579,9 @@ export interface LastWriteWinElementSetComponentDefinition<T> extends BaseCompon
     getOrNull(entity: Entity): DeepReadonly<T> | null;
 }
 
+// @public (undocumented)
+export const LightSource: LastWriteWinElementSetComponentDefinition<PBLightSource>;
+
 // @public
 export type Listeners = {
     onMouseDown?: Callback;
@@ -2454,6 +2458,58 @@ export namespace PBInputModifier_StandardInput {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBInputModifier_StandardInput;
     // (undocumented)
     export function encode(message: PBInputModifier_StandardInput, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBLightSource {
+    active?: boolean | undefined;
+    color?: PBColor3 | undefined;
+    intensity?: number | undefined;
+    range?: number | undefined;
+    shadow?: boolean | undefined;
+    shadowMaskTexture?: TextureUnion | undefined;
+    // (undocumented)
+    type?: {
+        $case: "point";
+        point: PBLightSource_Point;
+    } | {
+        $case: "spot";
+        spot: PBLightSource_Spot;
+    } | undefined;
+}
+
+// @public (undocumented)
+export namespace PBLightSource {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBLightSource;
+    // (undocumented)
+    export function encode(message: PBLightSource, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBLightSource_Point {
+}
+
+// @public (undocumented)
+export namespace PBLightSource_Point {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBLightSource_Point;
+    // (undocumented)
+    export function encode(_: PBLightSource_Point, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBLightSource_Spot {
+    innerAngle?: number | undefined;
+    outerAngle?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBLightSource_Spot {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBLightSource_Spot;
+    // (undocumented)
+    export function encode(message: PBLightSource_Spot, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)

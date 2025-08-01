@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=241.5k bytes
+SCENE_COMPILED_JS_SIZE_PROD=244.4k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -9,8 +9,8 @@ EVAL test/snapshots/production-bundles/cubes.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   OPCODES ~= 107k
-  MALLOC_COUNT = 18520
-  ALIVE_OBJS_DELTA ~= 4.60k
+  MALLOC_COUNT = 18643
+  ALIVE_OBJS_DELTA ~= 4.63k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -1652,4 +1652,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 700k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1204.22k bytes
+  MEMORY_USAGE_COUNT ~= 1212.77k bytes
