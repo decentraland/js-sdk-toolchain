@@ -9,7 +9,7 @@ export type ICreatedBy = LastWriteWinElementSetComponentDefinition<ICreatedByTyp
 
 function defineCreatedBy(engine: Pick<IEngine, 'defineComponent'>) {
   const CreatedBy = engine.defineComponent('core-schema::Created-By', {
-    address: Schemas.String,
+    address: Schemas.String
   })
   return CreatedBy
 }

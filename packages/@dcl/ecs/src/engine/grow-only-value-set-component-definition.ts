@@ -1,6 +1,11 @@
 import { ISchema } from '../schemas'
 import { ReadWriteByteBuffer } from '../serialization/ByteBuffer'
-import { AppendValueMessageBody, AppendValueOperation, CrdtMessageType, ProcessMessageResultType } from '../serialization/crdt'
+import {
+  AppendValueMessageBody,
+  AppendValueOperation,
+  CrdtMessageType,
+  ProcessMessageResultType
+} from '../serialization/crdt'
 import { ComponentType, GrowOnlyValueSetComponentDefinition, ValidateCallback } from './component'
 import { __DEV__ } from '../runtime/invariant'
 import { Entity } from './entity'
@@ -189,10 +194,7 @@ export function createValueSetComponentDefinitionFromSchema<T>(
     __dry_run_updateFromCrdt(_body) {
       return ProcessMessageResultType.StateUpdatedData
     },
-    validateBeforeChange(
-      entityOrCb: Entity | ValidateCallback<T>,
-      cb?: ValidateCallback<T>
-    ): void {
+    validateBeforeChange(entityOrCb: Entity | ValidateCallback<T>, cb?: ValidateCallback<T>): void {
       if (arguments.length === 1) {
         // Second overload: just callback (global validation)
         validateCallbacks.set(__GLOBAL_ENTITY, entityOrCb as ValidateCallback<T>)
@@ -205,13 +207,13 @@ export function createValueSetComponentDefinitionFromSchema<T>(
     __run_validateBeforeChange(entity, newValue, senderAddress, createdBy): boolean {
       const cb = entity && validateCallbacks.get(entity)
       const globalCb = validateCallbacks.get(__GLOBAL_ENTITY)
-      const currentValue = entity ? this.get(entity) as any : undefined
+      const currentValue = entity ? (this.get(entity) as any) : undefined
 
       const value = { entity, currentValue, newValue, senderAddress, createdBy }
-      
+
       const globalResult = globalCb?.(value) ?? true
       const entityResult = (globalResult && cb?.(value)) ?? true
-      
+
       return globalResult && entityResult
     }
   }
