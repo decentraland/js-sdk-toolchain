@@ -8,22 +8,6 @@ import {
 import { testComponentSerialization } from './assertion'
 
 function createPointLight(point: PBLightSource_Point): PBLightSource {
-  const test : PBLightSource = {
-    type: {
-      $case: 'spot',
-      spot: {
-        active: true,
-        color: { r: 1, g: 1, b: 1 },
-        intensity: 1,
-        range: 10,
-        shadowMaskTexture: undefined,
-        shadow: true,
-        innerAngle: 21.8,
-        outerAngle: 30
-      }
-    }
-  }
-
   return {
     type: {
       $case: 'point',
