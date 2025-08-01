@@ -73,8 +73,8 @@ export function fromScene(value: EditorComponentsTypes['Scene']): SceneInput {
     author: value.author || '',
     email: value.email || '',
     skyboxConfig: {
-      fixedTime: String(value.skyboxConfig?.fixedTime || MIDDAY_SECONDS),
-      transitionMode: String(value.skyboxConfig?.transitionMode || TransitionMode.TM_FORWARD)
+      fixedTime: String(value.skyboxConfig?.fixedTime ?? MIDDAY_SECONDS),
+      transitionMode: String(value.skyboxConfig?.transitionMode ?? TransitionMode.TM_FORWARD)
     },
     silenceVoiceChat: typeof value.silenceVoiceChat === 'boolean' ? value.silenceVoiceChat : false,
     disablePortableExperiences:
@@ -101,7 +101,7 @@ export function toScene(inputs: SceneInput): EditorComponentsTypes['Scene'] {
     email: inputs.email,
     skyboxConfig: {
       fixedTime: Number(inputs.skyboxConfig.fixedTime || MIDDAY_SECONDS),
-      transitionMode: TransitionMode.TM_FORWARD
+      transitionMode: inputs.skyboxConfig.transitionMode as unknown as TransitionMode
     },
     silenceVoiceChat: inputs.silenceVoiceChat,
     disablePortableExperiences: inputs.disablePortableExperiences,

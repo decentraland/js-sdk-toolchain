@@ -111,6 +111,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
   const categoriesProps = getInputProps('categories')
   const authorProps = getInputProps('author')
   const emailProps = getInputProps('email')
+  const transitionModeProps = getInputProps('skyboxConfig.transitionMode')
   const silenceVoiceChatProps = getInputProps('silenceVoiceChat', (e) => e.target.checked)
   const disablePortableExperiencesProps = getInputProps('disablePortableExperiences', (e) => e.target.checked)
 
@@ -382,16 +383,6 @@ export default withSdk<Props>(({ sdk, entity }) => {
     [componentValue]
   )
 
-  const handleChangeTransitionMode = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const newValue = {
-        ...componentValue,
-        skyboxConfig: { ...componentValue.skyboxConfig, transitionMode: parseInt(e.target.value) as TransitionMode }
-      }
-      setComponentValue(newValue)
-    },
-    [componentValue]
-  )
   return (
     <Container className="Scene" gap>
       <Tabs className="SceneTabs">
@@ -483,7 +474,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
             onChange={handleSkyboxAutoChange}
           />
           <RangeHourField
-            value={componentValue.skyboxConfig?.fixedTime || MIDDAY_SECONDS}
+            value={componentValue.skyboxConfig?.fixedTime ?? MIDDAY_SECONDS}
             min={0}
             max={86400}
             step={3600}
@@ -496,8 +487,8 @@ export default withSdk<Props>(({ sdk, entity }) => {
               { label: 'Forward', value: TransitionMode.TM_FORWARD },
               { label: 'Backward', value: TransitionMode.TM_BACKWARD }
             ]}
-            value={componentValue.skyboxConfig?.transitionMode}
-            onChange={(e) => handleChangeTransitionMode(e)}
+            {...transitionModeProps}
+            disabled={componentValue.skyboxConfig?.fixedTime === undefined}
           />
         </>
       ) : null}
