@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-SCENE_COMPILED_JS_SIZE_PROD=474.7k bytes
-=======
-SCENE_COMPILED_JS_SIZE_PROD=467.7k bytes
->>>>>>> 99d394c1 (update snapshots)
+SCENE_COMPILED_JS_SIZE_PROD=470.1k bytes
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -14,15 +10,9 @@ EVAL test/snapshots/development-bundles/two-way-crdt.test.js
   REQUIRE: ~system/Testing
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-<<<<<<< HEAD
-  OPCODES ~= 64k
-  MALLOC_COUNT = 14564
-  ALIVE_OBJS_DELTA ~= 2.92k
-=======
-  OPCODES ~= 47k
-  MALLOC_COUNT = 13901
-  ALIVE_OBJS_DELTA ~= 2.75k
->>>>>>> 99d394c1 (update snapshots)
+  OPCODES ~= 48k
+  MALLOC_COUNT = 14241
+  ALIVE_OBJS_DELTA ~= 2.81k
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=1 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
@@ -74,8 +64,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 4k
   MALLOC_COUNT = -40
   ALIVE_OBJS_DELTA ~= -0.01k
-<<<<<<< HEAD
-  MEMORY_USAGE_COUNT ~= 1239.42k bytes
-=======
-  MEMORY_USAGE_COUNT ~= 1199.03k bytes
->>>>>>> 99d394c1 (update snapshots)
+  MEMORY_USAGE_COUNT ~= 1209.60k bytes
