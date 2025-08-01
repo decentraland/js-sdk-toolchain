@@ -102,6 +102,7 @@ describe('Network Parenting', () => {
       Components.Transform.getMutable(entity).position.x += 1
     }
     await engineA.update(1)
+
     expect(Math.round(networkmessages[0].byteLength / 1024)).toBe(12)
     expect(interceptedMessages.length).toBe(CUBES_LENGTH)
     expect(networkmessages.length).toBe(2)

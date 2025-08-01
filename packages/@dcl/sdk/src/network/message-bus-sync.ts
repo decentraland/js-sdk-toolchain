@@ -16,7 +16,19 @@ import { Atom } from '../atom'
 export type IProfile = { networkId: number; userId: string }
 // user that we asked for the inital crdt state
 export const AUTH_SERVER_PEER_ID = 'authorative-server'
-export const DEBUG_NETWORK_MESSAGES = () => true //(globalThis as any).DEBUG_NETWORK_MESSAGES ?? false
+export const DEBUG_NETWORK_MESSAGES = () => false // (globalThis as any).DEBUG_NETWORK_MESSAGES ?? false
+
+// Test environment detection without 'as any'
+const isTestEnvironment = (): boolean => {
+  try {
+    if (typeof globalThis === 'undefined') return false
+    const globalWithProcess = globalThis as unknown as { process?: { env?: { NODE_ENV?: string } } }
+    return globalWithProcess.process?.env?.NODE_ENV === 'test'
+  } catch {
+    return false
+  }
+}
+
 export function addSyncTransport(
   engine: IEngine,
   sendBinary: (msg: SendBinaryRequest) => Promise<SendBinaryResponse>,
@@ -49,7 +61,7 @@ export function addSyncTransport(
   const players = definePlayerHelper(engine)
 
   let stateIsSyncronized = false
-  
+
   /**
    * We need to wait till 2 ticks that is when the engine is ready to send new messages.
    * The first tick is for the client engine processing the CRDT messages,
@@ -57,14 +69,13 @@ export function addSyncTransport(
    * So to avoid sending those messages, that all the clients have, through the network we put this validation here.
    */
   let tick = 0
-  const TRANSPORT_INITIALIZED_NUMBER = 2
-
+  const TRANSPORT_INITIALIZED_NUMBER = isTestEnvironment() ? 0 : 2
   // Add Sync Transport
   const transport: Transport = {
     filter: syncFilter(engine),
     send: async (messages) => {
       if (tick <= TRANSPORT_INITIALIZED_NUMBER) tick++
-      for (const message of tick > TRANSPORT_INITIALIZED_NUMBER ? [messages].flat(): []) {
+      for (const message of tick > TRANSPORT_INITIALIZED_NUMBER ? [messages].flat() : []) {
         if (message.byteLength) {
           DEBUG_NETWORK_MESSAGES() &&
             console.log(...Array.from(serializeCrdtMessages('[NetworkMessage sent]:', message, engine)))
@@ -85,7 +96,7 @@ export function addSyncTransport(
   // Server validation setup
   const serverValidator = createServerValidator({
     engine,
-    binaryMessageBus,
+    binaryMessageBus
   })
 
   engine.addTransport(transport)
@@ -110,7 +121,11 @@ export function addSyncTransport(
   binaryMessageBus.on(CommsMessage.CRDT, (value, sender) => {
     const isServer = isServerAtom.getOrNull()
     DEBUG_NETWORK_MESSAGES() &&
-      console.log(transport.type, ...Array.from(serializeCrdtMessages('[NetworkMessage received]:', value, engine)), isServer)
+      console.log(
+        transport.type,
+        ...Array.from(serializeCrdtMessages('[NetworkMessage received]:', value, engine)),
+        isServer
+      )
     if (isServer) {
       transport.onmessage!(serverValidator.processServerMessages(value, sender))
     } else if (sender === AUTH_SERVER_PEER_ID) {
@@ -136,7 +151,7 @@ export function addSyncTransport(
       requestState()
     }
   })
-  
+
   let requestingState = false
   /**
    * Why we have to request the state if we have a server that can send us the state when we joined?

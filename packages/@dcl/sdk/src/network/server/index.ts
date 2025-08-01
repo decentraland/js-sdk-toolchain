@@ -1,4 +1,4 @@
-import { IEngine, Entity, CrdtMessageType, CrdtMessageBody, ProcessMessageResultType, Schemas, CreatedBy } from '@dcl/ecs'
+import { IEngine, Entity, CrdtMessageType, CrdtMessageBody, ProcessMessageResultType } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { CommsMessage } from '../binary-message-bus'
@@ -6,7 +6,6 @@ import { chunkCrdtMessages } from '../chunking'
 import * as utils from './utils'
 import { AUTH_SERVER_PEER_ID, DEBUG_NETWORK_MESSAGES } from '../message-bus-sync'
 import { type BinaryMessageBus } from '../binary-message-bus'
-import { readMessage } from '@dcl/ecs/dist/serialization/crdt/message'
 
 export const LIVEKIT_MAX_SIZE = 12
 
@@ -48,7 +47,7 @@ export function createServerValidator(config: ServerValidationConfig) {
       networkId: message.networkId,
       entityId: message.entityId
     })
-    
+
     if (isServer) {
       CreatedBy.createOrReplace(newEntityId, { address: sender })
     }
@@ -79,9 +78,9 @@ export function createServerValidator(config: ServerValidationConfig) {
     if (!sender || sender === AUTH_SERVER_PEER_ID) {
       return false // Server shouldn't send messages to itself
     }
-    
+
     if (message.type === CrdtMessageType.DELETE_ENTITY) {
-      // TODO: how to handle this case ? 
+      // TODO: how to handle this case ?
     }
 
     if (message.type === CrdtMessageType.PUT_COMPONENT || message.type === CrdtMessageType.DELETE_COMPONENT) {
@@ -95,7 +94,9 @@ export function createServerValidator(config: ServerValidationConfig) {
         ProcessMessageResultType.EntityDeleted
       ].includes(dryRunCRDT)
       const createdBy = CreatedBy.getOrNull(message.entityId)
-      const validMessage = validCRDT && component.__run_validateBeforeChange(message.entityId, value, sender, createdBy?.address ?? AUTH_SERVER_PEER_ID)
+      const validMessage =
+        validCRDT &&
+        component.__run_validateBeforeChange(message.entityId, value, sender, createdBy?.address ?? AUTH_SERVER_PEER_ID)
 
       return !!validMessage
     }
@@ -174,10 +175,10 @@ export function createServerValidator(config: ServerValidationConfig) {
             const networkMessage = message as utils.NetworkMessage
             // 1. Find or create network entity mapping
             const localEntityId = findOrCreateNetworkEntity(networkMessage, sender, true)
-            
+
             // 2. Convert network message to regular message and collect for local application
             const regularMessage = convertNetworkToRegularMessage(networkMessage, localEntityId)
-            
+
             // 3. Basic permission validation
             if (!validateMessagePermissions(regularMessage as any, sender, localEntityId)) {
               // Send correction back to sender
@@ -188,7 +189,7 @@ export function createServerValidator(config: ServerValidationConfig) {
 
             // 4. Collect valid message for batched broadcasting
             messagesToBroadcast.push(networkMessage)
-            
+
             if (regularMessage?.messageBuffer.byteLength) {
               regularMessagesBuffer.writeBuffer(regularMessage.messageBuffer, false)
             }
