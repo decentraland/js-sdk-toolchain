@@ -55,9 +55,9 @@ export function engineToCrdt(engine: IEngine): Uint8Array[] {
     if (NOT_SYNC_COMPONENTS_IDS.includes(itComponentDefinition.componentId)) {
       continue
     }
+
     itComponentDefinition.dumpCrdtStateToBuffer(crdtBuffer, (entity) => {
-      const isNetworkEntity = NetworkEntity.has(entity)
-      return isNetworkEntity
+      return NetworkEntity.has(entity)
     })
   }
 

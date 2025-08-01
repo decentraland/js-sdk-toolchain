@@ -1,25 +1,26 @@
-import { IEngine, Entity } from '@dcl/ecs'
+import { IEngine, Entity, CrdtMessageType, CrdtMessageBody, ProcessMessageResultType, Schemas, CreatedBy } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { CommsMessage } from '../binary-message-bus'
 import { chunkCrdtMessages } from '../chunking'
 import * as utils from './utils'
+import { AUTH_SERVER_PEER_ID, DEBUG_NETWORK_MESSAGES } from '../message-bus-sync'
+import { type BinaryMessageBus } from '../binary-message-bus'
+import { readMessage } from '@dcl/ecs/dist/serialization/crdt/message'
 
 export const LIVEKIT_MAX_SIZE = 12
 
 export interface ServerValidationConfig {
   engine: IEngine
-  binaryMessageBus: any // Use any for now to avoid circular import issues
-  transport: { onmessage?: (data: Uint8Array) => void }
-  authServerPeerId: string
-  debugNetworkMessages: () => boolean
+  binaryMessageBus: ReturnType<typeof BinaryMessageBus>
 }
 
 export function createServerValidator(config: ServerValidationConfig) {
-  const { engine, binaryMessageBus, transport, authServerPeerId, debugNetworkMessages } = config
+  const { engine, binaryMessageBus } = config
 
   // Initialize components for network operations and transform fixing
   const NetworkEntity = components.NetworkEntity(engine)
+  const CreatedBy = components.CreatedBy(engine)
   const NetworkParent = components.NetworkParent(engine)
 
   function findExistingNetworkEntity(message: utils.NetworkMessage): Entity | null {
@@ -33,9 +34,10 @@ export function createServerValidator(config: ServerValidationConfig) {
     return null
   }
 
-  function findOrCreateNetworkEntity(message: utils.NetworkMessage): Entity {
+  function findOrCreateNetworkEntity(message: utils.NetworkMessage, sender: string, isServer: boolean): Entity {
     // Look for existing network entity mapping first
     const existingEntity = findExistingNetworkEntity(message)
+
     if (existingEntity) {
       return existingEntity
     }
@@ -46,7 +48,12 @@ export function createServerValidator(config: ServerValidationConfig) {
       networkId: message.networkId,
       entityId: message.entityId
     })
-    debugNetworkMessages() &&
+    
+    if (isServer) {
+      CreatedBy.createOrReplace(newEntityId, { address: sender })
+    }
+
+    DEBUG_NETWORK_MESSAGES() &&
       console.log(`[DEBUG] Created new entity ${newEntityId} for network ${message.networkId}:${message.entityId}`)
     return newEntityId
   }
@@ -54,31 +61,49 @@ export function createServerValidator(config: ServerValidationConfig) {
   function convertNetworkToRegularMessage(
     networkMessage: utils.NetworkMessage,
     localEntityId: Entity
-  ): Uint8Array | null {
+  ): (CrdtMessageBody & { messageBuffer: Uint8Array }) | null {
     const buffer = new ReadWriteByteBuffer()
 
     try {
       // Use the well-tested networkMessageToLocal utility with transform fixing for Unity
-      utils.networkMessageToLocal(networkMessage, localEntityId, buffer, NetworkParent)
-      return buffer.toBinary()
+      const message = utils.networkMessageToLocal(networkMessage, localEntityId, buffer, NetworkParent)
+      return { ...message, messageBuffer: buffer.toBinary() }
     } catch (error) {
-      debugNetworkMessages() && console.error('Error converting network message:', error)
+      DEBUG_NETWORK_MESSAGES() && console.error('Error converting network message:', error)
       return null
     }
   }
 
-  function validateMessagePermissions(_message: utils.NetworkMessage, sender: string, _localEntityId: Entity): boolean {
+  function validateMessagePermissions(message: utils.RegularMessage, sender: string, _localEntityId: Entity): boolean {
+    // Basic checks
+    if (!sender || sender === AUTH_SERVER_PEER_ID) {
+      return false // Server shouldn't send messages to itself
+    }
+    
+    if (message.type === CrdtMessageType.DELETE_ENTITY) {
+      // TODO: how to handle this case ? 
+    }
+
+    if (message.type === CrdtMessageType.PUT_COMPONENT || message.type === CrdtMessageType.DELETE_COMPONENT) {
+      const component = engine.getComponent(message.componentId)
+      const buf = 'data' in message ? new ReadWriteByteBuffer(message.data) : null
+      const value = buf ? component.schema.deserialize(buf) : null
+      const dryRunCRDT = component.__dry_run_updateFromCrdt(message)
+      const validCRDT = [
+        ProcessMessageResultType.StateUpdatedData,
+        ProcessMessageResultType.StateUpdatedTimestamp,
+        ProcessMessageResultType.EntityDeleted
+      ].includes(dryRunCRDT)
+      const createdBy = CreatedBy.getOrNull(message.entityId)
+      const validMessage = validCRDT && component.__run_validateBeforeChange(message.entityId, value, sender, createdBy?.address ?? AUTH_SERVER_PEER_ID)
+
+      return !!validMessage
+    }
+
     // For now, basic validation - in the future this will check component sync permissions
     // TODO: Check if sender owns the entity
     // TODO: Check component sync mode ('all' | 'owner' | 'server')
     // TODO: Run component custom validation
-
-    // Basic checks
-    if (!sender || sender === authServerPeerId) {
-      return false // Server shouldn't send messages to itself
-    }
-
-    // For now, allow all operations (will be enhanced with proper permission system)
     return true
   }
 
@@ -104,8 +129,7 @@ export function createServerValidator(config: ServerValidationConfig) {
     for (const chunk of chunks) {
       binaryMessageBus.emit(CommsMessage.CRDT, chunk)
     }
-
-    debugNetworkMessages() &&
+    DEBUG_NETWORK_MESSAGES() &&
       console.log(`Total: ${messages.length} messages in ${chunks.length} chunks from ${excludeSender}`)
   }
 
@@ -124,12 +148,12 @@ export function createServerValidator(config: ServerValidationConfig) {
           const networkMessage = message as utils.NetworkMessage
 
           // Find or create network entity mapping
-          const localEntityId = findOrCreateNetworkEntity(networkMessage)
+          const localEntityId = findOrCreateNetworkEntity(networkMessage, sender, false)
 
           // Convert network message to regular message
-          const regularMessageBuffer = convertNetworkToRegularMessage(networkMessage, localEntityId)
-          if (regularMessageBuffer) {
-            combinedBuffer.writeBuffer(regularMessageBuffer, false)
+          const regularMessage = convertNetworkToRegularMessage(networkMessage, localEntityId)
+          if (regularMessage?.messageBuffer.byteLength) {
+            combinedBuffer.writeBuffer(regularMessage.messageBuffer, false)
           }
         }
       }
@@ -148,39 +172,34 @@ export function createServerValidator(config: ServerValidationConfig) {
           // Only process network messages in server message handler
           if (utils.isNetworkMessage(message)) {
             const networkMessage = message as utils.NetworkMessage
-
             // 1. Find or create network entity mapping
-            const localEntityId = findOrCreateNetworkEntity(networkMessage)
-
-            // 2. Basic permission validation
-            if (!validateMessagePermissions(networkMessage, sender, localEntityId)) {
+            const localEntityId = findOrCreateNetworkEntity(networkMessage, sender, true)
+            
+            // 2. Convert network message to regular message and collect for local application
+            const regularMessage = convertNetworkToRegularMessage(networkMessage, localEntityId)
+            
+            // 3. Basic permission validation
+            if (!validateMessagePermissions(regularMessage as any, sender, localEntityId)) {
               // Send correction back to sender
               // sendCorrectionToSender(networkMessage, sender, localEntityId)
               // also we need to check if the CRDT is valid, maybe another peer win.
               continue
             }
 
-            // 3. Collect valid message for batched broadcasting
+            // 4. Collect valid message for batched broadcasting
             messagesToBroadcast.push(networkMessage)
-
-            // 4. Convert network message to regular message and collect for local application
-            const regularMessageBuffer = convertNetworkToRegularMessage(networkMessage, localEntityId)
-            if (regularMessageBuffer) {
-              regularMessagesBuffer.writeBuffer(regularMessageBuffer, false)
+            
+            if (regularMessage?.messageBuffer.byteLength) {
+              regularMessagesBuffer.writeBuffer(regularMessage.messageBuffer, false)
             }
           }
         } catch (error) {
-          debugNetworkMessages() && console.error('Error processing server message:', error)
+          DEBUG_NETWORK_MESSAGES() && console.error('Error processing server message:', error)
         }
       }
-
       // Batch broadcast all valid messages together
       broadcastBatchedMessages(messagesToBroadcast, sender)
-
-      // Apply all regular messages locally as a single batch
-      if (regularMessagesBuffer.currentWriteOffset() > 0) {
-        transport.onmessage!(regularMessagesBuffer.toBinary())
-      }
+      return regularMessagesBuffer.toBinary()
     },
     // engine changes that needs to be broadcasted.
     convertRegularToNetworkMessage: function convertRegularToNetworkMessage(regularMessage: Uint8Array): Uint8Array[] {

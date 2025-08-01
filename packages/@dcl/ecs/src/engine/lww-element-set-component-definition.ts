@@ -12,7 +12,7 @@ import {
   DeleteComponentNetworkMessageBody
 } from '../serialization/crdt'
 import { dataCompare } from '../systems/crdt/utils'
-import { LastWriteWinElementSetComponentDefinition, ComponentType } from './component'
+import { LastWriteWinElementSetComponentDefinition, ComponentType, ValidateCallback } from './component'
 import { Entity } from './entity'
 import { DeepReadonly, deepReadonly } from './readonly'
 
@@ -23,6 +23,7 @@ export function incrementTimestamp(entity: Entity, timestamps: Map<Entity, numbe
 }
 
 export function createDumpLwwFunctionFromCrdt(
+  componentName: string,
   componentId: number,
   timestamps: Map<Entity, number>,
   schema: Pick<ISchema<any>, 'serialize' | 'deserialize'>,
@@ -49,21 +50,17 @@ export function createDumpLwwFunctionFromCrdt(
   }
 }
 
-export function createUpdateLwwFromCrdt(
-  componentId: number,
+const __GLOBAL_ENTITY = '__GLOBAL_ENTITY' as any as Entity
+
+export function createCrdtRuleValidator(
   timestamps: Map<Entity, number>,
   schema: Pick<ISchema<any>, 'serialize' | 'deserialize'>,
   data: Map<Entity, unknown>
 ) {
   /**
-   * Process the received message only if the lamport number recieved is higher
-   * than the stored one. If its lower, we spread it to the network to correct the peer.
-   * If they are equal, the bigger raw data wins.
-
-    * Returns the recieved data if the lamport number was bigger than ours.
-    * If it was an outdated message, then we return void
-    * @public
-    */
+   * Shared CRDT conflict resolution logic
+   * @public
+   */
   function crdtRuleForCurrentState(
     message:
       | PutComponentMessageBody
@@ -100,17 +97,36 @@ export function createUpdateLwwFromCrdt(
     }
 
     // Same data, same timestamp. Weirdo echo message.
-    // console.log('3', currentDataGreater, writeBuffer.toBinary(), (message as any).data || null)
     if (currentDataGreater === 0) {
       return ProcessMessageResultType.NoChanges
     } else if (currentDataGreater > 0) {
       // Current data is greater
       return ProcessMessageResultType.StateOutdatedData
     } else {
-      // Curent data is lower
+      // Current data is lower
       return ProcessMessageResultType.StateUpdatedData
     }
   }
+
+  return crdtRuleForCurrentState
+}
+
+export function createUpdateLwwFromCrdt(
+  componentId: number,
+  timestamps: Map<Entity, number>,
+  schema: Pick<ISchema<any>, 'serialize' | 'deserialize'>,
+  data: Map<Entity, unknown>
+) {
+  /**
+   * Process the received message only if the lamport number recieved is higher
+   * than the stored one. If its lower, we spread it to the network to correct the peer.
+   * If they are equal, the bigger raw data wins.
+
+    * Returns the recieved data if the lamport number was bigger than ours.
+    * If it was an outdated message, then we return void
+    * @public
+    */
+  const crdtRuleForCurrentState = createCrdtRuleValidator(timestamps, schema, data)
 
   return (msg: CrdtMessageBody): [null | PutComponentMessageBody | DeleteComponentMessageBody, any] => {
     /* istanbul ignore next */
@@ -223,6 +239,7 @@ export function createComponentDefinitionFromSchema<T>(
   const dirtyIterator = new Set<Entity>()
   const timestamps = new Map<Entity, number>()
   const onChangeCallbacks = new Map<Entity, ((data: T | undefined) => void)[]>()
+  const validateCallbacks = new Map<Entity, ValidateCallback<T>>()
 
   return {
     get componentId() {
@@ -316,7 +333,33 @@ export function createComponentDefinitionFromSchema<T>(
     },
     getCrdtUpdates: createGetCrdtMessagesForLww(componentId, timestamps, dirtyIterator, schema, data),
     updateFromCrdt: createUpdateLwwFromCrdt(componentId, timestamps, schema, data),
-    dumpCrdtStateToBuffer: createDumpLwwFunctionFromCrdt(componentId, timestamps, schema, data),
+    __dry_run_updateFromCrdt: createCrdtRuleValidator(timestamps, schema, data),
+    dumpCrdtStateToBuffer: createDumpLwwFunctionFromCrdt(componentName, componentId, timestamps, schema, data),
+    validateBeforeChange(
+      entityOrCb: Entity | ValidateCallback<T>,
+      cb?: ValidateCallback<T>
+    ): void {
+      if (arguments.length === 1) {
+        // Second overload: just callback (global validation)
+        validateCallbacks.set(__GLOBAL_ENTITY, entityOrCb as ValidateCallback<T> )
+      } else {
+        if (cb) {
+          validateCallbacks.set(entityOrCb as Entity, cb)
+        }
+      }
+    },
+    __run_validateBeforeChange(entity, newValue, senderAddress, createdBy): boolean {
+      const cb = entity && validateCallbacks.get(entity)
+      const globalCb = validateCallbacks.get(__GLOBAL_ENTITY)
+      const currentValue = entity ? data.get(entity) : undefined
+
+      const value = { entity, currentValue, newValue, senderAddress, createdBy }
+      
+      const globalResult = globalCb?.(value) ?? true
+      const entityResult = (globalResult && cb?.(value)) ?? true
+      
+      return globalResult && entityResult
+    },
     onChange(entity, cb) {
       const cbs = onChangeCallbacks.get(entity) ?? []
       cbs.push(cb)

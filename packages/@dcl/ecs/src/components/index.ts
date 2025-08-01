@@ -19,6 +19,7 @@ import { defineInputModifierComponent, InputModifierComponentDefinitionExtended 
 import { defineLightSourceComponent, LightSourceComponentDefinitionExtended } from './extended/LightSource'
 import { defineTriggerAreaComponent, TriggerAreaComponentDefinitionExtended } from './extended/TriggerArea'
 import defineTagsComponent, { TagsComponentDefinitionExtended } from './manual/Tags'
+import defineCreatedBy, { ICreatedByType } from './manual/CreatedBy'
 
 export * from './generated/index.gen'
 
@@ -109,5 +110,12 @@ export const NetworkEntity: (
 export const NetworkParent: (
   engine: Pick<IEngine, 'defineComponent'>
 ) => LastWriteWinElementSetComponentDefinition<INetowrkParentType> = (engine) => defineNetworkParent(engine)
+
+/**
+ * @public
+ */
+export const CreatedBy: (
+  engine: Pick<IEngine, 'defineComponent'>
+) => LastWriteWinElementSetComponentDefinition<ICreatedByType> = (engine) => defineCreatedBy(engine)
 
 export { MediaState }
