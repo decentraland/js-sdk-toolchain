@@ -1,4 +1,4 @@
-import { EditorComponentsTypes, SceneAgeRating, SceneCategory } from '../../../lib/sdk/components'
+import { EditorComponentsTypes, SceneAgeRating, SceneCategory, TransitionMode } from '../../../lib/sdk/components'
 import { Layout } from '../../../lib/utils/layout'
 import { SceneInput } from './types'
 import { fromScene, isValidInput, parseParcels, toScene } from './utils'
@@ -18,7 +18,8 @@ function getInput(base: string, parcels: string): SceneInput {
     author: 'John Doe',
     email: 'johndoe@gmail.com',
     skyboxConfig: {
-      fixedTime: '36000'
+      fixedTime: '36000',
+      transitionMode: TransitionMode.TM_FORWARD
     },
     layout: {
       base,
@@ -43,7 +44,8 @@ function getScene(layout: Layout): EditorComponentsTypes['Scene'] {
     email: 'johndoe@gmail.com',
     layout,
     skyboxConfig: {
-      fixedTime: 36000
+      fixedTime: 36000,
+      transitionMode: TransitionMode.TM_FORWARD
     }
   }
   return scene

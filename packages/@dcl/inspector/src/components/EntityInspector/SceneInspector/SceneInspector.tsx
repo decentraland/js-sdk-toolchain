@@ -39,6 +39,7 @@ import { Tab } from '../Tab'
 import { transformBinaryToBase64Resource } from '../../../lib/data-layer/host/fs-utils'
 import { selectThumbnails } from '../../../redux/app'
 import { Layout } from './Layout'
+import { TransitionMode } from '../../../lib/sdk/components/SceneMetadata'
 
 const AGE_RATING_OPTIONS = [
   {
@@ -381,6 +382,16 @@ export default withSdk<Props>(({ sdk, entity }) => {
     [componentValue]
   )
 
+  const handleChangeTransitionMode = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const newValue = {
+        ...componentValue,
+        skyboxConfig: { ...componentValue.skyboxConfig, transitionMode: e.target.value as TransitionMode }
+      }
+      setComponentValue(newValue)
+    },
+    [componentValue]
+  )
   return (
     <Container className="Scene" gap>
       <Tabs className="SceneTabs">
@@ -478,6 +489,15 @@ export default withSdk<Props>(({ sdk, entity }) => {
             step={3600}
             onChange={handleSkyboxTimeChange}
             disabled={componentValue.skyboxConfig?.fixedTime === undefined}
+          />
+          <Dropdown
+            label="Transition Mode"
+            options={[
+              { label: 'Forward', value: TransitionMode.TM_FORWARD },
+              { label: 'Backward', value: TransitionMode.TM_BACKWARD }
+            ]}
+            value={componentValue.skyboxConfig?.transitionMode}
+            onChange={(e) => handleChangeTransitionMode(e)}
           />
         </>
       ) : null}

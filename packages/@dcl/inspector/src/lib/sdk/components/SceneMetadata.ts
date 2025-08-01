@@ -25,6 +25,11 @@ export const Coords = Schemas.Map({
   y: Schemas.Int
 })
 
+export enum TransitionMode {
+  TM_FORWARD = 1,
+  TM_BACKWARD = 0
+}
+
 //SceneMetadata component is now versioned, to add new versions you must need to keep the previous properties and add the new ones
 export const SceneMetadataV0 = {
   name: Schemas.Optional(Schemas.String),
@@ -88,7 +93,12 @@ export const SceneMetadataV1 = {
   }),
   silenceVoiceChat: Schemas.Optional(Schemas.Boolean),
   disablePortableExperiences: Schemas.Optional(Schemas.Boolean),
-  skyboxConfig: Schemas.Optional(Schemas.Map({ fixedTime: Schemas.Optional(Schemas.Int) })),
+  skyboxConfig: Schemas.Optional(
+    Schemas.Map({
+      fixedTime: Schemas.Optional(Schemas.Int),
+      transitionMode: Schemas.Optional(Schemas.EnumNumber(TransitionMode, TransitionMode.TM_FORWARD))
+    })
+  ),
   spawnPoints: Schemas.Optional(
     Schemas.Array(
       Schemas.Map({

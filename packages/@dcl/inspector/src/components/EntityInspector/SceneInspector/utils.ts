@@ -12,6 +12,7 @@ import { TreeNode } from '../../ProjectAssetExplorer/ProjectView'
 import { AssetNodeItem } from '../../ProjectAssetExplorer/types'
 import { isAssetNode } from '../../ProjectAssetExplorer/utils'
 import { ACCEPTED_FILE_TYPES } from '../../ui/FileUploadField/types'
+import { TransitionMode } from '../../../lib/sdk/components/SceneMetadata'
 
 function getValue(coord: SceneSpawnPointCoord) {
   return coord.$case === 'range' ? (coord.value[0] + coord.value[1]) / 2 : coord.value
@@ -72,7 +73,8 @@ export function fromScene(value: EditorComponentsTypes['Scene']): SceneInput {
     author: value.author || '',
     email: value.email || '',
     skyboxConfig: {
-      fixedTime: String(value.skyboxConfig?.fixedTime || MIDDAY_SECONDS)
+      fixedTime: String(value.skyboxConfig?.fixedTime || MIDDAY_SECONDS),
+      transitionMode: String(value.skyboxConfig?.transitionMode || TransitionMode.TM_FORWARD)
     },
     silenceVoiceChat: typeof value.silenceVoiceChat === 'boolean' ? value.silenceVoiceChat : false,
     disablePortableExperiences:
@@ -98,7 +100,8 @@ export function toScene(inputs: SceneInput): EditorComponentsTypes['Scene'] {
     author: inputs.author,
     email: inputs.email,
     skyboxConfig: {
-      fixedTime: Number(inputs.skyboxConfig.fixedTime || MIDDAY_SECONDS)
+      fixedTime: Number(inputs.skyboxConfig.fixedTime || MIDDAY_SECONDS),
+      transitionMode: TransitionMode.TM_FORWARD
     },
     silenceVoiceChat: inputs.silenceVoiceChat,
     disablePortableExperiences: inputs.disablePortableExperiences,

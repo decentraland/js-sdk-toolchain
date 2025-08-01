@@ -24,6 +24,7 @@ export type SceneInput = {
   description: string
   skyboxConfig: {
     fixedTime: string
+    transitionMode: string
   }
   thumbnail: string
   ageRating: string

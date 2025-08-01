@@ -21,7 +21,8 @@ import {
   defineSceneComponents,
   getLatestSceneComponentVersion,
   SceneAgeRating,
-  SceneCategory
+  SceneCategory,
+  TransitionMode
 } from './SceneMetadata'
 
 export { SceneAgeRating, SceneCategory }
@@ -94,6 +95,7 @@ export type SceneComponent = {
   description?: string
   skyboxConfig?: {
     fixedTime?: number
+    transitionMode?: TransitionMode
   }
   thumbnail?: string
   ageRating?: SceneAgeRating
