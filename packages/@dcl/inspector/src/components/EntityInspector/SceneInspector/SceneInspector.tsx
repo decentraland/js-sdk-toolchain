@@ -386,7 +386,7 @@ export default withSdk<Props>(({ sdk, entity }) => {
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       const newValue = {
         ...componentValue,
-        skyboxConfig: { ...componentValue.skyboxConfig, transitionMode: e.target.value as TransitionMode }
+        skyboxConfig: { ...componentValue.skyboxConfig, transitionMode: parseInt(e.target.value) as TransitionMode }
       }
       setComponentValue(newValue)
     },
