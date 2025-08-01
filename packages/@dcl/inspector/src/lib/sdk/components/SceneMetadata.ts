@@ -26,8 +26,8 @@ export const Coords = Schemas.Map({
 })
 
 export enum TransitionMode {
-  TM_FORWARD = 1,
-  TM_BACKWARD = 0
+  TM_FORWARD = 0,
+  TM_BACKWARD = 1
 }
 
 //SceneMetadata component is now versioned, to add new versions you must need to keep the previous properties and add the new ones

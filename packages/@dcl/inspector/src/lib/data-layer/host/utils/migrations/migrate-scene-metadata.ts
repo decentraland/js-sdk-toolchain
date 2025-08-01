@@ -53,7 +53,7 @@ export function migrateSceneMetadata(engine: IEngine) {
   const oldComponent = component
 
   oldComponent.deleteFrom(engine.RootEntity)
-  removeOldSceneVersions(engine, oldComponent.componentName)
+  removeOldSceneVersions(engine, latestComponentVersion.key)
 
   const SceneMetadata = engine.getComponent(latestComponentVersion.key) as EditorComponents['Scene']
   SceneMetadata.createOrReplace(engine.RootEntity, value)
