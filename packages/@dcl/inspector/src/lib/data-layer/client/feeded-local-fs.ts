@@ -11,6 +11,7 @@ import { createInMemoryStorage } from '../../logic/storage/in-memory'
 import { downloadAssets } from './builder-utils'
 import { SceneAgeRating } from '../../sdk/components'
 import { THUMBNAIL } from './constants'
+import { TransitionMode } from '../../sdk/components/SceneMetadata'
 
 export function createTempEngineContext() {
   const { engine, components } = createEngineContext()
@@ -42,6 +43,10 @@ export function generateMinimalComposite({ engine, components }: TempEngine) {
     description: 'This is a test scene',
     thumbnail: 'assets/scene/thumbnail.png',
     ageRating: SceneAgeRating.Teen,
+    skyboxConfig: {
+      fixedTime: 36000,
+      transitionMode: TransitionMode.TM_FORWARD
+    },
     categories: [],
     author: '',
     email: '',

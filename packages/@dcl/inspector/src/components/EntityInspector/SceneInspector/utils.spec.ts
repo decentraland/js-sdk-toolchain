@@ -1,8 +1,9 @@
-import { EditorComponentsTypes, SceneAgeRating, SceneCategory } from '../../../lib/sdk/components'
+import { EditorComponentsTypes, SceneAgeRating, SceneCategory, TransitionMode } from '../../../lib/sdk/components'
 import { Layout } from '../../../lib/utils/layout'
 import { SceneInput } from './types'
 import { fromScene, isValidInput, parseParcels, toScene } from './utils'
 
+//TODO fix tests
 function getInput(base: string, parcels: string): SceneInput {
   const input: SceneInput = {
     name: 'name',
@@ -16,6 +17,10 @@ function getInput(base: string, parcels: string): SceneInput {
     spawnPoints: [],
     author: 'John Doe',
     email: 'johndoe@gmail.com',
+    skyboxConfig: {
+      fixedTime: '36000',
+      transitionMode: TransitionMode.TM_FORWARD
+    },
     layout: {
       base,
       parcels
@@ -37,7 +42,11 @@ function getScene(layout: Layout): EditorComponentsTypes['Scene'] {
     spawnPoints: [],
     author: 'John Doe',
     email: 'johndoe@gmail.com',
-    layout
+    layout,
+    skyboxConfig: {
+      fixedTime: 36000,
+      transitionMode: TransitionMode.TM_FORWARD
+    }
   }
   return scene
 }
