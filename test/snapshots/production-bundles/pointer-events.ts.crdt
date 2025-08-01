@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=208k bytes
 =======
 <<<<<<< HEAD
@@ -7,6 +8,9 @@ SCENE_COMPILED_JS_SIZE_PROD=205.2k bytes
 SCENE_COMPILED_JS_SIZE_PROD=202.4k bytes
 >>>>>>> 99d394c1 (update snapshots)
 >>>>>>> c50aee8d (update snapshots)
+=======
+SCENE_COMPILED_JS_SIZE_PROD=203.3k bytes
+>>>>>>> 126220f1 (fix tests)
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -16,6 +20,7 @@ EVAL test/snapshots/production-bundles/pointer-events.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
+<<<<<<< HEAD
 <<<<<<< HEAD
   OPCODES ~= 58k
 <<<<<<< HEAD
@@ -30,6 +35,11 @@ EVAL test/snapshots/production-bundles/pointer-events.js
   ALIVE_OBJS_DELTA ~= 2.68k
 >>>>>>> 99d394c1 (update snapshots)
 >>>>>>> c50aee8d (update snapshots)
+=======
+  OPCODES ~= 49k
+  MALLOC_COUNT = 12467
+  ALIVE_OBJS_DELTA ~= 2.74k
+>>>>>>> 126220f1 (fix tests)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -63,6 +73,7 @@ CALL onUpdate(0.1)
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 <<<<<<< HEAD
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 904.81k bytes
 =======
 <<<<<<< HEAD
@@ -71,3 +82,6 @@ CALL onUpdate(0.1)
   MEMORY_USAGE_COUNT ~= 870.41k bytes
 >>>>>>> 99d394c1 (update snapshots)
 >>>>>>> c50aee8d (update snapshots)
+=======
+  MEMORY_USAGE_COUNT ~= 878.34k bytes
+>>>>>>> 126220f1 (fix tests)
