@@ -23,7 +23,6 @@ export function incrementTimestamp(entity: Entity, timestamps: Map<Entity, numbe
 }
 
 export function createDumpLwwFunctionFromCrdt(
-  componentName: string,
   componentId: number,
   timestamps: Map<Entity, number>,
   schema: Pick<ISchema<any>, 'serialize' | 'deserialize'>,
@@ -357,11 +356,8 @@ export function createComponentDefinitionFromSchema<T>(
     getCrdtUpdates: createGetCrdtMessagesForLww(componentId, timestamps, dirtyIterator, schema, data, lastSentData),
     updateFromCrdt: createUpdateLwwFromCrdt(componentId, timestamps, schema, data, lastSentData),
     __dry_run_updateFromCrdt: createCrdtRuleValidator(timestamps, schema, data, lastSentData),
-    dumpCrdtStateToBuffer: createDumpLwwFunctionFromCrdt(componentName, componentId, timestamps, schema, data),
-    validateBeforeChange(
-      entityOrCb: Entity | ValidateCallback<T>,
-      cb?: ValidateCallback<T>
-    ): void {
+    dumpCrdtStateToBuffer: createDumpLwwFunctionFromCrdt(componentId, timestamps, schema, data),
+    validateBeforeChange(entityOrCb: Entity | ValidateCallback<T>, cb?: ValidateCallback<T>): void {
       if (arguments.length === 1) {
         // Second overload: just callback (global validation)
         validateCallbacks.set(__GLOBAL_ENTITY, entityOrCb as ValidateCallback<T>)

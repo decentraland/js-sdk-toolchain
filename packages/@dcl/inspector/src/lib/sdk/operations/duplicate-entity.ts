@@ -1,10 +1,4 @@
-import {
-  Entity,
-  IEngine,
-  Transform as TransformEngine,
-  NetworkEntity as NetworkEntityEngine,
-  Name as NameEngine
-} from '@dcl/ecs'
+import { Entity, IEngine, Transform as TransformEngine, Name as NameEngine } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import { clone } from '@dcl/asset-packs'
 import { EditorComponentNames, EditorComponents } from '../components'
