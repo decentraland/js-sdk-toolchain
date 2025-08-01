@@ -6,6 +6,7 @@ import { ByteBuffer, ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/Byt
 import { PutComponentOperation } from '@dcl/ecs/dist/serialization/crdt/putComponent'
 import {
   CrdtMessage,
+  CrdtMessageBody,
   CrdtMessageHeader,
   CrdtMessageType,
   DeleteComponentMessage,
@@ -28,6 +29,7 @@ export type NetworkMessage = (
   | DeleteComponentNetworkMessage
   | DeleteEntityNetworkMessage
 ) & { messageBuffer: Uint8Array }
+
 export type RegularMessage = (PutComponentMessage | DeleteComponentMessage | DeleteEntityMessage) & {
   messageBuffer: Uint8Array
 }
@@ -84,7 +86,7 @@ export function networkMessageToLocal(
   destinationBuffer: ByteBuffer,
   // Optional network parent component for transform fixing
   networkParentComponent?: typeof NetworkParent
-) {
+): CrdtMessageBody {
   if (message.type === CrdtMessageType.PUT_COMPONENT_NETWORK) {
     let messageData = message.data
 
@@ -93,13 +95,30 @@ export function networkMessageToLocal(
       const parentNetwork = networkParentComponent.getOrNull(localEntityId)
       messageData = fixTransformParent(message, parentNetwork?.entityId)
     }
-
     PutComponentOperation.write(localEntityId, message.timestamp, message.componentId, messageData, destinationBuffer)
+    return {
+      type: CrdtMessageType.PUT_COMPONENT,
+      componentId: message.componentId,
+      timestamp: message.timestamp,
+      data: messageData,
+      entityId: localEntityId
+    }
   } else if (message.type === CrdtMessageType.DELETE_COMPONENT_NETWORK) {
     DeleteComponent.write(localEntityId, message.componentId, message.timestamp, destinationBuffer)
+    return {
+      type: CrdtMessageType.DELETE_COMPONENT,
+      componentId: message.componentId,
+      timestamp: message.timestamp,
+      entityId: localEntityId
+    }
   } else if (message.type === CrdtMessageType.DELETE_ENTITY_NETWORK) {
     DeleteEntity.write(localEntityId, destinationBuffer)
+    return {
+      type: CrdtMessageType.DELETE_ENTITY,
+      entityId: localEntityId
+    }
   }
+  throw 1
 }
 
 export function localMessageToNetwork(
@@ -137,7 +156,6 @@ export function fixTransformParent(message: ReceiveMessage, parent?: Entity): Ui
 
   // Generate new transform raw data with the parent
   const newTransform = { ...transform, parent }
-
   TransformSchema.serialize(newTransform, buffer)
   return buffer.toBinary()
 }

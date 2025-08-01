@@ -1,6 +1,6 @@
 import { ISchema } from '../schemas'
 import { ByteBuffer } from '../serialization/ByteBuffer'
-import { CrdtMessageBody, DeleteComponentMessageBody, PutComponentMessageBody } from '../serialization/crdt'
+import { CrdtMessageBody, DeleteComponentMessageBody, ProcessMessageResultType, PutComponentMessageBody } from '../serialization/crdt'
 import { Entity } from './entity'
 import { DeepReadonly, DeepReadonlySet } from './readonly'
 
@@ -38,6 +38,7 @@ export interface BaseComponent<T> {
    * @public
    */
   updateFromCrdt(body: CrdtMessageBody): [null | ConflictResolutionMessage, T | undefined]
+  __dry_run_updateFromCrdt(body: CrdtMessageBody): ProcessMessageResultType
 
   /**
    * This function returns an iterable with all the CRDT updates that need to be
@@ -104,7 +105,27 @@ export interface BaseComponent<T> {
    * If the value is undefined, the component was deleted.
    */
   onChange(entity: Entity, cb: (value: T | undefined) => void): void
+
+  /**
+   * @public
+   * 
+  */
+  validateBeforeChange(entity: Entity, cb: ValidateCallback<T>): void
+  validateBeforeChange(cb: ValidateCallback<T>): void
+  /**
+   * @public
+   * 
+  */
+  __run_validateBeforeChange(entity: Entity, newValue: T | undefined, senderAddress: string, createdBy: string): boolean
 }
+
+export type ValidateCallback<T> = (value: {
+  entity: Entity;           // The entity being validated
+  currentValue: T | undefined;  // Current value of the component (undefined if component doesn't exist)
+  newValue: T | undefined;      // New value being set (undefined if component is being deleted)
+  senderAddress: string;              // Peer address/sender of the change
+  createdBy: string;            // Address of the user who created the change
+}) => boolean
 
 /**
  * @public

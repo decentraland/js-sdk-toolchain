@@ -17,6 +17,7 @@ import { MediaState } from './generated/pb/decentraland/sdk/components/common/me
 import { defineVirtualCameraComponent, VirtualCameraComponentDefinitionExtended } from './extended/VirtualCamera'
 import { defineInputModifierComponent, InputModifierComponentDefinitionExtended } from './extended/InputModifier'
 import { defineLightSourceComponent, LightSourceComponentDefinitionExtended } from './extended/LightSource'
+import defineCreatedBy, { ICreatedByType } from './manual/CreatedBy'
 
 export * from './generated/index.gen'
 
@@ -99,5 +100,12 @@ export const NetworkEntity: (
 export const NetworkParent: (
   engine: Pick<IEngine, 'defineComponent'>
 ) => LastWriteWinElementSetComponentDefinition<INetowrkParentType> = (engine) => defineNetworkParent(engine)
+
+/**
+ * @public
+ */
+export const CreatedBy: (
+  engine: Pick<IEngine, 'defineComponent'>
+) => LastWriteWinElementSetComponentDefinition<ICreatedByType> = (engine) => defineCreatedBy(engine)
 
 export { MediaState }
