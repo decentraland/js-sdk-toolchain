@@ -15,6 +15,8 @@ import { Atom } from '../atom'
 
 export type IProfile = { networkId: number; userId: string }
 // user that we asked for the inital crdt state
+export const AUTH_SERVER_PEER_ID = 'authorative-server'
+export const DEBUG_NETWORK_MESSAGES = () => true //(globalThis as any).DEBUG_NETWORK_MESSAGES ?? false
 export function addSyncTransport(
   engine: IEngine,
   sendBinary: (msg: SendBinaryRequest) => Promise<SendBinaryResponse>,
@@ -22,8 +24,6 @@ export function addSyncTransport(
   isServerFn: (request: IsServerRequest) => Promise<IsServerResponse>,
   name: string
 ) {
-  const AUTH_SERVER_PEER_ID = 'authorative-server'
-  const DEBUG_NETWORK_MESSAGES = () => true //(globalThis as any).DEBUG_NETWORK_MESSAGES ?? false
   // Profile Info
   const myProfile: IProfile = {} as IProfile
   fetchProfile(myProfile!, getUserData)
@@ -49,13 +49,22 @@ export function addSyncTransport(
   const players = definePlayerHelper(engine)
 
   let stateIsSyncronized = false
-  let transportInitialzed = false
+  
+  /**
+   * We need to wait till 2 ticks that is when the engine is ready to send new messages.
+   * The first tick is for the client engine processing the CRDT messages,
+   * and the second one are the messages created by the main() function.
+   * So to avoid sending those messages, that all the clients have, through the network we put this validation here.
+   */
+  let tick = 0
+  const TRANSPORT_INITIALIZED_NUMBER = 2
 
   // Add Sync Transport
   const transport: Transport = {
     filter: syncFilter(engine),
     send: async (messages) => {
-      for (const message of transportInitialzed ? [messages].flat(): []) {
+      if (tick <= TRANSPORT_INITIALIZED_NUMBER) tick++
+      for (const message of tick > TRANSPORT_INITIALIZED_NUMBER ? [messages].flat(): []) {
         if (message.byteLength) {
           DEBUG_NETWORK_MESSAGES() &&
             console.log(...Array.from(serializeCrdtMessages('[NetworkMessage sent]:', message, engine)))
@@ -69,7 +78,6 @@ export function addSyncTransport(
       const peerMessages = getMessagesToSend()
       const response = await sendBinary({ data: [], peerData: peerMessages })
       binaryMessageBus.__processMessages(response.data)
-      transportInitialzed = true
     },
     type: name
   }
@@ -78,9 +86,6 @@ export function addSyncTransport(
   const serverValidator = createServerValidator({
     engine,
     binaryMessageBus,
-    transport,
-    authServerPeerId: AUTH_SERVER_PEER_ID,
-    debugNetworkMessages: DEBUG_NETWORK_MESSAGES
   })
 
   engine.addTransport(transport)
@@ -103,13 +108,12 @@ export function addSyncTransport(
 
   // received message from the network
   binaryMessageBus.on(CommsMessage.CRDT, (value, sender) => {
-    DEBUG_NETWORK_MESSAGES() &&
-      console.log(transport.type, ...Array.from(serializeCrdtMessages('[NetworkMessage received]:', value, engine)))
     const isServer = isServerAtom.getOrNull()
+    DEBUG_NETWORK_MESSAGES() &&
+      console.log(transport.type, ...Array.from(serializeCrdtMessages('[NetworkMessage received]:', value, engine)), isServer)
     if (isServer) {
-      serverValidator.processServerMessages(value, sender)
-    } else {
-      if (sender !== AUTH_SERVER_PEER_ID) return
+      transport.onmessage!(serverValidator.processServerMessages(value, sender))
+    } else if (sender === AUTH_SERVER_PEER_ID) {
       // Process network messages from server and convert to regular messages
       transport.onmessage!(serverValidator.processClientMessages(value, sender))
     }
@@ -134,7 +138,14 @@ export function addSyncTransport(
   })
   
   let requestingState = false
+  /**
+   * Why we have to request the state if we have a server that can send us the state when we joined?
+   * The thing is that when the server detects a new JOIN_PARTICIPANT on livekit room, it sends automatically the state to that peer.
+   * But in unity, it takes more time, so that message is not being delivered to the client.
+   * So instead, when we are finally connected to the room, we request the state, and then the server answers with the state :)
+   */
   function requestState() {
+    if (isServerAtom.getOrNull()) return
     if (RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom && !requestingState) {
       requestingState = true
       DEBUG_NETWORK_MESSAGES() && console.log('Requesting state...')
