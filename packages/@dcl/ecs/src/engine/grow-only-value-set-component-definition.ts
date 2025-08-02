@@ -207,9 +207,9 @@ export function createValueSetComponentDefinitionFromSchema<T>(
     __run_validateBeforeChange(entity, newValue, senderAddress, createdBy): boolean {
       const cb = entity && validateCallbacks.get(entity)
       const globalCb = validateCallbacks.get(__GLOBAL_ENTITY)
-      const currentValue = entity ? (this.get(entity) as any) : undefined
+      const currentValue = [...this.get(entity).values()]
 
-      const value = { entity, currentValue, newValue, senderAddress, createdBy }
+      const value = { entity, currentValue: currentValue as T, newValue, senderAddress, createdBy }
 
       const globalResult = globalCb?.(value) ?? true
       const entityResult = (globalResult && cb?.(value)) ?? true
