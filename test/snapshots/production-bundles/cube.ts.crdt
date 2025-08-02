@@ -83,10 +83,13 @@ CALL onUpdate(0.1)
   ALIVE_OBJS_DELTA ~= 0.00k
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 919.81k bytes
 =======
 =======
 >>>>>>> f7184856 (fix tests)
+=======
+>>>>>>> 5a6b10a9 (add tests)
 <<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 887.08k bytes
 =======
@@ -102,4 +105,10 @@ CALL onUpdate(0.1)
 =======
   MEMORY_USAGE_COUNT ~= 860.35k bytes
 >>>>>>> 126220f1 (fix tests)
+<<<<<<< HEAD
 >>>>>>> f7184856 (fix tests)
+=======
+=======
+  MEMORY_USAGE_COUNT ~= 860.34k bytes
+>>>>>>> 20f4b0d5 (add tests)
+>>>>>>> 5a6b10a9 (add tests)
