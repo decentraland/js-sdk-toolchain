@@ -5,7 +5,8 @@ describe('createEnumEntityId', () => {
   it('returns functions to get and increment enum entity id', () => {
     const engineMock: IEngine = {
       getComponent: jest.fn(),
-      getEntitiesWith: jest.fn()
+      getEntitiesWith: jest.fn(),
+      defineComponent: jest.fn()
     } as any as IEngine
 
     const mockNetworkEntity = (entityId: number) => ({

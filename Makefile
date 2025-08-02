@@ -55,7 +55,6 @@ lint-fix: sync-deps
 
 test:
 	node_modules/.bin/jest --detectOpenHandles --colors test/
-	make test-inspector
 
 TESTARGS ?= test/
 test-ecs:

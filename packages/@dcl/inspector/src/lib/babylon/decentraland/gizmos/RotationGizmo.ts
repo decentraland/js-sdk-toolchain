@@ -346,7 +346,7 @@ export class RotationGizmo implements IGizmoTransformer {
     this.dragState = null
   }
 
-  private initializeDragState(entities: EcsEntity[], gizmoNode: TransformNode): void {
+  private initializeDragState(entities: EcsEntity[], _gizmoNode: TransformNode): void {
     const transformData = new Map<Entity, EntityTransformData>()
 
     if (entities.length === 1) {
