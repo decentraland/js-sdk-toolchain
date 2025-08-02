@@ -426,4 +426,132 @@ describe('Server-Client Connectivity', () => {
     console.log(`Found ${serverMessages.length} server-mediated messages`)
     expect(serverMessages.length).toBeGreaterThan(0)
   })
+
+  it('should handle validation callbacks on server during CRDT processing', async () => {
+    console.log('=== Testing Server-Side Component Validation ===')
+    interceptedMessages.length = 0
+
+    let serverGlobalValidationCalled = false
+    let serverEntityValidationCalled = false
+    const validationResults: any[] = []
+
+    // Add global validation callback to SERVER components
+    serverComponents.Transform.validateBeforeChange((value) => {
+      serverGlobalValidationCalled = true
+      validationResults.push({ type: 'server-global', value })
+      console.log('Server global validation called:', value)
+      return true // Allow change
+    })
+
+    // Create test entity on client A that will sync to server
+    const validationEntity = clientEngineA.addEntity()
+    componentsA.Transform.create(validationEntity, { position: { x: 1, y: 2, z: 3 } })
+
+    // Add entity-specific validation callback to SERVER
+    const serverEntity = validationEntity // Server will use same entity ID
+    serverComponents.Transform.validateBeforeChange(serverEntity, (value) => {
+      serverEntityValidationCalled = true
+      validationResults.push({ type: 'server-entity', value })
+      console.log('Server entity validation called:', value)
+      return true // Allow change
+    })
+
+    syncA.syncEntity(validationEntity, [componentsA.Transform.componentId])
+
+    // Initial sync - this will trigger server validation when server processes the CRDT
+    await tick()
+    await tick()
+    await tick()
+
+    // Modify the entity to trigger another validation round
+    componentsA.Transform.getMutable(validationEntity).position.x = 999
+
+    await tick()
+    await tick()
+    await tick()
+
+    console.log('Validation results:', validationResults)
+    console.log('Global validation called:', serverGlobalValidationCalled)
+    console.log('Entity validation called:', serverEntityValidationCalled)
+
+    expect(serverGlobalValidationCalled).toBe(true)
+    expect(validationResults.length).toBeGreaterThan(0)
+  })
+
+  it('should handle validation rejection scenarios on server', async () => {
+    console.log('=== Testing Server Validation Rejection ===')
+    interceptedMessages.length = 0
+
+    let serverRejectionCalled = false
+
+    // Add server validation that rejects certain changes
+    serverComponents.Transform.validateBeforeChange((value) => {
+      serverRejectionCalled = true
+      console.log('Server validation checking:', value)
+      // Reject if x position is greater than 500
+      if (value.newValue && value.newValue.position.x > 500) {
+        console.log('Server rejecting change due to x > 500')
+        return false
+      }
+      return true
+    })
+
+    // Create entity for rejection testing on client B
+    const rejectionEntity = clientEngineB.addEntity()
+    componentsB.Transform.create(rejectionEntity, { position: { x: 10, y: 20, z: 30 } })
+    syncB.syncEntity(rejectionEntity, [componentsB.Transform.componentId])
+
+    // Let initial sync happen
+    await tick()
+    await tick()
+    await tick()
+
+    // Try to make a change that should be rejected by server
+    componentsB.Transform.getMutable(rejectionEntity).position.x = 600
+
+    await tick()
+    await tick()
+    await tick()
+
+    console.log('Server rejection called:', serverRejectionCalled)
+    expect(serverRejectionCalled).toBe(true)
+  })
+
+  it('should exercise dry run validation and __dry_run_updateFromCrdt during CRDT processing', async () => {
+    console.log('=== Testing Dry Run Validation ===')
+    interceptedMessages.length = 0
+
+    let serverValidationCalled = false
+
+    // Add validation to server that will be called during CRDT processing
+    serverComponents.Transform.validateBeforeChange((value) => {
+      serverValidationCalled = true
+      console.log('Server dry run validation called:', value)
+      return true
+    })
+
+    // Create an entity on client that will sync to server (triggering validation)
+    const dryRunEntity = clientEngineA.addEntity()
+    componentsA.Transform.create(dryRunEntity, { position: { x: 100, y: 200, z: 300 } })
+    syncA.syncEntity(dryRunEntity, [componentsA.Transform.componentId])
+
+    // Process multiple ticks to ensure CRDT messages are processed by server
+    await tick()
+    await tick()
+    await tick()
+
+    // Modify the entity to trigger more CRDT updates
+    componentsA.Transform.getMutable(dryRunEntity).position.y = 999
+
+    await tick()
+    await tick()
+    await tick()
+
+    console.log('Server validation during dry run called:', serverValidationCalled)
+    expect(serverValidationCalled).toBe(true)
+
+    // The key test is that validation was called - entity propagation is tested elsewhere
+    // Just verify that the server processed the messages (validation was the main goal)
+    expect(serverValidationCalled).toBe(true)
+  })
 })
