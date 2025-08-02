@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=207.1k bytes
 =======
 <<<<<<< HEAD
@@ -11,6 +12,9 @@ SCENE_COMPILED_JS_SIZE_PROD=201.5k bytes
 =======
 SCENE_COMPILED_JS_SIZE_PROD=202.5k bytes
 >>>>>>> 126220f1 (fix tests)
+=======
+SCENE_COMPILED_JS_SIZE_PROD=202.4k bytes
+>>>>>>> 20f4b0d5 (add tests)
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -63,6 +67,7 @@ CALL onUpdate(0.1)
   ALIVE_OBJS_DELTA ~= 0.00k
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 889.50k bytes
 =======
 <<<<<<< HEAD
@@ -74,3 +79,6 @@ CALL onUpdate(0.1)
 =======
   MEMORY_USAGE_COUNT ~= 863.04k bytes
 >>>>>>> 126220f1 (fix tests)
+=======
+  MEMORY_USAGE_COUNT ~= 863.03k bytes
+>>>>>>> 20f4b0d5 (add tests)

@@ -347,7 +347,7 @@ export function createComponentDefinitionFromSchema<T>(
     __run_validateBeforeChange(entity, newValue, senderAddress, createdBy): boolean {
       const cb = entity && validateCallbacks.get(entity)
       const globalCb = validateCallbacks.get(__GLOBAL_ENTITY)
-      const currentValue = entity ? data.get(entity) : undefined
+      const currentValue = data.get(entity)
 
       const value = { entity, currentValue, newValue, senderAddress, createdBy }
 

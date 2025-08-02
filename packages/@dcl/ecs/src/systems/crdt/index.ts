@@ -120,6 +120,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
             }
           } else {
             // Component not found - still broadcast for editor compatibility
+            /* istanbul ignore next */
             broadcastMessages.push(msg)
           }
         }
