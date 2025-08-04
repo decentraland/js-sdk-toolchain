@@ -2250,6 +2250,7 @@ export interface PBAvatarShape {
     hairColor?: PBColor3 | undefined;
     id: string;
     name?: string | undefined;
+    showOnlyWearables?: boolean | undefined;
     skinColor?: PBColor3 | undefined;
     talking?: boolean | undefined;
     wearables: string[];
