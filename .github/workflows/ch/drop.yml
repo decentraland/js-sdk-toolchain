@@ -1,0 +1,32 @@
+name: Drop pre-release
+on:
+  workflow_call:
+    inputs:
+      dry-run:
+        description: 'Compiles the app but not upload artifacts to distribution server'
+        default: false
+        required: false
+        type: boolean
+concurrency:
+  group: drop-${{ github.ref }}
+  cancel-in-progress: true
+defaults:
+  run:
+    shell: 'bash'
+jobs:
+  drop_pre_release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+      - uses: actions/setup-node@v4
+        with:
+          cache: 'npm'
+      - name: Drop pre releases
+        if: ${{github.ref == 'refs/heads/main' && !inputs.dry-run}}
+        uses: sgpublic/delete-release-action@v1.2
+        with:
+          pre-release-drop: true
+          pre-release-keep-count: -1
+          pre-release-drop-tag: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}

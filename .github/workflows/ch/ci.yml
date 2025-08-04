@@ -1,0 +1,85 @@
+name: CI
+# This workflow is the entry point for all CI processes.
+# It is from here that all other workflows are launched.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - 'renovate/**'
+    paths:
+      - 'packages/@dcl/inspector/**'
+      - 'packages/@dcl/creator-hub/**'
+    paths-ignore:
+      - '.github/**'
+      - '!.github/workflows/ch/ci.yml'
+      - '!.github/workflows/ch/typechecking.yml'
+      - '!.github/workflows/ch/tests.yml'
+      - '!.github/workflows/ch/release.yml'
+      - 'packages/@dcl/creator-hub/**.md'
+      - packages/@dcl/creator-hub/.editorconfig
+      - packages/@dcl/creator-hub/.gitignore
+      - packages/@dcl/creator-hub/.idea/**
+      - packages/@dcl/creator-hub/.vscode/**
+  pull_request:
+    paths:
+      - 'packages/@dcl/inspector/**'
+      - 'packages/@dcl/creator-hub/**'
+    paths-ignore:
+      - '.github/**'
+      - '!.github/workflows/ch/ci.yml'
+      - '!.github/workflows/ch/typechecking.yml'
+      - '!.github/workflows/ch/tests.yml'
+      - '!.github/workflows/ch/release.yml'
+      - 'packages/@dcl/creator-hub/**.md'
+      - packages/@dcl/creator-hub/.editorconfig
+      - packages/@dcl/creator-hub/.gitignore
+      - packages/@dcl/creator-hub/.idea/**
+      - packages/@dcl/creator-hub/.vscode/**
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  typechecking:
+    uses: ./.github/workflows/ch/typechecking.yml
+  tests:
+    uses: ./.github/workflows/ch/tests.yml
+  drop_pre_release:
+    permissions:
+      contents: write
+    with:
+      dry-run: ${{ github.event_name != 'push' || github.ref_name != 'main' }}
+    needs: [ typechecking, tests ]
+    uses: ./.github/workflows/ch/drop.yml
+  pre_release:
+    permissions:
+      contents: write # Allows this job to create releases
+      issues: write
+      pull-requests: write
+    with:
+      dry-run: ${{ github.event_name != 'push' || github.ref_name != 'main' }}
+    needs: [ drop_pre_release ]
+    uses: ./.github/workflows/ch/release.yml
+    secrets:
+      # Secrets required to sign and notarize the app in MacOS
+      MACOS_CSC_LINK: ${{ secrets.MACOS_CSC_LINK }}
+      MACOS_CSC_KEY_PASSWORD: ${{ secrets.MACOS_CSC_KEY_PASSWORD }}
+      MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.MACOS_NOTARIZATION_APPLE_ID }}
+      MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.MACOS_NOTARIZATION_TEAM_ID }}
+      MACOS_NOTARIZATION_PWD: ${{ secrets.MACOS_NOTARIZATION_PWD }}
+      VITE_SEGMENT_CREATORS_HUB_API_KEY: ${{ secrets.VITE_SEGMENT_CREATORS_HUB_API_KEY }}
+      VITE_SEGMENT_INSPECTOR_API_KEY: ${{ secrets.VITE_SEGMENT_INSPECTOR_API_KEY }}
+      VITE_ALLOWED_EXTERNAL_ORIGINS: ${{ secrets.VITE_ALLOWED_EXTERNAL_ORIGINS }}
+      SDK_TEAM_AWS_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
+      SDK_TEAM_AWS_SECRET: ${{ secrets.SDK_TEAM_AWS_SECRET }}
+      SDK_TEAM_S3_BUCKET: ${{ secrets.SDK_TEAM_S3_BUCKET }}
+      SDK_TEAM_S3_BASE_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}
+      ES_USERNAME: ${{ secrets.ES_USERNAME }}
+      ES_PASSWORD: ${{ secrets.ES_PASSWORD }}
+      WINDOWS_CREDENTIAL_ID_SIGNER: ${{ secrets.WINDOWS_CREDENTIAL_ID_SIGNER }}
+      ES_TOTP_SECRET: ${{ secrets.ES_TOTP_SECRET }}
+      # Sentry AUTH Token
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}

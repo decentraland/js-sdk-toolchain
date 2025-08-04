@@ -1,0 +1,83 @@
+.Tutorial {
+  cursor: pointer;
+  flex: 1 0 auto;
+  background-color: rgba(255, 255, 255, 0);
+  padding: 12px 12px 12px 12px;
+  border-radius: 16px;
+  margin-left: -12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.Tutorial:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.Tutorial .thumbnail-wrapper {
+  width: 252px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 16px;
+  height: 140px;
+  overflow: hidden;
+}
+
+.Tutorial .thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.Tutorial > .title {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: 0.15px;
+  text-align: left;
+}
+
+.Tutorials {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+  width: 256px;
+  padding-right: 12px;
+  gap: 32px;
+}
+
+.Tutorials .list {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+.Tutorials > .title {
+  text-transform: uppercase;
+  color: #a09ba8;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.Tutorials > .title .icon {
+  background-image: url(./icon.svg);
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  background-repeat: no-repeat;
+}
+
+.TutorialsWrapper {
+  display: flex;
+  flex: 1 0 auto;
+  gap: 64px;
+  width: 100%;
+}
+
+.TutorialsWrapper > .content {
+  flex: 1 0 auto;
+  max-width: calc(100% - 256px - 64px);
+}

@@ -12,7 +12,8 @@ import {
   PLAYGROUND_ASSETS_PATH,
   REACT_ECS,
   SDK_PATH,
-  SDK_COMMANDS_PATH
+  SDK_COMMANDS_PATH,
+  CH_PATH
 } from './common'
 import {
   copyFile,
@@ -164,6 +165,29 @@ flow('build-all', () => {
       ensureFileExists('react-ecs.js', SDK_PATH)
       ensureFileExists('react-ecs.d.ts', SDK_PATH)
     })
+  })
+
+  flow('@dcl/creator-hub build', () => {
+    itDeletesFolder('main/dist', CH_PATH)
+    itDeletesFolder('preload/dist', CH_PATH)
+    itDeletesFolder('renderer/dist', CH_PATH)
+
+    itExecutes(`npm i --silent`, CH_PATH)
+
+    // Ensure electron-vendors files exist (in case postinstall failed)
+    it('ensure electron-vendors files exist', async () => {
+      const electronVendorsPath = path.resolve(CH_PATH, '.electron-vendors.cache.json')
+      const browserslistPath = path.resolve(CH_PATH, '.browserslistrc')
+
+      if (!existsSync(electronVendorsPath)) {
+        writeFileSync(electronVendorsPath, JSON.stringify({ chrome: '138', node: '22' }))
+      }
+      if (!existsSync(browserslistPath)) {
+        writeFileSync(browserslistPath, 'Chrome 138')
+      }
+    })
+
+    itExecutes('npm run build --silent', CH_PATH)
   })
 
   flow('@dcl/playground-assets build', () => {

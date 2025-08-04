@@ -1,0 +1,13 @@
+node_modules
+.DS_Store
+dist
+*.local
+thumbs.db
+
+.eslintcache
+.browserslistrc
+.electron-vendors.cache.json
+
+.vscode/settings.json
+.env
+coverage/
