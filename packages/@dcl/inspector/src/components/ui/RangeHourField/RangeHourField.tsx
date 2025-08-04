@@ -1,20 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import cx from 'classnames'
-
 import { MIDNIGHT_SECONDS } from '../../../components/EntityInspector/SceneInspector/utils'
-
 import { Props } from './types'
 
 import './RangeHourField.css'
 
 const MIN_SECONDS = 0
 const STEP_SECONDS = 60
-const MAX_SECONDS = MIDNIGHT_SECONDS - STEP_SECONDS
+// 23:59 in seconds
+const MAX_SECONDS = 86340
 
 function formatHour(value: number): string {
-  if (value === MIDNIGHT_SECONDS) {
-    return '00:00'
-  }
   const hours = Math.floor(value / 3600)
   const minutes = Math.floor((value % 3600) / 60)
   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
@@ -27,6 +23,16 @@ const RangeHourField = React.forwardRef<HTMLInputElement, Props>((props, ref) =>
     timeInSeconds: Number(value),
     timeInHHMM: formatHour(Number(value))
   })
+
+  useEffect(() => {
+    const numValue = Number(value)
+    if (numValue !== time.timeInSeconds) {
+      setTime({
+        timeInSeconds: numValue,
+        timeInHHMM: formatHour(numValue)
+      })
+    }
+  }, [value])
 
   const completionPercentage = useMemo(() => {
     const normalizedValue = Math.min(Math.max(time.timeInSeconds, MIN_SECONDS), MAX_SECONDS)
@@ -57,16 +63,15 @@ const RangeHourField = React.forwardRef<HTMLInputElement, Props>((props, ref) =>
   const parseTimeInput = useCallback((timeStr: string): number => {
     const [hours = '0', minutes = '0'] = timeStr.split(':')
     const totalSeconds = parseInt(hours) * 3600 + parseInt(minutes) * 60
-    if (totalSeconds === MIN_SECONDS) {
-      return MIDNIGHT_SECONDS
-    }
-    return Math.min(Math.max(totalSeconds, MIN_SECONDS), MAX_SECONDS)
+    // When input is 00:00, send MIDNIGHT_SECONDS (86400)
+    return totalSeconds === 0 ? MIDNIGHT_SECONDS : totalSeconds
   }, [])
 
   const handleChangeTextField = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const inputValue = e.target.value
       const seconds = parseTimeInput(inputValue)
+      // When input is 00:00, send MIDNIGHT_SECONDS (86400)
       const valueToSend = seconds === MIN_SECONDS ? MIDNIGHT_SECONDS : seconds
       setTime({
         timeInSeconds: seconds,
