@@ -475,9 +475,6 @@ export default withSdk<Props>(({ sdk, entity }) => {
           />
           <RangeHourField
             value={componentValue.skyboxConfig?.fixedTime ?? MIDDAY_SECONDS}
-            min={0}
-            max={86400}
-            step={3600}
             onChange={handleSkyboxTimeChange}
             disabled={componentValue.skyboxConfig?.fixedTime === undefined}
           />

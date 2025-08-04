@@ -9,6 +9,9 @@ import { Props } from './types'
 import './RangeHourField.css'
 
 function formatHour(value: number): string {
+  if (value === 86400) {
+    return '00:00'
+  }
   const hours = Math.floor(value / 3600)
   const minutes = Math.floor((value % 3600) / 60)
   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
@@ -21,13 +24,12 @@ function isValidTimeFormat(value: string): boolean {
 const RangeHourField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
   const {
     label,
-    rightLabel,
     error,
     disabled,
     info,
     value = 0,
     min = 0,
-    max = 86400,
+    max = 86340,
     step = 60,
     isValidValue,
     onChange,
@@ -90,6 +92,9 @@ const RangeHourField = React.forwardRef<HTMLInputElement, Props>((props, ref) =>
   const parseTimeInput = useCallback((timeStr: string): number => {
     const [hours = '0', minutes = '0'] = timeStr.split(':')
     const totalSeconds = parseInt(hours) * 3600 + parseInt(minutes) * 60
+    if (totalSeconds === 0) {
+      return 86400
+    }
     return Math.min(Math.max(totalSeconds, 0), 86400)
   }, [])
 
@@ -97,14 +102,11 @@ const RangeHourField = React.forwardRef<HTMLInputElement, Props>((props, ref) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value
 
-      // Solo permitir números y :
       if (!/^[0-9:]*$/.test(value)) return
 
-      // Limitar a 5 caracteres (HH:MM)
       if (value.length <= 5) {
         setTextValue(value)
 
-        // Si es un formato válido de hora, actualizar el slider
         if (isValidTimeFormat(value)) {
           const seconds = parseTimeInput(value)
           if (seconds >= Number(min) && seconds <= Number(max)) {
@@ -125,7 +127,6 @@ const RangeHourField = React.forwardRef<HTMLInputElement, Props>((props, ref) =>
     (event) => {
       let finalValue = textValue
 
-      // Si el formato no es válido o está fuera de rango, revertir al último valor válido
       if (!isValidTimeFormat(textValue)) {
         finalValue = formatHour(inputValue)
       } else {
