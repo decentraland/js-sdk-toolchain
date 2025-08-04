@@ -100,7 +100,7 @@ export function toScene(inputs: SceneInput): EditorComponentsTypes['Scene'] {
     author: inputs.author,
     email: inputs.email,
     skyboxConfig: {
-      fixedTime: Number(inputs.skyboxConfig.fixedTime || MIDDAY_SECONDS),
+      fixedTime: Number(inputs.skyboxConfig.fixedTime ?? MIDDAY_SECONDS),
       transitionMode: inputs.skyboxConfig.transitionMode as unknown as TransitionMode
     },
     silenceVoiceChat: inputs.silenceVoiceChat,
@@ -142,3 +142,4 @@ export const isImageFile = (value: string): boolean =>
 export const isImage = (node: TreeNode): node is AssetNodeItem => isAssetNode(node) && isImageFile(node.name)
 
 export const MIDDAY_SECONDS = 43200
+export const MIDNIGHT_SECONDS = 86400
