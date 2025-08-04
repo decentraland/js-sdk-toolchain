@@ -1,0 +1,27 @@
+/* TODO: update the Modal component in ui2 to allow providing a className to the Material Modal...*/
+
+/* Initial Modal */
+.MuiModal-root .Initial {
+  display: flex;
+  flex-direction: column;
+}
+
+.MuiModal-root .Initial .select,
+.MuiModal-root .Initial .alternative_servers {
+  text-align: center;
+}
+
+.MuiModal-root .Initial .options {
+  display: flex;
+  margin: 20px 0;
+}
+
+.MuiModal-root .Initial .options .OptionBox + .OptionBox {
+  margin-left: 20px;
+}
+
+.MuiModal-root .Initial .alternative_servers {
+  text-decoration: underline;
+  text-transform: uppercase;
+  cursor: pointer;
+}

@@ -18,10 +18,6 @@
     "rootDir": "src",
     "types": []
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "dist"
-  ]
+  "include": ["src"],
+  "exclude": ["dist"]
 }

@@ -4,16 +4,19 @@ on:
       - main
       - experimental
   pull_request:
-  release:
-    types:
-      - created
 
 env:
+  PRODUCTION: ${{ github.ref == 'refs/heads/main' && !github.event.pull_request.number }}
   BRANCH_TAG: ${{ github.ref_name == 'experimental' && 'experimental' || '' }}
 
-name: CI
+name: "CI"
 jobs:
+  # ============================================================================
+  # Main CI Jobs
+  # ============================================================================
+
   lint:
+    name: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -27,8 +30,27 @@ jobs:
         run: make lint
       - name: lint-packages
         run: make lint-packages
+      - name: format
+        run: make format
+
+  typecheck:
+    name: typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: install
+        run: make install
+      - name: build
+        run: make build
+      - name: typecheck
+        run: make typecheck
 
   docs:
+    name: docs
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -40,6 +62,7 @@ jobs:
         run: make docs
 
   test:
+    name: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -56,9 +79,15 @@ jobs:
         run: make build
 
       - name: test
+        run: make test
         env:
-          NODE_OPTIONS: '--max_old_space_size=4096'
-        run: make test-coverage
+          NODE_OPTIONS: '--max-old-space-size=4096'
+          UPDATE_SNAPSHOTS: true
+
+      - name: commit
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: automatic linter and snapshot tests
 
       - name: test-cli
         run: make test-cli
@@ -77,7 +106,8 @@ jobs:
       - name: prepare releasable packages
         run: make prepare
 
-  test-e2e:
+  e2e-inspector:
+    name: E2E Inspector
     needs: [notify_deployment]
     runs-on: ubuntu-latest
     if: false
@@ -103,7 +133,32 @@ jobs:
           NODE_OPTIONS: '--max_old_space_size=4096'
         run: E2E_URL=https://${{steps.get-cloudflare-url.outputs.result}}/inspector make test-inspector-e2e
 
+  e2e-creator-hub:
+    name: E2E Creator Hub
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ macos-latest, windows-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: packages/@dcl/creator-hub
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+
+      - name: Run E2E tests
+        run: make test-creator-hub-e2e
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"
+
   build:
+    name: build
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -114,6 +169,7 @@ jobs:
       decentraland_inspector_s3_bucket_key: ${{ steps.publish_decentraland_inspector.outputs.s3-bucket-key }}
       decentraland_js_runtime_s3_bucket_key: ${{ steps.publish_dcl_js_runtime.outputs.s3-bucket-key }}
       decentraland_ecs_bucket_key: ${{ steps.publish_ecs.outputs.s3-bucket-key }}
+      sdk_version: ${{ steps.update_sdk_version.outputs.version }}
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v3
@@ -125,6 +181,7 @@ jobs:
         run: make install
 
       - name: update version of packages/@dcl/sdk/package.json, this version will be used for all packages
+        id: update_sdk_version
         uses: decentraland/oddish-action@master
         with:
           cwd: ./packages/@dcl/sdk
@@ -358,10 +415,10 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
   notify_deployment:
+    name: notify deployment
     needs: [build]
     if: ${{ github.event.pull_request.number }}
     runs-on: ubuntu-latest
-    name: Deployment Notification
     steps:
       - uses: actions/github-script@v6
         id: get-cloudflare-url
@@ -413,10 +470,10 @@ jobs:
         run: mkdir -p test_sdk_s3 && cd test_sdk_s3 && npm init --yes && npm install "${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_s3_bucket_key }}"
       - name: Test Inspector Install S3 URL
         run: mkdir -p test_inspector_s3 && cd test_inspector_s3 && npm init --yes && npm install "${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_inspector_s3_bucket_key }}"
-  cli_e2e:
+  e2e-cli:
+    name: E2E CLI
     needs: [build]
     runs-on: ubuntu-latest
-    name: CLI E2E
     steps:
       - uses: actions/setup-node@v3
         with:
@@ -437,7 +494,7 @@ jobs:
 
       - name: Set Realm Name
         run: |
-          modified_realm=$(echo "${{ github.head_ref || github.ref }}" | tr '/' '-' | tr -d '@')
+          modified_realm=$(echo "${{ github.head_ref || github.ref }}" | tr '/.' '-' | tr -d '@')
           echo "REALM_NAME=${modified_realm}" >> $GITHUB_ENV
       - name: export-static
         run: >
@@ -459,7 +516,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
   check-local-deps:
-    name: Check for development dependencies
+    name: check local deps
     needs: [build]
     runs-on: ubuntu-latest
     if: >
@@ -489,10 +546,10 @@ jobs:
             if [ -f "$pkg" ]; then
               # Get package name from the filename
               pkg_name=$(basename "$pkg" .tgz)
-              
+
               # Create directory for this package
               mkdir -p "extracted-packages/$pkg_name"
-              
+
               echo "Extracting $pkg to extracted-packages/$pkg_name"
               tar -xzf "$pkg" -C "extracted-packages/$pkg_name"
             fi
@@ -558,3 +615,69 @@ jobs:
         run: |
           echo "❌ Local package dependencies detected! These must be fixed before merging."
           exit 1
+
+  generate-release:
+    name: Generate SDK packages pre-release
+    needs: [build] # we don't want to generate a release if the build fails
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' && !github.event.pull_request.number }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Remove SDK packages pre-releases
+        uses: ./.github/actions/cleanup-prereleases
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get latest plain semver release
+        id: latest_release
+        shell: bash
+        run: |
+          # Get the latest plain semver (non Creator Hub) release
+          LATEST_TAG=$(
+            gh release list --limit 100 --json tagName,isPrerelease \
+              --jq '.[] | select(.isPrerelease == false) | .tagName' |
+            grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' |
+            head -n 1
+          )
+
+          if [[ -z "$LATEST_TAG" ]]; then
+            echo "❌ No matching semver releases found."
+            exit 1
+          fi
+
+          echo "Found latest plain semver release: $LATEST_TAG"
+          echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+        # TODO: changes outside packages/* won't be listed (e.g. README.md, .github/, etc)
+      - name: Generate SDK packages release notes
+        id: release_notes
+        uses: ./.github/actions/generate-release-notes
+        with:
+          previous_version: ${{ steps.latest_release.outputs.tag }}
+          current_version: ${{ needs.build.outputs.sdk_version }}
+          paths: 'packages/@dcl/sdk,packages/@dcl/inspector,packages/@dcl/js-runtime,packages/@dcl/ecs,packages/@dcl/react-ecs,packages/@dcl/sdk-commands,packages/@dcl/playground-assets'
+          section_names: 'SDK Changes,Inspector Changes,JS Runtime Changes,ECS Changes,React ECS Changes,SDK Commands Changes,Playground Assets Changes'
+          release_title: 'SDK Packages'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update release description
+        uses: ./.github/actions/update-release-description
+        with:
+          tag_name: ${{ needs.build.outputs.sdk_version }}
+          release_notes: ${{ steps.release_notes.outputs.release_notes }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          create_if_not_exists: true
+
+
+  trigger-creator-hub-workflow:
+    name: creator hub
+    needs: [build]
+    uses: ./.github/workflows/creator-hub.yml
+    with:
+      inspector-package-url: ${{ needs.build.outputs.decentraland_inspector_s3_bucket_key }}
+    secrets: inherit

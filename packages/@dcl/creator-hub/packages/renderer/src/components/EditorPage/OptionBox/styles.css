@@ -1,0 +1,35 @@
+.OptionBox {
+  display: flex;
+  flex-direction: column;
+  width: 340px;
+  min-height: 300px;
+  color: var(--white);
+  justify-content: space-evenly;
+  align-items: center;
+  text-align: center;
+  background-color: var(--dark-gray);
+  border-radius: 8px;
+  padding: 10px 30px;
+}
+
+.OptionBox h3 {
+  margin: 0;
+}
+
+.OptionBox .thumbnail {
+  width: 160px;
+  height: 90px;
+}
+
+.OptionBox .description {
+  font-size: 14px;
+}
+
+.OptionBox .learn-more {
+  text-transform: uppercase;
+  text-decoration: underline;
+  color: var(--white);
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}

@@ -1,0 +1,1 @@
+export { ExpandMore } from './component';

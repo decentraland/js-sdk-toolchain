@@ -1,0 +1,145 @@
+name: 'Cleanup Pre-releases'
+description: 'Removes all pre-releases and their tags for a specific tag pattern to ensure semantic versioning works correctly'
+
+inputs:
+  tag_prefix:
+    description: 'Tag prefix to filter releases (e.g., "creator-hub-v"). Leave empty for unprefixed releases (just semver)'
+    required: false
+    default: ''
+  github_token:
+    description: 'GitHub token for API access'
+    required: true
+  limit:
+    description: 'Maximum number of releases to check (default: 100)'
+    required: false
+    default: '100'
+  dry_run:
+    description: 'Only show what would be deleted without actually deleting (true/false)'
+    required: false
+    default: 'false'
+
+outputs:
+  deleted_count:
+    description: 'Number of pre-releases that were deleted'
+    value: ${{ steps.cleanup.outputs.deleted_count }}
+  deleted_tags:
+    description: 'Comma-separated list of deleted tag names'
+    value: ${{ steps.cleanup.outputs.deleted_tags }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Remove pre-releases and tags
+      id: cleanup
+      shell: bash
+      run: |
+        if [[ -n "${{ inputs.tag_prefix }}" ]]; then
+          echo "🔍 Finding pre-releases with prefix '${{ inputs.tag_prefix }}'..."
+          PATTERN="^${{ inputs.tag_prefix }}"
+          DESCRIPTION="prefixed releases (pattern: ${{ inputs.tag_prefix }}*)"
+        else
+          echo "🔍 Finding unprefixed pre-releases (semver only)..."
+          # Pattern to match semver but exclude any with prefixes
+          PATTERN="^[0-9]"
+          DESCRIPTION="unprefixed releases (semver only)"
+        fi
+
+        # Get all releases and filter based on our requirements
+        echo "📋 Checking up to ${{ inputs.limit }} releases..."
+
+        if [[ -n "${{ inputs.tag_prefix }}" ]]; then
+          # For prefixed releases: simple grep for the prefix
+          PRERELEASE_TAGS=$(gh release list --limit ${{ inputs.limit }} | grep "$PATTERN" | while read -r line; do
+            TAG=$(echo "$line" | awk '{print $1}')
+            IS_PRERELEASE=$(gh release view "$TAG" --json isPrerelease --jq '.isPrerelease' 2>/dev/null || echo "false")
+            if [[ "$IS_PRERELEASE" == "true" ]]; then
+              echo "$TAG"
+            fi
+          done)
+        else
+          # For unprefixed releases: more careful filtering to exclude any with known prefixes
+          PRERELEASE_TAGS=$(gh release list --limit ${{ inputs.limit }} | while read -r line; do
+            TAG=$(echo "$line" | awk '{print $1}')
+
+            if [[ "$TAG" =~ ^creator-hub-v ]] || [[ "$TAG" =~ ^[a-zA-Z] ]]; then
+              continue
+            fi
+
+            # Only process if it matches semver pattern (starts with number)
+            if [[ "$TAG" =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+              IS_PRERELEASE=$(gh release view "$TAG" --json isPrerelease --jq '.isPrerelease' 2>/dev/null || echo "false")
+              if [[ "$IS_PRERELEASE" == "true" ]]; then
+                echo "$TAG"
+              fi
+            fi
+          done)
+        fi
+
+        if [[ -z "$PRERELEASE_TAGS" ]]; then
+          echo "✅ No $DESCRIPTION pre-releases found to delete."
+          echo "deleted_count=0" >> $GITHUB_OUTPUT
+          echo "deleted_tags=" >> $GITHUB_OUTPUT
+          exit 0
+        fi
+
+        echo "📋 Found the following $DESCRIPTION pre-releases to delete:"
+        echo "$PRERELEASE_TAGS"
+        echo ""
+
+        # Count the pre-releases
+        DELETED_COUNT=$(echo "$PRERELEASE_TAGS" | wc -l)
+
+        if [[ "${{ inputs.dry_run }}" == "true" ]]; then
+          echo "🧪 DRY RUN MODE - Would delete the following pre-releases:"
+          echo "$PRERELEASE_TAGS" | while read -r TAG; do
+            if [[ -n "$TAG" ]]; then
+              echo "  🗑️  Would delete: $TAG"
+            fi
+          done
+          echo "🧪 DRY RUN COMPLETE - No actual deletions performed"
+        else
+          # Delete each pre-release and its tag
+          echo "$PRERELEASE_TAGS" | while read -r TAG; do
+            if [[ -n "$TAG" ]]; then
+              echo "🗑️  Deleting pre-release: $TAG"
+              if gh release delete "$TAG" --yes; then
+                echo "✅ Successfully deleted release $TAG"
+              else
+                echo "⚠️  Failed to delete release $TAG"
+              fi
+
+              echo "🏷️  Deleting tag from remote: $TAG"
+              if git push --delete origin "$TAG" 2>/dev/null; then
+                echo "✅ Successfully deleted remote tag $TAG"
+              else
+                echo "⚠️  Failed to delete remote tag $TAG (may not exist)"
+              fi
+
+              echo "🏷️  Deleting tag locally: $TAG"
+              if git tag -d "$TAG" 2>/dev/null; then
+                echo "✅ Successfully deleted local tag $TAG"
+              else
+                echo "⚠️  Failed to delete local tag $TAG (may not exist)"
+              fi
+
+              echo "✅ Completed cleanup for $TAG"
+              echo ""
+            fi
+          done
+
+          echo "🎉 Finished cleaning up all $DESCRIPTION pre-releases!"
+        fi
+
+        # Prepare outputs
+        DELETED_TAGS_LIST=$(echo "$PRERELEASE_TAGS" | tr '\n' ',' | sed 's/,$//')
+        echo "deleted_count=$DELETED_COUNT" >> $GITHUB_OUTPUT
+        echo "deleted_tags=$DELETED_TAGS_LIST" >> $GITHUB_OUTPUT
+
+        echo "📊 Summary:"
+        echo "  • Pre-releases processed: $DELETED_COUNT"
+        echo "  • Pattern: $DESCRIPTION"
+        if [[ "${{ inputs.dry_run }}" == "true" ]]; then
+          echo "  • Mode: DRY RUN (no actual deletions)"
+        fi
+      env:
+        GH_TOKEN: ${{ inputs.github_token }}

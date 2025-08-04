@@ -1,5 +1,5 @@
 import * as path from 'path'
-import { readFileSync, writeFileSync } from 'fs'
+import { readFileSync, writeFileSync, readdirSync } from 'fs'
 import { copySync, existsSync, mkdirSync, removeSync } from 'fs-extra'
 import { summary } from '@actions/core'
 
@@ -12,7 +12,8 @@ import {
   PLAYGROUND_ASSETS_PATH,
   REACT_ECS,
   SDK_PATH,
-  SDK_COMMANDS_PATH
+  SDK_COMMANDS_PATH,
+  CH_PATH
 } from './common'
 import {
   copyFile,
@@ -164,6 +165,15 @@ flow('build-all', () => {
       ensureFileExists('react-ecs.js', SDK_PATH)
       ensureFileExists('react-ecs.d.ts', SDK_PATH)
     })
+  })
+
+  flow('@dcl/creator-hub build', () => {
+    itDeletesFolder('main/dist', CH_PATH)
+    itDeletesFolder('preload/dist', CH_PATH)
+    itDeletesFolder('renderer/dist', CH_PATH)
+
+    itExecutes(`npm i --silent`, CH_PATH)
+    itExecutes('npm run build --silent', CH_PATH)
   })
 
   flow('@dcl/playground-assets build', () => {

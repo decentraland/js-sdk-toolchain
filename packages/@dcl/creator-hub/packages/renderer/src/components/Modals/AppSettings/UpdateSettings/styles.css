@@ -1,0 +1,31 @@
+.update-settings {
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.update-settings__button-container {
+  gap: 16px;
+  align-items: center;
+  justify-content: start;
+  min-height: 40px;
+}
+
+.update-settings__button-container button {
+  min-width: 210px;
+  flex-shrink: 0;
+}
+
+.update-settings__message-container {
+  gap: 10px;
+  align-items: center;
+}
+
+.update-settings__message-container svg {
+  width: 16px;
+}
+
+.update-settings__progress-container {
+  max-width: 300px;
+  align-items: center;
+  gap: 4px;
+}
