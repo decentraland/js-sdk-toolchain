@@ -87,7 +87,7 @@ const RangeHourField = React.forwardRef<HTMLInputElement, Props>((props, ref) =>
   )
 
   return (
-    <div className="Range Field">
+    <div className="Range Field RangeHour">
       <div className={cx('RangeContainer', { disabled })}>
         <div className="InputContainer">
           <input
