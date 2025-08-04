@@ -1,0 +1,71 @@
+.AppSettingsModal .MuiPaper-root {
+  background-color: #242129;
+  background-image: none;
+}
+
+.AppSettingsModal .CloseButtonContainer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.AppSettingsModal .FormContainer {
+  display: flex;
+  flex-direction: column;
+  margin-top: 32px;
+  gap: 32px;
+  width: 100%;
+}
+
+.AppSettingsModal .ScenesFolderFormControl {
+  gap: 16px;
+}
+
+.AppSettingsModal
+  .ScenesFolderFormControl
+  .MuiInputBase-root
+  fieldset.MuiOutlinedInput-notchedOutline {
+  /* TODO: Fix styles in the ui2 library */
+  border-color: #ffffff3b;
+}
+
+.AppSettingsModal .ChangeSceneFolderButton {
+  width: 184px;
+  font-weight: 600;
+}
+
+.AppSettingsModal .ApplyButton.Mui-disabled {
+  /* TODO: Fix styles in the ui2 library */
+  background-color: #f8919d;
+  color: #fee9ec;
+}
+
+.AppSettingsModal .UpdateContainer {
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.AppSettingsModal .UpdateButtonContainer {
+  gap: 16px;
+  align-items: center;
+  justify-content: start;
+  min-height: 40px;
+
+  button {
+    min-width: 210px;
+    flex-shrink: 0;
+  }
+}
+
+.AppSettingsModal .MessageContainer {
+  gap: 10px;
+  align-items: center;
+  svg {
+    width: 16px;
+  }
+}
+
+.AppSettingsModal .DownloadProgressContainer {
+  max-width: 300px;
+  align-items: center;
+  gap: 4px;
+}

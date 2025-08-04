@@ -10,6 +10,10 @@
       "packages/@dcl/sdk/tsconfig.json",
       "packages/@dcl/playground-assets/tsconfig.json",
       "packages/@dcl/react-ecs/tsconfig.json",
+      "packages/@dcl/creator-hub/packages/main/tsconfig.json",
+      "packages/@dcl/creator-hub/packages/preload/tsconfig.json",
+      "packages/@dcl/creator-hub/packages/renderer/tsconfig.json",
+      "packages/@dcl/creator-hub/packages/shared/tsconfig.json",
       "scripts/tsconfig.json",
       "test/tsconfig.json",
       "test/ecs/snippets/tsconfig.json"

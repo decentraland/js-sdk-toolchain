@@ -1,0 +1,1 @@
+export { AlternativeServers } from './component';

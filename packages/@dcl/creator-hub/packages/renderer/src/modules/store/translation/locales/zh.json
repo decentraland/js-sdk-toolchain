@@ -1,0 +1,427 @@
+{
+  "install": {
+    "message": "安装 decentraland 编辑器 v${version}",
+    "errors": {
+      "moveAppFailed": "请将 Creator Hub 应用程序移动到应用程序文件夹，并从那里打开它",
+      "unknown": "发生未知错误"
+    }
+  },
+  "home": {
+    "header": {
+      "title": "欢迎来到阿尔法编辑器"
+    },
+    "cards": {
+      "sign_in": {
+        "title": "登入以發布您的現場",
+        "action": "登录"
+      },
+      "scenes": {
+        "title": "場景",
+        "empty_scenes": {
+          "description": "創建您的第一個場景",
+          "action": "開始建造"
+        },
+        "action": "看全部"
+      },
+      "learn": {
+        "title": "學習",
+        "action": "看全部"
+      },
+      "feedback": {
+        "title": "塑造創作者中心的未來",
+        "action": "提交回饋"
+      }
+    }
+  },
+  "editor": {
+    "loading": {
+      "title": "正在准备场景..."
+    },
+    "header": {
+      "actions": {
+        "code": "代码",
+        "preview": "预览",
+        "publish": "发布",
+        "preview_options": {
+          "title": "预览选项",
+          "debugger": "在预览期间打开控制台窗口",
+          "skip_auth_screen": "跳过认证屏幕",
+          "open_new_instance": "打开多个实例",
+          "landscape_terrain_enabled": "启用景观地形"
+        },
+        "publish_options": {
+          "history": "发布历史"
+        }
+      }
+    }
+  },
+  "scene_list": {
+    "my_scenes": "我的场景",
+    "import_scene": "导入场景",
+    "templates": "模板",
+    "sort_by": "排序方式",
+    "project_actions": {
+      "delete_project": "删除场景",
+      "duplicate_project": "复制场景",
+      "open_folder": "打开文件夹"
+    },
+    "no_scenes": {
+      "title": "创建您的第一个场景",
+      "description": "释放您的创造力。开始为您的土地和世界建立场景，并与社区分享。<a>了解有关创建场景的更多信息。</a>"
+    },
+    "sort": {
+      "name": "名称",
+      "newest": "最新",
+      "size": "尺寸"
+    },
+    "results": "{count}结果",
+    "parcel_count": "{parcels} {包裹, plural, one {包裹} other {包裹}}",
+    "saving": "保存...",
+    "badges": {
+      "published": "已发布"
+    }
+  },
+  "navbar": {
+    "menu": {
+      "home": "首页",
+      "scenes": "场景",
+      "collections": "收藏",
+      "manage": "管理",
+      "learn": "学习",
+      "more": "更多"
+    },
+    "feedback": "给我们反馈",
+    "report_an_issue": "报告问题",
+    "user_menu": {
+      "sign_in": "登录",
+      "sign_out": "登出"
+    }
+  },
+  "modal": {
+    "cancel": "取消",
+    "confirm": "确认",
+    "missing_projects": {
+      "title": "缺失的场景",
+      "find": "寻找",
+      "discard": "丢弃",
+      "discard_all": "全部丢弃"
+    },
+    "delete_project": {
+      "title": "您确定要删除 \"{title}\" 吗？",
+      "remove_imported_scene": "这只会从编辑器中删除 \"{title}\"。您计算机上的原始场景文件不会受到影响。"
+    },
+    "publish_project": {
+      "title": "公共场所 \"{title}\"",
+      "select": "选择要部署此场景的位置：",
+      "worlds": {
+        "title": "世界赛",
+        "description": "在创世城地图中找不到。 \n最多可同时加入 100 个用户。",
+        "action": "发布到世界",
+        "select_world": {
+          "title": "發佈到世界",
+          "description": "選擇將定義 URL 的 Decentraland 姓名 或 ENS 網域",
+          "world_name": "世界（名稱）",
+          "placeholder": "選擇名稱",
+          "claim_new_name": "索取新名字",
+          "claim_new_ens_domain": "申請 ENS 域名",
+          "action": "發布",
+          "ens_providers": {
+            "dcl": "姓名",
+            "ens": "ENS 域"
+          },
+          "world_has_content": "{world} World 中的現有內容將替換為您要發布的新內容。",
+          "confirm_world_replace_content": "我了解此操作不可逆轉"
+        },
+        "empty_names": {
+          "title": "您沒有任何可用的世界",
+          "description": "<b>當您擁有一個NAME 時，您將獲得一個免費的世界</b>。你想要多少就可以有多少。",
+          "action": "索取新名字"
+        }
+      },
+      "land": {
+        "title": "我的地盘",
+        "description": "可在创世城地图中找到。 \n无限用户可以同时加入。",
+        "action": "发布到土地",
+        "select_parcel": {
+          "select_parcel": "选择将承载场景的 LAND",
+          "place_scene": "将场景放置在 {coords}",
+          "actions": {
+            "publish": "发表",
+            "reset": "重置"
+          }
+        }
+      },
+      "alternative_servers": {
+        "title": "发布到不同的服务器",
+        "list": "备用服务器",
+        "options": {
+          "test_server": "测试服务器",
+          "custom_server": "定制服务器"
+        },
+        "custom_server_url": "服务器地址",
+        "action": {
+          "test_server": "发布到测试服务器",
+          "custom_server": "发布到自定义服务器"
+        },
+        "errors": {
+          "url": "无效的网址"
+        }
+      },
+      "deploy": {
+        "world": "发布到您的世界",
+        "land": "发布到您的土地",
+        "loading": "加载中...",
+        "error": "错误",
+        "warning": {
+          "message": "请仔细阅读：<ul><li>部署后，您的场景将进行处理，然后才能使用。</li><li>此过程平均可能需要15分钟。</li><li>在此期间，您的场景将显示为空，直到客户端更新。</li></ul>",
+          "checkbox": "不再显示",
+          "continue": "继续",
+          "back": "返回"
+        },
+        "ethereum": {
+          "mainnet": "主网",
+          "testnet": "测试网"
+        },
+        "files": {
+          "count": "{count} {count, plural, one {文件} other {文件}}",
+          "size": "总大小 <b>{size}</b>",
+          "publish": "发布"
+        },
+        "deploying": {
+          "publish": "出版...",
+          "finishing": "整理完毕...",
+          "failed": "发布失败",
+          "try_again": "请重试",
+          "info": "此过程平均可能需要 15 分钟。在此期间，您的场景可能会显示为空，直到在客户端中更新为止。",
+          "step": {
+            "uploading": "上传中...",
+            "converting": "转换...",
+            "optimizing": "优化...",
+            "loading": "加载中...",
+            "failed": "失败的"
+          },
+          "errors": {
+            "details": "详细信息",
+            "fetch_status": "获取发布信息失败。\n请重试。",
+            "catalyst": "发布到Catalyst节点失败。\n请重试或检查您的互联网连接。",
+            "max_retries": "重试次数超过限制。\n请稍后再试。",
+            "not_found": "出了问题。\n请重试。",
+            "failed": "出了问题。\n请重试。",
+            "invalid_url": "出了问题。\n请重试。",
+            "invalid_identity": "出了问题。\n请重试。",
+            "max_file_size_exceeded": "一个或多个资产超过了允许的限制（{maxFileSizeInMb}MB）。\n优化或移除大文件并重试。",
+            "unknown": "出了问题。\n请重试。"
+          },
+          "actions": {
+            "report_issue": "报告问题",
+            "retry": "重试"
+          }
+        },
+        "success": {
+          "message": "您的场景已成功发布",
+          "url": "跳转到您的 {target} 的URL是：",
+          "world": "世界",
+          "land": "土地",
+          "jump_in": "跳转",
+          "in_progress": "现在，即使场景仍在处理中，您也可以访问该场景。"
+        }
+      }
+    },
+    "publish_history": {
+      "title": "出版历史"
+    },
+    "app_settings": {
+      "title": "應用程式設定",
+      "fields": {
+        "scenes_folder": {
+          "label": "場景資料夾",
+          "change_button": "更改資料夾"
+        },
+        "scene_editor_dependencies": {
+          "label": "場景編輯器依賴項",
+          "options": {
+            "auto_update": "自動更新我的所有場景",
+            "notify": "有新版本更新時通知我",
+            "do_nothing": "什麼也不做"
+          }
+        }
+      },
+      "actions": {
+        "apply_button": "申請"
+      },
+      "version": {
+        "current": "當前版本：{version}",
+        "new": "新版本：{version}",
+        "up_to_date": "Creator Hub 已是最新版本",
+        "label": "版本：{version}"
+      },
+      "update": {
+        "applying": "正在應用更新。",
+        "dont_close": "請勿關閉應用程序。",
+        "auto_restart": "更新後 Creator Hub 將自動重啟。",
+        "downloading": "正在下載... {progress}%",
+        "install": "立即安裝",
+        "update": "立即更新",
+        "check": "檢查更新",
+        "checking": "正在檢查更新...",
+        "error": "我們無法檢查更新。請稍後再試。",
+        "update_available": "更新可用"
+      }
+    },
+    "create_project": {
+      "title": "創建場景",
+      "fields": {
+        "name": "場景名稱",
+        "path": "場景路徑"
+      },
+      "actions": {
+        "create": "創建"
+      },
+      "errors": {
+        "path_exists": "路徑已存在"
+      }
+    },
+    "install_client": {
+      "title": "要输入，您需要首先安装分散",
+      "download": "下载",
+      "download_macos": "下载",
+      "download_win": "下载",
+      "cancel": "暂不安装"
+    }
+  },
+  "snackbar": {
+    "generic": {
+      "import_scene": "导入场景...",
+      "import_scene_failed": "场景导入失败",
+      "duplicate_scene": "复制场景...",
+      "duplicate_scene_failed": "复制场景失败",
+      "delete_scene": "删除场景...",
+      "delete_scene_failed": "删除场景失败",
+      "dependencies_updated": "場景相依性已更新",
+      "installing_dependencies": "安装依赖项",
+      "installing_dependencies_failed": "安装依赖项失败"
+    },
+    "missing_projects": {
+      "title": "{scenes} 丢失的 {scenes, plural, one {场景} other {场景}} 成立",
+      "actions": {
+        "view": "版本",
+        "discard_all": "全部丢弃"
+      }
+    },
+    "new_dependency_version": {
+      "title": "偵測到新的依賴項版本",
+      "actions": {
+        "update": "更新"
+      }
+    },
+    "deploy": {
+      "pending": {
+        "title": "{title} 正在發布...",
+        "actions": {
+          "view": "查看"
+        }
+      },
+      "success": {
+        "title": "{title} 已成功發布",
+        "actions": {
+          "view": "查看"
+        }
+      },
+      "error": {
+        "title": "{title} 發布過程失敗",
+        "actions": {
+          "retry": "重試"
+        }
+      }
+    }
+  },
+  "option_box": {
+    "learn_more": "了解更多"
+  },
+  "tutorials": {
+    "title": "教程"
+  },
+  "sign_in": {
+    "back": "後退",
+    "content": {
+      "title": "安全登入步驟",
+      "body": "請記住下面的驗證碼。<br></br>系統會提示您在網頁瀏覽器中進行確認，以安全地連結您的登入。",
+      "verification_code_info": "請將此號碼保密。它確保您的登入是安全的且對您來說是唯一的。",
+      "expiration": "驗證碼將在{minutes}:{seconds}分鐘後過期"
+    }
+  },
+  "more": {
+    "header": {
+      "title": "更多"
+    },
+    "cards": {
+      "create": {
+        "title": "创建",
+        "legacy_web_editor": {
+          "title": "旧版网页编辑器",
+          "description": "访问旧版网页编辑器继续编辑你的场景。"
+        },
+        "collections": {
+          "title": "收藏",
+          "description": "创建、审核并发布你的可穿戴设备和表情收藏。"
+        }
+      },
+      "manage": {
+        "title": "管理",
+        "names": {
+          "title": "名字",
+          "description": "领取你的独特名字，并将其分配给你的头像或地块。"
+        },
+        "worlds": {
+          "title": "世界",
+          "description": "创建和管理你自己的虚拟空间。"
+        },
+        "land": {
+          "title": "土地",
+          "description": "发布场景，创建庄园并管理你的土地权限。"
+        }
+      },
+      "open_in_browser": "在浏览器中打开"
+    }
+  },
+  "templates": {
+    "title": "选择一个模板",
+    "results": "{count} {count, plural, one {模板} other {模板}}",
+    "actions": {
+      "preview": "预览模板",
+      "code": "查看代码"
+    },
+    "new_scene": {
+      "title": "空景",
+      "description": "从头开始创建自己的场景"
+    },
+    "filters": {
+      "title": "过滤依据",
+      "difficulty": {
+        "easy": "简单的",
+        "medium": "中等的",
+        "hard": "难的"
+      }
+    },
+    "sort": {
+      "title": "排序方式：",
+      "default": "默认",
+      "newest": "最新"
+    },
+    "learn": {
+      "header": {
+        "title": "学习",
+        "videos": "视频",
+        "docs": "创作者文档",
+        "more": "更多"
+      },
+      "see_all": "查看全部",
+      "videos": {
+        "title": "视频"
+      },
+      "docs": {
+        "title": "创作者文档"
+      }
+    }
+  }
+}

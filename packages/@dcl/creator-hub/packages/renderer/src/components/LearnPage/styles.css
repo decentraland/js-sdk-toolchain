@@ -1,0 +1,143 @@
+.LearnPage .sections {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 24px;
+}
+
+.LearnPage .Container {
+  flex-direction: column;
+  align-items: center;
+}
+
+.LearnPage .section {
+  width: 330px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.LearnPage .section .header {
+  background: linear-gradient(180deg, #c640cd 0%, #691fa9 100%);
+  height: 100px;
+  border: 2px solid #691fa9;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  position: relative;
+  flex: none;
+}
+
+.LearnPage .section .header.clickable:hover {
+  cursor: pointer;
+  border: 2px solid white;
+}
+
+.LearnPage .section .header .image {
+  height: 100%;
+  width: 150px;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+}
+
+.LearnPage .section.videos .header .image {
+  background-image: url(./images/videos.png);
+}
+
+.LearnPage .section.docs .header .image {
+  background-image: url(./images/docs.png);
+}
+
+.LearnPage .section.more .header .image {
+  background-image: url(./images/more.png);
+}
+
+.LearnPage .section .header .title {
+  font-size: 24px;
+  line-height: 32px;
+  padding: 16px 24px;
+  font-weight: 700;
+  text-transform: uppercase;
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+}
+
+.LearnPage .section .content {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0px 32px 0px;
+  flex: auto;
+}
+
+.LearnPage .link {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.LearnPage .link .thumbnail-wrapper {
+  flex: none;
+  width: 132px;
+  height: 64px;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  box-sizing: border-box;
+}
+
+.LearnPage .link img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.LearnPage .link .icon {
+  width: 24px;
+  height: 24px;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.LearnPage .section.docs .link .icon {
+  background-image: url(./images/docs-icon.svg);
+}
+
+.LearnPage .section.more .link .icon {
+  background-image: url(./images/link-icon.svg);
+}
+
+.LearnPage .link .title {
+  font-size: 16px;
+  font-weight: 700;
+  flex: 0 1 auto;
+}
+
+.LearnPage .link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.LearnPage .see-all {
+  flex: none;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--light-gray);
+  text-align: center;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: background-color 0.2s ease-in-out;
+}
+
+.LearnPage .see-all:hover {
+  color: var(--light-gray) !important;
+  background-color: var(--secondary-light, #cfcdd4) !important;
+}

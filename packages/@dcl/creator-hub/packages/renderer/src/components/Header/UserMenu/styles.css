@@ -1,0 +1,9 @@
+.Header.Navbar > .user > .SignInButton {
+  background-color: var(--white) !important;
+  color: var(--black) !important;
+  font-weight: 600;
+}
+
+.Header.Navbar > .user > .AvatarButton:hover {
+  background-color: transparent;
+}
