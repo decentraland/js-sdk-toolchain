@@ -51,14 +51,8 @@ make deep-clean && make install && make build
 # Run all tests
 make test
 
-# Run ECS tests
-make test-ecs
-
 # Run Inspector tests
 make test-inspector
-
-# Run tests with coverage
-make test-coverage
 
 # Update test snapshots
 make update-snapshots
@@ -71,7 +65,7 @@ The project uses Protocol Buffers for type-safe communication. Protobuf files ar
 To manually rebuild protobuf files:
 
 ```bash
-make proto
+make build
 ```
 
 ## Release Process
@@ -96,9 +90,6 @@ We use snapshot testing with golden files to track runtime performance impacts:
 ```bash
 # All tests
 make test
-
-# Specific package
-make test-ecs
 make test-inspector
 ```
 
@@ -137,7 +128,7 @@ Common issues:
 
 - **Build failures**: Try `make clean && make install && make build`
 - **Test failures**: Run `make test` to see detailed errors
-- **Protobuf errors**: Run `make proto` to rebuild protocol buffers
+- **Protobuf errors**: Run `make build` to rebuild protocol buffers
 - **Package conflicts**: Delete `node_modules` and run `make install` again
 - **TypeScript errors**: Check package versions match in `package.json` files
 

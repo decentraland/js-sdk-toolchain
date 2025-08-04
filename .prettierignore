@@ -1,0 +1,14 @@
+**/node_modules
+**/dist
+**/dist-cjs
+**/generated
+**/public
+!**/public/index.html
+**/*.svg
+
+package.json
+package-lock.json
+.electron-vendors.cache.json
+
+.github
+.idea

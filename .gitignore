@@ -8,6 +8,9 @@ packages/**/*.js
 !packages/@dcl/inspector/hot-reload.js
 !packages/@dcl/inspector/test/jest-transformer.js
 !packages/@dcl/inspector/test/jest.config.js
+!packages/@dcl/creator-hub/**/vite.config.js
+!packages/@dcl/creator-hub/**/vitest.config.js
+!packages/@dcl/creator-hub/scripts/*
 packages/@dcl/sdk/package-lock.json
 packages/@dcl/sdk/**/*.js
 packages/@dcl/sdk/**/*.d.ts

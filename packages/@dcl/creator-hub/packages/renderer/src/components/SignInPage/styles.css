@@ -1,0 +1,40 @@
+.SignIn {
+  height: 100vh;
+}
+
+.SignIn .content {
+  margin-left: 128px;
+}
+
+.SignIn .MuiButton-root.back {
+  margin-bottom: 40px;
+}
+
+.SignIn .code {
+  display: flex;
+  align-items: center;
+}
+
+.SignIn .code .verificationCode {
+  font-size: 6rem;
+  font-weight: "bold";
+  margin-right: 24px;
+}
+
+.SignIn .background {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  /* TODO: Update  background image */
+  background: url("../../../../assets/images/genesis_plaza.png") no-repeat center center fixed;
+  background-size: cover;
+  z-index: -1;
+}
+
+.SignIn .background::before {
+  content: "";
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to left, transparent 45%, #491975 85%);
+}
