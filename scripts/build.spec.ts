@@ -1,5 +1,5 @@
 import * as path from 'path'
-import { readFileSync, writeFileSync } from 'fs'
+import { readFileSync, writeFileSync, readdirSync } from 'fs'
 import { copySync, existsSync, mkdirSync, removeSync } from 'fs-extra'
 import { summary } from '@actions/core'
 
@@ -173,20 +173,6 @@ flow('build-all', () => {
     itDeletesFolder('renderer/dist', CH_PATH)
 
     itExecutes(`npm i --silent`, CH_PATH)
-
-    // Ensure electron-vendors files exist (in case postinstall failed)
-    it('ensure electron-vendors files exist', async () => {
-      const electronVendorsPath = path.resolve(CH_PATH, '.electron-vendors.cache.json')
-      const browserslistPath = path.resolve(CH_PATH, '.browserslistrc')
-
-      if (!existsSync(electronVendorsPath)) {
-        writeFileSync(electronVendorsPath, JSON.stringify({ chrome: '138', node: '22' }))
-      }
-      if (!existsSync(browserslistPath)) {
-        writeFileSync(browserslistPath, 'Chrome 138')
-      }
-    })
-
     itExecutes('npm run build --silent', CH_PATH)
   })
 

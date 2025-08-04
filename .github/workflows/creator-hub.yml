@@ -1,0 +1,363 @@
+name: Creator Hub CI/CD
+
+# This workflow handles all Creator Hub related CI/CD processes
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - experimental
+  pull_request:
+  release:
+    types:
+      - created
+
+concurrency:
+  group: creator-hub-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  WORKING_DIRECTORY: packages/@dcl/creator-hub
+
+jobs:
+  # ============================================================================
+  # Code Quality Jobs
+  # ============================================================================
+
+  lint:
+    name: Lint & Code Style
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          cache: 'npm'
+          cache-dependency-path: ${{ env.WORKING_DIRECTORY }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+
+      - name: Run ESLint
+        run: npm run lint --if-present
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+
+      - name: Check code style with Prettier
+        run: |
+          npm i prettier
+          npx prettier --check "**/*.{js,mjs,cjs,jsx,ts,mts,cts,tsx,vue}"
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+
+  typechecking:
+    name: TypeScript Type Checking
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          cache: 'npm'
+          cache-dependency-path: ${{ env.WORKING_DIRECTORY }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+
+      - name: Run TypeScript type checking
+        run: npm run typecheck --if-present
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+
+  # ============================================================================
+  # Testing Jobs
+  # ============================================================================
+
+  tests:
+    name: Run Tests
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ macos-latest, windows-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          cache: 'npm'
+          cache-dependency-path: ${{ env.WORKING_DIRECTORY }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+
+      - name: Run main tests
+        run: npm run test:main --if-present
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+
+      - name: Run preload tests
+        run: npm run test:preload --if-present
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+
+      - name: Run renderer tests
+        run: npm run test:renderer --if-present
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+
+      - name: Run E2E tests (Ubuntu)
+        if: matrix.os == 'ubuntu-latest' && env.ENABLE_E2E_TESTS == 'true'
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e:ci --if-present
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"
+          ENABLE_E2E_TESTS: true
+
+      - name: Run E2E tests (Non-Ubuntu)
+        if: matrix.os != 'ubuntu-latest' && env.ENABLE_E2E_TESTS == 'true'
+        run: npm run test:e2e:ci --if-present
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"
+          ENABLE_E2E_TESTS: true
+
+  # ============================================================================
+  # Release Jobs (Only run on main branch)
+  # ============================================================================
+
+  drop-pre-release:
+    name: Drop Pre-releases
+    runs-on: ubuntu-latest
+    needs: [ typechecking, tests ]
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          cache: 'npm'
+
+      - name: Drop pre releases
+        uses: sgpublic/delete-release-action@v1.2
+        with:
+          pre-release-drop: true
+          pre-release-keep-count: -1
+          pre-release-drop-tag: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+
+  build-and-release:
+    name: Build and Release
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ macos-latest, windows-latest ]
+    runs-on: ${{ matrix.os }}
+    needs: [ drop-pre-release ]
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: ${{ env.WORKING_DIRECTORY }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+
+      - name: Build application
+        run: echo MODE=production && npm run build
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"
+          MODE: production
+          VITE_SEGMENT_CREATORS_HUB_API_KEY: ${{ secrets.VITE_SEGMENT_CREATORS_HUB_API_KEY }}
+          VITE_SEGMENT_INSPECTOR_API_KEY: ${{ secrets.VITE_SEGMENT_INSPECTOR_API_KEY }}
+          VITE_ALLOWED_EXTERNAL_ORIGINS: ${{ secrets.VITE_ALLOWED_EXTERNAL_ORIGINS }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+
+      - name: Generate release version
+        id: version
+        uses: paulhatch/semantic-version@v5.4.0
+        with:
+          tag_prefix: ""
+          version_format: ${major}.${minor}.${patch}
+          major_pattern: "/^(major|breaking).+/"
+          minor_pattern: "/^(minor|feat).+/"
+          bump_each_commit: false
+          bump_each_commit_patch_pattern: "/^(patch|fix).+/"
+          search_commit_body: true
+          user_format_type: "json"
+
+      - name: Checkout esigner-codesign repository (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: actions/checkout@v3
+        with:
+          repository: 'SSLcom/esigner-codesign'
+          path: esigner-codesign
+
+      - name: Build and publish artifacts
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 60
+          max_attempts: 6
+          retry_wait_seconds: 15
+          retry_on: error
+          shell: 'bash'
+          command: npx electron-builder --config electron-builder.cjs --config.extraMetadata.version=${{ steps.version.outputs.version }} ${{ matrix.os == 'macos-latest' && format('--config.mac.notarize={0}', true) || '' }} --publish always
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        env:
+          USE_HARD_LINKS: false
+          CSC_LINK: ${{ secrets.MACOS_CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.MACOS_CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.MACOS_NOTARIZATION_APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.MACOS_NOTARIZATION_TEAM_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.MACOS_NOTARIZATION_PWD }}
+          GH_TOKEN: ${{ secrets.github_token }}
+          EP_PRE_RELEASE: true
+          CODE_SIGN_SCRIPT_PATH: ${{ matrix.os == 'windows-latest' && format('{0}\\esigner-codesign\\dist\\index.js', github.workspace) || '' }}
+          INPUT_COMMAND: "sign"
+          INPUT_FILE_PATH: "${{ github.workspace }}\\${{ env.WORKING_DIRECTORY }}\\dist\\Decentraland Creator Hub-${{ steps.version.outputs.version }}-win-x64.exe"
+          INPUT_OVERRIDE: "true"
+          INPUT_MALWARE_BLOCK: "false"
+          INPUT_CLEAN_LOGS: "false"
+          INPUT_JVM_MAX_MEMORY: "1024M"
+          INPUT_ENVIRONMENT_NAME: "PROD"
+          INPUT_USERNAME: ${{ secrets.ES_USERNAME }}
+          INPUT_PASSWORD: ${{ secrets.ES_PASSWORD }}
+          INPUT_TOTP_SECRET: ${{ secrets.ES_TOTP_SECRET }}
+          INPUT_CREDENTIAL_ID: ${{ secrets.WINDOWS_CREDENTIAL_ID_SIGNER }}
+
+  # ============================================================================
+  # PR Preview Jobs (Only run on pull requests)
+  # ============================================================================
+
+  pr-preview:
+    name: PR Preview Build
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ macos-latest, windows-latest ]
+    runs-on: ${{ matrix.os }}
+    needs: [ typechecking, tests ]
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: ${{ env.WORKING_DIRECTORY }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm i --silent
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+
+      - name: Build application (development mode)
+        run: echo MODE=development && npm run build
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"
+          MODE: development
+          VITE_SEGMENT_CREATORS_HUB_API_KEY: ${{ secrets.VITE_SEGMENT_CREATORS_HUB_API_KEY }}
+          VITE_SEGMENT_INSPECTOR_API_KEY: ${{ secrets.VITE_SEGMENT_INSPECTOR_API_KEY }}
+          VITE_ALLOWED_EXTERNAL_ORIGINS: ${{ secrets.VITE_ALLOWED_EXTERNAL_ORIGINS }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+
+      - name: Generate preview version
+        id: version
+        uses: paulhatch/semantic-version@v5.4.0
+        with:
+          tag_prefix: ""
+          version_format: ${major}.${minor}.${patch}
+          major_pattern: "/^(major|breaking).+/"
+          minor_pattern: "/^(minor|feat).+/"
+          bump_each_commit: false
+          bump_each_commit_patch_pattern: "/^(patch|fix).+/"
+          search_commit_body: true
+          user_format_type: "json"
+
+      - name: Build artifacts (no publishing)
+        run: npx electron-builder --config electron-builder.cjs --config.extraMetadata.version=${{ steps.version.outputs.version }} --publish never
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        env:
+          USE_HARD_LINKS: false
+
+      - name: Move artifacts to upload folder
+        run: sh -c 'mkdir dist/upload && cp dist/*.dmg dist/*.exe dist/upload 2> /dev/null || :'
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+
+      - name: Upload to S3
+        id: upload
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
+        run: |
+          npx @dcl/cdn-uploader@next \
+            --bucket ${{ secrets.SDK_TEAM_S3_BUCKET }} \
+            --local-folder ${{ env.WORKING_DIRECTORY }}/dist/upload \
+            --bucket-folder creator-hub/branch/${{ github.head_ref }}
+
+      - name: Set download instructions (Windows)
+        if: matrix.os == 'windows-latest'
+        id: windows-instructions
+        run: |
+          echo "list<<EOF" >> $GITHUB_ENV
+          echo "[win-x64](${{ secrets.SDK_TEAM_S3_BASE_URL }}/creator-hub/branch/${{ github.head_ref }}/Decentraland%20Creator%20Hub-${{ steps.version.outputs.version }}-win-x64.exe)" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Set download instructions (macOS)
+        if: matrix.os == 'macos-latest'
+        id: macos-instructions
+        run: |
+          echo "list<<EOF" >> $GITHUB_ENV
+          echo "[mac-x64](${{ secrets.SDK_TEAM_S3_BASE_URL }}/creator-hub/branch/${{ github.head_ref }}/Decentraland%20Creator%20Hub-${{ steps.version.outputs.version }}-mac-x64.dmg)" >> $GITHUB_ENV
+          echo "[mac-arm64](${{ secrets.SDK_TEAM_S3_BASE_URL }}/creator-hub/branch/${{ github.head_ref }}/Decentraland%20Creator%20Hub-${{ steps.version.outputs.version }}-mac-arm64.dmg)" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+          content=$(cat ./.github/workflows/ch-macos-instructions.md)
+          echo "macos-instructions<<EOF" >> $GITHUB_ENV
+          echo "$content" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Find existing comment
+        uses: peter-evans/find-comment@v1
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: Test this pull request on ${{ matrix.os }}
+
+      - name: Create or update comment
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            # Test this pull request on ${{ matrix.os }}
+            #### Download the correct version for your architecture:
+              ${{ env.list }}
+
+              ${{ env.macos-instructions }}
+          edit-mode: replace

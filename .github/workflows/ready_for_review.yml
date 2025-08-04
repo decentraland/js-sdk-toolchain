@@ -2,10 +2,29 @@ name: Manual - Lint & Snapshot update
 
 on:
   workflow_dispatch:
+  # Also trigger on Creator Hub changes
+  push:
+    paths:
+      - 'packages/@dcl/creator-hub/**'
+      - 'packages/@dcl/inspector/**'
+  pull_request:
+    paths:
+      - 'packages/@dcl/creator-hub/**'
+      - 'packages/@dcl/inspector/**'
 
 jobs:
+  # ============================================================================
+  # Main SDK Lint & Snapshot Update
+  # ============================================================================
+
   lint:
+    name: SDK Lint & Snapshot Update
     runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      !contains(github.event.head_commit.modified, 'packages/@dcl/creator-hub/') &&
+      !contains(github.event.head_commit.added, 'packages/@dcl/creator-hub/') &&
+      !contains(github.event.head_commit.removed, 'packages/@dcl/creator-hub/')
 
     permissions:
       # Give the default GITHUB_TOKEN write permission to commit and push the
@@ -28,3 +47,45 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: automatic linter and snapshot tests
+
+  # ============================================================================
+  # Creator Hub Lint & Snapshot Update
+  # ============================================================================
+
+  creator-hub-lint:
+    name: Creator Hub Lint & Snapshot Update
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.head_commit.modified, 'packages/@dcl/creator-hub/') ||
+      contains(github.event.head_commit.added, 'packages/@dcl/creator-hub/') ||
+      contains(github.event.head_commit.removed, 'packages/@dcl/creator-hub/')
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: packages/@dcl/creator-hub/package-lock.json
+
+      - name: Install Creator Hub dependencies
+        run: npm ci
+        working-directory: packages/@dcl/creator-hub
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+
+      - name: Run Creator Hub lint fix
+        run: npm run lint:fix --if-present
+        working-directory: packages/@dcl/creator-hub
+
+      - name: Run Creator Hub tests
+        run: npm run test:main --if-present
+        working-directory: packages/@dcl/creator-hub
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: automatic creator hub linter and tests

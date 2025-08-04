@@ -14,10 +14,27 @@
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 12,
-    "sourceType": "module"
+    "sourceType": "module",
+    "project": [
+      "./packages/main/tsconfig.json",
+      "./packages/preload/tsconfig.json",
+      "./packages/renderer/tsconfig.json",
+      "./packages/shared/tsconfig.json"
+    ]
   },
   "plugins": ["@typescript-eslint", "import"],
-  "ignorePatterns": ["node_modules/**", "**/dist/**"],
+  "ignorePatterns": [
+    "node_modules/**",
+    "**/dist/**",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/tests/**",
+    "**/*.config.js",
+    "**/*.config.cjs",
+    "**/scripts/**",
+    "**/vitest.config.js",
+    "**/electron-builder.cjs"
+  ],
 
   "rules": {
     "@typescript-eslint/no-explicit-any": "off",

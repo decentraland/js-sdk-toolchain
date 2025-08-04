@@ -46,7 +46,7 @@ update-renderer:
 	cd packages/@dcl/sdk; npm i --save-exact @dcl/explorer@latest
 
 lint:
-	$(ESLINT) . --ext .ts,.tsx,.js,.json --fix
+	npx tsx scripts/lint-packages.ts
 
 typecheck:
 	make typecheck-creator-hub
@@ -63,7 +63,7 @@ lint-packages:
 	$(SYNC_PACK) format --config .syncpackrc.json  --source "packages/*/package.json" --source "package.json"
 
 lint-fix: sync-deps
-	node_modules/.bin/eslint . --ext .ts,.tsx --fix
+	npx tsx scripts/lint-packages.ts --fix
 
 test:
 	node_modules/.bin/jest --detectOpenHandles --colors test/
@@ -80,8 +80,13 @@ test-inspector:
 test-inspector-e2e:
 	cd ./packages/@dcl/inspector/; IS_E2E=true ./../../../node_modules/.bin/jest --detectOpenHandles --colors --config ./jest.config.js
 
+test-cli:
+	@rm -rf tmp
+	@mkdir -p tmp/scene
+	cd tmp/scene; $(PWD)/packages/@dcl/sdk-commands/dist/index.js init
+
 test-creator-hub:
-	cd $(CH_PATH); npm run test
+	cd $(CH_PATH); npm run test:ci
 
 test-coverage:
 	node_modules/.bin/jest --detectOpenHandles --colors --coverage $(TESTARGS)
@@ -147,7 +152,7 @@ deep-clean:
 	make clean
 
 update-snapshots: export UPDATE_SNAPSHOTS=true
-update-snapshots: test
+update-snapshots: build test
 
 clean:
 	@echo "> Cleaning all folders"
