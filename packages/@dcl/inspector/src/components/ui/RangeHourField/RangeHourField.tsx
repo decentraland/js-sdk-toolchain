@@ -28,16 +28,6 @@ const RangeHourField = React.forwardRef<HTMLInputElement, Props>((props, ref) =>
     timeInHHMM: formatHour(Number(value))
   })
 
-  useEffect(() => {
-    const numValue = Number(value)
-    if (numValue !== time.timeInSeconds) {
-      setTime({
-        timeInSeconds: numValue,
-        timeInHHMM: formatHour(numValue)
-      })
-    }
-  }, [value])
-
   const completionPercentage = useMemo(() => {
     const normalizedValue = Math.min(Math.max(time.timeInSeconds, MIN_SECONDS), MAX_SECONDS)
     return ((normalizedValue - MIN_SECONDS) / (MAX_SECONDS - MIN_SECONDS)) * 100 || 0
