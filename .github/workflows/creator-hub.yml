@@ -1,0 +1,218 @@
+name: Creator Hub CI
+
+on:
+  workflow_call:
+    inputs:
+      inspector-package-url:
+        description: "Uploaded inspector package url"
+        required: false
+        type: string
+        default: latest
+
+concurrency:
+  group: creator-hub-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  WORKING_DIRECTORY: packages/@dcl/creator-hub
+
+jobs:
+  build:
+    name: build
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ macos-latest, windows-latest ]
+    runs-on: ${{ matrix.os }}
+    env:
+      WORKING_DIRECTORY: packages/@dcl/creator-hub
+      PRODUCTION: ${{ github.ref == 'refs/heads/main' && !github.event.pull_request.number }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install @dcl/inspector@branch package
+        run: npm install "${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ inputs.inspector-package-url }}"
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+
+      - name: 'Install dependencies'
+        run: npm ci
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+
+      - name: 'Build'
+        run: echo MODE=$MODE && npm run build
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"
+          MODE: ${{ env.PRODUCTION == 'true' && 'production' || 'development' }}
+          VITE_SEGMENT_CREATORS_HUB_API_KEY: ${{ secrets.VITE_SEGMENT_CREATORS_HUB_API_KEY }}
+          VITE_SEGMENT_INSPECTOR_API_KEY: ${{ secrets.VITE_SEGMENT_INSPECTOR_API_KEY }}
+          VITE_ALLOWED_EXTERNAL_ORIGINS: ${{ secrets.VITE_ALLOWED_EXTERNAL_ORIGINS }}
+          # Sentry AUTH Token
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+
+      - name: Remove Creator Hub pre-releases
+        if: ${{ env.PRODUCTION == 'true' }}
+        uses: ./.github/actions/cleanup-prereleases
+        with:
+          tag_prefix: 'creator-hub-v'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bump latest release version
+        id: new_version
+        uses: paulhatch/semantic-version@v5.4.0
+        with:
+          tag_prefix: "creator-hub-v"
+          version_format: ${major}.${minor}.${patch}
+          major_pattern: "/^(major|breaking).+/"
+          minor_pattern: "/^(minor|feat).+/"
+          bump_each_commit: false
+          bump_each_commit_patch_pattern: "/^(patch|fix).+/"
+          search_commit_body: true
+          user_format_type: "json"
+          change_path: "packages/@dcl/creator-hub packages/@dcl/inspector"
+
+      # Download 'SSLcom/esigner-codesign' to a folder called 'esigner-codesign' inside creator-hub package
+      - name: Checkout esigner-codesign repository (Windows)
+        if: ${{ env.PRODUCTION == 'true' && matrix.os == 'windows-latest' }}
+        uses: actions/checkout@v3
+        with:
+          repository: 'SSLcom/esigner-codesign'
+          path: ${{ env.WORKING_DIRECTORY }}/esigner-codesign
+
+      - name: Compile artifacts ${{ env.PRODUCTION == 'true' && 'and upload them to github release' || '' }}
+        # I use this action because it is capable of retrying multiple times if there are any issues with the distribution server
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 60
+          max_attempts: 6
+          retry_wait_seconds: 15
+          retry_on: error
+          shell: 'bash'
+          command: npx electron-builder --project ${{ env.WORKING_DIRECTORY }} --config electron-builder.cjs --config.extraMetadata.version=${{ steps.new_version.outputs.version }} ${{ matrix.os == 'macos-latest' && format('--config.mac.notarize={0}', true) || '' }} --publish ${{ env.PRODUCTION == 'true' && 'always' || 'never' }}
+        env:
+          # Disable hard links to avoid issues with npm
+          USE_HARD_LINKS: false
+          # Code Signing params
+          # See https://www.electron.build/code-signing
+          CSC_LINK: ${{ secrets.MACOS_CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.MACOS_CSC_KEY_PASSWORD }}
+          # Notarization params
+          # See https://www.electron.build/configuration/mac#NotarizeNotaryOptions
+          APPLE_ID: ${{ secrets.MACOS_NOTARIZATION_APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.MACOS_NOTARIZATION_TEAM_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.MACOS_NOTARIZATION_PWD }}
+          # Publishing artifacts
+          GH_TOKEN: ${{ secrets.github_token }} # GitHub token, automatically provided (No need to define this secret in the repo settings)
+          EP_PRE_RELEASE: true # Publish as pre-release
+          # The following are the parameters required by the esigner-codesign action to work, we must explicitly pass in even the optional ones since we're not using the action directly, but from the checked out repo
+          CODE_SIGN_SCRIPT_PATH: ${{ matrix.os == 'windows-latest' && format('{0}\\esigner-codesign\\dist\\index.js', github.workspace) || '' }}
+          INPUT_COMMAND: "sign"
+          INPUT_FILE_PATH: "${{ github.workspace }}\\dist\\Decentraland Creator Hub-${{ steps.new_version.outputs.new_version }}-win-x64.exe"
+          INPUT_OVERRIDE: "true"
+          INPUT_MALWARE_BLOCK: "false"
+          INPUT_CLEAN_LOGS: "false"
+          INPUT_JVM_MAX_MEMORY: "1024M"
+          INPUT_ENVIRONMENT_NAME: "PROD"
+          INPUT_USERNAME: ${{ secrets.ES_USERNAME }}
+          INPUT_PASSWORD: ${{ secrets.ES_PASSWORD }}
+          INPUT_TOTP_SECRET: ${{ secrets.ES_TOTP_SECRET }}
+          INPUT_CREDENTIAL_ID: ${{ secrets.WINDOWS_CREDENTIAL_ID_SIGNER }}
+
+      - name: Move artifacts to upload folder
+        if: ${{ env.PRODUCTION == 'false' }}
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: sh -c 'mkdir dist/upload && cp dist/*.dmg dist/*.exe dist/upload 2> /dev/null || :'
+
+      - name: Upload to S3
+        if: ${{ env.PRODUCTION == 'false' }}
+        id: upload
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
+        run: |
+          npx @dcl/cdn-uploader@next --bucket ${{ secrets.SDK_TEAM_S3_BUCKET }} --local-folder dist/upload --bucket-folder creator-hub/branch/${{ github.head_ref }}
+
+      - name: Set specific windows instructions
+        if: ${{ env.PRODUCTION == 'false' && matrix.os == 'windows-latest' }}
+        id: windows-instructions
+        shell: bash
+        run: |
+          echo "list<<EOF" >> $GITHUB_ENV
+          echo "[win-x64](${{ secrets.SDK_TEAM_S3_BASE_URL }}/creator-hub/branch/${{ github.head_ref }}/Decentraland%20Creator%20Hub-${{ steps.new_version.outputs.new_version }}-win-x64.exe)" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Set specific macos instructions
+        if: ${{ env.PRODUCTION == 'false' && matrix.os == 'macos-latest' }}
+        id: macos-instructions
+        run: |
+          echo "list<<EOF" >> $GITHUB_ENV
+          echo "[mac-x64](${{ secrets.SDK_TEAM_S3_BASE_URL }}/creator-hub/branch/${{ github.head_ref }}/Decentraland%20Creator%20Hub-${{ steps.new_version.outputs.new_version }}-mac-x64.dmg)" >> $GITHUB_ENV
+          echo "[mac-arm64](${{ secrets.SDK_TEAM_S3_BASE_URL }}/creator-hub/branch/${{ github.head_ref }}/Decentraland%20Creator%20Hub-${{ steps.new_version.outputs.new_version }}-mac-arm64.dmg)" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+          content=$(cat ./.github/workflows/creator-hub-macos-instructions.md)
+          echo "macos-instructions<<EOF" >> $GITHUB_ENV
+          echo "$content" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Find Comment
+        if: ${{ env.PRODUCTION == 'false' }}
+        uses: peter-evans/find-comment@v1
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: Test this pull request on ${{ matrix.os }}
+
+      - name: Create or update comment
+        if: ${{ env.PRODUCTION == 'false' }}
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            # Test this pull request on ${{ matrix.os }}
+            #### Download the correct version for your architecture:
+              ${{ env.list }}
+
+              ${{ env.macos-instructions }}
+          edit-mode: replace
+
+      - name: Generate Creator Hub release notes
+        id: release_notes
+        if: ${{ env.PRODUCTION == 'true' }}
+        uses: ./.github/actions/generate-release-notes
+        with:
+          previous_version: ${{ steps.new_version.outputs.previous_version }}
+          current_version: ${{ steps.new_version.outputs.version }}
+          tag_prefix: 'creator-hub-v'
+          paths: 'packages/@dcl/creator-hub,packages/@dcl/inspector'
+          section_names: 'Creator Hub Changes,Inspector Changes'
+          release_title: 'Creator Hub'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Display generated release notes
+        if: ${{ env.PRODUCTION == 'true' }}
+        run: |
+          echo "${{ steps.release_notes.outputs.release_notes }}"
+
+      - name: Update release description
+        if: ${{ env.PRODUCTION == 'true' }}
+        uses: ./.github/actions/update-release-description
+        with:
+          tag_name: 'creator-hub-v${{ steps.new_version.outputs.version }}'
+          release_notes: ${{ steps.release_notes.outputs.release_notes }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}

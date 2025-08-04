@@ -1,0 +1,115 @@
+name: 'Update Release Description'
+description: 'Updates a GitHub release description with provided release notes'
+
+inputs:
+  tag_name:
+    description: 'The tag name of the release to update (e.g., "v1.2.0", "creator-hub-v1.2.0")'
+    required: true
+  release_notes:
+    description: 'The release notes content in markdown format'
+    required: true
+  github_token:
+    description: 'GitHub token for API access'
+    required: true
+  create_if_not_exists:
+    description: 'Create the release if it does not exist (true/false)'
+    required: false
+    default: 'false'
+  prerelease:
+    description: 'Mark as prerelease if creating a new release (true/false)'
+    required: false
+    default: 'true'
+  draft:
+    description: 'Mark as draft if creating a new release (true/false)'
+    required: false
+    default: 'false'
+
+outputs:
+  release_url:
+    description: 'URL of the updated/created release'
+    value: ${{ steps.update_release.outputs.release_url }}
+  release_id:
+    description: 'ID of the updated/created release'
+    value: ${{ steps.update_release.outputs.release_id }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Update or create release description
+      id: update_release
+      shell: bash
+      run: |
+        echo "🔍 Checking if release '${{ inputs.tag_name }}' exists..."
+
+        # Check if release exists
+        RELEASE_INFO=$(gh release view "${{ inputs.tag_name }}" --json id,url,isDraft,isPrerelease 2>/dev/null || echo "null")
+
+        if [[ "$RELEASE_INFO" != "null" ]]; then
+          # Release exists - update it
+          echo "✅ Release found! Updating description..."
+
+          RELEASE_ID=$(echo "$RELEASE_INFO" | jq -r '.id')
+          RELEASE_URL=$(echo "$RELEASE_INFO" | jq -r '.url')
+
+          # Create temporary file for release notes
+          echo "${{ inputs.release_notes }}" > temp_release_notes.md
+
+          # Update the release description
+          gh release edit "${{ inputs.tag_name }}" --notes-file temp_release_notes.md
+
+          echo "🎉 Successfully updated release description!"
+          echo "🔗 Release URL: $RELEASE_URL"
+
+          # Clean up
+          rm temp_release_notes.md
+
+          # Set outputs
+          echo "release_url=$RELEASE_URL" >> $GITHUB_OUTPUT
+          echo "release_id=$RELEASE_ID" >> $GITHUB_OUTPUT
+
+        elif [[ "${{ inputs.create_if_not_exists }}" == "true" ]]; then
+          # Release doesn't exist - create it
+          echo "🆕 Release not found. Creating new release..."
+
+          # Build create command with options
+          CREATE_CMD="gh release create '${{ inputs.tag_name }}'"
+
+          # Add release notes
+          echo "${{ inputs.release_notes }}" > temp_release_notes.md
+          CREATE_CMD="$CREATE_CMD --notes-file temp_release_notes.md"
+
+          # Add optional flags
+          if [[ "${{ inputs.prerelease }}" == "true" ]]; then
+            CREATE_CMD="$CREATE_CMD --prerelease"
+          fi
+
+          if [[ "${{ inputs.draft }}" == "true" ]]; then
+            CREATE_CMD="$CREATE_CMD --draft"
+          fi
+
+          # Execute create command
+          eval $CREATE_CMD
+
+          # Get the created release info
+          RELEASE_INFO=$(gh release view "${{ inputs.tag_name }}" --json id,url)
+          RELEASE_ID=$(echo "$RELEASE_INFO" | jq -r '.id')
+          RELEASE_URL=$(echo "$RELEASE_INFO" | jq -r '.url')
+
+          echo "🎉 Successfully created release!"
+          echo "🔗 Release URL: $RELEASE_URL"
+
+          # Clean up
+          rm temp_release_notes.md
+
+          # Set outputs
+          echo "release_url=$RELEASE_URL" >> $GITHUB_OUTPUT
+          echo "release_id=$RELEASE_ID" >> $GITHUB_OUTPUT
+
+        else
+          # Release doesn't exist and create_if_not_exists is false
+          echo "❌ ERROR: Release '${{ inputs.tag_name }}' not found!"
+          echo "To create the release automatically, set 'create_if_not_exists: true'"
+          exit 1
+        fi
+      env:
+        GH_TOKEN: ${{ inputs.github_token }}

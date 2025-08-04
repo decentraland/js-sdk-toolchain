@@ -1,0 +1,156 @@
+name: 'Generate Release Notes'
+description: 'Generates release notes from git commits for specified paths since the last version'
+
+inputs:
+  previous_version:
+    description: 'Previous version to compare against (without tag prefix)'
+    required: true
+  current_version:
+    description: 'Current version being released'
+    required: true
+  tag_prefix:
+    description: 'Tag prefix (e.g., "creator-hub-v", "my-app-v"). Leave empty if tags are just the version number'
+    required: false
+    default: ''
+  paths:
+    description: 'Comma-separated list of paths to track changes for (e.g., "packages/@dcl/creator-hub,packages/@dcl/inspector")'
+    required: true
+  section_names:
+    description: 'Comma-separated list of section names corresponding to paths (e.g., "Creator Hub Changes,Inspector Changes")'
+    required: true
+  release_title:
+    description: 'Title for the release notes (e.g., "Creator Hub", "My App")'
+    required: true
+  github_token:
+    description: 'GitHub token for API access'
+    required: true
+
+outputs:
+  release_notes:
+    description: 'Generated release notes in markdown format'
+    value: ${{ steps.generate_notes.outputs.release_notes }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Generate release notes
+      id: generate_notes
+      shell: bash
+      run: |
+        # Parse input parameters
+        IFS=',' read -ra PATHS <<< "${{ inputs.paths }}"
+        IFS=',' read -ra SECTION_NAMES <<< "${{ inputs.section_names }}"
+
+        # Validate that paths and section names have the same count
+        if [[ ${#PATHS[@]} -ne ${#SECTION_NAMES[@]} ]]; then
+          echo "❌ ERROR: Number of paths (${#PATHS[@]}) must match number of section names (${#SECTION_NAMES[@]})"
+          exit 1
+        fi
+
+        echo "🔍 Generating release notes for ${{ inputs.release_title }} v${{ inputs.current_version }}"
+        echo "📋 Tracking changes in paths: ${{ inputs.paths }}"
+
+        # Build the tag reference for git log
+        if [[ -n "${{ inputs.tag_prefix }}" ]]; then
+          TAG_REF="${{ inputs.tag_prefix }}${{ inputs.previous_version }}"
+          echo "🏷️  Comparing against: $TAG_REF"
+        else
+          TAG_REF="${{ inputs.previous_version }}"
+          echo "🏷️  Comparing against: $TAG_REF"
+        fi
+
+        # Get commits since last version that affect the specified paths
+        PATH_ARGS=""
+        for path in "${PATHS[@]}"; do
+          PATH_ARGS="$PATH_ARGS -- $(echo "$path" | xargs)"
+        done
+
+        COMMITS=$(git log $TAG_REF..HEAD --oneline --no-merges --pretty=format:"%H|%s|%an|%ae" $PATH_ARGS)
+
+        # Initialize release notes
+        echo "## ${{ inputs.release_title }} v${{ inputs.current_version }}" > release_notes.md
+        echo "" >> release_notes.md
+        echo "### Changes:" >> release_notes.md
+        echo "" >> release_notes.md
+
+        # Create associative arrays for each path
+        declare -A path_commits
+
+        # Initialize arrays for each path
+        for i in "${!PATHS[@]}"; do
+          path_commits["$i"]=""
+        done
+
+        # Process each commit and categorize by path
+        while IFS='|' read -r commit_hash commit_msg author_name author_email; do
+          if [[ -n "$commit_hash" ]]; then
+            # Check which files were changed in this commit
+            CHANGED_FILES=$(git show --name-only --pretty=format: $commit_hash)
+
+            echo "🔄 Processing commit: $commit_hash"
+
+            # Try to get PR number from commit
+            PR_INFO=$(gh api repos/${{ github.repository }}/commits/$commit_hash/pulls --jq '.[0] | select(. != null) | {number: .number, html_url: .html_url}' 2>/dev/null || echo "null")
+
+            # Get GitHub username from email
+            GITHUB_USER=$(gh api search/users?q="$author_email+in:email" --jq '.items[0].login // empty' 2>/dev/null || echo "")
+
+            # Format author link
+            if [[ -n "$GITHUB_USER" ]]; then
+              AUTHOR_LINK="[$author_name](https://github.com/$GITHUB_USER)"
+            else
+              AUTHOR_LINK="$author_name"
+            fi
+
+            # Format PR link if available
+            if [[ "$PR_INFO" != "null" ]] && [[ -n "$PR_INFO" ]]; then
+              PR_NUMBER=$(echo "$PR_INFO" | jq -r '.number')
+              PR_URL=$(echo "$PR_INFO" | jq -r '.html_url')
+              PR_LINK=" in [#$PR_NUMBER]($PR_URL)"
+            else
+              PR_LINK=""
+            fi
+
+            # Format the commit entry
+            COMMIT_ENTRY="- $commit_msg by $AUTHOR_LINK$PR_LINK"
+
+            # Check which paths this commit affects
+            for i in "${!PATHS[@]}"; do
+              path="${PATHS[$i]}"
+              AFFECTS_PATH=$(echo "$CHANGED_FILES" | grep -c "$path" || true)
+
+              if [[ $AFFECTS_PATH -gt 0 ]]; then
+                if [[ -n "${path_commits[$i]}" ]]; then
+                  path_commits["$i"]="${path_commits[$i]}"$'\n'"$COMMIT_ENTRY"
+                else
+                  path_commits["$i"]="$COMMIT_ENTRY"
+                fi
+              fi
+            done
+          fi
+        done <<< "$COMMITS"
+
+        # Write sections for each path that has changes
+        for i in "${!PATHS[@]}"; do
+          if [[ -n "${path_commits[$i]}" ]]; then
+            echo "#### ${SECTION_NAMES[$i]}:" >> release_notes.md
+            echo "" >> release_notes.md
+            echo "${path_commits[$i]}" >> release_notes.md
+            echo "" >> release_notes.md
+          fi
+        done
+
+        # Output the release notes content
+        echo "✅ Release notes generated successfully!"
+        echo ""
+        echo "📄 Generated release notes:"
+        cat release_notes.md
+
+        # Set output for use in other steps
+        {
+          echo "release_notes<<EOF"
+          cat release_notes.md
+          echo "EOF"
+        } >> $GITHUB_OUTPUT
+      env:
+        GH_TOKEN: ${{ inputs.github_token }}

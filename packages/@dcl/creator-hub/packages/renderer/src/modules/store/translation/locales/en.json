@@ -1,0 +1,430 @@
+{
+  "install": {
+    "message": "Installing Decentraland Creator Hub v{version}",
+    "errors": {
+      "moveAppFailed": "Please, move the Creator Hub application to the Applications folder and open the Creator Hub application from it",
+      "checkUpdatesFailed": "Unable to check for updates",
+      "downloadFailed": "Unable to download the update",
+      "installFailed": "Unable to install the update",
+      "unknown": "An unknown error occurred"
+    }
+  },
+  "home": {
+    "header": {
+      "title": "Welcome to Creator Hub"
+    },
+    "cards": {
+      "sign_in": {
+        "title": "Sign In to publish your scenes",
+        "action": "Sign In"
+      },
+      "scenes": {
+        "title": "Scenes",
+        "empty_scenes": {
+          "description": "Create your first scene",
+          "action": "Start Building"
+        },
+        "action": "See All"
+      },
+      "learn": {
+        "title": "Learn",
+        "action": "See All"
+      },
+      "feedback": {
+        "title": "Shape the future of Creator Hub",
+        "action": "Submit Feedback"
+      }
+    }
+  },
+  "editor": {
+    "loading": {
+      "title": "Loading..."
+    },
+    "header": {
+      "actions": {
+        "code": "Code",
+        "preview": "Preview",
+        "publish": "Publish",
+        "preview_options": {
+          "title": "Preview Options",
+          "debugger": "Open Debug Console",
+          "skip_auth_screen": "Skip Auth Screen",
+          "open_new_instance": "Open multiple instances",
+          "landscape_terrain_enabled": "Enable Landscape Terrains"
+        },
+        "publish_options": {
+          "history": "Publishing History"
+        }
+      }
+    }
+  },
+  "scene_list": {
+    "my_scenes": "My Scenes",
+    "import_scene": "Import Scene",
+    "templates": "Templates",
+    "sort_by": "Sort by",
+    "project_actions": {
+      "delete_project": "Delete from My Scenes",
+      "duplicate_project": "Duplicate",
+      "open_folder": "Open Folder Location"
+    },
+    "no_scenes": {
+      "title": "Create your first scene",
+      "description": "Unleash your creativity. Start building scenes for your LANDs and Worlds and share with the community. <a>Learn more about creating Scenes.</a>"
+    },
+    "sort": {
+      "name": "Name",
+      "newest": "Newest",
+      "size": "Size"
+    },
+    "results": "{count} {count, plural, one {scene} other {scenes}}",
+    "parcel_count": "{parcels} {parcels, plural, one {parcel} other {parcels}}",
+    "saving": "Saving...",
+    "badges": {
+      "published": "Published"
+    }
+  },
+  "navbar": {
+    "menu": {
+      "home": "Home",
+      "scenes": "Scenes",
+      "collections": "Collections",
+      "manage": "Manage",
+      "learn": "Learn",
+      "more": "More"
+    },
+    "feedback": "Submit feedback",
+    "report_an_issue": "Report an Issue",
+    "user_menu": {
+      "sign_in": "Sign In",
+      "sign_out": "Sign Out"
+    }
+  },
+  "modal": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "missing_projects": {
+      "title": "Scenes missing reference files",
+      "find": "Find",
+      "discard": "Delete",
+      "discard_all": "Delete all"
+    },
+    "delete_project": {
+      "title": "Are you sure you want to delete \"{title}\"?",
+      "remove_imported_scene": "This will only remove \"{title}\" from the Editor. The original scene files on your computer will not be affected"
+    },
+    "publish_project": {
+      "title": "Publish \"{title}\"",
+      "select": "Where would you like to deploy your scene to?",
+      "worlds": {
+        "title": "Worlds",
+        "description": "Your own virtual space, separate from Genesis City. Claim yours when you get a NAME.",
+        "action": "Publish to a World",
+        "select_world": {
+          "title": "Publish to World",
+          "description": "Select the Decentraland NAME or ENS Domain that will define the URL",
+          "world_name": "WORLD (NAME)",
+          "placeholder": "Select a Name",
+          "claim_new_name": "Claim a new NAME",
+          "claim_new_ens_domain": "Claim an ENS Domain",
+          "action": "Publish",
+          "ens_providers": {
+            "dcl": "NAME",
+            "ens": "ENS Domain"
+          },
+          "world_has_content": "The existing content in {world} World will be replaced with the new content you're about to publish.",
+          "confirm_world_replace_content": "I understand that this action is irreversible"
+        },
+        "empty_names": {
+          "title": "You don't have any available World",
+          "description": "<b>Get a free world when you own a NAME</b>.<br></br>Each NAME will give you access to one World. You can have as many as you want.",
+          "action": "Claim a new Name"
+        }
+      },
+      "land": {
+        "title": "My Land",
+        "description": "The parcels that make up Decentraland's Genesis City map. Buy or rent your own in the Marketplace.",
+        "action": "Publish to Land",
+        "select_parcel": {
+          "select_parcel": "Select the LANDs that will host your Scene",
+          "place_scene": "Placing Scene at {coords}",
+          "actions": {
+            "publish": "Publish",
+            "reset": "Reset"
+          }
+        }
+      },
+      "alternative_servers": {
+        "title": "Publish to a different server",
+        "list": "Alternate Servers",
+        "options": {
+          "test_server": "Test Server",
+          "custom_server": "Custom Server"
+        },
+        "custom_server_url": "Server URL",
+        "action": {
+          "test_server": "Publish to Test Server",
+          "custom_server": "Publish to Custom Server"
+        },
+        "errors": {
+          "url": "Invalid URL"
+        }
+      },
+      "deploy": {
+        "world": "Publish to your World",
+        "land": "Publish to your Land",
+        "loading": "Loading...",
+        "error": "Error",
+        "warning": {
+          "message": "PLEASE READ CAREFULLY:<ul><li>After deployment, your scene will undergo processing before becoming available.</li><li>This process may take 15 minutes on average.</li><li>During this time, your scene will appear empty until it has been updated on the client.</li></ul>",
+          "checkbox": "Don't show again",
+          "continue": "Continue",
+          "back": "Go back"
+        },
+        "ethereum": {
+          "mainnet": "Mainnet",
+          "testnet": "Testnet"
+        },
+        "files": {
+          "count": "{count} {count, plural, one {file} other {files}}",
+          "size": "Total Size <b>{size}</b>",
+          "publish": "Publish"
+        },
+        "deploying": {
+          "publish": "Publishing...",
+          "finishing": "Finishing up...",
+          "failed": "Publishing failed",
+          "try_again": "Please try again",
+          "info": "This process may take 15 minutes on average. During this time, your scene may appear empty until it has been updated in the client.",
+          "step": {
+            "uploading": "Uploading",
+            "converting": "Converting",
+            "optimizing": "Optimizing",
+            "loading": "In process...",
+            "failed": "Error"
+          },
+          "errors": {
+            "details": "Details",
+            "fetch_status": "Failed to fetch deployment information.\nPlease, try again.",
+            "catalyst": "Deployment to the Catalyst nodes failed.\nPlease retry or check your internet connection.",
+            "max_retries": "Retry limit exceeded.\nPlease, try again later.",
+            "not_found": "Something went wrong.\nPlease, try again.",
+            "failed": "Something went wrong.\nPlease, try again.",
+            "invalid_url": "Something went wrong.\nPlease, try again.",
+            "invalid_identity": "Something went wrong.\nPlease, try again.",
+            "max_file_size_exceeded": "One or more assets exceed the allowed limit ({maxFileSizeInMb}MB).\nOptimize or remove large files and try again.",
+            "unknown": "Something went wrong.\nPlease, try again."
+          },
+          "actions": {
+            "report_issue": "Report an issue",
+            "retry": "Retry"
+          }
+        },
+        "success": {
+          "message": "You scene is successfully published",
+          "url": "The URL to jump in your {target} is:",
+          "world": "World",
+          "land": "Land",
+          "jump_in": "Jump In",
+          "in_progress": "You can now access your scene even while it's still processing."
+        }
+      }
+    },
+    "publish_history": {
+      "title": "Publish History"
+    },
+    "app_settings": {
+      "title": "App Settings",
+      "fields": {
+        "scenes_folder": {
+          "label": "Scenes Folder",
+          "change_button": "Change Folder"
+        },
+        "scene_editor_dependencies": {
+          "label": "Scene Editor Dependencies",
+          "options": {
+            "auto_update": "Auto-update all my scenes",
+            "notify": "Notify me of new version updates",
+            "do_nothing": "Do nothing"
+          }
+        }
+      },
+      "actions": {
+        "apply_button": "Apply"
+      },
+      "version": {
+        "current": "Current Version: {version}",
+        "new": "New version: {version}",
+        "up_to_date": "Creator Hub is up to date",
+        "label": "Version: {version}"
+      },
+      "update": {
+        "applying": "Applying updates.",
+        "dont_close": "Please don't close the app.",
+        "auto_restart": "Creator Hub will auto-restart after the update.",
+        "downloading": "Downloading... {progress}%",
+        "install": "Install now",
+        "update": "Update now",
+        "check": "Check for updates",
+        "checking": "Checking for updates...",
+        "error": "We couldn't check for updates.\nPlease try again later.",
+        "update_available": "Update Available"
+      }
+    },
+    "create_project": {
+      "title": "Create Project",
+      "fields": {
+        "name": "Project Name",
+        "path": "Project Path"
+      },
+      "actions": {
+        "create": "Create"
+      },
+      "errors": {
+        "path_exists": "Path already exists"
+      }
+    },
+    "install_client": {
+      "title": "To jump in, you'll need to install Decentraland first",
+      "download": "Download",
+      "download_macos": "DOWNLOAD FOR MACOS",
+      "download_win": "DOWNLOAD FOR WINDOWS",
+      "cancel": "NOT NOW"
+    }
+  },
+  "snackbar": {
+    "generic": {
+      "import_scene": "Importing scene...",
+      "import_scene_failed": "Failed importing scene",
+      "duplicate_scene": "Duplicating scene...",
+      "duplicate_scene_failed": "Failed duplicating scene",
+      "delete_scene": "Deleting scene...",
+      "delete_scene_failed": "Failed deleting scene",
+      "dependencies_updated": "Scene dependencies were updated",
+      "installing_dependencies": "Installing dependencies...",
+      "installing_dependencies_failed": "Failed installing dependencies"
+    },
+    "missing_projects": {
+      "title": "{scenes} {scenes, plural, one {scene} other {scenes}} could not be loaded due to missing files",
+      "actions": {
+        "view": "View",
+        "discard_all": "Discard all"
+      }
+    },
+    "new_dependency_version": {
+      "title": "New dependencies version detected",
+      "actions": {
+        "update": "Update"
+      }
+    },
+    "deploy": {
+      "pending": {
+        "title": "{title} publishing is in process...",
+        "actions": {
+          "view": "View"
+        }
+      },
+      "success": {
+        "title": "{title} has been published successfully",
+        "actions": {
+          "view": "View"
+        }
+      },
+      "error": {
+        "title": "{title} publishing process failed",
+        "actions": {
+          "retry": "Retry"
+        }
+      }
+    }
+  },
+  "option_box": {
+    "learn_more": "Learn more"
+  },
+  "tutorials": {
+    "title": "Tutorials"
+  },
+  "sign_in": {
+    "back": "Back",
+    "content": {
+      "title": "Secure sign-in step",
+      "body": "Remember the verification number below.<br></br>You'll be prompted to confirm it in your web browser to securely link your sign in.",
+      "verification_code_info": "Keep this number private. It ensures that your sign-in is secure and unique to you.",
+      "expiration": "Verification number will expire in {minutes}:{seconds} minutes"
+    }
+  },
+  "more": {
+    "header": {
+      "title": "More"
+    },
+    "cards": {
+      "create": {
+        "title": "Create",
+        "legacy_web_editor": {
+          "title": "Legacy Web Editor",
+          "description": "Access the old web editor to continue working on your scenes."
+        },
+        "collections": {
+          "title": "Collections",
+          "description": "Create, review and publish your collections of Wearables and Emotes."
+        }
+      },
+      "manage": {
+        "title": "Manage",
+        "names": {
+          "title": "NAMEs",
+          "description": "Claim your unique name and assign it to your avatar or your parcels."
+        },
+        "worlds": {
+          "title": "Worlds",
+          "description": "Create and manage your own virtual spaces."
+        },
+        "land": {
+          "title": "LAND",
+          "description": "Publish Scenes, creata Estates and manage permissions of your LAND."
+        }
+      },
+      "open_in_browser": "Open in Browser"
+    }
+  },
+  "templates": {
+    "title": "Choose a Template",
+    "results": "{count} {count, plural, one {template} other {templates}}",
+    "actions": {
+      "preview": "Preview Template",
+      "code": "View Code"
+    },
+    "new_scene": {
+      "title": "Empty Scene",
+      "description": "Start your own scene from scratch"
+    },
+    "filters": {
+      "title": "Filter by",
+      "difficulty": {
+        "easy": "Easy",
+        "medium": "Medium",
+        "hard": "Hard"
+      }
+    },
+    "sort": {
+      "title": "Sort by:",
+      "default": "Default",
+      "newest": "Newest"
+    }
+  },
+  "learn": {
+    "header": {
+      "title": "Learn",
+      "videos": "Videos",
+      "docs": "Creator Docs",
+      "more": "More"
+    },
+    "see_all": "See All",
+    "videos": {
+      "title": "Videos"
+    },
+    "docs": {
+      "title": "Creator Docs"
+    }
+  }
+}

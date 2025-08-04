@@ -1,0 +1,89 @@
+.SceneCard.container {
+  width: 100%;
+  background-color: #313131;
+  border-radius: 10px;
+  height: 260px;
+  display: flex;
+  flex-direction: column;
+  border: none;
+  padding: 0;
+  color: white;
+  cursor: not-allowed;
+}
+
+.SceneCard.container:not(:disabled) {
+  cursor: pointer;
+}
+
+.SceneCard.container:disabled .media {
+  filter: grayscale(1);
+}
+
+.SceneCard .media {
+  width: 100%;
+  flex: 1;
+  position: relative;
+  height: 100%;
+}
+
+.SceneCard .thumbnail {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  object-fit: cover;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.SceneCard .thumbnail.hidden {
+  display: none;
+}
+
+.SceneCard .cardInfo {
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  text-align: left;
+  width: 100%;
+}
+
+.SceneCard .cardInfo .info {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 15px;
+}
+
+.SceneCard .description {
+  display: flex;
+  gap: 20px;
+}
+
+.SceneCard .descriptionInfo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.SceneCard.container:disabled .descriptionInfo {
+  opacity: 0.5;
+}
+
+.SceneCard .descriptionInfo .title {
+  font-size: 18px;
+  line-height: 22px;
+  font-family: var(--font-family);
+  font-weight: 600;
+}
+
+.SceneCard .descriptionInfo .subtitle {
+  font-size: 14px;
+  line-height: 24px;
+}
+
+.SceneCard .badge:global(.dcl.badge) {
+  height: fit-content;
+  padding: 2px 8px;
+  font-weight: normal;
+  border-radius: 34px;
+}
