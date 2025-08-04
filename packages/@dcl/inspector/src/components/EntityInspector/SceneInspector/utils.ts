@@ -101,7 +101,7 @@ export function toScene(inputs: SceneInput): EditorComponentsTypes['Scene'] {
     email: inputs.email,
     skyboxConfig: {
       fixedTime: Number(inputs.skyboxConfig.fixedTime ?? MIDDAY_SECONDS),
-      transitionMode: inputs.skyboxConfig.transitionMode as unknown as TransitionMode
+      transitionMode: Number(inputs.skyboxConfig.transitionMode) as TransitionMode
     },
     silenceVoiceChat: inputs.silenceVoiceChat,
     disablePortableExperiences: inputs.disablePortableExperiences,
