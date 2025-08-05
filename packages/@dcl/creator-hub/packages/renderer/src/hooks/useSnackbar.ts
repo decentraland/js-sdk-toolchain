@@ -1,5 +1,6 @@
-import { useCallback, type SyntheticEvent } from 'react';
-import { type SnackbarCloseReason } from 'decentraland-ui2';
+import type { type SyntheticEvent } from 'react';
+import { useCallback } from 'react';
+import type { type SnackbarCloseReason } from 'decentraland-ui2';
 
 import { actions } from '/@/modules/store/snackbar';
 import {

@@ -1,20 +1,22 @@
 import equal from 'fast-deep-equal';
 import { getCatalystServersFromCache } from 'dcl-catalyst-client/dist/contracts-snapshots';
-import { type SerializedError } from '@reduxjs/toolkit';
-import { type AuthChain, Authenticator } from '@dcl/crypto';
+import type { type SerializedError } from '@reduxjs/toolkit';
+import type { type AuthChain} from '@dcl/crypto';
+import { Authenticator } from '@dcl/crypto';
 import { ChainId } from '@dcl/schemas';
 import type { AuthIdentity } from 'decentraland-crypto-fetch';
 
 import { t } from '/@/modules/store/translation/utils';
 import { minutes, seconds } from '/shared/time';
 import { delay } from '/shared/utils';
-import {
-  DEPLOY_URLS,
+import type {
   type Info,
   type File,
   type AssetBundleRegistryResponse,
   type Status,
-  type DeploymentComponentsStatus,
+  type DeploymentComponentsStatus} from '/@/lib/deploy';
+import {
+  DEPLOY_URLS,
   STATUS_VALUES,
   DeploymentError,
 } from '/@/lib/deploy';
@@ -73,7 +75,7 @@ export const deploy = async (
 };
 
 export const getInitialDeploymentStatus = (
-  isWorld: boolean = false,
+  isWorld = false,
 ): DeploymentComponentsStatus => ({
   catalyst: 'idle',
   assetBundle: 'idle',
@@ -264,7 +266,7 @@ export async function checkDeploymentStatus(
  */
 export function checkDeploymentCompletion(
   status: DeploymentComponentsStatus,
-  percentage: number = 0.6,
+  percentage = 0.6,
 ): boolean {
   const statuses = Object.values(status);
   const total = statuses.length;

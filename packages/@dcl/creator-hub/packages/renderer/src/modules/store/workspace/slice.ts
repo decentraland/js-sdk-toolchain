@@ -1,8 +1,10 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { type PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
-import { type Project, SortBy } from '/shared/types/projects';
+import type { type Project} from '/shared/types/projects';
+import { SortBy } from '/shared/types/projects';
 import { DEFAULT_DEPENDENCY_UPDATE_STRATEGY } from '/shared/types/settings';
-import { type Workspace } from '/shared/types/workspace';
+import type { type Workspace } from '/shared/types/workspace';
 
 import type { Async } from '/shared/types/async';
 

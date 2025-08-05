@@ -1,4 +1,5 @@
-import net, { type AddressInfo } from 'net';
+import type { type AddressInfo } from 'net';
+import net from 'net';
 import { future } from 'fp-future';
 
 export async function getAvailablePort() {

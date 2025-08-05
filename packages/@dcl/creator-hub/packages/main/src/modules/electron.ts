@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'fs/promises';
-import { app, BrowserWindow, clipboard, dialog, type OpenDialogOptions, shell } from 'electron';
+import type { type OpenDialogOptions} from 'electron';
+import { app, BrowserWindow, clipboard, dialog, shell } from 'electron';
 
 export function getHome() {
   return app.getPath('home');

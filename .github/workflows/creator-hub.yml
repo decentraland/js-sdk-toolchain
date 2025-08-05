@@ -1,6 +1,5 @@
 name: Creator Hub CI/CD
 
-# This workflow handles all Creator Hub related CI/CD processes
 on:
   workflow_dispatch:
   push:
@@ -108,7 +107,7 @@ jobs:
 
       - name: Run E2E tests (Ubuntu)
         if: matrix.os == 'ubuntu-latest' && env.ENABLE_E2E_TESTS == 'true'
-        run: xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e:ci --if-present
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run build && vitest run
         working-directory: ${{ env.WORKING_DIRECTORY }}
         env:
           NODE_OPTIONS: "--max-old-space-size=8192"
@@ -116,7 +115,7 @@ jobs:
 
       - name: Run E2E tests (Non-Ubuntu)
         if: matrix.os != 'ubuntu-latest' && env.ENABLE_E2E_TESTS == 'true'
-        run: npm run test:e2e:ci --if-present
+        run: npm run build && vitest run
         working-directory: ${{ env.WORKING_DIRECTORY }}
         env:
           NODE_OPTIONS: "--max-old-space-size=8192"
@@ -219,8 +218,8 @@ jobs:
           retry_wait_seconds: 15
           retry_on: error
           shell: 'bash'
-          command: npx electron-builder --config electron-builder.cjs --config.extraMetadata.version=${{ steps.version.outputs.version }} ${{ matrix.os == 'macos-latest' && format('--config.mac.notarize={0}', true) || '' }} --publish always
-        working-directory: ${{ env.WORKING_DIRECTORY }}
+          command: npx electron-builder --config electron-builder.cjs --config.extraMetadata.version=${{ steps.version.outputs.version }} ${{ matrix.os == 'macos-latest' && '--config.mac.notarize=true' || '' }} --publish always
+          working-directory: ${{ env.WORKING_DIRECTORY }}
         env:
           USE_HARD_LINKS: false
           CSC_LINK: ${{ secrets.MACOS_CSC_LINK }}
@@ -336,7 +335,7 @@ jobs:
           echo "[mac-x64](${{ secrets.SDK_TEAM_S3_BASE_URL }}/creator-hub/branch/${{ github.head_ref }}/Decentraland%20Creator%20Hub-${{ steps.version.outputs.version }}-mac-x64.dmg)" >> $GITHUB_ENV
           echo "[mac-arm64](${{ secrets.SDK_TEAM_S3_BASE_URL }}/creator-hub/branch/${{ github.head_ref }}/Decentraland%20Creator%20Hub-${{ steps.version.outputs.version }}-mac-arm64.dmg)" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
-          content=$(cat ./.github/workflows/ch-macos-instructions.md)
+          content=$(cat ./.github/workflows/creator-hub-macos-instructions.md)
           echo "macos-instructions<<EOF" >> $GITHUB_ENV
           echo "$content" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV

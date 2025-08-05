@@ -1,16 +1,15 @@
-name: Manual - Lint & Snapshot update
+name: Ready for Review
 
 on:
   workflow_dispatch:
-  # Also trigger on Creator Hub changes
   push:
-    paths:
-      - 'packages/@dcl/creator-hub/**'
-      - 'packages/@dcl/inspector/**'
+    branches:
+      - main
+      - experimental
   pull_request:
-    paths:
-      - 'packages/@dcl/creator-hub/**'
-      - 'packages/@dcl/inspector/**'
+  release:
+    types:
+      - created
 
 jobs:
   # ============================================================================
@@ -49,11 +48,11 @@ jobs:
           commit_message: automatic linter and snapshot tests
 
   # ============================================================================
-  # Creator Hub Lint & Snapshot Update
+  # Creator Hub Lint
   # ============================================================================
 
   creator-hub-lint:
-    name: Creator Hub Lint & Snapshot Update
+    name: Creator Hub Lint
     runs-on: ubuntu-latest
     if: |
       github.event_name == 'workflow_dispatch' ||
@@ -82,10 +81,6 @@ jobs:
         run: npm run lint:fix --if-present
         working-directory: packages/@dcl/creator-hub
 
-      - name: Run Creator Hub tests
-        run: npm run test:main --if-present
-        working-directory: packages/@dcl/creator-hub
-
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: automatic creator hub linter and tests
+          commit_message: automatic creator hub linter

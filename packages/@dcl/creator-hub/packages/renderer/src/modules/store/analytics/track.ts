@@ -2,7 +2,7 @@ import { actions as workspaceActions } from '../workspace';
 import { actions as editorActions } from '../editor';
 import type { Events } from '/shared/types/analytics';
 import type { Project } from '/shared/types/projects';
-import { type GetState } from '#store';
+import type { type GetState } from '#store';
 
 type ActionWithPayload<P> = {
   type: string;

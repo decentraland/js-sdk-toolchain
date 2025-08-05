@@ -9,7 +9,8 @@ import { isDev } from '/@/modules/utils';
 import type { Async } from '/shared/types/async';
 import { ens as ensContract, ensResolver, dclRegistrar } from './contracts';
 import { getEnsProvider, isValidENSName } from './utils';
-import { USER_PERMISSIONS, type ENS, type ENSError } from './types';
+import type { type ENS, type ENSError } from './types';
+import { USER_PERMISSIONS } from './types';
 
 const REQUESTS_BATCH_SIZE = 25;
 const limit = pLimit(REQUESTS_BATCH_SIZE);

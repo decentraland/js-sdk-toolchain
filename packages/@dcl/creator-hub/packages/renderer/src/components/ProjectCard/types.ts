@@ -1,4 +1,4 @@
-import { type TypographyProps } from 'decentraland-ui2';
+import type { type TypographyProps } from 'decentraland-ui2';
 import type { ReactNode } from 'react';
 
 import type { Status } from '/shared/types/async';

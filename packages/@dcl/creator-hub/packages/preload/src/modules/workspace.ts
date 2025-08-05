@@ -1,11 +1,12 @@
 import { shell } from 'electron';
 import type { Scene } from '@dcl/schemas';
 
-import {
+import type {
   type DependencyState,
-  SortBy,
   type Project,
-  type ProjectInfo,
+  type ProjectInfo} from '/shared/types/projects';
+import {
+  SortBy,
 } from '/shared/types/projects';
 import { PACKAGES_LIST } from '/shared/types/pkg';
 import { DEFAULT_DEPENDENCY_UPDATE_STRATEGY } from '/shared/types/settings';

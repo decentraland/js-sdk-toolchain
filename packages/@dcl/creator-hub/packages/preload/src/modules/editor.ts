@@ -1,4 +1,5 @@
-import { ipcRenderer, type IpcRendererEvent } from 'electron';
+import type { type IpcRendererEvent } from 'electron';
+import { ipcRenderer } from 'electron';
 
 import type { DeployOptions } from '/shared/types/deploy';
 

@@ -1,10 +1,11 @@
 import { fileURLToPath } from 'node:url';
 import { join, resolve } from 'node:path';
-import { app, type BrowserWindow } from 'electron';
+import type { type BrowserWindow } from 'electron';
+import { app } from 'electron';
 import { createServer } from 'http-server';
 import log from 'electron-log';
 
-import { type Child } from './bin';
+import type { type Child } from './bin';
 import { getAvailablePort } from './port';
 import { createWindow, focusWindow, getWindow } from './window';
 import * as cache from './cache';

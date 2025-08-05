@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { type PackageJson } from '/shared/types/pkg';
+import type { type PackageJson } from '/shared/types/pkg';
 
 /**
  * Return the package json of a given module

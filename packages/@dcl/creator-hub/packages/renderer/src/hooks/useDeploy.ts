@@ -1,7 +1,8 @@
 import { useCallback } from 'react';
 import type { ChainId } from '@dcl/schemas';
 
-import { actions, type Deployment } from '/@/modules/store/deployment';
+import type { type Deployment } from '/@/modules/store/deployment';
+import { actions } from '/@/modules/store/deployment';
 import {
   deriveOverallStatus as _deriveOverallStatus,
   checkDeploymentCompletion,

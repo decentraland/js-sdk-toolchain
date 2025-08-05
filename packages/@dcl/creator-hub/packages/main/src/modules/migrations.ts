@@ -6,9 +6,11 @@ import { future } from 'fp-future';
 import deepmerge from 'deepmerge';
 
 import { SCENES_DIRECTORY } from '/shared/paths';
-import { FileSystemStorage, type IFileSystemStorage } from '/shared/types/storage';
+import type { type IFileSystemStorage } from '/shared/types/storage';
+import { FileSystemStorage } from '/shared/types/storage';
+import type {
+  type Config} from '/shared/types/config';
 import {
-  type Config,
   CURRENT_CONFIG_VERSION,
   DEFAULT_CONFIG,
   mergeConfig,

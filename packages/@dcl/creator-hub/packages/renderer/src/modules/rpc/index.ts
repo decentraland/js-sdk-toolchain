@@ -3,10 +3,11 @@ import { MessageTransport } from '@dcl/mini-rpc';
 import { debounceByKey } from '/shared/utils';
 import { CameraRPC } from './camera';
 
-import { type Project } from '/shared/types/projects';
+import type { type Project } from '/shared/types/projects';
 
 import { UiRPC } from './ui';
-import { type Method, type Params, type Result, StorageRPC } from './storage';
+import type { type Method, type Params, type Result} from './storage';
+import { StorageRPC } from './storage';
 import { fs, custom } from '#preload';
 
 export type RPCInfo = {

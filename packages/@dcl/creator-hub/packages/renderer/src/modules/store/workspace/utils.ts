@@ -1,7 +1,7 @@
 import { npm, workspace } from '#preload';
 
 import { DEPENDENCY_UPDATE_STRATEGY } from '/shared/types/settings';
-import { type DependencyState } from '/shared/types/projects';
+import type { type DependencyState } from '/shared/types/projects';
 
 export const hasOutdatedDependencies = (deps: DependencyState) => {
   return !!Object.keys(deps).length;

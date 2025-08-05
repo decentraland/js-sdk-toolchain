@@ -238,7 +238,7 @@ export function run(pkg: string, bin: string, options: RunOptions = {}): Child {
       treeKill(pid);
 
       // child successfully killed
-      const die = (force: boolean = false) => {
+      const die = (force = false) => {
         isKilling = false;
         alive = false;
         cleanup();

@@ -1,5 +1,5 @@
-import { type AsyncThunk } from '@reduxjs/toolkit';
-import { type AppDispatch } from '#store';
+import type { type AsyncThunk } from '@reduxjs/toolkit';
+import type { type AppDispatch } from '#store';
 
 export type RetryConfig = {
   maxRetries?: number;

@@ -1,5 +1,6 @@
 import { URL } from 'node:url';
-import { session, type Session } from 'electron';
+import type { type Session } from 'electron';
+import { session } from 'electron';
 import { app, shell } from 'electron';
 
 const IS_DEV = import.meta.env.DEV;

@@ -2,14 +2,15 @@ import type { Tile } from 'react-tile-map/dist/lib/common';
 import { createAsyncThunk, createSlice, createSelector } from '@reduxjs/toolkit';
 import type { ChainId } from '@dcl/schemas/dist/dapps/chain-id';
 import type { AtlasTileProps } from 'decentraland-ui2/dist/components/Atlas/Atlas.types';
+import type {
+  type Authorization,
+  type Land} from '/@/lib/land';
 import {
   colorByRole,
   coordsToId,
   Lands,
   LandType,
   Rentals,
-  type Authorization,
-  type Land,
 } from '/@/lib/land';
 import type { Async } from '/shared/types/async';
 import { isDev } from '/@/modules/utils';

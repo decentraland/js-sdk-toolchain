@@ -1,7 +1,7 @@
 import { app } from 'electron';
 import path from 'node:path';
 import fs from 'node:fs';
-import { type PackageJson } from '/shared/types/pkg';
+import type { type PackageJson } from '/shared/types/pkg';
 
 /**
  * The path to the unpacked app

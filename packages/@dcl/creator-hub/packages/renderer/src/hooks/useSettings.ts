@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import { actions as workspaceActions } from '/@/modules/store/workspace';
 import { useDispatch, useSelector } from '#store';
 
-import { type AppSettings } from '/shared/types/settings';
+import type { type AppSettings } from '/shared/types/settings';
 
 export const useSettings = () => {
   const dispatch = useDispatch();

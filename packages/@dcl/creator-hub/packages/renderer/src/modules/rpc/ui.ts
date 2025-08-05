@@ -1,4 +1,5 @@
-import { RPC, type Transport } from '@dcl/mini-rpc';
+import type { type Transport } from '@dcl/mini-rpc';
+import { RPC } from '@dcl/mini-rpc';
 
 export enum AssetsTab {
   FileSystem = 'FileSystem',
