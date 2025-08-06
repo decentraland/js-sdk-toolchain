@@ -2,7 +2,7 @@
   "name": "@dcl/inspector",
   "version": "0.1.0",
   "dependencies": {
-    "@dcl/asset-packs": "2.5.2",
+    "@dcl/asset-packs": "https://sdk-team-cdn.decentraland.org/@dcl/asset-packs/branch/feat/enhance-smart-items-metadata/dcl-asset-packs-2.5.4-16787893643.commit-d5a08fd.tgz",
     "ts-deepmerge": "^7.0.0"
   },
   "devDependencies": {
