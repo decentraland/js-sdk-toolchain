@@ -1,2 +1,4 @@
 import Asset from './Asset'
-export { Asset }
+import AssetContainer from './AssetContainer'
+
+export { Asset, AssetContainer }

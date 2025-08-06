@@ -1,0 +1,50 @@
+.SmartItemTooltip {
+  padding: 0 !important;
+  height: 130px;
+  width: 354px;
+  background-color: #161518 !important;
+  border-width: 0.5px 0px 0px 0.5px !important;
+  border-style: solid !important;
+  border-color: #ffffff !important;
+  border-radius: 4px 0px 0px 4px !important;
+}
+
+.SmartItemTooltip::before {
+  display: none !important;
+}
+
+.SmartItemTooltipTrigger {
+  display: inline-block;
+}
+
+.SmartItemTooltip .SmartItemTooltipPreviewImage {
+  object-fit: cover;
+  width: 100%;
+  height: 120px;
+}
+
+.SmartItemTooltip .SmartItemTooltipContent {
+  font-weight: 500;
+  font-size: 10px;
+  line-height: 14px;
+  letter-spacing: 0px;
+  vertical-align: middle;
+}
+
+.SmartItemTooltipText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 8px;
+}
+
+.SmartItemTooltip .SmartItemTooltipDescription {
+  color: #ffffff;
+}
+
+.SmartItemTooltip .SmartItemTooltipAuthor {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #ff2d55;
+}

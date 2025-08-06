@@ -5,10 +5,10 @@ import { BsFillLightningChargeFill as SmartItemIcon } from 'react-icons/bs'
 
 import { getContentsUrl, isSmart, isGround } from '../../../lib/logic/catalog'
 import { Asset } from '../../../lib/logic/catalog'
-import './Asset.css'
-
 import { fetchImage, resizeImage } from '../../../lib/utils/img'
 import { useIsMounted } from '../../../hooks/useIsMounted'
+
+import './Asset.css'
 
 const Asset: React.FC<{ value: Asset }> = ({ value }) => {
   const [, drag, preview] = useDrag(() => ({ type: 'catalog-asset', item: { value } }), [value])
@@ -33,7 +33,6 @@ const Asset: React.FC<{ value: Asset }> = ({ value }) => {
         ref={drag}
         data-test-id={value.id}
         data-test-label={value.name}
-        title={value.name}
       >
         <img src={imgSrc} alt={value.tags.join(', ')} />
         {isSmartItem && (
@@ -41,7 +40,7 @@ const Asset: React.FC<{ value: Asset }> = ({ value }) => {
             <SmartItemIcon />
           </div>
         )}
-        {isGroundItem && <div className="ground-badge  item-badge"></div>}
+        {isGroundItem && <div className="ground-badge item-badge"></div>}
       </div>
     </>
   )
