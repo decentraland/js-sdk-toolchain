@@ -1,7 +1,7 @@
 import future from 'fp-future'
 import * as BABYLON from '@babylonjs/core'
-import { GLTFLoaderAnimationStartMode } from '@babylonjs/loaders'
-import { LoadAssetContainerAsync } from '@babylonjs/core/Loading/sceneLoader'
+import { GLTFFileLoader, GLTFLoaderAnimationStartMode } from '@babylonjs/loaders'
+import { GLTFLoader } from '@babylonjs/loaders/glTF/2.0'
 import { ComponentType, PBGltfContainer } from '@dcl/ecs'
 
 import { markAsCollider } from '../colliders-utils'
@@ -13,6 +13,51 @@ import { CAMERA, PLAYER } from '../../../sdk/tree'
 let sceneContext: WeakRef<SceneContext>
 
 export const resourcesByPath = new Map<string, Set<string>>()
+
+BABYLON.SceneLoader.OnPluginActivatedObservable.add(function (plugin) {
+  if (plugin instanceof GLTFFileLoader) {
+    plugin.animationStartMode = GLTFLoaderAnimationStartMode.NONE
+    plugin.compileMaterials = true
+    plugin.validate = false
+    plugin.createInstances = true
+    plugin.animationStartMode = 0
+    plugin.preprocessUrlAsync = async function (url: string) {
+      // HERE BE DRAGONS 🐉:
+      //  To hack the GLTF loader to use Decentraland's file system, we must
+      //  access private properties to get the parent context to resolve individual
+      //  files.
+      //
+      //  This Hack prevents the engine from caching the entire GLB/GLTF because
+      //  query parameters are added to them. it is RECOMMENDED that the engine
+      //  caches all the files by their name (CIDv1)
+      const loader: GLTFLoader = (plugin as any)._loader
+      const file: string = (loader as any)._fileName
+      const [gltfFilename, strParams] = file.split('?')
+
+      if (strParams) {
+        const params = new URLSearchParams(strParams)
+        const base = params.get('base') || ''
+        const ctx = sceneContext.deref()
+        if (ctx) {
+          const filePath = base + '/' + url
+          console.log(`Fetching ${filePath}`)
+          const content = await ctx.getFile(filePath)
+          if (content) {
+            // This is a hack to get the resources loaded by the gltf file
+            if (!resourcesByPath.has(gltfFilename)) {
+              resourcesByPath.set(gltfFilename, new Set())
+            }
+            const resources = resourcesByPath.get(gltfFilename)!
+            resources.add(filePath)
+            // TODO: this works with File, but it doesn't match the types (it requires string)
+            return new File([content], gltfFilename) as any
+          }
+        }
+      }
+      throw new Error('Cannot resolve file ' + url)
+    }
+  }
+})
 
 export const putGltfContainerComponent: ComponentOperation = (entity, component) => {
   if (component.componentType === ComponentType.LastWriteWinElementSet) {
@@ -74,11 +119,6 @@ export async function loadGltf(entity: EcsEntity, value: string) {
 export function removeGltf(entity: EcsEntity) {
   const context = entity.context.deref()
   if (!context) return
-
-  if (entity.boundingInfoMesh) {
-    entity.boundingInfoMesh.dispose()
-    entity.boundingInfoMesh = undefined
-  }
 
   if (entity.gltfContainer) {
     entity.gltfContainer.setEnabled(false)
@@ -170,51 +210,7 @@ export function loadAssetContainer(
   pluginExtension?: string,
   name?: string
 ) {
-  const gltfPluginOptions = {
-    animationStartMode: GLTFLoaderAnimationStartMode.NONE,
-    compileMaterials: true,
-    validate: false,
-    createInstances: true,
-    preprocessUrlAsync: async (url: string) => {
-      // HERE BE DRAGONS 🐉:
-      //  To hack the GLTF loader to use Decentraland's file system, we must
-      //  access private properties to get the parent context to resolve individual
-      //  files.
-      //
-      //  This Hack prevents the engine from caching the entire GLB/GLTF because
-      //  query parameters are added to them. it is RECOMMENDED that the engine
-      //  caches all the files by their name (CIDv1)
-      const [gltfFilename, strParams] = file.name.split('?')
-      if (strParams) {
-        const params = new URLSearchParams(strParams)
-        const base = params.get('base') || ''
-
-        const ctx = sceneContext.deref()
-        if (ctx) {
-          const filePath = base + '/' + url
-          const content = await ctx.getFile(filePath)
-          if (content) {
-            if (!resourcesByPath.has(gltfFilename)) {
-              resourcesByPath.set(gltfFilename, new Set())
-            }
-            resourcesByPath.get(gltfFilename)!.add(filePath)
-            return new File([content], gltfFilename) as any
-          }
-        }
-      }
-      throw new Error('Cannot resolve file ' + url)
-    }
-  }
-  LoadAssetContainerAsync(file, scene, {
-    name,
-    pluginExtension,
-    pluginOptions: { gltf: gltfPluginOptions },
-    onProgress
-  })
-    .then(onSuccess)
-    .catch((err) => {
-      onError?.(scene, err.message || 'Unknown error', err)
-    })
+  BABYLON.SceneLoader.LoadAssetContainer('', file, scene, onSuccess, onProgress, onError, pluginExtension, name)
 }
 
 export function processGLTFAssetContainer(assetContainer: BABYLON.AssetContainer) {
@@ -451,7 +447,7 @@ function createLoadingSpinner(
     { frame: 100, value: CIRCLE }
   ])
 
-  const animationGroup = new BABYLON.AnimationGroup('loadingSpinnerAnimation', scene)
+  const animationGroup = new BABYLON.AnimationGroup('loadingSpinnerAnimation')
   animationGroup.addTargetedAnimation(rotationAnimation, semiTorus)
   animationGroup.play(true)
 

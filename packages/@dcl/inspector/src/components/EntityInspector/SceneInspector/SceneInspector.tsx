@@ -10,7 +10,15 @@ import { TextField } from '../../ui/TextField'
 import { FileUploadField } from '../../ui/FileUploadField'
 import { ACCEPTED_FILE_TYPES } from '../../ui/FileUploadField/types'
 import { Props } from './types'
-import { fromScene, toScene, isValidInput, isImage, fromSceneSpawnPoint, toSceneSpawnPoint } from './utils'
+import {
+  fromScene,
+  toScene,
+  isValidInput,
+  isImage,
+  fromSceneSpawnPoint,
+  toSceneSpawnPoint,
+  MIDDAY_SECONDS
+} from './utils'
 
 import './SceneInspector.css'
 import { EditorComponentsTypes, SceneAgeRating, SceneCategory, SceneSpawnPoint } from '../../../lib/sdk/components'
@@ -18,6 +26,7 @@ import { Dropdown } from '../../ui/Dropdown'
 import { TextArea } from '../../ui'
 import { Tabs } from '../Tabs'
 import { CheckboxField } from '../../ui/CheckboxField'
+import RangeHourField from '../../ui/RangeHourField/RangeHourField'
 import { useComponentValue } from '../../../hooks/sdk/useComponentValue'
 import { useArrayState } from '../../../hooks/useArrayState'
 import { AddButton } from '../AddButton'
@@ -30,6 +39,7 @@ import { Tab } from '../Tab'
 import { transformBinaryToBase64Resource } from '../../../lib/data-layer/host/fs-utils'
 import { selectThumbnails } from '../../../redux/app'
 import { Layout } from './Layout'
+import { TransitionMode } from '../../../lib/sdk/components/SceneMetadata'
 
 const AGE_RATING_OPTIONS = [
   {
@@ -101,12 +111,45 @@ export default withSdk<Props>(({ sdk, entity }) => {
   const categoriesProps = getInputProps('categories')
   const authorProps = getInputProps('author')
   const emailProps = getInputProps('email')
+  const transitionModeProps = getInputProps('skyboxConfig.transitionMode')
   const silenceVoiceChatProps = getInputProps('silenceVoiceChat', (e) => e.target.checked)
   const disablePortableExperiencesProps = getInputProps('disablePortableExperiences', (e) => e.target.checked)
 
   const [componentValue, setComponentValue, isComponentEqual] = useComponentValue<EditorComponentsTypes['Scene']>(
     entity,
     Scene
+  )
+
+  const handleSkyboxAutoChange = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const isAuto = e.target.checked
+      const newValue = {
+        ...componentValue,
+        skyboxConfig: {
+          ...componentValue.skyboxConfig,
+          fixedTime: isAuto ? undefined : MIDDAY_SECONDS
+        }
+      }
+
+      setComponentValue(newValue)
+    },
+    [sdk, Scene, entity, componentValue, setComponentValue]
+  )
+
+  const handleSkyboxTimeChange = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { value } = e.target as HTMLInputElement
+      const newValue = {
+        ...componentValue,
+        skyboxConfig: {
+          ...componentValue.skyboxConfig,
+          fixedTime: parseInt(value)
+        }
+      }
+
+      setComponentValue(newValue)
+    },
+    [sdk, Scene, entity, componentValue, setComponentValue]
   )
 
   const [spawnPoints, addSpawnPoint, modifySpawnPoint, removeSpawnPoint] = useArrayState<SceneSpawnPoint>(
@@ -424,6 +467,26 @@ export default withSdk<Props>(({ sdk, entity }) => {
           <Block label="Spawn Settings" className="underlined"></Block>
           {spawnPoints.map((spawnPoint, index) => renderSpawnPoint(spawnPoint, index))}
           <AddButton onClick={handleAddSpawnPoint}>Add Spawn Point</AddButton>
+          <Block label="Skybox" className="underlined"></Block>
+          <CheckboxField
+            label="Auto (decentraland time)"
+            checked={componentValue.skyboxConfig?.fixedTime === undefined}
+            onChange={handleSkyboxAutoChange}
+          />
+          <RangeHourField
+            value={componentValue.skyboxConfig?.fixedTime ?? MIDDAY_SECONDS}
+            onChange={handleSkyboxTimeChange}
+            disabled={componentValue.skyboxConfig?.fixedTime === undefined}
+          />
+          <Dropdown
+            label="Transition Mode"
+            options={[
+              { label: 'Forward', value: TransitionMode.TM_FORWARD },
+              { label: 'Backward', value: TransitionMode.TM_BACKWARD }
+            ]}
+            {...transitionModeProps}
+            disabled={componentValue.skyboxConfig?.fixedTime === undefined}
+          />
         </>
       ) : null}
     </Container>
