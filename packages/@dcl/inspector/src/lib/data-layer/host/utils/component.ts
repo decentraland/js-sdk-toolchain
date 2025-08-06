@@ -5,6 +5,7 @@ import { Scene } from '@dcl/schemas'
 
 import { EditorComponentsTypes, SceneAgeRating, SceneCategory, SceneComponent } from '../../../sdk/components'
 import { getConfig } from '../../../logic/config'
+import { TransitionMode } from '../../../sdk/components/SceneMetadata'
 
 export function isEqual(component: ComponentDefinition<unknown>, prevValue: unknown, newValue: unknown) {
   if (prevValue === newValue || (!prevValue && !newValue)) return true
@@ -30,7 +31,10 @@ const parseCoords = (coords: string) => {
   return { x: parseInt(x), y: parseInt(y) }
 }
 
-type SceneWithRating = Scene & { rating: SceneAgeRating }
+type SceneWithRating = Scene & {
+  rating: SceneAgeRating
+  skyboxConfig?: { fixedTime?: number; transitionMode?: TransitionMode }
+}
 
 export function fromSceneComponent(value: DeepReadonlyObject<EditorComponentsTypes['Scene']>): Partial<Scene> {
   const tags: string[] = []
@@ -73,7 +77,11 @@ export function fromSceneComponent(value: DeepReadonlyObject<EditorComponentsTyp
       voiceChat: value.silenceVoiceChat ? 'disabled' : 'enabled',
       portableExperiences: value.disablePortableExperiences ? 'disabled' : 'enabled'
     },
-    rating: value.ageRating
+    rating: value.ageRating,
+    skyboxConfig: {
+      fixedTime: value.skyboxConfig?.fixedTime,
+      transitionMode: value.skyboxConfig?.transitionMode
+    }
   }
 
   if (config.segmentAppId && config.projectId) {
@@ -114,6 +122,10 @@ export function toSceneComponent(value: Scene): EditorComponentsTypes['Scene'] {
     silenceVoiceChat: value.featureToggles?.voiceChat === 'disabled',
     disablePortableExperiences: value.featureToggles?.portableExperiences === 'disabled',
     ageRating: (value as SceneWithRating).rating,
+    skyboxConfig: {
+      fixedTime: (value as SceneWithRating).skyboxConfig?.fixedTime,
+      transitionMode: (value as SceneWithRating).skyboxConfig?.transitionMode
+    },
     spawnPoints: value.spawnPoints?.map((spawnPoint, index) => ({
       name: spawnPoint.name || `Spawn Point ${index + 1}`,
       default: spawnPoint.default,

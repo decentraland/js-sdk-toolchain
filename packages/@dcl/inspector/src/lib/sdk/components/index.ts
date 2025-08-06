@@ -16,6 +16,16 @@ import {
 import { Layout } from '../../utils/layout'
 import { GizmoType } from '../../utils/gizmo'
 import { TransformConfig } from './TransformConfig'
+import {
+  Coords,
+  defineSceneComponents,
+  getLatestSceneComponentVersion,
+  SceneAgeRating,
+  SceneCategory,
+  TransitionMode
+} from './SceneMetadata'
+
+export { SceneAgeRating, SceneCategory }
 
 export type Component<T = unknown> = ComponentDefinition<T>
 export type Node = { entity: Entity; open?: boolean; children: Entity[] }
@@ -41,31 +51,26 @@ export enum CoreComponents {
   VISIBILITY_COMPONENT = 'core::VisibilityComponent'
 }
 
-export enum EditorComponentNames {
-  Selection = 'inspector::Selection',
-  Scene = 'inspector::SceneMetadata',
-  Nodes = 'inspector::Nodes',
-  ActionTypes = ComponentName.ACTION_TYPES,
-  Actions = ComponentName.ACTIONS,
-  Counter = ComponentName.COUNTER,
-  CounterBar = ComponentName.COUNTER_BAR,
-  Triggers = ComponentName.TRIGGERS,
-  States = ComponentName.STATES,
-  TransformConfig = 'inspector::TransformConfig',
-  Hide = 'inspector::Hide',
-  Lock = 'inspector::Lock',
-  Config = 'inspector::Config',
-  Ground = 'inspector::Ground',
-  Tile = 'inspector::Tile',
-  CustomAsset = 'inspector::CustomAsset',
-  AdminTools = ComponentName.ADMIN_TOOLS,
-  Rewards = ComponentName.REWARDS,
-  VideoScreen = ComponentName.VIDEO_SCREEN
-}
-
-export enum SceneAgeRating {
-  Teen = 'T',
-  Adult = 'A'
+export const EditorComponentNames = {
+  Selection: 'inspector::Selection',
+  Scene: getLatestSceneComponentVersion().key,
+  Nodes: 'inspector::Nodes',
+  ActionTypes: ComponentName.ACTION_TYPES,
+  Actions: ComponentName.ACTIONS,
+  Counter: ComponentName.COUNTER,
+  CounterBar: ComponentName.COUNTER_BAR,
+  Triggers: ComponentName.TRIGGERS,
+  States: ComponentName.STATES,
+  TransformConfig: 'inspector::TransformConfig',
+  Hide: 'inspector::Hide',
+  Lock: 'inspector::Lock',
+  Config: 'inspector::Config',
+  Ground: 'inspector::Ground',
+  Tile: 'inspector::Tile',
+  CustomAsset: 'inspector::CustomAsset',
+  AdminTools: ComponentName.ADMIN_TOOLS,
+  Rewards: ComponentName.REWARDS,
+  VideoScreen: ComponentName.VIDEO_SCREEN
 }
 
 export type SceneSpawnPointCoord = { $case: 'single'; value: number } | { $case: 'range'; value: number[] }
@@ -88,6 +93,10 @@ export type SceneSpawnPoint = {
 export type SceneComponent = {
   name?: string
   description?: string
+  skyboxConfig?: {
+    fixedTime?: number
+    transitionMode?: TransitionMode
+  }
   thumbnail?: string
   ageRating?: SceneAgeRating
   main?: string
@@ -106,7 +115,7 @@ export const AllComponents = {
   ...EditorComponentNames
 }
 
-type AllComponentsType = CoreComponents | EditorComponentNames
+type AllComponentsType = CoreComponents | typeof EditorComponentNames[keyof typeof EditorComponentNames]
 
 export type ConfigComponent = {
   isBasicViewEnabled: boolean
@@ -127,20 +136,6 @@ export type TileComponent = {}
 
 export type CustomAssetComponent = {
   assetId: string
-}
-
-export enum SceneCategory {
-  ART = 'art',
-  GAME = 'game',
-  CASINO = 'casino',
-  SOCIAL = 'social',
-  MUSIC = 'music',
-  FASHION = 'fashion',
-  CRYPTO = 'crypto',
-  EDUCATION = 'education',
-  SHOP = 'shop',
-  BUSINESS = 'business',
-  SPORTS = 'sports'
 }
 
 export type EditorComponentsTypes = {
@@ -262,11 +257,6 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     gizmo: Schemas.Int
   })
 
-  const Coords = Schemas.Map({
-    x: Schemas.Int,
-    y: Schemas.Int
-  })
-
   // legacy component
   // we define the schema of the legacy component for retrocompat purposes
   engine.defineComponent('inspector::Scene', {
@@ -276,52 +266,7 @@ export function createEditorComponents(engine: IEngine): EditorComponents {
     })
   })
 
-  const Scene = engine.defineComponent(EditorComponentNames.Scene, {
-    // everything but layout is set as optional for retrocompat purposes
-    name: Schemas.Optional(Schemas.String),
-    description: Schemas.Optional(Schemas.String),
-    thumbnail: Schemas.Optional(Schemas.String),
-    ageRating: Schemas.Optional(Schemas.EnumString(SceneAgeRating, SceneAgeRating.Teen)),
-    categories: Schemas.Optional(Schemas.Array(Schemas.EnumString(SceneCategory, SceneCategory.GAME))),
-    author: Schemas.Optional(Schemas.String),
-    email: Schemas.Optional(Schemas.String),
-    tags: Schemas.Optional(Schemas.Array(Schemas.String)),
-    layout: Schemas.Map({
-      base: Coords,
-      parcels: Schemas.Array(Coords)
-    }),
-    silenceVoiceChat: Schemas.Optional(Schemas.Boolean),
-    disablePortableExperiences: Schemas.Optional(Schemas.Boolean),
-    spawnPoints: Schemas.Optional(
-      Schemas.Array(
-        Schemas.Map({
-          name: Schemas.String,
-          default: Schemas.Optional(Schemas.Boolean),
-          position: Schemas.Map({
-            x: Schemas.OneOf({
-              single: Schemas.Int,
-              range: Schemas.Array(Schemas.Int)
-            }),
-            y: Schemas.OneOf({
-              single: Schemas.Int,
-              range: Schemas.Array(Schemas.Int)
-            }),
-            z: Schemas.OneOf({
-              single: Schemas.Int,
-              range: Schemas.Array(Schemas.Int)
-            })
-          }),
-          cameraTarget: Schemas.Optional(
-            Schemas.Map({
-              x: Schemas.Int,
-              y: Schemas.Int,
-              z: Schemas.Int
-            })
-          )
-        })
-      )
-    )
-  })
+  const Scene = defineSceneComponents(engine).pop() as ReturnType<typeof defineSceneComponents>[0]
 
   const Nodes = engine.defineComponent(EditorComponentNames.Nodes, {
     value: Schemas.Array(
