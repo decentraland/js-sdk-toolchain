@@ -107,7 +107,7 @@ jobs:
 
       - name: Run E2E tests (Ubuntu)
         if: matrix.os == 'ubuntu-latest' && env.ENABLE_E2E_TESTS == 'true'
-        run: xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run build && vitest run
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run build && npx vitest run
         working-directory: ${{ env.WORKING_DIRECTORY }}
         env:
           NODE_OPTIONS: "--max-old-space-size=8192"
@@ -115,7 +115,7 @@ jobs:
 
       - name: Run E2E tests (Non-Ubuntu)
         if: matrix.os != 'ubuntu-latest' && env.ENABLE_E2E_TESTS == 'true'
-        run: npm run build && vitest run
+        run: npm run build && npx vitest run
         working-directory: ${{ env.WORKING_DIRECTORY }}
         env:
           NODE_OPTIONS: "--max-old-space-size=8192"
@@ -266,6 +266,12 @@ jobs:
           node-version: 22
           cache: 'npm'
           cache-dependency-path: ${{ env.WORKING_DIRECTORY }}/package-lock.json
+
+      - name: install
+        run: make install
+
+      - name: build
+        run: node_modules/.bin/jest --detectOpenHandles --colors --runInBand --runTestsByPath scripts/build.spec.ts
 
       - name: Install dependencies
         run: npm i --silent

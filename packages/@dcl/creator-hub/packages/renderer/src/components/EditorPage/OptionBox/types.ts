@@ -1,4 +1,4 @@
-import type { type MouseEvent } from 'react';
+import type { MouseEvent } from 'react';
 
 export type Props = {
   thumbnailSrc: string;

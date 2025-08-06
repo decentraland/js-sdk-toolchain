@@ -1,4 +1,4 @@
-import type { type AddressInfo } from 'net';
+import type { AddressInfo } from 'net';
 import net from 'net';
 import { future } from 'fp-future';
 

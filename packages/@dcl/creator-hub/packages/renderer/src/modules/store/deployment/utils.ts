@@ -1,7 +1,7 @@
 import equal from 'fast-deep-equal';
 import { getCatalystServersFromCache } from 'dcl-catalyst-client/dist/contracts-snapshots';
-import type { type SerializedError } from '@reduxjs/toolkit';
-import type { type AuthChain} from '@dcl/crypto';
+import type { SerializedError } from '@reduxjs/toolkit';
+import type { AuthChain } from '@dcl/crypto';
 import { Authenticator } from '@dcl/crypto';
 import { ChainId } from '@dcl/schemas';
 import type { AuthIdentity } from 'decentraland-crypto-fetch';
@@ -10,16 +10,13 @@ import { t } from '/@/modules/store/translation/utils';
 import { minutes, seconds } from '/shared/time';
 import { delay } from '/shared/utils';
 import type {
-  type Info,
-  type File,
-  type AssetBundleRegistryResponse,
-  type Status,
-  type DeploymentComponentsStatus} from '/@/lib/deploy';
-import {
-  DEPLOY_URLS,
-  STATUS_VALUES,
-  DeploymentError,
+  Info,
+  File,
+  AssetBundleRegistryResponse,
+  Status,
+  DeploymentComponentsStatus,
 } from '/@/lib/deploy';
+import { DEPLOY_URLS, STATUS_VALUES, DeploymentError } from '/@/lib/deploy';
 
 export const MAX_FILE_SIZE_BYTES = 50 * 1e6; // 50MB defined in sdk-commands...
 
@@ -74,9 +71,7 @@ export const deploy = async (
   }
 };
 
-export const getInitialDeploymentStatus = (
-  isWorld = false,
-): DeploymentComponentsStatus => ({
+export const getInitialDeploymentStatus = (isWorld = false): DeploymentComponentsStatus => ({
   catalyst: 'idle',
   assetBundle: 'idle',
   lods: isWorld ? 'complete' : 'idle', // Auto-complete for worlds

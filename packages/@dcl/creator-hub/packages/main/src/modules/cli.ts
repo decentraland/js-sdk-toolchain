@@ -7,7 +7,7 @@ import { CLIENT_NOT_INSTALLED_ERROR } from '/shared/utils';
 import type { DeployOptions } from '/shared/types/deploy';
 import { dynamicImport } from '/shared/dynamic-import';
 
-import type { type Child } from './bin';
+import type { Child } from './bin';
 import { dclDeepLink, run } from './bin';
 import { getAvailablePort } from './port';
 import { getProjectId, track } from './analytics';

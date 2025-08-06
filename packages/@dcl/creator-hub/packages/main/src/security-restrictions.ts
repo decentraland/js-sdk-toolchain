@@ -1,5 +1,5 @@
 import { URL } from 'node:url';
-import type { type Session } from 'electron';
+import type { Session } from 'electron';
 import { session } from 'electron';
 import { app, shell } from 'electron';
 

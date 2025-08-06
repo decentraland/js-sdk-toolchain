@@ -1,6 +1,6 @@
-import type { type ChainId } from '@dcl/schemas/dist/dapps/chain-id';
-import type { type Network } from '@dcl/schemas/dist/dapps/network';
-import type { type ProviderType } from '@dcl/schemas/dist/dapps/provider-type';
+import type { ChainId } from '@dcl/schemas/dist/dapps/chain-id';
+import type { Network } from '@dcl/schemas/dist/dapps/network';
+import type { ProviderType } from '@dcl/schemas/dist/dapps/provider-type';
 
 export type NetworkData = {
   mana: number;

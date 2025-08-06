@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs/promises';
-import type { type OpenDialogOptions} from 'electron';
+import type { OpenDialogOptions } from 'electron';
 import { app, BrowserWindow, clipboard, dialog, shell } from 'electron';
 
 export function getHome() {

@@ -16,8 +16,8 @@ beforeAll(async () => {
       // Disable sandbox for CI environments
       ELECTRON_NO_SANDBOX: '1',
       // Disable shared memory for CI environments
-      ELECTRON_DISABLE_SHARED_MEMORY: '1'
-    }
+      ELECTRON_DISABLE_SHARED_MEMORY: '1',
+    },
   };
 
   // Skip e2e tests in CI environments if not explicitly enabled

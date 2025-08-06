@@ -1,5 +1,4 @@
-import type {
-  type TypedUseSelectorHook} from 'react-redux';
+import type { TypedUseSelectorHook } from 'react-redux';
 import {
   useSelector as formerUseSelector,
   useDispatch as formerUseDispuseDispatch,

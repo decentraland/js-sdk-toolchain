@@ -1,4 +1,4 @@
-import type { type Scene } from '@dcl/schemas';
+import type { Scene } from '@dcl/schemas';
 
 const decoder = new TextDecoder();
 

@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import { takeScreenshot as takeScreenshotRPC } from '/@/modules/rpc';
 import { resizeImage } from '/@/modules/image';
-import type { type CameraRPC } from '/@/modules/rpc/camera';
+import type { CameraRPC } from '/@/modules/rpc/camera';
 
 type Screenshot = {
   iframe: HTMLIFrameElement;

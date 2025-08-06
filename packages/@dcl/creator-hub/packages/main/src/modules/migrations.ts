@@ -6,15 +6,10 @@ import { future } from 'fp-future';
 import deepmerge from 'deepmerge';
 
 import { SCENES_DIRECTORY } from '/shared/paths';
-import type { type IFileSystemStorage } from '/shared/types/storage';
+import type { IFileSystemStorage } from '/shared/types/storage';
 import { FileSystemStorage } from '/shared/types/storage';
-import type {
-  type Config} from '/shared/types/config';
-import {
-  CURRENT_CONFIG_VERSION,
-  DEFAULT_CONFIG,
-  mergeConfig,
-} from '/shared/types/config';
+import type { Config } from '/shared/types/config';
+import { CURRENT_CONFIG_VERSION, DEFAULT_CONFIG, mergeConfig } from '/shared/types/config';
 
 import { getAppHomeLegacy, getUserDataPath } from './electron';
 import { CONFIG_PATH } from './config';

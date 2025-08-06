@@ -1,4 +1,4 @@
-import type { type Transport } from '@dcl/mini-rpc';
+import type { Transport } from '@dcl/mini-rpc';
 import { RPC } from '@dcl/mini-rpc';
 
 export enum Method {

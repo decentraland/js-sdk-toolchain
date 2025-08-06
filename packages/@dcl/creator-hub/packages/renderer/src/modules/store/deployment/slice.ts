@@ -1,6 +1,6 @@
-import type { type PayloadAction } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
-import type { type AuthIdentity } from '@dcl/crypto';
+import type { AuthIdentity } from '@dcl/crypto';
 import { Authenticator } from '@dcl/crypto';
 import type { ChainId } from '@dcl/schemas';
 import { localStorageGetIdentity } from '@dcl/single-sign-on-client';

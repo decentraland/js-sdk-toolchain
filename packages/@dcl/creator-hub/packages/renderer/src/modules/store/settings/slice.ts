@@ -1,4 +1,4 @@
-import type { type PayloadAction } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 import { settings as settingsPreload } from '#preload';
 import type { IpcRendererEvent } from 'electron';

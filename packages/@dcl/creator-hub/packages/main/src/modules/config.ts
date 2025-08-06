@@ -1,10 +1,10 @@
 import path from 'node:path';
 import log from 'electron-log/main';
 
-import type { type IFileSystemStorage } from '/shared/types/storage';
+import type { IFileSystemStorage } from '/shared/types/storage';
 import { FileSystemStorage } from '/shared/types/storage';
 import { SETTINGS_DIRECTORY, CONFIG_FILE_NAME, getFullScenesPath } from '/shared/paths';
-import type { type Config } from '/shared/types/config';
+import type { Config } from '/shared/types/config';
 import { DEFAULT_CONFIG, mergeConfig } from '/shared/types/config';
 
 import { getUserDataPath } from './electron';

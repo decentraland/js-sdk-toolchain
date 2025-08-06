@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'path';
-import type { type WritableDraft } from 'immer';
+import type { WritableDraft } from 'immer';
 import { produce } from 'immer';
 import deepmerge from 'deepmerge';
 

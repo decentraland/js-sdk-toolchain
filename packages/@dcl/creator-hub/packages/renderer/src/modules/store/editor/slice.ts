@@ -4,7 +4,7 @@ import type { ChainId } from '@dcl/schemas';
 import { createAsyncThunk } from '/@/modules/store/thunk';
 
 import type { DeployOptions } from '/shared/types/deploy';
-import type { type Project } from '/shared/types/projects';
+import type { Project } from '/shared/types/projects';
 import type { PreviewOptions } from '/shared/types/settings';
 import { WorkspaceError } from '/shared/types/workspace';
 

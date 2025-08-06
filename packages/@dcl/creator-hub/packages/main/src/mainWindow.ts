@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'node:url';
-import type { type BrowserWindow } from 'electron';
+import type { BrowserWindow } from 'electron';
 
 import { createWindow, focusWindow, getWindow } from './modules/window';
 

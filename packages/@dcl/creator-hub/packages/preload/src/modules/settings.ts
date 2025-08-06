@@ -1,5 +1,5 @@
 import path from 'path';
-import type { type IpcRendererEvent } from 'electron';
+import type { IpcRendererEvent } from 'electron';
 import { ipcRenderer } from 'electron';
 import {
   DEPENDENCY_UPDATE_STRATEGY,

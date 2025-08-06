@@ -1,4 +1,4 @@
-import type { type Project} from '/shared/types/projects';
+import type { Project } from '/shared/types/projects';
 import { SortBy } from '/shared/types/projects';
 
 export function sortProjectsBy(projects: Project[], type: SortBy): Project[] {
