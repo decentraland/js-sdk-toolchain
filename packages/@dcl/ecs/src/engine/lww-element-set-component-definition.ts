@@ -9,7 +9,8 @@ import {
   PutComponentOperation,
   DeleteComponent,
   PutNetworkComponentMessageBody,
-  DeleteComponentNetworkMessageBody
+  DeleteComponentNetworkMessageBody,
+  AuthoritativePutComponentMessageBody
 } from '../serialization/crdt'
 import { dataCompare } from '../systems/crdt/utils'
 import { LastWriteWinElementSetComponentDefinition, ComponentType, ValidateCallback } from './component'
@@ -108,6 +109,27 @@ export function createCrdtRuleValidator(
   }
 
   return crdtRuleForCurrentState
+}
+
+export function createForceUpdateLwwFromCrdt(
+  componentId: number,
+  timestamps: Map<Entity, number>,
+  schema: Pick<ISchema<any>, 'serialize' | 'deserialize'>,
+  data: Map<Entity, unknown>
+) {
+  /**
+   * Force update component state regardless of timestamp - used for server authoritative messages
+   */
+  return (msg: AuthoritativePutComponentMessageBody): [null, any] => {
+    console.log('[ BOEDO ] [ CASLA ] ', msg)
+    const buffer = new ReadWriteByteBuffer(msg.data)
+    const deserializedValue = schema.deserialize(buffer)
+
+    data.set(msg.entityId, deserializedValue)
+    timestamps.set(msg.entityId, msg.timestamp)
+
+    return [null, deserializedValue]
+  }
 }
 
 export function createUpdateLwwFromCrdt(
@@ -332,6 +354,7 @@ export function createComponentDefinitionFromSchema<T>(
     },
     getCrdtUpdates: createGetCrdtMessagesForLww(componentId, timestamps, dirtyIterator, schema, data),
     updateFromCrdt: createUpdateLwwFromCrdt(componentId, timestamps, schema, data),
+    __forceUpdateFromCrdt: createForceUpdateLwwFromCrdt(componentId, timestamps, schema, data),
     __dry_run_updateFromCrdt: createCrdtRuleValidator(timestamps, schema, data),
     dumpCrdtStateToBuffer: createDumpLwwFunctionFromCrdt(componentId, timestamps, schema, data),
     validateBeforeChange(entityOrCb: Entity | ValidateCallback<T>, cb?: ValidateCallback<T>): void {
@@ -355,6 +378,18 @@ export function createComponentDefinitionFromSchema<T>(
       const entityResult = (globalResult && cb?.(value)) ?? true
 
       return globalResult && entityResult
+    },
+    getCrdtState(entity: Entity): { data: Uint8Array; timestamp: number } | null {
+      const componentData = data.get(entity)
+      const timestamp = timestamps.get(entity)
+
+      if (componentData && timestamp !== undefined) {
+        const buffer = new ReadWriteByteBuffer()
+        schema.serialize(deepReadonly(componentData), buffer)
+        return { data: buffer.toBinary(), timestamp }
+      }
+
+      return null
     },
     onChange(entity, cb) {
       const cbs = onChangeCallbacks.get(entity) ?? []
