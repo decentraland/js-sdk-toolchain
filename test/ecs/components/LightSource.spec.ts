@@ -1,6 +1,6 @@
 import { Engine, components } from '../../../packages/@dcl/ecs/src'
 import { testComponentSerialization } from './assertion'
-import { PBLightSource, PBLightSource_Point, LightSource } from "../../../packages/@dcl/ecs";
+import { PBLightSource, PBLightSource_Point, LightSource } from '../../../packages/@dcl/ecs'
 
 describe('Generated LightSource ProtoBuf', () => {
   it('should serialize/deserialize Point LightSource', () => {
@@ -83,7 +83,7 @@ describe('Generated LightSource ProtoBuf', () => {
       shadow: true,
       type: LightSource.Type.Spot({
         innerAngle: 21.8,
-        outerAngle: 30,
+        outerAngle: 30
       })
     })
 
