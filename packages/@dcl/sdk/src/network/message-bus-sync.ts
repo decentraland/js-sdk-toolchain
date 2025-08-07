@@ -134,6 +134,26 @@ export function addSyncTransport(
     }
   })
 
+  // received authoritative message from server - force apply to fix invalid local state
+  binaryMessageBus.on(CommsMessage.CRDT_AUTHORITATIVE, (value, sender) => {
+    // Only accept authoritative messages from authoritative server
+    if (sender !== AUTH_SERVER_PEER_ID) return
+
+    // DEBUG_NETWORK_MESSAGES() &&
+    console.log('[AUTHORITATIVE] Received authoritative message from server:', value.byteLength, 'bytes')
+
+    // Process authoritative messages by forcing them through normal CRDT processing
+    // but with a timestamp that's guaranteed to be accepted
+    const authoritativeBuffer = serverValidator.processClientMessages(value, sender, true)
+    if (authoritativeBuffer.byteLength > 0) {
+      // Apply authoritative message through normal transport, but the server's messages
+      // should be processed as authoritative with special timestamp handling
+      transport.onmessage!(authoritativeBuffer)
+
+      DEBUG_NETWORK_MESSAGES() && console.log('[AUTHORITATIVE] Applied server authoritative message to local state')
+    }
+  })
+
   players.onEnterScene((player) => {
     DEBUG_NETWORK_MESSAGES() && console.log('[onEnterScene]', player.userId)
     if (!isServerAtom.getOrNull() && myProfile.userId === player.userId) {
