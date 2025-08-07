@@ -4,7 +4,8 @@ export enum CommsMessage {
   CRDT = 1,
   REQ_CRDT_STATE = 2,
   RES_CRDT_STATE = 3,
-  CRDT_SERVER = 4
+  CRDT_SERVER = 4,
+  CRDT_AUTHORITATIVE = 5
 }
 
 export function BinaryMessageBus<T extends CommsMessage>(
