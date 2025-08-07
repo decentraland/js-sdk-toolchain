@@ -569,6 +569,7 @@ jobs:
 
   pr-preview:
     name: Creator Hub Build
+    needs: [build]
     strategy:
       fail-fast: true
       matrix:
@@ -587,6 +588,12 @@ jobs:
         with:
           node-version: 22
           cache: 'npm'
+
+      - name: Install @dcl/inspector@branch package
+        run: npm install "${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_inspector_s3_bucket_key }}"
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
 
       - name: 'Install dependencies'
         run: npm ci
@@ -607,19 +614,39 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
-      - name: Generate release version
-        id: version
-        uses: paulhatch/semantic-version@v5.4.0
-        with:
-          tag_prefix: ""
-          version_format: ${major}.${minor}.${patch}
-          major_pattern: "/^(major|breaking).+/"
-          minor_pattern: "/^(minor|feat).+/"
-          bump_each_commit: false
-          bump_each_commit_patch_pattern: "/^(patch|fix).+/"
-          search_commit_body: true
-          user_format_type: "json"
-          change_path: ${{ env.WORKING_DIRECTORY }}
+      - name: Get latest Creator Hub release version (or fallback to last version before migration to monorepo)
+        id: latest_version
+        shell: bash
+        run: |
+          TAG=$(gh release list --limit 100 | grep '^creator-hub-v' | head -n 1 | awk '{print $1}' || true)
+          if [[ -z "$TAG" ]]; then
+            echo "No previous creator-hub release found. Defaulting to 0.21.1"
+            VERSION="0.21.1"
+          else
+            VERSION=${TAG#"creator-hub-v"}
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bump latest release version (patch)
+        id: new_version
+        shell: bash
+        run: |
+          VERSION=${{ steps.latest_version.outputs.version }}
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+          PATCH=$((PATCH + 1))
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create custom tag before build
+        if: github.ref == 'refs/heads/main' && !github.event.pull_request
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag creator-hub-v${{ steps.new_version.outputs.new_version }}
+          git push origin creator-hub-v${{ steps.new_version.outputs.new_version }}
 
       # Download 'SSLcom/esigner-codesign' to a folder called 'esigner-codesign' inside creator-hub package
       - name: Checkout esigner-codesign repository (Windows)
@@ -638,7 +665,7 @@ jobs:
           retry_wait_seconds: 15
           retry_on: error
           shell: 'bash'
-          command: cd ${{ env.WORKING_DIRECTORY }} && npx electron-builder --config electron-builder.cjs --config.extraMetadata.version=${{ steps.version.outputs.version }} ${{ matrix.os == 'macos-latest' && format('--config.mac.notarize={0}', true) || '' }} --publish ${{ github.event.pull_request.number && 'never' || 'always' }}
+          command: npx electron-builder --project ${{ env.WORKING_DIRECTORY }} --config electron-builder.cjs --config.extraMetadata.version=${{ steps.new_version.outputs.new_version }} ${{ matrix.os == 'macos-latest' && format('--config.mac.notarize={0}', true) || '' }} --publish ${{ github.event.pull_request.number && 'never' || 'always' }}
         env:
           # Disable hard links to avoid issues with npm
           USE_HARD_LINKS: false
@@ -657,7 +684,7 @@ jobs:
           # The following are the parameters required by the esigner-codesign action to work, we must explicitly pass in even the optional ones since we're not using the action directly, but from the checked out repo
           CODE_SIGN_SCRIPT_PATH: ${{ matrix.os == 'windows-latest' && format('{0}\\esigner-codesign\\dist\\index.js', github.workspace) || '' }}
           INPUT_COMMAND: "sign"
-          INPUT_FILE_PATH: "${{ github.workspace }}\\dist\\Decentraland Creator Hub-${{ steps.version.outputs.version }}-win-x64.exe"
+          INPUT_FILE_PATH: "${{ github.workspace }}\\dist\\Decentraland Creator Hub-${{ steps.new_version.outputs.new_version }}-win-x64.exe"
           INPUT_OVERRIDE: "true"
           INPUT_MALWARE_BLOCK: "false"
           INPUT_CLEAN_LOGS: "false"
@@ -681,30 +708,26 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
         run: |
-          npx @dcl/cdn-uploader@next \
-            --bucket ${{ secrets.SDK_TEAM_S3_BUCKET }} \
-            --local-folder dist/upload \
-            --bucket-folder creator-hub/branch/${{ github.head_ref }}
+          npx @dcl/cdn-uploader@next --bucket ${{ secrets.SDK_TEAM_S3_BUCKET }} --local-folder dist/upload --bucket-folder creator-hub/branch/${{ github.head_ref }}
 
       - name: Set specific windows instructions
         if: ${{ github.event.pull_request.number && matrix.os == 'windows-latest' }}
         id: windows-instructions
-        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
         run: |
           echo "list<<EOF" >> $GITHUB_ENV
-          echo "[win-x64](${{ secrets.SDK_TEAM_S3_BASE_URL }}/creator-hub/branch/${{ github.head_ref }}/Decentraland%20Creator%20Hub-${{ steps.version.outputs.version }}-win-x64.exe)" >> $GITHUB_ENV
+          echo "[win-x64](${{ secrets.SDK_TEAM_S3_BASE_URL }}/creator-hub/branch/${{ github.head_ref }}/Decentraland%20Creator%20Hub-${{ steps.new_version.outputs.new_version }}-win-x64.exe)" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
       - name: Set specific macos instructions
         if: ${{ github.event.pull_request.number && matrix.os == 'macos-latest' }}
         id: macos-instructions
-        working-directory: ${{ env.WORKING_DIRECTORY }}
         run: |
           echo "list<<EOF" >> $GITHUB_ENV
-          echo "[mac-x64](${{ secrets.SDK_TEAM_S3_BASE_URL }}/creator-hub/branch/${{ github.head_ref }}/Decentraland%20Creator%20Hub-${{ steps.version.outputs.version }}-mac-x64.dmg)" >> $GITHUB_ENV
-          echo "[mac-arm64](${{ secrets.SDK_TEAM_S3_BASE_URL }}/creator-hub/branch/${{ github.head_ref }}/Decentraland%20Creator%20Hub-${{ steps.version.outputs.version }}-mac-arm64.dmg)" >> $GITHUB_ENV
+          echo "[mac-x64](${{ secrets.SDK_TEAM_S3_BASE_URL }}/creator-hub/branch/${{ github.head_ref }}/Decentraland%20Creator%20Hub-${{ steps.new_version.outputs.new_version }}-mac-x64.dmg)" >> $GITHUB_ENV
+          echo "[mac-arm64](${{ secrets.SDK_TEAM_S3_BASE_URL }}/creator-hub/branch/${{ github.head_ref }}/Decentraland%20Creator%20Hub-${{ steps.new_version.outputs.new_version }}-mac-arm64.dmg)" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
-          content=$(cat ./.github/workflows/macos-instructions.md)
+          content=$(cat ./.github/workflows/creator-hub-macos-instructions.md)
           echo "macos-instructions<<EOF" >> $GITHUB_ENV
           echo "$content" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
