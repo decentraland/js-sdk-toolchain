@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useMemo, useState } from 'react'
+import React, { useEffect, useCallback, useMemo, useState, useRef } from 'react'
 
 import { Popup, PopupContent } from 'decentraland-ui'
 
@@ -31,6 +31,8 @@ const EMPTY_AUTHOR_DATA: AuthorData = {
   avatar: null,
   isLoading: false
 }
+
+const SMART_TOOLTIP_DELAY = 500
 
 const createAuthorData = (name: string | null, avatar: string | null): AuthorData => ({
   name,
@@ -147,28 +149,26 @@ const SmartItemTooltipContent: React.FC<{ asset: AssetType }> = ({ asset }) => {
   )
 }
 
-const SmartItemTooltip: React.FC<{ asset: AssetType }> = ({ asset }) => {
+const SmartItemTooltip: React.FC<{ asset: AssetType; assetRef: React.RefObject<HTMLDivElement>; open: boolean }> = ({
+  asset,
+  assetRef,
+  open
+}) => {
   const author = useAuthorData(asset.author || null)
   const hasTooltipContent = asset.description || asset.author || 'preview.png' in asset.contents
   const isAuthorLoading = asset.author && author.isLoading
 
-  if (!hasTooltipContent || isAuthorLoading) {
-    return <Asset value={asset} />
+  if (!hasTooltipContent || isAuthorLoading || !assetRef.current) {
+    return null
   }
 
   return (
     <Popup
       className="SmartItemTooltip"
       position="right center"
-      trigger={
-        <div className="SmartItemTooltipTrigger" role="button" tabIndex={0}>
-          <Asset value={asset} />
-        </div>
-      }
-      on="hover"
-      mouseEnterDelay={500}
+      context={assetRef.current}
+      open={open}
       hideOnScroll={false}
-      hoverable
       wide
     >
       <PopupContent>
@@ -180,14 +180,50 @@ const SmartItemTooltip: React.FC<{ asset: AssetType }> = ({ asset }) => {
 
 const AssetContainer: React.FC<{ value: AssetType }> = ({ value }) => {
   const isSmartItem = useMemo(() => isSmart(value), [value])
+  const [isOpen, setIsOpen] = useState(false)
+  const assetRef = useRef<HTMLDivElement>(null)
+  const timeoutRef = useRef<NodeJS.Timeout>()
 
-  const renderAssetWithTooltips = useCallback(() => {
-    const assetElement = isSmartItem ? <SmartItemTooltip asset={value} /> : <Asset value={value} />
+  const handleInfoTooltipOpen = useCallback(() => {
+    if (isSmartItem) {
+      timeoutRef.current = setTimeout(() => {
+        setIsOpen(true)
+      }, SMART_TOOLTIP_DELAY)
+    }
+  }, [isSmartItem])
 
-    return <InfoTooltip text={value.name} trigger={assetElement} hideOnScroll={false} position="top center" />
-  }, [value, isSmartItem])
+  const handleInfoTooltipClose = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+    }
+    setIsOpen(false)
+  }, [])
 
-  return renderAssetWithTooltips()
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
+
+  const assetElement = useMemo(() => <Asset ref={assetRef} value={value} />, [value])
+
+  return (
+    <>
+      <InfoTooltip
+        text={value.name}
+        onOpen={handleInfoTooltipOpen}
+        onClose={handleInfoTooltipClose}
+        trigger={assetElement}
+        hideOnScroll={false}
+        position="top center"
+        hoverable={false}
+      />
+      {isSmartItem && <SmartItemTooltip asset={value} assetRef={assetRef} open={isOpen} />}
+    </>
+  )
 }
 
 export default React.memo(AssetContainer)
