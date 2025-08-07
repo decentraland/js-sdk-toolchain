@@ -1,10 +1,9 @@
-import { Entity, IEngine, NetworkEntity as NetworkEntityEngine } from '@dcl/ecs'
-
-import { CoreComponents } from './components'
+import { Entity, IEngine } from '@dcl/ecs'
+import * as components from '@dcl/ecs/dist/components'
 
 export const INSPECTOR_ENUM_ENTITY_ID_START: Entity = 8001 as Entity
 export function createEnumEntityId(engine: IEngine) {
-  const NetworkEntity = engine.getComponent(CoreComponents.NETWORK_ENTITY) as typeof NetworkEntityEngine
+  const NetworkEntity = components.NetworkEntity(engine)
 
   function getNextEnumEntityId(): Entity {
     let value: Entity = INSPECTOR_ENUM_ENTITY_ID_START

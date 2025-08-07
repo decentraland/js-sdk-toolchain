@@ -111,7 +111,7 @@ const ActionMapOption: Record<string, string> = {
 }
 
 export default withSdk<Props>(({ sdk, entity: entityId }) => {
-  const { Actions, States, Counter, GltfContainer, Rewards } = sdk.components
+  const { Actions, States, Counter, Rewards } = sdk.components
   const [componentValue, setComponentValue, isComponentEqual] = useComponentValue<EditorComponentsTypes['Actions']>(
     entityId,
     Actions
