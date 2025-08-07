@@ -16,6 +16,7 @@ import { AudioStreamComponentDefinitionExtended, defineAudioStreamComponent } fr
 import { MediaState } from './generated/pb/decentraland/sdk/components/common/media_state.gen'
 import { defineVirtualCameraComponent, VirtualCameraComponentDefinitionExtended } from './extended/VirtualCamera'
 import { defineInputModifierComponent, InputModifierComponentDefinitionExtended } from './extended/InputModifier'
+import {defineLightSourceComponent, LightSourceComponentDefinitionExtended} from "./extended/LightSource";
 
 export * from './generated/index.gen'
 
@@ -64,6 +65,10 @@ export const VirtualCamera: LwwComponentGetter<VirtualCameraComponentDefinitionE
 /* @__PURE__*/
 export const InputModifier: LwwComponentGetter<InputModifierComponentDefinitionExtended> = (engine) =>
   defineInputModifierComponent(engine)
+
+/* @__PURE__ */
+export const LightSource: LwwComponentGetter<LightSourceComponentDefinitionExtended> = (engine) =>
+  defineLightSourceComponent(engine)
 
 /**
  * @alpha
