@@ -65,3 +65,4 @@ jobs:
               --title "chore: sync main to experimental" \
               --body ":crown: *Automated PR to keep experimental in sync with main (with protocol updates, build & snapshots)*" \
               --label "auto-pr"
+          fi
