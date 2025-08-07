@@ -215,6 +215,22 @@ export function createValueSetComponentDefinitionFromSchema<T>(
       const entityResult = (globalResult && cb?.(value)) ?? true
 
       return globalResult && entityResult
+    },
+    getCrdtState(entity: Entity): { data: Uint8Array; timestamp: number } | null {
+      const row = data.get(entity)
+      if (!row || row.raw.length === 0) {
+        return null
+      }
+
+      // For GrowOnlySet, we need to return the complete CRDT messages for all values
+      // This is complex because GrowOnlySet uses APPEND messages, not a single PUT
+      // For now, return null to indicate this component type doesn't support simple corrections
+      return null
+    },
+    __forceUpdateFromCrdt(_msg) {
+      // GrowOnlySet doesn't support authoritative corrections in the same way as LWW
+      // since it uses APPEND_VALUE messages instead of PUT_COMPONENT messages
+      return [null, undefined]
     }
   }
 
