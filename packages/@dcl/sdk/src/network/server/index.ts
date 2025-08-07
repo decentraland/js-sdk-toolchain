@@ -1,4 +1,12 @@
-import { IEngine, Entity, CrdtMessageType, CrdtMessageBody, ProcessMessageResultType } from '@dcl/ecs'
+import {
+  IEngine,
+  Entity,
+  CrdtMessageType,
+  CrdtMessageBody,
+  ProcessMessageResultType,
+  ComponentType,
+  PutNetworkComponentOperation
+} from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { CommsMessage } from '../binary-message-bus'
@@ -6,6 +14,12 @@ import { chunkCrdtMessages } from '../chunking'
 import * as utils from './utils'
 import { AUTH_SERVER_PEER_ID, DEBUG_NETWORK_MESSAGES } from '../message-bus-sync'
 import { type BinaryMessageBus } from '../binary-message-bus'
+import {
+  LastWriteWinElementSetComponentDefinition,
+  GrowOnlyValueSetComponentDefinition,
+  ComponentDefinition,
+  InternalBaseComponent
+} from '@dcl/ecs/dist/engine/component'
 
 export const LIVEKIT_MAX_SIZE = 12
 
@@ -21,6 +35,17 @@ export function createServerValidator(config: ServerValidationConfig) {
   const NetworkEntity = components.NetworkEntity(engine)
   const CreatedBy = components.CreatedBy(engine)
   const NetworkParent = components.NetworkParent(engine)
+
+  // Type guard to check if component supports corrections (both LWW and GrowOnlySet)
+  function supportsCorrections<T>(
+    component: ComponentDefinition<T>
+  ): component is LastWriteWinElementSetComponentDefinition<T> | GrowOnlyValueSetComponentDefinition<T> {
+    return (
+      (component.componentType === ComponentType.LastWriteWinElementSet ||
+        component.componentType === ComponentType.GrowOnlyValueSet) &&
+      'getCrdtState' in component
+    )
+  }
 
   function findExistingNetworkEntity(message: utils.NetworkMessage): Entity | null {
     // Look for existing network entity mapping (don't create new ones)
@@ -59,13 +84,20 @@ export function createServerValidator(config: ServerValidationConfig) {
 
   function convertNetworkToRegularMessage(
     networkMessage: utils.NetworkMessage,
-    localEntityId: Entity
+    localEntityId: Entity,
+    forceCorrections = false
   ): (CrdtMessageBody & { messageBuffer: Uint8Array }) | null {
     const buffer = new ReadWriteByteBuffer()
 
     try {
       // Use the well-tested networkMessageToLocal utility with transform fixing for Unity
-      const message = utils.networkMessageToLocal(networkMessage, localEntityId, buffer, NetworkParent)
+      const message = utils.networkMessageToLocal(
+        networkMessage,
+        localEntityId,
+        buffer,
+        NetworkParent,
+        forceCorrections
+      )
       return { ...message, messageBuffer: buffer.toBinary() }
     } catch (error) {
       DEBUG_NETWORK_MESSAGES() && console.error('Error converting network message:', error)
@@ -84,7 +116,7 @@ export function createServerValidator(config: ServerValidationConfig) {
     }
 
     if (message.type === CrdtMessageType.PUT_COMPONENT || message.type === CrdtMessageType.DELETE_COMPONENT) {
-      const component = engine.getComponent(message.componentId)
+      const component = engine.getComponent(message.componentId) as InternalBaseComponent<unknown>
       const buf = 'data' in message ? new ReadWriteByteBuffer(message.data) : null
       const value = buf ? component.schema.deserialize(buf) : null
       const dryRunCRDT = component.__dry_run_updateFromCrdt(message)
@@ -134,9 +166,54 @@ export function createServerValidator(config: ServerValidationConfig) {
       console.log(`Total: ${messages.length} messages in ${chunks.length} chunks from ${excludeSender}`)
   }
 
+  function sendCorrectionToSender(networkMessage: utils.NetworkMessage, sender: string, localEntityId: Entity) {
+    try {
+      // Only handle component messages (PUT/DELETE), not entity deletion
+      if (networkMessage.type === CrdtMessageType.DELETE_ENTITY_NETWORK) {
+        DEBUG_NETWORK_MESSAGES() && console.log('[AUTHORITATIVE] Cannot send authoritative message for entity deletion')
+        return
+      }
+
+      // Safe to access componentId and timestamp now
+      const component = engine.getComponent(networkMessage.componentId)
+
+      // Only proceed if component supports authoritative messages (LWW or GrowOnlySet)
+      if (!supportsCorrections(component)) {
+        DEBUG_NETWORK_MESSAGES() && console.log('[AUTHORITATIVE] Component does not support authoritative messages')
+        return
+      }
+
+      const serverCRDTState = component.getCrdtState(localEntityId)
+
+      if (serverCRDTState) {
+        // Create authoritative message using PUT_COMPONENT_NETWORK
+        // Each client will convert this to AUTHORITATIVE_PUT_COMPONENT with proper entity mapping
+        const correctionBuffer = new ReadWriteByteBuffer()
+        PutNetworkComponentOperation.write(
+          networkMessage.entityId, // Use original network entity ID
+          serverCRDTState.timestamp,
+          networkMessage.componentId,
+          networkMessage.networkId,
+          serverCRDTState.data,
+          correctionBuffer
+        )
+        // Send authoritative message directly to the sender
+        binaryMessageBus.emit(CommsMessage.CRDT_AUTHORITATIVE, correctionBuffer.toBinary(), [sender])
+
+        DEBUG_NETWORK_MESSAGES() &&
+          console.log(
+            `[AUTHORITATIVE] Sent authoritative message to ${sender} for entity ${localEntityId} component ${networkMessage.componentId} with timestamp ${networkMessage.timestamp}`
+          )
+      }
+    } catch (error) {
+      DEBUG_NETWORK_MESSAGES() && console.error('Error sending correction:', error)
+    }
+  }
+
   return {
+    findExistingNetworkEntity,
     // transform Network messages to CRDT Common Messages.
-    processClientMessages: function processClientMessages(value: Uint8Array, sender: string) {
+    processClientMessages: function processClientMessages(value: Uint8Array, sender: string, forceCorrections = false) {
       // console.log(`[CLIENT] Processing message from ${sender}, ${value.length} bytes`)
 
       // Collect all regular messages in a single buffer for batched application
@@ -151,8 +228,9 @@ export function createServerValidator(config: ServerValidationConfig) {
           // Find or create network entity mapping
           const localEntityId = findOrCreateNetworkEntity(networkMessage, sender, false)
 
-          // Convert network message to regular message
-          const regularMessage = convertNetworkToRegularMessage(networkMessage, localEntityId)
+          // Convert network message to regular message or correction message
+          const regularMessage = convertNetworkToRegularMessage(networkMessage, localEntityId, forceCorrections)
+
           if (regularMessage?.messageBuffer.byteLength) {
             combinedBuffer.writeBuffer(regularMessage.messageBuffer, false)
           }
@@ -181,9 +259,8 @@ export function createServerValidator(config: ServerValidationConfig) {
 
             // 3. Basic permission validation
             if (!validateMessagePermissions(regularMessage as any, sender, localEntityId)) {
-              // Send correction back to sender
-              // sendCorrectionToSender(networkMessage, sender, localEntityId)
-              // also we need to check if the CRDT is valid, maybe another peer win.
+              // Send correction back to sender with server's authoritative state
+              sendCorrectionToSender(networkMessage, sender, localEntityId)
               continue
             }
 
