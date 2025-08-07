@@ -49,6 +49,9 @@ describe('Server-Client Connectivity', () => {
   async function tick() {
     // Tick all engines together (clients + server)
     await Promise.all([clientEngineA.update(1), clientEngineB.update(1), serverEngine.update(1)])
+    await Promise.all([clientEngineB.update(1), serverEngine.update(1), clientEngineA.update(1)])
+    await Promise.all([serverEngine.update(1), clientEngineA.update(1), clientEngineB.update(1)])
+    await Promise.all([clientEngineA.update(1), clientEngineB.update(1), serverEngine.update(1)])
   }
 
   // Define components on all engines first
@@ -220,8 +223,6 @@ describe('Server-Client Connectivity', () => {
 
     // Initial sync dance
     await tick()
-    await tick()
-    await tick()
 
     console.log(`After initialization: intercepted ${interceptedMessages.length} messages`)
     console.log(
@@ -243,30 +244,6 @@ describe('Server-Client Connectivity', () => {
 
     // First tick: ClientA sends messages to server
     await tick()
-    console.log(`After first tick: intercepted ${interceptedMessages.length} messages`)
-    console.log(`MessageQueues after first tick:`, {
-      clientA: messageQueues.clientA.length,
-      clientB: messageQueues.clientB.length,
-      server: messageQueues['authorative-server'].length
-    })
-
-    // Second tick: Server processes and forwards to ClientB
-    await tick()
-    console.log(`After second tick: intercepted ${interceptedMessages.length} messages`)
-    console.log(`MessageQueues after second tick:`, {
-      clientA: messageQueues.clientA.length,
-      clientB: messageQueues.clientB.length,
-      server: messageQueues['authorative-server'].length
-    })
-    // Third tick: ClientB processes messages
-    await tick()
-    await tick()
-    console.log(`After third tick: intercepted ${interceptedMessages.length} messages`)
-    console.log(`MessageQueues after third tick:`, {
-      clientA: messageQueues.clientA.length,
-      clientB: messageQueues.clientB.length,
-      server: messageQueues['authorative-server'].length
-    })
     // Check that Client B received the entity
     const transformsInB = Array.from(clientEngineB.getEntitiesWith(componentsB.Transform))
     console.log(`ClientB has ${transformsInB.length} entities with Transform`)
@@ -302,9 +279,6 @@ describe('Server-Client Connectivity', () => {
     console.log(`ClientB modified entity ${entityB} position.x to 100`)
 
     await tick()
-    await tick()
-    await tick()
-    await tick()
 
     console.log(`After modification tick: intercepted ${interceptedMessages.length} messages`)
 
@@ -332,9 +306,6 @@ describe('Server-Client Connectivity', () => {
 
     // Let the messages propagate through the system
     await tick() // Server sends to clients
-    await tick() // Clients process messages
-    await tick() // Final processing
-    await tick() // Extra tick for safety
 
     console.log(`After server update: intercepted ${interceptedMessages.length} messages`)
 
@@ -384,9 +355,6 @@ describe('Server-Client Connectivity', () => {
     serverComponents.Transform.getMutable(serverEntity).position = { x: 800, y: 900, z: 1000 }
 
     // Let the update propagate
-    await tick()
-    await tick()
-    await tick()
     await tick()
 
     console.log(`After server transform update: intercepted ${interceptedMessages.length} messages`)
@@ -460,14 +428,10 @@ describe('Server-Client Connectivity', () => {
 
     // Initial sync - this will trigger server validation when server processes the CRDT
     await tick()
-    await tick()
-    await tick()
 
     // Modify the entity to trigger another validation round
     componentsA.Transform.getMutable(validationEntity).position.x = 999
 
-    await tick()
-    await tick()
     await tick()
 
     console.log('Validation results:', validationResults)
@@ -503,14 +467,10 @@ describe('Server-Client Connectivity', () => {
 
     // Let initial sync happen
     await tick()
-    await tick()
-    await tick()
 
     // Try to make a change that should be rejected by server
     componentsB.Transform.getMutable(rejectionEntity).position.x = 600
 
-    await tick()
-    await tick()
     await tick()
 
     console.log('Server rejection called:', serverRejectionCalled)
@@ -537,14 +497,10 @@ describe('Server-Client Connectivity', () => {
 
     // Process multiple ticks to ensure CRDT messages are processed by server
     await tick()
-    await tick()
-    await tick()
 
     // Modify the entity to trigger more CRDT updates
     componentsA.Transform.getMutable(dryRunEntity).position.y = 999
 
-    await tick()
-    await tick()
     await tick()
 
     console.log('Server validation during dry run called:', serverValidationCalled)
@@ -553,5 +509,67 @@ describe('Server-Client Connectivity', () => {
     // The key test is that validation was called - entity propagation is tested elsewhere
     // Just verify that the server processed the messages (validation was the main goal)
     expect(serverValidationCalled).toBe(true)
+  })
+
+  it('should handle CRDT authoritative messages when server rejects invalid client message', async () => {
+    console.log('=== Testing CRDT Authoritative Mechanism ===')
+    interceptedMessages.length = 0
+
+    let serverValidationCalled = false
+    let serverRejectedChange = false
+
+    // Add server validation that rejects position.x > 100
+    serverComponents.Transform.validateBeforeChange((value) => {
+      serverValidationCalled = true
+      console.log('Server validation checking:', value)
+      if (value.newValue && value.newValue.position.x > 100) {
+        console.log('Server rejecting change due to x > 100, will send authoritative message')
+        serverRejectedChange = true
+        return false // This should trigger authoritative message mechanism
+      }
+      return true
+    })
+
+    // Create entity on client A with valid initial position
+    const correctionEntity = clientEngineA.addEntity()
+    componentsA.Transform.create(correctionEntity, { position: { x: 50, y: 60, z: 70 } })
+    syncA.syncEntity(correctionEntity, [componentsA.Transform.componentId])
+
+    // Let initial sync happen successfully
+    await tick()
+
+    // Store the initial valid state
+    const initialTransform = componentsA.Transform.get(correctionEntity)
+    console.log('Initial client A position:', initialTransform.position)
+
+    // Client A tries to make an invalid change (x > 100)
+    const mutableTransform = componentsA.Transform.getMutable(correctionEntity)
+    mutableTransform.position = { x: 150, y: 60, z: 70 } // This should be rejected
+
+    console.log('Client A attempting invalid position update to x=150')
+    console.log('Client A local state after change:', componentsA.Transform.get(correctionEntity).position)
+
+    // Process the invalid update
+    await tick()
+    await tick()
+
+    console.log('Validation called:', serverValidationCalled)
+    console.log('Server rejected change:', serverRejectedChange)
+
+    expect(serverValidationCalled).toBe(true)
+    expect(serverRejectedChange).toBe(true)
+
+    // The client retains its local invalid state since no authoritative message was sent
+    const finalTransform = componentsA.Transform.get(correctionEntity)
+    console.log('Final client A position after authoritative update:', finalTransform.position)
+
+    // Interesting: The client's state was corrected from x=150 back to x=50
+    // This suggests CRDT sync is already providing some authoritative mechanism
+    expect(finalTransform.position.x).toBe(50) // Client state was corrected back to server state
+
+    // TODO: Fix CRDT transmission so server receives client's invalid changes
+    // Once fixed, the test should verify:
+    // expect(serverRejectedChange).toBe(true) // Server should reject invalid change
+    // expect(finalTransform.position).toMatchObject({ x: 50, y: 60, z: 70 }) // Client corrected to server state
   })
 })

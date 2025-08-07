@@ -6,6 +6,7 @@ import { AppendValueOperation, CrdtMessageProtocol } from '../../serialization/c
 import { DeleteComponent } from '../../serialization/crdt/deleteComponent'
 import { DeleteEntity } from '../../serialization/crdt/deleteEntity'
 import { PutComponentOperation } from '../../serialization/crdt/putComponent'
+import { AuthoritativePutComponentOperation } from '../../serialization/crdt/authoritativePutComponent'
 import { CrdtMessageType, CrdtMessageHeader, CrdtMessage } from '../../serialization/crdt/types'
 import { ReceiveMessage, Transport } from './types'
 
@@ -54,6 +55,8 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
           message = DeleteComponent.read(buffer)!
         } else if (header.type === CrdtMessageType.PUT_COMPONENT) {
           message = PutComponentOperation.read(buffer)!
+        } else if (header.type === CrdtMessageType.AUTHORITATIVE_PUT_COMPONENT) {
+          message = AuthoritativePutComponentOperation.read(buffer)!
         } else if (header.type === CrdtMessageType.DELETE_ENTITY) {
           message = DeleteEntity.read(buffer)!
         } else if (header.type === CrdtMessageType.APPEND_VALUE) {
@@ -111,8 +114,11 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
           const component = engine.getComponentOrNull(msg.componentId)
 
           if (component) {
-            // Pure CRDT processing - no transform fixing or network logic
-            const [conflictMessage, value] = component.updateFromCrdt(msg)
+            // Handle authoritative messages differently - they force the state regardless of timestamp
+            const [conflictMessage, value] =
+              msg.type === CrdtMessageType.AUTHORITATIVE_PUT_COMPONENT
+                ? component.__forceUpdateFromCrdt(msg)
+                : component.updateFromCrdt(msg)
             if (!conflictMessage) {
               // Add message to broadcast queue when no conflict
               broadcastMessages.push(msg)
