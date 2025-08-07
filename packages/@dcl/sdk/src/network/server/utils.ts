@@ -4,6 +4,7 @@ import { ReceiveMessage } from '@dcl/ecs/dist/runtime/types'
 import { ReceiveNetworkMessage } from '@dcl/ecs/dist/systems/crdt/types'
 import { ByteBuffer, ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { PutComponentOperation } from '@dcl/ecs/dist/serialization/crdt/putComponent'
+import { AuthoritativePutComponentOperation } from '@dcl/ecs/dist/serialization/crdt/authoritativePutComponent'
 import {
   CrdtMessage,
   CrdtMessageBody,
@@ -14,6 +15,7 @@ import {
   DeleteEntityMessage,
   DeleteEntityNetworkMessage,
   PutComponentMessage,
+  AuthoritativePutComponentMessage,
   PutNetworkComponentMessage
 } from '@dcl/ecs/dist/serialization/crdt/types'
 import { DeleteComponent } from '@dcl/ecs/dist/serialization/crdt/deleteComponent'
@@ -30,10 +32,14 @@ export type NetworkMessage = (
   | DeleteEntityNetworkMessage
 ) & { messageBuffer: Uint8Array }
 
-export type RegularMessage = (PutComponentMessage | DeleteComponentMessage | DeleteEntityMessage) & {
+export type RegularMessage = (
+  | PutComponentMessage
+  | AuthoritativePutComponentMessage
+  | DeleteComponentMessage
+  | DeleteEntityMessage
+) & {
   messageBuffer: Uint8Array
 }
-
 export function readMessages(data: Uint8Array): (NetworkMessage | RegularMessage)[] {
   const buffer = new ReadWriteByteBuffer(data)
   const messages: (NetworkMessage | RegularMessage)[] = []
@@ -53,6 +59,8 @@ export function readMessages(data: Uint8Array): (NetworkMessage | RegularMessage
     // Regular messages
     else if (header.type === CrdtMessageType.PUT_COMPONENT) {
       message = PutComponentOperation.read(buffer)!
+    } else if (header.type === CrdtMessageType.AUTHORITATIVE_PUT_COMPONENT) {
+      message = AuthoritativePutComponentOperation.read(buffer)!
     } else if (header.type === CrdtMessageType.DELETE_COMPONENT) {
       message = DeleteComponent.read(buffer)!
     } else if (header.type === CrdtMessageType.DELETE_ENTITY) {
@@ -85,7 +93,9 @@ export function networkMessageToLocal(
   localEntityId: Entity,
   destinationBuffer: ByteBuffer,
   // Optional network parent component for transform fixing
-  networkParentComponent?: typeof NetworkParent
+  networkParentComponent?: typeof NetworkParent,
+  // Force corrections - converts PUT_COMPONENT_NETWORK to AUTHORATIVE_PUT_COMPONENT
+  forceCorrections = false
 ): CrdtMessageBody {
   if (message.type === CrdtMessageType.PUT_COMPONENT_NETWORK) {
     let messageData = message.data
@@ -95,13 +105,32 @@ export function networkMessageToLocal(
       const parentNetwork = networkParentComponent.getOrNull(localEntityId)
       messageData = fixTransformParent(message, parentNetwork?.entityId)
     }
-    PutComponentOperation.write(localEntityId, message.timestamp, message.componentId, messageData, destinationBuffer)
-    return {
-      type: CrdtMessageType.PUT_COMPONENT,
-      componentId: message.componentId,
-      timestamp: message.timestamp,
-      data: messageData,
-      entityId: localEntityId
+    if (forceCorrections) {
+      // Use AUTHORITATIVE_PUT_COMPONENT for forced state updates
+      AuthoritativePutComponentOperation.write(
+        localEntityId,
+        message.timestamp,
+        message.componentId,
+        messageData,
+        destinationBuffer
+      )
+      return {
+        type: CrdtMessageType.AUTHORITATIVE_PUT_COMPONENT,
+        componentId: message.componentId,
+        timestamp: message.timestamp,
+        data: messageData,
+        entityId: localEntityId
+      }
+    } else {
+      // Normal PUT_COMPONENT conversion
+      PutComponentOperation.write(localEntityId, message.timestamp, message.componentId, messageData, destinationBuffer)
+      return {
+        type: CrdtMessageType.PUT_COMPONENT,
+        componentId: message.componentId,
+        timestamp: message.timestamp,
+        data: messageData,
+        entityId: localEntityId
+      }
     }
   } else if (message.type === CrdtMessageType.DELETE_COMPONENT_NETWORK) {
     DeleteComponent.write(localEntityId, message.componentId, message.timestamp, destinationBuffer)
