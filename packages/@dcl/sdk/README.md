@@ -88,9 +88,6 @@ make build
 ```bash
 # Run all tests
 make test
-
-# Run only ECS tests
-make test-ecs
 ```
 
 ### Development Commands

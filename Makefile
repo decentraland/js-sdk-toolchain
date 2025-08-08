@@ -42,9 +42,6 @@ update-protocol:
 	cd packages/@dcl/sdk-commands; npm i --save-exact @dcl/protocol@next
 	$(MAKE) sync-deps compile_apis
 
-update-renderer:
-	cd packages/@dcl/sdk; npm i --save-exact @dcl/explorer@latest
-
 lint:
 	npx tsx scripts/lint-packages.ts
 
@@ -69,9 +66,6 @@ test:
 	node_modules/.bin/jest --detectOpenHandles --colors test/
 	make test-inspector
 	make test-creator-hub
-
-test-ecs:
-	node_modules/.bin/jest --detectOpenHandles --colors test/
 
 test-inspector:
 	cd ./packages/@dcl/inspector/; TS_JEST_TRANSFORMER=true ./../../../node_modules/.bin/jest --coverage --detectOpenHandles --colors --config ./jest.config.js $(FILES)
