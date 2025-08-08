@@ -1582,6 +1582,19 @@ export interface LastWriteWinElementSetComponentDefinition<T> extends BaseCompon
 // @public (undocumented)
 export const LightSource: LastWriteWinElementSetComponentDefinition<PBLightSource>;
 
+// @public (undocumented)
+export interface LightSourceComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBLightSource> {
+    Type: LightSourceHelper;
+}
+
+// @public (undocumented)
+export interface LightSourceHelper {
+    // (undocumented)
+    Point: (point: PBLightSource_Point) => PBLightSource['type'];
+    // (undocumented)
+    Spot: (spot: PBLightSource_Spot) => PBLightSource['type'];
+}
+
 // @public
 export type Listeners = {
     onMouseDown?: Callback;
