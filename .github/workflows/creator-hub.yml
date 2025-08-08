@@ -54,7 +54,7 @@ jobs:
         working-directory: ${{ env.WORKING_DIRECTORY }}
         env:
           NODE_OPTIONS: "--max-old-space-size=8192"
-          MODE: ${{ env.PRODUCTION && 'production' || 'development' }}
+          MODE: ${{ env.PRODUCTION == 'true' && 'production' || 'development' }}
           VITE_SEGMENT_CREATORS_HUB_API_KEY: ${{ secrets.VITE_SEGMENT_CREATORS_HUB_API_KEY }}
           VITE_SEGMENT_INSPECTOR_API_KEY: ${{ secrets.VITE_SEGMENT_INSPECTOR_API_KEY }}
           VITE_ALLOWED_EXTERNAL_ORIGINS: ${{ secrets.VITE_ALLOWED_EXTERNAL_ORIGINS }}
@@ -80,7 +80,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Delete previous pre-release and its tag
-        if: ${{ env.PRODUCTION && steps.latest_version.outputs.tag != '' }}
+        if: ${{ env.PRODUCTION == 'true' && steps.latest_version.outputs.tag != '' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
@@ -109,7 +109,7 @@ jobs:
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
       - name: Create custom tag before build
-        if: env.PRODUCTION
+        if: ${{ env.PRODUCTION == 'true' }}
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
@@ -119,13 +119,13 @@ jobs:
 
       # Download 'SSLcom/esigner-codesign' to a folder called 'esigner-codesign' inside creator-hub package
       - name: Checkout esigner-codesign repository (Windows)
-        if: ${{ env.PRODUCTION && matrix.os == 'windows-latest' }}
+        if: ${{ env.PRODUCTION == 'true' && matrix.os == 'windows-latest' }}
         uses: actions/checkout@v3
         with:
           repository: 'SSLcom/esigner-codesign'
           path: ${{ env.WORKING_DIRECTORY }}/esigner-codesign
 
-      - name: Compile artifacts ${{ env.PRODUCTION && 'and upload them to github release' || '' }}
+      - name: Compile artifacts ${{ env.PRODUCTION == 'true' && 'and upload them to github release' || '' }}
         # I use this action because it is capable of retrying multiple times if there are any issues with the distribution server
         uses: nick-fields/retry@v3
         with:
@@ -134,7 +134,7 @@ jobs:
           retry_wait_seconds: 15
           retry_on: error
           shell: 'bash'
-          command: npx electron-builder --project ${{ env.WORKING_DIRECTORY }} --config electron-builder.cjs --config.extraMetadata.version=${{ steps.new_version.outputs.new_version }} ${{ matrix.os == 'macos-latest' && format('--config.mac.notarize={0}', true) || '' }} --publish ${{ env.PRODUCTION && 'always' || 'never' }}
+          command: npx electron-builder --project ${{ env.WORKING_DIRECTORY }} --config electron-builder.cjs --config.extraMetadata.version=${{ steps.new_version.outputs.new_version }} ${{ matrix.os == 'macos-latest' && format('--config.mac.notarize={0}', true) || '' }} --publish ${{ env.PRODUCTION == 'true' && 'always' || 'never' }}
         env:
           # Disable hard links to avoid issues with npm
           USE_HARD_LINKS: false
@@ -165,12 +165,12 @@ jobs:
           INPUT_CREDENTIAL_ID: ${{ secrets.WINDOWS_CREDENTIAL_ID_SIGNER }}
 
       - name: Move artifacts to upload folder
-        if: ${{ !env.PRODUCTION }}
+        if: ${{ env.PRODUCTION == 'false' }}
         working-directory: ${{ env.WORKING_DIRECTORY }}
         run: sh -c 'mkdir dist/upload && cp dist/*.dmg dist/*.exe dist/upload 2> /dev/null || :'
 
       - name: Upload to S3
-        if: ${{ !env.PRODUCTION }}
+        if: ${{ env.PRODUCTION == 'false' }}
         id: upload
         working-directory: ${{ env.WORKING_DIRECTORY }}
         env:
@@ -180,7 +180,7 @@ jobs:
           npx @dcl/cdn-uploader@next --bucket ${{ secrets.SDK_TEAM_S3_BUCKET }} --local-folder dist/upload --bucket-folder creator-hub/branch/${{ github.head_ref }}
 
       - name: Set specific windows instructions
-        if: ${{ !env.PRODUCTION && matrix.os == 'windows-latest' }}
+        if: ${{ env.PRODUCTION == 'false' && matrix.os == 'windows-latest' }}
         id: windows-instructions
         shell: bash
         run: |
@@ -189,7 +189,7 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
 
       - name: Set specific macos instructions
-        if: ${{ !env.PRODUCTION && matrix.os == 'macos-latest' }}
+        if: ${{ env.PRODUCTION == 'false' && matrix.os == 'macos-latest' }}
         id: macos-instructions
         run: |
           echo "list<<EOF" >> $GITHUB_ENV
@@ -202,7 +202,7 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
 
       - name: Find Comment
-        if: ${{ !env.PRODUCTION }}
+        if: ${{ env.PRODUCTION == 'false' }}
         uses: peter-evans/find-comment@v1
         id: fc
         with:
@@ -211,7 +211,7 @@ jobs:
           body-includes: Test this pull request on ${{ matrix.os }}
 
       - name: Create or update comment
-        if: ${{ !env.PRODUCTION }}
+        if: ${{ env.PRODUCTION == 'false' }}
         uses: peter-evans/create-or-update-comment@v1
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
