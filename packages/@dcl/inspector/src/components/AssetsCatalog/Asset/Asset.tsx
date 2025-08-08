@@ -5,12 +5,12 @@ import { BsFillLightningChargeFill as SmartItemIcon } from 'react-icons/bs'
 
 import { getContentsUrl, isSmart, isGround } from '../../../lib/logic/catalog'
 import { Asset } from '../../../lib/logic/catalog'
-import './Asset.css'
-
 import { fetchImage, resizeImage } from '../../../lib/utils/img'
 import { useIsMounted } from '../../../hooks/useIsMounted'
 
-const Asset: React.FC<{ value: Asset }> = ({ value }) => {
+import './Asset.css'
+
+const Asset = React.forwardRef<HTMLDivElement, { value: Asset }>(({ value }, ref) => {
   const [, drag, preview] = useDrag(() => ({ type: 'catalog-asset', item: { value } }), [value])
   const isSmartItem = isSmart(value)
   const isGroundItem = isGround(value)
@@ -26,14 +26,13 @@ const Asset: React.FC<{ value: Asset }> = ({ value }) => {
   }, [imgSrc, setPreviewImg, isMounted])
 
   return (
-    <>
+    <div ref={ref}>
       {previewImg && <DragPreviewImage connect={preview} src={previewImg} />}
       <div
         className={cx('assets-catalog-asset', { 'smart-item': isSmartItem, ground: isGroundItem })}
         ref={drag}
         data-test-id={value.id}
         data-test-label={value.name}
-        title={value.name}
       >
         <img src={imgSrc} alt={value.tags.join(', ')} />
         {isSmartItem && (
@@ -41,10 +40,12 @@ const Asset: React.FC<{ value: Asset }> = ({ value }) => {
             <SmartItemIcon />
           </div>
         )}
-        {isGroundItem && <div className="ground-badge  item-badge"></div>}
+        {isGroundItem && <div className="ground-badge item-badge"></div>}
       </div>
-    </>
+    </div>
   )
-}
+})
+
+Asset.displayName = 'Asset'
 
 export default React.memo(Asset)

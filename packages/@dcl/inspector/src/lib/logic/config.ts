@@ -10,6 +10,7 @@ export type InspectorConfig = {
   segmentUserId: string | null
   segmentKey: string | null
   projectId: string | null
+  catalystBaseUrl: string | null
 }
 
 export type GlobalWithConfig = typeof globalThis & {
@@ -19,6 +20,8 @@ export type GlobalWithConfig = typeof globalThis & {
 export const CONTENT_URL = version.includes('commit')
   ? 'https://builder-items.decentraland.zone'
   : 'https://builder-items.decentraland.org'
+
+export const CATALYST_BASE_URL = 'https://peer.decentraland.org'
 
 export function getConfig(): InspectorConfig {
   const config = (globalThis as GlobalWithConfig).InspectorConfig
@@ -33,6 +36,7 @@ export function getConfig(): InspectorConfig {
     segmentAppId: params.get('segmentAppId') || config?.segmentAppId || null,
     segmentUserId: params.get('segmentUserId') || config?.segmentUserId || null,
     segmentKey: params.get('segmentKey') || config?.segmentKey || null,
-    projectId: params.get('projectId') || config?.projectId || null
+    projectId: params.get('projectId') || config?.projectId || null,
+    catalystBaseUrl: params.get('catalystBaseUrl') || config?.catalystBaseUrl || CATALYST_BASE_URL
   }
 }
