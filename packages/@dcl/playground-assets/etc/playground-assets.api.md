@@ -1579,8 +1579,10 @@ export interface LastWriteWinElementSetComponentDefinition<T> extends BaseCompon
     getOrNull(entity: Entity): DeepReadonly<T> | null;
 }
 
+// Warning: (ae-missing-release-tag) "LightSource" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const LightSource: LastWriteWinElementSetComponentDefinition<PBLightSource>;
+export const LightSource: LightSourceComponentDefinitionExtended;
 
 // @public (undocumented)
 export interface LightSourceComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBLightSource> {
