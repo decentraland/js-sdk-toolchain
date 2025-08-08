@@ -740,7 +740,6 @@ export const componentDefinitionByName: {
     "core::Raycast": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycast>>;
     "core::RaycastResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycastResult>>;
     "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
-    "core::Spotlight": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSpotlight>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
     "core::TextureCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextureCamera>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
@@ -3245,21 +3244,6 @@ export namespace PBRealmInfo {
 }
 
 // @public (undocumented)
-export interface PBSpotlight {
-    angle: number;
-    // Warning: (tsdoc-malformed-html-name) Invalid HTML element: Expecting an HTML name
-    innerAngle?: number | undefined;
-}
-
-// @public (undocumented)
-export namespace PBSpotlight {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBSpotlight;
-    // (undocumented)
-    export function encode(message: PBSpotlight, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
 export interface PBTextShape {
     font?: Font | undefined;
     fontAutoSize?: boolean | undefined;
@@ -4472,9 +4456,6 @@ export interface Spec {
     // (undocumented)
     [key: string]: ISchema;
 }
-
-// @public (undocumented)
-export const Spotlight: LastWriteWinElementSetComponentDefinition<PBSpotlight>;
 
 // @alpha
 export const SyncComponents: ISyncComponents;
