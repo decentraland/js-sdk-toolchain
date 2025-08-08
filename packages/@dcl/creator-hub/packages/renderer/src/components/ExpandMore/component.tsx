@@ -15,10 +15,7 @@ export function ExpandMore({ title, text }: Props) {
 
   return (
     <Box className="ExpandMore">
-      <Box
-        display="flex"
-        alignItems="center"
-      >
+      <Box display="flex" alignItems="center">
         <IconButton
           onClick={handleToggle}
           aria-expanded={expanded}
@@ -34,23 +31,13 @@ export function ExpandMore({ title, text }: Props) {
           <ExpandMoreIcon />
         </IconButton>
         {title && (
-          <Typography
-            className="title"
-            variant="subtitle1"
-          >
+          <Typography className="title" variant="subtitle1">
             {title}
           </Typography>
         )}
       </Box>
-      <Collapse
-        in={expanded}
-        timeout="auto"
-        unmountOnExit
-      >
-        <Typography
-          variant="body2"
-          sx={{ mt: 1 }}
-        >
+      <Collapse in={expanded} timeout="auto" unmountOnExit>
+        <Typography variant="body2" sx={{ mt: 1 }}>
           {text}
         </Typography>
       </Collapse>

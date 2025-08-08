@@ -37,27 +37,14 @@ export function SceneList({ projects, sortBy, onSort }: Props) {
 
   const renderSortDropdown = () => {
     return (
-      <Select
-        variant="standard"
-        value={sortBy}
-        onChange={handleDropdownChange}
-      >
-        <MenuItem
-          className="sort-item"
-          value={SortBy.NEWEST}
-        >
+      <Select variant="standard" value={sortBy} onChange={handleDropdownChange}>
+        <MenuItem className="sort-item" value={SortBy.NEWEST}>
           {t('scene_list.sort.newest')}
         </MenuItem>
-        <MenuItem
-          className="sort-item"
-          value={SortBy.NAME}
-        >
+        <MenuItem className="sort-item" value={SortBy.NAME}>
           {t('scene_list.sort.name')}
         </MenuItem>
-        <MenuItem
-          className="sort-item"
-          value={SortBy.SIZE}
-        >
+        <MenuItem className="sort-item" value={SortBy.SIZE}>
           {t('scene_list.sort.size')}
         </MenuItem>
       </Select>

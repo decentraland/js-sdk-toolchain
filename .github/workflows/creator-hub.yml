@@ -7,14 +7,6 @@ on:
         description: "Uploaded inspector package url"
         required: true
         type: string
-  # push:
-  #   branches:
-  #     - main
-  #     - experimental
-  # pull_request:
-  # release:
-  #   types:
-  #     - created
 
 concurrency:
   group: creator-hub-${{ github.ref }}
@@ -24,118 +16,15 @@ env:
   WORKING_DIRECTORY: packages/@dcl/creator-hub
 
 jobs:
-  # ============================================================================
-  # Code Quality Jobs
-  # ============================================================================
-
-  # lint:
-  #   name: Lint & Code Style
-  #   runs-on: ubuntu-latest
-  #   if: github.event_name != 'workflow_call'
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: actions/setup-node@v4
-  #       with:
-  #         cache: 'npm'
-  #         cache-dependency-path: ${{ env.WORKING_DIRECTORY }}/package-lock.json
-
-  #     - name: Install dependencies
-  #       run: npm ci
-  #       working-directory: ${{ env.WORKING_DIRECTORY }}
-  #       env:
-  #         PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-
-  #     - name: Run ESLint
-  #       run: npm run lint --if-present
-  #       working-directory: ${{ env.WORKING_DIRECTORY }}
-
-  #     - name: Check code style with Prettier
-  #       run: |
-  #         npm i prettier
-  #         npx prettier --check "**/*.{js,mjs,cjs,jsx,ts,mts,cts,tsx,vue}"
-  #       working-directory: ${{ env.WORKING_DIRECTORY }}
-
-  # typechecking:
-  #   name: TypeScript Type Checking
-  #   runs-on: ubuntu-latest
-  #   if: github.event_name != 'workflow_call'
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: actions/setup-node@v4
-  #       with:
-  #         cache: 'npm'
-  #         cache-dependency-path: ${{ env.WORKING_DIRECTORY }}/package-lock.json
-
-  #     - name: Install dependencies
-  #       run: npm ci
-  #       working-directory: ${{ env.WORKING_DIRECTORY }}
-  #       env:
-  #         PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-
-  #     - name: Run TypeScript type checking
-  #       run: npm run typecheck --if-present
-  #       working-directory: ${{ env.WORKING_DIRECTORY }}
-
-  # # ============================================================================
-  # # Testing Jobs
-  # # ============================================================================
-
-  # tests:
-  #   name: Run Tests
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       os: [ macos-latest, windows-latest ]
-  #   runs-on: ${{ matrix.os }}
-  #   if: github.event_name != 'workflow_call'
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: actions/setup-node@v4
-  #       with:
-  #         cache: 'npm'
-  #         cache-dependency-path: ${{ env.WORKING_DIRECTORY }}/package-lock.json
-
-  #     - name: Install dependencies
-  #       run: npm ci
-  #       working-directory: ${{ env.WORKING_DIRECTORY }}
-  #       env:
-  #         PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-
-  #     - name: Run main tests
-  #       run: npm run test:main --if-present
-  #       working-directory: ${{ env.WORKING_DIRECTORY }}
-
-  #     - name: Run preload tests
-  #       run: npm run test:preload --if-present
-  #       working-directory: ${{ env.WORKING_DIRECTORY }}
-
-  #     - name: Run renderer tests
-  #       run: npm run test:renderer --if-present
-  #       working-directory: ${{ env.WORKING_DIRECTORY }}
-
-  #     - name: Run E2E tests
-  #       if: env.ENABLE_E2E_TESTS == 'true'
-  #       run: npm run build && npx vitest run
-  #       working-directory: ${{ env.WORKING_DIRECTORY }}
-  #       env:
-  #         NODE_OPTIONS: "--max-old-space-size=8192"
-  #         ENABLE_E2E_TESTS: true
-
-  # ============================================================================
-  # PR Preview Jobs (Only run on pull requests)
-  # ============================================================================
-
-  pr-preview:
+  build:
     name: Creator Hub Build
     strategy:
       fail-fast: true
       matrix:
         os: [ macos-latest, windows-latest ]
     runs-on: ${{ matrix.os }}
-    # if: github.event_name == 'workflow_call'
     env:
       WORKING_DIRECTORY: packages/@dcl/creator-hub
-
     steps:
       - uses: actions/checkout@v4
         with:

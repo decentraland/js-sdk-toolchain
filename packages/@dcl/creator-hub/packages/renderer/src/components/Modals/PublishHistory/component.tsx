@@ -11,12 +11,7 @@ import './styles.css';
 
 export function PublishHistory({ open, onClose }: Props) {
   return (
-    <Modal
-      open={open}
-      title={t('modal.publish_history.title')}
-      onClose={onClose}
-      size="tiny"
-    >
+    <Modal open={open} title={t('modal.publish_history.title')} onClose={onClose} size="tiny">
       <div className="PublishHistory">
         <Deployment />
       </div>

@@ -67,11 +67,7 @@ export function AlternativeServers(props: Props) {
           <div className="selection">
             <div>
               <h3>{t('modal.publish_project.alternative_servers.list')}</h3>
-              <Select
-                variant="standard"
-                value={option}
-                onChange={handleChangeSelect}
-              >
+              <Select variant="standard" value={option} onChange={handleChangeSelect}>
                 <MenuItem value="test">
                   {t('modal.publish_project.alternative_servers.options.test_server')}
                 </MenuItem>
@@ -84,24 +80,15 @@ export function AlternativeServers(props: Props) {
                   <span className="title">
                     {t('modal.publish_project.alternative_servers.custom_server_url')}
                   </span>
-                  <input
-                    value={customUrl}
-                    onChange={handleChangeCustom}
-                  />
+                  <input value={customUrl} onChange={handleChangeCustom} />
                   <span className="error">{error}</span>
                 </div>
               )}
             </div>
-            <img
-              className="thumbnail"
-              src={GenesisPlazaPng}
-            />
+            <img className="thumbnail" src={GenesisPlazaPng} />
           </div>
           <div className="actions">
-            <span
-              className="learn-more"
-              onClick={handleClickLearnMore}
-            >
+            <span className="learn-more" onClick={handleClickLearnMore}>
               {t('option_box.learn_more')}
             </span>
             <Button onClick={handleClick}>

@@ -21,10 +21,7 @@ export function NewDependencyVersion({ onClose }: { onClose: () => void }) {
   const renderActions = useCallback(
     () => (
       <>
-        <Button
-          variant="text"
-          onClick={handleClickUpdate}
-        >
+        <Button variant="text" onClick={handleClickUpdate}>
           {t('snackbar.new_dependency_version.actions.update')}
         </Button>
         <IconButton onClick={onClose}>

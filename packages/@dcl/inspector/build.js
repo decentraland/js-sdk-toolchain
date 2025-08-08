@@ -29,19 +29,19 @@ async function main() {
       '.eot': 'dataurl',
       '.woff': 'dataurl',
       '.woff2': 'dataurl',
-      '.ttf': 'dataurl',
+      '.ttf': 'dataurl'
     },
     banner: {
       // prepend hot-reload script to the bundle when in development mode
       js: PRODUCTION ? '' : `;(() => {${fs.readFileSync(path.resolve(__dirname, './hot-reload.js'), 'utf-8')}})();`
     },
-    define: {...getEnvVars()}
+    define: { ...getEnvVars() }
   })
 
   if (WATCH_MODE) {
     await context.watch()
     let { host, port } = await context.serve({
-      servedir: 'public',
+      servedir: 'public'
     })
     console.log(`> Serving on http://${host}:${port}`)
   } else {
@@ -76,7 +76,7 @@ async function buildCommonJsDistributable() {
   }
 }
 
-main().catch(err => {
+main().catch((err) => {
   process.exitCode = 1
   console.error(err)
   process.exit(1)
@@ -113,7 +113,7 @@ function runTypeChecker() {
 
 function getNotBundledModules() {
   // || true is added because `npm ls` fails installing a package from S3
-  const child = child_process.execSync("npm ls --all --json || true", {})
+  const child = child_process.execSync('npm ls --all --json || true', {})
   const ret = JSON.parse(child.toString())
 
   const externalModules = new Set()
@@ -129,7 +129,9 @@ function getNotBundledModules() {
 
   // now remove the ESM dependencies
   const esmModulesToBundle = ['@dcl/sdk', '@dcl/ecs', '@dcl/mini-rpc', '@dcl/asset-packs', '@dcl-sdk/utils']
-  return Array.from(externalModules).concat(builtinModules).filter($ => !esmModulesToBundle.includes($))
+  return Array.from(externalModules)
+    .concat(builtinModules)
+    .filter(($) => !esmModulesToBundle.includes($))
 }
 
 function getEnvVars() {

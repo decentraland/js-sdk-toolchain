@@ -13,21 +13,13 @@ function Playlist(props: { list: string; videos: { id: string; title: string }[]
     <div className="playlist">
       <div className="header">
         <i className="icon"></i>
-        <Typography
-          variant="h6"
-          className="title"
-        >
+        <Typography variant="h6" className="title">
           {props.title}
         </Typography>
       </div>
       <div className="content">
         {props.videos.map((video, index) => (
-          <Video
-            key={index}
-            list={props.list}
-            id={video.id}
-            title={video.title}
-          />
+          <Video key={index} list={props.list} id={video.id} title={video.title} />
         ))}
       </div>
     </div>
@@ -37,15 +29,8 @@ function Playlist(props: { list: string; videos: { id: string; title: string }[]
 function Video(props: { id: string; list: string; title: string }) {
   const url = `https://youtu.be/${props.id}?list=${props.list}`;
   return (
-    <div
-      className="video"
-      onClick={() => misc.openExternal(url)}
-      title={props.title}
-    >
-      <img
-        className="thumbnail"
-        src={`https://img.youtube.com/vi/${props.id}/0.jpg`}
-      />
+    <div className="video" onClick={() => misc.openExternal(url)} title={props.title}>
+      <img className="thumbnail" src={`https://img.youtube.com/vi/${props.id}/0.jpg`} />
       <span className="title">{props.title}</span>
     </div>
   );
@@ -58,10 +43,7 @@ export function VideosPage() {
     <main className="VideosPage">
       <Navbar active={NavbarItem.LEARN} />
       <Container>
-        <Title
-          value={t('learn.videos.title')}
-          onBack={() => navigate('/learn')}
-        />
+        <Title value={t('learn.videos.title')} onBack={() => navigate('/learn')} />
         <div className="playlists">
           <Playlist
             title="Product Updates"

@@ -23,18 +23,12 @@ export function OptionBox({
 
   return (
     <div className="OptionBox">
-      <img
-        className="thumbnail"
-        src={thumbnailSrc}
-      />
+      <img className="thumbnail" src={thumbnailSrc} />
       <h3>{title}</h3>
       <span className="description">{description}</span>
       <Button onClick={onClickPublish}>{buttonText}</Button>
       {learnMoreUrl && (
-        <span
-          className="learn-more"
-          onClick={handleClickLearnMore}
-        >
+        <span className="learn-more" onClick={handleClickLearnMore}>
           {t('option_box.learn_more')}
         </span>
       )}

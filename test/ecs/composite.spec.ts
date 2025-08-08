@@ -150,7 +150,7 @@ describe('composite instantiation system', () => {
 
       const currentStateString = getStateAsString(engine)
       const stateFilePath = `${COMPOSITE_BASE_PATH}/${composite.src}.scene-snapshot.json`
-      const lastStateSavedString = existsSync(stateFilePath) ? readFileSync(stateFilePath).toString() : ''
+      const lastStateSavedString = existsSync(stateFilePath) ? readFileSync(stateFilePath).toString().trim() : ''
 
       if (writeToFile) {
         writeFileSync(stateFilePath, currentStateString)

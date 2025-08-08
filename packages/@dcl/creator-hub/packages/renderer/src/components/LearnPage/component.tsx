@@ -10,10 +10,7 @@ import './styles.css';
 function Video(props: { id: string; list: string; title: string }) {
   const url = `https://youtu.be/${props.id}?list=${props.list}`;
   return (
-    <div
-      className="link"
-      onClick={() => misc.openExternal(url)}
-    >
+    <div className="link" onClick={() => misc.openExternal(url)}>
       <div className="thumbnail-wrapper">
         <img src={`https://img.youtube.com/vi/${props.id}/0.jpg`} />
       </div>
@@ -24,10 +21,7 @@ function Video(props: { id: string; list: string; title: string }) {
 
 function Link(props: { url: string; title: string }) {
   return (
-    <div
-      className="link"
-      onClick={() => misc.openExternal(props.url)}
-    >
+    <div className="link" onClick={() => misc.openExternal(props.url)}>
       <i className="icon" />
       <span className="title">{props.title}</span>
     </div>
@@ -41,18 +35,12 @@ export function LearnPage() {
       <Navbar active={NavbarItem.LEARN} />
       <Container>
         <div className="content">
-          <Typography
-            variant="h3"
-            mb="48px"
-          >
+          <Typography variant="h3" mb="48px">
             {t('learn.header.title')}
           </Typography>
           <div className="sections">
             <div className="section videos">
-              <div
-                className="header clickable"
-                onClick={() => navigate('/learn/videos')}
-              >
+              <div className="header clickable" onClick={() => navigate('/learn/videos')}>
                 <i className="image"></i>
                 <span className="title">{t('learn.header.videos')}</span>
               </div>
@@ -78,19 +66,12 @@ export function LearnPage() {
                   title="Combine drag & dop + Code"
                 />
               </div>
-              <Button
-                className="see-all"
-                disableRipple
-                onClick={() => navigate('/learn/videos')}
-              >
+              <Button className="see-all" disableRipple onClick={() => navigate('/learn/videos')}>
                 {t('learn.see_all')}
               </Button>
             </div>
             <div className="section docs">
-              <div
-                className="header clickable"
-                onClick={() => navigate('/learn/docs')}
-              >
+              <div className="header clickable" onClick={() => navigate('/learn/docs')}>
                 <i className="image"></i>
                 <span className="title">{t('learn.header.docs')}</span>
               </div>
@@ -120,11 +101,7 @@ export function LearnPage() {
                   title="Creating a Collection"
                 />
               </div>
-              <Button
-                className="see-all"
-                onClick={() => navigate('/learn/docs')}
-                disableRipple
-              >
+              <Button className="see-all" onClick={() => navigate('/learn/docs')} disableRipple>
                 {t('learn.see_all')}
               </Button>
             </div>
@@ -134,18 +111,12 @@ export function LearnPage() {
                 <span className="title">{t('learn.header.more')}</span>
               </div>
               <div className="content">
-                <Link
-                  url="https://studios.decentraland.org/"
-                  title="Decentraland Studios"
-                />
+                <Link url="https://studios.decentraland.org/" title="Decentraland Studios" />
                 <Link
                   url="https://studios.decentraland.org/resources?sdk_version=SDK7&resource_type=Scene"
                   title="Example Scenes"
                 />
-                <Link
-                  url="https://docs.decentraland.org/contributor/"
-                  title="Open Protocol Docs"
-                />
+                <Link url="https://docs.decentraland.org/contributor/" title="Open Protocol Docs" />
               </div>
             </div>
           </div>

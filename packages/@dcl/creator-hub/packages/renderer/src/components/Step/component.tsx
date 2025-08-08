@@ -29,10 +29,7 @@ export function ConnectedSteps({ steps }: { steps: Step[] }) {
   return (
     <div className="ConnectedSteps">
       {steps.map(($, idx) => (
-        <Step
-          {...$}
-          key={idx}
-        />
+        <Step {...$} key={idx} />
       ))}
     </div>
   );

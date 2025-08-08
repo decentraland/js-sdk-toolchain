@@ -25,12 +25,7 @@ export function SnackbarComponent() {
       case 'new-dependency-version':
         return <NewDependencyVersion onClose={close(notification.id)} />;
       case 'deploy':
-        return (
-          <Deploy
-            onClose={close(notification.id)}
-            path={notification.path}
-          />
-        );
+        return <Deploy onClose={close(notification.id)} path={notification.path} />;
       default:
         return null;
     }

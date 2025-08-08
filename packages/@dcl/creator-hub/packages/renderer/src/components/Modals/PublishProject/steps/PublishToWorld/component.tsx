@@ -52,14 +52,7 @@ export function PublishToWorld(props: Props) {
       subtitle={t('modal.publish_project.worlds.select_world.description')}
       {...props}
     >
-      {!emptyNames ? (
-        <SelectWorld
-          project={project!}
-          onPublish={handleNext}
-        />
-      ) : (
-        <EmptyNames />
-      )}
+      {!emptyNames ? <SelectWorld project={project!} onPublish={handleNext} /> : <EmptyNames />}
     </PublishModal>
   );
 }
@@ -150,17 +143,11 @@ function SelectWorld({ project, onPublish }: { project: Project; onPublish: () =
             onChange={handleChangeSelectProvider}
           >
             <MenuItem value={ENSProvider.DCL}>
-              <img
-                className="SelectWorld-ENSProvider-Img"
-                src={LogoDCLSVG}
-              />
+              <img className="SelectWorld-ENSProvider-Img" src={LogoDCLSVG} />
               {t(`modal.publish_project.worlds.select_world.ens_providers.${ENSProvider.DCL}`)}
             </MenuItem>
             <MenuItem value={ENSProvider.ENS}>
-              <img
-                className="SelectWorld-ENSProvider-Img"
-                src={LogoENSSVG}
-              />
+              <img className="SelectWorld-ENSProvider-Img" src={LogoENSSVG} />
               {t(`modal.publish_project.worlds.select_world.ens_providers.${ENSProvider.ENS}`)}
             </MenuItem>
           </Select>
@@ -185,17 +172,11 @@ function SelectWorld({ project, onPublish }: { project: Project; onPublish: () =
                 return selected;
               }}
             >
-              <MenuItem
-                disabled
-                value=""
-              >
+              <MenuItem disabled value="">
                 <em>{t('modal.publish_project.worlds.select_world.placeholder')}</em>
               </MenuItem>
               {listNames.map((_world: string) => (
-                <MenuItem
-                  key={_world}
-                  value={_world}
-                >
+                <MenuItem key={_world} value={_world}>
                   {_world}
                 </MenuItem>
               ))}
@@ -257,37 +238,21 @@ function EmptyNames() {
 
   return (
     <div className="EmptyNames">
-      <Typography
-        variant="h6"
-        textAlign="center"
-      >
+      <Typography variant="h6" textAlign="center">
         {t('modal.publish_project.worlds.empty_names.title')}
       </Typography>
-      <img
-        className="thumbnail"
-        src={EmptyWorldSVG}
-      />
-      <Typography
-        variant="body2"
-        textAlign="center"
-      >
+      <img className="thumbnail" src={EmptyWorldSVG} />
+      <Typography variant="body2" textAlign="center">
         {t('modal.publish_project.worlds.empty_names.description', {
           b: (child: string) => <b>{child}</b>,
           br: () => <br />,
         })}
       </Typography>
       <div className="actions">
-        <Button
-          size="small"
-          onClick={handleClick}
-        >
+        <Button size="small" onClick={handleClick}>
           {t('modal.publish_project.worlds.empty_names.action')}
         </Button>
-        <Button
-          size="small"
-          color="secondary"
-          onClick={handleClickLearnMore}
-        >
+        <Button size="small" color="secondary" onClick={handleClickLearnMore}>
           {t('option_box.learn_more')}
         </Button>
       </div>

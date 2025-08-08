@@ -56,15 +56,9 @@ export function Tutorial(props: { title: string; id: string; list?: string }) {
     [dispatch, props.id, props.list],
   );
   return (
-    <div
-      className="Tutorial"
-      onClick={handleClick}
-    >
+    <div className="Tutorial" onClick={handleClick}>
       <div className="thumbnail-wrapper">
-        <img
-          className="thumbnail"
-          src={`https://img.youtube.com/vi/${props.id}/0.jpg`}
-        />
+        <img className="thumbnail" src={`https://img.youtube.com/vi/${props.id}/0.jpg`} />
       </div>
       <div className="title">{props.title}</div>
     </div>
@@ -74,21 +68,13 @@ export function Tutorial(props: { title: string; id: string; list?: string }) {
 export function Tutorials() {
   return (
     <div className="Tutorials">
-      <Typography
-        variant="h6"
-        className="title"
-      >
+      <Typography variant="h6" className="title">
         <i className="icon"></i>
         {t('tutorials.title')}
       </Typography>
       <div className="list">
         {playlist.map(video => (
-          <Tutorial
-            key={video.id}
-            title={video.title}
-            id={video.id}
-            list={PLAYLIST_ID}
-          />
+          <Tutorial key={video.id} title={video.title} id={video.id} list={PLAYLIST_ID} />
         ))}
       </div>
     </div>

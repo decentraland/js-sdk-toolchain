@@ -11,11 +11,7 @@ import './styles.css';
 
 export function Button({ children, className = '', onClick, ...props }: ButtonProps) {
   return (
-    <DclButton
-      {...props}
-      className={cx('Button', className)}
-      onClick={onClick}
-    >
+    <DclButton {...props} className={cx('Button', className)} onClick={onClick}>
       {children}
     </DclButton>
   );
@@ -38,21 +34,11 @@ export function ButtonGroup({ extra, ...props }: GroupProps) {
     <>
       <DclButtonGroup variant="contained">
         <Button {...props} />
-        <Button
-          className="extra-button"
-          color={props.color}
-          size="small"
-          onClick={handleToggle}
-        >
+        <Button className="extra-button" color={props.color} size="small" onClick={handleToggle}>
           <ArrowDropDownIcon />
         </Button>
         {open && (
-          <Popper
-            open={open}
-            onClose={handleClose}
-            anchorEl={anchorEl}
-            placement="bottom-end"
-          >
+          <Popper open={open} onClose={handleClose} anchorEl={anchorEl} placement="bottom-end">
             {extra}
           </Popper>
         )}

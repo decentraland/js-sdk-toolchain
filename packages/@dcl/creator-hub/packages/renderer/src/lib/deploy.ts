@@ -30,7 +30,7 @@ export type Info = {
 
 export const STATUS_VALUES = ['idle', 'pending', 'complete', 'failed'] as const;
 
-export type Status = (typeof STATUS_VALUES)[number];
+export type Status = typeof STATUS_VALUES[number];
 
 export type DeploymentComponentsStatus = {
   catalyst: Status;

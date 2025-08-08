@@ -5,48 +5,14 @@ import type { BrowserWindow } from 'electron';
 let electronApp: ElectronApplication;
 
 beforeAll(async () => {
-  // Configure Electron for headless environments (CI/CD)
-  const launchOptions = {
-    args: ['.'],
-    // Add headless configuration for CI environments
-    env: {
-      ...process.env,
-      // Disable GPU acceleration in headless environments
-      ELECTRON_DISABLE_GPU: '1',
-      // Disable sandbox for CI environments
-      ELECTRON_NO_SANDBOX: '1',
-      // Disable shared memory for CI environments
-      ELECTRON_DISABLE_SHARED_MEMORY: '1',
-    },
-  };
-
-  // Skip e2e tests in CI environments if not explicitly enabled
-  if (process.env.CI && !process.env.ENABLE_E2E_TESTS) {
-    console.log('Skipping e2e tests in CI environment. Set ENABLE_E2E_TESTS=true to run them.');
-    return;
-  }
-
-  try {
-    electronApp = await electron.launch(launchOptions);
-  } catch (error) {
-    console.error('Failed to launch Electron:', error);
-    throw error;
-  }
+  electronApp = await electron.launch({ args: ['.'] });
 });
 
 afterAll(async () => {
-  if (electronApp) {
-    await electronApp.close();
-  }
+  await electronApp.close();
 });
 
 test('Main window state', async () => {
-  // Skip test if Electron failed to launch
-  if (!electronApp) {
-    console.log('Skipping test - Electron not available');
-    return;
-  }
-
   console.log('start');
   const page = await electronApp.firstWindow();
   console.log('await electronApp.firstWindow');
@@ -82,12 +48,6 @@ test('Main window state', async () => {
 });
 
 test('Main window web content', async () => {
-  // Skip test if Electron failed to launch
-  if (!electronApp) {
-    console.log('Skipping test - Electron not available');
-    return;
-  }
-
   const page = await electronApp.firstWindow();
   await page.waitForSelector('#app', { state: 'visible' });
   const element = await page.$('#app', { strict: true });

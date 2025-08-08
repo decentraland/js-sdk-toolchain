@@ -28,12 +28,7 @@ const MAX_BUFFER_SIZE = 2048;
 type Error = 'COMMAND_FAILED';
 
 export class StreamError extends ErrorBase<Error> {
-  constructor(
-    type: Error,
-    message: string,
-    public stdout: Buffer,
-    public stderr: Buffer,
-  ) {
+  constructor(type: Error, message: string, public stdout: Buffer, public stderr: Buffer) {
     super(type, message);
   }
 }

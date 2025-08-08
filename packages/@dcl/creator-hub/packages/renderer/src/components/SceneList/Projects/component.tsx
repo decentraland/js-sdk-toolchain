@@ -23,15 +23,9 @@ export function Projects({ projects }: Props) {
 
   return (
     <>
-      <div
-        className="new-scene"
-        onClick={() => navigate('/templates')}
-      ></div>
+      <div className="new-scene" onClick={() => navigate('/templates')}></div>
       {projects.map(project => (
-        <Project
-          key={project.path}
-          project={project}
-        />
+        <Project key={project.path} project={project} />
       ))}
     </>
   );
@@ -143,20 +137,14 @@ function NoScenes() {
     <div className="no-scenes-container">
       <div className="no-scenes-card">
         <div className="no-scenes-card-text">
-          <Typography
-            variant="h3"
-            className="no-scenes-title"
-          >
+          <Typography variant="h3" className="no-scenes-title">
             {t('scene_list.no_scenes.title')}
           </Typography>
           <span className="no-scenes-description">
             {t('scene_list.no_scenes.description', { a: NoScenesAnchor })}
           </span>
         </div>
-        <div
-          className="no-scenes-card-button"
-          onClick={() => navigate('/templates')}
-        ></div>
+        <div className="no-scenes-card-button" onClick={() => navigate('/templates')}></div>
       </div>
     </div>
   );

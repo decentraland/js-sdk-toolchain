@@ -63,14 +63,8 @@ const learn_resources = [
 ];
 
 const CardBanner: React.FC<CardBannerProps> = React.memo(({ image, title, onClick }) => (
-  <div
-    className={cx('CardBanner', { Clickable: !!onClick })}
-    onClick={onClick}
-  >
-    <img
-      className="CardBannerImage"
-      src={image}
-    />
+  <div className={cx('CardBanner', { Clickable: !!onClick })} onClick={onClick}>
+    <img className="CardBannerImage" src={image} />
     <div className="CardBannerContent">{title}</div>
   </div>
 ));
@@ -92,17 +86,10 @@ const CardItem: React.FC<CardItemProps> = React.memo(({ title, icon, onClick }) 
 const SignInCard: React.FC<SignInCardProps> = React.memo(({ onClickSignIn }) => (
   <Card className="Card SignInCard">
     <CardContent className="CardContent CenteredContent">
-      <Typography
-        className="Title"
-        variant="subtitle1"
-      >
+      <Typography className="Title" variant="subtitle1">
         {t('home.cards.sign_in.title')}
       </Typography>
-      <Button
-        className="SignInButton"
-        variant="contained"
-        onClick={onClickSignIn}
-      >
+      <Button className="SignInButton" variant="contained" onClick={onClickSignIn}>
         {t('home.cards.sign_in.action')}
       </Button>
     </CardContent>
@@ -196,11 +183,7 @@ const LearnCard: React.FC = React.memo(() => {
 
   return (
     <Card className="Card LearnCard">
-      <CardBanner
-        image={BookPng}
-        title={t('home.cards.learn.title')}
-        onClick={handleClickSeeAll}
-      />
+      <CardBanner image={BookPng} title={t('home.cards.learn.title')} onClick={handleClickSeeAll} />
       <CardContent className="CardContent">
         <div className="CardList">
           {learn_resources.map((item, idx) => (
@@ -235,17 +218,10 @@ const FeedbackCard: React.FC = React.memo(() => {
     <Card className="Card FeedbackCard">
       <CardContent className="CardContent CenteredContent">
         <img src={InfluencePng} />
-        <Typography
-          className="Title"
-          variant="h5"
-        >
+        <Typography className="Title" variant="h5">
           {t('home.cards.feedback.title')}
         </Typography>
-        <Button
-          className="FeedbackButton"
-          variant="contained"
-          onClick={handleClickFeedback}
-        >
+        <Button className="FeedbackButton" variant="contained" onClick={handleClickFeedback}>
           {t('home.cards.feedback.action')}
         </Button>
       </CardContent>
@@ -265,40 +241,22 @@ export function HomePage() {
       <main className="HomePage">
         <Navbar active={NavbarItem.HOME} />
         <Container>
-          <Typography
-            variant="h3"
-            mb="48px"
-          >
+          <Typography variant="h3" mb="48px">
             {t('home.header.title')}
           </Typography>
-          <Grid
-            container
-            spacing={4}
-          >
+          <Grid container spacing={4}>
             {!auth.isSignedIn ? (
-              <Grid
-                item
-                xs
-              >
+              <Grid item xs>
                 <SignInCard onClickSignIn={auth.signIn} />
               </Grid>
             ) : null}
-            <Grid
-              item
-              xs
-            >
+            <Grid item xs>
               <ScenesCard />
             </Grid>
-            <Grid
-              item
-              xs
-            >
+            <Grid item xs>
               <LearnCard />
             </Grid>
-            <Grid
-              item
-              xs
-            >
+            <Grid item xs>
               <FeedbackCard />
             </Grid>
           </Grid>

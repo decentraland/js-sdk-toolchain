@@ -61,10 +61,7 @@ export function AppSettings({ open, onClose }: { open: boolean; onClose: () => v
   const isDirty = useMemo(() => !equal(_settings, settings), [settings, _settings]);
 
   return (
-    <Modal
-      open={open}
-      size="small"
-    >
+    <Modal open={open} size="small">
       <Box className="AppSettingsModal">
         <Box className="CloseButtonContainer">
           <IconButton onClick={onClose}>
@@ -86,10 +83,7 @@ export function AppSettings({ open, onClose }: { open: boolean; onClose: () => v
               onChange={handleChangeSceneFolder}
               endAdornment={
                 <InputAdornment position="end">
-                  <IconButton
-                    onClick={handleOpenFolder}
-                    edge="end"
-                  >
+                  <IconButton onClick={handleOpenFolder} edge="end">
                     <FolderIcon />
                   </IconButton>
                 </InputAdornment>

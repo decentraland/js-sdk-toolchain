@@ -21,11 +21,7 @@ export function Initial(props: Props) {
         {...rest}
       >
         <div className="Initial">
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={signIn}
-          >
+          <Button color="primary" variant="contained" onClick={signIn}>
             {t('home.cards.sign_in.action')}
           </Button>
         </div>
@@ -57,10 +53,7 @@ export function Initial(props: Props) {
               learnMoreUrl="https://docs.decentraland.org/creator/development-guide/sdk7/publishing-permissions/#land-permission-options"
             />
           </div>
-          <span
-            className="alternative_servers"
-            onClick={() => props.onStep('alternative-servers')}
-          >
+          <span className="alternative_servers" onClick={() => props.onStep('alternative-servers')}>
             {t('modal.publish_project.alternative_servers.title')}
           </span>
         </div>

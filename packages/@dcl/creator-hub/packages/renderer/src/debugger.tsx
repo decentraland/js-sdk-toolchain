@@ -72,15 +72,9 @@ function Debugger() {
         'Failed to attach. Please close this window and launch debugger again'
       ) : (
         <>
-          <div
-            className="logs"
-            ref={logsRef}
-          >
+          <div className="logs" ref={logsRef}>
             {logs.map(($, i) => (
-              <span
-                key={i}
-                dangerouslySetInnerHTML={{ __html: convert.toHtml($) }}
-              />
+              <span key={i} dangerouslySetInnerHTML={{ __html: convert.toHtml($) }} />
             ))}
           </div>
         </>

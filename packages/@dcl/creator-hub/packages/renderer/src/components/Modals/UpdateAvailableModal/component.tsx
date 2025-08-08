@@ -20,10 +20,7 @@ interface Props {
 export function UpdateAvailableModal({ open, onClose, version }: Props) {
   const dispatch = useDispatch();
   return (
-    <Modal
-      size="tiny"
-      open={open}
-    >
+    <Modal size="tiny" open={open}>
       <Box className="UpdateAvailableModal">
         <div className="CloseButtonContainer">
           <IconButton onClick={onClose}>
@@ -31,17 +28,11 @@ export function UpdateAvailableModal({ open, onClose, version }: Props) {
           </IconButton>
         </div>
         <Typography variant="h5">{t('modal.app_settings.update.update_available')}</Typography>
-        <Typography
-          variant="body1"
-          className="version"
-        >
+        <Typography variant="body1" className="version">
           {t('modal.app_settings.version.label', { version })}
         </Typography>
         <Box className="ImageButtonContainer">
-          <img
-            src={InfluencePng}
-            alt="Update available"
-          />
+          <img src={InfluencePng} alt="Update available" />
           <Box className="ButtonContainer">
             <Button
               variant="contained"

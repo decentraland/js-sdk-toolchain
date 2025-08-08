@@ -113,8 +113,8 @@ export function Deploy(props: Props) {
             ? t('modal.publish_project.deploy.world')
             : t('modal.publish_project.deploy.land')
           : loadingPublish
-            ? t('modal.publish_project.deploy.loading')
-            : t('modal.publish_project.deploy.error')
+          ? t('modal.publish_project.deploy.loading')
+          : t('modal.publish_project.deploy.error')
       }
       size="large"
       {...props}
@@ -135,25 +135,14 @@ export function Deploy(props: Props) {
             </div>
             <div className="actions">
               <label className="dont-show-again">
-                <Checkbox
-                  value={skipWarning}
-                  onChange={() => setSkipWarning(!skipWarning)}
-                />
+                <Checkbox value={skipWarning} onChange={() => setSkipWarning(!skipWarning)} />
                 {t('modal.publish_project.deploy.warning.checkbox')}
               </label>
               <span className="buttons">
-                <Button
-                  color="secondary"
-                  variant="outlined"
-                  size="medium"
-                  onClick={handleBack}
-                >
+                <Button color="secondary" variant="outlined" size="medium" onClick={handleBack}>
                   {t('modal.publish_project.deploy.warning.back')}
                 </Button>
-                <Button
-                  size="medium"
-                  onClick={handlePublish}
-                >
+                <Button size="medium" onClick={handlePublish}>
                   {t('modal.publish_project.deploy.warning.continue')}
                 </Button>
               </span>
@@ -199,10 +188,7 @@ export function Deploy(props: Props) {
                 />
                 <div className="text">
                   <Typography variant="body1">{deployment.info.title}</Typography>
-                  <Typography
-                    variant="body2"
-                    color="#A09BA8"
-                  >
+                  <Typography variant="body2" color="#A09BA8">
                     {deployment.info.description}
                   </Typography>
                 </div>
@@ -223,11 +209,7 @@ export function Deploy(props: Props) {
                 />
               )}
               {deployment.status === 'complete' && (
-                <Success
-                  info={deployment.info}
-                  url={jumpInUrl}
-                  onClick={handleJumpIn}
-                />
+                <Success info={deployment.info} url={jumpInUrl} onClick={handleJumpIn} />
               )}
             </div>
           </>
@@ -271,14 +253,8 @@ function Idle({ files, error, onClick }: IdleProps) {
       </div>
       <div className="list">
         {files.map(file => (
-          <div
-            className={cx('file', { invalid: file.size > MAX_FILE_SIZE_BYTES })}
-            key={file.name}
-          >
-            <div
-              className="filename"
-              title={file.name}
-            >
+          <div className={cx('file', { invalid: file.size > MAX_FILE_SIZE_BYTES })} key={file.name}>
+            <div className="filename" title={file.name}>
               {getPath(file.name)}
             </div>
             <div className="size">{getSize(file.size)}</div>
@@ -287,11 +263,7 @@ function Idle({ files, error, onClick }: IdleProps) {
       </div>
       <div className="actions">
         <p className="error">{errorMessage}</p>
-        <Button
-          size="large"
-          onClick={onClick}
-          disabled={!!error}
-        >
+        <Button size="large" onClick={onClick} disabled={!!error}>
           {t('modal.publish_project.deploy.files.publish')}
           <i className="deploy-icon" />
         </Button>
@@ -389,35 +361,20 @@ function Deploying({ deployment, url, onClick, onRetry }: DeployingProps) {
       <ConnectedSteps steps={steps} />
       {overallStatus === 'failed' ? (
         <div className="actions">
-          <Button
-            size="large"
-            variant="outlined"
-            color="secondary"
-            onClick={onReportIssue}
-          >
+          <Button size="large" variant="outlined" color="secondary" onClick={onReportIssue}>
             {t('modal.publish_project.deploy.deploying.actions.report_issue')}
           </Button>
-          <Button
-            size="large"
-            onClick={onRetry}
-          >
+          <Button size="large" onClick={onRetry}>
             {t('modal.publish_project.deploy.deploying.actions.retry')}
           </Button>
         </div>
       ) : isFinishing ? (
         <>
           <div className="jump">
-            <JumpUrl
-              inProgress
-              info={info}
-              url={url}
-            />
+            <JumpUrl inProgress info={info} url={url} />
           </div>
           <div className="actions">
-            <Button
-              size="large"
-              onClick={onClick}
-            >
+            <Button size="large" onClick={onClick}>
               {t('modal.publish_project.deploy.success.jump_in')}
               <i className="jump-in-icon" />
             </Button>
@@ -445,16 +402,10 @@ function Success({ info, url, onClick }: SuccessProps) {
       <div className="content">
         <i className="success-icon" />
         <div className="message">{t('modal.publish_project.deploy.success.message')}</div>
-        <JumpUrl
-          info={info}
-          url={url}
-        />
+        <JumpUrl info={info} url={url} />
       </div>
       <div className="actions">
-        <Button
-          size="large"
-          onClick={onClick}
-        >
+        <Button size="large" onClick={onClick}>
           {t('modal.publish_project.deploy.success.jump_in')}
           <i className="jump-in-icon" />
         </Button>
@@ -476,10 +427,7 @@ function JumpUrl({ inProgress, info, url }: { inProgress?: boolean; info: Info; 
       </label>
       <div className="url">
         {url}
-        <i
-          className="copy-icon"
-          onClick={() => misc.copyToClipboard(url)}
-        />
+        <i className="copy-icon" onClick={() => misc.copyToClipboard(url)} />
       </div>
     </div>
   );

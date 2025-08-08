@@ -110,11 +110,7 @@ export const UpdateSettings: React.FC<{ className?: string }> = ({ className = '
         </Typography>
       )}
       <Row className="update-settings__button-container">
-        <Button
-          variant="contained"
-          onClick={buttonProps.action}
-          disabled={buttonProps.disabled}
-        >
+        <Button variant="contained" onClick={buttonProps.action} disabled={buttonProps.disabled}>
           {buttonProps.text}
         </Button>
         {shouldShowUpdateAvailable() && (

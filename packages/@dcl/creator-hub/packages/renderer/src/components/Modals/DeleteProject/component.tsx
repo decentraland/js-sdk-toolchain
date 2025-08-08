@@ -20,10 +20,7 @@ export function DeleteProject({ open, project, onClose, onSubmit }: Props) {
       size="tiny"
       actions={
         <>
-          <Button
-            color="secondary"
-            onClick={onClose}
-          >
+          <Button color="secondary" onClick={onClose}>
             {t('modal.cancel')}
           </Button>
           <Button onClick={handleSubmit}>{t('modal.confirm')}</Button>

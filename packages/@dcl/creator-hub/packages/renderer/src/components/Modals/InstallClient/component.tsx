@@ -35,40 +35,19 @@ export function InstallClient({ open, onClose }: Props) {
   }, [agent]);
 
   return (
-    <Modal
-      className="InstallClientModal"
-      open={open}
-      size="tiny"
-    >
+    <Modal className="InstallClientModal" open={open} size="tiny">
       <Box className="InstallClientBox">
         <Box className="LogoContainer">
-          <img
-            src={LogoDCLSVG}
-            alt="Decentraland Logo"
-            className="Logo"
-          />
+          <img src={LogoDCLSVG} alt="Decentraland Logo" className="Logo" />
         </Box>
-        <Typography
-          variant="h5"
-          className="Title"
-        >
+        <Typography variant="h5" className="Title">
           {t('modal.install_client.title')}
         </Typography>
         <Box className="Actions">
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleDownload}
-            startIcon={icon}
-          >
+          <Button variant="contained" color="primary" onClick={handleDownload} startIcon={icon}>
             {text}
           </Button>
-          <Button
-            variant="outlined"
-            color="secondary"
-            fullWidth
-            onClick={onClose}
-          >
+          <Button variant="outlined" color="secondary" fullWidth onClick={onClose}>
             {t('modal.install_client.cancel')}
           </Button>
         </Box>

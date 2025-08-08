@@ -10,10 +10,7 @@ import './styles.css';
 
 function Link(props: { url: string; title: string }) {
   return (
-    <div
-      className="link"
-      onClick={() => misc.openExternal(props.url)}
-    >
+    <div className="link" onClick={() => misc.openExternal(props.url)}>
       <i className="icon" />
       <span className="title">{props.title}</span>
     </div>
@@ -27,19 +24,13 @@ export function DocsPage() {
     <main className="DocsPage">
       <Navbar active={NavbarItem.LEARN} />
       <Container>
-        <Title
-          value={t('learn.docs.title')}
-          onBack={() => navigate('/learn')}
-        />
+        <Title value={t('learn.docs.title')} onBack={() => navigate('/learn')} />
         <div className="docs">
           <div className="start">
             <div className="section">
               <h1>Where to start</h1>
               <div className="links horizontal">
-                <Link
-                  title="Wearable Overview"
-                  url="https://docs.decentraland.org"
-                />
+                <Link title="Wearable Overview" url="https://docs.decentraland.org" />
                 <Link
                   title="3D Model Essentials"
                   url="https://docs.decentraland.org/creator/3d-modeling/3d-models/"
@@ -52,18 +43,8 @@ export function DocsPage() {
             </div>
           </div>
           <div className="sections">
-            <Grid
-              container
-              spacing={4}
-            >
-              <Grid
-                item
-                xs={12}
-                sm={12}
-                md={6}
-                lg={4}
-                xl={3}
-              >
+            <Grid container spacing={4}>
+              <Grid item xs={12} sm={12} md={6} lg={4} xl={3}>
                 <div className="section">
                   <h4>Wearables & Emotes</h4>
                   <h5>Wearables</h5>
@@ -96,14 +77,7 @@ export function DocsPage() {
                   </div>
                 </div>
               </Grid>
-              <Grid
-                item
-                xs={12}
-                sm={12}
-                md={6}
-                lg={4}
-                xl={3}
-              >
+              <Grid item xs={12} sm={12} md={6} lg={4} xl={3}>
                 <div className="section">
                   <h4>Tutorials & Examples</h4>
                   <div className="links vertical">
@@ -122,14 +96,7 @@ export function DocsPage() {
                   </div>
                 </div>
               </Grid>
-              <Grid
-                item
-                xs={12}
-                sm={12}
-                md={6}
-                lg={4}
-                xl={3}
-              >
+              <Grid item xs={12} sm={12} md={6} lg={4} xl={3}>
                 <div className="section">
                   <h4>SDK</h4>
                   <div className="links vertical">
@@ -156,14 +123,7 @@ export function DocsPage() {
                   </div>
                 </div>
               </Grid>
-              <Grid
-                item
-                xs={12}
-                sm={12}
-                md={6}
-                lg={4}
-                xl={3}
-              >
+              <Grid item xs={12} sm={12} md={6} lg={4} xl={3}>
                 <div className="section">
                   <h4>3D Modeling & Animations</h4>
                   <div className="links vertical">

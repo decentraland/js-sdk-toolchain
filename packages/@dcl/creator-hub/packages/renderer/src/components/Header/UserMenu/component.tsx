@@ -28,10 +28,7 @@ export function UserMenu({ avatar, isSignedIn, onClickSignOut, onClickSignIn }: 
         onClick={handleClick}
         disableRipple
       >
-        <AvatarFace
-          size="medium"
-          avatar={avatar}
-        />
+        <AvatarFace size="medium" avatar={avatar} />
       </Button>
       <Menu
         id="UserMenu"
@@ -46,12 +43,7 @@ export function UserMenu({ avatar, isSignedIn, onClickSignOut, onClickSignIn }: 
       </Menu>
     </>
   ) : (
-    <Button
-      className="SignInButton"
-      onClick={onClickSignIn}
-      variant="contained"
-      disableRipple
-    >
+    <Button className="SignInButton" onClick={onClickSignIn} variant="contained" disableRipple>
       {t('navbar.user_menu.sign_in')}
     </Button>
   );

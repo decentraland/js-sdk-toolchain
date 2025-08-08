@@ -52,7 +52,7 @@ typecheck:
 	make typecheck-creator-hub
 
 typecheck-creator-hub:
-	cd $(CH_PATH); npm run typecheck
+	cd $(CH_PATH); npm run typecheck --if-present
 
 sync-deps:
 	$(SYNC_PACK) format --config .syncpackrc.json --source "packages/*/package.json" --source "package.json"
@@ -70,9 +70,8 @@ test:
 	make test-inspector
 	make test-creator-hub
 
-TESTARGS ?= test/
 test-ecs:
-	node_modules/.bin/jest --detectOpenHandles --colors $(TESTARGS)
+	node_modules/.bin/jest --detectOpenHandles --colors test/
 
 test-inspector:
 	cd ./packages/@dcl/inspector/; TS_JEST_TRANSFORMER=true ./../../../node_modules/.bin/jest --coverage --detectOpenHandles --colors --config ./jest.config.js $(FILES)
@@ -86,13 +85,13 @@ test-cli:
 	cd tmp/scene; $(PWD)/packages/@dcl/sdk-commands/dist/index.js init
 
 test-creator-hub:
-	cd $(CH_PATH); npm run test:ci
+	cd $(CH_PATH); npm run test
 
-test-coverage:
-	node_modules/.bin/jest --detectOpenHandles --colors --coverage $(TESTARGS)
+test-creator-hub-e2e:
+	cd $(CH_PATH); npm run test:e2e
 
 format:
-	npx prettier --write "**/*.{js,ts,tsx,json}"
+	npx prettier --write "**/*.{js,ts,tsx,json}" --loglevel=error
 
 install-protobuf:
 	curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v$(PROTOBUF_VERSION)/$(PROTOBUF_ZIP)

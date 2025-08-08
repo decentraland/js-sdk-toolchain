@@ -40,40 +40,20 @@ export function SignInPage() {
   }, [calculateAndSetExpirationCountdown]);
 
   return (
-    <Grid
-      className="SignIn"
-      container
-      direction="row"
-      alignItems="center"
-      height={'100hv'}
-    >
+    <Grid className="SignIn" container direction="row" alignItems="center" height={'100hv'}>
       <div className="background"></div>
-      <Grid
-        className="content"
-        xs={4}
-        item
-      >
-        <Button
-          className="back"
-          variant="contained"
-          onClick={handleBack}
-        >
+      <Grid className="content" xs={4} item>
+        <Button className="back" variant="contained" onClick={handleBack}>
           <ChevronLeftOutlined /> {t('sign_in.back')}
         </Button>
-        <Typography
-          variant="h4"
-          gutterBottom
-        >
+        <Typography variant="h4" gutterBottom>
           {t('sign_in.content.title')}
         </Typography>
         <Typography variant="body1">{t('sign_in.content.body', { br: () => <br /> })}</Typography>
         <Box className="code">
           <Typography className="verificationCode">{verificationCode}</Typography>
           <div className="tooltip">
-            <Tooltip
-              placement="right"
-              title={t('sign_in.content.verification_code_info')}
-            >
+            <Tooltip placement="right" title={t('sign_in.content.verification_code_info')}>
               <InfoOutlined />
             </Tooltip>
           </div>

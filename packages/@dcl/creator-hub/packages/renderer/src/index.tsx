@@ -57,54 +57,18 @@ root.render(
             <Router>
               <AuthProvider>
                 <Routes>
-                  <Route
-                    path="/"
-                    element={<HomePage />}
-                  />
-                  <Route
-                    path="/home"
-                    element={<HomePage />}
-                  />
-                  <Route
-                    path="/scenes"
-                    element={<ScenesPage />}
-                  />
-                  <Route
-                    path="/templates"
-                    element={<TemplatesPage />}
-                  />
-                  <Route
-                    path="/collections"
-                    element={<CollectionsPage />}
-                  />
-                  <Route
-                    path="/manage"
-                    element={<ManagePage />}
-                  />
-                  <Route
-                    path="/learn"
-                    element={<LearnPage />}
-                  />
-                  <Route
-                    path="/learn/videos"
-                    element={<VideosPage />}
-                  />
-                  <Route
-                    path="/learn/docs"
-                    element={<DocsPage />}
-                  />
-                  <Route
-                    path="/more"
-                    element={<MorePage />}
-                  />
-                  <Route
-                    path="/editor"
-                    element={<EditorPage />}
-                  />
-                  <Route
-                    path="/sign-in"
-                    element={<SignInPage />}
-                  />
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/home" element={<HomePage />} />
+                  <Route path="/scenes" element={<ScenesPage />} />
+                  <Route path="/templates" element={<TemplatesPage />} />
+                  <Route path="/collections" element={<CollectionsPage />} />
+                  <Route path="/manage" element={<ManagePage />} />
+                  <Route path="/learn" element={<LearnPage />} />
+                  <Route path="/learn/videos" element={<VideosPage />} />
+                  <Route path="/learn/docs" element={<DocsPage />} />
+                  <Route path="/more" element={<MorePage />} />
+                  <Route path="/editor" element={<EditorPage />} />
+                  <Route path="/sign-in" element={<SignInPage />} />
                 </Routes>
                 <Snackbar />
               </AuthProvider>

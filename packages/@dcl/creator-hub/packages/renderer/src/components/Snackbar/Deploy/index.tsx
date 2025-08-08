@@ -42,10 +42,7 @@ function Pending({ path, title, onClose }: { path: string; title: string; onClos
   const renderActions = useCallback(
     () => (
       <>
-        <Button
-          variant="text"
-          onClick={openModal}
-        >
+        <Button variant="text" onClick={openModal}>
           {t('snackbar.deploy.pending.actions.view')}
         </Button>
         <IconButton onClick={onClose}>
@@ -61,10 +58,7 @@ function Pending({ path, title, onClose }: { path: string; title: string; onClos
   return (
     <>
       {!open && (
-        <Alert
-          icon={<Loader size={20} />}
-          action={renderActions()}
-        >
+        <Alert icon={<Loader size={20} />} action={renderActions()}>
           {t('snackbar.deploy.pending.title', { title })}
         </Alert>
       )}
@@ -91,10 +85,7 @@ function Success({ path, title, onClose }: { path: string; title: string; onClos
   const renderActions = useCallback(
     () => (
       <>
-        <Button
-          variant="text"
-          onClick={openModal}
-        >
+        <Button variant="text" onClick={openModal}>
           {t('snackbar.deploy.success.actions.view')}
         </Button>
         <IconButton onClick={onClose}>
@@ -110,10 +101,7 @@ function Success({ path, title, onClose }: { path: string; title: string; onClos
   return (
     <>
       {!open && (
-        <Alert
-          severity="success"
-          action={renderActions()}
-        >
+        <Alert severity="success" action={renderActions()}>
           {t('snackbar.deploy.success.title', { title })}
         </Alert>
       )}
@@ -140,10 +128,7 @@ function Error({ path, title, onClose }: { path: string; title: string; onClose:
   const renderActions = useCallback(
     () => (
       <>
-        <Button
-          variant="text"
-          onClick={openModal}
-        >
+        <Button variant="text" onClick={openModal}>
           {t('snackbar.deploy.error.actions.retry')}
         </Button>
         <IconButton onClick={onClose}>
@@ -159,19 +144,11 @@ function Error({ path, title, onClose }: { path: string; title: string; onClose:
   return (
     <>
       {!open && (
-        <Alert
-          severity="error"
-          action={renderActions()}
-        >
+        <Alert severity="error" action={renderActions()}>
           {t('snackbar.deploy.error.title', { title })}
         </Alert>
       )}
-      <PublishProject
-        open={open}
-        disableGoBack
-        project={project}
-        onClose={onClose}
-      />
+      <PublishProject open={open} disableGoBack project={project} onClose={onClose} />
     </>
   );
 }

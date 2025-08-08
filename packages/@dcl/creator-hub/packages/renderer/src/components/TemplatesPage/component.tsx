@@ -126,22 +126,13 @@ export function TemplatesPage() {
       <Navbar active={NavbarItem.SCENES} />
       <Container>
         <TutorialsWrapper>
-          <Title
-            value={t('templates.title')}
-            onBack={handleBack}
-          />
+          <Title value={t('templates.title')} onBack={handleBack} />
           <FiltersBar>
             <>
               <Typography variant="h6">{t('templates.results', { count })}</Typography>
-              <Filters
-                value={difficulty}
-                onClick={handleClickDifficulty}
-              />
+              <Filters value={difficulty} onClick={handleClickDifficulty} />
             </>
-            <Sort
-              value={sortBy}
-              onChange={handleSort}
-            />
+            <Sort value={sortBy} onChange={handleSort} />
           </FiltersBar>
           <div className="template-list">
             <ProjectCard
@@ -163,13 +154,7 @@ export function TemplatesPage() {
                 height={480}
                 onClick={handleClickTemplate(template.github_link)}
                 content={(template.tags || []).map($ => (
-                  <Chip
-                    key={$}
-                    label={$}
-                    color="default"
-                    size="medium"
-                    variant="outlined"
-                  />
+                  <Chip key={$} label={$} color="default" size="medium" variant="outlined" />
                 ))}
               />
             ))}
@@ -241,21 +226,11 @@ function Sort({ value, onChange }: { value: SortBy; onChange: (value: SortBy) =>
   return (
     <>
       <p>{t('templates.sort.title')}</p>
-      <Select
-        variant="standard"
-        value={value}
-        onChange={handleSort}
-      >
-        <MenuItem
-          className="sort-item"
-          value={SortBy.DEFAULT}
-        >
+      <Select variant="standard" value={value} onChange={handleSort}>
+        <MenuItem className="sort-item" value={SortBy.DEFAULT}>
           {t('templates.sort.default')}
         </MenuItem>
-        <MenuItem
-          className="sort-item"
-          value={SortBy.NEWEST}
-        >
+        <MenuItem className="sort-item" value={SortBy.NEWEST}>
           {t('templates.sort.newest')}
         </MenuItem>
       </Select>

@@ -55,40 +55,17 @@ export function Navbar(props: { active: NavbarItem }) {
     <Header classNames={cx('Navbar')}>
       <>
         <div className="logo">
-          <img
-            src={logo}
-            alt="Decentraland Creator Hub"
-          />
+          <img src={logo} alt="Decentraland Creator Hub" />
         </div>
         <div className="menu">
-          <MenuItem
-            item={NavbarItem.HOME}
-            active={props.active}
-          />
-          <MenuItem
-            item={NavbarItem.SCENES}
-            active={props.active}
-          />
+          <MenuItem item={NavbarItem.HOME} active={props.active} />
+          <MenuItem item={NavbarItem.SCENES} active={props.active} />
           {/* This page will be added in a future shape */}
-          <MenuItem
-            item={NavbarItem.COLLECTIONS}
-            active={props.active}
-            disable={true}
-          />
-          <MenuItem
-            item={NavbarItem.LEARN}
-            active={props.active}
-          />
+          <MenuItem item={NavbarItem.COLLECTIONS} active={props.active} disable={true} />
+          <MenuItem item={NavbarItem.LEARN} active={props.active} />
           {/* This page will be added in a future shape */}
-          <MenuItem
-            item={NavbarItem.MANAGE}
-            active={props.active}
-            disable={true}
-          />
-          <MenuItem
-            item={NavbarItem.MORE}
-            active={props.active}
-          />
+          <MenuItem item={NavbarItem.MANAGE} active={props.active} disable={true} />
+          <MenuItem item={NavbarItem.MORE} active={props.active} />
         </div>
       </>
       <>
@@ -101,16 +78,10 @@ export function Navbar(props: { active: NavbarItem }) {
           >
             {t('navbar.report_an_issue')}
           </Button>
-          <IconButton
-            aria-label="help"
-            onClick={handleClickHelp}
-          >
+          <IconButton aria-label="help" onClick={handleClickHelp}>
             <QuestionMarkIcon />
           </IconButton>
-          <IconButton
-            aria-label="settings"
-            onClick={handleClickSettings}
-          >
+          <IconButton aria-label="settings" onClick={handleClickSettings}>
             <SettingsIcon />
           </IconButton>
         </Box>

@@ -28,18 +28,10 @@ export function MissingScenes({ onClose }: { onClose: () => void }) {
 
   const renderActions = () => (
     <>
-      <Button
-        color="inherit"
-        size="small"
-        onClick={handleModal(true)}
-      >
+      <Button color="inherit" size="small" onClick={handleModal(true)}>
         {t('snackbar.missing_projects.actions.view')}
       </Button>
-      <Button
-        color="inherit"
-        size="small"
-        onClick={handleDiscardAll}
-      >
+      <Button color="inherit" size="small" onClick={handleDiscardAll}>
         {t('snackbar.missing_projects.actions.discard_all')}
       </Button>
     </>
@@ -47,16 +39,10 @@ export function MissingScenes({ onClose }: { onClose: () => void }) {
 
   return (
     <>
-      <Alert
-        severity="error"
-        action={renderActions()}
-      >
+      <Alert severity="error" action={renderActions()}>
         {t('snackbar.missing_projects.title', { scenes: missing.length })}
       </Alert>
-      <MissingProjects
-        open={open}
-        onClose={handleModal(false)}
-      />
+      <MissingProjects open={open} onClose={handleModal(false)} />
     </>
   );
 }

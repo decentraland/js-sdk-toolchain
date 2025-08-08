@@ -43,16 +43,8 @@ export function ProjectCard({
   const heightPx = `${height}px`;
 
   return (
-    <div
-      className="ProjectCard"
-      onClick={onClick}
-      style={{ width: widthPx, height: heightPx }}
-    >
-      <Overlay
-        status={status}
-        width={widthPx}
-        height={heightPx}
-      />
+    <div className="ProjectCard" onClick={onClick} style={{ width: widthPx, height: heightPx }}>
+      <Overlay status={status} width={widthPx} height={heightPx} />
       {videoUrl ? (
         <video
           className="video"
@@ -73,10 +65,7 @@ export function ProjectCard({
         <div className="title">
           <Typography variant="h6">{title}</Typography>
           {dropdownOptions?.length && (
-            <Dropdown
-              className="options-dropdown"
-              options={dropdownOptions}
-            />
+            <Dropdown className="options-dropdown" options={dropdownOptions} />
           )}
         </div>
         {description && <p className="description">{description}</p>}
@@ -103,11 +92,7 @@ function Overlay({
   }, []);
 
   return (
-    <div
-      className="Overlay"
-      style={{ width, height }}
-      onClick={handleClick}
-    >
+    <div className="Overlay" style={{ width, height }} onClick={handleClick}>
       <Loader />
       {t('scene_list.saving')}
     </div>

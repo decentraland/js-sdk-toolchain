@@ -46,16 +46,10 @@ export function MissingProjects({ open, onClose }: Props) {
           <Row key={path}>
             {ellipsisAtMiddle(path, 40)}
             <div className="actions">
-              <Button
-                color="primary"
-                onClick={handleFind(path)}
-              >
+              <Button color="primary" onClick={handleFind(path)}>
                 {t('modal.missing_projects.find')}
               </Button>
-              <Button
-                color="info"
-                onClick={handleDiscard(path)}
-              >
+              <Button color="info" onClick={handleDiscard(path)}>
                 {t('modal.missing_projects.discard')}
               </Button>
             </div>

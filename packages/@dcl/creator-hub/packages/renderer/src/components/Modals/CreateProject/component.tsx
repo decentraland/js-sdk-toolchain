@@ -64,16 +64,10 @@ export function CreateProject({ open, initialValue, onClose, onSubmit }: Props) 
       size="medium"
       actions={
         <>
-          <Button
-            color="secondary"
-            onClick={onClose}
-          >
+          <Button color="secondary" onClick={onClose}>
             {t('modal.cancel')}
           </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={loading || !!error}
-          >
+          <Button onClick={handleSubmit} disabled={loading || !!error}>
             {loading ? <Loader size={20} /> : t('modal.create_project.actions.create')}
           </Button>
         </>
@@ -82,11 +76,7 @@ export function CreateProject({ open, initialValue, onClose, onSubmit }: Props) 
       <Box className="CreateProjectModal">
         <FormGroup className="CreateProjectFormControl">
           <Typography variant="body1">{t('modal.create_project.fields.name')}</Typography>
-          <OutlinedInput
-            color="secondary"
-            value={value.name}
-            onChange={handleChange('name')}
-          />
+          <OutlinedInput color="secondary" value={value.name} onChange={handleChange('name')} />
           <Typography variant="body1">{t('modal.create_project.fields.path')}</Typography>
           <OutlinedInput
             color="secondary"
@@ -95,20 +85,14 @@ export function CreateProject({ open, initialValue, onClose, onSubmit }: Props) 
             onBlur={validate}
             endAdornment={
               <InputAdornment position="end">
-                <IconButton
-                  onClick={handleOpenFolder}
-                  edge="end"
-                >
+                <IconButton onClick={handleOpenFolder} edge="end">
                   <FolderIcon />
                 </IconButton>
               </InputAdornment>
             }
           />
           {error && (
-            <Typography
-              variant="body1"
-              className="error"
-            >
+            <Typography variant="body1" className="error">
               {error}
             </Typography>
           )}

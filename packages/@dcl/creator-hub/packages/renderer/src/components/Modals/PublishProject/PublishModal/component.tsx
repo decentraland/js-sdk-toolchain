@@ -7,11 +7,7 @@ export function onBackNoop() {}
 export function PublishModal(props: React.PropsWithChildren<ModalProps>) {
   const { onBack, ...rest } = props;
   return (
-    <Modal
-      size="small"
-      {...rest}
-      onBack={onBack || onBackNoop}
-    >
+    <Modal size="small" {...rest} onBack={onBack || onBackNoop}>
       {props.children}
     </Modal>
   );

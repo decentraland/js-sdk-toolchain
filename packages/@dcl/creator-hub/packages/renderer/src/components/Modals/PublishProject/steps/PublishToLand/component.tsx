@@ -169,16 +169,9 @@ export function PublishToLand(props: Props) {
   }, [placement, setPlacement, initialPlacement, didAutoPlace, setDidAutoPlace, landTiles]);
 
   return (
-    <PublishToLandModal
-      title={t('modal.publish_project.land.action')}
-      size="large"
-      {...props}
-    >
+    <PublishToLandModal title={t('modal.publish_project.land.action')} size="large" {...props}>
       <Box>
-        <Box
-          height={480}
-          style={{ backgroundColor: 'black' }}
-        >
+        <Box height={480} style={{ backgroundColor: 'black' }}>
           {/* @ts-expect-error TODO: Update properties in UI2, making the not required `optional` */}
           <Atlas
             tiles={tiles}

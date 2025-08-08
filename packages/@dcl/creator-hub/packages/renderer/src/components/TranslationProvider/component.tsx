@@ -7,10 +7,7 @@ export function TranslationProvider(props: { children?: ReactNode }) {
   const locale = useSelector(selectors.getLocale);
   const keys = useSelector(selectors.getKeys);
   return (
-    <IntlProvider
-      locale={locale}
-      messages={keys}
-    >
+    <IntlProvider locale={locale} messages={keys}>
       {props.children}
     </IntlProvider>
   );

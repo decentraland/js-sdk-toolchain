@@ -157,7 +157,9 @@ export function EditorPage() {
   if (import.meta.env.VITE_ASSET_PACKS_JS_PORT && import.meta.env.VITE_ASSET_PACKS_JS_PATH) {
     // this is for local development of the asset-packs repo
     const b64 = btoa(import.meta.env.VITE_ASSET_PACKS_JS_PATH);
-    binIndexJsUrl = `http://localhost:${import.meta.env.VITE_ASSET_PACKS_JS_PORT}/content/contents/b64-${b64}`;
+    binIndexJsUrl = `http://localhost:${
+      import.meta.env.VITE_ASSET_PACKS_JS_PORT
+    }/content/contents/b64-${b64}`;
   }
 
   // this is the asset-packs javascript file
@@ -198,20 +200,13 @@ export function EditorPage() {
         <>
           <Header hideUserMenu>
             <>
-              <div
-                className="back"
-                onClick={handleBack}
-              >
+              <div className="back" onClick={handleBack}>
                 <ArrowBackIosIcon />
               </div>
               <div className="title">{project.title}</div>
             </>
             <div className="actions">
-              <Button
-                color="secondary"
-                onClick={openCode}
-                startIcon={<CodeIcon />}
-              >
+              <Button color="secondary" onClick={openCode} startIcon={<CodeIcon />}>
                 {t('editor.header.actions.code')}
               </Button>
               <ButtonGroup
@@ -239,16 +234,8 @@ export function EditorPage() {
               </Button>
             </div>
           </Header>
-          <iframe
-            className="inspector"
-            src={iframeUrl}
-            onLoad={handleIframeRef}
-          ></iframe>
-          <Modal
-            type={modalOpen}
-            project={project}
-            onClose={handleCloseModal}
-          />
+          <iframe className="inspector" src={iframeUrl} onLoad={handleIframeRef}></iframe>
+          <Modal type={modalOpen} project={project} onClose={handleCloseModal} />
         </>
       )}
     </main>
@@ -323,26 +310,11 @@ function PublishOptions({ onClick }: PublishOptionsProps) {
 function Modal({ type, ...props }: ModalProps) {
   switch (type) {
     case 'publish':
-      return (
-        <PublishProject
-          open={type === 'publish'}
-          {...props}
-        />
-      );
+      return <PublishProject open={type === 'publish'} {...props} />;
     case 'publish-history':
-      return (
-        <PublishHistory
-          open={type === 'publish-history'}
-          {...props}
-        />
-      );
+      return <PublishHistory open={type === 'publish-history'} {...props} />;
     case 'install-client':
-      return (
-        <InstallClient
-          open={type === 'install-client'}
-          onClose={props.onClose}
-        />
-      );
+      return <InstallClient open={type === 'install-client'} onClose={props.onClose} />;
     default:
       return null;
   }

@@ -5,11 +5,17 @@ type StorageData = {
   [key: string]: unknown;
 };
 
-export type IFileSystemStorage<T extends StorageData> = Awaited<
-  ReturnType<typeof _createFileSystemStorage<T>>
->;
+export interface IFileSystemStorage<T extends StorageData> {
+  get<K extends keyof T>(key: K): Promise<T[K] | undefined>;
+  getAll(): Promise<T>;
+  set<K extends keyof T>(key: K, value: T[K]): Promise<void>;
+  setAll(data: T): Promise<void>;
+  has<K extends keyof T>(key: K): Promise<boolean>;
+}
 
-async function _createFileSystemStorage<T extends StorageData>(storagePath: string) {
+async function _createFileSystemStorage<T extends StorageData>(
+  storagePath: string,
+): Promise<IFileSystemStorage<T>> {
   const dir = path.dirname(storagePath);
   try {
     await fs.stat(dir);
