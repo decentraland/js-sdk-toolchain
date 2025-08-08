@@ -72,10 +72,31 @@ jobs:
             VERSION="0.21.1"
           else
             VERSION=${TAG#"creator-hub-v"}
+            echo "Found latest release tag: $TAG"
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Delete previous pre-release and its tag
+        if: ${{ env.PRODUCTION && steps.latest_version.outputs.tag != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          TAG="${{ steps.latest_version.outputs.tag }}"
+          IS_PRERELEASE=$(gh release view "$TAG" --json isPrerelease --jq '.isPrerelease' || echo "false")
+          if [[ "$IS_PRERELEASE" == "true" ]]; then
+            echo "Deleting previous pre-release: $TAG"
+            gh release delete "$TAG" --yes
+            echo "Deleting tag from remote: $TAG"
+            git push --delete origin "$TAG" || true
+            echo "Deleting tag locally: $TAG"
+            git tag -d "$TAG" || true
+          else
+            echo "Previous release is not a pre-release. Skipping deletion."
+          fi
 
       - name: Bump latest release version (patch)
         id: new_version
@@ -95,6 +116,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag creator-hub-v${{ steps.new_version.outputs.new_version }}
           git push origin creator-hub-v${{ steps.new_version.outputs.new_version }}
+
 
       # Download 'SSLcom/esigner-codesign' to a folder called 'esigner-codesign' inside creator-hub package
       - name: Checkout esigner-codesign repository (Windows)
