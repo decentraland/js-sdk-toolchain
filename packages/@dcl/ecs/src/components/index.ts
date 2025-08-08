@@ -21,6 +21,7 @@ import defineNetworkEntity, { INetowrkEntityType } from './manual/NetworkEntity'
 import defineNetworkParent, { INetowrkParentType } from './manual/NetworkParent'
 import defineSyncComponent, { ISyncComponentsType } from './manual/SyncComponents'
 import { defineTransformComponent, TransformComponentExtended } from './manual/Transform'
+import { defineLightSourceComponent, LightSourceComponentDefinitionExtended } from './extended/LightSource'
 
 export * from './generated/index.gen'
 
@@ -77,6 +78,10 @@ export const VirtualCamera: LwwComponentGetter<VirtualCameraComponentDefinitionE
 /* @__PURE__*/
 export const InputModifier: LwwComponentGetter<InputModifierComponentDefinitionExtended> = (engine) =>
   defineInputModifierComponent(engine)
+
+/* @__PURE__ */
+export const LightSource: LwwComponentGetter<LightSourceComponentDefinitionExtended> = (engine) =>
+  defineLightSourceComponent(engine)
 
 /**
  * @alpha
