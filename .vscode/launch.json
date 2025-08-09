@@ -9,19 +9,9 @@
       "request": "launch",
       "name": "Jest current file",
       "program": "${workspaceFolder}/node_modules/jest/bin/jest.js",
-      "runtimeArgs": [
-        "--async-stack-traces"
-      ],
-      "args": [
-        "${file}",
-        "--verbose",
-        "--no-cache",
-        "-i"
-      ],
-      "skipFiles": [
-        "<node_internals>/**/*.js",
-        "node_modules/**/*.js"
-      ],
+      "runtimeArgs": ["--async-stack-traces"],
+      "args": ["${file}", "--verbose", "--no-cache", "-i"],
+      "skipFiles": ["<node_internals>/**/*.js", "node_modules/**/*.js"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
@@ -33,9 +23,7 @@
       "name": "(Inspector) Jest current file",
       "program": "${workspaceFolder}/node_modules/jest/bin/jest.js",
       "cwd": "${workspaceFolder}/packages/@dcl/inspector",
-      "runtimeArgs": [
-        "--async-stack-traces"
-      ],
+      "runtimeArgs": ["--async-stack-traces"],
       "args": [
         "${fileBasename}",
         "--verbose",
@@ -44,10 +32,7 @@
         "--config",
         "${workspaceFolder}/packages/@dcl/inspector/jest.config.js"
       ],
-      "skipFiles": [
-        "<node_internals>/**/*.js",
-        "node_modules/**/*.js"
-      ],
+      "skipFiles": ["<node_internals>/**/*.js", "node_modules/**/*.js"],
       "env": {
         "TS_JEST_TRANSFORMER": "true"
       },
@@ -61,9 +46,7 @@
       "request": "launch",
       "name": "Debug Build Inspector",
       "program": "${workspaceFolder}/packages/@dcl/inspector/build.js",
-      "runtimeArgs": [
-        "--async-stack-traces"
-      ],
+      "runtimeArgs": ["--async-stack-traces"],
       "args": [],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
@@ -75,14 +58,8 @@
       "request": "launch",
       "name": "Debug sdk-commands start test-scene",
       "program": "${workspaceFolder}/packages/@dcl/sdk-commands/dist/index.js",
-      "runtimeArgs": [
-        "--async-stack-traces"
-      ],
-      "args": [
-        "start",
-        "--data-layer",
-        "--no-browser"
-      ],
+      "runtimeArgs": ["--async-stack-traces"],
+      "args": ["start", "--data-layer", "--no-browser"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "autoAttachChildProcesses": true,
@@ -93,19 +70,14 @@
       "request": "launch",
       "name": "Serve inspector",
       "program": "${workspaceFolder}/packages/@dcl/inspector/build.js",
-      "args": [
-        "--watch"
-      ],
+      "args": ["--watch"],
       "cwd": "${workspaceFolder}/packages/@dcl/inspector"
     }
   ],
   "compounds": [
     {
       "name": "Inspector with data-layer in `sdk-commands`",
-      "configurations": [
-        "Debug sdk-commands start test-scene",
-        "Serve inspector"
-      ],
+      "configurations": ["Debug sdk-commands start test-scene", "Serve inspector"],
       "stopAll": true
     }
   ]

@@ -1,0 +1,1 @@
+export { Initial } from './component';

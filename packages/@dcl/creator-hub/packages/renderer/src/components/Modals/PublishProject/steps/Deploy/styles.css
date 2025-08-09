@@ -1,0 +1,354 @@
+.Deploy {
+  position: relative;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: 24px;
+}
+
+.Deploy > .Loader {
+  top: -40px;
+  position: relative;
+}
+
+.Deploy .ethereum {
+  display: flex;
+  gap: 8px;
+}
+
+.Deploy .chip {
+  min-height: 24px;
+  border-radius: 16px;
+  padding: 4px 10px;
+  font-size: 13px;
+  line-height: 18px;
+  background-color: rgba(255, 255, 255, 0.08);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.Deploy .chip.network {
+  background-color: #1f87e5;
+  text-transform: uppercase;
+}
+
+.Deploy .chip.username .verified {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  background: center no-repeat url(images/verified.svg);
+}
+
+.Deploy .chip.parcel .pin {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  background: center no-repeat url(images/pin.svg);
+}
+
+.Deploy .scene {
+  display: flex;
+  gap: 32px;
+}
+
+.Deploy .scene .info {
+  flex: 0 0 auto;
+  width: 256px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.Deploy .scene .info .thumbnail {
+  width: 100%;
+  height: 160px;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  border-radius: 8px;
+}
+
+.Deploy .scene .info .text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.Deploy .scene .files {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: stretch;
+  flex: 1 1 auto;
+}
+
+.Deploy .scene .files .filters {
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: space-between;
+  color: #a09ba8;
+  background-color: rgba(255, 255, 255, 0.05);
+  height: 48px;
+  align-items: center;
+  padding: 0px 16px;
+  border-radius: 48px;
+}
+
+.Deploy .scene .files .filters .count {
+  flex: none;
+  text-transform: uppercase;
+}
+
+.Deploy .scene .files .filters .size {
+  flex: none;
+}
+
+.Deploy .scene .files .list {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  max-height: 400px;
+}
+
+.Deploy .scene .files .list .file {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 6px 16px;
+  color: #a09ba8;
+}
+
+.Deploy .scene .files .list .file.invalid {
+  color: var(--error);
+}
+
+.Deploy .scene .files .list .file:last-child {
+  border-bottom: none;
+}
+
+.Deploy .scene .files .actions {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.Deploy .scene .files .Button .deploy-icon {
+  width: 24px;
+  height: 24px;
+  background: center no-repeat url(images/deploy.svg);
+  margin-left: 8px;
+}
+
+.Deploy .scene .files .Button .Loader {
+  margin-left: 12px;
+}
+
+.Deploy .scene .Button {
+  font-size: 15px;
+  padding: 8px 22px;
+  max-height: 40px;
+  flex: none;
+}
+
+.Deploy .scene .files .error {
+  color: var(--error);
+}
+
+.Deploy .cli-publish-error {
+  color: var(--dcl-silver);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.Deploy .Warning {
+  width: 81px;
+  height: 70px;
+  background: center no-repeat url(images/warning.svg);
+}
+
+.Deploy .scene .Success {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  padding-left: 32px;
+  border-left: 1px solid var(--dark-gray);
+}
+
+.Deploy .scene .Success .content {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 16px;
+  min-height: 380px;
+  padding-bottom: 80px;
+}
+
+.Deploy .scene .Success .content .success-icon {
+  width: 80px;
+  height: 80px;
+  background: center no-repeat url(images/success.svg);
+}
+
+.Deploy .scene .Success .content .message {
+  color: var(--dcl-silver);
+  font-size: 20px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.Deploy .scene .jump-in-url {
+  margin-bottom: 20px;
+}
+
+.Deploy .scene .jump-in-url .url {
+  color: var(--light-gray);
+  border: 1px solid var(--dark-gray);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: 0.46px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  margin-top: 5px;
+}
+
+.Deploy .scene .Deploying {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 10px;
+}
+
+.Deploy .scene .Deploying .header {
+  color: var(--dcl-silver);
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 20px;
+  flex-direction: column;
+}
+
+.Deploy .scene .Deploying .header .title {
+  display: flex;
+  align-items: center;
+  text-transform: uppercase;
+}
+
+.Deploy .scene .Deploying .header .Loader {
+  width: inherit;
+  margin-right: 12px;
+}
+
+.Deploy .scene .Deploying .header .Warning {
+  background-size: contain;
+  width: 40px;
+  margin-right: 12px;
+}
+
+.Deploy .scene .Deploying .header .error {
+  color: var(--error);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.Deploy .scene .Deploying .header .error .ExpandMore {
+  margin-left: -4px;
+}
+
+.Deploy .scene .Deploying .ConnectedSteps {
+  margin-bottom: 30px;
+}
+
+.Deploy .scene .Deploying .info {
+  display: flex;
+  flex-direction: row;
+  background-color: #1764C03D;
+  border-radius: 8px;
+  padding: 20px;
+  width: 450px;
+  color: var(--dcl-silver);
+}
+
+.Deploy .scene .Deploying .info svg {
+  color: var(--twitter);
+}
+
+.Deploy .scene .jump-in-url label {
+  color: var(--dcl-silver);
+  line-height: 20px;
+  font-size: 14px;
+  letter-spacing: 0.17px;
+  font-weight: 500;
+  margin-bottom: 2px;
+  display: block;
+}
+
+.Deploy .scene .jump-in-url .copy-icon {
+  width: 18px;
+  height: 18px;
+  background: center no-repeat url(images/copy.svg);
+  margin-left: 8px;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.Deploy .scene .actions {
+  flex: none;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.Deploy .scene .Button .jump-in-icon {
+  width: 24px;
+  height: 24px;
+  background: center no-repeat url(images/jump-in.svg);
+  margin-left: 8px;
+}
+
+.Deploy .publish-warning {
+  position: absolute;
+  width: 600px;
+  background-color: var(--black);
+  padding: 32px 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+  top: 40px;
+  left: calc(50% - 300px);
+}
+
+.Deploy .publish-warning .content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--dcl-silver);
+}
+
+.Deploy .publish-warning .actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.Deploy .publish-warning .dont-show-again {
+  display: flex;
+  align-items: center;
+}

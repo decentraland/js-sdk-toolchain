@@ -4,10 +4,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "pretty": true,
-    "types": [
-      "node",
-      "jest"
-    ],
+    "types": ["node", "jest"],
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,

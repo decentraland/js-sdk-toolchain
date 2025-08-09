@@ -1,0 +1,50 @@
+.PublishHistory .Deployment {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--dcl-silver);
+  max-height: 600px;
+}
+
+.PublishHistory .Deployment + .Deployment {
+  margin-top: 32px;
+}
+
+.PublishHistory .Deployment h3 {
+  margin: 0;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  width: 220px;
+}
+
+.PublishHistory .Deployment h3::after {
+  content: '';
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  width: 100%;
+  height: 1px;
+  background-color: var(--dark-gray);
+  margin-left: 16px;
+}
+
+.PublishHistory .Deployment .rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-left: 35px;
+}
+
+.PublishHistory .Deployment .row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.PublishHistory .Deployment .row > span {
+  color: var(--dark-gray);
+  width: 100px
+}

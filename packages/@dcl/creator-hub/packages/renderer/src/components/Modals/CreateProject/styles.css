@@ -1,0 +1,7 @@
+.CreateProjectModal .MuiInputBase-root + .MuiTypography-root {
+  margin-top: 16px;
+}
+
+.CreateProjectModal .error {
+  color: var(--error);
+}

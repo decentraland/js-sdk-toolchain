@@ -1,0 +1,1 @@
+export { PublishToLand } from './component';
