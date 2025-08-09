@@ -68,8 +68,8 @@ jobs:
         run: |
           TAG=$(gh release list --limit 100 | grep '^creator-hub-v' | head -n 1 | awk '{print $1}' || true)
           if [[ -z "$TAG" ]]; then
-            echo "No previous creator-hub release found. Defaulting to 0.21.1"
-            VERSION="0.21.1"
+            echo "No previous creator-hub release found. Defaulting to 0.3.0"
+            VERSION="0.3.0"
           else
             VERSION=${TAG#"creator-hub-v"}
             echo "Found latest release tag: $TAG"
