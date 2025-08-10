@@ -5,8 +5,9 @@ on:
     inputs:
       inspector-package-url:
         description: "Uploaded inspector package url"
-        required: true
+        required: false
         type: string
+        default: latest
 
 concurrency:
   group: creator-hub-${{ github.ref }}
@@ -62,14 +63,23 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
-      - name: Get latest Creator Hub release version (or fallback to last version before migration to monorepo)
+      - name: Get latest Creator Hub release/pre-release version
         id: latest_version
         shell: bash
         run: |
           TAG=$(gh release list --limit 100 | grep '^creator-hub-v' | head -n 1 | awk '{print $1}' || true)
           if [[ -z "$TAG" ]]; then
-            echo "No previous creator-hub release found. Defaulting to 0.3.0"
-            VERSION="0.3.0"
+            echo "❌ ERROR: No previous creator-hub release/pre-release found!"
+            echo "This workflow requires at least one existing Creator Hub release (not pre-release) to determine the version bump."
+            echo ""
+            echo "To fix this:"
+            echo "1. Create an initial Creator Hub release manually, OR"
+            echo "2. Create a tag like 'creator-hub-v0.3.0' and push it"
+            echo ""
+            echo "Example commands:"
+            echo "  git tag creator-hub-v0.3.0"
+            echo "  git push origin creator-hub-v0.3.0"
+            exit 1
           else
             VERSION=${TAG#"creator-hub-v"}
             echo "Found latest release tag: $TAG"
@@ -98,15 +108,19 @@ jobs:
             echo "Previous release is not a pre-release. Skipping deletion."
           fi
 
-      - name: Bump latest release version (patch)
+      - name: Bump latest release version
         id: new_version
-        shell: bash
-        run: |
-          VERSION=${{ steps.latest_version.outputs.version }}
-          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
-          PATCH=$((PATCH + 1))
-          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
-          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+        uses: paulhatch/semantic-version@v5.4.0
+        with:
+          tag_prefix: "creator-hub-v"
+          version_format: ${major}.${minor}.${patch}
+          major_pattern: "/^(major|breaking).+/"
+          minor_pattern: "/^(minor|feat).+/"
+          bump_each_commit: false
+          bump_each_commit_patch_pattern: "/^(patch|fix).+/"
+          search_commit_body: true
+          user_format_type: "json"
+          change_path: "packages/@dcl/creator-hub packages/@dcl/inspector"
 
       - name: Create custom tag before build
         if: ${{ env.PRODUCTION == 'true' }}
@@ -116,6 +130,8 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag creator-hub-v${{ steps.new_version.outputs.new_version }}
           git push origin creator-hub-v${{ steps.new_version.outputs.new_version }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Download 'SSLcom/esigner-codesign' to a folder called 'esigner-codesign' inside creator-hub package
       - name: Checkout esigner-codesign repository (Windows)
@@ -223,3 +239,97 @@ jobs:
 
               ${{ env.macos-instructions }}
           edit-mode: replace
+
+      - name: Generate Creator Hub release notes
+        id: release_notes
+        if: ${{ env.PRODUCTION == 'true' }}
+        run: |
+          # Get commits since last version that affect Creator Hub and Inspector
+          COMMITS=$(git log creator-hub-v${{ steps.new_version.outputs.previous_version }}..HEAD --oneline --no-merges --pretty=format:"%H|%s|%an|%ae" -- packages/@dcl/creator-hub packages/@dcl/inspector)
+
+          # Initialize release notes
+          echo "## Creator Hub v${{ steps.new_version.outputs.version }}" > release_notes.md
+          echo "" >> release_notes.md
+          echo "### Changes:" >> release_notes.md
+          echo "" >> release_notes.md
+
+          # Process each commit and categorize by package
+          declare -A creator_hub_commits
+          declare -A inspector_commits
+
+          while IFS='|' read -r commit_hash commit_msg author_name author_email; do
+            if [[ -n "$commit_hash" ]]; then
+              # Check which files were changed in this commit
+              CHANGED_FILES=$(git show --name-only --pretty=format: $commit_hash)
+
+              # Categorize commit based on changed files
+              AFFECTS_CREATOR_HUB=$(echo "$CHANGED_FILES" | grep -c "packages/@dcl/creator-hub" || true)
+              AFFECTS_INSPECTOR=$(echo "$CHANGED_FILES" | grep -c "packages/@dcl/inspector" || true)
+
+              echo "Processing commit: $commit_hash"
+
+              # Try to get PR number from commit
+              PR_INFO=$(gh api repos/${{ github.repository }}/commits/$commit_hash/pulls --jq '.[0] | select(. != null) | {number: .number, html_url: .html_url}' 2>/dev/null || echo "null")
+
+              # Get GitHub username from email
+              GITHUB_USER=$(gh api search/users?q="$author_email+in:email" --jq '.items[0].login // empty' 2>/dev/null || echo "")
+
+              # Format author link
+              if [[ -n "$GITHUB_USER" ]]; then
+                AUTHOR_LINK="[$author_name](https://github.com/$GITHUB_USER)"
+              else
+                AUTHOR_LINK="$author_name"
+              fi
+
+              # Format PR link if available
+              if [[ "$PR_INFO" != "null" ]] && [[ -n "$PR_INFO" ]]; then
+                PR_NUMBER=$(echo "$PR_INFO" | jq -r '.number')
+                PR_URL=$(echo "$PR_INFO" | jq -r '.html_url')
+                PR_LINK=" in [#$PR_NUMBER]($PR_URL)"
+              else
+                PR_LINK=""
+              fi
+
+              # Format the commit entry
+              COMMIT_ENTRY="- $commit_msg by $AUTHOR_LINK$PR_LINK"
+
+              # Add to appropriate section(s)
+              if [[ $AFFECTS_CREATOR_HUB -gt 0 ]]; then
+                creator_hub_commits["$commit_hash"]="$COMMIT_ENTRY"
+              fi
+              if [[ $AFFECTS_INSPECTOR -gt 0 ]]; then
+                inspector_commits["$commit_hash"]="$COMMIT_ENTRY"
+              fi
+            fi
+          done <<< "$COMMITS"
+
+          # Write Creator Hub changes
+          if [[ ${#creator_hub_commits[@]} -gt 0 ]]; then
+            echo "#### Creator Hub Changes:" >> release_notes.md
+            echo "" >> release_notes.md
+            for commit_hash in "${!creator_hub_commits[@]}"; do
+              echo "${creator_hub_commits[$commit_hash]}" >> release_notes.md
+            done
+            echo "" >> release_notes.md
+          fi
+
+          # Write Inspector changes
+          if [[ ${#inspector_commits[@]} -gt 0 ]]; then
+            echo "#### Inspector Changes:" >> release_notes.md
+            echo "" >> release_notes.md
+            for commit_hash in "${!inspector_commits[@]}"; do
+              echo "${inspector_commits[$commit_hash]}" >> release_notes.md
+            done
+          fi
+
+          # Output the release notes content for use in other steps
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+          cat release_notes.md >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Display generated release notes
+        if: ${{ env.PRODUCTION == 'true' }}
+        run: |
+          echo "${{ env.RELEASE_NOTES }}"
