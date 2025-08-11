@@ -8,7 +8,6 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    continue-on-error: true
 
     permissions:
       contents: write
@@ -27,6 +26,7 @@ jobs:
           git config pull.rebase false  # Always merge, never rebase
 
       - name: Sync main into experimental branch
+        continue-on-error: true
         run: |
           BRANCH_NAME="chore/sync"
           git checkout -B $BRANCH_NAME origin/experimental
@@ -41,6 +41,8 @@ jobs:
           make build
           make update-snapshots
 
+      - name: Commit and push changes in experimental
+        run: |
           # Commit if there are changes
           git add -A .
           git commit --no-edit -m "updated protocol and snapshots" || echo "No changes to commit"
