@@ -66,7 +66,7 @@ export const VirtualCamera: LwwComponentGetter<VirtualCameraComponentDefinitionE
 export const InputModifier: LwwComponentGetter<InputModifierComponentDefinitionExtended> = (engine) =>
   defineInputModifierComponent(engine)
 
-/* @__PURE__*/
+/* @__PURE__ */
 export const LightSource: LwwComponentGetter<LightSourceComponentDefinitionExtended> = (engine) =>
   defineLightSourceComponent(engine)
 
