@@ -625,25 +625,3 @@ jobs:
     with:
       inspector-package-url: ${{ needs.build.outputs.decentraland_inspector_s3_bucket_key }}
     secrets: inherit
-
-  check-release-version:
-    name: check release version
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-      - name: Bump latest release version
-        id: new_version
-        uses: paulhatch/semantic-version@v5.4.0
-        with:
-          tag_prefix: "creator-hub-v"
-          version_format: ${major}.${minor}.${patch}
-          major_pattern: "/^(major|breaking).+/"
-          minor_pattern: "/^(minor|feat).+/"
-          bump_each_commit: false
-          bump_each_commit_patch_pattern: "/^(patch|fix).+/"
-          search_commit_body: true
-          user_format_type: "json"
-          change_path: "packages/@dcl/creator-hub packages/@dcl/inspector"

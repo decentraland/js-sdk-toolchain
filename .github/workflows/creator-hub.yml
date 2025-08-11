@@ -63,50 +63,54 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
-      - name: Get latest Creator Hub release/pre-release version
-        id: latest_version
+      # Remove all Creator Hub pre-releases and their tags to ensure semantic versioning works correctly.
+      # By cleaning up all pre-releases, we ensure the semantic action will use the most recent stable release
+      # as the baseline for calculating the next version. This is necessary because pre-releases can interfere
+      # with the semantic action's version calculation.
+      - name: Remove all Creator Hub pre-releases and their tags
+        if: ${{ env.PRODUCTION == 'true' }}
         shell: bash
         run: |
-          TAG=$(gh release list --limit 100 | grep '^creator-hub-v' | head -n 1 | awk '{print $1}' || true)
-          if [[ -z "$TAG" ]]; then
-            echo "❌ ERROR: No previous creator-hub release/pre-release found!"
-            echo "This workflow requires at least one existing Creator Hub release (not pre-release) to determine the version bump."
-            echo ""
-            echo "To fix this:"
-            echo "1. Create an initial Creator Hub release manually, OR"
-            echo "2. Create a tag like 'creator-hub-v0.3.0' and push it"
-            echo ""
-            echo "Example commands:"
-            echo "  git tag creator-hub-v0.3.0"
-            echo "  git push origin creator-hub-v0.3.0"
-            exit 1
-          else
-            VERSION=${TAG#"creator-hub-v"}
-            echo "Found latest release tag: $TAG"
-          fi
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          echo "🔍 Finding all Creator Hub pre-releases..."
 
-      - name: Delete previous pre-release and its tag
-        if: ${{ env.PRODUCTION == 'true' && steps.latest_version.outputs.tag != '' }}
+          # Get all releases with creator-hub-v prefix and check which are pre-releases
+          PRERELEASE_TAGS=$(gh release list --limit 100 | grep '^creator-hub-v' | while read -r line; do
+            TAG=$(echo "$line" | awk '{print $1}')
+            IS_PRERELEASE=$(gh release view "$TAG" --json isPrerelease --jq '.isPrerelease' 2>/dev/null || echo "false")
+            if [[ "$IS_PRERELEASE" == "true" ]]; then
+              echo "$TAG"
+            fi
+          done)
+
+          if [[ -z "$PRERELEASE_TAGS" ]]; then
+            echo "✅ No Creator Hub pre-releases found to delete."
+            exit 0
+          fi
+
+          echo "📋 Found the following pre-releases to delete:"
+          echo "$PRERELEASE_TAGS"
+          echo ""
+
+          # Delete each pre-release and its tag
+          echo "$PRERELEASE_TAGS" | while read -r TAG; do
+            if [[ -n "$TAG" ]]; then
+              echo "🗑️  Deleting pre-release: $TAG"
+              gh release delete "$TAG" --yes || echo "⚠️  Failed to delete release $TAG"
+
+              echo "🏷️  Deleting tag from remote: $TAG"
+              git push --delete origin "$TAG" || echo "⚠️  Failed to delete remote tag $TAG"
+
+              echo "🏷️  Deleting tag locally: $TAG"
+              git tag -d "$TAG" || echo "⚠️  Failed to delete local tag $TAG"
+
+              echo "✅ Completed cleanup for $TAG"
+              echo ""
+            fi
+          done
+
+          echo "🎉 Finished cleaning up all Creator Hub pre-releases!"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: bash
-        run: |
-          TAG="${{ steps.latest_version.outputs.tag }}"
-          IS_PRERELEASE=$(gh release view "$TAG" --json isPrerelease --jq '.isPrerelease' || echo "false")
-          if [[ "$IS_PRERELEASE" == "true" ]]; then
-            echo "Deleting previous pre-release: $TAG"
-            gh release delete "$TAG" --yes
-            echo "Deleting tag from remote: $TAG"
-            git push --delete origin "$TAG" || true
-            echo "Deleting tag locally: $TAG"
-            git tag -d "$TAG" || true
-          else
-            echo "Previous release is not a pre-release. Skipping deletion."
-          fi
 
       - name: Bump latest release version
         id: new_version
@@ -121,17 +125,6 @@ jobs:
           search_commit_body: true
           user_format_type: "json"
           change_path: "packages/@dcl/creator-hub packages/@dcl/inspector"
-
-      - name: Create custom tag before build
-        if: ${{ env.PRODUCTION == 'true' }}
-        shell: bash
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag creator-hub-v${{ steps.new_version.outputs.new_version }}
-          git push origin creator-hub-v${{ steps.new_version.outputs.new_version }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Download 'SSLcom/esigner-codesign' to a folder called 'esigner-codesign' inside creator-hub package
       - name: Checkout esigner-codesign repository (Windows)
