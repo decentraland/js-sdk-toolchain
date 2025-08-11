@@ -43,6 +43,7 @@ jobs:
 
       - name: Commit and push changes in experimental
         run: |
+          BRANCH_NAME="chore/sync"
           # Commit if there are changes
           git add -A .
           git commit --no-edit -m "updated protocol and snapshots" || echo "No changes to commit"
