@@ -67,50 +67,12 @@ jobs:
       # By cleaning up all pre-releases, we ensure the semantic action will use the most recent stable release
       # as the baseline for calculating the next version. This is necessary because pre-releases can interfere
       # with the semantic action's version calculation.
-      - name: Remove all Creator Hub pre-releases and their tags
+      - name: Remove Creator Hub pre-releases
         if: ${{ env.PRODUCTION == 'true' }}
-        shell: bash
-        run: |
-          echo "🔍 Finding all Creator Hub pre-releases..."
-
-          # Get all releases with creator-hub-v prefix and check which are pre-releases
-          PRERELEASE_TAGS=$(gh release list --limit 100 | grep '^creator-hub-v' | while read -r line; do
-            TAG=$(echo "$line" | awk '{print $1}')
-            IS_PRERELEASE=$(gh release view "$TAG" --json isPrerelease --jq '.isPrerelease' 2>/dev/null || echo "false")
-            if [[ "$IS_PRERELEASE" == "true" ]]; then
-              echo "$TAG"
-            fi
-          done)
-
-          if [[ -z "$PRERELEASE_TAGS" ]]; then
-            echo "✅ No Creator Hub pre-releases found to delete."
-            exit 0
-          fi
-
-          echo "📋 Found the following pre-releases to delete:"
-          echo "$PRERELEASE_TAGS"
-          echo ""
-
-          # Delete each pre-release and its tag
-          echo "$PRERELEASE_TAGS" | while read -r TAG; do
-            if [[ -n "$TAG" ]]; then
-              echo "🗑️  Deleting pre-release: $TAG"
-              gh release delete "$TAG" --yes || echo "⚠️  Failed to delete release $TAG"
-
-              echo "🏷️  Deleting tag from remote: $TAG"
-              git push --delete origin "$TAG" || echo "⚠️  Failed to delete remote tag $TAG"
-
-              echo "🏷️  Deleting tag locally: $TAG"
-              git tag -d "$TAG" || echo "⚠️  Failed to delete local tag $TAG"
-
-              echo "✅ Completed cleanup for $TAG"
-              echo ""
-            fi
-          done
-
-          echo "🎉 Finished cleaning up all Creator Hub pre-releases!"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: ./.github/actions/cleanup-prereleases
+        with:
+          tag_prefix: 'creator-hub-v'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Bump latest release version
         id: new_version
@@ -236,93 +198,25 @@ jobs:
       - name: Generate Creator Hub release notes
         id: release_notes
         if: ${{ env.PRODUCTION == 'true' }}
-        run: |
-          # Get commits since last version that affect Creator Hub and Inspector
-          COMMITS=$(git log creator-hub-v${{ steps.new_version.outputs.previous_version }}..HEAD --oneline --no-merges --pretty=format:"%H|%s|%an|%ae" -- packages/@dcl/creator-hub packages/@dcl/inspector)
-
-          # Initialize release notes
-          echo "## Creator Hub v${{ steps.new_version.outputs.version }}" > release_notes.md
-          echo "" >> release_notes.md
-          echo "### Changes:" >> release_notes.md
-          echo "" >> release_notes.md
-
-          # Process each commit and categorize by package
-          declare -A creator_hub_commits
-          declare -A inspector_commits
-
-          while IFS='|' read -r commit_hash commit_msg author_name author_email; do
-            if [[ -n "$commit_hash" ]]; then
-              # Check which files were changed in this commit
-              CHANGED_FILES=$(git show --name-only --pretty=format: $commit_hash)
-
-              # Categorize commit based on changed files
-              AFFECTS_CREATOR_HUB=$(echo "$CHANGED_FILES" | grep -c "packages/@dcl/creator-hub" || true)
-              AFFECTS_INSPECTOR=$(echo "$CHANGED_FILES" | grep -c "packages/@dcl/inspector" || true)
-
-              echo "Processing commit: $commit_hash"
-
-              # Try to get PR number from commit
-              PR_INFO=$(gh api repos/${{ github.repository }}/commits/$commit_hash/pulls --jq '.[0] | select(. != null) | {number: .number, html_url: .html_url}' 2>/dev/null || echo "null")
-
-              # Get GitHub username from email
-              GITHUB_USER=$(gh api search/users?q="$author_email+in:email" --jq '.items[0].login // empty' 2>/dev/null || echo "")
-
-              # Format author link
-              if [[ -n "$GITHUB_USER" ]]; then
-                AUTHOR_LINK="[$author_name](https://github.com/$GITHUB_USER)"
-              else
-                AUTHOR_LINK="$author_name"
-              fi
-
-              # Format PR link if available
-              if [[ "$PR_INFO" != "null" ]] && [[ -n "$PR_INFO" ]]; then
-                PR_NUMBER=$(echo "$PR_INFO" | jq -r '.number')
-                PR_URL=$(echo "$PR_INFO" | jq -r '.html_url')
-                PR_LINK=" in [#$PR_NUMBER]($PR_URL)"
-              else
-                PR_LINK=""
-              fi
-
-              # Format the commit entry
-              COMMIT_ENTRY="- $commit_msg by $AUTHOR_LINK$PR_LINK"
-
-              # Add to appropriate section(s)
-              if [[ $AFFECTS_CREATOR_HUB -gt 0 ]]; then
-                creator_hub_commits["$commit_hash"]="$COMMIT_ENTRY"
-              fi
-              if [[ $AFFECTS_INSPECTOR -gt 0 ]]; then
-                inspector_commits["$commit_hash"]="$COMMIT_ENTRY"
-              fi
-            fi
-          done <<< "$COMMITS"
-
-          # Write Creator Hub changes
-          if [[ ${#creator_hub_commits[@]} -gt 0 ]]; then
-            echo "#### Creator Hub Changes:" >> release_notes.md
-            echo "" >> release_notes.md
-            for commit_hash in "${!creator_hub_commits[@]}"; do
-              echo "${creator_hub_commits[$commit_hash]}" >> release_notes.md
-            done
-            echo "" >> release_notes.md
-          fi
-
-          # Write Inspector changes
-          if [[ ${#inspector_commits[@]} -gt 0 ]]; then
-            echo "#### Inspector Changes:" >> release_notes.md
-            echo "" >> release_notes.md
-            for commit_hash in "${!inspector_commits[@]}"; do
-              echo "${inspector_commits[$commit_hash]}" >> release_notes.md
-            done
-          fi
-
-          # Output the release notes content for use in other steps
-          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
-          cat release_notes.md >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: ./.github/actions/generate-release-notes
+        with:
+          previous_version: ${{ steps.new_version.outputs.previous_version }}
+          current_version: ${{ steps.new_version.outputs.version }}
+          tag_prefix: 'creator-hub-v'
+          paths: 'packages/@dcl/creator-hub,packages/@dcl/inspector'
+          section_names: 'Creator Hub Changes,Inspector Changes'
+          release_title: 'Creator Hub'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Display generated release notes
         if: ${{ env.PRODUCTION == 'true' }}
         run: |
-          echo "${{ env.RELEASE_NOTES }}"
+          echo "${{ steps.release_notes.outputs.release_notes }}"
+
+      - name: Update release description
+        if: ${{ env.PRODUCTION == 'true' }}
+        uses: ./.github/actions/update-release-description
+        with:
+          tag_name: 'creator-hub-v${{ steps.new_version.outputs.version }}'
+          release_notes: ${{ steps.release_notes.outputs.release_notes }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}

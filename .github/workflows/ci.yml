@@ -4,11 +4,9 @@ on:
       - main
       - experimental
   pull_request:
-  release:
-    types:
-      - created
 
 env:
+  PRODUCTION: ${{ github.ref == 'refs/heads/main' && !github.event.pull_request.number }}
   BRANCH_TAG: ${{ github.ref_name == 'experimental' && 'experimental' || '' }}
 
 name: "CI"
@@ -171,6 +169,7 @@ jobs:
       decentraland_inspector_s3_bucket_key: ${{ steps.publish_decentraland_inspector.outputs.s3-bucket-key }}
       decentraland_js_runtime_s3_bucket_key: ${{ steps.publish_dcl_js_runtime.outputs.s3-bucket-key }}
       decentraland_ecs_bucket_key: ${{ steps.publish_ecs.outputs.s3-bucket-key }}
+      sdk_version: ${{ steps.update_sdk_version.outputs.version }}
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v3
@@ -182,6 +181,7 @@ jobs:
         run: make install
 
       - name: update version of packages/@dcl/sdk/package.json, this version will be used for all packages
+        id: update_sdk_version
         uses: decentraland/oddish-action@master
         with:
           cwd: ./packages/@dcl/sdk
@@ -616,9 +616,72 @@ jobs:
           echo "❌ Local package dependencies detected! These must be fixed before merging."
           exit 1
 
+  generate-release:
+    name: Generate SDK packages pre-release
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skip if not production
+        if: ${{ env.PRODUCTION != 'true' }}
+        run: exit 0
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Remove SDK packages pre-releases
+        id: cleanup_prereleases
+        if: ${{ env.PRODUCTION == 'true' }}
+        uses: ./.github/actions/cleanup-prereleases
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get latest plain semver release
+        id: latest_release
+        shell: bash
+        run: |
+          # Get the latest plain semver (non Creator Hub) release
+          LATEST_TAG=$(
+            gh release list --limit 100 --json tagName,isPrerelease \
+              --jq '.[] | select(.isPrerelease == false) | .tagName' |
+            grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' |
+            head -n 1
+          )
+
+          if [[ -z "$LATEST_TAG" ]]; then
+            echo "❌ No matching semver releases found."
+            exit 1
+          fi
+
+          echo "Found latest plain semver release: $LATEST_TAG"
+          echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate SDK packages release notes
+        id: release_notes
+        uses: ./.github/actions/generate-release-notes
+        with:
+          previous_version: ${{ steps.latest_release.outputs.tag }}
+          current_version: ${{ needs.build.outputs.sdk_version }}
+          paths: 'packages/@dcl/sdk,packages/@dcl/inspector,packages/@dcl/js-runtime,packages/@dcl/ecs,packages/@dcl/react-ecs,packages/@dcl/sdk-commands,packages/@dcl/playground-assets'
+          section_names: 'SDK Changes,Inspector Changes,JS Runtime Changes,ECS Changes,React ECS Changes,SDK Commands Changes,Playground Assets Changes'
+          release_title: 'SDK Packages'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Display generated release notes
+        run: |
+          echo "${{ steps.release_notes.outputs.release_notes }}"
+
+      - name: Update release description
+        uses: ./.github/actions/update-release-description
+        with:
+          tag_name: ${{ needs.build.outputs.sdk_version }}
+          release_notes: ${{ steps.release_notes.outputs.release_notes }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+
   trigger-creator-hub-workflow:
-    # OPTIMIZATION: trigger only with changes in packages/@dcl/creator-hub or packages/@dcl/inspector
-    # TODO: this should not run when a release for sdk/inspector/etc is created?
     name: creator hub
     needs: [build]
     uses: ./.github/workflows/creator-hub.yml
