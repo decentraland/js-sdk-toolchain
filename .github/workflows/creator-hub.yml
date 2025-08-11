@@ -63,10 +63,6 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
-      # Remove all Creator Hub pre-releases and their tags to ensure semantic versioning works correctly.
-      # By cleaning up all pre-releases, we ensure the semantic action will use the most recent stable release
-      # as the baseline for calculating the next version. This is necessary because pre-releases can interfere
-      # with the semantic action's version calculation.
       - name: Remove Creator Hub pre-releases
         if: ${{ env.PRODUCTION == 'true' }}
         uses: ./.github/actions/cleanup-prereleases
@@ -105,7 +101,7 @@ jobs:
           retry_wait_seconds: 15
           retry_on: error
           shell: 'bash'
-          command: npx electron-builder --project ${{ env.WORKING_DIRECTORY }} --config electron-builder.cjs --config.extraMetadata.version=${{ steps.new_version.outputs.new_version }} ${{ matrix.os == 'macos-latest' && format('--config.mac.notarize={0}', true) || '' }} --publish ${{ env.PRODUCTION == 'true' && 'always' || 'never' }}
+          command: npx electron-builder --project ${{ env.WORKING_DIRECTORY }} --config electron-builder.cjs --config.extraMetadata.version=${{ steps.new_version.outputs.version }} ${{ matrix.os == 'macos-latest' && format('--config.mac.notarize={0}', true) || '' }} --publish ${{ env.PRODUCTION == 'true' && 'always' || 'never' }}
         env:
           # Disable hard links to avoid issues with npm
           USE_HARD_LINKS: false

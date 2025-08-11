@@ -618,20 +618,15 @@ jobs:
 
   generate-release:
     name: Generate SDK packages pre-release
-    needs: [build]
+    needs: [build] # we don't want to generate a release if the build fails
     runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' && !github.event.pull_request.number }}
     steps:
-      - name: Skip if not production
-        if: ${{ env.PRODUCTION != 'true' }}
-        run: exit 0
-
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Remove SDK packages pre-releases
-        id: cleanup_prereleases
-        if: ${{ env.PRODUCTION == 'true' }}
         uses: ./.github/actions/cleanup-prereleases
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -658,6 +653,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+        # TODO: changes outside packages/* won't be listed (e.g. README.md, .github/, etc)
       - name: Generate SDK packages release notes
         id: release_notes
         uses: ./.github/actions/generate-release-notes
@@ -679,6 +675,7 @@ jobs:
           tag_name: ${{ needs.build.outputs.sdk_version }}
           release_notes: ${{ steps.release_notes.outputs.release_notes }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          create_if_not_exists: true
 
 
   trigger-creator-hub-workflow:

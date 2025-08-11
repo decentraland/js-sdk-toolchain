@@ -18,7 +18,7 @@ inputs:
   prerelease:
     description: 'Mark as prerelease if creating a new release (true/false)'
     required: false
-    default: 'false'
+    default: 'true'
   draft:
     description: 'Mark as draft if creating a new release (true/false)'
     required: false
@@ -42,14 +42,14 @@ runs:
         echo "🔍 Checking if release '${{ inputs.tag_name }}' exists..."
 
         # Check if release exists
-        RELEASE_INFO=$(gh release view "${{ inputs.tag_name }}" --json id,htmlUrl,isDraft,isPrerelease 2>/dev/null || echo "null")
+        RELEASE_INFO=$(gh release view "${{ inputs.tag_name }}" --json id,url,isDraft,isPrerelease 2>/dev/null || echo "null")
 
         if [[ "$RELEASE_INFO" != "null" ]]; then
           # Release exists - update it
           echo "✅ Release found! Updating description..."
 
           RELEASE_ID=$(echo "$RELEASE_INFO" | jq -r '.id')
-          RELEASE_URL=$(echo "$RELEASE_INFO" | jq -r '.htmlUrl')
+          RELEASE_URL=$(echo "$RELEASE_INFO" | jq -r '.url')
 
           # Create temporary file for release notes
           echo "${{ inputs.release_notes }}" > temp_release_notes.md
@@ -91,9 +91,9 @@ runs:
           eval $CREATE_CMD
 
           # Get the created release info
-          RELEASE_INFO=$(gh release view "${{ inputs.tag_name }}" --json id,htmlUrl)
+          RELEASE_INFO=$(gh release view "${{ inputs.tag_name }}" --json id,url)
           RELEASE_ID=$(echo "$RELEASE_INFO" | jq -r '.id')
-          RELEASE_URL=$(echo "$RELEASE_INFO" | jq -r '.htmlUrl')
+          RELEASE_URL=$(echo "$RELEASE_INFO" | jq -r '.url')
 
           echo "🎉 Successfully created release!"
           echo "🔗 Release URL: $RELEASE_URL"
