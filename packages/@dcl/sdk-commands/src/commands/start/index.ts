@@ -107,7 +107,7 @@ export async function main(options: Options) {
   const isCi = options.args['--ci'] || process.env.CI || false
   const debug = !options.args['--no-debug'] && !isCi
   const experimentalDaoExplorer = !options.args['--no-dao-explorer'] && !isCi
-  const openBrowser = (!experimentalDaoExplorer || !options.args['--no-browser']) && !isCi && !experimentalDaoExplorer
+  const openBrowser = !options.args['--no-browser'] && !experimentalDaoExplorer && !isCi
   const build = !options.args['--skip-build']
   const watch = !options.args['--no-watch']
   const withDataLayer = options.args['--data-layer']
