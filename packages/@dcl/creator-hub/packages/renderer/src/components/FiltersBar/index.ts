@@ -1,1 +1,0 @@
-export { FiltersBar } from './component';

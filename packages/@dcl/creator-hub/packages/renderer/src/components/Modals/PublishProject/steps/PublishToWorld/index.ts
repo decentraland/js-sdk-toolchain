@@ -1,1 +1,0 @@
-export { PublishToWorld } from './component';

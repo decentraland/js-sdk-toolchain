@@ -4,19 +4,16 @@ on:
       - main
       - experimental
   pull_request:
+  release:
+    types:
+      - created
 
 env:
-  PRODUCTION: ${{ github.ref == 'refs/heads/main' && !github.event.pull_request.number }}
   BRANCH_TAG: ${{ github.ref_name == 'experimental' && 'experimental' || '' }}
 
-name: "CI"
+name: CI
 jobs:
-  # ============================================================================
-  # Main CI Jobs
-  # ============================================================================
-
   lint:
-    name: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -30,27 +27,8 @@ jobs:
         run: make lint
       - name: lint-packages
         run: make lint-packages
-      - name: format
-        run: make format
-
-  typecheck:
-    name: typecheck
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 20
-          cache: 'npm'
-      - name: install
-        run: make install
-      - name: build
-        run: make build
-      - name: typecheck
-        run: make typecheck
 
   docs:
-    name: docs
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -62,7 +40,6 @@ jobs:
         run: make docs
 
   test:
-    name: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -92,11 +69,6 @@ jobs:
       - name: test-cli
         run: make test-cli
 
-      - name: test-inspector
-        env:
-          NODE_OPTIONS: '--max_old_space_size=4096'
-        run: make test-inspector
-
       - uses: codecov/codecov-action@v3
         if: always()
         with:
@@ -106,59 +78,7 @@ jobs:
       - name: prepare releasable packages
         run: make prepare
 
-  e2e-inspector:
-    name: E2E Inspector
-    needs: [notify_deployment]
-    runs-on: ubuntu-latest
-    if: false
-    steps:
-      - uses: actions/github-script@v6
-        id: get-cloudflare-url
-        env:
-          BRANCH: ${{ github.head_ref || github.ref }}
-        with:
-          script: return `${process.env.BRANCH.replaceAll('/', '-').substr(0, 28)}.${context.repo.repo}.pages.dev`
-          result-encoding: string
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 20
-          cache: 'npm'
-      - name: install repo
-        run: npm ci
-      - name: install inspector
-        run: cd packages/@dcl/inspector && npm i && cd ../../../
-      - name: test-inspector E2E
-        env:
-          NODE_OPTIONS: '--max_old_space_size=4096'
-        run: E2E_URL=https://${{steps.get-cloudflare-url.outputs.result}}/inspector make test-inspector-e2e
-
-  e2e-creator-hub:
-    name: E2E Creator Hub
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ macos-latest, windows-latest ]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-        working-directory: packages/@dcl/creator-hub
-        env:
-          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-
-      - name: Run E2E tests
-        run: make test-creator-hub-e2e
-        env:
-          NODE_OPTIONS: "--max-old-space-size=8192"
-
   build:
-    name: build
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -166,10 +86,8 @@ jobs:
     outputs:
       decentraland_sdk_s3_bucket_key: ${{ steps.publish_decentraland_sdk.outputs.s3-bucket-key }}
       decentraland_sdk_commands_s3_bucket_key: ${{ steps.publish_decentraland_sdk_commands.outputs.s3-bucket-key }}
-      decentraland_inspector_s3_bucket_key: ${{ steps.publish_decentraland_inspector.outputs.s3-bucket-key }}
       decentraland_js_runtime_s3_bucket_key: ${{ steps.publish_dcl_js_runtime.outputs.s3-bucket-key }}
       decentraland_ecs_bucket_key: ${{ steps.publish_ecs.outputs.s3-bucket-key }}
-      sdk_version: ${{ steps.update_sdk_version.outputs.version }}
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v3
@@ -181,7 +99,6 @@ jobs:
         run: make install
 
       - name: update version of packages/@dcl/sdk/package.json, this version will be used for all packages
-        id: update_sdk_version
         uses: decentraland/oddish-action@master
         with:
           cwd: ./packages/@dcl/sdk
@@ -282,42 +199,17 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
-      - name: publish @dcl/inspector package
-        uses: decentraland/oddish-action@master
-        id: publish_decentraland_inspector
-        with:
-          registry-url: 'https://registry.npmjs.org'
-          access: public
-          cwd: ./packages/@dcl/inspector
-          ## use action runId instead of current date to generate snapshot numbers
-          deterministic-snapshot: true
-          ## sign the deployment
-          provenance: true
-          ## publish every package to s3
-          s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
-          s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/inspector'
-          custom-tag: ${{ env.BRANCH_TAG }}
-          branch-to-custom-tag: ${{ env.BRANCH_TAG }}
-        env:
-          BRANCH_NAME: ${{ github.ref_name }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
-
       - name: (PR) change @dcl/sdk-commands dependencies versions to point to s3 url
         working-directory: ./packages/@dcl/sdk-commands
         if: ${{ github.event.pull_request.number }}
         run: |
           node -e "\
             let pkg=require('./package.json');\
-            pkg.dependencies['@dcl/inspector']='$INSPECTOR_URL';\
             pkg.dependencies['@dcl/ecs']='$ECS_S3_URL';\
             require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));\
           "
         env:
           ECS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_ecs.outputs.s3-bucket-key }}
-          INSPECTOR_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_decentraland_inspector.outputs.s3-bucket-key }}
 
       - name: publish @dcl/sdk-commands package
         uses: decentraland/oddish-action@master
@@ -348,7 +240,6 @@ jobs:
         run: |
           node -e "\
             let pkg=require('./package.json');\
-            pkg.dependencies['@dcl/inspector']='$INSPECTOR_URL';\
             pkg.dependencies['@dcl/js-runtime']='$JS_RUNTIME_S3_URL';\
             pkg.dependencies['@dcl/ecs']='$ECS_S3_URL';\
             pkg.dependencies['@dcl/react-ecs']='$REACT_ECS_S3_URL';\
@@ -356,7 +247,6 @@ jobs:
             require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));\
           "
         env:
-          INSPECTOR_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_decentraland_inspector.outputs.s3-bucket-key }}
           REACT_ECS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_react_ecs.outputs.s3-bucket-key }}
           ECS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_ecs.outputs.s3-bucket-key }}
           ROLLUP_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_rollup.outputs.s3-bucket-key }}
@@ -415,10 +305,10 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
   notify_deployment:
-    name: notify deployment
     needs: [build]
     if: ${{ github.event.pull_request.number }}
     runs-on: ubuntu-latest
+    name: Deployment Notification
     steps:
       - uses: actions/github-script@v6
         id: get-cloudflare-url
@@ -452,12 +342,6 @@ jobs:
                npx $SDK_COMMANDS init
                ```
 
-            - The `@dcl/inspector` package can be tested by visiting [this url](https://${{steps.get-cloudflare-url.outputs.result}}/inspector)
-              - Or by installing it via NPM
-               ```bash
-               npm install "${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_inspector_s3_bucket_key }}"
-               ```
-
             - The `/changerealm` command to test [test in-world](https://play.decentraland.zone/?realm=${{ secrets.SDK_TEAM_S3_BASE_URL }}/ipfs/${{ github.head_ref || github.ref }}-e2e)
                ```
                /changerealm ${{ secrets.SDK_TEAM_S3_BASE_URL }}/ipfs/${{ github.head_ref || github.ref }}-e2e
@@ -468,10 +352,8 @@ jobs:
           edit-mode: replace
       - name: Test SDK Install S3 URL
         run: mkdir -p test_sdk_s3 && cd test_sdk_s3 && npm init --yes && npm install "${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_s3_bucket_key }}"
-      - name: Test Inspector Install S3 URL
-        run: mkdir -p test_inspector_s3 && cd test_inspector_s3 && npm init --yes && npm install "${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_inspector_s3_bucket_key }}"
-  e2e-cli:
-    name: E2E CLI
+  cli_e2e:
+    name: CLI E2E
     needs: [build]
     runs-on: ubuntu-latest
     steps:
@@ -516,7 +398,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
   check-local-deps:
-    name: check local deps
+    name: Check for development dependencies
     needs: [build]
     runs-on: ubuntu-latest
     if: >
@@ -615,69 +497,3 @@ jobs:
         run: |
           echo "❌ Local package dependencies detected! These must be fixed before merging."
           exit 1
-
-  generate-release:
-    name: Generate SDK packages pre-release
-    needs: [build] # we don't want to generate a release if the build fails
-    runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' && !github.event.pull_request.number }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Remove SDK packages pre-releases
-        uses: ./.github/actions/cleanup-prereleases
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Get latest plain semver release
-        id: latest_release
-        shell: bash
-        run: |
-          # Get the latest plain semver (non Creator Hub) release
-          LATEST_TAG=$(
-            gh release list --limit 100 --json tagName,isPrerelease \
-              --jq '.[] | select(.isPrerelease == false) | .tagName' |
-            grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' |
-            head -n 1
-          )
-
-          if [[ -z "$LATEST_TAG" ]]; then
-            echo "❌ No matching semver releases found."
-            exit 1
-          fi
-
-          echo "Found latest plain semver release: $LATEST_TAG"
-          echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-        # TODO: changes outside packages/* won't be listed (e.g. README.md, .github/, etc)
-      - name: Generate SDK packages release notes
-        id: release_notes
-        uses: ./.github/actions/generate-release-notes
-        with:
-          previous_version: ${{ steps.latest_release.outputs.tag }}
-          current_version: ${{ needs.build.outputs.sdk_version }}
-          paths: 'packages/@dcl/sdk,packages/@dcl/inspector,packages/@dcl/js-runtime,packages/@dcl/ecs,packages/@dcl/react-ecs,packages/@dcl/sdk-commands,packages/@dcl/playground-assets'
-          section_names: 'SDK Changes,Inspector Changes,JS Runtime Changes,ECS Changes,React ECS Changes,SDK Commands Changes,Playground Assets Changes'
-          release_title: 'SDK Packages'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Update release description
-        uses: ./.github/actions/update-release-description
-        with:
-          tag_name: ${{ needs.build.outputs.sdk_version }}
-          release_notes: ${{ steps.release_notes.outputs.release_notes }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          create_if_not_exists: true
-
-
-  trigger-creator-hub-workflow:
-    name: creator hub
-    needs: [build]
-    uses: ./.github/workflows/creator-hub.yml
-    with:
-      inspector-package-url: ${{ needs.build.outputs.decentraland_inspector_s3_bucket_key }}
-    secrets: inherit

@@ -22,8 +22,6 @@ endif
 PROTOC = node_modules/.bin/protobuf/bin/protoc
 SCENE_PROTO_FILES := $(wildcard node_modules/@dcl/protocol/proto/decentraland/kernel/apis/*.proto)
 PBS_TS = $(SCENE_PROTO_FILES:node_modules/@dcl/protocol/proto/decentraland/kernel/apis/%.proto=scripts/rpc-api-generation/src/proto/%.gen.ts)
-INSPECTOR_PATH = packages/@dcl/inspector
-CH_PATH = packages/@dcl/creator-hub
 TSC = node_modules/.bin/tsc
 ESLINT = node_modules/.bin/eslint
 SYNC_PACK = node_modules/.bin/syncpack
@@ -45,12 +43,6 @@ update-protocol:
 lint:
 	npx tsx scripts/lint-packages.ts
 
-typecheck:
-	make typecheck-creator-hub
-
-typecheck-creator-hub:
-	cd $(CH_PATH); npm run typecheck --if-present
-
 sync-deps:
 	$(SYNC_PACK) format --config .syncpackrc.json --source "packages/*/package.json" --source "package.json"
 	$(SYNC_PACK) fix-mismatches --config .syncpackrc.json --source "packages/*/package.json" --source "package.json"
@@ -64,25 +56,11 @@ lint-fix: sync-deps
 
 test:
 	node_modules/.bin/jest --detectOpenHandles --colors test/
-	make test-inspector
-	make test-creator-hub
-
-test-inspector:
-	cd ./packages/@dcl/inspector/; TS_JEST_TRANSFORMER=true ./../../../node_modules/.bin/jest --coverage --detectOpenHandles --colors --config ./jest.config.js $(FILES)
-
-test-inspector-e2e:
-	cd ./packages/@dcl/inspector/; IS_E2E=true ./../../../node_modules/.bin/jest --detectOpenHandles --colors --config ./jest.config.js
 
 test-cli:
 	@rm -rf tmp
 	@mkdir -p tmp/scene
 	cd tmp/scene; $(PWD)/packages/@dcl/sdk-commands/dist/index.js init
-
-test-creator-hub:
-	cd $(CH_PATH); npm run test
-
-test-creator-hub-e2e:
-	cd $(CH_PATH); npm run test:e2e
 
 format:
 	npx prettier --write "**/*.{js,ts,tsx,json}" --loglevel=error
@@ -97,10 +75,6 @@ docs: | install build
 	node_modules/.bin/jest --detectOpenHandles --colors --runInBand --runTestsByPath scripts/docs.spec.ts
 # Cloudflare doesn't allow a directory called functions. 🪄🎩
 	mv api-docs/functions api-docs/funcs
-# copy inspector
-	cp -r packages/@dcl/inspector/public api-docs/inspector
-# big files need to be removed for cloudflare pages
-	rm api-docs/inspector/bundle.js.map
 # replace the paths of /functions to /funcs
 	find ./api-docs -type f -name '*.html' \
   	| xargs sed ${SED_OPTION} -E 's:(href="[^"]+)functions/:\1funcs/:g'
@@ -140,8 +114,6 @@ deep-clean:
 		packages/@dcl/react-ecs/node_modules/ \
 		packages/@dcl/sdk/node_modules/ \
 		packages/@dcl/sdk-commands/node_modules \
-		packages/@dcl/inspector/node_modules/ \
-		packages/@dcl/creator-hub/node_modules/
 	make clean
 
 update-snapshots: export UPDATE_SNAPSHOTS=true
@@ -151,7 +123,6 @@ clean:
 	@echo "> Cleaning all folders"
 	@rm -rf coverage/
 	@rm -rf packages/@dcl/sdk/*.js packages/@dcl/sdk/*.d.ts packages/@dcl/sdk/internal packages/@dcl/sdk/testing
-	@rm -rf packages/@dcl/inspector/public/*.js packages/@dcl/inspector/public/*.d.ts packages/@dcl/inspector/public/*.map packages/@dcl/inspector/public/*.css
 	@rm -rf packages/@dcl/ecs/dist/ packages/@dcl/sdk/dist/
 	@rm -rf packages/@dcl/sdk-commands/dist
 	@rm -rf packages/@dcl/ecs/src/components/generated/ packages/@dcl/ecs/temp/
@@ -165,7 +136,3 @@ clean:
 	@rm -rf test/build-ecs/fixtures/simple-scene-with-library/bin/ test/build-ecs/fixtures/simple-scene-with-library/node_modules/
 	@rm -rf test/build-ecs/fixtures/simple-scene/bin/ test/build-ecs/fixtures/simple-scene/node_modules/
 	@rm -rf test/ecs/snippets/dist/
-	@rm -rf $(CH_PATH)/node_modules/
-	@rm -rf $(CH_PATH)/main/dist/
-	@rm -rf $(CH_PATH)/preload/dist/
-	@rm -rf $(CH_PATH)/renderer/dist/

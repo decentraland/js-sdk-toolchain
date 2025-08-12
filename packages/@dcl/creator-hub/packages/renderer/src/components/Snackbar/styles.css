@@ -1,9 +1,0 @@
-.Snackbar .MuiPaper-root {
-  background-color: var(--black);
-  color: var(--white);
-  align-items: center;
-}
-
-.Snackbar .MuiPaper-root button {
-  color: var(--dcl);
-}

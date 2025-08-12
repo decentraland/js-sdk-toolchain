@@ -1,1 +1,0 @@
-export { Projects } from './component';

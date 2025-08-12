@@ -4,7 +4,6 @@
       "packages": ["**"],
       "dependencies": [
         "@dcl/ecs",
-        "@dcl/inspector",
         "@dcl/js-runtime",
         "@dcl/playground-assets",
         "@dcl/sdk",
