@@ -1,7 +1,7 @@
 /**
  * Config file for API Extractor.  For more info, please visit: https://api-extractor.com
  */
- {
+{
   "$schema": "https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json",
   /**
    * Optionally specifies another JSON config file that this file extends from.  This provides a way for
@@ -30,7 +30,7 @@
    * SUPPORTED TOKENS: <lookup>
    * DEFAULT VALUE: "<lookup>"
    */
-    "projectFolder": ".",
+  "projectFolder": ".",
   /**
    * (REQUIRED) Specifies the .d.ts file to be used as the starting point for analysis.  API Extractor
    * analyzes the symbols exported by this module.
@@ -185,7 +185,7 @@
     // "untrimmedFilePath": "<projectFolder>/dist/index.d.ts",
     "publicTrimmedFilePath": "<projectFolder>/dist/index.bundled.d.ts",
     "alphaTrimmedFilePath": "<projectFolder>/dist/alpha.d.ts",
-    "betaTrimmedFilePath": "<projectFolder>/dist/beta.d.ts",
+    "betaTrimmedFilePath": "<projectFolder>/dist/beta.d.ts"
     /**
      * Specifies the output path for a .d.ts rollup file to be generated with trimming for an "alpha" release.
      * This file will include only declarations that are marked as "@public", "@beta", or "@alpha".
@@ -294,15 +294,14 @@
          *
          * DEFAULT VALUE: "warning"
          */
-        "logLevel": "warning"
+        "logLevel": "warning",
         /**
          * When addToApiReportFile is true:  If API Extractor is configured to write an API report file (.api.md),
          * then the message will be written inside that file; otherwise, the message is instead logged according to
          * the "logLevel" option.
          *
          * DEFAULT VALUE: false
-         */,
-        "addToApiReportFile": false
+         */ "addToApiReportFile": false
       }
       // "TS2551": {
       //   "logLevel": "warning",
