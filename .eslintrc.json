@@ -4,16 +4,10 @@
     "project": [
       "packages/@dcl/sdk/types/tsconfig.ecs7.json",
       "packages/@dcl/ecs/tsconfig.json",
-      "packages/@dcl/inspector/tsconfig.json",
-      "packages/@dcl/inspector/test/tsconfig.json",
       "packages/@dcl/sdk-commands/tsconfig.json",
       "packages/@dcl/sdk/tsconfig.json",
       "packages/@dcl/playground-assets/tsconfig.json",
       "packages/@dcl/react-ecs/tsconfig.json",
-      "packages/@dcl/creator-hub/packages/main/tsconfig.json",
-      "packages/@dcl/creator-hub/packages/preload/tsconfig.json",
-      "packages/@dcl/creator-hub/packages/renderer/tsconfig.json",
-      "packages/@dcl/creator-hub/packages/shared/tsconfig.json",
       "scripts/tsconfig.json",
       "test/tsconfig.json",
       "test/ecs/snippets/tsconfig.json"
@@ -35,7 +29,6 @@
   "overrides": [
     {
       "files": [
-        "packages/@dcl/inspector/**/*.ts",
         "packages/@dcl/ecs/**/*.ts",
         "packages/@dcl/sdk/**/*.ts",
         "scripts/**/*.ts",

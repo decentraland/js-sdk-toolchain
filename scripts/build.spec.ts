@@ -7,13 +7,11 @@ import {
   commonChecks,
   ECS7_PATH,
   flow,
-  INSPECTOR_PATH,
   JS_RUNTIME,
   PLAYGROUND_ASSETS_PATH,
   REACT_ECS,
   SDK_PATH,
-  SDK_COMMANDS_PATH,
-  CH_PATH
+  SDK_COMMANDS_PATH
 } from './common'
 import {
   copyFile,
@@ -102,30 +100,6 @@ flow('build-all', () => {
     })
   })
 
-  flow('@dcl/inspector', () => {
-    itDeletesFolder('build', INSPECTOR_PATH)
-
-    const DATA_LAYER_PROTO_PATH = path.resolve(INSPECTOR_PATH, 'src/lib/data-layer/proto')
-    it('compile the data layer protocol buffer files', async () => {
-      await buildProtobuf(DATA_LAYER_PROTO_PATH, DATA_LAYER_PROTO_PATH, [
-        'esModuleInterop=true',
-        'returnObservable=false',
-        'outputServices=generic-definitions',
-        'fileSuffix=.gen',
-        'oneof=unions',
-        'useMapType=true'
-      ])
-    })
-
-    itExecutes('npm i --silent', INSPECTOR_PATH)
-
-    itExecutes('npm run build --silent', INSPECTOR_PATH)
-    it('check file exists', () => {
-      ensureFileExists('public/bundle.js', INSPECTOR_PATH)
-      ensureFileExists('public/bundle.css', INSPECTOR_PATH)
-    })
-  })
-
   flow('@dcl/sdk-commands build', () => {
     itDeletesFolder('dist', SDK_COMMANDS_PATH)
     itExecutes(`npm i --silent`, SDK_COMMANDS_PATH)
@@ -165,15 +139,6 @@ flow('build-all', () => {
       ensureFileExists('react-ecs.js', SDK_PATH)
       ensureFileExists('react-ecs.d.ts', SDK_PATH)
     })
-  })
-
-  flow('@dcl/creator-hub build', () => {
-    itDeletesFolder('main/dist', CH_PATH)
-    itDeletesFolder('preload/dist', CH_PATH)
-    itDeletesFolder('renderer/dist', CH_PATH)
-
-    itExecutes(`npm i --silent`, CH_PATH)
-    itExecutes('npm run build --silent', CH_PATH)
   })
 
   flow('@dcl/playground-assets build', () => {

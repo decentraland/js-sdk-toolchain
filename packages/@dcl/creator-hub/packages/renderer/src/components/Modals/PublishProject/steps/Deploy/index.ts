@@ -1,1 +1,0 @@
-export { Deploy } from './component';

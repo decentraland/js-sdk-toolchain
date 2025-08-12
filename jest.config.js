@@ -10,7 +10,6 @@ module.exports = {
     ]
   },
   transformIgnorePatterns: ['node_modules/(?!(@dcl/(ecs-math|quests-client))/)'],
-  modulePathIgnorePatterns: ['packages/@dcl/inspector'],
   coverageDirectory: 'coverage',
   coverageThreshold: {
     global: {
@@ -65,7 +64,6 @@ module.exports = {
     'scripts',
     'test',
     '(.)\\.(js)$',
-    'packages/@dcl/inspector',
     'packages/@dcl/playground-assets',
     'packages/@dcl/ecs/src/components/generated/pb',
     'packages/@dcl/ecs/src/components/generated/AvatarBase.gen.ts',
