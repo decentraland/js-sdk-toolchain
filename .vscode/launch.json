@@ -91,6 +91,28 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Debug sdk-commands export-static",
+      "program": "${workspaceFolder}/packages/@dcl/sdk-commands/dist/index.js",
+      "runtimeArgs": [
+        "--async-stack-traces"
+      ],
+      "args": [
+        "export-static",
+        "--destination",
+        "/home/user/github/sdk7-goerli-plaza/ipfs/",
+        "--realmName",
+        "test-scene",
+        "--baseUrl",
+        "http://localhost:8000/"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "autoAttachChildProcesses": true,
+      "cwd": "/home/user/github/sdk7-goerli-plaza"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Serve inspector",
       "program": "${workspaceFolder}/packages/@dcl/inspector/build.js",
       "args": [
