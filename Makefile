@@ -171,4 +171,13 @@ clean:
 
 init-test-scene:
 	git clone https://github.com/decentraland/sdk7-scene-template test-scene
-	cd test-scene && npm i ./../packages/@dcl/sdk  && npm i ./../packages/@dcl/sdk-commands  && npm i ./../packages/@dcl/js-runtime
+	make prepare-link-packages
+	cd test-scene && npm install
+	cd test-scene && npm link @dcl/sdk @dcl/react-ecs @dcl/sdk-commands @dcl/js-runtime @dcl/ecs @dcl/ecs-math @dcl/asset-packs
+
+prepare-link-packages:
+	cd packages/@dcl/sdk && npm link
+	cd packages/@dcl/react-ecs && npm link
+	cd packages/@dcl/sdk-commands && npm link
+	cd packages/@dcl/js-runtime && npm link
+	cd packages/@dcl/ecs && npm link
