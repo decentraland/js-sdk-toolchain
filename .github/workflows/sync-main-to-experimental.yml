@@ -8,7 +8,6 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    continue-on-error: true
 
     permissions:
       contents: write
@@ -27,13 +26,14 @@ jobs:
           git config pull.rebase false  # Always merge, never rebase
 
       - name: Sync main into experimental branch
+        continue-on-error: true
         run: |
           BRANCH_NAME="chore/sync"
           git checkout -B $BRANCH_NAME origin/experimental
 
           # Merge main changes into experimental, preferring main changes on conflicts
           git fetch origin main
-          git merge -X theirs origin/main || echo "Merge completed (conflicts auto-resolved in favor of main)"
+          git merge -X theirs origin/main --no-edit || echo "Merge completed (conflicts auto-resolved in favor of main)"
 
           # Run required update steps
           make update-protocol 'experimental'
@@ -41,9 +41,12 @@ jobs:
           make build
           make update-snapshots
 
+      - name: Commit and push changes in experimental
+        run: |
+          BRANCH_NAME="chore/sync"
           # Commit if there are changes
           git add -A .
-          git commit --no-edit || echo "No changes to commit"
+          git commit --no-edit -m "updated protocol and snapshots" || echo "No changes to commit"
 
           # Push (force to keep PR updated)
           git push --force --set-upstream origin $BRANCH_NAME
@@ -65,3 +68,4 @@ jobs:
               --title "chore: sync main to experimental" \
               --body ":crown: *Automated PR to keep experimental in sync with main (with protocol updates, build & snapshots)*" \
               --label "auto-pr"
+          fi
