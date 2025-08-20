@@ -1,12 +1,12 @@
 import React, { useEffect, useCallback, useMemo } from 'react'
 import { Entity, PBTween, TweenLoop } from '@dcl/ecs'
 import { Action, ActionPayload, ActionType, getJson } from '@dcl/asset-packs'
-import { WithSdkProps, withSdk } from '../../../../hoc/withSdk'
-import { useArrayState } from '../../../../hooks/useArrayState'
-import { useComponentValue } from '../../../../hooks/sdk/useComponentValue'
-import { Block } from '../../../Block'
-import { CheckboxField, RangeField } from '../../../ui'
-import { getPartialPayload } from '../../ActionInspector/utils'
+import { WithSdkProps, withSdk } from '../../../../../hoc/withSdk'
+import { useArrayState } from '../../../../../hooks/useArrayState'
+import { useComponentValue } from '../../../../../hooks/sdk/useComponentValue'
+import { Block } from '../../../../Block'
+import { CheckboxField, RangeField } from '../../../../ui'
+import { getPartialPayload } from '../../../ActionInspector/utils'
 
 type TweenAction = [number, Action]
 type TweenActionsMap = Map<string, TweenAction>

@@ -2,16 +2,22 @@ import React, { useCallback } from 'react'
 import { useDrop } from 'react-dnd'
 import cx from 'classnames'
 import { Entity } from '@dcl/ecs'
-import { withSdk, WithSdkProps } from '../../../../hoc/withSdk'
-import { useHasComponent } from '../../../../hooks/sdk/useHasComponent'
-import { useComponentInput } from '../../../../hooks/sdk/useComponentInput'
-import { LocalAssetDrop, getNode } from '../../../../lib/sdk/drag-drop'
-import { withAssetDir } from '../../../../lib/data-layer/host/fs-utils'
-import { useAppSelector } from '../../../../redux/hooks'
-import { selectAssetCatalog } from '../../../../redux/app'
-import { Block } from '../../../Block'
-import { TextField, CheckboxField, RangeField, InfoTooltip } from '../../../ui'
-import { fromVideoPlayer, toVideoPlayer, isValidInput, isVideo, isValidVolume } from '../../VideoPlayerInspector/utils'
+import { withSdk, WithSdkProps } from '../../../../../hoc/withSdk'
+import { useHasComponent } from '../../../../../hooks/sdk/useHasComponent'
+import { useComponentInput } from '../../../../../hooks/sdk/useComponentInput'
+import { LocalAssetDrop, getNode } from '../../../../../lib/sdk/drag-drop'
+import { withAssetDir } from '../../../../../lib/data-layer/host/fs-utils'
+import { useAppSelector } from '../../../../../redux/hooks'
+import { selectAssetCatalog } from '../../../../../redux/app'
+import { Block } from '../../../../Block'
+import { TextField, CheckboxField, RangeField, InfoTooltip } from '../../../../ui'
+import {
+  fromVideoPlayer,
+  toVideoPlayer,
+  isValidInput,
+  isVideo,
+  isValidVolume
+} from '../../../VideoPlayerInspector/utils'
 
 const DROP_TYPES = ['local-asset']
 

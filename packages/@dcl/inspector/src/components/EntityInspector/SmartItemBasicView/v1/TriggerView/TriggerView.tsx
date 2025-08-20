@@ -1,20 +1,21 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 import { Entity } from '@dcl/ecs'
 import { Action, Trigger, TriggerAction, TriggerCondition } from '@dcl/asset-packs'
-import { WithSdkProps, withSdk } from '../../../../hoc/withSdk'
-import { getComponentValue, useComponentValue } from '../../../../hooks/sdk/useComponentValue'
-import { useComponentsWith } from '../../../../hooks/sdk/useComponentsWith'
-import { useEntitiesWith } from '../../../../hooks/sdk/useEntitiesWith'
-import { useArrayState } from '../../../../hooks/useArrayState'
-import { Component, ConfigComponent, EditorComponentsTypes } from '../../../../lib/sdk/components'
-import { Container } from '../../../Container'
-import { Dropdown, EntityField } from '../../../ui'
-import MoreOptionsMenu from '../../MoreOptionsMenu'
-import { RemoveButton } from '../../RemoveButton'
-import { AddButton } from '../../AddButton'
+import { WithSdkProps, withSdk } from '../../../../../hoc/withSdk'
+import { getComponentValue, useComponentValue } from '../../../../../hooks/sdk/useComponentValue'
+import { useComponentsWith } from '../../../../../hooks/sdk/useComponentsWith'
+import { useEntitiesWith } from '../../../../../hooks/sdk/useEntitiesWith'
+import { useArrayState } from '../../../../../hooks/useArrayState'
+import { Component, EditorComponentsTypes } from '../../../../../lib/sdk/components'
+import { ConfigComponentType } from '../../../../../lib/sdk/components/Config'
+import { Container } from '../../../../Container'
+import { Dropdown, EntityField } from '../../../../ui'
+import MoreOptionsMenu from '../../../MoreOptionsMenu'
+import { RemoveButton } from '../../../RemoveButton'
+import { AddButton } from '../../../AddButton'
 
 export default React.memo(
-  withSdk<WithSdkProps & { entity: Entity; field: ConfigComponent['fields'][0] }>(({ sdk, entity, field }) => {
+  withSdk<WithSdkProps & { entity: Entity; field: ConfigComponentType['fields'][0] }>(({ sdk, entity, field }) => {
     const { Config, Triggers, Actions, Name } = sdk.components
     const [triggerComponent, setTriggerComponentValue, isTriggerComponentEqual] = useComponentValue<
       EditorComponentsTypes['Triggers']

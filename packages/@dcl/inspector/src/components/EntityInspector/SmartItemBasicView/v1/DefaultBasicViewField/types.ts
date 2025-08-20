@@ -1,10 +1,14 @@
 import { Entity } from '@dcl/ecs'
-import { ConfigComponent, EditorComponents, SdkComponents } from '../../../../lib/sdk/components'
+import { EditorComponents, SdkComponents } from '../../../../../lib/sdk/components'
+import { ConfigComponentType } from '../../../../../lib/sdk/components/Config'
 
 export enum FieldComponentType {
   CheckboxField = 'CheckboxField',
   TextField = 'TextField',
-  RangeField = 'RangeField'
+  RangeField = 'RangeField',
+  ColorField = 'ColorField',
+  FileUploadField = 'FileUploadField',
+  GroupField = 'GroupField'
 }
 
 export enum FieldType {
@@ -22,12 +26,14 @@ export type FieldConfig = {
   step?: string | number
   min?: string | number
   max?: string | number
+  multiplier?: number
   default?: string
+  layout?: Record<string, FieldConfig>
 }
 
 export type DefaultBasicViewFieldProps = {
   entity: Entity
-  field: ConfigComponent['fields'][0]
+  field: ConfigComponentType['fields'][0]
 }
 
 export type Components = EditorComponents & SdkComponents

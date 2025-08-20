@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect } from 'react'
 import { Entity, PBPointerEvents, PBPointerEvents_Entry } from '@dcl/ecs'
-import { withSdk, WithSdkProps } from '../../../../hoc/withSdk'
-import { Block } from '../../../Block'
-import { TextField, Dropdown } from '../../../ui'
-import { useComponentValue } from '../../../../hooks/sdk/useComponentValue'
-import { useArrayState } from '../../../../hooks/useArrayState'
-import { INPUT_ACTIONS, mapValueToInputAction } from '../../PointerEventsInspector/utils'
+import { withSdk, WithSdkProps } from '../../../../../hoc/withSdk'
+import { Block } from '../../../../Block'
+import { TextField, Dropdown } from '../../../../ui'
+import { useComponentValue } from '../../../../../hooks/sdk/useComponentValue'
+import { useArrayState } from '../../../../../hooks/useArrayState'
+import { INPUT_ACTIONS, mapValueToInputAction } from '../../../PointerEventsInspector/utils'
 
 export default React.memo(
   withSdk<WithSdkProps & { entity: Entity }>(({ sdk, entity }) => {

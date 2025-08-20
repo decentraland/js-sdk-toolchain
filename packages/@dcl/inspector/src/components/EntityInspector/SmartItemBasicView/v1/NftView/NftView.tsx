@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { Entity, NftFrameType, PBNftShape } from '@dcl/ecs'
-import { withSdk, WithSdkProps } from '../../../../hoc/withSdk'
-import { useHasComponent } from '../../../../hooks/sdk/useHasComponent'
-import { useComponentValue } from '../../../../hooks/sdk/useComponentValue'
-import { Block } from '../../../Block'
-import { TextField, Dropdown, ColorField, DropdownChangeEvent } from '../../../ui'
-import { toColor3, toHex } from '../../../ui/ColorField/utils'
+import { withSdk, WithSdkProps } from '../../../../../hoc/withSdk'
+import { useHasComponent } from '../../../../../hooks/sdk/useHasComponent'
+import { useComponentValue } from '../../../../../hooks/sdk/useComponentValue'
+import { Block } from '../../../../Block'
+import { TextField, Dropdown, ColorField, DropdownChangeEvent } from '../../../../ui'
+import { toColor3, toHex } from '../../../../ui/ColorField/utils'
 import {
   UrnTokens,
   buildTokens,
@@ -14,7 +14,7 @@ import {
   NETWORKS,
   DEFAULT_NETWORK,
   NFT_STYLES
-} from '../../NftShapeInspector/utils'
+} from '../../../NftShapeInspector/utils'
 
 export default React.memo(
   withSdk<WithSdkProps & { entity: Entity }>(({ sdk, entity }) => {

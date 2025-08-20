@@ -1,16 +1,17 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 import { Entity } from '@dcl/ecs'
 import { Action, ActionType, getActionSchema, getJson, getPayload } from '@dcl/asset-packs'
-import { WithSdkProps, withSdk } from '../../../../hoc/withSdk'
-import { useComponentValue } from '../../../../hooks/sdk/useComponentValue'
-import { useArrayState } from '../../../../hooks/useArrayState'
-import { ConfigComponent, EditorComponentsTypes } from '../../../../lib/sdk/components'
-import { capitalize, transformPropertyToLabel } from '../../../../lib/utils/strings'
-import { Block } from '../../../Block'
-import { Dropdown, RangeField, TextField, TextArea } from '../../../ui'
+import { WithSdkProps, withSdk } from '../../../../../hoc/withSdk'
+import { useComponentValue } from '../../../../../hooks/sdk/useComponentValue'
+import { useArrayState } from '../../../../../hooks/useArrayState'
+import { EditorComponentsTypes } from '../../../../../lib/sdk/components'
+import { ConfigComponentType } from '../../../../../lib/sdk/components/Config'
+import { capitalize, transformPropertyToLabel } from '../../../../../lib/utils/strings'
+import { Block } from '../../../../Block'
+import { Dropdown, RangeField, TextField, TextArea } from '../../../../ui'
 
 export default React.memo(
-  withSdk<WithSdkProps & { entity: Entity; field: ConfigComponent['fields'][0] }>(
+  withSdk<WithSdkProps & { entity: Entity; field: ConfigComponentType['fields'][0] }>(
     ({ sdk, entity, field: configField }) => {
       const { Actions } = sdk.components
       const [actionComponent, setActionComponentValue, isActionComponentEqual] = useComponentValue<

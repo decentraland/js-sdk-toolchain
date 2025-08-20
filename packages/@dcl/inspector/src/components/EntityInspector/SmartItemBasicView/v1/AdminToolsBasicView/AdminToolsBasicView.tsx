@@ -1,15 +1,15 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { withSdk } from '../../../../hoc/withSdk'
-import { useComponentValue } from '../../../../hooks/sdk/useComponentValue'
+import { withSdk } from '../../../../../hoc/withSdk'
+import { useComponentValue } from '../../../../../hooks/sdk/useComponentValue'
 
-import { Accordion } from '../../../ui'
+import { Accordion } from '../../../../ui'
 
-import { VideoControl } from '../../AdminToolkitView/VideoControl'
-import { SmartItemControl } from '../../AdminToolkitView/SmartItemControl'
-import { TextAnnouncementControl } from '../../AdminToolkitView/TextAnnouncementControl'
+import { VideoControl } from '../../../AdminToolkitView/VideoControl'
+import { SmartItemControl } from '../../../AdminToolkitView/SmartItemControl'
+import { TextAnnouncementControl } from '../../../AdminToolkitView/TextAnnouncementControl'
 
-import { type Props } from '../../AdminToolkitView/types'
+import { type Props } from '../../../AdminToolkitView/types'
 
 import './AdminToolsBasicView.css'
 
