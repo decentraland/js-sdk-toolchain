@@ -31,11 +31,6 @@ import { selectCustomAssets } from '../../../redux/app'
 import CustomAssetIcon from '../../Icons/CustomAsset'
 import { Container } from '../../Container'
 
-interface ModalState {
-  isOpen: boolean
-  cb?: () => void
-}
-
 export const getLabel = (sdk: SdkContextValue, entity: Entity) => {
   const nameComponent = sdk.components.Name.getOrNull(entity)
   switch (entity) {
@@ -57,12 +52,7 @@ export const getLabel = (sdk: SdkContextValue, entity: Entity) => {
 export default React.memo(
   withSdk<WithSdkProps & { entity: Entity }>(({ sdk, entity }) => {
     const { addComponent, getAvailableComponents } = useEntityComponent()
-    const [configComponent, setConfigComponentValue] = useComponentValue<EditorComponentsTypes['Config']>(
-      entity,
-      sdk.components.Config
-    )
     const [label, setLabel] = useState<string | null>()
-    const [modal, setModal] = useState<ModalState>({ isOpen: false })
     const [editMode, setEditMode] = useState(false)
     const [instanceOf, setInstanceOf] = useState<string | null>(null)
     const customAssets = useAppSelector(selectCustomAssets)
@@ -358,7 +348,6 @@ export default React.memo(
             ) : null}
             {!isRoot(entity) ? (
               <MoreOptionsMenu>
-                {hasConfigComponent ? renderToggleAdvanceMode() : <></>}
                 <RemoveButton className="RemoveButton" onClick={handleRemoveEntity}>
                   Delete Entity
                 </RemoveButton>

@@ -1,8 +1,7 @@
 import { Entity } from '@dcl/ecs'
-import { useEffect, useMemo, useState } from 'react'
+import { memo, useMemo } from 'react'
 
 import { withSdk } from '../../hoc/withSdk'
-import { useChange } from '../../hooks/sdk/useChange'
 import { useEntitiesWith } from '../../hooks/sdk/useEntitiesWith'
 import { useAppSelector } from '../../redux/hooks'
 import { getHiddenComponents } from '../../redux/ui'
@@ -73,22 +72,6 @@ const MultiEntityInspector = withSdk<{ entities: Entity[] }>(({ sdk, entities })
 
 const SingleEntityInspector = withSdk<{ entity: Entity | null }>(({ sdk, entity }) => {
   const hiddenComponents = useAppSelector(getHiddenComponents)
-  const [isBasicViewEnabled, setIsBasicViewEnabled] = useState(false)
-
-  useChange(
-    (event) => {
-      if (event.entity === entity && event.component?.componentId === sdk.components.Config.componentId) {
-        setIsBasicViewEnabled(sdk.components.Config.getOrNull(entity)?.isBasicViewEnabled === true)
-      }
-    },
-    [entity, sdk]
-  )
-
-  useEffect(() => {
-    if (entity !== null) {
-      setIsBasicViewEnabled(sdk.components.Config.getOrNull(entity)?.isBasicViewEnabled === true)
-    }
-  }, [entity, sdk, setIsBasicViewEnabled])
 
   const inspectors = useMemo(
     () => [{ name: sdk.components.Transform.componentName, component: TransformInspector }],
@@ -171,13 +154,10 @@ const SingleEntityInspector = withSdk<{ entity: Entity | null }>(({ sdk, entity 
             ({ name, component: Inspector }, index) =>
               !hiddenComponents[name] && <Inspector key={`${index}-${entity}`} entities={[entity]} />
           )}
-          {isBasicViewEnabled ? (
-            <SmartItemBasicView entity={entity} />
-          ) : (
-            advancedInspectorComponents.map(
-              ({ name, component: Inspector }, index) =>
-                !hiddenComponents[name] && <Inspector key={`${index}-${entity}`} entity={entity} />
-            )
+          <SmartItemBasicView entity={entity} />
+          {advancedInspectorComponents.map(
+            ({ name, component: Inspector }, index) =>
+              !hiddenComponents[name] && <Inspector key={`${index}-${entity}`} entity={entity} />
           )}
         </>
       ) : null}
@@ -185,4 +165,4 @@ const SingleEntityInspector = withSdk<{ entity: Entity | null }>(({ sdk, entity 
   )
 })
 
-export default EntityInspector
+export default memo(EntityInspector)
