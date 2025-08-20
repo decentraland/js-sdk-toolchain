@@ -38,6 +38,10 @@
   text-overflow: ellipsis;
 }
 
+.OptionContainer .Option.Disabled {
+  color: #a09ba8;
+}
+
 .OptionContainer:not(.SelectedOption):not(.DropdownPlaceholder):hover {
   background: var(--base-12);
 }
