@@ -14,7 +14,6 @@
       "skipFiles": ["<node_internals>/**/*.js", "node_modules/**/*.js"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "autoAttachChildProcesses": true
     },
     {
@@ -27,7 +26,6 @@
       "skipFiles": ["<node_internals>/**/*.js", "node_modules/**/*.js"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "protocol": "inspector",
       "autoAttachChildProcesses": true
     },
     {

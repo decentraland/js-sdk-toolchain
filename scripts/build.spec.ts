@@ -1,5 +1,5 @@
 import * as path from 'path'
-import { readFileSync, writeFileSync } from 'fs'
+import { readFileSync, writeFileSync, readdirSync } from 'fs'
 import { copySync, existsSync, mkdirSync, removeSync } from 'fs-extra'
 import { summary } from '@actions/core'
 
@@ -7,7 +7,6 @@ import {
   commonChecks,
   ECS7_PATH,
   flow,
-  INSPECTOR_PATH,
   JS_RUNTIME,
   PLAYGROUND_ASSETS_PATH,
   REACT_ECS,
@@ -98,30 +97,6 @@ flow('build-all', () => {
     it('check file exists', () => {
       ensureFileExists('dist/index.js', REACT_ECS)
       ensureFileExists('dist/index.d.ts', REACT_ECS)
-    })
-  })
-
-  flow('@dcl/inspector', () => {
-    itDeletesFolder('build', INSPECTOR_PATH)
-
-    const DATA_LAYER_PROTO_PATH = path.resolve(INSPECTOR_PATH, 'src/lib/data-layer/proto')
-    it('compile the data layer protocol buffer files', async () => {
-      await buildProtobuf(DATA_LAYER_PROTO_PATH, DATA_LAYER_PROTO_PATH, [
-        'esModuleInterop=true',
-        'returnObservable=false',
-        'outputServices=generic-definitions',
-        'fileSuffix=.gen',
-        'oneof=unions',
-        'useMapType=true'
-      ])
-    })
-
-    itExecutes('npm i --silent', INSPECTOR_PATH)
-
-    itExecutes('npm run build --silent', INSPECTOR_PATH)
-    it('check file exists', () => {
-      ensureFileExists('public/bundle.js', INSPECTOR_PATH)
-      ensureFileExists('public/bundle.css', INSPECTOR_PATH)
     })
   })
 
