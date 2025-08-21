@@ -70,13 +70,8 @@ const TriggerActionContainer: React.FC<WithSdkProps & Props> = ({ sdk, ...props 
       </div>
       {actions.map((action, idx) => {
         const actionEntity = getActionEntity(action)
-        const isBasicViewEnabled = sdk.components.Config.getOrNull(actionEntity as Entity)?.isBasicViewEnabled === true
         const actions = action.id
-          ? (
-              availableActions
-                .get(action.id)
-                ?.actions.filter((_action) => (isBasicViewEnabled ? !!_action?.allowedInBasicView : true)) ?? []
-            ).map(({ name }) => ({ value: name, label: name }))
+          ? (availableActions.get(action.id)?.actions ?? []).map(({ name }) => ({ value: name, label: name }))
           : []
         return (
           <div className="TriggerAction" key={`trigger-action-${idx}`}>
