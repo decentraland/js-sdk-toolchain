@@ -10,25 +10,9 @@ import { Dropdown, RangeField, InfoTooltip, FileUploadField, CheckboxField } fro
 import { ACCEPTED_FILE_TYPES } from '../../../ui/FileUploadField/types'
 
 import { isValid } from './utils'
-import type { Props } from './types'
+import { PLAY_MODE, PLAY_MODE_OPTIONS, type Props } from './types'
 
 import './PlaySoundAction.css'
-
-enum PLAY_MODE {
-  PLAY_ONCE = 'play-once',
-  LOOP = 'loop'
-}
-
-const playModeOptions = [
-  {
-    label: 'Play Once',
-    value: PLAY_MODE.PLAY_ONCE
-  },
-  {
-    label: 'Loop',
-    value: PLAY_MODE.LOOP
-  }
-]
 
 const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
   const [payload, setPayload] = useState<Partial<ActionPayload<ActionType.PLAY_SOUND>>>({
@@ -102,7 +86,7 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
           <Dropdown
             label="Play Mode"
             value={payload.loop ? PLAY_MODE.LOOP : PLAY_MODE.PLAY_ONCE}
-            options={playModeOptions}
+            options={PLAY_MODE_OPTIONS}
             onChange={handleChangePlayMode}
           />
         </div>

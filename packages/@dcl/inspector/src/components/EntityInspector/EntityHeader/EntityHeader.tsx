@@ -31,11 +31,6 @@ import { selectCustomAssets } from '../../../redux/app'
 import CustomAssetIcon from '../../Icons/CustomAsset'
 import { Container } from '../../Container'
 
-interface ModalState {
-  isOpen: boolean
-  cb?: () => void
-}
-
 export const getLabel = (sdk: SdkContextValue, entity: Entity) => {
   const nameComponent = sdk.components.Name.getOrNull(entity)
   switch (entity) {
@@ -57,12 +52,7 @@ export const getLabel = (sdk: SdkContextValue, entity: Entity) => {
 export default React.memo(
   withSdk<WithSdkProps & { entity: Entity }>(({ sdk, entity }) => {
     const { addComponent, getAvailableComponents } = useEntityComponent()
-    const [configComponent, setConfigComponentValue] = useComponentValue<EditorComponentsTypes['Config']>(
-      entity,
-      sdk.components.Config
-    )
     const [label, setLabel] = useState<string | null>()
-    const [modal, setModal] = useState<ModalState>({ isOpen: false })
     const [editMode, setEditMode] = useState(false)
     const [instanceOf, setInstanceOf] = useState<string | null>(null)
     const customAssets = useAppSelector(selectCustomAssets)
@@ -87,8 +77,6 @@ export default React.memo(
 
     const hasGltfContainer = useHasComponent(entity, sdk.components.GltfContainer)
     const hasMeshCollider = useHasComponent(entity, sdk.components.MeshCollider)
-    const hasConfigComponent = useHasComponent(entity, sdk.components.Config)
-    const isBasicViewEnabled = useMemo(() => configComponent.isBasicViewEnabled === true, [configComponent])
 
     const handleAddComponent = useCallback(
       (componentId: number, componentName: string, value?: any) => {
@@ -123,26 +111,11 @@ export default React.memo(
       [availableComponents, hasGltfContainer, hasMeshCollider, sdk.components.VisibilityComponent.componentId]
     )
 
-    const handleOpenModal = useCallback(
-      (cb?: () => void) => {
-        setModal({ isOpen: true, cb })
-      },
-      [setModal]
-    )
-
-    const handleCloseModal = useCallback(() => {
-      setModal({ isOpen: false, cb: undefined })
-    }, [setModal])
-
     const handleClickAddComponent = useCallback(
       (componentId: number, componentName: string, value?: any) => {
-        if (isBasicViewEnabled) {
-          handleOpenModal(() => handleAddComponent(componentId, componentName, value))
-          return
-        }
         handleAddComponent(componentId, componentName, value)
       },
-      [isBasicViewEnabled, handleAddComponent, handleOpenModal]
+      [handleAddComponent]
     )
 
     const getComponentTooltip = useCallback(
@@ -355,115 +328,6 @@ export default React.memo(
       await sdk.operations.dispatch()
     }, [entity, sdk])
 
-    const handleTrackSwitchToAdvanceView = useCallback(
-      (isAdvancedView: boolean) => {
-        const asset = getAssetById(configComponent.assetId!)
-        if (asset) {
-          analytics.track(Event.SWITCH_BUILDER_MODE, {
-            itemId: asset.id,
-            itemName: asset.name,
-            isAdvancedView: isAdvancedView
-          })
-        }
-      },
-      [entity, analytics]
-    )
-
-    const handleEnableAdvancedMode = useCallback(async () => {
-      if (modal.cb) {
-        modal.cb()
-      }
-      setConfigComponentValue({ ...configComponent, isBasicViewEnabled: false })
-      await sdk.operations.dispatch()
-      handleTrackSwitchToAdvanceView(true)
-      handleCloseModal()
-    }, [sdk, configComponent, modal, setConfigComponentValue, handleCloseModal, handleTrackSwitchToAdvanceView])
-
-    const handleEnableBasicMode = useCallback(async () => {
-      setConfigComponentValue({ ...configComponent, isBasicViewEnabled: true })
-      await sdk.operations.dispatch()
-      handleTrackSwitchToAdvanceView(false)
-      handleCloseModal()
-    }, [sdk, configComponent, setConfigComponentValue, handleCloseModal, handleTrackSwitchToAdvanceView])
-
-    const renderToggleAdvanceMode = useCallback(() => {
-      return (
-        <Button className="AdvancedModeButton" onClick={() => handleOpenModal()}>
-          {isBasicViewEnabled ? (
-            <>
-              <SettingsIcon /> Enable Advanced Mode
-            </>
-          ) : (
-            <>
-              <RevertIcon /> Revert to Basic Mode
-            </>
-          )}
-        </Button>
-      )
-    }, [isBasicViewEnabled, handleOpenModal])
-
-    const renderModalContent = useCallback(() => {
-      if (isBasicViewEnabled) {
-        return (
-          <>
-            <h2>
-              Enable <strong>Advanced Mode</strong>
-            </h2>
-            {!!modal.cb ? (
-              <p>
-                Advanced Mode enables complete customization, allowing you to{' '}
-                <strong>add or modify actions, triggers, and states</strong> of this smart item.
-              </p>
-            ) : (
-              <p>To incorporate additional components to this item, the activation of Advanced Mode is required.</p>
-            )}
-            <p>
-              Reverting to Basic Mode later <strong>will not retain any changes made in Advanced Mode</strong>.
-            </p>
-            <p>Are you sure you want to continue?</p>
-          </>
-        )
-      }
-
-      return (
-        <>
-          <h2>
-            Revert to <strong>Basic Mode</strong>
-          </h2>
-          <p>
-            You are about to <strong>reset this smart item to its original settings</strong>.
-          </p>
-          <p>
-            This action will undo all customizations made in Advanced Mode and return the item to its default basic
-            configuration.
-          </p>
-          <p>Are you sure you want to rever to Basic Mode?</p>
-        </>
-      )
-    }, [modal, isBasicViewEnabled])
-
-    const renderModalActions = useCallback(() => {
-      if (isBasicViewEnabled) {
-        return (
-          <>
-            <Button onClick={handleCloseModal}>Cancel</Button>
-            <Button className="primary" onClick={handleEnableAdvancedMode}>
-              Enable Advanced Mode
-            </Button>
-          </>
-        )
-      }
-
-      return (
-        <>
-          <Button onClick={handleCloseModal}>Cancel</Button>
-          <Button className="primary" onClick={handleEnableBasicMode}>
-            Revert to Basic Mode
-          </Button>
-        </>
-      )
-    }, [isBasicViewEnabled, handleCloseModal, handleEnableAdvancedMode, handleEnableBasicMode])
-
     return (
       <div className="EntityHeader">
         <div className="TitleWrapper">
@@ -484,7 +348,6 @@ export default React.memo(
             ) : null}
             {!isRoot(entity) ? (
               <MoreOptionsMenu>
-                {hasConfigComponent ? renderToggleAdvanceMode() : <></>}
                 <RemoveButton className="RemoveButton" onClick={handleRemoveEntity}>
                   Delete Entity
                 </RemoveButton>
@@ -501,19 +364,6 @@ export default React.memo(
             </span>
           </Container>
         )}
-        <Modal
-          isOpen={!!modal.isOpen}
-          onRequestClose={handleCloseModal}
-          className="ToggleBasicViewModal"
-          overlayClassName="EntityHeader"
-        >
-          <InfoIcon size={48} color="#3794ff" />
-          <div className="ModalBody">
-            <CloseIcon className="CloseIcon" size={16} color="#cccccc" onClick={handleCloseModal} />
-            <div className="ModalContent">{renderModalContent()}</div>
-            <div className="ModalActions">{renderModalActions()}</div>
-          </div>
-        </Modal>
       </div>
     )
   })

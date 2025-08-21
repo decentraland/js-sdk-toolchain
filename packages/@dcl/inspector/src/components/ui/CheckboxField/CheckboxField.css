@@ -1,67 +1,68 @@
 .Block .content:has(.Checkbox.Field .ErrorMessage) {
-    align-items: flex-start;
+  align-items: flex-start;
 }
 
 .Checkbox.Field {
-    flex-grow: 1;
+  flex-grow: 1;
 }
 
 .Checkbox.Field .InputContainer {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
+  min-height: 24px;
 }
 
 .Checkbox.Field .InputContainer input[type='checkbox'] {
-    -webkit-appearance: none;
-    appearance: none;
-    outline: none;
-    width: 16px;
-    height: 16px;
-    border-radius: 3px;
-    margin-right: 8px;
-    border: 1px solid var(--base-14);
-    background-color: var(--base-14);
-    cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  margin-right: 8px;
+  border: 1px solid var(--base-14);
+  background-color: var(--base-14);
+  cursor: pointer;
 }
 
 .Checkbox.Field .InputContainer input[type='checkbox']:checked {
-    position: relative;
+  position: relative;
 }
 
 .Checkbox.Field .InputContainer input[type='checkbox']:checked::before {
-    content: url('data:image/svg+xml;utf8,<svg width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.6467 0.893333L4.22667 9.66667L3.52667 9.62L0.586667 5.46667L1.28667 4.95333L3.9 8.64L10.9467 0.333333L11.6467 0.893333Z" fill="white"/></svg>');
-    font-size: 14px;
-    color: var(--base-01);
-    position: absolute;
-    left: 1.5px;
-    top: -1px;
+  content: url('data:image/svg+xml;utf8,<svg width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.6467 0.893333L4.22667 9.66667L3.52667 9.62L0.586667 5.46667L1.28667 4.95333L3.9 8.64L10.9467 0.333333L11.6467 0.893333Z" fill="white"/></svg>');
+  font-size: 14px;
+  color: var(--base-01);
+  position: absolute;
+  left: 1.5px;
+  top: -1px;
 }
 
 .Checkbox.Field .InputContainer input[type='checkbox']:focus {
-    border-color: var(--base-01);
+  border-color: var(--base-01);
 }
 
 .Checkbox.Field .InputContainer:not(.error):not(.disabled) input[type='checkbox']:hover:not(:focus) {
-    border-color: var(--base-09);
+  border-color: var(--base-09);
 }
 
 .Checkbox.Field .InputContainer.disabled input[type='checkbox'] {
-    background: var(--base-12);
-    border-color: var(--base-12);
+  background: var(--base-12);
+  border-color: var(--base-12);
 }
 
 .Checkbox.Field .InputContainer.disabled input[type='checkbox']:checked::before {
-    content: url('data:image/svg+xml;utf8,<svg width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.6467 0.893333L4.22667 9.66667L3.52667 9.62L0.586667 5.46667L1.28667 4.95333L3.9 8.64L10.9467 0.333333L11.6467 0.893333Z" fill="gray"/></svg>');
+  content: url('data:image/svg+xml;utf8,<svg width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.6467 0.893333L4.22667 9.66667L3.52667 9.62L0.586667 5.46667L1.28667 4.95333L3.9 8.64L10.9467 0.333333L11.6467 0.893333Z" fill="gray"/></svg>');
 }
 
 .Checkbox.Field .InputContainer .Label {
-    text-wrap: nowrap;
+  text-wrap: nowrap;
 }
 
 .Checkbox.Field .InputContainer.disabled .Label {
-    color: var(--base-09);
+  color: var(--base-09);
 }
 
 .Checkbox.Field .InputContainer.error input[type='checkbox'] {
-    border-color: var(--error-main);
+  border-color: var(--error-main);
 }

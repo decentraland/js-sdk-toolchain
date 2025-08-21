@@ -54,9 +54,18 @@ const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
 
   const isValid = useCallback(
     (value: Props['value']) => {
-      return isValidValue ? isValidValue(value) : true
+      if (isValidValue) {
+        return isValidValue(value)
+      }
+
+      // Default validation: value >= min && value <= max
+      const parsedValue = parseFloat(value?.toString() || '0')
+      const parsedMin = parseFloat(min?.toString() || '0')
+      const parsedMax = parseFloat(max?.toString() || '100')
+
+      return parsedValue >= parsedMin && parsedValue <= parsedMax
     },
-    [isValidValue]
+    [isValidValue, min, max]
   )
 
   const formatInput = useCallback(
@@ -71,15 +80,19 @@ const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value
 
-      if (parseFloat(value) >= parseFloat(min.toString()) && parseFloat(value) <= parseFloat(max.toString())) {
-        setInputValue(value)
-      }
+      setInputValue(value)
 
-      if (isValid(value)) {
-        onChange && onChange(e)
-      }
+      const isValidValue = isValid(value)
+
+      const formattedValue = isValidValue ? formatInput(value) : value
+
+      onChange &&
+        onChange({
+          ...e,
+          target: { ...e.target, value: formattedValue }
+        } as React.ChangeEvent<HTMLInputElement>)
     },
-    [min, max, onChange, isValid, setInputValue]
+    [isValid, formatInput, onChange, setInputValue]
   )
 
   const handleChangeTextField = useCallback(
@@ -146,6 +159,7 @@ const RangeField = React.forwardRef<HTMLInputElement, Props>((props, ref) => {
           type="number"
           value={inputValue}
           error={!!errorMessage}
+          rightLabel={rightLabel}
           disabled={disabled}
           onChange={handleChangeTextField}
           onBlur={handleOnBlur}

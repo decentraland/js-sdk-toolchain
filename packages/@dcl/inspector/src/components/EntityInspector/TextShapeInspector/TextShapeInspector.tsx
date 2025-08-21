@@ -32,7 +32,11 @@ export default withSdk<Props>(({ sdk, entity }) => {
       </Block>
       <Block label="Font Size">
         <TextField autoSelect type="number" {...getInputProps('fontSize')} />
-        <CheckboxField label="Font Auto-Size" {...getInputProps('fontAutoSize', (e) => e.target.checked)} />
+        <CheckboxField
+          label="Font Auto-Size"
+          checked={!!getInputProps('fontAutoSize').value}
+          {...getInputProps('fontAutoSize', (e) => e.target.checked)}
+        />
       </Block>
       <Block label="Text Align">
         <Dropdown options={TEXT_ALIGN_MODES} {...getInputProps('textAlign')} />
