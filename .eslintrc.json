@@ -4,8 +4,6 @@
     "project": [
       "packages/@dcl/sdk/types/tsconfig.ecs7.json",
       "packages/@dcl/ecs/tsconfig.json",
-      "packages/@dcl/inspector/tsconfig.json",
-      "packages/@dcl/inspector/test/tsconfig.json",
       "packages/@dcl/sdk-commands/tsconfig.json",
       "packages/@dcl/sdk/tsconfig.json",
       "packages/@dcl/playground-assets/tsconfig.json",
@@ -31,7 +29,6 @@
   "overrides": [
     {
       "files": [
-        "packages/@dcl/inspector/**/*.ts",
         "packages/@dcl/ecs/**/*.ts",
         "packages/@dcl/sdk/**/*.ts",
         "scripts/**/*.ts",
