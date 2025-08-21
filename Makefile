@@ -62,6 +62,10 @@ test-cli:
 	@mkdir -p tmp/scene
 	cd tmp/scene; $(PWD)/packages/@dcl/sdk-commands/dist/index.js init
 
+init-test-scene:
+	git clone https://github.com/decentraland/sdk7-scene-template test-scene
+	cd test-scene && npm i ./../packages/@dcl/sdk  && npm i ./../packages/@dcl/sdk-commands  && npm i ./../packages/@dcl/js-runtime
+
 format:
 	npx prettier --write "**/*.{js,ts,tsx,json}" --loglevel=error
 

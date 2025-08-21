@@ -301,7 +301,8 @@
          * the "logLevel" option.
          *
          * DEFAULT VALUE: false
-         */ "addToApiReportFile": false
+         */
+        "addToApiReportFile": true
       }
       // "TS2551": {
       //   "logLevel": "warning",

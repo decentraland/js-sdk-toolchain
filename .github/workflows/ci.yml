@@ -64,7 +64,7 @@ jobs:
       - name: commit
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: automatic linter and snapshot tests
+          commit_message: automatic snapshot tests
 
       - name: test-cli
         run: make test-cli
