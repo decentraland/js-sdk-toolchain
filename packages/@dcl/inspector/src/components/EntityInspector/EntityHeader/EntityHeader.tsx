@@ -479,7 +479,7 @@ export default React.memo(
             ) : null}
           </div>
           <div className="RightContent">
-            {componentOptions.some((option) => !option.header) ? (
+            {componentOptions.some((option) => !option.header) && !isRoot(entity) ? (
               <Dropdown className="AddComponent" options={componentOptions} trigger={<AddIcon />} />
             ) : null}
             {!isRoot(entity) ? (
