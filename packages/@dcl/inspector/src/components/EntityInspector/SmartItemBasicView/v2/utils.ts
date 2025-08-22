@@ -22,9 +22,7 @@ export function applyTransform(value: unknown, transform: SectionItem['transform
           result = Boolean(result)
           break
         case 'toFixed':
-          if (typeof result === 'number') {
-            result = result.toFixed(2)
-          }
+          result = Number(result).toFixed(2)
           break
         case 'parseInt':
           result = parseInt(String(result))
@@ -46,6 +44,12 @@ export function applyTransform(value: unknown, transform: SectionItem['transform
           break
         case 'millisecondsToSeconds':
           result = Number(result) / 1000
+          break
+        case 'toPercentage':
+          result = Number(result) * 100
+          break
+        case 'fromPercentage':
+          result = Number(result) / 100
           break
         default:
           // Unknown operation, keep the value as is

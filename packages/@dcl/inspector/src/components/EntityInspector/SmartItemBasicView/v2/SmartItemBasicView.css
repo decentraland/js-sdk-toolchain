@@ -23,7 +23,11 @@
   color: var(--white);
 }
 
-.SmartItemBasicViewInspector.Container > .content:has(.SmartItemBasicViewSection.Container) {
+.SmartItemBasicViewInspector.Container
+  > .content
+  > .SmartItemBasicViewSection.Container
+  > .content:has(.Field + .Field) {
+  display: grid;
   row-gap: 8px;
 }
 

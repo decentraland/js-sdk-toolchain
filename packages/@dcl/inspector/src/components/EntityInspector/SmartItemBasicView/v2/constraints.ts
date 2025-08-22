@@ -33,7 +33,6 @@ export function validateConstraints(value: any, constraints: SectionItem['constr
     if (constraints.max !== undefined && value > constraints.max) return false
     if (constraints.minExclusive !== undefined && value <= constraints.minExclusive) return false
     if (constraints.maxExclusive !== undefined && value >= constraints.maxExclusive) return false
-    if (constraints.multipleOf !== undefined && value % constraints.multipleOf !== 0) return false
   }
 
   if (typeof value === 'string') {
