@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { ActionPayload, ActionType } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 import { CheckboxField, FileUploadField } from '../../../ui'
@@ -23,29 +23,27 @@ const PlayCustomEmoteAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
 
   const files = useAppSelector(selectAssetCatalog)
 
-  useEffect(() => {
-    if (!recursiveCheck(payload, value, 2) || !isValid(payload)) return
-    onUpdate(payload)
-  }, [payload, onUpdate])
+  const handleUpdate = useCallback(
+    (_payload: Partial<ActionPayload<ActionType.PLAY_CUSTOM_EMOTE>>) => {
+      setPayload(_payload)
+      if (!recursiveCheck(_payload, value, 2) || !isValid(_payload)) return
+      onUpdate(_payload)
+    },
+    [setPayload, value, onUpdate]
+  )
 
   const handleChangeSrc = useCallback(
     (path: string) => {
-      setPayload({
-        ...payload,
-        src: path
-      })
+      handleUpdate({ ...payload, src: path })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangeLoop = useCallback(
     ({ target: { checked } }: React.ChangeEvent<HTMLInputElement>) => {
-      setPayload({
-        ...payload,
-        loop: checked
-      })
+      handleUpdate({ ...payload, loop: checked })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const error = useMemo(() => {

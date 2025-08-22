@@ -17,19 +17,20 @@ const OpenLinkAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
     ...value
   })
 
-  useEffect(() => {
-    if (!recursiveCheck(payload, value, 2) || !isValid(payload)) return
-    onUpdate(payload)
-  }, [payload, onUpdate])
+  const handleUpdate = useCallback(
+    (_payload: Partial<ActionPayload<ActionType.OPEN_LINK>>) => {
+      setPayload(_payload)
+      if (!recursiveCheck(_payload, value, 2) || !isValid(_payload)) return
+      onUpdate(_payload)
+    },
+    [setPayload, value, onUpdate]
+  )
 
   const handleChangeEmote = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
-      setPayload({
-        ...payload,
-        url: value
-      })
+      handleUpdate({ ...payload, url: value })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   return (

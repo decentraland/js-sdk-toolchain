@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { ActionPayload, ActionType, ProximityLayer } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 import { Dropdown, TextField } from '../../../ui'
@@ -15,30 +15,34 @@ const TriggerProximityAction: React.FC<Props> = ({ value, onUpdate }: Props) => 
     ...value
   })
 
-  useEffect(() => {
-    if (!recursiveCheck(payload, value, 3) || !isValid(payload)) return
-    onUpdate(payload)
-  }, [payload, onUpdate])
+  const handleUpdate = useCallback(
+    (_payload: Partial<ActionPayload<ActionType.DAMAGE>>) => {
+      setPayload(_payload)
+      if (!recursiveCheck(_payload, value, 3) || !isValid(_payload)) return
+      onUpdate(_payload)
+    },
+    [setPayload, value, onUpdate]
+  )
 
   const handleChangeRadius = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
-      setPayload({ ...payload, radius: parseFloat(value) })
+      handleUpdate({ ...payload, radius: parseFloat(value) })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangeHits = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
-      setPayload({ ...payload, hits: parseInt(value) })
+      handleUpdate({ ...payload, hits: parseInt(value) })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangeLayer = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
-      setPayload({ ...payload, layer: value as ProximityLayer })
+      handleUpdate({ ...payload, layer: value as ProximityLayer })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   return (

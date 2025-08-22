@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { ActionPayload, ActionType, Colliders } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 import { Block } from '../../../Block'
@@ -19,28 +19,32 @@ const SetVisibilityAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
     ...value
   })
 
-  useEffect(() => {
-    if (!recursiveCheck(payload, value, 2) || !isValid(payload)) return
-    onUpdate(payload)
-  }, [payload, onUpdate])
+  const handleUpdate = useCallback(
+    (_payload: Partial<ActionPayload<ActionType.SET_VISIBILITY>>) => {
+      setPayload(_payload)
+      if (!recursiveCheck(_payload, value, 2) || !isValid(_payload)) return
+      onUpdate(_payload)
+    },
+    [setPayload, value, onUpdate]
+  )
 
   const handleSetVisible = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
       const visible = value === 'true'
-      setPayload({
+      handleUpdate({
         ...payload,
         visible,
         collider: visible ? payload.collider : Colliders.CL_NONE
       })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangeCollider = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
-      setPayload({ ...payload, collider: parseInt(value, 10) })
+      handleUpdate({ ...payload, collider: parseInt(value, 10) })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const renderPhysicsCollidersMoreInfo = useCallback(() => {

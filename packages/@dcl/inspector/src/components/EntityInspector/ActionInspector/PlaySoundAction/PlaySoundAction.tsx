@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { ActionPayload, ActionType } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 
@@ -21,23 +21,27 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
 
   const files = useAppSelector(selectAssetCatalog)
 
-  useEffect(() => {
-    if (!recursiveCheck(payload, value, 2) || !isValid(payload)) return
-    onUpdate(payload)
-  }, [payload, onUpdate])
+  const handleUpdate = useCallback(
+    (_payload: Partial<ActionPayload<ActionType.PLAY_SOUND>>) => {
+      setPayload(_payload)
+      if (!recursiveCheck(_payload, value, 2) || !isValid(_payload)) return
+      onUpdate(_payload)
+    },
+    [setPayload, value, onUpdate]
+  )
 
   const handleDrop = useCallback(
     (src: string) => {
-      setPayload({ ...payload, src })
+      handleUpdate({ ...payload, src })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangePlayMode = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
-      setPayload({ ...payload, loop: value === PLAY_MODE.LOOP })
+      handleUpdate({ ...payload, loop: value === PLAY_MODE.LOOP })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangeVolume = useCallback(
@@ -45,17 +49,17 @@ const PlaySoundAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
       const { value } = e.target as HTMLInputElement
 
       if (isValidVolume(value)) {
-        setPayload({ ...payload, volume: volumeToAudioSource(value) })
+        handleUpdate({ ...payload, volume: volumeToAudioSource(value) })
       }
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangeGlobal = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      setPayload({ ...payload, global: e.target.checked })
+      handleUpdate({ ...payload, global: e.target.checked })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const error = useMemo(() => {

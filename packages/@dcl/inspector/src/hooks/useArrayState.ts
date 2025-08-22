@@ -11,18 +11,28 @@ export function useArrayState<T>(initialArray: T[] = []) {
 
   // Function to add an item to the array
   const addItem = useCallback(
-    (item: T) => {
-      setArray((prevArray) => [...prevArray, item])
+    (item: T, callback?: (updatedArray: T[]) => void) => {
+      setArray((prevArray) => {
+        const newArray = [...prevArray, item]
+        if (callback) {
+          setTimeout(() => callback(newArray), 0)
+        }
+        return newArray
+      })
     },
     [setArray]
   )
 
   // Function to modify an item in the array by index
   const modifyItem = useCallback(
-    (index: number, newItem: T) => {
+    (index: number, newItem: T, callback?: (updatedArray: T[]) => void) => {
       setArray((prevArray) => {
         const newArray = [...prevArray]
         newArray[index] = newItem
+        if (callback) {
+          // Use setTimeout to ensure the callback runs after the state update
+          setTimeout(() => callback(newArray), 0)
+        }
         return newArray
       })
     },
@@ -31,10 +41,13 @@ export function useArrayState<T>(initialArray: T[] = []) {
 
   // Function to remove an item from the array by index
   const removeItem = useCallback(
-    (index: number) => {
+    (index: number, callback?: (updatedArray: T[]) => void) => {
       setArray((prevArray) => {
         const newArray = [...prevArray]
         newArray.splice(index, 1)
+        if (callback) {
+          setTimeout(() => callback(newArray), 0)
+        }
         return newArray
       })
     },

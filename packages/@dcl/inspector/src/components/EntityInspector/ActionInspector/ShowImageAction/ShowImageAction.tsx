@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { ActionPayload, ActionType } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 import { useAppSelector } from '../../../../redux/hooks'
@@ -25,60 +25,64 @@ const ShowImageAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
 
   const files = useAppSelector(selectAssetCatalog)
 
-  useEffect(() => {
-    if (!recursiveCheck(payload, value, 2) || !isValid(payload)) return
-    onUpdate(payload)
-  }, [payload, onUpdate])
+  const handleUpdate = useCallback(
+    (_payload: Partial<ActionPayload<ActionType.SHOW_IMAGE>>) => {
+      setPayload(_payload)
+      if (!recursiveCheck(_payload, value, 2) || !isValid(_payload)) return
+      onUpdate(_payload)
+    },
+    [setPayload, value, onUpdate]
+  )
 
   const handleDrop = useCallback(
     (src: string) => {
-      setPayload({ ...payload, src })
+      handleUpdate({ ...payload, src })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangeText = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLTextAreaElement>) => {
-      setPayload({ ...payload, text: value })
+      handleUpdate({ ...payload, text: value })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangeHeight = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
-      setPayload({ ...payload, height: parseFloat(value) })
+      handleUpdate({ ...payload, height: parseFloat(value) })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangeWidth = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
-      setPayload({ ...payload, width: parseFloat(value) })
+      handleUpdate({ ...payload, width: parseFloat(value) })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangeHideAfterSeconds = useCallback(
     (e: React.ChangeEvent<HTMLElement>) => {
       const { value } = e.target as HTMLInputElement
 
-      setPayload({ ...payload, hideAfterSeconds: parseFloat(value) })
+      handleUpdate({ ...payload, hideAfterSeconds: parseFloat(value) })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangeFontSize = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
-      setPayload({ ...payload, fontSize: parseFloat(value) })
+      handleUpdate({ ...payload, fontSize: parseFloat(value) })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangeAlign = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
-      setPayload({ ...payload, align: parseInt(value) })
+      handleUpdate({ ...payload, align: parseInt(value) })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const error = useMemo(() => {

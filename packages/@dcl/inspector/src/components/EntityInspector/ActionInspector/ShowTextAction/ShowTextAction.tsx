@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { ActionPayload, ActionType } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 import { Block } from '../../../Block'
@@ -19,46 +19,50 @@ const ShowTextAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
     ...value
   })
 
-  useEffect(() => {
-    if (!recursiveCheck(payload, value, 2) || !isValid(payload)) return
-    onUpdate(payload)
-  }, [payload, onUpdate])
+  const handleUpdate = useCallback(
+    (_payload: Partial<ActionPayload<ActionType.SHOW_TEXT>>) => {
+      setPayload(_payload)
+      if (!recursiveCheck(_payload, value, 2) || !isValid(_payload)) return
+      onUpdate(_payload)
+    },
+    [setPayload, value, onUpdate]
+  )
 
   const handleChangeText = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
-      setPayload({ ...payload, text: value })
+      handleUpdate({ ...payload, text: value })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangeHideAfterSeconds = useCallback(
     (e: React.ChangeEvent<HTMLElement>) => {
       const { value } = e.target as HTMLInputElement
 
-      setPayload({ ...payload, hideAfterSeconds: parseFloat(value) })
+      handleUpdate({ ...payload, hideAfterSeconds: parseFloat(value) })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangeFont = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
-      setPayload({ ...payload, font: parseInt(value) })
+      handleUpdate({ ...payload, font: parseInt(value) })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangeFontSize = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
-      setPayload({ ...payload, fontSize: parseFloat(value) })
+      handleUpdate({ ...payload, fontSize: parseFloat(value) })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangeTextAlign = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
-      setPayload({ ...payload, textAlign: parseInt(value) })
+      handleUpdate({ ...payload, textAlign: parseInt(value) })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   return (

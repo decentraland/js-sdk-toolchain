@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { ActionPayload, ActionType } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 import { Dropdown } from '../../../ui/Dropdown'
@@ -12,23 +12,27 @@ const PlayAnimationAction: React.FC<Props> = ({ value, animations, onUpdate }: P
     ...value
   })
 
-  useEffect(() => {
-    if (!recursiveCheck(payload, value, 2) || !isValid(payload)) return
-    onUpdate(payload)
-  }, [payload, onUpdate])
+  const handleUpdate = useCallback(
+    (_payload: Partial<ActionPayload<ActionType.PLAY_ANIMATION>>) => {
+      setPayload(_payload)
+      if (!recursiveCheck(_payload, value, 2) || !isValid(_payload)) return
+      onUpdate(_payload)
+    },
+    [setPayload, value, onUpdate]
+  )
 
   const handleChangeAnimation = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
-      setPayload({ ...payload, animation: value })
+      handleUpdate({ ...payload, animation: value })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangePlayMode = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>) => {
-      setPayload({ ...payload, loop: value === PLAY_MODE.LOOP })
+      handleUpdate({ ...payload, loop: value === PLAY_MODE.LOOP })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   return (

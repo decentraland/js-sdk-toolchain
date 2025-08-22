@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { ActionPayload, ActionType } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 import { Block } from '../../../Block'
@@ -17,10 +17,14 @@ const RandomAction: React.FC<Props> = ({ availableActions, value, onUpdate }: Pr
     ...value
   })
 
-  useEffect(() => {
-    if (!recursiveCheck(payload, value, 2) || !isValid(payload)) return
-    onUpdate(payload)
-  }, [payload, onUpdate])
+  const handleUpdate = useCallback(
+    (_payload: Partial<ActionPayload<ActionType.RANDOM>>) => {
+      setPayload(_payload)
+      if (!recursiveCheck(_payload, value, 2) || !isValid(_payload)) return
+      onUpdate(_payload)
+    },
+    [setPayload, value, onUpdate]
+  )
 
   const actions = useMemo(() => {
     return availableActions.map((action) => ({ value: action.name, label: action.name }))
@@ -28,9 +32,9 @@ const RandomAction: React.FC<Props> = ({ availableActions, value, onUpdate }: Pr
 
   const handleChangeAction = useCallback(
     ({ target: { value } }: DropdownChangeEvent) => {
-      setPayload({ ...payload, actions: value as any[] })
+      handleUpdate({ ...payload, actions: value as any[] })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   return (

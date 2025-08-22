@@ -128,7 +128,7 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
   const hasStates = useHasComponent(entityId, States)
   const hasCounter = useHasComponent(entityId, Counter)
   const hasRewards = useHasComponent(entityId, Rewards)
-  const [gltfValue] = useComponentValue(entityId, sdk.components.GltfContainer)
+  const [gltfValue] = useComponentValue(entityId, GltfContainer)
 
   useChange(
     (event, sdk) => {
@@ -262,16 +262,28 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
 
   const areValidActions = useCallback((updatedActions: Action[]) => updatedActions.every(isValidAction), [])
 
-  useEffect(() => {
-    if (hasActions && areValidActions(actions)) {
-      const current = sdk.components.Actions.get(entityId)
-      if (isComponentEqual({ ...current, value: actions }) || isFocused) {
-        return
-      }
+  const handleUpdateActions = useCallback(
+    (updatedActions: Action[]) => {
+      if (hasActions && areValidActions(updatedActions)) {
+        const current = sdk.components.Actions.get(entityId)
+        if (isComponentEqual({ ...current, value: updatedActions }) || isFocused) {
+          return
+        }
 
-      setComponentValue({ ...current, value: [...actions] })
-    }
-  }, [actions, isFocused, sdk])
+        setComponentValue({ ...current, value: [...updatedActions] })
+      }
+    },
+    [isFocused, isComponentEqual, hasActions, entityId, sdk]
+  )
+
+  const handleModifyAction = useCallback(
+    (idx: number, action: Action) => {
+      modifyAction(idx, action, (updatedActions) => {
+        handleUpdateActions(updatedActions)
+      })
+    },
+    [modifyAction, handleUpdateActions]
+  )
 
   const hasAnimations = useMemo(() => {
     return animations.length > 0
@@ -324,275 +336,275 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
 
   const handleChangeAnimation = useCallback(
     (value: ActionPayload<ActionType.PLAY_ANIMATION>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.PLAY_ANIMATION>(value)
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleChangeState = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.SET_STATE>({
           state: value
         })
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleChangeTween = useCallback(
     (tween: ActionPayload<ActionType.START_TWEEN>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.START_TWEEN>(tween)
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleChangeSound = useCallback(
     (value: ActionPayload<ActionType.PLAY_SOUND>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.PLAY_SOUND>(value)
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleChangeCounter = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.SET_COUNTER>({
           counter: parseInt(value)
         })
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleChangeAmount = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.INCREMENT_COUNTER | ActionType.DECREASE_COUNTER>({
           amount: parseInt(value)
         })
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleChangeAnchorPoint = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.ATTACH_TO_PLAYER>({
           anchorPointId: parseInt(value)
         })
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleChangeTeleportPlayer = useCallback(
     (value: ActionPayload<ActionType.TELEPORT_PLAYER>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.TELEPORT_PLAYER>(value)
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleChangeMovePlayer = useCallback(
     (value: ActionPayload<ActionType.MOVE_PLAYER>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.MOVE_PLAYER>(value)
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleChangePlayDefaultEmote = useCallback(
     (value: ActionPayload<ActionType.PLAY_DEFAULT_EMOTE>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.PLAY_DEFAULT_EMOTE>(value)
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleChangePlayCustomEmote = useCallback(
     (value: ActionPayload<ActionType.PLAY_CUSTOM_EMOTE>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.PLAY_CUSTOM_EMOTE>(value)
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleChangeOpenLink = useCallback(
     (value: ActionPayload<ActionType.OPEN_LINK>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.OPEN_LINK>(value)
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleChangeText = useCallback(
     (value: ActionPayload<ActionType.SHOW_TEXT>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.SHOW_TEXT>(value)
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleChangeDelayAction = useCallback(
     (value: ActionPayload<ActionType.START_DELAY | ActionType.STOP_DELAY>, idx: number) => {
       const payload =
         'actions' in value ? getJson<ActionType.START_DELAY>(value) : getJson<ActionType.STOP_DELAY>(value)
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: payload
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleChangeLoopAction = useCallback(
     (value: ActionPayload<ActionType.START_LOOP | ActionType.STOP_LOOP>, idx: number) => {
       const payload = 'actions' in value ? getJson<ActionType.START_LOOP>(value) : getJson<ActionType.STOP_LOOP>(value)
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: payload
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleChangeCloneEntity = useCallback(
     (value: ActionPayload<ActionType.CLONE_ENTITY>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.CLONE_ENTITY>(value)
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleChangeType = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         type: value,
         jsonPayload: getDefaultPayload(value)
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleChangeName = useCallback(
     (e: React.ChangeEvent<HTMLElement>, idx: number) => {
       const { value } = e.target as HTMLInputElement
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         name: value
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleChangeVisibility = useCallback(
     (value: ActionPayload<ActionType.SET_VISIBILITY>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.SET_VISIBILITY>(value)
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleChangeImage = useCallback(
     (value: ActionPayload<ActionType.SHOW_IMAGE>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.SHOW_IMAGE>(value)
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleChangeFollowPlayer = useCallback(
     (value: ActionPayload<ActionType.FOLLOW_PLAYER>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.FOLLOW_PLAYER>(value)
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleChangeTriggerProximity = useCallback(
     (value: ActionPayload<ActionType.DAMAGE>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.DAMAGE>(value)
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleSetPosition = useCallback(
     (value: ActionPayload<ActionType.SET_POSITION>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.SET_POSITION>(value)
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleSetRotation = useCallback(
     (value: ActionPayload<ActionType.SET_ROTATION>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.SET_ROTATION>(value)
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleSetScale = useCallback(
     (value: ActionPayload<ActionType.SET_SCALE>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.SET_SCALE>(value)
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleChangeActions = useCallback(
     (value: ActionPayload<ActionType.RANDOM | ActionType.BATCH>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.RANDOM | ActionType.BATCH>(value)
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleFocusInput = useCallback(
@@ -608,27 +620,27 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
 
   const handleChangeVideo = useCallback(
     (value: ActionPayload<ActionType.PLAY_VIDEO_STREAM>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.PLAY_VIDEO_STREAM>(value)
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const handleChangeAudio = useCallback(
     (value: ActionPayload<ActionType.PLAY_AUDIO_STREAM>, idx: number) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<ActionType.PLAY_AUDIO_STREAM>(value)
       })
     },
-    [modifyAction, actions]
+    [actions, handleModifyAction]
   )
 
   const createHandler = <T extends ActionType>(getPayload: (value: string) => ActionPayload<T>, idx: number) => {
     const handler = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
-      modifyAction(idx, {
+      handleModifyAction(idx, {
         ...actions[idx],
         jsonPayload: getJson<T>(getPayload(value))
       })
@@ -638,9 +650,11 @@ export default withSdk<Props>(({ sdk, entity: entityId }) => {
 
   const handleRemoveAction = useCallback(
     (_e: React.MouseEvent, idx: number) => {
-      removeAction(idx)
+      removeAction(idx, (updatedActions) => {
+        handleUpdateActions(updatedActions)
+      })
     },
-    [removeAction]
+    [removeAction, handleUpdateActions]
   )
 
   if (!hasActions) {

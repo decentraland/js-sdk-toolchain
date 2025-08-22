@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { ActionPayload, ActionType } from '@dcl/asset-packs'
 import { Vector3 } from '@dcl/ecs-math'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
@@ -36,51 +36,37 @@ const MovePlayerAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
     ...value
   })
 
-  useEffect(() => {
-    if (!recursiveCheck(payload, value, 2) || !isValid(payload)) return
-    onUpdate(payload)
-  }, [payload, onUpdate])
+  const handleUpdate = useCallback(
+    (_payload: Partial<ActionPayload<ActionType.MOVE_PLAYER>>) => {
+      setPayload(_payload)
+      if (!recursiveCheck(_payload, value, 2) || !isValid(_payload)) return
+      onUpdate(_payload)
+    },
+    [setPayload, value, onUpdate]
+  )
 
   const handleChangePositionX = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
       if (!value) return
-      setPayload({
-        ...payload,
-        position: {
-          ...(payload.position as Vector3),
-          x: parseFloat(value)
-        }
-      })
+      handleUpdate({ ...payload, position: { ...(payload.position as Vector3), x: parseFloat(value) } })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangePositionY = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
       if (!value) return
-      setPayload({
-        ...payload,
-        position: {
-          ...(payload.position as Vector3),
-          y: parseFloat(value)
-        }
-      })
+      handleUpdate({ ...payload, position: { ...(payload.position as Vector3), y: parseFloat(value) } })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangePositionZ = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
       if (!value) return
-      setPayload({
-        ...payload,
-        position: {
-          ...(payload.position as Vector3),
-          z: parseFloat(value)
-        }
-      })
+      handleUpdate({ ...payload, position: { ...(payload.position as Vector3), z: parseFloat(value) } })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   return (

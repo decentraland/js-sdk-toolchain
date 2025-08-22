@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { ActionPayload, ActionType } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 import { CheckboxField, TextField } from '../../../ui'
@@ -25,43 +25,47 @@ const SetScaleAction: React.FC<Props> = ({ value, onUpdate }: Props) => {
     ...value
   })
 
-  useEffect(() => {
-    if (!recursiveCheck(payload, value, 3) || !isValid(payload)) return
-    onUpdate(payload)
-  }, [payload, onUpdate])
+  const handleUpdate = useCallback(
+    (_payload: Partial<ActionPayload<ActionType.SET_POSITION>>) => {
+      setPayload(_payload)
+      if (!recursiveCheck(_payload, value, 3) || !isValid(_payload)) return
+      onUpdate(_payload)
+    },
+    [setPayload, value, onUpdate]
+  )
 
   const handleChangeX = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
       const parsed = parseFloat(value)
       const actual = isNaN(parsed) ? ('' as any) : parsed
-      setPayload({ ...payload, x: actual })
+      handleUpdate({ ...payload, x: actual })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangeY = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
       const parsed = parseFloat(value)
       const actual = isNaN(parsed) ? ('' as any) : parsed
-      setPayload({ ...payload, y: actual })
+      handleUpdate({ ...payload, y: actual })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangeZ = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
       const parsed = parseFloat(value)
       const actual = isNaN(parsed) ? ('' as any) : parsed
-      setPayload({ ...payload, z: actual })
+      handleUpdate({ ...payload, z: actual })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangeRelative = useCallback(
     ({ target: { checked } }: React.ChangeEvent<HTMLInputElement>) => {
-      setPayload({ ...payload, relative: checked })
+      handleUpdate({ ...payload, relative: checked })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   return (

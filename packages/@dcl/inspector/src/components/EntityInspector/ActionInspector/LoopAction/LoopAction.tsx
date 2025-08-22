@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { ActionPayload, ActionType } from '@dcl/asset-packs'
 import { recursiveCheck } from 'jest-matcher-deep-close-to/lib/recursiveCheck'
 import { Block } from '../../../Block'
@@ -39,16 +39,14 @@ const LoopAction = <T extends ActionPayload<ActionType.START_LOOP | ActionType.S
     ...value
   })
 
-  useEffect(() => {
-    if (isStartLoopAction(payload) !== isStartLoopAction(value)) {
-      setPayload({ ...value })
-    }
-  }, [value, payload])
-
-  useEffect(() => {
-    if (!recursiveCheck(payload, value, 2) || !isValid(payload)) return
-    onUpdate(payload)
-  }, [payload, onUpdate])
+  const handleUpdate = useCallback(
+    (_payload: T) => {
+      setPayload(_payload)
+      if (!recursiveCheck(_payload, value, 2) || !isValid(_payload)) return
+      onUpdate(_payload)
+    },
+    [setPayload, value, onUpdate]
+  )
 
   const actions = useMemo(() => {
     return availableActions.map((action) => ({ value: action.name, label: action.name }))
@@ -57,21 +55,21 @@ const LoopAction = <T extends ActionPayload<ActionType.START_LOOP | ActionType.S
   const handleChangeAction = useCallback(
     ({ target: { value } }: DropdownChangeEvent) => {
       if (isStartLoopAction(payload)) {
-        setPayload({ ...payload, actions: value as any[] })
+        handleUpdate({ ...payload, actions: value as any[] })
       } else {
-        setPayload({ ...payload, action: value as any })
+        handleUpdate({ ...payload, action: value as any })
       }
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   const handleChangeInterval = useCallback(
     (e: React.ChangeEvent<HTMLElement>) => {
       const { value } = e.target as HTMLInputElement
 
-      setPayload({ ...payload, interval: parseFloat(value) })
+      handleUpdate({ ...payload, interval: parseFloat(value) })
     },
-    [payload, setPayload]
+    [payload, handleUpdate]
   )
 
   return (
