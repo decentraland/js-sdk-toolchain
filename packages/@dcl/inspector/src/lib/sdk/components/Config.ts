@@ -56,7 +56,8 @@ export const ConfigComponentSchema = {
                 minLength: Schemas.Optional(Schemas.Number),
                 maxLength: Schemas.Optional(Schemas.Number),
                 pattern: Schemas.Optional(Schemas.String),
-                format: Schemas.Optional(Schemas.String)
+                format: Schemas.Optional(Schemas.String),
+                default: Schemas.Optional(Schemas.String)
               })
             ),
             transform: Schemas.Optional(
