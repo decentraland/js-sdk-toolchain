@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { Entity } from '@dcl/ecs'
 import { Action, Trigger, TriggerAction, TriggerCondition } from '@dcl/asset-packs'
 import { withSdk } from '../../../../../hoc/withSdk'
@@ -55,11 +55,14 @@ const TriggerSection = withSdk<TriggerSectionProps>(({ sdk, entity, label, basic
     []
   )
 
-  useEffect(() => {
-    if (areValidTriggers(triggers) && !isTriggerComponentEqual({ value: triggers })) {
-      setTriggerComponentValue({ value: [...triggers] })
-    }
-  }, [triggers])
+  const handleUpdateTrigger = useCallback(
+    (updatedTriggers: Trigger[]) => {
+      if (areValidTriggers(updatedTriggers) && !isTriggerComponentEqual({ value: updatedTriggers })) {
+        setTriggerComponentValue({ value: [...updatedTriggers] })
+      }
+    },
+    [areValidTriggers, isTriggerComponentEqual, setTriggerComponentValue]
+  )
 
   const availableActions: Map<number, { name: string; actions: Action[] }> = useMemo(() => {
     if (!entitiesWithAction) return new Map()
@@ -103,33 +106,41 @@ const TriggerSection = withSdk<TriggerSectionProps>(({ sdk, entity, label, basic
       const triggerIdx = triggers.findIndex((_trigger) => _trigger.basicViewId === trigger.basicViewId)
       if (triggerIdx !== -1) {
         const actionValue = getActionValue(parseInt(value) as Entity)
-        modifyTrigger(triggerIdx, {
-          ...trigger,
-          actions: trigger.actions.map((action, _idx) => {
-            if (idx === _idx) {
-              return { ...action, id: actionValue?.id }
-            }
-            return action
-          })
-        })
+        modifyTrigger(
+          triggerIdx,
+          {
+            ...trigger,
+            actions: trigger.actions.map((action, _idx) => {
+              if (idx === _idx) {
+                return { ...action, id: actionValue?.id }
+              }
+              return action
+            })
+          },
+          (updatedTriggers) => handleUpdateTrigger(updatedTriggers)
+        )
       }
     },
-    [triggers, modifyTrigger, getActionValue]
+    [triggers, modifyTrigger, getActionValue, handleUpdateTrigger]
   )
 
   const handleChangeAction = useCallback(
     ({ target: { value } }: React.ChangeEvent<HTMLSelectElement>, idx: number, trigger: Trigger) => {
       const triggerIdx = triggers.findIndex((_trigger) => _trigger.basicViewId === trigger.basicViewId)
       if (triggerIdx !== -1) {
-        modifyTrigger(triggerIdx, {
-          ...trigger,
-          actions: trigger.actions.map((action, _idx) => {
-            if (idx === _idx) {
-              return { ...action, name: value }
-            }
-            return action
-          })
-        })
+        modifyTrigger(
+          triggerIdx,
+          {
+            ...trigger,
+            actions: trigger.actions.map((action, _idx) => {
+              if (idx === _idx) {
+                return { ...action, name: value }
+              }
+              return action
+            })
+          },
+          (updatedTriggers) => handleUpdateTrigger(updatedTriggers)
+        )
       }
     },
     [triggers, modifyTrigger]
@@ -139,18 +150,18 @@ const TriggerSection = withSdk<TriggerSectionProps>(({ sdk, entity, label, basic
     (_: React.MouseEvent, idx: number, trigger: Trigger) => {
       const triggerIdx = triggers.findIndex((_trigger) => _trigger.basicViewId === trigger.basicViewId)
       if (triggerIdx !== -1) {
-        modifyTrigger(triggerIdx, {
-          ...trigger,
-          actions: trigger.actions.filter((_action, _idx) => idx !== _idx)
-        })
+        modifyTrigger(
+          triggerIdx,
+          {
+            ...trigger,
+            actions: trigger.actions.filter((_action, _idx) => idx !== _idx)
+          },
+          (updatedTriggers) => handleUpdateTrigger(updatedTriggers)
+        )
       }
     },
     [triggers, modifyTrigger]
   )
-
-  if (!trigger) {
-    return null
-  }
 
   const getActionOptions = useCallback(
     (actionId: number | undefined) => {
@@ -169,11 +180,12 @@ const TriggerSection = withSdk<TriggerSectionProps>(({ sdk, entity, label, basic
 
   const renderAction = useCallback(
     (action: TriggerAction, idx: number) => {
+      if (!trigger) return null
+
       const actionId = action.id
       const actionEntity = getActionEntity(action)
 
       const actions = getActionOptions(actionId)
-      const isActionValid = action.id && trigger.actions.find((_action) => _action.id === action.id)
 
       return (
         <div className="TriggerAction" key={`trigger-action-${idx}`}>
@@ -185,7 +197,6 @@ const TriggerSection = withSdk<TriggerSectionProps>(({ sdk, entity, label, basic
             />
             <Dropdown
               placeholder="Action"
-              disabled={!isActionValid}
               options={actions}
               value={action.name}
               searchable
@@ -212,6 +223,10 @@ const TriggerSection = withSdk<TriggerSectionProps>(({ sdk, entity, label, basic
       sdk.components.Actions
     ]
   )
+
+  if (!trigger) {
+    return null
+  }
 
   return (
     <Container label={label || 'Trigger Actions'} border>
