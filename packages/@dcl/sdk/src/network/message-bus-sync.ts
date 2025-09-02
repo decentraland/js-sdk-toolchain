@@ -17,7 +17,7 @@ import { TypedEventBus, setGlobalEventBus, getEventRegistry } from './events/imp
 export type IProfile = { networkId: number; userId: string }
 // user that we asked for the inital crdt state
 export const AUTH_SERVER_PEER_ID = 'authorative-server'
-export const DEBUG_NETWORK_MESSAGES = () => false // (globalThis as any).DEBUG_NETWORK_MESSAGES ?? false
+export const DEBUG_NETWORK_MESSAGES = () => (globalThis as any).DEBUG_NETWORK_MESSAGES ?? false
 
 // Test environment detection without 'as any'
 const isTestEnvironment = (): boolean => {
@@ -43,7 +43,6 @@ export function addSyncTransport(
 
   const isServerAtom = Atom<boolean>()
   void isServerFn({}).then(($: IsServerResponse) => {
-    console.log('[BINARY MESSAGE BUS] IsServer!', !!$.isServer)
     return isServerAtom.swap(!!$.isServer)
   })
 
@@ -120,6 +119,7 @@ export function addSyncTransport(
   binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, async (data, sender) => {
     DEBUG_NETWORK_MESSAGES() && console.log('[REQ_CRDT_STATE]', sender, Date.now())
     for (const chunk of engineToCrdt(engine)) {
+      DEBUG_NETWORK_MESSAGES() && console.log('[Emiting:]', sender, Date.now())
       binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, chunk, [sender])
     }
   })
