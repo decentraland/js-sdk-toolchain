@@ -427,6 +427,8 @@ export const enum ColliderLayer {
     CL_CUSTOM8 = 32768,
     CL_NONE = 0,
     CL_PHYSICS = 2,
+    // (undocumented)
+    CL_PLAYER = 65536,
     CL_POINTER = 1,
     // (undocumented)
     CL_RESERVED1 = 4,
@@ -656,6 +658,8 @@ export const componentDefinitionByName: {
     "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
     "core::SkyboxTime": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSkyboxTime>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
+    "core::TriggerArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTriggerArea>>;
+    "core::TriggerAreaResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTriggerAreaResult>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
     "core::TweenSequence": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenSequence>>;
     "core::TweenState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenState>>;
@@ -1859,6 +1863,14 @@ export interface MeshRendererComponentDefinitionExtended extends LastWriteWinEle
     setSphere(entity: Entity): void;
 }
 
+// @public (undocumented)
+export const enum MeshType {
+    // (undocumented)
+    MT_BOX = 0,
+    // (undocumented)
+    MT_SPHERE = 1
+}
+
 // @alpha @deprecated (undocumented)
 export class MessageBus {
     constructor();
@@ -3034,6 +3046,54 @@ export namespace PBTextShape {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTextShape;
     // (undocumented)
     export function encode(message: PBTextShape, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBTriggerArea {
+    collisionMask?: number | undefined;
+    mesh?: MeshType | undefined;
+}
+
+// @public (undocumented)
+export namespace PBTriggerArea {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTriggerArea;
+    // (undocumented)
+    export function encode(message: PBTriggerArea, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBTriggerAreaResult {
+    eventType: TriggerAreaEventType;
+    timestamp: number;
+    triggeredEntity: number;
+    triggeredEntityPosition: PBVector3 | undefined;
+    triggeredEntityRotation: PBQuaternion | undefined;
+}
+
+// @public (undocumented)
+export namespace PBTriggerAreaResult {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTriggerAreaResult;
+    // (undocumented)
+    export function encode(message: PBTriggerAreaResult, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBTriggerAreaResult_Trigger {
+    entity: number;
+    layer: number;
+    position: PBVector3 | undefined;
+    rotation: PBQuaternion | undefined;
+    scale: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBTriggerAreaResult_Trigger {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTriggerAreaResult_Trigger;
+    // (undocumented)
+    export function encode(message: PBTriggerAreaResult_Trigger, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -4303,6 +4363,22 @@ export type Transport = {
 
 // @public (undocumented)
 export type TransportMessage = Omit<ReceiveMessage, 'data'>;
+
+// @public (undocumented)
+export const TriggerArea: LastWriteWinElementSetComponentDefinition<PBTriggerArea>;
+
+// @public (undocumented)
+export const enum TriggerAreaEventType {
+    // (undocumented)
+    TAET_ENTER = 0,
+    // (undocumented)
+    TAET_EXIT = 2,
+    // (undocumented)
+    TAET_STAY = 1
+}
+
+// @public (undocumented)
+export const TriggerAreaResult: LastWriteWinElementSetComponentDefinition<PBTriggerAreaResult>;
 
 // Warning: (ae-missing-release-tag) "Tween" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
