@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=561.4k bytes
+=======
+SCENE_COMPILED_JS_SIZE_PROD=502.2k bytes
+>>>>>>> 327f7995 (fix tests)
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -10,9 +14,50 @@ EVAL test/snapshots/development-bundles/static-scene.test.js
   REQUIRE: ~system/Testing
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
+<<<<<<< HEAD
   OPCODES ~= 66k
   MALLOC_COUNT = 16028
   ALIVE_OBJS_DELTA ~= 3.18k
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+  OPCODES ~= 61k
+  MALLOC_COUNT = 14733
+  ALIVE_OBJS_DELTA ~= 2.92k
+=======
+=======
+>>>>>>> f7184856 (fix tests)
+<<<<<<< HEAD
+  OPCODES ~= 56k
+  MALLOC_COUNT = 14173
+  ALIVE_OBJS_DELTA ~= 2.80k
+=======
+<<<<<<< HEAD
+  OPCODES ~= 55k
+  MALLOC_COUNT = 14039
+  ALIVE_OBJS_DELTA ~= 2.77k
+=======
+  OPCODES ~= 47k
+  MALLOC_COUNT = 13674
+  ALIVE_OBJS_DELTA ~= 2.68k
+>>>>>>> 99d394c1 (update snapshots)
+>>>>>>> c50aee8d (update snapshots)
+<<<<<<< HEAD
+>>>>>>> 9f5e0f01 (update snapshots)
+=======
+=======
+  OPCODES ~= 47k
+  MALLOC_COUNT = 14014
+  ALIVE_OBJS_DELTA ~= 2.74k
+>>>>>>> 126220f1 (fix tests)
+>>>>>>> f7184856 (fix tests)
+=======
+  OPCODES ~= 48k
+  MALLOC_COUNT = 14340
+  ALIVE_OBJS_DELTA ~= 2.81k
+>>>>>>> 4d3a904b (fix tests)
+>>>>>>> 327f7995 (fix tests)
 CALL onStart()
   main.crdt: PUT_COMPONENT e=0x200 c=1 t=0 data={"position":{"x":5.880000114440918,"y":2.7916901111602783,"z":7.380000114440918},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   main.crdt: PUT_COMPONENT e=0x202 c=1 t=0 data={"position":{"x":4,"y":0.800000011920929,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
@@ -42,6 +87,7 @@ CALL onStart()
   main.crdt: PUT_COMPONENT e=0x200 c=1062 t=0 data={"pointerEvents":[{"eventType":1,"eventInfo":{"button":1,"hoverText":"Press E to spawn","maxDistance":100,"showFeedback":true}}]}
   main.crdt: PUT_COMPONENT e=0x200 c=1017 t=0 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":1,"g":0.8500000238418579,"b":0.41999998688697815,"a":1}}}}
   OPCODES ~= 22k
+<<<<<<< HEAD
   MALLOC_COUNT = 232
   ALIVE_OBJS_DELTA ~= 0.09k
 CALL onUpdate(0)
@@ -49,11 +95,27 @@ CALL onUpdate(0)
   OPCODES ~= 18k
   MALLOC_COUNT = 41
   ALIVE_OBJS_DELTA ~= -0.00k
+=======
+  MALLOC_COUNT = 234
+  ALIVE_OBJS_DELTA ~= 0.09k
+CALL onUpdate(0)
+   ~system/Testing: plan {"tests":[{"name":"ensure that cubes are in the scene on the first frame"}]}
+  OPCODES ~= 15k
+  MALLOC_COUNT = -61
+  ALIVE_OBJS_DELTA ~= -0.03k
+>>>>>>> 327f7995 (fix tests)
 CALL onUpdate(0.1)
   LOG: ["🧪 Running test ensure that cubes are in the scene on the first frame"]
   LOG: ["🟢 Test passed ensure that cubes are in the scene on the first frame"]
   ~system/Testing: logTestResult {"name":"ensure that cubes are in the scene on the first frame","ok":true,"totalFrames":0,"totalTime":0}
+<<<<<<< HEAD
   OPCODES ~= 4k
   MALLOC_COUNT = -5
   ALIVE_OBJS_DELTA ~= 0.00k
   MEMORY_USAGE_COUNT ~= 1414.97k bytes
+=======
+  OPCODES ~= 3k
+  MALLOC_COUNT = -5
+  ALIVE_OBJS_DELTA ~= 0.00k
+  MEMORY_USAGE_COUNT ~= 1293.47k bytes
+>>>>>>> 327f7995 (fix tests)
