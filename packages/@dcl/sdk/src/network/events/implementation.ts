@@ -20,10 +20,10 @@ export type SendOptions = {
 }
 
 /**
- * TypedEventBus provides type-safe event communication between client and server
+ * Room provides type-safe communication between clients and server
  * Uses binary serialization with Schema definitions for efficiency
  */
-export class TypedEventBus<T extends EventSchemaRegistry = EventSchemaRegistry> {
+export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
   private listeners = new Map<keyof T, Set<EventCallback<any>>>()
   private binaryMessageBus: any
   private isServerFuture: IFuture<boolean> = future()
@@ -145,60 +145,66 @@ export function getEventRegistry(): EventSchemaRegistry {
   return globalEventRegistry
 }
 
-// Global eventBus instance (created by addSyncTransport)
-let globalEventBus: TypedEventBus | null = null
+// Global room instance (created by addSyncTransport)
+let globalRoom: Room | null = null
 
 /**
- * Set the global event bus instance (internal use)
+ * Set the global room instance (internal use)
  * @internal
  */
-export function setGlobalEventBus(eventBusInstance: TypedEventBus): void {
-  globalEventBus = eventBusInstance
+export function setGlobalRoom(roomInstance: Room): void {
+  globalRoom = roomInstance
 }
 
 /**
- * Register event schemas for use with the event bus
- * Call this before main() to add your custom events
- * @param events - Object containing your event schemas
- * @returns Typed eventBus instance for your registered events
+ * Register message schemas for use with the room
+ * Call this before main() to define your custom messages
+ * @param messages - Object containing your message schemas
+ * @returns Typed room instance for your registered messages
  */
-export function registerEvents<T extends EventSchemaRegistry>(events: T): TypedEventBus<T> {
-  Object.assign(globalEventRegistry, events)
-  if (!globalEventBus) {
-    throw new Error('EventBus not initialized. Make sure the SDK network transport is initialized.')
+export function registerMessages<T extends EventSchemaRegistry>(messages: T): Room<T> {
+  Object.assign(globalEventRegistry, messages)
+  if (!globalRoom) {
+    throw new Error('Room not initialized. Make sure the SDK network transport is initialized.')
   }
-  // Update the eventBus registry
-  (globalEventBus as any).registry = globalEventRegistry
-  return globalEventBus as unknown as TypedEventBus<T>
+  // Update the room registry
+  (globalRoom as any).registry = globalEventRegistry
+  return globalRoom as unknown as Room<T>
 }
 
 /**
- * Get a typed version of the global event bus
- * Use this when you want the eventBus with your specific event types
+ * Get a typed version of the global room
+ * Use this when you want the room with your specific message types
  * 
  * @example
  * ```typescript
- * const MyGameEvents = { ... }
- * registerEvents(MyGameEvents) // Register first
- * const eventBus = getEventBus<typeof MyGameEvents>() // Then get typed version
+ * const MyMessages = { ... }
+ * registerMessages(MyMessages) // Register first
+ * const room = getRoom<typeof MyMessages>() // Then get typed version
  * ```
  */
-export function getEventBus<T extends EventSchemaRegistry>(): TypedEventBus<T> {
-  if (!globalEventBus) {
-    throw new Error('EventBus not initialized. Make sure the SDK network transport is initialized.')
+export function getRoom<T extends EventSchemaRegistry>(): Room<T> {
+  if (!globalRoom) {
+    throw new Error('Room not initialized. Make sure the SDK network transport is initialized.')
   }
-  return globalEventBus as unknown as TypedEventBus<T>
+  return globalRoom as unknown as Room<T>
 }
 
 /**
- * Create a typed event bus with custom event schemas
- * @param registry - Your custom event schema registry
- * @returns TypedEventBus instance with your custom types
+ * Create a typed room with custom message schemas (internal use)
+ * @param registry - Your custom message schema registry
+ * @returns Room instance with your custom types
+ * @internal
  */
-export function createEventBus<T extends EventSchemaRegistry>(
+export function createRoom<T extends EventSchemaRegistry>(
   engine: IEngine,
   binaryMessageBus: any,
   isServerFn: Atom<boolean>
-): TypedEventBus<T> {
-  return new TypedEventBus(engine, binaryMessageBus, isServerFn)
+): Room<T> {
+  return new Room(engine, binaryMessageBus, isServerFn)
 }
+
+// Temporary exports for backwards compatibility with SDK internals
+export { Room as TypedEventBus }
+export { setGlobalRoom as setGlobalEventBus }
+export { createRoom as createEventBus }
