@@ -20,7 +20,7 @@ export function isServer(): boolean {
 const { getChildren, syncEntity, parentEntity, getParent, myProfile, removeParent, getFirstChild, isStateSyncronized, binaryMessageBus, eventBus } =
   addSyncTransport(engine, sendBinary, getUserData, isServerApi, 'network')
 
-// Re-export the event system
-export { registerEvents, getEventBus } from './events'
+// Re-export the room messaging system
+export { registerMessages, getRoom } from './events'
 
 export { getFirstChild, getChildren, syncEntity, parentEntity, getParent, myProfile, removeParent, isStateSyncronized, binaryMessageBus, eventBus }
