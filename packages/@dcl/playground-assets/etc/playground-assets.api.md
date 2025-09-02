@@ -1863,14 +1863,6 @@ export interface MeshRendererComponentDefinitionExtended extends LastWriteWinEle
     setSphere(entity: Entity): void;
 }
 
-// @public (undocumented)
-export const enum MeshType {
-    // (undocumented)
-    MT_BOX = 0,
-    // (undocumented)
-    MT_SPHERE = 1
-}
-
 // @alpha @deprecated (undocumented)
 export class MessageBus {
     constructor();
@@ -3051,7 +3043,7 @@ export namespace PBTextShape {
 // @public (undocumented)
 export interface PBTriggerArea {
     collisionMask?: number | undefined;
-    mesh?: MeshType | undefined;
+    mesh?: TriggerAreaMeshType | undefined;
 }
 
 // @public (undocumented)
@@ -4375,6 +4367,14 @@ export const enum TriggerAreaEventType {
     TAET_EXIT = 2,
     // (undocumented)
     TAET_STAY = 1
+}
+
+// @public (undocumented)
+export const enum TriggerAreaMeshType {
+    // (undocumented)
+    TAMT_BOX = 0,
+    // (undocumented)
+    TAMT_SPHERE = 1
 }
 
 // @public (undocumented)
