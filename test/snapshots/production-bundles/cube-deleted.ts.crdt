@@ -10,6 +10,7 @@ EVAL test/snapshots/production-bundles/cube-deleted.js
   REQUIRE: ~system/EngineApi
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   OPCODES ~= 63k
   MALLOC_COUNT = 12863
   ALIVE_OBJS_DELTA ~= 2.85k
@@ -39,6 +40,11 @@ EVAL test/snapshots/production-bundles/cube-deleted.js
   ALIVE_OBJS_DELTA ~= 2.66k
 >>>>>>> 126220f1 (fix tests)
 >>>>>>> f7184856 (fix tests)
+=======
+  OPCODES ~= 49k
+  MALLOC_COUNT = 12482
+  ALIVE_OBJS_DELTA ~= 2.73k
+>>>>>>> 4d3a904b (fix tests)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6

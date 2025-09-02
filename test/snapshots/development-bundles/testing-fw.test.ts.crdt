@@ -12,6 +12,7 @@ EVAL test/snapshots/development-bundles/testing-fw.test.js
   REQUIRE: ~system/EngineApi
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   OPCODES ~= 70k
   MALLOC_COUNT = 15263
   ALIVE_OBJS_DELTA ~= 3.08k
@@ -42,6 +43,11 @@ EVAL test/snapshots/development-bundles/testing-fw.test.js
   ALIVE_OBJS_DELTA ~= 2.81k
 >>>>>>> 126220f1 (fix tests)
 >>>>>>> f7184856 (fix tests)
+=======
+  OPCODES ~= 48k
+  MALLOC_COUNT = 14567
+  ALIVE_OBJS_DELTA ~= 2.88k
+>>>>>>> 4d3a904b (fix tests)
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=1 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}

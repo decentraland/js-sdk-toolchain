@@ -10,6 +10,7 @@ EVAL test/snapshots/production-bundles/cubes.js
   REQUIRE: ~system/EngineApi
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   OPCODES ~= 113k
   MALLOC_COUNT = 19161
   ALIVE_OBJS_DELTA ~= 4.76k
