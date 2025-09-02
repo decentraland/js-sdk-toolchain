@@ -100,6 +100,12 @@ export const int8Component = (engine: IEngine) => {
     onChange: () => {},
     __onChangeCallbacks() {
       return undefined
+    },
+    __forceUpdateFromCrdt() {
+      return [null, {}]
+    },
+    getCrdtState() {
+      return { data: new Uint8Array(), timestamp: 1 }
     }
   }
 
