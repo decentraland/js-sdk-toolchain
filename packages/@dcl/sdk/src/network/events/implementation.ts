@@ -16,7 +16,7 @@ export type EventCallback<T> = (data: T, context?: EventContext) => void
 
 // Options for sending events
 export type SendOptions = {
-  to?: string[]  // Target specific peers (server only)
+  to?: string[] // Target specific peers (server only)
 }
 
 /**
@@ -28,12 +28,8 @@ export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
   private binaryMessageBus: any
   private isServerFuture: IFuture<boolean> = future()
 
-  constructor(
-    _engine: IEngine,
-    binaryMessageBus: any,
-    isServerFn: Atom<boolean>
-  ) {
-    isServerFn.deref().then($ => this.isServerFuture.resolve($))
+  constructor(_engine: IEngine, binaryMessageBus: any, isServerFn: Atom<boolean>) {
+    void isServerFn.deref().then(($) => this.isServerFuture.resolve($))
 
     this.binaryMessageBus = binaryMessageBus
     // Listen for CUSTOM_EVENT messages
@@ -41,9 +37,9 @@ export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
       try {
         const { eventType, payload } = decodeEvent(data, globalEventRegistry)
         const callbacks = this.listeners.get(eventType)
-        
+
         if (callbacks) {
-          callbacks.forEach(async cb => {
+          callbacks.forEach(async (cb) => {
             if (await this.isServerFuture) {
               // Server handlers receive sender context
               cb(payload, { from: sender })
@@ -65,14 +61,10 @@ export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
    * @param data - The event data matching the schema
    * @param options - Optional send options (server only)
    */
-  async send<K extends keyof T>(
-    eventType: K,
-    data: EventTypes<T>[K],
-    options?: SendOptions
-  ): Promise<void> {
+  async send<K extends keyof T>(eventType: K, data: EventTypes<T>[K], options?: SendOptions): Promise<void> {
     try {
       const buffer = encodeEvent(eventType as string, data, globalEventRegistry)
-      
+
       if (await this.isServerFuture) {
         // Server can send to specific clients or broadcast
         this.binaryMessageBus.emit(CommsMessage.CUSTOM_EVENT, buffer, options?.to)
@@ -91,17 +83,14 @@ export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
    * @param callback - Callback to handle the event
    * @returns Unsubscribe function
    */
-  onMessage<K extends keyof T>(
-    eventType: K,
-    callback: EventCallback<EventTypes<T>[K]>
-  ): () => void {
+  onMessage<K extends keyof T>(eventType: K, callback: EventCallback<EventTypes<T>[K]>): () => void {
     if (!this.listeners.has(eventType)) {
       this.listeners.set(eventType, new Set())
     }
-    
+
     const callbacks = this.listeners.get(eventType)!
     callbacks.add(callback)
-    
+
     // Return unsubscribe function
     return () => {
       callbacks.delete(callback)
@@ -131,11 +120,10 @@ export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
   listenerCount<K extends keyof T>(eventType: K): number {
     return this.listeners.get(eventType)?.size ?? 0
   }
-
 }
 
 // Global registry for user-defined events
-let globalEventRegistry: EventSchemaRegistry = {}
+const globalEventRegistry: EventSchemaRegistry = {}
 
 /**
  * Get the global event registry (internal use)
@@ -168,14 +156,14 @@ export function registerMessages<T extends EventSchemaRegistry>(messages: T): Ro
     throw new Error('Room not initialized. Make sure the SDK network transport is initialized.')
   }
   // Update the room registry
-  (globalRoom as any).registry = globalEventRegistry
+  ;(globalRoom as any).registry = globalEventRegistry
   return globalRoom as unknown as Room<T>
 }
 
 /**
  * Get a typed version of the global room
  * Use this when you want the room with your specific message types
- * 
+ *
  * @example
  * ```typescript
  * const MyMessages = { ... }
