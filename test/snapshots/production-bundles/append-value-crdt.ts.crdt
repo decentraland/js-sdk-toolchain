@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=219.5k bytes
 =======
 =======
@@ -20,6 +21,9 @@ SCENE_COMPILED_JS_SIZE_PROD=205.4k bytes
 SCENE_COMPILED_JS_SIZE_PROD=206.3k bytes
 >>>>>>> 126220f1 (fix tests)
 >>>>>>> f7184856 (fix tests)
+=======
+SCENE_COMPILED_JS_SIZE_PROD=210.5k bytes
+>>>>>>> 4d3a904b (fix tests)
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -29,6 +33,7 @@ EVAL test/snapshots/production-bundles/append-value-crdt.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   OPCODES ~= 72k
@@ -61,6 +66,11 @@ EVAL test/snapshots/production-bundles/append-value-crdt.js
   ALIVE_OBJS_DELTA ~= 2.81k
 >>>>>>> 126220f1 (fix tests)
 >>>>>>> f7184856 (fix tests)
+=======
+  OPCODES ~= 50k
+  MALLOC_COUNT = 13081
+  ALIVE_OBJS_DELTA ~= 2.88k
+>>>>>>> 4d3a904b (fix tests)
 CALL onStart()
   Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5,"tickNumber":0}
   OPCODES ~= 8k
@@ -108,6 +118,7 @@ CALL onUpdate(0.1)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 967.39k bytes
 =======
 =======
@@ -136,3 +147,6 @@ CALL onUpdate(0.1)
   MEMORY_USAGE_COUNT ~= 901.50k bytes
 >>>>>>> 20f4b0d5 (add tests)
 >>>>>>> 5a6b10a9 (add tests)
+=======
+  MEMORY_USAGE_COUNT ~= 917.14k bytes
+>>>>>>> 4d3a904b (fix tests)

@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=252.9k bytes
 =======
 =======
@@ -29,6 +30,9 @@ SCENE_COMPILED_JS_SIZE_PROD=239.7k bytes
 SCENE_COMPILED_JS_SIZE_PROD=239.6k bytes
 >>>>>>> 20f4b0d5 (add tests)
 >>>>>>> 5a6b10a9 (add tests)
+=======
+SCENE_COMPILED_JS_SIZE_PROD=243.9k bytes
+>>>>>>> 4d3a904b (fix tests)
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -38,6 +42,7 @@ EVAL test/snapshots/production-bundles/cubes.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   OPCODES ~= 113k
@@ -69,6 +74,11 @@ EVAL test/snapshots/production-bundles/cubes.js
   ALIVE_OBJS_DELTA ~= 4.59k
 >>>>>>> 126220f1 (fix tests)
 >>>>>>> f7184856 (fix tests)
+=======
+  OPCODES ~= 99k
+  MALLOC_COUNT = 18901
+  ALIVE_OBJS_DELTA ~= 4.66k
+>>>>>>> 4d3a904b (fix tests)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -1713,6 +1723,7 @@ CALL onUpdate(0.1)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 1255.38k bytes
 =======
 =======
@@ -1741,3 +1752,6 @@ CALL onUpdate(0.1)
   MEMORY_USAGE_COUNT ~= 1187.15k bytes
 >>>>>>> 20f4b0d5 (add tests)
 >>>>>>> 5a6b10a9 (add tests)
+=======
+  MEMORY_USAGE_COUNT ~= 1203.43k bytes
+>>>>>>> 4d3a904b (fix tests)
