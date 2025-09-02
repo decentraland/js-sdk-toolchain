@@ -16,7 +16,7 @@ import { TypedEventBus, setGlobalEventBus } from './events/implementation'
 
 export type IProfile = { networkId: number; userId: string }
 // user that we asked for the inital crdt state
-export const AUTH_SERVER_PEER_ID = 'authorative-server'
+export const AUTH_SERVER_PEER_ID = 'authoritative-server'
 export const DEBUG_NETWORK_MESSAGES = () => (globalThis as any).DEBUG_NETWORK_MESSAGES ?? false
 
 // Test environment detection without 'as any'
