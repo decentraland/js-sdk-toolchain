@@ -7,7 +7,7 @@ import { Atom } from '../atom'
 
 // Create isServer atom for consistent state
 const isServerAtom = Atom<boolean>(false)
-void isServerApi({}).then(response => {
+void isServerApi({}).then((response) => {
   isServerAtom.swap(!!response.isServer)
 })
 
@@ -17,10 +17,31 @@ export function isServer(): boolean {
 }
 
 // initialize sync transport for sdk engine
-const { getChildren, syncEntity, parentEntity, getParent, myProfile, removeParent, getFirstChild, isStateSyncronized, binaryMessageBus, eventBus } =
-  addSyncTransport(engine, sendBinary, getUserData, isServerApi, 'network')
+const {
+  getChildren,
+  syncEntity,
+  parentEntity,
+  getParent,
+  myProfile,
+  removeParent,
+  getFirstChild,
+  isStateSyncronized,
+  binaryMessageBus,
+  eventBus
+} = addSyncTransport(engine, sendBinary, getUserData, isServerApi, 'network')
 
 // Re-export the room messaging system
 export { registerMessages, getRoom } from './events'
 
-export { getFirstChild, getChildren, syncEntity, parentEntity, getParent, myProfile, removeParent, isStateSyncronized, binaryMessageBus, eventBus }
+export {
+  getFirstChild,
+  getChildren,
+  syncEntity,
+  parentEntity,
+  getParent,
+  myProfile,
+  removeParent,
+  isStateSyncronized,
+  binaryMessageBus,
+  eventBus
+}
