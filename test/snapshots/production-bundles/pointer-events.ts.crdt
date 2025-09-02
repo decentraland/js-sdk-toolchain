@@ -1,4 +1,12 @@
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=245.1k bytes
+=======
+<<<<<<< HEAD
+SCENE_COMPILED_JS_SIZE_PROD=243.7k bytes
+=======
+SCENE_COMPILED_JS_SIZE_PROD=217.8k bytes
+>>>>>>> 327f7995 (fix tests)
+>>>>>>> 11b9aad2 (fix tests)
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -8,10 +16,56 @@ EVAL test/snapshots/production-bundles/pointer-events.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
+<<<<<<< HEAD
   REQUIRE: ~system/Runtime
   OPCODES ~= 77k
   MALLOC_COUNT = 14547
   ALIVE_OBJS_DELTA ~= 3.24k
+=======
+<<<<<<< HEAD
+  OPCODES ~= 69k
+  MALLOC_COUNT = 14290
+  ALIVE_OBJS_DELTA ~= 3.18k
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+  OPCODES ~= 64k
+  MALLOC_COUNT = 13122
+  ALIVE_OBJS_DELTA ~= 2.92k
+=======
+=======
+>>>>>>> f7184856 (fix tests)
+<<<<<<< HEAD
+  OPCODES ~= 58k
+<<<<<<< HEAD
+  MALLOC_COUNT = 12603
+  ALIVE_OBJS_DELTA ~= 2.80k
+=======
+  MALLOC_COUNT = 12480
+  ALIVE_OBJS_DELTA ~= 2.77k
+=======
+  OPCODES ~= 49k
+  MALLOC_COUNT = 12135
+  ALIVE_OBJS_DELTA ~= 2.68k
+>>>>>>> 99d394c1 (update snapshots)
+>>>>>>> c50aee8d (update snapshots)
+<<<<<<< HEAD
+>>>>>>> 9f5e0f01 (update snapshots)
+=======
+=======
+  OPCODES ~= 49k
+  MALLOC_COUNT = 12467
+  ALIVE_OBJS_DELTA ~= 2.74k
+>>>>>>> 126220f1 (fix tests)
+>>>>>>> f7184856 (fix tests)
+=======
+  OPCODES ~= 50k
+  MALLOC_COUNT = 12771
+  ALIVE_OBJS_DELTA ~= 2.81k
+>>>>>>> 4d3a904b (fix tests)
+>>>>>>> 327f7995 (fix tests)
+>>>>>>> 11b9aad2 (fix tests)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -30,6 +84,7 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x201 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   Scene: PUT_COMPONENT e=0x202 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   OPCODES ~= 24k
+<<<<<<< HEAD
   MALLOC_COUNT = 133
   ALIVE_OBJS_DELTA ~= 0.04k
 CALL onUpdate(0.1)
@@ -44,4 +99,25 @@ CALL onUpdate(0.1)
   OPCODES ~= 3k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 1040.87k bytes
+=======
+  MEMORY_USAGE_COUNT ~= 1031.70k bytes
+=======
+  MALLOC_COUNT = 37
+  ALIVE_OBJS_DELTA ~= 0.01k
+CALL onUpdate(0.1)
+  OPCODES ~= 2k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+CALL onUpdate(0.1)
+  OPCODES ~= 2k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+CALL onUpdate(0.1)
+  OPCODES ~= 2k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+  MEMORY_USAGE_COUNT ~= 941.40k bytes
+>>>>>>> 327f7995 (fix tests)
+>>>>>>> 11b9aad2 (fix tests)

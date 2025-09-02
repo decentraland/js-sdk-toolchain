@@ -1,4 +1,12 @@
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=244.1k bytes
+=======
+<<<<<<< HEAD
+SCENE_COMPILED_JS_SIZE_PROD=242.8k bytes
+=======
+SCENE_COMPILED_JS_SIZE_PROD=216.8k bytes
+>>>>>>> 327f7995 (fix tests)
+>>>>>>> 11b9aad2 (fix tests)
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -8,16 +16,60 @@ EVAL test/snapshots/production-bundles/cube.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
+<<<<<<< HEAD
   REQUIRE: ~system/Runtime
   OPCODES ~= 75k
   MALLOC_COUNT = 14254
   ALIVE_OBJS_DELTA ~= 3.16k
+=======
+<<<<<<< HEAD
+  OPCODES ~= 67k
+  MALLOC_COUNT = 13997
+  ALIVE_OBJS_DELTA ~= 3.09k
+=======
+  OPCODES ~= 63k
+  MALLOC_COUNT = 12836
+  ALIVE_OBJS_DELTA ~= 2.84k
+=======
+=======
+>>>>>>> f7184856 (fix tests)
+<<<<<<< HEAD
+  OPCODES ~= 57k
+<<<<<<< HEAD
+  MALLOC_COUNT = 12317
+  ALIVE_OBJS_DELTA ~= 2.72k
+=======
+  MALLOC_COUNT = 12194
+  ALIVE_OBJS_DELTA ~= 2.69k
+=======
+  OPCODES ~= 48k
+  MALLOC_COUNT = 11849
+  ALIVE_OBJS_DELTA ~= 2.59k
+>>>>>>> 99d394c1 (update snapshots)
+>>>>>>> c50aee8d (update snapshots)
+<<<<<<< HEAD
+>>>>>>> 9f5e0f01 (update snapshots)
+=======
+=======
+  OPCODES ~= 48k
+  MALLOC_COUNT = 12161
+  ALIVE_OBJS_DELTA ~= 2.66k
+>>>>>>> 126220f1 (fix tests)
+>>>>>>> f7184856 (fix tests)
+=======
+  OPCODES ~= 49k
+  MALLOC_COUNT = 12455
+  ALIVE_OBJS_DELTA ~= 2.72k
+>>>>>>> 4d3a904b (fix tests)
+>>>>>>> 327f7995 (fix tests)
+>>>>>>> 11b9aad2 (fix tests)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
+<<<<<<< HEAD
   OPCODES ~= 4k
   MALLOC_COUNT = 35
   ALIVE_OBJS_DELTA ~= 0.01k
@@ -33,4 +85,26 @@ CALL onUpdate(0.1)
   OPCODES ~= 3k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 1021.17k bytes
+=======
+  MEMORY_USAGE_COUNT ~= 1012.00k bytes
+=======
+  OPCODES ~= 2k
+  MALLOC_COUNT = 29
+  ALIVE_OBJS_DELTA ~= 0.01k
+CALL onUpdate(0.1)
+  OPCODES ~= 2k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+CALL onUpdate(0.1)
+  OPCODES ~= 2k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+CALL onUpdate(0.1)
+  OPCODES ~= 2k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+  MEMORY_USAGE_COUNT ~= 923.67k bytes
+>>>>>>> 327f7995 (fix tests)
+>>>>>>> 11b9aad2 (fix tests)

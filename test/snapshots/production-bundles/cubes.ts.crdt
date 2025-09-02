@@ -1,4 +1,12 @@
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=289.2k bytes
+=======
+<<<<<<< HEAD
+SCENE_COMPILED_JS_SIZE_PROD=287.9k bytes
+=======
+SCENE_COMPILED_JS_SIZE_PROD=254.2k bytes
+>>>>>>> 327f7995 (fix tests)
+>>>>>>> 11b9aad2 (fix tests)
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -8,10 +16,25 @@ EVAL test/snapshots/production-bundles/cubes.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
+<<<<<<< HEAD
   REQUIRE: ~system/Runtime
   OPCODES ~= 127k
   MALLOC_COUNT = 21015
   ALIVE_OBJS_DELTA ~= 5.16k
+=======
+<<<<<<< HEAD
+  OPCODES ~= 119k
+  MALLOC_COUNT = 20758
+  ALIVE_OBJS_DELTA ~= 5.09k
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+  OPCODES ~= 113k
+  MALLOC_COUNT = 19161
+  ALIVE_OBJS_DELTA ~= 4.76k
+>>>>>>> 327f7995 (fix tests)
+>>>>>>> 11b9aad2 (fix tests)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -564,9 +587,15 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x2b4 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   Scene: PUT_COMPONENT e=0x2b5 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   Scene: PUT_COMPONENT e=0x2b6 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
+<<<<<<< HEAD
   OPCODES ~= 1001k
   MALLOC_COUNT = 6214
   ALIVE_OBJS_DELTA ~= 1.83k
+=======
+  OPCODES ~= 960k
+  MALLOC_COUNT = 1842
+  ALIVE_OBJS_DELTA ~= 0.74k
+>>>>>>> 327f7995 (fix tests)
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=2 data={"position":{"x":-3,"y":2.7722561359405518,"z":-3},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":0.5,"y":0.5,"z":0.5},"parent":0}
   Scene: PUT_COMPONENT e=0x201 c=1 t=2 data={"position":{"x":-4,"y":3.498049020767212,"z":-4},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":0.5,"y":0.5,"z":0.5},"parent":0}
@@ -926,7 +955,11 @@ CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x2b4 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
   Scene: PUT_COMPONENT e=0x2b5 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
   Scene: PUT_COMPONENT e=0x2b6 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
+<<<<<<< HEAD
   OPCODES ~= 725k
+=======
+  OPCODES ~= 664k
+>>>>>>> 327f7995 (fix tests)
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
@@ -1288,7 +1321,11 @@ CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x2b4 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
   Scene: PUT_COMPONENT e=0x2b5 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
   Scene: PUT_COMPONENT e=0x2b6 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
+<<<<<<< HEAD
   OPCODES ~= 725k
+=======
+  OPCODES ~= 664k
+>>>>>>> 327f7995 (fix tests)
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
@@ -1650,7 +1687,18 @@ CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x2b4 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
   Scene: PUT_COMPONENT e=0x2b5 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
   Scene: PUT_COMPONENT e=0x2b6 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
+<<<<<<< HEAD
   OPCODES ~= 725k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 1479.60k bytes
+=======
+  MEMORY_USAGE_COUNT ~= 1470.43k bytes
+=======
+  OPCODES ~= 664k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+  MEMORY_USAGE_COUNT ~= 1259.14k bytes
+>>>>>>> 327f7995 (fix tests)
+>>>>>>> 11b9aad2 (fix tests)

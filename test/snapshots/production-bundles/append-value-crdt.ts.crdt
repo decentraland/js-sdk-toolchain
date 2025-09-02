@@ -1,4 +1,12 @@
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=248k bytes
+=======
+<<<<<<< HEAD
+SCENE_COMPILED_JS_SIZE_PROD=246.7k bytes
+=======
+SCENE_COMPILED_JS_SIZE_PROD=220.7k bytes
+>>>>>>> 327f7995 (fix tests)
+>>>>>>> 11b9aad2 (fix tests)
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -8,14 +16,65 @@ EVAL test/snapshots/production-bundles/append-value-crdt.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
+<<<<<<< HEAD
   REQUIRE: ~system/Runtime
   OPCODES ~= 85k
   MALLOC_COUNT = 15161
   ALIVE_OBJS_DELTA ~= 3.40k
+=======
+<<<<<<< HEAD
+  OPCODES ~= 77k
+  MALLOC_COUNT = 14904
+  ALIVE_OBJS_DELTA ~= 3.33k
+>>>>>>> 11b9aad2 (fix tests)
 CALL onStart()
   Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5,"tickNumber":0}
   OPCODES ~= 8k
   MALLOC_COUNT = 90
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+  OPCODES ~= 72k
+  MALLOC_COUNT = 13716
+  ALIVE_OBJS_DELTA ~= 3.07k
+=======
+=======
+>>>>>>> f7184856 (fix tests)
+<<<<<<< HEAD
+  OPCODES ~= 67k
+  MALLOC_COUNT = 13193
+  ALIVE_OBJS_DELTA ~= 2.95k
+=======
+<<<<<<< HEAD
+  OPCODES ~= 66k
+  MALLOC_COUNT = 13070
+  ALIVE_OBJS_DELTA ~= 2.92k
+=======
+  OPCODES ~= 49k
+  MALLOC_COUNT = 12427
+  ALIVE_OBJS_DELTA ~= 2.74k
+>>>>>>> 99d394c1 (update snapshots)
+>>>>>>> c50aee8d (update snapshots)
+<<<<<<< HEAD
+>>>>>>> 9f5e0f01 (update snapshots)
+=======
+=======
+  OPCODES ~= 49k
+  MALLOC_COUNT = 12772
+  ALIVE_OBJS_DELTA ~= 2.81k
+>>>>>>> 126220f1 (fix tests)
+>>>>>>> f7184856 (fix tests)
+=======
+  OPCODES ~= 50k
+  MALLOC_COUNT = 13081
+  ALIVE_OBJS_DELTA ~= 2.88k
+>>>>>>> 4d3a904b (fix tests)
+CALL onStart()
+  Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5,"tickNumber":0}
+  OPCODES ~= 8k
+  MALLOC_COUNT = 94
+>>>>>>> 327f7995 (fix tests)
   ALIVE_OBJS_DELTA ~= 0.03k
 CALL onUpdate(0)
   LOG: ["PointerEventsResult",[{"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5,"tickNumber":0}]]
@@ -24,8 +83,13 @@ CALL onUpdate(0)
   LOG: ["✅ Has DOWN command"]
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":0,"timestamp":2,"analog":5,"tickNumber":0}
+<<<<<<< HEAD
   OPCODES ~= 18k
   MALLOC_COUNT = 91
+=======
+  OPCODES ~= 16k
+  MALLOC_COUNT = 77
+>>>>>>> 327f7995 (fix tests)
   ALIVE_OBJS_DELTA ~= 0.03k
 CALL onUpdate(0.1)
   LOG: ["PointerEventsResult",[{"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5,"tickNumber":0},{"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":0,"timestamp":2,"analog":5,"tickNumber":0}]]
@@ -34,7 +98,11 @@ CALL onUpdate(0.1)
   LOG: ["✅ UP Was triggered"]
   LOG: ["✅ Doesn't have DOWN command"]
   Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":3,"analog":5,"tickNumber":0}
+<<<<<<< HEAD
   OPCODES ~= 15k
+=======
+  OPCODES ~= 13k
+>>>>>>> 327f7995 (fix tests)
   MALLOC_COUNT = 31
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
@@ -43,7 +111,11 @@ CALL onUpdate(0.1)
   LOG: ["✅ Was triggered"]
   LOG: ["✅ Has DOWN command"]
   Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":0,"timestamp":4,"analog":5,"tickNumber":0}
+<<<<<<< HEAD
   OPCODES ~= 15k
+=======
+  OPCODES ~= 13k
+>>>>>>> 327f7995 (fix tests)
   MALLOC_COUNT = 31
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
@@ -53,7 +125,18 @@ CALL onUpdate(0.1)
   LOG: ["isTriggered(RootEntity)=",false]
   LOG: ["getCommand(RootEntity)=",null]
   Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":5,"analog":5,"tickNumber":0}
+<<<<<<< HEAD
   OPCODES ~= 15k
   MALLOC_COUNT = 31
   ALIVE_OBJS_DELTA ~= 0.01k
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 1069.14k bytes
+=======
+  MEMORY_USAGE_COUNT ~= 1059.97k bytes
+=======
+  OPCODES ~= 13k
+  MALLOC_COUNT = 31
+  ALIVE_OBJS_DELTA ~= 0.01k
+  MEMORY_USAGE_COUNT ~= 971.25k bytes
+>>>>>>> 327f7995 (fix tests)
+>>>>>>> 11b9aad2 (fix tests)
