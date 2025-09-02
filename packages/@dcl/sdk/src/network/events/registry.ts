@@ -9,11 +9,10 @@ export type EventTypes<T extends EventSchemaRegistry = EventSchemaRegistry> = {
 }
 
 // Global interface that users can augment with their own events
-export interface RegisteredEvents extends EventSchemaRegistry {}
+export type RegisteredEvents = EventSchemaRegistry
 
 // Default empty registry
 export const EventSchemas = {} as RegisteredEvents
 
 // Helper to ensure user events conform to the registry type
 export type ValidateEventRegistry<T extends EventSchemaRegistry> = T
-

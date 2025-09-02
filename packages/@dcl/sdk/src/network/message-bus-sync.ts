@@ -12,7 +12,7 @@ import { definePlayerHelper } from '../players'
 import { serializeCrdtMessages } from '../internal/transports/logger'
 import { IsServerRequest, IsServerResponse } from '~system/EngineApi'
 import { Atom } from '../atom'
-import { TypedEventBus, setGlobalEventBus, getEventRegistry } from './events/implementation'
+import { TypedEventBus, setGlobalEventBus } from './events/implementation'
 
 export type IProfile = { networkId: number; userId: string }
 // user that we asked for the inital crdt state
@@ -102,13 +102,9 @@ export function addSyncTransport(
     binaryMessageBus
   })
 
-  // Initialize Event Bus with registered schemas  
-  const eventBus = new TypedEventBus(
-    engine,
-    binaryMessageBus,
-    isServerAtom
-  )
-  
+  // Initialize Event Bus with registered schemas
+  const eventBus = new TypedEventBus(engine, binaryMessageBus, isServerAtom)
+
   // Set global eventBus instance
   setGlobalEventBus(eventBus)
 
