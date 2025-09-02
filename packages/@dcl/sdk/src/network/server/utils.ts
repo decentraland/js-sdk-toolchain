@@ -94,7 +94,7 @@ export function networkMessageToLocal(
   destinationBuffer: ByteBuffer,
   // Optional network parent component for transform fixing
   networkParentComponent?: typeof NetworkParent,
-  // Force corrections - converts PUT_COMPONENT_NETWORK to AUTHORATIVE_PUT_COMPONENT
+  // Force corrections - converts PUT_COMPONENT_NETWORK to authoritative_PUT_COMPONENT
   forceCorrections = false
 ): CrdtMessageBody {
   if (message.type === CrdtMessageType.PUT_COMPONENT_NETWORK) {

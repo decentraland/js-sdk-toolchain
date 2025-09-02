@@ -79,7 +79,7 @@ describe('Server-Client Connectivity', () => {
   const messageQueues = {
     clientA: [] as Uint8Array[],
     clientB: [] as Uint8Array[],
-    'authorative-server': [] as Uint8Array[]
+    'authoritative-server': [] as Uint8Array[]
   }
 
   // Common routing function - routes message and tags with sender info
@@ -96,15 +96,15 @@ describe('Server-Client Connectivity', () => {
     // Determine targets based on client-server architecture rules
     let targets: string[] = []
 
-    if (sender === 'authorative-server') {
+    if (sender === 'authoritative-server') {
       // Server can send to specific clients or broadcast to all clients
       targets =
         addresses.length === 0
           ? ['clientA', 'clientB'] // Broadcast to all clients
-          : addresses.filter((addr) => addr !== 'authorative-server') // Only to specified clients, exclude server
+          : addresses.filter((addr) => addr !== 'authoritative-server') // Only to specified clients, exclude server
     } else {
       // Clients can only send to server
-      targets = ['authorative-server']
+      targets = ['authoritative-server']
     }
 
     console.log(`Targets: [${targets.join(', ')}]`)
@@ -161,13 +161,13 @@ describe('Server-Client Connectivity', () => {
     // Route server's messages using peerData addresses
     for (const peerData of msg.peerData) {
       for (const data of peerData.data) {
-        routeMessage(data, peerData.address, 'authorative-server')
+        routeMessage(data, peerData.address, 'authoritative-server')
       }
     }
 
     // Return messages queued for Server (already tagged with sender info)
-    const response = [...messageQueues['authorative-server']]
-    messageQueues['authorative-server'].length = 0
+    const response = [...messageQueues['authoritative-server']]
+    messageQueues['authoritative-server'].length = 0
     return { data: response }
   }
 
@@ -202,7 +202,7 @@ describe('Server-Client Connectivity', () => {
     sendBinaryServer,
     async () => ({
       data: {
-        userId: 'authorative-server',
+        userId: 'authoritative-server',
         version: 1,
         displayName: 'Server',
         hasConnectedWeb3: true,
