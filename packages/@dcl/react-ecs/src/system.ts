@@ -1,5 +1,5 @@
 import type { IEngine, PointerEventsSystem } from '@dcl/ecs'
-
+import React from 'react'
 import type { ReactEcs } from './react-ecs'
 import { createReconciler } from './reconciler'
 
@@ -24,7 +24,7 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
   let uiComponent: UiComponent | undefined = undefined
 
   function ReactBasedUiSystem() {
-    if (uiComponent) renderer.update(uiComponent())
+    if (uiComponent) renderer.update(React.createElement(uiComponent as any))
   }
 
   engine.addSystem(ReactBasedUiSystem, 100e3, '@dcl/react-ecs')

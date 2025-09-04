@@ -10,8 +10,12 @@ import ReactEcs, {
 } from '../../../../../packages/@dcl/react-ecs'
 
 let selectedIndex: number = 0
-const uiComponent = () => (
-  <UiEntity
+function uiComponent() {
+  ReactEcs.useEffect(() => {
+    console.log('mounted boedo')
+  }, [])
+  ReactEcs.useState(1)
+  return <UiEntity
     onMouseDown={() => {
       console.log('MOUSE_DOWN event')
     }}
@@ -70,7 +74,7 @@ const uiComponent = () => (
     <Button variant="primary" value="Primary Button" />
     <Button variant="secondary" value="Secondary Button" />
   </UiEntity>
-)
+  }
 
 export function setupUi() {
   ReactEcsRenderer.setUiRenderer(uiComponent)
