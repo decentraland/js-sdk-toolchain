@@ -171,7 +171,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
     external: ['~system/*', '@dcl/inspector', '@dcl/inspector/*' /* ban importing the inspector from the SDK */],
     alias: {
       // Ensure React is always resolved to the same module to prevent duplication
-      'react': (() => {
+      react: (() => {
         try {
           // First try to resolve from project's node_modules
           return require.resolve('react', { paths: [options.workingDirectory] })
