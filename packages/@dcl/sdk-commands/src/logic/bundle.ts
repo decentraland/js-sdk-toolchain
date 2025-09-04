@@ -161,6 +161,23 @@ export async function bundleSingleProject(components: BundleComponents, options:
     absWorkingDir: options.workingDirectory,
     target: 'es2020',
     external: ['~system/*', '@dcl/inspector', '@dcl/inspector/*' /* ban importing the inspector from the SDK */],
+    alias: {
+      // Ensure React is always resolved to the same module to prevent duplication
+      'react': (() => {
+        try {
+          // First try to resolve from project's node_modules
+          return require.resolve('react', { paths: [options.workingDirectory] })
+        } catch {
+          try {
+            // Fallback to SDK's React dependency
+            return require.resolve('react', { paths: [path.join(__dirname, '../../../@dcl/sdk')] })
+          } catch {
+            // Final fallback to bundled React
+            return require.resolve('react')
+          }
+        }
+      })()
+    },
     // convert filesystem paths into file:// to enable VSCode debugger
     sourceRoot: options.production ? 'dcl:///' : pathToFileURL(path.dirname(options.outputFile)).toString(),
     define: {
