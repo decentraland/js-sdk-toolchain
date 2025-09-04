@@ -1,0 +1,13 @@
+**/node_modules
+**/dist
+**/dist-cjs
+**/generated
+**/public
+!**/public/index.html
+**/*.svg
+
+package.json
+package-lock.json
+
+.github
+.idea
