@@ -3058,6 +3058,8 @@ export namespace PBTriggerArea {
 export interface PBTriggerAreaResult {
     eventType: TriggerAreaEventType;
     timestamp: number;
+    // (undocumented)
+    trigger: PBTriggerAreaResult_Trigger | undefined;
     triggeredEntity: number;
     triggeredEntityPosition: PBVector3 | undefined;
     triggeredEntityRotation: PBQuaternion | undefined;
