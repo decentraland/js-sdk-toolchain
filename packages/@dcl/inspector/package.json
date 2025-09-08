@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@dcl/asset-packs": "https://sdk-team-cdn.decentraland.org/@dcl/asset-packs/branch/ambient-music/dcl-asset-packs-2.5.10-17414190630.commit-cd116ae.tgz"
+  }
+}
