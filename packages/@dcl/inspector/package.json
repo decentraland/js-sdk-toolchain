@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@dcl/asset-packs": "https://sdk-team-cdn.decentraland.org/@dcl/asset-packs/branch/social-links/dcl-asset-packs-2.5.10-17475672742.commit-a1c8bf2.tgz"
+  }
+}
