@@ -659,7 +659,7 @@ export const componentDefinitionByName: {
     "core::SkyboxTime": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSkyboxTime>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
     "core::TriggerArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTriggerArea>>;
-    "core::TriggerAreaResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTriggerAreaResult>>;
+    "core::TriggerAreaResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBTriggerAreaResult>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
     "core::TweenSequence": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenSequence>>;
     "core::TweenState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenState>>;
@@ -4380,7 +4380,7 @@ export const enum TriggerAreaMeshType {
 }
 
 // @public (undocumented)
-export const TriggerAreaResult: LastWriteWinElementSetComponentDefinition<PBTriggerAreaResult>;
+export const TriggerAreaResult: GrowOnlyValueSetComponentDefinition<PBTriggerAreaResult>;
 
 // Warning: (ae-missing-release-tag) "Tween" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
