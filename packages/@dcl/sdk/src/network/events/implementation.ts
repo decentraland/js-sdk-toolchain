@@ -191,8 +191,3 @@ export function createRoom<T extends EventSchemaRegistry>(
 ): Room<T> {
   return new Room(engine, binaryMessageBus, isServerFn)
 }
-
-// Temporary exports for backwards compatibility with SDK internals
-export { Room as TypedEventBus }
-export { setGlobalRoom as setGlobalEventBus }
-export { createRoom as createEventBus }
