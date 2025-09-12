@@ -4362,6 +4362,28 @@ export type TransportMessage = Omit<ReceiveMessage, 'data'>;
 export const TriggerArea: LastWriteWinElementSetComponentDefinition<PBTriggerArea>;
 
 // @public (undocumented)
+export interface TriggerAreaComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBTriggerArea> {
+    setBox(entity: Entity, collisionMask?: ColliderLayer | ColliderLayer[]): void;
+    setSphere(entity: Entity, collisionMask?: ColliderLayer | ColliderLayer[]): void;
+}
+
+// @public (undocumented)
+export interface TriggerAreaEventsSystem {
+    onTriggerEnter(entity: Entity, cb: TriggerAreaEventSystemCallback): void;
+    onTriggerExit(entity: Entity, cb: TriggerAreaEventSystemCallback): void;
+    onTriggerStay(entity: Entity, cb: TriggerAreaEventSystemCallback): void;
+    removeOnTriggerEnter(entity: Entity): void;
+    removeOnTriggerExit(entity: Entity): void;
+    removeOnTriggerStay(entity: Entity): void;
+}
+
+// @public
+export const triggerAreaEventsSystem: TriggerAreaEventsSystem;
+
+// @public (undocumented)
+export type TriggerAreaEventSystemCallback = (result: DeepReadonlyObject<PBTriggerAreaResult>) => void;
+
+// @public (undocumented)
 export const enum TriggerAreaEventType {
     // (undocumented)
     TAET_ENTER = 0,
