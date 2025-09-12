@@ -35,7 +35,8 @@ import {
   INetowrkParent,
   VirtualCameraComponentDefinitionExtended,
   InputModifierComponentDefinitionExtended,
-  LightSourceComponentDefinitionExtended
+  LightSourceComponentDefinitionExtended,
+  TriggerAreaComponentDefinitionExtended
 } from './components/types'
 import { NameComponent } from './components/manual/Name'
 
@@ -52,6 +53,7 @@ export const Tween: TweenComponentDefinitionExtended = /* @__PURE__*/ components
 export const VirtualCamera: VirtualCameraComponentDefinitionExtended = /* @__PURE__*/ components.VirtualCamera(engine)
 export const InputModifier: InputModifierComponentDefinitionExtended = /* @__PURE__*/ components.InputModifier(engine)
 export const LightSource: LightSourceComponentDefinitionExtended = /* @__PURE__*/ components.LightSource(engine)
+export const TriggerArea: TriggerAreaComponentDefinitionExtended = /* @__PURE__*/ components.TriggerArea(engine)
 
 /**
  * @alpha

@@ -4358,8 +4358,10 @@ export type Transport = {
 // @public (undocumented)
 export type TransportMessage = Omit<ReceiveMessage, 'data'>;
 
+// Warning: (ae-missing-release-tag) "TriggerArea" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const TriggerArea: LastWriteWinElementSetComponentDefinition<PBTriggerArea>;
+export const TriggerArea: TriggerAreaComponentDefinitionExtended;
 
 // @public (undocumented)
 export interface TriggerAreaComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBTriggerArea> {
