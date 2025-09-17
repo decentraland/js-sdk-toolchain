@@ -1253,6 +1253,7 @@ export interface IEngine {
     defineValueSetComponentFromSchema<T>(componentName: string, spec: ISchema<T>, options: ValueSetOptions<T>): GrowOnlyValueSetComponentDefinition<T>;
     getComponent<T>(componentId: number | string): ComponentDefinition<T>;
     getComponentOrNull<T>(componentId: number | string): ComponentDefinition<T> | null;
+    getEntitiesByTag(tagName: string): Iterable<Entity>;
     getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     getEntityByName<T = never, K = T>(value: K & (T extends never ? never : string)): Entity;
     // @alpha
@@ -4080,6 +4081,24 @@ export type SystemItem = {
 //
 // @public (undocumented)
 export const SYSTEMS_REGULAR_PRIORITY = 100000;
+
+// Warning: (ae-missing-release-tag) "Tags" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const Tags: TagsComponent;
+
+// Warning: (ae-missing-release-tag) "TagsComponent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type TagsComponent = LastWriteWinElementSetComponentDefinition<TagsType>;
+
+// Warning: (ae-missing-release-tag) "TagsType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface TagsType {
+    // (undocumented)
+    tags: string[];
+}
 
 // Warning: (ae-missing-release-tag) "TargetEntityRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
