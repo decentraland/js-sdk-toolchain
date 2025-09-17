@@ -207,7 +207,7 @@ function preEngine(options?: IEngineOptions): PreEngine {
     const TagComponent = components.Tags({ defineComponent })
     for (const [entity, component] of getEntitiesWith(TagComponent)) {
       const tagComponent = component as TagsType
-      if (entity !== 0 && tagComponent.tags?.some((tag) => tag.name === tagName)) {
+      if (entity !== 0 && tagComponent.tags?.some((tag) => tag === tagName)) {
         yield entity
       }
     }
