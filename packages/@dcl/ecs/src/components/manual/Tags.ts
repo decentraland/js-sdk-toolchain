@@ -10,19 +10,20 @@ export type Tag = {
   name: string
   type: TagType
 }
-
-export interface Tags {
+export interface TagsType {
   tags: Tag[]
 }
 
-export type TagComponent = LastWriteWinElementSetComponentDefinition<Tags>
+export type TagsComponent = LastWriteWinElementSetComponentDefinition<TagsType>
 
 function defineTagsComponent(engine: Pick<IEngine, 'defineComponent'>) {
-  const Tags = engine.defineComponent('core::Tags', {
-    tags: Schemas.Map({
-      name: Schemas.String,
-      type: Schemas.EnumNumber(TagType, TagType.Custom)
-    })
+  const Tag = Schemas.Map({
+    name: Schemas.String,
+    type: Schemas.EnumNumber(TagType, TagType.Custom)
+  })
+
+  const Tags = engine.defineComponent('core-schema::Tags', {
+    tags: Schemas.Array(Tag)
   })
 
   return Tags

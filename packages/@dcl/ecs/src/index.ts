@@ -37,6 +37,7 @@ import {
   LightSourceComponentDefinitionExtended
 } from './components/types'
 import { NameComponent } from './components/manual/Name'
+import { TagsComponent } from './components/manual/Tags'
 
 // export components for global engine
 export const Transform: TransformComponentExtended = /* @__PURE__*/ components.Transform(engine)
@@ -47,6 +48,7 @@ export const Material: MaterialComponentDefinitionExtended = /* @__PURE__*/ comp
 export const MeshRenderer: MeshRendererComponentDefinitionExtended = /* @__PURE__*/ components.MeshRenderer(engine)
 export const MeshCollider: MeshColliderComponentDefinitionExtended = /* @__PURE__*/ components.MeshCollider(engine)
 export const Name: NameComponent = components.Name(engine)
+export const Tags: TagsComponent = components.Tags(engine)
 export const Tween: TweenComponentDefinitionExtended = /* @__PURE__*/ components.Tween(engine)
 export const VirtualCamera: VirtualCameraComponentDefinitionExtended = /* @__PURE__*/ components.VirtualCamera(engine)
 export const InputModifier: InputModifierComponentDefinitionExtended = /* @__PURE__*/ components.InputModifier(engine)

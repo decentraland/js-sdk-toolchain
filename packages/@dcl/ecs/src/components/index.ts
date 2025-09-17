@@ -17,7 +17,7 @@ import { MediaState } from './generated/pb/decentraland/sdk/components/common/me
 import { defineVirtualCameraComponent, VirtualCameraComponentDefinitionExtended } from './extended/VirtualCamera'
 import { defineInputModifierComponent, InputModifierComponentDefinitionExtended } from './extended/InputModifier'
 import { defineLightSourceComponent, LightSourceComponentDefinitionExtended } from './extended/LightSource'
-import defineTagsComponent from './manual/Tags'
+import defineTagsComponent, { TagsType } from './manual/Tags'
 
 export * from './generated/index.gen'
 
