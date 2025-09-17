@@ -63,6 +63,7 @@ export type PreEngine = Pick<
   | 'entityContainer'
   | 'getEntityOrNullByName'
   | 'getEntityByName'
+  | 'getEntitiesByTag'
 > & {
   getSystems: () => SystemItem[]
 }
@@ -255,6 +256,14 @@ export interface IEngine {
    * @typeParam T - The type of the entity name value
    */
   getEntityByName<T = never, K = T>(value: K & (T extends never ? never : string)): Entity
+
+  /**
+   * @public
+   * Get all entities that have a specific tag in their Tag component
+   * @param tag - Tag to search
+   * @returns Array of entities that have the specified tag
+   */
+  getEntitiesByTag(tagName: string): Iterable<Entity>
 
   /**
    * @public

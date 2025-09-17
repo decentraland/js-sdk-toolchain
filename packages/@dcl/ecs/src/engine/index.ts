@@ -24,6 +24,7 @@ import {
 } from './grow-only-value-set-component-definition'
 import { removeEntityWithChildren as removeEntityWithChildrenEngine } from '../runtime/helpers/tree'
 import { CrdtMessageType } from '../serialization/crdt'
+import { Tags } from '../components/manual/Tags'
 export * from './input'
 export * from './readonly'
 export * from './types'
@@ -202,6 +203,16 @@ function preEngine(options?: IEngineOptions): PreEngine {
     return entity!
   }
 
+  function* getEntitiesByTag(tagName: string): Iterable<Entity> {
+    const TagComponent = components.Tags({ defineComponent })
+    for (const [entity, component] of getEntitiesWith(TagComponent)) {
+      const tagComponent = component as Tags
+      if (entity !== 0 && tagComponent.tags?.some((tag) => tag.name === tagName)) {
+        yield entity
+      }
+    }
+  }
+
   function* getComponentDefGroup<T extends ComponentDefinition<any>[]>(...args: T): Iterable<[Entity, ...T]> {
     const [firstComponentDef, ...componentDefinitions] = args
     for (const [entity] of firstComponentDef.iterator()) {
@@ -258,6 +269,7 @@ function preEngine(options?: IEngineOptions): PreEngine {
     getComponentOrNull: getComponentOrNull as IEngine['getComponentOrNull'],
     getEntityOrNullByName,
     getEntityByName,
+    getEntitiesByTag,
     removeComponentDefinition,
     registerComponentDefinition,
     entityContainer,
@@ -320,7 +332,7 @@ export function Engine(options?: IEngineOptions): IEngine {
     seal: partialEngine.seal,
     getEntityOrNullByName: partialEngine.getEntityOrNullByName,
     getEntityByName: partialEngine.getEntityByName,
-
+    getEntitiesByTag: partialEngine.getEntitiesByTag,
     update,
 
     RootEntity: 0 as Entity,
