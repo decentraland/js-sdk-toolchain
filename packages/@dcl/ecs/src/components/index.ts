@@ -17,7 +17,7 @@ import { MediaState } from './generated/pb/decentraland/sdk/components/common/me
 import { defineVirtualCameraComponent, VirtualCameraComponentDefinitionExtended } from './extended/VirtualCamera'
 import { defineInputModifierComponent, InputModifierComponentDefinitionExtended } from './extended/InputModifier'
 import { defineLightSourceComponent, LightSourceComponentDefinitionExtended } from './extended/LightSource'
-import defineTagsComponent, { TagsType } from './manual/Tags'
+import defineTagsComponent, { TagsComponentDefinitionExtended } from './manual/Tags'
 
 export * from './generated/index.gen'
 
@@ -80,9 +80,8 @@ export const Name: (engine: Pick<IEngine, 'defineComponent'>) => LastWriteWinEle
 ) => defineNameComponent(engine)
 
 /* @__PURE__ */
-export const Tags: (engine: Pick<IEngine, 'defineComponent'>) => LastWriteWinElementSetComponentDefinition<TagsType> = (
-  engine
-) => defineTagsComponent(engine)
+export const Tags: (engine: Pick<IEngine, 'defineComponent'>) => TagsComponentDefinitionExtended = (engine) =>
+  defineTagsComponent(engine)
 
 /**
  * @alpha

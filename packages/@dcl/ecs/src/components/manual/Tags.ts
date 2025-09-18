@@ -6,7 +6,7 @@ export interface TagsType {
   tags: string[]
 }
 
-export interface TagsComponentDefinition extends LastWriteWinElementSetComponentDefinition<TagsType> {
+export interface TagsComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<TagsType> {
   /**
    * @public
    *
@@ -28,9 +28,14 @@ export interface TagsComponentDefinition extends LastWriteWinElementSetComponent
   removeTag(entity: Entity, tagName: string): boolean
 }
 
-export type TagsComponent = TagsComponentDefinition
-
-function defineTagsComponent(engine: Pick<IEngine, 'defineComponent'>): TagsComponentDefinition {
+/**
+ * @public
+ *
+ * Define the Tags component
+ * @param engine - the engine to define the component on
+ * @returns the Tags component definition
+ */
+function defineTagsComponent(engine: Pick<IEngine, 'defineComponent'>): TagsComponentDefinitionExtended {
   const Tags = engine.defineComponent('core-schema::Tags', {
     tags: Schemas.Array(Schemas.String)
   })
