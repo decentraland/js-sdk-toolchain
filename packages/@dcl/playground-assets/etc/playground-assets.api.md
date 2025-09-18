@@ -4091,8 +4091,8 @@ export const Tags: TagsComponentDefinitionExtended;
 //
 // @public (undocumented)
 export interface TagsComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<TagsType> {
-    addTag(entity: Entity, tagName: string): boolean;
-    removeTag(entity: Entity, tagName: string): boolean;
+    add(entity: Entity, tagName: string): boolean;
+    remove(entity: Entity, tagName: string): boolean;
 }
 
 // Warning: (ae-missing-release-tag) "TagsType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)

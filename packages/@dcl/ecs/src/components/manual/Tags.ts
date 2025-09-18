@@ -15,7 +15,7 @@ export interface TagsComponentDefinitionExtended extends LastWriteWinElementSetC
    * @param tagName - the tag name to add
    * @returns true if successful, false if the entity doesn't have a Tags component
    */
-  addTag(entity: Entity, tagName: string): boolean
+  add(entity: Entity, tagName: string): boolean
 
   /**
    * @public
@@ -25,7 +25,7 @@ export interface TagsComponentDefinitionExtended extends LastWriteWinElementSetC
    * @param tagName - the tag name to remove
    * @returns true if successful, false if the entity doesn't have a Tags component or the tag doesn't exist
    */
-  removeTag(entity: Entity, tagName: string): boolean
+  remove(entity: Entity, tagName: string): boolean
 }
 
 /**
@@ -42,7 +42,7 @@ function defineTagsComponent(engine: Pick<IEngine, 'defineComponent'>): TagsComp
 
   return {
     ...Tags,
-    addTag(entity: Entity, tagName: string): boolean {
+    add(entity: Entity, tagName: string): boolean {
       const tagsComponent = Tags.getMutableOrNull(entity)
 
       if (tagsComponent) {
@@ -54,14 +54,10 @@ function defineTagsComponent(engine: Pick<IEngine, 'defineComponent'>): TagsComp
 
       return true
     },
-    removeTag(entity: Entity, tagName: string): boolean {
+    remove(entity: Entity, tagName: string): boolean {
       const tagsComponent = Tags.getMutableOrNull(entity)
       if (!tagsComponent || !tagsComponent.tags) return false
-
-      const tagIndex = tagsComponent.tags.indexOf(tagName)
-      if (tagIndex === -1) return false
-
-      tagsComponent.tags.splice(tagIndex, 1)
+      tagsComponent.tags = tagsComponent.tags.filter((tag) => tag !== tagName)
       return true
     }
   }
