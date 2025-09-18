@@ -4085,12 +4085,13 @@ export const SYSTEMS_REGULAR_PRIORITY = 100000;
 // Warning: (ae-missing-release-tag) "Tags" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export const Tags: TagsComponent;
+export const Tags: LastWriteWinElementSetComponentDefinition<TagsType>;
 
+// Warning: (ae-forgotten-export) The symbol "TagsComponentDefinition" needs to be exported by the entry point index.d.ts
 // Warning: (ae-missing-release-tag) "TagsComponent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
-export type TagsComponent = LastWriteWinElementSetComponentDefinition<TagsType>;
+export type TagsComponent = TagsComponentDefinition;
 
 // Warning: (ae-missing-release-tag) "TagsType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
