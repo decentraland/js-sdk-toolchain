@@ -10,10 +10,10 @@ export interface TagsComponentDefinitionExtended extends LastWriteWinElementSetC
   /**
    * @public
    *
-   * Add a tag to the entity's Tags component
+   * Add a tag to the entity's Tags component or create the component if it doesn't exist and add the tag
    * @param entity - entity to add the tag to
    * @param tagName - the tag name to add
-   * @returns true if successful, false if the entity doesn't have a Tags component
+   * @returns true
    */
   add(entity: Entity, tagName: string): boolean
 
@@ -44,14 +44,11 @@ function defineTagsComponent(engine: Pick<IEngine, 'defineComponent'>): TagsComp
     ...Tags,
     add(entity: Entity, tagName: string): boolean {
       const tagsComponent = Tags.getMutableOrNull(entity)
-
       if (tagsComponent) {
         tagsComponent.tags.push(tagName)
-        return true
       } else {
         Tags.createOrReplace(entity, { tags: [tagName] })
       }
-
       return true
     },
     remove(entity: Entity, tagName: string): boolean {

@@ -24,7 +24,7 @@ import {
 } from './grow-only-value-set-component-definition'
 import { removeEntityWithChildren as removeEntityWithChildrenEngine } from '../runtime/helpers/tree'
 import { CrdtMessageType } from '../serialization/crdt'
-import { TagsType } from '../components/manual/Tags'
+import { TagsComponentDefinitionExtended, TagsType } from '../components/manual/Tags'
 export * from './input'
 export * from './readonly'
 export * from './types'
@@ -206,8 +206,7 @@ function preEngine(options?: IEngineOptions): PreEngine {
   function* getEntitiesByTag(tagName: string): Iterable<Entity> {
     const TagComponent = components.Tags({ defineComponent })
     for (const [entity, component] of getEntitiesWith(TagComponent)) {
-      const tagComponent = component as TagsType
-      if (entity !== 0 && tagComponent.tags?.some((tag) => tag === tagName)) {
+      if (entity !== 0 && component.tags?.some((tag) => tag === tagName)) {
         yield entity
       }
     }
