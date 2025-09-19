@@ -24,7 +24,6 @@ import {
 } from './grow-only-value-set-component-definition'
 import { removeEntityWithChildren as removeEntityWithChildrenEngine } from '../runtime/helpers/tree'
 import { CrdtMessageType } from '../serialization/crdt'
-import { TagsComponentDefinitionExtended, TagsType } from '../components/manual/Tags'
 export * from './input'
 export * from './readonly'
 export * from './types'

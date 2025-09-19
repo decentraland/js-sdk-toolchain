@@ -261,7 +261,7 @@ export interface IEngine {
    * @public
    * Get all entities that have a specific tag in their Tag component
    * @param tag - Tag to search
-   * @returns Array of entities that have the specified tag
+   * @returns Iterator of entities that have the given tag
    */
   getEntitiesByTag(tagName: string): Iterable<Entity>
 

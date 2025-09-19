@@ -54,7 +54,11 @@ function defineTagsComponent(engine: Pick<IEngine, 'defineComponent'>): TagsComp
     remove(entity: Entity, tagName: string): boolean {
       const tagsComponent = Tags.getMutableOrNull(entity)
       if (!tagsComponent || !tagsComponent.tags) return false
-      tagsComponent.tags = tagsComponent.tags.filter((tag) => tag !== tagName)
+
+      const newTags = tagsComponent.tags.filter((tag) => tag !== tagName)
+      if (newTags.length === tagsComponent.tags.length) return false
+
+      tagsComponent.tags = newTags
       return true
     }
   }
