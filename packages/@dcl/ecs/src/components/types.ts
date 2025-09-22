@@ -8,6 +8,7 @@ export type { TweenHelper, TweenComponentDefinitionExtended } from './extended/T
 export type { CameraTransitionHelper, VirtualCameraComponentDefinitionExtended } from './extended/VirtualCamera'
 export type { TransformComponentExtended, TransformTypeWithOptionals } from './manual/Transform'
 export type { NameComponent, NameType } from './manual/Name'
+export type { TagsComponentDefinitionExtended, TagsType } from './manual/Tags'
 export type { ISyncComponents, ISyncComponentsType } from './manual/SyncComponents'
 export type { INetowrkEntity, INetowrkEntityType } from './manual/NetworkEntity'
 export type { INetowrkParent, INetowrkParentType } from './manual/NetworkParent'
