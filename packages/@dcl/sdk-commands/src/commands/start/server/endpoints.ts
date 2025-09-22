@@ -547,8 +547,12 @@ async function fakeEntityV3FromProject(
   const projectFiles = await getProjectPublishableFilesWithHashes(components, project.workingDirectory, hashingFunction)
   const contentFiles = projectFilesToContentMappings(project.workingDirectory, projectFiles)
 
-  if (project.kind === 'scene' || project.kind === 'smart-wearable') {
+  if (project.kind === 'scene') {
     return createSceneEntity(components, project, contentFiles, hashingFunction)
+  }
+
+  if (project.kind === 'smart-wearable') {
+    return createWearableEntity(components, project, contentFiles, hashingFunction)
   }
 
   return null
