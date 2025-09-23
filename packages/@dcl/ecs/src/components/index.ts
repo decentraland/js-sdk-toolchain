@@ -17,7 +17,8 @@ import { MediaState } from './generated/pb/decentraland/sdk/components/common/me
 import { defineVirtualCameraComponent, VirtualCameraComponentDefinitionExtended } from './extended/VirtualCamera'
 import { defineInputModifierComponent, InputModifierComponentDefinitionExtended } from './extended/InputModifier'
 import { defineLightSourceComponent, LightSourceComponentDefinitionExtended } from './extended/LightSource'
-import { defineTriggerAreaComponent, TriggerAreaComponentDefinitionExtended } from "./extended/TriggerArea";
+import { defineTriggerAreaComponent, TriggerAreaComponentDefinitionExtended } from "./extended/TriggerArea"
+import defineTagsComponent, { TagsComponentDefinitionExtended } from './manual/Tags'
 
 export * from './generated/index.gen'
 
@@ -82,6 +83,10 @@ export const TriggerArea: LwwComponentGetter<TriggerAreaComponentDefinitionExten
 export const Name: (engine: Pick<IEngine, 'defineComponent'>) => LastWriteWinElementSetComponentDefinition<NameType> = (
   engine
 ) => defineNameComponent(engine)
+
+/* @__PURE__ */
+export const Tags: (engine: Pick<IEngine, 'defineComponent'>) => TagsComponentDefinitionExtended = (engine) =>
+  defineTagsComponent(engine)
 
 /**
  * @alpha
