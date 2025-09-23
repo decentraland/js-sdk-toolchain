@@ -1,24 +1,11 @@
 import * as components from '../components'
 import { DeepReadonlyObject, Entity, IEngine } from "../engine";
-import { ColliderLayer, PBTriggerAreaResult, TriggerAreaEventType, TriggerAreaMeshType } from "../components";
+import { PBTriggerAreaResult, TriggerAreaEventType } from "../components";
 
 /**
  * @public
  */
 export type TriggerAreaEventSystemCallback = (result: DeepReadonlyObject<PBTriggerAreaResult>) => void
-
-/**
- * @public
- */
-/*export type TriggerAreaEventSystemOptions = {
-  collisionMask?: number | undefined,
-  mesh: TriggerAreaMeshType
-}*/
-
-// export const getDefaultOpts = (opts: Partial<TriggerAreaEventSystemOptions> = {}): TriggerAreaEventSystemOptions => ({
-//   mesh: TriggerAreaMeshType.TAMT_BOX,
-//   collisionMask: ColliderLayer.CL_PLAYER
-// })
 
 /**
  * @public
@@ -74,13 +61,12 @@ export interface TriggerAreaEventsSystem {
  * @internal
  */
 export function createTriggerAreaEventsSystem(engine: IEngine) : TriggerAreaEventsSystem {
-  const triggerAreaComponent = components.TriggerArea(engine)
   const triggerAreaResultComponent = components.TriggerAreaResult(engine)
   const entitiesMap = new Map<
     Entity,
     {
       triggerCallbackMap: Map<TriggerAreaEventType, TriggerAreaEventSystemCallback>,
-      lastConsumedIndex: number
+      lastConsumedTimestamp: number
     }
   >()
 
@@ -95,7 +81,7 @@ export function createTriggerAreaEventsSystem(engine: IEngine) : TriggerAreaEven
       entitiesMap.set(entity,
         {
           triggerCallbackMap: new Map<TriggerAreaEventType, TriggerAreaEventSystemCallback>([[triggerType, callback]]),
-          lastConsumedIndex: -1
+          lastConsumedTimestamp: -1
         })
     }
   }
@@ -106,8 +92,6 @@ export function createTriggerAreaEventsSystem(engine: IEngine) : TriggerAreaEven
     entitiesMap.get(entity)!.triggerCallbackMap.delete(triggerType)
   }
 
-  // TODO: Where to add the TriggerArea component ???
-
   function onTriggerEnter(entity: Entity, cb: TriggerAreaEventSystemCallback) {
     addEntityCallback(entity, TriggerAreaEventType.TAET_ENTER, cb)
   }
@@ -115,7 +99,6 @@ export function createTriggerAreaEventsSystem(engine: IEngine) : TriggerAreaEven
     removeEntityCallback(entity, TriggerAreaEventType.TAET_ENTER)
   }
 
-  // TODO: Can we infer the "STAY" state when ENTER was received but not EXIT ???
   function onTriggerStay(entity: Entity, cb: TriggerAreaEventSystemCallback) {
     addEntityCallback(entity, TriggerAreaEventType.TAET_STAY, cb)
   }
@@ -132,17 +115,23 @@ export function createTriggerAreaEventsSystem(engine: IEngine) : TriggerAreaEven
 
   engine.addSystem(function TriggerAreaResultSystem() {
     for (const [entity, data] of entitiesMap) {
-      // Can OnChange be used ???
-
-      // triggerAreaResultComponent.getOrNull(enity) // GOVS don't have getOrNull() WTF
       const result = triggerAreaResultComponent.get(entity)
       const values = Array.from(result.values())
-      // const lastValue = values [result.size - 1]
 
-      if (data.lastConsumedIndex === result.size-1)
-        continue
+      if (values.length === 0) continue
 
-      for (let i = data.lastConsumedIndex+1; i < values.length; i++) {
+      // determine starting index for new values (more than one could be added between System updates)
+      // TODO (Optimization): Look for the startIndex with "20-values steps" from latest value backwards
+      let startIndex = 0
+      if (data.lastConsumedTimestamp >= 0) {
+        while (startIndex < values.length && values[startIndex].timestamp <= data.lastConsumedTimestamp) {
+          startIndex++
+        }
+      }
+
+      if (startIndex >= values.length) continue
+
+      for (let i = startIndex; i < values.length; i++) {
         switch (values[i].eventType) {
           case TriggerAreaEventType.TAET_ENTER:
             if (!data.triggerCallbackMap.has(TriggerAreaEventType.TAET_ENTER))
@@ -162,10 +151,8 @@ export function createTriggerAreaEventsSystem(engine: IEngine) : TriggerAreaEven
         }
       }
 
-      data.lastConsumedIndex = result.size - 1
+      data.lastConsumedTimestamp = values[values.length - 1].timestamp
     }
-
-    // engine.getEntitiesWith(triggerAreaResultComponent)
   })
 
   return {
