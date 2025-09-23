@@ -121,16 +121,27 @@ export function createTriggerAreaEventsSystem(engine: IEngine) : TriggerAreaEven
       if (values.length === 0) continue
 
       // determine starting index for new values (more than one could be added between System updates)
-      // TODO (Optimization): Look for the startIndex with "20-values steps" from latest value backwards
+      // search backwards to find the anchor at lastConsumedTimestamp
       let startIndex = 0
       if (data.lastConsumedTimestamp >= 0) {
-        while (startIndex < values.length && values[startIndex].timestamp <= data.lastConsumedTimestamp) {
-          startIndex++
+        const newestTimestamp = values[values.length - 1].timestamp
+
+        // if nothing new, skip processing
+        if (newestTimestamp <= data.lastConsumedTimestamp) {
+          continue
         }
+
+        // Find index of value with the lastConsumedTimestamp
+        let i = values.length - 2
+        while (i >= 0 && values[i].timestamp > data.lastConsumedTimestamp) i--
+
+        // Mark the following value index as the starting point to trigger all the new value callbacks
+        startIndex = i + 1
       }
 
       if (startIndex >= values.length) continue
 
+      // Trigger callbacks for all the new values
       for (let i = startIndex; i < values.length; i++) {
         switch (values[i].eventType) {
           case TriggerAreaEventType.TAET_ENTER:
