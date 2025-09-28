@@ -11,7 +11,7 @@ import { createRaycastSystem, RaycastSystem } from '../../systems/raycast'
 import { createVideoEventsSystem, VideoEventsSystem } from '../../systems/videoEvents'
 import { TweenSystem, createTweenSystem } from '../../systems/tween'
 import { pointerEventColliderChecker } from '../../systems/pointer-event-collider-checker'
-import {createTriggerAreaEventsSystem, TriggerAreaEventsSystem} from "../../systems/triggerArea";
+import { createTriggerAreaEventsSystem, TriggerAreaEventsSystem } from '../../systems/triggerArea'
 
 /**
  * @public

@@ -1,6 +1,6 @@
 import * as components from '../components'
-import { DeepReadonlyObject, Entity, IEngine } from "../engine";
-import { PBTriggerAreaResult, TriggerAreaEventType } from "../components";
+import { DeepReadonlyObject, Entity, IEngine } from '../engine'
+import { PBTriggerAreaResult, TriggerAreaEventType } from '../components'
 
 /**
  * @public
@@ -60,35 +60,37 @@ export interface TriggerAreaEventsSystem {
 /**
  * @internal
  */
-export function createTriggerAreaEventsSystem(engine: IEngine) : TriggerAreaEventsSystem {
+export function createTriggerAreaEventsSystem(engine: IEngine): TriggerAreaEventsSystem {
   const triggerAreaResultComponent = components.TriggerAreaResult(engine)
   const entitiesMap = new Map<
     Entity,
     {
-      triggerCallbackMap: Map<TriggerAreaEventType, TriggerAreaEventSystemCallback>,
+      triggerCallbackMap: Map<TriggerAreaEventType, TriggerAreaEventSystemCallback>
       lastConsumedTimestamp: number
     }
   >()
 
-  function hasCallbacksMap(entity: Entity) : boolean {
+  function hasCallbacksMap(entity: Entity): boolean {
     return entitiesMap.has(entity) && entitiesMap.get(entity) !== undefined
   }
 
-  function addEntityCallback(entity: Entity, triggerType: TriggerAreaEventType, callback: TriggerAreaEventSystemCallback) {
+  function addEntityCallback(
+    entity: Entity,
+    triggerType: TriggerAreaEventType,
+    callback: TriggerAreaEventSystemCallback
+  ) {
     if (hasCallbacksMap(entity)) {
       entitiesMap.get(entity)!.triggerCallbackMap.set(triggerType, callback)
     } else {
-      entitiesMap.set(entity,
-        {
-          triggerCallbackMap: new Map<TriggerAreaEventType, TriggerAreaEventSystemCallback>([[triggerType, callback]]),
-          lastConsumedTimestamp: -1
-        })
+      entitiesMap.set(entity, {
+        triggerCallbackMap: new Map<TriggerAreaEventType, TriggerAreaEventSystemCallback>([[triggerType, callback]]),
+        lastConsumedTimestamp: -1
+      })
     }
   }
 
   function removeEntityCallback(entity: Entity, triggerType: TriggerAreaEventType) {
-    if (!entitiesMap.has(entity) || !entitiesMap.get(entity)!.triggerCallbackMap.has(triggerType))
-      return
+    if (!entitiesMap.has(entity) || !entitiesMap.get(entity)!.triggerCallbackMap.has(triggerType)) return
     entitiesMap.get(entity)!.triggerCallbackMap.delete(triggerType)
   }
 
@@ -145,20 +147,17 @@ export function createTriggerAreaEventsSystem(engine: IEngine) : TriggerAreaEven
       for (let i = startIndex; i < values.length; i++) {
         switch (values[i].eventType) {
           case TriggerAreaEventType.TAET_ENTER:
-            if (!data.triggerCallbackMap.has(TriggerAreaEventType.TAET_ENTER))
-              continue
+            if (!data.triggerCallbackMap.has(TriggerAreaEventType.TAET_ENTER)) continue
             data.triggerCallbackMap.get(TriggerAreaEventType.TAET_ENTER)!(values[i])
-            break;
+            break
           case TriggerAreaEventType.TAET_STAY:
-            if (!data.triggerCallbackMap.has(TriggerAreaEventType.TAET_STAY))
-              continue
+            if (!data.triggerCallbackMap.has(TriggerAreaEventType.TAET_STAY)) continue
             data.triggerCallbackMap.get(TriggerAreaEventType.TAET_STAY)!(values[i])
-            break;
+            break
           case TriggerAreaEventType.TAET_EXIT:
-            if (!data.triggerCallbackMap.has(TriggerAreaEventType.TAET_EXIT))
-              continue
+            if (!data.triggerCallbackMap.has(TriggerAreaEventType.TAET_EXIT)) continue
             data.triggerCallbackMap.get(TriggerAreaEventType.TAET_EXIT)!(values[i])
-            break;
+            break
         }
       }
 
