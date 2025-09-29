@@ -8,7 +8,6 @@ This monorepo contains the core packages for Decentraland's SDK and development 
 - **[@dcl/ecs](packages/@dcl/ecs/README.md)**: Core Entity Component System (ECS) implementation with CRDT-based networking support
 - **[@dcl/react-ecs](packages/@dcl/react-ecs/README.md)**: React bindings for the ECS, providing a declarative way to build UIs using React's component model and JSX syntax
 - **[@dcl/js-runtime](packages/@dcl/js-runtime/README.md)**: TypeScript definitions for the Decentraland scene runtime environment.
-- **[@dcl/inspector](packages/@dcl/inspector/README.md)**: Visual editor and development tool for building Decentraland scenes
 - **[@dcl/sdk-commands](packages/@dcl/sdk-commands/README.md)**: CLI tools and commands for scene development, testing, and deployment
 - **[@dcl/playground-assets](packages/@dcl/playground-assets/README.md)**: Contains the built assets required by the Decentraland Playground
 
@@ -51,15 +50,6 @@ make deep-clean && make install && make build
 # Run all tests
 make test
 
-# Run ECS tests
-make test-ecs
-
-# Run Inspector tests
-make test-inspector
-
-# Run tests with coverage
-make test-coverage
-
 # Update test snapshots
 make update-snapshots
 ```
@@ -71,7 +61,7 @@ The project uses Protocol Buffers for type-safe communication. Protobuf files ar
 To manually rebuild protobuf files:
 
 ```bash
-make proto
+make build
 ```
 
 ## Release Process
@@ -96,10 +86,6 @@ We use snapshot testing with golden files to track runtime performance impacts:
 ```bash
 # All tests
 make test
-
-# Specific package
-make test-ecs
-make test-inspector
 ```
 
 ## SDK Version Support
@@ -137,7 +123,7 @@ Common issues:
 
 - **Build failures**: Try `make clean && make install && make build`
 - **Test failures**: Run `make test` to see detailed errors
-- **Protobuf errors**: Run `make proto` to rebuild protocol buffers
+- **Protobuf errors**: Run `make build` to rebuild protocol buffers
 - **Package conflicts**: Delete `node_modules` and run `make install` again
 - **TypeScript errors**: Check package versions match in `package.json` files
 
@@ -162,7 +148,6 @@ For a deeper understanding of the architecture and design decisions:
 - [ADR-165: Component Declaration](https://adr.decentraland.org/adr/ADR-165) - Describes the ECS component system design
 - [ADR-237: SDK 7 Custom UI Components](https://adr.decentraland.org/adr/ADR-237) - Details the UI component system
 - [ADR-281: Items in Decentraland tooling](https://adr.decentraland.org/adr/ADR-281) - Explains the Items abstraction used across tools
-- [ADR-282: Decentraland Inspector](https://adr.decentraland.org/adr/ADR-282) - Details the Inspector's architecture and integration approaches
 
 For more ADRs, visit our [ADR repository](https://adr.decentraland.org/).
 
