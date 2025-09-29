@@ -1,5 +1,6 @@
 import * as components from '../components'
 import { DeepReadonlyObject, Entity, IEngine } from '../engine'
+import { EntityState } from '../engine/entity'
 import { PBTriggerAreaResult, TriggerAreaEventType } from '../components'
 
 /**
@@ -91,7 +92,11 @@ export function createTriggerAreaEventsSystem(engine: IEngine): TriggerAreaEvent
 
   function removeEntityCallback(entity: Entity, triggerType: TriggerAreaEventType) {
     if (!entitiesMap.has(entity) || !entitiesMap.get(entity)!.triggerCallbackMap.has(triggerType)) return
-    entitiesMap.get(entity)!.triggerCallbackMap.delete(triggerType)
+    const triggerCallbackMap = entitiesMap.get(entity)!.triggerCallbackMap
+    triggerCallbackMap.delete(triggerType)
+
+    // Remove entity if no more trigger callbacks are registered
+    if (triggerCallbackMap.size === 0) entitiesMap.delete(entity)
   }
 
   function onTriggerEnter(entity: Entity, cb: TriggerAreaEventSystemCallback) {
@@ -116,11 +121,19 @@ export function createTriggerAreaEventsSystem(engine: IEngine): TriggerAreaEvent
   }
 
   engine.addSystem(function TriggerAreaResultSystem() {
+    const garbageEntries = []
     for (const [entity, data] of entitiesMap) {
-      const result = triggerAreaResultComponent.get(entity)
-      const values = Array.from(result.values())
+      if (engine.getEntityState(entity) === EntityState.Removed) {
+        garbageEntries.push(entity)
+        continue
+      }
 
-      if (values.length === 0) continue
+      const result = triggerAreaResultComponent.get(entity)
+
+      // The Explorer may be taking time before the result component is put
+      if (result.size === 0) continue
+
+      const values = Array.from(result.values())
 
       // determine starting index for new values (more than one could be added between System updates)
       // search backwards to find the anchor at lastConsumedTimestamp
@@ -163,6 +176,9 @@ export function createTriggerAreaEventsSystem(engine: IEngine): TriggerAreaEvent
 
       data.lastConsumedTimestamp = values[values.length - 1].timestamp
     }
+
+    // Clean up garbage entries
+    garbageEntries.forEach((garbageEntity) => entitiesMap.delete(garbageEntity))
   })
 
   return {
