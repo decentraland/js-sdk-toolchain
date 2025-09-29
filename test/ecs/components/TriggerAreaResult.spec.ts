@@ -15,7 +15,7 @@ describe('Generated TriggerAreaResult ProtoBuf', () => {
       timestamp: 10,
       trigger: {
         entity: 2,
-        layer: 0,
+        layers: 0,
         position: Vector3.create(4, 5, 6),
         rotation: Quaternion.Zero(),
         scale: Vector3.One()
@@ -30,7 +30,7 @@ describe('Generated TriggerAreaResult ProtoBuf', () => {
       timestamp: 20,
       trigger: {
         entity: 3,
-        layer: 1,
+        layers: 1,
         position: undefined,
         rotation: undefined,
         scale: undefined
@@ -45,7 +45,7 @@ describe('Generated TriggerAreaResult ProtoBuf', () => {
       timestamp: 30,
       trigger: {
         entity: 9,
-        layer: 2,
+        layers: 2,
         position: Vector3.One(),
         rotation: Quaternion.Identity(),
         scale: Vector3.create(2, 2, 2)

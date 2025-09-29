@@ -8,8 +8,8 @@ EVAL test/snapshots/production-bundles/billboard.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-  OPCODES ~= 74k
-  MALLOC_COUNT = 15698
+  OPCODES ~= 73k
+  MALLOC_COUNT = 15697
   ALIVE_OBJS_DELTA ~= 3.44k
 CALL onStart()
   OPCODES ~= 0k
@@ -77,4 +77,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 10k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1096.43k bytes
+  MEMORY_USAGE_COUNT ~= 1096.40k bytes

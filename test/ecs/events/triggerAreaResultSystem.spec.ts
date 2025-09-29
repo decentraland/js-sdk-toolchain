@@ -23,7 +23,7 @@ describe('Trigger Area Events Helper System should', () => {
       timestamp,
       trigger: {
         entity: engine.RootEntity as number,
-        layer: 0,
+        layers: 0,
         position: Vector3.Zero(),
         rotation: Quaternion.Zero(),
         scale: Vector3.One()

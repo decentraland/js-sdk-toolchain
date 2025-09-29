@@ -427,11 +427,8 @@ export const enum ColliderLayer {
     CL_CUSTOM8 = 32768,
     CL_NONE = 0,
     CL_PHYSICS = 2,
-    // (undocumented)
-    CL_PLAYER = 65536,
+    CL_PLAYER = 4,
     CL_POINTER = 1,
-    // (undocumented)
-    CL_RESERVED1 = 4,
     // (undocumented)
     CL_RESERVED2 = 8,
     // (undocumented)
@@ -3077,7 +3074,7 @@ export namespace PBTriggerAreaResult {
 // @public (undocumented)
 export interface PBTriggerAreaResult_Trigger {
     entity: number;
-    layer: number;
+    layers: number;
     position: PBVector3 | undefined;
     rotation: PBQuaternion | undefined;
     scale: PBVector3 | undefined;
