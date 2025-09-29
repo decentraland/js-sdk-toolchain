@@ -427,9 +427,8 @@ export const enum ColliderLayer {
     CL_CUSTOM8 = 32768,
     CL_NONE = 0,
     CL_PHYSICS = 2,
+    CL_PLAYER = 4,
     CL_POINTER = 1,
-    // (undocumented)
-    CL_RESERVED1 = 4,
     // (undocumented)
     CL_RESERVED2 = 8,
     // (undocumented)
@@ -656,6 +655,8 @@ export const componentDefinitionByName: {
     "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
     "core::SkyboxTime": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSkyboxTime>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
+    "core::TriggerArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTriggerArea>>;
+    "core::TriggerAreaResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBTriggerAreaResult>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
     "core::TweenSequence": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenSequence>>;
     "core::TweenState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenState>>;
@@ -3038,6 +3039,56 @@ export namespace PBTextShape {
 }
 
 // @public (undocumented)
+export interface PBTriggerArea {
+    collisionMask?: number | undefined;
+    mesh?: TriggerAreaMeshType | undefined;
+}
+
+// @public (undocumented)
+export namespace PBTriggerArea {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTriggerArea;
+    // (undocumented)
+    export function encode(message: PBTriggerArea, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBTriggerAreaResult {
+    eventType: TriggerAreaEventType;
+    timestamp: number;
+    // (undocumented)
+    trigger: PBTriggerAreaResult_Trigger | undefined;
+    triggeredEntity: number;
+    triggeredEntityPosition: PBVector3 | undefined;
+    triggeredEntityRotation: PBQuaternion | undefined;
+}
+
+// @public (undocumented)
+export namespace PBTriggerAreaResult {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTriggerAreaResult;
+    // (undocumented)
+    export function encode(message: PBTriggerAreaResult, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBTriggerAreaResult_Trigger {
+    entity: number;
+    layers: number;
+    position: PBVector3 | undefined;
+    rotation: PBQuaternion | undefined;
+    scale: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBTriggerAreaResult_Trigger {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTriggerAreaResult_Trigger;
+    // (undocumented)
+    export function encode(message: PBTriggerAreaResult_Trigger, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBTween {
     currentTime?: number | undefined;
     duration: number;
@@ -4325,6 +4376,54 @@ export type Transport = {
 
 // @public (undocumented)
 export type TransportMessage = Omit<ReceiveMessage, 'data'>;
+
+// Warning: (ae-missing-release-tag) "TriggerArea" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const TriggerArea: TriggerAreaComponentDefinitionExtended;
+
+// @public (undocumented)
+export interface TriggerAreaComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBTriggerArea> {
+    setBox(entity: Entity, collisionMask?: ColliderLayer | ColliderLayer[]): void;
+    setSphere(entity: Entity, collisionMask?: ColliderLayer | ColliderLayer[]): void;
+}
+
+// @public (undocumented)
+export interface TriggerAreaEventsSystem {
+    onTriggerEnter(entity: Entity, cb: TriggerAreaEventSystemCallback): void;
+    onTriggerExit(entity: Entity, cb: TriggerAreaEventSystemCallback): void;
+    onTriggerStay(entity: Entity, cb: TriggerAreaEventSystemCallback): void;
+    removeOnTriggerEnter(entity: Entity): void;
+    removeOnTriggerExit(entity: Entity): void;
+    removeOnTriggerStay(entity: Entity): void;
+}
+
+// @public
+export const triggerAreaEventsSystem: TriggerAreaEventsSystem;
+
+// @public (undocumented)
+export type TriggerAreaEventSystemCallback = (result: DeepReadonlyObject<PBTriggerAreaResult>) => void;
+
+// @public (undocumented)
+export const enum TriggerAreaEventType {
+    // (undocumented)
+    TAET_ENTER = 0,
+    // (undocumented)
+    TAET_EXIT = 2,
+    // (undocumented)
+    TAET_STAY = 1
+}
+
+// @public (undocumented)
+export const enum TriggerAreaMeshType {
+    // (undocumented)
+    TAMT_BOX = 0,
+    // (undocumented)
+    TAMT_SPHERE = 1
+}
+
+// @public (undocumented)
+export const TriggerAreaResult: GrowOnlyValueSetComponentDefinition<PBTriggerAreaResult>;
 
 // Warning: (ae-missing-release-tag) "Tween" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

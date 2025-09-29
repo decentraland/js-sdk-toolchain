@@ -11,6 +11,7 @@ export * from './systems/raycast'
 export * from './systems/videoEvents'
 export * from './systems/async-task'
 export * from './systems/tween'
+export * from './systems/triggerArea'
 export * from './engine/entity'
 export * from './components/types'
 
@@ -34,7 +35,8 @@ import {
   INetowrkParent,
   VirtualCameraComponentDefinitionExtended,
   InputModifierComponentDefinitionExtended,
-  LightSourceComponentDefinitionExtended
+  LightSourceComponentDefinitionExtended,
+  TriggerAreaComponentDefinitionExtended
 } from './components/types'
 import { NameComponent } from './components/manual/Name'
 import { TagsComponentDefinitionExtended } from './components/manual/Tags'
@@ -53,6 +55,7 @@ export const Tween: TweenComponentDefinitionExtended = /* @__PURE__*/ components
 export const VirtualCamera: VirtualCameraComponentDefinitionExtended = /* @__PURE__*/ components.VirtualCamera(engine)
 export const InputModifier: InputModifierComponentDefinitionExtended = /* @__PURE__*/ components.InputModifier(engine)
 export const LightSource: LightSourceComponentDefinitionExtended = /* @__PURE__*/ components.LightSource(engine)
+export const TriggerArea: TriggerAreaComponentDefinitionExtended = /* @__PURE__*/ components.TriggerArea(engine)
 
 /**
  * @alpha

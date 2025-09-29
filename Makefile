@@ -62,6 +62,9 @@ test-cli:
 	@mkdir -p tmp/scene
 	cd tmp/scene; $(PWD)/packages/@dcl/sdk-commands/dist/index.js init
 
+test-file:
+	node_modules/.bin/jest --detectOpenHandles --colors --runTestsByPath $(FILE)
+
 init-test-scene:
 	git clone https://github.com/decentraland/sdk7-scene-template test-scene
 	cd test-scene && npm i ./../packages/@dcl/sdk  && npm i ./../packages/@dcl/sdk-commands  && npm i ./../packages/@dcl/js-runtime
