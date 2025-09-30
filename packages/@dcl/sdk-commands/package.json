@@ -64,7 +64,8 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json && rm -rf dist/locales && cp -r src/locales dist/locales",
-    "start": "tsc -p tsconfig.json --watch && rm -rf dist/locales && cp -r src/locales dist/locales"
+    "start": "tsc -p tsconfig.json --watch && rm -rf dist/locales && cp -r src/locales dist/locales",
+    "postinstall": "npx @dcl/sdk-commands get-context-files"
   },
   "tsdoc": {
     "tsdocFlavor": "AEDoc"
