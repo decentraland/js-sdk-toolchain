@@ -1,6 +1,7 @@
 import path from 'path'
 import { CliComponents } from '../../components'
 import { declareArgs } from '../../logic/args'
+import { assertValidProjectFolder } from '../../logic/project-validations'
 
 import { Result } from 'arg'
 
@@ -90,6 +91,14 @@ export async function main(options: Options) {
 
   options.components.logger.log(`Working directory: ${targetDir}`)
 
+  try {
+    await assertValidProjectFolder(options.components, targetDir)
+    options.components.logger.log('✓ Valid Scene project')
+  } catch (error) {
+    options.components.logger.log('Not a valid Scene...')
+    return
+  }
+
   const contextDir = path.join(targetDir, 'context')
   const contextExists = await options.components.fs.directoryExists(contextDir)
 
@@ -111,19 +120,14 @@ export async function main(options: Options) {
       const localFilePath = path.join(contextDir, filename)
       await options.components.fs.writeFile(localFilePath, content)
       options.components.logger.log(`✓ Saved ${filePath}`)
-      return { filename: filePath, success: true }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error)
       options.components.logger.log(`✗ Failed to download ${filePath}: ${errorMessage}`)
-      return { filename: filePath, success: false, error: errorMessage }
     }
   })
 
-  const results = await Promise.all(downloadPromises)
+  await Promise.all(downloadPromises)
 
-  const successful = results.filter((r) => r.success).length
-  const failed = results.filter((r) => !r.success).length
-
-  options.components.logger.log(`\nDownload complete: ${successful} successful, ${failed} failed`)
+  options.components.logger.log(`\nDownload complete: ${filesToDownload.length} files processed`)
   options.components.logger.log(`Context files saved to: ${contextDir}`)
 }
