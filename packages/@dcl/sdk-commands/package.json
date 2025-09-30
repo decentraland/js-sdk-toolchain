@@ -65,7 +65,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && rm -rf dist/locales && cp -r src/locales dist/locales",
     "start": "tsc -p tsconfig.json --watch && rm -rf dist/locales && cp -r src/locales dist/locales",
-    "postinstall": "npx @dcl/sdk-commands get-context-files"
+    "postinstall": "if [ \"$NODE_ENV\" != \"development\" ]; then npm run build && npx @dcl/sdk-commands get-context-files; fi"
   },
   "tsdoc": {
     "tsdocFlavor": "AEDoc"
