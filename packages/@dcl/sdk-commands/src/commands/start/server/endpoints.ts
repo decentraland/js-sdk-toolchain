@@ -164,10 +164,10 @@ async function serveFolders(
       }
 
       if (path.resolve(fullPath) === path.resolve(baseProject.workingDirectory)) {
-        // if we are talking about the root directory, then we must return the json of the entity
-        const entity = await fakeEntityV3FromProject(components, baseProject, async ($) => b64HashingFunction($))
+        // if we are talking about the root directory, then we must return the json of the entities
+        const entities = await fakeEntityV3FromProject(components, baseProject, async ($) => b64HashingFunction($))
 
-        if (!entity) return { status: 404 }
+        if (!entities) return { status: 404 }
 
         return {
           headers: {
@@ -175,7 +175,7 @@ async function serveFolders(
             'x-sent': 'true',
             'cache-control': 'no-cache,private,max-age=1'
           },
-          body: entity
+          body: entities
         }
       }
 
@@ -358,11 +358,10 @@ async function getSceneJson(
   const requestedPointers = new Set<string>(pointers)
   const resultEntities: Entity[] = []
 
-  const allDeployments = await Promise.all(
-    workspace.projects.map((project) =>
-      fakeEntityV3FromProject(components, project, async ($) => b64HashingFunction($))
-    )
+  const deploymentPromises = workspace.projects.map((project) =>
+    fakeEntityV3FromProject(components, project, async ($) => b64HashingFunction($))
   )
+  const allDeployments = (await Promise.all(deploymentPromises)).flat()
 
   for (const pointer of Array.from(requestedPointers)) {
     // get deployment by pointer
@@ -479,28 +478,30 @@ async function fakeEntityV3FromProject(
   components: Pick<CliComponents, 'fs' | 'logger'>,
   project: ProjectUnion,
   hashingFunction: (filePath: string) => Promise<string>
-): Promise<Entity | null> {
+): Promise<Entity[]> {
   const projectFiles = await getProjectPublishableFilesWithHashes(components, project.workingDirectory, hashingFunction)
   const contentFiles = projectFilesToContentMappings(project.workingDirectory, projectFiles)
+  const entities: Entity[] = []
 
-  if (project.kind === 'scene') {
-    const sceneJsonPath = path.resolve(project.workingDirectory, 'scene.json')
-    const sceneJson = JSON.parse(await components.fs.readFile(sceneJsonPath, 'utf-8'))
-    const { base, parcels }: { base: string; parcels: string[] } = sceneJson.scene
-    const pointers = new Set<string>()
-    pointers.add(base)
-    parcels.forEach(($) => pointers.add($))
+  // always add the scene entity
+  const sceneJsonPath = path.resolve(project.workingDirectory, 'scene.json')
+  const sceneJson = JSON.parse(await components.fs.readFile(sceneJsonPath, 'utf-8'))
+  const { base, parcels }: { base: string; parcels: string[] } = sceneJson.scene
+  const pointers = new Set<string>()
+  pointers.add(base)
+  parcels.forEach(($) => pointers.add($))
 
-    return {
-      version: 'v3',
-      type: EntityType.SCENE,
-      id: await hashingFunction(project.workingDirectory),
-      pointers: Array.from(pointers),
-      timestamp: Date.now(),
-      metadata: sceneJson,
-      content: contentFiles
-    }
-  } else if (project.kind === 'smart-wearable') {
+  entities.push({
+    version: 'v3',
+    type: EntityType.SCENE,
+    id: await hashingFunction(project.workingDirectory),
+    pointers: Array.from(pointers),
+    timestamp: Date.now(),
+    metadata: sceneJson,
+    content: contentFiles
+  })
+
+  if (project.kind === 'smart-wearable') {
     const wearableJsonPath = path.resolve(project.workingDirectory, 'wearable.json')
     try {
       const wearableJson = JSON.parse(await components.fs.readFile(wearableJsonPath, 'utf-8'))
@@ -511,7 +512,7 @@ async function fakeEntityV3FromProject(
         components.logger.error(`Invalid wearable.json (${wearableJsonPath})`)
       }
 
-      return {
+      entities.push({
         version: 'v3',
         type: EntityType.WEARABLE,
         id: await hashingFunction(project.workingDirectory),
@@ -519,12 +520,12 @@ async function fakeEntityV3FromProject(
         timestamp: Date.now(),
         metadata: wearableJson,
         content: contentFiles
-      }
+      })
     } catch (err: any) {
       components.logger.error(`Unable to load wearable.json`)
       components.logger.error(err)
     }
   }
 
-  return null
+  return entities
 }
