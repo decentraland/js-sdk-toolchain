@@ -65,7 +65,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && rm -rf dist/locales && cp -r src/locales dist/locales",
     "start": "tsc -p tsconfig.json --watch && rm -rf dist/locales && cp -r src/locales dist/locales",
-    "postinstall": "node -e \"if(process.env.INIT_CWD!==process.cwd()){require('child_process').exec('npm run build && npx @dcl/sdk-commands get-context-files',(e)=>e&&console.log('Context files not downloaded:',e.message))}\""
+    "postinstall": "node -e \"if(process.cwd().includes('node_modules')){console.log('Running postinstall for external project...');require('child_process').exec('npx @dcl/sdk-commands get-context-files',(e)=>e&&console.log('Context files not downloaded:',e.message))}else{console.log('Skipping postinstall - not in node_modules')}\""
 
   },
   "tsdoc": {
