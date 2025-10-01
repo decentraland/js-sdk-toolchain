@@ -65,7 +65,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && rm -rf dist/locales && cp -r src/locales dist/locales",
     "start": "tsc -p tsconfig.json --watch && rm -rf dist/locales && cp -r src/locales dist/locales",
-    "postinstall": "if [ \"$NODE_ENV\" != \"development\" ]; then npm run build && npx @dcl/sdk-commands get-context-files; fi"
+    "postinstall": "node -e \"if(process.env.INIT_CWD!==process.cwd()){require('child_process').exec('npm run build && npx @dcl/sdk-commands get-context-files',(e)=>e&&console.log('Context files not downloaded:',e.message))}\""
+
   },
   "tsdoc": {
     "tsdocFlavor": "AEDoc"
