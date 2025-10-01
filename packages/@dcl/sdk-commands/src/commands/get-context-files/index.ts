@@ -103,8 +103,35 @@ export async function main(options: Options) {
   const contextExists = await options.components.fs.directoryExists(contextDir)
 
   if (!contextExists) {
-    options.components.logger.log('Creating .cursor/context directory...')
+    options.components.logger.log('Creating context directory...')
     await options.components.fs.mkdir(contextDir)
+  }
+
+  // Check and update .dclignore
+  const dclIgnorePath = path.join(targetDir, '.dclignore')
+  let dclIgnoreContent = ''
+  let dclIgnoreExists = false
+
+  try {
+    dclIgnoreContent = await options.components.fs.readFile(dclIgnorePath, 'utf8')
+    dclIgnoreExists = true
+    options.components.logger.log('Found .dclignore file')
+  } catch (error) {
+    options.components.logger.log('No .dclignore file found')
+  }
+
+  const ignoreContextName = '.context'
+  const hasContextIgnore = dclIgnoreContent.includes(ignoreContextName)
+
+  if (!hasContextIgnore) {
+    const newContent = dclIgnoreExists 
+      ? `${dclIgnoreContent}\n${ignoreContextName}\n`
+      : `${ignoreContextName}\n`
+    
+    await options.components.fs.writeFile(dclIgnorePath, newContent, 'utf8')
+    options.components.logger.log('✓ Added .context to .dclignore')
+  } else {
+    options.components.logger.log('✓ .context already in .dclignore')
   }
 
   options.components.logger.log(`Discovering context files...`)
