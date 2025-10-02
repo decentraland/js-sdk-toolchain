@@ -2,6 +2,8 @@ import path from 'path'
 import { CliComponents } from '../../components'
 import { declareArgs } from '../../logic/args'
 import { assertValidProjectFolder } from '../../logic/project-validations'
+import { CliError } from '../../logic/error'
+import i18next from 'i18next'
 
 import { Result } from 'arg'
 
@@ -26,6 +28,12 @@ export const args = declareArgs({
   '-h': '--help'
 })
 
+/**
+ * Gets & updates context files from this GitHub repository:
+ * https://github.com/decentraland/documentation/tree/main/ai-sdk-context
+ * Updates the .dclignore file to ignore the context directory
+ */
+
 export function help(options: Options) {
   options.components.logger.log(`
   Usage: 'sdk-commands get-context-files [options]'
@@ -38,29 +46,31 @@ export function help(options: Options) {
   `)
 }
 
-async function listFilesFromPath(fetch: any, path: string = ''): Promise<GitHubFile[]> {
+async function listFilesFromPath(components: Pick<CliComponents, 'fetch'>, path: string = ''): Promise<GitHubFile[]> {
   const url = path ? `${GITHUB_API_BASE}/${path}` : GITHUB_API_BASE
-  const response = await fetch.fetch(url)
+  const response = await components.fetch.fetch(url)
 
   if (!response.ok) {
-    throw new Error(`Failed to list files from ${url}: ${response.statusText}`)
+    throw new CliError('GET_CONTEXT_FILES_LIST_FAILED', i18next.t('errors.get_context_files.list_failed'))
   }
 
-  return await response.json()
+  return (await response.json()) as GitHubFile[]
 }
 
-async function downloadFile(fetch: any, url: string): Promise<string> {
-  const response = await fetch.fetch(url)
+async function downloadFile(components: Pick<CliComponents, 'fetch'>, url: string): Promise<string> {
+  const response = await components.fetch.fetch(url)
   if (!response.ok) {
-    throw new Error(`Failed to download ${url}: ${response.statusText}`)
+    throw new CliError('GET_CONTEXT_FILES_DOWNLOAD_FAILED', i18next.t('errors.get_context_files.download_failed'))
   }
   return await response.text()
 }
 
-async function getAllFiles(fetch: any): Promise<Array<{ url: string; filename: string; path: string }>> {
+async function getAllFiles(
+  components: Pick<CliComponents, 'fetch'>
+): Promise<Array<{ url: string; filename: string; path: string }>> {
   const files: Array<{ url: string; filename: string; path: string }> = []
 
-  const rootFiles = await listFilesFromPath(fetch)
+  const rootFiles = await listFilesFromPath(components)
 
   for (const file of rootFiles) {
     if (file.type === 'file') {
@@ -70,7 +80,7 @@ async function getAllFiles(fetch: any): Promise<Array<{ url: string; filename: s
         path: file.name
       })
     } else if (file.type === 'dir') {
-      const subFiles = await listFilesFromPath(fetch, file.name)
+      const subFiles = await listFilesFromPath(components, file.name)
       for (const subFile of subFiles) {
         if (subFile.type === 'file') {
           files.push({
@@ -88,7 +98,7 @@ async function getAllFiles(fetch: any): Promise<Array<{ url: string; filename: s
 
 async function addContextToDclIgnore(options: Options, targetDir: string): Promise<void> {
   const dclIgnorePath = path.join(targetDir, '.dclignore')
-  
+
   try {
     const dclIgnoreContent = await options.components.fs.readFile(dclIgnorePath, 'utf8')
     const newContent = `${dclIgnoreContent}\ncontext\n`
@@ -124,14 +134,14 @@ export async function main(options: Options) {
 
   options.components.logger.log(`Discovering context files...`)
 
-  const filesToDownload = await getAllFiles(options.components.fetch)
+  const filesToDownload = await getAllFiles(options.components)
 
   options.components.logger.log(`Found ${filesToDownload.length} files to download`)
 
   const downloadPromises = filesToDownload.map(async ({ url, filename, path: filePath }) => {
     try {
       options.components.logger.log(`Downloading ${filePath}...`)
-      const content = await downloadFile(options.components.fetch, url)
+      const content = await downloadFile(options.components, url)
       const localFilePath = path.join(contextDir, filename)
       await options.components.fs.writeFile(localFilePath, content)
       options.components.logger.log(`✓ Saved ${filePath}`)

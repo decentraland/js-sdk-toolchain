@@ -26,6 +26,9 @@ export type CliErrorName =
   | 'QUESTS_INVALID_UUID'
   // Components errors
   | 'CONFIG_NOT_PROVIDED'
+  // Get context files errors
+  | 'GET_CONTEXT_FILES_LIST_FAILED'
+  | 'GET_CONTEXT_FILES_DOWNLOAD_FAILED'
   // General errors
   | 'ACCOUNT_INVALID_PRIVATE_KEY'
   | 'ARGS_ARG_ERROR'
