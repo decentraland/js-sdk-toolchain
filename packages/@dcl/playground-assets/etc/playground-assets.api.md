@@ -4305,6 +4305,7 @@ export namespace TextureMove {
 export interface TextureMoveContinuous {
     // (undocumented)
     direction: PBVector2 | undefined;
+    movementType?: TextureMovementType | undefined;
     // (undocumented)
     speed: number;
 }
