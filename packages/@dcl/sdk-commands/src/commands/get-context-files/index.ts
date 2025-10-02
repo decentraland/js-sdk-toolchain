@@ -29,9 +29,8 @@ export const args = declareArgs({
 })
 
 /**
- * Gets & updates context files from this GitHub repository:
+ * Gets & updates context files from this GitHub repository only on valid scenes
  * https://github.com/decentraland/documentation/tree/main/ai-sdk-context
- * Updates the .dclignore file to ignore the context directory
  */
 
 export function help(options: Options) {
@@ -66,7 +65,8 @@ async function downloadFile(components: Pick<CliComponents, 'fetch'>, url: strin
 }
 
 async function getAllFiles(
-  components: Pick<CliComponents, 'fetch'>
+  components: Pick<CliComponents, 'fetch'>,
+  path: string = ''
 ): Promise<Array<{ url: string; filename: string; path: string }>> {
   const files: Array<{ url: string; filename: string; path: string }> = []
 
@@ -75,38 +75,17 @@ async function getAllFiles(
   for (const file of rootFiles) {
     if (file.type === 'file') {
       files.push({
-        url: `${GITHUB_RAW_BASE}/${file.name}`,
+        url: `${GITHUB_RAW_BASE}/${path ? `${path}/` : ''}${file.name}`,
         filename: file.name,
-        path: file.name
+        path: path ? `${path}/${file.name}` : file.name
       })
     } else if (file.type === 'dir') {
-      const subFiles = await listFilesFromPath(components, file.name)
-      for (const subFile of subFiles) {
-        if (subFile.type === 'file') {
-          files.push({
-            url: `${GITHUB_RAW_BASE}/${file.name}/${subFile.name}`,
-            filename: subFile.name,
-            path: `${file.name}/${subFile.name}`
-          })
-        }
-      }
+      const subFiles = await getAllFiles(components, path ? `${path}/${file.name}` : file.name)
+      files.push(...subFiles)
     }
   }
 
   return files
-}
-
-async function addContextToDclIgnore(options: Options, targetDir: string): Promise<void> {
-  const dclIgnorePath = path.join(targetDir, '.dclignore')
-
-  try {
-    const dclIgnoreContent = await options.components.fs.readFile(dclIgnorePath, 'utf8')
-    const newContent = `${dclIgnoreContent}\ncontext\n`
-    await options.components.fs.writeFile(dclIgnorePath, newContent, 'utf8')
-    options.components.logger.log('✓ Added context to .dclignore')
-  } catch (error) {
-    options.components.logger.log('No .dclignore file found, skipping')
-  }
 }
 
 export async function main(options: Options) {
@@ -129,8 +108,6 @@ export async function main(options: Options) {
     options.components.logger.log('Creating context directory...')
     await options.components.fs.mkdir(contextDir)
   }
-
-  await addContextToDclIgnore(options, targetDir)
 
   options.components.logger.log(`Discovering context files...`)
 

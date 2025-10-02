@@ -16,6 +16,7 @@ export const defaultDclIgnore = [
   '**/*.tsx',
   'Dockerfile',
   'dist',
+  'context',
   'README.md',
   '*.blend',
   '*.fbx',
