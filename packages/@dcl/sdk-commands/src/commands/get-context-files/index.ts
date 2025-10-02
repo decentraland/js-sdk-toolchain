@@ -86,6 +86,19 @@ async function getAllFiles(fetch: any): Promise<Array<{ url: string; filename: s
   return files
 }
 
+async function addContextToDclIgnore(options: Options, targetDir: string): Promise<void> {
+  const dclIgnorePath = path.join(targetDir, '.dclignore')
+  
+  try {
+    const dclIgnoreContent = await options.components.fs.readFile(dclIgnorePath, 'utf8')
+    const newContent = `${dclIgnoreContent}\ncontext\n`
+    await options.components.fs.writeFile(dclIgnorePath, newContent, 'utf8')
+    options.components.logger.log('✓ Added context to .dclignore')
+  } catch (error) {
+    options.components.logger.log('No .dclignore file found, skipping')
+  }
+}
+
 export async function main(options: Options) {
   const targetDir = process.cwd()
 
@@ -107,32 +120,7 @@ export async function main(options: Options) {
     await options.components.fs.mkdir(contextDir)
   }
 
-  // Check and update .dclignore
-  const dclIgnorePath = path.join(targetDir, '.dclignore')
-  let dclIgnoreContent = ''
-  let dclIgnoreExists = false
-
-  try {
-    dclIgnoreContent = await options.components.fs.readFile(dclIgnorePath, 'utf8')
-    dclIgnoreExists = true
-    options.components.logger.log('Found .dclignore file')
-  } catch (error) {
-    options.components.logger.log('No .dclignore file found')
-  }
-
-  const ignoreContextName = '.context'
-  const hasContextIgnore = dclIgnoreContent.includes(ignoreContextName)
-
-  if (!hasContextIgnore) {
-    const newContent = dclIgnoreExists 
-      ? `${dclIgnoreContent}\n${ignoreContextName}\n`
-      : `${ignoreContextName}\n`
-    
-    await options.components.fs.writeFile(dclIgnorePath, newContent, 'utf8')
-    options.components.logger.log('✓ Added .context to .dclignore')
-  } else {
-    options.components.logger.log('✓ .context already in .dclignore')
-  }
+  await addContextToDclIgnore(options, targetDir)
 
   options.components.logger.log(`Discovering context files...`)
 
