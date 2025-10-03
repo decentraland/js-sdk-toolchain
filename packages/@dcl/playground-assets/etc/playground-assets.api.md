@@ -4498,11 +4498,17 @@ export interface TweenHelper {
     // (undocumented)
     Move: (move: Move) => PBTween['mode'];
     // (undocumented)
+    MoveContinuous: (move: MoveContinuous) => PBTween['mode'];
+    // (undocumented)
     Rotate: (rotate: Rotate) => PBTween['mode'];
+    // (undocumented)
+    RotateContinuous: (rotate: RotateContinuous) => PBTween['mode'];
     // (undocumented)
     Scale: (scale: Scale) => PBTween['mode'];
     // (undocumented)
     TextureMove: (textureMove: TextureMove) => PBTween['mode'];
+    // (undocumented)
+    TextureMoveContinuous: (textureMove: TextureMoveContinuous) => PBTween['mode'];
 }
 
 // @public (undocumented)

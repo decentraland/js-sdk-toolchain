@@ -1,5 +1,15 @@
 import { IEngine, LastWriteWinElementSetComponentDefinition } from '../../engine'
-import { Tween, PBTween, Move, Rotate, Scale, TextureMove } from '../generated/index.gen'
+import {
+  Tween,
+  PBTween,
+  Move,
+  Rotate,
+  Scale,
+  TextureMove,
+  MoveContinuous,
+  RotateContinuous,
+  TextureMoveContinuous
+} from '../generated/index.gen'
 
 /**
  * @public
@@ -10,18 +20,29 @@ export interface TweenHelper {
    */
   Move: (move: Move) => PBTween['mode']
   /**
-   * @returns a move mode tween
+   * @returns a move-continuous mode tween
+   */
+  MoveContinuous: (move: MoveContinuous) => PBTween['mode']
+  /**
+   * @returns a rotate mode tween
    */
   Rotate: (rotate: Rotate) => PBTween['mode']
   /**
-   * @returns a move mode tween
+   * @returns a rotate-continuous mode tween
+   */
+  RotateContinuous: (rotate: RotateContinuous) => PBTween['mode']
+  /**
+   * @returns a scale mode tween
    */
   Scale: (scale: Scale) => PBTween['mode']
-
   /**
-   * @returns a texture move mode tween
+   * @returns a texture-move mode tween
    */
   TextureMove: (textureMove: TextureMove) => PBTween['mode']
+  /**
+   * @returns a texture-move-continuous mode tween
+   */
+  TextureMoveContinuous: (textureMove: TextureMoveContinuous) => PBTween['mode']
 }
 
 /**
@@ -41,10 +62,22 @@ const TweenHelper: TweenHelper = {
       move
     }
   },
+  MoveContinuous(moveContinuous) {
+    return {
+      $case: 'moveContinuous' as const,
+      moveContinuous
+    }
+  },
   Rotate(rotate) {
     return {
       $case: 'rotate',
       rotate
+    }
+  },
+  RotateContinuous(rotateContinuous) {
+    return {
+      $case: 'rotateContinuous',
+      rotateContinuous
     }
   },
   Scale(scale) {
@@ -57,6 +90,12 @@ const TweenHelper: TweenHelper = {
     return {
       $case: 'textureMove',
       textureMove
+    }
+  },
+  TextureMoveContinuous(textureMoveContinuous) {
+    return {
+      $case: 'textureMoveContinuous',
+      textureMoveContinuous
     }
   }
 }
