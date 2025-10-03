@@ -53,7 +53,8 @@
   },
   "files": [
     "dist",
-    ".dclrc"
+    ".dclrc",
+    "scripts"
   ],
   "keywords": [],
   "license": "Apache-2.0",
@@ -65,7 +66,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && rm -rf dist/locales && cp -r src/locales dist/locales",
     "start": "tsc -p tsconfig.json --watch && rm -rf dist/locales && cp -r src/locales dist/locales",
-    "postinstall": "node -e \"if(process.cwd().includes('node_modules')){const path=require('path');const sceneDir=path.resolve(process.cwd(),'../../..');require('child_process').exec('npx @dcl/sdk-commands get-context-files',{cwd:sceneDir},(e,stdout,stderr)=>{if(e){console.log('Error:',e.message)}else{console.log(stdout)}})}\""
+    "postinstall": "node scripts/postinstall.js"
   },
   "tsdoc": {
     "tsdocFlavor": "AEDoc"
