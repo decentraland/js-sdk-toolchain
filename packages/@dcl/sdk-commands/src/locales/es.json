@@ -48,6 +48,10 @@
       "invalid_realm_name": "--realmName tiene caracteres inválidos",
       "invalid_output_directory": "La ruta de destino {{outputDirectory}} no es un directorio"
     },
+    "get_context_files": {
+      "list_failed": "Error al listar archivos de contexto",
+      "download_failed": "Error al descargar archivo de contexto"
+    },
     "init": {
       "dir_not_empty": "El directorio de destino especificado no está vacío. Ejecuta este comando con --yes para sobrescribir.",
       "invalid_arguments": "No se permite especificar --template y --project al mismo tiempo. Por favor especifica solo uno de ellos.",

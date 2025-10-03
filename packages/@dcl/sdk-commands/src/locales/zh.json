@@ -48,6 +48,10 @@
       "invalid_realm_name": "--realmName 包含无效字符",
       "invalid_output_directory": "目标路径 {{outputDirectory}} 不是一个目录"
     },
+    "get_context_files": {
+      "list_failed": "列出上下文文件失败",
+      "download_failed": "下载上下文文件失败"
+    },
     "init": {
       "dir_not_empty": "指定的目标目录不为空。使用 --yes 运行此命令以覆盖。",
       "invalid_arguments": "不允许同时指定 --template 和 --project。请只指定其中一个。",

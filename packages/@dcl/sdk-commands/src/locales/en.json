@@ -48,6 +48,10 @@
       "invalid_realm_name": "--realmName has invalid characters",
       "invalid_output_directory": "The destination path {{outputDirectory}} is not a directory"
     },
+    "get_context_files": {
+      "list_failed": "Failed to list context files",
+      "download_failed": "Failed to download context file"
+    },
     "init": {
       "dir_not_empty": "The target directory specified is not empty. Run this command with --yes to override.",
       "invalid_arguments": "Specifying --template and --project at the same time is not allowed. Please specify only one of them.",

@@ -53,7 +53,8 @@
   },
   "files": [
     "dist",
-    ".dclrc"
+    ".dclrc",
+    "scripts"
   ],
   "keywords": [],
   "license": "Apache-2.0",
@@ -64,7 +65,8 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json && rm -rf dist/locales && cp -r src/locales dist/locales",
-    "start": "tsc -p tsconfig.json --watch && rm -rf dist/locales && cp -r src/locales dist/locales"
+    "start": "tsc -p tsconfig.json --watch && rm -rf dist/locales && cp -r src/locales dist/locales",
+    "postinstall": "node scripts/postinstall.js"
   },
   "tsdoc": {
     "tsdocFlavor": "AEDoc"
