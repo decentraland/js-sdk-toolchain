@@ -6,16 +6,13 @@ import { CliError } from '../../logic/error'
 import i18next from 'i18next'
 
 import { Result } from 'arg'
-
-// GitHub API endpoints
 const GITHUB_API_BASE = 'https://api.github.com/repos/decentraland/documentation/contents/ai-sdk-context'
-const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/decentraland/documentation/main/ai-sdk-context'
-
 interface GitHubFile {
   name: string
   path: string
   type: 'file' | 'dir'
   download_url?: string
+  url: string
 }
 
 export interface Options {
@@ -28,16 +25,11 @@ export const args = declareArgs({
   '-h': '--help'
 })
 
-/**
- * Gets & updates context files from this GitHub repository only on valid scenes
- * https://github.com/decentraland/documentation/tree/main/ai-sdk-context
- */
-
 export function help(options: Options) {
   options.components.logger.log(`
   Usage: 'sdk-commands get-context-files [options]'
     Options:
-      -h, --help                Displays complete help
+      -h, --help                Gets & updates context files from https://github.com/decentraland/documentation/tree/main/ai-sdk-context only on valid scenes
 
     Example:
     - Get context files:
@@ -45,8 +37,7 @@ export function help(options: Options) {
   `)
 }
 
-async function listFilesFromPath(components: Pick<CliComponents, 'fetch'>, path: string = ''): Promise<GitHubFile[]> {
-  const url = path ? `${GITHUB_API_BASE}/${path}` : GITHUB_API_BASE
+async function listFilesFromPath(components: Pick<CliComponents, 'fetch'>, url: string): Promise<GitHubFile[]> {
   const response = await components.fetch.fetch(url)
 
   if (!response.ok) {
@@ -66,21 +57,23 @@ async function downloadFile(components: Pick<CliComponents, 'fetch'>, url: strin
 
 async function getAllFiles(
   components: Pick<CliComponents, 'fetch'>,
-  path: string = ''
+  initialUrl: string = GITHUB_API_BASE
 ): Promise<Array<{ url: string; filename: string; path: string }>> {
   const files: Array<{ url: string; filename: string; path: string }> = []
-
-  const rootFiles = await listFilesFromPath(components)
-
+  const rootFiles = await listFilesFromPath(components, initialUrl)
   for (const file of rootFiles) {
     if (file.type === 'file') {
-      files.push({
-        url: `${GITHUB_RAW_BASE}/${path ? `${path}/` : ''}${file.name}`,
-        filename: file.name,
-        path: path ? `${path}/${file.name}` : file.name
-      })
+      if (file.download_url) {
+        const filename = file.name
+        const fileInfo = {
+          url: file.download_url,
+          filename: filename,
+          path: file.path
+        }
+        files.push(fileInfo)
+      }
     } else if (file.type === 'dir') {
-      const subFiles = await getAllFiles(components, path ? `${path}/${file.name}` : file.name)
+      const subFiles = await getAllFiles(components, file.url)
       files.push(...subFiles)
     }
   }
@@ -90,9 +83,6 @@ async function getAllFiles(
 
 export async function main(options: Options) {
   const targetDir = process.cwd()
-
-  options.components.logger.log(`Working directory: ${targetDir}`)
-
   try {
     await assertValidProjectFolder(options.components, targetDir)
     options.components.logger.log('✓ Valid Scene project')
@@ -101,35 +91,51 @@ export async function main(options: Options) {
     return
   }
 
-  const contextDir = path.join(targetDir, 'context')
+  const contextDir = path.join(targetDir, 'dclcontext')
   const contextExists = await options.components.fs.directoryExists(contextDir)
 
-  if (!contextExists) {
-    options.components.logger.log('Creating context directory...')
-    await options.components.fs.mkdir(contextDir)
+  if (contextExists) {
+    options.components.logger.log('Context directory exists. Removing old files...')
+    await options.components.fs.rm(contextDir, { recursive: true })
   }
 
-  options.components.logger.log(`Discovering context files...`)
+  options.components.logger.log('Creating context directory...')
+  await options.components.fs.mkdir(contextDir)
 
-  const filesToDownload = await getAllFiles(options.components)
-
-  options.components.logger.log(`Found ${filesToDownload.length} files to download`)
+  const filesToDownload = await getAllFiles(options.components, GITHUB_API_BASE)
+  const successfulDownloads: string[] = []
+  const failedDownloads: Array<{ filePath: string; error: string }> = []
 
   const downloadPromises = filesToDownload.map(async ({ url, filename, path: filePath }) => {
     try {
-      options.components.logger.log(`Downloading ${filePath}...`)
       const content = await downloadFile(options.components, url)
       const localFilePath = path.join(contextDir, filename)
       await options.components.fs.writeFile(localFilePath, content)
       options.components.logger.log(`✓ Saved ${filePath}`)
+      successfulDownloads.push(filePath)
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error)
       options.components.logger.log(`✗ Failed to download ${filePath}: ${errorMessage}`)
+      failedDownloads.push({ filePath, error: errorMessage })
     }
   })
 
   await Promise.all(downloadPromises)
 
-  options.components.logger.log(`\nDownload complete: ${filesToDownload.length} files processed`)
-  options.components.logger.log(`Context files saved to: ${contextDir}`)
+  options.components.logger.log(
+    `\nDownload complete: ${successfulDownloads.length} successful, ${failedDownloads.length} failed`
+  )
+  if (successfulDownloads.length > 0) {
+    options.components.logger.log(`Successfully downloaded:`)
+    successfulDownloads.forEach((filePath) => {
+      options.components.logger.log(`  ✓ ${filePath}`)
+    })
+  }
+
+  if (failedDownloads.length > 0) {
+    options.components.logger.log(`Failed downloads:`)
+    failedDownloads.forEach(({ filePath, error }) => {
+      options.components.logger.log(`  ✗ ${filePath}: ${error}`)
+    })
+  }
 }
