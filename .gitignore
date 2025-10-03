@@ -33,4 +33,4 @@ test/snapshots/bin
 **/.decentraland/ts-entry-points
 
 test/build-ecs/fixtures/ecs7-scene/aCaseSensitiveReadme.md
-!packages/@dcl/sdk-commands/scripts/postinstall.js
+!packages/@dcl/sdk-commands/scripts/*.js
