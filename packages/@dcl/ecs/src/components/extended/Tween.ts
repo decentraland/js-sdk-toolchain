@@ -69,14 +69,14 @@ export interface TweenComponentDefinitionExtended extends LastWriteWinElementSet
     easingFunction?: EasingFunction
   ): void
 
-  setMoveContinuous(entity: Entity, direction: Vector3, speed: number, duration: number): void
-  setRotateContinuous(entity: Entity, direction: Quaternion, speed: number, duration: number): void
+  setMoveContinuous(entity: Entity, direction: Vector3, speed: number, duration?: number): void
+  setRotateContinuous(entity: Entity, direction: Quaternion, speed: number, duration?: number): void
   setTextureMoveContinuous(
     entity: Entity,
     direction: Vector2,
     speed: number,
-    movementType: TextureMovementType,
-    duration: number
+    movementType?: TextureMovementType,
+    duration?: number
   ): void
 }
 
