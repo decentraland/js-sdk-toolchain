@@ -57,16 +57,16 @@ export interface TweenComponentDefinitionExtended extends LastWriteWinElementSet
    */
   Mode: TweenHelper
 
-  setMove(entity: Entity, start: Vector3, end: Vector3, duration: number, easingFunction: EasingFunction): void
-  setScale(entity: Entity, start: Vector3, end: Vector3, duration: number, easingFunction: EasingFunction): void
-  setRotate(entity: Entity, start: Quaternion, end: Quaternion, duration: number, easingFunction: EasingFunction): void
+  setMove(entity: Entity, start: Vector3, end: Vector3, duration: number, easingFunction?: EasingFunction): void
+  setScale(entity: Entity, start: Vector3, end: Vector3, duration: number, easingFunction?: EasingFunction): void
+  setRotate(entity: Entity, start: Quaternion, end: Quaternion, duration: number, easingFunction?: EasingFunction): void
   setTextureMove(
     entity: Entity,
     start: Vector2,
     end: Vector2,
     duration: number,
-    movementType: TextureMovementType,
-    easingFunction: EasingFunction
+    movementType?: TextureMovementType,
+    easingFunction?: EasingFunction
   ): void
 
   setMoveContinuous(entity: Entity, direction: Vector3, speed: number, duration: number): void
