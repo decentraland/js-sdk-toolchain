@@ -1,14 +1,17 @@
-import { IEngine, LastWriteWinElementSetComponentDefinition } from '../../engine'
+import { Entity, IEngine, LastWriteWinElementSetComponentDefinition } from '../../engine'
+import { Quaternion, Vector2, Vector3 } from '../generated/pb/decentraland/common/vectors.gen'
 import {
-  Tween,
-  PBTween,
+  EasingFunction,
   Move,
+  MoveContinuous,
+  PBTween,
   Rotate,
+  RotateContinuous,
   Scale,
   TextureMove,
-  MoveContinuous,
-  RotateContinuous,
-  TextureMoveContinuous
+  TextureMoveContinuous,
+  TextureMovementType,
+  Tween
 } from '../generated/index.gen'
 
 /**
@@ -53,6 +56,28 @@ export interface TweenComponentDefinitionExtended extends LastWriteWinElementSet
    * Texture helpers with constructor
    */
   Mode: TweenHelper
+
+  setMove(entity: Entity, start: Vector3, end: Vector3, duration: number, easingFunction: EasingFunction): void
+  setScale(entity: Entity, start: Vector3, end: Vector3, duration: number, easingFunction: EasingFunction): void
+  setRotate(entity: Entity, start: Quaternion, end: Quaternion, duration: number, easingFunction: EasingFunction): void
+  setTextureMove(
+    entity: Entity,
+    start: Vector2,
+    end: Vector2,
+    duration: number,
+    movementType: TextureMovementType,
+    easingFunction: EasingFunction
+  ): void
+
+  setMoveContinuous(entity: Entity, direction: Vector3, speed: number, duration: number): void
+  setRotateContinuous(entity: Entity, direction: Quaternion, speed: number, duration: number): void
+  setTextureMoveContinuous(
+    entity: Entity,
+    direction: Vector2,
+    speed: number,
+    movementType: TextureMovementType,
+    duration: number
+  ): void
 }
 
 const TweenHelper: TweenHelper = {
@@ -107,6 +132,130 @@ export function defineTweenComponent(
 
   return {
     ...theComponent,
-    Mode: TweenHelper
+    Mode: TweenHelper,
+    setMove(
+      entity: Entity,
+      start: Vector3,
+      end: Vector3,
+      duration: number,
+      easingFunction: EasingFunction = EasingFunction.EF_LINEAR
+    ) {
+      theComponent.createOrReplace(entity, {
+        mode: {
+          $case: 'move',
+          move: {
+            start,
+            end
+          }
+        },
+        duration,
+        easingFunction
+      })
+    },
+    setScale(
+      entity: Entity,
+      start: Vector3,
+      end: Vector3,
+      duration: number,
+      easingFunction: EasingFunction = EasingFunction.EF_LINEAR
+    ) {
+      theComponent.createOrReplace(entity, {
+        mode: {
+          $case: 'scale',
+          scale: {
+            start,
+            end
+          }
+        },
+        duration,
+        easingFunction
+      })
+    },
+    setRotate(
+      entity: Entity,
+      start: Quaternion,
+      end: Quaternion,
+      duration: number,
+      easingFunction: EasingFunction = EasingFunction.EF_LINEAR
+    ) {
+      theComponent.createOrReplace(entity, {
+        mode: {
+          $case: 'rotate',
+          rotate: {
+            start,
+            end
+          }
+        },
+        duration,
+        easingFunction
+      })
+    },
+    setTextureMove(
+      entity: Entity,
+      start: Vector2,
+      end: Vector2,
+      duration: number,
+      movementType: TextureMovementType = TextureMovementType.TMT_OFFSET,
+      easingFunction: EasingFunction = EasingFunction.EF_LINEAR
+    ) {
+      theComponent.createOrReplace(entity, {
+        mode: {
+          $case: 'textureMove',
+          textureMove: {
+            start,
+            end,
+            movementType
+          }
+        },
+        duration,
+        easingFunction
+      })
+    },
+    setMoveContinuous(entity: Entity, direction: Vector3, speed: number, duration: number = 0) {
+      theComponent.createOrReplace(entity, {
+        mode: {
+          $case: 'moveContinuous',
+          moveContinuous: {
+            direction,
+            speed
+          }
+        },
+        duration,
+        easingFunction: EasingFunction.EF_LINEAR
+      })
+    },
+    setRotateContinuous(entity: Entity, direction: Quaternion, speed: number, duration: number = 0) {
+      theComponent.createOrReplace(entity, {
+        mode: {
+          $case: 'rotateContinuous',
+          rotateContinuous: {
+            direction,
+            speed
+          }
+        },
+        duration,
+        easingFunction: EasingFunction.EF_LINEAR
+      })
+    },
+    setTextureMoveContinuous(
+      entity: Entity,
+      direction: Vector2,
+      speed: number,
+      movementType: TextureMovementType = TextureMovementType.TMT_OFFSET,
+      duration: number = 0
+    ) {
+      theComponent.createOrReplace(entity, {
+        mode: {
+          $case: 'textureMoveContinuous',
+          textureMoveContinuous: {
+            direction,
+            speed,
+            movementType
+          }
+        },
+        duration,
+        easingFunction: EasingFunction.EF_LINEAR
+      })
+    }
   }
 }
