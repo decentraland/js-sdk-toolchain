@@ -103,7 +103,8 @@ describe('Generated Tween ProtoBuf', () => {
         }
       },
       duration: 2.5,
-      easingFunction: EasingFunction.EF_EASEINQUAD
+      easingFunction: EasingFunction.EF_EASEINQUAD,
+      playing: true
     })
   })
 
@@ -123,7 +124,8 @@ describe('Generated Tween ProtoBuf', () => {
         }
       },
       duration: 1.5,
-      easingFunction: EasingFunction.EF_EASEOUTQUAD
+      easingFunction: EasingFunction.EF_EASEOUTQUAD,
+      playing: true
     })
   })
 
@@ -143,7 +145,8 @@ describe('Generated Tween ProtoBuf', () => {
         }
       },
       duration: 3.0,
-      easingFunction: EasingFunction.EF_EASEQUAD
+      easingFunction: EasingFunction.EF_EASEQUAD,
+      playing: true
     })
   })
 
@@ -164,7 +167,8 @@ describe('Generated Tween ProtoBuf', () => {
         }
       },
       duration: 1.0,
-      easingFunction: EasingFunction.EF_EASEINSINE
+      easingFunction: EasingFunction.EF_EASEINSINE,
+      playing: true
     })
   })
 
@@ -187,7 +191,8 @@ describe('Generated Tween ProtoBuf', () => {
         }
       },
       duration: 10.0,
-      easingFunction: EasingFunction.EF_LINEAR
+      easingFunction: EasingFunction.EF_LINEAR,
+      playing: true
     })
   })
 
@@ -210,7 +215,8 @@ describe('Generated Tween ProtoBuf', () => {
         }
       },
       duration: 5.0,
-      easingFunction: EasingFunction.EF_LINEAR
+      easingFunction: EasingFunction.EF_LINEAR,
+      playing: true
     })
   })
 
@@ -234,7 +240,8 @@ describe('Generated Tween ProtoBuf', () => {
         }
       },
       duration: 8.0,
-      easingFunction: EasingFunction.EF_LINEAR
+      easingFunction: EasingFunction.EF_LINEAR,
+      playing: true
     })
   })
 
@@ -245,24 +252,34 @@ describe('Generated Tween ProtoBuf', () => {
 
     // Test setMove with default easing function
     Tween.setMove(entity, start, end, 1.0)
-    expect(Tween.get(entity).easingFunction).toBe(EasingFunction.EF_LINEAR)
+    const moveComponent = Tween.get(entity)
+    expect(moveComponent.easingFunction).toBe(EasingFunction.EF_LINEAR)
+    expect(moveComponent.playing).toBe(true)
 
     // Test setScale with default easing function
     Tween.setScale(entity, start, end, 2.0)
-    expect(Tween.get(entity).easingFunction).toBe(EasingFunction.EF_LINEAR)
+    const scaleComponent = Tween.get(entity)
+    expect(scaleComponent.easingFunction).toBe(EasingFunction.EF_LINEAR)
+    expect(scaleComponent.playing).toBe(true)
 
     // Test setRotate with default easing function
     Tween.setRotate(entity, startQuat, endQuat, 1.5)
-    expect(Tween.get(entity).easingFunction).toBe(EasingFunction.EF_LINEAR)
+    const rotateComponent = Tween.get(entity)
+    expect(rotateComponent.easingFunction).toBe(EasingFunction.EF_LINEAR)
+    expect(rotateComponent.playing).toBe(true)
 
     // Test setMoveContinuous with default duration
     const direction = { x: 1, y: 0, z: 0 }
     Tween.setMoveContinuous(entity, direction, 2.0)
-    expect(Tween.get(entity).duration).toBe(0)
+    const moveContinuousComponent = Tween.get(entity)
+    expect(moveContinuousComponent.duration).toBe(0)
+    expect(moveContinuousComponent.playing).toBe(true)
 
     // Test setRotateContinuous with default duration
     Tween.setRotateContinuous(entity, { x: 0, y: 1, z: 0, w: 0 }, 1.5)
-    expect(Tween.get(entity).duration).toBe(0)
+    const rotateContinuousComponent = Tween.get(entity)
+    expect(rotateContinuousComponent.duration).toBe(0)
+    expect(rotateContinuousComponent.playing).toBe(true)
 
     // Test setTextureMove with default movement type and easing function
     Tween.setTextureMove(entity, start2d, end2d, 1.0)
@@ -276,6 +293,7 @@ describe('Generated Tween ProtoBuf', () => {
       }
     })
     expect(textureComponent.easingFunction).toBe(EasingFunction.EF_LINEAR)
+    expect(textureComponent.playing).toBe(true)
 
     // Test setTextureMove with default easing function only
     Tween.setTextureMove(entity, start2d, end2d, 2.0, TextureMovementType.TMT_TILING)
@@ -289,11 +307,13 @@ describe('Generated Tween ProtoBuf', () => {
       }
     })
     expect(textureComponent2.easingFunction).toBe(EasingFunction.EF_LINEAR)
+    expect(textureComponent2.playing).toBe(true)
 
     // Test setTextureMoveContinuous with default movement type and duration
     Tween.setTextureMoveContinuous(entity, { x: 1, y: 1 }, 3.0)
     const component = Tween.get(entity)
     expect(component.duration).toBe(0)
+    expect(component.playing).toBe(true)
     expect(component.mode).toStrictEqual({
       $case: 'textureMoveContinuous',
       textureMoveContinuous: {
@@ -314,7 +334,8 @@ describe('Generated Tween ProtoBuf', () => {
     expect(Tween.get(entity)).toMatchObject({
       mode: { $case: 'move' },
       duration: 1.0,
-      easingFunction: EasingFunction.EF_LINEAR
+      easingFunction: EasingFunction.EF_LINEAR,
+      playing: true
     })
 
     // Test setScale with only required parameters
@@ -322,7 +343,8 @@ describe('Generated Tween ProtoBuf', () => {
     expect(Tween.get(entity)).toMatchObject({
       mode: { $case: 'scale' },
       duration: 0.5,
-      easingFunction: EasingFunction.EF_LINEAR
+      easingFunction: EasingFunction.EF_LINEAR,
+      playing: true
     })
 
     // Test setRotate with only required parameters
@@ -330,7 +352,8 @@ describe('Generated Tween ProtoBuf', () => {
     expect(Tween.get(entity)).toMatchObject({
       mode: { $case: 'rotate' },
       duration: 2.0,
-      easingFunction: EasingFunction.EF_LINEAR
+      easingFunction: EasingFunction.EF_LINEAR,
+      playing: true
     })
 
     // Test setTextureMove with only required parameters
@@ -339,7 +362,8 @@ describe('Generated Tween ProtoBuf', () => {
     expect(textureResult).toMatchObject({
       mode: { $case: 'textureMove' },
       duration: 3.0,
-      easingFunction: EasingFunction.EF_LINEAR
+      easingFunction: EasingFunction.EF_LINEAR,
+      playing: true
     })
     expect(textureResult.mode).toStrictEqual({
       $case: 'textureMove',
@@ -356,7 +380,8 @@ describe('Generated Tween ProtoBuf', () => {
     expect(textureResult2).toMatchObject({
       mode: { $case: 'textureMove' },
       duration: 1.5,
-      easingFunction: EasingFunction.EF_LINEAR
+      easingFunction: EasingFunction.EF_LINEAR,
+      playing: true
     })
     expect(textureResult2.mode).toStrictEqual({
       $case: 'textureMove',
@@ -373,7 +398,8 @@ describe('Generated Tween ProtoBuf', () => {
     expect(Tween.get(entity)).toMatchObject({
       mode: { $case: 'moveContinuous' },
       duration: 0,
-      easingFunction: EasingFunction.EF_LINEAR
+      easingFunction: EasingFunction.EF_LINEAR,
+      playing: true
     })
 
     // Test setRotateContinuous with only required parameters (default duration)
@@ -382,7 +408,8 @@ describe('Generated Tween ProtoBuf', () => {
     expect(Tween.get(entity)).toMatchObject({
       mode: { $case: 'rotateContinuous' },
       duration: 0,
-      easingFunction: EasingFunction.EF_LINEAR
+      easingFunction: EasingFunction.EF_LINEAR,
+      playing: true
     })
 
     // Test setTextureMoveContinuous with only required parameters (default movement type and duration)
@@ -391,7 +418,8 @@ describe('Generated Tween ProtoBuf', () => {
     expect(textureContinuousResult).toMatchObject({
       mode: { $case: 'textureMoveContinuous' },
       duration: 0,
-      easingFunction: EasingFunction.EF_LINEAR
+      easingFunction: EasingFunction.EF_LINEAR,
+      playing: true
     })
     expect(textureContinuousResult.mode).toStrictEqual({
       $case: 'textureMoveContinuous',
@@ -408,7 +436,8 @@ describe('Generated Tween ProtoBuf', () => {
     expect(textureContinuousResult2).toMatchObject({
       mode: { $case: 'textureMoveContinuous' },
       duration: 0,
-      easingFunction: EasingFunction.EF_LINEAR
+      easingFunction: EasingFunction.EF_LINEAR,
+      playing: true
     })
     expect(textureContinuousResult2.mode).toStrictEqual({
       $case: 'textureMoveContinuous',
@@ -429,6 +458,7 @@ describe('Generated Tween ProtoBuf', () => {
     Tween.setMove(entity, start, end, 1.0, EasingFunction.EF_LINEAR)
     const initialComponent = Tween.get(entity)
     expect(initialComponent.mode?.$case).toBe('move')
+    expect(initialComponent.playing).toBe(true)
 
     // Replace with different tween type
     Tween.setScale(entity, { x: 1, y: 1, z: 1 }, { x: 2, y: 2, z: 2 }, 2.0, EasingFunction.EF_EASEINQUAD)
@@ -436,6 +466,7 @@ describe('Generated Tween ProtoBuf', () => {
     expect(replacedComponent.mode?.$case).toBe('scale')
     expect(replacedComponent.duration).toBe(2.0)
     expect(replacedComponent.easingFunction).toBe(EasingFunction.EF_EASEINQUAD)
+    expect(replacedComponent.playing).toBe(true)
 
     // Replace with continuous mode
     const direction = { x: 0, y: 1, z: 0 }
@@ -443,5 +474,6 @@ describe('Generated Tween ProtoBuf', () => {
     const continuousComponent = Tween.get(entity)
     expect(continuousComponent.mode?.$case).toBe('moveContinuous')
     expect(continuousComponent.duration).toBe(10.0)
+    expect(continuousComponent.playing).toBe(true)
   })
 })
