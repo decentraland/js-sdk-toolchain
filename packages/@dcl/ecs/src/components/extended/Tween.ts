@@ -63,7 +63,7 @@ export interface TweenComponentDefinitionExtended extends LastWriteWinElementSet
    * Creates or replaces a move tween component that animates an entity's position from start to end
    * @param entity - entity to apply the tween to
    * @param start - starting position vector
-   * @param end - ending position vector  
+   * @param end - ending position vector
    * @param duration - duration of the tween in seconds
    * @param easingFunction - easing function to use (defaults to EF_LINEAR)
    */
@@ -223,7 +223,8 @@ export function defineTweenComponent(
           }
         },
         duration,
-        easingFunction
+        easingFunction,
+        playing: true
       })
     },
     setScale(
@@ -242,7 +243,8 @@ export function defineTweenComponent(
           }
         },
         duration,
-        easingFunction
+        easingFunction,
+        playing: true
       })
     },
     setRotate(
@@ -261,7 +263,8 @@ export function defineTweenComponent(
           }
         },
         duration,
-        easingFunction
+        easingFunction,
+        playing: true
       })
     },
     setTextureMove(
@@ -282,7 +285,8 @@ export function defineTweenComponent(
           }
         },
         duration,
-        easingFunction
+        easingFunction,
+        playing: true
       })
     },
     setMoveContinuous(entity: Entity, direction: Vector3, speed: number, duration: number = 0) {
@@ -295,7 +299,8 @@ export function defineTweenComponent(
           }
         },
         duration,
-        easingFunction: EasingFunction.EF_LINEAR
+        easingFunction: EasingFunction.EF_LINEAR,
+        playing: true
       })
     },
     setRotateContinuous(entity: Entity, direction: Quaternion, speed: number, duration: number = 0) {
@@ -308,7 +313,8 @@ export function defineTweenComponent(
           }
         },
         duration,
-        easingFunction: EasingFunction.EF_LINEAR
+        easingFunction: EasingFunction.EF_LINEAR,
+        playing: true
       })
     },
     setTextureMoveContinuous(
@@ -328,7 +334,8 @@ export function defineTweenComponent(
           }
         },
         duration,
-        easingFunction: EasingFunction.EF_LINEAR
+        easingFunction: EasingFunction.EF_LINEAR,
+        playing: true
       })
     }
   }
