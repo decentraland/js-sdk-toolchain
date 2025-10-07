@@ -57,9 +57,53 @@ export interface TweenComponentDefinitionExtended extends LastWriteWinElementSet
    */
   Mode: TweenHelper
 
+  /**
+   * @public
+   *
+   * Creates or replaces a move tween component that animates an entity's position from start to end
+   * @param entity - entity to apply the tween to
+   * @param start - starting position vector
+   * @param end - ending position vector  
+   * @param duration - duration of the tween in seconds
+   * @param easingFunction - easing function to use (defaults to EF_LINEAR)
+   */
   setMove(entity: Entity, start: Vector3, end: Vector3, duration: number, easingFunction?: EasingFunction): void
+
+  /**
+   * @public
+   *
+   * Creates or replaces a scale tween component that animates an entity's scale from start to end
+   * @param entity - entity to apply the tween to
+   * @param start - starting scale vector
+   * @param end - ending scale vector
+   * @param duration - duration of the tween in seconds
+   * @param easingFunction - easing function to use (defaults to EF_LINEAR)
+   */
   setScale(entity: Entity, start: Vector3, end: Vector3, duration: number, easingFunction?: EasingFunction): void
+
+  /**
+   * @public
+   *
+   * Creates or replaces a rotation tween component that animates an entity's rotation from start to end
+   * @param entity - entity to apply the tween to
+   * @param start - starting rotation quaternion
+   * @param end - ending rotation quaternion
+   * @param duration - duration of the tween in seconds
+   * @param easingFunction - easing function to use (defaults to EF_LINEAR)
+   */
   setRotate(entity: Entity, start: Quaternion, end: Quaternion, duration: number, easingFunction?: EasingFunction): void
+
+  /**
+   * @public
+   *
+   * Creates or replaces a texture move tween component that animates texture UV coordinates from start to end
+   * @param entity - entity to apply the tween to
+   * @param start - starting UV coordinates
+   * @param end - ending UV coordinates
+   * @param duration - duration of the tween in seconds
+   * @param movementType - type of texture movement (defaults to TMT_OFFSET)
+   * @param easingFunction - easing function to use (defaults to EF_LINEAR)
+   */
   setTextureMove(
     entity: Entity,
     start: Vector2,
@@ -69,8 +113,38 @@ export interface TweenComponentDefinitionExtended extends LastWriteWinElementSet
     easingFunction?: EasingFunction
   ): void
 
+  /**
+   * @public
+   *
+   * Creates or replaces a continuous move tween component that moves an entity continuously in a direction
+   * @param entity - entity to apply the tween to
+   * @param direction - direction vector to move towards
+   * @param speed - speed of movement per second
+   * @param duration - duration of the tween in seconds (defaults to 0 for infinite)
+   */
   setMoveContinuous(entity: Entity, direction: Vector3, speed: number, duration?: number): void
+
+  /**
+   * @public
+   *
+   * Creates or replaces a continuous rotation tween component that rotates an entity continuously
+   * @param entity - entity to apply the tween to
+   * @param direction - rotation direction quaternion
+   * @param speed - speed of rotation per second
+   * @param duration - duration of the tween in seconds (defaults to 0 for infinite)
+   */
   setRotateContinuous(entity: Entity, direction: Quaternion, speed: number, duration?: number): void
+
+  /**
+   * @public
+   *
+   * Creates or replaces a continuous texture move tween component that moves texture UV coordinates continuously
+   * @param entity - entity to apply the tween to
+   * @param direction - direction vector for UV movement
+   * @param speed - speed of UV movement per second
+   * @param movementType - type of texture movement (defaults to TMT_OFFSET)
+   * @param duration - duration of the tween in seconds (defaults to 0 for infinite)
+   */
   setTextureMoveContinuous(
     entity: Entity,
     direction: Vector2,
