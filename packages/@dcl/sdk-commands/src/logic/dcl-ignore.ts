@@ -11,6 +11,7 @@ export const defaultDclIgnore = [
   'tsconfig.json',
   'tslint.json',
   'node_modules',
+  'context',
   '**/*.ts',
   '**/*.tsx',
   'Dockerfile',
