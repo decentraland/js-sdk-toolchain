@@ -4494,17 +4494,17 @@ export interface TweenComponentDefinitionExtended extends LastWriteWinElementSet
     // (undocumented)
     setMove(entity: Entity, start: PBVector3, end: PBVector3, duration: number, easingFunction?: EasingFunction): void;
     // (undocumented)
-    setMoveContinuous(entity: Entity, direction: PBVector3, speed: number, duration: number): void;
+    setMoveContinuous(entity: Entity, direction: PBVector3, speed: number, duration?: number): void;
     // (undocumented)
     setRotate(entity: Entity, start: PBQuaternion, end: PBQuaternion, duration: number, easingFunction?: EasingFunction): void;
     // (undocumented)
-    setRotateContinuous(entity: Entity, direction: PBQuaternion, speed: number, duration: number): void;
+    setRotateContinuous(entity: Entity, direction: PBQuaternion, speed: number, duration?: number): void;
     // (undocumented)
     setScale(entity: Entity, start: PBVector3, end: PBVector3, duration: number, easingFunction?: EasingFunction): void;
     // (undocumented)
     setTextureMove(entity: Entity, start: PBVector2, end: PBVector2, duration: number, movementType?: TextureMovementType, easingFunction?: EasingFunction): void;
     // (undocumented)
-    setTextureMoveContinuous(entity: Entity, direction: PBVector2, speed: number, movementType: TextureMovementType, duration: number): void;
+    setTextureMoveContinuous(entity: Entity, direction: PBVector2, speed: number, movementType?: TextureMovementType, duration?: number): void;
 }
 
 // @public (undocumented)
