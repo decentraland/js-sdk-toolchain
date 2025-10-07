@@ -201,9 +201,9 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
 
       const responseData = (await response.json()) as DeployResponse
 
-if (response.status !== 200 && responseData.message) {
-    throw new Error(responseData.message)
-}
+      if (response.status !== 200 && responseData.message) {
+        throw new Error(responseData.message)
+      }
 
       if (responseData.message) {
         printProgressInfo(options.components.logger, responseData.message)
