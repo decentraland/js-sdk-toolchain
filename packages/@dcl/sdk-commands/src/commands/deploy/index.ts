@@ -194,16 +194,18 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
       options.components.logger.info(`Address: ${linkerResponse.address}`)
       options.components.logger.info(`AuthChain: ${linkerResponse.authChain}`)
       options.components.logger.info(`Network: ${getChainName(linkerResponse.chainId!)}`)
-
       const response = (await client.deploy(deployData, {
         timeout: 600000
       })) as any
 
-      const responseData = (await response.json()) as DeployResponse
+      let responseData
 
-      if (response.status !== 200 && responseData.message) {
-        throw new Error(responseData.message)
+      if (response.status !== 200) {
+        responseData = await response.text()
+        throw new Error(responseData)
       }
+
+      responseData = (await response.json()) as DeployResponse
 
       if (responseData.message) {
         printProgressInfo(options.components.logger, responseData.message)
