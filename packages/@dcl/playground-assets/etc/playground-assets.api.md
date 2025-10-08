@@ -1888,6 +1888,22 @@ export namespace Move {
     export function encode(message: Move, writer?: _m0.Writer): _m0.Writer;
 }
 
+// @public (undocumented)
+export interface MoveContinuous {
+    // (undocumented)
+    direction: PBVector3 | undefined;
+    // (undocumented)
+    speed: number;
+}
+
+// @public (undocumented)
+export namespace MoveContinuous {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): MoveContinuous;
+    // (undocumented)
+    export function encode(message: MoveContinuous, writer?: _m0.Writer): _m0.Writer;
+}
+
 // Warning: (ae-missing-release-tag) "Name" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -3107,6 +3123,15 @@ export interface PBTween {
     } | {
         $case: "textureMove";
         textureMove: TextureMove;
+    } | {
+        $case: "rotateContinuous";
+        rotateContinuous: RotateContinuous;
+    } | {
+        $case: "moveContinuous";
+        moveContinuous: MoveContinuous;
+    } | {
+        $case: "textureMoveContinuous";
+        textureMoveContinuous: TextureMoveContinuous;
     } | undefined;
     playing?: boolean | undefined;
 }
@@ -3970,6 +3995,22 @@ export namespace Rotate {
     export function encode(message: Rotate, writer?: _m0.Writer): _m0.Writer;
 }
 
+// @public (undocumented)
+export interface RotateContinuous {
+    // (undocumented)
+    direction: PBQuaternion | undefined;
+    // (undocumented)
+    speed: number;
+}
+
+// @public (undocumented)
+export namespace RotateContinuous {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): RotateContinuous;
+    // (undocumented)
+    export function encode(message: RotateContinuous, writer?: _m0.Writer): _m0.Writer;
+}
+
 // Warning: (ae-missing-release-tag) "RPCSendableMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -4261,6 +4302,23 @@ export namespace TextureMove {
 }
 
 // @public (undocumented)
+export interface TextureMoveContinuous {
+    // (undocumented)
+    direction: PBVector2 | undefined;
+    movementType?: TextureMovementType | undefined;
+    // (undocumented)
+    speed: number;
+}
+
+// @public (undocumented)
+export namespace TextureMoveContinuous {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): TextureMoveContinuous;
+    // (undocumented)
+    export function encode(message: TextureMoveContinuous, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export const enum TextureMovementType {
     TMT_OFFSET = 0,
     // (undocumented)
@@ -4433,6 +4491,13 @@ export const Tween: TweenComponentDefinitionExtended;
 // @public (undocumented)
 export interface TweenComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBTween> {
     Mode: TweenHelper;
+    setMove(entity: Entity, start: PBVector3, end: PBVector3, duration: number, easingFunction?: EasingFunction): void;
+    setMoveContinuous(entity: Entity, direction: PBVector3, speed: number, duration?: number): void;
+    setRotate(entity: Entity, start: PBQuaternion, end: PBQuaternion, duration: number, easingFunction?: EasingFunction): void;
+    setRotateContinuous(entity: Entity, direction: PBQuaternion, speed: number, duration?: number): void;
+    setScale(entity: Entity, start: PBVector3, end: PBVector3, duration: number, easingFunction?: EasingFunction): void;
+    setTextureMove(entity: Entity, start: PBVector2, end: PBVector2, duration: number, movementType?: TextureMovementType, easingFunction?: EasingFunction): void;
+    setTextureMoveContinuous(entity: Entity, direction: PBVector2, speed: number, movementType?: TextureMovementType, duration?: number): void;
 }
 
 // @public (undocumented)
@@ -4440,11 +4505,17 @@ export interface TweenHelper {
     // (undocumented)
     Move: (move: Move) => PBTween['mode'];
     // (undocumented)
+    MoveContinuous: (move: MoveContinuous) => PBTween['mode'];
+    // (undocumented)
     Rotate: (rotate: Rotate) => PBTween['mode'];
+    // (undocumented)
+    RotateContinuous: (rotate: RotateContinuous) => PBTween['mode'];
     // (undocumented)
     Scale: (scale: Scale) => PBTween['mode'];
     // (undocumented)
     TextureMove: (textureMove: TextureMove) => PBTween['mode'];
+    // (undocumented)
+    TextureMoveContinuous: (textureMove: TextureMoveContinuous) => PBTween['mode'];
 }
 
 // @public (undocumented)
