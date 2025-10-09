@@ -75,7 +75,7 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
     return equal
   }
 
-  const restartTweens: (() => void)[] = []
+  /*const restartTweens: (() => void)[] = []
   // Logic for sequence tweens
   engine.addSystem(() => {
     for (const restart of restartTweens) {
@@ -127,7 +127,7 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
         }
       }
     }
-  }, Number.NEGATIVE_INFINITY)
+  }, Number.NEGATIVE_INFINITY)*/
 
   function backwardsTween(tween: PBTween): PBTween {
     if (tween.mode?.$case === 'move' && tween.mode.move) {
