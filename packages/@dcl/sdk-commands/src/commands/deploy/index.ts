@@ -10,6 +10,7 @@ import { declareArgs } from '../../logic/args'
 import { CliError } from '../../logic/error'
 import { printProgressInfo, printSuccess } from '../../logic/beautiful-logs'
 import { getPackageJson, b64HashingFunction } from '../../logic/project-files'
+import { getInstalledPackageVersion } from '../../logic/config'
 import { Events } from '../../components/analytics'
 import { Result } from 'arg'
 import { getAddressAndSignature, getCatalyst, sceneHasWorldCfg } from './utils'
@@ -26,6 +27,10 @@ interface Options {
 interface ProgrammaticDeployResult {
   finish: () => Promise<void>
   stop: () => Promise<void>
+}
+
+interface DeployResponse {
+  message?: string
 }
 
 export const args = declareArgs({
@@ -120,12 +125,13 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
 
   const contentFiles = new Map(files.map((file) => [file.path, new Uint8Array(file.content)]))
   const trackFeatures = await analyticsFeatures(options.components, resolve(projectRoot, sceneJson.main))
+  const sdkVersion = await getInstalledPackageVersion(options.components, '@dcl/sdk', projectRoot)
 
   const { entityId, files: entityFiles } = await DeploymentBuilder.buildEntity({
     type: EntityType.SCENE,
     pointers: sceneJson.scene.parcels,
     files: contentFiles,
-    metadata: sceneJson
+    metadata: { sdkVersion, ...sceneJson }
   })
 
   // Signing message
@@ -190,13 +196,23 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
       options.components.logger.info(`Address: ${linkerResponse.address}`)
       options.components.logger.info(`AuthChain: ${linkerResponse.authChain}`)
       options.components.logger.info(`Network: ${getChainName(linkerResponse.chainId!)}`)
-
       const response = (await client.deploy(deployData, {
         timeout: 600000
-      })) as { message?: string }
-      if (response.message) {
-        printProgressInfo(options.components.logger, response.message)
+      })) as any
+
+      let responseData
+
+      if (response.status !== 200) {
+        responseData = await response.text()
+        throw new Error(responseData)
       }
+
+      responseData = (await response.json()) as DeployResponse
+
+      if (responseData.message) {
+        printProgressInfo(options.components.logger, responseData.message)
+      }
+
       printSuccess(options.components.logger, 'Content uploaded successfully', sceneUrl)
       options.components.analytics.track('Scene deploy success', {
         ...trackProps,
