@@ -10,6 +10,7 @@ import { declareArgs } from '../../logic/args'
 import { CliError } from '../../logic/error'
 import { printProgressInfo, printSuccess } from '../../logic/beautiful-logs'
 import { getPackageJson, b64HashingFunction } from '../../logic/project-files'
+import { getInstalledPackageVersion } from '../../logic/config'
 import { Events } from '../../components/analytics'
 import { Result } from 'arg'
 import { getAddressAndSignature, getCatalyst, sceneHasWorldCfg } from './utils'
@@ -124,12 +125,13 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
 
   const contentFiles = new Map(files.map((file) => [file.path, new Uint8Array(file.content)]))
   const trackFeatures = await analyticsFeatures(options.components, resolve(projectRoot, sceneJson.main))
+  const sdkVersion = await getInstalledPackageVersion(options.components, '@dcl/sdk', projectRoot)
 
   const { entityId, files: entityFiles } = await DeploymentBuilder.buildEntity({
     type: EntityType.SCENE,
     pointers: sceneJson.scene.parcels,
     files: contentFiles,
-    metadata: sceneJson
+    metadata: { sdkVersion, ...sceneJson }
   })
 
   // Signing message
