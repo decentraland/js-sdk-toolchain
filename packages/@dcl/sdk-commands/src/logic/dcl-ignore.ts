@@ -3,7 +3,6 @@ import { CliComponents } from '../components'
 
 export const defaultDclIgnore = [
   '.*',
-  'package.json',
   'package-lock.json',
   'yarn-lock.json',
   'build.json',
