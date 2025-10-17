@@ -28,6 +28,10 @@ interface ProgrammaticDeployResult {
   stop: () => Promise<void>
 }
 
+interface DeployResponse {
+  message?: string
+}
+
 export const args = declareArgs({
   '--dir': String,
   '--help': Boolean,
@@ -190,13 +194,23 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
       options.components.logger.info(`Address: ${linkerResponse.address}`)
       options.components.logger.info(`AuthChain: ${linkerResponse.authChain}`)
       options.components.logger.info(`Network: ${getChainName(linkerResponse.chainId!)}`)
-
       const response = (await client.deploy(deployData, {
         timeout: 600000
-      })) as { message?: string }
-      if (response.message) {
-        printProgressInfo(options.components.logger, response.message)
+      })) as any
+
+      let responseData
+
+      if (response.status !== 200) {
+        responseData = await response.text()
+        throw new Error(responseData)
       }
+
+      responseData = (await response.json()) as DeployResponse
+
+      if (responseData.message) {
+        printProgressInfo(options.components.logger, responseData.message)
+      }
+
       printSuccess(options.components.logger, 'Content uploaded successfully', sceneUrl)
       options.components.analytics.track('Scene deploy success', {
         ...trackProps,

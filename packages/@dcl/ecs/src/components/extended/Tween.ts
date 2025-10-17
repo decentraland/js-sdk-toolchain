@@ -64,7 +64,7 @@ export interface TweenComponentDefinitionExtended extends LastWriteWinElementSet
    * @param entity - entity to apply the tween to
    * @param start - starting position vector
    * @param end - ending position vector
-   * @param duration - duration of the tween in seconds
+   * @param duration - duration of the tween in milliseconds
    * @param easingFunction - easing function to use (defaults to EF_LINEAR)
    */
   setMove(entity: Entity, start: Vector3, end: Vector3, duration: number, easingFunction?: EasingFunction): void
@@ -76,7 +76,7 @@ export interface TweenComponentDefinitionExtended extends LastWriteWinElementSet
    * @param entity - entity to apply the tween to
    * @param start - starting scale vector
    * @param end - ending scale vector
-   * @param duration - duration of the tween in seconds
+   * @param duration - duration of the tween in milliseconds
    * @param easingFunction - easing function to use (defaults to EF_LINEAR)
    */
   setScale(entity: Entity, start: Vector3, end: Vector3, duration: number, easingFunction?: EasingFunction): void
@@ -88,7 +88,7 @@ export interface TweenComponentDefinitionExtended extends LastWriteWinElementSet
    * @param entity - entity to apply the tween to
    * @param start - starting rotation quaternion
    * @param end - ending rotation quaternion
-   * @param duration - duration of the tween in seconds
+   * @param duration - duration of the tween in milliseconds
    * @param easingFunction - easing function to use (defaults to EF_LINEAR)
    */
   setRotate(entity: Entity, start: Quaternion, end: Quaternion, duration: number, easingFunction?: EasingFunction): void
@@ -100,7 +100,7 @@ export interface TweenComponentDefinitionExtended extends LastWriteWinElementSet
    * @param entity - entity to apply the tween to
    * @param start - starting UV coordinates
    * @param end - ending UV coordinates
-   * @param duration - duration of the tween in seconds
+   * @param duration - duration of the tween in milliseconds
    * @param movementType - type of texture movement (defaults to TMT_OFFSET)
    * @param easingFunction - easing function to use (defaults to EF_LINEAR)
    */
@@ -120,7 +120,7 @@ export interface TweenComponentDefinitionExtended extends LastWriteWinElementSet
    * @param entity - entity to apply the tween to
    * @param direction - direction vector to move towards
    * @param speed - speed of movement per second
-   * @param duration - duration of the tween in seconds (defaults to 0 for infinite)
+   * @param duration - duration of the tween in milliseconds (defaults to 0 for infinite)
    */
   setMoveContinuous(entity: Entity, direction: Vector3, speed: number, duration?: number): void
 
@@ -131,7 +131,7 @@ export interface TweenComponentDefinitionExtended extends LastWriteWinElementSet
    * @param entity - entity to apply the tween to
    * @param direction - rotation direction quaternion
    * @param speed - speed of rotation per second
-   * @param duration - duration of the tween in seconds (defaults to 0 for infinite)
+   * @param duration - duration of the tween in milliseconds (defaults to 0 for infinite)
    */
   setRotateContinuous(entity: Entity, direction: Quaternion, speed: number, duration?: number): void
 
@@ -143,7 +143,7 @@ export interface TweenComponentDefinitionExtended extends LastWriteWinElementSet
    * @param direction - direction vector for UV movement
    * @param speed - speed of UV movement per second
    * @param movementType - type of texture movement (defaults to TMT_OFFSET)
-   * @param duration - duration of the tween in seconds (defaults to 0 for infinite)
+   * @param duration - duration of the tween in milliseconds (defaults to 0 for infinite)
    */
   setTextureMoveContinuous(
     entity: Entity,
