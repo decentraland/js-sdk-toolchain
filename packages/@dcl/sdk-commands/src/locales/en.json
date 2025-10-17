@@ -74,6 +74,13 @@
       "no_input_files": "There are no input files to build: {{entrypointSource}}",
       "rebuild_failed": "Could not rebuild bundle: {{error}}",
       "type_checker_failed": "Typechecker exited with code {{code}}."
+    },
+    "code_to_composite": {
+      "build_failed": "Failed to build the scene: {{error}}",
+      "bundle_not_found": "Could not find the bundled scene at {{bundlePath}}",
+      "execution_failed": "Failed to execute scene code: {{error}}",
+      "no_engine": "Could not find engine instance in the scene bundle. Make sure your scene uses @dcl/sdk.",
+      "files_exist": "Composite or CRDT files already exist. Use --force to overwrite them."
     }
   }
 }
