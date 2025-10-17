@@ -74,6 +74,13 @@
       "no_input_files": "No hay archivos de entrada para construir: {{entrypointSource}}",
       "rebuild_failed": "No se pudo reconstruir el bundle: {{error}}",
       "type_checker_failed": "El typechecker salió con código {{code}}."
+    },
+    "code_to_composite": {
+      "build_failed": "Error al construir la escena: {{error}}",
+      "bundle_not_found": "No se pudo encontrar la escena empaquetada en {{bundlePath}}",
+      "execution_failed": "Error al ejecutar el código de la escena: {{error}}",
+      "no_engine": "No se pudo encontrar la instancia del motor en el bundle de la escena. Asegúrate de que tu escena use @dcl/sdk.",
+      "files_exist": "Los archivos composite o CRDT ya existen. Usa --force para sobrescribirlos."
     }
   }
 }
