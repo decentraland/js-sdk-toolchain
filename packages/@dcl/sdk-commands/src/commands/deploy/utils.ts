@@ -111,6 +111,7 @@ function setDeployRoutes(
 
   // We need to wait so the linker-dapp can receive the response and show a nice message.
   const resolveLinkerPromise = () => setTimeout(() => awaitResponse.resolve(), 100)
+  const rejectLinkerPromise = (e: Error) => setTimeout(() => awaitResponse.reject(e), 100)
   let linkerResponse: LinkerResponse
 
   router.get('/api/files', async () => ({
@@ -159,7 +160,7 @@ function setDeployRoutes(
       }
       return {}
     } catch (e) {
-      resolveLinkerPromise()
+      rejectLinkerPromise(e as Error)
       return { status: 400, body: { message: (e as Error).message } }
     }
   })
