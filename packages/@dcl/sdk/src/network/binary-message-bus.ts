@@ -1,9 +1,9 @@
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 
 export enum CommsMessage {
-  CRDT = 1,
-  REQ_CRDT_STATE = 2,
-  RES_CRDT_STATE = 3,
+  CRDT = 7,
+  REQ_CRDT_STATE = 8,
+  RES_CRDT_STATE = 9,
   CRDT_SERVER = 4,
   CRDT_AUTHORITATIVE = 5,
   CUSTOM_EVENT = 6
