@@ -15,46 +15,37 @@ function isAlreadyCommented(content: string): boolean {
  * Generates the comment header for migrated files
  */
 function generateCommentHeader(content: string): string {
-  return `/* ============================================================================
- * ${COMMENT_MARKER}
- *
- * This code has been migrated to main.composite and main.crdt files.
- * The scene can now be edited visually using the Creator Hub app.
- *
- * To restore code-based workflow: Uncomment the code below
- * For hybrid workflow: Uncomment specific parts you want to keep dynamic
- *
- * Learn more: https://docs.decentraland.org/creator
- * ============================================================================
- *
-${content}
- *
- */`
+  // use line-by-line commenting to avoid issues with existing /* */ comments
+  const commentedLines = content.split('\n').map(line => `// ${line}`).join('\n')
+
+  return `// ============================================================================
+// ${COMMENT_MARKER}
+//
+// This code has been migrated to main.composite and main.crdt files.
+// The scene can now be edited visually using the Creator Hub app.
+//
+// To restore code-based workflow: Uncomment the code below
+// For hybrid workflow: Uncomment specific parts you want to keep dynamic
+//
+// Learn more: https://docs.decentraland.org/creator
+// ============================================================================
+//
+${commentedLines}`
 }
 
 /**
- * Comments out the entire entrypoint file and adds a stub main() function
+ * Replaces the entrypoint file with a stub main() function
  */
 export async function commentEntrypoint({ fs }: Pick<CliComponents, 'fs'>, entrypointPath: string): Promise<void> {
-  const currentContent = await fs.readFile(entrypointPath, 'utf-8')
-
-  // Skip if already commented
-  if (isAlreadyCommented(currentContent)) {
-    return
-  }
-
-  const commentedContent = `${generateCommentHeader(currentContent)}
-
-// Basic stub for scene entrypoint
-import { engine } from '@dcl/sdk/ecs'
+  const stubContent = `// ${COMMENT_MARKER}
+// Scene content is managed by Creator Hub (main.composite)
 
 export function main() {
-  // Scene content is managed by Creator Hub (main.composite)
   // Add dynamic code, systems, or event handlers here
 }
 `
 
-  await fs.writeFile(entrypointPath, commentedContent)
+  await fs.writeFile(entrypointPath, stubContent)
 }
 
 /**
@@ -63,7 +54,6 @@ export function main() {
 async function commentSourceFile({ fs }: Pick<CliComponents, 'fs'>, filePath: string): Promise<void> {
   const currentContent = await fs.readFile(filePath, 'utf-8')
 
-  // Skip if already commented
   if (isAlreadyCommented(currentContent)) {
     return
   }
@@ -91,7 +81,7 @@ export async function commentSourceFiles(
     return []
   }
 
-  const sourceFiles = globSync('**/*.{ts,js}', {
+  const sourceFiles = globSync('**/*.{ts,tsx,js,jsx}', {
     cwd: srcDir,
     absolute: true,
     ignore: ['**/*.d.ts', '**/node_modules/**']

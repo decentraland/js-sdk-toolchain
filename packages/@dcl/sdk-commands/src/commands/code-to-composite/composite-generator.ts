@@ -8,6 +8,12 @@ import {
 import { CliComponents } from '../../components'
 import { createFileSystemInterfaceFromFsComponent } from '../start/data-layer/fs'
 import { Composite } from '@dcl/ecs/dist-cjs'
+import * as path from 'path'
+
+async function ensureDirectoryExists({ fs }: Pick<CliComponents, 'fs'>, filePath: string): Promise<void> {
+  const dir = path.dirname(filePath)
+  await fs.mkdir(dir, { recursive: true })
+}
 
 /**
  * Generates composite and CRDT files from an ECS engine state.
@@ -20,6 +26,11 @@ export async function generateCompositeFiles(
   entityNamesFilePath: string
 ): Promise<void> {
   const { fs } = components
+
+  // ensure all directories exist
+  await ensureDirectoryExists(components, compositeFilePath)
+  await ensureDirectoryExists(components, crdtFilePath)
+  await ensureDirectoryExists(components, entityNamesFilePath)
 
   // generate composite JSON
   const composite = dumpEngineToComposite(engine, 'json')
