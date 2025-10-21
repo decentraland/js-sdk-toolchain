@@ -8,22 +8,194 @@ import { CliError } from '../../logic/error'
 import { bundleProject } from '../../logic/bundle'
 
 /**
+ * Pre-defined mocks for critical ~system modules.
+ */
+const CRITICAL_MODULE_MOCKS: Record<string, any> = {
+  '~system/EngineApi': {
+    crdtSendToRenderer: async () => ({ data: [] }),
+    crdtGetState: async () => ({ hasEntities: false, data: [] }),
+    sendBatch: async () => ({ events: [] }),
+    subscribe: async () => ({}),
+    unsubscribe: async () => ({}),
+    isServer: async () => ({ isServer: false }),
+    crdtGetMessageFromRenderer: async () => ({ data: [] })
+  },
+
+  '~system/Scene': {
+    getSceneInfo: async () => ({
+      cid: '',
+      metadata: '{}',
+      baseUrl: '',
+      contents: []
+    })
+  },
+
+  '~system/UserIdentity': {
+    getUserData: async () => ({
+      data: {
+        displayName: 'Test User',
+        userId: 'test-user-id',
+        hasConnectedWeb3: false,
+        version: 1,
+        avatar: {
+          bodyShape: 'urn:decentraland:off-chain:base-avatars:BaseMale',
+          skinColor: '#000000',
+          hairColor: '#000000',
+          eyeColor: '#000000',
+          wearables: [],
+          snapshots: {
+            face256: '',
+            body: ''
+          }
+        }
+      }
+    }),
+    getUserPublicKey: async () => ({ address: undefined })
+  },
+
+  '~system/EnvironmentApi': {
+    isPreviewMode: async () => ({ isPreview: true }),
+    getBootstrapData: async () => ({
+      id: '',
+      baseUrl: '',
+      entity: {
+        content: [],
+        metadataJson: '{}'
+      },
+      useFPSThrottling: false
+    }),
+    getPlatform: async () => ({ platform: 'desktop' }),
+    areUnsafeRequestAllowed: async () => ({ status: false }),
+    getCurrentRealm: async () => ({ currentRealm: undefined }),
+    getExplorerConfiguration: async () => ({ clientUri: '', configurations: {} }),
+    getDecentralandTime: async () => ({ seconds: Date.now() / 1000 })
+  },
+
+  '~system/Runtime': {
+    getRealm: async () => ({
+      realmInfo: {
+        baseUrl: 'http://localhost',
+        realmName: 'localhost',
+        networkId: 1,
+        commsAdapter: 'offline',
+        isPreview: true
+      }
+    }),
+    getWorldTime: async () => ({ seconds: Date.now() / 1000 }),
+    readFile: async () => ({ content: new Uint8Array(), hash: '' }),
+    getSceneInformation: async () => ({
+      urn: '',
+      content: [],
+      metadataJson: '{}',
+      baseUrl: ''
+    }),
+    getExplorerInformation: async () => ({
+      agent: 'code-to-composite',
+      platform: 'desktop',
+      configurations: {}
+    })
+  },
+
+  '~system/Players': {
+    getPlayerData: async () => ({ data: undefined }),
+    getPlayersInScene: async () => ({ players: [] }),
+    getConnectedPlayers: async () => ({ players: [] })
+  },
+
+  '~system/RestrictedActions': {
+    movePlayerTo: async () => ({}),
+    teleportTo: async () => ({}),
+    triggerEmote: async () => ({}),
+    changeRealm: async () => ({ success: false }),
+    openExternalUrl: async () => ({ success: false }),
+    openNftDialog: async () => ({ success: false }),
+    setCommunicationsAdapter: async () => ({ success: false }),
+    triggerSceneEmote: async () => ({ success: false })
+  },
+
+  '~system/CommsApi': {
+    getActiveVideoStreams: async () => ({ streams: [] })
+  },
+
+  '~system/CommunicationsController': {
+    send: async () => ({}),
+    sendBinary: async () => ({ data: [] })
+  },
+
+  '~system/EthereumController': {
+    requirePayment: async () => ({ jsonAnyResponse: '{}' }),
+    signMessage: async () => ({ message: '', hexEncodedMessage: '', signature: '' }),
+    convertMessageToObject: async () => ({ dict: {} }),
+    sendAsync: async () => ({ jsonAnyResponse: '{}' }),
+    getUserAccount: async () => ({ address: undefined })
+  },
+
+  '~system/PortableExperiences': {
+    spawn: async () => ({ pid: '', parentCid: '', name: '' }),
+    kill: async () => ({ status: false }),
+    exit: async () => ({ status: false }),
+    getPortableExperiencesLoaded: async () => ({ loaded: [] })
+  },
+
+  '~system/SignedFetch': {
+    signedFetch: async () => ({
+      ok: false,
+      status: 404,
+      statusText: 'Not Found',
+      headers: {},
+      body: ''
+    }),
+    getHeaders: async () => ({ headers: {} })
+  },
+
+  '~system/Testing': {
+    logTestResult: async () => ({}),
+    plan: async () => ({}),
+    setCameraTransform: async () => ({})
+  },
+
+  '~system/UserActionModule': {
+    requestTeleport: async () => ({})
+  }
+}
+
+/**
+ * Creates a Proxy that automatically returns async functions for any missing properties.
+ * This ensures that any unknown function calls return a Promise resolving to an empty object.
+ */
+function createAutoMockProxy(baseMock: any = {}): any {
+  return new Proxy(baseMock, {
+    get(target, prop) {
+      // If the property exists in the base mock, return it
+      if (prop in target) {
+        return target[prop]
+      }
+
+      // For any unknown property, return an async function that resolves to an empty object
+      return async (...args: any[]) => {
+        // Return empty object as default for unknown functions
+        return {}
+      }
+    }
+  })
+}
+
+/**
  * Mocks for ~system/* modules that are marked as external in the bundle.
  * These are runtime-specific modules that don't exist in Node.js.
+ *
+ * This hybrid approach:
+ * 1. Returns pre-defined mocks for critical modules with meaningful defaults
+ * 2. Auto-generates mocks for any other module using a Proxy
+ * 3. Handles unknown functions gracefully by returning empty promises
  */
 function createSystemModuleMock(moduleId: string) {
-  if (moduleId === '~system/EngineApi') {
-    return {
-      crdtSendToRenderer: () => {},
-      crdtGetState: async () => ({ hasEntities: false, data: [] }),
-      sendBatch: () => {},
-      subscribe: () => {},
-      unsubscribe: () => {},
-      isServer: () => false
-    }
+  if (moduleId in CRITICAL_MODULE_MOCKS) {
+    return createAutoMockProxy(CRITICAL_MODULE_MOCKS[moduleId])
   }
 
-  return {}
+  // for unknown ~system modules, return a proxy that handles function calls
+  return createAutoMockProxy()
 }
 
 /**
@@ -46,15 +218,59 @@ function setupRequireHook(): () => void {
 }
 
 /**
- * Modifies the bundle code to export the engine instance.
- * The bundle creates a local `engine` variable but doesn't export it,
- * so we inject code to make it available via module.exports.
+ * Transforms the scene bundle code to make it executable in Node.js environment.
+ *
+ * Applies the following modifications:
+ * 1. Exports the engine instance so we can access it after execution
+ * 2. Ensures PlayerEntity has a Transform component before main() runs
  */
-function injectEngineExport(bundleCode: string): string {
-  return bundleCode.replace(
+function transformBundleCode(bundleCode: string): string {
+  let transformed = bundleCode
+
+  // Step 1: export the engine instance (the bundle creates a local 'engine' variable but doesn't export it)
+  transformed = transformed.replace(
     /var engine = (.*?Engine\(\));/,
     'var engine = $1; if (typeof module !== "undefined" && module.exports) { module.exports.engine = engine; }'
   )
+
+  // Step 2: inject PlayerEntity Transform creation
+  // this code runs after engine is created but before main() executes
+  const playerTransformSetup = `
+// Auto-injected: Ensure PlayerEntity has Transform component
+try {
+  if (engine && engine.PlayerEntity !== undefined) {
+    // Find the Transform component from the engine's registered components
+    let Transform = null;
+    for (const component of engine.componentsIter()) {
+      if (component.componentName === 'core::Transform') {
+        Transform = component;
+        break;
+      }
+    }
+
+    if (Transform && !Transform.has(engine.PlayerEntity)) {
+      Transform.create(engine.PlayerEntity, {
+        position: { x: 0, y: 0, z: 0 },
+        rotation: { x: 0, y: 0, z: 0, w: 1 },
+        scale: { x: 1, y: 1, z: 1 }
+      });
+    }
+  }
+} catch (err) {}
+`
+
+  // try to inject before main() function definition
+  let injected = transformed.replace(
+    /((?:function\s+main|(?:const|var|let)\s+main\s*=|exports\.main\s*=))/,
+    `${playerTransformSetup}\n$1`
+  )
+
+  // fallback: inject right after engine creation if 'main()' pattern not found
+  if (injected === transformed) {
+    injected = transformed.replace(/(var engine = .*?Engine\(\);)/, `$1\n${playerTransformSetup}`)
+  }
+
+  return injected
 }
 
 /**
@@ -129,7 +345,7 @@ export async function executeSceneCode(
 
   const bundleCode = await fs.readFile(bundlePath, 'utf-8')
   const tempBundlePath = bundlePath + '.temp.js'
-  const modifiedCode = injectEngineExport(bundleCode)
+  const modifiedCode = transformBundleCode(bundleCode)
   const restoreRequire = setupRequireHook()
 
   try {
