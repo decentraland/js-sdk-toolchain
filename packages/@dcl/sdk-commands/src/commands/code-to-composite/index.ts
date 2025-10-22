@@ -15,6 +15,7 @@ import {
 import { executeSceneCode } from './scene-executor'
 import { generateCompositeFiles } from './composite-generator'
 import { commentSourceFiles } from './code-commenter'
+import { migrateAssets } from './asset-migrator'
 
 interface Options {
   args: Result<typeof args>
@@ -58,7 +59,7 @@ export async function main(options: Options) {
   const workingDirectory = path.resolve(process.cwd(), options.args['--dir'] || '.')
   const workspace = await getValidWorkspace(options.components, workingDirectory)
 
-  const MAX_STEPS = 3
+  const MAX_STEPS = 4
 
   for (const project of workspace.projects) {
     printCurrentProjectStarting(options.components.logger, project, workspace)
@@ -102,17 +103,22 @@ async function exportSceneToCrdt(options: Options, project: SceneProject, maxSte
 
   // Step 1: execute scene code to populate engine
   printProgressStep(logger, 'Executing scene code to capture state', currentStep++, maxSteps)
-  const engine = await executeSceneCode(options.components, project)
+  const engine = await executeSceneCode(options.components, project, crdtFilePath)
   printProgressInfo(logger, `Engine state captured successfully`)
 
-  // Step 2: generate composite and crdt files
+  // Step 2: migrate assets (before generating composite/crdt)
+  printProgressStep(logger, 'Organizing assets for Creator Hub', currentStep++, maxSteps)
+  const updatedCount = await migrateAssets(options.components, project, engine)
+  printProgressInfo(logger, `Migrated ${updatedCount} asset file(s) successfully`)
+
+  // Step 3: generate composite and crdt files (with updated asset paths)
   printProgressStep(logger, 'Generating composite and crdt files', currentStep++, maxSteps)
   await generateCompositeFiles(options.components, engine, compositeFilePath, crdtFilePath, entityNamesFilePath)
   printProgressInfo(logger, `Generated main.composite ✅ (${compositeFilePath})`)
   printProgressInfo(logger, `Generated main.crdt ✅ (${crdtFilePath})`)
   printProgressInfo(logger, `Generated entity-names.ts ✅ (${entityNamesFilePath})`)
 
-  // Step 3: comment out original code
+  // Step 4: comment out original code
   printProgressStep(logger, 'Commenting out original code', currentStep++, maxSteps)
   const entrypoint = path.join(project.workingDirectory, project.scene.main)
   const commentedFiles = await commentSourceFiles(options.components, project.workingDirectory, entrypoint)

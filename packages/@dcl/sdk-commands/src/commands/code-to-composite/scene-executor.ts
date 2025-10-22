@@ -1,179 +1,261 @@
 import path from 'path'
 import Module from 'module'
 import i18next from 'i18next'
-import { IEngine } from '@dcl/ecs'
+import { IEngine as IEngineEcs } from '@dcl/ecs'
+import {
+  Transport,
+  Entity,
+  UiCanvasInformation,
+  CameraMode,
+  PutComponentOperation,
+  engine,
+  Transform,
+} from '@dcl/ecs/dist-cjs'
+import { ReadWriteByteBuffer } from '@dcl/ecs/dist-cjs/serialization/ByteBuffer'
+
+
 import { CliComponents } from '../../components'
 import { SceneProject } from '../../logic/project-validations'
 import { CliError } from '../../logic/error'
 import { bundleProject } from '../../logic/bundle'
 
 /**
- * Pre-defined mocks for critical ~system modules.
+ * Initializes the ECS engine with a mock transport layer.
+ *
+ * The transport layer is used to capture CRDT messages sent by the scene code.
+ * This allows us to capture the state of all entities and components.
  */
-const CRITICAL_MODULE_MOCKS: Record<string, any> = {
-  '~system/EngineApi': {
-    crdtSendToRenderer: async () => ({ data: [] }),
-    crdtGetState: async () => ({ hasEntities: false, data: [] }),
-    sendBatch: async () => ({ events: [] }),
-    subscribe: async () => ({}),
-    unsubscribe: async () => ({}),
-    isServer: async () => ({ isServer: false }),
-    crdtGetMessageFromRenderer: async () => ({ data: [] })
-  },
+function initEngine(): { engine: IEngineEcs, transport: Transport } {
+  const transport: Transport = {
+    filter: () => true,
+    send: async (_messages) => {}
+  }
 
-  '~system/Scene': {
-    getSceneInfo: async () => ({
-      cid: '',
-      metadata: '{}',
-      baseUrl: '',
-      contents: []
-    })
-  },
+  engine.addTransport(transport)
 
-  '~system/UserIdentity': {
-    getUserData: async () => ({
-      data: {
-        displayName: 'Test User',
-        userId: 'test-user-id',
-        hasConnectedWeb3: false,
-        version: 1,
-        avatar: {
-          bodyShape: 'urn:decentraland:off-chain:base-avatars:BaseMale',
-          skinColor: '#000000',
-          hairColor: '#000000',
-          eyeColor: '#000000',
-          wearables: [],
-          snapshots: {
-            face256: '',
-            body: ''
-          }
-        }
-      }
-    }),
-    getUserPublicKey: async () => ({ address: undefined })
-  },
-
-  '~system/EnvironmentApi': {
-    isPreviewMode: async () => ({ isPreview: true }),
-    getBootstrapData: async () => ({
-      id: '',
-      baseUrl: '',
-      entity: {
-        content: [],
-        metadataJson: '{}'
-      },
-      useFPSThrottling: false
-    }),
-    getPlatform: async () => ({ platform: 'desktop' }),
-    areUnsafeRequestAllowed: async () => ({ status: false }),
-    getCurrentRealm: async () => ({ currentRealm: undefined }),
-    getExplorerConfiguration: async () => ({ clientUri: '', configurations: {} }),
-    getDecentralandTime: async () => ({ seconds: Date.now() / 1000 })
-  },
-
-  '~system/Runtime': {
-    getRealm: async () => ({
-      realmInfo: {
-        baseUrl: 'http://localhost',
-        realmName: 'localhost',
-        networkId: 1,
-        commsAdapter: 'offline',
-        isPreview: true
-      }
-    }),
-    getWorldTime: async () => ({ seconds: Date.now() / 1000 }),
-    readFile: async () => ({ content: new Uint8Array(), hash: '' }),
-    getSceneInformation: async () => ({
-      urn: '',
-      content: [],
-      metadataJson: '{}',
-      baseUrl: ''
-    }),
-    getExplorerInformation: async () => ({
-      agent: 'code-to-composite',
-      platform: 'desktop',
-      configurations: {}
-    })
-  },
-
-  '~system/Players': {
-    getPlayerData: async () => ({ data: undefined }),
-    getPlayersInScene: async () => ({ players: [] }),
-    getConnectedPlayers: async () => ({ players: [] })
-  },
-
-  '~system/RestrictedActions': {
-    movePlayerTo: async () => ({}),
-    teleportTo: async () => ({}),
-    triggerEmote: async () => ({}),
-    changeRealm: async () => ({ success: false }),
-    openExternalUrl: async () => ({ success: false }),
-    openNftDialog: async () => ({ success: false }),
-    setCommunicationsAdapter: async () => ({ success: false }),
-    triggerSceneEmote: async () => ({ success: false })
-  },
-
-  '~system/CommsApi': {
-    getActiveVideoStreams: async () => ({ streams: [] })
-  },
-
-  '~system/CommunicationsController': {
-    send: async () => ({}),
-    sendBinary: async () => ({ data: [] })
-  },
-
-  '~system/EthereumController': {
-    requirePayment: async () => ({ jsonAnyResponse: '{}' }),
-    signMessage: async () => ({ message: '', hexEncodedMessage: '', signature: '' }),
-    convertMessageToObject: async () => ({ dict: {} }),
-    sendAsync: async () => ({ jsonAnyResponse: '{}' }),
-    getUserAccount: async () => ({ address: undefined })
-  },
-
-  '~system/PortableExperiences': {
-    spawn: async () => ({ pid: '', parentCid: '', name: '' }),
-    kill: async () => ({ status: false }),
-    exit: async () => ({ status: false }),
-    getPortableExperiencesLoaded: async () => ({ loaded: [] })
-  },
-
-  '~system/SignedFetch': {
-    signedFetch: async () => ({
-      ok: false,
-      status: 404,
-      statusText: 'Not Found',
-      headers: {},
-      body: ''
-    }),
-    getHeaders: async () => ({ headers: {} })
-  },
-
-  '~system/Testing': {
-    logTestResult: async () => ({}),
-    plan: async () => ({}),
-    setCameraTransform: async () => ({})
-  },
-
-  '~system/UserActionModule': {
-    requestTeleport: async () => ({})
+  return {
+    engine: engine as any as IEngineEcs,
+    transport
   }
 }
 
 /**
- * Creates a Proxy that automatically returns async functions for any missing properties.
- * This ensures that any unknown function calls return a Promise resolving to an empty object.
+ * Creates initial CRDT state with required engine components.
+ */
+function getInitialCrdtState(): Uint8Array[] {
+  function addPlayerEntityTransform() {
+    const buffer = new ReadWriteByteBuffer()
+    const transform = Transform.create(engine.PlayerEntity)
+    Transform.schema.serialize(transform, buffer)
+    const transformData = buffer.toCopiedBinary()
+    buffer.resetBuffer()
+    PutComponentOperation.write(1 as Entity, 1, Transform.componentId, transformData, buffer)
+    PutComponentOperation.write(2 as Entity, 1, Transform.componentId, transformData, buffer)
+    return buffer.toBinary()
+  }
+
+  function addUICanvasOnRootEntity() {
+    const buffer = new ReadWriteByteBuffer()
+    const uiCanvasInformation = UiCanvasInformation.create(engine.RootEntity)
+    UiCanvasInformation.schema.serialize(uiCanvasInformation, buffer)
+    const uiCanvasComponentData = buffer.toCopiedBinary()
+    buffer.resetBuffer()
+    PutComponentOperation.write(0 as Entity, 1, UiCanvasInformation.componentId, uiCanvasComponentData, buffer)
+
+    return buffer.toBinary()
+  }
+
+  function addCameraMode() {
+    const buffer = new ReadWriteByteBuffer()
+    const cameraMode = CameraMode.create(engine.RootEntity)
+    CameraMode.schema.serialize(cameraMode, buffer)
+    const cameraModeComponentData = buffer.toCopiedBinary()
+    buffer.resetBuffer()
+    PutComponentOperation.write(2 as Entity, 1, CameraMode.componentId, cameraModeComponentData, buffer)
+    return buffer.toBinary()
+  }
+
+  return [addPlayerEntityTransform(), addUICanvasOnRootEntity(), addCameraMode()]
+}
+
+/**
+ * Creates pre-defined mocks for critical ~system modules.
+ *
+ * These modules are runtime-specific and don't exist in Node.js.
+ * This function provides meaningful mock implementations for the most
+ * commonly used system modules to ensure scene code executes correctly.
+ */
+function createCriticalModuleMocks(engine: IEngineEcs, transport: Transport, crdtState: Uint8Array): Record<string, any> {
+  return {
+    '~system/EngineApi': {
+      crdtSendToRenderer: async (crdt: { data: Uint8Array }) => {
+        transport.onmessage!(crdt.data)
+        await engine.update(0)
+      },
+      crdtGetState: async () => ({
+        hasEntities: false,
+        data: [...getInitialCrdtState(), crdtState]
+      }),
+      sendBatch: async () => ({ events: [] }),
+      subscribe: async () => ({}),
+      unsubscribe: async () => ({}),
+      isServer: async () => ({ isServer: false }),
+      crdtGetMessageFromRenderer: async () => ({ data: [] })
+    },
+
+    '~system/Scene': {
+      getSceneInfo: async () => ({
+        cid: '',
+        metadata: '{}',
+        baseUrl: '',
+        contents: []
+      })
+    },
+
+    '~system/UserIdentity': {
+      getUserData: async () => ({
+        data: {
+          displayName: 'Test User',
+          userId: 'test-user-id',
+          hasConnectedWeb3: false,
+          version: 1,
+          avatar: {
+            bodyShape: 'urn:decentraland:off-chain:base-avatars:BaseMale',
+            skinColor: '#000000',
+            hairColor: '#000000',
+            eyeColor: '#000000',
+            wearables: [],
+            snapshots: {
+              face256: '',
+              body: ''
+            }
+          }
+        }
+      }),
+      getUserPublicKey: async () => ({ address: undefined })
+    },
+
+    '~system/EnvironmentApi': {
+      isPreviewMode: async () => ({ isPreview: true }),
+      getBootstrapData: async () => ({
+        id: '',
+        baseUrl: '',
+        entity: {
+          content: [],
+          metadataJson: '{}'
+        },
+        useFPSThrottling: false
+      }),
+      getPlatform: async () => ({ platform: 'desktop' }),
+      areUnsafeRequestAllowed: async () => ({ status: false }),
+      getCurrentRealm: async () => ({ currentRealm: undefined }),
+      getExplorerConfiguration: async () => ({ clientUri: '', configurations: {} }),
+      getDecentralandTime: async () => ({ seconds: Date.now() / 1000 })
+    },
+
+    '~system/Runtime': {
+      getRealm: async () => ({
+        realmInfo: {
+          baseUrl: 'http://localhost',
+          realmName: 'localhost',
+          networkId: 1,
+          commsAdapter: 'offline',
+          isPreview: true
+        }
+      }),
+      getWorldTime: async () => ({ seconds: Date.now() / 1000 }),
+      readFile: async () => ({ content: new Uint8Array(), hash: '' }),
+      getSceneInformation: async () => ({
+        urn: '',
+        content: [],
+        metadataJson: '{}',
+        baseUrl: ''
+      }),
+      getExplorerInformation: async () => ({
+        agent: 'code-to-composite',
+        platform: 'desktop',
+        configurations: {}
+      })
+    },
+
+    '~system/Players': {
+      getPlayerData: async () => ({ data: undefined }),
+      getPlayersInScene: async () => ({ players: [] }),
+      getConnectedPlayers: async () => ({ players: [] })
+    },
+
+    '~system/RestrictedActions': {
+      movePlayerTo: async () => ({}),
+      teleportTo: async () => ({}),
+      triggerEmote: async () => ({}),
+      changeRealm: async () => ({ success: false }),
+      openExternalUrl: async () => ({ success: false }),
+      openNftDialog: async () => ({ success: false }),
+      setCommunicationsAdapter: async () => ({ success: false }),
+      triggerSceneEmote: async () => ({ success: false })
+    },
+
+    '~system/CommsApi': {
+      getActiveVideoStreams: async () => ({ streams: [] })
+    },
+
+    '~system/CommunicationsController': {
+      send: async () => ({}),
+      sendBinary: async () => ({ data: [] })
+    },
+
+    '~system/EthereumController': {
+      requirePayment: async () => ({ jsonAnyResponse: '{}' }),
+      signMessage: async () => ({ message: '', hexEncodedMessage: '', signature: '' }),
+      convertMessageToObject: async () => ({ dict: {} }),
+      sendAsync: async () => ({ jsonAnyResponse: '{}' }),
+      getUserAccount: async () => ({ address: undefined })
+    },
+
+    '~system/PortableExperiences': {
+      spawn: async () => ({ pid: '', parentCid: '', name: '' }),
+      kill: async () => ({ status: false }),
+      exit: async () => ({ status: false }),
+      getPortableExperiencesLoaded: async () => ({ loaded: [] })
+    },
+
+    '~system/SignedFetch': {
+      signedFetch: async () => ({
+        ok: false,
+        status: 404,
+        statusText: 'Not Found',
+        headers: {},
+        body: ''
+      }),
+      getHeaders: async () => ({ headers: {} })
+    },
+
+    '~system/Testing': {
+      logTestResult: async () => ({}),
+      plan: async () => ({}),
+      setCameraTransform: async () => ({})
+    },
+
+    '~system/UserActionModule': {
+      requestTeleport: async () => ({})
+    }
+  }
+}
+
+/**
+ * Creates a Proxy that automatically mocks unknown properties and functions.
+ *
+ * This provides a fallback mechanism for ~system module functions that aren't
+ * explicitly mocked.
  */
 function createAutoMockProxy(baseMock: any = {}): any {
   return new Proxy(baseMock, {
     get(target, prop) {
-      // If the property exists in the base mock, return it
       if (prop in target) {
         return target[prop]
       }
 
-      // For any unknown property, return an async function that resolves to an empty object
       return async (...args: any[]) => {
-        // Return empty object as default for unknown functions
         return {}
       }
     }
@@ -181,33 +263,34 @@ function createAutoMockProxy(baseMock: any = {}): any {
 }
 
 /**
- * Mocks for ~system/* modules that are marked as external in the bundle.
- * These are runtime-specific modules that don't exist in Node.js.
+ * Creates a mock implementation for a ~system/* module.
  *
- * This hybrid approach:
- * 1. Returns pre-defined mocks for critical modules with meaningful defaults
- * 2. Auto-generates mocks for any other module using a Proxy
- * 3. Handles unknown functions gracefully by returning empty promises
+ * ~system modules are runtime-specific and don't exist in Node.js, so they need
+ * to be mocked for scene execution.
  */
-function createSystemModuleMock(moduleId: string) {
-  if (moduleId in CRITICAL_MODULE_MOCKS) {
-    return createAutoMockProxy(CRITICAL_MODULE_MOCKS[moduleId])
+function createSystemModuleMock(engine: IEngineEcs, transport: Transport, mainCrdt: Uint8Array, moduleId: string) {
+  const criticalModuleMocks = createCriticalModuleMocks(engine, transport, mainCrdt);
+  if (moduleId in criticalModuleMocks) {
+    return createAutoMockProxy(criticalModuleMocks[moduleId])
   }
-
-  // for unknown ~system modules, return a proxy that handles function calls
   return createAutoMockProxy()
 }
 
 /**
- * Sets up a require hook to mock ~system/* modules during bundle execution.
- * Returns a function to restore the original require.
+ * Sets up a Node.js require hook to intercept and mock ~system/* module imports.
+ *
+ * This patches Module.prototype.require to intercept require() calls during
+ * scene bundle execution.
+ *
+ * NOTE: The hook is temporary and should be removed after scene execution using
+ * the returned cleanup function.
  */
-function setupRequireHook(): () => void {
+function setupRequireHook(engine: IEngineEcs, transport: Transport, mainCrdt: Uint8Array): () => void {
   const originalRequire = Module.prototype.require
 
   Module.prototype.require = function (this: Module, id: string) {
     if (id.startsWith('~system/')) {
-      return createSystemModuleMock(id)
+      return createSystemModuleMock(engine, transport, mainCrdt, id)
     }
     return originalRequire.apply(this, [id])
   } as any
@@ -218,98 +301,59 @@ function setupRequireHook(): () => void {
 }
 
 /**
- * Transforms the scene bundle code to make it executable in Node.js environment.
- *
- * Applies the following modifications:
- * 1. Exports the engine instance so we can access it after execution
- * 2. Ensures PlayerEntity has a Transform component before main() runs
+ * Loads and executes the scene bundle to populate the ECS engine.
  */
-function transformBundleCode(bundleCode: string): string {
-  let transformed = bundleCode
-
-  // Step 1: export the engine instance (the bundle creates a local 'engine' variable but doesn't export it)
-  transformed = transformed.replace(
-    /var engine = (.*?Engine\(\));/,
-    'var engine = $1; if (typeof module !== "undefined" && module.exports) { module.exports.engine = engine; }'
-  )
-
-  // Step 2: inject PlayerEntity Transform creation
-  // this code runs after engine is created but before main() executes
-  const playerTransformSetup = `
-// Auto-injected: Ensure PlayerEntity has Transform component
-try {
-  if (engine && engine.PlayerEntity !== undefined) {
-    // Find the Transform component from the engine's registered components
-    let Transform = null;
-    for (const component of engine.componentsIter()) {
-      if (component.componentName === 'core::Transform') {
-        Transform = component;
-        break;
-      }
-    }
-
-    if (Transform && !Transform.has(engine.PlayerEntity)) {
-      Transform.create(engine.PlayerEntity, {
-        position: { x: 0, y: 0, z: 0 },
-        rotation: { x: 0, y: 0, z: 0, w: 1 },
-        scale: { x: 1, y: 1, z: 1 }
-      });
-    }
-  }
-} catch (err) {}
-`
-
-  // try to inject before main() function definition
-  let injected = transformed.replace(
-    /((?:function\s+main|(?:const|var|let)\s+main\s*=|exports\.main\s*=))/,
-    `${playerTransformSetup}\n$1`
-  )
-
-  // fallback: inject right after engine creation if 'main()' pattern not found
-  if (injected === transformed) {
-    injected = transformed.replace(/(var engine = .*?Engine\(\);)/, `$1\n${playerTransformSetup}`)
-  }
-
-  return injected
-}
-
-/**
- * Loads and executes the scene bundle, returning the engine instance.
- */
-async function loadAndExecuteBundle(bundlePath: string): Promise<IEngine> {
+async function loadAndExecuteBundle(bundlePath: string): Promise<void> {
   delete require.cache[require.resolve(bundlePath)]
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const sceneModule = require(bundlePath)
 
-  if (typeof sceneModule.main === 'function') {
-    const result = sceneModule.main()
-    if (result && typeof result.then === 'function') {
-      await result
+  if (typeof sceneModule.onStart === 'function') {
+    const onStart = sceneModule.onStart()
+    if (typeof onStart.then === 'function') {
+      await onStart
     }
   }
 
-  const engine: IEngine = sceneModule.engine
-  if (!engine) {
-    throw new CliError('CODE_TO_COMPOSITE_NO_ENGINE', i18next.t('errors.code_to_composite.no_engine'))
+  if (typeof sceneModule.onUpdate === 'function') {
+    const onUpdate = sceneModule.onUpdate(0)
+    if (typeof onUpdate.then === 'function') {
+      await onUpdate
+    }
   }
-
-  return engine
 }
 
 /**
- * Executes the scene's TypeScript code and returns the populated ECS engine.
+ * Loads the main CRDT file if it exists, otherwise returns an empty buffer.
  *
- * This works by:
- * 1. Building the scene to generate the bundled scene code
- * 2. Modifying the bundle to export the engine instance
- * 3. Loading and executing the bundle with mocked ~system/* modules
- * 4. Running the main() function to populate the engine
- * 5. Returning the engine with all entities and components
+ * The CRDT file contains serialized component state that may already exist
+ * in the scene. This is used to initialize the engine with any pre-existing
+ * state before executing the scene code.
+ */
+async function getMainCrdtFile(
+  components: Pick<CliComponents, 'fs' | 'logger'>,
+  crdtFilePath: string
+): Promise<Uint8Array> {
+  let mainCrdt = new Uint8Array()
+  if (await components.fs.fileExists(crdtFilePath)) {
+    mainCrdt = new Uint8Array(await components.fs.readFile(crdtFilePath))
+  }
+  return mainCrdt
+}
+
+/**
+ * Executes a Decentraland scene's code and captures the resulting ECS engine state.
+ *
+ * This is the main entry point for the code-to-composite command. It runs scene
+ * code in a Node.js environment to extract the entity/component structure.
+ *
+ * The returned engine can then be used to generate composite/CRDT files.
  */
 export async function executeSceneCode(
   components: Pick<CliComponents, 'fs' | 'logger'>,
-  project: SceneProject
-): Promise<IEngine> {
+  project: SceneProject,
+  crdtFilePath: string
+): Promise<IEngineEcs> {
   const { fs, logger } = components
   logger.log('Building scene...')
 
@@ -343,22 +387,23 @@ export async function executeSceneCode(
 
   logger.log('Executing scene code to capture engine state...')
 
+  // todo: this could be streamed to avoid having the whole code in memory
   const bundleCode = await fs.readFile(bundlePath, 'utf-8')
-  const tempBundlePath = bundlePath + '.temp.js'
-  const modifiedCode = transformBundleCode(bundleCode)
-  const restoreRequire = setupRequireHook()
+  const crdtState = await getMainCrdtFile(components, crdtFilePath)
+  const { engine, transport } = initEngine()
+  const restoreRequire = setupRequireHook(engine, transport, crdtState)
 
   try {
-    await fs.writeFile(tempBundlePath, modifiedCode)
-    return await loadAndExecuteBundle(tempBundlePath)
+    await fs.writeFile(bundlePath, bundleCode)
+    await loadAndExecuteBundle(bundlePath)
+    return engine as any as IEngineEcs
   } catch (err: any) {
     throw new CliError(
       'CODE_TO_COMPOSITE_EXECUTION_FAILED',
       i18next.t('errors.code_to_composite.execution_failed', { error: `${err.message}\n${err.stack || ''}` })
     )
   } finally {
-    // cleanup: restore original require and delete temp file
+    // cleanup: restore original require
     restoreRequire()
-    await fs.rm(tempBundlePath, { force: true })
   }
 }
