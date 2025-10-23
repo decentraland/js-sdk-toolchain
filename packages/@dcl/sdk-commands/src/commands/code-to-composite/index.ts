@@ -16,6 +16,7 @@ import { executeSceneCode } from './scene-executor'
 import { generateCompositeFiles } from './composite-generator'
 import { commentSourceFiles } from './code-commenter'
 import { migrateAssets } from './asset-migrator'
+import { generateEntityNames } from './name-generator'
 
 interface Options {
   args: Result<typeof args>
@@ -59,7 +60,7 @@ export async function main(options: Options) {
   const workingDirectory = path.resolve(process.cwd(), options.args['--dir'] || '.')
   const workspace = await getValidWorkspace(options.components, workingDirectory)
 
-  const MAX_STEPS = 4
+  const MAX_STEPS = 5
 
   for (const project of workspace.projects) {
     printCurrentProjectStarting(options.components.logger, project, workspace)
@@ -111,14 +112,19 @@ async function exportSceneToCrdt(options: Options, project: SceneProject, maxSte
   const updatedCount = await migrateAssets(options.components, project, engine)
   printProgressInfo(logger, `Migrated ${updatedCount} asset file(s) successfully`)
 
-  // Step 3: generate composite and crdt files (with updated asset paths)
+  // Step 3: generate entity names
+  printProgressStep(logger, 'Generating names for entities', currentStep++, maxSteps)
+  const namedEntitiesCount = await generateEntityNames(options.components, engine)
+  printProgressInfo(logger, `Generated names for ${namedEntitiesCount} entity/entities`)
+
+  // Step 4: generate composite and crdt files (with updated asset paths and names)
   printProgressStep(logger, 'Generating composite and crdt files', currentStep++, maxSteps)
   await generateCompositeFiles(options.components, engine, compositeFilePath, crdtFilePath, entityNamesFilePath)
   printProgressInfo(logger, `Generated main.composite ✅ (${compositeFilePath})`)
   printProgressInfo(logger, `Generated main.crdt ✅ (${crdtFilePath})`)
   printProgressInfo(logger, `Generated entity-names.ts ✅ (${entityNamesFilePath})`)
 
-  // Step 4: comment out original code
+  // Step 5: comment out original code
   printProgressStep(logger, 'Commenting out original code', currentStep++, maxSteps)
   const bundleEntrypoint = path.join(project.workingDirectory, project.scene.main)
   await commentSourceFiles(options.components, sceneCodeEntrypoint, bundleEntrypoint)

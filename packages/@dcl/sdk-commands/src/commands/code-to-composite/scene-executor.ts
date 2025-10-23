@@ -1,8 +1,8 @@
 import path from 'path'
 import Module from 'module'
 import i18next from 'i18next'
-import { IEngine as IEngineEcs } from '@dcl/ecs'
 import {
+  IEngine,
   Transport,
   Entity,
   UiCanvasInformation,
@@ -25,7 +25,7 @@ import { bundleProject } from '../../logic/bundle'
  * The transport layer is used to capture CRDT messages sent by the scene code.
  * This allows us to capture the state of all entities and components.
  */
-function initEngine(): { engine: IEngineEcs, transport: Transport } {
+function initEngine(): { engine: IEngine, transport: Transport } {
   const transport: Transport = {
     filter: () => true,
     send: async (_messages) => {}
@@ -34,7 +34,7 @@ function initEngine(): { engine: IEngineEcs, transport: Transport } {
   engine.addTransport(transport)
 
   return {
-    engine: engine as any as IEngineEcs,
+    engine,
     transport
   }
 }
@@ -85,7 +85,7 @@ function getInitialCrdtState(): Uint8Array[] {
  * This function provides meaningful mock implementations for the most
  * commonly used system modules to ensure scene code executes correctly.
  */
-function createCriticalModuleMocks(engine: IEngineEcs, transport: Transport, crdtState: Uint8Array): Record<string, any> {
+function createCriticalModuleMocks(engine: IEngine, transport: Transport, crdtState: Uint8Array): Record<string, any> {
   return {
     '~system/EngineApi': {
       crdtSendToRenderer: async (crdt: { data: Uint8Array }) => {
@@ -268,7 +268,7 @@ function createAutoMockProxy(baseMock: any = {}): any {
  * ~system modules are runtime-specific and don't exist in Node.js, so they need
  * to be mocked for scene execution.
  */
-function createSystemModuleMock(engine: IEngineEcs, transport: Transport, mainCrdt: Uint8Array, moduleId: string) {
+function createSystemModuleMock(engine: IEngine, transport: Transport, mainCrdt: Uint8Array, moduleId: string) {
   const criticalModuleMocks = createCriticalModuleMocks(engine, transport, mainCrdt);
   if (moduleId in criticalModuleMocks) {
     return createAutoMockProxy(criticalModuleMocks[moduleId])
@@ -285,7 +285,7 @@ function createSystemModuleMock(engine: IEngineEcs, transport: Transport, mainCr
  * NOTE: The hook is temporary and should be removed after scene execution using
  * the returned cleanup function.
  */
-function setupRequireHook(engine: IEngineEcs, transport: Transport, mainCrdt: Uint8Array): () => void {
+function setupRequireHook(engine: IEngine, transport: Transport, mainCrdt: Uint8Array): () => void {
   const originalRequire = Module.prototype.require
 
   Module.prototype.require = function (this: Module, id: string) {
@@ -379,7 +379,7 @@ export async function executeSceneCode(
   components: Pick<CliComponents, 'fs' | 'logger'>,
   project: SceneProject,
   crdtFilePath: string
-): Promise<{ engine: IEngineEcs, sceneCodeEntrypoint: string }> {
+): Promise<{ engine: IEngine, sceneCodeEntrypoint: string }> {
   const { fs, logger } = components
 
   logger.log('Building scene...')
@@ -404,7 +404,7 @@ export async function executeSceneCode(
   try {
     await fs.writeFile(bundlePath, bundleCode)
     await loadAndExecuteBundle(bundlePath)
-    return { engine: engine as any as IEngineEcs, sceneCodeEntrypoint }
+    return { engine: engine as any as IEngine, sceneCodeEntrypoint }
   } catch (err: any) {
     throw new CliError(
       'CODE_TO_COMPOSITE_EXECUTION_FAILED',

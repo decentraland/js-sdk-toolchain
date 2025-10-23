@@ -1,6 +1,7 @@
 import path from 'path'
-import { IEngine } from '@dcl/ecs'
+import { IEngine } from '@dcl/ecs/dist-cjs'
 import { validateBytes } from '@dcl/gltf-validator-ts'
+
 import { CliComponents } from '../../components'
 import { SceneProject } from '../../logic/project-validations'
 
