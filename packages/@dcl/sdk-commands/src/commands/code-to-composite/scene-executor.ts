@@ -342,23 +342,11 @@ async function getMainCrdtFile(
 }
 
 /**
- * Executes a Decentraland scene's code and captures the resulting ECS engine state.
- *
- * This is the main entry point for the code-to-composite command. It runs scene
- * code in a Node.js environment to extract the entity/component structure.
- *
- * The returned engine can then be used to generate composite/CRDT files.
+ * Bundles the scene code and returns the entrypoint.
  */
-export async function executeSceneCode(
-  components: Pick<CliComponents, 'fs' | 'logger'>,
-  project: SceneProject,
-  crdtFilePath: string
-): Promise<IEngineEcs> {
-  const { fs, logger } = components
-  logger.log('Building scene...')
-
+async function bundle(components: Pick<CliComponents, 'fs' | 'logger'>, project: SceneProject): Promise<string> {
   try {
-    await bundleProject(
+    const { inputs } = await bundleProject(
       components,
       {
         workingDirectory: project.workingDirectory,
@@ -370,12 +358,32 @@ export async function executeSceneCode(
       },
       project.scene
     )
+    return inputs[0].entrypoint
   } catch (err: any) {
     throw new CliError(
       'CODE_TO_COMPOSITE_BUILD_FAILED',
       i18next.t('errors.code_to_composite.build_failed', { error: err.message })
     )
   }
+}
+
+/**
+ * Executes a Decentraland scene's code and captures the resulting ECS engine state.
+ *
+ * This is the main entry point for the code-to-composite command. It runs scene
+ * code in a Node.js environment to extract the entity/component structure.
+ *
+ * The returned engine can then be used to generate composite/CRDT files.
+ */
+export async function executeSceneCode(
+  components: Pick<CliComponents, 'fs' | 'logger'>,
+  project: SceneProject,
+  crdtFilePath: string
+): Promise<{ engine: IEngineEcs, sceneCodeEntrypoint: string }> {
+  const { fs, logger } = components
+
+  logger.log('Building scene...')
+  const sceneCodeEntrypoint = await bundle(components, project)
 
   const bundlePath = path.join(project.workingDirectory, project.scene.main)
   if (!(await fs.fileExists(bundlePath))) {
@@ -396,7 +404,7 @@ export async function executeSceneCode(
   try {
     await fs.writeFile(bundlePath, bundleCode)
     await loadAndExecuteBundle(bundlePath)
-    return engine as any as IEngineEcs
+    return { engine: engine as any as IEngineEcs, sceneCodeEntrypoint }
   } catch (err: any) {
     throw new CliError(
       'CODE_TO_COMPOSITE_EXECUTION_FAILED',

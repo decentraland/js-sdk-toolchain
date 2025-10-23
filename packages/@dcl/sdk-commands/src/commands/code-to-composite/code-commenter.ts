@@ -1,5 +1,5 @@
 import path from 'path'
-import { globSync } from 'glob'
+
 import { CliComponents } from '../../components'
 
 const COMMENT_MARKER = 'COMMENTED BY "@dcl/sdk-commands code-to-composite" COMMAND'
@@ -63,42 +63,22 @@ async function commentSourceFile({ fs }: Pick<CliComponents, 'fs'>, filePath: st
   await fs.writeFile(filePath, commentedContent)
 }
 
+function getBackupPath(filePath: string): string {
+  const parsedPath = path.parse(filePath)
+  return path.join(parsedPath.dir, `${parsedPath.name}.backup${parsedPath.ext}`)
+}
+
 /**
- * Comments out all TypeScript and JavaScript files in the src directory including the entrypoint
+ * Comments out the entrypoint and the scene code entrypoint
  */
 export async function commentSourceFiles(
   components: Pick<CliComponents, 'fs'>,
-  workingDirectory: string,
-  entrypointPath: string
-): Promise<string[]> {
-  const { fs } = components
-  const normalizedEntrypoint = path.normalize(entrypointPath)
-  await commentEntrypoint(components, normalizedEntrypoint)
-
-  const srcDir = path.join(workingDirectory, 'src')
-
-  if (!(await fs.directoryExists(srcDir))) {
-    return []
-  }
-
-  const sourceFiles = globSync('**/*.{ts,tsx,js,jsx}', {
-    cwd: srcDir,
-    absolute: true,
-    ignore: ['**/*.d.ts', '**/node_modules/**']
-  })
-
-  const commentedFiles: string[] = []
-
-  for (const filePath of sourceFiles) {
-    const normalizedFilePath = path.normalize(filePath)
-
-    if (normalizedFilePath === normalizedEntrypoint) {
-      continue
-    }
-
-    await commentSourceFile(components, normalizedFilePath)
-    commentedFiles.push(normalizedFilePath)
-  }
-
-  return commentedFiles
+  sceneCodeEntrypoint: string,
+  bundleEntrypoint: string
+): Promise<void> {
+  await Promise.all([
+    commentEntrypoint(components, path.normalize(bundleEntrypoint)),
+    components.fs.copyFile(path.normalize(sceneCodeEntrypoint), getBackupPath(sceneCodeEntrypoint)),
+    commentSourceFile(components, path.normalize(sceneCodeEntrypoint))
+  ])
 }

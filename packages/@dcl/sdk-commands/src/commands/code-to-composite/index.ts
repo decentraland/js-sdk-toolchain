@@ -103,7 +103,7 @@ async function exportSceneToCrdt(options: Options, project: SceneProject, maxSte
 
   // Step 1: execute scene code to populate engine
   printProgressStep(logger, 'Executing scene code to capture state', currentStep++, maxSteps)
-  const engine = await executeSceneCode(options.components, project, crdtFilePath)
+  const { engine, sceneCodeEntrypoint } = await executeSceneCode(options.components, project, crdtFilePath)
   printProgressInfo(logger, `Engine state captured successfully`)
 
   // Step 2: migrate assets (before generating composite/crdt)
@@ -120,13 +120,11 @@ async function exportSceneToCrdt(options: Options, project: SceneProject, maxSte
 
   // Step 4: comment out original code
   printProgressStep(logger, 'Commenting out original code', currentStep++, maxSteps)
-  const entrypoint = path.join(project.workingDirectory, project.scene.main)
-  const commentedFiles = await commentSourceFiles(options.components, project.workingDirectory, entrypoint)
-  printProgressInfo(logger, `Commented out ${project.scene.main}`)
-  printProgressInfo(logger, `Added stub main() function`)
-  if (commentedFiles.length > 0) {
-    printProgressInfo(logger, `Commented out ${commentedFiles.length} additional source file(s)`)
-  }
+  const bundleEntrypoint = path.join(project.workingDirectory, project.scene.main)
+  await commentSourceFiles(options.components, sceneCodeEntrypoint, bundleEntrypoint)
+  const relativeEntrypoint = path.relative(project.workingDirectory, sceneCodeEntrypoint)
+  printProgressInfo(logger, `Commented out bundle entrypoint ${project.scene.main} and added stub main() function`)
+  printProgressInfo(logger, `Commented out scene code entrypoint ${relativeEntrypoint}`)
 
   printSuccess(
     logger,
