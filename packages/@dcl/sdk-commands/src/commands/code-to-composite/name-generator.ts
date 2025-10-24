@@ -9,11 +9,15 @@ import {
   LightSource,
   GltfContainer,
   ComponentDefinition,
+  AudioSource,
   PBLightSource,
   PBGltfContainer,
   PBMeshRenderer,
   PBTextShape,
   PBNftShape,
+  PBAudioSource,
+  VideoPlayer,
+  PBVideoPlayer,
 } from '@dcl/ecs/dist-cjs'
 
 import { CliComponents } from '../../components'
@@ -34,8 +38,10 @@ function getNameGenerators(): [
   ComponentNameGenerator<PBGltfContainer>,
   ComponentNameGenerator<PBMeshRenderer>,
   ComponentNameGenerator<PBTextShape>,
+  ComponentNameGenerator<PBVideoPlayer>,
   ComponentNameGenerator<PBNftShape>,
-  ComponentNameGenerator<PBLightSource>
+  ComponentNameGenerator<PBLightSource>,
+  ComponentNameGenerator<PBAudioSource>,
 ] {
   return [
     {
@@ -70,12 +76,32 @@ function getNameGenerators(): [
       }
     },
     {
+      component: VideoPlayer,
+      getName: (data) => {
+        if (data?.src) {
+          const filename = path.basename(data.src)
+          return path.parse(filename).name
+        }
+        return 'Video'
+      }
+    },
+    {
       component: NftShape,
       getName: () => 'NFT'
     },
     {
       component: LightSource,
       getName: () => 'Light'
+    },
+    {
+      component: AudioSource,
+      getName: (data) => {
+        if (data?.audioClipUrl) {
+          const filename = path.basename(data.audioClipUrl)
+          return path.parse(filename).name
+        }
+        return 'Audio'
+      }
     }
   ]
 }
