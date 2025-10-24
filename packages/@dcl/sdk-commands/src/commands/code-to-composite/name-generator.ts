@@ -10,6 +10,7 @@ import {
   GltfContainer,
   ComponentDefinition,
   AudioSource,
+  MeshCollider,
   PBLightSource,
   PBGltfContainer,
   PBMeshRenderer,
@@ -18,10 +19,10 @@ import {
   PBAudioSource,
   VideoPlayer,
   PBVideoPlayer,
+  PBMeshCollider,
 } from '@dcl/ecs/dist-cjs'
 
 import { CliComponents } from '../../components'
-
 interface ComponentNameGenerator<T = any> {
   component: ComponentDefinition<T>
   getName: (componentData: T | null) => string | null
@@ -42,6 +43,7 @@ function getNameGenerators(): [
   ComponentNameGenerator<PBNftShape>,
   ComponentNameGenerator<PBLightSource>,
   ComponentNameGenerator<PBAudioSource>,
+  ComponentNameGenerator<PBMeshCollider>
 ] {
   return [
     {
@@ -101,6 +103,17 @@ function getNameGenerators(): [
           return path.parse(filename).name
         }
         return 'Audio'
+      }
+    },
+    {
+      component: MeshCollider,
+      getName: (data) => {
+        const pre = 'Mesh Collider'
+        if (data?.mesh?.['$case']) {
+          const meshType = data.mesh['$case']
+          return `${pre}: ${meshType}`
+        }
+        return pre
       }
     }
   ]
