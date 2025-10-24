@@ -1,10 +1,8 @@
 import path from 'path'
-import i18next from 'i18next'
 import prompts from 'prompts'
 import { Result } from 'arg'
 import { CliComponents } from '../../components'
 import { declareArgs } from '../../logic/args'
-import { CliError } from '../../logic/error'
 import { getValidWorkspace } from '../../logic/workspace-validations'
 import { SceneProject } from '../../logic/project-validations'
 import {
@@ -29,8 +27,6 @@ export const args = declareArgs({
   '--dir': String,
   '--help': Boolean,
   '-h': '--help',
-  '--force': Boolean,
-  '-f': '--force'
 })
 
 export function help(options: Options) {
@@ -46,7 +42,6 @@ export function help(options: Options) {
 
     -h, --help                Displays complete help
     --dir                     Path to directory to export
-    -f, --force               Overwrite existing composite/crdt files
 
   Example:
 
@@ -126,14 +121,6 @@ async function exportSceneToCrdt(options: Options, project: SceneProject, maxSte
   const hasCrdt = await fs.fileExists(crdtFilePath)
 
   if (hasComposite || hasCrdt) {
-    if (!options.args['--force']) {
-      const foundFiles = [hasComposite ? 'main.composite' : '', hasCrdt ? 'main.crdt' : ''].filter(Boolean).join(', ')
-      throw new CliError(
-        'CODE_TO_COMPOSITE_FILES_EXIST',
-        i18next.t('errors.code_to_composite.files_exist') + '\n' + `  Found: ${foundFiles}`
-      )
-    }
-
     if (hasComposite) {
       await fs.rm(compositeFilePath)
       logger.log(`Removed existing main.composite file`)

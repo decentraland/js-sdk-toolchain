@@ -78,9 +78,7 @@
     "code_to_composite": {
       "build_failed": "Error al construir la escena: {{error}}",
       "bundle_not_found": "No se pudo encontrar la escena empaquetada en {{bundlePath}}",
-      "execution_failed": "Error al ejecutar el código de la escena: {{error}}",
-      "no_engine": "No se pudo encontrar la instancia del motor en el bundle de la escena. Asegúrate de que tu escena use @dcl/sdk.",
-      "files_exist": "Los archivos composite o CRDT ya existen. Usa --force para sobrescribirlos."
+      "execution_failed": "Error al ejecutar el código de la escena: {{error}}"
     }
   }
 }

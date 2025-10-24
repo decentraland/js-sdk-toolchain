@@ -78,9 +78,7 @@
     "code_to_composite": {
       "build_failed": "Failed to build the scene: {{error}}",
       "bundle_not_found": "Could not find the bundled scene at {{bundlePath}}",
-      "execution_failed": "Failed to execute scene code: {{error}}",
-      "no_engine": "Could not find engine instance in the scene bundle. Make sure your scene uses @dcl/sdk.",
-      "files_exist": "Composite or CRDT files already exist. Use --force to overwrite them."
+      "execution_failed": "Failed to execute scene code: {{error}}"
     }
   }
 }

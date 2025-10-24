@@ -78,9 +78,7 @@
     "code_to_composite": {
       "build_failed": "构建场景失败：{{error}}",
       "bundle_not_found": "在 {{bundlePath}} 找不到打包的场景",
-      "execution_failed": "执行场景代码失败：{{error}}",
-      "no_engine": "在场景包中找不到引擎实例。请确保您的场景使用 @dcl/sdk。",
-      "files_exist": "composite 或 CRDT 文件已存在。使用 --force 覆盖它们。"
+      "execution_failed": "执行场景代码失败：{{error}}"
     }
   }
 }
