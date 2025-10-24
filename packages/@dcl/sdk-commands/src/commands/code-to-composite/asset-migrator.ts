@@ -10,7 +10,7 @@ import { SceneProject } from '../../logic/project-validations'
  *
  * This module handles migrating asset files to the Creator Hub directory structure:
  * - Models: assets/scene/Models/{modelName}/*.{gltf,glb} (with dependencies)
- * - Images: assets/scene/Images/*.{png,jpg,jpeg}
+ * - Images: assets/scene/Images/*.{png,jpg,jpeg,bmp}
  * - Audio: assets/scene/Audio/*.{mp3,wav,ogg}
  * - Video: assets/scene/Video/*.{mp4}
  *
@@ -38,6 +38,7 @@ function getAssetType(extension: string): AssetType {
     case 'png':
     case 'jpg':
     case 'jpeg':
+    case 'bmp':
       return 'Images'
     case 'mp3':
     case 'wav':
