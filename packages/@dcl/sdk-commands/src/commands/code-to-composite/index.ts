@@ -1,5 +1,6 @@
 import path from 'path'
 import i18next from 'i18next'
+import prompts from 'prompts'
 import { Result } from 'arg'
 import { CliComponents } from '../../components'
 import { declareArgs } from '../../logic/args'
@@ -10,7 +11,8 @@ import {
   printCurrentProjectStarting,
   printProgressInfo,
   printProgressStep,
-  printSuccess
+  printSuccess,
+  printWarning
 } from '../../logic/beautiful-logs'
 import { executeSceneCode } from './scene-executor'
 import { generateCompositeFiles } from './composite-generator'
@@ -60,6 +62,11 @@ export async function main(options: Options) {
   const workingDirectory = path.resolve(process.cwd(), options.args['--dir'] || '.')
   const workspace = await getValidWorkspace(options.components, workingDirectory)
 
+  const shouldContinue = await promptForDestructiveAction(options.components)
+  if (!shouldContinue) {
+    return
+  }
+
   const MAX_STEPS = 5
 
   for (const project of workspace.projects) {
@@ -71,6 +78,41 @@ export async function main(options: Options) {
       options.components.logger.warn(`Project ${project.workingDirectory} is not a scene, skipping...`)
     }
   }
+}
+
+async function promptForDestructiveAction(components: Pick<CliComponents, 'logger'>): Promise<boolean> {
+  const { logger } = components
+  printWarning(
+    logger,
+    'This command will modify your scene code by commenting it out and creating composite/CRDT files.'
+  )
+  logger.log('  - Your original code will be backed up with a .backup.ts extension')
+  logger.log('  - The scene will be converted to Creator Hub format')
+  logger.log('  - Files will be moved around')
+  logger.log('  - If you are not using any version control system, undoing this operation will be REALLY cumbersome')
+  logger.log('')
+
+  let cancelled = false
+  const onCancel = () => {
+    cancelled = true
+  }
+
+  const { confirmed } = await prompts(
+    {
+      type: 'confirm',
+      name: 'confirmed',
+      message: 'Do you want to continue?',
+      initial: false
+    },
+    { onCancel }
+  )
+
+  if (cancelled || !confirmed) {
+    logger.log('Operation cancelled by user.')
+    return false
+  }
+
+  return true
 }
 
 async function exportSceneToCrdt(options: Options, project: SceneProject, maxSteps: number) {
