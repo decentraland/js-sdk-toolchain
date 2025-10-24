@@ -27,6 +27,8 @@ export const args = declareArgs({
   '--dir': String,
   '--help': Boolean,
   '-h': '--help',
+  '--yes': Boolean,
+  '-y': '--yes',
 })
 
 export function help(options: Options) {
@@ -42,6 +44,7 @@ export function help(options: Options) {
 
     -h, --help                Displays complete help
     --dir                     Path to directory to export
+    -y, --yes                 Skip the confirmation prompt
 
   Example:
 
@@ -57,10 +60,8 @@ export async function main(options: Options) {
   const workingDirectory = path.resolve(process.cwd(), options.args['--dir'] || '.')
   const workspace = await getValidWorkspace(options.components, workingDirectory)
 
-  const shouldContinue = await promptForDestructiveAction(options.components)
-  if (!shouldContinue) {
-    return
-  }
+  const shouldContinue = options.args['--yes'] ? true : await promptForDestructiveAction(options.components)
+  if (!shouldContinue) return
 
   const MAX_STEPS = 5
 
