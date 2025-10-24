@@ -119,12 +119,16 @@ export async function generateEntityNames(
       processedEntities.add(entity)
 
       // skip reserved entities
-      if (entity === engine.RootEntity ||
-          entity === engine.PlayerEntity ||
-          entity === engine.CameraEntity) {
+      if (entity === engine.RootEntity || entity === engine.PlayerEntity || entity === engine.CameraEntity) {
         continue
       }
 
+      // KNOWN ISSUE: The Name component is filtered out by the renderer transport during scene execution
+      // because its componentId exceeds MAX_STATIC_COMPONENT (only core renderer components are sent).
+      // See: https://github.com/decentraland/js-sdk-toolchain/blob/main/packages/%40dcl/sdk/src/internal/transports/rendererTransport.ts#L38
+      // This means Name components created in scene code are lost during code-to-composite execution,
+      // so Name.has(entity) will always return false here, causing custom names to be overwritten.
+      // We keep this check for future reference in case the transport filtering changes.
       if (Name.has(entity)) continue
 
       const name = generateNameFromComponent(generator, entity)
