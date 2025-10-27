@@ -12,12 +12,25 @@ import {
   Transform,
 } from '@dcl/ecs/dist-cjs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist-cjs/serialization/ByteBuffer'
+import { createEngineContext } from '@dcl/inspector'
 
 
 import { CliComponents } from '../../components'
 import { SceneProject } from '../../logic/project-validations'
 import { CliError } from '../../logic/error'
 import { bundleProject } from '../../logic/bundle'
+
+/**
+ * Returns the set of component IDs that are used by the @dcl/inspector.
+ */
+function getInspectorComponentsIds() {
+  const { components } = createEngineContext()
+  const ids = new Set<number>()
+  for (const [_, component] of Object.entries(components)) {
+    ids.add(component.componentId)
+  }
+  return ids
+}
 
 /**
  * Initializes the ECS engine with a mock transport layer.
@@ -324,6 +337,34 @@ async function loadAndExecuteBundle(bundlePath: string): Promise<void> {
 }
 
 /**
+ * Filters out components that are not supported by the Inspector.
+ *
+ * After executing scene code, the engine may contain components that cannot be
+ * serialized or displayed in the Inspector (such as runtime-only components or
+ * custom user components). This function removes those components from all entities
+ * to ensure only Inspector-compatible components remain in the final composite.
+ *
+ * The function:
+ * 1. Gets the set of component IDs that the Inspector recognizes
+ * 2. Iterates through all components registered in the engine
+ * 3. For each component that is NOT in the Inspector's whitelist (and has a deleteFrom method):
+ *    - Removes it from every entity that has it attached
+ *
+ * This cleanup is necessary because the composite file will be loaded in the Inspector,
+ * which only understands a specific set of ECS components.
+ */
+function filterInspectorCompatibleComponents(engine: IEngine) {
+  const validComponentIds = getInspectorComponentsIds()
+  for (const component of engine.componentsIter()) {
+    if (!validComponentIds.has(component.componentId) && 'deleteFrom' in component) {
+      for (const [entity] of engine.getEntitiesWith(component)) {
+        component.deleteFrom(entity)
+      }
+    }
+  }
+}
+
+/**
  * Loads the main CRDT file if it exists, otherwise returns an empty buffer.
  *
  * The CRDT file contains serialized component state that may already exist
@@ -395,15 +436,13 @@ export async function executeSceneCode(
 
   logger.log('Executing scene code to capture engine state...')
 
-  // todo: this could be streamed to avoid having the whole code in memory
-  const bundleCode = await fs.readFile(bundlePath, 'utf-8')
   const crdtState = await getMainCrdtFile(components, crdtFilePath)
   const { engine, transport } = initEngine()
   const restoreRequire = setupRequireHook(engine, transport, crdtState)
 
   try {
-    await fs.writeFile(bundlePath, bundleCode)
     await loadAndExecuteBundle(bundlePath)
+    filterInspectorCompatibleComponents(engine)
     return { engine: engine as any as IEngine, sceneCodeEntrypoint }
   } catch (err: any) {
     throw new CliError(

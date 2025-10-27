@@ -112,25 +112,12 @@ async function promptForDestructiveAction(components: Pick<CliComponents, 'logge
 }
 
 async function exportSceneToCrdt(options: Options, project: SceneProject, maxSteps: number) {
-  const { fs, logger } = options.components
+  const { logger } = options.components
   let currentStep = 1
 
   const compositeFilePath = path.join(project.workingDirectory, 'assets', 'scene', 'main.composite')
   const crdtFilePath = path.join(project.workingDirectory, 'main.crdt')
   const entityNamesFilePath = path.join(project.workingDirectory, 'src', 'entity-names.ts')
-  const hasComposite = await fs.fileExists(compositeFilePath)
-  const hasCrdt = await fs.fileExists(crdtFilePath)
-
-  if (hasComposite || hasCrdt) {
-    if (hasComposite) {
-      await fs.rm(compositeFilePath)
-      logger.log(`Removed existing main.composite file`)
-    }
-    if (hasCrdt) {
-      await fs.rm(crdtFilePath)
-      logger.log(`Removed existing main.crdt file`)
-    }
-  }
 
   // Step 1: execute scene code to populate engine
   printProgressStep(logger, 'Executing scene code to capture state', currentStep++, maxSteps)
