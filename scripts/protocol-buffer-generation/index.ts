@@ -10,7 +10,7 @@ import fs from 'fs-extra'
 import { FileDescriptorStandardOption, runCommand } from '../utils/shellCommand'
 import { PROTO_COMPILER_PATH, TS_PROTO_PLUGIN_PATH } from './protoConst'
 
-const NON_EXPOSED_LIST: number[] = [1097]
+const NON_EXPOSED_LIST: number[] = []
 
 /**
  * @param componentPath - Argument of execution '--component-path'
