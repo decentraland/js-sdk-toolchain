@@ -42,6 +42,7 @@ export async function generateCompositeFiles(
   const crdtData = dumpEngineToCrdtCommands(_engine)
   await fs.writeFile(crdtFilePath, crdtData)
 
-  const fsAdapter: FileSystemInterface = createFileSystemInterfaceFromFsComponent({ fs })
+  const workingDirectory = path.dirname(compositeFilePath)
+  const fsAdapter: FileSystemInterface = createFileSystemInterfaceFromFsComponent({ fs }, workingDirectory)
   await generateEntityNamesType(_engine, entityNamesFilePath, 'EntityNames', fsAdapter)
 }
