@@ -10,6 +10,13 @@ import {
   PutComponentOperation,
   engine,
   Transform,
+  UiTransform,
+  UiText,
+  UiBackground,
+  UiInput,
+  UiInputResult,
+  UiDropdown,
+  UiDropdownResult,
 } from '@dcl/ecs/dist-cjs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist-cjs/serialization/ByteBuffer'
 import { createEngineContext } from '@dcl/inspector'
@@ -74,7 +81,6 @@ function getInitialCrdtState(): Uint8Array[] {
     const uiCanvasComponentData = buffer.toCopiedBinary()
     buffer.resetBuffer()
     PutComponentOperation.write(0 as Entity, 1, UiCanvasInformation.componentId, uiCanvasComponentData, buffer)
-
     return buffer.toBinary()
   }
 
@@ -337,28 +343,41 @@ async function loadAndExecuteBundle(bundlePath: string): Promise<void> {
 }
 
 /**
- * Filters out components that are not supported by the Inspector.
- *
- * After executing scene code, the engine may contain components that cannot be
- * serialized or displayed in the Inspector (such as runtime-only components or
- * custom user components). This function removes those components from all entities
- * to ensure only Inspector-compatible components remain in the final composite.
- *
- * The function:
- * 1. Gets the set of component IDs that the Inspector recognizes
- * 2. Iterates through all components registered in the engine
- * 3. For each component that is NOT in the Inspector's whitelist (and has a deleteFrom method):
- *    - Removes it from every entity that has it attached
- *
- * This cleanup is necessary because the composite file will be loaded in the Inspector,
- * which only understands a specific set of ECS components.
+ * Filters out components that are not supported by the @dcl/inspector.
  */
 function filterInspectorCompatibleComponents(engine: IEngine) {
   const validComponentIds = getInspectorComponentsIds()
+
+  const reactEcsComponentIds = new Set([
+    UiTransform.componentId,
+    UiText.componentId,
+    UiBackground.componentId,
+    UiInput.componentId,
+    UiInputResult.componentId,
+    UiDropdown.componentId,
+    UiDropdownResult.componentId,
+  ])
+
+  // first pass: identify entities with react-ecs components
+  const uiEntities = new Set<Entity>()
   for (const component of engine.componentsIter()) {
-    if (!validComponentIds.has(component.componentId) && 'deleteFrom' in component) {
+    if (reactEcsComponentIds.has(component.componentId)) {
       for (const [entity] of engine.getEntitiesWith(component)) {
-        component.deleteFrom(entity)
+        uiEntities.add(entity)
+      }
+    }
+  }
+
+  // second pass: remove components from entities that either:
+  // - are root engine entities
+  // - have react-ecs components
+  for (const component of engine.componentsIter()) {
+    if ('deleteFrom' in component) {
+      const isValidComponent = validComponentIds.has(component.componentId)
+      for (const [entity] of engine.getEntitiesWith(component)) {
+        if (uiEntities.has(entity) || !isValidComponent) {
+          component.deleteFrom(entity)
+        }
       }
     }
   }
