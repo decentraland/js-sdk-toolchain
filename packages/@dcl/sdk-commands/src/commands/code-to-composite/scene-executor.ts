@@ -381,6 +381,9 @@ function filterInspectorCompatibleComponents(engine: IEngine) {
       }
     }
   }
+
+  // BONUS: remove Transform from PlayerEntity to avoid bad placement when running the client
+  Transform.deleteFrom(engine.PlayerEntity)
 }
 
 /**
