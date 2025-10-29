@@ -64,11 +64,6 @@ async function commentSourceFile({ fs }: Pick<CliComponents, 'fs'>, filePath: st
   await fs.writeFile(filePath, commentedContent)
 }
 
-function getBackupPath(filePath: string): string {
-  const parsedPath = path.parse(filePath)
-  return path.join(parsedPath.dir, `${parsedPath.name}.backup${parsedPath.ext}`)
-}
-
 /**
  * Comments out the entrypoint and all source files in the src directory
  *
@@ -97,7 +92,6 @@ export async function commentSourceFiles(
 
   await Promise.all([
     commentEntrypoint(components, normalizedBundleEntrypoint),
-    components.fs.copyFile(normalizedSceneCodeEntrypoint, getBackupPath(sceneCodeEntrypoint)),
     commentSourceFile(components, normalizedSceneCodeEntrypoint),
     ...filesToComment.map(file => commentSourceFile(components, file))
   ])
