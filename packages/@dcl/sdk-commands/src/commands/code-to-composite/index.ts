@@ -144,10 +144,13 @@ async function exportSceneToCrdt(options: Options, project: SceneProject, maxSte
   // Step 5: comment out original code
   printProgressStep(logger, 'Commenting out original code', currentStep++, maxSteps)
   const bundleEntrypoint = path.join(project.workingDirectory, project.scene.main)
-  await commentSourceFiles(options.components, sceneCodeEntrypoint, bundleEntrypoint)
+  const commentedFiles = await commentSourceFiles(options.components, sceneCodeEntrypoint, bundleEntrypoint)
   const relativeEntrypoint = path.relative(project.workingDirectory, sceneCodeEntrypoint)
   printProgressInfo(logger, `Commented out bundle entrypoint ${project.scene.main} and added stub main() function`)
   printProgressInfo(logger, `Commented out scene code entrypoint ${relativeEntrypoint}`)
+  if (commentedFiles > 0) {
+    printProgressInfo(logger, `Commented out ${commentedFiles} additional source file(s)`)
+  }
 
   printSuccess(
     logger,

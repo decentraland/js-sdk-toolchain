@@ -1,4 +1,5 @@
 import path from 'path'
+import { globSync } from 'glob'
 
 import { CliComponents } from '../../components'
 
@@ -69,16 +70,37 @@ function getBackupPath(filePath: string): string {
 }
 
 /**
- * Comments out the entrypoint and the scene code entrypoint
+ * Comments out the entrypoint and all source files in the src directory
+ *
+ * NOTE: Need to comment out all the src files otherwise typechecker will fail preventing deploys, etc.
  */
 export async function commentSourceFiles(
   components: Pick<CliComponents, 'fs'>,
   sceneCodeEntrypoint: string,
   bundleEntrypoint: string
-): Promise<void> {
+): Promise<number> {
+  const normalizedBundleEntrypoint = path.normalize(bundleEntrypoint)
+  const normalizedSceneCodeEntrypoint = path.normalize(sceneCodeEntrypoint)
+  const srcDir = path.dirname(normalizedSceneCodeEntrypoint)
+
+  const sourceFiles = globSync('**/*.{ts,tsx,js,jsx}', {
+    cwd: srcDir,
+    absolute: true,
+    ignore: ['**/*.d.ts', '**/node_modules/**']
+  })
+
+  const filesToComment = sourceFiles.filter(file => {
+    const normalized = path.normalize(file)
+    return normalized !== normalizedBundleEntrypoint &&
+           normalized !== normalizedSceneCodeEntrypoint
+  })
+
   await Promise.all([
-    commentEntrypoint(components, path.normalize(bundleEntrypoint)),
-    components.fs.copyFile(path.normalize(sceneCodeEntrypoint), getBackupPath(sceneCodeEntrypoint)),
-    commentSourceFile(components, path.normalize(sceneCodeEntrypoint))
+    commentEntrypoint(components, normalizedBundleEntrypoint),
+    components.fs.copyFile(normalizedSceneCodeEntrypoint, getBackupPath(sceneCodeEntrypoint)),
+    commentSourceFile(components, normalizedSceneCodeEntrypoint),
+    ...filesToComment.map(file => commentSourceFile(components, file))
   ])
+
+  return filesToComment.length
 }
