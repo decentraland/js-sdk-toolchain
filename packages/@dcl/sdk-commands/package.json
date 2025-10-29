@@ -10,7 +10,7 @@
     "@dcl/crypto": "^3.4.4",
     "@dcl/ecs": "file:../ecs",
     "@dcl/hashing": "1.1.3",
-    "@dcl/inspector": "7.12.8",
+    "@dcl/inspector": "7.13.5",
     "@dcl/linker-dapp": "^0.14.2",
     "@dcl/mini-comms": "1.0.1-20230216163137.commit-a4c75be",
     "@dcl/protocol": "1.0.0-18911717599.commit-e745352",
