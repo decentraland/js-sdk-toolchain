@@ -10,7 +10,6 @@ import { declareArgs } from '../../logic/args'
 import { CliError } from '../../logic/error'
 import { printProgressInfo, printSuccess } from '../../logic/beautiful-logs'
 import { getPackageJson, b64HashingFunction } from '../../logic/project-files'
-import { getInstalledPackageVersion } from '../../logic/config'
 import { Events } from '../../components/analytics'
 import { Result } from 'arg'
 import { getAddressAndSignature, getCatalyst, sceneHasWorldCfg } from './utils'
@@ -18,6 +17,7 @@ import { buildScene } from '../build'
 import { getValidWorkspace } from '../../logic/workspace-validations'
 import { LinkerResponse } from '../../linker-dapp/routes'
 import { analyticsFeatures } from './analytics-features'
+import { getInstalledPackageVersion } from '../../logic/config'
 
 interface Options {
   args: Result<typeof args>
@@ -97,7 +97,8 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
     throw new CliError('DEPLOY_INVALID_ARGUMENTS', i18next.t('errors.deploy.invalid_arguments'))
   }
 
-  const sceneJson = await getValidSceneJson(options.components, projectRoot, { log: true })
+  const sdkVersion = await getInstalledPackageVersion(options.components, '@dcl/sdk', projectRoot)
+  const sceneJson = { sdkVersion, ...(await getValidSceneJson(options.components, projectRoot, { log: true })) }
   const coords = getBaseCoords(sceneJson)
   const isWorld = sceneHasWorldCfg(sceneJson)
   const trackProps: Events['Scene deploy started'] = {
@@ -125,13 +126,12 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
 
   const contentFiles = new Map(files.map((file) => [file.path, new Uint8Array(file.content)]))
   const trackFeatures = await analyticsFeatures(options.components, resolve(projectRoot, sceneJson.main))
-  const sdkVersion = await getInstalledPackageVersion(options.components, '@dcl/sdk', projectRoot)
 
   const { entityId, files: entityFiles } = await DeploymentBuilder.buildEntity({
     type: EntityType.SCENE,
     pointers: sceneJson.scene.parcels,
     files: contentFiles,
-    metadata: { sdkVersion, ...sceneJson }
+    metadata: sceneJson
   })
 
   // Signing message

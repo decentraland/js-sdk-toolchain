@@ -485,8 +485,8 @@ async function fakeEntityV3FromProject(
 
   if (project.kind === 'scene') {
     const sceneJsonPath = path.resolve(project.workingDirectory, 'scene.json')
-    const sceneJson = JSON.parse(await components.fs.readFile(sceneJsonPath, 'utf-8'))
     const sdkVersion = await getInstalledPackageVersion(components, '@dcl/sdk', project.workingDirectory)
+    const sceneJson = { sdkVersion, ...JSON.parse(await components.fs.readFile(sceneJsonPath, 'utf-8')) }
     const { base, parcels }: { base: string; parcels: string[] } = sceneJson.scene
     const pointers = new Set<string>()
     pointers.add(base)
@@ -498,7 +498,7 @@ async function fakeEntityV3FromProject(
       id: await hashingFunction(project.workingDirectory),
       pointers: Array.from(pointers),
       timestamp: Date.now(),
-      metadata: { sdkVersion, ...sceneJson },
+      metadata: sceneJson,
       content: contentFiles
     }
   } else if (project.kind === 'smart-wearable') {
