@@ -74,6 +74,11 @@
       "no_input_files": "No hay archivos de entrada para construir: {{entrypointSource}}",
       "rebuild_failed": "No se pudo reconstruir el bundle: {{error}}",
       "type_checker_failed": "El typechecker salió con código {{code}}."
+    },
+    "code_to_composite": {
+      "build_failed": "Error al construir la escena: {{error}}",
+      "bundle_not_found": "No se pudo encontrar la escena empaquetada en {{bundlePath}}",
+      "execution_failed": "Error al ejecutar el código de la escena: {{error}}"
     }
   }
 }

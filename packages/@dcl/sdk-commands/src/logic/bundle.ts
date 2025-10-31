@@ -119,7 +119,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
     throw new CliError('BUNDLE_TSCONFIG_REQUIRED', i18next.t('errors.bundle.tsconfig_required', { tsconfig }))
   }
 
-  const entrypointSource = options.single ?? 'src/index.ts'
+  const entrypointSource = options.single || 'src/index.ts'
   const entrypoints = globSync(entrypointSource, { cwd: options.workingDirectory, absolute: true })
 
   /* istanbul ignore if */
