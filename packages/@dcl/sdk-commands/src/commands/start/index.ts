@@ -181,7 +181,8 @@ export async function main(options: Options) {
       let dataLayer: DataLayer | undefined
       if (withDataLayer) {
         try {
-          dataLayer = await createDataLayer(components)
+          const projectWorkingDir = workspace.projects[0]?.workingDirectory || workingDirectory
+          dataLayer = await createDataLayer(components, projectWorkingDir)
         } catch (e: unknown) {
           components.logger.error(e as Error)
         }

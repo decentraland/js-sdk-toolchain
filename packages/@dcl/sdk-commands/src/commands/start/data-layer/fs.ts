@@ -10,7 +10,10 @@ export function pathToPosix(value: string): string {
   return value.replace(/\\/g, '/')
 }
 
-export function createFileSystemInterfaceFromFsComponent({ fs }: Pick<CliComponents, 'fs'>): FileSystemInterface {
+export function createFileSystemInterfaceFromFsComponent(
+  { fs }: Pick<CliComponents, 'fs'>,
+  projectWorkingDirectory: string = process.cwd()
+): FileSystemInterface {
   return {
     dirname(value: string): string {
       return pathToPosix(path.dirname(value))
@@ -22,20 +25,24 @@ export function createFileSystemInterfaceFromFsComponent({ fs }: Pick<CliCompone
       return path.join(...paths)
     },
     async existFile(filePath: string): Promise<boolean> {
-      return fs.fileExists(filePath)
+      const resolvedPath = path.isAbsolute(filePath) ? filePath : path.resolve(projectWorkingDirectory, filePath)
+      return fs.fileExists(resolvedPath)
     },
     async readFile(filePath: string): Promise<Buffer> {
-      return fs.readFile(filePath)
+      const resolvedPath = path.isAbsolute(filePath) ? filePath : path.resolve(projectWorkingDirectory, filePath)
+      return fs.readFile(resolvedPath)
     },
     async writeFile(filePath: string, content: Buffer): Promise<void> {
-      const folder = path.dirname(filePath)
+      const resolvedPath = path.isAbsolute(filePath) ? filePath : path.resolve(projectWorkingDirectory, filePath)
+      const folder = path.dirname(resolvedPath)
       if (!(await fs.directoryExists(folder))) {
         await fs.mkdir(folder, { recursive: true })
       }
-      await fs.writeFile(filePath, content)
+      await fs.writeFile(resolvedPath, content)
     },
     async rm(filePath: string) {
-      await fs.rm(filePath)
+      const resolvedPath = path.isAbsolute(filePath) ? filePath : path.resolve(projectWorkingDirectory, filePath)
+      await fs.rm(resolvedPath)
     },
     async readdir(dirPath: string): Promise<{ name: string; isDirectory: boolean }[]> {
       if (dirPath.indexOf('/../') !== -1) {
@@ -43,7 +50,7 @@ export function createFileSystemInterfaceFromFsComponent({ fs }: Pick<CliCompone
       }
 
       const root = dirPath === '.' || dirPath === './' || dirPath === ''
-      const resolvedPath = root ? process.cwd() : dirPath
+      const resolvedPath = root ? projectWorkingDirectory : dirPath
 
       const result = await fs.readdir(resolvedPath)
       return Promise.all(
@@ -54,7 +61,7 @@ export function createFileSystemInterfaceFromFsComponent({ fs }: Pick<CliCompone
       )
     },
     cwd(): string {
-      return pathToPosix(path.basename(process.cwd()))
+      return pathToPosix(projectWorkingDirectory)
     }
   }
 }
