@@ -65,7 +65,6 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
     return equal
   }
   // Lazy initialization: only check platform and add tween sequence system on first frame
-  let tweenSequenceSystemInitialized = false
   let platformCheckStarted = false
   function initializeTweenSequenceSystem() {
     const restartTweens: (() => void)[] = []
@@ -144,38 +143,29 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
   }
 
   // Add a one-time system that checks platform on first frame and initializes tween sequences
+  // Only for non Explorer Alpha clients
   const initializeTweenSequenceOnFirstFrame = function (dt: number) {
-    if (tweenSequenceSystemInitialized) return
+    if (platformCheckStarted) return
+    platformCheckStarted = true
 
-    // Only try the platform check once
-    if (!platformCheckStarted) {
-      platformCheckStarted = true
-
-      // Fire and forget - handle async operation without blocking the system
-      ;(async () => {
-        try {
-          // Dynamic import to access runtime API that's only available in runtime
-          // @ts-ignore
-          const { getExplorerInformation } = await import('~system/Runtime')
-          const info = await getExplorerInformation({})
-          console.log(`PRAVS - explorer information: ${info.platform}`)
-
-          // Only enable tween sequences on desktop
-          if (info.platform !== 'desktop') {
-            initializeTweenSequenceSystem()
-          }
-
-          tweenSequenceSystemInitialized = true
-        } catch (error) {
-          // If we can't get platform info (e.g., during build), don't initialize tween sequences
-          console.log('Tween sequences disabled: platform detection unavailable')
-          tweenSequenceSystemInitialized = true
+    // Fire and forget - handle async operation without blocking the system
+    // @ts-ignore - Dynamic import to access runtime API that's only available in runtime
+    import('~system/Runtime')
+      .then(({ getExplorerInformation }) => getExplorerInformation({}))
+      .then((info) => {
+        // Only skip tween sequences on "Explorer Alpha" (desktop platform)
+        if (info.platform !== 'desktop') {
+          initializeTweenSequenceSystem()
         }
-
-        // Remove this initialization system once we've finished
+      })
+      .catch((error) => {
+        // If we can't get platform info initialize tween sequences by default
+        console.log('Platform detection unavailable, enabling tween sequences by default')
+        initializeTweenSequenceSystem()
+      })
+      .finally(() => {
         engine.removeSystem(initializeTweenSequenceOnFirstFrame)
-      })()
-    }
+      })
   }
   engine.addSystem(initializeTweenSequenceOnFirstFrame)
 
