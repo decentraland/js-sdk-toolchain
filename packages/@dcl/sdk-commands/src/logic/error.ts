@@ -59,6 +59,10 @@ export type CliErrorName =
   // Workspace validations errors
   | 'WORKSPACE_VALIDATIONS_INVALID_WORKSPACE_JSON'
   | 'WORKSPACE_VALIDATIONS_INVALID_WORKSPACE_JSON_READ'
+  // Code to composite errors
+  | 'CODE_TO_COMPOSITE_BUILD_FAILED'
+  | 'CODE_TO_COMPOSITE_BUNDLE_NOT_FOUND'
+  | 'CODE_TO_COMPOSITE_EXECUTION_FAILED'
 
 export class CliError<T extends CliErrorName> extends Error {
   constructor(public name: T = 'CliError' as T, public message: string = '', public stack?: string) {
