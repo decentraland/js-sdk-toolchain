@@ -4,7 +4,8 @@ import { componentNumberFromName } from '../../packages/@dcl/ecs/src/components/
 import {
   createGetCrdtMessagesForLww,
   createDumpLwwFunctionFromCrdt,
-  createUpdateLwwFromCrdt
+  createUpdateLwwFromCrdt,
+  createCrdtRuleValidator
 } from '../../packages/@dcl/ecs/src/engine/lww-element-set-component-definition'
 import * as components from '../../packages/@dcl/ecs/src/components'
 
@@ -38,6 +39,9 @@ export const int8Component = (engine: IEngine) => {
     componentName: componentName,
     componentType: ComponentType.LastWriteWinElementSet,
     updateFromCrdt: createUpdateLwwFromCrdt(ID, timestamps, schema, data),
+    __dry_run_updateFromCrdt: createCrdtRuleValidator(timestamps, schema, data),
+    validateBeforeChange: () => true,
+    __run_validateBeforeChange: () => true,
     schema,
     has: function (entity: Entity): boolean {
       return data.has(entity)
@@ -96,6 +100,12 @@ export const int8Component = (engine: IEngine) => {
     onChange: () => {},
     __onChangeCallbacks() {
       return undefined
+    },
+    __forceUpdateFromCrdt() {
+      return [null, {}]
+    },
+    getCrdtState() {
+      return { data: new Uint8Array(), timestamp: 1 }
     }
   }
 
