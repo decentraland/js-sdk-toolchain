@@ -9,7 +9,7 @@ EVAL test/snapshots/production-bundles/cubes.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   OPCODES ~= 113k
-  MALLOC_COUNT = 19174
+  MALLOC_COUNT = 19173
   ALIVE_OBJS_DELTA ~= 4.75k
 CALL onStart()
   OPCODES ~= 0k
@@ -1654,4 +1654,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 700k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1259.49k bytes
+  MEMORY_USAGE_COUNT ~= 1259.56k bytes
