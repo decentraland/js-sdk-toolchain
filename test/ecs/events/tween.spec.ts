@@ -67,7 +67,7 @@ function mockTweenEngine(engine: IEngine, Tween: TweenComponentDefinitionExtende
 function mockTweenStatusEngine(engine: IEngine, TweenState: ReturnType<typeof components.TweenState>) {
   return async function (entity: Entity) {
     TweenState.deleteFrom(entity)
-    // We need this updates in order to have at least 3 frames. (min amount of frames so a tween can consider completed)
+    // Run a few updates to ensure cache is initialized
     await engine.update(1)
     await engine.update(1)
     await engine.update(1)

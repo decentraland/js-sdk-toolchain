@@ -26,8 +26,6 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
     {
       // Used to detect new tweens for the same entity
       tween: Uint8Array
-      // Avoid updaing again the tween in the case we receieve a network tween from other client
-      frames: number
       // Trigger the isCompleted only once per tween
       completed: boolean
       // Tween has changed on this frame
@@ -38,15 +36,15 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
     const tweenState = TweenState.getOrNull(entity)
     const tween = Tween.getOrNull(entity)
     const tweenCache = cache.get(entity)
-    if (!tweenState || !tween) return false
+    if (!tweenState || !tween || !tweenCache) return false
     /* istanbul ignore next */
     if (
       // Renderer notified that the tween is completed
-      (tweenChanged(entity) || tweenState.state === TweenStateStatus.TS_COMPLETED) &&
+      // Only consider it completed if the tween hasn't changed this frame (to avoid false positives after YOYO/sequence processing)
+      ((tweenState.state === TweenStateStatus.TS_COMPLETED && !tweenCache.changed) ||
+       (tweenChanged(entity) && !tweenCache.changed)) &&
       // Avoid sending isCompleted multiple times
-      !tweenCache?.completed &&
-      // Amount of frames needed to consider a tween completed
-      (tweenCache?.frames ?? 0) > 2
+      !tweenCache.completed
     ) {
       return true
     }
@@ -59,10 +57,11 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
     if ((currentTween && !prevTween) || (!currentTween && prevTween)) {
       return true
     }
+    if (!currentTween || !prevTween) return false
     const currentBuff = new ReadWriteByteBuffer()
-    Tween.schema.serialize(currentTween!, currentBuff)
-    const equal = dataCompare(currentBuff.toBinary(), prevTween)
-    return equal
+    Tween.schema.serialize(currentTween, currentBuff)
+    const compareResult = dataCompare(currentBuff.toBinary(), prevTween)
+    return compareResult !== 0
   }
 
   // System to manage cache (needed for tweenSystem.tweenCompleted() to work)
@@ -73,7 +72,6 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
         Tween.schema.serialize(tween, buffer)
         cache.set(entity, {
           tween: buffer.toBinary(),
-          frames: 0,
           completed: false,
           changed: true
         })
@@ -81,11 +79,8 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
       }
       const tweenCache = cache.get(entity)
       if (tweenCache) {
-        tweenCache.frames += 1
         tweenCache.changed = false
         if (isCompleted(entity)) {
-          // Reset tween frames.
-          tweenCache.frames = 0
           // set the tween completed to avoid calling this again for the same tween
           tweenCache.completed = true
         }
@@ -144,11 +139,15 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
               mutableTweenHelper.sequence.push(tween)
             }
             // Reset completed flag for the next tween in sequence
+            // Mark as changed so the cache system will detect the change and reset the cache properly
             tweenCache.completed = false
+            tweenCache.changed = true
           } else if (tweenSequence.loop === TweenLoop.TL_YOYO) {
             Tween.createOrReplace(entity, backwardsTween(tween))
             // Reset completed flag for the backwards tween
+            // Mark as changed so the cache system will detect the change and reset the cache properly
             tweenCache.completed = false
+            tweenCache.changed = true
           } else if (tweenSequence.loop === TweenLoop.TL_RESTART) {
             Tween.deleteFrom(entity)
             cache.delete(entity)
