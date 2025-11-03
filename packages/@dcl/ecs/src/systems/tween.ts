@@ -64,6 +64,35 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
     const equal = dataCompare(currentBuff.toBinary(), prevTween)
     return equal
   }
+
+  // System to manage cache (needed for tweenSystem.tweenCompleted() to work)
+  engine.addSystem(() => {
+    for (const [entity, tween] of engine.getEntitiesWith(Tween)) {
+      if (tweenChanged(entity)) {
+        const buffer = new ReadWriteByteBuffer()
+        Tween.schema.serialize(tween, buffer)
+        cache.set(entity, {
+          tween: buffer.toBinary(),
+          frames: 0,
+          completed: false,
+          changed: true
+        })
+        continue
+      }
+      const tweenCache = cache.get(entity)
+      if (tweenCache) {
+        tweenCache.frames += 1
+        tweenCache.changed = false
+        if (isCompleted(entity)) {
+          // Reset tween frames.
+          tweenCache.frames = 0
+          // set the tween completed to avoid calling this again for the same tween
+          tweenCache.completed = true
+        }
+      }
+    }
+  }, Number.NEGATIVE_INFINITY)
+
   // Lazy initialization: only check platform and add tween sequence system on first frame
   let platformCheckStarted = false
   function initializeTweenSequenceSystem() {
@@ -98,25 +127,11 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
       }
       restartTweens.length = 0
       for (const [entity, tween] of engine.getEntitiesWith(Tween)) {
-        if (tweenChanged(entity)) {
-          const buffer = new ReadWriteByteBuffer()
-          Tween.schema.serialize(tween, buffer)
-          cache.set(entity, {
-            tween: buffer.toBinary(),
-            frames: 0,
-            completed: false,
-            changed: true
-          })
-          continue
-        }
-        const tweenCache = cache.get(entity)!
-        tweenCache.frames += 1
-        tweenCache.changed = false
-        if (isCompleted(entity)) {
-          // Reset tween frames.
-          tweenCache.frames = 0
-          // set the tween completed to avoid calling this again for the same tween
-          tweenCache.completed = true
+        const tweenCache = cache.get(entity)
+        if (!tweenCache) continue
+
+        // Only process tween sequences if the tween is completed
+        if (tweenCache.completed) {
           const tweenSequence = TweenSequence.getOrNull(entity)
           if (!tweenSequence) continue
           const { sequence } = tweenSequence
@@ -128,8 +143,12 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
             if (tweenSequence.loop === TweenLoop.TL_RESTART) {
               mutableTweenHelper.sequence.push(tween)
             }
+            // Reset completed flag for the next tween in sequence
+            tweenCache.completed = false
           } else if (tweenSequence.loop === TweenLoop.TL_YOYO) {
             Tween.createOrReplace(entity, backwardsTween(tween))
+            // Reset completed flag for the backwards tween
+            tweenCache.completed = false
           } else if (tweenSequence.loop === TweenLoop.TL_RESTART) {
             Tween.deleteFrom(entity)
             cache.delete(entity)
@@ -158,7 +177,7 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
           initializeTweenSequenceSystem()
         }
       })
-      .catch((error) => {
+      .catch((_error) => {
         // If we can't get platform info initialize tween sequences by default
         console.log('Platform detection unavailable, enabling tween sequences by default')
         initializeTweenSequenceSystem()
