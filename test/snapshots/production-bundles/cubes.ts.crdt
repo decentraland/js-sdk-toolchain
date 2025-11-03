@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=252.9k bytes
+SCENE_COMPILED_JS_SIZE_PROD=253.4k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -9,7 +9,7 @@ EVAL test/snapshots/production-bundles/cubes.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   OPCODES ~= 113k
-  MALLOC_COUNT = 19148
+  MALLOC_COUNT = 19174
   ALIVE_OBJS_DELTA ~= 4.75k
 CALL onStart()
   OPCODES ~= 0k
@@ -563,8 +563,10 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x2b4 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   Scene: PUT_COMPONENT e=0x2b5 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   Scene: PUT_COMPONENT e=0x2b6 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
+  REQUIRE: ~system/Runtime
+  LOG: ["Platform detection unavailable, enabling tween sequences by default"]
   OPCODES ~= 1012k
-  MALLOC_COUNT = 1840
+  MALLOC_COUNT = 1853
   ALIVE_OBJS_DELTA ~= 0.74k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=2 data={"position":{"x":-3,"y":2.7722561359405518,"z":-3},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":0.5,"y":0.5,"z":0.5},"parent":0}
@@ -1652,4 +1654,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 700k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1255.38k bytes
+  MEMORY_USAGE_COUNT ~= 1259.49k bytes

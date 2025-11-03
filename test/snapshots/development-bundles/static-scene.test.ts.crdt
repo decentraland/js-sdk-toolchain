@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=499.4k bytes
+SCENE_COMPILED_JS_SIZE_PROD=500.6k bytes
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -11,7 +11,7 @@ EVAL test/snapshots/development-bundles/static-scene.test.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   OPCODES ~= 61k
-  MALLOC_COUNT = 14716
+  MALLOC_COUNT = 14753
   ALIVE_OBJS_DELTA ~= 2.92k
 CALL onStart()
   main.crdt: PUT_COMPONENT e=0x200 c=1 t=0 data={"position":{"x":5.880000114440918,"y":2.7916901111602783,"z":7.380000114440918},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
@@ -46,14 +46,16 @@ CALL onStart()
   ALIVE_OBJS_DELTA ~= 0.09k
 CALL onUpdate(0)
    ~system/Testing: plan {"tests":[{"name":"ensure that cubes are in the scene on the first frame"}]}
-  OPCODES ~= 17k
-  MALLOC_COUNT = -61
-  ALIVE_OBJS_DELTA ~= -0.03k
+  REQUIRE: ~system/Runtime
+  LOG: ["Platform detection unavailable, enabling tween sequences by default"]
+  OPCODES ~= 18k
+  MALLOC_COUNT = -50
+  ALIVE_OBJS_DELTA ~= -0.02k
 CALL onUpdate(0.1)
   LOG: ["🧪 Running test ensure that cubes are in the scene on the first frame"]
   LOG: ["🟢 Test passed ensure that cubes are in the scene on the first frame"]
   ~system/Testing: logTestResult {"name":"ensure that cubes are in the scene on the first frame","ok":true,"totalFrames":0,"totalTime":0}
   OPCODES ~= 3k
-  MALLOC_COUNT = -5
+  MALLOC_COUNT = -7
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1285.88k bytes
+  MEMORY_USAGE_COUNT ~= 1293.17k bytes

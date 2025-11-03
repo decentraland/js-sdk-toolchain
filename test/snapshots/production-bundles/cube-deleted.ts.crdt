@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=215.7k bytes
+SCENE_COMPILED_JS_SIZE_PROD=216.2k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -9,7 +9,7 @@ EVAL test/snapshots/production-bundles/cube-deleted.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   OPCODES ~= 63k
-  MALLOC_COUNT = 12850
+  MALLOC_COUNT = 12876
   ALIVE_OBJS_DELTA ~= 2.85k
 CALL onStart()
   OPCODES ~= 0k
@@ -18,8 +18,10 @@ CALL onStart()
 CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   Scene: PUT_COMPONENT e=0x201 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
+  REQUIRE: ~system/Runtime
+  LOG: ["Platform detection unavailable, enabling tween sequences by default"]
   OPCODES ~= 4k
-  MALLOC_COUNT = 50
+  MALLOC_COUNT = 63
   ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0.1)
   Scene: DELETE_COMPONENT e=0x201 c=1019 t=2 data=null
@@ -42,4 +44,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 5k
   MALLOC_COUNT = 1
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 929.90k bytes
+  MEMORY_USAGE_COUNT ~= 934.10k bytes

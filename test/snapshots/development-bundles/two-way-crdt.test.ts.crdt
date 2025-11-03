@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=499.9k bytes
+SCENE_COMPILED_JS_SIZE_PROD=501.2k bytes
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -11,7 +11,7 @@ EVAL test/snapshots/development-bundles/two-way-crdt.test.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   OPCODES ~= 70k
-  MALLOC_COUNT = 15246
+  MALLOC_COUNT = 15283
   ALIVE_OBJS_DELTA ~= 3.08k
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
@@ -21,10 +21,12 @@ CALL onStart()
   ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0)
    ~system/Testing: plan {"tests":[{"name":"two way communication"}]}
+  REQUIRE: ~system/Runtime
   LOG: ["Adding one to position.y=0"]
+  LOG: ["Platform detection unavailable, enabling tween sequences by default"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=2 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
   OPCODES ~= 5k
-  MALLOC_COUNT = 17
+  MALLOC_COUNT = 28
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
   LOG: ["🧪 Running test two way communication"]
@@ -62,6 +64,6 @@ CALL onUpdate(0.1)
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=8 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   OPCODES ~= 5k
-  MALLOC_COUNT = -40
+  MALLOC_COUNT = -42
   ALIVE_OBJS_DELTA ~= -0.01k
-  MEMORY_USAGE_COUNT ~= 1294.78k bytes
+  MEMORY_USAGE_COUNT ~= 1302.07k bytes
