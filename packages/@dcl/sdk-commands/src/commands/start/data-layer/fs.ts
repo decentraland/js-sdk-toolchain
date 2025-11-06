@@ -38,7 +38,7 @@ export function createFileSystemInterfaceFromFsComponent(
       if (!(await fs.directoryExists(folder))) {
         await fs.mkdir(folder, { recursive: true })
       }
-      await fs.writeFile(resolvedPath, content)
+      await fs.writeFile(resolvedPath, content as Uint8Array)
     },
     async rm(filePath: string) {
       const resolvedPath = path.isAbsolute(filePath) ? filePath : path.resolve(projectWorkingDirectory, filePath)
@@ -62,6 +62,11 @@ export function createFileSystemInterfaceFromFsComponent(
     },
     cwd(): string {
       return pathToPosix(projectWorkingDirectory)
+    },
+    async stat(filePath: string): Promise<{ size: number }> {
+      const resolvedPath = path.isAbsolute(filePath) ? filePath : path.resolve(projectWorkingDirectory, filePath)
+      const stats = await fs.stat(resolvedPath)
+      return { size: Number(stats.size) }
     }
   }
 }
