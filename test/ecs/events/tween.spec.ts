@@ -12,47 +12,6 @@ import {
 import { createTweenSystem } from '../../../packages/@dcl/ecs/src/systems/tween'
 import { Quaternion, Vector2, Vector3 } from '../../../packages/@dcl/sdk/math'
 
-// Mock ~system/Runtime to control platform detection
-jest.mock('~system/Runtime')
-
-// Helper to set platform and wait for platform check to complete
-async function waitForPlatformCheck(engine: IEngine, platform: string = 'web') {
-  // Set platform before engine checks it
-  const Runtime = await import('~system/Runtime')
-  if ((Runtime as any).setPlatform) {
-    ;(Runtime as any).setPlatform(platform)
-  }
-  // Run frames to allow async platform check to complete
-  await engine.update(1)
-  await engine.update(1)
-  await engine.update(1)
-  // Small delay to ensure async promise chain completes
-  await new Promise((resolve) => setTimeout(resolve, 10))
-}
-
-// Helper to set platform before creating engine (for platform-specific tests)
-async function setPlatformBeforeEngine(platform: string) {
-  const Runtime = await import('~system/Runtime')
-  if ((Runtime as any).setPlatform) {
-    ;(Runtime as any).setPlatform(platform)
-  }
-  if ((Runtime as any).setShouldThrowError) {
-    ;(Runtime as any).setShouldThrowError(false)
-  }
-  // Small delay to ensure mock is set up
-  await new Promise((resolve) => setTimeout(resolve, 0))
-}
-
-// Helper to make platform check fail (for testing catch block)
-async function setPlatformCheckToFail() {
-  const Runtime = await import('~system/Runtime')
-  if ((Runtime as any).setShouldThrowError) {
-    ;(Runtime as any).setShouldThrowError(true)
-  }
-  // Small delay to ensure mock is set up
-  await new Promise((resolve) => setTimeout(resolve, 0))
-}
-
 function mockTweenEngine(engine: IEngine, Tween: TweenComponentDefinitionExtended) {
   return async function (entity: Entity, mode?: PBTween['mode']) {
     const tween = Tween.createOrReplace(entity, {
@@ -210,19 +169,23 @@ describe('Tween System', () => {
     expect(completed).toBeCalledTimes(0)
   })
 
-  describe('Platform-specific tween sequence behavior', () => {
-    it('should NOT execute YOYO tween sequence logic when platform is desktop', async () => {
-      // Set platform BEFORE creating engine so the check sees desktop
-      await setPlatformBeforeEngine('desktop')
+  describe('ENABLE_SDK_TWEEN_SEQUENCE flag behavior', () => {
+    const originalGlobalThis = globalThis as any
+
+    afterEach(() => {
+      // Clean up global flag after each test
+      delete (globalThis as any).ENABLE_SDK_TWEEN_SEQUENCE
+    })
+
+    it('should NOT execute YOYO tween sequence logic when flag is false', async () => {
+      // Set flag to false BEFORE creating engine
+      ;(globalThis as any).ENABLE_SDK_TWEEN_SEQUENCE = false
       const testEngine = Engine()
       const testTweenSystem = createTweenSystem(testEngine)
       const testTween = components.Tween(testEngine)
       const testTweenState = components.TweenState(testEngine)
       const testTweenSequence = components.TweenSequence(testEngine)
       const testEntity = testEngine.addEntity()
-
-      // Wait for platform check to complete
-      await waitForPlatformCheck(testEngine, 'desktop')
 
       // Create a tween with YOYO sequence
       const originalTween = testTween.createOrReplace(testEntity, {
@@ -241,23 +204,20 @@ describe('Tween System', () => {
       testTweenState.createOrReplace(testEntity, { state: TweenStateStatus.TS_COMPLETED, currentTime: 1 })
       await testEngine.update(1)
 
-      // On desktop, YOYO should NOT reverse the tween
+      // When flag is false, YOYO should NOT reverse the tween
       const currentTween = testTween.get(testEntity)
       expect(currentTween.mode).toMatchCloseTo(originalTween.mode)
     })
 
-    it('should execute YOYO tween sequence logic when platform is NOT desktop', async () => {
-      // Set platform BEFORE creating engine so the check sees web
-      await setPlatformBeforeEngine('web')
+    it('should execute YOYO tween sequence logic when flag is true', async () => {
+      // Set flag to true BEFORE creating engine
+      ;(globalThis as any).ENABLE_SDK_TWEEN_SEQUENCE = true
       const testEngine = Engine()
       const testTweenSystem = createTweenSystem(testEngine)
       const testTween = components.Tween(testEngine)
       const testTweenState = components.TweenState(testEngine)
       const testTweenSequence = components.TweenSequence(testEngine)
       const testEntity = testEngine.addEntity()
-
-      // Wait for platform check to complete
-      await waitForPlatformCheck(testEngine, 'web')
 
       // Create a tween with YOYO sequence
       const originalTween = testTween.createOrReplace(testEntity, {
@@ -276,25 +236,24 @@ describe('Tween System', () => {
       testTweenState.createOrReplace(testEntity, { state: TweenStateStatus.TS_COMPLETED, currentTime: 1 })
       await testEngine.update(1)
 
-      // On non-desktop, YOYO should reverse the tween
+      // When flag is true, YOYO should reverse the tween
       const currentTween = testTween.get(testEntity)
       expect(currentTween.mode).toMatchCloseTo(
         testTween.Mode.Move({ start: Vector3.create(1, 1, 1), end: Vector3.create(0, 0, 0) })
       )
     })
 
-    it('should execute YOYO tween sequence logic when platform detection fails (catch block)', async () => {
-      // Make platform check fail BEFORE creating engine
-      await setPlatformCheckToFail()
+    it('should execute YOYO tween sequence logic when flag is undefined (default behavior)', async () => {
+      // Ensure flag is undefined (default behavior) - delete it before creating engine
+      delete (globalThis as any).ENABLE_SDK_TWEEN_SEQUENCE
+      // Verify it's actually undefined
+      expect((globalThis as any).ENABLE_SDK_TWEEN_SEQUENCE).toBeUndefined()
       const testEngine = Engine()
       const testTweenSystem = createTweenSystem(testEngine)
       const testTween = components.Tween(testEngine)
       const testTweenState = components.TweenState(testEngine)
       const testTweenSequence = components.TweenSequence(testEngine)
       const testEntity = testEngine.addEntity()
-
-      // Wait for platform check to complete (it will fail and enable tween sequences by default)
-      await waitForPlatformCheck(testEngine, 'web') // platform param doesn't matter when error is thrown
 
       // Create a tween with YOYO sequence
       const originalTween = testTween.createOrReplace(testEntity, {
@@ -313,7 +272,7 @@ describe('Tween System', () => {
       testTweenState.createOrReplace(testEntity, { state: TweenStateStatus.TS_COMPLETED, currentTime: 1 })
       await testEngine.update(1)
 
-      // When platform detection fails, YOYO should still work (tween sequences enabled by default)
+      // When flag is undefined, YOYO should work (tween sequences enabled by default)
       const currentTween = testTween.get(testEntity)
       expect(currentTween.mode).toMatchCloseTo(
         testTween.Mode.Move({ start: Vector3.create(1, 1, 1), end: Vector3.create(0, 0, 0) })
