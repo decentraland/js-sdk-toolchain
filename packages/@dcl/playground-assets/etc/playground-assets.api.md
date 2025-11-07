@@ -143,6 +143,9 @@ export const AvatarEmoteCommand: GrowOnlyValueSetComponentDefinition<PBAvatarEmo
 export const AvatarEquippedData: LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>;
 
 // @public (undocumented)
+export const AvatarLocomotionSettings: LastWriteWinElementSetComponentDefinition<PBAvatarLocomotionSettings>;
+
+// @public (undocumented)
 export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>;
 
 // @public (undocumented)
@@ -629,6 +632,7 @@ export const componentDefinitionByName: {
     "core::AvatarBase": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarBase>>;
     "core::AvatarEmoteCommand": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>>;
     "core::AvatarEquippedData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>>;
+    "core::AvatarLocomotionSettings": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarLocomotionSettings>>;
     "core::AvatarModifierArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>>;
     "core::AvatarShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarShape>>;
     "core::Billboard": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBBillboard>>;
@@ -2260,6 +2264,24 @@ export namespace PBAvatarEquippedData {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarEquippedData;
     // (undocumented)
     export function encode(message: PBAvatarEquippedData, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAvatarLocomotionSettings {
+    hardLandingCooldown?: number | undefined;
+    jogSpeed?: number | undefined;
+    jumpHeight?: number | undefined;
+    runJumpHeight?: number | undefined;
+    runSpeed?: number | undefined;
+    walkSpeed?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBAvatarLocomotionSettings {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarLocomotionSettings;
+    // (undocumented)
+    export function encode(message: PBAvatarLocomotionSettings, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
