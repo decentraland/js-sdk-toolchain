@@ -88,8 +88,6 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
     }
   }, Number.NEGATIVE_INFINITY)
 
-  // Lazy initialization: only check platform and add tween sequence system on first frame
-  let platformCheckStarted = false
   function initializeTweenSequenceSystem() {
     const restartTweens: (() => void)[] = []
     function backwardsTween(tween: PBTween): PBTween {
@@ -160,32 +158,10 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
     }, Number.NEGATIVE_INFINITY)
   }
 
-  // Add a one-time system that checks platform on first frame and initializes tween sequences
-  // Only for non Explorer Alpha clients
-  const initializeTweenSequenceOnFirstFrame = function (dt: number) {
-    if (platformCheckStarted) return
-    platformCheckStarted = true
-
-    // Fire and forget - handle async operation without blocking the system
-    // @ts-ignore - Dynamic import to access runtime API that's only available in runtime
-    import('~system/Runtime')
-      .then(({ getExplorerInformation }) => getExplorerInformation({}))
-      .then((info) => {
-        // Only skip tween sequences on "Explorer Alpha" (desktop platform)
-        if (info.platform !== 'desktop') {
-          initializeTweenSequenceSystem()
-        }
-      })
-      .catch((_error) => {
-        // If we can't get platform info initialize tween sequences by default
-        console.log('Platform detection unavailable, enabling tween sequences by default')
-        initializeTweenSequenceSystem()
-      })
-      .finally(() => {
-        engine.removeSystem(initializeTweenSequenceOnFirstFrame)
-      })
-  }
-  engine.addSystem(initializeTweenSequenceOnFirstFrame)
+  // Some Explorers may not inject the flag and TweenSequence logic must be enabled in that case
+  const enableTweenSequenceLogic = (globalThis as any).ENABLE_SDK_TWEEN_SEQUENCE
+  if (enableTweenSequenceLogic === undefined || enableTweenSequenceLogic === true)
+    initializeTweenSequenceSystem()
 
   const tweenSystem: TweenSystem = {
     // This event is fired only once per tween
