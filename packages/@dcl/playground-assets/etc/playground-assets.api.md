@@ -509,9 +509,8 @@ export const enum ColliderLayer {
     CL_CUSTOM8 = 32768,
     CL_NONE = 0,
     CL_PHYSICS = 2,
+    CL_PLAYER = 4,
     CL_POINTER = 1,
-    // (undocumented)
-    CL_RESERVED1 = 4,
     // (undocumented)
     CL_RESERVED2 = 8,
     // (undocumented)
@@ -724,6 +723,7 @@ export const componentDefinitionByName: {
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
     "core::GltfNode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNode>>;
+    "core::GltfNodeModifiers": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNodeModifiers>>;
     "core::GltfNodeState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNodeState>>;
     "core::InputModifier": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBInputModifier>>;
     "core::LightSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBLightSource>>;
@@ -740,8 +740,11 @@ export const componentDefinitionByName: {
     "core::Raycast": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycast>>;
     "core::RaycastResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycastResult>>;
     "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
+    "core::SkyboxTime": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSkyboxTime>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
     "core::TextureCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextureCamera>>;
+    "core::TriggerArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTriggerArea>>;
+    "core::TriggerAreaResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTriggerAreaResult>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
     "core::TweenSequence": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenSequence>>;
     "core::TweenState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenState>>;
@@ -1330,6 +1333,9 @@ export const GltfContainerLoadingState: LastWriteWinElementSetComponentDefinitio
 
 // @public (undocumented)
 export const GltfNode: LastWriteWinElementSetComponentDefinition<PBGltfNode>;
+
+// @public (undocumented)
+export const GltfNodeModifiers: LastWriteWinElementSetComponentDefinition<PBGltfNodeModifiers>;
 
 // @public (undocumented)
 export const GltfNodeState: LastWriteWinElementSetComponentDefinition<PBGltfNodeState>;
@@ -1999,6 +2005,22 @@ export namespace Move {
     export function encode(message: Move, writer?: _m0.Writer): _m0.Writer;
 }
 
+// @public (undocumented)
+export interface MoveContinuous {
+    // (undocumented)
+    direction: PBVector3 | undefined;
+    // (undocumented)
+    speed: number;
+}
+
+// @public (undocumented)
+export namespace MoveContinuous {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): MoveContinuous;
+    // (undocumented)
+    export function encode(message: MoveContinuous, writer?: _m0.Writer): _m0.Writer;
+}
+
 // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
 // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
@@ -2414,6 +2436,7 @@ export interface PBAvatarShape {
     hairColor?: PBColor3 | undefined;
     id: string;
     name?: string | undefined;
+    showOnlyWearables?: boolean | undefined;
     skinColor?: PBColor3 | undefined;
     talking?: boolean | undefined;
     wearables: string[];
@@ -2619,6 +2642,35 @@ export namespace PBGltfNode {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfNode;
     // (undocumented)
     export function encode(message: PBGltfNode, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBGltfNodeModifiers {
+    // (undocumented)
+    modifiers: PBGltfNodeModifiers_GltfNodeModifier[];
+}
+
+// @public (undocumented)
+export namespace PBGltfNodeModifiers {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfNodeModifiers;
+    // (undocumented)
+    export function encode(message: PBGltfNodeModifiers, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBGltfNodeModifiers_GltfNodeModifier {
+    castShadows?: boolean | undefined;
+    material?: PBMaterial | undefined;
+    path: string;
+}
+
+// @public (undocumented)
+export namespace PBGltfNodeModifiers_GltfNodeModifier {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfNodeModifiers_GltfNodeModifier;
+    // (undocumented)
+    export function encode(message: PBGltfNodeModifiers_GltfNodeModifier, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3244,6 +3296,20 @@ export namespace PBRealmInfo {
 }
 
 // @public (undocumented)
+export interface PBSkyboxTime {
+    fixedTime: number;
+    transitionMode?: TransitionMode | undefined;
+}
+
+// @public (undocumented)
+export namespace PBSkyboxTime {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBSkyboxTime;
+    // (undocumented)
+    export function encode(message: PBSkyboxTime, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBTextShape {
     font?: Font | undefined;
     fontAutoSize?: boolean | undefined;
@@ -3303,6 +3369,56 @@ export namespace PBTextureCamera {
 }
 
 // @public (undocumented)
+export interface PBTriggerArea {
+    collisionMask?: number | undefined;
+    mesh?: TriggerAreaMeshType | undefined;
+}
+
+// @public (undocumented)
+export namespace PBTriggerArea {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTriggerArea;
+    // (undocumented)
+    export function encode(message: PBTriggerArea, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBTriggerAreaResult {
+    eventType: TriggerAreaEventType;
+    timestamp: number;
+    // (undocumented)
+    trigger: PBTriggerAreaResult_Trigger | undefined;
+    triggeredEntity: number;
+    triggeredEntityPosition: PBVector3 | undefined;
+    triggeredEntityRotation: PBQuaternion | undefined;
+}
+
+// @public (undocumented)
+export namespace PBTriggerAreaResult {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTriggerAreaResult;
+    // (undocumented)
+    export function encode(message: PBTriggerAreaResult, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBTriggerAreaResult_Trigger {
+    entity: number;
+    layers: number;
+    position: PBVector3 | undefined;
+    rotation: PBQuaternion | undefined;
+    scale: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBTriggerAreaResult_Trigger {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTriggerAreaResult_Trigger;
+    // (undocumented)
+    export function encode(message: PBTriggerAreaResult_Trigger, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBTween {
     currentTime?: number | undefined;
     duration: number;
@@ -3321,6 +3437,15 @@ export interface PBTween {
     } | {
         $case: "textureMove";
         textureMove: TextureMove;
+    } | {
+        $case: "rotateContinuous";
+        rotateContinuous: RotateContinuous;
+    } | {
+        $case: "moveContinuous";
+        moveContinuous: MoveContinuous;
+    } | {
+        $case: "textureMoveContinuous";
+        textureMoveContinuous: TextureMoveContinuous;
     } | undefined;
     playing?: boolean | undefined;
 }
@@ -4282,6 +4407,22 @@ export namespace Rotate {
     export function encode(message: Rotate, writer?: _m0.Writer): _m0.Writer;
 }
 
+// @public (undocumented)
+export interface RotateContinuous {
+    // (undocumented)
+    direction: PBQuaternion | undefined;
+    // (undocumented)
+    speed: number;
+}
+
+// @public (undocumented)
+export namespace RotateContinuous {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): RotateContinuous;
+    // (undocumented)
+    export function encode(message: RotateContinuous, writer?: _m0.Writer): _m0.Writer;
+}
+
 // Warning: (ae-missing-release-tag) "RPCSendableMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -4452,6 +4593,9 @@ export const enum ShowScrollBar {
 }
 
 // @public (undocumented)
+export const SkyboxTime: LastWriteWinElementSetComponentDefinition<PBSkyboxTime>;
+
+// @public (undocumented)
 export interface Spec {
     // (undocumented)
     [key: string]: ISchema;
@@ -4587,6 +4731,23 @@ export namespace TextureMove {
 }
 
 // @public (undocumented)
+export interface TextureMoveContinuous {
+    // (undocumented)
+    direction: PBVector2 | undefined;
+    movementType?: TextureMovementType | undefined;
+    // (undocumented)
+    speed: number;
+}
+
+// @public (undocumented)
+export namespace TextureMoveContinuous {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): TextureMoveContinuous;
+    // (undocumented)
+    export function encode(message: TextureMoveContinuous, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export const enum TextureMovementType {
     TMT_OFFSET = 0,
     // (undocumented)
@@ -4690,6 +4851,12 @@ export type TransformType = {
 export type TransformTypeWithOptionals = Partial<TransformType>;
 
 // @public (undocumented)
+export const enum TransitionMode {
+    TM_BACKWARD = 1,
+    TM_FORWARD = 0
+}
+
+// @public (undocumented)
 export type Transport = {
     send(message: Uint8Array | Uint8Array[]): Promise<void>;
     onmessage?(message: Uint8Array): void;
@@ -4699,6 +4866,30 @@ export type Transport = {
 
 // @public (undocumented)
 export type TransportMessage = Omit<ReceiveMessage, 'data'>;
+
+// @public (undocumented)
+export const TriggerArea: LastWriteWinElementSetComponentDefinition<PBTriggerArea>;
+
+// @public (undocumented)
+export const enum TriggerAreaEventType {
+    // (undocumented)
+    TAET_ENTER = 0,
+    // (undocumented)
+    TAET_EXIT = 2,
+    // (undocumented)
+    TAET_STAY = 1
+}
+
+// @public (undocumented)
+export const enum TriggerAreaMeshType {
+    // (undocumented)
+    TAMT_BOX = 0,
+    // (undocumented)
+    TAMT_SPHERE = 1
+}
+
+// @public (undocumented)
+export const TriggerAreaResult: LastWriteWinElementSetComponentDefinition<PBTriggerAreaResult>;
 
 // Warning: (ae-missing-release-tag) "Tween" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
