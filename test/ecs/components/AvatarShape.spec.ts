@@ -18,6 +18,7 @@ describe('Generated AvatarShape ProtoBuf', () => {
       expressionTriggerTimestamp: 0,
       talking: true,
       emotes: [],
+      showOnlyWearables: false,
       forceRender: []
     })
 
@@ -33,6 +34,7 @@ describe('Generated AvatarShape ProtoBuf', () => {
       expressionTriggerTimestamp: 1,
       talking: false,
       emotes: [],
+      showOnlyWearables: false,
       forceRender: []
     })
   })
