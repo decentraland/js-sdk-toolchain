@@ -202,6 +202,15 @@ function preEngine(options?: IEngineOptions): PreEngine {
     return entity!
   }
 
+  function* getEntitiesByTag(tagName: string): Iterable<Entity> {
+    const TagComponent = components.Tags({ defineComponent })
+    for (const [entity, component] of getEntitiesWith(TagComponent)) {
+      if (entity !== 0 && component.tags?.some((tag) => tag === tagName)) {
+        yield entity
+      }
+    }
+  }
+
   function* getComponentDefGroup<T extends ComponentDefinition<any>[]>(...args: T): Iterable<[Entity, ...T]> {
     const [firstComponentDef, ...componentDefinitions] = args
     for (const [entity] of firstComponentDef.iterator()) {
@@ -258,6 +267,7 @@ function preEngine(options?: IEngineOptions): PreEngine {
     getComponentOrNull: getComponentOrNull as IEngine['getComponentOrNull'],
     getEntityOrNullByName,
     getEntityByName,
+    getEntitiesByTag,
     removeComponentDefinition,
     registerComponentDefinition,
     entityContainer,
@@ -320,7 +330,7 @@ export function Engine(options?: IEngineOptions): IEngine {
     seal: partialEngine.seal,
     getEntityOrNullByName: partialEngine.getEntityOrNullByName,
     getEntityByName: partialEngine.getEntityByName,
-
+    getEntitiesByTag: partialEngine.getEntitiesByTag,
     update,
 
     RootEntity: 0 as Entity,

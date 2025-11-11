@@ -1,0 +1,84 @@
+{
+  "errors": {
+    "command": {
+      "invalid_folder": "Developer: All commands must be inside a folder",
+      "invalid_index_file": "Developer: All commands must have an \"index.js\" file inside",
+      "not_found": "Command \"{{command}}\" is invalid. {{help}}",
+      "not_valid": "Command does not follow implementation rules:\n* Requires a \"help\" function\n* Requires a \"main\" function"
+    },
+    "config": {
+      "not_provided": "Configuration {{key}} was not provided"
+    },
+    "account": {
+      "invalid_private_key": "Addresses should be 64 characters length."
+    },
+    "args": {
+      "arg_error": "Argument error: {{message}}"
+    },
+    "portable_experience_sw_validations": {
+      "invalid_scene_json": "Invalid scene.json file:\n{{errors}}"
+    },
+    "project_files": {
+      "duplicate_file": "The file {{file}} exists with a different casing. Please manually remove one occurrence",
+      "invalid_package_json": "Error reading the package.json file: {{error}}",
+      "package_json_required": "The project root doesn't have a package.json file",
+      "invalid_project_kind": "The kind of project of the folder {{workingDirectory}} cannot be identified"
+    },
+    "scene_validations": {
+      "invalid_scene_json": "Invalid scene.json file:\n{{errors}}",
+      "duplicate_parcels": "The scene contains duplicated parcel coordinates, they must all be unique. Check Scene Layout settings, or the scene.json file.",
+      "base_parcel_required": "You must include the coordinates for a base parcel {{base}} on the parcels attribute in the scene.json file.",
+      "coordinates_outside_limits": "The coordinates {{x}},{{y}} are re outside of the allowed limits, you cannot publish to those coordinates: \n\n{{constraints}}",
+      "parcels_not_connected": "Some of the parcels listed in the layout are not adjacent to each other, they must all be connected. Check Scene Layout settings, or the scene.json file.",
+      "invalid_main_format": "This scene's scene.main has an unsupported format {{main}}",
+      "max_file_size_exceeded": "Maximum file size exceeded: '{{path}}' is larger than {{maxSizeInMb}}MB"
+    },
+    "workspace_validations": {
+      "invalid_workspace_json": "Invalid {{workspace_file}} file:\n{{errors}}",
+      "invalid_workspace_json_error": "Error reading the {{workspace_file}} file: {{error}}"
+    },
+    "deploy": {
+      "workspace_not_supported": "This scene is not valid for publishing. Make sure the scene dependencies are all up to date.",
+      "invalid_project_type": "The project you're trying to publish is not being recognized as a Decentraland scene. Make sure it's valid, and that the scene dependencies are all up to date.",
+      "invalid_arguments": "You can't set values for both the 'target' and 'target-content' arguments in the same command.",
+      "failed_to_upload": "Could not upload content: {{error}}"
+    },
+    "export_static": {
+      "base_url_required": "--baseUrl is mandatory when --realmName is provided",
+      "invalid_realm_name": "--realmName has invalid characters",
+      "invalid_output_directory": "The destination path {{outputDirectory}} is not a directory"
+    },
+    "get_context_files": {
+      "list_failed": "Failed to list context files",
+      "download_failed": "Failed to download context file"
+    },
+    "init": {
+      "dir_not_empty": "The target directory specified is not empty. Run this command with --yes to override.",
+      "invalid_arguments": "Specifying --template and --project at the same time is not allowed. Please specify only one of them.",
+      "invalid_project": "The requested scene doesn't exist empty. Valid options are: {{options}}",
+      "invalid_template_zip_url": "The zip downloaded has many folder on the root, make sure it has only one folder on the root."
+    },
+    "quests": {
+      "invalid_target": "The provided target is not a valid URL",
+      "invalid_json": "{{path}} doesn't contain a valid JSON",
+      "invalid_quest_json": "You provided an invalid Quest JSON. Please check the documentation",
+      "file_does_not_exist": "File doesn't exist",
+      "creation_cancelled": "Quest creation was cancelled",
+      "invalid_address": "You should provide a valid EVM address",
+      "invalid_uuid": "You should provide a valid uuid"
+    },
+    "bundle": {
+      "scene_main_required": "This scene does not have the required file scene.main",
+      "scene_runtime_version_required": "The field `\"runtimeVersion\": \"7\"` must be present in the scene's scene.json file. Make sure the scene's code is written in SDK 7.x.",
+      "tsconfig_required": "This scene does not have the required file {{tsconfig}}",
+      "no_input_files": "There are no input files to build: {{entrypointSource}}",
+      "rebuild_failed": "Could not rebuild bundle: {{error}}",
+      "type_checker_failed": "Typechecker exited with code {{code}}."
+    },
+    "code_to_composite": {
+      "build_failed": "Failed to build the scene: {{error}}",
+      "bundle_not_found": "Could not find the bundled scene at {{bundlePath}}",
+      "execution_failed": "Failed to execute scene code: {{error}}"
+    }
+  }
+}

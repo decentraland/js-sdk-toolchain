@@ -1,0 +1,71 @@
+name: Sync main to experimental
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config pull.rebase false  # Always merge, never rebase
+
+      - name: Sync main into experimental branch
+        continue-on-error: true
+        run: |
+          BRANCH_NAME="chore/sync"
+          git checkout -B $BRANCH_NAME origin/experimental
+
+          # Merge main changes into experimental, preferring main changes on conflicts
+          git fetch origin main
+          git merge -X theirs origin/main --no-edit || echo "Merge completed (conflicts auto-resolved in favor of main)"
+
+          # Run required update steps
+          make update-protocol 'experimental'
+          make install
+          make build
+          make update-snapshots
+
+      - name: Commit and push changes in experimental
+        run: |
+          BRANCH_NAME="chore/sync"
+          # Commit if there are changes
+          git add -A .
+          git commit --no-edit -m "updated protocol and snapshots" || echo "No changes to commit"
+
+          # Push (force to keep PR updated)
+          git push --force --set-upstream origin $BRANCH_NAME
+
+      - name: Create or update PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(gh pr list --base experimental --head chore/sync --state open --json number --jq '.[0].number')
+
+          if [ -n "$PR_NUMBER" ]; then
+            echo "PR #$PR_NUMBER already exists, adding comment..."
+            gh pr comment $PR_NUMBER --body "🔄 Updated with latest changes from **main** on $(date -u '+%Y-%m-%d %H:%M UTC')"
+          else
+            echo "Creating new PR..."
+            gh pr create \
+              --base experimental \
+              --head chore/sync \
+              --title "chore: sync main to experimental" \
+              --body ":crown: *Automated PR to keep experimental in sync with main (with protocol updates, build & snapshots)*" \
+              --label "auto-pr"
+          fi

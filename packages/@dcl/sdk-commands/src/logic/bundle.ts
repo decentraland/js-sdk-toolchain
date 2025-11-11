@@ -8,12 +8,16 @@ import { future } from 'fp-future'
 import { globSync } from 'glob'
 import path from 'path'
 import { pathToFileURL } from 'url'
+import i18next from 'i18next'
+
 import { CliComponents } from '../components'
 import { colors } from '../components/log'
 import { printProgressInfo, printProgressStep, printWarning } from './beautiful-logs'
 import { CliError } from './error'
 import { getAllComposites } from './composite'
 import { isEditorScene } from './project-validations'
+import { watch } from 'chokidar'
+import { debounce } from './debounce'
 
 export type BundleComponents = Pick<CliComponents, 'logger' | 'fs'>
 
@@ -99,24 +103,28 @@ export async function bundleProject(components: BundleComponents, options: Compi
   const tsconfig = path.join(options.workingDirectory, 'tsconfig.json')
   /* istanbul ignore if */
   if (!options.single && !sceneJson.main) {
-    throw new CliError('scene.json .main must be present')
+    throw new CliError('BUNDLE_SCENE_MAIN_REQUIRED', i18next.t('errors.bundle.scene_main_required'))
   }
 
   /* istanbul ignore if */
   if ((sceneJson as any).runtimeVersion !== '7') {
-    throw new CliError('scene.json `"runtimeVersion": "7"` must be present')
+    throw new CliError(
+      'BUNDLE_SCENE_RUNTIME_VERSION_REQUIRED',
+      i18next.t('errors.bundle.scene_runtime_version_required')
+    )
   }
 
   /* istanbul ignore if */
   if (!(await components.fs.fileExists(tsconfig))) {
-    throw new CliError(`File ${tsconfig} must exist to compile the Typescript project`)
+    throw new CliError('BUNDLE_TSCONFIG_REQUIRED', i18next.t('errors.bundle.tsconfig_required', { tsconfig }))
   }
 
-  const entrypointSource = options.single ?? 'src/index.ts'
+  const entrypointSource = options.single || 'src/index.ts'
   const entrypoints = globSync(entrypointSource, { cwd: options.workingDirectory, absolute: true })
 
   /* istanbul ignore if */
-  if (!entrypoints.length) throw new CliError(`There are no input files to build: ${entrypointSource}`)
+  if (!entrypoints.length)
+    throw new CliError('BUNDLE_NO_INPUT_FILES', i18next.t('errors.bundle.no_input_files', { entrypointSource }))
 
   // const output = !options.single ? sceneJson.main : options.single.replace(/\.ts$/, '.js')
   // const outfile = path.join(options.workingDirectory, output)
@@ -161,6 +169,23 @@ export async function bundleSingleProject(components: BundleComponents, options:
     absWorkingDir: options.workingDirectory,
     target: 'es2020',
     external: ['~system/*', '@dcl/inspector', '@dcl/inspector/*' /* ban importing the inspector from the SDK */],
+    alias: {
+      // Ensure React is always resolved to the same module to prevent duplication
+      react: (() => {
+        try {
+          // First try to resolve from project's node_modules
+          return require.resolve('react', { paths: [options.workingDirectory] })
+        } catch {
+          try {
+            // Fallback to SDK's React dependency
+            return require.resolve('react', { paths: [path.join(__dirname, '../../../@dcl/sdk')] })
+          } catch {
+            // Final fallback to bundled React
+            return require.resolve('react')
+          }
+        }
+      })()
+    },
     // convert filesystem paths into file:// to enable VSCode debugger
     sourceRoot: options.production ? 'dcl:///' : pathToFileURL(path.dirname(options.outputFile)).toString(),
     define: {
@@ -191,16 +216,41 @@ export async function bundleSingleProject(components: BundleComponents, options:
 
   /* istanbul ignore if */
   if (options.watch) {
-    await context.watch({})
+    // Instead of using esbuild's watch, we create our own watcher
+    const watcher = watch(path.resolve(options.workingDirectory), {
+      ignored: ['**/dist/**', '**/*.crdt', '**/*.composite', path.resolve(options.outputFile)],
+      ignoreInitial: true
+    })
 
+    const debouncedRebuild = debounce(async () => {
+      try {
+        await context.rebuild()
+        printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
+      } catch (err: any) {
+        /* istanbul ignore next */
+        components.logger.error(err.toString())
+      }
+    }, 100)
+
+    watcher.on('all', async (event, filePath) => {
+      // Only rebuild for TypeScript and JavaScript files
+      if (/\.(ts|tsx|js|jsx)$/.test(filePath)) {
+        printProgressInfo(components.logger, `File ${filePath} changed, rebuilding...`)
+        debouncedRebuild()
+      }
+    })
+
+    // Do initial build
+    await context.rebuild()
     printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
+    printProgressInfo(components.logger, `The compiler is watching for changes`)
   } else {
     try {
       await context.rebuild()
       printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
     } catch (err: any) {
       /* istanbul ignore next */
-      throw new CliError(err.toString())
+      throw new CliError('BUNDLE_REBUILD_FAILED', i18next.t('errors.bundle.rebuild_failed', { error: err.toString() }))
     }
     await context.dispose()
   }
@@ -236,7 +286,9 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
     if (code === 0) {
       printProgressInfo(components.logger, `Type checking completed without errors`)
     } else {
-      typeCheckerFuture.reject(new CliError(`Typechecker exited with code ${code}.`))
+      typeCheckerFuture.reject(
+        new CliError('BUNDLE_TYPE_CHECKER_FAILED', i18next.t('errors.bundle.type_checker_failed', { code }))
+      )
       return
     }
 

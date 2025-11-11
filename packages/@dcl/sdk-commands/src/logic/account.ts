@@ -1,5 +1,6 @@
 import { hexToBytes } from 'eth-connect'
 import { ethSign, recoverAddressFromEthSignature } from '@dcl/crypto/dist/crypto'
+import i18next from 'i18next'
 
 import { CliError } from './error'
 
@@ -17,7 +18,7 @@ export function createWallet(privateKey: string): Wallet {
   }
 
   if (privateKey.length !== length) {
-    throw new CliError('Addresses should be 64 characters length.')
+    throw new CliError('ACCOUNT_INVALID_PRIVATE_KEY', i18next.t('errors.account.invalid_private_key'))
   }
 
   const pk = hexToBytes(privateKey)

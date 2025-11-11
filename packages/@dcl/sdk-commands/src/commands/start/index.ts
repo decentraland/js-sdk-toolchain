@@ -60,10 +60,11 @@ export const args = declareArgs({
   '--debug': Boolean,
   '--dclenv': String,
   '--realm': String,
-  '--local-scene': String,
+  '--local-scene': Boolean,
   '--position': String,
   '--skip-auth-screen': Boolean,
-  '--landscape-terrain-enabled': Boolean
+  '--landscape-terrain-enabled': Boolean,
+  '-n': Boolean
 })
 
 export async function help(options: Options) {
@@ -72,21 +73,22 @@ export async function help(options: Options) {
 
     Options:
 
-      -h, --help                  Displays complete help
-      -p, --port        [port]    Select a custom port for the development server
-      -d, --no-debug              Disable debugging panel
-      -b, --no-browser            Do not open a new browser window
-      -w, --no-watch              Do not open watch for filesystem changes
-      -c, --ci                    Run the parcel previewer on a remote unix server
-      --web3                      Connects preview to browser wallet to use the associated avatar and account
-      --skip-build                Skip build and only serve the files in preview mode
-      --debug                     Enables Debug panel mode inside DCL Explorer (default=true)
-      --dclenv                    Decentraland Environment. Which environment to use for the content. This determines the catalyst server used, asset-bundles, etc. Possible values: org, zone, today. (default=org)
-      --realm                     Realm used to serve the content. (default=Localhost)
-      --local-scene               Enable local scene development.
-      --position                  Initial Position to start the explorer. (default=position defined at scene.json)
-      --skip-auth-screen          Skip the auth screen.
-      --landscape-terrain-enabled Enable landscape terrain.
+      -h, --help                        Displays complete help
+      -p, --port                        Select a custom port for the development server
+      -d, --no-debug                    Disable debugging panel
+      -b, --no-browser                  Do not open a new browser window
+      -w, --no-watch                    Do not open watch for filesystem changes
+      -c, --ci                          Run the parcel previewer on a remote unix server
+      --web3                            Connects preview to browser wallet to use the associated avatar and account
+      --skip-build                      Skip build and only serve the files in preview mode
+      --debug                           Enables Debug panel mode inside DCL Explorer (default=true)
+      --dclenv                          Decentraland Environment. Which environment to use for the content. This determines the catalyst server used, asset-bundles, etc. Possible values: org, zone, today. (default=org)
+      --realm                           Realm used to serve the content. (default=Localhost)
+      --local-scene                     Enable local scene development.
+      --position                        Initial Position to start the explorer. (default=position defined at scene.json)
+      --skip-auth-screen                Skip the auth screen (accepts 'true' or 'false').
+      --landscape-terrain-enabled       Enable landscape terrain.
+      -n                                Open a new instance of the Client even if one is already running.
 
 
     Examples:
@@ -199,7 +201,8 @@ export async function main(options: Options) {
       let dataLayer: DataLayer | undefined
       if (withDataLayer) {
         try {
-          dataLayer = await createDataLayer(components)
+          const projectWorkingDir = workspace.projects[0]?.workingDirectory || workingDirectory
+          dataLayer = await createDataLayer(components, projectWorkingDir)
         } catch (e: unknown) {
           components.logger.error(e as Error)
         }

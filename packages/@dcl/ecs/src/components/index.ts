@@ -22,6 +22,7 @@ import defineNetworkParent, { INetowrkParentType } from './manual/NetworkParent'
 import defineSyncComponent, { ISyncComponentsType } from './manual/SyncComponents'
 import { defineTransformComponent, TransformComponentExtended } from './manual/Transform'
 import { defineLightSourceComponent, LightSourceComponentDefinitionExtended } from './extended/LightSource'
+import defineTagsComponent, { TagsComponentDefinitionExtended } from './manual/Tags'
 
 export * from './generated/index.gen'
 
@@ -83,6 +84,10 @@ export const InputModifier: LwwComponentGetter<InputModifierComponentDefinitionE
 export const LightSource: LwwComponentGetter<LightSourceComponentDefinitionExtended> = (engine) =>
   defineLightSourceComponent(engine)
 
+/* @__PURE__ */
+export const TriggerArea: LwwComponentGetter<TriggerAreaComponentDefinitionExtended> = (engine) =>
+  defineTriggerAreaComponent(engine)
+
 /**
  * @alpha
  */
@@ -90,6 +95,10 @@ export const LightSource: LwwComponentGetter<LightSourceComponentDefinitionExten
 export const Name: (engine: Pick<IEngine, 'defineComponent'>) => LastWriteWinElementSetComponentDefinition<NameType> = (
   engine
 ) => defineNameComponent(engine)
+
+/* @__PURE__ */
+export const Tags: (engine: Pick<IEngine, 'defineComponent'>) => TagsComponentDefinitionExtended = (engine) =>
+  defineTagsComponent(engine)
 
 /**
  * @alpha

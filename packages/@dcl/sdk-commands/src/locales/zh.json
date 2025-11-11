@@ -1,0 +1,84 @@
+{
+  "errors": {
+    "command": {
+      "invalid_folder": "开发者：所有命令必须在文件夹内",
+      "invalid_index_file": "开发者：所有命令必须包含一个 \"index.js\" 文件",
+      "not_found": "命令 \"{{command}}\" 无效。{{help}}",
+      "not_valid": "命令不符合实现规则：\n* 需要 \"help\" 函数\n* 需要 \"main\" 函数"
+    },
+    "config": {
+      "not_provided": "未提供配置 {{key}}"
+    },
+    "account": {
+      "invalid_private_key": "地址长度应为64个字符。"
+    },
+    "args": {
+      "arg_error": "参数错误：{{message}}"
+    },
+    "portable_experience_sw_validations": {
+      "invalid_scene_json": "无效的 scene.json 文件：\n{{errors}}"
+    },
+    "project_files": {
+      "duplicate_file": "文件 {{file}} 存在大小写不同的版本。请手动删除其中一个",
+      "invalid_package_json": "读取 package.json 文件时出错：{{error}}",
+      "package_json_required": "项目根目录没有 package.json 文件",
+      "invalid_project_kind": "无法识别文件夹 {{workingDirectory}} 的项目类型"
+    },
+    "scene_validations": {
+      "invalid_scene_json": "无效的 scene.json 文件：\n{{errors}}",
+      "duplicate_parcels": "场景包含重复的地块坐标，它们必须都是唯一的。请检查场景布局设置或 scene.json 文件。",
+      "base_parcel_required": "您必须在 scene.json 文件的 parcels 属性中包含基础地块 {{base}} 的坐标。",
+      "coordinates_outside_limits": "坐标 {{x}},{{y}} 超出允许的限制，您无法发布到这些坐标：\n\n{{constraints}}",
+      "parcels_not_connected": "布局中列出的一些地块彼此不相邻，它们必须都连接在一起。请检查场景布局设置或 scene.json 文件。",
+      "invalid_main_format": "此场景的 scene.main 具有不支持的格式 {{main}}",
+      "max_file_size_exceeded": "超出最大文件大小：'{{path}}' 大于 {{maxSizeInMb}}MB"
+    },
+    "workspace_validations": {
+      "invalid_workspace_json": "无效的 {{workspace_file}} 文件：\n{{errors}}",
+      "invalid_workspace_json_error": "读取 {{workspace_file}} 文件时出错：{{error}}"
+    },
+    "deploy": {
+      "workspace_not_supported": "此场景不适合发布。请确保场景依赖项都是最新的。",
+      "invalid_project_type": "您尝试发布的项目未被识别为 Decentraland 场景。请确保它有效，并且场景依赖项都是最新的。",
+      "invalid_arguments": "您不能在同一命令中同时为 'target' 和 'target-content' 参数设置值。",
+      "failed_to_upload": "无法上传内容：{{error}}"
+    },
+    "export_static": {
+      "base_url_required": "提供 --realmName 时，--baseUrl 是必需的",
+      "invalid_realm_name": "--realmName 包含无效字符",
+      "invalid_output_directory": "目标路径 {{outputDirectory}} 不是一个目录"
+    },
+    "get_context_files": {
+      "list_failed": "列出上下文文件失败",
+      "download_failed": "下载上下文文件失败"
+    },
+    "init": {
+      "dir_not_empty": "指定的目标目录不为空。使用 --yes 运行此命令以覆盖。",
+      "invalid_arguments": "不允许同时指定 --template 和 --project。请只指定其中一个。",
+      "invalid_project": "请求的场景不存在。有效选项：{{options}}",
+      "invalid_template_zip_url": "下载的压缩包在根目录有多个文件夹，请确保根目录只有一个文件夹。"
+    },
+    "quests": {
+      "invalid_target": "提供的目标不是有效的 URL",
+      "invalid_json": "{{path}} 不包含有效的 JSON",
+      "invalid_quest_json": "您提供了无效的任务 JSON。请查看文档",
+      "file_does_not_exist": "文件不存在",
+      "creation_cancelled": "任务创建已取消",
+      "invalid_address": "您应该提供一个有效的 EVM 地址",
+      "invalid_uuid": "您应该提供一个有效的 uuid"
+    },
+    "bundle": {
+      "scene_main_required": "此场景没有必需的文件 scene.main",
+      "scene_runtime_version_required": "场景的 scene.json 文件中必须存在字段 `\"runtimeVersion\": \"7\"`。请确保场景代码使用 SDK 7.x 编写。",
+      "tsconfig_required": "此场景没有必需的文件 {{tsconfig}}",
+      "no_input_files": "没有要构建的输入文件：{{entrypointSource}}",
+      "rebuild_failed": "无法重新构建包：{{error}}",
+      "type_checker_failed": "类型检查器退出，代码为 {{code}}。"
+    },
+    "code_to_composite": {
+      "build_failed": "构建场景失败：{{error}}",
+      "bundle_not_found": "在 {{bundlePath}} 找不到打包的场景",
+      "execution_failed": "执行场景代码失败：{{error}}"
+    }
+  }
+}

@@ -11,6 +11,7 @@ import { createRaycastSystem, RaycastSystem } from '../../systems/raycast'
 import { createVideoEventsSystem, VideoEventsSystem } from '../../systems/videoEvents'
 import { TweenSystem, createTweenSystem } from '../../systems/tween'
 import { pointerEventColliderChecker } from '../../systems/pointer-event-collider-checker'
+import { createTriggerAreaEventsSystem, TriggerAreaEventsSystem } from '../../systems/triggerArea'
 
 /**
  * @public
@@ -64,6 +65,13 @@ export { VideoEventsSystem }
  */
 export const tweenSystem: TweenSystem = createTweenSystem(engine)
 export { TweenSystem }
+
+/**
+ * @public
+ * Register callback functions for trigger area results.
+ */
+export const triggerAreaEventsSystem: TriggerAreaEventsSystem = /* @__PURE__ */ createTriggerAreaEventsSystem(engine)
+export { TriggerAreaEventsSystem }
 
 /**
  * Adds pointer event collider system only in DEV env

@@ -1,0 +1,84 @@
+{
+  "errors": {
+    "command": {
+      "invalid_folder": "Desarrollador: Todos los comandos deben estar dentro de una carpeta",
+      "invalid_index_file": "Desarrollador: Todos los comandos deben tener un archivo \"index.js\" dentro",
+      "not_found": "El comando \"{{command}}\" no es válido. {{help}}",
+      "not_valid": "El comando no sigue las reglas de implementación:\n* Requiere una función \"help\"\n* Requiere una función \"main\""
+    },
+    "config": {
+      "not_provided": "La configuración {{key}} no fue proporcionada"
+    },
+    "account": {
+      "invalid_private_key": "Las direcciones deben tener 64 caracteres de longitud."
+    },
+    "args": {
+      "arg_error": "Error de argumento: {{message}}"
+    },
+    "portable_experience_sw_validations": {
+      "invalid_scene_json": "Archivo scene.json inválido:\n{{errors}}"
+    },
+    "project_files": {
+      "duplicate_file": "El archivo {{file}} existe con un formato de mayúsculas diferente. Por favor elimina manualmente una de las ocurrencias",
+      "invalid_package_json": "Error al leer el archivo package.json: {{error}}",
+      "package_json_required": "La raíz del proyecto no tiene un archivo package.json",
+      "invalid_project_kind": "No se puede identificar el tipo de proyecto de la carpeta {{workingDirectory}}"
+    },
+    "scene_validations": {
+      "invalid_scene_json": "Archivo scene.json inválido:\n{{errors}}",
+      "duplicate_parcels": "La escena contiene coordenadas de parcelas duplicadas, todas deben ser únicas. Revisa la configuración de Diseño de Escena, o el archivo scene.json.",
+      "base_parcel_required": "Debes incluir las coordenadas para una parcela base {{base}} en el atributo parcels del archivo scene.json.",
+      "coordinates_outside_limits": "Las coordenadas {{x}},{{y}} están fuera de los límites permitidos, no puedes publicar en esas coordenadas: \n\n{{constraints}}",
+      "parcels_not_connected": "Algunas de las parcelas listadas en el diseño no son adyacentes entre sí, todas deben estar conectadas. Revisa la configuración de Diseño de Escena, o el archivo scene.json.",
+      "invalid_main_format": "El scene.main de esta escena tiene un formato no soportado {{main}}",
+      "max_file_size_exceeded": "Tamaño máximo de archivo excedido: '{{path}}' es más grande que {{maxSizeInMb}}MB"
+    },
+    "workspace_validations": {
+      "invalid_workspace_json": "Archivo {{workspace_file}} inválido:\n{{errors}}",
+      "invalid_workspace_json_error": "Error al leer el archivo {{workspace_file}}: {{error}}"
+    },
+    "deploy": {
+      "workspace_not_supported": "Esta escena no es válida para publicar. Asegúrate de que todas las dependencias de la escena estén actualizadas.",
+      "invalid_project_type": "El proyecto que intentas publicar no está siendo reconocido como una escena de Decentraland. Asegúrate de que sea válido y que todas las dependencias de la escena estén actualizadas.",
+      "invalid_arguments": "No puedes establecer valores para ambos argumentos 'target' y 'target-content' en el mismo comando.",
+      "failed_to_upload": "No se pudo subir el contenido: {{error}}"
+    },
+    "export_static": {
+      "base_url_required": "--baseUrl es obligatorio cuando se proporciona --realmName",
+      "invalid_realm_name": "--realmName tiene caracteres inválidos",
+      "invalid_output_directory": "La ruta de destino {{outputDirectory}} no es un directorio"
+    },
+    "get_context_files": {
+      "list_failed": "Error al listar archivos de contexto",
+      "download_failed": "Error al descargar archivo de contexto"
+    },
+    "init": {
+      "dir_not_empty": "El directorio de destino especificado no está vacío. Ejecuta este comando con --yes para sobrescribir.",
+      "invalid_arguments": "No se permite especificar --template y --project al mismo tiempo. Por favor especifica solo uno de ellos.",
+      "invalid_project": "La escena solicitada no existe. Opciones válidas son: {{options}}",
+      "invalid_template_zip_url": "El zip descargado tiene muchas carpetas en la raíz, asegúrate de que tenga solo una carpeta en la raíz."
+    },
+    "quests": {
+      "invalid_target": "El objetivo proporcionado no es una URL válida",
+      "invalid_json": "{{path}} no contiene un JSON válido",
+      "invalid_quest_json": "Proporcionaste un JSON de Quest inválido. Por favor revisa la documentación",
+      "file_does_not_exist": "El archivo no existe",
+      "creation_cancelled": "La creación de la quest fue cancelada",
+      "invalid_address": "Debes proporcionar una dirección EVM válida",
+      "invalid_uuid": "Debes proporcionar un uuid válido"
+    },
+    "bundle": {
+      "scene_main_required": "Esta escena no tiene el archivo requerido scene.main",
+      "scene_runtime_version_required": "El campo `\"runtimeVersion\": \"7\"` debe estar presente en el archivo scene.json de la escena. Asegúrate de que el código de la escena esté escrito en SDK 7.x.",
+      "tsconfig_required": "Esta escena no tiene el archivo requerido {{tsconfig}}",
+      "no_input_files": "No hay archivos de entrada para construir: {{entrypointSource}}",
+      "rebuild_failed": "No se pudo reconstruir el bundle: {{error}}",
+      "type_checker_failed": "El typechecker salió con código {{code}}."
+    },
+    "code_to_composite": {
+      "build_failed": "Error al construir la escena: {{error}}",
+      "bundle_not_found": "No se pudo encontrar la escena empaquetada en {{bundlePath}}",
+      "execution_failed": "Error al ejecutar el código de la escena: {{error}}"
+    }
+  }
+}

@@ -129,26 +129,3 @@ function installCrossDependencies(...paths: string[]) {
     }
   }
 }
-
-function checkNoLocalPackages(...paths: string[]) {
-  for (const path of paths) {
-    const packageJson = resolve(path, 'package.json')
-    it.skip('checking ' + packageJson, async () => {
-      const { dependencies, devDependencies } = JSON.parse(await readFile(packageJson, 'utf-8'))
-      const errors: string[] = []
-      for (const [key, value] of Object.entries({ ...dependencies, ...devDependencies } as Record<string, string>)) {
-        if (
-          value.startsWith('file:') ||
-          value.startsWith('http:') ||
-          value.startsWith('https:') ||
-          value.startsWith('git:')
-        ) {
-          errors.push(`Dependency ${key} is not pointing to a published version: ${value}`)
-        }
-      }
-      if (errors.length) {
-        throw new Error(errors.join('\n'))
-      }
-    })
-  }
-}
