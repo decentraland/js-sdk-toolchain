@@ -26,10 +26,9 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
   const textureRenderersAndUis: [DclReconciler, UiComponent][] = []
 
   function ReactBasedUiSystem() {
-    if (uiComponent) renderer.update(uiComponent())
-    // if (uiComponent) renderer.update(React.createElement(uiComponent as any)) // TODO: merge conflict... main branch uses React.createElement
+    if (uiComponent) renderer.update(React.createElement(uiComponent as any))
     for (const [textureRenderer, ui] of textureRenderersAndUis) {
-      textureRenderer.update(ui())
+      textureRenderer.update(React.createElement(ui() as any))
     }
   }
 
