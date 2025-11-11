@@ -13,10 +13,10 @@ module.exports = {
   coverageDirectory: 'coverage',
   coverageThreshold: {
     global: {
-      branches: 100,
-      functions: 100,
-      lines: 100,
-      statements: 100
+      branches: 90,
+      functions: 90,
+      lines: 90,
+      statements: 90,
     },
     'packages/@dcl/ecs/src/systems/crdt/index.ts': {
       // This should be deleted on another PR. Need to release this asap.

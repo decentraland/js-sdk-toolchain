@@ -39,6 +39,8 @@ import {
   TriggerAreaComponentDefinitionExtended
 } from './components/types'
 import { NameComponent } from './components/manual/Name'
+import { AvatarEquippedDataComponentDefinitionExtended } from './components/extended/AvatarEquippedData'
+import { AvatarShapeComponentDefinitionExtended } from './components/extended/AvatarShape'
 import { TagsComponentDefinitionExtended } from './components/manual/Tags'
 
 // export components for global engine

@@ -35,7 +35,23 @@ function getButtonProps(props: UiButtonProps) {
  */
 /* @__PURE__ */
 export function Button(props: UiButtonProps) {
-  const { uiTransform, uiBackground, onMouseDown, onMouseUp, onMouseEnter, onMouseLeave, ...otherProps } = props
+  const {
+    uiTransform,
+    uiBackground,
+    onMouseDown,
+    onMouseUp,
+    onMouseEnter,
+    onMouseLeave,
+    onMouseDrag,
+    onMouseDragLocked,
+    onMouseDragEnd,
+    onInputDown,
+    onInputUp,
+    onInputDrag,
+    onInputDragLocked,
+    onInputDragEnd,
+    ...otherProps
+  } = props
   const buttonProps = getButtonProps(props)
   const uiBackgroundProps = parseUiBackground({
     ...buttonProps.uiBackground,
@@ -66,6 +82,14 @@ export function Button(props: UiButtonProps) {
       onMouseUp={!!props.disabled ? undefined : onMouseUp}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      onMouseDrag={onMouseDrag}
+      onMouseDragLocked={onMouseDragLocked}
+      onMouseDragEnd={onMouseDragEnd}
+      onInputDown={!!props.disabled ? undefined : onInputDown}
+      onInputUp={!!props.disabled ? undefined : onInputUp}
+      onInputDrag={onInputDrag}
+      onInputDragLocked={onInputDragLocked}
+      onInputDragEnd={onInputDragEnd}
       uiTransform={uiTransformProps}
       uiText={textProps}
       uiBackground={uiBackgroundProps}

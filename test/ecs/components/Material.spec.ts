@@ -17,7 +17,8 @@ function createPbrMaterial(pbr: PBMaterial_PbrMaterial): PBMaterial {
     material: {
       $case: 'pbr',
       pbr
-    }
+    },
+    gltf: undefined
   }
 }
 
@@ -26,7 +27,8 @@ function createUnlitMaterial(unlit: PBMaterial_UnlitMaterial): PBMaterial {
     material: {
       $case: 'unlit',
       unlit
-    }
+    },
+    gltf: undefined
   }
 }
 

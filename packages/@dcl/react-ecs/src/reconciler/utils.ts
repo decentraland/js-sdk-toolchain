@@ -60,6 +60,14 @@ const entityComponent: EntityComponents = {
   onMouseUp: undefined as any,
   onMouseEnter: undefined as any,
   onMouseLeave: undefined as any,
+  onMouseDrag: undefined as any,
+  onMouseDragLocked: undefined as any,
+  onMouseDragEnd: undefined as any,
+  onInputDown: undefined as any,
+  onInputUp: undefined as any,
+  onInputDrag: undefined as any,
+  onInputDragLocked: undefined as any,
+  onInputDragEnd: undefined as any,
   uiInput: undefined as any,
   uiDropdown: undefined as any
 }
