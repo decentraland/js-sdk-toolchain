@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=375k bytes
+SCENE_COMPILED_JS_SIZE_PROD=374.7k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -9,8 +9,8 @@ EVAL test/snapshots/production-bundles/ui.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   OPCODES ~= 74k
-  MALLOC_COUNT = 20641
-  ALIVE_OBJS_DELTA ~= 4.14k
+  MALLOC_COUNT = 20613
+  ALIVE_OBJS_DELTA ~= 4.13k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -47,14 +47,12 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x202 c=1093 t=1 data={"placeholder":"SARASA","disabled":false}
   Scene: PUT_COMPONENT e=0x209 c=1093 t=1 data={"placeholder":"","disabled":false}
   Scene: PUT_COMPONENT e=0x201 c=1094 t=1 data={"acceptEmpty":false,"options":["BOEDO","CASLA"],"selectedIndex":0,"disabled":false,"color":{"r":1,"g":0,"b":0,"a":1}}
-  REQUIRE: ~system/Runtime
-  LOG: ["Platform detection unavailable, enabling tween sequences by default"]
-  OPCODES ~= 143k
-  MALLOC_COUNT = 722
+  OPCODES ~= 142k
+  MALLOC_COUNT = 709
   ALIVE_OBJS_DELTA ~= 0.25k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=2 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.008726535364985466,"z":0,"w":0.9999619126319885},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 68k
+  OPCODES ~= 67k
   MALLOC_COUNT = 254
   ALIVE_OBJS_DELTA ~= 0.12k
 CALL onUpdate(0.1)
@@ -67,4 +65,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 66k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1773.35k bytes
+  MEMORY_USAGE_COUNT ~= 1770.91k bytes

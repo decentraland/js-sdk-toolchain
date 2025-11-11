@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=216.1k bytes
+SCENE_COMPILED_JS_SIZE_PROD=215.9k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -9,28 +9,26 @@ EVAL test/snapshots/production-bundles/schema-components.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   OPCODES ~= 66k
-  MALLOC_COUNT = 12975
+  MALLOC_COUNT = 12947
   ALIVE_OBJS_DELTA ~= 2.87k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0)
-  REQUIRE: ~system/Runtime
-  LOG: ["Platform detection unavailable, enabling tween sequences by default"]
   OPCODES ~= 2k
-  MALLOC_COUNT = 36
+  MALLOC_COUNT = 23
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
-  OPCODES ~= 2k
+  OPCODES ~= 1k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
-  OPCODES ~= 2k
+  OPCODES ~= 1k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
-  OPCODES ~= 2k
+  OPCODES ~= 1k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 926.50k bytes
+  MEMORY_USAGE_COUNT ~= 924.06k bytes

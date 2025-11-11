@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=253k bytes
+SCENE_COMPILED_JS_SIZE_PROD=252.8k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -9,8 +9,8 @@ EVAL test/snapshots/production-bundles/billboard.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   OPCODES ~= 74k
-  MALLOC_COUNT = 15831
-  ALIVE_OBJS_DELTA ~= 3.47k
+  MALLOC_COUNT = 15803
+  ALIVE_OBJS_DELTA ~= 3.46k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 4
@@ -50,11 +50,9 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x203 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
   Scene: PUT_COMPONENT e=0x204 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
   Scene: PUT_COMPONENT e=0x205 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
-  REQUIRE: ~system/Runtime
-  LOG: ["Platform detection unavailable, enabling tween sequences by default"]
-  OPCODES ~= 114k
-  MALLOC_COUNT = 70
-  ALIVE_OBJS_DELTA ~= 0.03k
+  OPCODES ~= 113k
+  MALLOC_COUNT = 57
+  ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=2 data={"position":{"x":8,"y":3.0420734882354736,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   Scene: PUT_COMPONENT e=0x201 c=1 t=2 data={"position":{"x":12,"y":3.0420734882354736,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
@@ -79,4 +77,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 10k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1123.63k bytes
+  MEMORY_USAGE_COUNT ~= 1121.18k bytes
