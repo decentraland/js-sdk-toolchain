@@ -160,7 +160,7 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
 
   // Some Explorers may not inject the flag and TweenSequence logic must be enabled in that case
   const enableTweenSequenceLogic = (globalThis as any).ENABLE_SDK_TWEEN_SEQUENCE
-  if (enableTweenSequenceLogic === undefined || enableTweenSequenceLogic === true)
+  if (enableTweenSequenceLogic)
     initializeTweenSequenceSystem()
 
   const tweenSystem: TweenSystem = {
