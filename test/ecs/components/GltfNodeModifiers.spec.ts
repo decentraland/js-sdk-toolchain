@@ -38,7 +38,9 @@ describe('Generated GltfNodeModifiers ProtoBuf', () => {
         {
           path: 'test/path',
           castShadows: false,
-          material: createPbrMaterial({
+          material: {
+            gltf: undefined,
+            ...createPbrMaterial({
             albedoColor: { r: 0, g: 1, b: 1, a: 1 },
             alphaTest: 1,
             alphaTexture: undefined,
@@ -85,18 +87,22 @@ describe('Generated GltfNodeModifiers ProtoBuf', () => {
             roughness: 1,
             specularIntensity: 0,
             transparencyMode: MaterialTransparencyMode.MTM_ALPHA_BLEND
-          })
+            })
+          }
         },
         {
           path: 'test/path',
           castShadows: false,
-          material: createUnlitMaterial({
+          material: {
+            gltf: undefined,
+            ...createUnlitMaterial({
             castShadows: true,
             diffuseColor: { r: 0, g: 1, b: 1, a: 1 },
             alphaTexture: undefined,
             alphaTest: undefined,
             texture: undefined
-          })
+            })
+          }
         }
       ]
     })

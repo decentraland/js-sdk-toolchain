@@ -146,10 +146,8 @@ export const enum AvatarControlType {
 // @public (undocumented)
 export const AvatarEmoteCommand: GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>;
 
-// Warning: (ae-missing-release-tag) "AvatarEquippedData" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
-export const AvatarEquippedData: AvatarEquippedDataComponentDefinitionExtended;
+export const AvatarEquippedData: LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>;
 
 // @public (undocumented)
 export type AvatarEquippedDataComponentDefinitionExtended = LastWriteWinElementSetComponentDefinition<AvatarEquippedDataType>;
@@ -192,10 +190,8 @@ export namespace AvatarMovementSettings {
     export function encode(message: AvatarMovementSettings, writer?: _m0.Writer): _m0.Writer;
 }
 
-// Warning: (ae-missing-release-tag) "AvatarShape" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
 // @public (undocumented)
-export const AvatarShape: AvatarShapeComponentDefinitionExtended;
+export const AvatarShape: LastWriteWinElementSetComponentDefinition<PBAvatarShape>;
 
 // @public (undocumented)
 export type AvatarShapeComponentDefinitionExtended = LastWriteWinElementSetComponentDefinition<AvatarShapeType>;
@@ -744,7 +740,7 @@ export const componentDefinitionByName: {
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
     "core::TextureCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextureCamera>>;
     "core::TriggerArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTriggerArea>>;
-    "core::TriggerAreaResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTriggerAreaResult>>;
+    "core::TriggerAreaResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBTriggerAreaResult>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
     "core::TweenSequence": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenSequence>>;
     "core::TweenState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenState>>;
@@ -1376,6 +1372,7 @@ export interface IEngine {
     defineValueSetComponentFromSchema<T>(componentName: string, spec: ISchema<T>, options: ValueSetOptions<T>): GrowOnlyValueSetComponentDefinition<T>;
     getComponent<T>(componentId: number | string): ComponentDefinition<T>;
     getComponentOrNull<T>(componentId: number | string): ComponentDefinition<T> | null;
+    getEntitiesByTag(tagName: string): Iterable<Entity>;
     getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     getEntityByName<T = never, K = T>(value: K & (T extends never ? never : string)): Entity;
     // @alpha
@@ -1703,8 +1700,23 @@ export interface LastWriteWinElementSetComponentDefinition<T> extends BaseCompon
     getOrNull(entity: Entity): DeepReadonly<T> | null;
 }
 
+// Warning: (ae-missing-release-tag) "LightSource" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const LightSource: LastWriteWinElementSetComponentDefinition<PBLightSource>;
+export const LightSource: LightSourceComponentDefinitionExtended;
+
+// @public (undocumented)
+export interface LightSourceComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBLightSource> {
+    Type: LightSourceHelper;
+}
+
+// @public (undocumented)
+export interface LightSourceHelper {
+    // (undocumented)
+    Point: (point: PBLightSource_Point) => PBLightSource['type'];
+    // (undocumented)
+    Spot: (spot: PBLightSource_Spot) => PBLightSource['type'];
+}
 
 // @public
 export type Listeners = {
@@ -4621,6 +4633,27 @@ export type SystemItem = {
 // @public (undocumented)
 export const SYSTEMS_REGULAR_PRIORITY = 100000;
 
+// Warning: (ae-missing-release-tag) "Tags" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const Tags: TagsComponentDefinitionExtended;
+
+// Warning: (ae-missing-release-tag) "TagsComponentDefinitionExtended" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface TagsComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<TagsType> {
+    add(entity: Entity, tagName: string): boolean;
+    remove(entity: Entity, tagName: string): boolean;
+}
+
+// Warning: (ae-missing-release-tag) "TagsType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface TagsType {
+    // (undocumented)
+    tags: string[];
+}
+
 // Warning: (ae-missing-release-tag) "TargetEntityRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -4867,8 +4900,32 @@ export type Transport = {
 // @public (undocumented)
 export type TransportMessage = Omit<ReceiveMessage, 'data'>;
 
+// Warning: (ae-missing-release-tag) "TriggerArea" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const TriggerArea: LastWriteWinElementSetComponentDefinition<PBTriggerArea>;
+export const TriggerArea: TriggerAreaComponentDefinitionExtended;
+
+// @public (undocumented)
+export interface TriggerAreaComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBTriggerArea> {
+    setBox(entity: Entity, collisionMask?: ColliderLayer | ColliderLayer[]): void;
+    setSphere(entity: Entity, collisionMask?: ColliderLayer | ColliderLayer[]): void;
+}
+
+// @public (undocumented)
+export interface TriggerAreaEventsSystem {
+    onTriggerEnter(entity: Entity, cb: TriggerAreaEventSystemCallback): void;
+    onTriggerExit(entity: Entity, cb: TriggerAreaEventSystemCallback): void;
+    onTriggerStay(entity: Entity, cb: TriggerAreaEventSystemCallback): void;
+    removeOnTriggerEnter(entity: Entity): void;
+    removeOnTriggerExit(entity: Entity): void;
+    removeOnTriggerStay(entity: Entity): void;
+}
+
+// @public
+export const triggerAreaEventsSystem: TriggerAreaEventsSystem;
+
+// @public (undocumented)
+export type TriggerAreaEventSystemCallback = (result: DeepReadonlyObject<PBTriggerAreaResult>) => void;
 
 // @public (undocumented)
 export const enum TriggerAreaEventType {
@@ -4889,7 +4946,7 @@ export const enum TriggerAreaMeshType {
 }
 
 // @public (undocumented)
-export const TriggerAreaResult: LastWriteWinElementSetComponentDefinition<PBTriggerAreaResult>;
+export const TriggerAreaResult: GrowOnlyValueSetComponentDefinition<PBTriggerAreaResult>;
 
 // Warning: (ae-missing-release-tag) "Tween" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -4899,6 +4956,13 @@ export const Tween: TweenComponentDefinitionExtended;
 // @public (undocumented)
 export interface TweenComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBTween> {
     Mode: TweenHelper;
+    setMove(entity: Entity, start: PBVector3, end: PBVector3, duration: number, easingFunction?: EasingFunction): void;
+    setMoveContinuous(entity: Entity, direction: PBVector3, speed: number, duration?: number): void;
+    setRotate(entity: Entity, start: PBQuaternion, end: PBQuaternion, duration: number, easingFunction?: EasingFunction): void;
+    setRotateContinuous(entity: Entity, direction: PBQuaternion, speed: number, duration?: number): void;
+    setScale(entity: Entity, start: PBVector3, end: PBVector3, duration: number, easingFunction?: EasingFunction): void;
+    setTextureMove(entity: Entity, start: PBVector2, end: PBVector2, duration: number, movementType?: TextureMovementType, easingFunction?: EasingFunction): void;
+    setTextureMoveContinuous(entity: Entity, direction: PBVector2, speed: number, movementType?: TextureMovementType, duration?: number): void;
 }
 
 // @public (undocumented)
@@ -4906,11 +4970,17 @@ export interface TweenHelper {
     // (undocumented)
     Move: (move: Move) => PBTween['mode'];
     // (undocumented)
+    MoveContinuous: (move: MoveContinuous) => PBTween['mode'];
+    // (undocumented)
     Rotate: (rotate: Rotate) => PBTween['mode'];
+    // (undocumented)
+    RotateContinuous: (rotate: RotateContinuous) => PBTween['mode'];
     // (undocumented)
     Scale: (scale: Scale) => PBTween['mode'];
     // (undocumented)
     TextureMove: (textureMove: TextureMove) => PBTween['mode'];
+    // (undocumented)
+    TextureMoveContinuous: (textureMove: TextureMoveContinuous) => PBTween['mode'];
 }
 
 // @public (undocumented)

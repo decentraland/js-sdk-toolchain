@@ -22,6 +22,7 @@ import defineNetworkParent, { INetowrkParentType } from './manual/NetworkParent'
 import defineSyncComponent, { ISyncComponentsType } from './manual/SyncComponents'
 import { defineTransformComponent, TransformComponentExtended } from './manual/Transform'
 import { defineLightSourceComponent, LightSourceComponentDefinitionExtended } from './extended/LightSource'
+import { defineTriggerAreaComponent, TriggerAreaComponentDefinitionExtended } from './extended/TriggerArea'
 import defineTagsComponent, { TagsComponentDefinitionExtended } from './manual/Tags'
 
 export * from './generated/index.gen'

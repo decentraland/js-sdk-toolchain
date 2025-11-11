@@ -64,7 +64,7 @@ function getDaoExplorerPath(workingDirectory: string) {
 function getDaoExplorerExecutablePath(workingDirectory: string) {
   const platform = getPlatform()
   if (platform === SupportedPlatform.SP_UNSUPPORTED) {
-    throw new CliError('This platform is not supported to run the DAO Explorers.')
+    throw new CliError('PLATFORM_NOT_SUPPORTED', 'This platform is not supported to run the DAO Explorers.')
   }
 
   if (platform === SupportedPlatform.SP_WINDOWS_X64) {
@@ -89,7 +89,7 @@ export async function ensureDaoExplorer(
   const platform = getPlatform()
 
   if (platform === SupportedPlatform.SP_UNSUPPORTED) {
-    throw new CliError('This platform is not supported to run the DAO Explorers.')
+    throw new CliError('PLATFORM_NOT_SUPPORTED', 'This platform is not supported to run the DAO Explorers.')
   }
 
   const url = `${BEVY_BASE_URL}-${BEVY_URL_PLATFORM_SUFFIX[platform]}`
