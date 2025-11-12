@@ -193,7 +193,8 @@ describe('Generated Material ProtoBuf', () => {
     VideoPlayer.create(entity, {
       playing: true,
       position: 0.0,
-      src: 'someVideo.mp4'
+      src: 'someVideo.mp4',
+      isSpatial: false
     })
 
     Material.setBasicMaterial(entity, {

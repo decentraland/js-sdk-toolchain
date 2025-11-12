@@ -158,10 +158,7 @@ function collectAssetPaths(data: any, assetPaths: Set<string>): void {
  * Recursively replaces asset paths in component data
  * Returns an object with the updated data and a flag indicating if changes were made
  */
-function replaceAssetPaths(
-  data: any,
-  pathMapping: Map<string, string>
-): { data: any; hasChanges: boolean } {
+function replaceAssetPaths(data: any, pathMapping: Map<string, string>): { data: any; hasChanges: boolean } {
   if (data === null || data === undefined) {
     return { data, hasChanges: false }
   }

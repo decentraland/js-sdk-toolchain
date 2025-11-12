@@ -9,13 +9,15 @@ describe('Generated AudioStream ProtoBuf', () => {
     testComponentSerialization(AudioStream, {
       playing: true,
       volume: 1,
-      url: 'FakeUrl'
+      url: 'FakeUrl',
+      isSpatial: false
     })
 
     testComponentSerialization(AudioStream, {
       playing: false,
       volume: 0,
-      url: 'FakeUrl2'
+      url: 'FakeUrl2',
+      isSpatial: false
     })
   })
 
@@ -28,7 +30,8 @@ describe('Generated AudioStream ProtoBuf', () => {
 
     AudioStream.create(entity, {
       url: 'some-src',
-      playing: true
+      playing: true,
+      isSpatial: false
     })
 
     // entity without AudioStream
