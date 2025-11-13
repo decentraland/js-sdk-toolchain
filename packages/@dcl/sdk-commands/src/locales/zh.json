@@ -74,6 +74,11 @@
       "no_input_files": "没有要构建的输入文件：{{entrypointSource}}",
       "rebuild_failed": "无法重新构建包：{{error}}",
       "type_checker_failed": "类型检查器退出，代码为 {{code}}。"
+    },
+    "code_to_composite": {
+      "build_failed": "构建场景失败：{{error}}",
+      "bundle_not_found": "在 {{bundlePath}} 找不到打包的场景",
+      "execution_failed": "执行场景代码失败：{{error}}"
     }
   }
 }
