@@ -39,7 +39,6 @@ async function runApp(
     args: Result<typeof startArgs>
   }
 ) {
-  const cmd = isWindows ? 'start' : 'open'
   const position = args['--position'] ?? `${baseCoords.x},${baseCoords.y}`
   const realm = args['--realm'] ?? realmValue
   const dclenv = args['--dclenv'] ?? 'org'
@@ -72,7 +71,15 @@ async function runApp(
     const queryParams = params.toString()
 
     const app = `decentraland://"${queryParams}"`
-    await components.spawner.exec(cwd, cmd, [app], { silent: true })
+
+    if (isWindows) {
+      // On Windows, use cmd /c start with error handling
+      // The "" is needed as the first argument to start (window title)
+      await components.spawner.exec(cwd, 'cmd', ['/c', 'start', '""', app], { silent: true })
+    } else {
+      await components.spawner.exec(cwd, 'open', [app], { silent: true })
+    }
+
     components.logger.info(`Desktop client: decentraland://${queryParams}\n`)
     return true
   } catch (e: any) {
