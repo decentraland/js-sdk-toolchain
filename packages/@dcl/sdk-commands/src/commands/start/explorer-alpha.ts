@@ -23,21 +23,6 @@ export async function runExplorerAlpha(
   components.logger.log('Please download & install the Decentraland Desktop Client: https://dcl.gg/explorer\n\n')
 }
 
-async function checkProtocolHandlerWindows(components: CliComponents, cwd: string): Promise<boolean> {
-  try {
-    components.logger.log('[DEBUG] Checking if decentraland:// protocol handler is registered on Windows\n')
-    // Query the Windows registry to check if the decentraland protocol is registered
-    const regQuery = 'reg query HKEY_CLASSES_ROOT\\decentraland /ve'
-    components.logger.log(`[DEBUG] Running registry check: ${regQuery}\n`)
-    await components.spawner.exec(cwd, 'reg', ['query', 'HKEY_CLASSES_ROOT\\decentraland', '/ve'], { silent: true })
-    components.logger.log('[DEBUG] Protocol handler is registered\n')
-    return true
-  } catch (e: any) {
-    components.logger.log('[DEBUG] Protocol handler is NOT registered\n')
-    return false
-  }
-}
-
 async function runApp(
   components: CliComponents,
   {
@@ -63,12 +48,10 @@ async function runApp(
   const openDeeplinkInNewInstance = !!args['-n']
 
   try {
-    // On Windows, pre-check if the protocol handler is registered
     if (isWindows) {
-      const isRegistered = await checkProtocolHandlerWindows(components, cwd)
-      if (!isRegistered) {
-        throw new Error('Protocol handler not registered. Please install the Decentraland Desktop Client.')
-      }
+      // On Windows, pre-check if the protocol handler is registered as `start` will silently fail otherwise.
+      // This command will throw an error if the protocol is not registered, that is catched below.
+      await components.spawner.exec(cwd, 'reg', ['query', 'HKEY_CLASSES_ROOT\\decentraland', '/ve'], { silent: true })
     }
 
     const params = new URLSearchParams()
