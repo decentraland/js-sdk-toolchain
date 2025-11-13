@@ -86,6 +86,8 @@ if ((entrypoint as any).main !== undefined) {
       if (maybePromise && typeof maybePromise === 'object' && typeof (maybePromise as unknown as Promise<unknown>).then === 'function') {
         maybePromise.catch(console.error)
       }
+      // initialize and run all scripts
+      initializeScripts(engine)
     } catch (e) {
      console.error(e)
     } finally {
@@ -94,9 +96,6 @@ if ((entrypoint as any).main !== undefined) {
   }
   engine.addSystem(_INTERNAL_startup_system, Infinity)
 }
-
-// Initialize and run all scripts
-initializeScripts(engine)
 
 export * from '@dcl/sdk'
 export * from '${unixEntrypointPath}'
@@ -222,7 +221,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
   if (options.watch) {
     // Instead of using esbuild's watch, we create our own watcher
     const watcher = watch(path.resolve(options.workingDirectory), {
-      ignored: ['**/dist/**', '**/*.crdt', '**/*.composite', path.resolve(options.outputFile)],
+      ignored: ['**/dist/**', '**/*.crdt', path.resolve(options.outputFile)],
       ignoreInitial: true
     })
 
@@ -237,8 +236,8 @@ export async function bundleSingleProject(components: BundleComponents, options:
     }, 100)
 
     watcher.on('all', async (event, filePath) => {
-      // Only rebuild for TypeScript and JavaScript files
-      if (/\.(ts|tsx|js|jsx)$/.test(filePath)) {
+      // Rebuild for TypeScript, JavaScript, and composite files
+      if (/\.(ts|tsx|js|jsx|composite)$/.test(filePath)) {
         printProgressInfo(components.logger, `File ${filePath} changed, rebuilding...`)
         debouncedRebuild()
       }
@@ -382,58 +381,42 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
         let contents = `export function initializeScripts(engine) {}`
         let watchFiles: string[] = []
 
-        if (compositeData && compositeData.scripts.size > 0) {
-          const scriptEntries = Array.from(compositeData.scripts.entries())
-
+        if (compositeData && compositeData.scripts.length > 0) {
           let imports = ''
-          for (const [importName, scripts] of scriptEntries) {
-            const scriptPath = scripts[0].path.replace(/\\/g, '/')
-            const absolutePath = path.join(options.workingDirectory, scriptPath)
-            imports += `import * as ${importName} from './${scriptPath}'\n`
+          let scripts = '[\n'
+
+          for (const script of compositeData.scripts) {
+            const importName = getScriptImportName(script.path)
+            const normalizedPath = script.path.replace(/\\/g, '/')
+            const absolutePath = path.join(options.workingDirectory, script.path)
+
+            imports += `import * as ${importName} from './${normalizedPath}'\n`
+            scripts += `  {...${JSON.stringify(script)}, module: ${importName} },\n`
             watchFiles.push(absolutePath)
           }
 
-          let handlers = '{\n'
-          for (const [importName] of scriptEntries) {
-            handlers += `  '${importName}': ${importName},\n`
-          }
-          handlers += '}'
+          scripts += ']'
 
-          // pre-group scripts by priority and pre-compute instance keys
-          const scriptsByPriority = new Map<number, any[]>()
-
-          for (const [importName, scripts] of scriptEntries) {
-            for (let i = 0; i < scripts.length; i++) {
-              const script = scripts[i]
-              const priority = script.priority || 0
-              const instanceKey = `${script.entity}:${importName}:${i}`
-
-              if (!scriptsByPriority.has(priority)) {
-                scriptsByPriority.set(priority, [])
-              }
-
-              scriptsByPriority.get(priority)!.push({
-                ...script,
-                importName,
-                instanceKey
-              })
-            }
-          }
-
-          let scriptsByPriorityCode = '{\n'
-          for (const [priority, instances] of scriptsByPriority) {
-            scriptsByPriorityCode += `  ${priority}: ${JSON.stringify(instances)},\n`
-          }
-          scriptsByPriorityCode += '}'
-
-          const runtimeCode = generateScriptRuntimeCode()
+          const runtimeCodePath = require.resolve('./runtime-script')
+          const runtimeCode = (await components.fs.readFile(runtimeCodePath, 'utf-8'))
+            // remove all CommonJS/module system code and imports
+            .replace(/"use strict";?\s*/g, '')
+            .replace(/Object\.defineProperty\(exports,.*?\);?\s*/g, '')
+            .replace(/exports\.\w+\s*=\s*void 0;?\s*/g, '')
+            .replace(/exports\.\w+\s*=\s*/g, '')
+            .replace(/^export\s+/gm, '')
+            .replace(/^import\s+.*$/gm, '')
+            .replace(/\n{3,}/g, '\n\n')
+            .trim()
 
           contents = `
 ${imports}
-const handlers = ${handlers}
-const scriptsByPriority = ${scriptsByPriorityCode}
 
 ${runtimeCode}
+
+export function initializeScripts(engine) {
+  return runScripts(engine, ${scripts})
+}
 `
         }
 
@@ -448,70 +431,12 @@ ${runtimeCode}
   }
 }
 
-function generateScriptRuntimeCode(): string {
-  return `export function initializeScripts(engine) {
-  const classInstances = new Map()
-  const functionScripts = new Map()
-
-  for (const [priority, instances] of Object.entries(scriptsByPriority)) {
-    for (const scriptData of instances) {
-      const module = handlers[scriptData.importName]
-      if (!module) {
-        console.error('[Script] Unknown module:', scriptData.importName)
-        continue
-      }
-
-      const layout = scriptData.layout ? JSON.parse(scriptData.layout) : {}
-      const params = layout.params || {}
-      const paramValues = Object.values(params).map(p => p.value)
-
-      if (typeof module.start === 'function') {
-        try {
-          module.start(scriptData.entity, ...paramValues)
-        } catch (e) {
-          console.error('[Script Error] ' + scriptData.importName + ' start() failed:', e)
-          throw e
-        }
-        functionScripts.set(scriptData.instanceKey, { module, entity: scriptData.entity, params: paramValues })
-      } else {
-        const ScriptClass = Object.values(module).find(exp => typeof exp === 'function')
-        if (!ScriptClass) {
-          console.error('[Script] No class found in module:', scriptData.importName)
-          continue
-        }
-
-        try {
-          const instance = new ScriptClass(scriptData.entity, ...paramValues)
-          if (typeof instance.start === 'function') {
-            instance.start()
-          }
-          classInstances.set(scriptData.instanceKey, instance)
-        } catch (e) {
-          console.error('[Script Error] ' + scriptData.importName + ' class initialization failed:', e)
-          throw e
-        }
-      }
-    }
-
-    engine.addSystem((dt) => {
-      for (const scriptData of instances) {
-        try {
-          const classInstance = classInstances.get(scriptData.instanceKey)
-          if (classInstance) {
-            if (typeof classInstance.update === 'function') {
-              classInstance.update(dt)
-            }
-          } else {
-            const functionScript = functionScripts.get(scriptData.instanceKey)
-            if (functionScript && typeof functionScript.module.update === 'function') {
-              functionScript.module.update(functionScript.entity, dt, ...functionScript.params)
-            }
-          }
-        } catch (e) {
-          console.error('[Script Error] update() failed:', e)
-        }
-      }
-    }, Number(priority))
-  }
-}`
+/**
+ * Generates a sanitized import name for a script path.
+ * Example: "src/scripts/my-script.ts" -> "script_src_scripts_my_script"
+ */
+export function getScriptImportName(scriptPath: string): string {
+  return 'script_' + scriptPath
+    .replace(/\.tsx?$/, '')  // remove .ts or .tsx
+    .replace(/[^a-zA-Z0-9]/g, '_')  // sanitize
 }
