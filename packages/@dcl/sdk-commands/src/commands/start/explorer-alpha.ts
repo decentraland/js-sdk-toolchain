@@ -73,10 +73,13 @@ async function runApp(
     const app = `decentraland://"${queryParams}"`
 
     if (isWindows) {
-      // On Windows, use cmd /c start with error handling
-      // The "" is needed as the first argument to start (window title)
-      await components.spawner.exec(cwd, 'cmd', ['/c', 'start', '""', app], { silent: true })
+      // On Windows, use PowerShell Start-Process with ErrorAction Stop for better error handling
+      components.logger.log('[DEBUG] Using PowerShell Start-Process command for Windows\n')
+      const psCommand = `Start-Process '${app}' -ErrorAction Stop`
+      components.logger.log(`[DEBUG] PowerShell command: powershell -Command "${psCommand}"\n`)
+      await components.spawner.exec(cwd, 'powershell', ['-Command', psCommand], { silent: true })
     } else {
+      components.logger.log('[DEBUG] Using open command for Unix-based systems\n')
       await components.spawner.exec(cwd, 'open', [app], { silent: true })
     }
 
