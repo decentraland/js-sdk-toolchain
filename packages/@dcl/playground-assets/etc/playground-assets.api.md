@@ -2180,8 +2180,9 @@ export namespace PBAudioSource {
 
 // @public (undocumented)
 export interface PBAudioStream {
-    isSpatial?: boolean | undefined;
     playing?: boolean | undefined;
+    spatial?: boolean | undefined;
+    spatialMaxDistance?: number | undefined;
     url: string;
     volume?: number | undefined;
 }
@@ -3481,11 +3482,12 @@ export namespace PBVideoEvent {
 
 // @public (undocumented)
 export interface PBVideoPlayer {
-    isSpatial?: boolean | undefined;
     loop?: boolean | undefined;
     playbackRate?: number | undefined;
     playing?: boolean | undefined;
     position?: number | undefined;
+    spatial?: boolean | undefined;
+    spatialMaxDistance?: number | undefined;
     src: string;
     volume?: number | undefined;
 }
