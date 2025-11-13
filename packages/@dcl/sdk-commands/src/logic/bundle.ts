@@ -63,6 +63,7 @@ import { engine, NetworkEntity } from '@dcl/sdk/ecs'
 import * as sdk from '@dcl/sdk'
 import { compositeProvider } from '@dcl/sdk/composite-provider'
 import { compositeFromLoader } from '~sdk/all-composites'
+import { initializeScripts } from '~sdk/all-scripts'
 
 ${
   isEditorScene &&
@@ -74,7 +75,7 @@ initAssetPacks(engine, { syncEntity }, players)
 
 // TODO: do we need to do this on runtime ?
 // I think we have that information at build-time and we avoid to do evaluate this on the worker.
-// Read composite.json or main.crdt => If that file has a NetowrkEntity import '@dcl/@sdk/network'
+// Read composite.json or main.crdt => If that file has a NetworkEntity import '@dcl/@sdk/network'
 `
 }
 
@@ -93,6 +94,9 @@ if ((entrypoint as any).main !== undefined) {
   }
   engine.addSystem(_INTERNAL_startup_system, Infinity)
 }
+
+// Initialize and run all scripts
+initializeScripts(engine)
 
 export * from '@dcl/sdk'
 export * from '${unixEntrypointPath}'
@@ -308,16 +312,17 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
 
 function compositeLoader(components: BundleComponents, options: SingleProjectOptions): esbuild.Plugin {
   let shouldReload = true
-  let contents = `export const compositeFromLoader = {}` // default exports nothing
-  let watchFiles: string[] = [] // no files to watch
-  let lastBuiltSuccessful = false
+  let compositeData: Awaited<ReturnType<typeof getAllComposites>> | null = null
 
   return {
     name: 'composite-loader',
     setup(build) {
       build.onStart(() => {
         shouldReload = true
+        compositeData = null
       })
+
+      // Handle composites virtual module
       build.onResolve({ filter: /~sdk\/all-composites/ }, (_args) => {
         return {
           namespace: 'sdk-composite',
@@ -326,27 +331,29 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
       })
 
       build.onLoad({ filter: /.*/, namespace: 'sdk-composite' }, async (_) => {
-        if (shouldReload) {
+        // Load compositeData if not already loaded
+        if (shouldReload && !compositeData) {
           if (!options.ignoreComposite) {
-            const data = await getAllComposites(
+            compositeData = await getAllComposites(
               components,
               // we pass the build.initialOptions.absWorkingDir to build projects with multiple roots at once
               build.initialOptions.absWorkingDir ?? options.workingDirectory
             )
-            contents = `export const compositeFromLoader = {${data.compositeLines.join(',')}}`
-            watchFiles = data.watchFiles
 
-            if (data.withErrors) {
+            if (compositeData.withErrors) {
               printWarning(
                 components.logger,
                 'Some composites are not included because of errors while compiling them. There can be unexpected behavior in the scene, check the errors and try to fix them.'
               )
-            } else if (!lastBuiltSuccessful) {
             }
-            lastBuiltSuccessful = !data.withErrors
           }
           shouldReload = false
         }
+
+        const contents = compositeData
+          ? `export const compositeFromLoader = {${compositeData.compositeLines.join(',')}}`
+          : `export const compositeFromLoader = {}`
+        const watchFiles = compositeData?.watchFiles || []
 
         return {
           loader: 'js',
@@ -354,6 +361,157 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
           watchFiles
         }
       })
+
+      // Handle scripts virtual module
+      build.onResolve({ filter: /~sdk\/all-scripts/ }, (_args) => {
+        return {
+          namespace: 'sdk-scripts',
+          path: 'all-scripts'
+        }
+      })
+
+      build.onLoad({ filter: /.*/, namespace: 'sdk-scripts' }, async (_) => {
+        // ensure compositeData is loaded (in case scripts are imported before composites)
+        if (!compositeData && !options.ignoreComposite) {
+          compositeData = await getAllComposites(
+            components,
+            build.initialOptions.absWorkingDir ?? options.workingDirectory
+          )
+        }
+
+        let contents = `export function initializeScripts(engine) {}`
+        let watchFiles: string[] = []
+
+        if (compositeData && compositeData.scripts.size > 0) {
+          const scriptEntries = Array.from(compositeData.scripts.entries())
+
+          let imports = ''
+          for (const [importName, scripts] of scriptEntries) {
+            const scriptPath = scripts[0].path.replace(/\\/g, '/')
+            const absolutePath = path.join(options.workingDirectory, scriptPath)
+            imports += `import * as ${importName} from './${scriptPath}'\n`
+            watchFiles.push(absolutePath)
+          }
+
+          let handlers = '{\n'
+          for (const [importName] of scriptEntries) {
+            handlers += `  '${importName}': ${importName},\n`
+          }
+          handlers += '}'
+
+          // pre-group scripts by priority and pre-compute instance keys
+          const scriptsByPriority = new Map<number, any[]>()
+
+          for (const [importName, scripts] of scriptEntries) {
+            for (let i = 0; i < scripts.length; i++) {
+              const script = scripts[i]
+              const priority = script.priority || 0
+              const instanceKey = `${script.entity}:${importName}:${i}`
+
+              if (!scriptsByPriority.has(priority)) {
+                scriptsByPriority.set(priority, [])
+              }
+
+              scriptsByPriority.get(priority)!.push({
+                ...script,
+                importName,
+                instanceKey
+              })
+            }
+          }
+
+          let scriptsByPriorityCode = '{\n'
+          for (const [priority, instances] of scriptsByPriority) {
+            scriptsByPriorityCode += `  ${priority}: ${JSON.stringify(instances)},\n`
+          }
+          scriptsByPriorityCode += '}'
+
+          const runtimeCode = generateScriptRuntimeCode()
+
+          contents = `
+${imports}
+const handlers = ${handlers}
+const scriptsByPriority = ${scriptsByPriorityCode}
+
+${runtimeCode}
+`
+        }
+
+        return {
+          loader: 'js',
+          contents,
+          watchFiles,
+          resolveDir: options.workingDirectory
+        }
+      })
     }
   }
+}
+
+function generateScriptRuntimeCode(): string {
+  return `export function initializeScripts(engine) {
+  const classInstances = new Map()
+  const functionScripts = new Map()
+
+  for (const [priority, instances] of Object.entries(scriptsByPriority)) {
+    for (const scriptData of instances) {
+      const module = handlers[scriptData.importName]
+      if (!module) {
+        console.error('[Script] Unknown module:', scriptData.importName)
+        continue
+      }
+
+      const layout = scriptData.layout ? JSON.parse(scriptData.layout) : {}
+      const params = layout.params || {}
+      const paramValues = Object.values(params).map(p => p.value)
+
+      if (typeof module.start === 'function') {
+        try {
+          module.start(scriptData.entity, ...paramValues)
+        } catch (e) {
+          console.error('[Script Error] ' + scriptData.importName + ' start() failed:', e)
+          throw e
+        }
+        functionScripts.set(scriptData.instanceKey, { module, entity: scriptData.entity, params: paramValues })
+      } else {
+        const ScriptClass = Object.values(module).find(exp => typeof exp === 'function')
+        if (!ScriptClass) {
+          console.error('[Script] No class found in module:', scriptData.importName)
+          continue
+        }
+
+        try {
+          const instance = new ScriptClass(scriptData.entity, ...paramValues)
+          if (typeof instance.start === 'function') {
+            instance.start()
+          }
+          classInstances.set(scriptData.instanceKey, instance)
+        } catch (e) {
+          console.error('[Script Error] ' + scriptData.importName + ' class initialization failed:', e)
+          throw e
+        }
+      }
+    }
+
+    engine.addSystem((dt) => {
+      for (const scriptData of instances) {
+        try {
+          const classInstance = classInstances.get(scriptData.instanceKey)
+          if (classInstance) {
+            if (typeof classInstance.update === 'function') {
+              classInstance.update(dt)
+            }
+          } else {
+            const functionScript = functionScripts.get(scriptData.instanceKey)
+            if (functionScript && typeof functionScript.module.update === 'function') {
+              functionScript.module.update(functionScript.entity, dt, ...functionScript.params)
+            }
+          }
+        } catch (e) {
+          console.error('[Script Error] update() failed:', e)
+        }
+      }
+    }, Number(priority))
+  }
+}`
 }

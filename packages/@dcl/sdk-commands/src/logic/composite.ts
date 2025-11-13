@@ -1,18 +1,28 @@
 import { globSync } from 'glob'
 import path from 'path'
+import { LastWriteWinElementSetComponentDefinition, Composite, Engine, IEngine, Entity } from '@dcl/ecs/dist-cjs'
+import { EditorComponentNames, ScriptComponent, ScriptItem } from '@dcl/inspector'
+
 import { CliComponents } from '../components'
-import { Composite, Engine } from '@dcl/ecs/dist-cjs'
 import { printError } from './beautiful-logs'
 
 type CompositeComponents = Pick<CliComponents, 'logger' | 'fs'>
+type ScriptProvider = {
+  add(entity: Entity, script: ScriptItem): void
+}
+
+type ScriptInfo = ScriptItem & {
+  entity: Entity
+}
 
 export async function getAllComposites(
   components: CompositeComponents,
   workingDirectory: string
-): Promise<{ watchFiles: string[]; compositeLines: string[]; withErrors: boolean }> {
+): Promise<{ watchFiles: string[]; compositeLines: string[]; scripts: Map<string, ScriptInfo[]>; withErrors: boolean }> {
   let withErrors = false
   const composites: Record<string, Composite.Definition> = {}
   const watchFiles = globSync('**/*.composite', { cwd: workingDirectory })
+  const scripts = new Map<string, ScriptInfo[]>()
 
   const textDecoder = new TextDecoder()
   for (const file of watchFiles) {
@@ -39,6 +49,17 @@ export async function getAllComposites(
     }
   }
 
+  const scriptProvider: ScriptProvider = {
+    add(entity, script) {
+      const importName = 'script_' + script.path
+        .replace(/\.tsx?$/, '')  // remove .ts or .tsx
+        .replace(/[^a-zA-Z0-9]/g, '_')  // sanitize
+      const existingScripts = scripts.get(importName) || []
+      existingScripts.push({ ...script, entity })
+      scripts.set(importName, existingScripts)
+    }
+  }
+
   const compositeLines: string[] = []
 
   for (const compositeSource in composites) {
@@ -46,6 +67,7 @@ export async function getAllComposites(
     try {
       const composite = compositeProvider.getCompositeOrNull(compositeSource)!
       Composite.instance(engine, composite, compositeProvider)
+      extractScripts(engine, scriptProvider)
       compositeLines.push(`'${composite.src}':${JSON.stringify(Composite.toJson(composite.composite))}`)
     } catch (err: any) {
       printError(components.logger, `Composite '${compositeSource}' can't be instanced.`, err)
@@ -53,5 +75,16 @@ export async function getAllComposites(
     }
   }
 
-  return { compositeLines, watchFiles, withErrors }
+  return { compositeLines, watchFiles, scripts, withErrors }
+}
+
+function extractScripts(engine: IEngine, scriptProvider: ScriptProvider) {
+  const ScriptComponent = engine.getComponentOrNull(EditorComponentNames.Script) as LastWriteWinElementSetComponentDefinition<ScriptComponent> | null
+  if (!ScriptComponent) return
+
+  for (const [entity, { value: scripts }] of engine.getEntitiesWith(ScriptComponent)) {
+    for (const script of scripts) {
+      scriptProvider.add(entity, script)
+    }
+  }
 }
