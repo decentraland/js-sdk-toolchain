@@ -23,6 +23,21 @@ export async function runExplorerAlpha(
   components.logger.log('Please download & install the Decentraland Desktop Client: https://dcl.gg/explorer\n\n')
 }
 
+async function checkProtocolHandlerWindows(components: CliComponents, cwd: string): Promise<boolean> {
+  try {
+    components.logger.log('[DEBUG] Checking if decentraland:// protocol handler is registered on Windows\n')
+    // Query the Windows registry to check if the decentraland protocol is registered
+    const regQuery = 'reg query HKEY_CLASSES_ROOT\\decentraland /ve'
+    components.logger.log(`[DEBUG] Running registry check: ${regQuery}\n`)
+    await components.spawner.exec(cwd, 'reg', ['query', 'HKEY_CLASSES_ROOT\\decentraland', '/ve'], { silent: true })
+    components.logger.log('[DEBUG] Protocol handler is registered\n')
+    return true
+  } catch (e: any) {
+    components.logger.log('[DEBUG] Protocol handler is NOT registered\n')
+    return false
+  }
+}
+
 async function runApp(
   components: CliComponents,
   {
@@ -39,6 +54,7 @@ async function runApp(
     args: Result<typeof startArgs>
   }
 ) {
+  const cmd = isWindows ? 'start' : 'open'
   const position = args['--position'] ?? `${baseCoords.x},${baseCoords.y}`
   const realm = args['--realm'] ?? realmValue
   const dclenv = args['--dclenv'] ?? 'org'
@@ -47,6 +63,14 @@ async function runApp(
   const openDeeplinkInNewInstance = !!args['-n']
 
   try {
+    // On Windows, pre-check if the protocol handler is registered
+    if (isWindows) {
+      const isRegistered = await checkProtocolHandlerWindows(components, cwd)
+      if (!isRegistered) {
+        throw new Error('Protocol handler not registered. Please install the Decentraland Desktop Client.')
+      }
+    }
+
     const params = new URLSearchParams()
 
     params.set('realm', realm)
@@ -71,18 +95,7 @@ async function runApp(
     const queryParams = params.toString()
 
     const app = `decentraland://"${queryParams}"`
-
-    if (isWindows) {
-      // On Windows, use PowerShell Start-Process with ErrorAction Stop for better error handling
-      components.logger.log('[DEBUG] Using PowerShell Start-Process command for Windows\n')
-      const psCommand = `Start-Process '${app}' -ErrorAction Stop`
-      components.logger.log(`[DEBUG] PowerShell command: powershell -Command "${psCommand}"\n`)
-      await components.spawner.exec(cwd, 'powershell', ['-Command', psCommand], { silent: true })
-    } else {
-      components.logger.log('[DEBUG] Using open command for Unix-based systems\n')
-      await components.spawner.exec(cwd, 'open', [app], { silent: true })
-    }
-
+    await components.spawner.exec(cwd, cmd, [app], { silent: true })
     components.logger.info(`Desktop client: decentraland://${queryParams}\n`)
     return true
   } catch (e: any) {
