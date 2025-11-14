@@ -13,7 +13,7 @@ describe('VideoPlayer component', () => {
       position: 65.3,
       playing: true,
       volume: 0.3,
-      isSpatial: false
+      spatial: false
     })
   })
 })
