@@ -13,7 +13,8 @@ describe('VideoPlayer component', () => {
       position: 65.3,
       playing: true,
       volume: 0.3,
-      spatial: false
+      spatial: false,
+      spatialMaxDistance: 40
     })
   })
 })
