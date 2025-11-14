@@ -19,7 +19,7 @@ import {
   PBAudioSource,
   VideoPlayer,
   PBVideoPlayer,
-  PBMeshCollider,
+  PBMeshCollider
 } from '@dcl/ecs/dist-cjs'
 
 import { CliComponents } from '../../components'
@@ -122,10 +122,7 @@ function getNameGenerators(): [
 /**
  * Generates a name for an entity based on a specific component
  */
-function generateNameFromComponent(
-  generator: ComponentNameGenerator<any>,
-  entity: Entity
-): string | null {
+function generateNameFromComponent(generator: ComponentNameGenerator<any>, entity: Entity): string | null {
   if (!generator.component.has(entity) || !('getOrNull' in generator.component)) {
     return null
   }
@@ -141,10 +138,7 @@ function generateNameFromComponent(
  * Automatically generates Name components for entities based on their other components.
  * This makes entities easier to identify and work with in the Creator Hub.
  */
-export async function generateEntityNames(
-  components: Pick<CliComponents, 'logger'>,
-  engine: IEngine
-): Promise<number> {
+export async function generateEntityNames(components: Pick<CliComponents, 'logger'>, engine: IEngine): Promise<number> {
   const { logger } = components
 
   let createdCount = 0

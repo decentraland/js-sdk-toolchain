@@ -2181,6 +2181,8 @@ export namespace PBAudioSource {
 // @public (undocumented)
 export interface PBAudioStream {
     playing?: boolean | undefined;
+    spatial?: boolean | undefined;
+    spatialMaxDistance?: number | undefined;
     url: string;
     volume?: number | undefined;
 }
@@ -3484,6 +3486,8 @@ export interface PBVideoPlayer {
     playbackRate?: number | undefined;
     playing?: boolean | undefined;
     position?: number | undefined;
+    spatial?: boolean | undefined;
+    spatialMaxDistance?: number | undefined;
     src: string;
     volume?: number | undefined;
 }

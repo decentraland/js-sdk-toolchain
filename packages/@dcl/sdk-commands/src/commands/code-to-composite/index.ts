@@ -28,7 +28,7 @@ export const args = declareArgs({
   '--help': Boolean,
   '-h': '--help',
   '--yes': Boolean,
-  '-y': '--yes',
+  '-y': '--yes'
 })
 
 export function help(options: Options) {

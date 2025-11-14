@@ -16,11 +16,10 @@ import {
   UiInput,
   UiInputResult,
   UiDropdown,
-  UiDropdownResult,
+  UiDropdownResult
 } from '@dcl/ecs/dist-cjs'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist-cjs/serialization/ByteBuffer'
 import { createEngineContext } from '@dcl/inspector'
-
 
 import { CliComponents } from '../../components'
 import { SceneProject } from '../../logic/project-validations'
@@ -45,7 +44,7 @@ function getInspectorComponentsIds() {
  * The transport layer is used to capture CRDT messages sent by the scene code.
  * This allows us to capture the state of all entities and components.
  */
-function initEngine(): { engine: IEngine, transport: Transport } {
+function initEngine(): { engine: IEngine; transport: Transport } {
   const transport: Transport = {
     filter: () => true,
     send: async (_messages) => {}
@@ -288,7 +287,7 @@ function createAutoMockProxy(baseMock: any = {}): any {
  * to be mocked for scene execution.
  */
 function createSystemModuleMock(engine: IEngine, transport: Transport, mainCrdt: Uint8Array, moduleId: string) {
-  const criticalModuleMocks = createCriticalModuleMocks(engine, transport, mainCrdt);
+  const criticalModuleMocks = createCriticalModuleMocks(engine, transport, mainCrdt)
   if (moduleId in criticalModuleMocks) {
     return createAutoMockProxy(criticalModuleMocks[moduleId])
   }
@@ -355,7 +354,7 @@ function filterInspectorCompatibleComponents(engine: IEngine) {
     UiInput.componentId,
     UiInputResult.componentId,
     UiDropdown.componentId,
-    UiDropdownResult.componentId,
+    UiDropdownResult.componentId
   ])
 
   // first pass: identify entities with react-ecs components
@@ -442,7 +441,7 @@ export async function executeSceneCode(
   components: Pick<CliComponents, 'fs' | 'logger'>,
   project: SceneProject,
   crdtFilePath: string
-): Promise<{ engine: IEngine, sceneCodeEntrypoint: string }> {
+): Promise<{ engine: IEngine; sceneCodeEntrypoint: string }> {
   const { fs, logger } = components
 
   logger.log('Building scene...')
