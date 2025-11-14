@@ -249,7 +249,9 @@ export async function main(options: Options) {
       if (!explorerAlpha && openBrowser && sortedURLs.length) {
         try {
           const url = bevyWeb
-            ? `https://decentraland.zone/bevy-web/?preview&initialRealm=${sortedURLs[0]}`
+            ? `https://decentraland.zone/bevy-web/?preview&initialRealm=${new URL(sortedURLs[0]).origin}&location=${
+                baseCoords.x
+              },${baseCoords.y}`
             : sortedURLs[0]
           await open(url)
         } catch (_) {
