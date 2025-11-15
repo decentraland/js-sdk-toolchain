@@ -1,6 +1,12 @@
 import { globSync } from 'glob'
 import path from 'path'
-import { LastWriteWinElementSetComponentDefinition, Composite, Engine } from '@dcl/ecs/dist-cjs'
+import {
+  LastWriteWinElementSetComponentDefinition,
+  Composite,
+  Engine,
+  Entity,
+  EntityMappingMode
+} from '@dcl/ecs/dist-cjs'
 import { EditorComponentNames, ScriptComponent, ScriptItem } from '@dcl/inspector'
 
 import { CliComponents } from '../components'
@@ -52,7 +58,12 @@ export async function getAllComposites(
     const engine = Engine()
     try {
       const composite = compositeProvider.getCompositeOrNull(compositeSource)!
-      Composite.instance(engine, composite, compositeProvider)
+      Composite.instance(engine, composite, compositeProvider, {
+        entityMapping: {
+          type: EntityMappingMode.EMM_DIRECT_MAPPING,
+          getCompositeEntity: (compositeEntity: Entity | number) => compositeEntity as Entity
+        }
+      })
 
       const ScriptComponent = engine.getComponentOrNull(EditorComponentNames.Script) as LastWriteWinElementSetComponentDefinition<ScriptComponent> | null
       if (ScriptComponent) {
