@@ -381,18 +381,21 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
         let contents = `export function initializeScripts(engine) {}`
         let watchFiles: string[] = []
 
-        if (compositeData && compositeData.scripts.length > 0) {
+        if (compositeData && compositeData.scripts.size > 0) {
           let imports = ''
           let scripts = '[\n'
 
-          for (const script of compositeData.scripts) {
-            const importName = getScriptImportName(script.path)
-            const normalizedPath = script.path.replace(/\\/g, '/')
-            const absolutePath = path.join(options.workingDirectory, script.path)
+          for (const [scriptPath, scriptInstances] of compositeData.scripts.entries()) {
+            const importName = getScriptImportName(scriptPath)
+            const normalizedPath = scriptPath.replace(/\\/g, '/')
+            const absolutePath = path.join(options.workingDirectory, scriptPath)
 
             imports += `import * as ${importName} from './${normalizedPath}'\n`
-            scripts += `  {...${JSON.stringify(script)}, module: ${importName} },\n`
             watchFiles.push(absolutePath)
+
+            for (const script of scriptInstances) {
+              scripts += `  {...${JSON.stringify(script)}, module: ${importName} },\n`
+            }
           }
 
           scripts += ']'
