@@ -11,6 +11,7 @@ describe('Generated AudioStream ProtoBuf', () => {
       volume: 1,
       url: 'FakeUrl',
       spatial: false,
+      spatialMinDistance: 5,
       spatialMaxDistance: 40
     })
 
@@ -19,6 +20,7 @@ describe('Generated AudioStream ProtoBuf', () => {
       volume: 0,
       url: 'FakeUrl2',
       spatial: false,
+      spatialMinDistance: 5,
       spatialMaxDistance: 40
     })
   })
@@ -34,6 +36,7 @@ describe('Generated AudioStream ProtoBuf', () => {
       url: 'some-src',
       playing: true,
       spatial: false,
+      spatialMinDistance: 5,
       spatialMaxDistance: 40
     })
 

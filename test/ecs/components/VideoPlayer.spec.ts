@@ -14,6 +14,7 @@ describe('VideoPlayer component', () => {
       playing: true,
       volume: 0.3,
       spatial: false,
+      spatialMinDistance: 5,
       spatialMaxDistance: 40
     })
   })

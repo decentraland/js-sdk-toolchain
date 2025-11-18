@@ -195,6 +195,7 @@ describe('Generated Material ProtoBuf', () => {
       position: 0.0,
       src: 'someVideo.mp4',
       spatial: false,
+      spatialMinDistance: 5,
       spatialMaxDistance: 40
     })
 
