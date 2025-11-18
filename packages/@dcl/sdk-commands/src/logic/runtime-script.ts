@@ -1,4 +1,4 @@
-import type { IEngine, Entity } from '@dcl/ecs/dist-cjs'
+import { IEngine, Entity, EntityState } from '@dcl/ecs/dist-cjs'
 
 type ScriptLayout = {
   params?: Record<string, { value: unknown }>
@@ -31,6 +31,10 @@ type ScriptClassInstance = {
 type ScriptClass = new (entity: Entity, ...params: unknown[]) => ScriptClassInstance
 type ScriptsByPriority = Record<number, ScriptWithKey[]>
 
+function entityIsRemoved(engine: IEngine, entity: Entity) {
+  return engine.getEntityState(entity) === EntityState.Removed
+}
+
 /**
  * Initializes and runs all scripts organized by priority.
  * Supports both functional-style scripts (with start/update functions) and class-based scripts.
@@ -41,11 +45,13 @@ type ScriptsByPriority = Record<number, ScriptWithKey[]>
  */
 export function runScripts(engine: IEngine, scripts: Script[]) {
   const scriptsByPriority = groupScriptsByPriority(scripts)
-  const classInstances = new Map<string, ScriptClassInstance>()
+  const classInstances = new Map<string, { instance: ScriptClassInstance; entity: Entity }>()
   const functionScripts = new Map<string, { module: FunctionalScriptModule; entity: Entity; params: unknown[] }>()
 
   for (const [priority, instances] of Object.entries(scriptsByPriority)) {
     for (const script of instances) {
+      if (entityIsRemoved(engine, script.entity)) continue
+
       const module = script.module
       if (!module) {
         console.error('[Script] Unknown module:', script.path)
@@ -75,7 +81,7 @@ export function runScripts(engine: IEngine, scripts: Script[]) {
           if (typeof instance.start === 'function') {
             instance.start()
           }
-          classInstances.set(script.key, instance)
+          classInstances.set(script.key, { instance, entity: script.entity })
         } catch (e: unknown) {
           console.error('[Script Error] ' + script.path + ' class initialization failed:', e)
           throw e
@@ -87,14 +93,16 @@ export function runScripts(engine: IEngine, scripts: Script[]) {
       for (const scriptData of instances) {
         try {
           const classInstance = classInstances.get(scriptData.key)
-          if (classInstance) {
-            if (typeof classInstance.update === 'function') {
-              classInstance.update(dt)
+          if (classInstance && !entityIsRemoved(engine, classInstance.entity)) {
+            if (typeof classInstance.instance.update === 'function') {
+              classInstance.instance.update(dt)
             }
           } else {
             const functionScript = functionScripts.get(scriptData.key)
-            if (functionScript && typeof functionScript.module.update === 'function') {
-              functionScript.module.update(functionScript.entity, dt, ...functionScript.params)
+            if (functionScript && !entityIsRemoved(engine, functionScript.entity)) {
+              if (typeof functionScript.module.update === 'function') {
+                functionScript.module.update(functionScript.entity, dt, ...functionScript.params)
+              }
             }
           }
         } catch (e: unknown) {
