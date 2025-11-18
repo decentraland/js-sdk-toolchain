@@ -379,7 +379,7 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
         }
 
         let contents = `export function initializeScripts(engine) {}`
-        let watchFiles: string[] = []
+        const watchFiles: string[] = []
 
         if (compositeData && compositeData.scripts.size > 0) {
           let imports = ''
@@ -439,7 +439,10 @@ export function initializeScripts(engine) {
  * Example: "src/scripts/my-script.ts" -> "script_src_scripts_my_script"
  */
 export function getScriptImportName(scriptPath: string): string {
-  return 'script_' + scriptPath
-    .replace(/\.tsx?$/, '')  // remove .ts or .tsx
-    .replace(/[^a-zA-Z0-9]/g, '_')  // sanitize
+  return (
+    'script_' +
+    scriptPath
+      .replace(/\.tsx?$/, '') // remove .ts or .tsx
+      .replace(/[^a-zA-Z0-9]/g, '_')
+  ) // sanitize
 }

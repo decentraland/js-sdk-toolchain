@@ -1,19 +1,20 @@
 import { globSync } from 'glob'
 import path from 'path'
 import {
-  LastWriteWinElementSetComponentDefinition,
   Composite,
   Engine,
   Entity,
-  EntityMappingMode
+  EntityMappingMode,
+  LastWriteWinElementSetComponentDefinition
 } from '@dcl/ecs/dist-cjs'
-import { EditorComponentNames, ScriptComponent, ScriptItem } from '@dcl/inspector'
+import { ComponentName, type Script as ScriptSchema } from '@dcl/inspector/node_modules/@dcl/asset-packs'
 
 import { CliComponents } from '../components'
 import { printError } from './beautiful-logs'
 
 type CompositeComponents = Pick<CliComponents, 'logger' | 'fs'>
-
+type ScriptComponent = LastWriteWinElementSetComponentDefinition<ScriptSchema>
+type ScriptItem = ScriptSchema['value'][number]
 type Script = ScriptItem & {
   entity: number
 }
@@ -65,7 +66,7 @@ export async function getAllComposites(
         }
       })
 
-      const ScriptComponent = engine.getComponentOrNull(EditorComponentNames.Script) as LastWriteWinElementSetComponentDefinition<ScriptComponent> | null
+      const ScriptComponent = engine.getComponentOrNull(ComponentName.SCRIPT) as ScriptComponent | null
       if (ScriptComponent) {
         for (const [entity, { value }] of engine.getEntitiesWith(ScriptComponent)) {
           for (const script of value) {

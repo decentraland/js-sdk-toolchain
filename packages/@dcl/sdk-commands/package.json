@@ -11,7 +11,7 @@
     "@dcl/ecs": "file:../ecs",
     "@dcl/gltf-validator-ts": "1.0.14",
     "@dcl/hashing": "1.1.3",
-    "@dcl/inspector": "https://sdk-team-cdn.decentraland.org/creator-hub/branch/feature/scripts-component/@dcl/inspector/dcl-inspector-7.15.4-commit-707a5983e7274220535d004ee7afb26b03d1a251.tgz",
+    "@dcl/inspector": "https://sdk-team-cdn.decentraland.org/creator-hub/branch/feature/scripts-component/@dcl/inspector/dcl-inspector-7.15.5-commit-d1b342c2bf82d4d6905de9dbf7745de3c21091f0.tgz",
     "@dcl/linker-dapp": "^0.14.2",
     "@dcl/mini-comms": "1.0.1-20230216163137.commit-a4c75be",
     "@dcl/protocol": "1.0.0-19675433701.commit-48bfb23",
