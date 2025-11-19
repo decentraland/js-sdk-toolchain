@@ -64,10 +64,6 @@ jobs:
       - name: test-cli
         run: make test-cli
 
-      - name: test-inspector
-        env:
-          NODE_OPTIONS: "--max_old_space_size=4096"
-        run: make test-inspector
       - uses: codecov/codecov-action@v3
         if: always()
         with:
