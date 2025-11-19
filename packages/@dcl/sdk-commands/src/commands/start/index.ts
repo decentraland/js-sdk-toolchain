@@ -51,6 +51,7 @@ export const args = declareArgs({
   '--skip-build': Boolean,
   '--data-layer': Boolean,
   '--explorer-alpha': Boolean,
+  '--explorer-web': Boolean,
   '--hub': Boolean,
   // Params related to the explorer-alpha
   '--debug': Boolean,
@@ -77,6 +78,8 @@ export async function help(options: Options) {
       -c, --ci                          Run the parcel previewer on a remote unix server
       --web3                            Connects preview to browser wallet to use the associated avatar and account
       --skip-build                      Skip build and only serve the files in preview mode
+      --explorer-alpha                  Opens the new client (default)
+      --explorer-web                    Opens the web client instead of the new client
       --debug                           Enables Debug panel mode inside DCL Explorer (default=true)
       --dclenv                          Decentraland Environment. Which environment to use for the content. This determines the catalyst server used, asset-bundles, etc. Possible values: org, zone, today. (default=org)
       --realm                           Realm used to serve the content. (default=Localhost)
@@ -109,7 +112,7 @@ export async function main(options: Options) {
   const watch = !options.args['--no-watch']
   const withDataLayer = options.args['--data-layer']
   const enableWeb3 = options.args['--web3']
-  const explorerAlpha = options.args['--explorer-alpha']
+  const useExplorerAlpha = options.args['--explorer-web'] ? false : options.args['--explorer-alpha'] ?? true
   const isHub = !!options.args['--hub']
 
   let hasSmartWearable = false
@@ -191,7 +194,7 @@ export async function main(options: Options) {
       await wireRouter(components, workspace, dataLayer)
       if (watch) {
         for (const project of workspace.projects) {
-          await wireFileWatcherToWebSockets(components, project.workingDirectory, project.kind, !!explorerAlpha)
+          await wireFileWatcherToWebSockets(components, project.workingDirectory, project.kind, useExplorerAlpha)
         }
       }
       await startComponents()
@@ -200,7 +203,7 @@ export async function main(options: Options) {
       const availableURLs: string[] = []
 
       printProgressInfo(options.components.logger, 'Preview server is now running!')
-      if (!explorerAlpha) {
+      if (!useExplorerAlpha) {
         components.logger.log('Available on:\n')
       }
 
@@ -226,24 +229,24 @@ export async function main(options: Options) {
         return a.toLowerCase().includes('localhost') || a.includes('127.0.0.1') || a.includes('0.0.0.0') ? -1 : 1
       })
 
-      if (!explorerAlpha) {
+      if (!useExplorerAlpha) {
         for (const addr of sortedURLs) {
           components.logger.log(`    ${addr}`)
         }
       }
 
-      if (!explorerAlpha) {
+      if (!useExplorerAlpha) {
         components.logger.log('\n  Details:\n')
       }
       components.logger.log('\nPress CTRL+C to exit\n')
 
-      if (explorerAlpha) {
+      if (useExplorerAlpha) {
         const realm = new URL(sortedURLs[0]).origin
         await runExplorerAlpha(components, { cwd: workingDirectory, realm, baseCoords, isHub, args: options.args })
       }
 
       // Open preferably localhost/127.0.0.1
-      if (!explorerAlpha && openBrowser && sortedURLs.length) {
+      if (!useExplorerAlpha && openBrowser && sortedURLs.length) {
         try {
           await open(sortedURLs[0])
         } catch (_) {
