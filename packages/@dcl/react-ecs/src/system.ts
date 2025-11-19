@@ -1,5 +1,5 @@
 import type { Entity, IEngine, PointerEventsSystem } from '@dcl/ecs'
-import React from 'react'
+import React, { FunctionComponent } from 'react'
 import type { ReactEcs } from './react-ecs'
 import { createReconciler, DclReconciler } from './reconciler'
 
@@ -28,7 +28,7 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
   function ReactBasedUiSystem() {
     if (uiComponent) renderer.update(React.createElement(uiComponent as any))
     for (const [textureRenderer, ui] of textureRenderersAndUis) {
-      textureRenderer.update(React.createElement(ui() as any))
+      textureRenderer.update(React.createElement(ui as FunctionComponent))
     }
   }
 
