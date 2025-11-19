@@ -14,7 +14,7 @@ import { CliComponents } from '../components'
 import { colors } from '../components/log'
 import { printProgressInfo, printProgressStep, printWarning } from './beautiful-logs'
 import { CliError } from './error'
-import { getAllComposites } from './composite'
+import { getAllComposites, type Script } from './composite'
 import { isEditorScene } from './project-validations'
 import { watch } from 'chokidar'
 import { debounce } from './debounce'
@@ -378,50 +378,11 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
           )
         }
 
-        let contents = `export function initializeScripts(engine) {}`
-        const watchFiles: string[] = []
-
-        if (compositeData && compositeData.scripts.size > 0) {
-          let imports = ''
-          let scripts = '[\n'
-
-          for (const [scriptPath, scriptInstances] of compositeData.scripts.entries()) {
-            const importName = getScriptImportName(scriptPath)
-            const normalizedPath = scriptPath.replace(/\\/g, '/')
-            const absolutePath = path.join(options.workingDirectory, scriptPath)
-
-            imports += `import * as ${importName} from './${normalizedPath}'\n`
-            watchFiles.push(absolutePath)
-
-            for (const script of scriptInstances) {
-              scripts += `  {...${JSON.stringify(script)}, module: ${importName} },\n`
-            }
-          }
-
-          scripts += ']'
-
-          const runtimeCodePath = require.resolve('./runtime-script')
-          const runtimeCode = (await components.fs.readFile(runtimeCodePath, 'utf-8'))
-            // remove all CommonJS/module system code and imports
-            .replace(/"use strict";?\s*/g, '')
-            .replace(/Object\.defineProperty\(exports,.*?\);?\s*/g, '')
-            .replace(/exports\.\w+\s*=\s*void 0;?\s*/g, '')
-            .replace(/exports\.\w+\s*=\s*/g, '')
-            .replace(/^export\s+/gm, '')
-            .replace(/^import\s+.*$/gm, '')
-            .replace(/\n{3,}/g, '\n\n')
-            .trim()
-
-          contents = `
-${imports}
-
-${runtimeCode}
-
-export function initializeScripts(engine) {
-  return runScripts(engine, ${scripts})
-}
-`
-        }
+        const { contents, watchFiles } = await generateInitializeScriptsModule(
+          components.fs,
+          options.workingDirectory,
+          compositeData
+        )
 
         return {
           loader: 'js',
@@ -443,6 +404,59 @@ export function getScriptImportName(scriptPath: string): string {
     'script_' +
     scriptPath
       .replace(/\.tsx?$/, '') // remove .ts or .tsx
-      .replace(/[^a-zA-Z0-9]/g, '_')
-  ) // sanitize
+      .replace(/[^a-zA-Z0-9]/g, '_') // sanitize
+  )
+}
+
+export async function generateInitializeScriptsModule(
+  fs: BundleComponents['fs'],
+  workingDirectory: string,
+  compositeData: { scripts: Map<string, Script[]>; [key: string]: any } | null
+): Promise<{ contents: string; watchFiles: string[] }> {
+  let contents = `export function initializeScripts(engine) {}`
+  const watchFiles: string[] = []
+
+  if (compositeData && compositeData.scripts.size > 0) {
+    let imports = ''
+    let scripts = '[\n'
+
+    for (const [scriptPath, scriptInstances] of compositeData.scripts.entries()) {
+      const importName = getScriptImportName(scriptPath)
+      const normalizedPath = scriptPath.replace(/\\/g, '/')
+      const absolutePath = path.join(workingDirectory, scriptPath)
+
+      imports += `import * as ${importName} from './${normalizedPath}'\n`
+      watchFiles.push(absolutePath)
+
+      for (const script of scriptInstances) {
+        scripts += `  {...${JSON.stringify(script)}, module: ${importName} },\n`
+      }
+    }
+
+    scripts += ']'
+
+    const runtimeCodePath = require.resolve('./runtime-script')
+    const runtimeCode = (await fs.readFile(runtimeCodePath, 'utf-8'))
+      // remove all CommonJS/module system code and imports
+      .replace(/"use strict";?\s*/g, '')
+      .replace(/Object\.defineProperty\(exports,.*?\);?\s*/g, '')
+      .replace(/exports\.\w+\s*=\s*void 0;?\s*/g, '')
+      .replace(/exports\.\w+\s*=\s*/g, '')
+      .replace(/^export\s+/gm, '')
+      .replace(/^import\s+.*$/gm, '')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim()
+
+    contents = `
+${imports}
+
+${runtimeCode}
+
+export function initializeScripts(engine) {
+  return runScripts(engine, ${scripts})
+}
+`
+  }
+
+  return { contents, watchFiles }
 }

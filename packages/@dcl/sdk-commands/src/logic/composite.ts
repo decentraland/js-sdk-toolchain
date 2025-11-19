@@ -15,7 +15,7 @@ import { printError } from './beautiful-logs'
 type CompositeComponents = Pick<CliComponents, 'logger' | 'fs'>
 type ScriptComponent = LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Script']>
 type ScriptItem = EditorComponentsTypes['Script']['value'][number]
-type Script = ScriptItem & {
+export type Script = ScriptItem & {
   entity: number
 }
 
