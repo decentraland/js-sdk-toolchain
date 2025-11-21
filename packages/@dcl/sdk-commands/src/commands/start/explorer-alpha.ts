@@ -48,6 +48,12 @@ async function runApp(
   const openDeeplinkInNewInstance = !!args['-n']
 
   try {
+    if (isWindows) {
+      // On Windows, pre-check if the protocol handler is registered as `start` will silently fail otherwise.
+      // This command will throw an error if the protocol is not registered, that is catched below.
+      await components.spawner.exec(cwd, 'reg', ['query', 'HKEY_CLASSES_ROOT\\decentraland', '/ve'], { silent: true })
+    }
+
     const params = new URLSearchParams()
 
     params.set('realm', realm)
