@@ -10,8 +10,11 @@ export type DataLayer = {
   context: DataLayerContext
 }
 
-export async function createDataLayer(components: Pick<CliComponents, 'fs' | 'logger'>): Promise<DataLayer> {
-  const fs = createFileSystemInterfaceFromFsComponent({ fs: components.fs })
+export async function createDataLayer(
+  components: Pick<CliComponents, 'fs' | 'logger'>,
+  workingDirectory: string
+): Promise<DataLayer> {
+  const fs = createFileSystemInterfaceFromFsComponent({ fs: components.fs }, workingDirectory)
   const dataLayerHost = await createDataLayerHost(fs)
   const context: DataLayerContext = {
     fs,

@@ -1,29 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-SCENE_COMPILED_JS_SIZE_PROD=499.4k bytes
-=======
-=======
->>>>>>> f7184856 (fix tests)
-<<<<<<< HEAD
-SCENE_COMPILED_JS_SIZE_PROD=480.6k bytes
-=======
-<<<<<<< HEAD
-SCENE_COMPILED_JS_SIZE_PROD=474.2k bytes
-=======
-SCENE_COMPILED_JS_SIZE_PROD=467.2k bytes
->>>>>>> 99d394c1 (update snapshots)
->>>>>>> c50aee8d (update snapshots)
-<<<<<<< HEAD
->>>>>>> 9f5e0f01 (update snapshots)
-=======
-=======
-SCENE_COMPILED_JS_SIZE_PROD=469.6k bytes
->>>>>>> 126220f1 (fix tests)
->>>>>>> f7184856 (fix tests)
-=======
-SCENE_COMPILED_JS_SIZE_PROD=479.1k bytes
->>>>>>> 4d3a904b (fix tests)
+SCENE_COMPILED_JS_SIZE_PROD=498.8k bytes
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -35,44 +10,9 @@ EVAL test/snapshots/development-bundles/static-scene.test.js
   REQUIRE: ~system/Testing
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  OPCODES ~= 61k
-  MALLOC_COUNT = 14716
-  ALIVE_OBJS_DELTA ~= 2.92k
-=======
-=======
->>>>>>> f7184856 (fix tests)
-<<<<<<< HEAD
-  OPCODES ~= 56k
-  MALLOC_COUNT = 14173
-  ALIVE_OBJS_DELTA ~= 2.80k
-=======
-<<<<<<< HEAD
-  OPCODES ~= 55k
-  MALLOC_COUNT = 14039
-  ALIVE_OBJS_DELTA ~= 2.77k
-=======
-  OPCODES ~= 47k
-  MALLOC_COUNT = 13674
-  ALIVE_OBJS_DELTA ~= 2.68k
->>>>>>> 99d394c1 (update snapshots)
->>>>>>> c50aee8d (update snapshots)
-<<<<<<< HEAD
->>>>>>> 9f5e0f01 (update snapshots)
-=======
-=======
-  OPCODES ~= 47k
-  MALLOC_COUNT = 14014
-  ALIVE_OBJS_DELTA ~= 2.74k
->>>>>>> 126220f1 (fix tests)
->>>>>>> f7184856 (fix tests)
-=======
-  OPCODES ~= 48k
-  MALLOC_COUNT = 14340
-  ALIVE_OBJS_DELTA ~= 2.81k
->>>>>>> 4d3a904b (fix tests)
+  OPCODES ~= 53k
+  MALLOC_COUNT = 14926
+  ALIVE_OBJS_DELTA ~= 2.94k
 CALL onStart()
   main.crdt: PUT_COMPONENT e=0x200 c=1 t=0 data={"position":{"x":5.880000114440918,"y":2.7916901111602783,"z":7.380000114440918},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   main.crdt: PUT_COMPONENT e=0x202 c=1 t=0 data={"position":{"x":4,"y":0.800000011920929,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
@@ -116,38 +56,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 3k
   MALLOC_COUNT = -5
   ALIVE_OBJS_DELTA ~= 0.00k
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  MEMORY_USAGE_COUNT ~= 1285.88k bytes
-=======
-=======
->>>>>>> f7184856 (fix tests)
-=======
->>>>>>> 5a6b10a9 (add tests)
-<<<<<<< HEAD
-  MEMORY_USAGE_COUNT ~= 1242.30k bytes
-=======
-<<<<<<< HEAD
-  MEMORY_USAGE_COUNT ~= 1230.72k bytes
-=======
-  MEMORY_USAGE_COUNT ~= 1197.12k bytes
->>>>>>> 99d394c1 (update snapshots)
->>>>>>> c50aee8d (update snapshots)
-<<<<<<< HEAD
->>>>>>> 9f5e0f01 (update snapshots)
-=======
-=======
-  MEMORY_USAGE_COUNT ~= 1207.69k bytes
->>>>>>> 126220f1 (fix tests)
-<<<<<<< HEAD
->>>>>>> f7184856 (fix tests)
-=======
-=======
-  MEMORY_USAGE_COUNT ~= 1207.65k bytes
->>>>>>> 20f4b0d5 (add tests)
->>>>>>> 5a6b10a9 (add tests)
-=======
-  MEMORY_USAGE_COUNT ~= 1228.65k bytes
->>>>>>> 4d3a904b (fix tests)
+  MEMORY_USAGE_COUNT ~= 1277.46k bytes

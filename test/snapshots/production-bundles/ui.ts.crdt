@@ -1,29 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-SCENE_COMPILED_JS_SIZE_PROD=374.5k bytes
-=======
-=======
->>>>>>> f7184856 (fix tests)
-<<<<<<< HEAD
-SCENE_COMPILED_JS_SIZE_PROD=365.9k bytes
-=======
-<<<<<<< HEAD
-SCENE_COMPILED_JS_SIZE_PROD=363k bytes
-=======
-SCENE_COMPILED_JS_SIZE_PROD=360.3k bytes
->>>>>>> 99d394c1 (update snapshots)
->>>>>>> c50aee8d (update snapshots)
-<<<<<<< HEAD
->>>>>>> 9f5e0f01 (update snapshots)
-=======
-=======
-SCENE_COMPILED_JS_SIZE_PROD=361.2k bytes
->>>>>>> 126220f1 (fix tests)
->>>>>>> f7184856 (fix tests)
-=======
-SCENE_COMPILED_JS_SIZE_PROD=365.4k bytes
->>>>>>> 4d3a904b (fix tests)
+SCENE_COMPILED_JS_SIZE_PROD=374.2k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -33,43 +8,9 @@ EVAL test/snapshots/production-bundles/ui.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  OPCODES ~= 74k
-  MALLOC_COUNT = 20616
-  ALIVE_OBJS_DELTA ~= 4.14k
-=======
-=======
->>>>>>> f7184856 (fix tests)
-<<<<<<< HEAD
   OPCODES ~= 67k
-<<<<<<< HEAD
-  MALLOC_COUNT = 19968
-  ALIVE_OBJS_DELTA ~= 3.98k
-=======
-  MALLOC_COUNT = 19846
-  ALIVE_OBJS_DELTA ~= 3.95k
-=======
-  OPCODES ~= 58k
-  MALLOC_COUNT = 19500
-  ALIVE_OBJS_DELTA ~= 3.86k
->>>>>>> 99d394c1 (update snapshots)
->>>>>>> c50aee8d (update snapshots)
-<<<<<<< HEAD
->>>>>>> 9f5e0f01 (update snapshots)
-=======
-=======
-  OPCODES ~= 59k
-  MALLOC_COUNT = 19972
-  ALIVE_OBJS_DELTA ~= 3.95k
->>>>>>> 126220f1 (fix tests)
->>>>>>> f7184856 (fix tests)
-=======
-  OPCODES ~= 60k
-  MALLOC_COUNT = 20345
-  ALIVE_OBJS_DELTA ~= 4.03k
->>>>>>> 4d3a904b (fix tests)
+  MALLOC_COUNT = 21033
+  ALIVE_OBJS_DELTA ~= 4.20k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -106,22 +47,13 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x202 c=1093 t=1 data={"placeholder":"SARASA","disabled":false}
   Scene: PUT_COMPONENT e=0x209 c=1093 t=1 data={"placeholder":"","disabled":false}
   Scene: PUT_COMPONENT e=0x201 c=1094 t=1 data={"acceptEmpty":false,"options":["BOEDO","CASLA"],"selectedIndex":0,"disabled":false,"color":{"r":1,"g":0,"b":0,"a":1}}
-<<<<<<< HEAD
-  OPCODES ~= 142k
-=======
-  OPCODES ~= 139k
->>>>>>> 9f5e0f01 (update snapshots)
-  MALLOC_COUNT = 709
+  OPCODES ~= 140k
+  MALLOC_COUNT = 713
   ALIVE_OBJS_DELTA ~= 0.25k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=2 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.008726535364985466,"z":0,"w":0.9999619126319885},"scale":{"x":1,"y":1,"z":1},"parent":0}
-<<<<<<< HEAD
   OPCODES ~= 67k
   MALLOC_COUNT = 254
-=======
-  OPCODES ~= 66k
-  MALLOC_COUNT = 250
->>>>>>> 9f5e0f01 (update snapshots)
   ALIVE_OBJS_DELTA ~= 0.12k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=3 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.017452405765652657,"z":0,"w":0.9998477101325989},"scale":{"x":1,"y":1,"z":1},"parent":0}
@@ -133,29 +65,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 66k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  MEMORY_USAGE_COUNT ~= 1769.08k bytes
-=======
-=======
->>>>>>> f7184856 (fix tests)
-<<<<<<< HEAD
-  MEMORY_USAGE_COUNT ~= 1733.02k bytes
-=======
-<<<<<<< HEAD
-  MEMORY_USAGE_COUNT ~= 1724.49k bytes
-=======
-  MEMORY_USAGE_COUNT ~= 1698.52k bytes
->>>>>>> 99d394c1 (update snapshots)
->>>>>>> c50aee8d (update snapshots)
-<<<<<<< HEAD
->>>>>>> 9f5e0f01 (update snapshots)
-=======
-=======
-  MEMORY_USAGE_COUNT ~= 1708.30k bytes
->>>>>>> 126220f1 (fix tests)
->>>>>>> f7184856 (fix tests)
-=======
-  MEMORY_USAGE_COUNT ~= 1724.85k bytes
->>>>>>> 4d3a904b (fix tests)
+  MEMORY_USAGE_COUNT ~= 1763.43k bytes

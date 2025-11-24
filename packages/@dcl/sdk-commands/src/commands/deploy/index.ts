@@ -17,6 +17,7 @@ import { buildScene } from '../build'
 import { getValidWorkspace } from '../../logic/workspace-validations'
 import { LinkerResponse } from '../../linker-dapp/routes'
 import { analyticsFeatures } from './analytics-features'
+import { getInstalledPackageVersion } from '../../logic/config'
 
 interface Options {
   args: Result<typeof args>
@@ -96,7 +97,8 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
     throw new CliError('DEPLOY_INVALID_ARGUMENTS', i18next.t('errors.deploy.invalid_arguments'))
   }
 
-  const sceneJson = await getValidSceneJson(options.components, projectRoot, { log: true })
+  const sdkVersion = await getInstalledPackageVersion(options.components, '@dcl/sdk', projectRoot)
+  const sceneJson = { sdkVersion, ...(await getValidSceneJson(options.components, projectRoot, { log: true })) }
   const coords = getBaseCoords(sceneJson)
   const isWorld = sceneHasWorldCfg(sceneJson)
   const trackProps: Events['Scene deploy started'] = {

@@ -1,38 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-SCENE_COMPILED_JS_SIZE_PROD=252.9k bytes
-=======
-=======
->>>>>>> f7184856 (fix tests)
-=======
->>>>>>> 5a6b10a9 (add tests)
-<<<<<<< HEAD
-SCENE_COMPILED_JS_SIZE_PROD=244.4k bytes
-=======
-<<<<<<< HEAD
-SCENE_COMPILED_JS_SIZE_PROD=241.5k bytes
-=======
-SCENE_COMPILED_JS_SIZE_PROD=238.7k bytes
->>>>>>> 99d394c1 (update snapshots)
->>>>>>> c50aee8d (update snapshots)
-<<<<<<< HEAD
->>>>>>> 9f5e0f01 (update snapshots)
-=======
-=======
-SCENE_COMPILED_JS_SIZE_PROD=239.7k bytes
->>>>>>> 126220f1 (fix tests)
-<<<<<<< HEAD
->>>>>>> f7184856 (fix tests)
-=======
-=======
-SCENE_COMPILED_JS_SIZE_PROD=239.6k bytes
->>>>>>> 20f4b0d5 (add tests)
->>>>>>> 5a6b10a9 (add tests)
-=======
-SCENE_COMPILED_JS_SIZE_PROD=243.9k bytes
->>>>>>> 4d3a904b (fix tests)
+SCENE_COMPILED_JS_SIZE_PROD=252.6k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -42,43 +8,9 @@ EVAL test/snapshots/production-bundles/cubes.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  OPCODES ~= 113k
-  MALLOC_COUNT = 19148
-  ALIVE_OBJS_DELTA ~= 4.75k
-=======
-=======
->>>>>>> f7184856 (fix tests)
-<<<<<<< HEAD
-  OPCODES ~= 107k
-<<<<<<< HEAD
-  MALLOC_COUNT = 18643
-  ALIVE_OBJS_DELTA ~= 4.63k
-=======
-  MALLOC_COUNT = 18520
-  ALIVE_OBJS_DELTA ~= 4.60k
-=======
-  OPCODES ~= 98k
-  MALLOC_COUNT = 18175
-  ALIVE_OBJS_DELTA ~= 4.51k
->>>>>>> 99d394c1 (update snapshots)
->>>>>>> c50aee8d (update snapshots)
-<<<<<<< HEAD
->>>>>>> 9f5e0f01 (update snapshots)
-=======
-=======
-  OPCODES ~= 98k
-  MALLOC_COUNT = 18568
-  ALIVE_OBJS_DELTA ~= 4.59k
->>>>>>> 126220f1 (fix tests)
->>>>>>> f7184856 (fix tests)
-=======
-  OPCODES ~= 99k
-  MALLOC_COUNT = 18901
-  ALIVE_OBJS_DELTA ~= 4.66k
->>>>>>> 4d3a904b (fix tests)
+  OPCODES ~= 105k
+  MALLOC_COUNT = 19445
+  ALIVE_OBJS_DELTA ~= 4.79k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -1720,38 +1652,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 664k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  MEMORY_USAGE_COUNT ~= 1255.38k bytes
-=======
-=======
->>>>>>> f7184856 (fix tests)
-=======
->>>>>>> 5a6b10a9 (add tests)
-<<<<<<< HEAD
-  MEMORY_USAGE_COUNT ~= 1212.77k bytes
-=======
-<<<<<<< HEAD
-  MEMORY_USAGE_COUNT ~= 1204.22k bytes
-=======
-  MEMORY_USAGE_COUNT ~= 1178.41k bytes
->>>>>>> 99d394c1 (update snapshots)
->>>>>>> c50aee8d (update snapshots)
-<<<<<<< HEAD
->>>>>>> 9f5e0f01 (update snapshots)
-=======
-=======
-  MEMORY_USAGE_COUNT ~= 1187.16k bytes
->>>>>>> 126220f1 (fix tests)
-<<<<<<< HEAD
->>>>>>> f7184856 (fix tests)
-=======
-=======
-  MEMORY_USAGE_COUNT ~= 1187.15k bytes
->>>>>>> 20f4b0d5 (add tests)
->>>>>>> 5a6b10a9 (add tests)
-=======
-  MEMORY_USAGE_COUNT ~= 1203.43k bytes
->>>>>>> 4d3a904b (fix tests)
+  MEMORY_USAGE_COUNT ~= 1248.45k bytes

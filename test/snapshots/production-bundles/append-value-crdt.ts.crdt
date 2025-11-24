@@ -1,29 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-SCENE_COMPILED_JS_SIZE_PROD=219.5k bytes
-=======
-=======
->>>>>>> f7184856 (fix tests)
-<<<<<<< HEAD
-SCENE_COMPILED_JS_SIZE_PROD=211k bytes
-=======
-<<<<<<< HEAD
-SCENE_COMPILED_JS_SIZE_PROD=208.1k bytes
-=======
-SCENE_COMPILED_JS_SIZE_PROD=205.4k bytes
->>>>>>> 99d394c1 (update snapshots)
->>>>>>> c50aee8d (update snapshots)
-<<<<<<< HEAD
->>>>>>> 9f5e0f01 (update snapshots)
-=======
-=======
-SCENE_COMPILED_JS_SIZE_PROD=206.3k bytes
->>>>>>> 126220f1 (fix tests)
->>>>>>> f7184856 (fix tests)
-=======
-SCENE_COMPILED_JS_SIZE_PROD=210.5k bytes
->>>>>>> 4d3a904b (fix tests)
+SCENE_COMPILED_JS_SIZE_PROD=219.2k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -33,44 +8,9 @@ EVAL test/snapshots/production-bundles/append-value-crdt.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  OPCODES ~= 72k
-  MALLOC_COUNT = 13703
-  ALIVE_OBJS_DELTA ~= 3.07k
-=======
-=======
->>>>>>> f7184856 (fix tests)
-<<<<<<< HEAD
-  OPCODES ~= 67k
-  MALLOC_COUNT = 13193
-  ALIVE_OBJS_DELTA ~= 2.95k
-=======
-<<<<<<< HEAD
-  OPCODES ~= 66k
-  MALLOC_COUNT = 13070
-  ALIVE_OBJS_DELTA ~= 2.92k
-=======
-  OPCODES ~= 49k
-  MALLOC_COUNT = 12427
-  ALIVE_OBJS_DELTA ~= 2.74k
->>>>>>> 99d394c1 (update snapshots)
->>>>>>> c50aee8d (update snapshots)
-<<<<<<< HEAD
->>>>>>> 9f5e0f01 (update snapshots)
-=======
-=======
-  OPCODES ~= 49k
-  MALLOC_COUNT = 12772
-  ALIVE_OBJS_DELTA ~= 2.81k
->>>>>>> 126220f1 (fix tests)
->>>>>>> f7184856 (fix tests)
-=======
-  OPCODES ~= 50k
-  MALLOC_COUNT = 13081
-  ALIVE_OBJS_DELTA ~= 2.88k
->>>>>>> 4d3a904b (fix tests)
+  OPCODES ~= 56k
+  MALLOC_COUNT = 13630
+  ALIVE_OBJS_DELTA ~= 3.01k
 CALL onStart()
   Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5,"tickNumber":0}
   OPCODES ~= 8k
@@ -115,38 +55,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 13k
   MALLOC_COUNT = 31
   ALIVE_OBJS_DELTA ~= 0.01k
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  MEMORY_USAGE_COUNT ~= 967.39k bytes
-=======
-=======
->>>>>>> f7184856 (fix tests)
-=======
->>>>>>> 5a6b10a9 (add tests)
-<<<<<<< HEAD
-  MEMORY_USAGE_COUNT ~= 934.47k bytes
-=======
-<<<<<<< HEAD
-  MEMORY_USAGE_COUNT ~= 925.92k bytes
-=======
-  MEMORY_USAGE_COUNT ~= 893.35k bytes
->>>>>>> 99d394c1 (update snapshots)
->>>>>>> c50aee8d (update snapshots)
-<<<<<<< HEAD
->>>>>>> 9f5e0f01 (update snapshots)
-=======
-=======
-  MEMORY_USAGE_COUNT ~= 901.51k bytes
->>>>>>> 126220f1 (fix tests)
-<<<<<<< HEAD
->>>>>>> f7184856 (fix tests)
-=======
-=======
-  MEMORY_USAGE_COUNT ~= 901.50k bytes
->>>>>>> 20f4b0d5 (add tests)
->>>>>>> 5a6b10a9 (add tests)
-=======
-  MEMORY_USAGE_COUNT ~= 917.14k bytes
->>>>>>> 4d3a904b (fix tests)
+  MEMORY_USAGE_COUNT ~= 952.57k bytes
