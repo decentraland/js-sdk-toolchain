@@ -42,7 +42,7 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
       // Renderer notified that the tween is completed
       // Only consider it completed if the tween hasn't changed this frame (to avoid false positives after YOYO/sequence processing)
       ((tweenState.state === TweenStateStatus.TS_COMPLETED && !tweenCache.changed) ||
-       (tweenChanged(entity) && !tweenCache.changed)) &&
+        (tweenChanged(entity) && !tweenCache.changed)) &&
       // Avoid sending isCompleted multiple times
       !tweenCache.completed
     ) {
@@ -101,7 +101,10 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
         }
       }
       if (tween.mode?.$case === 'scale' && tween.mode.scale) {
-        return { ...tween, mode: { ...tween.mode, scale: { start: tween.mode.scale.end, end: tween.mode.scale.start } } }
+        return {
+          ...tween,
+          mode: { ...tween.mode, scale: { start: tween.mode.scale.end, end: tween.mode.scale.start } }
+        }
       }
       if (tween.mode?.$case === 'textureMove' && tween.mode.textureMove) {
         return {

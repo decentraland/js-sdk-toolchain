@@ -17,7 +17,10 @@ function isAlreadyCommented(content: string): boolean {
  */
 function generateCommentHeader(content: string): string {
   // use line-by-line commenting to avoid issues with existing /* */ comments
-  const commentedLines = content.split('\n').map(line => `// ${line}`).join('\n')
+  const commentedLines = content
+    .split('\n')
+    .map((line) => `// ${line}`)
+    .join('\n')
 
   return `// ============================================================================
 // ${COMMENT_MARKER}
@@ -84,16 +87,15 @@ export async function commentSourceFiles(
     ignore: ['**/*.d.ts', '**/node_modules/**']
   })
 
-  const filesToComment = sourceFiles.filter(file => {
+  const filesToComment = sourceFiles.filter((file) => {
     const normalized = path.normalize(file)
-    return normalized !== normalizedBundleEntrypoint &&
-           normalized !== normalizedSceneCodeEntrypoint
+    return normalized !== normalizedBundleEntrypoint && normalized !== normalizedSceneCodeEntrypoint
   })
 
   await Promise.all([
     commentEntrypoint(components, normalizedBundleEntrypoint),
     commentSourceFile(components, normalizedSceneCodeEntrypoint),
-    ...filesToComment.map(file => commentSourceFile(components, file))
+    ...filesToComment.map((file) => commentSourceFile(components, file))
   ])
 
   return filesToComment.length
