@@ -17,8 +17,8 @@ type ScriptWithKey = Script & {
 }
 
 type FunctionalScriptModule = {
-  start?: (entity: Entity, ...params: unknown[]) => void
-  update?: (entity: Entity, dt: number, ...params: unknown[]) => void
+  start?: (src: string, entity: Entity, ...params: unknown[]) => void
+  update?: (src: string, entity: Entity, dt: number, ...params: unknown[]) => void
   [key: string]: unknown
 }
 
@@ -28,7 +28,7 @@ type ScriptClassInstance = {
   [key: string]: unknown
 }
 
-type ScriptClass = new (entity: Entity, ...params: unknown[]) => ScriptClassInstance
+type ScriptClass = new (src: string, entity: Entity, ...params: unknown[]) => ScriptClassInstance
 type ScriptsByPriority = Record<number, ScriptWithKey[]>
 
 function entityIsRemoved(engine: IEngine, entity: Entity) {
@@ -46,7 +46,7 @@ function entityIsRemoved(engine: IEngine, entity: Entity) {
 export function runScripts(engine: IEngine, scripts: Script[]) {
   const scriptsByPriority = groupScriptsByPriority(scripts)
   const classInstances = new Map<string, { instance: ScriptClassInstance; entity: Entity }>()
-  const functionScripts = new Map<string, { module: FunctionalScriptModule; entity: Entity; params: unknown[] }>()
+  const functionScripts = new Map<string, { src: string; module: FunctionalScriptModule; entity: Entity; params: unknown[] }>()
 
   for (const [priority, instances] of Object.entries(scriptsByPriority)) {
     for (const script of instances) {
@@ -58,17 +58,18 @@ export function runScripts(engine: IEngine, scripts: Script[]) {
         continue
       }
 
+      const src = script.path.split('/').slice(0, -1).join('/')
       const layout: ScriptLayout = script.layout ? JSON.parse(script.layout) : {}
       const params = Object.values(layout.params || {}).map((p) => p.value)
 
       if (typeof module.start === 'function') {
         try {
-          module.start(script.entity, ...params)
+          module.start(src, script.entity, ...params)
         } catch (e: unknown) {
           console.error('[Script Error] ' + script.path + ' start() failed:', e)
           throw e
         }
-        functionScripts.set(script.key, { module: module as FunctionalScriptModule, entity: script.entity, params })
+        functionScripts.set(script.key, { src, module: module as FunctionalScriptModule, entity: script.entity, params })
       } else {
         const ScriptClass = Object.values(module).find((exp) => typeof exp === 'function') as ScriptClass | undefined
         if (!ScriptClass) {
@@ -77,7 +78,7 @@ export function runScripts(engine: IEngine, scripts: Script[]) {
         }
 
         try {
-          const instance = new ScriptClass(script.entity, ...params)
+          const instance = new ScriptClass(src, script.entity, ...params)
           if (typeof instance.start === 'function') {
             instance.start()
           }
@@ -101,7 +102,7 @@ export function runScripts(engine: IEngine, scripts: Script[]) {
             const functionScript = functionScripts.get(scriptData.key)
             if (functionScript && !entityIsRemoved(engine, functionScript.entity)) {
               if (typeof functionScript.module.update === 'function') {
-                functionScript.module.update(functionScript.entity, dt, ...functionScript.params)
+                functionScript.module.update(functionScript.src, functionScript.entity, dt, ...functionScript.params)
               }
             }
           }

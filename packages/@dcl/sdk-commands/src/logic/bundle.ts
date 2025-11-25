@@ -429,7 +429,7 @@ export async function generateInitializeScriptsModule(
       watchFiles.push(absolutePath)
 
       for (const script of scriptInstances) {
-        scripts += `  {...${JSON.stringify(script)}, module: ${importName} },\n`
+        scripts += `  { ...${JSON.stringify(script)}, module: ${importName} },\n`
       }
     }
 

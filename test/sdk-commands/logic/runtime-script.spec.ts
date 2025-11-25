@@ -62,7 +62,7 @@ describe('runtime-script', () => {
 
         runScripts(mockEngine, scripts)
 
-        expect(startSpy).toHaveBeenCalledWith(entity)
+        expect(startSpy).toHaveBeenCalledWith('', entity)
         expect(mockEngine.addSystem).toHaveBeenCalledWith(expect.any(Function), 0)
       })
 
@@ -91,7 +91,7 @@ describe('runtime-script', () => {
         const dt = 0.016
         addedSystems[0](dt)
 
-        expect(updateSpy).toHaveBeenCalledWith(entity, dt)
+        expect(updateSpy).toHaveBeenCalledWith('', entity, dt)
       })
 
       it('should pass params to functional scripts', () => {
@@ -115,7 +115,7 @@ describe('runtime-script', () => {
 
         runScripts(mockEngine, scripts)
 
-        expect(startSpy).toHaveBeenCalledWith(entity, 10, 'red')
+        expect(startSpy).toHaveBeenCalledWith('', entity, 10, 'red')
       })
 
       it('should not execute scripts for removed entities', () => {
@@ -179,7 +179,7 @@ describe('runtime-script', () => {
 
         class TestScript {
           start = startSpy
-          constructor(public entity: Entity) {}
+          constructor(public src: string, public entity: Entity) {}
         }
 
         ;(mockEngine.getEntityState as jest.Mock).mockReturnValue(EntityState.UsedEntity)
@@ -207,7 +207,7 @@ describe('runtime-script', () => {
 
         class TestScript {
           update = updateSpy
-          constructor(public entity: Entity) {}
+          constructor(public src: string, public entity: Entity) {}
         }
 
         ;(mockEngine.getEntityState as jest.Mock).mockReturnValue(EntityState.UsedEntity)
@@ -238,8 +238,8 @@ describe('runtime-script', () => {
         const params = { speed: { value: 10 }, color: { value: 'red' } }
 
         class TestScript {
-          constructor(entity: Entity, ...args: any[]) {
-            constructorSpy(entity, ...args)
+          constructor(src: string, entity: Entity, ...args: any[]) {
+            constructorSpy(src, entity, ...args)
           }
         }
 
@@ -259,7 +259,7 @@ describe('runtime-script', () => {
 
         runScripts(mockEngine, scripts)
 
-        expect(constructorSpy).toHaveBeenCalledWith(entity, 10, 'red')
+        expect(constructorSpy).toHaveBeenCalledWith('', entity, 10, 'red')
       })
     })
 
@@ -326,7 +326,7 @@ describe('runtime-script', () => {
         const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
 
         class TestScript {
-          constructor(entity: Entity) {
+          constructor(src: string, entity: Entity) {
             throw error
           }
         }
