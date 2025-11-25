@@ -4,6 +4,7 @@ import { getDCLIgnorePatterns } from './dcl-ignore'
 import { sync as globSync } from 'glob'
 import ignore from 'ignore'
 import i18next from 'i18next'
+import os from 'os'
 
 import path, { resolve } from 'path'
 import { CliError } from './error'
@@ -102,7 +103,11 @@ export async function getProjectPublishableFilesWithHashes(
   return ret
 }
 
-export const b64HashingFunction = (str: string) => 'b64-' + Buffer.from(str).toString('base64')
+export const b64HashingFunction = (str: string) => {
+  const machineId = os.hostname() || os.userInfo().username
+  const unique = `${str}-${machineId}`
+  return 'b64-' + Buffer.from(unique).toString('base64')
+}
 // export const ipfsHashingFunction = async (str: string) => hashV1(Buffer.from(str, 'utf8'))
 
 interface PackageJson {
