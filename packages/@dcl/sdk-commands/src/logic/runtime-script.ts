@@ -46,7 +46,10 @@ function entityIsRemoved(engine: IEngine, entity: Entity) {
 export function runScripts(engine: IEngine, scripts: Script[]) {
   const scriptsByPriority = groupScriptsByPriority(scripts)
   const classInstances = new Map<string, { instance: ScriptClassInstance; entity: Entity }>()
-  const functionScripts = new Map<string, { src: string; module: FunctionalScriptModule; entity: Entity; params: unknown[] }>()
+  const functionScripts = new Map<
+    string,
+    { src: string; module: FunctionalScriptModule; entity: Entity; params: unknown[] }
+  >()
 
   for (const [priority, instances] of Object.entries(scriptsByPriority)) {
     for (const script of instances) {
@@ -69,7 +72,12 @@ export function runScripts(engine: IEngine, scripts: Script[]) {
           console.error('[Script Error] ' + script.path + ' start() failed:', e)
           throw e
         }
-        functionScripts.set(script.key, { src, module: module as FunctionalScriptModule, entity: script.entity, params })
+        functionScripts.set(script.key, {
+          src,
+          module: module as FunctionalScriptModule,
+          entity: script.entity,
+          params
+        })
       } else {
         const ScriptClass = Object.values(module).find((exp) => typeof exp === 'function') as ScriptClass | undefined
         if (!ScriptClass) {
