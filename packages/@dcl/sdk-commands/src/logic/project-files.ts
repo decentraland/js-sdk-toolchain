@@ -102,9 +102,8 @@ export async function getProjectPublishableFilesWithHashes(
 
   return ret
 }
-
+export const machineId = os.hostname() || os.userInfo().username
 export const b64HashingFunction = (str: string) => {
-  const machineId = os.hostname() || os.userInfo().username
   const unique = `${str}-${machineId}`
   return 'b64-' + Buffer.from(unique).toString('base64')
 }
