@@ -61,7 +61,7 @@ export { VideoEventsSystem }
 
 /**
  * @public
- * Register callback functions to a particular entity on video events.
+ * Register callback functions to a particular entity on tween events.
  */
 export const tweenSystem: TweenSystem = createTweenSystem(engine)
 export { TweenSystem }
