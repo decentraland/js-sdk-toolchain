@@ -298,14 +298,14 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
     /* istanbul ignore else */
     if (code === 0) {
       printProgressInfo(components.logger, `Type checking completed without errors`)
-    } else {
+    } else if (!ts.killed) {
       typeCheckerFuture.reject(
         new CliError('BUNDLE_TYPE_CHECKER_FAILED', i18next.t('errors.bundle.type_checker_failed', { code }))
       )
       return
     }
 
-    typeCheckerFuture.resolve(code)
+    typeCheckerFuture.resolve(code ?? 0)
   })
 
   ts.stdout?.pipe(process.stdout)
