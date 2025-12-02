@@ -282,9 +282,7 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
   const typeCheckerFuture = future<number>()
 
   const cleanup = () => {
-    if (!ts.killed) {
-      ts.kill('SIGTERM')
-    }
+    if (!ts.killed) ts.kill('SIGTERM')
   }
 
   process.on('SIGTERM', cleanup)
