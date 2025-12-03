@@ -24,8 +24,21 @@ export function createProcessSpawnerComponent(spawnFn: typeof spawn): IProcessSp
           child.stderr.pipe(process.stderr)
         }
 
+        const cleanup = () => {
+          if (!child.killed) child.kill('SIGTERM')
+        }
+
+        process.on('SIGTERM', cleanup)
+        process.on('SIGINT', cleanup)
+        process.on('exit', cleanup)
+
         child.on('close', (code: number) => {
-          if (code !== 0) {
+          process.off('SIGTERM', cleanup)
+          process.off('SIGINT', cleanup)
+          process.off('exit', cleanup)
+
+          // Don't reject if we killed the child during shutdown
+          if (code !== 0 && !child.killed) {
             const _ = `${command} ${args.join(' ')}`
             reject(new Error(`Command "${_}" exited with code ${code}. Please try running the command manually`))
             return
