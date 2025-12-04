@@ -19,5 +19,8 @@
     "directory": "packages/@dcl/js-runtime"
   },
   "types": "./index.d.ts",
-  "typings": "./index.d.ts"
+  "typings": "./index.d.ts",
+  "dependencies": {
+    "@dcl/protocol": "https://sdk-team-cdn.decentraland.org/@dcl/protocol/branch//dcl-protocol-1.0.0-19816655032.commit-05998df.tgz"
+  }
 }

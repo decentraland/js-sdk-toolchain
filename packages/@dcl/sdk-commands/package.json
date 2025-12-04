@@ -14,7 +14,7 @@
     "@dcl/inspector": "7.15.5",
     "@dcl/linker-dapp": "^0.14.2",
     "@dcl/mini-comms": "1.0.1-20230216163137.commit-a4c75be",
-    "@dcl/protocol": "1.0.0-19675801604.commit-b4ca911",
+    "@dcl/protocol": "https://sdk-team-cdn.decentraland.org/@dcl/protocol/branch//dcl-protocol-1.0.0-19816655032.commit-05998df.tgz",
     "@dcl/quests-client": "^1.0.3",
     "@dcl/quests-manager": "^0.1.4",
     "@dcl/rpc": "^1.1.1",
