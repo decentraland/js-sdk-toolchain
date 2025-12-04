@@ -11,6 +11,7 @@ import { CliComponents } from '../../../components'
 import {
   b64HashingFunction,
   getProjectPublishableFilesWithHashes,
+  machineId,
   projectFilesToContentMappings
 } from '../../../logic/project-files'
 import { getCatalystBaseUrl, getInstalledPackageVersion } from '../../../logic/config'
@@ -152,7 +153,9 @@ async function serveFolders(
 
   router.get('/content/contents/:hash', async (ctx, next) => {
     if (ctx.params.hash && ctx.params.hash.startsWith('b64-')) {
-      const fullPath = path.resolve(Buffer.from(ctx.params.hash.replace(/^b64-/, ''), 'base64').toString('utf8'))
+      const decoded = Buffer.from(ctx.params.hash.replace(/^b64-/, ''), 'base64').toString('utf8')
+      // Strip the machineId suffix that was added during encoding
+      const fullPath = path.resolve(decoded.slice(0, -(machineId.length + 1)))
 
       // find a project that we are talking about. NOTE: this filter is not exhaustive
       //   relative paths should be used instead
