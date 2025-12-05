@@ -203,7 +203,7 @@ function createCriticalModuleMocks(engine: IEngine, transport: Transport, crdtSt
     },
 
     '~system/RestrictedActions': {
-      movePlayerTo: async () => ({}),
+      movePlayerTo: async () => ({ success: false }),
       teleportTo: async () => ({}),
       triggerEmote: async () => ({}),
       changeRealm: async () => ({ success: false }),
