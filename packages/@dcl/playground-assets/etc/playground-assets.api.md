@@ -50,8 +50,29 @@ export namespace AppendValueOperation {
 // @public
 export function areConnected(parcels: Coords[]): boolean;
 
+// Warning: (ae-missing-release-tag) "AudioAnalysis" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const AudioAnalysis: LastWriteWinElementSetComponentDefinition<PBAudioAnalysis>;
+export const AudioAnalysis: AudioAnalysisComponentDefinitionExtended;
+
+// Warning: (ae-missing-release-tag) "AudioAnalysisComponentDefinitionExtended" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface AudioAnalysisComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBAudioAnalysis> {
+    // (undocumented)
+    createAudioAnalysis(entity: Entity, mode: PBAudioAnalysisMode | undefined, // default is PBAudioAnalysisMode.MODE_LOGARITHMIC
+    amplitudeGain: number | undefined, bandsGain: number | undefined): void;
+    // (undocumented)
+    readIntoView(entity: Entity, out: AudioAnalysisView): void;
+}
+
+// Warning: (ae-missing-release-tag) "AudioAnalysisView" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type AudioAnalysisView = {
+    amplitude: number;
+    bands: number[];
+};
 
 // @public (undocumented)
 export const AudioEvent: GrowOnlyValueSetComponentDefinition<PBAudioEvent>;

@@ -1,6 +1,6 @@
 export type { AnimatorComponentDefinitionExtended } from './extended/Animator'
 export type { AudioSourceComponentDefinitionExtended } from './extended/AudioSource'
-export type { AudioAnalysisComponentDefinitionExtended } from './extended/AudioAnalysis'
+export type { AudioAnalysisComponentDefinitionExtended, AudioAnalysisView } from './extended/AudioAnalysis'
 export type { AudioStreamComponentDefinitionExtended } from './extended/AudioStream'
 export type { MeshRendererComponentDefinitionExtended } from './extended/MeshRenderer'
 export type { MeshColliderComponentDefinitionExtended } from './extended/MeshCollider'

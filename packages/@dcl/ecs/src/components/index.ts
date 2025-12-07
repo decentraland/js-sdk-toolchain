@@ -3,6 +3,7 @@ import { IEngine } from '../engine/types'
 import { AnimatorComponentDefinitionExtended, defineAnimatorComponent } from './extended/Animator'
 import { AudioSourceComponentDefinitionExtended, defineAudioSourceComponent } from './extended/AudioSource'
 import { AudioAnalysisComponentDefinitionExtended, defineAudioAnalysisComponent } from './extended/AudioAnalysis'
+import type { AudioAnalysisView } from './extended/AudioAnalysis'
 import { defineMaterialComponent, MaterialComponentDefinitionExtended } from './extended/Material'
 import { defineMeshColliderComponent, MeshColliderComponentDefinitionExtended } from './extended/MeshCollider'
 import { defineMeshRendererComponent, MeshRendererComponentDefinitionExtended } from './extended/MeshRenderer'
@@ -118,3 +119,5 @@ export const NetworkParent: (
 ) => LastWriteWinElementSetComponentDefinition<INetowrkParentType> = (engine) => defineNetworkParent(engine)
 
 export { MediaState }
+
+export type { AudioAnalysisView }
