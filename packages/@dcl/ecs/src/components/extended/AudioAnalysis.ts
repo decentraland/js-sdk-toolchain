@@ -4,20 +4,19 @@ import { AudioAnalysis } from '../generated/index.gen'
 import { PBAudioAnalysis, PBAudioAnalysisMode } from '../generated/pb/decentraland/sdk/components/audio_analysis.gen'
 
 export interface AudioAnalysisComponentDefinitionExtended
-extends LastWriteWinElementSetComponentDefinition<PBAudioAnalysis> {
-
+  extends LastWriteWinElementSetComponentDefinition<PBAudioAnalysis> {
   readIntoView(entity: Entity, out: AudioAnalysisView): void
 
   createAudioAnalysis(
     entity: Entity,
     mode: PBAudioAnalysisMode | undefined, // default is PBAudioAnalysisMode.MODE_LOGARITHMIC
     amplitudeGain: number | undefined,
-    bandsGain:  number | undefined
+    bandsGain: number | undefined
   ): void
 }
 
 export type AudioAnalysisView = {
-  amplitude: number,
+  amplitude: number
   bands: number[]
 }
 
@@ -47,10 +46,9 @@ export function defineAudioAnalysisComponent(
     createAudioAnalysis(
       entity: Entity,
       mode: PBAudioAnalysisMode | undefined = PBAudioAnalysisMode.MODE_LOGARITHMIC,
-        amplitudeGain: number | undefined = undefined,
-        bandsGain:  number | undefined = undefined
-    ): void
-    {
+      amplitudeGain: number | undefined = undefined,
+      bandsGain: number | undefined = undefined
+    ): void {
       const realMode: PBAudioAnalysisMode = mode === undefined ? PBAudioAnalysisMode.MODE_LOGARITHMIC : mode
 
       theComponent.create(entity, {
@@ -65,8 +63,8 @@ export function defineAudioAnalysisComponent(
         band4: 0,
         band5: 0,
         band6: 0,
-        band7: 0,
-      });
-    },
+        band7: 0
+      })
+    }
   }
 }
