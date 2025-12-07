@@ -28,6 +28,7 @@ import {
   TransformComponentExtended,
   AnimatorComponentDefinitionExtended,
   AudioSourceComponentDefinitionExtended,
+  AudioAnalysisComponentDefinitionExtended,
   AudioStreamComponentDefinitionExtended,
   ISyncComponents,
   TweenComponentDefinitionExtended,
@@ -45,6 +46,7 @@ import { TagsComponentDefinitionExtended } from './components/manual/Tags'
 export const Transform: TransformComponentExtended = /* @__PURE__*/ components.Transform(engine)
 export const Animator: AnimatorComponentDefinitionExtended = /* @__PURE__*/ components.Animator(engine)
 export const AudioSource: AudioSourceComponentDefinitionExtended = /* @__PURE__*/ components.AudioSource(engine)
+export const AudioAnalysis: AudioAnalysisComponentDefinitionExtended = /* @__PURE__*/ components.AudioAnalysis(engine)
 export const AudioStream: AudioStreamComponentDefinitionExtended = /* @__PURE__*/ components.AudioStream(engine)
 export const Material: MaterialComponentDefinitionExtended = /* @__PURE__*/ components.Material(engine)
 export const MeshRenderer: MeshRendererComponentDefinitionExtended = /* @__PURE__*/ components.MeshRenderer(engine)
