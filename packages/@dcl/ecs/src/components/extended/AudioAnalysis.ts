@@ -9,9 +9,9 @@ export interface AudioAnalysisComponentDefinitionExtended
 
   createAudioAnalysis(
     entity: Entity,
-    mode: PBAudioAnalysisMode | undefined, // default is PBAudioAnalysisMode.MODE_LOGARITHMIC
-    amplitudeGain: number | undefined,
-    bandsGain: number | undefined
+    mode?: PBAudioAnalysisMode, // default is PBAudioAnalysisMode.MODE_LOGARITHMIC
+    amplitudeGain?: number,
+    bandsGain?: number
   ): void
 }
 
@@ -45,16 +45,14 @@ export function defineAudioAnalysisComponent(
 
     createAudioAnalysis(
       entity: Entity,
-      mode: PBAudioAnalysisMode | undefined = PBAudioAnalysisMode.MODE_LOGARITHMIC,
-      amplitudeGain: number | undefined = undefined,
-      bandsGain: number | undefined = undefined
+      mode?: PBAudioAnalysisMode,
+      amplitudeGain?: number,
+      bandsGain?: number
     ): void {
-      const realMode: PBAudioAnalysisMode = mode === undefined ? PBAudioAnalysisMode.MODE_LOGARITHMIC : mode
-
       theComponent.create(entity, {
-        mode: realMode,
-        amplitudeGain,
-        bandsGain,
+        mode: mode || PBAudioAnalysisMode.MODE_LOGARITHMIC,
+        amplitudeGain: amplitudeGain || undefined,
+        bandsGain: bandsGain || undefined,
         amplitude: 0,
         band0: 0,
         band1: 0,

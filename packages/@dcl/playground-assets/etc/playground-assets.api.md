@@ -60,8 +60,8 @@ export const AudioAnalysis: AudioAnalysisComponentDefinitionExtended;
 // @public (undocumented)
 export interface AudioAnalysisComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBAudioAnalysis> {
     // (undocumented)
-    createAudioAnalysis(entity: Entity, mode: PBAudioAnalysisMode | undefined, // default is PBAudioAnalysisMode.MODE_LOGARITHMIC
-    amplitudeGain: number | undefined, bandsGain: number | undefined): void;
+    createAudioAnalysis(entity: Entity, mode?: PBAudioAnalysisMode, // default is PBAudioAnalysisMode.MODE_LOGARITHMIC
+    amplitudeGain?: number, bandsGain?: number): void;
     // (undocumented)
     readIntoView(entity: Entity, out: AudioAnalysisView): void;
 }
