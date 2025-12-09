@@ -5,9 +5,20 @@ import { PBAudioAnalysis, PBAudioAnalysisMode } from '../generated/pb/decentrala
 
 export interface AudioAnalysisComponentDefinitionExtended
   extends LastWriteWinElementSetComponentDefinition<PBAudioAnalysis> {
+
+    // Throws exception
   readIntoView(entity: Entity, out: AudioAnalysisView): void
 
+  tryReadIntoView(entity: Entity, out: AudioAnalysisView): boolean
+
   createAudioAnalysis(
+    entity: Entity,
+    mode?: PBAudioAnalysisMode, // default is PBAudioAnalysisMode.MODE_LOGARITHMIC
+    amplitudeGain?: number,
+    bandsGain?: number
+  ): void
+
+  createOrReplaceAudioAnalysis(
     entity: Entity,
     mode?: PBAudioAnalysisMode, // default is PBAudioAnalysisMode.MODE_LOGARITHMIC
     amplitudeGain?: number,
@@ -43,6 +54,25 @@ export function defineAudioAnalysisComponent(
       out.bands[7] = audioAnalysis.band7
     },
 
+    tryReadIntoView(entity: Entity, out: AudioAnalysisView): boolean {
+      const audioAnalysis = theComponent.getOrNull(entity)
+
+      if (!audioAnalysis) return false;
+
+      out.amplitude = audioAnalysis.amplitude
+
+      out.bands[0] = audioAnalysis.band0
+      out.bands[1] = audioAnalysis.band1
+      out.bands[2] = audioAnalysis.band2
+      out.bands[3] = audioAnalysis.band3
+      out.bands[4] = audioAnalysis.band4
+      out.bands[5] = audioAnalysis.band5
+      out.bands[6] = audioAnalysis.band6
+      out.bands[7] = audioAnalysis.band7
+
+      return true;
+    },
+
     createAudioAnalysis(
       entity: Entity,
       mode?: PBAudioAnalysisMode,
@@ -51,8 +81,30 @@ export function defineAudioAnalysisComponent(
     ): void {
       theComponent.create(entity, {
         mode: mode || PBAudioAnalysisMode.MODE_LOGARITHMIC,
-        amplitudeGain: amplitudeGain || undefined,
-        bandsGain: bandsGain || undefined,
+        amplitudeGain: amplitudeGain ?? undefined,
+        bandsGain: bandsGain ?? undefined,
+        amplitude: 0,
+        band0: 0,
+        band1: 0,
+        band2: 0,
+        band3: 0,
+        band4: 0,
+        band5: 0,
+        band6: 0,
+        band7: 0
+      })
+    },
+
+    createOrReplaceAudioAnalysis(
+      entity: Entity,
+      mode?: PBAudioAnalysisMode,
+      amplitudeGain?: number,
+      bandsGain?: number
+    ): boolean {
+      theComponent.createOrReplace(entity, {
+        mode: mode || PBAudioAnalysisMode.MODE_LOGARITHMIC,
+        amplitudeGain: amplitudeGain ?? undefined,
+        bandsGain: bandsGain ?? undefined,
         amplitude: 0,
         band0: 0,
         band1: 0,
