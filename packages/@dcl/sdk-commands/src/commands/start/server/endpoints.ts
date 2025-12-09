@@ -137,6 +137,26 @@ export async function setupEcs6Endpoints(
     return res
   })
 
+  router.get('/explorer/:address/wearables', async (ctx) => {
+    const u = new URL(ctx.url.toString())
+    u.host = catalystUrl.host
+    u.protocol = catalystUrl.protocol
+    u.port = catalystUrl.port
+    const req = await fetch(u.toString(), {
+      headers: {
+        connection: 'close'
+      },
+      method: 'GET'
+    })
+
+    return {
+      headers: {
+        'content-type': req.headers.get('content-type') || 'application/json'
+      },
+      body: req.body
+    }
+  })
+
   serveStatic(components, workspace, router)
 
   // TODO: get workspace scenes & wearables...
