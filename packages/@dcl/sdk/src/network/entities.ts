@@ -11,7 +11,7 @@ import {
   ISyncComponents
 } from '@dcl/ecs'
 import { IProfile } from './message-bus-sync'
-import { NOT_SYNC_COMPONENTS } from './state'
+import { getDesyncedComponents } from './state'
 
 export type SyncEntity = (entityId: Entity, componentIds: number[], entityEnumId?: number) => void
 
@@ -49,7 +49,7 @@ export function entityUtils(engine: IEngine, profile: IProfile) {
       }
     }
 
-    for (const component of NOT_SYNC_COMPONENTS) {
+    for (const component of getDesyncedComponents(engine)) {
       if (componentsIdsMutable.includes(component.componentId)) {
         console.log(`⚠️ ${component.componentName} can't be sync through the network!`)
         componentsIdsMutable = componentsIdsMutable.filter(($) => $ !== component.componentId)
