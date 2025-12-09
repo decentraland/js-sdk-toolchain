@@ -187,6 +187,22 @@ export async function bundleSingleProject(components: BundleComponents, options:
             return require.resolve('react')
           }
         }
+      })(),
+      // Resolve asset-packs from sdk-commands' dependencies (nested in @dcl/inspector)
+      '@dcl/asset-packs': (() => {
+        try {
+          // Try to resolve from project's node_modules first
+          return path.dirname(require.resolve('@dcl/asset-packs/package.json', { paths: [options.workingDirectory] }))
+        } catch {
+          try {
+            // Fallback: resolve from @dcl/inspector's node_modules
+            const inspectorPath = require.resolve('@dcl/inspector/package.json', { paths: [__dirname] })
+            return path.dirname(require.resolve('@dcl/asset-packs/package.json', { paths: [path.dirname(inspectorPath)] }))
+          } catch {
+            // Last resort: try resolving from current directory
+            return path.dirname(require.resolve('@dcl/asset-packs/package.json', { paths: [__dirname] }))
+          }
+        }
       })()
     },
     // convert filesystem paths into file:// to enable VSCode debugger
