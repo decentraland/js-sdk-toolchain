@@ -44,6 +44,10 @@ export function createFileSystemInterfaceFromFsComponent(
       const resolvedPath = path.isAbsolute(filePath) ? filePath : path.resolve(projectWorkingDirectory, filePath)
       await fs.rm(resolvedPath)
     },
+    async rmdir(dirPath: string) {
+      const resolvedPath = path.isAbsolute(dirPath) ? dirPath : path.resolve(projectWorkingDirectory, dirPath)
+      await fs.rm(resolvedPath, { recursive: true })
+    },
     async readdir(dirPath: string): Promise<{ name: string; isDirectory: boolean }[]> {
       if (dirPath.indexOf('/../') !== -1) {
         throw new Error('The usage of /../ is not allowed')
