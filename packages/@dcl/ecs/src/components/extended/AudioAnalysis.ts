@@ -138,7 +138,7 @@ export function defineAudioAnalysisComponent(
       mode?: PBAudioAnalysisMode,
       amplitudeGain?: number,
       bandsGain?: number
-    ): boolean {
+    ): void {
       theComponent.createOrReplace(entity, {
         mode: mode || PBAudioAnalysisMode.MODE_LOGARITHMIC,
         amplitudeGain: amplitudeGain ?? undefined,

@@ -59,16 +59,17 @@ export const AudioAnalysis: AudioAnalysisComponentDefinitionExtended;
 //
 // @public (undocumented)
 export interface AudioAnalysisComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBAudioAnalysis> {
-    // (undocumented)
     createAudioAnalysis(entity: Entity, mode?: PBAudioAnalysisMode, // default is PBAudioAnalysisMode.MODE_LOGARITHMIC
     amplitudeGain?: number, bandsGain?: number): void;
-    // (undocumented)
+    createOrReplaceAudioAnalysis(entity: Entity, mode?: PBAudioAnalysisMode, // default is PBAudioAnalysisMode.MODE_LOGARITHMIC
+    amplitudeGain?: number, bandsGain?: number): void;
     readIntoView(entity: Entity, out: AudioAnalysisView): void;
+    tryReadIntoView(entity: Entity, out: AudioAnalysisView): boolean;
 }
 
 // Warning: (ae-missing-release-tag) "AudioAnalysisView" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
-// @public (undocumented)
+// @public
 export type AudioAnalysisView = {
     amplitude: number;
     bands: number[];
