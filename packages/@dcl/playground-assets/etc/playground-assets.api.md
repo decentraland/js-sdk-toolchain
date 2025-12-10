@@ -50,6 +50,31 @@ export namespace AppendValueOperation {
 // @public
 export function areConnected(parcels: Coords[]): boolean;
 
+// Warning: (ae-missing-release-tag) "AudioAnalysis" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const AudioAnalysis: AudioAnalysisComponentDefinitionExtended;
+
+// Warning: (ae-missing-release-tag) "AudioAnalysisComponentDefinitionExtended" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface AudioAnalysisComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBAudioAnalysis> {
+    createAudioAnalysis(entity: Entity, mode?: PBAudioAnalysisMode, // default is PBAudioAnalysisMode.MODE_LOGARITHMIC
+    amplitudeGain?: number, bandsGain?: number): void;
+    createOrReplaceAudioAnalysis(entity: Entity, mode?: PBAudioAnalysisMode, // default is PBAudioAnalysisMode.MODE_LOGARITHMIC
+    amplitudeGain?: number, bandsGain?: number): void;
+    readIntoView(entity: Entity, out: AudioAnalysisView): void;
+    tryReadIntoView(entity: Entity, out: AudioAnalysisView): boolean;
+}
+
+// Warning: (ae-missing-release-tag) "AudioAnalysisView" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export type AudioAnalysisView = {
+    amplitude: number;
+    bands: number[];
+};
+
 // @public (undocumented)
 export const AudioEvent: GrowOnlyValueSetComponentDefinition<PBAudioEvent>;
 
@@ -625,6 +650,7 @@ export type ComponentDefinition<T> = LastWriteWinElementSetComponentDefinition<T
 // @public
 export const componentDefinitionByName: {
     "core::Animator": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAnimator>>;
+    "core::AudioAnalysis": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioAnalysis>>;
     "core::AudioEvent": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAudioEvent>>;
     "core::AudioSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioSource>>;
     "core::AudioStream": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioStream>>;
@@ -2148,6 +2174,46 @@ export namespace PBAnimator {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAnimator;
     // (undocumented)
     export function encode(message: PBAnimator, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAudioAnalysis {
+    amplitude: number;
+    amplitudeGain?: number | undefined;
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    band0: number;
+    // (undocumented)
+    band1: number;
+    // (undocumented)
+    band2: number;
+    // (undocumented)
+    band3: number;
+    // (undocumented)
+    band4: number;
+    // (undocumented)
+    band5: number;
+    // (undocumented)
+    band6: number;
+    // (undocumented)
+    band7: number;
+    bandsGain?: number | undefined;
+    mode: PBAudioAnalysisMode;
+}
+
+// @public (undocumented)
+export namespace PBAudioAnalysis {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAudioAnalysis;
+    // (undocumented)
+    export function encode(message: PBAudioAnalysis, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export const enum PBAudioAnalysisMode {
+    // (undocumented)
+    MODE_LOGARITHMIC = 1,
+    // (undocumented)
+    MODE_RAW = 0
 }
 
 // @public (undocumented)
