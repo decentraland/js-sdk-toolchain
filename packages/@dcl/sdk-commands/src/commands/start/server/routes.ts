@@ -1,3 +1,4 @@
+import QRCode from 'qrcode'
 import { Router } from '@well-known-components/http-server'
 import { upgradeWebSocketResponse } from '@well-known-components/http-server/dist/ws'
 import { WebSocket } from 'ws'
@@ -7,6 +8,7 @@ import { handleDataLayerWs } from '../data-layer/ws'
 import { PreviewComponents } from '../types'
 import { setupEcs6Endpoints } from './endpoints'
 import { setupRealmAndComms } from './realm'
+import { getLanIp } from '../utils'
 
 export const sceneUpdateClients = new Set<WebSocket>()
 export async function wireRouter(components: PreviewComponents, workspace: Workspace, dataLayer?: DataLayer) {
@@ -36,6 +38,32 @@ export async function wireRouter(components: PreviewComponents, workspace: Works
       localSceneParcels.push(parcel)
     }
   }
+
+  // Mobile preview QR code endpoint
+  router.get('/mobile-preview', async (ctx) => {
+    const lanIp = getLanIp()
+    if (!lanIp) {
+      return {
+        status: 404,
+        body: { ok: false, error: 'No LAN IP address found' }
+      }
+    }
+
+    const port = ctx.url.port
+    const lanUrl = `http://${lanIp}:${port}`
+    const qrDataUrl = await QRCode.toDataURL(lanUrl)
+
+    return {
+      headers: { 'content-type': 'application/json' },
+      body: {
+        ok: true,
+        data: {
+          url: lanUrl,
+          qr: qrDataUrl
+        }
+      }
+    }
+  })
 
   setupRealmAndComms(components, router, localSceneParcels)
   await setupEcs6Endpoints(components, router, workspace)

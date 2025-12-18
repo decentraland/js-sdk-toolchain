@@ -1,6 +1,7 @@
 import * as os from 'os'
 import * as path from 'path'
 import open from 'open'
+import QRCode from 'qrcode'
 
 import { CliComponents } from '../../components'
 import { buildScene } from '../build'
@@ -15,7 +16,7 @@ import { createRoomsComponent, roomsMetrics } from '@dcl/mini-comms/dist/adapter
 import { createServerComponent } from '@well-known-components/http-server'
 import { createConsoleLogComponent } from '@well-known-components/logger'
 import { providerInstance } from '../../components/eth'
-import { createStderrCliLogger } from '../../components/log'
+import { colors, createStderrCliLogger } from '../../components/log'
 import { wireFileWatcherToWebSockets } from './server/file-watch-notifier'
 import { wireRouter } from './server/routes'
 import { createWsComponent } from './server/ws'
@@ -27,6 +28,7 @@ import { printCurrentProjectStarting, printProgressInfo, printWarning } from '..
 import { Result } from 'arg'
 import { startValidations } from '../../logic/project-validations'
 import { runExplorerAlpha } from './explorer-alpha'
+import { getLanIp } from './utils'
 
 interface Options {
   args: Result<typeof args>
@@ -231,6 +233,9 @@ export async function main(options: Options) {
         })
       })
 
+      // Get the LAN IP address for external device access
+      const lanIp = getLanIp()
+
       // Push localhost and 127.0.0.1 at top
       const sortedURLs = availableURLs.sort((a, _b) => {
         return a.toLowerCase().includes('localhost') || a.includes('127.0.0.1') || a.includes('0.0.0.0') ? -1 : 1
@@ -253,6 +258,17 @@ export async function main(options: Options) {
         const realm = new URL(sortedURLs[0]).origin
         await runExplorerAlpha(components, { cwd: workingDirectory, realm, baseCoords, isHub, args: options.args })
       }
+      const previewMobile = true
+
+      if (previewMobile && lanIp) {
+        const lanUrl = `http://${lanIp}:${port}?position=${baseCoords.x}%2C${baseCoords.y}`
+        QRCode.toString(lanUrl, { type: 'terminal', small: true }, (err, qr) => {
+          if (!err) {
+            components.logger.log(colors.bold('\nScan to preview on mobile: \n'))
+            components.logger.log(qr)
+          }
+        })
+      }
 
       // Open preferably localhost/127.0.0.1
       if ((!explorerAlpha || bevyWeb) && openBrowser && sortedURLs.length) {
@@ -263,6 +279,7 @@ export async function main(options: Options) {
           components.logger.warn('Unable to open browser automatically.')
         }
       }
+      components.logger.log('\nPress CTRL+C to exit\n')
     }
   })
 
