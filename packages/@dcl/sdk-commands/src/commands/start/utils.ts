@@ -9,3 +9,12 @@ export function getLanIp(): string | undefined {
     .flat()
     .find((details) => details?.family === 'IPv4' && !details.internal && details.address !== '127.0.0.1')?.address
 }
+
+/**
+ * Get the full LAN URL with protocol for external device access
+ */
+export function getLanUrl(port: number | string): string | undefined {
+  const ip = getLanIp()
+  if (!ip) return undefined
+  return `http://${ip}:${port}`
+}
