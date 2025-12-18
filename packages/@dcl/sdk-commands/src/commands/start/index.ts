@@ -54,6 +54,8 @@ export const args = declareArgs({
   '--data-layer': Boolean,
   '--explorer-alpha': Boolean,
   '--hub': Boolean,
+  '--mobile': Boolean,
+  '-m': '--mobile',
   // Params related to the explorer-alpha
   '--debug': Boolean,
   '--dclenv': String,
@@ -87,6 +89,7 @@ export async function help(options: Options) {
       --skip-auth-screen                Skip the auth screen (accepts 'true' or 'false').
       --landscape-terrain-enabled       Enable landscape terrain.
       -n                                Open a new instance of the Client even if one is already running.
+      -m, --mobile                      Show QR code for mobile preview on the same network
 
 
     Examples:
@@ -241,10 +244,9 @@ export async function main(options: Options) {
         const realm = new URL(sortedURLs[0]).origin
         await runExplorerAlpha(components, { cwd: workingDirectory, realm, baseCoords, isHub, args: options.args })
       }
-      const previewMobile = true
 
-      if (previewMobile && lanIp) {
-        const lanUrl = `http://${lanIp}:${port}?position=${baseCoords.x}%2C${baseCoords.y}`
+      if (options.args['--mobile'] && lanIp) {
+        const lanUrl = `decentraland://open?preview=${lanIp}:${port}`
         QRCode.toString(lanUrl, { type: 'terminal', small: true }, (err, qr) => {
           if (!err) {
             components.logger.log(colors.bold('\nScan to preview on mobile: \n'))

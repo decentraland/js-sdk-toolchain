@@ -50,7 +50,7 @@ export async function wireRouter(components: PreviewComponents, workspace: Works
     }
 
     const port = ctx.url.port
-    const lanUrl = `http://${lanIp}:${port}`
+    const lanUrl = `decentraland://open?preview=${lanIp}:${port}`
     const qrDataUrl = await QRCode.toDataURL(lanUrl)
 
     return {
