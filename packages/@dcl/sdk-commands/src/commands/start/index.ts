@@ -28,7 +28,7 @@ import { printCurrentProjectStarting, printProgressInfo, printWarning } from '..
 import { Result } from 'arg'
 import { startValidations } from '../../logic/project-validations'
 import { runExplorerAlpha } from './explorer-alpha'
-import { getLanIp } from './utils'
+import { getLanUrl } from './utils'
 
 interface Options {
   args: Result<typeof args>
@@ -236,8 +236,8 @@ export async function main(options: Options) {
         })
       })
 
-      // Get the LAN IP address for external device access
-      const lanIp = getLanIp()
+      // Get the LAN URL for external device access
+      const lanUrl = getLanUrl(port)
 
       // Push localhost and 127.0.0.1 at top
       const sortedURLs = availableURLs.sort((a, _b) => {
@@ -262,9 +262,10 @@ export async function main(options: Options) {
         await runExplorerAlpha(components, { cwd: workingDirectory, realm, baseCoords, isHub, args: options.args })
       }
 
-      if (options.args['--mobile'] && lanIp) {
-        const lanUrl = `decentraland://open?preview=${lanIp}:${port}`
-        QRCode.toString(lanUrl, { type: 'terminal', small: true }, (err, qr) => {
+      if (options.args['--mobile'] && lanUrl) {
+        const deepLink = `decentraland://open?preview=${lanUrl}`
+        console.log({ deepLink })
+        QRCode.toString(deepLink, { type: 'terminal', small: true }, (err, qr) => {
           if (!err) {
             components.logger.log(colors.bold('\nScan to preview on mobile: \n'))
             components.logger.log(qr)

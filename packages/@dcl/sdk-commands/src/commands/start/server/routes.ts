@@ -8,7 +8,7 @@ import { handleDataLayerWs } from '../data-layer/ws'
 import { PreviewComponents } from '../types'
 import { setupEcs6Endpoints } from './endpoints'
 import { setupRealmAndComms } from './realm'
-import { getLanIp } from '../utils'
+import { getLanUrl } from '../utils'
 
 export const sceneUpdateClients = new Set<WebSocket>()
 export async function wireRouter(components: PreviewComponents, workspace: Workspace, dataLayer?: DataLayer) {
@@ -41,24 +41,23 @@ export async function wireRouter(components: PreviewComponents, workspace: Works
 
   // Mobile preview QR code endpoint
   router.get('/mobile-preview', async (ctx) => {
-    const lanIp = getLanIp()
-    if (!lanIp) {
+    const lanUrl = getLanUrl(ctx.url.port)
+    if (!lanUrl) {
       return {
         status: 404,
         body: { ok: false, error: 'No LAN IP address found' }
       }
     }
 
-    const port = ctx.url.port
-    const lanUrl = `decentraland://open?preview=${lanIp}:${port}`
-    const qrDataUrl = await QRCode.toDataURL(lanUrl)
+    const deepLink = `decentraland://open?preview=${lanUrl}`
+    const qrDataUrl = await QRCode.toDataURL(deepLink)
 
     return {
       headers: { 'content-type': 'application/json' },
       body: {
         ok: true,
         data: {
-          url: lanUrl,
+          url: deepLink,
           qr: qrDataUrl
         }
       }
