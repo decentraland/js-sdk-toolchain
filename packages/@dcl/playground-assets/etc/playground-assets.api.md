@@ -50,8 +50,30 @@ export namespace AppendValueOperation {
 // @public
 export function areConnected(parcels: Coords[]): boolean;
 
+// Warning: (ae-missing-release-tag) "AudioAnalysis" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const AudioAnalysis: LastWriteWinElementSetComponentDefinition<PBAudioAnalysis>;
+export const AudioAnalysis: AudioAnalysisComponentDefinitionExtended;
+
+// Warning: (ae-missing-release-tag) "AudioAnalysisComponentDefinitionExtended" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface AudioAnalysisComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBAudioAnalysis> {
+    createAudioAnalysis(entity: Entity, mode?: PBAudioAnalysisMode, // default is PBAudioAnalysisMode.MODE_LOGARITHMIC
+    amplitudeGain?: number, bandsGain?: number): void;
+    createOrReplaceAudioAnalysis(entity: Entity, mode?: PBAudioAnalysisMode, // default is PBAudioAnalysisMode.MODE_LOGARITHMIC
+    amplitudeGain?: number, bandsGain?: number): void;
+    readIntoView(entity: Entity, out: AudioAnalysisView): void;
+    tryReadIntoView(entity: Entity, out: AudioAnalysisView): boolean;
+}
+
+// Warning: (ae-missing-release-tag) "AudioAnalysisView" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export type AudioAnalysisView = {
+    amplitude: number;
+    bands: number[];
+};
 
 // @public (undocumented)
 export const AudioEvent: GrowOnlyValueSetComponentDefinition<PBAudioEvent>;
