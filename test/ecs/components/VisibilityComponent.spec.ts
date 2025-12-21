@@ -8,5 +8,7 @@ describe('Generated VisibilityComponent ProtoBuf', () => {
 
     testComponentSerialization(VisibilityComponent, { visible: true })
     testComponentSerialization(VisibilityComponent, { visible: false })
+    testComponentSerialization(VisibilityComponent, { visible: false, propagateToChildren: true })
+    testComponentSerialization(VisibilityComponent, { visible: true, propagateToChildren: false })
   })
 })
