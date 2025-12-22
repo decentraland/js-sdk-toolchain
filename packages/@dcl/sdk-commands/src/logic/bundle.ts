@@ -14,7 +14,7 @@ import { CliComponents } from '../components'
 import { colors } from '../components/log'
 import { printProgressInfo, printProgressStep, printWarning } from './beautiful-logs'
 import { CliError } from './error'
-import { getAllComposites } from './composite'
+import { getAllComposites, type Script } from './composite'
 import { isEditorScene } from './project-validations'
 import { watch } from 'chokidar'
 import { debounce } from './debounce'
@@ -63,6 +63,7 @@ import { engine, NetworkEntity } from '@dcl/sdk/ecs'
 import * as sdk from '@dcl/sdk'
 import { compositeProvider } from '@dcl/sdk/composite-provider'
 import { compositeFromLoader } from '~sdk/all-composites'
+import { initializeScripts } from '~sdk/all-scripts'
 
 ${
   isEditorScene &&
@@ -74,7 +75,7 @@ initAssetPacks(engine, { syncEntity }, players)
 
 // TODO: do we need to do this on runtime ?
 // I think we have that information at build-time and we avoid to do evaluate this on the worker.
-// Read composite.json or main.crdt => If that file has a NetowrkEntity import '@dcl/@sdk/network'
+// Read composite.json or main.crdt => If that file has a NetworkEntity import '@dcl/@sdk/network'
 `
 }
 
@@ -85,6 +86,8 @@ if ((entrypoint as any).main !== undefined) {
       if (maybePromise && typeof maybePromise === 'object' && typeof (maybePromise as unknown as Promise<unknown>).then === 'function') {
         maybePromise.catch(console.error)
       }
+      // initialize and run all scripts
+      initializeScripts(engine)
     } catch (e) {
      console.error(e)
     } finally {
@@ -184,6 +187,22 @@ export async function bundleSingleProject(components: BundleComponents, options:
             return require.resolve('react')
           }
         }
+      })(),
+      // Resolve asset-packs from sdk-commands' dependencies (nested in @dcl/inspector)
+      '@dcl/asset-packs': (() => {
+        try {
+          // Try to resolve from project's node_modules first
+          return path.dirname(require.resolve('@dcl/asset-packs/package.json', { paths: [options.workingDirectory] }))
+        } catch {
+          try {
+            // Fallback: resolve from @dcl/inspector's node_modules
+            const inspectorPath = require.resolve('@dcl/inspector/package.json', { paths: [__dirname] })
+            return path.dirname(require.resolve('@dcl/asset-packs/package.json', { paths: [path.dirname(inspectorPath)] }))
+          } catch {
+            // Last resort: try resolving from current directory
+            return path.dirname(require.resolve('@dcl/asset-packs/package.json', { paths: [__dirname] }))
+          }
+        }
       })()
     },
     // convert filesystem paths into file:// to enable VSCode debugger
@@ -218,7 +237,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
   if (options.watch) {
     // Instead of using esbuild's watch, we create our own watcher
     const watcher = watch(path.resolve(options.workingDirectory), {
-      ignored: ['**/dist/**', '**/*.crdt', '**/*.composite', path.resolve(options.outputFile)],
+      ignored: ['**/dist/**', '**/*.crdt', path.resolve(options.outputFile)],
       ignoreInitial: true
     })
 
@@ -233,8 +252,8 @@ export async function bundleSingleProject(components: BundleComponents, options:
     }, 100)
 
     watcher.on('all', async (event, filePath) => {
-      // Only rebuild for TypeScript and JavaScript files
-      if (/\.(ts|tsx|js|jsx)$/.test(filePath)) {
+      // Rebuild for TypeScript, JavaScript, and composite files
+      if (/\.(ts|tsx|js|jsx|composite)$/.test(filePath)) {
         printProgressInfo(components.logger, `File ${filePath} changed, rebuilding...`)
         debouncedRebuild()
       }
@@ -308,16 +327,17 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
 
 function compositeLoader(components: BundleComponents, options: SingleProjectOptions): esbuild.Plugin {
   let shouldReload = true
-  let contents = `export const compositeFromLoader = {}` // default exports nothing
-  let watchFiles: string[] = [] // no files to watch
-  let lastBuiltSuccessful = false
+  let compositeData: Awaited<ReturnType<typeof getAllComposites>> | null = null
 
   return {
     name: 'composite-loader',
     setup(build) {
       build.onStart(() => {
         shouldReload = true
+        compositeData = null
       })
+
+      // Handle composites virtual module
       build.onResolve({ filter: /~sdk\/all-composites/ }, (_args) => {
         return {
           namespace: 'sdk-composite',
@@ -326,27 +346,29 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
       })
 
       build.onLoad({ filter: /.*/, namespace: 'sdk-composite' }, async (_) => {
-        if (shouldReload) {
+        // Load compositeData if not already loaded
+        if (shouldReload && !compositeData) {
           if (!options.ignoreComposite) {
-            const data = await getAllComposites(
+            compositeData = await getAllComposites(
               components,
               // we pass the build.initialOptions.absWorkingDir to build projects with multiple roots at once
               build.initialOptions.absWorkingDir ?? options.workingDirectory
             )
-            contents = `export const compositeFromLoader = {${data.compositeLines.join(',')}}`
-            watchFiles = data.watchFiles
 
-            if (data.withErrors) {
+            if (compositeData.withErrors) {
               printWarning(
                 components.logger,
                 'Some composites are not included because of errors while compiling them. There can be unexpected behavior in the scene, check the errors and try to fix them.'
               )
-            } else if (!lastBuiltSuccessful) {
             }
-            lastBuiltSuccessful = !data.withErrors
           }
           shouldReload = false
         }
+
+        const contents = compositeData
+          ? `export const compositeFromLoader = {${compositeData.compositeLines.join(',')}}`
+          : `export const compositeFromLoader = {}`
+        const watchFiles = compositeData?.watchFiles || []
 
         return {
           loader: 'js',
@@ -354,6 +376,103 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
           watchFiles
         }
       })
+
+      // Handle scripts virtual module
+      build.onResolve({ filter: /~sdk\/all-scripts/ }, (_args) => {
+        return {
+          namespace: 'sdk-scripts',
+          path: 'all-scripts'
+        }
+      })
+
+      build.onLoad({ filter: /.*/, namespace: 'sdk-scripts' }, async (_) => {
+        // ensure compositeData is loaded (in case scripts are imported before composites)
+        if (!compositeData && !options.ignoreComposite) {
+          compositeData = await getAllComposites(
+            components,
+            build.initialOptions.absWorkingDir ?? options.workingDirectory
+          )
+        }
+
+        const { contents, watchFiles } = await generateInitializeScriptsModule(
+          components.fs,
+          options.workingDirectory,
+          compositeData
+        )
+
+        return {
+          loader: 'js',
+          contents,
+          watchFiles,
+          resolveDir: options.workingDirectory
+        }
+      })
     }
   }
+}
+
+/**
+ * Generates a sanitized import name for a script path.
+ * Example: "src/scripts/my-script.ts" -> "script_src_scripts_my_script"
+ */
+export function getScriptImportName(scriptPath: string): string {
+  return (
+    'script_' +
+    scriptPath
+      .replace(/\.tsx?$/, '') // remove .ts or .tsx
+      .replace(/[^a-zA-Z0-9]/g, '_') // sanitize
+  )
+}
+
+export async function generateInitializeScriptsModule(
+  fs: BundleComponents['fs'],
+  workingDirectory: string,
+  compositeData: { scripts: Map<string, Script[]>; [key: string]: any } | null
+): Promise<{ contents: string; watchFiles: string[] }> {
+  let contents = `export function initializeScripts(engine) {}`
+  const watchFiles: string[] = []
+
+  if (compositeData && compositeData.scripts.size > 0) {
+    let imports = ''
+    let scripts = '[\n'
+
+    for (const [scriptPath, scriptInstances] of compositeData.scripts.entries()) {
+      const importName = getScriptImportName(scriptPath)
+      const normalizedPath = scriptPath.replace(/\\/g, '/')
+      const absolutePath = path.join(workingDirectory, scriptPath)
+
+      imports += `import * as ${importName} from './${normalizedPath}'\n`
+      watchFiles.push(absolutePath)
+
+      for (const script of scriptInstances) {
+        scripts += `  { ...${JSON.stringify(script)}, module: ${importName} },\n`
+      }
+    }
+
+    scripts += ']'
+
+    const runtimeCodePath = require.resolve('./runtime-script')
+    const runtimeCode = (await fs.readFile(runtimeCodePath, 'utf-8'))
+      // remove all CommonJS/module system code and imports
+      .replace(/"use strict";?\s*/g, '')
+      .replace(/Object\.defineProperty\(exports,.*?\);?\s*/g, '')
+      .replace(/exports\.\w+\s*=\s*void 0;?\s*/g, '')
+      .replace(/exports\.\w+\s*=\s*/g, '')
+      .replace(/^export\s+/gm, '')
+      .replace(/^import\s+.*$/gm, '')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim()
+
+    contents = `
+${imports}
+
+${runtimeCode}
+
+export function initializeScripts(engine) {
+  return runScripts(engine, ${scripts})
+}
+`
+  }
+
+  return { contents, watchFiles }
 }
