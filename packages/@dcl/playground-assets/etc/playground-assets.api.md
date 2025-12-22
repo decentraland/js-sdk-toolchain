@@ -3520,6 +3520,7 @@ export namespace PBVirtualCamera {
 
 // @public (undocumented)
 export interface PBVisibilityComponent {
+    propagateToChildren?: boolean | undefined;
     visible?: boolean | undefined;
 }
 
