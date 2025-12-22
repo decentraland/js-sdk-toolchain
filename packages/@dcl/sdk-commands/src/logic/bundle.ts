@@ -300,22 +300,31 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
   })
   const typeCheckerFuture = future<number>()
 
+  let stdOutput = ''
+  ts.stdout?.on('data', (data: string) => {
+    stdOutput += data
+  })
+
+  ts.stdout?.pipe(process.stdout)
+  ts.stderr?.pipe(process.stderr)
+
   ts.on('close', (code) => {
     /* istanbul ignore else */
     if (code === 0) {
       printProgressInfo(components.logger, `Type checking completed without errors`)
     } else {
       typeCheckerFuture.reject(
-        new CliError('BUNDLE_TYPE_CHECKER_FAILED', i18next.t('errors.bundle.type_checker_failed', { code }))
+        new CliError(
+          'BUNDLE_TYPE_CHECKER_FAILED',
+          `${stdOutput.replace(/\x1b\[[0-9;]*m/g, '')}\n
+          ${i18next.t('errors.bundle.type_checker_failed', { code })}`
+        )
       )
       return
     }
 
     typeCheckerFuture.resolve(code)
   })
-
-  ts.stdout?.pipe(process.stdout)
-  ts.stderr?.pipe(process.stderr)
 
   /* istanbul ignore if */
   if (options.watch) {
