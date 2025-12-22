@@ -34,6 +34,7 @@ export function assertFilesExist(map: BasicSourceMapConsumer) {
     // TODO: what should we do with virtual files?
     if (file.endsWith('sdk-composite:all-composites')) continue
     if (file.endsWith('entry-point.ts')) continue
+    if (file.endsWith('sdk-scripts:all-scripts')) continue
 
     const fileExist = existsSync(fileURLToPath(file)) ? file : 'does not exit'
     expect(fileExist).toBe(file)
