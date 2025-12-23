@@ -6,7 +6,7 @@ describe('Generated VisibilityComponent ProtoBuf', () => {
     const newEngine = Engine()
     const VisibilityComponent = components.VisibilityComponent(newEngine)
 
-    testComponentSerialization(VisibilityComponent, { visible: true })
-    testComponentSerialization(VisibilityComponent, { visible: false })
+    testComponentSerialization(VisibilityComponent, { visible: true, propagateToChildren: false })
+    testComponentSerialization(VisibilityComponent, { visible: false, propagateToChildren: true })
   })
 })
