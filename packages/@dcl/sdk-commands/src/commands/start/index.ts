@@ -1,6 +1,7 @@
 import * as os from 'os'
 import * as path from 'path'
 import open from 'open'
+import QRCode from 'qrcode'
 
 import { CliComponents } from '../../components'
 import { buildScene } from '../build'
@@ -15,7 +16,7 @@ import { createRoomsComponent, roomsMetrics } from '@dcl/mini-comms/dist/adapter
 import { createServerComponent } from '@well-known-components/http-server'
 import { createConsoleLogComponent } from '@well-known-components/logger'
 import { providerInstance } from '../../components/eth'
-import { createStderrCliLogger } from '../../components/log'
+import { colors, createStderrCliLogger } from '../../components/log'
 import { wireFileWatcherToWebSockets } from './server/file-watch-notifier'
 import { wireRouter } from './server/routes'
 import { createWsComponent } from './server/ws'
@@ -27,6 +28,7 @@ import { printCurrentProjectStarting, printProgressInfo, printWarning } from '..
 import { Result } from 'arg'
 import { startValidations } from '../../logic/project-validations'
 import { runExplorerAlpha } from './explorer-alpha'
+import { getLanUrl } from './utils'
 
 interface Options {
   args: Result<typeof args>
@@ -53,6 +55,8 @@ export const args = declareArgs({
   '--explorer-alpha': Boolean,
   '--web-explorer': Boolean,
   '--hub': Boolean,
+  '--mobile': Boolean,
+  '-m': '--mobile',
   // Params related to the explorer-alpha
   '--debug': Boolean,
   '--dclenv': String,
@@ -87,6 +91,7 @@ export async function help(options: Options) {
       --skip-auth-screen                Skip the auth screen (accepts 'true' or 'false').
       --landscape-terrain-enabled       Enable landscape terrain.
       -n                                Open a new instance of the Client even if one is already running.
+      -m, --mobile                      Show QR code for mobile preview on the same network
 
 
     Examples:
@@ -223,6 +228,9 @@ export async function main(options: Options) {
         })
       })
 
+      // Get the LAN URL for external device access
+      const lanUrl = getLanUrl(port)
+
       // Push localhost and 127.0.0.1 at top
       const sortedURLs = availableURLs.sort((a, _b) => {
         return a.toLowerCase().includes('localhost') || a.includes('127.0.0.1') || a.includes('0.0.0.0') ? -1 : 1
@@ -234,14 +242,20 @@ export async function main(options: Options) {
         }
       }
 
-      if (!explorerAlpha) {
-        components.logger.log('\n  Details:\n')
-      }
-      components.logger.log('\nPress CTRL+C to exit\n')
-
       if (explorerAlpha) {
         const realm = new URL(sortedURLs[0]).origin
         await runExplorerAlpha(components, { cwd: workingDirectory, realm, baseCoords, isHub, args: options.args })
+      }
+
+      if (options.args['--mobile'] && lanUrl) {
+        const deepLink = `decentraland://open?preview=${lanUrl}`
+        console.log({ deepLink })
+        QRCode.toString(deepLink, { type: 'terminal', small: true }, (err, qr) => {
+          if (!err) {
+            components.logger.log(colors.bold('\nScan to preview on mobile: \n'))
+            components.logger.log(qr)
+          }
+        })
       }
 
       // Open preferably localhost/127.0.0.1
@@ -252,6 +266,7 @@ export async function main(options: Options) {
           components.logger.warn('Unable to open browser automatically.')
         }
       }
+      components.logger.log('\nPress CTRL+C to exit\n')
     }
   })
 
