@@ -61,7 +61,8 @@ export const args = declareArgs({
   '--position': String,
   '--skip-auth-screen': Boolean,
   '--landscape-terrain-enabled': Boolean,
-  '-n': Boolean
+  '-n': Boolean,
+  '--bevy-web': Boolean
 })
 
 export async function help(options: Options) {
@@ -87,6 +88,7 @@ export async function help(options: Options) {
       --skip-auth-screen                Skip the auth screen (accepts 'true' or 'false').
       --landscape-terrain-enabled       Enable landscape terrain.
       -n                                Open a new instance of the Client even if one is already running.
+      --bevy-web                        Opens preview using the Bevy Web browser window.
 
 
     Examples:
@@ -113,6 +115,7 @@ export async function main(options: Options) {
   const enableWeb3 = options.args['--web3']
   const explorerAlpha = !options.args['--web-explorer']
   const isHub = !!options.args['--hub']
+  const bevyWeb = !!options.args['--bevy-web']
 
   let hasSmartWearable = false
   const workspace = await getValidWorkspace(options.components, workingDirectory)
@@ -247,7 +250,12 @@ export async function main(options: Options) {
       // Open preferably localhost/127.0.0.1
       if (!explorerAlpha && openBrowser && sortedURLs.length) {
         try {
-          await open(sortedURLs[0])
+          const url = bevyWeb
+            ? `https://decentraland.zone/bevy-web/?preview&initialRealm=${new URL(sortedURLs[0]).origin}&location=${
+                baseCoords.x
+              },${baseCoords.y}`
+            : sortedURLs[0]
+          await open(url)
         } catch (_) {
           components.logger.warn('Unable to open browser automatically.')
         }
