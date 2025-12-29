@@ -51,6 +51,7 @@ export const args = declareArgs({
   '--skip-build': Boolean,
   '--data-layer': Boolean,
   '--explorer-alpha': Boolean,
+  '--web-explorer': Boolean,
   '--hub': Boolean,
   // Params related to the explorer-alpha
   '--debug': Boolean,
@@ -78,6 +79,7 @@ export async function help(options: Options) {
       -c, --ci                          Run the parcel previewer on a remote unix server
       --web3                            Connects preview to browser wallet to use the associated avatar and account
       --skip-build                      Skip build and only serve the files in preview mode
+      --web-explorer                    Launch the scene in the Web Explorer
       --debug                           Enables Debug panel mode inside DCL Explorer (default=true)
       --dclenv                          Decentraland Environment. Which environment to use for the content. This determines the catalyst server used, asset-bundles, etc. Possible values: org, zone, today. (default=org)
       --realm                           Realm used to serve the content. (default=Localhost)
@@ -111,7 +113,7 @@ export async function main(options: Options) {
   const watch = !options.args['--no-watch']
   const withDataLayer = options.args['--data-layer']
   const enableWeb3 = options.args['--web3']
-  const explorerAlpha = options.args['--explorer-alpha']
+  const explorerAlpha = !options.args['--web-explorer']
   const isHub = !!options.args['--hub']
   const bevyWeb = !!options.args['--bevy-web']
 
