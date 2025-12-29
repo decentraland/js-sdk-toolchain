@@ -113,9 +113,9 @@ export async function main(options: Options) {
   const watch = !options.args['--no-watch']
   const withDataLayer = options.args['--data-layer']
   const enableWeb3 = options.args['--web3']
-  const explorerAlpha = !options.args['--web-explorer']
   const isHub = !!options.args['--hub']
   const bevyWeb = !!options.args['--bevy-web']
+  const explorerAlpha = !options.args['--web-explorer'] && !bevyWeb
 
   let hasSmartWearable = false
   const workspace = await getValidWorkspace(options.components, workingDirectory)
@@ -196,7 +196,12 @@ export async function main(options: Options) {
       await wireRouter(components, workspace, dataLayer)
       if (watch) {
         for (const project of workspace.projects) {
-          await wireFileWatcherToWebSockets(components, project.workingDirectory, project.kind, !!explorerAlpha)
+          await wireFileWatcherToWebSockets(
+            components,
+            project.workingDirectory,
+            project.kind,
+            !!explorerAlpha || !!bevyWeb
+          )
         }
       }
       await startComponents()
@@ -230,15 +235,17 @@ export async function main(options: Options) {
       const sortedURLs = availableURLs.sort((a, _b) => {
         return a.toLowerCase().includes('localhost') || a.includes('127.0.0.1') || a.includes('0.0.0.0') ? -1 : 1
       })
-
+      const bevyUrl = `https://decentraland.zone/bevy-web/?preview=true&initialRealm=${
+        new URL(sortedURLs[0]).origin
+      }&location=${baseCoords.x},${baseCoords.y}`
       if (!explorerAlpha) {
-        for (const addr of sortedURLs) {
-          components.logger.log(`    ${addr}`)
+        if (bevyWeb) {
+          components.logger.log(`    ${bevyUrl}`)
+        } else {
+          for (const addr of sortedURLs) {
+            components.logger.log(`    ${addr}`)
+          }
         }
-      }
-
-      if (!explorerAlpha) {
-        components.logger.log('\n  Details:\n')
       }
       components.logger.log('\nPress CTRL+C to exit\n')
 
@@ -248,13 +255,9 @@ export async function main(options: Options) {
       }
 
       // Open preferably localhost/127.0.0.1
-      if (!explorerAlpha && openBrowser && sortedURLs.length) {
+      if ((!explorerAlpha || bevyWeb) && openBrowser && sortedURLs.length) {
         try {
-          const url = bevyWeb
-            ? `https://decentraland.zone/bevy-web/?preview&initialRealm=${new URL(sortedURLs[0]).origin}&location=${
-                baseCoords.x
-              },${baseCoords.y}`
-            : sortedURLs[0]
+          const url = bevyWeb ? bevyUrl : sortedURLs[0]
           await open(url)
         } catch (_) {
           components.logger.warn('Unable to open browser automatically.')
