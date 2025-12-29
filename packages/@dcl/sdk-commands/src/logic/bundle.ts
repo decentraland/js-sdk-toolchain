@@ -188,6 +188,26 @@ export async function bundleSingleProject(components: BundleComponents, options:
           }
         }
       })(),
+      // Ensure @dcl/sdk is always resolved to workspace version to prevent version conflicts
+      '@dcl/sdk': (() => {
+        try {
+          // First try to resolve from project's node_modules
+          return path.dirname(require.resolve('@dcl/sdk/package.json', { paths: [options.workingDirectory] }))
+        } catch {
+          // Fallback to workspace @dcl/sdk
+          return path.dirname(require.resolve('@dcl/sdk/package.json', { paths: [__dirname] }))
+        }
+      })(),
+      // Ensure @dcl/ecs is always resolved to workspace version to prevent version conflicts
+      '@dcl/ecs': (() => {
+        try {
+          // First try to resolve from project's node_modules
+          return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [options.workingDirectory] }))
+        } catch {
+          // Fallback to workspace @dcl/ecs
+          return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [__dirname] }))
+        }
+      })(),
       // Resolve asset-packs from sdk-commands' dependencies (nested in @dcl/inspector)
       '@dcl/asset-packs': (() => {
         try {
