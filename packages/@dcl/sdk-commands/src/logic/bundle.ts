@@ -313,7 +313,20 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
   ts.stdout?.pipe(process.stdout)
   ts.stderr?.pipe(process.stderr)
 
+  const cleanup = () => {
+    if (!ts.killed) ts.kill('SIGTERM')
+  }
+
+  process.on('SIGTERM', cleanup)
+  process.on('SIGINT', cleanup)
+  process.on('exit', cleanup)
+
   ts.on('close', (code) => {
+    // Remove listeners after process exits to prevent memory leaks
+    process.off('SIGTERM', cleanup)
+    process.off('SIGINT', cleanup)
+    process.off('exit', cleanup)
+
     /* istanbul ignore else */
     if (code === 0) {
       printProgressInfo(components.logger, `Type checking completed without errors`)
