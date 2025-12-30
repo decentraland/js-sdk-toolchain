@@ -120,6 +120,7 @@ export async function main(options: Options) {
   const enableWeb3 = options.args['--web3']
   const isHub = !!options.args['--hub']
   const bevyWeb = !!options.args['--bevy-web']
+  const isMobile = options.args['--mobile']
   const explorerAlpha = !options.args['--web-explorer'] && !bevyWeb
 
   let hasSmartWearable = false
@@ -257,14 +258,13 @@ export async function main(options: Options) {
       }
       components.logger.log('\nPress CTRL+C to exit\n')
 
-      if (explorerAlpha) {
+      if (explorerAlpha && !isMobile) {
         const realm = new URL(sortedURLs[0]).origin
         await runExplorerAlpha(components, { cwd: workingDirectory, realm, baseCoords, isHub, args: options.args })
       }
 
       if (options.args['--mobile'] && lanUrl) {
         const deepLink = `decentraland://open?preview=${lanUrl}`
-        console.log({ deepLink })
         QRCode.toString(deepLink, { type: 'terminal', small: true }, (err, qr) => {
           if (!err) {
             components.logger.log(colors.bold('\nScan to preview on mobile: \n'))
