@@ -2237,6 +2237,9 @@ export namespace PBAudioSource {
 // @public (undocumented)
 export interface PBAudioStream {
     playing?: boolean | undefined;
+    spatial?: boolean | undefined;
+    spatialMaxDistance?: number | undefined;
+    spatialMinDistance?: number | undefined;
     url: string;
     volume?: number | undefined;
 }
@@ -3540,6 +3543,9 @@ export interface PBVideoPlayer {
     playbackRate?: number | undefined;
     playing?: boolean | undefined;
     position?: number | undefined;
+    spatial?: boolean | undefined;
+    spatialMaxDistance?: number | undefined;
+    spatialMinDistance?: number | undefined;
     src: string;
     volume?: number | undefined;
 }
@@ -3570,6 +3576,7 @@ export namespace PBVirtualCamera {
 
 // @public (undocumented)
 export interface PBVisibilityComponent {
+    propagateToChildren?: boolean | undefined;
     visible?: boolean | undefined;
 }
 

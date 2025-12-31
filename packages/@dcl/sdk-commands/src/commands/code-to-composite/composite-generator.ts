@@ -4,9 +4,9 @@ import {
   generateEntityNamesType,
   FileSystemInterface
 } from '@dcl/inspector'
+import { IEngine as IEngineInspector } from '@dcl/inspector/node_modules/@dcl/ecs'
 import { CliComponents } from '../../components'
 import { createFileSystemInterfaceFromFsComponent } from '../start/data-layer/fs'
-import { IEngine as IEngineEcs } from '@dcl/ecs'
 import { IEngine, Composite } from '@dcl/ecs/dist-cjs'
 import * as path from 'path'
 
@@ -32,7 +32,7 @@ export async function generateCompositeFiles(
   await ensureDirectoryExists(components, crdtFilePath)
   await ensureDirectoryExists(components, entityNamesFilePath)
 
-  const _engine = engine as any as IEngineEcs
+  const _engine = engine as any as IEngineInspector
 
   // generate composite JSON
   const composite = dumpEngineToComposite(_engine, 'json')

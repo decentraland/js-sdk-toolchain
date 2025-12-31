@@ -22,11 +22,12 @@ import {
   UiInput,
   UiInputResult,
   UiText,
-  UiTransform
+  UiTransform,
+  ComponentDefinition
 } from '@dcl/ecs'
 import { LIVEKIT_MAX_SIZE } from './server'
 
-export const NOT_SYNC_COMPONENTS = [
+export const NOT_SYNC_COMPONENTS: ComponentDefinition<unknown>[] = [
   VideoEvent,
   TweenState,
   AudioEvent,
@@ -44,6 +45,22 @@ export const NOT_SYNC_COMPONENTS = [
 ]
 
 export const NOT_SYNC_COMPONENTS_IDS = NOT_SYNC_COMPONENTS.map(($) => $.componentId)
+export const NOT_SYNC_COMPONENTS_NAMES: string[] = [
+  'asset-packs::Script' // ComponentName from: https://github.com/decentraland/asset-packs/blob/main/src/enums.ts
+]
+
+export function shouldSyncComponent(component: ComponentDefinition<unknown>): boolean {
+  return !(
+    NOT_SYNC_COMPONENTS_IDS.includes(component.componentId) ||
+    NOT_SYNC_COMPONENTS_NAMES.includes(component.componentName)
+  )
+}
+
+export function getDesyncedComponents(engine: IEngine): ComponentDefinition<unknown>[] {
+  return [...NOT_SYNC_COMPONENTS, ...NOT_SYNC_COMPONENTS_NAMES.map(($) => engine.getComponentOrNull($))].filter(
+    Boolean
+  ) as ComponentDefinition<unknown>[]
+}
 
 export function engineToCrdt(engine: IEngine): Uint8Array[] {
   const crdtBuffer = new ReadWriteByteBuffer()
@@ -52,7 +69,7 @@ export function engineToCrdt(engine: IEngine): Uint8Array[] {
   const chunks: Uint8Array[] = []
 
   for (const itComponentDefinition of engine.componentsIter()) {
-    if (NOT_SYNC_COMPONENTS_IDS.includes(itComponentDefinition.componentId)) {
+    if (!shouldSyncComponent(itComponentDefinition)) {
       continue
     }
 
