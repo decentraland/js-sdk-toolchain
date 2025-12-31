@@ -45,6 +45,9 @@ export type CompileOptions = {
 
 const MAX_STEP = 2
 
+// Keep only the last 10KB of output to prevent memory leaks in watch mode
+const MAX_OUTPUT_SIZE = 10 * 1024
+
 /**
  * Generate the entry-point code for a given original entry-point
  * @param entrypointPath - file to be imported as original entry point
@@ -188,6 +191,26 @@ export async function bundleSingleProject(components: BundleComponents, options:
           }
         }
       })(),
+      // Ensure @dcl/sdk is always resolved to workspace version to prevent version conflicts
+      '@dcl/sdk': (() => {
+        try {
+          // First try to resolve from project's node_modules
+          return path.dirname(require.resolve('@dcl/sdk/package.json', { paths: [options.workingDirectory] }))
+        } catch {
+          // Fallback to workspace @dcl/sdk
+          return path.dirname(require.resolve('@dcl/sdk/package.json', { paths: [__dirname] }))
+        }
+      })(),
+      // Ensure @dcl/ecs is always resolved to workspace version to prevent version conflicts
+      '@dcl/ecs': (() => {
+        try {
+          // First try to resolve from project's node_modules
+          return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [options.workingDirectory] }))
+        } catch {
+          // Fallback to workspace @dcl/ecs
+          return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [__dirname] }))
+        }
+      })(),
       // Resolve asset-packs from sdk-commands' dependencies (nested in @dcl/inspector)
       '@dcl/asset-packs': (() => {
         try {
@@ -197,7 +220,9 @@ export async function bundleSingleProject(components: BundleComponents, options:
           try {
             // Fallback: resolve from @dcl/inspector's node_modules
             const inspectorPath = require.resolve('@dcl/inspector/package.json', { paths: [__dirname] })
-            return path.dirname(require.resolve('@dcl/asset-packs/package.json', { paths: [path.dirname(inspectorPath)] }))
+            return path.dirname(
+              require.resolve('@dcl/asset-packs/package.json', { paths: [path.dirname(inspectorPath)] })
+            )
           } catch {
             // Last resort: try resolving from current directory
             return path.dirname(require.resolve('@dcl/asset-packs/package.json', { paths: [__dirname] }))
@@ -300,22 +325,43 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
   })
   const typeCheckerFuture = future<number>()
 
-  ts.on('close', (code) => {
-    /* istanbul ignore else */
-    if (code === 0) {
-      printProgressInfo(components.logger, `Type checking completed without errors`)
-    } else {
-      typeCheckerFuture.reject(
-        new CliError('BUNDLE_TYPE_CHECKER_FAILED', i18next.t('errors.bundle.type_checker_failed', { code }))
-      )
-      return
-    }
-
-    typeCheckerFuture.resolve(code)
+  let stdOutput = ''
+  ts.stdout?.on('data', (data: string) => {
+    stdOutput = (stdOutput + data.toString()).slice(-MAX_OUTPUT_SIZE)
   })
 
   ts.stdout?.pipe(process.stdout)
   ts.stderr?.pipe(process.stderr)
+
+  const cleanup = () => {
+    if (!ts.killed) ts.kill('SIGTERM')
+  }
+
+  process.on('SIGTERM', cleanup)
+  process.on('SIGINT', cleanup)
+  process.on('exit', cleanup)
+
+  ts.on('close', (code) => {
+    // Remove listeners after process exits to prevent memory leaks
+    process.off('SIGTERM', cleanup)
+    process.off('SIGINT', cleanup)
+    process.off('exit', cleanup)
+
+    /* istanbul ignore else */
+    if (code === 0) {
+      printProgressInfo(components.logger, `Type checking completed without errors`)
+      typeCheckerFuture.resolve(code)
+    } else {
+      typeCheckerFuture.reject(
+        new CliError(
+          'BUNDLE_TYPE_CHECKER_FAILED',
+          `${stdOutput.replace(/\x1b\[[0-9;]*m/g, '')}\n
+          ${i18next.t('errors.bundle.type_checker_failed', { code })}`
+        )
+      )
+    }
+    stdOutput = ''
+  })
 
   /* istanbul ignore if */
   if (options.watch) {
