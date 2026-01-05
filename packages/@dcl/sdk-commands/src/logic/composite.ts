@@ -7,7 +7,7 @@ import {
   EntityMappingMode,
   LastWriteWinElementSetComponentDefinition
 } from '@dcl/ecs/dist-cjs'
-import { EditorComponentNames, EditorComponentsTypes } from '@dcl/inspector'
+import { EditorComponentNames, EditorComponentsTypes, dumpEngineToCrdtCommands } from '@dcl/inspector'
 
 import { CliComponents } from '../components'
 import { printError } from './beautiful-logs'
@@ -55,8 +55,8 @@ export async function getAllComposites(
 
   const compositeLines: string[] = []
 
+  const engine = Engine()
   for (const compositeSource in composites) {
-    const engine = Engine()
     try {
       const composite = compositeProvider.getCompositeOrNull(compositeSource)!
       Composite.instance(engine, composite, compositeProvider, {
@@ -83,6 +83,11 @@ export async function getAllComposites(
       withErrors = true
     }
   }
+
+  // generate CRDT binary
+  const crdtFilePath = path.join(workingDirectory, 'main.crdt')
+  const crdtData = dumpEngineToCrdtCommands(engine as any)
+  await components.fs.writeFile(crdtFilePath, crdtData)
 
   return { compositeLines, watchFiles, scripts, withErrors }
 }
