@@ -264,11 +264,12 @@ export async function main(options: Options) {
       }
 
       if (options.args['--mobile'] && lanUrl) {
-        const deepLink = `decentraland://open?preview=${lanUrl}`
+        const deepLink = `decentraland://open?preview=${lanUrl}&position=${baseCoords}`
         QRCode.toString(deepLink, { type: 'terminal', small: true }, (err, qr) => {
           if (!err) {
             components.logger.log(colors.bold('\nScan to preview on mobile: \n'))
             components.logger.log(qr)
+            components.logger.log(`This QR redirect to ${deepLink} in your phone.`)
           }
         })
       }
