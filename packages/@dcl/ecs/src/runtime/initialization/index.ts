@@ -12,6 +12,7 @@ import { createVideoEventsSystem, VideoEventsSystem } from '../../systems/videoE
 import { TweenSystem, createTweenSystem } from '../../systems/tween'
 import { pointerEventColliderChecker } from '../../systems/pointer-event-collider-checker'
 import { createTriggerAreaEventsSystem, TriggerAreaEventsSystem } from '../../systems/triggerArea'
+import { createTimers, Timers } from '../helpers/timers'
 
 /**
  * @public
@@ -72,6 +73,45 @@ export { TweenSystem }
  */
 export const triggerAreaEventsSystem: TriggerAreaEventsSystem = /* @__PURE__ */ createTriggerAreaEventsSystem(engine)
 export { TriggerAreaEventsSystem }
+
+/**
+ * @public
+ * Timer utilities for delayed and repeated execution.
+ */
+export const timers: Timers = /* @__PURE__ */ createTimers(engine)
+export { Timers, createTimers }
+
+/**
+ * @public
+ * Delays the execution of a function by a given amount of milliseconds.
+ * @example
+ * const id = setTimeout(() => console.log('1 second passed'), 1000)
+ */
+export const setTimeout = timers.setTimeout
+
+/**
+ * @public
+ * Cancels a timeout previously established by setTimeout.
+ * @example
+ * clearTimeout(timeoutId)
+ */
+export const clearTimeout = timers.clearTimeout
+
+/**
+ * @public
+ * Repeatedly executes a function at specified intervals.
+ * @example
+ * const id = setInterval(() => console.log('every second'), 1000)
+ */
+export const setInterval = timers.setInterval
+
+/**
+ * @public
+ * Cancels an interval previously established by setInterval.
+ * @example
+ * clearInterval(intervalId)
+ */
+export const clearInterval = timers.clearInterval
 
 /**
  * Adds pointer event collider system only in DEV env
