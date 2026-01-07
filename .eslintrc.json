@@ -6,6 +6,7 @@
       "packages/@dcl/ecs/tsconfig.json",
       "packages/@dcl/sdk-commands/tsconfig.json",
       "packages/@dcl/sdk/tsconfig.json",
+      "packages/@dcl/sdk-server/tsconfig.json",
       "packages/@dcl/playground-assets/tsconfig.json",
       "packages/@dcl/react-ecs/tsconfig.json",
       "scripts/tsconfig.json",
@@ -28,12 +29,7 @@
   },
   "overrides": [
     {
-      "files": [
-        "packages/@dcl/ecs/**/*.ts",
-        "packages/@dcl/sdk/**/*.ts",
-        "scripts/**/*.ts",
-        "test/**/*.ts"
-      ],
+      "files": ["packages/@dcl/ecs/**/*.ts", "packages/@dcl/sdk/**/*.ts", "scripts/**/*.ts", "test/**/*.ts"],
       "rules": {
         "no-console": "off"
       }
