@@ -407,6 +407,12 @@ export const enum CameraType {
 // @public (undocumented)
 export type Children = ReactEcs.JSX.ReactNode;
 
+// @public
+export const clearInterval: (timerId: number) => void;
+
+// @public
+export const clearTimeout: (timerId: number) => void;
+
 // @public (undocumented)
 export const enum ColliderLayer {
     // (undocumented)
@@ -865,6 +871,9 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
 
 // @public (undocumented)
 export function createReactBasedUiSystem(engine: IEngine, pointerSystem: PointerEventsSystem): ReactBasedUiSystem;
+
+// @public
+export function createTimers(targetEngine: IEngine): Timers;
 
 // @public (undocumented)
 export function createTweenSystem(engine: IEngine): TweenSystem;
@@ -4152,6 +4161,16 @@ export namespace Schemas {
     }) => void;
 }
 
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+//
+// @public
+export const setInterval: (callback: TimerCallback, ms: number) => number;
+
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+//
+// @public
+export const setTimeout: (callback: TimerCallback, ms: number) => number;
+
 // @public (undocumented)
 export const SkyboxTime: LastWriteWinElementSetComponentDefinition<PBSkyboxTime>;
 
@@ -4375,6 +4394,29 @@ export const enum TextWrap {
     // (undocumented)
     TW_WRAP = 0
 }
+
+// Warning: (ae-missing-release-tag) "TimerCallback" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export type TimerCallback = () => void;
+
+// Warning: (ae-missing-release-tag) "TimerId" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export type TimerId = number;
+
+// Warning: (ae-missing-release-tag) "Timers" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export type Timers = {
+    setTimeout(callback: TimerCallback, ms: number): TimerId;
+    clearTimeout(timerId: TimerId): void;
+    setInterval(callback: TimerCallback, ms: number): TimerId;
+    clearInterval(timerId: TimerId): void;
+};
+
+// @public
+export const timers: Timers;
 
 // @public
 export const ToGammaSpace: number;
