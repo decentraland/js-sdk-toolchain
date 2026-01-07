@@ -4,6 +4,7 @@ packages/@dcl/js-runtime
 test/sdk/simple-scene
 packages/@dcl/ecs/dist/
 packages/@dcl/sdk/dist/
+packages/@dcl/sdk-server/dist/
 packages/@dcl/sdk/internal/
 packages/@dcl/sdk/testing/
 packages/@dcl/playground-assets/dist
