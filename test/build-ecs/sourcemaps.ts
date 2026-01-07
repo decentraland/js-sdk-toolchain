@@ -36,6 +36,11 @@ export function assertFilesExist(map: BasicSourceMapConsumer) {
     if (file.endsWith('entry-point.ts')) continue
     if (file.endsWith('sdk-scripts:all-scripts')) continue
 
+    // Skip files from node_modules - npm packages often don't ship source files
+    // but may include source maps pointing to them. The source content is still
+    // embedded in the source map (validated by hasContentsOfAllSources below).
+    if (file.includes('/node_modules/')) continue
+
     const fileExist = existsSync(fileURLToPath(file)) ? file : 'does not exit'
     expect(fileExist).toBe(file)
   }
