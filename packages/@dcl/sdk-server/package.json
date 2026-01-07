@@ -1,0 +1,24 @@
+{
+  "name": "@dcl/sdk-server",
+  "description": "Server-side utilities for Decentraland scenes",
+  "version": "7.0.0",
+  "author": "Decentraland",
+  "keywords": [],
+  "license": "Apache-2.0",
+  "main": "./index.js",
+  "repository": {
+    "url": "git+https://github.com/decentraland/js-sdk-toolchain",
+    "directory": "packages/@dcl/sdk-server"
+  },
+  "dependencies": {
+    "@dcl/js-runtime": "file:../js-runtime",
+    "@dcl/sdk": "file:../sdk"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "npm run build && tsc -p tsconfig.json --watch"
+  },
+  "types": "./index.d.ts",
+  "typings": "./index.d.ts"
+}
+
