@@ -1,12 +1,9 @@
 import { IEngine } from '../../engine/types'
 
-/** Unique identifier for a timeout/interval */
 export type TimerId = number
 
-/** Callback function type for timers */
 export type TimerCallback = () => void
 
-/** Timer system interface returned by createTimers */
 export type Timers = {
   /**
    * Delays the execution of a function by a given amount of milliseconds.
@@ -73,7 +70,6 @@ export type Timers = {
   clearInterval(timerId: TimerId): void
 }
 
-/** Internal state for timer management */
 type TimerData = {
   callback: TimerCallback
   accumulatedTime: number
@@ -105,9 +101,6 @@ export function createTimers(targetEngine: IEngine): Timers {
   let timerIdCounter = 0
 
   function system(dt: number) {
-    const deadTimers: TimerId[] = []
-    const callbacks: TimerCallback[] = []
-
     for (const [timerId, timerData] of timers) {
       timerData.accumulatedTime += 1000 * dt
 
@@ -115,23 +108,15 @@ export function createTimers(targetEngine: IEngine): Timers {
         continue
       }
 
-      callbacks.push(timerData.callback)
-
       if (timerData.recurrent) {
         // For intervals, subtract full interval periods to handle accumulated time
         const fullIntervals = Math.floor(timerData.accumulatedTime / timerData.interval)
         timerData.accumulatedTime -= fullIntervals * timerData.interval
       } else {
-        deadTimers.push(timerId)
+        timers.delete(timerId)
       }
-    }
 
-    for (const timerId of deadTimers) {
-      timers.delete(timerId)
-    }
-
-    for (const callback of callbacks) {
-      callback()
+      timerData.callback()
     }
   }
 

@@ -80,38 +80,10 @@ export { TriggerAreaEventsSystem }
  */
 export const timers: Timers = /* @__PURE__ */ createTimers(engine)
 export { Timers, createTimers }
-
-/**
- * @public
- * Delays the execution of a function by a given amount of milliseconds.
- * @example
- * const id = setTimeout(() => console.log('1 second passed'), 1000)
- */
-export const setTimeout = timers.setTimeout
-
-/**
- * @public
- * Cancels a timeout previously established by setTimeout.
- * @example
- * clearTimeout(timeoutId)
- */
-export const clearTimeout = timers.clearTimeout
-
-/**
- * @public
- * Repeatedly executes a function at specified intervals.
- * @example
- * const id = setInterval(() => console.log('every second'), 1000)
- */
-export const setInterval = timers.setInterval
-
-/**
- * @public
- * Cancels an interval previously established by setInterval.
- * @example
- * clearInterval(intervalId)
- */
-export const clearInterval = timers.clearInterval
+;(globalThis as any).setTimeout = (globalThis as any).setTimeout ?? timers.setTimeout
+;(globalThis as any).clearTimeout = (globalThis as any).clearTimeout ?? timers.clearTimeout
+;(globalThis as any).setInterval = (globalThis as any).setInterval ?? timers.setInterval
+;(globalThis as any).clearInterval = (globalThis as any).clearInterval ?? timers.clearInterval
 
 /**
  * Adds pointer event collider system only in DEV env
