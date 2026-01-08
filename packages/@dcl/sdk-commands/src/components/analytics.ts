@@ -86,6 +86,20 @@ export type Events = {
     code: number
     creatorAddress: string
   }
+  'Deploy Env Success': {
+    key: string
+  }
+  'Deploy Env Failure': {
+    key: string
+    status: number
+  }
+  'Deploy Env Delete Success': {
+    key: string
+  }
+  'Deploy Env Delete Failure': {
+    key: string
+    status: number
+  }
 }
 
 const noopAnalytics: IAnalyticsComponent = {
