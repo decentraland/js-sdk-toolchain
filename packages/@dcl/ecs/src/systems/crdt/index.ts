@@ -115,10 +115,22 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
 
           if (component) {
             // Handle authoritative messages differently - they force the state regardless of timestamp
-            const [conflictMessage, value] =
-              msg.type === CrdtMessageType.AUTHORITATIVE_PUT_COMPONENT
-                ? component.__forceUpdateFromCrdt(msg)
-                : component.updateFromCrdt(msg)
+            const tryUpdate = () => {
+              try {
+                return msg.type === CrdtMessageType.AUTHORITATIVE_PUT_COMPONENT
+                  ? component.__forceUpdateFromCrdt(msg)
+                  : component.updateFromCrdt(msg)
+              } catch (e) {
+                console.error('[receiveMessages] ERROR processing message', msg, e)
+                return null
+              }
+            }
+
+            const result = tryUpdate()
+            if (!result) continue
+
+            const [conflictMessage, value] = result
+
             if (!conflictMessage) {
               // Add message to broadcast queue when no conflict
               broadcastMessages.push(msg)
