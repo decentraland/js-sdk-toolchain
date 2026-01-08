@@ -156,6 +156,198 @@ export async function setupEcs6Endpoints(
     }
   })
 
+  const RUNTIME_ENV_FILE = 'server-env.json'
+
+  /**
+   * Loads environment variables from a .env file in the project directory.
+   * Returns a Map of key-value pairs.
+   */
+  async function loadEnvFile(): Promise<Map<string, string>> {
+    const envMap = new Map<string, string>()
+    const envPath = path.join(workspace.projects[0].workingDirectory, '.env')
+
+    try {
+      const exists = await components.fs.fileExists(envPath)
+      if (!exists) {
+        return envMap
+      }
+
+      const content = await components.fs.readFile(envPath, 'utf-8')
+      const lines = content.split('\n')
+
+      for (const line of lines) {
+        const trimmed = line.trim()
+        // Skip empty lines and comments
+        if (!trimmed || trimmed.startsWith('#')) {
+          continue
+        }
+
+        const equalIndex = trimmed.indexOf('=')
+        if (equalIndex > 0) {
+          const key = trimmed.slice(0, equalIndex).trim()
+          let value = trimmed.slice(equalIndex + 1).trim()
+
+          // Remove surrounding quotes if present
+          if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+            value = value.slice(1, -1)
+          }
+
+          envMap.set(key, value)
+        }
+      }
+    } catch (error) {
+      components.logger.error(`Failed to load .env file: ${error}`)
+    }
+
+    return envMap
+  }
+
+  /**
+   * Loads runtime environment variables from server-env.json.
+   * These are values set via PUT /env/:key endpoints.
+   */
+  async function loadRuntimeEnv(): Promise<Record<string, string>> {
+    const runtimePath = path.join(workspace.projects[0].workingDirectory, RUNTIME_ENV_FILE)
+
+    try {
+      const exists = await components.fs.fileExists(runtimePath)
+      if (!exists) {
+        return {}
+      }
+
+      const content = await components.fs.readFile(runtimePath, 'utf-8')
+      return JSON.parse(content) as Record<string, string>
+    } catch (error) {
+      components.logger.error(`Failed to load ${RUNTIME_ENV_FILE}: ${error}`)
+      return {}
+    }
+  }
+
+  /**
+   * Saves runtime environment variables to server-env.json.
+   */
+  async function saveRuntimeEnv(data: Record<string, string>): Promise<void> {
+    const runtimePath = path.join(workspace.projects[0].workingDirectory, RUNTIME_ENV_FILE)
+
+    try {
+      await components.fs.writeFile(runtimePath, JSON.stringify(data, null, 2))
+    } catch (error) {
+      components.logger.error(`Failed to save ${RUNTIME_ENV_FILE}: ${error}`)
+      throw error
+    }
+  }
+
+  /**
+   * Gets merged environment variables.
+   * Runtime values (server-env.json) override .env values.
+   */
+  async function getMergedEnv(): Promise<Map<string, string>> {
+    const envFile = await loadEnvFile()
+    const runtimeEnv = await loadRuntimeEnv()
+
+    // Runtime overrides .env
+    for (const [key, value] of Object.entries(runtimeEnv)) {
+      envFile.set(key, value)
+    }
+
+    return envFile
+  }
+
+  router.get('/env', async () => {
+    const envVars = await getMergedEnv()
+    const body = Array.from(envVars.entries()).map(([key, value]) => ({ key, value }))
+    return { body }
+  })
+
+  router.get('/env/:key', async (ctx, next) => {
+    const { key } = ctx.params
+    if (key) {
+      const envVars = await getMergedEnv()
+      const value = envVars.get(key)
+      if (value !== undefined) {
+        return { body: value }
+      }
+      return {
+        status: 404,
+        body: { error: `Environment variable '${key}' not found` }
+      }
+    }
+    return next()
+  })
+
+  router.put('/env/:key', async (ctx) => {
+    const { key } = ctx.params
+
+    if (!key) {
+      return {
+        status: 400,
+        body: { error: 'Key is required' }
+      }
+    }
+
+    try {
+      // Read the request body as text (the value)
+      const value = await ctx.request.text()
+
+      // Load current runtime env, update it, and save
+      const runtimeEnv = await loadRuntimeEnv()
+      runtimeEnv[key] = value
+      await saveRuntimeEnv(runtimeEnv)
+
+      components.logger.log(`[env] PUT ${key}=${value}`)
+
+      return {
+        status: 200,
+        body: { success: true, key, value }
+      }
+    } catch (error) {
+      components.logger.error(`Failed to set environment variable '${key}': ${error}`)
+      return {
+        status: 500,
+        body: { error: `Failed to set environment variable '${key}'` }
+      }
+    }
+  })
+
+  router.delete('/env/:key', async (ctx) => {
+    const { key } = ctx.params
+
+    if (!key) {
+      return {
+        status: 400,
+        body: { error: 'Key is required' }
+      }
+    }
+
+    try {
+      // Load current runtime env, delete the key, and save
+      const runtimeEnv = await loadRuntimeEnv()
+
+      if (!(key in runtimeEnv)) {
+        return {
+          status: 404,
+          body: { error: `Environment variable '${key}' not found in runtime storage` }
+        }
+      }
+
+      delete runtimeEnv[key]
+      await saveRuntimeEnv(runtimeEnv)
+
+      components.logger.log(`[env] DELETE ${key}`)
+
+      return {
+        status: 200,
+        body: { success: true, key }
+      }
+    } catch (error) {
+      components.logger.error(`Failed to delete environment variable '${key}': ${error}`)
+      return {
+        status: 500,
+        body: { error: `Failed to delete environment variable '${key}'` }
+      }
+    }
+  })
+
   serveStatic(components, workspace, router)
 
   // TODO: get workspace scenes & wearables...
