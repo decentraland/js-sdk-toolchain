@@ -16,7 +16,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "start": "npm run build && tsc -p tsconfig.json --watch"
+    "start": "tsc -p tsconfig.json --watch"
   },
   "types": "./index.d.ts",
   "typings": "./index.d.ts"
