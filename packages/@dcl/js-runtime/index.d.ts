@@ -88,4 +88,10 @@ declare var console: {
   error(message?: any, ...optionalParams: any[]): void
 }
 
+/// --- Timers ---
+declare function setTimeout(callback: () => void, ms: number): number
+declare function clearTimeout(timerId: number): void
+declare function setInterval(callback: () => void, ms: number): number
+declare function clearInterval(timerId: number): void
+
 declare const DEBUG: boolean

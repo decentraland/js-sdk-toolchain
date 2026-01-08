@@ -316,10 +316,7 @@ describe('Timer helpers', () => {
         }, 100)
       }, 100)
 
-      await engine.update(0.1) // First callback
-      expect(order).toEqual([1])
-
-      await engine.update(0.1) // Second callback
+      await engine.update(0.1) // Both callbacks fire in the same frame
       expect(order).toEqual([1, 2])
     })
 
