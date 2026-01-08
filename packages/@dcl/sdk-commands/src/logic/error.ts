@@ -63,6 +63,12 @@ export type CliErrorName =
   | 'CODE_TO_COMPOSITE_BUILD_FAILED'
   | 'CODE_TO_COMPOSITE_BUNDLE_NOT_FOUND'
   | 'CODE_TO_COMPOSITE_EXECUTION_FAILED'
+  // Deploy env errors
+  | 'DEPLOY_ENV_MISSING_KEY'
+  | 'DEPLOY_ENV_EMPTY_KEY'
+  | 'DEPLOY_ENV_INVALID_OPTIONS'
+  | 'DEPLOY_ENV_MISSING_ACTION'
+  | 'DEPLOY_ENV_MISSING_WORLD'
 
 export class CliError<T extends CliErrorName> extends Error {
   constructor(public name: T = 'CliError' as T, public message: string = '', public stack?: string) {
