@@ -121,6 +121,7 @@ deep-clean:
 		packages/@dcl/react-ecs/node_modules/ \
 		packages/@dcl/sdk/node_modules/ \
 		packages/@dcl/sdk-commands/node_modules \
+		packages/@dcl/sdk-server/node_modules \
 	make clean
 
 update-snapshots: export UPDATE_SNAPSHOTS=true
@@ -132,6 +133,7 @@ clean:
 	@rm -rf packages/@dcl/sdk/*.js packages/@dcl/sdk/*.d.ts packages/@dcl/sdk/internal packages/@dcl/sdk/testing
 	@rm -rf packages/@dcl/ecs/dist/ packages/@dcl/sdk/dist/
 	@rm -rf packages/@dcl/sdk-commands/dist
+	@rm -rf packages/@dcl/sdk-server/dist/
 	@rm -rf packages/@dcl/ecs/src/components/generated/ packages/@dcl/ecs/temp/
 	@rm -rf packages/@dcl/js-runtime/apis.d.ts
 	@rm -rf packages/@dcl/react-ecs/dist/ packages/@dcl/react-ecs/src/generated/ packages/@dcl/react-ecs/temp/

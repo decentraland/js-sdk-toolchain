@@ -11,7 +11,8 @@ import {
   PLAYGROUND_ASSETS_PATH,
   REACT_ECS,
   SDK_PATH,
-  SDK_COMMANDS_PATH
+  SDK_COMMANDS_PATH,
+  SDK_SERVER_PATH
 } from './common'
 import {
   copyFile,
@@ -56,6 +57,16 @@ flow('build-all', () => {
     it('check file exists', () => {
       ensureFileExists('apis.d.ts', JS_RUNTIME)
       ensureFileExists('index.d.ts', JS_RUNTIME)
+    })
+  })
+
+  flow('@dcl/sdk-server build', () => {
+    itExecutes('npm i --silent', SDK_SERVER_PATH)
+    itExecutes(`npm install --silent ${JS_RUNTIME}`, SDK_SERVER_PATH)
+    itExecutes('npm run build --silent', SDK_SERVER_PATH)
+    it('check file exists', () => {
+      ensureFileExists('dist/index.js', SDK_SERVER_PATH)
+      ensureFileExists('dist/index.d.ts', SDK_SERVER_PATH)
     })
   })
 
