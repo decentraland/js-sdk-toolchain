@@ -3,8 +3,7 @@ import { CrdtMessageProtocol, NetworkParent } from '@dcl/ecs'
 import { ReceiveMessage } from '@dcl/ecs/dist/runtime/types'
 import { ReceiveNetworkMessage } from '@dcl/ecs/dist/systems/crdt/types'
 import { ByteBuffer, ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
-import { PutComponentOperation } from '@dcl/ecs/dist/serialization/crdt/putComponent'
-import { AuthoritativePutComponentOperation } from '@dcl/ecs/dist/serialization/crdt/authoritativePutComponent'
+import { AuthoritativePutComponentOperation, PutComponentOperation } from '@dcl/ecs/dist/serialization/crdt'
 import {
   CrdtMessage,
   CrdtMessageBody,
