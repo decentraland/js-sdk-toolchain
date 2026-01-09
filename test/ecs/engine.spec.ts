@@ -1,6 +1,7 @@
 import {
   cyclicParentingChecker,
   getComponentEntityTree,
+  getEntitiesWithParent,
   MapResult,
   RESERVED_STATIC_ENTITIES
 } from '../../packages/@dcl/ecs/src'
@@ -671,6 +672,40 @@ describe('Engine tests', () => {
     expect(entitiesWithValidComponent).toEqual(expect.arrayContaining([e_A, e_A1, e_A2, e_A3, e_A1_1, e_A1_2, e_A1_3]))
     expect(entitiesWithInvalidComponent).toEqual([e_A])
     expect(noEntitiesWithComponent).toEqual([])
+  })
+
+  it('should return all direct children of a parent entity', () => {
+    const engine = Engine()
+    const Transform = components.Transform(engine)
+
+    // Create parent
+    const parent = engine.addEntity()
+    Transform.create(parent, {})
+
+    // Create direct children
+    const child1 = engine.addEntity()
+    const child2 = engine.addEntity()
+    const child3 = engine.addEntity()
+    Transform.create(child1, { parent })
+    Transform.create(child2, { parent })
+    Transform.create(child3, { parent })
+
+    // Create grandchild (should NOT be included)
+    const grandchild = engine.addEntity()
+    Transform.create(grandchild, { parent: child1 })
+
+    // Create unrelated entity
+    const unrelated = engine.addEntity()
+    Transform.create(unrelated, {})
+
+    const children = getEntitiesWithParent(engine, parent)
+
+    expect(children).toHaveLength(3)
+    expect(children).toContain(child1)
+    expect(children).toContain(child2)
+    expect(children).toContain(child3)
+    expect(children).not.toContain(grandchild)
+    expect(children).not.toContain(unrelated)
   })
 
   it('should throw an error if the system is a thenable', async () => {
