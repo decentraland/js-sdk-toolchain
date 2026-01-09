@@ -5,20 +5,20 @@
   "author": "Decentraland",
   "keywords": [],
   "license": "Apache-2.0",
-  "main": "./index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "repository": {
     "url": "git+https://github.com/decentraland/js-sdk-toolchain",
     "directory": "packages/@dcl/sdk-server"
   },
   "dependencies": {
-    "@dcl/js-runtime": "file:../js-runtime",
-    "@dcl/sdk": "file:../sdk"
+    "@dcl/js-runtime": "file:../js-runtime"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start": "tsc -p tsconfig.json --watch"
-  },
-  "types": "./index.d.ts",
-  "typings": "./index.d.ts"
+  }
 }
-
