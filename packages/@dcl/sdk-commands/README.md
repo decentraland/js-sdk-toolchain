@@ -103,3 +103,4 @@ make sync-deps
 For detailed documentation on using the CLI tools, visit:
 
 - [CLI Documentation](https://docs.decentraland.org/creator/development-guide/sdk7/cli/)
+asd
