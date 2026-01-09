@@ -89,6 +89,15 @@ export type AuthoritativePutComponentMessageBody = {
 };
 
 // @public (undocumented)
+export namespace AuthoritativePutComponentOperation {
+    const // (undocumented)
+    MESSAGE_HEADER_LENGTH = 16;
+    // (undocumented)
+    export function read(buf: ByteBuffer): AuthoritativePutComponentMessage | null;
+    export function write(entity: Entity, timestamp: number, componentId: number, data: Uint8Array, buf: ByteBuffer): void;
+}
+
+// @public (undocumented)
 export const enum AvatarAnchorPointType {
     // (undocumented)
     AAPT_HEAD = 4,
