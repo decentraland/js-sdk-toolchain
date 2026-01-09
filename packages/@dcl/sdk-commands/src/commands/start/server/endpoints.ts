@@ -17,6 +17,7 @@ import {
 import { getCatalystBaseUrl, getInstalledPackageVersion } from '../../../logic/config'
 import { Workspace } from '../../../logic/workspace-validations'
 import { ProjectUnion, WearableProject } from '../../../logic/project-validations'
+import { getMergedEnv, loadRuntimeEnv, saveRuntimeEnv } from './runtime-env'
 
 type LambdasWearable = Wearable & {
   baseUrl: string
@@ -156,105 +157,9 @@ export async function setupEcs6Endpoints(
     }
   })
 
-  const RUNTIME_ENV_FILE = 'server-env.json'
-
-  /**
-   * Loads environment variables from a .env file in the project directory.
-   * Returns a Map of key-value pairs.
-   */
-  async function loadEnvFile(): Promise<Map<string, string>> {
-    const envMap = new Map<string, string>()
-    const envPath = path.join(workspace.projects[0].workingDirectory, '.env')
-
-    try {
-      const exists = await components.fs.fileExists(envPath)
-      if (!exists) {
-        return envMap
-      }
-
-      const content = await components.fs.readFile(envPath, 'utf-8')
-      const lines = content.split('\n')
-
-      for (const line of lines) {
-        const trimmed = line.trim()
-        // Skip empty lines and comments
-        if (!trimmed || trimmed.startsWith('#')) {
-          continue
-        }
-
-        const equalIndex = trimmed.indexOf('=')
-        if (equalIndex > 0) {
-          const key = trimmed.slice(0, equalIndex).trim()
-          let value = trimmed.slice(equalIndex + 1).trim()
-
-          // Remove surrounding quotes if present
-          if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
-            value = value.slice(1, -1)
-          }
-
-          envMap.set(key, value)
-        }
-      }
-    } catch (error) {
-      components.logger.error(`Failed to load .env file: ${error}`)
-    }
-
-    return envMap
-  }
-
-  /**
-   * Loads runtime environment variables from server-env.json.
-   * These are values set via PUT /env/:key endpoints.
-   */
-  async function loadRuntimeEnv(): Promise<Record<string, string>> {
-    const runtimePath = path.join(workspace.projects[0].workingDirectory, RUNTIME_ENV_FILE)
-
-    try {
-      const exists = await components.fs.fileExists(runtimePath)
-      if (!exists) {
-        return {}
-      }
-
-      const content = await components.fs.readFile(runtimePath, 'utf-8')
-      return JSON.parse(content) as Record<string, string>
-    } catch (error) {
-      components.logger.error(`Failed to load ${RUNTIME_ENV_FILE}: ${error}`)
-      return {}
-    }
-  }
-
-  /**
-   * Saves runtime environment variables to server-env.json.
-   */
-  async function saveRuntimeEnv(data: Record<string, string>): Promise<void> {
-    const runtimePath = path.join(workspace.projects[0].workingDirectory, RUNTIME_ENV_FILE)
-
-    try {
-      await components.fs.writeFile(runtimePath, JSON.stringify(data, null, 2))
-    } catch (error) {
-      components.logger.error(`Failed to save ${RUNTIME_ENV_FILE}: ${error}`)
-      throw error
-    }
-  }
-
-  /**
-   * Gets merged environment variables.
-   * Runtime values (server-env.json) override .env values.
-   */
-  async function getMergedEnv(): Promise<Map<string, string>> {
-    const envFile = await loadEnvFile()
-    const runtimeEnv = await loadRuntimeEnv()
-
-    // Runtime overrides .env
-    for (const [key, value] of Object.entries(runtimeEnv)) {
-      envFile.set(key, value)
-    }
-
-    return envFile
-  }
-
   router.get('/env', async () => {
-    const envVars = await getMergedEnv()
+    const projectDirectory = workspace.projects[0].workingDirectory
+    const envVars = await getMergedEnv(components, projectDirectory)
     const body = Array.from(envVars.entries()).map(([key, value]) => ({ key, value }))
     return { body }
   })
@@ -262,7 +167,8 @@ export async function setupEcs6Endpoints(
   router.get('/env/:key', async (ctx, next) => {
     const { key } = ctx.params
     if (key) {
-      const envVars = await getMergedEnv()
+      const projectDirectory = workspace.projects[0].workingDirectory
+      const envVars = await getMergedEnv(components, projectDirectory)
       const value = envVars.get(key)
       if (value !== undefined) {
         return { body: value }
@@ -290,9 +196,9 @@ export async function setupEcs6Endpoints(
       const value = await ctx.request.text()
 
       // Load current runtime env, update it, and save
-      const runtimeEnv = await loadRuntimeEnv()
+      const runtimeEnv = await loadRuntimeEnv(components)
       runtimeEnv[key] = value
-      await saveRuntimeEnv(runtimeEnv)
+      await saveRuntimeEnv(components, runtimeEnv)
 
       components.logger.log(`[env] PUT ${key}=${value}`)
 
@@ -321,7 +227,7 @@ export async function setupEcs6Endpoints(
 
     try {
       // Load current runtime env, delete the key, and save
-      const runtimeEnv = await loadRuntimeEnv()
+      const runtimeEnv = await loadRuntimeEnv(components)
 
       if (!(key in runtimeEnv)) {
         return {
@@ -331,7 +237,7 @@ export async function setupEcs6Endpoints(
       }
 
       delete runtimeEnv[key]
-      await saveRuntimeEnv(runtimeEnv)
+      await saveRuntimeEnv(components, runtimeEnv)
 
       components.logger.log(`[env] DELETE ${key}`)
 
