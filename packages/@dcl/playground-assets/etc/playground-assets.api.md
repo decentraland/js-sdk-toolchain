@@ -866,6 +866,9 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
 // @public (undocumented)
 export function createReactBasedUiSystem(engine: IEngine, pointerSystem: PointerEventsSystem): ReactBasedUiSystem;
 
+// @public
+export function createTimers(targetEngine: IEngine): Timers;
+
 // @public (undocumented)
 export function createTweenSystem(engine: IEngine): TweenSystem;
 
@@ -1194,6 +1197,9 @@ export function getCompositeRootComponent(engine: IEngine): LastWriteWinElementS
 //
 // @public (undocumented)
 export const getDefaultOpts: (opts?: Partial<EventSystemOptions>) => EventSystemOptions;
+
+// @public
+export function getEntitiesWithParent(engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema'>, parent: Entity): Entity[];
 
 // Warning: (ae-missing-release-tag) "GlobalDirectionRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -4375,6 +4381,29 @@ export const enum TextWrap {
     // (undocumented)
     TW_WRAP = 0
 }
+
+// Warning: (ae-missing-release-tag) "TimerCallback" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type TimerCallback = () => void;
+
+// Warning: (ae-missing-release-tag) "TimerId" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type TimerId = number;
+
+// Warning: (ae-missing-release-tag) "Timers" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type Timers = {
+    setTimeout(callback: TimerCallback, ms: number): TimerId;
+    clearTimeout(timerId: TimerId): void;
+    setInterval(callback: TimerCallback, ms: number): TimerId;
+    clearInterval(timerId: TimerId): void;
+};
+
+// @public
+export const timers: Timers;
 
 // @public
 export const ToGammaSpace: number;
