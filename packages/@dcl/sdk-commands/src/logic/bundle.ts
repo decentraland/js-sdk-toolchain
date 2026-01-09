@@ -205,9 +205,19 @@ export async function bundleSingleProject(components: BundleComponents, options:
       '@dcl/ecs': (() => {
         try {
           // First try to resolve from project's node_modules
+          components.logger.info(
+            `ASD FIRST PATH: ${path.dirname(
+              require.resolve('@dcl/ecs/package.json', { paths: [options.workingDirectory] })
+            )}`
+          )
           return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [options.workingDirectory] }))
         } catch {
           // Fallback to workspace @dcl/ecs
+          components.logger.info(
+            `ASD SECOND PATH: ${path.dirname(
+              path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [__dirname] }))
+            )}`
+          )
           return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [__dirname] }))
         }
       })(),
