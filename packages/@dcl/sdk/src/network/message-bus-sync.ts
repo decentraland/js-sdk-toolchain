@@ -121,6 +121,7 @@ export function addSyncTransport(
   })
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, async (data, sender) => {
     requestingState = false
+    elapsedTimeSinceRequest = 0
     if (isServerAtom.getOrNull() || sender !== AUTH_SERVER_PEER_ID) return
     DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength / 1024, 'KB')
     transport.onmessage!(serverValidator.processClientMessages(data, sender))
@@ -183,20 +184,39 @@ export function addSyncTransport(
   })
 
   let requestingState = false
+  let elapsedTimeSinceRequest = 0
+  const STATE_REQUEST_RETRY_INTERVAL = 2.0 // seconds
+
   /**
    * Why we have to request the state if we have a server that can send us the state when we joined?
    * The thing is that when the server detects a new JOIN_PARTICIPANT on livekit room, it sends automatically the state to that peer.
    * But in unity, it takes more time, so that message is not being delivered to the client.
    * So instead, when we are finally connected to the room, we request the state, and then the server answers with the state :)
+   *
+   * If no response is received within 2 seconds, the request is automatically retried.
    */
   function requestState() {
     if (isServerAtom.getOrNull()) return
     if (RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom && !requestingState) {
       requestingState = true
+      elapsedTimeSinceRequest = 0
       DEBUG_NETWORK_MESSAGES() && console.log('Requesting state...')
       binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
     }
   }
+
+  // System to retry state request if no response is received within the retry interval
+  engine.addSystem((dt: number) => {
+    if (requestingState && !stateIsSyncronized) {
+      elapsedTimeSinceRequest += dt
+      if (elapsedTimeSinceRequest >= STATE_REQUEST_RETRY_INTERVAL) {
+        DEBUG_NETWORK_MESSAGES() && console.log('State request timed out, retrying...')
+        elapsedTimeSinceRequest = 0
+        requestingState = false
+        requestState()
+      }
+    }
+  })
 
   players.onLeaveScene((userId) => {
     DEBUG_NETWORK_MESSAGES() && console.log('[onLeaveScene]', userId)
