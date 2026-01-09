@@ -8,44 +8,9 @@ EVAL test/snapshots/production-bundles/append-value-crdt.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   OPCODES ~= 72k
   MALLOC_COUNT = 13716
   ALIVE_OBJS_DELTA ~= 3.07k
-=======
-=======
->>>>>>> f7184856 (fix tests)
-<<<<<<< HEAD
-  OPCODES ~= 67k
-  MALLOC_COUNT = 13193
-  ALIVE_OBJS_DELTA ~= 2.95k
-=======
-<<<<<<< HEAD
-  OPCODES ~= 66k
-  MALLOC_COUNT = 13070
-  ALIVE_OBJS_DELTA ~= 2.92k
-=======
-  OPCODES ~= 49k
-  MALLOC_COUNT = 12427
-  ALIVE_OBJS_DELTA ~= 2.74k
->>>>>>> 99d394c1 (update snapshots)
->>>>>>> c50aee8d (update snapshots)
-<<<<<<< HEAD
->>>>>>> 9f5e0f01 (update snapshots)
-=======
-=======
-  OPCODES ~= 49k
-  MALLOC_COUNT = 12772
-  ALIVE_OBJS_DELTA ~= 2.81k
->>>>>>> 126220f1 (fix tests)
->>>>>>> f7184856 (fix tests)
-=======
-  OPCODES ~= 50k
-  MALLOC_COUNT = 13081
-  ALIVE_OBJS_DELTA ~= 2.88k
->>>>>>> 4d3a904b (fix tests)
 CALL onStart()
   Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5,"tickNumber":0}
   OPCODES ~= 8k

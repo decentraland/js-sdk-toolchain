@@ -11,37 +11,6 @@ EVAL test/snapshots/production-bundles/cube.js
   OPCODES ~= 63k
   MALLOC_COUNT = 12836
   ALIVE_OBJS_DELTA ~= 2.84k
-=======
-=======
->>>>>>> f7184856 (fix tests)
-<<<<<<< HEAD
-  OPCODES ~= 57k
-<<<<<<< HEAD
-  MALLOC_COUNT = 12317
-  ALIVE_OBJS_DELTA ~= 2.72k
-=======
-  MALLOC_COUNT = 12194
-  ALIVE_OBJS_DELTA ~= 2.69k
-=======
-  OPCODES ~= 48k
-  MALLOC_COUNT = 11849
-  ALIVE_OBJS_DELTA ~= 2.59k
->>>>>>> 99d394c1 (update snapshots)
->>>>>>> c50aee8d (update snapshots)
-<<<<<<< HEAD
->>>>>>> 9f5e0f01 (update snapshots)
-=======
-=======
-  OPCODES ~= 48k
-  MALLOC_COUNT = 12161
-  ALIVE_OBJS_DELTA ~= 2.66k
->>>>>>> 126220f1 (fix tests)
->>>>>>> f7184856 (fix tests)
-=======
-  OPCODES ~= 49k
-  MALLOC_COUNT = 12455
-  ALIVE_OBJS_DELTA ~= 2.72k
->>>>>>> 4d3a904b (fix tests)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6

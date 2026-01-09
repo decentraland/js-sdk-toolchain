@@ -10,44 +10,9 @@ EVAL test/snapshots/development-bundles/two-way-crdt.test.js
   REQUIRE: ~system/Testing
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   OPCODES ~= 70k
   MALLOC_COUNT = 15263
   ALIVE_OBJS_DELTA ~= 3.08k
-=======
-=======
->>>>>>> f7184856 (fix tests)
-<<<<<<< HEAD
-  OPCODES ~= 65k
-  MALLOC_COUNT = 14698
-  ALIVE_OBJS_DELTA ~= 2.95k
-=======
-<<<<<<< HEAD
-  OPCODES ~= 64k
-  MALLOC_COUNT = 14564
-  ALIVE_OBJS_DELTA ~= 2.92k
-=======
-  OPCODES ~= 47k
-  MALLOC_COUNT = 13901
-  ALIVE_OBJS_DELTA ~= 2.75k
->>>>>>> 99d394c1 (update snapshots)
->>>>>>> c50aee8d (update snapshots)
-<<<<<<< HEAD
->>>>>>> 9f5e0f01 (update snapshots)
-=======
-=======
-  OPCODES ~= 48k
-  MALLOC_COUNT = 14241
-  ALIVE_OBJS_DELTA ~= 2.81k
->>>>>>> 126220f1 (fix tests)
->>>>>>> f7184856 (fix tests)
-=======
-  OPCODES ~= 48k
-  MALLOC_COUNT = 14567
-  ALIVE_OBJS_DELTA ~= 2.88k
->>>>>>> 4d3a904b (fix tests)
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=1 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
