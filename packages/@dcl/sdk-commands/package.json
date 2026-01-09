@@ -67,7 +67,7 @@
     "directory": "packages/@dcl/sdk-commands"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json && rm -rf dist/locales && cp -r src/locales dist/locales",
+    "build": "tsc -p tsconfig.json && rm -rf dist/locales && cp -r src/locales dist/locales && cp src/logic/*.template dist/logic/",
     "start": "tsc -p tsconfig.json --watch && rm -rf dist/locales && cp -r src/locales dist/locales",
     "postinstall": "node scripts/postinstall.js"
   },

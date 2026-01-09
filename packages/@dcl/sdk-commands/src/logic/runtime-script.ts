@@ -1,5 +1,13 @@
 import { IEngine, Entity, EntityState } from '@dcl/ecs/dist-cjs'
 
+declare global {
+  var __DCL_SCRIPT_INSTANCES__: Map<string, { instance: any; entity: Entity; path: string }>
+}
+
+if (!globalThis.__DCL_SCRIPT_INSTANCES__) {
+  globalThis.__DCL_SCRIPT_INSTANCES__ = new Map()
+}
+
 type ScriptLayout = {
   params?: Record<string, { value: unknown }>
 }
@@ -36,9 +44,71 @@ function entityIsRemoved(engine: IEngine, entity: Entity) {
 }
 
 /**
+ * Get a specific script instance by entity and script path.
+ * @param entity - The entity ID
+ * @param scriptPath - The script file path
+ * @returns The script instance or null if not found
+ */
+export function getScriptInstance(entity: Entity, scriptPath: string): any {
+  const key = `${entity}:${scriptPath}`
+  const entry = globalThis.__DCL_SCRIPT_INSTANCES__.get(key)
+  return entry?.instance || null
+}
+
+/**
+ * Get all instances of a specific script (across all entities).
+ * @param scriptPath - The script file path
+ * @returns Array of { entity, instance } objects
+ */
+export function getScriptInstancesByPath(scriptPath: string): Array<{ entity: Entity; instance: any }> {
+  const results: Array<{ entity: Entity; instance: any }> = []
+  for (const [_, value] of globalThis.__DCL_SCRIPT_INSTANCES__) {
+    if (value.path === scriptPath) {
+      results.push({ entity: value.entity, instance: value.instance })
+    }
+  }
+  return results
+}
+
+/**
+ * Get all script instances attached to a specific entity
+ * @param entity - The entity ID
+ * @returns Array of { path, instance } objects
+ */
+export function getAllScriptInstances(entity: Entity): Array<{ path: string; instance: any }> {
+  const results: Array<{ path: string; instance: any }> = []
+  for (const [_, value] of globalThis.__DCL_SCRIPT_INSTANCES__) {
+    if (value.entity === entity) {
+      results.push({ path: value.path, instance: value.instance })
+    }
+  }
+  return results
+}
+
+/**
+ * Call a method on a script instance (with safety checks).
+ * @param entity - The entity ID
+ * @param scriptPath - The script file path
+ * @param methodName - The method name to call
+ * @param args - Arguments to pass to the method
+ * @returns The method's return value or undefined if method not found
+ */
+export function callScriptMethod(entity: Entity, scriptPath: string, methodName: string, ...args: any[]): any {
+  const instance = getScriptInstance(entity, scriptPath)
+  if (instance && typeof instance[methodName] === 'function') {
+    return instance[methodName](...args)
+  }
+  console.error(`Method ${methodName} not found on script ${scriptPath} for entity ${entity}`)
+  return undefined
+}
+
+/**
  * Initializes and runs all scripts organized by priority.
  * Supports both functional-style scripts (with start/update functions) and class-based scripts.
  * Scripts are extracted at build time from composites.
+ *
+ * @internal This function is called automatically by the SDK entry point.
+ * Users should not call this function directly.
  *
  * @param engine - The ECS engine instance
  * @param scripts - Scripts with their modules, extracted at build time
@@ -64,6 +134,7 @@ export function runScripts(engine: IEngine, scripts: Script[]) {
       const src = script.path.split('/').slice(0, -1).join('/')
       const layout: ScriptLayout = script.layout ? JSON.parse(script.layout) : {}
       const params = Object.values(layout.params || {}).map((p) => p.value)
+      const registryKey = `${script.entity}:${script.path}`
 
       if (typeof module.start === 'function') {
         try {
@@ -78,6 +149,11 @@ export function runScripts(engine: IEngine, scripts: Script[]) {
           entity: script.entity,
           params
         })
+        globalThis.__DCL_SCRIPT_INSTANCES__.set(registryKey, {
+          instance: module,
+          entity: script.entity,
+          path: script.path
+        })
       } else {
         const ScriptClass = Object.values(module).find((exp) => typeof exp === 'function') as ScriptClass | undefined
         if (!ScriptClass) {
@@ -91,6 +167,11 @@ export function runScripts(engine: IEngine, scripts: Script[]) {
             instance.start()
           }
           classInstances.set(script.key, { instance, entity: script.entity })
+          globalThis.__DCL_SCRIPT_INSTANCES__.set(registryKey, {
+            instance: instance,
+            entity: script.entity,
+            path: script.path
+          })
         } catch (e: unknown) {
           console.error('[Script Error] ' + script.path + ' class initialization failed:', e)
           throw e

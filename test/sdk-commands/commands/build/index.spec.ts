@@ -121,16 +121,16 @@ describe('bundle script utilities', () => {
       mockFs = createFsComponent()
     })
 
-    it('should generate empty initializeScripts when no scripts are found', async () => {
+    it('should generate empty _initializeScripts when no scripts are found', async () => {
       const compositeData = null
 
       const result = await generateInitializeScriptsModule(mockFs, '/test/project', compositeData)
 
-      expect(result.contents).toBe(`export function initializeScripts(engine) {}`)
+      expect(result.contents).toBe(`export function _initializeScripts(engine) {}`)
       expect(result.watchFiles).toEqual([])
     })
 
-    it('should generate empty initializeScripts when compositeData has no scripts', async () => {
+    it('should generate empty _initializeScripts when compositeData has no scripts', async () => {
       const compositeData = {
         scripts: new Map(),
         compositeLines: [],
@@ -140,11 +140,11 @@ describe('bundle script utilities', () => {
 
       const result = await generateInitializeScriptsModule(mockFs, '/test/project', compositeData)
 
-      expect(result.contents).toBe(`export function initializeScripts(engine) {}`)
+      expect(result.contents).toBe(`export function _initializeScripts(engine) {}`)
       expect(result.watchFiles).toEqual([])
     })
 
-    it('should generate initializeScripts with runScripts call when scripts are found', async () => {
+    it('should generate _initializeScripts with runScripts call when scripts are found', async () => {
       const compositeData = {
         scripts: new Map([
           [
@@ -206,7 +206,7 @@ describe('bundle script utilities', () => {
       const result = await generateInitializeScriptsModule(mockFs, '/test/project', compositeData)
 
       expect(result.contents).toContain('function runScripts(')
-      expect(result.contents).toContain('export function initializeScripts(engine)')
+      expect(result.contents).toContain('export function _initializeScripts(engine)')
     })
 
     it('should import script only once when used by multiple entities', async () => {
