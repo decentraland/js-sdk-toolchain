@@ -46,7 +46,7 @@ export async function getDCLIgnorePatterns(components: Pick<CliComponents, 'fs'>
   ignored.push(...defaultDclIgnore)
 
   // by default many files need to be ignored
-  ignored.push('.*', 'node_modules', '**/*.ts', '**/*.tsx', 'node_modules/**')
+  ignored.push('.*', 'node_modules', '**/*.ts', '**/*.tsx', 'node_modules/**', '*.md')
 
   return Array.from(new Set(ignored))
 }
