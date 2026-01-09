@@ -41,7 +41,8 @@ export const EnvVar = {
     })
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch environment variables: ${response.status} ${response.statusText}`)
+      console.error(`Failed to fetch environment variables: ${response.status} ${response.statusText}`)
+      return ''
     }
 
     return response.body
@@ -70,7 +71,8 @@ export const EnvVar = {
     })
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch environment variable '${key}': ${response.status} ${response.statusText}`)
+      console.error(`Failed to fetch environment variable '${key}': ${response.status} ${response.statusText}`)
+      return ''
     }
 
     return response.body
