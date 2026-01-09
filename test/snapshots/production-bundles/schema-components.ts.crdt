@@ -13,6 +13,7 @@ EVAL test/snapshots/production-bundles/schema-components.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
 <<<<<<< HEAD
+<<<<<<< HEAD
   OPCODES ~= 71k
   MALLOC_COUNT = 14129
   ALIVE_OBJS_DELTA ~= 3.13k
@@ -20,6 +21,8 @@ EVAL test/snapshots/production-bundles/schema-components.js
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+>>>>>>> e6454fdd (fix tests)
   OPCODES ~= 66k
   MALLOC_COUNT = 12963
   ALIVE_OBJS_DELTA ~= 2.88k

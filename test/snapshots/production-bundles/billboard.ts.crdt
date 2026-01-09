@@ -13,6 +13,7 @@ EVAL test/snapshots/production-bundles/billboard.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
 <<<<<<< HEAD
+<<<<<<< HEAD
   OPCODES ~= 79k
   MALLOC_COUNT = 17421
   ALIVE_OBJS_DELTA ~= 3.80k
@@ -55,6 +56,11 @@ EVAL test/snapshots/production-bundles/billboard.js
   ALIVE_OBJS_DELTA ~= 3.38k
 >>>>>>> 4d3a904b (fix tests)
 >>>>>>> 327f7995 (fix tests)
+=======
+  OPCODES ~= 74k
+  MALLOC_COUNT = 15819
+  ALIVE_OBJS_DELTA ~= 3.47k
+>>>>>>> e6454fdd (fix tests)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 4
