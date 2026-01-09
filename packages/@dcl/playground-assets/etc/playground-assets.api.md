@@ -1198,6 +1198,9 @@ export function getCompositeRootComponent(engine: IEngine): LastWriteWinElementS
 // @public (undocumented)
 export const getDefaultOpts: (opts?: Partial<EventSystemOptions>) => EventSystemOptions;
 
+// @public
+export function getEntitiesWithParent(engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema'>, parent: Entity): Entity[];
+
 // Warning: (ae-missing-release-tag) "GlobalDirectionRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)

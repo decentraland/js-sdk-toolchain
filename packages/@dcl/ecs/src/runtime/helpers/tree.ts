@@ -91,3 +91,34 @@ export function removeEntityWithChildren(
     engine.removeEntity(ent)
   }
 }
+
+/**
+ * Get all entities that have the given entity as their parent
+ * @public
+ * @param engine - the engine running the entities
+ * @param parent - the parent entity to find children for
+ * @returns An array of entities that have the given parent
+ *
+ * Example:
+ * ```ts
+ * const children = getEntitiesWithParent(engine, myEntity)
+ * for (const child of children) {
+ *   // process each child entity
+ * }
+ * ```
+ */
+export function getEntitiesWithParent(
+  engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema'>,
+  parent: Entity
+): Entity[] {
+  const Transform = components.Transform(engine)
+  const entitiesWithParent: Entity[] = []
+
+  for (const [entity, transform] of engine.getEntitiesWith(Transform)) {
+    if (transform.parent === parent) {
+      entitiesWithParent.push(entity)
+    }
+  }
+
+  return entitiesWithParent
+}
