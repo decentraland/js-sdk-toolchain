@@ -263,6 +263,7 @@ jobs:
             pkg.dependencies['@dcl/ecs']='$ECS_S3_URL';\
             pkg.dependencies['@dcl/react-ecs']='$REACT_ECS_S3_URL';\
             pkg.dependencies['@dcl/sdk-commands']='$SDK_COMMANDS_S3_URL';\
+            pkg.dependencies['@dcl/sdk-server']='$SDK_SERVER_S3_URL';\
             require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));\
           "
         env:
@@ -271,6 +272,7 @@ jobs:
           ROLLUP_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_rollup.outputs.s3-bucket-key }}
           JS_RUNTIME_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_js_runtime.outputs.s3-bucket-key }}
           SDK_COMMANDS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_decentraland_sdk_commands.outputs.s3-bucket-key }}
+          SDK_SERVER_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_sdk_server.outputs.s3-bucket-key }}
 
       - name: verify dependency packages are published before @dcl/sdk
         if: ${{ !github.event.pull_request.number }}
