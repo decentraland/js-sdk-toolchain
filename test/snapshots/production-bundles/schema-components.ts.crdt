@@ -17,11 +17,14 @@ EVAL test/snapshots/production-bundles/schema-components.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
 <<<<<<< HEAD
+<<<<<<< HEAD
   REQUIRE: ~system/Runtime
   OPCODES ~= 79k
   MALLOC_COUNT = 14386
   ALIVE_OBJS_DELTA ~= 3.19k
 =======
+=======
+>>>>>>> 112f68c7 (fix tests)
 <<<<<<< HEAD
   OPCODES ~= 71k
   MALLOC_COUNT = 14129
@@ -30,6 +33,8 @@ EVAL test/snapshots/production-bundles/schema-components.js
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+>>>>>>> e6454fdd (fix tests)
   OPCODES ~= 66k
   MALLOC_COUNT = 12963
   ALIVE_OBJS_DELTA ~= 2.88k
