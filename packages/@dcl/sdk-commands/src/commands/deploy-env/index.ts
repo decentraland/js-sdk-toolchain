@@ -83,7 +83,7 @@ export function help(options: Options) {
 interface EnvVarInfo {
   key: string
   value?: string
-  world: string
+  world?: string
   action: 'set' | 'delete'
   targetUrl: string
   rootCID: string // The message to sign (for linker-dapp compatibility)
@@ -186,18 +186,27 @@ export async function main(options: Options) {
   // Validate workspace exists
   await getValidWorkspace(options.components, projectRoot)
 
+  // Determine target URL (default to production)
+  const baseURL = options.args['--target'] || STORAGE_SERVER_ORG
+  const isLocalTarget = baseURL.includes('localhost') || baseURL.includes('127.0.0.1')
+
   // Get scene.json to extract worldConfiguration.name
   const sceneJson = await getValidSceneJson(options.components, projectRoot)
 
+  // worldConfiguration.name is required for remote servers, optional for local development
   const worldName = sceneJson.worldConfiguration?.name
-  if (!worldName) {
+  if (!worldName && !isLocalTarget) {
     throw new CliError(
       'DEPLOY_ENV_MISSING_WORLD',
-      'scene.json must have worldConfiguration.name defined to deploy environment variables'
+      'scene.json must have worldConfiguration.name defined to deploy environment variables to remote servers'
     )
   }
 
-  logger.info(`World: ${worldName}`)
+  if (worldName) {
+    logger.info(`World: ${worldName}`)
+  } else {
+    logger.info(`Local development mode (no world configuration required)`)
+  }
 
   // Parse KEY from positional arguments
   const positionalArgs = options.args._.filter((arg) => !arg.startsWith('-'))
@@ -229,9 +238,6 @@ export async function main(options: Options) {
     )
   }
 
-  // Determine target URL (default to production)
-  const baseURL = options.args['--target'] || STORAGE_SERVER_ORG
-
   // Linker dApp options
   const linkerPort = options.args['--port']
   const openBrowser = !options.args['--no-browser']
@@ -250,8 +256,8 @@ export async function main(options: Options) {
     // DELETE operation
     logger.info(`Deleting environment variable '${key}' from ${baseURL}`)
 
-    // Include world in metadata for the server to identify the target
-    const metadata = JSON.stringify({ key, world: worldName })
+    // Include world in metadata for the server to identify the target (optional for local)
+    const metadata = JSON.stringify(worldName ? { key, world: worldName } : { key })
     const pathname = new URL(url).pathname
     const payload = ['delete', pathname, timestamp, metadata].join(':').toLowerCase()
 
@@ -310,8 +316,8 @@ export async function main(options: Options) {
     // PUT operation (set value)
     logger.info(`Deploying environment variable '${key}' to ${baseURL}`)
 
-    // Include world in metadata for the server to identify the target
-    const metadata = JSON.stringify({ key, value, world: worldName })
+    // Include world in metadata for the server to identify the target (optional for local)
+    const metadata = JSON.stringify(worldName ? { key, value, world: worldName } : { key, value })
     const pathname = new URL(url).pathname
     const payload = ['put', pathname, timestamp, metadata].join(':').toLowerCase()
 
