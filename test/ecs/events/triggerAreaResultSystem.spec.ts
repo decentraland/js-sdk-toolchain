@@ -140,5 +140,3 @@ describe('Trigger Area Events Helper System should', () => {
     expect(triggerAreaResultComponent.get(entity).size).toBe(0)
   })
 })
-
-
