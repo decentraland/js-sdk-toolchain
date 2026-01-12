@@ -1,16 +1,8 @@
 import { signedFetch } from '~system/SignedFetch'
-import { isServer } from '../network'
+import { assertIsServer } from './utils'
 import { getStorageServerUrl } from './storage-url'
 
-/**
- * Validates that the code is running on a server-side scene.
- * Throws an error if called from a client-side context.
- */
-function assertIsServer(): void {
-  if (!isServer()) {
-    throw new Error('EnvVar is only available on server-side scenes')
-  }
-}
+const MODULE_NAME = 'EnvVar'
 
 /**
  * EnvVar provides methods to fetch environment variables from the
@@ -26,7 +18,7 @@ export const EnvVar = {
    * @throws Error if the request fails
    */
   async all(): Promise<string> {
-    assertIsServer()
+    assertIsServer(MODULE_NAME)
 
     const baseUrl = await getStorageServerUrl()
     const url = `${baseUrl}/env`
@@ -51,12 +43,11 @@ export const EnvVar = {
    * Fetches a specific environment variable by key as plain text.
    *
    * @param key - The name of the environment variable to fetch
-   * @returns A promise that resolves to the plain text value of the environment variable
+   * @returns A promise that resolves to the plain text value, or empty string if not found
    * @throws Error if not running on a server-side scene
-   * @throws Error if the request fails
    */
   async get(key: string): Promise<string> {
-    assertIsServer()
+    assertIsServer(MODULE_NAME)
 
     const baseUrl = await getStorageServerUrl()
     const url = `${baseUrl}/env/${encodeURIComponent(key)}`
