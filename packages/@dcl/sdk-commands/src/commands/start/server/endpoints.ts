@@ -17,7 +17,14 @@ import {
 import { getCatalystBaseUrl, getInstalledPackageVersion } from '../../../logic/config'
 import { Workspace } from '../../../logic/workspace-validations'
 import { ProjectUnion, WearableProject } from '../../../logic/project-validations'
-import { getMergedEnv, loadRuntimeEnv, saveRuntimeEnv } from './runtime-env'
+import {
+  getMergedEnv,
+  setEnvValue,
+  deleteEnvValue,
+  getWorldValue,
+  setWorldValue,
+  deleteWorldValue
+} from './runtime-env'
 
 type LambdasWearable = Wearable & {
   baseUrl: string
@@ -192,13 +199,8 @@ export async function setupEcs6Endpoints(
     }
 
     try {
-      // Read the request body as text (the value)
       const value = await ctx.request.text()
-
-      // Load current runtime env, update it, and save
-      const runtimeEnv = await loadRuntimeEnv(components)
-      runtimeEnv[key] = value
-      await saveRuntimeEnv(components, runtimeEnv)
+      await setEnvValue(components, key, value)
 
       components.logger.log(`[env] PUT ${key}=${value}`)
 
@@ -226,18 +228,14 @@ export async function setupEcs6Endpoints(
     }
 
     try {
-      // Load current runtime env, delete the key, and save
-      const runtimeEnv = await loadRuntimeEnv(components)
+      const deleted = await deleteEnvValue(components, key)
 
-      if (!(key in runtimeEnv)) {
+      if (!deleted) {
         return {
           status: 404,
           body: { error: `Environment variable '${key}' not found in runtime storage` }
         }
       }
-
-      delete runtimeEnv[key]
-      await saveRuntimeEnv(components, runtimeEnv)
 
       components.logger.log(`[env] DELETE ${key}`)
 
@@ -250,6 +248,91 @@ export async function setupEcs6Endpoints(
       return {
         status: 500,
         body: { error: `Failed to delete environment variable '${key}'` }
+      }
+    }
+  })
+
+  // World Storage endpoints (/values/:key)
+  router.get('/values/:key', async (ctx, next) => {
+    const { key } = ctx.params
+    if (key) {
+      const value = await getWorldValue(components, key)
+      if (value !== undefined) {
+        return {
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(value)
+        }
+      }
+      return {
+        status: 404,
+        body: { error: `Storage key '${key}' not found` }
+      }
+    }
+    return next()
+  })
+
+  router.put('/values/:key', async (ctx) => {
+    const { key } = ctx.params
+
+    if (!key) {
+      return {
+        status: 400,
+        body: { error: 'Key is required' }
+      }
+    }
+
+    try {
+      const bodyText = await ctx.request.text()
+      const value = JSON.parse(bodyText)
+
+      await setWorldValue(components, key, value)
+
+      components.logger.log(`[storage] PUT ${key}`)
+
+      return {
+        status: 200,
+        body: { success: true, key }
+      }
+    } catch (error) {
+      components.logger.error(`Failed to set storage value '${key}': ${error}`)
+      return {
+        status: 500,
+        body: { error: `Failed to set storage value '${key}'` }
+      }
+    }
+  })
+
+  router.delete('/values/:key', async (ctx) => {
+    const { key } = ctx.params
+
+    if (!key) {
+      return {
+        status: 400,
+        body: { error: 'Key is required' }
+      }
+    }
+
+    try {
+      const deleted = await deleteWorldValue(components, key)
+
+      if (!deleted) {
+        return {
+          status: 404,
+          body: { error: `Storage key '${key}' not found` }
+        }
+      }
+
+      components.logger.log(`[storage] DELETE ${key}`)
+
+      return {
+        status: 200,
+        body: { success: true, key }
+      }
+    } catch (error) {
+      components.logger.error(`Failed to delete storage value '${key}': ${error}`)
+      return {
+        status: 500,
+        body: { error: `Failed to delete storage value '${key}'` }
       }
     }
   })
