@@ -81,6 +81,7 @@ export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
     this.isProcessingQueue = true
     const isServer = await this.isServerFuture
 
+    // Process messages one at a time
     while (this.messageQueue.length > 0) {
       const message = this.messageQueue.shift()
       if (!message) break

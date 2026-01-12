@@ -128,6 +128,14 @@ export function addSyncTransport(
     DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength / 1024, 'KB')
     transport.onmessage!(serverValidator.processClientMessages(data, sender))
     stateIsSyncronized = true
+
+    // IMPORTANT: Only mark room as ready AFTER state is synchronized
+    // This ensures comms is truly connected and working
+    const realmInfo = RealmInfo.getOrNull(engine.RootEntity)
+    if (realmInfo && checkRoomReady(realmInfo)) {
+      DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady] Marking room as ready after state sync')
+      isRoomReadyAtom.swap(true)
+    }
   })
 
   // received message from the network
@@ -190,19 +198,27 @@ export function addSyncTransport(
 
   // Asks for the REQ_CRDT_STATE when its connected to comms
   RealmInfo.onChange(engine.RootEntity, (value) => {
+    const isServer = isServerAtom.getOrNull()
+
     if (!value?.isConnectedSceneRoom) {
       DEBUG_NETWORK_MESSAGES() && console.log('Disconnected from comms')
       isRoomReadyAtom.swap(false)
+      if (!isServer) {
+        stateIsSyncronized = false
+      }
     }
 
     if (value?.isConnectedSceneRoom) {
       requestState()
-    }
 
-    // Update room ready state
-    const isReady = value ? checkRoomReady(value) : false
-    isRoomReadyAtom.swap(isReady)
-    DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady]', isReady)
+      // For servers, mark as ready immediately when connected
+      // (servers don't need to sync state from anyone)
+      if (isServer && checkRoomReady(value)) {
+        DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady] Server marking room as ready')
+        isRoomReadyAtom.swap(true)
+      }
+      // For clients, room will be marked ready after receiving CRDT state (above)
+    }
   })
 
   let requestingState = false
