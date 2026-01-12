@@ -46,8 +46,7 @@ export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
     // Subscribe to room readiness changes to flush queue
     this.isRoomReadyAtom.observable.add((isReady) => {
       if (isReady && this.messageQueue.length > 0) {
-        // TODO: fix this
-        // void this.flushMessageQueue()
+        void this.flushMessageQueue()
       }
     })
     // Listen for CUSTOM_EVENT messages
