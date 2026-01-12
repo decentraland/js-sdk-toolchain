@@ -24,6 +24,8 @@ packages/@dcl/playground-assets/etc/playground-assets.api.json
 test/snapshots/*/package-lock.json
 test/snapshots/**/*.js
 test/snapshots/**/*.js.map
+test/**/*.crdt
+!test/snapshots/**/*.crdt
 tmp
 scene
 test-scene
