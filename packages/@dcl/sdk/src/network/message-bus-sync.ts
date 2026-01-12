@@ -42,6 +42,8 @@ export function addSyncTransport(
   fetchProfile(myProfile!, getUserData)
 
   const isServerAtom = Atom<boolean>()
+  const isRoomReadyAtom = Atom<boolean>(false)
+
   void isServerFn({}).then(($: IsServerResponse) => {
     return isServerAtom.swap(!!$.isServer)
   })
@@ -103,7 +105,7 @@ export function addSyncTransport(
   })
 
   // Initialize Event Bus with registered schemas
-  const eventBus = new Room(engine, binaryMessageBus, isServerAtom)
+  const eventBus = new Room(engine, binaryMessageBus, isServerAtom, isRoomReadyAtom)
 
   // Set global eventBus instance
   setGlobalRoom(eventBus)
@@ -172,15 +174,35 @@ export function addSyncTransport(
     }
   })
 
+  // Helper to check room ready conditions
+  function checkRoomReady(realmInfo: ReturnType<typeof RealmInfo.getOrNull>): boolean {
+    if (!realmInfo) return false
+
+    try {
+      // Check if room instance exists
+      if (!eventBus) return false
+
+      return !!(realmInfo.commsAdapter && realmInfo.isConnectedSceneRoom && realmInfo.room)
+    } catch {
+      return false
+    }
+  }
+
   // Asks for the REQ_CRDT_STATE when its connected to comms
   RealmInfo.onChange(engine.RootEntity, (value) => {
     if (!value?.isConnectedSceneRoom) {
       DEBUG_NETWORK_MESSAGES() && console.log('Disconnected from comms')
+      isRoomReadyAtom.swap(false)
     }
 
     if (value?.isConnectedSceneRoom) {
       requestState()
     }
+
+    // Update room ready state
+    const isReady = value ? checkRoomReady(value) : false
+    isRoomReadyAtom.swap(isReady)
+    DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady]', isReady)
   })
 
   let requestingState = false
@@ -231,6 +253,7 @@ export function addSyncTransport(
     myProfile,
     isStateSyncronized,
     binaryMessageBus,
-    eventBus
+    eventBus,
+    isRoomReadyAtom
   }
 }
