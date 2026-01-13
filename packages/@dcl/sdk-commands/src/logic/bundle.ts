@@ -620,10 +620,13 @@ export async function generateInitializeScriptsModule(
   workingDirectory: string,
   compositeData: { scripts: Map<string, Script[]>; [key: string]: any } | null
 ): Promise<{ contents: string; watchFiles: string[] }> {
+  // prepare runtime code (always needed for helper functions)
+  const runtimeCode = await prepareRuntimeCode(fs)
+
   // default empty implementation if no scripts
   if (!compositeData || compositeData.scripts.size === 0) {
     return {
-      contents: `export function _initializeScripts(engine) {}`,
+      contents: generateVirtualModuleContent('', runtimeCode, '[]'),
       watchFiles: []
     }
   }
@@ -631,10 +634,7 @@ export async function generateInitializeScriptsModule(
   // Step 1: Collect all script data
   const scriptData = collectScriptData(compositeData, workingDirectory)
 
-  // Step 2: Prepare runtime code
-  const runtimeCode = await prepareRuntimeCode(fs)
-
-  // Step 3: Update TypeScript declarations
+  // Step 2: Update TypeScript declarations
   await updateSdkTypeDeclarations(
     fs,
     workingDirectory,
@@ -643,7 +643,7 @@ export async function generateInitializeScriptsModule(
     compositeData.scripts.size
   )
 
-  // Step 4: Generate virtual module content
+  // Step 3: Generate virtual module content
   const contents = generateVirtualModuleContent(
     scriptData.runtimeImports,
     runtimeCode,

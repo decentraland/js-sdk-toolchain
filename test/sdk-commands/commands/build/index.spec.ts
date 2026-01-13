@@ -121,16 +121,20 @@ describe('bundle script utilities', () => {
       mockFs = createFsComponent()
     })
 
-    it('should generate empty _initializeScripts when no scripts are found', async () => {
+    it('should generate _initializeScripts with empty array and helper exports when no scripts are found', async () => {
       const compositeData = null
 
       const result = await generateInitializeScriptsModule(mockFs, '/test/project', compositeData)
 
-      expect(result.contents).toBe(`export function _initializeScripts(engine) {}`)
+      expect(result.contents).toContain('function runScripts(')
+      expect(result.contents).toContain('export function _initializeScripts(engine)')
+      expect(result.contents).toContain('const scriptsArray = []')
+      expect(result.contents).toContain('return runScripts(engine, scriptsArray)')
+      expect(result.contents).toContain('export { getScriptInstance, getScriptInstancesByPath, getAllScriptInstances, callScriptMethod }')
       expect(result.watchFiles).toEqual([])
     })
 
-    it('should generate empty _initializeScripts when compositeData has no scripts', async () => {
+    it('should generate _initializeScripts with empty array and helper exports when compositeData has no scripts', async () => {
       const compositeData = {
         scripts: new Map(),
         compositeLines: [],
@@ -140,7 +144,11 @@ describe('bundle script utilities', () => {
 
       const result = await generateInitializeScriptsModule(mockFs, '/test/project', compositeData)
 
-      expect(result.contents).toBe(`export function _initializeScripts(engine) {}`)
+      expect(result.contents).toContain('function runScripts(')
+      expect(result.contents).toContain('export function _initializeScripts(engine)')
+      expect(result.contents).toContain('const scriptsArray = []')
+      expect(result.contents).toContain('return runScripts(engine, scriptsArray)')
+      expect(result.contents).toContain('export { getScriptInstance, getScriptInstancesByPath, getAllScriptInstances, callScriptMethod }')
       expect(result.watchFiles).toEqual([])
     })
 
@@ -228,24 +236,19 @@ describe('bundle script utilities', () => {
 
       const result = await generateInitializeScriptsModule(mockFs, '/test/project', compositeData)
 
-      // Count how many times the import statement appears
       const importStatement = "import * as script_src_scripts_movePlayer from './src/scripts/movePlayer.ts'"
       const importCount =
         (result.contents.match(new RegExp(importStatement.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length
 
-      // Should only import once
       expect(importCount).toBe(1)
 
-      // But should have 3 script instances in the array
       expect(result.contents.match(/"entity":512/g)?.length).toBe(1)
       expect(result.contents.match(/"entity":513/g)?.length).toBe(1)
       expect(result.contents.match(/"entity":514/g)?.length).toBe(1)
 
-      // All should reference the same module
       const moduleReferenceCount = (result.contents.match(/module: script_src_scripts_movePlayer/g) || []).length
       expect(moduleReferenceCount).toBe(3)
 
-      // Should only watch the file once
       expect(result.watchFiles).toEqual(['/test/project/src/scripts/movePlayer.ts'])
     })
   })
