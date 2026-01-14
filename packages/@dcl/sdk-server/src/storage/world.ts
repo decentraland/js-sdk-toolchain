@@ -41,13 +41,7 @@ export const createWorldStorage = (): IWorldStorage => {
       const baseUrl = await getStorageServerUrl()
       const url = `${baseUrl}/values/${encodeURIComponent(key)}`
 
-      const response = await signedFetch({
-        url,
-        init: {
-          method: 'GET',
-          headers: {}
-        }
-      })
+      const response = await signedFetch({ url })
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -76,7 +70,7 @@ export const createWorldStorage = (): IWorldStorage => {
         init: {
           method: 'PUT',
           headers: {
-            'Content-Type': 'application/json'
+            'content-type': 'application/json'
           },
           body: JSON.stringify(value)
         }
