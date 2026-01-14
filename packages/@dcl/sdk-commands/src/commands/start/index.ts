@@ -66,7 +66,8 @@ export const args = declareArgs({
   '--skip-auth-screen': Boolean,
   '--landscape-terrain-enabled': Boolean,
   '-n': Boolean,
-  '--bevy-web': Boolean
+  '--bevy-web': Boolean,
+  '--no-client': Boolean
 })
 
 export async function help(options: Options) {
@@ -119,9 +120,10 @@ export async function main(options: Options) {
   const withDataLayer = options.args['--data-layer']
   const enableWeb3 = options.args['--web3']
   const isHub = !!options.args['--hub']
-  const bevyWeb = !!options.args['--bevy-web']
-  const isMobile = options.args['--mobile']
-  const explorerAlpha = !options.args['--web-explorer'] && !bevyWeb
+  const skipClient = !!options.args['--no-client']
+  const bevyWeb = !!options.args['--bevy-web'] && !skipClient
+  const isMobile = options.args['--mobile'] && !skipClient
+  const explorerAlpha = !options.args['--web-explorer'] && !bevyWeb && !skipClient
 
   let hasSmartWearable = false
   const workspace = await getValidWorkspace(options.components, workingDirectory)
