@@ -158,6 +158,15 @@ type SingleProjectOptions = CompileOptions & {
 export async function bundleSingleProject(components: BundleComponents, options: SingleProjectOptions) {
   printProgressStep(components.logger, `Bundling file ${colors.bold(options.entrypoint)}`, 1, MAX_STEP)
   const editorScene = await isEditorScene(components, options.workingDirectory)
+  const sdkPackagePath = (() => {
+    try {
+      // First try to resolve from project's node_modules
+      return path.dirname(require.resolve('@dcl/sdk/package.json', { paths: [options.workingDirectory] }))
+    } catch {
+      // Fallback to workspace @dcl/sdk
+      return path.dirname(require.resolve('@dcl/sdk/package.json', { paths: [__dirname] }))
+    }
+  })()
   const context = await esbuild.context({
     bundle: true,
     platform: 'browser',
@@ -192,23 +201,20 @@ export async function bundleSingleProject(components: BundleComponents, options:
         }
       })(),
       // Ensure @dcl/sdk is always resolved to workspace version to prevent version conflicts
-      '@dcl/sdk': (() => {
-        try {
-          // First try to resolve from project's node_modules
-          return path.dirname(require.resolve('@dcl/sdk/package.json', { paths: [options.workingDirectory] }))
-        } catch {
-          // Fallback to workspace @dcl/sdk
-          return path.dirname(require.resolve('@dcl/sdk/package.json', { paths: [__dirname] }))
-        }
-      })(),
-      // Ensure @dcl/ecs is always resolved to workspace version to prevent version conflicts
+      '@dcl/sdk': sdkPackagePath,
+      // Resolve ecs from sdk dependencies (nested in @dcl/sdk)
       '@dcl/ecs': (() => {
         try {
-          // First try to resolve from project's node_modules
-          return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [options.workingDirectory] }))
+          // First try to resolve from project's @dcl/sdk node_modules
+          return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [sdkPackagePath] }))
         } catch {
-          // Fallback to workspace @dcl/ecs
-          return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [__dirname] }))
+          try {
+            // Fallback: try to resolve from project's node_modules
+            return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [options.workingDirectory] }))
+          } catch {
+            // Last resort: try resolving from current directory
+            return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [__dirname] }))
+          }
         }
       })(),
       // Resolve asset-packs from sdk-commands' dependencies (nested in @dcl/inspector)
