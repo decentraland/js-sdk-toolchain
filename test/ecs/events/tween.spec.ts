@@ -126,7 +126,7 @@ describe('Tween System', () => {
     TweenState.deleteFrom(entity)
     const tween = await mockTween(entity, Tween.Mode.Move({ start: Vector3.Forward(), end: Vector3.Down() }))
     const rotateTween = { ...tween, mode: Tween.Mode.Rotate({ start: Quaternion.Zero(), end: Quaternion.Identity() }) }
-    const scaleTween = { ...tween, node: Tween.Mode.Scale({ start: Vector3.Left(), end: Vector3.Right() }) }
+    const scaleTween = { ...tween, mode: Tween.Mode.Scale({ start: Vector3.Left(), end: Vector3.Right() }) }
     TweenSequence.createOrReplace(entity, {
       sequence: [rotateTween, scaleTween],
       loop: TweenLoop.TL_RESTART
@@ -156,6 +156,8 @@ describe('Tween System', () => {
   })
 
   it('should call the createTweenSystem twice with different engines and check if both tween systems were created', async () => {
+    // Wait to ensure different engine IDs (engine._id uses Date.now())
+    await new Promise((resolve) => setTimeout(resolve, 2))
     const engineAlt = Engine()
     const tweenSystemAlt = createTweenSystem(engineAlt)
     expect(tweenSystem).not.toBe(tweenSystemAlt)
@@ -170,8 +172,6 @@ describe('Tween System', () => {
   })
 
   describe('ENABLE_SDK_TWEEN_SEQUENCE flag behavior', () => {
-    const originalGlobalThis = globalThis as any
-
     afterEach(() => {
       // Clean up global flag after each test
       delete (globalThis as any).ENABLE_SDK_TWEEN_SEQUENCE
@@ -180,8 +180,10 @@ describe('Tween System', () => {
     it('should NOT execute YOYO tween sequence logic when flag is false', async () => {
       // Set flag to false BEFORE creating engine
       ;(globalThis as any).ENABLE_SDK_TWEEN_SEQUENCE = false
+      // Wait to ensure unique engine ID
+      await new Promise((resolve) => setTimeout(resolve, 2))
       const testEngine = Engine()
-      const testTweenSystem = createTweenSystem(testEngine)
+      const _testTweenSystem = createTweenSystem(testEngine)
       const testTween = components.Tween(testEngine)
       const testTweenState = components.TweenState(testEngine)
       const testTweenSequence = components.TweenSequence(testEngine)
@@ -212,15 +214,17 @@ describe('Tween System', () => {
     it('should execute YOYO tween sequence logic when flag is true', async () => {
       // Set flag to true BEFORE creating engine
       ;(globalThis as any).ENABLE_SDK_TWEEN_SEQUENCE = true
+      // Wait to ensure unique engine ID
+      await new Promise((resolve) => setTimeout(resolve, 2))
       const testEngine = Engine()
-      const testTweenSystem = createTweenSystem(testEngine)
+      const _testTweenSystem = createTweenSystem(testEngine)
       const testTween = components.Tween(testEngine)
       const testTweenState = components.TweenState(testEngine)
       const testTweenSequence = components.TweenSequence(testEngine)
       const testEntity = testEngine.addEntity()
 
       // Create a tween with YOYO sequence
-      const originalTween = testTween.createOrReplace(testEntity, {
+      testTween.createOrReplace(testEntity, {
         duration: 1000,
         easingFunction: EasingFunction.EF_EASEBACK,
         mode: testTween.Mode.Move({ start: Vector3.create(0, 0, 0), end: Vector3.create(1, 1, 1) })
@@ -248,15 +252,17 @@ describe('Tween System', () => {
       delete (globalThis as any).ENABLE_SDK_TWEEN_SEQUENCE
       // Verify it's actually undefined
       expect((globalThis as any).ENABLE_SDK_TWEEN_SEQUENCE).toBeUndefined()
+      // Wait to ensure unique engine ID
+      await new Promise((resolve) => setTimeout(resolve, 2))
       const testEngine = Engine()
-      const testTweenSystem = createTweenSystem(testEngine)
+      const _testTweenSystem = createTweenSystem(testEngine)
       const testTween = components.Tween(testEngine)
       const testTweenState = components.TweenState(testEngine)
       const testTweenSequence = components.TweenSequence(testEngine)
       const testEntity = testEngine.addEntity()
 
       // Create a tween with YOYO sequence
-      const originalTween = testTween.createOrReplace(testEntity, {
+      testTween.createOrReplace(testEntity, {
         duration: 1000,
         easingFunction: EasingFunction.EF_EASEBACK,
         mode: testTween.Mode.Move({ start: Vector3.create(0, 0, 0), end: Vector3.create(1, 1, 1) })
