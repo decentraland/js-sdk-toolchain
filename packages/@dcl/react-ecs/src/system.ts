@@ -44,27 +44,26 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
   const additionalRenderers = new Map<Entity, UiComponent>()
 
   function ReactBasedUiSystem() {
-    // Check for entity-based cleanup
-    const entitiesToRemove: Entity[] = []
-    for (const [entity] of additionalRenderers) {
-      if (engine.getEntityState(entity) === EntityState.Removed) {
-        entitiesToRemove.push(entity)
-      }
-    }
-    for (const entity of entitiesToRemove) {
-      additionalRenderers.delete(entity)
-    }
-
     const components: React.ReactNode[] = []
 
-    // Add main UI component if set
+    // Add main UI component
     if (uiComponent) {
       components.push(React.createElement(uiComponent as any, { key: '__main__' }))
     }
 
-    // Add all additional UI renderers
+    const entitiesToRemove: Entity[] = []
     for (const [entity, component] of additionalRenderers) {
-      components.push(React.createElement(component as any, { key: `__entity_${entity}__` }))
+      // Check for entity-based cleanup
+      if (engine.getEntityState(entity) === EntityState.Removed) {
+        entitiesToRemove.push(entity)
+      } else {
+        components.push(React.createElement(component as any, { key: `__entity_${entity}__` }))
+      }
+    }
+
+    // Entity-based cleanup
+    for (const entity of entitiesToRemove) {
+      additionalRenderers.delete(entity)
     }
 
     // Always update the renderer - pass null when empty to clear the UI
