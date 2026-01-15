@@ -1,4 +1,4 @@
-import type { IEngine, PointerEventsSystem } from '@dcl/ecs'
+import type { Entity, EntityState, IEngine, PointerEventsSystem } from '@dcl/ecs'
 import React from 'react'
 import type { ReactEcs } from './react-ecs'
 import { createReconciler } from './reconciler'
@@ -9,18 +9,52 @@ import { createReconciler } from './reconciler'
 export type UiComponent = () => ReactEcs.JSX.ReactNode
 
 /**
+ * Options for addUiRenderer
+ * @public
+ */
+export interface AddUiRendererOptions {
+  /**
+   * Optional unique identifier for the UI renderer.
+   * If not provided, a unique key will be auto-generated and returned.
+   */
+  key?: string
+  /**
+   * Optional entity to associate with this UI renderer.
+   * When the entity is removed, the UI renderer will be automatically cleaned up.
+   * Defaults to engine.RootEntity if not provided.
+   */
+  entity?: Entity
+}
+
+/**
  * @public
  */
 export interface ReactBasedUiSystem {
   destroy(): void
   setUiRenderer(ui: UiComponent): void
   /**
-   * Add a UI renderer with a unique key. If a renderer with the same key already exists, it will be replaced.
-   * This allows dynamically adding UI structures that are rendered alongside the main UI set via setUiRenderer.
-   * @param key - Unique identifier for the UI renderer
+   * Add a UI renderer that will be rendered alongside the main UI set via setUiRenderer.
+   *
    * @param ui - The UI component to render
+   * @param options - Optional configuration:
+   *   - key: Unique identifier. If not provided, one will be auto-generated.
+   *   - entity: Entity to associate with this renderer. When the entity is removed,
+   *             the UI renderer is automatically cleaned up. Defaults to engine.RootEntity.
+   * @returns The key (provided or auto-generated) that can be used with removeUiRenderer
+   *
+   * @example
+   * ```ts
+   * // Simple usage - auto-generated key, bound to RootEntity
+   * const key = ReactEcsRenderer.addUiRenderer(myUi)
+   *
+   * // With explicit key
+   * ReactEcsRenderer.addUiRenderer(myUi, { key: 'notifications' })
+   *
+   * // Smart item with auto-cleanup when entity is removed
+   * ReactEcsRenderer.addUiRenderer(myUi, { entity: smartItemEntity })
+   * ```
    */
-  addUiRenderer(key: string, ui: UiComponent): void
+  addUiRenderer(ui: UiComponent, options?: AddUiRendererOptions): string
   /**
    * Remove a previously added UI renderer by its key.
    * @param key - The unique identifier of the UI renderer to remove
@@ -28,15 +62,34 @@ export interface ReactBasedUiSystem {
   removeUiRenderer(key: string): void
 }
 
+// Entity state enum value for removed entities
+const ENTITY_STATE_REMOVED = 2 // EntityState.Removed
+
 /**
  * @public
  */
 export function createReactBasedUiSystem(engine: IEngine, pointerSystem: PointerEventsSystem): ReactBasedUiSystem {
   const renderer = createReconciler(engine, pointerSystem)
   let uiComponent: UiComponent | undefined = undefined
-  const additionalRenderers = new Map<string, UiComponent>()
+  const additionalRenderers = new Map<string, { ui: UiComponent; entity: Entity }>()
+  let keyCounter = 0
+
+  function generateKey(): string {
+    return `__ui_renderer_${keyCounter++}`
+  }
 
   function ReactBasedUiSystem() {
+    // Check for entity-based cleanup - collect keys first to avoid modifying map during iteration
+    const keysToRemove: string[] = []
+    for (const [key, { entity }] of additionalRenderers) {
+      if (engine.getEntityState(entity) === ENTITY_STATE_REMOVED) {
+        keysToRemove.push(key)
+      }
+    }
+    for (const key of keysToRemove) {
+      additionalRenderers.delete(key)
+    }
+
     const components: React.ReactNode[] = []
 
     // Add main UI component if set
@@ -45,13 +98,15 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
     }
 
     // Add all additional UI renderers
-    for (const [key, component] of additionalRenderers) {
-      components.push(React.createElement(component as any, { key }))
+    for (const [key, { ui }] of additionalRenderers) {
+      components.push(React.createElement(ui as any, { key }))
     }
 
-    // Only render if there are components to render
+    // Always update the renderer - pass null when empty to clear the UI
     if (components.length > 0) {
       renderer.update(React.createElement(React.Fragment, null, ...components))
+    } else {
+      renderer.update(null)
     }
   }
 
@@ -67,8 +122,11 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
     setUiRenderer(ui: UiComponent) {
       uiComponent = ui
     },
-    addUiRenderer(key: string, ui: UiComponent) {
-      additionalRenderers.set(key, ui)
+    addUiRenderer(ui: UiComponent, options?: AddUiRendererOptions): string {
+      const key = options?.key ?? generateKey()
+      const entity = options?.entity ?? engine.RootEntity
+      additionalRenderers.set(key, { ui, entity })
+      return key
     },
     removeUiRenderer(key: string) {
       additionalRenderers.delete(key)
