@@ -1,7 +1,7 @@
 SCENE_COMPILED_JS_SIZE_PROD=502.2k bytes
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
-  OPCODES ~= 0k
+  OPCODES ~= 77k
   MALLOC_COUNT = 1005
   ALIVE_OBJS_DELTA ~= 0.19k
 EVAL test/snapshots/development-bundles/static-scene.test.js

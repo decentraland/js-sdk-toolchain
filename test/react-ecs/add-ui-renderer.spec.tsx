@@ -7,32 +7,38 @@ describe('addUiRenderer', () => {
   it('should allow adding multiple UI renderers dynamically', async () => {
     const { engine, uiRenderer } = setupEngine()
     const UiTransform = components.UiTransform(engine)
-    const entityIndex = engine.addEntity() as number
+
+    // Create entities to associate with UI renderers
+    const ownerEntity1 = engine.addEntity()
+    const ownerEntity2 = engine.addEntity()
 
     // First UI renderer
     const ui1 = () => <UiEntity uiTransform={{ width: 100 }} />
     // Second UI renderer
     const ui2 = () => <UiEntity uiTransform={{ width: 200 }} />
 
-    const entity1 = (entityIndex + 1) as Entity
-    const entity2 = (entityIndex + 2) as Entity
-
     // Add first renderer
-    uiRenderer.addUiRenderer('ui1', ui1)
+    uiRenderer.addUiRenderer(ownerEntity1, ui1)
     await engine.update(1)
-    expect(UiTransform.getOrNull(entity1)?.width).toBe(100)
+
+    let uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
+    expect(uiEntities.length).toBe(1)
+    expect(UiTransform.get(uiEntities[0][0]).width).toBe(100)
 
     // Add second renderer
-    uiRenderer.addUiRenderer('ui2', ui2)
+    uiRenderer.addUiRenderer(ownerEntity2, ui2)
     await engine.update(1)
-    expect(UiTransform.getOrNull(entity1)?.width).toBe(100)
-    expect(UiTransform.getOrNull(entity2)?.width).toBe(200)
+
+    uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
+    expect(uiEntities.length).toBe(2)
 
     // Remove first renderer
-    uiRenderer.removeUiRenderer('ui1')
+    uiRenderer.removeUiRenderer(ownerEntity1)
     await engine.update(1)
-    expect(UiTransform.getOrNull(entity1)).toBe(null)
-    expect(UiTransform.getOrNull(entity2)?.width).toBe(200)
+
+    uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
+    expect(uiEntities.length).toBe(1)
+    expect(UiTransform.get(uiEntities[0][0]).width).toBe(200)
 
     // Clean up
     uiRenderer.destroy()
@@ -41,82 +47,164 @@ describe('addUiRenderer', () => {
   it('should work alongside setUiRenderer', async () => {
     const { engine, uiRenderer } = setupEngine()
     const UiTransform = components.UiTransform(engine)
-    const entityIndex = engine.addEntity() as number
+
+    // Create entity to associate with additional UI renderer
+    const additionalEntity = engine.addEntity()
 
     // Main UI renderer via setUiRenderer
     const mainUi = () => <UiEntity uiTransform={{ width: 50 }} />
     // Additional UI renderer via addUiRenderer
     const additionalUi = () => <UiEntity uiTransform={{ width: 150 }} />
 
-    const mainEntity = (entityIndex + 1) as Entity
-    const additionalEntity = (entityIndex + 2) as Entity
-
     // Set main renderer
     uiRenderer.setUiRenderer(mainUi)
     await engine.update(1)
-    expect(UiTransform.getOrNull(mainEntity)?.width).toBe(50)
+
+    let uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
+    expect(uiEntities.length).toBe(1)
+    expect(UiTransform.get(uiEntities[0][0]).width).toBe(50)
 
     // Add additional renderer
-    uiRenderer.addUiRenderer('additional', additionalUi)
+    uiRenderer.addUiRenderer(additionalEntity, additionalUi)
     await engine.update(1)
-    expect(UiTransform.getOrNull(mainEntity)?.width).toBe(50)
-    expect(UiTransform.getOrNull(additionalEntity)?.width).toBe(150)
+
+    uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
+    expect(uiEntities.length).toBe(2)
 
     // Remove additional renderer, main should still work
-    uiRenderer.removeUiRenderer('additional')
+    uiRenderer.removeUiRenderer(additionalEntity)
     await engine.update(1)
-    expect(UiTransform.getOrNull(mainEntity)?.width).toBe(50)
-    expect(UiTransform.getOrNull(additionalEntity)).toBe(null)
+
+    uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
+    expect(uiEntities.length).toBe(1)
+    expect(UiTransform.get(uiEntities[0][0]).width).toBe(50)
 
     // Clean up
     uiRenderer.destroy()
   })
 
-  it('should replace existing renderer with the same key', async () => {
+  it('should replace existing renderer when same entity is used', async () => {
     const { engine, uiRenderer } = setupEngine()
     const UiTransform = components.UiTransform(engine)
+
+    // Create entity to associate with UI renderer
+    const ownerEntity = engine.addEntity()
 
     const ui1 = () => <UiEntity uiTransform={{ width: 100 }} />
     const ui1Updated = () => <UiEntity uiTransform={{ width: 300 }} />
 
     // Add first version
-    uiRenderer.addUiRenderer('myUi', ui1)
+    uiRenderer.addUiRenderer(ownerEntity, ui1)
     await engine.update(1)
 
-    // Get all entities with UiTransform and find the one we created
-    let entities = Array.from(engine.getEntitiesWith(UiTransform))
-    expect(entities.length).toBe(1)
-    expect(UiTransform.get(entities[0][0]).width).toBe(100)
+    let uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
+    expect(uiEntities.length).toBe(1)
+    expect(UiTransform.get(uiEntities[0][0]).width).toBe(100)
 
-    // Replace with updated version using the same key
-    uiRenderer.addUiRenderer('myUi', ui1Updated)
+    // Replace with updated version using the same entity
+    uiRenderer.addUiRenderer(ownerEntity, ui1Updated)
     await engine.update(1)
 
-    // Should still have exactly one entity, with updated width
-    entities = Array.from(engine.getEntitiesWith(UiTransform))
-    expect(entities.length).toBe(1)
-    expect(UiTransform.get(entities[0][0]).width).toBe(300)
+    // Should still have exactly one UI entity, with updated width
+    uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
+    expect(uiEntities.length).toBe(1)
+    expect(UiTransform.get(uiEntities[0][0]).width).toBe(300)
 
     // Clean up
     uiRenderer.destroy()
   })
 
-  it('should do nothing when removing non-existent key', async () => {
+  it('should do nothing when removing non-tracked entity', async () => {
     const { engine, uiRenderer } = setupEngine()
     const UiTransform = components.UiTransform(engine)
-    const entityIndex = engine.addEntity() as number
+
+    // Create entities
+    const ownerEntity = engine.addEntity()
+    const unrelatedEntity = engine.addEntity()
 
     const ui1 = () => <UiEntity uiTransform={{ width: 100 }} />
-    const entity1 = (entityIndex + 1) as Entity
 
-    uiRenderer.addUiRenderer('ui1', ui1)
+    uiRenderer.addUiRenderer(ownerEntity, ui1)
     await engine.update(1)
-    expect(UiTransform.getOrNull(entity1)?.width).toBe(100)
 
-    // Remove non-existent key should not affect anything
-    uiRenderer.removeUiRenderer('nonExistentKey')
+    let uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
+    expect(uiEntities.length).toBe(1)
+    expect(UiTransform.get(uiEntities[0][0]).width).toBe(100)
+
+    // Remove unrelated entity should not affect anything
+    uiRenderer.removeUiRenderer(unrelatedEntity)
     await engine.update(1)
-    expect(UiTransform.getOrNull(entity1)?.width).toBe(100)
+
+    uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
+    expect(uiEntities.length).toBe(1)
+    expect(UiTransform.get(uiEntities[0][0]).width).toBe(100)
+
+    // Clean up
+    uiRenderer.destroy()
+  })
+
+  it('should auto-cleanup UI when associated entity is removed from engine', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+
+    // Create entity to associate with UI renderer (e.g., a smart item entity)
+    const smartItemEntity = engine.addEntity()
+
+    const ui1 = () => <UiEntity uiTransform={{ width: 100 }} />
+
+    // Add UI renderer associated with the smart item entity
+    uiRenderer.addUiRenderer(smartItemEntity, ui1)
+    await engine.update(1)
+
+    // UI should be rendered
+    let uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
+    expect(uiEntities.length).toBe(1)
+
+    // Remove the smart item entity from the engine
+    engine.removeEntity(smartItemEntity)
+    // First update: entity removal is processed at the end of this cycle
+    await engine.update(1)
+    // Second update: UI system detects the removed entity and cleans up
+    await engine.update(1)
+
+    // UI should be automatically cleaned up
+    uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
+    expect(uiEntities.length).toBe(0)
+
+    // Clean up
+    uiRenderer.destroy()
+  })
+
+  it('should cleanup multiple UIs when their entities are removed', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+
+    // Create multiple entities
+    const entity1 = engine.addEntity()
+    const entity2 = engine.addEntity()
+    const entity3 = engine.addEntity()
+
+    const ui1 = () => <UiEntity uiTransform={{ width: 100 }} />
+    const ui2 = () => <UiEntity uiTransform={{ width: 200 }} />
+    const ui3 = () => <UiEntity uiTransform={{ width: 300 }} />
+
+    // Add all UI renderers
+    uiRenderer.addUiRenderer(entity1, ui1)
+    uiRenderer.addUiRenderer(entity2, ui2)
+    uiRenderer.addUiRenderer(entity3, ui3)
+    await engine.update(1)
+
+    let uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
+    expect(uiEntities.length).toBe(3)
+
+    // Remove entity2 from the engine
+    engine.removeEntity(entity2)
+    await engine.update(1)
+    await engine.update(1)
+
+    // Only entity2's UI should be cleaned up
+    uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
+    expect(uiEntities.length).toBe(2)
 
     // Clean up
     uiRenderer.destroy()

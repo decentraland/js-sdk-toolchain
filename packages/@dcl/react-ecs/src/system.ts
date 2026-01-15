@@ -1,4 +1,4 @@
-import type { IEngine, PointerEventsSystem } from '@dcl/ecs'
+import { EntityState, type Entity, type IEngine, type PointerEventsSystem } from '@dcl/ecs'
 import React from 'react'
 import type { ReactEcs } from './react-ecs'
 import { createReconciler } from './reconciler'
@@ -15,17 +15,24 @@ export interface ReactBasedUiSystem {
   destroy(): void
   setUiRenderer(ui: UiComponent): void
   /**
-   * Add a UI renderer with a unique key. If a renderer with the same key already exists, it will be replaced.
-   * This allows dynamically adding UI structures that are rendered alongside the main UI set via setUiRenderer.
-   * @param key - Unique identifier for the UI renderer
+   * Add a UI renderer associated with an entity. The UI will be automatically cleaned up
+   * when the entity is removed from the engine.
+   *
+   * If a renderer is already associated with the given entity, it will be replaced.
+   *
+   * This allows dynamically adding UI Renderers that are rendered alongside the main
+   * UI set via setUiRenderer().
+   *
+   * @param entity - The entity to associate with this UI renderer. When the entity is removed,
+   *                 the UI renderer is automatically cleaned up.
    * @param ui - The UI component to render
    */
-  addUiRenderer(key: string, ui: UiComponent): void
+  addUiRenderer(entity: Entity, ui: UiComponent): void
   /**
-   * Remove a previously added UI renderer by its key.
-   * @param key - The unique identifier of the UI renderer to remove
+   * Remove a previously added UI renderer by its associated entity.
+   * @param entity - The entity whose UI renderer should be removed
    */
-  removeUiRenderer(key: string): void
+  removeUiRenderer(entity: Entity): void
 }
 
 /**
@@ -34,9 +41,20 @@ export interface ReactBasedUiSystem {
 export function createReactBasedUiSystem(engine: IEngine, pointerSystem: PointerEventsSystem): ReactBasedUiSystem {
   const renderer = createReconciler(engine, pointerSystem)
   let uiComponent: UiComponent | undefined = undefined
-  const additionalRenderers = new Map<string, UiComponent>()
+  const additionalRenderers = new Map<Entity, UiComponent>()
 
   function ReactBasedUiSystem() {
+    // Check for entity-based cleanup
+    const entitiesToRemove: Entity[] = []
+    for (const [entity] of additionalRenderers) {
+      if (engine.getEntityState(entity) === EntityState.Removed) {
+        entitiesToRemove.push(entity)
+      }
+    }
+    for (const entity of entitiesToRemove) {
+      additionalRenderers.delete(entity)
+    }
+
     const components: React.ReactNode[] = []
 
     // Add main UI component if set
@@ -45,13 +63,15 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
     }
 
     // Add all additional UI renderers
-    for (const [key, component] of additionalRenderers) {
-      components.push(React.createElement(component as any, { key }))
+    for (const [entity, component] of additionalRenderers) {
+      components.push(React.createElement(component as any, { key: `__entity_${entity}__` }))
     }
 
-    // Only render if there are components to render
+    // Always update the renderer - pass null when empty to clear the UI
     if (components.length > 0) {
       renderer.update(React.createElement(React.Fragment, null, ...components))
+    } else {
+      renderer.update(null)
     }
   }
 
@@ -67,11 +87,11 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
     setUiRenderer(ui: UiComponent) {
       uiComponent = ui
     },
-    addUiRenderer(key: string, ui: UiComponent) {
-      additionalRenderers.set(key, ui)
+    addUiRenderer(entity: Entity, ui: UiComponent) {
+      additionalRenderers.set(entity, ui)
     },
-    removeUiRenderer(key: string) {
-      additionalRenderers.delete(key)
+    removeUiRenderer(entity: Entity) {
+      additionalRenderers.delete(entity)
     }
   }
 }

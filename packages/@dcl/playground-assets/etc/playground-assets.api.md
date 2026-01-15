@@ -3877,10 +3877,10 @@ export type RaycastSystemOptions = {
 
 // @public (undocumented)
 export interface ReactBasedUiSystem {
-    addUiRenderer(key: string, ui: UiComponent): void;
+    addUiRenderer(entity: Entity, ui: UiComponent): void;
     // (undocumented)
     destroy(): void;
-    removeUiRenderer(key: string): void;
+    removeUiRenderer(entity: Entity): void;
     // (undocumented)
     setUiRenderer(ui: UiComponent): void;
 }
