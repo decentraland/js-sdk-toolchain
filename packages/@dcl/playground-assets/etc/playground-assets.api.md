@@ -51,6 +51,12 @@ export namespace AppendValueOperation {
 export function areConnected(parcels: Coords[]): boolean;
 
 // @public (undocumented)
+export const AssetLoad: LastWriteWinElementSetComponentDefinition<PBAssetLoad>;
+
+// @public (undocumented)
+export const AssetLoadLoadingState: LastWriteWinElementSetComponentDefinition<PBAssetLoadLoadingState>;
+
+// @public (undocumented)
 export const AudioEvent: GrowOnlyValueSetComponentDefinition<PBAudioEvent>;
 
 // Warning: (ae-missing-release-tag) "AudioSource" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -622,6 +628,8 @@ export type ComponentDefinition<T> = LastWriteWinElementSetComponentDefinition<T
 // @public
 export const componentDefinitionByName: {
     "core::Animator": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAnimator>>;
+    "core::AssetLoad": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAssetLoad>>;
+    "core::AssetLoadLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAssetLoadLoadingState>>;
     "core::AudioEvent": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAudioEvent>>;
     "core::AudioSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioSource>>;
     "core::AudioStream": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioStream>>;
@@ -2142,6 +2150,36 @@ export namespace PBAnimator {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAnimator;
     // (undocumented)
     export function encode(message: PBAnimator, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAssetLoad {
+    // (undocumented)
+    assets: string[];
+}
+
+// @public (undocumented)
+export namespace PBAssetLoad {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAssetLoad;
+    // (undocumented)
+    export function encode(message: PBAssetLoad, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAssetLoadLoadingState {
+    // (undocumented)
+    asset: string;
+    // (undocumented)
+    currentState: LoadingState;
+}
+
+// @public (undocumented)
+export namespace PBAssetLoadLoadingState {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAssetLoadLoadingState;
+    // (undocumented)
+    export function encode(message: PBAssetLoadLoadingState, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
