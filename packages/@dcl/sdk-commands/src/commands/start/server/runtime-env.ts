@@ -3,8 +3,80 @@ import { CliComponents } from '../../../components'
 
 // Find the sdk-commands package root by resolving its package.json
 const SDK_COMMANDS_ROOT = path.dirname(require.resolve('@dcl/sdk-commands/package.json'))
-const RUNTIME_ENV_DIR = path.join(SDK_COMMANDS_ROOT, '.runtime-data')
-const RUNTIME_ENV_FILE = 'server-env.json'
+const RUNTIME_DATA_DIR = path.join(SDK_COMMANDS_ROOT, '.runtime-data')
+const SERVER_STORAGE_FILE = 'server-storage.json'
+
+/**
+ * Structure for all server-side storage data.
+ * Stored in sdk-commands package directory (hidden from users).
+ */
+export interface ServerStorage {
+  env: Record<string, string>
+  world: Record<string, unknown>
+}
+
+const DEFAULT_STORAGE: ServerStorage = {
+  env: {},
+  world: {}
+}
+
+/**
+ * Ensures the runtime data directory exists.
+ */
+async function ensureRuntimeDir(components: Pick<CliComponents, 'fs' | 'logger'>): Promise<void> {
+  try {
+    const exists = await components.fs.directoryExists(RUNTIME_DATA_DIR)
+    if (!exists) {
+      await components.fs.mkdir(RUNTIME_DATA_DIR, { recursive: true })
+    }
+  } catch (error) {
+    components.logger.error(`Failed to create runtime data directory: ${error}`)
+  }
+}
+
+/**
+ * Loads all server-side storage data from server-storage.json.
+ */
+export async function loadServerStorage(components: Pick<CliComponents, 'fs' | 'logger'>): Promise<ServerStorage> {
+  const storagePath = path.join(RUNTIME_DATA_DIR, SERVER_STORAGE_FILE)
+
+  try {
+    const exists = await components.fs.fileExists(storagePath)
+    if (!exists) {
+      return { ...DEFAULT_STORAGE }
+    }
+
+    const content = await components.fs.readFile(storagePath, 'utf-8')
+    const parsed = JSON.parse(content) as Partial<ServerStorage>
+
+    // Merge with defaults to ensure all keys exist
+    return {
+      env: parsed.env ?? {},
+      world: parsed.world ?? {}
+    }
+  } catch (error) {
+    components.logger.error(`Failed to load ${SERVER_STORAGE_FILE}: ${error}`)
+    return { ...DEFAULT_STORAGE }
+  }
+}
+
+/**
+ * Saves all server-side storage data to server-storage.json.
+ */
+export async function saveServerStorage(
+  components: Pick<CliComponents, 'fs' | 'logger'>,
+  data: ServerStorage
+): Promise<void> {
+  await ensureRuntimeDir(components)
+  const storagePath = path.join(RUNTIME_DATA_DIR, SERVER_STORAGE_FILE)
+
+  try {
+    await components.fs.writeFile(storagePath, JSON.stringify(data, null, 2))
+  } catch (error) {
+    components.logger.error(`Failed to save ${SERVER_STORAGE_FILE}: ${error}`)
+    throw error
+  }
+}
 
 /**
  * Loads environment variables from a .env file in the project directory.
@@ -54,72 +126,23 @@ export async function loadEnvFile(
 }
 
 /**
- * Ensures the runtime data directory exists.
+ * Gets runtime environment variables.
  */
-async function ensureRuntimeDir(components: Pick<CliComponents, 'fs' | 'logger'>): Promise<void> {
-  try {
-    const exists = await components.fs.directoryExists(RUNTIME_ENV_DIR)
-    if (!exists) {
-      await components.fs.mkdir(RUNTIME_ENV_DIR, { recursive: true })
-    }
-  } catch (error) {
-    components.logger.error(`Failed to create runtime data directory: ${error}`)
-  }
-}
-
-/**
- * Loads runtime environment variables from server-env.json.
- * These are values set via PUT /env/:key endpoints.
- * Stored in sdk-commands package directory (hidden from users).
- */
-export async function loadRuntimeEnv(
-  components: Pick<CliComponents, 'fs' | 'logger'>
-): Promise<Record<string, string>> {
-  const runtimePath = path.join(RUNTIME_ENV_DIR, RUNTIME_ENV_FILE)
-
-  try {
-    const exists = await components.fs.fileExists(runtimePath)
-    if (!exists) {
-      return {}
-    }
-
-    const content = await components.fs.readFile(runtimePath, 'utf-8')
-    return JSON.parse(content) as Record<string, string>
-  } catch (error) {
-    components.logger.error(`Failed to load ${RUNTIME_ENV_FILE}: ${error}`)
-    return {}
-  }
-}
-
-/**
- * Saves runtime environment variables to server-env.json.
- * Stored in sdk-commands package directory (hidden from users).
- */
-export async function saveRuntimeEnv(
-  components: Pick<CliComponents, 'fs' | 'logger'>,
-  data: Record<string, string>
-): Promise<void> {
-  await ensureRuntimeDir(components)
-  const runtimePath = path.join(RUNTIME_ENV_DIR, RUNTIME_ENV_FILE)
-
-  try {
-    await components.fs.writeFile(runtimePath, JSON.stringify(data, null, 2))
-  } catch (error) {
-    components.logger.error(`Failed to save ${RUNTIME_ENV_FILE}: ${error}`)
-    throw error
-  }
+export async function getEnvStorage(components: Pick<CliComponents, 'fs' | 'logger'>): Promise<Record<string, string>> {
+  const storage = await loadServerStorage(components)
+  return storage.env
 }
 
 /**
  * Gets merged environment variables.
- * Runtime values (server-env.json) override .env values.
+ * Runtime values (from server-storage.json) override .env values.
  */
 export async function getMergedEnv(
   components: Pick<CliComponents, 'fs' | 'logger'>,
   projectDirectory: string
 ): Promise<Map<string, string>> {
   const envFile = await loadEnvFile(components, projectDirectory)
-  const runtimeEnv = await loadRuntimeEnv(components)
+  const runtimeEnv = await getEnvStorage(components)
 
   // Runtime overrides .env
   for (const [key, value] of Object.entries(runtimeEnv)) {
@@ -127,4 +150,82 @@ export async function getMergedEnv(
   }
 
   return envFile
+}
+
+/**
+ * Sets a runtime environment variable.
+ */
+export async function setEnvValue(
+  components: Pick<CliComponents, 'fs' | 'logger'>,
+  key: string,
+  value: string
+): Promise<void> {
+  const storage = await loadServerStorage(components)
+  storage.env[key] = value
+  await saveServerStorage(components, storage)
+}
+
+/**
+ * Deletes a runtime environment variable.
+ * Returns true if key existed and was deleted, false otherwise.
+ */
+export async function deleteEnvValue(components: Pick<CliComponents, 'fs' | 'logger'>, key: string): Promise<boolean> {
+  const storage = await loadServerStorage(components)
+  if (!(key in storage.env)) {
+    return false
+  }
+  delete storage.env[key]
+  await saveServerStorage(components, storage)
+  return true
+}
+
+/**
+ * Gets all world storage data.
+ */
+export async function getWorldStorage(
+  components: Pick<CliComponents, 'fs' | 'logger'>
+): Promise<Record<string, unknown>> {
+  const storage = await loadServerStorage(components)
+  return storage.world
+}
+
+/**
+ * Gets a value from world storage.
+ */
+export async function getWorldValue(
+  components: Pick<CliComponents, 'fs' | 'logger'>,
+  key: string
+): Promise<unknown | undefined> {
+  const storage = await loadServerStorage(components)
+  return storage.world[key]
+}
+
+/**
+ * Sets a value in world storage.
+ */
+export async function setWorldValue(
+  components: Pick<CliComponents, 'fs' | 'logger'>,
+  key: string,
+  value: unknown
+): Promise<void> {
+  const storage = await loadServerStorage(components)
+  storage.world[key] = value
+  await saveServerStorage(components, storage)
+}
+
+/**
+ * Deletes a value from world storage.
+ * Returns true if key existed and was deleted, false otherwise.
+ */
+export async function deleteWorldValue(
+  components: Pick<CliComponents, 'fs' | 'logger'>,
+  key: string
+): Promise<boolean> {
+  const storage = await loadServerStorage(components)
+  if (!(key in storage.world)) {
+    return false
+  }
+  delete storage.world[key]
+  await saveServerStorage(components, storage)
+  return true
 }
