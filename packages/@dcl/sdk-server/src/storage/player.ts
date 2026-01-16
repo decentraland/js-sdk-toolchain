@@ -58,7 +58,7 @@ export const createPlayerStorage = (): IPlayerStorage => {
       }
 
       try {
-        return JSON.parse(response.body) as T
+        return JSON.parse(response.body).value as T
       } catch {
         console.error(`Failed to parse player storage value '${key}' for '${address}' as JSON`)
         return null
