@@ -52,7 +52,7 @@ export const createWorldStorage = (): IWorldStorage => {
       }
 
       try {
-        return JSON.parse(response.body) as T
+        return JSON.parse(response.body).value as T
       } catch {
         console.error(`Failed to parse storage value '${key}' as JSON`)
         return null
