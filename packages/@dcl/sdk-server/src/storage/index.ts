@@ -1,7 +1,9 @@
 import { createWorldStorage, IWorldStorage } from './world'
+import { createPlayerStorage, IPlayerStorage } from './player'
 
 // Re-export interfaces
 export { IWorldStorage } from './world'
+export { IPlayerStorage } from './player'
 
 /**
  * Storage interface containing all storage scopes.
@@ -9,6 +11,8 @@ export { IWorldStorage } from './world'
 export interface IStorage {
   /** World-scoped storage for key-value pairs */
   world: IWorldStorage
+  /** Player-scoped storage for key-value pairs */
+  player: IPlayerStorage
 }
 
 /**
@@ -16,7 +20,8 @@ export interface IStorage {
  */
 const createStorage = (): IStorage => {
   return {
-    world: createWorldStorage()
+    world: createWorldStorage(),
+    player: createPlayerStorage()
   }
 }
 
