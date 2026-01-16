@@ -866,6 +866,9 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
 // @public (undocumented)
 export function createReactBasedUiSystem(engine: IEngine, pointerSystem: PointerEventsSystem): ReactBasedUiSystem;
 
+// @public
+export function createTimers(targetEngine: IEngine): Timers;
+
 // @public (undocumented)
 export function createTweenSystem(engine: IEngine): TweenSystem;
 
@@ -1163,6 +1166,33 @@ export type ExcludeUndefined<T> = {
 // @public
 export const executeTask: (task: Task<unknown>) => void;
 
+// @public
+export interface FlatMaterial {
+    albedoColor: PBColor4 | undefined;
+    alphaTest: number | undefined;
+    readonly alphaTexture: FlatTexture;
+    readonly bumpTexture: FlatTexture;
+    castShadows: boolean | undefined;
+    diffuseColor: PBColor4 | undefined;
+    directIntensity: number | undefined;
+    emissiveColor: PBColor3 | undefined;
+    emissiveIntensity: number | undefined;
+    readonly emissiveTexture: FlatTexture;
+    metallic: number | undefined;
+    reflectivityColor: PBColor3 | undefined;
+    roughness: number | undefined;
+    specularIntensity: number | undefined;
+    readonly texture: FlatTexture;
+    transparencyMode: MaterialTransparencyMode | undefined;
+}
+
+// @public
+export interface FlatTexture {
+    filterMode: TextureFilterMode | undefined;
+    src: string | undefined;
+    wrapMode: TextureWrapMode | undefined;
+}
+
 // @public (undocumented)
 export type FlexDirectionType = 'row' | 'column' | 'column-reverse' | 'row-reverse';
 
@@ -1194,6 +1224,9 @@ export function getCompositeRootComponent(engine: IEngine): LastWriteWinElementS
 //
 // @public (undocumented)
 export const getDefaultOpts: (opts?: Partial<EventSystemOptions>) => EventSystemOptions;
+
+// @public
+export function getEntitiesWithParent(engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema'>, parent: Entity): Entity[];
 
 // Warning: (ae-missing-release-tag) "GlobalDirectionRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -1659,6 +1692,7 @@ export const Material: MaterialComponentDefinitionExtended;
 
 // @public (undocumented)
 export interface MaterialComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBMaterial> {
+    getFlat: (entity: Entity) => FlatMaterial;
     setBasicMaterial: (entity: Entity, material: PBMaterial_UnlitMaterial) => void;
     setPbrMaterial: (entity: Entity, material: PBMaterial_PbrMaterial) => void;
     Texture: TextureHelper;
@@ -4375,6 +4409,29 @@ export const enum TextWrap {
     // (undocumented)
     TW_WRAP = 0
 }
+
+// Warning: (ae-missing-release-tag) "TimerCallback" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type TimerCallback = () => void;
+
+// Warning: (ae-missing-release-tag) "TimerId" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type TimerId = number;
+
+// Warning: (ae-missing-release-tag) "Timers" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type Timers = {
+    setTimeout(callback: TimerCallback, ms: number): TimerId;
+    clearTimeout(timerId: TimerId): void;
+    setInterval(callback: TimerCallback, ms: number): TimerId;
+    clearInterval(timerId: TimerId): void;
+};
+
+// @public
+export const timers: Timers;
 
 // @public
 export const ToGammaSpace: number;
