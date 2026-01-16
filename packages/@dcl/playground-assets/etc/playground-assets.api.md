@@ -54,7 +54,7 @@ export function areConnected(parcels: Coords[]): boolean;
 export const AssetLoad: LastWriteWinElementSetComponentDefinition<PBAssetLoad>;
 
 // @public (undocumented)
-export const AssetLoadLoadingState: LastWriteWinElementSetComponentDefinition<PBAssetLoadLoadingState>;
+export const AssetLoadLoadingState: GrowOnlyValueSetComponentDefinition<PBAssetLoadLoadingState>;
 
 // @public (undocumented)
 export const AudioEvent: GrowOnlyValueSetComponentDefinition<PBAudioEvent>;
@@ -629,7 +629,7 @@ export type ComponentDefinition<T> = LastWriteWinElementSetComponentDefinition<T
 export const componentDefinitionByName: {
     "core::Animator": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAnimator>>;
     "core::AssetLoad": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAssetLoad>>;
-    "core::AssetLoadLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAssetLoadLoadingState>>;
+    "core::AssetLoadLoadingState": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAssetLoadLoadingState>>;
     "core::AudioEvent": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAudioEvent>>;
     "core::AudioSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioSource>>;
     "core::AudioStream": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioStream>>;
@@ -2172,6 +2172,7 @@ export interface PBAssetLoadLoadingState {
     asset: string;
     // (undocumented)
     currentState: LoadingState;
+    timestamp: number;
 }
 
 // @public (undocumented)
