@@ -40,7 +40,7 @@ export const args = declareArgs({
   '-d': '--delete'
 })
 
-const STORAGE_SERVER_ORG = 'https://storage-server.decentraland.org'
+const STORAGE_SERVER_ORG = 'https://storage.decentraland.org'
 
 export function help(options: Options) {
   options.components.logger.log(`
@@ -59,8 +59,8 @@ export function help(options: Options) {
       --https                   Use HTTPS for the linker dApp
 
     Target options:
-      - https://storage-server.decentraland.org  (production - default)
-      - https://storage-server.decentraland.zone (staging)
+      - https://storage.decentraland.org  (production - default)
+      - https://storage.decentraland.zone (staging)
       - http://localhost:<port>                  (local development)
 
     Examples:
@@ -73,7 +73,7 @@ export function help(options: Options) {
       $ sdk-commands deploy-env MY_KEY -d
 
     - Deploy to zone:
-      $ sdk-commands deploy-env MY_KEY --value my_value --target https://storage-server.decentraland.zone
+      $ sdk-commands deploy-env MY_KEY --value my_value --target https://storage.decentraland.zone
 
     - Deploy to local development server:
       $ sdk-commands deploy-env MY_KEY --value my_value --target http://localhost:8000
@@ -167,8 +167,8 @@ async function getAddressAndSignature(
     debug: info.debug,
     isWorld: info.isWorld,
     // Display info
-    title: `Deploy Env: ${info.key}`,
-    description: info.action === 'delete' ? `Delete environment variable` : `Set environment variable`
+    title: 'World Storage Service',
+    description: 'Manage environment variables in the World Storage Service'
   })
   const router = setDeployEnvRoutes(commonRouter, components, awaitResponse, deployCallback)
 
@@ -252,12 +252,22 @@ export async function main(options: Options) {
   const baseParcel = sceneJson.scene?.base || '0,0'
   const parcels = sceneJson.scene?.parcels || ['0,0']
 
+  // Build metadata for the world storage server (ADR-44 format)
+  const buildMetadata = () => {
+    const meta: Record<string, unknown> = {}
+    if (worldName) {
+      meta.realm = { serverName: worldName }
+      meta.realmName = worldName
+    }
+    meta.parcel = baseParcel
+    return JSON.stringify(meta)
+  }
+
   if (isDelete) {
     // DELETE operation
     logger.info(`Deleting environment variable '${key}' from ${baseURL}`)
 
-    // Include world in metadata for the server to identify the target (optional for local)
-    const metadata = JSON.stringify(worldName ? { key, world: worldName } : { key })
+    const metadata = buildMetadata()
     const pathname = new URL(url).pathname
     const payload = ['delete', pathname, timestamp, metadata].join(':').toLowerCase()
 
@@ -316,8 +326,7 @@ export async function main(options: Options) {
     // PUT operation (set value)
     logger.info(`Deploying environment variable '${key}' to ${baseURL}`)
 
-    // Include world in metadata for the server to identify the target (optional for local)
-    const metadata = JSON.stringify(worldName ? { key, value, world: worldName } : { key, value })
+    const metadata = buildMetadata()
     const pathname = new URL(url).pathname
     const payload = ['put', pathname, timestamp, metadata].join(':').toLowerCase()
 
@@ -349,9 +358,9 @@ export async function main(options: Options) {
           method: 'PUT',
           headers: {
             ...authHeaders,
-            'Content-Type': 'text/plain'
+            'Content-Type': 'application/json'
           },
-          body: value
+          body: JSON.stringify({ value })
         })
 
         if (res.ok) {
