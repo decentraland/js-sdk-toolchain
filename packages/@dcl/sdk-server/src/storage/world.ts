@@ -72,7 +72,7 @@ export const createWorldStorage = (): IWorldStorage => {
           headers: {
             'content-type': 'application/json'
           },
-          body: JSON.stringify(value)
+          body: JSON.stringify({ value })
         }
       })
 
