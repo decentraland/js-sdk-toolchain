@@ -1,7 +1,21 @@
 import { IEngine, Entity, EntityState } from '@dcl/ecs/dist-cjs'
+import type { ActionRef } from '@dcl/asset-packs';
+
+declare global {
+  var __DCL_SCRIPT_INSTANCES__: Map<string, { instance: any; entity: Entity; path: string }>
+}
+
+if (!globalThis.__DCL_SCRIPT_INSTANCES__) {
+  globalThis.__DCL_SCRIPT_INSTANCES__ = new Map()
+}
+
+type ScriptParam = {
+  type?: string
+  value: unknown
+}
 
 type ScriptLayout = {
-  params?: Record<string, { value: unknown }>
+  params?: Record<string, ScriptParam>
 }
 
 type Script = {
@@ -36,20 +50,136 @@ function entityIsRemoved(engine: IEngine, entity: Entity) {
 }
 
 /**
+ * Get a specific script instance by entity and script path.
+ * @param entity - The entity ID
+ * @param scriptPath - The script file path
+ * @returns The script instance or null if not found
+ */
+export function getScriptInstance(entity: Entity, scriptPath: string): any {
+  const key = `${entity}:${scriptPath}`
+  const entry = globalThis.__DCL_SCRIPT_INSTANCES__.get(key)
+  return entry?.instance || null
+}
+
+/**
+ * Get all instances of a specific script (across all entities).
+ * @param scriptPath - The script file path
+ * @returns Array of { entity, instance } objects
+ */
+export function getScriptInstancesByPath(scriptPath: string): Array<{ entity: Entity; instance: any }> {
+  const results: Array<{ entity: Entity; instance: any }> = []
+  for (const [_, value] of globalThis.__DCL_SCRIPT_INSTANCES__) {
+    if (value.path === scriptPath) {
+      results.push({ entity: value.entity, instance: value.instance })
+    }
+  }
+  return results
+}
+
+/**
+ * Get all script instances attached to a specific entity
+ * @param entity - The entity ID
+ * @returns Array of { path, instance } objects
+ */
+export function getAllScriptInstances(entity: Entity): Array<{ path: string; instance: any }> {
+  const results: Array<{ path: string; instance: any }> = []
+  for (const [_, value] of globalThis.__DCL_SCRIPT_INSTANCES__) {
+    if (value.entity === entity) {
+      results.push({ path: value.path, instance: value.instance })
+    }
+  }
+  return results
+}
+
+/**
+ * Call a method on a script instance (with safety checks).
+ * @param entity - The entity ID
+ * @param scriptPath - The script file path
+ * @param methodName - The method name to call
+ * @param args - Arguments to pass to the method
+ * @returns The method's return value or undefined if method not found
+ */
+export function callScriptMethod(entity: Entity, scriptPath: string, methodName: string, ...args: any[]): any {
+  const instance = getScriptInstance(entity, scriptPath)
+  if (instance && typeof instance[methodName] === 'function') {
+    return instance[methodName](...args)
+  }
+  console.error(`Method ${methodName} not found on script ${scriptPath} for entity ${entity}`)
+  return undefined
+}
+
+/**
+ * Creates an ActionCallback function from an ActionRef.
+ * The returned function, when called, will trigger the specified action on the entity.
+ *
+ * @param actionRef - The action reference containing entity and action name
+ * @param getActionEvents - Function to get action events emitter for an entity
+ * @returns A function that triggers the action when called
+ */
+export function createActionCallback(
+  actionRef: ActionRef,
+  getActionEvents: (entity: Entity) => { emit: (action: string, payload?: any) => void }
+): () => void {
+  return () => {
+    if (!actionRef.entity || !actionRef.action) {
+      console.warn('[Script] ActionCallback called with invalid action reference:', actionRef)
+      return
+    }
+    const actionEvents = getActionEvents(actionRef.entity)
+    actionEvents.emit(actionRef.action, {})
+  }
+}
+
+/**
+ * Resolves script parameters, converting ActionRef values to ActionCallback functions.
+ *
+ * @param params - The raw parameters from the script layout
+ * @param getActionEvents - Function to get action events emitter for an entity
+ * @returns Array of resolved parameter values
+ */
+export function resolveScriptParams(
+  params: Record<string, ScriptParam>,
+  getActionEvents: (entity: Entity) => { emit: (action: string, payload?: any) => void }
+): unknown[] {
+  return Object.values(params).map((param) => {
+    if (param.type === 'action' && param.value && typeof param.value === 'object') {
+      const actionRef = param.value as ActionRef
+      return createActionCallback(actionRef, getActionEvents)
+    }
+    return param.value
+  })
+}
+
+/**
  * Initializes and runs all scripts organized by priority.
  * Supports both functional-style scripts (with start/update functions) and class-based scripts.
  * Scripts are extracted at build time from composites.
  *
+ * @internal This function is called automatically by the SDK entry point.
+ * Users should not call this function directly.
+ *
  * @param engine - The ECS engine instance
  * @param scripts - Scripts with their modules, extracted at build time
+ * @param getActionEvents - Function to get action events emitter for an entity (for ActionCallback params)
  */
-export function runScripts(engine: IEngine, scripts: Script[]) {
+export function runScripts(
+  engine: IEngine,
+  scripts: Script[],
+  getActionEvents?: (entity: Entity) => { emit: (action: string, payload?: any) => void }
+) {
   const scriptsByPriority = groupScriptsByPriority(scripts)
   const classInstances = new Map<string, { instance: ScriptClassInstance; entity: Entity }>()
   const functionScripts = new Map<
     string,
     { src: string; module: FunctionalScriptModule; entity: Entity; params: unknown[] }
   >()
+
+  // Default no-op getActionEvents if not provided
+  const actionEventsGetter = getActionEvents || ((_entity: Entity) => ({
+    emit: (_action: string, _payload?: any) => {
+      console.warn('[Script] getActionEvents not provided, ActionCallback will not work')
+    }
+  }))
 
   for (const [priority, instances] of Object.entries(scriptsByPriority)) {
     for (const script of instances) {
@@ -63,7 +193,8 @@ export function runScripts(engine: IEngine, scripts: Script[]) {
 
       const src = script.path.split('/').slice(0, -1).join('/')
       const layout: ScriptLayout = script.layout ? JSON.parse(script.layout) : {}
-      const params = Object.values(layout.params || {}).map((p) => p.value)
+      const params = resolveScriptParams(layout.params || {}, actionEventsGetter)
+      const registryKey = `${script.entity}:${script.path}`
 
       if (typeof module.start === 'function') {
         try {
@@ -78,6 +209,11 @@ export function runScripts(engine: IEngine, scripts: Script[]) {
           entity: script.entity,
           params
         })
+        globalThis.__DCL_SCRIPT_INSTANCES__.set(registryKey, {
+          instance: module,
+          entity: script.entity,
+          path: script.path
+        })
       } else {
         const ScriptClass = Object.values(module).find((exp) => typeof exp === 'function') as ScriptClass | undefined
         if (!ScriptClass) {
@@ -91,6 +227,11 @@ export function runScripts(engine: IEngine, scripts: Script[]) {
             instance.start()
           }
           classInstances.set(script.key, { instance, entity: script.entity })
+          globalThis.__DCL_SCRIPT_INSTANCES__.set(registryKey, {
+            instance: instance,
+            entity: script.entity,
+            path: script.path
+          })
         } catch (e: unknown) {
           console.error('[Script Error] ' + script.path + ' class initialization failed:', e)
           throw e
