@@ -1,4 +1,5 @@
 import { IEngine, Entity, EntityState } from '@dcl/ecs/dist-cjs'
+import type { ActionRef } from '@dcl/asset-packs';
 
 declare global {
   var __DCL_SCRIPT_INSTANCES__: Map<string, { instance: any; entity: Entity; path: string }>
@@ -8,8 +9,13 @@ if (!globalThis.__DCL_SCRIPT_INSTANCES__) {
   globalThis.__DCL_SCRIPT_INSTANCES__ = new Map()
 }
 
+type ScriptParam = {
+  type?: string
+  value: unknown
+}
+
 type ScriptLayout = {
-  params?: Record<string, { value: unknown }>
+  params?: Record<string, ScriptParam>
 }
 
 type Script = {
@@ -103,6 +109,48 @@ export function callScriptMethod(entity: Entity, scriptPath: string, methodName:
 }
 
 /**
+ * Creates an ActionCallback function from an ActionRef.
+ * The returned function, when called, will trigger the specified action on the entity.
+ *
+ * @param actionRef - The action reference containing entity and action name
+ * @param getActionEvents - Function to get action events emitter for an entity
+ * @returns A function that triggers the action when called
+ */
+export function createActionCallback(
+  actionRef: ActionRef,
+  getActionEvents: (entity: Entity) => { emit: (action: string, payload?: any) => void }
+): () => void {
+  return () => {
+    if (!actionRef.entity || !actionRef.action) {
+      console.warn('[Script] ActionCallback called with invalid action reference:', actionRef)
+      return
+    }
+    const actionEvents = getActionEvents(actionRef.entity)
+    actionEvents.emit(actionRef.action, {})
+  }
+}
+
+/**
+ * Resolves script parameters, converting ActionRef values to ActionCallback functions.
+ *
+ * @param params - The raw parameters from the script layout
+ * @param getActionEvents - Function to get action events emitter for an entity
+ * @returns Array of resolved parameter values
+ */
+export function resolveScriptParams(
+  params: Record<string, ScriptParam>,
+  getActionEvents: (entity: Entity) => { emit: (action: string, payload?: any) => void }
+): unknown[] {
+  return Object.values(params).map((param) => {
+    if (param.type === 'action' && param.value && typeof param.value === 'object') {
+      const actionRef = param.value as ActionRef
+      return createActionCallback(actionRef, getActionEvents)
+    }
+    return param.value
+  })
+}
+
+/**
  * Initializes and runs all scripts organized by priority.
  * Supports both functional-style scripts (with start/update functions) and class-based scripts.
  * Scripts are extracted at build time from composites.
@@ -112,14 +160,26 @@ export function callScriptMethod(entity: Entity, scriptPath: string, methodName:
  *
  * @param engine - The ECS engine instance
  * @param scripts - Scripts with their modules, extracted at build time
+ * @param getActionEvents - Function to get action events emitter for an entity (for ActionCallback params)
  */
-export function runScripts(engine: IEngine, scripts: Script[]) {
+export function runScripts(
+  engine: IEngine,
+  scripts: Script[],
+  getActionEvents?: (entity: Entity) => { emit: (action: string, payload?: any) => void }
+) {
   const scriptsByPriority = groupScriptsByPriority(scripts)
   const classInstances = new Map<string, { instance: ScriptClassInstance; entity: Entity }>()
   const functionScripts = new Map<
     string,
     { src: string; module: FunctionalScriptModule; entity: Entity; params: unknown[] }
   >()
+
+  // Default no-op getActionEvents if not provided
+  const actionEventsGetter = getActionEvents || ((_entity: Entity) => ({
+    emit: (_action: string, _payload?: any) => {
+      console.warn('[Script] getActionEvents not provided, ActionCallback will not work')
+    }
+  }))
 
   for (const [priority, instances] of Object.entries(scriptsByPriority)) {
     for (const script of instances) {
@@ -133,7 +193,7 @@ export function runScripts(engine: IEngine, scripts: Script[]) {
 
       const src = script.path.split('/').slice(0, -1).join('/')
       const layout: ScriptLayout = script.layout ? JSON.parse(script.layout) : {}
-      const params = Object.values(layout.params || {}).map((p) => p.value)
+      const params = resolveScriptParams(layout.params || {}, actionEventsGetter)
       const registryKey = `${script.entity}:${script.path}`
 
       if (typeof module.start === 'function') {

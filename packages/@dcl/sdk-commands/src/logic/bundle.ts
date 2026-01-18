@@ -601,13 +601,14 @@ async function updateSdkTypeDeclarations(
  */
 function generateVirtualModuleContent(runtimeImports: string, runtimeCode: string, scriptsArray: string): string {
   return `
+import { getActionEvents } from '@dcl/asset-packs/dist/events'
 ${runtimeImports}
 
 ${runtimeCode}
 
 export function _initializeScripts(engine) {
   const scriptsArray = ${scriptsArray}
-  return runScripts(engine, scriptsArray)
+  return runScripts(engine, scriptsArray, getActionEvents)
 }
 
 // export helper functions that are defined in the inlined runtime code
