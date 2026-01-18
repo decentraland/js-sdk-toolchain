@@ -449,7 +449,7 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
         }
 
         const { contents, watchFiles } = await generateInitializeScriptsModule(
-          components.fs,
+          components,
           options.workingDirectory,
           compositeData
         )
@@ -554,12 +554,12 @@ async function prepareRuntimeCode(fs: BundleComponents['fs']): Promise<string> {
  * Generates the TypeScript declaration for the ~sdk/all-scripts module
  */
 async function generateScriptModuleDeclaration(
-  fs: BundleComponents['fs'],
+  components: BundleComponents,
   typeImports: string,
   scriptTypes: string
 ): Promise<string> {
   const templatePath = path.join(__dirname, 'script-module.d.ts.template')
-  const template = await fs.readFile(templatePath, 'utf-8')
+  const template = await components.fs.readFile(templatePath, 'utf-8')
 
   return template
     .replace('__TYPE_IMPORTS__', typeImports)
@@ -570,7 +570,7 @@ async function generateScriptModuleDeclaration(
  * Updates the sdk.d.ts file with script type declarations
  */
 async function updateSdkTypeDeclarations(
-  fs: BundleComponents['fs'],
+  components: BundleComponents,
   workingDirectory: string,
   typeImports: string,
   scriptTypes: string,
@@ -578,7 +578,7 @@ async function updateSdkTypeDeclarations(
 ): Promise<void> {
   try {
     const jsRuntimePath = require.resolve('@dcl/js-runtime/sdk.d.ts', { paths: [workingDirectory] })
-    let existingSdkDts = await fs.readFile(jsRuntimePath, 'utf-8')
+    let existingSdkDts = await components.fs.readFile(jsRuntimePath, 'utf-8')
 
     // remove any existing ~sdk/all-scripts module declaration
     existingSdkDts = existingSdkDts
@@ -586,13 +586,13 @@ async function updateSdkTypeDeclarations(
       .trim()
 
     // generate and append the new module declaration
-    const scriptModuleDeclaration = await generateScriptModuleDeclaration(fs, typeImports, scriptTypes)
+    const scriptModuleDeclaration = await generateScriptModuleDeclaration(components, typeImports, scriptTypes)
     const updatedSdkDts = existingSdkDts + '\n' + scriptModuleDeclaration
 
-    await fs.writeFile(jsRuntimePath, updatedSdkDts)
-    console.log(`✓ Updated sdk.d.ts with ${scriptCount} script type(s) at: ${jsRuntimePath}`)
-  } catch (err) {
-    console.warn('⚠ Could not update sdk.d.ts with script types:', err)
+    await components.fs.writeFile(jsRuntimePath, updatedSdkDts)
+    components.logger.info(`✓ Updated sdk.d.ts with ${scriptCount} script type(s) at: ${jsRuntimePath}`)
+  } catch (err: any) {
+    components.logger.error('⚠ Could not update sdk.d.ts with script types:', err)
   }
 }
 
@@ -616,12 +616,12 @@ export { getScriptInstance, getScriptInstancesByPath, getAllScriptInstances, cal
 }
 
 export async function generateInitializeScriptsModule(
-  fs: BundleComponents['fs'],
+  components: BundleComponents,
   workingDirectory: string,
   compositeData: { scripts: Map<string, Script[]>; [key: string]: any } | null
 ): Promise<{ contents: string; watchFiles: string[] }> {
   // prepare runtime code (always needed for helper functions)
-  const runtimeCode = await prepareRuntimeCode(fs)
+  const runtimeCode = await prepareRuntimeCode(components.fs)
 
   // default empty implementation if no scripts
   if (!compositeData || compositeData.scripts.size === 0) {
@@ -636,7 +636,7 @@ export async function generateInitializeScriptsModule(
 
   // Step 2: Update TypeScript declarations
   await updateSdkTypeDeclarations(
-    fs,
+    components,
     workingDirectory,
     scriptData.typeImports,
     scriptData.scriptTypes,
