@@ -26,6 +26,29 @@ declare module '~sdk/all-scripts' {
     : never
 
   /**
+   * A callback function that triggers an action on an entity.
+   * Use this type for script parameters that should trigger actions configured in the editor.
+   *
+   * @example
+   * ```typescript
+   * import type { ActionCallback } from '~sdk/all-scripts'
+   *
+   * export class Padlock {
+   *   constructor(
+   *     public src: string,
+   *     public entity: Entity,
+   *     public onUnlock: ActionCallback
+   *   ) {}
+   *
+   *   solve() {
+   *     this.onUnlock() // Triggers the action selected in the editor
+   *   }
+   * }
+   * ```
+   */
+  export type ActionCallback = () => void
+
+  /**
    * @deprecated
    * @internal This function is called automatically by the SDK entry point.
    * Users should not call this function directly.
