@@ -546,6 +546,8 @@ async function prepareRuntimeCode(fs: BundleComponents['fs']): Promise<string> {
     .replace(/exports\.\w+\s*=\s*/g, '')
     .replace(/^export\s+/gm, '')
     .replace(/^import\s+.*$/gm, '')
+    // fix nested asset-packs path (importing from @dcl/inspector is banned in runtime, but @dcl/asset-packs not)
+    .replace(/@dcl\/inspector\/node_modules\/@dcl\/asset-packs/g, '@dcl/asset-packs')
     .replace(/\n{3,}/g, '\n\n')
     .trim()
 }
