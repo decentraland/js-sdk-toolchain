@@ -57,6 +57,20 @@ export const AssetLoad: LastWriteWinElementSetComponentDefinition<PBAssetLoad>;
 export const AssetLoadLoadingState: GrowOnlyValueSetComponentDefinition<PBAssetLoadLoadingState>;
 
 // @public (undocumented)
+export interface AssetLoadLoadingStateSystem {
+    // (undocumented)
+    registerAssetLoadLoadingStateEntity(entity: Entity, callback: AssetLoadLoadingStateSystemCallback): void;
+    // (undocumented)
+    removeAssetLoadLoadingStateEntity(entity: Entity): void;
+}
+
+// @public
+export const assetLoadLoadingStateSystem: AssetLoadLoadingStateSystem;
+
+// @public (undocumented)
+export type AssetLoadLoadingStateSystemCallback = (event: DeepReadonlyObject<PBAssetLoadLoadingState>) => void;
+
+// @public (undocumented)
 export const AudioEvent: GrowOnlyValueSetComponentDefinition<PBAudioEvent>;
 
 // Warning: (ae-missing-release-tag) "AudioSource" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)

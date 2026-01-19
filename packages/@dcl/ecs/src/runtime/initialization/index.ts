@@ -9,6 +9,7 @@ import { createPointerEventsSystem, PointerEventsSystem } from '../../systems/ev
 import { createInputSystem, IInputSystem } from './../../engine/input'
 import { createRaycastSystem, RaycastSystem } from '../../systems/raycast'
 import { createVideoEventsSystem, VideoEventsSystem } from '../../systems/videoEvents'
+import { createAssetLoadLoadingStateSystem, AssetLoadLoadingStateSystem } from '../../systems/assetLoad'
 import { TweenSystem, createTweenSystem } from '../../systems/tween'
 import { pointerEventColliderChecker } from '../../systems/pointer-event-collider-checker'
 import { createTriggerAreaEventsSystem, TriggerAreaEventsSystem } from '../../systems/triggerArea'
@@ -58,6 +59,13 @@ export { RaycastSystem }
  */
 export const videoEventsSystem: VideoEventsSystem = /* @__PURE__ */ createVideoEventsSystem(engine)
 export { VideoEventsSystem }
+
+/**
+ * @public
+ * Register callback functions to a particular entity on asset pre-load events.
+ */
+export const assetLoadLoadingStateSystem: AssetLoadLoadingStateSystem = /* @__PURE__ */ createAssetLoadLoadingStateSystem(engine)
+export { AssetLoadLoadingStateSystem }
 
 /**
  * @public
