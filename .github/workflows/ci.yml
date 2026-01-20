@@ -81,7 +81,6 @@ jobs:
     outputs:
       decentraland_sdk_s3_bucket_key: ${{ steps.publish_decentraland_sdk.outputs.s3-bucket-key }}
       decentraland_sdk_commands_s3_bucket_key: ${{ steps.publish_decentraland_sdk_commands.outputs.s3-bucket-key }}
-      decentraland_sdk_server_s3_bucket_key: ${{ steps.publish_sdk_server.outputs.s3-bucket-key }}
       decentraland_js_runtime_s3_bucket_key: ${{ steps.publish_dcl_js_runtime.outputs.s3-bucket-key }}
       decentraland_ecs_bucket_key: ${{ steps.publish_ecs.outputs.s3-bucket-key }}
     steps:
@@ -137,28 +136,6 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
-      - name: publish @dcl/sdk-server package
-        uses: decentraland/oddish-action@master
-        id: publish_sdk_server
-        with:
-          registry-url: 'https://registry.npmjs.org'
-          access: public
-          cwd: ./packages/@dcl/sdk-server
-          ## use action runId instead of current date to generate snapshot numbers
-          deterministic-snapshot: true
-          ## sign the deployment
-          provenance: true
-          ## publish every package to s3
-          s3-bucket: ${{ secrets.SDK_TEAM_S3_BUCKET }}
-          s3-bucket-region: ${{ secrets.SDK_TEAM_AWS_REGION }}
-          s3-bucket-key-prefix: '@dcl/js-sdk-toolchain/branch/${{ github.head_ref || github.ref }}/@dcl/sdk-server'
-          custom-tag: ${{ env.BRANCH_TAG }}
-          branch-to-custom-tag: ${{ env.BRANCH_TAG }}
-        env:
-          BRANCH_NAME: ${{ github.ref_name }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
       - name: publish @dcl/ecs package
         uses: decentraland/oddish-action@master
@@ -263,7 +240,6 @@ jobs:
             pkg.dependencies['@dcl/ecs']='$ECS_S3_URL';\
             pkg.dependencies['@dcl/react-ecs']='$REACT_ECS_S3_URL';\
             pkg.dependencies['@dcl/sdk-commands']='$SDK_COMMANDS_S3_URL';\
-            pkg.dependencies['@dcl/sdk-server']='$SDK_SERVER_S3_URL';\
             require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));\
           "
         env:
@@ -272,7 +248,6 @@ jobs:
           ROLLUP_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_rollup.outputs.s3-bucket-key }}
           JS_RUNTIME_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_js_runtime.outputs.s3-bucket-key }}
           SDK_COMMANDS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_decentraland_sdk_commands.outputs.s3-bucket-key }}
-          SDK_SERVER_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_sdk_server.outputs.s3-bucket-key }}
 
       - name: verify dependency packages are published before @dcl/sdk
         if: ${{ !github.event.pull_request.number }}
@@ -398,11 +373,6 @@ jobs:
             - The `@dcl/js-runtime` package can be tested in scenes by running
                ```bash
                npm install "${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_js_runtime_s3_bucket_key }}"
-               ```
-
-            - The `@dcl/sdk-server` package can be tested in scenes by running
-               ```bash
-               npm install "${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_server_s3_bucket_key }}"
                ```
 
             - To test with `npx init`
