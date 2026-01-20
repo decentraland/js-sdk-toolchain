@@ -1,14 +1,13 @@
 import { signedFetch } from '~system/SignedFetch'
-import { isServer as isServerApi } from '~system/EngineApi'
+import { isServer } from '../network'
 import { getStorageServerUrl } from './storage-url'
 
 /**
  * Validates that the code is running on a server-side scene.
  * Throws an error if called from a client-side context.
  */
-async function assertIsServer(): Promise<void> {
-  const { isServer } = await isServerApi({})
-  if (!isServer) {
+function assertIsServer(): void {
+  if (!isServer()) {
     throw new Error('EnvVar is only available on server-side scenes')
   }
 }
@@ -27,7 +26,7 @@ export const EnvVar = {
    * @throws Error if the request fails
    */
   async all(): Promise<string> {
-    await assertIsServer()
+    assertIsServer()
 
     const baseUrl = await getStorageServerUrl()
     const url = `${baseUrl}/env`
@@ -57,7 +56,7 @@ export const EnvVar = {
    * @throws Error if the request fails
    */
   async get(key: string): Promise<string> {
-    await assertIsServer()
+    assertIsServer()
 
     const baseUrl = await getStorageServerUrl()
     const url = `${baseUrl}/env/${encodeURIComponent(key)}`

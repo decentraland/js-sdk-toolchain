@@ -8,7 +8,6 @@
         "@dcl/playground-assets",
         "@dcl/sdk",
         "@dcl/sdk-commands",
-        "@dcl/sdk-server",
         "@dcl/react-ecs"
       ],
       "isIgnored": true
