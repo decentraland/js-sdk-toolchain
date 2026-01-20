@@ -3,7 +3,14 @@ export type { AudioSourceComponentDefinitionExtended } from './extended/AudioSou
 export type { AudioStreamComponentDefinitionExtended } from './extended/AudioStream'
 export type { MeshRendererComponentDefinitionExtended } from './extended/MeshRenderer'
 export type { MeshColliderComponentDefinitionExtended } from './extended/MeshCollider'
-export type { TextureHelper, MaterialComponentDefinitionExtended, FlatTexture, FlatMaterial } from './extended/Material'
+export type {
+  TextureHelper,
+  MaterialComponentDefinitionExtended,
+  FlatTexture,
+  ReadonlyFlatMaterial,
+  ReadonlyFlatTexture,
+  FlatMaterial
+} from './extended/Material'
 export type { TweenHelper, TweenComponentDefinitionExtended } from './extended/Tween'
 export type { CameraTransitionHelper, VirtualCameraComponentDefinitionExtended } from './extended/VirtualCamera'
 export type { TransformComponentExtended, TransformTypeWithOptionals } from './manual/Transform'

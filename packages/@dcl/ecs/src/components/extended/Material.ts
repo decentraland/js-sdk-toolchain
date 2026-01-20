@@ -70,14 +70,14 @@ export interface FlatMaterial {
   readonly alphaTexture: FlatTexture
 
   /**
-   * Access to the emissive texture properties (PBR only - returns undefined on Unlit)
+   * Access to the emissive texture properties (PBR only - returns undefined for Unlit materials)
    */
-  readonly emissiveTexture: FlatTexture
+  readonly emissiveTexture: FlatTexture | undefined
 
   /**
-   * Access to the bump/normal texture properties (PBR only - returns undefined on Unlit)
+   * Access to the bump/normal texture properties (PBR only - returns undefined for Unlit materials)
    */
-  readonly bumpTexture: FlatTexture
+  readonly bumpTexture: FlatTexture | undefined
 
   // Shared properties (PBR + Unlit)
 
@@ -147,6 +147,111 @@ export interface FlatMaterial {
 }
 
 /**
+ * Readonly flattened texture interface for read-only property access
+ * @public
+ */
+export interface ReadonlyFlatTexture {
+  /** Path to the texture file */
+  readonly src: string | undefined
+  /** Texture wrapping behavior */
+  readonly wrapMode: TextureWrapMode | undefined
+  /** Texture filtering mode */
+  readonly filterMode: TextureFilterMode | undefined
+}
+
+/**
+ * Readonly flattened material interface for read-only property access
+ * @public
+ */
+export interface ReadonlyFlatMaterial {
+  /**
+   * Access to the main texture properties (works for both PBR and Unlit materials)
+   */
+  readonly texture: ReadonlyFlatTexture
+
+  /**
+   * Access to the alpha texture properties (works for both PBR and Unlit materials)
+   */
+  readonly alphaTexture: ReadonlyFlatTexture
+
+  /**
+   * Access to the emissive texture properties (PBR only - returns undefined for Unlit materials)
+   */
+  readonly emissiveTexture: ReadonlyFlatTexture | undefined
+
+  /**
+   * Access to the bump/normal texture properties (PBR only - returns undefined for Unlit materials)
+   */
+  readonly bumpTexture: ReadonlyFlatTexture | undefined
+
+  // Shared properties (PBR + Unlit)
+
+  /**
+   * Alpha test threshold (0-1). Default: 0.5
+   */
+  readonly alphaTest: number | undefined
+
+  /**
+   * Whether the material casts shadows. Default: true
+   */
+  readonly castShadows: boolean | undefined
+
+  // PBR-only properties (return undefined on Unlit)
+
+  /**
+   * Albedo/base color (PBR only). Default: white
+   */
+  readonly albedoColor: Color4 | undefined
+
+  /**
+   * Emissive color (PBR only). Default: black
+   */
+  readonly emissiveColor: Color3 | undefined
+
+  /**
+   * Reflectivity color (PBR only). Default: white
+   */
+  readonly reflectivityColor: Color3 | undefined
+
+  /**
+   * Transparency mode (PBR only). Default: MTM_AUTO
+   */
+  readonly transparencyMode: MaterialTransparencyMode | undefined
+
+  /**
+   * Metallic value 0-1 (PBR only). Default: 0.5
+   */
+  readonly metallic: number | undefined
+
+  /**
+   * Roughness value 0-1 (PBR only). Default: 0.5
+   */
+  readonly roughness: number | undefined
+
+  /**
+   * Specular intensity (PBR only). Default: 1
+   */
+  readonly specularIntensity: number | undefined
+
+  /**
+   * Emissive intensity (PBR only). Default: 2
+   */
+  readonly emissiveIntensity: number | undefined
+
+  /**
+   * Direct light intensity (PBR only). Default: 1
+   */
+  readonly directIntensity: number | undefined
+
+  // Unlit-only property (return undefined on PBR)
+
+  /**
+   * Diffuse color (Unlit only). Default: white
+   */
+  readonly diffuseColor: Color4 | undefined
+}
+
+/**
  * @public
  */
 export interface MaterialComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBMaterial> {
@@ -170,28 +275,44 @@ export interface MaterialComponentDefinitionExtended extends LastWriteWinElement
   setPbrMaterial: (entity: Entity, material: PBMaterial_PbrMaterial) => void
 
   /**
-   * Get a flattened accessor for the material's properties.
+   * Get a readonly flattened accessor for the material's properties.
+   * Simplifies reading material properties without navigating nested unions.
+   * Works for both PBR and Unlit materials.
+   * Throws if the entity does not have a Material component.
+   * @param entity - Entity with the Material component
+   * @returns A readonly accessor object with direct access to material properties
+   *
+   */
+  getFlat: (entity: Entity) => ReadonlyFlatMaterial
+
+  /**
+   * Get a readonly flattened accessor for the material's properties, or null if the entity
+   * does not have a Material component.
+   * @param entity - Entity to check for Material component
+   * @returns A readonly accessor object, or null if no Material component exists
+   *
+   */
+  getFlatOrNull: (entity: Entity) => ReadonlyFlatMaterial | null
+
+  /**
+   * Get a mutable flattened accessor for the material's properties.
    * Simplifies reading/writing material properties without navigating nested unions.
    * Works for both PBR and Unlit materials.
+   * Throws if the entity does not have a Material component.
    * @param entity - Entity with the Material component
-   * @returns An accessor object with direct access to material properties
+   * @returns A mutable accessor object with direct access to material properties
    *
-   * @example
-   * ```ts
-   * // Set texture source
-   * Material.getFlat(entity).texture.src = 'newTexture.png'
-   *
-   * // Set PBR properties
-   * Material.getFlat(entity).metallic = 0.9
-   * Material.getFlat(entity).roughness = 0.2
-   * Material.getFlat(entity).albedoColor = { r: 1, g: 0, b: 0, a: 1 }
-   *
-   * // Set shared properties
-   * Material.getFlat(entity).alphaTest = 0.8
-   * Material.getFlat(entity).castShadows = false
-   * ```
    */
-  getFlat: (entity: Entity) => FlatMaterial
+  getFlatMutable: (entity: Entity) => FlatMaterial
+
+  /**
+   * Get a mutable flattened accessor for the material's properties, or null if the entity
+   * does not have a Material component.
+   * @param entity - Entity to check for Material component
+   * @returns A mutable accessor object, or null if no Material component exists
+   *
+   */
+  getFlatMutableOrNull: (entity: Entity) => FlatMaterial | null
 }
 
 const TextureHelper: TextureHelper = {
@@ -271,9 +392,9 @@ function getTextureField(
     case 'alphaTexture':
       return innerMat.alphaTexture
     case 'emissiveTexture':
-      return isPbr ? (innerMat as PBMaterial_PbrMaterial).emissiveTexture : undefined
+      return (innerMat as PBMaterial_PbrMaterial).emissiveTexture
     case 'bumpTexture':
-      return isPbr ? (innerMat as PBMaterial_PbrMaterial).bumpTexture : undefined
+      return (innerMat as PBMaterial_PbrMaterial).bumpTexture
     default:
       return undefined
   }
@@ -489,11 +610,15 @@ class FlatMaterialAccessor implements FlatMaterial {
     return new FlatTextureAccessor(this.getMaterial, 'alphaTexture')
   }
 
-  get emissiveTexture(): FlatTexture {
+  get emissiveTexture(): FlatTexture | undefined {
+    const mat = this.getMaterial()
+    if (mat.material?.$case !== 'pbr') return undefined
     return new FlatTextureAccessor(this.getMaterial, 'emissiveTexture')
   }
 
-  get bumpTexture(): FlatTexture {
+  get bumpTexture(): FlatTexture | undefined {
+    const mat = this.getMaterial()
+    if (mat.material?.$case !== 'pbr') return undefined
     return new FlatTextureAccessor(this.getMaterial, 'bumpTexture')
   }
 
@@ -600,6 +725,145 @@ class FlatMaterialAccessor implements FlatMaterial {
   }
 }
 
+/**
+ * Readonly class-based accessor for FlatTexture properties.
+ * Provides only getters for read-only access to the nested material structure.
+ */
+class ReadonlyFlatTextureAccessor implements ReadonlyFlatTexture {
+  constructor(private getMaterial: () => PBMaterial, private field: TextureField) {}
+
+  get src(): string | undefined {
+    const mat = this.getMaterial()
+    const isPbr = mat.material?.$case === 'pbr'
+    const innerMat = getInnerMaterial(mat)
+    const textureUnion = getTextureField(innerMat, this.field, isPbr)
+    const texture = getTextureFromUnion(textureUnion)
+    return texture?.src
+  }
+
+  get wrapMode(): TextureWrapMode | undefined {
+    const mat = this.getMaterial()
+    const isPbr = mat.material?.$case === 'pbr'
+    const innerMat = getInnerMaterial(mat)
+    const textureUnion = getTextureField(innerMat, this.field, isPbr)
+    const texture = getTextureFromUnion(textureUnion)
+    return texture?.wrapMode
+  }
+
+  get filterMode(): TextureFilterMode | undefined {
+    const mat = this.getMaterial()
+    const isPbr = mat.material?.$case === 'pbr'
+    const innerMat = getInnerMaterial(mat)
+    const textureUnion = getTextureField(innerMat, this.field, isPbr)
+    const texture = getTextureFromUnion(textureUnion)
+    return texture?.filterMode
+  }
+}
+
+/**
+ * Readonly class-based accessor for FlatMaterial properties.
+ * Provides only getters for read-only access to material properties.
+ */
+class ReadonlyFlatMaterialAccessor implements ReadonlyFlatMaterial {
+  constructor(private getMaterial: () => PBMaterial) {}
+
+  // ==================== Private Helpers ====================
+
+  /**
+   * Get PBR material if available, undefined otherwise
+   */
+  private getPbrMaterial(): PBMaterial_PbrMaterial | undefined {
+    const mat = this.getMaterial()
+    if (mat.material?.$case !== 'pbr') return undefined
+    return mat.material.pbr
+  }
+
+  /**
+   * Get Unlit material if available, undefined otherwise
+   */
+  private getUnlitMaterial(): PBMaterial_UnlitMaterial | undefined {
+    const mat = this.getMaterial()
+    if (mat.material?.$case !== 'unlit') return undefined
+    return mat.material.unlit
+  }
+
+  // ==================== Texture Accessors ====================
+
+  get texture(): ReadonlyFlatTexture {
+    return new ReadonlyFlatTextureAccessor(this.getMaterial, 'texture')
+  }
+
+  get alphaTexture(): ReadonlyFlatTexture {
+    return new ReadonlyFlatTextureAccessor(this.getMaterial, 'alphaTexture')
+  }
+
+  get emissiveTexture(): ReadonlyFlatTexture | undefined {
+    const mat = this.getMaterial()
+    if (mat.material?.$case !== 'pbr') return undefined
+    return new ReadonlyFlatTextureAccessor(this.getMaterial, 'emissiveTexture')
+  }
+
+  get bumpTexture(): ReadonlyFlatTexture | undefined {
+    const mat = this.getMaterial()
+    if (mat.material?.$case !== 'pbr') return undefined
+    return new ReadonlyFlatTextureAccessor(this.getMaterial, 'bumpTexture')
+  }
+
+  // ==================== Shared Properties (PBR + Unlit) ====================
+
+  get alphaTest(): number | undefined {
+    return getInnerMaterial(this.getMaterial())?.alphaTest
+  }
+
+  get castShadows(): boolean | undefined {
+    return getInnerMaterial(this.getMaterial())?.castShadows
+  }
+
+  // ==================== PBR-only Properties ====================
+
+  get albedoColor(): Color4 | undefined {
+    return this.getPbrMaterial()?.albedoColor
+  }
+
+  get emissiveColor(): Color3 | undefined {
+    return this.getPbrMaterial()?.emissiveColor
+  }
+
+  get reflectivityColor(): Color3 | undefined {
+    return this.getPbrMaterial()?.reflectivityColor
+  }
+
+  get transparencyMode(): MaterialTransparencyMode | undefined {
+    return this.getPbrMaterial()?.transparencyMode
+  }
+
+  get metallic(): number | undefined {
+    return this.getPbrMaterial()?.metallic
+  }
+
+  get roughness(): number | undefined {
+    return this.getPbrMaterial()?.roughness
+  }
+
+  get specularIntensity(): number | undefined {
+    return this.getPbrMaterial()?.specularIntensity
+  }
+
+  get emissiveIntensity(): number | undefined {
+    return this.getPbrMaterial()?.emissiveIntensity
+  }
+
+  get directIntensity(): number | undefined {
+    return this.getPbrMaterial()?.directIntensity
+  }
+
+  // ==================== Unlit-only Property ====================
+
+  get diffuseColor(): Color4 | undefined {
+    return this.getUnlitMaterial()?.diffuseColor
+  }
+}
+
 export function defineMaterialComponent(
   engine: Pick<IEngine, 'defineComponentFromSchema'>
 ): MaterialComponentDefinitionExtended {
@@ -624,13 +888,27 @@ export function defineMaterialComponent(
         }
       })
     },
-    getFlat(entity: Entity): FlatMaterial {
+    getFlat(entity: Entity): ReadonlyFlatMaterial {
+      const mat = theComponent.get(entity)
+      return new ReadonlyFlatMaterialAccessor(() => mat as PBMaterial)
+    },
+    getFlatOrNull(entity: Entity): ReadonlyFlatMaterial | null {
+      const mat = theComponent.getOrNull(entity)
+      if (!mat) return null
+      return new ReadonlyFlatMaterialAccessor(() => mat as PBMaterial)
+    },
+    getFlatMutable(entity: Entity): FlatMaterial {
       const getMaterial = () => theComponent.getMutable(entity)
 
       // Verify component exists immediately (fail-fast)
       getMaterial()
 
       return new FlatMaterialAccessor(getMaterial)
+    },
+    getFlatMutableOrNull(entity: Entity): FlatMaterial | null {
+      const mat = theComponent.getMutableOrNull(entity)
+      if (!mat) return null
+      return new FlatMaterialAccessor(() => theComponent.getMutable(entity))
     }
   }
 }

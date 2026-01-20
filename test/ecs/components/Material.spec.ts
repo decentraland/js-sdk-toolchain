@@ -269,7 +269,7 @@ describe('Generated Material ProtoBuf', () => {
         metallic: 0.5
       })
 
-      Material.getFlat(entity).texture.src = 'updated.png'
+      Material.getFlatMutable(entity).texture.src = 'updated.png'
 
       const mat = Material.get(entity)
       expect(mat.material?.$case).toBe('pbr')
@@ -295,7 +295,7 @@ describe('Generated Material ProtoBuf', () => {
         diffuseColor: { r: 1, g: 0, b: 0, a: 1 }
       })
 
-      Material.getFlat(entity).texture.src = 'updated.png'
+      Material.getFlatMutable(entity).texture.src = 'updated.png'
 
       const mat = Material.get(entity)
       expect(mat.material?.$case).toBe('unlit')
@@ -320,7 +320,7 @@ describe('Generated Material ProtoBuf', () => {
       })
 
       // Set texture src - should create the nested structure
-      Material.getFlat(entity).texture.src = 'newTexture.png'
+      Material.getFlatMutable(entity).texture.src = 'newTexture.png'
 
       const mat = Material.get(entity)
       expect(mat.material?.$case).toBe('pbr')
@@ -376,7 +376,7 @@ describe('Generated Material ProtoBuf', () => {
       })
 
       expect(() => {
-        Material.getFlat(entity).texture.src = 'newTexture.png'
+        Material.getFlatMutable(entity).texture.src = 'newTexture.png'
       }).toThrow('Cannot set texture properties on Avatar texture')
     })
 
@@ -392,7 +392,7 @@ describe('Generated Material ProtoBuf', () => {
       })
 
       expect(() => {
-        Material.getFlat(entity).texture.src = 'newTexture.png'
+        Material.getFlatMutable(entity).texture.src = 'newTexture.png'
       }).toThrow('Cannot set texture properties on Video texture')
     })
 
@@ -408,7 +408,7 @@ describe('Generated Material ProtoBuf', () => {
       })
 
       expect(() => {
-        Material.getFlat(entity).texture.wrapMode = TextureWrapMode.TWM_MIRROR
+        Material.getFlatMutable(entity).texture.wrapMode = TextureWrapMode.TWM_MIRROR
       }).toThrow('Cannot set texture properties on Avatar texture')
     })
 
@@ -424,7 +424,7 @@ describe('Generated Material ProtoBuf', () => {
       })
 
       expect(() => {
-        Material.getFlat(entity).texture.filterMode = TextureFilterMode.TFM_TRILINEAR
+        Material.getFlatMutable(entity).texture.filterMode = TextureFilterMode.TFM_TRILINEAR
       }).toThrow('Cannot set texture properties on Video texture')
     })
 
@@ -447,7 +447,7 @@ describe('Generated Material ProtoBuf', () => {
         })
       })
 
-      const flat = Material.getFlat(entity)
+      const flat = Material.getFlatMutable(entity)
       flat.texture.wrapMode = TextureWrapMode.TWM_MIRROR
       flat.texture.filterMode = TextureFilterMode.TFM_TRILINEAR
 
@@ -470,7 +470,7 @@ describe('Generated Material ProtoBuf', () => {
         })
       })
 
-      const flat = Material.getFlat(entity)
+      const flat = Material.getFlatMutable(entity)
       expect(flat.alphaTexture.src).toBe('alpha.png')
 
       flat.alphaTexture.src = 'newAlpha.png'
@@ -488,7 +488,7 @@ describe('Generated Material ProtoBuf', () => {
         })
       })
 
-      const flat = Material.getFlat(entity)
+      const flat = Material.getFlatMutable(entity)
       expect(flat.alphaTexture.src).toBe('alpha.png')
 
       flat.alphaTexture.src = 'newAlpha.png'
@@ -507,11 +507,12 @@ describe('Generated Material ProtoBuf', () => {
         })
       })
 
-      const flat = Material.getFlat(entity)
-      expect(flat.emissiveTexture.src).toBe('glow.png')
+      const flat = Material.getFlatMutable(entity)
+      expect(flat.emissiveTexture).not.toBeUndefined()
+      expect(flat.emissiveTexture!.src).toBe('glow.png')
 
-      flat.emissiveTexture.src = 'newGlow.png'
-      expect(flat.emissiveTexture.src).toBe('newGlow.png')
+      flat.emissiveTexture!.src = 'newGlow.png'
+      expect(flat.emissiveTexture!.src).toBe('newGlow.png')
     })
 
     it('should return undefined when reading emissiveTexture on Unlit material', () => {
@@ -526,12 +527,10 @@ describe('Generated Material ProtoBuf', () => {
       })
 
       const flat = Material.getFlat(entity)
-      expect(flat.emissiveTexture.src).toBeUndefined()
-      expect(flat.emissiveTexture.wrapMode).toBeUndefined()
-      expect(flat.emissiveTexture.filterMode).toBeUndefined()
+      expect(flat.emissiveTexture).toBeUndefined()
     })
 
-    it('should throw when writing emissiveTexture on Unlit material', () => {
+    it('should return undefined when accessing emissiveTexture on Unlit material (mutable)', () => {
       const newEngine = Engine()
       const Material = components.Material(newEngine)
       const entity = newEngine.addEntity()
@@ -542,10 +541,8 @@ describe('Generated Material ProtoBuf', () => {
         })
       })
 
-      const flat = Material.getFlat(entity)
-      expect(() => {
-        flat.emissiveTexture.src = 'glow.png'
-      }).toThrow('Cannot set emissiveTexture on Unlit material')
+      const flat = Material.getFlatMutable(entity)
+      expect(flat.emissiveTexture).toBeUndefined()
     })
 
     // bumpTexture tests (PBR only)
@@ -560,11 +557,12 @@ describe('Generated Material ProtoBuf', () => {
         })
       })
 
-      const flat = Material.getFlat(entity)
-      expect(flat.bumpTexture.src).toBe('normal.png')
+      const flat = Material.getFlatMutable(entity)
+      expect(flat.bumpTexture).not.toBeUndefined()
+      expect(flat.bumpTexture!.src).toBe('normal.png')
 
-      flat.bumpTexture.src = 'newNormal.png'
-      expect(flat.bumpTexture.src).toBe('newNormal.png')
+      flat.bumpTexture!.src = 'newNormal.png'
+      expect(flat.bumpTexture!.src).toBe('newNormal.png')
     })
 
     it('should return undefined when reading bumpTexture on Unlit material', () => {
@@ -579,12 +577,10 @@ describe('Generated Material ProtoBuf', () => {
       })
 
       const flat = Material.getFlat(entity)
-      expect(flat.bumpTexture.src).toBeUndefined()
-      expect(flat.bumpTexture.wrapMode).toBeUndefined()
-      expect(flat.bumpTexture.filterMode).toBeUndefined()
+      expect(flat.bumpTexture).toBeUndefined()
     })
 
-    it('should throw when writing bumpTexture on Unlit material', () => {
+    it('should return undefined when accessing bumpTexture on Unlit material (mutable)', () => {
       const newEngine = Engine()
       const Material = components.Material(newEngine)
       const entity = newEngine.addEntity()
@@ -595,10 +591,8 @@ describe('Generated Material ProtoBuf', () => {
         })
       })
 
-      const flat = Material.getFlat(entity)
-      expect(() => {
-        flat.bumpTexture.src = 'normal.png'
-      }).toThrow('Cannot set bumpTexture on Unlit material')
+      const flat = Material.getFlatMutable(entity)
+      expect(flat.bumpTexture).toBeUndefined()
     })
 
     it('should create emissiveTexture structure when setting on PBR material without it', () => {
@@ -610,7 +604,9 @@ describe('Generated Material ProtoBuf', () => {
         metallic: 0.5
       })
 
-      Material.getFlat(entity).emissiveTexture.src = 'glow.png'
+      const flat = Material.getFlatMutable(entity)
+      expect(flat.emissiveTexture).not.toBeUndefined()
+      flat.emissiveTexture!.src = 'glow.png'
 
       const mat = Material.get(entity)
       if (mat.material?.$case === 'pbr') {
@@ -630,7 +626,9 @@ describe('Generated Material ProtoBuf', () => {
         metallic: 0.5
       })
 
-      Material.getFlat(entity).bumpTexture.src = 'normal.png'
+      const flat = Material.getFlatMutable(entity)
+      expect(flat.bumpTexture).not.toBeUndefined()
+      flat.bumpTexture!.src = 'normal.png'
 
       const mat = Material.get(entity)
       if (mat.material?.$case === 'pbr') {
@@ -654,7 +652,7 @@ describe('Generated Material ProtoBuf', () => {
           alphaTest: 0.3
         })
 
-        const flat = Material.getFlat(entity)
+        const flat = Material.getFlatMutable(entity)
         expect(flat.alphaTest).toBe(0.3)
 
         flat.alphaTest = 0.7
@@ -675,7 +673,7 @@ describe('Generated Material ProtoBuf', () => {
           alphaTest: 0.4
         })
 
-        const flat = Material.getFlat(entity)
+        const flat = Material.getFlatMutable(entity)
         expect(flat.alphaTest).toBe(0.4)
 
         flat.alphaTest = 0.9
@@ -696,7 +694,7 @@ describe('Generated Material ProtoBuf', () => {
           castShadows: true
         })
 
-        const flat = Material.getFlat(entity)
+        const flat = Material.getFlatMutable(entity)
         expect(flat.castShadows).toBe(true)
 
         flat.castShadows = false
@@ -717,7 +715,7 @@ describe('Generated Material ProtoBuf', () => {
           castShadows: false
         })
 
-        const flat = Material.getFlat(entity)
+        const flat = Material.getFlatMutable(entity)
         expect(flat.castShadows).toBe(false)
 
         flat.castShadows = true
@@ -754,7 +752,7 @@ describe('Generated Material ProtoBuf', () => {
           metallic: 0.5
         })
 
-        const flat = Material.getFlat(entity)
+        const flat = Material.getFlatMutable(entity)
         expect(flat.metallic).toBe(0.5)
 
         flat.metallic = 0.9
@@ -770,7 +768,7 @@ describe('Generated Material ProtoBuf', () => {
           roughness: 0.3
         })
 
-        const flat = Material.getFlat(entity)
+        const flat = Material.getFlatMutable(entity)
         expect(flat.roughness).toBe(0.3)
 
         flat.roughness = 0.8
@@ -786,7 +784,7 @@ describe('Generated Material ProtoBuf', () => {
           albedoColor: { r: 1, g: 0, b: 0, a: 1 }
         })
 
-        const flat = Material.getFlat(entity)
+        const flat = Material.getFlatMutable(entity)
         expect(flat.albedoColor).toEqual({ r: 1, g: 0, b: 0, a: 1 })
 
         flat.albedoColor = { r: 0, g: 1, b: 0, a: 0.5 }
@@ -802,7 +800,7 @@ describe('Generated Material ProtoBuf', () => {
           emissiveColor: { r: 1, g: 1, b: 0 }
         })
 
-        const flat = Material.getFlat(entity)
+        const flat = Material.getFlatMutable(entity)
         expect(flat.emissiveColor).toEqual({ r: 1, g: 1, b: 0 })
 
         flat.emissiveColor = { r: 0, g: 0, b: 1 }
@@ -818,7 +816,7 @@ describe('Generated Material ProtoBuf', () => {
           reflectivityColor: { r: 0.5, g: 0.5, b: 0.5 }
         })
 
-        const flat = Material.getFlat(entity)
+        const flat = Material.getFlatMutable(entity)
         expect(flat.reflectivityColor).toEqual({ r: 0.5, g: 0.5, b: 0.5 })
 
         flat.reflectivityColor = { r: 1, g: 1, b: 1 }
@@ -834,7 +832,7 @@ describe('Generated Material ProtoBuf', () => {
           transparencyMode: MaterialTransparencyMode.MTM_OPAQUE
         })
 
-        const flat = Material.getFlat(entity)
+        const flat = Material.getFlatMutable(entity)
         expect(flat.transparencyMode).toBe(MaterialTransparencyMode.MTM_OPAQUE)
 
         flat.transparencyMode = MaterialTransparencyMode.MTM_ALPHA_BLEND
@@ -850,7 +848,7 @@ describe('Generated Material ProtoBuf', () => {
           specularIntensity: 1.5
         })
 
-        const flat = Material.getFlat(entity)
+        const flat = Material.getFlatMutable(entity)
         expect(flat.specularIntensity).toBe(1.5)
 
         flat.specularIntensity = 2.0
@@ -866,7 +864,7 @@ describe('Generated Material ProtoBuf', () => {
           emissiveIntensity: 3.0
         })
 
-        const flat = Material.getFlat(entity)
+        const flat = Material.getFlatMutable(entity)
         expect(flat.emissiveIntensity).toBe(3.0)
 
         flat.emissiveIntensity = 5.0
@@ -882,7 +880,7 @@ describe('Generated Material ProtoBuf', () => {
           directIntensity: 1.0
         })
 
-        const flat = Material.getFlat(entity)
+        const flat = Material.getFlatMutable(entity)
         expect(flat.directIntensity).toBe(1.0)
 
         flat.directIntensity = 2.0
@@ -917,7 +915,7 @@ describe('Generated Material ProtoBuf', () => {
 
         Material.setBasicMaterial(entity, {})
 
-        const flat = Material.getFlat(entity)
+        const flat = Material.getFlatMutable(entity)
         expect(() => {
           flat.metallic = 0.5
         }).toThrow('Cannot set metallic on Unlit material')
@@ -930,7 +928,7 @@ describe('Generated Material ProtoBuf', () => {
 
         Material.setBasicMaterial(entity, {})
 
-        const flat = Material.getFlat(entity)
+        const flat = Material.getFlatMutable(entity)
         expect(() => {
           flat.roughness = 0.5
         }).toThrow('Cannot set roughness on Unlit material')
@@ -943,7 +941,7 @@ describe('Generated Material ProtoBuf', () => {
 
         Material.setBasicMaterial(entity, {})
 
-        const flat = Material.getFlat(entity)
+        const flat = Material.getFlatMutable(entity)
         expect(() => {
           flat.albedoColor = { r: 1, g: 0, b: 0, a: 1 }
         }).toThrow('Cannot set albedoColor on Unlit material')
@@ -956,7 +954,7 @@ describe('Generated Material ProtoBuf', () => {
 
         Material.setBasicMaterial(entity, {})
 
-        const flat = Material.getFlat(entity)
+        const flat = Material.getFlatMutable(entity)
         expect(() => {
           flat.transparencyMode = MaterialTransparencyMode.MTM_ALPHA_BLEND
         }).toThrow('Cannot set transparencyMode on Unlit material')
@@ -974,7 +972,7 @@ describe('Generated Material ProtoBuf', () => {
           diffuseColor: { r: 1, g: 0, b: 0, a: 1 }
         })
 
-        const flat = Material.getFlat(entity)
+        const flat = Material.getFlatMutable(entity)
         expect(flat.diffuseColor).toEqual({ r: 1, g: 0, b: 0, a: 1 })
 
         flat.diffuseColor = { r: 0, g: 0, b: 1, a: 0.8 }
@@ -1006,7 +1004,7 @@ describe('Generated Material ProtoBuf', () => {
 
         Material.setPbrMaterial(entity, {})
 
-        const flat = Material.getFlat(entity)
+        const flat = Material.getFlatMutable(entity)
         expect(() => {
           flat.diffuseColor = { r: 1, g: 0, b: 0, a: 1 }
         }).toThrow('Cannot set diffuseColor on PBR material')
@@ -1022,7 +1020,7 @@ describe('Generated Material ProtoBuf', () => {
 
         Material.setPbrMaterial(entity, {})
 
-        const flat = Material.getFlat(entity)
+        const flat = Material.getFlatMutable(entity)
         flat.metallic = 0.8
         flat.roughness = 0.2
         flat.alphaTest = 0.5
@@ -1047,7 +1045,7 @@ describe('Generated Material ProtoBuf', () => {
           texture: Material.Texture.Common({ src: 'original.png' })
         })
 
-        const flat = Material.getFlat(entity)
+        const flat = Material.getFlatMutable(entity)
         flat.texture.src = 'updated.png'
         flat.metallic = 0.9
         flat.roughness = 0.1
@@ -1065,6 +1063,106 @@ describe('Generated Material ProtoBuf', () => {
           }
         }
       })
+    })
+  })
+
+  describe('getFlatOrNull() API', () => {
+    it('should return null when entity does not have Material component', () => {
+      const newEngine = Engine()
+      const Material = components.Material(newEngine)
+      const entity = newEngine.addEntity()
+
+      expect(Material.getFlatOrNull(entity)).toBeNull()
+    })
+
+    it('should return readonly accessor when entity has Material component', () => {
+      const newEngine = Engine()
+      const Material = components.Material(newEngine)
+      const entity = newEngine.addEntity()
+
+      Material.setPbrMaterial(entity, {
+        metallic: 0.5,
+        texture: Material.Texture.Common({ src: 'test.png' })
+      })
+
+      const flat = Material.getFlatOrNull(entity)
+      expect(flat).not.toBeNull()
+      expect(flat!.metallic).toBe(0.5)
+      expect(flat!.texture.src).toBe('test.png')
+    })
+  })
+
+  describe('getFlatMutable() API', () => {
+    it('should throw when entity does not have Material component', () => {
+      const newEngine = Engine()
+      const Material = components.Material(newEngine)
+      const entity = newEngine.addEntity()
+
+      expect(() => Material.getFlatMutable(entity)).toThrow()
+    })
+
+    it('should allow mutations on the material', () => {
+      const newEngine = Engine()
+      const Material = components.Material(newEngine)
+      const entity = newEngine.addEntity()
+
+      Material.setPbrMaterial(entity, {
+        metallic: 0.5
+      })
+
+      const flat = Material.getFlatMutable(entity)
+      flat.metallic = 0.9
+
+      const mat = Material.get(entity)
+      if (mat.material?.$case === 'pbr') {
+        expect(mat.material.pbr.metallic).toBe(0.9)
+      }
+    })
+  })
+
+  describe('getFlatMutableOrNull() API', () => {
+    it('should return null when entity does not have Material component', () => {
+      const newEngine = Engine()
+      const Material = components.Material(newEngine)
+      const entity = newEngine.addEntity()
+
+      expect(Material.getFlatMutableOrNull(entity)).toBeNull()
+    })
+
+    it('should return mutable accessor when entity has Material component', () => {
+      const newEngine = Engine()
+      const Material = components.Material(newEngine)
+      const entity = newEngine.addEntity()
+
+      Material.setPbrMaterial(entity, {
+        metallic: 0.5
+      })
+
+      const flat = Material.getFlatMutableOrNull(entity)
+      expect(flat).not.toBeNull()
+      expect(flat!.metallic).toBe(0.5)
+    })
+
+    it('should allow mutations on the material', () => {
+      const newEngine = Engine()
+      const Material = components.Material(newEngine)
+      const entity = newEngine.addEntity()
+
+      Material.setPbrMaterial(entity, {
+        metallic: 0.5
+      })
+
+      const flat = Material.getFlatMutableOrNull(entity)
+      if (flat) {
+        flat.metallic = 0.9
+        flat.roughness = 0.2
+      }
+
+      const mat = Material.get(entity)
+      if (mat.material?.$case === 'pbr') {
+        expect(mat.material.pbr.metallic).toBe(0.9)
+        expect(mat.material.pbr.roughness).toBe(0.2)
+      }
     })
   })
 })

@@ -1171,13 +1171,13 @@ export interface FlatMaterial {
     albedoColor: PBColor4 | undefined;
     alphaTest: number | undefined;
     readonly alphaTexture: FlatTexture;
-    readonly bumpTexture: FlatTexture;
+    readonly bumpTexture: FlatTexture | undefined;
     castShadows: boolean | undefined;
     diffuseColor: PBColor4 | undefined;
     directIntensity: number | undefined;
     emissiveColor: PBColor3 | undefined;
     emissiveIntensity: number | undefined;
-    readonly emissiveTexture: FlatTexture;
+    readonly emissiveTexture: FlatTexture | undefined;
     metallic: number | undefined;
     reflectivityColor: PBColor3 | undefined;
     roughness: number | undefined;
@@ -1692,7 +1692,10 @@ export const Material: MaterialComponentDefinitionExtended;
 
 // @public (undocumented)
 export interface MaterialComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBMaterial> {
-    getFlat: (entity: Entity) => FlatMaterial;
+    getFlat: (entity: Entity) => ReadonlyFlatMaterial;
+    getFlatMutable: (entity: Entity) => FlatMaterial;
+    getFlatMutableOrNull: (entity: Entity) => FlatMaterial | null;
+    getFlatOrNull: (entity: Entity) => ReadonlyFlatMaterial | null;
     setBasicMaterial: (entity: Entity, material: PBMaterial_UnlitMaterial) => void;
     setPbrMaterial: (entity: Entity, material: PBMaterial_PbrMaterial) => void;
     Texture: TextureHelper;
@@ -3973,6 +3976,33 @@ export interface ReactElement<P = any, T extends string | JSXElementConstructor<
 export type ReadonlyComponentSchema<T extends [ComponentDefinition<unknown>, ...ComponentDefinition<unknown>[]]> = {
     [K in keyof T]: T[K] extends ComponentDefinition<unknown> ? ReturnType<T[K]['get']> : never;
 };
+
+// @public
+export interface ReadonlyFlatMaterial {
+    readonly albedoColor: PBColor4 | undefined;
+    readonly alphaTest: number | undefined;
+    readonly alphaTexture: ReadonlyFlatTexture;
+    readonly bumpTexture: ReadonlyFlatTexture | undefined;
+    readonly castShadows: boolean | undefined;
+    readonly diffuseColor: PBColor4 | undefined;
+    readonly directIntensity: number | undefined;
+    readonly emissiveColor: PBColor3 | undefined;
+    readonly emissiveIntensity: number | undefined;
+    readonly emissiveTexture: ReadonlyFlatTexture | undefined;
+    readonly metallic: number | undefined;
+    readonly reflectivityColor: PBColor3 | undefined;
+    readonly roughness: number | undefined;
+    readonly specularIntensity: number | undefined;
+    readonly texture: ReadonlyFlatTexture;
+    readonly transparencyMode: MaterialTransparencyMode | undefined;
+}
+
+// @public
+export interface ReadonlyFlatTexture {
+    readonly filterMode: TextureFilterMode | undefined;
+    readonly src: string | undefined;
+    readonly wrapMode: TextureWrapMode | undefined;
+}
 
 // @public (undocumented)
 export type ReadOnlyGrowOnlyValueSetComponentDefinition<T> = Omit<GrowOnlyValueSetComponentDefinition<T>, 'addValue'>;
