@@ -174,6 +174,44 @@ export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
   listenerCount<K extends keyof T>(eventType: K): number {
     return this.listeners.get(eventType)?.size ?? 0
   }
+
+  /**
+   * Check if the room is ready to send messages
+   * @returns true if messages will be sent immediately, false if they will be queued
+   */
+  isReady(): boolean {
+    return this.isRoomReadyAtom.getOrNull() ?? false
+  }
+
+  /**
+   * Subscribe to room readiness changes
+   * @param callback - Called when room becomes ready or disconnected
+   * @returns Unsubscribe function
+   *
+   * @example
+   * ```ts
+   * const unsubscribe = room.onReady((isReady) => {
+   *   if (isReady) {
+   *     console.log('Room connected!')
+   *   } else {
+   *     console.log('Room disconnected')
+   *   }
+   * })
+   *
+   * // Later: unsubscribe()
+   * ```
+   */
+  onReady(callback: (isReady: boolean) => void): () => void {
+    const observer = this.isRoomReadyAtom.observable.add((isReady) => {
+      callback(isReady)
+    })
+
+    return () => {
+      if (observer) {
+        this.isRoomReadyAtom.observable.remove(observer)
+      }
+    }
+  }
 }
 
 // Global registry for user-defined events
