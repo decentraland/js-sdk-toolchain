@@ -2,6 +2,8 @@ import {
   cyclicParentingChecker,
   getComponentEntityTree,
   getEntitiesWithParent,
+  getWorldPosition,
+  getWorldRotation,
   MapResult,
   RESERVED_STATIC_ENTITIES
 } from '../../packages/@dcl/ecs/src'
@@ -9,7 +11,7 @@ import { Engine, Entity, LastWriteWinElementSetComponentDefinition } from '../..
 import { createRendererTransport } from '../../packages/@dcl/sdk/src/internal/transports/rendererTransport'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
 import { components } from '../../packages/@dcl/ecs/src'
-import { Vector3 } from '../../packages/@dcl/sdk/src/math'
+import { Vector3, Quaternion } from '../../packages/@dcl/sdk/src/math'
 
 const PositionSchema = {
   x: Schemas.Float
@@ -706,6 +708,348 @@ describe('Engine tests', () => {
     expect(children).toContain(child3)
     expect(children).not.toContain(grandchild)
     expect(children).not.toContain(unrelated)
+  })
+
+  describe('getWorldPosition', () => {
+    it('should return zero vector for entity without Transform', () => {
+      const engine = Engine()
+      const entity = engine.addEntity()
+
+      const worldPos = getWorldPosition(engine, entity)
+
+      expect(worldPos).toEqual({ x: 0, y: 0, z: 0 })
+    })
+
+    it('should return local position for entity without parent', () => {
+      const engine = Engine()
+      const Transform = components.Transform(engine)
+      const entity = engine.addEntity()
+      Transform.create(entity, { position: { x: 5, y: 10, z: 15 } })
+
+      const worldPos = getWorldPosition(engine, entity)
+
+      expect(worldPos).toEqual({ x: 5, y: 10, z: 15 })
+    })
+
+    it('should compute world position with single parent (translation only)', () => {
+      const engine = Engine()
+      const Transform = components.Transform(engine)
+
+      const parent = engine.addEntity()
+      Transform.create(parent, { position: { x: 10, y: 0, z: 0 } })
+
+      const child = engine.addEntity()
+      Transform.create(child, { position: { x: 5, y: 0, z: 0 }, parent })
+
+      const worldPos = getWorldPosition(engine, child)
+
+      expect(worldPos).toEqual({ x: 15, y: 0, z: 0 })
+    })
+
+    it('should compute world position with multi-level hierarchy (translation only)', () => {
+      const engine = Engine()
+      const Transform = components.Transform(engine)
+
+      const grandparent = engine.addEntity()
+      Transform.create(grandparent, { position: { x: 100, y: 0, z: 0 } })
+
+      const parent = engine.addEntity()
+      Transform.create(parent, { position: { x: 10, y: 0, z: 0 }, parent: grandparent })
+
+      const child = engine.addEntity()
+      Transform.create(child, { position: { x: 1, y: 0, z: 0 }, parent })
+
+      const worldPos = getWorldPosition(engine, child)
+
+      expect(worldPos).toEqual({ x: 111, y: 0, z: 0 })
+    })
+
+    it('should compute world position with parent scale', () => {
+      const engine = Engine()
+      const Transform = components.Transform(engine)
+
+      const parent = engine.addEntity()
+      Transform.create(parent, {
+        position: { x: 0, y: 0, z: 0 },
+        scale: { x: 2, y: 2, z: 2 }
+      })
+
+      const child = engine.addEntity()
+      Transform.create(child, { position: { x: 5, y: 0, z: 0 }, parent })
+
+      const worldPos = getWorldPosition(engine, child)
+
+      // Child at local (5, 0, 0) with parent scale 2x should be at (10, 0, 0)
+      expect(worldPos).toEqual({ x: 10, y: 0, z: 0 })
+    })
+
+    it('should compute world position with parent rotation (90 degrees around Y)', () => {
+      const engine = Engine()
+      const Transform = components.Transform(engine)
+
+      const parent = engine.addEntity()
+      // Rotate 90 degrees around Y axis
+      Transform.create(parent, {
+        position: { x: 0, y: 0, z: 0 },
+        rotation: Quaternion.fromEulerDegrees(0, 90, 0)
+      })
+
+      const child = engine.addEntity()
+      Transform.create(child, { position: { x: 1, y: 0, z: 0 }, parent })
+
+      const worldPos = getWorldPosition(engine, child)
+
+      // A point at (1, 0, 0) rotated 90 degrees around Y should be at (0, 0, -1)
+      expect(worldPos.x).toBeCloseTo(0, 5)
+      expect(worldPos.y).toBeCloseTo(0, 5)
+      expect(worldPos.z).toBeCloseTo(-1, 5)
+    })
+
+    it('should compute world position with parent rotation and scale combined', () => {
+      const engine = Engine()
+      const Transform = components.Transform(engine)
+
+      const parent = engine.addEntity()
+      Transform.create(parent, {
+        position: { x: 10, y: 0, z: 0 },
+        rotation: Quaternion.fromEulerDegrees(0, 90, 0),
+        scale: { x: 2, y: 1, z: 1 }
+      })
+
+      const child = engine.addEntity()
+      Transform.create(child, { position: { x: 5, y: 0, z: 0 }, parent })
+
+      const worldPos = getWorldPosition(engine, child)
+
+      // Child at local (5, 0, 0) scaled by (2, 1, 1) = (10, 0, 0)
+      // Then rotated 90 degrees around Y = (0, 0, -10)
+      // Then translated by parent position (10, 0, 0) = (10, 0, -10)
+      expect(worldPos.x).toBeCloseTo(10, 5)
+      expect(worldPos.y).toBeCloseTo(0, 5)
+      expect(worldPos.z).toBeCloseTo(-10, 5)
+    })
+  })
+
+  describe('getWorldPosition circular dependency detection', () => {
+    it('should throw error for direct self-reference (A -> A)', () => {
+      const engine = Engine()
+      const Transform = components.Transform(engine)
+
+      const entityA = engine.addEntity()
+      Transform.create(entityA, {
+        position: { x: 1, y: 0, z: 0 },
+        parent: entityA // Self-reference
+      })
+
+      expect(() => getWorldPosition(engine, entityA)).toThrow(/Circular dependency detected/)
+    })
+
+    it('should throw error for two-entity cycle (A -> B -> A)', () => {
+      const engine = Engine()
+      const Transform = components.Transform(engine)
+
+      const entityA = engine.addEntity()
+      const entityB = engine.addEntity()
+
+      Transform.create(entityA, {
+        position: { x: 1, y: 0, z: 0 },
+        parent: entityB
+      })
+      Transform.create(entityB, {
+        position: { x: 2, y: 0, z: 0 },
+        parent: entityA
+      })
+
+      expect(() => getWorldPosition(engine, entityA)).toThrow(/Circular dependency detected/)
+      expect(() => getWorldPosition(engine, entityB)).toThrow(/Circular dependency detected/)
+    })
+
+    it('should throw error for three-entity cycle (A -> B -> C -> A)', () => {
+      const engine = Engine()
+      const Transform = components.Transform(engine)
+
+      const entityA = engine.addEntity()
+      const entityB = engine.addEntity()
+      const entityC = engine.addEntity()
+
+      Transform.create(entityA, {
+        position: { x: 1, y: 0, z: 0 },
+        parent: entityB
+      })
+      Transform.create(entityB, {
+        position: { x: 2, y: 0, z: 0 },
+        parent: entityC
+      })
+      Transform.create(entityC, {
+        position: { x: 3, y: 0, z: 0 },
+        parent: entityA
+      })
+
+      expect(() => getWorldPosition(engine, entityA)).toThrow(/Circular dependency detected/)
+      expect(() => getWorldPosition(engine, entityB)).toThrow(/Circular dependency detected/)
+      expect(() => getWorldPosition(engine, entityC)).toThrow(/Circular dependency detected/)
+    })
+
+    it('should work correctly with valid deep hierarchy (no cycle)', () => {
+      const engine = Engine()
+      const Transform = components.Transform(engine)
+
+      const root = engine.addEntity()
+      const level1 = engine.addEntity()
+      const level2 = engine.addEntity()
+      const level3 = engine.addEntity()
+      const level4 = engine.addEntity()
+
+      Transform.create(root, { position: { x: 1, y: 0, z: 0 } })
+      Transform.create(level1, { position: { x: 1, y: 0, z: 0 }, parent: root })
+      Transform.create(level2, { position: { x: 1, y: 0, z: 0 }, parent: level1 })
+      Transform.create(level3, { position: { x: 1, y: 0, z: 0 }, parent: level2 })
+      Transform.create(level4, { position: { x: 1, y: 0, z: 0 }, parent: level3 })
+
+      // Should not throw and should correctly accumulate positions
+      const worldPos = getWorldPosition(engine, level4)
+      expect(worldPos).toEqual({ x: 5, y: 0, z: 0 })
+    })
+  })
+
+  describe('getWorldRotation circular dependency detection', () => {
+    it('should throw error for direct self-reference (A -> A)', () => {
+      const engine = Engine()
+      const Transform = components.Transform(engine)
+
+      const entityA = engine.addEntity()
+      Transform.create(entityA, {
+        rotation: Quaternion.fromEulerDegrees(0, 45, 0),
+        parent: entityA // Self-reference
+      })
+
+      expect(() => getWorldRotation(engine, entityA)).toThrow(/Circular dependency detected/)
+    })
+
+    it('should throw error for two-entity cycle (A -> B -> A)', () => {
+      const engine = Engine()
+      const Transform = components.Transform(engine)
+
+      const entityA = engine.addEntity()
+      const entityB = engine.addEntity()
+
+      Transform.create(entityA, {
+        rotation: Quaternion.fromEulerDegrees(0, 45, 0),
+        parent: entityB
+      })
+      Transform.create(entityB, {
+        rotation: Quaternion.fromEulerDegrees(0, 45, 0),
+        parent: entityA
+      })
+
+      expect(() => getWorldRotation(engine, entityA)).toThrow(/Circular dependency detected/)
+      expect(() => getWorldRotation(engine, entityB)).toThrow(/Circular dependency detected/)
+    })
+
+    it('should work correctly with valid deep hierarchy (no cycle)', () => {
+      const engine = Engine()
+      const Transform = components.Transform(engine)
+
+      const root = engine.addEntity()
+      const level1 = engine.addEntity()
+      const level2 = engine.addEntity()
+      const level3 = engine.addEntity()
+
+      Transform.create(root, { rotation: Quaternion.fromEulerDegrees(0, 30, 0) })
+      Transform.create(level1, { rotation: Quaternion.fromEulerDegrees(0, 30, 0), parent: root })
+      Transform.create(level2, { rotation: Quaternion.fromEulerDegrees(0, 30, 0), parent: level1 })
+      Transform.create(level3, { rotation: Quaternion.fromEulerDegrees(0, 30, 0), parent: level2 })
+
+      // Should not throw and should correctly combine rotations (4 x 30 = 120 degrees)
+      const worldRot = getWorldRotation(engine, level3)
+      const expected = Quaternion.fromEulerDegrees(0, 120, 0)
+      expect(worldRot.x).toBeCloseTo(expected.x, 5)
+      expect(worldRot.y).toBeCloseTo(expected.y, 5)
+      expect(worldRot.z).toBeCloseTo(expected.z, 5)
+      expect(worldRot.w).toBeCloseTo(expected.w, 5)
+    })
+  })
+
+  describe('getWorldRotation', () => {
+    it('should return identity quaternion for entity without Transform', () => {
+      const engine = Engine()
+      const entity = engine.addEntity()
+
+      const worldRot = getWorldRotation(engine, entity)
+
+      expect(worldRot).toEqual({ x: 0, y: 0, z: 0, w: 1 })
+    })
+
+    it('should return local rotation for entity without parent', () => {
+      const engine = Engine()
+      const Transform = components.Transform(engine)
+      const entity = engine.addEntity()
+      const rotation = Quaternion.fromEulerDegrees(0, 45, 0)
+      Transform.create(entity, { rotation })
+
+      const worldRot = getWorldRotation(engine, entity)
+
+      expect(worldRot.x).toBeCloseTo(rotation.x, 5)
+      expect(worldRot.y).toBeCloseTo(rotation.y, 5)
+      expect(worldRot.z).toBeCloseTo(rotation.z, 5)
+      expect(worldRot.w).toBeCloseTo(rotation.w, 5)
+    })
+
+    it('should combine rotations in parent hierarchy', () => {
+      const engine = Engine()
+      const Transform = components.Transform(engine)
+
+      const parent = engine.addEntity()
+      Transform.create(parent, {
+        rotation: Quaternion.fromEulerDegrees(0, 45, 0)
+      })
+
+      const child = engine.addEntity()
+      Transform.create(child, {
+        rotation: Quaternion.fromEulerDegrees(0, 45, 0),
+        parent
+      })
+
+      const worldRot = getWorldRotation(engine, child)
+
+      // Two 45-degree rotations around Y should equal 90 degrees
+      const expected = Quaternion.fromEulerDegrees(0, 90, 0)
+      expect(worldRot.x).toBeCloseTo(expected.x, 5)
+      expect(worldRot.y).toBeCloseTo(expected.y, 5)
+      expect(worldRot.z).toBeCloseTo(expected.z, 5)
+      expect(worldRot.w).toBeCloseTo(expected.w, 5)
+    })
+
+    it('should combine rotations in multi-level hierarchy', () => {
+      const engine = Engine()
+      const Transform = components.Transform(engine)
+
+      const grandparent = engine.addEntity()
+      Transform.create(grandparent, {
+        rotation: Quaternion.fromEulerDegrees(0, 30, 0)
+      })
+
+      const parent = engine.addEntity()
+      Transform.create(parent, {
+        rotation: Quaternion.fromEulerDegrees(0, 30, 0),
+        parent: grandparent
+      })
+
+      const child = engine.addEntity()
+      Transform.create(child, {
+        rotation: Quaternion.fromEulerDegrees(0, 30, 0),
+        parent
+      })
+
+      const worldRot = getWorldRotation(engine, child)
+
+      // Three 30-degree rotations around Y should equal 90 degrees
+      const expected = Quaternion.fromEulerDegrees(0, 90, 0)
+      expect(worldRot.x).toBeCloseTo(expected.x, 5)
+      expect(worldRot.y).toBeCloseTo(expected.y, 5)
+      expect(worldRot.z).toBeCloseTo(expected.z, 5)
+      expect(worldRot.w).toBeCloseTo(expected.w, 5)
+    })
   })
 
   it('should throw an error if the system is a thenable', async () => {

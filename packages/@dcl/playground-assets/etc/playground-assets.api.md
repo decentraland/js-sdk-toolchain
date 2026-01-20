@@ -1228,6 +1228,12 @@ export const getDefaultOpts: (opts?: Partial<EventSystemOptions>) => EventSystem
 // @public
 export function getEntitiesWithParent(engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema'>, parent: Entity): Entity[];
 
+// @public
+export function getWorldPosition(engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema'>, entity: Entity): Vector3Type;
+
+// @public
+export function getWorldRotation(engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema'>, entity: Entity): QuaternionType;
+
 // Warning: (ae-missing-release-tag) "GlobalDirectionRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
