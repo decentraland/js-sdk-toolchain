@@ -1,5 +1,5 @@
 // @internal
-declare module '~sdk/all-scripts' {
+declare module '~sdk/script-utils' {
   import type { Entity } from '@dcl/ecs/dist-cjs'
 
 __TYPE_IMPORTS__
@@ -21,7 +21,7 @@ __TYPE_IMPORTS__
    *
    * @example
    * ```typescript
-   * import type { ActionCallback } from '~sdk/all-scripts'
+   * import type { ActionCallback } from '~sdk/script-utils'
    *
    * export class Padlock {
    *   constructor(

@@ -66,7 +66,7 @@ import { engine, NetworkEntity } from '@dcl/sdk/ecs'
 import * as sdk from '@dcl/sdk'
 import { compositeProvider } from '@dcl/sdk/composite-provider'
 import { compositeFromLoader } from '~sdk/all-composites'
-import { _initializeScripts } from '~sdk/all-scripts'
+import { _initializeScripts } from '~sdk/script-utils'
 
 ${
   isEditorScene &&
@@ -103,7 +103,7 @@ if ((entrypoint as any).main !== undefined) {
 
 export * from '@dcl/sdk'
 export * from '${unixEntrypointPath}'
-export * from '~sdk/all-scripts'
+export * from '~sdk/script-utils'
 `
 }
 
@@ -432,10 +432,10 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
       })
 
       // Handle scripts virtual module
-      build.onResolve({ filter: /~sdk\/all-scripts/ }, (_args) => {
+      build.onResolve({ filter: /~sdk\/script-utils/ }, (_args) => {
         return {
           namespace: 'sdk-scripts',
-          path: 'all-scripts'
+          path: 'script-utils'
         }
       })
 
@@ -539,21 +539,23 @@ async function prepareRuntimeCode(fs: BundleComponents['fs']): Promise<string> {
   const runtimeCode = await fs.readFile(runtimeCodePath, 'utf-8')
 
   // Strip CommonJS/module system code
-  return runtimeCode
-    .replace(/"use strict";?\s*/g, '')
-    .replace(/Object\.defineProperty\(exports,.*?\);?\s*/g, '')
-    .replace(/exports\.\w+\s*=\s*void 0;?\s*/g, '')
-    .replace(/exports\.\w+\s*=\s*/g, '')
-    .replace(/^export\s+/gm, '')
-    .replace(/^import\s+.*$/gm, '')
-    // fix nested asset-packs path (importing from @dcl/inspector is banned in runtime, but @dcl/asset-packs not)
-    .replace(/@dcl\/inspector\/node_modules\/@dcl\/asset-packs/g, '@dcl/asset-packs')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim()
+  return (
+    runtimeCode
+      .replace(/"use strict";?\s*/g, '')
+      .replace(/Object\.defineProperty\(exports,.*?\);?\s*/g, '')
+      .replace(/exports\.\w+\s*=\s*void 0;?\s*/g, '')
+      .replace(/exports\.\w+\s*=\s*/g, '')
+      .replace(/^export\s+/gm, '')
+      .replace(/^import\s+.*$/gm, '')
+      // fix nested asset-packs path (importing from @dcl/inspector is banned in runtime, but @dcl/asset-packs not)
+      .replace(/@dcl\/inspector\/node_modules\/@dcl\/asset-packs/g, '@dcl/asset-packs')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim()
+  )
 }
 
 /**
- * Generates the TypeScript declaration for the ~sdk/all-scripts module
+ * Generates the TypeScript declaration for the ~sdk/script-utils module
  */
 async function generateScriptModuleDeclaration(
   components: BundleComponents,
@@ -563,9 +565,7 @@ async function generateScriptModuleDeclaration(
   const templatePath = path.join(__dirname, 'script-module.d.ts.template')
   const template = await components.fs.readFile(templatePath, 'utf-8')
 
-  return template
-    .replace('__TYPE_IMPORTS__', typeImports)
-    .replace('__SCRIPT_TYPES__', scriptTypes)
+  return template.replace('__TYPE_IMPORTS__', typeImports).replace('__SCRIPT_TYPES__', scriptTypes)
 }
 
 /**
@@ -582,9 +582,9 @@ async function updateSdkTypeDeclarations(
     const jsRuntimePath = require.resolve('@dcl/js-runtime/sdk.d.ts', { paths: [workingDirectory] })
     let existingSdkDts = await components.fs.readFile(jsRuntimePath, 'utf-8')
 
-    // remove any existing ~sdk/all-scripts module declaration
+    // remove any existing ~sdk/script-utils module declaration
     existingSdkDts = existingSdkDts
-      .replace(/\/\/ @internal[\s]*\ndeclare module '~sdk\/all-scripts'[\s\S]*?(?=\n\/\/|$)/, '')
+      .replace(/\/\/ @internal[\s]*\ndeclare module '~sdk\/script-utils'[\s\S]*?(?=\n\/\/|$)/, '')
       .trim()
 
     // generate and append the new module declaration
@@ -646,11 +646,7 @@ export async function generateInitializeScriptsModule(
   )
 
   // Step 3: Generate virtual module content
-  const contents = generateVirtualModuleContent(
-    scriptData.runtimeImports,
-    runtimeCode,
-    scriptData.scriptsArray
-  )
+  const contents = generateVirtualModuleContent(scriptData.runtimeImports, runtimeCode, scriptData.scriptsArray)
 
   return { contents, watchFiles: scriptData.watchFiles }
 }

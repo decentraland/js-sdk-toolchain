@@ -1,7 +1,9 @@
+/* eslint-disable no-console */
 import { IEngine, Entity, EntityState } from '@dcl/ecs/dist-cjs'
 import { type ActionRef, getActionEvents } from '@dcl/inspector/node_modules/@dcl/asset-packs'
 
 declare global {
+  // eslint-disable-next-line no-var
   var __DCL_SCRIPT_INSTANCES__: Map<string, { instance: any; entity: Entity; path: string }>
 }
 

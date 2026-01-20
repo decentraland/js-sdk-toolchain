@@ -4,7 +4,7 @@ declare module '~sdk/all-composites' {
 }
 
 // @internal
-declare module '~sdk/all-scripts' {
+declare module '~sdk/script-utils' {
   type Entity = number; // this will get replaced with the proper import at scene build time
 
   /**
@@ -31,7 +31,7 @@ declare module '~sdk/all-scripts' {
    *
    * @example
    * ```typescript
-   * import type { ActionCallback } from '~sdk/all-scripts'
+   * import type { ActionCallback } from '~sdk/script-utils'
    *
    * export class Padlock {
    *   constructor(
