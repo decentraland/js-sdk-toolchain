@@ -3880,7 +3880,7 @@ export interface ReactBasedUiSystem {
     // (undocumented)
     destroy(): void;
     // (undocumented)
-    setUiRenderer(ui: UiComponent): void;
+    setUiRenderer(ui: UiComponent, options?: UiRendererOptions): void;
 }
 
 // @public (undocumented)
@@ -4653,6 +4653,12 @@ export interface UiLabelProps {
 
 // @public
 export type uint32 = number;
+
+// @public (undocumented)
+export type UiRendererOptions = {
+    virtualWidth: number;
+    virtualHeight: number;
+};
 
 // @public (undocumented)
 export const UiText: LastWriteWinElementSetComponentDefinition<PBUiText>;

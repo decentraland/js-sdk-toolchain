@@ -9,6 +9,8 @@ import { EntityPropTypes, ScaleContext, ScaleUnit, ScaleUnits } from './types'
 import { parseUiBackground } from './uiBackground'
 import { parseUiTransform } from './uiTransform'
 
+let uiScaleFactor = 1
+
 /**
  * @internal
  */
@@ -56,6 +58,21 @@ export function getScaleCtx(_engine: IEngine = engine): ScaleContext | undefined
   if (!canvasInfo) return undefined
   const { width, height, devicePixelRatio } = canvasInfo
   return { width, height, ratio: devicePixelRatio }
+}
+
+/**
+ * @internal
+ */
+export function getUiScaleFactor(): number {
+  return uiScaleFactor
+}
+
+/**
+ * @internal
+ */
+export function setUiScaleFactor(nextScale: number): void {
+  if (!Number.isFinite(nextScale) || nextScale < 0) return
+  uiScaleFactor = nextScale
 }
 
 /**
