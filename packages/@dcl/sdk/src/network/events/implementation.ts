@@ -23,18 +23,20 @@ export type SendOptions = {
  * Room provides type-safe communication between clients and server
  * Uses binary serialization with Schema definitions for efficiency
  */
-type QueuedMessage = {
-  eventType: string
-  buffer: Uint8Array
-  options?: SendOptions
-}
+type QueuedMessage<T extends EventSchemaRegistry = EventSchemaRegistry> = {
+  [K in keyof T]: {
+    eventType: K
+    data: EventTypes<T>[K]
+    options?: SendOptions
+  }
+}[keyof T]
 
 export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
   private listeners = new Map<keyof T, Set<EventCallback<any>>>()
   private binaryMessageBus: any
   private isServerFuture: IFuture<boolean> = future()
   private isRoomReadyAtom: Atom<boolean>
-  private messageQueue: QueuedMessage[] = []
+  private messageQueue: QueuedMessage<T>[] = []
   private isProcessingQueue = false
 
   constructor(_engine: IEngine, binaryMessageBus: any, isServerFn: Atom<boolean>, isRoomReadyAtom: Atom<boolean>) {
@@ -79,22 +81,14 @@ export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
     if (this.isProcessingQueue || this.messageQueue.length === 0) return
 
     this.isProcessingQueue = true
-    const isServer = await this.isServerFuture
 
-    // Process messages one at a time
-    while (this.messageQueue.length > 0) {
-      const message = this.messageQueue.shift()
-      if (!message) break
+    // Copy and clear the queue to avoid mutation during iteration
+    const messages = [...this.messageQueue]
+    this.messageQueue.length = 0
 
-      try {
-        if (isServer) {
-          this.binaryMessageBus.emit(CommsMessage.CUSTOM_EVENT, message.buffer, message.options?.to)
-        } else {
-          this.binaryMessageBus.emit(CommsMessage.CUSTOM_EVENT, message.buffer)
-        }
-      } catch (error) {
-        console.error(`[EventBus] Failed to send queued event '${message.eventType}':`, error)
-      }
+    // Re-send all queued messages
+    for (const message of messages) {
+      await this.send(message.eventType, message.data, message.options)
     }
 
     this.isProcessingQueue = false
@@ -110,20 +104,21 @@ export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
    */
   async send<K extends keyof T>(eventType: K, data: EventTypes<T>[K], options?: SendOptions): Promise<void> {
     try {
-      const buffer = encodeEvent(eventType as string, data, globalEventRegistry)
       const isRoomReady = this.isRoomReadyAtom.getOrNull() ?? false
 
-      // If room is not ready, queue the message
+      // If room is not ready, queue the message with original params
       if (!isRoomReady) {
         this.messageQueue.push({
-          eventType: String(eventType),
-          buffer,
+          eventType,
+          data,
           options
         })
         return
       }
 
       // Room is ready, send immediately
+      const buffer = encodeEvent(eventType as string, data, globalEventRegistry)
+
       if (await this.isServerFuture) {
         // Server can send to specific clients or broadcast
         this.binaryMessageBus.emit(CommsMessage.CUSTOM_EVENT, buffer, options?.to)
