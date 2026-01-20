@@ -36,7 +36,7 @@ export interface IWorldStorage {
 export const createWorldStorage = (): IWorldStorage => {
   return {
     async get<T = unknown>(key: string): Promise<T | null> {
-      await assertIsServer(MODULE_NAME)
+      assertIsServer(MODULE_NAME)
 
       const baseUrl = await getStorageServerUrl()
       const url = `${baseUrl}/values/${encodeURIComponent(key)}`
@@ -60,7 +60,7 @@ export const createWorldStorage = (): IWorldStorage => {
     },
 
     async set<T = unknown>(key: string, value: T): Promise<boolean> {
-      await assertIsServer(MODULE_NAME)
+      assertIsServer(MODULE_NAME)
 
       const baseUrl = await getStorageServerUrl()
       const url = `${baseUrl}/values/${encodeURIComponent(key)}`
@@ -85,7 +85,7 @@ export const createWorldStorage = (): IWorldStorage => {
     },
 
     async delete(key: string): Promise<boolean> {
-      await assertIsServer(MODULE_NAME)
+      assertIsServer(MODULE_NAME)
 
       const baseUrl = await getStorageServerUrl()
       const url = `${baseUrl}/values/${encodeURIComponent(key)}`
