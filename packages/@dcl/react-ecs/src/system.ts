@@ -22,7 +22,13 @@ export type UiRendererOptions = {
  * @public
  */
 export interface ReactBasedUiSystem {
+  /**
+   * Destroy all UI entities and unregister related systems.
+   */
   destroy(): void
+  /**
+   * Set the main UI renderer. Optional virtual size defines the global UI scale factor.
+   */
   setUiRenderer(ui: UiComponent, options?: UiRendererOptions): void
   /**
    * Add a UI renderer associated with an entity. The UI will be automatically cleaned up
@@ -36,10 +42,12 @@ export interface ReactBasedUiSystem {
    * @param entity - The entity to associate with this UI renderer. When the entity is removed,
    *                 the UI renderer is automatically cleaned up.
    * @param ui - The UI component to render
+   * @param options - Optional virtual size used for UI scale factor when main UI has none
    */
   addUiRenderer(entity: Entity, ui: UiComponent, options?: UiRendererOptions): void
   /**
    * Remove a previously added UI renderer by its associated entity.
+   * It does not affect the main UI renderer.
    * @param entity - The entity whose UI renderer should be removed
    */
   removeUiRenderer(entity: Entity): void
@@ -54,9 +62,12 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
   let virtualSize: UiRendererOptions | undefined = undefined
   const additionalRenderers = new Map<Entity, { ui: UiComponent; options?: UiRendererOptions }>()
   const UiCanvasInformation = ecsComponents.UiCanvasInformation(engine)
-  const scaleOwner = Symbol('react-ecs-ui-scale')
+
+  // Unique owner to prevent other UI systems resetting this scale factor.
+  const uiScaleFactorOwner = Symbol('react-ecs-ui-scale')
 
   function getActiveVirtualSize(): UiRendererOptions | undefined {
+    // Main renderer options win; otherwise use the first additional renderer option.
     if (virtualSize) return virtualSize
     for (const entry of additionalRenderers.values()) {
       if (entry.options) return entry.options
@@ -98,7 +109,8 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
   function UiScaleSystem() {
     const activeVirtualSize = getActiveVirtualSize()
     if (!activeVirtualSize) {
-      resetUiScaleFactor(scaleOwner)
+      // Reset only if this system owns the scale factor.
+      resetUiScaleFactor(uiScaleFactorOwner)
       return
     }
 
@@ -111,11 +123,8 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
 
     const nextScale = Math.min(width / virtualWidth, height / virtualHeight)
     if (Number.isFinite(nextScale) && nextScale !== getUiScaleFactor()) {
-
-      // @ts-ignore
-      console.log(`UiScaleSystem() - UiScaleFactor: ${nextScale} / Virtual Screen: ${virtualWidth}x${virtualHeight} / UiCanvasInfo: ${width}x${height}`)
-
-      setUiScaleFactor(nextScale, scaleOwner)
+      // Track ownership when updating to avoid cross-system conflicts.
+      setUiScaleFactor(nextScale, uiScaleFactorOwner)
     }
   }
 
@@ -126,7 +135,7 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
     destroy() {
       engine.removeSystem(UiScaleSystem)
       engine.removeSystem(ReactBasedUiSystem)
-      resetUiScaleFactor(scaleOwner)
+      resetUiScaleFactor(uiScaleFactorOwner)
       for (const entity of renderer.getEntities()) {
         engine.removeEntity(entity)
       }

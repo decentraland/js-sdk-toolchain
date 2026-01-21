@@ -73,17 +73,10 @@ export function getUiScaleFactor(): number {
  */
 export function setUiScaleFactor(nextScale: number, owner?: symbol): void {
   if (!Number.isFinite(nextScale) || nextScale < 0) return
-
   if (owner) {
+    // Mark ownership so only that system can reset the scale.
     uiScaleOwner = owner
-
-    // @ts-ignore
-    console.log(`uiScaleFactor owner updated.`)
   }
-
-  // @ts-ignore
-  console.log(`setUiScaleFactor() - OLD uiScaleFactor: ${uiScaleFactor} / NEW uiScaleFactor: ${nextScale}`)
-
   uiScaleFactor = nextScale
 }
 
@@ -91,10 +84,8 @@ export function setUiScaleFactor(nextScale: number, owner?: symbol): void {
  * @internal
  */
 export function resetUiScaleFactor(owner?: symbol): void {
+  // Ignore resets from non-owners to avoid stomping active scale.
   if (owner && uiScaleOwner !== owner) return
-  // @ts-ignore
-  console.log(`resetUiScaleFactor()`)
-
   uiScaleOwner = undefined
   uiScaleFactor = 1
 }
