@@ -101,6 +101,10 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
 
     const nextScale = Math.min(width / virtualWidth, height / virtualHeight)
     if (Number.isFinite(nextScale) && nextScale !== getUiScaleFactor()) {
+
+      // @ts-ignore
+      console.log(`UiScaleFactor: ${nextScale} / Virtual Screen: ${virtualWidth}x${virtualHeight} / UiCanvasInfo: ${width}x${height}`)
+
       setUiScaleFactor(nextScale)
     }
   }
