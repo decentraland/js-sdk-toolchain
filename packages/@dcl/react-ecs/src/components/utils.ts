@@ -72,6 +72,10 @@ export function getUiScaleFactor(): number {
  */
 export function setUiScaleFactor(nextScale: number): void {
   if (!Number.isFinite(nextScale) || nextScale < 0) return
+
+  // @ts-ignore
+  console.log(`setUiScaleFactor() - OLD uiScaleFactor: ${uiScaleFactor} / NEW uiScaleFactor: ${nextScale}`)
+
   uiScaleFactor = nextScale
 }
 
