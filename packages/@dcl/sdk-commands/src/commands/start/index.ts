@@ -128,6 +128,8 @@ export async function main(options: Options) {
   const explorerAlpha = !options.args['--web-explorer'] && !bevyWeb && !skipClient
 
   let hasSmartWearable = false
+  let needsHammurabiServer = false
+  let sceneWithMultiplayer: SceneWithMultiplayer | undefined
   const workspace = await getValidWorkspace(options.components, workingDirectory)
 
   /* istanbul ignore if */
@@ -138,6 +140,27 @@ export async function main(options: Options) {
     if (project.kind === 'smart-wearable') hasSmartWearable = true
     if (project.kind === 'scene' || project.kind === 'smart-wearable') {
       printCurrentProjectStarting(options.components.logger, project, workspace)
+
+      // Check if this is an authoritative multiplayer scene
+      sceneWithMultiplayer = project.scene as SceneWithMultiplayer
+      if (sceneWithMultiplayer.authoritativeMultiplayer) {
+        needsHammurabiServer = true
+        
+        // Check if Hammurabi server is installed
+        const isInstalled = await checkHammurabiServerInstalled(options.components, project.workingDirectory)
+        
+        if (!isInstalled) {
+          try {
+            await installHammurabiServer(options.components, project.workingDirectory)
+          } catch (error: any) {
+            printWarning(
+              options.components.logger,
+              `Failed to install Authoritative Server: ${error.message}. Continuing without server support.`
+            )
+            needsHammurabiServer = false
+          }
+        }
+      }
 
       // first run `npm run build`, this can be disabled with --skip-build
       // then start the embedded compiler, this can be disabled with --no-watch
