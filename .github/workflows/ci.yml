@@ -59,7 +59,6 @@ jobs:
         run: make test
         env:
           NODE_OPTIONS: '--max-old-space-size=4096'
-          UPDATE_SNAPSHOTS: true
 
       - name: test-cli
         run: make test-cli
