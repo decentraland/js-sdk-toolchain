@@ -10,6 +10,7 @@ import { parseUiBackground } from './uiBackground'
 import { parseUiTransform } from './uiTransform'
 
 let uiScaleFactor = 1
+let uiScaleOwner: symbol | undefined = undefined
 
 /**
  * @internal
@@ -70,13 +71,32 @@ export function getUiScaleFactor(): number {
 /**
  * @internal
  */
-export function setUiScaleFactor(nextScale: number): void {
+export function setUiScaleFactor(nextScale: number, owner?: symbol): void {
   if (!Number.isFinite(nextScale) || nextScale < 0) return
+
+  if (owner) {
+    uiScaleOwner = owner
+
+    // @ts-ignore
+    console.log(`uiScaleFactor owner updated.`)
+  }
 
   // @ts-ignore
   console.log(`setUiScaleFactor() - OLD uiScaleFactor: ${uiScaleFactor} / NEW uiScaleFactor: ${nextScale}`)
 
   uiScaleFactor = nextScale
+}
+
+/**
+ * @internal
+ */
+export function resetUiScaleFactor(owner?: symbol): void {
+  if (owner && uiScaleOwner !== owner) return
+  // @ts-ignore
+  console.log(`resetUiScaleFactor()`)
+
+  uiScaleOwner = undefined
+  uiScaleFactor = 1
 }
 
 /**

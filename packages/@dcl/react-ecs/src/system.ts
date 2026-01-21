@@ -3,7 +3,7 @@ import * as ecsComponents from '@dcl/ecs/dist/components'
 import React from 'react'
 import type { ReactEcs } from './react-ecs'
 import { createReconciler } from './reconciler'
-import { getUiScaleFactor, setUiScaleFactor } from './components/utils'
+import { getUiScaleFactor, resetUiScaleFactor, setUiScaleFactor } from './components/utils'
 
 /**
  * @public
@@ -37,7 +37,7 @@ export interface ReactBasedUiSystem {
    *                 the UI renderer is automatically cleaned up.
    * @param ui - The UI component to render
    */
-  addUiRenderer(entity: Entity, ui: UiComponent): void
+  addUiRenderer(entity: Entity, ui: UiComponent, options?: UiRendererOptions): void
   /**
    * Remove a previously added UI renderer by its associated entity.
    * @param entity - The entity whose UI renderer should be removed
@@ -52,8 +52,17 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
   const renderer = createReconciler(engine, pointerSystem)
   let uiComponent: UiComponent | undefined = undefined
   let virtualSize: UiRendererOptions | undefined = undefined
-  const additionalRenderers = new Map<Entity, UiComponent>()
+  const additionalRenderers = new Map<Entity, { ui: UiComponent; options?: UiRendererOptions }>()
   const UiCanvasInformation = ecsComponents.UiCanvasInformation(engine)
+  const scaleOwner = Symbol('react-ecs-ui-scale')
+
+  function getActiveVirtualSize(): UiRendererOptions | undefined {
+    if (virtualSize) return virtualSize
+    for (const entry of additionalRenderers.values()) {
+      if (entry.options) return entry.options
+    }
+    return undefined
+  }
 
   function ReactBasedUiSystem() {
     const components: React.ReactNode[] = []
@@ -64,12 +73,12 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
     }
 
     const entitiesToRemove: Entity[] = []
-    for (const [entity, component] of additionalRenderers) {
+    for (const [entity, entry] of additionalRenderers) {
       // Check for entity-based cleanup
       if (engine.getEntityState(entity) === EntityState.Removed) {
         entitiesToRemove.push(entity)
       } else {
-        components.push(React.createElement(component as any, { key: `__entity_${entity}__` }))
+        components.push(React.createElement(entry.ui as any, { key: `__entity_${entity}__` }))
       }
     }
 
@@ -87,8 +96,9 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
   }
 
   function UiScaleSystem() {
-    if (!virtualSize) {
-      if (getUiScaleFactor() !== 1) setUiScaleFactor(1)
+    const activeVirtualSize = getActiveVirtualSize()
+    if (!activeVirtualSize) {
+      resetUiScaleFactor(scaleOwner)
       return
     }
 
@@ -96,7 +106,7 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
     if (!canvasInfo) return
 
     const { width, height } = canvasInfo
-    const { virtualWidth, virtualHeight } = virtualSize
+    const { virtualWidth, virtualHeight } = activeVirtualSize
     if (!virtualWidth || !virtualHeight) return
 
     const nextScale = Math.min(width / virtualWidth, height / virtualHeight)
@@ -105,7 +115,7 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
       // @ts-ignore
       console.log(`UiScaleSystem() - UiScaleFactor: ${nextScale} / Virtual Screen: ${virtualWidth}x${virtualHeight} / UiCanvasInfo: ${width}x${height}`)
 
-      setUiScaleFactor(nextScale)
+      setUiScaleFactor(nextScale, scaleOwner)
     }
   }
 
@@ -116,7 +126,7 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
     destroy() {
       engine.removeSystem(UiScaleSystem)
       engine.removeSystem(ReactBasedUiSystem)
-      setUiScaleFactor(1)
+      resetUiScaleFactor(scaleOwner)
       for (const entity of renderer.getEntities()) {
         engine.removeEntity(entity)
       }
@@ -125,8 +135,8 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
       uiComponent = ui
       virtualSize = options
     },
-    addUiRenderer(entity: Entity, ui: UiComponent) {
-      additionalRenderers.set(entity, ui)
+    addUiRenderer(entity: Entity, ui: UiComponent, options?: UiRendererOptions) {
+      additionalRenderers.set(entity, { ui, options })
     },
     removeUiRenderer(entity: Entity) {
       additionalRenderers.delete(entity)
