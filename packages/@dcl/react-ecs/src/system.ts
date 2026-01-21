@@ -53,6 +53,8 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
   let uiComponent: UiComponent | undefined = undefined
   let virtualSize: UiRendererOptions | undefined = undefined
   const additionalRenderers = new Map<Entity, UiComponent>()
+  const UiCanvasInformation = ecsComponents.UiCanvasInformation(engine)
+
   function ReactBasedUiSystem() {
     const components: React.ReactNode[] = []
 
@@ -90,7 +92,6 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
       return
     }
 
-    const UiCanvasInformation = ecsComponents.UiCanvasInformation(engine)
     const canvasInfo = UiCanvasInformation.getOrNull(engine.RootEntity)
     if (!canvasInfo) return
 
