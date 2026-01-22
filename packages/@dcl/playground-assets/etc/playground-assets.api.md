@@ -1229,10 +1229,10 @@ export const getDefaultOpts: (opts?: Partial<EventSystemOptions>) => EventSystem
 export function getEntitiesWithParent(engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema'>, parent: Entity): Entity[];
 
 // @public
-export function getWorldPosition(engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema'>, entity: Entity): Vector3Type;
+export function getWorldPosition(engine: WorldTransformEngine, entity: Entity): Vector3Type;
 
 // @public
-export function getWorldRotation(engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema'>, entity: Entity): QuaternionType;
+export function getWorldRotation(engine: WorldTransformEngine, entity: Entity): QuaternionType;
 
 // Warning: (ae-missing-release-tag) "GlobalDirectionRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -5008,6 +5008,9 @@ export interface VirtualCameraComponentDefinitionExtended extends LastWriteWinEl
 
 // @public (undocumented)
 export const VisibilityComponent: LastWriteWinElementSetComponentDefinition<PBVisibilityComponent>;
+
+// @public
+export type WorldTransformEngine = Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema' | 'PlayerEntity'>;
 
 // @public (undocumented)
 export const enum YGAlign {

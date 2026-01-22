@@ -1052,6 +1052,156 @@ describe('Engine tests', () => {
     })
   })
 
+  describe('getWorldPosition with AvatarAttach', () => {
+    it('should use player position for entity with AvatarAttach (local player)', () => {
+      const engine = Engine()
+      const Transform = components.Transform(engine)
+      const AvatarAttach = components.AvatarAttach(engine)
+
+      // Set player position (PlayerEntity = 1)
+      Transform.create(engine.PlayerEntity, {
+        position: { x: 10, y: 5, z: 20 },
+        rotation: { x: 0, y: 0, z: 0, w: 1 }
+      })
+
+      // Create entity attached to local player (no avatarId means local player)
+      const attachedEntity = engine.addEntity()
+      AvatarAttach.create(attachedEntity, { anchorPointId: 2 }) // AAPT_LEFT_HAND
+
+      const worldPos = getWorldPosition(engine, attachedEntity)
+
+      // Should return player's position as the base
+      expect(worldPos).toEqual({ x: 10, y: 5, z: 20 })
+    })
+
+    it('should use player position for child of entity with AvatarAttach', () => {
+      const engine = Engine()
+      const Transform = components.Transform(engine)
+      const AvatarAttach = components.AvatarAttach(engine)
+
+      // Set player position
+      Transform.create(engine.PlayerEntity, {
+        position: { x: 10, y: 5, z: 20 },
+        rotation: { x: 0, y: 0, z: 0, w: 1 }
+      })
+
+      // Create entity attached to local player
+      const attachedEntity = engine.addEntity()
+      AvatarAttach.create(attachedEntity, { anchorPointId: 2 })
+      Transform.create(attachedEntity, { position: { x: 0, y: 0, z: 0 } })
+
+      // Create child of attached entity with offset
+      const childEntity = engine.addEntity()
+      Transform.create(childEntity, {
+        position: { x: 0, y: 0.225, z: 0 },
+        parent: attachedEntity
+      })
+
+      const worldPos = getWorldPosition(engine, childEntity)
+
+      // Should return player's position + child offset
+      expect(worldPos.x).toBeCloseTo(10, 5)
+      expect(worldPos.y).toBeCloseTo(5.225, 5)
+      expect(worldPos.z).toBeCloseTo(20, 5)
+    })
+
+    it('should apply player rotation to child offset', () => {
+      const engine = Engine()
+      const Transform = components.Transform(engine)
+      const AvatarAttach = components.AvatarAttach(engine)
+
+      // Set player position and 90 degree rotation around Y
+      Transform.create(engine.PlayerEntity, {
+        position: { x: 10, y: 0, z: 0 },
+        rotation: Quaternion.fromEulerDegrees(0, 90, 0)
+      })
+
+      // Create entity attached to local player
+      const attachedEntity = engine.addEntity()
+      AvatarAttach.create(attachedEntity, { anchorPointId: 2 })
+      Transform.create(attachedEntity, { position: { x: 0, y: 0, z: 0 } })
+
+      // Create child with offset along X axis
+      const childEntity = engine.addEntity()
+      Transform.create(childEntity, {
+        position: { x: 1, y: 0, z: 0 },
+        parent: attachedEntity
+      })
+
+      const worldPos = getWorldPosition(engine, childEntity)
+
+      // Offset (1,0,0) rotated 90 degrees around Y becomes (0,0,-1)
+      // Plus player position (10,0,0) = (10,0,-1)
+      expect(worldPos.x).toBeCloseTo(10, 5)
+      expect(worldPos.y).toBeCloseTo(0, 5)
+      expect(worldPos.z).toBeCloseTo(-1, 5)
+    })
+
+    it('should use player rotation for entity with AvatarAttach', () => {
+      const engine = Engine()
+      const Transform = components.Transform(engine)
+      const AvatarAttach = components.AvatarAttach(engine)
+
+      const playerRotation = Quaternion.fromEulerDegrees(0, 45, 0)
+      Transform.create(engine.PlayerEntity, {
+        position: { x: 0, y: 0, z: 0 },
+        rotation: playerRotation
+      })
+
+      const attachedEntity = engine.addEntity()
+      AvatarAttach.create(attachedEntity, { anchorPointId: 2 })
+
+      const worldRot = getWorldRotation(engine, attachedEntity)
+
+      expect(worldRot.x).toBeCloseTo(playerRotation.x, 5)
+      expect(worldRot.y).toBeCloseTo(playerRotation.y, 5)
+      expect(worldRot.z).toBeCloseTo(playerRotation.z, 5)
+      expect(worldRot.w).toBeCloseTo(playerRotation.w, 5)
+    })
+
+    it('should fall back to normal handling when player has no Transform', () => {
+      const engine = Engine()
+      const Transform = components.Transform(engine)
+      const AvatarAttach = components.AvatarAttach(engine)
+
+      // Don't set player Transform
+
+      const attachedEntity = engine.addEntity()
+      AvatarAttach.create(attachedEntity, { anchorPointId: 2 })
+      Transform.create(attachedEntity, { position: { x: 5, y: 10, z: 15 } })
+
+      const worldPos = getWorldPosition(engine, attachedEntity)
+
+      // Falls back to the entity's own Transform
+      expect(worldPos).toEqual({ x: 5, y: 10, z: 15 })
+    })
+
+    it('should fall back to normal handling for remote player attachment', () => {
+      const engine = Engine()
+      const Transform = components.Transform(engine)
+      const AvatarAttach = components.AvatarAttach(engine)
+
+      // Set local player Transform
+      Transform.create(engine.PlayerEntity, {
+        position: { x: 10, y: 5, z: 20 }
+      })
+
+      // Create entity attached to a remote player (with avatarId)
+      const attachedEntity = engine.addEntity()
+      AvatarAttach.create(attachedEntity, {
+        anchorPointId: 2,
+        avatarId: 'remote-player-id'
+      })
+      Transform.create(attachedEntity, { position: { x: 5, y: 0, z: 0 } })
+
+      const worldPos = getWorldPosition(engine, attachedEntity)
+
+      // Should use the entity's own Transform (not local player's)
+      // since we can't determine remote player's position
+      expect(worldPos).toEqual({ x: 5, y: 0, z: 0 })
+    })
+  })
+
   it('should throw an error if the system is a thenable', async () => {
     const engine = Engine()
     engine.addSystem(async function () {

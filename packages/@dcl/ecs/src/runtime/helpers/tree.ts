@@ -78,24 +78,114 @@ type WorldTransform = {
   scale: Vector3Type
 }
 
+/** @internal Identity transform values */
+const IDENTITY_POSITION: Vector3Type = { x: 0, y: 0, z: 0 }
+const IDENTITY_ROTATION: QuaternionType = { x: 0, y: 0, z: 0, w: 1 }
+const IDENTITY_SCALE: Vector3Type = { x: 1, y: 1, z: 1 }
+
+/** @internal Transform with position and rotation only (used for player transforms) */
+type PositionRotationTransform = { position: Vector3Type; rotation: QuaternionType }
+
+/** @internal Full transform with position, rotation, and scale (used for entity transforms) */
+type FullTransform = PositionRotationTransform & { scale: Vector3Type }
+
+/**
+ * @internal
+ * Computes the world transform for an entity with AvatarAttach.
+ * If the entity has a Transform, the avatar-relative values (set by the renderer)
+ * are combined with the player's transform. Otherwise, returns the player's transform
+ * with identity scale.
+ */
+function computeAvatarAttachedWorldTransform(
+  playerTransform: PositionRotationTransform,
+  entityTransform: FullTransform | null
+): WorldTransform {
+  if (!entityTransform) {
+    return {
+      position: { ...playerTransform.position },
+      rotation: { ...playerTransform.rotation },
+      scale: { ...IDENTITY_SCALE }
+    }
+  }
+
+  const rotatedPosition = rotateVectorByQuaternion(entityTransform.position, playerTransform.rotation)
+
+  return {
+    position: addVectors(playerTransform.position, rotatedPosition),
+    rotation: multiplyQuaternions(playerTransform.rotation, entityTransform.rotation),
+    scale: entityTransform.scale
+  }
+}
+
+/**
+ * @internal
+ * Finds the transform of a player by their avatar ID.
+ * Returns the local player's transform if avatarId is undefined,
+ * or searches for a remote player by matching their address.
+ */
+function findPlayerTransform(
+  Transform: ReturnType<typeof components.Transform>,
+  PlayerIdentityData: ReturnType<typeof components.PlayerIdentityData> | null,
+  localPlayerEntity: Entity,
+  avatarId: string | undefined
+): PositionRotationTransform | null {
+  // Local player (avatarId undefined)
+  if (avatarId === undefined) {
+    return Transform.getOrNull(localPlayerEntity)
+  }
+
+  // Remote player - find their entity by matching address
+  if (!PlayerIdentityData) {
+    return null
+  }
+
+  for (const [playerEntity, identityData] of PlayerIdentityData.iterator()) {
+    if (identityData.address === avatarId) {
+      return Transform.getOrNull(playerEntity)
+    }
+  }
+
+  return null
+}
+
 /**
  * @internal
  * Computes world position, rotation, and scale in a single hierarchy traversal.
  * This is O(n) where n is the depth of the hierarchy.
+ *
+ * When an entity has AvatarAttach and Transform, the renderer updates the Transform
+ * with avatar-relative values (including the exact anchor point offset). This function
+ * combines the player's transform with the entity's avatar-relative transform to
+ * compute the world-space position.
+ *
  * @throws Error if a circular dependency is detected in the entity hierarchy
  */
 function getWorldTransformInternal(
   Transform: ReturnType<typeof components.Transform>,
+  AvatarAttach: ReturnType<typeof components.AvatarAttach> | null,
+  PlayerIdentityData: ReturnType<typeof components.PlayerIdentityData> | null,
+  PlayerEntity: Entity,
   entity: Entity,
   visited: Set<Entity> = new Set()
 ): WorldTransform {
   const transform = Transform.getOrNull(entity)
+  const avatarAttach = AvatarAttach?.getOrNull(entity)
+
+  // Handle AvatarAttach: combine player's transform with the entity's avatar-relative transform
+  // (which the renderer updates with the exact anchor point offset for hand, head, etc.)
+  if (avatarAttach) {
+    const playerTransform = findPlayerTransform(Transform, PlayerIdentityData, PlayerEntity, avatarAttach.avatarId)
+    if (playerTransform) {
+      return computeAvatarAttachedWorldTransform(playerTransform, transform)
+    }
+    // Player's Transform not available, fall through to normal Transform handling
+  }
 
   if (!transform) {
     return {
-      position: { x: 0, y: 0, z: 0 },
-      rotation: { x: 0, y: 0, z: 0, w: 1 },
-      scale: { x: 1, y: 1, z: 1 }
+      position: { ...IDENTITY_POSITION },
+      rotation: { ...IDENTITY_ROTATION },
+      scale: { ...IDENTITY_SCALE }
     }
   }
 
@@ -115,10 +205,15 @@ function getWorldTransformInternal(
     )
   }
 
-  // Single recursive call to get parent's full world transform
-  const parentWorld = getWorldTransformInternal(Transform, transform.parent, visited)
+  const parentWorld = getWorldTransformInternal(
+    Transform,
+    AvatarAttach,
+    PlayerIdentityData,
+    PlayerEntity,
+    transform.parent,
+    visited
+  )
 
-  // Compute this entity's world transform
   const worldScale = multiplyVectors(parentWorld.scale, transform.scale)
   const worldRotation = multiplyQuaternions(parentWorld.rotation, transform.rotation)
 
@@ -254,10 +349,29 @@ export function getEntitiesWithParent(
   return entitiesWithParent
 }
 
+/** @public Engine type for world transform functions */
+export type WorldTransformEngine = Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema' | 'PlayerEntity'>
+
+/**
+ * @internal
+ * Computes the world transform for an entity using the provided engine.
+ * This is a convenience wrapper that initializes the required components.
+ */
+function getWorldTransform(engine: WorldTransformEngine, entity: Entity): WorldTransform {
+  const Transform = components.Transform(engine)
+  const AvatarAttach = components.AvatarAttach(engine)
+  const PlayerIdentityData = components.PlayerIdentityData(engine)
+  return getWorldTransformInternal(Transform, AvatarAttach, PlayerIdentityData, engine.PlayerEntity, entity)
+}
+
 /**
  * Get the world position of an entity, taking into account the full parent hierarchy.
  * This computes the world-space position by accumulating all parent transforms
  * (position, rotation, and scale).
+ *
+ * When the entity has AvatarAttach and Transform, the renderer updates the Transform
+ * with avatar-relative values (including the exact anchor point offset for hand, head, etc.).
+ * This function combines the player's transform with those values to compute the world position.
  *
  * @public
  * @param engine - the engine running the entities
@@ -270,17 +384,17 @@ export function getEntitiesWithParent(
  * console.log(`World position: ${worldPos.x}, ${worldPos.y}, ${worldPos.z}`)
  * ```
  */
-export function getWorldPosition(
-  engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema'>,
-  entity: Entity
-): Vector3Type {
-  const Transform = components.Transform(engine)
-  return getWorldTransformInternal(Transform, entity).position
+export function getWorldPosition(engine: WorldTransformEngine, entity: Entity): Vector3Type {
+  return getWorldTransform(engine, entity).position
 }
 
 /**
  * Get the world rotation of an entity, taking into account the full parent hierarchy.
  * This computes the world-space rotation by combining all parent rotations.
+ *
+ * When the entity has AvatarAttach and Transform, the renderer updates the Transform
+ * with avatar-relative values (including the exact anchor point rotation for hand, head, etc.).
+ * This function combines the player's rotation with those values to compute the world rotation.
  *
  * @public
  * @param engine - the engine running the entities
@@ -293,10 +407,6 @@ export function getWorldPosition(
  * console.log(`World rotation: ${worldRot.x}, ${worldRot.y}, ${worldRot.z}, ${worldRot.w}`)
  * ```
  */
-export function getWorldRotation(
-  engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema'>,
-  entity: Entity
-): QuaternionType {
-  const Transform = components.Transform(engine)
-  return getWorldTransformInternal(Transform, entity).rotation
+export function getWorldRotation(engine: WorldTransformEngine, entity: Entity): QuaternionType {
+  return getWorldTransform(engine, entity).rotation
 }
