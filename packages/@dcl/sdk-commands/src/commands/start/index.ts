@@ -29,8 +29,7 @@ import { Result } from 'arg'
 import { startValidations } from '../../logic/project-validations'
 import { runExplorerAlpha } from './explorer-alpha'
 import { getLanUrl } from './utils'
-import { checkHammurabiServerInstalled, installHammurabiServer, startHammurabiServer } from './hammurabi-server'
-import { SceneWithMultiplayer } from '../../logic/scene-validations'
+import { spawnMultiplayerIfNeeded } from './hammurabi-server'
 
 interface Options {
   args: Result<typeof args>
@@ -128,8 +127,6 @@ export async function main(options: Options) {
   const explorerAlpha = !options.args['--web-explorer'] && !bevyWeb && !skipClient
 
   let hasSmartWearable = false
-  let needsHammurabiServer = false
-  let sceneWithMultiplayer: SceneWithMultiplayer | undefined
   const workspace = await getValidWorkspace(options.components, workingDirectory)
 
   /* istanbul ignore if */
@@ -140,27 +137,6 @@ export async function main(options: Options) {
     if (project.kind === 'smart-wearable') hasSmartWearable = true
     if (project.kind === 'scene' || project.kind === 'smart-wearable') {
       printCurrentProjectStarting(options.components.logger, project, workspace)
-
-      // Check if this is an authoritative multiplayer scene
-      sceneWithMultiplayer = project.scene as SceneWithMultiplayer
-      if (sceneWithMultiplayer.authoritativeMultiplayer) {
-        needsHammurabiServer = true
-        
-        // Check if Hammurabi server is installed
-        const isInstalled = await checkHammurabiServerInstalled(options.components, project.workingDirectory)
-        
-        if (!isInstalled) {
-          try {
-            await installHammurabiServer(options.components, project.workingDirectory)
-          } catch (error: any) {
-            printWarning(
-              options.components.logger,
-              `Failed to install Authoritative Server: ${error.message}. Continuing without server support.`
-            )
-            needsHammurabiServer = false
-          }
-        }
-      }
 
       // first run `npm run build`, this can be disabled with --skip-build
       // then start the embedded compiler, this can be disabled with --no-watch
@@ -240,21 +216,10 @@ export async function main(options: Options) {
       await startComponents()
 
       // Start Hammurabi server if needed
-      if (needsHammurabiServer) {
-        try {
-          const projectWorkingDir = workspace.projects[0]?.workingDirectory || workingDirectory
-          const realm = `http://localhost:${port}`
-          components.hammurabiServer = startHammurabiServer(
-            components,
-            projectWorkingDir,
-            realm
-          )
-        } catch (error: any) {
-        printWarning(
-          components.logger,
-          `Failed to start Authoritative Server: ${error.message}`
-        )
-        }
+      const project = workspace.projects[0]
+      if (project) {
+        const realm = `http://localhost:${port}`
+        components.hammurabiServer = spawnMultiplayerIfNeeded(components, project, realm)
       }
 
       const networkInterfaces = os.networkInterfaces()
