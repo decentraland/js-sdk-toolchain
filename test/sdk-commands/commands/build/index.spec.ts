@@ -183,7 +183,7 @@ describe('bundle script utilities', () => {
 
       const result = await generateInitializeScriptsModule(mockComponents, '/test/project', compositeData)
 
-      expect(result.contents).toContain("import * as script_src_scripts_test from './src/scripts/test.ts'")
+      expect(result.contents).toContain('import * as script_src_scripts_test from "./src/scripts/test.ts"')
       expect(result.contents).toContain('return runScripts(engine,')
       expect(result.contents).toContain('"path":"src/scripts/test.ts"')
       expect(result.contents).toContain('module: script_src_scripts_test')
@@ -203,8 +203,8 @@ describe('bundle script utilities', () => {
 
       const result = await generateInitializeScriptsModule(mockComponents, '/test/project', compositeData)
 
-      expect(result.contents).toContain("import * as script_src_scripts_movePlayer from './src/scripts/movePlayer.ts'")
-      expect(result.contents).toContain("import * as script_src_scripts_rotateBox from './src/scripts/rotateBox.ts'")
+      expect(result.contents).toContain('import * as script_src_scripts_movePlayer from "./src/scripts/movePlayer.ts"')
+      expect(result.contents).toContain('import * as script_src_scripts_rotateBox from "./src/scripts/rotateBox.ts"')
       expect(result.contents).toContain('module: script_src_scripts_movePlayer')
       expect(result.contents).toContain('module: script_src_scripts_rotateBox')
       expect(result.watchFiles).toEqual([
@@ -246,7 +246,7 @@ describe('bundle script utilities', () => {
 
       const result = await generateInitializeScriptsModule(mockComponents, '/test/project', compositeData)
 
-      const importStatement = "import * as script_src_scripts_movePlayer from './src/scripts/movePlayer.ts'"
+      const importStatement = 'import * as script_src_scripts_movePlayer from "./src/scripts/movePlayer.ts"'
       const importCount = (
         result.contents.match(new RegExp(importStatement.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []
       ).length

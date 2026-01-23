@@ -55,13 +55,22 @@ const MAX_OUTPUT_SIZE = 10 * 1024
  * @returns the Typescript code
  */
 
+/**
+ * Converts a file path to a safe JavaScript module path string.
+ * Normalizes to Unix-style forward slashes and escapes special characters.
+ */
+function toSafeModulePath(filePath: string): string {
+  const unixPath = filePath.replace(/\\/g, '/')
+  return JSON.stringify(unixPath)
+}
+
 function getEntrypointCode(entrypointPath: string, forceCustomExport: boolean, isEditorScene: boolean = false) {
-  const unixEntrypointPath = entrypointPath.replace(/(\\)/g, '/')
-  if (forceCustomExport) return `;"use strict";export * from '${unixEntrypointPath}'`
+  const safeEntrypointPath = toSafeModulePath(entrypointPath)
+  if (forceCustomExport) return `;"use strict";export * from ${safeEntrypointPath}`
 
   return `// BEGIN AUTO GENERATED CODE "~sdk/scene-entrypoint"
 "use strict";
-import * as entrypoint from '${unixEntrypointPath}'
+import * as entrypoint from ${safeEntrypointPath}
 import { engine, NetworkEntity } from '@dcl/sdk/ecs'
 import * as sdk from '@dcl/sdk'
 import { compositeProvider } from '@dcl/sdk/composite-provider'
@@ -102,7 +111,7 @@ if ((entrypoint as any).main !== undefined) {
 }
 
 export * from '@dcl/sdk'
-export * from '${unixEntrypointPath}'
+export * from ${safeEntrypointPath}
 export * from '~sdk/script-utils'
 `
 }
@@ -501,18 +510,16 @@ function collectScriptData(
 
   for (const [scriptPath, scriptInstances] of compositeData.scripts.entries()) {
     const importName = getScriptImportName(scriptPath)
-    const normalizedPath = scriptPath.replace(/\\/g, '/')
     const absolutePath = path.join(workingDirectory, scriptPath)
-    const absoluteUnixPath = absolutePath.replace(/\\/g, '/')
 
     // For the virtual module runtime
-    runtimeImports.push(`import * as ${importName} from './${normalizedPath}'`)
+    runtimeImports.push(`import * as ${importName} from ${toSafeModulePath('./' + scriptPath)}`)
 
     // For .d.ts file using import() type syntax (works in ambient modules)
-    typeImports.push(`  type ${importName} = typeof import('${absoluteUnixPath}')`)
+    typeImports.push(`  type ${importName} = typeof import(${toSafeModulePath(absolutePath)})`)
 
     // Add to ScriptRegistry interface
-    scriptTypes.push(`  '${normalizedPath}': ExtractScriptType<${importName}>`)
+    scriptTypes.push(`  ${toSafeModulePath(scriptPath)}: ExtractScriptType<${importName}>`)
 
     // Add each script instance to the array
     for (const script of scriptInstances) {
