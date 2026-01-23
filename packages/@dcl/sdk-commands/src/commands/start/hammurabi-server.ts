@@ -27,25 +27,37 @@ export function startHammurabiServer(
     stdio: 'pipe'
   })
 
-  // Prefix and pipe stdout
+  // Prefix and pipe stdout with cyan color to differentiate from scene logs
   hammurabiProcess.stdout?.on('data', (data: Buffer) => {
     const lines = data
       .toString()
       .split('\n')
       .filter((line) => line.trim())
     lines.forEach((line) => {
-      components.logger.log(`${colors.bold('[Authoritative Server]')} ${line}`)
+      components.logger.log(`${colors.cyan(colors.bold('[Authoritative Server]'))} ${colors.cyan(line)}`)
     })
   })
 
-  // Prefix and pipe stderr
+  // Prefix and pipe stderr with cyan color to differentiate from scene logs
+  // Filter out npm installation warnings and show a cleaner message
+  let hasShownInstallMessage = false
   hammurabiProcess.stderr?.on('data', (data: Buffer) => {
     const lines = data
       .toString()
       .split('\n')
       .filter((line) => line.trim())
     lines.forEach((line) => {
-      components.logger.error(`${colors.bold('[Authoritative Server]')} ${line}`)
+      // Check if this is the npm warning about package installation
+      if (line.includes('npm warn exec') && line.includes('was not found and will be installed')) {
+        if (!hasShownInstallMessage) {
+          printProgressInfo(components.logger, 'Multiplayer Server package not found, installing it...')
+          hasShownInstallMessage = true
+        }
+        // Suppress the raw npm warning
+        return
+      }
+      // Log other stderr messages normally
+      components.logger.error(`${colors.cyan(colors.bold('[Authoritative Server]'))} ${colors.cyan(line)}`)
     })
   })
 
