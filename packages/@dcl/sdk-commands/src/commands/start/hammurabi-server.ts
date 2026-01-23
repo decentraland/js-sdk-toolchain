@@ -1,67 +1,12 @@
 import { spawn, ChildProcess } from 'child_process'
-import path from 'path'
 import { CliComponents } from '../../components'
 import { printProgressInfo, printWarning } from '../../logic/beautiful-logs'
 import { colors } from '../../components/log'
+import { PreviewComponents } from './types'
+import { ProjectUnion } from '../../logic/project-validations'
+import { SceneWithMultiplayer } from '../../logic/scene-validations'
 
-const HAMMURABI_PACKAGE = '@dcl/hammurabi-server'
-const HAMMURABI_VERSION = 'next'
-
-/**
- * Checks if @dcl/hammurabi-server (Authoritative Server) is installed in the project's devDependencies
- */
-export async function checkHammurabiServerInstalled(
-  components: Pick<CliComponents, 'fs'>,
-  workingDir: string
-): Promise<boolean> {
-  try {
-    const packageJsonPath = path.join(workingDir, 'package.json')
-    const packageJsonExists = await components.fs.fileExists(packageJsonPath)
-    
-    if (!packageJsonExists) {
-      return false
-    }
-
-    const packageJsonRaw = await components.fs.readFile(packageJsonPath, 'utf8')
-    const packageJson = JSON.parse(packageJsonRaw)
-    
-    return !!(
-      packageJson.devDependencies?.[HAMMURABI_PACKAGE] ||
-      packageJson.dependencies?.[HAMMURABI_PACKAGE]
-    )
-  } catch (error) {
-    return false
-  }
-}
-
-/**
- * Installs @dcl/hammurabi-server (Authoritative Server) package as a devDependency
- */
-export async function installHammurabiServer(
-  components: Pick<CliComponents, 'spawner' | 'logger'>,
-  workingDir: string
-): Promise<void> {
-  try {
-    printProgressInfo(
-      components.logger,
-      `Installing ${colors.bold('Authoritative Server')} (${HAMMURABI_PACKAGE}@${HAMMURABI_VERSION})...`
-    )
-    
-    await components.spawner.exec(
-      workingDir,
-      'npm',
-      ['install', '--save-dev', `${HAMMURABI_PACKAGE}@${HAMMURABI_VERSION}`],
-      { silent: false }
-    )
-    
-    printProgressInfo(
-      components.logger,
-      `${colors.bold('Authoritative Server')} installed successfully`
-    )
-  } catch (error: any) {
-    throw new Error(`Failed to install Authoritative Server: ${error.message}`)
-  }
-}
+const HAMMURABI_PACKAGE = '@dcl/hammurabi-server@next'
 
 /**
  * Starts the Authoritative Server process
@@ -76,37 +21,36 @@ export function startHammurabiServer(
     `Starting ${colors.bold('Authoritative Server')} with realm: ${colors.bold(realm)}`
   )
 
-  const hammurabiProcess = spawn(
-    'npx',
-    [HAMMURABI_PACKAGE, `--realm=${realm}`],
-    {
-      cwd: workingDir,
-      shell: true,
-      stdio: 'pipe'
-    }
-  )
+  const hammurabiProcess = spawn('npx', [HAMMURABI_PACKAGE, `--realm=${realm}`], {
+    cwd: workingDir,
+    shell: true,
+    stdio: 'pipe'
+  })
 
   // Prefix and pipe stdout
   hammurabiProcess.stdout?.on('data', (data: Buffer) => {
-    const lines = data.toString().split('\n').filter(line => line.trim())
-    lines.forEach(line => {
+    const lines = data
+      .toString()
+      .split('\n')
+      .filter((line) => line.trim())
+    lines.forEach((line) => {
       components.logger.log(`${colors.bold('[Authoritative Server]')} ${line}`)
     })
   })
 
   // Prefix and pipe stderr
   hammurabiProcess.stderr?.on('data', (data: Buffer) => {
-    const lines = data.toString().split('\n').filter(line => line.trim())
-    lines.forEach(line => {
+    const lines = data
+      .toString()
+      .split('\n')
+      .filter((line) => line.trim())
+    lines.forEach((line) => {
       components.logger.error(`${colors.bold('[Authoritative Server]')} ${line}`)
     })
   })
 
   hammurabiProcess.on('error', (error) => {
-    printWarning(
-      components.logger,
-      `Authoritative Server process error: ${error.message}`
-    )
+    printWarning(components.logger, `Authoritative Server process error: ${error.message}`)
   })
 
   // Register cleanup handlers immediately after spawning
@@ -127,12 +71,38 @@ export function startHammurabiServer(
     process.off('exit', cleanup)
 
     if (code !== 0 && code !== null) {
-      printWarning(
-        components.logger,
-        `Authoritative Server exited with code ${code}`
-      )
+      printWarning(components.logger, `Authoritative Server exited with code ${code}`)
     }
   })
 
   return hammurabiProcess
+}
+
+/**
+ * Spawns the multiplayer server if the project requires it.
+ * Uses npx to automatically handle installation and run the latest version.
+ *
+ * @param components - Preview components including logger
+ * @param project - The project to check for authoritative multiplayer support
+ * @param realm - The realm URL to pass to the hammurabi server
+ * @returns The ChildProcess if started, undefined otherwise
+ */
+export function spawnMultiplayerIfNeeded(
+  components: PreviewComponents,
+  project: ProjectUnion,
+  realm: string
+): ChildProcess | undefined {
+  // Check if this is an authoritative multiplayer scene
+  const sceneWithMultiplayer = project.scene as SceneWithMultiplayer
+  if (!sceneWithMultiplayer.authoritativeMultiplayer) {
+    return undefined
+  }
+
+  // Start the server (npx will handle installation automatically)
+  try {
+    return startHammurabiServer(components, project.workingDirectory, realm)
+  } catch (error: any) {
+    printWarning(components.logger, `Failed to start Authoritative Server: ${error.message}`)
+    return undefined
+  }
 }
