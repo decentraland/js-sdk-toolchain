@@ -3968,10 +3968,10 @@ export type RaycastSystemOptions = {
 
 // @public (undocumented)
 export interface ReactBasedUiSystem {
-    // (undocumented)
+    addUiRenderer(entity: Entity, ui: UiComponent, options?: UiRendererOptions): void;
     destroy(): void;
-    // (undocumented)
-    setUiRenderer(ui: UiComponent): void;
+    removeUiRenderer(entity: Entity): void;
+    setUiRenderer(ui: UiComponent, options?: UiRendererOptions): void;
 }
 
 // @public (undocumented)
@@ -4744,6 +4744,12 @@ export interface UiLabelProps {
 
 // @public
 export type uint32 = number;
+
+// @public (undocumented)
+export type UiRendererOptions = {
+    virtualWidth: number;
+    virtualHeight: number;
+};
 
 // @public (undocumented)
 export const UiText: LastWriteWinElementSetComponentDefinition<PBUiText>;

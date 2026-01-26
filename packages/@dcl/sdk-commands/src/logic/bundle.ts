@@ -55,18 +55,27 @@ const MAX_OUTPUT_SIZE = 10 * 1024
  * @returns the Typescript code
  */
 
+/**
+ * Converts a file path to a safe JavaScript module path string.
+ * Normalizes to Unix-style forward slashes and escapes special characters.
+ */
+function toSafeModulePath(filePath: string): string {
+  const unixPath = filePath.replace(/\\/g, '/')
+  return JSON.stringify(unixPath)
+}
+
 function getEntrypointCode(entrypointPath: string, forceCustomExport: boolean, isEditorScene: boolean = false) {
-  const unixEntrypointPath = entrypointPath.replace(/(\\)/g, '/')
-  if (forceCustomExport) return `;"use strict";export * from '${unixEntrypointPath}'`
+  const safeEntrypointPath = toSafeModulePath(entrypointPath)
+  if (forceCustomExport) return `;"use strict";export * from ${safeEntrypointPath}`
 
   return `// BEGIN AUTO GENERATED CODE "~sdk/scene-entrypoint"
 "use strict";
-import * as entrypoint from '${unixEntrypointPath}'
+import * as entrypoint from ${safeEntrypointPath}
 import { engine, NetworkEntity } from '@dcl/sdk/ecs'
 import * as sdk from '@dcl/sdk'
 import { compositeProvider } from '@dcl/sdk/composite-provider'
 import { compositeFromLoader } from '~sdk/all-composites'
-import { initializeScripts } from '~sdk/all-scripts'
+import { _initializeScripts } from '~sdk/script-utils'
 
 ${
   isEditorScene &&
@@ -85,12 +94,13 @@ initAssetPacks(engine, { syncEntity }, players)
 if ((entrypoint as any).main !== undefined) {
   function _INTERNAL_startup_system() {
     try {
+      // initialize and run all scripts
+      _initializeScripts(engine)
+
       const maybePromise = (entrypoint as any).main()
       if (maybePromise && typeof maybePromise === 'object' && typeof (maybePromise as unknown as Promise<unknown>).then === 'function') {
         maybePromise.catch(console.error)
       }
-      // initialize and run all scripts
-      initializeScripts(engine)
     } catch (e) {
      console.error(e)
     } finally {
@@ -101,7 +111,8 @@ if ((entrypoint as any).main !== undefined) {
 }
 
 export * from '@dcl/sdk'
-export * from '${unixEntrypointPath}'
+export * from ${safeEntrypointPath}
+export * from '~sdk/script-utils'
 `
 }
 
@@ -158,6 +169,15 @@ type SingleProjectOptions = CompileOptions & {
 export async function bundleSingleProject(components: BundleComponents, options: SingleProjectOptions) {
   printProgressStep(components.logger, `Bundling file ${colors.bold(options.entrypoint)}`, 1, MAX_STEP)
   const editorScene = await isEditorScene(components, options.workingDirectory)
+  const sdkPackagePath = (() => {
+    try {
+      // First try to resolve from project's node_modules
+      return path.dirname(require.resolve('@dcl/sdk/package.json', { paths: [options.workingDirectory] }))
+    } catch {
+      // Fallback to workspace @dcl/sdk
+      return path.dirname(require.resolve('@dcl/sdk/package.json', { paths: [__dirname] }))
+    }
+  })()
   const context = await esbuild.context({
     bundle: true,
     platform: 'browser',
@@ -192,23 +212,20 @@ export async function bundleSingleProject(components: BundleComponents, options:
         }
       })(),
       // Ensure @dcl/sdk is always resolved to workspace version to prevent version conflicts
-      '@dcl/sdk': (() => {
-        try {
-          // First try to resolve from project's node_modules
-          return path.dirname(require.resolve('@dcl/sdk/package.json', { paths: [options.workingDirectory] }))
-        } catch {
-          // Fallback to workspace @dcl/sdk
-          return path.dirname(require.resolve('@dcl/sdk/package.json', { paths: [__dirname] }))
-        }
-      })(),
-      // Ensure @dcl/ecs is always resolved to workspace version to prevent version conflicts
+      '@dcl/sdk': sdkPackagePath,
+      // Resolve ecs from sdk dependencies (nested in @dcl/sdk)
       '@dcl/ecs': (() => {
         try {
-          // First try to resolve from project's node_modules
-          return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [options.workingDirectory] }))
+          // First try to resolve from project's @dcl/sdk node_modules
+          return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [sdkPackagePath] }))
         } catch {
-          // Fallback to workspace @dcl/ecs
-          return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [__dirname] }))
+          try {
+            // Fallback: try to resolve from project's node_modules
+            return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [options.workingDirectory] }))
+          } catch {
+            // Last resort: try resolving from current directory
+            return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [__dirname] }))
+          }
         }
       })(),
       // Resolve asset-packs from sdk-commands' dependencies (nested in @dcl/inspector)
@@ -262,7 +279,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
   if (options.watch) {
     // Instead of using esbuild's watch, we create our own watcher
     const watcher = watch(path.resolve(options.workingDirectory), {
-      ignored: ['**/dist/**', '**/*.crdt', path.resolve(options.outputFile)],
+      ignored: ['**/dist/**', '**/*.crdt', '**/*.d.ts', path.resolve(options.outputFile)],
       ignoreInitial: true
     })
 
@@ -424,10 +441,10 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
       })
 
       // Handle scripts virtual module
-      build.onResolve({ filter: /~sdk\/all-scripts/ }, (_args) => {
+      build.onResolve({ filter: /~sdk\/script-utils/ }, (_args) => {
         return {
           namespace: 'sdk-scripts',
-          path: 'all-scripts'
+          path: 'script-utils'
         }
       })
 
@@ -441,7 +458,7 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
         }
 
         const { contents, watchFiles } = await generateInitializeScriptsModule(
-          components.fs,
+          components,
           options.workingDirectory,
           compositeData
         )
@@ -470,55 +487,173 @@ export function getScriptImportName(scriptPath: string): string {
   )
 }
 
-export async function generateInitializeScriptsModule(
-  fs: BundleComponents['fs'],
-  workingDirectory: string,
-  compositeData: { scripts: Map<string, Script[]>; [key: string]: any } | null
-): Promise<{ contents: string; watchFiles: string[] }> {
-  let contents = `export function initializeScripts(engine) {}`
+interface ScriptCollectionResult {
+  runtimeImports: string
+  typeImports: string
+  scriptTypes: string
+  scriptsArray: string
+  watchFiles: string[]
+}
+
+/**
+ * Collects and formats all script data for code generation
+ */
+function collectScriptData(
+  compositeData: { scripts: Map<string, Script[]>; [key: string]: any },
+  workingDirectory: string
+): ScriptCollectionResult {
+  const runtimeImports: string[] = []
+  const typeImports: string[] = []
+  const scriptTypes: string[] = []
+  const scriptsArray: string[] = []
   const watchFiles: string[] = []
 
-  if (compositeData && compositeData.scripts.size > 0) {
-    let imports = ''
-    let scripts = '[\n'
+  for (const [scriptPath, scriptInstances] of compositeData.scripts.entries()) {
+    const importName = getScriptImportName(scriptPath)
+    const absolutePath = path.join(workingDirectory, scriptPath)
 
-    for (const [scriptPath, scriptInstances] of compositeData.scripts.entries()) {
-      const importName = getScriptImportName(scriptPath)
-      const normalizedPath = scriptPath.replace(/\\/g, '/')
-      const absolutePath = path.join(workingDirectory, scriptPath)
+    // For the virtual module runtime
+    runtimeImports.push(`import * as ${importName} from ${toSafeModulePath('./' + scriptPath)}`)
 
-      imports += `import * as ${importName} from './${normalizedPath}'\n`
-      watchFiles.push(absolutePath)
+    // For .d.ts file using import() type syntax (works in ambient modules)
+    typeImports.push(`  type ${importName} = typeof import(${toSafeModulePath(absolutePath)})`)
 
-      for (const script of scriptInstances) {
-        scripts += `  { ...${JSON.stringify(script)}, module: ${importName} },\n`
-      }
+    // Add to ScriptRegistry interface
+    scriptTypes.push(`  ${toSafeModulePath(scriptPath)}: ExtractScriptType<${importName}>`)
+
+    // Add each script instance to the array
+    for (const script of scriptInstances) {
+      scriptsArray.push(`  { ...${JSON.stringify(script)}, module: ${importName} }`)
     }
 
-    scripts += ']'
+    watchFiles.push(absolutePath)
+  }
 
-    const runtimeCodePath = require.resolve('./runtime-script')
-    const runtimeCode = (await fs.readFile(runtimeCodePath, 'utf-8'))
-      // remove all CommonJS/module system code and imports
+  return {
+    runtimeImports: runtimeImports.join('\n'),
+    typeImports: typeImports.join('\n'),
+    scriptTypes: `interface ScriptRegistry {\n${scriptTypes.join(',\n')}\n}`,
+    scriptsArray: `[\n${scriptsArray.join(',\n')}\n]`,
+    watchFiles
+  }
+}
+
+/**
+ * Reads and prepares the runtime script code for inlining
+ */
+async function prepareRuntimeCode(fs: BundleComponents['fs']): Promise<string> {
+  const runtimeCodePath = require.resolve('./runtime-script')
+  const runtimeCode = await fs.readFile(runtimeCodePath, 'utf-8')
+
+  // Strip CommonJS/module system code
+  return (
+    runtimeCode
       .replace(/"use strict";?\s*/g, '')
       .replace(/Object\.defineProperty\(exports,.*?\);?\s*/g, '')
       .replace(/exports\.\w+\s*=\s*void 0;?\s*/g, '')
       .replace(/exports\.\w+\s*=\s*/g, '')
       .replace(/^export\s+/gm, '')
       .replace(/^import\s+.*$/gm, '')
+      // fix nested asset-packs path (importing from @dcl/inspector is banned in runtime, but @dcl/asset-packs not)
+      .replace(/@dcl\/inspector\/node_modules\/@dcl\/asset-packs/g, '@dcl/asset-packs')
       .replace(/\n{3,}/g, '\n\n')
       .trim()
+  )
+}
 
-    contents = `
-${imports}
+/**
+ * Generates the TypeScript declaration for the ~sdk/script-utils module
+ */
+async function generateScriptModuleDeclaration(
+  components: BundleComponents,
+  typeImports: string,
+  scriptTypes: string
+): Promise<string> {
+  const templatePath = path.join(__dirname, 'script-module.d.ts.template')
+  const template = await components.fs.readFile(templatePath, 'utf-8')
+
+  return template.replace('__TYPE_IMPORTS__', typeImports).replace('__SCRIPT_TYPES__', scriptTypes)
+}
+
+/**
+ * Updates the sdk.d.ts file with script type declarations
+ */
+async function updateSdkTypeDeclarations(
+  components: BundleComponents,
+  workingDirectory: string,
+  typeImports: string,
+  scriptTypes: string,
+  scriptCount: number
+): Promise<void> {
+  try {
+    const jsRuntimePath = require.resolve('@dcl/js-runtime/sdk.d.ts', { paths: [workingDirectory] })
+    let existingSdkDts = await components.fs.readFile(jsRuntimePath, 'utf-8')
+
+    // remove any existing ~sdk/script-utils module declaration
+    existingSdkDts = existingSdkDts
+      .replace(/\/\/ @internal[\s]*\ndeclare module '~sdk\/script-utils'[\s\S]*?(?=\n\/\/|$)/, '')
+      .trim()
+
+    // generate and append the new module declaration
+    const scriptModuleDeclaration = await generateScriptModuleDeclaration(components, typeImports, scriptTypes)
+    const updatedSdkDts = existingSdkDts + '\n' + scriptModuleDeclaration
+
+    await components.fs.writeFile(jsRuntimePath, updatedSdkDts)
+    components.logger.info(`✓ Updated sdk.d.ts with ${scriptCount} script type(s) at: ${jsRuntimePath}`)
+  } catch (err: any) {
+    components.logger.error('⚠ Could not update sdk.d.ts with script types:', err)
+  }
+}
+
+/**
+ * Generates the virtual module content with script initialization and helper functions
+ */
+function generateVirtualModuleContent(runtimeImports: string, runtimeCode: string, scriptsArray: string): string {
+  return `
+${runtimeImports}
 
 ${runtimeCode}
 
-export function initializeScripts(engine) {
-  return runScripts(engine, ${scripts})
+export function _initializeScripts(engine) {
+  const scriptsArray = ${scriptsArray}
+  return runScripts(engine, scriptsArray)
 }
+
+// export helper functions that are defined in the inlined runtime code
+export { getScriptInstance, getScriptInstancesByPath, getAllScriptInstances, callScriptMethod }
 `
+}
+
+export async function generateInitializeScriptsModule(
+  components: BundleComponents,
+  workingDirectory: string,
+  compositeData: { scripts: Map<string, Script[]>; [key: string]: any } | null
+): Promise<{ contents: string; watchFiles: string[] }> {
+  // prepare runtime code (always needed for helper functions)
+  const runtimeCode = await prepareRuntimeCode(components.fs)
+
+  // default empty implementation if no scripts
+  if (!compositeData || compositeData.scripts.size === 0) {
+    return {
+      contents: generateVirtualModuleContent('', runtimeCode, '[]'),
+      watchFiles: []
+    }
   }
 
-  return { contents, watchFiles }
+  // Step 1: Collect all script data
+  const scriptData = collectScriptData(compositeData, workingDirectory)
+
+  // Step 2: Update TypeScript declarations
+  await updateSdkTypeDeclarations(
+    components,
+    workingDirectory,
+    scriptData.typeImports,
+    scriptData.scriptTypes,
+    compositeData.scripts.size
+  )
+
+  // Step 3: Generate virtual module content
+  const contents = generateVirtualModuleContent(scriptData.runtimeImports, runtimeCode, scriptData.scriptsArray)
+
+  return { contents, watchFiles: scriptData.watchFiles }
 }

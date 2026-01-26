@@ -1,6 +1,6 @@
 import { Font, TextAlignMode, TextWrap } from '@dcl/ecs'
 import { TextAlignType, UiFontType, UiTextWrapType } from './types'
-import { calcOnViewport, getScaleCtx } from '../utils'
+import { calcOnViewport, getScaleCtx, getUiScaleFactor } from '../utils'
 import { ScaleContext, ScaleUnit } from '../types'
 
 const parseFont: Readonly<Record<UiFontType, Font>> = {
@@ -42,7 +42,7 @@ export function getTextAlign(textAlign: TextAlignType | undefined): Record<'text
 export function getFontSize(fontSize: ScaleUnit | undefined): Record<'fontSize', number> | undefined {
   if (!fontSize) return undefined
   if (typeof fontSize === 'string') return { fontSize: calcOnViewport(fontSize) }
-  return { fontSize }
+  return { fontSize: fontSize * getUiScaleFactor() }
 }
 
 /**
