@@ -11,7 +11,7 @@
     "@dcl/ecs": "file:../ecs",
     "@dcl/gltf-validator-ts": "1.0.14",
     "@dcl/hashing": "1.1.3",
-    "@dcl/inspector": "7.23.1",
+    "@dcl/inspector": "7.25.0",
     "@dcl/linker-dapp": "^0.14.2",
     "@dcl/mini-comms": "1.0.1-20230216163137.commit-a4c75be",
     "@dcl/protocol": "1.0.0-20755528534.commit-d6cccca",
@@ -67,7 +67,7 @@
     "directory": "packages/@dcl/sdk-commands"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json && rm -rf dist/locales && cp -r src/locales dist/locales",
+    "build": "tsc -p tsconfig.json && rm -rf dist/locales && cp -r src/locales dist/locales && cp src/logic/*.template dist/logic/",
     "start": "tsc -p tsconfig.json --watch && rm -rf dist/locales && cp -r src/locales dist/locales",
     "postinstall": "node scripts/postinstall.js"
   },
