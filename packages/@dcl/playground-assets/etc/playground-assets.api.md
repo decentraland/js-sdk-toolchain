@@ -2843,6 +2843,7 @@ export interface PBPointerEvents_Info {
     button?: InputAction | undefined;
     hoverText?: string | undefined;
     maxDistance?: number | undefined;
+    maxPlayerDistance?: number | undefined;
     showFeedback?: boolean | undefined;
     showHighlight?: boolean | undefined;
 }
