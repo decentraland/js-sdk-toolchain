@@ -182,19 +182,15 @@ async function streamLogs(
 
     const contentType = response.headers.get('content-type') || ''
     if (contentType.includes('text/event-stream') || contentType.includes('application/stream')) {
-      logger.info(`✅ Streaming logs in real-time (press CTRL+C to stop)...\n`)
+      logger.info(`Streaming logs in real-time (press CTRL+C to stop)...\n`)
 
       // Stream logs
       if (response.body) {
-        const reader = response.body.getReader()
         const decoder = new TextDecoder()
         let buffer = ''
 
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) break
-
-          buffer += decoder.decode(value, { stream: true })
+        for await (const chunk of response.body) {
+          buffer += decoder.decode(chunk, { stream: true })
           const lines = buffer.split('\n')
           buffer = lines.pop() || ''
 
