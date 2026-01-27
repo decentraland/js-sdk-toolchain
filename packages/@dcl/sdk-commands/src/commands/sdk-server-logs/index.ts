@@ -173,7 +173,7 @@ async function streamLogs(
 
     const contentType = response.headers.get('content-type') || ''
     if (contentType.includes('text/event-stream') || contentType.includes('application/stream')) {
-      logger.info('Streaming logs in real-time (press CTRL+C to stop)')
+      logger.info(`Streaming logs in real-time (press CTRL+C to stop)...\n`)
 
       // Stream logs
       if (response.body) {
