@@ -40,13 +40,14 @@ export function createAssetLoadLoadingStateSystem(engine: IEngine): AssetLoadLoa
 
   // @internal
   engine.addSystem(function EventSystem() {
+    const garbageEntries = []
     for (const [entity, data] of entitiesCallbackAssetLoadLoadingStateMap) {
-      const loadingState = assetLoadLoadingStateComponent.get(entity)
-
-      if (engine.getEntityState(entity) === EntityState.Removed || !loadingState) {
-        removeAssetLoadLoadingStateEntity(entity)
+      if (engine.getEntityState(entity) === EntityState.Removed) {
+        garbageEntries.push(entity)
         continue
       }
+
+      const loadingState = assetLoadLoadingStateComponent.get(entity)
 
       if (loadingState.size === 0 || loadingState.size === data.lastLoadingStateLength) continue
 
@@ -62,6 +63,9 @@ export function createAssetLoadLoadingStateSystem(engine: IEngine): AssetLoadLoa
         lastLoadingStateLength: loadingState.size
       })
     }
+
+    // Clean up garbage entries
+    garbageEntries.forEach((garbageEntity) => entitiesCallbackAssetLoadLoadingStateMap.delete(garbageEntity))
   })
 
   return {
