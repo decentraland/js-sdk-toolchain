@@ -221,7 +221,7 @@ export async function main(options: Options) {
       const project = workspace.projects[0]
       if (project) {
         const realm = `http://localhost:${port}`
-        hammurabiServer = spawnMultiplayerIfNeeded(components, project, realm)
+        hammurabiServer = await spawnMultiplayerIfNeeded(components, project, realm)
 
         // Register cleanup handler for hammurabi server
         if (hammurabiServer) {
