@@ -1,6 +1,5 @@
-import { signedFetch } from '~system/SignedFetch'
 import { getStorageServerUrl } from '../storage-url'
-import { assertIsServer } from '../utils'
+import { assertIsServer, wrapSignedFetch } from '../utils'
 import { MODULE_NAME } from './constants'
 
 /**
@@ -30,7 +29,8 @@ export interface IWorldStorage {
 }
 
 /**
- * Creates world-scoped storage for key-value pairs.
+ * Creates world-scoped storage that provides methods to interact with
+ * world-specific key-value pairs from the Server Side Storage service.
  * This module only works when running on server-side scenes.
  */
 export const createWorldStorage = (): IWorldStorage => {
@@ -41,22 +41,14 @@ export const createWorldStorage = (): IWorldStorage => {
       const baseUrl = await getStorageServerUrl()
       const url = `${baseUrl}/values/${encodeURIComponent(key)}`
 
-      const response = await signedFetch({ url })
+      const [error, data] = await wrapSignedFetch<{ value: T }>({ url })
 
-      if (!response.ok) {
-        if (response.status === 404) {
-          return null
-        }
-        console.error(`Failed to get storage value '${key}': ${response.status} ${response.statusText}`)
+      if (error) {
+        console.error(`Failed to get storage value '${key}': ${error}`)
         return null
       }
 
-      try {
-        return JSON.parse(response.body).value as T
-      } catch {
-        console.error(`Failed to parse storage value '${key}' as JSON`)
-        return null
-      }
+      return data?.value ?? null
     },
 
     async set<T = unknown>(key: string, value: T): Promise<boolean> {
@@ -65,7 +57,7 @@ export const createWorldStorage = (): IWorldStorage => {
       const baseUrl = await getStorageServerUrl()
       const url = `${baseUrl}/values/${encodeURIComponent(key)}`
 
-      const response = await signedFetch({
+      const [error] = await wrapSignedFetch({
         url,
         init: {
           method: 'PUT',
@@ -76,8 +68,8 @@ export const createWorldStorage = (): IWorldStorage => {
         }
       })
 
-      if (!response.ok) {
-        console.error(`Failed to set storage value '${key}': ${response.status} ${response.statusText}`)
+      if (error) {
+        console.error(`Failed to set storage value '${key}': ${error}`)
         return false
       }
 
@@ -90,7 +82,7 @@ export const createWorldStorage = (): IWorldStorage => {
       const baseUrl = await getStorageServerUrl()
       const url = `${baseUrl}/values/${encodeURIComponent(key)}`
 
-      const response = await signedFetch({
+      const [error] = await wrapSignedFetch({
         url,
         init: {
           method: 'DELETE',
@@ -98,12 +90,8 @@ export const createWorldStorage = (): IWorldStorage => {
         }
       })
 
-      if (response.status === 404) {
-        return false
-      }
-
-      if (!response.ok) {
-        console.error(`Failed to delete storage value '${key}': ${response.status} ${response.statusText}`)
+      if (error) {
+        console.error(`Failed to delete storage value '${key}': ${error}`)
         return false
       }
 
