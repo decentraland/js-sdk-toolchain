@@ -1,2 +1,2 @@
 export { EnvVar } from './env-var'
-export { Storage, IStorage, IWorldStorage, IPlayerStorage } from './storage'
+export { Storage, IStorage, ISceneStorage, IPlayerStorage } from './storage'
