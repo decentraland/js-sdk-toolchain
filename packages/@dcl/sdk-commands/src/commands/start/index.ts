@@ -29,6 +29,8 @@ import { Result } from 'arg'
 import { startValidations } from '../../logic/project-validations'
 import { runExplorerAlpha } from './explorer-alpha'
 import { getLanUrl } from './utils'
+import { spawnMultiplayerIfNeeded } from './hammurabi-server'
+import { ChildProcess } from 'child_process'
 
 interface Options {
   args: Result<typeof args>
@@ -213,6 +215,24 @@ export async function main(options: Options) {
         }
       }
       await startComponents()
+
+      // Start Hammurabi server if needed (stored outside components to avoid lifecycle management)
+      let hammurabiServer: ChildProcess | undefined
+      const project = workspace.projects[0]
+      if (project) {
+        const realm = `http://localhost:${port}`
+        hammurabiServer = await spawnMultiplayerIfNeeded(components, project, realm)
+
+        // Register cleanup handler for hammurabi server
+        if (hammurabiServer) {
+          const cleanup = () => {
+            if (hammurabiServer && !hammurabiServer.killed) {
+              hammurabiServer.kill('SIGTERM')
+            }
+          }
+          components.signaler.programClosed.then(cleanup).catch(() => {})
+        }
+      }
 
       const networkInterfaces = os.networkInterfaces()
       const availableURLs: string[] = []
