@@ -1,18 +1,8 @@
 // @internal
-declare module '~sdk/all-composites' {
-  export const compositeFromLoader: Record<string, Uint8Array | string>
-}
-
-// @internal
 declare module '~sdk/script-utils' {
-  type Entity = number; // this will get replaced with the proper import at scene build time
+  import type { Entity } from '@dcl/ecs/dist-cjs'
 
-  /**
-   * Registry interface that maps script paths to their types.
-   * This interface is populated at build time with actual script paths.
-   * It starts empty and gets augmented during scene builds.
-   */
-  export interface ScriptRegistry {}
+__TYPE_IMPORTS__
 
   /**
    * Type utility to extract the instance type from a script module.
@@ -47,6 +37,12 @@ declare module '~sdk/script-utils' {
    * ```
    */
   export type ActionCallback = () => void
+
+  /**
+   * Registry interface that maps script paths to their types.
+   * This interface is populated at build time with actual script paths.
+   */
+  export __SCRIPT_TYPES__
 
   /**
    * @deprecated
@@ -87,5 +83,4 @@ declare module '~sdk/script-utils' {
     methodName: M,
     ...args: ScriptRegistry[K][M] extends (...args: infer P) => any ? P : never
   ): ScriptRegistry[K][M] extends (...args: any[]) => infer R ? R : never
-  export function callScriptMethod(entity: Entity, scriptPath: string, methodName: string, ...args: any[]): any
 }

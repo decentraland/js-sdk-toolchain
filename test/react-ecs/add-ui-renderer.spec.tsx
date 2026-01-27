@@ -1,9 +1,14 @@
 import { Entity } from '../../packages/@dcl/ecs/src/engine'
 import { components } from '../../packages/@dcl/ecs/src'
 import { UiEntity, ReactEcs } from '../../packages/@dcl/react-ecs/src'
+import { getUiScaleFactor, resetUiScaleFactor } from '../../packages/@dcl/react-ecs/src/components/utils'
 import { setupEngine } from './utils'
 
 describe('addUiRenderer', () => {
+  afterEach(() => {
+    resetUiScaleFactor()
+  })
+
   it('should allow adding multiple UI renderers dynamically', async () => {
     const { engine, uiRenderer } = setupEngine()
     const UiTransform = components.UiTransform(engine)
@@ -207,6 +212,32 @@ describe('addUiRenderer', () => {
     expect(uiEntities.length).toBe(2)
 
     // Clean up
+    uiRenderer.destroy()
+  })
+
+  it('should apply virtual size from addUiRenderer when main UI has none', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiCanvasInformation = components.UiCanvasInformation(engine)
+    const ownerEntity = engine.addEntity()
+
+    UiCanvasInformation.create(engine.RootEntity, {
+      devicePixelRatio: 1,
+      width: 1600,
+      height: 900,
+      interactableArea: {
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0
+      }
+    })
+
+    const ui = () => <UiEntity uiTransform={{ width: 100 }} />
+    uiRenderer.addUiRenderer(ownerEntity, ui, { virtualWidth: 800, virtualHeight: 600 })
+    await engine.update(1)
+
+    expect(getUiScaleFactor()).toBeCloseTo(1.5)
+
     uiRenderer.destroy()
   })
 })

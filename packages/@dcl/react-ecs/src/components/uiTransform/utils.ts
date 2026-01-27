@@ -24,7 +24,7 @@ import {
   BorderRadius,
   UiTransformProps
 } from './types'
-import { calcOnViewport } from '../utils'
+import { calcOnViewport, getUiScaleFactor } from '../utils'
 import { ScaleUnit } from '../types'
 import { Color4 } from '@dcl/ecs/dist/components/generated/pb/decentraland/common/colors.gen'
 
@@ -57,6 +57,10 @@ function isVh(val: PositionUnit): val is ScaleUnit {
   return typeof val === 'string' && val.endsWith('vh')
 }
 
+function scalePixelValue(value: number): number {
+  return value * getUiScaleFactor()
+}
+
 function parsePositionUnit(val?: PositionUnit | 'auto'): [number | undefined, YGUnit] {
   function getValue(key: 'px' | '%' | 'vw' | 'vh', value: string) {
     return Number(value.slice(0, value.indexOf(key)))
@@ -71,7 +75,7 @@ function parsePositionUnit(val?: PositionUnit | 'auto'): [number | undefined, YG
   }
 
   if (typeof val === 'number' || (typeof val === 'string' && !isNaN(Number(val)))) {
-    return [Number(val), YGUnit.YGU_POINT]
+    return [scalePixelValue(Number(val)), YGUnit.YGU_POINT]
   }
 
   if (isPercent(val)) {
@@ -79,7 +83,7 @@ function parsePositionUnit(val?: PositionUnit | 'auto'): [number | undefined, YG
   }
 
   if (isPoint(val)) {
-    return [getValue('px', val), YGUnit.YGU_POINT]
+    return [scalePixelValue(getValue('px', val)), YGUnit.YGU_POINT]
   }
 
   if (isVw(val) || isVh(val)) {
