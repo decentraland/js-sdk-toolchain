@@ -53,7 +53,7 @@ export function createAssetLoadLoadingStateSystem(engine: IEngine): AssetLoadLoa
       // Get last added values (can be multiple per tick, just not for the same asset)
       const lastValues = Array.from(loadingState.values()).slice(data.lastLoadingStateLength)
 
-      lastValues.forEach(value => {
+      lastValues.forEach((value) => {
         data.callback(value)
       })
 

@@ -64,7 +64,8 @@ export { VideoEventsSystem }
  * @public
  * Register callback functions to a particular entity on asset pre-load events.
  */
-export const assetLoadLoadingStateSystem: AssetLoadLoadingStateSystem = /* @__PURE__ */ createAssetLoadLoadingStateSystem(engine)
+export const assetLoadLoadingStateSystem: AssetLoadLoadingStateSystem =
+  /* @__PURE__ */ createAssetLoadLoadingStateSystem(engine)
 export { AssetLoadLoadingStateSystem }
 
 /**
