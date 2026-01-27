@@ -3,11 +3,12 @@ import { assertIsServer, wrapSignedFetch } from '../utils'
 import { MODULE_NAME } from './constants'
 
 /**
- * Player-scoped storage interface for key-value pairs.
+ * Player-scoped storage interface for key-value pairs from the Server Side Storage service.
+ * This is NOT filesystem storage - data is stored in the remote storage service.
  */
 export interface IPlayerStorage {
   /**
-   * Retrieves a value from a player's storage by key.
+   * Retrieves a value from a player's storage by key from the Server Side Storage service.
    * @param address - The player's wallet address
    * @param key - The key to retrieve
    * @returns A promise that resolves to the parsed JSON value, or null if not found
@@ -15,7 +16,7 @@ export interface IPlayerStorage {
   get<T = unknown>(address: string, key: string): Promise<T | null>
 
   /**
-   * Stores a value in a player's storage.
+   * Stores a value in a player's storage in the Server Side Storage service.
    * @param address - The player's wallet address
    * @param key - The key to store the value under
    * @param value - The value to store (will be JSON serialized)
@@ -24,7 +25,7 @@ export interface IPlayerStorage {
   set<T = unknown>(address: string, key: string, value: T): Promise<boolean>
 
   /**
-   * Deletes a value from a player's storage.
+   * Deletes a value from a player's storage in the Server Side Storage service.
    * @param address - The player's wallet address
    * @param key - The key to delete
    * @returns A promise that resolves to true if deleted, false if not found
