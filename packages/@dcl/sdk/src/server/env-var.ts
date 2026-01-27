@@ -1,6 +1,5 @@
-import { signedFetch } from '~system/SignedFetch'
-import { assertIsServer } from './utils'
 import { getStorageServerUrl } from './storage-url'
+import { assertIsServer, wrapSignedFetch } from './utils'
 
 const MODULE_NAME = 'EnvVar'
 
@@ -10,35 +9,6 @@ const MODULE_NAME = 'EnvVar'
  * on server-side scenes.
  */
 export const EnvVar = {
-  /**
-   * Fetches all environment variables as plain text.
-   *
-   * @returns A promise that resolves to the plain text response containing all environment variables
-   * @throws Error if not running on a server-side scene
-   * @throws Error if the request fails
-   */
-  async all(): Promise<string> {
-    assertIsServer(MODULE_NAME)
-
-    const baseUrl = await getStorageServerUrl()
-    const url = `${baseUrl}/env`
-
-    const response = await signedFetch({
-      url,
-      init: {
-        method: 'GET',
-        headers: {}
-      }
-    })
-
-    if (!response.ok) {
-      console.error(`Failed to fetch environment variables: ${response.status} ${response.statusText}`)
-      return ''
-    }
-
-    return response.body
-  },
-
   /**
    * Fetches a specific environment variable by key as plain text.
    *
@@ -52,19 +22,15 @@ export const EnvVar = {
     const baseUrl = await getStorageServerUrl()
     const url = `${baseUrl}/env/${encodeURIComponent(key)}`
 
-    const response = await signedFetch({
-      url,
-      init: {
-        method: 'GET',
-        headers: {}
-      }
+    const [error, data] = await wrapSignedFetch<{ value: string }>({
+      url
     })
 
-    if (!response.ok) {
-      console.error(`Failed to fetch environment variable '${key}': ${response.status} ${response.statusText}`)
+    if (error) {
+      console.error(`Failed to fetch environment variable '${key}': ${error}`)
       return ''
     }
 
-    return response.body
+    return data?.value ?? ''
   }
 }
