@@ -1153,6 +1153,7 @@ export type EventSystemOptions = {
     maxDistance?: number;
     showFeedback?: boolean;
     showHighlight?: boolean;
+    maxPlayerDistance?: number;
 };
 
 // @public

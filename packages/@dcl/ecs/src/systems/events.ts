@@ -21,6 +21,7 @@ export type EventSystemOptions = {
   maxDistance?: number
   showFeedback?: boolean
   showHighlight?: boolean
+  maxPlayerDistance?: number
 }
 
 export const getDefaultOpts = (opts: Partial<EventSystemOptions> = {}): EventSystemOptions => ({
