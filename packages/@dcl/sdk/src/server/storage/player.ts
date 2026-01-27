@@ -1,6 +1,5 @@
-import { signedFetch } from '~system/SignedFetch'
 import { getStorageServerUrl } from '../storage-url'
-import { assertIsServer } from '../utils'
+import { assertIsServer, wrapSignedFetch } from '../utils'
 import { MODULE_NAME } from './constants'
 
 /**
@@ -34,44 +33,35 @@ export interface IPlayerStorage {
 }
 
 /**
- * Creates player-scoped storage for key-value pairs.
+ * Creates player-scoped storage that provides methods to interact with
+ * player-specific key-value pairs from the Server Side Storage service.
  * This module only works when running on server-side scenes.
  */
 export const createPlayerStorage = (): IPlayerStorage => {
   return {
     async get<T = unknown>(address: string, key: string): Promise<T | null> {
-      await assertIsServer(MODULE_NAME)
+      assertIsServer(MODULE_NAME)
 
       const baseUrl = await getStorageServerUrl()
       const url = `${baseUrl}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
 
-      const response = await signedFetch({ url })
+      const [error, data] = await wrapSignedFetch<{ value: T }>({ url })
 
-      if (!response.ok) {
-        if (response.status === 404) {
-          return null
-        }
-        console.error(
-          `Failed to get player storage value '${key}' for '${address}': ${response.status} ${response.statusText}`
-        )
+      if (error) {
+        console.error(`Failed to get player storage value '${key}' for '${address}': ${error}`)
         return null
       }
 
-      try {
-        return JSON.parse(response.body).value as T
-      } catch {
-        console.error(`Failed to parse player storage value '${key}' for '${address}' as JSON`)
-        return null
-      }
+      return data?.value ?? null
     },
 
     async set<T = unknown>(address: string, key: string, value: T): Promise<boolean> {
-      await assertIsServer(MODULE_NAME)
+      assertIsServer(MODULE_NAME)
 
       const baseUrl = await getStorageServerUrl()
       const url = `${baseUrl}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
 
-      const response = await signedFetch({
+      const [error] = await wrapSignedFetch({
         url,
         init: {
           method: 'PUT',
@@ -82,10 +72,8 @@ export const createPlayerStorage = (): IPlayerStorage => {
         }
       })
 
-      if (!response.ok) {
-        console.error(
-          `Failed to set player storage value '${key}' for '${address}': ${response.status} ${response.statusText}`
-        )
+      if (error) {
+        console.error(`Failed to set player storage value '${key}' for '${address}': ${error}`)
         return false
       }
 
@@ -93,12 +81,12 @@ export const createPlayerStorage = (): IPlayerStorage => {
     },
 
     async delete(address: string, key: string): Promise<boolean> {
-      await assertIsServer(MODULE_NAME)
+      assertIsServer(MODULE_NAME)
 
       const baseUrl = await getStorageServerUrl()
       const url = `${baseUrl}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
 
-      const response = await signedFetch({
+      const [error] = await wrapSignedFetch({
         url,
         init: {
           method: 'DELETE',
@@ -106,14 +94,8 @@ export const createPlayerStorage = (): IPlayerStorage => {
         }
       })
 
-      if (response.status === 404) {
-        return false
-      }
-
-      if (!response.ok) {
-        console.error(
-          `Failed to delete player storage value '${key}' for '${address}': ${response.status} ${response.statusText}`
-        )
+      if (error) {
+        console.error(`Failed to delete player storage value '${key}' for '${address}': ${error}`)
         return false
       }
 
