@@ -140,7 +140,7 @@ async function getAddressAndSignature(
   })
   const router = setServerLogsRoutes(commonRouter, components, awaitResponse, signCallback)
 
-  components.logger.info(`You need to sign to access server logs:`)
+  components.logger.info('You need to sign to access server logs')
   const { program } = await runDapp(components, router, { ...linkOptions, uri: `/` })
 
   return { program }
@@ -153,16 +153,7 @@ async function streamLogs(
 ): Promise<void> {
   const { logger, fetch: fetchComponent } = components
 
-  logger.info(`\n📡 Connecting to server logs...`)
-  logger.info(`URL: ${logsUrl}`)
-
-  // Debug: Log the headers being sent
-  logger.info(`\nAuth Headers:`)
-  Object.keys(authHeaders).forEach((key) => {
-    logger.info(`  ${key}: ${authHeaders[key]}`)
-  })
-
-  logger.info('')
+  logger.info('\nConnecting to server logs...')
 
   // Try SSE/streaming first
   try {
@@ -182,7 +173,7 @@ async function streamLogs(
 
     const contentType = response.headers.get('content-type') || ''
     if (contentType.includes('text/event-stream') || contentType.includes('application/stream')) {
-      logger.info(`Streaming logs in real-time (press CTRL+C to stop)...\n`)
+      logger.info('Streaming logs in real-time (press CTRL+C to stop)')
 
       // Stream logs
       if (response.body) {
@@ -206,9 +197,9 @@ async function streamLogs(
   } catch (e) {
     logger.warn(`Streaming not available, falling back to polling: ${(e as Error).message}`)
   }
-
+  
   // Fall back to polling
-  logger.info(`📊 Polling logs every 5 seconds (press CTRL+C to stop)...\n`)
+  logger.info('Polling logs every 5 seconds (press CTRL+C to stop)...\n')
 
   let lastTimestamp: number = Date.now()
   let consecutiveErrors = 0
@@ -260,7 +251,7 @@ async function streamLogs(
   // Handle graceful shutdown
   const cleanup = () => {
     clearInterval(intervalId)
-    logger.info('\n\n✋ Stopped streaming logs')
+    logger.info('\n\nStopped streaming logs')
     process.exit(0)
   }
 
@@ -289,25 +280,33 @@ function formatAndPrintLog(logger: CliComponents['logger'], log: any) {
   const level = (logObj.level || logObj.severity || 'INFO').toUpperCase()
   const message = logObj.message || logObj.msg || JSON.stringify(logObj)
 
-  // Color-code based on level
-  const colors = {
-    ERROR: '\x1b[31m', // Red
-    WARN: '\x1b[33m', // Yellow
-    WARNING: '\x1b[33m', // Yellow
-    INFO: '\x1b[37m', // White
-    DEBUG: '\x1b[36m', // Cyan
-    TRACE: '\x1b[90m' // Gray
-  }
-
-  const reset = '\x1b[0m'
-  const color = colors[level as keyof typeof colors] || colors.INFO
-
   // Format timestamp
   const date = new Date(timestamp)
   const formattedTime = date.toISOString().replace('T', ' ').substring(0, 19)
 
-  // Print formatted log
-  logger.log(`${color}[${formattedTime}] [${level}]${reset} ${message}`)
+  // Format the log message with timestamp
+  const formattedMessage = `[${formattedTime}] [${level}] ${message}`
+
+  // Map log levels to logger methods
+  const normalizedLevel = level.toLowerCase()
+
+  switch (normalizedLevel) {
+    case 'error':
+      logger.error(formattedMessage)
+      break
+    case 'warn':
+    case 'warning':
+      logger.warn(formattedMessage)
+      break
+    case 'debug':
+      logger.debug(formattedMessage)
+      break
+    case 'info':
+    case 'trace':
+    default:
+      logger.info(formattedMessage)
+      break
+  }
 
   // If there are additional fields, print them
   const additionalFields = Object.keys(logObj).filter(
@@ -335,7 +334,7 @@ export async function main(options: Options) {
   if (options.args['--world']) {
     // Use the world from command line argument
     world = options.args['--world'].replace(/\.dcl\.eth$/i, '')
-    logger.info(`World: ${world}`)
+    logger.info(`Viewing logs for world: ${world}`)
   } else {
     // Fall back to scene.json
     const sceneJson = await getValidSceneJson(options.components, projectRoot)
@@ -351,7 +350,7 @@ export async function main(options: Options) {
 
     // Strip .dcl.eth suffix if present
     world = worldName.replace(/\.dcl\.eth$/i, '')
-    logger.info(`World: ${world}`)
+    logger.info(`Viewing logs for world: ${world}`)
   }
 
   // Determine target URL
@@ -390,7 +389,7 @@ export async function main(options: Options) {
 
   try {
     await awaitResponse
-    logger.info('✅ Authentication successful!')
+    logger.info('Authentication successful!')
 
     // Close the browser window
     if (program) {
