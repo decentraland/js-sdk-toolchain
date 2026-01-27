@@ -115,22 +115,34 @@ describe('bundle script utilities', () => {
   })
 
   describe('generateInitializeScriptsModule', () => {
-    let mockFs: ReturnType<typeof createFsComponent>
+    let mockComponents: {
+      fs: ReturnType<typeof createFsComponent>
+      logger: { log: jest.Mock; info: jest.Mock; error: jest.Mock; debug: jest.Mock; warn: jest.Mock }
+    }
 
     beforeEach(() => {
-      mockFs = createFsComponent()
+      mockComponents = {
+        fs: createFsComponent(),
+        logger: { log: jest.fn(), info: jest.fn(), error: jest.fn(), debug: jest.fn(), warn: jest.fn() }
+      }
     })
 
-    it('should generate empty initializeScripts when no scripts are found', async () => {
+    it('should generate _initializeScripts with empty array and helper exports when no scripts are found', async () => {
       const compositeData = null
 
-      const result = await generateInitializeScriptsModule(mockFs, '/test/project', compositeData)
+      const result = await generateInitializeScriptsModule(mockComponents, '/test/project', compositeData)
 
-      expect(result.contents).toBe(`export function initializeScripts(engine) {}`)
+      expect(result.contents).toContain('function runScripts(')
+      expect(result.contents).toContain('export function _initializeScripts(engine)')
+      expect(result.contents).toContain('const scriptsArray = []')
+      expect(result.contents).toContain('return runScripts(engine, scriptsArray)')
+      expect(result.contents).toContain(
+        'export { getScriptInstance, getScriptInstancesByPath, getAllScriptInstances, callScriptMethod }'
+      )
       expect(result.watchFiles).toEqual([])
     })
 
-    it('should generate empty initializeScripts when compositeData has no scripts', async () => {
+    it('should generate _initializeScripts with empty array and helper exports when compositeData has no scripts', async () => {
       const compositeData = {
         scripts: new Map(),
         compositeLines: [],
@@ -138,13 +150,19 @@ describe('bundle script utilities', () => {
         withErrors: false
       }
 
-      const result = await generateInitializeScriptsModule(mockFs, '/test/project', compositeData)
+      const result = await generateInitializeScriptsModule(mockComponents, '/test/project', compositeData)
 
-      expect(result.contents).toBe(`export function initializeScripts(engine) {}`)
+      expect(result.contents).toContain('function runScripts(')
+      expect(result.contents).toContain('export function _initializeScripts(engine)')
+      expect(result.contents).toContain('const scriptsArray = []')
+      expect(result.contents).toContain('return runScripts(engine, scriptsArray)')
+      expect(result.contents).toContain(
+        'export { getScriptInstance, getScriptInstancesByPath, getAllScriptInstances, callScriptMethod }'
+      )
       expect(result.watchFiles).toEqual([])
     })
 
-    it('should generate initializeScripts with runScripts call when scripts are found', async () => {
+    it('should generate _initializeScripts with runScripts call when scripts are found', async () => {
       const compositeData = {
         scripts: new Map([
           [
@@ -163,9 +181,9 @@ describe('bundle script utilities', () => {
         withErrors: false
       }
 
-      const result = await generateInitializeScriptsModule(mockFs, '/test/project', compositeData)
+      const result = await generateInitializeScriptsModule(mockComponents, '/test/project', compositeData)
 
-      expect(result.contents).toContain("import * as script_src_scripts_test from './src/scripts/test.ts'")
+      expect(result.contents).toContain('import * as script_src_scripts_test from "./src/scripts/test.ts"')
       expect(result.contents).toContain('return runScripts(engine,')
       expect(result.contents).toContain('"path":"src/scripts/test.ts"')
       expect(result.contents).toContain('module: script_src_scripts_test')
@@ -183,10 +201,10 @@ describe('bundle script utilities', () => {
         withErrors: false
       }
 
-      const result = await generateInitializeScriptsModule(mockFs, '/test/project', compositeData)
+      const result = await generateInitializeScriptsModule(mockComponents, '/test/project', compositeData)
 
-      expect(result.contents).toContain("import * as script_src_scripts_movePlayer from './src/scripts/movePlayer.ts'")
-      expect(result.contents).toContain("import * as script_src_scripts_rotateBox from './src/scripts/rotateBox.ts'")
+      expect(result.contents).toContain('import * as script_src_scripts_movePlayer from "./src/scripts/movePlayer.ts"')
+      expect(result.contents).toContain('import * as script_src_scripts_rotateBox from "./src/scripts/rotateBox.ts"')
       expect(result.contents).toContain('module: script_src_scripts_movePlayer')
       expect(result.contents).toContain('module: script_src_scripts_rotateBox')
       expect(result.watchFiles).toEqual([
@@ -203,10 +221,10 @@ describe('bundle script utilities', () => {
         withErrors: false
       }
 
-      const result = await generateInitializeScriptsModule(mockFs, '/test/project', compositeData)
+      const result = await generateInitializeScriptsModule(mockComponents, '/test/project', compositeData)
 
       expect(result.contents).toContain('function runScripts(')
-      expect(result.contents).toContain('export function initializeScripts(engine)')
+      expect(result.contents).toContain('export function _initializeScripts(engine)')
     })
 
     it('should import script only once when used by multiple entities', async () => {
@@ -226,26 +244,22 @@ describe('bundle script utilities', () => {
         withErrors: false
       }
 
-      const result = await generateInitializeScriptsModule(mockFs, '/test/project', compositeData)
+      const result = await generateInitializeScriptsModule(mockComponents, '/test/project', compositeData)
 
-      // Count how many times the import statement appears
-      const importStatement = "import * as script_src_scripts_movePlayer from './src/scripts/movePlayer.ts'"
-      const importCount =
-        (result.contents.match(new RegExp(importStatement.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length
+      const importStatement = 'import * as script_src_scripts_movePlayer from "./src/scripts/movePlayer.ts"'
+      const importCount = (
+        result.contents.match(new RegExp(importStatement.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []
+      ).length
 
-      // Should only import once
       expect(importCount).toBe(1)
 
-      // But should have 3 script instances in the array
       expect(result.contents.match(/"entity":512/g)?.length).toBe(1)
       expect(result.contents.match(/"entity":513/g)?.length).toBe(1)
       expect(result.contents.match(/"entity":514/g)?.length).toBe(1)
 
-      // All should reference the same module
       const moduleReferenceCount = (result.contents.match(/module: script_src_scripts_movePlayer/g) || []).length
       expect(moduleReferenceCount).toBe(3)
 
-      // Should only watch the file once
       expect(result.watchFiles).toEqual(['/test/project/src/scripts/movePlayer.ts'])
     })
   })
