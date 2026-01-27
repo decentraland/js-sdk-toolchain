@@ -158,7 +158,8 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
         showFeedback: opts.showFeedback,
         showHighlight: opts.showHighlight,
         hoverText: opts.hoverText,
-        maxDistance: opts.maxDistance
+        maxDistance: opts.maxDistance,
+        maxPlayerDistance: opts.maxPlayerDistance
       }
     })
   }
