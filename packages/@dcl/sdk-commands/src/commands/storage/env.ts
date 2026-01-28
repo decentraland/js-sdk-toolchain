@@ -11,7 +11,7 @@ import {
 } from './shared'
 
 /**
- * Handles environment variable operations (set, delete, clear)
+ * Handles environment variable operations in the server-side storage service (set, delete, clear)
  */
 export const handleEnv = async (action: string, key: string | undefined, options: Options): Promise<void> => {
   const { logger, analytics } = options.components

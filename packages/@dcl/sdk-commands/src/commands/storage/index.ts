@@ -36,6 +36,7 @@ export function help(options: Options) {
   options.components.logger.log(`
   Usage: 'sdk-commands storage [subcommand] [action] [KEY] [options]'
     Manages server-side storage including environment variables, scene storage, and player storage.
+    This data is stored in Decentraland's remote storage service, not in the local filesystem.
     Requires a scene.json with worldConfiguration.name in the project directory.
 
     Subcommands:

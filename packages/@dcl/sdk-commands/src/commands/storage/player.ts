@@ -11,7 +11,7 @@ import {
 } from './shared'
 
 /**
- * Handles player storage operations (get, set, delete, clear)
+ * Handles player storage operations in the server-side storage service (get, set, delete, clear)
  */
 export const handlePlayer = async (action: string, key: string | undefined, options: Options): Promise<void> => {
   const { logger, analytics } = options.components
