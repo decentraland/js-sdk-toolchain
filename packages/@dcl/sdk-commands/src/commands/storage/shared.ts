@@ -19,7 +19,7 @@ import { StorageInfo, LinkerOptions } from './types'
 const STORAGE_SERVER_ORG = 'https://storage.decentraland.org'
 
 /**
- * Validates workspace and extracts world configuration
+ * Validates workspace and extracts world configuration for server-side storage operations
  */
 export const validateWorkspaceAndWorld = async (
   components: CliComponents,
@@ -46,7 +46,7 @@ export const validateWorkspaceAndWorld = async (
 }
 
 /**
- * Builds metadata for storage server requests (ADR-44 format)
+ * Builds metadata for server-side storage service requests (ADR-44 format)
  */
 export const buildStorageMetadata = (worldName: string | undefined, baseParcel: string): string => {
   const meta: Record<string, unknown> = {}
@@ -93,7 +93,7 @@ export const getLinkerDappOptions = (args: {
 }
 
 /**
- * Common setup for storage commands: validates action, workspace, and world configuration
+ * Common setup for server-side storage commands: validates action, workspace, and world configuration
  */
 export const setupStorageCommand = async (
   components: CliComponents,
@@ -130,7 +130,7 @@ export const setupStorageCommand = async (
 }
 
 /**
- * Sets up routes for the linker dApp specific to storage operations
+ * Sets up routes for the linker dApp specific to server-side storage operations
  */
 const setStorageRoutes = (
   router: Router<object>,
@@ -216,7 +216,7 @@ export const getAuthHeaders = async (
 }
 
 /**
- * Makes an authenticated request to the storage server
+ * Makes an authenticated request to the server-side storage service
  */
 export const makeAuthenticatedRequest = async (
   components: CliComponents,
@@ -276,14 +276,14 @@ export const makeAuthenticatedRequest = async (
 }
 
 /**
- * Gets the base URL for storage operations
+ * Gets the base URL for server-side storage service operations
  */
 export const getStorageBaseUrl = (targetArg?: string): string => {
   return targetArg || STORAGE_SERVER_ORG
 }
 
 /**
- * Creates storage info object for signing
+ * Creates storage info object for signing server-side storage service requests
  */
 export const createStorageInfo = (
   action: 'get' | 'set' | 'delete' | 'clear',

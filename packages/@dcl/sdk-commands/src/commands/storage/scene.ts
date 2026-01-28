@@ -11,7 +11,7 @@ import {
 } from './shared'
 
 /**
- * Handles scene storage operations (get, set, delete, clear)
+ * Handles scene storage operations in the server-side storage service (get, set, delete, clear)
  */
 export const handleScene = async (action: string, key: string | undefined, options: Options): Promise<void> => {
   const { logger, analytics } = options.components
