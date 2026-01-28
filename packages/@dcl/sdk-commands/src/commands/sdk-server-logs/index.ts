@@ -197,7 +197,7 @@ async function streamLogs(
   } catch (e) {
     logger.warn(`Streaming not available, falling back to polling: ${(e as Error).message}`)
   }
-  
+
   // Fall back to polling
   logger.info('Polling logs every 5 seconds (press CTRL+C to stop)...\n')
 
