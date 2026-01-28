@@ -15,7 +15,8 @@ describe('Generated OnPointerDown ProtoBuf', () => {
             hoverText: 'Tap to run',
             maxDistance: 10,
             showFeedback: true,
-            showHighlight: true
+            showHighlight: true,
+            maxPlayerDistance: 10
           }
         }
       ]
@@ -30,7 +31,8 @@ describe('Generated OnPointerDown ProtoBuf', () => {
             hoverText: 'Run to tap',
             maxDistance: 5,
             showFeedback: false,
-            showHighlight: false
+            showHighlight: false,
+            maxPlayerDistance: 7
           }
         }
       ]
@@ -54,7 +56,8 @@ describe('Generated OnPointerDown ProtoBuf', () => {
             hoverText: 'Run to tap',
             maxDistance: 5,
             showFeedback: false,
-            showHighlight: false
+            showHighlight: false,
+            maxPlayerDistance: 3
           }
         }
       ]
