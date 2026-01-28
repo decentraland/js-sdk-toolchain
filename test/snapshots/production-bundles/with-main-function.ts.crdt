@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=527.2k bytes
+SCENE_COMPILED_JS_SIZE_PROD=836.9k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -8,4 +8,4 @@ EVAL test/snapshots/production-bundles/with-main-function.js
   REQUIRE: long
   REQUIRE: ~system/CommunicationsController
   ERR! Error: Unknown module ~system/CommunicationsController
-    at <eval> (test/snapshots/production-bundles/with-main-function.js:12)
+    at <eval> (test/snapshots/production-bundles/with-main-function.js:13)

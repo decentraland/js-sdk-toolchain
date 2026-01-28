@@ -1,3 +1,13 @@
+jest.mock(
+  '@dcl/inspector/node_modules/@dcl/asset-packs',
+  () => ({
+    getActionEvents: jest.fn((entity) => ({
+      emit: jest.fn()
+    }))
+  }),
+  { virtual: true }
+)
+
 import { runScripts } from '../../../packages/@dcl/sdk-commands/src/logic/runtime-script'
 import { IEngine, Entity, EntityState } from '../../../packages/@dcl/ecs/dist-cjs'
 
