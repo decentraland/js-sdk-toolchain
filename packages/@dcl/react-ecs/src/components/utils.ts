@@ -9,6 +9,9 @@ import { EntityPropTypes, ScaleContext, ScaleUnit, ScaleUnits } from './types'
 import { parseUiBackground } from './uiBackground'
 import { parseUiTransform } from './uiTransform'
 
+let uiScaleFactor = 1
+let uiScaleOwner: symbol | undefined = undefined
+
 /**
  * @internal
  */
@@ -56,6 +59,35 @@ export function getScaleCtx(_engine: IEngine = engine): ScaleContext | undefined
   if (!canvasInfo) return undefined
   const { width, height, devicePixelRatio } = canvasInfo
   return { width, height, ratio: devicePixelRatio }
+}
+
+/**
+ * @internal
+ */
+export function getUiScaleFactor(): number {
+  return uiScaleFactor
+}
+
+/**
+ * @internal
+ */
+export function setUiScaleFactor(nextScale: number, owner?: symbol): void {
+  if (!Number.isFinite(nextScale) || nextScale < 0) return
+  if (owner) {
+    // Mark ownership so only that system can reset the scale.
+    uiScaleOwner = owner
+  }
+  uiScaleFactor = nextScale
+}
+
+/**
+ * @internal
+ */
+export function resetUiScaleFactor(owner?: symbol): void {
+  // Ignore resets from non-owners to avoid stomping active scale.
+  if (owner && uiScaleOwner !== owner) return
+  uiScaleOwner = undefined
+  uiScaleFactor = 1
 }
 
 /**
