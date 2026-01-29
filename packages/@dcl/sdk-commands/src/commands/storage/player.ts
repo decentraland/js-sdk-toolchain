@@ -49,7 +49,7 @@ export const handlePlayer = async (action: string, key: string | undefined, opti
     logger.info(`Getting player storage value '${key}' for ${address} from ${baseURL}`)
 
     const url = `${baseURL}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
-    const info = createStorageInfo('get', url, worldName, baseParcel, parcels, key, undefined, address)
+    const info = createStorageInfo('player', 'get', url, worldName, baseParcel, parcels, key, undefined, address)
 
     const result = await makeAuthenticatedRequest(options.components, info, linkOptions, 'GET', url)
 
@@ -92,7 +92,7 @@ export const handlePlayer = async (action: string, key: string | undefined, opti
     logger.info(`Setting player storage value '${key}' for ${address} to ${baseURL}`)
 
     const url = `${baseURL}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
-    const info = createStorageInfo('set', url, worldName, baseParcel, parcels, key, value, address)
+    const info = createStorageInfo('player', 'set', url, worldName, baseParcel, parcels, key, value, address)
 
     const result = await makeAuthenticatedRequest(options.components, info, linkOptions, 'PUT', url, { value })
 
@@ -126,7 +126,7 @@ export const handlePlayer = async (action: string, key: string | undefined, opti
     logger.info(`Deleting player storage value '${key}' for ${address} from ${baseURL}`)
 
     const url = `${baseURL}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
-    const info = createStorageInfo('delete', url, worldName, baseParcel, parcels, key, undefined, address)
+    const info = createStorageInfo('player', 'delete', url, worldName, baseParcel, parcels, key, undefined, address)
 
     const result = await makeAuthenticatedRequest(options.components, info, linkOptions, 'DELETE', url)
 
@@ -160,7 +160,17 @@ export const handlePlayer = async (action: string, key: string | undefined, opti
       logger.info(`Clearing all storage data for player ${address} from ${baseURL}`)
 
       const url = `${baseURL}/players/${encodeURIComponent(address)}/values`
-      const info = createStorageInfo('clear', url, worldName, baseParcel, parcels, undefined, undefined, address)
+      const info = createStorageInfo(
+        'player',
+        'clear',
+        url,
+        worldName,
+        baseParcel,
+        parcels,
+        undefined,
+        undefined,
+        address
+      )
 
       const result = await makeAuthenticatedRequest(options.components, info, linkOptions, 'DELETE', url, undefined, {
         'X-Confirm-Delete-All': 'true'
@@ -192,7 +202,7 @@ export const handlePlayer = async (action: string, key: string | undefined, opti
       logger.info(`Clearing all player storage data from ${baseURL}`)
 
       const url = `${baseURL}/players`
-      const info = createStorageInfo('clear', url, worldName, baseParcel, parcels)
+      const info = createStorageInfo('player', 'clear', url, worldName, baseParcel, parcels)
 
       const result = await makeAuthenticatedRequest(options.components, info, linkOptions, 'DELETE', url, undefined, {
         'X-Confirm-Delete-All': 'true'

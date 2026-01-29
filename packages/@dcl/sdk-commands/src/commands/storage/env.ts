@@ -44,7 +44,7 @@ export const handleEnv = async (action: string, key: string | undefined, options
     logger.info(`Setting environment variable '${key}' to ${baseURL}`)
 
     const url = `${baseURL}/env/${encodeURIComponent(key)}`
-    const info = createStorageInfo('set', url, worldName, baseParcel, parcels, key, value)
+    const info = createStorageInfo('env', 'set', url, worldName, baseParcel, parcels, key, value)
 
     const result = await makeAuthenticatedRequest(options.components, info, linkOptions, 'PUT', url, { value })
 
@@ -64,7 +64,7 @@ export const handleEnv = async (action: string, key: string | undefined, options
     logger.info(`Deleting environment variable '${key}' from ${baseURL}`)
 
     const url = `${baseURL}/env/${encodeURIComponent(key)}`
-    const info = createStorageInfo('delete', url, worldName, baseParcel, parcels, key)
+    const info = createStorageInfo('env', 'delete', url, worldName, baseParcel, parcels, key)
 
     const result = await makeAuthenticatedRequest(options.components, info, linkOptions, 'DELETE', url)
 
@@ -92,7 +92,7 @@ export const handleEnv = async (action: string, key: string | undefined, options
     logger.info(`Clearing all environment variables from ${baseURL}`)
 
     const url = `${baseURL}/env`
-    const info = createStorageInfo('clear', url, worldName, baseParcel, parcels)
+    const info = createStorageInfo('env', 'clear', url, worldName, baseParcel, parcels)
 
     const result = await makeAuthenticatedRequest(options.components, info, linkOptions, 'DELETE', url, undefined, {
       'X-Confirm-Delete-All': 'true'
