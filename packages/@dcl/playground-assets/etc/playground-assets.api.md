@@ -2226,9 +2226,7 @@ export namespace PBAssetLoad {
 
 // @public (undocumented)
 export interface PBAssetLoadLoadingState {
-    // (undocumented)
     asset: string;
-    // (undocumented)
     currentState: LoadingState;
     timestamp: number;
 }
