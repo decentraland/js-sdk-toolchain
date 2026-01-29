@@ -2383,6 +2383,8 @@ export namespace PBAvatarEquippedData {
 
 // @public (undocumented)
 export interface PBAvatarLocomotionSettings {
+    doubleJumpHeight?: number | undefined;
+    glidingSpeed?: number | undefined;
     hardLandingCooldown?: number | undefined;
     jogSpeed?: number | undefined;
     jumpHeight?: number | undefined;
@@ -2611,7 +2613,11 @@ export interface PBInputModifier_StandardInput {
     // (undocumented)
     disableAll?: boolean | undefined;
     // (undocumented)
+    disableDoubleJump?: boolean | undefined;
+    // (undocumented)
     disableEmote?: boolean | undefined;
+    // (undocumented)
+    disableGliding?: boolean | undefined;
     // (undocumented)
     disableJog?: boolean | undefined;
     // (undocumented)
