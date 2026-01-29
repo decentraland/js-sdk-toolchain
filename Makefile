@@ -55,7 +55,7 @@ lint-fix: sync-deps
 	npx tsx scripts/lint-packages.ts --fix
 
 test:
-	node_modules/.bin/jest --detectOpenHandles --colors test/
+	node_modules/.bin/jest --detectOpenHandles --forceExit --colors test/
 
 test-cli:
 	@rm -rf tmp
