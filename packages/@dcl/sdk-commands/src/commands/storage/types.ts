@@ -26,7 +26,10 @@ export interface Options {
   components: CliComponents
 }
 
+export type StorageType = 'env' | 'scene' | 'player'
+
 export interface StorageInfo {
+  storageType?: StorageType
   key?: string
   value?: string
   address?: string

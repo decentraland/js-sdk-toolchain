@@ -14,7 +14,7 @@ import { setRoutes, LinkerResponse } from '../../linker-dapp/routes'
 import { runDapp } from '../../run-dapp'
 import { getValidWorkspace } from '../../logic/workspace-validations'
 import { getValidSceneJson } from '../../logic/scene-validations'
-import { StorageInfo, LinkerOptions } from './types'
+import { StorageInfo, LinkerOptions, StorageType } from './types'
 
 const STORAGE_SERVER_ORG = 'https://storage.decentraland.org'
 
@@ -129,6 +129,12 @@ export const setupStorageCommand = async (
   return { baseURL, worldName, baseParcel, parcels }
 }
 
+export type StorageOperationResult = {
+  success: boolean
+  data?: any
+  error?: string
+}
+
 /**
  * Sets up routes for the linker dApp specific to server-side storage operations
  */
@@ -136,30 +142,35 @@ const setStorageRoutes = (
   router: Router<object>,
   components: CliComponents,
   awaitResponse: IFuture<void>,
-  deployCallback: (response: LinkerResponse) => Promise<void>
+  deployCallback: (response: LinkerResponse) => Promise<StorageOperationResult>
 ): Router<object> => {
   const { logger } = components
 
   const resolveLinkerPromise = () => setTimeout(() => awaitResponse.resolve(), 100)
   const rejectLinkerPromise = (e: Error) => setTimeout(() => awaitResponse.reject(e), 100)
 
-  router.post('/api/deploy', async (ctx) => {
+  router.post('/api/storage', async (ctx) => {
     const value = (await ctx.request.json()) as LinkerResponse
 
     if (!value.address || !value.authChain) {
       const errorMessage = `Invalid payload: ${Object.keys(value).join(' - ')}`
       logger.error(errorMessage)
       resolveLinkerPromise()
-      return { status: 400, body: { message: errorMessage } }
+      return { status: 400, body: { success: false, error: errorMessage } }
     }
 
     try {
-      await deployCallback(value)
+      const result = await deployCallback(value)
       resolveLinkerPromise()
-      return {}
+
+      if (!result.success) {
+        return { status: 400, body: { success: false, error: result.error } }
+      }
+
+      return { body: { success: true, data: result.data } }
     } catch (e) {
       rejectLinkerPromise(e as Error)
-      return { status: 400, body: { message: (e as Error).message } }
+      return { status: 400, body: { success: false, error: (e as Error).message } }
     }
   })
 
@@ -174,7 +185,7 @@ export const getAuthHeaders = async (
   awaitResponse: IFuture<void>,
   info: StorageInfo,
   linkOptions: LinkerOptions,
-  deployCallback: (response: LinkerResponse) => Promise<void>
+  deployCallback: (response: LinkerResponse) => Promise<StorageOperationResult>
 ): Promise<{ program?: Lifecycle.ComponentBasedProgram<unknown> }> => {
   // If DCL_PRIVATE_KEY is set, sign directly without the linker dapp
   if (process.env.DCL_PRIVATE_KEY) {
@@ -192,19 +203,21 @@ export const getAuthHeaders = async (
 
   // Use linker dapp for signing
   const { router: commonRouter } = setRoutes(components, {
+    storageType: info.storageType,
     key: info.key,
     value: info.value,
     address: info.address,
     world: info.world,
     action: info.action,
+    targetUrl: info.targetUrl,
     rootCID: info.rootCID,
     baseParcel: info.baseParcel,
     parcels: info.parcels,
     skipValidations: info.skipValidations,
     debug: info.debug,
     isWorld: info.isWorld,
-    title: 'World Storage Service',
-    description: 'Manage storage in the World Storage Service'
+    title: 'Storage Service',
+    description: 'Manage storage in the Decentraland Storage Service'
   })
   const router = setStorageRoutes(commonRouter, components, awaitResponse, deployCallback)
 
@@ -226,11 +239,10 @@ export const makeAuthenticatedRequest = async (
   url: string,
   body?: any,
   additionalHeaders?: Record<string, string>
-): Promise<{ success: boolean; data?: any; error?: string }> => {
+): Promise<StorageOperationResult> => {
   const { fetch: fetchComponent } = components
   const awaitResponse = future<void>()
-  let responseData: { value?: string } = { value: undefined }
-  let responseError: string | undefined
+  let operationResult: StorageOperationResult = { success: false, error: 'Operation not completed' }
 
   const { program } = await getAuthHeaders(components, awaitResponse, info, linkOptions, async (linkerResponse) => {
     const authHeaders = createAuthChainHeaders(linkerResponse.authChain, info.timestamp, info.metadata)
@@ -253,13 +265,17 @@ export const makeAuthenticatedRequest = async (
     if (res.ok) {
       try {
         const text = await res.text()
-        responseData = text ? JSON.parse(text) : {}
+        const responseData = text ? JSON.parse(text) : {}
+        operationResult = { success: true, data: responseData.value }
       } catch {
-        responseData = {}
+        operationResult = { success: true }
       }
     } else {
-      responseError = await res.text()
+      const errorText = await res.text()
+      operationResult = { success: false, error: errorText }
     }
+
+    return operationResult
   })
 
   try {
@@ -268,11 +284,7 @@ export const makeAuthenticatedRequest = async (
     void program?.stop()
   }
 
-  if (responseError) {
-    return { success: false, error: responseError }
-  }
-
-  return { success: true, data: responseData.value }
+  return operationResult
 }
 
 /**
@@ -286,6 +298,7 @@ export const getStorageBaseUrl = (targetArg?: string): string => {
  * Creates storage info object for signing server-side storage service requests
  */
 export const createStorageInfo = (
+  storageType: StorageType,
   action: 'get' | 'set' | 'delete' | 'clear',
   url: string,
   worldName: string | undefined,
@@ -303,6 +316,7 @@ export const createStorageInfo = (
   const payload = [method, pathname, timestamp, metadata].join(':').toLowerCase()
 
   return {
+    storageType,
     key,
     value,
     address,
