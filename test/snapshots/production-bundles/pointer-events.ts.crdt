@@ -9,8 +9,8 @@ EVAL test/snapshots/production-bundles/pointer-events.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   OPCODES ~= 64k
-  MALLOC_COUNT = 13172
-  ALIVE_OBJS_DELTA ~= 2.93k
+  MALLOC_COUNT = 13182
+  ALIVE_OBJS_DELTA ~= 2.94k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -43,4 +43,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 2k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 944.96k bytes
+  MEMORY_USAGE_COUNT ~= 945.48k bytes
