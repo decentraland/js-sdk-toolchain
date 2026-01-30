@@ -149,7 +149,8 @@ export async function startValidations(components: Pick<CliComponents, 'spawner'
   }
 }
 
-// If there is a main.crdt file, its an editor scene. We need asset-packs package.
-export function isEditorScene(components: Pick<CliComponents, 'fs'>, workingDirectory: string) {
-  return components.fs.fileExists(path.resolve(workingDirectory, 'main.crdt'))
+// If there is a main.composite file, its an editor scene. We need asset-packs package.
+export async function isEditorScene(components: Pick<CliComponents, 'fs'>, workingDirectory: string) {
+  const mainCompositePath = path.resolve(workingDirectory, 'assets', 'scene', 'main.composite')
+  return components.fs.fileExists(mainCompositePath)
 }

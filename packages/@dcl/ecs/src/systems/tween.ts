@@ -3,6 +3,7 @@ import { PBTween, TweenLoop, TweenStateStatus } from '../components'
 import { Entity, IEngine } from '../engine'
 import { ReadWriteByteBuffer } from '../serialization/ByteBuffer'
 import { dataCompare } from './crdt/utils'
+import { getGlobal } from '../runtime/globals'
 export type TweenSystem = {
   tweenCompleted(entity: Entity): boolean
 }
@@ -162,7 +163,7 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
   }
 
   // Some Explorers may not inject the flag and TweenSequence logic must be enabled in that case
-  const enableTweenSequenceLogic = (globalThis as any).ENABLE_SDK_TWEEN_SEQUENCE
+  const enableTweenSequenceLogic = getGlobal<boolean>('ENABLE_SDK_TWEEN_SEQUENCE')
   if (enableTweenSequenceLogic !== false) initializeTweenSequenceSystem()
 
   const tweenSystem: TweenSystem = {
