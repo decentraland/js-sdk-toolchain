@@ -85,23 +85,23 @@ function setServerLogsRoutes(
   const resolveLinkerPromise = () => setTimeout(() => awaitResponse.resolve(), 100)
   const rejectLinkerPromise = (e: Error) => setTimeout(() => awaitResponse.reject(e), 100)
 
-  router.post('/api/deploy', async (ctx) => {
+  router.post('/api/logs', async (ctx) => {
     const value = (await ctx.request.json()) as LinkerResponse
 
     if (!value.address || !value.authChain) {
       const errorMessage = `Invalid payload: ${Object.keys(value).join(' - ')}`
       logger.error(errorMessage)
       resolveLinkerPromise()
-      return { status: 400, body: { message: errorMessage } }
+      return { status: 400, body: { success: false, error: errorMessage } }
     }
 
     try {
       await signCallback(value)
       resolveLinkerPromise()
-      return {}
+      return { body: { success: true } }
     } catch (e) {
       rejectLinkerPromise(e as Error)
-      return { status: 400, body: { message: (e as Error).message } }
+      return { status: 400, body: { success: false, error: (e as Error).message } }
     }
   })
 
@@ -112,6 +112,8 @@ async function getAddressAndSignature(
   components: CliComponents,
   awaitResponse: IFuture<void>,
   payload: string,
+  world: string,
+  targetUrl: string,
   linkOptions: Omit<dAppOptions, 'uri'>,
   signCallback: (response: LinkerResponse) => Promise<void>
 ): Promise<{ program?: Lifecycle.ComponentBasedProgram<unknown> }> {
@@ -136,7 +138,10 @@ async function getAddressAndSignature(
     parcels: ['0,0'],
     skipValidations: true,
     debug: !!process.env.DEBUG,
-    isWorld: true
+    isWorld: true,
+    world,
+    targetUrl,
+    action: 'view-logs'
   })
   const router = setServerLogsRoutes(commonRouter, components, awaitResponse, signCallback)
 
@@ -155,7 +160,6 @@ async function streamLogs(
 
   logger.info('\nConnecting to server logs...')
 
-  // Try SSE/streaming first
   try {
     const response = await fetchComponent.fetch(logsUrl, {
       method: 'GET',
@@ -167,99 +171,38 @@ async function streamLogs(
 
     if (!response.ok) {
       const errorText = await response.text()
-      logger.error(`Server error response (${response.status}): ${errorText}`)
       throw new Error(`Server returned ${response.status}: ${errorText}`)
     }
 
     const contentType = response.headers.get('content-type') || ''
-    if (contentType.includes('text/event-stream') || contentType.includes('application/stream')) {
-      logger.info('Streaming logs in real-time (press CTRL+C to stop)')
+    if (!contentType.includes('text/event-stream') && !contentType.includes('application/stream')) {
+      throw new Error('Server does not support SSE streaming')
+    }
 
-      // Stream logs
-      if (response.body) {
-        const decoder = new TextDecoder()
-        let buffer = ''
+    logger.info('Streaming logs in real-time (press CTRL+C to stop)')
 
-        for await (const chunk of response.body) {
-          buffer += decoder.decode(chunk, { stream: true })
-          const lines = buffer.split('\n')
-          buffer = lines.pop() || ''
+    if (response.body) {
+      const decoder = new TextDecoder()
+      let buffer = ''
 
-          for (const line of lines) {
-            if (line.trim()) {
-              formatAndPrintLog(logger, line)
-            }
+      for await (const chunk of response.body) {
+        buffer += decoder.decode(chunk, { stream: true })
+        const lines = buffer.split('\n')
+        buffer = lines.pop() || ''
+
+        for (const line of lines) {
+          if (line.trim()) {
+            formatAndPrintLog(logger, line)
           }
         }
       }
-      return
     }
+
+    logger.info('\n======================= End Scene Logs =======================')
   } catch (e) {
-    logger.warn(`Streaming not available, falling back to polling: ${(e as Error).message}`)
+    printError(logger, 'Failed to stream logs:', e as Error)
+    process.exit(1)
   }
-
-  // Fall back to polling
-  logger.info('Polling logs every 5 seconds (press CTRL+C to stop)...\n')
-
-  let lastTimestamp: number = Date.now()
-  let consecutiveErrors = 0
-  const maxErrors = 3
-
-  const pollLogs = async () => {
-    try {
-      const response = await fetchComponent.fetch(`${logsUrl}?since=${lastTimestamp}`, {
-        method: 'GET',
-        headers: authHeaders
-      })
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`Server returned ${response.status}: ${errorText}`)
-      }
-
-      const data = (await response.json()) as any
-      const logs = Array.isArray(data) ? data : data.logs || []
-
-      if (logs.length > 0) {
-        logs.forEach((log: any) => {
-          formatAndPrintLog(logger, log)
-          // Update lastTimestamp if log has timestamp
-          if (log.timestamp) {
-            lastTimestamp = Math.max(lastTimestamp, new Date(log.timestamp).getTime())
-          }
-        })
-      }
-
-      consecutiveErrors = 0
-    } catch (e) {
-      consecutiveErrors++
-      if (consecutiveErrors >= maxErrors) {
-        printError(logger, 'Failed to fetch logs after multiple attempts:', e as Error)
-        process.exit(1)
-      } else {
-        logger.warn(`Failed to fetch logs (${consecutiveErrors}/${maxErrors}): ${(e as Error).message}`)
-      }
-    }
-  }
-
-  // Initial poll
-  await pollLogs()
-
-  // Set up polling interval
-  const intervalId = setInterval(pollLogs, 5000)
-
-  // Handle graceful shutdown
-  const cleanup = () => {
-    clearInterval(intervalId)
-    logger.info('\n\nStopped streaming logs')
-    process.exit(0)
-  }
-
-  process.on('SIGINT', cleanup)
-  process.on('SIGTERM', cleanup)
-
-  // Keep process alive
-  await new Promise(() => {})
 }
 
 function formatAndPrintLog(logger: CliComponents['logger'], log: any) {
@@ -381,6 +324,8 @@ export async function main(options: Options) {
     options.components,
     awaitResponse,
     payload,
+    world,
+    baseURL,
     linkOptions,
     async (linkerResponse) => {
       authHeaders = createAuthChainHeaders(linkerResponse.authChain, timestamp, metadata)
