@@ -39,3 +39,27 @@ describe('Generated AssetLoadLoadingState ProtoBuf', () => {
     testSchemaSerializationIdentity(AssetLoadLoadingState.schema, AssetLoadLoadingState.schema.create())
   })
 })
+
+describe('AssetLoadLoadingState GrowOnlyValueSet', () => {
+  const newEngine = Engine()
+  const AssetLoadLoadingState = components.AssetLoadLoadingState(newEngine)
+  const entity = newEngine.addEntity()
+
+  it('should append values to the set', () => {
+    const result = AssetLoadLoadingState.addValue(entity, {
+      asset: 'asset1',
+      currentState: LoadingState.LOADING,
+      timestamp: 1
+    })
+    expect(result.size).toBe(1)
+  })
+
+  it('should throw when trying to mutate the set or its values', () => {
+    const set = AssetLoadLoadingState.get(entity)
+    const [value] = set
+
+    expect(() => (set as any).add({})).toThrow('The set is frozen')
+    expect(() => (set as any).clear()).toThrow('The set is frozen')
+    expect(() => ((value as any).asset = 'asset2')).toThrow('Cannot assign to read only property')
+  })
+})
