@@ -6,6 +6,10 @@ import { EntityPropTypes } from '../types'
 import { UiInputProps } from './types'
 import { getTextAlign, getFont, getFontSize } from '../Label/utils'
 
+// Default colors for Input
+const DEFAULT_BORDER_COLOR = { r: 0.5, g: 0.5, b: 0.5, a: 1 } // Gray
+const DEFAULT_BACKGROUND_COLOR = { r: 1, g: 1, b: 1, a: 1 } // White
+
 function parseUiInput(props: Partial<UiInputProps>): PBUiInput {
   const { textAlign, font, fontSize, ...otherProps } = props
   return {
@@ -43,9 +47,21 @@ function parseUiInput(props: Partial<UiInputProps>): PBUiInput {
 export function Input(props: EntityPropTypes & Partial<UiInputProps>) {
   const { uiTransform, uiBackground, onMouseDown, onMouseUp, onMouseEnter, onMouseLeave, ...otherProps } = props
   const inputProps = parseUiInput(otherProps)
+
+  // Apply default uiTransform values for border properties
+  const uiTransformWithDefaults = {
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: DEFAULT_BORDER_COLOR,
+    ...uiTransform
+  }
+
+  // Apply default uiBackground if not provided
+  const uiBackgroundWithDefaults = uiBackground ?? { color: DEFAULT_BACKGROUND_COLOR }
+
   const commonProps = parseProps({
-    uiTransform,
-    uiBackground,
+    uiTransform: uiTransformWithDefaults,
+    uiBackground: uiBackgroundWithDefaults,
     onMouseDown,
     onMouseUp,
     onMouseEnter,
