@@ -50,6 +50,26 @@ export namespace AppendValueOperation {
 // @public
 export function areConnected(parcels: Coords[]): boolean;
 
+// @public (undocumented)
+export const AssetLoad: LastWriteWinElementSetComponentDefinition<PBAssetLoad>;
+
+// @public (undocumented)
+export const AssetLoadLoadingState: GrowOnlyValueSetComponentDefinition<PBAssetLoadLoadingState>;
+
+// @public (undocumented)
+export interface AssetLoadLoadingStateSystem {
+    // (undocumented)
+    registerAssetLoadLoadingStateEntity(entity: Entity, callback: AssetLoadLoadingStateSystemCallback): void;
+    // (undocumented)
+    removeAssetLoadLoadingStateEntity(entity: Entity): void;
+}
+
+// @public
+export const assetLoadLoadingStateSystem: AssetLoadLoadingStateSystem;
+
+// @public (undocumented)
+export type AssetLoadLoadingStateSystemCallback = (event: DeepReadonlyObject<PBAssetLoadLoadingState>) => void;
+
 // Warning: (ae-missing-release-tag) "AudioAnalysis" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -74,26 +94,6 @@ export type AudioAnalysisView = {
     amplitude: number;
     bands: number[];
 };
-
-// @public (undocumented)
-export const AssetLoad: LastWriteWinElementSetComponentDefinition<PBAssetLoad>;
-
-// @public (undocumented)
-export const AssetLoadLoadingState: GrowOnlyValueSetComponentDefinition<PBAssetLoadLoadingState>;
-
-// @public (undocumented)
-export interface AssetLoadLoadingStateSystem {
-    // (undocumented)
-    registerAssetLoadLoadingStateEntity(entity: Entity, callback: AssetLoadLoadingStateSystemCallback): void;
-    // (undocumented)
-    removeAssetLoadLoadingStateEntity(entity: Entity): void;
-}
-
-// @public
-export const assetLoadLoadingStateSystem: AssetLoadLoadingStateSystem;
-
-// @public (undocumented)
-export type AssetLoadLoadingStateSystemCallback = (event: DeepReadonlyObject<PBAssetLoadLoadingState>) => void;
 
 // @public (undocumented)
 export const AudioEvent: GrowOnlyValueSetComponentDefinition<PBAudioEvent>;
@@ -672,6 +672,7 @@ export const componentDefinitionByName: {
     "core::Animator": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAnimator>>;
     "core::AssetLoad": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAssetLoad>>;
     "core::AssetLoadLoadingState": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAssetLoadLoadingState>>;
+    "core::AudioAnalysis": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioAnalysis>>;
     "core::AudioEvent": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAudioEvent>>;
     "core::AudioSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioSource>>;
     "core::AudioStream": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioStream>>;
@@ -2268,6 +2269,46 @@ export namespace PBAssetLoadLoadingState {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAssetLoadLoadingState;
     // (undocumented)
     export function encode(message: PBAssetLoadLoadingState, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAudioAnalysis {
+    amplitude: number;
+    amplitudeGain?: number | undefined;
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    band0: number;
+    // (undocumented)
+    band1: number;
+    // (undocumented)
+    band2: number;
+    // (undocumented)
+    band3: number;
+    // (undocumented)
+    band4: number;
+    // (undocumented)
+    band5: number;
+    // (undocumented)
+    band6: number;
+    // (undocumented)
+    band7: number;
+    bandsGain?: number | undefined;
+    mode: PBAudioAnalysisMode;
+}
+
+// @public (undocumented)
+export namespace PBAudioAnalysis {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAudioAnalysis;
+    // (undocumented)
+    export function encode(message: PBAudioAnalysis, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export const enum PBAudioAnalysisMode {
+    // (undocumented)
+    MODE_LOGARITHMIC = 1,
+    // (undocumented)
+    MODE_RAW = 0
 }
 
 // @public (undocumented)
