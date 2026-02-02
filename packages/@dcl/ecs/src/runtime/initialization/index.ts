@@ -12,6 +12,8 @@ import { createVideoEventsSystem, VideoEventsSystem } from '../../systems/videoE
 import { TweenSystem, createTweenSystem } from '../../systems/tween'
 import { pointerEventColliderChecker } from '../../systems/pointer-event-collider-checker'
 import { createTriggerAreaEventsSystem, TriggerAreaEventsSystem } from '../../systems/triggerArea'
+import { createTimers, Timers } from '../helpers/timers'
+import { setGlobalPolyfill } from '../globals'
 
 /**
  * @public
@@ -72,6 +74,17 @@ export { TweenSystem }
  */
 export const triggerAreaEventsSystem: TriggerAreaEventsSystem = /* @__PURE__ */ createTriggerAreaEventsSystem(engine)
 export { TriggerAreaEventsSystem }
+
+/**
+ * @public
+ * Timer utilities for delayed and repeated execution.
+ */
+export const timers: Timers = /* @__PURE__ */ createTimers(engine)
+export { Timers, createTimers }
+setGlobalPolyfill('setTimeout', timers.setTimeout)
+setGlobalPolyfill('clearTimeout', timers.clearTimeout)
+setGlobalPolyfill('setInterval', timers.setInterval)
+setGlobalPolyfill('clearInterval', timers.clearInterval)
 
 /**
  * Adds pointer event collider system only in DEV env
