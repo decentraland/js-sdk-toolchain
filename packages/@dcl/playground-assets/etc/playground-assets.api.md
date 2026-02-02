@@ -76,6 +76,26 @@ export type AudioAnalysisView = {
 };
 
 // @public (undocumented)
+export const AssetLoad: LastWriteWinElementSetComponentDefinition<PBAssetLoad>;
+
+// @public (undocumented)
+export const AssetLoadLoadingState: GrowOnlyValueSetComponentDefinition<PBAssetLoadLoadingState>;
+
+// @public (undocumented)
+export interface AssetLoadLoadingStateSystem {
+    // (undocumented)
+    registerAssetLoadLoadingStateEntity(entity: Entity, callback: AssetLoadLoadingStateSystemCallback): void;
+    // (undocumented)
+    removeAssetLoadLoadingStateEntity(entity: Entity): void;
+}
+
+// @public
+export const assetLoadLoadingStateSystem: AssetLoadLoadingStateSystem;
+
+// @public (undocumented)
+export type AssetLoadLoadingStateSystemCallback = (event: DeepReadonlyObject<PBAssetLoadLoadingState>) => void;
+
+// @public (undocumented)
 export const AudioEvent: GrowOnlyValueSetComponentDefinition<PBAudioEvent>;
 
 // Warning: (ae-missing-release-tag) "AudioSource" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -650,7 +670,8 @@ export type ComponentDefinition<T> = LastWriteWinElementSetComponentDefinition<T
 // @public
 export const componentDefinitionByName: {
     "core::Animator": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAnimator>>;
-    "core::AudioAnalysis": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioAnalysis>>;
+    "core::AssetLoad": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAssetLoad>>;
+    "core::AssetLoadLoadingState": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAssetLoadLoadingState>>;
     "core::AudioEvent": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAudioEvent>>;
     "core::AudioSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioSource>>;
     "core::AudioStream": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioStream>>;
@@ -2221,43 +2242,32 @@ export namespace PBAnimator {
 }
 
 // @public (undocumented)
-export interface PBAudioAnalysis {
-    amplitude: number;
-    amplitudeGain?: number | undefined;
-    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-    band0: number;
+export interface PBAssetLoad {
     // (undocumented)
-    band1: number;
-    // (undocumented)
-    band2: number;
-    // (undocumented)
-    band3: number;
-    // (undocumented)
-    band4: number;
-    // (undocumented)
-    band5: number;
-    // (undocumented)
-    band6: number;
-    // (undocumented)
-    band7: number;
-    bandsGain?: number | undefined;
-    mode: PBAudioAnalysisMode;
+    assets: string[];
 }
 
 // @public (undocumented)
-export namespace PBAudioAnalysis {
+export namespace PBAssetLoad {
     // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAudioAnalysis;
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAssetLoad;
     // (undocumented)
-    export function encode(message: PBAudioAnalysis, writer?: _m0.Writer): _m0.Writer;
+    export function encode(message: PBAssetLoad, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
-export const enum PBAudioAnalysisMode {
+export interface PBAssetLoadLoadingState {
+    asset: string;
+    currentState: LoadingState;
+    timestamp: number;
+}
+
+// @public (undocumented)
+export namespace PBAssetLoadLoadingState {
     // (undocumented)
-    MODE_LOGARITHMIC = 1,
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAssetLoadLoadingState;
     // (undocumented)
-    MODE_RAW = 0
+    export function encode(message: PBAssetLoadLoadingState, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -4051,7 +4061,7 @@ export namespace ReactEcs {
     useEffect: EffectHook;
     const // (undocumented)
     useState: StateHook;
-        {};
+    export {};
 }
 
 // Warning: (tsdoc-at-sign-in-word) The "@" character looks like part of a TSDoc tag; use a backslash to escape it

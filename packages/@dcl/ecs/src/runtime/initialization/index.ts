@@ -9,10 +9,12 @@ import { createPointerEventsSystem, PointerEventsSystem } from '../../systems/ev
 import { createInputSystem, IInputSystem } from './../../engine/input'
 import { createRaycastSystem, RaycastSystem } from '../../systems/raycast'
 import { createVideoEventsSystem, VideoEventsSystem } from '../../systems/videoEvents'
+import { createAssetLoadLoadingStateSystem, AssetLoadLoadingStateSystem } from '../../systems/assetLoad'
 import { TweenSystem, createTweenSystem } from '../../systems/tween'
 import { pointerEventColliderChecker } from '../../systems/pointer-event-collider-checker'
 import { createTriggerAreaEventsSystem, TriggerAreaEventsSystem } from '../../systems/triggerArea'
 import { createTimers, Timers } from '../helpers/timers'
+import { setGlobalPolyfill } from '../globals'
 
 /**
  * @public
@@ -62,6 +64,14 @@ export { VideoEventsSystem }
 
 /**
  * @public
+ * Register callback functions to a particular entity on asset pre-load events.
+ */
+export const assetLoadLoadingStateSystem: AssetLoadLoadingStateSystem =
+  /* @__PURE__ */ createAssetLoadLoadingStateSystem(engine)
+export { AssetLoadLoadingStateSystem }
+
+/**
+ * @public
  * Register callback functions to a particular entity on tween events.
  */
 export const tweenSystem: TweenSystem = createTweenSystem(engine)
@@ -80,10 +90,10 @@ export { TriggerAreaEventsSystem }
  */
 export const timers: Timers = /* @__PURE__ */ createTimers(engine)
 export { Timers, createTimers }
-;(globalThis as any).setTimeout = (globalThis as any).setTimeout ?? timers.setTimeout
-;(globalThis as any).clearTimeout = (globalThis as any).clearTimeout ?? timers.clearTimeout
-;(globalThis as any).setInterval = (globalThis as any).setInterval ?? timers.setInterval
-;(globalThis as any).clearInterval = (globalThis as any).clearInterval ?? timers.clearInterval
+setGlobalPolyfill('setTimeout', timers.setTimeout)
+setGlobalPolyfill('clearTimeout', timers.clearTimeout)
+setGlobalPolyfill('setInterval', timers.setInterval)
+setGlobalPolyfill('clearInterval', timers.clearInterval)
 
 /**
  * Adds pointer event collider system only in DEV env
