@@ -2384,6 +2384,7 @@ export namespace PBAvatarEquippedData {
 // @public (undocumented)
 export interface PBAvatarLocomotionSettings {
     doubleJumpHeight?: number | undefined;
+    glidingFallingSpeed?: number | undefined;
     glidingSpeed?: number | undefined;
     hardLandingCooldown?: number | undefined;
     jogSpeed?: number | undefined;
