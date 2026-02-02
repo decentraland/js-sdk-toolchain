@@ -2,6 +2,8 @@ import * as fs from 'fs'
 import * as path from 'path'
 import componentSchemaTemplate from './componentSchemaTemplate'
 
+// this is a test comment
+
 export type Component = {
   componentId: number
   componentPascalName: string
