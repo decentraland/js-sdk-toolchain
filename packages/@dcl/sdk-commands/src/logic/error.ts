@@ -69,6 +69,8 @@ export type CliErrorName =
   | 'DEPLOY_ENV_INVALID_OPTIONS'
   | 'DEPLOY_ENV_MISSING_ACTION'
   | 'DEPLOY_ENV_MISSING_WORLD'
+  // Server logs errors
+  | 'SERVER_LOGS_MISSING_WORLD'
 
 export class CliError<T extends CliErrorName> extends Error {
   constructor(public name: T = 'CliError' as T, public message: string = '', public stack?: string) {
