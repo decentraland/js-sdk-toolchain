@@ -106,15 +106,16 @@ export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
     try {
       const isRoomReady = this.isRoomReadyAtom.getOrNull() ?? false
 
+      // TODO: Enable when props room and isConnectedSceneRoom are available in Unity explorer
       // If room is not ready, queue the message with original params
-      if (!isRoomReady) {
-        this.messageQueue.push({
-          eventType,
-          data,
-          options
-        })
-        return
-      }
+      // if (!isRoomReady) {
+      //   this.messageQueue.push({
+      //     eventType,
+      //     data,
+      //     options
+      //   })
+      //   return
+      // }
 
       // Room is ready, send immediately
       const buffer = encodeEvent(eventType as string, data, globalEventRegistry)
