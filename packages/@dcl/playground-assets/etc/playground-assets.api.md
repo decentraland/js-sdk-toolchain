@@ -54,7 +54,21 @@ export function areConnected(parcels: Coords[]): boolean;
 export const AssetLoad: LastWriteWinElementSetComponentDefinition<PBAssetLoad>;
 
 // @public (undocumented)
-export const AssetLoadLoadingState: LastWriteWinElementSetComponentDefinition<PBAssetLoadLoadingState>;
+export const AssetLoadLoadingState: GrowOnlyValueSetComponentDefinition<PBAssetLoadLoadingState>;
+
+// @public (undocumented)
+export interface AssetLoadLoadingStateSystem {
+    // (undocumented)
+    registerAssetLoadLoadingStateEntity(entity: Entity, callback: AssetLoadLoadingStateSystemCallback): void;
+    // (undocumented)
+    removeAssetLoadLoadingStateEntity(entity: Entity): void;
+}
+
+// @public
+export const assetLoadLoadingStateSystem: AssetLoadLoadingStateSystem;
+
+// @public (undocumented)
+export type AssetLoadLoadingStateSystemCallback = (event: DeepReadonlyObject<PBAssetLoadLoadingState>) => void;
 
 // Warning: (ae-missing-release-tag) "AudioAnalysis" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -657,7 +671,7 @@ export type ComponentDefinition<T> = LastWriteWinElementSetComponentDefinition<T
 export const componentDefinitionByName: {
     "core::Animator": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAnimator>>;
     "core::AssetLoad": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAssetLoad>>;
-    "core::AssetLoadLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAssetLoadLoadingState>>;
+    "core::AssetLoadLoadingState": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAssetLoadLoadingState>>;
     "core::AudioAnalysis": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioAnalysis>>;
     "core::AudioEvent": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAudioEvent>>;
     "core::AudioSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioSource>>;
