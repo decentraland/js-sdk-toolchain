@@ -14,7 +14,7 @@ env:
 name: CI
 jobs:
   lint:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v3
@@ -29,7 +29,7 @@ jobs:
         run: make lint-packages
 
   docs:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v3
@@ -40,7 +40,7 @@ jobs:
         run: make docs
 
   test:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
 
@@ -74,7 +74,7 @@ jobs:
         run: make prepare
 
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
@@ -341,7 +341,7 @@ jobs:
   notify_deployment:
     needs: [build]
     if: ${{ github.event.pull_request.number }}
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     name: Deployment Notification
     steps:
       - uses: actions/github-script@v6
@@ -394,7 +394,7 @@ jobs:
   cli_e2e:
     name: CLI E2E
     needs: [build]
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-node@v3
         with:
@@ -439,7 +439,7 @@ jobs:
   check-local-deps:
     name: Check for development dependencies
     needs: [build]
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: >
       (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main') ||
       github.ref == 'refs/heads/main'
