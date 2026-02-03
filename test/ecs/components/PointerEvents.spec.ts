@@ -1,4 +1,4 @@
-import { Engine, components, InputAction, PointerEventType } from '../../../packages/@dcl/ecs/src'
+import { Engine, components, InputAction, PointerEventType, InteractionType } from '../../../packages/@dcl/ecs/src'
 import { testComponentSerialization } from './assertion'
 
 describe('Generated OnPointerDown ProtoBuf', () => {
@@ -16,8 +16,10 @@ describe('Generated OnPointerDown ProtoBuf', () => {
             maxDistance: 10,
             showFeedback: true,
             showHighlight: true,
-            maxPlayerDistance: 10
-          }
+            maxPlayerDistance: 10,
+            priority: 0
+          },
+          interactionType: InteractionType.CURSOR
         }
       ]
     })
@@ -32,8 +34,10 @@ describe('Generated OnPointerDown ProtoBuf', () => {
             maxDistance: 5,
             showFeedback: false,
             showHighlight: false,
-            maxPlayerDistance: 7
-          }
+            maxPlayerDistance: 7,
+            priority: 0
+          },
+          interactionType: InteractionType.CURSOR
         }
       ]
     })
@@ -57,8 +61,10 @@ describe('Generated OnPointerDown ProtoBuf', () => {
             maxDistance: 5,
             showFeedback: false,
             showHighlight: false,
-            maxPlayerDistance: 3
-          }
+            maxPlayerDistance: 3,
+            priority: 0
+          },
+          interactionType: InteractionType.CURSOR
         }
       ]
     })
