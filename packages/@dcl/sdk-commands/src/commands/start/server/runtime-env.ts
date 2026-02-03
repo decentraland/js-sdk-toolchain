@@ -13,11 +13,13 @@ const SERVER_STORAGE_FILE = 'server-storage.json'
 export interface ServerStorage {
   env: Record<string, string>
   world: Record<string, unknown>
+  players: Record<string, Record<string, unknown>>
 }
 
 const DEFAULT_STORAGE: ServerStorage = {
   env: {},
-  world: {}
+  world: {},
+  players: {}
 }
 
 /**
@@ -52,7 +54,8 @@ export async function loadServerStorage(components: Pick<CliComponents, 'fs' | '
     // Merge with defaults to ensure all keys exist
     return {
       env: parsed.env ?? {},
-      world: parsed.world ?? {}
+      world: parsed.world ?? {},
+      players: parsed.players ?? {}
     }
   } catch (error) {
     components.logger.error(`Failed to load ${SERVER_STORAGE_FILE}: ${error}`)
@@ -226,6 +229,53 @@ export async function deleteWorldValue(
     return false
   }
   delete storage.world[key]
+  await saveServerStorage(components, storage)
+  return true
+}
+
+/**
+ * Gets a value from a player's storage.
+ */
+export async function getPlayerValue(
+  components: Pick<CliComponents, 'fs' | 'logger'>,
+  address: string,
+  key: string
+): Promise<unknown | undefined> {
+  const storage = await loadServerStorage(components)
+  return storage.players[address]?.[key]
+}
+
+/**
+ * Sets a value in a player's storage.
+ */
+export async function setPlayerValue(
+  components: Pick<CliComponents, 'fs' | 'logger'>,
+  address: string,
+  key: string,
+  value: unknown
+): Promise<void> {
+  const storage = await loadServerStorage(components)
+  if (!storage.players[address]) {
+    storage.players[address] = {}
+  }
+  storage.players[address][key] = value
+  await saveServerStorage(components, storage)
+}
+
+/**
+ * Deletes a value from a player's storage.
+ * Returns true if key existed and was deleted, false otherwise.
+ */
+export async function deletePlayerValue(
+  components: Pick<CliComponents, 'fs' | 'logger'>,
+  address: string,
+  key: string
+): Promise<boolean> {
+  const storage = await loadServerStorage(components)
+  if (!storage.players[address] || !(key in storage.players[address])) {
+    return false
+  }
+  delete storage.players[address][key]
   await saveServerStorage(components, storage)
   return true
 }

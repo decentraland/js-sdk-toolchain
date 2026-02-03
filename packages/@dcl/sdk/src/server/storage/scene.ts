@@ -1,28 +1,28 @@
-import { signedFetch } from '~system/SignedFetch'
 import { getStorageServerUrl } from '../storage-url'
-import { assertIsServer } from '../utils'
+import { assertIsServer, wrapSignedFetch } from '../utils'
 import { MODULE_NAME } from './constants'
 
 /**
- * World-scoped storage interface for key-value pairs.
+ * Scene-scoped storage interface for key-value pairs from the Server Side Storage service.
+ * This is NOT filesystem storage - data is stored in the remote storage service.
  */
-export interface IWorldStorage {
+export interface ISceneStorage {
   /**
-   * Retrieves a value from world storage by key.
+   * Retrieves a value from scene storage by key from the Server Side Storage service.
    * @param key - The key to retrieve
    * @returns A promise that resolves to the parsed JSON value, or null if not found
    */
   get<T = unknown>(key: string): Promise<T | null>
 
   /**
-   * Stores a value in world storage.
+   * Stores a value in scene storage in the Server Side Storage service.
    * @param key - The key to store the value under
    * @param value - The value to store (will be JSON serialized)
    */
   set<T = unknown>(key: string, value: T): Promise<boolean>
 
   /**
-   * Deletes a value from world storage.
+   * Deletes a value from scene storage in the Server Side Storage service.
    * @param key - The key to delete
    * @returns A promise that resolves to true if deleted, false if not found
    */
@@ -30,10 +30,11 @@ export interface IWorldStorage {
 }
 
 /**
- * Creates world-scoped storage for key-value pairs.
+ * Creates scene-scoped storage that provides methods to interact with
+ * scene-specific key-value pairs from the Server Side Storage service.
  * This module only works when running on server-side scenes.
  */
-export const createWorldStorage = (): IWorldStorage => {
+export const createSceneStorage = (): ISceneStorage => {
   return {
     async get<T = unknown>(key: string): Promise<T | null> {
       assertIsServer(MODULE_NAME)
@@ -41,22 +42,14 @@ export const createWorldStorage = (): IWorldStorage => {
       const baseUrl = await getStorageServerUrl()
       const url = `${baseUrl}/values/${encodeURIComponent(key)}`
 
-      const response = await signedFetch({ url })
+      const [error, data] = await wrapSignedFetch<{ value: T }>({ url })
 
-      if (!response.ok) {
-        if (response.status === 404) {
-          return null
-        }
-        console.error(`Failed to get storage value '${key}': ${response.status} ${response.statusText}`)
+      if (error) {
+        console.error(`Failed to get storage value '${key}': ${error}`)
         return null
       }
 
-      try {
-        return JSON.parse(response.body).value as T
-      } catch {
-        console.error(`Failed to parse storage value '${key}' as JSON`)
-        return null
-      }
+      return data?.value ?? null
     },
 
     async set<T = unknown>(key: string, value: T): Promise<boolean> {
@@ -65,19 +58,19 @@ export const createWorldStorage = (): IWorldStorage => {
       const baseUrl = await getStorageServerUrl()
       const url = `${baseUrl}/values/${encodeURIComponent(key)}`
 
-      const response = await signedFetch({
+      const [error] = await wrapSignedFetch({
         url,
         init: {
           method: 'PUT',
           headers: {
             'content-type': 'application/json'
           },
-          body: JSON.stringify(value)
+          body: JSON.stringify({ value })
         }
       })
 
-      if (!response.ok) {
-        console.error(`Failed to set storage value '${key}': ${response.status} ${response.statusText}`)
+      if (error) {
+        console.error(`Failed to set storage value '${key}': ${error}`)
         return false
       }
 
@@ -90,7 +83,7 @@ export const createWorldStorage = (): IWorldStorage => {
       const baseUrl = await getStorageServerUrl()
       const url = `${baseUrl}/values/${encodeURIComponent(key)}`
 
-      const response = await signedFetch({
+      const [error] = await wrapSignedFetch({
         url,
         init: {
           method: 'DELETE',
@@ -98,12 +91,8 @@ export const createWorldStorage = (): IWorldStorage => {
         }
       })
 
-      if (response.status === 404) {
-        return false
-      }
-
-      if (!response.ok) {
-        console.error(`Failed to delete storage value '${key}': ${response.status} ${response.statusText}`)
+      if (error) {
+        console.error(`Failed to delete storage value '${key}': ${error}`)
         return false
       }
 

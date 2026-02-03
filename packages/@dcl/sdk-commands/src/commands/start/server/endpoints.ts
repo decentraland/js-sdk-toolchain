@@ -23,7 +23,10 @@ import {
   deleteEnvValue,
   getWorldValue,
   setWorldValue,
-  deleteWorldValue
+  deleteWorldValue,
+  getPlayerValue,
+  setPlayerValue,
+  deletePlayerValue
 } from './runtime-env'
 
 type LambdasWearable = Wearable & {
@@ -333,6 +336,91 @@ export async function setupEcs6Endpoints(
       return {
         status: 500,
         body: { error: `Failed to delete storage value '${key}'` }
+      }
+    }
+  })
+
+  // Player Storage endpoints (/players/:address/values/:key)
+  router.get('/players/:address/values/:key', async (ctx, next) => {
+    const { address, key } = ctx.params
+    if (address && key) {
+      const value = await getPlayerValue(components, address, key)
+      if (value !== undefined) {
+        return {
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(value)
+        }
+      }
+      return {
+        status: 404,
+        body: { error: `Player storage key '${key}' not found for '${address}'` }
+      }
+    }
+    return next()
+  })
+
+  router.put('/players/:address/values/:key', async (ctx) => {
+    const { address, key } = ctx.params
+
+    if (!address || !key) {
+      return {
+        status: 400,
+        body: { error: 'Address and key are required' }
+      }
+    }
+
+    try {
+      const bodyText = await ctx.request.text()
+      const value = JSON.parse(bodyText)
+
+      await setPlayerValue(components, address, key, value)
+
+      components.logger.log(`[player-storage] PUT ${address}/${key}`)
+
+      return {
+        status: 200,
+        body: { success: true, address, key }
+      }
+    } catch (error) {
+      components.logger.error(`Failed to set player storage value '${key}' for '${address}': ${error}`)
+      return {
+        status: 500,
+        body: { error: `Failed to set player storage value '${key}' for '${address}'` }
+      }
+    }
+  })
+
+  router.delete('/players/:address/values/:key', async (ctx) => {
+    const { address, key } = ctx.params
+
+    if (!address || !key) {
+      return {
+        status: 400,
+        body: { error: 'Address and key are required' }
+      }
+    }
+
+    try {
+      const deleted = await deletePlayerValue(components, address, key)
+
+      if (!deleted) {
+        return {
+          status: 404,
+          body: { error: `Player storage key '${key}' not found for '${address}'` }
+        }
+      }
+
+      components.logger.log(`[player-storage] DELETE ${address}/${key}`)
+
+      return {
+        status: 200,
+        body: { success: true, address, key }
+      }
+    } catch (error) {
+      components.logger.error(`Failed to delete player storage value '${key}' for '${address}': ${error}`)
+      return {
+        status: 500,
+        body: { error: `Failed to delete player storage value '${key}' for '${address}'` }
       }
     }
   })
