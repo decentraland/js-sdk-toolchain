@@ -59,9 +59,10 @@ export function setupStorageEndpoints(
     const { key } = ctx.params
 
     try {
-      const value = await ctx.request.text()
+      const bodyText = await ctx.request.text()
+      const { value } = JSON.parse(bodyText)
       await setEnvValue(components, key, value)
-      return { body: JSON.stringify({ value }) }
+      return { status: 204 }
     } catch (error) {
       components.logger.error(`Failed to set environment variable '${key}': ${error}`)
       return { status: 500, body: { message: `Failed to set environment variable '${key}'` } }
@@ -96,7 +97,7 @@ export function setupStorageEndpoints(
 
     try {
       const bodyText = await ctx.request.text()
-      const value = JSON.parse(bodyText)
+      const { value } = JSON.parse(bodyText)
       await setWorldValue(components, key, value)
       return { body: JSON.stringify({ value }) }
     } catch (error) {
@@ -135,7 +136,7 @@ export function setupStorageEndpoints(
 
     try {
       const bodyText = await ctx.request.text()
-      const value = JSON.parse(bodyText)
+      const { value } = JSON.parse(bodyText)
 
       await setPlayerValue(components, address, key, value)
 
