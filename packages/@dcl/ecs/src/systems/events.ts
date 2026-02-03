@@ -1,4 +1,5 @@
 import { InputAction } from '../components/generated/pb/decentraland/sdk/components/common/input_action.gen'
+import { InteractionType } from '../components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import { PBPointerEventsResult } from '../components/generated/pb/decentraland/sdk/components/pointer_events_result.gen'
 import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import * as components from '../components'
@@ -22,10 +23,13 @@ export type EventSystemOptions = {
   showFeedback?: boolean
   showHighlight?: boolean
   maxPlayerDistance?: number
+  priority?: number
+  interactionType?: InteractionType
 }
 
 export const getDefaultOpts = (opts: Partial<EventSystemOptions> = {}): EventSystemOptions => ({
   button: InputAction.IA_ANY,
+  interactionType: InteractionType.CURSOR,
   ...opts
 })
 
@@ -159,8 +163,10 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
         showHighlight: opts.showHighlight,
         hoverText: opts.hoverText,
         maxDistance: opts.maxDistance,
-        maxPlayerDistance: opts.maxPlayerDistance
-      }
+        maxPlayerDistance: opts.maxPlayerDistance,
+        priority: opts.priority
+      },
+      interactionType: opts.interactionType ?? InteractionType.CURSOR
     })
   }
 
