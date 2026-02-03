@@ -1209,6 +1209,8 @@ export type EventSystemOptions = {
     showFeedback?: boolean;
     showHighlight?: boolean;
     maxPlayerDistance?: number;
+    priority?: number;
+    interactionType?: InteractionType;
 };
 
 // @public
@@ -1573,6 +1575,14 @@ export type InstanceCompositeOptions = {
     rootEntity?: Entity;
     alreadyRequestedSrc?: Set<string>;
 };
+
+// @public (undocumented)
+export const enum InteractionType {
+    // (undocumented)
+    CURSOR = 0,
+    // (undocumented)
+    PROXIMITY = 1
+}
 
 // @public (undocumented)
 export interface ISchema<T = any> {
@@ -3013,6 +3023,7 @@ export namespace PBPointerEvents {
 export interface PBPointerEvents_Entry {
     eventInfo: PBPointerEvents_Info | undefined;
     eventType: PointerEventType;
+    interactionType: InteractionType;
 }
 
 // @public (undocumented)
@@ -3029,6 +3040,7 @@ export interface PBPointerEvents_Info {
     hoverText?: string | undefined;
     maxDistance?: number | undefined;
     maxPlayerDistance?: number | undefined;
+    priority?: number | undefined;
     showFeedback?: boolean | undefined;
     showHighlight?: boolean | undefined;
 }
