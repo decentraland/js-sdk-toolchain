@@ -3,14 +3,9 @@ on:
     branches:
       - main
       - protocol-squad
-  pull_request:
   release:
     types:
       - created
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
 
 env:
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
