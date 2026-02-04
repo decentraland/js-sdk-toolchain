@@ -1355,6 +1355,9 @@ export const getDefaultOpts: (opts?: Partial<EventSystemOptions>) => EventSystem
 export function getEntitiesWithParent(engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema'>, parent: Entity): Entity[];
 
 // @public
+export function getGlobal<T>(key: string): T | undefined;
+
+// @public
 export function getWorldPosition(engine: WorldTransformEngine, entity: Entity): Vector3Type;
 
 // @public
@@ -4743,6 +4746,9 @@ export namespace ScrollPositionValue {
 
 // @public
 export type ScrollVisibleType = 'horizontal' | 'vertical' | 'both' | 'hidden';
+
+// @public
+export function setGlobalPolyfill<T>(key: string, value: T): void;
 
 // @public (undocumented)
 export const enum ShowScrollBar {
