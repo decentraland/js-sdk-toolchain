@@ -253,6 +253,44 @@ jobs:
           JS_RUNTIME_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_dcl_js_runtime.outputs.s3-bucket-key }}
           SDK_COMMANDS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_decentraland_sdk_commands.outputs.s3-bucket-key }}
 
+      - name: verify dependency packages are published before @dcl/sdk
+        if: ${{ !github.event.pull_request.number }}
+        run: |
+          VERSION=$(node -p "require('./packages/@dcl/sdk/package.json').version")
+          echo "Verifying dependency packages are published at version $VERSION"
+
+          PACKAGES=("@dcl/js-runtime" "@dcl/ecs" "@dcl/react-ecs" "@dcl/sdk-commands")
+          MAX_RETRIES=6
+          RETRY_DELAY=10
+
+          for PKG in "${PACKAGES[@]}"; do
+            echo "Checking $PKG@$VERSION..."
+            FOUND=0
+            for ATTEMPT in $(seq 1 $MAX_RETRIES); do
+              if npm view "$PKG@$VERSION" version > /dev/null 2>&1; then
+                echo "  ✓ $PKG@$VERSION is available on npm"
+                FOUND=1
+                break
+              else
+                if [ $ATTEMPT -lt $MAX_RETRIES ]; then
+                  echo "  Attempt $ATTEMPT/$MAX_RETRIES: $PKG@$VERSION not found, retrying in ${RETRY_DELAY}s..."
+                  sleep $RETRY_DELAY
+                fi
+              fi
+            done
+
+            if [ $FOUND -eq 0 ]; then
+              echo "  ✗ $PKG@$VERSION is NOT available on npm after $MAX_RETRIES attempts"
+              echo ""
+              echo "ERROR: $PKG@$VERSION is not published"
+              echo "Please ensure all dependency packages are published before releasing @dcl/sdk"
+              exit 1
+            fi
+          done
+
+          echo ""
+          echo "All dependency packages verified successfully!"
+
       - name: publish @dcl/sdk package
         uses: decentraland/oddish-action@master
         id: publish_decentraland_sdk
@@ -336,6 +374,11 @@ jobs:
                npm install "${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_s3_bucket_key }}"
                ```
 
+            - The `@dcl/js-runtime` package can be tested in scenes by running
+               ```bash
+               npm install "${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_js_runtime_s3_bucket_key }}"
+               ```
+
             - To test with `npx init`
                ```bash
                export SDK_COMMANDS="${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_commands_s3_bucket_key }}"
@@ -363,11 +406,11 @@ jobs:
       - name: npx @dcl/sdk-commands init --skip-install
         run: npx ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_commands_s3_bucket_key }} init --skip-install
         working-directory: scene
-      - name: install CI version of @dcl/sdk
-        run: npm install ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_s3_bucket_key }}
-        working-directory: scene
       - name: install rest of the dependencies
         run: npm install
+        working-directory: scene
+      - name: install CI version of @dcl/sdk
+        run: npm install ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_s3_bucket_key }}
         working-directory: scene
       - name: npm run build
         run: npm run build

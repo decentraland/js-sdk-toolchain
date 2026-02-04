@@ -1,6 +1,7 @@
 import * as os from 'os'
 import * as path from 'path'
 import open from 'open'
+import QRCode from 'qrcode'
 
 import { CliComponents } from '../../components'
 import { buildScene } from '../build'
@@ -15,7 +16,7 @@ import { createRoomsComponent, roomsMetrics } from '@dcl/mini-comms/dist/adapter
 import { createServerComponent } from '@well-known-components/http-server'
 import { createConsoleLogComponent } from '@well-known-components/logger'
 import { providerInstance } from '../../components/eth'
-import { createStderrCliLogger } from '../../components/log'
+import { colors, createStderrCliLogger } from '../../components/log'
 import { wireFileWatcherToWebSockets } from './server/file-watch-notifier'
 import { wireRouter } from './server/routes'
 import { createWsComponent } from './server/ws'
@@ -28,6 +29,7 @@ import { Result } from 'arg'
 import { startValidations } from '../../logic/project-validations'
 import { ensureDaoExplorer, runDaoExplorer } from '../../logic/dao-explorer'
 import { runExplorerAlpha } from './explorer-alpha'
+import { getLanUrl } from './utils'
 
 interface Options {
   args: Result<typeof args>
@@ -55,7 +57,10 @@ export const args = declareArgs({
   '-e': '--no-dao-explorer',
   '--customEntryPoint': Boolean,
   '--explorer-alpha': Boolean,
+  '--web-explorer': Boolean,
   '--hub': Boolean,
+  '--mobile': Boolean,
+  '-m': '--mobile',
   // Params related to the explorer-alpha
   '--debug': Boolean,
   '--dclenv': String,
@@ -64,7 +69,8 @@ export const args = declareArgs({
   '--position': String,
   '--skip-auth-screen': Boolean,
   '--landscape-terrain-enabled': Boolean,
-  '-n': Boolean
+  '-n': Boolean,
+  '--bevy-web': Boolean
 })
 
 export async function help(options: Options) {
@@ -81,6 +87,7 @@ export async function help(options: Options) {
       -c, --ci                          Run the parcel previewer on a remote unix server
       --web3                            Connects preview to browser wallet to use the associated avatar and account
       --skip-build                      Skip build and only serve the files in preview mode
+      --web-explorer                    Launch the scene in the Web Explorer
       --debug                           Enables Debug panel mode inside DCL Explorer (default=true)
       --dclenv                          Decentraland Environment. Which environment to use for the content. This determines the catalyst server used, asset-bundles, etc. Possible values: org, zone, today. (default=org)
       --realm                           Realm used to serve the content. (default=Localhost)
@@ -89,6 +96,8 @@ export async function help(options: Options) {
       --skip-auth-screen                Skip the auth screen (accepts 'true' or 'false').
       --landscape-terrain-enabled       Enable landscape terrain.
       -n                                Open a new instance of the Client even if one is already running.
+      --bevy-web                        Opens preview using the Bevy Web browser window.
+      --mobile                      Show QR code for mobile preview on the same network
 
 
     Examples:
@@ -114,8 +123,10 @@ export async function main(options: Options) {
   const watch = !options.args['--no-watch']
   const withDataLayer = options.args['--data-layer']
   const enableWeb3 = options.args['--web3']
-  const explorerAlpha = options.args['--explorer-alpha']
   const isHub = !!options.args['--hub']
+  const bevyWeb = !!options.args['--bevy-web']
+  const isMobile = options.args['--mobile']
+  const explorerAlpha = !options.args['--web-explorer'] && !bevyWeb
 
   let hasSmartWearable = false
   const workspace = await getValidWorkspace(options.components, workingDirectory)
@@ -211,7 +222,12 @@ export async function main(options: Options) {
       await wireRouter(components, workspace, dataLayer)
       if (watch) {
         for (const project of workspace.projects) {
-          await wireFileWatcherToWebSockets(components, project.workingDirectory, project.kind, !!explorerAlpha)
+          await wireFileWatcherToWebSockets(
+            components,
+            project.workingDirectory,
+            project.kind,
+            !!explorerAlpha || !!bevyWeb
+          )
         }
       }
       await startComponents()
@@ -242,21 +258,26 @@ export async function main(options: Options) {
         })
       })
 
+      // Get the LAN URL for external device access
+      const lanUrl = getLanUrl(port)
+
       // Push localhost and 127.0.0.1 at top
       const sortedURLs = availableURLs.sort((a, _b) => {
         return a.base.toLowerCase().includes('localhost') || a.base.includes('127.0.0.1') || a.base.includes('0.0.0.0')
           ? -1
           : 1
       })
-
+      const bevyUrl = `https://decentraland.zone/bevy-web/?preview=true&realm=${
+        sortedURLs[0].base
+      }&position=${baseCoords.x},${baseCoords.y}`
       if (!explorerAlpha) {
-        for (const addr of sortedURLs) {
-          components.logger.log(`    ${addr.url}`)
+        if (bevyWeb) {
+          components.logger.log(`    ${bevyUrl}`)
+        } else {
+          for (const addr of sortedURLs) {
+            components.logger.log(`    ${addr.url}`)
+          }
         }
-      }
-
-      if (!explorerAlpha) {
-        components.logger.log('\n  Details:\n')
       }
       components.logger.log('\nPress CTRL+C to exit\n')
 
@@ -265,19 +286,32 @@ export async function main(options: Options) {
       }
 
       // Open preferably localhost/127.0.0.1
-      if (explorerAlpha) {
+      if (explorerAlpha && !isMobile) {
         const realm = new URL(sortedURLs[0].url).origin
         await runExplorerAlpha(components, { cwd: workingDirectory, realm, baseCoords, isHub, args: options.args })
       }
 
+      if (options.args['--mobile'] && lanUrl) {
+        const deepLink = `decentraland://open?preview=${lanUrl}&position=${baseCoords.x}%2C${baseCoords.y}`
+        QRCode.toString(deepLink, { type: 'terminal', small: true }, (err, qr) => {
+          if (!err) {
+            components.logger.log(colors.bold('\nScan to preview on mobile: \n'))
+            components.logger.log(qr)
+            components.logger.log(`This QR redirects to ${deepLink} in your phone.`)
+          }
+        })
+      }
+
       // Open preferably localhost/127.0.0.1
-      if (!explorerAlpha && openBrowser && sortedURLs.length) {
+      if ((!explorerAlpha || bevyWeb) && openBrowser && sortedURLs.length) {
         try {
-          await open(sortedURLs[0].url)
+          const url = bevyWeb ? bevyUrl : sortedURLs[0].url
+          await open(url)
         } catch (_) {
           components.logger.warn('Unable to open browser automatically.')
         }
       }
+      components.logger.log('\nPress CTRL+C to exit\n')
     }
   })
 

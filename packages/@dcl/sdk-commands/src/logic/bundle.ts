@@ -14,7 +14,7 @@ import { CliComponents } from '../components'
 import { colors } from '../components/log'
 import { printProgressInfo, printProgressStep, printWarning } from './beautiful-logs'
 import { CliError } from './error'
-import { getAllComposites } from './composite'
+import { getAllComposites, type Script } from './composite'
 import { isEditorScene } from './project-validations'
 import { watch } from 'chokidar'
 import { debounce } from './debounce'
@@ -45,6 +45,9 @@ export type CompileOptions = {
 
 const MAX_STEP = 2
 
+// Keep only the last 10KB of output to prevent memory leaks in watch mode
+const MAX_OUTPUT_SIZE = 10 * 1024
+
 /**
  * Generate the entry-point code for a given original entry-point
  * @param entrypointPath - file to be imported as original entry point
@@ -52,17 +55,27 @@ const MAX_STEP = 2
  * @returns the Typescript code
  */
 
+/**
+ * Converts a file path to a safe JavaScript module path string.
+ * Normalizes to Unix-style forward slashes and escapes special characters.
+ */
+function toSafeModulePath(filePath: string): string {
+  const unixPath = filePath.replace(/\\/g, '/')
+  return JSON.stringify(unixPath)
+}
+
 function getEntrypointCode(entrypointPath: string, forceCustomExport: boolean, isEditorScene: boolean = false) {
-  const unixEntrypointPath = entrypointPath.replace(/(\\)/g, '/')
-  if (forceCustomExport) return `;"use strict";export * from '${unixEntrypointPath}'`
+  const safeEntrypointPath = toSafeModulePath(entrypointPath)
+  if (forceCustomExport) return `;"use strict";export * from ${safeEntrypointPath}`
 
   return `// BEGIN AUTO GENERATED CODE "~sdk/scene-entrypoint"
 "use strict";
-import * as entrypoint from '${unixEntrypointPath}'
+import * as entrypoint from ${safeEntrypointPath}
 import { engine, NetworkEntity } from '@dcl/sdk/ecs'
 import * as sdk from '@dcl/sdk'
 import { compositeProvider } from '@dcl/sdk/composite-provider'
 import { compositeFromLoader } from '~sdk/all-composites'
+import { _initializeScripts } from '~sdk/script-utils'
 
 ${
   isEditorScene &&
@@ -74,13 +87,16 @@ initAssetPacks(engine, { syncEntity }, players)
 
 // TODO: do we need to do this on runtime ?
 // I think we have that information at build-time and we avoid to do evaluate this on the worker.
-// Read composite.json or main.crdt => If that file has a NetowrkEntity import '@dcl/@sdk/network'
+// Read composite.json or main.crdt => If that file has a NetworkEntity import '@dcl/@sdk/network'
 `
 }
 
 if ((entrypoint as any).main !== undefined) {
   function _INTERNAL_startup_system() {
     try {
+      // initialize and run all scripts
+      _initializeScripts(engine)
+
       const maybePromise = (entrypoint as any).main()
       if (maybePromise && typeof maybePromise === 'object' && typeof (maybePromise as unknown as Promise<unknown>).then === 'function') {
         maybePromise.catch(console.error)
@@ -95,7 +111,8 @@ if ((entrypoint as any).main !== undefined) {
 }
 
 export * from '@dcl/sdk'
-export * from '${unixEntrypointPath}'
+export * from ${safeEntrypointPath}
+export * from '~sdk/script-utils'
 `
 }
 
@@ -152,6 +169,15 @@ type SingleProjectOptions = CompileOptions & {
 export async function bundleSingleProject(components: BundleComponents, options: SingleProjectOptions) {
   printProgressStep(components.logger, `Bundling file ${colors.bold(options.entrypoint)}`, 1, MAX_STEP)
   const editorScene = await isEditorScene(components, options.workingDirectory)
+  const sdkPackagePath = (() => {
+    try {
+      // First try to resolve from project's node_modules
+      return path.dirname(require.resolve('@dcl/sdk/package.json', { paths: [options.workingDirectory] }))
+    } catch {
+      // Fallback to workspace @dcl/sdk
+      return path.dirname(require.resolve('@dcl/sdk/package.json', { paths: [__dirname] }))
+    }
+  })()
   const context = await esbuild.context({
     bundle: true,
     platform: 'browser',
@@ -182,6 +208,41 @@ export async function bundleSingleProject(components: BundleComponents, options:
           } catch {
             // Final fallback to bundled React
             return require.resolve('react')
+          }
+        }
+      })(),
+      // Ensure @dcl/sdk is always resolved to workspace version to prevent version conflicts
+      '@dcl/sdk': sdkPackagePath,
+      // Resolve ecs from sdk dependencies (nested in @dcl/sdk)
+      '@dcl/ecs': (() => {
+        try {
+          // First try to resolve from project's @dcl/sdk node_modules
+          return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [sdkPackagePath] }))
+        } catch {
+          try {
+            // Fallback: try to resolve from project's node_modules
+            return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [options.workingDirectory] }))
+          } catch {
+            // Last resort: try resolving from current directory
+            return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [__dirname] }))
+          }
+        }
+      })(),
+      // Resolve asset-packs from sdk-commands' dependencies (nested in @dcl/inspector)
+      '@dcl/asset-packs': (() => {
+        try {
+          // Try to resolve from project's node_modules first
+          return path.dirname(require.resolve('@dcl/asset-packs/package.json', { paths: [options.workingDirectory] }))
+        } catch {
+          try {
+            // Fallback: resolve from @dcl/inspector's node_modules
+            const inspectorPath = require.resolve('@dcl/inspector/package.json', { paths: [__dirname] })
+            return path.dirname(
+              require.resolve('@dcl/asset-packs/package.json', { paths: [path.dirname(inspectorPath)] })
+            )
+          } catch {
+            // Last resort: try resolving from current directory
+            return path.dirname(require.resolve('@dcl/asset-packs/package.json', { paths: [__dirname] }))
           }
         }
       })()
@@ -218,7 +279,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
   if (options.watch) {
     // Instead of using esbuild's watch, we create our own watcher
     const watcher = watch(path.resolve(options.workingDirectory), {
-      ignored: ['**/dist/**', '**/*.crdt', '**/*.composite', path.resolve(options.outputFile)],
+      ignored: ['**/dist/**', '**/*.crdt', '**/*.d.ts', path.resolve(options.outputFile)],
       ignoreInitial: true
     })
 
@@ -233,8 +294,8 @@ export async function bundleSingleProject(components: BundleComponents, options:
     }, 100)
 
     watcher.on('all', async (event, filePath) => {
-      // Only rebuild for TypeScript and JavaScript files
-      if (/\.(ts|tsx|js|jsx)$/.test(filePath)) {
+      // Rebuild for TypeScript, JavaScript, and composite files
+      if (/\.(ts|tsx|js|jsx|composite)$/.test(filePath)) {
         printProgressInfo(components.logger, `File ${filePath} changed, rebuilding...`)
         debouncedRebuild()
       }
@@ -281,22 +342,43 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
   })
   const typeCheckerFuture = future<number>()
 
-  ts.on('close', (code) => {
-    /* istanbul ignore else */
-    if (code === 0) {
-      printProgressInfo(components.logger, `Type checking completed without errors`)
-    } else {
-      typeCheckerFuture.reject(
-        new CliError('BUNDLE_TYPE_CHECKER_FAILED', i18next.t('errors.bundle.type_checker_failed', { code }))
-      )
-      return
-    }
-
-    typeCheckerFuture.resolve(code)
+  let stdOutput = ''
+  ts.stdout?.on('data', (data: string) => {
+    stdOutput = (stdOutput + data.toString()).slice(-MAX_OUTPUT_SIZE)
   })
 
   ts.stdout?.pipe(process.stdout)
   ts.stderr?.pipe(process.stderr)
+
+  const cleanup = () => {
+    if (!ts.killed) ts.kill('SIGTERM')
+  }
+
+  process.on('SIGTERM', cleanup)
+  process.on('SIGINT', cleanup)
+  process.on('exit', cleanup)
+
+  ts.on('close', (code) => {
+    // Remove listeners after process exits to prevent memory leaks
+    process.off('SIGTERM', cleanup)
+    process.off('SIGINT', cleanup)
+    process.off('exit', cleanup)
+
+    /* istanbul ignore else */
+    if (code === 0) {
+      printProgressInfo(components.logger, `Type checking completed without errors`)
+      typeCheckerFuture.resolve(code)
+    } else {
+      typeCheckerFuture.reject(
+        new CliError(
+          'BUNDLE_TYPE_CHECKER_FAILED',
+          `${stdOutput.replace(/\x1b\[[0-9;]*m/g, '')}\n
+          ${i18next.t('errors.bundle.type_checker_failed', { code })}`
+        )
+      )
+    }
+    stdOutput = ''
+  })
 
   /* istanbul ignore if */
   if (options.watch) {
@@ -308,16 +390,17 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
 
 function compositeLoader(components: BundleComponents, options: SingleProjectOptions): esbuild.Plugin {
   let shouldReload = true
-  let contents = `export const compositeFromLoader = {}` // default exports nothing
-  let watchFiles: string[] = [] // no files to watch
-  let lastBuiltSuccessful = false
+  let compositeData: Awaited<ReturnType<typeof getAllComposites>> | null = null
 
   return {
     name: 'composite-loader',
     setup(build) {
       build.onStart(() => {
         shouldReload = true
+        compositeData = null
       })
+
+      // Handle composites virtual module
       build.onResolve({ filter: /~sdk\/all-composites/ }, (_args) => {
         return {
           namespace: 'sdk-composite',
@@ -326,27 +409,29 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
       })
 
       build.onLoad({ filter: /.*/, namespace: 'sdk-composite' }, async (_) => {
-        if (shouldReload) {
+        // Load compositeData if not already loaded
+        if (shouldReload && !compositeData) {
           if (!options.ignoreComposite) {
-            const data = await getAllComposites(
+            compositeData = await getAllComposites(
               components,
               // we pass the build.initialOptions.absWorkingDir to build projects with multiple roots at once
               build.initialOptions.absWorkingDir ?? options.workingDirectory
             )
-            contents = `export const compositeFromLoader = {${data.compositeLines.join(',')}}`
-            watchFiles = data.watchFiles
 
-            if (data.withErrors) {
+            if (compositeData.withErrors) {
               printWarning(
                 components.logger,
                 'Some composites are not included because of errors while compiling them. There can be unexpected behavior in the scene, check the errors and try to fix them.'
               )
-            } else if (!lastBuiltSuccessful) {
             }
-            lastBuiltSuccessful = !data.withErrors
           }
           shouldReload = false
         }
+
+        const contents = compositeData
+          ? `export const compositeFromLoader = {${compositeData.compositeLines.join(',')}}`
+          : `export const compositeFromLoader = {}`
+        const watchFiles = compositeData?.watchFiles || []
 
         return {
           loader: 'js',
@@ -354,6 +439,221 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
           watchFiles
         }
       })
+
+      // Handle scripts virtual module
+      build.onResolve({ filter: /~sdk\/script-utils/ }, (_args) => {
+        return {
+          namespace: 'sdk-scripts',
+          path: 'script-utils'
+        }
+      })
+
+      build.onLoad({ filter: /.*/, namespace: 'sdk-scripts' }, async (_) => {
+        // ensure compositeData is loaded (in case scripts are imported before composites)
+        if (!compositeData && !options.ignoreComposite) {
+          compositeData = await getAllComposites(
+            components,
+            build.initialOptions.absWorkingDir ?? options.workingDirectory
+          )
+        }
+
+        const { contents, watchFiles } = await generateInitializeScriptsModule(
+          components,
+          options.workingDirectory,
+          compositeData
+        )
+
+        return {
+          loader: 'js',
+          contents,
+          watchFiles,
+          resolveDir: options.workingDirectory
+        }
+      })
     }
   }
+}
+
+/**
+ * Generates a sanitized import name for a script path.
+ * Example: "src/scripts/my-script.ts" -> "script_src_scripts_my_script"
+ */
+export function getScriptImportName(scriptPath: string): string {
+  return (
+    'script_' +
+    scriptPath
+      .replace(/\.tsx?$/, '') // remove .ts or .tsx
+      .replace(/[^a-zA-Z0-9]/g, '_') // sanitize
+  )
+}
+
+interface ScriptCollectionResult {
+  runtimeImports: string
+  typeImports: string
+  scriptTypes: string
+  scriptsArray: string
+  watchFiles: string[]
+}
+
+/**
+ * Collects and formats all script data for code generation
+ */
+function collectScriptData(
+  compositeData: { scripts: Map<string, Script[]>; [key: string]: any },
+  workingDirectory: string
+): ScriptCollectionResult {
+  const runtimeImports: string[] = []
+  const typeImports: string[] = []
+  const scriptTypes: string[] = []
+  const scriptsArray: string[] = []
+  const watchFiles: string[] = []
+
+  for (const [scriptPath, scriptInstances] of compositeData.scripts.entries()) {
+    const importName = getScriptImportName(scriptPath)
+    const absolutePath = path.join(workingDirectory, scriptPath)
+
+    // For the virtual module runtime
+    runtimeImports.push(`import * as ${importName} from ${toSafeModulePath('./' + scriptPath)}`)
+
+    // For .d.ts file using import() type syntax (works in ambient modules)
+    typeImports.push(`  type ${importName} = typeof import(${toSafeModulePath(absolutePath)})`)
+
+    // Add to ScriptRegistry interface
+    scriptTypes.push(`  ${toSafeModulePath(scriptPath)}: ExtractScriptType<${importName}>`)
+
+    // Add each script instance to the array
+    for (const script of scriptInstances) {
+      scriptsArray.push(`  { ...${JSON.stringify(script)}, module: ${importName} }`)
+    }
+
+    watchFiles.push(absolutePath)
+  }
+
+  return {
+    runtimeImports: runtimeImports.join('\n'),
+    typeImports: typeImports.join('\n'),
+    scriptTypes: `interface ScriptRegistry {\n${scriptTypes.join(',\n')}\n}`,
+    scriptsArray: `[\n${scriptsArray.join(',\n')}\n]`,
+    watchFiles
+  }
+}
+
+/**
+ * Reads and prepares the runtime script code for inlining
+ */
+async function prepareRuntimeCode(fs: BundleComponents['fs']): Promise<string> {
+  const runtimeCodePath = require.resolve('./runtime-script')
+  const runtimeCode = await fs.readFile(runtimeCodePath, 'utf-8')
+
+  // Strip CommonJS/module system code
+  return (
+    runtimeCode
+      .replace(/"use strict";?\s*/g, '')
+      .replace(/Object\.defineProperty\(exports,.*?\);?\s*/g, '')
+      .replace(/exports\.\w+\s*=\s*void 0;?\s*/g, '')
+      .replace(/exports\.\w+\s*=\s*/g, '')
+      .replace(/^export\s+/gm, '')
+      .replace(/^import\s+.*$/gm, '')
+      // fix nested asset-packs path (importing from @dcl/inspector is banned in runtime, but @dcl/asset-packs not)
+      .replace(/@dcl\/inspector\/node_modules\/@dcl\/asset-packs/g, '@dcl/asset-packs')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim()
+  )
+}
+
+/**
+ * Generates the TypeScript declaration for the ~sdk/script-utils module
+ */
+async function generateScriptModuleDeclaration(
+  components: BundleComponents,
+  typeImports: string,
+  scriptTypes: string
+): Promise<string> {
+  const templatePath = path.join(__dirname, 'script-module.d.ts.template')
+  const template = await components.fs.readFile(templatePath, 'utf-8')
+
+  return template.replace('__TYPE_IMPORTS__', typeImports).replace('__SCRIPT_TYPES__', scriptTypes)
+}
+
+/**
+ * Updates the sdk.d.ts file with script type declarations
+ */
+async function updateSdkTypeDeclarations(
+  components: BundleComponents,
+  workingDirectory: string,
+  typeImports: string,
+  scriptTypes: string,
+  scriptCount: number
+): Promise<void> {
+  try {
+    const jsRuntimePath = require.resolve('@dcl/js-runtime/sdk.d.ts', { paths: [workingDirectory] })
+    let existingSdkDts = await components.fs.readFile(jsRuntimePath, 'utf-8')
+
+    // remove any existing ~sdk/script-utils module declaration
+    existingSdkDts = existingSdkDts
+      .replace(/\/\/ @internal[\s]*\ndeclare module '~sdk\/script-utils'[\s\S]*?(?=\n\/\/|$)/, '')
+      .trim()
+
+    // generate and append the new module declaration
+    const scriptModuleDeclaration = await generateScriptModuleDeclaration(components, typeImports, scriptTypes)
+    const updatedSdkDts = existingSdkDts + '\n' + scriptModuleDeclaration
+
+    await components.fs.writeFile(jsRuntimePath, updatedSdkDts)
+    components.logger.info(`✓ Updated sdk.d.ts with ${scriptCount} script type(s) at: ${jsRuntimePath}`)
+  } catch (err: any) {
+    components.logger.error('⚠ Could not update sdk.d.ts with script types:', err)
+  }
+}
+
+/**
+ * Generates the virtual module content with script initialization and helper functions
+ */
+function generateVirtualModuleContent(runtimeImports: string, runtimeCode: string, scriptsArray: string): string {
+  return `
+${runtimeImports}
+
+${runtimeCode}
+
+export function _initializeScripts(engine) {
+  const scriptsArray = ${scriptsArray}
+  return runScripts(engine, scriptsArray)
+}
+
+// export helper functions that are defined in the inlined runtime code
+export { getScriptInstance, getScriptInstancesByPath, getAllScriptInstances, callScriptMethod }
+`
+}
+
+export async function generateInitializeScriptsModule(
+  components: BundleComponents,
+  workingDirectory: string,
+  compositeData: { scripts: Map<string, Script[]>; [key: string]: any } | null
+): Promise<{ contents: string; watchFiles: string[] }> {
+  // prepare runtime code (always needed for helper functions)
+  const runtimeCode = await prepareRuntimeCode(components.fs)
+
+  // default empty implementation if no scripts
+  if (!compositeData || compositeData.scripts.size === 0) {
+    return {
+      contents: generateVirtualModuleContent('', runtimeCode, '[]'),
+      watchFiles: []
+    }
+  }
+
+  // Step 1: Collect all script data
+  const scriptData = collectScriptData(compositeData, workingDirectory)
+
+  // Step 2: Update TypeScript declarations
+  await updateSdkTypeDeclarations(
+    components,
+    workingDirectory,
+    scriptData.typeImports,
+    scriptData.scriptTypes,
+    compositeData.scripts.size
+  )
+
+  // Step 3: Generate virtual module content
+  const contents = generateVirtualModuleContent(scriptData.runtimeImports, runtimeCode, scriptData.scriptsArray)
+
+  return { contents, watchFiles: scriptData.watchFiles }
 }

@@ -3,7 +3,7 @@ export type ScaffoldedProject = 'scene-template' | 'px-template' | 'smart-wearab
 const scaffoldedProjectUrls: Record<ScaffoldedProject, string> = {
   'scene-template': 'https://github.com/decentraland/sdk7-scene-template/archive/refs/heads/main.zip',
   'px-template': 'https://github.com/decentraland/sdk7-scene-template/archive/refs/heads/main.zip',
-  'smart-wearable': 'https://github.com/decentraland/smart-wearable-sample/archive/refs/heads/sdk7.zip',
+  'smart-wearable': 'https://github.com/decentraland/smart-wearable-sample/archive/refs/heads/main.zip',
   library: 'https://github.com/decentraland/sdk7-library-template/archive/refs/heads/main.zip'
 }
 

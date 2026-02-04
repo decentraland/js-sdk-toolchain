@@ -11,6 +11,7 @@ import { CliComponents } from '../../../components'
 import {
   b64HashingFunction,
   getProjectPublishableFilesWithHashes,
+  machineId,
   projectFilesToContentMappings
 } from '../../../logic/project-files'
 import { getCatalystBaseUrl, getInstalledPackageVersion } from '../../../logic/config'
@@ -136,6 +137,25 @@ export async function setupEcs6Endpoints(
     return res
   })
 
+  router.all('/explorer/:path+', async (ctx) => {
+    const u = new URL(ctx.url.toString())
+    u.host = catalystUrl.host
+    u.protocol = catalystUrl.protocol
+    u.port = catalystUrl.port
+    const req = await fetch(u.toString(), {
+      headers: { connection: 'close' },
+      method: ctx.request.method,
+      body: ctx.request.method === 'get' ? undefined : ctx.request.body
+    })
+
+    return {
+      headers: {
+        'content-type': req.headers.get('content-type') || 'application/json'
+      },
+      body: req.body
+    }
+  })
+
   serveStatic(components, workspace, router)
 
   // TODO: get workspace scenes & wearables...
@@ -152,7 +172,9 @@ async function serveFolders(
 
   router.get('/content/contents/:hash', async (ctx, next) => {
     if (ctx.params.hash && ctx.params.hash.startsWith('b64-')) {
-      const fullPath = path.resolve(Buffer.from(ctx.params.hash.replace(/^b64-/, ''), 'base64').toString('utf8'))
+      const decoded = Buffer.from(ctx.params.hash.replace(/^b64-/, ''), 'base64').toString('utf8')
+      // Strip the machineId suffix that was added during encoding
+      const fullPath = path.resolve(decoded.slice(0, -(machineId.length + 1)))
 
       // find a project that we are talking about. NOTE: this filter is not exhaustive
       //   relative paths should be used instead

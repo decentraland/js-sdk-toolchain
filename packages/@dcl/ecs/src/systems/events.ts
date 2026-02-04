@@ -21,6 +21,7 @@ export type EventSystemOptions = {
   maxDistance?: number
   showFeedback?: boolean
   showHighlight?: boolean
+  maxPlayerDistance?: number
 }
 
 /**
@@ -243,7 +244,8 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
         showFeedback: opts.showFeedback,
         showHighlight: opts.showHighlight,
         hoverText: opts.hoverText,
-        maxDistance: opts.maxDistance
+        maxDistance: opts.maxDistance,
+        maxPlayerDistance: opts.maxPlayerDistance
       }
     })
   }

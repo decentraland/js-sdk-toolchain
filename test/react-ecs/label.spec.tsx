@@ -1,4 +1,4 @@
-import { Entity, TextAlignMode, TextWrap, Font, IEngine } from '../../packages/@dcl/ecs'
+import { Entity, TextAlignMode, TextWrap, Font, IEngine, YGUnit } from '../../packages/@dcl/ecs'
 import { components } from '../../packages/@dcl/ecs/src'
 import {
   ReactEcs,
@@ -8,8 +8,14 @@ import {
   scaleFontSize,
   UiTextWrapType
 } from '../../packages/@dcl/react-ecs/src'
-import { getScaleAndUnit, getScaleCtx } from '../../packages/@dcl/react-ecs/src/components/utils'
+import {
+  getScaleAndUnit,
+  getScaleCtx,
+  getUiScaleFactor,
+  setUiScaleFactor
+} from '../../packages/@dcl/react-ecs/src/components/utils'
 import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
+import { parseSize } from '../../packages/@dcl/react-ecs/src/components/uiTransform/utils'
 import { Color4 } from '../../packages/@dcl/sdk/math'
 import { setupEngine } from './utils'
 import { getFontSize } from '../../packages/@dcl/react-ecs/src/components/Label/utils'
@@ -161,6 +167,55 @@ describe('UiText React Ecs', () => {
 
     it('should return the same value provided', () => {
       expect(getFontSize(10)).toStrictEqual({ fontSize: 10 })
+    })
+  })
+
+  describe('ui scale factor', () => {
+    afterEach(() => {
+      setUiScaleFactor(1)
+    })
+
+    it('should scale numeric and px values for uiTransform sizes', () => {
+      setUiScaleFactor(2)
+      expect(parseSize(10, 'width')).toStrictEqual({
+        width: 20,
+        widthUnit: YGUnit.YGU_POINT
+      })
+      expect(parseSize('10px', 'width')).toStrictEqual({
+        width: 20,
+        widthUnit: YGUnit.YGU_POINT
+      })
+      expect(parseSize('10vw', 'width')).toStrictEqual({
+        width: 10,
+        widthUnit: YGUnit.YGU_POINT
+      })
+    })
+
+    it('should scale numeric font sizes when set', () => {
+      setUiScaleFactor(1.5)
+      expect(getFontSize(10)).toStrictEqual({ fontSize: 15 })
+      expect(getFontSize('10vw')).toStrictEqual({ fontSize: 10 })
+    })
+
+    it('should update the scale factor from UiCanvasInformation', async () => {
+      const { engine, uiRenderer } = setupEngine()
+      const UiCanvasInformation = components.UiCanvasInformation(engine)
+      UiCanvasInformation.create(engine.RootEntity, {
+        devicePixelRatio: 1,
+        width: 3000,
+        height: 2000,
+        interactableArea: {
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0
+        }
+      })
+
+      uiRenderer.setUiRenderer(() => null, { virtualWidth: 1000, virtualHeight: 1000 })
+      await engine.update(1)
+
+      expect(getUiScaleFactor()).toBe(2)
     })
   })
 

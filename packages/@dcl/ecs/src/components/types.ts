@@ -8,7 +8,14 @@ export type {
   AvatarEquippedDataType
 } from './extended/AvatarEquippedData'
 export type { AvatarShapeComponentDefinitionExtended, AvatarShapeType } from './extended/AvatarShape'
-export type { TextureHelper, MaterialComponentDefinitionExtended } from './extended/Material'
+export type {
+  TextureHelper,
+  MaterialComponentDefinitionExtended,
+  FlatTexture,
+  ReadonlyFlatMaterial,
+  ReadonlyFlatTexture,
+  FlatMaterial
+} from './extended/Material'
 export type { TweenHelper, TweenComponentDefinitionExtended } from './extended/Tween'
 export type { CameraTransitionHelper, VirtualCameraComponentDefinitionExtended } from './extended/VirtualCamera'
 export type { TransformComponentExtended, TransformTypeWithOptionals } from './manual/Transform'

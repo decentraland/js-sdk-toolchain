@@ -11,5 +11,5 @@ describe('blackbox: init', () => {
 
     await runSdkCommand(components, 'init', ['--dir=tmp/blackbox-scene'])
     await runSdkCommand(components, 'build', ['--dir=tmp/blackbox-scene', '--customEntryPoint'])
-  }, 60000)
+  }, 180000) // Increased timeout: npm install can be slow when running with other tests
 })
