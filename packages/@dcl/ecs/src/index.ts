@@ -4,6 +4,7 @@ export * from './schemas'
 export * from './runtime/initialization'
 export * from './runtime/types'
 export * from './runtime/helpers'
+export * from './runtime/globals'
 
 export { cyclicParentingChecker } from './systems/cyclicParentingChecker'
 export * from './systems/events'

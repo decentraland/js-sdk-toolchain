@@ -8,6 +8,10 @@ on:
     types:
       - created
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
   BRANCH_TAG: ${{ (github.head_ref || github.ref_name) == 'protocol-squad' && 'protocol-squad' || '' }}

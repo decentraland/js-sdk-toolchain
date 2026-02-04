@@ -27,7 +27,6 @@ import { getValidWorkspace } from '../../logic/workspace-validations'
 import { printCurrentProjectStarting, printProgressInfo, printWarning } from '../../logic/beautiful-logs'
 import { Result } from 'arg'
 import { startValidations } from '../../logic/project-validations'
-import { ensureDaoExplorer, runDaoExplorer } from '../../logic/dao-explorer'
 import { runExplorerAlpha } from './explorer-alpha'
 import { getLanUrl } from './utils'
 
@@ -52,9 +51,7 @@ export const args = declareArgs({
   '-b': '--no-browser',
   '-w': '--no-watch',
   '--skip-build': Boolean,
-  '--no-dao-explorer': Boolean,
   '--data-layer': Boolean,
-  '-e': '--no-dao-explorer',
   '--customEntryPoint': Boolean,
   '--explorer-alpha': Boolean,
   '--web-explorer': Boolean,
@@ -96,8 +93,8 @@ export async function help(options: Options) {
       --skip-auth-screen                Skip the auth screen (accepts 'true' or 'false').
       --landscape-terrain-enabled       Enable landscape terrain.
       -n                                Open a new instance of the Client even if one is already running.
-      --bevy-web                        Opens preview using the Bevy Web browser window.
-      --mobile                      Show QR code for mobile preview on the same network
+      --bevy-web                        Opens preview using the Bevy Web browser window (default=true)
+      --mobile, -m                      Show QR code for mobile preview on the same network (default=true)
 
 
     Examples:
@@ -117,23 +114,19 @@ export async function main(options: Options) {
   const workingDirectory = path.resolve(process.cwd(), options.args['--dir'] || '.')
   const isCi = options.args['--ci'] || process.env.CI || false
   const debug = !options.args['--no-debug'] && !isCi
-  const experimentalDaoExplorer = !options.args['--no-dao-explorer'] && !isCi
-  const openBrowser = !options.args['--no-browser'] && !experimentalDaoExplorer && !isCi
+  const openBrowser = !options.args['--no-browser'] && !isCi
   const build = !options.args['--skip-build']
   const watch = !options.args['--no-watch']
   const withDataLayer = options.args['--data-layer']
   const enableWeb3 = options.args['--web3']
   const isHub = !!options.args['--hub']
-  const bevyWeb = !!options.args['--bevy-web']
-  const isMobile = options.args['--mobile']
+  // Default to true if not specified (undefined), false only if explicitly set to false
+  const bevyWeb = (options.args['--bevy-web'] ?? true) && !isCi
+  const isMobile = (options.args['--mobile'] ?? true) && !isCi
   const explorerAlpha = !options.args['--web-explorer'] && !bevyWeb
 
   let hasSmartWearable = false
   const workspace = await getValidWorkspace(options.components, workingDirectory)
-
-  if (experimentalDaoExplorer) {
-    await ensureDaoExplorer(options.components, workspace.rootWorkingDirectory)
-  }
 
   /* istanbul ignore if */
   if (workspace.projects.length > 1)
@@ -267,9 +260,7 @@ export async function main(options: Options) {
           ? -1
           : 1
       })
-      const bevyUrl = `https://decentraland.zone/bevy-web/?preview=true&realm=${
-        sortedURLs[0].base
-      }&position=${baseCoords.x},${baseCoords.y}`
+      const bevyUrl = `https://decentraland.zone/bevy-web/?preview=true&realm=${sortedURLs[0].base}&position=${baseCoords.x},${baseCoords.y}`
       if (!explorerAlpha) {
         if (bevyWeb) {
           components.logger.log(`    ${bevyUrl}`)
@@ -281,17 +272,13 @@ export async function main(options: Options) {
       }
       components.logger.log('\nPress CTRL+C to exit\n')
 
-      if (experimentalDaoExplorer && sortedURLs.length) {
-        runDaoExplorer(components, sortedURLs[0].base, `${baseCoords.x},${baseCoords.y}`, workingDirectory)
-      }
-
       // Open preferably localhost/127.0.0.1
       if (explorerAlpha && !isMobile) {
         const realm = new URL(sortedURLs[0].url).origin
         await runExplorerAlpha(components, { cwd: workingDirectory, realm, baseCoords, isHub, args: options.args })
       }
 
-      if (options.args['--mobile'] && lanUrl) {
+      if (isMobile && lanUrl) {
         const deepLink = `decentraland://open?preview=${lanUrl}&position=${baseCoords.x}%2C${baseCoords.y}`
         QRCode.toString(deepLink, { type: 'terminal', small: true }, (err, qr) => {
           if (!err) {
