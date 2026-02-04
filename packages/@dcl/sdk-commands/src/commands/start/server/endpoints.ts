@@ -17,7 +17,6 @@ import {
 import { getCatalystBaseUrl, getInstalledPackageVersion } from '../../../logic/config'
 import { Workspace } from '../../../logic/workspace-validations'
 import { ProjectUnion, WearableProject } from '../../../logic/project-validations'
-import { getMergedEnv, loadRuntimeEnv, saveRuntimeEnv } from './runtime-env'
 
 type LambdasWearable = Wearable & {
   baseUrl: string
@@ -154,103 +153,6 @@ export async function setupEcs6Endpoints(
         'content-type': req.headers.get('content-type') || 'application/json'
       },
       body: req.body
-    }
-  })
-
-  router.get('/env', async () => {
-    const projectDirectory = workspace.projects[0].workingDirectory
-    const envVars = await getMergedEnv(components, projectDirectory)
-    const body = Array.from(envVars.entries()).map(([key, value]) => ({ key, value }))
-    return { body }
-  })
-
-  router.get('/env/:key', async (ctx, next) => {
-    const { key } = ctx.params
-    if (key) {
-      const projectDirectory = workspace.projects[0].workingDirectory
-      const envVars = await getMergedEnv(components, projectDirectory)
-      const value = envVars.get(key)
-      if (value !== undefined) {
-        return { body: value }
-      }
-      return {
-        status: 404,
-        body: { error: `Environment variable '${key}' not found` }
-      }
-    }
-    return next()
-  })
-
-  router.put('/env/:key', async (ctx) => {
-    const { key } = ctx.params
-
-    if (!key) {
-      return {
-        status: 400,
-        body: { error: 'Key is required' }
-      }
-    }
-
-    try {
-      // Read the request body as text (the value)
-      const value = await ctx.request.text()
-
-      // Load current runtime env, update it, and save
-      const runtimeEnv = await loadRuntimeEnv(components)
-      runtimeEnv[key] = value
-      await saveRuntimeEnv(components, runtimeEnv)
-
-      components.logger.log(`[env] PUT ${key}=${value}`)
-
-      return {
-        status: 200,
-        body: { success: true, key, value }
-      }
-    } catch (error) {
-      components.logger.error(`Failed to set environment variable '${key}': ${error}`)
-      return {
-        status: 500,
-        body: { error: `Failed to set environment variable '${key}'` }
-      }
-    }
-  })
-
-  router.delete('/env/:key', async (ctx) => {
-    const { key } = ctx.params
-
-    if (!key) {
-      return {
-        status: 400,
-        body: { error: 'Key is required' }
-      }
-    }
-
-    try {
-      // Load current runtime env, delete the key, and save
-      const runtimeEnv = await loadRuntimeEnv(components)
-
-      if (!(key in runtimeEnv)) {
-        return {
-          status: 404,
-          body: { error: `Environment variable '${key}' not found in runtime storage` }
-        }
-      }
-
-      delete runtimeEnv[key]
-      await saveRuntimeEnv(components, runtimeEnv)
-
-      components.logger.log(`[env] DELETE ${key}`)
-
-      return {
-        status: 200,
-        body: { success: true, key }
-      }
-    } catch (error) {
-      components.logger.error(`Failed to delete environment variable '${key}': ${error}`)
-      return {
-        status: 500,
-        body: { error: `Failed to delete environment variable '${key}'` }
-      }
     }
   })
 
