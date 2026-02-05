@@ -42,6 +42,8 @@ export function addSyncTransport(
   fetchProfile(myProfile!, getUserData)
 
   const isServerAtom = Atom<boolean>()
+  const isRoomReadyAtom = Atom<boolean>(false)
+
   void isServerFn({}).then(($: IsServerResponse) => {
     return isServerAtom.swap(!!$.isServer)
   })
@@ -103,7 +105,7 @@ export function addSyncTransport(
   })
 
   // Initialize Event Bus with registered schemas
-  const eventBus = new Room(engine, binaryMessageBus, isServerAtom)
+  const eventBus = new Room(engine, binaryMessageBus, isServerAtom, isRoomReadyAtom)
 
   // Set global eventBus instance
   setGlobalRoom(eventBus)
@@ -126,6 +128,14 @@ export function addSyncTransport(
     DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength / 1024, 'KB')
     transport.onmessage!(serverValidator.processClientMessages(data, sender))
     stateIsSyncronized = true
+
+    // IMPORTANT: Only mark room as ready AFTER state is synchronized
+    // This ensures comms is truly connected and working
+    const realmInfo = RealmInfo.getOrNull(engine.RootEntity)
+    if (realmInfo && checkRoomReady(realmInfo)) {
+      DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady] Marking room as ready after state sync')
+      isRoomReadyAtom.swap(true)
+    }
   })
 
   // received message from the network
@@ -172,14 +182,42 @@ export function addSyncTransport(
     }
   })
 
+  // Helper to check room ready conditions
+  function checkRoomReady(realmInfo: ReturnType<typeof RealmInfo.getOrNull>): boolean {
+    if (!realmInfo) return false
+
+    try {
+      // Check if room instance exists
+      if (!eventBus) return false
+
+      return !!(realmInfo.commsAdapter && realmInfo.isConnectedSceneRoom && realmInfo.room)
+    } catch {
+      return false
+    }
+  }
+
   // Asks for the REQ_CRDT_STATE when its connected to comms
   RealmInfo.onChange(engine.RootEntity, (value) => {
+    const isServer = isServerAtom.getOrNull()
+
     if (!value?.isConnectedSceneRoom) {
       DEBUG_NETWORK_MESSAGES() && console.log('Disconnected from comms')
+      isRoomReadyAtom.swap(false)
+      if (!isServer) {
+        stateIsSyncronized = false
+      }
     }
 
     if (value?.isConnectedSceneRoom) {
       requestState()
+
+      // For servers, mark as ready immediately when connected
+      // (servers don't need to sync state from anyone)
+      if (isServer && checkRoomReady(value) && isRoomReadyAtom.getOrNull() === false) {
+        DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady] Server marking room as ready')
+        isRoomReadyAtom.swap(true)
+      }
+      // For clients, room will be marked ready after receiving CRDT state (above)
     }
   })
 
@@ -231,6 +269,7 @@ export function addSyncTransport(
     myProfile,
     isStateSyncronized,
     binaryMessageBus,
-    eventBus
+    eventBus,
+    isRoomReadyAtom
   }
 }

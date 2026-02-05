@@ -136,6 +136,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
+
       - name: publish @dcl/ecs package
         uses: decentraland/oddish-action@master
         id: publish_ecs
