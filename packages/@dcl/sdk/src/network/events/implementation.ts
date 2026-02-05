@@ -23,15 +23,34 @@ export type SendOptions = {
  * Room provides type-safe communication between clients and server
  * Uses binary serialization with Schema definitions for efficiency
  */
+type QueuedMessage<T extends EventSchemaRegistry = EventSchemaRegistry> = {
+  [K in keyof T]: {
+    eventType: K
+    data: EventTypes<T>[K]
+    options?: SendOptions
+  }
+}[keyof T]
+
 export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
   private listeners = new Map<keyof T, Set<EventCallback<any>>>()
   private binaryMessageBus: any
   private isServerFuture: IFuture<boolean> = future()
+  private isRoomReadyAtom: Atom<boolean>
+  private messageQueue: QueuedMessage<T>[] = []
+  private isProcessingQueue = false
 
-  constructor(_engine: IEngine, binaryMessageBus: any, isServerFn: Atom<boolean>) {
+  constructor(_engine: IEngine, binaryMessageBus: any, isServerFn: Atom<boolean>, isRoomReadyAtom: Atom<boolean>) {
     void isServerFn.deref().then(($) => this.isServerFuture.resolve($))
 
     this.binaryMessageBus = binaryMessageBus
+    this.isRoomReadyAtom = isRoomReadyAtom
+
+    // Subscribe to room readiness changes to flush queue
+    this.isRoomReadyAtom.observable.add((isReady) => {
+      if (isReady && this.messageQueue.length > 0) {
+        void this.flushMessageQueue()
+      }
+    })
     // Listen for CUSTOM_EVENT messages
     binaryMessageBus.on(CommsMessage.CUSTOM_EVENT, (data: Uint8Array, sender: string) => {
       try {
@@ -56,13 +75,48 @@ export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
   }
 
   /**
+   * Flush queued messages when room becomes ready
+   */
+  private async flushMessageQueue(): Promise<void> {
+    if (this.isProcessingQueue || this.messageQueue.length === 0) return
+
+    this.isProcessingQueue = true
+
+    // Copy and clear the queue to avoid mutation during iteration
+    const messages = [...this.messageQueue]
+    this.messageQueue.length = 0
+
+    // Re-send all queued messages
+    for (const message of messages) {
+      await this.send(message.eventType, message.data, message.options)
+    }
+
+    this.isProcessingQueue = false
+  }
+
+  /**
    * Send an event
    * @param eventType - The type of event from the registry
    * @param data - The event data matching the schema
    * @param options - Optional send options (server only)
+   *
+   * Messages are automatically queued if the room is not ready and sent once connected.
    */
   async send<K extends keyof T>(eventType: K, data: EventTypes<T>[K], options?: SendOptions): Promise<void> {
     try {
+      const isRoomReady = this.isRoomReadyAtom.getOrNull() ?? false
+
+      // If room is not ready, queue the message with original params
+      if (!isRoomReady) {
+        this.messageQueue.push({
+          eventType,
+          data,
+          options
+        })
+        return
+      }
+
+      // Room is ready, send immediately
       const buffer = encodeEvent(eventType as string, data, globalEventRegistry)
 
       if (await this.isServerFuture) {
@@ -119,6 +173,44 @@ export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
    */
   listenerCount<K extends keyof T>(eventType: K): number {
     return this.listeners.get(eventType)?.size ?? 0
+  }
+
+  /**
+   * Check if the room is ready to send messages
+   * @returns true if messages will be sent immediately, false if they will be queued
+   */
+  isReady(): boolean {
+    return this.isRoomReadyAtom.getOrNull() ?? false
+  }
+
+  /**
+   * Subscribe to room readiness changes
+   * @param callback - Called when room becomes ready or disconnected
+   * @returns Unsubscribe function
+   *
+   * @example
+   * ```ts
+   * const unsubscribe = room.onReady((isReady) => {
+   *   if (isReady) {
+   *     console.log('Room connected!')
+   *   } else {
+   *     console.log('Room disconnected')
+   *   }
+   * })
+   *
+   * // Later: unsubscribe()
+   * ```
+   */
+  onReady(callback: (isReady: boolean) => void): () => void {
+    const observer = this.isRoomReadyAtom.observable.add((isReady) => {
+      callback(isReady)
+    })
+
+    return () => {
+      if (observer) {
+        this.isRoomReadyAtom.observable.remove(observer)
+      }
+    }
   }
 }
 
@@ -187,7 +279,8 @@ export function getRoom<T extends EventSchemaRegistry>(): Room<T> {
 export function createRoom<T extends EventSchemaRegistry>(
   engine: IEngine,
   binaryMessageBus: any,
-  isServerFn: Atom<boolean>
+  isServerFn: Atom<boolean>,
+  isRoomReadyAtom: Atom<boolean>
 ): Room<T> {
-  return new Room(engine, binaryMessageBus, isServerFn)
+  return new Room(engine, binaryMessageBus, isServerFn, isRoomReadyAtom)
 }
