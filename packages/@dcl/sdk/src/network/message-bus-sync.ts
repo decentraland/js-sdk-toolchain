@@ -213,7 +213,7 @@ export function addSyncTransport(
 
       // For servers, mark as ready immediately when connected
       // (servers don't need to sync state from anyone)
-      if (isServer && checkRoomReady(value)) {
+      if (isServer && checkRoomReady(value) && isRoomReadyAtom.getOrNull() === false) {
         DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady] Server marking room as ready')
         isRoomReadyAtom.swap(true)
       }
