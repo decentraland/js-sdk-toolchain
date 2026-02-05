@@ -86,6 +86,72 @@ export type Events = {
     code: number
     creatorAddress: string
   }
+  'Storage Env Set Success': {
+    key: string
+  }
+  'Storage Env Set Failure': {
+    key: string
+  }
+  'Storage Env Delete Success': {
+    key: string
+  }
+  'Storage Env Delete Failure': {
+    key: string
+  }
+  'Storage Env Clear Success': Record<string, never>
+  'Storage Env Clear Failure': Record<string, never>
+  'Storage Scene Get Success': {
+    key: string
+  }
+  'Storage Scene Get Failure': {
+    key: string
+  }
+  'Storage Scene Set Success': {
+    key: string
+  }
+  'Storage Scene Set Failure': {
+    key: string
+  }
+  'Storage Scene Delete Success': {
+    key: string
+  }
+  'Storage Scene Delete Failure': {
+    key: string
+  }
+  'Storage Scene Clear Success': Record<string, never>
+  'Storage Scene Clear Failure': Record<string, never>
+  'Storage Player Get Success': {
+    key: string
+    address: string
+  }
+  'Storage Player Get Failure': {
+    key: string
+    address: string
+  }
+  'Storage Player Set Success': {
+    key: string
+    address: string
+  }
+  'Storage Player Set Failure': {
+    key: string
+    address: string
+  }
+  'Storage Player Delete Success': {
+    key: string
+    address: string
+  }
+  'Storage Player Delete Failure': {
+    key: string
+    address: string
+  }
+  'Storage Player Clear Success': {
+    address: string
+  }
+  'Storage Player Clear Failure': {
+    address: string
+  }
+  'Storage Player Clear All Success': Record<string, never>
+  'Storage Player Clear All Failure': Record<string, never>
 }
 
 const noopAnalytics: IAnalyticsComponent = {

@@ -9,6 +9,7 @@ import { RoomComponent } from '@dcl/mini-comms/dist/adapters/rooms'
 import { WebSocketComponent } from './server/ws'
 import { CliComponents } from '../../components'
 import { ISignalerComponent } from '../../components/exit-signal'
+import { ChildProcess } from 'child_process'
 
 export type PreviewComponents = CliComponents & {
   logs: ILoggerComponent
@@ -19,4 +20,6 @@ export type PreviewComponents = CliComponents & {
   rooms: RoomComponent
   ws: WebSocketComponent
   signaler: ISignalerComponent
+  /** Authoritative Server process (@dcl/hammurabi-server) */
+  hammurabiServer?: ChildProcess
 }

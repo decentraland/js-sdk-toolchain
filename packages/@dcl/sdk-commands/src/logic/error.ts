@@ -63,6 +63,18 @@ export type CliErrorName =
   | 'CODE_TO_COMPOSITE_BUILD_FAILED'
   | 'CODE_TO_COMPOSITE_BUNDLE_NOT_FOUND'
   | 'CODE_TO_COMPOSITE_EXECUTION_FAILED'
+  // Storage errors
+  | 'STORAGE_INVALID_ACTION'
+  | 'STORAGE_MISSING_KEY'
+  | 'STORAGE_MISSING_VALUE'
+  | 'STORAGE_MISSING_ADDRESS'
+  | 'STORAGE_MISSING_SUBCOMMAND'
+  | 'STORAGE_INVALID_SUBCOMMAND'
+  | 'STORAGE_MISSING_ACTION'
+  | 'STORAGE_OPERATION_FAILED'
+  | 'STORAGE_MISSING_WORLD'
+  // Server logs errors
+  | 'SERVER_LOGS_MISSING_WORLD'
 
 export class CliError<T extends CliErrorName> extends Error {
   constructor(public name: T = 'CliError' as T, public message: string = '', public stack?: string) {

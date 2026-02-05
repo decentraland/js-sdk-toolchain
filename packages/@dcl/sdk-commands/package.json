@@ -12,7 +12,7 @@
     "@dcl/gltf-validator-ts": "1.0.14",
     "@dcl/hashing": "1.1.3",
     "@dcl/inspector": "7.25.0",
-    "@dcl/linker-dapp": "^0.14.2",
+    "@dcl/linker-dapp": "^0.14.3-21600693822.commit-1e9b4b4",
     "@dcl/mini-comms": "1.0.1-20230216163137.commit-a4c75be",
     "@dcl/protocol": "1.0.0-21519068572.commit-814b279",
     "@dcl/quests-client": "^1.0.3",
