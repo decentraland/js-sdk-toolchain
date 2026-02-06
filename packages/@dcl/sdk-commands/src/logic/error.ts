@@ -75,6 +75,7 @@ export type CliErrorName =
   | 'STORAGE_MISSING_WORLD'
   // Server logs errors
   | 'SERVER_LOGS_MISSING_WORLD'
+  | 'SERVER_LOGS_MISSING_MULTIPLAYER_ID'
 
 export class CliError<T extends CliErrorName> extends Error {
   constructor(public name: T = 'CliError' as T, public message: string = '', public stack?: string) {
