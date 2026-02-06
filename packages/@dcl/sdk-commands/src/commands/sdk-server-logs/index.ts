@@ -27,8 +27,8 @@ export const args = declareArgs({
   '--help': Boolean,
   '-h': '--help',
   '--dir': String,
-  '--world': String,
-  '-w': '--world',
+  '--multiplayerId': String,
+  '-m': '--multiplayerId',
   '--target': String,
   '-t': '--target',
   '--port': Number,
@@ -43,34 +43,31 @@ const DEFAULT_SERVER = 'https://multiplayer-server.decentraland.zone'
 export function help(options: Options) {
   options.components.logger.log(`
   Usage: 'sdk-commands sdk-server-logs [options]'
-    Streams real-time logs from the multiplayer server for your world.
-    Requires --world parameter or a scene.json with worldConfiguration.name.
+    Streams real-time logs from the multiplayer server for your scene.
+    Requires --multiplayerId parameter or a scene.json with multiplayerId.
 
     Options:
-      -h, --help                Displays complete help
-      -w, --world       [name]  World name (required, or uses scene.json)
-      -t, --target      [URL]   Target multiplayer server URL (default: ${DEFAULT_SERVER})
-      --dir             [path]  Path to the project directory
-      -p, --port        [port]  Select a custom port for the linker dApp
-      -b, --no-browser          Do not open a new browser window
-      --https                   Use HTTPS for the linker dApp
+      -h, --help                     Displays complete help
+      -m, --multiplayerId   [id]     Multiplayer server ID (required, or uses scene.json)
+      -t, --target          [URL]   Target multiplayer server URL (default: ${DEFAULT_SERVER})
+      --dir                 [path]  Path to the project directory
+      -p, --port            [port]  Select a custom port for the linker dApp
+      -b, --no-browser               Do not open a new browser window
+      --https                       Use HTTPS for the linker dApp
 
     Examples:
-    - View logs for world in scene.json:
+    - View logs using multiplayerId from scene.json:
       $ sdk-commands sdk-server-logs
 
-    - View logs for a specific world:
-      $ sdk-commands sdk-server-logs --world myworld
-      $ sdk-commands sdk-server-logs -w myworld.dcl.eth
-
-    - View logs for staging world:
-      $ sdk-commands sdk-server-logs --world staging-world
+    - View logs for a specific multiplayer ID:
+      $ sdk-commands sdk-server-logs --multiplayerId my-multiplayer-id
+      $ sdk-commands sdk-server-logs -m my-multiplayer-id
 
     - Connect to local development server:
-      $ sdk-commands sdk-server-logs --world myworld --target http://localhost:8000
+      $ sdk-commands sdk-server-logs --multiplayerId my-id --target http://localhost:8000
 
     - Use private key for authentication (no browser):
-      $ DCL_PRIVATE_KEY=0x... sdk-commands sdk-server-logs --world myworld
+      $ DCL_PRIVATE_KEY=0x... sdk-commands sdk-server-logs --multiplayerId my-id
 `)
 }
 
@@ -112,7 +109,7 @@ async function getAddressAndSignature(
   components: CliComponents,
   awaitResponse: IFuture<void>,
   payload: string,
-  world: string,
+  multiplayerId: string,
   targetUrl: string,
   linkOptions: Omit<dAppOptions, 'uri'>,
   signCallback: (response: LinkerResponse) => Promise<void>
@@ -139,7 +136,7 @@ async function getAddressAndSignature(
     skipValidations: true,
     debug: !!process.env.DEBUG,
     isWorld: true,
-    world,
+    world: multiplayerId,
     targetUrl,
     action: 'view-logs'
   })
@@ -271,39 +268,35 @@ export async function main(options: Options) {
   // Validate workspace exists
   await getValidWorkspace(options.components, projectRoot)
 
-  let world: string
+  let multiplayerId: string
 
-  // Check if --world parameter is provided
-  if (options.args['--world']) {
-    // Use the world from command line argument
-    world = options.args['--world'].replace(/\.dcl\.eth$/i, '')
-    logger.info(`Viewing logs for world: ${world}`)
+  // Check if --multiplayerId parameter is provided
+  if (options.args['--multiplayerId']) {
+    multiplayerId = options.args['--multiplayerId']
+    logger.info(`Viewing logs for multiplayer ID: ${multiplayerId}`)
   } else {
     // Fall back to scene.json
     const sceneJson = await getValidSceneJson(options.components, projectRoot)
 
-    // worldConfiguration.name is required if --world is not provided
-    const worldName = sceneJson.worldConfiguration?.name
-    if (!worldName) {
+    if (!sceneJson.multiplayerId) {
       throw new CliError(
-        'SERVER_LOGS_MISSING_WORLD',
-        'scene.json must have worldConfiguration.name defined, or provide --world parameter to view server logs'
+        'SERVER_LOGS_MISSING_MULTIPLAYER_ID',
+        'scene.json must have multiplayerId defined, or provide --multiplayerId parameter to view server logs'
       )
     }
 
-    // Strip .dcl.eth suffix if present
-    world = worldName.replace(/\.dcl\.eth$/i, '')
-    logger.info(`Viewing logs for world: ${world}`)
+    multiplayerId = sceneJson.multiplayerId
+    logger.info(`Viewing logs for multiplayer ID: ${multiplayerId}`)
   }
 
   // Determine target URL
   const baseURL = options.args['--target'] || DEFAULT_SERVER
 
   // Build the logs URL
-  const logsUrl = `${baseURL}/logs/${world}`
+  const logsUrl = `${baseURL}/logs/${multiplayerId}`
 
   // Build the pathname for signing
-  const pathname = `/logs/${world}`
+  const pathname = `/logs/${multiplayerId}`
 
   // Linker dApp options
   const linkerPort = options.args['--port']
@@ -324,7 +317,7 @@ export async function main(options: Options) {
     options.components,
     awaitResponse,
     payload,
-    world,
+    multiplayerId,
     baseURL,
     linkOptions,
     async (linkerResponse) => {
