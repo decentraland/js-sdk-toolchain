@@ -73,8 +73,13 @@ export function Button(props: UiButtonProps) {
   })
 
   if (!!props.disabled) {
-    if (textProps.color) textProps.color.a /= 2
-    if (uiBackgroundProps && uiBackgroundProps.color) uiBackgroundProps.color.a /= 2
+    // Create new color objects to avoid mutating the shared defaults
+    if (textProps.color) {
+      textProps.color = { ...textProps.color, a: textProps.color.a / 2 }
+    }
+    if (uiBackgroundProps && uiBackgroundProps.color) {
+      uiBackgroundProps.color = { ...uiBackgroundProps.color, a: uiBackgroundProps.color.a / 2 }
+    }
   }
 
   return (
