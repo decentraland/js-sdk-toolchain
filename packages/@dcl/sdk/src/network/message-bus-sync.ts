@@ -201,10 +201,13 @@ export function addSyncTransport(
     const isServer = isServerAtom.getOrNull()
 
     if (!value?.isConnectedSceneRoom) {
-      DEBUG_NETWORK_MESSAGES() && console.log('Disconnected from comms')
-      isRoomReadyAtom.swap(false)
-      if (!isServer) {
-        stateIsSyncronized = false
+      // Only react when actually transitioning from ready to not ready
+      if (isRoomReadyAtom.getOrNull() === true) {
+        DEBUG_NETWORK_MESSAGES() && console.log('Disconnected from comms')
+        isRoomReadyAtom.swap(false)
+        if (!isServer) {
+          stateIsSyncronized = false
+        }
       }
     }
 
