@@ -47,7 +47,7 @@ async function installPackage(
   }
 
   // Regular Node.js environment or fallback
-  await components.spawner.exec(workingDir, getNpmBin(), ['install', '--save-dev', `${packageName}@${version}`], {
+  await components.spawner.exec(workingDir, getNpmBin(), ['install', '--no-save', `${packageName}@${version}`], {
     silent: true
   })
 }
@@ -125,6 +125,7 @@ export function startHammurabiServer(
   const hammurabiProcess = spawn(process.execPath, [hammurabiPath, `--realm=${realm}`], {
     cwd: workingDir,
     shell: false,
+    stdio: 'inherit',
     env: getSpawnEnv()
   })
 
