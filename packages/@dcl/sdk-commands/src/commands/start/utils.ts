@@ -1,11 +1,10 @@
 import * as os from 'os'
 import fs from 'fs'
 import path from 'path'
-import { CliComponents } from '../../components'
-import { readJson } from '../../logic/fs'
 
-// Use the same npm binary pattern as the rest of the codebase
+// Platform-aware binary names
 const npmBin = /^win/.test(process.platform) ? 'npm.cmd' : 'npm'
+const npxBin = /^win/.test(process.platform) ? 'npx.cmd' : 'npx'
 
 /**
  * Get the LAN IP address for external device access (e.g., mobile preview)
@@ -54,6 +53,13 @@ export function getNpmBin(): string {
 }
 
 /**
+ * Gets the npx binary name (npx or npx.cmd on Windows)
+ */
+export function getNpxBin(): string {
+  return npxBin
+}
+
+/**
  * Gets the npm-cli.js path in Electron environment, or null if not found
  * Should only be called when isElectronEnvironment() returns true
  */
@@ -74,54 +80,53 @@ export function getElectronNpm(): string | null {
 }
 
 /**
- * Gets the package root directory by resolving the package itself and walking up to find package.json
- * This works even when package.json is not in the exports field
+ * Attempts to find npx-cli.js on disk. Works in both regular Node.js and Electron.
+ *
+ * Tries three strategies:
+ * 1. Derive from process.execPath (standard Node.js installs, nvm, etc.)
+ * 2. Look alongside the npm binary found on PATH
+ * 3. Look inside Electron's app.asar.unpacked bundled npm (e.g. Creator Hub)
+ *
+ * Returns the absolute path to npx-cli.js, or null if not found.
  */
-export function getPackageRoot(workingDir: string, packageName: string): string {
-  try {
-    // Resolve the package itself (not package.json) to avoid exports field restrictions
-    const packagePath = require.resolve(packageName, { paths: [workingDir] })
+export function findNpxCliJs(): string | null {
+  const execDir = path.dirname(process.execPath)
 
-    // Walk up the directory tree to find package.json
-    let currentDir = path.dirname(packagePath)
-    const root = path.parse(currentDir).root
+  // Strategy 1: Derive from process.execPath
+  // Unix:    {prefix}/bin/node  -> {prefix}/lib/node_modules/npm/bin/npx-cli.js
+  // Windows: {prefix}/node.exe  -> {prefix}/node_modules/npm/bin/npx-cli.js
+  const execPathCandidates = [
+    path.join(execDir, '..', 'lib', 'node_modules', 'npm', 'bin', 'npx-cli.js'),
+    path.join(execDir, 'node_modules', 'npm', 'bin', 'npx-cli.js')
+  ]
 
-    while (currentDir !== root) {
-      if (fs.existsSync(path.join(currentDir, 'package.json'))) {
-        return currentDir
-      }
-      currentDir = path.dirname(currentDir)
+  for (const candidate of execPathCandidates) {
+    if (fs.existsSync(candidate)) {
+      return candidate
     }
-
-    throw new Error(`Could not find package.json for ${packageName}`)
-  } catch (error: any) {
-    throw new Error(`Could not resolve package root for ${packageName}: ${error.message}`)
-  }
-}
-
-/**
- * Reads package.json and extracts the bin entry path
- */
-export async function getPackageBinPath(
-  components: Pick<CliComponents, 'fs'>,
-  packageDir: string,
-  binName: string
-): Promise<string> {
-  const packageJson = await readJson<{ bin?: string | Record<string, string> }>(
-    components,
-    path.join(packageDir, 'package.json')
-  )
-
-  const binPath =
-    typeof packageJson.bin === 'string'
-      ? packageJson.bin
-      : typeof packageJson.bin === 'object' && packageJson.bin?.[binName]
-      ? packageJson.bin[binName]
-      : null
-
-  if (!binPath) {
-    throw new Error(`No bin entry found for "${binName}" in package.json`)
   }
 
-  return path.resolve(packageDir, binPath)
+  // Strategy 2: Find npx-cli.js next to npm on PATH
+  const npmPath =
+    process.env.PATH?.split(path.delimiter)
+      .map((dir) => path.join(dir, npmBin))
+      .find((npm) => fs.existsSync(npm)) || npmBin
+
+  if (fs.existsSync(npmPath)) {
+    const npxCliJs = path.join(path.dirname(npmPath), 'npx-cli.js')
+    if (fs.existsSync(npxCliJs)) {
+      return npxCliJs
+    }
+  }
+
+  // Strategy 3: Look in Electron's app.asar.unpacked bundled npm
+  const resourcesPath = (process as any).resourcesPath as string | undefined
+  if (resourcesPath) {
+    const npxCliJs = path.join(resourcesPath, 'app.asar.unpacked', 'node_modules', 'npm', 'bin', 'npx-cli.js')
+    if (fs.existsSync(npxCliJs)) {
+      return npxCliJs
+    }
+  }
+
+  return null
 }
