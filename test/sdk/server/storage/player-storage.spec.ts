@@ -1,5 +1,5 @@
 /**
- * Tests for player storage getKeys and getValues (list/prefix) methods.
+ * Tests for player storage getValues (list/prefix/pagination) method.
  * Mocks storage-url and utils so no real server or runtime is required.
  */
 const mockGetStorageServerUrl = jest.fn()
@@ -25,57 +25,6 @@ describe('player storage', () => {
     mockGetStorageServerUrl.mockResolvedValue(baseUrl)
   })
 
-  describe('getKeys', () => {
-    it('should request /players/:address/values and return keys when no prefix is passed', async () => {
-      const playerStorage = createPlayerStorage()
-      mockWrapSignedFetch.mockResolvedValue([
-        null,
-        {
-          data: [
-            { key: 'score', value: 100 },
-            { key: 'level', value: 5 }
-          ]
-        }
-      ])
-
-      const keys = await playerStorage.getKeys(address)
-
-      expect(mockWrapSignedFetch).toHaveBeenCalledWith({
-        url: `${baseUrl}/players/${encodeURIComponent(address)}/values`
-      })
-      expect(keys).toEqual(['score', 'level'])
-    })
-
-    it('should request /players/:address/values?prefix=... when prefix is passed', async () => {
-      const playerStorage = createPlayerStorage()
-      mockWrapSignedFetch.mockResolvedValue([
-        null,
-        {
-          data: [
-            { key: 'inv-item-1', value: {} },
-            { key: 'inv-item-2', value: {} }
-          ]
-        }
-      ])
-
-      const keys = await playerStorage.getKeys(address, 'inv-item-')
-
-      expect(mockWrapSignedFetch).toHaveBeenCalledWith({
-        url: `${baseUrl}/players/${encodeURIComponent(address)}/values?prefix=inv-item-`
-      })
-      expect(keys).toEqual(['inv-item-1', 'inv-item-2'])
-    })
-
-    it('should return empty array when the request fails', async () => {
-      const playerStorage = createPlayerStorage()
-      mockWrapSignedFetch.mockResolvedValue(['Not found', null])
-
-      const keys = await playerStorage.getKeys(address)
-
-      expect(keys).toEqual([])
-    })
-  })
-
   describe('getValues', () => {
     it('should request /players/:address/values and return entries when no prefix is passed', async () => {
       const playerStorage = createPlayerStorage()
@@ -85,12 +34,12 @@ describe('player storage', () => {
       ]
       mockWrapSignedFetch.mockResolvedValue([null, { data }])
 
-      const values = await playerStorage.getValues(address)
+      const result = await playerStorage.getValues(address)
 
       expect(mockWrapSignedFetch).toHaveBeenCalledWith({
         url: `${baseUrl}/players/${encodeURIComponent(address)}/values`
       })
-      expect(values).toEqual(data)
+      expect(result).toEqual({ data, pagination: { offset: 0, total: data.length } })
     })
 
     it('should request /players/:address/values?prefix=... and return matching entries when prefix is passed', async () => {
@@ -98,21 +47,47 @@ describe('player storage', () => {
       const data = [{ key: 'pref-x', value: true }]
       mockWrapSignedFetch.mockResolvedValue([null, { data }])
 
-      const values = await playerStorage.getValues(address, 'pref-')
+      const result = await playerStorage.getValues(address, { prefix: 'pref-' })
 
       expect(mockWrapSignedFetch).toHaveBeenCalledWith({
         url: `${baseUrl}/players/${encodeURIComponent(address)}/values?prefix=pref-`
       })
-      expect(values).toEqual(data)
+      expect(result).toEqual({ data, pagination: { offset: 0, total: data.length } })
+    })
+
+    it('should request /players/:address/values?limit=...&offset=... when limit and offset are passed', async () => {
+      const playerStorage = createPlayerStorage()
+      const data = [{ key: 'score', value: 100 }]
+      mockWrapSignedFetch.mockResolvedValue([null, { data, pagination: { offset: 10, total: 1 } }])
+
+      const result = await playerStorage.getValues(address, { limit: 10, offset: 10 })
+
+      expect(mockWrapSignedFetch).toHaveBeenCalledWith({
+        url: `${baseUrl}/players/${encodeURIComponent(address)}/values?limit=10&offset=10`
+      })
+      expect(result).toEqual({ data, pagination: { offset: 10, total: 1 } })
+    })
+
+    it('should request /players/:address/values?prefix=...&limit=...&offset=... when prefix, limit and offset are passed', async () => {
+      const playerStorage = createPlayerStorage()
+      const data: Array<{ key: string; value: unknown }> = []
+      mockWrapSignedFetch.mockResolvedValue([null, { data, pagination: { offset: 10, total: 0 } }])
+
+      const result = await playerStorage.getValues(address, { prefix: 'inv-', limit: 5, offset: 10 })
+
+      expect(mockWrapSignedFetch).toHaveBeenCalledWith({
+        url: `${baseUrl}/players/${encodeURIComponent(address)}/values?prefix=inv-&limit=5&offset=10`
+      })
+      expect(result).toEqual({ data: [], pagination: { offset: 10, total: 0 } })
     })
 
     it('should return empty array when the request fails', async () => {
       const playerStorage = createPlayerStorage()
       mockWrapSignedFetch.mockResolvedValue(['Error', null])
 
-      const values = await playerStorage.getValues(address)
+      const result = await playerStorage.getValues(address)
 
-      expect(values).toEqual([])
+      expect(result).toEqual({ data: [], pagination: { offset: 0, total: 0 } })
     })
   })
 })

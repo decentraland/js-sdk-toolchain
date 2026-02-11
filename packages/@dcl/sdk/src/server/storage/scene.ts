@@ -1,6 +1,6 @@
 import { getStorageServerUrl } from '../storage-url'
 import { assertIsServer, wrapSignedFetch } from '../utils'
-import { MODULE_NAME } from './constants'
+import { GetValuesOptions, GetValuesResult, MODULE_NAME } from './constants'
 
 /**
  * Scene-scoped storage interface for key-value pairs from the Server Side Storage service.
@@ -29,18 +29,12 @@ export interface ISceneStorage {
   delete(key: string): Promise<boolean>
 
   /**
-   * Returns all keys from scene storage, optionally filtered by prefix.
-   * @param prefix - Optional prefix; only keys that start with this string are returned. Omit to get all keys.
-   * @returns A promise that resolves to an array of key strings
+   * Returns key-value entries from scene storage, optionally filtered by prefix.
+   * Supports pagination via limit and offset.
+   * @param options - Optional { prefix, limit, offset } for filtering and pagination.
+   * @returns A promise that resolves to { data, pagination: { offset, total } } for pagination UI
    */
-  getKeys(prefix?: string): Promise<string[]>
-
-  /**
-   * Returns all key-value entries from scene storage, optionally filtered by prefix.
-   * @param prefix - Optional prefix; only entries whose key starts with this string are returned. Omit to get all.
-   * @returns A promise that resolves to an array of { key, value } entries
-   */
-  getValues(prefix?: string): Promise<Array<{ key: string; value: unknown }>>
+  getValues(options?: GetValuesOptions): Promise<GetValuesResult>
 }
 
 /**
@@ -113,45 +107,43 @@ export const createSceneStorage = (): ISceneStorage => {
       return true
     },
 
-    async getKeys(prefix?: string): Promise<string[]> {
+    async getValues(options?: GetValuesOptions): Promise<GetValuesResult> {
       assertIsServer(MODULE_NAME)
 
+      const { prefix, limit, offset } = options ?? {}
       const baseUrl = await getStorageServerUrl()
-      let url = `${baseUrl}/values`
+      const parts: string[] = []
 
-      if (prefix !== undefined && prefix !== '') {
-        url = `${url}?prefix=${encodeURIComponent(prefix)}`
+      if (!!prefix) {
+        parts.push(`prefix=${encodeURIComponent(prefix)}`)
       }
 
-      const [error, data] = await wrapSignedFetch<{ data: Array<{ key: string; value: unknown }> }>({ url })
-
-      if (error) {
-        console.error(`Failed to get storage keys: ${error}`)
-        return []
+      if (!!limit) {
+        parts.push(`limit=${limit}`)
       }
 
-      const entries = data?.data ?? []
-      return entries.map((entry) => entry.key)
-    },
-
-    async getValues(prefix?: string): Promise<Array<{ key: string; value: unknown }>> {
-      assertIsServer(MODULE_NAME)
-
-      const baseUrl = await getStorageServerUrl()
-      let url = `${baseUrl}/values`
-
-      if (prefix !== undefined && prefix !== '') {
-        url = `${url}?prefix=${encodeURIComponent(prefix)}`
+      if (!!offset) {
+        parts.push(`offset=${offset}`)
       }
 
-      const [error, data] = await wrapSignedFetch<{ data: Array<{ key: string; value: unknown }> }>({ url })
+      const query = parts.join('&')
+      const url = query ? `${baseUrl}/values?${query}` : `${baseUrl}/values`
+
+      const [error, response] = await wrapSignedFetch<GetValuesResult>({ url })
 
       if (error) {
         console.error(`Failed to get storage values: ${error}`)
-        return []
+        return { data: [], pagination: { offset: 0, total: 0 } }
       }
 
-      return data?.data ?? []
+      const data = response?.data ?? []
+      const requestedOffset = offset ?? 0
+      const pagination = {
+        offset: response?.pagination?.offset ?? requestedOffset,
+        total: response?.pagination?.total ?? data.length
+      }
+
+      return { data, pagination }
     }
   }
 }

@@ -1,7 +1,8 @@
 import { createSceneStorage, ISceneStorage } from './scene'
 import { createPlayerStorage, IPlayerStorage } from './player'
 
-// Re-export interfaces
+// Re-export interfaces and types
+export { GetValuesOptions, GetValuesResult } from './constants'
 export { ISceneStorage } from './scene'
 export { IPlayerStorage } from './player'
 
@@ -25,7 +26,6 @@ const createStorage = (): IStorage => {
     get: sceneStorage.get,
     set: sceneStorage.set,
     delete: sceneStorage.delete,
-    getKeys: sceneStorage.getKeys,
     getValues: sceneStorage.getValues,
     // Keep player as nested property
     player: playerStorage
@@ -36,8 +36,8 @@ const createStorage = (): IStorage => {
  * Storage provides methods to store and retrieve key-value data from the
  * Server Side Storage service.
  *
- * - Use Storage.get/set/delete for scene-scoped storage
- * - Use Storage.player.get/set/delete for player-scoped storage
+ * - Use Storage.get/set/delete/getValues for scene-scoped storage
+ * - Use Storage.player.get/set/delete/getValues for player-scoped storage
  *
  * This module only works when running on server-side scenes.
  */

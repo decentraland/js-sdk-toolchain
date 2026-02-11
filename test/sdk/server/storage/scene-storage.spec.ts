@@ -1,5 +1,5 @@
 /**
- * Tests for scene storage getKeys and getValues (list/prefix) methods.
+ * Tests for scene storage getValues (list/prefix/pagination) method.
  * Mocks storage-url and utils so no real server or runtime is required.
  */
 const mockGetStorageServerUrl = jest.fn()
@@ -24,64 +24,6 @@ describe('scene storage', () => {
     mockGetStorageServerUrl.mockResolvedValue(baseUrl)
   })
 
-  describe('getKeys', () => {
-    it('should request /values and return keys when no prefix is passed', async () => {
-      const storage = createSceneStorage()
-      mockWrapSignedFetch.mockResolvedValue([
-        null,
-        {
-          data: [
-            { key: 'a', value: 1 },
-            { key: 'b', value: 2 }
-          ]
-        }
-      ])
-
-      const keys = await storage.getKeys()
-
-      expect(mockWrapSignedFetch).toHaveBeenCalledWith({ url: `${baseUrl}/values` })
-      expect(keys).toEqual(['a', 'b'])
-    })
-
-    it('should request /values?prefix=... and return matching keys when prefix is passed', async () => {
-      const storage = createSceneStorage()
-      mockWrapSignedFetch.mockResolvedValue([
-        null,
-        {
-          data: [
-            { key: 'some-prefix-1', value: 10 },
-            { key: 'some-prefix-2', value: 20 }
-          ]
-        }
-      ])
-
-      const keys = await storage.getKeys('some-prefix')
-
-      expect(mockWrapSignedFetch).toHaveBeenCalledWith({
-        url: `${baseUrl}/values?prefix=some-prefix`
-      })
-      expect(keys).toEqual(['some-prefix-1', 'some-prefix-2'])
-    })
-
-    it('should return empty array when the request fails', async () => {
-      const storage = createSceneStorage()
-      mockWrapSignedFetch.mockResolvedValue(['Network error', null])
-
-      const keys = await storage.getKeys()
-
-      expect(keys).toEqual([])
-    })
-
-    it('should return empty array when data is missing', async () => {
-      const storage = createSceneStorage()
-      mockWrapSignedFetch.mockResolvedValue([null, {}])
-
-      const keys = await storage.getKeys()
-
-      expect(keys).toEqual([])
-    })
-  })
-
   describe('getValues', () => {
     it('should request /values and return entries when no prefix is passed', async () => {
       const storage = createSceneStorage()
@@ -91,10 +33,10 @@ describe('scene storage', () => {
       ]
       mockWrapSignedFetch.mockResolvedValue([null, { data }])
 
-      const values = await storage.getValues()
+      const result = await storage.getValues()
 
       expect(mockWrapSignedFetch).toHaveBeenCalledWith({ url: `${baseUrl}/values` })
-      expect(values).toEqual(data)
+      expect(result).toEqual({ data, pagination: { offset: 0, total: data.length } })
     })
 
     it('should request /values?prefix=... and return matching entries when prefix is passed', async () => {
@@ -105,21 +47,47 @@ describe('scene storage', () => {
       ]
       mockWrapSignedFetch.mockResolvedValue([null, { data }])
 
-      const values = await storage.getValues('player-')
+      const result = await storage.getValues({ prefix: 'player-' })
 
       expect(mockWrapSignedFetch).toHaveBeenCalledWith({
         url: `${baseUrl}/values?prefix=player-`
       })
-      expect(values).toEqual(data)
+      expect(result).toEqual({ data, pagination: { offset: 0, total: data.length } })
+    })
+
+    it('should request /values?limit=...&offset=... when limit and offset are passed', async () => {
+      const storage = createSceneStorage()
+      const data = [{ key: 'a', value: 1 }]
+      mockWrapSignedFetch.mockResolvedValue([null, { data, pagination: { offset: 10, total: 1 } }])
+
+      const result = await storage.getValues({ limit: 10, offset: 10 })
+
+      expect(mockWrapSignedFetch).toHaveBeenCalledWith({
+        url: `${baseUrl}/values?limit=10&offset=10`
+      })
+      expect(result).toEqual({ data, pagination: { offset: 10, total: 1 } })
+    })
+
+    it('should request /values?prefix=...&limit=...&offset=... when prefix, limit and offset are passed', async () => {
+      const storage = createSceneStorage()
+      const data: Array<{ key: string; value: unknown }> = []
+      mockWrapSignedFetch.mockResolvedValue([null, { data, pagination: { offset: 10, total: 0 } }])
+
+      const result = await storage.getValues({ prefix: 'pref-', limit: 5, offset: 10 })
+
+      expect(mockWrapSignedFetch).toHaveBeenCalledWith({
+        url: `${baseUrl}/values?prefix=pref-&limit=5&offset=10`
+      })
+      expect(result).toEqual({ data: [], pagination: { offset: 10, total: 0 } })
     })
 
     it('should return empty array when the request fails', async () => {
       const storage = createSceneStorage()
       mockWrapSignedFetch.mockResolvedValue(['Server error', null])
 
-      const values = await storage.getValues()
+      const result = await storage.getValues()
 
-      expect(values).toEqual([])
+      expect(result).toEqual({ data: [], pagination: { offset: 0, total: 0 } })
     })
   })
 })
