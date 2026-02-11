@@ -697,6 +697,7 @@ export const componentDefinitionByName: {
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
     "core::NftShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBNftShape>>;
+    "core::PhysicsImpulse": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPhysicsImpulse>>;
     "core::PlayerIdentityData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>>;
     "core::PointerEvents": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerEvents>>;
     "core::PointerEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBPointerEventsResult>>;
@@ -2982,6 +2983,20 @@ export namespace PBNftShape {
 }
 
 // @public (undocumented)
+export interface PBPhysicsImpulse {
+    direction: PBVector3 | undefined;
+    timestamp: number;
+}
+
+// @public (undocumented)
+export namespace PBPhysicsImpulse {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPhysicsImpulse;
+    // (undocumented)
+    export function encode(message: PBPhysicsImpulse, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBPlayerIdentityData {
     address: string;
     // (undocumented)
@@ -3718,6 +3733,9 @@ export namespace PBVisibilityComponent {
     // (undocumented)
     export function encode(message: PBVisibilityComponent, writer?: _m0.Writer): _m0.Writer;
 }
+
+// @public (undocumented)
+export const PhysicsImpulse: LastWriteWinElementSetComponentDefinition<PBPhysicsImpulse>;
 
 // @public
 export namespace Plane {
