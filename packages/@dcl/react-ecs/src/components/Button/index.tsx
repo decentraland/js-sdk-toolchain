@@ -65,7 +65,7 @@ export function Button(props: UiButtonProps) {
 
   // Apply default uiTransform values for border properties
   const uiTransformProps = parseUiTransform({
-    borderRadius: 15,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: DEFAULT_BORDER_COLOR,
     height: 36,

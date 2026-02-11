@@ -50,7 +50,7 @@ export function Input(props: EntityPropTypes & Partial<UiInputProps>) {
 
   // Apply default uiTransform values for border properties
   const uiTransformWithDefaults = {
-    borderRadius: 15,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: DEFAULT_BORDER_COLOR,
     ...uiTransform
