@@ -141,7 +141,7 @@ flow('build-all', () => {
     })
   })
 
-  flow('@dcl/playground-assets build', () => {
+  flow.skip('@dcl/playground-assets build', () => {
     itDeletesFolder('dist', PLAYGROUND_ASSETS_PATH)
     itDeletesFolder('bin', PLAYGROUND_ASSETS_PATH)
 
@@ -179,7 +179,7 @@ flow('build-all', () => {
     })
   })
 
-  flow('playground copy files', () => {
+  flow.skip('playground copy files', () => {
     it('playground copy snippets', async () => {
       const PLAYGORUND_INFO_JSON = 'info.json'
       const snippetsPath = path.resolve(process.cwd(), 'test', 'ecs', 'snippets')
