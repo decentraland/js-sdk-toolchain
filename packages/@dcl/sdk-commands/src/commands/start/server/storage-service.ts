@@ -7,6 +7,7 @@ import {
   getMergedEnv,
   setEnvValue,
   deleteEnvValue,
+  loadServerStorage,
   getWorldValue,
   setWorldValue,
   deleteWorldValue,
@@ -81,6 +82,20 @@ export function setupStorageEndpoints(
     }
   })
 
+  // Scene Storage list endpoint (GET /values, optional ?prefix=)
+  router.get('/values', async (ctx) => {
+    const prefix = ctx.url.searchParams.get('prefix')
+
+    const storage = await loadServerStorage(components)
+    let entries = Object.entries(storage.world).map(([key, value]) => ({ key, value }))
+
+    if (prefix !== null && prefix !== '') {
+      entries = entries.filter((entry) => entry.key.startsWith(prefix))
+    }
+
+    return { body: JSON.stringify({ data: entries }) }
+  })
+
   // Scene Storage endpoints (/values/:key)
   router.get('/values/:key', withKeyValidation, async (ctx) => {
     const { key } = ctx.params
@@ -116,6 +131,22 @@ export function setupStorageEndpoints(
       components.logger.error(`Failed to delete storage value '${key}': ${error}`)
       return { status: 500, body: { message: `Failed to delete storage value '${key}'` } }
     }
+  })
+
+  // Player Storage list endpoint (GET /players/:address/values, optional ?prefix=)
+  router.get('/players/:address/values', withAddressValidation, async (ctx) => {
+    const { address } = ctx.params
+    const prefix = ctx.url.searchParams.get('prefix')
+
+    const storage = await loadServerStorage(components)
+    const playerData = storage.players[address] ?? {}
+    let entries = Object.entries(playerData).map(([key, value]) => ({ key, value }))
+
+    if (prefix !== null && prefix !== '') {
+      entries = entries.filter((entry) => entry.key.startsWith(prefix))
+    }
+
+    return { body: JSON.stringify({ data: entries }) }
   })
 
   // Player Storage endpoints (/players/:address/values/:key)

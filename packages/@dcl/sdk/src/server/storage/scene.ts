@@ -27,6 +27,20 @@ export interface ISceneStorage {
    * @returns A promise that resolves to true if deleted, false if not found
    */
   delete(key: string): Promise<boolean>
+
+  /**
+   * Returns all keys from scene storage, optionally filtered by prefix.
+   * @param prefix - Optional prefix; only keys that start with this string are returned. Omit to get all keys.
+   * @returns A promise that resolves to an array of key strings
+   */
+  getKeys(prefix?: string): Promise<string[]>
+
+  /**
+   * Returns all key-value entries from scene storage, optionally filtered by prefix.
+   * @param prefix - Optional prefix; only entries whose key starts with this string are returned. Omit to get all.
+   * @returns A promise that resolves to an array of { key, value } entries
+   */
+  getValues(prefix?: string): Promise<Array<{ key: string; value: unknown }>>
 }
 
 /**
@@ -97,6 +111,47 @@ export const createSceneStorage = (): ISceneStorage => {
       }
 
       return true
+    },
+
+    async getKeys(prefix?: string): Promise<string[]> {
+      assertIsServer(MODULE_NAME)
+
+      const baseUrl = await getStorageServerUrl()
+      let url = `${baseUrl}/values`
+
+      if (prefix !== undefined && prefix !== '') {
+        url = `${url}?prefix=${encodeURIComponent(prefix)}`
+      }
+
+      const [error, data] = await wrapSignedFetch<{ data: Array<{ key: string; value: unknown }> }>({ url })
+
+      if (error) {
+        console.error(`Failed to get storage keys: ${error}`)
+        return []
+      }
+
+      const entries = data?.data ?? []
+      return entries.map((entry) => entry.key)
+    },
+
+    async getValues(prefix?: string): Promise<Array<{ key: string; value: unknown }>> {
+      assertIsServer(MODULE_NAME)
+
+      const baseUrl = await getStorageServerUrl()
+      let url = `${baseUrl}/values`
+
+      if (prefix !== undefined && prefix !== '') {
+        url = `${url}?prefix=${encodeURIComponent(prefix)}`
+      }
+
+      const [error, data] = await wrapSignedFetch<{ data: Array<{ key: string; value: unknown }> }>({ url })
+
+      if (error) {
+        console.error(`Failed to get storage values: ${error}`)
+        return []
+      }
+
+      return data?.data ?? []
     }
   }
 }

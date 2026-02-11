@@ -25,6 +25,8 @@ const createStorage = (): IStorage => {
     get: sceneStorage.get,
     set: sceneStorage.set,
     delete: sceneStorage.delete,
+    getKeys: sceneStorage.getKeys,
+    getValues: sceneStorage.getValues,
     // Keep player as nested property
     player: playerStorage
   }

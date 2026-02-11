@@ -31,6 +31,22 @@ export interface IPlayerStorage {
    * @returns A promise that resolves to true if deleted, false if not found
    */
   delete(address: string, key: string): Promise<boolean>
+
+  /**
+   * Returns all keys from a player's storage, optionally filtered by prefix.
+   * @param address - The player's wallet address
+   * @param prefix - Optional prefix; only keys that start with this string are returned. Omit to get all keys.
+   * @returns A promise that resolves to an array of key strings
+   */
+  getKeys(address: string, prefix?: string): Promise<string[]>
+
+  /**
+   * Returns all key-value entries from a player's storage, optionally filtered by prefix.
+   * @param address - The player's wallet address
+   * @param prefix - Optional prefix; only entries whose key starts with this string are returned. Omit to get all.
+   * @returns A promise that resolves to an array of { key, value } entries
+   */
+  getValues(address: string, prefix?: string): Promise<Array<{ key: string; value: unknown }>>
 }
 
 /**
@@ -101,6 +117,46 @@ export const createPlayerStorage = (): IPlayerStorage => {
       }
 
       return true
+    },
+
+    async getKeys(address: string, prefix?: string): Promise<string[]> {
+      assertIsServer(MODULE_NAME)
+
+      const baseUrl = await getStorageServerUrl()
+      let url = `${baseUrl}/players/${encodeURIComponent(address)}/values`
+
+      if (prefix !== undefined && prefix !== '') {
+        url = `${url}?prefix=${encodeURIComponent(prefix)}`
+      }
+
+      const [error, data] = await wrapSignedFetch<{ data: Array<{ key: string; value: unknown }> }>({ url })
+
+      if (error) {
+        console.error(`Failed to get player storage keys for '${address}': ${error}`)
+        return []
+      }
+
+      const entries = data?.data ?? []
+      return entries.map((entry) => entry.key)
+    },
+
+    async getValues(address: string, prefix?: string): Promise<Array<{ key: string; value: unknown }>> {
+      assertIsServer(MODULE_NAME)
+
+      const baseUrl = await getStorageServerUrl()
+      let url = `${baseUrl}/players/${encodeURIComponent(address)}/values`
+      if (prefix !== undefined && prefix !== '') {
+        url = `${url}?prefix=${encodeURIComponent(prefix)}`
+      }
+
+      const [error, data] = await wrapSignedFetch<{ data: Array<{ key: string; value: unknown }> }>({ url })
+
+      if (error) {
+        console.error(`Failed to get player storage values for '${address}': ${error}`)
+        return []
+      }
+
+      return data?.data ?? []
     }
   }
 }
