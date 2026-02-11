@@ -38,7 +38,7 @@ export const args = declareArgs({
   '-b': '--no-browser'
 })
 
-const DEFAULT_SERVER = 'https://multiplayer-server.decentraland.zone'
+const DEFAULT_SERVER = 'https://multiplayer-server.decentraland.org'
 
 export function help(options: Options) {
   options.components.logger.log(`
