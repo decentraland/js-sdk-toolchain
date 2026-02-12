@@ -218,11 +218,11 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     })
   }
 
-  function removePointerEvent(entity: Entity, type: PointerEventType, button: InputAction) {
+  function removePointerEvent(entity: Entity, type: PointerEventType, button: InputAction, interactionType: InteractionType = InteractionType.CURSOR) {
     const pointerEvent = PointerEvents.getMutableOrNull(entity)
     if (!pointerEvent) return
     pointerEvent.pointerEvents = pointerEvent.pointerEvents.filter(
-      (pointer) => !(pointer.eventInfo?.button === button && pointer.eventType === type)
+      (pointer) => !(pointer.eventInfo?.button === button && pointer.eventType === type && pointer.interactionType === interactionType)
     )
   }
 
@@ -241,7 +241,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     return PointerEventType.PET_DOWN
   }
 
-  function removeEvent(entity: Entity, type: EventType) {
+  function removeEvent(entity: Entity, type: EventType, interactionType: InteractionType = InteractionType.CURSOR) {
     const event = getEvent(entity)
     const pointerEvent = event.get(type)
 
@@ -325,6 +325,42 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     setPointerEvent(entity, PointerEventType.PET_HOVER_LEAVE, options)
   }
 
+  const onProximityDown: PointerEventsSystem['onProximityDown'] = (...args) => {
+    const [data, cb] = args
+    const { entity, opts } = data
+    const options = getDefaultOpts(opts)
+    removeEvent(entity, EventType.Down, InteractionType.PROXIMITY)
+    getEvent(entity).set(EventType.Down, { cb, opts: options })
+    setPointerEvent(entity, PointerEventType.PET_DOWN, options, InteractionType.PROXIMITY)
+  }
+
+  const onProximityUp: PointerEventsSystem['onProximityUp'] = (...args) => {
+    const [data, cb] = args
+    const { entity, opts } = data
+    const options = getDefaultOpts(opts)
+    removeEvent(entity, EventType.Up, InteractionType.PROXIMITY)
+    getEvent(entity).set(EventType.Up, { cb, opts: options })
+    setPointerEvent(entity, PointerEventType.PET_UP, options, InteractionType.PROXIMITY)
+  }
+
+  const onProximityEnter: PointerEventsSystem['onProximityEnter'] = (...args) => {
+    const [data, cb] = args
+    const { entity, opts } = data
+    const options = getDefaultOpts(opts)
+    removeEvent(entity, EventType.ProximityEnter, InteractionType.PROXIMITY)
+    getEvent(entity).set(EventType.ProximityEnter, { cb, opts: options })
+    setPointerEvent(entity, PointerEventType.PET_PROXIMITY_ENTER, options, InteractionType.PROXIMITY)
+  }
+
+  const onProximityLeave: PointerEventsSystem['onProximityLeave'] = (...args) => {
+    const [data, cb] = args
+    const { entity, opts } = data
+    const options = getDefaultOpts(opts)
+    removeEvent(entity, EventType.ProximityLeave, InteractionType.PROXIMITY)
+    getEvent(entity).set(EventType.ProximityLeave, { cb, opts: options })
+    setPointerEvent(entity, PointerEventType.PET_PROXIMITY_LEAVE, options, InteractionType.PROXIMITY)
+  }
+  
   return {
     removeOnClick(entity: Entity) {
       removeEvent(entity, EventType.Click)
@@ -346,6 +382,22 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
       removeEvent(entity, EventType.HoverLeave)
     },
 
+    removeOnProximityDown(entity: Entity) {
+      removeEvent(entity, EventType.Down, InteractionType.PROXIMITY)
+    },
+
+    removeOnProximityUp(entity: Entity) {
+      removeEvent(entity, EventType.Up, InteractionType.PROXIMITY)
+    },
+
+    removeOnProximityEnter(entity: Entity) {
+      removeEvent(entity, EventType.ProximityEnter, InteractionType.PROXIMITY)
+    },
+
+    removeOnProximityLeave(entity: Entity) {
+      removeEvent(entity, EventType.ProximityLeave, InteractionType.PROXIMITY)
+    },
+
     onClick(value, cb) {
       const { entity } = value
       const options = getDefaultOpts(value.opts)
@@ -360,6 +412,10 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     onPointerDown,
     onPointerUp,
     onPointerHoverEnter,
-    onPointerHoverLeave
+    onPointerHoverLeave,
+    onProximityDown,
+    onProximityUp,
+    onProximityEnter,
+    onProximityLeave
   }
 }
