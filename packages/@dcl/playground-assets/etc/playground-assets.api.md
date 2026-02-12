@@ -697,6 +697,7 @@ export const componentDefinitionByName: {
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
     "core::NftShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBNftShape>>;
+    "core::PhysicsForce": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPhysicsForce>>;
     "core::PhysicsImpulse": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPhysicsImpulse>>;
     "core::PlayerIdentityData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>>;
     "core::PointerEvents": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerEvents>>;
@@ -2983,6 +2984,19 @@ export namespace PBNftShape {
 }
 
 // @public (undocumented)
+export interface PBPhysicsForce {
+    direction: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBPhysicsForce {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPhysicsForce;
+    // (undocumented)
+    export function encode(message: PBPhysicsForce, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBPhysicsImpulse {
     direction: PBVector3 | undefined;
     timestamp: number;
@@ -3733,6 +3747,9 @@ export namespace PBVisibilityComponent {
     // (undocumented)
     export function encode(message: PBVisibilityComponent, writer?: _m0.Writer): _m0.Writer;
 }
+
+// @public (undocumented)
+export const PhysicsForce: LastWriteWinElementSetComponentDefinition<PBPhysicsForce>;
 
 // @public (undocumented)
 export const PhysicsImpulse: LastWriteWinElementSetComponentDefinition<PBPhysicsImpulse>;
