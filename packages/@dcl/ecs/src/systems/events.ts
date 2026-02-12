@@ -24,12 +24,10 @@ export type EventSystemOptions = {
   showHighlight?: boolean
   maxPlayerDistance?: number
   priority?: number
-  interactionType?: InteractionType
 }
 
 export const getDefaultOpts = (opts: Partial<EventSystemOptions> = {}): EventSystemOptions => ({
   button: InputAction.IA_ANY,
-  interactionType: InteractionType.CURSOR,
   ...opts
 })
 
@@ -70,6 +68,34 @@ export interface PointerEventsSystem {
    * @param entity - Entity where the callback was attached
    */
   removeOnPointerHoverLeave(entity: Entity): void
+
+  /**
+   * @public
+   * Remove the callback for onProximityDown event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnProximityDown(entity: Entity): void
+
+  /**
+   * @public
+   * Remove the callback for onProximityUp event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnProximityUp(entity: Entity): void
+
+  /**
+   * @public
+   * Remove the callback for onProximityEnter event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnProximityEnter(entity: Entity): void
+
+  /**
+   * @public
+   * Remove the callback for onProximityLeave event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnProximityLeave(entity: Entity): void
 
   /**
    * @internal
@@ -129,6 +155,26 @@ export interface PointerEventsSystem {
     pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> },
     cb: EventSystemCallback
   ): void
+
+  /**
+   * @public
+   * Execute callback when the user presses the proximity button on the entity
+   * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
+   * @param cb - Function to execute when click fires
+   */
+  onProximityDown(pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
+
+  /**
+   * @public
+   * Execute callback when the user releases the proximity button on the entity
+   * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
+   * @param cb - Function to execute when click fires
+   */
+  onProximityUp(pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
+
+  onProximityEnter(pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
+
+  onProximityLeave(pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
 }
 
 /**
@@ -143,7 +189,9 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     Down,
     Up,
     HoverEnter,
-    HoverLeave
+    HoverLeave,
+    ProximityEnter,
+    ProximityLeave
   }
   type EventMapType = Map<EventType, { cb: EventSystemCallback; opts: EventSystemOptions }>
 
@@ -153,7 +201,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     return eventsMap.get(entity) || eventsMap.set(entity, new Map()).get(entity)!
   }
 
-  function setPointerEvent(entity: Entity, type: PointerEventType, opts: EventSystemOptions) {
+  function setPointerEvent(entity: Entity, type: PointerEventType, opts: EventSystemOptions, interactionType: InteractionType = InteractionType.CURSOR) {
     const pointerEvent = PointerEvents.getMutableOrNull(entity) || PointerEvents.create(entity)
     pointerEvent.pointerEvents.push({
       eventType: type,
@@ -166,7 +214,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
         maxPlayerDistance: opts.maxPlayerDistance,
         priority: opts.priority
       },
-      interactionType: opts.interactionType ?? InteractionType.CURSOR
+      interactionType: interactionType ?? InteractionType.CURSOR
     })
   }
 
@@ -185,6 +233,10 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
       return PointerEventType.PET_HOVER_LEAVE
     } else if (eventType === EventType.HoverEnter) {
       return PointerEventType.PET_HOVER_ENTER
+    } else if (eventType === EventType.ProximityEnter) {
+      return PointerEventType.PET_PROXIMITY_ENTER
+    } else if (eventType === EventType.ProximityLeave) {
+      return PointerEventType.PET_PROXIMITY_LEAVE
     }
     return PointerEventType.PET_DOWN
   }
@@ -218,7 +270,9 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
           eventType === EventType.Down ||
           eventType === EventType.Up ||
           eventType === EventType.HoverEnter ||
-          eventType === EventType.HoverLeave
+          eventType === EventType.HoverLeave ||
+          eventType === EventType.ProximityEnter ||
+          eventType === EventType.ProximityLeave
         ) {
           const command = inputSystem.getInputCommand(opts.button, getPointerEvent(eventType), entity)
           if (command) {
