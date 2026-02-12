@@ -1210,7 +1210,6 @@ export type EventSystemOptions = {
     showHighlight?: boolean;
     maxPlayerDistance?: number;
     priority?: number;
-    interactionType?: InteractionType;
 };
 
 // @public
@@ -3796,10 +3795,32 @@ export interface PointerEventsSystem {
     }, cb: EventSystemCallback): void;
     // @deprecated (undocumented)
     onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
+    onProximityDown(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
+    // (undocumented)
+    onProximityEnter(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
+    // (undocumented)
+    onProximityLeave(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
+    onProximityUp(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
     removeOnPointerDown(entity: Entity): void;
     removeOnPointerHoverEnter(entity: Entity): void;
     removeOnPointerHoverLeave(entity: Entity): void;
     removeOnPointerUp(entity: Entity): void;
+    removeOnProximityDown(entity: Entity): void;
+    removeOnProximityEnter(entity: Entity): void;
+    removeOnProximityLeave(entity: Entity): void;
+    removeOnProximityUp(entity: Entity): void;
 }
 
 // @public
@@ -3813,6 +3834,10 @@ export const enum PointerEventType {
     PET_HOVER_ENTER = 2,
     // (undocumented)
     PET_HOVER_LEAVE = 3,
+    // (undocumented)
+    PET_PROXIMITY_ENTER = 4,
+    // (undocumented)
+    PET_PROXIMITY_LEAVE = 5,
     // (undocumented)
     PET_UP = 0
 }
