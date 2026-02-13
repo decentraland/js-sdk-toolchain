@@ -3,13 +3,14 @@ on:
     branches:
       - main
       - experimental
+      - auth-server
   pull_request:
   release:
     types:
       - created
 
 env:
-  BRANCH_TAG: ${{ github.ref_name == 'experimental' && 'experimental' || '' }}
+  BRANCH_TAG: ${{ github.ref_name == 'experimental' && 'experimental' || github.ref_name == 'auth-server' && 'auth-server' || '' }}
 
 name: CI
 jobs:
