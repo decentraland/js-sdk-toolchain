@@ -114,11 +114,7 @@ export function addSyncTransport(
   // End add sync transport
 
   // Receive & Process CRDT_STATE
-  // Only the server should respond to state requests. Non-server responses are
-  // always discarded by clients (sender !== AUTH_SERVER_PEER_ID check), and they
-  // previously caused race conditions by interfering with the retry mechanism.
   binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, async (data, sender) => {
-    if (!isServerAtom.getOrNull()) return
     DEBUG_NETWORK_MESSAGES() && console.log('[REQ_CRDT_STATE]', sender, Date.now())
     for (const chunk of engineToCrdt(engine)) {
       DEBUG_NETWORK_MESSAGES() && console.log('[Emiting:]', sender, Date.now())
@@ -126,13 +122,9 @@ export function addSyncTransport(
     }
   })
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, async (data, sender) => {
-    // Only process responses from the authoritative server.
-    // Non-server responses must NOT reset requestingState, otherwise the retry
-    // mechanism is disabled and state sync can get stuck with 3+ participants.
-    if (isServerAtom.getOrNull() || sender !== AUTH_SERVER_PEER_ID) return
-
     requestingState = false
     elapsedTimeSinceRequest = 0
+    if (isServerAtom.getOrNull() || sender !== AUTH_SERVER_PEER_ID) return
     DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength / 1024, 'KB')
     transport.onmessage!(serverValidator.processClientMessages(data, sender))
     stateIsSyncronized = true
@@ -229,13 +221,6 @@ export function addSyncTransport(
         isRoomReadyAtom.swap(true)
       }
       // For clients, room will be marked ready after receiving CRDT state (above)
-
-      // Client fallback: if state was already synced but room wasn't ready when
-      // RES_CRDT_STATE arrived, mark room ready now that RealmInfo has updated
-      if (!isServer && stateIsSyncronized && checkRoomReady(value) && isRoomReadyAtom.getOrNull() === false) {
-        DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady] Client marking room as ready after RealmInfo update')
-        isRoomReadyAtom.swap(true)
-      }
     }
   })
 
