@@ -1,6 +1,6 @@
 import { getStorageServerUrl } from '../storage-url'
 import { assertIsServer, wrapSignedFetch } from '../utils'
-import { MODULE_NAME } from './constants'
+import { GetValuesOptions, GetValuesResult, MODULE_NAME } from './constants'
 
 /**
  * Scene-scoped storage interface for key-value pairs from the Server Side Storage service.
@@ -27,6 +27,14 @@ export interface ISceneStorage {
    * @returns A promise that resolves to true if deleted, false if not found
    */
   delete(key: string): Promise<boolean>
+
+  /**
+   * Returns key-value entries from scene storage, optionally filtered by prefix.
+   * Supports pagination via limit and offset.
+   * @param options - Optional { prefix, limit, offset } for filtering and pagination.
+   * @returns A promise that resolves to { data, pagination: { offset, total } } for pagination UI
+   */
+  getValues(options?: GetValuesOptions): Promise<GetValuesResult>
 }
 
 /**
@@ -97,6 +105,45 @@ export const createSceneStorage = (): ISceneStorage => {
       }
 
       return true
+    },
+
+    async getValues(options?: GetValuesOptions): Promise<GetValuesResult> {
+      assertIsServer(MODULE_NAME)
+
+      const { prefix, limit, offset } = options ?? {}
+      const baseUrl = await getStorageServerUrl()
+      const parts: string[] = []
+
+      if (!!prefix) {
+        parts.push(`prefix=${encodeURIComponent(prefix)}`)
+      }
+
+      if (!!limit) {
+        parts.push(`limit=${limit}`)
+      }
+
+      if (!!offset) {
+        parts.push(`offset=${offset}`)
+      }
+
+      const query = parts.join('&')
+      const url = query ? `${baseUrl}/values?${query}` : `${baseUrl}/values`
+
+      const [error, response] = await wrapSignedFetch<GetValuesResult>({ url })
+
+      if (error) {
+        console.error(`Failed to get storage values: ${error}`)
+        return { data: [], pagination: { offset: 0, total: 0 } }
+      }
+
+      const data = response?.data ?? []
+      const requestedOffset = offset ?? 0
+      const pagination = {
+        offset: response?.pagination?.offset ?? requestedOffset,
+        total: response?.pagination?.total ?? data.length
+      }
+
+      return { data, pagination }
     }
   }
 }
