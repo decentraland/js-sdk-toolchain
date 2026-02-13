@@ -7,6 +7,7 @@ import {
   getMergedEnv,
   setEnvValue,
   deleteEnvValue,
+  loadServerStorage,
   getWorldValue,
   setWorldValue,
   deleteWorldValue,
@@ -81,6 +82,27 @@ export function setupStorageEndpoints(
     }
   })
 
+  // Scene Storage list endpoint (GET /values, optional ?prefix=&limit=&offset=)
+  router.get('/values', async (ctx) => {
+    const prefix = ctx.url.searchParams.get('prefix')
+    const limitParam = ctx.url.searchParams.get('limit')
+    const offsetParam = ctx.url.searchParams.get('offset')
+
+    const storage = await loadServerStorage(components)
+    let entries = Object.entries(storage.world).map(([key, value]) => ({ key, value }))
+
+    if (prefix !== null && prefix !== '') {
+      entries = entries.filter((entry) => entry.key.startsWith(prefix))
+    }
+
+    const total = entries.length
+    const offset = offsetParam !== null ? Math.max(0, parseInt(offsetParam, 10) || 0) : 0
+    const limit = limitParam !== null ? Math.max(1, parseInt(limitParam, 10) || 0) : entries.length
+    const paginatedEntries = limit > 0 ? entries.slice(offset, offset + limit) : entries.slice(offset)
+
+    return { body: JSON.stringify({ data: paginatedEntries, pagination: { offset, total } }) }
+  })
+
   // Scene Storage endpoints (/values/:key)
   router.get('/values/:key', withKeyValidation, async (ctx) => {
     const { key } = ctx.params
@@ -116,6 +138,29 @@ export function setupStorageEndpoints(
       components.logger.error(`Failed to delete storage value '${key}': ${error}`)
       return { status: 500, body: { message: `Failed to delete storage value '${key}'` } }
     }
+  })
+
+  // Player Storage list endpoint (GET /players/:address/values, optional ?prefix=&limit=&offset=)
+  router.get('/players/:address/values', withAddressValidation, async (ctx) => {
+    const { address } = ctx.params
+    const prefix = ctx.url.searchParams.get('prefix')
+    const limitParam = ctx.url.searchParams.get('limit')
+    const offsetParam = ctx.url.searchParams.get('offset')
+
+    const storage = await loadServerStorage(components)
+    const playerData = storage.players[address] ?? {}
+    let entries = Object.entries(playerData).map(([key, value]) => ({ key, value }))
+
+    if (prefix !== null && prefix !== '') {
+      entries = entries.filter((entry) => entry.key.startsWith(prefix))
+    }
+
+    const total = entries.length
+    const offset = offsetParam !== null ? Math.max(0, parseInt(offsetParam, 10) || 0) : 0
+    const limit = limitParam !== null ? Math.max(1, parseInt(limitParam, 10) || 0) : entries.length
+    const paginatedEntries = limit > 0 ? entries.slice(offset, offset + limit) : entries.slice(offset)
+
+    return { body: JSON.stringify({ data: paginatedEntries, pagination: { offset, total } }) }
   })
 
   // Player Storage endpoints (/players/:address/values/:key)
