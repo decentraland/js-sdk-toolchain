@@ -122,9 +122,10 @@ export function addSyncTransport(
     }
   })
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, async (data, sender) => {
+    if (isServerAtom.getOrNull() || sender !== AUTH_SERVER_PEER_ID) return
+
     requestingState = false
     elapsedTimeSinceRequest = 0
-    if (isServerAtom.getOrNull() || sender !== AUTH_SERVER_PEER_ID) return
     DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength / 1024, 'KB')
     transport.onmessage!(serverValidator.processClientMessages(data, sender))
     stateIsSyncronized = true
