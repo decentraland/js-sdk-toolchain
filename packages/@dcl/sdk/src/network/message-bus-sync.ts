@@ -130,13 +130,10 @@ export function addSyncTransport(
     transport.onmessage!(serverValidator.processClientMessages(data, sender))
     stateIsSyncronized = true
 
-    // IMPORTANT: Only mark room as ready AFTER state is synchronized
-    // This ensures comms is truly connected and working
-    const realmInfo = RealmInfo.getOrNull(engine.RootEntity)
-    if (realmInfo && checkRoomReady(realmInfo)) {
-      DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady] Marking room as ready after state sync')
-      isRoomReadyAtom.swap(true)
-    }
+    // Mark room as ready: receiving RES_CRDT_STATE from the server proves
+    // bidirectional comms is working (we sent REQ, server sent RES, we received it).
+    DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady] Marking room as ready after state sync')
+    isRoomReadyAtom.swap(true)
   })
 
   // received message from the network
@@ -202,13 +199,11 @@ export function addSyncTransport(
     const isServer = isServerAtom.getOrNull()
 
     if (!value?.isConnectedSceneRoom) {
-      // Only react when actually transitioning from ready to not ready
-      if (isRoomReadyAtom.getOrNull() === true) {
-        DEBUG_NETWORK_MESSAGES() && console.log('Disconnected from comms')
-        isRoomReadyAtom.swap(false)
-        if (!isServer) {
-          stateIsSyncronized = false
-        }
+      DEBUG_NETWORK_MESSAGES() && console.log('Disconnected from comms')
+      isRoomReadyAtom.swap(false)
+      if (!isServer) {
+        stateIsSyncronized = false
+        requestingState = false
       }
     }
 
@@ -222,13 +217,6 @@ export function addSyncTransport(
         isRoomReadyAtom.swap(true)
       }
       // For clients, room will be marked ready after receiving CRDT state (above)
-
-      // Client fallback: state synced but checkRoomReady was false when RES_CRDT_STATE
-      // arrived (e.g. realmInfo.room not set yet). Now RealmInfo has updated.
-      if (!isServer && stateIsSyncronized && checkRoomReady(value) && isRoomReadyAtom.getOrNull() === false) {
-        DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady] Client marking room as ready after RealmInfo update')
-        isRoomReadyAtom.swap(true)
-      }
     }
   })
 
@@ -266,9 +254,7 @@ export function addSyncTransport(
     }
   }
 
-  // System to retry state request if no response is received within the retry interval.
-  // Also runs a recovery check: when connected + state synced + room ready but isRoomReadyAtom
-  // is false (e.g. checkRoomReady was false at sync time, or returning to scene with reused entities).
+  // System to retry state request if no response is received within the retry interval
   engine.addSystem((dt: number) => {
     if (requestingState && !stateIsSyncronized) {
       elapsedTimeSinceRequest += dt
@@ -277,16 +263,6 @@ export function addSyncTransport(
         elapsedTimeSinceRequest = 0
         requestingState = false
         requestState()
-      }
-    }
-
-    // Recovery: when connected + state synced + room ready but isRoomReadyAtom is false
-    const isServer = isServerAtom.getOrNull()
-    if (!isServer && stateIsSyncronized && isRoomReadyAtom.getOrNull() === false) {
-      const realmInfo = RealmInfo.getOrNull(engine.RootEntity)
-      if (realmInfo && checkRoomReady(realmInfo)) {
-        DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady] Recovery: marking room as ready')
-        isRoomReadyAtom.swap(true)
       }
     }
   })
