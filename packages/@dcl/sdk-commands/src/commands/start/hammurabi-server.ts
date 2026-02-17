@@ -4,7 +4,6 @@ import { printProgressInfo, printWarning } from '../../logic/beautiful-logs'
 import { colors } from '../../components/log'
 import { PreviewComponents } from './types'
 import { ProjectUnion } from '../../logic/project-validations'
-import { SceneWithMultiplayer } from '../../logic/scene-validations'
 import { isElectronEnvironment, getSpawnEnv, findNpxCliJs, getNpxBin } from './utils'
 
 const HAMMURABI_PACKAGE = '@dcl/hammurabi-server'
@@ -77,25 +76,20 @@ export function startHammurabiServer(
 }
 
 /**
- * Spawns the multiplayer server if the project requires it.
+ * Spawns the multiplayer server for the project.
+ * In the auth-server SDK, all scenes are authoritative multiplayer.
  * Uses npx to handle installation and execution in a single step (works in Electron).
  *
  * @param components - Preview components including logger
- * @param project - The project to check for authoritative multiplayer support
+ * @param project - The project to start the multiplayer server for
  * @param realm - The realm URL to pass to the hammurabi server
  * @returns The ChildProcess if started, undefined otherwise
  */
-export function spawnMultiplayerIfNeeded(
+export function spawnAuthServer(
   components: PreviewComponents,
   project: ProjectUnion,
   realm: string
 ): ChildProcess | undefined {
-  // Check if this is an authoritative multiplayer scene
-  const sceneWithMultiplayer = project.scene as SceneWithMultiplayer
-  if (!sceneWithMultiplayer.authoritativeMultiplayer) {
-    return undefined
-  }
-
   try {
     return startHammurabiServer(components, project.workingDirectory, realm)
   } catch (error: any) {
