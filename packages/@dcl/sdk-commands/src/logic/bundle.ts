@@ -157,6 +157,22 @@ export async function bundleProject(components: BundleComponents, options: Compi
     })
   }
 
+  // Auto-add authoritativeMultiplayer flag to scene.json for all scene builds
+  if (!options.single) {
+    const sceneJsonPath = path.join(options.workingDirectory, 'scene.json')
+    try {
+      const raw = await components.fs.readFile(sceneJsonPath, 'utf-8')
+      const parsed = JSON.parse(raw)
+      if (!parsed.authoritativeMultiplayer) {
+        parsed.authoritativeMultiplayer = true
+        await components.fs.writeFile(sceneJsonPath, JSON.stringify(parsed, null, 2))
+        printProgressInfo(components.logger, `Added ${colors.bold('authoritativeMultiplayer: true')} to scene.json`)
+      }
+    } catch (_) {
+      // scene.json read/write failed — skip silently
+    }
+  }
+
   return { sceneJson, inputs }
 }
 

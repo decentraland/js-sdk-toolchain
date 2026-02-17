@@ -29,7 +29,7 @@ import { Result } from 'arg'
 import { startValidations } from '../../logic/project-validations'
 import { runExplorerAlpha } from './explorer-alpha'
 import { getLanUrl } from './utils'
-import { spawnMultiplayerIfNeeded } from './hammurabi-server'
+import { spawnAuthServer } from './hammurabi-server'
 import { ChildProcess } from 'child_process'
 
 interface Options {
@@ -221,7 +221,7 @@ export async function main(options: Options) {
       const project = workspace.projects[0]
       if (project) {
         const realm = `http://localhost:${port}`
-        hammurabiServer = await spawnMultiplayerIfNeeded(components, project, realm)
+        hammurabiServer = spawnAuthServer(components, project, realm)
 
         // Register cleanup handler for hammurabi server
         if (hammurabiServer) {
