@@ -198,7 +198,7 @@ export function addSyncTransport(
   RealmInfo.onChange(engine.RootEntity, (value) => {
     const isServer = isServerAtom.getOrNull()
 
-    if (!value?.isConnectedSceneRoom) {
+    if (!value?.isConnectedSceneRoom && isRoomReadyAtom.getOrNull() === true) {
       DEBUG_NETWORK_MESSAGES() && console.log('Disconnected from comms')
       isRoomReadyAtom.swap(false)
       if (!isServer) {
