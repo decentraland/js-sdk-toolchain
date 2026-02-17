@@ -180,20 +180,10 @@ export const AvatarAttach: LastWriteWinElementSetComponentDefinition<PBAvatarAtt
 export const AvatarBase: LastWriteWinElementSetComponentDefinition<PBAvatarBase>;
 
 // @public (undocumented)
-export const enum AvatarControlType {
-    CCT_NONE = 0,
-    CCT_RELATIVE = 1,
-    CCT_TANK = 2
-}
-
-// @public (undocumented)
 export const AvatarEmoteCommand: GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>;
 
 // @public (undocumented)
 export const AvatarEquippedData: LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>;
-
-// @public (undocumented)
-export const AvatarLocomotionSettings: LastWriteWinElementSetComponentDefinition<PBAvatarLocomotionSettings>;
 
 // @public (undocumented)
 export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>;
@@ -202,34 +192,6 @@ export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAva
 export const enum AvatarModifierType {
     AMT_DISABLE_PASSPORTS = 1,
     AMT_HIDE_AVATARS = 0
-}
-
-// @public (undocumented)
-export const AvatarMovement: LastWriteWinElementSetComponentDefinition<PBAvatarMovement>;
-
-// @public (undocumented)
-export const AvatarMovementInfo: LastWriteWinElementSetComponentDefinition<PBAvatarMovementInfo>;
-
-// @public (undocumented)
-export interface AvatarMovementSettings {
-    allowWeightedMovement?: boolean | undefined;
-    // (undocumented)
-    controlMode?: AvatarControlType | undefined;
-    friction?: number | undefined;
-    gravity?: number | undefined;
-    jumpHeight?: number | undefined;
-    maxFallSpeed?: number | undefined;
-    runSpeed?: number | undefined;
-    turnSpeed?: number | undefined;
-    walkSpeed?: number | undefined;
-}
-
-// @public (undocumented)
-export namespace AvatarMovementSettings {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): AvatarMovementSettings;
-    // (undocumented)
-    export function encode(message: AvatarMovementSettings, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -449,12 +411,6 @@ export interface ByteBuffer {
 export type Callback = () => void;
 
 // @public (undocumented)
-export const CameraLayer: LastWriteWinElementSetComponentDefinition<PBCameraLayer>;
-
-// @public (undocumented)
-export const CameraLayers: LastWriteWinElementSetComponentDefinition<PBCameraLayers>;
-
-// @public (undocumented)
 export const CameraMode: LastWriteWinElementSetComponentDefinition<PBCameraMode>;
 
 // @public (undocumented)
@@ -501,29 +457,6 @@ export const enum CameraType {
 //
 // @public (undocumented)
 export type Children = ReactEcs.JSX.ReactNode;
-
-// @public (undocumented)
-export interface CinematicSettings {
-    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-    allowManualRotation?: boolean | undefined;
-    cameraEntity: number;
-    pitchRange?: number | undefined;
-    rollRange?: number | undefined;
-    yawRange?: number | undefined;
-    zoomMax?: number | undefined;
-    zoomMin?: number | undefined;
-}
-
-// @public (undocumented)
-export namespace CinematicSettings {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): CinematicSettings;
-    // (undocumented)
-    export function encode(message: CinematicSettings, writer?: _m0.Writer): _m0.Writer;
-}
 
 // @public (undocumented)
 export const enum ColliderLayer {
@@ -749,23 +682,15 @@ export const componentDefinitionByName: {
     "core::AvatarBase": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarBase>>;
     "core::AvatarEmoteCommand": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>>;
     "core::AvatarEquippedData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>>;
-    "core::AvatarLocomotionSettings": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarLocomotionSettings>>;
     "core::AvatarModifierArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>>;
-    "core::AvatarMovement": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarMovement>>;
-    "core::AvatarMovementInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarMovementInfo>>;
     "core::AvatarShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarShape>>;
     "core::Billboard": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBBillboard>>;
-    "core::CameraLayer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraLayer>>;
-    "core::CameraLayers": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraLayers>>;
     "core::CameraMode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraMode>>;
     "core::CameraModeArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraModeArea>>;
     "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
-    "core::GlobalLight": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGlobalLight>>;
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
-    "core::GltfNode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNode>>;
     "core::GltfNodeModifiers": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNodeModifiers>>;
-    "core::GltfNodeState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNodeState>>;
     "core::InputModifier": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBInputModifier>>;
     "core::LightSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBLightSource>>;
     "core::MainCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMainCamera>>;
@@ -783,20 +708,17 @@ export const componentDefinitionByName: {
     "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
     "core::SkyboxTime": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSkyboxTime>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
-    "core::TextureCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextureCamera>>;
     "core::TriggerArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTriggerArea>>;
     "core::TriggerAreaResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBTriggerAreaResult>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
     "core::TweenSequence": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenSequence>>;
     "core::TweenState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTweenState>>;
     "core::UiBackground": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiBackground>>;
-    "core::UiCanvas": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiCanvas>>;
     "core::UiCanvasInformation": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiCanvasInformation>>;
     "core::UiDropdown": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdown>>;
     "core::UiDropdownResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdownResult>>;
     "core::UiInput": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInput>>;
     "core::UiInputResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInputResult>>;
-    "core::UiScrollResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiScrollResult>>;
     "core::UiText": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiText>>;
     "core::UiTransform": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiTransform>>;
     "core::VideoEvent": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBVideoEvent>>;
@@ -1385,9 +1307,6 @@ export type GlobalDirectionRaycastSystemOptions = {
     direction?: PBVector3;
 };
 
-// @public (undocumented)
-export const GlobalLight: LastWriteWinElementSetComponentDefinition<PBGlobalLight>;
-
 // Warning: (ae-missing-release-tag) "GlobalTargetRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -1407,23 +1326,7 @@ export const GltfContainer: LastWriteWinElementSetComponentDefinition<PBGltfCont
 export const GltfContainerLoadingState: LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>;
 
 // @public (undocumented)
-export const GltfNode: LastWriteWinElementSetComponentDefinition<PBGltfNode>;
-
-// @public (undocumented)
 export const GltfNodeModifiers: LastWriteWinElementSetComponentDefinition<PBGltfNodeModifiers>;
-
-// @public (undocumented)
-export const GltfNodeState: LastWriteWinElementSetComponentDefinition<PBGltfNodeState>;
-
-// @public (undocumented)
-export const enum GltfNodeStateValue {
-    // (undocumented)
-    GNSV_FAILED = 1,
-    // (undocumented)
-    GNSV_PENDING = 0,
-    // (undocumented)
-    GNSV_READY = 2
-}
 
 // @public (undocumented)
 export interface GrowOnlyValueSetComponentDefinition<T> extends BaseComponent<T> {
@@ -2338,19 +2241,6 @@ export const onVideoEvent: Observable<{
     totalVideoLength: number;
 }>;
 
-// @public (undocumented)
-export interface Orthographic {
-    verticalRange?: number | undefined;
-}
-
-// @public (undocumented)
-export namespace Orthographic {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): Orthographic;
-    // (undocumented)
-    export function encode(message: Orthographic, writer?: _m0.Writer): _m0.Writer;
-}
-
 // @public
 export type OverflowType = 'hidden' | 'scroll' | 'visible';
 
@@ -2523,7 +2413,6 @@ export namespace PBAvatarEmoteCommand {
 export interface PBAvatarEquippedData {
     // (undocumented)
     emoteUrns: string[];
-    forceRender: string[];
     // (undocumented)
     wearableUrns: string[];
 }
@@ -2537,31 +2426,10 @@ export namespace PBAvatarEquippedData {
 }
 
 // @public (undocumented)
-export interface PBAvatarLocomotionSettings {
-    hardLandingCooldown?: number | undefined;
-    jogSpeed?: number | undefined;
-    jumpHeight?: number | undefined;
-    runJumpHeight?: number | undefined;
-    runSpeed?: number | undefined;
-    walkSpeed?: number | undefined;
-}
-
-// @public (undocumented)
-export namespace PBAvatarLocomotionSettings {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarLocomotionSettings;
-    // (undocumented)
-    export function encode(message: PBAvatarLocomotionSettings, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
 export interface PBAvatarModifierArea {
     area: PBVector3 | undefined;
     excludeIds: string[];
     modifiers: AvatarModifierType[];
-    // (undocumented)
-    movementSettings?: AvatarMovementSettings | undefined;
-    useColliderRange?: boolean | undefined;
 }
 
 // @public (undocumented)
@@ -2573,47 +2441,12 @@ export namespace PBAvatarModifierArea {
 }
 
 // @public (undocumented)
-export interface PBAvatarMovement {
-    // (undocumented)
-    groundDirection?: PBVector3 | undefined;
-    orientation: number;
-    // (undocumented)
-    velocity: PBVector3 | undefined;
-}
-
-// @public (undocumented)
-export namespace PBAvatarMovement {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarMovement;
-    // (undocumented)
-    export function encode(message: PBAvatarMovement, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
-export interface PBAvatarMovementInfo {
-    actualVelocity: PBVector3 | undefined;
-    externalVelocity: PBVector3 | undefined;
-    previousStepTime: number;
-    requestedVelocity: PBVector3 | undefined;
-    stepTime: number;
-}
-
-// @public (undocumented)
-export namespace PBAvatarMovementInfo {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarMovementInfo;
-    // (undocumented)
-    export function encode(message: PBAvatarMovementInfo, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
 export interface PBAvatarShape {
     bodyShape?: string | undefined;
     emotes: string[];
     expressionTriggerId?: string | undefined;
     expressionTriggerTimestamp?: number | undefined;
     eyeColor?: PBColor3 | undefined;
-    forceRender: string[];
     hairColor?: PBColor3 | undefined;
     id: string;
     name?: string | undefined;
@@ -2645,42 +2478,6 @@ export namespace PBBillboard {
 }
 
 // @public (undocumented)
-export interface PBCameraLayer {
-    // (undocumented)
-    ambientBrightnessOverride?: number | undefined;
-    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-    ambientColorOverride?: PBColor3 | undefined;
-    directionalLight?: boolean | undefined;
-    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-    layer: number;
-    showAvatars?: boolean | undefined;
-    showFog?: boolean | undefined;
-    showSkybox?: boolean | undefined;
-}
-
-// @public (undocumented)
-export namespace PBCameraLayer {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBCameraLayer;
-    // (undocumented)
-    export function encode(message: PBCameraLayer, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
-export interface PBCameraLayers {
-    // (undocumented)
-    layers: number[];
-}
-
-// @public (undocumented)
-export namespace PBCameraLayers {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBCameraLayers;
-    // (undocumented)
-    export function encode(message: PBCameraLayers, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
 export interface PBCameraMode {
     mode: CameraType;
 }
@@ -2696,10 +2493,7 @@ export namespace PBCameraMode {
 // @public (undocumented)
 export interface PBCameraModeArea {
     area: PBVector3 | undefined;
-    // (undocumented)
-    cinematicSettings?: CinematicSettings | undefined;
     mode: CameraType;
-    useColliderRange?: boolean | undefined;
 }
 
 // @public (undocumented)
@@ -2764,21 +2558,6 @@ export namespace PBEngineInfo {
 }
 
 // @public (undocumented)
-export interface PBGlobalLight {
-    ambientBrightness?: number | undefined;
-    ambientColor?: PBColor3 | undefined;
-    direction?: PBVector3 | undefined;
-}
-
-// @public (undocumented)
-export namespace PBGlobalLight {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGlobalLight;
-    // (undocumented)
-    export function encode(message: PBGlobalLight, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
 export interface PBGltfContainer {
     invisibleMeshesCollisionMask?: number | undefined;
     src: string;
@@ -2795,13 +2574,8 @@ export namespace PBGltfContainer {
 
 // @public (undocumented)
 export interface PBGltfContainerLoadingState {
-    animationNames: string[];
     // (undocumented)
     currentState: LoadingState;
-    materialNames: string[];
-    meshNames: string[];
-    nodePaths: string[];
-    skinNames: string[];
 }
 
 // @public (undocumented)
@@ -2810,19 +2584,6 @@ export namespace PBGltfContainerLoadingState {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfContainerLoadingState;
     // (undocumented)
     export function encode(message: PBGltfContainerLoadingState, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
-export interface PBGltfNode {
-    path: string;
-}
-
-// @public (undocumented)
-export namespace PBGltfNode {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfNode;
-    // (undocumented)
-    export function encode(message: PBGltfNode, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2852,22 +2613,6 @@ export namespace PBGltfNodeModifiers_GltfNodeModifier {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfNodeModifiers_GltfNodeModifier;
     // (undocumented)
     export function encode(message: PBGltfNodeModifiers_GltfNodeModifier, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
-export interface PBGltfNodeState {
-    // (undocumented)
-    error?: string | undefined;
-    // (undocumented)
-    state: GltfNodeStateValue;
-}
-
-// @public (undocumented)
-export namespace PBGltfNodeState {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBGltfNodeState;
-    // (undocumented)
-    export function encode(message: PBGltfNodeState, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2978,7 +2723,6 @@ export namespace PBMainCamera {
 
 // @public (undocumented)
 export interface PBMaterial {
-    gltf?: PBMaterial_GltfMaterial | undefined;
     // (undocumented)
     material?: {
         $case: "unlit";
@@ -2995,22 +2739,6 @@ export namespace PBMaterial {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMaterial;
     // (undocumented)
     export function encode(message: PBMaterial, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
-export interface PBMaterial_GltfMaterial {
-    // (undocumented)
-    gltfSrc: string;
-    // (undocumented)
-    name: string;
-}
-
-// @public (undocumented)
-export namespace PBMaterial_GltfMaterial {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMaterial_GltfMaterial;
-    // (undocumented)
-    export function encode(message: PBMaterial_GltfMaterial, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3074,9 +2802,6 @@ export interface PBMeshCollider {
     } | {
         $case: "plane";
         plane: PBMeshCollider_PlaneMesh;
-    } | {
-        $case: "gltf";
-        gltf: PBMeshCollider_GltfMesh;
     } | undefined;
 }
 
@@ -3112,20 +2837,6 @@ export namespace PBMeshCollider_CylinderMesh {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshCollider_CylinderMesh;
     // (undocumented)
     export function encode(message: PBMeshCollider_CylinderMesh, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
-export interface PBMeshCollider_GltfMesh {
-    gltfSrc: string;
-    name: string;
-}
-
-// @public (undocumented)
-export namespace PBMeshCollider_GltfMesh {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshCollider_GltfMesh;
-    // (undocumented)
-    export function encode(message: PBMeshCollider_GltfMesh, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3167,9 +2878,6 @@ export interface PBMeshRenderer {
     } | {
         $case: "plane";
         plane: PBMeshRenderer_PlaneMesh;
-    } | {
-        $case: "gltf";
-        gltf: PBMeshRenderer_GltfMesh;
     } | undefined;
 }
 
@@ -3206,20 +2914,6 @@ export namespace PBMeshRenderer_CylinderMesh {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshRenderer_CylinderMesh;
     // (undocumented)
     export function encode(message: PBMeshRenderer_CylinderMesh, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
-export interface PBMeshRenderer_GltfMesh {
-    gltfSrc: string;
-    name: string;
-}
-
-// @public (undocumented)
-export namespace PBMeshRenderer_GltfMesh {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBMeshRenderer_GltfMesh;
-    // (undocumented)
-    export function encode(message: PBMeshRenderer_GltfMesh, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3427,11 +3121,9 @@ export interface PBRaycast {
         $case: "targetEntity";
         targetEntity: number;
     } | undefined;
-    includeWorld?: boolean | undefined;
     maxDistance: number;
     originOffset?: PBVector3 | undefined;
     queryType: RaycastQueryType;
-    shape?: RaycastShape | undefined;
     timestamp?: number | undefined;
 }
 
@@ -3524,32 +3216,6 @@ export namespace PBTextShape {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTextShape;
     // (undocumented)
     export function encode(message: PBTextShape, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
-export interface PBTextureCamera {
-    clearColor?: PBColor4 | undefined;
-    farPlane?: number | undefined;
-    height?: number | undefined;
-    layer?: number | undefined;
-    // (undocumented)
-    mode?: {
-        $case: "perspective";
-        perspective: Perspective;
-    } | {
-        $case: "orthographic";
-        orthographic: Orthographic;
-    } | undefined;
-    volume?: number | undefined;
-    width?: number | undefined;
-}
-
-// @public (undocumented)
-export namespace PBTextureCamera {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTextureCamera;
-    // (undocumented)
-    export function encode(message: PBTextureCamera, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3693,23 +3359,6 @@ export namespace PBUiBackground {
 }
 
 // @public (undocumented)
-export interface PBUiCanvas {
-    color?: PBColor4 | undefined;
-    // (undocumented)
-    height: number;
-    // (undocumented)
-    width: number;
-}
-
-// @public (undocumented)
-export namespace PBUiCanvas {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiCanvas;
-    // (undocumented)
-    export function encode(message: PBUiCanvas, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
 export interface PBUiCanvasInformation {
     devicePixelRatio: number;
     height: number;
@@ -3803,26 +3452,10 @@ export namespace PBUiInputResult {
 }
 
 // @public (undocumented)
-export interface PBUiScrollResult {
-    // (undocumented)
-    value: PBVector2 | undefined;
-}
-
-// @public (undocumented)
-export namespace PBUiScrollResult {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiScrollResult;
-    // (undocumented)
-    export function encode(message: PBUiScrollResult, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
 export interface PBUiText {
     color?: PBColor4 | undefined;
     font?: Font | undefined;
     fontSize?: number | undefined;
-    outlineColor?: PBColor4 | undefined;
-    outlineWidth?: number | undefined;
     textAlign?: TextAlignMode | undefined;
     textWrap?: TextWrap | undefined;
     value: string;
@@ -3873,7 +3506,6 @@ export interface PBUiTransform {
     borderTopWidth?: number | undefined;
     borderTopWidthUnit?: YGUnit | undefined;
     display: YGDisplay;
-    elementId?: string | undefined;
     // (undocumented)
     flexBasis: number;
     flexBasisUnit: YGUnit;
@@ -3942,8 +3574,6 @@ export interface PBUiTransform {
     positionType: YGPositionType;
     // (undocumented)
     rightOf: number;
-    scrollPosition?: ScrollPositionValue | undefined;
-    scrollVisible?: ShowScrollBar | undefined;
     // (undocumented)
     width: number;
     widthUnit: YGUnit;
@@ -4063,19 +3693,6 @@ export namespace PBVisibilityComponent {
     export function encode(message: PBVisibilityComponent, writer?: _m0.Writer): _m0.Writer;
 }
 
-// @public (undocumented)
-export interface Perspective {
-    fieldOfView?: number | undefined;
-}
-
-// @public (undocumented)
-export namespace Perspective {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): Perspective;
-    // (undocumented)
-    export function encode(message: Perspective, writer?: _m0.Writer): _m0.Writer;
-}
-
 // @public
 export namespace Plane {
     // (undocumented)
@@ -4155,12 +3772,6 @@ export const enum PointerEventType {
     // (undocumented)
     PET_DOWN = 1,
     // (undocumented)
-    PET_DRAG = 5,
-    // (undocumented)
-    PET_DRAG_END = 6,
-    // (undocumented)
-    PET_DRAG_LOCKED = 4,
-    // (undocumented)
     PET_HOVER_ENTER = 2,
     // (undocumented)
     PET_HOVER_LEAVE = 3,
@@ -4185,13 +3796,7 @@ export const PointerLock: LastWriteWinElementSetComponentDefinition<PBPointerLoc
 // @public (undocumented)
 export const enum PointerType {
     POT_MOUSE = 1,
-    POT_NONE = 0,
-    // (undocumented)
-    POT_PAD = 2,
-    // (undocumented)
-    POT_TOUCH = 3,
-    // (undocumented)
-    POT_WAND = 4
+    POT_NONE = 0
 }
 
 // @public
@@ -4383,12 +3988,6 @@ export const enum RaycastQueryType {
 export const RaycastResult: LastWriteWinElementSetComponentDefinition<PBRaycastResult>;
 
 // @public (undocumented)
-export const enum RaycastShape {
-    RS_AVATAR = 1,
-    RS_RAY = 0
-}
-
-// @public (undocumented)
 export interface RaycastSystem {
     globalDirectionOptions(options?: Partial<GlobalDirectionRaycastOptions>): RaycastSystemOptions;
     globalTargetOptions(options?: Partial<GlobalTargetRaycastOptions>): RaycastSystemOptions;
@@ -4477,7 +4076,7 @@ export namespace ReactEcs {
     useEffect: EffectHook;
     const // (undocumented)
     useState: StateHook;
-        {};
+    export {};
 }
 
 // Warning: (tsdoc-at-sign-in-word) The "@" character looks like part of a TSDoc tag; use a backslash to escape it
@@ -4742,38 +4341,6 @@ export namespace Schemas {
 }
 
 // @public (undocumented)
-export interface ScrollPositionValue {
-    // (undocumented)
-    value?: {
-        $case: "position";
-        position: PBVector2;
-    } | {
-        $case: "reference";
-        reference: string;
-    } | undefined;
-}
-
-// @public (undocumented)
-export namespace ScrollPositionValue {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): ScrollPositionValue;
-    // (undocumented)
-    export function encode(message: ScrollPositionValue, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
-export const enum ShowScrollBar {
-    // (undocumented)
-    SSB_BOTH = 0,
-    // (undocumented)
-    SSB_HIDDEN = 3,
-    // (undocumented)
-    SSB_ONLY_HORIZONTAL = 2,
-    // (undocumented)
-    SSB_ONLY_VERTICAL = 1
-}
-
-// @public (undocumented)
 export const SkyboxTime: LastWriteWinElementSetComponentDefinition<PBSkyboxTime>;
 
 // @public (undocumented)
@@ -4887,9 +4454,6 @@ export namespace Texture {
 }
 
 // @public (undocumented)
-export const TextureCamera: LastWriteWinElementSetComponentDefinition<PBTextureCamera>;
-
-// @public (undocumented)
 export const enum TextureFilterMode {
     // (undocumented)
     TFM_BILINEAR = 1,
@@ -4968,9 +4532,6 @@ export interface TextureUnion {
     } | {
         $case: "videoTexture";
         videoTexture: VideoTexture;
-    } | {
-        $case: "uiTexture";
-        uiTexture: UiCanvasTexture;
     } | undefined;
 }
 
@@ -5240,26 +4801,7 @@ export interface UiButtonProps extends UiLabelProps, EntityPropTypes {
 }
 
 // @public (undocumented)
-export const UiCanvas: LastWriteWinElementSetComponentDefinition<PBUiCanvas>;
-
-// @public (undocumented)
 export const UiCanvasInformation: LastWriteWinElementSetComponentDefinition<PBUiCanvasInformation>;
-
-// @public (undocumented)
-export interface UiCanvasTexture {
-    filterMode?: TextureFilterMode | undefined;
-    // (undocumented)
-    uiCanvasEntity: number;
-    wrapMode?: TextureWrapMode | undefined;
-}
-
-// @public (undocumented)
-export namespace UiCanvasTexture {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): UiCanvasTexture;
-    // (undocumented)
-    export function encode(message: UiCanvasTexture, writer?: _m0.Writer): _m0.Writer;
-}
 
 // @public (undocumented)
 export type UiComponent = () => ReactEcs.JSX.ReactNode;
@@ -5328,9 +4870,6 @@ export type UiRendererOptions = {
     virtualWidth: number;
     virtualHeight: number;
 };
-
-// @public (undocumented)
-export const UiScrollResult: LastWriteWinElementSetComponentDefinition<PBUiScrollResult>;
 
 // @public (undocumented)
 export const UiText: LastWriteWinElementSetComponentDefinition<PBUiText>;

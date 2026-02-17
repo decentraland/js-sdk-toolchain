@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=509.7k bytes
+SCENE_COMPILED_JS_SIZE_PROD=508.6k bytes
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -10,9 +10,9 @@ EVAL test/snapshots/development-bundles/two-way-crdt.test.js
   REQUIRE: ~system/Testing
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-  OPCODES ~= 71k
-  MALLOC_COUNT = 15517
-  ALIVE_OBJS_DELTA ~= 3.13k
+  OPCODES ~= 55k
+  MALLOC_COUNT = 15421
+  ALIVE_OBJS_DELTA ~= 3.06k
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=1 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
@@ -23,7 +23,7 @@ CALL onUpdate(0)
    ~system/Testing: plan {"tests":[{"name":"two way communication"}]}
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=2 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
-  OPCODES ~= 4k
+  OPCODES ~= 5k
   MALLOC_COUNT = 15
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
@@ -35,7 +35,7 @@ CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   LOG: ["Adding one to position.y=1"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=4 data={"position":{"x":2,"y":1,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
-  OPCODES ~= 11k
+  OPCODES ~= 10k
   MALLOC_COUNT = 51
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
@@ -61,7 +61,7 @@ CALL onUpdate(0.1)
   ~system/Testing: logTestResult {"name":"two way communication","ok":true,"totalFrames":3,"totalTime":0.30000000000000004}
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=8 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 4k
+  OPCODES ~= 5k
   MALLOC_COUNT = -40
   ALIVE_OBJS_DELTA ~= -0.01k
-  MEMORY_USAGE_COUNT ~= 1327.84k bytes
+  MEMORY_USAGE_COUNT ~= 1309.07k bytes
