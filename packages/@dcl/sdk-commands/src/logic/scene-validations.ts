@@ -12,11 +12,10 @@ import { printWarning } from './beautiful-logs'
 
 /**
  * Extended Scene type that includes authoritativeMultiplayer flag
- * for enabling Authoritative Server integration and multiplayerId for server logs.
+ * for enabling Authoritative Server integration.
  */
 export type SceneWithMultiplayer = Scene & {
   authoritativeMultiplayer?: boolean
-  multiplayerId?: string
 }
 
 export interface IFile {

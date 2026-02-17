@@ -9,7 +9,6 @@ import { Router } from '@well-known-components/http-server'
 
 import { declareArgs } from '../../logic/args'
 import { CliComponents } from '../../components'
-import { CliError } from '../../logic/error'
 import { printError } from '../../logic/beautiful-logs'
 import { createWallet } from '../../logic/account'
 import { createAuthChainHeaders } from '../../logic/auth-chain-headers'
@@ -27,8 +26,6 @@ export const args = declareArgs({
   '--help': Boolean,
   '-h': '--help',
   '--dir': String,
-  '--multiplayerId': String,
-  '-m': '--multiplayerId',
   '--target': String,
   '-t': '--target',
   '--port': Number,
@@ -44,11 +41,12 @@ export function help(options: Options) {
   options.components.logger.log(`
   Usage: 'sdk-commands sdk-server-logs [options]'
     Streams real-time logs from the multiplayer server for your scene.
-    Requires --multiplayerId parameter or a scene.json with multiplayerId.
+    The scene identifier is automatically determined from scene.json:
+      - Worlds: uses worldConfiguration.name
+      - Genesis city scenes: uses scene.base parcel
 
     Options:
       -h, --help                     Displays complete help
-      -m, --multiplayerId   [id]     Multiplayer server ID (required, or uses scene.json)
       -t, --target          [URL]   Target multiplayer server URL (default: ${DEFAULT_SERVER})
       --dir                 [path]  Path to the project directory
       -p, --port            [port]  Select a custom port for the linker dApp
@@ -56,18 +54,14 @@ export function help(options: Options) {
       --https                       Use HTTPS for the linker dApp
 
     Examples:
-    - View logs using multiplayerId from scene.json:
+    - View logs for your scene (run from project directory):
       $ sdk-commands sdk-server-logs
 
-    - View logs for a specific multiplayer ID:
-      $ sdk-commands sdk-server-logs --multiplayerId my-multiplayer-id
-      $ sdk-commands sdk-server-logs -m my-multiplayer-id
-
     - Connect to local development server:
-      $ sdk-commands sdk-server-logs --multiplayerId my-id --target http://localhost:8000
+      $ sdk-commands sdk-server-logs --target http://localhost:8000
 
     - Use private key for authentication (no browser):
-      $ DCL_PRIVATE_KEY=0x... sdk-commands sdk-server-logs --multiplayerId my-id
+      $ DCL_PRIVATE_KEY=0x... sdk-commands sdk-server-logs
 `)
 }
 
@@ -109,7 +103,7 @@ async function getAddressAndSignature(
   components: CliComponents,
   awaitResponse: IFuture<void>,
   payload: string,
-  multiplayerId: string,
+  sceneIdentifier: string,
   targetUrl: string,
   linkOptions: Omit<dAppOptions, 'uri'>,
   signCallback: (response: LinkerResponse) => Promise<void>
@@ -136,7 +130,7 @@ async function getAddressAndSignature(
     skipValidations: true,
     debug: !!process.env.DEBUG,
     isWorld: true,
-    world: multiplayerId,
+    world: sceneIdentifier,
     targetUrl,
     action: 'view-logs'
   })
@@ -268,35 +262,22 @@ export async function main(options: Options) {
   // Validate workspace exists
   await getValidWorkspace(options.components, projectRoot)
 
-  let multiplayerId: string
-
-  // Check if --multiplayerId parameter is provided
-  if (options.args['--multiplayerId']) {
-    multiplayerId = options.args['--multiplayerId']
-    logger.info(`Viewing logs for multiplayer ID: ${multiplayerId}`)
-  } else {
-    // Fall back to scene.json
-    const sceneJson = await getValidSceneJson(options.components, projectRoot)
-
-    if (!sceneJson.multiplayerId) {
-      throw new CliError(
-        'SERVER_LOGS_MISSING_MULTIPLAYER_ID',
-        'scene.json must have multiplayerId defined, or provide --multiplayerId parameter to view server logs'
-      )
-    }
-
-    multiplayerId = sceneJson.multiplayerId
-    logger.info(`Viewing logs for multiplayer ID: ${multiplayerId}`)
-  }
+  const sceneJson = await getValidSceneJson(options.components, projectRoot)
+  const worldName = sceneJson.worldConfiguration?.name
+  const isWorld = !!worldName
+  const sceneIdentifier = isWorld ? worldName : sceneJson.scene.base
 
   // Determine target URL
   const baseURL = options.args['--target'] || DEFAULT_SERVER
 
   // Build the logs URL
-  const logsUrl = `${baseURL}/logs/${multiplayerId}`
+  const logsUrl = `${baseURL}/logs`
+
+  logger.info(`Viewing logs for ${isWorld ? 'world' : 'scene'}: ${sceneIdentifier}`)
+  logger.info(`Target: ${logsUrl}`)
 
   // Build the pathname for signing
-  const pathname = `/logs/${multiplayerId}`
+  const pathname = '/logs'
 
   // Linker dApp options
   const linkerPort = options.args['--port']
@@ -306,7 +287,13 @@ export async function main(options: Options) {
 
   const awaitResponse = future<void>()
   const timestamp = String(Date.now())
-  const metadata = JSON.stringify({})
+  // Build metadata following the standard signedFetch format
+  const metadata = JSON.stringify({
+    parcel: sceneJson.scene.base,
+    realm: { serverName: isWorld ? worldName : 'main' },
+    realmName: isWorld ? worldName : 'main',
+    sceneId: isWorld ? worldName : undefined
+  })
 
   // Build the payload to sign: method:path:timestamp:metadata
   const payload = ['get', pathname, timestamp, metadata].join(':').toLowerCase()
@@ -317,7 +304,7 @@ export async function main(options: Options) {
     options.components,
     awaitResponse,
     payload,
-    multiplayerId,
+    sceneIdentifier,
     baseURL,
     linkOptions,
     async (linkerResponse) => {
