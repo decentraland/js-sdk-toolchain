@@ -242,18 +242,6 @@ export function addSyncTransport(
     }
   }
 
-  // Handle case where RealmInfo is already set before onChange was registered (e.g., after /reload).
-  // onChange is change-driven only and does NOT fire for the current value, so we must check it explicitly.
-  const currentRealmInfo = RealmInfo.getOrNull(engine.RootEntity)
-  if (currentRealmInfo?.isConnectedSceneRoom) {
-    requestState()
-    const isServer = isServerAtom.getOrNull()
-    if (isServer && checkRoomReady(currentRealmInfo) && isRoomReadyAtom.getOrNull() === false) {
-      DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady] Server marking room as ready (RealmInfo already set)')
-      isRoomReadyAtom.swap(true)
-    }
-  }
-
   // System to retry state request if no response is received within the retry interval
   engine.addSystem((dt: number) => {
     if (requestingState && !stateIsSyncronized) {
