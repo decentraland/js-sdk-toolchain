@@ -1,10 +1,11 @@
 /**
- * Internal utilities for standardized globalThis access.
+ * Utilities for standardized globalThis access.
+ * @public
  */
 
 /**
  * Type-safe globalThis property access.
- * @internal
+ * @public
  */
 export function getGlobal<T>(key: string): T | undefined {
   return (globalThis as any)[key]
@@ -12,7 +13,7 @@ export function getGlobal<T>(key: string): T | undefined {
 
 /**
  * Sets a globalThis property as a polyfill (only if undefined/null).
- * @internal
+ * @public
  */
 export function setGlobalPolyfill<T>(key: string, value: T): void {
   ;(globalThis as any)[key] = (globalThis as any)[key] ?? value

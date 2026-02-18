@@ -85,5 +85,20 @@ describe('Generated MeshCollider ProtoBuf', () => {
         plane: {}
       }
     })
+
+    MeshCollider.setGltfMesh(entity, 'models/test.glb', 'someGltfMeshName', [
+      ColliderLayer.CL_POINTER,
+      ColliderLayer.CL_PHYSICS
+    ])
+    expect(MeshCollider.get(entity)).toStrictEqual({
+      collisionMask: ColliderLayer.CL_POINTER | ColliderLayer.CL_PHYSICS,
+      mesh: {
+        $case: 'gltf',
+        gltf: {
+          gltfSrc: 'models/test.glb',
+          name: 'someGltfMeshName'
+        }
+      }
+    })
   })
 })

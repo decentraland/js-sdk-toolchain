@@ -41,7 +41,23 @@ function parseUiInput(props: Partial<UiInputProps>): PBUiInput {
  * @category Component
  */ /* @__PURE__ */
 export function Input(props: EntityPropTypes & Partial<UiInputProps>) {
-  const { uiTransform, uiBackground, onMouseDown, onMouseUp, onMouseEnter, onMouseLeave, ...otherProps } = props
+  const {
+    uiTransform,
+    uiBackground,
+    onMouseDown,
+    onMouseUp,
+    onMouseEnter,
+    onMouseLeave,
+    onMouseDrag,
+    onMouseDragLocked,
+    onMouseDragEnd,
+    onInputDown,
+    onInputUp,
+    onInputDrag,
+    onInputDragLocked,
+    onInputDragEnd,
+    ...otherProps
+  } = props
   const inputProps = parseUiInput(otherProps)
   const commonProps = parseProps({
     uiTransform,
@@ -49,7 +65,15 @@ export function Input(props: EntityPropTypes & Partial<UiInputProps>) {
     onMouseDown,
     onMouseUp,
     onMouseEnter,
-    onMouseLeave
+    onMouseLeave,
+    onMouseDrag,
+    onMouseDragLocked,
+    onMouseDragEnd,
+    onInputDown,
+    onInputUp,
+    onInputDrag,
+    onInputDragLocked,
+    onInputDragEnd
   })
   return <entity {...commonProps} uiInput={inputProps} />
 }

@@ -24,6 +24,11 @@ export type EventSystemOptions = {
   maxPlayerDistance?: number
 }
 
+/**
+ * @public
+ */
+export type EventSystemOptionsCallback = EventSystemOptions & { cb: EventSystemCallback }
+
 export const getDefaultOpts = (opts: Partial<EventSystemOptions> = {}): EventSystemOptions => ({
   button: InputAction.IA_ANY,
   ...opts
@@ -68,6 +73,27 @@ export interface PointerEventsSystem {
   removeOnPointerHoverLeave(entity: Entity): void
 
   /**
+   * @public
+   * Remove the callback for onPointerDrag event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnPointerDrag(entity: Entity): void
+
+  /**
+   * @public
+   * Remove the callback for onPointerDragLocked event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnPointerDragLocked(entity: Entity): void
+
+  /**
+   * @public
+   * Remove the callback for onPointerDragEnd event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnPointerDragEnd(entity: Entity): void
+
+  /**
    * @internal
    * Execute callback when the user clicks the entity.
    * @param entity - Entity to attach the callback - Opts to trigger Feedback and Button
@@ -77,9 +103,14 @@ export interface PointerEventsSystem {
 
   /**
    * @public
+   * Execute callbacks when the user presses one of the InputButtons pointing at the entity
+   * @param pointerData - Entity to attach the callbacks, list of options to trigger Feedback, Button, and Callback
+   */
+  onPointerDown(pointerData: { entity: Entity; optsList: EventSystemOptionsCallback[] }): void
+  /**
+   * @public
    * Execute callback when the user press the InputButton pointing at the entity
    * @param pointerData - Entity to attach the callback, Opts to trigger Feedback and Button
-   * @param cb - Function to execute when click fires
    */
   onPointerDown(pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
   /**
@@ -89,6 +120,12 @@ export interface PointerEventsSystem {
    * @param opts - Opts to trigger Feedback and Button
    */
   onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void
+  /**
+   * @public
+   * Execute callbacks when the user releases one of the InputButtons pointing at the entity
+   * @param pointerData - Entity to attach the callbacks, list of options to trigger Feedback, Button, and Callback
+   */
+  onPointerUp(pointerData: { entity: Entity; optsList: EventSystemOptionsCallback[] }): void
   /**
    * @public
    * Execute callback when the user releases the InputButton pointing at the entity
@@ -125,6 +162,52 @@ export interface PointerEventsSystem {
     pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> },
     cb: EventSystemCallback
   ): void
+
+  /**
+   * @public
+   * Execute callbacks when the user drags the pointer from inside the entity
+   * @param pointerData - Entity to attach the callbacks, list of options to trigger Feedback, Button, and Callback
+   */
+  onPointerDrag(pointerData: { entity: Entity; optsList: EventSystemOptionsCallback[] }): void
+  /**
+   * @public
+   * Execute callback when the user clicks and drags the pointer from inside the entity
+   * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
+   * @param cb - Function to execute when click fires
+   */
+  onPointerDrag(pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
+
+  /**
+   * @public
+   * Execute callbacks when the user drags the pointer from inside the entity, locking the cursor in place.
+   * @param pointerData - Entity to attach the callbacks, list of options to trigger Feedback, Button, and Callback
+   */
+  onPointerDragLocked(pointerData: { entity: Entity; optsList: EventSystemOptionsCallback[] }): void
+  /**
+   * @public
+   * Execute callback when the user clicks and drags the pointer from inside the entity,
+   * locking the cursor in place
+   * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
+   * @param cb - Function to execute when click fires
+   */
+  onPointerDragLocked(
+    pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> },
+    cb: EventSystemCallback
+  ): void
+
+  /**
+   * @public
+   * Execute callbacks when the user releases a button after a drag
+   * @param pointerData - Entity to attach the callbacks, list of options to trigger Feedback, Button, and Callback
+   */
+  onPointerDragEnd(pointerData: { entity: Entity; optsList: EventSystemOptionsCallback[] }): void
+  /**
+   * @public
+   * Execute callback when the user releases the button after a drag
+   * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
+   * @param cb - Function to execute when click fires
+   */
+  onPointerDragEnd(pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
 }
 
 /**
@@ -139,9 +222,12 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     Down,
     Up,
     HoverEnter,
-    HoverLeave
+    HoverLeave,
+    Drag,
+    DragLocked,
+    DragEnd
   }
-  type EventMapType = Map<EventType, { cb: EventSystemCallback; opts: EventSystemOptions }>
+  type EventMapType = Map<EventType, Map<InputAction, EventSystemOptionsCallback>>
 
   const eventsMap = new Map<Entity, EventMapType>()
 
@@ -179,90 +265,177 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
       return PointerEventType.PET_HOVER_LEAVE
     } else if (eventType === EventType.HoverEnter) {
       return PointerEventType.PET_HOVER_ENTER
+    } else if (eventType === EventType.Drag) {
+      return PointerEventType.PET_DRAG
+    } else if (eventType === EventType.DragLocked) {
+      return PointerEventType.PET_DRAG_LOCKED
+    } else if (eventType === EventType.DragEnd) {
+      return PointerEventType.PET_DRAG_END
     }
     return PointerEventType.PET_DOWN
   }
 
+  function getEventType(pet: PointerEventType) {
+    if (pet === PointerEventType.PET_UP) {
+      return EventType.Up
+    } else if (pet === PointerEventType.PET_HOVER_ENTER) {
+      return EventType.HoverEnter
+    } else if (pet === PointerEventType.PET_HOVER_LEAVE) {
+      return EventType.HoverLeave
+    } else if (pet === PointerEventType.PET_DRAG) {
+      return EventType.Drag
+    } else if (pet === PointerEventType.PET_DRAG_LOCKED) {
+      return EventType.DragLocked
+    } else if (pet === PointerEventType.PET_DRAG_END) {
+      return EventType.DragEnd
+    } else {
+      return EventType.Down
+    }
+  }
+
   function removeEvent(entity: Entity, type: EventType) {
     const event = getEvent(entity)
-    const pointerEvent = event.get(type)
+    const pointerEventList = event.get(type)
 
-    if (pointerEvent?.opts.hoverText) {
-      removePointerEvent(entity, getPointerEvent(type), pointerEvent.opts.button)
+    if (pointerEventList === undefined) {
+      return
+    }
+
+    for (const button of pointerEventList.keys()) {
+      removePointerEvent(entity, getPointerEvent(type), button)
     }
 
     event.delete(type)
   }
 
   engine.addSystem(function EventSystem() {
-    for (const [entity, event] of eventsMap) {
+    if (eventsMap.size === 0) {
+      return
+    }
+
+    for (const entity of eventsMap.keys()) {
       if (engine.getEntityState(entity) === EntityState.Removed) {
         eventsMap.delete(entity)
+      }
+    }
+
+    for (const command of inputSystem.getInputCommands()) {
+      const entity = command.hit?.entityId as Entity
+      if (entity === undefined) {
         continue
       }
 
-      for (const [eventType, { cb, opts }] of event) {
-        if (eventType === EventType.Click) {
-          const command = inputSystem.getClick(opts.button, entity)
-          if (command)
-            checkNotThenable(cb(command.up), 'Click event returned a thenable. Only synchronous functions are allowed')
+      const entityMap = eventsMap.get(entity)
+      if (entityMap === undefined) {
+        continue
+      }
+
+      const typeMap = entityMap.get(getEventType(command.state))
+      if (typeMap) {
+        const data = typeMap.get(command.button)
+        if (data) {
+          checkNotThenable(
+            data.cb(command),
+            'Event handler returned a thenable. Only synchronous functions are allowed'
+          )
         }
 
-        if (
-          eventType === EventType.Down ||
-          eventType === EventType.Up ||
-          eventType === EventType.HoverEnter ||
-          eventType === EventType.HoverLeave
-        ) {
-          const command = inputSystem.getInputCommand(opts.button, getPointerEvent(eventType), entity)
-          if (command) {
-            checkNotThenable(cb(command), 'Event handler returned a thenable. Only synchronous functions are allowed')
+        const anyData = typeMap.get(InputAction.IA_ANY)
+        if (anyData) {
+          checkNotThenable(
+            anyData.cb(command),
+            'Event handler returned a thenable. Only synchronous functions are allowed'
+          )
+        }
+      }
+
+      // check clicks separately
+      if (command.state === PointerEventType.PET_UP) {
+        const clickMap = entityMap.get(EventType.Click)
+        if (clickMap) {
+          const data = clickMap.get(command.button)
+          if (data && inputSystem.getClick(command.button, entity)) {
+            checkNotThenable(
+              data.cb(command),
+              'Click event returned a thenable. Only synchronous functions are allowed'
+            )
+          }
+
+          const anyData = clickMap.get(InputAction.IA_ANY)
+          if (anyData && inputSystem.getClick(command.button, entity)) {
+            checkNotThenable(
+              anyData.cb(command),
+              'Event handler returned a thenable. Only synchronous functions are allowed'
+            )
           }
         }
       }
     }
   })
 
-  const onPointerDown: PointerEventsSystem['onPointerDown'] = (...args) => {
-    const [data, cb, maybeOpts] = args
-    if (typeof data === 'number') {
-      return onPointerDown({ entity: data, opts: maybeOpts ?? {} }, cb)
+  // return a function with the correct event type.
+  // we use onPointerDown as the "archetype" for the returned function, but it fits with
+  // all the onPointer* declarations
+  const onPointerFunction: (ty: EventType) => PointerEventsSystem['onPointerDown'] = (ty) => {
+    return (
+      arg0:
+        | Entity
+        | { entity: Entity; opts?: Partial<EventSystemOptions> }
+        | { entity: Entity; optsList: EventSystemOptionsCallback[] },
+      arg1?: EventSystemCallback,
+      arg2?: Partial<EventSystemOptions>
+    ) => {
+      let entity: Entity
+      let optsList: EventSystemOptionsCallback[]
+
+      if (typeof arg0 === 'number') {
+        // called as onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void
+        entity = arg0
+        const cb = arg1 as EventSystemCallback
+        const opts = arg2
+        optsList = [{ cb, ...getDefaultOpts(opts) }]
+      } else if (typeof arg1 === 'function') {
+        // called as onPointerDown(pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
+        const { entity: e, opts } = arg0 as { entity: Entity; opts?: Partial<EventSystemOptions> }
+        const cb = arg1 as EventSystemCallback
+        entity = e
+        optsList = [{ cb, ...getDefaultOpts(opts) }]
+      } else {
+        // called as onPointerDown(pointerData: { entity: Entity; optsList: EventSystemOptionsCallback[] }): void
+        const { entity: e, optsList: o } = arg0 as { entity: Entity; optsList: EventSystemOptionsCallback[] }
+        entity = e
+        optsList = o
+      }
+
+      const previous = getEvent(entity).get(ty) ?? new Map<InputAction, EventSystemOptionsCallback>()
+
+      const callbacks = new Map()
+      for (const opts of optsList) {
+        const prevOpts = previous.get(opts.button)
+        if (prevOpts !== undefined) {
+          if (
+            prevOpts.hoverText !== opts.hoverText ||
+            prevOpts.maxDistance !== opts.maxDistance ||
+            prevOpts.showFeedback !== opts.showFeedback ||
+            prevOpts.showHighlight !== opts.showHighlight
+          ) {
+            removePointerEvent(entity, getPointerEvent(ty), opts.button)
+            setPointerEvent(entity, getPointerEvent(ty), opts)
+          }
+        } else {
+          setPointerEvent(entity, getPointerEvent(ty), opts)
+        }
+        callbacks.set(opts.button, opts)
+      }
+
+      for (const button of previous.keys()) {
+        if (!callbacks.has(button)) {
+          removePointerEvent(entity, getPointerEvent(ty), button)
+        }
+      }
+
+      getEvent(entity).set(ty, callbacks)
     }
-    const { entity, opts } = data
-    const options = getDefaultOpts(opts)
-    removeEvent(entity, EventType.Down)
-    getEvent(entity).set(EventType.Down, { cb, opts: options })
-    setPointerEvent(entity, PointerEventType.PET_DOWN, options)
-  }
-
-  const onPointerUp: PointerEventsSystem['onPointerUp'] = (...args) => {
-    const [data, cb, maybeOpts] = args
-    if (typeof data === 'number') {
-      return onPointerUp({ entity: data, opts: maybeOpts ?? {} }, cb)
-    }
-    const { entity, opts } = data
-    const options = getDefaultOpts(opts)
-    removeEvent(entity, EventType.Up)
-    getEvent(entity).set(EventType.Up, { cb, opts: options })
-    setPointerEvent(entity, PointerEventType.PET_UP, options)
-  }
-
-  const onPointerHoverEnter: PointerEventsSystem['onPointerHoverEnter'] = (...args) => {
-    const [data, cb] = args
-    const { entity, opts } = data
-    const options = getDefaultOpts(opts)
-    removeEvent(entity, EventType.HoverEnter)
-    getEvent(entity).set(EventType.HoverEnter, { cb, opts: options })
-    setPointerEvent(entity, PointerEventType.PET_HOVER_ENTER, options)
-  }
-
-  const onPointerHoverLeave: PointerEventsSystem['onPointerHoverLeave'] = (...args) => {
-    const [data, cb] = args
-    const { entity, opts } = data
-    const options = getDefaultOpts(opts)
-    removeEvent(entity, EventType.HoverLeave)
-    getEvent(entity).set(EventType.HoverLeave, { cb, opts: options })
-    setPointerEvent(entity, PointerEventType.PET_HOVER_LEAVE, options)
   }
 
   return {
@@ -286,20 +459,25 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
       removeEvent(entity, EventType.HoverLeave)
     },
 
-    onClick(value, cb) {
-      const { entity } = value
-      const options = getDefaultOpts(value.opts)
-      // Clear previous event with over feedback included
-      removeEvent(entity, EventType.Click)
-
-      // Set new event
-      getEvent(entity).set(EventType.Click, { cb, opts: options })
-      setPointerEvent(entity, PointerEventType.PET_DOWN, options)
+    removeOnPointerDrag(entity: Entity) {
+      removeEvent(entity, EventType.Drag)
     },
 
-    onPointerDown,
-    onPointerUp,
-    onPointerHoverEnter,
-    onPointerHoverLeave
+    removeOnPointerDragLocked(entity: Entity) {
+      removeEvent(entity, EventType.DragLocked)
+    },
+
+    removeOnPointerDragEnd(entity: Entity) {
+      removeEvent(entity, EventType.DragEnd)
+    },
+
+    onClick: onPointerFunction(EventType.Click),
+    onPointerDown: onPointerFunction(EventType.Down),
+    onPointerUp: onPointerFunction(EventType.Up),
+    onPointerHoverEnter: onPointerFunction(EventType.HoverEnter),
+    onPointerHoverLeave: onPointerFunction(EventType.HoverLeave),
+    onPointerDrag: onPointerFunction(EventType.Drag),
+    onPointerDragLocked: onPointerFunction(EventType.DragLocked),
+    onPointerDragEnd: onPointerFunction(EventType.DragEnd)
   }
 }

@@ -4,6 +4,7 @@ export * from './schemas'
 export * from './runtime/initialization'
 export * from './runtime/types'
 export * from './runtime/helpers'
+export * from './runtime/globals'
 
 export { cyclicParentingChecker } from './systems/cyclicParentingChecker'
 export * from './systems/events'
@@ -40,6 +41,8 @@ import {
   TriggerAreaComponentDefinitionExtended
 } from './components/types'
 import { NameComponent } from './components/manual/Name'
+import { AvatarEquippedDataComponentDefinitionExtended } from './components/extended/AvatarEquippedData'
+import { AvatarShapeComponentDefinitionExtended } from './components/extended/AvatarShape'
 import { TagsComponentDefinitionExtended } from './components/manual/Tags'
 
 // export components for global engine

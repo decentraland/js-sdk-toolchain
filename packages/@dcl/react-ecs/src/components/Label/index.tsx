@@ -23,7 +23,23 @@ export { scaleFontSize } from './utils'
 
 /* @__PURE__ */
 export function Label(props: EntityPropTypes & UiLabelProps) {
-  const { uiTransform, uiBackground, onMouseDown, onMouseUp, onMouseEnter, onMouseLeave, ...uiTextProps } = props
+  const {
+    uiTransform,
+    uiBackground,
+    onMouseDown,
+    onMouseUp,
+    onMouseEnter,
+    onMouseLeave,
+    onMouseDrag,
+    onMouseDragLocked,
+    onMouseDragEnd,
+    onInputDown,
+    onInputUp,
+    onInputDrag,
+    onInputDragLocked,
+    onInputDragEnd,
+    ...uiTextProps
+  } = props
 
   const commonProps = parseProps({
     uiTransform,
@@ -31,7 +47,15 @@ export function Label(props: EntityPropTypes & UiLabelProps) {
     onMouseDown,
     onMouseUp,
     onMouseEnter,
-    onMouseLeave
+    onMouseLeave,
+    onMouseDrag,
+    onMouseDragLocked,
+    onMouseDragEnd,
+    onInputDown,
+    onInputUp,
+    onInputDrag,
+    onInputDragLocked,
+    onInputDragEnd
   })
   const { font, textAlign, fontSize, textWrap, ...textProps } = uiTextProps
   const uiText: PBUiText = {
@@ -39,7 +63,9 @@ export function Label(props: EntityPropTypes & UiLabelProps) {
     ...getFont(font),
     ...getTextAlign(textAlign),
     ...getFontSize(fontSize),
-    ...getTextWrap(textWrap)
+    ...getTextWrap(textWrap),
+    outlineWidth: props.outlineWidth,
+    outlineColor: props.outlineColor
   }
 
   return <entity {...commonProps} uiText={uiText} />

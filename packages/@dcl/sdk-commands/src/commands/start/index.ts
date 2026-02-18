@@ -52,6 +52,7 @@ export const args = declareArgs({
   '-w': '--no-watch',
   '--skip-build': Boolean,
   '--data-layer': Boolean,
+  '--customEntryPoint': Boolean,
   '--explorer-alpha': Boolean,
   '--web-explorer': Boolean,
   '--hub': Boolean,
@@ -92,8 +93,8 @@ export async function help(options: Options) {
       --skip-auth-screen                Skip the auth screen (accepts 'true' or 'false').
       --landscape-terrain-enabled       Enable landscape terrain.
       -n                                Open a new instance of the Client even if one is already running.
-      --bevy-web                        Opens preview using the Bevy Web browser window.
-      --mobile                      Show QR code for mobile preview on the same network
+      --bevy-web                        Opens preview using the Bevy Web browser window (default=true)
+      --mobile, -m                      Show QR code for mobile preview on the same network (default=true)
 
 
     Examples:
@@ -119,8 +120,9 @@ export async function main(options: Options) {
   const withDataLayer = options.args['--data-layer']
   const enableWeb3 = options.args['--web3']
   const isHub = !!options.args['--hub']
-  const bevyWeb = !!options.args['--bevy-web']
-  const isMobile = options.args['--mobile']
+  // Default to true if not specified (undefined), false only if explicitly set to false
+  const bevyWeb = (options.args['--bevy-web'] ?? true) && !isCi
+  const isMobile = (options.args['--mobile'] ?? true) && !isCi
   const explorerAlpha = !options.args['--web-explorer'] && !bevyWeb
 
   let hasSmartWearable = false
@@ -138,7 +140,18 @@ export async function main(options: Options) {
       // first run `npm run build`, this can be disabled with --skip-build
       // then start the embedded compiler, this can be disabled with --no-watch
       if (watch || build) {
-        await buildScene({ ...options, args: { '--dir': project.workingDirectory, '--watch': watch, _: [] } }, project)
+        await buildScene(
+          {
+            ...options,
+            args: {
+              '--dir': project.workingDirectory,
+              '--watch': watch,
+              _: [],
+              '--customEntryPoint': !!options.args['--customEntryPoint']
+            }
+          },
+          project
+        )
         await startValidations(options.components, project.workingDirectory)
       }
 
@@ -213,7 +226,7 @@ export async function main(options: Options) {
       await startComponents()
 
       const networkInterfaces = os.networkInterfaces()
-      const availableURLs: string[] = []
+      const availableURLs: { base: string; url: string }[] = []
 
       printProgressInfo(options.components.logger, 'Preview server is now running!')
       if (!explorerAlpha) {
@@ -224,15 +237,16 @@ export async function main(options: Options) {
         ;(networkInterfaces[dev] || []).forEach((details) => {
           if (details.family === 'IPv4') {
             const oldBackpack = 'DISABLE_backpack_editor_v2=&ENABLE_backpack_editor_v1'
-            let addr = `http://${details.address}:${port}?position=${baseCoords.x}%2C${baseCoords.y}&${oldBackpack}`
+            const baseUrl = `http://${details.address}:${port}`
+            let url = `${baseUrl}?position=${baseCoords.x}%2C${baseCoords.y}&${oldBackpack}`
             if (debug) {
-              addr = `${addr}&SCENE_DEBUG_PANEL`
+              url = `${url}&SCENE_DEBUG_PANEL`
             }
             if (enableWeb3 || hasSmartWearable) {
-              addr = `${addr}&ENABLE_WEB3`
+              url = `${url}&ENABLE_WEB3`
             }
 
-            availableURLs.push(addr)
+            availableURLs.push({ base: baseUrl, url })
           }
         })
       })
@@ -242,28 +256,29 @@ export async function main(options: Options) {
 
       // Push localhost and 127.0.0.1 at top
       const sortedURLs = availableURLs.sort((a, _b) => {
-        return a.toLowerCase().includes('localhost') || a.includes('127.0.0.1') || a.includes('0.0.0.0') ? -1 : 1
+        return a.base.toLowerCase().includes('localhost') || a.base.includes('127.0.0.1') || a.base.includes('0.0.0.0')
+          ? -1
+          : 1
       })
-      const bevyUrl = `https://decentraland.zone/bevy-web/?preview=true&realm=${
-        new URL(sortedURLs[0]).origin
-      }&position=${baseCoords.x},${baseCoords.y}`
+      const bevyUrl = `https://decentraland.zone/bevy-web/?preview=true&realm=${sortedURLs[0].base}&position=${baseCoords.x},${baseCoords.y}`
       if (!explorerAlpha) {
         if (bevyWeb) {
           components.logger.log(`    ${bevyUrl}`)
         } else {
           for (const addr of sortedURLs) {
-            components.logger.log(`    ${addr}`)
+            components.logger.log(`    ${addr.url}`)
           }
         }
       }
       components.logger.log('\nPress CTRL+C to exit\n')
 
+      // Open preferably localhost/127.0.0.1
       if (explorerAlpha && !isMobile) {
-        const realm = new URL(sortedURLs[0]).origin
+        const realm = new URL(sortedURLs[0].url).origin
         await runExplorerAlpha(components, { cwd: workingDirectory, realm, baseCoords, isHub, args: options.args })
       }
 
-      if (options.args['--mobile'] && lanUrl) {
+      if (isMobile && lanUrl) {
         const deepLink = `decentraland://open?preview=${lanUrl}&position=${baseCoords.x}%2C${baseCoords.y}`
         QRCode.toString(deepLink, { type: 'terminal', small: true }, (err, qr) => {
           if (!err) {
@@ -277,7 +292,7 @@ export async function main(options: Options) {
       // Open preferably localhost/127.0.0.1
       if ((!explorerAlpha || bevyWeb) && openBrowser && sortedURLs.length) {
         try {
-          const url = bevyWeb ? bevyUrl : sortedURLs[0]
+          const url = bevyWeb ? bevyUrl : sortedURLs[0].url
           await open(url)
         } catch (_) {
           components.logger.warn('Unable to open browser automatically.')

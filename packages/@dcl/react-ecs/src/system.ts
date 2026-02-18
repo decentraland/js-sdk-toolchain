@@ -1,8 +1,8 @@
 import { EntityState, type Entity, type IEngine, type PointerEventsSystem } from '@dcl/ecs'
 import * as ecsComponents from '@dcl/ecs/dist/components'
-import React from 'react'
+import React, { FunctionComponent } from 'react'
 import type { ReactEcs } from './react-ecs'
-import { createReconciler } from './reconciler'
+import { createReconciler, DclReconciler } from './reconciler'
 import { getUiScaleFactor, resetUiScaleFactor, setUiScaleFactor } from './components/utils'
 
 /**
@@ -31,6 +31,11 @@ export interface ReactBasedUiSystem {
    */
   setUiRenderer(ui: UiComponent, options?: UiRendererOptions): void
   /**
+   * Set a texture renderer for a specific entity.
+   * @deprecated Use addUiRenderer instead
+   */
+  setTextureRenderer(entity: Entity, ui: UiComponent): void
+  /**
    * Add a UI renderer associated with an entity. The UI will be automatically cleaned up
    * when the entity is removed from the engine.
    *
@@ -57,10 +62,11 @@ export interface ReactBasedUiSystem {
  * @public
  */
 export function createReactBasedUiSystem(engine: IEngine, pointerSystem: PointerEventsSystem): ReactBasedUiSystem {
-  const renderer = createReconciler(engine, pointerSystem)
+  const renderer = createReconciler(engine, pointerSystem, undefined)
   let uiComponent: UiComponent | undefined = undefined
   let virtualSize: UiRendererOptions | undefined = undefined
   const additionalRenderers = new Map<Entity, { ui: UiComponent; options?: UiRendererOptions }>()
+  const textureRenderersAndUis: [DclReconciler, UiComponent][] = []
   const UiCanvasInformation = ecsComponents.UiCanvasInformation(engine)
 
   // Unique owner to prevent other UI systems resetting this scale factor.
@@ -104,6 +110,11 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
     } else {
       renderer.update(null)
     }
+
+    // Update texture renderers (deprecated, kept for backwards compatibility)
+    for (const [textureRenderer, ui] of textureRenderersAndUis) {
+      textureRenderer.update(React.createElement(ui as FunctionComponent))
+    }
   }
 
   function UiScaleSystem() {
@@ -139,10 +150,18 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
       for (const entity of renderer.getEntities()) {
         engine.removeEntity(entity)
       }
+      for (const [textureRenderer, _] of textureRenderersAndUis) {
+        for (const entity of textureRenderer.getEntities()) {
+          engine.removeEntity(entity)
+        }
+      }
     },
     setUiRenderer(ui: UiComponent, options?: UiRendererOptions) {
       uiComponent = ui
       virtualSize = options
+    },
+    setTextureRenderer(entity, ui) {
+      textureRenderersAndUis.push([createReconciler(engine, pointerSystem, entity), ui])
     },
     addUiRenderer(entity: Entity, ui: UiComponent, options?: UiRendererOptions) {
       additionalRenderers.set(entity, { ui, options })

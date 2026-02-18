@@ -18,7 +18,8 @@ describe('Generated AvatarShape ProtoBuf', () => {
       expressionTriggerTimestamp: 0,
       talking: true,
       emotes: [],
-      showOnlyWearables: false
+      showOnlyWearables: false,
+      forceRender: []
     })
 
     testComponentSerialization(AvatarShape, {
@@ -33,7 +34,8 @@ describe('Generated AvatarShape ProtoBuf', () => {
       expressionTriggerTimestamp: 1,
       talking: false,
       emotes: [],
-      showOnlyWearables: false
+      showOnlyWearables: false,
+      forceRender: []
     })
   })
 })
