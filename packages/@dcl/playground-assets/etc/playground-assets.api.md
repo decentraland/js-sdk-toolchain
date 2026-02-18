@@ -2002,6 +2002,50 @@ export namespace MoveContinuous {
     export function encode(message: MoveContinuous, writer?: _m0.Writer): _m0.Writer;
 }
 
+// @public (undocumented)
+export interface MoveRotateScale {
+    // (undocumented)
+    positionEnd: PBVector3 | undefined;
+    // (undocumented)
+    positionStart: PBVector3 | undefined;
+    // (undocumented)
+    rotationEnd: PBQuaternion | undefined;
+    // (undocumented)
+    rotationStart: PBQuaternion | undefined;
+    // (undocumented)
+    scaleEnd: PBVector3 | undefined;
+    // (undocumented)
+    scaleStart: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace MoveRotateScale {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): MoveRotateScale;
+    // (undocumented)
+    export function encode(message: MoveRotateScale, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface MoveRotateScaleContinuous {
+    // (undocumented)
+    positionDirection: PBVector3 | undefined;
+    // (undocumented)
+    rotationDirection: PBQuaternion | undefined;
+    // (undocumented)
+    scaleDirection: PBVector3 | undefined;
+    // (undocumented)
+    speed: number;
+}
+
+// @public (undocumented)
+export namespace MoveRotateScaleContinuous {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): MoveRotateScaleContinuous;
+    // (undocumented)
+    export function encode(message: MoveRotateScaleContinuous, writer?: _m0.Writer): _m0.Writer;
+}
+
 // Warning: (ae-missing-release-tag) "Name" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -3321,6 +3365,12 @@ export interface PBTween {
     } | {
         $case: "textureMoveContinuous";
         textureMoveContinuous: TextureMoveContinuous;
+    } | {
+        $case: "moveRotateScale";
+        moveRotateScale: MoveRotateScale;
+    } | {
+        $case: "moveRotateScaleContinuous";
+        moveRotateScaleContinuous: MoveRotateScaleContinuous;
     } | undefined;
     playing?: boolean | undefined;
 }
