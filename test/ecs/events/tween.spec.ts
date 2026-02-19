@@ -110,6 +110,39 @@ describe('Tween System', () => {
     expect(Tween.get(entity).mode).toMatchCloseTo(Tween.Mode.TextureMove({ end: Vector2.Zero(), start: Vector2.One() }))
   })
 
+  it('should change to backwards the MoveRotateScale Tween when its completed', async () => {
+    const posStart = Vector3.create(0, 0, 0)
+    const posEnd = Vector3.create(5, 3, 0)
+    const rotStart = Quaternion.Identity()
+    const rotEnd = Quaternion.fromEulerDegrees(0, 90, 0)
+    const scaleStart = Vector3.One()
+    const scaleEnd = Vector3.create(2, 2, 2)
+
+    await mockTween(
+      entity,
+      Tween.Mode.MoveRotateScale({
+        positionStart: posStart,
+        positionEnd: posEnd,
+        rotationStart: rotStart,
+        rotationEnd: rotEnd,
+        scaleStart: scaleStart,
+        scaleEnd: scaleEnd
+      })
+    )
+    await mockTweenStatus(entity)
+    expect(completed).toBeCalledTimes(1)
+    expect(Tween.get(entity).mode).toMatchCloseTo(
+      Tween.Mode.MoveRotateScale({
+        positionStart: posEnd,
+        positionEnd: posStart,
+        rotationStart: rotEnd,
+        rotationEnd: rotStart,
+        scaleStart: scaleEnd,
+        scaleEnd: scaleStart
+      })
+    )
+  })
+
   it('should create a RESTART tweenSequence for the entity and restart the tween once its completed', async () => {
     TweenState.deleteFrom(entity)
     const tween = await mockTween(entity, Tween.Mode.Move({ start: Vector3.Forward(), end: Vector3.Down() }))

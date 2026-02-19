@@ -4,6 +4,8 @@ import {
   EasingFunction,
   Move,
   MoveContinuous,
+  MoveRotateScale,
+  MoveRotateScaleContinuous,
   PBTween,
   Rotate,
   RotateContinuous,
@@ -46,6 +48,14 @@ export interface TweenHelper {
    * @returns a texture-move-continuous mode tween
    */
   TextureMoveContinuous: (textureMove: TextureMoveContinuous) => PBTween['mode']
+  /**
+   * @returns a move-rotate-scale mode tween
+   */
+  MoveRotateScale: (moveRotateScale: MoveRotateScale) => PBTween['mode']
+  /**
+   * @returns a move-rotate-scale-continuous mode tween
+   */
+  MoveRotateScaleContinuous: (moveRotateScaleContinuous: MoveRotateScaleContinuous) => PBTween['mode']
 }
 
 /**
@@ -152,6 +162,54 @@ export interface TweenComponentDefinitionExtended extends LastWriteWinElementSet
     movementType?: TextureMovementType,
     duration?: number
   ): void
+
+  /**
+   * @public
+   *
+   * Creates or replaces a move-rotate-scale tween component that simultaneously animates
+   * an entity's position, rotation, and scale from start to end
+   * @param entity - entity to apply the tween to
+   * @param positionStart - starting position vector
+   * @param positionEnd - ending position vector
+   * @param rotationStart - starting rotation quaternion
+   * @param rotationEnd - ending rotation quaternion
+   * @param scaleStart - starting scale vector
+   * @param scaleEnd - ending scale vector
+   * @param duration - duration of the tween in milliseconds
+   * @param easingFunction - easing function to use (defaults to EF_LINEAR)
+   */
+  setMoveRotateScale(
+    entity: Entity,
+    positionStart: Vector3,
+    positionEnd: Vector3,
+    rotationStart: Quaternion,
+    rotationEnd: Quaternion,
+    scaleStart: Vector3,
+    scaleEnd: Vector3,
+    duration: number,
+    easingFunction?: EasingFunction
+  ): void
+
+  /**
+   * @public
+   *
+   * Creates or replaces a continuous move-rotate-scale tween component that simultaneously
+   * moves, rotates, and scales an entity continuously
+   * @param entity - entity to apply the tween to
+   * @param positionDirection - direction vector for movement
+   * @param rotationDirection - rotation direction quaternion
+   * @param scaleDirection - direction vector for scale change
+   * @param speed - speed of the animation per second
+   * @param duration - duration of the tween in milliseconds (defaults to 0 for infinite)
+   */
+  setMoveRotateScaleContinuous(
+    entity: Entity,
+    positionDirection: Vector3,
+    rotationDirection: Quaternion,
+    scaleDirection: Vector3,
+    speed: number,
+    duration?: number
+  ): void
 }
 
 const TweenHelper: TweenHelper = {
@@ -195,6 +253,18 @@ const TweenHelper: TweenHelper = {
     return {
       $case: 'textureMoveContinuous',
       textureMoveContinuous
+    }
+  },
+  MoveRotateScale(moveRotateScale) {
+    return {
+      $case: 'moveRotateScale',
+      moveRotateScale
+    }
+  },
+  MoveRotateScaleContinuous(moveRotateScaleContinuous) {
+    return {
+      $case: 'moveRotateScaleContinuous',
+      moveRotateScaleContinuous
     }
   }
 }
@@ -331,6 +401,57 @@ export function defineTweenComponent(
             direction,
             speed,
             movementType
+          }
+        },
+        duration,
+        easingFunction: EasingFunction.EF_LINEAR,
+        playing: true
+      })
+    },
+    setMoveRotateScale(
+      entity: Entity,
+      positionStart: Vector3,
+      positionEnd: Vector3,
+      rotationStart: Quaternion,
+      rotationEnd: Quaternion,
+      scaleStart: Vector3,
+      scaleEnd: Vector3,
+      duration: number,
+      easingFunction: EasingFunction = EasingFunction.EF_LINEAR
+    ) {
+      theComponent.createOrReplace(entity, {
+        mode: {
+          $case: 'moveRotateScale',
+          moveRotateScale: {
+            positionStart,
+            positionEnd,
+            rotationStart,
+            rotationEnd,
+            scaleStart,
+            scaleEnd
+          }
+        },
+        duration,
+        easingFunction,
+        playing: true
+      })
+    },
+    setMoveRotateScaleContinuous(
+      entity: Entity,
+      positionDirection: Vector3,
+      rotationDirection: Quaternion,
+      scaleDirection: Vector3,
+      speed: number,
+      duration: number = 0
+    ) {
+      theComponent.createOrReplace(entity, {
+        mode: {
+          $case: 'moveRotateScaleContinuous',
+          moveRotateScaleContinuous: {
+            positionDirection,
+            rotationDirection,
+            scaleDirection,
+            speed
           }
         },
         duration,

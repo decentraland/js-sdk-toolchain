@@ -83,6 +83,34 @@ describe('Generated Tween ProtoBuf', () => {
       playing: true,
       currentTime: 3.7
     })
+
+    testComponentSerialization(Tween, {
+      duration: 2000,
+      easingFunction: EasingFunction.EF_EASEINQUAD,
+      mode: Tween.Mode.MoveRotateScale({
+        positionStart: start,
+        positionEnd: end,
+        rotationStart: startQuat,
+        rotationEnd: endQuat,
+        scaleStart: start,
+        scaleEnd: end
+      }),
+      playing: true,
+      currentTime: 0
+    })
+
+    testComponentSerialization(Tween, {
+      duration: 0,
+      easingFunction: EasingFunction.EF_LINEAR,
+      mode: Tween.Mode.MoveRotateScaleContinuous({
+        positionDirection: { x: 0, y: 1, z: 0 },
+        rotationDirection: { x: 0, y: 0, z: 0, w: 1 },
+        scaleDirection: { x: 0, y: 0, z: 0 },
+        speed: 90
+      }),
+      playing: true,
+      currentTime: 0
+    })
   })
 
   it('should create component with setMove helper', () => {
@@ -245,6 +273,105 @@ describe('Generated Tween ProtoBuf', () => {
     })
   })
 
+  it('should create component with setMoveRotateScale helper', () => {
+    const newEngine = Engine()
+    const entity = newEngine.addEntity()
+    const Tween = components.Tween(newEngine)
+
+    const posStart = { x: 0, y: 0, z: 0 }
+    const posEnd = { x: 5, y: 3, z: 0 }
+    const rotStart = { x: 0, y: 0, z: 0, w: 1 }
+    const rotEnd = { x: 0, y: 0.7071, z: 0, w: 0.7071 }
+    const scaleStart = { x: 1, y: 1, z: 1 }
+    const scaleEnd = { x: 2, y: 2, z: 2 }
+
+    Tween.setMoveRotateScale(entity, posStart, posEnd, rotStart, rotEnd, scaleStart, scaleEnd, 2000, EasingFunction.EF_EASEINQUAD)
+
+    expect(Tween.get(entity)).toStrictEqual({
+      mode: {
+        $case: 'moveRotateScale',
+        moveRotateScale: {
+          positionStart: posStart,
+          positionEnd: posEnd,
+          rotationStart: rotStart,
+          rotationEnd: rotEnd,
+          scaleStart: scaleStart,
+          scaleEnd: scaleEnd
+        }
+      },
+      duration: 2000,
+      easingFunction: EasingFunction.EF_EASEINQUAD,
+      playing: true
+    })
+  })
+
+  it('should create component with setMoveRotateScale helper using default easing', () => {
+    const newEngine = Engine()
+    const entity = newEngine.addEntity()
+    const Tween = components.Tween(newEngine)
+
+    const posStart = { x: 0, y: 0, z: 0 }
+    const posEnd = { x: 1, y: 1, z: 1 }
+    const rotStart = { x: 0, y: 0, z: 0, w: 1 }
+    const rotEnd = { x: 0, y: 1, z: 0, w: 0 }
+    const scaleStart = { x: 1, y: 1, z: 1 }
+    const scaleEnd = { x: 3, y: 3, z: 3 }
+
+    Tween.setMoveRotateScale(entity, posStart, posEnd, rotStart, rotEnd, scaleStart, scaleEnd, 1500)
+
+    const result = Tween.get(entity)
+    expect(result.easingFunction).toBe(EasingFunction.EF_LINEAR)
+    expect(result.duration).toBe(1500)
+    expect(result.playing).toBe(true)
+    expect(result.mode?.$case).toBe('moveRotateScale')
+  })
+
+  it('should create component with setMoveRotateScaleContinuous helper', () => {
+    const newEngine = Engine()
+    const entity = newEngine.addEntity()
+    const Tween = components.Tween(newEngine)
+
+    const posDir = { x: 0, y: 1, z: 0 }
+    const rotDir = { x: 0, y: 0, z: 0, w: 1 }
+    const scaleDir = { x: 0, y: 0, z: 0 }
+    const speed = 90
+
+    Tween.setMoveRotateScaleContinuous(entity, posDir, rotDir, scaleDir, speed, 5000)
+
+    expect(Tween.get(entity)).toStrictEqual({
+      mode: {
+        $case: 'moveRotateScaleContinuous',
+        moveRotateScaleContinuous: {
+          positionDirection: posDir,
+          rotationDirection: rotDir,
+          scaleDirection: scaleDir,
+          speed
+        }
+      },
+      duration: 5000,
+      easingFunction: EasingFunction.EF_LINEAR,
+      playing: true
+    })
+  })
+
+  it('should create component with setMoveRotateScaleContinuous helper using default duration', () => {
+    const newEngine = Engine()
+    const entity = newEngine.addEntity()
+    const Tween = components.Tween(newEngine)
+
+    const posDir = { x: 1, y: 0, z: 0 }
+    const rotDir = { x: 0, y: 0, z: 0.3827, w: 0.9239 }
+    const scaleDir = { x: 0.1, y: 0.1, z: 0.1 }
+
+    Tween.setMoveRotateScaleContinuous(entity, posDir, rotDir, scaleDir, 2.5)
+
+    const result = Tween.get(entity)
+    expect(result.duration).toBe(0)
+    expect(result.easingFunction).toBe(EasingFunction.EF_LINEAR)
+    expect(result.playing).toBe(true)
+    expect(result.mode?.$case).toBe('moveRotateScaleContinuous')
+  })
+
   it('should use default parameters for helper methods', () => {
     const newEngine = Engine()
     const entity = newEngine.addEntity()
@@ -322,6 +449,20 @@ describe('Generated Tween ProtoBuf', () => {
         movementType: TextureMovementType.TMT_OFFSET
       }
     })
+
+    // Test setMoveRotateScale with default easing function
+    Tween.setMoveRotateScale(entity, start, end, startQuat, endQuat, start, end, 2000)
+    const mrsComponent = Tween.get(entity)
+    expect(mrsComponent.easingFunction).toBe(EasingFunction.EF_LINEAR)
+    expect(mrsComponent.playing).toBe(true)
+    expect(mrsComponent.mode?.$case).toBe('moveRotateScale')
+
+    // Test setMoveRotateScaleContinuous with default duration
+    Tween.setMoveRotateScaleContinuous(entity, { x: 1, y: 0, z: 0 }, startQuat, { x: 0, y: 0, z: 0 }, 5.0)
+    const mrscComponent = Tween.get(entity)
+    expect(mrscComponent.duration).toBe(0)
+    expect(mrscComponent.playing).toBe(true)
+    expect(mrscComponent.mode?.$case).toBe('moveRotateScaleContinuous')
   })
 
   it('should work with various optional parameter combinations', () => {

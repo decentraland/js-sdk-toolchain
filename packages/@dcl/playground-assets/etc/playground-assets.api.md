@@ -4787,6 +4787,8 @@ export interface TweenComponentDefinitionExtended extends LastWriteWinElementSet
     Mode: TweenHelper;
     setMove(entity: Entity, start: PBVector3, end: PBVector3, duration: number, easingFunction?: EasingFunction): void;
     setMoveContinuous(entity: Entity, direction: PBVector3, speed: number, duration?: number): void;
+    setMoveRotateScale(entity: Entity, positionStart: PBVector3, positionEnd: PBVector3, rotationStart: PBQuaternion, rotationEnd: PBQuaternion, scaleStart: PBVector3, scaleEnd: PBVector3, duration: number, easingFunction?: EasingFunction): void;
+    setMoveRotateScaleContinuous(entity: Entity, positionDirection: PBVector3, rotationDirection: PBQuaternion, scaleDirection: PBVector3, speed: number, duration?: number): void;
     setRotate(entity: Entity, start: PBQuaternion, end: PBQuaternion, duration: number, easingFunction?: EasingFunction): void;
     setRotateContinuous(entity: Entity, direction: PBQuaternion, speed: number, duration?: number): void;
     setScale(entity: Entity, start: PBVector3, end: PBVector3, duration: number, easingFunction?: EasingFunction): void;
@@ -4800,6 +4802,10 @@ export interface TweenHelper {
     Move: (move: Move) => PBTween['mode'];
     // (undocumented)
     MoveContinuous: (move: MoveContinuous) => PBTween['mode'];
+    // (undocumented)
+    MoveRotateScale: (moveRotateScale: MoveRotateScale) => PBTween['mode'];
+    // (undocumented)
+    MoveRotateScaleContinuous: (moveRotateScaleContinuous: MoveRotateScaleContinuous) => PBTween['mode'];
     // (undocumented)
     Rotate: (rotate: Rotate) => PBTween['mode'];
     // (undocumented)
