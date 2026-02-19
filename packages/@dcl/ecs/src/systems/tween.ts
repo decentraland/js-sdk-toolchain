@@ -113,22 +113,6 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
           mode: { ...tween.mode, textureMove: { start: tween.mode.textureMove.end, end: tween.mode.textureMove.start } }
         }
       }
-      if (tween.mode?.$case === 'moveRotateScale' && tween.mode.moveRotateScale) {
-        return {
-          ...tween,
-          mode: {
-            ...tween.mode,
-            moveRotateScale: {
-              positionStart: tween.mode.moveRotateScale.positionEnd,
-              positionEnd: tween.mode.moveRotateScale.positionStart,
-              rotationStart: tween.mode.moveRotateScale.rotationEnd,
-              rotationEnd: tween.mode.moveRotateScale.rotationStart,
-              scaleStart: tween.mode.moveRotateScale.scaleEnd,
-              scaleEnd: tween.mode.moveRotateScale.scaleStart
-            }
-          }
-        }
-      }
       /* istanbul ignore next */
       throw new Error('Invalid tween')
     }
