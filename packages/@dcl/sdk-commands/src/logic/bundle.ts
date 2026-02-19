@@ -116,6 +116,40 @@ export * from '~sdk/script-utils'
 `
 }
 
+/**
+ * Ensures a key exists in a JSON file. Supports dot-separated paths (e.g. "scripts.server-logs").
+ * Silently skips if the file can't be read/written or the key already exists.
+ */
+async function ensureJsonKey(
+  components: BundleComponents,
+  filePath: string,
+  keyPath: string,
+  value: unknown
+): Promise<void> {
+  try {
+    const raw = await components.fs.readFile(filePath, 'utf-8')
+    const parsed = JSON.parse(raw)
+
+    const keys = keyPath.split('.')
+    const lastKey = keys.pop()!
+    let target = parsed
+    for (const key of keys) {
+      target[key] = target[key] || {}
+      target = target[key]
+    }
+    if (target[lastKey] !== undefined) return
+
+    target[lastKey] = value
+    await components.fs.writeFile(filePath, JSON.stringify(parsed, null, 2))
+    printProgressInfo(
+      components.logger,
+      `Added ${colors.bold(`${keyPath}: ${JSON.stringify(value)}`)} to ${path.basename(filePath)}`
+    )
+  } catch (_) {
+    // read/write failed — skip silently
+  }
+}
+
 export async function bundleProject(components: BundleComponents, options: CompileOptions, sceneJson: Scene) {
   const tsconfig = path.join(options.workingDirectory, 'tsconfig.json')
   /* istanbul ignore if */
@@ -149,28 +183,24 @@ export async function bundleProject(components: BundleComponents, options: Compi
     ? entrypoints.map((entrypoint) => ({ entrypoint, outputFile: entrypoint.replace(/\.ts$/, '.js') }))
     : [{ entrypoint: entrypoints[0], outputFile: sceneJson.main }]
 
+  // Auto-add build-time defaults for Multiplayer Auth Server scene builds
+  if (!options.single) {
+    const dir = options.workingDirectory
+    await ensureJsonKey(components, path.join(dir, 'scene.json'), 'authoritativeMultiplayer', true)
+    await ensureJsonKey(
+      components,
+      path.join(dir, 'package.json'),
+      'scripts.server-logs',
+      'sdk-commands sdk-server-logs'
+    )
+  }
+
   for (const input of inputs) {
     await bundleSingleProject(components, {
       ...options,
       tsconfig,
       ...input
     })
-  }
-
-  // Auto-add authoritativeMultiplayer flag to scene.json for all scene builds
-  if (!options.single) {
-    const sceneJsonPath = path.join(options.workingDirectory, 'scene.json')
-    try {
-      const raw = await components.fs.readFile(sceneJsonPath, 'utf-8')
-      const parsed = JSON.parse(raw)
-      if (!parsed.authoritativeMultiplayer) {
-        parsed.authoritativeMultiplayer = true
-        await components.fs.writeFile(sceneJsonPath, JSON.stringify(parsed, null, 2))
-        printProgressInfo(components.logger, `Added ${colors.bold('authoritativeMultiplayer: true')} to scene.json`)
-      }
-    } catch (_) {
-      // scene.json read/write failed — skip silently
-    }
   }
 
   return { sceneJson, inputs }
