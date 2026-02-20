@@ -6,6 +6,7 @@ import child_process from 'child_process'
 import esbuild from 'esbuild'
 import { future } from 'fp-future'
 import { globSync } from 'glob'
+import fs from 'fs'
 import path from 'path'
 import { pathToFileURL } from 'url'
 import i18next from 'i18next'
@@ -228,23 +229,26 @@ export async function bundleSingleProject(components: BundleComponents, options:
           }
         }
       })(),
-      // Resolve asset-packs from sdk-commands' dependencies (nested in @dcl/inspector)
+      // Resolve asset-packs from the scene's own node_modules (if the user explicitly installed it),
+      // otherwise fall back to the version bundled inside @dcl/inspector.
+      // NOTE: We use a direct path check (fs.existsSync) instead of require.resolve here because
+      // require.resolve walks UP the directory tree from workingDirectory, which would incorrectly
+      // pick up @dcl/asset-packs installed next to the scene (e.g. at a monorepo root) rather
+      // than the one the user intentionally installed inside the scene.
       '@dcl/asset-packs': (() => {
+        const sceneOwnAssetPacks = path.join(options.workingDirectory, 'node_modules', '@dcl', 'asset-packs', 'package.json')
+        if (fs.existsSync(sceneOwnAssetPacks)) {
+          return path.dirname(sceneOwnAssetPacks)
+        }
         try {
-          const directPath = path.join(options.workingDirectory, 'node_modules/@dcl/asset-packs/package.json')
-          require.resolve(directPath)
-          return path.dirname(directPath)
+          // Fallback: resolve from @dcl/inspector's node_modules
+          const inspectorPath = require.resolve('@dcl/inspector/package.json', { paths: [__dirname] })
+          return path.dirname(
+            require.resolve('@dcl/asset-packs/package.json', { paths: [path.dirname(inspectorPath)] })
+          )
         } catch {
-          try {
-            // Fallback: resolve from @dcl/inspector's node_modules
-            const inspectorPath = require.resolve('@dcl/inspector/package.json', { paths: [__dirname] })
-            return path.dirname(
-              require.resolve('@dcl/asset-packs/package.json', { paths: [path.dirname(inspectorPath)] })
-            )
-          } catch {
-            // Last resort: try resolving from current directory
-            return path.dirname(require.resolve('@dcl/asset-packs/package.json', { paths: [__dirname] }))
-          }
+          // Last resort: try resolving from current directory
+          return path.dirname(require.resolve('@dcl/asset-packs/package.json', { paths: [__dirname] }))
         }
       })()
     },
