@@ -87,6 +87,13 @@ export function getSegmentKey() {
     : 'mjCV5Dc4VAKXLJAH5g7LyHyW1jrIR3to'
 }
 
+export function getStorageSegmentKey() {
+  const isProduction = !process.env.DEVELOPER_MODE
+  return isProduction
+    ? /* istanbul ignore next */ '8UFiv7zCIgTYR4Eqwn0jRoSZisc5w3hy'
+    : 'ioegDOzIWkKJWuJnlrjE3FDxm1Dkd4eZ'
+}
+
 /* istanbul ignore next */
 export async function getLandRegistry(components: Pick<CliComponents, 'config'>) {
   return readStringConfig(components, 'DCL_LAND_REGISTRY_ADDRESS')
