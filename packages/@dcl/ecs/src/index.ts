@@ -13,6 +13,7 @@ export * from './systems/assetLoad'
 export * from './systems/async-task'
 export * from './systems/tween'
 export * from './systems/triggerArea'
+export * from './systems/physics'
 export * from './engine/entity'
 export * from './components/types'
 
