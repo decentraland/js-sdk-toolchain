@@ -3748,11 +3748,31 @@ export namespace PBVisibilityComponent {
     export function encode(message: PBVisibilityComponent, writer?: _m0.Writer): _m0.Writer;
 }
 
+// @public
+export const Physics: PhysicsSystem;
+
 // @public (undocumented)
 export const PhysicsForce: LastWriteWinElementSetComponentDefinition<PBPhysicsForce>;
 
+// @public
+export enum PhysicsForceSpace {
+    // (undocumented)
+    PFS_LOCAL = "local",
+    // (undocumented)
+    PFS_WORLD = "world"
+}
+
 // @public (undocumented)
 export const PhysicsImpulse: LastWriteWinElementSetComponentDefinition<PBPhysicsImpulse>;
+
+// @public (undocumented)
+export interface PhysicsSystem {
+    applyForceToPlayer(source: Entity, vector: Vector3Type, space?: PhysicsForceSpace): void;
+    applyForceToPlayer(source: Entity, direction: Vector3Type, magnitude: number, space?: PhysicsForceSpace): void;
+    applyImpulseToPlayer(vector: Vector3Type, space?: PhysicsForceSpace): void;
+    applyImpulseToPlayer(direction: Vector3Type, magnitude: number, space?: PhysicsForceSpace): void;
+    removeForceFromPlayer(source: Entity): void;
+}
 
 // @public
 export namespace Plane {
@@ -4266,6 +4286,9 @@ export namespace RotateContinuous {
     // (undocumented)
     export function encode(message: RotateContinuous, writer?: _m0.Writer): _m0.Writer;
 }
+
+// @public
+export function rotateVectorByQuaternion(v: Vector3Type, q: QuaternionType): Vector3Type;
 
 // Warning: (ae-missing-release-tag) "RPCSendableMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
