@@ -16,7 +16,8 @@ import type {
   IEngineOptions,
   LastWriteWinElementSetComponentDefinition,
   MapComponentDefinition,
-  PreEngine
+  PreEngine,
+  AddEntityFromCompositeOptions
 } from './types'
 import {
   createValueSetComponentDefinitionFromSchema,
@@ -25,12 +26,13 @@ import {
 import { removeEntityWithChildren as removeEntityWithChildrenEngine } from '../runtime/helpers/tree'
 import { CrdtMessageType } from '../serialization/crdt'
 import type { CompositeProvider } from '../composite/instance'
+import { instanceComposite } from '../composite/instance'
 export * from './input'
 export * from './readonly'
 export * from './types'
 export { Entity, ByteBuffer, SystemItem, OnChangeFunction }
 
-function preEngine(options?: IEngineOptions): PreEngine {
+function preEngine(options?: IEngineOptions): PreEngine & { getCompositeProvider: () => CompositeProvider | null } {
   const entityContainer = options?.entityContainer ?? createEntityContainer()
   const componentsDefinition = new Map<number, ComponentDefinition<unknown>>()
   const systems = SystemContainer()
@@ -324,6 +326,28 @@ export function Engine(options?: IEngineOptions): IEngine {
     await crdtSystem.sendMessages(deletedEntites)
   }
 
+  const TransformComponent = components.Transform({ defineComponentFromSchema: partialEngine.defineComponentFromSchema })
+
+  function addEntityFromComposite(src: string, options?: AddEntityFromCompositeOptions): Entity {
+    const provider = partialEngine.getCompositeProvider()
+    if (!provider) {
+      throw new Error('CompositeProvider has not been set. Call engine.setCompositeProvider() first.')
+    }
+
+    const compositeResource = provider.getCompositeOrNull(src)
+    if (!compositeResource) {
+      throw new Error(`Composite "${src}" not found.`)
+    }
+
+    const rootEntity = instanceComposite(engineInstance, compositeResource, provider, {})
+
+    if (options?.transform) {
+      TransformComponent.createOrReplace(rootEntity, options.transform)
+    }
+
+    return rootEntity
+  }
+
   const engineInstance: IEngine = {
     _id: Date.now(),
     addEntity: partialEngine.addEntity,
@@ -355,7 +379,8 @@ export function Engine(options?: IEngineOptions): IEngine {
 
     entityContainer: partialEngine.entityContainer,
     setCompositeProvider: partialEngine.setCompositeProvider,
-    getCompositeProvider: partialEngine.getCompositeProvider
+    getCompositeProvider: partialEngine.getCompositeProvider,
+    addEntityFromComposite
   }
 
   return engineInstance
