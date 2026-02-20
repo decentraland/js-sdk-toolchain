@@ -5,8 +5,8 @@ import { Vector3Type } from '../schemas/custom/Vector3'
 import { createPhysicsImpulseHelper } from './physics-impulse'
 import { createPhysicsForceHelper } from './physics-force'
 
-export { PhysicsForceSpace } from './physics-common'
 import { PhysicsForceSpace } from './physics-common'
+export { PhysicsForceSpace } from './physics-common'
 
 /**
  * @public
@@ -74,14 +74,14 @@ export function createPhysicsSystem(engine: IEngine): PhysicsSystem {
   const force = createPhysicsForceHelper(engine)
 
   engine.addSystem(
-    function PhysicsFrameTracker() {
+    function PhysicsTickSystem() {
       impulse.advanceFrame()
       if (force.hasLocalSources) {
         force.recalcForce()
       }
     },
     SYSTEMS_REGULAR_PRIORITY * 2,
-    'dcl.PhysicsFrameTracker'
+    'dcl.PhysicsTickSystem'
   )
 
   return {

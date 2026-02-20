@@ -6,7 +6,7 @@ import { PhysicsForceSpace, isZeroVector, normalizeVector, scaleVector, addVecto
 
 /**
  * @internal
- * Impulse helper returned by the factory. The facade exposes only the public method;
+ * Impulse helper returned by the factory. The facade exposes `applyImpulseToPlayer`;
  * `advanceFrame` is called by the background system each tick.
  */
 export interface PhysicsImpulseHelper {

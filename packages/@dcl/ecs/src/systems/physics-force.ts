@@ -9,8 +9,9 @@ type ForceEntry = { vector: Vector3Type; space: PhysicsForceSpace }
 
 /**
  * @internal
- * Force helper returned by the factory. The facade exposes the public methods;
- * `hasLocalSources` and `recalcForce` are used by the background system.
+ * Force helper returned by the factory. The facade exposes `applyForceToPlayer`
+ * and `removeForceFromPlayer`; `hasLocalSources` and `recalcForce` are used
+ * by the background system.
  */
 export interface PhysicsForceHelper {
   applyForceToPlayer(
