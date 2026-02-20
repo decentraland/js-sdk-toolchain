@@ -2572,7 +2572,11 @@ export interface PBInputModifier_StandardInput {
     // (undocumented)
     disableAll?: boolean | undefined;
     // (undocumented)
+    disableDoubleJump?: boolean | undefined;
+    // (undocumented)
     disableEmote?: boolean | undefined;
+    // (undocumented)
+    disableGliding?: boolean | undefined;
     // (undocumented)
     disableJog?: boolean | undefined;
     // (undocumented)
