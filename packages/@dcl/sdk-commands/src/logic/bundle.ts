@@ -231,8 +231,9 @@ export async function bundleSingleProject(components: BundleComponents, options:
       // Resolve asset-packs from sdk-commands' dependencies (nested in @dcl/inspector)
       '@dcl/asset-packs': (() => {
         try {
-          // Try to resolve from project's node_modules first
-          return path.dirname(require.resolve('@dcl/asset-packs/package.json', { paths: [options.workingDirectory] }))
+          const directPath = path.join(options.workingDirectory, 'node_modules/@dcl/asset-packs/package.json')
+          require.resolve(directPath)
+          return path.dirname(directPath)
         } catch {
           try {
             // Fallback: resolve from @dcl/inspector's node_modules
