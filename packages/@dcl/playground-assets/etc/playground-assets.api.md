@@ -51,6 +51,26 @@ export namespace AppendValueOperation {
 export function areConnected(parcels: Coords[]): boolean;
 
 // @public (undocumented)
+export const AssetLoad: LastWriteWinElementSetComponentDefinition<PBAssetLoad>;
+
+// @public (undocumented)
+export const AssetLoadLoadingState: GrowOnlyValueSetComponentDefinition<PBAssetLoadLoadingState>;
+
+// @public (undocumented)
+export interface AssetLoadLoadingStateSystem {
+    // (undocumented)
+    registerAssetLoadLoadingStateEntity(entity: Entity, callback: AssetLoadLoadingStateSystemCallback): void;
+    // (undocumented)
+    removeAssetLoadLoadingStateEntity(entity: Entity): void;
+}
+
+// @public
+export const assetLoadLoadingStateSystem: AssetLoadLoadingStateSystem;
+
+// @public (undocumented)
+export type AssetLoadLoadingStateSystemCallback = (event: DeepReadonlyObject<PBAssetLoadLoadingState>) => void;
+
+// @public (undocumented)
 export const AudioEvent: GrowOnlyValueSetComponentDefinition<PBAudioEvent>;
 
 // Warning: (ae-missing-release-tag) "AudioSource" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -622,6 +642,8 @@ export type ComponentDefinition<T> = LastWriteWinElementSetComponentDefinition<T
 // @public
 export const componentDefinitionByName: {
     "core::Animator": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAnimator>>;
+    "core::AssetLoad": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAssetLoad>>;
+    "core::AssetLoadLoadingState": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAssetLoadLoadingState>>;
     "core::AudioEvent": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAudioEvent>>;
     "core::AudioSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioSource>>;
     "core::AudioStream": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioStream>>;
@@ -865,6 +887,9 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
 
 // @public (undocumented)
 export function createReactBasedUiSystem(engine: IEngine, pointerSystem: PointerEventsSystem): ReactBasedUiSystem;
+
+// @public
+export function createTimers(targetEngine: IEngine): Timers;
 
 // @public (undocumented)
 export function createTweenSystem(engine: IEngine): TweenSystem;
@@ -1153,6 +1178,7 @@ export type EventSystemOptions = {
     maxDistance?: number;
     showFeedback?: boolean;
     showHighlight?: boolean;
+    maxPlayerDistance?: number;
 };
 
 // @public
@@ -1162,6 +1188,33 @@ export type ExcludeUndefined<T> = {
 
 // @public
 export const executeTask: (task: Task<unknown>) => void;
+
+// @public
+export interface FlatMaterial {
+    albedoColor: PBColor4 | undefined;
+    alphaTest: number | undefined;
+    readonly alphaTexture: FlatTexture;
+    readonly bumpTexture: FlatTexture | undefined;
+    castShadows: boolean | undefined;
+    diffuseColor: PBColor4 | undefined;
+    directIntensity: number | undefined;
+    emissiveColor: PBColor3 | undefined;
+    emissiveIntensity: number | undefined;
+    readonly emissiveTexture: FlatTexture | undefined;
+    metallic: number | undefined;
+    reflectivityColor: PBColor3 | undefined;
+    roughness: number | undefined;
+    specularIntensity: number | undefined;
+    readonly texture: FlatTexture;
+    transparencyMode: MaterialTransparencyMode | undefined;
+}
+
+// @public
+export interface FlatTexture {
+    filterMode: TextureFilterMode | undefined;
+    src: string | undefined;
+    wrapMode: TextureWrapMode | undefined;
+}
 
 // @public (undocumented)
 export type FlexDirectionType = 'row' | 'column' | 'column-reverse' | 'row-reverse';
@@ -1194,6 +1247,15 @@ export function getCompositeRootComponent(engine: IEngine): LastWriteWinElementS
 //
 // @public (undocumented)
 export const getDefaultOpts: (opts?: Partial<EventSystemOptions>) => EventSystemOptions;
+
+// @public
+export function getEntitiesWithParent(engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema'>, parent: Entity): Entity[];
+
+// @public
+export function getWorldPosition(engine: WorldTransformEngine, entity: Entity): Vector3Type;
+
+// @public
+export function getWorldRotation(engine: WorldTransformEngine, entity: Entity): QuaternionType;
 
 // Warning: (ae-missing-release-tag) "GlobalDirectionRaycastOptions" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -1659,6 +1721,10 @@ export const Material: MaterialComponentDefinitionExtended;
 
 // @public (undocumented)
 export interface MaterialComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBMaterial> {
+    getFlat: (entity: Entity) => ReadonlyFlatMaterial;
+    getFlatMutable: (entity: Entity) => FlatMaterial;
+    getFlatMutableOrNull: (entity: Entity) => FlatMaterial | null;
+    getFlatOrNull: (entity: Entity) => ReadonlyFlatMaterial | null;
     setBasicMaterial: (entity: Entity, material: PBMaterial_UnlitMaterial) => void;
     setPbrMaterial: (entity: Entity, material: PBMaterial_PbrMaterial) => void;
     Texture: TextureHelper;
@@ -2142,6 +2208,35 @@ export namespace PBAnimator {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAnimator;
     // (undocumented)
     export function encode(message: PBAnimator, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAssetLoad {
+    // (undocumented)
+    assets: string[];
+}
+
+// @public (undocumented)
+export namespace PBAssetLoad {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAssetLoad;
+    // (undocumented)
+    export function encode(message: PBAssetLoad, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAssetLoadLoadingState {
+    asset: string;
+    currentState: LoadingState;
+    timestamp: number;
+}
+
+// @public (undocumented)
+export namespace PBAssetLoadLoadingState {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAssetLoadLoadingState;
+    // (undocumented)
+    export function encode(message: PBAssetLoadLoadingState, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2843,6 +2938,7 @@ export interface PBPointerEvents_Info {
     button?: InputAction | undefined;
     hoverText?: string | undefined;
     maxDistance?: number | undefined;
+    maxPlayerDistance?: number | undefined;
     showFeedback?: boolean | undefined;
     showHighlight?: boolean | undefined;
 }
@@ -3915,7 +4011,7 @@ export namespace ReactEcs {
     useEffect: EffectHook;
     const // (undocumented)
     useState: StateHook;
-        {};
+    export {};
 }
 
 // Warning: (tsdoc-at-sign-in-word) The "@" character looks like part of a TSDoc tag; use a backslash to escape it
@@ -3939,6 +4035,33 @@ export interface ReactElement<P = any, T extends string | JSXElementConstructor<
 export type ReadonlyComponentSchema<T extends [ComponentDefinition<unknown>, ...ComponentDefinition<unknown>[]]> = {
     [K in keyof T]: T[K] extends ComponentDefinition<unknown> ? ReturnType<T[K]['get']> : never;
 };
+
+// @public
+export interface ReadonlyFlatMaterial {
+    readonly albedoColor: PBColor4 | undefined;
+    readonly alphaTest: number | undefined;
+    readonly alphaTexture: ReadonlyFlatTexture;
+    readonly bumpTexture: ReadonlyFlatTexture | undefined;
+    readonly castShadows: boolean | undefined;
+    readonly diffuseColor: PBColor4 | undefined;
+    readonly directIntensity: number | undefined;
+    readonly emissiveColor: PBColor3 | undefined;
+    readonly emissiveIntensity: number | undefined;
+    readonly emissiveTexture: ReadonlyFlatTexture | undefined;
+    readonly metallic: number | undefined;
+    readonly reflectivityColor: PBColor3 | undefined;
+    readonly roughness: number | undefined;
+    readonly specularIntensity: number | undefined;
+    readonly texture: ReadonlyFlatTexture;
+    readonly transparencyMode: MaterialTransparencyMode | undefined;
+}
+
+// @public
+export interface ReadonlyFlatTexture {
+    readonly filterMode: TextureFilterMode | undefined;
+    readonly src: string | undefined;
+    readonly wrapMode: TextureWrapMode | undefined;
+}
 
 // @public (undocumented)
 export type ReadOnlyGrowOnlyValueSetComponentDefinition<T> = Omit<GrowOnlyValueSetComponentDefinition<T>, 'addValue'>;
@@ -4375,6 +4498,29 @@ export const enum TextWrap {
     // (undocumented)
     TW_WRAP = 0
 }
+
+// Warning: (ae-missing-release-tag) "TimerCallback" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type TimerCallback = () => void;
+
+// Warning: (ae-missing-release-tag) "TimerId" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type TimerId = number;
+
+// Warning: (ae-missing-release-tag) "Timers" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type Timers = {
+    setTimeout(callback: TimerCallback, ms: number): TimerId;
+    clearTimeout(timerId: TimerId): void;
+    setInterval(callback: TimerCallback, ms: number): TimerId;
+    clearInterval(timerId: TimerId): void;
+};
+
+// @public
+export const timers: Timers;
 
 // @public
 export const ToGammaSpace: number;
@@ -4915,6 +5061,9 @@ export interface VirtualCameraComponentDefinitionExtended extends LastWriteWinEl
 
 // @public (undocumented)
 export const VisibilityComponent: LastWriteWinElementSetComponentDefinition<PBVisibilityComponent>;
+
+// @public
+export type WorldTransformEngine = Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema' | 'PlayerEntity'>;
 
 // @public (undocumented)
 export const enum YGAlign {
