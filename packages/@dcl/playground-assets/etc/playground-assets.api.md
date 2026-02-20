@@ -792,6 +792,7 @@ export namespace CompositeDefinition {
 // @public (undocumented)
 export type CompositeProvider = {
     getCompositeOrNull(src: string): CompositeResource | null;
+    loadComposite?: (src: string) => Promise<CompositeResource>;
 };
 
 // @public (undocumented)
@@ -1316,6 +1317,7 @@ export interface IEngine {
     defineValueSetComponentFromSchema<T>(componentName: string, spec: ISchema<T>, options: ValueSetOptions<T>): GrowOnlyValueSetComponentDefinition<T>;
     getComponent<T>(componentId: number | string): ComponentDefinition<T>;
     getComponentOrNull<T>(componentId: number | string): ComponentDefinition<T> | null;
+    getCompositeProvider(): CompositeProvider | null;
     getEntitiesByTag(tagName: string): Iterable<Entity>;
     getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     getEntityByName<T = never, K = T>(value: K & (T extends never ? never : string)): Entity;
@@ -1333,6 +1335,7 @@ export interface IEngine {
     removeSystem(selector: string | SystemFn): boolean;
     readonly RootEntity: Entity;
     seal(): void;
+    setCompositeProvider(provider: CompositeProvider): void;
     // (undocumented)
     update(deltaTime: number): Promise<void>;
 }

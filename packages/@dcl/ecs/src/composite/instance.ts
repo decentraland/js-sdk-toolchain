@@ -24,6 +24,7 @@ export type CompositeResource = {
  */
 export type CompositeProvider = {
   getCompositeOrNull(src: string): CompositeResource | null
+  loadComposite?: (src: string) => Promise<CompositeResource>
 }
 
 /** @public */
