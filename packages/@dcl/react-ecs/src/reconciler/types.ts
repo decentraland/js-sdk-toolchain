@@ -6,13 +6,15 @@ export type EngineComponents = Omit<EntityComponents, keyof Listeners>
 
 export type OpaqueHandle = any
 export type Type = 'entity'
-export type Props = EntityComponents & { children?: Children; key?: Key }
+export type Props = EntityComponents & { children?: Children; key?: Key; pointerFeedback?: boolean }
 export type Container = Document | Instance | any
 export type Instance = {
   entity: Entity
   parent?: Entity
   rightOf?: Entity
   _child: Instance[]
+  /** When true, pointer events are registered with showFeedback true (Button only). */
+  pointerFeedback?: boolean
 }
 export type TextInstance = never
 export type SuspenseInstance = never

@@ -60,9 +60,15 @@ export function Button(props: UiButtonProps) {
     if (uiBackgroundProps && uiBackgroundProps.color) uiBackgroundProps.color.a /= 2
   }
 
+  const hasAnyPointerListener =
+    (onMouseDown ?? onMouseUp ?? onMouseEnter ?? onMouseLeave) != null
+  const ensurePointerEvents =
+    !props.disabled && !hasAnyPointerListener ? () => {} : undefined
+
   return (
     <entity
-      onMouseDown={!!props.disabled ? undefined : onMouseDown}
+      pointerFeedback
+      onMouseDown={!!props.disabled ? undefined : onMouseDown ?? ensurePointerEvents}
       onMouseUp={!!props.disabled ? undefined : onMouseUp}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}

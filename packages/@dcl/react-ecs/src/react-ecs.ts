@@ -7,7 +7,12 @@ import { Callback, Key } from './components'
  * @public
  */
 export interface EcsElements {
-  entity: Partial<EntityComponents> & { children?: ReactEcs.JSX.ReactNode; key?: Key }
+  entity: Partial<EntityComponents> & {
+    children?: ReactEcs.JSX.ReactNode
+    key?: Key
+    /** When true, PBPointerEvents is created with showFeedback true (e.g. Button). Default false. */
+    pointerFeedback?: boolean
+  }
 }
 
 /**

@@ -1090,6 +1090,7 @@ export interface EcsElements {
     entity: Partial<EntityComponents> & {
         children?: ReactEcs.JSX.ReactNode;
         key?: Key;
+        pointerFeedback?: boolean;
     };
 }
 

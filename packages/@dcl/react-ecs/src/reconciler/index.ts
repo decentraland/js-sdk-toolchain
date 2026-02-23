@@ -132,9 +132,7 @@ export function createReconciler(
             entity: instance.entity,
             opts: {
               button: InputAction.IA_POINTER,
-              // We add this showFeedBack so the pointerEventSystem creates a PointerEvent component with our entity
-              // This is needed for the renderer to know which entities are clickeables
-              showFeedback: true
+              showFeedback: instance.pointerFeedback === true
             }
           },
           () => pointerEventCallback(instance.entity, pointerEvent)
@@ -294,6 +292,10 @@ export function createReconciler(
         if (keyTyped === 'children' || keyTyped === 'key') {
           continue
         }
+        if (keyTyped === 'pointerFeedback') {
+          instance.pointerFeedback = props.pointerFeedback
+          continue
+        }
         if (isListener(keyTyped)) {
           upsertListener(instance, {
             type: 'add',
@@ -303,6 +305,14 @@ export function createReconciler(
         } else {
           upsertComponent(instance, props[keyTyped], keyTyped)
         }
+      }
+
+      if (instance.pointerFeedback && !clickEvents.has(instance.entity)) {
+        upsertListener(instance, {
+          type: 'add',
+          props: () => {},
+          component: 'onMouseDown'
+        })
       }
 
       return instance

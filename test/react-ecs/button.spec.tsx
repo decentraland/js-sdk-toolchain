@@ -65,7 +65,7 @@ describe('Button React Ecs', () => {
     disabled = true // changes text and background color alpha value
 
     await engine.update(1)
-    expect(getPointerEvent(rootDivEntity) === null)
+    expect(getPointerEvent(rootDivEntity)).toBeDefined()
     expect(getText(rootDivEntity)).toMatchObject({
       value: 'BOEDO',
       color: { r: 1, g: 0.2, b: 0.3, a: 0.5 }
