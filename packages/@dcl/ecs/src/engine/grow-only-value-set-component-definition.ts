@@ -26,7 +26,7 @@ function freezeSet<T>(set: Set<T>): ReadonlySet<T> {
 }
 
 function sortByTimestamp(a: { timestamp: number }, b: { timestamp: number }) {
-  return a.timestamp > b.timestamp ? 1 : -1
+  return a.timestamp - b.timestamp
 }
 
 /**
