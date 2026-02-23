@@ -192,6 +192,12 @@ export const enum AvatarModifierType {
 }
 
 // @public (undocumented)
+export const AvatarMovement: LastWriteWinElementSetComponentDefinition<PBAvatarMovement>;
+
+// @public (undocumented)
+export const AvatarMovementInfo: LastWriteWinElementSetComponentDefinition<PBAvatarMovementInfo>;
+
+// @public (undocumented)
 export interface AvatarMovementSettings {
     allowWeightedMovement?: boolean | undefined;
     // (undocumented)
@@ -734,6 +740,8 @@ export const componentDefinitionByName: {
     "core::AvatarEquippedData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>>;
     "core::AvatarLocomotionSettings": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarLocomotionSettings>>;
     "core::AvatarModifierArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>>;
+    "core::AvatarMovement": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarMovement>>;
+    "core::AvatarMovementInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarMovementInfo>>;
     "core::AvatarShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarShape>>;
     "core::Billboard": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBBillboard>>;
     "core::CameraLayer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraLayer>>;
@@ -2561,6 +2569,40 @@ export namespace PBAvatarModifierArea {
 }
 
 // @public (undocumented)
+export interface PBAvatarMovement {
+    // (undocumented)
+    groundDirection?: PBVector3 | undefined;
+    orientation: number;
+    // (undocumented)
+    velocity: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBAvatarMovement {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarMovement;
+    // (undocumented)
+    export function encode(message: PBAvatarMovement, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAvatarMovementInfo {
+    actualVelocity: PBVector3 | undefined;
+    externalVelocity: PBVector3 | undefined;
+    previousStepTime: number;
+    requestedVelocity: PBVector3 | undefined;
+    stepTime: number;
+}
+
+// @public (undocumented)
+export namespace PBAvatarMovementInfo {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarMovementInfo;
+    // (undocumented)
+    export function encode(message: PBAvatarMovementInfo, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBAvatarShape {
     bodyShape?: string | undefined;
     emotes: string[];
@@ -3381,9 +3423,11 @@ export interface PBRaycast {
         $case: "targetEntity";
         targetEntity: number;
     } | undefined;
+    includeWorld?: boolean | undefined;
     maxDistance: number;
     originOffset?: PBVector3 | undefined;
     queryType: RaycastQueryType;
+    shape?: RaycastShape | undefined;
     timestamp?: number | undefined;
 }
 
@@ -4370,6 +4414,12 @@ export const enum RaycastQueryType {
 export const RaycastResult: LastWriteWinElementSetComponentDefinition<PBRaycastResult>;
 
 // @public (undocumented)
+export const enum RaycastShape {
+    RS_AVATAR = 1,
+    RS_RAY = 0
+}
+
+// @public (undocumented)
 export interface RaycastSystem {
     globalDirectionOptions(options?: Partial<GlobalDirectionRaycastOptions>): RaycastSystemOptions;
     globalTargetOptions(options?: Partial<GlobalTargetRaycastOptions>): RaycastSystemOptions;
@@ -4460,7 +4510,7 @@ export namespace ReactEcs {
     useEffect: EffectHook;
     const // (undocumented)
     useState: StateHook;
-    export {};
+        {};
 }
 
 // Warning: (tsdoc-at-sign-in-word) The "@" character looks like part of a TSDoc tag; use a backslash to escape it

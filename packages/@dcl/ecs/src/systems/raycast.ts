@@ -1,5 +1,5 @@
 import * as components from '../components'
-import { ColliderLayer, RaycastQueryType, PBRaycastResult } from '../components'
+import { ColliderLayer, RaycastQueryType, RaycastShape, PBRaycastResult } from '../components'
 import { DeepReadonlyObject, Entity, IEngine } from '../engine'
 import { Vector3 } from '../components/generated/pb/decentraland/common/vectors.gen'
 import { EntityState } from '../engine/entity'
@@ -26,6 +26,8 @@ export type RaycastSystemOptions = {
   queryType: RaycastQueryType
   continuous?: boolean | undefined
   collisionMask?: number | undefined
+  shape?: RaycastShape | undefined
+  includeWorld?: boolean | undefined
 }
 
 export type LocalDirectionRaycastSystemOptions = {
@@ -256,6 +258,8 @@ export function createRaycastSystem(engine: IEngine): RaycastSystem {
       raycast.direction = raycastValue.directionRawValue
       raycast.continuous = raycastValue.continuous
       raycast.queryType = raycastValue.queryType
+      raycast.shape = raycastValue.shape
+      raycast.includeWorld = raycastValue.includeWorld
 
       entitiesCallbackResultMap.set(entity, { callback: callback })
     }
