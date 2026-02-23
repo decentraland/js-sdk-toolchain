@@ -25,7 +25,7 @@ import {
   UiTransform,
   ComponentDefinition
 } from '@dcl/ecs'
-import { LIVEKIT_MAX_SIZE } from '@dcl/ecs/dist/systems/crdt'
+import { LIVEKIT_MAX_SIZE } from './server'
 
 export const NOT_SYNC_COMPONENTS: ComponentDefinition<unknown>[] = [
   VideoEvent,
@@ -72,9 +72,9 @@ export function engineToCrdt(engine: IEngine): Uint8Array[] {
     if (!shouldSyncComponent(itComponentDefinition)) {
       continue
     }
+
     itComponentDefinition.dumpCrdtStateToBuffer(crdtBuffer, (entity) => {
-      const isNetworkEntity = NetworkEntity.has(entity)
-      return isNetworkEntity
+      return NetworkEntity.has(entity)
     })
   }
 
@@ -96,7 +96,6 @@ export function engineToCrdt(engine: IEngine): Uint8Array[] {
         }
 
         // If the message itself is larger than the limit, we need to handle it specially
-        // For now, we'll skip it to prevent infinite loops
         if (messageSize / 1024 > LIVEKIT_MAX_SIZE) {
           console.error(
             `Message too large (${messageSize} bytes), skipping component ${message.componentId} for entity ${message.entityId}`

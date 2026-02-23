@@ -7,6 +7,7 @@ import { DataLayer } from '../data-layer/rpc'
 import { handleDataLayerWs } from '../data-layer/ws'
 import { PreviewComponents } from '../types'
 import { setupEcs6Endpoints } from './endpoints'
+import { setupStorageEndpoints } from './storage-service'
 import { setupRealmAndComms } from './realm'
 import { getLanUrl } from '../utils'
 
@@ -67,6 +68,7 @@ export async function wireRouter(components: PreviewComponents, workspace: Works
   })
 
   setupRealmAndComms(components, router, localSceneParcels)
+  setupStorageEndpoints(components, router, workspace)
   await setupEcs6Endpoints(components, router, workspace)
 
   components.server.setContext(components)

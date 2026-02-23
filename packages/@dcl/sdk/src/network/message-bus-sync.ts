@@ -1,26 +1,52 @@
-import { IEngine, Transport, RealmInfo, PlayerIdentityData } from '@dcl/ecs'
+import { IEngine, Transport, RealmInfo } from '@dcl/ecs'
 import { type SendBinaryRequest, type SendBinaryResponse } from '~system/CommunicationsController'
 
 import { syncFilter } from './filter'
 import { engineToCrdt } from './state'
-import { BinaryMessageBus, CommsMessage, decodeString, encodeString } from './binary-message-bus'
+import { BinaryMessageBus, CommsMessage } from './binary-message-bus'
 import { fetchProfile } from './utils'
 import { entityUtils } from './entities'
+import { createServerValidator } from './server'
 import { GetUserDataRequest, GetUserDataResponse } from '~system/UserIdentity'
 import { definePlayerHelper } from '../players'
 import { serializeCrdtMessages } from '../internal/transports/logger'
+import { IsServerRequest, IsServerResponse } from '~system/EngineApi'
+import { Atom } from '../atom'
+import { setGlobalRoom, Room } from './events/implementation'
 
 export type IProfile = { networkId: number; userId: string }
 // user that we asked for the inital crdt state
+export const AUTH_SERVER_PEER_ID = 'authoritative-server'
+export const DEBUG_NETWORK_MESSAGES = () => (globalThis as any).DEBUG_NETWORK_MESSAGES ?? false
+
+// Test environment detection without 'as any'
+const isTestEnvironment = (): boolean => {
+  try {
+    if (typeof globalThis === 'undefined') return false
+    const globalWithProcess = globalThis as unknown as { process?: { env?: { NODE_ENV?: string } } }
+    return globalWithProcess.process?.env?.NODE_ENV === 'test'
+  } catch {
+    return false
+  }
+}
+
 export function addSyncTransport(
   engine: IEngine,
   sendBinary: (msg: SendBinaryRequest) => Promise<SendBinaryResponse>,
-  getUserData: (value: GetUserDataRequest) => Promise<GetUserDataResponse>
+  getUserData: (value: GetUserDataRequest) => Promise<GetUserDataResponse>,
+  isServerFn: (request: IsServerRequest) => Promise<IsServerResponse>,
+  name: string
 ) {
-  const DEBUG_NETWORK_MESSAGES = () => (globalThis as any).DEBUG_NETWORK_MESSAGES ?? false
   // Profile Info
   const myProfile: IProfile = {} as IProfile
   fetchProfile(myProfile!, getUserData)
+
+  const isServerAtom = Atom<boolean>()
+  const isRoomReadyAtom = Atom<boolean>(false)
+
+  void isServerFn({}).then(($: IsServerResponse) => {
+    return isServerAtom.swap(!!$.isServer)
+  })
 
   // Entity utils
   const entityDefinitions = entityUtils(engine, myProfile)
@@ -40,108 +66,196 @@ export function addSyncTransport(
   const players = definePlayerHelper(engine)
 
   let stateIsSyncronized = false
-  let transportInitialzed = false
 
+  /**
+   * We need to wait till 2 ticks that is when the engine is ready to send new messages.
+   * The first tick is for the client engine processing the CRDT messages,
+   * and the second one are the messages created by the main() function.
+   * So to avoid sending those messages, that all the clients have, through the network we put this validation here.
+   */
+  let tick = 0
+  const TRANSPORT_INITIALIZED_NUMBER = isTestEnvironment() ? 0 : 2
   // Add Sync Transport
   const transport: Transport = {
     filter: syncFilter(engine),
     send: async (messages) => {
-      for (const message of [messages].flat()) {
-        if (message.byteLength && transportInitialzed) {
+      if (tick <= TRANSPORT_INITIALIZED_NUMBER) tick++
+      for (const message of tick > TRANSPORT_INITIALIZED_NUMBER ? [messages].flat() : []) {
+        if (message.byteLength) {
           DEBUG_NETWORK_MESSAGES() &&
             console.log(...Array.from(serializeCrdtMessages('[NetworkMessage sent]:', message, engine)))
-          binaryMessageBus.emit(CommsMessage.CRDT, message)
+
+          // Convert regular messages to network messages for broadcasting with chunking
+          for (const chunk of serverValidator.convertRegularToNetworkMessage(message)) {
+            binaryMessageBus.emit(CommsMessage.CRDT, chunk)
+          }
         }
       }
       const peerMessages = getMessagesToSend()
-      let totalSize = 0
-      for (const message of peerMessages) {
-        for (const data of message.data) {
-          totalSize += data.byteLength
-        }
-      }
-      if (totalSize) {
-        DEBUG_NETWORK_MESSAGES() && console.log('Sending network messages: ', totalSize / 1024, 'KB')
-      }
       const response = await sendBinary({ data: [], peerData: peerMessages })
       binaryMessageBus.__processMessages(response.data)
-      transportInitialzed = true
     },
-    type: 'network'
+    type: name
   }
+
+  // Server validation setup
+  const serverValidator = createServerValidator({
+    engine,
+    binaryMessageBus
+  })
+
+  // Initialize Event Bus with registered schemas
+  const eventBus = new Room(engine, binaryMessageBus, isServerAtom, isRoomReadyAtom)
+
+  // Set global eventBus instance
+  setGlobalRoom(eventBus)
+
   engine.addTransport(transport)
   // End add sync transport
 
   // Receive & Process CRDT_STATE
-  binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, (value) => {
-    const { sender, data } = decodeCRDTState(value)
-    if (sender !== myProfile.userId) return
-    DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength / 1024, 'KB')
-    transport.onmessage!(data)
-    stateIsSyncronized = true
-  })
-
-  // Answer to REQ_CRDT_STATE
-  binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, async (_, userId) => {
-    DEBUG_NETWORK_MESSAGES() && console.log(`Sending CRDT State to: ${userId}`)
-
+  binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, async (data, sender) => {
+    DEBUG_NETWORK_MESSAGES() && console.log('[REQ_CRDT_STATE]', sender, Date.now())
     for (const chunk of engineToCrdt(engine)) {
-      binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(userId, chunk), [userId])
+      DEBUG_NETWORK_MESSAGES() && console.log('[Emiting:]', sender, Date.now())
+      binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, chunk, [sender])
+    }
+  })
+  binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, async (data, sender) => {
+    requestingState = false
+    elapsedTimeSinceRequest = 0
+    if (isServerAtom.getOrNull() || sender !== AUTH_SERVER_PEER_ID) return
+    DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength / 1024, 'KB')
+    transport.onmessage!(serverValidator.processClientMessages(data, sender))
+    stateIsSyncronized = true
+
+    // IMPORTANT: Only mark room as ready AFTER state is synchronized
+    // This ensures comms is truly connected and working
+    const realmInfo = RealmInfo.getOrNull(engine.RootEntity)
+    if (realmInfo && checkRoomReady(realmInfo)) {
+      DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady] Marking room as ready after state sync')
+      isRoomReadyAtom.swap(true)
     }
   })
 
-  // Process CRDT messages here
-  binaryMessageBus.on(CommsMessage.CRDT, (value) => {
+  // received message from the network
+  binaryMessageBus.on(CommsMessage.CRDT, (value, sender) => {
+    const isServer = isServerAtom.getOrNull()
     DEBUG_NETWORK_MESSAGES() &&
-      console.log(Array.from(serializeCrdtMessages('[NetworkMessage received]:', value, engine)))
-    transport.onmessage!(value)
+      console.log(
+        transport.type,
+        ...Array.from(serializeCrdtMessages('[NetworkMessage received]:', value, engine)),
+        isServer
+      )
+    if (isServer) {
+      transport.onmessage!(serverValidator.processServerMessages(value, sender))
+    } else if (sender === AUTH_SERVER_PEER_ID) {
+      // Process network messages from server and convert to regular messages
+      transport.onmessage!(serverValidator.processClientMessages(value, sender))
+    }
   })
 
-  async function requestState(retryCount: number = 1) {
-    let players = Array.from(engine.getEntitiesWith(PlayerIdentityData))
-    DEBUG_NETWORK_MESSAGES() && console.log(`Requesting state. Players connected: ${players.length - 1}`)
+  // received authoritative message from server - force apply to fix invalid local state
+  binaryMessageBus.on(CommsMessage.CRDT_AUTHORITATIVE, (value, sender) => {
+    // Only accept authoritative messages from authoritative server
+    if (sender !== AUTH_SERVER_PEER_ID) return
 
-    if (!RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom) {
-      DEBUG_NETWORK_MESSAGES() && console.log(`Aborting Requesting state?. Disconnected`)
-      return
+    // DEBUG_NETWORK_MESSAGES() &&
+    console.log('[AUTHORITATIVE] Received authoritative message from server:', value.byteLength, 'bytes')
+
+    // Process authoritative messages by forcing them through normal CRDT processing
+    // but with a timestamp that's guaranteed to be accepted
+    const authoritativeBuffer = serverValidator.processClientMessages(value, sender, true)
+    if (authoritativeBuffer.byteLength > 0) {
+      // Apply authoritative message through normal transport, but the server's messages
+      // should be processed as authoritative with special timestamp handling
+      transport.onmessage!(authoritativeBuffer)
+
+      DEBUG_NETWORK_MESSAGES() && console.log('[AUTHORITATIVE] Applied server authoritative message to local state')
     }
-
-    binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
-
-    // Wait ~5s for the response.
-    await sleep(5000)
-
-    players = Array.from(engine.getEntitiesWith(PlayerIdentityData))
-
-    if (!stateIsSyncronized) {
-      if (players.length > 1 && retryCount <= 2) {
-        DEBUG_NETWORK_MESSAGES() &&
-          console.log(`Requesting state again ${retryCount} (no response). Players connected: ${players.length - 1}`)
-        void requestState(retryCount + 1)
-      } else {
-        DEBUG_NETWORK_MESSAGES() && console.log('No active players. State syncronized')
-        stateIsSyncronized = true
-      }
-    }
-  }
+  })
 
   players.onEnterScene((player) => {
     DEBUG_NETWORK_MESSAGES() && console.log('[onEnterScene]', player.userId)
+    if (!isServerAtom.getOrNull() && myProfile.userId === player.userId) {
+      requestState()
+    }
   })
+
+  // Helper to check room ready conditions
+  function checkRoomReady(realmInfo: ReturnType<typeof RealmInfo.getOrNull>): boolean {
+    if (!realmInfo) return false
+
+    try {
+      // Check if room instance exists
+      if (!eventBus) return false
+
+      return !!(realmInfo.commsAdapter && realmInfo.isConnectedSceneRoom && realmInfo.room)
+    } catch {
+      return false
+    }
+  }
 
   // Asks for the REQ_CRDT_STATE when its connected to comms
   RealmInfo.onChange(engine.RootEntity, (value) => {
+    const isServer = isServerAtom.getOrNull()
+
     if (!value?.isConnectedSceneRoom) {
-      DEBUG_NETWORK_MESSAGES() && console.log('Disconnected from comms')
-      stateIsSyncronized = false
+      // Only react when actually transitioning from ready to not ready
+      if (isRoomReadyAtom.getOrNull() === true) {
+        DEBUG_NETWORK_MESSAGES() && console.log('Disconnected from comms')
+        isRoomReadyAtom.swap(false)
+        if (!isServer) {
+          stateIsSyncronized = false
+        }
+      }
     }
 
     if (value?.isConnectedSceneRoom) {
-      DEBUG_NETWORK_MESSAGES() && console.log('Connected to comms')
-    }
+      requestState()
 
-    if (value?.isConnectedSceneRoom && !stateIsSyncronized) {
-      void requestState()
+      // For servers, mark as ready immediately when connected
+      // (servers don't need to sync state from anyone)
+      if (isServer && checkRoomReady(value) && isRoomReadyAtom.getOrNull() === false) {
+        DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady] Server marking room as ready')
+        isRoomReadyAtom.swap(true)
+      }
+      // For clients, room will be marked ready after receiving CRDT state (above)
+    }
+  })
+
+  let requestingState = false
+  let elapsedTimeSinceRequest = 0
+  const STATE_REQUEST_RETRY_INTERVAL = 2.0 // seconds
+
+  /**
+   * Why we have to request the state if we have a server that can send us the state when we joined?
+   * The thing is that when the server detects a new JOIN_PARTICIPANT on livekit room, it sends automatically the state to that peer.
+   * But in unity, it takes more time, so that message is not being delivered to the client.
+   * So instead, when we are finally connected to the room, we request the state, and then the server answers with the state :)
+   *
+   * If no response is received within 2 seconds, the request is automatically retried.
+   */
+  function requestState() {
+    if (isServerAtom.getOrNull()) return
+    if (RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom && !requestingState) {
+      requestingState = true
+      elapsedTimeSinceRequest = 0
+      DEBUG_NETWORK_MESSAGES() && console.log('Requesting state...')
+      binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
+    }
+  }
+
+  // System to retry state request if no response is received within the retry interval
+  engine.addSystem((dt: number) => {
+    if (requestingState && !stateIsSyncronized) {
+      elapsedTimeSinceRequest += dt
+      if (elapsedTimeSinceRequest >= STATE_REQUEST_RETRY_INTERVAL) {
+        DEBUG_NETWORK_MESSAGES() && console.log('State request timed out, retrying...')
+        elapsedTimeSinceRequest = 0
+        requestingState = false
+        requestState()
+      }
     }
   })
 
@@ -153,56 +267,12 @@ export function addSyncTransport(
     return stateIsSyncronized
   }
 
-  function sleep(ms: number) {
-    return new Promise<void>((resolve) => {
-      let timer = 0
-      function sleepSystem(dt: number) {
-        timer += dt
-        if (timer * 1000 >= ms) {
-          engine.removeSystem(sleepSystem)
-          resolve()
-        }
-      }
-      engine.addSystem(sleepSystem)
-    })
-  }
-
   return {
     ...entityDefinitions,
     myProfile,
-    isStateSyncronized
+    isStateSyncronized,
+    binaryMessageBus,
+    eventBus,
+    isRoomReadyAtom
   }
-}
-
-/**
- * Messages Protocol Encoding
- *
- * CRDT: Plain Uint8Array
- *
- * CRDT_STATE_RES { sender: string, data: Uint8Array}
- */
-function decodeCRDTState(data: Uint8Array) {
-  let offset = 0
-  const r = new Uint8Array(data)
-  const view = new DataView(r.buffer)
-  const senderLength = view.getUint8(offset)
-  offset += 1
-  const sender = decodeString(data.subarray(1, senderLength + 1))
-  offset += senderLength
-  const state = r.subarray(offset)
-
-  return { sender, data: state }
-}
-
-function encodeCRDTState(address: string, data: Uint8Array) {
-  // address to uint8array
-  const addressBuffer = encodeString(address)
-  const addressOffset = 1
-  const messageLength = addressOffset + addressBuffer.byteLength + data.byteLength
-
-  const serializedMessage = new Uint8Array(messageLength)
-  serializedMessage.set(new Uint8Array([addressBuffer.byteLength]), 0)
-  serializedMessage.set(addressBuffer, 1)
-  serializedMessage.set(data, addressBuffer.byteLength + 1)
-  return serializedMessage
 }

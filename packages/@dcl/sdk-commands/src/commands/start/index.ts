@@ -29,6 +29,8 @@ import { Result } from 'arg'
 import { startValidations } from '../../logic/project-validations'
 import { runExplorerAlpha } from './explorer-alpha'
 import { getLanUrl } from './utils'
+import { spawnAuthServer } from './hammurabi-server'
+import { ChildProcess } from 'child_process'
 
 interface Options {
   args: Result<typeof args>
@@ -66,7 +68,8 @@ export const args = declareArgs({
   '--skip-auth-screen': Boolean,
   '--landscape-terrain-enabled': Boolean,
   '-n': Boolean,
-  '--bevy-web': Boolean
+  '--bevy-web': Boolean,
+  '--no-client': Boolean
 })
 
 export async function help(options: Options) {
@@ -119,9 +122,10 @@ export async function main(options: Options) {
   const withDataLayer = options.args['--data-layer']
   const enableWeb3 = options.args['--web3']
   const isHub = !!options.args['--hub']
-  const bevyWeb = !!options.args['--bevy-web']
-  const isMobile = options.args['--mobile']
-  const explorerAlpha = !options.args['--web-explorer'] && !bevyWeb
+  const skipClient = !!options.args['--no-client']
+  const bevyWeb = !!options.args['--bevy-web'] && !skipClient
+  const isMobile = options.args['--mobile'] && !skipClient
+  const explorerAlpha = !options.args['--web-explorer'] && !bevyWeb && !skipClient
 
   let hasSmartWearable = false
   const workspace = await getValidWorkspace(options.components, workingDirectory)
@@ -211,6 +215,24 @@ export async function main(options: Options) {
         }
       }
       await startComponents()
+
+      // Start Hammurabi server if needed (stored outside components to avoid lifecycle management)
+      let hammurabiServer: ChildProcess | undefined
+      const project = workspace.projects[0]
+      if (project) {
+        const realm = `http://localhost:${port}`
+        hammurabiServer = spawnAuthServer(components, project, realm)
+
+        // Register cleanup handler for hammurabi server
+        if (hammurabiServer) {
+          const cleanup = () => {
+            if (hammurabiServer && !hammurabiServer.killed) {
+              hammurabiServer.kill('SIGTERM')
+            }
+          }
+          components.signaler.programClosed.then(cleanup).catch(() => {})
+        }
+      }
 
       const networkInterfaces = os.networkInterfaces()
       const availableURLs: string[] = []
