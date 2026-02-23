@@ -21,6 +21,12 @@ const InputCommands: InputAction[] = [
   InputAction.IA_ACTION_5,
   InputAction.IA_ACTION_6
 ]
+
+type ButtonState = {
+  // stores the last observed timestamp for PET_UP and PET_DOWN
+  last: number[],
+}
+
 /**
  * @public
  */
@@ -102,7 +108,7 @@ export function createInputSystem(engine: IEngine): IInputSystem {
   const globalState = {
     previousFrameMaxTimestamp: 0,
     currentFrameMaxTimestamp: 0,
-    buttonState: new Map<InputAction, PBPointerEventsResult>(),
+    buttonState: new Map<InputAction, ButtonState>(),
     thisFrameCommands: [] as DeepReadonlyObject<PBPointerEventsResult>[]
   }
 
@@ -154,9 +160,10 @@ export function createInputSystem(engine: IEngine): IInputSystem {
         }
 
         if (command.state === PointerEventType.PET_UP || command.state === PointerEventType.PET_DOWN) {
-          const prevCommand = globalState.buttonState.get(command.button)
-          if (!prevCommand || command.timestamp > prevCommand.timestamp) {
-            globalState.buttonState.set(command.button, command)
+          const prevState = globalState.buttonState.get(command.button) 
+            ?? (globalState.buttonState.set(command.button, { last: [-1, -1] }), globalState.buttonState.get(command.button)!);
+          if (prevState.last[command.state] < command.timestamp) {
+            prevState.last[command.state] = command.timestamp;
           } else {
             // since we are iterating a descending array, we can early finish the
             // loop
@@ -298,7 +305,17 @@ export function createInputSystem(engine: IEngine): IInputSystem {
 
   // returns the global state of the input. This global state is updated from the system
   function isPressed(inputAction: InputAction) {
-    return globalState.buttonState.get(inputAction)?.state === PointerEventType.PET_DOWN
+    const state = globalState.buttonState.get(inputAction)
+    if (state === undefined) {
+      return false;
+    }
+
+    return (
+      // last DOWN was more recent that last UP
+      (state.last[PointerEventType.PET_DOWN] > state.last[PointerEventType.PET_UP]) 
+      // or last DOWN was the current frame
+      || (state.last[PointerEventType.PET_DOWN] > globalState.previousFrameMaxTimestamp)
+    )
   }
 
   function* getInputCommands() {
