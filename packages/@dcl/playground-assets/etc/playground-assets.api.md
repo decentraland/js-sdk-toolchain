@@ -3022,7 +3022,7 @@ export namespace PBPointerEvents {
 export interface PBPointerEvents_Entry {
     eventInfo: PBPointerEvents_Info | undefined;
     eventType: PointerEventType;
-    interactionType: InteractionType;
+    interactionType?: InteractionType | undefined;
 }
 
 // @public (undocumented)
@@ -3799,12 +3799,10 @@ export interface PointerEventsSystem {
         entity: Entity;
         opts?: Partial<EventSystemOptions>;
     }, cb: EventSystemCallback): void;
-    // (undocumented)
     onProximityEnter(pointerData: {
         entity: Entity;
         opts?: Partial<EventSystemOptions>;
     }, cb: EventSystemCallback): void;
-    // (undocumented)
     onProximityLeave(pointerData: {
         entity: Entity;
         opts?: Partial<EventSystemOptions>;

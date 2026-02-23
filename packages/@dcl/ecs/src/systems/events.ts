@@ -168,12 +168,24 @@ export interface PointerEventsSystem {
    * @public
    * Execute callback when the user releases the proximity button on the entity
    * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
-   * @param cb - Function to execute when click fires
+   * @param cb - Function to execute when event fires
    */
   onProximityUp(pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
 
+  /**
+   * @public
+   * Execute callback when the entity enters the proximity zone of the user
+   * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
+   * @param cb - Function to execute when event fires
+   */ 
   onProximityEnter(pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
 
+  /**
+   * @public
+   * Execute callback when the entity leaves the proximity zone of the user
+   * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
+   * @param cb - Function to execute when event fires
+   */
   onProximityLeave(pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
 }
 
