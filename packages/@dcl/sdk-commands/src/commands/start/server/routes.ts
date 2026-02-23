@@ -34,6 +34,7 @@ export async function wireRouter(components: PreviewComponents, workspace: Works
   })
 
   const localSceneParcels: string[] = []
+  const baseParcel = workspace.projects[0].scene.scene.base
   for (const project of workspace.projects) {
     for (const parcel of project.scene.scene.parcels) {
       localSceneParcels.push(parcel)
@@ -50,7 +51,8 @@ export async function wireRouter(components: PreviewComponents, workspace: Works
       }
     }
 
-    const deepLink = `decentraland://open?preview=${lanUrl}`
+    const [x, y] = baseParcel.split(',')
+    const deepLink = `decentraland://open?preview=${lanUrl}&position=${x},${y}`
     const qrDataUrl = await QRCode.toDataURL(deepLink)
 
     return {
