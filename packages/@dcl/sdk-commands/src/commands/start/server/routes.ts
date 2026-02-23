@@ -41,7 +41,7 @@ export async function wireRouter(components: PreviewComponents, workspace: Works
   }
 
   // Mobile preview QR code endpoint
-  router.get('/mobile-preview', async (ctx) => {
+  router.post('/mobile-preview', async (ctx) => {
     const lanUrl = getLanUrl(ctx.url.port)
     if (!lanUrl) {
       return {
