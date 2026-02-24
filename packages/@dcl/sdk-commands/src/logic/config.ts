@@ -90,8 +90,8 @@ export function getSegmentKey() {
 export function getStorageSegmentKey() {
   const isProduction = !process.env.DEVELOPER_MODE
   return isProduction
-    ? /* istanbul ignore next */ '8UFiv7zCIgTYR4Eqwn0jRoSZisc5w3hy'
-    : 'ioegDOzIWkKJWuJnlrjE3FDxm1Dkd4eZ'
+    ? /* istanbul ignore next */ 'CU6aHB0OedZQxKVcH9lMMnkDx1MMxROY'
+    : 'SXbdxJJqFKdDQ0hnt4I4E3Ejc2FAK6V7'
 }
 
 /* istanbul ignore next */
