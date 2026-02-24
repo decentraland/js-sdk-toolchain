@@ -1,7 +1,9 @@
 import { Result } from 'arg'
 import { declareArgs } from '../../logic/args'
 import { CliComponents } from '../../components'
+import { createAnalyticsComponent } from '../../components/analytics'
 import { CliError } from '../../logic/error'
+import { getStorageSegmentKey } from '../../logic/config'
 import { handleEnv } from './env'
 import { handleScene } from './scene'
 import { handlePlayer } from './player'
@@ -128,19 +130,29 @@ export async function main(options: Options) {
     )
   }
 
-  // Route to appropriate handler
+  // Use storage-specific analytics; pass augmented options so handlers use it without mutating shared components
+  const storageAnalytics = await createAnalyticsComponent(options.components, {
+    writeKey: getStorageSegmentKey()
+  })
+  const storageOptions = {
+    ...options,
+    components: { ...options.components, analytics: storageAnalytics }
+  }
+
   try {
     if (subcommand === 'env') {
-      await handleEnv(action, key, options)
+      await handleEnv(action, key, storageOptions)
     } else if (subcommand === 'scene') {
-      await handleScene(action, key, options)
+      await handleScene(action, key, storageOptions)
     } else if (subcommand === 'player') {
-      await handlePlayer(action, key, options)
+      await handlePlayer(action, key, storageOptions)
     }
   } catch (error) {
     if (error instanceof CliError) {
       throw error
     }
     throw new CliError('STORAGE_OPERATION_FAILED', `Storage operation failed: ${(error as Error).message}`)
+  } finally {
+    await storageAnalytics.stop()
   }
 }
