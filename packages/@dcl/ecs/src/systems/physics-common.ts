@@ -1,15 +1,5 @@
 import { Vector3Type } from '../schemas/custom/Vector3'
 
-/**
- * @public
- * Coordinate space for interpreting the force/impulse vector.
- * String enum to avoid ambiguity with the (direction, magnitude, space?) overload.
- */
-export enum PhysicsForceSpace {
-  PFS_WORLD = 'world',
-  PFS_LOCAL = 'local'
-}
-
 /** @internal */
 export function isZeroVector(v: Vector3Type): boolean {
   return v.x === 0 && v.y === 0 && v.z === 0
