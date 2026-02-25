@@ -1,8 +1,7 @@
 import * as components from '../components'
 import { IEngine } from '../engine'
 import { Vector3Type } from '../schemas/custom/Vector3'
-import { getWorldRotation, rotateVectorByQuaternion } from '../runtime/helpers/tree'
-import { PhysicsForceSpace, isZeroVector, normalizeVector, scaleVector, addVectors } from './physics-common'
+import { isZeroVector, normalizeVector, scaleVector, addVectors } from './physics-common'
 
 /**
  * @internal
@@ -10,11 +9,7 @@ import { PhysicsForceSpace, isZeroVector, normalizeVector, scaleVector, addVecto
  * `advanceFrame` is called by the background system each tick.
  */
 export interface PhysicsImpulseHelper {
-  applyImpulseToPlayer(
-    dirOrVector: Vector3Type,
-    magnitudeOrSpace?: number | PhysicsForceSpace,
-    maybeSpace?: PhysicsForceSpace
-  ): void
+  applyImpulseToPlayer(dirOrVector: Vector3Type, magnitude?: number): void
 
   /** Advance the internal frame counter. Called once per tick by the facade system. */
   advanceFrame(): void
@@ -22,10 +17,10 @@ export interface PhysicsImpulseHelper {
 
 /** @internal */
 export function createPhysicsImpulseHelper(engine: IEngine): PhysicsImpulseHelper {
-  const PhysicsImpulse = components.PhysicsImpulse(engine)
+  const PhysicsTotalImpulse = components.PhysicsTotalImpulse(engine)
 
-  let impulseTimestamp = 0
-  let lastWrittenTimestamp = 0
+  let impulseEventId = 0
+  let lastWrittenEventId = 0
   let lastWrittenFrame = -1
   let currentFrame = 0
 
@@ -33,49 +28,37 @@ export function createPhysicsImpulseHelper(engine: IEngine): PhysicsImpulseHelpe
     currentFrame++
   }
 
-  function applyImpulseToPlayer(
-    dirOrVector: Vector3Type,
-    magnitudeOrSpace?: number | PhysicsForceSpace,
-    maybeSpace?: PhysicsForceSpace
-  ): void {
-    let finalDirection: Vector3Type
-    let space: PhysicsForceSpace
+  function applyImpulseToPlayer(dirOrVector: Vector3Type, magnitude?: number): void {
+    let finalVector: Vector3Type
 
-    if (typeof magnitudeOrSpace === 'number') {
+    if (typeof magnitude === 'number') {
       if (isZeroVector(dirOrVector)) return
-      finalDirection = scaleVector(normalizeVector(dirOrVector), magnitudeOrSpace)
-      space = maybeSpace ?? PhysicsForceSpace.PFS_WORLD
+      finalVector = scaleVector(normalizeVector(dirOrVector), magnitude)
     } else {
       if (isZeroVector(dirOrVector)) return
-      finalDirection = dirOrVector
-      space = magnitudeOrSpace ?? PhysicsForceSpace.PFS_WORLD
+      finalVector = dirOrVector
     }
 
-    if (space === PhysicsForceSpace.PFS_LOCAL) {
-      const playerRotation = getWorldRotation(engine, engine.PlayerEntity)
-      finalDirection = rotateVectorByQuaternion(finalDirection, playerRotation)
-    }
+    const existing = PhysicsTotalImpulse.getOrNull(engine.PlayerEntity)
 
-    const existing = PhysicsImpulse.getOrNull(engine.PlayerEntity)
-
-    if (existing && existing.timestamp !== lastWrittenTimestamp && lastWrittenTimestamp !== 0) {
+    if (existing && existing.eventId !== lastWrittenEventId && lastWrittenEventId !== 0) {
       throw new Error(
-        'PBPhysicsImpulse was modified outside Physics helper. ' +
+        'PBPhysicsTotalImpulse was modified outside Physics helper. ' +
         'Do not mix direct component access with Physics.applyImpulseToPlayer().'
       )
     }
 
     if (lastWrittenFrame === currentFrame && existing) {
-      finalDirection = addVectors(existing.direction ?? { x: 0, y: 0, z: 0 }, finalDirection)
+      finalVector = addVectors(existing.vector ?? { x: 0, y: 0, z: 0 }, finalVector)
     } else {
-      lastWrittenTimestamp = ++impulseTimestamp
+      lastWrittenEventId = ++impulseEventId
     }
 
     lastWrittenFrame = currentFrame
 
-    PhysicsImpulse.createOrReplace(engine.PlayerEntity, {
-      direction: finalDirection,
-      timestamp: lastWrittenTimestamp
+    PhysicsTotalImpulse.createOrReplace(engine.PlayerEntity, {
+      vector: finalVector,
+      eventId: lastWrittenEventId
     })
   }
 

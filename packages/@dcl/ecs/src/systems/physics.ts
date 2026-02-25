@@ -5,56 +5,49 @@ import { Vector3Type } from '../schemas/custom/Vector3'
 import { createPhysicsImpulseHelper } from './physics-impulse'
 import { createPhysicsForceHelper } from './physics-force'
 
-import { PhysicsForceSpace } from './physics-common'
-export { PhysicsForceSpace } from './physics-common'
-
 /**
  * @public
  */
 export interface PhysicsSystem {
   /**
    * Apply a one-shot impulse to the player entity.
-   * Multiple calls within the same frame are accumulated (summed in world space).
+   * Multiple calls within the same frame are accumulated (summed).
    *
    * @param vector - Combined direction and magnitude vector
-   * @param space - Coordinate space (default: WORLD)
    */
-  applyImpulseToPlayer(vector: Vector3Type, space?: PhysicsForceSpace): void
+  applyImpulseToPlayer(vector: Vector3Type): void
 
   /**
    * Apply a one-shot impulse to the player entity.
-   * Multiple calls within the same frame are accumulated (summed in world space).
+   * Multiple calls within the same frame are accumulated (summed).
    *
    * @param direction - Direction of the impulse (will be normalized)
    * @param magnitude - Strength of the impulse
-   * @param space - Coordinate space (default: WORLD)
    */
-  applyImpulseToPlayer(direction: Vector3Type, magnitude: number, space?: PhysicsForceSpace): void
+  applyImpulseToPlayer(direction: Vector3Type, magnitude: number): void
 
   /**
    * Apply a continuous force to the player from a given source entity.
    * Multiple sources are accumulated: the registry sums all active forces
-   * and writes a single PBPhysicsForce component.
+   * and writes a single PBPhysicsTotalForce component.
    * Calling again with the same source replaces its previous force.
    *
    * @param source - Entity key identifying this force source
    * @param vector - Combined direction and magnitude vector
-   * @param space - Coordinate space (default: WORLD)
    */
-  applyForceToPlayer(source: Entity, vector: Vector3Type, space?: PhysicsForceSpace): void
+  applyForceToPlayer(source: Entity, vector: Vector3Type): void
 
   /**
    * Apply a continuous force to the player from a given source entity.
    * Multiple sources are accumulated: the registry sums all active forces
-   * and writes a single PBPhysicsForce component.
+   * and writes a single PBPhysicsTotalForce component.
    * Calling again with the same source replaces its previous force.
    *
    * @param source - Entity key identifying this force source
    * @param direction - Direction of the force (will be normalized)
    * @param magnitude - Strength of the force
-   * @param space - Coordinate space (default: WORLD)
    */
-  applyForceToPlayer(source: Entity, direction: Vector3Type, magnitude: number, space?: PhysicsForceSpace): void
+  applyForceToPlayer(source: Entity, direction: Vector3Type, magnitude: number): void
 
   /**
    * Remove a force source from the registry. The remaining forces are
@@ -76,9 +69,6 @@ export function createPhysicsSystem(engine: IEngine): PhysicsSystem {
   engine.addSystem(
     function PhysicsTickSystem() {
       impulse.advanceFrame()
-      if (force.hasLocalSources) {
-        force.recalcForce()
-      }
     },
     SYSTEMS_REGULAR_PRIORITY * 2,
     'dcl.PhysicsTickSystem'
