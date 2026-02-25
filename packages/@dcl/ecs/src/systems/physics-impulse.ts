@@ -9,7 +9,7 @@ import { isZeroVector, normalizeVector, scaleVector, addVectors } from './physic
  * `advanceFrame` is called by the background system each tick.
  */
 export interface PhysicsImpulseHelper {
-  applyImpulseToPlayer(dirOrVector: Vector3Type, magnitude?: number): void
+  applyImpulseToPlayer(vector: Vector3Type, magnitude?: number): void
 
   /** Advance the internal frame counter. Called once per tick by the facade system. */
   advanceFrame(): void
@@ -28,15 +28,15 @@ export function createPhysicsImpulseHelper(engine: IEngine): PhysicsImpulseHelpe
     currentFrame++
   }
 
-  function applyImpulseToPlayer(dirOrVector: Vector3Type, magnitude?: number): void {
+  function applyImpulseToPlayer(vector: Vector3Type, magnitude?: number): void {
     let finalVector: Vector3Type
 
     if (typeof magnitude === 'number') {
-      if (isZeroVector(dirOrVector)) return
-      finalVector = scaleVector(normalizeVector(dirOrVector), magnitude)
+      if (isZeroVector(vector)) return
+      finalVector = scaleVector(normalizeVector(vector), magnitude)
     } else {
-      if (isZeroVector(dirOrVector)) return
-      finalVector = dirOrVector
+      if (isZeroVector(vector)) return
+      finalVector = vector
     }
 
     const existing = PhysicsTotalImpulse.getOrNull(engine.PlayerEntity)
