@@ -10,7 +10,7 @@ import { isZeroVector, normalizeVector, scaleVector, addVectors, vectorsEqual } 
  * and `removeForceFromPlayer`.
  */
 export interface PhysicsForceHelper {
-  applyForceToPlayer(source: Entity, dirOrVector: Vector3Type, magnitude?: number): void
+  applyForceToPlayer(source: Entity, vector: Vector3Type, magnitude?: number): void
   removeForceFromPlayer(source: Entity): void
 }
 
@@ -49,17 +49,17 @@ export function createPhysicsForceHelper(engine: IEngine): PhysicsForceHelper {
     lastWrittenForceVector = sum
   }
 
-  function applyForceToPlayer(source: Entity, dirOrVector: Vector3Type, magnitude?: number): void {
-    let vector: Vector3Type
+  function applyForceToPlayer(source: Entity, vector: Vector3Type, magnitude?: number): void {
+    let finalVector: Vector3Type
 
     if (typeof magnitude === 'number') {
-      if (isZeroVector(dirOrVector)) return
-      vector = scaleVector(normalizeVector(dirOrVector), magnitude)
+      if (isZeroVector(vector)) return
+      finalVector = scaleVector(normalizeVector(vector), magnitude)
     } else {
-      vector = dirOrVector
+      finalVector = vector
     }
 
-    forceSources.set(source, vector)
+    forceSources.set(source, finalVector)
     recalcForce()
   }
 
