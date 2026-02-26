@@ -7,6 +7,9 @@
 import _m0 from 'protobufjs/minimal';
 
 // @public (undocumented)
+export function addVectors(a: Vector3Type, b: Vector3Type): Vector3Type;
+
+// @public (undocumented)
 export type AlignType = 'auto' | 'flex-start' | 'center' | 'flex-end' | 'stretch' | 'baseline' | 'space-between' | 'space-around';
 
 // Warning: (ae-missing-release-tag) "Animator" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -69,6 +72,31 @@ export const assetLoadLoadingStateSystem: AssetLoadLoadingStateSystem;
 
 // @public (undocumented)
 export type AssetLoadLoadingStateSystemCallback = (event: DeepReadonlyObject<PBAssetLoadLoadingState>) => void;
+
+// Warning: (ae-missing-release-tag) "AudioAnalysis" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const AudioAnalysis: AudioAnalysisComponentDefinitionExtended;
+
+// Warning: (ae-missing-release-tag) "AudioAnalysisComponentDefinitionExtended" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface AudioAnalysisComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBAudioAnalysis> {
+    createAudioAnalysis(entity: Entity, mode?: PBAudioAnalysisMode, // default is PBAudioAnalysisMode.MODE_LOGARITHMIC
+    amplitudeGain?: number, bandsGain?: number): void;
+    createOrReplaceAudioAnalysis(entity: Entity, mode?: PBAudioAnalysisMode, // default is PBAudioAnalysisMode.MODE_LOGARITHMIC
+    amplitudeGain?: number, bandsGain?: number): void;
+    readIntoView(entity: Entity, out: AudioAnalysisView): void;
+    tryReadIntoView(entity: Entity, out: AudioAnalysisView): boolean;
+}
+
+// Warning: (ae-missing-release-tag) "AudioAnalysisView" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export type AudioAnalysisView = {
+    amplitude: number;
+    bands: number[];
+};
 
 // @public (undocumented)
 export const AudioEvent: GrowOnlyValueSetComponentDefinition<PBAudioEvent>;
@@ -161,6 +189,9 @@ export const AvatarEmoteCommand: GrowOnlyValueSetComponentDefinition<PBAvatarEmo
 
 // @public (undocumented)
 export const AvatarEquippedData: LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>;
+
+// @public (undocumented)
+export const AvatarLocomotionSettings: LastWriteWinElementSetComponentDefinition<PBAvatarLocomotionSettings>;
 
 // @public (undocumented)
 export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>;
@@ -644,6 +675,7 @@ export const componentDefinitionByName: {
     "core::Animator": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAnimator>>;
     "core::AssetLoad": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAssetLoad>>;
     "core::AssetLoadLoadingState": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAssetLoadLoadingState>>;
+    "core::AudioAnalysis": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioAnalysis>>;
     "core::AudioEvent": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAudioEvent>>;
     "core::AudioSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioSource>>;
     "core::AudioStream": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioStream>>;
@@ -651,6 +683,7 @@ export const componentDefinitionByName: {
     "core::AvatarBase": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarBase>>;
     "core::AvatarEmoteCommand": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>>;
     "core::AvatarEquippedData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>>;
+    "core::AvatarLocomotionSettings": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarLocomotionSettings>>;
     "core::AvatarModifierArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>>;
     "core::AvatarShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarShape>>;
     "core::Billboard": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBBillboard>>;
@@ -667,6 +700,8 @@ export const componentDefinitionByName: {
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
     "core::NftShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBNftShape>>;
+    "core::PhysicsCombinedForce": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedForce>>;
+    "core::PhysicsCombinedImpulse": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedImpulse>>;
     "core::PlayerIdentityData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>>;
     "core::PointerEvents": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerEvents>>;
     "core::PointerEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBPointerEventsResult>>;
@@ -1499,6 +1534,8 @@ export const enum InputAction {
     // (undocumented)
     IA_LEFT = 7,
     // (undocumented)
+    IA_MODIFIER = 14,
+    // (undocumented)
     IA_POINTER = 0,
     // (undocumented)
     IA_PRIMARY = 1,
@@ -1573,6 +1610,9 @@ export interface ISyncComponentsType {
     // (undocumented)
     componentIds: number[];
 }
+
+// @public (undocumented)
+export function isZeroVector(v: Vector3Type): boolean;
 
 // @public (undocumented)
 export type JsonArray = Array<JsonPrimitive | JsonMap | JsonArray>;
@@ -2047,6 +2087,9 @@ export const enum NftFrameType {
 // @public (undocumented)
 export const NftShape: LastWriteWinElementSetComponentDefinition<PBNftShape>;
 
+// @public (undocumented)
+export function normalizeVector(v: Vector3Type): Vector3Type;
+
 // @public @deprecated
 export class Observable<T> {
     constructor(onObserverAdded?: (observer: Observer<T>) => void);
@@ -2240,6 +2283,46 @@ export namespace PBAssetLoadLoadingState {
 }
 
 // @public (undocumented)
+export interface PBAudioAnalysis {
+    amplitude: number;
+    amplitudeGain?: number | undefined;
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    band0: number;
+    // (undocumented)
+    band1: number;
+    // (undocumented)
+    band2: number;
+    // (undocumented)
+    band3: number;
+    // (undocumented)
+    band4: number;
+    // (undocumented)
+    band5: number;
+    // (undocumented)
+    band6: number;
+    // (undocumented)
+    band7: number;
+    bandsGain?: number | undefined;
+    mode: PBAudioAnalysisMode;
+}
+
+// @public (undocumented)
+export namespace PBAudioAnalysis {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAudioAnalysis;
+    // (undocumented)
+    export function encode(message: PBAudioAnalysis, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export const enum PBAudioAnalysisMode {
+    // (undocumented)
+    MODE_LOGARITHMIC = 1,
+    // (undocumented)
+    MODE_RAW = 0
+}
+
+// @public (undocumented)
 export interface PBAudioEvent {
     // (undocumented)
     state: MediaState;
@@ -2358,6 +2441,24 @@ export namespace PBAvatarEquippedData {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarEquippedData;
     // (undocumented)
     export function encode(message: PBAvatarEquippedData, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAvatarLocomotionSettings {
+    hardLandingCooldown?: number | undefined;
+    jogSpeed?: number | undefined;
+    jumpHeight?: number | undefined;
+    runJumpHeight?: number | undefined;
+    runSpeed?: number | undefined;
+    walkSpeed?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBAvatarLocomotionSettings {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarLocomotionSettings;
+    // (undocumented)
+    export function encode(message: PBAvatarLocomotionSettings, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -2889,6 +2990,33 @@ export namespace PBNftShape {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBNftShape;
     // (undocumented)
     export function encode(message: PBNftShape, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBPhysicsCombinedForce {
+    vector: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBPhysicsCombinedForce {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPhysicsCombinedForce;
+    // (undocumented)
+    export function encode(message: PBPhysicsCombinedForce, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBPhysicsCombinedImpulse {
+    eventId: number;
+    vector: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBPhysicsCombinedImpulse {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPhysicsCombinedImpulse;
+    // (undocumented)
+    export function encode(message: PBPhysicsCombinedImpulse, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3602,6 +3730,7 @@ export namespace PBVideoPlayer {
 export interface PBVirtualCamera {
     // (undocumented)
     defaultTransition?: CameraTransition | undefined;
+    fov?: number | undefined;
     // (undocumented)
     lookAtEntity?: number | undefined;
 }
@@ -3626,6 +3755,26 @@ export namespace PBVisibilityComponent {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBVisibilityComponent;
     // (undocumented)
     export function encode(message: PBVisibilityComponent, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public
+export const Physics: PhysicsSystem;
+
+// @public (undocumented)
+export const PhysicsCombinedForce: LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedForce>;
+
+// @public (undocumented)
+export const PhysicsCombinedImpulse: LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedImpulse>;
+
+// @public (undocumented)
+export interface PhysicsSystem {
+    applyForceToPlayer(source: Entity, vector: Vector3Type): void;
+    // (undocumented)
+    applyForceToPlayer(source: Entity, direction: Vector3Type, magnitude: number): void;
+    applyImpulseToPlayer(vector: Vector3Type): void;
+    // (undocumented)
+    applyImpulseToPlayer(direction: Vector3Type, magnitude: number): void;
+    removeForceFromPlayer(source: Entity): void;
 }
 
 // @public
@@ -4141,6 +4290,9 @@ export namespace RotateContinuous {
     export function encode(message: RotateContinuous, writer?: _m0.Writer): _m0.Writer;
 }
 
+// @public
+export function rotateVectorByQuaternion(v: Vector3Type, q: QuaternionType): Vector3Type;
+
 // Warning: (ae-missing-release-tag) "RPCSendableMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -4219,6 +4371,9 @@ export type ScaleUnit = `${number}${ScaleUnits}` | number;
 
 // @public
 export type ScaleUnits = 'vw' | 'vh';
+
+// @public (undocumented)
+export function scaleVector(v: Vector3Type, s: number): Vector3Type;
 
 // @public (undocumented)
 export namespace Schemas {
@@ -4989,6 +5144,9 @@ export type Vector3Type = {
     y: number;
     z: number;
 };
+
+// @public (undocumented)
+export function vectorsEqual(a: Vector3Type, b: Vector3Type): boolean;
 
 // @public (undocumented)
 export const VideoEvent: GrowOnlyValueSetComponentDefinition<PBVideoEvent>;

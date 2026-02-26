@@ -1,7 +1,7 @@
 import * as components from '../components'
 import { IEngine } from '../engine'
-import { Vector3Type } from '../schemas/custom/Vector3'
-import { isZeroVector, normalizeVector, scaleVector, addVectors } from '../runtime/helpers/math'
+import { Vector3Type } from '../schemas'
+import { isZeroVector, normalizeVector, scaleVector, addVectors } from '../runtime/helpers'
 
 /**
  * @internal
