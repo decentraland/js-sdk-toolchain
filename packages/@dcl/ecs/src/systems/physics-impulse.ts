@@ -12,7 +12,7 @@ interface PhysicsImpulseHelper {
 
 /** @internal */
 export function createPhysicsImpulseHelper(engine: IEngine): PhysicsImpulseHelper {
-  const PhysicsTotalImpulse = components.PhysicsTotalImpulse(engine)
+  const PhysicsCombinedImpulse = components.PhysicsCombinedImpulse(engine)
   const EngineInfo = components.EngineInfo(engine)
 
   let impulseEventId = 0
@@ -31,11 +31,11 @@ export function createPhysicsImpulseHelper(engine: IEngine): PhysicsImpulseHelpe
     }
 
     const currentTick = EngineInfo.getOrNull(engine.RootEntity)?.tickNumber ?? 0
-    const existing = PhysicsTotalImpulse.getOrNull(engine.PlayerEntity)
+    const existing = PhysicsCombinedImpulse.getOrNull(engine.PlayerEntity)
 
     if (existing && existing.eventId !== lastWrittenEventId && lastWrittenEventId !== 0) {
       throw new Error(
-        'PBPhysicsTotalImpulse was modified outside Physics helper. ' +
+        'PBPhysicsCombinedImpulse was modified outside Physics helper. ' +
         'Do not mix direct component access with Physics.applyImpulseToPlayer().'
       )
     }
@@ -48,7 +48,7 @@ export function createPhysicsImpulseHelper(engine: IEngine): PhysicsImpulseHelpe
 
     lastWrittenTick = currentTick
 
-    PhysicsTotalImpulse.createOrReplace(engine.PlayerEntity, {
+    PhysicsCombinedImpulse.createOrReplace(engine.PlayerEntity, {
       vector: finalVector,
       eventId: lastWrittenEventId
     })
