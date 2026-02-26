@@ -12,7 +12,12 @@ export type {
   ReadonlyFlatTexture,
   FlatMaterial
 } from './extended/Material'
-export type { TweenHelper, TweenComponentDefinitionExtended } from './extended/Tween'
+export type {
+  TweenHelper,
+  TweenComponentDefinitionExtended,
+  SetMoveRotateScaleParams,
+  SetMoveRotateScaleContinuousParams
+} from './extended/Tween'
 export type { CameraTransitionHelper, VirtualCameraComponentDefinitionExtended } from './extended/VirtualCamera'
 export type { TransformComponentExtended, TransformTypeWithOptionals } from './manual/Transform'
 export type { NameComponent, NameType } from './manual/Name'

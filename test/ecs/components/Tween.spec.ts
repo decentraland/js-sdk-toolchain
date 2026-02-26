@@ -285,7 +285,13 @@ describe('Generated Tween ProtoBuf', () => {
     const scaleStart = { x: 1, y: 1, z: 1 }
     const scaleEnd = { x: 2, y: 2, z: 2 }
 
-    Tween.setMoveRotateScale(entity, posStart, posEnd, rotStart, rotEnd, scaleStart, scaleEnd, 2000, EasingFunction.EF_EASEINQUAD)
+    Tween.setMoveRotateScale(entity, {
+      position: { start: posStart, end: posEnd },
+      rotation: { start: rotStart, end: rotEnd },
+      scale: { start: scaleStart, end: scaleEnd },
+      duration: 2000,
+      easingFunction: EasingFunction.EF_EASEINQUAD
+    })
 
     expect(Tween.get(entity)).toStrictEqual({
       mode: {
@@ -317,13 +323,148 @@ describe('Generated Tween ProtoBuf', () => {
     const scaleStart = { x: 1, y: 1, z: 1 }
     const scaleEnd = { x: 3, y: 3, z: 3 }
 
-    Tween.setMoveRotateScale(entity, posStart, posEnd, rotStart, rotEnd, scaleStart, scaleEnd, 1500)
+    Tween.setMoveRotateScale(entity, {
+      position: { start: posStart, end: posEnd },
+      rotation: { start: rotStart, end: rotEnd },
+      scale: { start: scaleStart, end: scaleEnd },
+      duration: 1500
+    })
 
     const result = Tween.get(entity)
     expect(result.easingFunction).toBe(EasingFunction.EF_LINEAR)
     expect(result.duration).toBe(1500)
     expect(result.playing).toBe(true)
     expect(result.mode?.$case).toBe('moveRotateScale')
+  })
+
+  it('should create component with setMoveRotateScale with only position', () => {
+    const newEngine = Engine()
+    const entity = newEngine.addEntity()
+    const Tween = components.Tween(newEngine)
+
+    const posStart = { x: 0, y: 0, z: 0 }
+    const posEnd = { x: 5, y: 0, z: 0 }
+
+    Tween.setMoveRotateScale(entity, {
+      position: { start: posStart, end: posEnd },
+      duration: 1000
+    })
+
+    const result = Tween.get(entity)
+    expect(result.mode?.$case).toBe('moveRotateScale')
+    if (result.mode?.$case === 'moveRotateScale') {
+      expect(result.mode.moveRotateScale.positionStart).toStrictEqual(posStart)
+      expect(result.mode.moveRotateScale.positionEnd).toStrictEqual(posEnd)
+      expect(result.mode.moveRotateScale.rotationStart).toBeUndefined()
+      expect(result.mode.moveRotateScale.rotationEnd).toBeUndefined()
+      expect(result.mode.moveRotateScale.scaleStart).toBeUndefined()
+      expect(result.mode.moveRotateScale.scaleEnd).toBeUndefined()
+    }
+    expect(result.duration).toBe(1000)
+  })
+
+  it('should create component with setMoveRotateScale with only rotation and scale', () => {
+    const newEngine = Engine()
+    const entity = newEngine.addEntity()
+    const Tween = components.Tween(newEngine)
+
+    const rotStart = { x: 0, y: 0, z: 0, w: 1 }
+    const rotEnd = { x: 0, y: 0.7071, z: 0, w: 0.7071 }
+    const scaleStart = { x: 1, y: 1, z: 1 }
+    const scaleEnd = { x: 2, y: 2, z: 2 }
+
+    Tween.setMoveRotateScale(entity, {
+      rotation: { start: rotStart, end: rotEnd },
+      scale: { start: scaleStart, end: scaleEnd },
+      duration: 500,
+      easingFunction: EasingFunction.EF_EASEINQUAD
+    })
+
+    const result = Tween.get(entity)
+    expect(result.mode?.$case).toBe('moveRotateScale')
+    if (result.mode?.$case === 'moveRotateScale') {
+      expect(result.mode.moveRotateScale.positionStart).toBeUndefined()
+      expect(result.mode.moveRotateScale.positionEnd).toBeUndefined()
+      expect(result.mode.moveRotateScale.rotationStart).toStrictEqual(rotStart)
+      expect(result.mode.moveRotateScale.rotationEnd).toStrictEqual(rotEnd)
+      expect(result.mode.moveRotateScale.scaleStart).toStrictEqual(scaleStart)
+      expect(result.mode.moveRotateScale.scaleEnd).toStrictEqual(scaleEnd)
+    }
+    expect(result.duration).toBe(500)
+    expect(result.easingFunction).toBe(EasingFunction.EF_EASEINQUAD)
+  })
+
+  it('should throw when setMoveRotateScale is called without position, rotation, or scale', () => {
+    const newEngine = Engine()
+    const entity = newEngine.addEntity()
+    const Tween = components.Tween(newEngine)
+
+    expect(() => {
+      Tween.setMoveRotateScale(entity, { duration: 1000 })
+    }).toThrow('setMoveRotateScale: at least one of position, rotation, or scale must be provided')
+  })
+
+  it('should throw when setMoveRotateScale has invalid duration', () => {
+    const newEngine = Engine()
+    const entity = newEngine.addEntity()
+    const Tween = components.Tween(newEngine)
+
+    expect(() => {
+      Tween.setMoveRotateScale(entity, {
+        position: { start: { x: 0, y: 0, z: 0 }, end: { x: 1, y: 1, z: 1 } },
+        duration: -1
+      })
+    }).toThrow('setMoveRotateScale: duration must be a non-negative finite number')
+  })
+
+  it('should create component with setMoveRotateScaleContinuous with only position', () => {
+    const newEngine = Engine()
+    const entity = newEngine.addEntity()
+    const Tween = components.Tween(newEngine)
+
+    const posDir = { x: 1, y: 0, z: 0 }
+
+    Tween.setMoveRotateScaleContinuous(entity, {
+      position: { direction: posDir },
+      speed: 3.0,
+      duration: 2000
+    })
+
+    const result = Tween.get(entity)
+    expect(result.mode?.$case).toBe('moveRotateScaleContinuous')
+    if (result.mode?.$case === 'moveRotateScaleContinuous') {
+      expect(result.mode.moveRotateScaleContinuous.positionDirection).toStrictEqual(posDir)
+      expect(result.mode.moveRotateScaleContinuous.rotationDirection).toBeUndefined()
+      expect(result.mode.moveRotateScaleContinuous.scaleDirection).toBeUndefined()
+      expect(result.mode.moveRotateScaleContinuous.speed).toBe(3.0)
+    }
+    expect(result.duration).toBe(2000)
+  })
+
+  it('should throw when setMoveRotateScaleContinuous is called without position, rotation, or scale', () => {
+    const newEngine = Engine()
+    const entity = newEngine.addEntity()
+    const Tween = components.Tween(newEngine)
+
+    expect(() => {
+      Tween.setMoveRotateScaleContinuous(entity, { speed: 1.0 })
+    }).toThrow(
+      'setMoveRotateScaleContinuous: at least one of position, rotation, or scale must be provided'
+    )
+  })
+
+  it('should throw when setMoveRotateScaleContinuous has invalid duration', () => {
+    const newEngine = Engine()
+    const entity = newEngine.addEntity()
+    const Tween = components.Tween(newEngine)
+
+    expect(() => {
+      Tween.setMoveRotateScaleContinuous(entity, {
+        position: { direction: { x: 1, y: 0, z: 0 } },
+        speed: 1.0,
+        duration: -100
+      })
+    }).toThrow('setMoveRotateScaleContinuous: duration must be a non-negative finite number')
   })
 
   it('should create component with setMoveRotateScaleContinuous helper', () => {
@@ -336,7 +477,13 @@ describe('Generated Tween ProtoBuf', () => {
     const scaleDir = { x: 0, y: 0, z: 0 }
     const speed = 90
 
-    Tween.setMoveRotateScaleContinuous(entity, posDir, rotDir, scaleDir, speed, 5000)
+    Tween.setMoveRotateScaleContinuous(entity, {
+      position: { direction: posDir },
+      rotation: { direction: rotDir },
+      scale: { direction: scaleDir },
+      speed,
+      duration: 5000
+    })
 
     expect(Tween.get(entity)).toStrictEqual({
       mode: {
@@ -363,7 +510,12 @@ describe('Generated Tween ProtoBuf', () => {
     const rotDir = { x: 0, y: 0, z: 0.3827, w: 0.9239 }
     const scaleDir = { x: 0.1, y: 0.1, z: 0.1 }
 
-    Tween.setMoveRotateScaleContinuous(entity, posDir, rotDir, scaleDir, 2.5)
+    Tween.setMoveRotateScaleContinuous(entity, {
+      position: { direction: posDir },
+      rotation: { direction: rotDir },
+      scale: { direction: scaleDir },
+      speed: 2.5
+    })
 
     const result = Tween.get(entity)
     expect(result.duration).toBe(0)
@@ -451,14 +603,24 @@ describe('Generated Tween ProtoBuf', () => {
     })
 
     // Test setMoveRotateScale with default easing function
-    Tween.setMoveRotateScale(entity, start, end, startQuat, endQuat, start, end, 2000)
+    Tween.setMoveRotateScale(entity, {
+      position: { start, end },
+      rotation: { start: startQuat, end: endQuat },
+      scale: { start, end },
+      duration: 2000
+    })
     const mrsComponent = Tween.get(entity)
     expect(mrsComponent.easingFunction).toBe(EasingFunction.EF_LINEAR)
     expect(mrsComponent.playing).toBe(true)
     expect(mrsComponent.mode?.$case).toBe('moveRotateScale')
 
     // Test setMoveRotateScaleContinuous with default duration
-    Tween.setMoveRotateScaleContinuous(entity, { x: 1, y: 0, z: 0 }, startQuat, { x: 0, y: 0, z: 0 }, 5.0)
+    Tween.setMoveRotateScaleContinuous(entity, {
+      position: { direction: { x: 1, y: 0, z: 0 } },
+      rotation: { direction: startQuat },
+      scale: { direction: { x: 0, y: 0, z: 0 } },
+      speed: 5.0
+    })
     const mrscComponent = Tween.get(entity)
     expect(mrscComponent.duration).toBe(0)
     expect(mrscComponent.playing).toBe(true)

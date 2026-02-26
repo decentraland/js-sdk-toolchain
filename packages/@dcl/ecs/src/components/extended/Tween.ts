@@ -18,6 +18,111 @@ import {
 
 /**
  * @public
+ * Parameters for setMoveRotateScale. At least one of position, rotation, or scale must be provided.
+ */
+export interface SetMoveRotateScaleParams {
+  /** Position tween (start → end). Optional. */
+  position?: { start: Vector3; end: Vector3 }
+  /** Rotation tween (start → end). Optional. */
+  rotation?: { start: Quaternion; end: Quaternion }
+  /** Scale tween (start → end). Optional. */
+  scale?: { start: Vector3; end: Vector3 }
+  /** Duration of the tween in milliseconds. */
+  duration: number
+  /** Easing function (defaults to EF_LINEAR). */
+  easingFunction?: EasingFunction
+}
+
+/**
+ * @public
+ * Parameters for setMoveRotateScaleContinuous. At least one of position, rotation, or scale must be provided.
+ */
+export interface SetMoveRotateScaleContinuousParams {
+  /** Position direction for continuous movement. Optional. */
+  position?: { direction: Vector3 }
+  /** Rotation direction for continuous rotation. Optional. */
+  rotation?: { direction: Quaternion }
+  /** Scale direction for continuous scale change. Optional. */
+  scale?: { direction: Vector3 }
+  /** Speed of the animation per second. */
+  speed: number
+  /** Duration in milliseconds (defaults to 0 for infinite). */
+  duration?: number
+}
+
+function validateAtLeastOneMoveRotateScale(
+  hasPosition: boolean,
+  hasRotation: boolean,
+  hasScale: boolean,
+  apiName: string
+): void {
+  if (!hasPosition && !hasRotation && !hasScale) {
+    throw new Error(`${apiName}: at least one of position, rotation, or scale must be provided`)
+  }
+}
+
+function validateDuration(duration: number, apiName: string): void {
+  if (typeof duration !== 'number' || !Number.isFinite(duration) || duration < 0) {
+    throw new Error(`${apiName}: duration must be a non-negative finite number`)
+  }
+}
+
+function validateSpeed(speed: number, apiName: string): void {
+  if (typeof speed !== 'number' || !Number.isFinite(speed)) {
+    throw new Error(`${apiName}: speed must be a finite number`)
+  }
+}
+
+function validateSetMoveRotateScaleParams(params: SetMoveRotateScaleParams, apiName: string): void {
+  const hasPosition = params.position != null
+  const hasRotation = params.rotation != null
+  const hasScale = params.scale != null
+  validateAtLeastOneMoveRotateScale(hasPosition, hasRotation, hasScale, apiName)
+  validateDuration(params.duration, apiName)
+  if (hasPosition) {
+    const pos = params.position!
+    if (pos.start == null || pos.end == null) {
+      throw new Error(`${apiName}: position must have both start and end`)
+    }
+  }
+  if (hasRotation) {
+    const rot = params.rotation!
+    if (rot.start == null || rot.end == null) {
+      throw new Error(`${apiName}: rotation must have both start and end`)
+    }
+  }
+  if (hasScale) {
+    const scl = params.scale!
+    if (scl.start == null || scl.end == null) {
+      throw new Error(`${apiName}: scale must have both start and end`)
+    }
+  }
+}
+
+function validateSetMoveRotateScaleContinuousParams(
+  params: SetMoveRotateScaleContinuousParams,
+  apiName: string
+): void {
+  const hasPosition = params.position != null
+  const hasRotation = params.rotation != null
+  const hasScale = params.scale != null
+  validateAtLeastOneMoveRotateScale(hasPosition, hasRotation, hasScale, apiName)
+  validateSpeed(params.speed, apiName)
+  const duration = params.duration ?? 0
+  validateDuration(duration, apiName)
+  if (hasPosition && params.position!.direction == null) {
+    throw new Error(`${apiName}: position must have direction`)
+  }
+  if (hasRotation && params.rotation!.direction == null) {
+    throw new Error(`${apiName}: rotation must have direction`)
+  }
+  if (hasScale && params.scale!.direction == null) {
+    throw new Error(`${apiName}: scale must have direction`)
+  }
+}
+
+/**
+ * @public
  */
 export interface TweenHelper {
   /**
@@ -167,49 +272,23 @@ export interface TweenComponentDefinitionExtended extends LastWriteWinElementSet
    * @public
    *
    * Creates or replaces a move-rotate-scale tween component that simultaneously animates
-   * an entity's position, rotation, and scale from start to end
+   * an entity's position, rotation, and/or scale from start to end. Provide only the
+   * properties you need (at least one of position, rotation, or scale).
    * @param entity - entity to apply the tween to
-   * @param positionStart - starting position vector
-   * @param positionEnd - ending position vector
-   * @param rotationStart - starting rotation quaternion
-   * @param rotationEnd - ending rotation quaternion
-   * @param scaleStart - starting scale vector
-   * @param scaleEnd - ending scale vector
-   * @param duration - duration of the tween in milliseconds
-   * @param easingFunction - easing function to use (defaults to EF_LINEAR)
+   * @param params - object with optional position, rotation, scale (each with start/end), duration, and optional easingFunction
    */
-  setMoveRotateScale(
-    entity: Entity,
-    positionStart: Vector3,
-    positionEnd: Vector3,
-    rotationStart: Quaternion,
-    rotationEnd: Quaternion,
-    scaleStart: Vector3,
-    scaleEnd: Vector3,
-    duration: number,
-    easingFunction?: EasingFunction
-  ): void
+  setMoveRotateScale(entity: Entity, params: SetMoveRotateScaleParams): void
 
   /**
    * @public
    *
    * Creates or replaces a continuous move-rotate-scale tween component that simultaneously
-   * moves, rotates, and scales an entity continuously
+   * moves, rotates, and/or scales an entity continuously. Provide only the properties
+   * you need (at least one of position, rotation, or scale).
    * @param entity - entity to apply the tween to
-   * @param positionDirection - direction vector for movement
-   * @param rotationDirection - rotation direction quaternion
-   * @param scaleDirection - direction vector for scale change
-   * @param speed - speed of the animation per second
-   * @param duration - duration of the tween in milliseconds (defaults to 0 for infinite)
+   * @param params - object with optional position, rotation, scale (each with direction), speed, and optional duration
    */
-  setMoveRotateScaleContinuous(
-    entity: Entity,
-    positionDirection: Vector3,
-    rotationDirection: Quaternion,
-    scaleDirection: Vector3,
-    speed: number,
-    duration?: number
-  ): void
+  setMoveRotateScaleContinuous(entity: Entity, params: SetMoveRotateScaleContinuousParams): void
 }
 
 const TweenHelper: TweenHelper = {
@@ -408,51 +487,47 @@ export function defineTweenComponent(
         playing: true
       })
     },
-    setMoveRotateScale(
-      entity: Entity,
-      positionStart: Vector3,
-      positionEnd: Vector3,
-      rotationStart: Quaternion,
-      rotationEnd: Quaternion,
-      scaleStart: Vector3,
-      scaleEnd: Vector3,
-      duration: number,
-      easingFunction: EasingFunction = EasingFunction.EF_LINEAR
-    ) {
+    setMoveRotateScale(entity: Entity, params: SetMoveRotateScaleParams) {
+      validateSetMoveRotateScaleParams(params, 'setMoveRotateScale')
+      const { position, rotation, scale, duration, easingFunction = EasingFunction.EF_LINEAR } = params
+      const hasPosition = position != null
+      const hasRotation = rotation != null
+      const hasScale = scale != null
+      const moveRotateScale: MoveRotateScale = {
+        positionStart: hasPosition ? position.start : undefined,
+        positionEnd: hasPosition ? position.end : undefined,
+        rotationStart: hasRotation ? rotation.start : undefined,
+        rotationEnd: hasRotation ? rotation.end : undefined,
+        scaleStart: hasScale ? scale.start : undefined,
+        scaleEnd: hasScale ? scale.end : undefined
+      }
       theComponent.createOrReplace(entity, {
         mode: {
           $case: 'moveRotateScale',
-          moveRotateScale: {
-            positionStart,
-            positionEnd,
-            rotationStart,
-            rotationEnd,
-            scaleStart,
-            scaleEnd
-          }
+          moveRotateScale
         },
         duration,
         easingFunction,
         playing: true
       })
     },
-    setMoveRotateScaleContinuous(
-      entity: Entity,
-      positionDirection: Vector3,
-      rotationDirection: Quaternion,
-      scaleDirection: Vector3,
-      speed: number,
-      duration: number = 0
-    ) {
+    setMoveRotateScaleContinuous(entity: Entity, params: SetMoveRotateScaleContinuousParams) {
+      const duration = params.duration ?? 0
+      validateSetMoveRotateScaleContinuousParams(params, 'setMoveRotateScaleContinuous')
+      const { position, rotation, scale, speed } = params
+      const hasPosition = position != null
+      const hasRotation = rotation != null
+      const hasScale = scale != null
+      const moveRotateScaleContinuous: MoveRotateScaleContinuous = {
+        positionDirection: hasPosition ? position.direction : undefined,
+        rotationDirection: hasRotation ? rotation.direction : undefined,
+        scaleDirection: hasScale ? scale.direction : undefined,
+        speed
+      }
       theComponent.createOrReplace(entity, {
         mode: {
           $case: 'moveRotateScaleContinuous',
-          moveRotateScaleContinuous: {
-            positionDirection,
-            rotationDirection,
-            scaleDirection,
-            speed
-          }
+          moveRotateScaleContinuous
         },
         duration,
         easingFunction: EasingFunction.EF_LINEAR,
