@@ -1,5 +1,5 @@
 import TextEncodingPolyfill from 'text-encoding'
-import { setGlobalPolyfill } from '@dcl/ecs'
+import { setGlobalPolyfill } from '@dcl/ecs/dist/runtime/globals'
 
 /* @__PURE__ */
 export function polyfillTextEncoder() {
