@@ -23,6 +23,16 @@ export function addVectors(a: Vector3Type, b: Vector3Type): Vector3Type {
 }
 
 /** @public */
+export function subtractVectors(a: Vector3Type, b: Vector3Type): Vector3Type {
+  return { x: a.x - b.x, y: a.y - b.y, z: a.z - b.z }
+}
+
+/** @public */
+export function vectorLength(v: Vector3Type): number {
+  return Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z)
+}
+
+/** @public */
 export function vectorsEqual(a: Vector3Type, b: Vector3Type): boolean {
   return a.x === b.x && a.y === b.y && a.z === b.z
 }

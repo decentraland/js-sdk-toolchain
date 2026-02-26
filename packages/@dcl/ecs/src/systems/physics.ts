@@ -1,8 +1,10 @@
 import { Entity } from '../engine'
 import { IEngine } from '../engine'
 import { Vector3Type } from '../schemas'
-import { createPhysicsImpulseHelper } from './physics-impulse'
+import { createPhysicsImpulseHelper, KnockbackFalloff } from './physics-impulse'
 import { createPhysicsForceHelper } from './physics-force'
+
+export { KnockbackFalloff } from './physics-impulse'
 
 /**
  * @public
@@ -39,6 +41,20 @@ export interface PhysicsSystem {
    * @param source - Entity key identifying the force source to remove
    */
   removeForceFromPlayer(source: Entity): void
+
+  /**
+   * Push the player away from a point. Computes direction from
+   * `fromPosition` to the player, applies falloff, and delegates
+   * to applyImpulseToPlayer.
+   *
+   * If the player is exactly at `fromPosition`, pushes upward.
+   *
+   * @param fromPosition - world-space origin of the knockback (explosion center, enemy position, etc.)
+   * @param magnitude - base impulse strength
+   * @param radius - max distance of effect (default: Infinity)
+   * @param falloff - how force decreases with distance (default: CONSTANT)
+   */
+  applyKnockbackToPlayer(fromPosition: Vector3Type, magnitude: number, radius?: number, falloff?: KnockbackFalloff): void
 }
 
 /**
@@ -51,6 +67,7 @@ export function createPhysicsSystem(engine: IEngine): PhysicsSystem {
   return {
     applyImpulseToPlayer: impulse.applyImpulseToPlayer,
     applyForceToPlayer: force.applyForceToPlayer,
-    removeForceFromPlayer: force.removeForceFromPlayer
+    removeForceFromPlayer: force.removeForceFromPlayer,
+    applyKnockbackToPlayer: impulse.applyKnockbackToPlayer
   }
 }
