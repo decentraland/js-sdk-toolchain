@@ -173,7 +173,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
 
   // Pre-compute composite data so we can inject maxCompositeEntity via esbuild define.
   // This must happen before the esbuild context is created because the define values
-  // are baked into the engine at compile time (the entity counter initializer reads it).
+  // are baked into the engine at compile time (the entity counter initializer reads it)
   let maxCompositeEntity = 0
   if (!options.ignoreComposite) {
     const composites = await getAllComposites(components, options.workingDirectory)
@@ -276,7 +276,6 @@ export async function bundleSingleProject(components: BundleComponents, options:
       DEBUG: options.production ? 'false' : 'true',
       'globalThis.DEBUG': options.production ? 'false' : 'true',
       'process.env.NODE_ENV': JSON.stringify(options.production ? 'production' : 'development'),
-      // Advance the engine entity counter past composite entities at init time
       DCL_MAX_COMPOSITE_ENTITY: String(maxCompositeEntity)
     },
     tsconfig: options.tsconfig,

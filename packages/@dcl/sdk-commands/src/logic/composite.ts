@@ -90,10 +90,7 @@ export async function getAllComposites(
     }
   }
 
-  // Scan composite data directly for the highest entity number.
-  // We cannot use engine.entityContainer.getExistingEntities() because
-  // EMM_DIRECT_MAPPING bypasses addEntity() — entities are used as
-  // component targets without being registered in the entity container.
+  // Compute composite's highest entity number
   let maxCompositeEntity = 0
   for (const composite of Object.values(composites)) {
     for (const component of composite.components) {

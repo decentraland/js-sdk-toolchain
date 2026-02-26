@@ -1,6 +1,6 @@
 import { createVersionGSet } from '../systems/crdt/gset'
 
-/** @internal Injected at build time by sdk-commands via esbuild define */
+/** @internal Optionally injected at build time (ex: esbuild define) */
 declare const DCL_MAX_COMPOSITE_ENTITY: number
 
 /**
