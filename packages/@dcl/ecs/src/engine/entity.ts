@@ -99,8 +99,8 @@ export type IEntityContainer = {
 
   /**
    * Advance the entity counter so that future generateEntity() calls
-   * return entity numbers >= minEntityNumber.  No-op when the counter
-   * is already at or above the requested value.
+   * return entity numbers starting at minEntityNumber or above.
+   * No-op when the counter is already past the requested value.
    */
   reserveEntitiesBelow(minEntityNumber: number): void
 }

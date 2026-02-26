@@ -1354,6 +1354,7 @@ export type IEntityContainer = {
     releaseRemovedEntities(): Entity[];
     updateRemovedEntity(entity: Entity): boolean;
     updateUsedEntity(entity: Entity): boolean;
+    reserveEntitiesBelow(minEntityNumber: number): void;
 };
 
 // @public (undocumented)
