@@ -23,14 +23,17 @@ describe('Ui Input - smooth typing', () => {
     uiRenderer.setUiRenderer(ui)
     await engine.update(1)
 
+    // Simulate the renderer reporting that the user typed "hello"
     UiInputResult.create(uiEntity, { value: 'hello' })
     await engine.update(1)
     expect(inputValue).toBe('hello')
 
+    // React re-renders with value="hello" (echoing it back).
+    // The reconciler should strip the echoed value from the update,
+    // so the component's value on the ECS side stays unchanged (not overwritten).
     const valueBefore = UiInput.get(uiEntity).value
     await engine.update(1)
-    const valueAfter = UiInput.get(uiEntity).value
-    expect(valueAfter).toBe(valueBefore)
+    expect(UiInput.get(uiEntity).value).toBe(valueBefore)
   })
 
   it('should still allow programmatic value changes that differ from renderer state', async () => {

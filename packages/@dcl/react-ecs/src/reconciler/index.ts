@@ -178,6 +178,18 @@ export function createReconciler(
       delete (props as any).onSubmit
     }
 
+    // Prevent keystroke drops: when React echoes back the same value the renderer
+    // reported, strip it from the props so the component isn't marked dirty for it.
+    // This avoids sending a stale value that overwrites what the user is currently typing.
+    if (
+      componentName === 'uiInput' &&
+      'value' in props &&
+      lastInputResultValues.has(instance.entity) &&
+      (props as any).value === lastInputResultValues.get(instance.entity)
+    ) {
+      delete (props as any).value
+    }
+
     // We check if there is any key pending to be changed to avoid updating the existing component
     if (!Object.keys(props).length) {
       return
@@ -188,10 +200,6 @@ export function createReconciler(
     const component = ComponentDef.getMutableOrNull(instance.entity) || ComponentDef.create(instance.entity)
     for (const key in props) {
       const keyProp = key as keyof EngineComponents[K]
-      // Skip echoing back the same value the renderer already has to prevent keystroke drops
-      if (componentName === 'uiInput' && keyProp === 'value' && props[keyProp] === lastInputResultValues.get(instance.entity)) {
-        continue
-      }
       component[keyProp] = props[keyProp]!
     }
   }
