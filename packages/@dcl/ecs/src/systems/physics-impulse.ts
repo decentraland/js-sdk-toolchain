@@ -8,7 +8,7 @@ import { isZeroVector, normalizeVector, scaleVector, addVectors } from './physic
  * Impulse helper returned by the factory. The facade exposes `applyImpulseToPlayer`;
  * `advanceFrame` is called by the background system each tick.
  */
-export interface PhysicsImpulseHelper {
+interface PhysicsImpulseHelper {
   applyImpulseToPlayer(vector: Vector3Type, magnitude?: number): void
 
   /** Advance the internal frame counter. Called once per tick by the facade system. */
