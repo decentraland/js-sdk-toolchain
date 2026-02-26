@@ -7,6 +7,9 @@
 import _m0 from 'protobufjs/minimal';
 
 // @public (undocumented)
+export function addVectors(a: Vector3Type, b: Vector3Type): Vector3Type;
+
+// @public (undocumented)
 export type AlignType = 'auto' | 'flex-start' | 'center' | 'flex-end' | 'stretch' | 'baseline' | 'space-between' | 'space-around';
 
 // Warning: (ae-missing-release-tag) "Animator" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -697,8 +700,8 @@ export const componentDefinitionByName: {
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
     "core::NftShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBNftShape>>;
-    "core::PhysicsTotalForce": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPhysicsTotalForce>>;
-    "core::PhysicsTotalImpulse": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPhysicsTotalImpulse>>;
+    "core::PhysicsCombinedForce": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedForce>>;
+    "core::PhysicsCombinedImpulse": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedImpulse>>;
     "core::PlayerIdentityData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>>;
     "core::PointerEvents": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerEvents>>;
     "core::PointerEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBPointerEventsResult>>;
@@ -1609,6 +1612,9 @@ export interface ISyncComponentsType {
 }
 
 // @public (undocumented)
+export function isZeroVector(v: Vector3Type): boolean;
+
+// @public (undocumented)
 export type JsonArray = Array<JsonPrimitive | JsonMap | JsonArray>;
 
 // @public (undocumented)
@@ -2080,6 +2086,9 @@ export const enum NftFrameType {
 
 // @public (undocumented)
 export const NftShape: LastWriteWinElementSetComponentDefinition<PBNftShape>;
+
+// @public (undocumented)
+export function normalizeVector(v: Vector3Type): Vector3Type;
 
 // @public @deprecated
 export class Observable<T> {
@@ -2984,30 +2993,30 @@ export namespace PBNftShape {
 }
 
 // @public (undocumented)
-export interface PBPhysicsTotalForce {
+export interface PBPhysicsCombinedForce {
     vector: PBVector3 | undefined;
 }
 
 // @public (undocumented)
-export namespace PBPhysicsTotalForce {
+export namespace PBPhysicsCombinedForce {
     // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPhysicsTotalForce;
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPhysicsCombinedForce;
     // (undocumented)
-    export function encode(message: PBPhysicsTotalForce, writer?: _m0.Writer): _m0.Writer;
+    export function encode(message: PBPhysicsCombinedForce, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
-export interface PBPhysicsTotalImpulse {
+export interface PBPhysicsCombinedImpulse {
     eventId: number;
     vector: PBVector3 | undefined;
 }
 
 // @public (undocumented)
-export namespace PBPhysicsTotalImpulse {
+export namespace PBPhysicsCombinedImpulse {
     // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPhysicsTotalImpulse;
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPhysicsCombinedImpulse;
     // (undocumented)
-    export function encode(message: PBPhysicsTotalImpulse, writer?: _m0.Writer): _m0.Writer;
+    export function encode(message: PBPhysicsCombinedImpulse, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3752,6 +3761,12 @@ export namespace PBVisibilityComponent {
 export const Physics: PhysicsSystem;
 
 // @public (undocumented)
+export const PhysicsCombinedForce: LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedForce>;
+
+// @public (undocumented)
+export const PhysicsCombinedImpulse: LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedImpulse>;
+
+// @public (undocumented)
 export interface PhysicsSystem {
     applyForceToPlayer(source: Entity, vector: Vector3Type): void;
     // (undocumented)
@@ -3761,12 +3776,6 @@ export interface PhysicsSystem {
     applyImpulseToPlayer(direction: Vector3Type, magnitude: number): void;
     removeForceFromPlayer(source: Entity): void;
 }
-
-// @public (undocumented)
-export const PhysicsTotalForce: LastWriteWinElementSetComponentDefinition<PBPhysicsTotalForce>;
-
-// @public (undocumented)
-export const PhysicsTotalImpulse: LastWriteWinElementSetComponentDefinition<PBPhysicsTotalImpulse>;
 
 // @public
 export namespace Plane {
@@ -4362,6 +4371,9 @@ export type ScaleUnit = `${number}${ScaleUnits}` | number;
 
 // @public
 export type ScaleUnits = 'vw' | 'vh';
+
+// @public (undocumented)
+export function scaleVector(v: Vector3Type, s: number): Vector3Type;
 
 // @public (undocumented)
 export namespace Schemas {
@@ -5132,6 +5144,9 @@ export type Vector3Type = {
     y: number;
     z: number;
 };
+
+// @public (undocumented)
+export function vectorsEqual(a: Vector3Type, b: Vector3Type): boolean;
 
 // @public (undocumented)
 export const VideoEvent: GrowOnlyValueSetComponentDefinition<PBVideoEvent>;
