@@ -18,15 +18,23 @@ import {
 
 /**
  * @public
- * Parameters for setMoveRotateScale. At least one of position, rotation, or scale must be provided.
+ * Partial params for Tween.Mode.MoveRotateScale(). At least one of position, rotation, or scale must be provided.
+ * Use this when building a mode for Tween.createOrReplace() or TweenSequence (e.g. only positionStart/positionEnd).
  */
-export interface SetMoveRotateScaleParams {
+export interface MoveRotateScaleModeParams {
   /** Position tween (start → end). Optional. */
   position?: { start: Vector3; end: Vector3 }
   /** Rotation tween (start → end). Optional. */
   rotation?: { start: Quaternion; end: Quaternion }
   /** Scale tween (start → end). Optional. */
   scale?: { start: Vector3; end: Vector3 }
+}
+
+/**
+ * @public
+ * Parameters for setMoveRotateScale. At least one of position, rotation, or scale must be provided.
+ */
+export interface SetMoveRotateScaleParams extends MoveRotateScaleModeParams {
   /** Duration of the tween in milliseconds. */
   duration: number
   /** Easing function (defaults to EF_LINEAR). */
@@ -35,9 +43,9 @@ export interface SetMoveRotateScaleParams {
 
 /**
  * @public
- * Parameters for setMoveRotateScaleContinuous. At least one of position, rotation, or scale must be provided.
+ * Partial params for Tween.Mode.MoveRotateScaleContinuous(). At least one of position, rotation, or scale must be provided.
  */
-export interface SetMoveRotateScaleContinuousParams {
+export interface MoveRotateScaleContinuousModeParams {
   /** Position direction for continuous movement. Optional. */
   position?: { direction: Vector3 }
   /** Rotation direction for continuous rotation. Optional. */
@@ -46,6 +54,13 @@ export interface SetMoveRotateScaleContinuousParams {
   scale?: { direction: Vector3 }
   /** Speed of the animation per second. */
   speed: number
+}
+
+/**
+ * @public
+ * Parameters for setMoveRotateScaleContinuous. At least one of position, rotation, or scale must be provided.
+ */
+export interface SetMoveRotateScaleContinuousParams extends MoveRotateScaleContinuousModeParams {
   /** Duration in milliseconds (defaults to 0 for infinite). */
   duration?: number
 }
@@ -73,12 +88,15 @@ function validateSpeed(speed: number, apiName: string): void {
   }
 }
 
-function validateSetMoveRotateScaleParams(params: SetMoveRotateScaleParams, apiName: string): void {
+/** Shared validation for params that have optional position/rotation/scale with start & end. */
+function validateMoveRotateScaleAxesStartEnd(
+  params: MoveRotateScaleModeParams,
+  apiName: string
+): void {
   const hasPosition = params.position != null
   const hasRotation = params.rotation != null
   const hasScale = params.scale != null
   validateAtLeastOneMoveRotateScale(hasPosition, hasRotation, hasScale, apiName)
-  validateDuration(params.duration, apiName)
   if (hasPosition) {
     const pos = params.position!
     if (pos.start == null || pos.end == null) {
@@ -99,8 +117,9 @@ function validateSetMoveRotateScaleParams(params: SetMoveRotateScaleParams, apiN
   }
 }
 
-function validateSetMoveRotateScaleContinuousParams(
-  params: SetMoveRotateScaleContinuousParams,
+/** Shared validation for params that have optional position/rotation/scale with direction + speed. */
+function validateMoveRotateScaleAxesDirection(
+  params: MoveRotateScaleContinuousModeParams,
   apiName: string
 ): void {
   const hasPosition = params.position != null
@@ -108,8 +127,6 @@ function validateSetMoveRotateScaleContinuousParams(
   const hasScale = params.scale != null
   validateAtLeastOneMoveRotateScale(hasPosition, hasRotation, hasScale, apiName)
   validateSpeed(params.speed, apiName)
-  const duration = params.duration ?? 0
-  validateDuration(duration, apiName)
   if (hasPosition && params.position!.direction == null) {
     throw new Error(`${apiName}: position must have direction`)
   }
@@ -119,6 +136,30 @@ function validateSetMoveRotateScaleContinuousParams(
   if (hasScale && params.scale!.direction == null) {
     throw new Error(`${apiName}: scale must have direction`)
   }
+}
+
+function validateSetMoveRotateScaleParams(params: SetMoveRotateScaleParams, apiName: string): void {
+  validateMoveRotateScaleModeParams(params, apiName)
+  validateDuration(params.duration, apiName)
+}
+
+function validateSetMoveRotateScaleContinuousParams(
+  params: SetMoveRotateScaleContinuousParams,
+  apiName: string
+): void {
+  validateMoveRotateScaleContinuousModeParams(params, apiName)
+  validateDuration(params.duration ?? 0, apiName)
+}
+
+function validateMoveRotateScaleModeParams(params: MoveRotateScaleModeParams, apiName: string): void {
+  validateMoveRotateScaleAxesStartEnd(params, apiName)
+}
+
+function validateMoveRotateScaleContinuousModeParams(
+  params: MoveRotateScaleContinuousModeParams,
+  apiName: string
+): void {
+  validateMoveRotateScaleAxesDirection(params, apiName)
 }
 
 /**
@@ -155,12 +196,14 @@ export interface TweenHelper {
   TextureMoveContinuous: (textureMove: TextureMoveContinuous) => PBTween['mode']
   /**
    * @returns a move-rotate-scale mode tween
+   * @param params - partial transform (at least one of position, rotation, scale); omit axes you don't need
    */
-  MoveRotateScale: (moveRotateScale: MoveRotateScale) => PBTween['mode']
+  MoveRotateScale: (params: MoveRotateScaleModeParams) => PBTween['mode']
   /**
    * @returns a move-rotate-scale-continuous mode tween
+   * @param params - partial transform (at least one of position, rotation, scale) + speed; omit axes you don't need
    */
-  MoveRotateScaleContinuous: (moveRotateScaleContinuous: MoveRotateScaleContinuous) => PBTween['mode']
+  MoveRotateScaleContinuous: (params: MoveRotateScaleContinuousModeParams) => PBTween['mode']
 }
 
 /**
@@ -334,13 +377,35 @@ const TweenHelper: TweenHelper = {
       textureMoveContinuous
     }
   },
-  MoveRotateScale(moveRotateScale) {
+  MoveRotateScale(params) {
+    validateMoveRotateScaleModeParams(params, 'Tween.Mode.MoveRotateScale')
+    const hasPosition = params.position != null
+    const hasRotation = params.rotation != null
+    const hasScale = params.scale != null
+    const moveRotateScale: MoveRotateScale = {
+      positionStart: hasPosition ? params.position!.start : undefined,
+      positionEnd: hasPosition ? params.position!.end : undefined,
+      rotationStart: hasRotation ? params.rotation!.start : undefined,
+      rotationEnd: hasRotation ? params.rotation!.end : undefined,
+      scaleStart: hasScale ? params.scale!.start : undefined,
+      scaleEnd: hasScale ? params.scale!.end : undefined
+    }
     return {
       $case: 'moveRotateScale',
       moveRotateScale
     }
   },
-  MoveRotateScaleContinuous(moveRotateScaleContinuous) {
+  MoveRotateScaleContinuous(params) {
+    validateMoveRotateScaleContinuousModeParams(params, 'Tween.Mode.MoveRotateScaleContinuous')
+    const hasPosition = params.position != null
+    const hasRotation = params.rotation != null
+    const hasScale = params.scale != null
+    const moveRotateScaleContinuous: MoveRotateScaleContinuous = {
+      positionDirection: hasPosition ? params.position!.direction : undefined,
+      rotationDirection: hasRotation ? params.rotation!.direction : undefined,
+      scaleDirection: hasScale ? params.scale!.direction : undefined,
+      speed: params.speed
+    }
     return {
       $case: 'moveRotateScaleContinuous',
       moveRotateScaleContinuous

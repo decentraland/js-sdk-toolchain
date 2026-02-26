@@ -2046,6 +2046,36 @@ export namespace MoveRotateScaleContinuous {
     export function encode(message: MoveRotateScaleContinuous, writer?: _m0.Writer): _m0.Writer;
 }
 
+// @public
+export interface MoveRotateScaleContinuousModeParams {
+    position?: {
+        direction: PBVector3;
+    };
+    rotation?: {
+        direction: PBQuaternion;
+    };
+    scale?: {
+        direction: PBVector3;
+    };
+    speed: number;
+}
+
+// @public
+export interface MoveRotateScaleModeParams {
+    position?: {
+        start: PBVector3;
+        end: PBVector3;
+    };
+    rotation?: {
+        start: PBQuaternion;
+        end: PBQuaternion;
+    };
+    scale?: {
+        start: PBVector3;
+        end: PBVector3;
+    };
+}
+
 // Warning: (ae-missing-release-tag) "Name" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -4417,36 +4447,14 @@ export namespace Schemas {
 }
 
 // @public
-export interface SetMoveRotateScaleContinuousParams {
+export interface SetMoveRotateScaleContinuousParams extends MoveRotateScaleContinuousModeParams {
     duration?: number;
-    position?: {
-        direction: PBVector3;
-    };
-    rotation?: {
-        direction: PBQuaternion;
-    };
-    scale?: {
-        direction: PBVector3;
-    };
-    speed: number;
 }
 
 // @public
-export interface SetMoveRotateScaleParams {
+export interface SetMoveRotateScaleParams extends MoveRotateScaleModeParams {
     duration: number;
     easingFunction?: EasingFunction;
-    position?: {
-        start: PBVector3;
-        end: PBVector3;
-    };
-    rotation?: {
-        start: PBQuaternion;
-        end: PBQuaternion;
-    };
-    scale?: {
-        start: PBVector3;
-        end: PBVector3;
-    };
 }
 
 // @public (undocumented)
@@ -4836,9 +4844,9 @@ export interface TweenHelper {
     // (undocumented)
     MoveContinuous: (move: MoveContinuous) => PBTween['mode'];
     // (undocumented)
-    MoveRotateScale: (moveRotateScale: MoveRotateScale) => PBTween['mode'];
+    MoveRotateScale: (params: MoveRotateScaleModeParams) => PBTween['mode'];
     // (undocumented)
-    MoveRotateScaleContinuous: (moveRotateScaleContinuous: MoveRotateScaleContinuous) => PBTween['mode'];
+    MoveRotateScaleContinuous: (params: MoveRotateScaleContinuousModeParams) => PBTween['mode'];
     // (undocumented)
     Rotate: (rotate: Rotate) => PBTween['mode'];
     // (undocumented)
