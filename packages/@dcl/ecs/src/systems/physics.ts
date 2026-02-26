@@ -1,6 +1,6 @@
-import { Entity } from '../engine/entity'
+import { Entity } from '../engine'
 import { IEngine } from '../engine'
-import { Vector3Type } from '../schemas/custom/Vector3'
+import { Vector3Type } from '../schemas'
 import { createPhysicsImpulseHelper } from './physics-impulse'
 import { createPhysicsForceHelper } from './physics-force'
 
