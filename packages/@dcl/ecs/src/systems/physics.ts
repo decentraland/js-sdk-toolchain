@@ -17,7 +17,7 @@ export interface PhysicsSystem {
    *   otherwise the length of `vector` encodes the strength directly.
    */
   applyImpulseToPlayer(vector: Vector3Type): void
-  applyImpulseToPlayer(vector: Vector3Type, magnitude: number): void
+  applyImpulseToPlayer(direction: Vector3Type, magnitude: number): void
 
   /**
    * Apply a continuous force to the player from a given source entity.
@@ -31,7 +31,7 @@ export interface PhysicsSystem {
    *   otherwise the length of `vector` encodes the strength directly.
    */
   applyForceToPlayer(source: Entity, vector: Vector3Type): void
-  applyForceToPlayer(source: Entity, vector: Vector3Type, magnitude: number): void
+  applyForceToPlayer(source: Entity, direction: Vector3Type, magnitude: number): void
 
   /**
    * Remove a continuous force from the player. Remaining sources are
