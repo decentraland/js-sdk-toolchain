@@ -5,28 +5,19 @@ import { isZeroVector, normalizeVector, scaleVector, addVectors } from './physic
 
 /**
  * @internal
- * Impulse helper returned by the factory. The facade exposes `applyImpulseToPlayer`;
- * `advanceFrame` is called by the background system each tick.
  */
 interface PhysicsImpulseHelper {
   applyImpulseToPlayer(vector: Vector3Type, magnitude?: number): void
-
-  /** Advance the internal frame counter. Called once per tick by the facade system. */
-  advanceFrame(): void
 }
 
 /** @internal */
 export function createPhysicsImpulseHelper(engine: IEngine): PhysicsImpulseHelper {
   const PhysicsTotalImpulse = components.PhysicsTotalImpulse(engine)
+  const EngineInfo = components.EngineInfo(engine)
 
   let impulseEventId = 0
   let lastWrittenEventId = 0
-  let lastWrittenFrame = -1
-  let currentFrame = 0
-
-  function advanceFrame(): void {
-    currentFrame++
-  }
+  let lastWrittenTick = -1
 
   function applyImpulseToPlayer(vector: Vector3Type, magnitude?: number): void {
     let finalVector: Vector3Type
@@ -39,6 +30,7 @@ export function createPhysicsImpulseHelper(engine: IEngine): PhysicsImpulseHelpe
       finalVector = vector
     }
 
+    const currentTick = EngineInfo.getOrNull(engine.RootEntity)?.tickNumber ?? 0
     const existing = PhysicsTotalImpulse.getOrNull(engine.PlayerEntity)
 
     if (existing && existing.eventId !== lastWrittenEventId && lastWrittenEventId !== 0) {
@@ -48,13 +40,13 @@ export function createPhysicsImpulseHelper(engine: IEngine): PhysicsImpulseHelpe
       )
     }
 
-    if (lastWrittenFrame === currentFrame && existing) {
+    if (lastWrittenTick === currentTick && existing) {
       finalVector = addVectors(existing.vector ?? { x: 0, y: 0, z: 0 }, finalVector)
     } else {
       lastWrittenEventId = ++impulseEventId
     }
 
-    lastWrittenFrame = currentFrame
+    lastWrittenTick = currentTick
 
     PhysicsTotalImpulse.createOrReplace(engine.PlayerEntity, {
       vector: finalVector,
@@ -62,5 +54,5 @@ export function createPhysicsImpulseHelper(engine: IEngine): PhysicsImpulseHelpe
     })
   }
 
-  return { applyImpulseToPlayer, advanceFrame }
+  return { applyImpulseToPlayer }
 }

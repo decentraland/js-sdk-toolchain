@@ -11,13 +11,21 @@ describe('Physics impulse helper system should', () => {
     const engine: IEngine = Engine()
     const physics: PhysicsSystem = createPhysicsSystem(engine)
     const PhysicsTotalImpulse = components.PhysicsTotalImpulse(engine)
-    return { engine, physics, PhysicsTotalImpulse }
+    const EngineInfo = components.EngineInfo(engine)
+
+    let tickNumber = 0
+    async function tick(dt = 1) {
+      EngineInfo.createOrReplace(engine.RootEntity, { tickNumber: ++tickNumber, frameNumber: tickNumber, totalRuntime: 0 })
+      await engine.update(dt)
+    }
+
+    return { engine, physics, PhysicsTotalImpulse, tick }
   }
 
   it('apply a single impulse with correct vector and eventId', async () => {
-    const { engine, physics, PhysicsTotalImpulse } = setup()
+    const { engine, physics, PhysicsTotalImpulse, tick } = setup()
 
-    await engine.update(1)
+    await tick()
     physics.applyImpulseToPlayer({ x: 0, y: 15, z: 0 })
 
     const impulse = PhysicsTotalImpulse.get(engine.PlayerEntity)
@@ -26,9 +34,9 @@ describe('Physics impulse helper system should', () => {
   })
 
   it('accumulate two impulses in the same frame', async () => {
-    const { engine, physics, PhysicsTotalImpulse } = setup()
+    const { engine, physics, PhysicsTotalImpulse, tick } = setup()
 
-    await engine.update(1)
+    await tick()
     physics.applyImpulseToPlayer({ x: 10, y: 0, z: 0 })
     physics.applyImpulseToPlayer({ x: 0, y: 5, z: 0 })
 
@@ -38,9 +46,9 @@ describe('Physics impulse helper system should', () => {
   })
 
   it('accumulate three impulses in the same frame', async () => {
-    const { engine, physics, PhysicsTotalImpulse } = setup()
+    const { engine, physics, PhysicsTotalImpulse, tick } = setup()
 
-    await engine.update(1)
+    await tick()
     physics.applyImpulseToPlayer({ x: 1, y: 0, z: 0 })
     physics.applyImpulseToPlayer({ x: 0, y: 2, z: 0 })
     physics.applyImpulseToPlayer({ x: 0, y: 0, z: 3 })
@@ -51,15 +59,15 @@ describe('Physics impulse helper system should', () => {
   })
 
   it('use different eventIds for impulses on different frames', async () => {
-    const { engine, physics, PhysicsTotalImpulse } = setup()
+    const { engine, physics, PhysicsTotalImpulse, tick } = setup()
 
-    await engine.update(1)
+    await tick()
     physics.applyImpulseToPlayer({ x: 10, y: 0, z: 0 })
 
     const first = PhysicsTotalImpulse.get(engine.PlayerEntity)
     expect(first.eventId).toBe(1)
 
-    await engine.update(1)
+    await tick()
     physics.applyImpulseToPlayer({ x: 0, y: 5, z: 0 })
 
     const second = PhysicsTotalImpulse.get(engine.PlayerEntity)
@@ -68,9 +76,9 @@ describe('Physics impulse helper system should', () => {
   })
 
   it('apply impulse with vector and magnitude overload', async () => {
-    const { engine, physics, PhysicsTotalImpulse } = setup()
+    const { engine, physics, PhysicsTotalImpulse, tick } = setup()
 
-    await engine.update(1)
+    await tick()
     physics.applyImpulseToPlayer({ x: 0, y: 1, z: 0 }, 20)
 
     const impulse = PhysicsTotalImpulse.get(engine.PlayerEntity)
@@ -81,9 +89,9 @@ describe('Physics impulse helper system should', () => {
   })
 
   it('normalize non-unit vector in magnitude overload', async () => {
-    const { engine, physics, PhysicsTotalImpulse } = setup()
+    const { engine, physics, PhysicsTotalImpulse, tick } = setup()
 
-    await engine.update(1)
+    await tick()
     physics.applyImpulseToPlayer({ x: 3, y: 0, z: 4 }, 10)
 
     const impulse = PhysicsTotalImpulse.get(engine.PlayerEntity)
@@ -93,27 +101,27 @@ describe('Physics impulse helper system should', () => {
   })
 
   it('skip zero vector (no-op)', async () => {
-    const { engine, physics, PhysicsTotalImpulse } = setup()
+    const { engine, physics, PhysicsTotalImpulse, tick } = setup()
 
-    await engine.update(1)
+    await tick()
     physics.applyImpulseToPlayer({ x: 0, y: 0, z: 0 })
 
     expect(PhysicsTotalImpulse.getOrNull(engine.PlayerEntity)).toBeNull()
   })
 
   it('skip zero vector in magnitude overload (no-op)', async () => {
-    const { engine, physics, PhysicsTotalImpulse } = setup()
+    const { engine, physics, PhysicsTotalImpulse, tick } = setup()
 
-    await engine.update(1)
+    await tick()
     physics.applyImpulseToPlayer({ x: 0, y: 0, z: 0 }, 10)
 
     expect(PhysicsTotalImpulse.getOrNull(engine.PlayerEntity)).toBeNull()
   })
 
   it('throw error when component is modified externally', async () => {
-    const { engine, physics, PhysicsTotalImpulse } = setup()
+    const { engine, physics, PhysicsTotalImpulse, tick } = setup()
 
-    await engine.update(1)
+    await tick()
     physics.applyImpulseToPlayer({ x: 1, y: 0, z: 0 })
 
     PhysicsTotalImpulse.createOrReplace(engine.PlayerEntity, {
@@ -127,19 +135,19 @@ describe('Physics impulse helper system should', () => {
   })
 
   it('not throw on first call (no prior state)', async () => {
-    const { engine, physics } = setup()
+    const { engine, physics, tick } = setup()
 
-    await engine.update(1)
+    await tick()
     expect(() => {
       physics.applyImpulseToPlayer({ x: 5, y: 0, z: 0 })
     }).not.toThrow()
   })
 
   it('correctly reset accumulation across frame boundaries', async () => {
-    const { engine, physics, PhysicsTotalImpulse } = setup()
+    const { engine, physics, PhysicsTotalImpulse, tick } = setup()
 
     // Frame 1: two impulses -> accumulated
-    await engine.update(1)
+    await tick()
     physics.applyImpulseToPlayer({ x: 10, y: 0, z: 0 })
     physics.applyImpulseToPlayer({ x: 0, y: 10, z: 0 })
 
@@ -147,7 +155,7 @@ describe('Physics impulse helper system should', () => {
     expect(frame1.vector).toEqual({ x: 10, y: 10, z: 0 })
 
     // Frame 2: single impulse -> NOT accumulated with frame 1
-    await engine.update(1)
+    await tick()
     physics.applyImpulseToPlayer({ x: 0, y: 0, z: 7 })
 
     const frame2 = PhysicsTotalImpulse.get(engine.PlayerEntity)
