@@ -16,25 +16,25 @@ export interface PhysicsForceHelper {
 
 /** @internal */
 export function createPhysicsForceHelper(engine: IEngine): PhysicsForceHelper {
-  const PhysicsTotalForce = components.PhysicsTotalForce(engine)
+  const PhysicsCombinedForce = components.PhysicsCombinedForce(engine)
 
   const forceSources = new Map<Entity, Vector3Type>()
   let lastWrittenForceVector: Vector3Type | null = null
 
   function recalcForce(): void {
     if (forceSources.size === 0) {
-      if (PhysicsTotalForce.getOrNull(engine.PlayerEntity) !== null) {
-        PhysicsTotalForce.deleteFrom(engine.PlayerEntity)
+      if (PhysicsCombinedForce.getOrNull(engine.PlayerEntity) !== null) {
+        PhysicsCombinedForce.deleteFrom(engine.PlayerEntity)
       }
       lastWrittenForceVector = null
       return
     }
 
-    const current = PhysicsTotalForce.getOrNull(engine.PlayerEntity)
+    const current = PhysicsCombinedForce.getOrNull(engine.PlayerEntity)
     if (current && lastWrittenForceVector && current.vector) {
       if (!vectorsEqual(current.vector, lastWrittenForceVector)) {
         throw new Error(
-          'PBPhysicsTotalForce was modified outside Physics helper. ' +
+          'PBPhysicsCombinedForce was modified outside Physics helper. ' +
           'Do not mix direct component access with Physics.applyForceToPlayer().'
         )
       }
@@ -45,7 +45,7 @@ export function createPhysicsForceHelper(engine: IEngine): PhysicsForceHelper {
       sum = addVectors(sum, v)
     }
 
-    PhysicsTotalForce.createOrReplace(engine.PlayerEntity, { vector: sum })
+    PhysicsCombinedForce.createOrReplace(engine.PlayerEntity, { vector: sum })
     lastWrittenForceVector = sum
   }
 

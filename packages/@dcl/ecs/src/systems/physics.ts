@@ -21,7 +21,7 @@ export interface PhysicsSystem {
   /**
    * Apply a continuous force to the player from a given source entity.
    * Multiple sources are accumulated: the registry sums all active forces
-   * and writes a single PBPhysicsTotalForce component.
+   * and writes a single PBPhysicsCombinedForce component.
    * Calling again with the same source replaces its previous force.
    *
    * @param source - Entity key identifying this force source

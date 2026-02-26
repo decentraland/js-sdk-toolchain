@@ -1,12 +1,12 @@
 import { Engine, components } from '../../../packages/@dcl/ecs/src'
 import { testComponentSerialization } from './assertion'
 
-describe('Generated PhysicsTotalForce ProtoBuf', () => {
-  it('should serialize/deserialize PhysicsTotalForce', () => {
+describe('Generated PhysicsCombinedForce ProtoBuf', () => {
+  it('should serialize/deserialize PhysicsCombinedForce', () => {
     const newEngine = Engine()
-    const PhysicsTotalForce = components.PhysicsTotalForce(newEngine)
+    const PhysicsCombinedForce = components.PhysicsCombinedForce(newEngine)
 
-    testComponentSerialization(PhysicsTotalForce, {
+    testComponentSerialization(PhysicsCombinedForce, {
       vector: { x: 5.0, y: -2.5, z: 8.3 }
     })
   })
