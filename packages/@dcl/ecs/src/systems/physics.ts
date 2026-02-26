@@ -1,7 +1,6 @@
-import { Entity } from '../engine/entity'
+import { Entity } from '../engine'
 import { IEngine } from '../engine'
-import { SYSTEMS_REGULAR_PRIORITY } from '../engine/systems'
-import { Vector3Type } from '../schemas/custom/Vector3'
+import { Vector3Type } from '../schemas'
 import { createPhysicsImpulseHelper } from './physics-impulse'
 import { createPhysicsForceHelper } from './physics-force'
 
@@ -50,14 +49,6 @@ export interface PhysicsSystem {
 export function createPhysicsSystem(engine: IEngine): PhysicsSystem {
   const impulse = createPhysicsImpulseHelper(engine)
   const force = createPhysicsForceHelper(engine)
-
-  engine.addSystem(
-    function PhysicsTickSystem() {
-      impulse.advanceFrame()
-    },
-    SYSTEMS_REGULAR_PRIORITY * 2,
-    'dcl.PhysicsTickSystem'
-  )
 
   return {
     applyImpulseToPlayer: impulse.applyImpulseToPlayer,
