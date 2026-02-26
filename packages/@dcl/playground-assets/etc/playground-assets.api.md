@@ -3751,20 +3751,14 @@ export namespace PBVisibilityComponent {
 // @public
 export const Physics: PhysicsSystem;
 
-// @public
-export enum PhysicsForceSpace {
-    // (undocumented)
-    PFS_LOCAL = "local",
-    // (undocumented)
-    PFS_WORLD = "world"
-}
-
 // @public (undocumented)
 export interface PhysicsSystem {
-    applyForceToPlayer(source: Entity, vector: Vector3Type, space?: PhysicsForceSpace): void;
-    applyForceToPlayer(source: Entity, direction: Vector3Type, magnitude: number, space?: PhysicsForceSpace): void;
-    applyImpulseToPlayer(vector: Vector3Type, space?: PhysicsForceSpace): void;
-    applyImpulseToPlayer(direction: Vector3Type, magnitude: number, space?: PhysicsForceSpace): void;
+    applyForceToPlayer(source: Entity, vector: Vector3Type): void;
+    // (undocumented)
+    applyForceToPlayer(source: Entity, direction: Vector3Type, magnitude: number): void;
+    applyImpulseToPlayer(vector: Vector3Type): void;
+    // (undocumented)
+    applyImpulseToPlayer(direction: Vector3Type, magnitude: number): void;
     removeForceFromPlayer(source: Entity): void;
 }
 
