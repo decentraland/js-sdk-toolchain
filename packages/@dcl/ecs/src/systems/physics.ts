@@ -68,6 +68,21 @@ export interface PhysicsSystem {
    */
   applyForceToPlayerForDuration(source: Entity, duration: number, vector: Vector3Type): void
   applyForceToPlayerForDuration(source: Entity, duration: number, direction: Vector3Type, magnitude: number): void
+
+  /**
+   * Apply a continuous repulsion force that pushes the player away from a point,
+   * recalculating direction every tick as the player moves.
+   * Remove with `removeForceFromPlayer(source)`.
+   *
+   * Negative magnitude = attraction (pulls toward the source).
+   *
+   * @param source - Entity key identifying this force source
+   * @param fromPosition - world-space origin of repulsion
+   * @param magnitude - base force strength
+   * @param radius - max distance of effect (default: Infinity)
+   * @param falloff - how force decreases with distance (default: CONSTANT)
+   */
+  applyRepulsionForceToPlayer(source: Entity, fromPosition: Vector3Type, magnitude: number, radius?: number, falloff?: KnockbackFalloff): void
 }
 
 /**
@@ -82,6 +97,7 @@ export function createPhysicsSystem(engine: IEngine): PhysicsSystem {
     applyForceToPlayer: force.applyForceToPlayer,
     removeForceFromPlayer: force.removeForceFromPlayer,
     applyKnockbackToPlayer: impulse.applyKnockbackToPlayer,
-    applyForceToPlayerForDuration: force.applyForceToPlayerForDuration
+    applyForceToPlayerForDuration: force.applyForceToPlayerForDuration,
+    applyRepulsionForceToPlayer: force.applyRepulsionForceToPlayer
   }
 }
