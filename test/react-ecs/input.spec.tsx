@@ -4,6 +4,63 @@ import { ReactEcs, Input } from '../../packages/@dcl/react-ecs/src'
 import { Color4 } from '../../packages/@dcl/sdk/math'
 import { setupEngine } from './utils'
 
+describe('Ui Input - smooth typing', () => {
+  it('should not echo back the same value the renderer reported, preventing keystroke drops', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiInput = components.UiInput(engine)
+    const UiInputResult = components.UiInputResult(engine)
+    const uiEntity = ((engine.addEntity() as number) + 1) as Entity
+
+    let inputValue = ''
+    const ui = () => (
+      <Input
+        uiTransform={{ width: 100 }}
+        value={inputValue}
+        onChange={(val) => { inputValue = val ?? '' }}
+        placeholder="type here"
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+
+    UiInputResult.create(uiEntity, { value: 'hello' })
+    await engine.update(1)
+    expect(inputValue).toBe('hello')
+
+    const valueBefore = UiInput.get(uiEntity).value
+    await engine.update(1)
+    const valueAfter = UiInput.get(uiEntity).value
+    expect(valueAfter).toBe(valueBefore)
+  })
+
+  it('should still allow programmatic value changes that differ from renderer state', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiInput = components.UiInput(engine)
+    const UiInputResult = components.UiInputResult(engine)
+    const uiEntity = ((engine.addEntity() as number) + 1) as Entity
+
+    let inputValue = ''
+    const ui = () => (
+      <Input
+        uiTransform={{ width: 100 }}
+        value={inputValue}
+        onChange={(val) => { inputValue = val ?? '' }}
+        placeholder="type here"
+      />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+
+    UiInputResult.create(uiEntity, { value: 'hello' })
+    await engine.update(1)
+    expect(inputValue).toBe('hello')
+
+    inputValue = ''
+    await engine.update(1)
+    expect(UiInput.get(uiEntity).value).toBe('')
+  })
+})
+
 describe('Ui Listeners React Ecs', () => {
   it('should run onChange if it was a keyboard event', async () => {
     const { engine, uiRenderer } = setupEngine()
