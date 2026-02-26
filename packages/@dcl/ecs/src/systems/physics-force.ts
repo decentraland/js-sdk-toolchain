@@ -2,16 +2,15 @@ import * as components from '../components'
 import { Entity } from '../engine'
 import { IEngine } from '../engine'
 import { Vector3Type } from '../schemas'
-import { isZeroVector, normalizeVector, scaleVector, addVectors, vectorsEqual } from '../runtime/helpers'
+import { isZeroVector, normalizeVector, scaleVector, addVectors, vectorsEqual, createTimers } from '../runtime/helpers'
 
 /**
  * @internal
- * Force helper returned by the factory. The facade exposes `applyForceToPlayer`
- * and `removeForceFromPlayer`.
  */
 export interface PhysicsForceHelper {
   applyForceToPlayer(source: Entity, vector: Vector3Type, magnitude?: number): void
   removeForceFromPlayer(source: Entity): void
+  applyForceToPlayerForDuration(source: Entity, duration: number, vector: Vector3Type, magnitude?: number): void
 }
 
 /** @internal */
@@ -69,5 +68,31 @@ export function createPhysicsForceHelper(engine: IEngine): PhysicsForceHelper {
     recalcForce()
   }
 
-  return { applyForceToPlayer, removeForceFromPlayer }
+  const timers = createTimers(engine)
+  const durationTimers = new Map<Entity, number>()
+
+  function scheduleForceDuration(source: Entity, seconds: number): void {
+    const existing = durationTimers.get(source)
+    if (existing !== undefined) {
+      timers.clearTimeout(existing)
+    }
+
+    const timerId = timers.setTimeout(() => {
+      durationTimers.delete(source)
+      removeForceFromPlayer(source)
+    }, seconds * 1000)
+    durationTimers.set(source, timerId)
+  }
+
+  function applyForceToPlayerForDuration(
+    source: Entity,
+    duration: number,
+    vector: Vector3Type,
+    magnitude?: number
+  ): void {
+    applyForceToPlayer(source, vector, magnitude)
+    scheduleForceDuration(source, duration)
+  }
+
+  return { applyForceToPlayer, removeForceFromPlayer, applyForceToPlayerForDuration }
 }
