@@ -96,6 +96,13 @@ export type IEntityContainer = {
   releaseRemovedEntities(): Entity[]
   updateRemovedEntity(entity: Entity): boolean
   updateUsedEntity(entity: Entity): boolean
+
+  /**
+   * Advance the entity counter so that future generateEntity() calls
+   * return entity numbers >= minEntityNumber.  No-op when the counter
+   * is already at or above the requested value.
+   */
+  reserveEntitiesBelow(minEntityNumber: number): void
 }
 
 /**
@@ -228,6 +235,12 @@ export function createEntityContainer(opts?: { reservedStaticEntities: number })
     return EntityState.Unknown
   }
 
+  function reserveEntitiesBelow(minEntityNumber: number) {
+    if (minEntityNumber > entityCounter) {
+      entityCounter = minEntityNumber
+    }
+  }
+
   return {
     generateEntity,
     removeEntity,
@@ -239,6 +252,7 @@ export function createEntityContainer(opts?: { reservedStaticEntities: number })
     releaseRemovedEntities,
 
     updateRemovedEntity,
-    updateUsedEntity
+    updateUsedEntity,
+    reserveEntitiesBelow
   }
 }

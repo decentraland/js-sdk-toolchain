@@ -71,12 +71,17 @@ function getEntrypointCode(entrypointPath: string, forceCustomExport: boolean, i
 
   return `// BEGIN AUTO GENERATED CODE "~sdk/scene-entrypoint"
 "use strict";
-import * as entrypoint from ${safeEntrypointPath}
+// we need to load engine & SDK before user code
 import { engine, NetworkEntity } from '@dcl/sdk/ecs'
 import * as sdk from '@dcl/sdk'
 import { compositeProvider } from '@dcl/sdk/composite-provider'
-import { compositeFromLoader } from '~sdk/all-composites'
+import { compositeFromLoader, maxCompositeEntity } from '~sdk/all-composites'
 import { _initializeScripts } from '~sdk/script-utils'
+
+// advance entity counter past composite entities to prevent ID collisions
+if (maxCompositeEntity > 0) {
+  ;(engine as any).entityContainer.reserveEntitiesBelow(maxCompositeEntity + 1)
+}
 
 ${
   isEditorScene &&
@@ -91,6 +96,8 @@ initAssetPacks(engine, { syncEntity }, players)
 // Read composite.json or main.crdt => If that file has a NetworkEntity import '@dcl/@sdk/network'
 `
 }
+
+import * as entrypoint from ${safeEntrypointPath}
 
 if ((entrypoint as any).main !== undefined) {
   function _INTERNAL_startup_system() {
@@ -236,7 +243,13 @@ export async function bundleSingleProject(components: BundleComponents, options:
       // pick up @dcl/asset-packs installed next to the scene (e.g. at a monorepo root) rather
       // than the one the user intentionally installed inside the scene.
       '@dcl/asset-packs': (() => {
-        const sceneOwnAssetPacks = path.join(options.workingDirectory, 'node_modules', '@dcl', 'asset-packs', 'package.json')
+        const sceneOwnAssetPacks = path.join(
+          options.workingDirectory,
+          'node_modules',
+          '@dcl',
+          'asset-packs',
+          'package.json'
+        )
         if (fs.existsSync(sceneOwnAssetPacks)) {
           return path.dirname(sceneOwnAssetPacks)
         }
@@ -434,8 +447,11 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
         }
 
         const contents = compositeData
-          ? `export const compositeFromLoader = {${compositeData.compositeLines.join(',')}}`
-          : `export const compositeFromLoader = {}`
+          ? `
+export const compositeFromLoader = {${compositeData.compositeLines.join(',')}}
+export const maxCompositeEntity = ${compositeData.maxCompositeEntity}
+          `
+          : `export const compositeFromLoader = {}\nexport const maxCompositeEntity = 0`
         const watchFiles = compositeData?.watchFiles || []
 
         return {
