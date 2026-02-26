@@ -101,23 +101,4 @@ describe('Entity container', () => {
     expect(entityContainer.updateUsedEntity(entity)).toBe(false)
   })
 
-  describe('reserveEntitiesBelow', () => {
-    it('advances entity counter so next entity starts at the reserved value', () => {
-      const entityContainer = createEntityContainer()
-      entityContainer.reserveEntitiesBelow(514)
-      const entity = entityContainer.generateEntity()
-      expect((entity & 0xffff) >>> 0).toBe(514)
-    })
-
-    it('is a no-op when the value is below the current counter', () => {
-      const entityContainer = createEntityContainer()
-      const first = entityContainer.generateEntity()
-      expect((first & 0xffff) >>> 0).toBe(RESERVED_STATIC_ENTITIES) // 512
-
-      entityContainer.reserveEntitiesBelow(RESERVED_STATIC_ENTITIES)
-
-      const second = entityContainer.generateEntity()
-      expect((second & 0xffff) >>> 0).toBe(RESERVED_STATIC_ENTITIES + 1) // 513
-    })
-  })
 })

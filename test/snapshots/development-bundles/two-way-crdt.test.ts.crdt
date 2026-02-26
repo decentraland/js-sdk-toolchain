@@ -11,7 +11,7 @@ EVAL test/snapshots/development-bundles/two-way-crdt.test.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   OPCODES ~= 71k
-  MALLOC_COUNT = 15528
+  MALLOC_COUNT = 15520
   ALIVE_OBJS_DELTA ~= 3.13k
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
@@ -64,4 +64,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 5k
   MALLOC_COUNT = -40
   ALIVE_OBJS_DELTA ~= -0.01k
-  MEMORY_USAGE_COUNT ~= 1328.51k bytes
+  MEMORY_USAGE_COUNT ~= 1328.08k bytes

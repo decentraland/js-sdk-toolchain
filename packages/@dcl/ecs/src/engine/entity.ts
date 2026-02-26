@@ -1,5 +1,8 @@
 import { createVersionGSet } from '../systems/crdt/gset'
 
+/** @internal Injected at build time by sdk-commands via esbuild define */
+declare const DCL_MAX_COMPOSITE_ENTITY: number
+
 /**
  * @public It only defines the type explicitly, no effects.
  */
@@ -96,13 +99,6 @@ export type IEntityContainer = {
   releaseRemovedEntities(): Entity[]
   updateRemovedEntity(entity: Entity): boolean
   updateUsedEntity(entity: Entity): boolean
-
-  /**
-   * Advance the entity counter so that future generateEntity() calls
-   * return entity numbers starting at minEntityNumber or above.
-   * No-op when the counter is already past the requested value.
-   */
-  reserveEntitiesBelow(minEntityNumber: number): void
 }
 
 /**
@@ -110,8 +106,10 @@ export type IEntityContainer = {
  */
 export function createEntityContainer(opts?: { reservedStaticEntities: number }): IEntityContainer {
   const reservedStaticEntities = opts?.reservedStaticEntities ?? RESERVED_STATIC_ENTITIES
-  // Local entities counter
-  let entityCounter = reservedStaticEntities
+  // If a build tool has set DCL_MAX_COMPOSITE_ENTITY (via esbuild define),
+  // start the counter past composite entities to prevent ID collisions.
+  const maxCompositeEntity = typeof DCL_MAX_COMPOSITE_ENTITY !== 'undefined' ? DCL_MAX_COMPOSITE_ENTITY : 0
+  let entityCounter = Math.max(reservedStaticEntities, maxCompositeEntity > 0 ? maxCompositeEntity + 1 : 0)
 
   const usedEntities: Set<Entity> = new Set()
   let toRemoveEntities: Entity[] = []
@@ -235,12 +233,6 @@ export function createEntityContainer(opts?: { reservedStaticEntities: number })
     return EntityState.Unknown
   }
 
-  function reserveEntitiesBelow(minEntityNumber: number) {
-    if (minEntityNumber > entityCounter) {
-      entityCounter = minEntityNumber
-    }
-  }
-
   return {
     generateEntity,
     removeEntity,
@@ -252,7 +244,6 @@ export function createEntityContainer(opts?: { reservedStaticEntities: number })
     releaseRemovedEntities,
 
     updateRemovedEntity,
-    updateUsedEntity,
-    reserveEntitiesBelow
+    updateUsedEntity
   }
 }

@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=265.1k bytes
+SCENE_COMPILED_JS_SIZE_PROD=265k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -9,7 +9,7 @@ EVAL test/snapshots/production-bundles/cubes.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   OPCODES ~= 114k
-  MALLOC_COUNT = 19802
+  MALLOC_COUNT = 19798
   ALIVE_OBJS_DELTA ~= 4.89k
 CALL onStart()
   OPCODES ~= 0k
@@ -564,8 +564,8 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x2b5 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   Scene: PUT_COMPONENT e=0x2b6 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   OPCODES ~= 1012k
-  MALLOC_COUNT = 1840
-  ALIVE_OBJS_DELTA ~= 0.74k
+  MALLOC_COUNT = 1838
+  ALIVE_OBJS_DELTA ~= 0.73k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=2 data={"position":{"x":-3,"y":2.7722561359405518,"z":-3},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":0.5,"y":0.5,"z":0.5},"parent":0}
   Scene: PUT_COMPONENT e=0x201 c=1 t=2 data={"position":{"x":-4,"y":3.498049020767212,"z":-4},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":0.5,"y":0.5,"z":0.5},"parent":0}
@@ -1652,4 +1652,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 700k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1307.35k bytes
+  MEMORY_USAGE_COUNT ~= 1307.08k bytes

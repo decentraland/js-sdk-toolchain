@@ -71,17 +71,12 @@ function getEntrypointCode(entrypointPath: string, forceCustomExport: boolean, i
 
   return `// BEGIN AUTO GENERATED CODE "~sdk/scene-entrypoint"
 "use strict";
-// we need to load engine & SDK before user code
+import * as entrypoint from ${safeEntrypointPath}
 import { engine, NetworkEntity } from '@dcl/sdk/ecs'
 import * as sdk from '@dcl/sdk'
 import { compositeProvider } from '@dcl/sdk/composite-provider'
-import { compositeFromLoader, maxCompositeEntity } from '~sdk/all-composites'
+import { compositeFromLoader } from '~sdk/all-composites'
 import { _initializeScripts } from '~sdk/script-utils'
-
-// advance entity counter past composite entities to prevent ID collisions
-if (maxCompositeEntity > 0) {
-  ;(engine as any).entityContainer.reserveEntitiesBelow(maxCompositeEntity + 1)
-}
 
 ${
   isEditorScene &&
@@ -96,8 +91,6 @@ initAssetPacks(engine, { syncEntity }, players)
 // Read composite.json or main.crdt => If that file has a NetworkEntity import '@dcl/@sdk/network'
 `
 }
-
-import * as entrypoint from ${safeEntrypointPath}
 
 if ((entrypoint as any).main !== undefined) {
   function _INTERNAL_startup_system() {
@@ -177,6 +170,16 @@ type SingleProjectOptions = CompileOptions & {
 export async function bundleSingleProject(components: BundleComponents, options: SingleProjectOptions) {
   printProgressStep(components.logger, `Bundling file ${colors.bold(options.entrypoint)}`, 1, MAX_STEP)
   const editorScene = await isEditorScene(components, options.workingDirectory)
+
+  // Pre-compute composite data so we can inject maxCompositeEntity via esbuild define.
+  // This must happen before the esbuild context is created because the define values
+  // are baked into the engine at compile time (the entity counter initializer reads it).
+  let maxCompositeEntity = 0
+  if (!options.ignoreComposite) {
+    const composites = await getAllComposites(components, options.workingDirectory)
+    maxCompositeEntity = composites.maxCompositeEntity
+  }
+
   const sdkPackagePath = (() => {
     try {
       // First try to resolve from project's node_modules
@@ -272,7 +275,9 @@ export async function bundleSingleProject(components: BundleComponents, options:
       window: 'undefined',
       DEBUG: options.production ? 'false' : 'true',
       'globalThis.DEBUG': options.production ? 'false' : 'true',
-      'process.env.NODE_ENV': JSON.stringify(options.production ? 'production' : 'development')
+      'process.env.NODE_ENV': JSON.stringify(options.production ? 'production' : 'development'),
+      // Advance the engine entity counter past composite entities at init time
+      DCL_MAX_COMPOSITE_ENTITY: String(maxCompositeEntity)
     },
     tsconfig: options.tsconfig,
     supported: {
@@ -447,11 +452,8 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
         }
 
         const contents = compositeData
-          ? `
-export const compositeFromLoader = {${compositeData.compositeLines.join(',')}}
-export const maxCompositeEntity = ${compositeData.maxCompositeEntity}
-          `
-          : `export const compositeFromLoader = {}\nexport const maxCompositeEntity = 0`
+          ? `export const compositeFromLoader = {${compositeData.compositeLines.join(',')}}`
+          : `export const compositeFromLoader = {}`
         const watchFiles = compositeData?.watchFiles || []
 
         return {
