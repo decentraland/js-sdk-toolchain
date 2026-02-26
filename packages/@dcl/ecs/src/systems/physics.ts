@@ -12,9 +12,8 @@ export interface PhysicsSystem {
    * Apply a one-shot impulse to the player entity.
    * Multiple calls within the same frame are accumulated (summed).
    *
-   * @param vector - Direction and magnitude of the impulse. If an explicit `magnitude` is also
-   *   passed, `vector` is treated as direction only (normalized) and `magnitude` sets the strength;
-   *   otherwise the length of `vector` encodes the strength directly.
+   * Pass a single `vector` whose length encodes the strength, or a `direction`
+   * with a separate `magnitude` — the direction will be normalized before scaling.
    */
   applyImpulseToPlayer(vector: Vector3Type): void
   applyImpulseToPlayer(direction: Vector3Type, magnitude: number): void
@@ -26,9 +25,9 @@ export interface PhysicsSystem {
    * Calling again with the same source replaces its previous force.
    *
    * @param source - Entity key identifying this force source
-   * @param vector - Direction and magnitude of the force. If an explicit `magnitude` is also
-   *   passed, `vector` is treated as direction only (normalized) and `magnitude` sets the strength;
-   *   otherwise the length of `vector` encodes the strength directly.
+   *
+   * Pass a single `vector` whose length encodes the strength, or a `direction`
+   * with a separate `magnitude` — the direction will be normalized before scaling.
    */
   applyForceToPlayer(source: Entity, vector: Vector3Type): void
   applyForceToPlayer(source: Entity, direction: Vector3Type, magnitude: number): void
