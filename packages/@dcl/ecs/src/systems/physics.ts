@@ -55,6 +55,19 @@ export interface PhysicsSystem {
    * @param falloff - how force decreases with distance (default: CONSTANT)
    */
   applyKnockbackToPlayer(fromPosition: Vector3Type, magnitude: number, radius?: number, falloff?: KnockbackFalloff): void
+
+  /**
+   * Apply a continuous force to the player for a limited duration.
+   * After `duration` seconds the force is automatically removed.
+   * Calling again with the same source resets the timer.
+   *
+   * @param source - Entity key identifying this force source
+   * @param duration - how long the force lasts, in seconds
+   * @param vector - single `vector` whose length encodes the strength
+   * or use overload for `direction` with a separate `magnitude` — the direction will be normalized before scaling.
+   */
+  applyForceToPlayerForDuration(source: Entity, duration: number, vector: Vector3Type): void
+  applyForceToPlayerForDuration(source: Entity, duration: number, direction: Vector3Type, magnitude: number): void
 }
 
 /**
@@ -68,6 +81,7 @@ export function createPhysicsSystem(engine: IEngine): PhysicsSystem {
     applyImpulseToPlayer: impulse.applyImpulseToPlayer,
     applyForceToPlayer: force.applyForceToPlayer,
     removeForceFromPlayer: force.removeForceFromPlayer,
-    applyKnockbackToPlayer: impulse.applyKnockbackToPlayer
+    applyKnockbackToPlayer: impulse.applyKnockbackToPlayer,
+    applyForceToPlayerForDuration: force.applyForceToPlayerForDuration
   }
 }
