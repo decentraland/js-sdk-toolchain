@@ -1656,6 +1656,13 @@ export type JustifyType = 'flex-start' | 'center' | 'flex-end' | 'space-between'
 // @public
 export type Key = number | string;
 
+// @public
+export enum KnockbackFalloff {
+    CONSTANT = 0,
+    INVERSE_SQUARE = 2,
+    LINEAR = 1
+}
+
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
 // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
 // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
@@ -3771,9 +3778,14 @@ export interface PhysicsSystem {
     applyForceToPlayer(source: Entity, vector: Vector3Type): void;
     // (undocumented)
     applyForceToPlayer(source: Entity, direction: Vector3Type, magnitude: number): void;
+    applyForceToPlayerForDuration(source: Entity, duration: number, vector: Vector3Type): void;
+    // (undocumented)
+    applyForceToPlayerForDuration(source: Entity, duration: number, direction: Vector3Type, magnitude: number): void;
     applyImpulseToPlayer(vector: Vector3Type): void;
     // (undocumented)
     applyImpulseToPlayer(direction: Vector3Type, magnitude: number): void;
+    applyKnockbackToPlayer(fromPosition: Vector3Type, magnitude: number, radius?: number, falloff?: KnockbackFalloff): void;
+    applyRepulsionForceToPlayer(source: Entity, fromPosition: Vector3Type, magnitude: number, radius?: number, falloff?: KnockbackFalloff): void;
     removeForceFromPlayer(source: Entity): void;
 }
 
@@ -4439,6 +4451,9 @@ export interface Spec {
     [key: string]: ISchema;
 }
 
+// @public (undocumented)
+export function subtractVectors(a: Vector3Type, b: Vector3Type): Vector3Type;
+
 // @alpha
 export const SyncComponents: ISyncComponents;
 
@@ -4700,6 +4715,7 @@ export interface TransformComponentExtended extends TransformComponent {
     create(entity: Entity, val?: TransformTypeWithOptionals): TransformType;
     // (undocumented)
     createOrReplace(entity: Entity, val?: TransformTypeWithOptionals): TransformType;
+    localToWorldDirection(entity: Entity, localDirection: Vector3Type): Vector3Type;
 }
 
 // @public (undocumented)
@@ -5144,6 +5160,9 @@ export type Vector3Type = {
     y: number;
     z: number;
 };
+
+// @public (undocumented)
+export function vectorLength(v: Vector3Type): number;
 
 // @public (undocumented)
 export function vectorsEqual(a: Vector3Type, b: Vector3Type): boolean;
