@@ -1,5 +1,8 @@
 import { createVersionGSet } from '../systems/crdt/gset'
 
+/** @internal Optionally injected at build time (ex: esbuild define) */
+declare const DCL_MAX_COMPOSITE_ENTITY: number
+
 /**
  * @public It only defines the type explicitly, no effects.
  */
@@ -103,8 +106,10 @@ export type IEntityContainer = {
  */
 export function createEntityContainer(opts?: { reservedStaticEntities: number }): IEntityContainer {
   const reservedStaticEntities = opts?.reservedStaticEntities ?? RESERVED_STATIC_ENTITIES
-  // Local entities counter
-  let entityCounter = reservedStaticEntities
+  // If a build tool has set DCL_MAX_COMPOSITE_ENTITY (via esbuild define),
+  // start the counter past composite entities to prevent ID collisions.
+  const maxCompositeEntity = typeof DCL_MAX_COMPOSITE_ENTITY !== 'undefined' ? DCL_MAX_COMPOSITE_ENTITY : 0
+  let entityCounter = Math.max(reservedStaticEntities, maxCompositeEntity > 0 ? maxCompositeEntity + 1 : 0)
 
   const usedEntities: Set<Entity> = new Set()
   let toRemoveEntities: Entity[] = []

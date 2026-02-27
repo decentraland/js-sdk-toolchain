@@ -170,6 +170,16 @@ type SingleProjectOptions = CompileOptions & {
 export async function bundleSingleProject(components: BundleComponents, options: SingleProjectOptions) {
   printProgressStep(components.logger, `Bundling file ${colors.bold(options.entrypoint)}`, 1, MAX_STEP)
   const editorScene = await isEditorScene(components, options.workingDirectory)
+
+  // Pre-compute composite data so we can inject maxCompositeEntity via esbuild define.
+  // This must happen before the esbuild context is created because the define values
+  // are baked into the engine at compile time (the entity counter initializer reads it)
+  let maxCompositeEntity = 0
+  if (!options.ignoreComposite) {
+    const composites = await getAllComposites(components, options.workingDirectory)
+    maxCompositeEntity = composites.maxCompositeEntity
+  }
+
   const sdkPackagePath = (() => {
     try {
       // First try to resolve from project's node_modules
@@ -236,7 +246,13 @@ export async function bundleSingleProject(components: BundleComponents, options:
       // pick up @dcl/asset-packs installed next to the scene (e.g. at a monorepo root) rather
       // than the one the user intentionally installed inside the scene.
       '@dcl/asset-packs': (() => {
-        const sceneOwnAssetPacks = path.join(options.workingDirectory, 'node_modules', '@dcl', 'asset-packs', 'package.json')
+        const sceneOwnAssetPacks = path.join(
+          options.workingDirectory,
+          'node_modules',
+          '@dcl',
+          'asset-packs',
+          'package.json'
+        )
         if (fs.existsSync(sceneOwnAssetPacks)) {
           return path.dirname(sceneOwnAssetPacks)
         }
@@ -259,7 +275,8 @@ export async function bundleSingleProject(components: BundleComponents, options:
       window: 'undefined',
       DEBUG: options.production ? 'false' : 'true',
       'globalThis.DEBUG': options.production ? 'false' : 'true',
-      'process.env.NODE_ENV': JSON.stringify(options.production ? 'production' : 'development')
+      'process.env.NODE_ENV': JSON.stringify(options.production ? 'production' : 'development'),
+      DCL_MAX_COMPOSITE_ENTITY: String(maxCompositeEntity)
     },
     tsconfig: options.tsconfig,
     supported: {
