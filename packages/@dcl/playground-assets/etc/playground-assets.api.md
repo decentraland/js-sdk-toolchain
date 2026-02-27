@@ -1543,6 +1543,7 @@ export type InstanceCompositeOptions = {
     };
     rootEntity?: Entity;
     alreadyRequestedSrc?: Set<string>;
+    useRootComponent?: boolean;
 };
 
 // @public (undocumented)
