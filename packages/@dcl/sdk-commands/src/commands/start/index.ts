@@ -66,7 +66,8 @@ export const args = declareArgs({
   '--skip-auth-screen': Boolean,
   '--landscape-terrain-enabled': Boolean,
   '-n': Boolean,
-  '--bevy-web': Boolean
+  '--bevy-web': Boolean,
+  '--multi-instance': Boolean
 })
 
 export async function help(options: Options) {
@@ -93,7 +94,8 @@ export async function help(options: Options) {
       --landscape-terrain-enabled       Enable landscape terrain.
       -n                                Open a new instance of the Client even if one is already running.
       --bevy-web                        Opens preview using the Bevy Web browser window.
-      --mobile                      Show QR code for mobile preview on the same network
+      --mobile                          Show QR code for mobile preview on the same network.
+      --multi-instance                  Allow running multiple Explorer instances simultaneously.
 
 
     Examples:
