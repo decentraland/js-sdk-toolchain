@@ -177,7 +177,7 @@ export interface PointerEventsSystem {
    * Execute callback when the entity enters the proximity zone of the user
    * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
    * @param cb - Function to execute when event fires
-   */ 
+   */
   onProximityEnter(pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
 
   /**
@@ -213,7 +213,12 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     return eventsMap.get(entity) || eventsMap.set(entity, new Map()).get(entity)!
   }
 
-  function setPointerEvent(entity: Entity, type: PointerEventType, opts: EventSystemOptions, interactionType: InteractionType = InteractionType.CURSOR) {
+  function setPointerEvent(
+    entity: Entity,
+    type: PointerEventType,
+    opts: EventSystemOptions,
+    interactionType: InteractionType = InteractionType.CURSOR
+  ) {
     const pointerEvent = PointerEvents.getMutableOrNull(entity) || PointerEvents.create(entity)
     pointerEvent.pointerEvents.push({
       eventType: type,
@@ -230,11 +235,21 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     })
   }
 
-  function removePointerEvent(entity: Entity, type: PointerEventType, button: InputAction, interactionType: InteractionType = InteractionType.CURSOR) {
+  function removePointerEvent(
+    entity: Entity,
+    type: PointerEventType,
+    button: InputAction,
+    interactionType: InteractionType = InteractionType.CURSOR
+  ) {
     const pointerEvent = PointerEvents.getMutableOrNull(entity)
     if (!pointerEvent) return
     pointerEvent.pointerEvents = pointerEvent.pointerEvents.filter(
-      (pointer) => !(pointer.eventInfo?.button === button && pointer.eventType === type && pointer.interactionType === interactionType)
+      (pointer) =>
+        !(
+          pointer.eventInfo?.button === button &&
+          pointer.eventType === type &&
+          pointer.interactionType === interactionType
+        )
     )
   }
 
@@ -372,7 +387,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     getEvent(entity).set(EventType.ProximityLeave, { cb, opts: options })
     setPointerEvent(entity, PointerEventType.PET_PROXIMITY_LEAVE, options, InteractionType.PROXIMITY)
   }
-  
+
   return {
     removeOnClick(entity: Entity) {
       removeEvent(entity, EventType.Click)
