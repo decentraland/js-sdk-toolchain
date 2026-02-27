@@ -8,9 +8,9 @@ EVAL test/snapshots/production-bundles/schema-components.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-  OPCODES ~= 69k
-  MALLOC_COUNT = 13380
-  ALIVE_OBJS_DELTA ~= 2.97k
+  OPCODES ~= 68k
+  MALLOC_COUNT = 13193
+  ALIVE_OBJS_DELTA ~= 2.93k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -31,4 +31,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 2k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 959.69k bytes
+  MEMORY_USAGE_COUNT ~= 938.24k bytes
