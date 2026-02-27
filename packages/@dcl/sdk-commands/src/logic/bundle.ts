@@ -236,7 +236,13 @@ export async function bundleSingleProject(components: BundleComponents, options:
       // pick up @dcl/asset-packs installed next to the scene (e.g. at a monorepo root) rather
       // than the one the user intentionally installed inside the scene.
       '@dcl/asset-packs': (() => {
-        const sceneOwnAssetPacks = path.join(options.workingDirectory, 'node_modules', '@dcl', 'asset-packs', 'package.json')
+        const sceneOwnAssetPacks = path.join(
+          options.workingDirectory,
+          'node_modules',
+          '@dcl',
+          'asset-packs',
+          'package.json'
+        )
         if (fs.existsSync(sceneOwnAssetPacks)) {
           return path.dirname(sceneOwnAssetPacks)
         }

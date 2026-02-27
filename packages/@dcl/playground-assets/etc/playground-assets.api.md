@@ -1209,6 +1209,7 @@ export type EventSystemOptions = {
     showFeedback?: boolean;
     showHighlight?: boolean;
     maxPlayerDistance?: number;
+    priority?: number;
 };
 
 // @public
@@ -1573,6 +1574,14 @@ export type InstanceCompositeOptions = {
     rootEntity?: Entity;
     alreadyRequestedSrc?: Set<string>;
 };
+
+// @public (undocumented)
+export const enum InteractionType {
+    // (undocumented)
+    CURSOR = 0,
+    // (undocumented)
+    PROXIMITY = 1
+}
 
 // @public (undocumented)
 export interface ISchema<T = any> {
@@ -3013,6 +3022,7 @@ export namespace PBPointerEvents {
 export interface PBPointerEvents_Entry {
     eventInfo: PBPointerEvents_Info | undefined;
     eventType: PointerEventType;
+    interactionType?: InteractionType | undefined;
 }
 
 // @public (undocumented)
@@ -3029,6 +3039,7 @@ export interface PBPointerEvents_Info {
     hoverText?: string | undefined;
     maxDistance?: number | undefined;
     maxPlayerDistance?: number | undefined;
+    priority?: number | undefined;
     showFeedback?: boolean | undefined;
     showHighlight?: boolean | undefined;
 }
@@ -3784,10 +3795,30 @@ export interface PointerEventsSystem {
     }, cb: EventSystemCallback): void;
     // @deprecated (undocumented)
     onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
+    onProximityDown(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
+    onProximityEnter(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
+    onProximityLeave(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
+    onProximityUp(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
     removeOnPointerDown(entity: Entity): void;
     removeOnPointerHoverEnter(entity: Entity): void;
     removeOnPointerHoverLeave(entity: Entity): void;
     removeOnPointerUp(entity: Entity): void;
+    removeOnProximityDown(entity: Entity): void;
+    removeOnProximityEnter(entity: Entity): void;
+    removeOnProximityLeave(entity: Entity): void;
+    removeOnProximityUp(entity: Entity): void;
 }
 
 // @public
@@ -3801,6 +3832,10 @@ export const enum PointerEventType {
     PET_HOVER_ENTER = 2,
     // (undocumented)
     PET_HOVER_LEAVE = 3,
+    // (undocumented)
+    PET_PROXIMITY_ENTER = 4,
+    // (undocumented)
+    PET_PROXIMITY_LEAVE = 5,
     // (undocumented)
     PET_UP = 0
 }
