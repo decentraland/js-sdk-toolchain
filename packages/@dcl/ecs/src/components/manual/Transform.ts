@@ -1,7 +1,12 @@
 import { LastWriteWinElementSetComponentDefinition, IEngine } from '../../engine'
 import { Entity } from '../../engine/entity'
 import type { ISchema } from '../../schemas/ISchema'
+import type { Vector3Type } from '../../schemas/custom/Vector3'
 import { ByteBuffer } from '../../serialization/ByteBuffer'
+// Use import * to safely handle circular dependency (tree.ts → components → Transform.ts → tree.ts).
+// With import *, the namespace object's properties are resolved at access time (live bindings in ESM,
+// getters via __importStar in CJS), so by the time methods are called all exports are available.
+import * as treeHelpers from '../../runtime/helpers/tree'
 
 /**
  * @public
@@ -14,6 +19,19 @@ export type TransformComponent = LastWriteWinElementSetComponentDefinition<Trans
 export interface TransformComponentExtended extends TransformComponent {
   create(entity: Entity, val?: TransformTypeWithOptionals): TransformType
   createOrReplace(entity: Entity, val?: TransformTypeWithOptionals): TransformType
+
+  /**
+   * Transforms a direction vector from an entity's local coordinate space
+   * to world space, accounting for the full parent hierarchy.
+   *
+   * This applies only rotation (not translation or scale) — suitable for
+   * direction vectors like force/impulse directions.
+   *
+   * @param entity - The source entity whose local space defines the direction
+   * @param localDirection - Direction vector in the entity's local coordinates
+   * @returns The direction vector in world coordinates
+   */
+  localToWorldDirection(entity: Entity, localDirection: Vector3Type): Vector3Type
 }
 
 /**
@@ -132,6 +150,7 @@ export function defineTransformComponent(
   engine: Pick<IEngine, 'defineComponentFromSchema'>
 ): TransformComponentExtended {
   const transformDef = engine.defineComponentFromSchema('core::Transform', TransformSchema)
+
   return {
     ...transformDef,
     create(entity: Entity, val?: TransformTypeWithOptionals) {
@@ -139,6 +158,10 @@ export function defineTransformComponent(
     },
     createOrReplace(entity: Entity, val?: TransformTypeWithOptionals) {
       return transformDef.createOrReplace(entity, TransformSchema.extend!(val))
+    },
+    localToWorldDirection(entity: Entity, localDirection: Vector3Type): Vector3Type {
+      const worldRotation = treeHelpers.getWorldRotation(engine as treeHelpers.WorldTransformEngine, entity)
+      return treeHelpers.rotateVectorByQuaternion(localDirection, worldRotation)
     }
   }
 }

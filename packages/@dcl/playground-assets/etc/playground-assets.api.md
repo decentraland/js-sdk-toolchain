@@ -7,6 +7,9 @@
 import _m0 from 'protobufjs/minimal';
 
 // @public (undocumented)
+export function addVectors(a: Vector3Type, b: Vector3Type): Vector3Type;
+
+// @public (undocumented)
 export type AlignType = 'auto' | 'flex-start' | 'center' | 'flex-end' | 'stretch' | 'baseline' | 'space-between' | 'space-around';
 
 // Warning: (ae-missing-release-tag) "Animator" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -697,6 +700,8 @@ export const componentDefinitionByName: {
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
     "core::NftShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBNftShape>>;
+    "core::PhysicsCombinedForce": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedForce>>;
+    "core::PhysicsCombinedImpulse": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedImpulse>>;
     "core::PlayerIdentityData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>>;
     "core::PointerEvents": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerEvents>>;
     "core::PointerEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBPointerEventsResult>>;
@@ -1607,6 +1612,9 @@ export interface ISyncComponentsType {
 }
 
 // @public (undocumented)
+export function isZeroVector(v: Vector3Type): boolean;
+
+// @public (undocumented)
 export type JsonArray = Array<JsonPrimitive | JsonMap | JsonArray>;
 
 // @public (undocumented)
@@ -1647,6 +1655,13 @@ export type JustifyType = 'flex-start' | 'center' | 'flex-end' | 'space-between'
 
 // @public
 export type Key = number | string;
+
+// @public
+export enum KnockbackFalloff {
+    CONSTANT = 0,
+    INVERSE_SQUARE = 2,
+    LINEAR = 1
+}
 
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
 // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
@@ -2078,6 +2093,9 @@ export const enum NftFrameType {
 
 // @public (undocumented)
 export const NftShape: LastWriteWinElementSetComponentDefinition<PBNftShape>;
+
+// @public (undocumented)
+export function normalizeVector(v: Vector3Type): Vector3Type;
 
 // @public @deprecated
 export class Observable<T> {
@@ -2982,6 +3000,33 @@ export namespace PBNftShape {
 }
 
 // @public (undocumented)
+export interface PBPhysicsCombinedForce {
+    vector: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBPhysicsCombinedForce {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPhysicsCombinedForce;
+    // (undocumented)
+    export function encode(message: PBPhysicsCombinedForce, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBPhysicsCombinedImpulse {
+    eventId: number;
+    vector: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBPhysicsCombinedImpulse {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPhysicsCombinedImpulse;
+    // (undocumented)
+    export function encode(message: PBPhysicsCombinedImpulse, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBPlayerIdentityData {
     address: string;
     // (undocumented)
@@ -3720,6 +3765,31 @@ export namespace PBVisibilityComponent {
 }
 
 // @public
+export const Physics: PhysicsSystem;
+
+// @public (undocumented)
+export const PhysicsCombinedForce: LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedForce>;
+
+// @public (undocumented)
+export const PhysicsCombinedImpulse: LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedImpulse>;
+
+// @public (undocumented)
+export interface PhysicsSystem {
+    applyForceToPlayer(source: Entity, vector: Vector3Type): void;
+    // (undocumented)
+    applyForceToPlayer(source: Entity, direction: Vector3Type, magnitude: number): void;
+    applyForceToPlayerForDuration(source: Entity, duration: number, vector: Vector3Type): void;
+    // (undocumented)
+    applyForceToPlayerForDuration(source: Entity, duration: number, direction: Vector3Type, magnitude: number): void;
+    applyImpulseToPlayer(vector: Vector3Type): void;
+    // (undocumented)
+    applyImpulseToPlayer(direction: Vector3Type, magnitude: number): void;
+    applyKnockbackToPlayer(fromPosition: Vector3Type, magnitude: number, radius?: number, falloff?: KnockbackFalloff): void;
+    applyRepulsionForceToPlayer(source: Entity, fromPosition: Vector3Type, magnitude: number, radius?: number, falloff?: KnockbackFalloff): void;
+    removeForceFromPlayer(source: Entity): void;
+}
+
+// @public
 export namespace Plane {
     // (undocumented)
     export function asArray(plane: ReadonlyPlane): number[];
@@ -4232,6 +4302,9 @@ export namespace RotateContinuous {
     export function encode(message: RotateContinuous, writer?: _m0.Writer): _m0.Writer;
 }
 
+// @public
+export function rotateVectorByQuaternion(v: Vector3Type, q: QuaternionType): Vector3Type;
+
 // Warning: (ae-missing-release-tag) "RPCSendableMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -4312,6 +4385,9 @@ export type ScaleUnit = `${number}${ScaleUnits}` | number;
 export type ScaleUnits = 'vw' | 'vh';
 
 // @public (undocumented)
+export function scaleVector(v: Vector3Type, s: number): Vector3Type;
+
+// @public (undocumented)
 export namespace Schemas {
     // (undocumented)
     export type SchemaType = ISchema;
@@ -4374,6 +4450,9 @@ export interface Spec {
     // (undocumented)
     [key: string]: ISchema;
 }
+
+// @public (undocumented)
+export function subtractVectors(a: Vector3Type, b: Vector3Type): Vector3Type;
 
 // @alpha
 export const SyncComponents: ISyncComponents;
@@ -4636,6 +4715,7 @@ export interface TransformComponentExtended extends TransformComponent {
     create(entity: Entity, val?: TransformTypeWithOptionals): TransformType;
     // (undocumented)
     createOrReplace(entity: Entity, val?: TransformTypeWithOptionals): TransformType;
+    localToWorldDirection(entity: Entity, localDirection: Vector3Type): Vector3Type;
 }
 
 // @public (undocumented)
@@ -5080,6 +5160,12 @@ export type Vector3Type = {
     y: number;
     z: number;
 };
+
+// @public (undocumented)
+export function vectorLength(v: Vector3Type): number;
+
+// @public (undocumented)
+export function vectorsEqual(a: Vector3Type, b: Vector3Type): boolean;
 
 // @public (undocumented)
 export const VideoEvent: GrowOnlyValueSetComponentDefinition<PBVideoEvent>;
