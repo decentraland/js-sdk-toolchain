@@ -22,11 +22,12 @@ export function initLanguage(language: Language) {
   return i18next.use(Backend).init({
     lng: language,
     fallbackLng: 'en',
+    showSupportNotice: false,
     interpolation: {
       escapeValue: false
     },
     backend: {
       loadPath: join(__dirname, '../locales/{{lng}}.json')
-    }
+    },
   })
 }

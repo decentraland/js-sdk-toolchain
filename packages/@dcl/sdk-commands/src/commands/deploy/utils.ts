@@ -184,6 +184,7 @@ export interface SceneInfo {
   skipValidations: boolean
   isPortableExperience: boolean
   isWorld: boolean
+  world?: string
 }
 
 export async function getSceneInfo(
@@ -209,6 +210,7 @@ export async function getSceneInfo(
     description: display?.description,
     skipValidations,
     isPortableExperience: !!isPortableExperience,
-    isWorld: sceneHasWorldCfg(scene)
+    isWorld: sceneHasWorldCfg(scene),
+    world: scene.worldConfiguration?.name
   }
 }

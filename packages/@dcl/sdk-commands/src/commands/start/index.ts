@@ -244,9 +244,9 @@ export async function main(options: Options) {
       const sortedURLs = availableURLs.sort((a, _b) => {
         return a.toLowerCase().includes('localhost') || a.includes('127.0.0.1') || a.includes('0.0.0.0') ? -1 : 1
       })
-      const bevyUrl = `https://decentraland.zone/bevy-web/?preview=true&initialRealm=${
+      const bevyUrl = `https://decentraland.zone/bevy-web/?preview=true&realm=${
         new URL(sortedURLs[0]).origin
-      }&location=${baseCoords.x},${baseCoords.y}`
+      }&position=${baseCoords.x},${baseCoords.y}`
       if (!explorerAlpha) {
         if (bevyWeb) {
           components.logger.log(`    ${bevyUrl}`)
@@ -264,7 +264,7 @@ export async function main(options: Options) {
       }
 
       if (options.args['--mobile'] && lanUrl) {
-        const deepLink = `decentraland://open?preview=${lanUrl}&position=${baseCoords.x}%2C${baseCoords.y}`
+        const deepLink = `decentraland://open?preview=${lanUrl}&position=${baseCoords.x},${baseCoords.y}`
         QRCode.toString(deepLink, { type: 'terminal', small: true }, (err, qr) => {
           if (!err) {
             components.logger.log(colors.bold('\nScan to preview on mobile: \n'))
