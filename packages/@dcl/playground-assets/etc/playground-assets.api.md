@@ -1575,6 +1575,14 @@ export type InstanceCompositeOptions = {
 };
 
 // @public (undocumented)
+export const enum InteractionType {
+    // (undocumented)
+    CURSOR = 0,
+    // (undocumented)
+    PROXIMITY = 1
+}
+
+// @public (undocumented)
 export interface ISchema<T = any> {
     // (undocumented)
     create(): T;
@@ -3087,6 +3095,7 @@ export namespace PBPointerEvents {
 export interface PBPointerEvents_Entry {
     eventInfo: PBPointerEvents_Info | undefined;
     eventType: PointerEventType;
+    interactionType?: InteractionType | undefined;
 }
 
 // @public (undocumented)
@@ -3103,6 +3112,7 @@ export interface PBPointerEvents_Info {
     hoverText?: string | undefined;
     maxDistance?: number | undefined;
     maxPlayerDistance?: number | undefined;
+    priority?: number | undefined;
     showFeedback?: boolean | undefined;
     showHighlight?: boolean | undefined;
 }
@@ -3881,6 +3891,10 @@ export const enum PointerEventType {
     PET_HOVER_ENTER = 2,
     // (undocumented)
     PET_HOVER_LEAVE = 3,
+    // (undocumented)
+    PET_PROXIMITY_ENTER = 4,
+    // (undocumented)
+    PET_PROXIMITY_LEAVE = 5,
     // (undocumented)
     PET_UP = 0
 }
