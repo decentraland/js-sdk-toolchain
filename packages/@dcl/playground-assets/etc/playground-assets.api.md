@@ -697,6 +697,8 @@ export const componentDefinitionByName: {
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
     "core::NftShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBNftShape>>;
+    "core::PhysicsCombinedForce": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedForce>>;
+    "core::PhysicsCombinedImpulse": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedImpulse>>;
     "core::PlayerIdentityData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>>;
     "core::PointerEvents": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerEvents>>;
     "core::PointerEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBPointerEventsResult>>;
@@ -3071,6 +3073,33 @@ export namespace PBNftShape {
 }
 
 // @public (undocumented)
+export interface PBPhysicsCombinedForce {
+    vector: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBPhysicsCombinedForce {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPhysicsCombinedForce;
+    // (undocumented)
+    export function encode(message: PBPhysicsCombinedForce, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBPhysicsCombinedImpulse {
+    eventId: number;
+    vector: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBPhysicsCombinedImpulse {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPhysicsCombinedImpulse;
+    // (undocumented)
+    export function encode(message: PBPhysicsCombinedImpulse, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBPlayerIdentityData {
     address: string;
     // (undocumented)
@@ -3815,6 +3844,12 @@ export namespace PBVisibilityComponent {
     // (undocumented)
     export function encode(message: PBVisibilityComponent, writer?: _m0.Writer): _m0.Writer;
 }
+
+// @public (undocumented)
+export const PhysicsCombinedForce: LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedForce>;
+
+// @public (undocumented)
+export const PhysicsCombinedImpulse: LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedImpulse>;
 
 // @public
 export namespace Plane {
