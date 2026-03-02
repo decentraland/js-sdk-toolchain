@@ -108,4 +108,22 @@ describe('Analytics Component', () => {
     await analytics.stop()
     expect(spyTrack).toBeCalled()
   })
+
+  it('should use custom writeKey when options.writeKey is provided', async () => {
+    const fs = createFsComponent()
+    const config = createRecordConfigComponent({
+      DCL_ANON_ID: 'fb3f84b2-4ddc-4a7e-96bf-1e8992c294dd'
+    })
+    const logger = createStderrCliLogger()
+
+    const analytics = await createAnalyticsComponent(
+      { config, logger, fs },
+      {
+        writeKey: 'custom-storage-write-key'
+      }
+    )
+
+    if (!('get' in analytics)) throw new Error('analytics.get is not defined')
+    expect((analytics.get() as unknown as { writeKey: string }).writeKey).toBe('custom-storage-write-key')
+  })
 })
