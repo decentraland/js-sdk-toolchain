@@ -1575,6 +1575,14 @@ export type InstanceCompositeOptions = {
 };
 
 // @public (undocumented)
+export const enum InteractionType {
+    // (undocumented)
+    CURSOR = 0,
+    // (undocumented)
+    PROXIMITY = 1
+}
+
+// @public (undocumented)
 export interface ISchema<T = any> {
     // (undocumented)
     create(): T;
@@ -2000,6 +2008,80 @@ export namespace MoveContinuous {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): MoveContinuous;
     // (undocumented)
     export function encode(message: MoveContinuous, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface MoveRotateScale {
+    // (undocumented)
+    positionEnd: PBVector3 | undefined;
+    // (undocumented)
+    positionStart: PBVector3 | undefined;
+    // (undocumented)
+    rotationEnd: PBQuaternion | undefined;
+    // (undocumented)
+    rotationStart: PBQuaternion | undefined;
+    // (undocumented)
+    scaleEnd: PBVector3 | undefined;
+    // (undocumented)
+    scaleStart: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace MoveRotateScale {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): MoveRotateScale;
+    // (undocumented)
+    export function encode(message: MoveRotateScale, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface MoveRotateScaleContinuous {
+    // (undocumented)
+    positionDirection: PBVector3 | undefined;
+    // (undocumented)
+    rotationDirection: PBQuaternion | undefined;
+    // (undocumented)
+    scaleDirection: PBVector3 | undefined;
+    // (undocumented)
+    speed: number;
+}
+
+// @public (undocumented)
+export namespace MoveRotateScaleContinuous {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): MoveRotateScaleContinuous;
+    // (undocumented)
+    export function encode(message: MoveRotateScaleContinuous, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public
+export interface MoveRotateScaleContinuousModeParams {
+    position?: {
+        direction: PBVector3;
+    };
+    rotation?: {
+        direction: PBQuaternion;
+    };
+    scale?: {
+        direction: PBVector3;
+    };
+    speed: number;
+}
+
+// @public
+export interface MoveRotateScaleModeParams {
+    position?: {
+        start: PBVector3;
+        end: PBVector3;
+    };
+    rotation?: {
+        start: PBQuaternion;
+        end: PBQuaternion;
+    };
+    scale?: {
+        start: PBVector3;
+        end: PBVector3;
+    };
 }
 
 // Warning: (ae-missing-release-tag) "Name" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -3013,6 +3095,7 @@ export namespace PBPointerEvents {
 export interface PBPointerEvents_Entry {
     eventInfo: PBPointerEvents_Info | undefined;
     eventType: PointerEventType;
+    interactionType?: InteractionType | undefined;
 }
 
 // @public (undocumented)
@@ -3029,6 +3112,7 @@ export interface PBPointerEvents_Info {
     hoverText?: string | undefined;
     maxDistance?: number | undefined;
     maxPlayerDistance?: number | undefined;
+    priority?: number | undefined;
     showFeedback?: boolean | undefined;
     showHighlight?: boolean | undefined;
 }
@@ -3321,6 +3405,12 @@ export interface PBTween {
     } | {
         $case: "textureMoveContinuous";
         textureMoveContinuous: TextureMoveContinuous;
+    } | {
+        $case: "moveRotateScale";
+        moveRotateScale: MoveRotateScale;
+    } | {
+        $case: "moveRotateScaleContinuous";
+        moveRotateScaleContinuous: MoveRotateScaleContinuous;
     } | undefined;
     playing?: boolean | undefined;
 }
@@ -3801,6 +3891,10 @@ export const enum PointerEventType {
     PET_HOVER_ENTER = 2,
     // (undocumented)
     PET_HOVER_LEAVE = 3,
+    // (undocumented)
+    PET_PROXIMITY_ENTER = 4,
+    // (undocumented)
+    PET_PROXIMITY_LEAVE = 5,
     // (undocumented)
     PET_UP = 0
 }
@@ -4366,6 +4460,17 @@ export namespace Schemas {
     }) => void;
 }
 
+// @public
+export interface SetMoveRotateScaleContinuousParams extends MoveRotateScaleContinuousModeParams {
+    duration?: number;
+}
+
+// @public
+export interface SetMoveRotateScaleParams extends MoveRotateScaleModeParams {
+    duration: number;
+    easingFunction?: EasingFunction;
+}
+
 // @public (undocumented)
 export const SkyboxTime: LastWriteWinElementSetComponentDefinition<PBSkyboxTime>;
 
@@ -4737,6 +4842,8 @@ export interface TweenComponentDefinitionExtended extends LastWriteWinElementSet
     Mode: TweenHelper;
     setMove(entity: Entity, start: PBVector3, end: PBVector3, duration: number, easingFunction?: EasingFunction): void;
     setMoveContinuous(entity: Entity, direction: PBVector3, speed: number, duration?: number): void;
+    setMoveRotateScale(entity: Entity, params: SetMoveRotateScaleParams): void;
+    setMoveRotateScaleContinuous(entity: Entity, params: SetMoveRotateScaleContinuousParams): void;
     setRotate(entity: Entity, start: PBQuaternion, end: PBQuaternion, duration: number, easingFunction?: EasingFunction): void;
     setRotateContinuous(entity: Entity, direction: PBQuaternion, speed: number, duration?: number): void;
     setScale(entity: Entity, start: PBVector3, end: PBVector3, duration: number, easingFunction?: EasingFunction): void;
@@ -4750,6 +4857,10 @@ export interface TweenHelper {
     Move: (move: Move) => PBTween['mode'];
     // (undocumented)
     MoveContinuous: (move: MoveContinuous) => PBTween['mode'];
+    // (undocumented)
+    MoveRotateScale: (params: MoveRotateScaleModeParams) => PBTween['mode'];
+    // (undocumented)
+    MoveRotateScaleContinuous: (params: MoveRotateScaleContinuousModeParams) => PBTween['mode'];
     // (undocumented)
     Rotate: (rotate: Rotate) => PBTween['mode'];
     // (undocumented)
