@@ -159,7 +159,14 @@ const noopAnalytics: IAnalyticsComponent = {
   async stop() {}
 }
 
-export async function createAnalyticsComponent(components: Pick<CliComponents, 'config' | 'logger' | 'fs'>) {
+export type CreateAnalyticsOptions = {
+  writeKey?: string
+}
+
+export async function createAnalyticsComponent(
+  components: Pick<CliComponents, 'config' | 'logger' | 'fs'>,
+  options?: CreateAnalyticsOptions
+) {
   const analyticsEnabled = (await readStringConfig(components, 'DCL_DISABLE_ANALYTICS')) !== 'true'
 
   if (!analyticsEnabled) {
@@ -169,7 +176,8 @@ export async function createAnalyticsComponent(components: Pick<CliComponents, '
   const USER_ID = 'sdk-commands-user'
   let anonId = await readStringConfig(components, 'DCL_ANON_ID')
 
-  const analytics: Analytics = new Analytics({ writeKey: getSegmentKey() })
+  const writeKey = options?.writeKey ?? getSegmentKey()
+  const analytics: Analytics = new Analytics({ writeKey })
 
   if (!anonId) {
     anonId = uuidv4()
