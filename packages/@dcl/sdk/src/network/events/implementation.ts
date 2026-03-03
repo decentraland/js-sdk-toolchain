@@ -269,18 +269,3 @@ export function getRoom<T extends EventSchemaRegistry>(): Room<T> {
   }
   return globalRoom as unknown as Room<T>
 }
-
-/**
- * Create a typed room with custom message schemas (internal use)
- * @param registry - Your custom message schema registry
- * @returns Room instance with your custom types
- * @internal
- */
-export function createRoom<T extends EventSchemaRegistry>(
-  engine: IEngine,
-  binaryMessageBus: any,
-  isServerFn: Atom<boolean>,
-  isRoomReadyAtom: Atom<boolean>
-): Room<T> {
-  return new Room(engine, binaryMessageBus, isServerFn, isRoomReadyAtom)
-}

@@ -132,7 +132,7 @@ export function addSyncTransport(
     // IMPORTANT: Only mark room as ready AFTER state is synchronized
     // This ensures comms is truly connected and working
     const realmInfo = RealmInfo.getOrNull(engine.RootEntity)
-    if (realmInfo && checkRoomReady(realmInfo)) {
+    if (realmInfo) {
       DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady] Marking room as ready after state sync')
       isRoomReadyAtom.swap(true)
     }
@@ -182,20 +182,6 @@ export function addSyncTransport(
     }
   })
 
-  // Helper to check room ready conditions
-  function checkRoomReady(realmInfo: ReturnType<typeof RealmInfo.getOrNull>): boolean {
-    if (!realmInfo) return false
-
-    try {
-      // Check if room instance exists
-      if (!eventBus) return false
-
-      return !!(realmInfo.commsAdapter && realmInfo.isConnectedSceneRoom && realmInfo.room)
-    } catch {
-      return false
-    }
-  }
-
   // Asks for the REQ_CRDT_STATE when its connected to comms
   RealmInfo.onChange(engine.RootEntity, (value) => {
     const isServer = isServerAtom.getOrNull()
@@ -216,7 +202,7 @@ export function addSyncTransport(
 
       // For servers, mark as ready immediately when connected
       // (servers don't need to sync state from anyone)
-      if (isServer && checkRoomReady(value) && isRoomReadyAtom.getOrNull() === false) {
+      if (isServer && isRoomReadyAtom.getOrNull() === false) {
         DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady] Server marking room as ready')
         isRoomReadyAtom.swap(true)
       }
