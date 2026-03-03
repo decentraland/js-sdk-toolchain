@@ -40,17 +40,6 @@ export interface SetMoveRotateScaleParams extends MoveRotateScaleModeParams {
   easingFunction?: EasingFunction
 }
 
-function assertAtLeastOneMoveRotateScale(
-  hasPosition: boolean,
-  hasRotation: boolean,
-  hasScale: boolean,
-  apiName: string
-): void {
-  if (!hasPosition && !hasRotation && !hasScale) {
-    throw new Error(`${apiName}: at least one of position, rotation, or scale must be provided`)
-  }
-}
-
 function assertDuration(duration: number, apiName: string): void {
   if (!Number.isFinite(duration) || duration < 0) {
     throw new Error(`${apiName}: duration must be a non-negative finite number`)
@@ -59,25 +48,25 @@ function assertDuration(duration: number, apiName: string): void {
 
 /** Shared validation for params that have optional position/rotation/scale with start & end. */
 function assertMoveRotateScaleAxesStartEnd(params: MoveRotateScaleModeParams, apiName: string): void {
-  const hasPosition = params.position !== null
-  const hasRotation = params.rotation !== null
-  const hasScale = params.scale !== null
-  assertAtLeastOneMoveRotateScale(hasPosition, hasRotation, hasScale, apiName)
-  if (hasPosition) {
+  if (!params.position && !params.rotation && !params.scale) {
+    throw new Error(`${apiName}: at least one of position, rotation, or scale must be provided`)
+  }
+
+  if (params.position) {
     const pos = params.position!
-    if (pos.start === null || pos.end === null) {
+    if (!pos.start || !pos.end) {
       throw new Error(`${apiName}: position must have both start and end`)
     }
   }
-  if (hasRotation) {
+  if (params.rotation) {
     const rot = params.rotation!
-    if (rot.start === null || rot.end === null) {
+    if (!rot.start || !rot.end) {
       throw new Error(`${apiName}: rotation must have both start and end`)
     }
   }
-  if (hasScale) {
+  if (params.scale) {
     const scl = params.scale!
-    if (scl.start === null || scl.end === null) {
+    if (!scl.start || !scl.end) {
       throw new Error(`${apiName}: scale must have both start and end`)
     }
   }
@@ -284,16 +273,13 @@ const TweenHelper: TweenHelper = {
   },
   MoveRotateScale(params) {
     assertMoveRotateScaleAxesStartEnd(params, 'Tween.Mode.MoveRotateScale')
-    const hasPosition = params.position !== null
-    const hasRotation = params.rotation !== null
-    const hasScale = params.scale !== null
     const moveRotateScale: MoveRotateScale = {
-      positionStart: hasPosition ? params.position!.start : undefined,
-      positionEnd: hasPosition ? params.position!.end : undefined,
-      rotationStart: hasRotation ? params.rotation!.start : undefined,
-      rotationEnd: hasRotation ? params.rotation!.end : undefined,
-      scaleStart: hasScale ? params.scale!.start : undefined,
-      scaleEnd: hasScale ? params.scale!.end : undefined
+      positionStart: params.position ? params.position.start : undefined,
+      positionEnd: params.position ? params.position.end : undefined,
+      rotationStart: params.rotation ? params.rotation.start : undefined,
+      rotationEnd: params.rotation ? params.rotation.end : undefined,
+      scaleStart: params.scale ? params.scale.start : undefined,
+      scaleEnd: params.scale ? params.scale!.end : undefined
     }
     return {
       $case: 'moveRotateScale',
@@ -445,16 +431,13 @@ export function defineTweenComponent(
       assertMoveRotateScaleAxesStartEnd(params, 'setMoveRotateScale')
       assertDuration(params.duration, 'setMoveRotateScale')
       const { position, rotation, scale, duration, easingFunction = EasingFunction.EF_LINEAR } = params
-      const hasPosition = position !== null
-      const hasRotation = rotation !== null
-      const hasScale = scale !== null
       const moveRotateScale: MoveRotateScale = {
-        positionStart: hasPosition ? position!.start : undefined,
-        positionEnd: hasPosition ? position!.end : undefined,
-        rotationStart: hasRotation ? rotation!.start : undefined,
-        rotationEnd: hasRotation ? rotation!.end : undefined,
-        scaleStart: hasScale ? scale!.start : undefined,
-        scaleEnd: hasScale ? scale!.end : undefined
+        positionStart: position ? position.start : undefined,
+        positionEnd: position ? position.end : undefined,
+        rotationStart: rotation ? rotation.start : undefined,
+        rotationEnd: rotation ? rotation.end : undefined,
+        scaleStart: scale ? scale.start : undefined,
+        scaleEnd: scale ? scale.end : undefined
       }
       theComponent.createOrReplace(entity, {
         mode: {
