@@ -122,20 +122,18 @@ export function addSyncTransport(
     }
   })
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, async (data, sender) => {
+    if (isServerAtom.getOrNull() || sender !== AUTH_SERVER_PEER_ID) return
+
     requestingState = false
     elapsedTimeSinceRequest = 0
-    if (isServerAtom.getOrNull() || sender !== AUTH_SERVER_PEER_ID) return
     DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength / 1024, 'KB')
     transport.onmessage!(serverValidator.processClientMessages(data, sender))
     stateIsSyncronized = true
 
-    // IMPORTANT: Only mark room as ready AFTER state is synchronized
-    // This ensures comms is truly connected and working
-    const realmInfo = RealmInfo.getOrNull(engine.RootEntity)
-    if (realmInfo && checkRoomReady(realmInfo)) {
-      DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady] Marking room as ready after state sync')
-      isRoomReadyAtom.swap(true)
-    }
+    // Mark room as ready: receiving RES_CRDT_STATE from the server proves
+    // bidirectional comms is working (we sent REQ, server sent RES, we received it).
+    DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady] Marking room as ready after state sync')
+    isRoomReadyAtom.swap(true)
   })
 
   // received message from the network
@@ -200,14 +198,12 @@ export function addSyncTransport(
   RealmInfo.onChange(engine.RootEntity, (value) => {
     const isServer = isServerAtom.getOrNull()
 
-    if (!value?.isConnectedSceneRoom) {
-      // Only react when actually transitioning from ready to not ready
-      if (isRoomReadyAtom.getOrNull() === true) {
-        DEBUG_NETWORK_MESSAGES() && console.log('Disconnected from comms')
-        isRoomReadyAtom.swap(false)
-        if (!isServer) {
-          stateIsSyncronized = false
-        }
+    if (!value?.isConnectedSceneRoom && isRoomReadyAtom.getOrNull() === true) {
+      DEBUG_NETWORK_MESSAGES() && console.log('Disconnected from comms')
+      isRoomReadyAtom.swap(false)
+      if (!isServer) {
+        stateIsSyncronized = false
+        requestingState = false
       }
     }
 
