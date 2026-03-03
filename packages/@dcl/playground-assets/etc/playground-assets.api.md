@@ -1211,6 +1211,7 @@ export type EventSystemOptions = {
     showFeedback?: boolean;
     showHighlight?: boolean;
     maxPlayerDistance?: number;
+    priority?: number;
 };
 
 // @public
@@ -3916,10 +3917,30 @@ export interface PointerEventsSystem {
     }, cb: EventSystemCallback): void;
     // @deprecated (undocumented)
     onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
+    onProximityDown(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
+    onProximityEnter(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
+    onProximityLeave(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
+    onProximityUp(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
     removeOnPointerDown(entity: Entity): void;
     removeOnPointerHoverEnter(entity: Entity): void;
     removeOnPointerHoverLeave(entity: Entity): void;
     removeOnPointerUp(entity: Entity): void;
+    removeOnProximityDown(entity: Entity): void;
+    removeOnProximityEnter(entity: Entity): void;
+    removeOnProximityLeave(entity: Entity): void;
+    removeOnProximityUp(entity: Entity): void;
 }
 
 // @public
