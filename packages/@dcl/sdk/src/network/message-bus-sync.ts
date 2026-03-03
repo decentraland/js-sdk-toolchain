@@ -116,9 +116,15 @@ export function addSyncTransport(
   // Receive & Process CRDT_STATE
   binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, async (data, sender) => {
     DEBUG_NETWORK_MESSAGES() && console.log('[REQ_CRDT_STATE]', sender, Date.now())
-    for (const chunk of engineToCrdt(engine)) {
-      DEBUG_NETWORK_MESSAGES() && console.log('[Emiting:]', sender, Date.now())
-      binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, chunk, [sender])
+    const chunks = engineToCrdt(engine)
+    if (chunks.length === 0) {
+      DEBUG_NETWORK_MESSAGES() && console.log('[Emiting empty state:]', sender, Date.now())
+      binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, new Uint8Array(), [sender])
+    } else {
+      for (const chunk of chunks) {
+        DEBUG_NETWORK_MESSAGES() && console.log('[Emiting:]', sender, Date.now())
+        binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, chunk, [sender])
+      }
     }
   })
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, async (data, sender) => {
@@ -126,7 +132,9 @@ export function addSyncTransport(
     elapsedTimeSinceRequest = 0
     if (isServerAtom.getOrNull() || sender !== AUTH_SERVER_PEER_ID) return
     DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength / 1024, 'KB')
-    transport.onmessage!(serverValidator.processClientMessages(data, sender))
+    if (data.byteLength > 0) {
+      transport.onmessage!(serverValidator.processClientMessages(data, sender))
+    }
     stateIsSyncronized = true
 
     // IMPORTANT: Only mark room as ready AFTER state is synchronized
