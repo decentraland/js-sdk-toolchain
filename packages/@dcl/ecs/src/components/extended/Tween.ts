@@ -40,7 +40,7 @@ export interface SetMoveRotateScaleParams extends MoveRotateScaleModeParams {
   easingFunction?: EasingFunction
 }
 
-function validateAtLeastOneMoveRotateScale(
+function assertAtLeastOneMoveRotateScale(
   hasPosition: boolean,
   hasRotation: boolean,
   hasScale: boolean,
@@ -51,24 +51,18 @@ function validateAtLeastOneMoveRotateScale(
   }
 }
 
-function validateDuration(duration: number, apiName: string): void {
+function assertDuration(duration: number, apiName: string): void {
   if (!Number.isFinite(duration) || duration < 0) {
     throw new Error(`${apiName}: duration must be a non-negative finite number`)
   }
 }
 
-function validateSpeed(speed: number, apiName: string): void {
-  if (!Number.isFinite(speed)) {
-    throw new Error(`${apiName}: speed must be a finite number`)
-  }
-}
-
 /** Shared validation for params that have optional position/rotation/scale with start & end. */
-function validateMoveRotateScaleAxesStartEnd(params: MoveRotateScaleModeParams, apiName: string): void {
+function assertMoveRotateScaleAxesStartEnd(params: MoveRotateScaleModeParams, apiName: string): void {
   const hasPosition = params.position !== null
   const hasRotation = params.rotation !== null
   const hasScale = params.scale !== null
-  validateAtLeastOneMoveRotateScale(hasPosition, hasRotation, hasScale, apiName)
+  assertAtLeastOneMoveRotateScale(hasPosition, hasRotation, hasScale, apiName)
   if (hasPosition) {
     const pos = params.position!
     if (pos.start === null || pos.end === null) {
@@ -87,15 +81,6 @@ function validateMoveRotateScaleAxesStartEnd(params: MoveRotateScaleModeParams, 
       throw new Error(`${apiName}: scale must have both start and end`)
     }
   }
-}
-
-function validateSetMoveRotateScaleParams(params: SetMoveRotateScaleParams, apiName: string): void {
-  validateMoveRotateScaleModeParams(params, apiName)
-  validateDuration(params.duration, apiName)
-}
-
-function validateMoveRotateScaleModeParams(params: MoveRotateScaleModeParams, apiName: string): void {
-  validateMoveRotateScaleAxesStartEnd(params, apiName)
 }
 
 /**
@@ -142,7 +127,7 @@ export interface TweenHelper {
  */
 export interface TweenComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBTween> {
   /**
-   * Texture helpers with constructor
+   * Helpers with constructor
    */
   Mode: TweenHelper
 
@@ -298,7 +283,7 @@ const TweenHelper: TweenHelper = {
     }
   },
   MoveRotateScale(params) {
-    validateMoveRotateScaleModeParams(params, 'Tween.Mode.MoveRotateScale')
+    assertMoveRotateScaleAxesStartEnd(params, 'Tween.Mode.MoveRotateScale')
     const hasPosition = params.position !== null
     const hasRotation = params.rotation !== null
     const hasScale = params.scale !== null
@@ -457,7 +442,8 @@ export function defineTweenComponent(
       })
     },
     setMoveRotateScale(entity: Entity, params: SetMoveRotateScaleParams) {
-      validateSetMoveRotateScaleParams(params, 'setMoveRotateScale')
+      assertMoveRotateScaleAxesStartEnd(params, 'setMoveRotateScale')
+      assertDuration(params.duration, 'setMoveRotateScale')
       const { position, rotation, scale, duration, easingFunction = EasingFunction.EF_LINEAR } = params
       const hasPosition = position !== null
       const hasRotation = rotation !== null
