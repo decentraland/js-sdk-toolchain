@@ -46,6 +46,7 @@ async function runApp(
   const skipAuthScreen = !!args['--skip-auth-screen']
   const landscapeTerrainEnabled = !!args['--landscape-terrain-enabled']
   const openDeeplinkInNewInstance = !!args['-n']
+  const multiInstance = !!args['--multi-instance']
 
   try {
     if (isWindows) {
@@ -73,6 +74,9 @@ async function runApp(
     }
     if (openDeeplinkInNewInstance) {
       params.set('open-deeplink-in-new-instance', 'true')
+    }
+    if (multiInstance) {
+      params.set('multi-instance', 'true')
     }
 
     const queryParams = params.toString()
