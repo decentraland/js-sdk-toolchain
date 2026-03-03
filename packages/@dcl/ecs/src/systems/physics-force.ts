@@ -2,7 +2,16 @@ import * as components from '../components'
 import { Entity } from '../engine'
 import { IEngine } from '../engine'
 import { Vector3Type } from '../schemas'
-import { isZeroVector, normalizeVector, scaleVector, addVectors, subtractVectors, vectorLength, vectorsEqual, createTimers } from '../runtime/helpers'
+import {
+  isZeroVector,
+  normalizeVector,
+  scaleVector,
+  addVectors,
+  subtractVectors,
+  vectorLength,
+  vectorsEqual,
+  createTimers
+} from '../runtime/helpers'
 import { KnockbackFalloff } from './physics-impulse'
 
 /**
@@ -12,7 +21,13 @@ export interface PhysicsForceHelper {
   applyForceToPlayer(source: Entity, vector: Vector3Type, magnitude?: number): void
   removeForceFromPlayer(source: Entity): void
   applyForceToPlayerForDuration(source: Entity, duration: number, vector: Vector3Type, magnitude?: number): void
-  applyRepulsionForceToPlayer(source: Entity, fromPosition: Vector3Type, magnitude: number, radius?: number, falloff?: KnockbackFalloff): void
+  applyRepulsionForceToPlayer(
+    source: Entity,
+    fromPosition: Vector3Type,
+    magnitude: number,
+    radius?: number,
+    falloff?: KnockbackFalloff
+  ): void
 }
 
 /** @internal */
@@ -21,7 +36,10 @@ export function createPhysicsForceHelper(engine: IEngine): PhysicsForceHelper {
   const Transform = components.Transform(engine)
 
   const forceSources = new Map<Entity, Vector3Type>()
-  const repulsionSources = new Map<Entity, { fromPosition: Vector3Type, magnitude: number, radius: number, falloff: KnockbackFalloff }>()
+  const repulsionSources = new Map<
+    Entity,
+    { fromPosition: Vector3Type; magnitude: number; radius: number; falloff: KnockbackFalloff }
+  >()
   let lastWrittenForceVector: Vector3Type | null = null
 
   function recalcForce(): void {
@@ -38,7 +56,7 @@ export function createPhysicsForceHelper(engine: IEngine): PhysicsForceHelper {
       if (!vectorsEqual(current.vector, lastWrittenForceVector)) {
         throw new Error(
           'PBPhysicsCombinedForce was modified outside Physics helper. ' +
-          'Do not mix direct component access with Physics.applyForceToPlayer().'
+            'Do not mix direct component access with Physics.applyForceToPlayer().'
         )
       }
     }

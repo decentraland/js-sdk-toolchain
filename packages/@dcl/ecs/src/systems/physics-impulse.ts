@@ -1,7 +1,14 @@
 import * as components from '../components'
 import { IEngine } from '../engine'
 import { Vector3Type } from '../schemas'
-import { isZeroVector, normalizeVector, scaleVector, addVectors, subtractVectors, vectorLength } from '../runtime/helpers'
+import {
+  isZeroVector,
+  normalizeVector,
+  scaleVector,
+  addVectors,
+  subtractVectors,
+  vectorLength
+} from '../runtime/helpers'
 
 /**
  * @public
@@ -21,7 +28,12 @@ export enum KnockbackFalloff {
  */
 export interface PhysicsImpulseHelper {
   applyImpulseToPlayer(vector: Vector3Type, magnitude?: number): void
-  applyKnockbackToPlayer(fromPosition: Vector3Type, magnitude: number, radius?: number, falloff?: KnockbackFalloff): void
+  applyKnockbackToPlayer(
+    fromPosition: Vector3Type,
+    magnitude: number,
+    radius?: number,
+    falloff?: KnockbackFalloff
+  ): void
 }
 
 /** @internal */
@@ -51,7 +63,7 @@ export function createPhysicsImpulseHelper(engine: IEngine): PhysicsImpulseHelpe
     if (existing && existing.eventId !== lastWrittenEventId && lastWrittenEventId !== 0) {
       throw new Error(
         'PBPhysicsCombinedImpulse was modified outside Physics helper. ' +
-        'Do not mix direct component access with Physics.applyImpulseToPlayer().'
+          'Do not mix direct component access with Physics.applyImpulseToPlayer().'
       )
     }
 

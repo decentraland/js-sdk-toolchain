@@ -54,7 +54,12 @@ export interface PhysicsSystem {
    * @param radius - max distance of effect (default: Infinity)
    * @param falloff - how force decreases with distance (default: CONSTANT)
    */
-  applyKnockbackToPlayer(fromPosition: Vector3Type, magnitude: number, radius?: number, falloff?: KnockbackFalloff): void
+  applyKnockbackToPlayer(
+    fromPosition: Vector3Type,
+    magnitude: number,
+    radius?: number,
+    falloff?: KnockbackFalloff
+  ): void
 
   /**
    * Apply a continuous force to the player for a limited duration.
@@ -82,7 +87,13 @@ export interface PhysicsSystem {
    * @param radius - max distance of effect (default: Infinity)
    * @param falloff - how force decreases with distance (default: CONSTANT)
    */
-  applyRepulsionForceToPlayer(source: Entity, fromPosition: Vector3Type, magnitude: number, radius?: number, falloff?: KnockbackFalloff): void
+  applyRepulsionForceToPlayer(
+    source: Entity,
+    fromPosition: Vector3Type,
+    magnitude: number,
+    radius?: number,
+    falloff?: KnockbackFalloff
+  ): void
 }
 
 /**
