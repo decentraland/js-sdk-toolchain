@@ -95,6 +95,29 @@ export interface AudioStreamComponentDefinitionExtended extends LastWriteWinElem
 }
 
 // @public (undocumented)
+export type AuthoritativePutComponentMessage = CrdtMessageHeader & AuthoritativePutComponentMessageBody;
+
+// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+//
+// @public
+export type AuthoritativePutComponentMessageBody = {
+    type: CrdtMessageType.AUTHORITATIVE_PUT_COMPONENT;
+    entityId: Entity;
+    componentId: number;
+    timestamp: number;
+    data: Uint8Array;
+};
+
+// @public (undocumented)
+export namespace AuthoritativePutComponentOperation {
+    const // (undocumented)
+    MESSAGE_HEADER_LENGTH = 16;
+    // (undocumented)
+    export function read(buf: ByteBuffer): AuthoritativePutComponentMessage | null;
+    export function write(entity: Entity, timestamp: number, componentId: number, data: Uint8Array, buf: ByteBuffer): void;
+}
+
+// @public (undocumented)
 export const enum AvatarAnchorPointType {
     // (undocumented)
     AAPT_HEAD = 4,
@@ -208,12 +231,20 @@ export interface BaseComponent<T> {
     dumpCrdtStateToBuffer(buffer: ByteBuffer, filterEntity?: (entity: Entity) => boolean): void;
     entityDeleted(entity: Entity, markAsDirty: boolean): void;
     get(entity: Entity): any;
+    getCrdtState(entity: Entity): {
+        data: Uint8Array;
+        timestamp: number;
+    } | null;
     getCrdtUpdates(): Iterable<CrdtMessageBody>;
     has(entity: Entity): boolean;
     onChange(entity: Entity, cb: (value: T | undefined) => void): void;
     // (undocumented)
     readonly schema: ISchema<T>;
     updateFromCrdt(body: CrdtMessageBody): [null | ConflictResolutionMessage, T | undefined];
+    // (undocumented)
+    validateBeforeChange(entity: Entity, cb: ValidateCallback<T>): void;
+    // (undocumented)
+    validateBeforeChange(cb: ValidateCallback<T>): void;
 }
 
 // @public (undocumented)
@@ -824,10 +855,10 @@ export type Coords = {
 export const CRDT_MESSAGE_HEADER_LENGTH = 8;
 
 // @public (undocumented)
-export type CrdtMessage = PutComponentMessage | DeleteComponentMessage | AppendValueMessage | DeleteEntityMessage | PutNetworkComponentMessage | DeleteComponentNetworkMessage | DeleteEntityNetworkMessage;
+export type CrdtMessage = PutComponentMessage | AuthoritativePutComponentMessage | DeleteComponentMessage | AppendValueMessage | DeleteEntityMessage | PutNetworkComponentMessage | DeleteComponentNetworkMessage | DeleteEntityNetworkMessage;
 
 // @public (undocumented)
-export type CrdtMessageBody = PutComponentMessageBody | DeleteComponentMessageBody | DeleteEntityMessageBody | AppendValueMessageBody | CrdtNetworkMessageBody;
+export type CrdtMessageBody = PutComponentMessageBody | AuthoritativePutComponentMessageBody | DeleteComponentMessageBody | DeleteEntityMessageBody | AppendValueMessageBody | CrdtNetworkMessageBody;
 
 // @public
 export type CrdtMessageHeader = {
@@ -848,6 +879,8 @@ export enum CrdtMessageType {
     // (undocumented)
     APPEND_VALUE = 4,
     // (undocumented)
+    AUTHORITATIVE_PUT_COMPONENT = 8,
+    // (undocumented)
     DELETE_COMPONENT = 2,
     // (undocumented)
     DELETE_COMPONENT_NETWORK = 6,
@@ -856,7 +889,7 @@ export enum CrdtMessageType {
     // (undocumented)
     DELETE_ENTITY_NETWORK = 7,
     // (undocumented)
-    MAX_MESSAGE_TYPE = 8,
+    MAX_MESSAGE_TYPE = 9,
     // (undocumented)
     PUT_COMPONENT = 1,
     // (undocumented)
@@ -867,6 +900,11 @@ export enum CrdtMessageType {
 
 // @public (undocumented)
 export type CrdtNetworkMessageBody = PutNetworkComponentMessageBody | DeleteComponentNetworkMessageBody | DeleteEntityNetworkMessageBody;
+
+// Warning: (ae-missing-release-tag) "CreatedBy" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const CreatedBy: ICreatedBy;
 
 // @public (undocumented)
 export function createEntityContainer(opts?: {
@@ -1303,6 +1341,19 @@ export interface GrowOnlyValueSetComponentDefinition<T> extends BaseComponent<T>
 // @public (undocumented)
 export type GSetComponentGetter<T extends GrowOnlyValueSetComponentDefinition<any>> = (engine: Pick<IEngine, 'defineValueSetComponentFromSchema'>) => T;
 
+// Warning: (ae-missing-release-tag) "ICreatedBy" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type ICreatedBy = LastWriteWinElementSetComponentDefinition<ICreatedByType>;
+
+// Warning: (ae-missing-release-tag) "ICreatedByType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface ICreatedByType {
+    // (undocumented)
+    address: string;
+}
+
 // @public (undocumented)
 export interface IEngine {
     addEntity(): Entity;
@@ -1541,6 +1592,20 @@ export type InstanceCompositeOptions = {
     rootEntity?: Entity;
     alreadyRequestedSrc?: Set<string>;
 };
+
+// Warning: (ae-missing-release-tag) "InternalBaseComponent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export interface InternalBaseComponent<T> extends BaseComponent<T> {
+    __dry_run_updateFromCrdt(body: CrdtMessageBody): ProcessMessageResultType;
+    // (undocumented)
+    __onChangeCallbacks(entity: Entity, value: T): void;
+    // (undocumented)
+    __run_validateBeforeChange(entity: Entity, newValue: T | undefined, senderAddress: string, createdBy: string): boolean;
+    // (undocumented)
+    dirtyIterator(): Iterable<Entity>;
+    iterator(): Iterable<[Entity, any]>;
+}
 
 // @public (undocumented)
 export interface ISchema<T = any> {
@@ -4859,6 +4924,17 @@ export interface UiTransformProps {
 
 // @public (undocumented)
 export type Unpacked<T> = T extends (infer U)[] ? U : T;
+
+// Warning: (ae-missing-release-tag) "ValidateCallback" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export type ValidateCallback<T> = (value: {
+    entity: Entity;
+    currentValue: T | undefined;
+    newValue: T | undefined;
+    senderAddress: string;
+    createdBy: string;
+}) => boolean;
 
 // @public (undocumented)
 export type ValueSetOptions<T> = {
