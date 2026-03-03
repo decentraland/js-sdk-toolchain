@@ -1,15 +1,14 @@
 import { getExplorerInformation } from '~system/Runtime'
-import { Atom } from '../atom'
 
-export type Platform = 'mobile' | 'desktop' | 'vr' | 'web'
+export type Platform = 'mobile' | 'desktop' | 'web'
 
-const platformAtom = Atom<Platform>()
+let platform: Platform | null = null
 void getExplorerInformation({}).then((response) => {
-  platformAtom.swap(response.platform as Platform)
+  platform = response.platform as Platform
 })
 
 export function getPlatform(): Platform | null {
-  return platformAtom.getOrNull()
+  return platform
 }
 
 export function isMobile(): boolean {
@@ -18,10 +17,6 @@ export function isMobile(): boolean {
 
 export function isDesktop(): boolean {
   return getPlatform() === 'desktop'
-}
-
-export function isVR(): boolean {
-  return getPlatform() === 'vr'
 }
 
 export function isWeb(): boolean {

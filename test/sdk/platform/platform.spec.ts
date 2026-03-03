@@ -31,8 +31,6 @@ describe('platform detection', () => {
     ${'isMobile'}  | ${'desktop'} | ${false}
     ${'isDesktop'} | ${'desktop'} | ${true}
     ${'isDesktop'} | ${'mobile'}  | ${false}
-    ${'isVR'}      | ${'vr'}      | ${true}
-    ${'isVR'}      | ${'web'}     | ${false}
     ${'isWeb'}     | ${'web'}     | ${true}
     ${'isWeb'}     | ${'desktop'} | ${false}
   `('$fnName() returns $expected for platform "$platform"', async ({ fnName, platform, expected }) => {
