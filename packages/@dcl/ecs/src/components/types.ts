@@ -15,9 +15,7 @@ export type {
   TweenHelper,
   TweenComponentDefinitionExtended,
   SetMoveRotateScaleParams,
-  SetMoveRotateScaleContinuousParams,
-  MoveRotateScaleModeParams,
-  MoveRotateScaleContinuousModeParams
+  MoveRotateScaleModeParams
 } from './extended/Tween'
 export type { CameraTransitionHelper, VirtualCameraComponentDefinitionExtended } from './extended/VirtualCamera'
 export type { TransformComponentExtended, TransformTypeWithOptionals } from './manual/Transform'
