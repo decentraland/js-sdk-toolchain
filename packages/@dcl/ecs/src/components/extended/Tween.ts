@@ -77,63 +77,57 @@ function validateAtLeastOneMoveRotateScale(
 }
 
 function validateDuration(duration: number, apiName: string): void {
-  if (typeof duration !== 'number' || !Number.isFinite(duration) || duration < 0) {
+  if (!Number.isFinite(duration) || duration < 0) {
     throw new Error(`${apiName}: duration must be a non-negative finite number`)
   }
 }
 
 function validateSpeed(speed: number, apiName: string): void {
-  if (typeof speed !== 'number' || !Number.isFinite(speed)) {
+  if (!Number.isFinite(speed)) {
     throw new Error(`${apiName}: speed must be a finite number`)
   }
 }
 
 /** Shared validation for params that have optional position/rotation/scale with start & end. */
-function validateMoveRotateScaleAxesStartEnd(
-  params: MoveRotateScaleModeParams,
-  apiName: string
-): void {
-  const hasPosition = params.position != null
-  const hasRotation = params.rotation != null
-  const hasScale = params.scale != null
+function validateMoveRotateScaleAxesStartEnd(params: MoveRotateScaleModeParams, apiName: string): void {
+  const hasPosition = params.position !== null
+  const hasRotation = params.rotation !== null
+  const hasScale = params.scale !== null
   validateAtLeastOneMoveRotateScale(hasPosition, hasRotation, hasScale, apiName)
   if (hasPosition) {
     const pos = params.position!
-    if (pos.start == null || pos.end == null) {
+    if (pos.start === null || pos.end === null) {
       throw new Error(`${apiName}: position must have both start and end`)
     }
   }
   if (hasRotation) {
     const rot = params.rotation!
-    if (rot.start == null || rot.end == null) {
+    if (rot.start === null || rot.end === null) {
       throw new Error(`${apiName}: rotation must have both start and end`)
     }
   }
   if (hasScale) {
     const scl = params.scale!
-    if (scl.start == null || scl.end == null) {
+    if (scl.start === null || scl.end === null) {
       throw new Error(`${apiName}: scale must have both start and end`)
     }
   }
 }
 
 /** Shared validation for params that have optional position/rotation/scale with direction + speed. */
-function validateMoveRotateScaleAxesDirection(
-  params: MoveRotateScaleContinuousModeParams,
-  apiName: string
-): void {
-  const hasPosition = params.position != null
-  const hasRotation = params.rotation != null
-  const hasScale = params.scale != null
+function validateMoveRotateScaleAxesDirection(params: MoveRotateScaleContinuousModeParams, apiName: string): void {
+  const hasPosition = params.position !== null
+  const hasRotation = params.rotation !== null
+  const hasScale = params.scale !== null
   validateAtLeastOneMoveRotateScale(hasPosition, hasRotation, hasScale, apiName)
   validateSpeed(params.speed, apiName)
-  if (hasPosition && params.position!.direction == null) {
+  if (hasPosition && params.position!.direction === null) {
     throw new Error(`${apiName}: position must have direction`)
   }
-  if (hasRotation && params.rotation!.direction == null) {
+  if (hasRotation && params.rotation!.direction === null) {
     throw new Error(`${apiName}: rotation must have direction`)
   }
-  if (hasScale && params.scale!.direction == null) {
+  if (hasScale && params.scale!.direction === null) {
     throw new Error(`${apiName}: scale must have direction`)
   }
 }
@@ -143,10 +137,7 @@ function validateSetMoveRotateScaleParams(params: SetMoveRotateScaleParams, apiN
   validateDuration(params.duration, apiName)
 }
 
-function validateSetMoveRotateScaleContinuousParams(
-  params: SetMoveRotateScaleContinuousParams,
-  apiName: string
-): void {
+function validateSetMoveRotateScaleContinuousParams(params: SetMoveRotateScaleContinuousParams, apiName: string): void {
   validateMoveRotateScaleContinuousModeParams(params, apiName)
   validateDuration(params.duration ?? 0, apiName)
 }
@@ -379,9 +370,9 @@ const TweenHelper: TweenHelper = {
   },
   MoveRotateScale(params) {
     validateMoveRotateScaleModeParams(params, 'Tween.Mode.MoveRotateScale')
-    const hasPosition = params.position != null
-    const hasRotation = params.rotation != null
-    const hasScale = params.scale != null
+    const hasPosition = params.position !== null
+    const hasRotation = params.rotation !== null
+    const hasScale = params.scale !== null
     const moveRotateScale: MoveRotateScale = {
       positionStart: hasPosition ? params.position!.start : undefined,
       positionEnd: hasPosition ? params.position!.end : undefined,
@@ -397,9 +388,9 @@ const TweenHelper: TweenHelper = {
   },
   MoveRotateScaleContinuous(params) {
     validateMoveRotateScaleContinuousModeParams(params, 'Tween.Mode.MoveRotateScaleContinuous')
-    const hasPosition = params.position != null
-    const hasRotation = params.rotation != null
-    const hasScale = params.scale != null
+    const hasPosition = params.position !== null
+    const hasRotation = params.rotation !== null
+    const hasScale = params.scale !== null
     const moveRotateScaleContinuous: MoveRotateScaleContinuous = {
       positionDirection: hasPosition ? params.position!.direction : undefined,
       rotationDirection: hasRotation ? params.rotation!.direction : undefined,
@@ -555,16 +546,16 @@ export function defineTweenComponent(
     setMoveRotateScale(entity: Entity, params: SetMoveRotateScaleParams) {
       validateSetMoveRotateScaleParams(params, 'setMoveRotateScale')
       const { position, rotation, scale, duration, easingFunction = EasingFunction.EF_LINEAR } = params
-      const hasPosition = position != null
-      const hasRotation = rotation != null
-      const hasScale = scale != null
+      const hasPosition = position !== null
+      const hasRotation = rotation !== null
+      const hasScale = scale !== null
       const moveRotateScale: MoveRotateScale = {
-        positionStart: hasPosition ? position.start : undefined,
-        positionEnd: hasPosition ? position.end : undefined,
-        rotationStart: hasRotation ? rotation.start : undefined,
-        rotationEnd: hasRotation ? rotation.end : undefined,
-        scaleStart: hasScale ? scale.start : undefined,
-        scaleEnd: hasScale ? scale.end : undefined
+        positionStart: hasPosition ? position!.start : undefined,
+        positionEnd: hasPosition ? position!.end : undefined,
+        rotationStart: hasRotation ? rotation!.start : undefined,
+        rotationEnd: hasRotation ? rotation!.end : undefined,
+        scaleStart: hasScale ? scale!.start : undefined,
+        scaleEnd: hasScale ? scale!.end : undefined
       }
       theComponent.createOrReplace(entity, {
         mode: {
@@ -580,13 +571,13 @@ export function defineTweenComponent(
       const duration = params.duration ?? 0
       validateSetMoveRotateScaleContinuousParams(params, 'setMoveRotateScaleContinuous')
       const { position, rotation, scale, speed } = params
-      const hasPosition = position != null
-      const hasRotation = rotation != null
-      const hasScale = scale != null
+      const hasPosition = position !== null
+      const hasRotation = rotation !== null
+      const hasScale = scale !== null
       const moveRotateScaleContinuous: MoveRotateScaleContinuous = {
-        positionDirection: hasPosition ? position.direction : undefined,
-        rotationDirection: hasRotation ? rotation.direction : undefined,
-        scaleDirection: hasScale ? scale.direction : undefined,
+        positionDirection: hasPosition ? position!.direction : undefined,
+        rotationDirection: hasRotation ? rotation!.direction : undefined,
+        scaleDirection: hasScale ? scale!.direction : undefined,
         speed
       }
       theComponent.createOrReplace(entity, {
