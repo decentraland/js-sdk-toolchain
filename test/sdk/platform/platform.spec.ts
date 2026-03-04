@@ -12,6 +12,11 @@ function mockPlatform(platform: string) {
   })
 }
 
+/** Flush pending microtasks so module-level promises settle. */
+function flushMicrotasks(): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, 0))
+}
+
 describe('platform detection', () => {
   beforeEach(() => {
     jest.resetModules()
@@ -20,8 +25,7 @@ describe('platform detection', () => {
 
   async function loadPlatformModule() {
     const mod = await import('../../../packages/@dcl/sdk/src/platform/index')
-    // Allow the promise from getExplorerInformation to resolve
-    await new Promise((r) => setTimeout(r, 0))
+    await flushMicrotasks()
     return mod
   }
 
@@ -50,5 +54,18 @@ describe('platform detection', () => {
     const { getPlatform, isMobile } = await loadPlatformModule()
     expect(getPlatform()).toBeNull()
     expect(isMobile()).toBe(false)
+  })
+
+  it('getPlatform() returns null for unknown platform values', async () => {
+    mockPlatform('unknown-platform')
+    const { getPlatform } = await loadPlatformModule()
+    expect(getPlatform()).toBeNull()
+  })
+
+  it('getPlatform() returns null when getExplorerInformation rejects', async () => {
+    mockGetExplorerInformation.mockRejectedValue(new Error('runtime unavailable'))
+    const { getPlatform } = await loadPlatformModule()
+    await flushMicrotasks()
+    expect(getPlatform()).toBeNull()
   })
 })
