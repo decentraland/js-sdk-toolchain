@@ -66,7 +66,8 @@ export const args = declareArgs({
   '--skip-auth-screen': Boolean,
   '--landscape-terrain-enabled': Boolean,
   '-n': Boolean,
-  '--bevy-web': Boolean
+  '--bevy-web': Boolean,
+  '--multi-instance': Boolean
 })
 
 export async function help(options: Options) {
@@ -93,7 +94,8 @@ export async function help(options: Options) {
       --landscape-terrain-enabled       Enable landscape terrain.
       -n                                Open a new instance of the Client even if one is already running.
       --bevy-web                        Opens preview using the Bevy Web browser window.
-      --mobile                      Show QR code for mobile preview on the same network
+      --mobile                          Show QR code for mobile preview on the same network.
+      --multi-instance                  Allow running multiple Explorer instances simultaneously.
 
 
     Examples:
@@ -264,7 +266,7 @@ export async function main(options: Options) {
       }
 
       if (options.args['--mobile'] && lanUrl) {
-        const deepLink = `decentraland://open?preview=${lanUrl}&position=${baseCoords.x}%2C${baseCoords.y}`
+        const deepLink = `decentraland://open?preview=${lanUrl}&position=${baseCoords.x},${baseCoords.y}`
         QRCode.toString(deepLink, { type: 'terminal', small: true }, (err, qr) => {
           if (!err) {
             components.logger.log(colors.bold('\nScan to preview on mobile: \n'))

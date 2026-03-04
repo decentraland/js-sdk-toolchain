@@ -206,8 +206,9 @@ export function createInputSystem(engine: IEngine): IInputSystem {
 
     if (!up || !down) return null
 
-    // If the DOWN command has happen before the UP commands, it means that that a clicked has happen
-    if (down.timestamp < up.timestamp && timestampIsCurrentFrame(up.timestamp)) {
+    // If the DOWN command has happened before or at the same time as the UP command, a click has happened.
+    // Same-timestamp is possible when both events are produced within the same renderer tick.
+    if (down.timestamp <= up.timestamp && timestampIsCurrentFrame(up.timestamp)) {
       return { up, down }
     }
 
