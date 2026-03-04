@@ -7,8 +7,9 @@ const VALID_PLATFORMS: Set<string> = new Set<string>(['mobile', 'desktop', 'web'
 let platform: Platform | null = null
 void getExplorerInformation({})
   .then((response) => {
-    if (VALID_PLATFORMS.has(response.platform)) {
-      platform = response.platform as Platform
+    const normalized = response.platform.toLowerCase()
+    if (VALID_PLATFORMS.has(normalized)) {
+      platform = normalized as Platform
     } else {
       console.error(`Unknown platform value: "${response.platform}"`)
     }

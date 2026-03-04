@@ -56,6 +56,13 @@ describe('platform detection', () => {
     expect(isMobile()).toBe(false)
   })
 
+  it('normalizes mixed-case platform values to lowercase', async () => {
+    mockPlatform('Desktop')
+    const { getPlatform, isDesktop } = await loadPlatformModule()
+    expect(getPlatform()).toBe('desktop')
+    expect(isDesktop()).toBe(true)
+  })
+
   it('getPlatform() returns null for unknown platform values', async () => {
     mockPlatform('unknown-platform')
     const { getPlatform } = await loadPlatformModule()
