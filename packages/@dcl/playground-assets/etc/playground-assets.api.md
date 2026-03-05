@@ -1253,6 +1253,11 @@ export const getDefaultOpts: (opts?: Partial<EventSystemOptions>) => EventSystem
 // @public
 export function getEntitiesWithParent(engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema'>, parent: Entity): Entity[];
 
+// Warning: (ae-missing-release-tag) "getGlobal" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export function getGlobal<T>(key: string): T | undefined;
+
 // @public
 export function getWorldPosition(engine: WorldTransformEngine, entity: Entity): Vector3Type;
 
@@ -4356,6 +4361,11 @@ export namespace Schemas {
         value?: any;
     }) => void;
 }
+
+// Warning: (ae-missing-release-tag) "setGlobalPolyfill" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export function setGlobalPolyfill<T>(key: string, value: T): void;
 
 // @public
 export interface SetMoveRotateScaleParams extends MoveRotateScaleModeParams {
