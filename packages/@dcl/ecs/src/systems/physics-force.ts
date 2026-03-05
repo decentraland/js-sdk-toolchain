@@ -1,17 +1,9 @@
+import { Vector3 } from '@dcl/ecs-math'
 import * as components from '../components'
 import { Entity } from '../engine'
 import { IEngine } from '../engine'
 import { Vector3Type } from '../schemas'
-import {
-  isZeroVector,
-  normalizeVector,
-  scaleVector,
-  addVectors,
-  subtractVectors,
-  vectorLength,
-  vectorsEqual,
-  createTimers
-} from '../runtime/helpers'
+import { createTimers } from '../runtime/helpers'
 import { KnockbackFalloff } from './physics-impulse'
 
 /**
@@ -35,6 +27,8 @@ export function createPhysicsForceHelper(engine: IEngine): PhysicsForceHelper {
   const PhysicsCombinedForce = components.PhysicsCombinedForce(engine)
   const Transform = components.Transform(engine)
 
+  const timers = createTimers(engine)
+  const durationTimers = new Map<Entity, number>()
   const forceSources = new Map<Entity, Vector3Type>()
   const repulsionSources = new Map<
     Entity,
@@ -53,7 +47,7 @@ export function createPhysicsForceHelper(engine: IEngine): PhysicsForceHelper {
 
     const current = PhysicsCombinedForce.getOrNull(engine.PlayerEntity)
     if (current && lastWrittenForceVector && current.vector) {
-      if (!vectorsEqual(current.vector, lastWrittenForceVector)) {
+      if (!Vector3.equals(current.vector, lastWrittenForceVector)) {
         throw new Error(
           'PBPhysicsCombinedForce was modified outside Physics helper. ' +
             'Do not mix direct component access with Physics.applyForceToPlayer().'
@@ -63,7 +57,7 @@ export function createPhysicsForceHelper(engine: IEngine): PhysicsForceHelper {
 
     let sum: Vector3Type = { x: 0, y: 0, z: 0 }
     for (const v of forceSources.values()) {
-      sum = addVectors(sum, v)
+      sum = Vector3.add(sum, v)
     }
 
     PhysicsCombinedForce.createOrReplace(engine.PlayerEntity, { vector: sum })
@@ -74,8 +68,8 @@ export function createPhysicsForceHelper(engine: IEngine): PhysicsForceHelper {
     let finalVector: Vector3Type
 
     if (typeof magnitude === 'number') {
-      if (isZeroVector(vector)) return
-      finalVector = scaleVector(normalizeVector(vector), magnitude)
+      if (Vector3.equalsToFloats(vector, 0, 0, 0)) return
+      finalVector = Vector3.scale(Vector3.normalize(vector), magnitude)
     } else {
       finalVector = vector
     }
@@ -95,9 +89,6 @@ export function createPhysicsForceHelper(engine: IEngine): PhysicsForceHelper {
     forceSources.delete(source)
     recalcForce()
   }
-
-  const timers = createTimers(engine)
-  const durationTimers = new Map<Entity, number>()
 
   function scheduleForceDuration(source: Entity, seconds: number): void {
     const existing = durationTimers.get(source)
@@ -128,16 +119,16 @@ export function createPhysicsForceHelper(engine: IEngine): PhysicsForceHelper {
     radius: number,
     falloff: KnockbackFalloff
   ): Vector3Type | null {
-    const diff = subtractVectors(Transform.get(engine.PlayerEntity).position, fromPosition)
+    const diff = Vector3.subtract(Transform.get(engine.PlayerEntity).position, fromPosition)
 
-    if (isZeroVector(diff)) return { x: 0, y: magnitude, z: 0 }
+    if (Vector3.equalsToFloats(diff, 0, 0, 0)) return { x: 0, y: magnitude, z: 0 }
 
     // Fast path: default params — no need to compute distance
     if (radius === Infinity && falloff === KnockbackFalloff.CONSTANT) {
-      return scaleVector(normalizeVector(diff), magnitude)
+      return Vector3.scale(Vector3.normalize(diff), magnitude)
     }
 
-    const distance = vectorLength(diff)
+    const distance = Vector3.length(diff)
     if (distance > radius) return null
 
     let effectiveMagnitude: number
@@ -157,7 +148,7 @@ export function createPhysicsForceHelper(engine: IEngine): PhysicsForceHelper {
     if (effectiveMagnitude === 0) return null
 
     // normalize(diff) * effectiveMagnitude in one step
-    return scaleVector(diff, effectiveMagnitude / distance)
+    return Vector3.scale(diff, effectiveMagnitude / distance)
   }
 
   function applyRepulsionForceToPlayer(

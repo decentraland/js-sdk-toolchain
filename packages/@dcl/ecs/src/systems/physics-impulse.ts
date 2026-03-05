@@ -1,14 +1,7 @@
+import { Vector3 } from '@dcl/ecs-math'
 import * as components from '../components'
 import { IEngine } from '../engine'
 import { Vector3Type } from '../schemas'
-import {
-  isZeroVector,
-  normalizeVector,
-  scaleVector,
-  addVectors,
-  subtractVectors,
-  vectorLength
-} from '../runtime/helpers'
 
 /**
  * @public
@@ -50,10 +43,10 @@ export function createPhysicsImpulseHelper(engine: IEngine): PhysicsImpulseHelpe
     let finalVector: Vector3Type
 
     if (typeof magnitude === 'number') {
-      if (isZeroVector(vector)) return
-      finalVector = scaleVector(normalizeVector(vector), magnitude)
+      if (Vector3.equalsToFloats(vector, 0, 0, 0)) return
+      finalVector = Vector3.scale(Vector3.normalize(vector), magnitude)
     } else {
-      if (isZeroVector(vector)) return
+      if (Vector3.equalsToFloats(vector, 0, 0, 0)) return
       finalVector = vector
     }
 
@@ -68,7 +61,7 @@ export function createPhysicsImpulseHelper(engine: IEngine): PhysicsImpulseHelpe
     }
 
     if (lastWrittenTick === currentTick && existing) {
-      finalVector = addVectors(existing.vector ?? { x: 0, y: 0, z: 0 }, finalVector)
+      finalVector = Vector3.add(existing.vector ?? { x: 0, y: 0, z: 0 }, finalVector)
     } else {
       lastWrittenEventId = ++impulseEventId
     }
@@ -87,20 +80,20 @@ export function createPhysicsImpulseHelper(engine: IEngine): PhysicsImpulseHelpe
     radius: number = Infinity,
     falloff: KnockbackFalloff = KnockbackFalloff.CONSTANT
   ): void {
-    const diff = subtractVectors(Transform.get(engine.PlayerEntity).position, fromPosition)
+    const diff = Vector3.subtract(Transform.get(engine.PlayerEntity).position, fromPosition)
 
-    if (isZeroVector(diff)) {
+    if (Vector3.equalsToFloats(diff, 0, 0, 0)) {
       applyImpulseToPlayer({ x: 0, y: magnitude, z: 0 })
       return
     }
 
     // Fast path: default params — no need to compute distance
     if (radius === Infinity && falloff === KnockbackFalloff.CONSTANT) {
-      applyImpulseToPlayer(scaleVector(normalizeVector(diff), magnitude))
+      applyImpulseToPlayer(Vector3.scale(Vector3.normalize(diff), magnitude))
       return
     }
 
-    const distance = vectorLength(diff)
+    const distance = Vector3.length(diff)
     if (distance > radius) return
 
     let effectiveMagnitude: number
@@ -118,7 +111,7 @@ export function createPhysicsImpulseHelper(engine: IEngine): PhysicsImpulseHelpe
     }
 
     // normalize(diff) * effectiveMagnitude in one step
-    applyImpulseToPlayer(scaleVector(diff, effectiveMagnitude / distance))
+    applyImpulseToPlayer(Vector3.scale(diff, effectiveMagnitude / distance))
   }
 
   return { applyImpulseToPlayer, applyKnockbackToPlayer }
