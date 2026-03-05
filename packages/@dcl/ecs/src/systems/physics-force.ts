@@ -44,7 +44,7 @@ export function createPhysicsForceHelper(engine: IEngine): PhysicsForceHelper {
 
   function recalcForce(): void {
     if (forceSources.size === 0) {
-      if (PhysicsCombinedForce.getOrNull(engine.PlayerEntity) !== null) {
+      if (PhysicsCombinedForce.has(engine.PlayerEntity)) {
         PhysicsCombinedForce.deleteFrom(engine.PlayerEntity)
       }
       lastWrittenForceVector = null
