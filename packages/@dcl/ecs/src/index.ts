@@ -1,7 +1,7 @@
 // The order of the following imports matters. Please do not auto-sort
 export * from './engine'
 export * from './schemas'
-export { getGlobal, setGlobalPolyfill } from './runtime/globals'
+export * from './runtime/globals'
 export * from './runtime/initialization'
 export * from './runtime/types'
 export * from './runtime/helpers'
