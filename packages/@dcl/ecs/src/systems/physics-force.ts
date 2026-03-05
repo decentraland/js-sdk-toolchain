@@ -29,6 +29,7 @@ export function createPhysicsForceHelper(engine: IEngine): PhysicsForceHelper {
 
   const timers = createTimers(engine)
   const durationTimers = new Map<Entity, number>()
+  // Key = source entity producing the force (not the target); all forces target PlayerEntity.
   const forceSources = new Map<Entity, Vector3Type>()
   const repulsionSources = new Map<
     Entity,
