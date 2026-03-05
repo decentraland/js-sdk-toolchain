@@ -24,6 +24,7 @@ import {
 } from './grow-only-value-set-component-definition'
 import { removeEntityWithChildren as removeEntityWithChildrenEngine } from '../runtime/helpers/tree'
 import { CrdtMessageType } from '../serialization/crdt'
+import type { CompositeProvider } from '../composite/instance'
 export * from './input'
 export * from './readonly'
 export * from './types'
@@ -252,6 +253,16 @@ function preEngine(options?: IEngineOptions): PreEngine {
     }
   }
 
+  let compositeProvider: CompositeProvider | null = null
+
+  function setCompositeProvider(provider: CompositeProvider) {
+    compositeProvider = provider
+  }
+
+  function getCompositeProvider(): CompositeProvider | null {
+    return compositeProvider
+  }
+
   return {
     addEntity,
     removeEntity,
@@ -272,7 +283,9 @@ function preEngine(options?: IEngineOptions): PreEngine {
     registerComponentDefinition,
     entityContainer,
     componentsIter,
-    seal
+    seal,
+    setCompositeProvider,
+    getCompositeProvider
   }
 }
 /**
@@ -311,7 +324,7 @@ export function Engine(options?: IEngineOptions): IEngine {
     await crdtSystem.sendMessages(deletedEntites)
   }
 
-  return {
+  const engineInstance: IEngine = {
     _id: Date.now(),
     addEntity: partialEngine.addEntity,
     removeEntity: partialEngine.removeEntity,
@@ -340,6 +353,10 @@ export function Engine(options?: IEngineOptions): IEngine {
     getEntityState: partialEngine.entityContainer.getEntityState,
     addTransport: crdtSystem.addTransport,
 
-    entityContainer: partialEngine.entityContainer
+    entityContainer: partialEngine.entityContainer,
+    setCompositeProvider: partialEngine.setCompositeProvider,
+    getCompositeProvider: partialEngine.getCompositeProvider
   }
+
+  return engineInstance
 }

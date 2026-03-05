@@ -11,6 +11,7 @@ import { Entity, IEntityContainer, EntityState } from './entity'
 import { ValueSetOptions } from './grow-only-value-set-component-definition'
 import { ReadonlyComponentSchema } from './readonly'
 import { SystemFn, SystemItem } from './systems'
+import type { CompositeProvider } from '../composite/instance'
 export * from './component'
 export { ValueSetOptions }
 
@@ -64,6 +65,8 @@ export type PreEngine = Pick<
   | 'getEntityOrNullByName'
   | 'getEntityByName'
   | 'getEntitiesByTag'
+  | 'setCompositeProvider'
+  | 'getCompositeProvider'
 > & {
   getSystems: () => SystemItem[]
 }
@@ -318,4 +321,18 @@ export interface IEngine {
    * Entity container with custom methods to update their state.
    */
   entityContainer: IEntityContainer
+
+  /**
+   * @public
+   * Register the composite provider used to resolve composite files.
+   * Called once by the SDK at initialization time.
+   */
+  setCompositeProvider(provider: CompositeProvider): void
+
+  /**
+   * @public
+   * Get the composite provider registered via setCompositeProvider.
+   * Returns null if no provider has been set.
+   */
+  getCompositeProvider(): CompositeProvider | null
 }
