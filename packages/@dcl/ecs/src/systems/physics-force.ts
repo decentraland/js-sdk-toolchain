@@ -66,9 +66,9 @@ export function createPhysicsForceHelper(engine: IEngine): PhysicsForceHelper {
 
   function applyForceToPlayer(source: Entity, vector: Vector3Type, magnitude?: number): void {
     let finalVector: Vector3Type
+    if (Vector3.equalsToFloats(vector, 0, 0, 0)) return
 
     if (typeof magnitude === 'number') {
-      if (Vector3.equalsToFloats(vector, 0, 0, 0)) return
       finalVector = Vector3.scale(Vector3.normalize(vector), magnitude)
     } else {
       finalVector = vector
