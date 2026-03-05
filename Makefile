@@ -36,9 +36,18 @@ install:
 	make install-protobuf
 
 update-protocol:
-	npm i --save-exact @dcl/protocol@next
-	cd packages/@dcl/sdk-commands; npm i --save-exact @dcl/protocol@next
-	$(MAKE) sync-deps compile_apis
+	@PROTO_TAG=$(word 2,$(MAKECMDGOALS)); \
+	if [ -z "$$PROTO_TAG" ]; then PROTO_TAG=next; fi; \
+	if [ "$$PROTO_TAG" != "next" ] && [ "$$PROTO_TAG" != "experimental" ]; then \
+	  echo "$$PROTO_TAG is not a valid argument" && exit 1; \
+	fi; \
+	echo "Using protocol tag: $$PROTO_TAG"; \
+	npm i --save-exact @dcl/protocol@$$PROTO_TAG; \
+	(cd packages/@dcl/sdk-commands && npm i --save-exact @dcl/protocol@$$PROTO_TAG); \
+	$(MAKE) sync-deps
+
+%:
+	@:
 
 lint:
 	npx tsx scripts/lint-packages.ts
