@@ -1985,6 +1985,46 @@ export namespace MoveContinuous {
     export function encode(message: MoveContinuous, writer?: _m0.Writer): _m0.Writer;
 }
 
+// @public (undocumented)
+export interface MoveRotateScale {
+    // (undocumented)
+    positionEnd: PBVector3 | undefined;
+    // (undocumented)
+    positionStart: PBVector3 | undefined;
+    // (undocumented)
+    rotationEnd: PBQuaternion | undefined;
+    // (undocumented)
+    rotationStart: PBQuaternion | undefined;
+    // (undocumented)
+    scaleEnd: PBVector3 | undefined;
+    // (undocumented)
+    scaleStart: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace MoveRotateScale {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): MoveRotateScale;
+    // (undocumented)
+    export function encode(message: MoveRotateScale, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public
+export interface MoveRotateScaleModeParams {
+    position?: {
+        start: PBVector3;
+        end: PBVector3;
+    };
+    rotation?: {
+        start: PBQuaternion;
+        end: PBQuaternion;
+    };
+    scale?: {
+        start: PBVector3;
+        end: PBVector3;
+    };
+}
+
 // Warning: (ae-missing-release-tag) "Name" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -2590,7 +2630,11 @@ export interface PBInputModifier_StandardInput {
     // (undocumented)
     disableAll?: boolean | undefined;
     // (undocumented)
+    disableDoubleJump?: boolean | undefined;
+    // (undocumented)
     disableEmote?: boolean | undefined;
+    // (undocumented)
+    disableGliding?: boolean | undefined;
     // (undocumented)
     disableJog?: boolean | undefined;
     // (undocumented)
@@ -3276,6 +3320,9 @@ export interface PBTween {
     } | {
         $case: "textureMoveContinuous";
         textureMoveContinuous: TextureMoveContinuous;
+    } | {
+        $case: "moveRotateScale";
+        moveRotateScale: MoveRotateScale;
     } | undefined;
     playing?: boolean | undefined;
 }
@@ -3672,6 +3719,12 @@ export namespace PBVisibilityComponent {
     // (undocumented)
     export function encode(message: PBVisibilityComponent, writer?: _m0.Writer): _m0.Writer;
 }
+
+// @public (undocumented)
+export const PhysicsCombinedForce: LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedForce>;
+
+// @public (undocumented)
+export const PhysicsCombinedImpulse: LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedImpulse>;
 
 // @public
 export const Physics: PhysicsSystem;
@@ -4351,6 +4404,12 @@ export namespace Schemas {
     }) => void;
 }
 
+// @public
+export interface SetMoveRotateScaleParams extends MoveRotateScaleModeParams {
+    duration: number;
+    easingFunction?: EasingFunction;
+}
+
 // @public (undocumented)
 export const SkyboxTime: LastWriteWinElementSetComponentDefinition<PBSkyboxTime>;
 
@@ -4726,6 +4785,7 @@ export interface TweenComponentDefinitionExtended extends LastWriteWinElementSet
     Mode: TweenHelper;
     setMove(entity: Entity, start: PBVector3, end: PBVector3, duration: number, easingFunction?: EasingFunction): void;
     setMoveContinuous(entity: Entity, direction: PBVector3, speed: number, duration?: number): void;
+    setMoveRotateScale(entity: Entity, params: SetMoveRotateScaleParams): void;
     setRotate(entity: Entity, start: PBQuaternion, end: PBQuaternion, duration: number, easingFunction?: EasingFunction): void;
     setRotateContinuous(entity: Entity, direction: PBQuaternion, speed: number, duration?: number): void;
     setScale(entity: Entity, start: PBVector3, end: PBVector3, duration: number, easingFunction?: EasingFunction): void;
@@ -4739,6 +4799,8 @@ export interface TweenHelper {
     Move: (move: Move) => PBTween['mode'];
     // (undocumented)
     MoveContinuous: (move: MoveContinuous) => PBTween['mode'];
+    // (undocumented)
+    MoveRotateScale: (params: MoveRotateScaleModeParams) => PBTween['mode'];
     // (undocumented)
     Rotate: (rotate: Rotate) => PBTween['mode'];
     // (undocumented)
