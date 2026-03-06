@@ -19,15 +19,9 @@ export type IProfile = { networkId: number; userId: string }
 export const AUTH_SERVER_PEER_ID = 'authoritative-server'
 export const DEBUG_NETWORK_MESSAGES = () => (globalThis as any).DEBUG_NETWORK_MESSAGES ?? false
 
-// Test environment detection without 'as any'
-const isTestEnvironment = (): boolean => {
-  try {
-    if (typeof globalThis === 'undefined') return false
-    const globalWithProcess = globalThis as unknown as { process?: { env?: { NODE_ENV?: string } } }
-    return globalWithProcess.process?.env?.NODE_ENV === 'test'
-  } catch {
-    return false
-  }
+function isTestEnvironment(): boolean {
+  const g = globalThis as unknown as { process?: { env?: { NODE_ENV?: string } } }
+  return g.process?.env?.NODE_ENV === 'test'
 }
 
 export function addSyncTransport(
@@ -128,9 +122,8 @@ export function addSyncTransport(
     }
   })
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, async (data, sender) => {
-    requestingState = false
-    elapsedTimeSinceRequest = 0
     if (isServerAtom.getOrNull() || sender !== AUTH_SERVER_PEER_ID) return
+    resetBackoff()
     DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength / 1024, 'KB')
     if (data.byteLength > 0) {
       transport.onmessage!(serverValidator.processClientMessages(data, sender))
@@ -168,8 +161,8 @@ export function addSyncTransport(
     // Only accept authoritative messages from authoritative server
     if (sender !== AUTH_SERVER_PEER_ID) return
 
-    // DEBUG_NETWORK_MESSAGES() &&
-    console.log('[AUTHORITATIVE] Received authoritative message from server:', value.byteLength, 'bytes')
+    DEBUG_NETWORK_MESSAGES() &&
+      console.log('[AUTHORITATIVE] Received authoritative message from server:', value.byteLength, 'bytes')
 
     // Process authoritative messages by forcing them through normal CRDT processing
     // but with a timestamp that's guaranteed to be accepted
@@ -201,6 +194,7 @@ export function addSyncTransport(
         isRoomReadyAtom.swap(false)
         if (!isServer) {
           stateIsSyncronized = false
+          resetBackoff()
         }
       }
     }
@@ -218,9 +212,21 @@ export function addSyncTransport(
     }
   })
 
+  const STATE_REQUEST_INITIAL_INTERVAL = 2.0 // seconds
+  const STATE_REQUEST_MAX_INTERVAL = 16.0 // cap
+  const STATE_REQUEST_MAX_RETRIES = 10
+
   let requestingState = false
   let elapsedTimeSinceRequest = 0
-  const STATE_REQUEST_RETRY_INTERVAL = 2.0 // seconds
+  let retryCount = 0
+  let currentRetryInterval = STATE_REQUEST_INITIAL_INTERVAL
+
+  function resetBackoff(): void {
+    requestingState = false
+    elapsedTimeSinceRequest = 0
+    retryCount = 0
+    currentRetryInterval = STATE_REQUEST_INITIAL_INTERVAL
+  }
 
   /**
    * Why we have to request the state if we have a server that can send us the state when we joined?
@@ -233,22 +239,28 @@ export function addSyncTransport(
   function requestState() {
     if (isServerAtom.getOrNull()) return
     if (RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom && !requestingState) {
+      resetBackoff()
       requestingState = true
-      elapsedTimeSinceRequest = 0
       DEBUG_NETWORK_MESSAGES() && console.log('Requesting state...')
       binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
     }
   }
 
-  // System to retry state request if no response is received within the retry interval
+  // System to retry state request with exponential backoff
   engine.addSystem((dt: number) => {
     if (requestingState && !stateIsSyncronized) {
       elapsedTimeSinceRequest += dt
-      if (elapsedTimeSinceRequest >= STATE_REQUEST_RETRY_INTERVAL) {
-        DEBUG_NETWORK_MESSAGES() && console.log('State request timed out, retrying...')
+      if (elapsedTimeSinceRequest >= currentRetryInterval) {
+        retryCount++
+        if (retryCount > STATE_REQUEST_MAX_RETRIES) {
+          DEBUG_NETWORK_MESSAGES() && console.log('State request max retries reached, giving up')
+          requestingState = false
+          return
+        }
+        DEBUG_NETWORK_MESSAGES() && console.log(`State request timed out (attempt ${retryCount}), retrying...`)
+        currentRetryInterval = Math.min(currentRetryInterval * 2, STATE_REQUEST_MAX_INTERVAL)
         elapsedTimeSinceRequest = 0
-        requestingState = false
-        requestState()
+        binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
       }
     }
   })
