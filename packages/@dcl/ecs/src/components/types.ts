@@ -28,3 +28,9 @@ export type { INetowrkParent, INetowrkParentType } from './manual/NetworkParent'
 export type { InputModifierHelper, InputModifierComponentDefinitionExtended } from './extended/InputModifier'
 export type { LightSourceHelper, LightSourceComponentDefinitionExtended } from './extended/LightSource'
 export type { TriggerAreaComponentDefinitionExtended } from './extended/TriggerArea'
+export type {
+  ParticleSystemShapeHelper,
+  ParticleSystemComponentDefinitionExtended,
+  ParticleSystemBlendMode,
+  ParticleSystemPlaybackState
+} from './extended/ParticleSystem'

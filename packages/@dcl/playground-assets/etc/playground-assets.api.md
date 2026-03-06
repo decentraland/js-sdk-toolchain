@@ -697,6 +697,7 @@ export const componentDefinitionByName: {
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
     "core::NftShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBNftShape>>;
+    "core::ParticleSystem": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBParticleSystem>>;
     "core::PhysicsCombinedForce": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedForce>>;
     "core::PhysicsCombinedImpulse": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedImpulse>>;
     "core::PlayerIdentityData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>>;
@@ -2262,6 +2263,24 @@ export const onVideoEvent: Observable<{
 // @public
 export type OverflowType = 'hidden' | 'scroll' | 'visible';
 
+// Warning: (ae-missing-release-tag) "ParticleSystem" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const ParticleSystem: ParticleSystemComponentDefinitionExtended;
+
+// @public (undocumented)
+export interface ParticleSystemComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBParticleSystem> {
+    Shape: ParticleSystemShapeHelper;
+}
+
+// @public (undocumented)
+export interface ParticleSystemShapeHelper {
+    Box: (box?: PBParticleSystem_Box) => PBParticleSystem['shape'];
+    Cone: (cone?: PBParticleSystem_Cone) => PBParticleSystem['shape'];
+    Point: (point?: PBParticleSystem_Point) => PBParticleSystem['shape'];
+    Sphere: (sphere?: PBParticleSystem_Sphere) => PBParticleSystem['shape'];
+}
+
 // @public (undocumented)
 export interface PBAnimationState {
     clip: string;
@@ -3037,6 +3056,178 @@ export namespace PBNftShape {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBNftShape;
     // (undocumented)
     export function encode(message: PBNftShape, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBParticleSystem {
+    active?: boolean | undefined;
+    additionalForce?: PBVector3 | undefined;
+    billboard?: boolean | undefined;
+    blendMode?: PBParticleSystem_BlendMode | undefined;
+    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+    colorOverTime?: PBParticleSystem_ColorRange | undefined;
+    gravity?: number | undefined;
+    initialColor?: PBParticleSystem_ColorRange | undefined;
+    initialRotation?: PBParticleSystem_FloatRange | undefined;
+    initialSize?: PBParticleSystem_FloatRange | undefined;
+    initialVelocitySpeed?: PBParticleSystem_FloatRange | undefined;
+    lifetime?: number | undefined;
+    maxParticles?: number | undefined;
+    playbackState?: PBParticleSystem_PlaybackState | undefined;
+    rate?: number | undefined;
+    restartCount?: number | undefined;
+    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+    rotationOverTime?: PBParticleSystem_FloatRange | undefined;
+    // (undocumented)
+    shape?: {
+        $case: "point";
+        point: PBParticleSystem_Point;
+    } | {
+        $case: "sphere";
+        sphere: PBParticleSystem_Sphere;
+    } | {
+        $case: "cone";
+        cone: PBParticleSystem_Cone;
+    } | {
+        $case: "box";
+        box: PBParticleSystem_Box;
+    } | undefined;
+    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+    sizeOverTime?: PBParticleSystem_FloatRange | undefined;
+    spriteSheet?: PBParticleSystem_SpriteSheetAnimation | undefined;
+    texture?: Texture | undefined;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem;
+    // (undocumented)
+    export function encode(message: PBParticleSystem, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+const enum PBParticleSystem_BlendMode {
+    PSB_ADD = 1,
+    PSB_ALPHA = 0,
+    PSB_MULTIPLY = 2
+}
+export { PBParticleSystem_BlendMode }
+export { PBParticleSystem_BlendMode as ParticleSystemBlendMode }
+
+// @public (undocumented)
+export interface PBParticleSystem_Box {
+    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+    size?: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_Box {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_Box;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_Box, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_ColorRange {
+    // (undocumented)
+    end: PBColor4 | undefined;
+    // (undocumented)
+    start: PBColor4 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_ColorRange {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_ColorRange;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_ColorRange, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_Cone {
+    angle?: number | undefined;
+    radius?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_Cone {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_Cone;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_Cone, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_FloatRange {
+    // (undocumented)
+    end: number;
+    // (undocumented)
+    start: number;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_FloatRange {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_FloatRange;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_FloatRange, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+const enum PBParticleSystem_PlaybackState {
+    PS_PAUSED = 1,
+    PS_PLAYING = 0,
+    PS_STOPPED = 2
+}
+export { PBParticleSystem_PlaybackState }
+export { PBParticleSystem_PlaybackState as ParticleSystemPlaybackState }
+
+// @public (undocumented)
+export interface PBParticleSystem_Point {
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_Point {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_Point;
+    // (undocumented)
+    export function encode(_: PBParticleSystem_Point, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_Sphere {
+    radius?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_Sphere {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_Sphere;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_Sphere, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_SpriteSheetAnimation {
+    cyclesPerLifetime?: number | undefined;
+    endFrame: number;
+    startFrame: number;
+    tilesX: number;
+    tilesY: number;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_SpriteSheetAnimation {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_SpriteSheetAnimation;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_SpriteSheetAnimation, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
