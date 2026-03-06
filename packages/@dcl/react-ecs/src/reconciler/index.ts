@@ -60,6 +60,9 @@ export function createReconciler(
   // Store the onChange callbacks to be runned every time a Result has changed
   const changeEvents = new Map<Entity, Map<number, OnChangeState | undefined>>()
   const clickEvents = new Map<Entity, Map<PointerEventType, Callback>>()
+  // Track the last value reported by the renderer for each input entity,
+  // so we can avoid echoing it back and causing keystroke drops.
+  const lastInputResultValues = new Map<Entity, string | undefined>()
   // Initialize components
   const UiTransform = components.UiTransform(engine)
   const UiText = components.UiText(engine)
@@ -175,6 +178,18 @@ export function createReconciler(
       delete (props as any).onSubmit
     }
 
+    // Prevent keystroke drops: when React echoes back the same value the renderer
+    // reported, strip it from the props so the component isn't marked dirty for it.
+    // This avoids sending a stale value that overwrites what the user is currently typing.
+    if (
+      componentName === 'uiInput' &&
+      'value' in props &&
+      lastInputResultValues.has(instance.entity) &&
+      (props as any).value === lastInputResultValues.get(instance.entity)
+    ) {
+      delete (props as any).value
+    }
+
     // We check if there is any key pending to be changed to avoid updating the existing component
     if (!Object.keys(props).length) {
       return
@@ -192,6 +207,7 @@ export function createReconciler(
   function removeChildEntity(instance: Instance) {
     changeEvents.delete(instance.entity)
     clickEvents.delete(instance.entity)
+    lastInputResultValues.delete(instance.entity)
     engine.removeEntity(instance.entity)
     for (const child of instance._child) {
       removeChildEntity(child)
@@ -252,6 +268,9 @@ export function createReconciler(
       const resultComponentId =
         componentId === UiDropdown.componentId ? UiDropdownResult.componentId : UiInputResult.componentId
       engine.getComponent<PBUiInputResult | PBUiDropdownResult>(resultComponentId).onChange(entity, (value) => {
+        if (resultComponentId === UiInputResult.componentId) {
+          lastInputResultValues.set(entity, value?.value as string | undefined)
+        }
         if ((value as PBUiInputResult)?.isSubmit) {
           const onSubmit = changeEvents.get(entity)?.get(componentId)?.onSubmitCallback
           onSubmit && onSubmit(value?.value)

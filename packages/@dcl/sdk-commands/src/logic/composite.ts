@@ -22,7 +22,13 @@ export type Script = ScriptItem & {
 export async function getAllComposites(
   components: CompositeComponents,
   workingDirectory: string
-): Promise<{ watchFiles: string[]; compositeLines: string[]; scripts: Map<string, Script[]>; withErrors: boolean }> {
+): Promise<{
+  watchFiles: string[]
+  compositeLines: string[]
+  scripts: Map<string, Script[]>
+  withErrors: boolean
+  maxCompositeEntity: number
+}> {
   let withErrors = false
   const composites: Record<string, Composite.Definition> = {}
   const watchFiles = globSync('**/*.composite', { cwd: workingDirectory })
@@ -84,10 +90,23 @@ export async function getAllComposites(
     }
   }
 
+  // Compute composite's highest entity number
+  let maxCompositeEntity = 0
+  for (const composite of Object.values(composites)) {
+    for (const component of composite.components) {
+      for (const entityId of component.data.keys()) {
+        const entityNumber = (entityId & 0xffff) >>> 0
+        if (entityNumber > maxCompositeEntity) {
+          maxCompositeEntity = entityNumber
+        }
+      }
+    }
+  }
+
   // generate CRDT binary
   const crdtFilePath = path.join(workingDirectory, 'main.crdt')
   const crdtData = dumpEngineToCrdtCommands(engine as any)
   await components.fs.writeFile(crdtFilePath, crdtData)
 
-  return { compositeLines, watchFiles, scripts, withErrors }
+  return { compositeLines, watchFiles, scripts, withErrors, maxCompositeEntity }
 }
