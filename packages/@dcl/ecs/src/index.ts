@@ -38,7 +38,8 @@ import {
   VirtualCameraComponentDefinitionExtended,
   InputModifierComponentDefinitionExtended,
   LightSourceComponentDefinitionExtended,
-  TriggerAreaComponentDefinitionExtended
+  TriggerAreaComponentDefinitionExtended,
+  ParticleSystemComponentDefinitionExtended
 } from './components/types'
 import { NameComponent } from './components/manual/Name'
 import { TagsComponentDefinitionExtended } from './components/manual/Tags'
@@ -59,6 +60,7 @@ export const VirtualCamera: VirtualCameraComponentDefinitionExtended = /* @__PUR
 export const InputModifier: InputModifierComponentDefinitionExtended = /* @__PURE__*/ components.InputModifier(engine)
 export const LightSource: LightSourceComponentDefinitionExtended = /* @__PURE__*/ components.LightSource(engine)
 export const TriggerArea: TriggerAreaComponentDefinitionExtended = /* @__PURE__*/ components.TriggerArea(engine)
+export const ParticleSystem: ParticleSystemComponentDefinitionExtended = /* @__PURE__*/ components.ParticleSystem(engine)
 
 /**
  * @alpha
