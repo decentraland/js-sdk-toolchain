@@ -141,6 +141,33 @@ export async function wireRouter(components: PreviewComponents, workspace: Works
     }
   })
 
+  // Editor changes — accept updates via POST (used by auth-server when WebSocket is unavailable)
+  router.post('/editor/changes', async (ctx) => {
+    try {
+      const body = await ctx.request.json()
+      if (body && typeof body === 'object') {
+        for (const [name, value] of Object.entries(body)) {
+          if (name && value && typeof value === 'object') {
+            editorChanges.set(name, value)
+            components.logger.log(`[editor] updated: ${name}`)
+          }
+        }
+        if (editorWriteTimer) clearTimeout(editorWriteTimer)
+        editorWriteTimer = setTimeout(() => flushEditorChanges(components.logger), EDITOR_WRITE_DEBOUNCE_MS)
+      }
+      return {
+        headers: { 'access-control-allow-origin': '*' },
+        body: { ok: true }
+      }
+    } catch (err: any) {
+      return {
+        status: 400,
+        headers: { 'access-control-allow-origin': '*' },
+        body: { ok: false, error: err.message || 'Invalid request' }
+      }
+    }
+  })
+
   setupRealmAndComms(components, router, localSceneParcels)
   setupStorageEndpoints(components, router, workspace)
   await setupEcs6Endpoints(components, router, workspace)

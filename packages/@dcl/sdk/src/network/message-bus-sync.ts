@@ -128,14 +128,17 @@ export function addSyncTransport(
     }
   })
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, async (data, sender) => {
+    if (isServerAtom.getOrNull() || sender !== AUTH_SERVER_PEER_ID) return
+    // Only reset for authoritative responses
     requestingState = false
     elapsedTimeSinceRequest = 0
-    if (isServerAtom.getOrNull() || sender !== AUTH_SERVER_PEER_ID) return
     DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength / 1024, 'KB')
     if (data.byteLength > 0) {
       transport.onmessage!(serverValidator.processClientMessages(data, sender))
     }
     stateIsSyncronized = true
+    retryCount = 0
+    currentRetryInterval = STATE_REQUEST_INITIAL_INTERVAL
 
     // IMPORTANT: Only mark room as ready AFTER state is synchronized
     // This ensures comms is truly connected and working
@@ -201,6 +204,9 @@ export function addSyncTransport(
         isRoomReadyAtom.swap(false)
         if (!isServer) {
           stateIsSyncronized = false
+          requestingState = false
+          retryCount = 0
+          currentRetryInterval = STATE_REQUEST_INITIAL_INTERVAL
         }
       }
     }
@@ -218,9 +224,14 @@ export function addSyncTransport(
     }
   })
 
+  const STATE_REQUEST_INITIAL_INTERVAL = 2.0 // seconds
+  const STATE_REQUEST_MAX_INTERVAL = 16.0 // cap
+  const STATE_REQUEST_MAX_RETRIES = 10
+
   let requestingState = false
   let elapsedTimeSinceRequest = 0
-  const STATE_REQUEST_RETRY_INTERVAL = 2.0 // seconds
+  let retryCount = 0
+  let currentRetryInterval = STATE_REQUEST_INITIAL_INTERVAL
 
   /**
    * Why we have to request the state if we have a server that can send us the state when we joined?
@@ -235,20 +246,28 @@ export function addSyncTransport(
     if (RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom && !requestingState) {
       requestingState = true
       elapsedTimeSinceRequest = 0
+      retryCount = 0
+      currentRetryInterval = STATE_REQUEST_INITIAL_INTERVAL
       DEBUG_NETWORK_MESSAGES() && console.log('Requesting state...')
       binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
     }
   }
 
-  // System to retry state request if no response is received within the retry interval
+  // System to retry state request with exponential backoff
   engine.addSystem((dt: number) => {
     if (requestingState && !stateIsSyncronized) {
       elapsedTimeSinceRequest += dt
-      if (elapsedTimeSinceRequest >= STATE_REQUEST_RETRY_INTERVAL) {
-        DEBUG_NETWORK_MESSAGES() && console.log('State request timed out, retrying...')
+      if (elapsedTimeSinceRequest >= currentRetryInterval) {
+        retryCount++
+        if (retryCount > STATE_REQUEST_MAX_RETRIES) {
+          DEBUG_NETWORK_MESSAGES() && console.log('State request max retries reached, giving up')
+          requestingState = false
+          return
+        }
+        DEBUG_NETWORK_MESSAGES() && console.log(`State request timed out (attempt ${retryCount}), retrying...`)
+        currentRetryInterval = Math.min(currentRetryInterval * 2, STATE_REQUEST_MAX_INTERVAL)
         elapsedTimeSinceRequest = 0
-        requestingState = false
-        requestState()
+        binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
       }
     }
   })
