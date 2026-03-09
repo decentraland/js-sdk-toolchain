@@ -7,9 +7,6 @@
 import _m0 from 'protobufjs/minimal';
 
 // @public (undocumented)
-export function addVectors(a: Vector3Type, b: Vector3Type): Vector3Type;
-
-// @public (undocumented)
 export type AlignType = 'auto' | 'flex-start' | 'center' | 'flex-end' | 'stretch' | 'baseline' | 'space-between' | 'space-around';
 
 // Warning: (ae-missing-release-tag) "Animator" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -1580,9 +1577,6 @@ export interface ISyncComponentsType {
 }
 
 // @public (undocumented)
-export function isZeroVector(v: Vector3Type): boolean;
-
-// @public (undocumented)
 export type JsonArray = Array<JsonPrimitive | JsonMap | JsonArray>;
 
 // @public (undocumented)
@@ -2101,9 +2095,6 @@ export const enum NftFrameType {
 
 // @public (undocumented)
 export const NftShape: LastWriteWinElementSetComponentDefinition<PBNftShape>;
-
-// @public (undocumented)
-export function normalizeVector(v: Vector3Type): Vector3Type;
 
 // @public @deprecated
 export class Observable<T> {
@@ -3720,12 +3711,6 @@ export namespace PBVisibilityComponent {
     export function encode(message: PBVisibilityComponent, writer?: _m0.Writer): _m0.Writer;
 }
 
-// @public (undocumented)
-export const PhysicsCombinedForce: LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedForce>;
-
-// @public (undocumented)
-export const PhysicsCombinedImpulse: LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedImpulse>;
-
 // @public
 export const Physics: PhysicsSystem;
 
@@ -4347,9 +4332,6 @@ export type ScaleUnit = `${number}${ScaleUnits}` | number;
 export type ScaleUnits = 'vw' | 'vh';
 
 // @public (undocumented)
-export function scaleVector(v: Vector3Type, s: number): Vector3Type;
-
-// @public (undocumented)
 export namespace Schemas {
     // (undocumented)
     export type SchemaType = ISchema;
@@ -4418,9 +4400,6 @@ export interface Spec {
     // (undocumented)
     [key: string]: ISchema;
 }
-
-// @public (undocumented)
-export function subtractVectors(a: Vector3Type, b: Vector3Type): Vector3Type;
 
 // @alpha
 export const SyncComponents: ISyncComponents;
@@ -5131,12 +5110,6 @@ export type Vector3Type = {
     y: number;
     z: number;
 };
-
-// @public (undocumented)
-export function vectorLength(v: Vector3Type): number;
-
-// @public (undocumented)
-export function vectorsEqual(a: Vector3Type, b: Vector3Type): boolean;
 
 // @public (undocumented)
 export const VideoEvent: GrowOnlyValueSetComponentDefinition<PBVideoEvent>;
