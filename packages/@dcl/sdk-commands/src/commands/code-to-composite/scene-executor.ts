@@ -203,11 +203,6 @@ function createCriticalModuleMocks(engine: IEngine, transport: Transport, crdtSt
     },
 
     '~system/RestrictedActions': {
-      AvatarEmoteMask: {
-        AEM_FULL_BODY: 0,
-        AEM_UPPER_BODY: 1,
-        UNRECOGNIZED: -1
-      },
       movePlayerTo: async () => ({}),
       teleportTo: async () => ({}),
       triggerEmote: async () => ({}),
