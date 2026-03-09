@@ -3073,8 +3073,11 @@ export interface PBParticleSystem {
     initialSize?: PBParticleSystem_FloatRange | undefined;
     initialVelocitySpeed?: PBParticleSystem_FloatRange | undefined;
     lifetime?: number | undefined;
+    limitVelocity?: PBParticleSystem_LimitVelocity | undefined;
+    loop?: boolean | undefined;
     maxParticles?: number | undefined;
     playbackState?: PBParticleSystem_PlaybackState | undefined;
+    prewarm?: boolean | undefined;
     rate?: number | undefined;
     restartCount?: number | undefined;
     // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
@@ -3177,6 +3180,20 @@ export namespace PBParticleSystem_FloatRange {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_FloatRange;
     // (undocumented)
     export function encode(message: PBParticleSystem_FloatRange, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_LimitVelocity {
+    dampen?: number | undefined;
+    speed: number;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_LimitVelocity {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_LimitVelocity;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_LimitVelocity, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
