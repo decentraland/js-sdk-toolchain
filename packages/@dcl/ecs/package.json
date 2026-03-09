@@ -31,9 +31,7 @@
     "displayName": "ECS",
     "tsconfig": "./tsconfig.json"
   },
-  "dependencies": {
-    "@dcl/ecs-math": "^2.1.0"
-  },
+  "dependencies": {},
   "types": "./dist/index.d.ts",
   "typings": "./dist/index.d.ts"
 }
