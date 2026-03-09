@@ -1,9 +1,8 @@
-import { Vector3 } from '@dcl/ecs-math'
 import * as components from '../components'
 import { Entity } from '../engine'
 import { IEngine } from '../engine'
 import { Vector3Type } from '../schemas'
-import { createTimers } from '../runtime/helpers'
+import { Vector3, createTimers } from '../runtime/helpers'
 import { KnockbackFalloff } from './physics-impulse'
 
 /**
