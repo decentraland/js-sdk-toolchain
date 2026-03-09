@@ -1254,6 +1254,9 @@ export const getDefaultOpts: (opts?: Partial<EventSystemOptions>) => EventSystem
 export function getEntitiesWithParent(engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema'>, parent: Entity): Entity[];
 
 // @public
+export function getGlobal<T>(key: string): T | undefined;
+
+// @public
 export function getWorldPosition(engine: WorldTransformEngine, entity: Entity): Vector3Type;
 
 // @public
@@ -4356,6 +4359,9 @@ export namespace Schemas {
         value?: any;
     }) => void;
 }
+
+// @public
+export function setGlobalPolyfill<T>(key: string, value: T): void;
 
 // @public
 export interface SetMoveRotateScaleParams extends MoveRotateScaleModeParams {
