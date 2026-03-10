@@ -1,8 +1,12 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=242.9k bytes
 =======
 SCENE_COMPILED_JS_SIZE_PROD=216.9k bytes
 >>>>>>> 327f7995 (fix tests)
+=======
+SCENE_COMPILED_JS_SIZE_PROD=225k bytes
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -12,6 +16,7 @@ EVAL test/snapshots/production-bundles/cube-deleted.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   OPCODES ~= 68k
@@ -61,6 +66,11 @@ EVAL test/snapshots/production-bundles/cube-deleted.js
   MALLOC_COUNT = 12863
   ALIVE_OBJS_DELTA ~= 2.85k
 >>>>>>> e6454fdd (fix tests)
+=======
+  OPCODES ~= 57k
+  MALLOC_COUNT = 13480
+  ALIVE_OBJS_DELTA ~= 2.96k
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -69,17 +79,23 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   Scene: PUT_COMPONENT e=0x201 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
 <<<<<<< HEAD
+<<<<<<< HEAD
   OPCODES ~= 5k
   MALLOC_COUNT = 68
 =======
   OPCODES ~= 4k
   MALLOC_COUNT = 52
 >>>>>>> 327f7995 (fix tests)
+=======
+  OPCODES ~= 4k
+  MALLOC_COUNT = 52
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
   ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0.1)
   Scene: DELETE_COMPONENT e=0x201 c=1019 t=2 data=null
   Scene: PUT_COMPONENT e=0x202 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   Scene: DELETE_ENTITY e=0x201
+<<<<<<< HEAD
 <<<<<<< HEAD
   OPCODES ~= 6k
   MALLOC_COUNT = 4
@@ -87,11 +103,16 @@ CALL onUpdate(0.1)
   OPCODES ~= 4k
   MALLOC_COUNT = 6
 >>>>>>> 327f7995 (fix tests)
+=======
+  OPCODES ~= 5k
+  MALLOC_COUNT = 6
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
   Scene: DELETE_COMPONENT e=0x202 c=1019 t=2 data=null
   Scene: PUT_COMPONENT e=0x10201 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   Scene: DELETE_ENTITY e=0x202
+<<<<<<< HEAD
 <<<<<<< HEAD
   OPCODES ~= 6k
   MALLOC_COUNT = 2
@@ -99,11 +120,16 @@ CALL onUpdate(0.1)
   OPCODES ~= 4k
   MALLOC_COUNT = 4
 >>>>>>> 327f7995 (fix tests)
+=======
+  OPCODES ~= 5k
+  MALLOC_COUNT = 4
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
   Scene: DELETE_COMPONENT e=0x10201 c=1019 t=2 data=null
   Scene: PUT_COMPONENT e=0x10202 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   Scene: DELETE_ENTITY e=0x10201
+<<<<<<< HEAD
 <<<<<<< HEAD
   OPCODES ~= 6k
   MALLOC_COUNT = 1
@@ -115,3 +141,9 @@ CALL onUpdate(0.1)
   ALIVE_OBJS_DELTA ~= 0.00k
   MEMORY_USAGE_COUNT ~= 933.76k bytes
 >>>>>>> 327f7995 (fix tests)
+=======
+  OPCODES ~= 5k
+  MALLOC_COUNT = 1
+  ALIVE_OBJS_DELTA ~= 0.00k
+  MEMORY_USAGE_COUNT ~= 961.12k bytes
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)

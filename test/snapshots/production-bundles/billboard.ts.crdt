@@ -1,8 +1,12 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=287.5k bytes
 =======
 SCENE_COMPILED_JS_SIZE_PROD=253.8k bytes
 >>>>>>> 327f7995 (fix tests)
+=======
+SCENE_COMPILED_JS_SIZE_PROD=269.6k bytes
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -12,6 +16,7 @@ EVAL test/snapshots/production-bundles/billboard.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   OPCODES ~= 79k
@@ -61,6 +66,11 @@ EVAL test/snapshots/production-bundles/billboard.js
   MALLOC_COUNT = 15819
   ALIVE_OBJS_DELTA ~= 3.47k
 >>>>>>> e6454fdd (fix tests)
+=======
+  OPCODES ~= 68k
+  MALLOC_COUNT = 16993
+  ALIVE_OBJS_DELTA ~= 3.69k
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 4
@@ -101,6 +111,7 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x204 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
   Scene: PUT_COMPONENT e=0x205 c=1018 t=1 data={"mesh":{"$case":"plane","plane":{"uvs":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0]}}}
 <<<<<<< HEAD
+<<<<<<< HEAD
   OPCODES ~= 114k
   MALLOC_COUNT = 361
   ALIVE_OBJS_DELTA ~= 0.10k
@@ -109,16 +120,25 @@ CALL onUpdate(0)
   MALLOC_COUNT = 59
   ALIVE_OBJS_DELTA ~= 0.02k
 >>>>>>> 327f7995 (fix tests)
+=======
+  OPCODES ~= 110k
+  MALLOC_COUNT = 59
+  ALIVE_OBJS_DELTA ~= 0.02k
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=2 data={"position":{"x":8,"y":3.0420734882354736,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   Scene: PUT_COMPONENT e=0x201 c=1 t=2 data={"position":{"x":12,"y":3.0420734882354736,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   Scene: PUT_COMPONENT e=0x204 c=1 t=2 data={"position":{"x":12,"y":3.0420734882354736,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   Scene: PUT_COMPONENT e=0x203 c=1 t=2 data={"position":{"x":8,"y":3.0420734882354736,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
 <<<<<<< HEAD
+<<<<<<< HEAD
   OPCODES ~= 12k
 =======
   OPCODES ~= 9k
 >>>>>>> 327f7995 (fix tests)
+=======
+  OPCODES ~= 9k
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
@@ -127,10 +147,14 @@ CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x204 c=1 t=3 data={"position":{"x":12,"y":3.087538480758667,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   Scene: PUT_COMPONENT e=0x203 c=1 t=3 data={"position":{"x":8,"y":3.087538480758667,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
 <<<<<<< HEAD
+<<<<<<< HEAD
   OPCODES ~= 12k
 =======
   OPCODES ~= 9k
 >>>>>>> 327f7995 (fix tests)
+=======
+  OPCODES ~= 9k
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
@@ -138,6 +162,7 @@ CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x201 c=1 t=4 data={"position":{"x":12,"y":3.0945944786071777,"z":1},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   Scene: PUT_COMPONENT e=0x204 c=1 t=4 data={"position":{"x":12,"y":3.0945944786071777,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
   Scene: PUT_COMPONENT e=0x203 c=1 t=4 data={"position":{"x":8,"y":3.0945944786071777,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":2,"y":2,"z":2},"parent":0}
+<<<<<<< HEAD
 <<<<<<< HEAD
   OPCODES ~= 12k
   MALLOC_COUNT = 0
@@ -149,3 +174,9 @@ CALL onUpdate(0.1)
   ALIVE_OBJS_DELTA ~= 0.00k
   MEMORY_USAGE_COUNT ~= 1123.21k bytes
 >>>>>>> 327f7995 (fix tests)
+=======
+  OPCODES ~= 9k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+  MEMORY_USAGE_COUNT ~= 1178.85k bytes
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
