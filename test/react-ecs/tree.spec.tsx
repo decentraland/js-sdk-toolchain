@@ -647,4 +647,136 @@ describe('RectEcs UI ✨', () => {
     expect(getUi(entityA).width).toBe(1)
     expect(getUi(entityB).width).toBe(2)
   })
+
+  it('should not produce circular rightOf when reordering 3+ keyed siblings via insertBefore', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    let uiEntities: { id: number; value: number }[] = [
+      { id: 1, value: 1 },
+      { id: 2, value: 2 },
+      { id: 3, value: 3 }
+    ]
+
+    const entityA = (entityIndex + 1) as Entity
+    const entityB = (entityIndex + 2) as Entity
+    const entityC = (entityIndex + 3) as Entity
+    const rootEntity = (entityIndex + uiEntities.length + 1) as Entity
+
+    const getUi = (entity: any) => UiTransform.get(entity as Entity)
+
+    const ui = () => (
+      <UiEntity uiTransform={{ width: 111 }}>
+        {uiEntities.map((props) => (
+          <UiEntity key={props.id} uiTransform={{ width: props.value }} />
+        ))}
+      </UiEntity>
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+
+    // Initial order: [A, B, C]
+    expect(getUi(entityA)).toMatchObject({ parent: rootEntity, rightOf: undefined, width: 1 })
+    expect(getUi(entityB)).toMatchObject({ parent: rootEntity, rightOf: entityA, width: 2 })
+    expect(getUi(entityC)).toMatchObject({ parent: rootEntity, rightOf: entityB, width: 3 })
+
+    // Reorder [A, B, C] → [B, A, C]
+    // React reconciliation: B stays (oldIdx=1 >= lastPlaced=0), A moves (oldIdx=0 < lastPlaced=1), C stays.
+    // React commits A via insertBefore(parent, A, C) since C is the next non-moved sibling.
+    // BUG: insertBefore doesn't handle reorders, so B.rightOf=A is never updated,
+    // producing A.rightOf=B AND B.rightOf=A (mutual cycle).
+    uiEntities = [
+      { id: 2, value: 2 },
+      { id: 1, value: 1 },
+      { id: 3, value: 3 }
+    ]
+    await engine.update(1)
+
+    // Expected correct order: [B, A, C]
+    expect(getUi(entityB)).toMatchObject({ parent: rootEntity, rightOf: undefined, width: 2 })
+    expect(getUi(entityA)).toMatchObject({ parent: rootEntity, rightOf: entityB, width: 1 })
+    expect(getUi(entityC)).toMatchObject({ parent: rootEntity, rightOf: entityA, width: 3 })
+
+    // Verify no circular rightOf: no entity should reference itself or form a cycle
+    const rightOfA = getUi(entityA).rightOf
+    const rightOfB = getUi(entityB).rightOf
+    const rightOfC = getUi(entityC).rightOf
+    expect(rightOfA).not.toBe(entityA) // no self-cycle
+    expect(rightOfB).not.toBe(entityB)
+    expect(rightOfC).not.toBe(entityC)
+    // no mutual cycle: if A.rightOf=X then X.rightOf must not be A
+    if (rightOfA) expect(getUi(rightOfA).rightOf).not.toBe(entityA)
+    if (rightOfB) expect(getUi(rightOfB).rightOf).not.toBe(entityB)
+    if (rightOfC) expect(getUi(rightOfC).rightOf).not.toBe(entityC)
+  })
+
+  it('should not produce circular rightOf when reordering 4 keyed siblings with insertBefore and appendChild', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    let uiEntities: { id: number; value: number }[] = [
+      { id: 1, value: 1 },
+      { id: 2, value: 2 },
+      { id: 3, value: 3 },
+      { id: 4, value: 4 }
+    ]
+
+    const entityA = (entityIndex + 1) as Entity
+    const entityB = (entityIndex + 2) as Entity
+    const entityC = (entityIndex + 3) as Entity
+    const entityD = (entityIndex + 4) as Entity
+    const rootEntity = (entityIndex + uiEntities.length + 1) as Entity
+
+    const getUi = (entity: any) => UiTransform.get(entity as Entity)
+
+    const ui = () => (
+      <UiEntity uiTransform={{ width: 111 }}>
+        {uiEntities.map((props) => (
+          <UiEntity key={props.id} uiTransform={{ width: props.value }} />
+        ))}
+      </UiEntity>
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+
+    // Initial order: [A, B, C, D]
+    expect(getUi(entityA)).toMatchObject({ parent: rootEntity, rightOf: undefined, width: 1 })
+    expect(getUi(entityB)).toMatchObject({ parent: rootEntity, rightOf: entityA, width: 2 })
+    expect(getUi(entityC)).toMatchObject({ parent: rootEntity, rightOf: entityB, width: 3 })
+    expect(getUi(entityD)).toMatchObject({ parent: rootEntity, rightOf: entityC, width: 4 })
+
+    // Reorder [A, B, C, D] → [C, A, D, B]
+    // React reconciliation:
+    //   C: oldIdx=2 >= last=0, no move, last=2
+    //   A: oldIdx=0 < last=2, MOVE → insertBefore(parent, A, D)
+    //   D: oldIdx=3 >= last=2, no move, last=3
+    //   B: oldIdx=1 < last=3, MOVE → appendChild(parent, B)
+    // BUG: insertBefore(A, D) corrupts the chain, then appendChild(B) cascades into A↔C cycle.
+    uiEntities = [
+      { id: 3, value: 3 },
+      { id: 1, value: 1 },
+      { id: 4, value: 4 },
+      { id: 2, value: 2 }
+    ]
+    await engine.update(1)
+
+    // Expected correct order: [C, A, D, B]
+    expect(getUi(entityC)).toMatchObject({ parent: rootEntity, rightOf: undefined, width: 3 })
+    expect(getUi(entityA)).toMatchObject({ parent: rootEntity, rightOf: entityC, width: 1 })
+    expect(getUi(entityD)).toMatchObject({ parent: rootEntity, rightOf: entityA, width: 4 })
+    expect(getUi(entityB)).toMatchObject({ parent: rootEntity, rightOf: entityD, width: 2 })
+
+    // Verify no circular rightOf
+    const entities = [entityA, entityB, entityC, entityD]
+    for (const entity of entities) {
+      const rightOf = getUi(entity).rightOf
+      // no self-cycle
+      expect(rightOf).not.toBe(entity)
+      // no mutual cycle
+      if (rightOf) expect(getUi(rightOf).rightOf).not.toBe(entity)
+    }
+  })
 })

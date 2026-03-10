@@ -359,6 +359,18 @@ export function createReconciler(
       }
     },
     insertBefore(parentInstance: Instance, child: Instance, beforeChild: Instance): void {
+      // Handle reorder: if child already exists in this parent, remove it from its old position
+      // and fix up the old neighbor's rightOf before inserting at the new position.
+      const existingIndex = parentInstance._child.findIndex((c) => c.entity === child.entity)
+      if (existingIndex !== -1) {
+        const oldNextSibling = parentInstance._child[existingIndex + 1]
+        if (oldNextSibling && oldNextSibling.entity !== beforeChild.entity) {
+          oldNextSibling.rightOf = child.rightOf
+          updateTree(oldNextSibling, { rightOf: oldNextSibling.rightOf })
+        }
+        parentInstance._child.splice(existingIndex, 1)
+      }
+
       const beforeChildIndex = parentInstance._child.findIndex((c) => c.entity === beforeChild.entity)
       parentInstance._child = [
         ...parentInstance._child.slice(0, beforeChildIndex),
