@@ -122,7 +122,6 @@ export function createForceUpdateLwwFromCrdt(
    * Force update component state regardless of timestamp - used for server authoritative messages
    */
   return (msg: AuthoritativePutComponentMessageBody): [null, any] => {
-    console.log('[ BOEDO ] [ CASLA ] ', msg)
     const buffer = new ReadWriteByteBuffer(msg.data)
     const deserializedValue = schema.deserialize(buffer)
 
