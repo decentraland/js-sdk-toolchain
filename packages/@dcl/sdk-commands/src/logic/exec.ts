@@ -3,6 +3,7 @@ import type { spawn } from 'child_process'
 interface Options {
   env: { [key: string]: string }
   silent: boolean
+  shell: boolean
 }
 
 export type IProcessSpawnerComponent = {
@@ -11,10 +12,15 @@ export type IProcessSpawnerComponent = {
 
 export function createProcessSpawnerComponent(spawnFn: typeof spawn): IProcessSpawnerComponent {
   return {
-    exec(cwd: string, command: string, args: string[], { env, silent }: Partial<Options> = {}): Promise<void> {
+    exec(
+      cwd: string,
+      command: string,
+      args: string[],
+      { env, silent, shell = true }: Partial<Options> = {}
+    ): Promise<void> {
       return new Promise((resolve, reject) => {
         const child = spawnFn(command, args, {
-          shell: true,
+          shell,
           cwd,
           env: { ...process.env, NODE_ENV: '', ...env }
         })

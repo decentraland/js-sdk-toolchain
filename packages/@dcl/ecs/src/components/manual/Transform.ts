@@ -17,7 +17,7 @@ export interface TransformComponentExtended extends TransformComponent {
 }
 
 /**
- * @internal
+ * @public
  */
 export const COMPONENT_ID = 1
 
@@ -31,10 +31,10 @@ export type TransformType = {
   parent?: Entity
 }
 
-/** @internal */
+/** @public */
 export const TRANSFORM_LENGTH = 44
 
-/** @internal */
+/** @public */
 export const TransformSchema: ISchema<TransformType> = {
   serialize(value: TransformType, builder: ByteBuffer): void {
     const ptr = builder.incrementWriteOffset(TRANSFORM_LENGTH)
