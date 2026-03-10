@@ -1,12 +1,21 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=244.1k bytes
 =======
+=======
+>>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
 <<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=242.8k bytes
 =======
 SCENE_COMPILED_JS_SIZE_PROD=216.8k bytes
 >>>>>>> 327f7995 (fix tests)
+<<<<<<< HEAD
 >>>>>>> 11b9aad2 (fix tests)
+=======
+=======
+SCENE_COMPILED_JS_SIZE_PROD=224.9k bytes
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
+>>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -17,11 +26,14 @@ EVAL test/snapshots/production-bundles/cube.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
 <<<<<<< HEAD
+<<<<<<< HEAD
   REQUIRE: ~system/Runtime
   OPCODES ~= 75k
   MALLOC_COUNT = 14254
   ALIVE_OBJS_DELTA ~= 3.16k
 =======
+=======
+>>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
 <<<<<<< HEAD
   OPCODES ~= 67k
   MALLOC_COUNT = 13997
@@ -68,13 +80,22 @@ EVAL test/snapshots/production-bundles/cube.js
 =======
 =======
 >>>>>>> e6454fdd (fix tests)
+<<<<<<< HEAD
 >>>>>>> 112f68c7 (fix tests)
+=======
+=======
+  OPCODES ~= 57k
+  MALLOC_COUNT = 13453
+  ALIVE_OBJS_DELTA ~= 2.95k
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
+>>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
+<<<<<<< HEAD
 <<<<<<< HEAD
   OPCODES ~= 4k
   MALLOC_COUNT = 35
@@ -113,4 +134,25 @@ CALL onUpdate(0.1)
   ALIVE_OBJS_DELTA ~= 0.00k
   MEMORY_USAGE_COUNT ~= 923.67k bytes
 >>>>>>> 327f7995 (fix tests)
+<<<<<<< HEAD
 >>>>>>> 11b9aad2 (fix tests)
+=======
+=======
+  OPCODES ~= 3k
+  MALLOC_COUNT = 29
+  ALIVE_OBJS_DELTA ~= 0.01k
+CALL onUpdate(0.1)
+  OPCODES ~= 1k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+CALL onUpdate(0.1)
+  OPCODES ~= 1k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+CALL onUpdate(0.1)
+  OPCODES ~= 1k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+  MEMORY_USAGE_COUNT ~= 950.86k bytes
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
+>>>>>>> e86adaed (Regenerate CRDT snapshots after merge)

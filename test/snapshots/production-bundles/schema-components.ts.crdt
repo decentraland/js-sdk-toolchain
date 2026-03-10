@@ -1,12 +1,21 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=244.2k bytes
 =======
+=======
+>>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
 <<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=242.8k bytes
 =======
 SCENE_COMPILED_JS_SIZE_PROD=216.9k bytes
 >>>>>>> 327f7995 (fix tests)
+<<<<<<< HEAD
 >>>>>>> 11b9aad2 (fix tests)
+=======
+=======
+SCENE_COMPILED_JS_SIZE_PROD=224.9k bytes
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
+>>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -18,6 +27,7 @@ EVAL test/snapshots/production-bundles/schema-components.js
   REQUIRE: ~system/EngineApi
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   REQUIRE: ~system/Runtime
   OPCODES ~= 79k
   MALLOC_COUNT = 14386
@@ -25,6 +35,8 @@ EVAL test/snapshots/production-bundles/schema-components.js
 =======
 =======
 >>>>>>> 112f68c7 (fix tests)
+=======
+>>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
 <<<<<<< HEAD
   OPCODES ~= 71k
   MALLOC_COUNT = 14129
@@ -39,12 +51,21 @@ EVAL test/snapshots/production-bundles/schema-components.js
   MALLOC_COUNT = 12963
   ALIVE_OBJS_DELTA ~= 2.88k
 >>>>>>> 327f7995 (fix tests)
+<<<<<<< HEAD
 >>>>>>> 11b9aad2 (fix tests)
+=======
+=======
+  OPCODES ~= 60k
+  MALLOC_COUNT = 13610
+  ALIVE_OBJS_DELTA ~= 2.99k
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
+>>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0)
+<<<<<<< HEAD
 <<<<<<< HEAD
   OPCODES ~= 3k
   MALLOC_COUNT = 31
@@ -66,10 +87,13 @@ CALL onUpdate(0.1)
 =======
   MEMORY_USAGE_COUNT ~= 1014.45k bytes
 =======
+=======
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
   OPCODES ~= 2k
   MALLOC_COUNT = 25
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
+<<<<<<< HEAD
   OPCODES ~= 2k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
@@ -83,4 +107,21 @@ CALL onUpdate(0.1)
   ALIVE_OBJS_DELTA ~= 0.00k
   MEMORY_USAGE_COUNT ~= 926.09k bytes
 >>>>>>> 327f7995 (fix tests)
+<<<<<<< HEAD
 >>>>>>> 11b9aad2 (fix tests)
+=======
+=======
+  OPCODES ~= 1k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+CALL onUpdate(0.1)
+  OPCODES ~= 1k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+CALL onUpdate(0.1)
+  OPCODES ~= 1k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+  MEMORY_USAGE_COUNT ~= 953.67k bytes
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
+>>>>>>> e86adaed (Regenerate CRDT snapshots after merge)

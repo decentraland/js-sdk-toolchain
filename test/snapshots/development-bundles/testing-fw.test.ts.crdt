@@ -1,12 +1,21 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=564.6k bytes
 =======
+=======
+>>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
 <<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=561.9k bytes
 =======
 SCENE_COMPILED_JS_SIZE_PROD=502.8k bytes
 >>>>>>> 327f7995 (fix tests)
+<<<<<<< HEAD
 >>>>>>> 11b9aad2 (fix tests)
+=======
+=======
+SCENE_COMPILED_JS_SIZE_PROD=519.6k bytes
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
+>>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -20,6 +29,7 @@ EVAL test/snapshots/development-bundles/testing-fw.test.js
   REQUIRE: ~system/EngineApi
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   REQUIRE: ~system/Runtime
   OPCODES ~= 83k
   MALLOC_COUNT = 16853
@@ -27,6 +37,8 @@ EVAL test/snapshots/development-bundles/testing-fw.test.js
 =======
 =======
 >>>>>>> 112f68c7 (fix tests)
+=======
+>>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
 <<<<<<< HEAD
   OPCODES ~= 75k
   MALLOC_COUNT = 16580
@@ -79,20 +91,33 @@ EVAL test/snapshots/development-bundles/testing-fw.test.js
   MALLOC_COUNT = 15263
   ALIVE_OBJS_DELTA ~= 3.08k
 >>>>>>> e6454fdd (fix tests)
+<<<<<<< HEAD
 >>>>>>> 112f68c7 (fix tests)
+=======
+=======
+  OPCODES ~= 56k
+  MALLOC_COUNT = 15659
+  ALIVE_OBJS_DELTA ~= 3.11k
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
+>>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=1 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
   OPCODES ~= 3k
 <<<<<<< HEAD
+<<<<<<< HEAD
   MALLOC_COUNT = 56
 =======
   MALLOC_COUNT = 52
 >>>>>>> 327f7995 (fix tests)
+=======
+  MALLOC_COUNT = 52
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
   ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0)
    ~system/Testing: plan {"tests":[{"name":"two way communication"}]}
   LOG: ["Adding one to position.y=0"]
+<<<<<<< HEAD
 <<<<<<< HEAD
   OPCODES ~= 6k
   MALLOC_COUNT = 12
@@ -101,12 +126,18 @@ CALL onUpdate(0)
   OPCODES ~= 4k
   MALLOC_COUNT = 15
 >>>>>>> 327f7995 (fix tests)
+=======
+  Renderer: PUT_COMPONENT e=0x0 c=1 t=2 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
+  OPCODES ~= 5k
+  MALLOC_COUNT = 15
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
   LOG: ["🧪 Running test two way communication"]
   LOG: ["✅ RootEntity has a transform"]
   LOG: ["✅ RootEntity has the correct scale"]
   LOG: ["⏱️ yield"]
+<<<<<<< HEAD
 <<<<<<< HEAD
   Scene: PUT_COMPONENT e=0x0 c=1 t=2 data={"position":{"x":1,"y":1,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
@@ -132,11 +163,17 @@ CALL onUpdate(0.1)
   MALLOC_COUNT = 48
   ALIVE_OBJS_DELTA ~= 0.02k
 =======
+=======
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
   Scene: PUT_COMPONENT e=0x0 c=1 t=3 data={"position":{"x":1,"y":1,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   LOG: ["Adding one to position.y=1"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=4 data={"position":{"x":2,"y":1,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
+<<<<<<< HEAD
   OPCODES ~= 9k
+=======
+  OPCODES ~= 10k
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
   MALLOC_COUNT = 51
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
@@ -155,13 +192,17 @@ CALL onUpdate(0.1)
   OPCODES ~= 6k
   MALLOC_COUNT = 32
   ALIVE_OBJS_DELTA ~= 0.01k
+<<<<<<< HEAD
 >>>>>>> 327f7995 (fix tests)
+=======
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
 CALL onUpdate(0.1)
   LOG: ["✅ RootEntity has the correct position"]
   LOG: ["✅ RootEntity has the correct scale"]
   LOG: ["🟢 Test passed two way communication"]
   ~system/Testing: logTestResult {"name":"two way communication","ok":true,"totalFrames":3,"totalTime":0.30000000000000004}
   LOG: ["Adding one to position.y=0"]
+<<<<<<< HEAD
 <<<<<<< HEAD
   OPCODES ~= 6k
   MALLOC_COUNT = -53
@@ -177,4 +218,14 @@ CALL onUpdate(0.1)
   ALIVE_OBJS_DELTA ~= -0.01k
   MEMORY_USAGE_COUNT ~= 1302.36k bytes
 >>>>>>> 327f7995 (fix tests)
+<<<<<<< HEAD
 >>>>>>> 11b9aad2 (fix tests)
+=======
+=======
+  Renderer: PUT_COMPONENT e=0x0 c=1 t=8 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  OPCODES ~= 5k
+  MALLOC_COUNT = -40
+  ALIVE_OBJS_DELTA ~= -0.01k
+  MEMORY_USAGE_COUNT ~= 1330.24k bytes
+>>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
+>>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
