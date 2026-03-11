@@ -226,11 +226,15 @@ export function createReconciler(
       const rightOfChild = parent._child.find((c) => c.rightOf === child.entity)
       if (rightOfChild) {
         rightOfChild.rightOf = child.rightOf
-        // Re-order parent._child array
-        parent._child = parent._child.filter((c) => c.entity !== child.entity)
-        parent._child.push(child)
         updateTree(rightOfChild, { rightOf: rightOfChild.rightOf })
       }
+      // Always remove from old position and push to end for reorders.
+      // Previously, filter/push was inside the if(rightOfChild) block, so when
+      // rightOfChild was not found (child was last), the child stayed at its old
+      // position. This caused _child[length-2] to potentially be the child itself,
+      // producing a self-referencing rightOf.
+      parent._child = parent._child.filter((c) => c.entity !== child.entity)
+      parent._child.push(child)
       // Its a re-order. We are the last element, so we need to fetch the element before us.
       child.rightOf = parent._child[parent._child.length - 2]?.entity
     } else {
@@ -245,15 +249,17 @@ export function createReconciler(
   function removeChild(parentInstance: Instance, child: Instance): void {
     const childIndex = parentInstance._child.findIndex((c) => c.entity === child.entity)
 
-    const childToModify = parentInstance._child[childIndex + 1]
+    if (childIndex !== -1) {
+      const childToModify = parentInstance._child[childIndex + 1]
 
-    if (childToModify) {
-      childToModify.rightOf = child.rightOf
-      updateTree(childToModify, { rightOf: child.rightOf })
+      if (childToModify) {
+        childToModify.rightOf = child.rightOf
+        updateTree(childToModify, { rightOf: child.rightOf })
+      }
+
+      parentInstance._child.splice(childIndex, 1)
     }
 
-    // Mutate 💀
-    parentInstance._child.splice(childIndex, 1)
     removeChildEntity(child)
   }
 
@@ -359,6 +365,24 @@ export function createReconciler(
       }
     },
     insertBefore(parentInstance: Instance, child: Instance, beforeChild: Instance): void {
+      // Handle reorder: if child already exists in this parent, remove it from its old position
+      // and fix up the old neighbor's rightOf before inserting at the new position.
+      const existingIndex = parentInstance._child.findIndex((c) => c.entity === child.entity)
+      if (existingIndex !== -1) {
+        // If beforeChild.rightOf already points to child, child is already in the correct
+        // position in the rightOf chain. Setting child.rightOf = beforeChild.rightOf would
+        // produce a self-cycle (child.rightOf = child.entity).
+        if (beforeChild.rightOf === child.entity) {
+          return
+        }
+        const oldNextSibling = parentInstance._child[existingIndex + 1]
+        if (oldNextSibling) {
+          oldNextSibling.rightOf = child.rightOf
+          updateTree(oldNextSibling, { rightOf: oldNextSibling.rightOf })
+        }
+        parentInstance._child.splice(existingIndex, 1)
+      }
+
       const beforeChildIndex = parentInstance._child.findIndex((c) => c.entity === beforeChild.entity)
       parentInstance._child = [
         ...parentInstance._child.slice(0, beforeChildIndex),
