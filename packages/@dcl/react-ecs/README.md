@@ -9,7 +9,103 @@ React bindings for Decentraland's Entity Component System (ECS), providing a dec
 - **Type Safety**: Full TypeScript support with proper type definitions
 - **Event Handling**: Support for mouse events and user interactions
 - **Performance**: Optimized reconciliation for minimal runtime overhead
+- **Context API**: `createContext` and `useContext` for sharing state across component trees without prop drilling
 - **Theme Support**: Built-in light and dark theme system with context-based switching
+
+## Context API
+
+Use `createContext` and `useContext` to share state across deeply nested components without passing props through every level.
+
+### Creating and providing a context
+
+```tsx
+import { ReactEcs, UiEntity, Label } from '@dcl/react-ecs'
+
+const { createContext, useContext, useState } = ReactEcs
+
+// Create a context with a default value
+const PlayerContext = createContext({ health: 100, mana: 50, name: 'Player' })
+
+// A deeply nested component that consumes the context directly
+function HealthBar() {
+  const { health, name } = useContext(PlayerContext)
+  return (
+    <UiEntity uiTransform={{ flexDirection: 'row', width: '100%' }}>
+      <Label value={`${name}: ${health} HP`} uiTransform={{ width: 200 }} />
+    </UiEntity>
+  )
+}
+
+function ManaBar() {
+  const { mana } = useContext(PlayerContext)
+  return <Label value={`Mana: ${mana}`} uiTransform={{ width: 200 }} />
+}
+
+// Intermediate component that doesn't need to know about player state
+function StatsPanel() {
+  return (
+    <UiEntity uiTransform={{ flexDirection: 'column' }}>
+      <HealthBar />
+      <ManaBar />
+    </UiEntity>
+  )
+}
+
+// Root component wraps the tree with a Provider
+export function GameUI() {
+  const [player, setPlayer] = useState({ health: 80, mana: 30, name: 'Adventurer' })
+
+  return (
+    <PlayerContext.Provider value={player}>
+      <StatsPanel />
+    </PlayerContext.Provider>
+  )
+}
+```
+
+### Using default values (no Provider)
+
+When no `Provider` is present in the tree, `useContext` returns the default value passed to `createContext`:
+
+```tsx
+const ThemeContext = createContext('light')
+
+function ThemedLabel() {
+  const theme = useContext(ThemeContext) // returns 'light' (the default)
+  return <Label value={`Theme: ${theme}`} uiTransform={{ width: 200 }} />
+}
+
+// No Provider needed if you only need the default value
+export function SimpleUI() {
+  return <ThemedLabel />
+}
+```
+
+### Multiple contexts
+
+You can compose multiple contexts for different concerns:
+
+```tsx
+const ThemeContext = createContext('dark')
+const LocaleContext = createContext('en')
+
+function LocalizedButton() {
+  const theme = useContext(ThemeContext)
+  const locale = useContext(LocaleContext)
+  const label = locale === 'es' ? 'Jugar' : 'Play'
+  return <Button value={label} onMouseDown={() => {}} />
+}
+
+export function GameUI() {
+  return (
+    <ThemeContext.Provider value="light">
+      <LocaleContext.Provider value="es">
+        <LocalizedButton />
+      </LocaleContext.Provider>
+    </ThemeContext.Provider>
+  )
+}
+```
 
 ## Component Guidelines
 

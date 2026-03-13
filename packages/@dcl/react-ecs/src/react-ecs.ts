@@ -84,4 +84,19 @@ export namespace ReactEcs {
   type EffectHook = (effect: EffectCallback, deps?: DependencyList) => void
   export const useEffect: EffectHook = (React as any).useEffect
   export const useState: StateHook = (React as any).useState
+
+  // Type for createContext / useContext
+  export interface ContextProviderProps<T> {
+    value: T
+    children?: JSX.ReactNode
+  }
+  export interface Context<T> {
+    Provider: (props: ContextProviderProps<T>) => JSX.Element | null
+    Consumer: (props: { children: (value: T) => JSX.ReactNode }) => JSX.Element | null
+    displayName?: string
+  }
+  type CreateContextFn = <T>(defaultValue: T) => Context<T>
+  type UseContextFn = <T>(context: Context<T>) => T
+  export const createContext: CreateContextFn = (React as any).createContext
+  export const useContext: UseContextFn = (React as any).useContext
 }
