@@ -4067,15 +4067,39 @@ export interface ReactBasedUiSystem {
 // @public (undocumented)
 export namespace ReactEcs {
     // (undocumented)
-    export type DependencyList = ReadonlyArray<any>;
+    export interface Context<T> {
+        // (undocumented)
+        Consumer: (props: {
+            children: (value: T) => JSX.ReactNode;
+        }) => JSX.Element | null;
+        // (undocumented)
+        displayName?: string;
+        // (undocumented)
+        Provider: (props: ContextProviderProps<T>) => JSX.Element | null;
+    }
     const // (undocumented)
     createElement: any;
+    // (undocumented)
+    export interface ContextProviderProps<T> {
+        // (undocumented)
+        children?: JSX.ReactNode;
+        // (undocumented)
+        value: T;
+    }
+    // (undocumented)
+    export type CreateContextFn = <T>(defaultValue: T) => Context<T>;
+    // (undocumented)
+    export type DependencyList = ReadonlyArray<any>;
     // (undocumented)
     export type Dispatch<T> = (action: SetStateAction<T>) => void;
     // (undocumented)
     export type EffectCallback = () => void | (() => void | undefined);
     // (undocumented)
     export type EffectHook = (effect: EffectCallback, deps?: DependencyList) => void;
+    const // (undocumented)
+    useEffect: EffectHook;
+    const // (undocumented)
+    useState: StateHook;
     // (undocumented)
     export namespace JSX {
         export interface Component {
@@ -4092,10 +4116,12 @@ export namespace ReactEcs {
     export type SetStateAction<T> = T | ((prevState: T) => T);
     // (undocumented)
     export type StateHook = <T>(initialState: T | (() => T)) => [T, Dispatch<T>];
+    // (undocumented)
+    export type UseContextFn = <T>(context: Context<T>) => T;
     const // (undocumented)
-    useEffect: EffectHook;
+    createContext: CreateContextFn;
     const // (undocumented)
-    useState: StateHook;
+    useContext: UseContextFn;
     export {};
 }
 
