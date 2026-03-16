@@ -173,26 +173,25 @@ export function createPhysicsForceHelper(engine: IEngine): PhysicsForceHelper {
   // Stale forces can appear when CRDT sync from another client writes PhysicsCombinedForce
   // externally (entity-1 ambiguity: each client interprets entity 1 as its own player).
   engine.addSystem(() => {
-    if (forceSources.size === 0 && repulsionSources.size === 0) {
-      if (PhysicsCombinedForce.has(engine.PlayerEntity)) {
-        PhysicsCombinedForce.deleteFrom(engine.PlayerEntity)
-        lastWrittenForceVector = null
+    // Repulsion forces need per-tick direction recalculation as the player moves
+    if (repulsionSources.size > 0) {
+      for (const [source, { fromPosition, magnitude, radius, falloff }] of repulsionSources) {
+        const vector = computeRepulsionVector(fromPosition, magnitude, radius, falloff)
+        if (vector) {
+          forceSources.set(source, vector)
+        } else {
+          forceSources.delete(source)
+        }
       }
+      recalcForce()
       return
     }
 
-    if (repulsionSources.size === 0) return
-
-    for (const [source, { fromPosition, magnitude, radius, falloff }] of repulsionSources) {
-      const vector = computeRepulsionVector(fromPosition, magnitude, radius, falloff)
-      if (vector) {
-        forceSources.set(source, vector)
-      } else {
-        forceSources.delete(source)
-      }
+    // No local sources — clean up any externally-created component (e.g. from CRDT sync)
+    if (forceSources.size === 0 && PhysicsCombinedForce.has(engine.PlayerEntity)) {
+      PhysicsCombinedForce.deleteFrom(engine.PlayerEntity)
+      lastWrittenForceVector = null
     }
-
-    recalcForce()
   })
 
   return { applyForceToPlayer, removeForceFromPlayer, applyForceToPlayerForDuration, applyRepulsionForceToPlayer }
