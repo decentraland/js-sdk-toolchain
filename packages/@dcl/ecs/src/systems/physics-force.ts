@@ -169,8 +169,18 @@ export function createPhysicsForceHelper(engine: IEngine): PhysicsForceHelper {
     recalcForce()
   }
 
-  // Background system: recalculate repulsion vectors every tick
+  // Background system: recalculate repulsion vectors and clean up stale forces every tick.
+  // Stale forces can appear when CRDT sync from another client writes PhysicsCombinedForce
+  // externally (entity-1 ambiguity: each client interprets entity 1 as its own player).
   engine.addSystem(() => {
+    if (forceSources.size === 0 && repulsionSources.size === 0) {
+      if (PhysicsCombinedForce.has(engine.PlayerEntity)) {
+        PhysicsCombinedForce.deleteFrom(engine.PlayerEntity)
+        lastWrittenForceVector = null
+      }
+      return
+    }
+
     if (repulsionSources.size === 0) return
 
     for (const [source, { fromPosition, magnitude, radius, falloff }] of repulsionSources) {
