@@ -48,9 +48,11 @@ export function createPhysicsForceHelper(engine: IEngine): PhysicsForceHelper {
     const current = PhysicsCombinedForce.getOrNull(engine.PlayerEntity)
     if (current && lastWrittenForceVector && current.vector) {
       if (!Vector3.equals(current.vector, lastWrittenForceVector)) {
-        throw new Error(
-          'PBPhysicsCombinedForce was modified outside Physics helper. ' +
-            'Do not mix direct component access with Physics.applyForceToPlayer().'
+        console.error(
+          'PBPhysicsCombinedForce was modified externally.',
+          'Expected:', lastWrittenForceVector,
+          'Found:', current.vector,
+          '-- overwriting with local state.'
         )
       }
     }
