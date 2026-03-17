@@ -96,6 +96,9 @@ export type AudioAnalysisView = {
 };
 
 // @public (undocumented)
+export const AudioEffectZone: LastWriteWinElementSetComponentDefinition<PBAudioEffectZone>;
+
+// @public (undocumented)
 export const AudioEvent: GrowOnlyValueSetComponentDefinition<PBAudioEvent>;
 
 // Warning: (ae-missing-release-tag) "AudioSource" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -673,6 +676,7 @@ export const componentDefinitionByName: {
     "core::AssetLoad": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAssetLoad>>;
     "core::AssetLoadLoadingState": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAssetLoadLoadingState>>;
     "core::AudioAnalysis": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioAnalysis>>;
+    "core::AudioEffectZone": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioEffectZone>>;
     "core::AudioEvent": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAudioEvent>>;
     "core::AudioSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioSource>>;
     "core::AudioStream": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioStream>>;
@@ -2360,6 +2364,36 @@ export const enum PBAudioAnalysisMode {
     MODE_LOGARITHMIC = 1,
     // (undocumented)
     MODE_RAW = 0
+}
+
+// @public (undocumented)
+export interface PBAudioEffectZone {
+    area: PBVector3 | undefined;
+    // (undocumented)
+    effect?: {
+        $case: "silence";
+        silence: PBAudioEffectZone_SilenceEffect;
+    } | undefined;
+}
+
+// @public (undocumented)
+export namespace PBAudioEffectZone {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAudioEffectZone;
+    // (undocumented)
+    export function encode(message: PBAudioEffectZone, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAudioEffectZone_SilenceEffect {
+}
+
+// @public (undocumented)
+export namespace PBAudioEffectZone_SilenceEffect {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAudioEffectZone_SilenceEffect;
+    // (undocumented)
+    export function encode(_: PBAudioEffectZone_SilenceEffect, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
