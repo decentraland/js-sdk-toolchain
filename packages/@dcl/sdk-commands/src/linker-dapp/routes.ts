@@ -127,4 +127,5 @@ export interface LinkerResponse {
   address: string
   authChain: AuthChain
   chainId?: ChainId
+  deleteSignature?: string
 }
