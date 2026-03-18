@@ -3097,6 +3097,7 @@ export interface PBParticleSystem {
         $case: "box";
         box: PBParticleSystem_Box;
     } | undefined;
+    simulationSpace?: PBParticleSystem_SimulationSpace | undefined;
     // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
     // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
     sizeOverTime?: PBParticleSystem_FloatRange | undefined;
@@ -3218,6 +3219,12 @@ export namespace PBParticleSystem_Point {
 }
 
 // @public (undocumented)
+export const enum PBParticleSystem_SimulationSpace {
+    PSS_LOCAL = 0,
+    PSS_WORLD = 1
+}
+
+// @public (undocumented)
 export interface PBParticleSystem_Sphere {
     radius?: number | undefined;
 }
@@ -3232,8 +3239,8 @@ export namespace PBParticleSystem_Sphere {
 
 // @public (undocumented)
 export interface PBParticleSystem_SpriteSheetAnimation {
-    cyclesPerLifetime?: number | undefined;
     endFrame: number;
+    framesPerSecond?: number | undefined;
     startFrame: number;
     tilesX: number;
     tilesY: number;

@@ -2,7 +2,8 @@ import { Engine, components } from '../../../packages/@dcl/ecs/src'
 import { testComponentSerialization } from './assertion'
 import {
   PBParticleSystem_BlendMode,
-  PBParticleSystem_PlaybackState
+  PBParticleSystem_PlaybackState,
+  PBParticleSystem_SimulationSpace
 } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/particle_system.gen'
 
 // Full object with all optional fields — required by testComponentSerialization
@@ -26,6 +27,10 @@ const emptyPS = {
   billboard: undefined,
   spriteSheet: undefined,
   shape: undefined,
+  loop: undefined,
+  prewarm: undefined,
+  limitVelocity: undefined,
+  simulationSpace: undefined,
   playbackState: undefined,
   restartCount: undefined
 }
@@ -121,7 +126,7 @@ describe('Generated ParticleSystem ProtoBuf', () => {
         tilesY: 4,
         startFrame: 0,
         endFrame: 15,
-        cyclesPerLifetime: 2
+        framesPerSecond: 30
       }
     })
   })
@@ -163,6 +168,18 @@ describe('Generated ParticleSystem ProtoBuf', () => {
       lifetime: 5,
       playbackState: PBParticleSystem_PlaybackState.PS_PAUSED,
       restartCount: 3
+    })
+  })
+
+  it('should serialize/deserialize simulation space', () => {
+    const newEngine = Engine()
+    const ParticleSystem = components.ParticleSystem(newEngine)
+
+    testComponentSerialization(ParticleSystem, {
+      ...emptyPS,
+      rate: 10,
+      lifetime: 5,
+      simulationSpace: PBParticleSystem_SimulationSpace.PSS_WORLD
     })
   })
 
