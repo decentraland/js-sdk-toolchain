@@ -79,13 +79,14 @@ export function buildDeleteScenesFromWorldPayload(worldName: string): string {
 
 export async function deleteWorldScenes(
   components: Pick<CliComponents, 'logger'>,
-  worldsContentServerUrl: string,
   worldName: string,
-  deleteSignature: string
+  deleteSignature: string,
+  targetContent?: string
 ): Promise<Response> {
   const { logger } = components
+
   const encodedName = encodeURIComponent(worldName)
-  const deleteUrl = `${worldsContentServerUrl}/entities/${encodedName}`
+  const deleteUrl = `${targetContent}/entities/${encodedName}`
 
   const authChain: AuthChain = JSON.parse(deleteSignature)
   const lastLink = authChain[authChain.length - 1]
@@ -120,11 +121,8 @@ export async function getAddressAndSignature(
   deployCallback: (response: LinkerResponse) => Promise<void>,
   deleteScenesFromWorldPayload?: string
 ): Promise<{ program?: Lifecycle.ComponentBasedProgram<unknown> }> {
-  components.logger.info(`[DEBUG getAddressAndSignature] using DCL_PRIVATE_KEY=${!!process.env.DCL_PRIVATE_KEY}`)
-
   if (process.env.DCL_PRIVATE_KEY) {
     const wallet = createWallet(process.env.DCL_PRIVATE_KEY)
-    components.logger.info(`[DEBUG getAddressAndSignature] DCL_PRIVATE_KEY wallet address=${wallet.address}`)
     const authChain = Authenticator.createSimpleAuthChain(
       messageToSign,
       wallet.address,
@@ -276,11 +274,11 @@ interface WorldScenesResponse {
 
 export async function fetchWorldScenes(
   logger: { info: (msg: string) => void },
-  contentServerUrl: string,
-  worldName: string
+  worldName: string,
+  targetContent?: string
 ): Promise<WorldScene[]> {
   const encodedName = encodeURIComponent(worldName)
-  const url = `${contentServerUrl}/world/${encodedName}/scenes`
+  const url = `${targetContent}/world/${encodedName}/scenes`
   logger.info(`[DEBUG fetchWorldScenes] GET ${url}`)
   const response = await fetch(url)
   logger.info(`[DEBUG fetchWorldScenes] response status=${response.status}`)

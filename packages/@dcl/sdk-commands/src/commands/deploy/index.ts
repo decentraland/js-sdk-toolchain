@@ -135,34 +135,48 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
   if (isWorld && !multiScene && worldName) {
     options.components.logger.info(`[DEBUG deploy] checking existing scenes for world "${worldName}"...`)
     try {
-      const worldsUrl = targetContent || 'https://worlds-content-server.decentraland.org'
-      const existingScenes = await fetchWorldScenes(options.components.logger, worldsUrl, worldName)
+      const existingScenes = await fetchWorldScenes(options.components.logger, worldName, targetContent)
       options.components.logger.info(`[DEBUG deploy] found ${existingScenes.length} existing scene(s)`)
 
       if (existingScenes.length > 0) {
-        options.components.logger.warn(`World "${worldName}" has ${existingScenes.length} existing scene(s):`)
-        for (const scene of existingScenes) {
-          const title = scene.entity?.metadata?.display?.title || 'Untitled'
-          const parcels = scene.parcels?.join(', ') || 'unknown parcels'
-          options.components.logger.log(`  - "${title}" at parcels ${parcels}`)
-        }
-        options.components.logger.log('')
-        options.components.logger.warn('Deploying without --multi-scene will DELETE all existing scenes first.')
+        const deployingParcels = new Set(sceneJson.scene.parcels)
+        const scenesOnOtherParcels = existingScenes.filter((scene) => {
+          const sceneParcels = scene.parcels || []
+          return sceneParcels.some((p) => !deployingParcels.has(p))
+        })
 
-        if (!autoYes) {
-          const confirmed = await promptUser('Continue? (y/N) ')
-          if (!confirmed) {
-            throw new CliError('DEPLOY_CANCELLED', 'Deployment cancelled by user.')
+        if (scenesOnOtherParcels.length > 0) {
+          options.components.logger.warn(
+            `World "${worldName}" has ${scenesOnOtherParcels.length} other scene(s) that will be removed:`
+          )
+          for (const scene of scenesOnOtherParcels) {
+            const title = scene.entity?.metadata?.display?.title || 'Untitled'
+            const parcels = scene.parcels?.join(', ') || 'unknown parcels'
+            options.components.logger.log(`  - "${title}" at parcels ${parcels}`)
           }
-        }
+          options.components.logger.log('')
+          options.components.logger.warn('Deploying without --multi-scene will DELETE all existing scenes first.')
 
-        needsDelete = true
-        options.components.logger.info(`[DEBUG deploy] needsDelete=true`)
+          if (!autoYes) {
+            const confirmed = await promptUser('Continue? (y/N) ')
+            if (!confirmed) {
+              throw new CliError('DEPLOY_CANCELLED', 'Deployment cancelled by user.')
+            }
+          }
+
+          needsDelete = true
+          options.components.logger.info(
+            `[DEBUG deploy] needsDelete=true, ${scenesOnOtherParcels.length} scene(s) on other parcels`
+          )
+        } else {
+          options.components.logger.info(
+            `[DEBUG deploy] existing scene(s) on same parcels, deploy will overwrite — no delete needed`
+          )
+        }
       }
     } catch (e: any) {
       if (e instanceof CliError) throw e
       options.components.logger.warn(`Could not check existing world scenes: ${e.message}`)
-      options.components.logger.warn('Proceeding with deploy. Use --multi-scene to skip this check.')
     }
   }
 
@@ -246,16 +260,15 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
       `[DEBUG deployEntity] needsDelete=${needsDelete}, hasDeleteSignature=${!!linkerResponse.deleteSignature}`
     )
     if (needsDelete && worldName && linkerResponse.deleteSignature) {
-      const worldsUrl = targetContent || 'https://worlds-content-server.decentraland.org'
       options.components.logger.info(`[DEBUG deployEntity] executing DELETE for "${worldName}"`)
       printProgressInfo(options.components.logger, `Deleting existing scenes from world "${worldName}"...`)
 
       try {
         const deleteResponse = await deleteWorldScenes(
           options.components,
-          worldsUrl,
           worldName,
-          linkerResponse.deleteSignature
+          linkerResponse.deleteSignature,
+          targetContent
         )
 
         if (deleteResponse.ok) {
@@ -265,17 +278,17 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
           options.components.logger.info(
             `[DEBUG deployEntity] DELETE FAILED: status=${deleteResponse.status} body=${errorText}`
           )
-          options.components.logger.warn(
-            `Failed to delete existing scenes (status ${deleteResponse.status}): ${errorText}`
-          )
-          options.components.logger.warn(
-            'Continuing with deploy. Existing scenes may remain. Use --multi-scene to skip this step.'
+          throw new CliError(
+            'DEPLOY_DELETE_FAILED',
+            `Failed to delete existing scenes from "${worldName}" (status ${deleteResponse.status}): ${errorText}\nUse --multi-scene to deploy alongside existing scenes.`
           )
         }
       } catch (e: any) {
-        options.components.logger.info(`[DEBUG deployEntity] DELETE error: ${e.message}`)
-        options.components.logger.warn(`Error deleting existing scenes: ${e.message}`)
-        options.components.logger.warn('Continuing with deploy.')
+        if (e instanceof CliError) throw e
+        throw new CliError(
+          'DEPLOY_DELETE_FAILED',
+          `Error deleting existing scenes from "${worldName}": ${e.message}\nUse --multi-scene to deploy alongside existing scenes.`
+        )
       }
     }
 
