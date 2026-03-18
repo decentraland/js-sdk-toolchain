@@ -148,7 +148,7 @@ describe('Physics force helper system should', () => {
     expect(force2.vector).toEqual({ x: 10, y: 0, z: 0 })
   })
 
-  it('throw error when component is modified externally', async () => {
+  it('log error when component is modified externally', async () => {
     const { engine, physics, PhysicsCombinedForce } = setup()
     const srcA = engine.addEntity()
     const srcB = engine.addEntity()
@@ -160,9 +160,13 @@ describe('Physics force helper system should', () => {
       vector: { x: 99, y: 0, z: 0 }
     })
 
-    expect(() => {
-      physics.applyForceToPlayer(srcB, { x: 0, y: 1, z: 0 })
-    }).toThrow(/modified outside Physics helper/)
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    physics.applyForceToPlayer(srcB, { x: 0, y: 1, z: 0 })
+    expect(spy).toHaveBeenCalledWith(
+      expect.stringMatching(/modified externally/),
+      expect.anything(), expect.anything(), expect.anything(), expect.anything(), expect.anything()
+    )
+    spy.mockRestore()
   })
 
   it('not throw on first call (no prior state)', async () => {
