@@ -19,6 +19,7 @@ import {
   buildDeleteScenesFromWorldPayload,
   deleteWorldScenes,
   fetchWorldScenes,
+  getScenesOnOtherParcels,
   promptUser
 } from './utils'
 import { buildScene } from '../build'
@@ -115,6 +116,7 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
   const coords = getBaseCoords(sceneJson)
   const isWorld = sceneHasWorldCfg(sceneJson)
   const worldName = sceneJson.worldConfiguration?.name
+
   options.components.logger.info(
     `[DEBUG deploy] isWorld=${isWorld}, multiScene=${multiScene}, autoYes=${autoYes}, worldName=${worldName}`
   )
@@ -139,23 +141,23 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
       options.components.logger.info(`[DEBUG deploy] found ${existingScenes.length} existing scene(s)`)
 
       if (existingScenes.length > 0) {
-        const deployingParcels = new Set(sceneJson.scene.parcels)
-        const scenesOnOtherParcels = existingScenes.filter((scene) => {
-          const sceneParcels = scene.parcels || []
-          return sceneParcels.some((p) => !deployingParcels.has(p))
-        })
+        const scenesOnOtherParcels = getScenesOnOtherParcels(existingScenes, sceneJson.scene.parcels)
 
         if (scenesOnOtherParcels.length > 0) {
           options.components.logger.warn(
             `World "${worldName}" has ${scenesOnOtherParcels.length} other scene(s) that will be removed:`
           )
+
           for (const scene of scenesOnOtherParcels) {
             const title = scene.entity?.metadata?.display?.title || 'Untitled'
             const parcels = scene.parcels?.join(', ') || 'unknown parcels'
             options.components.logger.log(`  - "${title}" at parcels ${parcels}`)
           }
+
           options.components.logger.log('')
-          options.components.logger.warn('Deploying without --multi-scene will DELETE all existing scenes first.')
+          options.components.logger.warn(
+            'Deploying without --multi-scene will DELETE all existing scenes in world first.'
+          )
 
           if (!autoYes) {
             const confirmed = await promptUser('Continue? (y/N) ')
@@ -201,7 +203,6 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
     metadata: sceneJson
   })
 
-  // Signing message
   const messageToSign = entityId
 
   const deleteScenesFromWorldPayload =
@@ -280,15 +281,12 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
           )
           throw new CliError(
             'DEPLOY_DELETE_FAILED',
-            `Failed to delete existing scenes from "${worldName}" (status ${deleteResponse.status}): ${errorText}\nUse --multi-scene to deploy alongside existing scenes.`
+            `Failed to delete existing scenes from "${worldName}" (status ${deleteResponse.status}): ${errorText}\n`
           )
         }
       } catch (e: any) {
         if (e instanceof CliError) throw e
-        throw new CliError(
-          'DEPLOY_DELETE_FAILED',
-          `Error deleting existing scenes from "${worldName}": ${e.message}\nUse --multi-scene to deploy alongside existing scenes.`
-        )
+        throw new CliError('DEPLOY_DELETE_FAILED', `Error deleting existing scenes from "${worldName}": ${e.message}\n`)
       }
     }
 
