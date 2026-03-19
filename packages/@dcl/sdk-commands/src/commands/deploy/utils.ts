@@ -267,10 +267,6 @@ export interface WorldScene {
   entity?: { metadata?: { display?: { title?: string } } }
 }
 
-/**
- * Returns scenes that have parcels NOT included in the deploying parcels.
- * If all existing scenes are on the same parcels being deployed, returns empty (no delete needed).
- */
 export function getScenesOnOtherParcels(existingScenes: WorldScene[], deployingParcels: string[]): WorldScene[] {
   const parcelsSet = new Set(deployingParcels)
   return existingScenes.filter((scene) => {
