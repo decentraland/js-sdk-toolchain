@@ -271,7 +271,7 @@ export function getScenesOnOtherParcels(existingScenes: WorldScene[], deployingP
   const parcelsSet = new Set(deployingParcels)
   return existingScenes.filter((scene) => {
     const sceneParcels = scene.parcels || []
-    return sceneParcels.some((p) => !parcelsSet.has(p))
+    return sceneParcels.every((p) => !parcelsSet.has(p))
   })
 }
 

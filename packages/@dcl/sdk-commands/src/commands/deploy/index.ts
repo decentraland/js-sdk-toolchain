@@ -260,6 +260,13 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
     options.components.logger.info(
       `[DEBUG deployEntity] needsDelete=${needsDelete}, hasDeleteSignature=${!!linkerResponse.deleteSignature}`
     )
+    if (needsDelete && worldName && !linkerResponse.deleteSignature) {
+      throw new CliError(
+        'DEPLOY_DELETE_FAILED',
+        `Cannot delete existing scenes from "${worldName}": there's not signatur for deleting the scenes.`
+      )
+    }
+
     if (needsDelete && worldName && linkerResponse.deleteSignature) {
       options.components.logger.info(`[DEBUG deployEntity] executing DELETE for "${worldName}"`)
       printProgressInfo(options.components.logger, `Deleting existing scenes from world "${worldName}"...`)
