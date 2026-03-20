@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@dcl/eslint-config": "^1.0.6-20220629202434.commit-44f87f0",
-    "@dcl/protocol": "https://sdk-team-cdn.decentraland.org/@dcl/protocol/branch//dcl-protocol-1.0.0-23255837728.commit-919e66f.tgz",
+    "@dcl/protocol": "https://sdk-team-cdn.decentraland.org/@dcl/protocol/branch//dcl-protocol-1.0.0-23346176076.commit-91ee968.tgz",
     "@types/node": "^18.11.18",
     "syncpack": "^9.8.4",
     "typedoc": "^0.23.28"

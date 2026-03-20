@@ -24,13 +24,13 @@ const emptyPS = {
   initialVelocitySpeed: undefined,
   texture: undefined,
   blendMode: undefined,
-  billboard: undefined,
   spriteSheet: undefined,
   shape: undefined,
   loop: undefined,
   prewarm: undefined,
   limitVelocity: undefined,
   simulationSpace: undefined,
+  faceTravelDirection: undefined,
   playbackState: undefined,
   restartCount: undefined
 }
@@ -154,7 +154,7 @@ describe('Generated ParticleSystem ProtoBuf', () => {
       rate: 10,
       lifetime: 3,
       blendMode: PBParticleSystem_BlendMode.PSB_ADD,
-      billboard: true
+      faceTravelDirection: true
     })
   })
 

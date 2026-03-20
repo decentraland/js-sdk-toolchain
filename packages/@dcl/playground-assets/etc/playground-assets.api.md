@@ -3062,11 +3062,11 @@ export namespace PBNftShape {
 export interface PBParticleSystem {
     active?: boolean | undefined;
     additionalForce?: PBVector3 | undefined;
-    billboard?: boolean | undefined;
     blendMode?: PBParticleSystem_BlendMode | undefined;
     // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
     // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
     colorOverTime?: PBParticleSystem_ColorRange | undefined;
+    faceTravelDirection?: boolean | undefined;
     gravity?: number | undefined;
     initialColor?: PBParticleSystem_ColorRange | undefined;
     initialRotation?: PBParticleSystem_FloatRange | undefined;
