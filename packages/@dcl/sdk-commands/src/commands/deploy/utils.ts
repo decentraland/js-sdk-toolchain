@@ -125,7 +125,16 @@ export async function getAddressAndSignature(
       wallet.address,
       ethSign(hexToBytes(wallet.privateKey), messageToSign)
     )
-    const linkerResponse: LinkerResponse = { authChain, address: wallet.address }
+    let deleteSignature: string | undefined
+    if (deleteScenesFromWorldPayload) {
+      const deleteAuthChain = Authenticator.createSimpleAuthChain(
+        deleteScenesFromWorldPayload,
+        wallet.address,
+        ethSign(hexToBytes(wallet.privateKey), deleteScenesFromWorldPayload)
+      )
+      deleteSignature = JSON.stringify(deleteAuthChain)
+    }
+    const linkerResponse: LinkerResponse = { authChain, address: wallet.address, deleteSignature }
     await deployCallback(linkerResponse)
     awaitResponse.resolve()
     return {}
