@@ -1,4 +1,6 @@
+import * as readline from 'readline'
 import { ChainId, Scene } from '@dcl/schemas'
+import { AuthChain } from '@dcl/crypto'
 import { Lifecycle } from '@well-known-components/interfaces'
 import { createCatalystClient, createContentClient, CatalystClient, ContentClient } from 'dcl-catalyst-client'
 import { getCatalystServersFromCache } from 'dcl-catalyst-client/dist/contracts-snapshots'
@@ -67,6 +69,44 @@ export async function getCatalyst(
   }
 }
 
+export function buildDeleteScenesFromWorldPayload(worldName: string): string {
+  const encodedName = encodeURIComponent(worldName)
+  const path = `/entities/${encodedName}`
+  const timestamp = String(Date.now())
+  const metadata = '{}'
+  return ['delete', path, timestamp, metadata].join(':').toLowerCase()
+}
+
+export async function deleteWorldScenes(
+  components: Pick<CliComponents, 'logger'>,
+  worldName: string,
+  deleteSignature: string,
+  targetContent?: string
+): Promise<Response> {
+  const { logger } = components
+
+  const encodedName = encodeURIComponent(worldName)
+  const deleteUrl = `${targetContent}/entities/${encodedName}`
+
+  const authChain: AuthChain = JSON.parse(deleteSignature)
+  const lastLink = authChain[authChain.length - 1]
+  const payloadParts = lastLink.payload.split(':')
+  const timestamp = payloadParts[2] || String(Date.now())
+  const metadata = payloadParts[3] || '{}'
+
+  const headers: Record<string, string> = {
+    'x-identity-timestamp': timestamp,
+    'x-identity-metadata': metadata
+  }
+  authChain.forEach((link, i) => {
+    headers[`x-identity-auth-chain-${i}`] = JSON.stringify(link)
+  })
+
+  const response = await fetch(deleteUrl, { method: 'DELETE', headers })
+  logger.info(`[DELETE] deleting world scenes status=${response.status}`)
+  return response
+}
+
 export async function getAddressAndSignature(
   components: CliComponents,
   awaitResponse: IFuture<void>,
@@ -75,7 +115,8 @@ export async function getAddressAndSignature(
   files: IFile[],
   skipValidations: boolean,
   linkOptions: Omit<dAppOptions, 'uri'>,
-  deployCallback: (response: LinkerResponse) => Promise<void>
+  deployCallback: (response: LinkerResponse) => Promise<void>,
+  deleteScenesFromWorldPayload?: string
 ): Promise<{ program?: Lifecycle.ComponentBasedProgram<unknown> }> {
   if (process.env.DCL_PRIVATE_KEY) {
     const wallet = createWallet(process.env.DCL_PRIVATE_KEY)
@@ -84,13 +125,13 @@ export async function getAddressAndSignature(
       wallet.address,
       ethSign(hexToBytes(wallet.privateKey), messageToSign)
     )
-    const linkerResponse = { authChain, address: wallet.address }
+    const linkerResponse: LinkerResponse = { authChain, address: wallet.address }
     await deployCallback(linkerResponse)
     awaitResponse.resolve()
     return {}
   }
 
-  const sceneInfo = await getSceneInfo(components, scene, messageToSign, skipValidations)
+  const sceneInfo = await getSceneInfo(components, scene, messageToSign, skipValidations, deleteScenesFromWorldPayload)
   const { router: commonRouter } = setRoutes(components, sceneInfo)
   const router = setDeployRoutes(commonRouter, components, awaitResponse, sceneInfo, files, deployCallback)
 
@@ -109,7 +150,6 @@ function setDeployRoutes(
 ): Router<object> {
   const { logger } = components
 
-  // We need to wait so the linker-dapp can receive the response and show a nice message.
   const resolveLinkerPromise = () => setTimeout(() => awaitResponse.resolve(), 100)
   const rejectLinkerPromise = (e: Error) => setTimeout(() => awaitResponse.reject(e), 100)
   let linkerResponse: LinkerResponse
@@ -129,8 +169,6 @@ function setDeployRoutes(
     const value = await getPointers(components, pointer, network)
     const deployedToAll = new Set(value.map((c) => c.entityId)).size === 1
 
-    // Deployed to every catalyst, close the linker dapp and
-    // exit the command automatically so the user dont have to.
     if (deployedToAll) resolveLinkerPromise()
 
     return {
@@ -140,7 +178,6 @@ function setDeployRoutes(
 
   router.post('/api/deploy', async (ctx) => {
     const value = (await ctx.request.json()) as LinkerResponse
-
     if (!value.address || !value.authChain || !value.chainId) {
       const errorMessage = `Invalid payload: ${Object.keys(value).join(' - ')}`
       logger.error(errorMessage)
@@ -148,13 +185,10 @@ function setDeployRoutes(
       return { status: 400, body: { message: errorMessage } }
     }
 
-    // Store the chainId so we can use it on the catalyst pointers.
     linkerResponse = value
 
     try {
       await deployCallback(value)
-      // If its a world we dont wait for the catalyst pointers.
-      // Close the program.
       if (sceneInfo.isWorld) {
         resolveLinkerPromise()
       }
@@ -185,13 +219,15 @@ export interface SceneInfo {
   isPortableExperience: boolean
   isWorld: boolean
   world?: string
+  deleteScenesFromWorldPayload?: string
 }
 
 export async function getSceneInfo(
   components: Pick<CliComponents, 'config'>,
   scene: Scene,
   rootCID: string,
-  skipValidations: boolean
+  skipValidations: boolean,
+  deleteScenesFromWorldPayload?: string
 ) {
   const {
     scene: { parcels, base },
@@ -211,6 +247,54 @@ export async function getSceneInfo(
     skipValidations,
     isPortableExperience: !!isPortableExperience,
     isWorld: sceneHasWorldCfg(scene),
-    world: scene.worldConfiguration?.name
+    world: scene.worldConfiguration?.name,
+    deleteScenesFromWorldPayload
   }
+}
+
+export interface WorldScene {
+  entityId: string
+  parcels?: string[]
+  entity?: { metadata?: { display?: { title?: string } } }
+}
+
+export function getScenesOnOtherParcels(existingScenes: WorldScene[], deployingParcels: string[]): WorldScene[] {
+  const parcelsSet = new Set(deployingParcels)
+  return existingScenes.filter((scene) => {
+    const sceneParcels = scene.parcels || []
+    return sceneParcels.every((p) => !parcelsSet.has(p))
+  })
+}
+
+interface WorldScenesResponse {
+  scenes: WorldScene[]
+  total: number
+}
+
+export async function fetchWorldScenes(
+  logger: { info: (msg: string) => void },
+  worldName: string,
+  targetContent?: string
+): Promise<WorldScene[]> {
+  const encodedName = encodeURIComponent(worldName)
+  const url = `${targetContent}/world/${encodedName}/scenes`
+  const response = await fetch(url)
+  if (!response.ok) {
+    const text = await response.text()
+    logger.info(`[DEPLOY] fetching scenes from world -  error: ${text}`)
+    throw new Error(`Failed to fetch world scenes: ${response.status} ${response.statusText}`)
+  }
+  const data = (await response.json()) as WorldScenesResponse
+  logger.info(`[DEPLOY] fetching scenes from world success: total=${data.total}, scenes=${data.scenes?.length}`)
+  return data.scenes || []
+}
+
+export function promptUser(question: string): Promise<boolean> {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+  return new Promise((resolve) => {
+    rl.question(question, (answer) => {
+      rl.close()
+      resolve(answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes')
+    })
+  })
 }
