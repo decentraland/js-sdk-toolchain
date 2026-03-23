@@ -94,8 +94,6 @@ export async function deleteWorldScenes(
   const timestamp = payloadParts[2] || String(Date.now())
   const metadata = payloadParts[3] || '{}'
 
-  logger.info(`[DEBUG deleteWorldScenes] DELETE ${deleteUrl}`)
-
   const headers: Record<string, string> = {
     'x-identity-timestamp': timestamp,
     'x-identity-metadata': metadata
@@ -104,9 +102,8 @@ export async function deleteWorldScenes(
     headers[`x-identity-auth-chain-${i}`] = JSON.stringify(link)
   })
 
-  logger.info(`[DEBUG deleteWorldScenes] sending DELETE request...`)
   const response = await fetch(deleteUrl, { method: 'DELETE', headers })
-  logger.info(`[DEBUG deleteWorldScenes] response status=${response.status}`)
+  logger.info(`[DELETE] deleting world scenes status=${response.status}`)
   return response
 }
 
@@ -135,7 +132,6 @@ export async function getAddressAndSignature(
   }
 
   const sceneInfo = await getSceneInfo(components, scene, messageToSign, skipValidations, deleteScenesFromWorldPayload)
-  components.logger.info(`[DEBUG getAddressAndSignature] browser flow, opening linker-dapp`)
   const { router: commonRouter } = setRoutes(components, sceneInfo)
   const router = setDeployRoutes(commonRouter, components, awaitResponse, sceneInfo, files, deployCallback)
 
@@ -182,11 +178,6 @@ function setDeployRoutes(
 
   router.post('/api/deploy', async (ctx) => {
     const value = (await ctx.request.json()) as LinkerResponse
-
-    logger.info(`[DEBUG /api/deploy] received from linker-dapp:`)
-    logger.info(`[DEBUG /api/deploy]   address=${value.address}`)
-    logger.info(`[DEBUG /api/deploy]   chainId=${value.chainId}`)
-
     if (!value.address || !value.authChain || !value.chainId) {
       const errorMessage = `Invalid payload: ${Object.keys(value).join(' - ')}`
       logger.error(errorMessage)
@@ -287,16 +278,14 @@ export async function fetchWorldScenes(
 ): Promise<WorldScene[]> {
   const encodedName = encodeURIComponent(worldName)
   const url = `${targetContent}/world/${encodedName}/scenes`
-  logger.info(`[DEBUG fetchWorldScenes] GET ${url}`)
   const response = await fetch(url)
-  logger.info(`[DEBUG fetchWorldScenes] response status=${response.status}`)
   if (!response.ok) {
     const text = await response.text()
-    logger.info(`[DEBUG fetchWorldScenes] error body: ${text}`)
+    logger.info(`[DEPLOY] fetching scenes from world -  error: ${text}`)
     throw new Error(`Failed to fetch world scenes: ${response.status} ${response.statusText}`)
   }
   const data = (await response.json()) as WorldScenesResponse
-  logger.info(`[DEBUG fetchWorldScenes] response: total=${data.total}, scenes=${data.scenes?.length}`)
+  logger.info(`[DEPLOY] fetching scenes from world success: total=${data.total}, scenes=${data.scenes?.length}`)
   return data.scenes || []
 }
 

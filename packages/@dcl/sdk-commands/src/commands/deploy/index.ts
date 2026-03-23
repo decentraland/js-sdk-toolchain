@@ -117,15 +117,18 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
   const isWorld = sceneHasWorldCfg(sceneJson)
   const worldName = sceneJson.worldConfiguration?.name
 
-  options.components.logger.info(
-    `[DEBUG deploy] isWorld=${isWorld}, multiScene=${multiScene}, autoYes=${autoYes}, worldName=${worldName}`
-  )
+  if (isWorld) {
+    options.components.logger.info(
+      `[DEPLOY] deploying in world:${isWorld}, multi scene world:${multiScene}, world name:${worldName}`
+    )
+  }
 
   const trackProps: Events['Scene deploy started'] = {
     projectHash: b64HashingFunction(projectRoot),
     coords,
     isWorld
   }
+
   const packageJson = await getPackageJson(options.components, projectRoot)
   const dependencies = Array.from(
     new Set([...Object.keys(packageJson.dependencies || {}), ...Object.keys(packageJson.devDependencies || {})])
@@ -135,10 +138,9 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
 
   let needsDelete = false
   if (isWorld && !multiScene && worldName) {
-    options.components.logger.info(`[DEBUG deploy] checking existing scenes for world "${worldName}"...`)
+    options.components.logger.info(`[DEPLOY] checking existing scenes for world "${worldName}"...`)
     try {
       const existingScenes = await fetchWorldScenes(options.components.logger, worldName, targetContent)
-      options.components.logger.info(`[DEBUG deploy] found ${existingScenes.length} existing scene(s)`)
 
       if (existingScenes.length > 0) {
         const scenesOnOtherParcels = getScenesOnOtherParcels(existingScenes, sceneJson.scene.parcels)
@@ -165,15 +167,9 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
               throw new CliError('DEPLOY_CANCELLED', 'Deployment cancelled by user.')
             }
           }
-
           needsDelete = true
-          options.components.logger.info(
-            `[DEBUG deploy] needsDelete=true, ${scenesOnOtherParcels.length} scene(s) on other parcels`
-          )
         } else {
-          options.components.logger.info(
-            `[DEBUG deploy] existing scene(s) on same parcels, deploy will overwrite — no delete needed`
-          )
+          options.components.logger.warn(`[DEPLOY] no existing scenes in other parcels, deployment will continue`)
         }
       }
     } catch (e: any) {
@@ -207,11 +203,6 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
 
   const deleteScenesFromWorldPayload =
     needsDelete && worldName ? buildDeleteScenesFromWorldPayload(worldName) : undefined
-  options.components.logger.info(
-    `[DEBUG deploy] opening linker-dapp, needsDelete=${needsDelete}, deleteScenesFromWorldPayload=${
-      deleteScenesFromWorldPayload ? 'SET' : 'NOT SET'
-    }`
-  )
 
   const awaitResponse = future<void>()
   const { program } = await getAddressAndSignature(
@@ -257,9 +248,6 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
     // Uploading data
     const { client, url } = await getCatalyst(chainId, options.args['--target'], options.args['--target-content'])
 
-    options.components.logger.info(
-      `[DEBUG deployEntity] needsDelete=${needsDelete}, hasDeleteSignature=${!!linkerResponse.deleteSignature}`
-    )
     if (needsDelete && worldName && !linkerResponse.deleteSignature) {
       throw new CliError(
         'DEPLOY_DELETE_FAILED',
@@ -268,8 +256,7 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
     }
 
     if (needsDelete && worldName && linkerResponse.deleteSignature) {
-      options.components.logger.info(`[DEBUG deployEntity] executing DELETE for "${worldName}"`)
-      printProgressInfo(options.components.logger, `Deleting existing scenes from world "${worldName}"...`)
+      options.components.logger.info(`[DEPLOY] deleting scenes for "${worldName}"`)
 
       try {
         const deleteResponse = await deleteWorldScenes(
@@ -280,12 +267,10 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
         )
 
         if (deleteResponse.ok) {
-          printProgressInfo(options.components.logger, 'Existing scenes deleted successfully.')
+          options.components.logger.info(`[DEPLOY] existing scenes for "${worldName} deleted successfully"`)
         } else {
           const errorText = await deleteResponse.text()
-          options.components.logger.info(
-            `[DEBUG deployEntity] DELETE FAILED: status=${deleteResponse.status} body=${errorText}`
-          )
+          options.components.logger.info(`[DEPLOY] DELETE FAILED: status=${deleteResponse.status} body=${errorText}`)
           throw new CliError(
             'DEPLOY_DELETE_FAILED',
             `Failed to delete existing scenes from "${worldName}" (status ${deleteResponse.status}): ${errorText}\n`
