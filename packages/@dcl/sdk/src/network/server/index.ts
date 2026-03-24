@@ -116,7 +116,8 @@ export function createServerValidator(config: ServerValidationConfig) {
     }
 
     if (message.type === CrdtMessageType.PUT_COMPONENT || message.type === CrdtMessageType.DELETE_COMPONENT) {
-      const component = engine.getComponent(message.componentId) as InternalBaseComponent<unknown>
+      const component = engine.getComponentOrNull(message.componentId) as InternalBaseComponent<unknown> | null
+      if (!component) return false
       const buf = 'data' in message ? new ReadWriteByteBuffer(message.data) : null
       const value = buf ? component.schema.deserialize(buf) : null
       const dryRunCRDT = component.__dry_run_updateFromCrdt(message)

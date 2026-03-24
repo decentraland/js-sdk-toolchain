@@ -171,8 +171,8 @@ export function addSyncTransport(
     // Only accept authoritative messages from authoritative server
     if (sender !== AUTH_SERVER_PEER_ID) return
 
-    // DEBUG_NETWORK_MESSAGES() &&
-    console.log('[AUTHORITATIVE] Received authoritative message from server:', value.byteLength, 'bytes')
+    DEBUG_NETWORK_MESSAGES() &&
+      console.log('[AUTHORITATIVE] Received authoritative message from server:', value.byteLength, 'bytes')
 
     // Process authoritative messages by forcing them through normal CRDT processing
     // but with a timestamp that's guaranteed to be accepted
