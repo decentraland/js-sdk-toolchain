@@ -278,7 +278,7 @@ describe('test CRDT flow E2E', () => {
           componentId: int8A.componentId,
           entityId: entityA,
           type: CrdtMessageType.DELETE_COMPONENT,
-          timestamp: 7
+          timestamp: 6
         },
         {
           direction: 'a->b',
