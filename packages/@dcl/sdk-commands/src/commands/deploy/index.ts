@@ -228,7 +228,8 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
     },
     deployEntity,
     deleteScenesFromWorldPayload,
-    targetContent
+    targetContent,
+    multiScene
   )
 
   // Programmatic mode early return
