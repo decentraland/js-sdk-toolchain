@@ -20,7 +20,6 @@ import {
   deleteWorldScenes,
   fetchWorldScenes,
   getScenesOnOtherParcels,
-  validateWorldExists,
   checkWorldDeploymentPermission,
   promptUser
 } from './utils'
@@ -118,22 +117,6 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
   const coords = getBaseCoords(sceneJson)
   const isWorld = sceneHasWorldCfg(sceneJson)
   const worldName = sceneJson.worldConfiguration?.name
-
-  if (isWorld && worldName && targetContent) {
-    try {
-      const worldExists = await validateWorldExists(worldName, targetContent)
-      if (!worldExists) {
-        throw new CliError(
-          'DEPLOY_WORLD_NOT_FOUND',
-          `World "${worldName}" does not exist. Verify the name in your scene.json worldConfiguration.name.`
-        )
-      }
-      options.components.logger.log(`[DEPLOY] World "${worldName}" exists.`)
-    } catch (e: any) {
-      if (e instanceof CliError) throw e
-      options.components.logger.warn(`Could not verify world existence: ${e.message}`)
-    }
-  }
 
   const trackProps: Events['Scene deploy started'] = {
     projectHash: b64HashingFunction(projectRoot),
