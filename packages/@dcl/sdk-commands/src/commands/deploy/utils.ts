@@ -368,13 +368,6 @@ export function promptUser(question: string): Promise<boolean> {
   })
 }
 
-export async function validateWorldExists(worldName: string, targetContent: string): Promise<boolean> {
-  const encodedName = encodeURIComponent(worldName)
-  const url = `${targetContent}/world/${encodedName}/about`
-  const response = await fetch(url)
-  return response.ok
-}
-
 interface WorldPermissionsResponse {
   permissions: {
     deployment: {
@@ -406,7 +399,6 @@ export async function fetchParcelPermissions(
 ): Promise<string[]> {
   const encodedName = encodeURIComponent(worldName)
   const url = `${targetContent}/world/${encodedName}/permissions/deployment/address/${address.toLowerCase()}/parcels`
-  console.log(`[DEPLOY] Fetching parcel permissions from: ${url}`)
   const response = await fetch(url)
   if (!response.ok) {
     throw new Error(`Failed to fetch parcel permissions: ${response.status} ${response.statusText}`)
@@ -424,8 +416,6 @@ export async function checkWorldDeploymentPermission(
 ): Promise<{ allowed: boolean; deniedParcels?: string[] }> {
   const permissions = await fetchWorldPermissions(worldName, targetContent)
   const lowerAddress = address.toLowerCase()
-
-  logger.info(`[DEPLOY] Permissions response for "${worldName}": ${JSON.stringify(permissions)}`)
 
   // Check if wallet is the world owner
   if (permissions.owner?.toLowerCase() === lowerAddress) {
@@ -446,7 +436,6 @@ export async function checkWorldDeploymentPermission(
       if (!deploymentSummary || deploymentSummary.world_wide) {
         return { allowed: true }
       }
-      // Wallet is in allow-list but only has per-parcel permissions, fall through to parcel check
     }
   }
 
