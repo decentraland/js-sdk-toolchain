@@ -20,6 +20,8 @@ import {
   deleteWorldScenes,
   fetchWorldScenes,
   getScenesOnOtherParcels,
+  validateWorldExists,
+  checkWorldDeploymentPermission,
   promptUser
 } from './utils'
 import { buildScene } from '../build'
@@ -117,10 +119,20 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
   const isWorld = sceneHasWorldCfg(sceneJson)
   const worldName = sceneJson.worldConfiguration?.name
 
-  if (isWorld) {
-    options.components.logger.info(
-      `[DEPLOY] deploying in world:${isWorld}, multi scene world:${multiScene}, world name:${worldName}`
-    )
+  if (isWorld && worldName && targetContent) {
+    try {
+      const worldExists = await validateWorldExists(worldName, targetContent)
+      if (!worldExists) {
+        throw new CliError(
+          'DEPLOY_WORLD_NOT_FOUND',
+          `World "${worldName}" does not exist. Verify the name in your scene.json worldConfiguration.name.`
+        )
+      }
+      options.components.logger.log(`[DEPLOY] World "${worldName}" exists.`)
+    } catch (e: any) {
+      if (e instanceof CliError) throw e
+      options.components.logger.warn(`Could not verify world existence: ${e.message}`)
+    }
   }
 
   const trackProps: Events['Scene deploy started'] = {
@@ -138,7 +150,6 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
 
   let needsDelete = false
   if (isWorld && !multiScene && worldName) {
-    options.components.logger.info(`[DEPLOY] checking existing scenes for world "${worldName}"...`)
     try {
       const existingScenes = await fetchWorldScenes(options.components.logger, worldName, targetContent)
 
@@ -168,8 +179,6 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
             }
           }
           needsDelete = true
-        } else {
-          options.components.logger.warn(`[DEPLOY] no existing scenes in other parcels, deployment will continue`)
         }
       }
     } catch (e: any) {
@@ -218,7 +227,8 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
       isHttps: !!options.args['--https']
     },
     deployEntity,
-    deleteScenesFromWorldPayload
+    deleteScenesFromWorldPayload,
+    targetContent
   )
 
   // Programmatic mode early return
@@ -245,13 +255,40 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
   async function deployEntity(linkerResponse: LinkerResponse) {
     const { authChain, chainId } = linkerResponse
 
+    if (isWorld && worldName && targetContent && linkerResponse.address) {
+      options.components.logger.log(`[DEPLOY] Checking permissions for wallet ${linkerResponse.address}...`)
+      try {
+        const permissionCheck = await checkWorldDeploymentPermission(
+          options.components.logger,
+          worldName,
+          linkerResponse.address,
+          targetContent,
+          sceneJson.scene.parcels
+        )
+        if (!permissionCheck.allowed) {
+          const deniedMsg = permissionCheck.deniedParcels?.length
+            ? `\nYou don't have permission for parcels: ${permissionCheck.deniedParcels.join(', ')}.`
+            : ''
+          throw new CliError(
+            'DEPLOY_NO_PERMISSION',
+            `Wallet ${linkerResponse.address} does not have permission to deploy to world "${worldName}".${deniedMsg}\n` +
+              `Contact the world owner to grant deployment permissions.`
+          )
+        }
+        options.components.logger.log(`[DEPLOY] Permissions verified.`)
+      } catch (e: any) {
+        if (e instanceof CliError) throw e
+        options.components.logger.warn(`Could not verify deployment permissions: ${e.message}`)
+      }
+    }
+
     // Uploading data
     const { client, url } = await getCatalyst(chainId, options.args['--target'], options.args['--target-content'])
 
     if (needsDelete && worldName && !linkerResponse.deleteSignature) {
       throw new CliError(
         'DEPLOY_DELETE_FAILED',
-        `Cannot delete existing scenes from "${worldName}": there's not signatur for deleting the scenes.`
+        `Cannot delete existing scenes from "${worldName}": missing signature for deleting the scenes.`
       )
     }
 
@@ -278,7 +315,11 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
         }
       } catch (e: any) {
         if (e instanceof CliError) throw e
-        throw new CliError('DEPLOY_DELETE_FAILED', `Error deleting existing scenes from "${worldName}": ${e.message}\n`)
+        throw new CliError(
+          'DEPLOY_DELETE_FAILED',
+          `Error deleting existing scenes from "${worldName}": ${e.message}\n` +
+            `Hint: Use --multi-scene to deploy alongside existing scenes without deleting them.`
+        )
       }
     }
 
