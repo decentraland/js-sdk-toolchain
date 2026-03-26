@@ -17,7 +17,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
             showFeedback: true,
             showHighlight: true,
             maxPlayerDistance: 10,
-            priority: 0
+            priority: 1,
           },
           interactionType: InteractionType.CURSOR
         }
@@ -35,7 +35,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
             showFeedback: false,
             showHighlight: false,
             maxPlayerDistance: 7,
-            priority: 0
+            priority: 2
           },
           interactionType: InteractionType.CURSOR
         }
