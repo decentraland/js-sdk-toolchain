@@ -1285,6 +1285,9 @@ export const getDefaultOpts: (opts?: Partial<EventSystemOptions>) => EventSystem
 export function getEntitiesWithParent(engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema'>, parent: Entity): Entity[];
 
 // @public
+export function getGlobal<T>(key: string): T | undefined;
+
+// @public
 export function getWorldPosition(engine: WorldTransformEngine, entity: Entity): Vector3Type;
 
 // @public
@@ -1658,6 +1661,13 @@ export type JustifyType = 'flex-start' | 'center' | 'flex-end' | 'space-between'
 
 // @public
 export type Key = number | string;
+
+// @public
+export enum KnockbackFalloff {
+    CONSTANT = 0,
+    INVERSE_SQUARE = 2,
+    LINEAR = 1
+}
 
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
 // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
@@ -3809,11 +3819,30 @@ export namespace PBVisibilityComponent {
     export function encode(message: PBVisibilityComponent, writer?: _m0.Writer): _m0.Writer;
 }
 
+// @public
+export const Physics: PhysicsSystem;
+
 // @public (undocumented)
 export const PhysicsCombinedForce: LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedForce>;
 
 // @public (undocumented)
 export const PhysicsCombinedImpulse: LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedImpulse>;
+
+// @public (undocumented)
+export interface PhysicsSystem {
+    applyForceToPlayer(source: Entity, vector: Vector3Type): void;
+    // (undocumented)
+    applyForceToPlayer(source: Entity, direction: Vector3Type, magnitude: number): void;
+    applyForceToPlayerForDuration(source: Entity, duration: number, vector: Vector3Type): void;
+    // (undocumented)
+    applyForceToPlayerForDuration(source: Entity, duration: number, direction: Vector3Type, magnitude: number): void;
+    applyImpulseToPlayer(vector: Vector3Type): void;
+    // (undocumented)
+    applyImpulseToPlayer(direction: Vector3Type, magnitude: number): void;
+    applyKnockbackToPlayer(fromPosition: Vector3Type, magnitude: number, radius?: number, falloff?: KnockbackFalloff): void;
+    applyRepulsionForceToPlayer(source: Entity, fromPosition: Vector3Type, magnitude: number, radius?: number, falloff?: KnockbackFalloff): void;
+    removeForceFromPlayer(source: Entity): void;
+}
 
 // @public
 export namespace Plane {
@@ -4352,6 +4381,9 @@ export namespace RotateContinuous {
     export function encode(message: RotateContinuous, writer?: _m0.Writer): _m0.Writer;
 }
 
+// @public
+export function rotateVectorByQuaternion(v: Vector3Type, q: QuaternionType): Vector3Type;
+
 // Warning: (ae-missing-release-tag) "RPCSendableMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -4485,6 +4517,9 @@ export namespace Schemas {
         value?: any;
     }) => void;
 }
+
+// @public
+export function setGlobalPolyfill<T>(key: string, value: T): void;
 
 // @public
 export interface SetMoveRotateScaleParams extends MoveRotateScaleModeParams {
@@ -4762,6 +4797,7 @@ export interface TransformComponentExtended extends TransformComponent {
     create(entity: Entity, val?: TransformTypeWithOptionals): TransformType;
     // (undocumented)
     createOrReplace(entity: Entity, val?: TransformTypeWithOptionals): TransformType;
+    localToWorldDirection(entity: Entity, localDirection: Vector3Type): Vector3Type;
 }
 
 // @public (undocumented)
