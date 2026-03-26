@@ -23,5 +23,3 @@ describe('Generated TriggerArea ProtoBuf', () => {
     testSchemaSerializationIdentity(TriggerArea.schema, TriggerArea.schema.create())
   })
 })
-
-
