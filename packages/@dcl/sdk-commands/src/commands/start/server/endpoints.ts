@@ -201,16 +201,48 @@ async function serveFolders(
         }
       }
 
-      if (!(await components.fs.fileExists(fullPath))) return { status: 404 }
-      if (await components.fs.directoryExists(fullPath)) return { status: 404 }
+      const stat = await components.fs.stat(fullPath)
 
-      return {
-        headers: {
-          'x-timestamp': Date.now().toString(),
-          'x-sent': 'true',
-          'cache-control': 'no-cache,private,max-age=1'
-        },
-        body: components.fs.createReadStream(fullPath)
+      if (!stat.isFile())
+        return { status: 404 };
+
+      // Support for range requests is required for video textures to work in
+      // the Unity based explorer on macOS.
+      const headers: Record<string, string> = {
+        'accept-ranges': 'bytes',
+        'cache-control': 'no-cache,private,max-age=1',
+        'x-sent': 'true',
+        'x-timestamp': Date.now().toString()
+      }
+
+      // Else, video textures don't work on the Unity based explorer on macOS.
+      if (fullPath.endsWith('.mp4'))
+        headers['content-type'] = 'video/mp4'
+
+      const fileSize = stat.size
+      const range = ctx.request.headers.get('range')
+
+      if (range) {
+        const parts = range.replace(/bytes=/, '').split('-')
+        const start = parseInt(parts[0], 10)
+        const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1
+
+        headers['content-range'] = `bytes ${start}-${end}/${fileSize}`
+        headers['content-length'] = (end - start + 1).toString()
+
+        return {
+          status: 206,
+          headers: headers,
+          body: components.fs.createReadStream(fullPath, { start, end })
+        }
+      }
+      else {
+        headers['content-length'] = fileSize.toString()
+        
+        return {
+          headers: headers,
+          body: components.fs.createReadStream(fullPath)
+        }
       }
     }
 
