@@ -6,6 +6,7 @@
   "bugs": "https://github.com/decentraland/js-sdk-toolchain/issues",
   "dependencies": {
     "@actions/core": "^1.10.0",
+    "@dcl/protocol": "1.0.0-23421238265.commit-3882f15",
     "@dcl/quickjs-emscripten": "^0.21.0-3680274614.commit-1808aa1",
     "@dcl/ts-proto": "1.153.0",
     "@types/fs-extra": "^9.0.12",
@@ -24,7 +25,6 @@
   },
   "devDependencies": {
     "@dcl/eslint-config": "^1.0.6-20220629202434.commit-44f87f0",
-    "@dcl/protocol": "https://sdk-team-cdn.decentraland.org/@dcl/protocol/branch//dcl-protocol-1.0.0-23346176076.commit-91ee968.tgz",
     "@types/node": "^18.11.18",
     "syncpack": "^9.8.4",
     "typedoc": "^0.23.28"

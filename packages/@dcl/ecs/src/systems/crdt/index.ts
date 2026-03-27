@@ -261,6 +261,12 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
 
       // Then we send all the new crdtMessages that the transport needs to process
       for (const message of crdtMessages) {
+        // Avoid echo messages
+        if (message.transportId === transportIndex) continue
+
+        // Redundant message for the transport
+        if (!transport.filter(message)) continue
+
         // Check if adding this message would exceed the size limit
         const currentBufferSize = transportBuffer.toBinary().byteLength
         const messageSize = message.messageBuffer.byteLength
@@ -279,12 +285,6 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
             continue
           }
         }
-
-        // Avoid echo messages
-        if (message.transportId === transportIndex) continue
-
-        // Redundant message for the transport
-        if (!transport.filter(message)) continue
         const { entityId } = findNetworkId(message)
 
         const transformNeedsFix =
