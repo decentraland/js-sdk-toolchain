@@ -32,7 +32,7 @@ const emptyPS = {
   simulationSpace: undefined,
   faceTravelDirection: undefined,
   playbackState: undefined,
-  restartCount: undefined
+  bursts: [] as const
 }
 
 describe('Generated ParticleSystem ProtoBuf', () => {
@@ -124,8 +124,6 @@ describe('Generated ParticleSystem ProtoBuf', () => {
       spriteSheet: {
         tilesX: 4,
         tilesY: 4,
-        startFrame: 0,
-        endFrame: 15,
         framesPerSecond: 30
       }
     })
@@ -166,8 +164,7 @@ describe('Generated ParticleSystem ProtoBuf', () => {
       ...emptyPS,
       rate: 10,
       lifetime: 5,
-      playbackState: PBParticleSystem_PlaybackState.PS_PAUSED,
-      restartCount: 3
+      playbackState: PBParticleSystem_PlaybackState.PS_PAUSED
     })
   })
 
@@ -183,6 +180,20 @@ describe('Generated ParticleSystem ProtoBuf', () => {
     })
   })
 
+  it('should serialize/deserialize with emission bursts', () => {
+    const newEngine = Engine()
+    const ParticleSystem = components.ParticleSystem(newEngine)
+    testComponentSerialization(ParticleSystem, {
+      ...emptyPS,
+      rate: 10,
+      lifetime: 5,
+      bursts: [
+        { time: 0, count: 20, cycles: 3, interval: 0.5, probability: 1.0 },
+        { time: 2.0, count: 50, cycles: undefined, interval: undefined, probability: undefined }
+      ]
+    })
+  })
+
   it('should use Shape helpers to build emitter shapes', () => {
     const newEngine = Engine()
     const ParticleSystem = components.ParticleSystem(newEngine)
@@ -191,6 +202,7 @@ describe('Generated ParticleSystem ProtoBuf', () => {
     ParticleSystem.create(entity, {
       rate: 10,
       lifetime: 5,
+      bursts: [],
       shape: ParticleSystem.Shape.Cone({ angle: 30, radius: 1 })
     })
 
@@ -205,6 +217,7 @@ describe('Generated ParticleSystem ProtoBuf', () => {
 
     ParticleSystem.create(entity, {
       rate: 5,
+      bursts: [],
       shape: ParticleSystem.Shape.Point()
     })
 
@@ -217,6 +230,7 @@ describe('Generated ParticleSystem ProtoBuf', () => {
     const entity = newEngine.addEntity()
 
     ParticleSystem.create(entity, {
+      bursts: [],
       shape: ParticleSystem.Shape.Sphere({ radius: 3 })
     })
 
@@ -229,6 +243,7 @@ describe('Generated ParticleSystem ProtoBuf', () => {
     const entity = newEngine.addEntity()
 
     ParticleSystem.create(entity, {
+      bursts: [],
       shape: ParticleSystem.Shape.Box({ size: { x: 1, y: 2, z: 3 } })
     })
 

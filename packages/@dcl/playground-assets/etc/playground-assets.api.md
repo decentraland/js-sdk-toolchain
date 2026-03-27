@@ -639,6 +639,22 @@ export type Color4Type = {
 };
 
 // @public (undocumented)
+export interface ColorRange {
+    // (undocumented)
+    end: PBColor4 | undefined;
+    // (undocumented)
+    start: PBColor4 | undefined;
+}
+
+// @public (undocumented)
+export namespace ColorRange {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): ColorRange;
+    // (undocumented)
+    export function encode(message: ColorRange, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface ComponentData {
     // (undocumented)
     data?: {
@@ -1258,6 +1274,22 @@ export type FlexWrapType = 'wrap' | 'nowrap' | 'wrap-reverse';
 
 // @public (undocumented)
 export type FloatArray = number[];
+
+// @public (undocumented)
+export interface FloatRange {
+    // (undocumented)
+    end: number;
+    // (undocumented)
+    start: number;
+}
+
+// @public (undocumented)
+export namespace FloatRange {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): FloatRange;
+    // (undocumented)
+    export function encode(message: FloatRange, writer?: _m0.Writer): _m0.Writer;
+}
 
 // @public (undocumented)
 export const enum Font {
@@ -3073,15 +3105,16 @@ export interface PBParticleSystem {
     active?: boolean | undefined;
     additionalForce?: PBVector3 | undefined;
     blendMode?: PBParticleSystem_BlendMode | undefined;
+    bursts: PBParticleSystem_Burst[];
     // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
     // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-    colorOverTime?: PBParticleSystem_ColorRange | undefined;
+    colorOverTime?: ColorRange | undefined;
     faceTravelDirection?: boolean | undefined;
     gravity?: number | undefined;
-    initialColor?: PBParticleSystem_ColorRange | undefined;
-    initialRotation?: PBParticleSystem_FloatRange | undefined;
-    initialSize?: PBParticleSystem_FloatRange | undefined;
-    initialVelocitySpeed?: PBParticleSystem_FloatRange | undefined;
+    initialColor?: ColorRange | undefined;
+    initialRotation?: FloatRange | undefined;
+    initialSize?: FloatRange | undefined;
+    initialVelocitySpeed?: FloatRange | undefined;
     lifetime?: number | undefined;
     limitVelocity?: PBParticleSystem_LimitVelocity | undefined;
     loop?: boolean | undefined;
@@ -3089,10 +3122,9 @@ export interface PBParticleSystem {
     playbackState?: PBParticleSystem_PlaybackState | undefined;
     prewarm?: boolean | undefined;
     rate?: number | undefined;
-    restartCount?: number | undefined;
     // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
     // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-    rotationOverTime?: PBParticleSystem_FloatRange | undefined;
+    rotationOverTime?: FloatRange | undefined;
     // (undocumented)
     shape?: {
         $case: "point";
@@ -3110,7 +3142,7 @@ export interface PBParticleSystem {
     simulationSpace?: PBParticleSystem_SimulationSpace | undefined;
     // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
     // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-    sizeOverTime?: PBParticleSystem_FloatRange | undefined;
+    sizeOverTime?: FloatRange | undefined;
     spriteSheet?: PBParticleSystem_SpriteSheetAnimation | undefined;
     texture?: Texture | undefined;
 }
@@ -3148,19 +3180,20 @@ export namespace PBParticleSystem_Box {
 }
 
 // @public (undocumented)
-export interface PBParticleSystem_ColorRange {
-    // (undocumented)
-    end: PBColor4 | undefined;
-    // (undocumented)
-    start: PBColor4 | undefined;
+export interface PBParticleSystem_Burst {
+    count: number;
+    cycles?: number | undefined;
+    interval?: number | undefined;
+    probability?: number | undefined;
+    time: number;
 }
 
 // @public (undocumented)
-export namespace PBParticleSystem_ColorRange {
+export namespace PBParticleSystem_Burst {
     // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_ColorRange;
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_Burst;
     // (undocumented)
-    export function encode(message: PBParticleSystem_ColorRange, writer?: _m0.Writer): _m0.Writer;
+    export function encode(message: PBParticleSystem_Burst, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3175,22 +3208,6 @@ export namespace PBParticleSystem_Cone {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_Cone;
     // (undocumented)
     export function encode(message: PBParticleSystem_Cone, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
-export interface PBParticleSystem_FloatRange {
-    // (undocumented)
-    end: number;
-    // (undocumented)
-    start: number;
-}
-
-// @public (undocumented)
-export namespace PBParticleSystem_FloatRange {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_FloatRange;
-    // (undocumented)
-    export function encode(message: PBParticleSystem_FloatRange, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3249,9 +3266,7 @@ export namespace PBParticleSystem_Sphere {
 
 // @public (undocumented)
 export interface PBParticleSystem_SpriteSheetAnimation {
-    endFrame: number;
     framesPerSecond?: number | undefined;
-    startFrame: number;
     tilesX: number;
     tilesY: number;
 }
