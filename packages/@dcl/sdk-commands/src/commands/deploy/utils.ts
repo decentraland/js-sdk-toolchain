@@ -441,7 +441,6 @@ export async function checkWorldDeploymentPermission(
 
   // Check per-parcel permissions
   const allowedParcels = await fetchParcelPermissions(worldName, address, targetContent)
-  logger.info(`[DEPLOY] Allowed parcels for ${address}: ${JSON.stringify(allowedParcels)}`)
   const allowedSet = new Set(allowedParcels)
   const deniedParcels = deployingParcels.filter((p) => !allowedSet.has(p))
 

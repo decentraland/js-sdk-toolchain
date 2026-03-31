@@ -324,9 +324,6 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
     const sceneUrl = `${domain}/?NETWORK=${network}&position=${position}${worldRealm}`
 
     try {
-      options.components.logger.info(`Address: ${linkerResponse.address}`)
-      options.components.logger.info(`AuthChain: ${linkerResponse.authChain}`)
-      options.components.logger.info(`Network: ${getChainName(linkerResponse.chainId!)}`)
       const response = (await client.deploy(deployData, {
         timeout: 600000
       })) as any
