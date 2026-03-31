@@ -7,6 +7,7 @@ import { PreviewComponents } from '../types'
 import { sceneUpdateClients } from './routes'
 import { ProjectUnion } from '../../../logic/project-validations'
 import { b64HashingFunction } from '../../../logic/project-files'
+import { isWSL2 } from '../../../logic/is-wsl2'
 import {
   WsSceneMessage,
   UpdateModelType
@@ -27,13 +28,21 @@ export async function wireFileWatcherToWebSockets(
 ) {
   const ignored = await getDCLIgnorePatterns(components, projectRoot)
   const sceneId = b64HashingFunction(projectRoot)
+  const usePolling = isWSL2()
 
   chokidar
     .watch(path.resolve(projectRoot), {
       atomic: false,
       ignored,
       ignoreInitial: false,
-      cwd: projectRoot
+      cwd: projectRoot,
+      ...(usePolling
+        ? {
+            usePolling: true,
+            interval: 300,
+            binaryInterval: 500
+          }
+        : {})
     })
     .on('unlink', (_: unknown, file: string) => {
       if (desktopClient) {
