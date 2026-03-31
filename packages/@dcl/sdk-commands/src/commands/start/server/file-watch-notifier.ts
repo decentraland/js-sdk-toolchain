@@ -29,20 +29,22 @@ export async function wireFileWatcherToWebSockets(
   const ignored = await getDCLIgnorePatterns(components, projectRoot)
   const sceneId = b64HashingFunction(projectRoot)
   const usePolling = isWSL2()
+  const watchPath = usePolling ? path.resolve(projectRoot, 'src') : path.resolve(projectRoot)
+  const watchOptions = usePolling
+    ? {
+        usePolling: true,
+        interval: 300,
+        binaryInterval: 500
+      }
+    : {}
 
   chokidar
-    .watch(path.resolve(projectRoot), {
+    .watch(watchPath, {
       atomic: false,
       ignored,
       ignoreInitial: false,
       cwd: projectRoot,
-      ...(usePolling
-        ? {
-            usePolling: true,
-            interval: 300,
-            binaryInterval: 500
-          }
-        : {})
+      ...watchOptions
     })
     .on('unlink', (_: unknown, file: string) => {
       if (desktopClient) {
