@@ -29,7 +29,7 @@ export type { InputModifierHelper, InputModifierComponentDefinitionExtended } fr
 export type { LightSourceHelper, LightSourceComponentDefinitionExtended } from './extended/LightSource'
 export type { TriggerAreaComponentDefinitionExtended } from './extended/TriggerArea'
 export type {
-  ParticleSystemShapeHelper,
+  ParticleSystemHelper,
   ParticleSystemComponentDefinitionExtended,
   ParticleSystemBlendMode,
   ParticleSystemPlaybackState

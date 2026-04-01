@@ -16,7 +16,7 @@ export { PBParticleSystem_BlendMode as ParticleSystemBlendMode, PBParticleSystem
 /**
  * @public
  */
-export interface ParticleSystemShapeHelper {
+export interface ParticleSystemHelper {
   /** Emit from a single point */
   Point: (point?: PBParticleSystem_Point) => PBParticleSystem['shape']
   /** Emit from the surface or volume of a sphere */
@@ -33,10 +33,10 @@ export interface ParticleSystemShapeHelper {
 export interface ParticleSystemComponentDefinitionExtended
   extends LastWriteWinElementSetComponentDefinition<PBParticleSystem> {
   /** Helpers for constructing emitter shapes */
-  Shape: ParticleSystemShapeHelper
+  Shape: ParticleSystemHelper
 }
 
-const ParticleSystemShapeHelper: ParticleSystemShapeHelper = {
+const ParticleSystemShapeHelper: ParticleSystemHelper = {
   Point(point = {}) {
     return { $case: 'point', point }
   },

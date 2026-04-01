@@ -2312,11 +2312,11 @@ export const ParticleSystem: ParticleSystemComponentDefinitionExtended;
 
 // @public (undocumented)
 export interface ParticleSystemComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBParticleSystem> {
-    Shape: ParticleSystemShapeHelper;
+    Shape: ParticleSystemHelper;
 }
 
 // @public (undocumented)
-export interface ParticleSystemShapeHelper {
+export interface ParticleSystemHelper {
     Box: (box?: PBParticleSystem_Box) => PBParticleSystem['shape'];
     Cone: (cone?: PBParticleSystem_Cone) => PBParticleSystem['shape'];
     Point: (point?: PBParticleSystem_Point) => PBParticleSystem['shape'];
