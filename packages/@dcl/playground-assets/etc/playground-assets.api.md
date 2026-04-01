@@ -3104,6 +3104,7 @@ export namespace PBNftShape {
 export interface PBParticleSystem {
     active?: boolean | undefined;
     additionalForce?: PBVector3 | undefined;
+    billboard?: boolean | undefined;
     blendMode?: PBParticleSystem_BlendMode | undefined;
     bursts: PBParticleSystem_Burst[];
     // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
@@ -3112,7 +3113,7 @@ export interface PBParticleSystem {
     faceTravelDirection?: boolean | undefined;
     gravity?: number | undefined;
     initialColor?: ColorRange | undefined;
-    initialRotation?: FloatRange | undefined;
+    initialRotation?: PBQuaternion | undefined;
     initialSize?: FloatRange | undefined;
     initialVelocitySpeed?: FloatRange | undefined;
     lifetime?: number | undefined;
@@ -3122,9 +3123,7 @@ export interface PBParticleSystem {
     playbackState?: PBParticleSystem_PlaybackState | undefined;
     prewarm?: boolean | undefined;
     rate?: number | undefined;
-    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-    rotationOverTime?: FloatRange | undefined;
+    rotationOverTime?: PBQuaternion | undefined;
     // (undocumented)
     shape?: {
         $case: "point";

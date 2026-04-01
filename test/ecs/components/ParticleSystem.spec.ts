@@ -7,7 +7,8 @@ import {
 } from '../../../packages/@dcl/ecs/src/components/generated/pb/decentraland/sdk/components/particle_system.gen'
 
 // Full object with all optional fields — required by testComponentSerialization
-// since the deserializer always returns all fields (undefined for unset ones)
+// since the deserializer always returns all fields (undefined for unset ones).
+// Field order matches createBasePBParticleSystem() in the generated file.
 const emptyPS = {
   active: undefined,
   rate: undefined,
@@ -19,18 +20,19 @@ const emptyPS = {
   sizeOverTime: undefined,
   initialRotation: undefined,
   rotationOverTime: undefined,
+  faceTravelDirection: undefined,
   initialColor: undefined,
   colorOverTime: undefined,
   initialVelocitySpeed: undefined,
   texture: undefined,
   blendMode: undefined,
+  billboard: undefined,
   spriteSheet: undefined,
   shape: undefined,
   loop: undefined,
   prewarm: undefined,
-  limitVelocity: undefined,
   simulationSpace: undefined,
-  faceTravelDirection: undefined,
+  limitVelocity: undefined,
   playbackState: undefined,
   bursts: [] as const
 }
@@ -248,5 +250,40 @@ describe('Generated ParticleSystem ProtoBuf', () => {
     })
 
     expect(ParticleSystem.get(entity).shape).toStrictEqual({ $case: 'box', box: { size: { x: 1, y: 2, z: 3 } } })
+  })
+
+  it('should serialize/deserialize billboard property', () => {
+    const newEngine = Engine()
+    const ParticleSystem = components.ParticleSystem(newEngine)
+    testComponentSerialization(ParticleSystem, {
+      ...emptyPS,
+      rate: 10,
+      lifetime: 5,
+      billboard: false
+    })
+  })
+
+  it('should serialize/deserialize with quaternion initial rotation', () => {
+    const newEngine = Engine()
+    const ParticleSystem = components.ParticleSystem(newEngine)
+    testComponentSerialization(ParticleSystem, {
+      ...emptyPS,
+      rate: 10,
+      lifetime: 5,
+      // Identity quaternion: all values exact in float32
+      initialRotation: { x: 0, y: 0, z: 0, w: 1 }
+    })
+  })
+
+  it('should serialize/deserialize with quaternion rotation over time', () => {
+    const newEngine = Engine()
+    const ParticleSystem = components.ParticleSystem(newEngine)
+    testComponentSerialization(ParticleSystem, {
+      ...emptyPS,
+      rate: 10,
+      lifetime: 5,
+      // 90-degree Y rotation: all values exact in float32
+      rotationOverTime: { x: 0, y: 0.5, z: 0, w: 0.5 }
+    })
   })
 })
