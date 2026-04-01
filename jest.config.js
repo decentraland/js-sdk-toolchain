@@ -10,6 +10,9 @@ module.exports = {
     ]
   },
   transformIgnorePatterns: ['node_modules/(?!(@dcl/(ecs-math|quests-client))/)'],
+  moduleNameMapper: {
+    '^@dcl/ecs$': '<rootDir>/packages/@dcl/ecs/dist/index.js'
+  },
   coverageDirectory: 'coverage',
   coverageThreshold: {
     global: {

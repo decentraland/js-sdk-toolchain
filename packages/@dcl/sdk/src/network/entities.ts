@@ -41,10 +41,19 @@ export function entityUtils(engine: IEngine, profile: IProfile) {
       networkValue.networkId = 0
       networkValue.entityId = entityEnumId as Entity
 
-      // Check if this enum is already used
-      for (const [_, network] of engine.getEntitiesWith(NetworkEntity)) {
-        if (network.networkId === networkValue.networkId && network.entityId === networkValue.entityId) {
-          throw new Error('syncEntity failed because the id provided is already in use')
+      // Check if this enum is already used by a different entity.
+      // We skip the entity currently being registered so that late-joining clients
+      // (which receive CRDT state before main() runs) can safely re-register
+      // entities that were pre-populated via state sync without hitting a false positive.
+      for (const [entity, network] of engine.getEntitiesWith(NetworkEntity)) {
+        if (
+          entity !== entityId &&
+          network.networkId === networkValue.networkId &&
+          network.entityId === networkValue.entityId
+        ) {
+          throw new Error(
+            `syncEntity failed because the id provided (${entityEnumId}) is already in use by a different entity`
+          )
         }
       }
     }
