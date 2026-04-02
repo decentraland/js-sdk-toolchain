@@ -130,9 +130,15 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
   }
 
   const packageJson = await getPackageJson(options.components, projectRoot)
+
+  // NOTE: keeping 👇 for query backward-compatibility
   const dependencies = Array.from(
     new Set([...Object.keys(packageJson.dependencies || {}), ...Object.keys(packageJson.devDependencies || {})])
   )
+  const dependencyVersions: Record<string, string> = {}
+  for (const dep of dependencies) {
+    dependencyVersions[dep] = await getInstalledPackageVersion(options.components, dep, projectRoot)
+  }
 
   options.components.analytics.track('Scene deploy started', trackProps)
 
@@ -321,6 +327,7 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
         worldName: sceneJson.worldConfiguration?.name,
         isPortableExperience: !!sceneJson.isPortableExperience,
         dependencies,
+        dependencyVersions,
         serverlessMultiplayer: trackFeatures.serverlessMultiplayer
       })
 
