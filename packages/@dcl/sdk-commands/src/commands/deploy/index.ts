@@ -1,5 +1,5 @@
 import { resolve } from 'path'
-import { EntityType, ChainId, getChainName } from '@dcl/schemas'
+import { EntityType, ChainId } from '@dcl/schemas'
 import { DeploymentBuilder } from 'dcl-catalyst-client'
 import future from 'fp-future'
 import i18next from 'i18next'
