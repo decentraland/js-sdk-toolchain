@@ -50,7 +50,8 @@
     },
     "get_context_files": {
       "list_failed": "Error al listar archivos de contexto",
-      "download_failed": "Error al descargar archivo de contexto"
+      "download_failed": "Error al descargar archivo de contexto",
+      "write_config_failed": "Error al escribir archivo de configuración de contexto AI"
     },
     "init": {
       "dir_not_empty": "El directorio de destino especificado no está vacío. Ejecuta este comando con --yes para sobrescribir.",

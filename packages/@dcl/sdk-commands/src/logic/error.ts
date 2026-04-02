@@ -31,6 +31,7 @@ export type CliErrorName =
   // Get context files errors
   | 'GET_CONTEXT_FILES_LIST_FAILED'
   | 'GET_CONTEXT_FILES_DOWNLOAD_FAILED'
+  | 'GET_CONTEXT_FILES_WRITE_CONFIG_FAILED'
   // General errors
   | 'ACCOUNT_INVALID_PRIVATE_KEY'
   | 'ARGS_ARG_ERROR'
