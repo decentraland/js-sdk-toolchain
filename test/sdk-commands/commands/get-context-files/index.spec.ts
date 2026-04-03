@@ -346,7 +346,7 @@ describe('get-context-files command', () => {
     // Should not throw
     await getContextFiles.main({ args: { _: [] }, components })
 
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('[AI-Context] Failed to generate CLAUDE.md'))
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('[AI-Context] Failed to discover skills'))
   })
 
   it('should remove old dclcontext directory before downloading', async () => {

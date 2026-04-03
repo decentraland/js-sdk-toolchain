@@ -8,12 +8,50 @@ import i18next from 'i18next'
 
 import { Result } from 'arg'
 const GITHUB_API_BASE = 'https://api.github.com/repos/decentraland/docs/contents/ai-sdk-context'
+
+/** Allowed hostname prefixes for GitHub API and raw content URLs */
+const ALLOWED_HOSTS = ['https://api.github.com/', 'https://raw.githubusercontent.com/']
+
 interface GitHubFile {
   name: string
   path: string
   type: 'file' | 'dir'
   download_url?: string
   url: string
+}
+
+/**
+ * Validates that a URL starts with one of the allowed GitHub hosts.
+ * Prevents SSRF if the API response contains unexpected URLs.
+ */
+function isAllowedUrl(url: string): boolean {
+  return ALLOWED_HOSTS.some((host) => url.startsWith(host))
+}
+
+/**
+ * Validates that a path segment (file or directory name) is safe:
+ * no traversal sequences, no absolute paths, no empty segments.
+ */
+function isSafePathSegment(name: string): boolean {
+  if (!name || name === '.' || name === '..') return false
+  if (name.includes('/') || name.includes('\\')) return false
+  if (name.includes('\0')) return false
+  return true
+}
+
+/**
+ * Validates that the GitHub API response is an array of objects with the expected shape.
+ */
+function isGitHubFileArray(data: unknown): data is GitHubFile[] {
+  if (!Array.isArray(data)) return false
+  return data.every(
+    (item) =>
+      typeof item === 'object' &&
+      item !== null &&
+      typeof item.name === 'string' &&
+      typeof item.type === 'string' &&
+      typeof item.url === 'string'
+  )
 }
 
 export interface Options {
@@ -39,16 +77,29 @@ export function help(options: Options) {
 }
 
 async function listFilesFromPath(components: Pick<CliComponents, 'fetch'>, url: string): Promise<GitHubFile[]> {
+  if (!isAllowedUrl(url)) {
+    throw new CliError('GET_CONTEXT_FILES_LIST_FAILED', `Refused to fetch from untrusted URL: ${url}`)
+  }
+
   const response = await components.fetch.fetch(url)
 
   if (!response.ok) {
     throw new CliError('GET_CONTEXT_FILES_LIST_FAILED', i18next.t('errors.get_context_files.list_failed'))
   }
 
-  return (await response.json()) as GitHubFile[]
+  const data: unknown = await response.json()
+  if (!isGitHubFileArray(data)) {
+    throw new CliError('GET_CONTEXT_FILES_LIST_FAILED', 'Unexpected response format from GitHub API')
+  }
+
+  return data
 }
 
 async function downloadFile(components: Pick<CliComponents, 'fetch'>, url: string): Promise<string> {
+  if (!isAllowedUrl(url)) {
+    throw new CliError('GET_CONTEXT_FILES_DOWNLOAD_FAILED', `Refused to download from untrusted URL: ${url}`)
+  }
+
   const response = await components.fetch.fetch(url)
   if (!response.ok) {
     throw new CliError('GET_CONTEXT_FILES_DOWNLOAD_FAILED', i18next.t('errors.get_context_files.download_failed'))
@@ -68,6 +119,9 @@ async function getAllFiles(
   const files: Array<{ url: string; relativePath: string }> = []
   const entries = await listFilesFromPath(components, initialUrl)
   for (const entry of entries) {
+    // Validate each path segment to prevent path traversal
+    if (!isSafePathSegment(entry.name)) continue
+
     const entryRelativePath = basePath ? `${basePath}/${entry.name}` : entry.name
     if (entry.type === 'file') {
       if (entry.download_url) {
@@ -221,7 +275,11 @@ export async function main(options: Options) {
   const downloadPromises = filesToDownload.map(async ({ url, relativePath }) => {
     try {
       const content = await downloadFile(options.components, url)
-      const localFilePath = path.join(contextDir, relativePath)
+      const localFilePath = path.resolve(contextDir, relativePath)
+      // Containment check: ensure resolved path stays within contextDir
+      if (!localFilePath.startsWith(contextDir + path.sep) && localFilePath !== contextDir) {
+        throw new Error(`Path traversal blocked: ${relativePath}`)
+      }
       // Ensure the parent directory exists for nested files
       const parentDir = path.dirname(localFilePath)
       await options.components.fs.mkdir(parentDir, { recursive: true })
@@ -254,9 +312,17 @@ export async function main(options: Options) {
     })
   }
 
+  // Discover skills once and share the result across generators
+  let skills: Array<{ name: string; relativePath: string }> = []
+  try {
+    skills = await discoverSkills(options.components, contextDir)
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    options.components.logger.log(`[AI-Context] Failed to discover skills: ${errorMessage}`)
+  }
+
   // Step 2: Generate CLAUDE.md (only if absent)
   try {
-    const skills = await discoverSkills(options.components, contextDir)
     await generateClaudeMd(options.components, targetDir, skills)
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
@@ -265,7 +331,6 @@ export async function main(options: Options) {
 
   // Step 3: Generate .cursorrules (only if absent)
   try {
-    const skills = await discoverSkills(options.components, contextDir)
     await generateCursorRules(options.components, targetDir, skills)
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
