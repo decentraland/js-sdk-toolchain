@@ -18,6 +18,7 @@ import { defineVirtualCameraComponent, VirtualCameraComponentDefinitionExtended 
 import { defineInputModifierComponent, InputModifierComponentDefinitionExtended } from './extended/InputModifier'
 import { defineLightSourceComponent, LightSourceComponentDefinitionExtended } from './extended/LightSource'
 import { defineTriggerAreaComponent, TriggerAreaComponentDefinitionExtended } from './extended/TriggerArea'
+import { defineParticleSystemComponent, ParticleSystemComponentDefinitionExtended } from './extended/ParticleSystem'
 import defineTagsComponent, { TagsComponentDefinitionExtended } from './manual/Tags'
 
 export * from './generated/index.gen'
@@ -75,6 +76,10 @@ export const LightSource: LwwComponentGetter<LightSourceComponentDefinitionExten
 /* @__PURE__ */
 export const TriggerArea: LwwComponentGetter<TriggerAreaComponentDefinitionExtended> = (engine) =>
   defineTriggerAreaComponent(engine)
+
+/* @__PURE__ */
+export const ParticleSystem: LwwComponentGetter<ParticleSystemComponentDefinitionExtended> = (engine) =>
+  defineParticleSystemComponent(engine)
 
 /**
  * @alpha
