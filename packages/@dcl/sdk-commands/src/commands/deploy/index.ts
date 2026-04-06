@@ -118,6 +118,15 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
   const isWorld = sceneHasWorldCfg(sceneJson)
   const worldName = sceneJson.worldConfiguration?.name
 
+  if (isWorld && !targetContent && !options.args['--target']) {
+    throw new CliError(
+      'DEPLOY_MISSING_TARGET_CONTENT',
+      `Your scene.json has worldConfiguration set (world: "${worldName}"). ` +
+        `You must specify the worlds content server using --target-content.\n` +
+        `Example: sdk-commands deploy --target-content https://worlds-content-server.decentraland.org`
+    )
+  }
+
   const trackProps: Events['Scene deploy started'] = {
     projectHash: b64HashingFunction(projectRoot),
     coords,
