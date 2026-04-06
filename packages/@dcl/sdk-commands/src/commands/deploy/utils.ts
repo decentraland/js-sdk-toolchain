@@ -116,7 +116,9 @@ export async function getAddressAndSignature(
   skipValidations: boolean,
   linkOptions: Omit<dAppOptions, 'uri'>,
   deployCallback: (response: LinkerResponse) => Promise<void>,
-  deleteScenesFromWorldPayload?: string
+  deleteScenesFromWorldPayload?: string,
+  targetContent?: string,
+  multiScene?: boolean
 ): Promise<{ program?: Lifecycle.ComponentBasedProgram<unknown> }> {
   if (process.env.DCL_PRIVATE_KEY) {
     const wallet = createWallet(process.env.DCL_PRIVATE_KEY)
@@ -140,7 +142,15 @@ export async function getAddressAndSignature(
     return {}
   }
 
-  const sceneInfo = await getSceneInfo(components, scene, messageToSign, skipValidations, deleteScenesFromWorldPayload)
+  const sceneInfo = await getSceneInfo(
+    components,
+    scene,
+    messageToSign,
+    skipValidations,
+    deleteScenesFromWorldPayload,
+    targetContent,
+    multiScene
+  )
   const { router: commonRouter } = setRoutes(components, sceneInfo)
   const router = setDeployRoutes(commonRouter, components, awaitResponse, sceneInfo, files, deployCallback)
 
@@ -182,6 +192,50 @@ function setDeployRoutes(
 
     return {
       body: { catalysts: value }
+    }
+  })
+
+  router.get('/api/world-parcel-permissions/:address', async (ctx) => {
+    if (!sceneInfo.isWorld || !sceneInfo.world || !sceneInfo.targetContent) {
+      return { status: 400, body: { message: 'Not a world deployment or missing targetContent' } }
+    }
+    try {
+      const address = ctx.params.address
+      const permissions = await fetchWorldPermissions(sceneInfo.world, sceneInfo.targetContent)
+      const lowerAddress = address.toLowerCase()
+
+      const allGranted = sceneInfo.parcels.map((p) => {
+        const [x, y] = p.split(',')
+        return { x: parseInt(x, 10), y: parseInt(y, 10), isUpdateAuthorized: true }
+      })
+
+      if (permissions.owner?.toLowerCase() === lowerAddress) {
+        return { body: { authorizations: allGranted, worldWidePermission: true } }
+      }
+
+      const walletSummary = permissions.summary?.[lowerAddress]
+      const deploymentSummary = walletSummary?.find((s) => s.permission === 'deployment')
+      const hasWorldWide = deploymentSummary?.world_wide ?? false
+
+      if (hasWorldWide) {
+        return { body: { authorizations: allGranted, worldWidePermission: true } }
+      }
+
+      const allowedParcels = await fetchParcelPermissions(sceneInfo.world, address, sceneInfo.targetContent)
+      const allowedSet = new Set(allowedParcels)
+
+      return {
+        body: {
+          authorizations: sceneInfo.parcels.map((p) => {
+            const [x, y] = p.split(',')
+            return { x: parseInt(x, 10), y: parseInt(y, 10), isUpdateAuthorized: allowedSet.has(p) }
+          }),
+          worldWidePermission: false
+        }
+      }
+    } catch (e) {
+      logger.error(`Error fetching world parcel permissions: ${(e as Error).message}`)
+      return { status: 500, body: { message: (e as Error).message } }
     }
   })
 
@@ -229,6 +283,8 @@ export interface SceneInfo {
   isWorld: boolean
   world?: string
   deleteScenesFromWorldPayload?: string
+  targetContent?: string
+  multiScene?: boolean
 }
 
 export async function getSceneInfo(
@@ -236,7 +292,9 @@ export async function getSceneInfo(
   scene: Scene,
   rootCID: string,
   skipValidations: boolean,
-  deleteScenesFromWorldPayload?: string
+  deleteScenesFromWorldPayload?: string,
+  targetContent?: string,
+  multiScene?: boolean
 ) {
   const {
     scene: { parcels, base },
@@ -257,7 +315,9 @@ export async function getSceneInfo(
     isPortableExperience: !!isPortableExperience,
     isWorld: sceneHasWorldCfg(scene),
     world: scene.worldConfiguration?.name,
-    deleteScenesFromWorldPayload
+    deleteScenesFromWorldPayload,
+    targetContent,
+    multiScene
   }
 }
 
@@ -306,4 +366,87 @@ export function promptUser(question: string): Promise<boolean> {
       resolve(answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes')
     })
   })
+}
+
+interface WorldPermissionsResponse {
+  permissions: {
+    deployment: {
+      type: string
+      wallets: string[]
+    }
+  }
+  owner?: string
+  summary?: Record<string, { permission: string; world_wide: boolean; parcel_count: number }[]>
+}
+
+export async function fetchWorldPermissions(
+  worldName: string,
+  targetContent: string
+): Promise<WorldPermissionsResponse> {
+  const encodedName = encodeURIComponent(worldName)
+  const url = `${targetContent}/world/${encodedName}/permissions`
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new Error(`Failed to fetch world permissions: ${response.status} ${response.statusText}`)
+  }
+  return (await response.json()) as WorldPermissionsResponse
+}
+
+export async function fetchParcelPermissions(
+  worldName: string,
+  address: string,
+  targetContent: string
+): Promise<string[]> {
+  const encodedName = encodeURIComponent(worldName)
+  const url = `${targetContent}/world/${encodedName}/permissions/deployment/address/${address.toLowerCase()}/parcels`
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new Error(`Failed to fetch parcel permissions: ${response.status} ${response.statusText}`)
+  }
+  const data = (await response.json()) as { parcels: string[] }
+  return data.parcels || []
+}
+
+export async function checkWorldDeploymentPermission(
+  logger: { info: (msg: string) => void },
+  worldName: string,
+  address: string,
+  targetContent: string,
+  deployingParcels: string[]
+): Promise<{ allowed: boolean; deniedParcels?: string[] }> {
+  const permissions = await fetchWorldPermissions(worldName, targetContent)
+  const lowerAddress = address.toLowerCase()
+
+  // Check if wallet is the world owner
+  if (permissions.owner?.toLowerCase() === lowerAddress) {
+    return { allowed: true }
+  }
+
+  // Check world-wide deployment permission
+  const deploymentPermission = permissions.permissions?.deployment
+  if (deploymentPermission) {
+    if (deploymentPermission.type === 'unrestricted') {
+      return { allowed: true }
+    }
+    const allowedWallets = (deploymentPermission.wallets || []).map((w: string) => w.toLowerCase())
+    if (allowedWallets.includes(lowerAddress)) {
+      // Check if wallet has world-wide permission or only per-parcel
+      const walletSummary = permissions.summary?.[lowerAddress]
+      const deploymentSummary = walletSummary?.find((s) => s.permission === 'deployment')
+      if (!deploymentSummary || deploymentSummary.world_wide) {
+        return { allowed: true }
+      }
+    }
+  }
+
+  // Check per-parcel permissions
+  const allowedParcels = await fetchParcelPermissions(worldName, address, targetContent)
+  const allowedSet = new Set(allowedParcels)
+  const deniedParcels = deployingParcels.filter((p) => !allowedSet.has(p))
+
+  if (deniedParcels.length === 0) {
+    return { allowed: true }
+  }
+
+  return { allowed: false, deniedParcels }
 }
