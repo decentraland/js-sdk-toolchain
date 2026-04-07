@@ -112,8 +112,16 @@ export function entityUtils(engine: IEngine, profile: IProfile) {
     if (!Transform.getOrNull(entity)) {
       Transform.create(entity)
     } else {
-      // We force to send a tick update of the transform so we can send the NEW parent to the renderer
-      Transform.getMutable(entity)
+      // Force a tick update of the transform so the renderer receives the NEW parent.
+      // createOrReplace bypasses the CRDT unchanged-data suppression optimization,
+      // ensuring the renderer transport can inject the network parent into the message.
+      const t = Transform.get(entity)
+      Transform.createOrReplace(entity, {
+        position: { x: t.position.x, y: t.position.y, z: t.position.z },
+        rotation: { x: t.rotation.x, y: t.rotation.y, z: t.rotation.z, w: t.rotation.w },
+        scale: { x: t.scale.x, y: t.scale.y, z: t.scale.z },
+        parent: t.parent
+      })
     }
   }
 

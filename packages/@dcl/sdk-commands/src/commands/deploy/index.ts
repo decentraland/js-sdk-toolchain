@@ -1,5 +1,5 @@
 import { resolve } from 'path'
-import { EntityType, ChainId, getChainName } from '@dcl/schemas'
+import { EntityType, ChainId } from '@dcl/schemas'
 import { DeploymentBuilder } from 'dcl-catalyst-client'
 import future from 'fp-future'
 import i18next from 'i18next'
@@ -20,6 +20,7 @@ import {
   deleteWorldScenes,
   fetchWorldScenes,
   getScenesOnOtherParcels,
+  checkWorldDeploymentPermission,
   promptUser
 } from './utils'
 import { buildScene } from '../build'
@@ -117,9 +118,12 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
   const isWorld = sceneHasWorldCfg(sceneJson)
   const worldName = sceneJson.worldConfiguration?.name
 
-  if (isWorld) {
-    options.components.logger.info(
-      `[DEPLOY] deploying in world:${isWorld}, multi scene world:${multiScene}, world name:${worldName}`
+  if (isWorld && !targetContent && !options.args['--target']) {
+    throw new CliError(
+      'DEPLOY_MISSING_TARGET_CONTENT',
+      `Your scene.json has worldConfiguration set (world: "${worldName}"). ` +
+        `You must specify the worlds content server using --target-content.\n` +
+        `Example: sdk-commands deploy --target-content https://worlds-content-server.decentraland.org`
     )
   }
 
@@ -130,15 +134,20 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
   }
 
   const packageJson = await getPackageJson(options.components, projectRoot)
+
+  // NOTE: keeping 👇 for query backward-compatibility
   const dependencies = Array.from(
     new Set([...Object.keys(packageJson.dependencies || {}), ...Object.keys(packageJson.devDependencies || {})])
   )
+  const dependencyVersions: Record<string, string> = {}
+  for (const dep of dependencies) {
+    dependencyVersions[dep] = await getInstalledPackageVersion(options.components, dep, projectRoot)
+  }
 
   options.components.analytics.track('Scene deploy started', trackProps)
 
   let needsDelete = false
   if (isWorld && !multiScene && worldName) {
-    options.components.logger.info(`[DEPLOY] checking existing scenes for world "${worldName}"...`)
     try {
       const existingScenes = await fetchWorldScenes(options.components.logger, worldName, targetContent)
 
@@ -168,8 +177,6 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
             }
           }
           needsDelete = true
-        } else {
-          options.components.logger.warn(`[DEPLOY] no existing scenes in other parcels, deployment will continue`)
         }
       }
     } catch (e: any) {
@@ -218,7 +225,9 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
       isHttps: !!options.args['--https']
     },
     deployEntity,
-    deleteScenesFromWorldPayload
+    deleteScenesFromWorldPayload,
+    targetContent,
+    multiScene
   )
 
   // Programmatic mode early return
@@ -245,13 +254,40 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
   async function deployEntity(linkerResponse: LinkerResponse) {
     const { authChain, chainId } = linkerResponse
 
+    if (isWorld && worldName && targetContent && linkerResponse.address) {
+      options.components.logger.log(`[DEPLOY] Checking permissions for wallet ${linkerResponse.address}...`)
+      try {
+        const permissionCheck = await checkWorldDeploymentPermission(
+          options.components.logger,
+          worldName,
+          linkerResponse.address,
+          targetContent,
+          sceneJson.scene.parcels
+        )
+        if (!permissionCheck.allowed) {
+          const deniedMsg = permissionCheck.deniedParcels?.length
+            ? `\nYou don't have permission for parcels: ${permissionCheck.deniedParcels.join(', ')}.`
+            : ''
+          throw new CliError(
+            'DEPLOY_NO_PERMISSION',
+            `Wallet ${linkerResponse.address} does not have permission to deploy to world "${worldName}".${deniedMsg}\n` +
+              `Contact the world owner to grant deployment permissions.`
+          )
+        }
+        options.components.logger.log(`[DEPLOY] Permissions verified.`)
+      } catch (e: any) {
+        if (e instanceof CliError) throw e
+        options.components.logger.warn(`Could not verify deployment permissions: ${e.message}`)
+      }
+    }
+
     // Uploading data
     const { client, url } = await getCatalyst(chainId, options.args['--target'], options.args['--target-content'])
 
     if (needsDelete && worldName && !linkerResponse.deleteSignature) {
       throw new CliError(
         'DEPLOY_DELETE_FAILED',
-        `Cannot delete existing scenes from "${worldName}": there's not signatur for deleting the scenes.`
+        `Cannot delete existing scenes from "${worldName}": missing signature for deleting the scenes.`
       )
     }
 
@@ -278,7 +314,11 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
         }
       } catch (e: any) {
         if (e instanceof CliError) throw e
-        throw new CliError('DEPLOY_DELETE_FAILED', `Error deleting existing scenes from "${worldName}": ${e.message}\n`)
+        throw new CliError(
+          'DEPLOY_DELETE_FAILED',
+          `Error deleting existing scenes from "${worldName}": ${e.message}\n` +
+            `Hint: Use --multi-scene to deploy alongside existing scenes without deleting them.`
+        )
       }
     }
 
@@ -293,9 +333,6 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
     const sceneUrl = `${domain}/?NETWORK=${network}&position=${position}${worldRealm}`
 
     try {
-      options.components.logger.info(`Address: ${linkerResponse.address}`)
-      options.components.logger.info(`AuthChain: ${linkerResponse.authChain}`)
-      options.components.logger.info(`Network: ${getChainName(linkerResponse.chainId!)}`)
       const response = (await client.deploy(deployData, {
         timeout: 600000
       })) as any
@@ -321,6 +358,7 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
         worldName: sceneJson.worldConfiguration?.name,
         isPortableExperience: !!sceneJson.isPortableExperience,
         dependencies,
+        dependencyVersions,
         serverlessMultiplayer: trackFeatures.serverlessMultiplayer
       })
 
