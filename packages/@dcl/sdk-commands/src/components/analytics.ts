@@ -43,6 +43,7 @@ export type Events = {
     coords: { x: number; y: number }
     isWorld: boolean
     dependencies: string[]
+    dependencyVersions: Record<string, string>
     sceneId: string
     targetContentServer: string
     worldName: string | undefined

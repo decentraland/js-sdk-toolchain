@@ -647,6 +647,22 @@ export type Color4Type = {
 };
 
 // @public (undocumented)
+export interface ColorRange {
+    // (undocumented)
+    end: PBColor4 | undefined;
+    // (undocumented)
+    start: PBColor4 | undefined;
+}
+
+// @public (undocumented)
+export namespace ColorRange {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): ColorRange;
+    // (undocumented)
+    export function encode(message: ColorRange, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface ComponentData {
     // (undocumented)
     data?: {
@@ -705,6 +721,7 @@ export const componentDefinitionByName: {
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
     "core::NftShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBNftShape>>;
+    "core::ParticleSystem": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBParticleSystem>>;
     "core::PhysicsCombinedForce": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedForce>>;
     "core::PhysicsCombinedImpulse": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedImpulse>>;
     "core::PlayerIdentityData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>>;
@@ -1267,6 +1284,22 @@ export type FlexWrapType = 'wrap' | 'nowrap' | 'wrap-reverse';
 export type FloatArray = number[];
 
 // @public (undocumented)
+export interface FloatRange {
+    // (undocumented)
+    end: number;
+    // (undocumented)
+    start: number;
+}
+
+// @public (undocumented)
+export namespace FloatRange {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): FloatRange;
+    // (undocumented)
+    export function encode(message: FloatRange, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export const enum Font {
     // (undocumented)
     F_MONOSPACE = 2,
@@ -1291,6 +1324,9 @@ export const getDefaultOpts: (opts?: Partial<EventSystemOptions>) => EventSystem
 
 // @public
 export function getEntitiesWithParent(engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema'>, parent: Entity): Entity[];
+
+// @public
+export function getGlobal<T>(key: string): T | undefined;
 
 // @public
 export function getWorldPosition(engine: WorldTransformEngine, entity: Entity): Vector3Type;
@@ -1666,6 +1702,13 @@ export type JustifyType = 'flex-start' | 'center' | 'flex-end' | 'space-between'
 
 // @public
 export type Key = number | string;
+
+// @public
+export enum KnockbackFalloff {
+    CONSTANT = 0,
+    INVERSE_SQUARE = 2,
+    LINEAR = 1
+}
 
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
 // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
@@ -2269,6 +2312,24 @@ export const onVideoEvent: Observable<{
 
 // @public
 export type OverflowType = 'hidden' | 'scroll' | 'visible';
+
+// Warning: (ae-missing-release-tag) "ParticleSystem" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const ParticleSystem: ParticleSystemComponentDefinitionExtended;
+
+// @public (undocumented)
+export interface ParticleSystemComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBParticleSystem> {
+    Shape: ParticleSystemHelper;
+}
+
+// @public (undocumented)
+export interface ParticleSystemHelper {
+    Box: (box?: PBParticleSystem_Box) => PBParticleSystem['shape'];
+    Cone: (cone?: PBParticleSystem_Cone) => PBParticleSystem['shape'];
+    Point: (point?: PBParticleSystem_Point) => PBParticleSystem['shape'];
+    Sphere: (sphere?: PBParticleSystem_Sphere) => PBParticleSystem['shape'];
+}
 
 // @public (undocumented)
 export interface PBAnimationState {
@@ -3048,6 +3109,184 @@ export namespace PBNftShape {
 }
 
 // @public (undocumented)
+export interface PBParticleSystem {
+    active?: boolean | undefined;
+    additionalForce?: PBVector3 | undefined;
+    billboard?: boolean | undefined;
+    blendMode?: PBParticleSystem_BlendMode | undefined;
+    bursts: PBParticleSystem_Burst[];
+    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+    colorOverTime?: ColorRange | undefined;
+    faceTravelDirection?: boolean | undefined;
+    gravity?: number | undefined;
+    initialColor?: ColorRange | undefined;
+    initialRotation?: PBQuaternion | undefined;
+    initialSize?: FloatRange | undefined;
+    initialVelocitySpeed?: FloatRange | undefined;
+    lifetime?: number | undefined;
+    limitVelocity?: PBParticleSystem_LimitVelocity | undefined;
+    loop?: boolean | undefined;
+    maxParticles?: number | undefined;
+    playbackState?: PBParticleSystem_PlaybackState | undefined;
+    prewarm?: boolean | undefined;
+    rate?: number | undefined;
+    rotationOverTime?: PBQuaternion | undefined;
+    // (undocumented)
+    shape?: {
+        $case: "point";
+        point: PBParticleSystem_Point;
+    } | {
+        $case: "sphere";
+        sphere: PBParticleSystem_Sphere;
+    } | {
+        $case: "cone";
+        cone: PBParticleSystem_Cone;
+    } | {
+        $case: "box";
+        box: PBParticleSystem_Box;
+    } | undefined;
+    simulationSpace?: PBParticleSystem_SimulationSpace | undefined;
+    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+    sizeOverTime?: FloatRange | undefined;
+    spriteSheet?: PBParticleSystem_SpriteSheetAnimation | undefined;
+    texture?: Texture | undefined;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem;
+    // (undocumented)
+    export function encode(message: PBParticleSystem, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+const enum PBParticleSystem_BlendMode {
+    PSB_ADD = 1,
+    PSB_ALPHA = 0,
+    PSB_MULTIPLY = 2
+}
+export { PBParticleSystem_BlendMode }
+export { PBParticleSystem_BlendMode as ParticleSystemBlendMode }
+
+// @public (undocumented)
+export interface PBParticleSystem_Box {
+    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+    size?: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_Box {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_Box;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_Box, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_Burst {
+    count: number;
+    cycles?: number | undefined;
+    interval?: number | undefined;
+    probability?: number | undefined;
+    time: number;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_Burst {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_Burst;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_Burst, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_Cone {
+    angle?: number | undefined;
+    radius?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_Cone {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_Cone;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_Cone, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_LimitVelocity {
+    dampen?: number | undefined;
+    speed: number;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_LimitVelocity {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_LimitVelocity;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_LimitVelocity, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+const enum PBParticleSystem_PlaybackState {
+    PS_PAUSED = 1,
+    PS_PLAYING = 0,
+    PS_STOPPED = 2
+}
+export { PBParticleSystem_PlaybackState }
+export { PBParticleSystem_PlaybackState as ParticleSystemPlaybackState }
+
+// @public (undocumented)
+export interface PBParticleSystem_Point {
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_Point {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_Point;
+    // (undocumented)
+    export function encode(_: PBParticleSystem_Point, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export const enum PBParticleSystem_SimulationSpace {
+    PSS_LOCAL = 0,
+    PSS_WORLD = 1
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_Sphere {
+    radius?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_Sphere {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_Sphere;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_Sphere, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_SpriteSheetAnimation {
+    framesPerSecond?: number | undefined;
+    tilesX: number;
+    tilesY: number;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_SpriteSheetAnimation {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_SpriteSheetAnimation;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_SpriteSheetAnimation, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBPhysicsCombinedForce {
     vector: PBVector3 | undefined;
 }
@@ -3817,11 +4056,30 @@ export namespace PBVisibilityComponent {
     export function encode(message: PBVisibilityComponent, writer?: _m0.Writer): _m0.Writer;
 }
 
+// @public
+export const Physics: PhysicsSystem;
+
 // @public (undocumented)
 export const PhysicsCombinedForce: LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedForce>;
 
 // @public (undocumented)
 export const PhysicsCombinedImpulse: LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedImpulse>;
+
+// @public (undocumented)
+export interface PhysicsSystem {
+    applyForceToPlayer(source: Entity, vector: Vector3Type): void;
+    // (undocumented)
+    applyForceToPlayer(source: Entity, direction: Vector3Type, magnitude: number): void;
+    applyForceToPlayerForDuration(source: Entity, duration: number, vector: Vector3Type): void;
+    // (undocumented)
+    applyForceToPlayerForDuration(source: Entity, duration: number, direction: Vector3Type, magnitude: number): void;
+    applyImpulseToPlayer(vector: Vector3Type): void;
+    // (undocumented)
+    applyImpulseToPlayer(direction: Vector3Type, magnitude: number): void;
+    applyKnockbackToPlayer(fromPosition: Vector3Type, magnitude: number, radius?: number, falloff?: KnockbackFalloff): void;
+    applyRepulsionForceToPlayer(source: Entity, fromPosition: Vector3Type, magnitude: number, radius?: number, falloff?: KnockbackFalloff): void;
+    removeForceFromPlayer(source: Entity): void;
+}
 
 // @public
 export namespace Plane {
@@ -4360,6 +4618,9 @@ export namespace RotateContinuous {
     export function encode(message: RotateContinuous, writer?: _m0.Writer): _m0.Writer;
 }
 
+// @public
+export function rotateVectorByQuaternion(v: Vector3Type, q: QuaternionType): Vector3Type;
+
 // Warning: (ae-missing-release-tag) "RPCSendableMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -4493,6 +4754,9 @@ export namespace Schemas {
         value?: any;
     }) => void;
 }
+
+// @public
+export function setGlobalPolyfill<T>(key: string, value: T): void;
 
 // @public
 export interface SetMoveRotateScaleParams extends MoveRotateScaleModeParams {
@@ -4770,6 +5034,7 @@ export interface TransformComponentExtended extends TransformComponent {
     create(entity: Entity, val?: TransformTypeWithOptionals): TransformType;
     // (undocumented)
     createOrReplace(entity: Entity, val?: TransformTypeWithOptionals): TransformType;
+    localToWorldDirection(entity: Entity, localDirection: Vector3Type): Vector3Type;
 }
 
 // @public (undocumented)

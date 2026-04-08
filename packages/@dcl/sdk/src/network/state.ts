@@ -13,6 +13,8 @@ import {
   AudioEvent,
   EngineInfo,
   GltfContainerLoadingState,
+  PhysicsCombinedForce,
+  PhysicsCombinedImpulse,
   PointerEventsResult,
   RaycastResult,
   RealmInfo,
@@ -33,6 +35,8 @@ export const NOT_SYNC_COMPONENTS: ComponentDefinition<unknown>[] = [
   AudioEvent,
   EngineInfo,
   GltfContainerLoadingState,
+  PhysicsCombinedForce,
+  PhysicsCombinedImpulse,
   PointerEventsResult,
   RaycastResult,
   RealmInfo,
@@ -46,7 +50,8 @@ export const NOT_SYNC_COMPONENTS: ComponentDefinition<unknown>[] = [
 
 export const NOT_SYNC_COMPONENTS_IDS = NOT_SYNC_COMPONENTS.map(($) => $.componentId)
 export const NOT_SYNC_COMPONENTS_NAMES: string[] = [
-  'asset-packs::Script' // ComponentName from: https://github.com/decentraland/asset-packs/blob/main/src/enums.ts
+  'asset-packs::Script', // ComponentName from: https://github.com/decentraland/asset-packs/blob/main/src/enums.ts
+  'asset-packs::ActionTypes'
 ]
 
 export function shouldSyncComponent(component: ComponentDefinition<unknown>): boolean {
