@@ -18,6 +18,7 @@ export const args = declareArgs({
   '--watch': Boolean,
   '-w': '--watch',
   '--production': Boolean,
+  '--sourcemap': Boolean,
   '--single': String,
   '--emitDeclaration': Boolean,
   '--ignoreComposite': Boolean,
@@ -33,7 +34,8 @@ export function help(options: Options) {
     Options:'
       -h, --help                Displays complete help
       -w, --watch               Watch for file changes and build on change
-      -p, --production          Build without sourcemaps
+      -p, --production          Build minified for production (no sourcemaps by default)
+      --sourcemap               Generate sourcemaps (external in production, inline in dev)
       --skip-install            Skip installing dependencies
       --dir                     Path to directory to build
 
@@ -74,6 +76,7 @@ export async function buildScene(options: Options, project: SceneProject | Weara
       watch,
       single: options.args['--single'],
       production: !!options.args['--production'],
+      sourcemap: !!options.args['--sourcemap'],
       emitDeclaration: !!options.args['--emitDeclaration'],
       ignoreComposite: !!options.args['--ignoreComposite'],
       customEntryPoint: !!options.args['--customEntryPoint']

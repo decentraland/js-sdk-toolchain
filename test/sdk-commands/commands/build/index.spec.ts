@@ -86,6 +86,7 @@ describe('build command', () => {
         watch: false,
         single: undefined,
         production: true,
+        sourcemap: false,
         customEntryPoint: false,
         ignoreComposite: false
       },

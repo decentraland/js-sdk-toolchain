@@ -42,6 +42,9 @@ export type CompileOptions = {
 
   ignoreComposite: boolean
   customEntryPoint: boolean
+
+  // opt-in: generate sourcemaps in production builds
+  sourcemap: boolean
 }
 
 const MAX_STEP = 2
@@ -196,7 +199,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
     preserveSymlinks: false,
     outfile: options.outputFile,
     allowOverwrite: false,
-    sourcemap: options.production ? 'external' : 'inline',
+    sourcemap: options.production ? (options.sourcemap ? 'external' : false) : 'inline',
     minify: options.production,
     minifyIdentifiers: options.production,
     minifySyntax: options.production,

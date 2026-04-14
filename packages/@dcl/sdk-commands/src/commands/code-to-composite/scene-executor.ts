@@ -414,6 +414,7 @@ async function bundle(components: Pick<CliComponents, 'fs' | 'logger'>, project:
         workingDirectory: project.workingDirectory,
         watch: false,
         production: false, // keep source maps for better error messages
+        sourcemap: false,
         emitDeclaration: false,
         ignoreComposite: true, // don't load existing composite files
         customEntryPoint: false
