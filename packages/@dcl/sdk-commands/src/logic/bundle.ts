@@ -196,7 +196,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
     preserveSymlinks: false,
     outfile: options.outputFile,
     allowOverwrite: false,
-    sourcemap: options.production ? 'external' : 'inline',
+    sourcemap: options.production ? false : 'inline',
     minify: options.production,
     minifyIdentifiers: options.production,
     minifySyntax: options.production,
