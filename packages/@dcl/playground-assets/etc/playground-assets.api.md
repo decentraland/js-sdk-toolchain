@@ -2514,6 +2514,7 @@ export namespace PBAvatarShape {
 // @public (undocumented)
 export interface PBBillboard {
     billboardMode?: BillboardMode | undefined;
+    lookAtEntity?: number | undefined;
 }
 
 // @public (undocumented)
