@@ -34,7 +34,7 @@ const emptyPS = {
   simulationSpace: undefined,
   limitVelocity: undefined,
   playbackState: undefined,
-  bursts: [] as const
+  bursts: undefined
 }
 
 describe('Generated ParticleSystem ProtoBuf', () => {
@@ -189,10 +189,10 @@ describe('Generated ParticleSystem ProtoBuf', () => {
       ...emptyPS,
       rate: 10,
       lifetime: 5,
-      bursts: [
+      bursts: { values: [
         { time: 0, count: 20, cycles: 3, interval: 0.5, probability: 1.0 },
         { time: 2.0, count: 50, cycles: undefined, interval: undefined, probability: undefined }
-      ]
+      ] }
     })
   })
 
@@ -204,7 +204,6 @@ describe('Generated ParticleSystem ProtoBuf', () => {
     ParticleSystem.create(entity, {
       rate: 10,
       lifetime: 5,
-      bursts: [],
       shape: ParticleSystem.Shape.Cone({ angle: 30, radius: 1 })
     })
 
@@ -219,7 +218,6 @@ describe('Generated ParticleSystem ProtoBuf', () => {
 
     ParticleSystem.create(entity, {
       rate: 5,
-      bursts: [],
       shape: ParticleSystem.Shape.Point()
     })
 
@@ -232,7 +230,6 @@ describe('Generated ParticleSystem ProtoBuf', () => {
     const entity = newEngine.addEntity()
 
     ParticleSystem.create(entity, {
-      bursts: [],
       shape: ParticleSystem.Shape.Sphere({ radius: 3 })
     })
 
@@ -245,7 +242,6 @@ describe('Generated ParticleSystem ProtoBuf', () => {
     const entity = newEngine.addEntity()
 
     ParticleSystem.create(entity, {
-      bursts: [],
       shape: ParticleSystem.Shape.Box({ size: { x: 1, y: 2, z: 3 } })
     })
 
