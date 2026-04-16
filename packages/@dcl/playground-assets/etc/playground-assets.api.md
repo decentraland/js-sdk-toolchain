@@ -3013,7 +3013,8 @@ export interface PBParticleSystem {
     additionalForce?: PBVector3 | undefined;
     billboard?: boolean | undefined;
     blendMode?: PBParticleSystem_BlendMode | undefined;
-    bursts: PBParticleSystem_Burst[];
+    // (undocumented)
+    bursts?: PBParticleSystem_BurstConfiguration | undefined;
     // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
     // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
     colorOverTime?: ColorRange | undefined;
@@ -3100,6 +3101,20 @@ export namespace PBParticleSystem_Burst {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_Burst;
     // (undocumented)
     export function encode(message: PBParticleSystem_Burst, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_BurstConfiguration {
+    // (undocumented)
+    values: PBParticleSystem_Burst[];
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_BurstConfiguration {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_BurstConfiguration;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_BurstConfiguration, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
