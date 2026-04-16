@@ -4,6 +4,7 @@ temp
 tsdoc-metadata.json
 coverage
 **/.DS_Store
+.idea
 packages/**/*.js
 packages/@dcl/sdk/package-lock.json
 packages/@dcl/sdk/**/*.js

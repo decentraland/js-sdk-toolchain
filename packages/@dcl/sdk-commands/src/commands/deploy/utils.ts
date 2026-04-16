@@ -52,13 +52,16 @@ export async function getCatalyst(
     const catalysts = getCatalystServersFromCache('mainnet')
 
     for (const catalyst of catalysts) {
-      const client = createCatalystClient({ url: catalyst.address, fetcher: createFetchComponent() })
-
-      const isHealthy = (await client.fetchAbout()).healthy
-
-      if (isHealthy) {
-        catalystClient = client
-        break
+      try {
+        const client = createCatalystClient({ url: catalyst.address, fetcher: createFetchComponent() })
+        const about = await client.fetchAbout()
+        if (about.healthy) {
+          catalystClient = client
+          break
+        }
+      } catch (_) {
+        // Unreachable or invalid response — skip and try next catalyst
+        continue
       }
     }
   }
