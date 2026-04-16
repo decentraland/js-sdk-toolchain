@@ -3013,7 +3013,6 @@ export interface PBParticleSystem {
     additionalForce?: PBVector3 | undefined;
     billboard?: boolean | undefined;
     blendMode?: PBParticleSystem_BlendMode | undefined;
-    // (undocumented)
     bursts?: PBParticleSystem_BurstConfiguration | undefined;
     // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
     // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
