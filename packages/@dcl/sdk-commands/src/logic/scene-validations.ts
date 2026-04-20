@@ -11,8 +11,8 @@ import { getPublishableFiles } from './project-files'
 import { printWarning } from './beautiful-logs'
 
 /**
- * Extended Scene type that includes authoritativeMultiplayer flag
- * for enabling Authoritative Server integration.
+ * Extended Scene type that includes the authoritativeMultiplayer flag for
+ * enabling Authoritative Server integration.
  */
 export type SceneWithMultiplayer = Scene & {
   authoritativeMultiplayer?: boolean
