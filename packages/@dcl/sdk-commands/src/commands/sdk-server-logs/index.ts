@@ -9,6 +9,7 @@ import { Router } from '@well-known-components/http-server'
 
 import { declareArgs } from '../../logic/args'
 import { CliComponents } from '../../components'
+import { CliError } from '../../logic/error'
 import { printError } from '../../logic/beautiful-logs'
 import { createWallet } from '../../logic/account'
 import { createAuthChainHeaders } from '../../logic/auth-chain-headers'
@@ -26,6 +27,9 @@ export const args = declareArgs({
   '--help': Boolean,
   '-h': '--help',
   '--dir': String,
+  '--world': String,
+  '-w': '--world',
+  '--position': String,
   '--target': String,
   '-t': '--target',
   '--port': Number,
@@ -40,28 +44,39 @@ const DEFAULT_SERVER = 'https://multiplayer-server.decentraland.org'
 export function help(options: Options) {
   options.components.logger.log(`
   Usage: 'sdk-commands sdk-server-logs [options]'
-    Streams real-time logs from the multiplayer server for your scene.
-    The scene identifier is automatically determined from scene.json:
-      - Worlds: uses worldConfiguration.name
-      - Genesis city scenes: uses scene.base parcel
+    Streams real-time logs from the multiplayer server.
+    Runs from any directory when --world and/or --position are provided.
+    Falls back to scene.json (worldConfiguration.name) when neither is passed.
 
     Options:
-      -h, --help                     Displays complete help
-      -t, --target          [URL]   Target multiplayer server URL (default: ${DEFAULT_SERVER})
-      --dir                 [path]  Path to the project directory
-      -p, --port            [port]  Select a custom port for the linker dApp
-      -b, --no-browser               Do not open a new browser window
-      --https                       Use HTTPS for the linker dApp
+      -h, --help                Displays complete help
+      -w, --world       [name]  World name. When omitted, --position targets Genesis City.
+      --position        [x,y]   Parcel coordinates. Optional for worlds (selects a scene
+                                in a multi-scene world). Required for Genesis City.
+      -t, --target      [URL]   Target multiplayer server URL (default: ${DEFAULT_SERVER})
+      --dir             [path]  Path to the project directory (used with scene.json fallback)
+      -p, --port        [port]  Select a custom port for the linker dApp
+      -b, --no-browser          Do not open a new browser window
+      --https                   Use HTTPS for the linker dApp
 
     Examples:
-    - View logs for your scene (run from project directory):
+    - View logs using the world in the current scene.json:
       $ sdk-commands sdk-server-logs
 
-    - Connect to local development server:
-      $ sdk-commands sdk-server-logs --target http://localhost:8000
+    - View logs for a world from any directory:
+      $ sdk-commands sdk-server-logs --world myworld.dcl.eth
+
+    - View logs for a specific scene in a multi-scene world:
+      $ sdk-commands sdk-server-logs --world myworld.dcl.eth --position 10,10
+
+    - View logs for a Genesis City scene (use =value form for negative coords):
+      $ sdk-commands sdk-server-logs --position=-125,-96
+
+    - Connect to a custom server:
+      $ sdk-commands sdk-server-logs --world myworld --target https://multiplayer-server.decentraland.zone
 
     - Use private key for authentication (no browser):
-      $ DCL_PRIVATE_KEY=0x... sdk-commands sdk-server-logs
+      $ DCL_PRIVATE_KEY=0x... sdk-commands sdk-server-logs --world myworld
 `)
 }
 
@@ -103,7 +118,7 @@ async function getAddressAndSignature(
   components: CliComponents,
   awaitResponse: IFuture<void>,
   payload: string,
-  sceneIdentifier: string,
+  displayLabel: string,
   targetUrl: string,
   linkOptions: Omit<dAppOptions, 'uri'>,
   signCallback: (response: LinkerResponse) => Promise<void>
@@ -130,7 +145,7 @@ async function getAddressAndSignature(
     skipValidations: true,
     debug: !!process.env.DEBUG,
     isWorld: true,
-    world: sceneIdentifier,
+    world: displayLabel,
     targetUrl,
     action: 'view-logs'
   })
@@ -255,29 +270,86 @@ function formatAndPrintLog(logger: CliComponents['logger'], log: any) {
   }
 }
 
+function normalizePosition(raw: string): string {
+  const match = raw.trim().match(/^(-?\d+)\s*,\s*(-?\d+)$/)
+  if (!match) {
+    throw new CliError(
+      'SERVER_LOGS_INVALID_POSITION',
+      `Invalid --position "${raw}"; expected "x,y" with integer coordinates`
+    )
+  }
+  return `${parseInt(match[1], 10)},${parseInt(match[2], 10)}`
+}
+
+interface LogsRequest {
+  logsUrl: string
+  pathname: string
+  metadata: string
+}
+
+/**
+ * Build the HTTP request shape for the multiplayer-server `/logs` endpoint.
+ *
+ * Every call targets the same `/logs` route; the server picks the scene from
+ * the signed metadata:
+ *   - worlds  → `sceneId: "<world>.dcl.eth"` (+ `parcel` for multi-scene worlds)
+ *   - Genesis → `parcel: "x,y"` only
+ *
+ * `parcel` and `realmName` are always set. `realmName` defaults to `"main"` for
+ * Genesis, matching the convention used by other signed-fetch emitters
+ * (hammurabi worker, unity explorer, kernel).
+ */
+function buildLogsRequest(baseURL: string, world: string | undefined, position: string | undefined): LogsRequest {
+  const metadata = JSON.stringify({
+    parcel: position ?? '0,0',
+    realmName: world ? `${world}.dcl.eth` : 'main',
+    ...(world && { sceneId: `${world}.dcl.eth` })
+  })
+
+  return {
+    logsUrl: `${baseURL}/logs`,
+    pathname: '/logs',
+    metadata
+  }
+}
+
 export async function main(options: Options) {
   const { logger } = options.components
   const projectRoot = resolve(process.cwd(), options.args['--dir'] || '.')
 
-  // Validate workspace exists
-  await getValidWorkspace(options.components, projectRoot)
+  const positionArg = options.args['--position']
+  const worldArg = options.args['--world']
 
-  const sceneJson = await getValidSceneJson(options.components, projectRoot)
-  const worldName = sceneJson.worldConfiguration?.name
-  const isWorld = !!worldName
-  const sceneIdentifier = isWorld ? worldName : sceneJson.scene.base
+  const position = positionArg ? normalizePosition(positionArg) : undefined
+  let world: string | undefined
 
-  // Determine target URL
+  if (worldArg) {
+    world = worldArg.replace(/\.dcl\.eth$/i, '')
+  } else if (!position) {
+    // no --world nor --position: fall back to scene.json in the current directory
+    await getValidWorkspace(options.components, projectRoot)
+    const sceneJson = await getValidSceneJson(options.components, projectRoot)
+    const worldName = sceneJson.worldConfiguration?.name
+    if (!worldName) {
+      throw new CliError(
+        'SERVER_LOGS_MISSING_WORLD',
+        'Provide --world (with optional --position) for worlds, or --position alone for Genesis City scenes. ' +
+          'Alternatively, run from a project whose scene.json defines worldConfiguration.name.'
+      )
+    }
+    world = worldName.replace(/\.dcl\.eth$/i, '')
+  }
+
+  const displayLabel = world
+    ? position
+      ? `${world}.dcl.eth ${position}`
+      : `${world}.dcl.eth`
+    : `Genesis City ${position}`
+
+  logger.info(`Viewing logs for ${displayLabel}`)
+
   const baseURL = options.args['--target'] || DEFAULT_SERVER
-
-  // Build the logs URL
-  const logsUrl = `${baseURL}/logs`
-
-  logger.info(`Viewing logs for ${isWorld ? 'world' : 'scene'}: ${sceneIdentifier}`)
-  logger.info(`Target: ${logsUrl}`)
-
-  // Build the pathname for signing
-  const pathname = '/logs'
+  const { logsUrl, pathname, metadata } = buildLogsRequest(baseURL, world, position)
 
   // Linker dApp options
   const linkerPort = options.args['--port']
@@ -287,13 +359,6 @@ export async function main(options: Options) {
 
   const awaitResponse = future<void>()
   const timestamp = String(Date.now())
-  // Build metadata following the standard signedFetch format
-  const metadata = JSON.stringify({
-    parcel: sceneJson.scene.base,
-    realm: { serverName: isWorld ? worldName : 'main' },
-    realmName: isWorld ? worldName : 'main',
-    sceneId: isWorld ? worldName : undefined
-  })
 
   // Build the payload to sign: method:path:timestamp:metadata
   const payload = ['get', pathname, timestamp, metadata].join(':').toLowerCase()
@@ -304,7 +369,7 @@ export async function main(options: Options) {
     options.components,
     awaitResponse,
     payload,
-    sceneIdentifier,
+    displayLabel,
     baseURL,
     linkOptions,
     async (linkerResponse) => {
