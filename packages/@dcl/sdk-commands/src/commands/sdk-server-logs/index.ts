@@ -27,8 +27,9 @@ export const args = declareArgs({
   '--help': Boolean,
   '-h': '--help',
   '--dir': String,
-  '--multiplayerId': String,
-  '-m': '--multiplayerId',
+  '--world': String,
+  '-w': '--world',
+  '--position': String,
   '--target': String,
   '-t': '--target',
   '--port': Number,
@@ -43,31 +44,40 @@ const DEFAULT_SERVER = 'https://multiplayer-server.decentraland.org'
 export function help(options: Options) {
   options.components.logger.log(`
   Usage: 'sdk-commands sdk-server-logs [options]'
-    Streams real-time logs from the multiplayer server for your scene.
-    Requires --multiplayerId parameter or a scene.json with multiplayerId.
+    Streams real-time logs from the multiplayer server.
+    Requires --world (or scene.json with worldConfiguration.name) for a world scene,
+    or --position for a Genesis City scene.
 
     Options:
-      -h, --help                     Displays complete help
-      -m, --multiplayerId   [id]     Multiplayer server ID (required, or uses scene.json)
-      -t, --target          [URL]   Target multiplayer server URL (default: ${DEFAULT_SERVER})
-      --dir                 [path]  Path to the project directory
-      -p, --port            [port]  Select a custom port for the linker dApp
-      -b, --no-browser               Do not open a new browser window
-      --https                       Use HTTPS for the linker dApp
+      -h, --help                Displays complete help
+      -w, --world       [name]  World name (required for worlds, or uses scene.json)
+      --position        [x,y]   Parcel coordinates. Required for Genesis City scenes,
+                                and for multi-scene worlds to select a specific scene.
+      -t, --target      [URL]   Target multiplayer server URL (default: ${DEFAULT_SERVER})
+      --dir             [path]  Path to the project directory
+      -p, --port        [port]  Select a custom port for the linker dApp
+      -b, --no-browser          Do not open a new browser window
+      --https                   Use HTTPS for the linker dApp
 
     Examples:
-    - View logs using multiplayerId from scene.json:
+    - View logs for world in scene.json:
       $ sdk-commands sdk-server-logs
 
-    - View logs for a specific multiplayer ID:
-      $ sdk-commands sdk-server-logs --multiplayerId my-multiplayer-id
-      $ sdk-commands sdk-server-logs -m my-multiplayer-id
+    - View logs for a specific world (single-scene):
+      $ sdk-commands sdk-server-logs --world myworld
+      $ sdk-commands sdk-server-logs -w myworld.dcl.eth
+
+    - View logs for a specific scene in a multi-scene world:
+      $ sdk-commands sdk-server-logs --world myworld.dcl.eth --position 10,10
+
+    - View logs for a Genesis City scene:
+      $ sdk-commands sdk-server-logs --position 27,7
 
     - Connect to local development server:
-      $ sdk-commands sdk-server-logs --multiplayerId my-id --target http://localhost:8000
+      $ sdk-commands sdk-server-logs --world myworld --target http://localhost:8000
 
     - Use private key for authentication (no browser):
-      $ DCL_PRIVATE_KEY=0x... sdk-commands sdk-server-logs --multiplayerId my-id
+      $ DCL_PRIVATE_KEY=0x... sdk-commands sdk-server-logs --world myworld
 `)
 }
 
@@ -109,7 +119,7 @@ async function getAddressAndSignature(
   components: CliComponents,
   awaitResponse: IFuture<void>,
   payload: string,
-  multiplayerId: string,
+  world: string | undefined,
   targetUrl: string,
   linkOptions: Omit<dAppOptions, 'uri'>,
   signCallback: (response: LinkerResponse) => Promise<void>
@@ -135,8 +145,8 @@ async function getAddressAndSignature(
     parcels: ['0,0'],
     skipValidations: true,
     debug: !!process.env.DEBUG,
-    isWorld: true,
-    world: multiplayerId,
+    isWorld: !!world,
+    world,
     targetUrl,
     action: 'view-logs'
   })
@@ -261,6 +271,54 @@ function formatAndPrintLog(logger: CliComponents['logger'], log: any) {
   }
 }
 
+function normalizePosition(raw: string): string {
+  const match = raw.trim().match(/^(-?\d+)\s*,\s*(-?\d+)$/)
+  if (!match) {
+    throw new CliError(
+      'SERVER_LOGS_INVALID_POSITION',
+      `Invalid --position "${raw}"; expected "x,y" with integer coordinates`
+    )
+  }
+  return `${parseInt(match[1], 10)},${parseInt(match[2], 10)}`
+}
+
+interface LogsRequest {
+  /** Full URL the client will fetch. */
+  logsUrl: string
+  /** Pathname-only portion, used when signing. */
+  pathname: string
+  /** JSON string carried in the signed `x-identity-metadata` header. */
+  metadata: string
+}
+
+/**
+ * Build the HTTP request shape for a given target.
+ *
+ * Three shapes map to three CLI use cases:
+ *   - world only                → `/logs/:world`                 (single-scene)
+ *   - world + position          → `/logs/:world?position=x,y`    (multi-scene world)
+ *   - position only (no world)  → `/logs` with parcel in metadata (Genesis City)
+ *
+ * Query strings are not part of the signed payload, so `pathname` is always the
+ * bare route. Genesis City is the only shape that ships data in metadata.
+ */
+function buildLogsRequest(baseURL: string, world: string | undefined, position: string | undefined): LogsRequest {
+  if (world) {
+    const query = position ? `?position=${encodeURIComponent(position)}` : ''
+    return {
+      logsUrl: `${baseURL}/logs/${world}${query}`,
+      pathname: `/logs/${world}`,
+      metadata: JSON.stringify({})
+    }
+  }
+
+  return {
+    logsUrl: `${baseURL}/logs`,
+    pathname: '/logs',
+    metadata: JSON.stringify({ parcel: position })
+  }
+}
+
 export async function main(options: Options) {
   const { logger } = options.components
   const projectRoot = resolve(process.cwd(), options.args['--dir'] || '.')
@@ -268,35 +326,40 @@ export async function main(options: Options) {
   // Validate workspace exists
   await getValidWorkspace(options.components, projectRoot)
 
-  let multiplayerId: string
+  const positionArg = options.args['--position']
+  const worldArg = options.args['--world']
 
-  // Check if --multiplayerId parameter is provided
-  if (options.args['--multiplayerId']) {
-    multiplayerId = options.args['--multiplayerId']
-    logger.info(`Viewing logs for multiplayer ID: ${multiplayerId}`)
-  } else {
-    // Fall back to scene.json
+  const position = positionArg ? normalizePosition(positionArg) : undefined
+  let world: string | undefined
+
+  if (worldArg) {
+    world = worldArg.replace(/\.dcl\.eth$/i, '')
+  } else if (!position) {
+    // Genesis City callers do not set --world. Otherwise fall back to scene.json.
     const sceneJson = await getValidSceneJson(options.components, projectRoot)
-
-    if (!sceneJson.multiplayerId) {
+    const worldName = sceneJson.worldConfiguration?.name
+    if (!worldName) {
       throw new CliError(
-        'SERVER_LOGS_MISSING_MULTIPLAYER_ID',
-        'scene.json must have multiplayerId defined, or provide --multiplayerId parameter to view server logs'
+        'SERVER_LOGS_MISSING_WORLD',
+        'Provide --world (with optional --position) for worlds, or --position alone for Genesis City scenes. ' +
+          'Alternatively, run from a project whose scene.json defines worldConfiguration.name.'
       )
     }
-
-    multiplayerId = sceneJson.multiplayerId
-    logger.info(`Viewing logs for multiplayer ID: ${multiplayerId}`)
+    world = worldName.replace(/\.dcl\.eth$/i, '')
   }
 
-  // Determine target URL
+  if (world) {
+    logger.info(
+      position
+        ? `Viewing logs for world: ${world} at position ${position}`
+        : `Viewing logs for world: ${world}`
+    )
+  } else {
+    logger.info(`Viewing logs for Genesis City scene at position ${position!}`)
+  }
+
   const baseURL = options.args['--target'] || DEFAULT_SERVER
-
-  // Build the logs URL
-  const logsUrl = `${baseURL}/logs/${multiplayerId}`
-
-  // Build the pathname for signing
-  const pathname = `/logs/${multiplayerId}`
+  const { logsUrl, pathname, metadata } = buildLogsRequest(baseURL, world, position)
 
   // Linker dApp options
   const linkerPort = options.args['--port']
@@ -306,7 +369,6 @@ export async function main(options: Options) {
 
   const awaitResponse = future<void>()
   const timestamp = String(Date.now())
-  const metadata = JSON.stringify({})
 
   // Build the payload to sign: method:path:timestamp:metadata
   const payload = ['get', pathname, timestamp, metadata].join(':').toLowerCase()
@@ -317,7 +379,7 @@ export async function main(options: Options) {
     options.components,
     awaitResponse,
     payload,
-    multiplayerId,
+    world,
     baseURL,
     linkOptions,
     async (linkerResponse) => {
