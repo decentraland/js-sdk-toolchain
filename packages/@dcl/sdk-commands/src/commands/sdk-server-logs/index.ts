@@ -29,6 +29,7 @@ export const args = declareArgs({
   '--dir': String,
   '--world': String,
   '-w': '--world',
+  '--position': String,
   '--target': String,
   '-t': '--target',
   '--port': Number,
@@ -43,12 +44,15 @@ const DEFAULT_SERVER = 'https://multiplayer-server.decentraland.zone'
 export function help(options: Options) {
   options.components.logger.log(`
   Usage: 'sdk-commands sdk-server-logs [options]'
-    Streams real-time logs from the multiplayer server for your world.
-    Requires --world parameter or a scene.json with worldConfiguration.name.
+    Streams real-time logs from the multiplayer server.
+    Requires --world (or scene.json with worldConfiguration.name) for a world scene,
+    or --position for a Genesis City scene.
 
     Options:
       -h, --help                Displays complete help
-      -w, --world       [name]  World name (required, or uses scene.json)
+      -w, --world       [name]  World name (required for worlds, or uses scene.json)
+      --position        [x,y]   Parcel coordinates. Required for Genesis City scenes,
+                                and for multi-scene worlds to select a specific scene.
       -t, --target      [URL]   Target multiplayer server URL (default: ${DEFAULT_SERVER})
       --dir             [path]  Path to the project directory
       -p, --port        [port]  Select a custom port for the linker dApp
@@ -59,12 +63,15 @@ export function help(options: Options) {
     - View logs for world in scene.json:
       $ sdk-commands sdk-server-logs
 
-    - View logs for a specific world:
+    - View logs for a specific world (single-scene):
       $ sdk-commands sdk-server-logs --world myworld
       $ sdk-commands sdk-server-logs -w myworld.dcl.eth
 
-    - View logs for staging world:
-      $ sdk-commands sdk-server-logs --world staging-world
+    - View logs for a specific scene in a multi-scene world:
+      $ sdk-commands sdk-server-logs --world myworld.dcl.eth --position 10,10
+
+    - View logs for a Genesis City scene:
+      $ sdk-commands sdk-server-logs --position 27,7
 
     - Connect to local development server:
       $ sdk-commands sdk-server-logs --world myworld --target http://localhost:8000
@@ -321,6 +328,54 @@ function formatAndPrintLog(logger: CliComponents['logger'], log: any) {
   }
 }
 
+function normalizePosition(raw: string): string {
+  const match = raw.trim().match(/^(-?\d+)\s*,\s*(-?\d+)$/)
+  if (!match) {
+    throw new CliError(
+      'SERVER_LOGS_INVALID_POSITION',
+      `Invalid --position "${raw}"; expected "x,y" with integer coordinates`
+    )
+  }
+  return `${parseInt(match[1], 10)},${parseInt(match[2], 10)}`
+}
+
+interface LogsRequest {
+  /** Full URL the client will fetch. */
+  logsUrl: string
+  /** Pathname-only portion, used when signing. */
+  pathname: string
+  /** JSON string carried in the signed `x-identity-metadata` header. */
+  metadata: string
+}
+
+/**
+ * Build the HTTP request shape for a given target.
+ *
+ * Three shapes map to three CLI use cases:
+ *   - world only                → `/logs/:world`                 (single-scene)
+ *   - world + position          → `/logs/:world?position=x,y`    (multi-scene world)
+ *   - position only (no world)  → `/logs` with parcel in metadata (Genesis City)
+ *
+ * Query strings are not part of the signed payload, so `pathname` is always the
+ * bare route. Genesis City is the only shape that ships data in metadata.
+ */
+function buildLogsRequest(baseURL: string, world: string | undefined, position: string | undefined): LogsRequest {
+  if (world) {
+    const query = position ? `?position=${encodeURIComponent(position)}` : ''
+    return {
+      logsUrl: `${baseURL}/logs/${world}${query}`,
+      pathname: `/logs/${world}`,
+      metadata: JSON.stringify({})
+    }
+  }
+
+  return {
+    logsUrl: `${baseURL}/logs`,
+    pathname: '/logs',
+    metadata: JSON.stringify({ parcel: position })
+  }
+}
+
 export async function main(options: Options) {
   const { logger } = options.components
   const projectRoot = resolve(process.cwd(), options.args['--dir'] || '.')
@@ -328,39 +383,40 @@ export async function main(options: Options) {
   // Validate workspace exists
   await getValidWorkspace(options.components, projectRoot)
 
-  let world: string
+  const positionArg = options.args['--position']
+  const worldArg = options.args['--world']
 
-  // Check if --world parameter is provided
-  if (options.args['--world']) {
-    // Use the world from command line argument
-    world = options.args['--world'].replace(/\.dcl\.eth$/i, '')
-    logger.info(`Viewing logs for world: ${world}`)
-  } else {
-    // Fall back to scene.json
+  const position = positionArg ? normalizePosition(positionArg) : undefined
+  let world: string | undefined
+
+  if (worldArg) {
+    world = worldArg.replace(/\.dcl\.eth$/i, '')
+  } else if (!position) {
+    // Genesis City callers do not set --world. Otherwise fall back to scene.json.
     const sceneJson = await getValidSceneJson(options.components, projectRoot)
-
-    // worldConfiguration.name is required if --world is not provided
     const worldName = sceneJson.worldConfiguration?.name
     if (!worldName) {
       throw new CliError(
         'SERVER_LOGS_MISSING_WORLD',
-        'scene.json must have worldConfiguration.name defined, or provide --world parameter to view server logs'
+        'Provide --world (with optional --position) for worlds, or --position alone for Genesis City scenes. ' +
+          'Alternatively, run from a project whose scene.json defines worldConfiguration.name.'
       )
     }
-
-    // Strip .dcl.eth suffix if present
     world = worldName.replace(/\.dcl\.eth$/i, '')
-    logger.info(`Viewing logs for world: ${world}`)
   }
 
-  // Determine target URL
+  if (world) {
+    logger.info(
+      position
+        ? `Viewing logs for world: ${world} at position ${position}`
+        : `Viewing logs for world: ${world}`
+    )
+  } else {
+    logger.info(`Viewing logs for Genesis City scene at position ${position!}`)
+  }
+
   const baseURL = options.args['--target'] || DEFAULT_SERVER
-
-  // Build the logs URL
-  const logsUrl = `${baseURL}/logs/${world}`
-
-  // Build the pathname for signing
-  const pathname = `/logs/${world}`
+  const { logsUrl, pathname, metadata } = buildLogsRequest(baseURL, world, position)
 
   // Linker dApp options
   const linkerPort = options.args['--port']
@@ -370,7 +426,6 @@ export async function main(options: Options) {
 
   const awaitResponse = future<void>()
   const timestamp = String(Date.now())
-  const metadata = JSON.stringify({})
 
   // Build the payload to sign: method:path:timestamp:metadata
   const payload = ['get', pathname, timestamp, metadata].join(':').toLowerCase()
