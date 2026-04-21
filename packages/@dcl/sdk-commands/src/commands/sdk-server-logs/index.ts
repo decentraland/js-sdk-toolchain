@@ -299,23 +299,28 @@ interface LogsRequest {
  *   - world + position          → `/logs/:world?position=x,y`    (multi-scene world)
  *   - position only (no world)  → `/logs` with parcel in metadata (Genesis City)
  *
- * Query strings are not part of the signed payload, so `pathname` is always the
- * bare route. Genesis City is the only shape that ships data in metadata.
+ * The parcel is also included in the signed `x-identity-metadata` whenever it
+ * is known. Query strings are not part of the signed payload, so carrying the
+ * parcel in metadata keeps it authoritative and aligns with other signed-fetch
+ * emitters (hammurabi worker, unity explorer, kernel) that always ship
+ * `parcel` alongside the request.
  */
 function buildLogsRequest(baseURL: string, world: string | undefined, position: string | undefined): LogsRequest {
+  const metadata = JSON.stringify(position ? { parcel: position } : {})
+
   if (world) {
     const query = position ? `?position=${encodeURIComponent(position)}` : ''
     return {
       logsUrl: `${baseURL}/logs/${world}${query}`,
       pathname: `/logs/${world}`,
-      metadata: JSON.stringify({})
+      metadata
     }
   }
 
   return {
     logsUrl: `${baseURL}/logs`,
     pathname: '/logs',
-    metadata: JSON.stringify({ parcel: position })
+    metadata
   }
 }
 
@@ -329,7 +334,7 @@ export async function main(options: Options) {
   const positionArg = options.args['--position']
   const worldArg = options.args['--world']
 
-  const position = positionArg ? normalizePosition(positionArg) : undefined
+  let position = positionArg ? normalizePosition(positionArg) : undefined
   let world: string | undefined
 
   if (worldArg) {
@@ -346,6 +351,11 @@ export async function main(options: Options) {
       )
     }
     world = worldName.replace(/\.dcl\.eth$/i, '')
+    // Default position to the scene's base parcel so signed metadata always
+    // carries the parcel — consistent with other signed-fetch emitters.
+    if (!position && sceneJson.scene?.base) {
+      position = normalizePosition(sceneJson.scene.base)
+    }
   }
 
   if (world) {
