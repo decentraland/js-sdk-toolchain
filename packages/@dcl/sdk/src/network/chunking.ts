@@ -15,7 +15,7 @@ export function chunkCrdtMessages(data: Uint8Array, maxSizeKB: number = 12): Uin
 
   for (const message of readMessages(data)) {
     // Check if adding this message would exceed the size limit
-    const currentBufferSize = networkBuffer.toBinary().byteLength
+    const currentBufferSize = networkBuffer.currentWriteOffset()
     const messageSize = message.messageBuffer.byteLength
 
     if ((currentBufferSize + messageSize) / 1024 > maxSizeKB) {

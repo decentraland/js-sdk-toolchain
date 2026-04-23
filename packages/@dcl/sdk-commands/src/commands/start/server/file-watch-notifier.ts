@@ -26,6 +26,7 @@ export async function wireFileWatcherToWebSockets(
   desktopClient: boolean
 ) {
   const ignored = await getDCLIgnorePatterns(components, projectRoot)
+  ignored.push('**/editor-scene.json')
   const sceneId = b64HashingFunction(projectRoot)
 
   chokidar
