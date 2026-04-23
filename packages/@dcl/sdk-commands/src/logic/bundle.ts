@@ -83,12 +83,8 @@ ${
   `
 import { syncEntity } from '@dcl/sdk/network'
 import players from '@dcl/sdk/players'
-import { initAssetPacks, setSyncEntity } from '@dcl/asset-packs/dist/scene-entrypoint'
+import { initAssetPacks } from '@dcl/asset-packs/dist/scene-entrypoint'
 initAssetPacks(engine, { syncEntity }, players)
-
-// TODO: do we need to do this on runtime ?
-// I think we have that information at build-time and we avoid to do evaluate this on the worker.
-// Read composite.json or main.crdt => If that file has a NetworkEntity import '@dcl/@sdk/network'
 `
 }
 
@@ -169,6 +165,10 @@ type SingleProjectOptions = CompileOptions & {
 
 export async function bundleSingleProject(components: BundleComponents, options: SingleProjectOptions) {
   printProgressStep(components.logger, `Bundling file ${colors.bold(options.entrypoint)}`, 1, MAX_STEP)
+  // NOTE: editorScene is evaluated once and baked into stdin at esbuild context-creation
+  // time. In watch mode it is NOT re-evaluated on context.rebuild(). If a scene's
+  // editor status changes (e.g. first smart item added to an empty composite) the
+  // watch process must be restarted for initAssetPacks to be injected correctly.
   const editorScene = await isEditorScene(components, options.workingDirectory)
 
   // Pre-compute composite data so we can inject maxCompositeEntity via esbuild define.
