@@ -165,10 +165,6 @@ type SingleProjectOptions = CompileOptions & {
 
 export async function bundleSingleProject(components: BundleComponents, options: SingleProjectOptions) {
   printProgressStep(components.logger, `Bundling file ${colors.bold(options.entrypoint)}`, 1, MAX_STEP)
-  // NOTE: editorScene is evaluated once and baked into stdin at esbuild context-creation
-  // time. In watch mode it is NOT re-evaluated on context.rebuild(). If a scene's
-  // editor status changes (e.g. first smart item added to an empty composite) the
-  // watch process must be restarted for initAssetPacks to be injected correctly.
   const editorScene = await isEditorScene(components, options.workingDirectory)
 
   // Pre-compute composite data so we can inject maxCompositeEntity via esbuild define.

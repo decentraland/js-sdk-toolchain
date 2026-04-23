@@ -162,18 +162,14 @@ export async function startValidations(components: Pick<CliComponents, 'spawner'
  * NOT re-evaluated during watch-mode rebuilds. If a scene's editor status changes
  * (e.g. a smart item is added for the first time), the watch process must be restarted.
  */
-export async function isEditorScene(
-  components: Pick<CliComponents, 'fs'>,
-  workingDirectory: string
-): Promise<boolean> {
+export async function isEditorScene(components: Pick<CliComponents, 'fs'>, workingDirectory: string): Promise<boolean> {
   const mainCompositePath = path.resolve(workingDirectory, 'assets', 'scene', 'main.composite')
   if (!(await components.fs.fileExists(mainCompositePath))) return false
 
   try {
     const fileBuffer = await components.fs.readFile(mainCompositePath)
     const json = JSON.parse(new TextDecoder().decode(fileBuffer))
-    // asset-packs::Script is a build-time component — its presence alone does not
-    // require the initAssetPacks runtime entrypoint.
+    // asset-packs::Script is a build-time component — it doesn't require the initAssetPacks runtime entrypoint.
     const SCRIPT_COMPONENT = 'asset-packs::Script'
     return (
       Array.isArray(json.components) &&
