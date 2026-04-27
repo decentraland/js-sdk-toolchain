@@ -84,4 +84,35 @@ export namespace ReactEcs {
   type EffectHook = (effect: EffectCallback, deps?: DependencyList) => void
   export const useEffect: EffectHook = (React as any).useEffect
   export const useState: StateHook = (React as any).useState
+
+  // useMemo
+  type MemoHook = <T>(factory: () => T, deps: DependencyList | undefined) => T
+  export const useMemo: MemoHook = (React as any).useMemo
+
+  // useCallback
+  type CallbackHook = <T extends (...args: any[]) => any>(callback: T, deps: DependencyList) => T
+  export const useCallback: CallbackHook = (React as any).useCallback
+
+  // useRef
+  export interface MutableRefObject<T> {
+    current: T
+  }
+  type RefHook = <T>(initialValue: T) => MutableRefObject<T>
+  export const useRef: RefHook = (React as any).useRef
+
+  // useReducer
+  type Reducer<S, A> = (prevState: S, action: A) => S
+  type ReducerHook = <S, A>(reducer: Reducer<S, A>, initialState: S) => [S, (action: A) => void]
+  export const useReducer: ReducerHook = (React as any).useReducer
+
+  // React.memo
+  type MemoComponent = <P extends object>(
+    Component: (props: P) => ReactEcs.JSX.ReactNode,
+    propsAreEqual?: (prevProps: Readonly<P>, nextProps: Readonly<P>) => boolean
+  ) => (props: P) => ReactElement | null
+  export const memo: MemoComponent = (React as any).memo
+
+  // Fragment
+  export const Fragment: (props: { children?: ReactEcs.JSX.ReactNode }) => ReactEcs.JSX.ReactNode =
+    (React as any).Fragment
 }

@@ -19,6 +19,7 @@
     "allowJs": true,
     "jsx": "react",
     "jsxFactory": "ReactEcs.createElement",
+    "jsxFragmentFactory": "ReactEcs.Fragment",
     "alwaysStrict": true,
     "strict": true,
     "strictNullChecks": true,
