@@ -3,7 +3,13 @@ import * as ecsComponents from '@dcl/ecs/dist/components'
 import React from 'react'
 import type { ReactEcs } from './react-ecs'
 import { createReconciler } from './reconciler'
-import { getUiScaleFactor, resetUiScaleFactor, setUiScaleFactor } from './components/utils'
+import {
+  getUiScaleFactor,
+  resetSafeAreaInsets,
+  resetUiScaleFactor,
+  setSafeAreaInsets,
+  setUiScaleFactor
+} from './components/utils'
 
 /**
  * @public
@@ -65,6 +71,8 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
 
   // Unique owner to prevent other UI systems resetting this scale factor.
   const uiScaleFactorOwner = Symbol('react-ecs-ui-scale')
+  // Unique owner for the safe-area insets module variable.
+  const safeAreaOwner = Symbol('react-ecs-safe-area')
 
   function getActiveVirtualSize(): UiRendererOptions | undefined {
     // Main renderer options win; otherwise use the first additional renderer option.
@@ -107,6 +115,14 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
   }
 
   function UiScaleSystem() {
+    const canvasInfo = UiCanvasInformation.getOrNull(engine.RootEntity)
+
+    // Update safe-area insets unconditionally — they are independent of the
+    // virtual size and useful even when the renderer has no virtual canvas.
+    if (canvasInfo?.interactableArea) {
+      setSafeAreaInsets(canvasInfo.interactableArea, safeAreaOwner)
+    }
+
     const activeVirtualSize = getActiveVirtualSize()
     if (!activeVirtualSize) {
       // Reset only if this system owns the scale factor.
@@ -114,7 +130,6 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
       return
     }
 
-    const canvasInfo = UiCanvasInformation.getOrNull(engine.RootEntity)
     if (!canvasInfo) return
 
     const { width, height } = canvasInfo
@@ -136,6 +151,7 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
       engine.removeSystem(UiScaleSystem)
       engine.removeSystem(ReactBasedUiSystem)
       resetUiScaleFactor(uiScaleFactorOwner)
+      resetSafeAreaInsets(safeAreaOwner)
       for (const entity of renderer.getEntities()) {
         engine.removeEntity(entity)
       }

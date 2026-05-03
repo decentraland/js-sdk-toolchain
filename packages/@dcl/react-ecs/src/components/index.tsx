@@ -13,11 +13,14 @@ export * from './uiBackground/types'
 export * from './Dropdown/types'
 export * from './Label/types'
 export * from './Button/types'
+export * from './SafeAreaContainer/types'
 
 export { Dropdown } from './Dropdown'
 export { Input } from './Input'
 export { Label, scaleFontSize } from './Label'
 export { Button } from './Button'
+export { SafeAreaContainer } from './SafeAreaContainer'
+export { getSafeAreaInsets } from './utils'
 
 /**
  * @public
