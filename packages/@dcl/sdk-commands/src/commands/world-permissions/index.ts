@@ -140,7 +140,7 @@ async function grantWorldWidePermissions(
   await executeSignedRequest(
     components,
     linkerOpts,
-    { url, method: 'POST', metadata, worldName },
+    { url, method: 'POST', metadata, worldName, displayAddresses: newAddresses.map((a) => a.toLowerCase()) },
     async (authchainHeaders) => {
       printProgressInfo(logger, 'Submitting permissions...')
       const response = await components.fetch.fetch(url, {
@@ -183,7 +183,7 @@ async function grantParcelPermissions(
     await executeSignedRequest(
       components,
       linkerOpts,
-      { url, method: 'POST', metadata, worldName },
+      { url, method: 'POST', metadata, worldName, displayAddresses: [address.toLowerCase()] },
       async (authchainHeaders) => {
         printProgressInfo(logger, `Granting parcel access to ${address}...`)
         const response = await components.fetch.fetch(url, {

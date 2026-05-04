@@ -68,6 +68,7 @@ export async function executeSignedRequest(
     method: 'POST' | 'PUT' | 'DELETE'
     metadata: Record<string, unknown>
     worldName: string
+    displayAddresses?: string[]
   },
   callback: (authchainHeaders: Record<string, string>) => Promise<void>
 ): Promise<{ program?: Lifecycle.ComponentBasedProgram<unknown> }> {
@@ -90,8 +91,8 @@ export async function executeSignedRequest(
   const awaitResponse: IFuture<void> = future()
   const info = {
     worldName: requestData.worldName,
-    allowed: [],
-    oldAllowed: [],
+    allowed: requestData.displayAddresses ?? [],
+    oldAllowed: [] as string[],
     method: 'put',
     payload,
     expiration: 600
