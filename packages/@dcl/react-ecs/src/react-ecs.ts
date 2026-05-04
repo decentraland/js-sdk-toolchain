@@ -93,13 +93,6 @@ export namespace ReactEcs {
   export const useEffect: EffectHook = (React as any).useEffect
   export const useState: StateHook = (React as any).useState
 
-  // --- Context API ---------------------------------------------------------
-  //
-  // `react-ecs` is built on top of `react-reconciler`, which fully supports
-  // React's Context API at runtime. We just re-expose `createContext` and
-  // `useContext` from React so scenes can use the standard Provider/Consumer
-  // pattern without reaching into the React package directly.
-
   /**
    * @public
    * Provider component returned by `createContext`. Wrap a subtree with it
