@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=242.8k bytes
 =======
 SCENE_COMPILED_JS_SIZE_PROD=216.9k bytes
@@ -7,6 +8,9 @@ SCENE_COMPILED_JS_SIZE_PROD=216.9k bytes
 =======
 SCENE_COMPILED_JS_SIZE_PROD=224.9k bytes
 >>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
+=======
+SCENE_COMPILED_JS_SIZE_PROD=238.5k bytes
+>>>>>>> 63ddb3f8 (update snapshots)
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -16,6 +20,7 @@ EVAL test/snapshots/production-bundles/schema-components.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -37,11 +42,17 @@ EVAL test/snapshots/production-bundles/schema-components.js
   MALLOC_COUNT = 13610
   ALIVE_OBJS_DELTA ~= 2.99k
 >>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
+=======
+  OPCODES ~= 62k
+  MALLOC_COUNT = 14133
+  ALIVE_OBJS_DELTA ~= 3.10k
+>>>>>>> 63ddb3f8 (update snapshots)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   OPCODES ~= 3k
@@ -83,15 +94,26 @@ CALL onUpdate(0.1)
 >>>>>>> 327f7995 (fix tests)
 =======
   OPCODES ~= 1k
+=======
+  OPCODES ~= 3k
+  MALLOC_COUNT = 33
+  ALIVE_OBJS_DELTA ~= 0.01k
+CALL onUpdate(0.1)
+  OPCODES ~= 2k
+>>>>>>> 63ddb3f8 (update snapshots)
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
-  OPCODES ~= 1k
+  OPCODES ~= 2k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
-  OPCODES ~= 1k
+  OPCODES ~= 2k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 953.67k bytes
 >>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
+=======
+  MEMORY_USAGE_COUNT ~= 993.16k bytes
+>>>>>>> 63ddb3f8 (update snapshots)
