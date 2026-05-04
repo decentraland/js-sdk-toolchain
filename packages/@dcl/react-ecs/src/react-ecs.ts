@@ -92,4 +92,57 @@ export namespace ReactEcs {
   type EffectHook = (effect: EffectCallback, deps?: DependencyList) => void
   export const useEffect: EffectHook = (React as any).useEffect
   export const useState: StateHook = (React as any).useState
+
+  // --- Context API ---------------------------------------------------------
+  //
+  // `react-ecs` is built on top of `react-reconciler`, which fully supports
+  // React's Context API at runtime. We just re-expose `createContext` and
+  // `useContext` from React so scenes can use the standard Provider/Consumer
+  // pattern without reaching into the React package directly.
+
+  /**
+   * @public
+   * Provider component returned by `createContext`. Wrap a subtree with it
+   * to make `value` available to any descendant that calls `useContext`.
+   */
+  export interface Provider<T> {
+    (props: { value: T; children?: JSX.ReactNode }): JSX.Element | null
+  }
+
+  /**
+   * @public
+   * Consumer component returned by `createContext`. Renders its child
+   * function with the current context value.
+   */
+  export interface Consumer<T> {
+    (props: { children: (value: T) => JSX.ReactNode }): JSX.Element | null
+  }
+
+  /**
+   * @public
+   * Object returned by `createContext`. Pass to `useContext` to read the
+   * current value, or use `<MyContext.Provider value={...}>` to set one.
+   */
+  export interface Context<T> {
+    Provider: Provider<T>
+    Consumer: Consumer<T>
+    displayName?: string
+  }
+
+  type CreateContext = <T>(defaultValue: T) => Context<T>
+  type ContextHook = <T>(context: Context<T>) => T
+
+  /**
+   * @public
+   * Creates a Context object. The default value is used by descendants that
+   * don't have a matching Provider above them in the tree.
+   */
+  export const createContext: CreateContext = (React as any).createContext
+
+  /**
+   * @public
+   * Reads the value of the nearest matching Provider for the given Context.
+   * If none is found, returns the Context's default value.
+   */
+  export const useContext: ContextHook = (React as any).useContext
 }
