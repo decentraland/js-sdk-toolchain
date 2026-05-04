@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=284k bytes
+SCENE_COMPILED_JS_SIZE_PROD=283.6k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -8,9 +8,9 @@ EVAL test/snapshots/production-bundles/cubes.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-  OPCODES ~= 118k
-  MALLOC_COUNT = 20580
-  ALIVE_OBJS_DELTA ~= 5.05k
+  OPCODES ~= 110k
+  MALLOC_COUNT = 20852
+  ALIVE_OBJS_DELTA ~= 5.08k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -563,8 +563,8 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x2b4 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   Scene: PUT_COMPONENT e=0x2b5 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   Scene: PUT_COMPONENT e=0x2b6 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  OPCODES ~= 1001k
-  MALLOC_COUNT = 6214
+  OPCODES ~= 949k
+  MALLOC_COUNT = 6216
   ALIVE_OBJS_DELTA ~= 1.83k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=2 data={"position":{"x":-3,"y":2.7722561359405518,"z":-3},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":0.5,"y":0.5,"z":0.5},"parent":0}
@@ -925,7 +925,7 @@ CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x2b4 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
   Scene: PUT_COMPONENT e=0x2b5 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
   Scene: PUT_COMPONENT e=0x2b6 c=1017 t=2 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
-  OPCODES ~= 725k
+  OPCODES ~= 690k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
@@ -1287,7 +1287,7 @@ CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x2b4 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
   Scene: PUT_COMPONENT e=0x2b5 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
   Scene: PUT_COMPONENT e=0x2b6 c=1017 t=3 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
-  OPCODES ~= 725k
+  OPCODES ~= 690k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
@@ -1649,7 +1649,7 @@ CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x2b4 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
   Scene: PUT_COMPONENT e=0x2b5 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
   Scene: PUT_COMPONENT e=0x2b6 c=1017 t=4 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":0,"g":0,"b":1,"a":1}}}}
-  OPCODES ~= 725k
+  OPCODES ~= 690k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1459.31k bytes
+  MEMORY_USAGE_COUNT ~= 1450.71k bytes

@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=553k bytes
+SCENE_COMPILED_JS_SIZE_PROD=551.9k bytes
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -10,21 +10,21 @@ EVAL test/snapshots/development-bundles/two-way-crdt.test.js
   REQUIRE: ~system/Testing
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-  OPCODES ~= 74k
-  MALLOC_COUNT = 16395
-  ALIVE_OBJS_DELTA ~= 3.30k
+  OPCODES ~= 57k
+  MALLOC_COUNT = 16262
+  ALIVE_OBJS_DELTA ~= 3.22k
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=1 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
   OPCODES ~= 3k
-  MALLOC_COUNT = 56
+  MALLOC_COUNT = 60
   ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0)
    ~system/Testing: plan {"tests":[{"name":"two way communication"}]}
   LOG: ["Adding one to position.y=0"]
-  OPCODES ~= 6k
-  MALLOC_COUNT = 12
-  ALIVE_OBJS_DELTA ~= 0.01k
+  OPCODES ~= 5k
+  MALLOC_COUNT = 10
+  ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
   LOG: ["🧪 Running test two way communication"]
   LOG: ["✅ RootEntity has a transform"]
@@ -34,7 +34,7 @@ CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   LOG: ["Adding one to position.y=1"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=3 data={"position":{"x":2,"y":1,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
-  OPCODES ~= 11k
+  OPCODES ~= 10k
   MALLOC_COUNT = 80
   ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0.1)
@@ -42,7 +42,7 @@ CALL onUpdate(0.1)
   Scene: DELETE_COMPONENT e=0x200 c=1 t=2 data=null
   Scene: DELETE_COMPONENT e=0x0 c=1 t=4 data=null
   Scene: DELETE_ENTITY e=0x200
-  OPCODES ~= 10k
+  OPCODES ~= 8k
   MALLOC_COUNT = -78
   ALIVE_OBJS_DELTA ~= -0.03k
 CALL onUpdate(0.1)
@@ -50,7 +50,7 @@ CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x0 c=1 t=5 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=6 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 8k
+  OPCODES ~= 7k
   MALLOC_COUNT = 48
   ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0.1)
@@ -59,7 +59,7 @@ CALL onUpdate(0.1)
   LOG: ["🟢 Test passed two way communication"]
   ~system/Testing: logTestResult {"name":"two way communication","ok":true,"totalFrames":3,"totalTime":0.30000000000000004}
   LOG: ["Adding one to position.y=0"]
-  OPCODES ~= 6k
+  OPCODES ~= 5k
   MALLOC_COUNT = -53
   ALIVE_OBJS_DELTA ~= -0.01k
-  MEMORY_USAGE_COUNT ~= 1406.25k bytes
+  MEMORY_USAGE_COUNT ~= 1387.02k bytes
