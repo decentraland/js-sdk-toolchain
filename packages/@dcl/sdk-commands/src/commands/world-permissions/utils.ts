@@ -3,7 +3,6 @@ import { hexToBytes } from 'eth-connect'
 import { ethSign } from '@dcl/crypto/dist/crypto'
 import { Authenticator, AuthChain } from '@dcl/crypto'
 import { Lifecycle } from '@well-known-components/interfaces'
-import { Router } from '@well-known-components/http-server'
 
 import { CliComponents } from '../../components'
 import { createWallet } from '../../logic/account'
@@ -29,10 +28,6 @@ export interface WorldPermissionsResponse {
   }
 }
 
-/**
- * Fetches the current deployment permissions for a world.
- * Returns an empty allow-list if the world has no permissions configured.
- */
 export async function fetchWorldDeploymentPermissions(
   fetchFn: CliComponents['fetch'],
   targetContent: string,
@@ -65,19 +60,14 @@ function createAuthchainHeaders(authchain: AuthChain, timestamp: string, metadat
   return headers
 }
 
-/**
- * Opens the linker dapp for the user to sign a request, then calls `callback`
- * with the resulting auth-chain headers. If `DCL_PRIVATE_KEY` is set in the
- * environment the linker dapp is bypassed and the key is used directly.
- */
 export async function executeSignedRequest(
   components: CliComponents,
   linkerOpts: Omit<dAppOptions, 'uri'>,
   requestData: {
     url: string
     method: 'POST' | 'PUT' | 'DELETE'
-    /** Payload metadata included in the signed message (sent as x-identity-metadata). */
     metadata: Record<string, unknown>
+    worldName: string
   },
   callback: (authchainHeaders: Record<string, string>) => Promise<void>
 ): Promise<{ program?: Lifecycle.ComponentBasedProgram<unknown> }> {
@@ -98,39 +88,25 @@ export async function executeSignedRequest(
   }
 
   const awaitResponse: IFuture<void> = future()
-  const info = { messageToSign: payload, worldName: requestData.url }
-  const { router } = setRoutes(components, info, '/world-permissions')
+  const info = {
+    worldName: requestData.worldName,
+    allowed: [],
+    oldAllowed: [],
+    method: 'put',
+    payload,
+    expiration: 600
+  }
+  const { router } = setRoutes(components, info, '/acl')
   const { logger } = components
 
   const resolveLinkerPromise = () => setTimeout(() => awaitResponse.resolve(), 100)
   const rejectLinkerPromise = (e: Error) => setTimeout(() => awaitResponse.reject(e), 100)
 
-  setSignRoute(router, components, resolveLinkerPromise, rejectLinkerPromise, async (linkerResponse) => {
-    await callback(createAuthchainHeaders(linkerResponse.authChain, timestamp, metadataStr))
-  })
+  router.get('/api/acl', async () => ({
+    body: info
+  }))
 
-  logger.info('You need to sign the request to continue:')
-  const { program } = await runDapp(components, router, { ...linkerOpts, uri: '/world-permissions' })
-
-  try {
-    await awaitResponse
-  } finally {
-    void program?.stop()
-  }
-
-  return { program }
-}
-
-function setSignRoute(
-  router: Router<object>,
-  components: CliComponents,
-  resolveLinkerPromise: () => void,
-  rejectLinkerPromise: (e: Error) => void,
-  callback: (linkerResponse: LinkerResponse) => Promise<void>
-): void {
-  const { logger } = components
-
-  router.post('/api/world-permissions', async (ctx) => {
+  router.post('/api/acl', async (ctx) => {
     const value = (await ctx.request.json()) as LinkerResponse
 
     if (!value.address || !value.authChain) {
@@ -141,7 +117,7 @@ function setSignRoute(
     }
 
     try {
-      await callback(value)
+      await callback(createAuthchainHeaders(value.authChain, timestamp, metadataStr))
       resolveLinkerPromise()
       return {}
     } catch (e) {
@@ -149,4 +125,15 @@ function setSignRoute(
       return { status: 400, body: { message: (e as Error).message } }
     }
   })
+
+  logger.info('You need to sign the request to continue:')
+  const { program } = await runDapp(components, router, { ...linkerOpts, uri: '/acl' })
+
+  try {
+    await awaitResponse
+  } finally {
+    void program?.stop()
+  }
+
+  return { program }
 }

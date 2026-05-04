@@ -137,22 +137,27 @@ async function grantWorldWidePermissions(
   const url = `${targetContent}/world/${encodedName}/permissions/deployment`
   const metadata = { type: 'allow-list', wallets: allWallets }
 
-  await executeSignedRequest(components, linkerOpts, { url, method: 'POST', metadata }, async (authchainHeaders) => {
-    printProgressInfo(logger, 'Submitting permissions...')
-    const response = await components.fetch.fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authchainHeaders },
-      body: JSON.stringify(metadata)
-    })
+  await executeSignedRequest(
+    components,
+    linkerOpts,
+    { url, method: 'POST', metadata, worldName },
+    async (authchainHeaders) => {
+      printProgressInfo(logger, 'Submitting permissions...')
+      const response = await components.fetch.fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authchainHeaders },
+        body: JSON.stringify(metadata)
+      })
 
-    if (!response.ok) {
-      const text = await response.text()
-      throw new CliError(
-        'WORLD_PERMISSIONS_GRANT_FAILED',
-        i18next.t('errors.world_permissions.grant_failed', { error: `${response.status} ${text}` })
-      )
+      if (!response.ok) {
+        const text = await response.text()
+        throw new CliError(
+          'WORLD_PERMISSIONS_GRANT_FAILED',
+          i18next.t('errors.world_permissions.grant_failed', { error: `${response.status} ${text}` })
+        )
+      }
     }
-  })
+  )
 }
 
 async function grantParcelPermissions(
@@ -175,21 +180,26 @@ async function grantParcelPermissions(
     const url = `${targetContent}/world/${encodedName}/permissions/deployment/address/${address.toLowerCase()}/parcels`
     const metadata = { parcels }
 
-    await executeSignedRequest(components, linkerOpts, { url, method: 'POST', metadata }, async (authchainHeaders) => {
-      printProgressInfo(logger, `Granting parcel access to ${address}...`)
-      const response = await components.fetch.fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...authchainHeaders },
-        body: JSON.stringify(metadata)
-      })
+    await executeSignedRequest(
+      components,
+      linkerOpts,
+      { url, method: 'POST', metadata, worldName },
+      async (authchainHeaders) => {
+        printProgressInfo(logger, `Granting parcel access to ${address}...`)
+        const response = await components.fetch.fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...authchainHeaders },
+          body: JSON.stringify(metadata)
+        })
 
-      if (!response.ok) {
-        const text = await response.text()
-        throw new CliError(
-          'WORLD_PERMISSIONS_GRANT_FAILED',
-          i18next.t('errors.world_permissions.grant_failed', { error: `${response.status} ${text}` })
-        )
+        if (!response.ok) {
+          const text = await response.text()
+          throw new CliError(
+            'WORLD_PERMISSIONS_GRANT_FAILED',
+            i18next.t('errors.world_permissions.grant_failed', { error: `${response.status} ${text}` })
+          )
+        }
       }
-    })
+    )
   }
 }
