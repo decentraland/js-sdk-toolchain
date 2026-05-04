@@ -246,7 +246,7 @@ describe('world-permissions command', () => {
           url: `https://worlds-content-server.decentraland.org/world/${encodeURIComponent(WORLD_NAME)}/permissions/deployment/address/${VALID_ADDRESS_1.toLowerCase()}/parcels`,
           method: 'POST',
           metadata: { parcels: ['0,0', '1,0', '-1,2'] },
-          worldName: WORLD_NAME,
+          worldName: `${WORLD_NAME} (parcels: 0,0, 1,0, -1,2)`,
           displayAddresses: [VALID_ADDRESS_1.toLowerCase()]
         },
         expect.any(Function)
@@ -260,7 +260,7 @@ describe('world-permissions command', () => {
           url: `https://worlds-content-server.decentraland.org/world/${encodeURIComponent(WORLD_NAME)}/permissions/deployment/address/${VALID_ADDRESS_2.toLowerCase()}/parcels`,
           method: 'POST',
           metadata: { parcels: ['0,0', '1,0', '-1,2'] },
-          worldName: WORLD_NAME,
+          worldName: `${WORLD_NAME} (parcels: 0,0, 1,0, -1,2)`,
           displayAddresses: [VALID_ADDRESS_2.toLowerCase()]
         },
         expect.any(Function)

@@ -183,7 +183,13 @@ async function grantParcelPermissions(
     await executeSignedRequest(
       components,
       linkerOpts,
-      { url, method: 'POST', metadata, worldName, displayAddresses: [address.toLowerCase()] },
+      {
+        url,
+        method: 'POST',
+        metadata,
+        worldName: `${worldName} (parcels: ${parcels.join(', ')})`,
+        displayAddresses: [address.toLowerCase()]
+      },
       async (authchainHeaders) => {
         printProgressInfo(logger, `Granting parcel access to ${address}...`)
         const response = await components.fetch.fetch(url, {
