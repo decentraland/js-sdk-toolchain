@@ -1,9 +1,12 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=248k bytes
 =======
 =======
 >>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
+=======
+>>>>>>> 8e67b6b5 (update snapshots)
 <<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=246.7k bytes
 =======
@@ -15,7 +18,13 @@ SCENE_COMPILED_JS_SIZE_PROD=220.7k bytes
 =======
 SCENE_COMPILED_JS_SIZE_PROD=228.8k bytes
 >>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
+<<<<<<< HEAD
 >>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
+=======
+=======
+SCENE_COMPILED_JS_SIZE_PROD=242.4k bytes
+>>>>>>> 63ddb3f8 (update snapshots)
+>>>>>>> 8e67b6b5 (update snapshots)
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -28,6 +37,7 @@ EVAL test/snapshots/production-bundles/append-value-crdt.js
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   REQUIRE: ~system/Runtime
   OPCODES ~= 85k
   MALLOC_COUNT = 15161
@@ -37,6 +47,8 @@ EVAL test/snapshots/production-bundles/append-value-crdt.js
 >>>>>>> 112f68c7 (fix tests)
 =======
 >>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
+=======
+>>>>>>> 8e67b6b5 (update snapshots)
 <<<<<<< HEAD
   OPCODES ~= 77k
   MALLOC_COUNT = 14904
@@ -60,6 +72,11 @@ CALL onStart()
   MALLOC_COUNT = 14083
   ALIVE_OBJS_DELTA ~= 3.11k
 >>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
+=======
+  OPCODES ~= 60k
+  MALLOC_COUNT = 14611
+  ALIVE_OBJS_DELTA ~= 3.22k
+>>>>>>> 63ddb3f8 (update snapshots)
 CALL onStart()
   Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5,"tickNumber":0}
   OPCODES ~= 8k
@@ -78,6 +95,7 @@ CALL onUpdate(0)
   Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":0,"timestamp":2,"analog":5,"tickNumber":0}
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   OPCODES ~= 18k
   MALLOC_COUNT = 91
 =======
@@ -88,6 +106,10 @@ CALL onUpdate(0)
   OPCODES ~= 16k
   MALLOC_COUNT = 77
 >>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
+=======
+  OPCODES ~= 17k
+  MALLOC_COUNT = 93
+>>>>>>> 63ddb3f8 (update snapshots)
   ALIVE_OBJS_DELTA ~= 0.03k
 CALL onUpdate(0.1)
   LOG: ["PointerEventsResult",[{"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5,"tickNumber":0},{"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":0,"timestamp":2,"analog":5,"tickNumber":0}]]
@@ -98,6 +120,7 @@ CALL onUpdate(0.1)
   Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":3,"analog":5,"tickNumber":0}
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   OPCODES ~= 15k
 =======
   OPCODES ~= 13k
@@ -105,6 +128,9 @@ CALL onUpdate(0.1)
 =======
   OPCODES ~= 13k
 >>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
+=======
+  OPCODES ~= 14k
+>>>>>>> 63ddb3f8 (update snapshots)
   MALLOC_COUNT = 31
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
@@ -115,6 +141,7 @@ CALL onUpdate(0.1)
   Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":0,"timestamp":4,"analog":5,"tickNumber":0}
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   OPCODES ~= 15k
 =======
   OPCODES ~= 13k
@@ -122,6 +149,9 @@ CALL onUpdate(0.1)
 =======
   OPCODES ~= 13k
 >>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
+=======
+  OPCODES ~= 14k
+>>>>>>> 63ddb3f8 (update snapshots)
   MALLOC_COUNT = 31
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
@@ -131,6 +161,7 @@ CALL onUpdate(0.1)
   LOG: ["isTriggered(RootEntity)=",false]
   LOG: ["getCommand(RootEntity)=",null]
   Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":5,"analog":5,"tickNumber":0}
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   OPCODES ~= 15k
@@ -155,4 +186,13 @@ CALL onUpdate(0.1)
   ALIVE_OBJS_DELTA ~= 0.01k
   MEMORY_USAGE_COUNT ~= 992.50k bytes
 >>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
+<<<<<<< HEAD
 >>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
+=======
+=======
+  OPCODES ~= 14k
+  MALLOC_COUNT = 31
+  ALIVE_OBJS_DELTA ~= 0.01k
+  MEMORY_USAGE_COUNT ~= 1032.30k bytes
+>>>>>>> 63ddb3f8 (update snapshots)
+>>>>>>> 8e67b6b5 (update snapshots)

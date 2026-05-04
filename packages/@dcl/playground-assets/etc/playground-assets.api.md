@@ -1666,6 +1666,14 @@ export type InstanceCompositeOptions = {
     alreadyRequestedSrc?: Set<string>;
 };
 
+// @public (undocumented)
+export const enum InteractionType {
+    // (undocumented)
+    CURSOR = 0,
+    // (undocumented)
+    PROXIMITY = 1
+}
+
 // Warning: (ae-missing-release-tag) "InternalBaseComponent" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public
@@ -1678,14 +1686,6 @@ export interface InternalBaseComponent<T> extends BaseComponent<T> {
     // (undocumented)
     dirtyIterator(): Iterable<Entity>;
     iterator(): Iterable<[Entity, any]>;
-}
-
-// @public (undocumented)
-export const enum InteractionType {
-    // (undocumented)
-    CURSOR = 0,
-    // (undocumented)
-    PROXIMITY = 1
 }
 
 // @public (undocumented)

@@ -1,9 +1,12 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=564.1k bytes
 =======
 =======
 >>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
+=======
+>>>>>>> 8e67b6b5 (update snapshots)
 <<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=561.4k bytes
 =======
@@ -15,6 +18,9 @@ THE BUNDLE HAS SOURCEMAPS
   OPCODES ~= 72k
 =======
 SCENE_COMPILED_JS_SIZE_PROD=519.1k bytes
+=======
+SCENE_COMPILED_JS_SIZE_PROD=551.4k bytes
+>>>>>>> 63ddb3f8 (update snapshots)
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -30,6 +36,7 @@ EVAL test/snapshots/development-bundles/static-scene.test.js
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   REQUIRE: ~system/Runtime
   OPCODES ~= 73k
   MALLOC_COUNT = 16301
@@ -39,6 +46,8 @@ EVAL test/snapshots/development-bundles/static-scene.test.js
 >>>>>>> 112f68c7 (fix tests)
 =======
 >>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
+=======
+>>>>>>> 8e67b6b5 (update snapshots)
 <<<<<<< HEAD
   OPCODES ~= 66k
   MALLOC_COUNT = 16028
@@ -99,7 +108,15 @@ EVAL test/snapshots/development-bundles/static-scene.test.js
   MALLOC_COUNT = 15427
   ALIVE_OBJS_DELTA ~= 3.04k
 >>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
+<<<<<<< HEAD
 >>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
+=======
+=======
+  OPCODES ~= 57k
+  MALLOC_COUNT = 16026
+  ALIVE_OBJS_DELTA ~= 3.15k
+>>>>>>> 63ddb3f8 (update snapshots)
+>>>>>>> 8e67b6b5 (update snapshots)
 CALL onStart()
   main.crdt: PUT_COMPONENT e=0x200 c=1 t=0 data={"position":{"x":5.880000114440918,"y":2.7916901111602783,"z":7.380000114440918},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   main.crdt: PUT_COMPONENT e=0x202 c=1 t=0 data={"position":{"x":4,"y":0.800000011920929,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
@@ -150,6 +167,7 @@ CALL onUpdate(0)
   ALIVE_OBJS_DELTA ~= 0.09k
 CALL onUpdate(0)
    ~system/Testing: plan {"tests":[{"name":"ensure that cubes are in the scene on the first frame"}]}
+<<<<<<< HEAD
   OPCODES ~= 15k
   MALLOC_COUNT = -61
   ALIVE_OBJS_DELTA ~= -0.03k
@@ -160,11 +178,20 @@ CALL onUpdate(0)
 =======
 =======
 >>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
+<<<<<<< HEAD
 >>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
+=======
+=======
+  OPCODES ~= 16k
+  MALLOC_COUNT = 43
+  ALIVE_OBJS_DELTA ~= -0.00k
+>>>>>>> 63ddb3f8 (update snapshots)
+>>>>>>> 8e67b6b5 (update snapshots)
 CALL onUpdate(0.1)
   LOG: ["🧪 Running test ensure that cubes are in the scene on the first frame"]
   LOG: ["🟢 Test passed ensure that cubes are in the scene on the first frame"]
   ~system/Testing: logTestResult {"name":"ensure that cubes are in the scene on the first frame","ok":true,"totalFrames":0,"totalTime":0}
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   OPCODES ~= 5k
@@ -174,6 +201,8 @@ CALL onUpdate(0.1)
 =======
 =======
 >>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
+=======
+>>>>>>> 8e67b6b5 (update snapshots)
 <<<<<<< HEAD
   OPCODES ~= 4k
   MALLOC_COUNT = -5
@@ -194,4 +223,13 @@ CALL onUpdate(0.1)
   ALIVE_OBJS_DELTA ~= 0.00k
   MEMORY_USAGE_COUNT ~= 1328.24k bytes
 >>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
+<<<<<<< HEAD
 >>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
+=======
+=======
+  OPCODES ~= 4k
+  MALLOC_COUNT = -5
+  ALIVE_OBJS_DELTA ~= 0.00k
+  MEMORY_USAGE_COUNT ~= 1387.69k bytes
+>>>>>>> 63ddb3f8 (update snapshots)
+>>>>>>> 8e67b6b5 (update snapshots)
