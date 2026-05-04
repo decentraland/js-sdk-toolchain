@@ -46,6 +46,12 @@ module.exports = {
       lines: 0,
       statements: 0
     },
+    'packages/@dcl/sdk-commands/src/commands/world-permissions': {
+      branches: 0,
+      functions: 0,
+      lines: 0,
+      statements: 0
+    },
     'packages/@dcl/sdk-commands/src/components/exit-signal.ts': {
       branches: 0,
       functions: 0,
