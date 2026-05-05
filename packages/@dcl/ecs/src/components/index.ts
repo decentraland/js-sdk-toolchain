@@ -2,6 +2,8 @@ import { GrowOnlyValueSetComponentDefinition, LastWriteWinElementSetComponentDef
 import { IEngine } from '../engine/types'
 import { AnimatorComponentDefinitionExtended, defineAnimatorComponent } from './extended/Animator'
 import { AudioSourceComponentDefinitionExtended, defineAudioSourceComponent } from './extended/AudioSource'
+import { AudioAnalysisComponentDefinitionExtended, defineAudioAnalysisComponent } from './extended/AudioAnalysis'
+import type { AudioAnalysisView } from './extended/AudioAnalysis'
 import { defineMaterialComponent, MaterialComponentDefinitionExtended } from './extended/Material'
 import { defineMeshColliderComponent, MeshColliderComponentDefinitionExtended } from './extended/MeshCollider'
 import { defineMeshRendererComponent, MeshRendererComponentDefinitionExtended } from './extended/MeshRenderer'
@@ -45,6 +47,10 @@ export const Animator: LwwComponentGetter<AnimatorComponentDefinitionExtended> =
 /* @__PURE__ */
 export const AudioSource: LwwComponentGetter<AudioSourceComponentDefinitionExtended> = (engine) =>
   defineAudioSourceComponent(engine)
+
+/* @__PURE__ */
+export const AudioAnalysis: LwwComponentGetter<AudioAnalysisComponentDefinitionExtended> = (engine) =>
+  defineAudioAnalysisComponent(engine)
 
 /* @__PURE__ */
 export const AudioStream: (
@@ -124,3 +130,5 @@ export const CreatedBy: (
 ) => LastWriteWinElementSetComponentDefinition<ICreatedByType> = (engine) => defineCreatedBy(engine)
 
 export { MediaState }
+
+export type { AudioAnalysisView }

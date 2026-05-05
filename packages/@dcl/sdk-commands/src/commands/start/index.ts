@@ -99,6 +99,7 @@ export async function help(options: Options) {
       --bevy-web                        Opens preview using the Bevy Web browser window.
       --mobile                          Show QR code for mobile preview on the same network.
       --multi-instance                  Allow running multiple Explorer instances simultaneously.
+      --no-client                       Suppress every auto-launch (desktop Explorer deeplink, browser open, mobile QR). The file watcher still notifies a desktop Explorer if it connects on its own — useful when an external tool owns the Explorer process.
 
 
     Examples:
@@ -125,9 +126,9 @@ export async function main(options: Options) {
   const enableWeb3 = options.args['--web3']
   const isHub = !!options.args['--hub']
   const skipClient = !!options.args['--no-client']
-  const bevyWeb = !!options.args['--bevy-web'] && !skipClient
-  const isMobile = options.args['--mobile'] && !skipClient
-  const explorerAlpha = !options.args['--web-explorer'] && !bevyWeb && !skipClient
+  const bevyWeb = !!options.args['--bevy-web']
+  const isMobile = !!options.args['--mobile']
+  const explorerAlpha = !options.args['--web-explorer'] && !bevyWeb
 
   let hasSmartWearable = false
   const workspace = await getValidWorkspace(options.components, workingDirectory)
@@ -282,12 +283,12 @@ export async function main(options: Options) {
       }
       components.logger.log('\nPress CTRL+C to exit\n')
 
-      if (explorerAlpha && !isMobile) {
+      if (explorerAlpha && !isMobile && !skipClient) {
         const realm = new URL(sortedURLs[0]).origin
         await runExplorerAlpha(components, { cwd: workingDirectory, realm, baseCoords, isHub, args: options.args })
       }
 
-      if (options.args['--mobile'] && lanUrl) {
+      if (isMobile && !skipClient && lanUrl) {
         const deepLink = `decentraland://open?preview=${lanUrl}&position=${baseCoords.x},${baseCoords.y}`
         QRCode.toString(deepLink, { type: 'terminal', small: true }, (err, qr) => {
           if (!err) {
@@ -299,7 +300,7 @@ export async function main(options: Options) {
       }
 
       // Open preferably localhost/127.0.0.1
-      if ((!explorerAlpha || bevyWeb) && openBrowser && sortedURLs.length) {
+      if ((!explorerAlpha || bevyWeb) && openBrowser && !skipClient && sortedURLs.length) {
         try {
           const url = bevyWeb ? bevyUrl : sortedURLs[0]
           await open(url)
