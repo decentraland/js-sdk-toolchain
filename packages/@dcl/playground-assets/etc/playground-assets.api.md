@@ -1299,6 +1299,14 @@ export function getEntitiesWithParent(engine: Pick<IEngine, 'getEntitiesWith' | 
 export function getGlobal<T>(key: string): T | undefined;
 
 // @public
+export function getSafeAreaInsets(): {
+    top: number;
+    left: number;
+    right: number;
+    bottom: number;
+};
+
+// @public
 export function getWorldPosition(engine: WorldTransformEngine, entity: Entity): Vector3Type;
 
 // @public
@@ -4610,6 +4618,11 @@ export type RPCSendableMessage = {
     params: any[];
 };
 
+// Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
+//
+// @public
+export function SafeAreaContainer(props: UiSafeAreaContainerProps): ReactEcs.JSX.Element;
+
 // @public
 export namespace Scalar {
     const TwoPi: number;
@@ -5276,6 +5289,11 @@ export type uint32 = number;
 export type UiRendererOptions = {
     virtualWidth: number;
     virtualHeight: number;
+};
+
+// @public
+export type UiSafeAreaContainerProps = Omit<EntityPropTypes, 'uiTransform'> & {
+    uiTransform?: Omit<NonNullable<EntityPropTypes['uiTransform']>, 'positionType' | 'position'>;
 };
 
 // @public (undocumented)
