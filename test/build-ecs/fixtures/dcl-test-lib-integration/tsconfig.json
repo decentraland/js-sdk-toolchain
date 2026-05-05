@@ -1,7 +1,6 @@
 {
   "include": ["src"],
   "compilerOptions": {
-    "ignoreDeprecations": "5.0",
     "module": "ESNext",
     "rootDir": "src",
     "outDir": "bin",
