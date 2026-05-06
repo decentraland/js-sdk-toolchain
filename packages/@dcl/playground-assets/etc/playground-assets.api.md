@@ -1291,14 +1291,6 @@ export function getEntitiesWithParent(engine: Pick<IEngine, 'getEntitiesWith' | 
 export function getGlobal<T>(key: string): T | undefined;
 
 // @public
-export function getSafeAreaInsets(): {
-    top: number;
-    left: number;
-    right: number;
-    bottom: number;
-};
-
-// @public
 export function getWorldPosition(engine: WorldTransformEngine, entity: Entity): Vector3Type;
 
 // @public
@@ -1588,6 +1580,11 @@ export type InstanceCompositeOptions = {
     rootEntity?: Entity;
     alreadyRequestedSrc?: Set<string>;
 };
+
+// Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
+//
+// @public
+export function InteractableArea(props: UiInteractableAreaProps): ReactEcs.JSX.Element;
 
 // @public (undocumented)
 export const enum InteractionType {
@@ -4554,7 +4551,7 @@ export type RPCSendableMessage = {
 // Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
 //
 // @public
-export function SafeAreaContainer(props: UiSafeAreaContainerProps): ReactEcs.JSX.Element;
+export function ScreenInsetArea(props: UiScreenInsetAreaProps): ReactEcs.JSX.Element;
 
 // @public
 export namespace Scalar {
@@ -5225,7 +5222,12 @@ export type UiRendererOptions = {
 };
 
 // @public
-export type UiSafeAreaContainerProps = Omit<EntityPropTypes, 'uiTransform'> & {
+export type UiInteractableAreaProps = Omit<EntityPropTypes, 'uiTransform'> & {
+    uiTransform?: Omit<NonNullable<EntityPropTypes['uiTransform']>, 'positionType' | 'position'>;
+};
+
+// @public
+export type UiScreenInsetAreaProps = Omit<EntityPropTypes, 'uiTransform'> & {
     uiTransform?: Omit<NonNullable<EntityPropTypes['uiTransform']>, 'positionType' | 'position'>;
 };
 

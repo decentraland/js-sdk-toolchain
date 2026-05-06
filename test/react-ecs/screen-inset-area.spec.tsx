@@ -1,16 +1,16 @@
 import { Entity, YGPositionType, YGUnit } from '../../packages/@dcl/ecs/dist'
 import { components } from '../../packages/@dcl/ecs/src'
-import { ReactEcs, SafeAreaContainer } from '../../packages/@dcl/react-ecs/src'
+import { ReactEcs, ScreenInsetArea } from '../../packages/@dcl/react-ecs/src'
 import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
-import { getSafeAreaInsets, resetSafeAreaInsets } from '../../packages/@dcl/react-ecs/src/components/utils'
+import { resetScreenInsetArea } from '../../packages/@dcl/react-ecs/src/components/utils'
 import { setupEngine } from './utils'
 
-describe('SafeAreaContainer React Ecs', () => {
+describe('ScreenInsetArea React Ecs', () => {
   afterEach(() => {
-    resetSafeAreaInsets()
+    resetScreenInsetArea()
   })
 
-  it('positions itself absolutely using the renderer-reported interactable area', async () => {
+  it('positions itself absolutely using the renderer-reported screen inset area', async () => {
     const { engine, uiRenderer } = setupEngine()
     const UiTransform = components.UiTransform(engine)
     const UiCanvasInformation = components.UiCanvasInformation(engine)
@@ -21,10 +21,11 @@ describe('SafeAreaContainer React Ecs', () => {
       devicePixelRatio: 1,
       width: 1920,
       height: 1080,
-      interactableArea: { top: 24, left: 12, right: 16, bottom: 32 }
+      interactableArea: undefined,
+      screenInsetArea: { top: 24, left: 12, right: 16, bottom: 32 }
     })
 
-    uiRenderer.setUiRenderer(() => <SafeAreaContainer />)
+    uiRenderer.setUiRenderer(() => <ScreenInsetArea />)
     await engine.update(1)
 
     expect(UiTransform.get(rootDivEntity)).toMatchObject({
@@ -43,7 +44,7 @@ describe('SafeAreaContainer React Ecs', () => {
     uiRenderer.destroy()
   })
 
-  it('updates its position when the interactable area changes', async () => {
+  it('updates its position when the screen inset area changes', async () => {
     const { engine, uiRenderer } = setupEngine()
     const UiTransform = components.UiTransform(engine)
     const UiCanvasInformation = components.UiCanvasInformation(engine)
@@ -54,10 +55,11 @@ describe('SafeAreaContainer React Ecs', () => {
       devicePixelRatio: 1,
       width: 1920,
       height: 1080,
-      interactableArea: { top: 0, left: 0, right: 0, bottom: 0 }
+      interactableArea: undefined,
+      screenInsetArea: { top: 0, left: 0, right: 0, bottom: 0 }
     })
 
-    uiRenderer.setUiRenderer(() => <SafeAreaContainer />)
+    uiRenderer.setUiRenderer(() => <ScreenInsetArea />)
     await engine.update(1)
 
     expect(UiTransform.get(rootDivEntity)).toMatchObject({
@@ -68,7 +70,7 @@ describe('SafeAreaContainer React Ecs', () => {
     })
 
     const next = UiCanvasInformation.getMutable(engine.RootEntity)
-    next.interactableArea = { top: 50, left: 60, right: 70, bottom: 80 }
+    next.screenInsetArea = { top: 50, left: 60, right: 70, bottom: 80 }
     await engine.update(1)
 
     expect(UiTransform.get(rootDivEntity)).toMatchObject({
@@ -87,7 +89,7 @@ describe('SafeAreaContainer React Ecs', () => {
     const entityIndex = engine.addEntity() as number
     const rootDivEntity = (entityIndex + 1) as Entity
 
-    uiRenderer.setUiRenderer(() => <SafeAreaContainer />)
+    uiRenderer.setUiRenderer(() => <ScreenInsetArea />)
     await engine.update(1)
 
     expect(UiTransform.get(rootDivEntity)).toMatchObject({
@@ -112,11 +114,12 @@ describe('SafeAreaContainer React Ecs', () => {
       devicePixelRatio: 1,
       width: 1920,
       height: 1080,
-      interactableArea: { top: 10, left: 10, right: 10, bottom: 10 }
+      interactableArea: undefined,
+      screenInsetArea: { top: 10, left: 10, right: 10, bottom: 10 }
     })
 
     uiRenderer.setUiRenderer(() => (
-      <SafeAreaContainer
+      <ScreenInsetArea
         uiTransform={
           {
             // user-provided overrides for position* should be ignored by typing,
@@ -139,25 +142,5 @@ describe('SafeAreaContainer React Ecs', () => {
     })
 
     uiRenderer.destroy()
-  })
-
-  it('exposes the current insets via getSafeAreaInsets()', async () => {
-    const { engine, uiRenderer } = setupEngine()
-    const UiCanvasInformation = components.UiCanvasInformation(engine)
-
-    UiCanvasInformation.create(engine.RootEntity, {
-      devicePixelRatio: 1,
-      width: 1920,
-      height: 1080,
-      interactableArea: { top: 1, left: 2, right: 3, bottom: 4 }
-    })
-
-    uiRenderer.setUiRenderer(() => null)
-    await engine.update(1)
-
-    expect(getSafeAreaInsets()).toEqual({ top: 1, left: 2, right: 3, bottom: 4 })
-
-    uiRenderer.destroy()
-    expect(getSafeAreaInsets()).toEqual({ top: 0, left: 0, right: 0, bottom: 0 })
   })
 })

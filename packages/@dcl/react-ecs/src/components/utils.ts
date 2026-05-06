@@ -12,9 +12,14 @@ import { parseUiTransform } from './uiTransform'
 let uiScaleFactor = 1
 let uiScaleOwner: symbol | undefined = undefined
 
-const ZERO_SAFE_AREA_INSETS = { top: 0, left: 0, right: 0, bottom: 0 } as const
-let safeAreaInsets: { top: number; left: number; right: number; bottom: number } = { ...ZERO_SAFE_AREA_INSETS }
-let safeAreaOwner: symbol | undefined = undefined
+const ZERO_INSETS = { top: 0, left: 0, right: 0, bottom: 0 } as const
+type Insets = { top: number; left: number; right: number; bottom: number }
+
+let screenInsetArea: Insets = { ...ZERO_INSETS }
+let screenInsetAreaOwner: symbol | undefined = undefined
+
+let interactableArea: Insets = { ...ZERO_INSETS }
+let interactableAreaOwner: symbol | undefined = undefined
 
 /**
  * @internal
@@ -95,40 +100,55 @@ export function resetUiScaleFactor(owner?: symbol): void {
 }
 
 /**
- * Returns the current safe-area insets, in virtual pixels, as last reported
- * by the renderer through `UiCanvasInformation.interactableArea`. Each value
- * is the number of pixels reserved on that edge for platform UI (chat,
- * minimap on desktop) or hardware (notch, home indicator on mobile).
- *
- * Returns zeros until the renderer has reported canvas information at least
- * once.
- *
- * @public
+ * @internal
  */
-export function getSafeAreaInsets(): { top: number; left: number; right: number; bottom: number } {
-  return { ...safeAreaInsets }
+export function getScreenInsetArea(): Insets {
+  return { ...screenInsetArea }
 }
 
 /**
  * @internal
  */
-export function setSafeAreaInsets(
-  next: { top: number; left: number; right: number; bottom: number },
-  owner?: symbol
-): void {
+export function setScreenInsetArea(next: Insets, owner?: symbol): void {
   if (owner) {
-    safeAreaOwner = owner
+    screenInsetAreaOwner = owner
   }
-  safeAreaInsets = { top: next.top, left: next.left, right: next.right, bottom: next.bottom }
+  screenInsetArea = { top: next.top, left: next.left, right: next.right, bottom: next.bottom }
 }
 
 /**
  * @internal
  */
-export function resetSafeAreaInsets(owner?: symbol): void {
-  if (owner && safeAreaOwner !== owner) return
-  safeAreaOwner = undefined
-  safeAreaInsets = { ...ZERO_SAFE_AREA_INSETS }
+export function resetScreenInsetArea(owner?: symbol): void {
+  if (owner && screenInsetAreaOwner !== owner) return
+  screenInsetAreaOwner = undefined
+  screenInsetArea = { ...ZERO_INSETS }
+}
+
+/**
+ * @internal
+ */
+export function getInteractableArea(): Insets {
+  return { ...interactableArea }
+}
+
+/**
+ * @internal
+ */
+export function setInteractableArea(next: Insets, owner?: symbol): void {
+  if (owner) {
+    interactableAreaOwner = owner
+  }
+  interactableArea = { top: next.top, left: next.left, right: next.right, bottom: next.bottom }
+}
+
+/**
+ * @internal
+ */
+export function resetInteractableArea(owner?: symbol): void {
+  if (owner && interactableAreaOwner !== owner) return
+  interactableAreaOwner = undefined
+  interactableArea = { ...ZERO_INSETS }
 }
 
 /**

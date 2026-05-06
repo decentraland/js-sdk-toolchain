@@ -5,9 +5,11 @@ import type { ReactEcs } from './react-ecs'
 import { createReconciler } from './reconciler'
 import {
   getUiScaleFactor,
-  resetSafeAreaInsets,
+  resetInteractableArea,
+  resetScreenInsetArea,
   resetUiScaleFactor,
-  setSafeAreaInsets,
+  setInteractableArea,
+  setScreenInsetArea,
   setUiScaleFactor
 } from './components/utils'
 
@@ -71,8 +73,9 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
 
   // Unique owner to prevent other UI systems resetting this scale factor.
   const uiScaleFactorOwner = Symbol('react-ecs-ui-scale')
-  // Unique owner for the safe-area insets module variable.
-  const safeAreaOwner = Symbol('react-ecs-safe-area')
+  // Unique owners for the inset module variables.
+  const screenInsetAreaOwner = Symbol('react-ecs-screen-inset-area')
+  const interactableAreaOwner = Symbol('react-ecs-interactable-area')
 
   function getActiveVirtualSize(): UiRendererOptions | undefined {
     // Main renderer options win; otherwise use the first additional renderer option.
@@ -117,10 +120,13 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
   function UiScaleSystem() {
     const canvasInfo = UiCanvasInformation.getOrNull(engine.RootEntity)
 
-    // Update safe-area insets unconditionally — they are independent of the
-    // virtual size and useful even when the renderer has no virtual canvas.
+    // Update inset module variables unconditionally — they are independent of
+    // the virtual size and useful even when the renderer has no virtual canvas.
+    if (canvasInfo?.screenInsetArea) {
+      setScreenInsetArea(canvasInfo.screenInsetArea, screenInsetAreaOwner)
+    }
     if (canvasInfo?.interactableArea) {
-      setSafeAreaInsets(canvasInfo.interactableArea, safeAreaOwner)
+      setInteractableArea(canvasInfo.interactableArea, interactableAreaOwner)
     }
 
     const activeVirtualSize = getActiveVirtualSize()
@@ -151,7 +157,8 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
       engine.removeSystem(UiScaleSystem)
       engine.removeSystem(ReactBasedUiSystem)
       resetUiScaleFactor(uiScaleFactorOwner)
-      resetSafeAreaInsets(safeAreaOwner)
+      resetScreenInsetArea(screenInsetAreaOwner)
+      resetInteractableArea(interactableAreaOwner)
       for (const entity of renderer.getEntities()) {
         engine.removeEntity(entity)
       }
