@@ -3732,6 +3732,7 @@ export interface PBUiCanvasInformation {
     devicePixelRatio: number;
     height: number;
     interactableArea: BorderRect | undefined;
+    screenInsetArea?: BorderRect | undefined;
     width: number;
 }
 
@@ -4494,7 +4495,7 @@ export namespace ReactEcs {
     useEffect: EffectHook;
     const // (undocumented)
     useState: StateHook;
-    export {};
+        {};
 }
 
 // Warning: (tsdoc-at-sign-in-word) The "@" character looks like part of a TSDoc tag; use a backslash to escape it
@@ -4637,11 +4638,6 @@ export type RPCSendableMessage = {
     params: any[];
 };
 
-// Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
-//
-// @public
-export function ScreenInsetArea(props: UiScreenInsetAreaProps): ReactEcs.JSX.Element;
-
 // @public
 export namespace Scalar {
     const TwoPi: number;
@@ -4765,6 +4761,11 @@ export namespace Schemas {
         value?: any;
     }) => void;
 }
+
+// Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
+//
+// @public
+export function ScreenInsetArea(props: UiScreenInsetAreaProps): ReactEcs.JSX.Element;
 
 // @public
 export function setGlobalPolyfill<T>(key: string, value: T): void;
@@ -5292,6 +5293,11 @@ export interface UiInputProps extends Omit<PBUiInput, 'font' | 'textAlign' | 'fo
 export const UiInputResult: LastWriteWinElementSetComponentDefinition<PBUiInputResult>;
 
 // @public
+export type UiInteractableAreaProps = Omit<EntityPropTypes, 'uiTransform'> & {
+    uiTransform?: Omit<NonNullable<EntityPropTypes['uiTransform']>, 'positionType' | 'position'>;
+};
+
+// @public
 export interface UiLabelProps {
     color?: PBColor4 | undefined;
     font?: UiFontType | undefined;
@@ -5308,11 +5314,6 @@ export type uint32 = number;
 export type UiRendererOptions = {
     virtualWidth: number;
     virtualHeight: number;
-};
-
-// @public
-export type UiInteractableAreaProps = Omit<EntityPropTypes, 'uiTransform'> & {
-    uiTransform?: Omit<NonNullable<EntityPropTypes['uiTransform']>, 'positionType' | 'position'>;
 };
 
 // @public
