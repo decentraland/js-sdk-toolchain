@@ -126,9 +126,9 @@ export async function main(options: Options) {
   const enableWeb3 = options.args['--web3']
   const isHub = !!options.args['--hub']
   const skipClient = !!options.args['--no-client']
-  const bevyWeb = !!options.args['--bevy-web'] && !skipClient
-  const isMobile = options.args['--mobile'] && !skipClient
-  const explorerAlpha = !options.args['--web-explorer'] && !bevyWeb && !skipClient
+  const bevyWeb = !!options.args['--bevy-web']
+  const isMobile = !!options.args['--mobile']
+  const explorerAlpha = !options.args['--web-explorer'] && !bevyWeb
 
   let hasSmartWearable = false
   const workspace = await getValidWorkspace(options.components, workingDirectory)

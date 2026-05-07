@@ -1,12 +1,15 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=564.7k bytes
 =======
 =======
 >>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
 =======
 >>>>>>> 8e67b6b5 (update snapshots)
+=======
+>>>>>>> 718e522d (sync: merge main into auth-server (#1392))
 <<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=561.9k bytes
 =======
@@ -24,7 +27,13 @@ SCENE_COMPILED_JS_SIZE_PROD=519.6k bytes
 =======
 SCENE_COMPILED_JS_SIZE_PROD=551.9k bytes
 >>>>>>> 63ddb3f8 (update snapshots)
+<<<<<<< HEAD
 >>>>>>> 8e67b6b5 (update snapshots)
+=======
+=======
+SCENE_COMPILED_JS_SIZE_PROD=560.8k bytes
+>>>>>>> 1828100c (sync: merge main into auth-server (#1392))
+>>>>>>> 718e522d (sync: merge main into auth-server (#1392))
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -40,6 +49,7 @@ EVAL test/snapshots/development-bundles/two-way-crdt.test.js
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   REQUIRE: ~system/Runtime
   OPCODES ~= 83k
   MALLOC_COUNT = 16853
@@ -51,6 +61,8 @@ EVAL test/snapshots/development-bundles/two-way-crdt.test.js
 >>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
 =======
 >>>>>>> 8e67b6b5 (update snapshots)
+=======
+>>>>>>> 718e522d (sync: merge main into auth-server (#1392))
 <<<<<<< HEAD
   OPCODES ~= 75k
   MALLOC_COUNT = 16580
@@ -119,7 +131,15 @@ EVAL test/snapshots/development-bundles/two-way-crdt.test.js
   MALLOC_COUNT = 16262
   ALIVE_OBJS_DELTA ~= 3.22k
 >>>>>>> 63ddb3f8 (update snapshots)
+<<<<<<< HEAD
 >>>>>>> 8e67b6b5 (update snapshots)
+=======
+=======
+  OPCODES ~= 58k
+  MALLOC_COUNT = 16447
+  ALIVE_OBJS_DELTA ~= 3.26k
+>>>>>>> 1828100c (sync: merge main into auth-server (#1392))
+>>>>>>> 718e522d (sync: merge main into auth-server (#1392))
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=1 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
@@ -277,6 +297,7 @@ CALL onUpdate(0.1)
   MALLOC_COUNT = -53
   ALIVE_OBJS_DELTA ~= -0.01k
 <<<<<<< HEAD
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 1330.24k bytes
 >>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
 <<<<<<< HEAD
@@ -285,4 +306,10 @@ CALL onUpdate(0.1)
 =======
   MEMORY_USAGE_COUNT ~= 1387.02k bytes
 >>>>>>> 63ddb3f8 (update snapshots)
+<<<<<<< HEAD
 >>>>>>> 8e67b6b5 (update snapshots)
+=======
+=======
+  MEMORY_USAGE_COUNT ~= 1402.21k bytes
+>>>>>>> 1828100c (sync: merge main into auth-server (#1392))
+>>>>>>> 718e522d (sync: merge main into auth-server (#1392))

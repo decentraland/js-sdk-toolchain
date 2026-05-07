@@ -1,12 +1,15 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=564.1k bytes
 =======
 =======
 >>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
 =======
 >>>>>>> 8e67b6b5 (update snapshots)
+=======
+>>>>>>> 718e522d (sync: merge main into auth-server (#1392))
 <<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=561.4k bytes
 =======
@@ -21,6 +24,9 @@ SCENE_COMPILED_JS_SIZE_PROD=519.1k bytes
 =======
 SCENE_COMPILED_JS_SIZE_PROD=551.4k bytes
 >>>>>>> 63ddb3f8 (update snapshots)
+=======
+SCENE_COMPILED_JS_SIZE_PROD=560.3k bytes
+>>>>>>> 1828100c (sync: merge main into auth-server (#1392))
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -37,6 +43,7 @@ EVAL test/snapshots/development-bundles/static-scene.test.js
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   REQUIRE: ~system/Runtime
   OPCODES ~= 73k
   MALLOC_COUNT = 16301
@@ -48,6 +55,8 @@ EVAL test/snapshots/development-bundles/static-scene.test.js
 >>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
 =======
 >>>>>>> 8e67b6b5 (update snapshots)
+=======
+>>>>>>> 718e522d (sync: merge main into auth-server (#1392))
 <<<<<<< HEAD
   OPCODES ~= 66k
   MALLOC_COUNT = 16028
@@ -116,7 +125,15 @@ EVAL test/snapshots/development-bundles/static-scene.test.js
   MALLOC_COUNT = 16026
   ALIVE_OBJS_DELTA ~= 3.15k
 >>>>>>> 63ddb3f8 (update snapshots)
+<<<<<<< HEAD
 >>>>>>> 8e67b6b5 (update snapshots)
+=======
+=======
+  OPCODES ~= 58k
+  MALLOC_COUNT = 16211
+  ALIVE_OBJS_DELTA ~= 3.19k
+>>>>>>> 1828100c (sync: merge main into auth-server (#1392))
+>>>>>>> 718e522d (sync: merge main into auth-server (#1392))
 CALL onStart()
   main.crdt: PUT_COMPONENT e=0x200 c=1 t=0 data={"position":{"x":5.880000114440918,"y":2.7916901111602783,"z":7.380000114440918},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   main.crdt: PUT_COMPONENT e=0x202 c=1 t=0 data={"position":{"x":4,"y":0.800000011920929,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
@@ -183,7 +200,7 @@ CALL onUpdate(0)
 =======
 =======
   OPCODES ~= 16k
-  MALLOC_COUNT = 43
+  MALLOC_COUNT = 41
   ALIVE_OBJS_DELTA ~= -0.00k
 >>>>>>> 63ddb3f8 (update snapshots)
 >>>>>>> 8e67b6b5 (update snapshots)
@@ -207,6 +224,7 @@ CALL onUpdate(0.1)
   OPCODES ~= 4k
   MALLOC_COUNT = -5
   ALIVE_OBJS_DELTA ~= 0.00k
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 1414.97k bytes
 =======
   OPCODES ~= 3k
@@ -232,4 +250,10 @@ CALL onUpdate(0.1)
   ALIVE_OBJS_DELTA ~= 0.00k
   MEMORY_USAGE_COUNT ~= 1387.69k bytes
 >>>>>>> 63ddb3f8 (update snapshots)
+<<<<<<< HEAD
 >>>>>>> 8e67b6b5 (update snapshots)
+=======
+=======
+  MEMORY_USAGE_COUNT ~= 1402.81k bytes
+>>>>>>> 1828100c (sync: merge main into auth-server (#1392))
+>>>>>>> 718e522d (sync: merge main into auth-server (#1392))

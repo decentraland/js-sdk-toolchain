@@ -1,12 +1,15 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=244.2k bytes
 =======
 =======
 >>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
 =======
 >>>>>>> 8e67b6b5 (update snapshots)
+=======
+>>>>>>> 718e522d (sync: merge main into auth-server (#1392))
 <<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=242.8k bytes
 =======
@@ -24,7 +27,13 @@ SCENE_COMPILED_JS_SIZE_PROD=224.9k bytes
 =======
 SCENE_COMPILED_JS_SIZE_PROD=238.5k bytes
 >>>>>>> 63ddb3f8 (update snapshots)
+<<<<<<< HEAD
 >>>>>>> 8e67b6b5 (update snapshots)
+=======
+=======
+SCENE_COMPILED_JS_SIZE_PROD=242.4k bytes
+>>>>>>> 1828100c (sync: merge main into auth-server (#1392))
+>>>>>>> 718e522d (sync: merge main into auth-server (#1392))
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -34,6 +43,7 @@ EVAL test/snapshots/production-bundles/schema-components.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -49,6 +59,8 @@ EVAL test/snapshots/production-bundles/schema-components.js
 >>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
 =======
 >>>>>>> 8e67b6b5 (update snapshots)
+=======
+>>>>>>> 718e522d (sync: merge main into auth-server (#1392))
 <<<<<<< HEAD
   OPCODES ~= 71k
   MALLOC_COUNT = 14129
@@ -79,7 +91,15 @@ EVAL test/snapshots/production-bundles/schema-components.js
   MALLOC_COUNT = 14133
   ALIVE_OBJS_DELTA ~= 3.10k
 >>>>>>> 63ddb3f8 (update snapshots)
+<<<<<<< HEAD
 >>>>>>> 8e67b6b5 (update snapshots)
+=======
+=======
+  OPCODES ~= 63k
+  MALLOC_COUNT = 14311
+  ALIVE_OBJS_DELTA ~= 3.14k
+>>>>>>> 1828100c (sync: merge main into auth-server (#1392))
+>>>>>>> 718e522d (sync: merge main into auth-server (#1392))
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -151,6 +171,7 @@ CALL onUpdate(0.1)
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 <<<<<<< HEAD
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 953.67k bytes
 >>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
 <<<<<<< HEAD
@@ -159,4 +180,10 @@ CALL onUpdate(0.1)
 =======
   MEMORY_USAGE_COUNT ~= 993.16k bytes
 >>>>>>> 63ddb3f8 (update snapshots)
+<<<<<<< HEAD
 >>>>>>> 8e67b6b5 (update snapshots)
+=======
+=======
+  MEMORY_USAGE_COUNT ~= 1004.28k bytes
+>>>>>>> 1828100c (sync: merge main into auth-server (#1392))
+>>>>>>> 718e522d (sync: merge main into auth-server (#1392))
