@@ -20,7 +20,7 @@
     "@types/uuid": "^8.3.4"
   },
   "dependencies": {
-    "typescript": "*",
+    "typescript": "^5.0.2",
     "uuid": "^9.0.0"
   }
 }
