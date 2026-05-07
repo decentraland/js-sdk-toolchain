@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=242.8k bytes
 =======
 SCENE_COMPILED_JS_SIZE_PROD=216.8k bytes
@@ -11,6 +12,9 @@ SCENE_COMPILED_JS_SIZE_PROD=224.9k bytes
 =======
 SCENE_COMPILED_JS_SIZE_PROD=238.5k bytes
 >>>>>>> 63ddb3f8 (update snapshots)
+=======
+SCENE_COMPILED_JS_SIZE_PROD=242.4k bytes
+>>>>>>> 1828100c (sync: merge main into auth-server (#1392))
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -20,6 +24,7 @@ EVAL test/snapshots/production-bundles/cube.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -75,6 +80,11 @@ EVAL test/snapshots/production-bundles/cube.js
   MALLOC_COUNT = 13971
   ALIVE_OBJS_DELTA ~= 3.06k
 >>>>>>> 63ddb3f8 (update snapshots)
+=======
+  OPCODES ~= 59k
+  MALLOC_COUNT = 14149
+  ALIVE_OBJS_DELTA ~= 3.10k
+>>>>>>> 1828100c (sync: merge main into auth-server (#1392))
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -134,8 +144,12 @@ CALL onUpdate(0.1)
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 <<<<<<< HEAD
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 950.86k bytes
 >>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
 =======
   MEMORY_USAGE_COUNT ~= 990.32k bytes
 >>>>>>> 63ddb3f8 (update snapshots)
+=======
+  MEMORY_USAGE_COUNT ~= 1001.44k bytes
+>>>>>>> 1828100c (sync: merge main into auth-server (#1392))

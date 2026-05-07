@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=404.1k bytes
 =======
 SCENE_COMPILED_JS_SIZE_PROD=385k bytes
@@ -7,6 +8,9 @@ SCENE_COMPILED_JS_SIZE_PROD=385k bytes
 =======
 SCENE_COMPILED_JS_SIZE_PROD=399.8k bytes
 >>>>>>> 63ddb3f8 (update snapshots)
+=======
+SCENE_COMPILED_JS_SIZE_PROD=403.8k bytes
+>>>>>>> 1828100c (sync: merge main into auth-server (#1392))
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -16,6 +20,7 @@ EVAL test/snapshots/production-bundles/ui.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   OPCODES ~= 80k
@@ -31,6 +36,11 @@ EVAL test/snapshots/production-bundles/ui.js
   MALLOC_COUNT = 22188
   ALIVE_OBJS_DELTA ~= 4.43k
 >>>>>>> 63ddb3f8 (update snapshots)
+=======
+  OPCODES ~= 72k
+  MALLOC_COUNT = 22366
+  ALIVE_OBJS_DELTA ~= 4.47k
+>>>>>>> 1828100c (sync: merge main into auth-server (#1392))
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -134,5 +144,9 @@ CALL onUpdate(0.1)
   OPCODES ~= 68k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 1860.30k bytes
 >>>>>>> 63ddb3f8 (update snapshots)
+=======
+  MEMORY_USAGE_COUNT ~= 1871.42k bytes
+>>>>>>> 1828100c (sync: merge main into auth-server (#1392))

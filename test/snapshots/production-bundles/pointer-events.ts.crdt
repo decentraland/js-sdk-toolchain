@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=243.7k bytes
 =======
 SCENE_COMPILED_JS_SIZE_PROD=217.8k bytes
@@ -11,6 +12,9 @@ SCENE_COMPILED_JS_SIZE_PROD=225.8k bytes
 =======
 SCENE_COMPILED_JS_SIZE_PROD=239.4k bytes
 >>>>>>> 63ddb3f8 (update snapshots)
+=======
+SCENE_COMPILED_JS_SIZE_PROD=243.3k bytes
+>>>>>>> 1828100c (sync: merge main into auth-server (#1392))
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -20,6 +24,7 @@ EVAL test/snapshots/production-bundles/pointer-events.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -81,6 +86,11 @@ EVAL test/snapshots/production-bundles/pointer-events.js
   MALLOC_COUNT = 14294
   ALIVE_OBJS_DELTA ~= 3.15k
 >>>>>>> 63ddb3f8 (update snapshots)
+=======
+  OPCODES ~= 61k
+  MALLOC_COUNT = 14472
+  ALIVE_OBJS_DELTA ~= 3.19k
+>>>>>>> 1828100c (sync: merge main into auth-server (#1392))
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -156,8 +166,12 @@ CALL onUpdate(0.1)
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
 <<<<<<< HEAD
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 969.21k bytes
 >>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
 =======
   MEMORY_USAGE_COUNT ~= 1010.64k bytes
 >>>>>>> 63ddb3f8 (update snapshots)
+=======
+  MEMORY_USAGE_COUNT ~= 1021.75k bytes
+>>>>>>> 1828100c (sync: merge main into auth-server (#1392))
