@@ -105,14 +105,6 @@ function setupEditorChangesEndpoints(
 
   router.options('/editor/changes', async () => ({ status: 204, headers: corsHeaders }))
 
-  router.get('/editor/changes', async () => {
-    const data = (await readMainEntities(components, workingDirectory)) ?? {}
-    return {
-      headers: { 'content-type': 'application/json', ...corsHeaders },
-      body: data
-    }
-  })
-
   router.post('/editor/changes', async (ctx) => {
     let updates: Scene
     try {
