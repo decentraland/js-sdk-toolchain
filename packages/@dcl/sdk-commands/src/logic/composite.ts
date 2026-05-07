@@ -11,6 +11,7 @@ import { EditorComponentNames, EditorComponentsTypes, dumpEngineToCrdtCommands }
 
 import { CliComponents } from '../components'
 import { printError } from './beautiful-logs'
+import { applySceneToEngine, readMainEntities } from './main-entities'
 
 type CompositeComponents = Pick<CliComponents, 'logger' | 'fs'>
 type ScriptComponent = LastWriteWinElementSetComponentDefinition<EditorComponentsTypes['Script']>
@@ -101,6 +102,20 @@ export async function getAllComposites(
         }
       }
     }
+  }
+
+  // Layer main-entities.ts (name-keyed authoring format) into the same
+  // engine. Entity IDs come from engine.addEntity() and don't collide with
+  // composite IDs because composites use direct mapping while addEntity
+  // allocates fresh ones.
+  try {
+    const scene = await readMainEntities(components, workingDirectory)
+    if (scene) {
+      applySceneToEngine(engine, scene)
+    }
+  } catch (err) {
+    printError(components.logger, `Failed to apply main-entities.ts to engine.`, err as Error)
+    withErrors = true
   }
 
   // generate CRDT binary
