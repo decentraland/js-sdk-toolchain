@@ -185,6 +185,14 @@ export const AvatarBase: LastWriteWinElementSetComponentDefinition<PBAvatarBase>
 export const AvatarEmoteCommand: GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>;
 
 // @public (undocumented)
+export const enum AvatarEmoteMask {
+    // (undocumented)
+    AEM_FULL_BODY = 0,
+    // (undocumented)
+    AEM_UPPER_BODY = 1
+}
+
+// @public (undocumented)
 export const AvatarEquippedData: LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>;
 
 // @public (undocumented)
@@ -1567,6 +1575,7 @@ export const enum InputAction {
     IA_JUMP = 8,
     // (undocumented)
     IA_LEFT = 7,
+    // (undocumented)
     IA_MODIFIER = 14,
     // (undocumented)
     IA_POINTER = 0,
@@ -2545,6 +2554,9 @@ export namespace PBAvatarEquippedData {
 
 // @public (undocumented)
 export interface PBAvatarLocomotionSettings {
+    doubleJumpHeight?: number | undefined;
+    glidingFallingSpeed?: number | undefined;
+    glidingSpeed?: number | undefined;
     hardLandingCooldown?: number | undefined;
     jogSpeed?: number | undefined;
     jumpHeight?: number | undefined;
@@ -4031,6 +4043,7 @@ export namespace PBVideoPlayer {
 export interface PBVirtualCamera {
     // (undocumented)
     defaultTransition?: CameraTransition | undefined;
+    fov?: number | undefined;
     // (undocumented)
     lookAtEntity?: number | undefined;
 }
