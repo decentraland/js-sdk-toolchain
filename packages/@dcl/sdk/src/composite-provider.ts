@@ -1,7 +1,6 @@
 import { compositeFromLoader } from '~sdk/all-composites'
 import { readFile } from '~system/Runtime'
-import { Composite } from '@dcl/ecs'
-import { polyfillTextEncoder } from './ethereum-provider/text-encoder'
+import { Composite, getGlobal } from '@dcl/ecs'
 
 const composites: Composite.Resource[] = []
 
@@ -39,9 +38,15 @@ export const compositeProvider: Composite.Provider = {
     // .composite files are JSON (UTF-8); .composite.bin files are protobuf binary
     let composite: Composite.Definition
     if (content[0] === 0x7b /* '{' = JSON */) {
-      polyfillTextEncoder()
-      const TextDecoderCtor = (globalThis as any).TextDecoder as new () => { decode(input: Uint8Array): string }
-      composite = Composite.fromJson(JSON.parse(new TextDecoderCtor().decode(content)))
+      const TD = getGlobal<new () => { decode(input: Uint8Array): string }>('TextDecoder')
+      if (!TD) {
+        throw new Error(
+          'loadComposite: TextDecoder is not available in this runtime. ' +
+            'Use a .composite.bin file, or import `@dcl/sdk/ethereum-provider` ' +
+            'to install the TextEncoder/TextDecoder polyfill.'
+        )
+      }
+      composite = Composite.fromJson(JSON.parse(new TD().decode(content)))
     } else {
       composite = Composite.fromBinary(content)
     }
