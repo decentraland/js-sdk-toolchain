@@ -1575,6 +1575,7 @@ export const enum InputAction {
     IA_JUMP = 8,
     // (undocumented)
     IA_LEFT = 7,
+    IA_MODIFIER = 14,
     // (undocumented)
     IA_MODIFIER = 14,
     // (undocumented)
@@ -2554,9 +2555,6 @@ export namespace PBAvatarEquippedData {
 
 // @public (undocumented)
 export interface PBAvatarLocomotionSettings {
-    doubleJumpHeight?: number | undefined;
-    glidingFallingSpeed?: number | undefined;
-    glidingSpeed?: number | undefined;
     hardLandingCooldown?: number | undefined;
     jogSpeed?: number | undefined;
     jumpHeight?: number | undefined;
