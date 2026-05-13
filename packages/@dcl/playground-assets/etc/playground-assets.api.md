@@ -1575,7 +1575,6 @@ export const enum InputAction {
     IA_JUMP = 8,
     // (undocumented)
     IA_LEFT = 7,
-    // (undocumented)
     IA_MODIFIER = 14,
     // (undocumented)
     IA_POINTER = 0,
