@@ -326,7 +326,9 @@ export function Engine(options?: IEngineOptions): IEngine {
     await crdtSystem.sendMessages(deletedEntites)
   }
 
-  const TransformComponent = components.Transform({ defineComponentFromSchema: partialEngine.defineComponentFromSchema })
+  const TransformComponent = components.Transform({
+    defineComponentFromSchema: partialEngine.defineComponentFromSchema
+  })
 
   function addEntityFromComposite(src: string, options?: AddEntityFromCompositeOptions): Entity {
     const provider = partialEngine.getCompositeProvider()

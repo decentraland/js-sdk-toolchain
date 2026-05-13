@@ -7,6 +7,11 @@
 import _m0 from 'protobufjs/minimal';
 
 // @public (undocumented)
+export type AddEntityFromCompositeOptions = {
+    transform?: TransformTypeWithOptionals;
+};
+
+// @public (undocumented)
 export type AlignType = 'auto' | 'flex-start' | 'center' | 'flex-end' | 'stretch' | 'baseline' | 'space-between' | 'space-around';
 
 // Warning: (ae-missing-release-tag) "Animator" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -764,7 +769,7 @@ export namespace Composite {
     export function fromBinary(buffer: Uint8Array): Composite.Definition;
     // (undocumented)
     export function fromJson(object: any): Composite.Definition;
-    export function instance(engine: IEngine, compositeData: Composite.Resource, compositeProvider: CompositeProvider, options?: InstanceCompositeOptions): void;
+    export function instance(engine: IEngine, compositeData: Composite.Resource, compositeProvider: CompositeProvider, options?: InstanceCompositeOptions): Entity;
     // (undocumented)
     export type Provider = CompositeProvider;
     export function resolveAndNormalizePath(src: string, cwd?: string): string;
@@ -1376,6 +1381,7 @@ export type GSetComponentGetter<T extends GrowOnlyValueSetComponentDefinition<an
 // @public (undocumented)
 export interface IEngine {
     addEntity(): Entity;
+    addEntityFromComposite(src: string, options?: AddEntityFromCompositeOptions): Entity;
     addSystem(system: SystemFn, priority?: number, name?: string): void;
     // @alpha (undocumented)
     addTransport(transport: Transport): void;

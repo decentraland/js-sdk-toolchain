@@ -177,6 +177,18 @@ describe('composite instantiation system', () => {
     }).toThrow()
   })
 
+  it('should return the root entity from Composite.instance()', () => {
+    const composite = validComposites.find((c) => c.src === nonBinaryCompositeJsonPath)!
+    const engine = Engine()
+
+    const rootEntity = Composite.instance(engine, composite, compositeProvider)
+
+    expect(rootEntity).toBeDefined()
+    expect(typeof rootEntity).toBe('number')
+    // Composite-spawned entities are non-reserved; the root must be a real entity number.
+    expect(rootEntity as number).toBeGreaterThan(0)
+  })
+
   describe(`should work with a entity offset`, () => {
     it('with EMM_NEXT_AVAILABLE option', () => {
       const engine = Engine()

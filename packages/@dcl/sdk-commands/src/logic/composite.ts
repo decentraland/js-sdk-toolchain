@@ -31,7 +31,7 @@ export async function getAllComposites(
 }> {
   let withErrors = false
   const composites: Record<string, Composite.Definition> = {}
-  const watchFiles = globSync('**/*.composite', { cwd: workingDirectory })
+  const watchFiles = globSync('main.composite', { cwd: workingDirectory })
   const scripts = new Map<string, Script[]>()
 
   const textDecoder = new TextDecoder()

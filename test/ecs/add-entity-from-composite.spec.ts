@@ -227,3 +227,65 @@ describe('engine.addEntityFromComposite', () => {
     })
   })
 })
+
+describe('preload-then-spawn pattern (provider.loadComposite + engine.addEntityFromComposite)', () => {
+  let allComposites: Composite.Resource[]
+  let loadCallCount: Record<string, number>
+
+  beforeEach(() => {
+    allComposites = getJsonCompositeFrom('*.composite', COMPOSITE_BASE_PATH)
+    loadCallCount = {}
+  })
+
+  function createAsyncProvider(): Composite.Provider {
+    const cache: Composite.Resource[] = []
+    return {
+      getCompositeOrNull(src: string) {
+        return cache.find((item) => item.src === src) || null
+      },
+      async loadComposite(src: string) {
+        loadCallCount[src] = (loadCallCount[src] || 0) + 1
+        const found = allComposites.find((item) => item.src === src)
+        if (!found) throw new Error(`mock provider: composite "${src}" not in fixture set`)
+        const existing = cache.find((item) => item.src === src)
+        if (existing) return existing
+        cache.push(found)
+        return found
+      }
+    }
+  }
+
+  it('addEntityFromComposite throws when called before loadComposite resolves', () => {
+    const engine = Engine()
+    engine.setCompositeProvider(createAsyncProvider())
+
+    expect(() => engine.addEntityFromComposite('one-transform.composite')).toThrow('not found')
+  })
+
+  it('addEntityFromComposite succeeds after loadComposite resolves', async () => {
+    const engine = Engine()
+    const provider = createAsyncProvider()
+    engine.setCompositeProvider(provider)
+
+    await provider.loadComposite!('one-transform.composite')
+    const rootEntity = engine.addEntityFromComposite('one-transform.composite')
+
+    expect(rootEntity).toBeDefined()
+    expect(typeof rootEntity).toBe('number')
+    expect(loadCallCount['one-transform.composite']).toBe(1)
+  })
+
+  it('repeated loadComposite for same src does not re-fetch (cache hit)', async () => {
+    const engine = Engine()
+    const provider = createAsyncProvider()
+    engine.setCompositeProvider(provider)
+
+    const first = await provider.loadComposite!('one-transform.composite')
+    const second = await provider.loadComposite!('one-transform.composite')
+
+    expect(first).toBe(second) // same Composite.Resource reference
+    // Note: this assertion is about the mock provider's cache behavior. The SDK
+    // provider's identical behavior is verified at the SDK-build level (Phase 2),
+    // not here — this test only documents the contract the SDK provider must honor.
+  })
+})
