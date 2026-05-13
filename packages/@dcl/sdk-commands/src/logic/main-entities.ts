@@ -250,6 +250,45 @@ function normalizeMeshCollider(value: any): any {
   return out
 }
 
+/** AvatarShape: `wearables` and `emotes` are repeated proto fields; the encoder
+ *  does `for..of` on them and crashes if they're undefined. Fill with []. */
+function normalizeAvatarShape(value: any): any {
+  return { ...value, wearables: value?.wearables ?? [], emotes: value?.emotes ?? [] }
+}
+
+/** CameraModeArea: `area` is required-by-proto but the encoder allows undefined.
+ *  Default to (0,0,0) so authors who forget it don't get a silent zero-volume zone. */
+function normalizeCameraModeArea(value: any): any {
+  return { mode: 0, ...value, area: value?.area ?? { x: 0, y: 0, z: 0 } }
+}
+
+/** GltfNodeModifiers: `modifiers` is a repeated proto field; encoder iterates. */
+function normalizeGltfNodeModifiers(value: any): any {
+  return { ...value, modifiers: value?.modifiers ?? [] }
+}
+
+/** PointerEvents: `pointerEvents` is a repeated proto field; encoder iterates. */
+function normalizePointerEvents(value: any): any {
+  return { ...value, pointerEvents: value?.pointerEvents ?? [] }
+}
+
+/** TweenSequence: `sequence` is a repeated proto field; encoder iterates. */
+function normalizeTweenSequence(value: any): any {
+  return { ...value, sequence: value?.sequence ?? [] }
+}
+
+/**
+ * AvatarAttach: `avatarId` defaults to the local player when the proto field
+ * is *absent* — not when it's present-but-empty. An AI agent or editor that
+ * emits `avatarId: ""` would otherwise lose the local-player fallback,
+ * because the encoder writes the empty string as a present zero-length field.
+ */
+function normalizeAvatarAttach(value: any): any {
+  const out = { ...value }
+  if (out.avatarId === '') delete out.avatarId
+  return out
+}
+
 interface RawTransform {
   position?: { x: number; y: number; z: number }
   rotation?: { x: number; y: number; z: number; w: number }
@@ -268,93 +307,133 @@ function normalizeTransform(raw: any): { position: any; rotation: any; scale: an
   }
 }
 
-// ── Engine population ──────────────────────────────────────────────────
+// ── Component registry ────────────────────────────────────────────────
+//
+// Single source of truth for which components `applySceneToEngine` knows
+// how to process. The `satisfies` clause types every row against
+// `ComponentSpec` at compile time, so typos in `normalize` / shape
+// mistakes / missing function references fail the build.
+//
+// IMPORTANT: this list must mirror the keys of `SceneEntityComponents` in
+// `@dcl/sdk/src/scene-types.ts`. Adding or removing a key there requires
+// updating this registry; if you don't, the runtime will throw
+// "unsupported component" on first use. We can't enforce cross-package
+// exhaustiveness here because `@dcl/sdk-commands` doesn't depend on
+// `@dcl/sdk` (would create a dependency cycle).
 
-interface ComponentSetters {
-  Name: ReturnType<typeof ecsComponents.Name>
-  Transform: ReturnType<typeof ecsComponents.Transform>
-  GltfContainer: ReturnType<typeof ecsComponents.GltfContainer>
-  MeshRenderer: ReturnType<typeof ecsComponents.MeshRenderer>
-  MeshCollider: ReturnType<typeof ecsComponents.MeshCollider>
-  Material: ReturnType<typeof ecsComponents.Material>
-  VisibilityComponent: ReturnType<typeof ecsComponents.VisibilityComponent>
-  Billboard: ReturnType<typeof ecsComponents.Billboard>
-  AudioSource: ReturnType<typeof ecsComponents.AudioSource>
-  VideoPlayer: ReturnType<typeof ecsComponents.VideoPlayer>
-  TextShape: ReturnType<typeof ecsComponents.TextShape>
-  NftShape: ReturnType<typeof ecsComponents.NftShape>
-  Animator: ReturnType<typeof ecsComponents.Animator>
+type Normalizer = (raw: any) => any
+
+interface ComponentSpec {
+  /** Optional pre-encoding pass: fills proto defaults, strips runtime-only
+   *  fields, etc. Skipped if absent. */
+  normalize?: Normalizer
+  /** Fields whose value is an entity-name string in the literal but a
+   *  numeric Entity ID at runtime. Stripped during pass 1, resolved in pass 2. */
+  entityRefFields?: readonly string[]
 }
 
-function getOrDefineComponents(engine: IEngine): ComponentSetters {
-  return {
-    Name: ecsComponents.Name(engine),
-    Transform: ecsComponents.Transform(engine),
-    GltfContainer: ecsComponents.GltfContainer(engine),
-    MeshRenderer: ecsComponents.MeshRenderer(engine),
-    MeshCollider: ecsComponents.MeshCollider(engine),
-    Material: ecsComponents.Material(engine),
-    VisibilityComponent: ecsComponents.VisibilityComponent(engine),
-    Billboard: ecsComponents.Billboard(engine),
-    AudioSource: ecsComponents.AudioSource(engine),
-    VideoPlayer: ecsComponents.VideoPlayer(engine),
-    TextShape: ecsComponents.TextShape(engine),
-    NftShape: ecsComponents.NftShape(engine),
-    Animator: ecsComponents.Animator(engine)
+const COMPONENT_REGISTRY: Record<string, ComponentSpec> = {
+  Transform: { normalize: normalizeTransform, entityRefFields: ['parent'] },
+  GltfContainer: {},
+  MeshRenderer: { normalize: normalizeMeshRenderer },
+  MeshCollider: { normalize: normalizeMeshCollider },
+  Material: {},
+  VisibilityComponent: {},
+  Billboard: {},
+  AudioSource: {},
+  AudioStream: {},
+  VideoPlayer: {},
+  TextShape: {},
+  NftShape: {},
+  Animator: {},
+  LightSource: {},
+  AvatarShape: { normalize: normalizeAvatarShape },
+  AvatarAttach: { normalize: normalizeAvatarAttach },
+  CameraModeArea: { normalize: normalizeCameraModeArea },
+  VirtualCamera: { entityRefFields: ['lookAtEntity'] },
+  GltfNodeModifiers: { normalize: normalizeGltfNodeModifiers },
+  Tween: {},
+  TweenSequence: { normalize: normalizeTweenSequence },
+  PointerEvents: { normalize: normalizePointerEvents }
+}
+
+/** Per-engine component-definition cache so `Component(engine)` isn't repeated per-entity. */
+function makeComponentCache(engine: IEngine): (name: string) => any {
+  const cache = new Map<string, any>()
+  return (name: string) => {
+    let def = cache.get(name)
+    if (!def) {
+      const getter = (ecsComponents as Record<string, any>)[name]
+      if (typeof getter !== 'function') {
+        throw new Error(`Component "${name}" not found in @dcl/ecs/components`)
+      }
+      def = getter(engine)
+      cache.set(name, def)
+    }
+    return def
   }
 }
 
 /**
  * Apply a Scene to an existing Engine instance. No-op if the scene is
- * empty. Throws on invalid parent references.
+ * empty. Throws on unknown components or unresolved entity-name references.
  *
- * Walks entries in two passes: first creates entities and assigns
- * components without parent resolution; second resolves Transform.parent
- * by name → entity ID (so forward references work).
+ * Walks entries in two passes: pass 1 creates entities and applies every
+ * component (with entity-ref fields stripped); pass 2 resolves entity-name
+ * refs (`Transform.parent`, `VirtualCamera.lookAtEntity`) to numeric IDs,
+ * so forward references between sibling entries work.
  */
 export function applySceneToEngine(engine: IEngine, scene: Scene): void {
   if (Object.keys(scene).length === 0) return
 
-  const C = getOrDefineComponents(engine)
+  const getDef = makeComponentCache(engine)
+  const Name = getDef('Name')
   const sortedNames = Object.keys(scene).sort()
   const nameToEntity = new Map<string, Entity>()
 
   for (const name of sortedNames) {
-    const entry = scene[name]
     const entity = engine.addEntity()
     nameToEntity.set(name, entity)
+    Name.createOrReplace(entity, { value: name })
 
-    C.Name.createOrReplace(entity, { value: name })
-
-    const components = (entry?.components ?? {}) as Record<string, any>
-
-    if (components.Transform) {
-      C.Transform.createOrReplace(entity, normalizeTransform(components.Transform))
+    const components = (scene[name]?.components ?? {}) as Record<string, unknown>
+    for (const [componentName, raw] of Object.entries(components)) {
+      const spec = (COMPONENT_REGISTRY as Record<string, ComponentSpec | undefined>)[componentName]
+      if (!spec) {
+        throw new Error(
+          `Entity "${name}" declares unsupported component "${componentName}" in ${MAIN_ENTITIES_FILE}`
+        )
+      }
+      let value = spec.normalize ? spec.normalize(raw) : raw
+      if (spec.entityRefFields) {
+        value = { ...(value as Record<string, unknown>) }
+        for (const f of spec.entityRefFields) delete (value as Record<string, unknown>)[f]
+      }
+      getDef(componentName).createOrReplace(entity, value)
     }
-    if (components.GltfContainer) C.GltfContainer.createOrReplace(entity, components.GltfContainer)
-    if (components.MeshRenderer) C.MeshRenderer.createOrReplace(entity, normalizeMeshRenderer(components.MeshRenderer))
-    if (components.MeshCollider) C.MeshCollider.createOrReplace(entity, normalizeMeshCollider(components.MeshCollider))
-    if (components.Material) C.Material.createOrReplace(entity, components.Material)
-    if (components.VisibilityComponent) C.VisibilityComponent.createOrReplace(entity, components.VisibilityComponent)
-    if (components.Billboard) C.Billboard.createOrReplace(entity, components.Billboard)
-    if (components.AudioSource) C.AudioSource.createOrReplace(entity, components.AudioSource)
-    if (components.VideoPlayer) C.VideoPlayer.createOrReplace(entity, components.VideoPlayer)
-    if (components.TextShape) C.TextShape.createOrReplace(entity, components.TextShape)
-    if (components.NftShape) C.NftShape.createOrReplace(entity, components.NftShape)
-    if (components.Animator) C.Animator.createOrReplace(entity, components.Animator)
   }
 
   for (const name of sortedNames) {
-    const entry = scene[name]
-    const t = (entry?.components?.Transform ?? {}) as RawTransform
-    if (!t.parent) continue
-    const parentEntity = nameToEntity.get(t.parent)
-    if (parentEntity === undefined) {
-      throw new Error(`Entity "${name}" has parent "${t.parent}" which does not exist in ${MAIN_ENTITIES_FILE}`)
+    const components = (scene[name]?.components ?? {}) as Record<string, any>
+    for (const [componentName, spec] of Object.entries(COMPONENT_REGISTRY)) {
+      const refs = spec.entityRefFields
+      if (!refs) continue
+      const raw = components[componentName]
+      if (!raw) continue
+      const def = getDef(componentName)
+      const mut = def.getMutable(nameToEntity.get(name)!)
+      for (const f of refs) {
+        const targetName = raw[f]
+        if (!targetName) continue
+        const targetId = nameToEntity.get(targetName)
+        if (targetId === undefined) {
+          throw new Error(
+            `Entity "${name}" has ${f} "${targetName}" which does not exist in ${MAIN_ENTITIES_FILE}`
+          )
+        }
+        mut[f] = targetId
+      }
     }
-    const entity = nameToEntity.get(name)!
-    const transform = C.Transform.getMutable(entity)
-    transform.parent = parentEntity
   }
 }
 

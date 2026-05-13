@@ -27,15 +27,25 @@
 import {
   Animator,
   AudioSource,
+  AudioStream,
+  AvatarAttach,
+  AvatarShape,
   Billboard,
+  CameraModeArea,
   GltfContainer,
+  GltfNodeModifiers,
+  LightSource,
   Material,
   MeshCollider,
   MeshRenderer,
   NftShape,
+  PointerEvents,
   TextShape,
   Transform,
+  Tween,
+  TweenSequence,
   VideoPlayer,
+  VirtualCamera,
   VisibilityComponent
 } from '@dcl/ecs'
 
@@ -63,6 +73,24 @@ export type SceneVideoPlayer = ValueOf<typeof VideoPlayer>
 export type SceneTextShape = ValueOf<typeof TextShape>
 export type SceneNftShape = ValueOf<typeof NftShape>
 export type SceneAnimator = ValueOf<typeof Animator>
+export type SceneLightSource = ValueOf<typeof LightSource>
+export type SceneAvatarShape = ValueOf<typeof AvatarShape>
+export type SceneCameraModeArea = ValueOf<typeof CameraModeArea>
+export type SceneGltfNodeModifiers = ValueOf<typeof GltfNodeModifiers>
+export type SceneAudioStream = ValueOf<typeof AudioStream>
+export type SceneTween = ValueOf<typeof Tween>
+export type SceneTweenSequence = ValueOf<typeof TweenSequence>
+export type ScenePointerEvents = ValueOf<typeof PointerEvents>
+export type SceneAvatarAttach = ValueOf<typeof AvatarAttach>
+
+/**
+ * VirtualCamera with `lookAtEntity` referenced by entity name (string), not
+ * Entity ID. Resolved at build time, same model as `Transform.parent`.
+ */
+export type SceneVirtualCamera = Omit<ValueOf<typeof VirtualCamera>, 'lookAtEntity'> & {
+  /** Entity name to track. Resolved to an Entity ID at build time. */
+  lookAtEntity?: string
+}
 
 /** Components an entity can declare in `main-entities.ts`. */
 export interface SceneEntityComponents {
@@ -75,10 +103,20 @@ export interface SceneEntityComponents {
   VisibilityComponent?: SceneVisibilityComponent
   Billboard?: SceneBillboard
   AudioSource?: SceneAudioSource
+  AudioStream?: SceneAudioStream
   VideoPlayer?: SceneVideoPlayer
   TextShape?: SceneTextShape
   NftShape?: SceneNftShape
   Animator?: SceneAnimator
+  LightSource?: SceneLightSource
+  AvatarShape?: SceneAvatarShape
+  AvatarAttach?: SceneAvatarAttach
+  CameraModeArea?: SceneCameraModeArea
+  VirtualCamera?: SceneVirtualCamera
+  GltfNodeModifiers?: SceneGltfNodeModifiers
+  Tween?: SceneTween
+  TweenSequence?: SceneTweenSequence
+  PointerEvents?: ScenePointerEvents
 }
 
 export interface SceneEntity {
