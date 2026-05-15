@@ -191,6 +191,12 @@ async function run(fileName: string, fileContents: string) {
           }
         } else if (moduleName === '~system/Testing') {
           return testingFramework.module
+        } else if (moduleName === '~system/Runtime') {
+          return {
+            async readFile(_data: { fileName: string }) {
+              return { content: new Uint8Array(), hash: '' }
+            }
+          }
         }
 
         throw new Error('Unknown module ' + moduleName)
