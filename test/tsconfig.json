@@ -22,7 +22,6 @@
     "alwaysStrict": true,
     "jsx": "react",
     "jsxFactory": "ReactEcs.createElement",
-    "jsxFragmentFactory": "ReactEcs.Fragment",
     "skipLibCheck": true,
     "typeRoots": ["../packages", "../node_modules/@types"],
     "incremental": true

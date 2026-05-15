@@ -4470,11 +4470,9 @@ export interface ReactBasedUiSystem {
 // @public (undocumented)
 export namespace ReactEcs {
     // (undocumented)
-    export type CallbackHook = <T extends (...args: any[]) => any>(callback: T, deps: DependencyList) => T;
+    export type DependencyList = ReadonlyArray<any>;
     const // (undocumented)
     createElement: any;
-    // (undocumented)
-    export type DependencyList = ReadonlyArray<any>;
     // (undocumented)
     export type Dispatch<T> = (action: SetStateAction<T>) => void;
     // (undocumented)
@@ -4494,42 +4492,13 @@ export namespace ReactEcs {
         export type ReactNode = Element | ReactElement | string | number | boolean | null | undefined | ReactNode[];
     }
     // (undocumented)
-    export type MemoComponent = <P extends object>(Component: (props: P) => ReactEcs.JSX.ReactNode, propsAreEqual?: (prevProps: Readonly<P>, nextProps: Readonly<P>) => boolean) => (props: P) => ReactElement | null;
+    export type SetStateAction<T> = T | ((prevState: T) => T);
+    // (undocumented)
+    export type StateHook = <T>(initialState: T | (() => T)) => [T, Dispatch<T>];
     const // (undocumented)
     useEffect: EffectHook;
     const // (undocumented)
     useState: StateHook;
-    // (undocumented)
-    export type MemoHook = <T>(factory: () => T, deps: DependencyList | undefined) => T;
-    const // (undocumented)
-    useMemo: MemoHook;
-    // (undocumented)
-    export interface MutableRefObject<T> {
-        // (undocumented)
-        current: T;
-    }
-    const // (undocumented)
-    useCallback: CallbackHook;
-    // (undocumented)
-    export type Reducer<S, A> = (prevState: S, action: A) => S;
-    // (undocumented)
-    export type ReducerHook = <S, A>(reducer: Reducer<S, A>, initialState: S) => [S, (action: A) => void];
-    const // (undocumented)
-    useRef: RefHook;
-    // (undocumented)
-    export type RefHook = <T>(initialValue: T) => MutableRefObject<T>;
-    // (undocumented)
-    export type SetStateAction<T> = T | ((prevState: T) => T);
-    const // (undocumented)
-    useReducer: ReducerHook;
-    // (undocumented)
-    export type StateHook = <T>(initialState: T | (() => T)) => [T, Dispatch<T>];
-    const // (undocumented)
-    memo: MemoComponent;
-    const // (undocumented)
-    Fragment: (props: {
-        children?: ReactEcs.JSX.ReactNode;
-    }) => ReactEcs.JSX.ReactNode;
     export {};
 }
 

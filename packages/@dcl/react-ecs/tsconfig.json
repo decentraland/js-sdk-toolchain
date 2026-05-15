@@ -15,7 +15,6 @@
     "jsx": "react",
     "lib": ["ES2020"],
     "jsxFactory": "ReactEcs.createElement",
-    "jsxFragmentFactory": "ReactEcs.Fragment",
     "rootDir": "src",
     "types": []
   },
