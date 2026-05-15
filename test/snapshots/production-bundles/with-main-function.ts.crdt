@@ -9,9 +9,9 @@ EVAL test/snapshots/production-bundles/with-main-function.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
-  OPCODES ~= 208k
-  MALLOC_COUNT = 42397
-  ALIVE_OBJS_DELTA ~= 9.39k
+  OPCODES ~= 216k
+  MALLOC_COUNT = 42582
+  ALIVE_OBJS_DELTA ~= 9.44k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -25,17 +25,17 @@ CALL onUpdate(0)
   ALIVE_OBJS_DELTA ~= 0.03k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x202 c=1041 t=1 data={"src":"test.glb"}
-  OPCODES ~= 4k
+  OPCODES ~= 5k
   MALLOC_COUNT = 13
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x203 c=1041 t=1 data={"src":"test.glb"}
-  OPCODES ~= 4k
+  OPCODES ~= 5k
   MALLOC_COUNT = 13
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x204 c=1041 t=1 data={"src":"test.glb"}
-  OPCODES ~= 4k
+  OPCODES ~= 5k
   MALLOC_COUNT = 13
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 2912.88k bytes
+  MEMORY_USAGE_COUNT ~= 2917.15k bytes

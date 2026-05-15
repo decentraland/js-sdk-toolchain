@@ -19,6 +19,11 @@ export type Script = ScriptItem & {
   entity: number
 }
 
+export type ComponentRegistration = {
+  name: string
+  jsonSchema: any
+}
+
 export async function getAllComposites(
   components: CompositeComponents,
   workingDirectory: string
@@ -28,6 +33,7 @@ export async function getAllComposites(
   scripts: Map<string, Script[]>
   withErrors: boolean
   maxCompositeEntity: number
+  componentRegistrations: ComponentRegistration[]
 }> {
   let withErrors = false
   const composites: Record<string, Composite.Definition> = {}
@@ -113,10 +119,30 @@ export async function getAllComposites(
     }
   }
 
+  // Collect every unique custom (non-core::) component schema carried by any
+  // composite in the scene. The auto-generated entrypoint pre-registers these
+  // at module-load via the virtual module `~sdk/composite-components` so that
+  // runtime `engine.addEntityFromComposite` calls (post-seal) find every
+  // component already defined, avoiding the "Engine is already sealed" throw
+  // that would otherwise fire from `instanceComposite → defineComponentFromSchema`.
+  const componentRegistrationsByName = new Map<string, ComponentRegistration>()
+  for (const composite of Object.values(composites)) {
+    for (const component of composite.components) {
+      if (!component.name || component.name.startsWith('core::')) continue
+      if (component.jsonSchema === undefined || component.jsonSchema === null) continue
+      if (componentRegistrationsByName.has(component.name)) continue
+      componentRegistrationsByName.set(component.name, {
+        name: component.name,
+        jsonSchema: component.jsonSchema
+      })
+    }
+  }
+  const componentRegistrations = Array.from(componentRegistrationsByName.values())
+
   // generate CRDT binary
   const crdtFilePath = path.join(workingDirectory, 'main.crdt')
   const crdtData = dumpEngineToCrdtCommands(engine as any)
   await components.fs.writeFile(crdtFilePath, crdtData)
 
-  return { compositeLines, watchFiles, scripts, withErrors, maxCompositeEntity }
+  return { compositeLines, watchFiles, scripts, withErrors, maxCompositeEntity, componentRegistrations }
 }
