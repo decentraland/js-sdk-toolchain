@@ -31,7 +31,12 @@ export async function getAllComposites(
 }> {
   let withErrors = false
   const composites: Record<string, Composite.Definition> = {}
-  const watchFiles = globSync('main.composite', { cwd: workingDirectory })
+  // Discover every composite so build-time recursion (`instanceComposite` →
+  // `getCompositeOrNull(childCompositePath)`) can resolve nested references
+  // embedded in `main.composite`. Only `main.composite` is later inlined into
+  // the JS bundle (`compositeLines` below); secondary composites lazy-load at
+  // runtime via `~system/Runtime.readFile`.
+  const watchFiles = globSync('**/*.composite', { cwd: workingDirectory })
   const scripts = new Map<string, Script[]>()
 
   const textDecoder = new TextDecoder()
@@ -83,7 +88,12 @@ export async function getAllComposites(
         }
       }
 
-      compositeLines.push(`'${composite.src}':${JSON.stringify(Composite.toJson(composite.composite))}`)
+      // Only inline `main.composite` into `~sdk/all-composites`. Secondary
+      // composites stay on disk and are fetched at runtime via the provider's
+      // `loadComposite` (see packages/@dcl/sdk/src/composite-provider.ts).
+      if (compositeSource === 'main.composite') {
+        compositeLines.push(`'${composite.src}':${JSON.stringify(Composite.toJson(composite.composite))}`)
+      }
     } catch (err: any) {
       printError(components.logger, `Composite '${compositeSource}' can't be instanced.`, err)
       withErrors = true

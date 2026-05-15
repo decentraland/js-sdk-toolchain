@@ -3,7 +3,14 @@ import { Composite, engine } from '@dcl/ecs'
 import { crdtGetState, crdtSendToRenderer, sendBatch } from '~system/EngineApi'
 import { createRendererTransport } from './internal/transports/rendererTransport'
 import { pollEvents } from './observables'
+import { polyfillTextEncoder } from './ethereum-provider/text-encoder'
 import { compositeProvider } from './composite-provider'
+
+// Install TextEncoder/TextDecoder polyfill so compositeProvider.loadComposite
+// can decode JSON composites at runtime. The QuickJS scene runtime has no
+// native TextDecoder; without this, on-demand loads of JSON-formatted .composite
+// files throw 'TextDecoder is not available...'.
+polyfillTextEncoder()
 
 // Attach CRDT transport
 // @internal
