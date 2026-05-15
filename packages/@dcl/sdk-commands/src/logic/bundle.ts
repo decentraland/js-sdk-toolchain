@@ -15,7 +15,7 @@ import { CliComponents } from '../components'
 import { colors } from '../components/log'
 import { printProgressInfo, printProgressStep, printWarning } from './beautiful-logs'
 import { CliError } from './error'
-import { getAllComposites, type Script } from './composite'
+import { getAllComposites, renderComponentRegistrationsModule, type Script } from './composite'
 import { isEditorScene } from './project-validations'
 import { watch } from 'chokidar'
 import { debounce } from './debounce'
@@ -484,30 +484,10 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
           )
         }
 
-        const registrations = compositeData?.componentRegistrations ?? []
-        const registrationLines = registrations
-          .map(
-            ({ name, jsonSchema }) =>
-              `engine.defineComponentFromSchema(${JSON.stringify(name)}, Schemas.fromJson(${JSON.stringify(
-                jsonSchema
-              )}))`
-          )
-          .join('\n')
-
-        const contents = `import { engine, Schemas } from '@dcl/ecs'
-import { getCompositeRootComponent } from '@dcl/ecs'
-// Pre-register composite::root so runtime addEntityFromComposite recursion
-// (via getCompositeRootComponent inside instanceComposite) doesn't trip the
-// seal for scenes that have no main.composite to instance at scene boot.
-getCompositeRootComponent(engine)
-${registrationLines}
-`
-
-        const watchFiles = compositeData?.watchFiles || []
         return {
           loader: 'js',
-          contents,
-          watchFiles
+          contents: renderComponentRegistrationsModule(compositeData?.componentRegistrations ?? []),
+          watchFiles: compositeData?.watchFiles ?? []
         }
       })
 

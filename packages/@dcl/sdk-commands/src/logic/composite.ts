@@ -24,6 +24,33 @@ export type ComponentRegistration = {
   jsonSchema: any
 }
 
+/**
+ * Render the source text for the `~sdk/composite-components` virtual module.
+ *
+ * The returned code is injected pre-seal by the auto-generated scene entrypoint
+ * (see `getEntrypointCode` in `bundle.ts`). It pre-registers `composite::root`
+ * plus every custom (non-`core::`) component schema discovered in the scene's
+ * composites, so runtime `engine.addEntityFromComposite` calls find each
+ * component already defined and don't trip the engine's seal check.
+ */
+export function renderComponentRegistrationsModule(registrations: ComponentRegistration[]): string {
+  const registrationLines = registrations
+    .map(
+      ({ name, jsonSchema }) =>
+        `engine.defineComponentFromSchema(${JSON.stringify(name)}, Schemas.fromJson(${JSON.stringify(jsonSchema)}))`
+    )
+    .join('\n')
+
+  return `import { engine, Schemas } from '@dcl/ecs'
+import { getCompositeRootComponent } from '@dcl/ecs'
+// Pre-register composite::root so runtime addEntityFromComposite recursion
+// (via getCompositeRootComponent inside instanceComposite) doesn't trip the
+// seal for scenes that have no main.composite to instance at scene boot.
+getCompositeRootComponent(engine)
+${registrationLines}
+`
+}
+
 export async function getAllComposites(
   components: CompositeComponents,
   workingDirectory: string
@@ -43,6 +70,23 @@ export async function getAllComposites(
   // the JS bundle (`compositeLines` below); secondary composites lazy-load at
   // runtime via `~system/Runtime.readFile`.
   const watchFiles = globSync('**/*.composite', { cwd: workingDirectory })
+  // Asset-packs ship composites under the `composite.json` convention (e.g.
+  // `assets/asset-packs/fantasy_chest/composite.json`). We scan these for
+  // component-schema pre-registration only — they are NOT instantiated into
+  // the engine at build time (that would bake their entities into main.crdt
+  // and defeat on-demand spawning via `engine.addEntityFromComposite`).
+  const additionalCompositeFiles = globSync('**/composite.json', { cwd: workingDirectory })
+  components.logger.info(
+    `[composite] scanning workingDirectory='${workingDirectory}': ` +
+      `${watchFiles.length} .composite file(s), ` +
+      `${additionalCompositeFiles.length} composite.json file(s)`
+  )
+  if (watchFiles.length > 0) {
+    components.logger.info(`[composite]   .composite files: ${watchFiles.join(', ')}`)
+  }
+  if (additionalCompositeFiles.length > 0) {
+    components.logger.info(`[composite]   composite.json files: ${additionalCompositeFiles.join(', ')}`)
+  }
   const scripts = new Map<string, Script[]>()
 
   const textDecoder = new TextDecoder()
@@ -58,6 +102,18 @@ export async function getAllComposites(
         err
       )
       withErrors = true
+    }
+  }
+
+  const additionalComposites: Composite.Definition[] = []
+  for (const file of additionalCompositeFiles) {
+    try {
+      const fileBuffer = await components.fs.readFile(path.join(workingDirectory, file))
+      const json = JSON.parse(textDecoder.decode(fileBuffer))
+      additionalComposites.push(Composite.fromJson(json))
+    } catch {
+      // Not every `composite.json` in the tree is a valid composite definition
+      // (some are unrelated config). Skip silently — these are scan-only.
     }
   }
 
@@ -126,7 +182,8 @@ export async function getAllComposites(
   // component already defined, avoiding the "Engine is already sealed" throw
   // that would otherwise fire from `instanceComposite → defineComponentFromSchema`.
   const componentRegistrationsByName = new Map<string, ComponentRegistration>()
-  for (const composite of Object.values(composites)) {
+  const scanForComponents = [...Object.values(composites), ...additionalComposites]
+  for (const composite of scanForComponents) {
     for (const component of composite.components) {
       if (!component.name || component.name.startsWith('core::')) continue
       if (component.jsonSchema === undefined || component.jsonSchema === null) continue
@@ -138,11 +195,24 @@ export async function getAllComposites(
     }
   }
   const componentRegistrations = Array.from(componentRegistrationsByName.values())
+  components.logger.info(
+    `[composite] pre-registering ${componentRegistrations.length} unique custom component schema(s) for ~sdk/composite-components`
+  )
+  if (componentRegistrations.length > 0) {
+    components.logger.info(`[composite]   components: ${componentRegistrations.map((r) => r.name).join(', ')}`)
+  }
 
   // generate CRDT binary
   const crdtFilePath = path.join(workingDirectory, 'main.crdt')
   const crdtData = dumpEngineToCrdtCommands(engine as any)
   await components.fs.writeFile(crdtFilePath, crdtData)
 
-  return { compositeLines, watchFiles, scripts, withErrors, maxCompositeEntity, componentRegistrations }
+  return {
+    compositeLines,
+    watchFiles: [...watchFiles, ...additionalCompositeFiles],
+    scripts,
+    withErrors,
+    maxCompositeEntity,
+    componentRegistrations
+  }
 }
