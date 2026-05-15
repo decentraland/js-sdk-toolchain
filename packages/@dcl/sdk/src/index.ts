@@ -17,7 +17,7 @@ polyfillTextEncoder()
 export const rendererTransport = createRendererTransport({ crdtSendToRenderer })
 engine.addTransport(rendererTransport)
 
-// Register composite provider so engine.addEntityFromComposite() can resolve composite files
+// Register composite provider so Composite.instance() and engine.getCompositeProvider() can resolve composite files
 engine.setCompositeProvider(compositeProvider)
 
 export async function onUpdate(deltaTime: number) {

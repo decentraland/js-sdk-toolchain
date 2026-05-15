@@ -25,6 +25,7 @@ import {
   UiInputResult,
   UiText,
   UiTransform,
+  TriggerAreaResult,
   ComponentDefinition
 } from '@dcl/ecs'
 import { LIVEKIT_MAX_SIZE } from '@dcl/ecs/dist/systems/crdt'
@@ -45,7 +46,8 @@ export const NOT_SYNC_COMPONENTS: ComponentDefinition<unknown>[] = [
   UiInput,
   UiInputResult,
   UiTransform,
-  UiText
+  UiText,
+  TriggerAreaResult
 ]
 
 export const NOT_SYNC_COMPONENTS_IDS = NOT_SYNC_COMPONENTS.map(($) => $.componentId)
