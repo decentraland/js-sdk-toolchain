@@ -69,8 +69,8 @@ export function help(options: Options) {
     - View logs for a specific scene in a multi-scene world:
       $ sdk-commands sdk-server-logs --world myworld.dcl.eth --position 10,10
 
-    - View logs for a Genesis City scene (use =value form for negative coords):
-      $ sdk-commands sdk-server-logs --position=-125,-96
+    - View logs for a Genesis City scene (negative coords are supported):
+      $ sdk-commands sdk-server-logs --position -125,-96
 
     - Connect to a custom server:
       $ sdk-commands sdk-server-logs --world myworld --target https://multiplayer-server.decentraland.zone
