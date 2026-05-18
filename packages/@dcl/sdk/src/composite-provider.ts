@@ -41,16 +41,14 @@ function decodeFromBytes(content: Uint8Array): Composite.Definition {
 
 // @public
 export const compositeProvider: Composite.Provider = {
-  getCompositeOrNull(src: string, _currentPath?: string) {
-    // TODO: resolve path from src and currentPath
-
+  getCompositeOrNull(src: string) {
     const fromLoader = compositeFromLoader[src]
     if (fromLoader) {
       try {
         const composite = decodeFromLoader(src, fromLoader)
         if (composite) cache(src, composite)
       } catch (err) {
-        console.error(err)
+        console.error(`compositeProvider: failed to decode composite "${src}"`, err)
       }
       delete compositeFromLoader[src]
     }
