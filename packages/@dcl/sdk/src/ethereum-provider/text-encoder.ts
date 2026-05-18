@@ -1,5 +1,5 @@
 import TextEncodingPolyfill from 'text-encoding'
-import { setGlobalPolyfill } from '@dcl/ecs/dist/runtime/globals'
+import { setGlobalPolyfill } from '@dcl/ecs'
 
 // NOTE: this function mutates globalThis — it is NOT pure. Do not annotate
 // with /* @__PURE__ */; minifiers would treat the call as dead code and drop

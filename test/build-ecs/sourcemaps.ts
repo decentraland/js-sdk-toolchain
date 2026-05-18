@@ -33,6 +33,7 @@ export function assertFilesExist(map: BasicSourceMapConsumer) {
 
     // TODO: what should we do with virtual files?
     if (file.endsWith('sdk-composite:all-composites')) continue
+    if (file.endsWith('sdk-composite-components:composite-components')) continue
     if (file.endsWith('entry-point.ts')) continue
     if (file.endsWith('sdk-scripts:script-utils')) continue
 

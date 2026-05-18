@@ -2,17 +2,17 @@ import { compositeFromLoader } from '~sdk/all-composites'
 import { readFile } from '~system/Runtime'
 import { Composite, getGlobal } from '@dcl/ecs'
 
-const composites: Composite.Resource[] = []
+const composites = new Map<string, Composite.Resource>()
 
 function findCached(src: string): Composite.Resource | null {
-  return composites.find((item) => item.src === src) || null
+  return composites.get(src) ?? null
 }
 
 function cache(src: string, composite: Composite.Definition): Composite.Resource {
   const existing = findCached(src)
   if (existing) return existing
   const resource: Composite.Resource = { src, composite }
-  composites.push(resource)
+  composites.set(src, resource)
   return resource
 }
 
@@ -24,8 +24,10 @@ function decodeFromLoader(src: string, fromLoader: unknown): Composite.Definitio
 }
 
 function decodeFromBytes(content: Uint8Array): Composite.Definition {
-  // .composite files are JSON (UTF-8); .composite.bin files are protobuf binary
-  if (content[0] === 0x7b /* '{' = JSON */) {
+  // .composite files are JSON (UTF-8); .composite.bin files are protobuf binary.
+  // The first-byte check is a fast path; a JSON.parse failure falls back to fromBinary
+  // because a protobuf message can also begin with 0x7b.
+  if (content[0] === 0x7b /* '{' */) {
     const TD = getGlobal<new () => { decode(input: Uint8Array): string }>('TextDecoder')
     if (!TD) {
       throw new Error(
@@ -34,7 +36,11 @@ function decodeFromBytes(content: Uint8Array): Composite.Definition {
           'to install the TextEncoder/TextDecoder polyfill.'
       )
     }
-    return Composite.fromJson(JSON.parse(new TD().decode(content)))
+    try {
+      return Composite.fromJson(JSON.parse(new TD().decode(content)))
+    } catch {
+      return Composite.fromBinary(content)
+    }
   }
   return Composite.fromBinary(content)
 }
