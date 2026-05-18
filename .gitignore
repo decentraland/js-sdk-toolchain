@@ -38,13 +38,5 @@ test/snapshots/bin
 test/build-ecs/fixtures/ecs7-scene/aCaseSensitiveReadme.md
 !packages/@dcl/sdk-commands/scripts/*.js
 
-# Gas Town (added by gt)
-.runtime/
 .claude/
 .logs/
-__pycache__/
-state.json
-
-# Dolt database files (added by bd init)
-.dolt/
-*.db
