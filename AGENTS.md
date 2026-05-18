@@ -1,150 +1,103 @@
 # Agent Instructions
 
-This project uses **bd** (beads) for issue tracking. Run `bd onboard` to get started.
+This is the **Decentraland JavaScript SDK Toolchain** monorepo — TypeScript/JavaScript packages for building interactive 3D scenes for Decentraland.
 
-## Quick Reference
+## Start here
 
-```bash
-bd ready              # Find available work
-bd show <id>          # View issue details
-bd update <id> --claim  # Claim work atomically
-bd close <id>         # Complete work
-bd dolt push          # Push beads data to remote
-```
+Before doing non-trivial work, read:
 
-## Non-Interactive Shell Commands
+1. **[docs/ai-agent-context.md](docs/ai-agent-context.md)** — comprehensive project overview: every package's purpose, key concepts (ECS, CRDT, composites, React reconciler, transports), tech stack, full CLI command reference, deployment environments, and project layout. This is the canonical project briefing.
+2. **[docs/REFERENCES.md](docs/REFERENCES.md)** — curated index of every doc in this repo, grouped by topic.
+3. **[README.md](README.md)** — public-facing repo overview and quick-start.
 
-**ALWAYS use non-interactive flags** with file operations to avoid hanging on confirmation prompts.
+For deeper context on a specific subsystem (component serialization, CRDT suppression, world transform behavior, etc.), use `docs/REFERENCES.md` as the entry point.
 
-Shell commands like `cp`, `mv`, and `rm` may be aliased to include `-i` (interactive) mode on some systems, causing the agent to hang indefinitely waiting for y/n input.
+## Packages
 
-**Use these forms instead:**
-```bash
-# Force overwrite without prompting
-cp -f source dest           # NOT: cp source dest
-mv -f source dest           # NOT: mv source dest
-rm -f file                  # NOT: rm file
+Six packages under `packages/@dcl/` (npm workspaces):
 
-# For recursive operations
-rm -rf directory            # NOT: rm -r directory
-cp -rf source dest          # NOT: cp -r source dest
-```
+| Package | Purpose |
+| --- | --- |
+| `@dcl/ecs` | Core ECS engine + CRDT networking |
+| `@dcl/sdk` | Main developer-facing aggregator package |
+| `@dcl/react-ecs` | React bindings (custom Fiber + Flexbox layout) |
+| `@dcl/sdk-commands` | CLI binary (`init`, `start`, `build`, `deploy`, …) |
+| `@dcl/js-runtime` | Type-definition-only package for scene runtime globals |
+| `@dcl/playground-assets` | Browser-compatible SDK bundle |
 
-**Other commands that may prompt:**
-- `scp` - use `-o BatchMode=yes` for non-interactive
-- `ssh` - use `-o BatchMode=yes` to fail instead of prompting
-- `apt-get` - use `-y` flag
-- `brew` - use `HOMEBREW_NO_AUTO_UPDATE=1` env var
+Internal references use `file:../` paths during development; published versions get pinned semver ranges (managed via syncpack — see `make sync-deps`).
 
-<!-- BEGIN BEADS INTEGRATION profile:full hash:d4f96305 -->
-## Issue Tracking with bd (beads)
+## Development commands
 
-**IMPORTANT**: This project uses **bd (beads)** for ALL issue tracking. Do NOT use markdown TODOs, task lists, or other tracking methods.
+The repo is orchestrated via **`make`** (the Makefile is the source of truth — `package.json` only carries `postinstall`). All commands run from the repo root:
 
-### Why bd?
+| Task | Command | Notes |
+| --- | --- | --- |
+| Install deps | `make install` | `npm install` + downloads the protobuf compiler binary |
+| Full build | `make build` | Compiles all packages with `tsc` + generates protobuf-derived TS |
+| Run all tests | `make test` | Jest across all packages (includes snapshot/golden-file tests) |
+| Lint (check) | `make lint` | Runs `scripts/lint-packages.ts` — ESLint + Prettier check per package |
+| Lint (auto-fix) | `make lint-fix` | Runs `make sync-deps` then lint with `--fix` |
+| Format | `make format` | `prettier --write "**/*.{js,ts,tsx,json}"` |
+| Sync dep versions | `make sync-deps` | Cross-package version alignment via syncpack |
+| Update snapshots | `make update-snapshots` | Regenerate QuickJS opcode golden files after intentional runtime changes |
 
-- Dependency-aware: Track blockers and relationships between issues
-- Git-friendly: Dolt-powered version control with native sync
-- Agent-optimized: JSON output, ready work detection, discovered-from links
-- Prevents duplicate tracking systems and confusion
+### Scoped testing
 
-### Quick Start
-
-**Check for ready work:**
+The full Jest suite is slow. For faster iteration, scope to a path pattern:
 
 ```bash
-bd ready --json
+node_modules/.bin/jest --colors --forceExit --testPathPattern='test/sdk-commands'
+node_modules/.bin/jest --colors --forceExit --testPathPattern='test/ecs'
+node_modules/.bin/jest --colors --forceExit --testPathPattern='test/react-ecs'
+node_modules/.bin/jest --colors --forceExit --testPathPattern='test/snapshots'
 ```
 
-**Create new issues:**
+### Per-package typecheck
+
+A fast feedback loop without running the full test suite:
 
 ```bash
-bd create "Issue title" --description="Detailed context" -t bug|feature|task -p 0-4 --json
-bd create "Issue title" --description="What this issue is about" -p 1 --deps discovered-from:bd-123 --json
+cd packages/@dcl/<package> && npx tsc --noEmit -p tsconfig.json
 ```
 
-**Claim and update:**
+## Code conventions
+
+- **TypeScript** 5.0.2, strict mode.
+- **Conventional Commits** for commit subjects (`feat:`, `fix:`, `refactor:`, `chore:`, `test:`, `docs:`, `perf:`). Match the existing `git log` style.
+- **No `Co-Authored-By`** lines in commits (carried over from the user's global preference).
+- **Prettier** governs all `*.{js,ts,tsx,json}` formatting. Run `make format` before committing.
+- **ESLint** governs lint rules; `make lint` must exit 0.
+- **100% coverage** required for `@dcl/ecs` (branches / functions / lines).
+- Prefer **`make` targets** over running tools directly — they pick up monorepo-wide config (workspace globs, syncpack rules, etc.).
+- **Adding or modifying a built-in component**: follow [docs/adding-or-modifying-a-component.md](docs/adding-or-modifying-a-component.md).
+
+## Spec & planning conventions
+
+This repo uses the **`/plan-plus:*` plugin** for multi-phase feature work. New designs land under `docs/specs/<feature>/` with `plan.md`, per-phase files, and a `learnings/` sidecar. Whether these directories ship as part of PR diffs is a per-PR judgment call — add `docs/specs/` to `.gitignore` if your team prefers keeping them as local-only audit trails.
+
+## Shell safety
+
+Some shell environments alias destructive commands to interactive mode (`cp -i`, `mv -i`, `rm -i`), which causes long-running agent sessions to hang on confirmation prompts. Prefer explicit non-interactive flags:
 
 ```bash
-bd update <id> --claim --json
-bd update bd-42 --priority 1 --json
+cp -f source dest          # not: cp source dest
+mv -f source dest          # not: mv source dest
+rm -f file                 # not: rm file
+rm -rf directory           # not: rm -r directory
 ```
 
-**Complete work:**
+For other potentially-prompting tools: `ssh`/`scp -o BatchMode=yes`, `apt-get -y`, `brew` with `HOMEBREW_NO_AUTO_UPDATE=1`.
 
-```bash
-bd close bd-42 --reason "Completed" --json
-```
+## What's out of scope for this repo
 
-### Issue Types
+The following live in separate repos and should not be implemented here:
 
-- `bug` - Something broken
-- `feature` - New functionality
-- `task` - Work item (tests, docs, refactoring)
-- `epic` - Large feature with subtasks
-- `chore` - Maintenance (dependencies, tooling)
+- The Decentraland Kernel and 3D Renderer (the ECS talks to it via CRDT messages but doesn't implement it).
+- Catalyst node infrastructure and asset CDN.
+- Blockchain contracts, NFT minting, LAND transactions.
+- Avatar rendering and customization.
+- World Content Servers and comms infrastructure.
+- The Decentraland Playground web application itself (this repo only provides the `@dcl/playground-assets` bundle it consumes).
 
-### Priorities
-
-- `0` - Critical (security, data loss, broken builds)
-- `1` - High (major features, important bugs)
-- `2` - Medium (default, nice-to-have)
-- `3` - Low (polish, optimization)
-- `4` - Backlog (future ideas)
-
-### Workflow for AI Agents
-
-1. **Check ready work**: `bd ready` shows unblocked issues
-2. **Claim your task atomically**: `bd update <id> --claim`
-3. **Work on it**: Implement, test, document
-4. **Discover new work?** Create linked issue:
-   - `bd create "Found bug" --description="Details about what was found" -p 1 --deps discovered-from:<parent-id>`
-5. **Complete**: `bd close <id> --reason "Done"`
-
-### Auto-Sync
-
-bd automatically syncs via Dolt:
-
-- Each write auto-commits to Dolt history
-- Use `bd dolt push`/`bd dolt pull` for remote sync
-- No manual export/import needed!
-
-### Important Rules
-
-- ✅ Use bd for ALL task tracking
-- ✅ Always use `--json` flag for programmatic use
-- ✅ Link discovered work with `discovered-from` dependencies
-- ✅ Check `bd ready` before asking "what should I work on?"
-- ❌ Do NOT create markdown TODO lists
-- ❌ Do NOT use external issue trackers
-- ❌ Do NOT duplicate tracking systems
-
-For more details, see README.md and docs/QUICKSTART.md.
-
-## Landing the Plane (Session Completion)
-
-**When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
-
-**MANDATORY WORKFLOW:**
-
-1. **File issues for remaining work** - Create issues for anything that needs follow-up
-2. **Run quality gates** (if code changed) - Tests, linters, builds
-3. **Update issue status** - Close finished work, update in-progress items
-4. **PUSH TO REMOTE** - This is MANDATORY:
-   ```bash
-   git pull --rebase
-   bd dolt push
-   git push
-   git status  # MUST show "up to date with origin"
-   ```
-5. **Clean up** - Clear stashes, prune remote branches
-6. **Verify** - All changes committed AND pushed
-7. **Hand off** - Provide context for next session
-
-**CRITICAL RULES:**
-- Work is NOT complete until `git push` succeeds
-- NEVER stop before pushing - that leaves work stranded locally
-- NEVER say "ready to push when you are" - YOU must push
-- If push fails, resolve and retry until it succeeds
-
-<!-- END BEADS INTEGRATION -->
+ADRs (Architecture Decision Records) referenced in code by number (e.g., ADR-117 for CRDT) live in the [`@dcl/protocol`](https://github.com/decentraland/protocol) repo.
