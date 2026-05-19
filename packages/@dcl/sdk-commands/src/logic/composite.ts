@@ -59,9 +59,6 @@ export async function getAllComposites(
     cwd: workingDirectory,
     ignore: ['node_modules/**', '**/node_modules/**']
   })
-  components.logger.info(
-    `[composite] scanning '${workingDirectory}': ${watchFiles.length} .composite, ${additionalCompositeFiles.length} composite.json file(s)`
-  )
   if (watchFiles.length > 0) components.logger.debug(`[composite]   .composite: ${watchFiles.join(', ')}`)
   if (additionalCompositeFiles.length > 0)
     components.logger.debug(`[composite]   composite.json: ${additionalCompositeFiles.join(', ')}`)
@@ -187,9 +184,6 @@ export async function getAllComposites(
     }
   }
   const componentRegistrations = Array.from(componentRegistrationsByName.values())
-  components.logger.info(
-    `[composite] pre-registering ${componentRegistrations.length} unique custom component schema(s) for ~sdk/composite-components`
-  )
   if (componentRegistrations.length > 0) {
     components.logger.debug(`[composite]   components: ${componentRegistrations.map((r) => r.name).join(', ')}`)
   }
