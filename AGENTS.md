@@ -61,6 +61,18 @@ A fast feedback loop without running the full test suite:
 cd packages/@dcl/<package> && npx tsc --noEmit -p tsconfig.json
 ```
 
+### Snapshot maintenance
+
+After running `make update-snapshots` (or `UPDATE_SNAPSHOTS=true` with a scoped Jest run), you **MUST** verify that no regenerated `.crdt` file contains an `ERR!` line:
+
+```bash
+grep -rn "ERR!" test/snapshots/        # must return no output
+```
+
+An `ERR!` line means the QuickJS eval threw mid-execution (commonly a missing mock in `test/snapshots.spec.ts`'s `require` shim — e.g. a new `~system/Runtime` method the SDK started calling at module-load). The resulting snapshot captures a *truncated* run, hides real behavior, and would mask future regressions.
+
+**Anti-pattern:** committing snapshots containing `ERR! Error: Unknown module ...`, `ERR! TypeError: ... is not a function`, or any other `ERR!` trace. Treat them as broken artifacts — fix the mock (or the underlying scene-load failure), regenerate, and re-verify before committing.
+
 ## Code conventions
 
 - **TypeScript** 5.0.2, strict mode.
