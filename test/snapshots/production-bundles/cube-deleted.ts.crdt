@@ -2,6 +2,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=244.2k bytes
 =======
 =======
@@ -34,6 +35,9 @@ SCENE_COMPILED_JS_SIZE_PROD=238.6k bytes
 SCENE_COMPILED_JS_SIZE_PROD=242.5k bytes
 >>>>>>> 1828100c (sync: merge main into auth-server (#1392))
 >>>>>>> 718e522d (sync: merge main into auth-server (#1392))
+=======
+SCENE_COMPILED_JS_SIZE_PROD=242.5k bytes
+>>>>>>> 2afa13b8 (update snapshots)
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -43,6 +47,7 @@ EVAL test/snapshots/production-bundles/cube-deleted.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -137,6 +142,11 @@ EVAL test/snapshots/production-bundles/cube-deleted.js
   ALIVE_OBJS_DELTA ~= 3.10k
 >>>>>>> 1828100c (sync: merge main into auth-server (#1392))
 >>>>>>> 718e522d (sync: merge main into auth-server (#1392))
+=======
+  OPCODES ~= 60k
+  MALLOC_COUNT = 14176
+  ALIVE_OBJS_DELTA ~= 3.10k
+>>>>>>> 2afa13b8 (update snapshots)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -144,78 +154,31 @@ CALL onStart()
 CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   Scene: PUT_COMPONENT e=0x201 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  OPCODES ~= 5k
-  MALLOC_COUNT = 68
-=======
-  OPCODES ~= 4k
-  MALLOC_COUNT = 52
->>>>>>> 327f7995 (fix tests)
-=======
-  OPCODES ~= 4k
-  MALLOC_COUNT = 52
->>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
-  ALIVE_OBJS_DELTA ~= 0.02k
-=======
   OPCODES ~= 5k
   MALLOC_COUNT = 70
   ALIVE_OBJS_DELTA ~= 0.03k
->>>>>>> 63ddb3f8 (update snapshots)
 CALL onUpdate(0.1)
   Scene: DELETE_COMPONENT e=0x201 c=1019 t=2 data=null
   Scene: PUT_COMPONENT e=0x202 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   Scene: DELETE_ENTITY e=0x201
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   OPCODES ~= 6k
   MALLOC_COUNT = 4
-=======
-  OPCODES ~= 4k
-  MALLOC_COUNT = 6
->>>>>>> 327f7995 (fix tests)
-=======
-  OPCODES ~= 5k
-  MALLOC_COUNT = 6
->>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
-=======
-  OPCODES ~= 6k
-  MALLOC_COUNT = 4
->>>>>>> 63ddb3f8 (update snapshots)
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
   Scene: DELETE_COMPONENT e=0x202 c=1019 t=2 data=null
   Scene: PUT_COMPONENT e=0x10201 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   Scene: DELETE_ENTITY e=0x202
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   OPCODES ~= 6k
-  MALLOC_COUNT = 2
-=======
-  OPCODES ~= 4k
   MALLOC_COUNT = 4
->>>>>>> 327f7995 (fix tests)
-=======
-  OPCODES ~= 5k
-=======
-  OPCODES ~= 6k
->>>>>>> 63ddb3f8 (update snapshots)
-  MALLOC_COUNT = 4
->>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
   Scene: DELETE_COMPONENT e=0x10201 c=1019 t=2 data=null
   Scene: PUT_COMPONENT e=0x10202 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   Scene: DELETE_ENTITY e=0x10201
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   OPCODES ~= 6k
   MALLOC_COUNT = 1
   ALIVE_OBJS_DELTA ~= 0.00k
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 1031.41k bytes
@@ -254,3 +217,6 @@ CALL onUpdate(0.1)
   MEMORY_USAGE_COUNT ~= 1011.86k bytes
 >>>>>>> 1828100c (sync: merge main into auth-server (#1392))
 >>>>>>> 718e522d (sync: merge main into auth-server (#1392))
+=======
+  MEMORY_USAGE_COUNT ~= 1011.86k bytes
+>>>>>>> 2afa13b8 (update snapshots)

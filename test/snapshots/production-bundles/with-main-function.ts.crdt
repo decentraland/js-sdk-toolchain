@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=607.3k bytes
 =======
 =======
@@ -25,6 +26,9 @@ SCENE_COMPILED_JS_SIZE_PROD=587k bytes
 SCENE_COMPILED_JS_SIZE_PROD=597.5k bytes
 >>>>>>> 1828100c (sync: merge main into auth-server (#1392))
 >>>>>>> 718e522d (sync: merge main into auth-server (#1392))
+=======
+SCENE_COMPILED_JS_SIZE_PROD=602.9k bytes
+>>>>>>> 2afa13b8 (update snapshots)
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -34,6 +38,7 @@ EVAL test/snapshots/production-bundles/with-main-function.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -72,6 +77,11 @@ EVAL test/snapshots/production-bundles/with-main-function.js
   ALIVE_OBJS_DELTA ~= 9.81k
 >>>>>>> 1828100c (sync: merge main into auth-server (#1392))
 >>>>>>> 718e522d (sync: merge main into auth-server (#1392))
+=======
+  OPCODES ~= 204k
+  MALLOC_COUNT = 45782
+  ALIVE_OBJS_DELTA ~= 10.25k
+>>>>>>> 2afa13b8 (update snapshots)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -80,6 +90,7 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   Scene: PUT_COMPONENT e=0x201 c=1041 t=1 data={"src":"test.glb"}
   Scene: PUT_COMPONENT e=0x200 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   OPCODES ~= 8k
@@ -111,9 +122,10 @@ CALL onUpdate(0.1)
   OPCODES ~= 6k
   MALLOC_COUNT = 75
 =======
+=======
+>>>>>>> 2afa13b8 (update snapshots)
   OPCODES ~= 7k
-  MALLOC_COUNT = 101
->>>>>>> 63ddb3f8 (update snapshots)
+  MALLOC_COUNT = 98
   ALIVE_OBJS_DELTA ~= 0.03k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x202 c=1041 t=1 data={"src":"test.glb"}
@@ -131,6 +143,7 @@ CALL onUpdate(0.1)
   MALLOC_COUNT = 13
   ALIVE_OBJS_DELTA ~= 0.00k
 <<<<<<< HEAD
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 2699.40k bytes
 >>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
 <<<<<<< HEAD
@@ -146,3 +159,6 @@ CALL onUpdate(0.1)
   MEMORY_USAGE_COUNT ~= 2911.03k bytes
 >>>>>>> 1828100c (sync: merge main into auth-server (#1392))
 >>>>>>> 718e522d (sync: merge main into auth-server (#1392))
+=======
+  MEMORY_USAGE_COUNT ~= 2958.95k bytes
+>>>>>>> 2afa13b8 (update snapshots)

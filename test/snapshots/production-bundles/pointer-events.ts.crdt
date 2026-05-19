@@ -2,6 +2,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=245.1k bytes
 =======
 =======
@@ -34,6 +35,9 @@ SCENE_COMPILED_JS_SIZE_PROD=239.4k bytes
 SCENE_COMPILED_JS_SIZE_PROD=243.3k bytes
 >>>>>>> 1828100c (sync: merge main into auth-server (#1392))
 >>>>>>> 718e522d (sync: merge main into auth-server (#1392))
+=======
+SCENE_COMPILED_JS_SIZE_PROD=243.3k bytes
+>>>>>>> 2afa13b8 (update snapshots)
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -43,6 +47,7 @@ EVAL test/snapshots/production-bundles/pointer-events.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -137,6 +142,11 @@ EVAL test/snapshots/production-bundles/pointer-events.js
   ALIVE_OBJS_DELTA ~= 3.19k
 >>>>>>> 1828100c (sync: merge main into auth-server (#1392))
 >>>>>>> 718e522d (sync: merge main into auth-server (#1392))
+=======
+  OPCODES ~= 61k
+  MALLOC_COUNT = 14472
+  ALIVE_OBJS_DELTA ~= 3.19k
+>>>>>>> 2afa13b8 (update snapshots)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -154,6 +164,7 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   Scene: PUT_COMPONENT e=0x201 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   Scene: PUT_COMPONENT e=0x202 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   OPCODES ~= 24k
@@ -201,10 +212,11 @@ CALL onUpdate(0.1)
   MALLOC_COUNT = 39
   ALIVE_OBJS_DELTA ~= 0.02k
 =======
+=======
+>>>>>>> 2afa13b8 (update snapshots)
   OPCODES ~= 23k
   MALLOC_COUNT = 135
   ALIVE_OBJS_DELTA ~= 0.04k
->>>>>>> 63ddb3f8 (update snapshots)
 CALL onUpdate(0.1)
   OPCODES ~= 2k
   MALLOC_COUNT = 0
@@ -217,6 +229,7 @@ CALL onUpdate(0.1)
   OPCODES ~= 2k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 969.21k bytes
@@ -234,3 +247,6 @@ CALL onUpdate(0.1)
   MEMORY_USAGE_COUNT ~= 1021.75k bytes
 >>>>>>> 1828100c (sync: merge main into auth-server (#1392))
 >>>>>>> 718e522d (sync: merge main into auth-server (#1392))
+=======
+  MEMORY_USAGE_COUNT ~= 1021.75k bytes
+>>>>>>> 2afa13b8 (update snapshots)

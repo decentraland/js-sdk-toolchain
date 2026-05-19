@@ -2,6 +2,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=244.1k bytes
 =======
 =======
@@ -34,6 +35,9 @@ SCENE_COMPILED_JS_SIZE_PROD=238.5k bytes
 SCENE_COMPILED_JS_SIZE_PROD=242.4k bytes
 >>>>>>> 1828100c (sync: merge main into auth-server (#1392))
 >>>>>>> 718e522d (sync: merge main into auth-server (#1392))
+=======
+SCENE_COMPILED_JS_SIZE_PROD=242.4k bytes
+>>>>>>> 2afa13b8 (update snapshots)
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -43,6 +47,7 @@ EVAL test/snapshots/production-bundles/cube.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -129,12 +134,18 @@ EVAL test/snapshots/production-bundles/cube.js
   ALIVE_OBJS_DELTA ~= 3.10k
 >>>>>>> 1828100c (sync: merge main into auth-server (#1392))
 >>>>>>> 718e522d (sync: merge main into auth-server (#1392))
+=======
+  OPCODES ~= 59k
+  MALLOC_COUNT = 14149
+  ALIVE_OBJS_DELTA ~= 3.10k
+>>>>>>> 2afa13b8 (update snapshots)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   OPCODES ~= 4k
@@ -178,6 +189,8 @@ CALL onUpdate(0.1)
 >>>>>>> 11b9aad2 (fix tests)
 =======
 =======
+=======
+>>>>>>> 2afa13b8 (update snapshots)
   OPCODES ~= 3k
   MALLOC_COUNT = 37
   ALIVE_OBJS_DELTA ~= 0.01k
@@ -195,6 +208,7 @@ CALL onUpdate(0.1)
   ALIVE_OBJS_DELTA ~= 0.00k
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 950.86k bytes
 >>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
 <<<<<<< HEAD
@@ -210,3 +224,6 @@ CALL onUpdate(0.1)
   MEMORY_USAGE_COUNT ~= 1001.44k bytes
 >>>>>>> 1828100c (sync: merge main into auth-server (#1392))
 >>>>>>> 718e522d (sync: merge main into auth-server (#1392))
+=======
+  MEMORY_USAGE_COUNT ~= 1001.44k bytes
+>>>>>>> 2afa13b8 (update snapshots)
