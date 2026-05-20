@@ -51,10 +51,15 @@ import {
 
 /**
  * Extract the "value" type from a component definition by inferring the
- * return type of `.create(entity, val)`. Works because every typed
- * component's `create` returns the same shape it stores.
+ * `val` parameter of `.create(entity, val)` — the shape the author writes
+ * in `main-entities.ts`. Using the INPUT type (not the return) matches the
+ * SDK's own ergonomic contract: Transform's `create` accepts
+ * `Partial<TransformType>` and fills in defaults at runtime, so an author
+ * writing `Transform: { position: { x: 1, y: 0, z: 0 } }` is valid and
+ * should typecheck. Proto-derived components use the same shape for input
+ * and output, so this is a no-op for them.
  */
-type ValueOf<T> = T extends { create(entity: any, val?: any): infer R } ? R : never
+type ValueOf<T> = T extends { create(entity: any, val?: infer V): any } ? V : never
 
 /** Transform with `parent` referenced by entity name (string), not Entity ID. */
 export type SceneTransform = Omit<ValueOf<typeof Transform>, 'parent'> & {
