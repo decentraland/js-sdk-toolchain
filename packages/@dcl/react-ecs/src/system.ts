@@ -5,10 +5,8 @@ import type { ReactEcs } from './react-ecs'
 import { createReconciler } from './reconciler'
 import {
   getUiScaleFactor,
-  resetInteractableArea,
   resetScreenInsetArea,
   resetUiScaleFactor,
-  setInteractableArea,
   setScreenInsetArea,
   setUiScaleFactor
 } from './components/utils'
@@ -73,9 +71,8 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
 
   // Unique owner to prevent other UI systems resetting this scale factor.
   const uiScaleFactorOwner = Symbol('react-ecs-ui-scale')
-  // Unique owners for the inset module variables.
+  // Unique owner for the screen inset module variable.
   const screenInsetAreaOwner = Symbol('react-ecs-screen-inset-area')
-  const interactableAreaOwner = Symbol('react-ecs-interactable-area')
 
   function getActiveVirtualSize(): UiRendererOptions | undefined {
     // Main renderer options win; otherwise use the first additional renderer option.
@@ -120,13 +117,11 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
   function UiScaleSystem() {
     const canvasInfo = UiCanvasInformation.getOrNull(engine.RootEntity)
 
-    // Update inset module variables unconditionally — they are independent of
-    // the virtual size and useful even when the renderer has no virtual canvas.
+    // Update the screen inset module variable unconditionally — it is
+    // independent of the virtual size and useful even when the renderer has no
+    // virtual canvas.
     if (canvasInfo?.screenInsetArea) {
       setScreenInsetArea(canvasInfo.screenInsetArea, screenInsetAreaOwner)
-    }
-    if (canvasInfo?.interactableArea) {
-      setInteractableArea(canvasInfo.interactableArea, interactableAreaOwner)
     }
 
     const activeVirtualSize = getActiveVirtualSize()
@@ -158,7 +153,6 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
       engine.removeSystem(ReactBasedUiSystem)
       resetUiScaleFactor(uiScaleFactorOwner)
       resetScreenInsetArea(screenInsetAreaOwner)
-      resetInteractableArea(interactableAreaOwner)
       for (const entity of renderer.getEntities()) {
         engine.removeEntity(entity)
       }

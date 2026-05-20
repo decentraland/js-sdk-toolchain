@@ -18,9 +18,6 @@ type Insets = { top: number; left: number; right: number; bottom: number }
 let screenInsetArea: Insets = { ...ZERO_INSETS }
 let screenInsetAreaOwner: symbol | undefined = undefined
 
-let interactableArea: Insets = { ...ZERO_INSETS }
-let interactableAreaOwner: symbol | undefined = undefined
-
 /**
  * @internal
  */
@@ -123,32 +120,6 @@ export function resetScreenInsetArea(owner?: symbol): void {
   if (owner && screenInsetAreaOwner !== owner) return
   screenInsetAreaOwner = undefined
   screenInsetArea = { ...ZERO_INSETS }
-}
-
-/**
- * @internal
- */
-export function getInteractableArea(): Insets {
-  return { ...interactableArea }
-}
-
-/**
- * @internal
- */
-export function setInteractableArea(next: Insets, owner?: symbol): void {
-  if (owner) {
-    interactableAreaOwner = owner
-  }
-  interactableArea = { top: next.top, left: next.left, right: next.right, bottom: next.bottom }
-}
-
-/**
- * @internal
- */
-export function resetInteractableArea(owner?: symbol): void {
-  if (owner && interactableAreaOwner !== owner) return
-  interactableAreaOwner = undefined
-  interactableArea = { ...ZERO_INSETS }
 }
 
 /**
