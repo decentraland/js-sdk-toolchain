@@ -29,6 +29,9 @@
     "syncpack": "^9.8.4",
     "typedoc": "^0.23.28"
   },
+  "engines": {
+    "node": "20"
+  },
   "homepage": "https://github.com/decentraland/js-sdk-toolchain#readme",
   "keywords": [],
   "license": "Apache-2.0",
