@@ -3727,6 +3727,7 @@ export interface PBUiCanvasInformation {
     devicePixelRatio: number;
     height: number;
     interactableArea: BorderRect | undefined;
+    screenInsetArea?: BorderRect | undefined;
     width: number;
 }
 
@@ -4756,6 +4757,11 @@ export namespace Schemas {
     }) => void;
 }
 
+// Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
+//
+// @public
+export function ScreenInsetArea(props: UiScreenInsetAreaProps): ReactEcs.JSX.Element;
+
 // @public
 export function setGlobalPolyfill<T>(key: string, value: T): void;
 
@@ -5298,6 +5304,11 @@ export type uint32 = number;
 export type UiRendererOptions = {
     virtualWidth: number;
     virtualHeight: number;
+};
+
+// @public
+export type UiScreenInsetAreaProps = Omit<EntityPropTypes, 'uiTransform'> & {
+    uiTransform?: Omit<NonNullable<EntityPropTypes['uiTransform']>, 'positionType' | 'position'>;
 };
 
 // @public (undocumented)
