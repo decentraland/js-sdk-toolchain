@@ -11,17 +11,8 @@ import { Entity, IEntityContainer, EntityState } from './entity'
 import { ValueSetOptions } from './grow-only-value-set-component-definition'
 import { ReadonlyComponentSchema } from './readonly'
 import { SystemFn, SystemItem } from './systems'
-import type { TransformTypeWithOptionals } from '../components/manual/Transform'
-import type { CompositeProvider } from '../composite/instance'
 export * from './component'
 export { ValueSetOptions }
-
-/**
- * @public
- */
-export type AddEntityFromCompositeOptions = {
-  transform?: TransformTypeWithOptionals
-}
 
 /**
  * @public
@@ -73,8 +64,6 @@ export type PreEngine = Pick<
   | 'getEntityOrNullByName'
   | 'getEntityByName'
   | 'getEntitiesByTag'
-  | 'setCompositeProvider'
-  | 'getCompositeProvider'
 > & {
   getSystems: () => SystemItem[]
 }
@@ -329,27 +318,4 @@ export interface IEngine {
    * Entity container with custom methods to update their state.
    */
   entityContainer: IEntityContainer
-
-  /**
-   * @public
-   * Register the composite provider used to resolve composite files.
-   * Called once by the SDK at initialization time.
-   */
-  setCompositeProvider(provider: CompositeProvider): void
-
-  /**
-   * @public
-   * Get the composite provider registered via setCompositeProvider.
-   * Returns null if no provider has been set.
-   */
-  getCompositeProvider(): CompositeProvider | null
-
-  /**
-   * @public
-   * Instantiate a composite file into the engine, creating all its entities and components.
-   * Returns the root entity of the instantiated composite.
-   * @param src - path to the composite file (e.g. 'barrel.composite')
-   * @param options - optional transform override for the root entity
-   */
-  addEntityFromComposite(src: string, options?: AddEntityFromCompositeOptions): Entity
 }

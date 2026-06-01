@@ -47,6 +47,7 @@ function decodeFromBytes(content: Uint8Array): Composite.Definition {
 
 // @public
 export const compositeProvider: Composite.Provider = {
+  schemas: [],
   getCompositeOrNull(src: string) {
     const fromLoader = compositeFromLoader[src]
     if (fromLoader) {

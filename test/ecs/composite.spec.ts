@@ -145,8 +145,17 @@ describe('composite instantiation system', () => {
 
       const composites = Array.from(CompositeRootComponent.iterator())
 
-      // It should instance at least the requested composite
-      expect(composites.length).toBeGreaterThan(0)
+      // A CompositeRoot bookkeeping component is written only when the composite
+      // actually instances nested child composites. Leaf composites (whose
+      // definition carries no `composite::root` component) emit none.
+      const hasNestedComposites = composite.composite.components.some(
+        component => component.name === CompositeRootComponent.componentName
+      )
+      if (hasNestedComposites) {
+        expect(composites.length).toBeGreaterThan(0)
+      } else {
+        expect(composites.length).toBe(0)
+      }
 
       const currentStateString = getStateAsString(engine)
       const stateFilePath = `${COMPOSITE_BASE_PATH}/${composite.src}.scene-snapshot.json`
@@ -234,9 +243,17 @@ describe('composite instantiation system', () => {
       const subCompositesEntities = Array.from(entities).filter((item) => item < entityOffset)
       const mainCompositeEntity = Array.from(entities).filter((item) => item >= entityOffset)
 
-      // This number remains from the composite definition, see '2-level-deep' and count the entities that should be created :)
-      expect(subCompositesEntities.length).toBe(7) // the sub composite entities
-      expect(mainCompositeEntity.length).toBe(5) // only CompositeRoot (children and the root)
+      // See '2-level-deep' and its referenced composites. With auto-detected
+      // CompositeRoot bookkeeping, entities that used to exist only to hold a
+      // `composite::root` row (leaf composites with no other components) are no
+      // longer created — so the counts are lower than the legacy behavior.
+      // Sub-composite entities (< offset) are the real-content entities created
+      // via engine.addEntity() during nested instancing.
+      expect(subCompositesEntities.length).toBe(4)
+      // Main-range entities (>= offset) that survive are the two composites that
+      // actually instance nested children (the root and 'only-children'), which
+      // still carry a CompositeRoot.
+      expect(mainCompositeEntity.length).toBe(2)
     })
   })
 })

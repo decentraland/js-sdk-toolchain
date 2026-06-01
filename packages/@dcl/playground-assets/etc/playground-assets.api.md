@@ -7,11 +7,6 @@
 import _m0 from 'protobufjs/minimal';
 
 // @public (undocumented)
-export type AddEntityFromCompositeOptions = {
-    transform?: TransformTypeWithOptionals;
-};
-
-// @public (undocumented)
 export type AlignType = 'auto' | 'flex-start' | 'center' | 'flex-end' | 'stretch' | 'baseline' | 'space-between' | 'space-around';
 
 // Warning: (ae-missing-release-tag) "Animator" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -847,6 +842,10 @@ export namespace CompositeDefinition {
 export type CompositeProvider = {
     getCompositeOrNull(src: string): CompositeResource | null;
     loadComposite?: (src: string) => Promise<CompositeResource>;
+    schemas?: Iterable<{
+        name: string;
+        jsonSchema: any;
+    }>;
 };
 
 // @public (undocumented)
@@ -1312,6 +1311,9 @@ export function getComponentEntityTree<T>(engine: Pick<IEngine, 'getEntitiesWith
     parent?: Entity;
 }>): Generator<Entity>;
 
+// @public
+export function getCompositeProvider(): CompositeProvider | null;
+
 // @public @deprecated (undocumented)
 export function getCompositeRootComponent(engine: IEngine): LastWriteWinElementSetComponentDefinition<CompositeRootType>;
 
@@ -1381,7 +1383,6 @@ export type GSetComponentGetter<T extends GrowOnlyValueSetComponentDefinition<an
 // @public (undocumented)
 export interface IEngine {
     addEntity(): Entity;
-    addEntityFromComposite(src: string, options?: AddEntityFromCompositeOptions): Entity;
     addSystem(system: SystemFn, priority?: number, name?: string): void;
     // @alpha (undocumented)
     addTransport(transport: Transport): void;
@@ -1392,7 +1393,6 @@ export interface IEngine {
     defineValueSetComponentFromSchema<T>(componentName: string, spec: ISchema<T>, options: ValueSetOptions<T>): GrowOnlyValueSetComponentDefinition<T>;
     getComponent<T>(componentId: number | string): ComponentDefinition<T>;
     getComponentOrNull<T>(componentId: number | string): ComponentDefinition<T> | null;
-    getCompositeProvider(): CompositeProvider | null;
     getEntitiesByTag(tagName: string): Iterable<Entity>;
     getEntitiesWith<T extends [ComponentDefinition<any>, ...ComponentDefinition<any>[]]>(...components: T): Iterable<[Entity, ...ReadonlyComponentSchema<T>]>;
     getEntityByName<T = never, K = T>(value: K & (T extends never ? never : string)): Entity;
@@ -1410,7 +1410,6 @@ export interface IEngine {
     removeSystem(selector: string | SystemFn): boolean;
     readonly RootEntity: Entity;
     seal(): void;
-    setCompositeProvider(provider: CompositeProvider): void;
     // (undocumented)
     update(deltaTime: number): Promise<void>;
 }
@@ -1619,7 +1618,6 @@ export type InstanceCompositeOptions = {
     };
     rootEntity?: Entity;
     alreadyRequestedSrc?: Set<string>;
-    useRootComponent?: boolean;
 };
 
 // @public (undocumented)
@@ -4771,6 +4769,9 @@ export namespace Schemas {
 //
 // @public
 export function ScreenInsetArea(props: UiScreenInsetAreaProps): ReactEcs.JSX.Element;
+
+// @public
+export function setCompositeProvider(engine: IEngine, provider: CompositeProvider): void;
 
 // @public
 export function setGlobalPolyfill<T>(key: string, value: T): void;

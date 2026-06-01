@@ -25,7 +25,20 @@ function createCompositeProvider(composites: Composite.Resource[]): Composite.Pr
   }
 }
 
-describe('engine.addEntityFromComposite', () => {
+function spawnFromComposite(engine: IEngine, provider: Composite.Provider, src: string, transform?: any): Entity {
+  const resource = provider.getCompositeOrNull(src)
+  if (!resource) {
+    throw new Error(`Composite "${src}" not found.`)
+  }
+  const rootEntity = Composite.instance(engine, resource, provider, {})
+  if (transform) {
+    const Transform = components.Transform(engine)
+    Transform.createOrReplace(rootEntity, transform)
+  }
+  return rootEntity
+}
+
+describe('Composite.instance (formerly engine.addEntityFromComposite)', () => {
   let allComposites: Composite.Resource[]
   let compositeProvider: Composite.Provider
 
@@ -34,32 +47,17 @@ describe('engine.addEntityFromComposite', () => {
     compositeProvider = createCompositeProvider(allComposites)
   })
 
-  describe('when the composite provider is not set', () => {
+  describe('when the composite provider is used', () => {
     let engine: IEngine
 
     beforeEach(() => {
       engine = Engine()
-    })
-
-    it('should throw an error', () => {
-      expect(() => {
-        engine.addEntityFromComposite('one-transform.composite')
-      }).toThrow('CompositeProvider has not been set')
-    })
-  })
-
-  describe('when the composite provider is set', () => {
-    let engine: IEngine
-
-    beforeEach(() => {
-      engine = Engine()
-      engine.setCompositeProvider(compositeProvider)
     })
 
     describe('and the composite src does not exist', () => {
       it('should throw an error', () => {
         expect(() => {
-          engine.addEntityFromComposite('nonexistent.composite')
+          spawnFromComposite(engine, compositeProvider, 'nonexistent.composite')
         }).toThrow('not found')
       })
     })
@@ -68,7 +66,7 @@ describe('engine.addEntityFromComposite', () => {
       let rootEntity: Entity
 
       beforeEach(() => {
-        rootEntity = engine.addEntityFromComposite('one-transform.composite')
+        rootEntity = spawnFromComposite(engine, compositeProvider, 'one-transform.composite')
       })
 
       it('should return a valid entity', () => {
@@ -102,10 +100,8 @@ describe('engine.addEntityFromComposite', () => {
       let rootEntity: Entity
 
       beforeEach(() => {
-        rootEntity = engine.addEntityFromComposite('one-transform.composite', {
-          transform: {
-            position: { x: 10, y: 20, z: 30 }
-          }
+        rootEntity = spawnFromComposite(engine, compositeProvider, 'one-transform.composite', {
+          position: { x: 10, y: 20, z: 30 }
         })
       })
 
@@ -137,11 +133,9 @@ describe('engine.addEntityFromComposite', () => {
           scale: { x: 1, y: 1, z: 1 }
         })
 
-        rootEntity = engine.addEntityFromComposite('one-transform.composite', {
-          transform: {
-            position: { x: 5, y: 5, z: 5 },
-            parent: parentEntity
-          }
+        rootEntity = spawnFromComposite(engine, compositeProvider, 'one-transform.composite', {
+          position: { x: 5, y: 5, z: 5 },
+          parent: parentEntity
         })
       })
 
@@ -167,7 +161,7 @@ describe('engine.addEntityFromComposite', () => {
         let rootEntity: Entity
 
         beforeEach(() => {
-          rootEntity = engine.addEntityFromComposite('empty.composite')
+          rootEntity = spawnFromComposite(engine, compositeProvider, 'empty.composite')
         })
 
         it('should return a valid entity', () => {
@@ -186,10 +180,8 @@ describe('engine.addEntityFromComposite', () => {
         let rootEntity: Entity
 
         beforeEach(() => {
-          rootEntity = engine.addEntityFromComposite('empty.composite', {
-            transform: {
-              position: { x: 42, y: 0, z: 0 }
-            }
+          rootEntity = spawnFromComposite(engine, compositeProvider, 'empty.composite', {
+            position: { x: 42, y: 0, z: 0 }
           })
         })
 
@@ -202,16 +194,16 @@ describe('engine.addEntityFromComposite', () => {
       })
     })
 
-    describe('and addEntityFromComposite is called multiple times', () => {
+    describe('and Composite.instance is called multiple times', () => {
       let firstRoot: Entity
       let secondRoot: Entity
 
       beforeEach(() => {
-        firstRoot = engine.addEntityFromComposite('one-transform.composite', {
-          transform: { position: { x: 1, y: 0, z: 0 } }
+        firstRoot = spawnFromComposite(engine, compositeProvider, 'one-transform.composite', {
+          position: { x: 1, y: 0, z: 0 }
         })
-        secondRoot = engine.addEntityFromComposite('one-transform.composite', {
-          transform: { position: { x: 2, y: 0, z: 0 } }
+        secondRoot = spawnFromComposite(engine, compositeProvider, 'one-transform.composite', {
+          position: { x: 2, y: 0, z: 0 }
         })
       })
 
@@ -228,7 +220,7 @@ describe('engine.addEntityFromComposite', () => {
   })
 })
 
-describe('preload-then-spawn pattern (provider.loadComposite + engine.addEntityFromComposite)', () => {
+describe('preload-then-spawn pattern (provider.loadComposite + Composite.instance)', () => {
   let allComposites: Composite.Resource[]
   let loadCallCount: Record<string, number>
 
@@ -255,20 +247,19 @@ describe('preload-then-spawn pattern (provider.loadComposite + engine.addEntityF
     }
   }
 
-  it('addEntityFromComposite throws when called before loadComposite resolves', () => {
-    const engine = Engine()
-    engine.setCompositeProvider(createAsyncProvider())
-
-    expect(() => engine.addEntityFromComposite('one-transform.composite')).toThrow('not found')
-  })
-
-  it('addEntityFromComposite succeeds after loadComposite resolves', async () => {
+  it('Composite.instance throws when called before loadComposite resolves', () => {
     const engine = Engine()
     const provider = createAsyncProvider()
-    engine.setCompositeProvider(provider)
+
+    expect(() => spawnFromComposite(engine, provider, 'one-transform.composite')).toThrow('not found')
+  })
+
+  it('Composite.instance succeeds after loadComposite resolves', async () => {
+    const engine = Engine()
+    const provider = createAsyncProvider()
 
     await provider.loadComposite!('one-transform.composite')
-    const rootEntity = engine.addEntityFromComposite('one-transform.composite')
+    const rootEntity = spawnFromComposite(engine, provider, 'one-transform.composite')
 
     expect(rootEntity).toBeDefined()
     expect(typeof rootEntity).toBe('number')
@@ -276,9 +267,7 @@ describe('preload-then-spawn pattern (provider.loadComposite + engine.addEntityF
   })
 
   it('repeated loadComposite for same src does not re-fetch (cache hit)', async () => {
-    const engine = Engine()
     const provider = createAsyncProvider()
-    engine.setCompositeProvider(provider)
 
     const first = await provider.loadComposite!('one-transform.composite')
     const second = await provider.loadComposite!('one-transform.composite')

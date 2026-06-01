@@ -22,6 +22,7 @@ export type {
 }
 export { EntityMappingMode }
 export { getCompositeRootComponent }
+export { setCompositeProvider, getCompositeProvider } from './provider-registry'
 
 /**
  * @public
@@ -68,7 +69,7 @@ export namespace Composite {
    * @param engine - the engine that will own the new entities
    * @param compositeData - the composite resource to instance
    * @param compositeProvider - provider used to resolve nested composite references
-   * @param options - instancing options (`rootEntity`, `entityMapping`, `alreadyRequestedSrc`, `useRootComponent`)
+   * @param options - instancing options (`rootEntity`, `entityMapping`, `alreadyRequestedSrc`)
    * @returns the root entity of the instanced composite
    *
    * @public
