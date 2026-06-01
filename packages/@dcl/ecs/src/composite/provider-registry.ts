@@ -1,5 +1,6 @@
 import type { IEngine } from '../engine'
 import { Schemas } from '../schemas'
+import { getCompositeRootComponent } from './components'
 import type { CompositeProvider } from './instance'
 
 let currentProvider: CompositeProvider | null = null
@@ -12,6 +13,11 @@ let currentProvider: CompositeProvider | null = null
  */
 export function setCompositeProvider(engine: IEngine, provider: CompositeProvider): void {
   currentProvider = provider
+  // Define composite::root pre-seal. setCompositeProvider runs at module-load,
+  // so this guarantees the component exists before the engine seals — composites
+  // instanced at runtime (post-seal) would otherwise trip the seal when
+  // instanceComposite looks it up via getCompositeRootComponent.
+  getCompositeRootComponent(engine)
   if (!provider.schemas) return
   for (const { name, jsonSchema } of provider.schemas) {
     if (engine.getComponentOrNull(name)) continue

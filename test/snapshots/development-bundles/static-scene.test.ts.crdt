@@ -11,9 +11,9 @@ EVAL test/snapshots/development-bundles/static-scene.test.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
-  OPCODES ~= 66k
-  MALLOC_COUNT = 16104
-  ALIVE_OBJS_DELTA ~= 3.19k
+  OPCODES ~= 73k
+  MALLOC_COUNT = 16289
+  ALIVE_OBJS_DELTA ~= 3.24k
 CALL onStart()
   main.crdt: PUT_COMPONENT e=0x200 c=1 t=0 data={"position":{"x":5.880000114440918,"y":2.7916901111602783,"z":7.380000114440918},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   main.crdt: PUT_COMPONENT e=0x202 c=1 t=0 data={"position":{"x":4,"y":0.800000011920929,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
@@ -47,14 +47,14 @@ CALL onStart()
   ALIVE_OBJS_DELTA ~= 0.09k
 CALL onUpdate(0)
    ~system/Testing: plan {"tests":[{"name":"ensure that cubes are in the scene on the first frame"}]}
-  OPCODES ~= 18k
-  MALLOC_COUNT = 41
-  ALIVE_OBJS_DELTA ~= -0.00k
+  OPCODES ~= 19k
+  MALLOC_COUNT = 67
+  ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
   LOG: ["🧪 Running test ensure that cubes are in the scene on the first frame"]
   LOG: ["🟢 Test passed ensure that cubes are in the scene on the first frame"]
   ~system/Testing: logTestResult {"name":"ensure that cubes are in the scene on the first frame","ok":true,"totalFrames":0,"totalTime":0}
-  OPCODES ~= 4k
+  OPCODES ~= 5k
   MALLOC_COUNT = -5
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1420.63k bytes
+  MEMORY_USAGE_COUNT ~= 1425.67k bytes

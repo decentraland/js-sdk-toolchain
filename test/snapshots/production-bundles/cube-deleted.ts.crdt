@@ -9,9 +9,9 @@ EVAL test/snapshots/production-bundles/cube-deleted.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
-  OPCODES ~= 68k
-  MALLOC_COUNT = 14088
-  ALIVE_OBJS_DELTA ~= 3.11k
+  OPCODES ~= 76k
+  MALLOC_COUNT = 14273
+  ALIVE_OBJS_DELTA ~= 3.17k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -43,4 +43,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 6k
   MALLOC_COUNT = 1
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1026.56k bytes
+  MEMORY_USAGE_COUNT ~= 1030.85k bytes
