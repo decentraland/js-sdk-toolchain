@@ -1,11 +1,4 @@
-import TextEncodingPolyfill from 'text-encoding'
-import { setGlobalPolyfill } from '@dcl/ecs'
-
-// NOTE: this function mutates globalThis — it is NOT pure. Do not annotate
-// with /* @__PURE__ */; minifiers would treat the call as dead code and drop
-// the polyfill installation, breaking runtime callers like
-// compositeProvider.loadComposite that rely on globalThis.TextDecoder.
-export function polyfillTextEncoder() {
-  setGlobalPolyfill('TextEncoder', TextEncodingPolyfill.TextEncoder)
-  setGlobalPolyfill('TextDecoder', TextEncodingPolyfill.TextDecoder)
-}
+// The TextEncoder/TextDecoder polyfill now lives in the lean `@dcl/sdk/text-codec`
+// subpath so it can be installed without pulling in the ethereum provider. This
+// re-export keeps the historical `./text-encoder` import path working.
+export { polyfillTextEncoder } from '../text-codec'
