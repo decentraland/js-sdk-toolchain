@@ -311,7 +311,7 @@ export function Engine(options?: IEngineOptions): IEngine {
     await crdtSystem.sendMessages(deletedEntites)
   }
 
-  return {
+  const engineInstance: IEngine = {
     _id: Date.now(),
     addEntity: partialEngine.addEntity,
     removeEntity: partialEngine.removeEntity,
@@ -342,4 +342,6 @@ export function Engine(options?: IEngineOptions): IEngine {
 
     entityContainer: partialEngine.entityContainer
   }
+
+  return engineInstance
 }
