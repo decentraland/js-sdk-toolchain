@@ -89,6 +89,8 @@ export type Events = {
   }
   'Optimize scene': {
     projectHash: string
+    glbsProcessed: number
+    texturesExtracted: number
     filesProcessed: number
     filesOptimized: number
     totalSaved: number
