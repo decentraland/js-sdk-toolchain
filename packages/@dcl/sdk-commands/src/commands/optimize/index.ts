@@ -680,6 +680,23 @@ export async function main(options: Options) {
       quality: settings.quality,
       dryRun
     })
+
+    return {
+      glbsProcessed: totalGlbsProcessed,
+      texturesExtracted: totalTexturesExtracted,
+      compression: results.map((r) => ({
+        path: path.relative(workingDirectory, r.path),
+        originalSize: r.originalSize,
+        optimizedSize: r.optimizedSize,
+        skipped: r.skipped,
+        reason: r.reason
+      })),
+      summary: {
+        filesProcessed: results.length,
+        filesOptimized: optimized.length,
+        totalSaved
+      }
+    }
   } else if (totalGlbsProcessed > 0) {
     printSuccess(
       options.components.logger,
@@ -700,5 +717,23 @@ export async function main(options: Options) {
       quality: settings.quality,
       dryRun
     })
+
+    return {
+      glbsProcessed: totalGlbsProcessed,
+      texturesExtracted: totalTexturesExtracted,
+      compression: [],
+      summary: {
+        filesProcessed: 0,
+        filesOptimized: 0,
+        totalSaved: totalGlbSaved
+      }
+    }
+  }
+
+  return {
+    glbsProcessed: 0,
+    texturesExtracted: 0,
+    compression: [],
+    summary: { filesProcessed: 0, filesOptimized: 0, totalSaved: 0 }
   }
 }
