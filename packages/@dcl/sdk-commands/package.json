@@ -58,7 +58,8 @@
   "files": [
     "dist",
     ".dclrc",
-    "scripts"
+    "scripts",
+    "NOTICE"
   ],
   "keywords": [],
   "license": "Apache-2.0",
