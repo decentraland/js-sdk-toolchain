@@ -764,7 +764,7 @@ export namespace Composite {
     export function fromBinary(buffer: Uint8Array): Composite.Definition;
     // (undocumented)
     export function fromJson(object: any): Composite.Definition;
-    export function instance(engine: IEngine, compositeData: Composite.Resource, compositeProvider: CompositeProvider, options?: InstanceCompositeOptions): void;
+    export function instance(engine: IEngine, compositeData: Composite.Resource, compositeProvider: CompositeProvider, options?: InstanceCompositeOptions): Entity;
     // (undocumented)
     export type Provider = CompositeProvider;
     export function resolveAndNormalizePath(src: string, cwd?: string): string;
@@ -841,6 +841,11 @@ export namespace CompositeDefinition {
 // @public (undocumented)
 export type CompositeProvider = {
     getCompositeOrNull(src: string): CompositeResource | null;
+    loadComposite?: (src: string) => Promise<CompositeResource>;
+    schemas?: Iterable<{
+        name: string;
+        jsonSchema: any;
+    }>;
 };
 
 // @public (undocumented)
@@ -1305,6 +1310,9 @@ export const enum Font {
 export function getComponentEntityTree<T>(engine: Pick<IEngine, 'getEntitiesWith'>, entity: Entity, component: ComponentDefinition<T & {
     parent?: Entity;
 }>): Generator<Entity>;
+
+// @public
+export function getCompositeProvider(): CompositeProvider | null;
 
 // @public @deprecated (undocumented)
 export function getCompositeRootComponent(engine: IEngine): LastWriteWinElementSetComponentDefinition<CompositeRootType>;
@@ -4761,6 +4769,9 @@ export namespace Schemas {
 //
 // @public
 export function ScreenInsetArea(props: UiScreenInsetAreaProps): ReactEcs.JSX.Element;
+
+// @public
+export function setCompositeProvider(engine: IEngine, provider: CompositeProvider): void;
 
 // @public
 export function setGlobalPolyfill<T>(key: string, value: T): void;
