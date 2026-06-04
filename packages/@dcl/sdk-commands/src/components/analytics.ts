@@ -87,6 +87,15 @@ export type Events = {
     code: number
     creatorAddress: string
   }
+  'Optimize scene': {
+    projectHash: string
+    filesProcessed: number
+    filesOptimized: number
+    totalSaved: number
+    format: string
+    quality: number
+    dryRun: boolean
+  }
 }
 
 const noopAnalytics: IAnalyticsComponent = {
