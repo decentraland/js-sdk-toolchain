@@ -3811,7 +3811,6 @@ export interface PBUiCanvasInformation {
     devicePixelRatio: number;
     height: number;
     interactableArea: BorderRect | undefined;
-    screenInsetArea?: BorderRect | undefined;
     width: number;
 }
 
