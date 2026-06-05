@@ -23,7 +23,7 @@ describe('ScreenInsetArea React Ecs', () => {
       height: 1080,
       interactableArea: undefined,
       screenInsetArea: { top: 24, left: 12, right: 16, bottom: 32 }
-    })
+    } as any)
 
     uiRenderer.setUiRenderer(() => <ScreenInsetArea />)
     await engine.update(1)
@@ -57,7 +57,7 @@ describe('ScreenInsetArea React Ecs', () => {
       height: 1080,
       interactableArea: undefined,
       screenInsetArea: { top: 0, left: 0, right: 0, bottom: 0 }
-    })
+    } as any)
 
     uiRenderer.setUiRenderer(() => <ScreenInsetArea />)
     await engine.update(1)
@@ -69,7 +69,7 @@ describe('ScreenInsetArea React Ecs', () => {
       positionBottom: 0
     })
 
-    const next = UiCanvasInformation.getMutable(engine.RootEntity)
+    const next = UiCanvasInformation.getMutable(engine.RootEntity) as any
     next.screenInsetArea = { top: 50, left: 60, right: 70, bottom: 80 }
     await engine.update(1)
 
@@ -116,7 +116,7 @@ describe('ScreenInsetArea React Ecs', () => {
       height: 1080,
       interactableArea: undefined,
       screenInsetArea: { top: 10, left: 10, right: 10, bottom: 10 }
-    })
+    } as any)
 
     uiRenderer.setUiRenderer(() => (
       <ScreenInsetArea

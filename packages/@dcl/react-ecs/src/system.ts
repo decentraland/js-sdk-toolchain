@@ -120,8 +120,9 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
     // Update the screen inset module variable unconditionally — it is
     // independent of the virtual size and useful even when the renderer has no
     // virtual canvas.
-    if (canvasInfo?.screenInsetArea) {
-      setScreenInsetArea(canvasInfo.screenInsetArea, screenInsetAreaOwner)
+    const screenInset = (canvasInfo as any)?.screenInsetArea
+    if (screenInset) {
+      setScreenInsetArea(screenInset, screenInsetAreaOwner)
     }
 
     const activeVirtualSize = getActiveVirtualSize()
