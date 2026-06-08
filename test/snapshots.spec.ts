@@ -191,6 +191,32 @@ async function run(fileName: string, fileContents: string) {
           }
         } else if (moduleName === '~system/Testing') {
           return testingFramework.module
+        } else if (moduleName === '~system/Runtime') {
+          return {
+            async readFile(_data: { fileName: string }) {
+              return { content: new Uint8Array(), hash: '' }
+            },
+            async getExplorerInformation() {
+              return { agent: 'snapshot-tests', platform: 'desktop', configurations: {} }
+            },
+            async getRealm() {
+              return {
+                realmInfo: {
+                  baseUrl: 'http://localhost',
+                  realmName: 'localhost',
+                  networkId: 1,
+                  commsAdapter: 'offline',
+                  isPreview: true
+                }
+              }
+            },
+            async getWorldTime() {
+              return { seconds: 0 }
+            },
+            async getSceneInformation() {
+              return { urn: '', content: [], metadataJson: '{}', baseUrl: '' }
+            }
+          }
         }
 
         throw new Error('Unknown module ' + moduleName)

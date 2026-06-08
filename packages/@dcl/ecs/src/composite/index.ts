@@ -22,6 +22,7 @@ export type {
 }
 export { EntityMappingMode }
 export { getCompositeRootComponent }
+export { setCompositeProvider, getCompositeProvider } from './provider-registry'
 
 /**
  * @public
@@ -64,10 +65,12 @@ export namespace Composite {
   }
 
   /**
-   * Instance a composite and returns its root entity
-   * @param compositeData - state serialized by the CRDT protocol
-   * @param getNextAvailableEntity - function that gives unused entities
-   * @param rootEntity - (optional) suggested mapped rootEntity for the composite
+   * Instance a composite and return its root entity.
+   * @param engine - the engine that will own the new entities
+   * @param compositeData - the composite resource to instance
+   * @param compositeProvider - provider used to resolve nested composite references
+   * @param options - instancing options (`rootEntity`, `entityMapping`, `alreadyRequestedSrc`)
+   * @returns the root entity of the instanced composite
    *
    * @public
    */
@@ -77,7 +80,7 @@ export namespace Composite {
     compositeProvider: CompositeProvider,
     options: InstanceCompositeOptions = {}
   ) {
-    instanceComposite(engine, compositeData, compositeProvider, options)
+    return instanceComposite(engine, compositeData, compositeProvider, options)
   }
 
   /**
