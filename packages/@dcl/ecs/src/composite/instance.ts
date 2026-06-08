@@ -24,6 +24,8 @@ export type CompositeResource = {
  */
 export type CompositeProvider = {
   getCompositeOrNull(src: string): CompositeResource | null
+  loadComposite?: (src: string) => Promise<CompositeResource>
+  schemas?: Iterable<{ name: string; jsonSchema: any }>
 }
 
 /** @public */
@@ -86,7 +88,9 @@ export function getComponentDefinition(
     } else if (component.jsonSchema) {
       return engine.defineComponentFromSchema(component.name, Schemas.fromJson(component.jsonSchema))
     } else {
-      throw new Error(`${component.name} is not defined and there is no schema to define it.`)
+      throw new Error(
+        `Composite references undefined component "${component.name}". Ensure provider.schemas was registered pre-seal via setCompositeProvider().`
+      )
     }
   } else {
     return existingComponentDefinition as LastWriteWinElementSetComponentDefinition<unknown>
@@ -145,6 +149,7 @@ export function instanceComposite(
 
   const TransformComponentNumber = componentNumberFromName('core::Transform')
   const CompositeRootComponent = getCompositeRootComponent(engine)
+  let hadNestedComposite = false
   // Key => EntityNumber from the composite
   // Value => EntityNumber in current engine
   const mappedEntities: Map<Entity, Entity> = new Map()
@@ -163,32 +168,39 @@ export function instanceComposite(
   // If there are more composite inside this one, we instance first.
   // => This is not only a copy, we need to instance. Otherwise, we'd be missing that branches
   // => TODO: in the future, the instanciation is first, then the overides (to parameterize Composite, e.g. house with different wall colors)
-  const childrenComposite = compositeResource.composite.components.find(
-    (item) => item.name === CompositeRootComponent.componentName
-  )
-  if (childrenComposite) {
-    for (const [childCompositeEntity, compositeRawData] of childrenComposite.data) {
-      const childComposite = getComponentValue(CompositeRootComponent, compositeRawData)
-      const childCompositePath = path.resolveComposite(childComposite.src, compositeDirectoryPath)
-      const childCompositeResource = compositeProvider.getCompositeOrNull(childCompositePath)
-      const targetEntity = getCompositeEntity(childCompositeEntity)
-      if (childCompositeResource) {
-        if (
-          alreadyRequestedSrc.has(childCompositeResource.src) ||
-          childCompositeResource.src === compositeResource.src
-        ) {
-          throw new Error(
-            `Composite ${compositeResource.src} has a recursive instanciation while try to instance ${
-              childCompositeResource.src
-            }. Previous instances: ${alreadyRequestedSrc.toString()}`
+  if (CompositeRootComponent) {
+    const childrenComposite = compositeResource.composite.components.find(
+      (item) => item.name === CompositeRootComponent.componentName
+    )
+    if (childrenComposite) {
+      for (const [childCompositeEntity, compositeRawData] of childrenComposite.data) {
+        const childComposite = getComponentValue(CompositeRootComponent, compositeRawData)
+        const childCompositePath = path.resolveComposite(childComposite.src, compositeDirectoryPath)
+        const childCompositeResource = compositeProvider.getCompositeOrNull(childCompositePath)
+        const targetEntity = getCompositeEntity(childCompositeEntity)
+        if (childCompositeResource) {
+          if (
+            alreadyRequestedSrc.has(childCompositeResource.src) ||
+            childCompositeResource.src === compositeResource.src
+          ) {
+            throw new Error(
+              `Composite ${compositeResource.src} has a recursive instanciation while try to instance ${
+                childCompositeResource.src
+              }. Previous instances: ${alreadyRequestedSrc.toString()}`
+            )
+          }
+
+          hadNestedComposite = true
+          instanceComposite(engine, childCompositeResource, compositeProvider, {
+            rootEntity: targetEntity as Entity,
+            alreadyRequestedSrc: new Set(alreadyRequestedSrc).add(childCompositeResource.src),
+            entityMapping: entityMapping?.type === EntityMappingMode.EMM_NEXT_AVAILABLE ? entityMapping : undefined
+          })
+        } else {
+          console.warn(
+            `Composite "${compositeResource.src}" references missing nested composite "${childCompositePath}". Skipping; the spawned subtree will be incomplete.`
           )
         }
-
-        instanceComposite(engine, childCompositeResource, compositeProvider, {
-          rootEntity: targetEntity as Entity,
-          alreadyRequestedSrc: new Set(alreadyRequestedSrc).add(childCompositeResource.src),
-          entityMapping: entityMapping?.type === EntityMappingMode.EMM_NEXT_AVAILABLE ? entityMapping : undefined
-        })
       }
     }
   }
@@ -197,7 +209,7 @@ export function instanceComposite(
   // Then, we copy the all rest of the components (skipping the Composite ones)
   for (const component of compositeResource.composite.components) {
     // We already instanced the composite
-    if (component.name === CompositeRootComponent.componentName) continue
+    if (CompositeRootComponent && component.name === CompositeRootComponent.componentName) continue
 
     // ## 3a ##
     // We find the component definition
@@ -237,15 +249,17 @@ export function instanceComposite(
     }
   }
 
-  const composite =
-    CompositeRootComponent.getMutableOrNull(compositeRootEntity) || CompositeRootComponent.create(compositeRootEntity)
-  for (const [entitySource, targetEntity] of mappedEntities) {
-    composite.entities.push({
-      src: entitySource,
-      dest: targetEntity
-    })
+  if (hadNestedComposite) {
+    const composite =
+      CompositeRootComponent.getMutableOrNull(compositeRootEntity) || CompositeRootComponent.create(compositeRootEntity)
+    for (const [entitySource, targetEntity] of mappedEntities) {
+      composite.entities.push({
+        src: entitySource,
+        dest: targetEntity
+      })
+    }
+    composite.src = compositeResource.src
   }
-  composite.src = compositeResource.src
 
   return compositeRootEntity
 }
