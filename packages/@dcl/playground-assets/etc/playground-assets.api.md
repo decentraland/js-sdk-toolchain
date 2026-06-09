@@ -70,6 +70,31 @@ export const assetLoadLoadingStateSystem: AssetLoadLoadingStateSystem;
 // @public (undocumented)
 export type AssetLoadLoadingStateSystemCallback = (event: DeepReadonlyObject<PBAssetLoadLoadingState>) => void;
 
+// Warning: (ae-missing-release-tag) "AudioAnalysis" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const AudioAnalysis: AudioAnalysisComponentDefinitionExtended;
+
+// Warning: (ae-missing-release-tag) "AudioAnalysisComponentDefinitionExtended" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface AudioAnalysisComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBAudioAnalysis> {
+    createAudioAnalysis(entity: Entity, mode?: PBAudioAnalysisMode, // default is PBAudioAnalysisMode.MODE_LOGARITHMIC
+    amplitudeGain?: number, bandsGain?: number): void;
+    createOrReplaceAudioAnalysis(entity: Entity, mode?: PBAudioAnalysisMode, // default is PBAudioAnalysisMode.MODE_LOGARITHMIC
+    amplitudeGain?: number, bandsGain?: number): void;
+    readIntoView(entity: Entity, out: AudioAnalysisView): void;
+    tryReadIntoView(entity: Entity, out: AudioAnalysisView): boolean;
+}
+
+// Warning: (ae-missing-release-tag) "AudioAnalysisView" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export type AudioAnalysisView = {
+    amplitude: number;
+    bands: number[];
+};
+
 // @public (undocumented)
 export const AudioEvent: GrowOnlyValueSetComponentDefinition<PBAudioEvent>;
 
@@ -161,6 +186,9 @@ export const AvatarEmoteCommand: GrowOnlyValueSetComponentDefinition<PBAvatarEmo
 
 // @public (undocumented)
 export const AvatarEquippedData: LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>;
+
+// @public (undocumented)
+export const AvatarLocomotionSettings: LastWriteWinElementSetComponentDefinition<PBAvatarLocomotionSettings>;
 
 // @public (undocumented)
 export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>;
@@ -660,6 +688,7 @@ export const componentDefinitionByName: {
     "core::Animator": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAnimator>>;
     "core::AssetLoad": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAssetLoad>>;
     "core::AssetLoadLoadingState": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAssetLoadLoadingState>>;
+    "core::AudioAnalysis": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioAnalysis>>;
     "core::AudioEvent": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAudioEvent>>;
     "core::AudioSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioSource>>;
     "core::AudioStream": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioStream>>;
@@ -667,6 +696,7 @@ export const componentDefinitionByName: {
     "core::AvatarBase": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarBase>>;
     "core::AvatarEmoteCommand": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>>;
     "core::AvatarEquippedData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>>;
+    "core::AvatarLocomotionSettings": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarLocomotionSettings>>;
     "core::AvatarModifierArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>>;
     "core::AvatarShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarShape>>;
     "core::Billboard": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBBillboard>>;
@@ -734,7 +764,7 @@ export namespace Composite {
     export function fromBinary(buffer: Uint8Array): Composite.Definition;
     // (undocumented)
     export function fromJson(object: any): Composite.Definition;
-    export function instance(engine: IEngine, compositeData: Composite.Resource, compositeProvider: CompositeProvider, options?: InstanceCompositeOptions): void;
+    export function instance(engine: IEngine, compositeData: Composite.Resource, compositeProvider: CompositeProvider, options?: InstanceCompositeOptions): Entity;
     // (undocumented)
     export type Provider = CompositeProvider;
     export function resolveAndNormalizePath(src: string, cwd?: string): string;
@@ -811,6 +841,11 @@ export namespace CompositeDefinition {
 // @public (undocumented)
 export type CompositeProvider = {
     getCompositeOrNull(src: string): CompositeResource | null;
+    loadComposite?: (src: string) => Promise<CompositeResource>;
+    schemas?: Iterable<{
+        name: string;
+        jsonSchema: any;
+    }>;
 };
 
 // @public (undocumented)
@@ -1276,6 +1311,9 @@ export function getComponentEntityTree<T>(engine: Pick<IEngine, 'getEntitiesWith
     parent?: Entity;
 }>): Generator<Entity>;
 
+// @public
+export function getCompositeProvider(): CompositeProvider | null;
+
 // @public @deprecated (undocumented)
 export function getCompositeRootComponent(engine: IEngine): LastWriteWinElementSetComponentDefinition<CompositeRootType>;
 
@@ -1537,6 +1575,7 @@ export const enum InputAction {
     IA_JUMP = 8,
     // (undocumented)
     IA_LEFT = 7,
+    IA_MODIFIER = 14,
     // (undocumented)
     IA_POINTER = 0,
     // (undocumented)
@@ -2352,6 +2391,46 @@ export namespace PBAssetLoadLoadingState {
 }
 
 // @public (undocumented)
+export interface PBAudioAnalysis {
+    amplitude: number;
+    amplitudeGain?: number | undefined;
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    band0: number;
+    // (undocumented)
+    band1: number;
+    // (undocumented)
+    band2: number;
+    // (undocumented)
+    band3: number;
+    // (undocumented)
+    band4: number;
+    // (undocumented)
+    band5: number;
+    // (undocumented)
+    band6: number;
+    // (undocumented)
+    band7: number;
+    bandsGain?: number | undefined;
+    mode: PBAudioAnalysisMode;
+}
+
+// @public (undocumented)
+export namespace PBAudioAnalysis {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAudioAnalysis;
+    // (undocumented)
+    export function encode(message: PBAudioAnalysis, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export const enum PBAudioAnalysisMode {
+    // (undocumented)
+    MODE_LOGARITHMIC = 1,
+    // (undocumented)
+    MODE_RAW = 0
+}
+
+// @public (undocumented)
 export interface PBAudioEvent {
     // (undocumented)
     state: MediaState;
@@ -2470,6 +2549,24 @@ export namespace PBAvatarEquippedData {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarEquippedData;
     // (undocumented)
     export function encode(message: PBAvatarEquippedData, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAvatarLocomotionSettings {
+    hardLandingCooldown?: number | undefined;
+    jogSpeed?: number | undefined;
+    jumpHeight?: number | undefined;
+    runJumpHeight?: number | undefined;
+    runSpeed?: number | undefined;
+    walkSpeed?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBAvatarLocomotionSettings {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarLocomotionSettings;
+    // (undocumented)
+    export function encode(message: PBAvatarLocomotionSettings, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3013,7 +3110,7 @@ export interface PBParticleSystem {
     additionalForce?: PBVector3 | undefined;
     billboard?: boolean | undefined;
     blendMode?: PBParticleSystem_BlendMode | undefined;
-    bursts: PBParticleSystem_Burst[];
+    bursts?: PBParticleSystem_BurstConfiguration | undefined;
     // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
     // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
     colorOverTime?: ColorRange | undefined;
@@ -3100,6 +3197,20 @@ export namespace PBParticleSystem_Burst {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_Burst;
     // (undocumented)
     export function encode(message: PBParticleSystem_Burst, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_BurstConfiguration {
+    // (undocumented)
+    values: PBParticleSystem_Burst[];
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_BurstConfiguration {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_BurstConfiguration;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_BurstConfiguration, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3624,6 +3735,7 @@ export interface PBUiCanvasInformation {
     devicePixelRatio: number;
     height: number;
     interactableArea: BorderRect | undefined;
+    screenInsetArea?: BorderRect | undefined;
     width: number;
 }
 
@@ -4653,6 +4765,14 @@ export namespace Schemas {
     }) => void;
 }
 
+// Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
+//
+// @public
+export function ScreenInsetArea(props: UiScreenInsetAreaProps): ReactEcs.JSX.Element;
+
+// @public
+export function setCompositeProvider(engine: IEngine, provider: CompositeProvider): void;
+
 // @public
 export function setGlobalPolyfill<T>(key: string, value: T): void;
 
@@ -5195,6 +5315,11 @@ export type uint32 = number;
 export type UiRendererOptions = {
     virtualWidth: number;
     virtualHeight: number;
+};
+
+// @public
+export type UiScreenInsetAreaProps = Omit<EntityPropTypes, 'uiTransform'> & {
+    uiTransform?: Omit<NonNullable<EntityPropTypes['uiTransform']>, 'positionType' | 'position'>;
 };
 
 // @public (undocumented)

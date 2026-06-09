@@ -19,7 +19,8 @@ const InputCommands: InputAction[] = [
   InputAction.IA_ACTION_3,
   InputAction.IA_ACTION_4,
   InputAction.IA_ACTION_5,
-  InputAction.IA_ACTION_6
+  InputAction.IA_ACTION_6,
+  InputAction.IA_MODIFIER
 ]
 /**
  * @public

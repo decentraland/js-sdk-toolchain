@@ -1,5 +1,7 @@
 # AI Agent Context
 
+> **Documentation map** — this file is the canonical project briefing. For development commands and contribution conventions see [../AGENTS.md](../AGENTS.md); for the curated index of every per-topic doc in this repo (component serialization, CRDT internals, on-demand composite loading, etc.) see [REFERENCES.md](REFERENCES.md).
+
 **Service Purpose:** The Decentraland JavaScript SDK Toolchain is the monorepo that provides all TypeScript/JavaScript packages for building interactive 3D scenes in the Decentraland metaverse. It covers the full developer workflow: an Entity Component System (ECS) runtime with CRDT-based networking, React UI bindings, a CLI for building and deploying scenes, and type definitions for the scene runtime environment.
 
 **Key Capabilities:**

@@ -83,12 +83,8 @@ ${
   `
 import { syncEntity } from '@dcl/sdk/network'
 import players from '@dcl/sdk/players'
-import { initAssetPacks, setSyncEntity } from '@dcl/asset-packs/dist/scene-entrypoint'
+import { initAssetPacks } from '@dcl/asset-packs/dist/scene-entrypoint'
 initAssetPacks(engine, { syncEntity }, players)
-
-// TODO: do we need to do this on runtime ?
-// I think we have that information at build-time and we avoid to do evaluate this on the worker.
-// Read composite.json or main.crdt => If that file has a NetworkEntity import '@dcl/@sdk/network'
 `
 }
 
@@ -196,7 +192,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
     preserveSymlinks: false,
     outfile: options.outputFile,
     allowOverwrite: false,
-    sourcemap: options.production ? 'external' : 'inline',
+    sourcemap: options.production ? false : 'inline',
     minify: options.production,
     minifyIdentifiers: options.production,
     minifySyntax: options.production,

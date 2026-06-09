@@ -1,4 +1,5 @@
 import {
+  BorderRect,
   engine,
   IEngine,
   LastWriteWinElementSetComponentDefinition,
@@ -11,6 +12,11 @@ import { parseUiTransform } from './uiTransform'
 
 let uiScaleFactor = 1
 let uiScaleOwner: symbol | undefined = undefined
+
+const ZERO_INSETS: BorderRect = { top: 0, left: 0, right: 0, bottom: 0 }
+
+let screenInsetArea: BorderRect = { ...ZERO_INSETS }
+let screenInsetAreaOwner: symbol | undefined = undefined
 
 /**
  * @internal
@@ -69,12 +75,21 @@ export function getUiScaleFactor(): number {
 }
 
 /**
+ * Sets the global UI scale factor.
+ *
+ * The `owner` symbol implements a cooperative reset-protection scheme shared
+ * with {@link resetUiScaleFactor}:
+ *  - Writes always succeed — last writer claims ownership (the most recent
+ *    `owner` passed to `set` is the one allowed to `reset`).
+ *  - Resets from a non-matching owner are ignored, so a stale system can't
+ *    stomp the active scale while another system is driving it.
+ *  - A reset called without an owner always wins (used by tests / teardown).
+ *
  * @internal
  */
 export function setUiScaleFactor(nextScale: number, owner?: symbol): void {
   if (!Number.isFinite(nextScale) || nextScale < 0) return
   if (owner) {
-    // Mark ownership so only that system can reset the scale.
     uiScaleOwner = owner
   }
   uiScaleFactor = nextScale
@@ -84,10 +99,49 @@ export function setUiScaleFactor(nextScale: number, owner?: symbol): void {
  * @internal
  */
 export function resetUiScaleFactor(owner?: symbol): void {
-  // Ignore resets from non-owners to avoid stomping active scale.
+  // No-op for non-owners (see ownership rules on `setUiScaleFactor`).
+  // A reset with no owner always wins — used by tests and teardown.
   if (owner && uiScaleOwner !== owner) return
   uiScaleOwner = undefined
   uiScaleFactor = 1
+}
+
+/**
+ * @internal
+ */
+export function getScreenInsetArea(): BorderRect {
+  return { ...screenInsetArea }
+}
+
+/**
+ * Sets the global screen inset area.
+ *
+ * The `owner` symbol implements a cooperative reset-protection scheme shared
+ * with {@link resetScreenInsetArea}:
+ *  - Writes always succeed — last writer claims ownership (the most recent
+ *    `owner` passed to `set` is the one allowed to `reset`).
+ *  - Resets from a non-matching owner are ignored, so a stale system can't
+ *    stomp the active insets while another system is driving them.
+ *  - A reset called without an owner always wins (used by tests / teardown).
+ *
+ * @internal
+ */
+export function setScreenInsetArea(next: BorderRect, owner?: symbol): void {
+  if (owner) {
+    screenInsetAreaOwner = owner
+  }
+  screenInsetArea = { top: next.top, left: next.left, right: next.right, bottom: next.bottom }
+}
+
+/**
+ * @internal
+ */
+export function resetScreenInsetArea(owner?: symbol): void {
+  // No-op for non-owners (see ownership rules on `setScreenInsetArea`).
+  // A reset with no owner always wins — used by tests and teardown.
+  if (owner && screenInsetAreaOwner !== owner) return
+  screenInsetAreaOwner = undefined
+  screenInsetArea = { ...ZERO_INSETS }
 }
 
 /**
