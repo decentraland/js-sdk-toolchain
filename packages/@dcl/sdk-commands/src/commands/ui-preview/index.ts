@@ -35,9 +35,15 @@ export async function help(options: Options) {
     Renders the scene's react-ecs UI in the browser with hot-reload, so you can
     iterate on layout without launching the full 3D client.
 
-    Zero-config: with no extra files it runs the scene's main() and renders
-    whatever UI the scene registers on boot. Add a ui-preview.tsx to seed game
-    state and declare named panels (a panel switcher appears in the toolbar).
+    Zero-config: runs the scene's main() and renders whatever UI it registers.
+
+    Panels: add a ui-preview.tsx that calls your setup and default-exports
+    named functions seeding game state — each becomes a sidebar entry, so you
+    can flip through every screen without playing to reach it.
+
+    Stories: any *.stories.tsx file (named function exports returning JSX)
+    becomes a sidebar group; each story renders that component in isolation —
+    a storybook for your scene's components.
 
     Options:
       -h, --help            Displays this help
@@ -45,7 +51,7 @@ export async function help(options: Options) {
       --entry <file>        UI entry file (default: ui-preview.tsx, else main())
       -p, --port <number>   Preview server port (default: auto)
       --no-browser          Do not open the browser automatically
-      --mobile              Start in mobile (isMobile=true) layout
+      --mobile              Force isMobile()=true regardless of canvas preset
 
     Example:
       sdk-commands ui-preview
