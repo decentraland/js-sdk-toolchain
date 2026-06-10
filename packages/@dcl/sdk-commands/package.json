@@ -67,7 +67,7 @@
     "directory": "packages/@dcl/sdk-commands"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json && rm -rf dist/locales && cp -r src/locales dist/locales && cp src/logic/*.template dist/logic/",
+    "build": "tsc -p tsconfig.json && rm -rf dist/locales && cp -r src/locales dist/locales && cp src/logic/*.template dist/logic/ && rm -rf dist/commands/ui-preview/harness && cp -r src/commands/ui-preview/harness dist/commands/ui-preview/harness",
     "start": "tsc -p tsconfig.json --watch && rm -rf dist/locales && cp -r src/locales dist/locales",
     "postinstall": "node scripts/postinstall.js"
   },

@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "jsx": "react",
+    "jsxFactory": "ReactEcs.createElement",
+    "jsxFragmentFactory": "ReactEcs.Fragment",
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@dcl/ecs": ["../ecs/dist/index.d.ts"],
+      "@dcl/react-ecs": ["../react-ecs/dist/index.d.ts"]
+    }
+  },
+  "include": ["src"]
+}
