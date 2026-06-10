@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>react-ecs preview</title>
+    <style>
+      :root {
+        --bg: #15151a;
+        --panel: #1f1f27;
+        --border: #34343f;
+        --text: #e6e6ee;
+        --muted: #8a8a99;
+        --accent: #ff2d55;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        height: 100%;
+        background: var(--bg);
+        color: var(--text);
+        font-family: ui-sans-serif, system-ui, sans-serif;
+      }
+      #app { display: flex; flex-direction: column; height: 100%; }
+      header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 16px;
+        background: var(--panel);
+        border-bottom: 1px solid var(--border);
+        font-size: 13px;
+      }
+      header .title { font-weight: 600; }
+      header .dot { width: 8px; height: 8px; border-radius: 50%; background: #3ad07a; }
+      header .spacer { flex: 1; }
+      header label { color: var(--muted); }
+      header select {
+        background: #2a2a33;
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 4px 8px;
+      }
+      #stage {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        padding: 24px;
+      }
+      /* #preview-root emulates the in-world UI canvas (the full screen). It's
+         scaled down by JS (fit()) to fit the window so the whole canvas is visible. */
+      #preview-root {
+        position: relative;
+        overflow: hidden;
+        background: #0d0d11;
+        box-shadow: 0 12px 48px rgba(0, 0, 0, 0.55);
+        border: 1px solid var(--border);
+        transform-origin: center center;
+        /* Keep the exact logical canvas size — never flex-shrink to the window,
+           or the renderer would read the wrong canvas dims. fit() scales visually. */
+        flex: none;
+        /* default canvas; overridden by the size selector */
+        width: 1920px;
+        height: 1080px;
+      }
+      #err {
+        display: none;
+        position: fixed;
+        left: 0; right: 0; bottom: 0;
+        max-height: 45%;
+        overflow: auto;
+        background: #2a0d12;
+        border-top: 2px solid var(--accent);
+        color: #ffd7dd;
+        font-family: ui-monospace, monospace;
+        font-size: 12px;
+        white-space: pre-wrap;
+        padding: 12px 16px;
+        z-index: 9999;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <header>
+        <span class="dot"></span>
+        <span class="title">react-ecs preview</span>
+        <span class="spacer"></span>
+        <label for="size">canvas</label>
+        <select id="size">
+          <option value="1920x1080">1920 × 1080</option>
+          <option value="1280x720">1280 × 720</option>
+          <option value="1024x768">1024 × 768</option>
+          <option value="1561x720" data-mobile="1">iPhone 14 Pro (1561 × 720)</option>
+        </select>
+      </header>
+      <div id="stage">
+        <div id="preview-root"></div>
+      </div>
+    </div>
+    <pre id="err"></pre>
+
+    <script>
+      // Canvas size selector
+      var sel = document.getElementById('size')
+      var root = document.getElementById('preview-root')
+      var stage = document.getElementById('stage')
+
+      // Scale the whole canvas down so it always fits the window — lets you see
+      // the entire UI even when a panel is taller than the viewport. The logical
+      // canvas size (what the UI lays out against) is unchanged; this is just zoom.
+      function fit() {
+        var availW = stage.clientWidth - 48
+        var availH = stage.clientHeight - 48
+        var scale = Math.min(availW / root.offsetWidth, availH / root.offsetHeight, 1)
+        root.style.transform = 'scale(' + scale + ')'
+      }
+      // The "mobile" preset drives the mocked isMobile() (read live by the scene's
+      // responsive layout). Set before the bundle runs so the first render is right.
+      function syncMobile() {
+        window.__previewMobile = sel.selectedOptions[0].dataset.mobile === '1'
+      }
+      // Godot applies content_scale_factor = min(w/720, h/720) to the window, so the
+      // canvas the scene actually sees (UiCanvasInformation) is window / content_scale
+      // — which works out to ~720px tall in landscape. Replicate that exactly so the
+      // preview's layout scale matches the client (otherwise the UI is oversized).
+      function applyCanvas() {
+        var p = sel.value.split('x')
+        var dw = parseInt(p[0], 10)
+        var dh = parseInt(p[1], 10)
+        var contentScale = Math.min(dw / 720, dh / 720)
+        root.style.width = Math.round(dw / contentScale) + 'px'
+        root.style.height = Math.round(dh / contentScale) + 'px'
+        root.dataset.dpr = String(contentScale)
+        syncMobile()
+        fit()
+      }
+      // Persist the canvas choice so switching panels (a page reload) keeps it.
+      try {
+        var saved = localStorage.getItem('preview:canvas')
+        // Only restore if it still matches an existing option.
+        if (saved && [].some.call(sel.options, function (o) { return o.value === saved })) {
+          sel.value = saved
+        }
+      } catch (e) {}
+      sel.addEventListener('change', function () {
+        try {
+          localStorage.setItem('preview:canvas', sel.value)
+        } catch (e) {}
+        applyCanvas()
+      })
+      window.addEventListener('resize', fit)
+      applyCanvas()
+      // Surface uncaught errors in-page so a broken UI doesn't just blank out.
+      var errBox = document.getElementById('err')
+      window.__showError = function (msg) {
+        errBox.style.display = 'block'
+        errBox.textContent = String(msg)
+      }
+      window.__clearError = function () {
+        errBox.style.display = 'none'
+        errBox.textContent = ''
+      }
+      window.addEventListener('error', function (e) {
+        window.__showError((e.error && e.error.stack) || e.message)
+      })
+    </script>
+    <script type="module" src="/bundle.js"></script>
+    <!-- esbuild live-reload: reload the page on every rebuild -->
+    <script>
+      new EventSource('/esbuild').addEventListener('change', function () {
+        location.reload()
+      })
+    </script>
+  </body>
+</html>

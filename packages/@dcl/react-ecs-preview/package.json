@@ -1,0 +1,13 @@
+{
+  "name": "@dcl/react-ecs-preview",
+  "description": "Local browser preview for @dcl/react-ecs UIs, with hot-reload",
+  "version": "0.0.1",
+  "private": true,
+  "author": "DCL",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "start": "node dev-server.mjs",
+    "dev": "node dev-server.mjs"
+  }
+}
