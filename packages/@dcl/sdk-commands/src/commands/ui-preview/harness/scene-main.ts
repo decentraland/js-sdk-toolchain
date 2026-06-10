@@ -43,7 +43,7 @@ export function startScenePreview(scenarios?: Scenarios, storyModules?: StoryMod
     if (story) renderStory(story)
   }
 
-  buildSidebar(panelNames, stories, selection.id)
+  buildSidebar(panelNames, stories, selection.kind === 'boot' ? '__boot__' : selection.id)
 
   const dpr = () => parseFloat(root.dataset.dpr || '1') || 1
   const renderer = setupSceneRenderer({
@@ -131,13 +131,10 @@ function activeSelection(panelNames: string[], stories: Story[]): Selection {
 
 // ── Sidebar ───────────────────────────────────────────────────────────────────
 
+// Always visible — even when empty it teaches the panel/stories conventions.
 function buildSidebar(panelNames: string[], stories: Story[], activeId: string): void {
   const sidebar = document.getElementById('sidebar')
   if (!sidebar) return
-  if (!panelNames.length && !stories.length) {
-    sidebar.style.display = 'none'
-    return
-  }
 
   const addGroup = (title: string) => {
     const h = document.createElement('div')
@@ -152,16 +149,30 @@ function buildSidebar(panelNames: string[], stories: Story[], activeId: string):
     b.addEventListener('click', () => onClick(b))
     sidebar.appendChild(b)
   }
+  const addHint = (html: string) => {
+    const d = document.createElement('div')
+    d.className = 'hint'
+    d.innerHTML = html
+    sidebar.appendChild(d)
+  }
 
-  if (panelNames.length) {
-    addGroup('Scene')
-    for (const name of panelNames) {
-      // Panels mutate state → reload for a clean slate.
-      addItem(name, name, () => {
-        location.hash = 'scenario=' + encodeURIComponent(name)
-        location.reload()
-      })
-    }
+  addGroup('Scene')
+  // Boot = whatever the scene registers on startup, with no panel state applied.
+  addItem('Boot', '__boot__', () => {
+    location.hash = ''
+    location.reload()
+  })
+  for (const name of panelNames) {
+    // Panels mutate state → reload for a clean slate.
+    addItem(name, name, () => {
+      location.hash = 'scenario=' + encodeURIComponent(name)
+      location.reload()
+    })
+  }
+  if (!panelNames.length) {
+    addHint(
+      'Add panels: create <code>ui-preview.tsx</code> default-exporting named functions that seed each screen’s state.'
+    )
   }
 
   let lastGroup = ''
@@ -177,5 +188,11 @@ function buildSidebar(panelNames: string[], stories: Story[], activeId: string):
       for (const el of sidebar.querySelectorAll('.item.active')) el.classList.remove('active')
       self.classList.add('active')
     })
+  }
+  if (!stories.length) {
+    addGroup('Stories')
+    addHint(
+      'Add a component catalog: create <code>src/MyComponent.stories.tsx</code> — every exported function renders here in isolation.'
+    )
   }
 }

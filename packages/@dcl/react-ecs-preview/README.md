@@ -140,8 +140,8 @@ off each entity, rebuild the tree via the `parent` / `rightOf` links, and emit a
 - **Scene mode renders against mocked data.** Network/players/storage are stubbed,
   so panels show their empty/disconnected state (e.g. "Unranked", "0 / 72"). The
   canvas-size selector re-seeds `UiCanvasInformation` live, so responsive scale
-  recomputes when you resize; the mobile preset (iPhone 14 Pro, landscape
-  852×393) also flips `isMobile()` to `true`.
+  recomputes when you resize; the mobile preset (iPhone 14 Pro native
+  2556×1179 → canvas 1561×720, dpr 1.64) also flips `isMobile()` to `true`.
 - **Canvas matches the client's content-scale.** Presets are *device* resolutions.
   Like the Godot client (`apply_ui_zoom`), the preview scales each by
   `content_scale = min(w/720, h/720)` and feeds the scene the resulting canvas

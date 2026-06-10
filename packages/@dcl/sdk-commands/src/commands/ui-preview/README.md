@@ -77,11 +77,12 @@ restarting the server.
 ### The toolbar
 
 - **canvas** — device presets. Sizes are *device* resolutions; the preview
-  applies the same content-scale the client does, so your px values and font
-  sizes look exactly as in-world. The **iPhone 14 Pro** preset uses the
-  client's emulated mobile window and flips `isMobile()` to `true`, so
-  responsive layouts render their mobile form. The choice persists across
-  reloads.
+  applies the same content-scale the client does (`min(w/720, h/720)`), so your
+  px values and font sizes look exactly as in-world. The **iPhone 14 Pro**
+  preset is the native 2556×1179 — producing the same 1561×720 canvas and
+  ~1.64 devicePixelRatio a real device reports — and flips `isMobile()` to
+  `true`, so responsive layouts render their mobile form. The choice persists
+  across reloads.
 - Clicks work: `onMouseDown`/`onMouseUp`/`onClick` fire through the real
   pointer systems. `useState`/`useEffect` work — timers tick, counters count.
 - Errors appear in a red overlay at the bottom instead of a blank page.
