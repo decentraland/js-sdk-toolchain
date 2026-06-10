@@ -281,13 +281,36 @@ async function scaffoldEntry(workingDir: string): Promise<string> {
 // Each entry below becomes a button in the preview's sidebar. Clicking it puts
 // your UI into that state — so you can jump straight to any screen (a menu, the
 // game-over panel, ...) without playing to reach it.
+import { Color4 } from '@dcl/sdk/math'
+import ReactEcs, { Label, ReactEcsRenderer, UiEntity } from '@dcl/sdk/react-ecs'
 ${importLine}
 
 ${callLine}
 
+// A visible demo so the first click does something — replace it with your own.
+const ExampleBanner = () => (
+  <UiEntity
+    uiTransform={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' }}
+  >
+    <UiEntity
+      uiTransform={{ padding: 24, borderRadius: 12, flexDirection: 'column', alignItems: 'center' }}
+      uiBackground={{ color: Color4.create(0.1, 0.1, 0.16, 0.95) }}
+    >
+      <Label value="<b>This is the 'Example' panel</b>" fontSize={22} color={Color4.White()} />
+      <Label
+        value="Edit ui-preview.tsx: replace this with a function that opens one of YOUR screens"
+        fontSize={14}
+        color={Color4.create(0.65, 0.65, 0.75, 1)}
+      />
+    </UiEntity>
+  </UiEntity>
+)
+
 export default {
   // The name is the sidebar label; the function sets up the state for it:
-  //
+  'Example panel': () => ReactEcsRenderer.setUiRenderer(ExampleBanner),
+
+  // Real panels change YOUR scene's state, e.g.:
   // 'Shop open':  () => openShop(),
   // 'Game over':  () => GameState.create(engine.addEntity(), { state: 'ended', score: 1250 }),
 }
@@ -444,7 +467,8 @@ function startAssetServer(root: string, port: number): string {
       const pathname = decodeURIComponent(new URL(req.url || '/', 'http://x').pathname)
 
       if (req.method === 'POST' && pathname.startsWith('/__scaffold/')) {
-        void handleScaffold(root, pathname.slice('/__scaffold/'.length), res)
+        const force = new URL(req.url || '/', 'http://x').searchParams.get('force') === '1'
+        void handleScaffold(root, pathname.slice('/__scaffold/'.length), force, res)
         return
       }
 
@@ -470,8 +494,10 @@ function startAssetServer(root: string, port: number): string {
 
 // Writes the starter file for the requested kind. The esbuild watcher picks the
 // new file up (watchFiles/watchDirs on the virtual modules) and the page
-// live-reloads with it — no restart.
-async function handleScaffold(root: string, kind: string, res: http.ServerResponse): Promise<void> {
+// live-reloads with it — no restart. `force` overwrites an existing file, but
+// ONLY when it demonstrably has no creator content (empty default export) —
+// never clobber edited files.
+async function handleScaffold(root: string, kind: string, force: boolean, res: http.ServerResponse): Promise<void> {
   try {
     let target: string
     let contents: string
@@ -486,8 +512,13 @@ async function handleScaffold(root: string, kind: string, res: http.ServerRespon
       return
     }
     if (fsSync.existsSync(target)) {
-      res.writeHead(409, { 'content-type': 'text/plain' }).end(path.basename(target))
-      return
+      const overwritable = kind === 'panels' && hasEmptyDefaultExport(await fs.readFile(target, 'utf8'))
+      if (!(force && overwritable)) {
+        res
+          .writeHead(409, { 'content-type': 'text/plain' })
+          .end(`${overwritable ? 'EMPTY' : 'EDITED'}:${path.basename(target)}`)
+        return
+      }
     }
     await fs.mkdir(path.dirname(target), { recursive: true })
     await fs.writeFile(target, contents, 'utf8')
@@ -495,6 +526,13 @@ async function handleScaffold(root: string, kind: string, res: http.ServerRespon
   } catch (e) {
     res.writeHead(500, { 'content-type': 'text/plain' }).end(String(e))
   }
+}
+
+// True when the file's default export is an object with no entries (comments
+// aside) — i.e. an untouched scaffold that is safe to replace.
+function hasEmptyDefaultExport(code: string): boolean {
+  const stripped = code.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '')
+  return /export\s+default\s*\{\s*\}/.test(stripped)
 }
 
 // Self-contained example — imports only the SDK, so it compiles in any scene.

@@ -162,17 +162,22 @@ function buildSidebar(panelNames: string[], stories: Story[], activeId: string, 
   }
   // "Create it for me": POSTs to the dev server, which writes a starter file;
   // the watcher picks it up and the page live-reloads with it. No restart.
-  const addScaffoldButton = (label: string, kind: 'panels' | 'stories') => {
+  // With force, the server overwrites — but only after verifying the existing
+  // file has no creator content (it answers 409 EDITED otherwise).
+  const addScaffoldButton = (label: string, kind: 'panels' | 'stories', force = false) => {
     const b = document.createElement('button')
     b.className = 'hint-btn'
     b.textContent = label
     b.addEventListener('click', () => {
       b.disabled = true
       b.textContent = 'Creating…'
-      fetch(`${__SCENE_ASSETS__}__scaffold/${kind}`, { method: 'POST' })
+      fetch(`${__SCENE_ASSETS__}__scaffold/${kind}${force ? '?force=1' : ''}`, { method: 'POST' })
         .then(async (r) => {
-          const file = await r.text()
+          const body = await r.text()
+          const file = body.replace(/^(EMPTY|EDITED):/, '')
           if (r.status === 201) b.textContent = `Created ${file} — reloading…`
+          else if (r.status === 409 && body.startsWith('EDITED'))
+            b.textContent = `${file} has your code — edit it instead`
           else if (r.status === 409) b.textContent = `${file} already exists — edit it`
           else b.textContent = 'Failed — see terminal'
         })
@@ -197,8 +202,10 @@ function buildSidebar(panelNames: string[], stories: Story[], activeId: string, 
   if (!panelNames.length) {
     addHint('Panels are shortcuts to your screens (shop open, game over, …).')
     if (entryMeta?.mode === 'file') {
-      // The file exists but its default export has no entries yet.
-      addHint(`Open ${entryMeta.file} and add entries to its default export — each one becomes a button here.`)
+      // The file exists but its default export has no entries yet. Offer a
+      // working example — the server refuses if the file has creator code.
+      addHint(`${entryMeta.file} exists but has no panels yet.`)
+      addScaffoldButton('↻ Replace it with a working example', 'panels', true)
     } else {
       addScaffoldButton('+ Create ui-preview.tsx', 'panels')
     }
