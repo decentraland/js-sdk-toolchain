@@ -99,10 +99,10 @@ export async function main(options: Options) {
   // file (by hand or via the sidebar's "create it for me" button) hot-swaps in
   // without restarting the server.
   const stdinContents = [
-    `import scenarios from 'preview:entry'`,
+    `import scenarios, { __entryMeta } from 'preview:entry'`,
     `import stories from 'preview:stories'`,
     `import { startScenePreview } from ${JSON.stringify(path.join(harnessDir, 'scene-main.ts'))}`,
-    `startScenePreview(scenarios, stories)`
+    `startScenePreview(scenarios, stories, __entryMeta)`
   ].join('\n')
 
   const ctx = await esbuild.context({
@@ -229,18 +229,25 @@ function entryPlugin(workingDir: string, explicit: string | undefined): esbuild.
       build.onResolve({ filter: /^preview:entry$/ }, (a) => ({ path: a.path, namespace: 'dcl-preview-entry' }))
       build.onLoad({ filter: /.*/, namespace: 'dcl-preview-entry' }, () => {
         const entry = resolveEntrySync(workingDir, explicit)
+        // __entryMeta lets the sidebar tailor its hints — e.g. "edit your
+        // ui-preview.tsx" (file exists, zero panels) vs "create one" (no file).
+        const meta = `export const __entryMeta = ${JSON.stringify({
+          mode: entry.kind,
+          file: entry.path ? path.relative(workingDir, entry.path).split(path.sep).join('/') : ''
+        })}`
         let contents: string
         if (entry.kind === 'file') {
-          contents = [`import def from ${JSON.stringify(entry.path)}`, `export default def`].join('\n')
+          contents = [`import def from ${JSON.stringify(entry.path)}`, `export default def`, meta].join('\n')
         } else if (entry.kind === 'main') {
           contents = [
             `import * as scene from ${JSON.stringify(entry.path)}`,
             `Promise.resolve(typeof (scene as any).main === 'function' ? (scene as any).main() : undefined)`,
             `  .catch((e) => (window as any).__showError?.('scene main() failed: ' + ((e && e.stack) || e)))`,
-            `export default undefined`
+            `export default undefined`,
+            meta
           ].join('\n')
         } else {
-          contents = `export default undefined`
+          contents = [`export default undefined`, meta].join('\n')
         }
         return {
           contents,

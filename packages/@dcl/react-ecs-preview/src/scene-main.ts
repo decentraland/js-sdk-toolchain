@@ -27,7 +27,9 @@ const win = window as unknown as {
   __clearError?: () => void
 }
 
-export function startScenePreview(scenarios?: Scenarios, storyModules?: StoryModule[]): void {
+type EntryMeta = { mode: 'file' | 'main' | 'none'; file: string }
+
+export function startScenePreview(scenarios?: Scenarios, storyModules?: StoryModule[], entryMeta?: EntryMeta): void {
   const root = document.getElementById('preview-root')
   if (!root) throw new Error('#preview-root not found')
 
@@ -46,7 +48,7 @@ export function startScenePreview(scenarios?: Scenarios, storyModules?: StoryMod
     if (story) renderStory(story)
   }
 
-  buildSidebar(panelNames, stories, selection.kind === 'boot' ? '__boot__' : selection.id)
+  buildSidebar(panelNames, stories, selection.kind === 'boot' ? '__boot__' : selection.id, entryMeta)
 
   const dpr = () => parseFloat(root.dataset.dpr || '1') || 1
   const renderer = setupSceneRenderer({
@@ -135,7 +137,7 @@ function activeSelection(panelNames: string[], stories: Story[]): Selection {
 // ── Sidebar ───────────────────────────────────────────────────────────────────
 
 // Always visible — even when empty it teaches the panel/stories conventions.
-function buildSidebar(panelNames: string[], stories: Story[], activeId: string): void {
+function buildSidebar(panelNames: string[], stories: Story[], activeId: string, entryMeta?: EntryMeta): void {
   const sidebar = document.getElementById('sidebar')
   if (!sidebar) return
 
@@ -194,7 +196,12 @@ function buildSidebar(panelNames: string[], stories: Story[], activeId: string):
   }
   if (!panelNames.length) {
     addHint('Panels are shortcuts to your screens (shop open, game over, …).')
-    addScaffoldButton('+ Create ui-preview.tsx', 'panels')
+    if (entryMeta?.mode === 'file') {
+      // The file exists but its default export has no entries yet.
+      addHint(`Open ${entryMeta.file} and add entries to its default export — each one becomes a button here.`)
+    } else {
+      addScaffoldButton('+ Create ui-preview.tsx', 'panels')
+    }
   }
 
   let lastGroup = ''
