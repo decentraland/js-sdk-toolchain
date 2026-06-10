@@ -92,19 +92,23 @@ export async function main(options: Options) {
   //    export (if any) is a map of named panel scenarios.
   //  - 'main': zero-config — run the scene's real main() from src/index.ts,
   //    exactly what the runtime does in-world (minus the 3D rendering).
+  // Either way, 'preview:stories' resolves to the scene's *.stories.tsx catalog
+  // (storybook-style component stories) via the storiesPlugin below.
   const stdinContents =
     entry.kind === 'file'
       ? [
           `import scenarios from ${JSON.stringify(entry.path)}`,
+          `import stories from 'preview:stories'`,
           `import { startScenePreview } from ${JSON.stringify(path.join(harnessDir, 'scene-main.ts'))}`,
-          `startScenePreview(scenarios)`
+          `startScenePreview(scenarios, stories)`
         ].join('\n')
       : [
           `import * as scene from ${JSON.stringify(entry.path)}`,
+          `import stories from 'preview:stories'`,
           `import { startScenePreview } from ${JSON.stringify(path.join(harnessDir, 'scene-main.ts'))}`,
           `Promise.resolve(typeof (scene as any).main === 'function' ? (scene as any).main() : undefined)`,
           `  .catch((e) => (window as any).__showError?.('scene main() failed: ' + ((e && e.stack) || e)))`,
-          `startScenePreview(undefined)`
+          `startScenePreview(undefined, stories)`
         ].join('\n')
 
   const ctx = await esbuild.context({
@@ -140,7 +144,7 @@ export async function main(options: Options) {
       '@dcl/sdk/math': sdkMath,
       '@dcl/sdk/platform': mock('platform.ts')
     },
-    plugins: [systemStubPlugin()],
+    plugins: [systemStubPlugin(), storiesPlugin(workingDir)],
     logLevel: 'silent'
   })
 
@@ -295,6 +299,83 @@ function systemStubPlugin(): esbuild.Plugin {
       build.onLoad({ filter: /.*/, namespace: 'dcl-system-stub' }, () => ({ contents: stub, loader: 'js' }))
     }
   }
+}
+
+// Storybook-style component catalog. 'preview:stories' is a virtual module that
+// globs the scene for *.stories.{tsx,ts,jsx,js} on EVERY rebuild (watchDirs makes
+// esbuild rebuild when files are added/removed) and exports:
+//   [{ file: 'src/ui/Button.stories.tsx', mod: <namespace> }, ...]
+// Story files follow CSF-lite: optional `export default { title }`, every other
+// exported function is a story returning JSX.
+function storiesPlugin(workingDir: string): esbuild.Plugin {
+  return {
+    name: 'dcl-preview-stories',
+    setup(build) {
+      build.onResolve({ filter: /^preview:stories$/ }, (a) => ({ path: a.path, namespace: 'dcl-preview-stories' }))
+      build.onLoad({ filter: /.*/, namespace: 'dcl-preview-stories' }, async () => {
+        const files = findStoryFiles(workingDir)
+        const imports = files.map((f, i) => `import * as s${i} from ${JSON.stringify(f)}`)
+        const entries = files.map(
+          (f, i) => `{ file: ${JSON.stringify(path.relative(workingDir, f).split(path.sep).join('/'))}, mod: s${i} }`
+        )
+        return {
+          contents: [...imports, `export default [${entries.join(', ')}]`].join('\n'),
+          resolveDir: workingDir,
+          loader: 'ts',
+          watchDirs: storyWatchDirs(workingDir)
+        }
+      })
+    }
+  }
+}
+
+const STORY_FILE = /\.stories\.(tsx|ts|jsx|js)$/
+const SKIP_DIRS = new Set(['node_modules', 'bin', 'dist', '.git', 'assets'])
+
+function findStoryFiles(workingDir: string): string[] {
+  const found: string[] = []
+  const stack = [workingDir]
+  while (stack.length) {
+    const dir = stack.pop()!
+    let entries: fsSync.Dirent[]
+    try {
+      entries = fsSync.readdirSync(dir, { withFileTypes: true })
+    } catch {
+      continue
+    }
+    for (const ent of entries) {
+      const full = path.join(dir, ent.name)
+      if (ent.isDirectory()) {
+        if (!SKIP_DIRS.has(ent.name) && !ent.name.startsWith('.')) stack.push(full)
+      } else if (STORY_FILE.test(ent.name)) {
+        found.push(full)
+      }
+    }
+  }
+  return found.sort()
+}
+
+// Directories esbuild should watch for added/removed story files.
+function storyWatchDirs(workingDir: string): string[] {
+  const dirs = [workingDir]
+  const stack = [workingDir]
+  while (stack.length) {
+    const dir = stack.pop()!
+    let entries: fsSync.Dirent[]
+    try {
+      entries = fsSync.readdirSync(dir, { withFileTypes: true })
+    } catch {
+      continue
+    }
+    for (const ent of entries) {
+      if (ent.isDirectory() && !SKIP_DIRS.has(ent.name) && !ent.name.startsWith('.')) {
+        const full = path.join(dir, ent.name)
+        dirs.push(full)
+        stack.push(full)
+      }
+    }
+  }
+  return dirs
 }
 
 const CONTENT_TYPES: Record<string, string> = {

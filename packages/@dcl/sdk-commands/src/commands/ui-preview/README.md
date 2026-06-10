@@ -69,6 +69,26 @@ export default {                  // optional: named panels for the switcher
 If absent, the command scaffolds a starter (best-effort detecting the scene's
 `setupXxxUi` function).
 
+## Component stories (storybook-style)
+
+Any `*.stories.tsx` file in the scene becomes a group in the preview's sidebar
+(CSF-lite: optional `export default { title }`; every named function export is a
+story rendered in isolation, centered on the canvas):
+
+```tsx
+// src/ui/components/FrostyButton.stories.tsx
+import { FrostyButton } from './FrostyButton'
+export default { title: 'Components/FrostyButton' }
+export const Primary = () => <FrostyButton label="Play" onPress={() => {}} />
+export const Secondary = () => <FrostyButton label="Cancel" variant="secondary" onPress={() => {}} />
+```
+
+Discovery is a virtual module (`preview:stories`) produced by an esbuild plugin
+that re-globs on every rebuild and registers `watchDirs`, so adding/removing a
+stories file is picked up without restarting. Selecting a story swaps the main
+UI renderer live (`ReactEcsRenderer.setUiRenderer`) — no reload; Scene panels
+keep reload semantics since they mutate game state.
+
 ## Maintenance notes
 
 - `harness/**` is browser code; it is **excluded** from `tsconfig.json` and copied

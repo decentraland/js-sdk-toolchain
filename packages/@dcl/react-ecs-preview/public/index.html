@@ -22,6 +22,44 @@
         font-family: ui-sans-serif, system-ui, sans-serif;
       }
       #app { display: flex; flex-direction: column; height: 100%; }
+      #main { flex: 1; display: flex; min-height: 0; }
+      /* Storybook-style catalog: Scene panels + *.stories components. Hidden by
+         scene-main.ts when there is nothing to list. */
+      #sidebar {
+        width: 220px;
+        flex: none;
+        overflow-y: auto;
+        background: var(--panel);
+        border-right: 1px solid var(--border);
+        padding: 10px 0;
+      }
+      #sidebar .group {
+        padding: 10px 14px 4px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      #sidebar .item {
+        display: block;
+        width: 100%;
+        text-align: left;
+        background: none;
+        border: none;
+        color: var(--text);
+        font: inherit;
+        font-size: 13px;
+        padding: 6px 14px 6px 22px;
+        cursor: pointer;
+        border-left: 2px solid transparent;
+      }
+      #sidebar .item:hover { background: rgba(255, 255, 255, 0.05); }
+      #sidebar .item.active {
+        border-left-color: var(--accent);
+        background: rgba(255, 45, 85, 0.08);
+        color: #fff;
+      }
       header {
         display: flex;
         align-items: center;
@@ -97,8 +135,11 @@
           <option value="1561x720" data-mobile="1">iPhone 14 Pro (1561 × 720)</option>
         </select>
       </header>
-      <div id="stage">
-        <div id="preview-root"></div>
+      <div id="main">
+        <aside id="sidebar"></aside>
+        <div id="stage">
+          <div id="preview-root"></div>
+        </div>
       </div>
     </div>
     <pre id="err"></pre>
