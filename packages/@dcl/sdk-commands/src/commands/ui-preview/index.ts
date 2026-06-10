@@ -81,7 +81,7 @@ export async function main(options: Options) {
   const sdkReactEcs = resolveSdk('react-ecs')
   const sdkMath = resolveSdk('math')
 
-  const entry = await resolveEntry(workingDir, options.args['--entry'], logger)
+  const entry = await describeEntry(workingDir, options.args['--entry'], logger)
 
   const port = await getPort(options.args['--port'] || 0)
   const assetPort = port + 1
@@ -93,29 +93,17 @@ export async function main(options: Options) {
 
   const mock = (n: string) => path.join(harnessDir, 'mocks', n)
 
-  // Two entry modes:
-  //  - 'file': a ui-preview.tsx — importing it registers the UI; its default
-  //    export (if any) is a map of named panel scenarios.
-  //  - 'main': zero-config — run the scene's real main() from src/index.ts,
-  //    exactly what the runtime does in-world (minus the 3D rendering).
-  // Either way, 'preview:stories' resolves to the scene's *.stories.tsx catalog
-  // (storybook-style component stories) via the storiesPlugin below.
-  const stdinContents =
-    entry.kind === 'file'
-      ? [
-          `import scenarios from ${JSON.stringify(entry.path)}`,
-          `import stories from 'preview:stories'`,
-          `import { startScenePreview } from ${JSON.stringify(path.join(harnessDir, 'scene-main.ts'))}`,
-          `startScenePreview(scenarios, stories)`
-        ].join('\n')
-      : [
-          `import * as scene from ${JSON.stringify(entry.path)}`,
-          `import stories from 'preview:stories'`,
-          `import { startScenePreview } from ${JSON.stringify(path.join(harnessDir, 'scene-main.ts'))}`,
-          `Promise.resolve(typeof (scene as any).main === 'function' ? (scene as any).main() : undefined)`,
-          `  .catch((e) => (window as any).__showError?.('scene main() failed: ' + ((e && e.stack) || e)))`,
-          `startScenePreview(undefined, stories)`
-        ].join('\n')
+  // Both 'preview:entry' (the scene's ui-preview.tsx panels, or its main() as the
+  // zero-config fallback) and 'preview:stories' (the *.stories.tsx catalog) are
+  // virtual modules re-resolved on every rebuild — so creating either kind of
+  // file (by hand or via the sidebar's "create it for me" button) hot-swaps in
+  // without restarting the server.
+  const stdinContents = [
+    `import scenarios from 'preview:entry'`,
+    `import stories from 'preview:stories'`,
+    `import { startScenePreview } from ${JSON.stringify(path.join(harnessDir, 'scene-main.ts'))}`,
+    `startScenePreview(scenarios, stories)`
+  ].join('\n')
 
   const ctx = await esbuild.context({
     stdin: {
@@ -150,7 +138,7 @@ export async function main(options: Options) {
       '@dcl/sdk/math': sdkMath,
       '@dcl/sdk/platform': mock('platform.ts')
     },
-    plugins: [systemStubPlugin(), storiesPlugin(workingDir)],
+    plugins: [systemStubPlugin(), entryPlugin(workingDir, options.args['--entry']), storiesPlugin(workingDir)],
     logLevel: 'silent'
   })
 
@@ -180,19 +168,17 @@ export async function main(options: Options) {
   await ctx.dispose()
 }
 
-type ResolvedEntry = { kind: 'file' | 'main'; path: string }
+type ResolvedEntry = { kind: 'file' | 'main' | 'none'; path: string }
 
 // Entry resolution, friendliest first:
 //   1. --entry <file>
 //   2. ui-preview.tsx (full control: seeded state + named panels)
 //   3. zero-config: the scene's own main() from src/index.ts — what the runtime
 //      runs in-world, so whatever the scene shows on boot shows here too
-//   4. scaffold a starter ui-preview.tsx (no main() found)
-async function resolveEntry(
-  workingDir: string,
-  explicit: string | undefined,
-  logger: Options['components']['logger']
-): Promise<ResolvedEntry> {
+// Re-evaluated on every rebuild (see entryPlugin), so creating/removing the file
+// hot-swaps modes without a server restart. This sync version is shared by the
+// plugin and the startup banner.
+function resolveEntrySync(workingDir: string, explicit: string | undefined): ResolvedEntry {
   if (explicit) {
     const p = path.resolve(workingDir, explicit)
     if (!fsSync.existsSync(p)) throw new CliError('UI_PREVIEW_ENTRY_NOT_FOUND', `--entry file not found: ${p}`)
@@ -202,29 +188,70 @@ async function resolveEntry(
     const p = path.join(workingDir, c)
     if (fsSync.existsSync(p)) return { kind: 'file', path: p }
   }
-
-  // Zero-config: run the scene's real main().
   for (const idx of ['src/index.ts', 'src/index.tsx', 'src/index.js']) {
     const p = path.join(workingDir, idx)
     if (!fsSync.existsSync(p)) continue
-    const code = await fs.readFile(p, 'utf8')
+    const code = fsSync.readFileSync(p, 'utf8')
     if (/export\s+(async\s+)?function\s+main\s*\(/.test(code) || /export\s*\{[^}]*\bmain\b/.test(code)) {
-      logger.log('')
-      logger.log(
-        `  ${colors.dim('running the scene')} main() ${colors.dim('— create a')} ui-preview.tsx ${colors.dim(
-          'to seed state and add a panel switcher'
-        )}`
-      )
       return { kind: 'main', path: p }
     }
   }
+  return { kind: 'none', path: '' }
+}
 
-  const scaffolded = path.join(workingDir, 'ui-preview.tsx')
-  await fs.writeFile(scaffolded, await scaffoldEntry(workingDir), 'utf8')
-  logger.log('')
-  logger.log(`  ${colors.yellowBright('Created ui-preview.tsx')} — edit it to register your UI and panels.`)
-  logger.log('')
-  return { kind: 'file', path: scaffolded }
+async function describeEntry(
+  workingDir: string,
+  explicit: string | undefined,
+  logger: Options['components']['logger']
+): Promise<ResolvedEntry> {
+  const entry = resolveEntrySync(workingDir, explicit)
+  if (entry.kind === 'main') {
+    logger.log('')
+    logger.log(
+      `  ${colors.dim('running the scene')} main() ${colors.dim(
+        '— use the sidebar to add panels for specific screens'
+      )}`
+    )
+  } else if (entry.kind === 'none') {
+    logger.log('')
+    logger.log(`  ${colors.yellowBright('No UI entry found')} — use the sidebar buttons to create one.`)
+  }
+  return entry
+}
+
+// 'preview:entry' — virtual module that re-resolves the entry each rebuild.
+// watchFiles/watchDirs make esbuild rebuild when a ui-preview.tsx appears or
+// disappears, so the sidebar's "create it for me" flow needs no restart.
+function entryPlugin(workingDir: string, explicit: string | undefined): esbuild.Plugin {
+  return {
+    name: 'dcl-preview-entry',
+    setup(build) {
+      build.onResolve({ filter: /^preview:entry$/ }, (a) => ({ path: a.path, namespace: 'dcl-preview-entry' }))
+      build.onLoad({ filter: /.*/, namespace: 'dcl-preview-entry' }, () => {
+        const entry = resolveEntrySync(workingDir, explicit)
+        let contents: string
+        if (entry.kind === 'file') {
+          contents = [`import def from ${JSON.stringify(entry.path)}`, `export default def`].join('\n')
+        } else if (entry.kind === 'main') {
+          contents = [
+            `import * as scene from ${JSON.stringify(entry.path)}`,
+            `Promise.resolve(typeof (scene as any).main === 'function' ? (scene as any).main() : undefined)`,
+            `  .catch((e) => (window as any).__showError?.('scene main() failed: ' + ((e && e.stack) || e)))`,
+            `export default undefined`
+          ].join('\n')
+        } else {
+          contents = `export default undefined`
+        }
+        return {
+          contents,
+          resolveDir: workingDir,
+          loader: 'ts',
+          watchFiles: ENTRY_CANDIDATES.map((c) => path.join(workingDir, c)),
+          watchDirs: [workingDir]
+        }
+      })
+    }
+  }
 }
 
 async function scaffoldEntry(workingDir: string): Promise<string> {
@@ -242,16 +269,20 @@ async function scaffoldEntry(workingDir: string): Promise<string> {
     /* fall back to the commented template */
   }
 
-  return `// Preview-only entry for 'sdk-commands ui-preview'. NOT part of the deployed scene.
-// 1. Register your UI here (same call your scene makes in-world).
-// 2. Optionally export a map of named panels — they appear in the preview's
-//    panel switcher so you can flip between UI states without editing code.
+  return `// Panels for 'sdk-commands ui-preview'. NOT part of the deployed scene.
+//
+// Each entry below becomes a button in the preview's sidebar. Clicking it puts
+// your UI into that state — so you can jump straight to any screen (a menu, the
+// game-over panel, ...) without playing to reach it.
 ${importLine}
 
 ${callLine}
 
 export default {
-  // 'My panel': () => openMyPanel(),
+  // The name is the sidebar label; the function sets up the state for it:
+  //
+  // 'Shop open':  () => openShop(),
+  // 'Game over':  () => GameState.create(engine.addEntity(), { state: 'ended', score: 1250 }),
 }
 `
 }
@@ -396,12 +427,21 @@ const CONTENT_TYPES: Record<string, string> = {
   '.wav': 'audio/wav'
 }
 
-// Serve the scene's static files (images/audio) so texture/audio `src` paths load.
+// Serve the scene's static files (images/audio) so texture/audio `src` paths
+// load, plus the /__scaffold endpoints behind the sidebar's "create it for me"
+// buttons. CORS is open because the preview page runs on the sibling port.
 function startAssetServer(root: string, port: number): string {
   http
     .createServer((req, res) => {
-      const rel = decodeURIComponent(new URL(req.url || '/', 'http://x').pathname).replace(/^\/+/, '')
-      const file = path.join(root, rel)
+      res.setHeader('access-control-allow-origin', '*')
+      const pathname = decodeURIComponent(new URL(req.url || '/', 'http://x').pathname)
+
+      if (req.method === 'POST' && pathname.startsWith('/__scaffold/')) {
+        void handleScaffold(root, pathname.slice('/__scaffold/'.length), res)
+        return
+      }
+
+      const file = path.join(root, pathname.replace(/^\/+/, ''))
       if (!file.startsWith(root)) {
         res.writeHead(403).end()
         return
@@ -420,3 +460,58 @@ function startAssetServer(root: string, port: number): string {
     .listen(port)
   return `http://localhost:${port}/`
 }
+
+// Writes the starter file for the requested kind. The esbuild watcher picks the
+// new file up (watchFiles/watchDirs on the virtual modules) and the page
+// live-reloads with it — no restart.
+async function handleScaffold(root: string, kind: string, res: http.ServerResponse): Promise<void> {
+  try {
+    let target: string
+    let contents: string
+    if (kind === 'panels') {
+      target = path.join(root, 'ui-preview.tsx')
+      contents = await scaffoldEntry(root)
+    } else if (kind === 'stories') {
+      target = path.join(root, 'src', 'example.stories.tsx')
+      contents = STORIES_EXAMPLE
+    } else {
+      res.writeHead(400).end()
+      return
+    }
+    if (fsSync.existsSync(target)) {
+      res.writeHead(409, { 'content-type': 'text/plain' }).end(path.basename(target))
+      return
+    }
+    await fs.mkdir(path.dirname(target), { recursive: true })
+    await fs.writeFile(target, contents, 'utf8')
+    res.writeHead(201, { 'content-type': 'text/plain' }).end(path.relative(root, target))
+  } catch (e) {
+    res.writeHead(500, { 'content-type': 'text/plain' }).end(String(e))
+  }
+}
+
+// Self-contained example — imports only the SDK, so it compiles in any scene.
+const STORIES_EXAMPLE = `// Component stories for 'sdk-commands ui-preview'. NOT part of the deployed scene.
+// Every exported function is a "story": it renders alone, centered on the canvas.
+// Rename this file / copy it next to your own components (anything *.stories.tsx works).
+import { Color4 } from '@dcl/sdk/math'
+import ReactEcs, { Label, UiEntity } from '@dcl/sdk/react-ecs'
+
+export default { title: 'Examples/Badge' } // group name in the sidebar
+
+const Badge = (props: { text: string; color: Color4 }) => (
+  <UiEntity
+    uiTransform={{ padding: { top: 6, bottom: 6, left: 16, right: 16 }, borderRadius: 14, alignItems: 'center' }}
+    uiBackground={{ color: props.color }}
+  >
+    <Label value={props.text} fontSize={14} color={Color4.White()} />
+  </UiEntity>
+)
+
+export const Success = () => <Badge text="success" color={Color4.create(0.18, 0.65, 0.35, 1)} />
+export const Warning = () => <Badge text="warning" color={Color4.create(0.85, 0.6, 0.1, 1)} />
+
+// Now try one with YOUR component:
+// import { MyButton } from './ui/MyButton'
+// export const MyButtonDefault = () => <MyButton label="Click me" />
+`

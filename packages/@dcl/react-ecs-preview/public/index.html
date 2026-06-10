@@ -71,6 +71,21 @@
         font-size: 11px;
         color: var(--text);
       }
+      #sidebar .hint-btn {
+        display: block;
+        margin: 4px 14px 10px 22px;
+        padding: 6px 10px;
+        font: inherit;
+        font-size: 12px;
+        color: #fff;
+        background: rgba(255, 45, 85, 0.16);
+        border: 1px solid var(--accent);
+        border-radius: 8px;
+        cursor: pointer;
+        text-align: left;
+      }
+      #sidebar .hint-btn:hover:not(:disabled) { background: rgba(255, 45, 85, 0.3); }
+      #sidebar .hint-btn:disabled { opacity: 0.7; cursor: default; }
       header {
         display: flex;
         align-items: center;

@@ -17,6 +17,9 @@ type Scenarios = Record<string, () => void>
 type StoryModule = { file: string; mod: Record<string, unknown> }
 type Story = { group: string; name: string; fn: () => unknown }
 
+// Base URL of the scene asset/scaffold server (defined by the bundler).
+declare const __SCENE_ASSETS__: string
+
 const FRAME_MS = 1000 / 30
 
 const win = window as unknown as {
@@ -149,11 +152,31 @@ function buildSidebar(panelNames: string[], stories: Story[], activeId: string):
     b.addEventListener('click', () => onClick(b))
     sidebar.appendChild(b)
   }
-  const addHint = (html: string) => {
+  const addHint = (text: string) => {
     const d = document.createElement('div')
     d.className = 'hint'
-    d.innerHTML = html
+    d.textContent = text
     sidebar.appendChild(d)
+  }
+  // "Create it for me": POSTs to the dev server, which writes a starter file;
+  // the watcher picks it up and the page live-reloads with it. No restart.
+  const addScaffoldButton = (label: string, kind: 'panels' | 'stories') => {
+    const b = document.createElement('button')
+    b.className = 'hint-btn'
+    b.textContent = label
+    b.addEventListener('click', () => {
+      b.disabled = true
+      b.textContent = 'Creating…'
+      fetch(`${__SCENE_ASSETS__}__scaffold/${kind}`, { method: 'POST' })
+        .then(async (r) => {
+          const file = await r.text()
+          if (r.status === 201) b.textContent = `Created ${file} — reloading…`
+          else if (r.status === 409) b.textContent = `${file} already exists — edit it`
+          else b.textContent = 'Failed — see terminal'
+        })
+        .catch(() => (b.textContent = 'Failed — is the server running?'))
+    })
+    sidebar.appendChild(b)
   }
 
   addGroup('Scene')
@@ -170,9 +193,8 @@ function buildSidebar(panelNames: string[], stories: Story[], activeId: string):
     })
   }
   if (!panelNames.length) {
-    addHint(
-      'Add panels: create <code>ui-preview.tsx</code> default-exporting named functions that seed each screen’s state.'
-    )
+    addHint('Panels are shortcuts to your screens (shop open, game over, …).')
+    addScaffoldButton('+ Create ui-preview.tsx', 'panels')
   }
 
   let lastGroup = ''
@@ -191,8 +213,7 @@ function buildSidebar(panelNames: string[], stories: Story[], activeId: string):
   }
   if (!stories.length) {
     addGroup('Stories')
-    addHint(
-      'Add a component catalog: create <code>src/MyComponent.stories.tsx</code> — every exported function renders here in isolation.'
-    )
+    addHint('Stories show one component by itself — a catalog of your buttons, panels, …')
+    addScaffoldButton('+ Add an example story', 'stories')
   }
 }
