@@ -86,4 +86,21 @@ describe('Generated MeshCollider ProtoBuf', () => {
       }
     })
   })
+
+  it('getCollisionMask combines CL_PLAYER and CL_MAIN_PLAYER into bitfield 12', () => {
+    const newEngine = Engine()
+    const entity = newEngine.addEntity()
+    const MeshCollider = components.MeshCollider(newEngine)
+
+    // CL_PLAYER = 4, CL_MAIN_PLAYER = 8 => OR = 12
+    MeshCollider.setBox(entity, [ColliderLayer.CL_PLAYER, ColliderLayer.CL_MAIN_PLAYER])
+    expect(MeshCollider.get(entity)).toStrictEqual({
+      collisionMask: 12,
+      mesh: {
+        $case: 'box',
+        box: {}
+      }
+    })
+    expect(ColliderLayer.CL_PLAYER | ColliderLayer.CL_MAIN_PLAYER).toBe(12)
+  })
 })
