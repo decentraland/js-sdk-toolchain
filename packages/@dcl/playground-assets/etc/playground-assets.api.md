@@ -473,12 +473,11 @@ export const enum ColliderLayer {
     CL_CUSTOM7 = 16384,
     // (undocumented)
     CL_CUSTOM8 = 32768,
+    CL_MAIN_PLAYER = 8,
     CL_NONE = 0,
     CL_PHYSICS = 2,
     CL_PLAYER = 4,
     CL_POINTER = 1,
-    // (undocumented)
-    CL_RESERVED2 = 8,
     // (undocumented)
     CL_RESERVED3 = 16,
     // (undocumented)
