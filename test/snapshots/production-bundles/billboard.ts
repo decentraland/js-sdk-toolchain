@@ -52,6 +52,10 @@ function createBillboards() {
   const plane4 = createPlaneTexture(12, 3, 8)
   createPlaneTexture(4, 3, 8)
 
+  // Target entity for look_at_entity demonstration
+  const targetEntity = engine.addEntity()
+  Transform.create(targetEntity, { position: { x: 8, y: 3, z: 4 } })
+
   Billboard.create(plane1, {
     billboardMode: BillboardMode.BM_Y
   })
@@ -61,6 +65,13 @@ function createBillboards() {
   })
   Billboard.create(plane5, {
     billboardMode: BillboardMode.BM_Y
+  })
+
+  // Billboard that faces a specific entity instead of the camera
+  const plane6 = createPlaneTexture(4, 3, 4)
+  Billboard.create(plane6, {
+    billboardMode: BillboardMode.BM_Y,
+    lookAtEntity: targetEntity
   })
 }
 
