@@ -50,7 +50,8 @@
     },
     "get_context_files": {
       "list_failed": "Failed to list context files",
-      "download_failed": "Failed to download context file"
+      "download_failed": "Failed to download context file",
+      "write_config_failed": "Failed to write AI context config file"
     },
     "init": {
       "dir_not_empty": "The target directory specified is not empty. Run this command with --yes to override.",
