@@ -185,8 +185,17 @@ export function createGetCrdtMessagesForLww(
   data: Map<Entity, unknown>,
   lastSentData: Map<Entity, Uint8Array>
 ) {
+  // Reused across ticks: the generator runs for every registered component on every engine tick,
+  // so allocating the buffer inside it produced a 10KB allocation per component per tick even when
+  // nothing was dirty. The yielded data is always a copy (toCopiedBinary) so reuse is safe.
+  let reusableWriteBuffer: ReadWriteByteBuffer | null = null
+
   return function* () {
-    const writeBuffer = new ReadWriteByteBuffer()
+    // Skip the buffer allocation entirely for clean components (the common case)
+    if (dirtyIterator.size === 0) return
+
+    const writeBuffer = (reusableWriteBuffer = reusableWriteBuffer ?? new ReadWriteByteBuffer())
+
     for (const entity of dirtyIterator) {
       if (data.has(entity)) {
         writeBuffer.resetBuffer()

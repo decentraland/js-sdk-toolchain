@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=607.1k bytes
+SCENE_COMPILED_JS_SIZE_PROD=604.1k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -10,8 +10,8 @@ EVAL test/snapshots/production-bundles/with-main-function.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
   OPCODES ~= 222k
-  MALLOC_COUNT = 43870
-  ALIVE_OBJS_DELTA ~= 9.88k
+  MALLOC_COUNT = 43998
+  ALIVE_OBJS_DELTA ~= 9.90k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -20,22 +20,22 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   Scene: PUT_COMPONENT e=0x201 c=1041 t=1 data={"src":"test.glb"}
   Scene: PUT_COMPONENT e=0x200 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  OPCODES ~= 8k
-  MALLOC_COUNT = 96
-  ALIVE_OBJS_DELTA ~= 0.03k
+  OPCODES ~= 7k
+  MALLOC_COUNT = 133
+  ALIVE_OBJS_DELTA ~= 0.04k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x202 c=1041 t=1 data={"src":"test.glb"}
-  OPCODES ~= 5k
+  OPCODES ~= 3k
   MALLOC_COUNT = 13
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x203 c=1041 t=1 data={"src":"test.glb"}
-  OPCODES ~= 5k
+  OPCODES ~= 3k
   MALLOC_COUNT = 13
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x204 c=1041 t=1 data={"src":"test.glb"}
-  OPCODES ~= 5k
+  OPCODES ~= 3k
   MALLOC_COUNT = 13
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 2964.74k bytes
+  MEMORY_USAGE_COUNT ~= 3029.32k bytes
