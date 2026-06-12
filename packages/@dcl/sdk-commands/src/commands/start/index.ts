@@ -17,7 +17,7 @@ import { createServerComponent } from '@well-known-components/http-server'
 import { createConsoleLogComponent } from '@well-known-components/logger'
 import { providerInstance } from '../../components/eth'
 import { colors, createStderrCliLogger } from '../../components/log'
-import { wireFileWatcherToWebSockets } from './server/file-watch-notifier'
+import { watchMainEntitiesFile, wireFileWatcherToWebSockets } from './server/file-watch-notifier'
 import { wireRouter } from './server/routes'
 import { createWsComponent } from './server/ws'
 import { b64HashingFunction } from '../../logic/project-files'
@@ -213,6 +213,7 @@ export async function main(options: Options) {
             project.kind,
             !!explorerAlpha || !!bevyWeb
           )
+          watchMainEntitiesFile(components, project.workingDirectory)
         }
       }
       await startComponents()
