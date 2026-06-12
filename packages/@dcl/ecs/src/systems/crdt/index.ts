@@ -50,6 +50,10 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
   const receivedMessages: ReceiveMessage[] = []
   // Messages already processed by the engine but that we need to broadcast to other transports.
   const broadcastMessages: ReceiveMessage[] = []
+  // Scratch buffers reused across ticks to avoid a 10KB ReadWriteByteBuffer allocation per frame each.
+  // Safe to reuse: their contents never escape sendMessages (views are copied into the per-call transport buffer).
+  const outgoingMessagesBuffer = new ReadWriteByteBuffer()
+  const conversionBuffer = new ReadWriteByteBuffer()
 
   /**
    *
@@ -201,13 +205,20 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
   async function sendMessages(entitiesDeletedThisTick: Entity[]) {
     // CRDT Messages will be the merge between the recieved transport messages and the new crdt messages
     const crdtMessages = getMessages(broadcastMessages)
-    const buffer = new ReadWriteByteBuffer()
+    const buffer = outgoingMessagesBuffer
+    buffer.resetBuffer()
 
     for (const component of engine.componentsIter()) {
       for (const message of component.getCrdtUpdates()) {
         const offset = buffer.currentWriteOffset()
-        // Avoid creating messages if there is no transport that will handle it
-        if (transports.some((t) => t.filter(message))) {
+
+        // Avoid creating messages if there is no transport that will handle it.
+        // Plain loop instead of transports.some(...) to avoid a closure allocation per message
+        let anyTransportAcceptsIt = false
+        for (let t = 0; t < transports.length && !anyTransportAcceptsIt; t++)
+          anyTransportAcceptsIt = transports[t].filter(message)
+
+        if (anyTransportAcceptsIt) {
           if (message.type === CrdtMessageType.PUT_COMPONENT) {
             PutComponentOperation.write(message.entityId, message.timestamp, message.componentId, message.data, buffer)
           } else if (message.type === CrdtMessageType.DELETE_COMPONENT) {
@@ -245,19 +256,22 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
       onProcessEntityComponentChange && onProcessEntityComponentChange(entityId, CrdtMessageType.DELETE_ENTITY)
     }
 
-    // Send CRDT messages to transports
+    // Send CRDT messages to transports.
+    // The transport buffer is deliberately allocated per call: its final toBinary() view is handed
+    // to transport.send and reusing it across ticks would alias memory a transport may still hold
     const transportBuffer = new ReadWriteByteBuffer()
-    for (const index in transports) {
+
+    for (let transportIndex = 0; transportIndex < transports.length; transportIndex++) {
       const __NetworkMessagesBuffer: Uint8Array[] = []
 
-      const transportIndex = Number(index)
       const transport = transports[transportIndex]
       const isRendererTransport = transport.type === 'renderer'
       const isNetworkTransport = transport.type === 'network'
 
-      // Reset Buffer for each Transport
+      // Reset Buffers for each Transport
       transportBuffer.resetBuffer()
-      const buffer = new ReadWriteByteBuffer()
+      const buffer = conversionBuffer
+      buffer.resetBuffer()
 
       // Then we send all the new crdtMessages that the transport needs to process
       for (const message of crdtMessages) {
@@ -268,7 +282,8 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         if (!transport.filter(message)) continue
 
         // Check if adding this message would exceed the size limit
-        const currentBufferSize = transportBuffer.toBinary().byteLength
+        // (currentWriteOffset is the written length; toBinary() would allocate a subarray view per message)
+        const currentBufferSize = transportBuffer.currentWriteOffset()
         const messageSize = message.messageBuffer.byteLength
 
         if (isNetworkTransport && (currentBufferSize + messageSize) / 1024 > LIVEKIT_MAX_SIZE) {

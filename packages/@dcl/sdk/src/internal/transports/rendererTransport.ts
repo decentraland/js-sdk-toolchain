@@ -8,8 +8,11 @@ export type EngineApiForTransport = {
 
 export function createRendererTransport(engineApi: EngineApiForTransport): Transport {
   async function sendToRenderer(message: Uint8Array) {
+    // The batch is passed as-is (it may be a view over the CRDT system's transport buffer):
+    // the engine api consumes the bytes within this call and the buffer is not rewritten
+    // until the next frame's send, after this await resolves
     const response = await engineApi.crdtSendToRenderer({
-      data: new Uint8Array(message)
+      data: message
     })
     if (response && response.data && response.data.length) {
       if (rendererTransport.onmessage) {
@@ -28,7 +31,6 @@ export function createRendererTransport(engineApi: EngineApiForTransport): Trans
         // this is the console.error of the scene
         // eslint-disable-next-line no-console
         console.error(error)
-        debugger
       }
     },
     filter(message: TransportMessage) {

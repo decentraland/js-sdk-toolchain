@@ -9,7 +9,7 @@ export const $\{ComponentName\}Schema: ISchema<PB$\{ComponentName\}> & { COMPONE
   COMPONENT_ID: $\{ComponentId\},
   serialize(value: PB$\{ComponentName\}, builder: ByteBuffer): void {
     const writer = PB$\{ComponentName\}.encode(value)
-    const buffer = new Uint8Array(writer.finish(), 0, writer.len)
+    const buffer = writer.finish()
     builder.writeBuffer(buffer, false)
   },
   deserialize(reader: ByteBuffer): PB$\{ComponentName\} {
