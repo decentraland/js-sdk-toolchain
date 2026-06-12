@@ -50,6 +50,28 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
   const receivedMessages: ReceiveMessage[] = []
   // Messages already processed by the engine but that we need to broadcast to other transports.
   const broadcastMessages: ReceiveMessage[] = []
+  // Lazy index of NetworkEntity components used by findNetworkId: networkId -> (network entityId -> mapping).
+  // Rebuilt at most once per receive/send pass; without it every network message linearly scanned
+  // all networked entities (O(messages x networked entities) per tick).
+  const networkEntitiesIndex = new Map<number, Map<number, { entityId: Entity; network: INetowrkEntityType }>>()
+  let networkEntitiesIndexDirty = true
+
+  function registerInNetworkEntitiesIndex(entityId: Entity, network: INetowrkEntityType) {
+    let byNetworkEntityId = networkEntitiesIndex.get(network.networkId)
+    if (!byNetworkEntityId) {
+      byNetworkEntityId = new Map()
+      networkEntitiesIndex.set(network.networkId, byNetworkEntityId)
+    }
+    byNetworkEntityId.set(network.entityId as number, { entityId, network })
+  }
+
+  function rebuildNetworkEntitiesIndex() {
+    networkEntitiesIndex.clear()
+    for (const [entityId, network] of engine.getEntitiesWith(NetworkEntity)) {
+      registerInNetworkEntitiesIndex(entityId, network)
+    }
+    networkEntitiesIndexDirty = false
+  }
 
   /**
    *
@@ -120,11 +142,12 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
     const hasNetworkId = 'networkId' in msg
 
     if (hasNetworkId) {
-      for (const [entityId, network] of engine.getEntitiesWith(NetworkEntity)) {
-        if (network.networkId === msg.networkId && network.entityId === msg.entityId) {
-          return { entityId, network }
-        }
+      if (networkEntitiesIndexDirty) {
+        rebuildNetworkEntitiesIndex()
       }
+
+      const found = networkEntitiesIndex.get(msg.networkId!)?.get(msg.entityId as number)
+      if (found) return found
     }
 
     return { entityId: msg.entityId }
@@ -138,6 +161,9 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
     const messagesToProcess = getMessages(receivedMessages)
     const entitiesShouldBeCleaned: Entity[] = []
 
+    // NetworkEntity components may have been added/removed since the last pass (e.g. by user systems)
+    networkEntitiesIndexDirty = true
+
     for (const msg of messagesToProcess) {
       let { entityId, network } = findNetworkId(msg)
       // We receive a new Entity. Create the localEntity and map it to the NetworkEntity component
@@ -145,6 +171,9 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         entityId = engine.addEntity()
         network = { entityId: msg.entityId, networkId: msg.networkId }
         NetworkEntity.createOrReplace(entityId, network)
+
+        // Keep the already-built index coherent for the rest of this batch
+        if (!networkEntitiesIndexDirty) registerInNetworkEntitiesIndex(entityId, network)
       }
       if (msg.type === CrdtMessageType.DELETE_ENTITY || msg.type === CrdtMessageType.DELETE_ENTITY_NETWORK) {
         entitiesShouldBeCleaned.push(entityId)
@@ -199,6 +228,9 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
    * Iterates the dirty map and generates crdt messages to be send
    */
   async function sendMessages(entitiesDeletedThisTick: Entity[]) {
+    // NetworkEntity components may have changed while user systems ran this tick
+    networkEntitiesIndexDirty = true
+
     // CRDT Messages will be the merge between the recieved transport messages and the new crdt messages
     const crdtMessages = getMessages(broadcastMessages)
     const buffer = new ReadWriteByteBuffer()
