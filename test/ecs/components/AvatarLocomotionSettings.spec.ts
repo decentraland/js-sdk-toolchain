@@ -12,7 +12,10 @@ describe('Generated AvatarLocomotionSettings ProtoBuf', () => {
       runSpeed: 3,
       jumpHeight: 4,
       runJumpHeight: 5,
-      hardLandingCooldown: 6
+      hardLandingCooldown: 6,
+      doubleJumpHeight: 7,
+      glidingFallingSpeed: 8,
+      glidingSpeed: 9
     })
   })
 })
