@@ -107,7 +107,10 @@ export function createInputSystem(engine: IEngine): IInputSystem {
   ): PBPointerEventsResult | undefined {
     const ascendingTimestampIterator = PointerEventsResult.get(entity)
     for (const command of Array.from(ascendingTimestampIterator).reverse()) {
-      if (command.button === inputAction && command.state === pointerEventType) {
+      if (
+        (command.button === inputAction || command.button === InputAction.IA_ANY) &&
+        command.state === pointerEventType
+      ) {
         return command
       }
     }
