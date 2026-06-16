@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=425.5k bytes
+SCENE_COMPILED_JS_SIZE_PROD=425.6k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -52,17 +52,17 @@ CALL onUpdate(0)
   ALIVE_OBJS_DELTA ~= 0.24k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=2 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.008726535364985466,"z":0,"w":0.9999619126319885},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 72k
+  OPCODES ~= 78k
   MALLOC_COUNT = 259
   ALIVE_OBJS_DELTA ~= 0.13k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=3 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.017452405765652657,"z":0,"w":0.9998477101325989},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 71k
+  OPCODES ~= 76k
   MALLOC_COUNT = 35
   ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=4 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.026176948100328445,"z":0,"w":0.9996573328971863},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 71k
+  OPCODES ~= 76k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1933.93k bytes
+  MEMORY_USAGE_COUNT ~= 1934.09k bytes
