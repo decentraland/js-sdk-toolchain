@@ -16,8 +16,8 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: 'npm'
@@ -31,8 +31,8 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: 'npm'
@@ -42,9 +42,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: 'npm'
@@ -84,8 +84,8 @@ jobs:
       decentraland_js_runtime_s3_bucket_key: ${{ steps.publish_dcl_js_runtime.outputs.s3-bucket-key }}
       decentraland_ecs_bucket_key: ${{ steps.publish_ecs.outputs.s3-bucket-key }}
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: 'npm'
@@ -94,7 +94,7 @@ jobs:
         run: make install
 
       - name: update version of packages/@dcl/sdk/package.json, this version will be used for all packages
-        uses: decentraland/oddish-action@master
+        uses: decentraland/oddish-action@0074f2d535c43b5c83f136525304a6277166d77f # @master
         with:
           cwd: ./packages/@dcl/sdk
           deterministic-snapshot: true
@@ -115,7 +115,7 @@ jobs:
 
       - name: publish @dcl/js-runtime package
         id: publish_dcl_js_runtime
-        uses: decentraland/oddish-action@master
+        uses: decentraland/oddish-action@0074f2d535c43b5c83f136525304a6277166d77f # @master
         with:
           registry-url: 'https://registry.npmjs.org'
           access: public
@@ -132,12 +132,11 @@ jobs:
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
           BRANCH_NAME: ${{ github.ref_name }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
       - name: publish @dcl/ecs package
-        uses: decentraland/oddish-action@master
+        uses: decentraland/oddish-action@0074f2d535c43b5c83f136525304a6277166d77f # @master
         id: publish_ecs
         with:
           registry-url: 'https://registry.npmjs.org'
@@ -155,7 +154,6 @@ jobs:
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
           BRANCH_NAME: ${{ github.ref_name }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
@@ -173,7 +171,7 @@ jobs:
 
       - name: publish @dcl/react-ecs package
         id: publish_dcl_react_ecs
-        uses: decentraland/oddish-action@master
+        uses: decentraland/oddish-action@0074f2d535c43b5c83f136525304a6277166d77f # @master
         with:
           registry-url: 'https://registry.npmjs.org'
           access: public
@@ -190,7 +188,6 @@ jobs:
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
           BRANCH_NAME: ${{ github.ref_name }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
@@ -207,7 +204,7 @@ jobs:
           ECS_S3_URL: ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ steps.publish_ecs.outputs.s3-bucket-key }}
 
       - name: publish @dcl/sdk-commands package
-        uses: decentraland/oddish-action@master
+        uses: decentraland/oddish-action@0074f2d535c43b5c83f136525304a6277166d77f # @master
         id: publish_decentraland_sdk_commands
         with:
           registry-url: 'https://registry.npmjs.org'
@@ -225,7 +222,6 @@ jobs:
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
           BRANCH_NAME: ${{ github.ref_name }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
@@ -287,7 +283,7 @@ jobs:
           echo "All dependency packages verified successfully!"
 
       - name: publish @dcl/sdk package
-        uses: decentraland/oddish-action@master
+        uses: decentraland/oddish-action@0074f2d535c43b5c83f136525304a6277166d77f # @master
         id: publish_decentraland_sdk
         with:
           registry-url: 'https://registry.npmjs.org'
@@ -305,7 +301,6 @@ jobs:
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
           BRANCH_NAME: ${{ github.ref_name }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
@@ -316,7 +311,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
 
       - name: publish @dcl/playground-assets package
-        uses: decentraland/oddish-action@master
+        uses: decentraland/oddish-action@0074f2d535c43b5c83f136525304a6277166d77f # @master
         id: publish_playground_assets
         with:
           registry-url: 'https://registry.npmjs.org'
@@ -334,7 +329,6 @@ jobs:
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
           BRANCH_NAME: ${{ github.ref_name }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
   notify_deployment:
@@ -395,7 +389,7 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
       - run: mkdir -p scene
@@ -444,9 +438,9 @@ jobs:
       github.ref == 'refs/heads/main'
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
 
