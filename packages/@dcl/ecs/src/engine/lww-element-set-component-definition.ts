@@ -171,7 +171,10 @@ export function createUpdateLwwFromCrdt(
         if (msg.type === CrdtMessageType.PUT_COMPONENT || msg.type === CrdtMessageType.PUT_COMPONENT_NETWORK) {
           const buf = new ReadWriteByteBuffer(msg.data!)
           data.set(entity, schema.deserialize(buf))
-          lastSentData.set(entity, new Uint8Array(msg.data!))
+          // do NOT seed lastSentData from an INCOMING message!!!!
+          // seeding it from received bytes makes the engine
+          // believe it already sent this state, which kills valid re-broadcasting 🧨
+          lastSentData.delete(entity)
         } else {
           data.delete(entity)
           lastSentData.delete(entity)
