@@ -60,41 +60,6 @@
           "dest": 516
         }
       ]
-    },
-    "513": {
-      "src": "empty.composite",
-      "entities": [
-        {
-          "src": 0,
-          "dest": 513
-        }
-      ]
-    },
-    "514": {
-      "src": "one-transform.composite",
-      "entities": [
-        {
-          "src": 0,
-          "dest": 514
-        },
-        {
-          "src": 518,
-          "dest": 515
-        }
-      ]
-    },
-    "516": {
-      "src": "cube-scene.composite",
-      "entities": [
-        {
-          "src": 0,
-          "dest": 516
-        },
-        {
-          "src": 512,
-          "dest": 517
-        }
-      ]
     }
   },
   "core::MeshRenderer": {

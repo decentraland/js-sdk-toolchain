@@ -3,7 +3,13 @@ import * as ecsComponents from '@dcl/ecs/dist/components'
 import React from 'react'
 import type { ReactEcs } from './react-ecs'
 import { createReconciler } from './reconciler'
-import { getUiScaleFactor, resetUiScaleFactor, setUiScaleFactor } from './components/utils'
+import {
+  getUiScaleFactor,
+  resetScreenInsetArea,
+  resetUiScaleFactor,
+  setScreenInsetArea,
+  setUiScaleFactor
+} from './components/utils'
 
 /**
  * @public
@@ -65,6 +71,8 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
 
   // Unique owner to prevent other UI systems resetting this scale factor.
   const uiScaleFactorOwner = Symbol('react-ecs-ui-scale')
+  // Unique owner for the screen inset module variable.
+  const screenInsetAreaOwner = Symbol('react-ecs-screen-inset-area')
 
   function getActiveVirtualSize(): UiRendererOptions | undefined {
     // Main renderer options win; otherwise use the first additional renderer option.
@@ -107,6 +115,15 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
   }
 
   function UiScaleSystem() {
+    const canvasInfo = UiCanvasInformation.getOrNull(engine.RootEntity)
+
+    // Update the screen inset module variable unconditionally — it is
+    // independent of the virtual size and useful even when the renderer has no
+    // virtual canvas.
+    if (canvasInfo?.screenInsetArea) {
+      setScreenInsetArea(canvasInfo.screenInsetArea, screenInsetAreaOwner)
+    }
+
     const activeVirtualSize = getActiveVirtualSize()
     if (!activeVirtualSize) {
       // Reset only if this system owns the scale factor.
@@ -114,7 +131,6 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
       return
     }
 
-    const canvasInfo = UiCanvasInformation.getOrNull(engine.RootEntity)
     if (!canvasInfo) return
 
     const { width, height } = canvasInfo
@@ -136,6 +152,7 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
       engine.removeSystem(UiScaleSystem)
       engine.removeSystem(ReactBasedUiSystem)
       resetUiScaleFactor(uiScaleFactorOwner)
+      resetScreenInsetArea(screenInsetAreaOwner)
       for (const entity of renderer.getEntities()) {
         engine.removeEntity(entity)
       }

@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 24
           cache: 'npm'
       - name: install
         run: make install
@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 24
           cache: 'npm'
       - name: docs
         run: make docs
@@ -47,7 +47,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 24
           cache: 'npm'
 
       - name: install
@@ -88,7 +88,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 24
           cache: 'npm'
 
       - name: install
@@ -399,7 +399,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 24
       - run: mkdir -p scene
       - name: npx @dcl/sdk-commands init --skip-install
         run: npx ${{ secrets.SDK_TEAM_S3_BASE_URL }}/${{ needs.build.outputs.decentraland_sdk_commands_s3_bucket_key }} init --skip-install
@@ -450,7 +450,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Download prepared packages
         uses: actions/download-artifact@v4

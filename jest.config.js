@@ -81,6 +81,10 @@ module.exports = {
   ],
   verbose: true,
   testMatch: ['**/*.spec.(ts|tsx)'],
+  // Keep the default node_modules ignore, and exclude Claude Code worktrees so a
+  // nested `.claude/worktrees/*` checkout doesn't get crawled and double-run.
+  testPathIgnorePatterns: ['/node_modules/', '/\\.claude/'],
+  modulePathIgnorePatterns: ['/\\.claude/'],
   testEnvironment: 'node',
   setupFilesAfterEnv: ['./test/ecs/setup.ts']
 }
