@@ -2,6 +2,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=607.3k bytes
 =======
 =======
@@ -29,6 +30,9 @@ SCENE_COMPILED_JS_SIZE_PROD=597.5k bytes
 =======
 SCENE_COMPILED_JS_SIZE_PROD=602.9k bytes
 >>>>>>> 2afa13b8 (update snapshots)
+=======
+SCENE_COMPILED_JS_SIZE_PROD=605.5k bytes
+>>>>>>> 2cfa6733 (fix: snapshots)
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -43,6 +47,7 @@ EVAL test/snapshots/production-bundles/with-main-function.js
 <<<<<<< HEAD
 <<<<<<< HEAD
   REQUIRE: ~system/Runtime
+<<<<<<< HEAD
   OPCODES ~= 222k
   MALLOC_COUNT = 43886
   ALIVE_OBJS_DELTA ~= 9.89k
@@ -82,6 +87,11 @@ EVAL test/snapshots/production-bundles/with-main-function.js
   MALLOC_COUNT = 45782
   ALIVE_OBJS_DELTA ~= 10.25k
 >>>>>>> 2afa13b8 (update snapshots)
+=======
+  OPCODES ~= 212k
+  MALLOC_COUNT = 46135
+  ALIVE_OBJS_DELTA ~= 10.34k
+>>>>>>> 2cfa6733 (fix: snapshots)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -93,24 +103,30 @@ CALL onUpdate(0)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   OPCODES ~= 8k
   MALLOC_COUNT = 96
+=======
+  OPCODES ~= 7k
+  MALLOC_COUNT = 98
+>>>>>>> 2cfa6733 (fix: snapshots)
   ALIVE_OBJS_DELTA ~= 0.03k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x202 c=1041 t=1 data={"src":"test.glb"}
-  OPCODES ~= 5k
+  OPCODES ~= 4k
   MALLOC_COUNT = 13
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x203 c=1041 t=1 data={"src":"test.glb"}
-  OPCODES ~= 5k
+  OPCODES ~= 4k
   MALLOC_COUNT = 13
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x204 c=1041 t=1 data={"src":"test.glb"}
-  OPCODES ~= 5k
+  OPCODES ~= 4k
   MALLOC_COUNT = 13
   ALIVE_OBJS_DELTA ~= 0.00k
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   MEMORY_USAGE_COUNT ~= 2965.68k bytes
@@ -162,3 +178,6 @@ CALL onUpdate(0.1)
 =======
   MEMORY_USAGE_COUNT ~= 2958.95k bytes
 >>>>>>> 2afa13b8 (update snapshots)
+=======
+  MEMORY_USAGE_COUNT ~= 2973.43k bytes
+>>>>>>> 2cfa6733 (fix: snapshots)

@@ -21,8 +21,11 @@
     }
   },
 <<<<<<< HEAD
+<<<<<<< HEAD
   "core-schema::Network-Entity": {},
   "core-schema::Network-Parent": {},
+=======
+>>>>>>> 2cfa6733 (fix: snapshots)
   "composite::root": {},
 =======
   "composite::root": {

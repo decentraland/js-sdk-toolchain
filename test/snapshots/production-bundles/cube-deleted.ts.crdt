@@ -3,6 +3,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=244.2k bytes
 =======
 =======
@@ -38,6 +39,9 @@ SCENE_COMPILED_JS_SIZE_PROD=242.5k bytes
 =======
 SCENE_COMPILED_JS_SIZE_PROD=242.5k bytes
 >>>>>>> 2afa13b8 (update snapshots)
+=======
+SCENE_COMPILED_JS_SIZE_PROD=243.8k bytes
+>>>>>>> 2cfa6733 (fix: snapshots)
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -54,6 +58,7 @@ EVAL test/snapshots/production-bundles/cube-deleted.js
 <<<<<<< HEAD
 <<<<<<< HEAD
   REQUIRE: ~system/Runtime
+<<<<<<< HEAD
   OPCODES ~= 76k
   MALLOC_COUNT = 14281
   ALIVE_OBJS_DELTA ~= 3.17k
@@ -147,6 +152,11 @@ EVAL test/snapshots/production-bundles/cube-deleted.js
   MALLOC_COUNT = 14176
   ALIVE_OBJS_DELTA ~= 3.10k
 >>>>>>> 2afa13b8 (update snapshots)
+=======
+  OPCODES ~= 68k
+  MALLOC_COUNT = 14463
+  ALIVE_OBJS_DELTA ~= 3.18k
+>>>>>>> 2cfa6733 (fix: snapshots)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -178,6 +188,7 @@ CALL onUpdate(0.1)
   OPCODES ~= 6k
   MALLOC_COUNT = 1
   ALIVE_OBJS_DELTA ~= 0.00k
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -220,3 +231,6 @@ CALL onUpdate(0.1)
 =======
   MEMORY_USAGE_COUNT ~= 1011.86k bytes
 >>>>>>> 2afa13b8 (update snapshots)
+=======
+  MEMORY_USAGE_COUNT ~= 1021.42k bytes
+>>>>>>> 2cfa6733 (fix: snapshots)

@@ -3,6 +3,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 SCENE_COMPILED_JS_SIZE_PROD=288.9k bytes
 =======
 =======
@@ -38,6 +39,9 @@ SCENE_COMPILED_JS_SIZE_PROD=287.1k bytes
 =======
 SCENE_COMPILED_JS_SIZE_PROD=287.1k bytes
 >>>>>>> 2afa13b8 (update snapshots)
+=======
+SCENE_COMPILED_JS_SIZE_PROD=288.5k bytes
+>>>>>>> 2cfa6733 (fix: snapshots)
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -54,6 +58,7 @@ EVAL test/snapshots/production-bundles/billboard.js
 <<<<<<< HEAD
 <<<<<<< HEAD
   REQUIRE: ~system/Runtime
+<<<<<<< HEAD
   OPCODES ~= 87k
   MALLOC_COUNT = 17678
   ALIVE_OBJS_DELTA ~= 3.87k
@@ -147,6 +152,11 @@ EVAL test/snapshots/production-bundles/billboard.js
   MALLOC_COUNT = 17723
   ALIVE_OBJS_DELTA ~= 3.84k
 >>>>>>> 2afa13b8 (update snapshots)
+=======
+  OPCODES ~= 79k
+  MALLOC_COUNT = 18010
+  ALIVE_OBJS_DELTA ~= 3.91k
+>>>>>>> 2cfa6733 (fix: snapshots)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 4
@@ -214,6 +224,7 @@ CALL onUpdate(0.1)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   OPCODES ~= 12k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
@@ -259,3 +270,9 @@ CALL onUpdate(0.1)
   ALIVE_OBJS_DELTA ~= 0.00k
   MEMORY_USAGE_COUNT ~= 1237.74k bytes
 >>>>>>> 2afa13b8 (update snapshots)
+=======
+  OPCODES ~= 11k
+  MALLOC_COUNT = 0
+  ALIVE_OBJS_DELTA ~= 0.00k
+  MEMORY_USAGE_COUNT ~= 1247.30k bytes
+>>>>>>> 2cfa6733 (fix: snapshots)
