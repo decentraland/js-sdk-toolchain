@@ -1,6 +1,6 @@
 import { dirname, resolve } from 'path'
-import fetch from 'node-fetch'
-import https from 'https'
+import { Readable } from 'stream'
+import { Agent } from 'undici'
 import { Router } from '@well-known-components/http-server'
 import { IHttpServerComponent } from '@well-known-components/interfaces'
 import { ChainId } from '@dcl/schemas'
@@ -22,6 +22,10 @@ export function setRoutes<T extends { [key: string]: any }>(
   const { fs } = components
   const router = new Router()
   const linkerDapp = dirname(require.resolve('@dcl/linker-dapp/package.json'))
+
+  // Dispatcher used by the /auth proxy below to skip TLS verification, mirroring the
+  // previous `new https.Agent({ rejectUnauthorized: false })` behavior with native fetch.
+  const insecureDispatcher = new Agent({ connect: { rejectUnauthorized: false } })
 
   router.get(mainRoute, async () => ({
     headers: { 'Content-Type': 'text/html' },
@@ -49,15 +53,11 @@ export function setRoutes<T extends { [key: string]: any }>(
    */
   router.get('/auth/(.*)', async (ctx): Promise<IHttpServerComponent.IResponse> => {
     try {
-      const httpsAgent = new https.Agent({
-        rejectUnauthorized: false
-      })
-
       const domain = 'decentraland.org'
       const url = `https://${domain}${ctx.url.pathname}${ctx.url.search}`
 
       // Forward the incoming request to the Decentraland auth endpoint.
-      const resp = await fetch(url, {
+      const resp = await components.fetch.fetch(url, {
         method: ctx.request.method, // Ensure the correct method (GET in this case).
         headers: {
           ...ctx.request.headers,
@@ -65,18 +65,21 @@ export function setRoutes<T extends { [key: string]: any }>(
           Referer: url,
           Origin: url
         }, // Forward headers for proper proxy behavior.
-        body: ctx.request.body, // Forward request body if necessary.
-        agent: httpsAgent // Use the insecure HTTPS agent.
+        body: ctx.request.body as any, // Forward request body if necessary.
+        duplex: 'half', // Required by native fetch when streaming a request body.
+        dispatcher: insecureDispatcher // Skip TLS verification.
       })
 
       // Remove content-encoding header if present to prevent issues with compressed responses.
       resp.headers.delete('content-encoding')
 
       // Return the proxied response, including body, status, and headers.
+      // `resp.body` is a web ReadableStream; convert it to a Node stream so the
+      // http-server can pipe it (it only handles Node streams / Buffers / strings).
       return {
-        body: resp.body,
+        body: resp.body ? Readable.fromWeb(resp.body as any) : undefined,
         status: resp.status,
-        headers: resp.headers
+        headers: Object.fromEntries(resp.headers)
       }
     } catch (error) {
       return {
