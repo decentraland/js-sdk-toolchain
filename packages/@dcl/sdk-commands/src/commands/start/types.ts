@@ -1,9 +1,7 @@
-import {
-  ILoggerComponent,
-  IMetricsComponent,
-  IHttpServerComponent,
-  IConfigComponent
-} from '@well-known-components/interfaces'
+import { ILoggerComponent, IMetricsComponent, IConfigComponent } from '@well-known-components/interfaces'
+// The http-server component now comes from @dcl/http-server, which is typed against
+// @dcl/core-commons' IHttpServerComponent (a native-fetch-bound mirror of the WKC one).
+import { IHttpServerComponent } from '@dcl/core-commons'
 import { HTTPProvider } from 'eth-connect'
 import { RoomComponent } from '@dcl/mini-comms/dist/adapters/rooms'
 import { WebSocketComponent } from './server/ws'

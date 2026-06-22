@@ -4,7 +4,7 @@ import { hexToBytes } from 'eth-connect'
 import { Lifecycle } from '@well-known-components/interfaces'
 import { Authenticator, AuthChain } from '@dcl/crypto'
 import { dirname, resolve } from 'path'
-import { Router } from '@well-known-components/http-server'
+import { Router } from '@dcl/http-server'
 import { validateStepsAndConnections } from '@dcl/quests-client/dist-cjs/utils'
 import prompts from 'prompts'
 

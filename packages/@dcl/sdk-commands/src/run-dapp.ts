@@ -1,4 +1,4 @@
-import { Router, createServerComponent } from '@well-known-components/http-server'
+import { Router, createServerComponent } from '@dcl/http-server'
 import { Lifecycle } from '@well-known-components/interfaces'
 import { createRecordConfigComponent } from '@well-known-components/env-config-provider'
 import { createConsoleLogComponent } from '@well-known-components/logger'

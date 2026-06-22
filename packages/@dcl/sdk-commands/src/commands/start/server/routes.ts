@@ -1,6 +1,6 @@
 import QRCode from 'qrcode'
-import { Router } from '@well-known-components/http-server'
-import { upgradeWebSocketResponse } from '@well-known-components/http-server/dist/ws'
+import { Router } from '@dcl/http-server'
+import { upgradeWebSocketResponse } from '@dcl/http-server/dist/ws'
 import { WebSocket } from 'ws'
 import { Workspace } from '../../../logic/workspace-validations'
 import { DataLayer } from '../data-layer/rpc'
