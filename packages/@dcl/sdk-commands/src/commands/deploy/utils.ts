@@ -4,7 +4,7 @@ import { AuthChain } from '@dcl/crypto'
 import { Lifecycle } from '@well-known-components/interfaces'
 import { createCatalystClient, createContentClient, CatalystClient, ContentClient } from 'dcl-catalyst-client'
 import { getCatalystServersFromCache } from 'dcl-catalyst-client/dist/contracts-snapshots'
-import { createFetchComponent } from '@well-known-components/fetch-component'
+import * as undici from 'undici'
 import { hexToBytes } from 'eth-connect'
 import { ethSign } from '@dcl/crypto/dist/crypto'
 import { Authenticator } from '@dcl/crypto'
@@ -20,6 +20,31 @@ import { getObject } from '../../logic/coordinates'
 import { getPointers } from '../../logic/catalyst-requests'
 import { Router } from '@well-known-components/http-server'
 import { dAppOptions, runDapp } from '../../run-dapp'
+
+/**
+ * Minimal undici-backed fetch component for the catalyst client. Replaces
+ * @well-known-components/fetch-component, which uses cross-fetch -> node-fetch v2
+ * and trips a gzip "Premature close" under keep-alive socket reuse on recent Node
+ * runtimes (nodejs/node#63989). Honors the `timeout` option (used by deploy) via an
+ * AbortController; all other init fields pass straight through to undici.fetch.
+ */
+function createFetchComponent() {
+  return {
+    async fetch(url: string, init: undici.RequestInit & { timeout?: number } = {}): Promise<undici.Response> {
+      const { timeout, signal, ...rest } = init
+      const controller = new AbortController()
+      const onExternalAbort = () => controller.abort()
+      signal?.addEventListener('abort', onExternalAbort, { once: true })
+      const timer = timeout ? setTimeout(() => controller.abort(), timeout) : undefined
+      try {
+        return await undici.fetch(url, { ...rest, signal: controller.signal })
+      } finally {
+        if (timer) clearTimeout(timer)
+        signal?.removeEventListener('abort', onExternalAbort)
+      }
+    }
+  }
+}
 
 export async function getCatalyst(
   chainId: ChainId = ChainId.ETHEREUM_MAINNET,
