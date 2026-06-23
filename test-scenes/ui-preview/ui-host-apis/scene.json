@@ -1,0 +1,6 @@
+{
+  "runtimeVersion": "7",
+  "main": "bin/index.js",
+  "scene": { "parcels": ["0,0"], "base": "0,0" },
+  "display": { "title": "ui-host-apis" }
+}

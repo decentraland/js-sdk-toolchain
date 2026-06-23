@@ -2,6 +2,9 @@ export type CliErrorName =
   // Command errors
   | 'COMMAND_NOT_VALID'
   | 'COMMAND_NOT_FOUND'
+  // UI preview errors
+  | 'UI_PREVIEW_SDK_NOT_FOUND'
+  | 'UI_PREVIEW_ENTRY_NOT_FOUND'
   // Deployment errors
   | 'DEPLOY_WORKSPACE_NOT_SUPPORTED'
   | 'DEPLOY_INVALID_PROJECT_TYPE'
