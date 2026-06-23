@@ -3,6 +3,10 @@ export type Coords = {
   y: number
 }
 
+export function formatCoord(coord: { x: number; y: number } | Coords): string {
+  return `${coord.x},${coord.y}`
+}
+
 /**
  * Returns true if the given parcels array are connected
  */
@@ -22,11 +26,22 @@ export function isEqual(p1: Coords, p2: Coords): boolean {
 }
 
 function visitParcel(parcel: Coords, allParcels: Coords[], visited: Coords[] = []): Coords[] {
-  const isVisited = visited.some((visitedParcel) => isEqual(visitedParcel, parcel))
-  if (!isVisited) {
-    visited.push(parcel)
-    const neighbours = getNeighbours(parcel.x, parcel.y, allParcels)
-    neighbours.forEach((neighbours) => visitParcel(neighbours, allParcels, visited))
+  // Use an iterative DFS to avoid blowing the call stack on large connected parcel sets.
+  const visitedSet = new Set<string>()
+  const stackToVisit: Coords[] = [parcel]
+
+  while (stackToVisit.length > 0) {
+    const currentParcel = stackToVisit.pop() as Coords
+    const key = formatCoord(currentParcel)
+    const isVisited = visitedSet.has(key)
+    if (!isVisited) {
+      visitedSet.add(key)
+      visited.push(currentParcel)
+      const neighbours = getNeighbours(currentParcel.x, currentParcel.y, allParcels)
+      for (const n of neighbours) {
+        if (!visitedSet.has(formatCoord(n))) stackToVisit.push(n)
+      }
+    }
   }
   return visited
 }
