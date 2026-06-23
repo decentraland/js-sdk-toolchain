@@ -51,3 +51,30 @@ export async function getDCLIgnorePatterns(components: Pick<CliComponents, 'fs'>
 
   return Array.from(new Set(ignored))
 }
+
+/**
+ * Reads the .dclignore file, checks for missing entries, and appends them.
+ * If the file does not exist, creates it with only the provided entries.
+ */
+export async function ensureDclIgnoreEntries(
+  components: Pick<CliComponents, 'fs'>,
+  dir: string,
+  entries: string[]
+): Promise<void> {
+  const dclIgnorePath = path.resolve(dir, '.dclignore')
+  const content = await getDCLIgnoreFileContents(components, dir)
+
+  if (content === null) {
+    // No .dclignore file — create one with the entries
+    await components.fs.writeFile(dclIgnorePath, entries.join('\n') + '\n')
+    return
+  }
+
+  const existingLines = new Set(content.split('\n').map((line) => line.trim()))
+  const missingEntries = entries.filter((entry) => !existingLines.has(entry))
+
+  if (missingEntries.length === 0) return
+
+  const suffix = content.endsWith('\n') ? '' : '\n'
+  await components.fs.appendFile(dclIgnorePath, suffix + missingEntries.join('\n') + '\n')
+}

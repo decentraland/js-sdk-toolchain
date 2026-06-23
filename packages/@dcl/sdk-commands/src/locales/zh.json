@@ -50,7 +50,8 @@
     },
     "get_context_files": {
       "list_failed": "列出上下文文件失败",
-      "download_failed": "下载上下文文件失败"
+      "download_failed": "下载上下文文件失败",
+      "write_config_failed": "写入AI上下文配置文件失败"
     },
     "init": {
       "dir_not_empty": "指定的目标目录不为空。使用 --yes 运行此命令以覆盖。",
