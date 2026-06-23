@@ -1305,6 +1305,14 @@ export const enum Font {
     F_SERIF = 1
 }
 
+// Warning: (ae-missing-release-tag) "formatCoord" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export function formatCoord(coord: {
+    x: number;
+    y: number;
+} | Coords): string;
+
 // @public
 export function getComponentEntityTree<T>(engine: Pick<IEngine, 'getEntitiesWith'>, entity: Entity, component: ComponentDefinition<T & {
     parent?: Entity;
