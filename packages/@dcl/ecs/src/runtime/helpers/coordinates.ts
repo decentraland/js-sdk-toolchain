@@ -3,7 +3,8 @@ export type Coords = {
   y: number
 }
 
-export function formatCoord(coord: { x: number; y: number } | Coords): string {
+/** Returns a string representation of the given coordinates in the format "x,y" */
+function formatCoord(coord: { x: number; y: number }): string {
   return `${coord.x},${coord.y}`
 }
 
@@ -14,8 +15,8 @@ export function areConnected(parcels: Coords[]): boolean {
   if (parcels.length === 0) {
     return false
   }
-  const visited = visitParcel(parcels[0], parcels)
-  return visited.length === parcels.length
+  const visited = visitConnectedParcels(parcels[0], parcels)
+  return visited.size === parcels.length
 }
 
 /**
@@ -25,8 +26,15 @@ export function isEqual(p1: Coords, p2: Coords): boolean {
   return p1.x === p2.x && p1.y === p2.y
 }
 
-function visitParcel(parcel: Coords, allParcels: Coords[], visited: Coords[] = []): Coords[] {
-  // Use an iterative DFS to avoid blowing the call stack on large connected parcel sets.
+/**
+ * Returns the list of connected parcels starting from the given parcel.
+ * @param parcel - The starting parcel to visit
+ * @param allParcels - The list of all parcels to consider for connectivity
+ * @returns The list of connected parcels starting from the given parcel
+ * @remarks This function uses an iterative depth-first search (DFS) approach to avoid blowing the call stack on large connected parcel sets.
+ */
+function visitConnectedParcels(parcel: Coords, allParcels: Coords[]): Set<string> {
+  const allParcelsSet = new Set(allParcels.map(formatCoord))
   const visitedSet = new Set<string>()
   const stackToVisit: Coords[] = [parcel]
 
@@ -36,22 +44,21 @@ function visitParcel(parcel: Coords, allParcels: Coords[], visited: Coords[] = [
     const isVisited = visitedSet.has(key)
     if (!isVisited) {
       visitedSet.add(key)
-      visited.push(currentParcel)
-      const neighbours = getNeighbours(currentParcel.x, currentParcel.y, allParcels)
+      const neighbours = getNeighbours(currentParcel.x, currentParcel.y, allParcelsSet)
       for (const n of neighbours) {
         if (!visitedSet.has(formatCoord(n))) stackToVisit.push(n)
       }
     }
   }
-  return visited
+  return visitedSet
 }
 
-function getIsNeighbourMatcher(x: number, y: number) {
-  return (coords: Coords) =>
-    (coords.x === x && (coords.y + 1 === y || coords.y - 1 === y)) ||
-    (coords.y === y && (coords.x + 1 === x || coords.x - 1 === x))
-}
-
-function getNeighbours(x: number, y: number, parcels: Coords[]): Coords[] {
-  return parcels.filter(getIsNeighbourMatcher(x, y))
+function getNeighbours(x: number, y: number, parcels: Set<string>): Coords[] {
+  const neighbourCandidates = [
+    { x: x + 1, y },
+    { x: x - 1, y },
+    { x, y: y + 1 },
+    { x, y: y - 1 }
+  ]
+  return neighbourCandidates.filter((c) => parcels.has(formatCoord(c)))
 }
