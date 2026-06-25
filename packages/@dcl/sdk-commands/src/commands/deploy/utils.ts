@@ -18,6 +18,7 @@ import { IFuture } from 'fp-future'
 import { getEstateRegistry, getLandRegistry } from '../../logic/config'
 import { getObject } from '../../logic/coordinates'
 import { getPointers } from '../../logic/catalyst-requests'
+import { drainResponse } from '../../logic/fetch'
 import { Router } from '@well-known-components/http-server'
 import { dAppOptions, runDapp } from '../../run-dapp'
 
@@ -415,6 +416,7 @@ export async function fetchWorldPermissions(
   const url = `${targetContent}/world/${encodedName}/permissions`
   const response = await fetch(url)
   if (!response.ok) {
+    await drainResponse(response)
     throw new Error(`Failed to fetch world permissions: ${response.status} ${response.statusText}`)
   }
   return (await response.json()) as WorldPermissionsResponse
@@ -429,6 +431,7 @@ export async function fetchParcelPermissions(
   const url = `${targetContent}/world/${encodedName}/permissions/deployment/address/${address.toLowerCase()}/parcels`
   const response = await fetch(url)
   if (!response.ok) {
+    await drainResponse(response)
     throw new Error(`Failed to fetch parcel permissions: ${response.status} ${response.statusText}`)
   }
   const data = (await response.json()) as { parcels: string[] }
