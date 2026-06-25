@@ -1,38 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-SCENE_COMPILED_JS_SIZE_PROD=564.1k bytes
-=======
-=======
->>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
-=======
->>>>>>> 8e67b6b5 (update snapshots)
-=======
->>>>>>> 718e522d (sync: merge main into auth-server (#1392))
-<<<<<<< HEAD
-SCENE_COMPILED_JS_SIZE_PROD=561.4k bytes
-=======
-SCENE_COMPILED_JS_SIZE_PROD=502.2k bytes
->>>>>>> 327f7995 (fix tests)
->>>>>>> 11b9aad2 (fix tests)
-THE BUNDLE HAS SOURCEMAPS
-(start empty vm 0.21.0-3680274614.commit-1808aa1)
-  OPCODES ~= 72k
-=======
-SCENE_COMPILED_JS_SIZE_PROD=519.1k bytes
-=======
-SCENE_COMPILED_JS_SIZE_PROD=551.4k bytes
->>>>>>> 63ddb3f8 (update snapshots)
-=======
-=======
->>>>>>> 2afa13b8 (update snapshots)
-SCENE_COMPILED_JS_SIZE_PROD=560.3k bytes
-=======
 SCENE_COMPILED_JS_SIZE_PROD=563k bytes
->>>>>>> 2cfa6733 (fix: snapshots)
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -44,113 +10,10 @@ EVAL test/snapshots/development-bundles/static-scene.test.js
   REQUIRE: ~system/Testing
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   REQUIRE: ~system/Runtime
-<<<<<<< HEAD
-  OPCODES ~= 73k
-  MALLOC_COUNT = 16301
-  ALIVE_OBJS_DELTA ~= 3.24k
-=======
-=======
->>>>>>> 112f68c7 (fix tests)
-=======
->>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
-=======
->>>>>>> 8e67b6b5 (update snapshots)
-=======
->>>>>>> 718e522d (sync: merge main into auth-server (#1392))
-<<<<<<< HEAD
-  OPCODES ~= 66k
-  MALLOC_COUNT = 16028
-  ALIVE_OBJS_DELTA ~= 3.18k
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  OPCODES ~= 61k
-  MALLOC_COUNT = 14733
-  ALIVE_OBJS_DELTA ~= 2.92k
-=======
-=======
->>>>>>> f7184856 (fix tests)
-<<<<<<< HEAD
-  OPCODES ~= 56k
-  MALLOC_COUNT = 14173
-  ALIVE_OBJS_DELTA ~= 2.80k
-=======
-<<<<<<< HEAD
-  OPCODES ~= 55k
-  MALLOC_COUNT = 14039
-  ALIVE_OBJS_DELTA ~= 2.77k
-=======
-  OPCODES ~= 47k
-  MALLOC_COUNT = 13674
-  ALIVE_OBJS_DELTA ~= 2.68k
->>>>>>> 99d394c1 (update snapshots)
->>>>>>> c50aee8d (update snapshots)
-<<<<<<< HEAD
->>>>>>> 9f5e0f01 (update snapshots)
-=======
-=======
-  OPCODES ~= 47k
-  MALLOC_COUNT = 14014
-  ALIVE_OBJS_DELTA ~= 2.74k
->>>>>>> 126220f1 (fix tests)
->>>>>>> f7184856 (fix tests)
-=======
-  OPCODES ~= 48k
-  MALLOC_COUNT = 14340
-  ALIVE_OBJS_DELTA ~= 2.81k
->>>>>>> 4d3a904b (fix tests)
->>>>>>> 327f7995 (fix tests)
-<<<<<<< HEAD
->>>>>>> 11b9aad2 (fix tests)
-=======
-=======
-  OPCODES ~= 61k
-  MALLOC_COUNT = 14733
-  ALIVE_OBJS_DELTA ~= 2.92k
->>>>>>> e6454fdd (fix tests)
-<<<<<<< HEAD
->>>>>>> 112f68c7 (fix tests)
-=======
-=======
-  OPCODES ~= 55k
-  MALLOC_COUNT = 15427
-  ALIVE_OBJS_DELTA ~= 3.04k
->>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
-<<<<<<< HEAD
->>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
-=======
-=======
-  OPCODES ~= 57k
-  MALLOC_COUNT = 16026
-  ALIVE_OBJS_DELTA ~= 3.15k
->>>>>>> 63ddb3f8 (update snapshots)
-<<<<<<< HEAD
->>>>>>> 8e67b6b5 (update snapshots)
-=======
-=======
-  OPCODES ~= 58k
-  MALLOC_COUNT = 16211
-  ALIVE_OBJS_DELTA ~= 3.19k
->>>>>>> 1828100c (sync: merge main into auth-server (#1392))
->>>>>>> 718e522d (sync: merge main into auth-server (#1392))
-=======
-  OPCODES ~= 58k
-  MALLOC_COUNT = 16211
-  ALIVE_OBJS_DELTA ~= 3.19k
->>>>>>> 2afa13b8 (update snapshots)
-=======
   OPCODES ~= 66k
   MALLOC_COUNT = 16514
   ALIVE_OBJS_DELTA ~= 3.26k
->>>>>>> 2cfa6733 (fix: snapshots)
 CALL onStart()
   main.crdt: PUT_COMPONENT e=0x200 c=1 t=0 data={"position":{"x":5.880000114440918,"y":2.7916901111602783,"z":7.380000114440918},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   main.crdt: PUT_COMPONENT e=0x202 c=1 t=0 data={"position":{"x":4,"y":0.800000011920929,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
@@ -180,128 +43,18 @@ CALL onStart()
   main.crdt: PUT_COMPONENT e=0x200 c=1062 t=0 data={"pointerEvents":[{"eventType":1,"eventInfo":{"button":1,"hoverText":"Press E to spawn","maxDistance":100,"showFeedback":true}}]}
   main.crdt: PUT_COMPONENT e=0x200 c=1017 t=0 data={"material":{"$case":"pbr","pbr":{"albedoColor":{"r":1,"g":0.8500000238418579,"b":0.41999998688697815,"a":1}}}}
   OPCODES ~= 22k
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  MALLOC_COUNT = 232
-  ALIVE_OBJS_DELTA ~= 0.09k
-CALL onUpdate(0)
-   ~system/Testing: plan {"tests":[{"name":"ensure that cubes are in the scene on the first frame"}]}
-<<<<<<< HEAD
-  OPCODES ~= 19k
-=======
   MALLOC_COUNT = 234
   ALIVE_OBJS_DELTA ~= 0.09k
 CALL onUpdate(0)
    ~system/Testing: plan {"tests":[{"name":"ensure that cubes are in the scene on the first frame"}]}
   OPCODES ~= 18k
->>>>>>> 2cfa6733 (fix: snapshots)
-  MALLOC_COUNT = 67
-  ALIVE_OBJS_DELTA ~= 0.01k
-=======
-  OPCODES ~= 18k
-  MALLOC_COUNT = 41
-  ALIVE_OBJS_DELTA ~= -0.00k
-=======
-=======
->>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
-=======
->>>>>>> 2afa13b8 (update snapshots)
-  MALLOC_COUNT = 234
-  ALIVE_OBJS_DELTA ~= 0.09k
-CALL onUpdate(0)
-   ~system/Testing: plan {"tests":[{"name":"ensure that cubes are in the scene on the first frame"}]}
-<<<<<<< HEAD
-<<<<<<< HEAD
-  OPCODES ~= 15k
-  MALLOC_COUNT = -61
-  ALIVE_OBJS_DELTA ~= -0.03k
-<<<<<<< HEAD
->>>>>>> 327f7995 (fix tests)
-<<<<<<< HEAD
->>>>>>> 11b9aad2 (fix tests)
-=======
-=======
->>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
-<<<<<<< HEAD
->>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
-=======
-=======
-  OPCODES ~= 16k
-  MALLOC_COUNT = 41
-  ALIVE_OBJS_DELTA ~= -0.00k
->>>>>>> 63ddb3f8 (update snapshots)
->>>>>>> 8e67b6b5 (update snapshots)
-=======
-  OPCODES ~= 16k
-  MALLOC_COUNT = 41
-  ALIVE_OBJS_DELTA ~= -0.00k
->>>>>>> 2afa13b8 (update snapshots)
+  MALLOC_COUNT = -43
+  ALIVE_OBJS_DELTA ~= -0.02k
 CALL onUpdate(0.1)
   LOG: ["🧪 Running test ensure that cubes are in the scene on the first frame"]
   LOG: ["🟢 Test passed ensure that cubes are in the scene on the first frame"]
   ~system/Testing: logTestResult {"name":"ensure that cubes are in the scene on the first frame","ok":true,"totalFrames":0,"totalTime":0}
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  OPCODES ~= 5k
-  MALLOC_COUNT = -5
-  ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1426.65k bytes
-=======
-=======
->>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
-=======
->>>>>>> 8e67b6b5 (update snapshots)
-<<<<<<< HEAD
   OPCODES ~= 4k
   MALLOC_COUNT = -5
   ALIVE_OBJS_DELTA ~= 0.00k
-<<<<<<< HEAD
-  MEMORY_USAGE_COUNT ~= 1414.97k bytes
-=======
-  OPCODES ~= 3k
-  MALLOC_COUNT = -5
-  ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1293.47k bytes
->>>>>>> 327f7995 (fix tests)
-<<<<<<< HEAD
->>>>>>> 11b9aad2 (fix tests)
-=======
-=======
-  OPCODES ~= 3k
-  MALLOC_COUNT = -5
-  ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1328.24k bytes
->>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
-<<<<<<< HEAD
->>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
-=======
-=======
-  OPCODES ~= 4k
-  MALLOC_COUNT = -5
-  ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1387.69k bytes
->>>>>>> 63ddb3f8 (update snapshots)
-<<<<<<< HEAD
->>>>>>> 8e67b6b5 (update snapshots)
-=======
-=======
-  MEMORY_USAGE_COUNT ~= 1402.81k bytes
->>>>>>> 1828100c (sync: merge main into auth-server (#1392))
->>>>>>> 718e522d (sync: merge main into auth-server (#1392))
-=======
-  OPCODES ~= 4k
-  MALLOC_COUNT = -5
-  ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1402.81k bytes
->>>>>>> 2afa13b8 (update snapshots)
-=======
-  OPCODES ~= 4k
-  MALLOC_COUNT = -5
-  ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1414.89k bytes
->>>>>>> 2cfa6733 (fix: snapshots)
+  MEMORY_USAGE_COUNT ~= 1412.24k bytes

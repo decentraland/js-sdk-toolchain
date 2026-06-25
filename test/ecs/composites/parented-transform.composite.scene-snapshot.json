@@ -39,34 +39,7 @@
       "parent": 513
     }
   },
-<<<<<<< HEAD
-<<<<<<< HEAD
-  "core-schema::Network-Entity": {},
-  "core-schema::Network-Parent": {},
-=======
->>>>>>> 2cfa6733 (fix: snapshots)
   "composite::root": {},
-=======
-  "composite::root": {
-    "512": {
-      "src": "parented-transform.composite",
-      "entities": [
-        {
-          "src": 0,
-          "dest": 512
-        },
-        {
-          "src": 518,
-          "dest": 513
-        },
-        {
-          "src": 519,
-          "dest": 514
-        }
-      ]
-    }
-  },
->>>>>>> 67c518f0 (update snapshots)
   "custom-parenter": {
     "513": {
       "customParent": 512,

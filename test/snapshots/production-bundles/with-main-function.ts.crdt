@@ -1,38 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-SCENE_COMPILED_JS_SIZE_PROD=607.3k bytes
-=======
-=======
->>>>>>> 8e67b6b5 (update snapshots)
-=======
->>>>>>> 718e522d (sync: merge main into auth-server (#1392))
-<<<<<<< HEAD
-SCENE_COMPILED_JS_SIZE_PROD=604.6k bytes
-=======
-SCENE_COMPILED_JS_SIZE_PROD=550k bytes
->>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
-<<<<<<< HEAD
->>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
-=======
-=======
-SCENE_COMPILED_JS_SIZE_PROD=587k bytes
->>>>>>> 63ddb3f8 (update snapshots)
-<<<<<<< HEAD
->>>>>>> 8e67b6b5 (update snapshots)
-=======
-=======
-SCENE_COMPILED_JS_SIZE_PROD=597.5k bytes
->>>>>>> 1828100c (sync: merge main into auth-server (#1392))
->>>>>>> 718e522d (sync: merge main into auth-server (#1392))
-=======
-SCENE_COMPILED_JS_SIZE_PROD=602.9k bytes
->>>>>>> 2afa13b8 (update snapshots)
-=======
-SCENE_COMPILED_JS_SIZE_PROD=605.5k bytes
->>>>>>> 2cfa6733 (fix: snapshots)
+SCENE_COMPILED_JS_SIZE_PROD=605.6k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -42,56 +8,10 @@ EVAL test/snapshots/production-bundles/with-main-function.js
   REQUIRE: long
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   REQUIRE: ~system/Runtime
-<<<<<<< HEAD
-  OPCODES ~= 222k
-  MALLOC_COUNT = 43886
-  ALIVE_OBJS_DELTA ~= 9.89k
-=======
-=======
->>>>>>> 8e67b6b5 (update snapshots)
-=======
->>>>>>> 718e522d (sync: merge main into auth-server (#1392))
-<<<<<<< HEAD
-  OPCODES ~= 213k
-  MALLOC_COUNT = 43567
-  ALIVE_OBJS_DELTA ~= 9.81k
-=======
-  OPCODES ~= 186k
-  MALLOC_COUNT = 41655
-  ALIVE_OBJS_DELTA ~= 9.26k
->>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
-<<<<<<< HEAD
->>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
-=======
-=======
-  OPCODES ~= 195k
-  MALLOC_COUNT = 43717
-  ALIVE_OBJS_DELTA ~= 9.63k
->>>>>>> 63ddb3f8 (update snapshots)
-<<<<<<< HEAD
->>>>>>> 8e67b6b5 (update snapshots)
-=======
-=======
-  OPCODES ~= 198k
-  MALLOC_COUNT = 44498
-  ALIVE_OBJS_DELTA ~= 9.81k
->>>>>>> 1828100c (sync: merge main into auth-server (#1392))
->>>>>>> 718e522d (sync: merge main into auth-server (#1392))
-=======
-  OPCODES ~= 204k
-  MALLOC_COUNT = 45782
-  ALIVE_OBJS_DELTA ~= 10.25k
->>>>>>> 2afa13b8 (update snapshots)
-=======
   OPCODES ~= 212k
-  MALLOC_COUNT = 46135
+  MALLOC_COUNT = 46131
   ALIVE_OBJS_DELTA ~= 10.34k
->>>>>>> 2cfa6733 (fix: snapshots)
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -100,46 +20,6 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   Scene: PUT_COMPONENT e=0x201 c=1041 t=1 data={"src":"test.glb"}
   Scene: PUT_COMPONENT e=0x200 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  OPCODES ~= 8k
-  MALLOC_COUNT = 96
-=======
-  OPCODES ~= 7k
-  MALLOC_COUNT = 98
->>>>>>> 2cfa6733 (fix: snapshots)
-  ALIVE_OBJS_DELTA ~= 0.03k
-CALL onUpdate(0.1)
-  Scene: PUT_COMPONENT e=0x202 c=1041 t=1 data={"src":"test.glb"}
-  OPCODES ~= 4k
-  MALLOC_COUNT = 13
-  ALIVE_OBJS_DELTA ~= 0.00k
-CALL onUpdate(0.1)
-  Scene: PUT_COMPONENT e=0x203 c=1041 t=1 data={"src":"test.glb"}
-  OPCODES ~= 4k
-  MALLOC_COUNT = 13
-  ALIVE_OBJS_DELTA ~= 0.00k
-CALL onUpdate(0.1)
-  Scene: PUT_COMPONENT e=0x204 c=1041 t=1 data={"src":"test.glb"}
-  OPCODES ~= 4k
-  MALLOC_COUNT = 13
-  ALIVE_OBJS_DELTA ~= 0.00k
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  MEMORY_USAGE_COUNT ~= 2965.68k bytes
-=======
-=======
->>>>>>> 718e522d (sync: merge main into auth-server (#1392))
-  MEMORY_USAGE_COUNT ~= 2951.53k bytes
-=======
-  OPCODES ~= 6k
-  MALLOC_COUNT = 75
-=======
-=======
->>>>>>> 2afa13b8 (update snapshots)
   OPCODES ~= 7k
   MALLOC_COUNT = 98
   ALIVE_OBJS_DELTA ~= 0.03k
@@ -158,26 +38,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 4k
   MALLOC_COUNT = 13
   ALIVE_OBJS_DELTA ~= 0.00k
-<<<<<<< HEAD
-<<<<<<< HEAD
-  MEMORY_USAGE_COUNT ~= 2699.40k bytes
->>>>>>> 6cbc24b1 (Regenerate CRDT snapshots after merge)
-<<<<<<< HEAD
->>>>>>> e86adaed (Regenerate CRDT snapshots after merge)
-=======
-=======
-  MEMORY_USAGE_COUNT ~= 2865.58k bytes
->>>>>>> 63ddb3f8 (update snapshots)
-<<<<<<< HEAD
->>>>>>> 8e67b6b5 (update snapshots)
-=======
-=======
-  MEMORY_USAGE_COUNT ~= 2911.03k bytes
->>>>>>> 1828100c (sync: merge main into auth-server (#1392))
->>>>>>> 718e522d (sync: merge main into auth-server (#1392))
-=======
-  MEMORY_USAGE_COUNT ~= 2958.95k bytes
->>>>>>> 2afa13b8 (update snapshots)
-=======
-  MEMORY_USAGE_COUNT ~= 2973.43k bytes
->>>>>>> 2cfa6733 (fix: snapshots)
+  MEMORY_USAGE_COUNT ~= 2973.31k bytes
