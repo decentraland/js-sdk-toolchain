@@ -28,6 +28,7 @@ import { getValidWorkspace } from '../../logic/workspace-validations'
 import { LinkerResponse } from '../../linker-dapp/routes'
 import { analyticsFeatures } from './analytics-features'
 import { getInstalledPackageVersion } from '../../logic/config'
+import { drainResponse } from '../../logic/fetch'
 
 interface Options {
   args: Result<typeof args>
@@ -303,6 +304,7 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
         )
 
         if (deleteResponse.ok) {
+          await drainResponse(deleteResponse)
           options.components.logger.info(`[DEPLOY] existing scenes for "${worldName} deleted successfully"`)
         } else {
           const errorText = await deleteResponse.text()
