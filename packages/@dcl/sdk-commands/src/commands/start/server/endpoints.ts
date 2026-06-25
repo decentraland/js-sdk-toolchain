@@ -137,6 +137,12 @@ export async function setupEcs6Endpoints(
       duplex: 'half'
     })
 
+    // undici decompresses the body but leaves the original content-encoding /
+    // content-length headers in place; forwarding them would make the client
+    // re-decode (or truncate to the compressed length) the already-decoded body.
+    res.headers.delete('content-encoding')
+    res.headers.delete('content-length')
+
     return {
       status: res.status,
       headers: Object.fromEntries(res.headers),

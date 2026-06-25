@@ -70,8 +70,10 @@ export function setRoutes<T extends { [key: string]: any }>(
         dispatcher: insecureDispatcher // Skip TLS verification.
       })
 
-      // Remove content-encoding header if present to prevent issues with compressed responses.
+      // undici decompresses the body but leaves content-encoding / content-length in
+      // place; forwarding them would make the client re-decode or truncate the body.
       resp.headers.delete('content-encoding')
+      resp.headers.delete('content-length')
 
       // Return the proxied response, including body, status, and headers.
       // `resp.body` is a web ReadableStream; convert it to a Node stream so the

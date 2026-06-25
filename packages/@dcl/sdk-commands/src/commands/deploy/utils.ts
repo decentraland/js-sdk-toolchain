@@ -34,6 +34,7 @@ function createFetchComponent() {
     async fetch(url: string, init: undici.RequestInit & { timeout?: number } = {}): Promise<undici.Response> {
       const { timeout, signal, ...rest } = init
       const controller = new AbortController()
+      if (signal?.aborted) controller.abort()
       const onExternalAbort = () => controller.abort()
       signal?.addEventListener('abort', onExternalAbort, { once: true })
       const timer = timeout ? setTimeout(() => controller.abort(), timeout) : undefined
