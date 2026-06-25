@@ -9,9 +9,15 @@ class AnalyticsClass {
     return Promise.resolve()
   }
 
-  track(eventName, cb) {
-    console.log({ eventName, cb })
-    return cb()
+  // @segment/analytics-node v2+ `track` takes a single message object and
+  // delivers events asynchronously (no per-call callback). Events are flushed
+  // on closeAndFlush() or the internal flush interval.
+  track(message) {
+    console.log({ message })
+  }
+
+  closeAndFlush() {
+    return Promise.resolve()
   }
 }
 Analytics.Analytics = AnalyticsClass
