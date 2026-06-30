@@ -196,7 +196,8 @@ export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAva
 // @public (undocumented)
 export const enum AvatarModifierType {
     AMT_DISABLE_PASSPORTS = 1,
-    AMT_HIDE_AVATARS = 0
+    AMT_HIDE_AVATARS = 0,
+    AMT_HIDE_NAMETAGS = 2
 }
 
 // @public (undocumented)
@@ -725,6 +726,7 @@ export const componentDefinitionByName: {
     "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
     "core::SkyboxTime": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSkyboxTime>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
+    "core::TouchscreenInputControls": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTouchscreenInputControls>>;
     "core::TriggerArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTriggerArea>>;
     "core::TriggerAreaResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBTriggerAreaResult>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
@@ -735,6 +737,7 @@ export const componentDefinitionByName: {
     "core::UiDropdown": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdown>>;
     "core::UiDropdownResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdownResult>>;
     "core::UiInput": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInput>>;
+    "core::UiInputBinding": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInputBinding>>;
     "core::UiInputResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInputResult>>;
     "core::UiText": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiText>>;
     "core::UiTransform": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiTransform>>;
@@ -2552,6 +2555,9 @@ export namespace PBAvatarEquippedData {
 
 // @public (undocumented)
 export interface PBAvatarLocomotionSettings {
+    doubleJumpHeight?: number | undefined;
+    glidingFallingSpeed?: number | undefined;
+    glidingSpeed?: number | undefined;
     hardLandingCooldown?: number | undefined;
     jogSpeed?: number | undefined;
     jumpHeight?: number | undefined;
@@ -3587,6 +3593,20 @@ export namespace PBTextShape {
 }
 
 // @public (undocumented)
+export interface PBTouchscreenInputControls {
+    hideGamepad: boolean;
+    hideJoystick: boolean;
+}
+
+// @public (undocumented)
+export namespace PBTouchscreenInputControls {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTouchscreenInputControls;
+    // (undocumented)
+    export function encode(message: PBTouchscreenInputControls, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBTriggerArea {
     collisionMask?: number | undefined;
     mesh?: TriggerAreaMeshType | undefined;
@@ -3806,6 +3826,19 @@ export namespace PBUiInput {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiInput;
     // (undocumented)
     export function encode(message: PBUiInput, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBUiInputBinding {
+    actions: InputAction[];
+}
+
+// @public (undocumented)
+export namespace PBUiInputBinding {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiInputBinding;
+    // (undocumented)
+    export function encode(message: PBUiInputBinding, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -5037,6 +5070,9 @@ export const ToLinearSpace = 2.2;
 // @public (undocumented)
 export type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTypes<T>;
 
+// @public (undocumented)
+export const TouchscreenInputControls: LastWriteWinElementSetComponentDefinition<PBTouchscreenInputControls>;
+
 // Warning: (ae-missing-release-tag) "Transform" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -5281,6 +5317,9 @@ export type UiFontType = 'sans-serif' | 'serif' | 'monospace';
 
 // @public (undocumented)
 export const UiInput: LastWriteWinElementSetComponentDefinition<PBUiInput>;
+
+// @public (undocumented)
+export const UiInputBinding: LastWriteWinElementSetComponentDefinition<PBUiInputBinding>;
 
 // @public (undocumented)
 export interface UiInputProps extends Omit<PBUiInput, 'font' | 'textAlign' | 'fontSize'> {
