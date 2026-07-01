@@ -54,4 +54,3 @@ Runtime.setShouldThrowError = (throwError: boolean) => {
 }
 
 module.exports = Runtime
-

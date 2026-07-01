@@ -61,8 +61,10 @@ describe('Generated OnPointerDown ProtoBuf', () => {
             maxDistance: 5,
             showFeedback: false,
             showHighlight: false,
-            maxPlayerDistance: 3
-          }
+            maxPlayerDistance: 3,
+            priority: 0
+          },
+          interactionType: InteractionType.CURSOR
         }
       ]
     })
