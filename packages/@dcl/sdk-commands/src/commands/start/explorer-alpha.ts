@@ -46,7 +46,6 @@ async function runApp(
   const skipAuthScreen = !!args['--skip-auth-screen']
   const landscapeTerrainEnabled = !!args['--landscape-terrain-enabled']
   const openDeeplinkInNewInstance = !!args['-n']
-  const multiInstance = !!args['--multi-instance']
 
   try {
     if (isWindows) {
@@ -62,6 +61,7 @@ async function runApp(
     params.set('dclenv', dclenv)
 
     params.set('local-scene', 'true')
+    params.set('multi-instance', 'true')
 
     if (isHub) {
       params.set('hub', 'true')
@@ -74,9 +74,6 @@ async function runApp(
     }
     if (openDeeplinkInNewInstance) {
       params.set('open-deeplink-in-new-instance', 'true')
-    }
-    if (multiInstance) {
-      params.set('multi-instance', 'true')
     }
 
     const queryParams = params.toString()
