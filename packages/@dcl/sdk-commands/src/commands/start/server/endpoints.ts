@@ -1,8 +1,8 @@
 import { Router } from '@well-known-components/http-server'
 import * as path from 'path'
+import { Readable } from 'stream'
 import { WearableJson } from '@dcl/schemas/dist/sdk'
 import { Entity, EntityType, Locale, Wearable } from '@dcl/schemas'
-import fetch, { Headers } from 'node-fetch'
 import { v4 as uuidv4 } from 'uuid'
 
 import { PreviewComponents } from '../types'
@@ -77,12 +77,13 @@ export async function setupEcs6Endpoints(
         u.host = catalystUrl.host
         u.protocol = catalystUrl.protocol
         u.port = catalystUrl.port
-        const req = await fetch(u.toString(), {
+        const req = await components.fetch.fetch(u.toString(), {
           headers: {
             connection: 'close'
           },
           method: ctx.request.method,
-          body: ctx.request.method === 'get' ? undefined : ctx.request.body
+          body: ctx.request.method === 'get' ? undefined : (ctx.request.body as any),
+          duplex: 'half'
         })
 
         const deployedProfile = (await req.json()) as any[]
@@ -110,31 +111,43 @@ export async function setupEcs6Endpoints(
     u.host = catalystUrl.host
     u.protocol = catalystUrl.protocol
     u.port = catalystUrl.port
-    const req = await fetch(u.toString(), {
+    const req = await components.fetch.fetch(u.toString(), {
       headers: {
         connection: 'close'
       },
       method: ctx.request.method,
-      body: ctx.request.method === 'get' ? undefined : ctx.request.body
+      body: ctx.request.method === 'get' ? undefined : (ctx.request.body as any),
+      duplex: 'half'
     })
 
     return {
       headers: {
         'content-type': req.headers.get('content-type') || 'application/binary'
       },
-      body: req.body
+      // `req.body` is a web ReadableStream; convert it to a Node stream so the
+      // http-server can pipe it (it only handles Node streams / Buffers / strings).
+      body: req.body ? Readable.fromWeb(req.body as any) : undefined
     }
   })
 
   router.post('/content/entities', async (ctx) => {
-    const headers = new Headers()
-    const res = await fetch(`${catalystUrl.toString()}/content/entities`, {
+    const res = await components.fetch.fetch(`${catalystUrl.toString()}/content/entities`, {
       method: 'post',
-      headers,
-      body: ctx.request.body
+      body: ctx.request.body as any,
+      duplex: 'half'
     })
 
-    return res
+    // undici decompresses the body but leaves the original content-encoding /
+    // content-length headers in place; forwarding them would make the client
+    // re-decode (or truncate to the compressed length) the already-decoded body.
+    res.headers.delete('content-encoding')
+    res.headers.delete('content-length')
+
+    return {
+      status: res.status,
+      headers: Object.fromEntries(res.headers),
+      body: res.body ? Readable.fromWeb(res.body as any) : undefined
+    }
   })
 
   router.all('/explorer/:path+', async (ctx) => {
@@ -142,17 +155,20 @@ export async function setupEcs6Endpoints(
     u.host = catalystUrl.host
     u.protocol = catalystUrl.protocol
     u.port = catalystUrl.port
-    const req = await fetch(u.toString(), {
+    const req = await components.fetch.fetch(u.toString(), {
       headers: { connection: 'close' },
       method: ctx.request.method,
-      body: ctx.request.method === 'get' ? undefined : ctx.request.body
+      body: ctx.request.method === 'get' ? undefined : (ctx.request.body as any),
+      duplex: 'half'
     })
 
     return {
       headers: {
         'content-type': req.headers.get('content-type') || 'application/json'
       },
-      body: req.body
+      // `req.body` is a web ReadableStream; convert it to a Node stream so the
+      // http-server can pipe it (it only handles Node streams / Buffers / strings).
+      body: req.body ? Readable.fromWeb(req.body as any) : undefined
     }
   })
 
@@ -403,7 +419,11 @@ async function getSceneJson(
   return resultEntities
 }
 
-function serveStatic(components: Pick<CliComponents, 'fs'>, workspace: Workspace, router: Router<PreviewComponents>) {
+function serveStatic(
+  components: Pick<CliComponents, 'fs' | 'fetch'>,
+  workspace: Workspace,
+  router: Router<PreviewComponents>
+) {
   const sdkPath = path.dirname(
     require.resolve('@dcl/sdk/package.json', {
       paths: [workspace.rootWorkingDirectory, ...workspace.projects.map(($) => $.workingDirectory)]
@@ -486,7 +506,7 @@ function serveStatic(components: Pick<CliComponents, 'fs'>, workspace: Workspace
   createStaticRoutes(components, '/@/explorer/:path+', dclExplorerJsonPath, (filePath) => filePath.replace(/.br+$/, ''))
 
   router.get('/feature-flags/:file', async (ctx) => {
-    const res = await fetch(`https://feature-flags.decentraland.zone/${ctx.params.file}`, {
+    const res = await components.fetch.fetch(`https://feature-flags.decentraland.zone/${ctx.params.file}`, {
       headers: {
         connection: 'close'
       }
