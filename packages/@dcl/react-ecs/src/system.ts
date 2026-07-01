@@ -133,11 +133,14 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
 
     if (!canvasInfo) return
 
-    const { width, height } = canvasInfo
+    const { width, height, devicePixelRatio } = canvasInfo
     const { virtualWidth, virtualHeight } = activeVirtualSize
     if (!virtualWidth || !virtualHeight) return
 
-    const nextScale = Math.min(width / virtualWidth, height / virtualHeight)
+    // Normalize by devicePixelRatio so virtual px map to logical px (matching the
+    // vw/vh path); without it the scale was inflated on high-dpr mobile screens.
+    const ratio = devicePixelRatio || 1
+    const nextScale = Math.min(width / virtualWidth, height / virtualHeight) / ratio
     if (Number.isFinite(nextScale) && nextScale !== getUiScaleFactor()) {
       // Track ownership when updating to avoid cross-system conflicts.
       setUiScaleFactor(nextScale, uiScaleFactorOwner)
