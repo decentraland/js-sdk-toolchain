@@ -133,7 +133,7 @@ export async function getValidSceneJson(
   } catch (err: any) {
     throw new CliError(
       'SCENE_VALIDATIONS_INVALID_SCENE_JSON',
-      i18next.t('errors.scene_validations.invalid_scene_json', { error: err.message })
+      i18next.t('errors.scene_validations.invalid_scene_json', { errors: err.message })
     )
   }
 }

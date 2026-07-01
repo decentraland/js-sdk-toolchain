@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Analytics } from '@segment/analytics-node'
-import future from 'fp-future'
 
 import { CliComponents } from '.'
 import { colors } from './log'
@@ -129,8 +128,6 @@ export async function createAnalyticsComponent(components: Pick<CliComponents, '
     )
   }
 
-  const promises: Promise<void>[] = []
-
   const sdkVersion = await getInstalledPackageVersion(components, '@dcl/sdk', process.cwd())
 
   // the following properties are added to every telemetry report
@@ -150,22 +147,14 @@ export async function createAnalyticsComponent(components: Pick<CliComponents, '
   }
 
   function track<T extends keyof Events>(eventName: T, eventProps: Events[T]) {
-    const trackFuture = future<void>()
-
-    const trackInfo = {
+    analytics.track({
       userId: USER_ID,
       event: eventName,
       properties: {
         ...eventProps,
         ...baseTelemetryProperties
       }
-    }
-
-    analytics.track(trackInfo, () => {
-      trackFuture.resolve()
     })
-
-    promises.push(trackFuture)
   }
 
   return {
@@ -174,7 +163,10 @@ export async function createAnalyticsComponent(components: Pick<CliComponents, '
     },
     track,
     async stop() {
-      await Promise.all(promises)
+      // Flush queued events before exit. Under @segment/analytics-node v2+, events are
+      // batched and only delivered on closeAndFlush() or the ~10s flush interval, so
+      // awaiting per-event callbacks would stall the CLI (or drop events on a fast exit).
+      await analytics.closeAndFlush()
     }
   }
 }

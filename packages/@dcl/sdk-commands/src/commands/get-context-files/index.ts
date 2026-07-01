@@ -3,6 +3,7 @@ import { CliComponents } from '../../components'
 import { declareArgs } from '../../logic/args'
 import { assertValidProjectFolder } from '../../logic/project-validations'
 import { CliError } from '../../logic/error'
+import { drainResponse } from '../../logic/fetch'
 import i18next from 'i18next'
 
 import { Result } from 'arg'
@@ -41,6 +42,7 @@ async function listFilesFromPath(components: Pick<CliComponents, 'fetch'>, url: 
   const response = await components.fetch.fetch(url)
 
   if (!response.ok) {
+    await drainResponse(response)
     throw new CliError('GET_CONTEXT_FILES_LIST_FAILED', i18next.t('errors.get_context_files.list_failed'))
   }
 
@@ -50,6 +52,7 @@ async function listFilesFromPath(components: Pick<CliComponents, 'fetch'>, url: 
 async function downloadFile(components: Pick<CliComponents, 'fetch'>, url: string): Promise<string> {
   const response = await components.fetch.fetch(url)
   if (!response.ok) {
+    await drainResponse(response)
     throw new CliError('GET_CONTEXT_FILES_DOWNLOAD_FAILED', i18next.t('errors.get_context_files.download_failed'))
   }
   return await response.text()
