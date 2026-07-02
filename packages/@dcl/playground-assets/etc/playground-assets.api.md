@@ -1619,6 +1619,11 @@ export type InstanceCompositeOptions = {
     alreadyRequestedSrc?: Set<string>;
 };
 
+// Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
+//
+// @public
+export function InteractableArea(props: UiInteractableAreaProps): ReactEcs.JSX.Element;
+
 // @public (undocumented)
 export const enum InteractionType {
     // (undocumented)
@@ -5299,6 +5304,11 @@ export interface UiInputProps extends Omit<PBUiInput, 'font' | 'textAlign' | 'fo
 
 // @public (undocumented)
 export const UiInputResult: LastWriteWinElementSetComponentDefinition<PBUiInputResult>;
+
+// @public
+export type UiInteractableAreaProps = Omit<EntityPropTypes, 'uiTransform'> & {
+    uiTransform?: Omit<NonNullable<EntityPropTypes['uiTransform']>, 'positionType' | 'position'>;
+};
 
 // @public
 export interface UiLabelProps {
