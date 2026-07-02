@@ -726,7 +726,7 @@ export const componentDefinitionByName: {
     "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
     "core::SkyboxTime": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSkyboxTime>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
-    "core::TouchscreenInputControls": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTouchscreenInputControls>>;
+    "core::TouchScreenControls": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTouchScreenControls>>;
     "core::TriggerArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTriggerArea>>;
     "core::TriggerAreaResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBTriggerAreaResult>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
@@ -3593,17 +3593,35 @@ export namespace PBTextShape {
 }
 
 // @public (undocumented)
-export interface PBTouchscreenInputControls {
-    hideGamepad: boolean;
+export interface PBTouchScreenControls {
+    hideCrosshair: boolean;
     hideJoystick: boolean;
+    mainAction?: InputAction | undefined;
+    // (undocumented)
+    touchInputs: PBTouchScreenControls_TouchInput[];
 }
 
 // @public (undocumented)
-export namespace PBTouchscreenInputControls {
+export namespace PBTouchScreenControls {
     // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTouchscreenInputControls;
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTouchScreenControls;
     // (undocumented)
-    export function encode(message: PBTouchscreenInputControls, writer?: _m0.Writer): _m0.Writer;
+    export function encode(message: PBTouchScreenControls, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBTouchScreenControls_TouchInput {
+    hide: boolean;
+    icon?: string | undefined;
+    inputAction: InputAction;
+}
+
+// @public (undocumented)
+export namespace PBTouchScreenControls_TouchInput {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTouchScreenControls_TouchInput;
+    // (undocumented)
+    export function encode(message: PBTouchScreenControls_TouchInput, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -5070,8 +5088,20 @@ export const ToLinearSpace = 2.2;
 // @public (undocumented)
 export type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTypes<T>;
 
+// Warning: (ae-missing-release-tag) "TouchScreenControls" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const TouchscreenInputControls: LastWriteWinElementSetComponentDefinition<PBTouchscreenInputControls>;
+export const TouchScreenControls: TouchScreenControlsComponentDefinitionExtended;
+
+// @public
+export interface TouchScreenControlsComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBTouchScreenControls> {
+    hide(actions: InputAction[]): void;
+    hideAll(): void;
+    hideCrosshair(): void;
+    hideJoystick(): void;
+    setMainAction(action: InputAction): void;
+    showAll(): void;
+}
 
 // Warning: (ae-missing-release-tag) "Transform" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

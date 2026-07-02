@@ -21,6 +21,10 @@ import { defineInputModifierComponent, InputModifierComponentDefinitionExtended 
 import { defineLightSourceComponent, LightSourceComponentDefinitionExtended } from './extended/LightSource'
 import { defineTriggerAreaComponent, TriggerAreaComponentDefinitionExtended } from './extended/TriggerArea'
 import { defineParticleSystemComponent, ParticleSystemComponentDefinitionExtended } from './extended/ParticleSystem'
+import {
+  defineTouchScreenControlsComponent,
+  TouchScreenControlsComponentDefinitionExtended
+} from './extended/TouchScreenControls'
 import defineTagsComponent, { TagsComponentDefinitionExtended } from './manual/Tags'
 
 export * from './generated/index.gen'
@@ -86,6 +90,10 @@ export const TriggerArea: LwwComponentGetter<TriggerAreaComponentDefinitionExten
 /* @__PURE__ */
 export const ParticleSystem: LwwComponentGetter<ParticleSystemComponentDefinitionExtended> = (engine) =>
   defineParticleSystemComponent(engine)
+
+/* @__PURE__ */
+export const TouchScreenControls: LwwComponentGetter<TouchScreenControlsComponentDefinitionExtended> = (engine) =>
+  defineTouchScreenControlsComponent(engine)
 
 /**
  * @alpha
