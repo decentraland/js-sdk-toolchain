@@ -10,6 +10,7 @@ import { createQuestByPrompting, executeSubcommand, setUpManager, urlRegex } fro
 import { CreateQuest } from './types'
 import { colors } from '../../components/log'
 import { CliError } from '../../logic/error'
+import { drainResponse } from '../../logic/fetch'
 import { dAppOptions, runDapp } from '../../run-dapp'
 import { printError, printSuccess } from '../../logic/beautiful-logs'
 
@@ -250,6 +251,7 @@ async function executeActivateSubcommand(
         }
       })
       if (res.status === 202) {
+        await drainResponse(res)
         components.analytics.track('Quest Activated Success', { questId })
         printSuccess(logger, 'Your Quest is active again!', '')
       } else {
@@ -293,6 +295,7 @@ async function executeDeactivateSubcommand(
       })
 
       if (res.status === 202) {
+        await drainResponse(res)
         components.analytics.track('Quest Deactivated Success', { questId })
         printSuccess(logger, 'Your Quest was deactivated', '')
       } else {

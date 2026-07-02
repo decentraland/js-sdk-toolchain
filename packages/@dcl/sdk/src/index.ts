@@ -1,5 +1,5 @@
 /** @alpha THIS FILE INITIALIZES THE DECENTRALAND RUNTIME. WILL CHANGE SOON */
-import { Composite, engine } from '@dcl/ecs'
+import { Composite, engine, setCompositeProvider } from '@dcl/ecs'
 import { crdtGetState, crdtSendToRenderer, sendBatch } from '~system/EngineApi'
 import { createRendererTransport } from './internal/transports/rendererTransport'
 import { pollEvents } from './observables'
@@ -9,6 +9,9 @@ import { compositeProvider } from './composite-provider'
 // @internal
 export const rendererTransport = createRendererTransport({ crdtSendToRenderer })
 engine.addTransport(rendererTransport)
+
+// Register composite provider at module-load (pre-seal); also registers any provider.schemas on the engine.
+setCompositeProvider(engine, compositeProvider)
 
 export async function onUpdate(deltaTime: number) {
   engine.seal()

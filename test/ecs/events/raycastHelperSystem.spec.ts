@@ -462,6 +462,21 @@ describe('Raycast Helper System should', () => {
     expect(fn).toHaveBeenCalled()
   })
 
+  it('round-trips CL_MAIN_PLAYER collision mask through raycast helper', async () => {
+    const raycastEntity = engine.addEntity()
+    raycastHelperSystem.registerLocalDirectionRaycast(raycastEntity, (_result) => {}, {
+      direction: Vector3.Forward(),
+      queryType: RaycastQueryType.RQT_HIT_FIRST,
+      collisionMask: ColliderLayer.CL_MAIN_PLAYER
+    })
+
+    await engine.update(1)
+
+    const attachedRaycast = raycastComponent.get(raycastEntity)
+    expect(attachedRaycast.collisionMask).toBe(ColliderLayer.CL_MAIN_PLAYER)
+    expect(attachedRaycast.collisionMask).toBe(8)
+  })
+
   it('attach raycast component after 1 frame', async () => {
     const raycastEntity = engine.addEntity()
     raycastHelperSystem.registerGlobalDirectionRaycast({ entity: raycastEntity }, (_result) => {})
