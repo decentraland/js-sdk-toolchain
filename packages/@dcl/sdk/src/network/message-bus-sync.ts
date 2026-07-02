@@ -1,4 +1,5 @@
-import { IEngine, Transport, RealmInfo, PlayerIdentityData } from '@dcl/ecs'
+import { IEngine, Transport, RealmInfo, PlayerIdentityData, SyncComponents as _SyncComponents } from '@dcl/ecs'
+import { localWriteSuppressor } from '@dcl/ecs/dist/engine/lww-element-set-component-definition'
 import { type SendBinaryRequest, type SendBinaryResponse } from '~system/CommunicationsController'
 
 import { syncFilter } from './filter'
@@ -11,6 +12,11 @@ import { definePlayerHelper } from '../players'
 import { serializeCrdtMessages } from '../internal/transports/logger'
 
 export type IProfile = { networkId: number; userId: string }
+
+// How long local writes to synced components stay suppressed when comms never connect
+// (offline realms / preview), and the hard cap when the handshake never resolves.
+const SUPPRESSED_WRITES_GRACE_PERIOD_MS = 10_000
+const SUPPRESSED_WRITES_FAILSAFE_PERIOD_MS = 30_000
 // user that we asked for the inital crdt state
 export function addSyncTransport(
   engine: IEngine,
@@ -41,6 +47,36 @@ export function addSyncTransport(
 
   let stateIsSyncronized = false
   let transportInitialzed = false
+
+  // Until the initial state handshake resolves, local writes to synced components are
+  // withheld at the CRDT layer: no message is generated and the Lamport timestamp does
+  // not advance, so a received RES_CRDT_STATE always wins the LWW conflict resolution.
+  // Suppressed writes stay dirty and flush (or are overwritten by the snapshot) on release.
+  const SyncComponents = engine.getComponent(_SyncComponents.componentId) as typeof _SyncComponents
+  let suppressLocalWrites = true
+
+  localWriteSuppressor.shouldSuppress = (entity, componentId) => {
+    if (!suppressLocalWrites) return false
+    const sync = SyncComponents.getOrNull(entity)
+    return !!sync && sync.componentIds.includes(componentId)
+  }
+
+  function releaseLocalWrites(reason: string) {
+    if (!suppressLocalWrites) return
+    suppressLocalWrites = false
+    DEBUG_NETWORK_MESSAGES() && console.log(`[SyncTransport] releasing suppressed local writes: ${reason}`)
+  }
+
+  // Failsafe release for scenes where the handshake can never resolve.
+  void (async () => {
+    await sleep(SUPPRESSED_WRITES_GRACE_PERIOD_MS)
+    if (!RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom) {
+      releaseLocalWrites('comms not connected after grace period')
+      return
+    }
+    await sleep(SUPPRESSED_WRITES_FAILSAFE_PERIOD_MS - SUPPRESSED_WRITES_GRACE_PERIOD_MS)
+    releaseLocalWrites('handshake did not resolve within failsafe period')
+  })()
 
   // Add Sync Transport
   const transport: Transport = {
@@ -79,6 +115,9 @@ export function addSyncTransport(
     DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength / 1024, 'KB')
     transport.onmessage!(data)
     stateIsSyncronized = true
+    // The snapshot chunk is queued ahead of any local flush: it is applied on the next
+    // tick's receiveMessages, before getCrdtUpdates can emit the released writes.
+    releaseLocalWrites('CRDT state received')
   })
 
   // Answer to REQ_CRDT_STATE
@@ -121,6 +160,7 @@ export function addSyncTransport(
       } else {
         DEBUG_NETWORK_MESSAGES() && console.log('No active players. State syncronized')
         stateIsSyncronized = true
+        releaseLocalWrites('no active players to sync with')
       }
     }
   }

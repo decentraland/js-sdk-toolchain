@@ -22,6 +22,19 @@ export function incrementTimestamp(entity: Entity, timestamps: Map<Entity, numbe
   return newTimestamp
 }
 
+/**
+ * While `shouldSuppress` returns true for a dirty (entity, component) pair,
+ * `getCrdtUpdates` produces no CRDT message for it: the Lamport timestamp does
+ * not advance and the entity remains dirty, so it is re-evaluated on the next
+ * tick. With the timestamp unset/stale, a concurrently received remote state
+ * (e.g. a RES_CRDT_STATE snapshot) wins the LWW conflict resolution.
+ */
+export const localWriteSuppressor: {
+  shouldSuppress: ((entity: Entity, componentId: number) => boolean) | null
+} = {
+  shouldSuppress: null
+}
+
 export function createDumpLwwFunctionFromCrdt(
   componentId: number,
   timestamps: Map<Entity, number>,
@@ -187,7 +200,13 @@ export function createGetCrdtMessagesForLww(
 ) {
   return function* () {
     const writeBuffer = new ReadWriteByteBuffer()
+    let suppressedEntities: Entity[] | null = null
     for (const entity of dirtyIterator) {
+      if (localWriteSuppressor.shouldSuppress && localWriteSuppressor.shouldSuppress(entity, componentId)) {
+        suppressedEntities = suppressedEntities ?? []
+        suppressedEntities.push(entity)
+        continue
+      }
       if (data.has(entity)) {
         writeBuffer.resetBuffer()
         schema.serialize(data.get(entity)!, writeBuffer)
@@ -227,6 +246,11 @@ export function createGetCrdtMessagesForLww(
       }
     }
     dirtyIterator.clear()
+    if (suppressedEntities) {
+      for (const entity of suppressedEntities) {
+        dirtyIterator.add(entity)
+      }
+    }
   }
 }
 
