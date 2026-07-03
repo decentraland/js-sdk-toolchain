@@ -3,6 +3,7 @@ import * as ecsComponents from '@dcl/ecs/dist/components'
 import React from 'react'
 import type { ReactEcs } from './react-ecs'
 import { createReconciler } from './reconciler'
+import { InteractableArea, ScreenInsetArea } from './components'
 import {
   getUiScaleFactor,
   resetInteractableArea,
@@ -20,10 +21,24 @@ export type UiComponent = () => ReactEcs.JSX.ReactNode
 
 /**
  * @public
+ * The area a UI renderer's root is constrained to:
+ * - 'none': render as-is, no wrapping (default).
+ * - 'screen-inset': wrap in `ScreenInsetArea`, constraining to the device safe area.
+ * - 'interactable': wrap in `ScreenInsetArea` and, inside it, `InteractableArea`,
+ *   constraining to the HUD-safe zone not covered by client UI.
+ */
+export type UiRootAreaType = 'none' | 'screen-inset' | 'interactable'
+
+/**
+ * @public
  */
 export type UiRendererOptions = {
   virtualWidth: number
   virtualHeight: number
+  /**
+   * Optional root area the rendered ui is constrained to. Defaults to 'none' (no wrapping).
+   */
+  area?: UiRootAreaType
 }
 
 /**
@@ -36,6 +51,7 @@ export interface ReactBasedUiSystem {
   destroy(): void
   /**
    * Set the main UI renderer. Optional virtual size defines the global UI scale factor.
+   * `options.area` optionally constrains the rendered ui to a renderer-reported root area.
    */
   setUiRenderer(ui: UiComponent, options?: UiRendererOptions): void
   /**
@@ -50,7 +66,8 @@ export interface ReactBasedUiSystem {
    * @param entity - The entity to associate with this UI renderer. When the entity is removed,
    *                 the UI renderer is automatically cleaned up.
    * @param ui - The UI component to render
-   * @param options - Optional virtual size used for UI scale factor when main UI has none
+   * @param options - Optional virtual size used for UI scale factor when main UI has none.
+   *                  `options.area` optionally constrains the rendered ui to a renderer-reported root area.
    */
   addUiRenderer(entity: Entity, ui: UiComponent, options?: UiRendererOptions): void
   /**
@@ -87,12 +104,29 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
     return undefined
   }
 
+  // Wraps the rendered `ui` in the renderer-reported root area container(s)
+  // requested via `options.area`, applying the `key` to the outermost element
+  // so the resulting node can be used directly as a child of the components list.
+  function buildUiElement(ui: UiComponent, key: string, area?: UiRootAreaType): React.ReactElement {
+    if (area === 'screen-inset') {
+      return React.createElement(ScreenInsetArea, { key }, React.createElement(ui as any))
+    }
+    if (area === 'interactable') {
+      return React.createElement(
+        ScreenInsetArea,
+        { key },
+        React.createElement(InteractableArea, null, React.createElement(ui as any))
+      )
+    }
+    return React.createElement(ui as any, { key })
+  }
+
   function ReactBasedUiSystem() {
     const components: React.ReactNode[] = []
 
     // Add main UI component
     if (uiComponent) {
-      components.push(React.createElement(uiComponent as any, { key: '__main__' }))
+      components.push(buildUiElement(uiComponent, '__main__', virtualSize?.area))
     }
 
     const entitiesToRemove: Entity[] = []
@@ -101,7 +135,7 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
       if (engine.getEntityState(entity) === EntityState.Removed) {
         entitiesToRemove.push(entity)
       } else {
-        components.push(React.createElement(entry.ui as any, { key: `__entity_${entity}__` }))
+        components.push(buildUiElement(entry.ui, `__entity_${entity}__`, entry.options?.area))
       }
     }
 
