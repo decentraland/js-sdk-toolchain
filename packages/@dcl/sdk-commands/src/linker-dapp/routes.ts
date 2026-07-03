@@ -72,8 +72,14 @@ export function setRoutes<T extends { [key: string]: any }>(
 
       // undici decompresses the body but leaves content-encoding / content-length in
       // place; forwarding them would make the client re-decode or truncate the body.
-      resp.headers.delete('content-encoding')
-      resp.headers.delete('content-length')
+      // The headers on a fetch() Response are immutable (mutating them throws
+      // `TypeError: immutable`), so build a filtered copy instead of deleting in place.
+      const headers: Record<string, string> = {}
+      for (const [key, value] of resp.headers) {
+        const name = key.toLowerCase()
+        if (name === 'content-encoding' || name === 'content-length') continue
+        headers[key] = value
+      }
 
       // Return the proxied response, including body, status, and headers.
       // `resp.body` is a web ReadableStream; convert it to a Node stream so the
@@ -81,7 +87,7 @@ export function setRoutes<T extends { [key: string]: any }>(
       return {
         body: resp.body ? Readable.fromWeb(resp.body as any) : undefined,
         status: resp.status,
-        headers: Object.fromEntries(resp.headers)
+        headers
       }
     } catch (error) {
       return {
