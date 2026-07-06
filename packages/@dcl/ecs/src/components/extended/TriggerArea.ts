@@ -10,7 +10,7 @@ export interface TriggerAreaComponentDefinitionExtended
    * @public
    * Set a box in the MeshCollider component
    * @param entity - entity to create or replace the TriggerArea component
-   * @param collisionMask - the collision layers mask for the trigger to react, default: Player
+   * @param collisionMask - the collision layers mask for the trigger to react, default: CL_PLAYER
    */
   setBox(entity: Entity, collisionMask?: ColliderLayer | ColliderLayer[]): void
 
@@ -18,7 +18,7 @@ export interface TriggerAreaComponentDefinitionExtended
    * @public
    * Set a sphere in the MeshCollider component
    * @param entity - entity to create or replace the TriggerArea component
-   * @param collisionMask - the collision layers mask for the trigger to react, default: Player
+   * @param collisionMask - the collision layers mask for the trigger to react, default: CL_PLAYER
    */
   setSphere(entity: Entity, collisionMask?: ColliderLayer | ColliderLayer[]): void
 }

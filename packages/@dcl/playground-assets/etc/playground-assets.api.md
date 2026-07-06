@@ -474,12 +474,11 @@ export const enum ColliderLayer {
     CL_CUSTOM7 = 16384,
     // (undocumented)
     CL_CUSTOM8 = 32768,
+    CL_MAIN_PLAYER = 8,
     CL_NONE = 0,
     CL_PHYSICS = 2,
     CL_PLAYER = 4,
     CL_POINTER = 1,
-    // (undocumented)
-    CL_RESERVED2 = 8,
     // (undocumented)
     CL_RESERVED3 = 16,
     // (undocumented)
@@ -765,7 +764,7 @@ export namespace Composite {
     export function fromBinary(buffer: Uint8Array): Composite.Definition;
     // (undocumented)
     export function fromJson(object: any): Composite.Definition;
-    export function instance(engine: IEngine, compositeData: Composite.Resource, compositeProvider: CompositeProvider, options?: InstanceCompositeOptions): void;
+    export function instance(engine: IEngine, compositeData: Composite.Resource, compositeProvider: CompositeProvider, options?: InstanceCompositeOptions): Entity;
     // (undocumented)
     export type Provider = CompositeProvider;
     export function resolveAndNormalizePath(src: string, cwd?: string): string;
@@ -842,6 +841,11 @@ export namespace CompositeDefinition {
 // @public (undocumented)
 export type CompositeProvider = {
     getCompositeOrNull(src: string): CompositeResource | null;
+    loadComposite?: (src: string) => Promise<CompositeResource>;
+    schemas?: Iterable<{
+        name: string;
+        jsonSchema: any;
+    }>;
 };
 
 // @public (undocumented)
@@ -1307,6 +1311,9 @@ export function getComponentEntityTree<T>(engine: Pick<IEngine, 'getEntitiesWith
     parent?: Entity;
 }>): Generator<Entity>;
 
+// @public
+export function getCompositeProvider(): CompositeProvider | null;
+
 // @public @deprecated (undocumented)
 export function getCompositeRootComponent(engine: IEngine): LastWriteWinElementSetComponentDefinition<CompositeRootType>;
 
@@ -1612,6 +1619,11 @@ export type InstanceCompositeOptions = {
     rootEntity?: Entity;
     alreadyRequestedSrc?: Set<string>;
 };
+
+// Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
+//
+// @public
+export function InteractableArea(props: UiInteractableAreaProps): ReactEcs.JSX.Element;
 
 // @public (undocumented)
 export const enum InteractionType {
@@ -2546,6 +2558,9 @@ export namespace PBAvatarEquippedData {
 
 // @public (undocumented)
 export interface PBAvatarLocomotionSettings {
+    doubleJumpHeight?: number | undefined;
+    glidingFallingSpeed?: number | undefined;
+    glidingSpeed?: number | undefined;
     hardLandingCooldown?: number | undefined;
     jogSpeed?: number | undefined;
     jumpHeight?: number | undefined;
@@ -3728,6 +3743,7 @@ export interface PBUiCanvasInformation {
     devicePixelRatio: number;
     height: number;
     interactableArea: BorderRect | undefined;
+    screenInsetArea?: BorderRect | undefined;
     width: number;
 }
 
@@ -4757,6 +4773,14 @@ export namespace Schemas {
     }) => void;
 }
 
+// Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
+//
+// @public
+export function ScreenInsetArea(props: UiScreenInsetAreaProps): ReactEcs.JSX.Element;
+
+// @public
+export function setCompositeProvider(engine: IEngine, provider: CompositeProvider): void;
+
 // @public
 export function setGlobalPolyfill<T>(key: string, value: T): void;
 
@@ -5283,6 +5307,11 @@ export interface UiInputProps extends Omit<PBUiInput, 'font' | 'textAlign' | 'fo
 export const UiInputResult: LastWriteWinElementSetComponentDefinition<PBUiInputResult>;
 
 // @public
+export type UiInteractableAreaProps = Omit<EntityPropTypes, 'uiTransform'> & {
+    uiTransform?: Omit<NonNullable<EntityPropTypes['uiTransform']>, 'positionType' | 'position'>;
+};
+
+// @public
 export interface UiLabelProps {
     color?: PBColor4 | undefined;
     font?: UiFontType | undefined;
@@ -5299,6 +5328,11 @@ export type uint32 = number;
 export type UiRendererOptions = {
     virtualWidth: number;
     virtualHeight: number;
+};
+
+// @public
+export type UiScreenInsetAreaProps = Omit<EntityPropTypes, 'uiTransform'> & {
+    uiTransform?: Omit<NonNullable<EntityPropTypes['uiTransform']>, 'positionType' | 'position'>;
 };
 
 // @public (undocumented)
