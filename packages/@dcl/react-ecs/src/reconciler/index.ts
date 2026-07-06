@@ -71,6 +71,7 @@ export function createReconciler(
   const UiInputResult = components.UiInputResult(engine)
   const UiDropdown = components.UiDropdown(engine)
   const UiDropdownResult = components.UiDropdownResult(engine)
+  const UiInputBinding = components.UiInputBinding(engine)
 
   // Component ID Helper
   const getComponentId: {
@@ -80,7 +81,8 @@ export function createReconciler(
     uiText: UiText.componentId,
     uiBackground: UiBackground.componentId,
     uiInput: UiInput.componentId,
-    uiDropdown: UiDropdown.componentId
+    uiDropdown: UiDropdown.componentId,
+    uiInputBinding: UiInputBinding.componentId
   }
 
   function pointerEventCallback(entity: Entity, pointerEvent: PointerEventType) {

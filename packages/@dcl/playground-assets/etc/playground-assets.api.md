@@ -1181,6 +1181,7 @@ export type EntityComponents = {
     uiBackground: PBUiBackground;
     uiInput: PBUiInput;
     uiDropdown: PBUiDropdown;
+    uiInputBinding: PBUiInputBinding;
     onMouseDown: Callback;
     onMouseUp: Callback;
     onMouseEnter: Callback;
@@ -1201,6 +1202,7 @@ export enum EntityMappingMode {
 export interface EntityPropTypes extends Listeners {
     key?: Key;
     uiBackground?: UiBackgroundProps;
+    uiInputBinding?: PBUiInputBinding;
     uiTransform?: UiTransformProps;
 }
 
