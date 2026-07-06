@@ -17,5 +17,11 @@ describe('Generated Avatar ModifierArea ProtoBuf', () => {
       modifiers: [],
       excludeIds: ['exclude_this', 'testId', '12837127371']
     })
+
+    testComponentSerialization(AvatarModifierArea, {
+      area: { x: 6, y: 7, z: 8 },
+      modifiers: [AvatarModifierType.AMT_HIDE_NAMETAGS],
+      excludeIds: []
+    })
   })
 })
