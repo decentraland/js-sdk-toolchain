@@ -12,6 +12,11 @@ import {
   setScreenInsetArea,
   setUiScaleFactor
 } from './components/utils'
+import { isMobile } from './platform'
+
+// react-ecs compiles with `types: []` (no runtime typings), so the console
+// global provided by the scene runtime is declared here.
+declare const console: { log(message: string): void }
 
 /**
  * @public
@@ -27,6 +32,26 @@ export type UiRendererOptions = {
 }
 
 /**
+ * Default virtual screen size used on mobile platforms, and the size 16:9
+ * virtual screens are overridden to on mobile (phone screens are much wider
+ * than 16:9, so a 16:9 virtual canvas would letterbox the UI).
+ */
+const MOBILE_VIRTUAL_SIZE: UiRendererOptions = { virtualWidth: 1600, virtualHeight: 720 }
+
+/**
+ * Default virtual screen size used on non-mobile platforms.
+ */
+const DEFAULT_VIRTUAL_SIZE: UiRendererOptions = { virtualWidth: 1920, virtualHeight: 1080 }
+
+function isValidVirtualSize(options: UiRendererOptions | undefined): options is UiRendererOptions {
+  return !!options && options.virtualWidth > 0 && options.virtualHeight > 0
+}
+
+function is16by9(options: UiRendererOptions): boolean {
+  return options.virtualWidth * 9 === options.virtualHeight * 16
+}
+
+/**
  * @public
  */
 export interface ReactBasedUiSystem {
@@ -36,6 +61,11 @@ export interface ReactBasedUiSystem {
   destroy(): void
   /**
    * Set the main UI renderer. Optional virtual size defines the global UI scale factor.
+   *
+   * When no virtual size is provided, a platform default is used: 1600x720 on
+   * mobile, 1920x1080 otherwise. Providing an invalid size (values \<= 0)
+   * disables the virtual screen (no UI scaling). On mobile, a provided 16:9
+   * virtual size is overridden to 1600x720 to fit phone screens.
    */
   setUiRenderer(ui: UiComponent, options?: UiRendererOptions): void
   /**
@@ -50,7 +80,8 @@ export interface ReactBasedUiSystem {
    * @param entity - The entity to associate with this UI renderer. When the entity is removed,
    *                 the UI renderer is automatically cleaned up.
    * @param ui - The UI component to render
-   * @param options - Optional virtual size used for UI scale factor when main UI has none
+   * @param options - Optional virtual size used for UI scale factor when main UI has none.
+   *                  Defaults and the mobile 16:9 override behave as in {@link ReactBasedUiSystem.setUiRenderer}.
    */
   addUiRenderer(entity: Entity, ui: UiComponent, options?: UiRendererOptions): void
   /**
@@ -78,6 +109,10 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
   // Unique owner for the interactable area module variable.
   const interactableAreaOwner = Symbol('react-ecs-interactable-area')
 
+  // Last 16:9 size we already logged the mobile override for, so the log
+  // fires once per provided size instead of every tick.
+  let loggedMobileOverrideSize: string | null = null
+
   function getActiveVirtualSize(): UiRendererOptions | undefined {
     // Main renderer options win; otherwise use the first additional renderer option.
     if (virtualSize) return virtualSize
@@ -85,6 +120,40 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
       if (entry.options) return entry.options
     }
     return undefined
+  }
+
+  /**
+   * Resolves the virtual screen to scale the UI against, or `undefined` when
+   * the virtual screen is disabled.
+   */
+  function resolveVirtualSize(): UiRendererOptions | undefined {
+    const provided = getActiveVirtualSize()
+    const mobile = isMobile()
+
+    // No creator-provided size: fall back to the platform default.
+    if (!provided) {
+      return mobile ? MOBILE_VIRTUAL_SIZE : DEFAULT_VIRTUAL_SIZE
+    }
+
+    // An explicitly provided but invalid size (values <= 0) disables the
+    // virtual screen — no UI scaling at all.
+    if (!isValidVirtualSize(provided)) {
+      return undefined
+    }
+
+    // On mobile, 16:9 virtual screens don't fit phone aspect ratios — override them.
+    if (mobile && is16by9(provided)) {
+      const providedSize = `${provided.virtualWidth}x${provided.virtualHeight}`
+      if (loggedMobileOverrideSize !== providedSize) {
+        loggedMobileOverrideSize = providedSize
+        console.log(
+          `Mobile platform detected: overriding 16:9 virtual screen size ${providedSize} with ${MOBILE_VIRTUAL_SIZE.virtualWidth}x${MOBILE_VIRTUAL_SIZE.virtualHeight}`
+        )
+      }
+      return MOBILE_VIRTUAL_SIZE
+    }
+
+    return provided
   }
 
   function ReactBasedUiSystem() {
@@ -133,9 +202,17 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
       setInteractableArea(canvasInfo.interactableArea, interactableAreaOwner)
     }
 
-    const activeVirtualSize = getActiveVirtualSize()
-    if (!activeVirtualSize) {
+    // The virtual screen (provided or defaulted) only applies while some
+    // renderer is registered; with no UI at all the scale factor is released.
+    if (uiComponent === undefined && additionalRenderers.size === 0) {
       // Reset only if this system owns the scale factor.
+      resetUiScaleFactor(uiScaleFactorOwner)
+      return
+    }
+
+    const activeVirtualSize = resolveVirtualSize()
+    if (!activeVirtualSize) {
+      // Virtual screen explicitly disabled by an invalid provided size.
       resetUiScaleFactor(uiScaleFactorOwner)
       return
     }
@@ -144,7 +221,6 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
 
     const { width, height, devicePixelRatio } = canvasInfo
     const { virtualWidth, virtualHeight } = activeVirtualSize
-    if (!virtualWidth || !virtualHeight) return
 
     // Normalize by devicePixelRatio so virtual px map to logical px (matching the
     // vw/vh path); without it the scale was inflated on high-dpr mobile screens.
