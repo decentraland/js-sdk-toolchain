@@ -143,6 +143,48 @@ describe('explorer-alpha', () => {
     })
   })
 
+  describe('multiInstance parameter', () => {
+    it('should include multi-instance parameter when --multi-instance flag is provided', async () => {
+      const args: any = {
+        '--multi-instance': true
+      }
+
+      await runExplorerAlpha(mockComponents, {
+        cwd: '/test',
+        realm: 'test-realm',
+        baseCoords: { x: 0, y: 0 },
+        isHub: false,
+        args
+      })
+
+      expect(mockExec).toHaveBeenCalledWith(
+        '/test',
+        'open',
+        expect.arrayContaining([expect.stringContaining('multi-instance=true')]),
+        { silent: true }
+      )
+    })
+
+    it('should not include multi-instance parameter when --multi-instance flag is not provided', async () => {
+      const args: any = {}
+
+      await runExplorerAlpha(mockComponents, {
+        cwd: '/test',
+        realm: 'test-realm',
+        baseCoords: { x: 0, y: 0 },
+        isHub: false,
+        args
+      })
+
+      expect(mockExec).toHaveBeenCalledWith(
+        '/test',
+        'open',
+        expect.arrayContaining([expect.not.stringContaining('multi-instance')]),
+        { silent: true }
+      )
+    })
+  })
+
   describe('URL parameter construction', () => {
     it('should construct URL with all parameters correctly', async () => {
       const args: any = {
