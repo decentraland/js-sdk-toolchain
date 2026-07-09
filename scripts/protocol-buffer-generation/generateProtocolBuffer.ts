@@ -19,7 +19,20 @@ export async function generateProtocolBuffer(params: {
   fs.removeSync(pbGeneratedPath)
   fs.mkdirSync(pbGeneratedPath, { recursive: true })
 
-  const protoFiles = components.map((item) => path.resolve(definitionsPath, `${item.componentFile}.proto`)).join(' ')
+  const componentProtoFiles = components.map((item) => path.resolve(definitionsPath, `${item.componentFile}.proto`))
+
+  /**
+   * Common protos that are NOT referenced by any ECS component (so protoc would not
+   * generate them transitively) but whose types must still be exposed to scenes.
+   * e.g. `AvatarMask` is only used as an argument of the `~system/RestrictedActions`
+   * `triggerSceneEmote` RPC, so without this it never reaches `@dcl/sdk/ecs` and is
+   * `undefined` at runtime. Paths are relative to `definitionsPath` (sdk/components).
+   */
+  const additionalCommonProtos = ['common/avatar_mask.proto']
+    .map((relPath) => path.resolve(definitionsPath, relPath))
+    .filter((absPath) => fs.existsSync(absPath))
+
+  const protoFiles = [...componentProtoFiles, ...additionalCommonProtos].join(' ')
 
   const protoCommandArgs: string[] = [
     `--plugin=${TS_PROTO_PLUGIN_PATH}`,
