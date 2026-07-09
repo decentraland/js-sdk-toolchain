@@ -196,7 +196,8 @@ export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAva
 // @public (undocumented)
 export const enum AvatarModifierType {
     AMT_DISABLE_PASSPORTS = 1,
-    AMT_HIDE_AVATARS = 0
+    AMT_HIDE_AVATARS = 0,
+    AMT_HIDE_NAMETAGS = 2
 }
 
 // @public (undocumented)
@@ -2618,6 +2619,7 @@ export namespace PBAvatarShape {
 // @public (undocumented)
 export interface PBBillboard {
     billboardMode?: BillboardMode | undefined;
+    targetEntity?: number | undefined;
 }
 
 // @public (undocumented)
