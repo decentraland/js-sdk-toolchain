@@ -34,6 +34,15 @@ export DEVELOPER_MODE=true
 install:
 	npm i --silent
 	make install-protobuf
+	make link-ecs-into-js-runtime
+
+# The generated packages/@dcl/js-runtime/apis.d.ts references `import('@dcl/ecs').AvatarMask`
+# (see scripts/rpc-api-generation). This repo has no root-hoisted node_modules, so make
+# @dcl/ecs resolvable from the js-runtime package dir for every build/test tsconfig.
+# @dcl/ecs has no dependencies, so a plain symlink is enough.
+link-ecs-into-js-runtime:
+	mkdir -p packages/@dcl/js-runtime/node_modules/@dcl
+	ln -sf ../../../ecs packages/@dcl/js-runtime/node_modules/@dcl/ecs
 
 update-protocol:
 	npm i --save-exact @dcl/protocol@next

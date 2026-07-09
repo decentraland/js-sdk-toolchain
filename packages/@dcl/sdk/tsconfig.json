@@ -4,15 +4,7 @@
     "declaration": true,
     "stripInternal": true,
     "outDir": ".",
-    "removeComments": false,
-    // `@dcl/js-runtime`'s apis.d.ts references `import('@dcl/ecs').AvatarMask`.
-    // js-runtime is a symlinked (file:) dep, so tsc resolves that import from its
-    // realpath (packages/@dcl/js-runtime), where @dcl/ecs isn't reachable. Pin the
-    // specifier to this package's installed copy for the build. Scenes are unaffected
-    // (they resolve @dcl/ecs from their own node_modules).
-    "paths": {
-      "@dcl/ecs": ["./node_modules/@dcl/ecs"]
-    }
+    "removeComments": false
   },
   "include": ["src"],
   "exclude": ["dist"],
