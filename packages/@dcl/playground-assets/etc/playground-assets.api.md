@@ -199,6 +199,12 @@ export const AvatarEquippedData: LastWriteWinElementSetComponentDefinition<PBAva
 export const AvatarLocomotionSettings: LastWriteWinElementSetComponentDefinition<PBAvatarLocomotionSettings>;
 
 // @public (undocumented)
+export const enum AvatarMask {
+    // (undocumented)
+    AM_UPPER_BODY = 0
+}
+
+// @public (undocumented)
 export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>;
 
 // @public (undocumented)
