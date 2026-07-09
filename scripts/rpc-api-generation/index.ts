@@ -106,7 +106,39 @@ async function internalCompile() {
     rmSync(apiModuleDirPath, { recursive: true, force: true })
   }
 
+  apisDTsContent = unifyEcsSharedTypes(apisDTsContent)
+
   writeFileSync(path.resolve(outModulesPath, 'index.d.ts'), apisDTsContent)
+}
+
+/**
+ * Some enums used by `~system/*` APIs are shared SDK component types that are also
+ * exported (with a runtime value) by `@dcl/ecs`. The proto-to-dts pipeline inlines a
+ * fresh `export enum` copy into the ambient module, which is nominally distinct from
+ * the `@dcl/ecs` one — so a scene cannot pass a value imported from `@dcl/sdk/ecs` to
+ * the API (e.g. `AvatarMask` on `triggerSceneEmote`). To keep a single type, we drop
+ * the inlined copy and point the remaining references at `@dcl/ecs`.
+ *
+ * We use an inline `import('@dcl/ecs').Type` rather than a top-level import so that
+ * `apis.d.ts` stays a script (not a module) — otherwise its `declare module "~system/*"`
+ * blocks would stop being ambient/global and scenes couldn't resolve `~system/*`.
+ */
+const ECS_SHARED_TYPES = ['AvatarMask']
+
+function unifyEcsSharedTypes(content: string): string {
+  for (const typeName of ECS_SHARED_TYPES) {
+    const enumBlock = new RegExp(`[ \\t]*export enum ${typeName} \\{[\\s\\S]*?\\n[ \\t]*\\}\\n?`, 'g')
+    if (!enumBlock.test(content)) continue
+
+    // Drop an optional one-line JSDoc that immediately precedes the inlined enum
+    content = content.replace(new RegExp(`[ \\t]*/\\*\\*[^\\n]*\\*/\\n(?=[ \\t]*export enum ${typeName}\\b)`, 'g'), '')
+    content = content.replace(enumBlock, '')
+
+    // Point remaining type references at the single `@dcl/ecs` declaration
+    content = content.replace(new RegExp(`\\b${typeName}\\b`, 'g'), `import('@dcl/ecs').${typeName}`)
+  }
+
+  return content
 }
 
 async function preprocessProtoGeneration(protoPath: string) {
