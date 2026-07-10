@@ -6,7 +6,7 @@ import { getDCLIgnorePatterns } from '../../../logic/dcl-ignore'
 import { PreviewComponents } from '../types'
 import { sceneUpdateClients } from './routes'
 import { ProjectUnion } from '../../../logic/project-validations'
-import { b64HashingFunction } from '../../../logic/project-files'
+import { b64UrlHashingFunction } from '../../../logic/project-files'
 import {
   WsSceneMessage,
   UpdateModelType
@@ -26,7 +26,7 @@ export async function wireFileWatcherToWebSockets(
   desktopClient: boolean
 ) {
   const ignored = await getDCLIgnorePatterns(components, projectRoot)
-  const sceneId = b64HashingFunction(projectRoot)
+  const sceneId = b64UrlHashingFunction(projectRoot)
 
   chokidar
     .watch(path.resolve(projectRoot), {
@@ -61,7 +61,7 @@ function updateScene(sceneId: string, file: string) {
   if (isGLTFModel(file)) {
     message = {
       $case: 'updateModel',
-      updateModel: { hash: b64HashingFunction(file), sceneId, src: file, type: UpdateModelType.UMT_CHANGE }
+      updateModel: { hash: b64UrlHashingFunction(file), sceneId, src: file, type: UpdateModelType.UMT_CHANGE }
     }
   } else {
     message = {
@@ -77,7 +77,7 @@ function removeModel(sceneId: string, file: string) {
     const sceneMessage: WsSceneMessage = {
       message: {
         $case: 'updateModel',
-        updateModel: { sceneId, src: file, hash: b64HashingFunction(file), type: UpdateModelType.UMT_REMOVE }
+        updateModel: { sceneId, src: file, hash: b64UrlHashingFunction(file), type: UpdateModelType.UMT_REMOVE }
       }
     }
 
@@ -102,7 +102,7 @@ export function __LEGACY__updateScene(dir: string, clients: Set<WebSocket>, proj
     if (client.readyState === WebSocket.OPEN) {
       const message: sdk.SceneUpdate = {
         type: sdk.SCENE_UPDATE,
-        payload: { sceneId: b64HashingFunction(dir), sceneType: projectKind }
+        payload: { sceneId: b64UrlHashingFunction(dir), sceneType: projectKind }
       }
 
       // Old explorer

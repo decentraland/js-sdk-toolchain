@@ -12,11 +12,12 @@ export async function runExplorerAlpha(
     baseCoords: { x: number; y: number }
     isHub: boolean
     args: Result<typeof startArgs>
+    assetBundlesUrl?: string
   }
 ) {
-  const { cwd, realm, baseCoords, isHub } = opts
+  const { cwd, realm, baseCoords, isHub, assetBundlesUrl } = opts
 
-  if (await runApp(components, { cwd, realm, baseCoords, isHub, args: opts.args })) {
+  if (await runApp(components, { cwd, realm, baseCoords, isHub, args: opts.args, assetBundlesUrl })) {
     return
   }
 
@@ -30,13 +31,15 @@ async function runApp(
     realm: realmValue,
     baseCoords,
     isHub,
-    args
+    args,
+    assetBundlesUrl
   }: {
     cwd: string
     realm: string
     baseCoords: { x: number; y: number }
     isHub: boolean
     args: Result<typeof startArgs>
+    assetBundlesUrl?: string
   }
 ) {
   const cmd = isWindows ? 'start' : 'open'
@@ -62,6 +65,10 @@ async function runApp(
     params.set('dclenv', dclenv)
 
     params.set('local-scene', 'true')
+
+    if (assetBundlesUrl) {
+      params.set('optimized-assets-url', assetBundlesUrl)
+    }
 
     if (isHub) {
       params.set('hub', 'true')

@@ -1,0 +1,75 @@
+import * as os from 'os'
+import * as path from 'path'
+
+import { CliComponents } from '../../components'
+import { getCatalystBaseUrl } from '../../logic/config'
+import { drainResponse } from '../../logic/fetch'
+import { getPort } from '../../logic/get-free-port'
+
+const READY_TIMEOUT_MS = 15_000
+const READY_POLL_INTERVAL_MS = 250
+const READY_REQUEST_TIMEOUT_MS = 2_000
+
+/**
+ * Boots an `abgen` sidecar: an ab-cdn-compatible server that JIT-converts the
+ * scene being previewed into asset bundles, reading it through the preview's
+ * own /content endpoints. Returns the sidecar URL once it answers /readyz, or
+ * undefined — with a warning — when the binary is missing or never comes up.
+ */
+export async function runAssetBundlesSidecar(
+  components: Pick<CliComponents, 'fetch' | 'logger' | 'spawner' | 'config'>,
+  previewPort: number
+): Promise<string | undefined> {
+  const bin = process.env.ABGEN_BIN || 'abgen'
+  const port = await getPort(0)
+  const url = `http://127.0.0.1:${port}`
+  const catalystUrl = await getCatalystBaseUrl(components)
+  const cacheRoot = path.join(os.tmpdir(), 'dcl-abgen')
+
+  // ABGEN_* variables already present in the environment win over this wiring
+  const env: Record<string, string> = {
+    HTTP_SERVER_HOST: '127.0.0.1',
+    HTTP_SERVER_PORT: port.toString(),
+    ABGEN_CATALYST_URL: process.env.ABGEN_CATALYST_URL || `http://127.0.0.1:${previewPort}/content`,
+    ABGEN_WORLDS_CONTENT_URL: process.env.ABGEN_WORLDS_CONTENT_URL || `${catalystUrl}/content`,
+    ABGEN_OUT_ROOT: process.env.ABGEN_OUT_ROOT || path.join(cacheRoot, 'out'),
+    ABGEN_CACHE_DIR: process.env.ABGEN_CACHE_DIR || path.join(cacheRoot, 'cache'),
+    RUST_LOG: process.env.RUST_LOG || 'abgen=info,tower_http=warn'
+  }
+
+  // shell-less spawn: paths with spaces need no quoting, and kill() reaches abgen itself
+  let exited = false
+  components.spawner
+    .exec(process.cwd(), bin, [], { env, silent: false, shell: false })
+    .catch((error: Error) => components.logger.warn(`asset-bundles: ${bin} exited (${error.message})`))
+    .finally(() => {
+      exited = true
+    })
+
+  const deadline = Date.now() + READY_TIMEOUT_MS
+  while (Date.now() < deadline && !exited) {
+    if (await isReady(components, url)) return url
+    await sleep(READY_POLL_INTERVAL_MS)
+  }
+
+  components.logger.warn(
+    `asset-bundles: ${bin} did not come up on ${url}. Install the abgen binary (or set ABGEN_BIN to its path) to serve asset bundles in preview, or pass --no-asset-bundles to turn this off.`
+  )
+  return undefined
+}
+
+async function isReady(components: Pick<CliComponents, 'fetch'>, url: string): Promise<boolean> {
+  try {
+    const response = await components.fetch.fetch(`${url}/readyz`, {
+      signal: AbortSignal.timeout(READY_REQUEST_TIMEOUT_MS)
+    })
+    await drainResponse(response)
+    return response.ok
+  } catch {
+    return false
+  }
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}

@@ -28,6 +28,7 @@ import { printCurrentProjectStarting, printProgressInfo, printWarning } from '..
 import { Result } from 'arg'
 import { startValidations } from '../../logic/project-validations'
 import { runExplorerAlpha } from './explorer-alpha'
+import { runAssetBundlesSidecar } from './asset-bundles'
 import { getLanUrl } from './utils'
 
 interface Options {
@@ -68,7 +69,8 @@ export const args = declareArgs({
   '-n': Boolean,
   '--bevy-web': Boolean,
   '--multi-instance': Boolean,
-  '--no-client': Boolean
+  '--no-client': Boolean,
+  '--no-asset-bundles': Boolean
 })
 
 export async function help(options: Options) {
@@ -98,6 +100,7 @@ export async function help(options: Options) {
       --mobile                          Show QR code for mobile preview on the same network.
       --multi-instance                  Allow running multiple Explorer instances simultaneously.
       --no-client                       Suppress every auto-launch (desktop Explorer deeplink, browser open, mobile QR). The file watcher still notifies a desktop Explorer if it connects on its own — useful when an external tool owns the Explorer process.
+      --no-asset-bundles                Do not run the abgen asset-bundle sidecar (default; the abgen binary on the PATH or ABGEN_BIN, skipped with a warning when missing).
 
 
     Examples:
@@ -130,6 +133,7 @@ export async function main(options: Options) {
 
   let hasSmartWearable = false
   const workspace = await getValidWorkspace(options.components, workingDirectory)
+  const withAssetBundles = !options.args['--no-asset-bundles']
 
   /* istanbul ignore if */
   if (workspace.projects.length > 1)
@@ -217,6 +221,14 @@ export async function main(options: Options) {
       }
       await startComponents()
 
+      let assetBundlesUrl: string | undefined
+      if (withAssetBundles) {
+        assetBundlesUrl = await runAssetBundlesSidecar(components, port)
+        if (assetBundlesUrl) {
+          printProgressInfo(options.components.logger, `Serving asset bundles (abgen JIT): ${assetBundlesUrl}`)
+        }
+      }
+
       const networkInterfaces = os.networkInterfaces()
       const availableURLs: string[] = []
 
@@ -265,7 +277,14 @@ export async function main(options: Options) {
 
       if (explorerAlpha && !isMobile && !skipClient) {
         const realm = new URL(sortedURLs[0]).origin
-        await runExplorerAlpha(components, { cwd: workingDirectory, realm, baseCoords, isHub, args: options.args })
+        await runExplorerAlpha(components, {
+          cwd: workingDirectory,
+          realm,
+          baseCoords,
+          isHub,
+          args: options.args,
+          assetBundlesUrl
+        })
       }
 
       if (isMobile && !skipClient && lanUrl) {
