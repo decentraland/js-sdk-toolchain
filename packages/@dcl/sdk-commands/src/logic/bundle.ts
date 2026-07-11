@@ -163,19 +163,7 @@ type SingleProjectOptions = CompileOptions & {
   outputFile: string
 }
 
-export async function bundleSingleProject(components: BundleComponents, options: SingleProjectOptions) {
-  printProgressStep(components.logger, `Bundling file ${colors.bold(options.entrypoint)}`, 1, MAX_STEP)
-  const editorScene = await isEditorScene(components, options.workingDirectory)
-
-  // Pre-compute composite data so we can inject maxCompositeEntity via esbuild define.
-  // This must happen before the esbuild context is created because the define values
-  // are baked into the engine at compile time (the entity counter initializer reads it)
-  let maxCompositeEntity = 0
-  if (!options.ignoreComposite) {
-    const composites = await getAllComposites(components, options.workingDirectory)
-    maxCompositeEntity = composites.maxCompositeEntity
-  }
-
+function resolveSdkAliases(options: SingleProjectOptions): Record<string, string> {
   const sdkPackagePath = (() => {
     try {
       // First try to resolve from project's node_modules
@@ -185,12 +173,78 @@ export async function bundleSingleProject(components: BundleComponents, options:
       return path.dirname(require.resolve('@dcl/sdk/package.json', { paths: [__dirname] }))
     }
   })()
-  const context = await esbuild.context({
+  return {
+    // Ensure React is always resolved to the same module to prevent duplication
+    react: (() => {
+      try {
+        // First try to resolve from project's node_modules
+        return require.resolve('react', { paths: [options.workingDirectory] })
+      } catch {
+        try {
+          // Fallback to SDK's React dependency
+          return require.resolve('react', { paths: [path.join(__dirname, '../../../@dcl/sdk')] })
+        } catch {
+          // Final fallback to bundled React
+          return require.resolve('react')
+        }
+      }
+    })(),
+    // Ensure @dcl/sdk is always resolved to workspace version to prevent version conflicts
+    '@dcl/sdk': sdkPackagePath,
+    // Resolve ecs from sdk dependencies (nested in @dcl/sdk)
+    '@dcl/ecs': (() => {
+      try {
+        // First try to resolve from project's @dcl/sdk node_modules
+        return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [sdkPackagePath] }))
+      } catch {
+        try {
+          // Fallback: try to resolve from project's node_modules
+          return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [options.workingDirectory] }))
+        } catch {
+          // Last resort: try resolving from current directory
+          return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [__dirname] }))
+        }
+      }
+    })(),
+    // Resolve asset-packs from the scene's own node_modules (if the user explicitly installed it),
+    // otherwise fall back to the version bundled inside @dcl/inspector.
+    // NOTE: We use a direct path check (fs.existsSync) instead of require.resolve here because
+    // require.resolve walks UP the directory tree from workingDirectory, which would incorrectly
+    // pick up @dcl/asset-packs installed next to the scene (e.g. at a monorepo root) rather
+    // than the one the user intentionally installed inside the scene.
+    '@dcl/asset-packs': (() => {
+      const sceneOwnAssetPacks = path.join(
+        options.workingDirectory,
+        'node_modules',
+        '@dcl',
+        'asset-packs',
+        'package.json'
+      )
+      if (fs.existsSync(sceneOwnAssetPacks)) {
+        return path.dirname(sceneOwnAssetPacks)
+      }
+      try {
+        // Fallback: resolve from @dcl/inspector's node_modules
+        const inspectorPath = require.resolve('@dcl/inspector/package.json', { paths: [__dirname] })
+        return path.dirname(require.resolve('@dcl/asset-packs/package.json', { paths: [path.dirname(inspectorPath)] }))
+      } catch {
+        // Last resort: try resolving from current directory
+        return path.dirname(require.resolve('@dcl/asset-packs/package.json', { paths: [__dirname] }))
+      }
+    })()
+  }
+}
+
+function sharedEsbuildOptions(
+  options: SingleProjectOptions,
+  maxCompositeEntity: number,
+  outputFile: string
+): esbuild.BuildOptions {
+  return {
     bundle: true,
     platform: 'browser',
     format: 'cjs',
     preserveSymlinks: false,
-    outfile: options.outputFile,
     allowOverwrite: false,
     sourcemap: options.production ? false : 'inline',
     minify: options.production,
@@ -201,71 +255,8 @@ export async function bundleSingleProject(components: BundleComponents, options:
     metafile: true,
     absWorkingDir: options.workingDirectory,
     target: 'es2020',
-    external: ['~system/*', '@dcl/inspector', '@dcl/inspector/*' /* ban importing the inspector from the SDK */],
-    alias: {
-      // Ensure React is always resolved to the same module to prevent duplication
-      react: (() => {
-        try {
-          // First try to resolve from project's node_modules
-          return require.resolve('react', { paths: [options.workingDirectory] })
-        } catch {
-          try {
-            // Fallback to SDK's React dependency
-            return require.resolve('react', { paths: [path.join(__dirname, '../../../@dcl/sdk')] })
-          } catch {
-            // Final fallback to bundled React
-            return require.resolve('react')
-          }
-        }
-      })(),
-      // Ensure @dcl/sdk is always resolved to workspace version to prevent version conflicts
-      '@dcl/sdk': sdkPackagePath,
-      // Resolve ecs from sdk dependencies (nested in @dcl/sdk)
-      '@dcl/ecs': (() => {
-        try {
-          // First try to resolve from project's @dcl/sdk node_modules
-          return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [sdkPackagePath] }))
-        } catch {
-          try {
-            // Fallback: try to resolve from project's node_modules
-            return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [options.workingDirectory] }))
-          } catch {
-            // Last resort: try resolving from current directory
-            return path.dirname(require.resolve('@dcl/ecs/package.json', { paths: [__dirname] }))
-          }
-        }
-      })(),
-      // Resolve asset-packs from the scene's own node_modules (if the user explicitly installed it),
-      // otherwise fall back to the version bundled inside @dcl/inspector.
-      // NOTE: We use a direct path check (fs.existsSync) instead of require.resolve here because
-      // require.resolve walks UP the directory tree from workingDirectory, which would incorrectly
-      // pick up @dcl/asset-packs installed next to the scene (e.g. at a monorepo root) rather
-      // than the one the user intentionally installed inside the scene.
-      '@dcl/asset-packs': (() => {
-        const sceneOwnAssetPacks = path.join(
-          options.workingDirectory,
-          'node_modules',
-          '@dcl',
-          'asset-packs',
-          'package.json'
-        )
-        if (fs.existsSync(sceneOwnAssetPacks)) {
-          return path.dirname(sceneOwnAssetPacks)
-        }
-        try {
-          // Fallback: resolve from @dcl/inspector's node_modules
-          const inspectorPath = require.resolve('@dcl/inspector/package.json', { paths: [__dirname] })
-          return path.dirname(
-            require.resolve('@dcl/asset-packs/package.json', { paths: [path.dirname(inspectorPath)] })
-          )
-        } catch {
-          // Last resort: try resolving from current directory
-          return path.dirname(require.resolve('@dcl/asset-packs/package.json', { paths: [__dirname] }))
-        }
-      })()
-    },
     // convert filesystem paths into file:// to enable VSCode debugger
-    sourceRoot: options.production ? 'dcl:///' : pathToFileURL(path.dirname(options.outputFile)).toString(),
+    sourceRoot: options.production ? 'dcl:///' : pathToFileURL(path.dirname(outputFile)).toString(),
     define: {
       document: 'undefined',
       window: 'undefined',
@@ -283,7 +274,28 @@ export async function bundleSingleProject(components: BundleComponents, options:
     },
     logOverride: {
       'import-is-undefined': 'silent'
-    },
+    }
+  }
+}
+
+export async function bundleSingleProject(components: BundleComponents, options: SingleProjectOptions) {
+  printProgressStep(components.logger, `Bundling file ${colors.bold(options.entrypoint)}`, 1, MAX_STEP)
+  const editorScene = await isEditorScene(components, options.workingDirectory)
+
+  // Pre-compute composite data so we can inject maxCompositeEntity via esbuild define.
+  // This must happen before the esbuild context is created because the define values
+  // are baked into the engine at compile time (the entity counter initializer reads it)
+  let maxCompositeEntity = 0
+  if (!options.ignoreComposite) {
+    const composites = await getAllComposites(components, options.workingDirectory)
+    maxCompositeEntity = composites.maxCompositeEntity
+  }
+
+  const context = await esbuild.context({
+    ...sharedEsbuildOptions(options, maxCompositeEntity, options.outputFile),
+    outfile: options.outputFile,
+    external: ['~system/*', '@dcl/inspector', '@dcl/inspector/*' /* ban importing the inspector from the SDK */],
+    alias: resolveSdkAliases(options),
     plugins: [compositeLoader(components, options)],
     stdin: {
       contents: getEntrypointCode(options.entrypoint, options.customEntryPoint, editorScene),
