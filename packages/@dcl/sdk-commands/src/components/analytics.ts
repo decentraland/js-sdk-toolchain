@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid'
+import { randomUUID } from 'crypto'
 import { Analytics } from '@segment/analytics-node'
 
 import { CliComponents } from '.'
@@ -106,7 +106,7 @@ export async function createAnalyticsComponent(components: Pick<CliComponents, '
   const analytics: Analytics = new Analytics({ writeKey: getSegmentKey() })
 
   if (!anonId) {
-    anonId = uuidv4()
+    anonId = randomUUID()
     await writeGlobalConfig(components, 'DCL_ANON_ID', anonId)
 
     analytics.identify({

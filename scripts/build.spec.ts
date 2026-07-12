@@ -1,7 +1,20 @@
 import * as path from 'path'
 import { readFileSync, writeFileSync, readdirSync } from 'fs'
 import { copySync, existsSync, mkdirSync, removeSync } from 'fs-extra'
-import { summary } from '@actions/core'
+import { appendFileSync } from 'fs'
+
+// minimal stand-in for @actions/core's summary: append to the GitHub job summary when present
+const summaryChunks: string[] = []
+const summary = {
+  addRaw(text: string) {
+    summaryChunks.push(text)
+    return summary
+  },
+  async write() {
+    if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, summaryChunks.join(''))
+    summaryChunks.length = 0
+  }
+}
 
 import {
   commonChecks,

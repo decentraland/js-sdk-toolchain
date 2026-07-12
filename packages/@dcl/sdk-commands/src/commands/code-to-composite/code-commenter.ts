@@ -1,5 +1,5 @@
 import path from 'path'
-import { globSync } from 'glob'
+import { globSync } from 'fs'
 
 import { CliComponents } from '../../components'
 
@@ -81,11 +81,9 @@ export async function commentSourceFiles(
   const normalizedSceneCodeEntrypoint = path.normalize(sceneCodeEntrypoint)
   const srcDir = path.dirname(normalizedSceneCodeEntrypoint)
 
-  const sourceFiles = globSync('**/*.{ts,tsx,js,jsx}', {
-    cwd: srcDir,
-    absolute: true,
-    ignore: ['**/*.d.ts', '**/node_modules/**']
-  })
+  const sourceFiles = globSync('**/*.{ts,tsx,js,jsx}', { cwd: srcDir })
+    .filter((file) => !file.endsWith('.d.ts') && !file.includes('node_modules'))
+    .map((file) => path.resolve(srcDir, file))
 
   const filesToComment = sourceFiles.filter((file) => {
     const normalized = path.normalize(file)

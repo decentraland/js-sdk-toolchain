@@ -4,8 +4,8 @@
 import { Scene } from '@dcl/schemas'
 import child_process from 'child_process'
 import esbuild from 'esbuild'
-import { future } from 'fp-future'
-import { globSync } from 'glob'
+import { future } from './future'
+import { globSync } from 'fs'
 import fs from 'fs'
 import path from 'path'
 import { pathToFileURL } from 'url'
@@ -134,7 +134,9 @@ export async function bundleProject(components: BundleComponents, options: Compi
   }
 
   const entrypointSource = options.single || 'src/index.ts'
-  const entrypoints = globSync(entrypointSource, { cwd: options.workingDirectory, absolute: true })
+  const entrypoints = globSync(entrypointSource, { cwd: options.workingDirectory }).map((entry) =>
+    path.resolve(options.workingDirectory, entry)
+  )
 
   /* istanbul ignore if */
   if (!entrypoints.length)
