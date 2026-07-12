@@ -40,8 +40,8 @@ describe('quests command', () => {
       await expect(() => quests.main({ args: { _: [], '--create-from-json': 'null' }, components })).rejects.toThrow(
         "File doesn't exist"
       )
-      expect(existSpy).toBeCalled()
-      expect(executeSubcommand).not.toBeCalled()
+      expect(existSpy).toHaveBeenCalled()
+      expect(executeSubcommand).not.toHaveBeenCalled()
     })
 
     it('should throw if provided Quest is invalid', async () => {
@@ -52,7 +52,7 @@ describe('quests command', () => {
       await expect(() => quests.main({ args: { _: [], '--create-from-json': path }, components })).rejects.toThrow(
         'You provided an invalid Quest JSON. Please check the documentation'
       )
-      expect(executeSubcommand).not.toBeCalled()
+      expect(executeSubcommand).not.toHaveBeenCalled()
     })
 
     it('should throw if provided file does not contain a JSON', async () => {
@@ -63,7 +63,7 @@ describe('quests command', () => {
       await expect(() => quests.main({ args: { _: [], '--create-from-json': path }, components })).rejects.toThrow(
         `${path} doesn't contain a valid JSON`
       )
-      expect(executeSubcommand).not.toBeCalled()
+      expect(executeSubcommand).not.toHaveBeenCalled()
     })
 
     it('should be executed properly when Quest is valid', async () => {
@@ -75,7 +75,7 @@ describe('quests command', () => {
 
       await quests.main({ args: { _: [], '--create-from-json': path }, components })
 
-      expect(executeSubcommand).toBeCalledWith(
+      expect(executeSubcommand).toHaveBeenCalledWith(
         components,
         { linkerPort: undefined, isHttps: false, openBrowser: true },
         {
@@ -100,9 +100,9 @@ describe('quests command', () => {
       await expect(() => quests.main({ args: { _: [], '--create': true }, components })).rejects.toThrow(
         'Quest creation was cancelled'
       )
-      expect(existSpy).not.toBeCalled()
-      expect(createMock).toBeCalledWith({ logger: components.logger })
-      expect(executeSubcommand).not.toBeCalled()
+      expect(existSpy).not.toHaveBeenCalled()
+      expect(createMock).toHaveBeenCalledWith({ logger: components.logger })
+      expect(executeSubcommand).not.toHaveBeenCalled()
     })
 
     it('should be executed properly when users prompts correctly', async () => {
@@ -119,9 +119,9 @@ describe('quests command', () => {
 
       await quests.main({ args: { _: [], '--create': true }, components })
 
-      expect(existSpy).not.toBeCalled()
-      expect(createMock).toBeCalledWith({ logger: components.logger })
-      expect(executeSubcommand).toBeCalledWith(
+      expect(existSpy).not.toHaveBeenCalled()
+      expect(createMock).toHaveBeenCalledWith({ logger: components.logger })
+      expect(executeSubcommand).toHaveBeenCalledWith(
         components,
         { linkerPort: undefined, isHttps: false, openBrowser: true },
         {
@@ -143,7 +143,7 @@ describe('quests command', () => {
 
       await quests.main({ args: { _: [], '--list': '0xc0ffee254729296a45a3885639AC7E10F9d54979' }, components })
 
-      expect(executeSubcommand).toBeCalledWith(
+      expect(executeSubcommand).toHaveBeenCalledWith(
         components,
         { linkerPort: undefined, isHttps: false, openBrowser: true },
         {
@@ -163,7 +163,7 @@ describe('quests command', () => {
       await expect(() => quests.main({ args: { _: [], '--list': '0xA' }, components })).rejects.toThrow(
         'You should provide a valid EVM address'
       )
-      expect(executeSubcommand).not.toBeCalled()
+      expect(executeSubcommand).not.toHaveBeenCalled()
     })
   })
 
@@ -174,7 +174,7 @@ describe('quests command', () => {
 
       await quests.main({ args: { _: [], '--activate': '342adfeb-535f-4adb-9d78-975f732808b2' }, components })
 
-      expect(executeSubcommand).toBeCalledWith(
+      expect(executeSubcommand).toHaveBeenCalledWith(
         components,
         { linkerPort: undefined, isHttps: false, openBrowser: true },
         {
@@ -197,7 +197,7 @@ describe('quests command', () => {
       await expect(() =>
         quests.main({ args: { _: [], '--activate': '342adfeb-535f-4adb-9d78-975f7' }, components })
       ).rejects.toThrow('You should provide a valid uuid')
-      expect(executeSubcommand).not.toBeCalled()
+      expect(executeSubcommand).not.toHaveBeenCalled()
     })
   })
 
@@ -208,7 +208,7 @@ describe('quests command', () => {
 
       await quests.main({ args: { _: [], '--deactivate': '342adfeb-535f-4adb-9d78-975f732808b2' }, components })
 
-      expect(executeSubcommand).toBeCalledWith(
+      expect(executeSubcommand).toHaveBeenCalledWith(
         components,
         { linkerPort: undefined, isHttps: false, openBrowser: true },
         {
@@ -231,7 +231,7 @@ describe('quests command', () => {
       await expect(() =>
         quests.main({ args: { _: [], '--deactivate': '342adfeb-535f-4adb-9d78-975f' }, components })
       ).rejects.toThrow('You should provide a valid uuid')
-      expect(executeSubcommand).not.toBeCalled()
+      expect(executeSubcommand).not.toHaveBeenCalled()
     })
   })
 })

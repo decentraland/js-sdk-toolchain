@@ -56,22 +56,22 @@ describe('Tween System', () => {
         completed()
       }
     })
-    expect(completed).toBeCalledTimes(0)
+    expect(completed).toHaveBeenCalledTimes(0)
   })
   it('should create a tweenState and call isCompleted', async () => {
     await mockTweenStatus(entity)
-    expect(completed).toBeCalledTimes(1)
+    expect(completed).toHaveBeenCalledTimes(1)
   })
   it('should not called again isCompleted', async () => {
     await engine.update(1)
-    expect(completed).toBeCalledTimes(0)
+    expect(completed).toHaveBeenCalledTimes(0)
   })
 
   it('should reset fn and called isChanged if the tween has changed', async () => {
     TweenState.deleteFrom(entity)
     await mockTween(entity, Tween.Mode.Move({ start: Vector3.Forward(), end: Vector3.Down() }))
     await engine.update(1)
-    expect(completed).toBeCalledTimes(0)
+    expect(completed).toHaveBeenCalledTimes(0)
   })
 
   it('should create a YOYO tweenSequence for the entity', async () => {
@@ -83,14 +83,14 @@ describe('Tween System', () => {
     expect(Tween.get(entity).mode).toMatchCloseTo(Tween.Mode.Move({ start: Vector3.Forward(), end: Vector3.Down() }))
     await mockTweenStatus(entity)
     await engine.update(1)
-    expect(completed).toBeCalledTimes(1)
+    expect(completed).toHaveBeenCalledTimes(1)
     expect(Tween.get(entity).mode).toMatchCloseTo(Tween.Mode.Move({ start: Vector3.Down(), end: Vector3.Forward() }))
   })
 
   it('should change to backwards the Rotate Tween when its completed', async () => {
     await mockTween(entity, Tween.Mode.Rotate({ start: Quaternion.Zero(), end: Quaternion.Identity() }))
     await mockTweenStatus(entity)
-    expect(completed).toBeCalledTimes(1)
+    expect(completed).toHaveBeenCalledTimes(1)
     expect(Tween.get(entity).mode).toMatchCloseTo(
       Tween.Mode.Rotate({ end: Quaternion.Zero(), start: Quaternion.Identity() })
     )
@@ -99,14 +99,14 @@ describe('Tween System', () => {
   it('should change to backwards the Scale Tween when its completed', async () => {
     await mockTween(entity, Tween.Mode.Scale({ start: Vector3.Left(), end: Vector3.Right() }))
     await mockTweenStatus(entity)
-    expect(completed).toBeCalledTimes(1)
+    expect(completed).toHaveBeenCalledTimes(1)
     expect(Tween.get(entity).mode).toMatchCloseTo(Tween.Mode.Scale({ end: Vector3.Left(), start: Vector3.Right() }))
   })
 
   it('should change to backwards the TextureMove Tween when its completed', async () => {
     await mockTween(entity, Tween.Mode.TextureMove({ start: Vector2.Zero(), end: Vector2.One() }))
     await mockTweenStatus(entity)
-    expect(completed).toBeCalledTimes(1)
+    expect(completed).toHaveBeenCalledTimes(1)
     expect(Tween.get(entity).mode).toMatchCloseTo(Tween.Mode.TextureMove({ end: Vector2.Zero(), start: Vector2.One() }))
   })
 
@@ -117,7 +117,7 @@ describe('Tween System', () => {
     await mockTweenStatus(entity)
     // One frame to delete the Tween so the renderer can restart it
     expect(Tween.getOrNull(entity)).toBe(null)
-    expect(completed).toBeCalledTimes(1)
+    expect(completed).toHaveBeenCalledTimes(1)
     await engine.update(1)
     expect(Tween.getOrNull(entity)).toMatchCloseTo(tween)
   })
@@ -133,12 +133,12 @@ describe('Tween System', () => {
     })
     await mockTweenStatus(entity)
     expect(Tween.getOrNull(entity)).toMatchObject(rotateTween)
-    expect(completed).toBeCalledTimes(1)
+    expect(completed).toHaveBeenCalledTimes(1)
     expect(TweenSequence.get(entity).sequence).toMatchObject([scaleTween, tween])
     TweenState.deleteFrom(entity)
     await mockTweenStatus(entity)
     expect(Tween.getOrNull(entity)).toMatchObject(scaleTween)
-    expect(completed).toBeCalledTimes(2)
+    expect(completed).toHaveBeenCalledTimes(2)
     expect(TweenSequence.get(entity).sequence).toMatchObject([tween, rotateTween])
   })
 
@@ -152,7 +152,7 @@ describe('Tween System', () => {
         completed()
       }
     })
-    expect(completed).toBeCalledTimes(0)
+    expect(completed).toHaveBeenCalledTimes(0)
   })
 
   it('should call the createTweenSystem twice with different engines and check if both tween systems were created', async () => {
@@ -168,7 +168,7 @@ describe('Tween System', () => {
         completed()
       }
     })
-    expect(completed).toBeCalledTimes(0)
+    expect(completed).toHaveBeenCalledTimes(0)
   })
 
   describe('ENABLE_SDK_TWEEN_SEQUENCE flag behavior', () => {

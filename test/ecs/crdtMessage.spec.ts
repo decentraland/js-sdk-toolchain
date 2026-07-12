@@ -101,22 +101,22 @@ describe('Component operation tests', () => {
     writeSomeInvalidMessage()
     expect(() => {
       PutComponentOperation.read(buf)
-    }).toThrowError()
+    }).toThrow()
 
     writeSomeInvalidMessage()
     expect(() => {
       DeleteEntity.read(buf)
-    }).toThrowError()
+    }).toThrow()
 
     writeSomeInvalidMessage()
     expect(() => {
       DeleteComponent.read(buf)
-    }).toThrowError()
+    }).toThrow()
 
     writeSomeInvalidMessage()
     expect(() => {
       DeleteComponent.read(buf)
-    }).toThrowError()
+    }).toThrow()
 
     writeSomeInvalidMessage()
     expect(readMessage(buf)).toBeNull()

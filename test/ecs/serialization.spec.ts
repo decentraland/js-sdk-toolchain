@@ -479,7 +479,7 @@ describe('test schema serialization', () => {
       }
 
       Schemas.EnumNumber<BadEnum>(BadEnum, BadEnum.Red)
-    }).toThrowError()
+    }).toThrow()
 
     expect(() => {
       enum BadEnum {
@@ -489,7 +489,7 @@ describe('test schema serialization', () => {
       }
 
       Schemas.EnumString<BadEnum>(BadEnum, BadEnum.Red)
-    }).toThrowError()
+    }).toThrow()
 
     expect(() => {
       enum BadEnum {
@@ -500,7 +500,7 @@ describe('test schema serialization', () => {
       }
 
       Schemas.EnumNumber<BadEnum>(BadEnum, BadEnum.Red)
-    }).toThrowError()
+    }).toThrow()
 
     expect(() => {
       enum BadEnum {
@@ -510,7 +510,7 @@ describe('test schema serialization', () => {
       }
 
       Schemas.EnumNumber<BadEnum>(BadEnum, BadEnum.Red)
-    }).toThrowError()
+    }).toThrow()
 
     expect(() => {
       enum BadEnum {
@@ -521,7 +521,7 @@ describe('test schema serialization', () => {
       }
 
       Schemas.EnumString<BadEnum>(BadEnum, BadEnum.Red)
-    }).toThrowError()
+    }).toThrow()
 
     expect(() => {
       enum RightEnum {
@@ -531,7 +531,7 @@ describe('test schema serialization', () => {
       }
 
       Schemas.EnumString<RightEnum>(RightEnum, RightEnum.Red)
-    }).not.toThrowError()
+    }).not.toThrow()
 
     expect(() => {
       enum RightEnum {
@@ -541,7 +541,7 @@ describe('test schema serialization', () => {
       }
 
       Schemas.EnumNumber<RightEnum>(RightEnum, RightEnum.Red)
-    }).not.toThrowError()
+    }).not.toThrow()
   })
 })
 describe('test json-schema function', () => {
@@ -599,7 +599,7 @@ describe('test json-schema function', () => {
         type: 'super-strange-description' as any,
         serializationType: 'sarasa' as any
       })
-    }).toThrowError()
+    }).toThrow()
   })
 
   it('should mutate each value', () => {

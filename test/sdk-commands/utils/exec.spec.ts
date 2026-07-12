@@ -28,12 +28,12 @@ describe('utils/exec', () => {
 
     const res = await component.exec(process.cwd(), 'run', ['some', 'test'])
 
-    expect(spawnSpy).toBeCalledWith('run', ['some', 'test'], {
+    expect(spawnSpy).toHaveBeenCalledWith('run', ['some', 'test'], {
       shell: true,
       cwd: process.cwd(),
       env: { ...process.env, NODE_ENV: '' }
     })
-    expect(pipeSpy).toBeCalled()
+    expect(pipeSpy).toHaveBeenCalled()
     expect(res).toBe(undefined)
   })
 
@@ -59,12 +59,12 @@ describe('utils/exec', () => {
       env: { someKey: '1' }
     })
 
-    expect(spawnSpy).toBeCalledWith('run', ['some', 'test'], {
+    expect(spawnSpy).toHaveBeenCalledWith('run', ['some', 'test'], {
       shell: true,
       cwd: process.cwd(),
       env: { ...process.env, NODE_ENV: '', someKey: '1' }
     })
-    expect(pipeSpy).toBeCalled()
+    expect(pipeSpy).toHaveBeenCalled()
     expect(res).toBe(undefined)
   })
 
@@ -91,12 +91,12 @@ describe('utils/exec', () => {
       silent: true
     })
 
-    expect(spawnSpy).toBeCalledWith('run', ['some', 'test'], {
+    expect(spawnSpy).toHaveBeenCalledWith('run', ['some', 'test'], {
       shell: true,
       cwd: process.cwd(),
       env: { ...process.env, NODE_ENV: '', someKey: '1' }
     })
-    expect(pipeSpy).not.toBeCalled()
+    expect(pipeSpy).not.toHaveBeenCalled()
     expect(res).toBe(undefined)
   })
 
@@ -128,7 +128,7 @@ describe('utils/exec', () => {
       error = e
     }
 
-    expect(spawnSpy).toBeCalledWith('run', ['some', 'test'], {
+    expect(spawnSpy).toHaveBeenCalledWith('run', ['some', 'test'], {
       shell: true,
       cwd: process.cwd(),
       env: { ...process.env, NODE_ENV: '', someKey: '1' }

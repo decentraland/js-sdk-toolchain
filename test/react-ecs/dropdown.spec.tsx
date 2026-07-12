@@ -47,21 +47,21 @@ describe('UiDropdown React ECS', () => {
     expect(UiDropdown.get(uiEntity).selectedIndex).toBe(0)
   })
   it('onChange should not be called if there is no DropdownResult', async () => {
-    expect(onChange).toBeCalledTimes(0)
+    expect(onChange).toHaveBeenCalledTimes(0)
     await engine.update(1)
-    expect(onChange).toBeCalledTimes(0)
+    expect(onChange).toHaveBeenCalledTimes(0)
   })
 
   it('creates a dropdownResult, so now should be called', async () => {
     UiDropdownResult.create(uiEntity, { value: 1 })
     await engine.update(1)
-    expect(onChange).toBeCalledWith(1)
+    expect(onChange).toHaveBeenCalledWith(1)
   })
 
   it('reset the onChange mock fn, and update the value with the previous value so there should be no called either', async () => {
     onChange.mockClear()
     await engine.update(1)
-    expect(onChange).toBeCalledTimes(0)
+    expect(onChange).toHaveBeenCalledTimes(0)
     UiDropdownResult.getMutable(uiEntity).value = 1
     await engine.update(1)
   })
@@ -69,26 +69,26 @@ describe('UiDropdown React ECS', () => {
   it('remove the onchange fn, so if we change the value there is no call to the fn because there is no onChange fn', async () => {
     onChange.mockClear()
     conditional = false
-    expect(onChange).toBeCalledTimes(0)
+    expect(onChange).toHaveBeenCalledTimes(0)
     await engine.update(1)
 
     UiDropdownResult.getMutable(uiEntity).value = 2
-    expect(onChange).toBeCalledTimes(0)
+    expect(onChange).toHaveBeenCalledTimes(0)
     await engine.update(1)
-    expect(onChange).toBeCalledTimes(0)
+    expect(onChange).toHaveBeenCalledTimes(0)
   })
 
   it('put the conditional en true, so we have the onChange fn again', async () => {
     onChange.mockClear()
     conditional = true
     await engine.update(1)
-    expect(onChange).toBeCalledTimes(0)
+    expect(onChange).toHaveBeenCalledTimes(0)
   })
 
   it('should call the fn only if there is a new change on it', async () => {
     UiDropdownResult.getMutable(uiEntity).value = 4
     await engine.update(1)
-    expect(onChange).toBeCalledWith(4)
+    expect(onChange).toHaveBeenCalledWith(4)
     onChange.mockClear()
   })
 
@@ -97,6 +97,6 @@ describe('UiDropdown React ECS', () => {
     await engine.update(1)
     UiDropdownResult.create(uiEntity).value = 1
     await engine.update(1)
-    expect(onChange).toBeCalledTimes(0)
+    expect(onChange).toHaveBeenCalledTimes(0)
   })
 })

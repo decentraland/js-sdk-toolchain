@@ -35,7 +35,7 @@ describe('Engine tests', () => {
     const entity = engine.addEntity()
     const Position = engine.defineComponent('PositionSchema', PositionSchema)
     Position.create(entity, { x: 1 })
-    expect(() => Position.create(entity, { x: 10 })).toThrowError()
+    expect(() => Position.create(entity, { x: 10 })).toThrow()
   })
 
   it('should delete component if exists or not', async () => {
@@ -52,11 +52,11 @@ describe('Engine tests', () => {
     const engine = Engine()
     const system = () => {}
     engine.addSystem(system)
-    expect(() => engine.addSystem(system)).toThrowError()
+    expect(() => engine.addSystem(system)).toThrow()
 
     const systemA = () => {}
     engine.addSystem(systemA)
-    expect(() => engine.addSystem(systemA)).toThrowError()
+    expect(() => engine.addSystem(systemA)).toThrow()
   })
 
   it('should replace existing component with the new one', async () => {
@@ -89,17 +89,17 @@ describe('Engine tests', () => {
     expect(Position.get(entity)).toStrictEqual({ x: 80 })
 
     engine.removeComponentDefinition(888)
-    expect(() => engine.getComponent(888)).toThrowError()
+    expect(() => engine.getComponent(888)).toThrow()
 
     engine.seal()
-    expect(() => engine.removeComponentDefinition(888)).toThrowError(
+    expect(() => engine.removeComponentDefinition(888)).toThrow(
       'Engine is already sealed. No components can be removed at this stage'
     )
   })
 
   it('should fail if we try to fetch a component not deifned', async () => {
     const engine = Engine()
-    expect(() => engine.getComponent(1238)).toThrowError()
+    expect(() => engine.getComponent(1238)).toThrow()
   })
 
   it('should return component by name', async () => {
@@ -166,7 +166,7 @@ describe('Engine tests', () => {
     for (const [_entity, position] of engine.getEntitiesWith(Position)) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      expect(() => (position.x = 1000000000000)).toThrowError()
+      expect(() => (position.x = 1000000000000)).toThrow()
     }
     expect(Position.get(entity)).toStrictEqual({ x: 10 })
   })
@@ -179,7 +179,7 @@ describe('Engine tests', () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const assignError = () => (Position.get(entity).x = 1000000000000)
-    expect(assignError).toThrowError()
+    expect(assignError).toThrow()
     expect(Position.get(entity)).toStrictEqual({ x: 10 })
   })
 
@@ -189,7 +189,7 @@ describe('Engine tests', () => {
     const Position = engine.defineComponent('PositionSchema', PositionSchema)
     const Velocity = engine.defineComponent('VelocitySchema', VelocitySchema)
     Position.create(entity, { x: 10 })
-    expect(() => Velocity.get(entity)).toThrowError()
+    expect(() => Velocity.get(entity)).toThrow()
   })
 
   it('should return null if the component not exists on the entity.', async () => {
@@ -359,7 +359,7 @@ describe('Engine tests', () => {
   //   const MeshRenderer = components.MeshRenderer(engine)
   //   const entityA = engine.addEntity()
   //   const buf = new ReadWriteByteBuffer()
-  //   expect(() => MeshRenderer.writeToByteBuffer(entityA, buf)).toThrowError('')
+  //   expect(() => MeshRenderer.writeToByteBuffer(entityA, buf)).toThrow('')
   // })
 
   it('should remove component when using deleteFrom', async () => {
@@ -541,19 +541,19 @@ describe('Engine tests', () => {
     Transform.create(e2).parent = e1
     Transform.create(e3).parent = e2
     await engine.update(1 / 30)
-    expect(errorFunc).not.toBeCalled()
+    expect(errorFunc).not.toHaveBeenCalled()
 
     Transform.getMutable(e3).parent = e3
     await engine.update(1.0 / 30.0)
-    expect(errorFunc).toBeCalledWith(errorString(e3))
+    expect(errorFunc).toHaveBeenCalledWith(errorString(e3))
     errorFunc.mock.calls = []
 
     Transform.getMutable(e3).parent = e2
     Transform.getMutable(e0).parent = e3
     await engine.update(1.0 / 30.0)
     expect(errorFunc.mock.calls.length).toBe(2)
-    expect(errorFunc).toBeCalledTimes(2)
-    expect(errorFunc).toBeCalledWith(errorString(e0))
+    expect(errorFunc).toHaveBeenCalledTimes(2)
+    expect(errorFunc).toHaveBeenCalledWith(errorString(e0))
   })
 
   it('should remove all children of a tree', async () => {
@@ -1209,7 +1209,7 @@ describe('Engine tests', () => {
     })
     const previousDebugMode = globalThis.DEBUG
     globalThis.DEBUG = true
-    await expect(engine.update(1)).rejects.toThrowError()
+    await expect(engine.update(1)).rejects.toThrow()
 
     if (previousDebugMode) {
       globalThis.DEBUG = previousDebugMode
@@ -1227,7 +1227,7 @@ describe('Engine tests', () => {
 
     expect(() => {
       engine.defineComponent('comp3', {})
-    }).toThrowError()
+    }).toThrow()
   })
 
   it('should throw an error if the system is added twice', async () => {
@@ -1237,7 +1237,7 @@ describe('Engine tests', () => {
 
     expect(() => {
       engine.addSystem(testSystem)
-    }).toThrowError()
+    }).toThrow()
   })
 
   it('define and remove component from component name', async () => {
@@ -1250,7 +1250,7 @@ describe('Engine tests', () => {
     expect(Position).not.toBeNull()
 
     engine.removeComponentDefinition('PositionSchema')
-    expect(() => engine.getComponent('PositionSchema')).toThrowError()
+    expect(() => engine.getComponent('PositionSchema')).toThrow()
   })
 
   describe('should return mutable obj if use component.getOrCreateMutable()', () => {
