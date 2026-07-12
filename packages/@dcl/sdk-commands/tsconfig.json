@@ -12,10 +12,18 @@
     "resolveJsonModule": true,
     "strict": true,
     "sourceMap": true,
-    "types": ["node"],
-    "lib": ["es2020"],
+    "types": [
+      "node"
+    ],
+    "lib": [
+      "es2024"
+    ],
     "outDir": "./dist"
   },
-  "include": ["src"],
-  "exclude": ["dist"]
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "dist"
+  ]
 }

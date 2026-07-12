@@ -1,5 +1,5 @@
 import path from 'path'
-import prompts from 'prompts'
+import prompts from '../../logic/prompts'
 import { Result } from 'arg'
 import { CliComponents } from '../../components'
 import { declareArgs } from '../../logic/args'

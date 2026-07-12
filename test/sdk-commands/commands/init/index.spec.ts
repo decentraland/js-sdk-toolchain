@@ -22,9 +22,9 @@ describe('init command', () => {
 
     await expect(() => init.main({ args: { _: [] }, components })).rejects.toThrow()
 
-    expect(downloadSpy).not.toBeCalled()
-    expect(extractSpy).not.toBeCalled()
-    expect(installDependenciesSpy).not.toBeCalled()
+    expect(downloadSpy).not.toHaveBeenCalled()
+    expect(extractSpy).not.toHaveBeenCalled()
+    expect(installDependenciesSpy).not.toHaveBeenCalled()
   })
 
   it('main: should download & extract if directory is not empty and "--yes" arg is provided', async () => {
@@ -40,10 +40,10 @@ describe('init command', () => {
     const installDependenciesSpy = jest.spyOn(projectValidations, 'installDependencies').mockResolvedValue(undefined)
     await init.main({ args: { _: [], '--yes': true }, components })
 
-    expect(downloadSpy).toBeCalled()
-    expect(extractSpy).toBeCalled()
-    expect(removeSpy).toBeCalled()
-    expect(installDependenciesSpy).toBeCalled()
+    expect(downloadSpy).toHaveBeenCalled()
+    expect(extractSpy).toHaveBeenCalled()
+    expect(removeSpy).toHaveBeenCalled()
+    expect(installDependenciesSpy).toHaveBeenCalled()
   })
 
   it('main: should move files out of dirs', async () => {
@@ -59,12 +59,12 @@ describe('init command', () => {
 
     await init.main({ args: { _: [], '--yes': true, '--skip-install': true }, components })
 
-    expect(downloadSpy).toBeCalled()
-    expect(extractSpy).toBeCalled()
-    expect(removeSpy).toBeCalled()
-    expect(readdirSpy).toBeCalled()
-    expect(renameSpy).toBeCalled()
-    expect(rmdirSpy).toBeCalled()
+    expect(downloadSpy).toHaveBeenCalled()
+    expect(extractSpy).toHaveBeenCalled()
+    expect(removeSpy).toHaveBeenCalled()
+    expect(readdirSpy).toHaveBeenCalled()
+    expect(renameSpy).toHaveBeenCalled()
+    expect(rmdirSpy).toHaveBeenCalled()
   })
 
   it('main: should throw if something wrong happens', async () => {

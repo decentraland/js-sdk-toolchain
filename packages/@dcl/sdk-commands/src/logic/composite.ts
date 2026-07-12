@@ -1,4 +1,4 @@
-import { globSync } from 'glob'
+import { globSync } from 'fs'
 import path from 'path'
 import {
   Composite,

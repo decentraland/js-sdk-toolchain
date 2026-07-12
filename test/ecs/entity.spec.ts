@@ -66,14 +66,14 @@ describe('Entity container', () => {
     }
     expect(() => {
       entityContainer.generateEntity()
-    }).toThrowError()
+    }).toThrow()
 
     entityContainer.removeEntity(50e3 as Entity)
     entityContainer.releaseRemovedEntities()
 
     expect(() => {
       entityContainer.generateEntity()
-    }).not.toThrowError()
+    }).not.toThrow()
   })
 
   it(`should drain the all versions of entity number ${RESERVED_STATIC_ENTITIES}`, () => {

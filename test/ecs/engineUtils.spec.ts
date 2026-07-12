@@ -16,7 +16,7 @@ describe('Engine utils', () => {
 
     const readonlyObj = deepReadonly(obj)
     // @ts-ignore
-    expect(() => (readonlyObj.prop = 1)).toThrowError()
+    expect(() => (readonlyObj.prop = 1)).toThrow()
   })
 
   it('Should not fail if you try to update a readonly prop on production (perf issues) 👀', () => {

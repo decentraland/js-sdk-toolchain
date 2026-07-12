@@ -2,7 +2,7 @@ import { exec } from 'child_process'
 import { sync as globSync } from 'glob'
 import { resolve, relative } from 'path'
 import { existsSync, readFileSync, writeFileSync, lstatSync, removeSync, copySync } from 'fs-extra'
-import { sync as rimraf } from 'rimraf'
+import { rmSync } from 'fs'
 
 /**
  * @returns the resolved absolute path
@@ -46,14 +46,14 @@ export function itExecutes(command: string, cwd: string, env?: Record<string, st
 export function itDeletesFolder(folder: string, cwd: string) {
   const path = resolve(cwd, folder)
   it('rm -rf ' + path, () => {
-    rimraf(path)
+    rmSync(path, { recursive: true, force: true })
   })
 }
 export function itDeletesGlob(pattern: string, cwd: string) {
   it(`deletes ${pattern} in ${cwd}`, () => {
     globSync(pattern, { absolute: true, cwd }).forEach((file) => {
       console.log(`> deleting ${file}`)
-      rimraf(file)
+      rmSync(file, { recursive: true, force: true })
     })
   })
 }

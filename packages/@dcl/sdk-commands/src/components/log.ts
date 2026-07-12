@@ -1,5 +1,5 @@
 import { ILoggerComponent } from '@well-known-components/interfaces'
-import { createColors } from 'colorette'
+import { styleText } from 'util'
 import { CliError } from '../logic/error'
 
 /**
@@ -18,9 +18,24 @@ export const writeToStderr = (...parameters: readonly unknown[]) => {
 
 // @see https://no-color.org
 // @see https://www.npmjs.com/package/chalk
-export const colors = createColors({
-  useColor: process.env.FORCE_COLOR !== '0' && !process.env.NO_COLOR
-})
+const useColor = process.env.FORCE_COLOR !== '0' && !process.env.NO_COLOR
+const paint =
+  (format: Parameters<typeof styleText>[0]) =>
+  (text: string | number) =>
+    useColor ? styleText(format, String(text)) : String(text)
+
+export const colors = {
+  bgBlack: paint('bgBlack'),
+  blueBright: paint('blueBright'),
+  bold: paint('bold'),
+  cyan: paint('cyan'),
+  dim: paint('dim'),
+  greenBright: paint('greenBright'),
+  redBright: paint('redBright'),
+  reset: paint('reset'),
+  white: paint('white'),
+  yellow: paint('yellow')
+}
 
 export function createStderrCliLogger(): ILoggerComponent.ILogger {
   return {
