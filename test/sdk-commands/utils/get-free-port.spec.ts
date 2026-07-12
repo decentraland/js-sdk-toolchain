@@ -1,5 +1,6 @@
-jest.mock('../../../packages/@dcl/sdk-commands/node_modules/portfinder')
-import * as pf from '../../../packages/@dcl/sdk-commands/node_modules/portfinder'
+jest.mock('net', () => ({ __esModule: true, ...jest.requireActual('net') }))
+
+import * as net from 'net'
 import { getPort } from '../../../packages/@dcl/sdk-commands/src/logic/get-free-port'
 
 afterEach(() => {
@@ -13,17 +14,17 @@ describe('utils/get-free-port', () => {
     expect(result).toBe(8)
   })
 
-  it('should return found available port', async () => {
-    const pfSpy = jest.spyOn(pf, 'getPortPromise').mockResolvedValueOnce(8000)
+  it('should return a free port from the OS when none is provided', async () => {
     const result = await getPort(NaN, 123)
-    expect(result).toBe(8000)
-    expect(pfSpy).toHaveBeenCalledWith({ port: 0 })
+    expect(result).toBeGreaterThan(0)
+    expect(result).toBeLessThan(65536)
   })
 
-  it('should return fail over port', async () => {
-    const pfSpy = jest.spyOn(pf, 'getPortPromise').mockRejectedValue(null)
+  it('should return the fail-over port when probing fails', async () => {
+    jest.spyOn(net, 'createServer').mockImplementation(() => {
+      throw new Error('probe failed')
+    })
     const result = await getPort(NaN, 123)
     expect(result).toBe(123)
-    expect(pfSpy).toHaveBeenCalledWith({ port: 0 })
   })
 })

@@ -1,6 +1,5 @@
 import { Result } from 'arg'
 import { isAddress } from 'eth-connect'
-import { validate } from 'uuid'
 import { validateCreateQuest } from '@dcl/quests-client/dist-cjs/utils'
 import i18next from 'i18next'
 
@@ -234,7 +233,7 @@ async function executeActivateSubcommand(
 
   const activateQuest = `${baseURL}/api/quests/${questId}/activate`
 
-  if (!validate(questId)) {
+  if (!isUuid(questId)) {
     throw new CliError('QUESTS_INVALID_UUID', i18next.t('errors.quests.invalid_uuid'))
   }
 
@@ -277,7 +276,7 @@ async function executeDeactivateSubcommand(
 
   const deactivateQuest = `${baseURL}/api/quests/${questId}`
 
-  if (!validate(questId)) {
+  if (!isUuid(questId)) {
     throw new CliError('QUESTS_INVALID_UUID', i18next.t('errors.quests.invalid_uuid'))
   }
 
@@ -338,4 +337,8 @@ async function executeManagerSubcommand(
   })
 
   await p
+}
+
+function isUuid(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
 }
