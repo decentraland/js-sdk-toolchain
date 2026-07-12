@@ -415,4 +415,17 @@ describe('ensure that VM works', () => {
 
       expect(logs).toEqual([new Uint8Array([1, 2, 3]), new Uint8Array([]), new Uint8Array([])])
     }))
+
+  it('provides TextEncoder/TextDecoder as the runtime contract declares', async () =>
+    withQuickJsVm(async (opts) => {
+      expect(opts.eval(`Array.from(new TextEncoder().encode('é\\ud800'))`)).toEqual(
+        Array.from(new TextEncoder().encode('é\ud800'))
+      )
+      expect(opts.eval(`new TextDecoder().decode(new Uint8Array([104, 0xed, 0xa0, 0x80]))`)).toEqual(
+        new TextDecoder().decode(new Uint8Array([104, 0xed, 0xa0, 0x80]))
+      )
+      expect(
+        opts.eval(`(() => { try { new TextDecoder('latin1') } catch (err) { return err.constructor.name } })()`)
+      ).toEqual('RangeError')
+    }))
 })

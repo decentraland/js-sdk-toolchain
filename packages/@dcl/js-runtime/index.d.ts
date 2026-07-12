@@ -94,4 +94,31 @@ declare function clearTimeout(timerId: number): void
 declare function setInterval(callback: () => void, ms: number): number
 declare function clearInterval(timerId: number): void
 
+/// --- Text encoding ---
+/// utf-8 support is guaranteed; behavior for any other encoding label is
+/// unspecified (implementations may throw RangeError).
+
+interface TextEncoder {
+  readonly encoding: string
+  encode(input?: string): Uint8Array
+  encodeInto(source: string, destination: Uint8Array): { read: number; written: number }
+}
+
+declare var TextEncoder: {
+  prototype: TextEncoder
+  new (): TextEncoder
+}
+
+interface TextDecoder {
+  readonly encoding: string
+  readonly fatal: boolean
+  readonly ignoreBOM: boolean
+  decode(input?: ArrayBuffer | ArrayBufferView, options?: { stream?: boolean }): string
+}
+
+declare var TextDecoder: {
+  prototype: TextDecoder
+  new (label?: string, options?: { fatal?: boolean; ignoreBOM?: boolean }): TextDecoder
+}
+
 declare const DEBUG: boolean

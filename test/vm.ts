@@ -1,3 +1,5 @@
+/// <reference types="node" />
+import { readFileSync } from 'fs'
 import { QuickJSHandle, QuickJSContext, getQuickJS } from '@dcl/quickjs-emscripten'
 
 export type ProvideOptions = {
@@ -75,6 +77,8 @@ export async function withQuickJsVm<T>(
   vm.unwrapResult(
     vm.evalCode('(t) => { return (t && t instanceof Uint8Array) ? Array.from(t) : null }', 'isUint8Array.js')
   ).consume((isUint8Array) => vm.setProp(vm.global, 'isUint8Array', isUint8Array))
+
+  installTextCodec(vm)
 
   const int = setInterval(() => {
     try {
@@ -214,6 +218,24 @@ function callFunctionFromEval(vm: QuickJSContext, codeReturningAFunction: string
   return vm.unwrapResult(vm.evalCode(codeReturningAFunction)).consume((fn) => {
     return nativeToVmType(vm, arg).consume((arg) => vm.callFunction(fn, vm.global, arg))
   })
+}
+
+// The runtime contract guarantees TextEncoder/TextDecoder (utf-8 only). Provide
+// them by evaluating the compiled SDK polyfill inside the VM, the same
+// implementation a runtime without natives falls back to. The compiled files
+// are ESM for the scene bundler; hoisting them into one scope only needs the
+// module syntax stripped (imports resolve to the definitions evaluated above).
+function installTextCodec(vm: QuickJSContext) {
+  const stripModuleSyntax = (source: string) => source.replace(/^import .*$/gm, '').replace(/^export /gm, '')
+  const utf8Source = readFileSync(require.resolve('../packages/@dcl/sdk/internal/utf8.js'), 'utf8')
+  const textCodecSource = readFileSync(require.resolve('../packages/@dcl/sdk/text-codec.js'), 'utf8')
+  const bootstrap = `(() => {
+    ${stripModuleSyntax(utf8Source)}
+    const setGlobalPolyfill = (key, value) => { globalThis[key] = globalThis[key] ?? value }
+    ${stripModuleSyntax(textCodecSource)}
+    polyfillTextEncoder()
+  })()`
+  vm.unwrapResult(vm.evalCode(bootstrap, 'text-codec-bootstrap.js')).dispose()
 }
 
 function dumpAndDispose(vm: QuickJSContext, val: QuickJSHandle) {
