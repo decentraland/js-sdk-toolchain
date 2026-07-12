@@ -3,7 +3,7 @@ import * as path from 'path'
 import { Readable } from 'stream'
 import { WearableJson } from '@dcl/schemas/dist/sdk'
 import { Entity, EntityType, Locale, Wearable } from '@dcl/schemas'
-import { v4 as uuidv4 } from 'uuid'
+import { randomUUID } from 'crypto'
 
 import { PreviewComponents } from '../types'
 import { fetchEntityByPointer } from '../../../logic/catalyst-requests'
@@ -354,7 +354,7 @@ async function serveWearable(
 
   // Set wearable ID.
   const sceneHash = b64HashingFunction(project.workingDirectory)
-  const wearableId = wearableCache.get(sceneHash) ?? `urn:${uuidv4()}`
+  const wearableId = wearableCache.get(sceneHash) ?? `urn:${randomUUID()}`
   wearableCache.set(sceneHash, wearableId)
 
   const representations = wearableJson.data.representations.map((representation) => ({
