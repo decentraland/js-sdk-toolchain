@@ -2,7 +2,7 @@ import { exec } from 'child_process'
 import { sync as globSync } from 'glob'
 import { resolve, relative } from 'path'
 import { existsSync, readFileSync, writeFileSync, lstatSync, removeSync, copySync } from 'fs-extra'
-import { sync as rimraf } from 'rimraf'
+import { rimrafSync as rimraf } from 'rimraf'
 
 /**
  * @returns the resolved absolute path

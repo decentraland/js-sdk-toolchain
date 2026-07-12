@@ -26,8 +26,8 @@ describe('build command', () => {
       await build.main({ args: { _: [] }, components })
     } catch (_) {}
 
-    expect(needsDependenciesSpy).toBeCalledWith(components, process.cwd())
-    expect(installDependenciesSpy).toBeCalledWith(components, process.cwd())
+    expect(needsDependenciesSpy).toHaveBeenCalledWith(components, process.cwd())
+    expect(installDependenciesSpy).toHaveBeenCalledWith(components, process.cwd())
   })
 
   it('should avoid installing dependencies if not needed', async () => {
@@ -43,8 +43,8 @@ describe('build command', () => {
       await build.main({ args: { _: [] }, components })
     } catch (_) {}
 
-    expect(needsDependenciesSpy).toBeCalledWith(components, process.cwd())
-    expect(installDependenciesSpy).not.toBeCalled()
+    expect(needsDependenciesSpy).toHaveBeenCalledWith(components, process.cwd())
+    expect(installDependenciesSpy).not.toHaveBeenCalled()
   })
 
   it('should avoid installing dependencies if "--skip-install" is provided', async () => {
@@ -60,8 +60,8 @@ describe('build command', () => {
     try {
       await build.main({ args: { _: [], '--skip-install': true }, components })
     } catch (_) {}
-    expect(needsDependenciesSpy).not.toBeCalled()
-    expect(installDependenciesSpy).not.toBeCalled()
+    expect(needsDependenciesSpy).not.toHaveBeenCalled()
+    expect(installDependenciesSpy).not.toHaveBeenCalled()
   })
 
   it('should build typescript if all conditions are met', async () => {
@@ -78,7 +78,7 @@ describe('build command', () => {
       components
     })
 
-    expect(tsBuildSpy).toBeCalledWith(
+    expect(tsBuildSpy).toHaveBeenCalledWith(
       components,
       {
         workingDirectory: process.cwd(),
