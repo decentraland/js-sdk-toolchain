@@ -25,7 +25,7 @@ describe('Transport tests', () => {
     Transform.create(entity)
     await engine.update(1)
 
-    expect(rendererSpy).toBeCalledTimes(1)
+    expect(rendererSpy).toHaveBeenCalledTimes(1)
     jest.resetAllMocks()
 
     // MeshRenderer component should be sent to renderer transport
@@ -34,7 +34,7 @@ describe('Transport tests', () => {
     })
     await engine.update(1)
 
-    expect(rendererSpy).toBeCalledTimes(1)
+    expect(rendererSpy).toHaveBeenCalledTimes(1)
     jest.resetAllMocks()
 
     // Custom user component should NOT be sent to renderer transport
@@ -43,8 +43,8 @@ describe('Transport tests', () => {
     await engine.update(1)
 
     // Now the send is invoked, but the arg should be []
-    expect(rendererSpy).toBeCalledTimes(1)
-    expect(rendererSpy).toBeCalledWith(new Uint8Array([]))
+    expect(rendererSpy).toHaveBeenCalledTimes(1)
+    expect(rendererSpy).toHaveBeenCalledWith(new Uint8Array([]))
   })
 
   it('should send and receive crdt messages', async () => {
@@ -68,8 +68,8 @@ describe('Transport tests', () => {
     // since callRpc is async function, it's necessary
     await new Promise(process.nextTick)
 
-    expect(rendererSpy).toBeCalledTimes(1)
-    expect(transports[0].onmessage).toBeCalledTimes(1)
+    expect(rendererSpy).toHaveBeenCalledTimes(1)
+    expect(transports[0].onmessage).toHaveBeenCalledTimes(1)
     jest.resetAllMocks()
   })
 
@@ -100,15 +100,15 @@ describe('Transport tests', () => {
     await engine.update(1)
     await new Promise(process.nextTick)
 
-    expect(rendererSpy).toBeCalledTimes(2)
-    expect(transports[0].onmessage).toBeCalledTimes(1)
+    expect(rendererSpy).toHaveBeenCalledTimes(2)
+    expect(transports[0].onmessage).toHaveBeenCalledTimes(1)
 
     // 3) Another tick without updates
     await engine.update(1)
     await new Promise(process.nextTick)
 
-    expect(rendererSpy).toBeCalledTimes(3)
-    expect(transports[0].onmessage).toBeCalledTimes(2)
+    expect(rendererSpy).toHaveBeenCalledTimes(3)
+    expect(transports[0].onmessage).toHaveBeenCalledTimes(2)
 
     Transform.createOrReplace(entity)
 
@@ -116,8 +116,8 @@ describe('Transport tests', () => {
     await engine.update(1)
     await new Promise(process.nextTick)
 
-    expect(rendererSpy).toBeCalledTimes(4)
-    expect(transports[0].onmessage).toBeCalledTimes(3)
+    expect(rendererSpy).toHaveBeenCalledTimes(4)
+    expect(transports[0].onmessage).toHaveBeenCalledTimes(3)
 
     jest.resetAllMocks()
   })
@@ -140,7 +140,7 @@ describe('Transport tests', () => {
     Transform.create(entity)
     await engine.update(1)
 
-    expect(crdtSendToRenderer).toBeCalledTimes(1)
+    expect(crdtSendToRenderer).toHaveBeenCalledTimes(1)
 
     jest.resetAllMocks()
   })

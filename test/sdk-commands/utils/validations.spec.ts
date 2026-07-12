@@ -36,8 +36,8 @@ describe('build:helpers', () => {
     const res = await projectValidation.assertValidProjectFolder(components, 'some/path')
 
     expect(res).toEqual({ kind: 'scene', scene, workingDirectory: 'some/path' })
-    expect(fileExists).toBeCalledWith(path.resolve('some/path/package.json'))
-    expect(readFile).toBeCalledWith(path.resolve('some/path/scene.json'), 'utf8')
+    expect(fileExists).toHaveBeenCalledWith(path.resolve('some/path/package.json'))
+    expect(readFile).toHaveBeenCalledWith(path.resolve('some/path/scene.json'), 'utf8')
   })
 
   it('assertValidProjectFolder: should fail on unrecognized file', async () => {
@@ -50,7 +50,7 @@ describe('build:helpers', () => {
 
     await expect(() => projectValidation.assertValidProjectFolder(components, 'some/path')).rejects.toThrow()
 
-    expect(fileExists).toBeCalledWith(path.resolve('some/path/package.json'))
+    expect(fileExists).toHaveBeenCalledWith(path.resolve('some/path/package.json'))
   })
 
   it("assertValidProjectFolder: should throw if package.json doesn't exist", async () => {
@@ -60,7 +60,7 @@ describe('build:helpers', () => {
 
     await expect(() => projectValidation.assertValidProjectFolder(components, 'some/path')).rejects.toThrow()
 
-    expect(fileExists).toBeCalledWith(path.resolve('some/path/package.json'))
+    expect(fileExists).toHaveBeenCalledWith(path.resolve('some/path/package.json'))
   })
 
   it('needsDependencies: should return true if "node_modules" does not exist', async () => {
@@ -98,7 +98,7 @@ describe('build:helpers', () => {
 
     await projectValidation.installDependencies(components, 'some/path')
 
-    expect(execSpy).toBeCalledWith('some/path', 'npm', ['install'])
+    expect(execSpy).toHaveBeenCalledWith('some/path', 'npm', ['install'])
   })
 
   it('npmRun: should build pass on the process.env', async () => {
@@ -107,7 +107,7 @@ describe('build:helpers', () => {
 
     await projectValidation.npmRun(components, 'some/path', 'build', 'a')
 
-    expect(execSpy).toBeCalledWith('some/path', 'npm', ['run', 'build', '--silent', '--', 'a'], {
+    expect(execSpy).toHaveBeenCalledWith('some/path', 'npm', ['run', 'build', '--silent', '--', 'a'], {
       env: process.env
     })
   })
@@ -118,7 +118,7 @@ describe('build:helpers', () => {
 
     await projectValidation.npmCommand(components, 'some/path', 'install', 'boedo')
 
-    expect(execSpy).toBeCalledWith('some/path', 'npm', ['install', 'boedo', '--silent'], {
+    expect(execSpy).toHaveBeenCalledWith('some/path', 'npm', ['install', 'boedo', '--silent'], {
       env: process.env
     })
   })

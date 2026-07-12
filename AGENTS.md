@@ -47,10 +47,10 @@ The repo is orchestrated via **`make`** (the Makefile is the source of truth —
 The full Jest suite is slow. For faster iteration, scope to a path pattern:
 
 ```bash
-node_modules/.bin/jest --colors --forceExit --testPathPattern='test/sdk-commands'
-node_modules/.bin/jest --colors --forceExit --testPathPattern='test/ecs'
-node_modules/.bin/jest --colors --forceExit --testPathPattern='test/react-ecs'
-node_modules/.bin/jest --colors --forceExit --testPathPattern='test/snapshots'
+node_modules/.bin/jest --colors --forceExit --testPathPatterns='test/sdk-commands'
+node_modules/.bin/jest --colors --forceExit --testPathPatterns='test/ecs'
+node_modules/.bin/jest --colors --forceExit --testPathPatterns='test/react-ecs'
+node_modules/.bin/jest --colors --forceExit --testPathPatterns='test/snapshots'
 ```
 
 ### Per-package typecheck

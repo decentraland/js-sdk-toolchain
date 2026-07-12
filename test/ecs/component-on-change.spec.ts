@@ -26,41 +26,41 @@ describe('onChange Component event', () => {
   it('should not called onChange on Transform if there is no change', async () => {
     Transform.onChange(entity, cb)
     await engine.update(1)
-    expect(cb).toBeCalledTimes(0)
+    expect(cb).toHaveBeenCalledTimes(0)
   })
   it('should call onChange cb if the transform is created', async () => {
     Transform.create(entity, { position: { x: 8, y: 8, z: 8 } })
     const transform = Transform.get(entity)
     await engine.update(1)
-    expect(cb).toBeCalledWith(transform)
+    expect(cb).toHaveBeenCalledWith(transform)
   })
   it('should call onChange cb if the transform is updated', async () => {
     Transform.getMutable(entity).position = { x: 88, y: 88, z: 88 }
     const transform = Transform.get(entity)
     await engine.update(1)
-    expect(cb).toBeCalledWith(transform)
+    expect(cb).toHaveBeenCalledWith(transform)
   })
   it('should return undefined if the component is deleted', async () => {
     Transform.deleteFrom(entity)
     await engine.update(1)
-    expect(cb).toBeCalledWith(undefined)
+    expect(cb).toHaveBeenCalledWith(undefined)
   })
 
   it('should not called onChange on GrowOnlySet Cusdtom component if there is no change', async () => {
     GrowOnlyComponent.onChange(entity, cb)
     await engine.update(1)
-    expect(cb).toBeCalledTimes(0)
+    expect(cb).toHaveBeenCalledTimes(0)
   })
   it('should call onChange cb if the transform is created', async () => {
     GrowOnlyComponent.addValue(entity, { timestamp: 1, text: 'boedo' })
     const value = GrowOnlyComponent.get(entity)
     await engine.update(1)
-    expect(cb).toBeCalledWith(value)
+    expect(cb).toHaveBeenCalledWith(value)
   })
   it('should return undefined if the component is deleted', async () => {
     console.log('-----------------------')
     engine.removeEntity(entity)
     await engine.update(1)
-    expect(cb).toBeCalledWith(undefined)
+    expect(cb).toHaveBeenCalledWith(undefined)
   })
 })

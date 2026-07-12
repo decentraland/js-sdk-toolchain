@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs'
-import glob from 'glob'
+import { glob } from 'glob'
 import path from 'path'
 import { Composite, Engine, Entity, IEngine } from '../../packages/@dcl/ecs/src'
 import { components } from '../../packages/@dcl/ecs/src'
