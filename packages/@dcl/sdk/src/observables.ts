@@ -300,7 +300,7 @@ function processObservables() {
     const playerEntities = new Set<Entity>()
     engine.addSystem(() => {
       for (const [entity] of engine.getEntitiesWith(PlayerIdentityData)) {
-        if (playerEntities.has(entity)) return
+        if (playerEntities.has(entity)) continue
         playerEntities.add(entity)
 
         PointerEventsResult.onChange(entity, (data) => {
