@@ -205,6 +205,7 @@ export function createReconciler(
   }
 
   function removeChildEntity(instance: Instance) {
+    entities.delete(instance.entity)
     changeEvents.delete(instance.entity)
     clickEvents.delete(instance.entity)
     lastInputResultValues.delete(instance.entity)
