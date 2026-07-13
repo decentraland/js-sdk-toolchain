@@ -128,8 +128,11 @@ export function createTimers(targetEngine: IEngine): Timers {
       }
 
       armContext = { accruedMs: elapsedMs - residualMs }
-      timerData.callback()
-      armContext = null
+      try {
+        timerData.callback()
+      } finally {
+        armContext = null
+      }
     }
   }
 
