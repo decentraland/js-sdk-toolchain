@@ -188,7 +188,8 @@ export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAva
 // @public (undocumented)
 export const enum AvatarModifierType {
     AMT_DISABLE_PASSPORTS = 1,
-    AMT_HIDE_AVATARS = 0
+    AMT_HIDE_AVATARS = 0,
+    AMT_HIDE_NAMETAGS = 2
 }
 
 // @public (undocumented)
@@ -762,6 +763,9 @@ export const componentDefinitionByName: {
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
     "core::NftShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBNftShape>>;
+    "core::ParticleSystem": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBParticleSystem>>;
+    "core::PhysicsCombinedForce": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedForce>>;
+    "core::PhysicsCombinedImpulse": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedImpulse>>;
     "core::PlayerIdentityData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>>;
     "core::PointerEvents": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerEvents>>;
     "core::PointerEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBPointerEventsResult>>;
@@ -1337,6 +1341,22 @@ export type FlexWrapType = 'wrap' | 'nowrap' | 'wrap-reverse';
 export type FloatArray = number[];
 
 // @public (undocumented)
+export interface FloatRange {
+    // (undocumented)
+    end: number;
+    // (undocumented)
+    start: number;
+}
+
+// @public (undocumented)
+export namespace FloatRange {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): FloatRange;
+    // (undocumented)
+    export function encode(message: FloatRange, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export const enum Font {
     // (undocumented)
     F_MONOSPACE = 2,
@@ -1633,6 +1653,8 @@ export const enum InputAction {
     // (undocumented)
     IA_LEFT = 7,
     // (undocumented)
+    IA_MODIFIER = 14,
+    // (undocumented)
     IA_POINTER = 0,
     // (undocumented)
     IA_PRIMARY = 1,
@@ -1675,6 +1697,14 @@ export type InstanceCompositeOptions = {
     rootEntity?: Entity;
     alreadyRequestedSrc?: Set<string>;
 };
+
+// @public (undocumented)
+export const enum InteractionType {
+    // (undocumented)
+    CURSOR = 0,
+    // (undocumented)
+    PROXIMITY = 1
+}
 
 // @public (undocumented)
 export interface ISchema<T = any> {
@@ -2114,6 +2144,30 @@ export namespace MoveContinuous {
     export function encode(message: MoveContinuous, writer?: _m0.Writer): _m0.Writer;
 }
 
+// @public (undocumented)
+export interface MoveRotateScale {
+    // (undocumented)
+    positionEnd: PBVector3 | undefined;
+    // (undocumented)
+    positionStart: PBVector3 | undefined;
+    // (undocumented)
+    rotationEnd: PBQuaternion | undefined;
+    // (undocumented)
+    rotationStart: PBQuaternion | undefined;
+    // (undocumented)
+    scaleEnd: PBVector3 | undefined;
+    // (undocumented)
+    scaleStart: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace MoveRotateScale {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): MoveRotateScale;
+    // (undocumented)
+    export function encode(message: MoveRotateScale, writer?: _m0.Writer): _m0.Writer;
+}
+
 // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
 // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
@@ -2351,6 +2405,9 @@ export namespace Orthographic {
 export type OverflowType = 'hidden' | 'scroll' | 'visible';
 
 // @public (undocumented)
+export const ParticleSystem: LastWriteWinElementSetComponentDefinition<PBParticleSystem>;
+
+// @public (undocumented)
 export interface PBAnimationState {
     clip: string;
     loop?: boolean | undefined;
@@ -2534,6 +2591,9 @@ export namespace PBAvatarEquippedData {
 
 // @public (undocumented)
 export interface PBAvatarLocomotionSettings {
+    doubleJumpHeight?: number | undefined;
+    glidingFallingSpeed?: number | undefined;
+    glidingSpeed?: number | undefined;
     hardLandingCooldown?: number | undefined;
     jogSpeed?: number | undefined;
     jumpHeight?: number | undefined;
@@ -2575,6 +2635,7 @@ export interface PBAvatarMovement {
     orientation: number;
     // (undocumented)
     velocity: PBVector3 | undefined;
+    walkSuccess?: boolean | undefined;
 }
 
 // @public (undocumented)
@@ -2587,11 +2648,17 @@ export namespace PBAvatarMovement {
 
 // @public (undocumented)
 export interface PBAvatarMovementInfo {
+    // (undocumented)
+    activeAvatarLocomotionSettings: PBAvatarLocomotionSettings | undefined;
+    // (undocumented)
+    activeInputModifier: PBInputModifier | undefined;
     actualVelocity: PBVector3 | undefined;
     externalVelocity: PBVector3 | undefined;
     previousStepTime: number;
     requestedVelocity: PBVector3 | undefined;
     stepTime: number;
+    walkTarget?: PBVector3 | undefined;
+    walkThreshold?: number | undefined;
 }
 
 // @public (undocumented)
@@ -2888,7 +2955,11 @@ export interface PBInputModifier_StandardInput {
     // (undocumented)
     disableAll?: boolean | undefined;
     // (undocumented)
+    disableDoubleJump?: boolean | undefined;
+    // (undocumented)
     disableEmote?: boolean | undefined;
+    // (undocumented)
+    disableGliding?: boolean | undefined;
     // (undocumented)
     disableJog?: boolean | undefined;
     // (undocumented)
@@ -3259,6 +3330,208 @@ export namespace PBNftShape {
 }
 
 // @public (undocumented)
+export interface PBParticleSystem {
+    active?: boolean | undefined;
+    additionalForce?: PBVector3 | undefined;
+    billboard?: boolean | undefined;
+    blendMode?: PBParticleSystem_BlendMode | undefined;
+    bursts: PBParticleSystem_Burst[];
+    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+    colorOverTime?: ColorRange | undefined;
+    faceTravelDirection?: boolean | undefined;
+    gravity?: number | undefined;
+    // Warning: (ae-forgotten-export) The symbol "ColorRange" needs to be exported by the entry point index.d.ts
+    initialColor?: ColorRange | undefined;
+    initialRotation?: PBQuaternion | undefined;
+    initialSize?: FloatRange | undefined;
+    initialVelocitySpeed?: FloatRange | undefined;
+    lifetime?: number | undefined;
+    limitVelocity?: PBParticleSystem_LimitVelocity | undefined;
+    loop?: boolean | undefined;
+    maxParticles?: number | undefined;
+    playbackState?: PBParticleSystem_PlaybackState | undefined;
+    prewarm?: boolean | undefined;
+    rate?: number | undefined;
+    rotationOverTime?: PBQuaternion | undefined;
+    // (undocumented)
+    shape?: {
+        $case: "point";
+        point: PBParticleSystem_Point;
+    } | {
+        $case: "sphere";
+        sphere: PBParticleSystem_Sphere;
+    } | {
+        $case: "cone";
+        cone: PBParticleSystem_Cone;
+    } | {
+        $case: "box";
+        box: PBParticleSystem_Box;
+    } | undefined;
+    simulationSpace?: PBParticleSystem_SimulationSpace | undefined;
+    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+    sizeOverTime?: FloatRange | undefined;
+    spriteSheet?: PBParticleSystem_SpriteSheetAnimation | undefined;
+    texture?: Texture | undefined;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem;
+    // (undocumented)
+    export function encode(message: PBParticleSystem, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export const enum PBParticleSystem_BlendMode {
+    PSB_ADD = 1,
+    PSB_ALPHA = 0,
+    PSB_MULTIPLY = 2
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_Box {
+    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+    size?: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_Box {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_Box;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_Box, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_Burst {
+    count: number;
+    cycles?: number | undefined;
+    interval?: number | undefined;
+    probability?: number | undefined;
+    time: number;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_Burst {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_Burst;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_Burst, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_Cone {
+    angle?: number | undefined;
+    radius?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_Cone {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_Cone;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_Cone, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_LimitVelocity {
+    dampen?: number | undefined;
+    speed: number;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_LimitVelocity {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_LimitVelocity;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_LimitVelocity, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export const enum PBParticleSystem_PlaybackState {
+    PS_PAUSED = 1,
+    PS_PLAYING = 0,
+    PS_STOPPED = 2
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_Point {
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_Point {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_Point;
+    // (undocumented)
+    export function encode(_: PBParticleSystem_Point, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export const enum PBParticleSystem_SimulationSpace {
+    PSS_LOCAL = 0,
+    PSS_WORLD = 1
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_Sphere {
+    radius?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_Sphere {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_Sphere;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_Sphere, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_SpriteSheetAnimation {
+    framesPerSecond?: number | undefined;
+    tilesX: number;
+    tilesY: number;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_SpriteSheetAnimation {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_SpriteSheetAnimation;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_SpriteSheetAnimation, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBPhysicsCombinedForce {
+    vector: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBPhysicsCombinedForce {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPhysicsCombinedForce;
+    // (undocumented)
+    export function encode(message: PBPhysicsCombinedForce, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBPhysicsCombinedImpulse {
+    eventId: number;
+    vector: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBPhysicsCombinedImpulse {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPhysicsCombinedImpulse;
+    // (undocumented)
+    export function encode(message: PBPhysicsCombinedImpulse, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBPlayerIdentityData {
     address: string;
     // (undocumented)
@@ -3290,6 +3563,7 @@ export namespace PBPointerEvents {
 export interface PBPointerEvents_Entry {
     eventInfo: PBPointerEvents_Info | undefined;
     eventType: PointerEventType;
+    interactionType?: InteractionType | undefined;
 }
 
 // @public (undocumented)
@@ -3306,6 +3580,7 @@ export interface PBPointerEvents_Info {
     hoverText?: string | undefined;
     maxDistance?: number | undefined;
     maxPlayerDistance?: number | undefined;
+    priority?: number | undefined;
     showFeedback?: boolean | undefined;
     showHighlight?: boolean | undefined;
 }
@@ -3626,6 +3901,9 @@ export interface PBTween {
     } | {
         $case: "textureMoveContinuous";
         textureMoveContinuous: TextureMoveContinuous;
+    } | {
+        $case: "moveRotateScale";
+        moveRotateScale: MoveRotateScale;
     } | undefined;
     playing?: boolean | undefined;
 }
@@ -3710,6 +3988,7 @@ export interface PBUiCanvasInformation {
     devicePixelRatio: number;
     height: number;
     interactableArea: BorderRect | undefined;
+    screenInsetArea?: BorderRect | undefined;
     width: number;
 }
 
@@ -3762,11 +4041,13 @@ export namespace PBUiDropdownResult {
 
 // @public (undocumented)
 export interface PBUiInput {
+    clearOnSubmit?: boolean | undefined;
     color?: PBColor4 | undefined;
     // (undocumented)
     disabled: boolean;
     font?: Font | undefined;
     fontSize?: number | undefined;
+    multiLine?: boolean | undefined;
     // (undocumented)
     placeholder: string;
     placeholderColor?: PBColor4 | undefined;
@@ -4072,6 +4353,12 @@ export namespace Perspective {
     export function encode(message: Perspective, writer?: _m0.Writer): _m0.Writer;
 }
 
+// @public (undocumented)
+export const PhysicsCombinedForce: LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedForce>;
+
+// @public (undocumented)
+export const PhysicsCombinedImpulse: LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedImpulse>;
+
 // @public
 export namespace Plane {
     // (undocumented)
@@ -4186,15 +4473,19 @@ export const enum PointerEventType {
     // (undocumented)
     PET_DOWN = 1,
     // (undocumented)
-    PET_DRAG = 5,
+    PET_DRAG = 7,
     // (undocumented)
-    PET_DRAG_END = 6,
+    PET_DRAG_END = 8,
     // (undocumented)
-    PET_DRAG_LOCKED = 4,
+    PET_DRAG_LOCKED = 6,
     // (undocumented)
     PET_HOVER_ENTER = 2,
     // (undocumented)
     PET_HOVER_LEAVE = 3,
+    // (undocumented)
+    PET_PROXIMITY_ENTER = 4,
+    // (undocumented)
+    PET_PROXIMITY_LEAVE = 5,
     // (undocumented)
     PET_UP = 0
 }
@@ -4466,6 +4757,8 @@ export type RaycastSystemOptions = {
     queryType: RaycastQueryType;
     continuous?: boolean | undefined;
     collisionMask?: number | undefined;
+    shape?: RaycastShape | undefined;
+    includeWorld?: boolean | undefined;
 };
 
 // @public (undocumented)
@@ -4510,7 +4803,7 @@ export namespace ReactEcs {
     useEffect: EffectHook;
     const // (undocumented)
     useState: StateHook;
-        {};
+    export {};
 }
 
 // Warning: (tsdoc-at-sign-in-word) The "@" character looks like part of a TSDoc tag; use a backslash to escape it
