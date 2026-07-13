@@ -24,27 +24,36 @@ export function addSyncTransport(
   // Entity utils
   const entityDefinitions = entityUtils(engine, myProfile)
   const pendingProfileOperations: (() => void)[] = []
-  let profileInitialized = false
+  let profileInitializationState: 'pending' | 'ready' | 'failed' = 'pending'
 
   const ready = fetchProfile(myProfile, getUserData).then(() => {
-    profileInitialized = true
+    profileInitializationState = 'ready'
     for (const operation of pendingProfileOperations.splice(0)) {
-      operation()
+      try {
+        operation()
+      } catch (error) {
+        console.error('Queued network operation failed', error)
+      }
     }
   })
 
   // Keep module-level initialization failures handled even when callers do not
   // explicitly await readiness. The returned `ready` promise still rejects for
   // callers that do await it.
-  void ready.catch((error) => {
-    pendingProfileOperations.length = 0
-    console.error(error)
-  })
+  const profileInitializedSuccessfully = ready.then(
+    () => true,
+    (error) => {
+      profileInitializationState = 'failed'
+      pendingProfileOperations.length = 0
+      console.error(error)
+      return false
+    }
+  )
 
   function runWhenProfileIsReady(operation: () => void): void {
-    if (profileInitialized) {
+    if (profileInitializationState === 'ready') {
       operation()
-    } else {
+    } else if (profileInitializationState === 'pending') {
       pendingProfileOperations.push(operation)
     }
   }
@@ -70,7 +79,8 @@ export function addSyncTransport(
   const transport: Transport = {
     filter: syncFilter(engine),
     send: async (messages) => {
-      await ready
+      if (!(await profileInitializedSuccessfully)) return
+
       for (const message of [messages].flat()) {
         if (message.byteLength && transportInitialzed) {
           DEBUG_NETWORK_MESSAGES() &&
