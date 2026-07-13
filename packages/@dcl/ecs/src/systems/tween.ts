@@ -10,15 +10,14 @@ export type TweenSystem = {
 /**
  * Avoid creating multiple tween systems
  */
-const cacheTween: Map<number, TweenSystem> = new Map()
+const cacheTween: WeakMap<IEngine, TweenSystem> = new WeakMap()
 /**
  * @public
  * @returns tween helper to be used on the scene
  */
 export function createTweenSystem(engine: IEngine): TweenSystem {
-  if (cacheTween.has(engine._id)) {
-    return cacheTween.get(engine._id)!
-  }
+  const cachedTweenSystem = cacheTween.get(engine)
+  if (cachedTweenSystem) return cachedTweenSystem
   const Tween = components.Tween(engine)
   const TweenState = components.TweenState(engine)
   const TweenSequence = components.TweenSequence(engine)
@@ -170,6 +169,6 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
     // This event is fired only once per tween
     tweenCompleted: isCompleted
   }
-  cacheTween.set(engine._id, tweenSystem)
+  cacheTween.set(engine, tweenSystem)
   return tweenSystem
 }
