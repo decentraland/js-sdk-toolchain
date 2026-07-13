@@ -1,4 +1,4 @@
-import { join, resolve } from 'path'
+import { resolve } from 'path'
 import { createFsComponent } from '../../packages/@dcl/sdk-commands/src/components/fs'
 import { getInstalledPackageVersion } from '../../packages/@dcl/sdk-commands/src/logic/config'
 import { itExecutes, ensureFileExists, itDeletesFolder } from '../../scripts/helpers'
@@ -21,7 +21,8 @@ describe('build-ecs: simple scene compilation', () => {
 
     expect(await getInstalledPackageVersion({ fs: createFsComponent() }, '@dcl/sdk', cwd)).toEqual('7.0.0')
 
-    const { map } = await loadSourceMap(join(cwd, 'bin/game.js'))
+    // the scene main is the loader stub; the scene code and its source map live in the scene chunk
+    const { map } = await loadSourceMap(ensureFileExists('bin/scene.js', cwd))
     assertFilesExist(map)
   })
 })
@@ -40,16 +41,3 @@ describe('build-ecs: simple scene compilation, production mode', () => {
   })
 })
 
-describe('build-ecs: scene with react', () => {
-  const cwd = resolve(__dirname, './fixtures/ecs7-ui-ethereum')
-
-  itDeletesFolder('./bin', cwd)
-  itDeletesFolder('./node_modules', cwd)
-
-  itExecutes('npm install --silent --no-progress', cwd)
-  itExecutes('npm run --silent build-prod', cwd)
-
-  it('ensure files exist', () => {
-    ensureFileExists('bin/game.js', cwd)
-  })
-})

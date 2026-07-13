@@ -1,0 +1,72 @@
+// Split-bundle loader stub, written into the scene's `main` file by
+// `sdk-commands build --split-build`. It reads the SDK-runtime and scene chunks
+// at runtime and wires them together. Top-level names and the eval helper's
+// locals are __dclSplit-prefixed: chunk code is direct-eval'd inside that helper,
+// so those names sit on the chunk's scope chain and must not shadow globals.
+'use strict'
+
+var __dclSplitSdkChunkPath = __DCL_SDK_CHUNK__
+var __dclSplitSceneChunkPath = __DCL_SCENE_CHUNK__
+var __dclSplitSceneModule = null
+
+// Chunks are ASCII (esbuild's default charset). TextDecoder is not a sandbox
+// contract on every runtime, so fall back to chunked String.fromCharCode.
+function __dclSplitDecode(bytes) {
+  if (typeof TextDecoder === 'function') {
+    try {
+      return new TextDecoder().decode(bytes)
+    } catch (err) {}
+  }
+  var parts = []
+  for (var i = 0; i < bytes.length; i += 32768) {
+    var slice = bytes.subarray ? bytes.subarray(i, i + 32768) : bytes.slice(i, i + 32768)
+    parts.push(String.fromCharCode.apply(null, slice))
+  }
+  return parts.join('')
+}
+
+// ~system/* passes through to the host require; every other specifier must be a
+// registry key or fail loudly. The scene chunk externalizes the SDK with wildcards
+// that are broader than the registry, so an unregistered SDK deep-import is caught here.
+function __dclSplitMakeRequire(registry, hostRequire) {
+  return function (spec) {
+    if (spec.lastIndexOf('~system/', 0) === 0) return hostRequire(spec)
+    if (spec in registry) return registry[spec]
+    throw new Error('split bundle: "' + spec + '" is not in the sdk runtime registry')
+  }
+}
+
+// Direct eval, never new Function: the web sandbox provides console/fetch/etc. as
+// lexical consts of this stub, and only direct eval keeps them on the chunk's scope
+// chain. The sourceURL suffix names the chunk in stack traces.
+function __dclSplitEvalChunk(__dclSplitCode, __dclSplitPath, __dclSplitRequire) {
+  var __dclSplitModule = { exports: {} }
+  var __dclSplitFactory = eval(
+    '"use strict";(function(globalThis,module,exports,require){' +
+      __dclSplitCode +
+      '\n})\n//# sourceURL=dcl:///' +
+      __dclSplitPath
+  )
+  __dclSplitFactory.call(globalThis, globalThis, __dclSplitModule, __dclSplitModule.exports, __dclSplitRequire)
+  return __dclSplitModule.exports
+}
+
+// Both runtimes fully await onStart before the first onUpdate, so the null guard
+// in onUpdate is enough.
+module.exports.onStart = async function () {
+  var runtime = require('~system/Runtime')
+  var sdkSrc = __dclSplitDecode((await runtime.readFile({ fileName: __dclSplitSdkChunkPath })).content)
+  var sceneSrc = __dclSplitDecode((await runtime.readFile({ fileName: __dclSplitSceneChunkPath })).content)
+
+  var registry = __dclSplitEvalChunk(sdkSrc, __dclSplitSdkChunkPath, __dclSplitMakeRequire({}, require))
+  var scene = __dclSplitEvalChunk(sceneSrc, __dclSplitSceneChunkPath, __dclSplitMakeRequire(registry, require))
+
+  __dclSplitSceneModule = scene
+  if (typeof scene.onStart === 'function') return scene.onStart()
+}
+
+module.exports.onUpdate = function (deltaTime) {
+  if (__dclSplitSceneModule && typeof __dclSplitSceneModule.onUpdate === 'function') {
+    return __dclSplitSceneModule.onUpdate(deltaTime)
+  }
+}

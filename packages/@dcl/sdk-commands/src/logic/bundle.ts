@@ -19,6 +19,7 @@ import { getAllComposites, type Script } from './composite'
 import { isEditorScene } from './project-validations'
 import { watch } from 'chokidar'
 import { debounce } from './debounce'
+import { chunkPaths, isRegistryModule, loaderStub, registryKeys, sceneExternals, sdkRuntimeEntry } from './split'
 
 export type BundleComponents = Pick<CliComponents, 'logger' | 'fs'>
 
@@ -42,9 +43,19 @@ export type CompileOptions = {
 
   ignoreComposite: boolean
   customEntryPoint: boolean
+
+  // Internal: set false to force a single-file bundle. code-to-composite runs the scene
+  // in-process (Node require), where a loader stub can't readFile its chunks. Not a CLI flag —
+  // scenes always split; `--single` builds also stay single-file regardless of this.
+  splitBuild?: boolean
 }
 
 const MAX_STEP = 2
+const SPLIT_MAX_STEP = 3
+
+// Host modules plus the inspector, kept out of every bundle (the inspector must never
+// leak into the scene runtime). Shared by the normal, scene-chunk and SDK-chunk builds.
+const HOST_AND_INSPECTOR_EXTERNALS = ['~system/*', '@dcl/inspector', '@dcl/inspector/*']
 
 // Keep only the last 10KB of output to prevent memory leaks in watch mode
 const MAX_OUTPUT_SIZE = 10 * 1024
@@ -279,6 +290,12 @@ function sharedEsbuildOptions(
 }
 
 export async function bundleSingleProject(components: BundleComponents, options: SingleProjectOptions) {
+  // A scene always builds as a split bundle: an SDK-runtime chunk, a scene chunk and a loader
+  // stub written to the scene's main. `--single` emits a standalone file (a lib entry or a test
+  // bundle), not a scene main, so it can't carry the loader stub; code-to-composite opts out via
+  // splitBuild:false because it runs the scene in-process. Both build single-file.
+  if (!options.single && options.splitBuild !== false) return bundleSplitProject(components, options)
+
   printProgressStep(components.logger, `Bundling file ${colors.bold(options.entrypoint)}`, 1, MAX_STEP)
   const editorScene = await isEditorScene(components, options.workingDirectory)
 
@@ -294,7 +311,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
   const context = await esbuild.context({
     ...sharedEsbuildOptions(options, maxCompositeEntity, options.outputFile),
     outfile: options.outputFile,
-    external: ['~system/*', '@dcl/inspector', '@dcl/inspector/*' /* ban importing the inspector from the SDK */],
+    external: HOST_AND_INSPECTOR_EXTERNALS,
     alias: resolveSdkAliases(options),
     plugins: [compositeLoader(components, options)],
     stdin: {
@@ -352,7 +369,112 @@ export async function bundleSingleProject(components: BundleComponents, options:
   await runTypeChecker(components, options)
 }
 
-function runTypeChecker(components: BundleComponents, options: CompileOptions) {
+async function bundleSplitProject(components: BundleComponents, options: SingleProjectOptions) {
+  const chunks = chunkPaths(options.outputFile)
+  const sceneOut = path.join(options.workingDirectory, chunks.scene)
+  const sdkOut = path.join(options.workingDirectory, chunks.sdk)
+  const mainOut = path.join(options.workingDirectory, options.outputFile)
+  const editorScene = await isEditorScene(components, options.workingDirectory)
+
+  let maxCompositeEntity = 0
+  if (!options.ignoreComposite) {
+    maxCompositeEntity = (await getAllComposites(components, options.workingDirectory)).maxCompositeEntity
+  }
+
+  // Emit all three files. Watch mode just re-runs this on change; esbuild is deterministic, so a
+  // scene-only edit re-emits an identical SDK chunk and a preview client 304s it (content-addressed).
+  const buildChunks = async () => {
+    // The scene chunk: just the scene code; the SDK, composites and scripts stay external.
+    const sceneResult = await buildSplitChunk({
+      ...sharedEsbuildOptions(options, maxCompositeEntity, chunks.scene),
+      outfile: sceneOut,
+      external: [...HOST_AND_INSPECTOR_EXTERNALS, ...sceneExternals],
+      plugins: [compositeLoader(components, options)],
+      stdin: {
+        contents: getEntrypointCode(options.entrypoint, options.customEntryPoint, editorScene),
+        resolveDir: path.dirname(options.entrypoint),
+        sourcefile: path.basename(options.entrypoint) + '.entry-point.ts',
+        loader: 'ts'
+      }
+    })
+
+    // The registry is the resolvable candidate superset plus whatever the scene chunk imports
+    // (its metafile), so same-SDK scenes emit an identical chunk yet an exotic deep import is
+    // never missing.
+    const keys = registryKeys(options.workingDirectory, collectSdkExternals(sceneResult.metafile))
+    await buildSplitChunk({
+      ...sharedEsbuildOptions(options, maxCompositeEntity, chunks.sdk),
+      outfile: sdkOut,
+      // Keep the full SDK: tree-shaking would prune the chunk to what *this* scene reaches, so
+      // scenes exercising different SDK surfaces would emit different chunks and lose the
+      // cross-scene sharing that is the whole point. The scene chunk above still tree-shakes.
+      treeShaking: false,
+      // a stable sourceRoot keeps the chunk byte-identical across scene directories
+      sourceRoot: 'dcl:///',
+      external: HOST_AND_INSPECTOR_EXTERNALS,
+      alias: resolveSdkAliases(options),
+      plugins: [compositeLoader(components, options)],
+      stdin: {
+        contents: sdkRuntimeEntry(keys),
+        resolveDir: options.workingDirectory,
+        sourcefile: 'sdk-runtime-entry.js',
+        loader: 'js'
+      }
+    })
+
+    // The loader stub only references the chunk paths.
+    await components.fs.writeFile(mainOut, await loaderStub(components, chunks.sdk, chunks.scene))
+  }
+
+  printProgressStep(components.logger, `Bundling scene and SDK runtime`, 1, SPLIT_MAX_STEP)
+  await buildChunks()
+  printProgressStep(components.logger, `Loader stub saved ${colors.bold(options.outputFile)}`, 2, SPLIT_MAX_STEP)
+
+  /* istanbul ignore if */
+  if (options.watch) {
+    const watcher = watch(path.resolve(options.workingDirectory), {
+      ignored: ['**/dist/**', '**/*.crdt', '**/*.d.ts', sceneOut, sdkOut, mainOut],
+      ignoreInitial: true
+    })
+    const debouncedRebuild = debounce(async () => {
+      try {
+        await buildChunks()
+        printProgressInfo(components.logger, `Chunks saved ${colors.bold(chunks.scene)}`)
+      } catch (err: any) {
+        components.logger.error(err.toString())
+      }
+    }, 100)
+    watcher.on('all', (_event, filePath) => {
+      if (/\.(ts|tsx|js|jsx|composite)$/.test(filePath)) {
+        printProgressInfo(components.logger, `File ${filePath} changed, rebuilding...`)
+        debouncedRebuild()
+      }
+    })
+    printProgressInfo(components.logger, `The compiler is watching for changes`)
+  }
+
+  await runTypeChecker(components, options, 3, SPLIT_MAX_STEP)
+}
+
+async function buildSplitChunk(buildOptions: esbuild.BuildOptions) {
+  try {
+    return await esbuild.build(buildOptions)
+  } catch (err: any) {
+    throw new CliError('BUNDLE_REBUILD_FAILED', i18next.t('errors.bundle.rebuild_failed', { error: err.toString() }))
+  }
+}
+
+function collectSdkExternals(metafile: esbuild.Metafile | undefined): string[] {
+  const keys = new Set<string>()
+  for (const output of Object.values(metafile?.outputs ?? {})) {
+    for (const imported of output.imports) {
+      if (imported.external && isRegistryModule(imported.path)) keys.add(imported.path)
+    }
+  }
+  return [...keys].sort()
+}
+
+function runTypeChecker(components: BundleComponents, options: CompileOptions, step = 2, maxStep = MAX_STEP) {
   const tsBin = require.resolve('typescript/lib/tsc')
   const args = [
     '-p',
@@ -364,7 +486,7 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
   /* istanbul ignore if */
   if (options.watch) args.push('--watch')
 
-  printProgressStep(components.logger, `Running type checker`, 2, MAX_STEP)
+  printProgressStep(components.logger, `Running type checker`, step, maxStep)
   const ts = child_process.fork(tsBin, args, {
     stdio: 'pipe',
     env: process.env,

@@ -18,6 +18,8 @@ test/ecs/snippets/**/*.js
 test/sdk/simple-scene
 **/bin/game.js
 **/bin/game.js.map
+**/bin/scene.js
+**/bin/sdk-runtime.js
 **/*.js.map
 
 test/build-ecs/fixtures/*/package-lock.json

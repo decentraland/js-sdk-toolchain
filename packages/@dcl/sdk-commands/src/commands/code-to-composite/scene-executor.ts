@@ -416,7 +416,8 @@ async function bundle(components: Pick<CliComponents, 'fs' | 'logger'>, project:
         production: false, // keep source maps for better error messages
         emitDeclaration: false,
         ignoreComposite: true, // don't load existing composite files
-        customEntryPoint: false
+        customEntryPoint: false,
+        splitBuild: false // run the scene in-process (Node require): a single bundle, not chunks
       },
       project.scene
     )
