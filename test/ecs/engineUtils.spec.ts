@@ -41,4 +41,16 @@ describe('Engine utils', () => {
     const newArray = array.filter(isNotUndefined)
     expect(newArray).toStrictEqual([1, 2, 3])
   })
+
+  describe('when development readonly checks are disabled', () => {
+    let value: { x: number }
+
+    beforeEach(() => {
+      value = { x: 1 }
+    })
+
+    it('should return the original value without allocating a frozen copy', () => {
+      expect(deepReadonly(value, false)).toBe(value)
+    })
+  })
 })
