@@ -258,6 +258,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
       // Reset Buffer for each Transport
       transportBuffer.resetBuffer()
       const buffer = new ReadWriteByteBuffer()
+      const serializedMessageBuffer = new ReadWriteByteBuffer()
 
       // Then we send all the new crdtMessages that the transport needs to process
       for (const message of crdtMessages) {
@@ -267,24 +268,6 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         // Redundant message for the transport
         if (!transport.filter(message)) continue
 
-        // Check if adding this message would exceed the size limit
-        const currentBufferSize = transportBuffer.toBinary().byteLength
-        const messageSize = message.messageBuffer.byteLength
-
-        if (isNetworkTransport && (currentBufferSize + messageSize) / 1024 > LIVEKIT_MAX_SIZE) {
-          // If the current buffer has content, save it as a chunk
-          if (currentBufferSize > 0) {
-            __NetworkMessagesBuffer.push(transportBuffer.toCopiedBinary())
-            transportBuffer.resetBuffer()
-          }
-
-          // If the message itself is larger than the limit, we need to handle it specially
-          // For now, we'll skip it to prevent infinite loops
-          if (messageSize / 1024 > LIVEKIT_MAX_SIZE) {
-            console.error(`Message too large (${messageSize} bytes), skipping message for entity ${message.entityId}`)
-            continue
-          }
-        }
         const { entityId } = findNetworkId(message)
 
         const transformNeedsFix =
@@ -294,17 +277,17 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
           NetworkParent.has(entityId) &&
           NetworkEntity.has(entityId)
 
+        buffer.resetBuffer()
+        serializedMessageBuffer.resetBuffer()
+
         // If there was a LOCAL change in the transform. Add the parent to that transform
         if (isRendererTransport && message.type === CrdtMessageType.PUT_COMPONENT && transformNeedsFix) {
           const parent = findNetworkId(NetworkParent.get(entityId))
           const transformData = networkUtils.fixTransformParent(message, Transform.get(entityId), parent.entityId)
           const offset = buffer.currentWriteOffset()
           PutComponentOperation.write(entityId, message.timestamp, message.componentId, transformData, buffer)
-          transportBuffer.writeBuffer(buffer.buffer().subarray(offset, buffer.currentWriteOffset()), false)
-          continue
-        }
-
-        if (isRendererTransport && networkUtils.isNetworkMessage(message)) {
+          serializedMessageBuffer.writeBuffer(buffer.buffer().subarray(offset, buffer.currentWriteOffset()), false)
+        } else if (isRendererTransport && networkUtils.isNetworkMessage(message)) {
           // If it's the renderer transport and its a NetworkMessage, we need to fix the entityId field and convert it to a known Message.
           // PUT_NETWORK_COMPONENT -> PUT_COMPONENT
           let transformData: Uint8Array = 'data' in message ? message.data : new Uint8Array()
@@ -316,25 +299,39 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
             { ...message, data: transformData } as any,
             entityId,
             buffer,
-            transportBuffer
+            serializedMessageBuffer
           )
-          // Iterate the next message
-          continue
-        }
-
-        // If its a network transport and its a PUT_COMPONENT that has a NetworkEntity component, we need to send this message
-        // through comms with the EntityID and NetworkID from ther NetworkEntity so everyone can recieve this message and map to their custom entityID.
-        if (isNetworkTransport && !networkUtils.isNetworkMessage(message)) {
+        } else if (isNetworkTransport && !networkUtils.isNetworkMessage(message)) {
+          // If its a network transport and its a PUT_COMPONENT that has a NetworkEntity component, we need to send this message
+          // through comms with the EntityID and NetworkID from ther NetworkEntity so everyone can recieve this message and map to their custom entityID.
           const networkData = NetworkEntity.getOrNull(message.entityId)
           // If it has networkData convert the message to PUT_NETWORK_COMPONENT.
           if (networkData) {
-            networkUtils.localMessageToNetwork(message, networkData, buffer, transportBuffer)
-            // Iterate the next message
+            networkUtils.localMessageToNetwork(message, networkData, buffer, serializedMessageBuffer)
+          } else {
+            serializedMessageBuffer.writeBuffer(message.messageBuffer, false)
+          }
+        } else {
+          // Common message
+          serializedMessageBuffer.writeBuffer(message.messageBuffer, false)
+        }
+
+        const currentBufferSize = transportBuffer.currentWriteOffset()
+        const messageSize = serializedMessageBuffer.currentWriteOffset()
+
+        if (isNetworkTransport && (currentBufferSize + messageSize) / 1024 > LIVEKIT_MAX_SIZE) {
+          if (currentBufferSize > 0) {
+            __NetworkMessagesBuffer.push(transportBuffer.toCopiedBinary())
+            transportBuffer.resetBuffer()
+          }
+
+          if (messageSize / 1024 > LIVEKIT_MAX_SIZE) {
+            console.error(`Message too large (${messageSize} bytes), skipping message for entity ${message.entityId}`)
             continue
           }
         }
-        // Common message
-        transportBuffer.writeBuffer(message.messageBuffer, false)
+
+        transportBuffer.writeBuffer(serializedMessageBuffer.toBinary(), false)
       }
 
       if (isNetworkTransport && transportBuffer.currentWriteOffset()) {
