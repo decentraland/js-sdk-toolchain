@@ -2,12 +2,13 @@ import path from 'path'
 
 import { CliComponents } from '../../components'
 
-async function downloadFile(
-  components: Pick<CliComponents, 'fs' | 'logger' | 'fetch'>,
-  fileUrl: string,
-  outputPath: string
-) {
-  const response = await (await components.fetch.fetch(fileUrl)).arrayBuffer()
+async function downloadFile(components: Pick<CliComponents, 'fs' | 'fetch'>, fileUrl: string, outputPath: string) {
+  const fetchResponse = await components.fetch.fetch(fileUrl)
+  if (!fetchResponse.ok) {
+    throw new Error(`Failed to download ${fileUrl}: ${fetchResponse.status} ${fetchResponse.statusText}`)
+  }
+
+  const response = await fetchResponse.arrayBuffer()
   const buffer = Buffer.from(response)
   await components.fs.writeFile(outputPath, buffer)
 }
@@ -39,37 +40,38 @@ function parseGitHubUrl(githubUrl: string) {
 }
 
 export async function downloadGithubFolder(
-  components: Pick<CliComponents, 'fs' | 'logger' | 'fetch'>,
+  components: Pick<CliComponents, 'fs' | 'fetch'>,
   githubUrl: string,
   destination: string
 ) {
   const { owner, repo, branch, path: subfolderPath } = parseGitHubUrl(githubUrl)
   const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${subfolderPath}?ref=${branch}`
 
-  try {
-    const data: any = await (await components.fetch.fetch(apiUrl)).json()
+  const fetchResponse = await components.fetch.fetch(apiUrl)
+  if (!fetchResponse.ok) {
+    throw new Error(`Failed to download ${apiUrl}: ${fetchResponse.status} ${fetchResponse.statusText}`)
+  }
 
-    if (Array.isArray(data)) {
-      for await (const file of data) {
-        const filePath = path.join(destination, file.name)
+  const data: any = await fetchResponse.json()
 
-        if (file.type === 'file') {
-          await downloadFile(components, file.download_url, filePath)
-        } else if (file.type === 'dir') {
-          if (!(await components.fs.directoryExists(filePath))) {
-            await components.fs.mkdir(filePath, { recursive: true })
-          }
-          const nextUrl = `https://github.com/${owner}/${repo}/tree/${branch}/${file.path}`
+  if (Array.isArray(data)) {
+    for await (const file of data) {
+      const filePath = path.join(destination, file.name)
 
-          await downloadGithubFolder(components, nextUrl, filePath)
+      if (file.type === 'file') {
+        await downloadFile(components, file.download_url, filePath)
+      } else if (file.type === 'dir') {
+        if (!(await components.fs.directoryExists(filePath))) {
+          await components.fs.mkdir(filePath, { recursive: true })
         }
+        const nextUrl = `https://github.com/${owner}/${repo}/tree/${branch}/${file.path}`
+
+        await downloadGithubFolder(components, nextUrl, filePath)
       }
-    } else {
-      // Handle single file or root without subfolders
-      const filePath = path.join(destination, data.name)
-      await downloadFile(components, data.download_url, filePath)
     }
-  } catch (error: any) {
-    components.logger.error(`Error downloading folder: ${apiUrl} \n ${error.message}`)
+  } else {
+    // Handle single file or root without subfolders
+    const filePath = path.join(destination, data.name)
+    await downloadFile(components, data.download_url, filePath)
   }
 }
