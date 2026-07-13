@@ -36,7 +36,7 @@ export type UiRendererOptions = {
  * virtual screens are overridden to on mobile (phone screens are much wider
  * than 16:9, so a 16:9 virtual canvas would letterbox the UI).
  */
-const MOBILE_VIRTUAL_SIZE: UiRendererOptions = { virtualWidth: 1600, virtualHeight: 720 }
+const DEFAULT_MOBILE_VIRTUAL_SIZE: UiRendererOptions = { virtualWidth: 1600, virtualHeight: 720 }
 
 /**
  * Default virtual screen size used on non-mobile platforms.
@@ -110,8 +110,10 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
   const interactableAreaOwner = Symbol('react-ecs-interactable-area')
 
   // Last 16:9 size we already logged the mobile override for, so the log
-  // fires once per provided size instead of every tick.
-  let loggedMobileOverrideSize: string | null = null
+  // fires once per provided size instead of every tick. Tracked as raw numbers
+  // to avoid allocating a comparison string every tick.
+  let loggedMobileOverrideW = 0
+  let loggedMobileOverrideH = 0
 
   function getActiveVirtualSize(): UiRendererOptions | undefined {
     // Main renderer options win; otherwise use the first additional renderer option.
@@ -132,7 +134,7 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
 
     // No creator-provided size: fall back to the platform default.
     if (!provided) {
-      return mobile ? MOBILE_VIRTUAL_SIZE : DEFAULT_VIRTUAL_SIZE
+      return mobile ? DEFAULT_MOBILE_VIRTUAL_SIZE : DEFAULT_VIRTUAL_SIZE
     }
 
     // An explicitly provided but invalid size (values <= 0) disables the
@@ -143,14 +145,14 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
 
     // On mobile, 16:9 virtual screens don't fit phone aspect ratios — override them.
     if (mobile && is16by9(provided)) {
-      const providedSize = `${provided.virtualWidth}x${provided.virtualHeight}`
-      if (loggedMobileOverrideSize !== providedSize) {
-        loggedMobileOverrideSize = providedSize
+      if (loggedMobileOverrideW !== provided.virtualWidth || loggedMobileOverrideH !== provided.virtualHeight) {
+        loggedMobileOverrideW = provided.virtualWidth
+        loggedMobileOverrideH = provided.virtualHeight
         console.log(
-          `Mobile platform detected: overriding 16:9 virtual screen size ${providedSize} with ${MOBILE_VIRTUAL_SIZE.virtualWidth}x${MOBILE_VIRTUAL_SIZE.virtualHeight}`
+          `Mobile platform detected: overriding 16:9 virtual screen size ${provided.virtualWidth}x${provided.virtualHeight} with ${DEFAULT_MOBILE_VIRTUAL_SIZE.virtualWidth}x${DEFAULT_MOBILE_VIRTUAL_SIZE.virtualHeight}`
         )
       }
-      return MOBILE_VIRTUAL_SIZE
+      return DEFAULT_MOBILE_VIRTUAL_SIZE
     }
 
     return provided

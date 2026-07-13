@@ -12,6 +12,7 @@ let isMobileProvider: () => boolean = () => false
 /**
  * Injects the function used to detect whether the scene runs on a mobile
  * platform. Called by `@dcl/sdk` with its `isMobile()` platform helper.
+ * @internal
  */
 export function setIsMobileProvider(provider: () => boolean): void {
   isMobileProvider = provider

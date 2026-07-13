@@ -83,6 +83,34 @@ describe('Virtual screen size defaults', () => {
     uiRenderer.destroy()
   })
 
+  it('should disable the virtual screen when the provided size is NaN', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    createCanvasInfo(engine, 3840, 2160)
+
+    // NaN fails the `> 0` guard, so it disables UI scaling like any other invalid size
+    uiRenderer.setUiRenderer(ui, { virtualWidth: NaN, virtualHeight: 1080 })
+    await engine.update(1)
+    expect(getUiScaleFactor()).toBe(1)
+
+    uiRenderer.destroy()
+  })
+
+  it('should use the main renderer size when both main and an additional renderer are valid', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    createCanvasInfo(engine, 3840, 2160)
+    const ownerEntity = engine.addEntity()
+
+    // Main renderer options win over any additional renderer's options
+    uiRenderer.setUiRenderer(ui, { virtualWidth: 1920, virtualHeight: 1080 })
+    uiRenderer.addUiRenderer(ownerEntity, ui, { virtualWidth: 800, virtualHeight: 600 })
+    await engine.update(1)
+
+    // scale comes from main: Math.min(3840/1920, 2160/1080) = 2 (not 800x600's 4.8)
+    expect(getUiScaleFactor()).toBe(2)
+
+    uiRenderer.destroy()
+  })
+
   it('should disable the virtual screen when the main size is invalid, even if an additional renderer has a valid one', async () => {
     const { engine, uiRenderer } = setupEngine()
     createCanvasInfo(engine, 1600, 900)
