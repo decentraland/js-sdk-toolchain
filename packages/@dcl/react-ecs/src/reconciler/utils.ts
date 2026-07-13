@@ -99,28 +99,29 @@ export function isEqual<T = unknown>(val1: T, val2: T): boolean {
     return val1 === val2
   }
 
-  if (Array.isArray(val1) && Array.isArray(val2)) {
-    if (val1.length !== val2.length) {
-      return false
-    }
-  }
-
-  if (Object.keys(val1).length !== Object.keys(val2).length) {
+  if (Array.isArray(val1) && Array.isArray(val2) && val1.length !== val2.length) {
     return false
   }
 
-  if (JSON.stringify(val1) === JSON.stringify(val2)) {
-    return true
-  }
+  const first = val1 as Record<string, unknown>
+  const second = val2 as Record<string, unknown>
+  let firstKeyCount = 0
+  let secondKeyCount = 0
 
-  for (const key in val1) {
-    if (!isEqual(val1[key]!, val2[key]!)) {
+  for (const key in first) {
+    if (!Object.prototype.hasOwnProperty.call(first, key)) continue
+    firstKeyCount++
+
+    if (!Object.prototype.hasOwnProperty.call(second, key) || !isEqual(first[key], second[key])) {
       return false
     }
   }
 
-  /* istanbul ignore next */
-  return true
+  for (const key in second) {
+    if (Object.prototype.hasOwnProperty.call(second, key)) secondKeyCount++
+  }
+
+  return firstKeyCount === secondKeyCount
 }
 
 export const isNotUndefined = <T>(val: T | undefined): val is T => {
