@@ -28,17 +28,20 @@ export function definePlayerHelper(engine: IEngine) {
   const AvatarEquippedData = defineAvatarEquippedData(engine)
   const AvatarBase = defineAvatarBase(engine)
   const playerEntities = new Map<Entity, string>()
+  const entitiesByAddress = new Map<string, Entity>()
 
   const onEnterSceneCb: ((player: GetPlayerDataRes) => void)[] = []
   const onLeaveSceneCb: ((userId: string) => void)[] = []
 
   engine.addSystem(() => {
-    const players = Array.from(engine.getEntitiesWith(PlayerIdentityData, AvatarBase))
-    if (players.length === playerEntities.size) return
+    if (onEnterSceneCb.length === 0 && onLeaveSceneCb.length === 0) return
 
-    for (const [entity, identity] of players) {
+    for (const [entity, identity] of engine.getEntitiesWith(PlayerIdentityData)) {
+      if (!AvatarBase.has(entity)) continue
+
       if (!playerEntities.has(entity)) {
         playerEntities.set(entity, identity.address)
+        entitiesByAddress.set(identity.address, entity)
 
         // Call onEnter callback
         if (onEnterSceneCb.length) {
@@ -48,8 +51,12 @@ export function definePlayerHelper(engine: IEngine) {
         // Check for changes/remove callbacks
         AvatarBase.onChange(entity, (value) => {
           if (!value && playerEntities.get(entity)) {
-            onLeaveSceneCb.forEach((cb) => cb(playerEntities.get(entity)!))
+            const address = playerEntities.get(entity)!
+            onLeaveSceneCb.forEach((cb) => cb(address))
             playerEntities.delete(entity)
+            if (entitiesByAddress.get(address) === entity) {
+              entitiesByAddress.delete(address)
+            }
           }
         })
       }
@@ -69,6 +76,10 @@ export function definePlayerHelper(engine: IEngine) {
     getPlayer(user?: GetPlayerDataReq): GetPlayerDataRes | null {
       function getEntity() {
         if (!user?.userId) return engine.PlayerEntity
+
+        const cachedEntity = entitiesByAddress.get(user.userId)
+        if (cachedEntity !== undefined) return cachedEntity
+
         for (const [entity, data] of engine.getEntitiesWith(PlayerIdentityData)) {
           if (data.address === user.userId) {
             return entity
