@@ -50,6 +50,35 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
   const receivedMessages: ReceiveMessage[] = []
   // Messages already processed by the engine but that we need to broadcast to other transports.
   const broadcastMessages: ReceiveMessage[] = []
+  const networkEntityIndex = new Map<string, { localEntityId: Entity; network: INetowrkEntityType }>()
+  const networkEntityKeyByLocalEntity = new Map<Entity, string>()
+
+  function networkEntityKey(networkId: number, entityId: Entity): string {
+    return `${networkId}:${entityId}`
+  }
+
+  function removeIndexedNetworkEntity(localEntityId: Entity): void {
+    const previousKey = networkEntityKeyByLocalEntity.get(localEntityId)
+    if (!previousKey) return
+
+    if (networkEntityIndex.get(previousKey)?.localEntityId === localEntityId) {
+      networkEntityIndex.delete(previousKey)
+    }
+    networkEntityKeyByLocalEntity.delete(localEntityId)
+  }
+
+  function indexNetworkEntity(localEntityId: Entity, network?: INetowrkEntityType): void {
+    removeIndexedNetworkEntity(localEntityId)
+    if (!network) return
+
+    const key = networkEntityKey(network.networkId, network.entityId)
+    const indexedNetwork = {
+      localEntityId,
+      network: { networkId: network.networkId, entityId: network.entityId }
+    }
+    networkEntityIndex.set(key, indexedNetwork)
+    networkEntityKeyByLocalEntity.set(localEntityId, key)
+  }
 
   /**
    *
@@ -120,10 +149,9 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
     const hasNetworkId = 'networkId' in msg
 
     if (hasNetworkId) {
-      for (const [entityId, network] of engine.getEntitiesWith(NetworkEntity)) {
-        if (network.networkId === msg.networkId && network.entityId === msg.entityId) {
-          return { entityId, network }
-        }
+      const indexedNetwork = networkEntityIndex.get(networkEntityKey(msg.networkId!, msg.entityId))
+      if (indexedNetwork) {
+        return { entityId: indexedNetwork.localEntityId, network: indexedNetwork.network }
       }
     }
 
@@ -145,6 +173,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         entityId = engine.addEntity()
         network = { entityId: msg.entityId, networkId: msg.networkId }
         NetworkEntity.createOrReplace(entityId, network)
+        indexNetworkEntity(entityId, network)
       }
       if (msg.type === CrdtMessageType.DELETE_ENTITY || msg.type === CrdtMessageType.DELETE_ENTITY_NETWORK) {
         entitiesShouldBeCleaned.push(entityId)
@@ -174,6 +203,9 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
           }
           const [conflictMessage, value] = component.updateFromCrdt({ ...msg, entityId })
           if (!conflictMessage) {
+            if (component.componentId === NetworkEntity.componentId) {
+              indexNetworkEntity(entityId, value as INetowrkEntityType | undefined)
+            }
             // Add message to transport queue to be processed by others transports
             broadcastMessages.push(msg)
             onProcessEntityComponentChange && onProcessEntityComponentChange(entityId, msg.type, component, value)
@@ -186,6 +218,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
     }
     // the last stage of the syncrhonization is to delete the entities
     for (const entity of entitiesShouldBeCleaned) {
+      removeIndexedNetworkEntity(entity)
       for (const definition of engine.componentsIter()) {
         // TODO: check this with pato/pravus
         definition.entityDeleted(entity, true)
@@ -220,19 +253,24 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
             messageBuffer: buffer.buffer().subarray(offset, buffer.currentWriteOffset())
           })
         }
-        if (onProcessEntityComponentChange) {
+        if (onProcessEntityComponentChange || component.componentId === NetworkEntity.componentId) {
           const rawValue =
             message.type === CrdtMessageType.PUT_COMPONENT || message.type === CrdtMessageType.APPEND_VALUE
               ? component.get(message.entityId)
               : undefined
 
-          onProcessEntityComponentChange(message.entityId, message.type, component, rawValue)
+          if (component.componentId === NetworkEntity.componentId) {
+            indexNetworkEntity(message.entityId, rawValue as INetowrkEntityType | undefined)
+          }
+          onProcessEntityComponentChange &&
+            onProcessEntityComponentChange(message.entityId, message.type, component, rawValue)
         }
       }
     }
 
     // After all updates, I execute the DeletedEntity messages
     for (const entityId of entitiesDeletedThisTick) {
+      removeIndexedNetworkEntity(entityId)
       const offset = buffer.currentWriteOffset()
       DeleteEntity.write(entityId, buffer)
 
