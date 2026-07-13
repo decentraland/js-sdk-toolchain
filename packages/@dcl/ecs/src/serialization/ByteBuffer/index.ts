@@ -1,14 +1,15 @@
 import * as utf8 from '@protobufjs/utf8'
 
 /**
- * Take the max between currentSize and intendedSize and then plus 1024. Then,
- *  find the next nearer multiple of 1024.
+ * Grow geometrically to avoid repeatedly copying the accumulated payload when
+ * a buffer receives many small writes. Large single writes still grow directly
+ * to the required capacity.
  * @param currentSize - number
  * @param intendedSize - number
  * @returns the calculated number
  */
 function getNextSize(currentSize: number, intendedSize: number) {
-  const minNewSize = Math.max(currentSize, intendedSize) + 1024
+  const minNewSize = Math.max(currentSize * 2, intendedSize)
   return Math.ceil(minNewSize / 1024) * 1024
 }
 
