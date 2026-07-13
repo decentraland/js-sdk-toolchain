@@ -38,9 +38,22 @@ export function propsChanged<K extends keyof EntityComponents>(
   }
 
   const changes: Partial<EntityComponents[K]> = {}
+  // Iterate prevProps (this also catches removed keys, where nextProps[k] is undefined)...
   for (const k in prevProps) {
     const propKey = k as keyof typeof prevProps
     if (!isEqual(prevProps[propKey], nextProps[propKey])) {
+      changes[propKey] = nextProps[propKey]
+    }
+  }
+  // ...then catch keys present only in nextProps (an optional prop set for the first time,
+  // e.g. `scrollPosition` going from undefined to a value). Iterating prevProps alone would
+  // drop these. Two allocation-free loops are used instead of a Set union to keep this hot
+  // path cheap. These keys aren't in prevProps, so emitting them whenever they're defined is
+  // both cheaper than (and avoids the falsy-value trap of) an isEqual(undefined, ...) compare.
+  for (const k in nextProps) {
+    if (k in prevProps) continue
+    const propKey = k as keyof typeof nextProps
+    if (nextProps[propKey] !== undefined) {
       changes[propKey] = nextProps[propKey]
     }
   }

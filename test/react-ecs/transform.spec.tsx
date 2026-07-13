@@ -556,6 +556,52 @@ describe('UiTransform React Ecs', () => {
     })
   })
 
+  it('should apply an optional prop set for the first time (undefined -> value)', async () => {
+    // Regression for a reconciler diff bug: `propsChanged` only iterated the keys present
+    // in the previous props, so a field that was absent before (an optional prop rendered
+    // for the first time) was silently dropped on its first appearance. `scrollPosition`
+    // is the canonical case — while undefined it is omitted from the parsed transform, so
+    // the first `undefined -> reference` change produced no CRDT update at all.
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+    const rootDivEntity = (entityIndex + 1) as Entity
+
+    let scrollPosition: { x: number; y: number } | string | undefined = undefined
+
+    const ui = () => <UiEntity uiTransform={{ scrollPosition }} />
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    // nothing requested yet
+    expect(UiTransform.get(rootDivEntity).scrollPosition).toBeUndefined()
+
+    // first ever scrollPosition: must be transmitted, not dropped
+    scrollPosition = 'row-50'
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(UiTransform.get(rootDivEntity)).toMatchObject({
+      scrollPosition: {
+        value: {
+          $case: 'reference',
+          reference: 'row-50'
+        }
+      }
+    })
+
+    // and a subsequent change still works
+    scrollPosition = 'row-10'
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+    expect(UiTransform.get(rootDivEntity)).toMatchObject({
+      scrollPosition: {
+        value: {
+          $case: 'reference',
+          reference: 'row-10'
+        }
+      }
+    })
+  })
+
   it('should parse positive zIndex correctly', async () => {
     const { engine, uiRenderer } = setupEngine()
     const UiTransform = components.UiTransform(engine)

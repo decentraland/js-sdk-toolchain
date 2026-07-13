@@ -15,12 +15,14 @@ describe('Generated InputModifier ProtoBuf', () => {
           disableJog: true,
           disableRun: true,
           disableJump: true,
-          disableEmote: true
+          disableEmote: true,
+          disableDoubleJump: true,
+          disableGliding: true
         }
       }
     })
   })
-  it('should test Standar modifier', () => {
+  it('should test Standard modifier', () => {
     const newEngine = Engine()
     const InputModifier = components.InputModifier(newEngine)
 
@@ -31,7 +33,9 @@ describe('Generated InputModifier ProtoBuf', () => {
         disableJog: true,
         disableRun: true,
         disableJump: true,
-        disableEmote: true
+        disableEmote: true,
+        disableDoubleJump: true,
+        disableGliding: true
       })
     })
   })
