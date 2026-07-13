@@ -50,6 +50,8 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
   const receivedMessages: ReceiveMessage[] = []
   // Messages already processed by the engine but that we need to broadcast to other transports.
   const broadcastMessages: ReceiveMessage[] = []
+  // Local messages are filtered once while they are serialized and reuse that routing decision below.
+  const localMessageTransports = new WeakMap<object, boolean[]>()
 
   /**
    *
@@ -206,8 +208,9 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
     for (const component of engine.componentsIter()) {
       for (const message of component.getCrdtUpdates()) {
         const offset = buffer.currentWriteOffset()
+        const acceptedTransports = transports.map((transport) => transport.filter(message))
         // Avoid creating messages if there is no transport that will handle it
-        if (transports.some((t) => t.filter(message))) {
+        if (acceptedTransports.some(Boolean)) {
           if (message.type === CrdtMessageType.PUT_COMPONENT) {
             PutComponentOperation.write(message.entityId, message.timestamp, message.componentId, message.data, buffer)
           } else if (message.type === CrdtMessageType.DELETE_COMPONENT) {
@@ -215,10 +218,12 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
           } else if (message.type === CrdtMessageType.APPEND_VALUE) {
             AppendValueOperation.write(message.entityId, message.timestamp, message.componentId, message.data, buffer)
           }
-          crdtMessages.push({
+          const serializedMessage = {
             ...message,
             messageBuffer: buffer.buffer().subarray(offset, buffer.currentWriteOffset())
-          })
+          }
+          localMessageTransports.set(serializedMessage, acceptedTransports)
+          crdtMessages.push(serializedMessage)
         }
         if (onProcessEntityComponentChange) {
           const rawValue =
@@ -264,8 +269,9 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         // Avoid echo messages
         if (message.transportId === transportIndex) continue
 
-        // Redundant message for the transport
-        if (!transport.filter(message)) continue
+        // Local messages were already filtered before serialization. Received messages still need routing here.
+        const acceptedTransports = localMessageTransports.get(message)
+        if (acceptedTransports ? !acceptedTransports[transportIndex] : !transport.filter(message)) continue
 
         // Check if adding this message would exceed the size limit
         const currentBufferSize = transportBuffer.toBinary().byteLength

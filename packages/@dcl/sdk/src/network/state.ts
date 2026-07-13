@@ -55,11 +55,12 @@ export const NOT_SYNC_COMPONENTS_NAMES: string[] = [
   'asset-packs::Script', // ComponentName from: https://github.com/decentraland/asset-packs/blob/main/src/enums.ts
   'asset-packs::ActionTypes'
 ]
+const NOT_SYNC_COMPONENTS_IDS_SET = new Set(NOT_SYNC_COMPONENTS_IDS)
+const NOT_SYNC_COMPONENTS_NAMES_SET = new Set(NOT_SYNC_COMPONENTS_NAMES)
 
 export function shouldSyncComponent(component: ComponentDefinition<unknown>): boolean {
   return !(
-    NOT_SYNC_COMPONENTS_IDS.includes(component.componentId) ||
-    NOT_SYNC_COMPONENTS_NAMES.includes(component.componentName)
+    NOT_SYNC_COMPONENTS_IDS_SET.has(component.componentId) || NOT_SYNC_COMPONENTS_NAMES_SET.has(component.componentName)
   )
 }
 
