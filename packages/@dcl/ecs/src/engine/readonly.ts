@@ -1,4 +1,5 @@
 import { ComponentDefinition } from './component'
+import { __DEV__ } from '../runtime/invariant'
 
 /**
  * @public
@@ -42,6 +43,6 @@ export type DeepReadonly<T> = T extends ReadonlyPrimitive
 /**
  * @internal
  */
-export function deepReadonly<T extends Record<string, unknown>>(val: T): DeepReadonly<T> {
-  return Object.freeze({ ...val }) as DeepReadonly<T>
+export function deepReadonly<T extends Record<string, unknown>>(val: T, freeze = __DEV__): DeepReadonly<T> {
+  return (freeze ? Object.freeze({ ...val }) : val) as DeepReadonly<T>
 }
