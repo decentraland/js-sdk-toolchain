@@ -20,10 +20,34 @@ export function addSyncTransport(
   const DEBUG_NETWORK_MESSAGES = () => (globalThis as any).DEBUG_NETWORK_MESSAGES ?? false
   // Profile Info
   const myProfile: IProfile = {} as IProfile
-  fetchProfile(myProfile!, getUserData)
 
   // Entity utils
   const entityDefinitions = entityUtils(engine, myProfile)
+  const pendingProfileOperations: (() => void)[] = []
+  let profileInitialized = false
+
+  const ready = fetchProfile(myProfile, getUserData).then(() => {
+    profileInitialized = true
+    for (const operation of pendingProfileOperations.splice(0)) {
+      operation()
+    }
+  })
+
+  // Keep module-level initialization failures handled even when callers do not
+  // explicitly await readiness. The returned `ready` promise still rejects for
+  // callers that do await it.
+  void ready.catch((error) => {
+    pendingProfileOperations.length = 0
+    console.error(error)
+  })
+
+  function runWhenProfileIsReady(operation: () => void): void {
+    if (profileInitialized) {
+      operation()
+    } else {
+      pendingProfileOperations.push(operation)
+    }
+  }
 
   // List of MessageBuss messsages to be sent on every frame to comms
   const pendingMessageBusMessagesToSend: { data: Uint8Array[]; address: string[] }[] = []
@@ -46,6 +70,7 @@ export function addSyncTransport(
   const transport: Transport = {
     filter: syncFilter(engine),
     send: async (messages) => {
+      await ready
       for (const message of [messages].flat()) {
         if (message.byteLength && transportInitialzed) {
           DEBUG_NETWORK_MESSAGES() &&
@@ -169,7 +194,17 @@ export function addSyncTransport(
 
   return {
     ...entityDefinitions,
+    syncEntity(...args: Parameters<typeof entityDefinitions.syncEntity>) {
+      runWhenProfileIsReady(() => entityDefinitions.syncEntity(...args))
+    },
+    parentEntity(...args: Parameters<typeof entityDefinitions.parentEntity>) {
+      runWhenProfileIsReady(() => entityDefinitions.parentEntity(...args))
+    },
+    removeParent(...args: Parameters<typeof entityDefinitions.removeParent>) {
+      runWhenProfileIsReady(() => entityDefinitions.removeParent(...args))
+    },
     myProfile,
+    ready,
     isStateSyncronized
   }
 }

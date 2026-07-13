@@ -4,7 +4,26 @@ import { addSyncTransport } from './message-bus-sync'
 import { getUserData } from '~system/UserIdentity'
 
 // initialize sync transport for sdk engine
-const { getChildren, syncEntity, parentEntity, getParent, myProfile, removeParent, getFirstChild, isStateSyncronized } =
-  addSyncTransport(engine, sendBinary, getUserData)
+const {
+  getChildren,
+  syncEntity,
+  parentEntity,
+  getParent,
+  myProfile,
+  removeParent,
+  getFirstChild,
+  isStateSyncronized,
+  ready: networkReady
+} = addSyncTransport(engine, sendBinary, getUserData)
 
-export { getFirstChild, getChildren, syncEntity, parentEntity, getParent, myProfile, removeParent, isStateSyncronized }
+export {
+  getFirstChild,
+  getChildren,
+  syncEntity,
+  parentEntity,
+  getParent,
+  myProfile,
+  removeParent,
+  isStateSyncronized,
+  networkReady
+}

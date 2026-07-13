@@ -5,18 +5,17 @@ import type { GetUserDataRequest, GetUserDataResponse } from '~system/UserIdenti
 import { IProfile } from './message-bus-sync'
 
 // Retrieve userId to start sending this info as the networkId
-export function fetchProfile(
+export async function fetchProfile(
   myProfile: IProfile,
   getUserData: (value: GetUserDataRequest) => Promise<GetUserDataResponse>
-) {
-  void getUserData({}).then(({ data }) => {
-    if (data?.userId) {
-      const userId = data.userId
-      const networkId = componentNumberFromName(data.userId)
-      myProfile.networkId = networkId
-      myProfile.userId = userId
-    } else {
-      throw new Error(`Couldn't fetch profile data`)
-    }
-  })
+): Promise<void> {
+  const { data } = await getUserData({})
+  if (!data?.userId) {
+    throw new Error(`Couldn't fetch profile data`)
+  }
+
+  const userId = data.userId
+  const networkId = componentNumberFromName(userId)
+  myProfile.networkId = networkId
+  myProfile.userId = userId
 }
