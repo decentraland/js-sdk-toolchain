@@ -228,18 +228,35 @@ function getWorldTransformInternal(
   }
 }
 
-function* genEntityTree<T>(entity: Entity, entities: Map<Entity, T & { parent?: Entity }>): Generator<Entity> {
-  // This avoid infinite loop when there is a cyclic parenting
+function* genEntityTree(
+  entity: Entity,
+  entities: Set<Entity>,
+  childrenByParent: Map<Entity, Entity[]>
+): Generator<Entity> {
   if (!entities.has(entity)) return
-  entities.delete(entity)
 
-  for (const [_entity, value] of entities) {
-    if (value.parent === entity) {
-      yield* genEntityTree(_entity, entities)
+  const visited = new Set<Entity>()
+  const stack: Array<{ entity: Entity; expanded: boolean }> = [{ entity, expanded: false }]
+
+  while (stack.length > 0) {
+    const current = stack.pop()!
+
+    if (current.expanded) {
+      yield current.entity
+      continue
+    }
+
+    if (visited.has(current.entity)) continue
+    visited.add(current.entity)
+    stack.push({ entity: current.entity, expanded: true })
+
+    const children = childrenByParent.get(current.entity)
+    if (!children) continue
+
+    for (let i = children.length - 1; i >= 0; i--) {
+      stack.push({ entity: children[i], expanded: false })
     }
   }
-
-  yield entity
 }
 
 /**
@@ -267,8 +284,21 @@ export function getComponentEntityTree<T>(
   entity: Entity,
   component: ComponentDefinition<T & { parent?: Entity }>
 ): Generator<Entity> {
-  const entities = new Map(engine.getEntitiesWith(component))
-  return genEntityTree(entity, entities)
+  const entities = new Set<Entity>()
+  const childrenByParent = new Map<Entity, Entity[]>()
+
+  for (const [currentEntity, value] of engine.getEntitiesWith(component)) {
+    entities.add(currentEntity)
+    const parent = (value as { readonly parent?: Entity }).parent
+
+    if (parent !== undefined) {
+      const children = childrenByParent.get(parent) ?? []
+      children.push(currentEntity)
+      childrenByParent.set(parent, children)
+    }
+  }
+
+  return genEntityTree(entity, entities, childrenByParent)
 }
 
 // I swear by all the gods that this is being tested on test/sdk/network/sync-engines.spec.ts
@@ -280,19 +310,39 @@ function removeNetworkEntityChildrens(
   const NetworkParent = components.NetworkParent(engine)
   const NetworkEntity = components.NetworkEntity(engine)
 
-  // Remove parent
-  engine.removeEntity(parent)
+  const childrenByNetwork = new Map<number, Map<Entity, Entity[]>>()
+  for (const [entity, networkParent] of engine.getEntitiesWith(NetworkParent)) {
+    const childrenByParent = childrenByNetwork.get(networkParent.networkId) ?? new Map<Entity, Entity[]>()
+    const children = childrenByParent.get(networkParent.entityId) ?? []
+    children.push(entity)
+    childrenByParent.set(networkParent.entityId, children)
+    childrenByNetwork.set(networkParent.networkId, childrenByParent)
+  }
 
-  // Remove childs
-  const network = NetworkEntity.getOrNull(parent)
-  if (network) {
-    for (const [entity, parent] of engine.getEntitiesWith(NetworkParent)) {
-      if (parent.entityId === network.entityId && parent.networkId === network.networkId) {
-        removeNetworkEntityChildrens(engine, entity)
-      }
+  // Parent-first, unlike the Transform tree: the recursive version removed each entity
+  // before descending, and sync-engines asserts that message order.
+  const visited = new Set<Entity>()
+  const stack: Entity[] = [parent]
+
+  while (stack.length > 0) {
+    const current = stack.pop()!
+
+    if (visited.has(current)) continue
+    visited.add(current)
+
+    // NetworkEntity survives removeEntity by design, so reading it either side is equivalent.
+    const network = NetworkEntity.getOrNull(current)
+    engine.removeEntity(current)
+
+    if (!network) continue
+
+    const children = childrenByNetwork.get(network.networkId)?.get(network.entityId)
+    if (!children) continue
+
+    for (let i = children.length - 1; i >= 0; i--) {
+      stack.push(children[i])
     }
   }
-  return
 }
 
 /**
