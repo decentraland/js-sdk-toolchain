@@ -83,6 +83,21 @@ describe('Virtual screen size defaults', () => {
     uiRenderer.destroy()
   })
 
+  it('should apply the default virtual size for an addUiRenderer with no options and no main renderer', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    createCanvasInfo(engine, 3840, 2160)
+    const ownerEntity = engine.addEntity()
+
+    // No setUiRenderer at all; only an additional renderer with no options
+    uiRenderer.addUiRenderer(ownerEntity, ui)
+    await engine.update(1)
+
+    // Default 1920x1080 applies → Math.min(3840/1920, 2160/1080) = 2
+    expect(getUiScaleFactor()).toBe(2)
+
+    uiRenderer.destroy()
+  })
+
   it('should disable the virtual screen when the provided size is NaN', async () => {
     const { engine, uiRenderer } = setupEngine()
     createCanvasInfo(engine, 3840, 2160)
