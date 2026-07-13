@@ -229,23 +229,29 @@ function processObservables() {
     switch (eventName) {
       case 'playerClicked': {
         subscribePlayerClick()
+        break
       }
       case 'onEnterScene':
       case 'playerConnected': {
         subscribeEnterScene()
+        break
       }
       case 'onLeaveScene':
       case 'playerDisconnected': {
         subscribeLeaveScene()
+        break
       }
       case 'onRealmChanged': {
         subscribeRealmChange()
+        break
       }
       case 'playerExpression': {
         subscribePlayerExpression()
+        break
       }
       case 'profileChanged': {
         subscribeProfileChange()
+        break
       }
     }
     subscriptions.add(eventName)
