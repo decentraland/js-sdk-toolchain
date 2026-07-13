@@ -9,6 +9,7 @@ import { getObject } from './coordinates'
 import { CliComponents } from '../components'
 import { getPublishableFiles } from './project-files'
 import { printWarning } from './beautiful-logs'
+import { mapWithConcurrency } from './promise-utils'
 
 export interface IFile {
   path: string
@@ -154,23 +155,17 @@ export function getBaseCoords(scene: Scene): { x: number; y: number } {
  */
 export async function getFiles(components: Pick<CliComponents, 'fs' | 'logger'>, dir: string): Promise<IFile[]> {
   const files = await getPublishableFiles(components, dir)
-  const data: IFile[] = []
-
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i]
+  return mapWithConcurrency(files, async (file): Promise<IFile> => {
     const filePath = resolve(dir, file)
     const stat = await components.fs.stat(filePath)
-
     const content = await components.fs.readFile(filePath)
 
-    data.push({
+    return {
       path: file.replace(/\\/g, '/'),
       content: Buffer.from(content),
       size: stat.size
-    })
-  }
-
-  return data
+    }
+  })
 }
 
 export function validateFilesSizes(files: IFile[]) {
