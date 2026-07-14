@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync, readdirSync, readFileSync, removeSync, rmSync, writeFileSync } from 'fs-extra'
+import { copyFileSync, mkdirSync, readFileSync, removeSync, rmSync, writeFileSync } from 'fs-extra'
 import * as path from 'path'
 import { TSC } from '../common'
 import { runCommand } from '../helpers'
@@ -170,13 +170,22 @@ const COMPONENTS_PROTO_PATH = path.resolve(
 // The ecs codegen only compiles (and @dcl/ecs only exports) the common protos that some
 // component proto imports. A common proto used exclusively by kernel APIs has no @dcl/ecs
 // counterpart, so its declarations must stay embedded in apis.d.ts.
+let componentProtoImports: Set<string> | undefined
 function isExportedByEcs(commonModuleName: string): boolean {
-  const protoImport = `import "decentraland/sdk/components/${commonModuleName
-    .replace(/^.*decentraland\/sdk\/components\//, '')
-    .replace(/\.gen$/, '.proto')}"`
-  return readdirSync(COMPONENTS_PROTO_PATH)
-    .filter((file) => file.endsWith('.proto'))
-    .some((file) => readFileSync(path.resolve(COMPONENTS_PROTO_PATH, file)).toString().includes(protoImport))
+  componentProtoImports ??= new Set(
+    getFilePathsSync(COMPONENTS_PROTO_PATH)
+      .filter((file) => file.endsWith('.proto'))
+      .flatMap((file) =>
+        Array.from(
+          readFileSync(path.resolve(COMPONENTS_PROTO_PATH, file))
+            .toString()
+            .matchAll(/^\s*import\s+"decentraland\/sdk\/components\/([^"]+)"/gm),
+          (match) => match[1]
+        )
+      )
+  )
+  const protoFile = commonModuleName.replace(/^.*decentraland\/sdk\/components\//, '').replace(/\.gen$/, '.proto')
+  return componentProtoImports.has(protoFile)
 }
 
 function processDeclarations(apiName: string, filePath: string) {
@@ -212,7 +221,7 @@ function processDeclarations(apiName: string, filePath: string) {
     where += 'declare module'.length
   } while (where)
 
-  let content = blocks.join('\n\t// Function declaration section').replace(/import(.*)\n/g, '')
+  let content = blocks.join('\n\t// Function declaration section').replace(/^[ \t]*import\b(.*)\n/gm, '')
   for (const typeName of typesFromEcs) {
     // '../ecs' is @dcl/ecs, always a sibling of @dcl/js-runtime (both under @dcl/) and the
     // same nominal types that @dcl/sdk/ecs re-exports. Inlined at each reference (instead of
