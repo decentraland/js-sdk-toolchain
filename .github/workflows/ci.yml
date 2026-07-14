@@ -20,25 +20,57 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - uses: actions/checkout@master
+      - name: checkout head
+        uses: actions/checkout@master
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: head
+
+      - name: checkout base
+        uses: actions/checkout@master
+        with:
+          ref: ${{ github.event.pull_request.base.sha || github.event.before }}
+          path: base
+
       - uses: actions/setup-node@v3
         with:
           node-version: 24.16.0
           cache: 'npm'
+          cache-dependency-path: head/package-lock.json
 
-      - name: install
+      - name: install head
+        working-directory: head
         run: make install
 
-      - name: build
+      - name: build head
+        working-directory: head
         run: make build
 
-      - name: run ECS benchmarks
-        run: make benchmark-ecs-json > ecs-benchmark.json
+      - name: install base
+        working-directory: base
+        run: make install
+
+      - name: build base
+        working-directory: base
+        run: make build
+
+      - name: use head benchmark definitions for base
+        run: |
+          mkdir -p base/benchmarks
+          cp -R head/benchmarks/. base/benchmarks/
+
+      - name: benchmark base
+        working-directory: base
+        run: ../head/node_modules/.bin/tsx benchmarks/ecs/index.ts --json > ../ecs-benchmark-base.json
+
+      - name: benchmark head
+        working-directory: head
+        run: make benchmark-ecs-json > ../ecs-benchmark-head.json
 
       - name: render benchmark report
-        run: node_modules/.bin/tsx benchmarks/ecs/format-markdown.ts ecs-benchmark.json > ecs-benchmark.md
+        run: >-
+          head/node_modules/.bin/tsx head/benchmarks/ecs/format-markdown.ts
+          ecs-benchmark-head.json ecs-benchmark-base.json > ecs-benchmark.md
 
       - name: add benchmark report to job summary
         run: cat ecs-benchmark.md >> "$GITHUB_STEP_SUMMARY"
@@ -48,7 +80,8 @@ jobs:
         with:
           name: ecs-benchmark-${{ github.event.pull_request.head.sha || github.sha }}
           path: |
-            ecs-benchmark.json
+            ecs-benchmark-base.json
+            ecs-benchmark-head.json
             ecs-benchmark.md
           retention-days: 30
 

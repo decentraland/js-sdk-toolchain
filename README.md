@@ -96,7 +96,7 @@ Run the standalone ECS benchmark suite with:
 make benchmark-ecs
 ```
 
-The suite reports repeated measurements for entity lifecycles, component queries and mutations, hierarchy removal, and CRDT flushing and routing. See [benchmarks/README.md](benchmarks/README.md) for configuration, JSON output, and branch comparison instructions.
+The suite reports repeated measurements for entity lifecycles, component queries and mutations, hierarchy operations, CRDT send/receive paths, representative frames, and schema serialization. CI compares base and head commits on the same runner and publishes the benchmark table on each pull request commit. See [benchmarks/README.md](benchmarks/README.md) for configuration, JSON output, and comparison details.
 
 ## SDK Version Support
 

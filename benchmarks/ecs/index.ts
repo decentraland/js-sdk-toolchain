@@ -7,6 +7,9 @@ import { BenchmarkDefinition, BenchmarkOptions, BenchmarkReport, BenchmarkResult
 const DEFAULT_ENTITY_COUNT = 10_000
 const DEFAULT_SAMPLES = 10
 const DEFAULT_WARMUPS = 2
+const TARGET_SAMPLE_MILLISECONDS = 100
+const MAX_ITERATIONS_PER_SAMPLE = 250
+const MAX_SETUP_ENTITIES_PER_SAMPLE = 100_000
 
 type CliOptions = BenchmarkOptions & {
   json: boolean
@@ -75,21 +78,40 @@ async function measureBenchmark(benchmark: BenchmarkDefinition, options: Benchma
     await executeTask(benchmark, options)
   }
 
+  const calibrationTask = await benchmark.setup(options)
+  const calibrationStart = performance.now()
+  const calibrationChecksum = await calibrationTask.run()
+  const calibrationElapsed = performance.now() - calibrationStart
+
+  if (!Number.isFinite(calibrationChecksum) || calibrationElapsed <= 0) {
+    throw new Error(`${benchmark.name} produced an invalid calibration sample`)
+  }
+
+  const iterationsPerSample = Math.min(
+    MAX_ITERATIONS_PER_SAMPLE,
+    Math.max(1, Math.floor(MAX_SETUP_ENTITIES_PER_SAMPLE / options.entityCount)),
+    Math.max(1, Math.ceil(TARGET_SAMPLE_MILLISECONDS / calibrationElapsed))
+  )
   const samples: number[] = []
   let operationsPerSample = 0
 
   for (let index = 0; index < options.samples; index++) {
-    const task = await benchmark.setup(options)
-    const start = performance.now()
-    const checksum = await task.run()
-    const elapsed = performance.now() - start
+    let elapsed = 0
 
-    if (!Number.isFinite(checksum) || elapsed <= 0) {
-      throw new Error(`${benchmark.name} produced an invalid sample`)
+    for (let iteration = 0; iteration < iterationsPerSample; iteration++) {
+      const task = await benchmark.setup(options)
+      const start = performance.now()
+      const checksum = await task.run()
+      elapsed += performance.now() - start
+
+      if (!Number.isFinite(checksum)) {
+        throw new Error(`${benchmark.name} produced an invalid sample`)
+      }
+
+      operationsPerSample = task.operations
     }
 
-    operationsPerSample = task.operations
-    samples.push(elapsed)
+    samples.push(elapsed / iterationsPerSample)
   }
 
   const throughputSamples = samples.map((milliseconds) => operationsPerSample / (milliseconds / 1_000))
@@ -98,6 +120,7 @@ async function measureBenchmark(benchmark: BenchmarkDefinition, options: Benchma
     name: benchmark.name,
     description: benchmark.description,
     operationsPerSample,
+    iterationsPerSample,
     samples,
     medianMilliseconds: median(samples),
     p95Milliseconds: percentile(samples, 0.95),
@@ -129,6 +152,9 @@ function printHumanReadable(report: BenchmarkReport): void {
     console.log(`  median: ${formatNumber(result.medianMilliseconds)} ms`)
     console.log(`  p95:    ${formatNumber(result.p95Milliseconds)} ms`)
     console.log(`  rate:   ${formatNumber(result.medianOperationsPerSecond)} ops/s`)
+    if (result.iterationsPerSample > 1) {
+      console.log(`  batch:  ${result.iterationsPerSample} iterations per sample`)
+    }
   }
 }
 

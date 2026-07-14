@@ -19,6 +19,7 @@ export type BenchmarkResult = {
   name: string
   description: string
   operationsPerSample: number
+  iterationsPerSample: number
   samples: number[]
   medianMilliseconds: number
   p95Milliseconds: number
