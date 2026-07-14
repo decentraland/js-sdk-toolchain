@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=406.9k bytes
+SCENE_COMPILED_JS_SIZE_PROD=408.1k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -6,16 +6,17 @@ SCENE_COMPILED_JS_SIZE_PROD=406.9k bytes
 EVAL test/snapshots/production-bundles/ui.js
   REQUIRE: buffer
   REQUIRE: long
+  REQUIRE: ~system/Runtime
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
   OPCODES ~= 88k
-  MALLOC_COUNT = 22279
-  ALIVE_OBJS_DELTA ~= 4.49k
+  MALLOC_COUNT = 22407
+  ALIVE_OBJS_DELTA ~= 4.52k
 CALL onStart()
   OPCODES ~= 0k
-  MALLOC_COUNT = 6
-  ALIVE_OBJS_DELTA ~= 0.00k
+  MALLOC_COUNT = -39
+  ALIVE_OBJS_DELTA ~= -0.01k
 CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   Scene: PUT_COMPONENT e=0x200 c=1062 t=1 data={"pointerEvents":[{"eventType":1,"eventInfo":{"button":1,"hoverText":"Press E to spawn","maxDistance":100,"showFeedback":true}}]}
@@ -66,4 +67,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 74k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1892.00k bytes
+  MEMORY_USAGE_COUNT ~= 1896.18k bytes
