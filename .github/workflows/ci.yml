@@ -59,13 +59,31 @@ jobs:
           mkdir -p base/benchmarks
           cp -R head/benchmarks/. base/benchmarks/
 
-      - name: benchmark base
-        working-directory: base
-        run: ../head/node_modules/.bin/tsx benchmarks/ecs/index.ts --json > ../ecs-benchmark-base.json
-
-      - name: benchmark head
+      - name: typecheck benchmarks
         working-directory: head
-        run: make benchmark-ecs-json > ../ecs-benchmark-head.json
+        run: node_modules/.bin/tsc -p benchmarks/tsconfig.json
+
+      # Base and head run alternately, one round at a time on the same runner,
+      # so slow drift (thermal throttling, a noisy neighbour) lands on both
+      # commits instead of only whichever ran second. --expose-gc lets the
+      # harness collect garbage before each timed iteration to cut variance.
+      - name: run interleaved benchmark rounds
+        env:
+          NODE_OPTIONS: --expose-gc
+          ROUNDS: '3'
+          SAMPLES_PER_ROUND: '4'
+        run: |
+          for round in $(seq 1 "$ROUNDS"); do
+            echo "::group::benchmark round $round"
+            (cd base && ../head/node_modules/.bin/tsx benchmarks/ecs/index.ts --json --samples "$SAMPLES_PER_ROUND" > "../ecs-benchmark-base-$round.json")
+            (cd head && ../head/node_modules/.bin/tsx benchmarks/ecs/index.ts --json --samples "$SAMPLES_PER_ROUND" > "../ecs-benchmark-head-$round.json")
+            echo "::endgroup::"
+          done
+
+      - name: merge benchmark rounds
+        run: |
+          head/node_modules/.bin/tsx head/benchmarks/ecs/merge-reports.ts ecs-benchmark-base-*.json > ecs-benchmark-base.json
+          head/node_modules/.bin/tsx head/benchmarks/ecs/merge-reports.ts ecs-benchmark-head-*.json > ecs-benchmark-head.json
 
       - name: render benchmark report
         run: >-

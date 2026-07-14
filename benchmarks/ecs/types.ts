@@ -23,6 +23,9 @@ export type BenchmarkResult = {
   samples: number[]
   medianMilliseconds: number
   p95Milliseconds: number
+  meanMilliseconds: number
+  standardDeviationMilliseconds: number
+  relativeMarginOfErrorPercent: number
   medianOperationsPerSecond: number
 }
 
@@ -35,6 +38,8 @@ export type BenchmarkReport = {
     entityCount: number
     samples: number
     warmups: number
+    rounds: number
+    garbageCollected: boolean
     timestamp: string
   }
   results: BenchmarkResult[]

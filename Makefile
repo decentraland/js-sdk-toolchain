@@ -68,11 +68,11 @@ test-file:
 
 benchmark-ecs:
 	@$(TSC) -p benchmarks/tsconfig.json
-	@$(TSX) benchmarks/ecs/index.ts $(BENCHMARK_ARGS)
+	@NODE_OPTIONS=--expose-gc $(TSX) benchmarks/ecs/index.ts $(BENCHMARK_ARGS)
 
 benchmark-ecs-json:
 	@$(TSC) -p benchmarks/tsconfig.json
-	@$(TSX) benchmarks/ecs/index.ts --json $(BENCHMARK_ARGS)
+	@NODE_OPTIONS=--expose-gc $(TSX) benchmarks/ecs/index.ts --json $(BENCHMARK_ARGS)
 
 init-test-scene:
 	git clone https://github.com/decentraland/sdk7-scene-template test-scene
