@@ -24,6 +24,8 @@ make benchmark-ecs-json > ecs-benchmark.json
 
 Results include every measured sample, median duration, p95 duration, and median operations per second. Setup is excluded from the timed section, and every sample uses a fresh engine.
 
+CI runs the default benchmark suite for every pull request commit and every push to `main` or `experimental`. The JSON and Markdown reports are uploaded as workflow artifacts and added to the job summary. For branches in this repository, CI also updates a single pull request comment with the latest commit and results table. GitHub does not grant write permission to pull-request workflows from forks, so forked pull requests receive the artifact and job summary without a comment.
+
 ## Compare a change
 
 Wall-clock results vary between machines. Compare the base and feature branches on the same idle machine with the same Node version and arguments:

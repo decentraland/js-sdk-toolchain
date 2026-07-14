@@ -13,6 +13,63 @@ env:
 
 name: CI
 jobs:
+  benchmark-ecs:
+    if: ${{ github.event_name != 'release' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@master
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 24.16.0
+          cache: 'npm'
+
+      - name: install
+        run: make install
+
+      - name: build
+        run: make build
+
+      - name: run ECS benchmarks
+        run: make benchmark-ecs-json > ecs-benchmark.json
+
+      - name: render benchmark report
+        run: node_modules/.bin/tsx benchmarks/ecs/format-markdown.ts ecs-benchmark.json > ecs-benchmark.md
+
+      - name: add benchmark report to job summary
+        run: cat ecs-benchmark.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: ecs-benchmark-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            ecs-benchmark.json
+            ecs-benchmark.md
+          retention-days: 30
+
+      - name: find benchmark comment
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+        uses: peter-evans/find-comment@v3
+        id: benchmark-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '<!-- ecs-benchmark-results -->'
+
+      - name: create or update benchmark comment
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          comment-id: ${{ steps.benchmark-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body-path: ecs-benchmark.md
+          edit-mode: replace
+
   lint:
     runs-on: ubuntu-latest
     steps:
