@@ -3,6 +3,7 @@ import { arch, platform } from 'os'
 import { performance } from 'perf_hooks'
 import { benchmarks } from './workloads'
 import { BenchmarkDefinition, BenchmarkOptions, BenchmarkReport, BenchmarkResult } from './types'
+import { median, summarize } from './statistics'
 
 const DEFAULT_ENTITY_COUNT = 10_000
 const DEFAULT_SAMPLES = 10
@@ -10,46 +11,6 @@ const DEFAULT_WARMUPS = 3
 const TARGET_SAMPLE_MILLISECONDS = 100
 const MAX_ITERATIONS_PER_SAMPLE = 250
 const MAX_SETUP_ENTITIES_PER_SAMPLE = 100_000
-
-// Critical values of Student's t-distribution at the two-tailed 95% confidence
-// level, indexed by degrees of freedom (sample count minus one). Used to turn a
-// sample's standard error into a margin of error, matching the approach popular
-// benchmark runners take. Degrees of freedom beyond the table fall back to the
-// normal-distribution limit.
-const T_DISTRIBUTION_95 = [
-  Infinity,
-  12.706,
-  4.303,
-  3.182,
-  2.776,
-  2.571,
-  2.447,
-  2.365,
-  2.306,
-  2.262,
-  2.228,
-  2.201,
-  2.179,
-  2.16,
-  2.145,
-  2.131,
-  2.12,
-  2.11,
-  2.101,
-  2.093,
-  2.086,
-  2.08,
-  2.074,
-  2.069,
-  2.064,
-  2.06,
-  2.056,
-  2.052,
-  2.048,
-  2.045,
-  2.042
-]
-const T_DISTRIBUTION_LIMIT = 1.96
 
 // Manual garbage collection is exposed by running Node with `--expose-gc`. When
 // available it runs before every timed iteration so heap pressure from a
@@ -96,41 +57,6 @@ function parseArguments(args: string[]): CliOptions {
   }
 
   return options
-}
-
-function percentile(values: number[], quantile: number): number {
-  const sorted = [...values].sort((left, right) => left - right)
-  const index = Math.max(0, Math.ceil(sorted.length * quantile) - 1)
-  return sorted[index]
-}
-
-function median(values: number[]): number {
-  const sorted = [...values].sort((left, right) => left - right)
-  const middle = Math.floor(sorted.length / 2)
-  return sorted.length % 2 === 0 ? (sorted[middle - 1] + sorted[middle]) / 2 : sorted[middle]
-}
-
-function mean(values: number[]): number {
-  return values.reduce((total, value) => total + value, 0) / values.length
-}
-
-function standardDeviation(values: number[], average: number): number {
-  if (values.length < 2) return 0
-  const variance = values.reduce((total, value) => total + (value - average) ** 2, 0) / (values.length - 1)
-  return Math.sqrt(variance)
-}
-
-// Relative margin of error: the half-width of the 95% confidence interval
-// around the mean, expressed as a percentage of the mean. It is the noise floor
-// for a single benchmark — changes smaller than this are indistinguishable from
-// measurement jitter.
-function relativeMarginOfError(values: number[], average: number, deviation: number): number {
-  if (values.length < 2 || average === 0) return 0
-  const degreesOfFreedom = values.length - 1
-  const tValue = T_DISTRIBUTION_95[degreesOfFreedom] ?? T_DISTRIBUTION_LIMIT
-  const standardError = deviation / Math.sqrt(values.length)
-  const marginOfError = tValue * standardError
-  return (marginOfError / average) * 100
 }
 
 async function executeTask(benchmark: BenchmarkDefinition, options: BenchmarkOptions): Promise<number> {
@@ -187,9 +113,8 @@ async function measureBenchmark(benchmark: BenchmarkDefinition, options: Benchma
     samples.push(elapsed / iterationsPerSample)
   }
 
-  const throughputSamples = samples.map((milliseconds) => operationsPerSample / (milliseconds / 1_000))
-  const averageMilliseconds = mean(samples)
-  const deviationMilliseconds = standardDeviation(samples, averageMilliseconds)
+  const summary = summarize(samples)
+  const throughputSamples = summary.trimmed.map((milliseconds) => operationsPerSample / (milliseconds / 1_000))
 
   return {
     name: benchmark.name,
@@ -197,11 +122,11 @@ async function measureBenchmark(benchmark: BenchmarkDefinition, options: Benchma
     operationsPerSample,
     iterationsPerSample,
     samples,
-    medianMilliseconds: median(samples),
-    p95Milliseconds: percentile(samples, 0.95),
-    meanMilliseconds: averageMilliseconds,
-    standardDeviationMilliseconds: deviationMilliseconds,
-    relativeMarginOfErrorPercent: relativeMarginOfError(samples, averageMilliseconds, deviationMilliseconds),
+    medianMilliseconds: summary.median,
+    p95Milliseconds: summary.p95,
+    meanMilliseconds: summary.mean,
+    standardDeviationMilliseconds: summary.standardDeviation,
+    relativeMarginOfErrorPercent: summary.relativeMarginOfErrorPercent,
     medianOperationsPerSecond: median(throughputSamples)
   }
 }

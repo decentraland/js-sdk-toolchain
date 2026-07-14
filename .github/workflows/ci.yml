@@ -71,13 +71,14 @@ jobs:
       # commits instead of only whichever ran second. --expose-gc lets the
       # harness collect garbage before each timed iteration to cut variance.
       # More, shorter rounds keep base and head close together in time so less
-      # drift builds up between them, and pooling the extra samples tightens the
-      # confidence interval on the change.
+      # drift builds up between them, and pooling ~25 samples per commit (of
+      # which the harness trims the slowest fifth) tightens the confidence
+      # interval on the change.
       - name: run interleaved benchmark rounds
         env:
           NODE_OPTIONS: --expose-gc
           ROUNDS: '5'
-          SAMPLES_PER_ROUND: '3'
+          SAMPLES_PER_ROUND: '5'
         run: |
           for round in $(seq 1 "$ROUNDS"); do
             echo "::group::benchmark round $round"
