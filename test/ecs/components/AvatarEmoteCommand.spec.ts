@@ -1,8 +1,8 @@
 ﻿import { AvatarMask, Engine, components } from '../../../packages/@dcl/ecs/src'
 import { testSchemaSerializationIdentity } from './assertion'
 
-describe('Generated PointerEventsResult ProtoBuf', () => {
-  it('should serialize/deserialize PointerEventsResult', () => {
+describe('Generated AvatarEmoteCommand ProtoBuf', () => {
+  it('should serialize/deserialize AvatarEmoteCommand', () => {
     const newEngine = Engine()
     const AvatarEmoteCommand = components.AvatarEmoteCommand(newEngine)
     // AvatarEmoteCommand.addValue()
