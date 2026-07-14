@@ -60,7 +60,7 @@ function median(values: number[]): number {
 }
 
 async function executeTask(benchmark: BenchmarkDefinition, options: BenchmarkOptions): Promise<number> {
-  const task = benchmark.setup(options)
+  const task = await benchmark.setup(options)
   const checksum = await task.run()
 
   if (!Number.isFinite(checksum)) {
@@ -79,7 +79,7 @@ async function measureBenchmark(benchmark: BenchmarkDefinition, options: Benchma
   let operationsPerSample = 0
 
   for (let index = 0; index < options.samples; index++) {
-    const task = benchmark.setup(options)
+    const task = await benchmark.setup(options)
     const start = performance.now()
     const checksum = await task.run()
     const elapsed = performance.now() - start

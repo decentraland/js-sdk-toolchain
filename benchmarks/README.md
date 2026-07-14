@@ -43,8 +43,10 @@ Run each branch more than once when a difference is small. The suite currently r
 ## Workloads
 
 - Entity creation with one map component
-- Two-component queries with a 50% match rate
+- Entity removal with one map component
+- One-, two-, and three-component queries with dense and sparse match rates
 - Mutable component updates
-- CRDT serialization and transport flushing
+- Wide entity hierarchy removal
+- CRDT serialization, unchanged-mutable suppression, and multi-transport routing
 
 Use deterministic input data and keep setup outside the timed section when adding a workload. Prefer one isolated ECS behavior per benchmark so regressions have an identifiable source.

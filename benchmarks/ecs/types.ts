@@ -12,7 +12,7 @@ export type BenchmarkTask = {
 export type BenchmarkDefinition = {
   name: string
   description: string
-  setup(options: BenchmarkOptions): BenchmarkTask
+  setup(options: BenchmarkOptions): BenchmarkTask | Promise<BenchmarkTask>
 }
 
 export type BenchmarkResult = {
