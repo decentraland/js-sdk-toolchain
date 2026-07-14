@@ -162,17 +162,56 @@ async function preprocessProtoGeneration(protoPath: string) {
   return apis
 }
 
+const COMPONENTS_PROTO_PATH = path.resolve(
+  __dirname,
+  '../../node_modules/@dcl/protocol/proto/decentraland/sdk/components'
+)
+
+// The ecs codegen only compiles (and @dcl/ecs only exports) the common protos that some
+// component proto imports. A common proto used exclusively by kernel APIs has no @dcl/ecs
+// counterpart, so its declarations must stay embedded in apis.d.ts.
+let componentProtoImports: Set<string> | undefined
+function isExportedByEcs(commonModuleName: string): boolean {
+  componentProtoImports ??= new Set(
+    getFilePathsSync(COMPONENTS_PROTO_PATH)
+      .filter((file) => file.endsWith('.proto'))
+      .flatMap((file) =>
+        Array.from(
+          readFileSync(path.resolve(COMPONENTS_PROTO_PATH, file))
+            .toString()
+            .matchAll(/^\s*import\s+"decentraland\/sdk\/components\/([^"]+)"/gm),
+          (match) => match[1]
+        )
+      )
+  )
+  const protoFile = commonModuleName.replace(/^.*decentraland\/sdk\/components\//, '').replace(/\.gen$/, '.proto')
+  return componentProtoImports.has(protoFile)
+}
+
 function processDeclarations(apiName: string, filePath: string) {
   const decFile = readFileSync(filePath).toString()
 
   const blocks: string[] = []
+  const typesFromEcs: Set<string> = new Set()
   let where = 0
   do {
     where = decFile.indexOf('declare module', where)
     if (where !== -1) {
+      const moduleName = decFile.slice(where).match(/^declare module "([^"]+)"/)?.[1] ?? ''
       const block = getBlock(decFile, where).replace(/export const protobufPackage (.*)\n/, '')
       if (block.length > 0) {
-        blocks.push(block)
+        if (moduleName.includes('decentraland/sdk/components/common/') && isExportedByEcs(moduleName)) {
+          // Nominal types (enums) shared with sdk components are already exported by
+          // @dcl/sdk/ecs. Import them instead of re-declaring, so a value typed with the
+          // @dcl/sdk/ecs declaration is assignable to the RPC request fields.
+          for (const [, typeName] of block.matchAll(
+            /export\s+(?:declare\s+)?(?:const\s+)?(?:enum|interface|type|class)\s+(\w+)/g
+          )) {
+            typesFromEcs.add(typeName)
+          }
+        } else {
+          blocks.push(block)
+        }
       } else {
         throw new Error('bad block')
       }
@@ -182,6 +221,12 @@ function processDeclarations(apiName: string, filePath: string) {
     where += 'declare module'.length
   } while (where)
 
-  const content = blocks.join('\n\t// Function declaration section').replace(/import(.*)\n/g, '')
+  let content = blocks.join('\n\t// Function declaration section').replace(/^[ \t]*import\b(.*)\n/gm, '')
+  for (const typeName of typesFromEcs) {
+    // '../ecs' is @dcl/ecs, always a sibling of @dcl/js-runtime (both under @dcl/) and the
+    // same nominal types that @dcl/sdk/ecs re-exports. Inlined at each reference (instead of
+    // a local alias) because everything declared in an ambient module is importable from it.
+    content = content.replace(new RegExp(`\\b${typeName}\\b`, 'g'), `import('../ecs').${typeName}`)
+  }
   writeFileSync(filePath, `declare module "~system/${apiName}" {\n${content}\n}`)
 }
