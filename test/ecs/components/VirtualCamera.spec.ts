@@ -11,7 +11,8 @@ describe('VirtualCamera component', () => {
           time: 3
         }
       },
-      lookAtEntity: 35
+      lookAtEntity: 35,
+      fov: 45
     })
   })
 
@@ -22,7 +23,8 @@ describe('VirtualCamera component', () => {
       defaultTransition: {
         transitionMode: vCamera.Transition.Time(6)
       },
-      lookAtEntity: 86
+      lookAtEntity: 86,
+      fov: 50
     })
   })
 
@@ -35,7 +37,8 @@ describe('VirtualCamera component', () => {
           speed: 13
         }
       },
-      lookAtEntity: 86
+      lookAtEntity: 86,
+      fov: 30
     })
   })
 
@@ -46,7 +49,8 @@ describe('VirtualCamera component', () => {
       defaultTransition: {
         transitionMode: vCamera.Transition.Speed(15)
       },
-      lookAtEntity: 86
+      lookAtEntity: 86,
+      fov: 48
     })
   })
 })
