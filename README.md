@@ -88,6 +88,16 @@ We use snapshot testing with golden files to track runtime performance impacts:
 make test
 ```
 
+### ECS Performance Benchmarks
+
+Run the standalone ECS benchmark suite with:
+
+```bash
+make benchmark-ecs
+```
+
+The suite reports repeated measurements for entity creation, component queries and mutations, and CRDT flushing. See [benchmarks/README.md](benchmarks/README.md) for configuration, JSON output, and branch comparison instructions.
+
 ## SDK Version Support
 
 ### SDK7

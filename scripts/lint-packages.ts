@@ -9,6 +9,7 @@ const shouldFix = args.includes('--fix')
 
 // Packages that should be linted
 const packages = [
+  'benchmarks',
   'packages/@dcl/ecs',
   'packages/@dcl/sdk',
   'packages/@dcl/sdk-commands',

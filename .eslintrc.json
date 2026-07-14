@@ -8,6 +8,7 @@
       "packages/@dcl/sdk/tsconfig.json",
       "packages/@dcl/playground-assets/tsconfig.json",
       "packages/@dcl/react-ecs/tsconfig.json",
+      "benchmarks/tsconfig.json",
       "scripts/tsconfig.json",
       "test/tsconfig.json",
       "test/ecs/snippets/tsconfig.json"
@@ -29,6 +30,7 @@
   "overrides": [
     {
       "files": [
+        "benchmarks/**/*.ts",
         "packages/@dcl/ecs/**/*.ts",
         "packages/@dcl/sdk/**/*.ts",
         "scripts/**/*.ts",
