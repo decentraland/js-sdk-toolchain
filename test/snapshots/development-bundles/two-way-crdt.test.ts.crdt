@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=564.4k bytes
+SCENE_COMPILED_JS_SIZE_PROD=565.2k bytes
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -12,7 +12,7 @@ EVAL test/snapshots/development-bundles/two-way-crdt.test.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
   OPCODES ~= 66k
-  MALLOC_COUNT = 16753
+  MALLOC_COUNT = 16759
   ALIVE_OBJS_DELTA ~= 3.33k
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
@@ -63,4 +63,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 5k
   MALLOC_COUNT = -61
   ALIVE_OBJS_DELTA ~= -0.01k
-  MEMORY_USAGE_COUNT ~= 1414.53k bytes
+  MEMORY_USAGE_COUNT ~= 1415.49k bytes
