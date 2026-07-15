@@ -9,7 +9,7 @@ jest.mock(
 )
 
 import { runScripts } from '../../../packages/@dcl/sdk-commands/src/logic/runtime-script'
-import { IEngine, Entity, EntityState } from '../../../packages/@dcl/ecs/dist-cjs'
+import { IEngine, Entity, EntityState } from '../../../packages/@dcl/ecs/dist'
 
 describe('runtime-script', () => {
   let mockEngine: IEngine

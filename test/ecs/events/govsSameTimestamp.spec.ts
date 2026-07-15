@@ -237,7 +237,7 @@ describe('GrowOnlyValueSet same-timestamp behavior', () => {
       })
     }
 
-    it('should fire all callbacks when multiple events share the same timestamp', async () => {
+    it('should fire callbacks for ENTER and EXIT wire events sharing the same timestamp; wire-STAY is ignored', async () => {
       const entity = engine.addEntity()
       TriggerArea.setBox(entity)
 
@@ -255,11 +255,12 @@ describe('GrowOnlyValueSet same-timestamp behavior', () => {
       await engine.update(1)
 
       expect(onEnter).toHaveBeenCalledTimes(1)
-      expect(onStay).toHaveBeenCalledTimes(1)
+      // wire-STAY is ignored; EXIT removes triggerer before Pass 2 runs, so onStay = 0.
+      expect(onStay).toHaveBeenCalledTimes(0)
       expect(onExit).toHaveBeenCalledTimes(1)
     })
 
-    it('should preserve insertion order for same-timestamp events', async () => {
+    it('should preserve insertion order for same-timestamp ENTER/EXIT events; wire-STAY produces no callback', async () => {
       const entity = engine.addEntity()
       TriggerArea.setBox(entity)
 
@@ -274,10 +275,11 @@ describe('GrowOnlyValueSet same-timestamp behavior', () => {
 
       await engine.update(1)
 
-      expect(callOrder).toEqual(['enter', 'stay', 'exit'])
+      // wire-STAY is ignored; EXIT removes triggerer before Pass 2 synthesizes any stay.
+      expect(callOrder).toEqual(['enter', 'exit'])
     })
 
-    it('should not re-fire callbacks for already-consumed same-timestamp events on the next tick', async () => {
+    it('should not re-fire ENTER for already-consumed same-timestamp events on the next tick', async () => {
       const entity = engine.addEntity()
       TriggerArea.setBox(entity)
 
@@ -287,15 +289,18 @@ describe('GrowOnlyValueSet same-timestamp behavior', () => {
       triggerAreaEventsSystem.onTriggerStay(entity, onStay)
 
       addTriggerResult(entity, TriggerAreaEventType.TAET_ENTER, 10)
+      // wire-STAY is silently ignored; only the ENTER advances state.
       addTriggerResult(entity, TriggerAreaEventType.TAET_STAY, 10)
 
+      // Tick 1: ENTER fires once, Pass 2 synthesizes one onStay.
       await engine.update(1)
       expect(onEnter).toHaveBeenCalledTimes(1)
       expect(onStay).toHaveBeenCalledTimes(1)
 
+      // Tick 2: no new wire events — ENTER does not re-fire; Pass 2 synthesizes another onStay.
       await engine.update(1)
       expect(onEnter).toHaveBeenCalledTimes(1)
-      expect(onStay).toHaveBeenCalledTimes(1)
+      expect(onStay).toHaveBeenCalledTimes(2)
     })
 
     it('should handle multiple same-timestamp enter events from different trigger entities', async () => {
