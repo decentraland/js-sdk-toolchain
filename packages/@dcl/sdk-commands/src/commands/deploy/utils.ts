@@ -113,7 +113,9 @@ export async function deployWithSingleWorldScene(
   contentUrl: string,
   timeout: number
 ): Promise<undici.Response> {
-  const form = await client.buildEntityFormDataForDeployment(deployData)
+  // Pass the timeout through so the internal hashesAlreadyOnServer check is bounded too, matching
+  // client.deploy (which forwards its request options into buildEntityFormDataForDeployment).
+  const form = await client.buildEntityFormDataForDeployment(deployData, { timeout })
   const url = `${contentUrl.replace(/\/$/, '')}/entities?single_world_scene=true`
   return createFetchComponent().fetch(url, { method: 'POST', body: form as any, timeout })
 }
