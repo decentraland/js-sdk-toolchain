@@ -103,6 +103,38 @@ describe('ScreenInsetArea React Ecs', () => {
     uiRenderer.destroy()
   })
 
+  it('keeps its position in canvas pixels when the UI scale factor is not 1', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const UiCanvasInformation = components.UiCanvasInformation(engine)
+    const entityIndex = engine.addEntity() as number
+    const rootDivEntity = (entityIndex + 1) as Entity
+
+    // Canvas at 2x the default 1920x1080 virtual screen -> scale factor 2. The
+    // stored position must still equal the raw canvas-px insets: they are
+    // pre-divided by the scale factor so the px parser's multiplication cancels out.
+    UiCanvasInformation.create(engine.RootEntity, {
+      devicePixelRatio: 1,
+      width: 3840,
+      height: 2160,
+      interactableArea: undefined,
+      screenInsetArea: { top: 24, left: 12, right: 16, bottom: 32 }
+    })
+
+    uiRenderer.setUiRenderer(() => <ScreenInsetArea />)
+    await engine.update(1)
+
+    expect(UiTransform.get(rootDivEntity)).toMatchObject({
+      positionType: YGPositionType.YGPT_ABSOLUTE,
+      positionTop: 24,
+      positionLeft: 12,
+      positionRight: 16,
+      positionBottom: 32
+    })
+
+    uiRenderer.destroy()
+  })
+
   it('forwards user uiTransform props but ignores positionType / position overrides', async () => {
     const { engine, uiRenderer } = setupEngine()
     const UiTransform = components.UiTransform(engine)
