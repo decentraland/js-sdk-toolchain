@@ -105,7 +105,7 @@ export async function getCatalyst(
  * world is never emptied, so its place — and any env variables bound to that place's id — is preserved.
  *
  * `client.deploy` POSTs to a fixed `/entities` URL and cannot carry a query param, so this builds the
- * same multipart deployment form the client would and POSTs it to `/entities?singleWorldScene=true`.
+ * same multipart deployment form the client would and POSTs it to `/entities?single_world_scene=true`.
  */
 export async function deployWithSingleWorldScene(
   client: ContentClient,
@@ -114,7 +114,7 @@ export async function deployWithSingleWorldScene(
   timeout: number
 ): Promise<undici.Response> {
   const form = await client.buildEntityFormDataForDeployment(deployData)
-  const url = `${contentUrl.replace(/\/$/, '')}/entities?singleWorldScene=true`
+  const url = `${contentUrl.replace(/\/$/, '')}/entities?single_world_scene=true`
   return createFetchComponent().fetch(url, { method: 'POST', body: form as any, timeout })
 }
 
