@@ -482,7 +482,7 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
         )
 
         return {
-          loader: 'js',
+          loader: 'ts',
           contents,
           watchFiles,
           resolveDir: options.workingDirectory
@@ -557,26 +557,14 @@ function collectScriptData(
 }
 
 /**
- * Reads and prepares the runtime script code for inlining
+ * Reads the runtime script TypeScript source for inlining as ESM
  */
 async function prepareRuntimeCode(fs: BundleComponents['fs']): Promise<string> {
-  const runtimeCodePath = require.resolve('./runtime-script')
+  const runtimeCodePath = path.join(__dirname, 'runtime-script.ts')
   const runtimeCode = await fs.readFile(runtimeCodePath, 'utf-8')
 
-  // Strip CommonJS/module system code
-  return (
-    runtimeCode
-      .replace(/"use strict";?\s*/g, '')
-      .replace(/Object\.defineProperty\(exports,.*?\);?\s*/g, '')
-      .replace(/exports\.\w+\s*=\s*void 0;?\s*/g, '')
-      .replace(/exports\.\w+\s*=\s*/g, '')
-      .replace(/^export\s+/gm, '')
-      .replace(/^import\s+.*$/gm, '')
-      // fix nested asset-packs path (importing from @dcl/inspector is banned in runtime, but @dcl/asset-packs not)
-      .replace(/@dcl\/inspector\/node_modules\/@dcl\/asset-packs/g, '@dcl/asset-packs')
-      .replace(/\n{3,}/g, '\n\n')
-      .trim()
-  )
+  // fix nested asset-packs path (importing from @dcl/inspector is banned in scene bundles, @dcl/asset-packs is not)
+  return runtimeCode.replace(/@dcl\/inspector\/node_modules\/@dcl\/asset-packs/g, '@dcl/asset-packs')
 }
 
 /**
@@ -636,9 +624,6 @@ export function _initializeScripts(engine) {
   const scriptsArray = ${scriptsArray}
   return runScripts(engine, scriptsArray)
 }
-
-// export helper functions that are defined in the inlined runtime code
-export { getScriptInstance, getScriptInstancesByPath, getAllScriptInstances, callScriptMethod }
 `
 }
 

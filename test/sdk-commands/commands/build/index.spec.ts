@@ -136,9 +136,10 @@ describe('bundle script utilities', () => {
       expect(result.contents).toContain('export function _initializeScripts(engine)')
       expect(result.contents).toContain('const scriptsArray = []')
       expect(result.contents).toContain('return runScripts(engine, scriptsArray)')
-      expect(result.contents).toContain(
-        'export { getScriptInstance, getScriptInstancesByPath, getAllScriptInstances, callScriptMethod }'
-      )
+      expect(result.contents).toContain('export function getScriptInstance(')
+      expect(result.contents).toContain('export function getScriptInstancesByPath(')
+      expect(result.contents).toContain('export function getAllScriptInstances(')
+      expect(result.contents).toContain('export function callScriptMethod(')
       expect(result.watchFiles).toEqual([])
     })
 
@@ -156,9 +157,10 @@ describe('bundle script utilities', () => {
       expect(result.contents).toContain('export function _initializeScripts(engine)')
       expect(result.contents).toContain('const scriptsArray = []')
       expect(result.contents).toContain('return runScripts(engine, scriptsArray)')
-      expect(result.contents).toContain(
-        'export { getScriptInstance, getScriptInstancesByPath, getAllScriptInstances, callScriptMethod }'
-      )
+      expect(result.contents).toContain('export function getScriptInstance(')
+      expect(result.contents).toContain('export function getScriptInstancesByPath(')
+      expect(result.contents).toContain('export function getAllScriptInstances(')
+      expect(result.contents).toContain('export function callScriptMethod(')
       expect(result.watchFiles).toEqual([])
     })
 
