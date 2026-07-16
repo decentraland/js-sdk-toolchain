@@ -284,7 +284,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
     logOverride: {
       'import-is-undefined': 'silent'
     },
-    plugins: [compositeLoader(components, options)],
+    plugins: [compositeLoader(components, options, editorScene)],
     stdin: {
       contents: getEntrypointCode(options.entrypoint, options.customEntryPoint, editorScene),
       resolveDir: path.dirname(options.entrypoint),
@@ -406,7 +406,11 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
   return typeCheckerFuture
 }
 
-function compositeLoader(components: BundleComponents, options: SingleProjectOptions): esbuild.Plugin {
+function compositeLoader(
+  components: BundleComponents,
+  options: SingleProjectOptions,
+  editorScene: boolean
+): esbuild.Plugin {
   let shouldReload = true
   let compositeData: Awaited<ReturnType<typeof getAllComposites>> | null = null
 
@@ -478,7 +482,8 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
         const { contents, watchFiles } = await generateInitializeScriptsModule(
           components,
           options.workingDirectory,
-          compositeData
+          compositeData,
+          { editorScene }
         )
 
         return {
@@ -624,6 +629,34 @@ async function updateSdkTypeDeclarations(
 }
 
 /**
+ * Minimal '~sdk/script-utils' for scenes with no scripts: same export surface,
+ * empty-registry semantics, no embedded script runtime (skips the
+ * @dcl/asset-packs payload and its glue).
+ */
+function generateScriptStubModuleContent(): string {
+  return `
+export function _initializeScripts(_engine) {}
+
+export function getScriptInstance(_entity, _scriptPath) {
+  return null
+}
+
+export function getScriptInstancesByPath(_scriptPath) {
+  return []
+}
+
+export function getAllScriptInstances(_entity) {
+  return []
+}
+
+export function callScriptMethod(entity, scriptPath, methodName, ..._args) {
+  console.error(\`Method \${methodName} not found on script \${scriptPath} for entity \${entity}\`)
+  return undefined
+}
+`
+}
+
+/**
  * Generates the virtual module content with script initialization and helper functions
  */
 function generateVirtualModuleContent(runtimeImports: string, runtimeCode: string, scriptsArray: string): string {
@@ -645,13 +678,23 @@ export { getScriptInstance, getScriptInstancesByPath, getAllScriptInstances, cal
 export async function generateInitializeScriptsModule(
   components: BundleComponents,
   workingDirectory: string,
-  compositeData: { scripts: Map<string, Script[]>; [key: string]: any } | null
+  compositeData: { scripts: Map<string, Script[]>; [key: string]: any } | null,
+  opts?: { editorScene?: boolean }
 ): Promise<{ contents: string; watchFiles: string[] }> {
-  // prepare runtime code (always needed for helper functions)
+  const hasScripts = !!compositeData && compositeData.scripts.size > 0
+
+  // scriptless non-editor scenes skip the embedded script runtime entirely
+  if (!hasScripts && !opts?.editorScene) {
+    return {
+      contents: generateScriptStubModuleContent(),
+      watchFiles: []
+    }
+  }
+
   const runtimeCode = await prepareRuntimeCode(components.fs)
 
   // default empty implementation if no scripts
-  if (!compositeData || compositeData.scripts.size === 0) {
+  if (!hasScripts) {
     return {
       contents: generateVirtualModuleContent('', runtimeCode, '[]'),
       watchFiles: []

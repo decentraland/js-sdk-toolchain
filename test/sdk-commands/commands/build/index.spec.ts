@@ -127,22 +127,23 @@ describe('bundle script utilities', () => {
       }
     })
 
-    it('should generate _initializeScripts with empty array and helper exports when no scripts are found', async () => {
+    it('should generate a stub module without the script runtime when no scripts are found', async () => {
       const compositeData = null
 
       const result = await generateInitializeScriptsModule(mockComponents, '/test/project', compositeData)
 
-      expect(result.contents).toContain('function runScripts(')
-      expect(result.contents).toContain('export function _initializeScripts(engine)')
-      expect(result.contents).toContain('const scriptsArray = []')
-      expect(result.contents).toContain('return runScripts(engine, scriptsArray)')
-      expect(result.contents).toContain(
-        'export { getScriptInstance, getScriptInstancesByPath, getAllScriptInstances, callScriptMethod }'
-      )
+      expect(result.contents).toContain('export function _initializeScripts(')
+      expect(result.contents).toContain('export function getScriptInstance(')
+      expect(result.contents).toContain('export function getScriptInstancesByPath(')
+      expect(result.contents).toContain('export function getAllScriptInstances(')
+      expect(result.contents).toContain('export function callScriptMethod(')
+      expect(result.contents).not.toContain('runScripts(')
+      expect(result.contents).not.toContain('@dcl/asset-packs')
+      expect(result.contents).not.toContain('require(')
       expect(result.watchFiles).toEqual([])
     })
 
-    it('should generate _initializeScripts with empty array and helper exports when compositeData has no scripts', async () => {
+    it('should generate a stub module without the script runtime when compositeData has no scripts', async () => {
       const compositeData = {
         scripts: new Map(),
         compositeLines: [],
@@ -151,6 +152,29 @@ describe('bundle script utilities', () => {
       }
 
       const result = await generateInitializeScriptsModule(mockComponents, '/test/project', compositeData)
+
+      expect(result.contents).toContain('export function _initializeScripts(')
+      expect(result.contents).toContain('export function getScriptInstance(')
+      expect(result.contents).toContain('export function getScriptInstancesByPath(')
+      expect(result.contents).toContain('export function getAllScriptInstances(')
+      expect(result.contents).toContain('export function callScriptMethod(')
+      expect(result.contents).not.toContain('runScripts(')
+      expect(result.contents).not.toContain('@dcl/asset-packs')
+      expect(result.contents).not.toContain('require(')
+      expect(result.watchFiles).toEqual([])
+    })
+
+    it('should keep the full runtime module for editor scenes without scripts', async () => {
+      const compositeData = {
+        scripts: new Map(),
+        compositeLines: [],
+        watchFiles: [],
+        withErrors: false
+      }
+
+      const result = await generateInitializeScriptsModule(mockComponents, '/test/project', compositeData, {
+        editorScene: true
+      })
 
       expect(result.contents).toContain('function runScripts(')
       expect(result.contents).toContain('export function _initializeScripts(engine)')
