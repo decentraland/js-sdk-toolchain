@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
-import { IEngine, Entity, EntityState } from '@dcl/ecs/dist-cjs'
+import type { IEngine, Entity } from '@dcl/ecs'
+import { EntityState } from '@dcl/ecs/dist-cjs/engine/entity'
 import { type ActionRef, getActionEvents } from '@dcl/inspector/node_modules/@dcl/asset-packs'
 
 declare global {

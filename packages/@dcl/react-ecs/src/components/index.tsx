@@ -14,12 +14,14 @@ export * from './Dropdown/types'
 export * from './Label/types'
 export * from './Button/types'
 export * from './ScreenInsetArea/types'
+export * from './InteractableArea/types'
 
 export { Dropdown } from './Dropdown'
 export { Input } from './Input'
 export { Label, scaleFontSize } from './Label'
 export { Button } from './Button'
 export { ScreenInsetArea } from './ScreenInsetArea'
+export { InteractableArea } from './InteractableArea'
 
 /**
  * @public

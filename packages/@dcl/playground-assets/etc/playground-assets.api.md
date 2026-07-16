@@ -214,12 +214,19 @@ export const AvatarEquippedData: LastWriteWinElementSetComponentDefinition<PBAva
 export const AvatarLocomotionSettings: LastWriteWinElementSetComponentDefinition<PBAvatarLocomotionSettings>;
 
 // @public (undocumented)
+export const enum AvatarMask {
+    // (undocumented)
+    AM_UPPER_BODY = 0
+}
+
+// @public (undocumented)
 export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>;
 
 // @public (undocumented)
 export const enum AvatarModifierType {
     AMT_DISABLE_PASSPORTS = 1,
-    AMT_HIDE_AVATARS = 0
+    AMT_HIDE_AVATARS = 0,
+    AMT_HIDE_NAMETAGS = 2
 }
 
 // @public (undocumented)
@@ -1670,6 +1677,11 @@ export type InstanceCompositeOptions = {
     alreadyRequestedSrc?: Set<string>;
 };
 
+// Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
+//
+// @public
+export function InteractableArea(props: UiInteractableAreaProps): ReactEcs.JSX.Element;
+
 // @public (undocumented)
 export const enum InteractionType {
     // (undocumented)
@@ -2588,6 +2600,8 @@ export interface PBAvatarEmoteCommand {
     emoteUrn: string;
     // (undocumented)
     loop: boolean;
+    // (undocumented)
+    mask?: AvatarMask | undefined;
     timestamp: number;
 }
 
@@ -2678,6 +2692,7 @@ export namespace PBAvatarShape {
 // @public (undocumented)
 export interface PBBillboard {
     billboardMode?: BillboardMode | undefined;
+    targetEntity?: number | undefined;
 }
 
 // @public (undocumented)
@@ -5364,6 +5379,11 @@ export interface UiInputProps extends Omit<PBUiInput, 'font' | 'textAlign' | 'fo
 
 // @public (undocumented)
 export const UiInputResult: LastWriteWinElementSetComponentDefinition<PBUiInputResult>;
+
+// @public
+export type UiInteractableAreaProps = Omit<EntityPropTypes, 'uiTransform'> & {
+    uiTransform?: Omit<NonNullable<EntityPropTypes['uiTransform']>, 'positionType' | 'position'>;
+};
 
 // @public
 export interface UiLabelProps {
