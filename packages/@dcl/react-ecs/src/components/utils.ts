@@ -110,6 +110,22 @@ export function resetUiScaleFactor(owner?: symbol): void {
 }
 
 /**
+ * Divides an inset area by the current UI scale factor.
+ *
+ * Inset areas are reported by the renderer in canvas pixels, but raw pixel
+ * values in `uiTransform` props are multiplied by the UI scale factor when
+ * parsed. Pre-dividing cancels that multiplication out, so the values sent to
+ * the renderer stay in canvas pixels regardless of the virtual screen.
+ *
+ * @internal
+ */
+export function compensateInsetForUiScale(area: BorderRect): BorderRect {
+  const scale = getUiScaleFactor()
+  const factor = scale > 0 ? scale : 1
+  return { top: area.top / factor, left: area.left / factor, right: area.right / factor, bottom: area.bottom / factor }
+}
+
+/**
  * @internal
  */
 export function getScreenInsetArea(): BorderRect {

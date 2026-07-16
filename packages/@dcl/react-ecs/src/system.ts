@@ -12,6 +12,7 @@ import {
   setScreenInsetArea,
   setUiScaleFactor
 } from './components/utils'
+import { InteractableArea, ScreenInsetArea } from './components'
 import { isMobile } from './platform'
 
 // react-ecs compiles with `types: []` (no runtime typings), so the console
@@ -24,9 +25,31 @@ declare const console: { log(message: string): void }
 export type UiComponent = () => ReactEcs.JSX.ReactNode
 
 /**
+ * Screen area used to position a renderer's UI entities:
+ * - `'device'`: the device safe area (excludes notch, status bar, rounded corners),
+ *   reported in `UiCanvasInformation.screenInsetArea`.
+ * - `'interactable'`: the area free of the Explorer's native HUD (minimap, chat, ...),
+ *   reported in `UiCanvasInformation.interactableArea`.
+ * - `'none'`: the whole screen, with 0,0 at its top-left corner.
+ * @public
+ */
+export type UiScreenInset = 'device' | 'interactable' | 'none'
+
+/**
  * @public
  */
 export type UiRendererOptions = {
+  virtualWidth?: number
+  virtualHeight?: number
+  /**
+   * Screen area the renderer's UI is positioned in. Defaults to `'none'` (whole screen).
+   * Each renderer honors its own value, so the main UI and additional renderers can
+   * use different insets simultaneously.
+   */
+  screenInset?: UiScreenInset
+}
+
+type VirtualSize = {
   virtualWidth: number
   virtualHeight: number
 }
@@ -36,18 +59,22 @@ export type UiRendererOptions = {
  * virtual screens are overridden to on mobile (phone screens are much wider
  * than 16:9, so a 16:9 virtual canvas would letterbox the UI).
  */
-const DEFAULT_MOBILE_VIRTUAL_SIZE: UiRendererOptions = { virtualWidth: 1600, virtualHeight: 720 }
+const DEFAULT_MOBILE_VIRTUAL_SIZE: VirtualSize = { virtualWidth: 1600, virtualHeight: 720 }
 
 /**
  * Default virtual screen size used on non-mobile platforms.
  */
-const DEFAULT_VIRTUAL_SIZE: UiRendererOptions = { virtualWidth: 1920, virtualHeight: 1080 }
+const DEFAULT_VIRTUAL_SIZE: VirtualSize = { virtualWidth: 1920, virtualHeight: 1080 }
 
-function isValidVirtualSize(options: UiRendererOptions | undefined): options is UiRendererOptions {
-  return !!options && options.virtualWidth > 0 && options.virtualHeight > 0
+function hasVirtualSize(options: UiRendererOptions | undefined): boolean {
+  return !!options && (options.virtualWidth !== undefined || options.virtualHeight !== undefined)
 }
 
-function is16by9(options: UiRendererOptions): boolean {
+function isValidVirtualSize(options: UiRendererOptions | undefined): options is UiRendererOptions & VirtualSize {
+  return !!options && (options.virtualWidth ?? 0) > 0 && (options.virtualHeight ?? 0) > 0
+}
+
+function is16by9(options: VirtualSize): boolean {
   return options.virtualWidth * 9 === options.virtualHeight * 16
 }
 
@@ -66,6 +93,9 @@ export interface ReactBasedUiSystem {
    * mobile, 1920x1080 otherwise. Providing an invalid size (values \<= 0)
    * disables the virtual screen (no UI scaling). On mobile, a provided 16:9
    * virtual size is overridden to 1600x720 to fit phone screens.
+   *
+   * The optional `screenInset` selects the screen area the UI is positioned in
+   * (see {@link UiScreenInset}); it defaults to `'none'` (whole screen).
    */
   setUiRenderer(ui: UiComponent, options?: UiRendererOptions): void
   /**
@@ -82,6 +112,7 @@ export interface ReactBasedUiSystem {
    * @param ui - The UI component to render
    * @param options - Optional virtual size used for UI scale factor when main UI has none.
    *                  Defaults and the mobile 16:9 override behave as in {@link ReactBasedUiSystem.setUiRenderer}.
+   *                  `screenInset` is honored per renderer, independently of the main UI's value.
    */
   addUiRenderer(entity: Entity, ui: UiComponent, options?: UiRendererOptions): void
   /**
@@ -98,7 +129,7 @@ export interface ReactBasedUiSystem {
 export function createReactBasedUiSystem(engine: IEngine, pointerSystem: PointerEventsSystem): ReactBasedUiSystem {
   const renderer = createReconciler(engine, pointerSystem)
   let uiComponent: UiComponent | undefined = undefined
-  let virtualSize: UiRendererOptions | undefined = undefined
+  let mainOptions: UiRendererOptions | undefined = undefined
   const additionalRenderers = new Map<Entity, { ui: UiComponent; options?: UiRendererOptions }>()
   const UiCanvasInformation = ecsComponents.UiCanvasInformation(engine)
 
@@ -117,9 +148,11 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
 
   function getActiveVirtualSize(): UiRendererOptions | undefined {
     // Main renderer options win; otherwise use the first additional renderer option.
-    if (virtualSize) return virtualSize
+    // Options carrying no virtual dims (e.g. only a screen inset) are skipped so
+    // they don't count as a provided-but-invalid virtual size.
+    if (hasVirtualSize(mainOptions)) return mainOptions
     for (const entry of additionalRenderers.values()) {
-      if (entry.options) return entry.options
+      if (hasVirtualSize(entry.options)) return entry.options
     }
     return undefined
   }
@@ -128,7 +161,7 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
    * Resolves the virtual screen to scale the UI against, or `undefined` when
    * the virtual screen is disabled.
    */
-  function resolveVirtualSize(): UiRendererOptions | undefined {
+  function resolveVirtualSize(): VirtualSize | undefined {
     const provided = getActiveVirtualSize()
     const mobile = isMobile()
 
@@ -158,12 +191,28 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
     return provided
   }
 
+  /**
+   * Wraps a renderer's component in a container positioned within the selected
+   * screen inset area. `'none'` (the default) adds no wrapper so the current
+   * full-screen behavior is preserved as-is. Applied per renderer, so each
+   * renderer can use a different inset.
+   */
+  function wrapWithScreenInset(ui: UiComponent, inset: UiScreenInset | undefined, key: string): React.ReactNode {
+    if (inset === 'device') {
+      return React.createElement(ScreenInsetArea as any, { key }, React.createElement(ui as any))
+    }
+    if (inset === 'interactable') {
+      return React.createElement(InteractableArea as any, { key }, React.createElement(ui as any))
+    }
+    return React.createElement(ui as any, { key })
+  }
+
   function ReactBasedUiSystem() {
     const components: React.ReactNode[] = []
 
     // Add main UI component
     if (uiComponent) {
-      components.push(React.createElement(uiComponent as any, { key: '__main__' }))
+      components.push(wrapWithScreenInset(uiComponent, mainOptions?.screenInset, '__main__'))
     }
 
     const entitiesToRemove: Entity[] = []
@@ -172,7 +221,7 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
       if (engine.getEntityState(entity) === EntityState.Removed) {
         entitiesToRemove.push(entity)
       } else {
-        components.push(React.createElement(entry.ui as any, { key: `__entity_${entity}__` }))
+        components.push(wrapWithScreenInset(entry.ui, entry.options?.screenInset, `__entity_${entity}__`))
       }
     }
 
@@ -250,7 +299,7 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
     },
     setUiRenderer(ui: UiComponent, options?: UiRendererOptions) {
       uiComponent = ui
-      virtualSize = options
+      mainOptions = options
     },
     addUiRenderer(entity: Entity, ui: UiComponent, options?: UiRendererOptions) {
       additionalRenderers.set(entity, { ui, options })

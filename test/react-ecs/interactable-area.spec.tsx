@@ -44,6 +44,38 @@ describe('InteractableArea React Ecs', () => {
     uiRenderer.destroy()
   })
 
+  it('keeps its position in canvas pixels when the UI scale factor is not 1', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const UiCanvasInformation = components.UiCanvasInformation(engine)
+    const entityIndex = engine.addEntity() as number
+    const rootDivEntity = (entityIndex + 1) as Entity
+
+    // Canvas at 2x the default 1920x1080 virtual screen -> scale factor 2. The
+    // stored position must still equal the raw canvas-px insets: they are
+    // pre-divided by the scale factor so the px parser's multiplication cancels out.
+    UiCanvasInformation.create(engine.RootEntity, {
+      devicePixelRatio: 1,
+      width: 3840,
+      height: 2160,
+      screenInsetArea: undefined,
+      interactableArea: { top: 0, left: 480, right: 0, bottom: 0 }
+    })
+
+    uiRenderer.setUiRenderer(() => <InteractableArea />)
+    await engine.update(1)
+
+    expect(UiTransform.get(rootDivEntity)).toMatchObject({
+      positionType: YGPositionType.YGPT_ABSOLUTE,
+      positionTop: 0,
+      positionLeft: 480,
+      positionRight: 0,
+      positionBottom: 0
+    })
+
+    uiRenderer.destroy()
+  })
+
   it('updates its position when the interactable area changes', async () => {
     const { engine, uiRenderer } = setupEngine()
     const UiTransform = components.UiTransform(engine)
