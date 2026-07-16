@@ -16,8 +16,7 @@ import {
   getAddressAndSignature,
   getCatalyst,
   sceneHasWorldCfg,
-  buildDeleteScenesFromWorldPayload,
-  deleteWorldScenes,
+  deployWithSingleWorldScene,
   fetchWorldScenes,
   getScenesOnOtherParcels,
   checkWorldDeploymentPermission,
@@ -28,7 +27,6 @@ import { getValidWorkspace } from '../../logic/workspace-validations'
 import { LinkerResponse } from '../../linker-dapp/routes'
 import { analyticsFeatures } from './analytics-features'
 import { getInstalledPackageVersion } from '../../logic/config'
-import { drainResponse } from '../../logic/fetch'
 
 interface Options {
   args: Result<typeof args>
@@ -147,7 +145,9 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
 
   options.components.analytics.track('Scene deploy started', trackProps)
 
-  let needsDelete = false
+  // Deploying a world without --multi-scene replaces it with this single scene: the content server
+  // deploys this scene and then removes the others (see the singleWorldScene flag below). Warn about
+  // any other scenes that will be removed, but note the world — and its place — are preserved.
   if (isWorld && !multiScene && worldName) {
     try {
       const existingScenes = await fetchWorldScenes(options.components.logger, worldName, targetContent)
@@ -157,7 +157,8 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
 
         if (scenesOnOtherParcels.length > 0) {
           options.components.logger.warn(
-            `World "${worldName}" has ${scenesOnOtherParcels.length} other scene(s) that will be removed:`
+            `World "${worldName}" has ${scenesOnOtherParcels.length} other scene(s) that will be removed ` +
+              `(the world and its place are preserved; use --multi-scene to keep them):`
           )
 
           for (const scene of scenesOnOtherParcels) {
@@ -167,9 +168,6 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
           }
 
           options.components.logger.log('')
-          options.components.logger.warn(
-            'Deploying without --multi-scene will DELETE all existing scenes in world first.'
-          )
 
           if (!autoYes) {
             const confirmed = await promptUser('Continue? (y/N) ')
@@ -177,7 +175,6 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
               throw new CliError('DEPLOY_CANCELLED', 'Deployment cancelled by user.')
             }
           }
-          needsDelete = true
         }
       }
     } catch (e: any) {
@@ -209,9 +206,8 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
 
   const messageToSign = entityId
 
-  const deleteScenesFromWorldPayload =
-    needsDelete && worldName ? buildDeleteScenesFromWorldPayload(worldName) : undefined
-
+  // Single-scene world replacement now happens server-side (via the singleWorldScene deploy flag), so
+  // the client no longer signs a separate world-delete payload — a plain deploy signature is enough.
   const awaitResponse = future<void>()
   const { program } = await getAddressAndSignature(
     options.components,
@@ -226,7 +222,7 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
       isHttps: !!options.args['--https']
     },
     deployEntity,
-    deleteScenesFromWorldPayload,
+    undefined,
     targetContent,
     multiScene
   )
@@ -285,45 +281,6 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
     // Uploading data
     const { client, url } = await getCatalyst(chainId, options.args['--target'], options.args['--target-content'])
 
-    if (needsDelete && worldName && !linkerResponse.deleteSignature) {
-      throw new CliError(
-        'DEPLOY_DELETE_FAILED',
-        `Cannot delete existing scenes from "${worldName}": missing signature for deleting the scenes.`
-      )
-    }
-
-    if (needsDelete && worldName && linkerResponse.deleteSignature) {
-      options.components.logger.info(`[DEPLOY] deleting scenes for "${worldName}"`)
-
-      try {
-        const deleteResponse = await deleteWorldScenes(
-          options.components,
-          worldName,
-          linkerResponse.deleteSignature,
-          targetContent
-        )
-
-        if (deleteResponse.ok) {
-          await drainResponse(deleteResponse)
-          options.components.logger.info(`[DEPLOY] existing scenes for "${worldName} deleted successfully"`)
-        } else {
-          const errorText = await deleteResponse.text()
-          options.components.logger.info(`[DEPLOY] DELETE FAILED: status=${deleteResponse.status} body=${errorText}`)
-          throw new CliError(
-            'DEPLOY_DELETE_FAILED',
-            `Failed to delete existing scenes from "${worldName}" (status ${deleteResponse.status}): ${errorText}\n`
-          )
-        }
-      } catch (e: any) {
-        if (e instanceof CliError) throw e
-        throw new CliError(
-          'DEPLOY_DELETE_FAILED',
-          `Error deleting existing scenes from "${worldName}": ${e.message}\n` +
-            `Hint: Use --multi-scene to deploy alongside existing scenes without deleting them.`
-        )
-      }
-    }
-
     printProgressInfo(options.components.logger, `Uploading data to: ${url}...`)
 
     const deployData = { entityId, files: entityFiles, authChain }
@@ -335,9 +292,15 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
     const sceneUrl = `${domain}/?NETWORK=${network}&position=${position}${worldRealm}`
 
     try {
-      const response = (await client.deploy(deployData, {
-        timeout: 600000
-      })) as any
+      // A default (non-multi-scene) world deploy replaces the world with just this scene. Send the
+      // singleWorldScene flag so the content server does that server-side (deploy, then per-scene
+      // undeploy of the others) — which preserves the world's place and its bound env variables.
+      const singleWorldScene = isWorld && !multiScene
+      const response = (
+        singleWorldScene
+          ? await deployWithSingleWorldScene(client, deployData, url, 600000)
+          : await client.deploy(deployData, { timeout: 600000 })
+      ) as any
 
       let responseData
 

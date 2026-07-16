@@ -1,6 +1,5 @@
 import * as readline from 'readline'
 import { ChainId, Scene } from '@dcl/schemas'
-import { AuthChain } from '@dcl/crypto'
 import { Lifecycle } from '@well-known-components/interfaces'
 import { createCatalystClient, createContentClient, CatalystClient, ContentClient } from 'dcl-catalyst-client'
 import { getCatalystServersFromCache } from 'dcl-catalyst-client/dist/contracts-snapshots'
@@ -99,42 +98,24 @@ export async function getCatalyst(
   }
 }
 
-export function buildDeleteScenesFromWorldPayload(worldName: string): string {
-  const encodedName = encodeURIComponent(worldName)
-  const path = `/entities/${encodedName}`
-  const timestamp = String(Date.now())
-  const metadata = '{}'
-  return ['delete', path, timestamp, metadata].join(':').toLowerCase()
-}
-
-export async function deleteWorldScenes(
-  components: Pick<CliComponents, 'logger'>,
-  worldName: string,
-  deleteSignature: string,
-  targetContent?: string
-): Promise<Response> {
-  const { logger } = components
-
-  const encodedName = encodeURIComponent(worldName)
-  const deleteUrl = `${targetContent}/entities/${encodedName}`
-
-  const authChain: AuthChain = JSON.parse(deleteSignature)
-  const lastLink = authChain[authChain.length - 1]
-  const payloadParts = lastLink.payload.split(':')
-  const timestamp = payloadParts[2] || String(Date.now())
-  const metadata = payloadParts[3] || '{}'
-
-  const headers: Record<string, string> = {
-    'x-identity-timestamp': timestamp,
-    'x-identity-metadata': metadata
-  }
-  authChain.forEach((link, i) => {
-    headers[`x-identity-auth-chain-${i}`] = JSON.stringify(link)
-  })
-
-  const response = await fetch(deleteUrl, { method: 'DELETE', headers })
-  logger.info(`[DELETE] deleting world scenes status=${response.status}`)
-  return response
+/**
+ * Deploys a scene to a world with the `singleWorldScene` flag. This tells the worlds content server to
+ * replace the whole world with just this scene: it deploys the scene and then removes any OTHER scenes
+ * via a per-scene undeployment. Unlike the previous "delete the whole world, then redeploy" flow, the
+ * world is never emptied, so its place — and any env variables bound to that place's id — is preserved.
+ *
+ * `client.deploy` POSTs to a fixed `/entities` URL and cannot carry a query param, so this builds the
+ * same multipart deployment form the client would and POSTs it to `/entities?singleWorldScene=true`.
+ */
+export async function deployWithSingleWorldScene(
+  client: ContentClient,
+  deployData: Parameters<ContentClient['buildEntityFormDataForDeployment']>[0],
+  contentUrl: string,
+  timeout: number
+): Promise<undici.Response> {
+  const form = await client.buildEntityFormDataForDeployment(deployData)
+  const url = `${contentUrl.replace(/\/$/, '')}/entities?singleWorldScene=true`
+  return createFetchComponent().fetch(url, { method: 'POST', body: form as any, timeout })
 }
 
 export async function getAddressAndSignature(
