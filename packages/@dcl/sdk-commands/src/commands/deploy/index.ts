@@ -145,8 +145,14 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
 
   options.components.analytics.track('Scene deploy started', trackProps)
 
+  // Whether this deploy will replace OTHER existing scenes in the world. Only then is the
+  // single_world_scene flag sent (which requires world-wide authority server-side) — a plain
+  // redeploy of a world with no other scenes stays a normal deploy that a per-parcel deployer can
+  // still make. The world's place is preserved either way: there is no world-wide delete anymore, so
+  // the flag only controls cleanup of the OTHER scenes, never whether the place survives.
+  let replaceExistingScenes = false
   // Deploying a world without --multi-scene replaces it with this single scene: the content server
-  // deploys this scene and then removes the others (see the singleWorldScene flag below). Warn about
+  // deploys this scene and then removes the others (see the single_world_scene flag below). Warn about
   // any other scenes that will be removed, but note the world — and its place — are preserved.
   if (isWorld && !multiScene && worldName) {
     try {
@@ -175,6 +181,8 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
               throw new CliError('DEPLOY_CANCELLED', 'Deployment cancelled by user.')
             }
           }
+
+          replaceExistingScenes = true
         }
       }
     } catch (e: any) {
@@ -295,7 +303,7 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
       // A default (non-multi-scene) world deploy replaces the world with just this scene. Send the
       // singleWorldScene flag so the content server does that server-side (deploy, then per-scene
       // undeploy of the others) — which preserves the world's place and its bound env variables.
-      const singleWorldScene = isWorld && !multiScene
+      const singleWorldScene = isWorld && !multiScene && replaceExistingScenes
       const response = (
         singleWorldScene
           ? await deployWithSingleWorldScene(client, deployData, url, 600000)
