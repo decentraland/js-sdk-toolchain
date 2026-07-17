@@ -68,7 +68,8 @@ export const args = declareArgs({
   '-n': Boolean,
   '--bevy-web': Boolean,
   '--multi-instance': Boolean,
-  '--no-client': Boolean
+  '--no-client': Boolean,
+  '--mcp': Boolean
 })
 
 export async function help(options: Options) {
@@ -98,6 +99,7 @@ export async function help(options: Options) {
       --mobile                          Show QR code for mobile preview on the same network.
       --multi-instance                  Allow running multiple Explorer instances simultaneously.
       --no-client                       Suppress every auto-launch (desktop Explorer deeplink, browser open, mobile QR). The file watcher still notifies a desktop Explorer if it connects on its own — useful when an external tool owns the Explorer process.
+      --mcp                             Enable the MCP server in the Explorer (forwarded as a deep link parameter).
 
 
     Examples:

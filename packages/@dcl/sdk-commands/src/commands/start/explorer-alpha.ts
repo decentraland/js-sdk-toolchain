@@ -47,6 +47,7 @@ async function runApp(
   const landscapeTerrainEnabled = !!args['--landscape-terrain-enabled']
   const openDeeplinkInNewInstance = !!args['-n']
   const multiInstance = !!args['--multi-instance']
+  const mcp = !!args['--mcp']
 
   try {
     if (isWindows) {
@@ -77,6 +78,9 @@ async function runApp(
     }
     if (multiInstance) {
       params.set('multi-instance', 'true')
+    }
+    if (mcp) {
+      params.set('mcp', 'true')
     }
 
     const queryParams = params.toString()
