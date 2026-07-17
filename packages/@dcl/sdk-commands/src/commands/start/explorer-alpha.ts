@@ -73,6 +73,7 @@ async function runApp(
   const openDeeplinkInNewInstance = !!args['-n']
   const multiInstance = !!args['--multi-instance']
   const mcp = !!args['--mcp']
+  const mcpPort = args['--mcp-port']
 
   try {
     if (isWindows) {
@@ -106,6 +107,9 @@ async function runApp(
     }
     if (mcp) {
       params.set('mcp', 'true')
+    }
+    if (mcpPort !== undefined) {
+      params.set('mcp-port', String(mcpPort))
     }
 
     // Forward any params placed after a standalone `--` verbatim into the deep link.

@@ -207,6 +207,47 @@ describe('explorer-alpha', () => {
       )
     })
 
+    it('should include mcp-port parameter when --mcp-port is provided', async () => {
+      const args: any = {
+        '--mcp': true,
+        '--mcp-port': 8025
+      }
+
+      await runExplorerAlpha(mockComponents, {
+        cwd: '/test',
+        realm: 'test-realm',
+        baseCoords: { x: 0, y: 0 },
+        isHub: false,
+        args
+      })
+
+      expect(mockExec).toHaveBeenCalledWith(
+        '/test',
+        'open',
+        expect.arrayContaining([expect.stringContaining('mcp-port=8025')]),
+        { silent: true }
+      )
+    })
+
+    it('should not include mcp-port parameter when --mcp-port is not provided', async () => {
+      const args: any = {}
+
+      await runExplorerAlpha(mockComponents, {
+        cwd: '/test',
+        realm: 'test-realm',
+        baseCoords: { x: 0, y: 0 },
+        isHub: false,
+        args
+      })
+
+      expect(mockExec).toHaveBeenCalledWith(
+        '/test',
+        'open',
+        expect.arrayContaining([expect.not.stringContaining('mcp-port')]),
+        { silent: true }
+      )
+    })
+
     it('should not include mcp parameter when --mcp flag is not provided', async () => {
       const args: any = {}
 
