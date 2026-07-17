@@ -101,6 +101,13 @@ export async function help(options: Options) {
       --no-client                       Suppress every auto-launch (desktop Explorer deeplink, browser open, mobile QR). The file watcher still notifies a desktop Explorer if it connects on its own — useful when an external tool owns the Explorer process.
       --mcp                             Enable the MCP server in the Explorer (forwarded as a deep link parameter).
 
+    Any argument placed after a standalone \`--\` is not parsed by the CLI and is forwarded verbatim
+    into the Explorer deep link as a query parameter. Supported forms: --key=value, --key value,
+    and bare --key (forwarded as key=true). Forwarded params override the defaults above.
+
+      $ sdk-commands start -- --paramA --paramX valueX
+      $ npm run start -- -- --paramA --paramX valueX      (npm consumes the first --)
+
 
     Examples:
 

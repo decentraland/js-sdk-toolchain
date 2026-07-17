@@ -4,6 +4,31 @@ import { CliComponents } from '../../components'
 
 const isWindows = /^win/.test(process.platform)
 
+/**
+ * Parses raw CLI tokens (everything after a standalone `--`) into deep link query params.
+ * Supports `--key=value`, `--key value` and bare `--key` (mapped to `key=true`).
+ * Tokens that are not flags and not consumed as a value are ignored.
+ */
+export function parsePassthroughParams(tokens: string[]): Map<string, string> {
+  const params = new Map<string, string>()
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i]
+    if (!token.startsWith('-')) continue
+    const stripped = token.replace(/^-+/, '')
+    if (!stripped) continue
+    const eqIndex = stripped.indexOf('=')
+    if (eqIndex > 0) {
+      params.set(stripped.slice(0, eqIndex), stripped.slice(eqIndex + 1))
+    } else if (eqIndex === -1 && i + 1 < tokens.length && !tokens[i + 1].startsWith('-')) {
+      params.set(stripped, tokens[i + 1])
+      i++
+    } else if (eqIndex === -1) {
+      params.set(stripped, 'true')
+    }
+  }
+  return params
+}
+
 export async function runExplorerAlpha(
   components: CliComponents,
   opts: {
@@ -81,6 +106,12 @@ async function runApp(
     }
     if (mcp) {
       params.set('mcp', 'true')
+    }
+
+    // Forward any params placed after a standalone `--` verbatim into the deep link.
+    // Applied last so they can override the defaults above, same as the declared flags do.
+    for (const [key, value] of parsePassthroughParams(args._ ?? [])) {
+      params.set(key, value)
     }
 
     const queryParams = params.toString()

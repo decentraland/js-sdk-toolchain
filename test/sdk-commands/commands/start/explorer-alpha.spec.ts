@@ -227,6 +227,58 @@ describe('explorer-alpha', () => {
     })
   })
 
+  describe('passthrough parameters (after standalone --)', () => {
+    async function run(args: any) {
+      await runExplorerAlpha(mockComponents, {
+        cwd: '/test',
+        realm: 'test-realm',
+        baseCoords: { x: 0, y: 0 },
+        isHub: false,
+        args
+      })
+      return mockExec.mock.calls[0][2][0] as string
+    }
+
+    it('forwards a bare flag as key=true', async () => {
+      const deepLink = await run({ _: ['--paramA'] })
+      expect(deepLink).toContain('paramA=true')
+    })
+
+    it('forwards a flag followed by a value as key=value', async () => {
+      const deepLink = await run({ _: ['--paramX', 'valueX'] })
+      expect(deepLink).toContain('paramX=valueX')
+    })
+
+    it('forwards --key=value syntax', async () => {
+      const deepLink = await run({ _: ['--paramX=valueX'] })
+      expect(deepLink).toContain('paramX=valueX')
+    })
+
+    it('forwards multiple params, mixing bare flags and valued flags', async () => {
+      const deepLink = await run({ _: ['--paramA', '--paramB', '--paramX', 'valueX'] })
+      expect(deepLink).toContain('paramA=true')
+      expect(deepLink).toContain('paramB=true')
+      expect(deepLink).toContain('paramX=valueX')
+    })
+
+    it('overrides built-in deep link params, same as declared flags do', async () => {
+      const deepLink = await run({ _: ['--realm', 'whatever.dcl.eth'] })
+      expect(deepLink).toContain('realm=whatever.dcl.eth')
+      expect(deepLink).not.toContain('realm=test-realm')
+    })
+
+    it('ignores bare tokens that are not flags and not values of a flag', async () => {
+      const deepLink = await run({ _: ['stray-positional', '--paramA'] })
+      expect(deepLink).not.toContain('stray-positional')
+      expect(deepLink).toContain('paramA=true')
+    })
+
+    it('url-encodes forwarded values', async () => {
+      const deepLink = await run({ _: ['--paramX', 'a value&other'] })
+      expect(deepLink).toContain('paramX=a+value%26other')
+    })
+  })
+
   describe('URL parameter construction', () => {
     it('should construct URL with all parameters correctly', async () => {
       const args: any = {
