@@ -1,5 +1,5 @@
 jest.mock(
-  '@dcl/inspector/node_modules/@dcl/asset-packs',
+  '@dcl/inspector/node_modules/@dcl/asset-packs/dist/events',
   () => ({
     getActionEvents: jest.fn((entity) => ({
       emit: jest.fn()
