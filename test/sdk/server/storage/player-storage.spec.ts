@@ -14,6 +14,7 @@ jest.mock('../../../../packages/@dcl/sdk/src/server/utils', () => ({
   wrapSignedFetch: (req: { url: string }) => mockWrapSignedFetch(req)
 }))
 
+import { createStorageConfig } from '../../../../packages/@dcl/sdk/src/server/storage/constants'
 import { createPlayerStorage } from '../../../../packages/@dcl/sdk/src/server/storage/player'
 
 describe('player storage', () => {
@@ -88,6 +89,96 @@ describe('player storage', () => {
       const result = await playerStorage.getValues(address)
 
       expect(result).toEqual({ data: [], pagination: { offset: 0, total: 0 } })
+    })
+  })
+
+  describe('set', () => {
+    it('should PUT on every call by default, even for identical values', async () => {
+      const playerStorage = createPlayerStorage()
+      mockWrapSignedFetch.mockResolvedValue([null, {}])
+
+      expect(await playerStorage.set(address, 'score', 42)).toBe(true)
+      expect(await playerStorage.set(address, 'score', 42)).toBe(true)
+
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+      expect(mockWrapSignedFetch).toHaveBeenCalledWith({
+        url: `${baseUrl}/players/${encodeURIComponent(address)}/values/score`,
+        init: {
+          method: 'PUT',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ value: 42 })
+        }
+      })
+    })
+
+    it('should skip the PUT for an unchanged value when skipIfUnchanged is passed', async () => {
+      const playerStorage = createPlayerStorage()
+      mockWrapSignedFetch.mockResolvedValue([null, {}])
+
+      expect(await playerStorage.set(address, 'score', 42, { skipIfUnchanged: true })).toBe(true)
+      expect(await playerStorage.set(address, 'score', 42, { skipIfUnchanged: true })).toBe(true)
+
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
+    })
+
+    it('should not dedupe across different addresses', async () => {
+      const playerStorage = createPlayerStorage()
+      const otherAddress = '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd'
+      mockWrapSignedFetch.mockResolvedValue([null, {}])
+
+      await playerStorage.set(address, 'score', 42, { skipIfUnchanged: true })
+      await playerStorage.set(otherAddress, 'score', 42, { skipIfUnchanged: true })
+
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should dedupe addresses case-insensitively', async () => {
+      const playerStorage = createPlayerStorage()
+      mockWrapSignedFetch.mockResolvedValue([null, {}])
+
+      await playerStorage.set('0xAbCdefAbcdEFabcdefabcdefabcdefabcdefabcd', 'score', 42, { skipIfUnchanged: true })
+      await playerStorage.set('0xabcdefabcdefabcdefabcdefabcdefabcdefabcd', 'score', 42, { skipIfUnchanged: true })
+
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
+    })
+
+    it('should dedupe by configured default and allow a per-call false to force the PUT', async () => {
+      const playerStorage = createPlayerStorage(createStorageConfig({ skipIfUnchanged: true }))
+      mockWrapSignedFetch.mockResolvedValue([null, {}])
+
+      await playerStorage.set(address, 'score', 42)
+      await playerStorage.set(address, 'score', 42)
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
+
+      await playerStorage.set(address, 'score', 42, { skipIfUnchanged: false })
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+  })
+
+  describe('get and set interplay', () => {
+    it('should populate the cache from get so an unchanged write is skipped', async () => {
+      const playerStorage = createPlayerStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: { hp: 100 } }])
+
+      expect(await playerStorage.get(address, 'state')).toEqual({ hp: 100 })
+      expect(await playerStorage.set(address, 'state', { hp: 100 }, { skipIfUnchanged: true })).toBe(true)
+
+      // Only the GET hit the network.
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('delete', () => {
+    it('should invalidate the cache so a later identical set writes again', async () => {
+      const playerStorage = createPlayerStorage()
+      mockWrapSignedFetch.mockResolvedValue([null, {}])
+
+      await playerStorage.set(address, 'score', 42, { skipIfUnchanged: true })
+      expect(await playerStorage.delete(address, 'score')).toBe(true)
+      await playerStorage.set(address, 'score', 42, { skipIfUnchanged: true })
+
+      // set + delete + set all hit the network.
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(3)
     })
   })
 })

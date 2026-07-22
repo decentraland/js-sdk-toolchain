@@ -1,6 +1,14 @@
 import { getStorageServerUrl } from '../storage-url'
 import { assertIsServer, wrapSignedFetch } from '../utils'
-import { GetValuesOptions, GetValuesResult, MODULE_NAME } from './constants'
+import {
+  createStorageConfig,
+  GetValuesOptions,
+  GetValuesResult,
+  MODULE_NAME,
+  SetOptions,
+  StorageConfigState
+} from './constants'
+import { createValueCache, fingerprint } from './value-cache'
 
 /**
  * Scene-scoped storage interface for key-value pairs from the Server Side Storage service.
@@ -18,8 +26,9 @@ export interface ISceneStorage {
    * Stores a value in scene storage in the Server Side Storage service.
    * @param key - The key to store the value under
    * @param value - The value to store (will be JSON serialized)
+   * @param options - Optional { skipIfUnchanged } to skip the network write when the value is already stored
    */
-  set<T = unknown>(key: string, value: T): Promise<boolean>
+  set<T = unknown>(key: string, value: T, options?: SetOptions): Promise<boolean>
 
   /**
    * Deletes a value from scene storage in the Server Side Storage service.
@@ -42,7 +51,9 @@ export interface ISceneStorage {
  * scene-specific key-value pairs from the Server Side Storage service.
  * This module only works when running on server-side scenes.
  */
-export const createSceneStorage = (): ISceneStorage => {
+export const createSceneStorage = (config: StorageConfigState = createStorageConfig()): ISceneStorage => {
+  const cache = createValueCache(config)
+
   return {
     async get<T = unknown>(key: string): Promise<T | null> {
       assertIsServer(MODULE_NAME)
@@ -57,11 +68,25 @@ export const createSceneStorage = (): ISceneStorage => {
         return null
       }
 
+      if (data && data.value !== undefined) {
+        // Same serialization shape as set()'s PUT body, so a read followed by
+        // an unchanged write can be skipped.
+        cache.set(key, fingerprint(JSON.stringify({ value: data.value })))
+      }
+
       return data?.value ?? null
     },
 
-    async set<T = unknown>(key: string, value: T): Promise<boolean> {
+    async set<T = unknown>(key: string, value: T, options?: SetOptions): Promise<boolean> {
       assertIsServer(MODULE_NAME)
+
+      const body = JSON.stringify({ value })
+      const print = fingerprint(body)
+      const skipIfUnchanged = options?.skipIfUnchanged ?? config.skipIfUnchanged
+
+      if (skipIfUnchanged && cache.get(key) === print) {
+        return true
+      }
 
       const baseUrl = await getStorageServerUrl()
       const url = `${baseUrl}/values/${encodeURIComponent(key)}`
@@ -73,7 +98,7 @@ export const createSceneStorage = (): ISceneStorage => {
           headers: {
             'content-type': 'application/json'
           },
-          body: JSON.stringify({ value })
+          body
         }
       })
 
@@ -82,11 +107,16 @@ export const createSceneStorage = (): ISceneStorage => {
         return false
       }
 
+      cache.set(key, print)
       return true
     },
 
     async delete(key: string): Promise<boolean> {
       assertIsServer(MODULE_NAME)
+
+      // Invalidate even if the request fails: the DELETE may have reached the
+      // server, and a stale "unchanged" skip would lose a future write.
+      cache.delete(key)
 
       const baseUrl = await getStorageServerUrl()
       const url = `${baseUrl}/values/${encodeURIComponent(key)}`

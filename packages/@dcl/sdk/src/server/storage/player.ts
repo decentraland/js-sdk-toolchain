@@ -1,6 +1,14 @@
 import { getStorageServerUrl } from '../storage-url'
 import { assertIsServer, wrapSignedFetch } from '../utils'
-import { GetValuesOptions, GetValuesResult, MODULE_NAME } from './constants'
+import {
+  createStorageConfig,
+  GetValuesOptions,
+  GetValuesResult,
+  MODULE_NAME,
+  SetOptions,
+  StorageConfigState
+} from './constants'
+import { createValueCache, fingerprint } from './value-cache'
 
 /**
  * Player-scoped storage interface for key-value pairs from the Server Side Storage service.
@@ -20,9 +28,10 @@ export interface IPlayerStorage {
    * @param address - The player's wallet address
    * @param key - The key to store the value under
    * @param value - The value to store (will be JSON serialized)
+   * @param options - Optional { skipIfUnchanged } to skip the network write when the value is already stored
    * @returns A promise that resolves to true if successful, false otherwise
    */
-  set<T = unknown>(address: string, key: string, value: T): Promise<boolean>
+  set<T = unknown>(address: string, key: string, value: T, options?: SetOptions): Promise<boolean>
 
   /**
    * Deletes a value from a player's storage in the Server Side Storage service.
@@ -47,7 +56,14 @@ export interface IPlayerStorage {
  * player-specific key-value pairs from the Server Side Storage service.
  * This module only works when running on server-side scenes.
  */
-export const createPlayerStorage = (): IPlayerStorage => {
+export const createPlayerStorage = (config: StorageConfigState = createStorageConfig()): IPlayerStorage => {
+  const cache = createValueCache(config)
+
+  // Ethereum addresses are case-insensitive (checksum casing only), so
+  // mixed-case callers must share the same cache entry. The NUL separator
+  // cannot appear in an address, making the pair unambiguous.
+  const cacheKey = (address: string, key: string) => `${address.toLowerCase()}\u0000${key}`
+
   return {
     async get<T = unknown>(address: string, key: string): Promise<T | null> {
       assertIsServer(MODULE_NAME)
@@ -62,11 +78,25 @@ export const createPlayerStorage = (): IPlayerStorage => {
         return null
       }
 
+      if (data && data.value !== undefined) {
+        // Same serialization shape as set()'s PUT body, so a read followed by
+        // an unchanged write can be skipped.
+        cache.set(cacheKey(address, key), fingerprint(JSON.stringify({ value: data.value })))
+      }
+
       return data?.value ?? null
     },
 
-    async set<T = unknown>(address: string, key: string, value: T): Promise<boolean> {
+    async set<T = unknown>(address: string, key: string, value: T, options?: SetOptions): Promise<boolean> {
       assertIsServer(MODULE_NAME)
+
+      const body = JSON.stringify({ value })
+      const print = fingerprint(body)
+      const skipIfUnchanged = options?.skipIfUnchanged ?? config.skipIfUnchanged
+
+      if (skipIfUnchanged && cache.get(cacheKey(address, key)) === print) {
+        return true
+      }
 
       const baseUrl = await getStorageServerUrl()
       const url = `${baseUrl}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
@@ -78,7 +108,7 @@ export const createPlayerStorage = (): IPlayerStorage => {
           headers: {
             'content-type': 'application/json'
           },
-          body: JSON.stringify({ value })
+          body
         }
       })
 
@@ -87,11 +117,16 @@ export const createPlayerStorage = (): IPlayerStorage => {
         return false
       }
 
+      cache.set(cacheKey(address, key), print)
       return true
     },
 
     async delete(address: string, key: string): Promise<boolean> {
       assertIsServer(MODULE_NAME)
+
+      // Invalidate even if the request fails: the DELETE may have reached the
+      // server, and a stale "unchanged" skip would lose a future write.
+      cache.delete(cacheKey(address, key))
 
       const baseUrl = await getStorageServerUrl()
       const url = `${baseUrl}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
