@@ -46,8 +46,12 @@ export async function runAssetBundlesSidecar(
     ? 'https://ab-cdn.decentraland.zone'
     : 'https://ab-cdn.decentraland.org'
 
-  // A local sidecar only ever serves the host platform; eager registry builds
-  // for the other platform would be pure waste.
+  // The eager index lane is off: the explorer's registry POSTs (/entities/active)
+  // are about wearables and emotes, and eager-building those against the preview
+  // server can only 404 (it serves the local scene's files, not remote entities) —
+  // the upstream read-through covers them. The previewed scene still converts JIT
+  // on its manifest request. Platforms are narrowed to the host as belt-and-braces
+  // for anyone re-enabling the lane via env.
   const hostPlatform = process.platform === 'win32' ? 'windows' : process.platform === 'darwin' ? 'mac' : 'linux'
 
   // ABGEN_* variables already present in the environment win over this wiring
@@ -58,6 +62,7 @@ export async function runAssetBundlesSidecar(
     ABGEN_WORLDS_CONTENT_URL: process.env.ABGEN_WORLDS_CONTENT_URL || 'off',
     ABGEN_UPSTREAM_AB_CDN: process.env.ABGEN_UPSTREAM_AB_CDN || upstreamAbCdn,
     ABGEN_INDEX_BUILD_PLATFORMS: process.env.ABGEN_INDEX_BUILD_PLATFORMS || hostPlatform,
+    ABGEN_INDEX_EAGER_BUILD: process.env.ABGEN_INDEX_EAGER_BUILD || 'off',
     ABGEN_OUT_ROOT: process.env.ABGEN_OUT_ROOT || path.join(cacheRoot, 'out'),
     ABGEN_CACHE_DIR: process.env.ABGEN_CACHE_DIR || path.join(cacheRoot, 'cache'),
     RUST_LOG: process.env.RUST_LOG || 'abgen=info,tower_http=warn'

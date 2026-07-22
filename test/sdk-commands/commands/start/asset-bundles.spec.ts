@@ -39,6 +39,9 @@ describe('start/asset-bundles', () => {
     expect(options.env.ABGEN_WORLDS_CONTENT_URL).toBe('off')
     expect(options.env.ABGEN_UPSTREAM_AB_CDN).toBe('https://ab-cdn.decentraland.org')
     expect(['windows', 'mac', 'linux']).toContain(options.env.ABGEN_INDEX_BUILD_PLATFORMS)
+    // registry POSTs are about remote wearables/emotes, which the preview server
+    // cannot resolve — eager-building them would only produce write-back 404s
+    expect(options.env.ABGEN_INDEX_EAGER_BUILD).toBe('off')
     expect(options.env.HTTP_SERVER_HOST).toBe('127.0.0.1')
     expect(url).toContain(options.env.HTTP_SERVER_PORT)
     expect(fetch).toHaveBeenCalledWith(`${url}/readyz`, expect.objectContaining({ signal: expect.anything() }))
