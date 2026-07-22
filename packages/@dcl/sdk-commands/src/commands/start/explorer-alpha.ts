@@ -113,8 +113,10 @@ async function runApp(
     }
 
     // Forward any params placed after a standalone `--` verbatim into the deep link.
-    // Applied last so they can override the defaults above, same as the declared flags do.
+    // Only fill in params that aren't already covered by a declared flag/default, so
+    // passthrough can't silently override an intentionally declared flag.
     for (const [key, value] of parsePassthroughParams(args._ ?? [])) {
+      if (params.has(key)) continue
       params.set(key, value)
     }
 

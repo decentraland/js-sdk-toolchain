@@ -302,10 +302,21 @@ describe('explorer-alpha', () => {
       expect(deepLink).toContain('paramX=valueX')
     })
 
-    it('overrides built-in deep link params, same as declared flags do', async () => {
+    it('does not override built-in deep link params already covered by a declared flag/default', async () => {
       const deepLink = await run({ _: ['--realm', 'whatever.dcl.eth'] })
-      expect(deepLink).toContain('realm=whatever.dcl.eth')
-      expect(deepLink).not.toContain('realm=test-realm')
+      expect(deepLink).toContain('realm=test-realm')
+      expect(deepLink).not.toContain('realm=whatever.dcl.eth')
+    })
+
+    it('does not override an explicitly declared flag', async () => {
+      const deepLink = await run({ '--realm': 'declared.dcl.eth', _: ['--realm', 'whatever.dcl.eth'] })
+      expect(deepLink).toContain('realm=declared.dcl.eth')
+      expect(deepLink).not.toContain('realm=whatever.dcl.eth')
+    })
+
+    it('fills in a param that is not covered by any declared flag/default', async () => {
+      const deepLink = await run({ _: ['--paramA'] })
+      expect(deepLink).toContain('paramA=true')
     })
 
     it('ignores bare tokens that are not flags and not values of a flag', async () => {
