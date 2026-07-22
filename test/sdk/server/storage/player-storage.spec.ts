@@ -93,14 +93,14 @@ describe('player storage', () => {
   })
 
   describe('set', () => {
-    it('should PUT on every call by default, even for identical values', async () => {
+    it('should skip the PUT for an unchanged value by default', async () => {
       const playerStorage = createPlayerStorage()
       mockWrapSignedFetch.mockResolvedValue([null, {}])
 
       expect(await playerStorage.set(address, 'score', 42)).toBe(true)
       expect(await playerStorage.set(address, 'score', 42)).toBe(true)
 
-      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
       expect(mockWrapSignedFetch).toHaveBeenCalledWith({
         url: `${baseUrl}/players/${encodeURIComponent(address)}/values/score`,
         init: {
@@ -179,6 +179,94 @@ describe('player storage', () => {
 
       // set + delete + set all hit the network.
       expect(mockWrapSignedFetch).toHaveBeenCalledTimes(3)
+    })
+  })
+
+  describe('get read caching', () => {
+    function deferred<T>() {
+      let resolve!: (value: T) => void
+      const promise = new Promise<T>((r) => (resolve = r))
+      return { promise, resolve }
+    }
+
+    it('should serve a repeated get from cache', async () => {
+      const playerStorage = createPlayerStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: { hp: 100 } }, 200])
+
+      expect(await playerStorage.get(address, 'state')).toEqual({ hp: 100 })
+      expect(await playerStorage.get(address, 'state')).toEqual({ hp: 100 })
+
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
+    })
+
+    it('should bypass the cache with fresh: true and refresh it with the result', async () => {
+      const playerStorage = createPlayerStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'A' }, 200])
+      expect(await playerStorage.get(address, 'key')).toBe('A')
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'B' }, 200])
+      expect(await playerStorage.get(address, 'key', { fresh: true })).toBe('B')
+
+      expect(await playerStorage.get(address, 'key')).toBe('B')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should cache a confirmed 404 as absent', async () => {
+      const playerStorage = createPlayerStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce(['404 Not Found', null, 404])
+
+      expect(await playerStorage.get(address, 'missing')).toBeNull()
+      expect(await playerStorage.get(address, 'missing')).toBeNull()
+
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
+    })
+
+    it('should serve null from the negative cache after a successful delete', async () => {
+      const playerStorage = createPlayerStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 1 }, 200])
+      expect(await playerStorage.get(address, 'key')).toBe(1)
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+      expect(await playerStorage.delete(address, 'key')).toBe(true)
+
+      expect(await playerStorage.get(address, 'key')).toBeNull()
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should coalesce concurrent gets case-insensitively per address, never across addresses', async () => {
+      const playerStorage = createPlayerStorage()
+      const mixedCaseAddress = '0xAbCdefAbcdEFabcdefabcdefabcdefabcdefabcd'
+      const lowerCaseAddress = '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd'
+      const request = deferred<[null, { value: number }, number]>()
+      const otherRequest = deferred<[null, { value: number }, number]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => request.promise)
+      mockWrapSignedFetch.mockImplementationOnce(() => otherRequest.promise)
+
+      const gets = Promise.all([
+        playerStorage.get(mixedCaseAddress, 'key'),
+        playerStorage.get(lowerCaseAddress, 'key'),
+        playerStorage.get(address, 'key')
+      ])
+      request.resolve([null, { value: 1 }, 200])
+      otherRequest.resolve([null, { value: 2 }, 200])
+
+      expect(await gets).toEqual([1, 1, 2])
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should seed the per-key cache from getValues, scoped to the address', async () => {
+      const playerStorage = createPlayerStorage()
+      const otherAddress = '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd'
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { data: [{ key: 'a', value: 1 }] }])
+
+      await playerStorage.getValues(address)
+      expect(await playerStorage.get(address, 'a')).toBe(1)
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
+
+      // The seed for one address must not serve another address's reads.
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 2 }, 200])
+      expect(await playerStorage.get(otherAddress, 'a')).toBe(2)
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
     })
   })
 })

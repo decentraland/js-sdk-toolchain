@@ -31,9 +31,8 @@ describe('Storage singleton', () => {
     return Storage
   }
 
-  it('configure({ skipIfUnchanged: true }) applies to both scene and player storage', async () => {
+  it('dedupes unchanged writes by default for both scene and player storage', async () => {
     const Storage = await loadStorage()
-    Storage.configure({ skipIfUnchanged: true })
 
     await Storage.set('score', 42)
     await Storage.set('score', 42)
@@ -44,22 +43,49 @@ describe('Storage singleton', () => {
     expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
   })
 
-  it('does not dedupe by default', async () => {
+  it('configure({ skipIfUnchanged: false }) disables write dedup for both scene and player storage', async () => {
     const Storage = await loadStorage()
+    Storage.configure({ skipIfUnchanged: false })
 
     await Storage.set('score', 42)
     await Storage.set('score', 42)
-
     expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+
+    await Storage.player.set(address, 'score', 42)
+    await Storage.player.set(address, 'score', 42)
+    expect(mockWrapSignedFetch).toHaveBeenCalledTimes(4)
   })
 
   it('scene and player caches are isolated for the same key and value', async () => {
     const Storage = await loadStorage()
-    Storage.configure({ skipIfUnchanged: true })
 
     await Storage.set('score', 42)
     await Storage.player.set(address, 'score', 42)
 
     expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+  })
+
+  it('serves repeated gets from cache by default', async () => {
+    const Storage = await loadStorage()
+    mockWrapSignedFetch.mockResolvedValue([null, { value: 42 }, 200])
+
+    expect(await Storage.get('score')).toBe(42)
+    expect(await Storage.get('score')).toBe(42)
+
+    expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
+  })
+
+  it('configure({ cacheReads: false }) disables read caching for both scene and player storage', async () => {
+    const Storage = await loadStorage()
+    Storage.configure({ cacheReads: false })
+    mockWrapSignedFetch.mockResolvedValue([null, { value: 42 }, 200])
+
+    await Storage.get('score')
+    await Storage.get('score')
+    expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+
+    await Storage.player.get(address, 'score')
+    await Storage.player.get(address, 'score')
+    expect(mockWrapSignedFetch).toHaveBeenCalledTimes(4)
   })
 })

@@ -4,6 +4,7 @@ export {
   IStorage,
   ISceneStorage,
   IPlayerStorage,
+  GetOptions,
   GetValuesOptions,
   GetValuesResult,
   SetOptions,

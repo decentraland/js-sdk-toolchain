@@ -2,6 +2,7 @@ import { getStorageServerUrl } from '../storage-url'
 import { assertIsServer, wrapSignedFetch } from '../utils'
 import {
   createStorageConfig,
+  GetOptions,
   GetValuesOptions,
   GetValuesResult,
   MODULE_NAME,
@@ -17,11 +18,18 @@ import { createValueCache, fingerprint } from './value-cache'
 export interface IPlayerStorage {
   /**
    * Retrieves a value from a player's storage by key from the Server Side Storage service.
+   *
+   * By default (cacheReads), values read or written during the last cacheMaxAgeMs
+   * are served from a local cache without a network request, including confirmed
+   * "not found" results. Concurrent gets for the same player and key share one
+   * request. Out-of-band writers (e.g. CLI storage commands) may not be visible
+   * for up to cacheMaxAgeMs — pass { fresh: true } to force a network read.
    * @param address - The player's wallet address
    * @param key - The key to retrieve
+   * @param options - Optional { fresh } to bypass the read cache
    * @returns A promise that resolves to the parsed JSON value, or null if not found
    */
-  get<T = unknown>(address: string, key: string): Promise<T | null>
+  get<T = unknown>(address: string, key: string, options?: GetOptions): Promise<T | null>
 
   /**
    * Stores a value in a player's storage in the Server Side Storage service.
@@ -58,6 +66,10 @@ export interface IPlayerStorage {
  */
 export const createPlayerStorage = (config: StorageConfigState = createStorageConfig()): IPlayerStorage => {
   const cache = createValueCache(config)
+  // Each in-flight GET is tracked by a wrapper object whose identity marks
+  // ownership: set()/delete() drop the wrapper, detaching the pending GET so
+  // its stale response cannot overwrite the newer cache entry.
+  const inflightGets = new Map<string, { promise: Promise<unknown> }>()
 
   // Ethereum addresses are case-insensitive (checksum casing only), so
   // mixed-case callers must share the same cache entry. The NUL separator
@@ -65,36 +77,72 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
   const cacheKey = (address: string, key: string) => `${address.toLowerCase()}\u0000${key}`
 
   return {
-    async get<T = unknown>(address: string, key: string): Promise<T | null> {
+    async get<T = unknown>(address: string, key: string, options?: GetOptions): Promise<T | null> {
       assertIsServer(MODULE_NAME)
 
-      const baseUrl = await getStorageServerUrl()
-      const url = `${baseUrl}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
+      const ck = cacheKey(address, key)
 
-      const [error, data] = await wrapSignedFetch<{ value: T }>({ url })
-
-      if (error) {
-        console.error(`Failed to get player storage value '${key}' for '${address}': ${error}`)
-        return null
+      if (config.cacheReads && !options?.fresh) {
+        const entry = cache.get(ck)
+        if (entry?.absent) return null
+        // Parse per hit so each caller gets a fresh object (no shared mutation).
+        if (entry?.body !== undefined) return JSON.parse(entry.body).value as T
       }
 
-      if (data && data.value !== undefined) {
-        // Same serialization shape as set()'s PUT body, so a read followed by
-        // an unchanged write can be skipped.
-        cache.set(cacheKey(address, key), fingerprint(JSON.stringify({ value: data.value })))
-      }
+      // Coalesce concurrent gets (even fresh ones: an in-flight response is
+      // milliseconds old, not TTL-stale) into a single network request.
+      const joined = inflightGets.get(ck)
+      if (joined) return joined.promise as Promise<T | null>
 
-      return data?.value ?? null
+      const inflight = {} as { promise: Promise<T | null> }
+      inflight.promise = (async () => {
+        try {
+          const baseUrl = await getStorageServerUrl()
+          const url = `${baseUrl}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
+
+          const [error, data, status] = await wrapSignedFetch<{ value: T }>({ url })
+
+          const isOwner = inflightGets.get(ck) === inflight
+
+          if (error) {
+            // A confirmed 404 is a first-class "absent" outcome, not a failure.
+            if (status === 404) {
+              if (isOwner) cache.setAbsent(ck)
+              return null
+            }
+            console.error(`Failed to get player storage value '${key}' for '${address}': ${error}`)
+            return null
+          }
+
+          if (data && data.value !== undefined) {
+            // Same serialization shape as set()'s PUT body, so a read followed by
+            // an unchanged write can be skipped.
+            const body = JSON.stringify({ value: data.value })
+            if (isOwner) cache.set(ck, { print: fingerprint(body), body })
+            return data.value
+          }
+
+          // 200 with a missing value is ambiguous: neither a confirmed value
+          // nor a confirmed absence, so cache nothing.
+          return null
+        } finally {
+          if (inflightGets.get(ck) === inflight) inflightGets.delete(ck)
+        }
+      })()
+
+      inflightGets.set(ck, inflight)
+      return inflight.promise
     },
 
     async set<T = unknown>(address: string, key: string, value: T, options?: SetOptions): Promise<boolean> {
       assertIsServer(MODULE_NAME)
 
+      const ck = cacheKey(address, key)
       const body = JSON.stringify({ value })
       const print = fingerprint(body)
       const skipIfUnchanged = options?.skipIfUnchanged ?? config.skipIfUnchanged
 
-      if (skipIfUnchanged && cache.get(cacheKey(address, key)) === print) {
+      if (skipIfUnchanged && cache.get(ck)?.print === print) {
         return true
       }
 
@@ -112,26 +160,36 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
         }
       })
 
+      // Either way the entry changed server-side (or may have): detach any
+      // overlapping in-flight GET so its stale response is not cached.
+      inflightGets.delete(ck)
+
       if (error) {
+        // The PUT may have reached the server, so the cached body and
+        // fingerprint are no longer reliable.
+        cache.delete(ck)
         console.error(`Failed to set player storage value '${key}' for '${address}': ${error}`)
         return false
       }
 
-      cache.set(cacheKey(address, key), print)
+      cache.set(ck, { print, body })
       return true
     },
 
     async delete(address: string, key: string): Promise<boolean> {
       assertIsServer(MODULE_NAME)
 
+      const ck = cacheKey(address, key)
+
       // Invalidate even if the request fails: the DELETE may have reached the
       // server, and a stale "unchanged" skip would lose a future write.
-      cache.delete(cacheKey(address, key))
+      cache.delete(ck)
+      inflightGets.delete(ck)
 
       const baseUrl = await getStorageServerUrl()
       const url = `${baseUrl}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
 
-      const [error] = await wrapSignedFetch({
+      const [error, , status] = await wrapSignedFetch({
         url,
         init: {
           method: 'DELETE',
@@ -139,11 +197,17 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
         }
       })
 
+      // Detach again: a GET may have started while the DELETE was in flight.
+      inflightGets.delete(ck)
+
       if (error) {
+        // A 404 still confirms the key is absent server-side.
+        if (status === 404) cache.setAbsent(ck)
         console.error(`Failed to delete player storage value '${key}' for '${address}': ${error}`)
         return false
       }
 
+      cache.setAbsent(ck)
       return true
     },
 
@@ -179,6 +243,18 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       }
 
       const data = response?.data ?? []
+
+      // Seed the per-key cache so subsequent get()/set() on returned keys can
+      // skip the network. Absence is never seeded (prefix/pagination make it
+      // non-authoritative). A page larger than cacheMaxEntries churns the
+      // cache; entries repopulate lazily.
+      for (const entry of data) {
+        if (entry.value !== undefined) {
+          const body = JSON.stringify({ value: entry.value })
+          cache.set(cacheKey(address, entry.key), { print: fingerprint(body), body })
+        }
+      }
+
       const requestedOffset = offset ?? 0
       const pagination = {
         offset: response?.pagination?.offset ?? requestedOffset,

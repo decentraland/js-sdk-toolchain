@@ -24,23 +24,50 @@ export function fingerprint(serialized: string): string {
 }
 
 /**
- * Bounded, lazily-expiring cache of value fingerprints, used to skip storage
- * writes whose value is already known to be stored.
+ * A cached fact about a key's server-side state.
+ * @internal
+ */
+export interface CacheEntry {
+  /** Write-dedup fingerprint of the serialized body; absent for negative entries. */
+  print?: string
+  /** Serialized `{ value }` body; parsed per read hit so callers never share object references. */
+  body?: string
+  /** True when the server confirmed the key does not exist (GET 404 or successful DELETE). */
+  absent?: boolean
+}
+
+/**
+ * Bounded, lazily-expiring cache of key states, backing both write dedup
+ * (skip storage writes whose value is already known to be stored) and read
+ * caching (serve get() without a network request within the TTL).
  * @internal
  */
 export interface ValueCache {
-  /** Returns the stored fingerprint if present and fresh; lazily evicts expired entries. */
-  get(key: string): string | undefined
-  /** Stores or refreshes a fingerprint; evicts oldest entries beyond cacheMaxEntries. */
-  set(key: string, print: string): void
+  /** Returns the entry if present and fresh; lazily evicts expired entries. */
+  get(key: string): CacheEntry | undefined
+  /** Stores or refreshes a known value (fingerprint + serialized body); overwrites negative entries. */
+  set(key: string, entry: { print: string; body: string }): void
+  /** Stores a confirmed-absent (negative) entry, replacing any value entry. */
+  setAbsent(key: string): void
   delete(key: string): void
 }
 
 export function createValueCache(config: StorageConfigState): ValueCache {
-  const entries = new Map<string, { print: string; storedAt: number }>()
+  const entries = new Map<string, CacheEntry & { storedAt: number }>()
+
+  function insert(key: string, entry: CacheEntry): void {
+    // Delete + re-insert moves refreshed keys to the end of the Map's
+    // insertion order, so eviction below drops the least-recently-written.
+    entries.delete(key)
+    entries.set(key, { ...entry, storedAt: Date.now() })
+
+    while (entries.size > config.cacheMaxEntries) {
+      entries.delete(entries.keys().next().value!)
+    }
+  }
 
   return {
-    get(key: string): string | undefined {
+    get(key: string): CacheEntry | undefined {
       const entry = entries.get(key)
       if (!entry) return undefined
 
@@ -51,18 +78,15 @@ export function createValueCache(config: StorageConfigState): ValueCache {
         return undefined
       }
 
-      return entry.print
+      return entry
     },
 
-    set(key: string, print: string): void {
-      // Delete + re-insert moves refreshed keys to the end of the Map's
-      // insertion order, so eviction below drops the least-recently-written.
-      entries.delete(key)
-      entries.set(key, { print, storedAt: Date.now() })
+    set(key: string, entry: { print: string; body: string }): void {
+      insert(key, entry)
+    },
 
-      while (entries.size > config.cacheMaxEntries) {
-        entries.delete(entries.keys().next().value!)
-      }
+    setAbsent(key: string): void {
+      insert(key, { absent: true })
     },
 
     delete(key: string): void {
