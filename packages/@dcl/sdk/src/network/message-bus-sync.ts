@@ -78,14 +78,20 @@ export function addSyncTransport(
     if (sender !== myProfile.userId) return
     DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength / 1024, 'KB')
     transport.onmessage!(data)
-    stateIsSyncronized = true
+    aloneResolvedWithoutState = false
+    if (!stateIsSyncronized) {
+      DEBUG_NETWORK_MESSAGES() && console.log('State syncronized. Initial CRDT state received')
+      stateIsSyncronized = true
+    }
   })
 
   // Answer to REQ_CRDT_STATE
   binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, async (_, userId) => {
     DEBUG_NETWORK_MESSAGES() && console.log(`Sending CRDT State to: ${userId}`)
 
-    for (const chunk of engineToCrdt(engine)) {
+    const chunks = engineToCrdt(engine)
+    if (!chunks.length) chunks.push(new Uint8Array())
+    for (const chunk of chunks) {
       binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(userId, chunk), [userId])
     }
   })
@@ -97,36 +103,65 @@ export function addSyncTransport(
     transport.onmessage!(value)
   })
 
-  async function requestState(retryCount: number = 1) {
-    let players = Array.from(engine.getEntitiesWith(PlayerIdentityData))
-    DEBUG_NETWORK_MESSAGES() && console.log(`Requesting state. Players connected: ${players.length - 1}`)
+  const REQUEST_STATE_INITIAL_RETRY_MS = 1000
+  const REQUEST_STATE_MAX_RETRY_MS = 30000
+  const REQUEST_STATE_MIN_ALONE_ATTEMPT = 3
+  const REQUEST_STATE_GIVE_UP_MS = 60_000
+  let requestingState = false
+  let resetBackoff = false
+  let aloneResolvedWithoutState = false
 
-    if (!RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom) {
-      DEBUG_NETWORK_MESSAGES() && console.log(`Aborting Requesting state?. Disconnected`)
-      return
-    }
+  async function requestState() {
+    if (requestingState) return
+    requestingState = true
+    try {
+      let waitedMs = 0
+      for (let attempt = 0; !stateIsSyncronized; attempt++) {
+        if (resetBackoff) {
+          resetBackoff = false
+          attempt = 0
+          waitedMs = 0
+        }
+        if (!RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom) {
+          DEBUG_NETWORK_MESSAGES() && console.log(`Aborting Requesting state?. Disconnected`)
+          return
+        }
 
-    binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
+        const players = Array.from(engine.getEntitiesWith(PlayerIdentityData))
+        if (attempt >= REQUEST_STATE_MIN_ALONE_ATTEMPT && players.length <= 1) {
+          DEBUG_NETWORK_MESSAGES() && console.log('No active players. State syncronized')
+          aloneResolvedWithoutState = true
+          stateIsSyncronized = true
+          return
+        }
+        if (waitedMs >= REQUEST_STATE_GIVE_UP_MS && players.length > 1) {
+          console.error(
+            `No answer to REQ_CRDT_STATE after ${waitedMs}ms with other players present — proceeding as synced; late state still merges on arrival`
+          )
+          stateIsSyncronized = true
+          return
+        }
 
-    // Wait ~5s for the response.
-    await sleep(5000)
-
-    players = Array.from(engine.getEntitiesWith(PlayerIdentityData))
-
-    if (!stateIsSyncronized) {
-      if (players.length > 1 && retryCount <= 2) {
         DEBUG_NETWORK_MESSAGES() &&
-          console.log(`Requesting state again ${retryCount} (no response). Players connected: ${players.length - 1}`)
-        void requestState(retryCount + 1)
-      } else {
-        DEBUG_NETWORK_MESSAGES() && console.log('No active players. State syncronized')
-        stateIsSyncronized = true
+          console.log(`Requesting state. Attempt: ${attempt + 1}. Players connected: ${players.length - 1}`)
+        binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
+
+        const delay = Math.min(REQUEST_STATE_INITIAL_RETRY_MS * 2 ** attempt, REQUEST_STATE_MAX_RETRY_MS)
+        waitedMs += delay
+        await sleep(delay)
       }
+    } finally {
+      requestingState = false
     }
   }
 
   players.onEnterScene((player) => {
     DEBUG_NETWORK_MESSAGES() && console.log('[onEnterScene]', player.userId)
+    if (aloneResolvedWithoutState) {
+      aloneResolvedWithoutState = false
+      stateIsSyncronized = false
+      void requestState()
+    }
   })
 
   // Asks for the REQ_CRDT_STATE when its connected to comms
@@ -141,6 +176,7 @@ export function addSyncTransport(
     }
 
     if (value?.isConnectedSceneRoom && !stateIsSyncronized) {
+      resetBackoff = true
       void requestState()
     }
   })
