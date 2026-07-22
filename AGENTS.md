@@ -79,10 +79,9 @@ An `ERR!` line means the QuickJS eval threw mid-execution (commonly a missing mo
 
 `@dcl/asset-packs` is not a direct dependency of this repo — it ships nested inside `@dcl/inspector`, and `packages/@dcl/sdk-commands/src/logic/bundle.ts` resolves it from the inspector's `node_modules`. To bump (prior art: commits `04270ca5`, `8b6bd63d`):
 
-1. Edit the pin in `packages/@dcl/sdk-commands/package.json`.
-2. Regenerate that package's standalone lockfile: `cd packages/@dcl/sdk-commands && npm install --package-lock-only`
-3. `make install && make build` (the build installs the new version into the package's own `node_modules/`).
-4. Regenerate snapshots with a `UPDATE_SNAPSHOTS=true` scoped Jest run — `test/snapshots/package-lock.json` updates itself during this run. Verify no `ERR!` lines (see above).
+1. `cd packages/@dcl/sdk-commands && npm i --save-exact @dcl/inspector@<x.y.z>` — updates the pin, the package's standalone lockfile, and its `node_modules/` in one step (same pattern as the Makefile's `update-protocol` target).
+2. `make build` from the repo root.
+3. Regenerate snapshots with a `UPDATE_SNAPSHOTS=true` scoped Jest run — `test/snapshots/package-lock.json` updates itself during this run. Verify no `ERR!` lines (see above).
 
 Asset-packs injection is gated behind `isEditorScene` (requires `assets/scene/main.composite` — see `packages/@dcl/sdk-commands/src/logic/project-validations.ts`), so inspector bumps no longer change `.crdt` snapshots. An empty snapshot diff is expected, not a stale artifact.
 
