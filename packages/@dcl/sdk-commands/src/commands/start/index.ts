@@ -100,7 +100,7 @@ export async function help(options: Options) {
       --mobile                          Show QR code for mobile preview on the same network.
       --multi-instance                  Allow running multiple Explorer instances simultaneously.
       --no-client                       Suppress every auto-launch (desktop Explorer deeplink, browser open, mobile QR). The file watcher still notifies a desktop Explorer if it connects on its own — useful when an external tool owns the Explorer process.
-      --no-asset-bundles                Do not run the abgen asset-bundle sidecar (default; the abgen binary on the PATH or ABGEN_BIN, skipped with a warning when missing).
+      --no-asset-bundles                Do not run the abgen asset-bundle sidecar (the binary resolves from ABGEN_BIN, a cached download of the pinned abgen release, or the PATH; skipped with a warning when none is found).
 
 
     Examples:
@@ -223,7 +223,11 @@ export async function main(options: Options) {
 
       let assetBundlesUrl: string | undefined
       if (withAssetBundles) {
-        assetBundlesUrl = await runAssetBundlesSidecar(components, port)
+        assetBundlesUrl = await runAssetBundlesSidecar(
+          components,
+          port,
+          workspace.projects[0]?.workingDirectory || workingDirectory
+        )
         if (assetBundlesUrl) {
           printProgressInfo(options.components.logger, `Serving asset bundles (abgen JIT): ${assetBundlesUrl}`)
         }

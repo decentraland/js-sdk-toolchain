@@ -1,10 +1,10 @@
-import * as os from 'os'
 import * as path from 'path'
 
 import { CliComponents } from '../../components'
 import { getCatalystBaseUrl } from '../../logic/config'
 import { drainResponse } from '../../logic/fetch'
 import { getPort } from '../../logic/get-free-port'
+import { ABGEN_VERSION, resolveAbgenBin } from './abgen-binary'
 
 const READY_TIMEOUT_MS = 15_000
 const READY_POLL_INTERVAL_MS = 250
@@ -15,16 +15,22 @@ const READY_REQUEST_TIMEOUT_MS = 2_000
  * scene being previewed into asset bundles, reading it through the preview's
  * own /content endpoints. Returns the sidecar URL once it answers /readyz, or
  * undefined — with a warning — when the binary is missing or never comes up.
+ * The binary resolves from $ABGEN_BIN, then the pinned abgen release
+ * (downloaded and cached on first use), then `abgen` on the PATH.
  */
 export async function runAssetBundlesSidecar(
-  components: Pick<CliComponents, 'fetch' | 'logger' | 'spawner' | 'config'>,
-  previewPort: number
+  components: Pick<CliComponents, 'fetch' | 'logger' | 'spawner' | 'config' | 'fs'>,
+  previewPort: number,
+  projectRoot: string
 ): Promise<string | undefined> {
-  const bin = process.env.ABGEN_BIN || 'abgen'
+  const bin = await resolveAbgenBin(components)
   const port = await getPort(0)
   const url = `http://127.0.0.1:${port}`
   const catalystUrl = await getCatalystBaseUrl(components)
-  const cacheRoot = path.join(os.tmpdir(), 'dcl-abgen')
+  // next to scene.json: converted bundles survive preview restarts (never
+  // reconverted) and stay per-scene; the leading dot rides the default
+  // dcl-ignore, keeping the dir out of the watcher and deployments
+  const cacheRoot = path.join(projectRoot, '.dcl-optimized-assets')
 
   // ABGEN_* variables already present in the environment win over this wiring
   const env: Record<string, string> = {
@@ -53,7 +59,7 @@ export async function runAssetBundlesSidecar(
   }
 
   components.logger.warn(
-    `asset-bundles: ${bin} did not come up on ${url}. Install the abgen binary (or set ABGEN_BIN to its path) to serve asset bundles in preview, or pass --no-asset-bundles to turn this off.`
+    `asset-bundles: ${bin} did not come up on ${url}. Install abgen ${ABGEN_VERSION} (put abgen on the PATH or set ABGEN_BIN) to serve asset bundles in preview, or pass --no-asset-bundles to turn this off.`
   )
   return undefined
 }
