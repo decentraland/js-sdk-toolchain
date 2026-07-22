@@ -80,6 +80,29 @@ describe('createValueCache', () => {
     }
   })
 
+  it('treats a negative cacheMaxEntries as 0 instead of looping forever', () => {
+    const cache = createValueCache(createStorageConfig({ cacheMaxEntries: -1 }))
+
+    // Must terminate (a negative bound can never be reached by an empty map)
+    // and behave as a disabled cache.
+    cache.set('a', { print: '1', body: 'b1' })
+
+    expect(cache.get('a')).toBeUndefined()
+  })
+
+  it('falls back to the default bound when cacheMaxEntries is not finite', () => {
+    const cache = createValueCache(createStorageConfig({ cacheMaxEntries: NaN }))
+
+    // Eviction must not be silently disabled: the default bound (512) applies.
+    for (let i = 0; i < 513; i++) {
+      cache.set(`key-${i}`, { print: `${i}`, body: `b${i}` })
+    }
+
+    expect(cache.get('key-0')).toBeUndefined()
+    expect(cache.get('key-1')?.print).toBe('1')
+    expect(cache.get('key-512')?.print).toBe('512')
+  })
+
   it('applies config mutations to an existing cache', () => {
     const config = createStorageConfig({ cacheMaxEntries: 10 })
     const cache = createValueCache(config)

@@ -1,4 +1,4 @@
-import { StorageConfigState } from './constants'
+import { DEFAULT_STORAGE_CONFIG, StorageConfigState } from './constants'
 
 /**
  * 32-bit FNV-1a hash over a string. The scene runtime (QuickJS) has no native
@@ -61,7 +61,13 @@ export function createValueCache(config: StorageConfigState): ValueCache {
     entries.delete(key)
     entries.set(key, { ...entry, storedAt: Date.now() })
 
-    while (entries.size > config.cacheMaxEntries) {
+    // Guard against misconfiguration: a negative bound would loop forever on
+    // an empty map, and a NaN bound would silently disable eviction.
+    const maxEntries = Number.isFinite(config.cacheMaxEntries)
+      ? Math.max(0, config.cacheMaxEntries)
+      : DEFAULT_STORAGE_CONFIG.cacheMaxEntries
+
+    while (entries.size > maxEntries) {
       entries.delete(entries.keys().next().value!)
     }
   }
