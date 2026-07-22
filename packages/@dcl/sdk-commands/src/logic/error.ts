@@ -67,6 +67,13 @@ export type CliErrorName =
   | 'CODE_TO_COMPOSITE_BUILD_FAILED'
   | 'CODE_TO_COMPOSITE_BUNDLE_NOT_FOUND'
   | 'CODE_TO_COMPOSITE_EXECUTION_FAILED'
+  // World permissions errors
+  | 'WORLD_PERMISSIONS_MISSING_WORLD'
+  | 'WORLD_PERMISSIONS_MISSING_ADDRESS'
+  | 'WORLD_PERMISSIONS_INVALID_ADDRESS'
+  | 'WORLD_PERMISSIONS_INVALID_PARCEL'
+  | 'WORLD_PERMISSIONS_FETCH_FAILED'
+  | 'WORLD_PERMISSIONS_GRANT_FAILED'
 
 export class CliError<T extends CliErrorName> extends Error {
   constructor(public name: T = 'CliError' as T, public message: string = '', public stack?: string) {
