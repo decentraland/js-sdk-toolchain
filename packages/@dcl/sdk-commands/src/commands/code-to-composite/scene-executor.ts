@@ -273,7 +273,7 @@ function createAutoMockProxy(baseMock: any = {}): any {
         return target[prop]
       }
 
-      return async (...args: any[]) => {
+      return async () => {
         return {}
       }
     }

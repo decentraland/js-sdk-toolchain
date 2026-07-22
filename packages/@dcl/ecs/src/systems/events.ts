@@ -268,7 +268,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     return PointerEventType.PET_DOWN
   }
 
-  function removeEvent(entity: Entity, type: EventType, interactionType: InteractionType = InteractionType.CURSOR) {
+  function removeEvent(entity: Entity, type: EventType, _interactionType: InteractionType = InteractionType.CURSOR) {
     const event = getEvent(entity)
     const pointerEvent = event.get(type)
 

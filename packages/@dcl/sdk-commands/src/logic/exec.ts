@@ -3,6 +3,9 @@ import type { spawn } from 'child_process'
 interface Options {
   env: { [key: string]: string }
   silent: boolean
+  // default true; false spawns the binary directly (no shell quoting, and kill() reaches
+  // the binary itself - on Windows killing the wrapping shell leaves grandchildren alive)
+  shell: boolean
 }
 
 export type IProcessSpawnerComponent = {
@@ -11,10 +14,10 @@ export type IProcessSpawnerComponent = {
 
 export function createProcessSpawnerComponent(spawnFn: typeof spawn): IProcessSpawnerComponent {
   return {
-    exec(cwd: string, command: string, args: string[], { env, silent }: Partial<Options> = {}): Promise<void> {
+    exec(cwd: string, command: string, args: string[], { env, silent, shell }: Partial<Options> = {}): Promise<void> {
       return new Promise((resolve, reject) => {
         const child = spawnFn(command, args, {
-          shell: true,
+          shell: shell ?? true,
           cwd,
           env: { ...process.env, NODE_ENV: '', ...env }
         })
@@ -32,10 +35,26 @@ export function createProcessSpawnerComponent(spawnFn: typeof spawn): IProcessSp
         process.on('SIGINT', cleanup)
         process.on('exit', cleanup)
 
-        child.on('close', (code: number) => {
+        const offCleanup = () => {
           process.off('SIGTERM', cleanup)
           process.off('SIGINT', cleanup)
           process.off('exit', cleanup)
+        }
+
+        let settled = false
+
+        // without a shell, a missing binary emits 'error' (ENOENT) and never 'close'
+        child.on('error', (error: Error) => {
+          if (settled) return
+          settled = true
+          offCleanup()
+          reject(new Error(`Command "${command}" failed: ${error.message}`))
+        })
+
+        child.on('close', (code: number) => {
+          if (settled) return
+          settled = true
+          offCleanup()
 
           // Don't reject if we killed the child during shutdown
           if (code !== 0 && !child.killed) {

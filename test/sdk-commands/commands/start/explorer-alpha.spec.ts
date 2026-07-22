@@ -57,6 +57,45 @@ describe('explorer-alpha', () => {
       )
     })
 
+    it('should include optimized-assets-url only when an asset bundles url is provided', async () => {
+      const args: any = {}
+
+      await runExplorerAlpha(mockComponents, {
+        cwd: '/test',
+        realm: 'test-realm',
+        baseCoords: { x: 0, y: 0 },
+        isHub: false,
+        args,
+        assetBundlesUrl: 'http://127.0.0.1:5147'
+      })
+
+      expect(mockExec).toHaveBeenCalledWith(
+        '/test',
+        'open',
+        expect.arrayContaining([
+          expect.stringContaining(`optimized-assets-url=${encodeURIComponent('http://127.0.0.1:5147')}`)
+        ]),
+        { silent: true }
+      )
+
+      mockExec.mockClear()
+
+      await runExplorerAlpha(mockComponents, {
+        cwd: '/test',
+        realm: 'test-realm',
+        baseCoords: { x: 0, y: 0 },
+        isHub: false,
+        args
+      })
+
+      expect(mockExec).toHaveBeenCalledWith(
+        '/test',
+        'open',
+        expect.not.arrayContaining([expect.stringContaining('optimized-assets-url')]),
+        { silent: true }
+      )
+    })
+
     it('should always include local-scene and debug even when they are false', async () => {
       const args: any = {
         '--local-scene': false,
@@ -137,7 +176,7 @@ describe('explorer-alpha', () => {
       expect(mockExec).toHaveBeenCalledWith(
         '/test',
         'open',
-        expect.arrayContaining([expect.not.stringContaining('open-deeplink-in-new-instance')]),
+        expect.not.arrayContaining([expect.stringContaining('open-deeplink-in-new-instance')]),
         { silent: true }
       )
     })
@@ -179,7 +218,7 @@ describe('explorer-alpha', () => {
       expect(mockExec).toHaveBeenCalledWith(
         '/test',
         'open',
-        expect.arrayContaining([expect.not.stringContaining('multi-instance')]),
+        expect.not.arrayContaining([expect.stringContaining('multi-instance')]),
         { silent: true }
       )
     })

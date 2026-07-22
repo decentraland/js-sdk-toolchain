@@ -9,9 +9,9 @@ import { PreviewComponents } from '../types'
 import { fetchEntityByPointer } from '../../../logic/catalyst-requests'
 import { CliComponents } from '../../../components'
 import {
-  b64HashingFunction,
+  b64UrlHashDecodingFunction,
+  b64UrlHashingFunction,
   getProjectPublishableFilesWithHashes,
-  machineId,
   projectFilesToContentMappings
 } from '../../../logic/project-files'
 import { getCatalystBaseUrl, getInstalledPackageVersion } from '../../../logic/config'
@@ -188,9 +188,7 @@ async function serveFolders(
 
   router.get('/content/contents/:hash', async (ctx, next) => {
     if (ctx.params.hash && ctx.params.hash.startsWith('b64-')) {
-      const decoded = Buffer.from(ctx.params.hash.replace(/^b64-/, ''), 'base64').toString('utf8')
-      // Strip the machineId suffix that was added during encoding
-      const fullPath = path.resolve(decoded.slice(0, -(machineId.length + 1)))
+      const fullPath = path.resolve(b64UrlHashDecodingFunction(ctx.params.hash))
 
       // find a project that we are talking about. NOTE: this filter is not exhaustive
       //   relative paths should be used instead
@@ -203,7 +201,7 @@ async function serveFolders(
 
       if (path.resolve(fullPath) === path.resolve(baseProject.workingDirectory)) {
         // if we are talking about the root directory, then we must return the json of the entity
-        const entity = await fakeEntityV3FromProject(components, baseProject, async ($) => b64HashingFunction($))
+        const entity = await fakeEntityV3FromProject(components, baseProject, async ($) => b64UrlHashingFunction($))
 
         if (!entity) return { status: 404 }
 
@@ -344,7 +342,7 @@ async function serveWearable(
   }
 
   const projectFiles = await getProjectPublishableFilesWithHashes(components, project.workingDirectory, async ($) =>
-    b64HashingFunction($)
+    b64UrlHashingFunction($)
   )
   const contentFiles = projectFilesToContentMappings(project.workingDirectory, projectFiles)
 
@@ -353,7 +351,7 @@ async function serveWearable(
     thumbnailFiltered.length > 0 && thumbnailFiltered[0]!.hash && `${baseUrl}/${thumbnailFiltered[0].hash}`
 
   // Set wearable ID.
-  const sceneHash = b64HashingFunction(project.workingDirectory)
+  const sceneHash = b64UrlHashingFunction(project.workingDirectory)
   const wearableId = wearableCache.get(sceneHash) ?? `urn:${uuidv4()}`
   wearableCache.set(sceneHash, wearableId)
 
@@ -398,7 +396,7 @@ async function getSceneJson(
 
   const allDeployments = await Promise.all(
     workspace.projects.map((project) =>
-      fakeEntityV3FromProject(components, project, async ($) => b64HashingFunction($))
+      fakeEntityV3FromProject(components, project, async ($) => b64UrlHashingFunction($))
     )
   )
 
