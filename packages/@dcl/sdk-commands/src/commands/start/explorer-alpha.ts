@@ -68,6 +68,9 @@ async function runApp(
 
     if (assetBundlesUrl) {
       params.set('optimized-assets-url', assetBundlesUrl)
+      // The scene itself loads asset bundles only with this flag; the url alone
+      // re-bases wearable/registry traffic but leaves scene content on raw GLTFs
+      params.set('local-ab', 'true')
     }
 
     if (isHub) {

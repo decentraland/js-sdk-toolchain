@@ -77,6 +77,13 @@ describe('explorer-alpha', () => {
         ]),
         { silent: true }
       )
+      // local-ab makes the scene itself load bundles; it travels with the url
+      expect(mockExec).toHaveBeenCalledWith(
+        '/test',
+        'open',
+        expect.arrayContaining([expect.stringContaining('local-ab=true')]),
+        { silent: true }
+      )
 
       mockExec.mockClear()
 
@@ -92,6 +99,12 @@ describe('explorer-alpha', () => {
         '/test',
         'open',
         expect.not.arrayContaining([expect.stringContaining('optimized-assets-url')]),
+        { silent: true }
+      )
+      expect(mockExec).toHaveBeenCalledWith(
+        '/test',
+        'open',
+        expect.not.arrayContaining([expect.stringContaining('local-ab')]),
         { silent: true }
       )
     })

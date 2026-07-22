@@ -34,7 +34,11 @@ describe('start/asset-bundles', () => {
     expect(bin).toMatch(/abgen-v\d+\.\d+\.\d+-[a-z0-9_]+-[a-z-]+[/\\]abgen(\.exe)?$/)
     expect(execArgs).toEqual([])
     expect(options.env.ABGEN_CATALYST_URL).toBe('http://127.0.0.1:8000/content')
-    expect(options.env.ABGEN_WORLDS_CONTENT_URL).toBe('https://peer.decentraland.org/content')
+    // remote entities are never converted locally: the worlds content fallback is
+    // off and misses stream prebuilt from the production CDN
+    expect(options.env.ABGEN_WORLDS_CONTENT_URL).toBe('off')
+    expect(options.env.ABGEN_UPSTREAM_AB_CDN).toBe('https://ab-cdn.decentraland.org')
+    expect(['windows', 'mac', 'linux']).toContain(options.env.ABGEN_INDEX_BUILD_PLATFORMS)
     expect(options.env.HTTP_SERVER_HOST).toBe('127.0.0.1')
     expect(url).toContain(options.env.HTTP_SERVER_PORT)
     expect(fetch).toHaveBeenCalledWith(`${url}/readyz`, expect.objectContaining({ signal: expect.anything() }))

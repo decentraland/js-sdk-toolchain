@@ -1,4 +1,5 @@
 import * as path from 'path'
+import portfinder from 'portfinder'
 
 import { CliComponents } from '../../components'
 import { getCatalystBaseUrl } from '../../logic/config'
@@ -9,6 +10,11 @@ import { ABGEN_VERSION, resolveAbgenBin } from './abgen-binary'
 const READY_TIMEOUT_MS = 15_000
 const READY_POLL_INTERVAL_MS = 250
 const READY_REQUEST_TIMEOUT_MS = 2_000
+
+// abgen's default port, and the Explorer's default `optimized-assets-url`:
+// preferring it lets a connected Unity Editor find the sidecar with zero
+// configuration. Scans upward when taken (the deeplink carries the real URL).
+const PREFERRED_SIDECAR_PORT = 5147
 
 /**
  * Boots an `abgen` sidecar: an ab-cdn-compatible server that JIT-converts the
@@ -24,7 +30,7 @@ export async function runAssetBundlesSidecar(
   projectRoot: string
 ): Promise<string | undefined> {
   const bin = await resolveAbgenBin(components)
-  const port = await getPort(0)
+  const port = await portfinder.getPortPromise({ port: PREFERRED_SIDECAR_PORT }).catch(() => getPort(0))
   const url = `http://127.0.0.1:${port}`
   const catalystUrl = await getCatalystBaseUrl(components)
   // next to scene.json: converted bundles survive preview restarts (never
@@ -32,12 +38,26 @@ export async function runAssetBundlesSidecar(
   // dcl-ignore, keeping the dir out of the watcher and deployments
   const cacheRoot = path.join(projectRoot, '.dcl-optimized-assets')
 
+  // Wearables/emotes and every other non-local entity stream prebuilt from the
+  // production CDN (abgen's upstream read-through) instead of being converted
+  // locally per scene — only the previewed scene is ever built. The worlds
+  // content fallback is disabled so nothing remote is even convertible.
+  const upstreamAbCdn = catalystUrl.includes('.zone')
+    ? 'https://ab-cdn.decentraland.zone'
+    : 'https://ab-cdn.decentraland.org'
+
+  // A local sidecar only ever serves the host platform; eager registry builds
+  // for the other platform would be pure waste.
+  const hostPlatform = process.platform === 'win32' ? 'windows' : process.platform === 'darwin' ? 'mac' : 'linux'
+
   // ABGEN_* variables already present in the environment win over this wiring
   const env: Record<string, string> = {
     HTTP_SERVER_HOST: '127.0.0.1',
     HTTP_SERVER_PORT: port.toString(),
     ABGEN_CATALYST_URL: process.env.ABGEN_CATALYST_URL || `http://127.0.0.1:${previewPort}/content`,
-    ABGEN_WORLDS_CONTENT_URL: process.env.ABGEN_WORLDS_CONTENT_URL || `${catalystUrl}/content`,
+    ABGEN_WORLDS_CONTENT_URL: process.env.ABGEN_WORLDS_CONTENT_URL || 'off',
+    ABGEN_UPSTREAM_AB_CDN: process.env.ABGEN_UPSTREAM_AB_CDN || upstreamAbCdn,
+    ABGEN_INDEX_BUILD_PLATFORMS: process.env.ABGEN_INDEX_BUILD_PLATFORMS || hostPlatform,
     ABGEN_OUT_ROOT: process.env.ABGEN_OUT_ROOT || path.join(cacheRoot, 'out'),
     ABGEN_CACHE_DIR: process.env.ABGEN_CACHE_DIR || path.join(cacheRoot, 'cache'),
     RUST_LOG: process.env.RUST_LOG || 'abgen=info,tower_http=warn'
