@@ -1,3 +1,5 @@
+import { basename, dirname } from 'path'
+
 import {
   ABGEN_VERSION,
   getAbgenStorageRoot,
@@ -68,9 +70,12 @@ describe('start/abgen-binary', () => {
 
   it('prunes superseded releases once the pinned one resolves', async () => {
     const { components, fs } = makeComponents({ cached: true })
+    // the pinned dist dir name is platform-dependent: take it from the resolver itself
+    const keep = basename(dirname(await resolveAbgenBin(components)))
+    fs.rm.mockClear()
     fs.readdir.mockResolvedValue([
-      'abgen-v0.11.4-aarch64-apple-darwin',
-      `abgen-${ABGEN_VERSION}-aarch64-apple-darwin`,
+      'abgen-v0.0.0-superseded-target',
+      keep,
       '.staging-123-1' // a concurrent resolver may be mid-extract: never touched
     ])
 
@@ -78,7 +83,7 @@ describe('start/abgen-binary', () => {
 
     const removed = fs.rm.mock.calls.map((c: any[]) => c[0])
     expect(removed).toHaveLength(1)
-    expect(removed[0]).toContain('abgen-v0.11.4-aarch64-apple-darwin')
+    expect(removed[0]).toContain('abgen-v0.0.0-superseded-target')
   })
 
   it('never fails the resolve over pruning errors', async () => {
