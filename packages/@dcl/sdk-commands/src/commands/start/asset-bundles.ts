@@ -2,7 +2,7 @@ import * as path from 'path'
 import portfinder from 'portfinder'
 
 import { CliComponents } from '../../components'
-import { printProgressInfo } from '../../logic/beautiful-logs'
+import { printProgressInfo, printProgressStep } from '../../logic/beautiful-logs'
 import { getCatalystBaseUrl } from '../../logic/config'
 import { drainResponse } from '../../logic/fetch'
 import { getPort } from '../../logic/get-free-port'
@@ -12,7 +12,8 @@ import { ABGEN_VERSION, resolveAbgenBin } from './abgen-binary'
 const READY_TIMEOUT_MS = 15_000
 const READY_POLL_INTERVAL_MS = 250
 const READY_REQUEST_TIMEOUT_MS = 2_000
-const PREWARM_HEARTBEAT_MS = 10_000
+const PREWARM_POLL_MS = 2_500
+const PREWARM_FALLBACK_EVERY_TICKS = 4 // seconds-heartbeat cadence when /progress is unavailable
 const PREWARM_TIMEOUT_MS = 15 * 60_000
 const PREWARM_RETRY_DELAY_MS = 2_000
 
@@ -122,9 +123,20 @@ async function prewarmScene(
   const deadline = started + PREWARM_TIMEOUT_MS
   const elapsed = () => Math.round((Date.now() - started) / 1000)
   printProgressInfo(components.logger, 'asset-bundles: converting the scene (cached after the first run)...')
+  let ticks = 0
   const heartbeat = setInterval(() => {
-    printProgressInfo(components.logger, `asset-bundles: still converting... (${elapsed()}s)`)
-  }, PREWARM_HEARTBEAT_MS)
+    ticks++
+    void (async () => {
+      // per-asset progress from the sidecar; falls back to a plain elapsed-time
+      // heartbeat against sidecars that predate the /progress route
+      const progress = await fetchBuildProgress(components, url, entityId)
+      if (progress) {
+        printProgressStep(components.logger, `converting ${progress.file}`, progress.done, progress.total)
+      } else if (ticks % PREWARM_FALLBACK_EVERY_TICKS === 0) {
+        printProgressInfo(components.logger, `asset-bundles: still converting... (${elapsed()}s)`)
+      }
+    })()
+  }, PREWARM_POLL_MS)
   let lastError = 'timed out'
   try {
     // A single held request can die a transport death minutes in; the conversion keeps
@@ -163,6 +175,24 @@ async function prewarmScene(
     )
   } finally {
     clearInterval(heartbeat)
+  }
+}
+
+async function fetchBuildProgress(
+  components: Pick<CliComponents, 'fetch'>,
+  url: string,
+  entityId: string
+): Promise<{ done: number; total: number; file: string } | undefined> {
+  try {
+    const response = await components.fetch.fetch(`${url}/progress/${entityId}`, {
+      signal: AbortSignal.timeout(1_000)
+    })
+    if (!response.ok) return undefined
+    const progress = (await response.json()) as { done?: number; total?: number; file?: string }
+    if (typeof progress.done !== 'number' || typeof progress.total !== 'number' || !progress.total) return undefined
+    return { done: progress.done, total: progress.total, file: progress.file ?? '' }
+  } catch {
+    return undefined
   }
 }
 
