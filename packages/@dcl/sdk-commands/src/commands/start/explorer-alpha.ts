@@ -91,9 +91,11 @@ async function runApp(
 
     const queryParams = params.toString()
 
-    // --no-browser prints the deeplink without launching the client, so tools
-    // wrapping this command (Creator Hub) can decide when the explorer opens
-    if (!args['--no-browser']) {
+    // A hub-launched session never self-opens the client: Creator Hub captures the
+    // deeplink line below, adjusts it, and fires it itself when the user asks —
+    // self-opening here would race it with unadjusted params (or open the explorer
+    // during a background conversion no one asked to see).
+    if (!isHub) {
       const app = `decentraland://"${queryParams}"`
       await components.spawner.exec(cwd, cmd, [app], { silent: true })
     }
