@@ -12,11 +12,12 @@ export async function runExplorerAlpha(
     baseCoords: { x: number; y: number }
     isHub: boolean
     args: Result<typeof startArgs>
+    assetBundlesUrl?: string
   }
 ) {
-  const { cwd, realm, baseCoords, isHub } = opts
+  const { cwd, realm, baseCoords, isHub, assetBundlesUrl } = opts
 
-  if (await runApp(components, { cwd, realm, baseCoords, isHub, args: opts.args })) {
+  if (await runApp(components, { cwd, realm, baseCoords, isHub, args: opts.args, assetBundlesUrl })) {
     return
   }
 
@@ -30,13 +31,15 @@ async function runApp(
     realm: realmValue,
     baseCoords,
     isHub,
-    args
+    args,
+    assetBundlesUrl
   }: {
     cwd: string
     realm: string
     baseCoords: { x: number; y: number }
     isHub: boolean
     args: Result<typeof startArgs>
+    assetBundlesUrl?: string
   }
 ) {
   const cmd = isWindows ? 'start' : 'open'
@@ -63,6 +66,13 @@ async function runApp(
 
     params.set('local-scene', 'true')
 
+    if (assetBundlesUrl) {
+      params.set('optimized-assets-url', assetBundlesUrl)
+      // The scene itself loads asset bundles only with this flag; the url alone
+      // re-bases wearable/registry traffic but leaves scene content on raw GLTFs
+      params.set('local-ab', 'true')
+    }
+
     if (isHub) {
       params.set('hub', 'true')
     }
@@ -81,8 +91,14 @@ async function runApp(
 
     const queryParams = params.toString()
 
-    const app = `decentraland://"${queryParams}"`
-    await components.spawner.exec(cwd, cmd, [app], { silent: true })
+    // A hub-launched session never self-opens the client: Creator Hub captures the
+    // deeplink line below, adjusts it, and fires it itself when the user asks —
+    // self-opening here would race it with unadjusted params (or open the explorer
+    // during a background conversion no one asked to see).
+    if (!isHub) {
+      const app = `decentraland://"${queryParams}"`
+      await components.spawner.exec(cwd, cmd, [app], { silent: true })
+    }
     components.logger.info(`Desktop client: decentraland://${queryParams}\n`)
     return true
   } catch (e: any) {

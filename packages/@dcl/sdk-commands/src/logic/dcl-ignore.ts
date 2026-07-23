@@ -49,5 +49,11 @@ export async function getDCLIgnorePatterns(components: Pick<CliComponents, 'fs'>
   // by default many files need to be ignored
   ignored.push('.*', 'node_modules', '**/*.ts', '**/*.tsx', 'node_modules/**', '*.md')
 
+  // The asset-bundle sidecar writes into .dcl-optimized-assets on every manifest
+  // request; `.*` alone does not prune it from the file watcher (chokidar tests
+  // absolute paths), and a watched write here means reload → manifest request →
+  // write → reload, forever. The `**/` form matches regardless of path anchoring.
+  ignored.push('.dcl-optimized-assets', '**/.dcl-optimized-assets/**')
+
   return Array.from(new Set(ignored))
 }

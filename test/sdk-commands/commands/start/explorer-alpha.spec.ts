@@ -57,6 +57,75 @@ describe('explorer-alpha', () => {
       )
     })
 
+    it('should print the deeplink without launching the client when launched by the hub', async () => {
+      const logInfo = jest.spyOn(mockComponents.logger, 'info')
+
+      await runExplorerAlpha(mockComponents, {
+        cwd: '/test',
+        realm: 'test-realm',
+        baseCoords: { x: 0, y: 0 },
+        isHub: true,
+        args: {} as any
+      })
+
+      // the hub captures the printed deeplink and fires it itself when the user
+      // asks; the sdk must not race it by self-opening the client
+      expect(mockExec).not.toHaveBeenCalled()
+      expect(logInfo).toHaveBeenCalledWith(expect.stringContaining('Desktop client: decentraland://'))
+    })
+
+    it('should include optimized-assets-url only when an asset bundles url is provided', async () => {
+      const args: any = {}
+
+      await runExplorerAlpha(mockComponents, {
+        cwd: '/test',
+        realm: 'test-realm',
+        baseCoords: { x: 0, y: 0 },
+        isHub: false,
+        args,
+        assetBundlesUrl: 'http://127.0.0.1:5147'
+      })
+
+      expect(mockExec).toHaveBeenCalledWith(
+        '/test',
+        'open',
+        expect.arrayContaining([
+          expect.stringContaining(`optimized-assets-url=${encodeURIComponent('http://127.0.0.1:5147')}`)
+        ]),
+        { silent: true }
+      )
+      // local-ab makes the scene itself load bundles; it travels with the url
+      expect(mockExec).toHaveBeenCalledWith(
+        '/test',
+        'open',
+        expect.arrayContaining([expect.stringContaining('local-ab=true')]),
+        { silent: true }
+      )
+
+      mockExec.mockClear()
+
+      await runExplorerAlpha(mockComponents, {
+        cwd: '/test',
+        realm: 'test-realm',
+        baseCoords: { x: 0, y: 0 },
+        isHub: false,
+        args
+      })
+
+      expect(mockExec).toHaveBeenCalledWith(
+        '/test',
+        'open',
+        expect.not.arrayContaining([expect.stringContaining('optimized-assets-url')]),
+        { silent: true }
+      )
+      expect(mockExec).toHaveBeenCalledWith(
+        '/test',
+        'open',
+        expect.not.arrayContaining([expect.stringContaining('local-ab')]),
+        { silent: true }
+      )
+    })
+
     it('should always include local-scene and debug even when they are false', async () => {
       const args: any = {
         '--local-scene': false,
@@ -137,7 +206,7 @@ describe('explorer-alpha', () => {
       expect(mockExec).toHaveBeenCalledWith(
         '/test',
         'open',
-        expect.arrayContaining([expect.not.stringContaining('open-deeplink-in-new-instance')]),
+        expect.not.arrayContaining([expect.stringContaining('open-deeplink-in-new-instance')]),
         { silent: true }
       )
     })
@@ -179,7 +248,7 @@ describe('explorer-alpha', () => {
       expect(mockExec).toHaveBeenCalledWith(
         '/test',
         'open',
-        expect.arrayContaining([expect.not.stringContaining('multi-instance')]),
+        expect.not.arrayContaining([expect.stringContaining('multi-instance')]),
         { silent: true }
       )
     })
@@ -205,25 +274,23 @@ describe('explorer-alpha', () => {
         args
       })
 
-      expect(mockExec).toHaveBeenCalledWith(
-        '/test',
-        'open',
-        expect.arrayContaining([expect.stringMatching(/decentraland:\/\/".*"$/)]),
-        { silent: true }
-      )
+      // hub sessions never self-open the client: the deeplink is only printed
+      expect(mockExec).not.toHaveBeenCalled()
+      const logInfo = mockComponents.logger.info as jest.Mock
+      const logged = logInfo.mock.calls.map((c) => String(c[0])).find((l) => l.includes('Desktop client:'))!
+      expect(logged).toBeDefined()
 
       // Check that all expected parameters are present
-      const callArgs = mockExec.mock.calls[0][2][0]
-      expect(callArgs).toContain('realm=custom-realm')
-      expect(callArgs).toContain('position=10%2C20')
-      expect(callArgs).toContain('dclenv=zone')
-      expect(callArgs).toContain('local-scene=true')
-      expect(callArgs).toContain('hub=true')
-      expect(callArgs).toContain('skip-auth-screen=true')
-      expect(callArgs).toContain('open-deeplink-in-new-instance=true')
+      expect(logged).toContain('realm=custom-realm')
+      expect(logged).toContain('position=10%2C20')
+      expect(logged).toContain('dclenv=zone')
+      expect(logged).toContain('local-scene=true')
+      expect(logged).toContain('hub=true')
+      expect(logged).toContain('skip-auth-screen=true')
+      expect(logged).toContain('open-deeplink-in-new-instance=true')
 
       // Check that false parameters are not present
-      expect(callArgs).not.toContain('landscape-terrain-enabled=true')
+      expect(logged).not.toContain('landscape-terrain-enabled=true')
     })
 
     it('should use default values when parameters are not provided', async () => {

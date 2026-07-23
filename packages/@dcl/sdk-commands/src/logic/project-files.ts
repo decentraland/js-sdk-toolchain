@@ -107,6 +107,18 @@ export const b64HashingFunction = (str: string) => {
   const unique = `${str}-${machineId}`
   return 'b64-' + Buffer.from(unique).toString('base64')
 }
+
+// The preview content server hands these ids out in URL path segments, and the asset-bundle
+// tooling turns them into directory names. base64url keeps them free of '/', '+' and '='.
+export const b64UrlHashingFunction = (str: string) => {
+  const unique = `${str}-${machineId}`
+  return 'b64-' + Buffer.from(unique).toString('base64url')
+}
+
+export const b64UrlHashDecodingFunction = (hash: string) => {
+  const decoded = Buffer.from(hash.replace(/^b64-/, ''), 'base64url').toString('utf8')
+  return decoded.slice(0, -(machineId.length + 1))
+}
 // export const ipfsHashingFunction = async (str: string) => hashV1(Buffer.from(str, 'utf8'))
 
 interface PackageJson {
