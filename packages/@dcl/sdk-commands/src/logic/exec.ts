@@ -25,6 +25,11 @@ export function createProcessSpawnerComponent(spawnFn: typeof spawn): IProcessSp
         if (!silent) {
           child.stdout.pipe(process.stdout)
           child.stderr.pipe(process.stderr)
+        } else {
+          // the pipes must still be drained: a chatty child fills the ~64KB pipe buffer
+          // and then blocks on its next write, deadlocking at 0% CPU
+          child.stdout.resume()
+          child.stderr.resume()
         }
 
         const cleanup = () => {

@@ -108,10 +108,12 @@ describe('utils/exec', () => {
     const spawnMock = {
       stdout: {
         on: jest.fn(),
-        pipe: jest.fn()
+        pipe: jest.fn(),
+        resume: jest.fn()
       },
       stderr: {
-        pipe: jest.fn()
+        pipe: jest.fn(),
+        resume: jest.fn()
       },
       on: jest.fn()
     }
@@ -133,6 +135,10 @@ describe('utils/exec', () => {
       env: { ...process.env, NODE_ENV: '', someKey: '1' }
     })
     expect(pipeSpy).not.toBeCalled()
+    // silent must still drain the pipes: a chatty child would otherwise fill the
+    // pipe buffer and deadlock on its next write
+    expect(spawnMock.stdout.resume).toBeCalled()
+    expect(spawnMock.stderr.resume).toBeCalled()
     expect(res).toBe(undefined)
   })
 
