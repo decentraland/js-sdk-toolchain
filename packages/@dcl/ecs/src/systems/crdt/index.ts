@@ -1,5 +1,6 @@
 import { Entity, EntityState } from '../../engine/entity'
 import type { ComponentDefinition } from '../../engine'
+import type { ConflictResolutionMessage } from '../../engine/component'
 import type { PreEngine } from '../../engine/types'
 import { ReadWriteByteBuffer } from '../../serialization/ByteBuffer'
 import {
@@ -50,6 +51,8 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
   const receivedMessages: ReceiveMessage[] = []
   // Messages already processed by the engine but that we need to broadcast to other transports.
   const broadcastMessages: ReceiveMessage[] = []
+  // Corrections (the current winning state) for peers that sent an outdated update, waiting to be sent.
+  const conflictMessages: ConflictResolutionMessage[] = []
 
   /**
    *
@@ -177,6 +180,9 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
             // Add message to transport queue to be processed by others transports
             broadcastMessages.push(msg)
             onProcessEntityComponentChange && onProcessEntityComponentChange(entityId, msg.type, component, value)
+          } else {
+            // The message lost the conflict resolution, queue the winning state so the outdated peer converges
+            conflictMessages.push(conflictMessage)
           }
         } else {
           // TODO: test this line, it is fundammental to make the editor work
@@ -229,6 +235,33 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
           onProcessEntityComponentChange(message.entityId, message.type, component, rawValue)
         }
       }
+    }
+
+    // Send the current winning state to the peers that sent an outdated update, so they converge.
+    // A message queued above for the same component and entity carries a newer timestamp and supersedes it.
+    // Network messages are skipped from that check since their entityId lives in the network space.
+    for (const message of getMessages(conflictMessages)) {
+      const superseded = crdtMessages.some(
+        (crdtMessage) =>
+          !networkUtils.isNetworkMessage(crdtMessage) &&
+          'componentId' in crdtMessage &&
+          crdtMessage.componentId === message.componentId &&
+          crdtMessage.entityId === message.entityId &&
+          crdtMessage.timestamp >= message.timestamp
+      )
+      // Avoid creating messages if there is no transport that will handle it
+      if (superseded || !transports.some((t) => t.filter(message))) continue
+
+      const offset = buffer.currentWriteOffset()
+      if (message.type === CrdtMessageType.PUT_COMPONENT) {
+        PutComponentOperation.write(message.entityId, message.timestamp, message.componentId, message.data, buffer)
+      } else {
+        DeleteComponent.write(message.entityId, message.componentId, message.timestamp, buffer)
+      }
+      crdtMessages.push({
+        ...message,
+        messageBuffer: buffer.buffer().subarray(offset, buffer.currentWriteOffset())
+      })
     }
 
     // After all updates, I execute the DeletedEntity messages
