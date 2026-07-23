@@ -5,7 +5,6 @@ import { PBAudioAnalysis, PBAudioAnalysisMode } from '../generated/pb/decentrala
 
 export interface AudioAnalysisComponentDefinitionExtended
   extends LastWriteWinElementSetComponentDefinition<PBAudioAnalysis> {
-
   /**
    * Reads the component data of `entity` into the provided `out` view.
    *
@@ -95,7 +94,7 @@ export function defineAudioAnalysisComponent(
     tryReadIntoView(entity: Entity, out: AudioAnalysisView): boolean {
       const audioAnalysis = theComponent.getOrNull(entity)
 
-      if (!audioAnalysis) return false;
+      if (!audioAnalysis) return false
 
       out.amplitude = audioAnalysis.amplitude
 
@@ -108,15 +107,10 @@ export function defineAudioAnalysisComponent(
       out.bands[6] = audioAnalysis.band6
       out.bands[7] = audioAnalysis.band7
 
-      return true;
+      return true
     },
 
-    createAudioAnalysis(
-      entity: Entity,
-      mode?: PBAudioAnalysisMode,
-      amplitudeGain?: number,
-      bandsGain?: number
-    ): void {
+    createAudioAnalysis(entity: Entity, mode?: PBAudioAnalysisMode, amplitudeGain?: number, bandsGain?: number): void {
       theComponent.create(entity, {
         mode: mode || PBAudioAnalysisMode.MODE_LOGARITHMIC,
         amplitudeGain: amplitudeGain ?? undefined,
