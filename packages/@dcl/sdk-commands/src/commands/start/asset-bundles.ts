@@ -14,6 +14,7 @@ const READY_POLL_INTERVAL_MS = 250
 const READY_REQUEST_TIMEOUT_MS = 2_000
 const PREWARM_HEARTBEAT_MS = 10_000
 const PREWARM_TIMEOUT_MS = 15 * 60_000
+const PREWARM_RETRY_DELAY_MS = 2_000
 
 // abgen's default port, and the Explorer's default `optimized-assets-url`:
 // preferring it lets a connected Unity Editor find the sidecar with zero
@@ -88,7 +89,7 @@ export async function runAssetBundlesSidecar(
   const deadline = Date.now() + READY_TIMEOUT_MS
   while (Date.now() < deadline && !exited) {
     if (await isReady(components, url)) {
-      await prewarmScene(components, url, projectRoot, hostPlatform)
+      await prewarmScene(components, url, projectRoot, hostPlatform, () => !exited)
       return url
     }
     await sleep(READY_POLL_INTERVAL_MS)
@@ -112,31 +113,53 @@ async function prewarmScene(
   components: Pick<CliComponents, 'fetch' | 'logger'>,
   url: string,
   projectRoot: string,
-  platform: string
+  platform: string,
+  sidecarAlive: () => boolean
 ): Promise<void> {
   // the same id the preview content server hands out for this scene
   const entityId = b64UrlHashingFunction(projectRoot)
   const started = Date.now()
+  const deadline = started + PREWARM_TIMEOUT_MS
   const elapsed = () => Math.round((Date.now() - started) / 1000)
   printProgressInfo(components.logger, 'asset-bundles: converting the scene (cached after the first run)...')
   const heartbeat = setInterval(() => {
     printProgressInfo(components.logger, `asset-bundles: still converting... (${elapsed()}s)`)
   }, PREWARM_HEARTBEAT_MS)
+  let lastError = 'timed out'
   try {
-    const response = await components.fetch.fetch(`${url}/manifest/${entityId}_${platform}.json`, {
-      signal: AbortSignal.timeout(PREWARM_TIMEOUT_MS)
-    })
-    const manifest = (await response.json()) as { exitCode?: number; files?: string[] }
-    if (response.ok && manifest.exitCode === 0) {
-      components.logger.log(`asset-bundles: scene converted (${manifest.files?.length ?? 0} bundles, ${elapsed()}s)`)
-    } else {
-      components.logger.warn(
-        `asset-bundles: scene conversion reported exitCode ${manifest.exitCode}; assets that failed to convert will load as raw GLTFs`
-      )
+    // A single held request can die a transport death minutes in; the conversion keeps
+    // running server-side regardless, and a retried request attaches to the in-flight
+    // build (or hits the finished cache), so just keep asking until the deadline.
+    while (Date.now() < deadline) {
+      try {
+        const response = await components.fetch.fetch(`${url}/manifest/${entityId}_${platform}.json`, {
+          signal: AbortSignal.timeout(deadline - Date.now())
+        })
+        const manifest = (await response.json()) as { exitCode?: number; files?: string[] }
+        if (response.ok && manifest.exitCode === 0) {
+          components.logger.log(
+            `asset-bundles: scene converted (${manifest.files?.length ?? 0} bundles, ${elapsed()}s)`
+          )
+        } else {
+          components.logger.warn(
+            `asset-bundles: scene conversion reported exitCode ${manifest.exitCode}; assets that failed to convert will load as raw GLTFs`
+          )
+        }
+        return
+      } catch (error: any) {
+        lastError = error.message
+        // a dead sidecar can never answer: stop retrying and let the explorer degrade
+        if (!sidecarAlive() || !(await isReady(components, url))) {
+          components.logger.warn(
+            `asset-bundles: the sidecar went away during conversion (${lastError}); previewing with raw GLTFs`
+          )
+          return
+        }
+        await sleep(PREWARM_RETRY_DELAY_MS)
+      }
     }
-  } catch (error: any) {
     components.logger.warn(
-      `asset-bundles: scene pre-conversion did not finish (${error.message}); the explorer may need a reload once conversion completes`
+      `asset-bundles: scene pre-conversion did not finish (${lastError}); the explorer may need a reload once conversion completes`
     )
   } finally {
     clearInterval(heartbeat)
