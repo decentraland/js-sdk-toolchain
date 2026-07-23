@@ -9,7 +9,22 @@ describe('Generated TouchScreenControls ProtoBuf', () => {
     testComponentSerialization(TouchScreenControls, {
       touchInputs: [
         { inputAction: InputAction.IA_SECONDARY, hide: true, icon: undefined },
-        { inputAction: InputAction.IA_JUMP, hide: false, icon: 'custom-jump' }
+        {
+          inputAction: InputAction.IA_JUMP,
+          hide: false,
+          icon: {
+            tex: {
+              $case: 'texture',
+              texture: {
+                src: 'custom-jump',
+                wrapMode: undefined,
+                filterMode: undefined,
+                offset: undefined,
+                tiling: undefined
+              }
+            }
+          }
+        }
       ],
       mainAction: InputAction.IA_PRIMARY,
       hideJoystick: true,
