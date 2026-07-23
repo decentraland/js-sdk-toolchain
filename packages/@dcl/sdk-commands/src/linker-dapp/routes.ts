@@ -1,4 +1,4 @@
-import { dirname, resolve } from 'path'
+import { dirname, join, resolve } from 'path'
 import { Readable } from 'stream'
 import { Agent } from 'undici'
 import { Router } from '@well-known-components/http-server'
@@ -7,6 +7,7 @@ import { ChainId } from '@dcl/schemas'
 import { AuthChain } from '@dcl/crypto'
 
 import { CliComponents } from '../components'
+import { resolvePathInside } from '../commands/start/server/path'
 
 /**
  * Set common routes to use on Linker dApp
@@ -34,17 +35,23 @@ export function setRoutes<T extends { [key: string]: any }>(
 
   router.get('/static/:type/:path', async (ctx) => {
     const contentType = getContentType(ctx.params.type)
+    const filePath = resolvePathInside(resolve(linkerDapp, 'static'), join(ctx.params.type, ctx.params.path))
+    if (!filePath) return { status: 404 }
+
     return {
       headers: { 'Content-Type': contentType },
-      body: fs.createReadStream(resolve(linkerDapp, 'static', ctx.params.type, ctx.params.path))
+      body: fs.createReadStream(filePath)
     }
   })
 
   router.get('/assets/:path', async (ctx) => {
     const contentType = getContentTypeFromPath(ctx.params.path)
+    const filePath = resolvePathInside(resolve(linkerDapp, 'assets'), ctx.params.path)
+    if (!filePath) return { status: 404 }
+
     return {
       headers: { 'Content-Type': contentType },
-      body: fs.createReadStream(resolve(linkerDapp, 'assets', ctx.params.path))
+      body: fs.createReadStream(filePath)
     }
   })
 

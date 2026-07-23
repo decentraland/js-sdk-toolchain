@@ -14,6 +14,7 @@ import { createWallet } from '../../logic/account'
 import { LinkerResponse } from '../../linker-dapp/routes'
 import { dAppOptions, runDapp } from '../../run-dapp'
 import { setRoutes } from '../../linker-dapp/routes'
+import { resolvePathInside } from '../start/server/path'
 
 async function getAddressAndSignature(
   components: CliComponents,
@@ -362,8 +363,11 @@ export const setUpManager = (components: Pick<CliComponents, 'fs' | 'logger' | '
   }))
 
   router.get('/:path*', async (ctx) => {
+    const filePath = resolvePathInside(questsManager, ctx.params.path! as unknown as string)
+    if (!filePath) return { status: 404 }
+
     return {
-      body: fs.createReadStream(resolve(questsManager, ctx.params.path! as unknown as string))
+      body: fs.createReadStream(filePath)
     }
   })
 
