@@ -64,7 +64,10 @@ export async function resolveAbgenBin(
   const target = TARGET_BY_PLATFORM[`${process.platform}-${process.arch}`]
   const dist = target && `abgen-${ABGEN_VERSION}-${target}`
   const binPath = dist && path.join(getAbgenStorageRoot(), dist, binName)
-  if (binPath && (await components.fs.fileExists(binPath))) return binPath
+  if (binPath && (await components.fs.fileExists(binPath))) {
+    await pruneStaleReleases(components, dist)
+    return binPath
+  }
 
   const onPath = await findOnPath(components, binName)
   if (onPath) return onPath
@@ -81,6 +84,7 @@ export async function resolveAbgenBin(
     if (!(await components.fs.fileExists(binPath))) {
       throw new Error(`${dist}.tar.gz did not contain ${dist}/${binName}`)
     }
+    await pruneStaleReleases(components, dist)
     return binPath
   } catch (error: any) {
     components.logger.warn(
@@ -88,6 +92,23 @@ export async function resolveAbgenBin(
     )
     return 'abgen'
   }
+}
+
+/**
+ * Superseded release dirs are never resolved again (lookups are exact on the
+ * pinned version), so once the pinned one is in place the others are deleted.
+ * Staging dirs are left alone — a concurrent resolver may be mid-extract.
+ * Cache housekeeping only: failures never affect the resolve.
+ */
+async function pruneStaleReleases(components: Pick<CliComponents, 'fs' | 'logger'>, keep: string): Promise<void> {
+  const root = getAbgenStorageRoot()
+  try {
+    for (const entry of await components.fs.readdir(root)) {
+      if (entry === keep || !entry.startsWith('abgen-v')) continue
+      await components.fs.rm(path.join(root, entry), { recursive: true, force: true })
+      components.logger.info(`asset-bundles: pruned superseded ${entry}`)
+    }
+  } catch {}
 }
 
 async function findOnPath(components: Pick<CliComponents, 'fs'>, binName: string): Promise<string | undefined> {

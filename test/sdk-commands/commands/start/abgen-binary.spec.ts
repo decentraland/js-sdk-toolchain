@@ -23,7 +23,9 @@ function makeComponents({
     fileExists: jest.fn(async (_path: string) => cached),
     mkdir: jest.fn(async () => {}),
     writeFile: jest.fn(async () => {}),
-    unlink: jest.fn(async () => {})
+    unlink: jest.fn(async () => {}),
+    readdir: jest.fn(async () => [] as string[]),
+    rm: jest.fn(async () => {})
   }
   return { components: { fetch: { fetch }, logger, spawner: { exec }, fs } as any, fetch, logger, exec, fs }
 }
@@ -62,6 +64,30 @@ describe('start/abgen-binary', () => {
     expect(bin.startsWith(getAbgenStorageRoot())).toBe(true)
     expect(bin).toContain(`abgen-${ABGEN_VERSION}-`)
     expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it('prunes superseded releases once the pinned one resolves', async () => {
+    const { components, fs } = makeComponents({ cached: true })
+    fs.readdir.mockResolvedValue([
+      'abgen-v0.11.4-aarch64-apple-darwin',
+      `abgen-${ABGEN_VERSION}-aarch64-apple-darwin`,
+      '.staging-123-1' // a concurrent resolver may be mid-extract: never touched
+    ])
+
+    await resolveAbgenBin(components)
+
+    const removed = fs.rm.mock.calls.map((c: any[]) => c[0])
+    expect(removed).toHaveLength(1)
+    expect(removed[0]).toContain('abgen-v0.11.4-aarch64-apple-darwin')
+  })
+
+  it('never fails the resolve over pruning errors', async () => {
+    const { components, fs } = makeComponents({ cached: true })
+    fs.readdir.mockRejectedValue(new Error('EACCES'))
+
+    const bin = await resolveAbgenBin(components)
+
+    expect(bin).toContain(`abgen-${ABGEN_VERSION}-`)
   })
 
   it('prefers a binary already on the PATH over downloading', async () => {
