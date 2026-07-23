@@ -74,7 +74,8 @@ const entityComponent: EntityComponents = {
   onMouseEnter: undefined as any,
   onMouseLeave: undefined as any,
   uiInput: undefined as any,
-  uiDropdown: undefined as any
+  uiDropdown: undefined as any,
+  uiInputBinding: undefined as any
 }
 export const componentKeys: (keyof EntityComponents)[] = Object.keys(entityComponent) as (keyof EntityComponents)[]
 

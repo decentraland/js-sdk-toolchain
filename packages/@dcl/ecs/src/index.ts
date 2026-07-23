@@ -41,7 +41,8 @@ import {
   InputModifierComponentDefinitionExtended,
   LightSourceComponentDefinitionExtended,
   TriggerAreaComponentDefinitionExtended,
-  ParticleSystemComponentDefinitionExtended
+  ParticleSystemComponentDefinitionExtended,
+  TouchScreenControlsComponentDefinitionExtended
 } from './components/types'
 import { NameComponent } from './components/manual/Name'
 import { TagsComponentDefinitionExtended } from './components/manual/Tags'
@@ -64,6 +65,8 @@ export const LightSource: LightSourceComponentDefinitionExtended = /* @__PURE__*
 export const TriggerArea: TriggerAreaComponentDefinitionExtended = /* @__PURE__*/ components.TriggerArea(engine)
 export const ParticleSystem: ParticleSystemComponentDefinitionExtended =
   /* @__PURE__*/ components.ParticleSystem(engine)
+export const TouchScreenControls: TouchScreenControlsComponentDefinitionExtended =
+  /* @__PURE__*/ components.TouchScreenControls(engine)
 
 /**
  * @alpha

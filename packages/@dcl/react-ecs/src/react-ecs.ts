@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
-import { PBUiBackground, PBUiText, PBUiTransform, PBUiInput, PBUiDropdown } from '@dcl/ecs'
+import { PBUiBackground, PBUiText, PBUiTransform, PBUiInput, PBUiDropdown, PBUiInputBinding } from '@dcl/ecs'
 import React from 'react'
 import { Callback, Key } from './components'
 
@@ -19,6 +19,7 @@ export type EntityComponents = {
   uiBackground: PBUiBackground
   uiInput: PBUiInput
   uiDropdown: PBUiDropdown
+  uiInputBinding: PBUiInputBinding
   onMouseDown: Callback
   onMouseUp: Callback
   onMouseEnter: Callback
