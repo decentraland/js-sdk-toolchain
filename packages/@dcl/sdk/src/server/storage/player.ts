@@ -9,7 +9,7 @@ import {
   SetOptions,
   StorageConfigState
 } from './constants'
-import { createValueCache, fingerprint } from './value-cache'
+import { createValueCache } from './value-cache'
 
 /**
  * Player-scoped storage interface for key-value pairs from the Server Side Storage service.
@@ -118,7 +118,7 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
             // Same serialization shape as set()'s PUT body, so a read followed by
             // an unchanged write can be skipped.
             const body = JSON.stringify({ value: data.value })
-            if (isOwner) cache.set(ck, { print: fingerprint(body), body })
+            if (isOwner) cache.set(ck, { body })
             return data.value
           }
 
@@ -139,10 +139,9 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
 
       const ck = cacheKey(address, key)
       const body = JSON.stringify({ value })
-      const print = fingerprint(body)
       const skipIfUnchanged = options?.skipIfUnchanged ?? config.skipIfUnchanged
 
-      if (skipIfUnchanged && cache.get(ck)?.print === print) {
+      if (skipIfUnchanged && cache.get(ck)?.body === body) {
         return true
       }
 
@@ -165,14 +164,14 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       inflightGets.delete(ck)
 
       if (error) {
-        // The PUT may have reached the server, so the cached body and
-        // fingerprint are no longer reliable.
+        // The PUT may have reached the server, so the cached body is no
+        // longer reliable.
         cache.delete(ck)
         console.error(`Failed to set player storage value '${key}' for '${address}': ${error}`)
         return false
       }
 
-      cache.set(ck, { print, body })
+      cache.set(ck, { body })
       return true
     },
 
@@ -250,8 +249,7 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       // cache; entries repopulate lazily.
       for (const entry of data) {
         if (entry.value !== undefined) {
-          const body = JSON.stringify({ value: entry.value })
-          cache.set(cacheKey(address, entry.key), { print: fingerprint(body), body })
+          cache.set(cacheKey(address, entry.key), { body: JSON.stringify({ value: entry.value }) })
         }
       }
 

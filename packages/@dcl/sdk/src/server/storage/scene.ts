@@ -9,7 +9,7 @@ import {
   SetOptions,
   StorageConfigState
 } from './constants'
-import { createValueCache, fingerprint } from './value-cache'
+import { createValueCache } from './value-cache'
 
 /**
  * Scene-scoped storage interface for key-value pairs from the Server Side Storage service.
@@ -106,7 +106,7 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
             // Same serialization shape as set()'s PUT body, so a read followed by
             // an unchanged write can be skipped.
             const body = JSON.stringify({ value: data.value })
-            if (isOwner) cache.set(key, { print: fingerprint(body), body })
+            if (isOwner) cache.set(key, { body })
             return data.value
           }
 
@@ -126,10 +126,9 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
       assertIsServer(MODULE_NAME)
 
       const body = JSON.stringify({ value })
-      const print = fingerprint(body)
       const skipIfUnchanged = options?.skipIfUnchanged ?? config.skipIfUnchanged
 
-      if (skipIfUnchanged && cache.get(key)?.print === print) {
+      if (skipIfUnchanged && cache.get(key)?.body === body) {
         return true
       }
 
@@ -152,14 +151,14 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
       inflightGets.delete(key)
 
       if (error) {
-        // The PUT may have reached the server, so the cached body and
-        // fingerprint are no longer reliable.
+        // The PUT may have reached the server, so the cached body is no
+        // longer reliable.
         cache.delete(key)
         console.error(`Failed to set storage value '${key}': ${error}`)
         return false
       }
 
-      cache.set(key, { print, body })
+      cache.set(key, { body })
       return true
     },
 
@@ -233,8 +232,7 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
       // cache; entries repopulate lazily.
       for (const entry of data) {
         if (entry.value !== undefined) {
-          const body = JSON.stringify({ value: entry.value })
-          cache.set(entry.key, { print: fingerprint(body), body })
+          cache.set(entry.key, { body: JSON.stringify({ value: entry.value }) })
         }
       }
 

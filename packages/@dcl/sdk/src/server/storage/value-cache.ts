@@ -1,36 +1,15 @@
 import { DEFAULT_STORAGE_CONFIG, StorageConfigState } from './constants'
 
 /**
- * 32-bit FNV-1a hash over a string. The scene runtime (QuickJS) has no native
- * crypto, so a cheap JS hash is used to fingerprint serialized values.
- * @internal
- */
-export function fnv1a(input: string): number {
-  let hash = 0x811c9dc5
-  for (let i = 0; i < input.length; i++) {
-    hash ^= input.charCodeAt(i)
-    hash = Math.imul(hash, 0x01000193)
-  }
-  return hash >>> 0
-}
-
-/**
- * Cheap fingerprint of a serialized body: fnv1a hash plus length. The length
- * guards against hash collisions between same-key values.
- * @internal
- */
-export function fingerprint(serialized: string): string {
-  return `${fnv1a(serialized).toString(16)}:${serialized.length}`
-}
-
-/**
  * A cached fact about a key's server-side state.
  * @internal
  */
 export interface CacheEntry {
-  /** Write-dedup fingerprint of the serialized body; absent for negative entries. */
-  print?: string
-  /** Serialized `{ value }` body; parsed per read hit so callers never share object references. */
+  /**
+   * Serialized `{ value }` body; absent for negative entries. Parsed per read
+   * hit so callers never share object references, and compared verbatim for
+   * write dedup (exact equality — no hash-collision risk).
+   */
   body?: string
   /** True when the server confirmed the key does not exist (GET 404 or successful DELETE). */
   absent?: boolean
@@ -45,8 +24,8 @@ export interface CacheEntry {
 export interface ValueCache {
   /** Returns the entry if present and fresh; lazily evicts expired entries. */
   get(key: string): CacheEntry | undefined
-  /** Stores or refreshes a known value (fingerprint + serialized body); overwrites negative entries. */
-  set(key: string, entry: { print: string; body: string }): void
+  /** Stores or refreshes a known value (serialized body); overwrites negative entries. */
+  set(key: string, entry: { body: string }): void
   /** Stores a confirmed-absent (negative) entry, replacing any value entry. */
   setAbsent(key: string): void
   delete(key: string): void
@@ -87,7 +66,7 @@ export function createValueCache(config: StorageConfigState): ValueCache {
       return entry
     },
 
-    set(key: string, entry: { print: string; body: string }): void {
+    set(key: string, entry: { body: string }): void {
       insert(key, entry)
     },
 
