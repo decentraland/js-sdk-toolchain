@@ -38,7 +38,7 @@ export async function runSdkCommand(components: CliComponents, command: string, 
   const language = getLanguage(argv)
 
   await initLanguage(language)
-  const commandArgv = argv.filter((arg) => arg !== '--language')
+  argv = argv.filter((arg) => arg !== '--language')
 
   const commands = await getCommands(components)
 
@@ -59,7 +59,7 @@ export async function runSdkCommand(components: CliComponents, command: string, 
   if (asserValidCommand(cmd)) {
     let args: ReturnType<typeof parseArgs>
     try {
-      args = parseArgs(commandArgv, cmd.args)
+      args = parseArgs(argv, cmd.args)
     } catch (e) {
       components.logger.error((e as Error).message)
       return cmd.help({ args: {} as any, components })

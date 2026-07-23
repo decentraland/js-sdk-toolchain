@@ -279,7 +279,10 @@ export function createTriggerAreaEventsSystem(engine: IEngine): TriggerAreaEvent
       // Pass 2: synthesize per-tick onStay callbacks
       // -----------------------------------------------------------------------
       // Only run if an onStay callback is registered and there are tracked triggerers.
-      if (data.triggerCallbackMap.has(TriggerAreaEventType.TAET_STAY) && data.insideTriggerers.size > 0) {
+      if (
+        data.triggerCallbackMap.has(TriggerAreaEventType.TAET_STAY) &&
+        data.insideTriggerers.size > 0
+      ) {
         const onStay = data.triggerCallbackMap.get(TriggerAreaEventType.TAET_STAY)!
         const currentTimestamp = Date.now()
         for (const [triggererEntity, cachedResult] of data.insideTriggerers) {
