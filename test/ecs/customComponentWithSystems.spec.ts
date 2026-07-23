@@ -261,7 +261,17 @@ describe('test CRDT flow E2E', () => {
       expect(int8B.get(entityA)).toBe(45)
 
       await Promise.all([engineA.update(0), engineB.update(0)])
-      expect(env.connection.interceptedMessages).toMatchObject([])
+      // engineA keeps the winning value (48 wins the byte comparison) and sends a
+      // correction back so the outdated peer converges towards it
+      expect(env.connection.interceptedMessages).toMatchObject([
+        {
+          direction: 'a->b',
+          componentId: int8A.componentId,
+          entityId: entityA,
+          data: Uint8Array.of(48),
+          timestamp: 5
+        }
+      ])
       env.connection.interceptedMessages = []
 
       expect(int8A.get(entityA)).toBe(48)

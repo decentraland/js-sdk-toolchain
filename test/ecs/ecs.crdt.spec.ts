@@ -6,11 +6,33 @@ import {
   LastWriteWinElementSetComponentDefinition,
   Schemas
 } from '../../packages/@dcl/ecs/src'
-import { PutComponentOperation } from '../../packages/@dcl/ecs/src/serialization/crdt'
+import { CrdtMessageProtocol, PutComponentOperation } from '../../packages/@dcl/ecs/src/serialization/crdt'
+import {
+  CrdtMessageHeader,
+  DeleteComponentMessage,
+  PutComponentMessage
+} from '../../packages/@dcl/ecs/src/serialization/crdt/types'
 import { Entity, EntityState, EntityUtils, RESERVED_STATIC_ENTITIES } from '../../packages/@dcl/ecs/src/engine/entity'
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
+import { dataCompare } from '../../packages/@dcl/ecs/src/systems/crdt/utils'
 import { Vector3 } from '../../packages/@dcl/sdk/src/math'
 import { SandBox, wait } from './utils'
+
+function parseSentCrdtMessages(sentBytes: Uint8Array) {
+  const buf = new ReadWriteByteBuffer(sentBytes)
+  const messages: (PutComponentMessage | DeleteComponentMessage)[] = []
+  let header: CrdtMessageHeader | null
+  while ((header = CrdtMessageProtocol.getHeader(buf))) {
+    if (header.type === CrdtMessageType.PUT_COMPONENT) {
+      messages.push(PutComponentOperation.read(buf)!)
+    } else if (header.type === CrdtMessageType.DELETE_COMPONENT) {
+      messages.push(DeleteComponent.read(buf)!)
+    } else {
+      buf.incrementReadOffset(header.length)
+    }
+  }
+  return messages
+}
 
 async function simpleScene(engine: IEngine) {
   const Transform = components.Transform(engine)
@@ -245,7 +267,7 @@ describe('CRDT tests', () => {
     expect(() => Transform.getMutable(123 as Entity)).toThrow()
   })
 
-  it('should not resend a crdt message if its outdated', async () => {
+  it('should not resend an outdated crdt message, sending a correction with the winning state instead', async () => {
     const [{ engine, transports, spySend }] = SandBox.create({ length: 1 })
     const entity = engine.addEntity()
     const Transform = components.Transform(engine)
@@ -254,13 +276,120 @@ describe('CRDT tests', () => {
     Transform.getMutable(entity).position.x = 8
     await engine.update(1)
     const buffer = new ReadWriteByteBuffer()
-    const tmpBuffer1 = new ReadWriteByteBuffer()
-    Transform.schema.serialize(Transform.get(entity), tmpBuffer1)
-    PutComponentOperation.write(entity, 0, Transform.componentId, tmpBuffer1.toBinary(), buffer)
+    const staleData = new ReadWriteByteBuffer()
+    Transform.schema.serialize({ ...SandBox.DEFAULT_POSITION, position: Vector3.create(4, 4, 4) }, staleData)
+    PutComponentOperation.write(entity, 0, Transform.componentId, staleData.toBinary(), buffer)
     jest.resetAllMocks()
     transports[0].onmessage!(buffer.toBinary())
     await engine.update(1)
 
+    // The stale value is not applied, and the peer that sent it receives the winning state back
+    expect(Transform.get(entity).position.x).toBe(8)
+    const winningData = new ReadWriteByteBuffer()
+    Transform.schema.serialize(Transform.get(entity), winningData)
+    const sent = parseSentCrdtMessages(spySend.mock.calls[0][0] as Uint8Array)
+    expect(sent).toMatchObject([
+      { type: CrdtMessageType.PUT_COMPONENT, entityId: entity, componentId: Transform.componentId, timestamp: 2 }
+    ])
+    expect((sent[0] as PutComponentMessage).data).toEqual(winningData.toBinary())
+  })
+
+  it('should send a DELETE correction when an outdated PUT arrives for a deleted component', async () => {
+    const [{ engine, transports, spySend }] = SandBox.create({ length: 1 })
+    const entity = engine.addEntity()
+    const Transform = components.Transform(engine)
+    Transform.create(entity, SandBox.DEFAULT_POSITION)
+    await engine.update(1)
+    Transform.deleteFrom(entity)
+    await engine.update(1)
+
+    const buffer = new ReadWriteByteBuffer()
+    const staleData = new ReadWriteByteBuffer()
+    Transform.schema.serialize(SandBox.DEFAULT_POSITION, staleData)
+    PutComponentOperation.write(entity, 1, Transform.componentId, staleData.toBinary(), buffer)
+    jest.resetAllMocks()
+    transports[0].onmessage!(buffer.toBinary())
+    await engine.update(1)
+
+    expect(Transform.getOrNull(entity)).toBe(null)
+    const sent = parseSentCrdtMessages(spySend.mock.calls[0][0] as Uint8Array)
+    expect(sent).toMatchObject([
+      { type: CrdtMessageType.DELETE_COMPONENT, entityId: entity, componentId: Transform.componentId, timestamp: 2 }
+    ])
+  })
+
+  it('should send a correction when an equal-timestamp PUT loses the byte comparison', async () => {
+    const [{ engine, transports, spySend }] = SandBox.create({ length: 1 })
+    const entity = engine.addEntity()
+    const Transform = components.Transform(engine)
+    Transform.create(entity, { ...SandBox.DEFAULT_POSITION, position: Vector3.create(1, 1, 2) })
+    await engine.update(1)
+
+    const localData = new ReadWriteByteBuffer()
+    Transform.schema.serialize(Transform.get(entity), localData)
+    const incomingData = new ReadWriteByteBuffer()
+    Transform.schema.serialize({ ...SandBox.DEFAULT_POSITION, position: Vector3.create(8, 1, 2) }, incomingData)
+    // Same lamport timestamp, and the local data wins the byte comparison
+    expect(dataCompare(localData.toBinary(), incomingData.toBinary())).toBe(1)
+
+    const buffer = new ReadWriteByteBuffer()
+    PutComponentOperation.write(entity, 1, Transform.componentId, incomingData.toBinary(), buffer)
+    jest.resetAllMocks()
+    transports[0].onmessage!(buffer.toBinary())
+    await engine.update(1)
+
+    expect(Transform.get(entity).position.x).toBe(1)
+    const sent = parseSentCrdtMessages(spySend.mock.calls[0][0] as Uint8Array)
+    expect(sent).toMatchObject([
+      { type: CrdtMessageType.PUT_COMPONENT, entityId: entity, componentId: Transform.componentId, timestamp: 1 }
+    ])
+    expect((sent[0] as PutComponentMessage).data).toEqual(localData.toBinary())
+  })
+
+  it('should not send a correction when the incoming PUT wins the conflict', async () => {
+    const [{ engine, transports, spySend }] = SandBox.create({ length: 1 })
+    const entity = engine.addEntity()
+    const Transform = components.Transform(engine)
+    Transform.create(entity, SandBox.DEFAULT_POSITION)
+    await engine.update(1)
+
+    const incomingData = new ReadWriteByteBuffer()
+    Transform.schema.serialize({ ...SandBox.DEFAULT_POSITION, position: Vector3.create(9, 9, 9) }, incomingData)
+    const buffer = new ReadWriteByteBuffer()
+    PutComponentOperation.write(entity, 2, Transform.componentId, incomingData.toBinary(), buffer)
+    jest.resetAllMocks()
+    transports[0].onmessage!(buffer.toBinary())
+    await engine.update(1)
+
+    expect(Transform.get(entity).position.x).toBe(9)
+    expect(spySend).toBeCalledWith(new Uint8Array([]))
+  })
+
+  it('should not send a correction again when the correction itself is echoed back', async () => {
+    const [{ engine, transports, spySend }] = SandBox.create({ length: 1 })
+    const entity = engine.addEntity()
+    const Transform = components.Transform(engine)
+    Transform.create(entity, SandBox.DEFAULT_POSITION)
+    await engine.update(1)
+    Transform.getMutable(entity).position.x = 8
+    await engine.update(1)
+
+    const buffer = new ReadWriteByteBuffer()
+    const staleData = new ReadWriteByteBuffer()
+    Transform.schema.serialize({ ...SandBox.DEFAULT_POSITION, position: Vector3.create(4, 4, 4) }, staleData)
+    PutComponentOperation.write(entity, 0, Transform.componentId, staleData.toBinary(), buffer)
+    jest.resetAllMocks()
+    transports[0].onmessage!(buffer.toBinary())
+    await engine.update(1)
+
+    const correctionBytes = spySend.mock.calls[0][0] as Uint8Array
+    expect(parseSentCrdtMessages(correctionBytes)).toHaveLength(1)
+
+    // A peer holding the winning state receives the correction as an equal-timestamp, equal-bytes
+    // message, which produces no new conflict message, so corrections cannot ping-pong
+    jest.resetAllMocks()
+    transports[0].onmessage!(correctionBytes)
+    await engine.update(1)
     expect(spySend).toBeCalledWith(new Uint8Array([]))
   })
 
