@@ -4,7 +4,7 @@ import { type SendBinaryRequest, type SendBinaryResponse } from '~system/Communi
 import { syncFilter } from './filter'
 import { engineToCrdt } from './state'
 import { BinaryMessageBus, CommsMessage, decodeString, encodeString } from './binary-message-bus'
-import { fetchProfile } from './utils'
+import { fetchProfile, shouldAnswerStateRequest, AUTHORITATIVE_SERVER_ADDRESS } from './utils'
 import { entityUtils } from './entities'
 import { GetUserDataRequest, GetUserDataResponse } from '~system/UserIdentity'
 import { definePlayerHelper } from '../players'
@@ -42,6 +42,26 @@ export function addSyncTransport(
   let stateIsSyncronized = false
   let transportInitialzed = false
 
+  let runsOnServer = false
+  void (async () => {
+    try {
+      const { isServer } = await import('~system/EngineApi')
+      runsOnServer = !!(await isServer({})).isServer
+    } catch {}
+  })()
+  const AUTHORITATIVE_SERVER_SILENCE_S = 60
+  let elapsedS = 0
+  engine.addSystem((dt) => {
+    elapsedS += dt
+  })
+  let lastServerSeenAtS: number | undefined = undefined
+  function noteSender(sender: string) {
+    if (sender === AUTHORITATIVE_SERVER_ADDRESS) lastServerSeenAtS = elapsedS
+  }
+  function serverRecentlySeen() {
+    return lastServerSeenAtS !== undefined && elapsedS - lastServerSeenAtS < AUTHORITATIVE_SERVER_SILENCE_S
+  }
+
   // Add Sync Transport
   const transport: Transport = {
     filter: syncFilter(engine),
@@ -73,7 +93,8 @@ export function addSyncTransport(
   // End add sync transport
 
   // Receive & Process CRDT_STATE
-  binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, (value) => {
+  binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, (value, envelopeSender) => {
+    noteSender(envelopeSender)
     const { sender, data } = decodeCRDTState(value)
     if (sender !== myProfile.userId) return
     DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength / 1024, 'KB')
@@ -83,15 +104,31 @@ export function addSyncTransport(
 
   // Answer to REQ_CRDT_STATE
   binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, async (_, userId) => {
+    noteSender(userId)
+    const peerAddresses = Array.from(engine.getEntitiesWith(PlayerIdentityData)).map(([, identity]) => identity.address)
+    const answer = shouldAnswerStateRequest({
+      runsOnServer,
+      requesterAddress: userId,
+      hasSeenAuthoritativeServer: serverRecentlySeen(),
+      myAddress: myProfile.userId,
+      knownAddresses: peerAddresses
+    })
+    if (!answer) {
+      DEBUG_NETWORK_MESSAGES() && console.log(`Skip sending CRDT State to: ${userId}. Another peer owns the answer`)
+      return
+    }
     DEBUG_NETWORK_MESSAGES() && console.log(`Sending CRDT State to: ${userId}`)
 
-    for (const chunk of engineToCrdt(engine)) {
+    const chunks = engineToCrdt(engine)
+    if (!chunks.length) chunks.push(new Uint8Array())
+    for (const chunk of chunks) {
       binaryMessageBus.emit(CommsMessage.RES_CRDT_STATE, encodeCRDTState(userId, chunk), [userId])
     }
   })
 
   // Process CRDT messages here
-  binaryMessageBus.on(CommsMessage.CRDT, (value) => {
+  binaryMessageBus.on(CommsMessage.CRDT, (value, sender) => {
+    noteSender(sender)
     DEBUG_NETWORK_MESSAGES() &&
       console.log(Array.from(serializeCrdtMessages('[NetworkMessage received]:', value, engine)))
     transport.onmessage!(value)
