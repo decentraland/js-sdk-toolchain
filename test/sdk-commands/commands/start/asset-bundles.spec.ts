@@ -4,7 +4,7 @@ import { b64UrlHashingFunction } from '../../../../packages/@dcl/sdk-commands/sr
 function makeComponents({ ready, execRejects }: { ready: boolean; execRejects?: boolean }) {
   const sidecarKeepsRunning = new Promise<void>(() => {})
   const exec = jest.fn(() => (execRejects ? Promise.reject(new Error('spawn abgen ENOENT')) : sidecarKeepsRunning))
-  const fetch = jest.fn(async () => ({ ok: ready }))
+  const fetch = jest.fn(async () => ({ ok: ready, json: async () => ({ exitCode: 0, files: ['a_mac', 'dcl'] }) }))
   const logger = { log: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn(), debug: jest.fn() }
   const config = { getString: jest.fn(async () => undefined), requireString: jest.fn(), getNumber: jest.fn() }
   // the pinned release is "already downloaded", keeping these tests off the network
@@ -45,6 +45,13 @@ describe('start/asset-bundles', () => {
     expect(options.env.HTTP_SERVER_HOST).toBe('127.0.0.1')
     expect(url).toContain(options.env.HTTP_SERVER_PORT)
     expect(fetch).toHaveBeenCalledWith(`${url}/readyz`, expect.objectContaining({ signal: expect.anything() }))
+    // the scene is pre-converted before the explorer launches: the sidecar holds the
+    // manifest request until conversion finishes, so the explorer can never time out on it
+    const sceneId = b64UrlHashingFunction('/tmp/e2e-scene')
+    expect(fetch).toHaveBeenCalledWith(
+      expect.stringMatching(new RegExp(`/manifest/${sceneId}_(windows|mac|linux)\\.json$`)),
+      expect.objectContaining({ signal: expect.anything() })
+    )
   })
 
   it('resolves the binary from ABGEN_BIN when set', async () => {

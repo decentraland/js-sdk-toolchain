@@ -5,11 +5,14 @@ import { CliComponents } from '../../components'
 import { getCatalystBaseUrl } from '../../logic/config'
 import { drainResponse } from '../../logic/fetch'
 import { getPort } from '../../logic/get-free-port'
+import { b64UrlHashingFunction } from '../../logic/project-files'
 import { ABGEN_VERSION, resolveAbgenBin } from './abgen-binary'
 
 const READY_TIMEOUT_MS = 15_000
 const READY_POLL_INTERVAL_MS = 250
 const READY_REQUEST_TIMEOUT_MS = 2_000
+const PREWARM_HEARTBEAT_MS = 10_000
+const PREWARM_TIMEOUT_MS = 15 * 60_000
 
 // abgen's default port, and the Explorer's default `optimized-assets-url`:
 // preferring it lets a connected Unity Editor find the sidecar with zero
@@ -79,7 +82,10 @@ export async function runAssetBundlesSidecar(
 
   const deadline = Date.now() + READY_TIMEOUT_MS
   while (Date.now() < deadline && !exited) {
-    if (await isReady(components, url)) return url
+    if (await isReady(components, url)) {
+      await prewarmScene(components, url, projectRoot, hostPlatform)
+      return url
+    }
     await sleep(READY_POLL_INTERVAL_MS)
   }
 
@@ -87,6 +93,49 @@ export async function runAssetBundlesSidecar(
     `asset-bundles: ${bin} did not come up on ${url}. Install abgen ${ABGEN_VERSION} (put abgen on the PATH or set ABGEN_BIN) to serve asset bundles in preview, or run without --asset-bundles.`
   )
   return undefined
+}
+
+/**
+ * Converts the previewed scene before the explorer ever asks: the sidecar holds a
+ * manifest request open until the conversion finishes, so awaiting one here means
+ * the explorer's own manifest fetch is always a cache hit and cannot time out on a
+ * large first-time conversion. Conversions persist in .dcl-optimized-assets, so
+ * only the first run of a scene pays this wait; failures keep the pre-existing
+ * degrade (the explorer falls back to raw GLTFs).
+ */
+async function prewarmScene(
+  components: Pick<CliComponents, 'fetch' | 'logger'>,
+  url: string,
+  projectRoot: string,
+  platform: string
+): Promise<void> {
+  // the same id the preview content server hands out for this scene
+  const entityId = b64UrlHashingFunction(projectRoot)
+  const started = Date.now()
+  const elapsed = () => Math.round((Date.now() - started) / 1000)
+  components.logger.log('asset-bundles: converting the scene (cached after the first run)...')
+  const heartbeat = setInterval(() => {
+    components.logger.log(`asset-bundles: still converting... (${elapsed()}s)`)
+  }, PREWARM_HEARTBEAT_MS)
+  try {
+    const response = await components.fetch.fetch(`${url}/manifest/${entityId}_${platform}.json`, {
+      signal: AbortSignal.timeout(PREWARM_TIMEOUT_MS)
+    })
+    const manifest = (await response.json()) as { exitCode?: number; files?: string[] }
+    if (response.ok && manifest.exitCode === 0) {
+      components.logger.log(`asset-bundles: scene converted (${manifest.files?.length ?? 0} bundles, ${elapsed()}s)`)
+    } else {
+      components.logger.warn(
+        `asset-bundles: scene conversion reported exitCode ${manifest.exitCode}; assets that failed to convert will load as raw GLTFs`
+      )
+    }
+  } catch (error: any) {
+    components.logger.warn(
+      `asset-bundles: scene pre-conversion did not finish (${error.message}); the explorer may need a reload once conversion completes`
+    )
+  } finally {
+    clearInterval(heartbeat)
+  }
 }
 
 async function isReady(components: Pick<CliComponents, 'fetch'>, url: string): Promise<boolean> {
