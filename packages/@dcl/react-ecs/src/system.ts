@@ -5,8 +5,10 @@ import type { ReactEcs } from './react-ecs'
 import { createReconciler } from './reconciler'
 import {
   getUiScaleFactor,
+  resetInteractableArea,
   resetScreenInsetArea,
   resetUiScaleFactor,
+  setInteractableArea,
   setScreenInsetArea,
   setUiScaleFactor
 } from './components/utils'
@@ -73,6 +75,8 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
   const uiScaleFactorOwner = Symbol('react-ecs-ui-scale')
   // Unique owner for the screen inset module variable.
   const screenInsetAreaOwner = Symbol('react-ecs-screen-inset-area')
+  // Unique owner for the interactable area module variable.
+  const interactableAreaOwner = Symbol('react-ecs-interactable-area')
 
   function getActiveVirtualSize(): UiRendererOptions | undefined {
     // Main renderer options win; otherwise use the first additional renderer option.
@@ -124,6 +128,11 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
       setScreenInsetArea(canvasInfo.screenInsetArea, screenInsetAreaOwner)
     }
 
+    // Update the interactable area module variable unconditionally.
+    if (canvasInfo?.interactableArea) {
+      setInteractableArea(canvasInfo.interactableArea, interactableAreaOwner)
+    }
+
     const activeVirtualSize = getActiveVirtualSize()
     if (!activeVirtualSize) {
       // Reset only if this system owns the scale factor.
@@ -133,11 +142,14 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
 
     if (!canvasInfo) return
 
-    const { width, height } = canvasInfo
+    const { width, height, devicePixelRatio } = canvasInfo
     const { virtualWidth, virtualHeight } = activeVirtualSize
     if (!virtualWidth || !virtualHeight) return
 
-    const nextScale = Math.min(width / virtualWidth, height / virtualHeight)
+    // Normalize by devicePixelRatio so virtual px map to logical px (matching the
+    // vw/vh path); without it the scale was inflated on high-dpr mobile screens.
+    const ratio = devicePixelRatio || 1
+    const nextScale = Math.min(width / virtualWidth, height / virtualHeight) / ratio
     if (Number.isFinite(nextScale) && nextScale !== getUiScaleFactor()) {
       // Track ownership when updating to avoid cross-system conflicts.
       setUiScaleFactor(nextScale, uiScaleFactorOwner)
@@ -153,6 +165,7 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
       engine.removeSystem(ReactBasedUiSystem)
       resetUiScaleFactor(uiScaleFactorOwner)
       resetScreenInsetArea(screenInsetAreaOwner)
+      resetInteractableArea(interactableAreaOwner)
       for (const entity of renderer.getEntities()) {
         engine.removeEntity(entity)
       }

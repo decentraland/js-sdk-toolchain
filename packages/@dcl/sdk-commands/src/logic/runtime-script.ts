@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
-import { IEngine, Entity, EntityState } from '@dcl/ecs/dist-cjs'
-import { type ActionRef, getActionEvents } from '@dcl/inspector/node_modules/@dcl/asset-packs'
+import type { IEngine, Entity, EntityState } from '@dcl/ecs'
+import type { ActionRef } from '@dcl/inspector/node_modules/@dcl/asset-packs'
+import { getActionEvents } from '@dcl/inspector/node_modules/@dcl/asset-packs/dist/events'
 
 declare global {
   // eslint-disable-next-line no-var
@@ -47,8 +48,11 @@ type ScriptClassInstance = {
 type ScriptClass = new (src: string, entity: Entity, ...params: unknown[]) => ScriptClassInstance
 type ScriptsByPriority = Record<number, ScriptWithKey[]>
 
+// compiler-checked literal: the @dcl/ecs d.ts pins EntityState.Removed = 2, so drift fails this build with TS2322; a value import would embed ecs runtime code into every scene bundle
+const ENTITY_STATE_REMOVED: EntityState.Removed = 2
+
 function entityIsRemoved(engine: IEngine, entity: Entity) {
-  return engine.getEntityState(entity) === EntityState.Removed
+  return engine.getEntityState(entity) === ENTITY_STATE_REMOVED
 }
 
 /**
