@@ -10,7 +10,7 @@ import { CliComponents } from '../../components'
  * assets it resolves from its own directory, so the whole archive is
  * extracted and the binary runs from inside it.
  */
-export const ABGEN_VERSION = 'v0.11.5'
+export const ABGEN_VERSION = 'v0.11.6'
 
 const ABGEN_RELEASE_BASE_URL = `https://github.com/decentraland/abgen/releases/download/${ABGEN_VERSION}`
 
@@ -18,12 +18,12 @@ const ABGEN_RELEASE_BASE_URL = `https://github.com/decentraland/abgen/releases/d
 // The builds are reproducible (built twice in CI, required bit-identical), so
 // these are stable for the pinned tag.
 const ABGEN_SHA256: Record<string, string> = {
-  'x86_64-unknown-linux-gnu': '43e4ea6f60c371b5e4910e69ac4051d29092c87ce1c56a1355b7314aabc36c68',
-  'aarch64-unknown-linux-gnu': 'fe66c728a6492d3c66a5d5d20be9078192e0d1cc8ccc6b95116a53ab2650cb0e',
-  'x86_64-apple-darwin': 'f5ee5f39788d29deab075843409aa64e6287f37e5f39f8b2ababa85c317ec45e',
-  'aarch64-apple-darwin': '43568c09580d6be7418edaf9e421479d072e5a05168535f16350e5b35d68ea22',
-  'x86_64-pc-windows-gnu': 'b1a15cf19116dbe0728c243bbe04047c193c4c3478b6b3b7ad2fe7b04e4d9c5e',
-  'aarch64-pc-windows-gnullvm': '4f783d2bead36c8d2d0fee699cc9fe8ac65f5e91a33692ca8d243789addf8987'
+  'x86_64-unknown-linux-gnu': '0a817603d7c876f88f83a10ef28c9b27d7c30f6fb99be2120f4061556fe64bdb',
+  'aarch64-unknown-linux-gnu': '8687db2bc278da9bf2dca4c5acd3642edb540499d33847eda2890cc8389b8e0f',
+  'x86_64-apple-darwin': '108dc1cb684f949fe7b3423538d03c3f5a7cc250dcac4f69dd7a726ceed83bed',
+  'aarch64-apple-darwin': '157706083ffc3801ceeb6f47e3c0297f7a9d81bcc764fba0e75bc406541eccb5',
+  'x86_64-pc-windows-gnu': '5bd6f8dad01b11fc4e990d647df19f4f8a59f5f3a1d2590dc4174dacf9939ac7',
+  'aarch64-pc-windows-gnullvm': '2cf4e61b8e8f646c918e663a2fed3939484e33f2dc6e14d9a7de68559b513b93'
 }
 
 const TARGET_BY_PLATFORM: Record<string, string> = {
