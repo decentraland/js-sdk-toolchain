@@ -1,6 +1,5 @@
 import { dirname, resolve } from 'path'
 import { Readable } from 'stream'
-import { Agent } from 'undici'
 import { Router } from '@well-known-components/http-server'
 import { IHttpServerComponent } from '@well-known-components/interfaces'
 import { ChainId } from '@dcl/schemas'
@@ -22,10 +21,6 @@ export function setRoutes<T extends { [key: string]: any }>(
   const { fs } = components
   const router = new Router()
   const linkerDapp = dirname(require.resolve('@dcl/linker-dapp/package.json'))
-
-  // Dispatcher used by the /auth proxy below to skip TLS verification, mirroring the
-  // previous `new https.Agent({ rejectUnauthorized: false })` behavior with native fetch.
-  const insecureDispatcher = new Agent({ connect: { rejectUnauthorized: false } })
 
   router.get(mainRoute, async () => ({
     headers: { 'Content-Type': 'text/html' },
@@ -66,8 +61,7 @@ export function setRoutes<T extends { [key: string]: any }>(
           Origin: url
         }, // Forward headers for proper proxy behavior.
         body: ctx.request.body as any, // Forward request body if necessary.
-        duplex: 'half', // Required by native fetch when streaming a request body.
-        dispatcher: insecureDispatcher // Skip TLS verification.
+        duplex: 'half' // Required by native fetch when streaming a request body.
       })
 
       // undici decompresses the body but leaves content-encoding / content-length in
