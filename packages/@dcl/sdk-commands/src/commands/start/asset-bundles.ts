@@ -2,6 +2,7 @@ import * as path from 'path'
 import portfinder from 'portfinder'
 
 import { CliComponents } from '../../components'
+import { printProgressInfo } from '../../logic/beautiful-logs'
 import { getCatalystBaseUrl } from '../../logic/config'
 import { drainResponse } from '../../logic/fetch'
 import { getPort } from '../../logic/get-free-port'
@@ -68,13 +69,17 @@ export async function runAssetBundlesSidecar(
     ABGEN_INDEX_EAGER_BUILD: process.env.ABGEN_INDEX_EAGER_BUILD || 'off',
     ABGEN_OUT_ROOT: process.env.ABGEN_OUT_ROOT || path.join(cacheRoot, 'out'),
     ABGEN_CACHE_DIR: process.env.ABGEN_CACHE_DIR || path.join(cacheRoot, 'cache'),
-    RUST_LOG: process.env.RUST_LOG || 'abgen=info,tower_http=warn'
+    // warnings only: abgen's per-asset INFO output would drown the conversion
+    // heartbeat below; export RUST_LOG to get the full sidecar logs back
+    RUST_LOG: process.env.RUST_LOG || 'abgen=warn,tower_http=warn'
   }
 
-  // shell-less spawn: paths with spaces need no quoting, and kill() reaches abgen itself
+  // shell-less spawn: paths with spaces need no quoting, and kill() reaches abgen itself.
+  // Silent by default: the sidecar's per-file ABGEN_BUILD telemetry would drown the
+  // conversion heartbeat; exporting RUST_LOG opts back into the full sidecar output.
   let exited = false
   components.spawner
-    .exec(process.cwd(), bin, [], { env, silent: false, shell: false })
+    .exec(process.cwd(), bin, [], { env, silent: !process.env.RUST_LOG, shell: false })
     .catch((error: Error) => components.logger.warn(`asset-bundles: ${bin} exited (${error.message})`))
     .finally(() => {
       exited = true
@@ -113,9 +118,9 @@ async function prewarmScene(
   const entityId = b64UrlHashingFunction(projectRoot)
   const started = Date.now()
   const elapsed = () => Math.round((Date.now() - started) / 1000)
-  components.logger.log('asset-bundles: converting the scene (cached after the first run)...')
+  printProgressInfo(components.logger, 'asset-bundles: converting the scene (cached after the first run)...')
   const heartbeat = setInterval(() => {
-    components.logger.log(`asset-bundles: still converting... (${elapsed()}s)`)
+    printProgressInfo(components.logger, `asset-bundles: still converting... (${elapsed()}s)`)
   }, PREWARM_HEARTBEAT_MS)
   try {
     const response = await components.fetch.fetch(`${url}/manifest/${entityId}_${platform}.json`, {
