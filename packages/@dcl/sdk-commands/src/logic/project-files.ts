@@ -8,6 +8,7 @@ import os from 'os'
 
 import path, { resolve } from 'path'
 import { CliError } from './error'
+import { mapWithConcurrency } from './promise-utils'
 
 export type ProjectFile = {
   absolutePath: string
@@ -75,16 +76,15 @@ export async function getProjectPublishableFilesWithHashes(
   hashingFunction: (filePath: string) => Promise<string>
 ): Promise<ProjectFile[]> {
   const projectFiles = await getPublishableFiles(components, projectRoot)
-  const ret: ProjectFile[] = []
+  const existingFiles = (
+    await mapWithConcurrency(projectFiles, async (file) => {
+      const absolutePath = path.resolve(projectRoot, file)
+      return (await components.fs.fileExists(absolutePath)) ? { file, absolutePath } : null
+    })
+  ).filter((file): file is { file: string; absolutePath: string } => file !== null)
 
   const usedFilenames = new Set<string>()
-
-  for (const file of projectFiles) {
-    const absolutePath = path.resolve(projectRoot, file)
-
-    /* istanbul ignore if */
-    if (!(await components.fs.fileExists(absolutePath))) continue
-
+  for (const { file } of existingFiles) {
     const normalizedFile = normalizeDecentralandFilename(projectRoot, file)
 
     /* istanbul ignore if */
@@ -93,14 +93,14 @@ export async function getProjectPublishableFilesWithHashes(
     }
 
     usedFilenames.add(normalizedFile)
-
-    ret.push({
-      absolutePath,
-      hash: await hashingFunction(absolutePath)
-    })
   }
 
-  return ret
+  return mapWithConcurrency(existingFiles, async ({ absolutePath }) => {
+    return {
+      absolutePath,
+      hash: await hashingFunction(absolutePath)
+    }
+  })
 }
 export const machineId = os.hostname() || os.userInfo().username
 export const b64HashingFunction = (str: string) => {
