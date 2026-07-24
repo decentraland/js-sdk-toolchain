@@ -14,7 +14,7 @@ For deeper context on a specific subsystem (component serialization, CRDT suppre
 
 ## Packages
 
-Six packages under `packages/@dcl/` (npm workspaces):
+Six packages under `packages/@dcl/` (a monorepo layout, but **not** npm workspaces):
 
 | Package | Purpose |
 | --- | --- |
@@ -26,6 +26,8 @@ Six packages under `packages/@dcl/` (npm workspaces):
 | `@dcl/playground-assets` | Browser-compatible SDK bundle |
 
 Internal references use `file:../` paths during development; published versions get pinned semver ranges (managed via syncpack — see `make sync-deps`).
+
+The root `package.json` has no `workspaces` field — root `make install` only installs root-level tooling deps. Each package keeps its own standalone `package-lock.json`, and per-package `node_modules/` are populated by `make build`, which runs `npm i` inside each package (`scripts/build.spec.ts`). Don't expect package deps to be hoisted to the root `node_modules/`.
 
 ## Development commands
 
@@ -72,6 +74,21 @@ grep -rn "ERR!" test/snapshots/        # must return no output
 An `ERR!` line means the QuickJS eval threw mid-execution (commonly a missing mock in `test/snapshots.spec.ts`'s `require` shim — e.g. a new `~system/Runtime` method the SDK started calling at module-load). The resulting snapshot captures a *truncated* run, hides real behavior, and would mask future regressions.
 
 **Anti-pattern:** committing snapshots containing `ERR! Error: Unknown module ...`, `ERR! TypeError: ... is not a function`, or any other `ERR!` trace. Treat them as broken artifacts — fix the mock (or the underlying scene-load failure), regenerate, and re-verify before committing.
+
+### Bumping `@dcl/inspector` (the vehicle for `@dcl/asset-packs`)
+
+`@dcl/asset-packs` is not a direct dependency of this repo — it ships nested inside `@dcl/inspector`, and `packages/@dcl/sdk-commands/src/logic/bundle.ts` resolves it from the inspector's `node_modules`. To bump (prior art: commits `04270ca5`, `8b6bd63d`):
+
+1. `cd packages/@dcl/sdk-commands && npm i --save-exact @dcl/inspector@<x.y.z>` — updates the pin, the package's standalone lockfile, and its `node_modules/` in one step (same pattern as the Makefile's `update-protocol` target).
+2. `make build` from the repo root.
+3. Regenerate snapshots with a `UPDATE_SNAPSHOTS=true` scoped Jest run — `test/snapshots/package-lock.json` updates itself during this run. Verify no `ERR!` lines (see above).
+
+Asset-packs injection is gated behind `isEditorScene` (requires `assets/scene/main.composite` — see `packages/@dcl/sdk-commands/src/logic/project-validations.ts`), so inspector bumps no longer change `.crdt` snapshots. An empty snapshot diff is expected, not a stale artifact.
+
+## Committing hygiene gotchas
+
+- A newer local npm rewrites committed lockfiles with `"peer": true` / `"dev": true` metadata churn during installs (root and per-package lockfiles). Revert lockfile changes unrelated to your dependency change before committing.
+- `make format` runs prettier over the whole repo, including paths CI's `make lint` does not check (`test/`, `scripts/`, dot-files), where HEAD may carry drift — a blind `make format` can dirty dozens of unrelated files. Check your own files, revert the rest.
 
 ## Code conventions
 

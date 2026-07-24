@@ -68,7 +68,9 @@ export const args = declareArgs({
   '-n': Boolean,
   '--bevy-web': Boolean,
   '--multi-instance': Boolean,
-  '--no-client': Boolean
+  '--no-client': Boolean,
+  '--mcp': Boolean,
+  '--mcp-port': Number
 })
 
 export async function help(options: Options) {
@@ -98,6 +100,15 @@ export async function help(options: Options) {
       --mobile                          Show QR code for mobile preview on the same network.
       --multi-instance                  Allow running multiple Explorer instances simultaneously.
       --no-client                       Suppress every auto-launch (desktop Explorer deeplink, browser open, mobile QR). The file watcher still notifies a desktop Explorer if it connects on its own — useful when an external tool owns the Explorer process.
+      --mcp                             Enable the MCP server in the Explorer (forwarded as a deep link parameter).
+      --mcp-port                        Port for the MCP server in the Explorer (forwarded as a deep link parameter).
+
+    Any argument placed after a standalone \`--\` is not parsed by the CLI and is forwarded verbatim
+    into the Explorer deep link as a query parameter. Supported forms: --key=value, --key value,
+    and bare --key (forwarded as key=true). Declared flags above take precedence over forwarded params.
+
+      $ sdk-commands start -- --paramA --paramX valueX
+      $ npm run start -- -- --paramA --paramX valueX      (npm consumes the first --)
 
 
     Examples:
