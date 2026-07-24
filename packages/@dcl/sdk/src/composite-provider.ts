@@ -1,6 +1,7 @@
 import { compositeFromLoader } from '~sdk/all-composites'
 import { readFile } from '~system/Runtime'
-import { Composite, getGlobal } from '@dcl/ecs'
+import { Composite } from '@dcl/ecs'
+import { decodeUtf8 } from './internal/utf8'
 
 const composites = new Map<string, Composite.Resource>()
 
@@ -28,16 +29,8 @@ function decodeFromBytes(content: Uint8Array): Composite.Definition {
   // The first-byte check is a fast path; a JSON.parse failure falls back to fromBinary
   // because a protobuf message can also begin with 0x7b.
   if (content[0] === 0x7b /* '{' */) {
-    const TD = getGlobal<new () => { decode(input: Uint8Array): string }>('TextDecoder')
-    if (!TD) {
-      throw new Error(
-        'loadComposite: TextDecoder is not available in this runtime. ' +
-          'Use a .composite.bin file, or import `@dcl/sdk/ethereum-provider` ' +
-          'to install the TextEncoder/TextDecoder polyfill.'
-      )
-    }
     try {
-      return Composite.fromJson(JSON.parse(new TD().decode(content)))
+      return Composite.fromJson(JSON.parse(decodeUtf8(content, { fatal: true })))
     } catch {
       return Composite.fromBinary(content)
     }
