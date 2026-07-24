@@ -63,6 +63,7 @@ export interface IPlayerStorage {
  * Creates player-scoped storage that provides methods to interact with
  * player-specific key-value pairs from the Server Side Storage service.
  * This module only works when running on server-side scenes.
+ * @internal
  */
 export const createPlayerStorage = (config: StorageConfigState = createStorageConfig()): IPlayerStorage => {
   const cache = createValueCache(config)

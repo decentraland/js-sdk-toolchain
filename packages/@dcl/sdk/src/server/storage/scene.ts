@@ -58,6 +58,7 @@ export interface ISceneStorage {
  * Creates scene-scoped storage that provides methods to interact with
  * scene-specific key-value pairs from the Server Side Storage service.
  * This module only works when running on server-side scenes.
+ * @internal
  */
 export const createSceneStorage = (config: StorageConfigState = createStorageConfig()): ISceneStorage => {
   const cache = createValueCache(config)

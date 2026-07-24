@@ -31,6 +31,10 @@ export interface ValueCache {
   delete(key: string): void
 }
 
+/**
+ * Creates the bounded value cache shared by a storage scope.
+ * @internal
+ */
 export function createValueCache(config: StorageConfigState): ValueCache {
   const entries = new Map<string, CacheEntry & { storedAt: number }>()
 

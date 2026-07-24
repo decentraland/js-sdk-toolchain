@@ -89,6 +89,10 @@ export interface StorageConfigState {
   cacheMaxAgeMs: number
 }
 
+/**
+ * Default values for the resolved storage configuration.
+ * @internal
+ */
 export const DEFAULT_STORAGE_CONFIG: Readonly<StorageConfigState> = {
   skipIfUnchanged: true,
   cacheReads: true,
