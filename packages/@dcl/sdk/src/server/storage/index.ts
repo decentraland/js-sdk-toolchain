@@ -41,7 +41,9 @@ const createStorage = (): IStorage => {
     // Keep player as nested property
     player: playerStorage,
     configure(options: StorageOptions): void {
-      Object.assign(config, options)
+      for (const [key, value] of Object.entries(options)) {
+        if (value !== undefined) (config as unknown as Record<string, unknown>)[key] = value
+      }
     }
   }
 }
@@ -57,10 +59,12 @@ const createStorage = (): IStorage => {
  * Reads are cached by default: get() serves values known from a network
  * round-trip within the last cacheMaxAgeMs (including confirmed "not found"
  * results) without hitting the service, and concurrent gets for the same key
- * share one request. Writes are never deferred — set()/delete() always reach
- * the service; by default (skipIfUnchanged) an unchanged set is skipped, but
- * only when a previous confirmed round-trip proved the exact value is already
- * stored. Out-of-band writers (e.g. CLI storage commands)
+ * share one request. Overlapping writes to the same key are serialized so the
+ * service commits them in issue order, and rapid writes coalesce to the
+ * latest value; every set()/delete() resolves once its value (or the newer
+ * value that superseded it) is durably applied. By default (skipIfUnchanged)
+ * an unchanged set is skipped, but only when a previous confirmed round-trip
+ * proved the exact value is already stored. Out-of-band writers (e.g. CLI storage commands)
  * may not be visible for up to cacheMaxAgeMs; use get(key, { fresh: true })
  * for an authoritative read or Storage.configure({ cacheReads: false }) to
  * disable read caching.

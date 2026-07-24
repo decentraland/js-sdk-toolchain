@@ -92,6 +92,25 @@ describe('createValueCache', () => {
     expect(cache.get('key-512')?.body).toBe('b512')
   })
 
+  it('falls back to the default max age when cacheMaxAgeMs is not finite', () => {
+    const cache = createValueCache(createStorageConfig({ cacheMaxAgeMs: NaN }))
+    const nowSpy = jest.spyOn(Date, 'now')
+
+    try {
+      // Expiry must not be silently disabled: the default bound (15 min) applies.
+      nowSpy.mockReturnValue(10_000)
+      cache.set('a', { body: 'b1' })
+
+      nowSpy.mockReturnValue(10_000 + 15 * 60 * 1000)
+      expect(cache.get('a')?.body).toBe('b1')
+
+      nowSpy.mockReturnValue(10_000 + 15 * 60 * 1000 + 1)
+      expect(cache.get('a')).toBeUndefined()
+    } finally {
+      nowSpy.mockRestore()
+    }
+  })
+
   it('applies config mutations to an existing cache', () => {
     const config = createStorageConfig({ cacheMaxEntries: 10 })
     const cache = createValueCache(config)

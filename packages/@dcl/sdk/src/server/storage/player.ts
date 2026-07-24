@@ -10,6 +10,7 @@ import {
   StorageConfigState
 } from './constants'
 import { createValueCache } from './value-cache'
+import { createWriteQueue } from './write-queue'
 
 /**
  * Player-scoped storage interface for key-value pairs from the Server Side Storage service.
@@ -77,6 +78,69 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
   // cannot appear in an address, making the pair unambiguous.
   const cacheKey = (address: string, key: string) => `${address.toLowerCase()}\u0000${key}`
 
+  // Writes to the same player key are serialized (and rapid ones coalesced to
+  // the latest value) so the service commits them in issue order — overlapping
+  // PUTs would otherwise leave both the kept value and the cached value to
+  // response-order chance. Keyed by the same case-insensitive cache key.
+  const writes = createWriteQueue()
+
+  async function executeSet(address: string, key: string, ck: string, body: string): Promise<boolean> {
+    const baseUrl = await getStorageServerUrl()
+    const url = `${baseUrl}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
+
+    const [error] = await wrapSignedFetch({
+      url,
+      init: {
+        method: 'PUT',
+        headers: {
+          'content-type': 'application/json'
+        },
+        body
+      }
+    })
+
+    // Either way the entry changed server-side (or may have): detach any
+    // overlapping in-flight GET so its stale response is not cached.
+    inflightGets.delete(ck)
+
+    if (error) {
+      // The PUT may have reached the server, so the cached body is no
+      // longer reliable.
+      cache.delete(ck)
+      console.error(`Failed to set player storage value '${key}' for '${address}': ${error}`)
+      return false
+    }
+
+    cache.set(ck, { body })
+    return true
+  }
+
+  async function executeDelete(address: string, key: string, ck: string): Promise<boolean> {
+    const baseUrl = await getStorageServerUrl()
+    const url = `${baseUrl}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
+
+    const [error, , status] = await wrapSignedFetch({
+      url,
+      init: {
+        method: 'DELETE',
+        headers: {}
+      }
+    })
+
+    // Detach again: a GET may have started while the DELETE was in flight.
+    inflightGets.delete(ck)
+
+    if (error) {
+      // A 404 still confirms the key is absent server-side.
+      if (status === 404) cache.setAbsent(ck)
+      console.error(`Failed to delete player storage value '${key}' for '${address}': ${error}`)
+      return false
+    }
+
+    cache.setAbsent(ck)
+    return true
+  }
+
   return {
     async get<T = unknown>(address: string, key: string, options?: GetOptions): Promise<T | null> {
       assertIsServer(MODULE_NAME)
@@ -142,38 +206,14 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       const body = JSON.stringify({ value })
       const skipIfUnchanged = options?.skipIfUnchanged ?? config.skipIfUnchanged
 
-      if (skipIfUnchanged && cache.get(ck)?.body === body) {
+      // Dedup against confirmed state only while no write is pending — a
+      // pending write makes the cache momentarily stale; enqueue() coalesces
+      // against pending writes instead.
+      if (skipIfUnchanged && writes.pending(ck) === undefined && cache.get(ck)?.body === body) {
         return true
       }
 
-      const baseUrl = await getStorageServerUrl()
-      const url = `${baseUrl}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
-
-      const [error] = await wrapSignedFetch({
-        url,
-        init: {
-          method: 'PUT',
-          headers: {
-            'content-type': 'application/json'
-          },
-          body
-        }
-      })
-
-      // Either way the entry changed server-side (or may have): detach any
-      // overlapping in-flight GET so its stale response is not cached.
-      inflightGets.delete(ck)
-
-      if (error) {
-        // The PUT may have reached the server, so the cached body is no
-        // longer reliable.
-        cache.delete(ck)
-        console.error(`Failed to set player storage value '${key}' for '${address}': ${error}`)
-        return false
-      }
-
-      cache.set(ck, { body })
-      return true
+      return writes.enqueue(ck, body, (b) => executeSet(address, key, ck, b as string), skipIfUnchanged)
     },
 
     async delete(address: string, key: string): Promise<boolean> {
@@ -181,34 +221,13 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
 
       const ck = cacheKey(address, key)
 
-      // Invalidate even if the request fails: the DELETE may have reached the
-      // server, and a stale "unchanged" skip would lose a future write.
+      // Invalidate immediately — even while the DELETE waits behind other
+      // writes, reads must not serve the doomed value, and a stale
+      // "unchanged" skip would lose a future write.
       cache.delete(ck)
       inflightGets.delete(ck)
 
-      const baseUrl = await getStorageServerUrl()
-      const url = `${baseUrl}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
-
-      const [error, , status] = await wrapSignedFetch({
-        url,
-        init: {
-          method: 'DELETE',
-          headers: {}
-        }
-      })
-
-      // Detach again: a GET may have started while the DELETE was in flight.
-      inflightGets.delete(ck)
-
-      if (error) {
-        // A 404 still confirms the key is absent server-side.
-        if (status === 404) cache.setAbsent(ck)
-        console.error(`Failed to delete player storage value '${key}' for '${address}': ${error}`)
-        return false
-      }
-
-      cache.setAbsent(ck)
-      return true
+      return writes.enqueue(ck, null, () => executeDelete(address, key, ck), true)
     },
 
     async getValues(address: string, options?: GetValuesOptions): Promise<GetValuesResult> {
@@ -245,12 +264,16 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       const data = response?.data ?? []
 
       // Seed the per-key cache so subsequent get()/set() on returned keys can
-      // skip the network. Absence is never seeded (prefix/pagination make it
-      // non-authoritative). A page larger than cacheMaxEntries churns the
-      // cache; entries repopulate lazily.
+      // skip the network. Only keys with no live entry and no pending write
+      // are seeded: existing per-key state comes from a confirmed operation
+      // that this page snapshot — whose request started earlier — must not
+      // clobber with stale data. Absence is never seeded (prefix/pagination
+      // make it non-authoritative). A page larger than cacheMaxEntries churns
+      // the cache; entries repopulate lazily.
       for (const entry of data) {
-        if (entry.value !== undefined) {
-          cache.set(cacheKey(address, entry.key), { body: JSON.stringify({ value: entry.value }) })
+        const ck = cacheKey(address, entry.key)
+        if (entry.value !== undefined && !writes.isPending(ck) && cache.get(ck) === undefined) {
+          cache.set(ck, { body: JSON.stringify({ value: entry.value }) })
         }
       }
 

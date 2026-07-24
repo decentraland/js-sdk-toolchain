@@ -10,6 +10,7 @@ import {
   StorageConfigState
 } from './constants'
 import { createValueCache } from './value-cache'
+import { createWriteQueue } from './write-queue'
 
 /**
  * Scene-scoped storage interface for key-value pairs from the Server Side Storage service.
@@ -66,6 +67,68 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
   // ownership: set()/delete() drop the wrapper, detaching the pending GET so
   // its stale response cannot overwrite the newer cache entry.
   const inflightGets = new Map<string, { promise: Promise<unknown> }>()
+  // Writes to the same key are serialized (and rapid ones coalesced to the
+  // latest value) so the service commits them in issue order — overlapping
+  // PUTs would otherwise leave both the kept value and the cached value to
+  // response-order chance.
+  const writes = createWriteQueue()
+
+  async function executeSet(key: string, body: string): Promise<boolean> {
+    const baseUrl = await getStorageServerUrl()
+    const url = `${baseUrl}/values/${encodeURIComponent(key)}`
+
+    const [error] = await wrapSignedFetch({
+      url,
+      init: {
+        method: 'PUT',
+        headers: {
+          'content-type': 'application/json'
+        },
+        body
+      }
+    })
+
+    // Either way the entry changed server-side (or may have): detach any
+    // overlapping in-flight GET so its stale response is not cached.
+    inflightGets.delete(key)
+
+    if (error) {
+      // The PUT may have reached the server, so the cached body is no
+      // longer reliable.
+      cache.delete(key)
+      console.error(`Failed to set storage value '${key}': ${error}`)
+      return false
+    }
+
+    cache.set(key, { body })
+    return true
+  }
+
+  async function executeDelete(key: string): Promise<boolean> {
+    const baseUrl = await getStorageServerUrl()
+    const url = `${baseUrl}/values/${encodeURIComponent(key)}`
+
+    const [error, , status] = await wrapSignedFetch({
+      url,
+      init: {
+        method: 'DELETE',
+        headers: {}
+      }
+    })
+
+    // Detach again: a GET may have started while the DELETE was in flight.
+    inflightGets.delete(key)
+
+    if (error) {
+      // A 404 still confirms the key is absent server-side.
+      if (status === 404) cache.setAbsent(key)
+      console.error(`Failed to delete storage value '${key}': ${error}`)
+      return false
+    }
+
+    cache.setAbsent(key)
+    return true
+  }
 
   return {
     async get<T = unknown>(key: string, options?: GetOptions): Promise<T | null> {
@@ -129,71 +192,26 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
       const body = JSON.stringify({ value })
       const skipIfUnchanged = options?.skipIfUnchanged ?? config.skipIfUnchanged
 
-      if (skipIfUnchanged && cache.get(key)?.body === body) {
+      // Dedup against confirmed state only while no write is pending — a
+      // pending write makes the cache momentarily stale; enqueue() coalesces
+      // against pending writes instead.
+      if (skipIfUnchanged && writes.pending(key) === undefined && cache.get(key)?.body === body) {
         return true
       }
 
-      const baseUrl = await getStorageServerUrl()
-      const url = `${baseUrl}/values/${encodeURIComponent(key)}`
-
-      const [error] = await wrapSignedFetch({
-        url,
-        init: {
-          method: 'PUT',
-          headers: {
-            'content-type': 'application/json'
-          },
-          body
-        }
-      })
-
-      // Either way the entry changed server-side (or may have): detach any
-      // overlapping in-flight GET so its stale response is not cached.
-      inflightGets.delete(key)
-
-      if (error) {
-        // The PUT may have reached the server, so the cached body is no
-        // longer reliable.
-        cache.delete(key)
-        console.error(`Failed to set storage value '${key}': ${error}`)
-        return false
-      }
-
-      cache.set(key, { body })
-      return true
+      return writes.enqueue(key, body, (b) => executeSet(key, b as string), skipIfUnchanged)
     },
 
     async delete(key: string): Promise<boolean> {
       assertIsServer(MODULE_NAME)
 
-      // Invalidate even if the request fails: the DELETE may have reached the
-      // server, and a stale "unchanged" skip would lose a future write.
+      // Invalidate immediately — even while the DELETE waits behind other
+      // writes, reads must not serve the doomed value, and a stale
+      // "unchanged" skip would lose a future write.
       cache.delete(key)
       inflightGets.delete(key)
 
-      const baseUrl = await getStorageServerUrl()
-      const url = `${baseUrl}/values/${encodeURIComponent(key)}`
-
-      const [error, , status] = await wrapSignedFetch({
-        url,
-        init: {
-          method: 'DELETE',
-          headers: {}
-        }
-      })
-
-      // Detach again: a GET may have started while the DELETE was in flight.
-      inflightGets.delete(key)
-
-      if (error) {
-        // A 404 still confirms the key is absent server-side.
-        if (status === 404) cache.setAbsent(key)
-        console.error(`Failed to delete storage value '${key}': ${error}`)
-        return false
-      }
-
-      cache.setAbsent(key)
-      return true
+      return writes.enqueue(key, null, () => executeDelete(key), true)
     },
 
     async getValues(options?: GetValuesOptions): Promise<GetValuesResult> {
@@ -228,11 +246,14 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
       const data = response?.data ?? []
 
       // Seed the per-key cache so subsequent get()/set() on returned keys can
-      // skip the network. Absence is never seeded (prefix/pagination make it
-      // non-authoritative). A page larger than cacheMaxEntries churns the
-      // cache; entries repopulate lazily.
+      // skip the network. Only keys with no live entry and no pending write
+      // are seeded: existing per-key state comes from a confirmed operation
+      // that this page snapshot — whose request started earlier — must not
+      // clobber with stale data. Absence is never seeded (prefix/pagination
+      // make it non-authoritative). A page larger than cacheMaxEntries churns
+      // the cache; entries repopulate lazily.
       for (const entry of data) {
-        if (entry.value !== undefined) {
+        if (entry.value !== undefined && !writes.isPending(entry.key) && cache.get(entry.key) === undefined) {
           cache.set(entry.key, { body: JSON.stringify({ value: entry.value }) })
         }
       }

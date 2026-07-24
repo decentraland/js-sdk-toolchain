@@ -227,13 +227,215 @@ describe('scene storage', () => {
     })
   })
 
-  describe('get read caching', () => {
-    function deferred<T>() {
-      let resolve!: (value: T) => void
-      const promise = new Promise<T>((r) => (resolve = r))
-      return { promise, resolve }
-    }
+  function deferred<T>() {
+    let resolve!: (value: T) => void
+    const promise = new Promise<T>((r) => (resolve = r))
+    return { promise, resolve }
+  }
 
+  /** Lets queued executors advance to their network call. */
+  const flush = () => new Promise((r) => setTimeout(r, 0))
+
+  describe('write serialization', () => {
+    it('should hold a second set for a key until the in-flight PUT lands, preserving issue order', async () => {
+      const storage = createSceneStorage()
+      const firstPut = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => firstPut.promise)
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+
+      const first = storage.set('key', 'v1')
+      const second = storage.set('key', 'v2')
+      await flush()
+
+      // v2 must not race v1 on the network.
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
+
+      firstPut.resolve([null, {}])
+      expect(await first).toBe(true)
+      expect(await second).toBe(true)
+
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+      expect(mockWrapSignedFetch).toHaveBeenLastCalledWith({
+        url: `${baseUrl}/values/key`,
+        init: {
+          method: 'PUT',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ value: 'v2' })
+        }
+      })
+
+      // The cache asserts the last write issued, served locally.
+      expect(await storage.get('key')).toBe('v2')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should coalesce rapid writes into at most two PUTs, keeping the latest value', async () => {
+      const storage = createSceneStorage()
+      const firstPut = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => firstPut.promise)
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+
+      const results = Promise.all([storage.set('key', 1), storage.set('key', 2), storage.set('key', 3)])
+      await flush()
+      firstPut.resolve([null, {}])
+
+      expect(await results).toEqual([true, true, true])
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+      expect(mockWrapSignedFetch).toHaveBeenLastCalledWith(
+        expect.objectContaining({ init: expect.objectContaining({ body: JSON.stringify({ value: 3 }) }) })
+      )
+
+      expect(await storage.get('key')).toBe(3)
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should join concurrent identical sets into the in-flight PUT', async () => {
+      const storage = createSceneStorage()
+      const put = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put.promise)
+
+      const first = storage.set('key', 7)
+      const second = storage.set('key', 7)
+      await flush()
+      put.resolve([null, {}])
+
+      expect(await first).toBe(true)
+      expect(await second).toBe(true)
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
+    })
+
+    it('should not join the in-flight PUT when skipIfUnchanged is false', async () => {
+      const storage = createSceneStorage()
+      const put = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put.promise)
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+
+      const first = storage.set('key', 7)
+      // An always-write caller expects a PUT issued at-or-after its call.
+      const second = storage.set('key', 7, { skipIfUnchanged: false })
+      await flush()
+      put.resolve([null, {}])
+
+      expect(await first).toBe(true)
+      expect(await second).toBe(true)
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should serialize a delete behind an in-flight set', async () => {
+      const storage = createSceneStorage()
+      const put = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put.promise)
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+
+      const setting = storage.set('key', 'v')
+      const deleting = storage.delete('key')
+      await flush()
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
+
+      put.resolve([null, {}])
+      expect(await setting).toBe(true)
+      expect(await deleting).toBe(true)
+
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+      expect(mockWrapSignedFetch).toHaveBeenLastCalledWith({
+        url: `${baseUrl}/values/key`,
+        init: { method: 'DELETE', headers: {} }
+      })
+
+      // Issue order won: the key ends up absent, served from the negative cache.
+      expect(await storage.get('key')).toBeNull()
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should fail coalesced writers and invalidate the cache when their PUT fails', async () => {
+      const storage = createSceneStorage()
+      const firstPut = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => firstPut.promise)
+      mockWrapSignedFetch.mockResolvedValueOnce(['500 Internal Server Error', null])
+
+      const first = storage.set('key', 1)
+      const second = storage.set('key', 2)
+      await flush()
+      firstPut.resolve([null, {}])
+
+      expect(await first).toBe(true)
+      expect(await second).toBe(false)
+
+      // The failed flush invalidated the entry, so the retry hits the network.
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+      expect(await storage.set('key', 2)).toBe(true)
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(3)
+    })
+  })
+
+  describe('getValues seeding race guard', () => {
+    it('should not let a page overwrite per-key state confirmed while the list was in flight', async () => {
+      const storage = createSceneStorage()
+      const list = deferred<[null, { data: Array<{ key: string; value: unknown }> }]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => list.promise)
+
+      const listing = storage.getValues()
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+      await storage.set('a', 'new')
+
+      list.resolve([
+        null,
+        {
+          data: [
+            { key: 'a', value: 'stale' },
+            { key: 'b', value: 2 }
+          ]
+        }
+      ])
+      await listing
+
+      // 'a' keeps the write-through value; unknown 'b' was seeded.
+      expect(await storage.get('a')).toBe('new')
+      expect(await storage.get('b')).toBe(2)
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should not seed keys whose write is still pending when the page lands', async () => {
+      const storage = createSceneStorage()
+      const list = deferred<[null, { data: Array<{ key: string; value: unknown }> }]>()
+      const put = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => list.promise)
+      mockWrapSignedFetch.mockImplementationOnce(() => put.promise)
+
+      const listing = storage.getValues()
+      const setting = storage.set('a', 'new')
+      await flush()
+
+      list.resolve([null, { data: [{ key: 'a', value: 'stale' }] }])
+      await listing
+
+      put.resolve([null, {}])
+      expect(await setting).toBe(true)
+
+      expect(await storage.get('a')).toBe('new')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it("should keep a delete's negative entry over a stale page value", async () => {
+      const storage = createSceneStorage()
+      const list = deferred<[null, { data: Array<{ key: string; value: unknown }> }]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => list.promise)
+
+      const listing = storage.getValues()
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+      await storage.delete('a')
+
+      list.resolve([null, { data: [{ key: 'a', value: 'stale' }] }])
+      await listing
+
+      expect(await storage.get('a')).toBeNull()
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+  })
+
+  describe('get read caching', () => {
     it('should serve a repeated get from cache with fresh objects per hit', async () => {
       const storage = createSceneStorage()
       mockWrapSignedFetch.mockResolvedValueOnce([null, { value: { hp: 100 } }, 200])

@@ -60,9 +60,16 @@ export function createValueCache(config: StorageConfigState): ValueCache {
       const entry = entries.get(key)
       if (!entry) return undefined
 
+      // Guard against misconfiguration, mirroring cacheMaxEntries: a NaN
+      // bound would silently disable expiry (NaN comparisons are false).
+      // Negative values need no guard — they just expire everything.
+      const maxAgeMs = Number.isFinite(config.cacheMaxAgeMs)
+        ? config.cacheMaxAgeMs
+        : DEFAULT_STORAGE_CONFIG.cacheMaxAgeMs
+
       // Lazy max-age expiry: storedAt is never refreshed on hits, so the age
       // bounds the time since the last actual network confirmation.
-      if (Date.now() - entry.storedAt > config.cacheMaxAgeMs) {
+      if (Date.now() - entry.storedAt > maxAgeMs) {
         entries.delete(key)
         return undefined
       }

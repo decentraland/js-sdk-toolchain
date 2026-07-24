@@ -75,6 +75,22 @@ describe('Storage singleton', () => {
     expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
   })
 
+  it('configure() ignores explicitly-undefined options instead of clobbering defaults', async () => {
+    const Storage = await loadStorage()
+    // A forwarded partial options object with undefined members must not
+    // disable dedup/read caching.
+    Storage.configure({ skipIfUnchanged: undefined, cacheReads: undefined })
+
+    await Storage.set('score', 42)
+    await Storage.set('score', 42)
+    expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
+
+    mockWrapSignedFetch.mockResolvedValue([null, { value: 7 }, 200])
+    await Storage.get('other')
+    await Storage.get('other')
+    expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+  })
+
   it('configure({ cacheReads: false }) disables read caching for both scene and player storage', async () => {
     const Storage = await loadStorage()
     Storage.configure({ cacheReads: false })

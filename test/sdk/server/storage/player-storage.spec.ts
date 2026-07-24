@@ -182,6 +182,75 @@ describe('player storage', () => {
     })
   })
 
+  describe('write serialization', () => {
+    function deferred<T>() {
+      let resolve!: (value: T) => void
+      const promise = new Promise<T>((r) => (resolve = r))
+      return { promise, resolve }
+    }
+    const flush = () => new Promise((r) => setTimeout(r, 0))
+
+    it('should serialize overlapping sets per player key and coalesce to the latest value', async () => {
+      const playerStorage = createPlayerStorage()
+      const firstPut = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => firstPut.promise)
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+
+      const results = Promise.all([
+        playerStorage.set(address, 'key', 1),
+        playerStorage.set(address, 'key', 2),
+        playerStorage.set(address, 'key', 3)
+      ])
+      await flush()
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
+      firstPut.resolve([null, {}])
+
+      expect(await results).toEqual([true, true, true])
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+      expect(mockWrapSignedFetch).toHaveBeenLastCalledWith(
+        expect.objectContaining({ init: expect.objectContaining({ body: JSON.stringify({ value: 3 }) }) })
+      )
+
+      expect(await playerStorage.get(address, 'key')).toBe(3)
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should serialize writes case-insensitively across address casings', async () => {
+      const playerStorage = createPlayerStorage()
+      const firstPut = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => firstPut.promise)
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+
+      const first = playerStorage.set(address, 'key', 1)
+      const second = playerStorage.set(address.toUpperCase().replace('0X', '0x'), 'key', 2)
+      await flush()
+
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
+      firstPut.resolve([null, {}])
+
+      expect(await first).toBe(true)
+      expect(await second).toBe(true)
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should not let a stale getValues page overwrite a newer write', async () => {
+      const playerStorage = createPlayerStorage()
+      const list = deferred<[null, { data: Array<{ key: string; value: unknown }> }]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => list.promise)
+
+      const listing = playerStorage.getValues(address)
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+      await playerStorage.set(address, 'a', 'new')
+
+      list.resolve([null, { data: [{ key: 'a', value: 'stale' }] }])
+      await listing
+
+      expect(await playerStorage.get(address, 'a')).toBe('new')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+  })
+
   describe('get read caching', () => {
     function deferred<T>() {
       let resolve!: (value: T) => void
