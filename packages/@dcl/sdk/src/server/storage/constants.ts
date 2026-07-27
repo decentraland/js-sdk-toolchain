@@ -73,7 +73,9 @@ export interface StorageOptions {
   /**
    * Max age of a cache entry in milliseconds, bounding both read-cache
    * staleness and write-dedup trust; older entries are treated as unknown.
-   * Default: 900000 (15 minutes).
+   * The default is deliberately short so out-of-band writers (CLI storage
+   * commands, dashboards) become visible within a minute, while still
+   * absorbing hot per-frame reads. Default: 60000 (1 minute).
    */
   cacheMaxAgeMs?: number
 }
@@ -97,7 +99,7 @@ export const DEFAULT_STORAGE_CONFIG: Readonly<StorageConfigState> = {
   skipIfUnchanged: true,
   cacheReads: true,
   cacheMaxEntries: 512,
-  cacheMaxAgeMs: 15 * 60 * 1000
+  cacheMaxAgeMs: 60 * 1000
 }
 
 /**

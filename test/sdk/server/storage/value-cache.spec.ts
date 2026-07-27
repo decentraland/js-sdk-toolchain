@@ -1,4 +1,4 @@
-import { createStorageConfig } from '../../../../packages/@dcl/sdk/src/server/storage/constants'
+import { createStorageConfig, DEFAULT_STORAGE_CONFIG } from '../../../../packages/@dcl/sdk/src/server/storage/constants'
 import { createValueCache } from '../../../../packages/@dcl/sdk/src/server/storage/value-cache'
 
 describe('createValueCache', () => {
@@ -97,14 +97,14 @@ describe('createValueCache', () => {
     const nowSpy = jest.spyOn(Date, 'now')
 
     try {
-      // Expiry must not be silently disabled: the default bound (15 min) applies.
+      // Expiry must not be silently disabled: the default bound applies.
       nowSpy.mockReturnValue(10_000)
       cache.set('a', { body: 'b1' })
 
-      nowSpy.mockReturnValue(10_000 + 15 * 60 * 1000)
+      nowSpy.mockReturnValue(10_000 + DEFAULT_STORAGE_CONFIG.cacheMaxAgeMs)
       expect(cache.get('a')?.body).toBe('b1')
 
-      nowSpy.mockReturnValue(10_000 + 15 * 60 * 1000 + 1)
+      nowSpy.mockReturnValue(10_000 + DEFAULT_STORAGE_CONFIG.cacheMaxAgeMs + 1)
       expect(cache.get('a')).toBeUndefined()
     } finally {
       nowSpy.mockRestore()
