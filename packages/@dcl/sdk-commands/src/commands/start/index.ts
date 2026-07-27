@@ -70,7 +70,7 @@ export const args = declareArgs({
   '--bevy-web': Boolean,
   '--multi-instance': Boolean,
   '--no-client': Boolean,
-  '--asset-bundles': Boolean
+  '--asset-bundles': Boolean,
   '--mcp': Boolean,
   '--mcp-port': Number
 })
