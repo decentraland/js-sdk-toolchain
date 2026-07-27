@@ -62,9 +62,12 @@ export async function wrapSignedFetch<T = unknown>(signedFetchBody: SignedFetchR
     return [errorMessage, null, response.status]
   }
 
-  const [parseError, body] = await tryCatch<T>(JSON.parse(response.body || '{}'))
-
-  if (parseError) {
+  let body: T
+  try {
+    // JSON.parse throws synchronously, so it can't be wrapped with tryCatch (the
+    // throw would happen while evaluating the argument, rejecting this promise).
+    body = JSON.parse(response.body || '{}')
+  } catch {
     console.error(`Failed to parse response from ${signedFetchBody.url}`)
     return ['Failed to parse response', null, response.status]
   }
