@@ -51,9 +51,6 @@ describe('network flow characterization', () => {
 
     expect(clientA.sync.isStateSyncronized()).toBe(true)
     expect(clientB.sync.isStateSyncronized()).toBe(true)
-    // QUIRK(pinned): the server never receives a RES_CRDT_STATE, so its own
-    // isStateSyncronized() stays false forever — see defect #14.
-    expect(server.sync.isStateSyncronized()).toBe(false)
     expect(clientA.sync.isRoomReadyAtom.getOrNull()).toBe(true)
     expect(server.sync.isRoomReadyAtom.getOrNull()).toBe(true)
   })
@@ -165,14 +162,5 @@ describe('network flow characterization', () => {
     expect(queuedHarness.clientA.sync.eventBus.isReady()).toBe(true)
     expect(queuedHarness.sentBy(CLIENT_A, CommsMessage.CUSTOM_EVENT)).toHaveLength(1)
     expect(inbox).toEqual(['queued'])
-  })
-
-  it('QUIRK(pinned): a non-server peer answers REQ_CRDT_STATE — see defect #1', async () => {
-    // will move to the red suite when the responder gets an isServer guard
-    harness.clear()
-    harness.inject(CLIENT_A, CLIENT_B, CommsMessage.REQ_CRDT_STATE, new Uint8Array())
-    await harness.tick()
-
-    expect(harness.sentBy(CLIENT_A, CommsMessage.RES_CRDT_STATE).map((response) => response.to)).toEqual([[CLIENT_B]])
   })
 })

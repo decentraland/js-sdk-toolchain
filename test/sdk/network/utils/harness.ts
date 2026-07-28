@@ -10,7 +10,7 @@
  *   - the server reaches the addresses it asks for, or every client when the
  *     address list is empty (broadcast)
  */
-import { Engine, Entity, IEngine, RealmInfo, engine as globalEngine } from '../../../../packages/@dcl/ecs'
+import { Engine, Entity, IEngine } from '../../../../packages/@dcl/ecs'
 import * as components from '../../../../packages/@dcl/ecs/dist/components'
 import { addSyncTransport } from '../../../../packages/@dcl/sdk/src/network/message-bus-sync'
 import {
@@ -67,12 +67,13 @@ export function flush(): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, 0))
 }
 
+/** every engine `attach` ever built, so a realm write reaches all of them at once */
+const attachedEngines: IEngine[] = []
+
 /**
- * `message-bus-sync` reads/observes `RealmInfo` through the singleton component
- * bound to the module-level global engine (not the engine passed to
- * `addSyncTransport`), so a single write here is observed by every peer.
- * `onChange` callbacks only fire from the CRDT receive path, hence the explicit
- * `__onChangeCallbacks` call.
+ * Writes `RealmInfo` on every attached peer, which is what comms coming up looks
+ * like from inside a scene. `onChange` callbacks only fire from the CRDT receive
+ * path, hence the explicit `__onChangeCallbacks` call.
  */
 export function setRealmConnected(isConnectedSceneRoom: boolean): void {
   const value = {
@@ -84,10 +85,13 @@ export function setRealmConnected(isConnectedSceneRoom: boolean): void {
     room: 'scene-room',
     isConnectedSceneRoom
   }
-  RealmInfo.createOrReplace(globalEngine.RootEntity, value)
-  // `__onChangeCallbacks` is @internal, so it is trimmed from the published types
-  const internal = RealmInfo as unknown as { __onChangeCallbacks(entity: Entity, value: unknown): void }
-  internal.__onChangeCallbacks(globalEngine.RootEntity, value)
+  for (const engine of attachedEngines) {
+    const RealmInfo = components.RealmInfo(engine)
+    RealmInfo.createOrReplace(engine.RootEntity, value)
+    // `__onChangeCallbacks` is @internal, so it is trimmed from the published types
+    const internal = RealmInfo as unknown as { __onChangeCallbacks(entity: Entity, value: unknown): void }
+    internal.__onChangeCallbacks(engine.RootEntity, value)
+  }
 }
 
 export function createHarness() {
@@ -127,6 +131,7 @@ export function createHarness() {
   function attach(id: string, isServer: boolean | Promise<boolean>): Peer {
     queues[id] = queues[id] ?? []
     const engine = Engine()
+    attachedEngines.push(engine)
     const peerComponents = defineComponents(engine)
     const sendBinary = async (msg: SendBinaryRequest): Promise<SendBinaryResponse> => {
       for (const peerData of msg.peerData) {
@@ -169,6 +174,10 @@ export function createHarness() {
     tick,
     /** also usable to replace a peer with a fresh engine keeping its comms identity */
     attach,
+    /** throw away what piled up for a peer, the way a real disconnect does */
+    drop(peerId: string) {
+      queues[peerId].length = 0
+    },
     /** push a comms message into a peer's inbox as if `sender` had emitted it */
     inject(target: string, sender: string, type: CommsMessage, payload: Uint8Array) {
       deliver(target, sender, craftCommsMessage(type, payload))
