@@ -732,6 +732,7 @@ export const componentDefinitionByName: {
     "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
     "core::SkyboxTime": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSkyboxTime>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
+    "core::TouchScreenControls": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTouchScreenControls>>;
     "core::TriggerArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTriggerArea>>;
     "core::TriggerAreaResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBTriggerAreaResult>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
@@ -742,6 +743,7 @@ export const componentDefinitionByName: {
     "core::UiDropdown": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdown>>;
     "core::UiDropdownResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdownResult>>;
     "core::UiInput": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInput>>;
+    "core::UiInputBinding": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInputBinding>>;
     "core::UiInputResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInputResult>>;
     "core::UiText": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiText>>;
     "core::UiTransform": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiTransform>>;
@@ -3605,6 +3607,38 @@ export namespace PBTextShape {
 }
 
 // @public (undocumented)
+export interface PBTouchScreenControls {
+    hideCrosshair: boolean;
+    hideJoystick: boolean;
+    mainAction?: InputAction | undefined;
+    // (undocumented)
+    touchInputs: PBTouchScreenControls_TouchInput[];
+}
+
+// @public (undocumented)
+export namespace PBTouchScreenControls {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTouchScreenControls;
+    // (undocumented)
+    export function encode(message: PBTouchScreenControls, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBTouchScreenControls_TouchInput {
+    hide: boolean;
+    icon?: TextureUnion | undefined;
+    inputAction: InputAction;
+}
+
+// @public (undocumented)
+export namespace PBTouchScreenControls_TouchInput {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTouchScreenControls_TouchInput;
+    // (undocumented)
+    export function encode(message: PBTouchScreenControls_TouchInput, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBTriggerArea {
     collisionMask?: number | undefined;
     mesh?: TriggerAreaMeshType | undefined;
@@ -3824,6 +3858,19 @@ export namespace PBUiInput {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiInput;
     // (undocumented)
     export function encode(message: PBUiInput, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBUiInputBinding {
+    actions: InputAction[];
+}
+
+// @public (undocumented)
+export namespace PBUiInputBinding {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiInputBinding;
+    // (undocumented)
+    export function encode(message: PBUiInputBinding, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -4057,6 +4104,7 @@ export namespace PBVideoPlayer {
 export interface PBVirtualCamera {
     // (undocumented)
     defaultTransition?: CameraTransition | undefined;
+    fov?: number | undefined;
     // (undocumented)
     lookAtEntity?: number | undefined;
 }
@@ -5055,6 +5103,9 @@ export const ToLinearSpace = 2.2;
 // @public (undocumented)
 export type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTypes<T>;
 
+// @public (undocumented)
+export const TouchScreenControls: LastWriteWinElementSetComponentDefinition<PBTouchScreenControls>;
+
 // Warning: (ae-missing-release-tag) "Transform" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -5299,6 +5350,9 @@ export type UiFontType = 'sans-serif' | 'serif' | 'monospace';
 
 // @public (undocumented)
 export const UiInput: LastWriteWinElementSetComponentDefinition<PBUiInput>;
+
+// @public (undocumented)
+export const UiInputBinding: LastWriteWinElementSetComponentDefinition<PBUiInputBinding>;
 
 // @public (undocumented)
 export interface UiInputProps extends Omit<PBUiInput, 'font' | 'textAlign' | 'fontSize'> {
