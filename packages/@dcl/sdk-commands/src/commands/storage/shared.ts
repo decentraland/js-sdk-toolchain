@@ -39,10 +39,25 @@ export const validateWorkspaceAndWorld = async (
     )
   }
 
-  const baseParcel = sceneJson.scene?.base || '0,0'
-  const parcels = sceneJson.scene?.parcels || ['0,0']
+  // getValidSceneJson (above) already validated the scene, so scene.base and
+  // scene.parcels are guaranteed to exist. Use them directly instead of a '0,0'
+  // fallback, which would silently target the wrong scene on the storage service.
+  const baseParcel = sceneJson.scene.base
+  const parcels = sceneJson.scene.parcels
 
   return { worldName, baseParcel, parcels }
+}
+
+/**
+ * Appends the scene base parcel as a `position` query param to a storage URL.
+ * The Server Side Storage service resolves which scene a request targets from
+ * this param; without it the service defaults to '0,0' and rejects world requests.
+ */
+export const withPosition = (url: string, baseParcel: string): string => {
+  // Keep the "x,y" comma literal (not percent-encoded) to match the convention used
+  // elsewhere (e.g. deploy's `&position=${scene.base}`) and what the service expects.
+  const separator = url.includes('?') ? '&' : '?'
+  return `${url}${separator}position=${baseParcel}`
 }
 
 /**

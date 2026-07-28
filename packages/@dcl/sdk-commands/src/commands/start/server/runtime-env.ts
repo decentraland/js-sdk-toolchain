@@ -1,5 +1,6 @@
 import path from 'path'
 import { CliComponents } from '../../../components'
+import { getObject } from '../../../logic/coordinates'
 
 // Find the sdk-commands package root by resolving its package.json
 const SDK_COMMANDS_ROOT = path.dirname(require.resolve('@dcl/sdk-commands/package.json'))
@@ -9,18 +10,34 @@ const SERVER_STORAGE_FILE = 'server-storage.json'
 /**
  * Structure for all server-side storage data.
  * Stored in sdk-commands package directory (hidden from users).
+ *
+ * `world` is namespaced by scene base coordinates (`"x,y"`) so that previewing
+ * different scenes does not share the same scene-storage bucket.
  */
 export interface ServerStorage {
   env: Record<string, string>
-  world: Record<string, unknown>
+  world: Record<string, Record<string, unknown>>
   players: Record<string, Record<string, unknown>>
 }
 
-const DEFAULT_STORAGE: ServerStorage = {
+/**
+ * Normalizes a scene base parcel (e.g. `"60, -9"`) into the canonical `"x,y"`
+ * key used to namespace world storage, so equivalent spellings map to one bucket.
+ */
+export function getSceneStorageKey(base: string): string {
+  const { x, y } = getObject(base)
+  return `${x},${y}`
+}
+
+const isPlainObject = (value: unknown): boolean => typeof value === 'object' && value !== null && !Array.isArray(value)
+
+// Factory (not a shared const): each call returns fresh nested objects so callers
+// can never mutate a shared default and leak state into later loads.
+const createDefaultStorage = (): ServerStorage => ({
   env: {},
   world: {},
   players: {}
-}
+})
 
 /**
  * Ensures the runtime data directory exists.
@@ -45,21 +62,31 @@ export async function loadServerStorage(components: Pick<CliComponents, 'fs' | '
   try {
     const exists = await components.fs.fileExists(storagePath)
     if (!exists) {
-      return { ...DEFAULT_STORAGE }
+      return createDefaultStorage()
     }
 
     const content = await components.fs.readFile(storagePath, 'utf-8')
     const parsed = JSON.parse(content) as Partial<ServerStorage>
 
+    // `world` is now namespaced by scene coordinates (`"x,y"` -> key -> value).
+    // A file with any non-object top-level `world` entry predates that change
+    // (flat `key -> value`); its data has no scene to attribute to, so discard it.
+    // Local preview storage is disposable, so resetting is preferable to migrating.
+    const rawWorld = parsed.world ?? {}
+    const isLegacyWorld = Object.values(rawWorld).some((value) => !isPlainObject(value))
+    if (isLegacyWorld) {
+      components.logger.debug('Resetting legacy local preview world storage (pre scene-coordinate namespacing)')
+    }
+
     // Merge with defaults to ensure all keys exist
     return {
       env: parsed.env ?? {},
-      world: parsed.world ?? {},
+      world: isLegacyWorld ? {} : rawWorld,
       players: parsed.players ?? {}
     }
   } catch (error) {
     components.logger.error(`Failed to load ${SERVER_STORAGE_FILE}: ${error}`)
-    return { ...DEFAULT_STORAGE }
+    return createDefaultStorage()
   }
 }
 
@@ -183,52 +210,59 @@ export async function deleteEnvValue(components: Pick<CliComponents, 'fs' | 'log
 }
 
 /**
- * Gets all world storage data.
+ * Gets all world storage data for a scene, keyed by its base-coordinate bucket.
  */
 export async function getWorldStorage(
-  components: Pick<CliComponents, 'fs' | 'logger'>
+  components: Pick<CliComponents, 'fs' | 'logger'>,
+  sceneKey: string
 ): Promise<Record<string, unknown>> {
   const storage = await loadServerStorage(components)
-  return storage.world
+  return storage.world[sceneKey] ?? {}
 }
 
 /**
- * Gets a value from world storage.
+ * Gets a value from a scene's world storage.
  */
 export async function getWorldValue(
   components: Pick<CliComponents, 'fs' | 'logger'>,
+  sceneKey: string,
   key: string
 ): Promise<unknown | undefined> {
   const storage = await loadServerStorage(components)
-  return storage.world[key]
+  return storage.world[sceneKey]?.[key]
 }
 
 /**
- * Sets a value in world storage.
+ * Sets a value in a scene's world storage.
  */
 export async function setWorldValue(
   components: Pick<CliComponents, 'fs' | 'logger'>,
+  sceneKey: string,
   key: string,
   value: unknown
 ): Promise<void> {
   const storage = await loadServerStorage(components)
-  storage.world[key] = value
+  if (!storage.world[sceneKey]) {
+    storage.world[sceneKey] = {}
+  }
+  storage.world[sceneKey][key] = value
   await saveServerStorage(components, storage)
 }
 
 /**
- * Deletes a value from world storage.
+ * Deletes a value from a scene's world storage.
  * Returns true if key existed and was deleted, false otherwise.
  */
 export async function deleteWorldValue(
   components: Pick<CliComponents, 'fs' | 'logger'>,
+  sceneKey: string,
   key: string
 ): Promise<boolean> {
   const storage = await loadServerStorage(components)
-  if (!(key in storage.world)) {
+  if (!storage.world[sceneKey] || !(key in storage.world[sceneKey])) {
     return false
   }
-  delete storage.world[key]
+  delete storage.world[sceneKey][key]
   await saveServerStorage(components, storage)
   return true
 }
