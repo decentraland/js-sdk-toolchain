@@ -27,7 +27,7 @@ export async function wireRouter(components: PreviewComponents, workspace: Works
 
   router.get('/', async (ctx, next) => {
     if (ctx.request.headers.get('upgrade') === 'websocket') {
-      return upgradeWebSocketResponse((ws) => initWsConnection(ws as any as WebSocket, sceneUpdateClients))
+      return upgradeWebSocketResponse((ws) => initWsConnection(components, ws as any as WebSocket, sceneUpdateClients))
     }
 
     return next()
@@ -76,7 +76,14 @@ export async function wireRouter(components: PreviewComponents, workspace: Works
   components.server.use(router.middleware())
 }
 
-const initWsConnection = (ws: WebSocket, clients: Set<WebSocket>) => {
+const initWsConnection = (components: Pick<PreviewComponents, 'logger'>, ws: WebSocket, clients: Set<WebSocket>) => {
+  // without this listener a dropped hot-reload socket raises an unhandled 'error'
+  // event, which takes the whole preview server down
+  ws.on('error', (error) => {
+    components.logger.error(error)
+    ws.close()
+  })
+
   if (ws.readyState === ws.OPEN) {
     clients.add(ws)
   } else {
