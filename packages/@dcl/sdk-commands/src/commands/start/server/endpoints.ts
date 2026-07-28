@@ -528,20 +528,27 @@ async function fakeEntityV3FromProject(
   if (project.kind === 'scene') {
     const sceneJsonPath = path.resolve(project.workingDirectory, 'scene.json')
     const sdkVersion = await getInstalledPackageVersion(components, '@dcl/sdk', project.workingDirectory)
-    const sceneJson = { sdkVersion, ...JSON.parse(await components.fs.readFile(sceneJsonPath, 'utf-8')) }
-    const { base, parcels }: { base: string; parcels: string[] } = sceneJson.scene
-    const pointers = new Set<string>()
-    pointers.add(base)
-    parcels.forEach(($) => pointers.add($))
+    // an editor mid-save leaves scene.json unparseable for a moment; a 500 here
+    // aborts the whole preview load, so report it and let the caller retry
+    try {
+      const sceneJson = { sdkVersion, ...JSON.parse(await components.fs.readFile(sceneJsonPath, 'utf-8')) }
+      const { base, parcels }: { base: string; parcels: string[] } = sceneJson.scene
+      const pointers = new Set<string>()
+      pointers.add(base)
+      parcels.forEach(($) => pointers.add($))
 
-    return {
-      version: 'v3',
-      type: EntityType.SCENE,
-      id: await hashingFunction(project.workingDirectory),
-      pointers: Array.from(pointers),
-      timestamp: Date.now(),
-      metadata: sceneJson,
-      content: contentFiles
+      return {
+        version: 'v3',
+        type: EntityType.SCENE,
+        id: await hashingFunction(project.workingDirectory),
+        pointers: Array.from(pointers),
+        timestamp: Date.now(),
+        metadata: sceneJson,
+        content: contentFiles
+      }
+    } catch (err: any) {
+      components.logger.error(`Unable to load scene.json (${sceneJsonPath})`)
+      components.logger.error(err)
     }
   } else if (project.kind === 'smart-wearable') {
     const wearableJsonPath = path.resolve(project.workingDirectory, 'wearable.json')

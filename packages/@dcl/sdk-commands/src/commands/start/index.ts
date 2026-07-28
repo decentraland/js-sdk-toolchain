@@ -24,13 +24,12 @@ import { b64HashingFunction } from '../../logic/project-files'
 import { DataLayer, createDataLayer } from './data-layer/rpc'
 import { createExitSignalComponent } from '../../components/exit-signal'
 import { getValidWorkspace } from '../../logic/workspace-validations'
-import { printCurrentProjectStarting, printProgressInfo, printWarning } from '../../logic/beautiful-logs'
+import { printCurrentProjectStarting, printError, printProgressInfo, printWarning } from '../../logic/beautiful-logs'
 import { Result } from 'arg'
 import { startValidations } from '../../logic/project-validations'
 import { runExplorerAlpha } from './explorer-alpha'
 import { getLanUrl } from './utils'
 import { spawnAuthServer } from './hammurabi-server'
-import { ChildProcess } from 'child_process'
 
 interface Options {
   args: Result<typeof args>
@@ -115,6 +114,20 @@ export async function help(options: Options) {
 }
 
 export async function main(options: Options) {
+  // A long dev session hits stray errors (a dropped socket, a rejected build step).
+  // Reporting them keeps the preview usable; letting them reach the default handler
+  // kills the server mid-session with nothing on screen to explain it.
+  process.on('uncaughtException', (error) => {
+    printError(options.components.logger, 'Uncaught exception in the preview server', error)
+  })
+  process.on('unhandledRejection', (reason) => {
+    printError(
+      options.components.logger,
+      'Unhandled promise rejection in the preview server',
+      reason instanceof Error ? reason : new Error(String(reason))
+    )
+  })
+
   let baseCoords = { x: 0, y: 0 }
   const workingDirectory = path.resolve(process.cwd(), options.args['--dir'] || '.')
   const isCi = options.args['--ci'] || process.env.CI || false
@@ -219,21 +232,13 @@ export async function main(options: Options) {
       }
       await startComponents()
 
-      // Start Hammurabi server if needed (stored outside components to avoid lifecycle management)
-      let hammurabiServer: ChildProcess | undefined
       const project = workspace.projects[0]
       if (project) {
-        const realm = `http://localhost:${port}`
-        hammurabiServer = spawnAuthServer(components, project, realm)
-
-        // Register cleanup handler for hammurabi server
+        const hammurabiServer = spawnAuthServer(components, project, `http://localhost:${port}`)
         if (hammurabiServer) {
-          const cleanup = () => {
-            if (hammurabiServer && !hammurabiServer.killed) {
-              hammurabiServer.kill('SIGTERM')
-            }
-          }
-          components.signaler.programClosed.then(cleanup).catch(() => {})
+          // on components so the file watcher can restart it after a rebuild
+          components.hammurabiServer = hammurabiServer
+          components.signaler.programClosed.then(() => hammurabiServer.stop()).catch(() => {})
         }
       }
 
