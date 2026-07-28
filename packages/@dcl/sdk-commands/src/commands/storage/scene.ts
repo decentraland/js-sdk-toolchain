@@ -7,7 +7,8 @@ import {
   createStorageInfo,
   makeAuthenticatedRequest,
   confirmAction,
-  getLinkerDappOptions
+  getLinkerDappOptions,
+  withPosition
 } from './shared'
 
 /**
@@ -38,7 +39,7 @@ export const handleScene = async (action: string, key: string | undefined, optio
 
     logger.info(`Getting scene storage value '${key}' from ${baseURL}`)
 
-    const url = `${baseURL}/values/${encodeURIComponent(key)}`
+    const url = withPosition(`${baseURL}/values/${encodeURIComponent(key)}`, baseParcel)
     const info = createStorageInfo('scene', 'get', url, worldName, baseParcel, parcels, key)
 
     const result = await makeAuthenticatedRequest(options.components, info, linkOptions, 'GET', url)
@@ -64,7 +65,7 @@ export const handleScene = async (action: string, key: string | undefined, optio
 
     logger.info(`Setting scene storage value '${key}' to ${baseURL}`)
 
-    const url = `${baseURL}/values/${encodeURIComponent(key)}`
+    const url = withPosition(`${baseURL}/values/${encodeURIComponent(key)}`, baseParcel)
     const info = createStorageInfo('scene', 'set', url, worldName, baseParcel, parcels, key, value)
 
     const result = await makeAuthenticatedRequest(options.components, info, linkOptions, 'PUT', url, { value })
@@ -84,7 +85,7 @@ export const handleScene = async (action: string, key: string | undefined, optio
 
     logger.info(`Deleting scene storage value '${key}' from ${baseURL}`)
 
-    const url = `${baseURL}/values/${encodeURIComponent(key)}`
+    const url = withPosition(`${baseURL}/values/${encodeURIComponent(key)}`, baseParcel)
     const info = createStorageInfo('scene', 'delete', url, worldName, baseParcel, parcels, key)
 
     const result = await makeAuthenticatedRequest(options.components, info, linkOptions, 'DELETE', url)
@@ -112,7 +113,7 @@ export const handleScene = async (action: string, key: string | undefined, optio
 
     logger.info(`Clearing all scene storage data from ${baseURL}`)
 
-    const url = `${baseURL}/values`
+    const url = withPosition(`${baseURL}/values`, baseParcel)
     const info = createStorageInfo('scene', 'clear', url, worldName, baseParcel, parcels)
 
     const result = await makeAuthenticatedRequest(options.components, info, linkOptions, 'DELETE', url, undefined, {

@@ -8,6 +8,8 @@ import {
   setEnvValue,
   deleteEnvValue,
   loadServerStorage,
+  getSceneStorageKey,
+  getWorldStorage,
   getWorldValue,
   setWorldValue,
   deleteWorldValue,
@@ -24,6 +26,10 @@ export function setupStorageEndpoints(
   router: Router<PreviewComponents>,
   workspace: Workspace
 ) {
+  // World (scene) storage is namespaced by the previewed scene's base coordinates,
+  // read directly from its scene.json (same source as routes.ts uses for the QR link).
+  const sceneKey = getSceneStorageKey(workspace.projects[0].scene.scene.base)
+
   const withKeyValidation: IHttpServerComponent.IRequestHandler<
     IHttpServerComponent.PathAwareContext<PreviewComponents, string>
   > = async (ctx, next) => {
@@ -88,8 +94,8 @@ export function setupStorageEndpoints(
     const limitParam = ctx.url.searchParams.get('limit')
     const offsetParam = ctx.url.searchParams.get('offset')
 
-    const storage = await loadServerStorage(components)
-    let entries = Object.entries(storage.world).map(([key, value]) => ({ key, value }))
+    const world = await getWorldStorage(components, sceneKey)
+    let entries = Object.entries(world).map(([key, value]) => ({ key, value }))
 
     if (prefix !== null && prefix !== '') {
       entries = entries.filter((entry) => entry.key.startsWith(prefix))
@@ -107,7 +113,7 @@ export function setupStorageEndpoints(
   router.get('/values/:key', withKeyValidation, async (ctx) => {
     const { key } = ctx.params
 
-    const value = await getWorldValue(components, key)
+    const value = await getWorldValue(components, sceneKey, key)
     if (value === undefined) {
       return { status: 404, body: { message: `Storage key '${key}' not found` } }
     }
@@ -120,7 +126,7 @@ export function setupStorageEndpoints(
     try {
       const bodyText = await ctx.request.text()
       const { value } = JSON.parse(bodyText)
-      await setWorldValue(components, key, value)
+      await setWorldValue(components, sceneKey, key, value)
       return { body: JSON.stringify({ value }) }
     } catch (error) {
       components.logger.error(`Failed to set storage value '${key}': ${error}`)
@@ -132,7 +138,7 @@ export function setupStorageEndpoints(
     const { key } = ctx.params
 
     try {
-      await deleteWorldValue(components, key)
+      await deleteWorldValue(components, sceneKey, key)
       return { status: 204 }
     } catch (error) {
       components.logger.error(`Failed to delete storage value '${key}': ${error}`)

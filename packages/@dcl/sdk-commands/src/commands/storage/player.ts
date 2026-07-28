@@ -7,7 +7,8 @@ import {
   createStorageInfo,
   makeAuthenticatedRequest,
   confirmAction,
-  getLinkerDappOptions
+  getLinkerDappOptions,
+  withPosition
 } from './shared'
 
 /**
@@ -48,7 +49,10 @@ export const handlePlayer = async (action: string, key: string | undefined, opti
 
     logger.info(`Getting player storage value '${key}' for ${address} from ${baseURL}`)
 
-    const url = `${baseURL}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
+    const url = withPosition(
+      `${baseURL}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`,
+      baseParcel
+    )
     const info = createStorageInfo('player', 'get', url, worldName, baseParcel, parcels, key, undefined, address)
 
     const result = await makeAuthenticatedRequest(options.components, info, linkOptions, 'GET', url)
@@ -91,7 +95,10 @@ export const handlePlayer = async (action: string, key: string | undefined, opti
 
     logger.info(`Setting player storage value '${key}' for ${address} to ${baseURL}`)
 
-    const url = `${baseURL}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
+    const url = withPosition(
+      `${baseURL}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`,
+      baseParcel
+    )
     const info = createStorageInfo('player', 'set', url, worldName, baseParcel, parcels, key, value, address)
 
     const result = await makeAuthenticatedRequest(options.components, info, linkOptions, 'PUT', url, { value })
@@ -125,7 +132,10 @@ export const handlePlayer = async (action: string, key: string | undefined, opti
 
     logger.info(`Deleting player storage value '${key}' for ${address} from ${baseURL}`)
 
-    const url = `${baseURL}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
+    const url = withPosition(
+      `${baseURL}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`,
+      baseParcel
+    )
     const info = createStorageInfo('player', 'delete', url, worldName, baseParcel, parcels, key, undefined, address)
 
     const result = await makeAuthenticatedRequest(options.components, info, linkOptions, 'DELETE', url)
@@ -159,7 +169,7 @@ export const handlePlayer = async (action: string, key: string | undefined, opti
 
       logger.info(`Clearing all storage data for player ${address} from ${baseURL}`)
 
-      const url = `${baseURL}/players/${encodeURIComponent(address)}/values`
+      const url = withPosition(`${baseURL}/players/${encodeURIComponent(address)}/values`, baseParcel)
       const info = createStorageInfo(
         'player',
         'clear',
@@ -201,7 +211,7 @@ export const handlePlayer = async (action: string, key: string | undefined, opti
 
       logger.info(`Clearing all player storage data from ${baseURL}`)
 
-      const url = `${baseURL}/players`
+      const url = withPosition(`${baseURL}/players`, baseParcel)
       const info = createStorageInfo('player', 'clear', url, worldName, baseParcel, parcels)
 
       const result = await makeAuthenticatedRequest(options.components, info, linkOptions, 'DELETE', url, undefined, {
