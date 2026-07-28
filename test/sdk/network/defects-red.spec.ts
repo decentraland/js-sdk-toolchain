@@ -8,9 +8,10 @@
  *
  * Fixed in phase 1 (hydration FSM), now plain `it`: #1, #2, #6, #7, #9, #14.
  * Fixed in phase 2 (validator hardening), now plain `it`: #3, #4.
+ * Fixed in phase 3 (codec unification), now plain `it`: #8.
  *
  * Source locations of what is still red, verified at the time of writing:
- *   #8  state.ts:106-111 (already names the component) + chunking.ts:29-32 (does not)
+ *   #8  fixed in phase 3: codec.ts `packChunks` is the one place that reports it
  *   #10 message-bus-sync.ts:89-91     client emits CRDT with no address
  *   #11 server/index.ts:143-167       broadcastBatchedMessages ignores excludeSender
  *   #12 events/implementation.ts:245-253  registerMessages Object.assign over a flat global registry
@@ -21,7 +22,7 @@ import * as components from '../../../packages/@dcl/ecs/dist/components'
 import { ReadWriteByteBuffer } from '../../../packages/@dcl/ecs/dist/serialization/ByteBuffer'
 import { DeleteEntityNetwork, PutComponentOperation } from '../../../packages/@dcl/ecs/dist/serialization/crdt'
 import { CommsMessage } from '../../../packages/@dcl/sdk/src/network/binary-message-bus'
-import { chunkCrdtMessages } from '../../../packages/@dcl/sdk/src/network/chunking'
+import { chunkCrdtMessages } from '../../../packages/@dcl/sdk/src/network/codec'
 import { registerMessages } from '../../../packages/@dcl/sdk/src/network/events/implementation'
 import { engineToCrdt } from '../../../packages/@dcl/sdk/src/network/state'
 import { definePlayerHelper } from '../../../packages/@dcl/sdk/src/players'
@@ -184,10 +185,10 @@ describe('known defects (red: asserting the correct behavior)', () => {
     expectConvergence({ restartedServer: restarted.engine, clientA: harness.clientA.engine })
   })
 
-  it.failing('#8 dropping an oversized message always names the component and its size', async () => {
+  it('#8 dropping an oversized message always names the component and its size', async () => {
     const error = jest.spyOn(console, 'error').mockImplementation(() => {})
 
-    // state.ts already names the component and the size
+    // the state dump path
     const engine = Engine()
     const local = defineComponents(engine)
     const Big = engine.defineComponent('test::Big', { blob: Schemas.String })
@@ -198,7 +199,7 @@ describe('known defects (red: asserting the correct behavior)', () => {
     engineToCrdt(engine)
     expect(error).toHaveBeenCalledWith(expect.stringContaining(`component ${Big.componentId}`))
 
-    // chunking.ts drops the message without saying which component it belonged to
+    // ...and the chunking path, which reports it through the same code
     error.mockClear()
     const oversized = new ReadWriteByteBuffer()
     PutComponentOperation.write(512 as Entity, 1, GlobalTransform.componentId, new Uint8Array(13 * 1024), oversized)

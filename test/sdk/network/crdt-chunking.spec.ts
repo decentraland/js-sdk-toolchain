@@ -3,9 +3,11 @@ import * as components from '../../../packages/@dcl/ecs/dist/components'
 import { ReadWriteByteBuffer } from '../../../packages/@dcl/ecs/dist/serialization/ByteBuffer'
 import { readMessage } from '../../../packages/@dcl/ecs/dist/serialization/crdt/message'
 import { CrdtMessage, CrdtMessageType } from '../../../packages/@dcl/ecs/dist'
-import { LIVEKIT_MAX_SIZE } from '../../../packages/@dcl/sdk/src/network/server'
+import { PutNetworkComponentOperation } from '../../../packages/@dcl/ecs/dist/serialization/crdt'
+import { LIVEKIT_MAX_SIZE, createServerValidator } from '../../../packages/@dcl/sdk/src/network/server'
 import { addSyncTransport } from '../../../packages/@dcl/sdk/src/network/message-bus-sync'
-import { CommsMessage } from '../../../packages/@dcl/sdk/src/network/binary-message-bus'
+import { BinaryMessageBus, CommsMessage } from '../../../packages/@dcl/sdk/src/network/binary-message-bus'
+import * as codec from '../../../packages/@dcl/sdk/src/network/codec'
 import { SendBinaryRequest, SendBinaryResponse } from '~system/CommunicationsController'
 // Message capture for testing chunking
 class MessageCapture {
@@ -411,6 +413,73 @@ describe('CRDT Network Transport Chunking Tests', () => {
     // Should have at least one chunk for the update
     expect(messageCapture.capturedChunks.length).toBeGreaterThanOrEqual(0)
   })
+})
+
+describe('parse-once pipeline', () => {
+  /**
+   * The codec is the only thing that turns bytes into messages, so counting calls
+   * to `readMessages` counts how many times the server walked the CRDT structure
+   * of one inbound payload. Before phase 3 it walked it twice: once on ingest,
+   * once more inside the chunker on the way back out.
+   *
+   * The component data is still deserialized a second time by the validator's dry
+   * run — that is inherent to CRDT conflict resolution, not a structure re-parse.
+   */
+  it('walks an inbound buffer once, from ingest through validation to broadcast', async () => {
+    const engine = Engine()
+    const Transform = components.Transform(engine as any)
+    components.NetworkEntity(engine as any)
+    components.NetworkParent(engine as any)
+    components.CreatedBy(engine as any)
+    await engine.update(1)
+
+    const emitted: Uint8Array[] = []
+    const validator = createServerValidator({
+      engine,
+      binaryMessageBus: BinaryMessageBus((data) => emitted.push(data))
+    })
+
+    const payload = new ReadWriteByteBuffer()
+    Transform.schema.serialize(
+      {
+        position: { x: 1, y: 2, z: 3 },
+        rotation: { x: 0, y: 0, z: 0, w: 1 },
+        scale: { x: 1, y: 1, z: 1 },
+        parent: 0
+      } as never,
+      payload
+    )
+    const inbound = new ReadWriteByteBuffer()
+    const MESSAGES = 5
+    for (let i = 0; i < MESSAGES; i++) {
+      PutNetworkComponentOperation.write(
+        (600 + i) as Entity,
+        1,
+        Transform.componentId,
+        42,
+        payload.toCopiedBinary(),
+        inbound
+      )
+    }
+
+    const parse = jest.spyOn(codec, 'readMessages')
+    const applied = validator.processServerMessages(inbound.toBinary(), 'clientA')
+
+    expect(parse).toHaveBeenCalledTimes(1)
+    expect(parse.mock.calls[0][0].byteLength).toBe(inbound.currentWriteOffset())
+    // the whole payload really did make it through: applied locally and broadcast
+    expect(readMessagesOf(applied)).toBe(MESSAGES)
+    expect(emitted).toHaveLength(1)
+    parse.mockRestore()
+    expect(readMessagesOf(emitted[0].subarray(1))).toBe(MESSAGES)
+  })
+
+  function readMessagesOf(data: Uint8Array): number {
+    const buffer = new ReadWriteByteBuffer(data)
+    let count = 0
+    while (readMessage(buffer)) count++
+    return count
+  }
 })
 
 // Custom function to extract entity and component info from CRDT messages
