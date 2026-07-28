@@ -132,12 +132,8 @@ async function runApp(
 
     const queryParams = params.toString()
 
-    // --no-browser prints the deeplink without launching the client, so tools
-    // wrapping this command (Creator Hub) can decide when the explorer opens
-    if (!args['--no-browser']) {
-      const app = `decentraland://"${queryParams}"`
-      await components.spawner.exec(cwd, cmd, [app], { silent: true })
-    }
+    const app = `decentraland://"${queryParams}"`
+    await components.spawner.exec(cwd, cmd, [app], { silent: true })
     components.logger.info(`Desktop client: decentraland://${queryParams}\n`)
     return true
   } catch (e: any) {
