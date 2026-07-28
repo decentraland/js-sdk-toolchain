@@ -15,11 +15,13 @@ import { type BinaryMessageBus } from '../binary-message-bus'
 import {
   components,
   ReadWriteByteBuffer,
+  DeleteComponentNetwork,
   LastWriteWinElementSetComponentDefinition,
   GrowOnlyValueSetComponentDefinition,
   ComponentDefinition,
   InternalBaseComponent
 } from '../ecs-adapter'
+import { createNetworkEntityIndex } from '../entity-index'
 
 export { LIVEKIT_MAX_SIZE } from '../constants'
 
@@ -47,15 +49,10 @@ export function createServerValidator(config: ServerValidationConfig) {
     )
   }
 
+  const findNetworkEntity = createNetworkEntityIndex(engine, NetworkEntity)
+
   function findExistingNetworkEntity(message: utils.NetworkMessage): Entity | null {
-    // Look for existing network entity mapping (don't create new ones)
-    for (const [entityId, networkData] of engine.getEntitiesWith(NetworkEntity)) {
-      if (networkData.networkId === message.networkId && networkData.entityId === message.entityId) {
-        return entityId
-      }
-    }
-    // Return null if not found
-    return null
+    return findNetworkEntity(message.networkId, message.entityId)
   }
 
   function findOrCreateNetworkEntity(message: utils.NetworkMessage, sender: string, isServer: boolean): Entity {
@@ -105,39 +102,71 @@ export function createServerValidator(config: ServerValidationConfig) {
     }
   }
 
-  function validateMessagePermissions(message: utils.RegularMessage, sender: string, _localEntityId: Entity): boolean {
-    // Basic checks
+  /**
+   * Everything a peer asks the authoritative world to change goes through here.
+   * A type this function does not name is refused: a permissive fallthrough turns
+   * every message the protocol grows into an unaudited write.
+   *
+   * ponytail: authority is per-component (`validateBeforeChange`) plus CreatedBy
+   * ownership on entity deletion. The sync mode the old TODO promised
+   * ('all' | 'owner' | 'server') does not exist on this branch — `SyncComponents`
+   * carries a bare `componentIds: number[]` and nothing anywhere reads a mode — so
+   * there is nothing to enforce. Upgrade path: add the mode to the SyncComponents
+   * schema, then gate the PUT/DELETE_COMPONENT arm on it before the dry run.
+   */
+  function validateMessagePermissions(message: CrdtMessageBody, sender: string, localEntityId: Entity): boolean {
     if (!sender || sender === AUTH_SERVER_PEER_ID) {
       return false // Server shouldn't send messages to itself
     }
 
-    if (message.type === CrdtMessageType.DELETE_ENTITY) {
-      // TODO: how to handle this case ?
+    switch (message.type) {
+      case CrdtMessageType.PUT_COMPONENT:
+      case CrdtMessageType.DELETE_COMPONENT: {
+        const component = engine.getComponent(message.componentId) as InternalBaseComponent<unknown>
+        const buf = 'data' in message ? new ReadWriteByteBuffer(message.data) : null
+        const value = buf ? component.schema.deserialize(buf) : null
+        const dryRunCRDT = component.__dry_run_updateFromCrdt(message)
+        const validCRDT = [
+          ProcessMessageResultType.StateUpdatedData,
+          ProcessMessageResultType.StateUpdatedTimestamp,
+          ProcessMessageResultType.EntityDeleted
+        ].includes(dryRunCRDT)
+        const createdBy = CreatedBy.getOrNull(localEntityId)
+
+        return !!(
+          validCRDT &&
+          component.__run_validateBeforeChange(
+            message.entityId,
+            value,
+            sender,
+            createdBy?.address ?? AUTH_SERVER_PEER_ID
+          )
+        )
+      }
+
+      case CrdtMessageType.DELETE_ENTITY:
+      case CrdtMessageType.DELETE_ENTITY_NETWORK:
+        // Destroying an entity is only the creator's call. The server may do it too,
+        // which it cannot reach today: a message from itself is refused above.
+        // `localEntityId` and not `message.entityId`, because the network variant
+        // still names the sender's entity id rather than the local one.
+        //
+        // ponytail: a delete naming an entity the server has never seen still passes,
+        // because `findOrCreateNetworkEntity` created it a few lines earlier and
+        // stamped the sender as its creator. No existing state is reachable that way,
+        // but it does let a peer make the server broadcast a create and a delete for
+        // a phantom entity. Upgrade path: skip the create for DELETE_ENTITY_NETWORK
+        // and reject the message when the lookup misses.
+        return sender === AUTH_SERVER_PEER_ID || CreatedBy.getOrNull(localEntityId)?.address === sender
+
+      default:
+        console.error(
+          `[network] rejected an unhandled message type ${
+            CrdtMessageType[message.type] ?? message.type
+          } from ${sender}: the authoritative server only accepts component writes and entity deletions`
+        )
+        return false
     }
-
-    if (message.type === CrdtMessageType.PUT_COMPONENT || message.type === CrdtMessageType.DELETE_COMPONENT) {
-      const component = engine.getComponent(message.componentId) as InternalBaseComponent<unknown>
-      const buf = 'data' in message ? new ReadWriteByteBuffer(message.data) : null
-      const value = buf ? component.schema.deserialize(buf) : null
-      const dryRunCRDT = component.__dry_run_updateFromCrdt(message)
-      const validCRDT = [
-        ProcessMessageResultType.StateUpdatedData,
-        ProcessMessageResultType.StateUpdatedTimestamp,
-        ProcessMessageResultType.EntityDeleted
-      ].includes(dryRunCRDT)
-      const createdBy = CreatedBy.getOrNull(message.entityId)
-      const validMessage =
-        validCRDT &&
-        component.__run_validateBeforeChange(message.entityId, value, sender, createdBy?.address ?? AUTH_SERVER_PEER_ID)
-
-      return !!validMessage
-    }
-
-    // For now, basic validation - in the future this will check component sync permissions
-    // TODO: Check if sender owns the entity
-    // TODO: Check component sync mode ('all' | 'owner' | 'server')
-    // TODO: Run component custom validation
-    return true
   }
 
   function broadcastBatchedMessages(messages: utils.NetworkMessage[], excludeSender: string) {
@@ -184,11 +213,11 @@ export function createServerValidator(config: ServerValidationConfig) {
       }
 
       const serverCRDTState = component.getCrdtState(localEntityId)
+      const correctionBuffer = new ReadWriteByteBuffer()
 
       if (serverCRDTState) {
         // Create authoritative message using PUT_COMPONENT_NETWORK
         // Each client will convert this to AUTHORITATIVE_PUT_COMPONENT with proper entity mapping
-        const correctionBuffer = new ReadWriteByteBuffer()
         PutNetworkComponentOperation.write(
           networkMessage.entityId, // Use original network entity ID
           serverCRDTState.timestamp,
@@ -197,14 +226,32 @@ export function createServerValidator(config: ServerValidationConfig) {
           serverCRDTState.data,
           correctionBuffer
         )
-        // Send authoritative message directly to the sender
-        binaryMessageBus.emit(CommsMessage.CRDT_AUTHORITATIVE, correctionBuffer.toBinary(), [sender])
-
-        DEBUG_NETWORK_MESSAGES() &&
-          console.log(
-            `[AUTHORITATIVE] Sent authoritative message to ${sender} for entity ${localEntityId} component ${networkMessage.componentId} with timestamp ${networkMessage.timestamp}`
-          )
+      } else {
+        // A rejected *first* write leaves the server holding nothing, and "revert to
+        // the server state" then means "you do not have this component". There is no
+        // authoritative delete on the wire — AUTHORITATIVE_PUT_COMPONENT is the only
+        // force-applied opcode — so the delete has to win the LWW on merit, and the
+        // one clock we know beats the offender's is the timestamp it just sent.
+        DeleteComponentNetwork.write(
+          networkMessage.entityId,
+          networkMessage.componentId,
+          networkMessage.timestamp + 1,
+          networkMessage.networkId,
+          correctionBuffer
+        )
       }
+
+      // Send authoritative message directly to the sender
+      binaryMessageBus.emit(CommsMessage.CRDT_AUTHORITATIVE, correctionBuffer.toBinary(), [sender])
+
+      DEBUG_NETWORK_MESSAGES() &&
+        console.log(
+          `[AUTHORITATIVE] Sent authoritative ${
+            serverCRDTState ? 'state' : 'delete'
+          } to ${sender} for entity ${localEntityId} component ${networkMessage.componentId} with timestamp ${
+            networkMessage.timestamp
+          }`
+        )
     } catch (error) {
       DEBUG_NETWORK_MESSAGES() && console.error('Error sending correction:', error)
     }
@@ -266,8 +313,10 @@ export function createServerValidator(config: ServerValidationConfig) {
             // 2. Convert network message to regular message and collect for local application
             const regularMessage = convertNetworkToRegularMessage(networkMessage, localEntityId)
 
-            // 3. Basic permission validation
-            if (!validateMessagePermissions(regularMessage as any, sender, localEntityId)) {
+            // 3. Basic permission validation. A payload that did not decode is
+            //    unvalidatable and therefore unbroadcastable, so it is treated as a
+            //    rejection rather than waved through as an untyped message.
+            if (!regularMessage || !validateMessagePermissions(regularMessage, sender, localEntityId)) {
               // Send correction back to sender with server's authoritative state
               sendCorrectionToSender(networkMessage, sender, localEntityId)
               continue
@@ -276,7 +325,7 @@ export function createServerValidator(config: ServerValidationConfig) {
             // 4. Collect valid message for batched broadcasting
             messagesToBroadcast.push(networkMessage)
 
-            if (regularMessage?.messageBuffer.byteLength) {
+            if (regularMessage.messageBuffer.byteLength) {
               regularMessagesBuffer.writeBuffer(regularMessage.messageBuffer, false)
             }
           }
