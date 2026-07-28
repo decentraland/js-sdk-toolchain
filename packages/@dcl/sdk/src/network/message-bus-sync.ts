@@ -11,13 +11,12 @@ import { GetUserDataRequest, GetUserDataResponse } from '~system/UserIdentity'
 import { definePlayerHelper } from '../players'
 import { serializeCrdtMessages } from '../internal/transports/logger'
 import { IsServerRequest, IsServerResponse } from '~system/EngineApi'
-import { Atom } from '../atom'
+import { AUTH_SERVER_PEER_ID, DEBUG_NETWORK_MESSAGES, IProfile } from './constants'
+import { createRuntimeContext } from './runtime-context'
 import { setGlobalRoom, Room } from './events/implementation'
 
-export type IProfile = { networkId: number; userId: string }
-// user that we asked for the inital crdt state
-export const AUTH_SERVER_PEER_ID = 'authoritative-server'
-export const DEBUG_NETWORK_MESSAGES = () => (globalThis as any).DEBUG_NETWORK_MESSAGES ?? false
+export { AUTH_SERVER_PEER_ID, DEBUG_NETWORK_MESSAGES } from './constants'
+export type { IProfile } from './constants'
 
 // Test environment detection without 'as any'
 const isTestEnvironment = (): boolean => {
@@ -41,12 +40,7 @@ export function addSyncTransport(
   const myProfile: IProfile = {} as IProfile
   fetchProfile(myProfile!, getUserData)
 
-  const isServerAtom = Atom<boolean>()
-  const isRoomReadyAtom = Atom<boolean>(false)
-
-  void isServerFn({}).then(($: IsServerResponse) => {
-    return isServerAtom.swap(!!$.isServer)
-  })
+  const { isServerAtom, isRoomReadyAtom } = createRuntimeContext(isServerFn)
 
   // Entity utils
   const entityDefinitions = entityUtils(engine, myProfile)
@@ -98,6 +92,16 @@ export function addSyncTransport(
     type: name
   }
 
+  // `onmessage` is wired by `engine.addTransport`; a comms message that arrives
+  // before that (or after a transport swap) must not take the handler down.
+  function deliverToEngine(buffer: Uint8Array) {
+    if (!transport.onmessage) {
+      DEBUG_NETWORK_MESSAGES() && console.log('[deliverToEngine] transport not wired yet, dropping', buffer.byteLength)
+      return
+    }
+    transport.onmessage(buffer)
+  }
+
   // Server validation setup
   const serverValidator = createServerValidator({
     engine,
@@ -133,7 +137,7 @@ export function addSyncTransport(
     if (isServerAtom.getOrNull() || sender !== AUTH_SERVER_PEER_ID) return
     DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength / 1024, 'KB')
     if (data.byteLength > 0) {
-      transport.onmessage!(serverValidator.processClientMessages(data, sender))
+      deliverToEngine(serverValidator.processClientMessages(data, sender))
     }
     stateIsSyncronized = true
 
@@ -156,10 +160,10 @@ export function addSyncTransport(
         isServer
       )
     if (isServer) {
-      transport.onmessage!(serverValidator.processServerMessages(value, sender))
+      deliverToEngine(serverValidator.processServerMessages(value, sender))
     } else if (sender === AUTH_SERVER_PEER_ID) {
       // Process network messages from server and convert to regular messages
-      transport.onmessage!(serverValidator.processClientMessages(value, sender))
+      deliverToEngine(serverValidator.processClientMessages(value, sender))
     }
   })
 
@@ -168,8 +172,8 @@ export function addSyncTransport(
     // Only accept authoritative messages from authoritative server
     if (sender !== AUTH_SERVER_PEER_ID) return
 
-    // DEBUG_NETWORK_MESSAGES() &&
-    console.log('[AUTHORITATIVE] Received authoritative message from server:', value.byteLength, 'bytes')
+    DEBUG_NETWORK_MESSAGES() &&
+      console.log('[AUTHORITATIVE] Received authoritative message from server:', value.byteLength, 'bytes')
 
     // Process authoritative messages by forcing them through normal CRDT processing
     // but with a timestamp that's guaranteed to be accepted
@@ -177,7 +181,7 @@ export function addSyncTransport(
     if (authoritativeBuffer.byteLength > 0) {
       // Apply authoritative message through normal transport, but the server's messages
       // should be processed as authoritative with special timestamp handling
-      transport.onmessage!(authoritativeBuffer)
+      deliverToEngine(authoritativeBuffer)
 
       DEBUG_NETWORK_MESSAGES() && console.log('[AUTHORITATIVE] Applied server authoritative message to local state')
     }
@@ -267,6 +271,7 @@ export function addSyncTransport(
     isStateSyncronized,
     binaryMessageBus,
     eventBus,
+    isServerAtom,
     isRoomReadyAtom
   }
 }

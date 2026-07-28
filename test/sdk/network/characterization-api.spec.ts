@@ -110,9 +110,9 @@ describe('@dcl/sdk/network public surface characterization', () => {
     expect(network.isServer()).toBe(false)
     expect(network.myProfile).toEqual({})
     expect(network.isStateSyncronized()).toBe(false)
-    // the role is asked twice at boot: once for the exported isServer(), once
-    // inside addSyncTransport — two independent atoms over the same answer
-    expect(mockIsServer).toHaveBeenCalledTimes(2)
+    // Phase 0 collapsed the two atoms into one runtime context, so the role is
+    // resolved once at boot and the exported isServer() reads that same atom
+    expect(mockIsServer).toHaveBeenCalledTimes(1)
     expect(mockGetUserData).toHaveBeenCalledTimes(1)
 
     resolveIsServer({ isServer: true })

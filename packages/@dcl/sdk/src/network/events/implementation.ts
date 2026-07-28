@@ -1,10 +1,9 @@
 import { IEngine } from '@dcl/ecs'
 import { CommsMessage } from '../binary-message-bus'
-import { AUTH_SERVER_PEER_ID } from '../message-bus-sync'
+import { AUTH_SERVER_PEER_ID } from '../constants'
 import { EventTypes, EventSchemaRegistry } from './registry'
 import { encodeEvent, decodeEvent } from './protocol'
 import { Atom } from '../../atom'
-import { future, IFuture } from '../../future'
 
 // Context provided to server-side event handlers
 export type EventContext = {
@@ -34,14 +33,13 @@ type QueuedMessage<T extends EventSchemaRegistry = EventSchemaRegistry> = {
 export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
   private listeners = new Map<keyof T, Set<EventCallback<any>>>()
   private binaryMessageBus: any
-  private isServerFuture: IFuture<boolean> = future()
+  private isServerAtom: Atom<boolean>
   private isRoomReadyAtom: Atom<boolean>
   private messageQueue: QueuedMessage<T>[] = []
   private isProcessingQueue = false
 
-  constructor(_engine: IEngine, binaryMessageBus: any, isServerFn: Atom<boolean>, isRoomReadyAtom: Atom<boolean>) {
-    void isServerFn.deref().then(($) => this.isServerFuture.resolve($))
-
+  constructor(_engine: IEngine, binaryMessageBus: any, isServerAtom: Atom<boolean>, isRoomReadyAtom: Atom<boolean>) {
+    this.isServerAtom = isServerAtom
     this.binaryMessageBus = binaryMessageBus
     this.isRoomReadyAtom = isRoomReadyAtom
 
@@ -59,7 +57,7 @@ export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
 
         if (callbacks) {
           callbacks.forEach(async (cb) => {
-            if (await this.isServerFuture) {
+            if (await this.isServerAtom.deref()) {
               // Server handlers receive sender context
               cb(payload, { from: sender })
             } else if (sender === AUTH_SERVER_PEER_ID) {
@@ -119,7 +117,7 @@ export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
       // Room is ready, send immediately
       const buffer = encodeEvent(eventType as string, data, globalEventRegistry)
 
-      if (await this.isServerFuture) {
+      if (await this.isServerAtom.deref()) {
         // Server can send to specific clients or broadcast
         this.binaryMessageBus.emit(CommsMessage.CUSTOM_EVENT, buffer, options?.to)
       } else {
@@ -247,8 +245,6 @@ export function registerMessages<T extends EventSchemaRegistry>(messages: T): Ro
   if (!globalRoom) {
     throw new Error('Room not initialized. Make sure the SDK network transport is initialized.')
   }
-  // Update the room registry
-  ;(globalRoom as any).registry = globalEventRegistry
   return globalRoom as unknown as Room<T>
 }
 

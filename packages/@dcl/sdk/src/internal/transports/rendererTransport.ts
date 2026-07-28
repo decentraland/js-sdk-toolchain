@@ -28,7 +28,6 @@ export function createRendererTransport(engineApi: EngineApiForTransport): Trans
         // this is the console.error of the scene
         // eslint-disable-next-line no-console
         console.error(error)
-        debugger
       }
     },
     filter(message: TransportMessage) {
