@@ -1,9 +1,11 @@
+import { sdk } from '@dcl/schemas'
 import path from 'path'
 import { WebSocket } from 'ws'
 import chokidar from 'chokidar'
 import { getDCLIgnorePatterns } from '../../../logic/dcl-ignore'
 import { PreviewComponents } from '../types'
 import { sceneUpdateClients } from './routes'
+import { ProjectUnion } from '../../../logic/project-validations'
 import { b64HashingFunction } from '../../../logic/project-files'
 import {
   WsSceneMessage,
@@ -17,7 +19,8 @@ import { debounce } from '../../../logic/debounce'
  */
 export async function wireFileWatcherToWebSockets(
   components: Pick<PreviewComponents, 'fs' | 'ws' | 'logger'>,
-  projectRoot: string
+  projectRoot: string,
+  projectKind: ProjectUnion['kind']
 ) {
   const ignored = await getDCLIgnorePatterns(components, projectRoot)
   const sceneId = b64HashingFunction(projectRoot)
@@ -36,6 +39,9 @@ export async function wireFileWatcherToWebSockets(
       'all',
       debounce(async (_, file) => {
         updateScene(sceneId, file)
+        // Legacy JSON protocol: still the only one Bevy and Godot explorers understand.
+        // Remove once both consume the protobuf WsSceneMessage.
+        __LEGACY__updateScene(projectRoot, sceneUpdateClients, projectKind)
       }, 800)
     )
 }
@@ -79,6 +85,23 @@ function sendSceneMessage(sceneMessage: WsSceneMessage) {
   for (const client of sceneUpdateClients) {
     if (client.readyState === WebSocket.OPEN) {
       client.send(message, { binary: true })
+    }
+  }
+}
+
+/**
+ * @deprecated legacy JSON protocol, consumed by Bevy and Godot explorers
+ */
+export function __LEGACY__updateScene(dir: string, clients: Set<WebSocket>, projectKind: ProjectUnion['kind']): void {
+  for (const client of clients) {
+    if (client.readyState === WebSocket.OPEN) {
+      const message: sdk.SceneUpdate = {
+        type: sdk.SCENE_UPDATE,
+        payload: { sceneId: b64HashingFunction(dir), sceneType: projectKind }
+      }
+
+      client.send(sdk.UPDATE, { binary: false })
+      client.send(JSON.stringify(message), { binary: false })
     }
   }
 }
