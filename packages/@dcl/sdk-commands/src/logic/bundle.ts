@@ -319,9 +319,19 @@ export async function bundleSingleProject(components: BundleComponents, options:
       }
     })
 
-    // Do initial build
-    await context.rebuild()
-    printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
+    // Do initial build. A build error must not kill the process in watch mode:
+    // the watcher above is already running and the preview server can still
+    // start, so report the error and recover on the next file save — the same
+    // contract as a failed re-build. Throwing here left `sdk-commands start`
+    // dead when a scene was opened with a pre-existing syntax error, with no
+    // watcher alive to pick up the fix.
+    try {
+      await context.rebuild()
+      printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
+    } catch (err: any) {
+      /* istanbul ignore next */
+      components.logger.error(err.toString())
+    }
     printProgressInfo(components.logger, `The compiler is watching for changes`)
   } else {
     try {
