@@ -27,7 +27,7 @@ import {
   TriggerAreaResult,
   ComponentDefinition
 } from '@dcl/ecs'
-import { LIVEKIT_MAX_SIZE } from './constants'
+import { PackableMessage, packChunks } from './codec'
 import { ReadWriteByteBuffer } from './ecs-adapter'
 
 export const NOT_SYNC_COMPONENTS: ComponentDefinition<unknown>[] = [
@@ -71,9 +71,7 @@ export function getDesyncedComponents(engine: IEngine): ComponentDefinition<unkn
 
 export function engineToCrdt(engine: IEngine): Uint8Array[] {
   const crdtBuffer = new ReadWriteByteBuffer()
-  const networkBuffer = new ReadWriteByteBuffer()
   const NetworkEntity = engine.getComponent(_NetworkEntity.componentId) as INetowrkEntity
-  const chunks: Uint8Array[] = []
 
   for (const itComponentDefinition of engine.componentsIter()) {
     if (!shouldSyncComponent(itComponentDefinition)) {
@@ -85,51 +83,33 @@ export function engineToCrdt(engine: IEngine): Uint8Array[] {
     })
   }
 
-  let header: CrdtMessageHeader | null
-  while ((header = CrdtMessageProtocol.getHeader(crdtBuffer))) {
-    if (header.type === CrdtMessageType.PUT_COMPONENT) {
+  // One scratch buffer for the whole dump: the packer copies each message out
+  // before pulling the next one, which overwrites it.
+  function* asNetworkMessages(): Generator<PackableMessage> {
+    const scratch = new ReadWriteByteBuffer()
+    let header: CrdtMessageHeader | null
+    while ((header = CrdtMessageProtocol.getHeader(crdtBuffer))) {
+      if (header.type !== CrdtMessageType.PUT_COMPONENT) {
+        crdtBuffer.incrementReadOffset(header.length)
+        continue
+      }
+
       const message = PutComponentOperation.read(crdtBuffer)!
       const networkEntity = NetworkEntity.getOrNull(message.entityId)
+      if (!networkEntity) continue
 
-      // Check if adding this message would exceed the size limit
-      const currentBufferSize = networkBuffer.toBinary().byteLength
-      const messageSize = message.data.byteLength
-
-      if ((currentBufferSize + messageSize) / 1024 > LIVEKIT_MAX_SIZE) {
-        // If the current buffer has content, save it as a chunk
-        if (currentBufferSize > 0) {
-          chunks.push(networkBuffer.toCopiedBinary())
-          networkBuffer.resetBuffer()
-        }
-
-        // If the message itself is larger than the limit, we need to handle it specially
-        if (messageSize / 1024 > LIVEKIT_MAX_SIZE) {
-          console.error(
-            `Message too large (${messageSize} bytes), skipping component ${message.componentId} for entity ${message.entityId}`
-          )
-          continue
-        }
-      }
-
-      if (networkEntity) {
-        PutNetworkComponentOperation.write(
-          networkEntity.entityId,
-          message.timestamp,
-          message.componentId,
-          networkEntity.networkId,
-          message.data,
-          networkBuffer
-        )
-      }
-    } else {
-      crdtBuffer.incrementReadOffset(header.length)
+      scratch.resetBuffer()
+      PutNetworkComponentOperation.write(
+        networkEntity.entityId,
+        message.timestamp,
+        message.componentId,
+        networkEntity.networkId,
+        message.data,
+        scratch
+      )
+      yield { messageBuffer: scratch.toBinary(), entityId: message.entityId, componentId: message.componentId }
     }
   }
 
-  // Add any remaining data as the final chunk
-  if (networkBuffer.currentWriteOffset() > 0) {
-    chunks.push(networkBuffer.toBinary())
-  }
-
-  return chunks
+  return packChunks(asNetworkMessages())
 }

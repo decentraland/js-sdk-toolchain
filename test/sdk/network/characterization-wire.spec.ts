@@ -40,16 +40,18 @@ import {
   decodeString,
   encodeString
 } from '../../../packages/@dcl/sdk/src/network/binary-message-bus'
-import { chunkCrdtMessages } from '../../../packages/@dcl/sdk/src/network/chunking'
 import { engineToCrdt } from '../../../packages/@dcl/sdk/src/network/state'
+// `server/utils.ts` + `chunking.ts` became `codec.ts` in phase 3. The describe
+// blocks below keep their original names so the golden snapshot keys still match.
 import {
   NetworkMessage,
   RegularMessage,
+  chunkCrdtMessages,
   isNetworkMessage,
   localMessageToNetwork,
   networkMessageToLocal,
   readMessages
-} from '../../../packages/@dcl/sdk/src/network/server/utils'
+} from '../../../packages/@dcl/sdk/src/network/codec'
 import { decodeEvent, encodeEvent } from '../../../packages/@dcl/sdk/src/network/events/protocol'
 import { toHex } from './utils/hex'
 
