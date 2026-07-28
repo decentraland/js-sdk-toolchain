@@ -10,7 +10,7 @@ import {
   TransformComponent,
   ISyncComponents
 } from '@dcl/ecs'
-import { IProfile } from './message-bus-sync'
+import { IProfile } from './constants'
 import { getDesyncedComponents } from './state'
 
 export type SyncEntity = (entityId: Entity, componentIds: number[], entityEnumId?: number) => void

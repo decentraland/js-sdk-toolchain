@@ -1,4 +1,4 @@
-import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
+import { ReadWriteByteBuffer } from './ecs-adapter'
 
 export enum CommsMessage {
   CRDT = 7,

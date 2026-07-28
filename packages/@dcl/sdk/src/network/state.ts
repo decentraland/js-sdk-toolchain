@@ -1,4 +1,3 @@
-import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import {
   CrdtMessageHeader,
   CrdtMessageProtocol,
@@ -28,7 +27,8 @@ import {
   TriggerAreaResult,
   ComponentDefinition
 } from '@dcl/ecs'
-import { LIVEKIT_MAX_SIZE } from './server'
+import { LIVEKIT_MAX_SIZE } from './constants'
+import { ReadWriteByteBuffer } from './ecs-adapter'
 
 export const NOT_SYNC_COMPONENTS: ComponentDefinition<unknown>[] = [
   VideoEvent,
