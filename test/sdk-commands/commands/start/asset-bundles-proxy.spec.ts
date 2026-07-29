@@ -39,17 +39,21 @@ describe('start/server/asset-bundles-proxy', () => {
 
   it('streams requests through to the sidecar, stripping the mount prefix and keeping the query string', async () => {
     const { fetch, dispatch } = makeProxy(() => 'http://127.0.0.1:53211')
-    fetch.mockResolvedValue(
-      new Response('bundle-bytes', {
-        status: 200,
-        headers: {
-          'content-type': 'application/octet-stream',
-          // undici already decompressed the body: these must not be forwarded
-          'content-encoding': 'gzip',
-          'content-length': '999'
-        }
-      })
-    )
+    const sidecarResponse = new Response('bundle-bytes', {
+      status: 200,
+      headers: {
+        'content-type': 'application/octet-stream',
+        // undici already decompressed the body: these must not be forwarded
+        'content-encoding': 'gzip',
+        'content-length': '999'
+      }
+    })
+    // real fetch() responses carry immutable Headers (guard "immutable"), unlike
+    // constructed ones (guard "response") — mimic that so a mutation regresses loudly
+    sidecarResponse.headers.delete = () => {
+      throw new TypeError('immutable')
+    }
+    fetch.mockResolvedValue(sidecarResponse)
 
     const response = await dispatch('GET', 'v49/b64-abc/scene_bundle', '?x=1')
 

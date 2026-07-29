@@ -37,12 +37,14 @@ export function setupAssetBundlesProxy(
     // undici decompresses the body but leaves the original content-encoding /
     // content-length headers in place; forwarding them would make the client
     // re-decode (or truncate to the compressed length) the already-decoded body.
-    response.headers.delete('content-encoding')
-    response.headers.delete('content-length')
+    // fetch() responses carry immutable Headers, so filter instead of delete.
+    const headers = Object.fromEntries(response.headers)
+    delete headers['content-encoding']
+    delete headers['content-length']
 
     return {
       status: response.status,
-      headers: Object.fromEntries(response.headers),
+      headers,
       // `response.body` is a web ReadableStream; convert it to a Node stream so
       // the http-server can pipe it (it only handles Node streams / Buffers / strings).
       body: response.body ? Readable.fromWeb(response.body as any) : undefined
