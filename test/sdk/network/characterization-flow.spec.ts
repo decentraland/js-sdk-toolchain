@@ -40,9 +40,7 @@ describe('network flow characterization', () => {
 
     const requests = harness.sentBy(CLIENT_A, CommsMessage.REQ_CRDT_STATE)
     expect(requests.length).toBeGreaterThanOrEqual(1)
-    // QUIRK(pinned): the state request is broadcast to every peer instead of
-    // being addressed to the authoritative server — see defect #1/#10.
-    expect(requests[0].to).toEqual([])
+    expect(requests[0].to).toEqual([SERVER])
 
     const responses = harness.sentBy(SERVER, CommsMessage.RES_CRDT_STATE)
     expect(responses.map((response) => response.to)).toEqual(expect.arrayContaining([[CLIENT_A], [CLIENT_B]]))
@@ -76,9 +74,6 @@ describe('network flow characterization', () => {
     )[0]
     expect(clientB.components.Transform.get(clientBEntity).position).toMatchObject({ x: 1, y: 2, z: 3 })
 
-    // QUIRK(pinned): a client emits CRDT with an empty address list (broadcast)
-    // rather than addressing the server — see defect #10.
-    expect(harness.sentBy(CLIENT_A, CommsMessage.CRDT)[0].to).toEqual([])
     // QUIRK(pinned): the server re-broadcasts to everybody, so the originating
     // client receives an echo of its own write — see defect #11.
     expect(harness.sentBy(SERVER, CommsMessage.CRDT)[0].to).toEqual([])

@@ -9,13 +9,11 @@
  * Fixed in phase 1 (hydration FSM), now plain `it`: #1, #2, #6, #7, #9, #14.
  * Fixed in phase 2 (validator hardening), now plain `it`: #3, #4.
  * Fixed in phase 3 (codec unification), now plain `it`: #8.
+ * Fixed in phase 4 (topology), now plain `it`: #10, #12.
  *
- * Source locations of what is still red, verified at the time of writing:
- *   #8  fixed in phase 3: codec.ts `packChunks` is the one place that reports it
- *   #10 message-bus-sync.ts:89-91     client emits CRDT with no address
- *   #11 server/index.ts:143-167       broadcastBatchedMessages ignores excludeSender
- *   #12 events/implementation.ts:245-253  registerMessages Object.assign over a flat global registry
- *   #13 players/index.ts:35-57        per-frame diff keyed on `players.length === playerEntities.size`
+ * Fixed: 11. Deferred pending lower layers: 2 (#11, #13). Neither is fixable in
+ * the network layer; the measurements and the upgrade paths are in
+ * `docs/network-peer-visibility.md`.
  */
 import { Engine, Entity, Schemas, Transform as GlobalTransform } from '../../../packages/@dcl/ecs'
 import * as components from '../../../packages/@dcl/ecs/dist/components'
@@ -225,7 +223,7 @@ describe('known defects (red: asserting the correct behavior)', () => {
     expect(Array.from(late.engine.getEntitiesWith(late.components.NetworkEntity))).toHaveLength(1)
   })
 
-  it.failing('#10 a client addresses its CRDT to the authoritative server', async () => {
+  it('#10 a client addresses its CRDT to the authoritative server', async () => {
     const harness = createHarness()
     await flush()
 
@@ -240,6 +238,9 @@ describe('known defects (red: asserting the correct behavior)', () => {
     expect(crdt.map((message) => message.to)).toEqual(crdt.map(() => [SERVER]))
   })
 
+  // deferred: needs a host roster or a wire-level broadcast-except-X primitive.
+  // Excluding one peer means naming all the others, and the server has no roster
+  // to name them from — see `docs/network-peer-visibility.md`
   it.failing('#11 the server broadcast excludes the peer that sent the message', async () => {
     const harness = createHarness()
     await flush()
@@ -254,7 +255,7 @@ describe('known defects (red: asserting the correct behavior)', () => {
     expect(harness.deliveredTo(CLIENT_B, CommsMessage.CRDT).length).toBeGreaterThanOrEqual(1)
   })
 
-  it.failing('#12 registering the same message key twice reports the collision', async () => {
+  it('#12 registering the same message key twice reports the collision', async () => {
     createHarness()
     const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
     const error = jest.spyOn(console, 'error').mockImplementation(() => {})
@@ -265,6 +266,11 @@ describe('known defects (red: asserting the correct behavior)', () => {
     expect(warn.mock.calls.length + error.mock.calls.length).toBeGreaterThanOrEqual(1)
   })
 
+  // deferred: needs a component-wide change subscription in @dcl/ecs — per-entity
+  // `onChange` cannot be registered for an entity that does not exist yet. This
+  // fixture writes locally, which collapses to a delete and loses the address
+  // outright; over the wire the value does survive — see
+  // `docs/network-peer-visibility.md`
   it.failing('#13 a player joining and leaving within one frame fires both callbacks', async () => {
     const engine = Engine()
     const players = definePlayerHelper(engine)
