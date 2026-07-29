@@ -303,10 +303,9 @@ export async function main(options: Options) {
           baseCoords,
           isHub,
           args: options.args,
-          // the proxied path on the realm the client already has — never the
-          // sidecar's private origin (migration: explorers derive this from the
-          // realm under local-ab; the explicit param stays as a generic override)
-          assetBundlesUrl: assetBundlesSidecar.url ? `${realm}/optimized-assets` : undefined
+          // the explorer derives the /optimized-assets base from the realm it
+          // already has — the sidecar's private origin is never exposed
+          assetBundles: !!assetBundlesSidecar.url
         })
       }
 

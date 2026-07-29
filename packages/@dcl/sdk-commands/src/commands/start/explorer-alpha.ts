@@ -37,12 +37,12 @@ export async function runExplorerAlpha(
     baseCoords: { x: number; y: number }
     isHub: boolean
     args: Result<typeof startArgs>
-    assetBundlesUrl?: string
+    assetBundles?: boolean
   }
 ) {
-  const { cwd, realm, baseCoords, isHub, assetBundlesUrl } = opts
+  const { cwd, realm, baseCoords, isHub, assetBundles } = opts
 
-  if (await runApp(components, { cwd, realm, baseCoords, isHub, args: opts.args, assetBundlesUrl })) {
+  if (await runApp(components, { cwd, realm, baseCoords, isHub, args: opts.args, assetBundles })) {
     return
   }
 
@@ -57,14 +57,14 @@ async function runApp(
     baseCoords,
     isHub,
     args,
-    assetBundlesUrl
+    assetBundles
   }: {
     cwd: string
     realm: string
     baseCoords: { x: number; y: number }
     isHub: boolean
     args: Result<typeof startArgs>
-    assetBundlesUrl?: string
+    assetBundles?: boolean
   }
 ) {
   const cmd = isWindows ? 'start' : 'open'
@@ -93,10 +93,9 @@ async function runApp(
 
     params.set('local-scene', 'true')
 
-    if (assetBundlesUrl) {
-      params.set('optimized-assets-url', assetBundlesUrl)
-      // The scene itself loads asset bundles only with this flag; the url alone
-      // re-bases wearable/registry traffic but leaves scene content on raw GLTFs
+    if (assetBundles) {
+      // the explorer derives the /optimized-assets base from the realm it
+      // already has; this flag makes the scene itself load asset bundles
       params.set('local-ab', 'true')
     }
 
