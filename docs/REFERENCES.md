@@ -24,6 +24,7 @@ Curated map of every doc in this repo. Use this as the entry point when looking 
 | [material-getflat-api.md](material-getflat-api.md) | Material `getFlat` API: reading a fully-resolved material descriptor instead of the discriminated union. |
 | [network-timestamp-trust.md](network-timestamp-trust.md) | Why the authoritative server trusts client-supplied CRDT timestamps, the griefing that enables, and what server-side re-stamping would cost. |
 | [network-peer-visibility.md](network-peer-visibility.md) | Why the server can't exclude a sender from its broadcast and why a same-frame player join and leave goes unreported. Two defects that need a layer below the network code. |
+| [host-conformance.md](host-conformance.md) | The `~system` contract the network layer actually depends on, as a checklist a new host (Bevy client, headless server) validates against — required behaviors, known gaps, and how to run the 3-engine harness as a conformance smoke test. |
 
 ## Guides (how-to)
 

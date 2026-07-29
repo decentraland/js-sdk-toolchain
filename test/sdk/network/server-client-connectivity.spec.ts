@@ -188,7 +188,9 @@ describe('Server-Client Connectivity', () => {
       data: { userId: 'clientA', version: 1, displayName: 'Client A', hasConnectedWeb3: true, avatar: undefined }
     }),
     mockIsServerClient,
-    'clientA'
+    'clientA',
+    // this spec asserts on the first frames, so nothing is suppressed
+    { transportInitializedTicks: 0 }
   ) // clientA is not a server
 
   const syncB = addSyncTransport(
@@ -198,7 +200,8 @@ describe('Server-Client Connectivity', () => {
       data: { userId: 'clientB', version: 1, displayName: 'Client B', hasConnectedWeb3: true, avatar: undefined }
     }),
     mockIsServerClient,
-    'clientB'
+    'clientB',
+    { transportInitializedTicks: 0 }
   ) // clientB is not a server
 
   // Server sync transport - configured to run in server mode
@@ -215,7 +218,8 @@ describe('Server-Client Connectivity', () => {
       }
     }),
     mockIsServerServer,
-    'server'
+    'server',
+    { transportInitializedTicks: 0 }
   ) // server is a server
 
   let testEntity: Entity

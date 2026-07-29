@@ -58,7 +58,8 @@ function setupEngineWithSyncTransport(name: string, isServer: boolean = false) {
   const isServerFn = async () => ({ isServer })
 
   // Initialize sync transport AFTER defining components
-  addSyncTransport(engine, sendBinary, getUserData, isServerFn, name)
+  // this spec asserts on the first frames, so nothing is suppressed
+  addSyncTransport(engine, sendBinary, getUserData, isServerFn, name, { transportInitializedTicks: 0 })
 
   return {
     engine,
