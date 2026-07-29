@@ -66,14 +66,16 @@ describe('explorer-alpha', () => {
         baseCoords: { x: 0, y: 0 },
         isHub: false,
         args,
-        assetBundlesUrl: 'http://127.0.0.1:5147'
+        assetBundlesUrl: 'http://127.0.0.1:8000/optimized-assets'
       })
 
       expect(mockExec).toHaveBeenCalledWith(
         '/test',
         'open',
         expect.arrayContaining([
-          expect.stringContaining(`optimized-assets-url=${encodeURIComponent('http://127.0.0.1:5147')}`)
+          expect.stringContaining(
+            `optimized-assets-url=${encodeURIComponent('http://127.0.0.1:8000/optimized-assets')}`
+          )
         ]),
         { silent: true }
       )

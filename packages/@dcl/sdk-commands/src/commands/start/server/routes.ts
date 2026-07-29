@@ -6,13 +6,23 @@ import { Workspace } from '../../../logic/workspace-validations'
 import { DataLayer } from '../data-layer/rpc'
 import { handleDataLayerWs } from '../data-layer/ws'
 import { PreviewComponents } from '../types'
+import { setupAssetBundlesProxy } from './asset-bundles-proxy'
 import { setupEcs6Endpoints } from './endpoints'
 import { setupRealmAndComms } from './realm'
 import { getLanUrl } from '../utils'
 
 export const sceneUpdateClients = new Set<WebSocket>()
-export async function wireRouter(components: PreviewComponents, workspace: Workspace, dataLayer?: DataLayer) {
+export async function wireRouter(
+  components: PreviewComponents,
+  workspace: Workspace,
+  dataLayer?: DataLayer,
+  getAssetBundlesSidecarUrl?: () => string | undefined
+) {
   const router = new Router<PreviewComponents>()
+
+  if (getAssetBundlesSidecarUrl) {
+    setupAssetBundlesProxy(components, router, getAssetBundlesSidecarUrl)
+  }
 
   if (dataLayer) {
     router.get('/data-layer', async (ctx, next) => {
