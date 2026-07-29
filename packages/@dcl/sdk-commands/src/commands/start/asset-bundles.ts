@@ -8,7 +8,10 @@ import { getPort } from '../../logic/get-free-port'
 import { b64UrlHashingFunction } from '../../logic/project-files'
 import { ABGEN_VERSION, resolveAbgenBin } from './abgen-binary'
 
-const READY_TIMEOUT_MS = 15_000
+// generous: first boots can be slow to bind (e.g. Windows Defender scanning a
+// freshly downloaded binary), and giving up here strands the still-running
+// sidecar — it keeps converting and holding the port with no handle to kill it
+const READY_TIMEOUT_MS = 60_000
 const READY_POLL_INTERVAL_MS = 250
 const READY_REQUEST_TIMEOUT_MS = 2_000
 const PREWARM_POLL_MS = 2_500
