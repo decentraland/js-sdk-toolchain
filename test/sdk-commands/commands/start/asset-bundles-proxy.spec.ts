@@ -7,11 +7,11 @@ function makeProxy(getSidecarUrl: () => string | undefined) {
   setupAssetBundlesProxy({ fetch: { fetch } } as any, router as any, getSidecarUrl)
   // requests reach the handler with the /optimized-assets prefix already
   // consumed by the route pattern: ctx.params.path carries the rest
-  const dispatch = (method: string, path: string, search = '', body?: any) =>
+  const dispatch = (method: string, path: string, search = '', body?: any, headers: Record<string, string> = {}) =>
     handler({
       url: new URL(`http://127.0.0.1:8000/optimized-assets/${path}${search}`),
       params: { path },
-      request: { method, body }
+      request: { method, body, headers: new Headers({ host: '127.0.0.1:8000', ...headers }) }
     })
   return { fetch, router, dispatch }
 }
@@ -73,12 +73,22 @@ describe('start/server/asset-bundles-proxy', () => {
     fetch.mockResolvedValue(new Response('nope', { status: 404 }))
 
     const requestBody = 'the-registry-post'
-    const response = await dispatch('POST', 'entities/active', '', requestBody)
+    const response = await dispatch('POST', 'entities/active', '', requestBody, {
+      'content-type': 'application/json',
+      'content-length': '17'
+    })
 
     expect(fetch).toHaveBeenCalledWith(
       'http://127.0.0.1:53211/entities/active',
       expect.objectContaining({ method: 'POST', body: requestBody, duplex: 'half' })
     )
+    // the client's headers ride along (the sidecar 415s JSON posts without their
+    // content-type), while the per-connection ones are replaced for the sidecar leg
+    const forwardedHeaders = fetch.mock.calls[0][1].headers
+    expect(forwardedHeaders['content-type']).toBe('application/json')
+    expect(forwardedHeaders['content-length']).toBeUndefined()
+    expect(forwardedHeaders['host']).toBeUndefined()
+    expect(forwardedHeaders['connection']).toBe('close')
     expect(response.status).toBe(404)
   })
 })

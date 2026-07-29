@@ -27,8 +27,20 @@ export function setupAssetBundlesProxy(
     }
 
     const method = ctx.request.method.toUpperCase()
+
+    // forward the client's headers (the sidecar 415s JSON POSTs without their
+    // content-type) minus the per-connection ones, which must describe the
+    // proxy→sidecar leg instead: host/connection are recomputed by fetch, the
+    // re-streamed body invalidates content-length, and accept-encoding is
+    // dropped so undici negotiates (and transparently decodes) its own encoding.
+    const requestHeaders = Object.fromEntries(ctx.request.headers)
+    delete requestHeaders['host']
+    delete requestHeaders['content-length']
+    delete requestHeaders['accept-encoding']
+    requestHeaders['connection'] = 'close'
+
     const response = await components.fetch.fetch(`${sidecarUrl}/${ctx.params.path}${ctx.url.search}`, {
-      headers: { connection: 'close' },
+      headers: requestHeaders,
       method,
       body: method === 'GET' || method === 'HEAD' ? undefined : (ctx.request.body as any),
       duplex: 'half'
