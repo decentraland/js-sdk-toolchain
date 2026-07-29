@@ -23,8 +23,6 @@ import {
 } from '../ecs-adapter'
 import { createNetworkEntityIndex } from '../entity-index'
 
-export { LIVEKIT_MAX_SIZE } from '../constants'
-
 export interface ServerValidationConfig {
   engine: IEngine
   binaryMessageBus: ReturnType<typeof BinaryMessageBus>
@@ -33,12 +31,10 @@ export interface ServerValidationConfig {
 export function createServerValidator(config: ServerValidationConfig) {
   const { engine, binaryMessageBus } = config
 
-  // Initialize components for network operations and transform fixing
   const NetworkEntity = components.NetworkEntity(engine)
   const CreatedBy = components.CreatedBy(engine)
   const NetworkParent = components.NetworkParent(engine)
 
-  // Type guard to check if component supports corrections (both LWW and GrowOnlySet)
   function supportsCorrections<T>(
     component: ComponentDefinition<T>
   ): component is LastWriteWinElementSetComponentDefinition<T> | GrowOnlyValueSetComponentDefinition<T> {
@@ -51,19 +47,13 @@ export function createServerValidator(config: ServerValidationConfig) {
 
   const findNetworkEntity = createNetworkEntityIndex(engine, NetworkEntity)
 
-  function findExistingNetworkEntity(message: codec.NetworkMessage): Entity | null {
-    return findNetworkEntity(message.networkId, message.entityId)
-  }
-
   function findOrCreateNetworkEntity(message: codec.NetworkMessage, sender: string, isServer: boolean): Entity {
-    // Look for existing network entity mapping first
-    const existingEntity = findExistingNetworkEntity(message)
+    const existingEntity = findNetworkEntity(message.networkId, message.entityId)
 
     if (existingEntity) {
       return existingEntity
     }
 
-    // Create new entity and network mapping
     const newEntityId = engine.addEntity()
     NetworkEntity.createOrReplace(newEntityId, {
       networkId: message.networkId,
@@ -91,7 +81,6 @@ export function createServerValidator(config: ServerValidationConfig) {
     forceCorrections = false
   ): CrdtMessageBody | null {
     try {
-      // Use the well-tested networkMessageToLocal utility with transform fixing for Unity
       return codec.networkMessageToLocal(networkMessage, localEntityId, destination, NetworkParent, forceCorrections)
     } catch (error) {
       console.error('Error converting network message:', error)
@@ -182,16 +171,14 @@ export function createServerValidator(config: ServerValidationConfig) {
 
   function sendCorrectionToSender(networkMessage: codec.NetworkMessage, sender: string, localEntityId: Entity) {
     try {
-      // Only handle component messages (PUT/DELETE), not entity deletion
       if (networkMessage.type === CrdtMessageType.DELETE_ENTITY_NETWORK) {
         DEBUG_NETWORK_MESSAGES() && console.log('[AUTHORITATIVE] Cannot send authoritative message for entity deletion')
         return
       }
 
-      // Safe to access componentId and timestamp now
+      // narrowed away DELETE_ENTITY_NETWORK above, so componentId/timestamp exist
       const component = engine.getComponent(networkMessage.componentId)
 
-      // Only proceed if component supports authoritative messages (LWW or GrowOnlySet)
       if (!supportsCorrections(component)) {
         DEBUG_NETWORK_MESSAGES() && console.log('[AUTHORITATIVE] Component does not support authoritative messages')
         return
@@ -201,8 +188,7 @@ export function createServerValidator(config: ServerValidationConfig) {
       const correctionBuffer = new ReadWriteByteBuffer()
 
       if (serverCRDTState) {
-        // Create authoritative message using PUT_COMPONENT_NETWORK
-        // Each client will convert this to AUTHORITATIVE_PUT_COMPONENT with proper entity mapping
+        // each client turns this into an AUTHORITATIVE_PUT_COMPONENT for its own entity id
         PutNetworkComponentOperation.write(
           networkMessage.entityId, // Use original network entity ID
           serverCRDTState.timestamp,
@@ -226,7 +212,6 @@ export function createServerValidator(config: ServerValidationConfig) {
         )
       }
 
-      // Send authoritative message directly to the sender
       binaryMessageBus.emit(CommsMessage.CRDT_AUTHORITATIVE, correctionBuffer.toBinary(), [sender])
 
       DEBUG_NETWORK_MESSAGES() &&
@@ -243,7 +228,6 @@ export function createServerValidator(config: ServerValidationConfig) {
   }
 
   return {
-    findExistingNetworkEntity,
     // transform Network messages to CRDT Common Messages.
     // `seen` collects the local entities the payload named, so a caller applying a
     // full state dump can tell which of its network entities the dump left out
@@ -254,18 +238,12 @@ export function createServerValidator(config: ServerValidationConfig) {
       forceCorrections = false,
       seen?: Set<Entity>
     ) {
-      // console.log(`[CLIENT] Processing message from ${sender}, ${value.length} bytes`)
-
-      // Collect all regular messages in a single buffer for batched application
       const combinedBuffer = new ReadWriteByteBuffer()
 
-      // Clients process network messages from server and convert them to regular messages
       for (const message of codec.readMessages(value)) {
-        // Only process network messages in client message handler
         if (codec.isNetworkMessage(message)) {
           const networkMessage = message as codec.NetworkMessage
 
-          // Find or create network entity mapping
           const localEntityId = findOrCreateNetworkEntity(networkMessage, sender, false)
           seen?.add(localEntityId)
 
@@ -276,11 +254,8 @@ export function createServerValidator(config: ServerValidationConfig) {
       }
       return combinedBuffer.toBinary()
     },
-    // Sever Code: process message, handle permissions, and broadcast if needed.
+    // Server code: process message, handle permissions, and broadcast if needed.
     processServerMessages: function processServerMessages(value: Uint8Array, sender: string) {
-      // console.log(`[SERVER] Processing message from ${sender}, ${value.length} bytes`)
-
-      // Collect all valid messages for batched broadcasting
       const messagesToBroadcast: codec.NetworkMessage[] = []
       const regularMessagesBuffer = new ReadWriteByteBuffer()
       // a message is translated before it is judged, so it lands here first and is
@@ -289,26 +264,21 @@ export function createServerValidator(config: ServerValidationConfig) {
 
       for (const message of codec.readMessages(value)) {
         try {
-          // Only process network messages in server message handler
           if (codec.isNetworkMessage(message)) {
             const networkMessage = message as codec.NetworkMessage
-            // 1. Find or create network entity mapping
             const localEntityId = findOrCreateNetworkEntity(networkMessage, sender, true)
 
-            // 2. Convert network message to regular message and collect for local application
             candidate.resetBuffer()
             const regularMessage = convertNetworkToRegularMessage(networkMessage, localEntityId, candidate)
 
-            // 3. Basic permission validation. A payload that did not decode is
-            //    unvalidatable and therefore unbroadcastable, so it is treated as a
-            //    rejection rather than waved through as an untyped message.
+            // A payload that did not decode is unvalidatable and therefore
+            // unbroadcastable, so it is treated as a rejection rather than waved
+            // through as an untyped message.
             if (!regularMessage || !validateMessagePermissions(regularMessage, sender, localEntityId)) {
-              // Send correction back to sender with server's authoritative state
               sendCorrectionToSender(networkMessage, sender, localEntityId)
               continue
             }
 
-            // 4. Collect valid message for batched broadcasting
             messagesToBroadcast.push(networkMessage)
 
             if (candidate.currentWriteOffset()) {
@@ -319,7 +289,6 @@ export function createServerValidator(config: ServerValidationConfig) {
           console.error('Error processing server message:', error)
         }
       }
-      // Batch broadcast all valid messages together
       broadcastBatchedMessages(messagesToBroadcast, sender)
       return regularMessagesBuffer.toBinary()
     },
@@ -330,7 +299,6 @@ export function createServerValidator(config: ServerValidationConfig) {
       function* asNetworkMessages(): Generator<codec.PackableMessage> {
         const scratch = new ReadWriteByteBuffer()
         for (const message of codec.readMessages(regularMessage)) {
-          // Only convert regular messages that have network data
           const networkData = NetworkEntity.getOrNull(message.entityId)
           if (!networkData || codec.isNetworkMessage(message)) continue
 

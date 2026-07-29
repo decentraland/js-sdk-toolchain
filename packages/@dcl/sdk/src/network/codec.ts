@@ -133,20 +133,6 @@ export function packChunks(messages: Iterable<PackableMessage>, maxSizeKB: numbe
   return chunks
 }
 
-/**
- * Parse-then-pack, for a caller holding raw bytes rather than parsed messages.
- *
- * ponytail: no production caller is left — killing the double parse gave every
- * one of them the parsed messages already. It stays because the wire
- * characterization pins chunk boundaries through it, and pinning them through
- * the composition is what makes those goldens comparable across the refactor.
- * Upgrade path: point the characterization at `packChunks(readMessages(...))`
- * and delete this.
- */
-export function chunkCrdtMessages(data: Uint8Array, maxSizeKB: number = LIVEKIT_MAX_SIZE): Uint8Array[] {
-  return packChunks(readMessages(data), maxSizeKB)
-}
-
 export function isNetworkMessage(message: ReceiveMessage): message is ReceiveNetworkMessage {
   return [
     CrdtMessageType.DELETE_COMPONENT_NETWORK,
@@ -246,7 +232,7 @@ export function localMessageToNetwork(
   }
 }
 
-export function fixTransformParent(message: ReceiveMessage, parent?: Entity): Uint8Array {
+function fixTransformParent(message: ReceiveMessage, parent?: Entity): Uint8Array {
   const buffer = new ReadWriteByteBuffer()
   const transform = 'data' in message && TransformSchema.deserialize(new ReadWriteByteBuffer(message.data))
 

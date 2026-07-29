@@ -12,7 +12,7 @@ import { getPlayerHelper } from '../players'
 import { serializeCrdtMessages } from '../internal/transports/logger'
 import { IsServerRequest, IsServerResponse } from '~system/EngineApi'
 import { AUTH_SERVER_PEER_ID, DEBUG_NETWORK_MESSAGES, IProfile } from './constants'
-import { createRuntimeContext } from './runtime-context'
+import { Atom } from '../atom'
 import { setGlobalRoom, Room } from './events/implementation'
 import { components } from './ecs-adapter'
 import {
@@ -51,27 +51,23 @@ export function addSyncTransport(
   name: string,
   { transportInitializedTicks = TRANSPORT_INITIALIZED_TICKS }: { transportInitializedTicks?: number } = {}
 ) {
-  // Profile Info
   const myProfile: IProfile = {} as IProfile
   fetchProfile(myProfile!, getUserData)
 
-  const { isServerAtom, isRoomReadyAtom } = createRuntimeContext(isServerFn)
+  // Per-transport, not module scope, on purpose: several transports (each with its
+  // own `isServerFn`) coexist in one process in the tests and must not share a role.
+  const isServerAtom = Atom<boolean>()
+  const isRoomReadyAtom = Atom<boolean>(false)
+  void isServerFn({}).then(($) => isServerAtom.swap(!!$.isServer))
 
-  // Entity utils
   const entityDefinitions = entityUtils(engine, myProfile)
 
-  // List of MessageBuss messsages to be sent on every frame to comms
   const pendingMessageBusMessagesToSend: { data: Uint8Array[]; address: string[] }[] = []
 
   const binaryMessageBus = BinaryMessageBus((data, address) => {
     pendingMessageBusMessagesToSend.push({ data: [data], address: address ?? [] })
   })
 
-  function getMessagesToSend(): typeof pendingMessageBusMessagesToSend {
-    const messages = [...pendingMessageBusMessagesToSend]
-    pendingMessageBusMessagesToSend.length = 0
-    return messages
-  }
   const players = getPlayerHelper(engine)
 
   const RealmInfo = components.RealmInfo(engine)
@@ -95,7 +91,7 @@ export function addSyncTransport(
   function crdtAudience(): string[] | undefined {
     return isServerAtom.getOrNull() === false ? [AUTH_SERVER_PEER_ID] : undefined
   }
-  // Add Sync Transport
+
   const transport: Transport = {
     filter: syncFilter(engine),
     send: async (messages) => {
@@ -105,13 +101,12 @@ export function addSyncTransport(
           DEBUG_NETWORK_MESSAGES() &&
             console.log(...Array.from(serializeCrdtMessages('[NetworkMessage sent]:', message, engine)))
 
-          // Convert regular messages to network messages for broadcasting with chunking
           for (const chunk of serverValidator.convertRegularToNetworkMessage(message)) {
             binaryMessageBus.emit(CommsMessage.CRDT, chunk, crdtAudience())
           }
         }
       }
-      const peerMessages = getMessagesToSend()
+      const peerMessages = pendingMessageBusMessagesToSend.splice(0)
       const response = await sendBinary({ data: [], peerData: peerMessages })
       binaryMessageBus.__processMessages(response.data)
     },
@@ -128,20 +123,15 @@ export function addSyncTransport(
     transport.onmessage(buffer)
   }
 
-  // Server validation setup
   const serverValidator = createServerValidator({
     engine,
     binaryMessageBus
   })
 
-  // Initialize Event Bus with registered schemas
-  const eventBus = new Room(engine, binaryMessageBus, isServerAtom, isRoomReadyAtom)
-
-  // Set global eventBus instance
+  const eventBus = new Room(binaryMessageBus, isServerAtom, isRoomReadyAtom)
   setGlobalRoom(eventBus)
 
   engine.addTransport(transport)
-  // End add sync transport
 
   /**
    * Comms that lands before `isServerAtom` resolves cannot be routed — the server
@@ -206,7 +196,6 @@ export function addSyncTransport(
     }
   }
 
-  // Receive & Process CRDT_STATE
   onComms(CommsMessage.REQ_CRDT_STATE, (_data, sender) => {
     // only the authoritative peer owns the world: a client answering here would
     // hand its own partial view to another client
@@ -248,7 +237,6 @@ export function addSyncTransport(
     applyEffects(hydration.send({ type: 'serverAnnounced', generation: decodeGeneration(data) }))
   })
 
-  // received message from the network
   onComms(CommsMessage.CRDT, (value, sender) => {
     const isServer = isServerAtom.getOrNull()
     DEBUG_NETWORK_MESSAGES() &&
@@ -260,27 +248,20 @@ export function addSyncTransport(
     if (isServer) {
       deliverToEngine(serverValidator.processServerMessages(value, sender))
     } else if (sender === AUTH_SERVER_PEER_ID) {
-      // Process network messages from server and convert to regular messages
       deliverToEngine(serverValidator.processClientMessages(value, sender))
     }
   })
 
-  // received authoritative message from server - force apply to fix invalid local state
+  // a correction from the server: force-applied to overwrite invalid local state
   onComms(CommsMessage.CRDT_AUTHORITATIVE, (value, sender) => {
-    // Only accept authoritative messages from authoritative server
     if (sender !== AUTH_SERVER_PEER_ID) return
 
     DEBUG_NETWORK_MESSAGES() &&
       console.log('[AUTHORITATIVE] Received authoritative message from server:', value.byteLength, 'bytes')
 
-    // Process authoritative messages by forcing them through normal CRDT processing
-    // but with a timestamp that's guaranteed to be accepted
     const authoritativeBuffer = serverValidator.processClientMessages(value, sender, true)
     if (authoritativeBuffer.byteLength > 0) {
-      // Apply authoritative message through normal transport, but the server's messages
-      // should be processed as authoritative with special timestamp handling
       deliverToEngine(authoritativeBuffer)
-
       DEBUG_NETWORK_MESSAGES() && console.log('[AUTHORITATIVE] Applied server authoritative message to local state')
     }
   })
