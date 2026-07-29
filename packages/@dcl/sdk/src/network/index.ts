@@ -1,10 +1,19 @@
+/**
+ * Public facade of `@dcl/sdk/network`.
+ *
+ * Boot lives in `addSyncTransport`, which takes every runtime dependency as a
+ * parameter; this module is the one place that binds them to the real `~system`
+ * APIs and the global engine. The call stays at module scope because a scene
+ * only ever imports this module — the generated entrypoint calls `onStart` /
+ * `onUpdate` and never an initializer, so importing has to be what boots the
+ * layer. Tests call `addSyncTransport` directly instead of importing here.
+ */
 import { sendBinary } from '~system/CommunicationsController'
 import { engine } from '@dcl/ecs'
 import { addSyncTransport } from './message-bus-sync'
 import { getUserData } from '~system/UserIdentity'
 import { isServer as isServerApi } from '~system/EngineApi'
 
-// initialize sync transport for sdk engine
 const {
   getChildren,
   syncEntity,

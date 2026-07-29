@@ -5,7 +5,8 @@
  *
  * @example Basic usage:
  * ```typescript
- * import { registerMessages, getRoom, isServer } from '@dcl/sdk/network/events'
+ * import { registerMessages, getRoom } from '@dcl/sdk/network/events'
+ * import { isServer } from '@dcl/sdk/network'
  *
  * const MyMessages = {
  *   playerJump: Schemas.Map({ playerId: Schemas.String, position: Schemas.Vector3 }),

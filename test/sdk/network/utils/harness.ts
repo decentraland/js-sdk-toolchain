@@ -148,7 +148,9 @@ export function createHarness() {
         data: { userId: id, version: 1, displayName: id, hasConnectedWeb3: true, avatar: undefined }
       }),
       async () => ({ isServer: await isServer }),
-      id
+      id,
+      // the harness asserts on the very first frames, so nothing is suppressed
+      { transportInitializedTicks: 0 }
     )
     peers[id] = { id, engine, components: peerComponents, sync }
     return peers[id]
