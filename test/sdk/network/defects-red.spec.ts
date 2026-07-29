@@ -20,7 +20,7 @@ import * as components from '../../../packages/@dcl/ecs/dist/components'
 import { ReadWriteByteBuffer } from '../../../packages/@dcl/ecs/dist/serialization/ByteBuffer'
 import { DeleteEntityNetwork, PutComponentOperation } from '../../../packages/@dcl/ecs/dist/serialization/crdt'
 import { CommsMessage } from '../../../packages/@dcl/sdk/src/network/binary-message-bus'
-import { chunkCrdtMessages } from '../../../packages/@dcl/sdk/src/network/codec'
+import { packChunks, readMessages } from '../../../packages/@dcl/sdk/src/network/codec'
 import { registerMessages } from '../../../packages/@dcl/sdk/src/network/events/implementation'
 import { engineToCrdt } from '../../../packages/@dcl/sdk/src/network/state'
 import { definePlayerHelper } from '../../../packages/@dcl/sdk/src/players'
@@ -201,7 +201,7 @@ describe('known defects (red: asserting the correct behavior)', () => {
     error.mockClear()
     const oversized = new ReadWriteByteBuffer()
     PutComponentOperation.write(512 as Entity, 1, GlobalTransform.componentId, new Uint8Array(13 * 1024), oversized)
-    expect(chunkCrdtMessages(oversized.toBinary(), 12)).toEqual([])
+    expect(packChunks(readMessages(oversized.toBinary()), 12)).toEqual([])
     expect(error).toHaveBeenCalledWith(expect.stringContaining(`component ${GlobalTransform.componentId}`))
   })
 

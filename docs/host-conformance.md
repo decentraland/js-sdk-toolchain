@@ -15,13 +15,13 @@ and the CRDT protocol itself are out of scope.
 ### 1. `EngineApi.isServer()` answers truthfully, exactly once, and resolves
 
 - Declared at `apis.d.ts:943-947` (`IsServerResponse.isServer`) and `apis.d.ts:968`.
-- Called once per transport at boot: `network/runtime-context.ts:20`. The answer
+- Called once per transport at boot: `network/message-bus-sync.ts:61`. The answer
   populates an atom that never re-resolves; a host cannot change a peer's role
   mid-session.
 - **A promise that never settles wedges the peer.** Received comms is buffered
-  until the role is known (`network/message-bus-sync.ts:155-166`, cap 256
+  until the role is known (`network/message-bus-sync.ts:145-156`, cap 256
   messages) and then dropped with a loud error. Outgoing CRDT is *not* buffered:
-  before the role resolves it is broadcast (`message-bus-sync.ts:85-96`), which
+  before the role resolves it is broadcast (`message-bus-sync.ts:81-93`), which
   is safe but wasteful. Resolve promptly.
 - Exactly one peer per room may answer `true`. Two authoritative servers means
   two worlds, and nothing in the layer detects it.
@@ -35,16 +35,16 @@ and the CRDT protocol itself are out of scope.
   identity to the authoritative peer.
 - Targeted delivery is load-bearing, not an optimization:
   - a client sends **all** its CRDT to `['authoritative-server']` only
-    (`message-bus-sync.ts:95-96`, `:110`) — if the host ignores the address list
+    (`message-bus-sync.ts:91-92`, `:105`) — if the host ignores the address list
     and broadcasts, every client sees every other client's unvalidated writes;
   - state hydration answers one requester: `SERVER_ANNOUNCE` and each
-    `RES_CRDT_STATE` chunk go to `[sender]` (`message-bus-sync.ts:216`, `:220`,
-    `:224`) — if these are broadcast, every already-synced client re-hydrates
+    `RES_CRDT_STATE` chunk go to `[sender]` (`message-bus-sync.ts:205`, `:209`,
+    `:213`) — if these are broadcast, every already-synced client re-hydrates
     from another client's dump.
 - The server's own fan-out uses the empty-array broadcast
-  (`network/server/index.ts:169-177`).
+  (`network/server/index.ts:158-167`).
 - `sendBinary` doubles as the receive poll: its response drains the peer's inbox
-  (`message-bus-sync.ts:115-116`). A host that never returns queued messages
+  (`message-bus-sync.ts:110-111`). A host that never returns queued messages
   from `sendBinary` delivers nothing, however well it accepts sends.
 
 ### 3. Avatar components are populated for connected players
@@ -54,7 +54,7 @@ and the CRDT protocol itself are out of scope.
   scene's stream, one entity per connected player.
 - The network layer depends on this for hydration, not just for scene code: one
   of the events that drives a client to request world state is its **own** player
-  entity appearing (`message-bus-sync.ts:288-291`). Other triggers remain — the
+  entity appearing (`message-bus-sync.ts:269-272`). Other triggers remain — the
   realm connecting, and a tick-driven retry — so a host that never writes these
   components degrades hydration rather than breaking it outright.
 - On the current runtime these arrive in the `crdtSendToRenderer` **response**
@@ -114,7 +114,7 @@ from inside; the first two are pinned as `it.failing` in
 - **No "broadcast except X" primitive.** `PeerMessageData.address` can only
   name recipients (`apis.d.ts:76-77`), so excluding one peer requires naming all
   the others — i.e. a roster. Consequence: every accepted client write is echoed
-  back to its own sender (`network/server/index.ts:169-177`, red #11). A host
+  back to its own sender (`network/server/index.ts:158-167`, red #11). A host
   that adds a wire-level exclude removes the echo outright.
 - **No component-wide change subscription in `@dcl/ecs`.** `onChange` is
   registered per entity, so a player whose entity is created and destroyed
@@ -164,4 +164,3 @@ stubbing.
   boundary.
 - [wire-message.md](wire-message.md) — the CRDT wire format underneath all of
   this.
-</content>

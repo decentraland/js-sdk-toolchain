@@ -1,5 +1,4 @@
-import { IEngine } from '@dcl/ecs'
-import { CommsMessage } from '../binary-message-bus'
+import { BinaryMessageBus, CommsMessage } from '../binary-message-bus'
 import { AUTH_SERVER_PEER_ID } from '../constants'
 import { EventTypes, EventSchemaRegistry } from './registry'
 import { encodeEvent, decodeEvent } from './protocol'
@@ -32,25 +31,20 @@ type QueuedMessage<T extends EventSchemaRegistry = EventSchemaRegistry> = {
 
 export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
   private listeners = new Map<keyof T, Set<EventCallback<any>>>()
-  private binaryMessageBus: any
-  private isServerAtom: Atom<boolean>
-  private isRoomReadyAtom: Atom<boolean>
   private messageQueue: QueuedMessage<T>[] = []
   private isProcessingQueue = false
 
-  constructor(_engine: IEngine, binaryMessageBus: any, isServerAtom: Atom<boolean>, isRoomReadyAtom: Atom<boolean>) {
-    this.isServerAtom = isServerAtom
-    this.binaryMessageBus = binaryMessageBus
-    this.isRoomReadyAtom = isRoomReadyAtom
-
-    // Subscribe to room readiness changes to flush queue
+  constructor(
+    private binaryMessageBus: ReturnType<typeof BinaryMessageBus>,
+    private isServerAtom: Atom<boolean>,
+    private isRoomReadyAtom: Atom<boolean>
+  ) {
     this.isRoomReadyAtom.observable.add((isReady) => {
       if (isReady && this.messageQueue.length > 0) {
         void this.flushMessageQueue()
       }
     })
-    // Listen for CUSTOM_EVENT messages
-    binaryMessageBus.on(CommsMessage.CUSTOM_EVENT, (data: Uint8Array, sender: string) => {
+    binaryMessageBus.on(CommsMessage.CUSTOM_EVENT, (data, sender) => {
       try {
         const { eventType, payload } = decodeEvent(data, globalEventRegistry)
         const callbacks = this.listeners.get(eventType)
@@ -235,7 +229,7 @@ export function setGlobalRoom(roomInstance: Room): void {
 }
 
 /** message keys the SDK keeps for itself, so its own traffic can never clash with a scene's */
-export const RESERVED_MESSAGE_PREFIX = '~sdk/'
+const RESERVED_MESSAGE_PREFIX = '~sdk/'
 
 /**
  * Register message schemas for use with the room
