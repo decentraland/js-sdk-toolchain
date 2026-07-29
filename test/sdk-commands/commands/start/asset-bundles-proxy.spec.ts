@@ -75,7 +75,8 @@ describe('start/server/asset-bundles-proxy', () => {
     const requestBody = 'the-registry-post'
     const response = await dispatch('POST', 'entities/active', '', requestBody, {
       'content-type': 'application/json',
-      'content-length': '17'
+      'content-length': '17',
+      connection: 'close'
     })
 
     expect(fetch).toHaveBeenCalledWith(
@@ -83,12 +84,13 @@ describe('start/server/asset-bundles-proxy', () => {
       expect.objectContaining({ method: 'POST', body: requestBody, duplex: 'half' })
     )
     // the client's headers ride along (the sidecar 415s JSON posts without their
-    // content-type), while the per-connection ones are replaced for the sidecar leg
+    // content-type), while the per-connection ones are dropped so undici manages
+    // its own leg — a forwarded connection:close would kill sidecar keep-alive
     const forwardedHeaders = fetch.mock.calls[0][1].headers
     expect(forwardedHeaders['content-type']).toBe('application/json')
     expect(forwardedHeaders['content-length']).toBeUndefined()
     expect(forwardedHeaders['host']).toBeUndefined()
-    expect(forwardedHeaders['connection']).toBe('close')
+    expect(forwardedHeaders['connection']).toBeUndefined()
     expect(response.status).toBe(404)
   })
 })
