@@ -185,6 +185,152 @@ describe('explorer-alpha', () => {
     })
   })
 
+  describe('mcp parameter', () => {
+    it('should include mcp parameter when --mcp flag is provided', async () => {
+      const args: any = {
+        '--mcp': true
+      }
+
+      await runExplorerAlpha(mockComponents, {
+        cwd: '/test',
+        realm: 'test-realm',
+        baseCoords: { x: 0, y: 0 },
+        isHub: false,
+        args
+      })
+
+      expect(mockExec).toHaveBeenCalledWith(
+        '/test',
+        'open',
+        expect.arrayContaining([expect.stringContaining('mcp=true')]),
+        { silent: true }
+      )
+    })
+
+    it('should include mcp-port parameter when --mcp-port is provided', async () => {
+      const args: any = {
+        '--mcp': true,
+        '--mcp-port': 8025
+      }
+
+      await runExplorerAlpha(mockComponents, {
+        cwd: '/test',
+        realm: 'test-realm',
+        baseCoords: { x: 0, y: 0 },
+        isHub: false,
+        args
+      })
+
+      expect(mockExec).toHaveBeenCalledWith(
+        '/test',
+        'open',
+        expect.arrayContaining([expect.stringContaining('mcp-port=8025')]),
+        { silent: true }
+      )
+    })
+
+    it('should not include mcp-port parameter when --mcp-port is not provided', async () => {
+      const args: any = {}
+
+      await runExplorerAlpha(mockComponents, {
+        cwd: '/test',
+        realm: 'test-realm',
+        baseCoords: { x: 0, y: 0 },
+        isHub: false,
+        args
+      })
+
+      expect(mockExec).toHaveBeenCalledWith(
+        '/test',
+        'open',
+        expect.arrayContaining([expect.not.stringContaining('mcp-port')]),
+        { silent: true }
+      )
+    })
+
+    it('should not include mcp parameter when --mcp flag is not provided', async () => {
+      const args: any = {}
+
+      await runExplorerAlpha(mockComponents, {
+        cwd: '/test',
+        realm: 'test-realm',
+        baseCoords: { x: 0, y: 0 },
+        isHub: false,
+        args
+      })
+
+      expect(mockExec).toHaveBeenCalledWith(
+        '/test',
+        'open',
+        expect.arrayContaining([expect.not.stringContaining('mcp=true')]),
+        { silent: true }
+      )
+    })
+  })
+
+  describe('passthrough parameters (after standalone --)', () => {
+    async function run(args: any) {
+      await runExplorerAlpha(mockComponents, {
+        cwd: '/test',
+        realm: 'test-realm',
+        baseCoords: { x: 0, y: 0 },
+        isHub: false,
+        args
+      })
+      return mockExec.mock.calls[0][2][0] as string
+    }
+
+    it('forwards a bare flag as key=true', async () => {
+      const deepLink = await run({ _: ['--paramA'] })
+      expect(deepLink).toContain('paramA=true')
+    })
+
+    it('forwards a flag followed by a value as key=value', async () => {
+      const deepLink = await run({ _: ['--paramX', 'valueX'] })
+      expect(deepLink).toContain('paramX=valueX')
+    })
+
+    it('forwards --key=value syntax', async () => {
+      const deepLink = await run({ _: ['--paramX=valueX'] })
+      expect(deepLink).toContain('paramX=valueX')
+    })
+
+    it('forwards multiple params, mixing bare flags and valued flags', async () => {
+      const deepLink = await run({ _: ['--paramA', '--paramB', '--paramX', 'valueX'] })
+      expect(deepLink).toContain('paramA=true')
+      expect(deepLink).toContain('paramB=true')
+      expect(deepLink).toContain('paramX=valueX')
+    })
+
+    it('does not override built-in deep link params already covered by a declared flag/default', async () => {
+      const deepLink = await run({ _: ['--realm', 'whatever.dcl.eth'] })
+      expect(deepLink).toContain('realm=test-realm')
+      expect(deepLink).not.toContain('realm=whatever.dcl.eth')
+    })
+
+    it('does not override an explicitly declared flag', async () => {
+      const deepLink = await run({ '--realm': 'declared.dcl.eth', _: ['--realm', 'whatever.dcl.eth'] })
+      expect(deepLink).toContain('realm=declared.dcl.eth')
+      expect(deepLink).not.toContain('realm=whatever.dcl.eth')
+    })
+
+    it('fills in a param that is not covered by any declared flag/default', async () => {
+      const deepLink = await run({ _: ['--paramA'] })
+      expect(deepLink).toContain('paramA=true')
+    })
+
+    it('ignores bare tokens that are not flags and not values of a flag', async () => {
+      const deepLink = await run({ _: ['stray-positional', '--paramA'] })
+      expect(deepLink).not.toContain('stray-positional')
+      expect(deepLink).toContain('paramA=true')
+    })
+
+    it('url-encodes forwarded values', async () => {
+      const deepLink = await run({ _: ['--paramX', 'a value&other'] })
+      expect(deepLink).toContain('paramX=a+value%26other')
+    })
+  })
+
   describe('URL parameter construction', () => {
     it('should construct URL with all parameters correctly', async () => {
       const args: any = {
