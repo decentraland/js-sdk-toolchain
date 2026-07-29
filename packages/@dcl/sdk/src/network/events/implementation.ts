@@ -122,7 +122,7 @@ export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
         this.binaryMessageBus.emit(CommsMessage.CUSTOM_EVENT, buffer, options?.to)
       } else {
         // Client always sends to authoritative server
-        this.binaryMessageBus.emit(CommsMessage.CUSTOM_EVENT, buffer)
+        this.binaryMessageBus.emit(CommsMessage.CUSTOM_EVENT, buffer, [AUTH_SERVER_PEER_ID])
       }
     } catch (error) {
       console.error(`[EventBus] Failed to send event '${String(eventType)}':`, error)
@@ -234,14 +234,34 @@ export function setGlobalRoom(roomInstance: Room): void {
   globalRoom = roomInstance
 }
 
+/** message keys the SDK keeps for itself, so its own traffic can never clash with a scene's */
+export const RESERVED_MESSAGE_PREFIX = '~sdk/'
+
 /**
  * Register message schemas for use with the room
  * Call this before main() to define your custom messages
+ *
+ * The registry is flat and global: a key names the same message for every peer in
+ * the room. Registering one twice is therefore reported — the last schema wins,
+ * and any peer still holding the earlier one decodes the payload as garbage.
+ * Keys under `~sdk/` are reserved for SDK-internal messages and are not registered.
+ *
  * @param messages - Object containing your message schemas
  * @returns Typed room instance for your registered messages
  */
 export function registerMessages<T extends EventSchemaRegistry>(messages: T): Room<T> {
-  Object.assign(globalEventRegistry, messages)
+  for (const [key, schema] of Object.entries(messages)) {
+    // reported through `error` and not `warn`: the scene runtime's console has
+    // only `log` and `error`
+    if (key.startsWith(RESERVED_MESSAGE_PREFIX)) {
+      console.error(`[Room] ignoring '${key}': the '${RESERVED_MESSAGE_PREFIX}' prefix is reserved for the SDK`)
+      continue
+    }
+    if (key in globalEventRegistry) {
+      console.error(`[Room] message '${key}' is already registered; the schema registered last is the one that decodes`)
+    }
+    globalEventRegistry[key] = schema
+  }
   if (!globalRoom) {
     throw new Error('Room not initialized. Make sure the SDK network transport is initialized.')
   }

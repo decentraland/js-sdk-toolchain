@@ -10,7 +10,8 @@ import {
   CrdtMessage
 } from '../../../packages/@dcl/ecs'
 import * as components from '../../../packages/@dcl/ecs/src/components'
-import { addSyncTransport } from '../../../packages/@dcl/sdk/network/message-bus-sync'
+import { addSyncTransport } from '../../../packages/@dcl/sdk/src/network/message-bus-sync'
+import { getPlayerHelper } from '../../../packages/@dcl/sdk/src/players'
 import { CommsMessage, encodeString } from '../../../packages/@dcl/sdk/network/binary-message-bus'
 import { ReadWriteByteBuffer } from '../../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { readMessage } from '../../../packages/@dcl/ecs/src/serialization/crdt/message'
@@ -106,5 +107,29 @@ describe('Network Parenting', () => {
     expect(Math.round(networkmessages[0].byteLength / 1024)).toBe(12)
     expect(interceptedMessages.length).toBe(CUBES_LENGTH)
     expect(networkmessages.length).toBe(2)
+  })
+})
+
+describe('players helper wiring', () => {
+  it('runs one player-diff system per engine, however many consumers ask for the helper', () => {
+    const engine = Engine()
+    defineComponents(engine)
+    const helper = getPlayerHelper(engine)
+
+    const addSystem = jest.spyOn(engine, 'addSystem')
+    addSyncTransport(
+      engine,
+      async () => ({ data: [] }),
+      async () => ({
+        data: { userId: 'A', version: 1, displayName: '1', hasConnectedWeb3: true, avatar: undefined }
+      }),
+      async () => ({ isServer: false }),
+      'A'
+    )
+
+    expect(getPlayerHelper(engine)).toBe(helper)
+    // the hydration tick, and nothing else: the transport shares the existing
+    // helper rather than registering a second identical per-frame diff
+    expect(addSystem).toHaveBeenCalledTimes(1)
   })
 })

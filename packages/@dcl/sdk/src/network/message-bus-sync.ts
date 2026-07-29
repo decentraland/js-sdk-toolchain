@@ -8,7 +8,7 @@ import { fetchProfile } from './utils'
 import { entityUtils } from './entities'
 import { createServerValidator } from './server'
 import { GetUserDataRequest, GetUserDataResponse } from '~system/UserIdentity'
-import { definePlayerHelper } from '../players'
+import { getPlayerHelper } from '../players'
 import { serializeCrdtMessages } from '../internal/transports/logger'
 import { IsServerRequest, IsServerResponse } from '~system/EngineApi'
 import { AUTH_SERVER_PEER_ID, DEBUG_NETWORK_MESSAGES, IProfile } from './constants'
@@ -69,7 +69,7 @@ export function addSyncTransport(
     pendingMessageBusMessagesToSend.length = 0
     return messages
   }
-  const players = definePlayerHelper(engine)
+  const players = getPlayerHelper(engine)
 
   const RealmInfo = components.RealmInfo(engine)
   const NetworkEntity = components.NetworkEntity(engine)
@@ -85,6 +85,20 @@ export function addSyncTransport(
    */
   let tick = 0
   const TRANSPORT_INITIALIZED_NUMBER = isTestEnvironment() ? 0 : 2
+
+  /**
+   * Who this peer's own CRDT is addressed to. A client only ever talks to the
+   * authoritative server; the server's fan-out to the room is legitimate, so it
+   * keeps broadcasting (`undefined` — an empty address list means broadcast).
+   *
+   * Comms is buffered until the role resolves, so nothing *received* is handled
+   * before it is known. `transport.send` is not: it runs on the engine clock and
+   * can reach here first. Broadcasting in that window is the pre-role fallback,
+   * not a leftover of the peer-to-peer topology.
+   */
+  function crdtAudience(): string[] | undefined {
+    return isServerAtom.getOrNull() === false ? [AUTH_SERVER_PEER_ID] : undefined
+  }
   // Add Sync Transport
   const transport: Transport = {
     filter: syncFilter(engine),
@@ -97,7 +111,7 @@ export function addSyncTransport(
 
           // Convert regular messages to network messages for broadcasting with chunking
           for (const chunk of serverValidator.convertRegularToNetworkMessage(message)) {
-            binaryMessageBus.emit(CommsMessage.CRDT, chunk)
+            binaryMessageBus.emit(CommsMessage.CRDT, chunk, crdtAudience())
           }
         }
       }
@@ -159,7 +173,8 @@ export function addSyncTransport(
     for (const effect of effects) {
       if (effect === 'requestState') {
         DEBUG_NETWORK_MESSAGES() && console.log('Requesting state...')
-        binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
+        // unconditionally addressed: the FSM only ever asks for state as a client
+        binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array(), [AUTH_SERVER_PEER_ID])
       } else if (effect === 'markSynced') {
         // the room only counts as ready once comms has answered at least once
         if (RealmInfo.getOrNull(engine.RootEntity)) {
