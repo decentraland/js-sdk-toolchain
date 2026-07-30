@@ -5118,6 +5118,8 @@ export interface TouchScreenControlsComponentDefinitionExtended extends LastWrit
     hideJoystick(): void;
     setMainAction(action: InputAction): void;
     showAll(): void;
+    showCrosshair(): void;
+    showJoystick(): void;
 }
 
 // Warning: (ae-missing-release-tag) "Transform" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
