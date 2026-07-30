@@ -100,4 +100,26 @@ describe('Entity container', () => {
 
     expect(entityContainer.updateUsedEntity(entity)).toBe(false)
   })
+
+  describe('DCL_MAX_COMPOSITE_ENTITY (build-time define)', () => {
+    afterEach(() => {
+      delete (globalThis as any).DCL_MAX_COMPOSITE_ENTITY
+    })
+
+    it('starts entity counter past the max composite entity', () => {
+      ;(globalThis as any).DCL_MAX_COMPOSITE_ENTITY = 600
+      const entityContainer = createEntityContainer()
+      const entity = entityContainer.generateEntity()
+      // counter should start at 601 (one past the max composite entity)
+      expect((entity & 0xffff) >>> 0).toBe(601)
+    })
+
+    it('is a no-op when the value is below reservedStaticEntities', () => {
+      ;(globalThis as any).DCL_MAX_COMPOSITE_ENTITY = 100
+      const entityContainer = createEntityContainer()
+      const entity = entityContainer.generateEntity()
+      // reservedStaticEntities (512) wins over maxCompositeEntity (100)
+      expect((entity & 0xffff) >>> 0).toBe(RESERVED_STATIC_ENTITIES)
+    })
+  })
 })

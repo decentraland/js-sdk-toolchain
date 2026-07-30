@@ -1,4 +1,4 @@
-import { InputAction } from '../components/generated/pb/decentraland/sdk/components/common/input_action.gen'
+import { InputAction, InteractionType } from '../components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import { PBPointerEventsResult } from '../components/generated/pb/decentraland/sdk/components/pointer_events_result.gen'
 import { PointerEventType } from '../components/generated/pb/decentraland/sdk/components/common/input_action.gen'
 import * as components from '../components'
@@ -22,6 +22,7 @@ export type EventSystemOptions = {
   showFeedback?: boolean
   showHighlight?: boolean
   maxPlayerDistance?: number
+  priority?: number
 }
 
 /**
@@ -92,6 +93,34 @@ export interface PointerEventsSystem {
    * @param entity - Entity where the callback was attached
    */
   removeOnPointerDragEnd(entity: Entity): void
+
+  /**
+   * @public
+   * Remove the callback for onProximityDown event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnProximityDown(entity: Entity): void
+
+  /**
+   * @public
+   * Remove the callback for onProximityUp event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnProximityUp(entity: Entity): void
+
+  /**
+   * @public
+   * Remove the callback for onProximityEnter event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnProximityEnter(entity: Entity): void
+
+  /**
+   * @public
+   * Remove the callback for onProximityLeave event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnProximityLeave(entity: Entity): void
 
   /**
    * @internal
@@ -208,6 +237,38 @@ export interface PointerEventsSystem {
    * @param cb - Function to execute when click fires
    */
   onPointerDragEnd(pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
+
+  /**
+   * @public
+   * Execute callback when the user presses the proximity button on the entity
+   * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
+   * @param cb - Function to execute when click fires
+   */
+  onProximityDown(pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
+
+  /**
+   * @public
+   * Execute callback when the user releases the proximity button on the entity
+   * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
+   * @param cb - Function to execute when event fires
+   */
+  onProximityUp(pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
+
+  /**
+   * @public
+   * Execute callback when the entity enters the proximity zone of the user
+   * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
+   * @param cb - Function to execute when event fires
+   */
+  onProximityEnter(pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
+
+  /**
+   * @public
+   * Execute callback when the entity leaves the proximity zone of the user
+   * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
+   * @param cb - Function to execute when event fires
+   */
+  onProximityLeave(pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
 }
 
 /**
@@ -225,7 +286,9 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     HoverLeave,
     Drag,
     DragLocked,
-    DragEnd
+    DragEnd,
+    ProximityEnter,
+    ProximityLeave
   }
   type EventMapType = Map<EventType, Map<InputAction, EventSystemOptionsCallback>>
 
@@ -235,26 +298,43 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     return eventsMap.get(entity) || eventsMap.set(entity, new Map()).get(entity)!
   }
 
-  function setPointerEvent(entity: Entity, type: PointerEventType, opts: EventSystemOptions) {
+  function setPointerEvent(
+    entity: Entity,
+    type: PointerEventType,
+    opts: EventSystemOptions,
+    interactionType: InteractionType = InteractionType.CURSOR
+  ) {
     const pointerEvent = PointerEvents.getMutableOrNull(entity) || PointerEvents.create(entity)
     pointerEvent.pointerEvents.push({
       eventType: type,
+      interactionType,
       eventInfo: {
         button: opts.button,
         showFeedback: opts.showFeedback,
         showHighlight: opts.showHighlight,
         hoverText: opts.hoverText,
         maxDistance: opts.maxDistance,
-        maxPlayerDistance: opts.maxPlayerDistance
+        maxPlayerDistance: opts.maxPlayerDistance,
+        priority: opts.priority
       }
     })
   }
 
-  function removePointerEvent(entity: Entity, type: PointerEventType, button: InputAction) {
+  function removePointerEvent(
+    entity: Entity,
+    type: PointerEventType,
+    button: InputAction,
+    interactionType: InteractionType = InteractionType.CURSOR
+  ) {
     const pointerEvent = PointerEvents.getMutableOrNull(entity)
     if (!pointerEvent) return
     pointerEvent.pointerEvents = pointerEvent.pointerEvents.filter(
-      (pointer) => !(pointer.eventInfo?.button === button && pointer.eventType === type)
+      (pointer) =>
+        !(
+          pointer.eventInfo?.button === button &&
+          pointer.eventType === type &&
+          pointer.interactionType === interactionType
+        )
     )
   }
 
@@ -271,6 +351,10 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
       return PointerEventType.PET_DRAG_LOCKED
     } else if (eventType === EventType.DragEnd) {
       return PointerEventType.PET_DRAG_END
+    } else if (eventType === EventType.ProximityEnter) {
+      return PointerEventType.PET_PROXIMITY_ENTER
+    } else if (eventType === EventType.ProximityLeave) {
+      return PointerEventType.PET_PROXIMITY_LEAVE
     }
     return PointerEventType.PET_DOWN
   }
@@ -288,12 +372,16 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
       return EventType.DragLocked
     } else if (pet === PointerEventType.PET_DRAG_END) {
       return EventType.DragEnd
+    } else if (pet === PointerEventType.PET_PROXIMITY_ENTER) {
+      return EventType.ProximityEnter
+    } else if (pet === PointerEventType.PET_PROXIMITY_LEAVE) {
+      return EventType.ProximityLeave
     } else {
       return EventType.Down
     }
   }
 
-  function removeEvent(entity: Entity, type: EventType) {
+  function removeEvent(entity: Entity, type: EventType, interactionType: InteractionType = InteractionType.CURSOR) {
     const event = getEvent(entity)
     const pointerEventList = event.get(type)
 
@@ -302,7 +390,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     }
 
     for (const button of pointerEventList.keys()) {
-      removePointerEvent(entity, getPointerEvent(type), button)
+      removePointerEvent(entity, getPointerEvent(type), button, interactionType)
     }
 
     event.delete(type)
@@ -438,6 +526,24 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     }
   }
 
+  // proximity events mirror the cursor setters but tag the PointerEvents entry
+  // with InteractionType.PROXIMITY so the renderer sources them from the avatar's
+  // position rather than the cursor ray (single-callback shape, as upstream).
+  const onProximityFunction: (ty: EventType, pet: PointerEventType) => PointerEventsSystem['onProximityEnter'] = (
+    ty,
+    pet
+  ) => {
+    return (pointerData, cb) => {
+      const { entity, opts } = pointerData
+      const options = getDefaultOpts(opts)
+      removeEvent(entity, ty, InteractionType.PROXIMITY)
+      const callbacks = getEvent(entity).get(ty) ?? new Map<InputAction, EventSystemOptionsCallback>()
+      callbacks.set(options.button, { cb, ...options })
+      getEvent(entity).set(ty, callbacks)
+      setPointerEvent(entity, pet, options, InteractionType.PROXIMITY)
+    }
+  }
+
   return {
     removeOnClick(entity: Entity) {
       removeEvent(entity, EventType.Click)
@@ -478,6 +584,27 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     onPointerHoverLeave: onPointerFunction(EventType.HoverLeave),
     onPointerDrag: onPointerFunction(EventType.Drag),
     onPointerDragLocked: onPointerFunction(EventType.DragLocked),
-    onPointerDragEnd: onPointerFunction(EventType.DragEnd)
+    onPointerDragEnd: onPointerFunction(EventType.DragEnd),
+
+    removeOnProximityDown(entity: Entity) {
+      removeEvent(entity, EventType.Down, InteractionType.PROXIMITY)
+    },
+
+    removeOnProximityUp(entity: Entity) {
+      removeEvent(entity, EventType.Up, InteractionType.PROXIMITY)
+    },
+
+    removeOnProximityEnter(entity: Entity) {
+      removeEvent(entity, EventType.ProximityEnter, InteractionType.PROXIMITY)
+    },
+
+    removeOnProximityLeave(entity: Entity) {
+      removeEvent(entity, EventType.ProximityLeave, InteractionType.PROXIMITY)
+    },
+
+    onProximityDown: onProximityFunction(EventType.Down, PointerEventType.PET_DOWN),
+    onProximityUp: onProximityFunction(EventType.Up, PointerEventType.PET_UP),
+    onProximityEnter: onProximityFunction(EventType.ProximityEnter, PointerEventType.PET_PROXIMITY_ENTER),
+    onProximityLeave: onProximityFunction(EventType.ProximityLeave, PointerEventType.PET_PROXIMITY_LEAVE)
   }
 }

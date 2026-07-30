@@ -16,7 +16,12 @@ export type {
   ReadonlyFlatTexture,
   FlatMaterial
 } from './extended/Material'
-export type { TweenHelper, TweenComponentDefinitionExtended } from './extended/Tween'
+export type {
+  TweenHelper,
+  TweenComponentDefinitionExtended,
+  SetMoveRotateScaleParams,
+  MoveRotateScaleModeParams
+} from './extended/Tween'
 export type { CameraTransitionHelper, VirtualCameraComponentDefinitionExtended } from './extended/VirtualCamera'
 export type { TransformComponentExtended, TransformTypeWithOptionals } from './manual/Transform'
 export type { NameComponent, NameType } from './manual/Name'
@@ -27,3 +32,9 @@ export type { INetowrkParent, INetowrkParentType } from './manual/NetworkParent'
 export type { InputModifierHelper, InputModifierComponentDefinitionExtended } from './extended/InputModifier'
 export type { LightSourceHelper, LightSourceComponentDefinitionExtended } from './extended/LightSource'
 export type { TriggerAreaComponentDefinitionExtended } from './extended/TriggerArea'
+export type {
+  ParticleSystemHelper,
+  ParticleSystemComponentDefinitionExtended,
+  ParticleSystemBlendMode,
+  ParticleSystemPlaybackState
+} from './extended/ParticleSystem'

@@ -41,6 +41,7 @@ export class MessageBus {
     if (this.flushing) return
 
     const message = this.messageQueue.shift()!
+    this.flushing = true
     communicationsController.send({ message }).then(
       (_) => {
         this.flushing = false
@@ -48,6 +49,7 @@ export class MessageBus {
       },
       (_) => {
         this.flushing = false
+        this.flush()
       }
     )
   }

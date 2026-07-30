@@ -34,13 +34,28 @@ describe('UiDropdown React ECS', () => {
 
     await engine.update(1)
 
+    const expectedPointerEventEntry = {
+      eventType: 1,
+      interactionType: 0,
+      eventInfo: {
+        button: 0,
+        showFeedback: true,
+        hoverText: undefined,
+        maxDistance: undefined,
+        maxPlayerDistance: undefined,
+        priority: undefined,
+        showHighlight: undefined
+      }
+    }
+    const expectedPointerEventEntryHover = {
+      ...expectedPointerEventEntry,
+      eventType: 0
+    }
+
     // after update, there should be only one pointer event per eventType and button
     for (const [_entity, pe] of engine.getEntitiesWith(PointerEvents)) {
       expect(pe).toEqual({
-        pointerEvents: [
-          { eventType: 1, eventInfo: { button: 0, showFeedback: true } },
-          { eventType: 0, eventInfo: { button: 0, showFeedback: true } }
-        ]
+        pointerEvents: [expectedPointerEventEntry, expectedPointerEventEntryHover]
       })
     }
 
@@ -50,10 +65,7 @@ describe('UiDropdown React ECS', () => {
     // after update, there should be only one pointer event per eventType and button
     for (const [_entity, pe] of engine.getEntitiesWith(PointerEvents)) {
       expect(pe).toEqual({
-        pointerEvents: [
-          { eventType: 1, eventInfo: { button: 0, showFeedback: true } },
-          { eventType: 0, eventInfo: { button: 0, showFeedback: true } }
-        ]
+        pointerEvents: [expectedPointerEventEntry, expectedPointerEventEntryHover]
       })
     }
   })

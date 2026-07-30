@@ -6,6 +6,7 @@ import child_process from 'child_process'
 import esbuild from 'esbuild'
 import { future } from 'fp-future'
 import { globSync } from 'glob'
+import fs from 'fs'
 import path from 'path'
 import { pathToFileURL } from 'url'
 import i18next from 'i18next'
@@ -82,12 +83,8 @@ ${
   `
 import { syncEntity } from '@dcl/sdk/network'
 import players from '@dcl/sdk/players'
-import { initAssetPacks, setSyncEntity } from '@dcl/asset-packs/dist/scene-entrypoint'
+import { initAssetPacks } from '@dcl/asset-packs/dist/scene-entrypoint'
 initAssetPacks(engine, { syncEntity }, players)
-
-// TODO: do we need to do this on runtime ?
-// I think we have that information at build-time and we avoid to do evaluate this on the worker.
-// Read composite.json or main.crdt => If that file has a NetworkEntity import '@dcl/@sdk/network'
 `
 }
 
@@ -169,6 +166,16 @@ type SingleProjectOptions = CompileOptions & {
 export async function bundleSingleProject(components: BundleComponents, options: SingleProjectOptions) {
   printProgressStep(components.logger, `Bundling file ${colors.bold(options.entrypoint)}`, 1, MAX_STEP)
   const editorScene = await isEditorScene(components, options.workingDirectory)
+
+  // Pre-compute composite data so we can inject maxCompositeEntity via esbuild define.
+  // This must happen before the esbuild context is created because the define values
+  // are baked into the engine at compile time (the entity counter initializer reads it)
+  let maxCompositeEntity = 0
+  if (!options.ignoreComposite) {
+    const composites = await getAllComposites(components, options.workingDirectory)
+    maxCompositeEntity = composites.maxCompositeEntity
+  }
+
   const sdkPackagePath = (() => {
     try {
       // First try to resolve from project's node_modules
@@ -185,7 +192,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
     preserveSymlinks: false,
     outfile: options.outputFile,
     allowOverwrite: false,
-    sourcemap: options.production ? 'external' : 'inline',
+    sourcemap: options.production ? false : 'inline',
     minify: options.production,
     minifyIdentifiers: options.production,
     minifySyntax: options.production,
@@ -228,22 +235,32 @@ export async function bundleSingleProject(components: BundleComponents, options:
           }
         }
       })(),
-      // Resolve asset-packs from sdk-commands' dependencies (nested in @dcl/inspector)
+      // Resolve asset-packs from the scene's own node_modules (if the user explicitly installed it),
+      // otherwise fall back to the version bundled inside @dcl/inspector.
+      // NOTE: We use a direct path check (fs.existsSync) instead of require.resolve here because
+      // require.resolve walks UP the directory tree from workingDirectory, which would incorrectly
+      // pick up @dcl/asset-packs installed next to the scene (e.g. at a monorepo root) rather
+      // than the one the user intentionally installed inside the scene.
       '@dcl/asset-packs': (() => {
+        const sceneOwnAssetPacks = path.join(
+          options.workingDirectory,
+          'node_modules',
+          '@dcl',
+          'asset-packs',
+          'package.json'
+        )
+        if (fs.existsSync(sceneOwnAssetPacks)) {
+          return path.dirname(sceneOwnAssetPacks)
+        }
         try {
-          // Try to resolve from project's node_modules first
-          return path.dirname(require.resolve('@dcl/asset-packs/package.json', { paths: [options.workingDirectory] }))
+          // Fallback: resolve from @dcl/inspector's node_modules
+          const inspectorPath = require.resolve('@dcl/inspector/package.json', { paths: [__dirname] })
+          return path.dirname(
+            require.resolve('@dcl/asset-packs/package.json', { paths: [path.dirname(inspectorPath)] })
+          )
         } catch {
-          try {
-            // Fallback: resolve from @dcl/inspector's node_modules
-            const inspectorPath = require.resolve('@dcl/inspector/package.json', { paths: [__dirname] })
-            return path.dirname(
-              require.resolve('@dcl/asset-packs/package.json', { paths: [path.dirname(inspectorPath)] })
-            )
-          } catch {
-            // Last resort: try resolving from current directory
-            return path.dirname(require.resolve('@dcl/asset-packs/package.json', { paths: [__dirname] }))
-          }
+          // Last resort: try resolving from current directory
+          return path.dirname(require.resolve('@dcl/asset-packs/package.json', { paths: [__dirname] }))
         }
       })()
     },
@@ -254,7 +271,8 @@ export async function bundleSingleProject(components: BundleComponents, options:
       window: 'undefined',
       DEBUG: options.production ? 'false' : 'true',
       'globalThis.DEBUG': options.production ? 'false' : 'true',
-      'process.env.NODE_ENV': JSON.stringify(options.production ? 'production' : 'development')
+      'process.env.NODE_ENV': JSON.stringify(options.production ? 'production' : 'development'),
+      DCL_MAX_COMPOSITE_ENTITY: String(maxCompositeEntity)
     },
     tsconfig: options.tsconfig,
     supported: {
@@ -266,7 +284,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
     logOverride: {
       'import-is-undefined': 'silent'
     },
-    plugins: [compositeLoader(components, options)],
+    plugins: [compositeLoader(components, options, editorScene)],
     stdin: {
       contents: getEntrypointCode(options.entrypoint, options.customEntryPoint, editorScene),
       resolveDir: path.dirname(options.entrypoint),
@@ -301,9 +319,19 @@ export async function bundleSingleProject(components: BundleComponents, options:
       }
     })
 
-    // Do initial build
-    await context.rebuild()
-    printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
+    // Do initial build. A build error must not kill the process in watch mode:
+    // the watcher above is already running and the preview server can still
+    // start, so report the error and recover on the next file save — the same
+    // contract as a failed re-build. Throwing here left `sdk-commands start`
+    // dead when a scene was opened with a pre-existing syntax error, with no
+    // watcher alive to pick up the fix.
+    try {
+      await context.rebuild()
+      printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
+    } catch (err: any) {
+      /* istanbul ignore next */
+      components.logger.error(err.toString())
+    }
     printProgressInfo(components.logger, `The compiler is watching for changes`)
   } else {
     try {
@@ -388,7 +416,11 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
   return typeCheckerFuture
 }
 
-function compositeLoader(components: BundleComponents, options: SingleProjectOptions): esbuild.Plugin {
+function compositeLoader(
+  components: BundleComponents,
+  options: SingleProjectOptions,
+  editorScene: boolean
+): esbuild.Plugin {
   let shouldReload = true
   let compositeData: Awaited<ReturnType<typeof getAllComposites>> | null = null
 
@@ -460,11 +492,12 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
         const { contents, watchFiles } = await generateInitializeScriptsModule(
           components,
           options.workingDirectory,
-          compositeData
+          compositeData,
+          { editorScene }
         )
 
         return {
-          loader: 'js',
+          loader: 'ts',
           contents,
           watchFiles,
           resolveDir: options.workingDirectory
@@ -539,26 +572,14 @@ function collectScriptData(
 }
 
 /**
- * Reads and prepares the runtime script code for inlining
+ * Reads the runtime script TypeScript source for inlining as ESM
  */
 async function prepareRuntimeCode(fs: BundleComponents['fs']): Promise<string> {
-  const runtimeCodePath = require.resolve('./runtime-script')
+  const runtimeCodePath = path.join(__dirname, 'runtime-script.ts')
   const runtimeCode = await fs.readFile(runtimeCodePath, 'utf-8')
 
-  // Strip CommonJS/module system code
-  return (
-    runtimeCode
-      .replace(/"use strict";?\s*/g, '')
-      .replace(/Object\.defineProperty\(exports,.*?\);?\s*/g, '')
-      .replace(/exports\.\w+\s*=\s*void 0;?\s*/g, '')
-      .replace(/exports\.\w+\s*=\s*/g, '')
-      .replace(/^export\s+/gm, '')
-      .replace(/^import\s+.*$/gm, '')
-      // fix nested asset-packs path (importing from @dcl/inspector is banned in runtime, but @dcl/asset-packs not)
-      .replace(/@dcl\/inspector\/node_modules\/@dcl\/asset-packs/g, '@dcl/asset-packs')
-      .replace(/\n{3,}/g, '\n\n')
-      .trim()
-  )
+  // fix nested asset-packs path (importing from @dcl/inspector is banned in scene bundles, @dcl/asset-packs is not)
+  return runtimeCode.replace(/@dcl\/inspector\/node_modules\/@dcl\/asset-packs/g, '@dcl/asset-packs')
 }
 
 /**
@@ -606,6 +627,34 @@ async function updateSdkTypeDeclarations(
 }
 
 /**
+ * Minimal '~sdk/script-utils' for scenes with no scripts: same export surface,
+ * empty-registry semantics, no embedded script runtime (skips the
+ * @dcl/asset-packs payload and its glue).
+ */
+function generateScriptStubModuleContent(): string {
+  return `
+export function _initializeScripts(_engine) {}
+
+export function getScriptInstance(_entity, _scriptPath) {
+  return null
+}
+
+export function getScriptInstancesByPath(_scriptPath) {
+  return []
+}
+
+export function getAllScriptInstances(_entity) {
+  return []
+}
+
+export function callScriptMethod(entity, scriptPath, methodName, ..._args) {
+  console.error(\`Method \${methodName} not found on script \${scriptPath} for entity \${entity}\`)
+  return undefined
+}
+`
+}
+
+/**
  * Generates the virtual module content with script initialization and helper functions
  */
 function generateVirtualModuleContent(runtimeImports: string, runtimeCode: string, scriptsArray: string): string {
@@ -618,22 +667,29 @@ export function _initializeScripts(engine) {
   const scriptsArray = ${scriptsArray}
   return runScripts(engine, scriptsArray)
 }
-
-// export helper functions that are defined in the inlined runtime code
-export { getScriptInstance, getScriptInstancesByPath, getAllScriptInstances, callScriptMethod }
 `
 }
 
 export async function generateInitializeScriptsModule(
   components: BundleComponents,
   workingDirectory: string,
-  compositeData: { scripts: Map<string, Script[]>; [key: string]: any } | null
+  compositeData: { scripts: Map<string, Script[]>; [key: string]: any } | null,
+  opts?: { editorScene?: boolean }
 ): Promise<{ contents: string; watchFiles: string[] }> {
-  // prepare runtime code (always needed for helper functions)
+  const hasScripts = !!compositeData && compositeData.scripts.size > 0
+
+  // scriptless non-editor scenes skip the embedded script runtime entirely
+  if (!hasScripts && !opts?.editorScene) {
+    return {
+      contents: generateScriptStubModuleContent(),
+      watchFiles: []
+    }
+  }
+
   const runtimeCode = await prepareRuntimeCode(components.fs)
 
   // default empty implementation if no scripts
-  if (!compositeData || compositeData.scripts.size === 0) {
+  if (!hasScripts) {
     return {
       contents: generateVirtualModuleContent('', runtimeCode, '[]'),
       watchFiles: []

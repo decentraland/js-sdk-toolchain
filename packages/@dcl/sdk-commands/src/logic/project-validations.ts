@@ -149,8 +149,39 @@ export async function startValidations(components: Pick<CliComponents, 'spawner'
   }
 }
 
-// If there is a main.composite file, its an editor scene. We need asset-packs package.
-export async function isEditorScene(components: Pick<CliComponents, 'fs'>, workingDirectory: string) {
+/**
+ * Returns true if the scene is an "editor scene" that requires the asset-packs runtime.
+ *
+ * A scene is an editor scene when its main.composite file contains at least one
+ * asset-packs component other than `asset-packs::Script`. The Script component is
+ * a build-time-only construct (it defines JavaScript scripts bundled separately via
+ * `generateInitializeScriptsModule`) and does not require the `initAssetPacks` runtime.
+ * Only Action/Trigger/State and similar runtime components need `initAssetPacks`.
+ *
+ * NOTE: This value is baked into the esbuild stdin at context-creation time and is
+ * NOT re-evaluated during watch-mode rebuilds. If a scene's editor status changes
+ * (e.g. a smart item is added for the first time), the watch process must be restarted.
+ */
+export async function isEditorScene(components: Pick<CliComponents, 'fs'>, workingDirectory: string): Promise<boolean> {
   const mainCompositePath = path.resolve(workingDirectory, 'assets', 'scene', 'main.composite')
-  return components.fs.fileExists(mainCompositePath)
+  if (!(await components.fs.fileExists(mainCompositePath))) return false
+
+  try {
+    const fileBuffer = await components.fs.readFile(mainCompositePath)
+    const json = JSON.parse(new TextDecoder().decode(fileBuffer))
+    // asset-packs::Script is a build-time component — it doesn't require the initAssetPacks runtime entrypoint.
+    const SCRIPT_COMPONENT = 'asset-packs::Script'
+    return (
+      Array.isArray(json.components) &&
+      json.components.some(
+        (c: unknown) =>
+          typeof (c as Record<string, unknown>).name === 'string' &&
+          ((c as Record<string, unknown>).name as string).startsWith('asset-packs::') &&
+          (c as Record<string, unknown>).name !== SCRIPT_COMPONENT
+      )
+    )
+  } catch {
+    // Malformed composite — treat as non-editor scene to avoid bundling unnecessary code
+    return false
+  }
 }

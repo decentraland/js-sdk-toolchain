@@ -110,6 +110,7 @@ flow('build-all', () => {
     it('check files exists', () => {
       ensureFileExists('dist/index.js', SDK_COMMANDS_PATH)
       ensureFileExists('dist/index.d.ts', SDK_COMMANDS_PATH)
+      ensureFileExists('dist/logic/runtime-script.ts', SDK_COMMANDS_PATH)
     })
 
     itExecutes(`chmod +x dist/index.js`, SDK_COMMANDS_PATH)

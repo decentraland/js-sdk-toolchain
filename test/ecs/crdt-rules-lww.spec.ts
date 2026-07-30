@@ -46,7 +46,8 @@ describe('Conflict resolution rules for LWW-ElementSet based components', () => 
   const timestamps = new Map<Entity, number>()
   const data = new Map<Entity, number>()
 
-  const updateFn = createUpdateLwwFromCrdt(componentId, timestamps, schema, data)
+  const lastSentData = new Map<Entity, Uint8Array>()
+  const updateFn = createUpdateLwwFromCrdt(componentId, timestamps, schema, data, lastSentData)
   const dumpFn = createDumpLwwFunctionFromCrdt(componentId, timestamps, schema, data)
 
   it('PUT an unexistent value should succeed', () => {

@@ -1,8 +1,4 @@
-import TextEncodingPolyfill from 'text-encoding'
-import { setGlobalPolyfill } from '@dcl/ecs'
-
-/* @__PURE__ */
-export function polyfillTextEncoder() {
-  setGlobalPolyfill('TextEncoder', TextEncodingPolyfill.TextEncoder)
-  setGlobalPolyfill('TextDecoder', TextEncodingPolyfill.TextDecoder)
-}
+// The TextEncoder/TextDecoder polyfill now lives in the lean `@dcl/sdk/text-codec`
+// subpath so it can be installed without pulling in the ethereum provider. This
+// re-export keeps the historical `./text-encoder` import path working.
+export { polyfillTextEncoder } from '../text-codec'

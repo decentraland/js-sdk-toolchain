@@ -68,29 +68,26 @@ describe('Analytics Component', () => {
 
     const trackSpy = jest.spyOn(analytics.get(), 'track')
     analytics.track('Scene created', { projectType: '', url: '' })
-    expect(trackSpy).toHaveBeenCalledWith(
-      {
-        userId: 'sdk-commands-user',
-        event: 'Scene created',
-        properties: {
-          projectType: '',
-          url: '',
-          os: process.platform,
-          nodeVersion: process.version,
-          cliVersion: '7.0.0',
-          isCI: isCI(),
-          isEditor: false,
-          devId: 'fb3f84b2-4ddc-4a7e-96bf-1e8992c294dd',
-          appId: null,
-          projectId: null,
-          ecs: {
-            ecsVersion: 'ecs7',
-            packageVersion: 'unknown'
-          }
+    expect(trackSpy).toHaveBeenCalledWith({
+      userId: 'sdk-commands-user',
+      event: 'Scene created',
+      properties: {
+        projectType: '',
+        url: '',
+        os: process.platform,
+        nodeVersion: process.version,
+        cliVersion: '7.0.0',
+        isCI: isCI(),
+        isEditor: false,
+        devId: 'fb3f84b2-4ddc-4a7e-96bf-1e8992c294dd',
+        appId: null,
+        projectId: null,
+        ecs: {
+          ecsVersion: 'ecs7',
+          packageVersion: 'unknown'
         }
-      },
-      expect.anything()
-    )
+      }
+    })
   })
 
   it('should wait for promises to finished', async () => {
