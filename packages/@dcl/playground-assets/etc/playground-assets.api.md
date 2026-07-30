@@ -1187,6 +1187,7 @@ export type EntityComponents = {
     uiBackground: PBUiBackground;
     uiInput: PBUiInput;
     uiDropdown: PBUiDropdown;
+    uiInputBinding: PBUiInputBinding;
     onMouseDown: Callback;
     onMouseUp: Callback;
     onMouseEnter: Callback;
@@ -1207,6 +1208,7 @@ export enum EntityMappingMode {
 export interface EntityPropTypes extends Listeners {
     key?: Key;
     uiBackground?: UiBackgroundProps;
+    uiInputBinding?: PBUiInputBinding;
     uiTransform?: UiTransformProps;
 }
 
@@ -5103,8 +5105,22 @@ export const ToLinearSpace = 2.2;
 // @public (undocumented)
 export type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTypes<T>;
 
+// Warning: (ae-missing-release-tag) "TouchScreenControls" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const TouchScreenControls: LastWriteWinElementSetComponentDefinition<PBTouchScreenControls>;
+export const TouchScreenControls: TouchScreenControlsComponentDefinitionExtended;
+
+// @public
+export interface TouchScreenControlsComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBTouchScreenControls> {
+    hide(actions: InputAction[]): void;
+    hideAll(): void;
+    hideCrosshair(): void;
+    hideJoystick(): void;
+    setMainAction(action: InputAction): void;
+    showAll(): void;
+    showCrosshair(): void;
+    showJoystick(): void;
+}
 
 // Warning: (ae-missing-release-tag) "Transform" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
