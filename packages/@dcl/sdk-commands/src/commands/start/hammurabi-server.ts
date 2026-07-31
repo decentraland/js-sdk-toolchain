@@ -9,7 +9,7 @@ import { isElectronEnvironment, getSpawnEnv, findNpxCliJs, getNpxBin } from './u
 const HAMMURABI_PACKAGE = '@dcl/hammurabi-server'
 const HAMMURABI_VERSION = 'next'
 
-const BEVY_PACKAGE = '@dcl/bevy-headless-server'
+const BEVY_PACKAGE = '@dcl-regenesislabs/bevy-headless-server'
 const BEVY_VERSION = 'next'
 
 // The bevy server exits with this when it can never run here (unsupported platform,
@@ -21,6 +21,16 @@ type ServerEngine = 'bevy' | 'hammurabi'
 function selectedEngine(): ServerEngine {
   const requested = process.env.DCL_SERVER_ENGINE
   return requested === 'bevy' || requested === 'hammurabi' ? requested : 'hammurabi'
+}
+
+/**
+ * npx accepts a directory or tarball as well as a registry spec, so pointing
+ * DCL_SERVER_PACKAGE at a local build exercises this spawn path without publishing.
+ */
+function packageSpec(engine: ServerEngine): string {
+  const override = process.env.DCL_SERVER_PACKAGE
+  if (override) return override
+  return engine === 'bevy' ? `${BEVY_PACKAGE}@${BEVY_VERSION}` : `${HAMMURABI_PACKAGE}@${HAMMURABI_VERSION}`
 }
 
 /**
@@ -48,7 +58,7 @@ export function startHammurabiServer(
   realm: string,
   engine: ServerEngine = 'hammurabi'
 ): ChildProcess {
-  const pkg = engine === 'bevy' ? `${BEVY_PACKAGE}@${BEVY_VERSION}` : `${HAMMURABI_PACKAGE}@${HAMMURABI_VERSION}`
+  const pkg = packageSpec(engine)
 
   printProgressInfo(
     components.logger,
