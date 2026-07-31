@@ -140,12 +140,14 @@ export async function setupEcs6Endpoints(
     // undici decompresses the body but leaves the original content-encoding /
     // content-length headers in place; forwarding them would make the client
     // re-decode (or truncate to the compressed length) the already-decoded body.
-    res.headers.delete('content-encoding')
-    res.headers.delete('content-length')
+    // fetch() responses carry immutable Headers, so filter instead of delete.
+    const headers = Object.fromEntries(res.headers)
+    delete headers['content-encoding']
+    delete headers['content-length']
 
     return {
       status: res.status,
-      headers: Object.fromEntries(res.headers),
+      headers,
       body: res.body ? Readable.fromWeb(res.body as any) : undefined
     }
   })
