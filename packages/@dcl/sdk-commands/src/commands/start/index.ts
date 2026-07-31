@@ -219,7 +219,10 @@ export async function main(options: Options) {
         }
       }
 
-      await wireRouter(components, workspace, dataLayer)
+      // the sidecar boots after the server (it reads the scene through the
+      // preview's own /content endpoints), so the proxy target is late-bound
+      const assetBundlesSidecar: { url?: string } = {}
+      await wireRouter(components, workspace, dataLayer, withAssetBundles ? () => assetBundlesSidecar.url : undefined)
       if (watch) {
         for (const project of workspace.projects) {
           await wireFileWatcherToWebSockets(
@@ -232,15 +235,17 @@ export async function main(options: Options) {
       }
       await startComponents()
 
-      let assetBundlesUrl: string | undefined
       if (withAssetBundles) {
-        assetBundlesUrl = await runAssetBundlesSidecar(
+        assetBundlesSidecar.url = await runAssetBundlesSidecar(
           components,
           port,
           workspace.projects[0]?.workingDirectory || workingDirectory
         )
-        if (assetBundlesUrl) {
-          printProgressInfo(options.components.logger, `Serving asset bundles (abgen JIT): ${assetBundlesUrl}`)
+        if (assetBundlesSidecar.url) {
+          printProgressInfo(
+            options.components.logger,
+            `Serving asset bundles (abgen JIT): http://127.0.0.1:${port}/optimized-assets`
+          )
         }
       }
 
@@ -298,7 +303,9 @@ export async function main(options: Options) {
           baseCoords,
           isHub,
           args: options.args,
-          assetBundlesUrl
+          // the explorer derives the /optimized-assets base from the realm it
+          // already has — the sidecar's private origin is never exposed
+          assetBundles: !!assetBundlesSidecar.url
         })
       }
 

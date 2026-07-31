@@ -1,5 +1,4 @@
 import * as path from 'path'
-import portfinder from 'portfinder'
 
 import { CliComponents } from '../../components'
 import { printProgressInfo, printProgressStep } from '../../logic/beautiful-logs'
@@ -17,11 +16,6 @@ const PREWARM_FALLBACK_EVERY_TICKS = 4 // seconds-heartbeat cadence when /progre
 const PREWARM_TIMEOUT_MS = 15 * 60_000
 const PREWARM_RETRY_DELAY_MS = 2_000
 
-// abgen's default port, and the Explorer's default `optimized-assets-url`:
-// preferring it lets a connected Unity Editor find the sidecar with zero
-// configuration. Scans upward when taken (the deeplink carries the real URL).
-const PREFERRED_SIDECAR_PORT = 5147
-
 /**
  * Boots an `abgen` sidecar: an ab-cdn-compatible server that JIT-converts the
  * scene being previewed into asset bundles, reading it through the preview's
@@ -29,6 +23,10 @@ const PREFERRED_SIDECAR_PORT = 5147
  * undefined — with a warning — when the binary is missing or never comes up.
  * The binary resolves from $ABGEN_BIN, then a cached copy of the pinned abgen
  * release, then `abgen` on the PATH, and downloads the release only when none exist.
+ *
+ * The sidecar binds an ephemeral port that stays private to sdk-commands:
+ * clients reach it through the preview server's /optimized-assets proxy, so
+ * they only ever see the realm origin they already have.
  */
 export async function runAssetBundlesSidecar(
   components: Pick<CliComponents, 'fetch' | 'logger' | 'spawner' | 'config' | 'fs'>,
@@ -36,7 +34,7 @@ export async function runAssetBundlesSidecar(
   projectRoot: string
 ): Promise<string | undefined> {
   const bin = await resolveAbgenBin(components)
-  const port = await portfinder.getPortPromise({ port: PREFERRED_SIDECAR_PORT }).catch(() => getPort(0))
+  const port = await getPort(0)
   const url = `http://127.0.0.1:${port}`
   const catalystUrl = await getCatalystBaseUrl(components)
   // next to scene.json: converted bundles survive preview restarts (never

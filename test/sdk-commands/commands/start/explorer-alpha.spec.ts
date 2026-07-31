@@ -57,7 +57,7 @@ describe('explorer-alpha', () => {
       )
     })
 
-    it('should include optimized-assets-url only when an asset bundles url is provided', async () => {
+    it('should include local-ab only when asset bundles are enabled', async () => {
       const args: any = {}
 
       await runExplorerAlpha(mockComponents, {
@@ -66,22 +66,20 @@ describe('explorer-alpha', () => {
         baseCoords: { x: 0, y: 0 },
         isHub: false,
         args,
-        assetBundlesUrl: 'http://127.0.0.1:5147'
+        assetBundles: true
       })
 
-      expect(mockExec).toHaveBeenCalledWith(
-        '/test',
-        'open',
-        expect.arrayContaining([
-          expect.stringContaining(`optimized-assets-url=${encodeURIComponent('http://127.0.0.1:5147')}`)
-        ]),
-        { silent: true }
-      )
-      // local-ab makes the scene itself load bundles; it travels with the url
+      // local-ab alone: the explorer derives the /optimized-assets base from the realm
       expect(mockExec).toHaveBeenCalledWith(
         '/test',
         'open',
         expect.arrayContaining([expect.stringContaining('local-ab=true')]),
+        { silent: true }
+      )
+      expect(mockExec).toHaveBeenCalledWith(
+        '/test',
+        'open',
+        expect.not.arrayContaining([expect.stringContaining('optimized-assets-url')]),
         { silent: true }
       )
 
@@ -95,12 +93,6 @@ describe('explorer-alpha', () => {
         args
       })
 
-      expect(mockExec).toHaveBeenCalledWith(
-        '/test',
-        'open',
-        expect.not.arrayContaining([expect.stringContaining('optimized-assets-url')]),
-        { silent: true }
-      )
       expect(mockExec).toHaveBeenCalledWith(
         '/test',
         'open',
