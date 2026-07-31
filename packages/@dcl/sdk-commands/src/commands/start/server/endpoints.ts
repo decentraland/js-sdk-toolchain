@@ -174,7 +174,16 @@ export async function setupEcs6Endpoints(
     }
   })
 
-  serveStatic(components, workspace, router)
+  router.get('/feature-flags/:file', async (ctx) => {
+    const res = await components.fetch.fetch(`https://feature-flags.decentraland.zone/${ctx.params.file}`, {
+      headers: {
+        connection: 'close'
+      }
+    })
+    return {
+      body: await res.arrayBuffer()
+    }
+  })
 
   // TODO: get workspace scenes & wearables...
 
@@ -417,104 +426,6 @@ async function getSceneJson(
   }
 
   return resultEntities
-}
-
-function serveStatic(
-  components: Pick<CliComponents, 'fs' | 'fetch'>,
-  workspace: Workspace,
-  router: Router<PreviewComponents>
-) {
-  const sdkPath = path.dirname(
-    require.resolve('@dcl/sdk/package.json', {
-      paths: [workspace.rootWorkingDirectory, ...workspace.projects.map(($) => $.workingDirectory)]
-    })
-  )
-  const dclExplorerJsonPath = path.dirname(
-    require.resolve('@dcl/explorer/package.json', {
-      paths: [workspace.rootWorkingDirectory, ...workspace.projects.map(($) => $.workingDirectory), sdkPath]
-    })
-  )
-
-  const dclKernelDefaultProfilePath = path.resolve(dclExplorerJsonPath, 'default-profile')
-  const dclKernelImagesDecentralandConnect = path.resolve(dclExplorerJsonPath, 'images', 'decentraland-connect')
-
-  const routes = [
-    {
-      route: '/',
-      path: path.resolve(dclExplorerJsonPath, 'preview.html'),
-      type: 'text/html'
-    },
-    {
-      route: '/favicon.ico',
-      path: path.resolve(dclExplorerJsonPath, 'favicon.ico'),
-      type: 'text/html'
-    },
-    {
-      route: '/@/explorer/index.js',
-      path: path.resolve(dclExplorerJsonPath, 'index.js'),
-      type: 'text/javascript'
-    }
-  ]
-
-  for (const route of routes) {
-    router.get(route.route, async (_ctx) => {
-      return {
-        headers: { 'Content-Type': route.type },
-        body: components.fs.createReadStream(route.path)
-      }
-    })
-  }
-
-  function createStaticRoutes(
-    components: Pick<CliComponents, 'fs'>,
-    route: string,
-    folder: string,
-    transform = (str: string) => str
-  ) {
-    router.get(route, async (ctx, next) => {
-      const file = ctx.params.path
-      const fullPath = path.resolve(folder, transform(file))
-
-      // only return files IF the file is within a baseFolder
-      if (!(await components.fs.fileExists(fullPath))) {
-        return next()
-      }
-
-      if (await components.fs.directoryExists(fullPath)) {
-        return { status: 404 }
-      }
-
-      const headers: Record<string, any> = {
-        'x-timestamp': Date.now(),
-        'x-sent': true,
-        'cache-control': 'no-cache,private,max-age=1'
-      }
-
-      if (fullPath.endsWith('.wasm')) {
-        headers['content-type'] = 'application/wasm'
-      }
-
-      return {
-        headers,
-        body: components.fs.createReadStream(fullPath)
-      }
-    })
-  }
-
-  createStaticRoutes(components, '/images/decentraland-connect/:path+', dclKernelImagesDecentralandConnect)
-  createStaticRoutes(components, '/default-profile/:path+', dclKernelDefaultProfilePath)
-  createStaticRoutes(components, '/@/explorer/:path+', dclExplorerJsonPath, (filePath) => filePath.replace(/.br+$/, ''))
-
-  router.get('/feature-flags/:file', async (ctx) => {
-    const res = await components.fetch.fetch(`https://feature-flags.decentraland.zone/${ctx.params.file}`, {
-      headers: {
-        connection: 'close'
-      }
-    })
-    return {
-      body: await res.arrayBuffer()
-    }
-  })
 }
 
 async function fakeEntityV3FromProject(
