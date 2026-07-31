@@ -32,7 +32,7 @@ export async function wireFileWatcherToWebSockets(
       ignoreInitial: false,
       cwd: projectRoot
     })
-    .on('unlink', (_: unknown, file: string) => {
+    .on('unlink', (file: string) => {
       removeModel(sceneId, file)
     })
     .on(
