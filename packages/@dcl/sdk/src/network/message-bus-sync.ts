@@ -39,7 +39,7 @@ export function addSyncTransport(
 ) {
   // Profile Info
   const myProfile: IProfile = {} as IProfile
-  fetchProfile(myProfile!, getUserData)
+  const profileReady = fetchProfile(myProfile!, getUserData)
 
   const isServerAtom = Atom<boolean>()
   const isRoomReadyAtom = Atom<boolean>(false)
@@ -183,12 +183,29 @@ export function addSyncTransport(
     }
   })
 
-  players.onEnterScene((player) => {
-    DEBUG_NETWORK_MESSAGES() && console.log('[onEnterScene]', player.userId)
-    if (!isServerAtom.getOrNull() && myProfile.userId === player.userId) {
-      requestState()
-    }
-  })
+  // Deferred until the local identity is known: this compares against `myProfile.userId`,
+  // which `fetchProfile` populates asynchronously, so subscribing at module load would miss
+  // the local player's arrival whenever the profile lost that race.
+  //
+  // `requireProfile: false` — bootstrapping state needs the local identity, not the avatar
+  // profile, which can replicate seconds later or never.
+  // `replayPresent: true` — the default, stated explicitly because this subscription is late
+  // by construction: the local player has usually arrived already, and without the replay the
+  // bootstrap would never fire. `requestState` is guarded by `requestingState`, so an extra
+  // call is a no-op.
+  void profileReady
+    .catch(() => undefined)
+    .then(() => {
+      players.onEnterScene(
+        (player) => {
+          DEBUG_NETWORK_MESSAGES() && console.log('[onEnterScene]', player.userId)
+          if (!isServerAtom.getOrNull() && myProfile.userId?.toLowerCase() === player.userId.toLowerCase()) {
+            requestState()
+          }
+        },
+        { requireProfile: false, replayPresent: true }
+      )
+    })
 
   // Asks for the REQ_CRDT_STATE when its connected to comms
   RealmInfo.onChange(engine.RootEntity, (value) => {
