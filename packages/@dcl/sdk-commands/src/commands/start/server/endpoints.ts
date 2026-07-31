@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { PreviewComponents } from '../types'
 import { fetchEntityByPointer } from '../../../logic/catalyst-requests'
 import { CliComponents } from '../../../components'
+import { resolvePathInside } from './path'
 import {
   b64HashingFunction,
   getProjectPublishableFilesWithHashes,
@@ -194,7 +195,9 @@ async function serveFolders(
 
       // find a project that we are talking about. NOTE: this filter is not exhaustive
       //   relative paths should be used instead
-      const baseProject = workspace.projects.find((project) => fullPath.startsWith(project.workingDirectory))
+      const baseProject = workspace.projects.find(
+        (project) => resolvePathInside(project.workingDirectory, fullPath) !== undefined
+      )
 
       // only return files IF the file is within a baseFolder
       if (!baseProject) {
@@ -473,7 +476,11 @@ function serveStatic(
   ) {
     router.get(route, async (ctx, next) => {
       const file = ctx.params.path
-      const fullPath = path.resolve(folder, transform(file))
+      const fullPath = resolvePathInside(folder, transform(file))
+
+      if (!fullPath) {
+        return next()
+      }
 
       // only return files IF the file is within a baseFolder
       if (!(await components.fs.fileExists(fullPath))) {

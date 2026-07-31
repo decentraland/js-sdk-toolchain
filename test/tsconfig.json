@@ -4,7 +4,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "pretty": true,
-    "types": ["jest", "@dcl/js-runtime"],
+    "types": ["jest", "node", "@dcl/js-runtime"],
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
