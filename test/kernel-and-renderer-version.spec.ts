@@ -27,14 +27,7 @@ describe('Check there is fixed version', () => {
 
   it('should @dcl/sdk has fixed version dependencies', async () => {
     const sdkDeps = checkDeps(SDK_PATH)
-    const requiredDependencies = [
-      '@dcl/sdk-commands',
-      '@dcl/ecs-math',
-      '@dcl/ecs',
-      '@dcl/js-runtime',
-      '@dcl/explorer',
-      '@dcl/react-ecs'
-    ]
+    const requiredDependencies = ['@dcl/sdk-commands', '@dcl/ecs-math', '@dcl/ecs', '@dcl/js-runtime', '@dcl/react-ecs']
 
     const dependencies = Object.keys(sdkDeps)
 
