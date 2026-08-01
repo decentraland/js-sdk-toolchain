@@ -26,6 +26,7 @@ TSC = node_modules/.bin/tsc
 ESLINT = node_modules/.bin/eslint
 SYNC_PACK = node_modules/.bin/syncpack
 JEST = node_modules/.bin/jest
+TSX = node_modules/.bin/tsx
 
 # this DEVELOPER_MODE is important to not send developer's events to the same segment
 # stream as the production ones. Look for it's usage on the analytics component
@@ -64,6 +65,14 @@ test-cli:
 
 test-file:
 	node_modules/.bin/jest --detectOpenHandles --colors --runTestsByPath $(FILE)
+
+benchmark-ecs:
+	@$(TSC) -p benchmarks/tsconfig.json
+	@NODE_OPTIONS=--expose-gc $(TSX) benchmarks/ecs/index.ts $(BENCHMARK_ARGS)
+
+benchmark-ecs-json:
+	@$(TSC) -p benchmarks/tsconfig.json
+	@NODE_OPTIONS=--expose-gc $(TSX) benchmarks/ecs/index.ts --json $(BENCHMARK_ARGS)
 
 init-test-scene:
 	git clone https://github.com/decentraland/sdk7-scene-template test-scene
@@ -113,7 +122,7 @@ deep-clean-and-snapshot:
 	make build
 	make update-snapshots
 
-.PHONY: build test install docs deep-clean-and-snapshot update-snapshots lint-packages
+.PHONY: build test benchmark-ecs benchmark-ecs-json install docs deep-clean-and-snapshot update-snapshots lint-packages
 
 deep-clean:
 	rm -rf node_modules/ \

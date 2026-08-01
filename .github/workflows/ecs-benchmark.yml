@@ -1,0 +1,158 @@
+# Runs the ECS benchmark comparison. Split out from ci.yml so it can be gated
+# with a paths filter: most pull requests do not touch the ECS engine, and the
+# job rebuilds two checkouts, so skipping it when nothing relevant changed saves
+# a lot of CI time. PRs that do not match the paths get no benchmark comment,
+# which is the intended behaviour.
+on:
+  push:
+    branches:
+      - main
+      - experimental
+    paths:
+      - 'packages/@dcl/ecs/**'
+      - 'benchmarks/**'
+      - '.github/workflows/ecs-benchmark.yml'
+  pull_request:
+    paths:
+      - 'packages/@dcl/ecs/**'
+      - 'benchmarks/**'
+      - '.github/workflows/ecs-benchmark.yml'
+
+name: ECS Benchmark
+jobs:
+  benchmark-ecs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: checkout head
+        uses: actions/checkout@master
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: head
+
+      - name: checkout base
+        uses: actions/checkout@master
+        with:
+          # Check out the base branch by name so every run — including manual
+          # re-runs after main has advanced — compares against the live tip of
+          # the branch being merged into, not a base SHA frozen at PR-event time.
+          ref: ${{ github.event.pull_request.base.ref || github.event.before }}
+          path: base
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 24.16.0
+          cache: 'npm'
+          cache-dependency-path: head/package-lock.json
+
+      # Resolve the base branch to a concrete commit so the cache key tracks the
+      # branch tip: keying on the branch name would keep serving a stale build
+      # after the base advances.
+      - name: resolve base commit
+        id: base-commit
+        run: echo "sha=$(git -C base rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      # The base is usually main's tip and identical across many pull requests.
+      # Codegen is deterministic for a given commit, so caching the generated
+      # sources by base SHA lets us skip the expensive `make build` on a hit. A
+      # missing path only fails loudly (module not found) on the next run — it
+      # can never produce stale benchmark numbers, because a different commit
+      # misses the cache.
+      - name: restore base build cache
+        id: base-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            base/packages/@dcl/ecs/src/components/generated
+            base/packages/@dcl/ecs/src/composite/proto/gen
+          key: ecs-benchmark-base-${{ runner.os }}-node24.16.0-${{ steps.base-commit.outputs.sha }}
+
+      - name: install head
+        working-directory: head
+        run: make install
+
+      - name: build head
+        working-directory: head
+        run: make build
+
+      - name: install base
+        working-directory: base
+        run: make install
+
+      - name: build base
+        if: steps.base-cache.outputs.cache-hit != 'true'
+        working-directory: base
+        run: make build
+
+      - name: use head benchmark definitions for base
+        run: |
+          mkdir -p base/benchmarks
+          cp -R head/benchmarks/. base/benchmarks/
+
+      - name: typecheck benchmarks
+        working-directory: head
+        run: node_modules/.bin/tsc -p benchmarks/tsconfig.json
+
+      # Base and head run alternately, one round at a time on the same runner,
+      # so slow drift (thermal throttling, a noisy neighbour) lands on both
+      # commits instead of only whichever ran second. --expose-gc lets the
+      # harness collect garbage before each timed iteration to cut variance.
+      # More, shorter rounds keep base and head close together in time so less
+      # drift builds up between them, and pooling ~25 samples per commit (of
+      # which the harness trims the slowest fifth) tightens the confidence
+      # interval on the change.
+      - name: run interleaved benchmark rounds
+        env:
+          NODE_OPTIONS: --expose-gc
+          ROUNDS: '5'
+          SAMPLES_PER_ROUND: '5'
+        run: |
+          for round in $(seq 1 "$ROUNDS"); do
+            echo "::group::benchmark round $round"
+            (cd base && ../head/node_modules/.bin/tsx benchmarks/ecs/index.ts --json --samples "$SAMPLES_PER_ROUND" --warmups 2 > "../ecs-benchmark-base-$round.json")
+            (cd head && ../head/node_modules/.bin/tsx benchmarks/ecs/index.ts --json --samples "$SAMPLES_PER_ROUND" --warmups 2 > "../ecs-benchmark-head-$round.json")
+            echo "::endgroup::"
+          done
+
+      - name: merge benchmark rounds
+        run: |
+          head/node_modules/.bin/tsx head/benchmarks/ecs/merge-reports.ts ecs-benchmark-base-*.json > ecs-benchmark-base.json
+          head/node_modules/.bin/tsx head/benchmarks/ecs/merge-reports.ts ecs-benchmark-head-*.json > ecs-benchmark-head.json
+
+      - name: render benchmark report
+        run: >-
+          head/node_modules/.bin/tsx head/benchmarks/ecs/format-markdown.ts
+          ecs-benchmark-head.json ecs-benchmark-base.json > ecs-benchmark.md
+
+      - name: add benchmark report to job summary
+        run: cat ecs-benchmark.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: ecs-benchmark-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            ecs-benchmark-base.json
+            ecs-benchmark-head.json
+            ecs-benchmark.md
+          retention-days: 30
+
+      - name: find benchmark comment
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+        uses: peter-evans/find-comment@v3
+        id: benchmark-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '<!-- ecs-benchmark-results -->'
+
+      - name: create or update benchmark comment
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          comment-id: ${{ steps.benchmark-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body-path: ecs-benchmark.md
+          edit-mode: replace

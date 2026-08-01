@@ -27,6 +27,7 @@
     "@dcl/eslint-config": "^1.0.6-20220629202434.commit-44f87f0",
     "@types/node": "^18.11.18",
     "syncpack": "^9.8.4",
+    "tsx": "4.23.1",
     "typedoc": "^0.23.28"
   },
   "engines": {
