@@ -7,6 +7,7 @@
     "sdk-commands": "./dist/index.js"
   },
   "dependencies": {
+    "@dcl/abgen-node": "^0.15.0",
     "@dcl/crypto": "^3.4.4",
     "@dcl/ecs": "file:../ecs",
     "@dcl/gltf-validator-ts": "1.0.14",
@@ -76,8 +77,5 @@
     "readmeFile": "./README.md",
     "displayName": "SDK",
     "tsconfig": "./tsconfig.json"
-  },
-  "optionalDependencies": {
-    "@dcl/abgen-node": "^0.15.0"
   }
 }

@@ -166,7 +166,13 @@ export async function setupAssetBundles(
   }
 }
 
-/** An optionalDependency: no prebuild for this platform must not fail the preview. */
+/**
+ * A plain dependency, so the module is always installed — but the native
+ * binary inside it is not. @dcl/abgen-node carries no os/cpu constraint and
+ * declares its five per-platform binaries as its own optionalDependencies, so
+ * on a platform with no prebuild (musl, win32-arm64) the package resolves and
+ * the require fails. That must degrade the preview, not end it.
+ */
 async function loadAbgen(components: Pick<CliComponents, 'logger'>): Promise<AbgenModule | undefined> {
   try {
     // Through a variable so the build does not require the addon present.
@@ -174,7 +180,8 @@ async function loadAbgen(components: Pick<CliComponents, 'logger'>): Promise<Abg
     return (await import(specifier)) as unknown as AbgenModule
   } catch (error: any) {
     components.logger.warn(
-      `asset-bundles: @dcl/abgen-node is not available (${error.message}); install it to serve asset bundles in preview, or run without --asset-bundles.`
+      `asset-bundles: no @dcl/abgen-node binary for ${process.platform}-${process.arch} (${error.message}); ` +
+        'previewing with raw GLTFs. Run without --asset-bundles to silence this.'
     )
     return undefined
   }
