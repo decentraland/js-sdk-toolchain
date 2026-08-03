@@ -142,14 +142,20 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
 
     if (!canvasInfo) return
 
-    const { width, height, devicePixelRatio } = canvasInfo
+    const { width, height } = canvasInfo
     const { virtualWidth, virtualHeight } = activeVirtualSize
     if (!virtualWidth || !virtualHeight) return
 
-    // Normalize by devicePixelRatio so virtual px map to logical px (matching the
-    // vw/vh path); without it the scale was inflated on high-dpr mobile screens.
-    const ratio = devicePixelRatio || 1
-    const nextScale = Math.min(width / virtualWidth, height / virtualHeight) / ratio
+    // The scale factor is the contain-fit of the design resolution inside the canvas,
+    // and nothing else.
+    //
+    // devicePixelRatio is deliberately absent. It is a density hint — "how many physical
+    // pixels per canvas unit", for picking a 1x/2x/3x asset — not a layout unit, the same
+    // role it has in CSS and React Native, where it is exposed but never enters layout.
+    // Dividing by it made UI size inversely proportional to a quantity the scene author
+    // does not control and that measures something different on every renderer: panel
+    // density on mobile, OS display scaling on web, display/window on native desktop.
+    const nextScale = Math.min(width / virtualWidth, height / virtualHeight)
     if (Number.isFinite(nextScale) && nextScale !== getUiScaleFactor()) {
       // Track ownership when updating to avoid cross-system conflicts.
       setUiScaleFactor(nextScale, uiScaleFactorOwner)
