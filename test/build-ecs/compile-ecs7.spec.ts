@@ -42,9 +42,13 @@ describe('build: scene with etherum', () => {
     const binPath = ensureFileExists('bin/game.js', cwd)
     const fileText = readFileSync(binPath, 'utf8')
 
+    const polyfillIncluded = fileText.includes('polyfillTextEncoder')
+    if (!polyfillIncluded) {
+      throw new Error(`scene doesn't include the TextEncoder/TextDecoder polyfill`)
+    }
     const textEncodingLibraryIncluded = fileText.includes('text-encoding')
-    if (!textEncodingLibraryIncluded) {
-      throw new Error(`scene doesn't include textEncoding`)
+    if (textEncodingLibraryIncluded) {
+      throw new Error('textEncoding is being bundled in the scene.')
     }
   })
 })
