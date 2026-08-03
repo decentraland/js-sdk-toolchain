@@ -15,6 +15,7 @@ import { pointerEventColliderChecker } from '../../systems/pointer-event-collide
 import { createTriggerAreaEventsSystem, TriggerAreaEventsSystem } from '../../systems/triggerArea'
 import { createTimers, Timers } from '../helpers/timers'
 import { setGlobalPolyfill } from '../globals'
+import { createPhysicsSystem, PhysicsSystem } from '../../systems/physics'
 
 /**
  * @public
@@ -94,6 +95,13 @@ setGlobalPolyfill('setTimeout', timers.setTimeout)
 setGlobalPolyfill('clearTimeout', timers.clearTimeout)
 setGlobalPolyfill('setInterval', timers.setInterval)
 setGlobalPolyfill('clearInterval', timers.clearInterval)
+
+/**
+ * @public
+ * Physics helpers for applying impulses and forces to the player.
+ */
+export const Physics: PhysicsSystem = /* @__PURE__ */ createPhysicsSystem(engine)
+export { PhysicsSystem }
 
 /**
  * Adds pointer event collider system only in DEV env

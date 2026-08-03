@@ -5,11 +5,12 @@ import {
   PointerEventsSystem,
   PBUiInputResult,
   PBUiDropdownResult,
-  EventSystemCallback
+  EventSystemCallback,
+  PointerEventType
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import Reconciler, { HostConfig } from 'react-reconciler'
-import { isListener, Listeners } from '../components'
+import { Callback, isListener, Listeners } from '../components'
 import { CANVAS_ROOT_ENTITY } from '../components/uiTransform'
 import { ReactEcs } from '../react-ecs'
 import {
@@ -57,6 +58,10 @@ export function createReconciler(
   const entities = new Set<Entity>()
   // Store the onChange callbacks to be runned every time a Result has changed
   const changeEvents = new Map<Entity, Map<number, OnChangeState | undefined>>()
+  const clickEvents = new Map<Entity, Map<PointerEventType, Callback>>()
+  // Track the last value reported by the renderer for each input entity,
+  // so we can avoid echoing it back and causing keystroke drops.
+  const lastInputResultValues = new Map<Entity, string | undefined>()
   // Initialize components
   const UiTransform = components.UiTransform(engine)
   const UiText = components.UiText(engine)
@@ -201,6 +206,18 @@ export function createReconciler(
       delete (props as any).onSubmit
     }
 
+    // Prevent keystroke drops: when React echoes back the same value the renderer
+    // reported, strip it from the props so the component isn't marked dirty for it.
+    // This avoids sending a stale value that overwrites what the user is currently typing.
+    if (
+      componentName === 'uiInput' &&
+      'value' in props &&
+      lastInputResultValues.has(instance.entity) &&
+      (props as any).value === lastInputResultValues.get(instance.entity)
+    ) {
+      delete (props as any).value
+    }
+
     // We check if there is any key pending to be changed to avoid updating the existing component
     if (!Object.keys(props).length) {
       return
@@ -217,6 +234,8 @@ export function createReconciler(
 
   function removeChildEntity(instance: Instance) {
     changeEvents.delete(instance.entity)
+    clickEvents.delete(instance.entity)
+    lastInputResultValues.delete(instance.entity)
     engine.removeEntity(instance.entity)
     for (const child of instance._child) {
       removeChildEntity(child)
@@ -235,11 +254,15 @@ export function createReconciler(
       const rightOfChild = parent._child.find((c) => c.rightOf === child.entity)
       if (rightOfChild) {
         rightOfChild.rightOf = child.rightOf
-        // Re-order parent._child array
-        parent._child = parent._child.filter((c) => c.entity !== child.entity)
-        parent._child.push(child)
         updateTree(rightOfChild, { rightOf: rightOfChild.rightOf })
       }
+      // Always remove from old position and push to end for reorders.
+      // Previously, filter/push was inside the if(rightOfChild) block, so when
+      // rightOfChild was not found (child was last), the child stayed at its old
+      // position. This caused _child[length-2] to potentially be the child itself,
+      // producing a self-referencing rightOf.
+      parent._child = parent._child.filter((c) => c.entity !== child.entity)
+      parent._child.push(child)
       // Its a re-order. We are the last element, so we need to fetch the element before us.
       child.rightOf = parent._child[parent._child.length - 2]?.entity
     } else {
@@ -254,15 +277,17 @@ export function createReconciler(
   function removeChild(parentInstance: Instance, child: Instance): void {
     const childIndex = parentInstance._child.findIndex((c) => c.entity === child.entity)
 
-    const childToModify = parentInstance._child[childIndex + 1]
+    if (childIndex !== -1) {
+      const childToModify = parentInstance._child[childIndex + 1]
 
-    if (childToModify) {
-      childToModify.rightOf = child.rightOf
-      updateTree(childToModify, { rightOf: child.rightOf })
+      if (childToModify) {
+        childToModify.rightOf = child.rightOf
+        updateTree(childToModify, { rightOf: child.rightOf })
+      }
+
+      parentInstance._child.splice(childIndex, 1)
     }
 
-    // Mutate 💀
-    parentInstance._child.splice(childIndex, 1)
     removeChildEntity(child)
   }
 
@@ -277,6 +302,9 @@ export function createReconciler(
       const resultComponentId =
         componentId === UiDropdown.componentId ? UiDropdownResult.componentId : UiInputResult.componentId
       engine.getComponent<PBUiInputResult | PBUiDropdownResult>(resultComponentId).onChange(entity, (value) => {
+        if (resultComponentId === UiInputResult.componentId) {
+          lastInputResultValues.set(entity, value?.value as string | undefined)
+        }
         if ((value as PBUiInputResult)?.isSubmit) {
           const onSubmit = changeEvents.get(entity)?.get(componentId)?.onSubmitCallback
           onSubmit && onSubmit(value?.value)
@@ -381,6 +409,24 @@ export function createReconciler(
       }
     },
     insertBefore(parentInstance: Instance, child: Instance, beforeChild: Instance): void {
+      // Handle reorder: if child already exists in this parent, remove it from its old position
+      // and fix up the old neighbor's rightOf before inserting at the new position.
+      const existingIndex = parentInstance._child.findIndex((c) => c.entity === child.entity)
+      if (existingIndex !== -1) {
+        // If beforeChild.rightOf already points to child, child is already in the correct
+        // position in the rightOf chain. Setting child.rightOf = beforeChild.rightOf would
+        // produce a self-cycle (child.rightOf = child.entity).
+        if (beforeChild.rightOf === child.entity) {
+          return
+        }
+        const oldNextSibling = parentInstance._child[existingIndex + 1]
+        if (oldNextSibling) {
+          oldNextSibling.rightOf = child.rightOf
+          updateTree(oldNextSibling, { rightOf: oldNextSibling.rightOf })
+        }
+        parentInstance._child.splice(existingIndex, 1)
+      }
+
       const beforeChildIndex = parentInstance._child.findIndex((c) => c.entity === beforeChild.entity)
       parentInstance._child = [
         ...parentInstance._child.slice(0, beforeChildIndex),

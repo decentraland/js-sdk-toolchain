@@ -7,7 +7,8 @@ import {
   InputAction,
   PBPointerEvents_Entry,
   PointerEvents,
-  PointerEventType
+  PointerEventType,
+  InteractionType
 } from '@dcl/sdk/ecs'
 
 // Cube factory
@@ -29,8 +30,10 @@ createCube(15, 1, 15, [
       button: InputAction.IA_PRIMARY,
       hoverText: 'PrimaryDown',
       maxDistance: 5,
-      showFeedback: true
-    }
+      showFeedback: true,
+      priority: 0
+    },
+    interactionType: InteractionType.CURSOR
   }
 ])
 
@@ -41,9 +44,11 @@ createCube(13, 1, 15, [
       button: InputAction.IA_SECONDARY,
       hoverText: 'Secondary Up',
       maxDistance: 5,
-      showFeedback: true
+      showFeedback: true,
+      priority: 0
+    },
+    interactionType: InteractionType.CURSOR
     }
-  }
 ])
 
 createCube(11, 1, 15, [
@@ -53,7 +58,9 @@ createCube(11, 1, 15, [
       button: InputAction.IA_ANY,
       hoverText: 'Infinity Hover',
       maxDistance: 10000000,
-      showFeedback: true
-    }
+      showFeedback: true,
+      priority: 0
+    },
+    interactionType: InteractionType.PROXIMITY
   }
 ])

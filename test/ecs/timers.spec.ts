@@ -304,7 +304,7 @@ describe('Timer helpers', () => {
       expect(called).toBe(true)
     })
 
-    it('should handle callback that schedules another timer', async () => {
+    it('a timer scheduled inside a callback is measured from when it was armed', async () => {
       const engine = Engine()
       const timers = createTimers(engine)
       const order: number[] = []
@@ -316,8 +316,84 @@ describe('Timer helpers', () => {
         }, 100)
       }, 100)
 
-      await engine.update(0.1) // Both callbacks fire in the same frame
+      // Outer fires at 100ms; the inner is armed at that instant and asks for
+      // 100ms more, so it must NOT fire in the same frame.
+      await engine.update(0.1)
+      expect(order).toEqual([1])
+
+      // It fires on the next frame, ~100ms after it was armed.
+      await engine.update(0.1)
       expect(order).toEqual([1, 2])
+    })
+
+    it('does not lock up when a setTimeout re-arms itself under a large dt', async () => {
+      const engine = Engine()
+      const timers = createTimers(engine)
+      let count = 0
+      const rearm = () => {
+        count++
+        timers.setTimeout(rearm, 1000) // re-arm every 1s
+      }
+      timers.setTimeout(rearm, 1000)
+
+      // 10s in a single frame: the chain must catch up a bounded, correct number
+      // of times (10) and return — not loop forever.
+      await engine.update(10)
+      expect(count).toBe(10)
+    })
+
+    it('a re-arming setTimeout catches up at the requested rate, like setInterval', async () => {
+      const engine = Engine()
+      const timers = createTimers(engine)
+      let rearmCount = 0
+      let intervalCount = 0
+
+      const rearm = () => {
+        rearmCount++
+        timers.setTimeout(rearm, 250)
+      }
+      timers.setTimeout(rearm, 250)
+      timers.setInterval(() => intervalCount++, 250)
+
+      // Uneven frames (100ms) vs a 250ms period exercises the residual carry; a
+      // re-arming setTimeout should stay in lock-step with setInterval.
+      for (let i = 0; i < 30; i++) {
+        await engine.update(0.1)
+        expect(rearmCount).toBe(intervalCount)
+      }
+    })
+
+    it('a finite chain of zero-delay timers runs within the same frame', async () => {
+      const engine = Engine()
+      const timers = createTimers(engine)
+      const order: number[] = []
+
+      // A common pattern: each callback schedules the next step with a 0ms delay,
+      // expecting them to run promptly in sequence within the frame (not one per
+      // frame). A finite chain of distinct timers terminates the same frame.
+      timers.setTimeout(() => {
+        order.push(1)
+        timers.setTimeout(() => {
+          order.push(2)
+          timers.setTimeout(() => order.push(3), 0)
+        }, 0)
+      }, 0)
+
+      await engine.update(0.016)
+      expect(order).toEqual([1, 2, 3])
+    })
+
+    it('a top-level setTimeout(0) still fires on the next frame', async () => {
+      const engine = Engine()
+      const timers = createTimers(engine)
+      let called = false
+      timers.setTimeout(() => {
+        called = true
+      }, 0)
+
+      expect(called).toBe(false)
+      await engine.update(0.016)
+      expect(called).toBe(true)
     })
 
     it('should handle interval that clears itself', async () => {

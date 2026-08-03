@@ -1,6 +1,7 @@
 // The order of the following imports matters. Please do not auto-sort
 export * from './engine'
 export * from './schemas'
+export * from './runtime/globals'
 export * from './runtime/initialization'
 export * from './runtime/types'
 export * from './runtime/helpers'
@@ -14,6 +15,7 @@ export * from './systems/assetLoad'
 export * from './systems/async-task'
 export * from './systems/tween'
 export * from './systems/triggerArea'
+export * from './systems/physics'
 export * from './engine/entity'
 export * from './components/types'
 
@@ -38,7 +40,8 @@ import {
   VirtualCameraComponentDefinitionExtended,
   InputModifierComponentDefinitionExtended,
   LightSourceComponentDefinitionExtended,
-  TriggerAreaComponentDefinitionExtended
+  TriggerAreaComponentDefinitionExtended,
+  ParticleSystemComponentDefinitionExtended
 } from './components/types'
 import { NameComponent } from './components/manual/Name'
 import { AvatarEquippedDataComponentDefinitionExtended } from './components/extended/AvatarEquippedData'
@@ -60,6 +63,8 @@ export const VirtualCamera: VirtualCameraComponentDefinitionExtended = /* @__PUR
 export const InputModifier: InputModifierComponentDefinitionExtended = /* @__PURE__*/ components.InputModifier(engine)
 export const LightSource: LightSourceComponentDefinitionExtended = /* @__PURE__*/ components.LightSource(engine)
 export const TriggerArea: TriggerAreaComponentDefinitionExtended = /* @__PURE__*/ components.TriggerArea(engine)
+export const ParticleSystem: ParticleSystemComponentDefinitionExtended =
+  /* @__PURE__*/ components.ParticleSystem(engine)
 
 /**
  * @alpha

@@ -4,6 +4,7 @@ import {
   EasingFunction,
   Move,
   MoveContinuous,
+  MoveRotateScale,
   PBTween,
   Rotate,
   RotateContinuous,
@@ -13,6 +14,63 @@ import {
   TextureMovementType,
   Tween
 } from '../generated/index.gen'
+
+/**
+ * @public
+ * Partial params for Tween.Mode.MoveRotateScale(). At least one of position, rotation, or scale must be provided.
+ * Use this when building a mode for Tween.createOrReplace() or TweenSequence (e.g. only positionStart/positionEnd).
+ */
+export interface MoveRotateScaleModeParams {
+  /** Position tween (start → end). Optional. */
+  position?: { start: Vector3; end: Vector3 }
+  /** Rotation tween (start → end). Optional. */
+  rotation?: { start: Quaternion; end: Quaternion }
+  /** Scale tween (start → end). Optional. */
+  scale?: { start: Vector3; end: Vector3 }
+}
+
+/**
+ * @public
+ * Parameters for setMoveRotateScale. At least one of position, rotation, or scale must be provided.
+ */
+export interface SetMoveRotateScaleParams extends MoveRotateScaleModeParams {
+  /** Duration of the tween in milliseconds. */
+  duration: number
+  /** Easing function (defaults to EF_LINEAR). */
+  easingFunction?: EasingFunction
+}
+
+function assertDuration(duration: number, apiName: string): void {
+  if (!Number.isFinite(duration) || duration < 0) {
+    throw new Error(`${apiName}: duration must be a non-negative finite number`)
+  }
+}
+
+/** Shared validation for params that have optional position/rotation/scale with start & end. */
+function assertMoveRotateScaleAxesStartEnd(params: MoveRotateScaleModeParams, apiName: string): void {
+  if (!params.position && !params.rotation && !params.scale) {
+    throw new Error(`${apiName}: at least one of position, rotation, or scale must be provided`)
+  }
+
+  if (params.position) {
+    const pos = params.position!
+    if (!pos.start || !pos.end) {
+      throw new Error(`${apiName}: position must have both start and end`)
+    }
+  }
+  if (params.rotation) {
+    const rot = params.rotation!
+    if (!rot.start || !rot.end) {
+      throw new Error(`${apiName}: rotation must have both start and end`)
+    }
+  }
+  if (params.scale) {
+    const scl = params.scale!
+    if (!scl.start || !scl.end) {
+      throw new Error(`${apiName}: scale must have both start and end`)
+    }
+  }
+}
 
 /**
  * @public
@@ -46,6 +104,11 @@ export interface TweenHelper {
    * @returns a texture-move-continuous mode tween
    */
   TextureMoveContinuous: (textureMove: TextureMoveContinuous) => PBTween['mode']
+  /**
+   * @returns a move-rotate-scale mode tween
+   * @param params - partial transform (at least one of position, rotation, scale); omit axes you don't need
+   */
+  MoveRotateScale: (params: MoveRotateScaleModeParams) => PBTween['mode']
 }
 
 /**
@@ -53,7 +116,7 @@ export interface TweenHelper {
  */
 export interface TweenComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBTween> {
   /**
-   * Texture helpers with constructor
+   * Helpers with constructor
    */
   Mode: TweenHelper
 
@@ -152,6 +215,17 @@ export interface TweenComponentDefinitionExtended extends LastWriteWinElementSet
     movementType?: TextureMovementType,
     duration?: number
   ): void
+
+  /**
+   * @public
+   *
+   * Creates or replaces a move-rotate-scale tween component that simultaneously animates
+   * an entity's position, rotation, and/or scale from start to end. Provide only the
+   * properties you need (at least one of position, rotation, or scale).
+   * @param entity - entity to apply the tween to
+   * @param params - object with optional position, rotation, scale (each with start/end), duration, and optional easingFunction
+   */
+  setMoveRotateScale(entity: Entity, params: SetMoveRotateScaleParams): void
 }
 
 const TweenHelper: TweenHelper = {
@@ -195,6 +269,21 @@ const TweenHelper: TweenHelper = {
     return {
       $case: 'textureMoveContinuous',
       textureMoveContinuous
+    }
+  },
+  MoveRotateScale(params) {
+    assertMoveRotateScaleAxesStartEnd(params, 'Tween.Mode.MoveRotateScale')
+    const moveRotateScale: MoveRotateScale = {
+      positionStart: params.position ? params.position.start : undefined,
+      positionEnd: params.position ? params.position.end : undefined,
+      rotationStart: params.rotation ? params.rotation.start : undefined,
+      rotationEnd: params.rotation ? params.rotation.end : undefined,
+      scaleStart: params.scale ? params.scale.start : undefined,
+      scaleEnd: params.scale ? params.scale!.end : undefined
+    }
+    return {
+      $case: 'moveRotateScale',
+      moveRotateScale
     }
   }
 }
@@ -335,6 +424,28 @@ export function defineTweenComponent(
         },
         duration,
         easingFunction: EasingFunction.EF_LINEAR,
+        playing: true
+      })
+    },
+    setMoveRotateScale(entity: Entity, params: SetMoveRotateScaleParams) {
+      assertMoveRotateScaleAxesStartEnd(params, 'setMoveRotateScale')
+      assertDuration(params.duration, 'setMoveRotateScale')
+      const { position, rotation, scale, duration, easingFunction = EasingFunction.EF_LINEAR } = params
+      const moveRotateScale: MoveRotateScale = {
+        positionStart: position ? position.start : undefined,
+        positionEnd: position ? position.end : undefined,
+        rotationStart: rotation ? rotation.start : undefined,
+        rotationEnd: rotation ? rotation.end : undefined,
+        scaleStart: scale ? scale.start : undefined,
+        scaleEnd: scale ? scale.end : undefined
+      }
+      theComponent.createOrReplace(entity, {
+        mode: {
+          $case: 'moveRotateScale',
+          moveRotateScale
+        },
+        duration,
+        easingFunction,
         playing: true
       })
     }

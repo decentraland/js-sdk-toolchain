@@ -67,7 +67,11 @@ export const args = declareArgs({
   '--skip-auth-screen': Boolean,
   '--landscape-terrain-enabled': Boolean,
   '-n': Boolean,
-  '--bevy-web': Boolean
+  '--bevy-web': Boolean,
+  '--multi-instance': Boolean,
+  '--no-client': Boolean,
+  '--mcp': Boolean,
+  '--mcp-port': Number
 })
 
 export async function help(options: Options) {
@@ -93,8 +97,19 @@ export async function help(options: Options) {
       --skip-auth-screen                Skip the auth screen (accepts 'true' or 'false').
       --landscape-terrain-enabled       Enable landscape terrain.
       -n                                Open a new instance of the Client even if one is already running.
-      --bevy-web                        Opens preview using the Bevy Web browser window (default=true)
-      --mobile, -m                      Show QR code for mobile preview on the same network (default=true)
+      --bevy-web                        Opens preview using the Bevy Web browser window (default=true on this branch).
+      --mobile                          Show QR code for mobile preview on the same network.
+      --multi-instance                  Allow running multiple Explorer instances simultaneously.
+      --no-client                       Suppress every auto-launch (desktop Explorer deeplink, browser open, mobile QR). The file watcher still notifies a desktop Explorer if it connects on its own — useful when an external tool owns the Explorer process.
+      --mcp                             Enable the MCP server in the Explorer (forwarded as a deep link parameter).
+      --mcp-port                        Port for the MCP server in the Explorer (forwarded as a deep link parameter).
+
+    Any argument placed after a standalone \`--\` is not parsed by the CLI and is forwarded verbatim
+    into the Explorer deep link as a query parameter. Supported forms: --key=value, --key value,
+    and bare --key (forwarded as key=true). Declared flags above take precedence over forwarded params.
+
+      $ sdk-commands start -- --paramA --paramX valueX
+      $ npm run start -- -- --paramA --paramX valueX      (npm consumes the first --)
 
 
     Examples:
@@ -120,9 +135,10 @@ export async function main(options: Options) {
   const withDataLayer = options.args['--data-layer']
   const enableWeb3 = options.args['--web3']
   const isHub = !!options.args['--hub']
-  // Default to true if not specified (undefined), false only if explicitly set to false
+  const skipClient = !!options.args['--no-client']
+  // protocol-squad: the bevy-web preview stays this branch's default
   const bevyWeb = (options.args['--bevy-web'] ?? true) && !isCi
-  const isMobile = (options.args['--mobile'] ?? true) && !isCi
+  const isMobile = !!options.args['--mobile']
   const explorerAlpha = !options.args['--web-explorer'] && !bevyWeb
 
   let hasSmartWearable = false
@@ -272,14 +288,13 @@ export async function main(options: Options) {
       }
       components.logger.log('\nPress CTRL+C to exit\n')
 
-      // Open preferably localhost/127.0.0.1
-      if (explorerAlpha && !isMobile) {
+      if (explorerAlpha && !isMobile && !skipClient) {
         const realm = new URL(sortedURLs[0].url).origin
         await runExplorerAlpha(components, { cwd: workingDirectory, realm, baseCoords, isHub, args: options.args })
       }
 
-      if (isMobile && lanUrl) {
-        const deepLink = `decentraland://open?preview=${lanUrl}&position=${baseCoords.x}%2C${baseCoords.y}`
+      if (isMobile && !skipClient && lanUrl) {
+        const deepLink = `decentraland://open?preview=${lanUrl}&position=${baseCoords.x},${baseCoords.y}`
         QRCode.toString(deepLink, { type: 'terminal', small: true }, (err, qr) => {
           if (!err) {
             components.logger.log(colors.bold('\nScan to preview on mobile: \n'))
@@ -290,7 +305,7 @@ export async function main(options: Options) {
       }
 
       // Open preferably localhost/127.0.0.1
-      if ((!explorerAlpha || bevyWeb) && openBrowser && sortedURLs.length) {
+      if ((!explorerAlpha || bevyWeb) && openBrowser && !skipClient && sortedURLs.length) {
         try {
           const url = bevyWeb ? bevyUrl : sortedURLs[0].url
           await open(url)

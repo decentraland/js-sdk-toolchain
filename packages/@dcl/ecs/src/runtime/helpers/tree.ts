@@ -43,11 +43,11 @@ function multiplyQuaternions(q1: QuaternionType, q2: QuaternionType): Quaternion
 }
 
 /**
- * @internal
+ * @public
  * Rotate a vector by a quaternion
  * Uses the formula: v' = q * v * q^(-1), optimized version
  */
-function rotateVectorByQuaternion(v: Vector3Type, q: QuaternionType): Vector3Type {
+export function rotateVectorByQuaternion(v: Vector3Type, q: QuaternionType): Vector3Type {
   // Extract quaternion components
   const qx = q.x,
     qy = q.y,

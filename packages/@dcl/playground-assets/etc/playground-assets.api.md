@@ -70,6 +70,31 @@ export const assetLoadLoadingStateSystem: AssetLoadLoadingStateSystem;
 // @public (undocumented)
 export type AssetLoadLoadingStateSystemCallback = (event: DeepReadonlyObject<PBAssetLoadLoadingState>) => void;
 
+// Warning: (ae-missing-release-tag) "AudioAnalysis" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const AudioAnalysis: AudioAnalysisComponentDefinitionExtended;
+
+// Warning: (ae-missing-release-tag) "AudioAnalysisComponentDefinitionExtended" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export interface AudioAnalysisComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBAudioAnalysis> {
+    createAudioAnalysis(entity: Entity, mode?: PBAudioAnalysisMode, // default is PBAudioAnalysisMode.MODE_LOGARITHMIC
+    amplitudeGain?: number, bandsGain?: number): void;
+    createOrReplaceAudioAnalysis(entity: Entity, mode?: PBAudioAnalysisMode, // default is PBAudioAnalysisMode.MODE_LOGARITHMIC
+    amplitudeGain?: number, bandsGain?: number): void;
+    readIntoView(entity: Entity, out: AudioAnalysisView): void;
+    tryReadIntoView(entity: Entity, out: AudioAnalysisView): boolean;
+}
+
+// Warning: (ae-missing-release-tag) "AudioAnalysisView" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public
+export type AudioAnalysisView = {
+    amplitude: number;
+    bands: number[];
+};
+
 // @public (undocumented)
 export const AudioEvent: GrowOnlyValueSetComponentDefinition<PBAudioEvent>;
 
@@ -170,17 +195,13 @@ export const AvatarEmoteCommand: GrowOnlyValueSetComponentDefinition<PBAvatarEmo
 export const AvatarEquippedData: LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>;
 
 // @public (undocumented)
-export type AvatarEquippedDataComponentDefinitionExtended = LastWriteWinElementSetComponentDefinition<AvatarEquippedDataType>;
-
-// Warning: (ae-missing-release-tag) "AvatarEquippedDataType" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public (undocumented)
-export type AvatarEquippedDataType = Omit<PBAvatarEquippedData, 'forceRender'> & {
-    forceRender?: string[] | undefined;
-};
-
-// @public (undocumented)
 export const AvatarLocomotionSettings: LastWriteWinElementSetComponentDefinition<PBAvatarLocomotionSettings>;
+
+// @public (undocumented)
+export const enum AvatarMask {
+    // (undocumented)
+    AM_UPPER_BODY = 0
+}
 
 // @public (undocumented)
 export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>;
@@ -188,7 +209,8 @@ export const AvatarModifierArea: LastWriteWinElementSetComponentDefinition<PBAva
 // @public (undocumented)
 export const enum AvatarModifierType {
     AMT_DISABLE_PASSPORTS = 1,
-    AMT_HIDE_AVATARS = 0
+    AMT_HIDE_AVATARS = 0,
+    AMT_HIDE_NAMETAGS = 2
 }
 
 // @public (undocumented)
@@ -532,12 +554,11 @@ export const enum ColliderLayer {
     CL_CUSTOM7 = 16384,
     // (undocumented)
     CL_CUSTOM8 = 32768,
+    CL_MAIN_PLAYER = 8,
     CL_NONE = 0,
     CL_PHYSICS = 2,
     CL_PLAYER = 4,
     CL_POINTER = 1,
-    // (undocumented)
-    CL_RESERVED2 = 8,
     // (undocumented)
     CL_RESERVED3 = 16,
     // (undocumented)
@@ -698,6 +719,22 @@ export type Color4Type = {
 };
 
 // @public (undocumented)
+export interface ColorRange {
+    // (undocumented)
+    end: PBColor4 | undefined;
+    // (undocumented)
+    start: PBColor4 | undefined;
+}
+
+// @public (undocumented)
+export namespace ColorRange {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): ColorRange;
+    // (undocumented)
+    export function encode(message: ColorRange, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface ComponentData {
     // (undocumented)
     data?: {
@@ -731,6 +768,7 @@ export const componentDefinitionByName: {
     "core::Animator": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAnimator>>;
     "core::AssetLoad": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAssetLoad>>;
     "core::AssetLoadLoadingState": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAssetLoadLoadingState>>;
+    "core::AudioAnalysis": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioAnalysis>>;
     "core::AudioEvent": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBAudioEvent>>;
     "core::AudioSource": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioSource>>;
     "core::AudioStream": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAudioStream>>;
@@ -762,6 +800,9 @@ export const componentDefinitionByName: {
     "core::MeshCollider": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshCollider>>;
     "core::MeshRenderer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBMeshRenderer>>;
     "core::NftShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBNftShape>>;
+    "core::ParticleSystem": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBParticleSystem>>;
+    "core::PhysicsCombinedForce": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedForce>>;
+    "core::PhysicsCombinedImpulse": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedImpulse>>;
     "core::PlayerIdentityData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>>;
     "core::PointerEvents": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerEvents>>;
     "core::PointerEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBPointerEventsResult>>;
@@ -772,7 +813,7 @@ export const componentDefinitionByName: {
     "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
     "core::SkyboxTime": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSkyboxTime>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
-    "core::TextureCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextureCamera>>;
+    "core::TouchScreenControls": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTouchScreenControls>>;
     "core::TriggerArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTriggerArea>>;
     "core::TriggerAreaResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBTriggerAreaResult>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
@@ -784,6 +825,7 @@ export const componentDefinitionByName: {
     "core::UiDropdown": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdown>>;
     "core::UiDropdownResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdownResult>>;
     "core::UiInput": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInput>>;
+    "core::UiInputBinding": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInputBinding>>;
     "core::UiInputResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInputResult>>;
     "core::UiScrollResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiScrollResult>>;
     "core::UiText": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiText>>;
@@ -813,7 +855,7 @@ export namespace Composite {
     export function fromBinary(buffer: Uint8Array): Composite.Definition;
     // (undocumented)
     export function fromJson(object: any): Composite.Definition;
-    export function instance(engine: IEngine, compositeData: Composite.Resource, compositeProvider: CompositeProvider, options?: InstanceCompositeOptions): void;
+    export function instance(engine: IEngine, compositeData: Composite.Resource, compositeProvider: CompositeProvider, options?: InstanceCompositeOptions): Entity;
     // (undocumented)
     export type Provider = CompositeProvider;
     export function resolveAndNormalizePath(src: string, cwd?: string): string;
@@ -890,6 +932,11 @@ export namespace CompositeDefinition {
 // @public (undocumented)
 export type CompositeProvider = {
     getCompositeOrNull(src: string): CompositeResource | null;
+    loadComposite?: (src: string) => Promise<CompositeResource>;
+    schemas?: Iterable<{
+        name: string;
+        jsonSchema: any;
+    }>;
 };
 
 // @public (undocumented)
@@ -1285,6 +1332,7 @@ export type EventSystemOptions = {
     showFeedback?: boolean;
     showHighlight?: boolean;
     maxPlayerDistance?: number;
+    priority?: number;
 };
 
 // @public (undocumented)
@@ -1337,6 +1385,22 @@ export type FlexWrapType = 'wrap' | 'nowrap' | 'wrap-reverse';
 export type FloatArray = number[];
 
 // @public (undocumented)
+export interface FloatRange {
+    // (undocumented)
+    end: number;
+    // (undocumented)
+    start: number;
+}
+
+// @public (undocumented)
+export namespace FloatRange {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): FloatRange;
+    // (undocumented)
+    export function encode(message: FloatRange, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export const enum Font {
     // (undocumented)
     F_MONOSPACE = 2,
@@ -1350,6 +1414,9 @@ export const enum Font {
 export function getComponentEntityTree<T>(engine: Pick<IEngine, 'getEntitiesWith'>, entity: Entity, component: ComponentDefinition<T & {
     parent?: Entity;
 }>): Generator<Entity>;
+
+// @public
+export function getCompositeProvider(): CompositeProvider | null;
 
 // @public @deprecated (undocumented)
 export function getCompositeRootComponent(engine: IEngine): LastWriteWinElementSetComponentDefinition<CompositeRootType>;
@@ -1632,6 +1699,7 @@ export const enum InputAction {
     IA_JUMP = 8,
     // (undocumented)
     IA_LEFT = 7,
+    IA_MODIFIER = 14,
     // (undocumented)
     IA_POINTER = 0,
     // (undocumented)
@@ -1675,6 +1743,19 @@ export type InstanceCompositeOptions = {
     rootEntity?: Entity;
     alreadyRequestedSrc?: Set<string>;
 };
+
+// Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
+//
+// @public
+export function InteractableArea(props: UiInteractableAreaProps): ReactEcs.JSX.Element;
+
+// @public (undocumented)
+export const enum InteractionType {
+    // (undocumented)
+    CURSOR = 0,
+    // (undocumented)
+    PROXIMITY = 1
+}
 
 // @public (undocumented)
 export interface ISchema<T = any> {
@@ -1749,6 +1830,13 @@ export type JustifyType = 'flex-start' | 'center' | 'flex-end' | 'space-between'
 
 // @public
 export type Key = number | string;
+
+// @public
+export enum KnockbackFalloff {
+    CONSTANT = 0,
+    INVERSE_SQUARE = 2,
+    LINEAR = 1
+}
 
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
 // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
@@ -2114,19 +2202,45 @@ export namespace MoveContinuous {
     export function encode(message: MoveContinuous, writer?: _m0.Writer): _m0.Writer;
 }
 
-// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-//
+// @public (undocumented)
+export interface MoveRotateScale {
+    // (undocumented)
+    positionEnd: PBVector3 | undefined;
+    // (undocumented)
+    positionStart: PBVector3 | undefined;
+    // (undocumented)
+    rotationEnd: PBQuaternion | undefined;
+    // (undocumented)
+    rotationStart: PBQuaternion | undefined;
+    // (undocumented)
+    scaleEnd: PBVector3 | undefined;
+    // (undocumented)
+    scaleStart: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace MoveRotateScale {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): MoveRotateScale;
+    // (undocumented)
+    export function encode(message: MoveRotateScale, writer?: _m0.Writer): _m0.Writer;
+}
+
 // @public
-export type MultiCallback = Partial<Record<InputAction, EventSystemCallback>>;
+export interface MoveRotateScaleModeParams {
+    position?: {
+        start: PBVector3;
+        end: PBVector3;
+    };
+    rotation?: {
+        start: PBQuaternion;
+        end: PBQuaternion;
+    };
+    scale?: {
+        start: PBVector3;
+        end: PBVector3;
+    };
+}
 
 // Warning: (ae-missing-release-tag) "Name" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2350,6 +2464,24 @@ export namespace Orthographic {
 // @public
 export type OverflowType = 'hidden' | 'scroll' | 'visible';
 
+// Warning: (ae-missing-release-tag) "ParticleSystem" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const ParticleSystem: ParticleSystemComponentDefinitionExtended;
+
+// @public (undocumented)
+export interface ParticleSystemComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBParticleSystem> {
+    Shape: ParticleSystemHelper;
+}
+
+// @public (undocumented)
+export interface ParticleSystemHelper {
+    Box: (box?: PBParticleSystem_Box) => PBParticleSystem['shape'];
+    Cone: (cone?: PBParticleSystem_Cone) => PBParticleSystem['shape'];
+    Point: (point?: PBParticleSystem_Point) => PBParticleSystem['shape'];
+    Sphere: (sphere?: PBParticleSystem_Sphere) => PBParticleSystem['shape'];
+}
+
 // @public (undocumented)
 export interface PBAnimationState {
     clip: string;
@@ -2408,6 +2540,46 @@ export namespace PBAssetLoadLoadingState {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAssetLoadLoadingState;
     // (undocumented)
     export function encode(message: PBAssetLoadLoadingState, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAudioAnalysis {
+    amplitude: number;
+    amplitudeGain?: number | undefined;
+    // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
+    band0: number;
+    // (undocumented)
+    band1: number;
+    // (undocumented)
+    band2: number;
+    // (undocumented)
+    band3: number;
+    // (undocumented)
+    band4: number;
+    // (undocumented)
+    band5: number;
+    // (undocumented)
+    band6: number;
+    // (undocumented)
+    band7: number;
+    bandsGain?: number | undefined;
+    mode: PBAudioAnalysisMode;
+}
+
+// @public (undocumented)
+export namespace PBAudioAnalysis {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAudioAnalysis;
+    // (undocumented)
+    export function encode(message: PBAudioAnalysis, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export const enum PBAudioAnalysisMode {
+    // (undocumented)
+    MODE_LOGARITHMIC = 1,
+    // (undocumented)
+    MODE_RAW = 0
 }
 
 // @public (undocumented)
@@ -2504,6 +2676,8 @@ export interface PBAvatarEmoteCommand {
     emoteUrn: string;
     // (undocumented)
     loop: boolean;
+    // (undocumented)
+    mask?: AvatarMask | undefined;
     timestamp: number;
 }
 
@@ -2534,6 +2708,9 @@ export namespace PBAvatarEquippedData {
 
 // @public (undocumented)
 export interface PBAvatarLocomotionSettings {
+    doubleJumpHeight?: number | undefined;
+    glidingFallingSpeed?: number | undefined;
+    glidingSpeed?: number | undefined;
     hardLandingCooldown?: number | undefined;
     jogSpeed?: number | undefined;
     jumpHeight?: number | undefined;
@@ -2630,6 +2807,7 @@ export namespace PBAvatarShape {
 // @public (undocumented)
 export interface PBBillboard {
     billboardMode?: BillboardMode | undefined;
+    targetEntity?: number | undefined;
 }
 
 // @public (undocumented)
@@ -2888,7 +3066,11 @@ export interface PBInputModifier_StandardInput {
     // (undocumented)
     disableAll?: boolean | undefined;
     // (undocumented)
+    disableDoubleJump?: boolean | undefined;
+    // (undocumented)
     disableEmote?: boolean | undefined;
+    // (undocumented)
+    disableGliding?: boolean | undefined;
     // (undocumented)
     disableJog?: boolean | undefined;
     // (undocumented)
@@ -3259,6 +3441,225 @@ export namespace PBNftShape {
 }
 
 // @public (undocumented)
+export interface PBParticleSystem {
+    active?: boolean | undefined;
+    additionalForce?: PBVector3 | undefined;
+    billboard?: boolean | undefined;
+    blendMode?: PBParticleSystem_BlendMode | undefined;
+    bursts?: PBParticleSystem_BurstConfiguration | undefined;
+    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+    colorOverTime?: ColorRange | undefined;
+    faceTravelDirection?: boolean | undefined;
+    gravity?: number | undefined;
+    initialColor?: ColorRange | undefined;
+    initialRotation?: PBQuaternion | undefined;
+    initialSize?: FloatRange | undefined;
+    initialVelocitySpeed?: FloatRange | undefined;
+    lifetime?: number | undefined;
+    limitVelocity?: PBParticleSystem_LimitVelocity | undefined;
+    loop?: boolean | undefined;
+    maxParticles?: number | undefined;
+    playbackState?: PBParticleSystem_PlaybackState | undefined;
+    prewarm?: boolean | undefined;
+    rate?: number | undefined;
+    rotationOverTime?: PBQuaternion | undefined;
+    // (undocumented)
+    shape?: {
+        $case: "point";
+        point: PBParticleSystem_Point;
+    } | {
+        $case: "sphere";
+        sphere: PBParticleSystem_Sphere;
+    } | {
+        $case: "cone";
+        cone: PBParticleSystem_Cone;
+    } | {
+        $case: "box";
+        box: PBParticleSystem_Box;
+    } | undefined;
+    simulationSpace?: PBParticleSystem_SimulationSpace | undefined;
+    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+    sizeOverTime?: FloatRange | undefined;
+    spriteSheet?: PBParticleSystem_SpriteSheetAnimation | undefined;
+    texture?: Texture | undefined;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem;
+    // (undocumented)
+    export function encode(message: PBParticleSystem, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+const enum PBParticleSystem_BlendMode {
+    PSB_ADD = 1,
+    PSB_ALPHA = 0,
+    PSB_MULTIPLY = 2
+}
+export { PBParticleSystem_BlendMode }
+export { PBParticleSystem_BlendMode as ParticleSystemBlendMode }
+
+// @public (undocumented)
+export interface PBParticleSystem_Box {
+    // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
+    // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+    size?: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_Box {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_Box;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_Box, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_Burst {
+    count: number;
+    cycles?: number | undefined;
+    interval?: number | undefined;
+    probability?: number | undefined;
+    time: number;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_Burst {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_Burst;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_Burst, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_BurstConfiguration {
+    // (undocumented)
+    values: PBParticleSystem_Burst[];
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_BurstConfiguration {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_BurstConfiguration;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_BurstConfiguration, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_Cone {
+    angle?: number | undefined;
+    radius?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_Cone {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_Cone;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_Cone, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_LimitVelocity {
+    dampen?: number | undefined;
+    speed: number;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_LimitVelocity {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_LimitVelocity;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_LimitVelocity, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+const enum PBParticleSystem_PlaybackState {
+    PS_PAUSED = 1,
+    PS_PLAYING = 0,
+    PS_STOPPED = 2
+}
+export { PBParticleSystem_PlaybackState }
+export { PBParticleSystem_PlaybackState as ParticleSystemPlaybackState }
+
+// @public (undocumented)
+export interface PBParticleSystem_Point {
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_Point {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_Point;
+    // (undocumented)
+    export function encode(_: PBParticleSystem_Point, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export const enum PBParticleSystem_SimulationSpace {
+    PSS_LOCAL = 0,
+    PSS_WORLD = 1
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_Sphere {
+    radius?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_Sphere {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_Sphere;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_Sphere, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBParticleSystem_SpriteSheetAnimation {
+    framesPerSecond?: number | undefined;
+    tilesX: number;
+    tilesY: number;
+}
+
+// @public (undocumented)
+export namespace PBParticleSystem_SpriteSheetAnimation {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBParticleSystem_SpriteSheetAnimation;
+    // (undocumented)
+    export function encode(message: PBParticleSystem_SpriteSheetAnimation, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBPhysicsCombinedForce {
+    vector: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBPhysicsCombinedForce {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPhysicsCombinedForce;
+    // (undocumented)
+    export function encode(message: PBPhysicsCombinedForce, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBPhysicsCombinedImpulse {
+    eventId: number;
+    vector: PBVector3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBPhysicsCombinedImpulse {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPhysicsCombinedImpulse;
+    // (undocumented)
+    export function encode(message: PBPhysicsCombinedImpulse, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBPlayerIdentityData {
     address: string;
     // (undocumented)
@@ -3290,6 +3691,7 @@ export namespace PBPointerEvents {
 export interface PBPointerEvents_Entry {
     eventInfo: PBPointerEvents_Info | undefined;
     eventType: PointerEventType;
+    interactionType?: InteractionType | undefined;
 }
 
 // @public (undocumented)
@@ -3306,6 +3708,7 @@ export interface PBPointerEvents_Info {
     hoverText?: string | undefined;
     maxDistance?: number | undefined;
     maxPlayerDistance?: number | undefined;
+    priority?: number | undefined;
     showFeedback?: boolean | undefined;
     showHighlight?: boolean | undefined;
 }
@@ -3523,29 +3926,35 @@ export namespace PBTextShape {
 }
 
 // @public (undocumented)
-export interface PBTextureCamera {
-    clearColor?: PBColor4 | undefined;
-    farPlane?: number | undefined;
-    height?: number | undefined;
-    layer?: number | undefined;
+export interface PBTouchScreenControls {
+    hideCrosshair: boolean;
+    hideJoystick: boolean;
+    mainAction?: InputAction | undefined;
     // (undocumented)
-    mode?: {
-        $case: "perspective";
-        perspective: Perspective;
-    } | {
-        $case: "orthographic";
-        orthographic: Orthographic;
-    } | undefined;
-    volume?: number | undefined;
-    width?: number | undefined;
+    touchInputs: PBTouchScreenControls_TouchInput[];
 }
 
 // @public (undocumented)
-export namespace PBTextureCamera {
+export namespace PBTouchScreenControls {
     // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTextureCamera;
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTouchScreenControls;
     // (undocumented)
-    export function encode(message: PBTextureCamera, writer?: _m0.Writer): _m0.Writer;
+    export function encode(message: PBTouchScreenControls, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBTouchScreenControls_TouchInput {
+    hide: boolean;
+    icon?: TextureUnion | undefined;
+    inputAction: InputAction;
+}
+
+// @public (undocumented)
+export namespace PBTouchScreenControls_TouchInput {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTouchScreenControls_TouchInput;
+    // (undocumented)
+    export function encode(message: PBTouchScreenControls_TouchInput, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3626,6 +4035,9 @@ export interface PBTween {
     } | {
         $case: "textureMoveContinuous";
         textureMoveContinuous: TextureMoveContinuous;
+    } | {
+        $case: "moveRotateScale";
+        moveRotateScale: MoveRotateScale;
     } | undefined;
     playing?: boolean | undefined;
 }
@@ -3710,6 +4122,7 @@ export interface PBUiCanvasInformation {
     devicePixelRatio: number;
     height: number;
     interactableArea: BorderRect | undefined;
+    screenInsetArea?: BorderRect | undefined;
     width: number;
 }
 
@@ -3781,6 +4194,19 @@ export namespace PBUiInput {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiInput;
     // (undocumented)
     export function encode(message: PBUiInput, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBUiInputBinding {
+    actions: InputAction[];
+}
+
+// @public (undocumented)
+export namespace PBUiInputBinding {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiInputBinding;
+    // (undocumented)
+    export function encode(message: PBUiInputBinding, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -4033,6 +4459,7 @@ export namespace PBVideoPlayer {
 export interface PBVirtualCamera {
     // (undocumented)
     defaultTransition?: CameraTransition | undefined;
+    fov?: number | undefined;
     // (undocumented)
     lookAtEntity?: number | undefined;
 }
@@ -4070,6 +4497,31 @@ export namespace Perspective {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): Perspective;
     // (undocumented)
     export function encode(message: Perspective, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public
+export const Physics: PhysicsSystem;
+
+// @public (undocumented)
+export const PhysicsCombinedForce: LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedForce>;
+
+// @public (undocumented)
+export const PhysicsCombinedImpulse: LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedImpulse>;
+
+// @public (undocumented)
+export interface PhysicsSystem {
+    applyForceToPlayer(source: Entity, vector: Vector3Type): void;
+    // (undocumented)
+    applyForceToPlayer(source: Entity, direction: Vector3Type, magnitude: number): void;
+    applyForceToPlayerForDuration(source: Entity, duration: number, vector: Vector3Type): void;
+    // (undocumented)
+    applyForceToPlayerForDuration(source: Entity, duration: number, direction: Vector3Type, magnitude: number): void;
+    applyImpulseToPlayer(vector: Vector3Type): void;
+    // (undocumented)
+    applyImpulseToPlayer(direction: Vector3Type, magnitude: number): void;
+    applyKnockbackToPlayer(fromPosition: Vector3Type, magnitude: number, radius?: number, falloff?: KnockbackFalloff): void;
+    applyRepulsionForceToPlayer(source: Entity, fromPosition: Vector3Type, magnitude: number, radius?: number, falloff?: KnockbackFalloff): void;
+    removeForceFromPlayer(source: Entity): void;
 }
 
 // @public
@@ -4169,6 +4621,22 @@ export interface PointerEventsSystem {
     }, cb: EventSystemCallback): void;
     // @deprecated (undocumented)
     onPointerUp(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
+    onProximityDown(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
+    onProximityEnter(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
+    onProximityLeave(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
+    onProximityUp(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
     removeOnPointerDown(entity: Entity): void;
     removeOnPointerDrag(entity: Entity): void;
     removeOnPointerDragEnd(entity: Entity): void;
@@ -4176,6 +4644,10 @@ export interface PointerEventsSystem {
     removeOnPointerHoverEnter(entity: Entity): void;
     removeOnPointerHoverLeave(entity: Entity): void;
     removeOnPointerUp(entity: Entity): void;
+    removeOnProximityDown(entity: Entity): void;
+    removeOnProximityEnter(entity: Entity): void;
+    removeOnProximityLeave(entity: Entity): void;
+    removeOnProximityUp(entity: Entity): void;
 }
 
 // @public
@@ -4195,6 +4667,10 @@ export const enum PointerEventType {
     PET_HOVER_ENTER = 2,
     // (undocumented)
     PET_HOVER_LEAVE = 3,
+    // (undocumented)
+    PET_PROXIMITY_ENTER = 4,
+    // (undocumented)
+    PET_PROXIMITY_LEAVE = 5,
     // (undocumented)
     PET_UP = 0
 }
@@ -4640,6 +5116,9 @@ export namespace RotateContinuous {
     export function encode(message: RotateContinuous, writer?: _m0.Writer): _m0.Writer;
 }
 
+// @public
+export function rotateVectorByQuaternion(v: Vector3Type, q: QuaternionType): Vector3Type;
+
 // Warning: (ae-missing-release-tag) "RPCSendableMessage" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -4772,6 +5251,23 @@ export namespace Schemas {
         changed: boolean;
         value?: any;
     }) => void;
+}
+
+// Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
+//
+// @public
+export function ScreenInsetArea(props: UiScreenInsetAreaProps): ReactEcs.JSX.Element;
+
+// @public
+export function setCompositeProvider(engine: IEngine, provider: CompositeProvider): void;
+
+// @public
+export function setGlobalPolyfill<T>(key: string, value: T): void;
+
+// @public
+export interface SetMoveRotateScaleParams extends MoveRotateScaleModeParams {
+    duration: number;
+    easingFunction?: EasingFunction;
 }
 
 // @public (undocumented)
@@ -5074,6 +5570,9 @@ export const ToLinearSpace = 2.2;
 // @public (undocumented)
 export type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTypes<T>;
 
+// @public (undocumented)
+export const TouchScreenControls: LastWriteWinElementSetComponentDefinition<PBTouchScreenControls>;
+
 // Warning: (ae-missing-release-tag) "Transform" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -5088,6 +5587,7 @@ export interface TransformComponentExtended extends TransformComponent {
     create(entity: Entity, val?: TransformTypeWithOptionals): TransformType;
     // (undocumented)
     createOrReplace(entity: Entity, val?: TransformTypeWithOptionals): TransformType;
+    localToWorldDirection(entity: Entity, localDirection: Vector3Type): Vector3Type;
 }
 
 // @public (undocumented)
@@ -5189,6 +5689,7 @@ export interface TweenComponentDefinitionExtended extends LastWriteWinElementSet
     Mode: TweenHelper;
     setMove(entity: Entity, start: PBVector3, end: PBVector3, duration: number, easingFunction?: EasingFunction): void;
     setMoveContinuous(entity: Entity, direction: PBVector3, speed: number, duration?: number): void;
+    setMoveRotateScale(entity: Entity, params: SetMoveRotateScaleParams): void;
     setRotate(entity: Entity, start: PBQuaternion, end: PBQuaternion, duration: number, easingFunction?: EasingFunction): void;
     setRotateContinuous(entity: Entity, direction: PBQuaternion, speed: number, duration?: number): void;
     setScale(entity: Entity, start: PBVector3, end: PBVector3, duration: number, easingFunction?: EasingFunction): void;
@@ -5202,6 +5703,8 @@ export interface TweenHelper {
     Move: (move: Move) => PBTween['mode'];
     // (undocumented)
     MoveContinuous: (move: MoveContinuous) => PBTween['mode'];
+    // (undocumented)
+    MoveRotateScale: (params: MoveRotateScaleModeParams) => PBTween['mode'];
     // (undocumented)
     Rotate: (rotate: Rotate) => PBTween['mode'];
     // (undocumented)
@@ -5336,6 +5839,9 @@ export type UiFontType = 'sans-serif' | 'serif' | 'monospace';
 export const UiInput: LastWriteWinElementSetComponentDefinition<PBUiInput>;
 
 // @public (undocumented)
+export const UiInputBinding: LastWriteWinElementSetComponentDefinition<PBUiInputBinding>;
+
+// @public (undocumented)
 export interface UiInputProps extends Omit<PBUiInput, 'font' | 'textAlign' | 'fontSize'> {
     // (undocumented)
     font?: UiFontType;
@@ -5349,6 +5855,11 @@ export interface UiInputProps extends Omit<PBUiInput, 'font' | 'textAlign' | 'fo
 
 // @public (undocumented)
 export const UiInputResult: LastWriteWinElementSetComponentDefinition<PBUiInputResult>;
+
+// @public
+export type UiInteractableAreaProps = Omit<EntityPropTypes, 'uiTransform'> & {
+    uiTransform?: Omit<NonNullable<EntityPropTypes['uiTransform']>, 'positionType' | 'position'>;
+};
 
 // @public
 export interface UiLabelProps {
@@ -5369,6 +5880,11 @@ export type uint32 = number;
 export type UiRendererOptions = {
     virtualWidth: number;
     virtualHeight: number;
+};
+
+// @public
+export type UiScreenInsetAreaProps = Omit<EntityPropTypes, 'uiTransform'> & {
+    uiTransform?: Omit<NonNullable<EntityPropTypes['uiTransform']>, 'positionType' | 'position'>;
 };
 
 // @public (undocumented)

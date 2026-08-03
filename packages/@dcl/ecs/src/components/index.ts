@@ -23,6 +23,7 @@ import defineSyncComponent, { ISyncComponentsType } from './manual/SyncComponent
 import { defineTransformComponent, TransformComponentExtended } from './manual/Transform'
 import { defineLightSourceComponent, LightSourceComponentDefinitionExtended } from './extended/LightSource'
 import { defineTriggerAreaComponent, TriggerAreaComponentDefinitionExtended } from './extended/TriggerArea'
+import { defineParticleSystemComponent, ParticleSystemComponentDefinitionExtended } from './extended/ParticleSystem'
 import defineTagsComponent, { TagsComponentDefinitionExtended } from './manual/Tags'
 
 export * from './generated/index.gen'
@@ -48,6 +49,8 @@ export const Animator: LwwComponentGetter<AnimatorComponentDefinitionExtended> =
 /* @__PURE__ */
 export const AudioSource: LwwComponentGetter<AudioSourceComponentDefinitionExtended> = (engine) =>
   defineAudioSourceComponent(engine)
+
+/* @__PURE__ */
 
 /* @__PURE__ */
 export const AudioStream: (
@@ -89,6 +92,10 @@ export const LightSource: LwwComponentGetter<LightSourceComponentDefinitionExten
 export const TriggerArea: LwwComponentGetter<TriggerAreaComponentDefinitionExtended> = (engine) =>
   defineTriggerAreaComponent(engine)
 
+/* @__PURE__ */
+export const ParticleSystem: LwwComponentGetter<ParticleSystemComponentDefinitionExtended> = (engine) =>
+  defineParticleSystemComponent(engine)
+
 /**
  * @alpha
  */
@@ -126,3 +133,4 @@ export const NetworkParent: (
 ) => LastWriteWinElementSetComponentDefinition<INetowrkParentType> = (engine) => defineNetworkParent(engine)
 
 export { MediaState }
+

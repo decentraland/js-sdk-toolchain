@@ -53,7 +53,8 @@ export function createUpdateLwwFromCrdt(
   componentId: number,
   timestamps: Map<Entity, number>,
   schema: Pick<ISchema<any>, 'serialize' | 'deserialize'>,
-  data: Map<Entity, unknown>
+  data: Map<Entity, unknown>,
+  lastSentData: Map<Entity, Uint8Array>
 ) {
   /**
    * Process the received message only if the lamport number recieved is higher
@@ -134,8 +135,10 @@ export function createUpdateLwwFromCrdt(
         if (msg.type === CrdtMessageType.PUT_COMPONENT || msg.type === CrdtMessageType.PUT_COMPONENT_NETWORK) {
           const buf = new ReadWriteByteBuffer(msg.data!)
           data.set(entity, schema.deserialize(buf))
+          lastSentData.set(entity, new Uint8Array(msg.data!))
         } else {
           data.delete(entity)
+          lastSentData.delete(entity)
         }
 
         return [null, data.get(entity)]
@@ -179,25 +182,40 @@ export function createGetCrdtMessagesForLww(
   timestamps: Map<Entity, number>,
   dirtyIterator: Set<Entity>,
   schema: Pick<ISchema<any>, 'serialize'>,
-  data: Map<Entity, unknown>
+  data: Map<Entity, unknown>,
+  lastSentData: Map<Entity, Uint8Array>
 ) {
   return function* () {
+    const writeBuffer = new ReadWriteByteBuffer()
     for (const entity of dirtyIterator) {
-      const newTimestamp = incrementTimestamp(entity, timestamps)
       if (data.has(entity)) {
-        const writeBuffer = new ReadWriteByteBuffer()
+        writeBuffer.resetBuffer()
         schema.serialize(data.get(entity)!, writeBuffer)
+
+        // Compare against last-sent snapshot using the zero-copy subarray view.
+        // Only allocate a copy when bytes actually differ.
+        const previousBytes = lastSentData.get(entity)
+        if (previousBytes && dataCompare(writeBuffer.toBinary(), previousBytes) === 0) {
+          continue
+        }
+
+        const currentBytes = writeBuffer.toCopiedBinary()
+        const newTimestamp = incrementTimestamp(entity, timestamps)
+        lastSentData.set(entity, currentBytes)
 
         const msg: PutComponentMessageBody = {
           type: CrdtMessageType.PUT_COMPONENT,
           componentId,
           entityId: entity,
-          data: writeBuffer.toBinary(),
+          data: currentBytes,
           timestamp: newTimestamp
         }
 
         yield msg
       } else {
+        lastSentData.delete(entity)
+        const newTimestamp = incrementTimestamp(entity, timestamps)
+
         const msg: DeleteComponentMessageBody = {
           type: CrdtMessageType.DELETE_COMPONENT,
           componentId,
@@ -223,6 +241,7 @@ export function createComponentDefinitionFromSchema<T>(
   const data = new Map<Entity, T>()
   const dirtyIterator = new Set<Entity>()
   const timestamps = new Map<Entity, number>()
+  const lastSentData = new Map<Entity, Uint8Array>()
   const onChangeCallbacks = new Map<Entity, ((data: T | undefined) => void)[]>()
 
   return {
@@ -245,12 +264,14 @@ export function createComponentDefinitionFromSchema<T>(
       if (data.delete(entity) && markAsDirty) {
         dirtyIterator.add(entity)
       }
+      lastSentData.delete(entity)
       return component || null
     },
     entityDeleted(entity: Entity, markAsDirty: boolean): void {
       if (data.delete(entity) && markAsDirty) {
         dirtyIterator.add(entity)
       }
+      lastSentData.delete(entity)
     },
     getOrNull(entity: Entity): DeepReadonly<T> | null {
       const component = data.get(entity)
@@ -279,6 +300,7 @@ export function createComponentDefinitionFromSchema<T>(
         value === undefined ? schema.create() : schema.extend ? schema.extend(value as DeepReadonly<T>) : value
       data.set(entity, usedValue!)
       dirtyIterator.add(entity)
+      lastSentData.delete(entity)
       return usedValue!
     },
     getMutableOrNull(entity: Entity): T | null {
@@ -315,8 +337,8 @@ export function createComponentDefinitionFromSchema<T>(
         yield entity
       }
     },
-    getCrdtUpdates: createGetCrdtMessagesForLww(componentId, timestamps, dirtyIterator, schema, data),
-    updateFromCrdt: createUpdateLwwFromCrdt(componentId, timestamps, schema, data),
+    getCrdtUpdates: createGetCrdtMessagesForLww(componentId, timestamps, dirtyIterator, schema, data, lastSentData),
+    updateFromCrdt: createUpdateLwwFromCrdt(componentId, timestamps, schema, data, lastSentData),
     dumpCrdtStateToBuffer: createDumpLwwFunctionFromCrdt(componentId, timestamps, schema, data),
     onChange(entity, cb) {
       const cbs = onChangeCallbacks.get(entity) ?? []

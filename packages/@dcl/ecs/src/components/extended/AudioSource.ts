@@ -11,11 +11,13 @@ export interface AudioSourceComponentDefinitionExtended
   /**
    * @public
    *
-   * Set playing=true the sound `$name`
-   * @param entity - entity with AudioSource component
+   * Play the sound `src` on the given entity. Creates the AudioSource component
+   * if it does not yet exist. Always emits a CRDT PUT, so repeated calls with
+   * identical parameters reliably retrigger playback.
+   * @param entity - target entity (AudioSource will be created if missing)
    * @param src - the path to the sound to play
    * @param resetCursor - the sound starts at 0 or continues from the current cursor position
-   * @returns true in successful playing, false if it doesn't find the AudioSource component
+   * @returns always true; retained for backwards compatibility
    */
   playSound(entity: Entity, src: string, resetCursor?: boolean): boolean
 
@@ -38,13 +40,14 @@ export function defineAudioSourceComponent(
   return {
     ...theComponent,
     playSound(entity: Entity, src: string, resetCursor: boolean = true): boolean {
-      // Get the mutable to modify
-      const audioSource = theComponent.getMutableOrNull(entity)
-      if (!audioSource) return false
+      const existing = theComponent.getOrNull(entity)
 
-      audioSource.audioClipUrl = src
-      audioSource.playing = true
-      audioSource.currentTime = resetCursor ? 0 : audioSource.currentTime
+      theComponent.createOrReplace(entity, {
+        ...existing,
+        audioClipUrl: src,
+        playing: true,
+        currentTime: resetCursor ? 0 : existing?.currentTime ?? 0
+      })
 
       return true
     },

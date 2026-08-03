@@ -15,6 +15,7 @@ export const int8Component = (engine: IEngine) => {
   const data = new Map<Entity, number>()
   const timestamps = new Map<Entity, number>()
   const dirtyIterator = new Set<Entity>()
+  const lastSentData = new Map<Entity, Uint8Array>()
   const schema: ISchema<number> = {
     serialize(value: number, builder: ByteBuffer): void {
       builder.writeInt8(value)
@@ -37,7 +38,7 @@ export const int8Component = (engine: IEngine) => {
     componentId: ID,
     componentName: componentName,
     componentType: ComponentType.LastWriteWinElementSet,
-    updateFromCrdt: createUpdateLwwFromCrdt(ID, timestamps, schema, data),
+    updateFromCrdt: createUpdateLwwFromCrdt(ID, timestamps, schema, data, lastSentData),
     schema,
     has: function (entity: Entity): boolean {
       return data.has(entity)
@@ -57,17 +58,20 @@ export const int8Component = (engine: IEngine) => {
     createOrReplace: function (entity: Entity, val?: any) {
       data.set(entity, (val || 0) % 256 | 0)
       dirtyIterator.add(entity)
+      lastSentData.delete(entity)
     },
     deleteFrom: function (entity: Entity, markAsDirty = true) {
       data.delete(entity)
       if (markAsDirty) {
         dirtyIterator.add(entity)
       }
+      lastSentData.delete(entity)
     },
     entityDeleted: function (entity: Entity, markAsDirty) {
       if (data.delete(entity) && markAsDirty) {
         dirtyIterator.add(entity)
       }
+      lastSentData.delete(entity)
     },
     getMutable: function (_entity: Entity) {
       throw new Error('Function not implemented.')
@@ -88,7 +92,7 @@ export const int8Component = (engine: IEngine) => {
         yield entity
       }
     },
-    getCrdtUpdates: createGetCrdtMessagesForLww(ID, timestamps, dirtyIterator, schema, data),
+    getCrdtUpdates: createGetCrdtMessagesForLww(ID, timestamps, dirtyIterator, schema, data, lastSentData),
     setTestTimestamp(entity: Entity, timestamp: number) {
       timestamps.set(entity, (timestamps.get(entity) || 0) + timestamp)
     },

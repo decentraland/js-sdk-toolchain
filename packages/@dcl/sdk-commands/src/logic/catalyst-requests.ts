@@ -1,6 +1,7 @@
 import { Entity } from '@dcl/schemas'
 import { CliComponents } from '../components'
 import { getCatalystBaseUrl } from './config'
+import { drainResponse } from './fetch'
 
 export type DAOCatalyst = {
   baseUrl: string
@@ -48,7 +49,12 @@ export async function fetchEntityByPointer(
     body: JSON.stringify({ pointers })
   })
 
-  const deployments: Entity[] = response.ok ? ((await response.json()) as Entity[]) : []
+  let deployments: Entity[] = []
+  if (response.ok) {
+    deployments = (await response.json()) as Entity[]
+  } else {
+    await drainResponse(response)
+  }
 
   return {
     baseUrl,
