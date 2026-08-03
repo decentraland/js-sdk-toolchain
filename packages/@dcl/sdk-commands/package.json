@@ -76,5 +76,8 @@
     "readmeFile": "./README.md",
     "displayName": "SDK",
     "tsconfig": "./tsconfig.json"
+  },
+  "optionalDependencies": {
+    "@dcl/abgen-node": "^0.15.0"
   }
 }

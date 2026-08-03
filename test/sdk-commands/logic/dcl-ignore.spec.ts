@@ -30,5 +30,20 @@ describe('dcl-ignore', () => {
       expect(patterns).toContain('custom-folder')
       expect(patterns).toContain('*.log')
     })
+
+    it('always ignores the asset-bundle sidecar cache, even for scenes with a custom .dclignore', async () => {
+      // A watched write inside .dcl-optimized-assets means reload → manifest
+      // request → revalidation write → reload, forever. The `**/` form is
+      // required because the file watcher tests absolute paths, which the bare
+      // `.*` entry does not prune.
+      const components = {
+        fs: {
+          readFile: jest.fn().mockResolvedValue('node_modules\nbin/*.map')
+        }
+      }
+      const patterns = await getDCLIgnorePatterns(components as any, '/some/dir')
+      expect(patterns).toContain('.dcl-optimized-assets')
+      expect(patterns).toContain('**/.dcl-optimized-assets/**')
+    })
   })
 })

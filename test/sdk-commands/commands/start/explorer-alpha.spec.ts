@@ -57,6 +57,50 @@ describe('explorer-alpha', () => {
       )
     })
 
+    it('should include local-ab only when asset bundles are enabled', async () => {
+      const args: any = {}
+
+      await runExplorerAlpha(mockComponents, {
+        cwd: '/test',
+        realm: 'test-realm',
+        baseCoords: { x: 0, y: 0 },
+        isHub: false,
+        args,
+        assetBundles: true
+      })
+
+      // local-ab alone: the explorer derives the /optimized-assets base from the realm
+      expect(mockExec).toHaveBeenCalledWith(
+        '/test',
+        'open',
+        expect.arrayContaining([expect.stringContaining('local-ab=true')]),
+        { silent: true }
+      )
+      expect(mockExec).toHaveBeenCalledWith(
+        '/test',
+        'open',
+        expect.not.arrayContaining([expect.stringContaining('optimized-assets-url')]),
+        { silent: true }
+      )
+
+      mockExec.mockClear()
+
+      await runExplorerAlpha(mockComponents, {
+        cwd: '/test',
+        realm: 'test-realm',
+        baseCoords: { x: 0, y: 0 },
+        isHub: false,
+        args
+      })
+
+      expect(mockExec).toHaveBeenCalledWith(
+        '/test',
+        'open',
+        expect.not.arrayContaining([expect.stringContaining('local-ab')]),
+        { silent: true }
+      )
+    })
+
     it('should always include local-scene and debug even when they are false', async () => {
       const args: any = {
         '--local-scene': false,
@@ -137,7 +181,7 @@ describe('explorer-alpha', () => {
       expect(mockExec).toHaveBeenCalledWith(
         '/test',
         'open',
-        expect.arrayContaining([expect.not.stringContaining('open-deeplink-in-new-instance')]),
+        expect.not.arrayContaining([expect.stringContaining('open-deeplink-in-new-instance')]),
         { silent: true }
       )
     })
@@ -179,7 +223,7 @@ describe('explorer-alpha', () => {
       expect(mockExec).toHaveBeenCalledWith(
         '/test',
         'open',
-        expect.arrayContaining([expect.not.stringContaining('multi-instance')]),
+        expect.not.arrayContaining([expect.stringContaining('multi-instance')]),
         { silent: true }
       )
     })

@@ -28,6 +28,7 @@ import { printCurrentProjectStarting, printProgressInfo, printWarning } from '..
 import { Result } from 'arg'
 import { startValidations } from '../../logic/project-validations'
 import { runExplorerAlpha } from './explorer-alpha'
+import { AssetBundles, setupAssetBundles } from './asset-bundles'
 import { getLanUrl } from './utils'
 
 interface Options {
@@ -69,6 +70,7 @@ export const args = declareArgs({
   '--web': '--bevy-web',
   '--multi-instance': Boolean,
   '--no-client': Boolean,
+  '--asset-bundles': Boolean,
   '--mcp': Boolean,
   '--mcp-port': Number
 })
@@ -99,6 +101,7 @@ export async function help(options: Options) {
       --mobile                          Show QR code for mobile preview on the same network.
       --multi-instance                  Allow running multiple Explorer instances simultaneously.
       --no-client                       Suppress every auto-launch (desktop Explorer deeplink, browser open, mobile QR). The file watcher still notifies a desktop Explorer if it connects on its own — useful when an external tool owns the Explorer process.
+      --asset-bundles                   Convert the scene to asset bundles in-process via @dcl/abgen-node (skipped with a warning when the addon is unavailable).
       --mcp                             Enable the MCP server in the Explorer (forwarded as a deep link parameter).
       --mcp-port                        Port for the MCP server in the Explorer (forwarded as a deep link parameter).
 
@@ -137,6 +140,7 @@ export async function main(options: Options) {
   const explorerAlpha = !bevyWeb
 
   const workspace = await getValidWorkspace(options.components, workingDirectory)
+  const withAssetBundles = !!options.args['--asset-bundles']
 
   /* istanbul ignore if */
   if (workspace.projects.length > 1)
@@ -210,13 +214,31 @@ export async function main(options: Options) {
         }
       }
 
-      await wireRouter(components, workspace, dataLayer)
+      // conversion starts after the server is listening, so the routes read
+      // the handle late
+      const assetBundles: { value?: AssetBundles } = {}
+      await wireRouter(components, workspace, dataLayer, withAssetBundles ? () => assetBundles.value : undefined)
       if (watch) {
         for (const project of workspace.projects) {
-          await wireFileWatcherToWebSockets(components, project.workingDirectory, project.kind)
+          await wireFileWatcherToWebSockets(components, project.workingDirectory, project.kind, () =>
+            assetBundles.value?.invalidate()
+          )
         }
       }
       await startComponents()
+
+      if (withAssetBundles) {
+        assetBundles.value = await setupAssetBundles(
+          components,
+          workspace.projects[0]?.workingDirectory || workingDirectory
+        )
+        if (assetBundles.value) {
+          printProgressInfo(
+            options.components.logger,
+            `Serving asset bundles (abgen, in-process): http://127.0.0.1:${port}/optimized-assets`
+          )
+        }
+      }
 
       const networkInterfaces = os.networkInterfaces()
       const availableURLs: string[] = []
@@ -257,7 +279,16 @@ export async function main(options: Options) {
 
       if (explorerAlpha && !isMobile && !skipClient) {
         const realm = new URL(sortedURLs[0]).origin
-        await runExplorerAlpha(components, { cwd: workingDirectory, realm, baseCoords, isHub, args: options.args })
+        await runExplorerAlpha(components, {
+          cwd: workingDirectory,
+          realm,
+          baseCoords,
+          isHub,
+          args: options.args,
+          // the explorer derives the /optimized-assets base from the realm it
+          // already has
+          assetBundles: !!assetBundles.value
+        })
       }
 
       if (isMobile && !skipClient && lanUrl) {

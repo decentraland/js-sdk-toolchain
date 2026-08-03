@@ -37,11 +37,12 @@ export async function runExplorerAlpha(
     baseCoords: { x: number; y: number }
     isHub: boolean
     args: Result<typeof startArgs>
+    assetBundles?: boolean
   }
 ) {
-  const { cwd, realm, baseCoords, isHub } = opts
+  const { cwd, realm, baseCoords, isHub, assetBundles } = opts
 
-  if (await runApp(components, { cwd, realm, baseCoords, isHub, args: opts.args })) {
+  if (await runApp(components, { cwd, realm, baseCoords, isHub, args: opts.args, assetBundles })) {
     return
   }
 
@@ -55,13 +56,15 @@ async function runApp(
     realm: realmValue,
     baseCoords,
     isHub,
-    args
+    args,
+    assetBundles
   }: {
     cwd: string
     realm: string
     baseCoords: { x: number; y: number }
     isHub: boolean
     args: Result<typeof startArgs>
+    assetBundles?: boolean
   }
 ) {
   const cmd = isWindows ? 'start' : 'open'
@@ -89,6 +92,12 @@ async function runApp(
     params.set('dclenv', dclenv)
 
     params.set('local-scene', 'true')
+
+    if (assetBundles) {
+      // the explorer derives the /optimized-assets base from the realm it
+      // already has; this flag makes the scene itself load asset bundles
+      params.set('local-ab', 'true')
+    }
 
     if (isHub) {
       params.set('hub', 'true')

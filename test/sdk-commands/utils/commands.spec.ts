@@ -37,19 +37,17 @@ describe('utils/commands', () => {
     await runSdkCommand(components, 'help', ['--help'])
   })
 
+  // Imports every command module, so its cost is ts-jest compiling the whole
+  // CLI once, not anything the assertions do. That is seconds on an idle
+  // machine and multiples of that on a loaded one, and the test says nothing
+  // about speed, so it gets a timeout with room rather than the 5s default.
   it('runs a help command over all commands', async () => {
     const components = await initComponents()
 
     const result = await commands.getCommands(components)
 
     for (const command of result) {
-      try {
-        await runSdkCommand(components, command, ['--help'])
-      } catch (e: any) {
-        console.dir(e)
-        console.error(e)
-        throw e
-      }
+      await runSdkCommand(components, command, ['--help'])
     }
-  })
+  }, 120_000)
 })
