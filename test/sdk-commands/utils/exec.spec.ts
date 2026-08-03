@@ -37,26 +37,6 @@ describe('utils/exec', () => {
     expect(res).toBe(undefined)
   })
 
-  it('spawns without a shell when shell:false is passed', async () => {
-    const spawnMock = {
-      stdout: { on: jest.fn(), pipe: jest.fn() },
-      stderr: { pipe: jest.fn() },
-      on: jest.fn()
-    }
-    const spawnSpy = jest.fn(() => spawnMock as any)
-    const component = execUtils.createProcessSpawnerComponent(spawnSpy)
-    spawnMock.on.mockImplementation((event: string, cb: (code: number) => void) => {
-      if (event === 'close') cb(0)
-    })
-
-    await component.exec(process.cwd(), '/path with spaces/abgen', [], { shell: false })
-
-    expect(spawnSpy).toBeCalledWith('/path with spaces/abgen', [], {
-      shell: false,
-      cwd: process.cwd(),
-      env: { ...process.env, NODE_ENV: '' }
-    })
-  })
 
   it('rejects when the child emits a spawn error', async () => {
     const spawnMock = {
@@ -70,7 +50,7 @@ describe('utils/exec', () => {
       if (event === 'error') cb(new Error('spawn abgen ENOENT'))
     })
 
-    await expect(component.exec(process.cwd(), 'abgen', [], { shell: false })).rejects.toThrow('spawn abgen ENOENT')
+    await expect(component.exec(process.cwd(), 'abgen', [])).rejects.toThrow('spawn abgen ENOENT')
   })
 
   it('it should be called with proper params #2', async () => {

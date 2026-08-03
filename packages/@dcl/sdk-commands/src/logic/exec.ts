@@ -3,9 +3,6 @@ import type { spawn } from 'child_process'
 interface Options {
   env: { [key: string]: string }
   silent: boolean
-  // default true; false spawns the binary directly (no shell quoting, and kill() reaches
-  // the binary itself - on Windows killing the wrapping shell leaves grandchildren alive)
-  shell: boolean
 }
 
 export type IProcessSpawnerComponent = {
@@ -14,10 +11,10 @@ export type IProcessSpawnerComponent = {
 
 export function createProcessSpawnerComponent(spawnFn: typeof spawn): IProcessSpawnerComponent {
   return {
-    exec(cwd: string, command: string, args: string[], { env, silent, shell }: Partial<Options> = {}): Promise<void> {
+    exec(cwd: string, command: string, args: string[], { env, silent }: Partial<Options> = {}): Promise<void> {
       return new Promise((resolve, reject) => {
         const child = spawnFn(command, args, {
-          shell: shell ?? true,
+          shell: true,
           cwd,
           env: { ...process.env, NODE_ENV: '', ...env }
         })

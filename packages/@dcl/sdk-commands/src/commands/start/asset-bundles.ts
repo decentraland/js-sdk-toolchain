@@ -49,8 +49,8 @@ export function hostPlatform(): string {
  * leading dot rides the default dcl-ignore — out of the watcher and out of
  * deployments — so only a scene's first preview pays the wait.
  *
- * Returns undefined with a warning when the addon is not installed; the
- * explorer degrades to raw GLTFs as it did without the sidecar binary.
+ * Returns undefined with a warning when the native addon is unavailable; the
+ * explorer degrades to raw GLTFs.
  */
 export async function setupAssetBundles(
   components: Pick<CliComponents, 'fetch' | 'logger' | 'config' | 'fs'>,

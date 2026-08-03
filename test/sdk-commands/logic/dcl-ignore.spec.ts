@@ -31,7 +31,7 @@ describe('dcl-ignore', () => {
       expect(patterns).toContain('*.log')
     })
 
-    it('always ignores the asset-bundle sidecar cache, even for scenes with a custom .dclignore', async () => {
+    it('always ignores the asset-bundle cache, even for scenes with a custom .dclignore', async () => {
       // A watched write inside .dcl-optimized-assets means reload → manifest
       // request → revalidation write → reload, forever. The `**/` form is
       // required because the file watcher tests absolute paths, which the bare
