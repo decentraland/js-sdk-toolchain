@@ -113,23 +113,34 @@ describe('UiText React Ecs', () => {
     })
 
     it('should scale font size using viewport width by default', () => {
-      expect(scaleFontSize(16, undefined, scaleCtx)).toBeCloseTo(17.56)
+      // 16 + 0.39% of 800
+      expect(scaleFontSize(16, undefined, scaleCtx)).toBeCloseTo(19.12)
     })
 
     it('should scale font size using viewport height when scale unit is "vh"', () => {
-      expect(scaleFontSize(16, '10vh', scaleCtx)).toBeCloseTo(46)
+      // 16 + 10% of 600
+      expect(scaleFontSize(16, '10vh', scaleCtx)).toBeCloseTo(76)
     })
 
     it('should scale font size correctly when scale unit is "vw"', () => {
-      expect(scaleFontSize(16, '10vw', scaleCtx)).toBeCloseTo(56)
+      // 16 + 10% of 800
+      expect(scaleFontSize(16, '10vw', scaleCtx)).toBeCloseTo(96)
     })
 
     it('should handle scaling with a numeric value', () => {
-      expect(scaleFontSize(16, 10, scaleCtx)).toBeCloseTo(56)
+      expect(scaleFontSize(16, 10, scaleCtx)).toBeCloseTo(96)
     })
 
     it('should handle scaling with a numeric value and unit "vw"', () => {
-      expect(scaleFontSize(16, '10.5vw', scaleCtx)).toBeCloseTo(58)
+      expect(scaleFontSize(16, '10.5vw', scaleCtx)).toBeCloseTo(100)
+    })
+
+    it('should not depend on the context ratio', () => {
+      // 'Nvw' is N% of the canvas width by definition, exactly as in CSS. The density
+      // hint on the context must not change what a viewport unit resolves to.
+      for (const ratio of [0.5, 1, 2, 3]) {
+        expect(scaleFontSize(16, '10vw', { ...scaleCtx, ratio })).toBeCloseTo(96)
+      }
     })
   })
 
