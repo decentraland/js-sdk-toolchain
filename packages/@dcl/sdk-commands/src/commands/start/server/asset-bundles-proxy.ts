@@ -39,7 +39,17 @@ export function setupAssetBundlesProxy(
     delete requestHeaders['content-length']
     delete requestHeaders['accept-encoding']
 
-    const response = await components.fetch.fetch(`${sidecarUrl}/${ctx.params.path}${ctx.url.search}`, {
+    // The route pattern types :path+ as string[], but the runtime hands it over as one string.
+    const rawPath = Array.isArray(ctx.params.path) ? ctx.params.path.join('/') : ctx.params.path
+
+    // Explorer requests v49+ scene bundles by their digest-bearing file name under the
+    // CDN's shared {version}/assets/ prefix (unity-explorer#9442). The sidecar serves
+    // those same files through its flat /assets/{file} lane (bundle-index lookup) but
+    // has no version-prefixed route, so strip the version segment on the way through.
+    // TODO: drop once abgen serves GET /{version}/assets/{file} natively.
+    const path = rawPath.replace(/^v\d+\/assets\//, 'assets/')
+
+    const response = await components.fetch.fetch(`${sidecarUrl}/${path}${ctx.url.search}`, {
       headers: requestHeaders,
       method,
       body: method === 'GET' || method === 'HEAD' ? undefined : (ctx.request.body as any),

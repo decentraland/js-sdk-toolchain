@@ -68,6 +68,18 @@ describe('start/server/asset-bundles-proxy', () => {
     await expect(readBody(response.body)).resolves.toBe('bundle-bytes')
   })
 
+  it('rewrites the version-prefixed assets/ shape to the flat assets/ lane the sidecar serves', async () => {
+    const { fetch, dispatch } = makeProxy(() => 'http://127.0.0.1:53211')
+    fetch.mockResolvedValue(new Response('bundle-bytes', { status: 200 }))
+
+    await dispatch('GET', 'v49/assets/b64-abc_7580fefaf1c77b8b771687a8a4f86063_mac')
+
+    expect(fetch).toHaveBeenCalledWith(
+      'http://127.0.0.1:53211/assets/b64-abc_7580fefaf1c77b8b771687a8a4f86063_mac',
+      expect.anything()
+    )
+  })
+
   it('forwards non-GET methods with their body and the sidecar status', async () => {
     const { fetch, dispatch } = makeProxy(() => 'http://127.0.0.1:53211')
     fetch.mockResolvedValue(new Response('nope', { status: 404 }))
