@@ -2,7 +2,7 @@ import { Entity, MAX_U16 } from '../../packages/@dcl/ecs/src/engine/entity'
 import { components } from '../../packages/@dcl/ecs/src'
 import { ReactEcs, UiEntity } from '../../packages/@dcl/react-ecs/src'
 import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
-import { setupEngine } from './utils'
+import { setupEngine, WHOLE_SCREEN } from './utils'
 
 describe('RectEcs UI ✨', () => {
   it('should generate a UI and update the width', async () => {
@@ -31,7 +31,7 @@ describe('RectEcs UI ✨', () => {
         {/* UiEntity B */}
       </UiEntity>
     )
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
     expect(getUi(rootEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
@@ -89,7 +89,7 @@ describe('RectEcs UI ✨', () => {
       )
     }
 
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
 
     expect(getUi(rootEntity)).toMatchObject({
@@ -180,7 +180,7 @@ describe('RectEcs UI ✨', () => {
         {/* UiEntity B */}
       </UiEntity>
     )
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
 
     expect(getUi(entityA)).toMatchObject({
@@ -269,7 +269,7 @@ describe('RectEcs UI ✨', () => {
         {/* UiEntity Added */}
       </UiEntity>
     )
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
     expect(getUi(rootEntity)).toMatchObject({
       parent: CANVAS_ROOT_ENTITY,
@@ -368,7 +368,7 @@ describe('RectEcs UI ✨', () => {
       </UiEntity>
     )
 
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
 
     addChild = true
@@ -453,7 +453,7 @@ describe('RectEcs UI ✨', () => {
         ))}
       </UiEntity>
     )
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
 
     expect(getUi(entityA)).toMatchObject({
@@ -576,7 +576,7 @@ describe('RectEcs UI ✨', () => {
         ))}
       </UiEntity>
     )
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
 
     expect(getUi(entityA)).toMatchObject({
@@ -672,7 +672,7 @@ describe('RectEcs UI ✨', () => {
         ))}
       </UiEntity>
     )
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
 
     // Initial order: A → B → C
@@ -729,7 +729,7 @@ describe('RectEcs UI ✨', () => {
         ))}
       </UiEntity>
     )
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
 
     // Initial order: A → B → C → D
@@ -795,7 +795,7 @@ describe('RectEcs UI ✨', () => {
         ))}
       </UiEntity>
     )
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
 
     const verifyCyclesFree = () => {
@@ -811,14 +811,26 @@ describe('RectEcs UI ✨', () => {
     }
 
     // Reorder 1: [1,2,3,4,5] → [2,1,3,4,5]
-    items = [{ id: 2, value: 200 }, { id: 1, value: 100 }, { id: 3, value: 300 }, { id: 4, value: 400 }, { id: 5, value: 500 }]
+    items = [
+      { id: 2, value: 200 },
+      { id: 1, value: 100 },
+      { id: 3, value: 300 },
+      { id: 4, value: 400 },
+      { id: 5, value: 500 }
+    ]
     await engine.update(1)
     expect(getUi(entityB).rightOf).toBe(undefined)
     expect(getUi(entityA).rightOf).toBe(entityB)
     verifyCyclesFree()
 
     // Reorder 2: [2,1,3,4,5] → [5,4,3,2,1]
-    items = [{ id: 5, value: 500 }, { id: 4, value: 400 }, { id: 3, value: 300 }, { id: 2, value: 200 }, { id: 1, value: 100 }]
+    items = [
+      { id: 5, value: 500 },
+      { id: 4, value: 400 },
+      { id: 3, value: 300 },
+      { id: 2, value: 200 },
+      { id: 1, value: 100 }
+    ]
     await engine.update(1)
     expect(getUi(entityE).rightOf).toBe(undefined)
     expect(getUi(entityD).rightOf).toBe(entityE)
@@ -828,7 +840,13 @@ describe('RectEcs UI ✨', () => {
     verifyCyclesFree()
 
     // Reorder 3: back to original [1,2,3,4,5]
-    items = [{ id: 1, value: 100 }, { id: 2, value: 200 }, { id: 3, value: 300 }, { id: 4, value: 400 }, { id: 5, value: 500 }]
+    items = [
+      { id: 1, value: 100 },
+      { id: 2, value: 200 },
+      { id: 3, value: 300 },
+      { id: 4, value: 400 },
+      { id: 5, value: 500 }
+    ]
     await engine.update(1)
     expect(getUi(entityA).rightOf).toBe(undefined)
     expect(getUi(entityB).rightOf).toBe(entityA)
