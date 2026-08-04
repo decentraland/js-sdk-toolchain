@@ -7,7 +7,7 @@
     "sdk-commands": "./dist/index.js"
   },
   "dependencies": {
-    "@dcl/abgen-node": "^0.15.2",
+    "@dcl/abgen-node": "^0.15.4",
     "@dcl/crypto": "^3.4.4",
     "@dcl/ecs": "file:../ecs",
     "@dcl/gltf-validator-ts": "1.0.14",
