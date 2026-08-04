@@ -17,7 +17,7 @@ import {
 import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
 import { parseSize } from '../../packages/@dcl/react-ecs/src/components/uiTransform/utils'
 import { Color4 } from '../../packages/@dcl/sdk/math'
-import { setupEngine } from './utils'
+import { setupEngine, WHOLE_SCREEN } from './utils'
 import { getFontSize } from '../../packages/@dcl/react-ecs/src/components/Label/utils'
 
 describe('UiText React Ecs', () => {
@@ -32,7 +32,7 @@ describe('UiText React Ecs', () => {
 
     const ui = () => <Label uiTransform={{ width: 100 }} value="DCLROCKS" />
 
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
 
     expect(getText(rootDivEntity)).toMatchObject({
@@ -67,7 +67,7 @@ describe('UiText React Ecs', () => {
       />
     )
 
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
 
     expect(getUiTransform(rootDivEntity)).toMatchObject({

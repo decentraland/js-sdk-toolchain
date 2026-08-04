@@ -26,8 +26,8 @@ export type UiComponent = () => ReactEcs.JSX.ReactNode
 
 /**
  * Screen area used to position a renderer's UI entities:
- * - `'device'`: the device safe area (excludes notch, status bar, rounded corners),
- *   reported in `UiCanvasInformation.screenInsetArea`.
+ * - `'device'` (default): the device safe area (excludes notch, status bar,
+ *   rounded corners), reported in `UiCanvasInformation.screenInsetArea`.
  * - `'interactable'`: the area free of the Explorer's native HUD (minimap, chat, ...),
  *   reported in `UiCanvasInformation.interactableArea`.
  * - `'none'`: the whole screen, with 0,0 at its top-left corner.
@@ -42,9 +42,10 @@ export type UiRendererOptions = {
   virtualWidth?: number
   virtualHeight?: number
   /**
-   * Screen area the renderer's UI is positioned in. Defaults to `'none'` (whole screen).
-   * Each renderer honors its own value, so the main UI and additional renderers can
-   * use different insets simultaneously.
+   * Screen area the renderer's UI is positioned in. Defaults to `'device'`, so UI
+   * stays inside the device safe area unless the creator opts out with `'none'`.
+   * Each renderer honors its own value, so the main UI and additional renderers
+   * can use different insets simultaneously.
    */
   screenInset?: UiScreenInset
 }
@@ -65,6 +66,13 @@ const DEFAULT_MOBILE_VIRTUAL_SIZE: VirtualSize = { virtualWidth: 1600, virtualHe
  * Default virtual screen size used on non-mobile platforms.
  */
 const DEFAULT_VIRTUAL_SIZE: VirtualSize = { virtualWidth: 1920, virtualHeight: 1080 }
+
+/**
+ * Screen area a renderer uses when it doesn't pick one. UI defaults to the device
+ * safe area: drawing under a notch, a status bar or a rounded corner is something
+ * a creator should opt into, not the out-of-the-box behavior.
+ */
+const DEFAULT_SCREEN_INSET: UiScreenInset = 'device'
 
 function hasVirtualSize(options: UiRendererOptions | undefined): boolean {
   return !!options && (options.virtualWidth !== undefined || options.virtualHeight !== undefined)
@@ -95,7 +103,8 @@ export interface ReactBasedUiSystem {
    * virtual size is overridden to 1600x720 to fit phone screens.
    *
    * The optional `screenInset` selects the screen area the UI is positioned in
-   * (see {@link UiScreenInset}); it defaults to `'none'` (whole screen).
+   * (see {@link UiScreenInset}); it defaults to `'device'`. Pass `'none'` to
+   * place the UI over the whole screen.
    */
   setUiRenderer(ui: UiComponent, options?: UiRendererOptions): void
   /**
@@ -112,7 +121,8 @@ export interface ReactBasedUiSystem {
    * @param ui - The UI component to render
    * @param options - Optional virtual size used for UI scale factor when main UI has none.
    *                  Defaults and the mobile 16:9 override behave as in {@link ReactBasedUiSystem.setUiRenderer}.
-   *                  `screenInset` is honored per renderer, independently of the main UI's value.
+   *                  `screenInset` is honored per renderer, independently of the main UI's value,
+   *                  and defaults to `'device'` here too.
    */
   addUiRenderer(entity: Entity, ui: UiComponent, options?: UiRendererOptions): void
   /**
@@ -193,18 +203,18 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
 
   /**
    * Wraps a renderer's component in a container positioned within the selected
-   * screen inset area. `'none'` (the default) adds no wrapper so the current
-   * full-screen behavior is preserved as-is. Applied per renderer, so each
-   * renderer can use a different inset.
+   * screen inset area. `'none'` adds no wrapper, leaving the UI on the whole
+   * screen. Applied per renderer, so each renderer can use a different inset.
    */
   function wrapWithScreenInset(ui: UiComponent, inset: UiScreenInset | undefined, key: string): React.ReactNode {
-    if (inset === 'device') {
-      return React.createElement(ScreenInsetArea as any, { key }, React.createElement(ui as any))
+    switch (inset ?? DEFAULT_SCREEN_INSET) {
+      case 'device':
+        return React.createElement(ScreenInsetArea as any, { key }, React.createElement(ui as any))
+      case 'interactable':
+        return React.createElement(InteractableArea as any, { key }, React.createElement(ui as any))
+      default:
+        return React.createElement(ui as any, { key })
     }
-    if (inset === 'interactable') {
-      return React.createElement(InteractableArea as any, { key }, React.createElement(ui as any))
-    }
-    return React.createElement(ui as any, { key })
   }
 
   function ReactBasedUiSystem() {

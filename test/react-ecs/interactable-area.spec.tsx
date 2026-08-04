@@ -3,7 +3,7 @@ import { components } from '../../packages/@dcl/ecs/src'
 import { InteractableArea, ReactEcs } from '../../packages/@dcl/react-ecs/src'
 import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
 import { resetInteractableArea } from '../../packages/@dcl/react-ecs/src/components/utils'
-import { setupEngine } from './utils'
+import { setupEngine, WHOLE_SCREEN } from './utils'
 
 describe('InteractableArea React Ecs', () => {
   afterEach(() => {
@@ -25,7 +25,7 @@ describe('InteractableArea React Ecs', () => {
       interactableArea: { top: 0, left: 480, right: 0, bottom: 0 }
     })
 
-    uiRenderer.setUiRenderer(() => <InteractableArea />)
+    uiRenderer.setUiRenderer(() => <InteractableArea />, WHOLE_SCREEN)
     await engine.update(1)
 
     expect(UiTransform.get(rootDivEntity)).toMatchObject({
@@ -62,7 +62,7 @@ describe('InteractableArea React Ecs', () => {
       interactableArea: { top: 0, left: 480, right: 0, bottom: 0 }
     })
 
-    uiRenderer.setUiRenderer(() => <InteractableArea />)
+    uiRenderer.setUiRenderer(() => <InteractableArea />, WHOLE_SCREEN)
     await engine.update(1)
 
     expect(UiTransform.get(rootDivEntity)).toMatchObject({
@@ -91,7 +91,7 @@ describe('InteractableArea React Ecs', () => {
       interactableArea: { top: 0, left: 0, right: 0, bottom: 0 }
     })
 
-    uiRenderer.setUiRenderer(() => <InteractableArea />)
+    uiRenderer.setUiRenderer(() => <InteractableArea />, WHOLE_SCREEN)
     await engine.update(1)
 
     expect(UiTransform.get(rootDivEntity)).toMatchObject({
@@ -121,7 +121,7 @@ describe('InteractableArea React Ecs', () => {
     const entityIndex = engine.addEntity() as number
     const rootDivEntity = (entityIndex + 1) as Entity
 
-    uiRenderer.setUiRenderer(() => <InteractableArea />)
+    uiRenderer.setUiRenderer(() => <InteractableArea />, WHOLE_SCREEN)
     await engine.update(1)
 
     expect(UiTransform.get(rootDivEntity)).toMatchObject({
@@ -150,19 +150,22 @@ describe('InteractableArea React Ecs', () => {
       interactableArea: { top: 10, left: 10, right: 10, bottom: 10 }
     })
 
-    uiRenderer.setUiRenderer(() => (
-      <InteractableArea
-        uiTransform={
-          {
-            // user-provided overrides for position* should be ignored by typing,
-            // but we cast through `any` to assert runtime behaviour as well.
-            positionType: 'relative',
-            position: { top: 999, left: 999, right: 999, bottom: 999 },
-            padding: 4
-          } as any
-        }
-      />
-    ))
+    uiRenderer.setUiRenderer(
+      () => (
+        <InteractableArea
+          uiTransform={
+            {
+              // user-provided overrides for position* should be ignored by typing,
+              // but we cast through `any` to assert runtime behaviour as well.
+              positionType: 'relative',
+              position: { top: 999, left: 999, right: 999, bottom: 999 },
+              padding: 4
+            } as any
+          }
+        />
+      ),
+      WHOLE_SCREEN
+    )
     await engine.update(1)
 
     expect(UiTransform.get(rootDivEntity)).toMatchObject({

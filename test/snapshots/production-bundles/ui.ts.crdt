@@ -11,7 +11,7 @@ EVAL test/snapshots/production-bundles/ui.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
   OPCODES ~= 89k
-  MALLOC_COUNT = 22754
+  MALLOC_COUNT = 22755
   ALIVE_OBJS_DELTA ~= 4.61k
 CALL onStart()
   OPCODES ~= 0k
@@ -33,7 +33,8 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x208 c=1050 t=1 data={"parent":523,"rightOf":518,"alignItems":2,"positionType":0,"alignSelf":0,"flexDirection":0,"justifyContent":1,"overflow":0,"display":0,"flexBasisUnit":0,"flexBasis":0,"flexGrow":0,"widthUnit":2,"width":100,"heightUnit":1,"height":100,"minWidthUnit":0,"minWidth":0,"minHeightUnit":0,"minHeight":0,"maxWidthUnit":0,"maxWidth":0,"maxHeightUnit":0,"maxHeight":0,"positionLeftUnit":0,"positionLeft":0,"positionTopUnit":0,"positionTop":0,"positionRightUnit":0,"positionRight":0,"positionBottomUnit":0,"positionBottom":0,"marginLeftUnit":0,"marginLeft":0,"marginTopUnit":0,"marginTop":0,"marginRightUnit":0,"marginRight":0,"marginBottomUnit":0,"marginBottom":0,"paddingLeftUnit":0,"paddingLeft":0,"paddingTopUnit":0,"paddingTop":0,"paddingRightUnit":0,"paddingRight":0,"paddingBottomUnit":0,"paddingBottom":0,"pointerFilter":0,"opacity":1,"zIndex":0}
   Scene: PUT_COMPONENT e=0x209 c=1050 t=1 data={"parent":523,"rightOf":520,"positionType":0,"alignSelf":0,"flexDirection":0,"justifyContent":0,"overflow":0,"display":0,"flexBasisUnit":0,"flexBasis":0,"flexGrow":0,"widthUnit":3,"width":0,"heightUnit":0,"height":0,"minWidthUnit":0,"minWidth":0,"minHeightUnit":0,"minHeight":0,"maxWidthUnit":0,"maxWidth":0,"maxHeightUnit":0,"maxHeight":0,"positionLeftUnit":0,"positionLeft":0,"positionTopUnit":0,"positionTop":0,"positionRightUnit":0,"positionRight":0,"positionBottomUnit":0,"positionBottom":0,"marginLeftUnit":0,"marginLeft":0,"marginTopUnit":0,"marginTop":0,"marginRightUnit":0,"marginRight":0,"marginBottomUnit":0,"marginBottom":0,"paddingLeftUnit":0,"paddingLeft":0,"paddingTopUnit":0,"paddingTop":0,"paddingRightUnit":0,"paddingRight":0,"paddingBottomUnit":0,"paddingBottom":0,"pointerFilter":0,"opacity":1,"zIndex":0}
   Scene: PUT_COMPONENT e=0x20a c=1050 t=1 data={"parent":523,"rightOf":521,"positionType":0,"alignSelf":0,"flexDirection":0,"justifyContent":0,"overflow":0,"display":0,"flexBasisUnit":0,"flexBasis":0,"flexGrow":0,"widthUnit":3,"width":0,"heightUnit":1,"height":36,"minWidthUnit":0,"minWidth":0,"minHeightUnit":0,"minHeight":0,"maxWidthUnit":0,"maxWidth":0,"maxHeightUnit":0,"maxHeight":0,"positionLeftUnit":0,"positionLeft":0,"positionTopUnit":0,"positionTop":0,"positionRightUnit":0,"positionRight":0,"positionBottomUnit":0,"positionBottom":0,"marginLeftUnit":0,"marginLeft":0,"marginTopUnit":0,"marginTop":0,"marginRightUnit":0,"marginRight":0,"marginBottomUnit":0,"marginBottom":0,"paddingLeftUnit":0,"paddingLeft":0,"paddingTopUnit":0,"paddingTop":0,"paddingRightUnit":0,"paddingRight":0,"paddingBottomUnit":0,"paddingBottom":0,"pointerFilter":0,"opacity":1,"zIndex":0}
-  Scene: PUT_COMPONENT e=0x20b c=1050 t=1 data={"parent":0,"rightOf":0,"positionType":0,"alignSelf":0,"flexDirection":0,"justifyContent":0,"overflow":0,"display":0,"flexBasisUnit":0,"flexBasis":0,"flexGrow":0,"widthUnit":1,"width":700,"heightUnit":1,"height":400,"minWidthUnit":0,"minWidth":0,"minHeightUnit":0,"minHeight":0,"maxWidthUnit":0,"maxWidth":0,"maxHeightUnit":0,"maxHeight":0,"positionLeftUnit":0,"positionLeft":0,"positionTopUnit":0,"positionTop":0,"positionRightUnit":0,"positionRight":0,"positionBottomUnit":0,"positionBottom":0,"marginLeftUnit":1,"marginLeft":500,"marginTopUnit":1,"marginTop":35,"marginRightUnit":0,"marginRight":0,"marginBottomUnit":0,"marginBottom":0,"paddingLeftUnit":0,"paddingLeft":0,"paddingTopUnit":0,"paddingTop":0,"paddingRightUnit":0,"paddingRight":0,"paddingBottomUnit":0,"paddingBottom":0,"pointerFilter":0,"opacity":1,"zIndex":0}
+  Scene: PUT_COMPONENT e=0x20b c=1050 t=1 data={"parent":524,"rightOf":0,"positionType":0,"alignSelf":0,"flexDirection":0,"justifyContent":0,"overflow":0,"display":0,"flexBasisUnit":0,"flexBasis":0,"flexGrow":0,"widthUnit":1,"width":700,"heightUnit":1,"height":400,"minWidthUnit":0,"minWidth":0,"minHeightUnit":0,"minHeight":0,"maxWidthUnit":0,"maxWidth":0,"maxHeightUnit":0,"maxHeight":0,"positionLeftUnit":0,"positionLeft":0,"positionTopUnit":0,"positionTop":0,"positionRightUnit":0,"positionRight":0,"positionBottomUnit":0,"positionBottom":0,"marginLeftUnit":1,"marginLeft":500,"marginTopUnit":1,"marginTop":35,"marginRightUnit":0,"marginRight":0,"marginBottomUnit":0,"marginBottom":0,"paddingLeftUnit":0,"paddingLeft":0,"paddingTopUnit":0,"paddingTop":0,"paddingRightUnit":0,"paddingRight":0,"paddingBottomUnit":0,"paddingBottom":0,"pointerFilter":0,"opacity":1,"zIndex":0}
+  Scene: PUT_COMPONENT e=0x20c c=1050 t=1 data={"parent":0,"rightOf":0,"positionType":1,"alignSelf":0,"flexDirection":0,"justifyContent":0,"overflow":0,"display":0,"flexBasisUnit":0,"flexBasis":0,"flexGrow":0,"widthUnit":3,"width":0,"heightUnit":0,"height":0,"minWidthUnit":0,"minWidth":0,"minHeightUnit":0,"minHeight":0,"maxWidthUnit":0,"maxWidth":0,"maxHeightUnit":0,"maxHeight":0,"positionLeftUnit":1,"positionLeft":0,"positionTopUnit":1,"positionTop":0,"positionRightUnit":1,"positionRight":0,"positionBottomUnit":1,"positionBottom":0,"marginLeftUnit":0,"marginLeft":0,"marginTopUnit":0,"marginTop":0,"marginRightUnit":0,"marginRight":0,"marginBottomUnit":0,"marginBottom":0,"paddingLeftUnit":0,"paddingLeft":0,"paddingTopUnit":0,"paddingTop":0,"paddingRightUnit":0,"paddingRight":0,"paddingBottomUnit":0,"paddingBottom":0,"pointerFilter":0,"opacity":1,"zIndex":0}
   Scene: PUT_COMPONENT e=0x200 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   Scene: PUT_COMPONENT e=0x203 c=1052 t=1 data={"value":"SDK 7","fontSize":80,"textWrap":0}
   Scene: PUT_COMPONENT e=0x205 c=1052 t=1 data={"value":"Counter:","fontSize":60,"textWrap":0}
@@ -49,22 +50,22 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x202 c=1093 t=1 data={"placeholder":"SARASA","disabled":false}
   Scene: PUT_COMPONENT e=0x209 c=1093 t=1 data={"placeholder":"","disabled":false}
   Scene: PUT_COMPONENT e=0x201 c=1094 t=1 data={"acceptEmpty":false,"options":["BOEDO","CASLA"],"selectedIndex":0,"disabled":false,"color":{"r":1,"g":0,"b":0,"a":1}}
-  OPCODES ~= 145k
-  MALLOC_COUNT = 967
-  ALIVE_OBJS_DELTA ~= 0.31k
+  OPCODES ~= 154k
+  MALLOC_COUNT = 1012
+  ALIVE_OBJS_DELTA ~= 0.33k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=2 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.008726535364985466,"z":0,"w":0.9999619126319885},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 76k
-  MALLOC_COUNT = 259
-  ALIVE_OBJS_DELTA ~= 0.13k
+  OPCODES ~= 83k
+  MALLOC_COUNT = 279
+  ALIVE_OBJS_DELTA ~= 0.14k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=3 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.017452405765652657,"z":0,"w":0.9998477101325989},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 74k
-  MALLOC_COUNT = 35
+  OPCODES ~= 80k
+  MALLOC_COUNT = 37
   ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=4 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.026176948100328445,"z":0,"w":0.9996573328971863},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 74k
+  OPCODES ~= 80k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1914.30k bytes
+  MEMORY_USAGE_COUNT ~= 1921.38k bytes

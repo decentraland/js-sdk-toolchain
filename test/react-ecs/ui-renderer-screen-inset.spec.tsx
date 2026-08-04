@@ -36,22 +36,71 @@ describe('UI renderer screenInset option', () => {
     })
   }
 
-  it('adds no wrapper entity by default and with an explicit none', async () => {
+  it('wraps the main UI in the device screen inset area by default', async () => {
     const { engine, uiRenderer } = setupEngine()
     const UiTransform = components.UiTransform(engine)
-    createCanvasInfo(engine, { screenInsetArea: { top: 24, left: 12, right: 16, bottom: 32 } })
+    // Both areas are reported, so the assertion pins down which one the default picks.
+    createCanvasInfo(engine, {
+      screenInsetArea: { top: 24, left: 12, right: 16, bottom: 32 },
+      interactableArea: { top: 0, left: 480, right: 0, bottom: 0 }
+    })
 
     uiRenderer.setUiRenderer(() => <UiEntity uiTransform={{ width: 100 }} />)
     await engine.update(1)
 
-    let uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
-    expect(uiEntities.length).toBe(1)
-    expect(UiTransform.get(uiEntities[0][0]).parent).toBe(CANVAS_ROOT_ENTITY)
+    const uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
+    expect(uiEntities.length).toBe(2)
+
+    const wrapper = uiEntities.find(([, transform]) => transform.positionType === YGPositionType.YGPT_ABSOLUTE)!
+    expect(wrapper[1]).toMatchObject({
+      parent: CANVAS_ROOT_ENTITY,
+      positionTop: 24,
+      positionLeft: 12,
+      positionRight: 16,
+      positionBottom: 32
+    })
+
+    const child = uiEntities.find(([, transform]) => transform.width === 100)!
+    expect(child[1].parent).toBe(wrapper[0])
+
+    uiRenderer.destroy()
+  })
+
+  it('wraps an additional renderer in the device screen inset area by default', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    createCanvasInfo(engine, {
+      screenInsetArea: { top: 24, left: 12, right: 16, bottom: 32 },
+      interactableArea: { top: 0, left: 480, right: 0, bottom: 0 }
+    })
+    const ownerEntity = engine.addEntity()
+
+    uiRenderer.addUiRenderer(ownerEntity, () => <UiEntity uiTransform={{ width: 100 }} />)
+    await engine.update(1)
+
+    const uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
+    expect(uiEntities.length).toBe(2)
+
+    const child = uiEntities.find(([, transform]) => transform.width === 100)!
+    expect(UiTransform.get(child[1].parent as Entity)).toMatchObject({
+      parent: CANVAS_ROOT_ENTITY,
+      positionType: YGPositionType.YGPT_ABSOLUTE,
+      positionTop: 24,
+      positionLeft: 12
+    })
+
+    uiRenderer.destroy()
+  })
+
+  it('adds no wrapper entity with an explicit none', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    createCanvasInfo(engine, { screenInsetArea: { top: 24, left: 12, right: 16, bottom: 32 } })
 
     uiRenderer.setUiRenderer(() => <UiEntity uiTransform={{ width: 100 }} />, { screenInset: 'none' })
     await engine.update(1)
 
-    uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
+    const uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
     expect(uiEntities.length).toBe(1)
     expect(UiTransform.get(uiEntities[0][0]).parent).toBe(CANVAS_ROOT_ENTITY)
 
@@ -128,7 +177,7 @@ describe('UI renderer screenInset option', () => {
 
     uiRenderer.setUiRenderer(() => <UiEntity uiTransform={{ width: 100 }} />, { screenInset: 'interactable' })
     uiRenderer.addUiRenderer(deviceEntity, () => <UiEntity uiTransform={{ width: 200 }} />, { screenInset: 'device' })
-    uiRenderer.addUiRenderer(noneEntity, () => <UiEntity uiTransform={{ width: 300 }} />)
+    uiRenderer.addUiRenderer(noneEntity, () => <UiEntity uiTransform={{ width: 300 }} />, { screenInset: 'none' })
     await engine.update(1)
 
     // 3 renderer children + 2 wrappers ('none' adds none).
@@ -239,7 +288,7 @@ describe('UI renderer screenInset option', () => {
     createCanvasInfo(engine, { screenInsetArea: { top: 24, left: 12, right: 16, bottom: 32 } })
     const ui = () => <UiEntity uiTransform={{ width: 100 }} />
 
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, { screenInset: 'none' })
     await engine.update(1)
     expect(Array.from(engine.getEntitiesWith(UiTransform)).length).toBe(1)
 
