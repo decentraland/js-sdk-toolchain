@@ -51,14 +51,11 @@ export function setupAssetBundlesProxy(
 
     // Explorer requests v49+ scene bundles by their digest-bearing file name under the
     // CDN's shared {version}/assets/ prefix (unity-explorer#9442). The sidecar has no
-    // such route — its digest-tolerant, JIT-building lane is the legacy per-entity one —
-    // so rewrite to {version}/{sceneId}/{hash}_{platform}, dropping the deps digest
-    // (bare b64 hashes never contain '_', so the digest segment is unambiguous).
+    // such route, but its per-entity lane serves the same digest-bearing file names —
+    // resolved straight from disk (immune to a stale boot-time bundle index, unlike the
+    // flat /assets/ lane) and JIT-built on miss — so only the entity segment changes.
     // TODO: drop once abgen serves GET /{version}/assets/{file} natively.
-    const path = rawPath.replace(
-      /^(v\d+)\/assets\/(.+?)(?:_[0-9a-f]{32})?(_(?:windows|mac|linux)(?:\.br)?)$/,
-      (_match, version, hash, platform) => `${version}/${sceneId}/${hash}${platform}`
-    )
+    const path = rawPath.replace(/^(v\d+)\/assets\//, `$1/${sceneId}/`)
 
     const response = await components.fetch.fetch(`${sidecarUrl}/${path}${ctx.url.search}`, {
       headers: requestHeaders,

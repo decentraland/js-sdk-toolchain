@@ -72,16 +72,19 @@ describe('start/server/asset-bundles-proxy', () => {
     await expect(readBody(response.body)).resolves.toBe('bundle-bytes')
   })
 
-  it('rewrites digest-bearing {version}/assets/ requests to the legacy per-entity lane, dropping the digest', async () => {
+  it('rewrites {version}/assets/ requests to the per-entity lane, preserving the digest-bearing file name', async () => {
     const { fetch, dispatch } = makeProxy(() => 'http://127.0.0.1:53211')
     fetch.mockResolvedValue(new Response('bundle-bytes', { status: 200 }))
 
     await dispatch('GET', 'v49/assets/b64-abc_7580fefaf1c77b8b771687a8a4f86063_mac')
 
-    expect(fetch).toHaveBeenCalledWith(`http://127.0.0.1:53211/v49/${sceneId}/b64-abc_mac`, expect.anything())
+    expect(fetch).toHaveBeenCalledWith(
+      `http://127.0.0.1:53211/v49/${sceneId}/b64-abc_7580fefaf1c77b8b771687a8a4f86063_mac`,
+      expect.anything()
+    )
   })
 
-  it('rewrites digest-less {version}/assets/ requests to the legacy per-entity lane', async () => {
+  it('rewrites digest-less {version}/assets/ requests through the same rule', async () => {
     const { fetch, dispatch } = makeProxy(() => 'http://127.0.0.1:53211')
     fetch.mockResolvedValue(new Response('bundle-bytes', { status: 200 }))
 
