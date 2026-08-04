@@ -98,6 +98,23 @@ export type AudioAnalysisView = {
 // @public (undocumented)
 export const AudioEvent: GrowOnlyValueSetComponentDefinition<PBAudioEvent>;
 
+// @public (undocumented)
+export interface AudioEventsSystem {
+    getAudioState(entity: Entity): DeepReadonlyObject<PBAudioEvent> | undefined;
+    // (undocumented)
+    hasAudioEventsEntity(entity: Entity): boolean;
+    // (undocumented)
+    registerAudioEventsEntity(entity: Entity, callback: AudioEventsSystemCallback): void;
+    // (undocumented)
+    removeAudioEventsEntity(entity: Entity): void;
+}
+
+// @public
+export const audioEventsSystem: AudioEventsSystem;
+
+// @public (undocumented)
+export type AudioEventsSystemCallback = (event: DeepReadonlyObject<PBAudioEvent>) => void;
+
 // Warning: (ae-missing-release-tag) "AudioSource" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -1161,6 +1178,13 @@ export interface EcsElements {
         children?: ReactEcs.JSX.ReactNode;
         key?: Key;
     };
+}
+
+// @public (undocumented)
+export const enum EmoteState {
+    ES_FINISHED = 1,
+    ES_INTERRUPTED = 2,
+    ES_STARTED = 0
 }
 
 // @public @deprecated
@@ -2549,6 +2573,7 @@ export interface PBAvatarEmoteCommand {
     loop: boolean;
     // (undocumented)
     mask?: AvatarMask | undefined;
+    state?: EmoteState | undefined;
     timestamp: number;
 }
 
