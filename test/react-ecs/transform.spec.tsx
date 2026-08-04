@@ -22,7 +22,7 @@ import {
 } from '../../packages/@dcl/react-ecs/src'
 import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
 import { Color4 } from '../../packages/@dcl/sdk/math'
-import { setupEngine } from './utils'
+import { setupEngine, WHOLE_SCREEN } from './utils'
 
 describe('UiTransform React Ecs', () => {
   it('should send empty object if uiTransform is undefined', async () => {
@@ -34,7 +34,7 @@ describe('UiTransform React Ecs', () => {
     const rootDivEntity = (entityIndex + 1) as Entity
     const getUiTransform = (entity: Entity) => UiTransform.get(entity)
     const ui = () => <UiEntity uiTransform={undefined} />
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
     expect(getUiTransform(rootDivEntity).width).toBe(0)
   })
@@ -64,7 +64,7 @@ describe('UiTransform React Ecs', () => {
         }}
       />
     )
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
     expect(UiText.get(rootDivEntity)).toMatchObject({ value: 'BOEDO' })
     expect(getUiTransform(rootDivEntity)).toMatchObject({
@@ -98,7 +98,7 @@ describe('UiTransform React Ecs', () => {
 
     const ui = () => <UiEntity uiTransform={{ width: 100, position }} />
 
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
 
     expect(getUiTransform(rootDivEntity)).toMatchObject({
@@ -174,7 +174,7 @@ describe('UiTransform React Ecs', () => {
 
     const ui = () => <UiEntity uiTransform={{ width: 100, borderRadius, borderColor: Color4.Green(), borderWidth }} />
 
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
 
     const matchObject: Partial<PBUiTransform> = {
@@ -297,7 +297,7 @@ describe('UiTransform React Ecs', () => {
       />
     )
 
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
 
     expect(getUiTransform(rootDivEntity)).toMatchObject({
@@ -354,7 +354,7 @@ describe('UiTransform React Ecs', () => {
 
     const ui = () => <UiEntity uiTransform={{ margin }} />
 
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
 
     expect(getUiTransform(rootDivEntity)).toMatchObject({
@@ -457,7 +457,7 @@ describe('UiTransform React Ecs', () => {
         }}
       />
     )
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       pointerFilter: PointerFilterMode.PFM_BLOCK
@@ -480,7 +480,7 @@ describe('UiTransform React Ecs', () => {
         }}
       />
     )
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       widthUnit: YGUnit.YGU_AUTO,
@@ -505,7 +505,7 @@ describe('UiTransform React Ecs', () => {
       />
     )
 
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       zIndex: 10
@@ -528,7 +528,7 @@ describe('UiTransform React Ecs', () => {
         }}
       />
     )
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       zIndex: -5
@@ -551,7 +551,7 @@ describe('UiTransform React Ecs', () => {
         }}
       />
     )
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       zIndex: 0
@@ -574,7 +574,7 @@ describe('UiTransform React Ecs', () => {
         }}
       />
     )
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       zIndex: 0
@@ -598,7 +598,7 @@ describe('UiTransform React Ecs', () => {
       />
     )
 
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       opacity: 10
@@ -621,7 +621,7 @@ describe('UiTransform React Ecs', () => {
         }}
       />
     )
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       opacity: -5
@@ -644,7 +644,7 @@ describe('UiTransform React Ecs', () => {
         }}
       />
     )
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       opacity: 0
@@ -667,7 +667,7 @@ describe('UiTransform React Ecs', () => {
         }}
       />
     )
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       opacity: 1
