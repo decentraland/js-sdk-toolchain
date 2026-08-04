@@ -21,7 +21,7 @@ export async function wireRouter(
   const router = new Router<PreviewComponents>()
 
   if (getAssetBundlesSidecarUrl) {
-    setupAssetBundlesProxy(components, router, getAssetBundlesSidecarUrl)
+    setupAssetBundlesProxy(components, router, getAssetBundlesSidecarUrl, workspace)
   }
 
   if (dataLayer) {

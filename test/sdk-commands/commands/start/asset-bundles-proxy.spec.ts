@@ -1,10 +1,14 @@
 import { setupAssetBundlesProxy } from '../../../../packages/@dcl/sdk-commands/src/commands/start/server/asset-bundles-proxy'
+import { b64UrlHashingFunction } from '../../../../packages/@dcl/sdk-commands/src/logic/project-files'
+
+const workspace = { projects: [{ workingDirectory: '/tmp/scene' }] } as any
+const sceneId = b64UrlHashingFunction('/tmp/scene')
 
 function makeProxy(getSidecarUrl: () => string | undefined) {
   const fetch = jest.fn()
   let handler: (ctx: any) => Promise<any>
   const router = { all: jest.fn((_path: string, h: any) => (handler = h)) }
-  setupAssetBundlesProxy({ fetch: { fetch } } as any, router as any, getSidecarUrl)
+  setupAssetBundlesProxy({ fetch: { fetch } } as any, router as any, getSidecarUrl, workspace)
   // requests reach the handler with the /optimized-assets prefix already
   // consumed by the route pattern: ctx.params.path carries the rest
   const dispatch = (method: string, path: string, search = '', body?: any, headers: Record<string, string> = {}) =>
@@ -68,16 +72,22 @@ describe('start/server/asset-bundles-proxy', () => {
     await expect(readBody(response.body)).resolves.toBe('bundle-bytes')
   })
 
-  it('rewrites the version-prefixed assets/ shape to the flat assets/ lane the sidecar serves', async () => {
+  it('rewrites digest-bearing {version}/assets/ requests to the legacy per-entity lane, dropping the digest', async () => {
     const { fetch, dispatch } = makeProxy(() => 'http://127.0.0.1:53211')
     fetch.mockResolvedValue(new Response('bundle-bytes', { status: 200 }))
 
     await dispatch('GET', 'v49/assets/b64-abc_7580fefaf1c77b8b771687a8a4f86063_mac')
 
-    expect(fetch).toHaveBeenCalledWith(
-      'http://127.0.0.1:53211/assets/b64-abc_7580fefaf1c77b8b771687a8a4f86063_mac',
-      expect.anything()
-    )
+    expect(fetch).toHaveBeenCalledWith(`http://127.0.0.1:53211/v49/${sceneId}/b64-abc_mac`, expect.anything())
+  })
+
+  it('rewrites digest-less {version}/assets/ requests to the legacy per-entity lane', async () => {
+    const { fetch, dispatch } = makeProxy(() => 'http://127.0.0.1:53211')
+    fetch.mockResolvedValue(new Response('bundle-bytes', { status: 200 }))
+
+    await dispatch('GET', 'v49/assets/b64-abc_windows.br')
+
+    expect(fetch).toHaveBeenCalledWith(`http://127.0.0.1:53211/v49/${sceneId}/b64-abc_windows.br`, expect.anything())
   })
 
   it('forwards non-GET methods with their body and the sidecar status', async () => {

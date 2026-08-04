@@ -2,6 +2,8 @@ import { Router } from '@well-known-components/http-server'
 import { Readable } from 'stream'
 
 import { CliComponents } from '../../../components'
+import { Workspace } from '../../../logic/workspace-validations'
+import { b64UrlHashingFunction } from '../../../logic/project-files'
 import { PreviewComponents } from '../types'
 
 /**
@@ -18,8 +20,13 @@ import { PreviewComponents } from '../types'
 export function setupAssetBundlesProxy(
   components: Pick<CliComponents, 'fetch'>,
   router: Router<PreviewComponents>,
-  getSidecarUrl: () => string | undefined
+  getSidecarUrl: () => string | undefined,
+  workspace: Workspace
 ) {
+  // Same derivation the preview content server uses for the scene's entity id
+  // (endpoints.ts getSceneJson). Multi-project workspaces keep the first project's
+  // id: local scene development previews a single scene.
+  const sceneId = b64UrlHashingFunction(workspace.projects[0].workingDirectory)
   router.all('/optimized-assets/:path+', async (ctx) => {
     const sidecarUrl = getSidecarUrl()
     if (!sidecarUrl) {
@@ -43,11 +50,15 @@ export function setupAssetBundlesProxy(
     const rawPath = Array.isArray(ctx.params.path) ? ctx.params.path.join('/') : ctx.params.path
 
     // Explorer requests v49+ scene bundles by their digest-bearing file name under the
-    // CDN's shared {version}/assets/ prefix (unity-explorer#9442). The sidecar serves
-    // those same files through its flat /assets/{file} lane (bundle-index lookup) but
-    // has no version-prefixed route, so strip the version segment on the way through.
+    // CDN's shared {version}/assets/ prefix (unity-explorer#9442). The sidecar has no
+    // such route — its digest-tolerant, JIT-building lane is the legacy per-entity one —
+    // so rewrite to {version}/{sceneId}/{hash}_{platform}, dropping the deps digest
+    // (bare b64 hashes never contain '_', so the digest segment is unambiguous).
     // TODO: drop once abgen serves GET /{version}/assets/{file} natively.
-    const path = rawPath.replace(/^v\d+\/assets\//, 'assets/')
+    const path = rawPath.replace(
+      /^(v\d+)\/assets\/(.+?)(?:_[0-9a-f]{32})?(_(?:windows|mac|linux)(?:\.br)?)$/,
+      (_match, version, hash, platform) => `${version}/${sceneId}/${hash}${platform}`
+    )
 
     const response = await components.fetch.fetch(`${sidecarUrl}/${path}${ctx.url.search}`, {
       headers: requestHeaders,
