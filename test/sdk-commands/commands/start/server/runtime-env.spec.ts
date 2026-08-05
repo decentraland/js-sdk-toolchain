@@ -4,26 +4,43 @@ import {
   getWorldValue,
   setWorldValue,
   deleteWorldValue,
-  loadServerStorage
+  loadServerStorage,
+  setEnvValue
 } from '../../../../../packages/@dcl/sdk-commands/src/commands/start/server/runtime-env'
 
 /**
- * In-memory stand-in for the single `.runtime-data/server-storage.json` file that
- * runtime-env reads and writes. Path is ignored — there is only one file.
+ * In-memory stand-in for the `.runtime-data/` directory that runtime-env reads and
+ * writes, keyed by path so the temp-file-then-rename write is observable.
+ * runtime-env derives that path from its own package location, so it is learned
+ * from the first access rather than duplicated here.
  */
 function makeComponents(initialFile?: string) {
-  let fileContent = initialFile
+  const files = new Map<string, string>()
+  let mainPath = ''
+  const seed = (filePath: string) => {
+    if (filePath.endsWith('.tmp')) return
+    mainPath = filePath
+    if (initialFile !== undefined && !files.has(filePath)) files.set(filePath, initialFile)
+  }
   const fs = {
-    fileExists: jest.fn(async () => fileContent !== undefined),
-    readFile: jest.fn(async () => fileContent ?? ''),
+    fileExists: jest.fn(async (filePath: string) => {
+      seed(filePath)
+      return files.has(filePath)
+    }),
+    readFile: jest.fn(async (filePath: string) => files.get(filePath) ?? ''),
     directoryExists: jest.fn(async () => true),
     mkdir: jest.fn(async () => undefined),
-    writeFile: jest.fn(async (_path: string, content: string) => {
-      fileContent = content
+    writeFile: jest.fn(async (filePath: string, content: string) => {
+      files.set(filePath, content)
+    }),
+    rename: jest.fn(async (from: string, to: string) => {
+      files.set(to, files.get(from)!)
+      files.delete(from)
+      seed(to)
     })
   }
   const logger = { debug: jest.fn(), error: jest.fn(), info: jest.fn(), log: jest.fn(), warn: jest.fn() }
-  return { components: { fs, logger } as any, logger, readFile: () => fileContent }
+  return { components: { fs, logger } as any, fs, logger, readFile: () => files.get(mainPath) }
 }
 
 describe('runtime-env world storage namespacing', () => {
@@ -98,6 +115,31 @@ describe('runtime-env world storage namespacing', () => {
 
       expect(storage.world).toEqual({ '60,-9': { highScore: 42 } })
       expect(logger.debug).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('loadServerStorage corrupt file handling', () => {
+    it('reports the discarded state loudly and falls back to defaults', async () => {
+      const { components, logger } = makeComponents('{ "env": { "A": "1" }, "world"')
+
+      const storage = await loadServerStorage(components)
+
+      expect(storage).toEqual({ env: {}, world: {}, players: {} })
+      expect(logger.error).toHaveBeenCalledTimes(1)
+      expect(String(logger.error.mock.calls[0][0])).toMatch(/discard/i)
+    })
+  })
+
+  describe('saveServerStorage atomicity', () => {
+    it('writes a temp file and renames it over the target', async () => {
+      const { components, fs, readFile } = makeComponents()
+
+      await setEnvValue(components, 'FOO', 'bar')
+
+      const writtenPath: string = fs.writeFile.mock.calls[0][0]
+      expect(writtenPath).toMatch(/server-storage\.json\.tmp$/)
+      expect(fs.rename).toHaveBeenCalledWith(writtenPath, writtenPath.replace(/\.tmp$/, ''))
+      expect(JSON.parse(readFile()!).env).toEqual({ FOO: 'bar' })
     })
   })
 })

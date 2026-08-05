@@ -20,13 +20,27 @@ import { debounce } from '../../../logic/debounce'
  * IMPORTANT: this is a legacy protocol and needs to be revisited for SDK7
  */
 export async function wireFileWatcherToWebSockets(
-  components: Pick<PreviewComponents, 'fs' | 'ws' | 'logger'>,
+  components: Pick<PreviewComponents, 'fs' | 'ws' | 'logger' | 'hammurabiServer'>,
   projectRoot: string,
   projectKind: ProjectUnion['kind'],
   desktopClient: boolean
 ) {
   const ignored = await getDCLIgnorePatterns(components, projectRoot)
   const sceneId = b64HashingFunction(projectRoot)
+
+  const notifyClients = debounce(async (_event: unknown, file: string) => {
+    if (desktopClient) {
+      updateScene(sceneId, file)
+    }
+    return __LEGACY__updateScene(projectRoot, sceneUpdateClients, projectKind)
+  }, 800)
+
+  // Clients get told to reload, but the authoritative server keeps executing the
+  // bundle it booted with, so it has to be restarted too.
+  // ponytail: restarts on any watched change, not just the built bundle. Narrow it
+  // to scene.main if the restart cost ever becomes noticeable.
+  const restartServer = debounce(() => components.hammurabiServer?.restart(), 800)
+  let initialScanDone = false
 
   chokidar
     .watch(path.resolve(projectRoot), {
@@ -40,15 +54,15 @@ export async function wireFileWatcherToWebSockets(
         return removeModel(sceneId, file)
       }
     })
-    .on(
-      'all',
-      debounce(async (a, file) => {
-        if (desktopClient) {
-          updateScene(sceneId, file)
-        }
-        return __LEGACY__updateScene(projectRoot, sceneUpdateClients, projectKind)
-      }, 800)
-    )
+    .on('ready', () => {
+      initialScanDone = true
+    })
+    .on('all', (event, file) => {
+      notifyClients(event, file)
+      // events from the initial scan describe files that were already there when the
+      // server booted — restarting for those would kill it right after startup
+      if (initialScanDone) restartServer()
+    })
 }
 
 function isGLTFModel(file: string) {

@@ -85,7 +85,10 @@ export async function loadServerStorage(components: Pick<CliComponents, 'fs' | '
       players: parsed.players ?? {}
     }
   } catch (error) {
-    components.logger.error(`Failed to load ${SERVER_STORAGE_FILE}: ${error}`)
+    components.logger.error(
+      `Discarding local preview storage: ${SERVER_STORAGE_FILE} could not be read (${error}). ` +
+        `Stored env, world and player values are reset to defaults.`
+    )
     return createDefaultStorage()
   }
 }
@@ -101,7 +104,11 @@ export async function saveServerStorage(
   const storagePath = path.join(RUNTIME_DATA_DIR, SERVER_STORAGE_FILE)
 
   try {
-    await components.fs.writeFile(storagePath, JSON.stringify(data, null, 2))
+    // Write-then-rename: rename is atomic within a filesystem, so a crash can never
+    // leave a half-written file behind for loadServerStorage to discard.
+    const tmpPath = `${storagePath}.tmp`
+    await components.fs.writeFile(tmpPath, JSON.stringify(data, null, 2))
+    await components.fs.rename(tmpPath, storagePath)
   } catch (error) {
     components.logger.error(`Failed to save ${SERVER_STORAGE_FILE}: ${error}`)
     throw error
