@@ -213,7 +213,15 @@ export function createServerValidator(config: ServerValidationConfig) {
   return {
     findExistingNetworkEntity,
     // transform Network messages to CRDT Common Messages.
-    processClientMessages: function processClientMessages(value: Uint8Array, sender: string, forceCorrections = false) {
+    // `seen` collects the local entities the payload named, so a caller applying a
+    // full state dump can tell which of its network entities the dump left out
+    // without parsing the payload a second time.
+    processClientMessages: function processClientMessages(
+      value: Uint8Array,
+      sender: string,
+      forceCorrections = false,
+      seen?: Set<Entity>
+    ) {
       // console.log(`[CLIENT] Processing message from ${sender}, ${value.length} bytes`)
 
       // Collect all regular messages in a single buffer for batched application
@@ -227,6 +235,7 @@ export function createServerValidator(config: ServerValidationConfig) {
 
           // Find or create network entity mapping
           const localEntityId = findOrCreateNetworkEntity(networkMessage, sender, false)
+          seen?.add(localEntityId)
 
           // Convert network message to regular message or correction message
           const regularMessage = convertNetworkToRegularMessage(networkMessage, localEntityId, forceCorrections)

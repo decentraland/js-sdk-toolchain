@@ -1,18 +1,17 @@
 /**
  * Red suite: one test per known defect, each asserting the CORRECT behavior.
  *
- * Every test is declared with `it.failing`, so jest expects it to throw today.
- * When a phase fixes a defect its test starts passing and `it.failing` turns
+ * An unfixed defect is declared with `it.failing`, so jest expects it to throw
+ * today. When a phase fixes one its test starts passing and `it.failing` turns
  * red — that is the signal to flip it to a plain `it` (and to drop the matching
  * `QUIRK(pinned)` assertion from the characterization specs).
  *
- * Source locations verified against the tree at the time of writing:
- *   #1  message-bus-sync.ts:117-129   REQ_CRDT_STATE responder, no isServer guard
- *   #2  message-bus-sync.ts:130-133   RES_CRDT_STATE clears the retry state before checking the sender
+ * Fixed in phase 1 (hydration FSM), now plain `it`: #1, #2, #6, #7, #9, #14.
+ *
+ * Source locations of what is still red, verified at the time of writing:
  *   #3  server/index.ts:108-141       validateMessagePermissions: DELETE_ENTITY TODO + default `return true`
  *   #4  server/index.ts:169-211       sendCorrectionToSender
  *   #8  state.ts:106-111 (already names the component) + chunking.ts:29-32 (does not)
- *   #9  message-bus-sync.ts:150-163   CRDT handler reads a possibly-null role
  *   #10 message-bus-sync.ts:89-91     client emits CRDT with no address
  *   #11 server/index.ts:143-167       broadcastBatchedMessages ignores excludeSender
  *   #12 events/implementation.ts:245-253  registerMessages Object.assign over a flat global registry
@@ -60,7 +59,7 @@ describe('known defects (red: asserting the correct behavior)', () => {
     jest.restoreAllMocks()
   })
 
-  it.failing('#1 only the authoritative server answers REQ_CRDT_STATE', async () => {
+  it('#1 only the authoritative server answers REQ_CRDT_STATE', async () => {
     const harness = createHarness()
     await flush()
     harness.clear()
@@ -71,7 +70,7 @@ describe('known defects (red: asserting the correct behavior)', () => {
     expect(harness.sentBy(CLIENT_A, CommsMessage.RES_CRDT_STATE)).toHaveLength(0)
   })
 
-  it.failing('#2 a stray RES_CRDT_STATE from a non-server peer must not halt the retry loop', async () => {
+  it('#2 a stray RES_CRDT_STATE from a non-server peer must not halt the retry loop', async () => {
     const harness = createHarness()
     await flush()
     setRealmConnected(true)
@@ -137,7 +136,7 @@ describe('known defects (red: asserting the correct behavior)', () => {
     expect(harness.clientA.components.Transform.get(entity).position.x).not.toBe(600)
   })
 
-  it.failing('#6 re-hydration removes network entities missing from the new full state', async () => {
+  it('#6 re-hydration removes network entities missing from the new full state', async () => {
     const harness = createHarness()
     await harness.connect()
 
@@ -162,7 +161,7 @@ describe('known defects (red: asserting the correct behavior)', () => {
     expect(harness.entities(harness.clientA)).toHaveLength(1)
   })
 
-  it.failing('#7 a restarted server makes its clients re-hydrate', async () => {
+  it('#7 a restarted server makes its clients re-hydrate', async () => {
     const harness = createHarness()
     await harness.connect()
 
@@ -206,7 +205,7 @@ describe('known defects (red: asserting the correct behavior)', () => {
     expect(error).toHaveBeenCalledWith(expect.stringContaining(`component ${GlobalTransform.componentId}`))
   })
 
-  it.failing('#9 CRDT that arrives before the role resolves is buffered, not dropped', async () => {
+  it('#9 CRDT that arrives before the role resolves is buffered, not dropped', async () => {
     const harness = createHarness()
     let resolveRole!: (isServer: boolean) => void
     const role = new Promise<boolean>((resolve) => (resolveRole = resolve))
@@ -287,7 +286,7 @@ describe('known defects (red: asserting the correct behavior)', () => {
     expect(left).toEqual(['0xplayer'])
   })
 
-  it.failing('#14 the server reports a synchronized state once it is ready', async () => {
+  it('#14 the server reports a synchronized state once it is ready', async () => {
     const harness = createHarness()
     await harness.connect()
 

@@ -6,7 +6,9 @@ export enum CommsMessage {
   RES_CRDT_STATE = 9,
   CRDT_SERVER = 4,
   CRDT_AUTHORITATIVE = 5,
-  CUSTOM_EVENT = 6
+  CUSTOM_EVENT = 6,
+  /** authoritative server announcing which run of it is on the air */
+  SERVER_ANNOUNCE = 10
 }
 
 export function BinaryMessageBus<T extends CommsMessage>(

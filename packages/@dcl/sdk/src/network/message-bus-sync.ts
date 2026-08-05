@@ -1,4 +1,4 @@
-import { IEngine, Transport, RealmInfo } from '@dcl/ecs'
+import { Entity, IEngine, Transport } from '@dcl/ecs'
 import { type SendBinaryRequest, type SendBinaryResponse } from '~system/CommunicationsController'
 
 import { syncFilter } from './filter'
@@ -14,9 +14,21 @@ import { IsServerRequest, IsServerResponse } from '~system/EngineApi'
 import { AUTH_SERVER_PEER_ID, DEBUG_NETWORK_MESSAGES, IProfile } from './constants'
 import { createRuntimeContext } from './runtime-context'
 import { setGlobalRoom, Room } from './events/implementation'
+import { components } from './ecs-adapter'
+import {
+  HydrationEffect,
+  createHydration,
+  decodeGeneration,
+  encodeGeneration,
+  newGeneration,
+  stateResponse
+} from './hydration'
 
 export { AUTH_SERVER_PEER_ID, DEBUG_NETWORK_MESSAGES } from './constants'
 export type { IProfile } from './constants'
+
+/** how much comms may pile up while the peer does not know its own role yet */
+const MAX_BUFFERED_COMMS = 256
 
 // Test environment detection without 'as any'
 const isTestEnvironment = (): boolean => {
@@ -59,7 +71,11 @@ export function addSyncTransport(
   }
   const players = definePlayerHelper(engine)
 
-  let stateIsSyncronized = false
+  const RealmInfo = components.RealmInfo(engine)
+  const NetworkEntity = components.NetworkEntity(engine)
+  const hydration = createHydration()
+  /** names this run of the peer; only an authoritative server ever announces it */
+  const generation = newGeneration()
 
   /**
    * We need to wait till 2 ticks that is when the engine is ready to send new messages.
@@ -117,9 +133,76 @@ export function addSyncTransport(
   engine.addTransport(transport)
   // End add sync transport
 
+  /**
+   * Comms that lands before `isServerAtom` resolves cannot be routed — the server
+   * and the client path are different — so it waits here and is replayed in
+   * arrival order once the role is known.
+   *
+   * ponytail: a fixed cap and a loud drop instead of back-pressure. The window is
+   * one runtime round-trip, so an overflow already means something upstream is
+   * broken. Upgrade path: hold off polling comms until the role is known.
+   */
+  const bufferedComms: (() => void)[] = []
+
+  function onComms(message: CommsMessage, handler: (value: Uint8Array, sender: string) => void) {
+    binaryMessageBus.on(message, (value, sender) => {
+      if (isServerAtom.getOrNull() !== null) return handler(value, sender)
+      if (bufferedComms.length >= MAX_BUFFERED_COMMS) {
+        console.error(`[network] role still unresolved and the comms buffer is full, dropping ${CommsMessage[message]}`)
+        return
+      }
+      bufferedComms.push(() => handler(value, sender))
+    })
+  }
+
+  function applyEffects(effects: HydrationEffect[]) {
+    for (const effect of effects) {
+      if (effect === 'requestState') {
+        DEBUG_NETWORK_MESSAGES() && console.log('Requesting state...')
+        binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
+      } else if (effect === 'markSynced') {
+        // the room only counts as ready once comms has answered at least once
+        if (RealmInfo.getOrNull(engine.RootEntity)) {
+          DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady] Marking room as ready after state sync')
+          isRoomReadyAtom.swap(true)
+        }
+      } else if (effect === 'announce') {
+        binaryMessageBus.emit(CommsMessage.SERVER_ANNOUNCE, encodeGeneration(generation))
+      }
+      // 'reconcile' is applied by the RES_CRDT_STATE handler, the only place that
+      // holds the dump it has to be reconciled against
+    }
+  }
+
+  /** the state dump being applied; the server may split one over several chunks */
+  let dump: { entities: Set<Entity>; reconcile: boolean; quiet: boolean } | null = null
+
+  /**
+   * A re-hydration dump is the authoritative world in full, so a network entity it
+   * does not name no longer exists. Only NetworkEntity-tagged entities are looked
+   * at — local-only entities are invisible to the network layer and never touched.
+   * Dropping the tag before removing the entity is what keeps the removal local:
+   * `syncFilter` forwards a DELETE_ENTITY only for entities that still carry it.
+   */
+  function reconcileWithDump(present: Set<Entity>) {
+    const stale = Array.from(engine.getEntitiesWith(NetworkEntity))
+      .map(([entity]) => entity)
+      .filter((entity) => !present.has(entity))
+    for (const entity of stale) {
+      DEBUG_NETWORK_MESSAGES() && console.log('[reconcile] dropping entity absent from the state dump', entity)
+      NetworkEntity.deleteFrom(entity)
+      engine.removeEntity(entity)
+    }
+  }
+
   // Receive & Process CRDT_STATE
-  binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, async (data, sender) => {
+  onComms(CommsMessage.REQ_CRDT_STATE, (_data, sender) => {
+    // only the authoritative peer owns the world: a client answering here would
+    // hand its own partial view to another client
+    if (!isServerAtom.getOrNull()) return
     DEBUG_NETWORK_MESSAGES() && console.log('[REQ_CRDT_STATE]', sender, Date.now())
+    // name the world before shipping it, so the requester can tell a later restart apart
+    binaryMessageBus.emit(CommsMessage.SERVER_ANNOUNCE, encodeGeneration(generation), [sender])
     const chunks = engineToCrdt(engine)
     if (chunks.length === 0) {
       DEBUG_NETWORK_MESSAGES() && console.log('[Emiting empty state:]', sender, Date.now())
@@ -131,27 +214,31 @@ export function addSyncTransport(
       }
     }
   })
-  binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, async (data, sender) => {
-    requestingState = false
-    elapsedTimeSinceRequest = 0
-    if (isServerAtom.getOrNull() || sender !== AUTH_SERVER_PEER_ID) return
+  onComms(CommsMessage.RES_CRDT_STATE, (data, sender) => {
+    const event = stateResponse(sender)
+    if (!event || isServerAtom.getOrNull()) return
     DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength / 1024, 'KB')
-    if (data.byteLength > 0) {
-      deliverToEngine(serverValidator.processClientMessages(data, sender))
-    }
-    stateIsSyncronized = true
 
-    // IMPORTANT: Only mark room as ready AFTER state is synchronized
-    // This ensures comms is truly connected and working
-    const realmInfo = RealmInfo.getOrNull(engine.RootEntity)
-    if (realmInfo) {
-      DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady] Marking room as ready after state sync')
-      isRoomReadyAtom.swap(true)
+    const firstChunk = dump === null
+    const current = (dump = dump ?? { entities: new Set<Entity>(), reconcile: false, quiet: false })
+    current.quiet = false
+    if (data.byteLength > 0) {
+      deliverToEngine(serverValidator.processClientMessages(data, sender, false, current.entities))
     }
+
+    const effects = hydration.send(event)
+    // only the head of a dump decides: every chunk after it describes the same world
+    if (firstChunk) current.reconcile = effects.includes('reconcile')
+    applyEffects(effects)
+  })
+
+  onComms(CommsMessage.SERVER_ANNOUNCE, (data, sender) => {
+    if (sender !== AUTH_SERVER_PEER_ID) return
+    applyEffects(hydration.send({ type: 'serverAnnounced', generation: decodeGeneration(data) }))
   })
 
   // received message from the network
-  binaryMessageBus.on(CommsMessage.CRDT, (value, sender) => {
+  onComms(CommsMessage.CRDT, (value, sender) => {
     const isServer = isServerAtom.getOrNull()
     DEBUG_NETWORK_MESSAGES() &&
       console.log(
@@ -168,7 +255,7 @@ export function addSyncTransport(
   })
 
   // received authoritative message from server - force apply to fix invalid local state
-  binaryMessageBus.on(CommsMessage.CRDT_AUTHORITATIVE, (value, sender) => {
+  onComms(CommsMessage.CRDT_AUTHORITATIVE, (value, sender) => {
     // Only accept authoritative messages from authoritative server
     if (sender !== AUTH_SERVER_PEER_ID) return
 
@@ -189,86 +276,63 @@ export function addSyncTransport(
 
   players.onEnterScene((player) => {
     DEBUG_NETWORK_MESSAGES() && console.log('[onEnterScene]', player.userId)
-    if (!isServerAtom.getOrNull() && myProfile.userId === player.userId) {
-      requestState()
-    }
+    if (myProfile.userId === player.userId) applyEffects(hydration.send({ type: 'ownPlayerEntered' }))
   })
 
-  // Asks for the REQ_CRDT_STATE when its connected to comms
+  /**
+   * Why ask for the state when the server already pushes it to whoever joins?
+   * The server does send it on the livekit JOIN_PARTICIPANT event, but unity takes
+   * long enough getting there that the push is not delivered. So the client asks
+   * once comms is up, and the server answers.
+   */
   RealmInfo.onChange(engine.RootEntity, (value) => {
-    const isServer = isServerAtom.getOrNull()
-
-    if (!value?.isConnectedSceneRoom) {
-      // Only react when actually transitioning from ready to not ready
-      if (isRoomReadyAtom.getOrNull() === true) {
-        DEBUG_NETWORK_MESSAGES() && console.log('Disconnected from comms')
-        isRoomReadyAtom.swap(false)
-        if (!isServer) {
-          stateIsSyncronized = false
-        }
-      }
-    }
-
     if (value?.isConnectedSceneRoom) {
-      requestState()
-
-      // For servers, mark as ready immediately when connected
-      // (servers don't need to sync state from anyone)
-      if (isServer && isRoomReadyAtom.getOrNull() === false) {
+      applyEffects(hydration.send({ type: 'realmConnected' }))
+      // a server hydrates from nobody, so being on comms is all it waits for
+      if (isServerAtom.getOrNull() && isRoomReadyAtom.getOrNull() === false) {
         DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady] Server marking room as ready')
         isRoomReadyAtom.swap(true)
       }
-      // For clients, room will be marked ready after receiving CRDT state (above)
+      return
+    }
+    // only react when actually transitioning from ready to not ready
+    if (isRoomReadyAtom.getOrNull() === true) {
+      DEBUG_NETWORK_MESSAGES() && console.log('Disconnected from comms')
+      isRoomReadyAtom.swap(false)
+      applyEffects(hydration.send({ type: 'realmDisconnected' }))
     }
   })
 
-  let requestingState = false
-  let elapsedTimeSinceRequest = 0
-  const STATE_REQUEST_RETRY_INTERVAL = 2.0 // seconds
-
-  /**
-   * Why we have to request the state if we have a server that can send us the state when we joined?
-   * The thing is that when the server detects a new JOIN_PARTICIPANT on livekit room, it sends automatically the state to that peer.
-   * But in unity, it takes more time, so that message is not being delivered to the client.
-   * So instead, when we are finally connected to the room, we request the state, and then the server answers with the state :)
-   *
-   * If no response is received within 2 seconds, the request is automatically retried.
-   */
-  function requestState() {
-    if (isServerAtom.getOrNull()) return
-    if (RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom && !requestingState) {
-      requestingState = true
-      elapsedTimeSinceRequest = 0
-      DEBUG_NETWORK_MESSAGES() && console.log('Requesting state...')
-      binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
-    }
-  }
-
-  // System to retry state request if no response is received within the retry interval
+  // drives the state-request retry, and closes a dump once its chunks stop coming
   engine.addSystem((dt: number) => {
-    if (requestingState && !stateIsSyncronized) {
-      elapsedTimeSinceRequest += dt
-      if (elapsedTimeSinceRequest >= STATE_REQUEST_RETRY_INTERVAL) {
-        DEBUG_NETWORK_MESSAGES() && console.log('State request timed out, retrying...')
-        elapsedTimeSinceRequest = 0
-        requestingState = false
-        requestState()
-      }
+    applyEffects(hydration.send({ type: 'tick', dt }))
+    if (!dump) return
+    // one silent frame before deciding what the dump left out, so a dump split
+    // over several chunks is judged whole instead of chunk by chunk.
+    // ponytail: a quiet frame, not a terminator — a chunk delayed by more than a
+    // frame reconciles early and its entities are dropped and re-created (churn,
+    // not divergence). Upgrade path: mark the last chunk of a dump on the wire.
+    if (!dump.quiet) {
+      dump.quiet = true
+      return
     }
+    if (dump.reconcile) reconcileWithDump(dump.entities)
+    dump = null
+  })
+
+  void isServerAtom.pipe((isServer) => {
+    applyEffects(hydration.send({ type: 'roleResolved', isServer }))
+    for (const replay of bufferedComms.splice(0)) replay()
   })
 
   players.onLeaveScene((userId) => {
     DEBUG_NETWORK_MESSAGES() && console.log('[onLeaveScene]', userId)
   })
 
-  function isStateSyncronized() {
-    return stateIsSyncronized
-  }
-
   return {
     ...entityDefinitions,
     myProfile,
-    isStateSyncronized,
+    isStateSyncronized: hydration.isSynced,
     binaryMessageBus,
     eventBus,
     isServerAtom,
