@@ -30,23 +30,26 @@ export type { IProfile } from './constants'
 /** how much comms may pile up while the peer does not know its own role yet */
 const MAX_BUFFERED_COMMS = 256
 
-// Test environment detection without 'as any'
-const isTestEnvironment = (): boolean => {
-  try {
-    if (typeof globalThis === 'undefined') return false
-    const globalWithProcess = globalThis as unknown as { process?: { env?: { NODE_ENV?: string } } }
-    return globalWithProcess.process?.env?.NODE_ENV === 'test'
-  } catch {
-    return false
-  }
-}
+/**
+ * We need to wait till 2 ticks that is when the engine is ready to send new messages.
+ * The first tick is for the client engine processing the CRDT messages,
+ * and the second one are the messages created by the main() function.
+ * So to avoid sending those messages, that all the clients have, through the network we put this validation here.
+ */
+const TRANSPORT_INITIALIZED_TICKS = 2
 
+/**
+ * Boots the network layer on `engine`. Everything the layer talks to is a
+ * parameter, so a test drives it exactly the way `network/index.ts` does at
+ * import time — with the runtime's `~system` functions swapped for fakes.
+ */
 export function addSyncTransport(
   engine: IEngine,
   sendBinary: (msg: SendBinaryRequest) => Promise<SendBinaryResponse>,
   getUserData: (value: GetUserDataRequest) => Promise<GetUserDataResponse>,
   isServerFn: (request: IsServerRequest) => Promise<IsServerResponse>,
-  name: string
+  name: string,
+  { transportInitializedTicks = TRANSPORT_INITIALIZED_TICKS }: { transportInitializedTicks?: number } = {}
 ) {
   // Profile Info
   const myProfile: IProfile = {} as IProfile
@@ -77,14 +80,7 @@ export function addSyncTransport(
   /** names this run of the peer; only an authoritative server ever announces it */
   const generation = newGeneration()
 
-  /**
-   * We need to wait till 2 ticks that is when the engine is ready to send new messages.
-   * The first tick is for the client engine processing the CRDT messages,
-   * and the second one are the messages created by the main() function.
-   * So to avoid sending those messages, that all the clients have, through the network we put this validation here.
-   */
   let tick = 0
-  const TRANSPORT_INITIALIZED_NUMBER = isTestEnvironment() ? 0 : 2
 
   /**
    * Who this peer's own CRDT is addressed to. A client only ever talks to the
@@ -103,8 +99,8 @@ export function addSyncTransport(
   const transport: Transport = {
     filter: syncFilter(engine),
     send: async (messages) => {
-      if (tick <= TRANSPORT_INITIALIZED_NUMBER) tick++
-      for (const message of tick > TRANSPORT_INITIALIZED_NUMBER ? [messages].flat() : []) {
+      if (tick <= transportInitializedTicks) tick++
+      for (const message of tick > transportInitializedTicks ? [messages].flat() : []) {
         if (message.byteLength) {
           DEBUG_NETWORK_MESSAGES() &&
             console.log(...Array.from(serializeCrdtMessages('[NetworkMessage sent]:', message, engine)))

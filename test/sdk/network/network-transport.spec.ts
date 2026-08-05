@@ -79,7 +79,9 @@ describe('Network Parenting', () => {
       data: { userId: 'A', version: 1, displayName: '1', hasConnectedWeb3: true, avatar: undefined }
     }),
     async () => ({ isServer: false }),
-    'A'
+    'A',
+    // this spec asserts on the first frames, so nothing is suppressed
+    { transportInitializedTicks: 0 }
   )
 
   const Cube = engineA.defineComponent('cube', {})
