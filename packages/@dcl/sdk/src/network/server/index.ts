@@ -8,11 +8,11 @@ import {
   PutNetworkComponentOperation
 } from '@dcl/ecs'
 import { CommsMessage } from '../binary-message-bus'
-import { chunkCrdtMessages } from '../chunking'
-import * as utils from './utils'
-import { AUTH_SERVER_PEER_ID, DEBUG_NETWORK_MESSAGES, LIVEKIT_MAX_SIZE } from '../constants'
+import * as codec from '../codec'
+import { AUTH_SERVER_PEER_ID, DEBUG_NETWORK_MESSAGES } from '../constants'
 import { type BinaryMessageBus } from '../binary-message-bus'
 import {
+  ByteBuffer,
   components,
   ReadWriteByteBuffer,
   DeleteComponentNetwork,
@@ -51,11 +51,11 @@ export function createServerValidator(config: ServerValidationConfig) {
 
   const findNetworkEntity = createNetworkEntityIndex(engine, NetworkEntity)
 
-  function findExistingNetworkEntity(message: utils.NetworkMessage): Entity | null {
+  function findExistingNetworkEntity(message: codec.NetworkMessage): Entity | null {
     return findNetworkEntity(message.networkId, message.entityId)
   }
 
-  function findOrCreateNetworkEntity(message: utils.NetworkMessage, sender: string, isServer: boolean): Entity {
+  function findOrCreateNetworkEntity(message: codec.NetworkMessage, sender: string, isServer: boolean): Entity {
     // Look for existing network entity mapping first
     const existingEntity = findExistingNetworkEntity(message)
 
@@ -79,23 +79,20 @@ export function createServerValidator(config: ServerValidationConfig) {
     return newEntityId
   }
 
+  /**
+   * Translates one network message into its local form, serialized straight into
+   * `destination`. A conversion that throws does so before writing anything, so a
+   * failure never leaves half a message behind.
+   */
   function convertNetworkToRegularMessage(
-    networkMessage: utils.NetworkMessage,
+    networkMessage: codec.NetworkMessage,
     localEntityId: Entity,
+    destination: ByteBuffer,
     forceCorrections = false
-  ): (CrdtMessageBody & { messageBuffer: Uint8Array }) | null {
-    const buffer = new ReadWriteByteBuffer()
-
+  ): CrdtMessageBody | null {
     try {
       // Use the well-tested networkMessageToLocal utility with transform fixing for Unity
-      const message = utils.networkMessageToLocal(
-        networkMessage,
-        localEntityId,
-        buffer,
-        NetworkParent,
-        forceCorrections
-      )
-      return { ...message, messageBuffer: buffer.toBinary() }
+      return codec.networkMessageToLocal(networkMessage, localEntityId, destination, NetworkParent, forceCorrections)
     } catch (error) {
       console.error('Error converting network message:', error)
       return null
@@ -169,24 +166,12 @@ export function createServerValidator(config: ServerValidationConfig) {
     }
   }
 
-  function broadcastBatchedMessages(messages: utils.NetworkMessage[], excludeSender: string) {
+  function broadcastBatchedMessages(messages: codec.NetworkMessage[], excludeSender: string) {
     if (messages.length === 0) return
 
-    // Build the complete buffer with all messages
-    const networkBuffer = new ReadWriteByteBuffer()
-    for (const message of messages) {
-      // Skip oversized messages upfront
-      if (message.messageBuffer.byteLength / 1024 > LIVEKIT_MAX_SIZE) {
-        console.error(
-          `Message too large (${message.messageBuffer.byteLength} bytes), skipping message from ${excludeSender}`
-        )
-        continue
-      }
-      networkBuffer.writeBuffer(message.messageBuffer, false)
-    }
-
-    // Use the chunking function to split into proper chunks
-    const chunks = chunkCrdtMessages(networkBuffer.toBinary(), LIVEKIT_MAX_SIZE)
+    // The messages still carry the bytes they arrived as, so re-broadcasting them
+    // is a matter of packing those slices — no re-serialization, no second parse.
+    const chunks = codec.packChunks(messages)
 
     for (const chunk of chunks) {
       binaryMessageBus.emit(CommsMessage.CRDT, chunk)
@@ -195,7 +180,7 @@ export function createServerValidator(config: ServerValidationConfig) {
       console.log(`Total: ${messages.length} messages in ${chunks.length} chunks from ${excludeSender}`)
   }
 
-  function sendCorrectionToSender(networkMessage: utils.NetworkMessage, sender: string, localEntityId: Entity) {
+  function sendCorrectionToSender(networkMessage: codec.NetworkMessage, sender: string, localEntityId: Entity) {
     try {
       // Only handle component messages (PUT/DELETE), not entity deletion
       if (networkMessage.type === CrdtMessageType.DELETE_ENTITY_NETWORK) {
@@ -275,21 +260,18 @@ export function createServerValidator(config: ServerValidationConfig) {
       const combinedBuffer = new ReadWriteByteBuffer()
 
       // Clients process network messages from server and convert them to regular messages
-      for (const message of utils.readMessages(value)) {
+      for (const message of codec.readMessages(value)) {
         // Only process network messages in client message handler
-        if (utils.isNetworkMessage(message)) {
-          const networkMessage = message as utils.NetworkMessage
+        if (codec.isNetworkMessage(message)) {
+          const networkMessage = message as codec.NetworkMessage
 
           // Find or create network entity mapping
           const localEntityId = findOrCreateNetworkEntity(networkMessage, sender, false)
           seen?.add(localEntityId)
 
-          // Convert network message to regular message or correction message
-          const regularMessage = convertNetworkToRegularMessage(networkMessage, localEntityId, forceCorrections)
-
-          if (regularMessage?.messageBuffer.byteLength) {
-            combinedBuffer.writeBuffer(regularMessage.messageBuffer, false)
-          }
+          // Nothing validates a message from the authoritative server, so it is
+          // translated straight into the buffer the engine will be handed
+          convertNetworkToRegularMessage(networkMessage, localEntityId, combinedBuffer, forceCorrections)
         }
       }
       return combinedBuffer.toBinary()
@@ -299,19 +281,23 @@ export function createServerValidator(config: ServerValidationConfig) {
       // console.log(`[SERVER] Processing message from ${sender}, ${value.length} bytes`)
 
       // Collect all valid messages for batched broadcasting
-      const messagesToBroadcast: utils.NetworkMessage[] = []
+      const messagesToBroadcast: codec.NetworkMessage[] = []
       const regularMessagesBuffer = new ReadWriteByteBuffer()
+      // a message is translated before it is judged, so it lands here first and is
+      // only copied into the batch once it has been accepted
+      const candidate = new ReadWriteByteBuffer()
 
-      for (const message of utils.readMessages(value)) {
+      for (const message of codec.readMessages(value)) {
         try {
           // Only process network messages in server message handler
-          if (utils.isNetworkMessage(message)) {
-            const networkMessage = message as utils.NetworkMessage
+          if (codec.isNetworkMessage(message)) {
+            const networkMessage = message as codec.NetworkMessage
             // 1. Find or create network entity mapping
             const localEntityId = findOrCreateNetworkEntity(networkMessage, sender, true)
 
             // 2. Convert network message to regular message and collect for local application
-            const regularMessage = convertNetworkToRegularMessage(networkMessage, localEntityId)
+            candidate.resetBuffer()
+            const regularMessage = convertNetworkToRegularMessage(networkMessage, localEntityId, candidate)
 
             // 3. Basic permission validation. A payload that did not decode is
             //    unvalidatable and therefore unbroadcastable, so it is treated as a
@@ -325,8 +311,8 @@ export function createServerValidator(config: ServerValidationConfig) {
             // 4. Collect valid message for batched broadcasting
             messagesToBroadcast.push(networkMessage)
 
-            if (regularMessage.messageBuffer.byteLength) {
-              regularMessagesBuffer.writeBuffer(regularMessage.messageBuffer, false)
+            if (candidate.currentWriteOffset()) {
+              regularMessagesBuffer.writeBuffer(candidate.toBinary(), false)
             }
           }
         } catch (error) {
@@ -339,21 +325,29 @@ export function createServerValidator(config: ServerValidationConfig) {
     },
     // engine changes that needs to be broadcasted.
     convertRegularToNetworkMessage: function convertRegularToNetworkMessage(regularMessage: Uint8Array): Uint8Array[] {
-      const groupedBuffer = new ReadWriteByteBuffer()
+      // One scratch buffer for the batch: the packer copies each message out before
+      // pulling the next one, which overwrites it.
+      function* asNetworkMessages(): Generator<codec.PackableMessage> {
+        const scratch = new ReadWriteByteBuffer()
+        for (const message of codec.readMessages(regularMessage)) {
+          // Only convert regular messages that have network data
+          const networkData = NetworkEntity.getOrNull(message.entityId)
+          if (!networkData || codec.isNetworkMessage(message)) continue
 
-      // First pass: Convert all regular messages to network format and group them into one big buffer
-      for (const message of utils.readMessages(regularMessage)) {
-        // Only convert regular messages that have network data
-        const networkData = NetworkEntity.getOrNull(message.entityId)
+          scratch.resetBuffer()
+          codec.localMessageToNetwork(message, networkData, scratch)
+          // AUTHORITATIVE_PUT_COMPONENT has no network counterpart and encodes to nothing
+          if (!scratch.currentWriteOffset()) continue
 
-        if (networkData && !utils.isNetworkMessage(message)) {
-          utils.localMessageToNetwork(message, networkData, groupedBuffer)
+          yield {
+            messageBuffer: scratch.toBinary(),
+            entityId: message.entityId,
+            componentId: 'componentId' in message ? message.componentId : undefined
+          }
         }
       }
 
-      // Second pass: Use the new chunking function that respects message boundaries
-      const totalData = groupedBuffer.toBinary()
-      return chunkCrdtMessages(totalData, LIVEKIT_MAX_SIZE)
+      return codec.packChunks(asNetworkMessages())
     }
   }
 }
