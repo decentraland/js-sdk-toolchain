@@ -32,27 +32,22 @@ export function definePlayerHelper(engine: IEngine) {
   const onEnterSceneCb: ((player: GetPlayerDataRes) => void)[] = []
   const onLeaveSceneCb: ((userId: string) => void)[] = []
 
+  // Both directions are polled. The `players.length === playerEntities.size`
+  // shortcut this replaces went blind on a frame where one player joined and
+  // another left, and the per-entity `AvatarBase.onChange` that used to report a
+  // departure never fired for a player whose entity was removed whole.
   engine.addSystem(() => {
-    const players = Array.from(engine.getEntitiesWith(PlayerIdentityData, AvatarBase))
-    if (players.length === playerEntities.size) return
-
-    for (const [entity, identity] of players) {
-      if (!playerEntities.has(entity)) {
-        playerEntities.set(entity, identity.address)
-
-        // Call onEnter callback
-        if (onEnterSceneCb.length) {
-          onEnterSceneCb.forEach((cb) => cb(getPlayer({ userId: identity.address })!))
-        }
-
-        // Check for changes/remove callbacks
-        AvatarBase.onChange(entity, (value) => {
-          if (!value && playerEntities.get(entity)) {
-            onLeaveSceneCb.forEach((cb) => cb(playerEntities.get(entity)!))
-            playerEntities.delete(entity)
-          }
-        })
-      }
+    const present = new Set<Entity>()
+    for (const [entity, identity] of engine.getEntitiesWith(PlayerIdentityData, AvatarBase)) {
+      present.add(entity)
+      if (playerEntities.has(entity)) continue
+      playerEntities.set(entity, identity.address)
+      for (const cb of onEnterSceneCb) cb(getPlayer({ userId: identity.address })!)
+    }
+    for (const [entity, address] of playerEntities) {
+      if (present.has(entity)) continue
+      playerEntities.delete(entity)
+      for (const cb of onLeaveSceneCb) cb(address)
     }
   })
 
@@ -100,7 +95,23 @@ export function definePlayerHelper(engine: IEngine) {
   }
 }
 
-const players = definePlayerHelper(engine)
+type PlayerHelper = ReturnType<typeof definePlayerHelper>
+const helpers = new WeakMap<IEngine, PlayerHelper>()
+
+/**
+ * One helper per engine. Both the public API below and `addSyncTransport` need
+ * one, and two of them on the same engine means two identical per-frame diffs
+ * and every `onEnterScene` callback firing twice.
+ */
+export function getPlayerHelper(engine: IEngine): PlayerHelper {
+  const existing = helpers.get(engine)
+  if (existing) return existing
+  const helper = definePlayerHelper(engine)
+  helpers.set(engine, helper)
+  return helper
+}
+
+const players = getPlayerHelper(engine)
 const { getPlayer, onEnterScene, onLeaveScene } = players
 
 export { getPlayer, onEnterScene, onLeaveScene }
