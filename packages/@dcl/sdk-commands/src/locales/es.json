@@ -79,6 +79,14 @@
       "build_failed": "Error al construir la escena: {{error}}",
       "bundle_not_found": "No se pudo encontrar la escena empaquetada en {{bundlePath}}",
       "execution_failed": "Error al ejecutar el código de la escena: {{error}}"
+    },
+    "world_permissions": {
+      "missing_world": "El nombre del mundo es obligatorio. Usa --world <nombre>",
+      "missing_address": "Se requiere al menos una dirección. Usa --address <billetera>",
+      "invalid_address": "Dirección Ethereum inválida: {{address}}",
+      "invalid_parcel": "Formato de parcela inválido: \"{{parcel}}\". Se esperaba \"x,y\" (por ejemplo, \"0,0\")",
+      "fetch_failed": "Error al obtener los permisos del mundo: {{error}}",
+      "grant_failed": "Error al otorgar permisos: {{error}}"
     }
   }
 }
