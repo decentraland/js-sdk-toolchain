@@ -7,21 +7,21 @@ import {
   ComponentType,
   PutNetworkComponentOperation
 } from '@dcl/ecs'
-import * as components from '@dcl/ecs/dist/components'
-import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { CommsMessage } from '../binary-message-bus'
 import { chunkCrdtMessages } from '../chunking'
 import * as utils from './utils'
-import { AUTH_SERVER_PEER_ID, DEBUG_NETWORK_MESSAGES } from '../message-bus-sync'
+import { AUTH_SERVER_PEER_ID, DEBUG_NETWORK_MESSAGES, LIVEKIT_MAX_SIZE } from '../constants'
 import { type BinaryMessageBus } from '../binary-message-bus'
 import {
+  components,
+  ReadWriteByteBuffer,
   LastWriteWinElementSetComponentDefinition,
   GrowOnlyValueSetComponentDefinition,
   ComponentDefinition,
   InternalBaseComponent
-} from '@dcl/ecs/dist/engine/component'
+} from '../ecs-adapter'
 
-export const LIVEKIT_MAX_SIZE = 12
+export { LIVEKIT_MAX_SIZE } from '../constants'
 
 export interface ServerValidationConfig {
   engine: IEngine
@@ -100,7 +100,7 @@ export function createServerValidator(config: ServerValidationConfig) {
       )
       return { ...message, messageBuffer: buffer.toBinary() }
     } catch (error) {
-      DEBUG_NETWORK_MESSAGES() && console.error('Error converting network message:', error)
+      console.error('Error converting network message:', error)
       return null
     }
   }
@@ -272,7 +272,7 @@ export function createServerValidator(config: ServerValidationConfig) {
             }
           }
         } catch (error) {
-          DEBUG_NETWORK_MESSAGES() && console.error('Error processing server message:', error)
+          console.error('Error processing server message:', error)
         }
       }
       // Batch broadcast all valid messages together

@@ -1,29 +1,30 @@
-import { Entity } from '@dcl/ecs/dist/engine'
-import { CrdtMessageProtocol, NetworkParent } from '@dcl/ecs'
-import { ReceiveMessage } from '@dcl/ecs/dist/runtime/types'
-import { ReceiveNetworkMessage } from '@dcl/ecs/dist/systems/crdt/types'
-import { ByteBuffer, ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
-import { AuthoritativePutComponentOperation, PutComponentOperation } from '@dcl/ecs/dist/serialization/crdt'
+import { CrdtMessageProtocol, CrdtMessageType, Entity, NetworkParent } from '@dcl/ecs'
 import {
+  AuthoritativePutComponentOperation,
+  ByteBuffer,
   CrdtMessage,
   CrdtMessageBody,
   CrdtMessageHeader,
-  CrdtMessageType,
+  DeleteComponent,
   DeleteComponentMessage,
+  DeleteComponentNetwork,
   DeleteComponentNetworkMessage,
+  DeleteEntity,
   DeleteEntityMessage,
+  DeleteEntityNetwork,
   DeleteEntityNetworkMessage,
+  INetowrkEntityType,
   PutComponentMessage,
+  PutComponentOperation,
   AuthoritativePutComponentMessage,
-  PutNetworkComponentMessage
-} from '@dcl/ecs/dist/serialization/crdt/types'
-import { DeleteComponent } from '@dcl/ecs/dist/serialization/crdt/deleteComponent'
-import { DeleteEntity } from '@dcl/ecs/dist/serialization/crdt/deleteEntity'
-import { INetowrkEntityType } from '@dcl/ecs/dist/components/types'
-import { PutNetworkComponentOperation } from '@dcl/ecs/dist/serialization/crdt/network/putComponentNetwork'
-import { DeleteComponentNetwork } from '@dcl/ecs/dist/serialization/crdt/network/deleteComponentNetwork'
-import { DeleteEntityNetwork } from '@dcl/ecs/dist/serialization/crdt/network/deleteEntityNetwork'
-import { TransformSchema, COMPONENT_ID as TransformComponentId } from '@dcl/ecs/dist/components/manual/Transform'
+  PutNetworkComponentMessage,
+  PutNetworkComponentOperation,
+  ReadWriteByteBuffer,
+  ReceiveMessage,
+  ReceiveNetworkMessage,
+  TransformSchema,
+  TransformComponentId
+} from '../ecs-adapter'
 
 export type NetworkMessage = (
   | PutNetworkComponentMessage
@@ -146,7 +147,9 @@ export function networkMessageToLocal(
       entityId: localEntityId
     }
   }
-  throw 1
+  throw new Error(
+    `networkMessageToLocal: unhandled message type ${CrdtMessageType[(message as ReceiveNetworkMessage).type]}`
+  )
 }
 
 export function localMessageToNetwork(

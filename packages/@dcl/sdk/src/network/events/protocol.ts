@@ -1,4 +1,4 @@
-import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
+import { ReadWriteByteBuffer } from '../ecs-adapter'
 import { Schemas } from '@dcl/ecs'
 import { EventSchemas, EventTypes, EventSchemaRegistry } from './registry'
 

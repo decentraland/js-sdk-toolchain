@@ -226,26 +226,36 @@ function processObservables() {
 
   function subscribe(eventName: keyof IEvents) {
     if (subscriptions.has(eventName)) return
+    // ponytail: the guard is per event name, so the two names that share a
+    // subscriber (onEnterScene/playerConnected, onLeaveScene/playerDisconnected)
+    // still register it twice and notify twice. Upgrade path: make each
+    // subscribe* idempotent instead of guarding on the event name.
     switch (eventName) {
       case 'playerClicked': {
         subscribePlayerClick()
+        break
       }
       case 'onEnterScene':
       case 'playerConnected': {
         subscribeEnterScene()
+        break
       }
       case 'onLeaveScene':
       case 'playerDisconnected': {
         subscribeLeaveScene()
+        break
       }
       case 'onRealmChanged': {
         subscribeRealmChange()
+        break
       }
       case 'playerExpression': {
         subscribePlayerExpression()
+        break
       }
       case 'profileChanged': {
         subscribeProfileChange()
+        break
       }
     }
     subscriptions.add(eventName)
