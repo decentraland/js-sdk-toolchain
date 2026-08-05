@@ -7,10 +7,9 @@
  * `QUIRK(pinned)` assertion from the characterization specs).
  *
  * Fixed in phase 1 (hydration FSM), now plain `it`: #1, #2, #6, #7, #9, #14.
+ * Fixed in phase 2 (validator hardening), now plain `it`: #3, #4.
  *
  * Source locations of what is still red, verified at the time of writing:
- *   #3  server/index.ts:108-141       validateMessagePermissions: DELETE_ENTITY TODO + default `return true`
- *   #4  server/index.ts:169-211       sendCorrectionToSender
  *   #8  state.ts:106-111 (already names the component) + chunking.ts:29-32 (does not)
  *   #10 message-bus-sync.ts:89-91     client emits CRDT with no address
  *   #11 server/index.ts:143-167       broadcastBatchedMessages ignores excludeSender
@@ -93,7 +92,7 @@ describe('known defects (red: asserting the correct behavior)', () => {
     expect(harness.clientA.sync.isStateSyncronized()).toBe(true)
   })
 
-  it.failing('#3 the server rejects a DELETE_ENTITY for an entity the sender did not create', async () => {
+  it('#3 the server rejects a DELETE_ENTITY for an entity the sender did not create', async () => {
     const harness = createHarness()
     await flush()
 
@@ -116,7 +115,7 @@ describe('known defects (red: asserting the correct behavior)', () => {
     expect(harness.sentBy(SERVER, CommsMessage.CRDT)).toHaveLength(0)
   })
 
-  it.failing('#4 a rejected first write is corrected with CRDT_AUTHORITATIVE to the offender', async () => {
+  it('#4 a rejected first write is corrected with CRDT_AUTHORITATIVE to the offender', async () => {
     const harness = createHarness()
     await flush()
     harness.server.components.Transform.validateBeforeChange(
@@ -129,11 +128,13 @@ describe('known defects (red: asserting the correct behavior)', () => {
     harness.clear()
     await harness.tick()
 
-    // the server holds no state for the component yet, so getCrdtState() returns
-    // null and the correction is silently skipped
+    // the server holds no state for the component, so the only correction it can
+    // state is "you do not have this component" — hence getOrNull, the offender is
+    // left with no Transform at all rather than with a different one
     const corrections = harness.sentBy(SERVER, CommsMessage.CRDT_AUTHORITATIVE)
     expect(corrections.map((correction) => correction.to)).toEqual([[CLIENT_A]])
-    expect(harness.clientA.components.Transform.get(entity).position.x).not.toBe(600)
+    expect(harness.clientA.components.Transform.getOrNull(entity)?.position.x).not.toBe(600)
+    expectConvergence({ server: harness.server.engine, clientA: harness.clientA.engine })
   })
 
   it('#6 re-hydration removes network entities missing from the new full state', async () => {

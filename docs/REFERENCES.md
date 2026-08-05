@@ -22,6 +22,7 @@ Curated map of every doc in this repo. Use this as the entry point when looking 
 | [world-transform-no-caching.md](world-transform-no-caching.md) | Why world-space transforms are computed lazily (not cached) and what that means for system authors. |
 | [on-demand-composite-loading.md](on-demand-composite-loading.md) | Runtime composite instantiation via `engine.addEntityFromComposite(src, options)`. The provider abstraction and pre-registration flow. |
 | [material-getflat-api.md](material-getflat-api.md) | Material `getFlat` API: reading a fully-resolved material descriptor instead of the discriminated union. |
+| [network-timestamp-trust.md](network-timestamp-trust.md) | Why the authoritative server trusts client-supplied CRDT timestamps, the griefing that enables, and what server-side re-stamping would cost. |
 
 ## Guides (how-to)
 

@@ -11,6 +11,7 @@ import {
   ISyncComponents
 } from '@dcl/ecs'
 import { IProfile } from './constants'
+import { createNetworkEntityIndex } from './entity-index'
 import { getDesyncedComponents } from './state'
 
 export type SyncEntity = (entityId: Entity, componentIds: number[], entityEnumId?: number) => void
@@ -20,6 +21,7 @@ export function entityUtils(engine: IEngine, profile: IProfile) {
   const NetworkParent = engine.getComponent(_NetworkParent.componentId) as INetowrkParent
   const Transform = engine.getComponent(_Transform.componentId) as TransformComponent
   const SyncComponents = engine.getComponent(_SyncComponents.componentId) as ISyncComponents
+  const findNetworkEntity = createNetworkEntityIndex(engine, NetworkEntity)
 
   /**
    * Create a network entity (sync) through comms, and sync the received components
@@ -42,10 +44,8 @@ export function entityUtils(engine: IEngine, profile: IProfile) {
       networkValue.entityId = entityEnumId as Entity
 
       // Check if this enum is already used
-      for (const [_, network] of engine.getEntitiesWith(NetworkEntity)) {
-        if (network.networkId === networkValue.networkId && network.entityId === networkValue.entityId) {
-          throw new Error('syncEntity failed because the id provided is already in use')
-        }
+      if (findNetworkEntity(networkValue.networkId, networkValue.entityId)) {
+        throw new Error('syncEntity failed because the id provided is already in use')
       }
     }
 
@@ -65,6 +65,11 @@ export function entityUtils(engine: IEngine, profile: IProfile) {
    * Returns an iterable of all the childrens of the given entity.
    * for (const children of getChildren(parent)) { console.log(children) }
    * or just => const childrens: Entity[] = Array.from(getChildren(parent))
+   *
+   * ponytail: still a scan, and over NetworkParent rather than NetworkEntity —
+   * a one-to-many reverse index is a different structure, and nothing on the
+   * per-message hot path calls this. Upgrade path: a second index keyed by parent
+   * identity, once a caller makes it worth maintaining.
    */
   function* getChildren(parent: Entity): Iterable<Entity> {
     const network = NetworkEntity.getOrNull(parent)
@@ -87,12 +92,7 @@ export function entityUtils(engine: IEngine, profile: IProfile) {
   function getParent(child: Entity): Entity | undefined {
     const parent = NetworkParent.getOrNull(child)
     if (!parent) return undefined
-    for (const [entity, network] of engine.getEntitiesWith(NetworkEntity)) {
-      if (parent.networkId === network.networkId && parent.entityId === network.entityId) {
-        return entity
-      }
-    }
-    return undefined
+    return findNetworkEntity(parent.networkId, parent.entityId) ?? undefined
   }
 
   /**

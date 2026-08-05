@@ -16,6 +16,7 @@ import { createRendererTransport } from '../../../packages/@dcl/sdk/internal/tra
 import { ReadWriteByteBuffer } from '../../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { readMessage } from '../../../packages/@dcl/ecs/src/serialization/crdt/message'
 import { SendBinaryRequest, SendBinaryResponse } from '~system/CommunicationsController'
+import { expectConvergence } from './utils/convergence'
 
 function defineComponents(engine: IEngine) {
   return {
@@ -82,9 +83,13 @@ describe('Server-Client Connectivity', () => {
     'authoritative-server': [] as Uint8Array[]
   }
 
+  /** one entry per comms payload that crossed the wire, with the addresses it asked for */
+  const sentComms: { from: string; to: string[]; type: CommsMessage }[] = []
+
   // Common routing function - routes message and tags with sender info
   function routeMessage(data: Uint8Array, addresses: string[], sender: string) {
     console.log(`Routing message from ${sender} to addresses: [${addresses.join(', ')}]`)
+    sentComms.push({ from: sender, to: [...addresses], type: data[0] as CommsMessage })
 
     // Create message with sender information
     const senderBytes = encodeString(sender)
@@ -511,65 +516,49 @@ describe('Server-Client Connectivity', () => {
     expect(serverValidationCalled).toBe(true)
   })
 
-  it('should handle CRDT authoritative messages when server rejects invalid client message', async () => {
-    console.log('=== Testing CRDT Authoritative Mechanism ===')
+  it('corrects only the offender when the server rejects an invalid change', async () => {
     interceptedMessages.length = 0
 
-    let serverValidationCalled = false
     let serverRejectedChange = false
 
-    // Add server validation that rejects position.x > 100
+    // Reject any position past x = 100
     serverComponents.Transform.validateBeforeChange((value) => {
-      serverValidationCalled = true
-      console.log('Server validation checking:', value)
       if (value.newValue && value.newValue.position.x > 100) {
-        console.log('Server rejecting change due to x > 100, will send authoritative message')
         serverRejectedChange = true
-        return false // This should trigger authoritative message mechanism
+        return false
       }
       return true
     })
 
-    // Create entity on client A with valid initial position
+    // A valid state the server accepts and keeps, so it has something to correct with
     const correctionEntity = clientEngineA.addEntity()
     componentsA.Transform.create(correctionEntity, { position: { x: 50, y: 60, z: 70 } })
     syncA.syncEntity(correctionEntity, [componentsA.Transform.componentId])
-
-    // Let initial sync happen successfully
     await tick()
 
-    // Store the initial valid state
-    const initialTransform = componentsA.Transform.get(correctionEntity)
-    console.log('Initial client A position:', initialTransform.position)
+    let serverEntity: Entity | undefined
+    for (const [local, network] of serverEngine.getEntitiesWith(serverComponents.NetworkEntity)) {
+      if (network.networkId === syncA.myProfile.networkId && network.entityId === correctionEntity) serverEntity = local
+    }
+    expect(serverComponents.Transform.get(serverEntity!).position).toMatchObject({ x: 50, y: 60, z: 70 })
 
-    // Client A tries to make an invalid change (x > 100)
-    const mutableTransform = componentsA.Transform.getMutable(correctionEntity)
-    mutableTransform.position = { x: 150, y: 60, z: 70 } // This should be rejected
-
-    console.log('Client A attempting invalid position update to x=150')
-    console.log('Client A local state after change:', componentsA.Transform.get(correctionEntity).position)
-
-    // Process the invalid update
+    sentComms.length = 0
+    componentsA.Transform.getMutable(correctionEntity).position = { x: 150, y: 60, z: 70 }
     await tick()
     await tick()
 
-    console.log('Validation called:', serverValidationCalled)
-    console.log('Server rejected change:', serverRejectedChange)
-
-    expect(serverValidationCalled).toBe(true)
     expect(serverRejectedChange).toBe(true)
 
-    // The client retains its local invalid state since no authoritative message was sent
-    const finalTransform = componentsA.Transform.get(correctionEntity)
-    console.log('Final client A position after authoritative update:', finalTransform.position)
+    // the correction is a CRDT_AUTHORITATIVE addressed to the offender and nobody else
+    const corrections = sentComms.filter((message) => message.type === CommsMessage.CRDT_AUTHORITATIVE)
+    expect(corrections.length).toBeGreaterThanOrEqual(1)
+    expect(corrections.map((correction) => [correction.from, ...correction.to])).toEqual(
+      corrections.map(() => ['authoritative-server', 'clientA'])
+    )
 
-    // Interesting: The client's state was corrected from x=150 back to x=50
-    // This suggests CRDT sync is already providing some authoritative mechanism
-    expect(finalTransform.position.x).toBe(50) // Client state was corrected back to server state
-
-    // TODO: Fix CRDT transmission so server receives client's invalid changes
-    // Once fixed, the test should verify:
-    // expect(serverRejectedChange).toBe(true) // Server should reject invalid change
-    // expect(finalTransform.position).toMatchObject({ x: 50, y: 60, z: 70 }) // Client corrected to server state
+    // the offender is back on the state the server kept, and the world agrees
+    expect(componentsA.Transform.get(correctionEntity).position).toMatchObject({ x: 50, y: 60, z: 70 })
+    expect(serverComponents.Transform.get(serverEntity!).position).toMatchObject({ x: 50, y: 60, z: 70 })
+    expectConvergence({ server: serverEngine, clientA: clientEngineA, clientB: clientEngineB })
   })
 })
