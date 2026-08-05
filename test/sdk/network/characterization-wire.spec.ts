@@ -46,10 +46,10 @@ import { engineToCrdt } from '../../../packages/@dcl/sdk/src/network/state'
 import {
   NetworkMessage,
   RegularMessage,
-  chunkCrdtMessages,
   isNetworkMessage,
   localMessageToNetwork,
   networkMessageToLocal,
+  packChunks,
   readMessages
 } from '../../../packages/@dcl/sdk/src/network/codec'
 import { decodeEvent, encodeEvent } from '../../../packages/@dcl/sdk/src/network/events/protocol'
@@ -232,7 +232,7 @@ describe('wire format characterization', () => {
       const messageSize = readMessages(data)[0].messageBuffer.byteLength
       expect(messageSize).toBe(2072)
 
-      const chunks = chunkCrdtMessages(data, 12)
+      const chunks = packChunks(readMessages(data), 12)
       expect(chunks.map((chunk) => chunk.byteLength)).toEqual([10360, 10360, 4144])
       // no message is split: every chunk re-parses into whole messages
       expect(chunks.map((chunk) => readMessages(chunk).length)).toEqual([5, 5, 2])
@@ -242,7 +242,7 @@ describe('wire format characterization', () => {
         )
       }
       expect(chunks.reduce((total, chunk) => total + chunk.byteLength, 0)).toBe(data.byteLength)
-      expect(chunkCrdtMessages(new Uint8Array(), 12)).toEqual([])
+      expect(packChunks(readMessages(new Uint8Array()), 12)).toEqual([])
     })
 
     it('drops a single message larger than the limit', () => {
@@ -252,7 +252,7 @@ describe('wire format characterization', () => {
       PutComponentOperation.write(ENTITY, 2, COMPONENT_ID, new Uint8Array(13 * 1024), buffer)
       PutComponentOperation.write(ENTITY, 3, COMPONENT_ID, new Uint8Array(64), buffer)
 
-      const chunks = chunkCrdtMessages(buffer.toBinary(), 12)
+      const chunks = packChunks(readMessages(buffer.toBinary()), 12)
       const timestamps = chunks.flatMap((chunk) =>
         readMessages(chunk).map((message) => ('timestamp' in message ? message.timestamp : -1))
       )

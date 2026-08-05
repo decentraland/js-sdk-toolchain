@@ -172,7 +172,6 @@ export function createHarness() {
     clientB,
     peers,
     sent,
-    delivered,
     tick,
     /** also usable to replace a peer with a fresh engine keeping its comms identity */
     attach,
