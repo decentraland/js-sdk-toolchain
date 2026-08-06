@@ -1,5 +1,7 @@
 import {
   getAlign,
+  getBoxSizing,
+  getDirection,
   getDisplay,
   getFlexDirection,
   getFlexWrap,
@@ -10,6 +12,7 @@ import {
   parseBorderColor,
   parseBorderRadius,
   parseBorderWidth,
+  parseGap,
   parsePosition,
   parseSize
 } from './utils'
@@ -102,12 +105,18 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     borderRadius,
     borderWidth,
     borderColor,
+    gap,
+    rowGap,
+    columnGap,
+    direction,
+    boxSizing,
     ...otherProps
   } = props
 
   return {
     ...defaultUiTransform,
     ...otherProps,
+    ...parseGap(gap, rowGap, columnGap),
     ...parsePosition(props.position, 'position'),
     ...parsePosition(props.margin, 'margin'),
     ...parsePosition(props.padding, 'padding'),
@@ -130,6 +139,8 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     ...(flexWrap && getFlexWrap(flexWrap)),
     ...(borderRadius && parseBorderRadius(borderRadius)),
     ...(borderWidth && parseBorderWidth(borderWidth)),
-    ...(borderColor && parseBorderColor(borderColor))
+    ...(borderColor && parseBorderColor(borderColor)),
+    ...(direction && getDirection(direction)),
+    ...(boxSizing && getBoxSizing(boxSizing))
   }
 }

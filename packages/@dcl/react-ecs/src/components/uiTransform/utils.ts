@@ -1,5 +1,7 @@
 import {
   YGAlign,
+  YGBoxSizing,
+  YGDirection,
   YGDisplay,
   YGFlexDirection,
   YGJustify,
@@ -11,9 +13,12 @@ import {
 } from '@dcl/ecs'
 import {
   AlignType,
+  BoxSizingType,
+  DirectionType,
   FlexDirectionType,
   DisplayType,
   FlexWrapType,
+  GapShorthand,
   JustifyType,
   OverflowType,
   Position,
@@ -213,6 +218,49 @@ export function parsePosition<T extends PropName>(
   return parsePosition({ top, right, bottom, left }, prop)
 }
 
+type GapProp = 'gap' | 'rowGap' | 'columnGap'
+type GapPropUnit = `${GapProp}Unit`
+type GapProps = {
+  [key in GapProp]?: number
+} & {
+  [key in GapPropUnit]?: YGUnit
+}
+/**
+ * @internal
+ */
+export function parseGap(
+  gap: GapShorthand | undefined,
+  rowGap: PositionUnit | undefined,
+  columnGap: PositionUnit | undefined
+): Partial<GapProps> {
+  const obj: Partial<GapProps> = {}
+
+  function setGap(prop: GapProp, val: PositionUnit | undefined) {
+    const [value, unit] = parsePositionUnit(val)
+    if (value === undefined) return
+    obj[prop] = value
+    obj[`${prop}Unit`] = unit
+  }
+
+  if (typeof gap === 'string') {
+    const values = gap.split(' ').filter((a) => a !== '') as PositionUnit[]
+    if (values.length >= 2) {
+      setGap('rowGap', values[0])
+      setGap('columnGap', values[1])
+    } else {
+      setGap('gap', values[0])
+    }
+  } else {
+    setGap('gap', gap)
+  }
+
+  // longhands win over the shorthand; Yoga resolves row/column precedence over the all-gutter
+  setGap('rowGap', rowGap)
+  setGap('columnGap', columnGap)
+
+  return obj
+}
+
 // Size Props
 type HeightWidth = 'height' | 'width'
 type SizePropName = HeightWidth | `max${Capitalize<HeightWidth>}` | `min${Capitalize<HeightWidth>}`
@@ -350,4 +398,29 @@ export function getPointerFilter(
 const parsePointerFilter: Readonly<Record<PointerFilterType, PointerFilterMode>> = {
   none: PointerFilterMode.PFM_NONE,
   block: PointerFilterMode.PFM_BLOCK
+}
+
+/**
+ * @internal
+ */
+export function getDirection(direction: DirectionType): Record<'direction', YGDirection> {
+  return { direction: parseDirection[direction] }
+}
+
+const parseDirection: Readonly<Record<DirectionType, YGDirection>> = {
+  inherit: YGDirection.YGDIR_INHERIT,
+  ltr: YGDirection.YGDIR_LTR,
+  rtl: YGDirection.YGDIR_RTL
+}
+
+/**
+ * @internal
+ */
+export function getBoxSizing(boxSizing: BoxSizingType): Record<'boxSizing', YGBoxSizing> {
+  return { boxSizing: parseBoxSizing[boxSizing] }
+}
+
+const parseBoxSizing: Readonly<Record<BoxSizingType, YGBoxSizing>> = {
+  'border-box': YGBoxSizing.YGBS_BORDER_BOX,
+  'content-box': YGBoxSizing.YGBS_CONTENT_BOX
 }

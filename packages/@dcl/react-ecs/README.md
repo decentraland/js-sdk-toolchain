@@ -100,6 +100,10 @@ The layout system is based on Flexbox and supports the following properties:
 - `width`, `height`
 - `margin`, `padding`
 - `positionType: 'absolute' | 'relative'`
+- `gap`, `rowGap`, `columnGap`
+- `flex`, `aspectRatio`
+- `direction: 'inherit' | 'ltr' | 'rtl'`
+- `boxSizing: 'border-box' | 'content-box'`
 
 ## Event Handling
 

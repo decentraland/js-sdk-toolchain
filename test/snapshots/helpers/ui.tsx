@@ -7,7 +7,8 @@ export const uiComponent = () => (
     uiTransform={{
       width: 700,
       height: 400,
-      margin: { top: '35px', left: '500px' }
+      margin: { top: '35px', left: '500px' },
+      gap: '10px 5%'
     }}
     uiBackground={{ color: Color4.create(0.5, 0.8, 0.1, 0.6) }}
   >
@@ -18,7 +19,9 @@ export const uiComponent = () => (
         height: '20%',
         justifyContent: 'center',
         alignItems: 'center',
-        display: 'flex'
+        display: 'flex',
+        gap: 8,
+        aspectRatio: 1.75
       }}
     >
       <Dropdown
@@ -50,7 +53,11 @@ export const uiComponent = () => (
         height: '20%',
         justifyContent: 'center',
         alignItems: 'center',
-        display: 'flex'
+        display: 'flex',
+        rowGap: '4px',
+        columnGap: '2%',
+        direction: 'rtl',
+        boxSizing: 'content-box'
       }}
     >
       <Label value={`Counter:`} fontSize={60} uiBackground={{ color: Color4.fromHexString('#fbf0f0') }} />
@@ -61,7 +68,8 @@ export const uiComponent = () => (
         height: '100px',
         justifyContent: 'center',
         alignItems: 'center',
-        display: 'flex'
+        display: 'flex',
+        flex: 1
       }}
     >
       <Label value={`Player:`} fontSize={40} uiBackground={{ color: Color4.fromHexString('#fbf0f0') }} />
