@@ -96,13 +96,31 @@ export type PositionType = 'absolute' | 'relative'
 export type PointerFilterType = 'none' | 'block'
 
 /**
+ * @public
+ * The direction property specifies the layout direction of the element (left-to-right or right-to-left)
+ */
+export type DirectionType = 'inherit' | 'ltr' | 'rtl'
+
+/**
+ * @public
+ * The box-sizing property defines whether width/height include padding and border (border-box) or only the content (content-box)
+ */
+export type BoxSizingType = 'border-box' | 'content-box'
+
+/**
+ * The gap shorthand: one value applies to both axes; two space-separated values apply to row then column
+ * @public
+ */
+export type GapShorthand = PositionUnit | `${PositionUnit} ${PositionUnit}`
+
+/**
  * Layout props to position things in the canvas
  * @public
  */
 export interface UiTransformProps {
   /** The display property controls if a item is going to be displayed or not. */
   display?: DisplayType
-  /** The flex shorthand property sets how a flex item will grow or shrink to fit the space available in its flex container. */
+  /** The flex shorthand property sets how a flex item will grow or shrink to fit the space available in its flex container. It sets flex-grow, flex-shrink and flex-basis following Yoga semantics. */
   flex?: number
   /** Justify content describes how to align children within the main axis of their container. */
   justifyContent?: JustifyType
@@ -155,4 +173,16 @@ export interface UiTransformProps {
   opacity?: number
   /** default 0 */
   zIndex?: number
+  /** The gap shorthand sets the spacing between rows and columns of a flex container. One value applies to both axes; two space-separated values apply to row then column. */
+  gap?: GapShorthand
+  /** The row-gap property sets the spacing between the rows of a flex container. Takes precedence over gap on its axis. */
+  rowGap?: PositionUnit
+  /** The column-gap property sets the spacing between the columns of a flex container. Takes precedence over gap on its axis. */
+  columnGap?: PositionUnit
+  /** The aspect-ratio property locks the element's width / height ratio. */
+  aspectRatio?: number
+  /** The direction property specifies the layout direction of the element @defaultValue 'inherit' */
+  direction?: DirectionType
+  /** The box-sizing property defines whether width/height include padding and border @defaultValue 'border-box' */
+  boxSizing?: BoxSizingType
 }

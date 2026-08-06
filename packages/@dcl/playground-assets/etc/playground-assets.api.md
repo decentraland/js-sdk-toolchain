@@ -299,6 +299,9 @@ export namespace BorderRect {
     export function encode(message: BorderRect, writer?: _m0.Writer): _m0.Writer;
 }
 
+// @public
+export type BoxSizingType = 'border-box' | 'content-box';
+
 // Warning: (tsdoc-undefined-tag) The TSDoc tag "@category" is not defined in this configuration
 //
 // @public
@@ -1060,6 +1063,9 @@ export type DeleteEntityNetworkMessageBody = {
     networkId: number;
 };
 
+// @public
+export type DirectionType = 'inherit' | 'ltr' | 'rtl';
+
 // @public (undocumented)
 export type DisplayType = 'flex' | 'none';
 
@@ -1315,6 +1321,9 @@ export const enum Font {
     // (undocumented)
     F_SERIF = 1
 }
+
+// @public
+export type GapShorthand = PositionUnit | `${PositionUnit} ${PositionUnit}`;
 
 // @public
 export function getComponentEntityTree<T>(engine: Pick<IEngine, 'getEntitiesWith'>, entity: Entity, component: ComponentDefinition<T & {
@@ -3913,6 +3922,7 @@ export interface PBUiTransform {
     alignContent?: YGAlign | undefined;
     alignItems?: YGAlign | undefined;
     alignSelf: YGAlign;
+    aspectRatio?: number | undefined;
     // (undocumented)
     borderBottomColor?: PBColor4 | undefined;
     // (undocumented)
@@ -3944,7 +3954,13 @@ export interface PBUiTransform {
     // (undocumented)
     borderTopWidth?: number | undefined;
     borderTopWidthUnit?: YGUnit | undefined;
+    boxSizing?: YGBoxSizing | undefined;
+    // (undocumented)
+    columnGap?: number | undefined;
+    columnGapUnit?: YGUnit | undefined;
+    direction?: YGDirection | undefined;
     display: YGDisplay;
+    flex?: number | undefined;
     // (undocumented)
     flexBasis: number;
     flexBasisUnit: YGUnit;
@@ -3953,6 +3969,9 @@ export interface PBUiTransform {
     flexGrow: number;
     flexShrink?: number | undefined;
     flexWrap?: YGWrap | undefined;
+    // (undocumented)
+    gap?: number | undefined;
+    gapUnit?: YGUnit | undefined;
     // (undocumented)
     height: number;
     heightUnit: YGUnit;
@@ -4013,6 +4032,9 @@ export interface PBUiTransform {
     positionType: YGPositionType;
     // (undocumented)
     rightOf: number;
+    // (undocumented)
+    rowGap?: number | undefined;
+    rowGapUnit?: YGUnit | undefined;
     // (undocumented)
     width: number;
     widthUnit: YGUnit;
@@ -5435,12 +5457,16 @@ export interface UiTransformProps {
     alignContent?: AlignType;
     alignItems?: AlignType;
     alignSelf?: AlignType;
+    aspectRatio?: number;
     // (undocumented)
     borderColor?: Record<keyof Partial<Position>, PBColor4> | PBColor4 | undefined;
     // (undocumented)
     borderRadius?: Partial<BorderRadius> | PositionUnit;
     // (undocumented)
     borderWidth?: Partial<Position> | PositionUnit;
+    boxSizing?: BoxSizingType;
+    columnGap?: PositionUnit;
+    direction?: DirectionType;
     display?: DisplayType;
     flex?: number;
     flexBasis?: number;
@@ -5448,6 +5474,7 @@ export interface UiTransformProps {
     flexGrow?: number;
     flexShrink?: number;
     flexWrap?: FlexWrapType;
+    gap?: GapShorthand;
     height?: PositionUnit | 'auto';
     justifyContent?: JustifyType;
     margin?: Partial<Position> | PositionShorthand;
@@ -5461,6 +5488,7 @@ export interface UiTransformProps {
     pointerFilter?: PointerFilterType;
     position?: Partial<Position> | PositionShorthand;
     positionType?: PositionType;
+    rowGap?: PositionUnit;
     width?: PositionUnit | 'auto';
     zIndex?: number;
 }
@@ -5691,6 +5719,24 @@ export const enum YGAlign {
     YGA_SPACE_BETWEEN = 6,
     // (undocumented)
     YGA_STRETCH = 4
+}
+
+// @public (undocumented)
+export const enum YGBoxSizing {
+    // (undocumented)
+    YGBS_BORDER_BOX = 0,
+    // (undocumented)
+    YGBS_CONTENT_BOX = 1
+}
+
+// @public (undocumented)
+export const enum YGDirection {
+    // (undocumented)
+    YGDIR_INHERIT = 0,
+    // (undocumented)
+    YGDIR_LTR = 1,
+    // (undocumented)
+    YGDIR_RTL = 2
 }
 
 // @public (undocumented)

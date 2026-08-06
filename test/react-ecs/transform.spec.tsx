@@ -5,6 +5,8 @@ import {
   YGFlexDirection,
   YGOverflow,
   YGAlign,
+  YGBoxSizing,
+  YGDirection,
   YGDisplay,
   YGPositionType,
   YGJustify,
@@ -671,6 +673,178 @@ describe('UiTransform React Ecs', () => {
     await engine.update(1)
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       opacity: 1
+    })
+  })
+
+  it('should parse gap shorthand props', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    let gap: UiTransformProps['gap'] = 10
+
+    const ui = () => <UiEntity uiTransform={{ gap }} />
+
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      gap: 10,
+      gapUnit: YGUnit.YGU_POINT,
+      rowGap: undefined,
+      rowGapUnit: undefined,
+      columnGap: undefined,
+      columnGapUnit: undefined
+    })
+
+    gap = '5px'
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      gap: 5,
+      gapUnit: YGUnit.YGU_POINT
+    })
+
+    gap = '10%'
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      gap: 10,
+      gapUnit: YGUnit.YGU_PERCENT
+    })
+
+    gap = '10px 5%'
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      gap: undefined,
+      gapUnit: undefined,
+      rowGap: 10,
+      rowGapUnit: YGUnit.YGU_POINT,
+      columnGap: 5,
+      columnGapUnit: YGUnit.YGU_PERCENT
+    })
+
+    gap = undefined
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      gap: undefined,
+      gapUnit: undefined,
+      rowGap: undefined,
+      rowGapUnit: undefined,
+      columnGap: undefined,
+      columnGapUnit: undefined
+    })
+  })
+
+  it('should parse rowGap & columnGap props and let them win over the gap shorthand', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    let uiTransform: UiTransformProps = { rowGap: '4px', columnGap: '2%' }
+
+    const ui = () => <UiEntity uiTransform={uiTransform} />
+
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      gap: undefined,
+      gapUnit: undefined,
+      rowGap: 4,
+      rowGapUnit: YGUnit.YGU_POINT,
+      columnGap: 2,
+      columnGapUnit: YGUnit.YGU_PERCENT
+    })
+
+    uiTransform = { gap: '10px 5px', columnGap: '3%' }
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      gap: undefined,
+      gapUnit: undefined,
+      rowGap: 10,
+      rowGapUnit: YGUnit.YGU_POINT,
+      columnGap: 3,
+      columnGapUnit: YGUnit.YGU_PERCENT
+    })
+  })
+
+  it('should parse aspectRatio & flex props', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    let uiTransform: UiTransformProps = { aspectRatio: 1.5, flex: 1 }
+
+    const ui = () => <UiEntity uiTransform={uiTransform} />
+
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      aspectRatio: 1.5,
+      flex: 1
+    })
+
+    uiTransform = {}
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      aspectRatio: undefined,
+      flex: undefined
+    })
+  })
+
+  it('should parse direction & boxSizing props', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getUiTransform = (entity: Entity) => UiTransform.get(entity)
+
+    let uiTransform: UiTransformProps = {}
+
+    const ui = () => <UiEntity uiTransform={uiTransform} />
+
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      direction: undefined,
+      boxSizing: undefined
+    })
+
+    uiTransform = { direction: 'rtl', boxSizing: 'content-box' }
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      direction: YGDirection.YGDIR_RTL,
+      boxSizing: YGBoxSizing.YGBS_CONTENT_BOX
+    })
+
+    // clearing from a non-zero enum value unsets the field
+    uiTransform = { direction: 'ltr' }
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      direction: YGDirection.YGDIR_LTR,
+      boxSizing: undefined
+    })
+
+    uiTransform = { direction: 'inherit', boxSizing: 'border-box' }
+    await engine.update(1)
+    expect(getUiTransform(rootDivEntity)).toMatchObject({
+      direction: YGDirection.YGDIR_INHERIT,
+      boxSizing: YGBoxSizing.YGBS_BORDER_BOX
     })
   })
 })
