@@ -31,25 +31,43 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
       completed: boolean
       // Tween has changed on this frame
       changed: boolean
+      // True right after this tween was (re)introduced (created, replaced, or advanced by the
+      // sequence/YOYO logic below). Cleared the first time the renderer reports a state other than
+      // TS_COMPLETED (or reports no state at all) for it. While true, a TS_COMPLETED reading is
+      // assumed to be a stale leftover from the tween this one replaced - the renderer's PUT for
+      // the new tween's own state hasn't round-tripped back yet - and is never trusted as its
+      // completion.
+      awaitingFreshState: boolean
     }
   >()
   function isCompleted(entity: Entity) {
-    const tweenState = TweenState.getOrNull(entity)
     const tween = Tween.getOrNull(entity)
     const tweenCache = cache.get(entity)
-    if (!tweenState || !tween || !tweenCache) return false
-    /* istanbul ignore next */
-    if (
-      // Renderer notified that the tween is completed
-      // Only consider it completed if the tween hasn't changed this frame (to avoid false positives after YOYO/sequence processing)
-      ((tweenState.state === TweenStateStatus.TS_COMPLETED && !tweenCache.changed) ||
-        (tweenChanged(entity) && !tweenCache.changed)) &&
-      // Avoid sending isCompleted multiple times
-      !tweenCache.completed
-    ) {
-      return true
+    if (!tween || !tweenCache) return false
+
+    // A tween that was just replaced (this frame) is never completed: the cache-maintenance
+    // system below hasn't caught up with the new definition yet, so `tweenCache` still describes
+    // the tween that was just replaced, not the current one.
+    if (tweenChanged(entity)) return false
+
+    const tweenState = TweenState.getOrNull(entity)
+    if (!tweenState || tweenState.state !== TweenStateStatus.TS_COMPLETED) {
+      // The renderer isn't (or is no longer) reporting completion for this tween, so any earlier
+      // TS_COMPLETED reading is confirmed stale: trust the next TS_COMPLETED we see for it.
+      tweenCache.awaitingFreshState = false
+      return false
     }
-    return false
+
+    // From here, the renderer reports TS_COMPLETED for the current tween definition.
+    if (
+      // Still the stale completion of the tween this one replaced
+      tweenCache.awaitingFreshState ||
+      // Avoid sending isCompleted multiple times
+      tweenCache.completed
+    ) {
+      return false
+    }
+    return true
   }
   function tweenChanged(entity: Entity) {
     const currentTween = Tween.getOrNull(entity)
@@ -74,7 +92,8 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
         cache.set(entity, {
           tween: buffer.toBinary(),
           completed: false,
-          changed: true
+          changed: true,
+          awaitingFreshState: true
         })
         continue
       }
@@ -144,12 +163,18 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
             // Mark as changed so the cache system will detect the change and reset the cache properly
             tweenCache.completed = false
             tweenCache.changed = true
+            // The renderer still hasn't reported on this replacement tween; don't trust a
+            // TS_COMPLETED reading until it reports something else for it first.
+            tweenCache.awaitingFreshState = true
           } else if (tweenSequence.loop === TweenLoop.TL_YOYO) {
             Tween.createOrReplace(entity, backwardsTween(tween))
             // Reset completed flag for the backwards tween
             // Mark as changed so the cache system will detect the change and reset the cache properly
             tweenCache.completed = false
             tweenCache.changed = true
+            // The renderer still hasn't reported on this replacement tween; don't trust a
+            // TS_COMPLETED reading until it reports something else for it first.
+            tweenCache.awaitingFreshState = true
           } else if (tweenSequence.loop === TweenLoop.TL_RESTART) {
             Tween.deleteFrom(entity)
             cache.delete(entity)

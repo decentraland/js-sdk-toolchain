@@ -285,4 +285,145 @@ describe('Tween System', () => {
       )
     })
   })
+
+  // Regression coverage for the "retarget mid-travel" false-positive bug: replacing a tween
+  // (Tween.createOrReplace / setMove et al.) while a previous one is still running, or right
+  // after it arrived, must never be reported as completed for the *new* tween.
+  describe('mid-flight retargeting must never be reported as completed', () => {
+    it('does not report completed when a tween is replaced while still TS_ACTIVE, even when read in the same frame as the replacement', async () => {
+      const testEngine = Engine()
+      const testTweenSystem = createTweenSystem(testEngine)
+      const testTween = components.Tween(testEngine)
+      const testTweenState = components.TweenState(testEngine)
+      const testEntity = testEngine.addEntity()
+      const testMockTween = mockTweenEngine(testEngine, testTween)
+
+      await testMockTween(testEntity, testTween.Mode.Move({ start: Vector3.create(), end: Vector3.create(1, 1, 1) }))
+      await testEngine.update(1) // let the cache pick up the first tween
+
+      testTweenState.createOrReplace(testEntity, { state: TweenStateStatus.TS_ACTIVE, currentTime: 0.5 })
+      await testEngine.update(1) // now travelling, mid-flight
+
+      let resultOnRetargetFrame: boolean | undefined
+      testEngine.addSystem(() => {
+        if (resultOnRetargetFrame === undefined) {
+          // Replace the tween and read tweenCompleted() in the very same tick, before the
+          // internal cache-maintenance system (registered at -Infinity) gets a chance to run.
+          testTween.createOrReplace(testEntity, {
+            duration: 1000,
+            easingFunction: EasingFunction.EF_EASEBACK,
+            mode: testTween.Mode.Move({ start: Vector3.create(1, 1, 1), end: Vector3.create(2, 2, 2) })
+          })
+          resultOnRetargetFrame = testTweenSystem.tweenCompleted(testEntity)
+        }
+      })
+
+      await testEngine.update(1)
+      expect(resultOnRetargetFrame).toBe(false)
+
+      // And it must stay false on the following frames too, while genuinely mid-flight
+      expect(testTweenSystem.tweenCompleted(testEntity)).toBe(false)
+      await testEngine.update(1)
+      expect(testTweenSystem.tweenCompleted(testEntity)).toBe(false)
+    })
+
+    it('does not report completed for a tween retargeted right after an arrival (stale TS_COMPLETED), but does report once the new tween genuinely completes', async () => {
+      const testEngine = Engine()
+      const testTweenSystem = createTweenSystem(testEngine)
+      const testTween = components.Tween(testEngine)
+      const testTweenState = components.TweenState(testEngine)
+      const testEntity = testEngine.addEntity()
+      const testMockTween = mockTweenEngine(testEngine, testTween)
+      const testMockTweenStatus = mockTweenStatusEngine(testEngine, testTweenState)
+      const testCompleted = jest.fn()
+      testEngine.addSystem(() => {
+        if (testTweenSystem.tweenCompleted(testEntity)) testCompleted()
+      })
+
+      // First tween genuinely completes
+      await testMockTween(testEntity)
+      await testMockTweenStatus(testEntity)
+      expect(testCompleted).toBeCalledTimes(1)
+
+      // Retarget while TweenState is still (stale) TS_COMPLETED from the tween we just replaced -
+      // the renderer's PUT acknowledging the new tween hasn't round-tripped back yet.
+      testCompleted.mockClear()
+      await testMockTween(testEntity, testTween.Mode.Move({ start: Vector3.create(), end: Vector3.create(5, 5, 5) }))
+      await testEngine.update(1)
+      expect(testCompleted).toBeCalledTimes(0)
+
+      // Stays uncompleted across several frames of stale TS_COMPLETED (the round trip is "at
+      // least 2 frames, variable" - a single-frame guard is not enough)
+      await testEngine.update(1)
+      expect(testCompleted).toBeCalledTimes(0)
+      await testEngine.update(1)
+      expect(testCompleted).toBeCalledTimes(0)
+
+      // Renderer catches up and reports the new tween as active
+      testTweenState.createOrReplace(testEntity, { state: TweenStateStatus.TS_ACTIVE, currentTime: 0.1 })
+      await testEngine.update(1)
+      expect(testCompleted).toBeCalledTimes(0)
+
+      // The new tween genuinely completes
+      testTweenState.createOrReplace(testEntity, { state: TweenStateStatus.TS_COMPLETED, currentTime: 1 })
+      await testEngine.update(1)
+      expect(testCompleted).toBeCalledTimes(1)
+
+      // And is not reported again on subsequent frames
+      testCompleted.mockClear()
+      await testEngine.update(1)
+      expect(testCompleted).toBeCalledTimes(0)
+    })
+
+    it('does not double-report a sequence-advanced step while the renderer still echoes the previous step TS_COMPLETED', async () => {
+      const testEngine = Engine()
+      const testTweenSystem = createTweenSystem(testEngine)
+      const testTween = components.Tween(testEngine)
+      const testTweenState = components.TweenState(testEngine)
+      const testTweenSequence = components.TweenSequence(testEngine)
+      const testEntity = testEngine.addEntity()
+      const testMockTween = mockTweenEngine(testEngine, testTween)
+      const testCompleted = jest.fn()
+      testEngine.addSystem(() => {
+        if (testTweenSystem.tweenCompleted(testEntity)) testCompleted()
+      })
+
+      const moveTween = await testMockTween(
+        testEntity,
+        testTween.Mode.Move({ start: Vector3.create(), end: Vector3.create(1, 1, 1) })
+      )
+      const rotateTween = {
+        ...moveTween,
+        mode: testTween.Mode.Rotate({ start: Quaternion.Zero(), end: Quaternion.Identity() })
+      }
+      testTweenSequence.createOrReplace(testEntity, { sequence: [rotateTween], loop: TweenLoop.TL_RESTART })
+
+      // Settle the cache on the move tween
+      await testEngine.update(1)
+      await testEngine.update(1)
+
+      // Move tween genuinely completes -> sequence system advances to the rotate tween this same frame
+      testTweenState.createOrReplace(testEntity, { state: TweenStateStatus.TS_COMPLETED, currentTime: 1 })
+      await testEngine.update(1)
+      expect(testCompleted).toBeCalledTimes(1)
+      expect(testTween.get(testEntity).mode).toMatchCloseTo(rotateTween.mode)
+
+      // TweenState is still (stale) TS_COMPLETED, echoing the move tween that just finished. The
+      // renderer hasn't acknowledged the rotate tween yet - it must not be reported as completed.
+      testCompleted.mockClear()
+      await testEngine.update(1)
+      expect(testCompleted).toBeCalledTimes(0)
+      await testEngine.update(1)
+      expect(testCompleted).toBeCalledTimes(0)
+
+      // Renderer catches up: rotate tween is active, then genuinely completes
+      testTweenState.createOrReplace(testEntity, { state: TweenStateStatus.TS_ACTIVE, currentTime: 0.2 })
+      await testEngine.update(1)
+      expect(testCompleted).toBeCalledTimes(0)
+
+      testTweenState.createOrReplace(testEntity, { state: TweenStateStatus.TS_COMPLETED, currentTime: 1 })
+      await testEngine.update(1)
+      expect(testCompleted).toBeCalledTimes(1)
+    })
+  })
 })
