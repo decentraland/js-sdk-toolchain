@@ -103,7 +103,7 @@ describe('Analytics Component', () => {
     const spyTrack = jest.spyOn(analytics.get(), 'track')
     analytics.track('Build scene', {} as any)
     await analytics.stop()
-    expect(spyTrack).toBeCalled()
+    expect(spyTrack).toHaveBeenCalled()
   })
 
   it('should use custom writeKey when options.writeKey is provided', async () => {
