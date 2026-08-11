@@ -55,17 +55,32 @@ function registerProcessCleanup(cleanup: () => void): () => void {
 
 // `2026-08-11T14:28:33.522058Z  INFO scene_runner::renderer_context: ` — the
 // timestamp/level/target prefix the bevy engine's tracing puts on every line
-const TRACING_PREFIX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s+(INFO|WARN|ERROR|DEBUG|TRACE)\s+[\w:]+:\s?/
+const TRACING_PREFIX = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})\.\d+Z\s+(INFO|WARN|ERROR|DEBUG|TRACE)\s+[\w:]+:\s?/
 const HEARTBEAT_LINE = /^\[headless\] alive:/
 // The engine colors its output even when piped, so lines arrive wrapped in ANSI
 // escapes and must be stripped before the prefix regex can match.
 // eslint-disable-next-line no-control-regex
 const ANSI_CODES = /\u001b\[[0-9;]*m/g
 
+// Engine-internal noise in local preview: the asset pipeline hunts dot-prefixed
+// processed gltf paths the preview server never has, and repeats the failure on
+// every scene composition
+const ENGINE_NOISE = [/^failed to process gltf/, /^Path not found: \$ipfs/]
+
+// `[[0, 0] 3.33] ` — parcel coords + scene clock the engine prepends to every
+// scene log line; redundant in a single-scene preview
+const SCENE_CONTEXT = /^\[\[-?\d+, -?\d+\] \d+\.\d+\] /
+
 function levelMarker(level: string): string {
   if (level === 'WARN') return colors.yellow('WARN') + ' '
   if (level === 'ERROR') return colors.redBright('ERROR') + ' '
   return ''
+}
+
+// engine timestamps are UTC ISO with microseconds; show local wall-clock instead
+function localTime(utcTimestamp: string): string {
+  const date = new Date(utcTimestamp + 'Z')
+  return isNaN(date.getTime()) ? '' : colors.gray(date.toTimeString().slice(0, 8)) + ' '
 }
 
 /**
@@ -81,7 +96,11 @@ function forwardEngineLogs(source: Readable | null, sink: NodeJS.WriteStream) {
     if (!match) {
       sink.write(line + '\n')
     } else {
-      sink.write(levelMarker(match[1]) + line.slice(match[0].length) + '\n')
+      const message = line.slice(match[0].length)
+      if (ENGINE_NOISE.some((pattern) => pattern.test(message))) return
+      // scene lines carry their own LOG/ERROR tag, so the engine's level marker is redundant
+      const marker = SCENE_CONTEXT.test(message) ? '' : levelMarker(match[2])
+      sink.write(localTime(match[1]) + marker + message.replace(SCENE_CONTEXT, '') + '\n')
     }
   }
   let pending = ''
