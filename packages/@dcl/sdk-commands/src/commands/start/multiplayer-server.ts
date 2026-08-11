@@ -18,9 +18,11 @@ const EXIT_UNAVAILABLE = 78
 
 type ServerEngine = 'bevy' | 'hammurabi'
 
+const DEFAULT_ENGINE: ServerEngine = 'bevy'
+
 function selectedEngine(): ServerEngine {
   const requested = process.env.DCL_SERVER_ENGINE
-  return requested === 'bevy' || requested === 'hammurabi' ? requested : 'hammurabi'
+  return requested === 'bevy' || requested === 'hammurabi' ? requested : DEFAULT_ENGINE
 }
 
 /**
@@ -52,11 +54,11 @@ function registerProcessCleanup(cleanup: () => void): () => void {
 /**
  * Starts the Multiplayer Server process using npx to install and run in one step
  */
-export function startHammurabiServer(
+export function startMultiplayerServer(
   components: Pick<CliComponents, 'logger'>,
   workingDir: string,
   realm: string,
-  engine: ServerEngine = 'hammurabi'
+  engine: ServerEngine = DEFAULT_ENGINE
 ): ChildProcess {
   const pkg = packageSpec(engine)
 
@@ -75,31 +77,31 @@ export function startHammurabiServer(
 
   // If npx-cli.js was found, run it directly via process.execPath (node in regular env,
   // Electron Helper with ELECTRON_RUN_AS_NODE=1 in Electron). Otherwise fall back to npx binary.
-  const hammurabiProcess = npxCliJs
+  const serverProcess = npxCliJs
     ? spawn(process.execPath, [npxCliJs, ...npxArgs], { cwd: workingDir, shell: false, stdio: 'inherit', env })
     : spawn(getNpxBin(), npxArgs, { cwd: workingDir, shell: false, stdio: 'inherit', env })
 
-  hammurabiProcess.on('error', (error) => {
+  serverProcess.on('error', (error) => {
     printWarning(components.logger, `Multiplayer Server process error: ${error.message}`)
   })
 
   // Register cleanup handlers
   const cleanup = () => {
-    if (!hammurabiProcess.killed) {
-      hammurabiProcess.kill('SIGTERM')
+    if (!serverProcess.killed) {
+      serverProcess.kill('SIGTERM')
     }
   }
 
   const removeCleanup = registerProcessCleanup(cleanup)
 
-  hammurabiProcess.on('close', (code) => {
+  serverProcess.on('close', (code) => {
     removeCleanup()
     if (code !== 0 && code !== null) {
       printWarning(components.logger, `Multiplayer Server exited with code ${code}`)
     }
   })
 
-  return hammurabiProcess
+  return serverProcess
 }
 
 /**
@@ -107,8 +109,8 @@ export function startHammurabiServer(
  * In the auth-server SDK, all scenes are authoritative multiplayer.
  * Uses npx to handle installation and execution in a single step (works in Electron).
  *
- * Which implementation runs is chosen by DCL_SERVER_ENGINE (bevy | hammurabi). When bevy
- * reports itself unavailable on this machine, hammurabi is started instead.
+ * Which implementation runs is chosen by DCL_SERVER_ENGINE (bevy | hammurabi), defaulting
+ * to bevy. When bevy reports itself unavailable on this machine, hammurabi is started instead.
  *
  * @param components - Preview components including logger
  * @param project - The project to start the multiplayer server for
@@ -122,12 +124,14 @@ export function spawnAuthServer(
 ): ChildProcess | undefined {
   const engine = selectedEngine()
   try {
-    const child = startHammurabiServer(components, project.workingDirectory, realm, engine)
-    if (engine === 'bevy') {
+    const child = startMultiplayerServer(components, project.workingDirectory, realm, engine)
+    // No fallback when DCL_SERVER_PACKAGE is set: packageSpec would resolve the
+    // hammurabi retry to the same overridden package that just exited 78.
+    if (engine === 'bevy' && !process.env.DCL_SERVER_PACKAGE) {
       child.on('close', (code) => {
         if (code === EXIT_UNAVAILABLE) {
           printWarning(components.logger, 'Bevy multiplayer server unavailable here — falling back to hammurabi')
-          startHammurabiServer(components, project.workingDirectory, realm, 'hammurabi')
+          startMultiplayerServer(components, project.workingDirectory, realm, 'hammurabi')
         }
       })
     }
