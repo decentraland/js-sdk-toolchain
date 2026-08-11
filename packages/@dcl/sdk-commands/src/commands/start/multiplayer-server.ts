@@ -84,23 +84,31 @@ function localTime(utcTimestamp: string): string {
 }
 
 /**
- * Forwards a bevy child stream line by line, dropping the tracing prefix (keeping
- * WARN/ERROR markers) and the periodic `[headless] alive:` heartbeat.
+ * Forwards a bevy child stream line by line, tagged `[Server]` to stand apart from
+ * the preview CLI's own output, dropping the tracing prefix (keeping WARN/ERROR
+ * markers) and the periodic `[headless] alive:` heartbeat.
  */
 function forwardEngineLogs(source: Readable | null, sink: NodeJS.WriteStream) {
   if (!source) return
+  const serverTag = colors.green('[Server]') + ' '
   const writeClean = (raw: string) => {
     const line = raw.replace(ANSI_CODES, '')
+    if (!line.trim()) return
     if (HEARTBEAT_LINE.test(line)) return
     const match = line.match(TRACING_PREFIX)
     if (!match) {
-      sink.write(line + '\n')
+      // launcher lines ([headless] realm=...): the [Server] tag replaces their own
+      sink.write(serverTag + line.replace(/^\[headless\] /, '') + '\n')
+      return
+    }
+    const message = line.slice(match[0].length)
+    if (ENGINE_NOISE.some((pattern) => pattern.test(message))) return
+    if (SCENE_CONTEXT.test(message)) {
+      // scene lines carry their own LOG/ERROR tag; just color errors red
+      const sceneMessage = message.replace(SCENE_CONTEXT, '').replace(/^ERROR /, colors.redBright('ERROR') + ' ')
+      sink.write(serverTag + localTime(match[1]) + sceneMessage + '\n')
     } else {
-      const message = line.slice(match[0].length)
-      if (ENGINE_NOISE.some((pattern) => pattern.test(message))) return
-      // scene lines carry their own LOG/ERROR tag, so the engine's level marker is redundant
-      const marker = SCENE_CONTEXT.test(message) ? '' : levelMarker(match[2])
-      sink.write(localTime(match[1]) + marker + message.replace(SCENE_CONTEXT, '') + '\n')
+      sink.write(serverTag + localTime(match[1]) + levelMarker(match[2]) + message + '\n')
     }
   }
   let pending = ''

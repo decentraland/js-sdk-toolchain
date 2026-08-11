@@ -168,9 +168,12 @@ export async function main(options: Options) {
       const config = createRecordConfigComponent({
         HTTP_SERVER_PORT: port.toString(),
         HTTP_SERVER_HOST: '0.0.0.0',
+        // the embedded comms server (RoomsComponent/LinearProtocol) logs every
+        // connect/disconnect at DEBUG; LOG_LEVEL=DEBUG in the env re-enables it
+        LOG_LEVEL: 'INFO',
         ...process.env
       })
-      const logs = await createConsoleLogComponent({})
+      const logs = await createConsoleLogComponent({ config })
       const ws = await createWsComponent({ logs })
       const server = await createServerComponent<PreviewComponents>({ config, ws: ws.ws, logs }, { cors: {} })
       const rooms = await createRoomsComponent({
