@@ -35,7 +35,10 @@
   "homepage": "https://github.com/decentraland/js-sdk-toolchain#readme",
   "keywords": [],
   "license": "Apache-2.0",
-  "repository": "decentraland/js-sdk-toolchain.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decentraland/js-sdk-toolchain.git"
+  },
   "scripts": {
     "postinstall": "make sync-deps"
   }
