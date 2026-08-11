@@ -4,6 +4,7 @@
       "invalid_folder": "Developer: All commands must be inside a folder",
       "invalid_index_file": "Developer: All commands must have an \"index.js\" file inside",
       "not_found": "Command \"{{command}}\" is invalid. {{help}}",
+      "removed": "The \"{{command}}\" command has been removed from the SDK. {{hint}}",
       "not_valid": "Command does not follow implementation rules:\n* Requires a \"help\" function\n* Requires a \"main\" function"
     },
     "config": {
@@ -57,15 +58,6 @@
       "invalid_arguments": "Specifying --template and --project at the same time is not allowed. Please specify only one of them.",
       "invalid_project": "The requested scene doesn't exist empty. Valid options are: {{options}}",
       "invalid_template_zip_url": "The zip downloaded has many folder on the root, make sure it has only one folder on the root."
-    },
-    "quests": {
-      "invalid_target": "The provided target is not a valid URL",
-      "invalid_json": "{{path}} doesn't contain a valid JSON",
-      "invalid_quest_json": "You provided an invalid Quest JSON. Please check the documentation",
-      "file_does_not_exist": "File doesn't exist",
-      "creation_cancelled": "Quest creation was cancelled",
-      "invalid_address": "You should provide a valid EVM address",
-      "invalid_uuid": "You should provide a valid uuid"
     },
     "bundle": {
       "scene_main_required": "This scene does not have the required file scene.main",

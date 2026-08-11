@@ -9,7 +9,7 @@
 - **ECS Runtime (`@dcl/ecs`)**: Core engine with entity/component/system lifecycle, CRDT-based state synchronization across peers, binary serialization for network transport, and built-in systems for physics, raycasts, tweens, and input.
 - **Main SDK (`@dcl/sdk`)**: High-level developer-facing package aggregating all sub-packages. Exposes pre-built components (`Transform`, `GltfContainer`, `Material`, `AudioSource`, `Animator`, `UiTransform`, etc.), math utilities, networking primitives, observables, and testing helpers.
 - **React Bindings (`@dcl/react-ecs`)**: Custom React reconciler that bridges React 18 functional components and JSX to the ECS. Implements a CSS Flexbox–subset layout system for UI, theme support, and mouse event handling.
-- **CLI (`@dcl/sdk-commands`)**: Node.js binary (`sdk-commands`) for `init`, `start` (dev server with hot reload), `build` (esbuild bundling), `deploy` (signed Catalyst publish), `export-static`, `pack-smart-wearable`, and `quests` commands.
+- **CLI (`@dcl/sdk-commands`)**: Node.js binary (`sdk-commands`) for `init`, `start` (dev server with hot reload), `build` (esbuild bundling), `deploy` (signed Catalyst publish), `export-static`, `pack-smart-wearable`, `code-to-composite`, and `get-context-files` commands.
 - **Runtime Types (`@dcl/js-runtime`)**: Pure type-definition package (`.d.ts` only, no JS). Declares Web APIs (`fetch`, `WebSocket`, `console`), SDK runtime globals, and auto-generated RPC API types from Decentraland protocol buffers.
 - **Playground Assets (`@dcl/playground-assets`)**: Single browser-compatible bundle re-exporting the full SDK for use in the Decentraland web Playground IDE.
 
@@ -35,7 +35,6 @@
 - **@dcl/inspector**: In-world scene inspector tool (used by `start` command)
 - **dcl-catalyst-client**: Publishes scene content to the Catalyst decentralized network
 - **@dcl/linker-dapp**: Wallet integration for signing deployment transactions
-- **@dcl/quests-client / @dcl/quests-manager**: Quest system integration in the CLI
 - **@dcl/gltf-validator-ts**: GLTF model validation during `build` and `deploy`
 - **@segment/analytics-node**: CLI usage analytics (opt-out supported)
 - **esbuild**: Scene code bundling in `build` and `start` commands
@@ -220,20 +219,6 @@ Validates the project, builds with `--production`, gathers all publishable files
 
 ---
 
-**`sdk-commands quests`** — Manage Quests on the Decentraland Quests service.
-
-| Flag | Description |
-| --- | --- |
-| `-m, --manager` | Open the Quests Manager web UI |
-| `--create` | Create a quest interactively |
-| `--create-from-json <path>` | Create a quest from a JSON file |
-| `-l, --list <address>` | List quests by creator address |
-| `--activate <questId>` | Activate a deactivated quest |
-| `--deactivate <questId>` | Deactivate an active quest |
-| `-t, --target <url>` | Target Quests server (default: `https://quests.decentraland.org`) |
-
----
-
 **`sdk-commands get-context-files`** — Download AI coding-assistant context files from the Decentraland documentation repo into `./dclcontext/`.
 
 ---
@@ -317,7 +302,7 @@ js-sdk-toolchain/
 │   │   └── apis.d.ts            # Auto-generated from @dcl/protocol
 │   ├── sdk-commands/            # CLI binary
 │   │   └── src/
-│   │       ├── commands/        # init, start, build, deploy, quests, etc.
+│   │       ├── commands/        # init, start, build, deploy, etc.
 │   │       ├── logic/           # Bundling, validation, project file handling
 │   │       ├── components/      # Analytics, logging, workspace introspection
 │   │       └── locales/         # i18n translation files

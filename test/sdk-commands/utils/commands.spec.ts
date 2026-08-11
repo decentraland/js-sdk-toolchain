@@ -19,7 +19,6 @@ describe('utils/commands', () => {
     expect(result).toContain('export-static')
     expect(result).toContain('init')
     expect(result).toContain('start')
-    expect(result).toContain('quests')
   })
 
   it('should throw if command does not have an "index"', async () => {
@@ -29,6 +28,14 @@ describe('utils/commands', () => {
     await expect(commands.getCommands(components)).rejects.toThrow(CliError)
 
     expect(readDirSpy).toHaveBeenCalled()
+  })
+
+  it('points removed commands at their replacement', async () => {
+    const components = await initComponents()
+
+    await expect(runSdkCommand(components, 'quests', [])).rejects.toThrow(
+      'The "quests" command has been removed from the SDK. Quests can be managed through the Decentraland Quests API (https://quests.decentraland.org).'
+    )
   })
 
   test('runs a help command', async () => {

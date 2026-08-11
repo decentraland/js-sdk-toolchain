@@ -58,12 +58,6 @@ npx @dcl/sdk-commands export-static
 npx @dcl/sdk-commands pack-smart-wearable
 ```
 
-### Manage Quests
-
-```bash
-npx @dcl/sdk-commands quests
-```
-
 ## Development
 
 ### Building the Package

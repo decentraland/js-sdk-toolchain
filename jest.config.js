@@ -14,7 +14,7 @@ module.exports = {
       }
     ]
   },
-  transformIgnorePatterns: ['node_modules/(?!(@dcl/(ecs-math|quests-client))/)'],
+  transformIgnorePatterns: ['node_modules/(?!(@dcl/ecs-math)/)'],
   coverageDirectory: 'coverage',
   coverageThreshold: {
     global: {
