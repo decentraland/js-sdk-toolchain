@@ -1,5 +1,5 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs'
-import glob from 'glob'
+import { glob } from 'glob'
 import path from 'path'
 import {
   Composite,

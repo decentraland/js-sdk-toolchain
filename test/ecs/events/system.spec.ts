@@ -236,7 +236,7 @@ describe('Events System', () => {
 
     const previousDebugMode = globalThis.DEBUG
     globalThis.DEBUG = true
-    await expect(engine.update(1)).rejects.toThrowError()
+    await expect(engine.update(1)).rejects.toThrow()
 
     if (previousDebugMode) {
       globalThis.DEBUG = previousDebugMode
