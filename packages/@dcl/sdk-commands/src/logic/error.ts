@@ -20,15 +20,6 @@ export type CliErrorName =
   | 'INIT_INVALID_ARGUMENTS'
   | 'INIT_INVALID_PROJECT'
   | 'INIT_INVALID_TEMPLATE_ZIP_URL'
-  // Quests errors — the quests command was removed; these members are kept
-  // only so the union stays type-compatible for external consumers
-  | 'QUESTS_INVALID_TARGET'
-  | 'QUESTS_INVALID_JSON'
-  | 'QUESTS_INVALID_QUEST_JSON'
-  | 'QUESTS_FILE_DOES_NOT_EXIST'
-  | 'QUESTS_CREATION_CANCELLED'
-  | 'QUESTS_INVALID_ADDRESS'
-  | 'QUESTS_INVALID_UUID'
   // Components errors
   | 'CONFIG_NOT_PROVIDED'
   // Get context files errors

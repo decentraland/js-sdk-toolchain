@@ -4,6 +4,7 @@
       "invalid_folder": "开发者：所有命令必须在文件夹内",
       "invalid_index_file": "开发者：所有命令必须包含一个 \"index.js\" 文件",
       "not_found": "命令 \"{{command}}\" 无效。{{help}}",
+      "removed": "\"{{command}}\" 命令已从 SDK 中移除。{{hint}}",
       "not_valid": "命令不符合实现规则：\n* 需要 \"help\" 函数\n* 需要 \"main\" 函数"
     },
     "config": {

@@ -4,6 +4,7 @@
       "invalid_folder": "Desarrollador: Todos los comandos deben estar dentro de una carpeta",
       "invalid_index_file": "Desarrollador: Todos los comandos deben tener un archivo \"index.js\" dentro",
       "not_found": "El comando \"{{command}}\" no es válido. {{help}}",
+      "removed": "El comando \"{{command}}\" fue eliminado del SDK. {{hint}}",
       "not_valid": "El comando no sigue las reglas de implementación:\n* Requiere una función \"help\"\n* Requiere una función \"main\""
     },
     "config": {

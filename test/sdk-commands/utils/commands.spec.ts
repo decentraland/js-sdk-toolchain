@@ -30,6 +30,14 @@ describe('utils/commands', () => {
     expect(readDirSpy).toHaveBeenCalled()
   })
 
+  it('points removed commands at their replacement', async () => {
+    const components = await initComponents()
+
+    await expect(runSdkCommand(components, 'quests', [])).rejects.toThrow(
+      'The "quests" command has been removed from the SDK. Quests can be managed through the Decentraland Quests API (https://quests.decentraland.org).'
+    )
+  })
+
   test('runs a help command', async () => {
     const components = await initComponents()
 

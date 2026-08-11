@@ -9,7 +9,7 @@
 - **ECS Runtime (`@dcl/ecs`)**: Core engine with entity/component/system lifecycle, CRDT-based state synchronization across peers, binary serialization for network transport, and built-in systems for physics, raycasts, tweens, and input.
 - **Main SDK (`@dcl/sdk`)**: High-level developer-facing package aggregating all sub-packages. Exposes pre-built components (`Transform`, `GltfContainer`, `Material`, `AudioSource`, `Animator`, `UiTransform`, etc.), math utilities, networking primitives, observables, and testing helpers.
 - **React Bindings (`@dcl/react-ecs`)**: Custom React reconciler that bridges React 18 functional components and JSX to the ECS. Implements a CSS Flexbox–subset layout system for UI, theme support, and mouse event handling.
-- **CLI (`@dcl/sdk-commands`)**: Node.js binary (`sdk-commands`) for `init`, `start` (dev server with hot reload), `build` (esbuild bundling), `deploy` (signed Catalyst publish), `export-static`, and `pack-smart-wearable` commands.
+- **CLI (`@dcl/sdk-commands`)**: Node.js binary (`sdk-commands`) for `init`, `start` (dev server with hot reload), `build` (esbuild bundling), `deploy` (signed Catalyst publish), `export-static`, `pack-smart-wearable`, `code-to-composite`, and `get-context-files` commands.
 - **Runtime Types (`@dcl/js-runtime`)**: Pure type-definition package (`.d.ts` only, no JS). Declares Web APIs (`fetch`, `WebSocket`, `console`), SDK runtime globals, and auto-generated RPC API types from Decentraland protocol buffers.
 - **Playground Assets (`@dcl/playground-assets`)**: Single browser-compatible bundle re-exporting the full SDK for use in the Decentraland web Playground IDE.
 

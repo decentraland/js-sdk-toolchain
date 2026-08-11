@@ -4,6 +4,7 @@
       "invalid_folder": "Developer: All commands must be inside a folder",
       "invalid_index_file": "Developer: All commands must have an \"index.js\" file inside",
       "not_found": "Command \"{{command}}\" is invalid. {{help}}",
+      "removed": "The \"{{command}}\" command has been removed from the SDK. {{hint}}",
       "not_valid": "Command does not follow implementation rules:\n* Requires a \"help\" function\n* Requires a \"main\" function"
     },
     "config": {

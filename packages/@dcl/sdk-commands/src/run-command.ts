@@ -22,6 +22,12 @@ interface FileExports {
 
 const listCommandsStr = (commands: string[]) => commands.map(($) => `\t *sdk-commands ${$} \n`).join('')
 
+// commands that shipped in previous releases and were deliberately removed;
+// invoking one gets a pointer to the replacement instead of a generic not-found
+const REMOVED_COMMANDS: Record<string, string> = {
+  quests: 'Quests can be managed through the Decentraland Quests API (https://quests.decentraland.org).'
+}
+
 /* istanbul ignore next */
 function asserValidCommand(fns: FileExports): fns is Required<FileExports> {
   const { help, main } = fns
@@ -43,6 +49,12 @@ export async function runSdkCommand(components: CliComponents, command: string, 
   const commands = await getCommands(components)
 
   if (!commands.includes(command)) {
+    if (command in REMOVED_COMMANDS) {
+      throw new CliError(
+        'COMMAND_NOT_FOUND',
+        i18next.t('errors.command.removed', { command, hint: REMOVED_COMMANDS[command] })
+      )
+    }
     if (needsHelp) {
       components.logger.log(helpMessage(commands))
       return
