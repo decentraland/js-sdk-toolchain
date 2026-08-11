@@ -11,8 +11,8 @@ const HAMMURABI_PACKAGE = '@dcl/hammurabi-server'
 const HAMMURABI_VERSION = 'next'
 
 const BEVY_PACKAGE = '@dcl-regenesislabs/bevy-headless-server'
-// `latest` moves only when a proven snapshot is promoted via bevy-explorer's
-// promote-headless workflow — engine pushes to main land on `next` and cannot
+// `latest` moves only when someone dispatches bevy-explorer's publish-headless
+// workflow with dist_tag=latest — engine pushes to main land on `next` and cannot
 // change what previews run. DCL_SERVER_PACKAGE overrides for local builds.
 const BEVY_VERSION = 'latest'
 
