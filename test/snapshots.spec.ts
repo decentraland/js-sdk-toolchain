@@ -1,7 +1,7 @@
 import { version as vmVersion } from '@dcl/quickjs-emscripten/package.json'
 import { exec } from 'child_process'
 import { existsSync, readFileSync, writeFileSync } from 'fs-extra'
-import { glob } from 'glob'
+import { globSync } from 'fs'
 import path from 'path'
 import { CrdtMessageType, engine } from '../packages/@dcl/ecs/src'
 import { ReadWriteByteBuffer } from '../packages/@dcl/ecs/src/serialization/ByteBuffer'
@@ -40,13 +40,9 @@ describe('Runs the snapshots', () => {
     ENV
   )
 
-  glob
-    .sync('test/snapshots/production-bundles/*.ts', { absolute: false })
-    .forEach((file) => testFileSnapshot(file, true))
+  globSync('test/snapshots/production-bundles/*.ts').forEach((file) => testFileSnapshot(file, true))
 
-  glob
-    .sync('test/snapshots/development-bundles/*.ts', { absolute: false })
-    .forEach((file) => testFileSnapshot(file, false))
+  globSync('test/snapshots/development-bundles/*.ts').forEach((file) => testFileSnapshot(file, false))
 })
 
 function testFileSnapshot(fileName: string, _productionBuild: boolean) {
