@@ -58,15 +58,6 @@
       "invalid_project": "请求的场景不存在。有效选项：{{options}}",
       "invalid_template_zip_url": "下载的压缩包在根目录有多个文件夹，请确保根目录只有一个文件夹。"
     },
-    "quests": {
-      "invalid_target": "提供的目标不是有效的 URL",
-      "invalid_json": "{{path}} 不包含有效的 JSON",
-      "invalid_quest_json": "您提供了无效的任务 JSON。请查看文档",
-      "file_does_not_exist": "文件不存在",
-      "creation_cancelled": "任务创建已取消",
-      "invalid_address": "您应该提供一个有效的 EVM 地址",
-      "invalid_uuid": "您应该提供一个有效的 uuid"
-    },
     "bundle": {
       "scene_main_required": "此场景没有必需的文件 scene.main",
       "scene_runtime_version_required": "场景的 scene.json 文件中必须存在字段 `\"runtimeVersion\": \"7\"`。请确保场景代码使用 SDK 7.x 编写。",

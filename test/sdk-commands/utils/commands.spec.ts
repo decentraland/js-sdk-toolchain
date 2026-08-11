@@ -19,7 +19,6 @@ describe('utils/commands', () => {
     expect(result).toContain('export-static')
     expect(result).toContain('init')
     expect(result).toContain('start')
-    expect(result).toContain('quests')
   })
 
   it('should throw if command does not have an "index"', async () => {

@@ -58,15 +58,6 @@
       "invalid_project": "The requested scene doesn't exist empty. Valid options are: {{options}}",
       "invalid_template_zip_url": "The zip downloaded has many folder on the root, make sure it has only one folder on the root."
     },
-    "quests": {
-      "invalid_target": "The provided target is not a valid URL",
-      "invalid_json": "{{path}} doesn't contain a valid JSON",
-      "invalid_quest_json": "You provided an invalid Quest JSON. Please check the documentation",
-      "file_does_not_exist": "File doesn't exist",
-      "creation_cancelled": "Quest creation was cancelled",
-      "invalid_address": "You should provide a valid EVM address",
-      "invalid_uuid": "You should provide a valid uuid"
-    },
     "bundle": {
       "scene_main_required": "This scene does not have the required file scene.main",
       "scene_runtime_version_required": "The field `\"runtimeVersion\": \"7\"` must be present in the scene's scene.json file. Make sure the scene's code is written in SDK 7.x.",

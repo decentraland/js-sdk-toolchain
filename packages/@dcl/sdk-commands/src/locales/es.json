@@ -58,15 +58,6 @@
       "invalid_project": "La escena solicitada no existe. Opciones válidas son: {{options}}",
       "invalid_template_zip_url": "El zip descargado tiene muchas carpetas en la raíz, asegúrate de que tenga solo una carpeta en la raíz."
     },
-    "quests": {
-      "invalid_target": "El objetivo proporcionado no es una URL válida",
-      "invalid_json": "{{path}} no contiene un JSON válido",
-      "invalid_quest_json": "Proporcionaste un JSON de Quest inválido. Por favor revisa la documentación",
-      "file_does_not_exist": "El archivo no existe",
-      "creation_cancelled": "La creación de la quest fue cancelada",
-      "invalid_address": "Debes proporcionar una dirección EVM válida",
-      "invalid_uuid": "Debes proporcionar un uuid válido"
-    },
     "bundle": {
       "scene_main_required": "Esta escena no tiene el archivo requerido scene.main",
       "scene_runtime_version_required": "El campo `\"runtimeVersion\": \"7\"` debe estar presente en el archivo scene.json de la escena. Asegúrate de que el código de la escena esté escrito en SDK 7.x.",
