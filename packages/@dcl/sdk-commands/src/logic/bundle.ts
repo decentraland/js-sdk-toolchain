@@ -19,6 +19,7 @@ import { getAllComposites, type Script } from './composite'
 import { isEditorScene } from './project-validations'
 import { watch } from 'chokidar'
 import { debounce } from './debounce'
+import { isWSL2 } from './is-wsl2'
 
 export type BundleComponents = Pick<CliComponents, 'logger' | 'fs'>
 
@@ -295,10 +296,25 @@ export async function bundleSingleProject(components: BundleComponents, options:
 
   /* istanbul ignore if */
   if (options.watch) {
+    const usePolling = isWSL2()
+    // polling can choke when watching the entire project, so restrict to /src on wsl
+    const watchPath = usePolling
+      ? path.resolve(options.workingDirectory, 'src')
+      : path.resolve(options.workingDirectory)
+
+    const watchOptions = usePolling
+      ? {
+          usePolling: true,
+          interval: 300,
+          binaryInterval: 500
+        }
+      : {}
+
     // Instead of using esbuild's watch, we create our own watcher
-    const watcher = watch(path.resolve(options.workingDirectory), {
+    const watcher = watch(watchPath, {
       ignored: ['**/dist/**', '**/*.crdt', '**/*.d.ts', path.resolve(options.outputFile)],
-      ignoreInitial: true
+      ignoreInitial: true,
+      ...watchOptions
     })
 
     const debouncedRebuild = debounce(async () => {
