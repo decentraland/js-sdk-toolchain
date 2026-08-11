@@ -55,7 +55,7 @@ export function createAudioEventsSystem(engine: IEngine): AudioEventsSystem {
   }
 
   // @internal
-  engine.addSystem(function EventSystem() {
+  engine.addSystem(function AudioEventSystem() {
     for (const [entity, data] of entitiesCallbackAudioStateMap) {
       const hasAudioSource = audioSourceComponent.has(entity)
       const hasAudioStream = audioStreamComponent.has(entity)

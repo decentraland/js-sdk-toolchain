@@ -61,7 +61,7 @@ describe('Audio events helper system should', () => {
 
     await engine.update(1)
 
-    expect(fn).toHaveBeenCalled()
+    expect(fn).toHaveBeenCalledWith(expect.objectContaining({ state: MediaState.MS_PLAYING, timestamp: 2 }))
   })
 
   it('run callback once per status change', async () => {
@@ -139,7 +139,7 @@ describe('Audio events helper system should', () => {
 
     await engine.update(1)
 
-    expect(fn).toBeCalledTimes(0)
+    expect(fn).toHaveBeenCalledTimes(0)
     expect(audioEventsSystem.hasAudioEventsEntity(audioSourceEntity)).toBe(false)
   })
 
@@ -161,7 +161,7 @@ describe('Audio events helper system should', () => {
 
     await engine.update(1)
 
-    expect(fn).toBeCalledTimes(0)
+    expect(fn).toHaveBeenCalledTimes(0)
     expect(audioEventsSystem.hasAudioEventsEntity(audioStreamEntity)).toBe(false)
   })
 
