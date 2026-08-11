@@ -11,10 +11,10 @@ const HAMMURABI_PACKAGE = '@dcl/hammurabi-server'
 const HAMMURABI_VERSION = 'next'
 
 const BEVY_PACKAGE = '@dcl-regenesislabs/bevy-headless-server'
-// Pinned exactly so every push to the engine's main doesn't change what previews
-// run: each sdk-commands release ships a known, tested engine. Bump deliberately.
-// DCL_SERVER_PACKAGE still overrides for local/unpublished builds.
-const BEVY_VERSION = '0.1.0-31482267820.commit-be377f8'
+// `latest` moves only when a proven snapshot is promoted via bevy-explorer's
+// promote-headless workflow — engine pushes to main land on `next` and cannot
+// change what previews run. DCL_SERVER_PACKAGE overrides for local builds.
+const BEVY_VERSION = 'latest'
 
 // The bevy server exits with this when it can never run here (unsupported platform,
 // missing binary, bad arguments). We fail the preview loudly instead of retrying:
