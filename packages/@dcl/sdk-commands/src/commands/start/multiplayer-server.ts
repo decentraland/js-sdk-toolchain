@@ -63,9 +63,15 @@ const HEARTBEAT_LINE = /^\[headless\] alive:/
 const ANSI_CODES = /\u001b\[[0-9;]*m/g
 
 // Engine-internal noise in local preview: the asset pipeline hunts dot-prefixed
-// processed gltf paths the preview server never has, and repeats the failure on
-// every scene composition
-const ENGINE_NOISE = [/^failed to process gltf/, /^Path not found: \$ipfs/]
+// processed gltf paths the preview server never has (repeated on every scene
+// composition), and the headless build's expected gizmo/asset-loader startup
+// complaints about the renderer it deliberately doesn't have
+const ENGINE_NOISE = [
+  /^failed to process gltf/,
+  /^Path not found: \$ipfs/,
+  /^bevy_render feature is enabled but RenderApp was not detected/,
+  /^Could not find an asset loader matching: .* Path: Some\("embedded:\/\//
+]
 
 // `[[0, 0] 3.33] ` — parcel coords + scene clock the engine prepends to every
 // scene log line; redundant in a single-scene preview
