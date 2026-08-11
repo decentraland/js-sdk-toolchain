@@ -57,6 +57,16 @@ function registerProcessCleanup(cleanup: () => void): () => void {
 // timestamp/level/target prefix the bevy engine's tracing puts on every line
 const TRACING_PREFIX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s+(INFO|WARN|ERROR|DEBUG|TRACE)\s+[\w:]+:\s?/
 const HEARTBEAT_LINE = /^\[headless\] alive:/
+// The engine colors its output even when piped, so lines arrive wrapped in ANSI
+// escapes and must be stripped before the prefix regex can match.
+// eslint-disable-next-line no-control-regex
+const ANSI_CODES = /\u001b\[[0-9;]*m/g
+
+function levelMarker(level: string): string {
+  if (level === 'WARN') return colors.yellow('WARN') + ' '
+  if (level === 'ERROR') return colors.redBright('ERROR') + ' '
+  return ''
+}
 
 /**
  * Forwards a bevy child stream line by line, dropping the tracing prefix (keeping
@@ -64,24 +74,25 @@ const HEARTBEAT_LINE = /^\[headless\] alive:/
  */
 function forwardEngineLogs(source: Readable | null, sink: NodeJS.WriteStream) {
   if (!source) return
+  const writeClean = (raw: string) => {
+    const line = raw.replace(ANSI_CODES, '')
+    if (HEARTBEAT_LINE.test(line)) return
+    const match = line.match(TRACING_PREFIX)
+    if (!match) {
+      sink.write(line + '\n')
+    } else {
+      sink.write(levelMarker(match[1]) + line.slice(match[0].length) + '\n')
+    }
+  }
   let pending = ''
   source.setEncoding('utf8')
   source.on('data', (chunk: string) => {
     const lines = (pending + chunk).split('\n')
     pending = lines.pop() ?? ''
-    for (const line of lines) {
-      if (HEARTBEAT_LINE.test(line)) continue
-      const match = line.match(TRACING_PREFIX)
-      if (!match) {
-        sink.write(line + '\n')
-      } else {
-        const message = line.slice(match[0].length)
-        sink.write((match[1] === 'INFO' ? message : `${match[1]} ${message}`) + '\n')
-      }
-    }
+    lines.forEach(writeClean)
   })
   source.on('end', () => {
-    if (pending && !HEARTBEAT_LINE.test(pending)) sink.write(pending + '\n')
+    if (pending) writeClean(pending)
   })
 }
 
@@ -144,7 +155,7 @@ export function startMultiplayerServer(
 
   const removeCleanup = registerProcessCleanup(cleanup)
 
-  serverProcess.on('close', (code) => {
+  serverProcess.on('close', (code, signal) => {
     removeCleanup()
     if (code !== 0 && code !== null) {
       // report abnormal exits (including bevy's exit-78 "can't run here") so we can
@@ -155,6 +166,10 @@ export function startMultiplayerServer(
         unavailable: code === EXIT_UNAVAILABLE
       })
       printWarning(components.logger, `Multiplayer Server exited with code ${code}`)
+    } else if (signal && signal !== 'SIGTERM' && signal !== 'SIGINT') {
+      // SIGTERM/SIGINT are our own shutdown; anything else (SIGSEGV, SIGKILL/OOM)
+      // means the engine died out from under the preview
+      printWarning(components.logger, `Multiplayer Server terminated by signal ${signal}`)
     }
   })
 
