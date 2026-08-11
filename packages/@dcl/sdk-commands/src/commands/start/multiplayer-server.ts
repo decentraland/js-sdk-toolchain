@@ -90,7 +90,7 @@ function colorByLevel(level: string | undefined, message: string): string {
 // engine timestamps are UTC ISO with microseconds; show local wall-clock instead
 function localTime(utcTimestamp: string): string {
   const date = new Date(utcTimestamp + 'Z')
-  return isNaN(date.getTime()) ? '' : colors.gray(date.toTimeString().slice(0, 8)) + ' '
+  return isNaN(date.getTime()) ? '' : colors.dim(date.toTimeString().slice(0, 8)) + ' '
 }
 
 /**
@@ -100,7 +100,7 @@ function localTime(utcTimestamp: string): string {
  */
 function forwardEngineLogs(source: Readable | null, sink: NodeJS.WriteStream) {
   if (!source) return
-  const serverTag = colors.green('[Server]') + ' '
+  const serverTag = colors.greenBright('[Server]') + ' '
   const writeClean = (raw: string) => {
     const line = raw.replace(ANSI_CODES, '')
     if (!line.trim()) return
