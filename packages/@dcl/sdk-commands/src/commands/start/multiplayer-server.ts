@@ -1,4 +1,5 @@
-import { spawn, ChildProcess } from 'child_process'
+import { spawn, ChildProcess, StdioOptions } from 'child_process'
+import { Readable } from 'stream'
 import { CliComponents } from '../../components'
 import { printProgressInfo, printWarning } from '../../logic/beautiful-logs'
 import { colors } from '../../components/log'
@@ -52,6 +53,38 @@ function registerProcessCleanup(cleanup: () => void): () => void {
   }
 }
 
+// `2026-08-11T14:28:33.522058Z  INFO scene_runner::renderer_context: ` — the
+// timestamp/level/target prefix the bevy engine's tracing puts on every line
+const TRACING_PREFIX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s+(INFO|WARN|ERROR|DEBUG|TRACE)\s+[\w:]+:\s?/
+const HEARTBEAT_LINE = /^\[headless\] alive:/
+
+/**
+ * Forwards a bevy child stream line by line, dropping the tracing prefix (keeping
+ * WARN/ERROR markers) and the periodic `[headless] alive:` heartbeat.
+ */
+function forwardEngineLogs(source: Readable | null, sink: NodeJS.WriteStream) {
+  if (!source) return
+  let pending = ''
+  source.setEncoding('utf8')
+  source.on('data', (chunk: string) => {
+    const lines = (pending + chunk).split('\n')
+    pending = lines.pop() ?? ''
+    for (const line of lines) {
+      if (HEARTBEAT_LINE.test(line)) continue
+      const match = line.match(TRACING_PREFIX)
+      if (!match) {
+        sink.write(line + '\n')
+      } else {
+        const message = line.slice(match[0].length)
+        sink.write((match[1] === 'INFO' ? message : `${match[1]} ${message}`) + '\n')
+      }
+    }
+  })
+  source.on('end', () => {
+    if (pending && !HEARTBEAT_LINE.test(pending)) sink.write(pending + '\n')
+  })
+}
+
 /**
  * Starts the Multiplayer Server process using npx to install and run in one step
  */
@@ -84,11 +117,19 @@ export function startMultiplayerServer(
     env.RUST_LOG = 'warn,scene_runner::renderer_context=info'
   }
 
+  // Bevy output goes through the line filter below; hammurabi keeps the terminal directly.
+  const stdio: StdioOptions = engine === 'bevy' ? ['inherit', 'pipe', 'pipe'] : 'inherit'
+
   // If npx-cli.js was found, run it directly via process.execPath (node in regular env,
   // Electron Helper with ELECTRON_RUN_AS_NODE=1 in Electron). Otherwise fall back to npx binary.
   const serverProcess = npxCliJs
-    ? spawn(process.execPath, [npxCliJs, ...npxArgs], { cwd: workingDir, shell: false, stdio: 'inherit', env })
-    : spawn(getNpxBin(), npxArgs, { cwd: workingDir, shell: false, stdio: 'inherit', env })
+    ? spawn(process.execPath, [npxCliJs, ...npxArgs], { cwd: workingDir, shell: false, stdio, env })
+    : spawn(getNpxBin(), npxArgs, { cwd: workingDir, shell: false, stdio, env })
+
+  if (engine === 'bevy') {
+    forwardEngineLogs(serverProcess.stdout, process.stdout)
+    forwardEngineLogs(serverProcess.stderr, process.stderr)
+  }
 
   serverProcess.on('error', (error) => {
     printWarning(components.logger, `Multiplayer Server process error: ${error.message}`)
