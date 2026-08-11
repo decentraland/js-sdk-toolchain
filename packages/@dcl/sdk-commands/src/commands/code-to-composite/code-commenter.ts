@@ -82,7 +82,7 @@ export async function commentSourceFiles(
   const srcDir = path.dirname(normalizedSceneCodeEntrypoint)
 
   const sourceFiles = globSync('**/*.{ts,tsx,js,jsx}', { cwd: srcDir })
-    .filter((file) => !file.endsWith('.d.ts') && !file.includes('node_modules'))
+    .filter((file) => !file.endsWith('.d.ts') && !file.split(/[\\/]/).includes('node_modules'))
     .map((file) => path.resolve(srcDir, file))
 
   const filesToComment = sourceFiles.filter((file) => {

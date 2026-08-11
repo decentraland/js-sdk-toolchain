@@ -3,12 +3,10 @@ import * as readline from 'readline/promises'
 type BaseQuestion = { name: string; message: string }
 type TextQuestion = BaseQuestion & {
   type: 'text'
-  initial?: string
   validate?: (value: string) => boolean | Promise<boolean>
 }
 type NumberQuestion = BaseQuestion & {
   type: 'number'
-  initial?: number
   validate?: (value: number) => boolean | Promise<boolean>
 }
 type ConfirmQuestion = BaseQuestion & { type: 'confirm'; initial?: boolean }

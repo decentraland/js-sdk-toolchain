@@ -4,7 +4,12 @@ export type IFuture<T> = Promise<T> & {
 }
 
 export function future<T = void>(): IFuture<T> {
-  const { promise, resolve, reject } = Promise.withResolvers<T>()
+  let resolve!: (value: T | PromiseLike<T>) => void
+  let reject!: (reason?: any) => void
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res
+    reject = rej
+  })
   return Object.assign(promise, { resolve, reject })
 }
 
