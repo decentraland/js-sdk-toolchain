@@ -71,10 +71,11 @@ const ENGINE_NOISE = [/^failed to process gltf/, /^Path not found: \$ipfs/]
 // scene log line; redundant in a single-scene preview
 const SCENE_CONTEXT = /^\[\[-?\d+, -?\d+\] \d+\.\d+\] /
 
-function levelMarker(level: string): string {
-  if (level === 'WARN') return colors.yellow('WARN') + ' '
-  if (level === 'ERROR') return colors.redBright('ERROR') + ' '
-  return ''
+// color alone conveys the level; the LOG/WARN/ERROR words are dropped
+function colorByLevel(level: string | undefined, message: string): string {
+  if (level === 'WARN') return colors.yellow(message)
+  if (level === 'ERROR') return colors.redBright(message)
+  return message
 }
 
 // engine timestamps are UTC ISO with microseconds; show local wall-clock instead
@@ -85,8 +86,8 @@ function localTime(utcTimestamp: string): string {
 
 /**
  * Forwards a bevy child stream line by line, tagged `[Server]` to stand apart from
- * the preview CLI's own output, dropping the tracing prefix (keeping WARN/ERROR
- * markers) and the periodic `[headless] alive:` heartbeat.
+ * the preview CLI's own output, dropping the tracing prefix (warnings yellow,
+ * errors red) and the periodic `[headless] alive:` heartbeat.
  */
 function forwardEngineLogs(source: Readable | null, sink: NodeJS.WriteStream) {
   if (!source) return
@@ -104,11 +105,12 @@ function forwardEngineLogs(source: Readable | null, sink: NodeJS.WriteStream) {
     const message = line.slice(match[0].length)
     if (ENGINE_NOISE.some((pattern) => pattern.test(message))) return
     if (SCENE_CONTEXT.test(message)) {
-      // scene lines carry their own LOG/ERROR tag; just color errors red
-      const sceneMessage = message.replace(SCENE_CONTEXT, '').replace(/^ERROR /, colors.redBright('ERROR') + ' ')
-      sink.write(serverTag + localTime(match[1]) + sceneMessage + '\n')
+      const sceneMessage = message.replace(SCENE_CONTEXT, '')
+      const sceneTag = sceneMessage.match(/^(LOG|WARN|ERROR|DEBUG) /)
+      const body = sceneTag ? sceneMessage.slice(sceneTag[0].length) : sceneMessage
+      sink.write(serverTag + localTime(match[1]) + colorByLevel(sceneTag?.[1], body) + '\n')
     } else {
-      sink.write(serverTag + localTime(match[1]) + levelMarker(match[2]) + message + '\n')
+      sink.write(serverTag + localTime(match[1]) + colorByLevel(match[2], message) + '\n')
     }
   }
   let pending = ''
