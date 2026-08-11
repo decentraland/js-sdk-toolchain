@@ -82,6 +82,16 @@ function isValidVirtualSize(options: UiRendererOptions | undefined): options is 
   return !!options && (options.virtualWidth ?? 0) > 0 && (options.virtualHeight ?? 0) > 0
 }
 
+/**
+ * Whether a provided size spells out one dimension but not the other. Both are
+ * optional in the type, so this is reachable. It is invalid either way — this only
+ * decides whether to warn, since a half-given size is a mistake while a value
+ * \<= 0 is the documented way to turn the virtual screen off.
+ */
+function isPartialVirtualSize(options: UiRendererOptions): boolean {
+  return (options.virtualWidth === undefined) !== (options.virtualHeight === undefined)
+}
+
 function is16by9(options: VirtualSize): boolean {
   return options.virtualWidth * 9 === options.virtualHeight * 16
 }
@@ -98,8 +108,9 @@ export interface ReactBasedUiSystem {
    * Set the main UI renderer. Optional virtual size defines the global UI scale factor.
    *
    * When no virtual size is provided, a platform default is used: 1600x720 on
-   * mobile, 1920x1080 otherwise. Providing an invalid size (values \<= 0)
-   * disables the virtual screen (no UI scaling). On mobile, a provided 16:9
+   * mobile, 1920x1080 otherwise. Providing an invalid size disables the virtual
+   * screen (no UI scaling): either a value \<= 0, or only one of the two
+   * dimensions, which additionally logs a warning. On mobile, a provided 16:9
    * virtual size is overridden to 1600x720 to fit phone screens.
    *
    * The optional `screenInset` selects the screen area the UI is positioned in
@@ -156,6 +167,12 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
   let loggedMobileOverrideW = 0
   let loggedMobileOverrideH = 0
 
+  // Same once-per-size guard for the incomplete-size warning. A partial size maps
+  // its missing dimension to 0, and the provided one can itself be 0, so -1 is the
+  // "nothing logged yet" sentinel — 0/0 is a reachable real value here.
+  let loggedPartialW = -1
+  let loggedPartialH = -1
+
   function getActiveVirtualSize(): UiRendererOptions | undefined {
     // Main renderer options win; otherwise use the first additional renderer option.
     // Options carrying no virtual dims (e.g. only a screen inset) are skipped so
@@ -180,9 +197,24 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
       return mobile ? DEFAULT_MOBILE_VIRTUAL_SIZE : DEFAULT_VIRTUAL_SIZE
     }
 
-    // An explicitly provided but invalid size (values <= 0) disables the
-    // virtual screen — no UI scaling at all.
+    // An explicitly provided but invalid size disables the virtual screen — no UI
+    // scaling at all. That covers a value <= 0 (the deliberate opt-out) and a size
+    // that gives only one of its two dimensions.
     if (!isValidVirtualSize(provided)) {
+      // A half-given size is a mistake rather than an opt-out, and disabling scaling
+      // is not what the creator was reaching for, so say so once per provided size.
+      // The <= 0 opt-out is documented and stays silent.
+      if (isPartialVirtualSize(provided)) {
+        const width = provided.virtualWidth ?? 0
+        const height = provided.virtualHeight ?? 0
+        if (loggedPartialW !== width || loggedPartialH !== height) {
+          loggedPartialW = width
+          loggedPartialH = height
+          console.log(
+            `Incomplete virtual screen size (virtualWidth: ${provided.virtualWidth}, virtualHeight: ${provided.virtualHeight}): both dimensions are required, so the virtual screen is disabled and no UI scaling is applied.`
+          )
+        }
+      }
       return undefined
     }
 
@@ -207,11 +239,15 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
    * screen. Applied per renderer, so each renderer can use a different inset.
    */
   function wrapWithScreenInset(ui: UiComponent, inset: UiScreenInset | undefined, key: string): React.ReactNode {
+    // An omitted inset is resolved to DEFAULT_SCREEN_INSET ('device') before the
+    // switch, so it lands on `case 'device'`. Only an explicit 'none' reaches the
+    // `default` clause below — the two are unrelated despite sharing a name.
     switch (inset ?? DEFAULT_SCREEN_INSET) {
       case 'device':
         return React.createElement(ScreenInsetArea as any, { key }, React.createElement(ui as any))
       case 'interactable':
         return React.createElement(InteractableArea as any, { key }, React.createElement(ui as any))
+      // 'none' — the whole screen, no wrapper entity
       default:
         return React.createElement(ui as any, { key })
     }

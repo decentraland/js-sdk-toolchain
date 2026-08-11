@@ -6,7 +6,7 @@ import { IEngine, PointerEventsSystem } from '../../packages/@dcl/ecs'
 
 /**
  * Renderer options for suites that assert the UI tree hanging directly off the
- * canvas root. The default inset ('interactable') adds a wrapper entity between
+ * canvas root. The default inset ('device') adds a wrapper entity between
  * the two, which is what `ui-renderer-screen-inset.spec.tsx` is there to cover
  * and is noise everywhere else.
  */
