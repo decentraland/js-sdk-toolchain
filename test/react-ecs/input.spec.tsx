@@ -96,43 +96,43 @@ describe('Ui Listeners React Ecs', () => {
     }
     uiRenderer.setUiRenderer(ui)
 
-    expect(onChange).toBeCalledTimes(0)
+    expect(onChange).toHaveBeenCalledTimes(0)
     await engine.update(1)
-    expect(onChange).toBeCalledTimes(0)
+    expect(onChange).toHaveBeenCalledTimes(0)
     UiInputResult.create(uiEntity, { value: 'BOEDO' })
     await engine.update(1)
-    expect(onChange).toBeCalledWith('BOEDO')
+    expect(onChange).toHaveBeenCalledWith('BOEDO')
     onChange.mockClear()
     await engine.update(1)
-    expect(onChange).toBeCalledTimes(0)
+    expect(onChange).toHaveBeenCalledTimes(0)
     UiInputResult.getMutable(uiEntity).value = 'CASLA'
     await engine.update(1)
-    expect(onChange).toBeCalledWith('CASLA')
+    expect(onChange).toHaveBeenCalledWith('CASLA')
     onChange.mockClear()
     conditional = false
     await engine.update(1)
     UiInputResult.getMutable(uiEntity).value = 'Casla - Boedo'
     await engine.update(1)
-    expect(onChange).toBeCalledTimes(0)
+    expect(onChange).toHaveBeenCalledTimes(0)
     UiInputResult.getMutable(uiEntity).value = 'Casla - Boedo'
     await engine.update(1)
-    expect(onChange).toBeCalledTimes(0)
+    expect(onChange).toHaveBeenCalledTimes(0)
     conditional = true
     await engine.update(1)
-    expect(onChange).toBeCalledTimes(0)
+    expect(onChange).toHaveBeenCalledTimes(0)
     UiInputResult.getMutable(uiEntity).value = 'Casla - '
     await engine.update(1)
-    expect(onChange).toBeCalledWith('Casla - ')
+    expect(onChange).toHaveBeenCalledWith('Casla - ')
     onChange.mockClear()
-    expect(onSubmit).toBeCalledTimes(0)
+    expect(onSubmit).toHaveBeenCalledTimes(0)
     UiInputResult.getMutable(uiEntity).isSubmit = true
     await engine.update(1)
-    expect(onSubmit).toBeCalledTimes(1)
+    expect(onSubmit).toHaveBeenCalledTimes(1)
     onChange.mockClear()
     removeComponent = true
     await engine.update(1)
     UiInputResult.create(uiEntity, { value: 'BOEDO' })
     await engine.update(1)
-    expect(onChange).toBeCalledTimes(0)
+    expect(onChange).toHaveBeenCalledTimes(0)
   })
 })

@@ -29,12 +29,14 @@ export function assertFilesExist(map: BasicSourceMapConsumer) {
   // then check each file
   expect(map.sources.length).toBeGreaterThan(0)
   for (const file of map.sources) {
+    // virtual modules have no backing file; source-map >=0.7.5 no longer joins
+    // scheme-prefixed sources with sourceRoot, so skip them before asserting
+    if (file.endsWith('sdk-composite:all-composites')) continue
+    if (file.endsWith('sdk-scripts:script-utils')) continue
+
     expect(file.startsWith('file://')).toBeTruthy()
 
-    // TODO: what should we do with virtual files?
-    if (file.endsWith('sdk-composite:all-composites')) continue
     if (file.endsWith('entry-point.ts')) continue
-    if (file.endsWith('sdk-scripts:script-utils')) continue
 
     // Skip files from node_modules - npm packages often don't ship source files
     // but may include source maps pointing to them. The source content is still
