@@ -74,7 +74,15 @@ export function startMultiplayerServer(
   // In Electron, override npm_config_prefix because npm derives its prefix from process.execPath,
   // which points to the Electron Helper binary. This causes npm to look for a `lib/` directory
   // inside the Helper bundle, which doesn't exist (ENOENT).
-  const env = isElectronEnvironment() ? { ...getSpawnEnv(), npm_config_prefix: workingDir } : getSpawnEnv()
+  const env: { [key: string]: string } = isElectronEnvironment()
+    ? { ...getSpawnEnv(), npm_config_prefix: workingDir }
+    : { ...getSpawnEnv() }
+
+  // Quiet the bevy engine's internal tracing chatter while keeping scene logs
+  // (scene_runner::renderer_context) and real warnings. An explicit RUST_LOG wins.
+  if (engine === 'bevy' && !env.RUST_LOG) {
+    env.RUST_LOG = 'warn,scene_runner::renderer_context=info'
+  }
 
   // If npx-cli.js was found, run it directly via process.execPath (node in regular env,
   // Electron Helper with ELECTRON_RUN_AS_NODE=1 in Electron). Otherwise fall back to npx binary.
