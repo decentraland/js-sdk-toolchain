@@ -5405,9 +5405,13 @@ export type uint32 = number;
 
 // @public (undocumented)
 export type UiRendererOptions = {
-    virtualWidth: number;
-    virtualHeight: number;
+    virtualWidth?: number;
+    virtualHeight?: number;
+    screenInset?: UiScreenInset;
 };
+
+// @public
+export type UiScreenInset = 'device' | 'interactable' | 'none';
 
 // @public
 export type UiScreenInsetAreaProps = Omit<EntityPropTypes, 'uiTransform'> & {

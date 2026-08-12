@@ -53,8 +53,8 @@ export function getScaleAndUnit(scaleUnit: ScaleUnit): [number, ScaleUnits] {
 /**
  * @internal
  */
-export function scaleOnDim(scale: number, dim: number, pxRatio: number) {
-  return (dim / 100) * (scale / pxRatio)
+export function scaleOnDim(scale: number, dim: number) {
+  return (dim / 100) * scale
 }
 
 /**
@@ -107,6 +107,22 @@ export function resetUiScaleFactor(owner?: symbol): void {
   if (owner && uiScaleOwner !== owner) return
   uiScaleOwner = undefined
   uiScaleFactor = 1
+}
+
+/**
+ * Divides an inset area by the current UI scale factor.
+ *
+ * Inset areas are reported by the renderer in canvas pixels, but raw pixel
+ * values in `uiTransform` props are multiplied by the UI scale factor when
+ * parsed. Pre-dividing cancels that multiplication out, so the values sent to
+ * the renderer stay in canvas pixels regardless of the virtual screen.
+ *
+ * @internal
+ */
+export function compensateInsetForUiScale(area: BorderRect): BorderRect {
+  const scale = getUiScaleFactor()
+  const factor = scale > 0 ? scale : 1
+  return { top: area.top / factor, left: area.left / factor, right: area.right / factor, bottom: area.bottom / factor }
 }
 
 /**
@@ -192,10 +208,13 @@ export function calcOnViewport(value: ScaleUnit, ctx: ScaleContext | undefined =
   const [scale, unit] = getScaleAndUnit(value)
   if (!ctx) return scale
 
-  const { height, width, ratio } = ctx
+  // `ctx.ratio` is intentionally not read: '1vw' is 1% of the canvas width by
+  // definition, exactly as in CSS. It stays on ScaleContext as an informational
+  // density hint for callers that need to pick an asset resolution.
+  const { height, width } = ctx
 
-  if (unit === 'vh') return scaleOnDim(scale, height, ratio)
+  if (unit === 'vh') return scaleOnDim(scale, height)
 
   // by default, we scale by 'vw' (width)
-  return scaleOnDim(scale, width, ratio)
+  return scaleOnDim(scale, width)
 }
