@@ -1,5 +1,4 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs'
-import { glob } from 'glob'
+import { existsSync, readFileSync, writeFileSync, globSync } from 'fs'
 import path from 'path'
 import {
   Composite,
@@ -23,7 +22,7 @@ const nonBinaryCompositeJsonPath = 'non-binary.composite'
 // ########
 
 function getJsonCompositeFrom(globPath: string, cwd: string): Composite.Resource[] {
-  const compositeFileContent = glob.sync(globPath, { cwd }).map((item) => ({
+  const compositeFileContent = globSync(globPath, { cwd }).map((item) => ({
     src: item,
     content: readFileSync(path.resolve(cwd, item)).toString()
   }))
@@ -34,7 +33,7 @@ function getJsonCompositeFrom(globPath: string, cwd: string): Composite.Resource
 }
 
 function getBinaryCompositeFrom(globPath: string, cwd: string) {
-  const compositeFileContent = glob.sync(globPath, { cwd }).map((item) => ({
+  const compositeFileContent = globSync(globPath, { cwd }).map((item) => ({
     src: item,
     content: readFileSync(path.resolve(cwd, item))
   }))
@@ -149,7 +148,7 @@ describe('composite instantiation system', () => {
       // actually instances nested child composites. Leaf composites (whose
       // definition carries no `composite::root` component) emit none.
       const hasNestedComposites = composite.composite.components.some(
-        component => component.name === CompositeRootComponent.componentName
+        (component) => component.name === CompositeRootComponent.componentName
       )
       if (hasNestedComposites) {
         expect(composites.length).toBeGreaterThan(0)
