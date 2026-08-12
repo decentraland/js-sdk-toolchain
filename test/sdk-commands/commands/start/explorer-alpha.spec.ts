@@ -185,6 +185,48 @@ describe('explorer-alpha', () => {
     })
   })
 
+  describe('assetBundles parameter', () => {
+    it('should include local-ab parameter when --asset-bundles flag is provided', async () => {
+      const args: any = {
+        '--asset-bundles': true
+      }
+
+      await runExplorerAlpha(mockComponents, {
+        cwd: '/test',
+        realm: 'test-realm',
+        baseCoords: { x: 0, y: 0 },
+        isHub: false,
+        args
+      })
+
+      expect(mockExec).toHaveBeenCalledWith(
+        '/test',
+        'open',
+        expect.arrayContaining([expect.stringContaining('local-ab=true')]),
+        { silent: true }
+      )
+    })
+
+    it('should not include local-ab parameter when --asset-bundles flag is not provided', async () => {
+      const args: any = {}
+
+      await runExplorerAlpha(mockComponents, {
+        cwd: '/test',
+        realm: 'test-realm',
+        baseCoords: { x: 0, y: 0 },
+        isHub: false,
+        args
+      })
+
+      expect(mockExec).toHaveBeenCalledWith(
+        '/test',
+        'open',
+        expect.arrayContaining([expect.not.stringContaining('local-ab')]),
+        { silent: true }
+      )
+    })
+  })
+
   describe('mcp parameter', () => {
     it('should include mcp parameter when --mcp flag is provided', async () => {
       const args: any = {
