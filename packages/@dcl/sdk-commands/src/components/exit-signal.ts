@@ -1,4 +1,4 @@
-import future from 'fp-future'
+import future from '../logic/future'
 import { IBaseComponent } from '@well-known-components/interfaces'
 
 export type ISignalerComponent = {

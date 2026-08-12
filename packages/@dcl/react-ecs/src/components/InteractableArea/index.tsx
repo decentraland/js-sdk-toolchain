@@ -1,6 +1,6 @@
 import { ReactEcs } from '../../react-ecs'
 import { UiEntity } from '../index'
-import { getInteractableArea } from '../utils'
+import { compensateInsetForUiScale, getInteractableArea } from '../utils'
 import { UiInteractableAreaProps } from './types'
 
 /**
@@ -25,7 +25,8 @@ import { UiInteractableAreaProps } from './types'
  */
 /* @__PURE__ */
 export function InteractableArea(props: UiInteractableAreaProps) {
-  const { top, left, right, bottom } = getInteractableArea()
+  // Insets are canvas px; pre-divide so the parser's scale multiplication cancels out.
+  const { top, left, right, bottom } = compensateInsetForUiScale(getInteractableArea())
   const { uiTransform, ...otherProps } = props
 
   return (
