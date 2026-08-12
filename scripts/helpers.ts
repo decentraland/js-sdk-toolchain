@@ -1,8 +1,7 @@
 import { exec } from 'child_process'
-import { sync as globSync } from 'glob'
 import { resolve, relative } from 'path'
 import { existsSync, readFileSync, writeFileSync, lstatSync, removeSync, copySync } from 'fs-extra'
-import { rmSync } from 'fs'
+import { rmSync, globSync } from 'fs'
 
 /**
  * @returns the resolved absolute path
@@ -51,10 +50,12 @@ export function itDeletesFolder(folder: string, cwd: string) {
 }
 export function itDeletesGlob(pattern: string, cwd: string) {
   it(`deletes ${pattern} in ${cwd}`, () => {
-    globSync(pattern, { absolute: true, cwd }).forEach((file) => {
-      console.log(`> deleting ${file}`)
-      rmSync(file, { recursive: true, force: true })
-    })
+    globSync(pattern, { cwd })
+      .map((file) => resolve(cwd, file))
+      .forEach((file) => {
+        console.log(`> deleting ${file}`)
+        rmSync(file, { recursive: true, force: true })
+      })
   })
 }
 

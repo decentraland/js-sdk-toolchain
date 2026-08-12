@@ -22,10 +22,13 @@ export default async function prompts(
   options: Options = {}
 ): Promise<Record<string, string | number | boolean>> {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+  // on Node <24 Ctrl+C only pauses stdin instead of rejecting rl.question; abort so onCancel runs
+  const canceled = new AbortController()
+  rl.on('SIGINT', () => canceled.abort())
   try {
     for (;;) {
       const suffix = question.type === 'confirm' ? (question.initial ? ' [Y/n] ' : ' [y/N] ') : ' '
-      const answer = await rl.question(`${question.message}${suffix}`)
+      const answer = await rl.question(`${question.message}${suffix}`, { signal: canceled.signal })
       if (question.type === 'confirm') {
         const value = answer === '' ? !!question.initial : /^y(es)?$/i.test(answer)
         return { [question.name]: value }
