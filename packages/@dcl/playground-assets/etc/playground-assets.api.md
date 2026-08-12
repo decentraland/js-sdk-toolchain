@@ -1172,6 +1172,13 @@ export interface EcsElements {
     };
 }
 
+// @public (undocumented)
+export const enum EmoteState {
+    ES_FINISHED = 1,
+    ES_INTERRUPTED = 2,
+    ES_STARTED = 0
+}
+
 // @public @deprecated
 export function Engine(options?: IEngineOptions): IEngine;
 
@@ -2558,6 +2565,7 @@ export interface PBAvatarEmoteCommand {
     loop: boolean;
     // (undocumented)
     mask?: AvatarMask | undefined;
+    state?: EmoteState | undefined;
     timestamp: number;
 }
 
