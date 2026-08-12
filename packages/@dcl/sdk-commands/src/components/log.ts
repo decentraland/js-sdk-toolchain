@@ -19,10 +19,9 @@ export const writeToStderr = (...parameters: readonly unknown[]) => {
 // @see https://no-color.org
 // @see https://www.npmjs.com/package/chalk
 const useColor = process.env.FORCE_COLOR !== '0' && !process.env.NO_COLOR
-const paint =
-  (format: Parameters<typeof styleText>[0]) =>
-  (text: string | number) =>
-    useColor ? styleText(format, String(text)) : String(text)
+// skip styleText's stream validation: it checks stdout, but the logger writes to stderr
+const paint = (format: Parameters<typeof styleText>[0]) => (text: string | number) =>
+  useColor ? styleText(format, String(text), { validateStream: false }) : String(text)
 
 export const colors = {
   bgBlack: paint('bgBlack'),

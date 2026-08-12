@@ -1,5 +1,4 @@
-import { readFileSync } from 'fs'
-import { glob } from 'glob'
+import { readFileSync, globSync } from 'fs'
 import path from 'path'
 import { Composite, Engine, Entity, IEngine } from '../../packages/@dcl/ecs/src'
 import { components } from '../../packages/@dcl/ecs/src'
@@ -7,7 +6,7 @@ import { components } from '../../packages/@dcl/ecs/src'
 const COMPOSITE_BASE_PATH = 'test/ecs/composites'
 
 function getJsonCompositeFrom(globPath: string, cwd: string): Composite.Resource[] {
-  const compositeFileContent = glob.sync(globPath, { cwd }).map((item) => ({
+  const compositeFileContent = globSync(globPath, { cwd }).map((item) => ({
     src: item,
     content: readFileSync(path.resolve(cwd, item)).toString()
   }))
