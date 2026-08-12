@@ -96,14 +96,14 @@ describe('CRDT tests', () => {
 
     // Tick update and verify that both messages are being sent through ws.send
     await engine.update(1 / 30)
-    expect(spySend).toBeCalledTimes(1)
+    expect(spySend).toHaveBeenCalledTimes(1)
 
     // Reset ws.send called times
     jest.resetAllMocks()
 
     Transform.getMutable(entityA).position.x = 10
     await engine.update(1 / 30)
-    expect(spySend).toBeCalledTimes(1)
+    expect(spySend).toHaveBeenCalledTimes(1)
   })
 
   it('Send ONLY dirty components via trasnport and spy on send messages', async () => {
@@ -118,7 +118,7 @@ describe('CRDT tests', () => {
 
     // Tick update and verify that both messages are being sent through ws.send
     await engine.update(1 / 30)
-    expect(spySend).toBeCalledTimes(1)
+    expect(spySend).toHaveBeenCalledTimes(1)
 
     // Reset ws.send called times
     jest.resetAllMocks()
@@ -126,7 +126,7 @@ describe('CRDT tests', () => {
     // Update a component and verify that's being sent through the crdt system
     Transform.getMutable(entityA).position.x = 10
     await engine.update(1 / 30)
-    expect(spySend).toBeCalledTimes(1)
+    expect(spySend).toHaveBeenCalledTimes(1)
 
     // Reset ws.send again
     jest.resetAllMocks()
@@ -134,7 +134,7 @@ describe('CRDT tests', () => {
     // Call update again with no updates and verify that there's no message
     // being sent through the wire
     await engine.update(1 / 30)
-    expect(spySend).toBeCalledWith(new Uint8Array([]))
+    expect(spySend).toHaveBeenCalledWith(new Uint8Array([]))
   })
 
   it('should sent new entity through the wire and process it in the other engine', async () => {
@@ -164,8 +164,8 @@ describe('CRDT tests', () => {
 
     expect(SandBox.DEFAULT_POSITION).toBeDeepCloseTo(TransformB.get(entityA))
     expect(posA).toBeDeepCloseTo(PositionB.get(entityA))
-    expect(clientA.spySend).toBeCalledTimes(1)
-    expect(clientB.spySend).toBeCalledTimes(1)
+    expect(clientA.spySend).toHaveBeenCalledTimes(1)
+    expect(clientB.spySend).toHaveBeenCalledTimes(1)
 
     expect(clientA.operations).toBeDeepCloseTo([
       { entity: entityA, value: SandBox.DEFAULT_POSITION },
@@ -201,7 +201,7 @@ describe('CRDT tests', () => {
       DoorComponent.create(entity, { open: 1 })
     })
 
-    clients.forEach((c) => expect(c.spySend).toBeCalledTimes(0))
+    clients.forEach((c) => expect(c.spySend).toHaveBeenCalledTimes(0))
     /**
      * If we change a static entity in one scene. It should be send to other peers.
      */
@@ -261,7 +261,7 @@ describe('CRDT tests', () => {
     transports[0].onmessage!(buffer.toBinary())
     await engine.update(1)
 
-    expect(spySend).toBeCalledWith(new Uint8Array([]))
+    expect(spySend).toHaveBeenCalledWith(new Uint8Array([]))
   })
 
   it('should remove a component if we receive a DELETE_COMPONENT operation message', async () => {

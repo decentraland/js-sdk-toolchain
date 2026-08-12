@@ -98,6 +98,23 @@ export type AudioAnalysisView = {
 // @public (undocumented)
 export const AudioEvent: GrowOnlyValueSetComponentDefinition<PBAudioEvent>;
 
+// @public (undocumented)
+export interface AudioEventsSystem {
+    getAudioState(entity: Entity): DeepReadonlyObject<PBAudioEvent> | undefined;
+    // (undocumented)
+    hasAudioEventsEntity(entity: Entity): boolean;
+    // (undocumented)
+    registerAudioEventsEntity(entity: Entity, callback: AudioEventsSystemCallback): void;
+    // (undocumented)
+    removeAudioEventsEntity(entity: Entity): void;
+}
+
+// @public
+export const audioEventsSystem: AudioEventsSystem;
+
+// @public (undocumented)
+export type AudioEventsSystemCallback = (event: DeepReadonlyObject<PBAudioEvent>) => void;
+
 // Warning: (ae-missing-release-tag) "AudioSource" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -183,14 +200,6 @@ export const AvatarBase: LastWriteWinElementSetComponentDefinition<PBAvatarBase>
 
 // @public (undocumented)
 export const AvatarEmoteCommand: GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>;
-
-// @public (undocumented)
-export const enum AvatarEmoteMask {
-    // (undocumented)
-    AEM_FULL_BODY = 0,
-    // (undocumented)
-    AEM_UPPER_BODY = 1
-}
 
 // @public (undocumented)
 export const AvatarEquippedData: LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>;
@@ -1162,6 +1171,13 @@ export interface EcsElements {
         children?: ReactEcs.JSX.ReactNode;
         key?: Key;
     };
+}
+
+// @public (undocumented)
+export const enum EmoteState {
+    ES_FINISHED = 1,
+    ES_INTERRUPTED = 2,
+    ES_STARTED = 0
 }
 
 // @public @deprecated
@@ -2571,6 +2587,7 @@ export interface PBAvatarEmoteCommand {
     loop: boolean;
     // (undocumented)
     mask?: AvatarMask | undefined;
+    state?: EmoteState | undefined;
     timestamp: number;
 }
 
@@ -5194,6 +5211,8 @@ export interface TouchScreenControlsComponentDefinitionExtended extends LastWrit
     hideJoystick(): void;
     setMainAction(action: InputAction): void;
     showAll(): void;
+    showCrosshair(): void;
+    showJoystick(): void;
 }
 
 // Warning: (ae-missing-release-tag) "Transform" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
@@ -5479,9 +5498,13 @@ export type uint32 = number;
 
 // @public (undocumented)
 export type UiRendererOptions = {
-    virtualWidth: number;
-    virtualHeight: number;
+    virtualWidth?: number;
+    virtualHeight?: number;
+    screenInset?: UiScreenInset;
 };
+
+// @public
+export type UiScreenInset = 'device' | 'interactable' | 'none';
 
 // @public
 export type UiScreenInsetAreaProps = Omit<EntityPropTypes, 'uiTransform'> & {

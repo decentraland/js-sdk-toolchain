@@ -48,7 +48,7 @@ describe('Generated Animator ProtoBuf', () => {
 
     expect(() => {
       Animator.getClip(entityWithoutAnimator, 'ClipSome')
-    }).toThrowError()
+    }).toThrow()
     expect(Animator.getClipOrNull(entityWithoutAnimator, 'ClipSome')).toBeNull()
 
     expect(Animator.getClipOrNull(entity, 'ClipSome')).not.toBeNull()
@@ -56,7 +56,7 @@ describe('Generated Animator ProtoBuf', () => {
 
     expect(() => {
       Animator.getClip(entity, 'SomeInexistent')
-    }).toThrowError()
+    }).toThrow()
     expect(Animator.getClipOrNull(entity, 'SomeInexistent')).toBeNull()
 
     expect(Animator.getClip(entity, 'ClipSome')).toStrictEqual({

@@ -25,7 +25,10 @@ export interface TouchScreenControlsComponentDefinitionExtended
   extends LastWriteWinElementSetComponentDefinition<PBTouchScreenControls> {
   /** Hide every on-screen gamepad button. */
   hideAll(): void
-  /** Show every on-screen gamepad button (clears the hide list). */
+  /**
+   * Show every on-screen gamepad button (clears the button hide list).
+   * Does NOT change the joystick/crosshair — use `showJoystick()` / `showCrosshair()` for those.
+   */
   showAll(): void
   /** Hide the given on-screen buttons (merged into the current config). */
   hide(actions: InputAction[]): void
@@ -33,8 +36,12 @@ export interface TouchScreenControlsComponentDefinitionExtended
   setMainAction(action: InputAction): void
   /** Hide the native virtual joystick. */
   hideJoystick(): void
+  /** Show the native virtual joystick. */
+  showJoystick(): void
   /** Hide the on-screen crosshair / reticle. */
   hideCrosshair(): void
+  /** Show the on-screen crosshair / reticle. */
+  showCrosshair(): void
 }
 
 export function defineTouchScreenControlsComponent(
@@ -46,7 +53,9 @@ export function defineTouchScreenControlsComponent(
   function current(): PBTouchScreenControls {
     const value = theComponent.getOrNull(ROOT_ENTITY)
     return {
-      touchInputs: value?.touchInputs ? value.touchInputs.map((t) => ({ ...t })) : [],
+      touchInputs: value?.touchInputs
+        ? value.touchInputs.map((t) => ({ ...t, icon: t.icon ? { ...t.icon } : t.icon }))
+        : [],
       mainAction: value?.mainAction,
       hideJoystick: value?.hideJoystick ?? false,
       hideCrosshair: value?.hideCrosshair ?? false
@@ -57,7 +66,7 @@ export function defineTouchScreenControlsComponent(
     const value = current()
     const byAction = new Map<InputAction, PBTouchScreenControls_TouchInput>()
     for (const input of value.touchInputs) byAction.set(input.inputAction, input)
-    for (const action of actions) byAction.set(action, { inputAction: action, hide: true })
+    for (const action of actions) byAction.set(action, { ...byAction.get(action), inputAction: action, hide: true })
     value.touchInputs = [...byAction.values()]
     theComponent.createOrReplace(ROOT_ENTITY, value)
   }
@@ -85,9 +94,19 @@ export function defineTouchScreenControlsComponent(
       value.hideJoystick = true
       theComponent.createOrReplace(ROOT_ENTITY, value)
     },
+    showJoystick(): void {
+      const value = current()
+      value.hideJoystick = false
+      theComponent.createOrReplace(ROOT_ENTITY, value)
+    },
     hideCrosshair(): void {
       const value = current()
       value.hideCrosshair = true
+      theComponent.createOrReplace(ROOT_ENTITY, value)
+    },
+    showCrosshair(): void {
+      const value = current()
+      value.hideCrosshair = false
       theComponent.createOrReplace(ROOT_ENTITY, value)
     }
   }

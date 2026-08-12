@@ -3,7 +3,7 @@ import { components } from '../../packages/@dcl/ecs/src'
 import { ReactEcs, Button, UiButtonProps } from '../../packages/@dcl/react-ecs/src'
 import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
 import { Color4 } from '../../packages/@dcl/sdk/math'
-import { setupEngine } from './utils'
+import { setupEngine, WHOLE_SCREEN } from './utils'
 
 describe('Button React Ecs', () => {
   it('validates button props', async () => {
@@ -36,7 +36,7 @@ describe('Button React Ecs', () => {
       />
     )
 
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
 
     expect(getPointerEvent(rootDivEntity)).toBeDefined()
