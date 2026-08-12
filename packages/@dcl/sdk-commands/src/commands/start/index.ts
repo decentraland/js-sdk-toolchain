@@ -1,6 +1,6 @@
 import * as os from 'os'
 import * as path from 'path'
-import open from 'open'
+import open from '../../logic/open'
 import QRCode from 'qrcode'
 
 import { CliComponents } from '../../components'
@@ -55,7 +55,6 @@ export const args = declareArgs({
   '--skip-build': Boolean,
   '--data-layer': Boolean,
   '--explorer-alpha': Boolean,
-  '--web-explorer': Boolean,
   '--hub': Boolean,
   '--mobile': Boolean,
   '-m': '--mobile',
@@ -69,8 +68,11 @@ export const args = declareArgs({
   '--landscape-terrain-enabled': Boolean,
   '-n': Boolean,
   '--bevy-web': Boolean,
+  '--web': '--bevy-web',
   '--multi-instance': Boolean,
-  '--no-client': Boolean
+  '--no-client': Boolean,
+  '--mcp': Boolean,
+  '--mcp-port': Number
 })
 
 export async function help(options: Options) {
@@ -81,13 +83,12 @@ export async function help(options: Options) {
 
       -h, --help                        Displays complete help
       -p, --port                        Select a custom port for the development server
-      -d, --no-debug                    Disable debugging panel
+      -d, --no-debug                    (deprecated) No effect. Kept for backwards compatibility
       -b, --no-browser                  Do not open a new browser window
       -w, --no-watch                    Do not open watch for filesystem changes
       -c, --ci                          Run the parcel previewer on a remote unix server
-      --web3                            Connects preview to browser wallet to use the associated avatar and account
+      --web3                            (deprecated) No effect. Kept for backwards compatibility
       --skip-build                      Skip build and only serve the files in preview mode
-      --web-explorer                    Launch the scene in the Web Explorer
       --debug                           Enables Debug panel mode inside DCL Explorer (default=true)
       --dclenv                          Decentraland Environment. Which environment to use for the content. This determines the catalyst server used, asset-bundles, etc. Possible values: org, zone, today. (default=org)
       --realm                           Realm used to serve the content. (default=Localhost)
@@ -96,10 +97,19 @@ export async function help(options: Options) {
       --skip-auth-screen                Skip the auth screen (accepts 'true' or 'false').
       --landscape-terrain-enabled       Enable landscape terrain.
       -n                                Open a new instance of the Client even if one is already running.
-      --bevy-web                        Opens preview using the Bevy Web browser window.
+      --web, --bevy-web                 Opens preview using the Bevy Web browser window.
       --mobile                          Show QR code for mobile preview on the same network.
       --multi-instance                  Allow running multiple Explorer instances simultaneously.
       --no-client                       Suppress every auto-launch (desktop Explorer deeplink, browser open, mobile QR). The file watcher still notifies a desktop Explorer if it connects on its own — useful when an external tool owns the Explorer process.
+      --mcp                             Enable the MCP server in the Explorer (forwarded as a deep link parameter).
+      --mcp-port                        Port for the MCP server in the Explorer (forwarded as a deep link parameter).
+
+    Any argument placed after a standalone \`--\` is not parsed by the CLI and is forwarded verbatim
+    into the Explorer deep link as a query parameter. Supported forms: --key=value, --key value,
+    and bare --key (forwarded as key=true). Declared flags above take precedence over forwarded params.
+
+      $ sdk-commands start -- --paramA --paramX valueX
+      $ npm run start -- -- --paramA --paramX valueX      (npm consumes the first --)
 
 
     Examples:
@@ -118,19 +128,16 @@ export async function main(options: Options) {
   let baseCoords = { x: 0, y: 0 }
   const workingDirectory = path.resolve(process.cwd(), options.args['--dir'] || '.')
   const isCi = options.args['--ci'] || process.env.CI || false
-  const debug = !options.args['--no-debug'] && !isCi
   const openBrowser = !options.args['--no-browser'] && !isCi
   const build = !options.args['--skip-build']
   const watch = !options.args['--no-watch']
   const withDataLayer = options.args['--data-layer']
-  const enableWeb3 = options.args['--web3']
   const isHub = !!options.args['--hub']
   const skipClient = !!options.args['--no-client']
   const bevyWeb = !!options.args['--bevy-web']
   const isMobile = !!options.args['--mobile']
-  const explorerAlpha = !options.args['--web-explorer'] && !bevyWeb
+  const explorerAlpha = !bevyWeb
 
-  let hasSmartWearable = false
   const workspace = await getValidWorkspace(options.components, workingDirectory)
 
   /* istanbul ignore if */
@@ -138,7 +145,6 @@ export async function main(options: Options) {
     printWarning(options.components.logger, 'Support for multiple projects is still experimental.')
 
   for (const project of workspace.projects) {
-    if (project.kind === 'smart-wearable') hasSmartWearable = true
     if (project.kind === 'scene' || project.kind === 'smart-wearable') {
       printCurrentProjectStarting(options.components.logger, project, workspace)
 
@@ -209,12 +215,7 @@ export async function main(options: Options) {
       await wireRouter(components, workspace, dataLayer)
       if (watch) {
         for (const project of workspace.projects) {
-          await wireFileWatcherToWebSockets(
-            components,
-            project.workingDirectory,
-            project.kind,
-            !!explorerAlpha || !!bevyWeb
-          )
+          await wireFileWatcherToWebSockets(components, project.workingDirectory, project.kind)
         }
       }
       await startComponents()
@@ -241,23 +242,11 @@ export async function main(options: Options) {
       const availableURLs: string[] = []
 
       printProgressInfo(options.components.logger, 'Preview server is now running!')
-      if (!explorerAlpha) {
-        components.logger.log('Available on:\n')
-      }
 
       Object.keys(networkInterfaces).forEach((dev) => {
         ;(networkInterfaces[dev] || []).forEach((details) => {
           if (details.family === 'IPv4') {
-            const oldBackpack = 'DISABLE_backpack_editor_v2=&ENABLE_backpack_editor_v1'
-            let addr = `http://${details.address}:${port}?position=${baseCoords.x}%2C${baseCoords.y}&${oldBackpack}`
-            if (debug) {
-              addr = `${addr}&SCENE_DEBUG_PANEL`
-            }
-            if (enableWeb3 || hasSmartWearable) {
-              addr = `${addr}&ENABLE_WEB3`
-            }
-
-            availableURLs.push(addr)
+            availableURLs.push(`http://${details.address}:${port}`)
           }
         })
       })
@@ -269,17 +258,20 @@ export async function main(options: Options) {
       const sortedURLs = availableURLs.sort((a, _b) => {
         return a.toLowerCase().includes('localhost') || a.includes('127.0.0.1') || a.includes('0.0.0.0') ? -1 : 1
       })
-      const bevyUrl = `https://decentraland.zone/bevy-web/?preview=true&realm=${
+      const bevyUrl = `https://decentraland.org/bevy-web/?preview=true&realm=${
         new URL(sortedURLs[0]).origin
       }&position=${baseCoords.x},${baseCoords.y}`
-      if (!explorerAlpha) {
-        if (bevyWeb) {
-          components.logger.log(`    ${bevyUrl}`)
-        } else {
-          for (const addr of sortedURLs) {
-            components.logger.log(`    ${addr}`)
-          }
-        }
+      if (bevyWeb) {
+        components.logger.log('Available on:\n')
+        components.logger.log(`    ${bevyUrl}`)
+        printWarning(
+          components.logger,
+          'Chromium-based browsers require permission for websites to reach localhost (Local Network Access).\n' +
+            'When the browser asks to access apps on your device, click "Allow".\n' +
+            'If the scene never loads and no prompt appears, enable it manually and reload:\n' +
+            '  chrome://settings/content/siteDetails?site=https%3A%2F%2Fdecentraland.org\n' +
+            '  → "Apps on device" (Chrome 145+) or "Local network access" (Chrome 142-144) → Allow'
+        )
       }
       components.logger.log('\nPress CTRL+C to exit\n')
 
@@ -299,11 +291,9 @@ export async function main(options: Options) {
         })
       }
 
-      // Open preferably localhost/127.0.0.1
-      if ((!explorerAlpha || bevyWeb) && openBrowser && !skipClient && sortedURLs.length) {
+      if (bevyWeb && openBrowser && !skipClient && sortedURLs.length) {
         try {
-          const url = bevyWeb ? bevyUrl : sortedURLs[0]
-          await open(url)
+          await open(bevyUrl)
         } catch (_) {
           components.logger.warn('Unable to open browser automatically.')
         }

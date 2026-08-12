@@ -1,3 +1,4 @@
+import { PBUiInputBinding } from '@dcl/ecs'
 import { ReactEcs } from '../react-ecs'
 import { Listeners } from './listeners/types'
 import { UiBackgroundProps } from './uiBackground/types'
@@ -12,6 +13,8 @@ export interface EntityPropTypes extends Listeners {
   uiTransform?: UiTransformProps
   /** To define a background color or image */
   uiBackground?: UiBackgroundProps
+  /** Bind input actions to this element, held down while it's pressed (touch or pointer) */
+  uiInputBinding?: PBUiInputBinding
   /** Uinique key to identiy elments when iterating arrays */
   key?: Key
 }

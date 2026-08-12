@@ -3,7 +3,7 @@ import * as path from 'path'
 import { Readable } from 'stream'
 import { WearableJson } from '@dcl/schemas/dist/sdk'
 import { Entity, EntityType, Locale, Wearable } from '@dcl/schemas'
-import { v4 as uuidv4 } from 'uuid'
+import { randomUUID } from 'crypto'
 
 import { PreviewComponents } from '../types'
 import { fetchEntityByPointer } from '../../../logic/catalyst-requests'
@@ -140,12 +140,14 @@ export async function setupEcs6Endpoints(
     // undici decompresses the body but leaves the original content-encoding /
     // content-length headers in place; forwarding them would make the client
     // re-decode (or truncate to the compressed length) the already-decoded body.
-    res.headers.delete('content-encoding')
-    res.headers.delete('content-length')
+    // fetch() responses carry immutable Headers, so filter instead of delete.
+    const headers = Object.fromEntries(res.headers)
+    delete headers['content-encoding']
+    delete headers['content-length']
 
     return {
       status: res.status,
-      headers: Object.fromEntries(res.headers),
+      headers,
       body: res.body ? Readable.fromWeb(res.body as any) : undefined
     }
   })
@@ -172,7 +174,16 @@ export async function setupEcs6Endpoints(
     }
   })
 
-  serveStatic(components, workspace, router)
+  router.get('/feature-flags/:file', async (ctx) => {
+    const res = await components.fetch.fetch(`https://feature-flags.decentraland.zone/${ctx.params.file}`, {
+      headers: {
+        connection: 'close'
+      }
+    })
+    return {
+      body: await res.arrayBuffer()
+    }
+  })
 
   // TODO: get workspace scenes & wearables...
 
@@ -354,7 +365,7 @@ async function serveWearable(
 
   // Set wearable ID.
   const sceneHash = b64HashingFunction(project.workingDirectory)
-  const wearableId = wearableCache.get(sceneHash) ?? `urn:${uuidv4()}`
+  const wearableId = wearableCache.get(sceneHash) ?? `urn:${randomUUID()}`
   wearableCache.set(sceneHash, wearableId)
 
   const representations = wearableJson.data.representations.map((representation) => ({
@@ -417,104 +428,6 @@ async function getSceneJson(
   }
 
   return resultEntities
-}
-
-function serveStatic(
-  components: Pick<CliComponents, 'fs' | 'fetch'>,
-  workspace: Workspace,
-  router: Router<PreviewComponents>
-) {
-  const sdkPath = path.dirname(
-    require.resolve('@dcl/sdk/package.json', {
-      paths: [workspace.rootWorkingDirectory, ...workspace.projects.map(($) => $.workingDirectory)]
-    })
-  )
-  const dclExplorerJsonPath = path.dirname(
-    require.resolve('@dcl/explorer/package.json', {
-      paths: [workspace.rootWorkingDirectory, ...workspace.projects.map(($) => $.workingDirectory), sdkPath]
-    })
-  )
-
-  const dclKernelDefaultProfilePath = path.resolve(dclExplorerJsonPath, 'default-profile')
-  const dclKernelImagesDecentralandConnect = path.resolve(dclExplorerJsonPath, 'images', 'decentraland-connect')
-
-  const routes = [
-    {
-      route: '/',
-      path: path.resolve(dclExplorerJsonPath, 'preview.html'),
-      type: 'text/html'
-    },
-    {
-      route: '/favicon.ico',
-      path: path.resolve(dclExplorerJsonPath, 'favicon.ico'),
-      type: 'text/html'
-    },
-    {
-      route: '/@/explorer/index.js',
-      path: path.resolve(dclExplorerJsonPath, 'index.js'),
-      type: 'text/javascript'
-    }
-  ]
-
-  for (const route of routes) {
-    router.get(route.route, async (_ctx) => {
-      return {
-        headers: { 'Content-Type': route.type },
-        body: components.fs.createReadStream(route.path)
-      }
-    })
-  }
-
-  function createStaticRoutes(
-    components: Pick<CliComponents, 'fs'>,
-    route: string,
-    folder: string,
-    transform = (str: string) => str
-  ) {
-    router.get(route, async (ctx, next) => {
-      const file = ctx.params.path
-      const fullPath = path.resolve(folder, transform(file))
-
-      // only return files IF the file is within a baseFolder
-      if (!(await components.fs.fileExists(fullPath))) {
-        return next()
-      }
-
-      if (await components.fs.directoryExists(fullPath)) {
-        return { status: 404 }
-      }
-
-      const headers: Record<string, any> = {
-        'x-timestamp': Date.now(),
-        'x-sent': true,
-        'cache-control': 'no-cache,private,max-age=1'
-      }
-
-      if (fullPath.endsWith('.wasm')) {
-        headers['content-type'] = 'application/wasm'
-      }
-
-      return {
-        headers,
-        body: components.fs.createReadStream(fullPath)
-      }
-    })
-  }
-
-  createStaticRoutes(components, '/images/decentraland-connect/:path+', dclKernelImagesDecentralandConnect)
-  createStaticRoutes(components, '/default-profile/:path+', dclKernelDefaultProfilePath)
-  createStaticRoutes(components, '/@/explorer/:path+', dclExplorerJsonPath, (filePath) => filePath.replace(/.br+$/, ''))
-
-  router.get('/feature-flags/:file', async (ctx) => {
-    const res = await components.fetch.fetch(`https://feature-flags.decentraland.zone/${ctx.params.file}`, {
-      headers: {
-        connection: 'close'
-      }
-    })
-    return {
-      body: await res.arrayBuffer()
-    }
-  })
 }
 
 async function fakeEntityV3FromProject(

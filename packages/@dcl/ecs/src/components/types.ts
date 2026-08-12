@@ -29,6 +29,7 @@ export type { ICreatedBy, ICreatedByType } from './manual/CreatedBy'
 export type { InputModifierHelper, InputModifierComponentDefinitionExtended } from './extended/InputModifier'
 export type { LightSourceHelper, LightSourceComponentDefinitionExtended } from './extended/LightSource'
 export type { TriggerAreaComponentDefinitionExtended } from './extended/TriggerArea'
+export type { TouchScreenControlsComponentDefinitionExtended } from './extended/TouchScreenControls'
 export type {
   ParticleSystemHelper,
   ParticleSystemComponentDefinitionExtended,
