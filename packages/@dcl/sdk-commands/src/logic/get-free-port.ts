@@ -23,8 +23,15 @@ export async function getPort(port: number, failoverPort = 2044) {
     for (let candidate = BASE_PORT; candidate <= HIGHEST_PORT; candidate++) {
       try {
         return await tryListen(candidate)
-      } catch {
-        // busy, try the next one
+      } catch (err: any) {
+        // EADDRINUSE means "busy, try the next one". Any other error (e.g. EACCES on
+        // privileged ports, unexpected system failures) isn't going to resolve itself by
+        // scanning the remaining ~57k ports, so bail out to the failover port immediately
+        // instead of looping needlessly.
+        if (err && err.code === 'EADDRINUSE') {
+          continue
+        }
+        return failoverPort
       }
     }
     return failoverPort

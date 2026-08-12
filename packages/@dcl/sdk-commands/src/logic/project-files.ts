@@ -35,7 +35,13 @@ export async function getPublishableFiles(
     }
   })
 
-  return ig.filter(allFiles).filter((file) => statSync(resolve(projectRoot, file)).isFile())
+  return ig.filter(allFiles).filter((file) => {
+    // a dangling symlink resolves to a path that doesn't exist: statSync (which follows
+    // symlinks) throws ENOENT instead of returning stats. Treat it as "not a file" instead
+    // of letting deploy/export-static crash on it.
+    const stat = statSync(resolve(projectRoot, file), { throwIfNoEntry: false })
+    return !!stat && stat.isFile()
+  })
 }
 
 /**
