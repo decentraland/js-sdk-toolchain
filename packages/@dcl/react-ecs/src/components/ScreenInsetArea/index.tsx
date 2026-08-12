@@ -1,6 +1,6 @@
 import { ReactEcs } from '../../react-ecs'
 import { UiEntity } from '../index'
-import { getScreenInsetArea } from '../utils'
+import { compensateInsetForUiScale, getScreenInsetArea } from '../utils'
 import { UiScreenInsetAreaProps } from './types'
 
 /**
@@ -24,7 +24,8 @@ import { UiScreenInsetAreaProps } from './types'
  */
 /* @__PURE__ */
 export function ScreenInsetArea(props: UiScreenInsetAreaProps) {
-  const { top, left, right, bottom } = getScreenInsetArea()
+  // Insets are canvas px; pre-divide so the parser's scale multiplication cancels out.
+  const { top, left, right, bottom } = compensateInsetForUiScale(getScreenInsetArea())
   const { uiTransform, ...otherProps } = props
 
   return (

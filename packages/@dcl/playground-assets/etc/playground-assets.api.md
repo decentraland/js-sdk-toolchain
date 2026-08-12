@@ -1172,13 +1172,6 @@ export interface EcsElements {
     };
 }
 
-// @public (undocumented)
-export const enum EmoteState {
-    ES_FINISHED = 1,
-    ES_INTERRUPTED = 2,
-    ES_STARTED = 0
-}
-
 // @public @deprecated
 export function Engine(options?: IEngineOptions): IEngine;
 
@@ -2565,7 +2558,6 @@ export interface PBAvatarEmoteCommand {
     loop: boolean;
     // (undocumented)
     mask?: AvatarMask | undefined;
-    state?: EmoteState | undefined;
     timestamp: number;
 }
 
@@ -5430,9 +5422,13 @@ export type uint32 = number;
 
 // @public (undocumented)
 export type UiRendererOptions = {
-    virtualWidth: number;
-    virtualHeight: number;
+    virtualWidth?: number;
+    virtualHeight?: number;
+    screenInset?: UiScreenInset;
 };
+
+// @public
+export type UiScreenInset = 'device' | 'interactable' | 'none';
 
 // @public
 export type UiScreenInsetAreaProps = Omit<EntityPropTypes, 'uiTransform'> & {

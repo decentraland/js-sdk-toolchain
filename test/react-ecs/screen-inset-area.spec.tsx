@@ -3,7 +3,7 @@ import { components } from '../../packages/@dcl/ecs/src'
 import { ReactEcs, ScreenInsetArea } from '../../packages/@dcl/react-ecs/src'
 import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
 import { resetScreenInsetArea } from '../../packages/@dcl/react-ecs/src/components/utils'
-import { setupEngine } from './utils'
+import { setupEngine, WHOLE_SCREEN } from './utils'
 
 describe('ScreenInsetArea React Ecs', () => {
   afterEach(() => {
@@ -25,7 +25,7 @@ describe('ScreenInsetArea React Ecs', () => {
       screenInsetArea: { top: 24, left: 12, right: 16, bottom: 32 }
     })
 
-    uiRenderer.setUiRenderer(() => <ScreenInsetArea />)
+    uiRenderer.setUiRenderer(() => <ScreenInsetArea />, WHOLE_SCREEN)
     await engine.update(1)
 
     expect(UiTransform.get(rootDivEntity)).toMatchObject({
@@ -59,7 +59,7 @@ describe('ScreenInsetArea React Ecs', () => {
       screenInsetArea: { top: 0, left: 0, right: 0, bottom: 0 }
     })
 
-    uiRenderer.setUiRenderer(() => <ScreenInsetArea />)
+    uiRenderer.setUiRenderer(() => <ScreenInsetArea />, WHOLE_SCREEN)
     await engine.update(1)
 
     expect(UiTransform.get(rootDivEntity)).toMatchObject({
@@ -89,7 +89,7 @@ describe('ScreenInsetArea React Ecs', () => {
     const entityIndex = engine.addEntity() as number
     const rootDivEntity = (entityIndex + 1) as Entity
 
-    uiRenderer.setUiRenderer(() => <ScreenInsetArea />)
+    uiRenderer.setUiRenderer(() => <ScreenInsetArea />, WHOLE_SCREEN)
     await engine.update(1)
 
     expect(UiTransform.get(rootDivEntity)).toMatchObject({
@@ -98,6 +98,38 @@ describe('ScreenInsetArea React Ecs', () => {
       positionLeft: 0,
       positionRight: 0,
       positionBottom: 0
+    })
+
+    uiRenderer.destroy()
+  })
+
+  it('keeps its position in canvas pixels when the UI scale factor is not 1', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const UiCanvasInformation = components.UiCanvasInformation(engine)
+    const entityIndex = engine.addEntity() as number
+    const rootDivEntity = (entityIndex + 1) as Entity
+
+    // Canvas at 2x the default 1920x1080 virtual screen -> scale factor 2. The
+    // stored position must still equal the raw canvas-px insets: they are
+    // pre-divided by the scale factor so the px parser's multiplication cancels out.
+    UiCanvasInformation.create(engine.RootEntity, {
+      devicePixelRatio: 1,
+      width: 3840,
+      height: 2160,
+      interactableArea: undefined,
+      screenInsetArea: { top: 24, left: 12, right: 16, bottom: 32 }
+    })
+
+    uiRenderer.setUiRenderer(() => <ScreenInsetArea />, WHOLE_SCREEN)
+    await engine.update(1)
+
+    expect(UiTransform.get(rootDivEntity)).toMatchObject({
+      positionType: YGPositionType.YGPT_ABSOLUTE,
+      positionTop: 24,
+      positionLeft: 12,
+      positionRight: 16,
+      positionBottom: 32
     })
 
     uiRenderer.destroy()
@@ -118,19 +150,22 @@ describe('ScreenInsetArea React Ecs', () => {
       screenInsetArea: { top: 10, left: 10, right: 10, bottom: 10 }
     })
 
-    uiRenderer.setUiRenderer(() => (
-      <ScreenInsetArea
-        uiTransform={
-          {
-            // user-provided overrides for position* should be ignored by typing,
-            // but we cast through `any` to assert runtime behaviour as well.
-            positionType: 'relative',
-            position: { top: 999, left: 999, right: 999, bottom: 999 },
-            padding: 4
-          } as any
-        }
-      />
-    ))
+    uiRenderer.setUiRenderer(
+      () => (
+        <ScreenInsetArea
+          uiTransform={
+            {
+              // user-provided overrides for position* should be ignored by typing,
+              // but we cast through `any` to assert runtime behaviour as well.
+              positionType: 'relative',
+              position: { top: 999, left: 999, right: 999, bottom: 999 },
+              padding: 4
+            } as any
+          }
+        />
+      ),
+      WHOLE_SCREEN
+    )
     await engine.update(1)
 
     expect(UiTransform.get(rootDivEntity)).toMatchObject({
