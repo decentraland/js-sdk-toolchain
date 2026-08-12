@@ -6,7 +6,7 @@ import { CrdtMessage, CrdtMessageType } from '../../../packages/@dcl/ecs/dist'
 import { LIVEKIT_MAX_SIZE } from '../../../packages/@dcl/sdk/src/network/server'
 import { addSyncTransport } from '../../../packages/@dcl/sdk/src/network/message-bus-sync'
 import { CommsMessage } from '../../../packages/@dcl/sdk/src/network/binary-message-bus'
-import { SendBinaryRequest, SendBinaryResponse } from '~system/CommunicationsController'
+import type { SendBinaryRequest, SendBinaryResponse } from '~system/CommunicationsController'
 // Message capture for testing chunking
 class MessageCapture {
   capturedChunks: Uint8Array[] = []
