@@ -68,6 +68,7 @@ export const args = declareArgs({
   '--bevy-web': Boolean,
   '--web': '--bevy-web',
   '--multi-instance': Boolean,
+  '--asset-bundles': Boolean,
   '--no-client': Boolean,
   '--mcp': Boolean,
   '--mcp-port': Number
@@ -98,6 +99,7 @@ export async function help(options: Options) {
       --web, --bevy-web                 Opens preview using the Bevy Web browser window.
       --mobile                          Show QR code for mobile preview on the same network.
       --multi-instance                  Allow running multiple Explorer instances simultaneously.
+      --asset-bundles                   Preview with optimized asset bundles (forwarded as local-ab=true in the deep link; the Desktop Explorer converts the scene's assets itself).
       --no-client                       Suppress every auto-launch (desktop Explorer deeplink, browser open, mobile QR). The file watcher still notifies a desktop Explorer if it connects on its own — useful when an external tool owns the Explorer process.
       --mcp                             Enable the MCP server in the Explorer (forwarded as a deep link parameter).
       --mcp-port                        Port for the MCP server in the Explorer (forwarded as a deep link parameter).
