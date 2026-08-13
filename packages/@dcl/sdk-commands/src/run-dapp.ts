@@ -3,7 +3,7 @@ import { Lifecycle } from '@well-known-components/interfaces'
 import { createRecordConfigComponent } from '@well-known-components/env-config-provider'
 import { createConsoleLogComponent } from '@well-known-components/logger'
 import { resolve } from 'path'
-import open from 'open'
+import open from './logic/open'
 
 import { getPort } from './logic/get-free-port'
 import { CliComponents } from './components'

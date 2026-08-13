@@ -10,6 +10,7 @@ export { cyclicParentingChecker } from './systems/cyclicParentingChecker'
 export * from './systems/events'
 export * from './systems/raycast'
 export * from './systems/videoEvents'
+export * from './systems/audioEvents'
 export * from './systems/assetLoad'
 export * from './systems/async-task'
 export * from './systems/tween'
@@ -42,7 +43,8 @@ import {
   LightSourceComponentDefinitionExtended,
   TriggerAreaComponentDefinitionExtended,
   ParticleSystemComponentDefinitionExtended,
-  ICreatedBy
+  ICreatedBy,
+  TouchScreenControlsComponentDefinitionExtended
 } from './components/types'
 import { NameComponent } from './components/manual/Name'
 import { TagsComponentDefinitionExtended } from './components/manual/Tags'
@@ -65,6 +67,8 @@ export const LightSource: LightSourceComponentDefinitionExtended = /* @__PURE__*
 export const TriggerArea: TriggerAreaComponentDefinitionExtended = /* @__PURE__*/ components.TriggerArea(engine)
 export const ParticleSystem: ParticleSystemComponentDefinitionExtended =
   /* @__PURE__*/ components.ParticleSystem(engine)
+export const TouchScreenControls: TouchScreenControlsComponentDefinitionExtended =
+  /* @__PURE__*/ components.TouchScreenControls(engine)
 
 /**
  * @alpha

@@ -121,7 +121,7 @@ describe('Video events helper system should', () => {
 
     await engine.update(1)
 
-    expect(fn).toBeCalledTimes(0)
+    expect(fn).toHaveBeenCalledTimes(0)
     expect(videoEventsSystem.hasVideoEventsEntity(videoPlayerEntity)).toBe(false)
   })
 

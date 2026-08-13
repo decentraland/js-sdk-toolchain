@@ -25,8 +25,8 @@ describe('utils/fs', () => {
     const dist = await fsUtils.download({ fs, fetch }, 'some/path', 'other/path')
 
     expect(dist).toBe('other/path')
-    expect(fetchSpy).toBeCalledWith('some/path')
-    expect(writeFileSpy).toBeCalledWith('other/path', Buffer.from(new ArrayBuffer(123)))
+    expect(fetchSpy).toHaveBeenCalledWith('some/path')
+    expect(writeFileSpy).toHaveBeenCalledWith('other/path', Buffer.from(new ArrayBuffer(123)))
   })
 
   it('fileExists directoryExists', async () => {
@@ -43,7 +43,7 @@ describe('utils/fs', () => {
     const dist = await fsUtils.extract('some/path', './other/path')
 
     expect(dist).toStrictEqual({ destPath: path.resolve('./other/path'), topLevelFolders: [] })
-    expect(extractSpy).toBeCalledWith(
+    expect(extractSpy).toHaveBeenCalledWith(
       resolve('some/path'),
       expect.objectContaining({
         dir: resolve(dist.destPath)
