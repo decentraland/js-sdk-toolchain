@@ -72,6 +72,7 @@ async function runApp(
   const landscapeTerrainEnabled = !!args['--landscape-terrain-enabled']
   const openDeeplinkInNewInstance = !!args['-n']
   const multiInstance = !!args['--multi-instance']
+  const assetBundles = !!args['--asset-bundles']
   const mcp = !!args['--mcp']
   const mcpPort = args['--mcp-port']
 
@@ -104,6 +105,11 @@ async function runApp(
     }
     if (multiInstance) {
       params.set('multi-instance', 'true')
+    }
+    if (assetBundles) {
+      // The explorer owns asset-bundle conversion: local-ab makes it spawn its own
+      // JIT converter against this preview's content server. No sidecar runs here.
+      params.set('local-ab', 'true')
     }
     if (mcp) {
       params.set('mcp', 'true')
