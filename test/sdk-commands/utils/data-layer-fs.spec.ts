@@ -92,9 +92,9 @@ describe('FsInterface', () => {
       expect(result).toEqual(expectedOutput)
     })
 
-    test('should throw an error when the path contains "/../"', async () => {
-      const input = 'scene/assets/../'
-      await expect(fsInterface.readdir(input)).rejects.toThrow('The usage of /../ is not allowed')
+    test('should throw an error when the path escapes the project directory', async () => {
+      const input = 'scene/assets/../../../outside'
+      await expect(fsInterface.readdir(input)).rejects.toThrow('Path is outside the project directory')
     })
   })
 })
