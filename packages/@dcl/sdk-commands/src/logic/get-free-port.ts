@@ -9,7 +9,10 @@ function tryListen(port: number): Promise<number> {
     const server = net.createServer()
     server.unref()
     server.once('error', reject)
-    server.listen(port, () => {
+    // probe the same address the servers bind (HTTP_SERVER_HOST=0.0.0.0): a hostless
+    // listen binds the IPv6 wildcard, which on macOS coexists with an IPv4 listener
+    // and reports ports as free that the real server then fails to bind (EADDRINUSE)
+    server.listen(port, '0.0.0.0', () => {
       const address = server.address()
       server.close(() => resolve(typeof address === 'object' && address ? address.port : port))
     })
