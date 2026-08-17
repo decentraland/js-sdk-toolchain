@@ -92,17 +92,9 @@ export interface IEngine {
    * @public
    * Remove all components of an entity
    * @param entity - entity
-   * @returns true if the entity id was released for reuse; false if it was not, which is the
-   *   case for every entity whose NUMBER falls in the renderer-reserved range
-   *   (`RESERVED_STATIC_ENTITIES`). The check is on the NUMBER, so it holds at every version:
-   *   `#32 v1` packs to `65568` and is refused just as `#32 v0` is.
-   *
-   *   The return value describes the id, not the components. Components are still purged for
-   *   RootEntity/PlayerEntity/CameraEntity — the scene authors those and the renderer applies
-   *   deletes for them — so a `false` there means "id not reusable", not "nothing happened".
-   *   Components are NOT purged for entities the renderer streams (the avatar range), because
-   *   the renderer keeps them alive and never re-sends, which would leave the scene holding a
-   *   permanently incomplete copy of a live player.
+   * @returns whether the entity id was released for reuse. Ids in the renderer-reserved range
+   *   are never released, at any version. Components are still purged for
+   *   RootEntity/PlayerEntity/CameraEntity, but not for the avatar range.
    */
   removeEntity(entity: Entity): boolean
 

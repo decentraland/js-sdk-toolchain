@@ -99,57 +99,17 @@ export type IEntityContainer = {
   releaseRemovedEntities(): Entity[]
   updateRemovedEntity(entity: Entity): boolean
   updateUsedEntity(entity: Entity): boolean
-
-  /**
-   * The exclusive upper bound of the renderer-reserved entity NUMBER range this container
-   * enforces — i.e. the `reservedStaticEntities` it was built with.
-   *
-   * `Engine.removeEntity` needs it to decide whether to purge an entity's components, and
-   * that decision has to agree with whether this container will release the id. Optional so
-   * a custom `IEntityContainer` passed via `IEngineOptions.entityContainer` stays
-   * source-compatible; when absent the engine falls back to `RESERVED_STATIC_ENTITIES`, which
-   * only matches if the container also uses the default.
-   */
-  readonly reservedStaticEntities?: number
 }
 
 /**
- * The three entity numbers a scene may legitimately author components on: RootEntity 0,
- * PlayerEntity 1, CameraEntity 2. Everything from here up to `reservedStaticEntities` is
- * STREAMED by the renderer (the avatar range) — a different ownership regime, see
- * `isRendererStreamedNumber`.
- */
-const NAMED_STATIC_ENTITIES = 3
-
-/**
- * True when `entity`'s NUMBER is below `bound`, i.e. renderer-owned.
+ * True when `entity`'s NUMBER falls in the renderer-reserved range, at any version.
  *
- * Module-scope and mask-based on purpose. Masking beats `EntityUtils.fromEntityId`, which
- * allocates a `[number, number]` tuple per call just to read the number, and this runs on
- * every removeEntity/updateRemovedEntity/updateUsedEntity. `entity & MAX_U16` already lands
- * in [0, 65535], so fromEntityId's `>>> 0` is a no-op for the comparison. Declaring it out
- * here rather than inside the factory also avoids a closure per container.
+ * Masks rather than calling `EntityUtils.fromEntityId`, which allocates a tuple per call to
+ * read one number; this runs on every inbound CRDT message. `entity & MAX_U16` already lands
+ * in [0, 65535], so the `>>> 0` fromEntityId applies is a no-op here.
  */
-function isReservedNumber(entity: Entity, bound: number): boolean {
-  return (entity & MAX_U16) < bound
-}
-
-/**
- * True when the renderer STREAMS this entity's components, so a scene must not purge them
- * locally: the renderer keeps the entity alive and never re-sends, and the scene's outgoing
- * deletes are dropped by its write guard.
- *
- * Deliberately NOT the whole reserved range. The renderer denies scene component ops only on
- * the avatar range; ops on RootEntity/PlayerEntity/CameraEntity pass through and ARE applied
- * — that is how `InputModifier.deleteFrom(engine.PlayerEntity)` clears an input lock, and its
- * wire frame is byte-identical to the one a removal emits. Treating those three like avatars
- * would silently turn a working removal into a no-op.
- *
- * @internal
- */
-export function isRendererStreamedNumber(entity: Entity, bound: number = RESERVED_STATIC_ENTITIES): boolean {
-  const entityNumber = (entity & MAX_U16) >>> 0
-  return entityNumber >= NAMED_STATIC_ENTITIES && entityNumber < bound
+function isReservedEntity(entity: Entity, reservedStaticEntities: number): boolean {
+  return (entity & MAX_U16) < reservedStaticEntities
 }
 
 /**
@@ -194,12 +154,10 @@ export function createEntityContainer(opts?: { reservedStaticEntities: number })
     }
 
     for (const [number, version] of removedEntities.getMap()) {
-      // Skip renderer-reserved numbers. `removedEntities` is keyed by entity NUMBER,
-      // and a DELETE_ENTITY arriving from the renderer for a remote player's avatar
-      // slot used to seed one here (see updateRemovedEntity); recycling it handed the
-      // scene an id the renderer independently reissues to the next joining peer —
-      // both sides compute toEntityId(number, version + 1) from the same stored
-      // version, so the two allocators produce the identical id in lockstep.
+      // Never recycle a renderer-reserved number: the renderer reissues those slots as
+      // toEntityId(number, version + 1) too, from the same stored version, so it would hand
+      // the scene an id belonging to a live remote player. Belt-and-braces — every writer
+      // into `removedEntities` refuses reserved numbers, so this cannot fire today.
       if (number >= reservedStaticEntities && version < MAX_U16) {
         const entity = EntityUtils.toEntityId(number, version + 1)
         // If the entity is not being used, we can re-use it
@@ -215,7 +173,7 @@ export function createEntityContainer(opts?: { reservedStaticEntities: number })
   }
 
   function removeEntity(entity: Entity) {
-    if (isReservedNumber(entity, reservedStaticEntities)) return false
+    if (isReservedEntity(entity, reservedStaticEntities)) return false
 
     if (usedEntities.has(entity)) {
       usedEntities.delete(entity)
@@ -242,13 +200,11 @@ export function createEntityContainer(opts?: { reservedStaticEntities: number })
   }
 
   function updateRemovedEntity(entity: Entity) {
-    // The CRDT receive path calls this for EVERY inbound DELETE_ENTITY, including the
-    // renderer's own tombstones for departed remote players. Recording a reserved
-    // number here is what fed it to generateEntity's recycling loop; refuse it at the
-    // door so the free list only ever holds numbers this container owns. Reserved
-    // numbers need no tombstone anyway — getEntityState reports them as `Reserved`
-    // before it ever consults `removedEntities`, so `Removed` is unreachable for them.
-    if (isReservedNumber(entity, reservedStaticEntities)) return false
+    // Called for EVERY inbound DELETE_ENTITY, including the renderer's tombstones for
+    // departed remote players — so this is the door reserved numbers would otherwise enter
+    // the free list through. They need no tombstone: getEntityState reports them Reserved
+    // before it consults `removedEntities`, so `Removed` is unreachable for them anyway.
+    if (isReservedEntity(entity, reservedStaticEntities)) return false
 
     const [n, v] = EntityUtils.fromEntityId(entity)
 
@@ -264,11 +220,10 @@ export function createEntityContainer(opts?: { reservedStaticEntities: number })
   }
 
   function updateUsedEntity(entity: Entity) {
-    // Same invariant as updateRemovedEntity: this container tracks only the numbers it
-    // owns. Reserved numbers are unreachable from the CRDT path today (getEntityState
-    // returns `Reserved`, never `Unknown`, so nothing calls this for them), but the
-    // `v > 0` branch below would seed `removedEntities` with a reserved number too.
-    if (isReservedNumber(entity, reservedStaticEntities)) return false
+    // Same invariant as updateRemovedEntity. Unreachable from the CRDT path today
+    // (getEntityState returns `Reserved`, never `Unknown`), but the `v > 0` branch below
+    // would seed `removedEntities` with a reserved number.
+    if (isReservedEntity(entity, reservedStaticEntities)) return false
 
     const [n, v] = EntityUtils.fromEntityId(entity)
 
@@ -287,10 +242,13 @@ export function createEntityContainer(opts?: { reservedStaticEntities: number })
   }
 
   function getEntityState(entity: Entity): EntityState {
-    const [n, v] = EntityUtils.fromEntityId(entity)
-    if (n < reservedStaticEntities) {
+    // Same guard as the three above, so `Engine.removeEntity` — which classifies via
+    // getEntityState — cannot disagree with whether this container releases the id.
+    if (isReservedEntity(entity, reservedStaticEntities)) {
       return EntityState.Reserved
     }
+
+    const [n, v] = EntityUtils.fromEntityId(entity)
 
     if (usedEntities.has(entity)) {
       return EntityState.UsedEntity
@@ -305,7 +263,6 @@ export function createEntityContainer(opts?: { reservedStaticEntities: number })
   }
 
   return {
-    reservedStaticEntities,
     generateEntity,
     removeEntity,
     getExistingEntities(): Set<Entity> {

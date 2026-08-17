@@ -18,10 +18,6 @@ import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
  * returned an id the renderer independently reissued to the next joining peer. Both
  * sides derive `toEntityId(number, version + 1)` from the same stored version, so the
  * two allocators produce the identical id rather than merely overlapping ranges.
- *
- * Imports avoid the package barrel (`packages/@dcl/ecs/src`) deliberately: it eagerly
- * instantiates extended components and cannot be required from a spec without a prior
- * codegen build.
  */
 describe('Reserved entity range ownership', () => {
   const AVATAR_SLOT_NUMBER = 32
@@ -32,14 +28,12 @@ describe('Reserved entity range ownership', () => {
     let entityContainer: IEntityContainer
     let avatarSlot: Entity
 
-    // Two preconditions are BOTH required for the production bug, and getting either wrong
-    // makes the test vacuous — an earlier version of this setup passed against the unfixed
-    // container. First, a standing allocation deficit, so generateEntity() reaches its
-    // recycling loop instead of short-circuiting to generateNewEntity(). Second, the avatar
-    // number has to be recorded BEFORE any recyclable scene number, because `removedEntities`
-    // is a Map iterated in insertion order and the loop returns the FIRST eligible entry — if
-    // scene number 512 is recorded first, it is handed out and the avatar key is never
-    // reached, hiding the defect.
+    // Two preconditions are both required, and getting either wrong makes these tests vacuous.
+    // First, a standing allocation deficit, so generateEntity() reaches its recycling loop
+    // instead of short-circuiting to generateNewEntity(). Second, the avatar number must be
+    // recorded BEFORE any recyclable scene number: `removedEntities` is a Map iterated in
+    // insertion order and the loop returns the first eligible entry, so a scene number
+    // recorded first is handed out and the avatar key is never reached.
     beforeEach(() => {
       entityContainer = createEntityContainer()
       avatarSlot = EntityUtils.toEntityId(AVATAR_SLOT_NUMBER, 0)
@@ -83,7 +77,7 @@ describe('Reserved entity range ownership', () => {
 
     // Guards the setup itself: if the deficit disappears, generateEntity() short-circuits and
     // the test above passes for the wrong reason.
-    it('should have left the container in the recycling branch, so the test above can fire', () => {
+    it('should recycle a released number, confirming the allocation deficit', () => {
       const generated = entityContainer.generateEntity()
 
       expect(EntityUtils.fromEntityId(generated)[1]).toBeGreaterThan(0)
@@ -97,13 +91,10 @@ describe('Reserved entity range ownership', () => {
     const COMPOSITE_ENTITY_COUNT = 230
 
     beforeEach(() => {
-      // The define has to be set for real, not simulated. An earlier version of this block
-      // only marked entities used, which leaves `entityCounter` at 512 — so
-      // `usedSize + 512 >= entityCounter` held, generateEntity() short-circuited to
-      // generateNewEntity(), and the recycling loop this exists to test was never entered.
       // createEntityContainer reads the define at call time, so assigning the global first
-      // reproduces the build faithfully: counter starts at 746 while only 230 composite
-      // entities are ever marked used, leaving a permanent deficit of 4.
+      // reproduces the build: the counter starts at 746 while only 230 composite entities are
+      // ever marked used, leaving a permanent deficit of 4. Marking entities used without the
+      // define leaves the counter at 512 and never enters the recycling loop at all.
       ;(globalThis as unknown as { DCL_MAX_COMPOSITE_ENTITY: number }).DCL_MAX_COMPOSITE_ENTITY = MAX_COMPOSITE_ENTITY
       entityContainer = createEntityContainer()
       for (let i = 0; i < COMPOSITE_ENTITY_COUNT; i++) {
@@ -245,6 +236,50 @@ describe('Reserved entity range ownership', () => {
 
         expect(Owned.getOrNull(rendererOwned)).not.toBeNull()
       })
+    })
+  })
+
+  // The renderer applies scene component ops on the three named static entities — that is how
+  // InputModifier.deleteFrom(engine.PlayerEntity) clears an input lock — so a removal must
+  // still purge them, even though their ids are reserved and never released.
+  describe('when a scene removes a named static entity', () => {
+    let engine: ReturnType<typeof Engine>
+    let InputLock: ReturnType<ReturnType<typeof Engine>['defineComponent']>
+
+    beforeEach(() => {
+      engine = Engine()
+      InputLock = engine.defineComponent('test::lock', { value: Schemas.Boolean })
+      InputLock.create(engine.PlayerEntity, { value: true })
+    })
+
+    it('should refuse to release the id', () => {
+      expect(engine.removeEntity(engine.PlayerEntity)).toBe(false)
+    })
+
+    it('should still purge its components, unlike an avatar entity', () => {
+      engine.removeEntity(engine.PlayerEntity)
+
+      expect(InputLock.getOrNull(engine.PlayerEntity)).toBeNull()
+    })
+
+    it('should purge the RootEntity too, the lowest named static number', () => {
+      InputLock.create(engine.RootEntity, { value: true })
+
+      engine.removeEntity(engine.RootEntity)
+
+      expect(InputLock.getOrNull(engine.RootEntity)).toBeNull()
+    })
+
+    // The boundary itself: number 3 is the first NON-named reserved number, so it must behave
+    // like an avatar entity, not like the camera. Collapsing NAMED_STATIC_ENTITIES to 0 or
+    // widening it to 4 both break exactly here.
+    it('should NOT purge the first number above the named statics', () => {
+      const firstAvatarNumber = EntityUtils.toEntityId(3, 0)
+      InputLock.create(firstAvatarNumber, { value: true })
+
+      engine.removeEntity(firstAvatarNumber)
+
+      expect(InputLock.getOrNull(firstAvatarNumber)).not.toBeNull()
     })
   })
 

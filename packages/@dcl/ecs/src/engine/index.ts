@@ -8,7 +8,7 @@ import { ByteBuffer } from '../serialization/ByteBuffer'
 import { crdtSceneSystem, OnChangeFunction } from '../systems/crdt'
 import { ComponentDefinition } from './component'
 import { createComponentDefinitionFromSchema } from './lww-element-set-component-definition'
-import { Entity, createEntityContainer, isRendererStreamedNumber } from './entity'
+import { Entity, EntityState, EntityUtils, createEntityContainer } from './entity'
 import { ReadonlyComponentSchema } from './readonly'
 import { SystemItem, SystemContainer, SystemFn, SYSTEMS_REGULAR_PRIORITY } from './systems'
 import type {
@@ -28,6 +28,9 @@ export * from './input'
 export * from './readonly'
 export * from './types'
 export { Entity, ByteBuffer, SystemItem, OnChangeFunction }
+
+/** RootEntity 0, PlayerEntity 1, CameraEntity 2 — see the engineInstance fields below. */
+const NAMED_STATIC_ENTITIES = 3
 
 function preEngine(options?: IEngineOptions): PreEngine {
   const entityContainer = options?.entityContainer ?? createEntityContainer()
@@ -49,34 +52,26 @@ function preEngine(options?: IEngineOptions): PreEngine {
     return entity
   }
   function removeEntity(entity: Entity) {
-    const released = entityContainer.removeEntity(entity)
+    // The renderer streams the avatar range and drops the scene's deletes there, so purging
+    // locally is permanent: a one-shot component like PlayerIdentityData is never re-sent, and
+    // the entity is left as a moving Transform with no identity. The three named static
+    // entities are reserved too, but the renderer DOES apply scene deletes on them — that is
+    // how InputModifier.deleteFrom(engine.PlayerEntity) clears an input lock — so they must
+    // still be purged. Asking the container keeps this in step with whether it releases the
+    // id, including for a custom container with a different reserved range.
+    const [entityNumber] = EntityUtils.fromEntityId(entity)
+    const isAvatarEntity =
+      entityNumber >= NAMED_STATIC_ENTITIES && entityContainer.getEntityState(entity) === EntityState.Reserved
 
-    // Skip the component purge ONLY for entities the renderer streams — the avatar range.
-    // Purging those desynchronizes the scene with no path back: the outgoing deletes are
-    // dropped by the renderer's write guard, so it keeps the entity alive and never re-sends.
-    // A streamed component (Transform) returns once the renderer's timestamp passes the one
-    // the scene left behind, but a one-shot one (PlayerIdentityData) stays gone for the rest
-    // of that peer's session, leaving a moving Transform with no identity that is invisible to
-    // every getEntitiesWith(PlayerIdentityData, ...) query.
-    //
-    // NOT the whole reserved range: the renderer denies scene component ops only on the avatar
-    // range, so deletes on RootEntity/PlayerEntity/CameraEntity DO reach it and are applied.
-    // Skipping those would silently break a working removal — the frame is byte-identical to
-    // InputModifier.deleteFrom(engine.PlayerEntity).
-    // Bound taken from the CONTAINER, not the module default, so the purge decision and the
-    // id-release decision cannot disagree. They are two halves of one question, and a custom
-    // container injected via IEngineOptions.entityContainer may enforce a different range: with
-    // a larger one the purge would run on entities the container treats as renderer-owned, and
-    // with a smaller one it would be skipped for scene-owned entities whose ids ARE released —
-    // leaving a "removed" entity still visible to getEntitiesWith with its data intact.
-    if (!isRendererStreamedNumber(entity, entityContainer.reservedStaticEntities)) {
-      for (const [, component] of componentsDefinition) {
-        // TODO: hack for the moment.
-        // We still need the NetworkEntity to forward this message to the SyncTransport.
-        // If we remove it then we can't notify the other users which entity was deleted.
-        if (component.componentName === 'core-schema::Network-Entity') continue
-        component.entityDeleted(entity, true)
-      }
+    const released = entityContainer.removeEntity(entity)
+    if (isAvatarEntity) return released
+
+    for (const [, component] of componentsDefinition) {
+      // TODO: hack for the moment.
+      // We still need the NetworkEntity to forward this message to the SyncTransport.
+      // If we remove it then we can't notify the other users which entity was deleted.
+      if (component.componentName === 'core-schema::Network-Entity') continue
+      component.entityDeleted(entity, true)
     }
 
     return released
