@@ -128,8 +128,11 @@ export function createEntityContainer(opts?: { reservedStaticEntities: number })
    * scene locally destroy a live remote player's entity.
    */
   function isReservedEntityNumber(entity: Entity): boolean {
-    const [entityNumber] = EntityUtils.fromEntityId(entity)
-    return entityNumber < reservedStaticEntities
+    // Masks inline rather than calling EntityUtils.fromEntityId, which allocates a
+    // [number, number] tuple per call — wasteful when only the number is wanted, and this
+    // runs on every removeEntity/updateRemovedEntity/updateUsedEntity. `entity & MAX_U16`
+    // is already in [0, 65535], so fromEntityId's `>>> 0` is a no-op for this comparison.
+    return (entity & MAX_U16) < reservedStaticEntities
   }
 
   function generateNewEntity(): Entity {
