@@ -92,8 +92,18 @@ export interface IEngine {
    * @public
    * Remove all components of an entity
    * @param entity - entity
+   * @returns true if the entity was removed; false if the removal was refused, leaving the
+   *   entity's components untouched. A removal is refused when the entity's NUMBER falls in
+   *   the renderer-reserved range (`RESERVED_STATIC_ENTITIES`): the root, player and camera
+   *   entities, plus the range the avatar system allocates remote players from. Those belong
+   *   to the renderer rather than the scene, and purging them locally desynchronizes the
+   *   scene with no way back — the outgoing deletes are dropped by the renderer's scene
+   *   write guard, so it keeps the entity alive and never re-sends the components.
+   *
+   *   The check is on the entity NUMBER, so it holds at every version: `#32 v1` packs to
+   *   `65568` and is refused just as `#32 v0` is.
    */
-  removeEntity(entity: Entity): void
+  removeEntity(entity: Entity): boolean
 
   /**
    * Remove all components of each entity in the tree made with Transform parenting
