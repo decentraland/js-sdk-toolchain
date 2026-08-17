@@ -16,10 +16,29 @@ export interface ServerStorage {
   players: Record<string, Record<string, unknown>>
 }
 
-const DEFAULT_STORAGE: ServerStorage = {
-  env: {},
-  world: {},
-  players: {}
+function createDefaultStorage(): ServerStorage {
+  return {
+    env: {},
+    world: {},
+    players: {}
+  }
+}
+
+let writeQueue: Promise<unknown> = Promise.resolve()
+
+/**
+ * Serializes read-modify-write cycles against server-storage.json. The entire
+ * load→mutate→save must run under one lock: two handlers that each load the same
+ * snapshot would otherwise lose one update, and two concurrent saves would interleave
+ * their writes into a corrupt file.
+ */
+function serialize<T>(task: () => Promise<T>): Promise<T> {
+  const run = writeQueue.then(task, task)
+  writeQueue = run.then(
+    () => undefined,
+    () => undefined
+  )
+  return run
 }
 
 /**
@@ -45,13 +64,12 @@ export async function loadServerStorage(components: Pick<CliComponents, 'fs' | '
   try {
     const exists = await components.fs.fileExists(storagePath)
     if (!exists) {
-      return { ...DEFAULT_STORAGE }
+      return createDefaultStorage()
     }
 
     const content = await components.fs.readFile(storagePath, 'utf-8')
     const parsed = JSON.parse(content) as Partial<ServerStorage>
 
-    // Merge with defaults to ensure all keys exist
     return {
       env: parsed.env ?? {},
       world: parsed.world ?? {},
@@ -59,7 +77,7 @@ export async function loadServerStorage(components: Pick<CliComponents, 'fs' | '
     }
   } catch (error) {
     components.logger.error(`Failed to load ${SERVER_STORAGE_FILE}: ${error}`)
-    return { ...DEFAULT_STORAGE }
+    return createDefaultStorage()
   }
 }
 
@@ -74,7 +92,9 @@ export async function saveServerStorage(
   const storagePath = path.join(RUNTIME_DATA_DIR, SERVER_STORAGE_FILE)
 
   try {
-    await components.fs.writeFile(storagePath, JSON.stringify(data, null, 2))
+    const tmpPath = `${storagePath}.tmp`
+    await components.fs.writeFile(tmpPath, JSON.stringify(data, null, 2))
+    await components.fs.rename(tmpPath, storagePath)
   } catch (error) {
     components.logger.error(`Failed to save ${SERVER_STORAGE_FILE}: ${error}`)
     throw error
@@ -163,9 +183,11 @@ export async function setEnvValue(
   key: string,
   value: string
 ): Promise<void> {
-  const storage = await loadServerStorage(components)
-  storage.env[key] = value
-  await saveServerStorage(components, storage)
+  return serialize(async () => {
+    const storage = await loadServerStorage(components)
+    storage.env[key] = value
+    await saveServerStorage(components, storage)
+  })
 }
 
 /**
@@ -173,13 +195,15 @@ export async function setEnvValue(
  * Returns true if key existed and was deleted, false otherwise.
  */
 export async function deleteEnvValue(components: Pick<CliComponents, 'fs' | 'logger'>, key: string): Promise<boolean> {
-  const storage = await loadServerStorage(components)
-  if (!(key in storage.env)) {
-    return false
-  }
-  delete storage.env[key]
-  await saveServerStorage(components, storage)
-  return true
+  return serialize(async () => {
+    const storage = await loadServerStorage(components)
+    if (!(key in storage.env)) {
+      return false
+    }
+    delete storage.env[key]
+    await saveServerStorage(components, storage)
+    return true
+  })
 }
 
 /**
@@ -211,9 +235,11 @@ export async function setWorldValue(
   key: string,
   value: unknown
 ): Promise<void> {
-  const storage = await loadServerStorage(components)
-  storage.world[key] = value
-  await saveServerStorage(components, storage)
+  return serialize(async () => {
+    const storage = await loadServerStorage(components)
+    storage.world[key] = value
+    await saveServerStorage(components, storage)
+  })
 }
 
 /**
@@ -224,13 +250,15 @@ export async function deleteWorldValue(
   components: Pick<CliComponents, 'fs' | 'logger'>,
   key: string
 ): Promise<boolean> {
-  const storage = await loadServerStorage(components)
-  if (!(key in storage.world)) {
-    return false
-  }
-  delete storage.world[key]
-  await saveServerStorage(components, storage)
-  return true
+  return serialize(async () => {
+    const storage = await loadServerStorage(components)
+    if (!(key in storage.world)) {
+      return false
+    }
+    delete storage.world[key]
+    await saveServerStorage(components, storage)
+    return true
+  })
 }
 
 /**
@@ -254,12 +282,14 @@ export async function setPlayerValue(
   key: string,
   value: unknown
 ): Promise<void> {
-  const storage = await loadServerStorage(components)
-  if (!storage.players[address]) {
-    storage.players[address] = {}
-  }
-  storage.players[address][key] = value
-  await saveServerStorage(components, storage)
+  return serialize(async () => {
+    const storage = await loadServerStorage(components)
+    if (!storage.players[address]) {
+      storage.players[address] = {}
+    }
+    storage.players[address][key] = value
+    await saveServerStorage(components, storage)
+  })
 }
 
 /**
@@ -271,11 +301,13 @@ export async function deletePlayerValue(
   address: string,
   key: string
 ): Promise<boolean> {
-  const storage = await loadServerStorage(components)
-  if (!storage.players[address] || !(key in storage.players[address])) {
-    return false
-  }
-  delete storage.players[address][key]
-  await saveServerStorage(components, storage)
-  return true
+  return serialize(async () => {
+    const storage = await loadServerStorage(components)
+    if (!storage.players[address] || !(key in storage.players[address])) {
+      return false
+    }
+    delete storage.players[address][key]
+    await saveServerStorage(components, storage)
+    return true
+  })
 }
