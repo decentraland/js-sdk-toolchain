@@ -46,6 +46,25 @@ describe('Reserved entity range ownership', () => {
       expect(entityContainer.updateRemovedEntity(avatarSlot)).toBe(false)
     })
 
+    // updateUsedEntity is unreachable for reserved numbers from the CRDT path, because
+    // getEntityState returns `Reserved` rather than `Unknown` and only `Unknown` calls it.
+    // Asserted anyway: it is public on IEntityContainer, and its `v > 0` branch would
+    // otherwise seed removedEntities with a reserved number — the same defect by a
+    // different door.
+    it('should refuse to mark a reserved entity number as used', () => {
+      expect(entityContainer.updateUsedEntity(avatarSlot)).toBe(false)
+    })
+
+    it('should refuse to mark a recycled reserved entity number as used', () => {
+      expect(entityContainer.updateUsedEntity(EntityUtils.toEntityId(AVATAR_SLOT_NUMBER, 4))).toBe(false)
+    })
+
+    it('should not expose a reserved entity number as an existing entity', () => {
+      entityContainer.updateUsedEntity(avatarSlot)
+
+      expect(Array.from(entityContainer.getExistingEntities())).not.toContain(avatarSlot)
+    })
+
     it('should never generate an entity inside the reserved range afterwards', () => {
       entityContainer.updateRemovedEntity(avatarSlot)
 
