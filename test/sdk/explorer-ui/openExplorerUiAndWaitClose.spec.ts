@@ -3,15 +3,12 @@ import { AppendValueOperation } from '../../../packages/@dcl/ecs/src/serializati
 import { DeleteEntity } from '../../../packages/@dcl/ecs/src/serialization/crdt/deleteEntity'
 import { ReadWriteByteBuffer } from '../../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { Transport } from '../../../packages/@dcl/ecs/src/systems/crdt/types'
-// Type-only import: erased at runtime, so it does NOT evaluate the `~system` mock
-// factory (which would trip the mock-variable TDZ during module hoisting).
+// Type-only: erased at runtime, so it does not evaluate the `~system` mock
+// factory before `mockOpenExplorerUi` is initialized.
 import type { OpenExplorerUiAndWaitCloseResult } from '../../../packages/@dcl/sdk/src/explorer-ui'
 
-// The helper module statically imports `openExplorerUi` + `OpenExplorerUiResult`
-// from `~system/RestrictedActions`, which jest cannot resolve on its own; the
-// virtual mock makes the import (and the enum values the helper compares
-// against) resolvable. The tests below drive the factory with their own engine
-// and mocked RPC, so this stub only has to exist and expose the enum.
+// The helper imports from `~system/RestrictedActions`, which jest cannot
+// resolve on its own; this virtual mock provides the module and the enum values.
 const mockOpenExplorerUi = jest.fn()
 
 jest.mock(
@@ -31,8 +28,7 @@ jest.mock(
   { virtual: true }
 )
 
-// Loaded lazily in beforeAll (after the mock variable is initialized) so the
-// helper's `~system/RestrictedActions` import resolves against the mock above.
+// Imported lazily so the helper resolves `~system/RestrictedActions` against the mock above.
 let createOpenExplorerUiAndWaitClose: typeof import('../../../packages/@dcl/sdk/src/explorer-ui').createOpenExplorerUiAndWaitClose
 let EXPLORER_UI_WAIT_CLOSE_TIMEOUT_SYSTEM: string
 let OpenExplorerUiResult: typeof import('~system/RestrictedActions').OpenExplorerUiResult
@@ -47,8 +43,7 @@ beforeAll(async () => {
 type OpenExplorerUiResultType = import('~system/RestrictedActions').OpenExplorerUiResult
 type OpenFn = (request: { ui: ExplorerUi }) => Promise<{ openResult: OpenExplorerUiResultType }>
 
-/** Resolves after all currently-queued microtasks, so the RPC continuation and
- * the waiter registration inside the helper have run. */
+/** Lets queued microtasks run: the RPC continuation and the waiter registration. */
 function flush(): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, 0))
 }
@@ -95,10 +90,8 @@ describe('openExplorerUiAndWaitClose', () => {
     event: { $case: 'closed', closed: {} }
   })
 
-  // The public engine only exposes addSystem/removeSystem (not getSystems), so
-  // presence is probed via removeSystem: it returns false when no system with
-  // that name exists. Only call this where the system is expected to be ABSENT
-  // (a true return would have the side effect of removing it).
+  // The engine has no getSystems; removeSystem returns false when the system
+  // is absent. Only call where absence is expected — a true return removes it.
   function timeoutSystemAbsent() {
     return engine.removeSystem(EXPLORER_UI_WAIT_CLOSE_TIMEOUT_SYSTEM) === false
   }
@@ -161,8 +154,7 @@ describe('openExplorerUiAndWaitClose', () => {
     })
     await flush()
 
-    // The timeout system being armed is verified indirectly: it is the only
-    // thing that can resolve this promise below.
+    // The armed timeout system is the only thing that can resolve this promise.
     await engine.update(0.5) // 500ms accumulated
     expect(settled).toBeUndefined()
 
@@ -214,13 +206,12 @@ describe('openExplorerUiAndWaitClose', () => {
     const promise = openExplorerUiAndWaitClose({ ui: ExplorerUi.EU_PLACES })
     await flush()
 
-    // opened + closed land while the RPC is still in flight — no waiter exists yet,
-    // so onChange drops them; they only survive in the accumulated set.
+    // opened + closed land while the RPC is in flight — no waiter exists yet,
+    // so they only survive in the accumulated set.
     await injectEvent(opened(ExplorerUi.EU_PLACES, 10))
     await injectEvent(closed(ExplorerUi.EU_PLACES, 11))
 
-    // Now the RPC resolves OPENED; the waiter registers and the snapshot scan
-    // must recover the already-accumulated opened + closed.
+    // The waiter registers late; the replay scan must recover both events.
     rpc.resolve({ openResult: OpenExplorerUiResult.OPENED })
     const result = await promise
     expect(result.closed).toEqual(closed(ExplorerUi.EU_PLACES, 11))
@@ -282,8 +273,7 @@ describe('openExplorerUiAndWaitClose', () => {
     await injectEvent(closed(ExplorerUi.EU_MAP, 11))
     expect((await w1).closed).toEqual(closed(ExplorerUi.EU_MAP, 11))
 
-    // w2 arms late; its replay over the accumulated set must SKIP the consumed
-    // 10/11 pair instead of anchoring on it and resolving with closed@11.
+    // w2 arms late; its replay must skip the consumed 10/11 pair.
     rpc2.resolve({ openResult: OpenExplorerUiResult.OPENED })
     await flush()
     expect(w2settled).toBeUndefined()
@@ -310,8 +300,7 @@ describe('openExplorerUiAndWaitClose', () => {
     })
     await flush()
 
-    // w1's session events arrive late: the orphaned opened@10 must be swallowed
-    // (not anchor w2) and its closed@11 must not resolve w2.
+    // w1's events arrive late: opened@10 must be swallowed, closed@11 must not resolve w2.
     await injectEvent(opened(ExplorerUi.EU_MAP, 10))
     await injectEvent(closed(ExplorerUi.EU_MAP, 11))
     expect(w2settled).toBe(false)
