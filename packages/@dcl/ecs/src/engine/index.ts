@@ -49,6 +49,17 @@ function preEngine(options?: IEngineOptions): PreEngine {
     return entity
   }
   function removeEntity(entity: Entity) {
+    // Ask the container FIRST and purge only if it accepts. It rejects renderer-owned
+    // entity numbers (root, player, camera, the avatar range), and purging those anyway
+    // desynchronizes the scene from the renderer with no path back: the outgoing
+    // DELETE_COMPONENT/DELETE_ENTITY ops are dropped by the renderer's scene write
+    // guard, so the renderer keeps the entity alive and never learns to re-send. A
+    // streamed component (Transform) recovers on the next packet, but a one-shot one
+    // (PlayerIdentityData) stays gone for the rest of that peer's session — the entity
+    // is then a moving Transform with no identity, invisible to every
+    // getEntitiesWith(PlayerIdentityData, ...) query the scene makes.
+    if (!entityContainer.removeEntity(entity)) return false
+
     for (const [, component] of componentsDefinition) {
       // TODO: hack for the moment.
       // We still need the NetworkEntity to forward this message to the SyncTransport.
@@ -57,7 +68,7 @@ function preEngine(options?: IEngineOptions): PreEngine {
       component.entityDeleted(entity, true)
     }
 
-    return entityContainer.removeEntity(entity)
+    return true
   }
 
   function removeEntityWithChildren(entity: Entity) {

@@ -115,6 +115,23 @@ export function createEntityContainer(opts?: { reservedStaticEntities: number })
   let toRemoveEntities: Entity[] = []
   const removedEntities = createVersionGSet()
 
+  /**
+   * The renderer owns every entity NUMBER below `reservedStaticEntities`, at EVERY
+   * version: the static entities (root 0, player 1, camera 2) and the range the
+   * avatar-communication system allocates remote players from. This container must
+   * never generate one, recycle one, or record one in its free list.
+   *
+   * Always decompose — never compare the packed id against `reservedStaticEntities`.
+   * The version lives in the upper 16 bits, so a packed reserved id is only below
+   * 512 while its version is 0: number 32 version 1 packs to 65568, which sails
+   * through a raw comparison. `removeEntity` had exactly that bug, which let a
+   * scene locally destroy a live remote player's entity.
+   */
+  function isReservedEntityNumber(entity: Entity): boolean {
+    const [entityNumber] = EntityUtils.fromEntityId(entity)
+    return entityNumber < reservedStaticEntities
+  }
+
   function generateNewEntity(): Entity {
     if (entityCounter > MAX_ENTITY_NUMBER - 1) {
       throw new Error(`It fails trying to generate an entity out of range ${MAX_ENTITY_NUMBER}.`)
@@ -143,7 +160,13 @@ export function createEntityContainer(opts?: { reservedStaticEntities: number })
     }
 
     for (const [number, version] of removedEntities.getMap()) {
-      if (version < MAX_U16) {
+      // Skip renderer-reserved numbers. `removedEntities` is keyed by entity NUMBER,
+      // and a DELETE_ENTITY arriving from the renderer for a remote player's avatar
+      // slot used to seed one here (see updateRemovedEntity); recycling it handed the
+      // scene an id the renderer independently reissues to the next joining peer —
+      // both sides compute toEntityId(number, version + 1) from the same stored
+      // version, so the two allocators produce the identical id in lockstep.
+      if (number >= reservedStaticEntities && version < MAX_U16) {
         const entity = EntityUtils.toEntityId(number, version + 1)
         // If the entity is not being used, we can re-use it
         // If the entity was removed in this tick, we're not counting for the usedEntities, but we have it in the toRemoveEntityArray
@@ -158,7 +181,7 @@ export function createEntityContainer(opts?: { reservedStaticEntities: number })
   }
 
   function removeEntity(entity: Entity) {
-    if (entity < reservedStaticEntities) return false
+    if (isReservedEntityNumber(entity)) return false
 
     if (usedEntities.has(entity)) {
       usedEntities.delete(entity)
@@ -185,6 +208,14 @@ export function createEntityContainer(opts?: { reservedStaticEntities: number })
   }
 
   function updateRemovedEntity(entity: Entity) {
+    // The CRDT receive path calls this for EVERY inbound DELETE_ENTITY, including the
+    // renderer's own tombstones for departed remote players. Recording a reserved
+    // number here is what fed it to generateEntity's recycling loop; refuse it at the
+    // door so the free list only ever holds numbers this container owns. Reserved
+    // numbers need no tombstone anyway — getEntityState reports them as `Reserved`
+    // before it ever consults `removedEntities`, so `Removed` is unreachable for them.
+    if (isReservedEntityNumber(entity)) return false
+
     const [n, v] = EntityUtils.fromEntityId(entity)
 
     // Update the removed entities map
@@ -199,6 +230,12 @@ export function createEntityContainer(opts?: { reservedStaticEntities: number })
   }
 
   function updateUsedEntity(entity: Entity) {
+    // Same invariant as updateRemovedEntity: this container tracks only the numbers it
+    // owns. Reserved numbers are unreachable from the CRDT path today (getEntityState
+    // returns `Reserved`, never `Unknown`, so nothing calls this for them), but the
+    // `v > 0` branch below would seed `removedEntities` with a reserved number too.
+    if (isReservedEntityNumber(entity)) return false
+
     const [n, v] = EntityUtils.fromEntityId(entity)
 
     // if the entity was removed then abort fast
