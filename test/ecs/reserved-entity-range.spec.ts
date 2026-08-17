@@ -32,13 +32,23 @@ describe('Reserved entity range ownership', () => {
     let entityContainer: IEntityContainer
     let avatarSlot: Entity
 
+    // Two preconditions are BOTH required for the production bug, and getting either wrong
+    // makes the test vacuous — an earlier version of this setup passed against the unfixed
+    // container. First, a standing allocation deficit, so generateEntity() reaches its
+    // recycling loop instead of short-circuiting to generateNewEntity(). Second, the avatar
+    // number has to be recorded BEFORE any recyclable scene number, because `removedEntities`
+    // is a Map iterated in insertion order and the loop returns the FIRST eligible entry — if
+    // scene number 512 is recorded first, it is handed out and the avatar key is never
+    // reached, hiding the defect.
     beforeEach(() => {
       entityContainer = createEntityContainer()
       avatarSlot = EntityUtils.toEntityId(AVATAR_SLOT_NUMBER, 0)
-      // Release one scene-owned entity so generateEntity() reaches its recycling branch
-      // instead of short-circuiting to generateNewEntity().
-      const sceneOwned = entityContainer.generateEntity()
-      entityContainer.removeEntity(sceneOwned)
+      // 4 allocations, then 2 released -> counter 516, used 2 -> deficit of 2.
+      const owned = Array.from({ length: 4 }, () => entityContainer.generateEntity())
+      // Avatar tombstone FIRST, so its key leads the insertion order.
+      entityContainer.updateRemovedEntity(avatarSlot)
+      entityContainer.removeEntity(owned[0])
+      entityContainer.removeEntity(owned[1])
       entityContainer.releaseRemovedEntities()
     })
 
@@ -66,27 +76,49 @@ describe('Reserved entity range ownership', () => {
     })
 
     it('should never generate an entity inside the reserved range afterwards', () => {
-      entityContainer.updateRemovedEntity(avatarSlot)
-
       const generated = Array.from({ length: 16 }, () => entityContainer.generateEntity())
 
       expect(generated.filter((entity) => entityNumberOf(entity) < RESERVED_STATIC_ENTITIES)).toEqual([])
+    })
+
+    // Guards the setup itself: if the deficit disappears, generateEntity() short-circuits and
+    // the test above passes for the wrong reason.
+    it('should have left the container in the recycling branch, so the test above can fire', () => {
+      const generated = entityContainer.generateEntity()
+
+      expect(EntityUtils.fromEntityId(generated)[1]).toBeGreaterThan(0)
     })
   })
 
   describe('when a composite build offsets the entity counter past the used entities', () => {
     let entityContainer: IEntityContainer
 
+    const MAX_COMPOSITE_ENTITY = 745
+    const COMPOSITE_ENTITY_COUNT = 230
+
     beforeEach(() => {
-      // Reproduces the standing allocation deficit a `DCL_MAX_COMPOSITE_ENTITY` build
-      // creates: the counter starts past the composite's entities while only some of
-      // them are ever marked used, so generateEntity() takes the recycling branch with
-      // no scene-side removal at all.
-      entityContainer = createEntityContainer({ reservedStaticEntities: RESERVED_STATIC_ENTITIES })
-      for (let entityNumber = RESERVED_STATIC_ENTITIES; entityNumber < RESERVED_STATIC_ENTITIES + 8; entityNumber++) {
-        entityContainer.updateUsedEntity(EntityUtils.toEntityId(entityNumber, 0))
+      // The define has to be set for real, not simulated. An earlier version of this block
+      // only marked entities used, which leaves `entityCounter` at 512 — so
+      // `usedSize + 512 >= entityCounter` held, generateEntity() short-circuited to
+      // generateNewEntity(), and the recycling loop this exists to test was never entered.
+      // createEntityContainer reads the define at call time, so assigning the global first
+      // reproduces the build faithfully: counter starts at 746 while only 230 composite
+      // entities are ever marked used, leaving a permanent deficit of 4.
+      ;(globalThis as unknown as { DCL_MAX_COMPOSITE_ENTITY: number }).DCL_MAX_COMPOSITE_ENTITY =
+        MAX_COMPOSITE_ENTITY
+      entityContainer = createEntityContainer()
+      for (let i = 0; i < COMPOSITE_ENTITY_COUNT; i++) {
+        entityContainer.updateUsedEntity(EntityUtils.toEntityId(RESERVED_STATIC_ENTITIES + i, 0))
       }
       entityContainer.updateRemovedEntity(EntityUtils.toEntityId(AVATAR_SLOT_NUMBER, 0))
+    })
+
+    afterEach(() => {
+      delete (globalThis as unknown as { DCL_MAX_COMPOSITE_ENTITY?: number }).DCL_MAX_COMPOSITE_ENTITY
+    })
+
+    it('should start the counter past the composite, leaving a standing deficit', () => {
+      expect(entityContainer.generateEntity() as number).toBeGreaterThan(MAX_COMPOSITE_ENTITY)
     })
 
     it('should keep every allocation outside the reserved range', () => {
