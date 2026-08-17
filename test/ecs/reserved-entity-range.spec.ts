@@ -104,8 +104,7 @@ describe('Reserved entity range ownership', () => {
       // createEntityContainer reads the define at call time, so assigning the global first
       // reproduces the build faithfully: counter starts at 746 while only 230 composite
       // entities are ever marked used, leaving a permanent deficit of 4.
-      ;(globalThis as unknown as { DCL_MAX_COMPOSITE_ENTITY: number }).DCL_MAX_COMPOSITE_ENTITY =
-        MAX_COMPOSITE_ENTITY
+      ;(globalThis as unknown as { DCL_MAX_COMPOSITE_ENTITY: number }).DCL_MAX_COMPOSITE_ENTITY = MAX_COMPOSITE_ENTITY
       entityContainer = createEntityContainer()
       for (let i = 0; i < COMPOSITE_ENTITY_COUNT; i++) {
         entityContainer.updateUsedEntity(EntityUtils.toEntityId(RESERVED_STATIC_ENTITIES + i, 0))
@@ -188,6 +187,64 @@ describe('Reserved entity range ownership', () => {
       engine.removeEntity(recycledAvatarSlot)
 
       expect(Array.from(engine.getEntitiesWith(RendererOwned))).toHaveLength(1)
+    })
+  })
+
+  // IEngineOptions.entityContainer is a public injection seam, so Engine.removeEntity must take
+  // the reserved bound from the CONTAINER rather than the module default. Using the default
+  // breaks in both directions, and neither is detectable by a caller.
+  describe('when a custom entity container enforces a different reserved bound', () => {
+    let engine: ReturnType<typeof Engine>
+    let Owned: ReturnType<ReturnType<typeof Engine>['defineComponent']>
+
+    describe('and the bound is LOWER than the default, so the id IS released', () => {
+      let sceneEntity: Entity
+
+      beforeEach(() => {
+        engine = Engine({ entityContainer: createEntityContainer({ reservedStaticEntities: 64 }) })
+        Owned = engine.defineComponent('test::owned', { value: Schemas.Int })
+        // Number 100 is scene-owned under a bound of 64, but sits inside the default range.
+        sceneEntity = EntityUtils.toEntityId(100, 0)
+        Owned.create(sceneEntity, { value: 111 })
+      })
+
+      it('should release the id, confirming the container considers it scene-owned', () => {
+        expect(engine.removeEntity(sceneEntity)).toBe(true)
+      })
+
+      it('should purge its components, so a released id cannot keep them', () => {
+        engine.removeEntity(sceneEntity)
+
+        expect(Owned.getOrNull(sceneEntity)).toBeNull()
+      })
+
+      it('should stop yielding it from getEntitiesWith', () => {
+        engine.removeEntity(sceneEntity)
+
+        expect(Array.from(engine.getEntitiesWith(Owned))).toHaveLength(0)
+      })
+    })
+
+    describe('and the bound is HIGHER than the default, so the id is NOT released', () => {
+      let rendererOwned: Entity
+
+      beforeEach(() => {
+        engine = Engine({ entityContainer: createEntityContainer({ reservedStaticEntities: 1024 }) })
+        Owned = engine.defineComponent('test::owned', { value: Schemas.Int })
+        // Number 700 is renderer-owned under a bound of 1024, but outside the default range.
+        rendererOwned = EntityUtils.toEntityId(700, 0)
+        Owned.create(rendererOwned, { value: 222 })
+      })
+
+      it('should refuse to release the id', () => {
+        expect(engine.removeEntity(rendererOwned)).toBe(false)
+      })
+
+      it('should NOT purge its components, since the container treats it as renderer-owned', () => {
+        engine.removeEntity(rendererOwned)
+
+        expect(Owned.getOrNull(rendererOwned)).not.toBeNull()
+      })
     })
   })
 

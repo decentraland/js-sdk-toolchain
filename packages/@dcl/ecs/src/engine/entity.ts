@@ -99,6 +99,18 @@ export type IEntityContainer = {
   releaseRemovedEntities(): Entity[]
   updateRemovedEntity(entity: Entity): boolean
   updateUsedEntity(entity: Entity): boolean
+
+  /**
+   * The exclusive upper bound of the renderer-reserved entity NUMBER range this container
+   * enforces — i.e. the `reservedStaticEntities` it was built with.
+   *
+   * `Engine.removeEntity` needs it to decide whether to purge an entity's components, and
+   * that decision has to agree with whether this container will release the id. Optional so
+   * a custom `IEntityContainer` passed via `IEngineOptions.entityContainer` stays
+   * source-compatible; when absent the engine falls back to `RESERVED_STATIC_ENTITIES`, which
+   * only matches if the container also uses the default.
+   */
+  readonly reservedStaticEntities?: number
 }
 
 /**
@@ -293,6 +305,7 @@ export function createEntityContainer(opts?: { reservedStaticEntities: number })
   }
 
   return {
+    reservedStaticEntities,
     generateEntity,
     removeEntity,
     getExistingEntities(): Set<Entity> {

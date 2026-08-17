@@ -1487,6 +1487,7 @@ export type IEntityContainer = {
     releaseRemovedEntities(): Entity[];
     updateRemovedEntity(entity: Entity): boolean;
     updateUsedEntity(entity: Entity): boolean;
+    readonly reservedStaticEntities?: number;
 };
 
 // @public (undocumented)

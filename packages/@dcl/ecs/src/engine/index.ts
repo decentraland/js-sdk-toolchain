@@ -63,7 +63,13 @@ function preEngine(options?: IEngineOptions): PreEngine {
     // range, so deletes on RootEntity/PlayerEntity/CameraEntity DO reach it and are applied.
     // Skipping those would silently break a working removal — the frame is byte-identical to
     // InputModifier.deleteFrom(engine.PlayerEntity).
-    if (!isRendererStreamedNumber(entity)) {
+    // Bound taken from the CONTAINER, not the module default, so the purge decision and the
+    // id-release decision cannot disagree. They are two halves of one question, and a custom
+    // container injected via IEngineOptions.entityContainer may enforce a different range: with
+    // a larger one the purge would run on entities the container treats as renderer-owned, and
+    // with a smaller one it would be skipped for scene-owned entities whose ids ARE released —
+    // leaving a "removed" entity still visible to getEntitiesWith with its data intact.
+    if (!isRendererStreamedNumber(entity, entityContainer.reservedStaticEntities)) {
       for (const [, component] of componentsDefinition) {
         // TODO: hack for the moment.
         // We still need the NetworkEntity to forward this message to the SyncTransport.
