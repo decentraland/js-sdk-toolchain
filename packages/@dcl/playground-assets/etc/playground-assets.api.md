@@ -726,6 +726,7 @@ export const componentDefinitionByName: {
     "core::CameraMode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraMode>>;
     "core::CameraModeArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraModeArea>>;
     "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
+    "core::ExplorerUiEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBExplorerUiEventsResult>>;
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
     "core::GltfNodeModifiers": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNodeModifiers>>;
@@ -1278,6 +1279,27 @@ export type ExcludeUndefined<T> = {
 // @public
 export const executeTask: (task: Task<unknown>) => void;
 
+// @public (undocumented)
+export const enum ExplorerUi {
+    // (undocumented)
+    EU_BACKPACK = 2,
+    // (undocumented)
+    EU_CAMERA_REEL = 3,
+    // (undocumented)
+    EU_COMMUNITIES = 4,
+    // (undocumented)
+    EU_EVENTS = 6,
+    // (undocumented)
+    EU_MAP = 1,
+    // (undocumented)
+    EU_PLACES = 5,
+    // (undocumented)
+    EU_SETTINGS = 0
+}
+
+// @public (undocumented)
+export const ExplorerUiEventsResult: GrowOnlyValueSetComponentDefinition<PBExplorerUiEventsResult>;
+
 // @public
 export interface FlatMaterial {
     albedoColor: PBColor4 | undefined;
@@ -1439,7 +1461,7 @@ export interface IEngine {
     registerComponentDefinition<T>(componentName: string, componentDefinition: ComponentDefinition<T>): ComponentDefinition<T>;
     // (undocumented)
     removeComponentDefinition(componentId: number | string): void;
-    removeEntity(entity: Entity): void;
+    removeEntity(entity: Entity): boolean;
     removeEntityWithChildren(entity: Entity): void;
     removeSystem(selector: string | SystemFn): boolean;
     readonly RootEntity: Entity;
@@ -2745,6 +2767,52 @@ export namespace PBEngineInfo {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBEngineInfo;
     // (undocumented)
     export function encode(message: PBEngineInfo, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBExplorerUiEventsResult {
+    // (undocumented)
+    event?: {
+        $case: "opened";
+        opened: PBExplorerUiEventsResult_UiOpened;
+    } | {
+        $case: "closed";
+        closed: PBExplorerUiEventsResult_UiClosed;
+    } | undefined;
+    timestamp: number;
+    ui: ExplorerUi;
+}
+
+// @public (undocumented)
+export namespace PBExplorerUiEventsResult {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBExplorerUiEventsResult;
+    // (undocumented)
+    export function encode(message: PBExplorerUiEventsResult, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBExplorerUiEventsResult_UiClosed {
+}
+
+// @public (undocumented)
+export namespace PBExplorerUiEventsResult_UiClosed {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBExplorerUiEventsResult_UiClosed;
+    // (undocumented)
+    export function encode(_: PBExplorerUiEventsResult_UiClosed, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBExplorerUiEventsResult_UiOpened {
+}
+
+// @public (undocumented)
+export namespace PBExplorerUiEventsResult_UiOpened {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBExplorerUiEventsResult_UiOpened;
+    // (undocumented)
+    export function encode(_: PBExplorerUiEventsResult_UiOpened, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -5430,9 +5498,13 @@ export type uint32 = number;
 
 // @public (undocumented)
 export type UiRendererOptions = {
-    virtualWidth: number;
-    virtualHeight: number;
+    virtualWidth?: number;
+    virtualHeight?: number;
+    screenInset?: UiScreenInset;
 };
+
+// @public
+export type UiScreenInset = 'device' | 'interactable' | 'none';
 
 // @public
 export type UiScreenInsetAreaProps = Omit<EntityPropTypes, 'uiTransform'> & {

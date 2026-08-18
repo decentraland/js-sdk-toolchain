@@ -97,39 +97,6 @@ describe('Audio events helper system should', () => {
     expect(fn).toHaveBeenCalledTimes(1)
   })
 
-  it('preserve the last audio state when re-registering a callback on the same entity', async () => {
-    const fn = jest.fn()
-    const newFn = jest.fn()
-
-    const audioSourceEntity = engine.addEntity()
-    audioSourceComponent.create(audioSourceEntity)
-    // simulate audio event attach in renderer
-    audioEventComponent.addValue(audioSourceEntity, {
-      state: MediaState.MS_PLAYING,
-      timestamp: 1
-    })
-
-    audioEventsSystem.registerAudioEventsEntity(audioSourceEntity, fn)
-
-    await engine.update(1)
-    expect(fn).toHaveBeenCalledTimes(1)
-
-    // re-register with a new callback; the state hasn't changed so it must not re-fire
-    audioEventsSystem.registerAudioEventsEntity(audioSourceEntity, newFn)
-
-    await engine.update(1)
-    expect(newFn).not.toHaveBeenCalled()
-
-    // a new state change still fires the new callback
-    audioEventComponent.addValue(audioSourceEntity, {
-      state: MediaState.MS_PAUSED,
-      timestamp: 2
-    })
-
-    await engine.update(1)
-    expect(newFn).toHaveBeenCalledWith(expect.objectContaining({ state: MediaState.MS_PAUSED, timestamp: 2 }))
-  })
-
   it('run callback for an entity with an AudioStream component instead of AudioSource', async () => {
     const fn = jest.fn()
 

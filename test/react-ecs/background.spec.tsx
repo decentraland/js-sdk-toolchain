@@ -3,7 +3,7 @@ import { components } from '../../packages/@dcl/ecs/src'
 import { Color4 } from '../../packages/@dcl/sdk/math'
 import { ReactEcs, UiEntity, UiBackgroundProps } from '../../packages/@dcl/react-ecs/src'
 import { CANVAS_ROOT_ENTITY } from '../../packages/@dcl/react-ecs/src/components/uiTransform'
-import { setupEngine } from './utils'
+import { setupEngine, WHOLE_SCREEN } from './utils'
 
 describe('UiBackground React Ecs', () => {
   it('should generate a UI and update the width of a div', async () => {
@@ -20,7 +20,7 @@ describe('UiBackground React Ecs', () => {
 
     const ui = () => <UiEntity uiTransform={{ width: 100 }} uiBackground={{ color }} />
 
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
 
     expect(getUiTransform(rootDivEntity)).toMatchObject({
@@ -66,7 +66,7 @@ describe('UiBackground React Ecs', () => {
 
     const ui = () => <UiEntity uiTransform={{ width: 100 }} {...backgroundProps} />
 
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
     expect(getBackground()?.color).toMatchObject(backgroundProps.uiBackground.color!)
 
@@ -98,7 +98,7 @@ describe('UiBackground React Ecs', () => {
 
     const ui = () => <UiEntity uiTransform={{ width: 100 }} {...backgroundProps} />
 
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
     expect(getBackground()?.color).toMatchObject(backgroundProps.uiBackground.color!)
     expect(getBackground()?.texture).toMatchObject({
@@ -140,7 +140,7 @@ describe('UiBackground React Ecs', () => {
     const getBackground = () => UiBackground.getOrNull(rootDivEntity)
     const ui = () => <UiEntity uiTransform={{ width: 100 }} uiBackground={{}} />
 
-    uiRenderer.setUiRenderer(ui)
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
     await engine.update(1)
     expect(getBackground()?.color).toBe(undefined)
   })

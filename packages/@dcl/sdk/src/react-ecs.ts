@@ -18,5 +18,12 @@
  */
 
 import ReactEcs from '@dcl/react-ecs'
+import { setIsMobileProvider } from '@dcl/react-ecs/dist/platform'
+import { isMobile } from './platform'
+
+// react-ecs cannot reach ~system/Runtime itself, so the platform check used
+// for virtual screen size defaults is injected here.
+setIsMobileProvider(isMobile)
+
 export * from '@dcl/react-ecs'
 export default ReactEcs

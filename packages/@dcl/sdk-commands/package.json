@@ -14,7 +14,7 @@
     "@dcl/inspector": "7.36.3",
     "@dcl/linker-dapp": "0.15.2",
     "@dcl/mini-comms": "1.0.1-20230216163137.commit-a4c75be",
-    "@dcl/protocol": "1.0.0-31211128817.commit-215d09c",
+    "@dcl/protocol": "1.0.0-31617402096.commit-86c4613",
     "@dcl/quests-client": "^1.0.3",
     "@dcl/quests-manager": "^0.1.4",
     "@dcl/rpc": "^1.1.1",
@@ -41,6 +41,12 @@
     "@types/archiver": "^5.3.2",
     "@types/qrcode": "^1.5.6",
     "@types/ws": "^8.5.4"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "overrides": {
+    "protobufjs": "^7.6.3"
   },
   "files": [
     "dist",

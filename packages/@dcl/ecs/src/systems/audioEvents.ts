@@ -43,8 +43,7 @@ export function createAudioEventsSystem(engine: IEngine): AudioEventsSystem {
   function registerAudioEventsEntity(entity: Entity, callback: AudioEventsSystemCallback) {
     // audio event component is not added here because the renderer adds it
     // to every entity with an AudioSource or AudioStream component
-    const existing = entitiesCallbackAudioStateMap.get(entity)
-    entitiesCallbackAudioStateMap.set(entity, { callback: callback, lastAudioState: existing?.lastAudioState })
+    entitiesCallbackAudioStateMap.set(entity, { callback: callback })
   }
 
   function removeAudioEventsEntity(entity: Entity) {
