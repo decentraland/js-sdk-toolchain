@@ -1,6 +1,7 @@
 import { Engine } from '../../packages/@dcl/ecs/src/engine'
 import {
   Entity,
+  EntityState,
   EntityUtils,
   IEntityContainer,
   RESERVED_STATIC_ENTITIES,
@@ -272,6 +273,66 @@ describe('Reserved entity range ownership', () => {
   // The renderer applies scene component ops on the three named static entities — that is how
   // InputModifier.deleteFrom(engine.PlayerEntity) clears an input lock — so a removal must
   // still purge them, even though their ids are reserved and never released.
+  // engine.getEntityState must delegate to the container rather than alias its method. An
+  // aliased reference binds `this` to the engine, so a container that uses `this` reports the
+  // wrong state through the public API while the engine — which calls the container directly —
+  // reports the right one. removeEntity now classifies via getEntityState, so a divergence
+  // there means the public API contradicts the engine's own behaviour.
+  describe('when a custom container depends on `this`', () => {
+    const CUSTOM_BOUND = 1000
+
+    let engine: ReturnType<typeof Engine>
+    let rendererOwned: Entity
+
+    beforeEach(() => {
+      class ThisDependentContainer {
+        readonly bound = CUSTOM_BOUND
+        private readonly used = new Set<number>()
+        private counter = CUSTOM_BOUND
+        generateEntity(): Entity {
+          const entity = EntityUtils.toEntityId(this.counter++, 0)
+          this.used.add(entity as number)
+          return entity
+        }
+        removeEntity(entity: Entity): boolean {
+          if (EntityUtils.fromEntityId(entity)[0] < this.bound) return false
+          this.used.delete(entity as number)
+          return true
+        }
+        getEntityState(entity: Entity): EntityState {
+          if (EntityUtils.fromEntityId(entity)[0] < this.bound) return EntityState.Reserved
+          return this.used.has(entity as number) ? EntityState.UsedEntity : EntityState.Unknown
+        }
+        getExistingEntities(): Set<Entity> {
+          return new Set([...this.used] as Entity[])
+        }
+        releaseRemovedEntities(): Entity[] {
+          return []
+        }
+        updateRemovedEntity(): boolean {
+          return false
+        }
+        updateUsedEntity(): boolean {
+          return false
+        }
+      }
+      engine = Engine({ onChangeFunction: () => {}, entityContainer: new ThisDependentContainer() })
+      rendererOwned = EntityUtils.toEntityId(700, 0)
+    })
+
+    it('should report the state the container reports, not undefined-compared garbage', () => {
+      expect(engine.getEntityState(rendererOwned)).toBe(EntityState.Reserved)
+    })
+
+    it('should agree with what removeEntity actually does', () => {
+      expect(engine.removeEntity(rendererOwned)).toBe(false)
+    })
+
+    it('should still classify a container-owned entity as releasable', () => {
+      expect(engine.removeEntity(engine.addEntity())).toBe(true)
+    })
+  })
+
   describe('when a scene removes a named static entity', () => {
     let engine: ReturnType<typeof Engine>
     let InputLock: ReturnType<ReturnType<typeof Engine>['defineComponent']>

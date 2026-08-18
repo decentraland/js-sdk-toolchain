@@ -354,7 +354,12 @@ export function Engine(options?: IEngineOptions): IEngine {
     PlayerEntity: 1 as Entity,
     CameraEntity: 2 as Entity,
 
-    getEntityState: partialEngine.entityContainer.getEntityState,
+    // Delegated, not aliased. A detached `entityContainer.getEntityState` reference binds
+    // `this` to the engine, so a custom IEntityContainer that uses `this` silently reports the
+    // wrong state through the public API while the engine itself, which calls the container
+    // directly, reports the right one. Harmless for the built-in closure-based container, but
+    // removeEntity now classifies through getEntityState, so the two must never diverge.
+    getEntityState: (entity: Entity) => partialEngine.entityContainer.getEntityState(entity),
     addTransport: crdtSystem.addTransport,
 
     entityContainer: partialEngine.entityContainer

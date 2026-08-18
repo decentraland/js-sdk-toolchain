@@ -101,6 +101,10 @@ export interface IEngine {
   /**
    * Remove all components of each entity in the tree made with Transform parenting
    * @param entity - the root entity of the tree
+   *
+   * May complete only partially and does not report it: nodes in the renderer-reserved range
+   * are refused by `removeEntity`, so a reserved node anywhere in the tree survives while its
+   * descendants are removed — leaving its `Transform.parent` pointing at a removed entity.
    */
   removeEntityWithChildren(entity: Entity): void
 
