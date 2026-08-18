@@ -1461,7 +1461,7 @@ export interface IEngine {
     registerComponentDefinition<T>(componentName: string, componentDefinition: ComponentDefinition<T>): ComponentDefinition<T>;
     // (undocumented)
     removeComponentDefinition(componentId: number | string): void;
-    removeEntity(entity: Entity): void;
+    removeEntity(entity: Entity): boolean;
     removeEntityWithChildren(entity: Entity): void;
     removeSystem(selector: string | SystemFn): boolean;
     readonly RootEntity: Entity;
