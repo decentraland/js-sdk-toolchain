@@ -7,6 +7,8 @@ import {
   createEntityContainer
 } from '../../packages/@dcl/ecs/src/engine/entity'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
+import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
+import { PutComponentOperation } from '../../packages/@dcl/ecs/src/serialization/crdt'
 
 /**
  * The renderer owns entity NUMBERS [0, RESERVED_STATIC_ENTITIES) at every version:
@@ -28,18 +30,20 @@ describe('Reserved entity range ownership', () => {
     let entityContainer: IEntityContainer
     let avatarSlot: Entity
 
-    // Two preconditions are both required, and getting either wrong makes these tests vacuous.
-    // First, a standing allocation deficit, so generateEntity() reaches its recycling loop
-    // instead of short-circuiting to generateNewEntity(). Second, the avatar number must be
-    // recorded BEFORE any recyclable scene number: `removedEntities` is a Map iterated in
-    // insertion order and the loop returns the first eligible entry, so a scene number
-    // recorded first is handed out and the avatar key is never reached.
+    // This setup exists to make the tests DISCRIMINATE. Against a fixed container the
+    // tombstone is refused outright, so neither precondition below has any effect — but both
+    // are what make these tests fail against an unfixed one, and getting either wrong makes
+    // them vacuous. First, a standing allocation deficit, so generateEntity() reaches its
+    // recycling loop rather than short-circuiting to generateNewEntity(). Second, the avatar
+    // number is recorded BEFORE any recyclable scene number: `removedEntities` is a Map
+    // iterated in insertion order and the loop returns the first eligible entry, so a scene
+    // number recorded first would be handed out and the avatar key never reached.
     beforeEach(() => {
       entityContainer = createEntityContainer()
       avatarSlot = EntityUtils.toEntityId(AVATAR_SLOT_NUMBER, 0)
       // 4 allocations, then 2 released -> counter 516, used 2 -> deficit of 2.
       const owned = Array.from({ length: 4 }, () => entityContainer.generateEntity())
-      // Avatar tombstone FIRST, so its key leads the insertion order.
+      // Avatar tombstone FIRST, so its key would lead the insertion order (see above).
       entityContainer.updateRemovedEntity(avatarSlot)
       entityContainer.removeEntity(owned[0])
       entityContainer.removeEntity(owned[1])
@@ -192,7 +196,10 @@ describe('Reserved entity range ownership', () => {
       let sceneEntity: Entity
 
       beforeEach(() => {
-        engine = Engine({ entityContainer: createEntityContainer({ reservedStaticEntities: 64 }) })
+        engine = Engine({
+          onChangeFunction: () => {},
+          entityContainer: createEntityContainer({ reservedStaticEntities: 64 })
+        })
         Owned = engine.defineComponent('test::owned', { value: Schemas.Int })
         // Number 100 is scene-owned under a bound of 64, but sits inside the default range.
         sceneEntity = EntityUtils.toEntityId(100, 0)
@@ -214,13 +221,36 @@ describe('Reserved entity range ownership', () => {
 
         expect(Array.from(engine.getEntitiesWith(Owned))).toHaveLength(0)
       })
+
+      // Drives an INBOUND message deliberately. `onChangeFunction` is only invoked from the
+      // CRDT receive path, so a bare update() with no transport never reaches it — omitting
+      // that required Engine option produced an engine that threw here while every other test
+      // in this block stayed green.
+      it('should produce a usable engine that processes an inbound message', async () => {
+        const transport = { name: 'test', send: async () => {}, filter: () => true } as never as Parameters<
+          typeof engine.addTransport
+        >[0]
+        engine.addTransport(transport)
+        const buffer = new ReadWriteByteBuffer()
+        const payload = new ReadWriteByteBuffer()
+        Owned.schema.serialize({ value: 7 }, payload)
+        PutComponentOperation.write(EntityUtils.toEntityId(600, 0), 1, Owned.componentId, payload.toBinary(), buffer)
+        ;(transport as unknown as { onmessage: (b: Uint8Array) => void }).onmessage(buffer.toBinary())
+
+        await engine.update(1 / 30)
+
+        expect(Owned.getOrNull(EntityUtils.toEntityId(600, 0))).not.toBeNull()
+      })
     })
 
     describe('and the bound is HIGHER than the default, so the id is NOT released', () => {
       let rendererOwned: Entity
 
       beforeEach(() => {
-        engine = Engine({ entityContainer: createEntityContainer({ reservedStaticEntities: 1024 }) })
+        engine = Engine({
+          onChangeFunction: () => {},
+          entityContainer: createEntityContainer({ reservedStaticEntities: 1024 })
+        })
         Owned = engine.defineComponent('test::owned', { value: Schemas.Int })
         // Number 700 is renderer-owned under a bound of 1024, but outside the default range.
         rendererOwned = EntityUtils.toEntityId(700, 0)
