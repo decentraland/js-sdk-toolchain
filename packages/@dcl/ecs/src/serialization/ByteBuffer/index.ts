@@ -48,9 +48,8 @@ export class ReadWriteByteBuffer implements ByteBuffer {
       const newsize = getNextSize(this._buffer.byteLength, this.woffset + amount)
       const newBuffer = new Uint8Array(newsize)
       newBuffer.set(this._buffer)
-      const oldOffset = this._buffer.byteOffset
       this._buffer = newBuffer
-      this.view = new DataView(this._buffer.buffer, oldOffset)
+      this.view = new DataView(this._buffer.buffer, this._buffer.byteOffset, this._buffer.byteLength)
     }
 
     this.woffset += amount
