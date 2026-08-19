@@ -58,6 +58,11 @@ export type Events = {
   'Pack smart wearable': {
     projectHash: string
   }
+  'Multiplayer server exited': {
+    engine: string
+    exitCode: number
+    unavailable: boolean
+  }
   'Quest Created Success': {
     questId: string
     questName: string
