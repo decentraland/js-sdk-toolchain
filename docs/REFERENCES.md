@@ -9,6 +9,7 @@ Curated map of every doc in this repo. Use this as the entry point when looking 
 | [ai-agent-context.md](ai-agent-context.md) | **Canonical project briefing** — every package's purpose, key concepts (ECS, CRDT, composites, React reconciler, transports), tech stack, full CLI command reference, deployment environments (`.zone` / `peer-testing` / `.org`), project layout, and what's out of scope. Start here. |
 | [../README.md](../README.md) | Public-facing repo overview, package list, quick-start (clone → `make install` → `make build`). |
 | [../AGENTS.md](../AGENTS.md) | Agent-facing instructions: dev commands, conventions, spec workflow, shell safety. |
+| [../REVIEW.md](../REVIEW.md) | PR review rules every reviewer (human or agent) must apply: code-comment policy, PR description requirements, proof-of-fix requirement, and the blocking reject conditions. |
 
 ## Architecture & runtime internals
 
