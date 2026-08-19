@@ -93,6 +93,7 @@ Asset-packs injection is gated behind `isEditorScene` (requires `assets/scene/ma
 
 - A newer local npm rewrites committed lockfiles with `"peer": true` / `"dev": true` metadata churn during installs (root and per-package lockfiles). Revert lockfile changes unrelated to your dependency change before committing.
 - `make format` runs prettier over the whole repo, including paths CI's `make lint` does not check (`test/`, `scripts/`, dot-files), where HEAD may carry drift — a blind `make format` can dirty dozens of unrelated files. Check your own files, revert the rest.
+- **PR base branch:** this repo runs long-lived integration branches (e.g. `auth-server`) that are far ahead of `main`. Open a PR against the branch your feature branch was cut from, not `main` — targeting `main` sweeps in hundreds of unrelated files. Find the real base with `git branch -a --contains HEAD~` or by checking which branch gives a clean `git diff <base>...HEAD`; when working from `auth-server`, point the PR at `auth-server`.
 
 ## Code conventions
 

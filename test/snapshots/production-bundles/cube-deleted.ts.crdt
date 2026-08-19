@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=266.2k bytes
+SCENE_COMPILED_JS_SIZE_PROD=265.9k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -7,9 +7,9 @@ EVAL test/snapshots/production-bundles/cube-deleted.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
-  OPCODES ~= 78k
-  MALLOC_COUNT = 14876
-  ALIVE_OBJS_DELTA ~= 3.30k
+  OPCODES ~= 70k
+  MALLOC_COUNT = 15058
+  ALIVE_OBJS_DELTA ~= 3.31k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = 6
@@ -18,27 +18,27 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   Scene: PUT_COMPONENT e=0x201 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   OPCODES ~= 5k
-  MALLOC_COUNT = 68
-  ALIVE_OBJS_DELTA ~= 0.02k
+  MALLOC_COUNT = 70
+  ALIVE_OBJS_DELTA ~= 0.03k
 CALL onUpdate(0.1)
   Scene: DELETE_COMPONENT e=0x201 c=1019 t=2 data=null
   Scene: PUT_COMPONENT e=0x202 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   Scene: DELETE_ENTITY e=0x201
-  OPCODES ~= 7k
+  OPCODES ~= 6k
   MALLOC_COUNT = 4
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
   Scene: DELETE_COMPONENT e=0x202 c=1019 t=2 data=null
   Scene: PUT_COMPONENT e=0x10201 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   Scene: DELETE_ENTITY e=0x202
-  OPCODES ~= 7k
-  MALLOC_COUNT = 2
+  OPCODES ~= 6k
+  MALLOC_COUNT = 4
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0.1)
   Scene: DELETE_COMPONENT e=0x10201 c=1019 t=2 data=null
   Scene: PUT_COMPONENT e=0x10202 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
   Scene: DELETE_ENTITY e=0x10201
-  OPCODES ~= 7k
+  OPCODES ~= 6k
   MALLOC_COUNT = 1
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1101.14k bytes
+  MEMORY_USAGE_COUNT ~= 1091.17k bytes

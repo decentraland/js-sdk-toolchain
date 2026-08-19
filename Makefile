@@ -120,7 +120,7 @@ deep-clean:
 		packages/@dcl/ecs/node_modules/ \
 		packages/@dcl/react-ecs/node_modules/ \
 		packages/@dcl/sdk/node_modules/ \
-		packages/@dcl/sdk-commands/node_modules \
+		packages/@dcl/sdk-commands/node_modules
 	make clean
 
 update-snapshots: export UPDATE_SNAPSHOTS=true
