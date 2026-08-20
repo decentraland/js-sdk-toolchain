@@ -31,8 +31,6 @@ export function getSceneStorageKey(base: string): string {
   return `${x},${y}`
 }
 
-const COORDINATE_KEY = /^-?\d+,-?\d+$/
-
 const createDefaultStorage = (): ServerStorage => ({
   env: {},
   world: {},
@@ -119,31 +117,6 @@ export async function saveServerStorage(
     components.logger.error(`Failed to save ${SERVER_STORAGE_FILE}: ${error}`)
     throw error
   }
-}
-
-/**
- * Migrates a legacy flat-format world file (`world: key -> value`, written before
- * scene-coordinate namespacing) into the currently-previewed scene's bucket, so no
- * local dev data is lost on the format change. No-op once the file is already
- * namespaced (`world: "x,y" -> key -> value`).
- */
-export async function migrateLegacyWorldStorage(
-  components: Pick<CliComponents, 'fs' | 'logger'>,
-  baseDir: string,
-  sceneKey: string
-): Promise<void> {
-  return serialize(async () => {
-    const storage = await loadServerStorage(components, baseDir)
-    const world = storage.world ?? {}
-    const keys = Object.keys(world)
-    const isLegacyFlat = keys.some((key) => !COORDINATE_KEY.test(key))
-    if (!isLegacyFlat) {
-      return
-    }
-    components.logger.debug(`Migrating legacy flat world storage into scene bucket ${sceneKey}`)
-    storage.world = { [sceneKey]: world }
-    await saveServerStorage(components, baseDir, storage)
-  })
 }
 
 /**

@@ -15,8 +15,7 @@ import {
   getPlayerStorage,
   getPlayerValue,
   setPlayerValue,
-  deletePlayerValue,
-  migrateLegacyWorldStorage
+  deletePlayerValue
 } from './runtime-env'
 
 /**
@@ -25,18 +24,15 @@ import {
  * World (scene) storage is namespaced by the previewed scene's base coordinates, read
  * directly from its scene.json (same source as routes.ts uses for the QR link). The
  * storage file lives in the project directory (`baseDir`) so local dev progress survives
- * SDK upgrades; a legacy flat-format file is migrated into the current scene bucket once
- * at startup.
+ * SDK upgrades.
  */
-export async function setupStorageEndpoints(
+export function setupStorageEndpoints(
   components: CliComponents,
   router: Router<PreviewComponents>,
   workspace: Workspace
 ) {
   const baseDir = workspace.projects[0].workingDirectory
   const sceneKey = getSceneStorageKey(workspace.projects[0].scene.scene.base)
-
-  await migrateLegacyWorldStorage(components, baseDir, sceneKey)
 
   const withKeyValidation: IHttpServerComponent.IRequestHandler<
     IHttpServerComponent.PathAwareContext<PreviewComponents, string>

@@ -30,6 +30,7 @@ test/**/*.crdt
 tmp
 scene
 test-scene
+**/.runtime-data
 test/snapshots/bin
 **/*.tsbuildinfo
 

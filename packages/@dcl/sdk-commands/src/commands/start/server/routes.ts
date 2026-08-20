@@ -68,7 +68,7 @@ export async function wireRouter(components: PreviewComponents, workspace: Works
   })
 
   setupRealmAndComms(components, router, localSceneParcels)
-  await setupStorageEndpoints(components, router, workspace)
+  setupStorageEndpoints(components, router, workspace)
   await setupEcs6Endpoints(components, router, workspace)
 
   components.server.setContext(components)

@@ -4,8 +4,7 @@ import {
   getWorldStorage,
   getWorldValue,
   setWorldValue,
-  deleteWorldValue,
-  migrateLegacyWorldStorage
+  deleteWorldValue
 } from '../../../../../packages/@dcl/sdk-commands/src/commands/start/server/runtime-env'
 
 const BASE_DIR = '/project'
@@ -15,9 +14,8 @@ const STORAGE_PATH = path.join(BASE_DIR, '.runtime-data', 'server-storage.json')
  * Path-aware in-memory stand-in for the project's `.runtime-data/` directory. Tracks
  * writes by path so the tmp-file + rename atomic save cycle behaves as it does on disk.
  */
-function makeComponents(initialFile?: string) {
+function makeComponents() {
   const files = new Map<string, string>()
-  if (initialFile !== undefined) files.set(STORAGE_PATH, initialFile)
   const fs = {
     fileExists: jest.fn(async (filePath: string) => files.has(filePath)),
     readFile: jest.fn(async (filePath: string) => files.get(filePath) ?? ''),
@@ -96,31 +94,6 @@ describe('runtime-env world storage namespacing', () => {
       expect(tmpPath.startsWith(path.join(BASE_DIR, '.runtime-data'))).toBe(true)
       expect(fs.rename).toHaveBeenCalledWith(tmpPath, STORAGE_PATH)
       expect(JSON.parse(read()!).world).toEqual({ '60,-9': { score: 100 } })
-    })
-  })
-
-  describe('migrateLegacyWorldStorage', () => {
-    it('moves a legacy flat world map into the current scene bucket, preserving env/players', async () => {
-      const legacy = JSON.stringify({ env: { A: '1' }, world: { highScore: 42 }, players: { '0xabc': { c: 1 } } })
-      const { components, logger, read } = makeComponents(legacy)
-
-      await migrateLegacyWorldStorage(components, BASE_DIR, '60,-9')
-
-      const stored = JSON.parse(read()!)
-      expect(stored.world).toEqual({ '60,-9': { highScore: 42 } })
-      expect(stored.env).toEqual({ A: '1' })
-      expect(stored.players).toEqual({ '0xabc': { c: 1 } })
-      expect(logger.debug).toHaveBeenCalled()
-    })
-
-    it('is a no-op for an already-namespaced world (no rewrite)', async () => {
-      const current = JSON.stringify({ env: {}, world: { '60,-9': { highScore: 42 } }, players: {} })
-      const { components, fs, logger } = makeComponents(current)
-
-      await migrateLegacyWorldStorage(components, BASE_DIR, '10,20')
-
-      expect(fs.writeFile).not.toHaveBeenCalled()
-      expect(logger.debug).not.toHaveBeenCalled()
     })
   })
 })
