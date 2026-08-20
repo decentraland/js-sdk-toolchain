@@ -7,12 +7,12 @@ import {
   getMergedEnv,
   setEnvValue,
   deleteEnvValue,
-  loadServerStorage,
   getSceneStorageKey,
   getWorldStorage,
   getWorldValue,
   setWorldValue,
   deleteWorldValue,
+  getPlayerStorage,
   getPlayerValue,
   setPlayerValue,
   deletePlayerValue,
@@ -161,8 +161,7 @@ export async function setupStorageEndpoints(
     const limitParam = ctx.url.searchParams.get('limit')
     const offsetParam = ctx.url.searchParams.get('offset')
 
-    const storage = await loadServerStorage(components, baseDir)
-    const playerData = storage.players[address] ?? {}
+    const playerData = await getPlayerStorage(components, baseDir, address)
     let entries = Object.entries(playerData).map(([key, value]) => ({ key, value }))
 
     if (prefix !== null && prefix !== '') {

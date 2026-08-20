@@ -31,7 +31,7 @@ export function getSceneStorageKey(base: string): string {
   return `${x},${y}`
 }
 
-const isPlainObject = (value: unknown): boolean => typeof value === 'object' && value !== null && !Array.isArray(value)
+const COORDINATE_KEY = /^-?\d+,-?\d+$/
 
 const createDefaultStorage = (): ServerStorage => ({
   env: {},
@@ -135,7 +135,8 @@ export async function migrateLegacyWorldStorage(
   return serialize(async () => {
     const storage = await loadServerStorage(components, baseDir)
     const world = storage.world ?? {}
-    const isLegacyFlat = Object.values(world).some((value) => !isPlainObject(value))
+    const keys = Object.keys(world)
+    const isLegacyFlat = keys.some((key) => !COORDINATE_KEY.test(key))
     if (!isLegacyFlat) {
       return
     }
@@ -320,6 +321,18 @@ export async function deleteWorldValue(
     await saveServerStorage(components, baseDir, storage)
     return true
   })
+}
+
+/**
+ * Gets all storage data for a player, keyed by their address bucket.
+ */
+export async function getPlayerStorage(
+  components: Pick<CliComponents, 'fs' | 'logger'>,
+  baseDir: string,
+  address: string
+): Promise<Record<string, unknown>> {
+  const storage = await loadServerStorage(components, baseDir)
+  return storage.players[address] ?? {}
 }
 
 /**
