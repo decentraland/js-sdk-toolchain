@@ -7,7 +7,8 @@ import {
   createStorageInfo,
   makeAuthenticatedRequest,
   confirmAction,
-  getLinkerDappOptions
+  getLinkerDappOptions,
+  withPosition
 } from './shared'
 
 /**
@@ -43,7 +44,7 @@ export const handleEnv = async (action: string, key: string | undefined, options
 
     logger.info(`Setting environment variable '${key}' to ${baseURL}`)
 
-    const url = `${baseURL}/env/${encodeURIComponent(key)}`
+    const url = withPosition(`${baseURL}/env/${encodeURIComponent(key)}`, baseParcel)
     const info = createStorageInfo('env', 'set', url, worldName, baseParcel, parcels, key, value)
 
     const result = await makeAuthenticatedRequest(options.components, info, linkOptions, 'PUT', url, { value })
@@ -63,7 +64,7 @@ export const handleEnv = async (action: string, key: string | undefined, options
 
     logger.info(`Deleting environment variable '${key}' from ${baseURL}`)
 
-    const url = `${baseURL}/env/${encodeURIComponent(key)}`
+    const url = withPosition(`${baseURL}/env/${encodeURIComponent(key)}`, baseParcel)
     const info = createStorageInfo('env', 'delete', url, worldName, baseParcel, parcels, key)
 
     const result = await makeAuthenticatedRequest(options.components, info, linkOptions, 'DELETE', url)
@@ -91,7 +92,7 @@ export const handleEnv = async (action: string, key: string | undefined, options
 
     logger.info(`Clearing all environment variables from ${baseURL}`)
 
-    const url = `${baseURL}/env`
+    const url = withPosition(`${baseURL}/env`, baseParcel)
     const info = createStorageInfo('env', 'clear', url, worldName, baseParcel, parcels)
 
     const result = await makeAuthenticatedRequest(options.components, info, linkOptions, 'DELETE', url, undefined, {

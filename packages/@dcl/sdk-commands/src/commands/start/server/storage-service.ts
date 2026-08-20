@@ -7,10 +7,12 @@ import {
   getMergedEnv,
   setEnvValue,
   deleteEnvValue,
-  loadServerStorage,
+  getSceneStorageKey,
+  getWorldStorage,
   getWorldValue,
   setWorldValue,
   deleteWorldValue,
+  getPlayerStorage,
   getPlayerValue,
   setPlayerValue,
   deletePlayerValue
@@ -18,12 +20,20 @@ import {
 
 /**
  * Sets up storage-related endpoints for environment variables, scene storage, and player storage.
+ *
+ * World (scene) storage is namespaced by the previewed scene's base coordinates, read
+ * directly from its scene.json (same source as routes.ts uses for the QR link). The
+ * storage file lives in the project directory (`baseDir`) so local dev progress survives
+ * SDK upgrades.
  */
 export function setupStorageEndpoints(
   components: CliComponents,
   router: Router<PreviewComponents>,
   workspace: Workspace
 ) {
+  const baseDir = workspace.projects[0].workingDirectory
+  const sceneKey = getSceneStorageKey(workspace.projects[0].scene.scene.base)
+
   const withKeyValidation: IHttpServerComponent.IRequestHandler<
     IHttpServerComponent.PathAwareContext<PreviewComponents, string>
   > = async (ctx, next) => {
@@ -46,7 +56,7 @@ export function setupStorageEndpoints(
   router.get('/env/:key', withKeyValidation, async (ctx) => {
     const { key } = ctx.params
 
-    const envVars = await getMergedEnv(components, workspace.projects[0].workingDirectory)
+    const envVars = await getMergedEnv(components, baseDir)
     const value = envVars.get(key)
 
     if (value === undefined) {
@@ -62,7 +72,7 @@ export function setupStorageEndpoints(
     try {
       const bodyText = await ctx.request.text()
       const { value } = JSON.parse(bodyText)
-      await setEnvValue(components, key, value)
+      await setEnvValue(components, baseDir, key, value)
       return { status: 204 }
     } catch (error) {
       components.logger.error(`Failed to set environment variable '${key}': ${error}`)
@@ -74,7 +84,7 @@ export function setupStorageEndpoints(
     const { key } = ctx.params
 
     try {
-      await deleteEnvValue(components, key)
+      await deleteEnvValue(components, baseDir, key)
       return { status: 204 }
     } catch (error) {
       components.logger.error(`Failed to delete environment variable '${key}': ${error}`)
@@ -88,8 +98,8 @@ export function setupStorageEndpoints(
     const limitParam = ctx.url.searchParams.get('limit')
     const offsetParam = ctx.url.searchParams.get('offset')
 
-    const storage = await loadServerStorage(components)
-    let entries = Object.entries(storage.world).map(([key, value]) => ({ key, value }))
+    const world = await getWorldStorage(components, baseDir, sceneKey)
+    let entries = Object.entries(world).map(([key, value]) => ({ key, value }))
 
     if (prefix !== null && prefix !== '') {
       entries = entries.filter((entry) => entry.key.startsWith(prefix))
@@ -107,7 +117,7 @@ export function setupStorageEndpoints(
   router.get('/values/:key', withKeyValidation, async (ctx) => {
     const { key } = ctx.params
 
-    const value = await getWorldValue(components, key)
+    const value = await getWorldValue(components, baseDir, sceneKey, key)
     if (value === undefined) {
       return { status: 404, body: { message: `Storage key '${key}' not found` } }
     }
@@ -120,7 +130,7 @@ export function setupStorageEndpoints(
     try {
       const bodyText = await ctx.request.text()
       const { value } = JSON.parse(bodyText)
-      await setWorldValue(components, key, value)
+      await setWorldValue(components, baseDir, sceneKey, key, value)
       return { body: JSON.stringify({ value }) }
     } catch (error) {
       components.logger.error(`Failed to set storage value '${key}': ${error}`)
@@ -132,7 +142,7 @@ export function setupStorageEndpoints(
     const { key } = ctx.params
 
     try {
-      await deleteWorldValue(components, key)
+      await deleteWorldValue(components, baseDir, sceneKey, key)
       return { status: 204 }
     } catch (error) {
       components.logger.error(`Failed to delete storage value '${key}': ${error}`)
@@ -147,8 +157,7 @@ export function setupStorageEndpoints(
     const limitParam = ctx.url.searchParams.get('limit')
     const offsetParam = ctx.url.searchParams.get('offset')
 
-    const storage = await loadServerStorage(components)
-    const playerData = storage.players[address] ?? {}
+    const playerData = await getPlayerStorage(components, baseDir, address)
     let entries = Object.entries(playerData).map(([key, value]) => ({ key, value }))
 
     if (prefix !== null && prefix !== '') {
@@ -167,7 +176,7 @@ export function setupStorageEndpoints(
   router.get('/players/:address/values/:key', withAddressValidation, withKeyValidation, async (ctx) => {
     const { address, key } = ctx.params
 
-    const value = await getPlayerValue(components, address, key)
+    const value = await getPlayerValue(components, baseDir, address, key)
 
     if (value === undefined) {
       return { status: 404, body: { message: `Player storage key '${key}' not found for '${address}'` } }
@@ -183,7 +192,7 @@ export function setupStorageEndpoints(
       const bodyText = await ctx.request.text()
       const { value } = JSON.parse(bodyText)
 
-      await setPlayerValue(components, address, key, value)
+      await setPlayerValue(components, baseDir, address, key, value)
 
       return { body: JSON.stringify({ value }) }
     } catch (error) {
@@ -196,7 +205,7 @@ export function setupStorageEndpoints(
     const { address, key } = ctx.params
 
     try {
-      await deletePlayerValue(components, address, key)
+      await deletePlayerValue(components, baseDir, address, key)
       return { status: 204 }
     } catch (error) {
       components.logger.error(`Failed to delete player storage value '${key}' for '${address}': ${error}`)

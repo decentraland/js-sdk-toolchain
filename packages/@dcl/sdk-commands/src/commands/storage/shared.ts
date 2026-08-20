@@ -39,10 +39,21 @@ export const validateWorkspaceAndWorld = async (
     )
   }
 
-  const baseParcel = sceneJson.scene?.base || '0,0'
-  const parcels = sceneJson.scene?.parcels || ['0,0']
+  const baseParcel = sceneJson.scene.base
+  const parcels = sceneJson.scene.parcels
 
   return { worldName, baseParcel, parcels }
+}
+
+/**
+ * Appends the scene base parcel as a `position` query param to a storage URL.
+ * The Server Side Storage service resolves which scene a request targets from
+ * this param; without it the service defaults to '0,0' and rejects world requests.
+ */
+export const withPosition = (url: string, baseParcel: string): string => {
+  const position = baseParcel.replace(/\s/g, '')
+  const separator = url.includes('?') ? '&' : '?'
+  return `${url}${separator}position=${position}`
 }
 
 /**
