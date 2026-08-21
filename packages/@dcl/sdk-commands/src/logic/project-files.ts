@@ -1,7 +1,7 @@
 import { ContentMapping } from '@dcl/schemas/dist/misc/content-mapping'
 import { CliComponents } from '../components'
 import { getDCLIgnorePatterns } from './dcl-ignore'
-import { sync as globSync } from 'glob'
+import { globSync, statSync, Dirent } from 'fs'
 import ignore from 'ignore'
 import i18next from 'i18next'
 import os from 'os'
@@ -27,13 +27,15 @@ export async function getPublishableFiles(
   const ig = ignore().add(ignorePatterns)
   const allFiles = globSync('**/*', {
     cwd: projectRoot,
-    absolute: false,
-    dot: false,
-    ignore: ignorePatterns,
-    nodir: true
+    // prune walking into trees ig.filter below always excludes anyway (perf only;
+    // exclude receives a string on some Node versions and a Dirent on others)
+    exclude: (entry: string | Dirent) => {
+      const name = typeof entry === 'string' ? path.basename(entry) : entry.name
+      return name.startsWith('.') || name === 'node_modules'
+    }
   })
 
-  return ig.filter(allFiles)
+  return ig.filter(allFiles).filter((file) => statSync(resolve(projectRoot, file)).isFile())
 }
 
 /**

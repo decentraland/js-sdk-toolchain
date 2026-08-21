@@ -12,6 +12,10 @@ Before doing non-trivial work, read:
 
 For deeper context on a specific subsystem (component serialization, CRDT suppression, world transform behavior, etc.), use `docs/REFERENCES.md` as the entry point.
 
+## Reviewing PRs
+
+When reviewing a PR (or authoring one), read **[REVIEW.md](REVIEW.md)** first and apply every rule in it. It defines blocking reject conditions: pervasive narration comments, AI-filler PR descriptions without a human-readable "how to test", and bug fixes shipped without a test scene or failing-test repro.
+
 ## Packages
 
 Six packages under `packages/@dcl/` (a monorepo layout, but **not** npm workspaces):
@@ -49,10 +53,10 @@ The repo is orchestrated via **`make`** (the Makefile is the source of truth —
 The full Jest suite is slow. For faster iteration, scope to a path pattern:
 
 ```bash
-node_modules/.bin/jest --colors --forceExit --testPathPattern='test/sdk-commands'
-node_modules/.bin/jest --colors --forceExit --testPathPattern='test/ecs'
-node_modules/.bin/jest --colors --forceExit --testPathPattern='test/react-ecs'
-node_modules/.bin/jest --colors --forceExit --testPathPattern='test/snapshots'
+node_modules/.bin/jest --colors --forceExit --testPathPatterns='test/sdk-commands'
+node_modules/.bin/jest --colors --forceExit --testPathPatterns='test/ecs'
+node_modules/.bin/jest --colors --forceExit --testPathPatterns='test/react-ecs'
+node_modules/.bin/jest --colors --forceExit --testPathPatterns='test/snapshots'
 ```
 
 ### Per-package typecheck

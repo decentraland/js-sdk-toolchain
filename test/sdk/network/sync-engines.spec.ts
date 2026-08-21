@@ -18,7 +18,7 @@ import { createRendererTransport } from '../../../packages/@dcl/sdk/internal/tra
 import { ReadWriteByteBuffer } from '../../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { readMessage } from '../../../packages/@dcl/ecs/src/serialization/crdt/message'
 import { EntityState, PutNetworkComponentOperation } from '../../../packages/@dcl/ecs/src'
-import { SendBinaryRequest, SendBinaryResponse } from '~system/CommunicationsController'
+import type { SendBinaryRequest, SendBinaryResponse } from '~system/CommunicationsController'
 
 function defineComponents(engine: IEngine) {
   return {

@@ -269,7 +269,7 @@ export function createRaycastSystem(engine: IEngine): RaycastSystem {
   }
 
   // @internal
-  engine.addSystem(function EventSystem() {
+  engine.addSystem(function RaycastEventSystem() {
     for (const addMissingRaycast of nextTickRaycasts) {
       addMissingRaycast()
     }
