@@ -37,6 +37,26 @@ export function forwardedHeaders(
 }
 
 /**
+ * Builds the headers returned to the linker-dapp client from a proxied fetch response.
+ *
+ * undici transparently decompresses the body but leaves the upstream `content-encoding` and
+ * `content-length` in place; forwarding them would make the client re-decode an already-decoded
+ * body or truncate it at the wrong length, so both are dropped and the framing is recomputed
+ * downstream.
+ */
+export function proxiedResponseHeaders(headers: Headers): Record<string, string> {
+  const result: Record<string, string> = {}
+
+  for (const [key, value] of headers) {
+    const name = key.toLowerCase()
+    if (['content-encoding', 'content-length'].includes(name)) continue
+    result[name] = value
+  }
+
+  return result
+}
+
+/**
  * Set common routes to use on Linker dApp
  * @param components Server components
  * @param info Info to be sent within /api/info body response
@@ -91,12 +111,7 @@ export function setRoutes<T extends { [key: string]: any }>(
         dispatcher: insecureDispatcher
       })
 
-      const responseHeaders: Record<string, string> = {}
-      for (const [key, value] of response.headers) {
-        const name = key.toLowerCase()
-        if (['content-encoding', 'content-length'].includes(name)) continue
-        responseHeaders[name] = value
-      }
+      const responseHeaders = proxiedResponseHeaders(response.headers)
 
       return {
         body: response.body ? Readable.fromWeb(response.body as any) : undefined,

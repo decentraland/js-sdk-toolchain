@@ -1,6 +1,6 @@
 import { createRequire } from 'module'
 import type { IHttpServerComponent } from '@well-known-components/interfaces'
-import { forwardedHeaders } from '../../../packages/@dcl/sdk-commands/src/linker-dapp/routes'
+import { forwardedHeaders, proxiedResponseHeaders } from '../../../packages/@dcl/sdk-commands/src/linker-dapp/routes'
 
 const sdkRequire = createRequire(require.resolve('../../../packages/@dcl/sdk-commands/package.json'))
 const { Headers } = sdkRequire('node-fetch')
@@ -68,6 +68,34 @@ describe('forwardedHeaders', () => {
 
     it('should still forward the end-to-end headers', () => {
       expect(result.authorization).toBe('Bearer token')
+    })
+  })
+})
+
+describe('proxiedResponseHeaders', () => {
+  let responseHeaders: Headers
+  let result: Record<string, string>
+
+  describe('when the upstream response includes body-framing headers', () => {
+    beforeEach(() => {
+      responseHeaders = new Headers({
+        'content-encoding': 'gzip',
+        'content-length': '10',
+        'cache-control': 'no-cache'
+      })
+      result = proxiedResponseHeaders(responseHeaders)
+    })
+
+    it('should drop the content-encoding header that no longer matches the decompressed body', () => {
+      expect(result['content-encoding']).toBeUndefined()
+    })
+
+    it('should drop the content-length header that no longer matches the decompressed body', () => {
+      expect(result['content-length']).toBeUndefined()
+    })
+
+    it('should forward the remaining headers', () => {
+      expect(result['cache-control']).toBe('no-cache')
     })
   })
 })
