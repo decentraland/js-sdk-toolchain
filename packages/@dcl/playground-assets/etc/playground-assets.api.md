@@ -5798,10 +5798,6 @@ export const enum YGWrap {
     YGW_WRAP_REVERSE = 2
 }
 
-// Warnings were encountered during analysis:
-//
-// /Users/pravus/git/js-sdk-toolchain-alt/packages/@dcl/ecs/dist/systems/crdt/types.d.ts:34:53 - (tsdoc-malformed-html-name) Invalid HTML element: A space is not allowed here
-
 // (No @packageDocumentation comment for this package)
 
 ```
