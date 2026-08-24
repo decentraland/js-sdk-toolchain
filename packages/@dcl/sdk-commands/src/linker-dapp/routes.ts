@@ -8,7 +8,7 @@ import { AuthChain } from '@dcl/crypto'
 
 import { CliComponents } from '../components'
 
-const CONNECTION_HEADERS = new Set([
+const STRIPPED_REQUEST_HEADERS = new Set([
   'connection',
   'content-length',
   'keep-alive',
@@ -29,7 +29,7 @@ export function forwardedHeaders(
 
   for (const [key, value] of request.headers) {
     const name = key.toLowerCase()
-    if (CONNECTION_HEADERS.has(name) || overriddenNames.has(name)) continue
+    if (STRIPPED_REQUEST_HEADERS.has(name) || overriddenNames.has(name)) continue
     forwarded[name] = value
   }
 
@@ -94,8 +94,8 @@ export function setRoutes<T extends { [key: string]: any }>(
       const responseHeaders: Record<string, string> = {}
       for (const [key, value] of response.headers) {
         const name = key.toLowerCase()
-        if (name === 'content-encoding' || name === 'content-length') continue
-        responseHeaders[key] = value
+        if (['content-encoding', 'content-length'].includes(name)) continue
+        responseHeaders[name] = value
       }
 
       return {
