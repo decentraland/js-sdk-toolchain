@@ -1,4 +1,4 @@
-import future, { IFuture } from 'fp-future'
+import future, { IFuture } from '../../logic/future'
 import { ethSign } from '@dcl/crypto/dist/crypto'
 import { hexToBytes } from 'eth-connect'
 import { Lifecycle } from '@well-known-components/interfaces'
@@ -6,7 +6,7 @@ import { Authenticator, AuthChain } from '@dcl/crypto'
 import { dirname, resolve } from 'path'
 import { Router } from '@well-known-components/http-server'
 import { validateStepsAndConnections } from '@dcl/quests-client/dist-cjs/utils'
-import prompts from 'prompts'
+import prompts from '../../logic/prompts'
 
 import { CreateQuest, QuestLinkerActionType } from './types'
 import { CliComponents } from '../../components'
@@ -170,7 +170,7 @@ export const createQuestByPrompting = async (
     onCancel
   )
 
-  let { definition } = await prompts(
+  const { definition: rawDefinition } = await prompts(
     {
       type: 'text',
       name: 'definition',
@@ -187,9 +187,10 @@ export const createQuestByPrompting = async (
     },
     onCancel
   )
-  definition = JSON.parse(definition)
 
   if (cancelled) return null
+
+  const definition: CreateQuest['definition'] = JSON.parse(rawDefinition)
 
   const { withReward } = await prompts(
     {

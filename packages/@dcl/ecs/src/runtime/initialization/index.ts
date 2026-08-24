@@ -9,6 +9,7 @@ import { createPointerEventsSystem, PointerEventsSystem } from '../../systems/ev
 import { createInputSystem, IInputSystem } from './../../engine/input'
 import { createRaycastSystem, RaycastSystem } from '../../systems/raycast'
 import { createVideoEventsSystem, VideoEventsSystem } from '../../systems/videoEvents'
+import { createAudioEventsSystem, AudioEventsSystem } from '../../systems/audioEvents'
 import { createAssetLoadLoadingStateSystem, AssetLoadLoadingStateSystem } from '../../systems/assetLoad'
 import { TweenSystem, createTweenSystem } from '../../systems/tween'
 import { pointerEventColliderChecker } from '../../systems/pointer-event-collider-checker'
@@ -62,6 +63,13 @@ export { RaycastSystem }
  */
 export const videoEventsSystem: VideoEventsSystem = /* @__PURE__ */ createVideoEventsSystem(engine)
 export { VideoEventsSystem }
+
+/**
+ * @public
+ * Register callback functions to a particular entity on audio events.
+ */
+export const audioEventsSystem: AudioEventsSystem = /* @__PURE__ */ createAudioEventsSystem(engine)
+export { AudioEventsSystem }
 
 /**
  * @public

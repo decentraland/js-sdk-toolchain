@@ -311,11 +311,12 @@ describe('Virtual scale factor with mixed % and pixel values', () => {
     uiRenderer.destroy()
   })
 
-  it('should normalize the scale factor by devicePixelRatio', async () => {
+  it('should not let devicePixelRatio affect the scale factor', async () => {
     const { engine, uiRenderer } = setupEngine()
     const UiTransform = components.UiTransform(engine)
     const UiCanvasInformation = components.UiCanvasInformation(engine)
-    // Physical-pixel canvas on a high-DPR (mobile) screen: 3840x2160 @ dpr 2.
+    // High-density screen: 3840x2160 @ dpr 2. The design resolution fits the canvas
+    // exactly twice over, so that — and only that — is the scale factor.
     UiCanvasInformation.create(engine.RootEntity, {
       devicePixelRatio: 2,
       width: 3840,
@@ -328,39 +329,43 @@ describe('Virtual scale factor with mixed % and pixel values', () => {
 
     await engine.update(1)
 
-    // scale = Math.min(3840/1920, 2160/1080) / 2 = 2 / 2 = 1
-    expect(getUiScaleFactor()).toBe(1)
-
-    const panelEntity = (entityIndex + 1) as Entity
-    expect(UiTransform.get(panelEntity).width).toBe(300) // 300 * 1
-    expect(UiTransform.get(panelEntity).height).toBe(300) // 300 * 1
-
-    uiRenderer.destroy()
-  })
-
-  it('should treat a missing/zero devicePixelRatio as 1', async () => {
-    const { engine, uiRenderer } = setupEngine()
-    const UiTransform = components.UiTransform(engine)
-    const UiCanvasInformation = components.UiCanvasInformation(engine)
-    UiCanvasInformation.create(engine.RootEntity, {
-      devicePixelRatio: 0,
-      width: 3840,
-      height: 2160,
-      interactableArea: { left: 0, right: 0, top: 0, bottom: 0 }
-    })
-    const entityIndex = engine.addEntity() as number
-
-    uiRenderer.setUiRenderer(() => <Panel1 />, { virtualWidth: 1920, virtualHeight: 1080 })
-
-    await engine.update(1)
-
-    // dpr 0 must not divide by zero — falls back to 1, so scale = 2
+    // scale = Math.min(3840/1920, 2160/1080) = 2, undivided.
     expect(getUiScaleFactor()).toBe(2)
 
     const panelEntity = (entityIndex + 1) as Entity
     expect(UiTransform.get(panelEntity).width).toBe(600) // 300 * 2
+    expect(UiTransform.get(panelEntity).height).toBe(600) // 300 * 2
 
     uiRenderer.destroy()
+  })
+
+  it('should produce the same scale factor whatever devicePixelRatio reports', async () => {
+    // The regression guard: two canvases identical in every way except the density
+    // hint must lay out identically. dpr 0 is included because it used to be a
+    // divide-by-zero guard, and there must no longer be a division to guard.
+    for (const devicePixelRatio of [0, 1, 2, 3.5]) {
+      const { engine, uiRenderer } = setupEngine()
+      const UiTransform = components.UiTransform(engine)
+      const UiCanvasInformation = components.UiCanvasInformation(engine)
+      UiCanvasInformation.create(engine.RootEntity, {
+        devicePixelRatio,
+        width: 3840,
+        height: 2160,
+        interactableArea: { left: 0, right: 0, top: 0, bottom: 0 }
+      })
+      const entityIndex = engine.addEntity() as number
+
+      uiRenderer.setUiRenderer(() => <Panel1 />, { virtualWidth: 1920, virtualHeight: 1080 })
+
+      await engine.update(1)
+
+      expect(getUiScaleFactor()).toBe(2)
+
+      const panelEntity = (entityIndex + 1) as Entity
+      expect(UiTransform.get(panelEntity).width).toBe(600) // 300 * 2
+
+      uiRenderer.destroy()
+    }
   })
 
   it('should use scale factor 1 when UiCanvasInformation is not yet available', async () => {
