@@ -33,4 +33,12 @@ export type Transport = {
   onmessage?(message: Uint8Array): void
   filter(message: Omit<TransportMessage, 'messageBuffer'>): boolean
   type?: string
+  /**
+   * Whether this transport is allowed to delete reserved-range entities
+   * (root/player/camera + avatars, entity number < RESERVED_STATIC_ENTITIES).
+   * Only the trusted host/renderer transport sets this. An inbound DELETE_ENTITY
+   * on a reserved entity from a transport without this flag (a comms peer, or any
+   * scene-added transport) is rejected — see `receiveMessages`.
+   */
+  allowReservedEntities?: boolean
 }

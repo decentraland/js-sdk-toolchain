@@ -97,6 +97,18 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
       // Simple CRDT processing - no network logic
 
       if (msg.type === CrdtMessageType.DELETE_ENTITY) {
+        // Reserved-range entities (root/player/camera + avatars, entity number <
+        // RESERVED_STATIC_ENTITIES) are host-owned. Only the trusted host/renderer
+        // transport may delete them; reject an inbound DELETE_ENTITY on a reserved
+        // entity from any other transport (a comms peer, or a scene-added transport).
+        // The allocator half is already guarded (engine.removeEntity is a no-op on
+        // this range); this closes the receive-side half.
+        const isReserved = engine.entityContainer.getEntityState(msg.entityId) === EntityState.Reserved
+        const fromTrustedTransport =
+          msg.transportId !== undefined && !!transports[msg.transportId]?.allowReservedEntities
+        if (isReserved && !fromTrustedTransport) {
+          continue
+        }
         entitiesShouldBeCleaned.push(msg.entityId)
         broadcastMessages.push(msg)
       } else {
