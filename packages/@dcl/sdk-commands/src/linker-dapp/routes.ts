@@ -9,6 +9,48 @@ import { AuthChain } from '@dcl/crypto'
 import { CliComponents } from '../components'
 
 /**
+ * Headers that describe THIS connection rather than the proxied request. Passing them along
+ * makes undici reject the request outright or leaves the upstream framing a body that is no
+ * longer the one being sent.
+ */
+const HOP_BY_HOP_HEADERS = new Set([
+  'connection',
+  'content-length',
+  'keep-alive',
+  'proxy-authenticate',
+  'proxy-authorization',
+  'te',
+  'trailer',
+  'transfer-encoding',
+  'upgrade'
+])
+
+/**
+ * Builds the header set to forward upstream, with `overrides` winning over whatever the
+ * client sent.
+ *
+ * Header names are case-insensitive on the wire but not as object keys, so an incoming
+ * `host` and an override `Host` would both survive into the request and be sent as two
+ * conflicting headers. Names are lowercased and the overridden ones dropped first, so each
+ * one is written exactly once.
+ */
+function forwardedHeaders(
+  request: IHttpServerComponent.IRequest,
+  overrides: Record<string, string>
+): Record<string, string> {
+  const overridden = new Set(Object.keys(overrides).map((name) => name.toLowerCase()))
+  const headers: Record<string, string> = {}
+
+  for (const [key, value] of request.headers) {
+    const name = key.toLowerCase()
+    if (HOP_BY_HOP_HEADERS.has(name) || overridden.has(name)) continue
+    headers[name] = value
+  }
+
+  return { ...headers, ...overrides }
+}
+
+/**
  * Set common routes to use on Linker dApp
  * @param components Server components
  * @param info Info to be sent within /api/info body response
@@ -57,14 +99,18 @@ export function setRoutes<T extends { [key: string]: any }>(
       const url = `https://${domain}${ctx.url.pathname}${ctx.url.search}`
 
       // Forward the incoming request to the Decentraland auth endpoint.
+      //
+      // The client's headers have to be ITERATED, never spread: they live behind a
+      // symbol-keyed slot, so a spread copies that symbol and none of the headers — and
+      // undici rejects a symbol key outright ("cannot be converted to a ByteString"),
+      // taking the whole proxied request down with it.
       const resp = await components.fetch.fetch(url, {
         method: ctx.request.method, // Ensure the correct method (GET in this case).
-        headers: {
-          ...ctx.request.headers,
-          Host: domain,
-          Referer: url,
-          Origin: url
-        }, // Forward headers for proper proxy behavior.
+        headers: forwardedHeaders(ctx.request, {
+          host: domain,
+          referer: url,
+          origin: url
+        }),
         body: ctx.request.body as any, // Forward request body if necessary.
         duplex: 'half', // Required by native fetch when streaming a request body.
         dispatcher: insecureDispatcher // Skip TLS verification.
