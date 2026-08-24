@@ -40,7 +40,7 @@ describe('ByteBuffer tests', () => {
 
     expect(() => {
       buf.readInt8()
-    }).toThrowError('Outside of the bounds of writen data.')
+    }).toThrow('Outside of the bounds of writen data.')
 
     expect(buf.currentWriteOffset()).toBe(2)
     buf.writeInt8(100)

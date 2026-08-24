@@ -34,6 +34,6 @@ describe('Execute Task', () => {
 
     // flush the callback event looper
     await new Promise(process.nextTick)
-    expect(error).toBeCalledWith('Error bubbles to console')
+    expect(error).toHaveBeenCalledWith('Error bubbles to console')
   })
 })

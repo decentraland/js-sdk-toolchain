@@ -110,14 +110,14 @@ Uses esbuild with `platform: 'browser'`, `format: 'cjs'`, `target: 'es2020'`, an
 | `-p, --port <number>` | HTTP port (auto-detected if omitted) |
 | `--dclenv <env>` | Explorer environment: `org` (mainnet production, default), `zone` (staging), `today` |
 | `--realm <name>` | Realm name shown in Explorer (default: `Localhost`) |
-| `--web3` | Enable Web3 wallet integration in the preview |
+| `--web3` | (deprecated) No effect; kept for backwards compatibility |
 | `--skip-build` | Serve pre-built files without rebuilding |
 | `--no-watch` | Disable file watching / hot reload |
 | `--no-browser` | Don't auto-open Explorer |
 | `--ci` | CI mode: disable browser and debug panel |
 | `--debug` | Enable scene debug panel (on by default with `--explorer-alpha`) |
 | `--explorer-alpha` | Use the new Alpha Explorer deeplink (default) |
-| `--web-explorer` | Use legacy web-based Explorer |
+| `--web, --bevy-web` | Open the preview in Bevy Web (`https://decentraland.org/bevy-web/`) instead of the desktop Explorer. Chrome 142+ requires the Local Network Access permission ("Apps on device" in 145+) for the page to reach the localhost preview server; the CLI prints instructions |
 | `--mobile` | Print ASCII QR code for mobile preview |
 | `--position <x,y>` | Initial spawn position (default: from `scene.json`) |
 | `--skip-auth-screen` | Skip Explorer's authentication screen |
