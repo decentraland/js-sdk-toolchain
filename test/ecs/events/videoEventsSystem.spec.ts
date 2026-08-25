@@ -100,6 +100,45 @@ describe('Video events helper system should', () => {
     expect(fn).toHaveBeenCalledTimes(1)
   })
 
+  it('preserve the last video state when re-registering a callback on the same entity', async () => {
+    const fn = jest.fn()
+    const newFn = jest.fn()
+
+    const videoPlayerEntity = engine.addEntity()
+    videoPlayerComponent.create(videoPlayerEntity)
+    // simulate video event attach in renderer
+    videoEventComponent.addValue(videoPlayerEntity, {
+      state: VideoState.VS_PLAYING,
+      currentOffset: 0,
+      videoLength: 5,
+      timestamp: 1,
+      tickNumber: 1
+    })
+
+    videoEventsSystem.registerVideoEventsEntity(videoPlayerEntity, fn)
+
+    await engine.update(1)
+    expect(fn).toHaveBeenCalledTimes(1)
+
+    // re-register with a new callback; the state hasn't changed so it must not re-fire
+    videoEventsSystem.registerVideoEventsEntity(videoPlayerEntity, newFn)
+
+    await engine.update(1)
+    expect(newFn).not.toHaveBeenCalled()
+
+    // a new state change still fires the new callback
+    videoEventComponent.addValue(videoPlayerEntity, {
+      state: VideoState.VS_PAUSED,
+      currentOffset: 2,
+      videoLength: 5,
+      timestamp: 2,
+      tickNumber: 2
+    })
+
+    await engine.update(1)
+    expect(newFn).toHaveBeenCalledWith(expect.objectContaining({ state: VideoState.VS_PAUSED }))
+  })
+
   it('remove subscribed entity when video player is removed', async () => {
     const fn = jest.fn()
 
@@ -121,7 +160,7 @@ describe('Video events helper system should', () => {
 
     await engine.update(1)
 
-    expect(fn).toBeCalledTimes(0)
+    expect(fn).toHaveBeenCalledTimes(0)
     expect(videoEventsSystem.hasVideoEventsEntity(videoPlayerEntity)).toBe(false)
   })
 
