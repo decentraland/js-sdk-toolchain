@@ -106,11 +106,8 @@ export async function getProjectPublishableFilesWithHashes(
 }
 export const machineId = os.hostname() || os.userInfo().username
 
-/**
- * Preview entity ids. Also the base of the LSD Pulse realm key, which explorers
- * derive independently — see docs/lsd-identity-and-pulse-realm.md before changing
- * the encoding.
- */
+// Preview entity ids, and the base of the LSD Pulse realm key that explorers
+// derive independently. See docs/lsd-identity-and-pulse-realm.md before changing.
 export const b64HashingFunction = (str: string) => {
   const unique = `${str}-${machineId}`
   return 'b64-' + Buffer.from(unique).toString('base64')

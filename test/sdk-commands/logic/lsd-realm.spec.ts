@@ -1,4 +1,7 @@
 import { createHash } from 'crypto'
+import { mkdtemp, writeFile } from 'fs/promises'
+import os from 'os'
+import path from 'path'
 import {
   PULSE_MAX_REALM_LENGTH,
   lsdPreviewSceneId,
@@ -8,53 +11,46 @@ import {
 } from '../../../packages/@dcl/sdk-commands/src/logic/lsd-realm'
 import { b64HashingFunction, machineId } from '../../../packages/@dcl/sdk-commands/src/logic/project-files'
 
-/**
- * The LSD identity contract (see docs/lsd-identity-and-pulse-realm.md).
- *
- * Pulse partitions visibility by exact realm-string match: every party derives
- * the string independently and there is no key exchange, so any drift between
- * the CLI and an explorer is an invisible "my friend can't see me" bug rather
- * than a connection error. These tests pin the derivation.
- */
+// Pulse matches realms by exact string, so a drifting derivation fails silently.
+// Contract: docs/lsd-identity-and-pulse-realm.md
+const PROJECT_ROOT = '/home/dev/my-scene'
+
 describe('LSD preview scene id', () => {
   it('is the shared b64HashingFunction, not a second derivation', () => {
-    const projectRoot = '/home/dev/my-scene'
-
-    expect(lsdPreviewSceneId(projectRoot)).toEqual(b64HashingFunction(projectRoot))
+    expect(lsdPreviewSceneId(PROJECT_ROOT)).toEqual(b64HashingFunction(PROJECT_ROOT))
   })
 
   it('encodes `${absoluteProjectRoot}-${machineId}` as documented', () => {
-    const projectRoot = '/home/dev/my-scene'
+    const expected = 'b64-' + Buffer.from(`${PROJECT_ROOT}-${machineId}`).toString('base64')
 
-    const expected = 'b64-' + Buffer.from(`${projectRoot}-${machineId}`).toString('base64')
-    expect(lsdPreviewSceneId(projectRoot)).toEqual(expected)
+    expect(lsdPreviewSceneId(PROJECT_ROOT)).toEqual(expected)
   })
 })
 
 describe('LSD Pulse realm key', () => {
   it('prefixes the preview scene id with `lsd:`', () => {
-    const projectRoot = '/home/dev/my-scene'
-
-    expect(lsdRealmKey(projectRoot)).toEqual(`lsd:${b64HashingFunction(projectRoot)}`)
-  })
-
-  it('derives from the project root alone, so it survives edits and reloads', () => {
-    // PR #1529 versions per-file preview hashes by mtime but keeps the project
-    // directory's own entity id path-only. Deriving the realm key from anything
-    // content- or mtime-shaped would re-partition comms on every file save.
-    const projectRoot = '/home/dev/my-scene'
-
-    expect(lsdRealmKey(projectRoot)).toEqual(lsdRealmKey(projectRoot))
+    expect(lsdRealmKey(PROJECT_ROOT)).toEqual(`lsd:${b64HashingFunction(PROJECT_ROOT)}`)
   })
 
   it('gives different projects different realms', () => {
     expect(lsdRealmKey('/home/dev/scene-a')).not.toEqual(lsdRealmKey('/home/dev/scene-b'))
   })
 
+  it('does not change when the project contents change', async () => {
+    // the realm must survive edits and reloads; a content- or mtime-shaped
+    // derivation would re-partition comms on every file save
+    const projectRoot = await mkdtemp(path.join(os.tmpdir(), 'lsd-realm-'))
+    const before = lsdRealmKey(projectRoot)
+
+    await writeFile(path.join(projectRoot, 'game.ts'), 'export const a = 1')
+    await writeFile(path.join(projectRoot, 'game.ts'), 'export const a = 2')
+
+    expect(lsdRealmKey(projectRoot)).toEqual(before)
+  })
+
   describe('when the raw key would exceed Pulse MaxRealmLength', () => {
-    // base64 output length is always a multiple of 4, so no project root yields a
-    // raw key of exactly 255 chars. Grow the root until the rule trips and assert
-    // on the two keys straddling the boundary.
+    // base64 lengths are multiples of 4, so no root yields exactly 255; grow the
+    // root until the rule trips and assert on the keys straddling the boundary
     const boundary = (() => {
       for (let length = 1; length < 1024; length++) {
         const root = '/home/dev/' + 'x'.repeat(length)
@@ -77,10 +73,9 @@ describe('LSD Pulse realm key', () => {
       expect(boundary.firstHashed).toEqual(expected)
     })
 
-    it('produces a key that fits, deterministically', () => {
+    it('produces a key that fits', () => {
       expect(boundary.firstHashed).toMatch(/^lsd:sha256:[0-9a-f]{64}$/)
       expect(boundary.firstHashed.length).toBeLessThanOrEqual(PULSE_MAX_REALM_LENGTH)
-      expect(lsdRealmKey(boundary.root)).toEqual(boundary.firstHashed)
     })
   })
 })
@@ -93,8 +88,6 @@ describe('the --pulse-realm gate', () => {
     else process.env.DCL_SERVER_PULSE_REALM = original
   })
 
-  // bevy-explorer#1030 makes the headless binary exit 2 on arguments it used to
-  // ignore, so the flag stays opt-in until bevy-headless declares support.
   it('is off unless opted into', () => {
     delete process.env.DCL_SERVER_PULSE_REALM
     expect(pulseRealmEnabled()).toBe(false)
@@ -120,12 +113,12 @@ describe('the --pulse-realm gate', () => {
   it('contributes no arguments while gated off', () => {
     delete process.env.DCL_SERVER_PULSE_REALM
 
-    expect(pulseRealmArgs('/home/dev/my-scene')).toEqual([])
+    expect(pulseRealmArgs(PROJECT_ROOT)).toEqual([])
   })
 
-  it('contributes one engine-agnostic flag when enabled', () => {
+  it('contributes one flag when enabled', () => {
     process.env.DCL_SERVER_PULSE_REALM = '1'
 
-    expect(pulseRealmArgs('/home/dev/my-scene')).toEqual([`--pulse-realm=${lsdRealmKey('/home/dev/my-scene')}`])
+    expect(pulseRealmArgs(PROJECT_ROOT)).toEqual([`--pulse-realm=${lsdRealmKey(PROJECT_ROOT)}`])
   })
 })
