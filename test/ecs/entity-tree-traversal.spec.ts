@@ -183,7 +183,8 @@ describe('removeEntityWithChildren', () => {
     const firstChild = createCube(first)
     const secondChild = createCube(first)
     const thirdChild = createCube(first)
-    const tree = [thirdChild, secondChild, firstChild, second, third, root]
+    // `first` is an internal parent: checked so the middle of the tree is proven removed too.
+    const tree = [thirdChild, secondChild, firstChild, first, second, third, root]
 
     if (closeTheLoop) {
       const recursive = createCube(first)
@@ -235,6 +236,8 @@ describe('removeEntityWithChildren', () => {
   })
 
   describe('and the entity is synchronized with cyclic network parenting', () => {
+    let child: Entity
+    let parent: Entity
     let removed: Entity[]
 
     beforeEach(() => {
@@ -242,8 +245,8 @@ describe('removeEntityWithChildren', () => {
       const NetworkEntity = components.NetworkEntity(engine)
       const NetworkParent = components.NetworkParent(engine)
 
-      const parent = engine.addEntity()
-      const child = engine.addEntity()
+      parent = engine.addEntity()
+      child = engine.addEntity()
       NetworkEntity.create(parent, { entityId: 1 as Entity, networkId: 1 })
       NetworkEntity.create(child, { entityId: 2 as Entity, networkId: 1 })
       NetworkParent.create(child, { entityId: 1 as Entity, networkId: 1 })
@@ -267,8 +270,8 @@ describe('removeEntityWithChildren', () => {
       )
     })
 
-    it('should remove each entity in the cycle exactly once', () => {
-      expect(removed).toHaveLength(2)
+    it('should remove each entity in the cycle exactly once, parent first', () => {
+      expect(removed).toEqual([parent, child])
     })
   })
 })
