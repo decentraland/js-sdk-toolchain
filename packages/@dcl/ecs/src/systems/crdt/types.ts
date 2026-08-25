@@ -35,7 +35,7 @@ export type Transport = {
   type?: string
   /**
    * Whether this transport is allowed to mutate reserved-range entities
-   * (root/player/camera + avatars, entity number < RESERVED_STATIC_ENTITIES).
+   * (root/player/camera + avatars, entity number below `RESERVED_STATIC_ENTITIES`).
    * Only the trusted host/renderer transport sets this. An inbound DELETE_ENTITY
    * or component operation (PUT_COMPONENT, DELETE_COMPONENT, APPEND_VALUE,
    * AUTHORITATIVE_PUT_COMPONENT) on a reserved entity from a transport without

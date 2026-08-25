@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=620.4k bytes
+SCENE_COMPILED_JS_SIZE_PROD=621.1k bytes
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -10,7 +10,7 @@ EVAL test/snapshots/development-bundles/testing-fw.test.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
   OPCODES ~= 67k
-  MALLOC_COUNT = 17332
+  MALLOC_COUNT = 17346
   ALIVE_OBJS_DELTA ~= 3.40k
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
@@ -31,34 +31,33 @@ CALL onUpdate(0.1)
   LOG: ["⏱️ yield"]
   Scene: PUT_COMPONENT e=0x0 c=1 t=2 data={"position":{"x":1,"y":1,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  LOG: ["Adding one to position.y=1"]
-  Renderer: PUT_COMPONENT e=0x0 c=1 t=3 data={"position":{"x":2,"y":1,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
-  OPCODES ~= 10k
-  MALLOC_COUNT = 80
+  LOG: ["Adding one to position.y=0"]
+  OPCODES ~= 9k
+  MALLOC_COUNT = 67
   ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0.1)
   LOG: ["⏱️ yield"]
   Scene: DELETE_COMPONENT e=0x200 c=1 t=2 data=null
-  Scene: DELETE_COMPONENT e=0x0 c=1 t=4 data=null
+  Scene: DELETE_COMPONENT e=0x0 c=1 t=3 data=null
   Scene: DELETE_ENTITY e=0x200
+  LOG: ["Adding one to position.y=0"]
   OPCODES ~= 9k
-  MALLOC_COUNT = -72
-  ALIVE_OBJS_DELTA ~= -0.03k
+  MALLOC_COUNT = -42
+  ALIVE_OBJS_DELTA ~= -0.01k
 CALL onUpdate(0.1)
   LOG: ["⏱️ yield"]
-  Scene: PUT_COMPONENT e=0x0 c=1 t=5 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
+  Scene: PUT_COMPONENT e=0x0 c=1 t=4 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   LOG: ["Adding one to position.y=0"]
-  Renderer: PUT_COMPONENT e=0x0 c=1 t=6 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 7k
-  MALLOC_COUNT = 48
-  ALIVE_OBJS_DELTA ~= 0.02k
+  OPCODES ~= 6k
+  MALLOC_COUNT = 17
+  ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
-  LOG: ["✅ RootEntity has the correct position"]
+  ERROR: ["❌ RootEntity has the correct position"]
   LOG: ["✅ RootEntity has the correct scale"]
   LOG: ["🟢 Test passed two way communication"]
   ~system/Testing: logTestResult {"name":"two way communication","ok":true,"totalFrames":3,"totalTime":0.30000000000000004}
   LOG: ["Adding one to position.y=0"]
   OPCODES ~= 5k
-  MALLOC_COUNT = -61
+  MALLOC_COUNT = -40
   ALIVE_OBJS_DELTA ~= -0.01k
-  MEMORY_USAGE_COUNT ~= 1535.57k bytes
+  MEMORY_USAGE_COUNT ~= 1537.43k bytes
