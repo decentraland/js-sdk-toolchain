@@ -400,10 +400,29 @@ function createPlayerHelper(engine: IEngine): IPlayersHelper {
     }
     // Live scan. Case-insensitive on purpose: addresses reach scenes in mixed casings, and
     // an exact comparison silently returns null for a lowercased address.
+    //
+    // Ranked rather than first-match, using the same comparison as the tracker. This path runs
+    // precisely when the address is NOT resolvable from the tracked set — no incumbent, or an
+    // incumbent whose identity moved — which is the duplicate-entity case, where first-match is
+    // at its worst: `getEntitiesWith` iterates its first component's backing `Map`, that store
+    // preserves insertion order, and `PlayerIdentityData` is PUT once per peer per join. So
+    // iteration order is join order, a stale entity always precedes the one that replaced it,
+    // and first-match would return the stale one deterministically on every call — disagreeing
+    // with whatever the tracker settles on next tick.
+    let best: Candidate | undefined
     for (const [entity, data] of engine.getEntitiesWith(PlayerIdentityData)) {
-      if (data.address?.toLowerCase() === key) return entity
+      const address = data.address
+      if (address?.toLowerCase() !== key) continue
+      const candidate: Candidate = {
+        key,
+        userId: address,
+        entity,
+        isGuest: !!data.isGuest,
+        avatar: AvatarBase.getOrNull(entity)
+      }
+      best = best ? betterCandidate(best, candidate, trackedEntity) : candidate
     }
-    return undefined
+    return best?.entity
   }
 
   function buildPlayerData(entity: Entity): GetPlayerDataRes | null {
