@@ -1,23 +1,40 @@
-import { Engine, Entity, IEngine, Schemas, components, getComponentEntityTree } from '../../packages/@dcl/ecs/src'
+import {
+  Engine,
+  Entity,
+  IEngine,
+  Schemas,
+  components,
+  getComponentEntityTree,
+  removeEntityWithChildren
+} from '../../packages/@dcl/ecs/src'
+
+type TreeComponent = ReturnType<IEngine['defineComponent']>
+
+/** A parenting component plus a factory that creates entities already attached to it. */
+function setupTree(engine: IEngine, componentName: string) {
+  const TreeComponent = engine.defineComponent(componentName, { parent: Schemas.Entity })
+  const create = (parent?: Entity): Entity => {
+    const entity = engine.addEntity()
+    TreeComponent.create(entity, parent === undefined ? {} : { parent })
+    return entity
+  }
+  return { TreeComponent, create }
+}
 
 describe('getComponentEntityTree', () => {
   describe('when the tree is a deep chain', () => {
     let deepestChild: Entity
-    let engine: IEngine
     let entities: Entity[]
     let root: Entity
 
     beforeEach(() => {
-      engine = Engine()
-      const TreeComponent = engine.defineComponent('test::DeepTree', { parent: Schemas.Entity })
-      root = engine.addEntity()
-      TreeComponent.create(root, {})
+      const engine = Engine()
+      const { TreeComponent, create } = setupTree(engine, 'test::DeepTree')
+      root = create()
 
       let parent = root
       for (let i = 0; i < 12_000; i++) {
-        const child = engine.addEntity()
-        TreeComponent.create(child, { parent })
-        parent = child
+        parent = create(parent)
       }
       deepestChild = parent
 
@@ -37,19 +54,13 @@ describe('getComponentEntityTree', () => {
     })
   })
 
-  describe('when a parent has several children', () => {
-    let engine: IEngine
+  describe('when parents have several children', () => {
     let entities: Entity[]
     let expected: Entity[]
 
     beforeEach(() => {
-      engine = Engine()
-      const TreeComponent = engine.defineComponent('test::WideTree', { parent: Schemas.Entity })
-      const create = (parent?: Entity): Entity => {
-        const entity = engine.addEntity()
-        TreeComponent.create(entity, parent === undefined ? {} : { parent })
-        return entity
-      }
+      const engine = Engine()
+      const { TreeComponent, create } = setupTree(engine, 'test::WideTree')
 
       const root = create()
       const first = create(root)
@@ -57,9 +68,10 @@ describe('getComponentEntityTree', () => {
       const third = create(root)
       const firstChild = create(first)
       const secondChild = create(first)
+      const thirdChild = create(first)
 
-      // Each subtree is drained in sibling order before the parent is yielded.
-      expected = [firstChild, secondChild, first, second, third, root]
+      // Each subtree is drained in sibling order before its parent is yielded.
+      expected = [firstChild, secondChild, thirdChild, first, second, third, root]
       entities = Array.from(getComponentEntityTree(engine, root, TreeComponent))
     })
 
@@ -69,20 +81,16 @@ describe('getComponentEntityTree', () => {
   })
 
   describe('when the parenting is cyclic', () => {
-    let engine: IEngine
     let entities: Entity[]
     let expected: Entity[]
 
     beforeEach(() => {
-      engine = Engine()
-      const TreeComponent = engine.defineComponent('test::CyclicTree', { parent: Schemas.Entity })
-      const root = engine.addEntity()
-      const child = engine.addEntity()
-      const grandChild = engine.addEntity()
+      const engine = Engine()
+      const { TreeComponent, create } = setupTree(engine, 'test::CyclicTree')
 
-      TreeComponent.create(root, {})
-      TreeComponent.create(child, { parent: root })
-      TreeComponent.create(grandChild, { parent: child })
+      const root = create()
+      const child = create(root)
+      const grandChild = create(child)
       // Close the loop: the root now hangs off its own descendant.
       TreeComponent.getMutable(root).parent = grandChild
 
@@ -95,16 +103,58 @@ describe('getComponentEntityTree', () => {
     })
   })
 
-  describe('when the root does not have the parenting component', () => {
-    let engine: IEngine
+  describe('when the parent is the root entity', () => {
+    let entities: Entity[]
+    let expected: Entity[]
+
+    beforeEach(() => {
+      const engine = Engine()
+      const TreeComponent = engine.defineComponent('test::RootParentedTree', { parent: Schemas.Entity })
+      // Entity 0 is a legitimate parent key, and Schemas.Entity defaults to it.
+      TreeComponent.create(engine.RootEntity, {})
+      const first = engine.addEntity()
+      const second = engine.addEntity()
+      TreeComponent.create(first, { parent: engine.RootEntity })
+      TreeComponent.create(second, { parent: engine.RootEntity })
+
+      expected = [first, second, engine.RootEntity]
+      entities = Array.from(getComponentEntityTree(engine, engine.RootEntity, TreeComponent))
+    })
+
+    it('should treat entity 0 as a parent rather than as absent', () => {
+      expect(entities).toEqual(expected)
+    })
+  })
+
+  describe('when the component has no parent field', () => {
+    let entities: Entity[]
+    let root: Entity
+
+    beforeEach(() => {
+      const engine = Engine()
+      const MeshCollider = components.MeshCollider(engine)
+      root = engine.addEntity()
+      MeshCollider.create(root, { mesh: { $case: 'box', box: {} } })
+      const child = engine.addEntity()
+      MeshCollider.create(child, { mesh: { $case: 'box', box: {} } })
+
+      entities = Array.from(getComponentEntityTree(engine, root, MeshCollider))
+    })
+
+    it('should return only the root', () => {
+      expect(entities).toEqual([root])
+    })
+  })
+
+  describe('when the root does not have the component', () => {
     let entities: Entity[]
 
     beforeEach(() => {
-      engine = Engine()
-      const TreeComponent = engine.defineComponent('test::AbsentTree', { parent: Schemas.Entity })
+      const engine = Engine()
+      const Transform = components.Transform(engine)
       const root = engine.addEntity()
 
-      entities = Array.from(getComponentEntityTree(engine, root, TreeComponent))
+      entities = Array.from(getComponentEntityTree(engine, root, Transform))
     })
 
     it('should yield nothing', () => {
@@ -114,132 +164,111 @@ describe('getComponentEntityTree', () => {
 })
 
 describe('removeEntityWithChildren', () => {
-  describe('when the tree is acyclic', () => {
-    let collidersAfter: unknown[]
-    let collidersBefore: unknown[]
-    let tree: Entity[]
-
-    beforeEach(() => {
-      const engine = Engine()
-      const Transform = components.Transform(engine)
-      const MeshCollider = components.MeshCollider(engine)
-      const createCube = (parent?: Entity): Entity => {
-        const entity = engine.addEntity()
-        Transform.create(entity, { parent })
-        MeshCollider.create(entity, { mesh: { $case: 'box', box: {} } })
-        return entity
-      }
-
-      const root = createCube()
-      const first = createCube(root)
-      const second = createCube(root)
-      const third = createCube(root)
-      const firstChild = createCube(first)
-      const secondChild = createCube(first)
-      const thirdChild = createCube(first)
-
-      tree = [thirdChild, secondChild, firstChild, second, third, root]
-      collidersBefore = tree.map((entity) => MeshCollider.getOrNull(entity))
-      engine.removeEntityWithChildren(root)
-      collidersAfter = tree.map((entity) => MeshCollider.getOrNull(entity))
-    })
-
-    it('should start with a collider on every entity in the tree', () => {
-      expect(collidersBefore.filter((collider) => collider === null)).toEqual([])
-    })
-
-    it('should remove the collider from every entity in the tree', () => {
-      expect(collidersAfter).toEqual(tree.map(() => null))
-    })
-  })
-
-  describe('when the tree has recursive parenting', () => {
-    let collidersAfter: unknown[]
-    let collidersBefore: unknown[]
-    let tree: Entity[]
-
-    beforeEach(() => {
-      const engine = Engine()
-      const Transform = components.Transform(engine)
-      const MeshCollider = components.MeshCollider(engine)
-      const createCube = (parent?: Entity): Entity => {
-        const entity = engine.addEntity()
-        Transform.create(entity, { parent })
-        MeshCollider.create(entity, { mesh: { $case: 'box', box: {} } })
-        return entity
-      }
-
-      const root = createCube()
-      const first = createCube(root)
-      const second = createCube(root)
-      const third = createCube(root)
-      const firstChild = createCube(first)
-      const secondChild = createCube(first)
-      const thirdChild = createCube(first)
-      const recursive = createCube(first)
-      // Close the loop: the root now hangs off a descendant.
-      Transform.getMutable(root).parent = recursive
-
-      tree = [thirdChild, secondChild, firstChild, second, third, root, recursive]
-      collidersBefore = tree.map((entity) => MeshCollider.getOrNull(entity))
-      engine.removeEntityWithChildren(root)
-      collidersAfter = tree.map((entity) => MeshCollider.getOrNull(entity))
-    })
-
-    it('should start with a collider on every entity in the tree', () => {
-      expect(collidersBefore.filter((collider) => collider === null)).toEqual([])
-    })
-
-    it('should remove the collider from every entity in the cycle', () => {
-      expect(collidersAfter).toEqual(tree.map(() => null))
-    })
-  })
-})
-
-describe('getComponentEntityTree, across component shapes', () => {
-  let engine: IEngine
-  let expectedTree: Entity[]
-  let root: Entity
-  let treeComponentEntities: Entity[]
-  let unparentedComponentEntities: Entity[]
-  let absentComponentEntities: Entity[]
-
-  beforeEach(() => {
-    engine = Engine()
+  /** Builds a Transform-parented tree of cubes and reports collider state around removal. */
+  function removeTree(closeTheLoop: boolean) {
+    const engine = Engine()
     const Transform = components.Transform(engine)
     const MeshCollider = components.MeshCollider(engine)
-    const TreeComponent = engine.defineComponent('test::MixedTree', { parent: Schemas.Entity })
     const createCube = (parent?: Entity): Entity => {
       const entity = engine.addEntity()
+      Transform.create(entity, { parent })
       MeshCollider.create(entity, { mesh: { $case: 'box', box: {} } })
-      TreeComponent.create(entity, { parent })
       return entity
     }
 
-    root = createCube()
+    const root = createCube()
     const first = createCube(root)
     const second = createCube(root)
     const third = createCube(root)
     const firstChild = createCube(first)
     const secondChild = createCube(first)
     const thirdChild = createCube(first)
+    const tree = [thirdChild, secondChild, firstChild, second, third, root]
 
-    expectedTree = [firstChild, secondChild, thirdChild, first, second, third, root]
-    treeComponentEntities = Array.from(getComponentEntityTree(engine, root, TreeComponent))
-    // MeshCollider has no `parent` field, so nothing is ever indexed as a child.
-    unparentedComponentEntities = Array.from(getComponentEntityTree(engine, root, MeshCollider))
-    absentComponentEntities = Array.from(getComponentEntityTree(engine, root, Transform))
+    if (closeTheLoop) {
+      const recursive = createCube(first)
+      tree.push(recursive)
+      Transform.getMutable(root).parent = recursive
+    }
+
+    const before = tree.map((entity) => MeshCollider.getOrNull(entity))
+    engine.removeEntityWithChildren(root)
+    const after = tree.map((entity) => MeshCollider.getOrNull(entity))
+
+    return { after, before, tree }
+  }
+
+  describe('when the tree is acyclic', () => {
+    let after: unknown[]
+    let before: unknown[]
+    let tree: Entity[]
+
+    beforeEach(() => {
+      ;({ after, before, tree } = removeTree(false))
+    })
+
+    it('should start with a collider on every entity in the tree', () => {
+      expect(before.filter((collider) => collider === null)).toEqual([])
+    })
+
+    it('should remove the collider from every entity in the tree', () => {
+      expect(after).toEqual(tree.map(() => null))
+    })
   })
 
-  it('should return the whole tree for the parenting component', () => {
-    expect(treeComponentEntities).toEqual(expect.arrayContaining(expectedTree))
+  describe('when the tree has recursive parenting', () => {
+    let after: unknown[]
+    let before: unknown[]
+    let tree: Entity[]
+
+    beforeEach(() => {
+      ;({ after, before, tree } = removeTree(true))
+    })
+
+    it('should start with a collider on every entity in the tree', () => {
+      expect(before.filter((collider) => collider === null)).toEqual([])
+    })
+
+    it('should remove the collider from every entity in the cycle', () => {
+      expect(after).toEqual(tree.map(() => null))
+    })
   })
 
-  it('should return only the root for a component without a parent field', () => {
-    expect(unparentedComponentEntities).toEqual([root])
-  })
+  describe('and the entity is synchronized with cyclic network parenting', () => {
+    let removed: Entity[]
 
-  it('should return nothing when the root does not have the component', () => {
-    expect(absentComponentEntities).toEqual([])
+    beforeEach(() => {
+      const engine = Engine()
+      const NetworkEntity = components.NetworkEntity(engine)
+      const NetworkParent = components.NetworkParent(engine)
+
+      const parent = engine.addEntity()
+      const child = engine.addEntity()
+      NetworkEntity.create(parent, { entityId: 1 as Entity, networkId: 1 })
+      NetworkEntity.create(child, { entityId: 2 as Entity, networkId: 1 })
+      NetworkParent.create(child, { entityId: 1 as Entity, networkId: 1 })
+      // Close the loop: the parent is also registered as a child of its own child.
+      NetworkParent.create(parent, { entityId: 2 as Entity, networkId: 1 })
+
+      removed = []
+      // engine.removeEntityWithChildren passes its own closure-scoped removeEntity, so the
+      // helper is called directly to observe the removals.
+      removeEntityWithChildren(
+        {
+          removeEntity: (entity: Entity) => {
+            removed.push(entity)
+            return engine.removeEntity(entity)
+          },
+          defineComponentFromSchema: engine.defineComponentFromSchema,
+          defineComponent: engine.defineComponent,
+          getEntitiesWith: engine.getEntitiesWith
+        },
+        parent
+      )
+    })
+
+    it('should remove each entity in the cycle exactly once', () => {
+      expect(removed).toHaveLength(2)
+    })
   })
 })
