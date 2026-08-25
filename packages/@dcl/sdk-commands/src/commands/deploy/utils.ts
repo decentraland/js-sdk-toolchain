@@ -4,7 +4,6 @@ import { AuthChain } from '@dcl/crypto'
 import { Lifecycle } from '@well-known-components/interfaces'
 import { createCatalystClient, createContentClient, CatalystClient, ContentClient } from 'dcl-catalyst-client'
 import { getCatalystServersFromCache } from 'dcl-catalyst-client/dist/contracts-snapshots'
-import * as undici from 'undici'
 import { hexToBytes } from 'eth-connect'
 import { ethSign } from '@dcl/crypto/dist/crypto'
 import { Authenticator } from '@dcl/crypto'
@@ -14,7 +13,7 @@ import { IFile } from '../../logic/scene-validations'
 import { LinkerResponse } from '../../linker-dapp/routes'
 import { setRoutes } from '../../linker-dapp/routes'
 import { createWallet } from '../../logic/account'
-import { IFuture } from 'fp-future'
+import { IFuture } from '../../logic/future'
 import { getEstateRegistry, getLandRegistry } from '../../logic/config'
 import { getObject } from '../../logic/coordinates'
 import { getPointers } from '../../logic/catalyst-requests'
@@ -31,7 +30,7 @@ import { dAppOptions, runDapp } from '../../run-dapp'
  */
 function createFetchComponent() {
   return {
-    async fetch(url: string, init: undici.RequestInit & { timeout?: number } = {}): Promise<undici.Response> {
+    async fetch(url: string, init: RequestInit & { timeout?: number } = {}): Promise<Response> {
       const { timeout, signal, ...rest } = init
       const controller = new AbortController()
       if (signal?.aborted) controller.abort()
@@ -39,7 +38,7 @@ function createFetchComponent() {
       signal?.addEventListener('abort', onExternalAbort, { once: true })
       const timer = timeout ? setTimeout(() => controller.abort(), timeout) : undefined
       try {
-        return await undici.fetch(url, { ...rest, signal: controller.signal })
+        return await fetch(url, { ...rest, signal: controller.signal })
       } finally {
         if (timer) clearTimeout(timer)
         signal?.removeEventListener('abort', onExternalAbort)

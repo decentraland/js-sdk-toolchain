@@ -20,6 +20,10 @@ function mobileOverrideLogs(logSpy: jest.SpyInstance) {
   return logSpy.mock.calls.filter((args) => String(args[0]).includes('Mobile platform detected'))
 }
 
+function partialSizeLogs(logSpy: jest.SpyInstance) {
+  return logSpy.mock.calls.filter((args) => String(args[0]).includes('Incomplete virtual screen size'))
+}
+
 describe('Virtual screen size defaults', () => {
   afterEach(() => {
     setIsMobileProvider(() => false)
@@ -96,6 +100,102 @@ describe('Virtual screen size defaults', () => {
     expect(getUiScaleFactor()).toBe(2)
 
     uiRenderer.destroy()
+  })
+
+  it('should disable the virtual screen and warn when only virtualWidth is provided', async () => {
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+    const { engine, uiRenderer } = setupEngine()
+    createCanvasInfo(engine, 3840, 2160)
+
+    // Establish a scale factor first, so the assertion below proves it was released
+    // rather than never set.
+    uiRenderer.setUiRenderer(ui, { virtualWidth: 1920, virtualHeight: 1080 })
+    await engine.update(1)
+    expect(getUiScaleFactor()).toBe(2)
+
+    // Half a size is invalid: no scaling, and no fallback to the platform default
+    uiRenderer.setUiRenderer(ui, { virtualWidth: 1920 })
+    await engine.update(1)
+
+    expect(getUiScaleFactor()).toBe(1)
+    expect(partialSizeLogs(logSpy)).toHaveLength(1)
+
+    uiRenderer.destroy()
+    logSpy.mockRestore()
+  })
+
+  it('should disable the virtual screen and warn when only virtualHeight is provided', async () => {
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+    const { engine, uiRenderer } = setupEngine()
+    createCanvasInfo(engine, 3840, 2160)
+
+    uiRenderer.setUiRenderer(ui, { virtualHeight: 1080 })
+    await engine.update(1)
+
+    expect(getUiScaleFactor()).toBe(1)
+    expect(partialSizeLogs(logSpy)).toHaveLength(1)
+
+    uiRenderer.destroy()
+    logSpy.mockRestore()
+  })
+
+  it('should disable the virtual screen for a partial size on mobile too', async () => {
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+    setIsMobileProvider(() => true)
+    const { engine, uiRenderer } = setupEngine()
+    createCanvasInfo(engine, 3200, 1440)
+
+    // The mobile default does not apply either — a partial size is simply invalid
+    uiRenderer.setUiRenderer(ui, { virtualWidth: 1920 })
+    await engine.update(1)
+
+    expect(getUiScaleFactor()).toBe(1)
+    expect(partialSizeLogs(logSpy)).toHaveLength(1)
+
+    uiRenderer.destroy()
+    logSpy.mockRestore()
+  })
+
+  it('should warn about a partial size once per size, not every tick', async () => {
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+    const { engine, uiRenderer } = setupEngine()
+    createCanvasInfo(engine, 3840, 2160)
+
+    // A zero dimension paired with a missing one is still partial — and exercises
+    // the sentinel, since 0 is a real value the once-guard has to distinguish.
+    uiRenderer.setUiRenderer(ui, { virtualWidth: 0 })
+    await engine.update(1)
+    await engine.update(1)
+    await engine.update(1)
+
+    expect(getUiScaleFactor()).toBe(1)
+    expect(partialSizeLogs(logSpy)).toHaveLength(1)
+
+    // A different partial size warns again
+    uiRenderer.setUiRenderer(ui, { virtualHeight: 720 })
+    await engine.update(1)
+    await engine.update(1)
+
+    expect(partialSizeLogs(logSpy)).toHaveLength(2)
+
+    uiRenderer.destroy()
+    logSpy.mockRestore()
+  })
+
+  it('should stay silent when a size opts out with a value <= 0', async () => {
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+    const { engine, uiRenderer } = setupEngine()
+    createCanvasInfo(engine, 3840, 2160)
+
+    // Both dimensions spelled out is the documented opt-out — deliberate, so no warning
+    uiRenderer.setUiRenderer(ui, { virtualWidth: 0, virtualHeight: 0 })
+    await engine.update(1)
+
+    expect(getUiScaleFactor()).toBe(1)
+    expect(partialSizeLogs(logSpy)).toHaveLength(0)
+
+    uiRenderer.destroy()
+    logSpy.mockRestore()
   })
 
   it('should disable the virtual screen when the provided size is NaN', async () => {
