@@ -193,8 +193,16 @@ export interface IPlayersHelper {
    *
    * Because of that it reflects the last settled tick, while {@link getPlayers} validates
    * against live components — so for one frame after an entity disappears this can read one
-   * higher than `getPlayers().length`. Use `getPlayers().length` when you need the two to
-   * agree exactly.
+   * higher than `getPlayers().length`.
+   *
+   * Use this for cheap per-frame observation, and `getPlayers().length` wherever the number has
+   * to match the list a scene acts on — a capacity gate that admits or turns away a player, for
+   * instance, since a count one higher than the list would reject the last joiner for a frame:
+   *
+   * ```ts
+   * if (getPlayerCount() >= SOFT_LIMIT) showBusyHint()          // fine: cosmetic, per frame
+   * if (getPlayers().length >= HARD_LIMIT) rejectJoin(userId)   // must agree with the roster
+   * ```
    */
   getPlayerCount(): number
 }
@@ -481,6 +489,22 @@ function createPlayerHelper(engine: IEngine): IPlayersHelper {
     return buildPlayerData(userEntity)
   }
 
+  /**
+   * Last known state of a tracked player, for the departure callbacks.
+   *
+   * `displayName` is derived from the STICKY `player.name`, where `buildPlayerData` re-resolves
+   * from the live `AvatarBase`. The two cannot disagree, for two independent reasons, and it is
+   * worth knowing both before changing either side:
+   *
+   *  - Every write to `name` in the tracker pairs it with `nameResolved` from the same
+   *    `resolveName` call, and `resolveName` returns either null or a non-empty trimmed string.
+   *    So `nameResolved === true` implies a non-empty `name`, and the sticky value is never a
+   *    stale-empty one.
+   *  - This runs only on departure, where the live read has nothing to offer anyway: either the
+   *    identity is gone, or the profile is. `buildPlayerData` would fall through to this same
+   *    sticky value. The tracker also settles `player.name` earlier in the pass, so it is
+   *    current as of this tick.
+   */
   function snapshotOf(player: TrackedPlayer): PlayerSnapshot {
     return {
       userId: player.userId,
