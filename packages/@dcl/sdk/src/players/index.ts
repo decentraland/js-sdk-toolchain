@@ -203,6 +203,23 @@ export interface IPlayersHelper {
 const ADDRESS_FALLBACK_LENGTH = 8
 
 /**
+ * Priority for the tracking system, deliberately above `@dcl/ecs`'s `SYSTEMS_REGULAR_PRIORITY`
+ * (100e3) so the tracked set is always settled before any scene system reads it.
+ *
+ * Not left at the default: `SystemContainer.sort` orders by descending priority, and equal
+ * priorities fall back to insertion order — which `SystemContainer` itself flags as not
+ * guaranteed ("systems with the same priority should always have the same stable order").
+ * Since this module registers its system at import time, a scene that adds its own systems
+ * before first importing `@dcl/sdk/players` — trivially the case behind a dynamic `import()` —
+ * would otherwise see `getPlayers()` return the previous tick's set, and receive arrival
+ * callbacks after that frame's scene logic had already run.
+ *
+ * Hardcoded rather than imported: `SYSTEMS_REGULAR_PRIORITY` is re-exported from `@dcl/ecs`
+ * type-only, so it is not reachable as a value without widening that package's public surface.
+ */
+const PLAYER_TRACKING_PRIORITY = 200e3
+
+/**
  * Cap for `displayName`. Profile names are short; this only bounds a hostile or corrupt
  * value, since this is the field the API tells scenes to render.
  */
@@ -605,8 +622,9 @@ function createPlayerHelper(engine: IEngine): IPlayersHelper {
 
   // Registered eagerly rather than on first subscription: adding a system from inside a
   // running system re-sorts the live system list mid-iteration, which can make a sibling
-  // system run twice in that frame.
-  engine.addSystem(trackingSystem, undefined, '@dcl/sdk/players')
+  // system run twice in that frame. Priority puts it ahead of scene systems regardless of when
+  // this module was imported — see PLAYER_TRACKING_PRIORITY.
+  engine.addSystem(trackingSystem, PLAYER_TRACKING_PRIORITY, '@dcl/sdk/players')
 
   return {
     onEnterScene(cb, options) {
