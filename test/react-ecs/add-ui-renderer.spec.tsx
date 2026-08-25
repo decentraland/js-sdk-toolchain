@@ -2,7 +2,7 @@ import { Entity } from '../../packages/@dcl/ecs/src/engine'
 import { components } from '../../packages/@dcl/ecs/src'
 import { UiEntity, ReactEcs } from '../../packages/@dcl/react-ecs/src'
 import { getUiScaleFactor, resetUiScaleFactor } from '../../packages/@dcl/react-ecs/src/components/utils'
-import { setupEngine } from './utils'
+import { setupEngine, WHOLE_SCREEN } from './utils'
 
 describe('addUiRenderer', () => {
   afterEach(() => {
@@ -23,7 +23,7 @@ describe('addUiRenderer', () => {
     const ui2 = () => <UiEntity uiTransform={{ width: 200 }} />
 
     // Add first renderer
-    uiRenderer.addUiRenderer(ownerEntity1, ui1)
+    uiRenderer.addUiRenderer(ownerEntity1, ui1, WHOLE_SCREEN)
     await engine.update(1)
 
     let uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
@@ -31,7 +31,7 @@ describe('addUiRenderer', () => {
     expect(UiTransform.get(uiEntities[0][0]).width).toBe(100)
 
     // Add second renderer
-    uiRenderer.addUiRenderer(ownerEntity2, ui2)
+    uiRenderer.addUiRenderer(ownerEntity2, ui2, WHOLE_SCREEN)
     await engine.update(1)
 
     uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
@@ -62,7 +62,7 @@ describe('addUiRenderer', () => {
     const additionalUi = () => <UiEntity uiTransform={{ width: 150 }} />
 
     // Set main renderer
-    uiRenderer.setUiRenderer(mainUi)
+    uiRenderer.setUiRenderer(mainUi, WHOLE_SCREEN)
     await engine.update(1)
 
     let uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
@@ -70,7 +70,7 @@ describe('addUiRenderer', () => {
     expect(UiTransform.get(uiEntities[0][0]).width).toBe(50)
 
     // Add additional renderer
-    uiRenderer.addUiRenderer(additionalEntity, additionalUi)
+    uiRenderer.addUiRenderer(additionalEntity, additionalUi, WHOLE_SCREEN)
     await engine.update(1)
 
     uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
@@ -99,7 +99,7 @@ describe('addUiRenderer', () => {
     const ui1Updated = () => <UiEntity uiTransform={{ width: 300 }} />
 
     // Add first version
-    uiRenderer.addUiRenderer(ownerEntity, ui1)
+    uiRenderer.addUiRenderer(ownerEntity, ui1, WHOLE_SCREEN)
     await engine.update(1)
 
     let uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
@@ -107,7 +107,7 @@ describe('addUiRenderer', () => {
     expect(UiTransform.get(uiEntities[0][0]).width).toBe(100)
 
     // Replace with updated version using the same entity
-    uiRenderer.addUiRenderer(ownerEntity, ui1Updated)
+    uiRenderer.addUiRenderer(ownerEntity, ui1Updated, WHOLE_SCREEN)
     await engine.update(1)
 
     // Should still have exactly one UI entity, with updated width
@@ -129,7 +129,7 @@ describe('addUiRenderer', () => {
 
     const ui1 = () => <UiEntity uiTransform={{ width: 100 }} />
 
-    uiRenderer.addUiRenderer(ownerEntity, ui1)
+    uiRenderer.addUiRenderer(ownerEntity, ui1, WHOLE_SCREEN)
     await engine.update(1)
 
     let uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
@@ -158,7 +158,7 @@ describe('addUiRenderer', () => {
     const ui1 = () => <UiEntity uiTransform={{ width: 100 }} />
 
     // Add UI renderer associated with the smart item entity
-    uiRenderer.addUiRenderer(smartItemEntity, ui1)
+    uiRenderer.addUiRenderer(smartItemEntity, ui1, WHOLE_SCREEN)
     await engine.update(1)
 
     // UI should be rendered
@@ -194,9 +194,9 @@ describe('addUiRenderer', () => {
     const ui3 = () => <UiEntity uiTransform={{ width: 300 }} />
 
     // Add all UI renderers
-    uiRenderer.addUiRenderer(entity1, ui1)
-    uiRenderer.addUiRenderer(entity2, ui2)
-    uiRenderer.addUiRenderer(entity3, ui3)
+    uiRenderer.addUiRenderer(entity1, ui1, WHOLE_SCREEN)
+    uiRenderer.addUiRenderer(entity2, ui2, WHOLE_SCREEN)
+    uiRenderer.addUiRenderer(entity3, ui3, WHOLE_SCREEN)
     await engine.update(1)
 
     let uiEntities = Array.from(engine.getEntitiesWith(UiTransform))
@@ -233,7 +233,7 @@ describe('addUiRenderer', () => {
     })
 
     const ui = () => <UiEntity uiTransform={{ width: 100 }} />
-    uiRenderer.addUiRenderer(ownerEntity, ui, { virtualWidth: 800, virtualHeight: 600 })
+    uiRenderer.addUiRenderer(ownerEntity, ui, { ...WHOLE_SCREEN, virtualWidth: 800, virtualHeight: 600 })
     await engine.update(1)
 
     expect(getUiScaleFactor()).toBeCloseTo(1.5)

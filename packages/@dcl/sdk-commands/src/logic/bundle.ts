@@ -4,8 +4,8 @@
 import { Scene } from '@dcl/schemas'
 import child_process from 'child_process'
 import esbuild from 'esbuild'
-import { future } from 'fp-future'
-import { globSync } from 'glob'
+import { future } from './future'
+import { globSync } from 'fs'
 import fs from 'fs'
 import path from 'path'
 import { pathToFileURL } from 'url'
@@ -168,7 +168,9 @@ export async function bundleProject(components: BundleComponents, options: Compi
   }
 
   const entrypointSource = options.single || 'src/index.ts'
-  const entrypoints = globSync(entrypointSource, { cwd: options.workingDirectory, absolute: true })
+  const entrypoints = globSync(entrypointSource, { cwd: options.workingDirectory }).map((entry) =>
+    path.resolve(options.workingDirectory, entry)
+  )
 
   /* istanbul ignore if */
   if (!entrypoints.length)
@@ -330,7 +332,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
     logOverride: {
       'import-is-undefined': 'silent'
     },
-    plugins: [compositeLoader(components, options)],
+    plugins: [compositeLoader(components, options, editorScene)],
     stdin: {
       contents: getEntrypointCode(options.entrypoint, options.customEntryPoint, editorScene),
       resolveDir: path.dirname(options.entrypoint),
@@ -365,9 +367,19 @@ export async function bundleSingleProject(components: BundleComponents, options:
       }
     })
 
-    // Do initial build
-    await context.rebuild()
-    printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
+    // Do initial build. A build error must not kill the process in watch mode:
+    // the watcher above is already running and the preview server can still
+    // start, so report the error and recover on the next file save — the same
+    // contract as a failed re-build. Throwing here left `sdk-commands start`
+    // dead when a scene was opened with a pre-existing syntax error, with no
+    // watcher alive to pick up the fix.
+    try {
+      await context.rebuild()
+      printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
+    } catch (err: any) {
+      /* istanbul ignore next */
+      components.logger.error(err.toString())
+    }
     printProgressInfo(components.logger, `The compiler is watching for changes`)
   } else {
     try {
@@ -452,7 +464,11 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
   return typeCheckerFuture
 }
 
-function compositeLoader(components: BundleComponents, options: SingleProjectOptions): esbuild.Plugin {
+function compositeLoader(
+  components: BundleComponents,
+  options: SingleProjectOptions,
+  editorScene: boolean
+): esbuild.Plugin {
   let shouldReload = true
   let compositeData: Awaited<ReturnType<typeof getAllComposites>> | null = null
 
@@ -524,11 +540,12 @@ function compositeLoader(components: BundleComponents, options: SingleProjectOpt
         const { contents, watchFiles } = await generateInitializeScriptsModule(
           components,
           options.workingDirectory,
-          compositeData
+          compositeData,
+          { editorScene }
         )
 
         return {
-          loader: 'js',
+          loader: 'ts',
           contents,
           watchFiles,
           resolveDir: options.workingDirectory
@@ -603,26 +620,14 @@ function collectScriptData(
 }
 
 /**
- * Reads and prepares the runtime script code for inlining
+ * Reads the runtime script TypeScript source for inlining as ESM
  */
 async function prepareRuntimeCode(fs: BundleComponents['fs']): Promise<string> {
-  const runtimeCodePath = require.resolve('./runtime-script')
+  const runtimeCodePath = path.join(__dirname, 'runtime-script.ts')
   const runtimeCode = await fs.readFile(runtimeCodePath, 'utf-8')
 
-  // Strip CommonJS/module system code
-  return (
-    runtimeCode
-      .replace(/"use strict";?\s*/g, '')
-      .replace(/Object\.defineProperty\(exports,.*?\);?\s*/g, '')
-      .replace(/exports\.\w+\s*=\s*void 0;?\s*/g, '')
-      .replace(/exports\.\w+\s*=\s*/g, '')
-      .replace(/^export\s+/gm, '')
-      .replace(/^import\s+.*$/gm, '')
-      // fix nested asset-packs path (importing from @dcl/inspector is banned in runtime, but @dcl/asset-packs not)
-      .replace(/@dcl\/inspector\/node_modules\/@dcl\/asset-packs/g, '@dcl/asset-packs')
-      .replace(/\n{3,}/g, '\n\n')
-      .trim()
-  )
+  // fix nested asset-packs path (importing from @dcl/inspector is banned in scene bundles, @dcl/asset-packs is not)
+  return runtimeCode.replace(/@dcl\/inspector\/node_modules\/@dcl\/asset-packs/g, '@dcl/asset-packs')
 }
 
 /**
@@ -670,6 +675,34 @@ async function updateSdkTypeDeclarations(
 }
 
 /**
+ * Minimal '~sdk/script-utils' for scenes with no scripts: same export surface,
+ * empty-registry semantics, no embedded script runtime (skips the
+ * @dcl/asset-packs payload and its glue).
+ */
+function generateScriptStubModuleContent(): string {
+  return `
+export function _initializeScripts(_engine) {}
+
+export function getScriptInstance(_entity, _scriptPath) {
+  return null
+}
+
+export function getScriptInstancesByPath(_scriptPath) {
+  return []
+}
+
+export function getAllScriptInstances(_entity) {
+  return []
+}
+
+export function callScriptMethod(entity, scriptPath, methodName, ..._args) {
+  console.error(\`Method \${methodName} not found on script \${scriptPath} for entity \${entity}\`)
+  return undefined
+}
+`
+}
+
+/**
  * Generates the virtual module content with script initialization and helper functions
  */
 function generateVirtualModuleContent(runtimeImports: string, runtimeCode: string, scriptsArray: string): string {
@@ -682,22 +715,29 @@ export function _initializeScripts(engine) {
   const scriptsArray = ${scriptsArray}
   return runScripts(engine, scriptsArray)
 }
-
-// export helper functions that are defined in the inlined runtime code
-export { getScriptInstance, getScriptInstancesByPath, getAllScriptInstances, callScriptMethod }
 `
 }
 
 export async function generateInitializeScriptsModule(
   components: BundleComponents,
   workingDirectory: string,
-  compositeData: { scripts: Map<string, Script[]>; [key: string]: any } | null
+  compositeData: { scripts: Map<string, Script[]>; [key: string]: any } | null,
+  opts?: { editorScene?: boolean }
 ): Promise<{ contents: string; watchFiles: string[] }> {
-  // prepare runtime code (always needed for helper functions)
+  const hasScripts = !!compositeData && compositeData.scripts.size > 0
+
+  // scriptless non-editor scenes skip the embedded script runtime entirely
+  if (!hasScripts && !opts?.editorScene) {
+    return {
+      contents: generateScriptStubModuleContent(),
+      watchFiles: []
+    }
+  }
+
   const runtimeCode = await prepareRuntimeCode(components.fs)
 
   // default empty implementation if no scripts
-  if (!compositeData || compositeData.scripts.size === 0) {
+  if (!hasScripts) {
     return {
       contents: generateVirtualModuleContent('', runtimeCode, '[]'),
       watchFiles: []

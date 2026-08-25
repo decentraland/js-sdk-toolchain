@@ -3,9 +3,14 @@ module.exports = {
   moduleFileExtensions: ['ts', 'js', 'tsx', 'jsx'],
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': [
-      'ts-jest',
+      'babel-jest',
       {
-        tsconfig: 'test/tsconfig.json'
+        presets: [['@babel/preset-typescript', { isTSX: true, allExtensions: true, onlyRemoveTypeImports: true }]],
+        plugins: [
+          '@babel/plugin-transform-modules-commonjs',
+          '@babel/plugin-transform-dynamic-import',
+          ['@babel/plugin-transform-react-jsx', { pragma: 'ReactEcs.createElement' }]
+        ]
       }
     ]
   },

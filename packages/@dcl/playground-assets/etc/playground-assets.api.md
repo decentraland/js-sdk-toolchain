@@ -98,6 +98,23 @@ export type AudioAnalysisView = {
 // @public (undocumented)
 export const AudioEvent: GrowOnlyValueSetComponentDefinition<PBAudioEvent>;
 
+// @public (undocumented)
+export interface AudioEventsSystem {
+    getAudioState(entity: Entity): DeepReadonlyObject<PBAudioEvent> | undefined;
+    // (undocumented)
+    hasAudioEventsEntity(entity: Entity): boolean;
+    // (undocumented)
+    registerAudioEventsEntity(entity: Entity, callback: AudioEventsSystemCallback): void;
+    // (undocumented)
+    removeAudioEventsEntity(entity: Entity): void;
+}
+
+// @public
+export const audioEventsSystem: AudioEventsSystem;
+
+// @public (undocumented)
+export type AudioEventsSystemCallback = (event: DeepReadonlyObject<PBAudioEvent>) => void;
+
 // Warning: (ae-missing-release-tag) "AudioSource" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -740,6 +757,7 @@ export const componentDefinitionByName: {
     "core::CameraMode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraMode>>;
     "core::CameraModeArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraModeArea>>;
     "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
+    "core::ExplorerUiEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBExplorerUiEventsResult>>;
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
     "core::GltfNodeModifiers": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfNodeModifiers>>;
@@ -763,6 +781,7 @@ export const componentDefinitionByName: {
     "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
     "core::SkyboxTime": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSkyboxTime>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
+    "core::TouchScreenControls": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTouchScreenControls>>;
     "core::TriggerArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTriggerArea>>;
     "core::TriggerAreaResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBTriggerAreaResult>>;
     "core::Tween": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTween>>;
@@ -773,6 +792,7 @@ export const componentDefinitionByName: {
     "core::UiDropdown": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdown>>;
     "core::UiDropdownResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiDropdownResult>>;
     "core::UiInput": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInput>>;
+    "core::UiInputBinding": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInputBinding>>;
     "core::UiInputResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiInputResult>>;
     "core::UiText": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiText>>;
     "core::UiTransform": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBUiTransform>>;
@@ -1191,6 +1211,13 @@ export interface EcsElements {
     };
 }
 
+// @public (undocumented)
+export const enum EmoteState {
+    ES_FINISHED = 1,
+    ES_INTERRUPTED = 2,
+    ES_STARTED = 0
+}
+
 // @public @deprecated
 export function Engine(options?: IEngineOptions): IEngine;
 
@@ -1223,6 +1250,7 @@ export type EntityComponents = {
     uiBackground: PBUiBackground;
     uiInput: PBUiInput;
     uiDropdown: PBUiDropdown;
+    uiInputBinding: PBUiInputBinding;
     onMouseDown: Callback;
     onMouseUp: Callback;
     onMouseEnter: Callback;
@@ -1243,6 +1271,7 @@ export enum EntityMappingMode {
 export interface EntityPropTypes extends Listeners {
     key?: Key;
     uiBackground?: UiBackgroundProps;
+    uiInputBinding?: PBUiInputBinding;
     uiTransform?: UiTransformProps;
 }
 
@@ -1287,6 +1316,27 @@ export type ExcludeUndefined<T> = {
 
 // @public
 export const executeTask: (task: Task<unknown>) => void;
+
+// @public (undocumented)
+export const enum ExplorerUi {
+    // (undocumented)
+    EU_BACKPACK = 2,
+    // (undocumented)
+    EU_CAMERA_REEL = 3,
+    // (undocumented)
+    EU_COMMUNITIES = 4,
+    // (undocumented)
+    EU_EVENTS = 6,
+    // (undocumented)
+    EU_MAP = 1,
+    // (undocumented)
+    EU_PLACES = 5,
+    // (undocumented)
+    EU_SETTINGS = 0
+}
+
+// @public (undocumented)
+export const ExplorerUiEventsResult: GrowOnlyValueSetComponentDefinition<PBExplorerUiEventsResult>;
 
 // @public
 export interface FlatMaterial {
@@ -1462,7 +1512,7 @@ export interface IEngine {
     registerComponentDefinition<T>(componentName: string, componentDefinition: ComponentDefinition<T>): ComponentDefinition<T>;
     // (undocumented)
     removeComponentDefinition(componentId: number | string): void;
-    removeEntity(entity: Entity): void;
+    removeEntity(entity: Entity): boolean;
     removeEntityWithChildren(entity: Entity): void;
     removeSystem(selector: string | SystemFn): boolean;
     readonly RootEntity: Entity;
@@ -2602,6 +2652,7 @@ export interface PBAvatarEmoteCommand {
     loop: boolean;
     // (undocumented)
     mask?: AvatarMask | undefined;
+    state?: EmoteState | undefined;
     timestamp: number;
 }
 
@@ -2781,6 +2832,52 @@ export namespace PBEngineInfo {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBEngineInfo;
     // (undocumented)
     export function encode(message: PBEngineInfo, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBExplorerUiEventsResult {
+    // (undocumented)
+    event?: {
+        $case: "opened";
+        opened: PBExplorerUiEventsResult_UiOpened;
+    } | {
+        $case: "closed";
+        closed: PBExplorerUiEventsResult_UiClosed;
+    } | undefined;
+    timestamp: number;
+    ui: ExplorerUi;
+}
+
+// @public (undocumented)
+export namespace PBExplorerUiEventsResult {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBExplorerUiEventsResult;
+    // (undocumented)
+    export function encode(message: PBExplorerUiEventsResult, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBExplorerUiEventsResult_UiClosed {
+}
+
+// @public (undocumented)
+export namespace PBExplorerUiEventsResult_UiClosed {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBExplorerUiEventsResult_UiClosed;
+    // (undocumented)
+    export function encode(_: PBExplorerUiEventsResult_UiClosed, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBExplorerUiEventsResult_UiOpened {
+}
+
+// @public (undocumented)
+export namespace PBExplorerUiEventsResult_UiOpened {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBExplorerUiEventsResult_UiOpened;
+    // (undocumented)
+    export function encode(_: PBExplorerUiEventsResult_UiOpened, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -3670,6 +3767,38 @@ export namespace PBTextShape {
 }
 
 // @public (undocumented)
+export interface PBTouchScreenControls {
+    hideCrosshair: boolean;
+    hideJoystick: boolean;
+    mainAction?: InputAction | undefined;
+    // (undocumented)
+    touchInputs: PBTouchScreenControls_TouchInput[];
+}
+
+// @public (undocumented)
+export namespace PBTouchScreenControls {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTouchScreenControls;
+    // (undocumented)
+    export function encode(message: PBTouchScreenControls, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBTouchScreenControls_TouchInput {
+    hide: boolean;
+    icon?: TextureUnion | undefined;
+    inputAction: InputAction;
+}
+
+// @public (undocumented)
+export namespace PBTouchScreenControls_TouchInput {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBTouchScreenControls_TouchInput;
+    // (undocumented)
+    export function encode(message: PBTouchScreenControls_TouchInput, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBTriggerArea {
     collisionMask?: number | undefined;
     mesh?: TriggerAreaMeshType | undefined;
@@ -3889,6 +4018,19 @@ export namespace PBUiInput {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiInput;
     // (undocumented)
     export function encode(message: PBUiInput, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBUiInputBinding {
+    actions: InputAction[];
+}
+
+// @public (undocumented)
+export namespace PBUiInputBinding {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBUiInputBinding;
+    // (undocumented)
+    export function encode(message: PBUiInputBinding, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
@@ -4122,6 +4264,7 @@ export namespace PBVideoPlayer {
 export interface PBVirtualCamera {
     // (undocumented)
     defaultTransition?: CameraTransition | undefined;
+    fov?: number | undefined;
     // (undocumented)
     lookAtEntity?: number | undefined;
 }
@@ -5120,6 +5263,23 @@ export const ToLinearSpace = 2.2;
 // @public (undocumented)
 export type ToOptional<T> = OnlyOptionalUndefinedTypes<T> & OnlyNonUndefinedTypes<T>;
 
+// Warning: (ae-missing-release-tag) "TouchScreenControls" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
+// @public (undocumented)
+export const TouchScreenControls: TouchScreenControlsComponentDefinitionExtended;
+
+// @public
+export interface TouchScreenControlsComponentDefinitionExtended extends LastWriteWinElementSetComponentDefinition<PBTouchScreenControls> {
+    hide(actions: InputAction[]): void;
+    hideAll(): void;
+    hideCrosshair(): void;
+    hideJoystick(): void;
+    setMainAction(action: InputAction): void;
+    showAll(): void;
+    showCrosshair(): void;
+    showJoystick(): void;
+}
+
 // Warning: (ae-missing-release-tag) "Transform" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -5367,6 +5527,9 @@ export type UiFontType = 'sans-serif' | 'serif' | 'monospace';
 export const UiInput: LastWriteWinElementSetComponentDefinition<PBUiInput>;
 
 // @public (undocumented)
+export const UiInputBinding: LastWriteWinElementSetComponentDefinition<PBUiInputBinding>;
+
+// @public (undocumented)
 export interface UiInputProps extends Omit<PBUiInput, 'font' | 'textAlign' | 'fontSize'> {
     // (undocumented)
     font?: UiFontType;
@@ -5401,9 +5564,13 @@ export type uint32 = number;
 
 // @public (undocumented)
 export type UiRendererOptions = {
-    virtualWidth: number;
-    virtualHeight: number;
+    virtualWidth?: number;
+    virtualHeight?: number;
+    screenInset?: UiScreenInset;
 };
+
+// @public
+export type UiScreenInset = 'device' | 'interactable' | 'none';
 
 // @public
 export type UiScreenInsetAreaProps = Omit<EntityPropTypes, 'uiTransform'> & {
