@@ -254,6 +254,26 @@ function shortenAddress(userId: string): string {
 }
 
 /**
+ * Copy an avatar profile, nested colours included.
+ *
+ * The component's `getOrNull` returns `deepReadonly(value)`, which is `Object.freeze({ ...value })`
+ * — a shallow freeze of a shallow copy. So the object handed out is already detached at the top
+ * level, but `skinColor`/`eyesColor`/`hairColor` still point at live component data:
+ * `player.avatar.skinColor.r = 5` would write straight into the component with no dirty-marking.
+ * That is the same hazard `wearables`/`emotes` are copied to avoid, so `avatar` is copied on the
+ * same terms rather than being the one live reference left in the payload.
+ */
+function copyAvatar(avatar: PBAvatarBase | undefined): PBAvatarBase | undefined {
+  if (!avatar) return undefined
+  return {
+    ...avatar,
+    skinColor: avatar.skinColor ? { ...avatar.skinColor } : undefined,
+    eyesColor: avatar.eyesColor ? { ...avatar.eyesColor } : undefined,
+    hairColor: avatar.hairColor ? { ...avatar.hairColor } : undefined
+  }
+}
+
+/**
  * Bound and de-markup a value destined for `displayName`. The client renders scene text as
  * TextMeshPro rich text, so `<...>` is interpreted markup rather than literal text — angle
  * brackets are stripped rather than escaped, because escaping shows up literally in TMP.
@@ -384,7 +404,7 @@ function createPlayerHelper(engine: IEngine): IPlayersHelper {
 
     // `displayName`/`nameResolved` are STICKY: once a real name has been seen it survives a
     // profile that later reports empty, matching the no-downgrade rule in the tracker.
-    // `name`/`avatar` stay the raw live values.
+    // `name`/`avatar` report the raw live values rather than the sticky ones.
     const position = Transform.getOrNull(entity)?.position
     const liveResolved = resolveName(avatarData?.name, userId.toLowerCase())
     const resolved = liveResolved ?? (entry?.nameResolved ? entry.name : null)
@@ -396,10 +416,10 @@ function createPlayerHelper(engine: IEngine): IPlayersHelper {
       nameResolved: resolved !== null,
       isGuest: !!playerData.isGuest,
       userId,
-      avatar: avatarData ?? undefined,
       // Copied, not aliased: `Readonly<>` is a compile-time hint and the component's own
-      // freeze is shallow, so handing out the live arrays would let a handler write straight
-      // into component data with no dirty-marking.
+      // freeze is shallow, so handing out the live arrays or the avatar's nested colours would
+      // let a handler write straight into component data with no dirty-marking.
+      avatar: copyAvatar(avatarData ?? undefined),
       wearables: [...(wearablesData?.wearableUrns ?? [])],
       emotes: [...(wearablesData?.emoteUrns ?? [])],
       position: position ? { ...position } : undefined,
