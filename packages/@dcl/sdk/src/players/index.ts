@@ -601,40 +601,53 @@ function createPlayerHelper(engine: IEngine): IPlayersHelper {
       withProfile.delete(key)
     }
 
-    const leaveNow = [...leaveSubs]
-    for (const player of leftWithProfile) {
-      const snapshot = snapshotOf(player)
-      emit(leaveNow, true, 'onLeaveScene', (cb) => cb(player.userId, snapshot))
-    }
-    for (const player of leftIdentity) {
-      const snapshot = snapshotOf(player)
-      emit(leaveNow, false, 'onLeaveScene', (cb) => cb(player.userId, snapshot))
+    // Each subscriber list below is snapshotted once for the whole tick, so every event in
+    // this pass goes to the same set of subscribers: subscribing from inside a handler takes
+    // effect from the next tick, and unsubscribing a sibling mid-pass does not retroactively
+    // skip it.
+    //
+    // Each snapshot is also taken only when that kind of event actually fires. This system
+    // runs every frame for any populated scene, and the steady state is that nobody arrived,
+    // left, or was renamed — so hoisting the copies out would allocate three throwaway arrays
+    // per frame for a pass that delivers nothing.
+    if (leftWithProfile.length > 0 || leftIdentity.length > 0) {
+      const leaveNow = [...leaveSubs]
+      for (const player of leftWithProfile) {
+        const snapshot = snapshotOf(player)
+        emit(leaveNow, true, 'onLeaveScene', (cb) => cb(player.userId, snapshot))
+      }
+      for (const player of leftIdentity) {
+        const snapshot = snapshotOf(player)
+        emit(leaveNow, false, 'onLeaveScene', (cb) => cb(player.userId, snapshot))
+      }
     }
 
-    // A handler can remove an entity mid-delivery. If the payload can no longer be built,
-    // drop the key instead of leaving a tracked player that would later emit a departure it
-    // never got an arrival for.
-    // Snapshotted once for the whole tick, so every event in this pass goes to the same set
-    // of subscribers. Subscribing from inside a handler therefore takes effect from the next
-    // tick, and unsubscribing a sibling mid-pass does not retroactively skip it.
-    const enterNow = [...enterSubs]
-    const nameChangedNow = [...nameChangedSubs]
+    // Gated on the arrival lists rather than on `enterSubs`, because the `forget` below is
+    // bookkeeping that has to happen whether or not anyone is listening: a handler can remove
+    // an entity mid-delivery, and a key whose payload can no longer be built must be dropped
+    // rather than left tracked, where it would later emit a departure with no matching arrival.
+    if (arrivedIdentity.length > 0 || arrivedWithProfile.length > 0) {
+      const enterNow = [...enterSubs]
+      for (const key of arrivedIdentity) {
+        const data = dataForTracked(key)
+        if (data) emit(enterNow, false, 'onEnterScene', (cb) => cb(data))
+        else forget(key)
+      }
+      for (const key of arrivedWithProfile) {
+        const data = dataForTracked(key)
+        if (data) emit(enterNow, true, 'onEnterScene', (cb) => cb(data))
+        else forget(key)
+      }
+    }
 
-    for (const key of arrivedIdentity) {
-      const data = dataForTracked(key)
-      if (data) emit(enterNow, false, 'onEnterScene', (cb) => cb(data))
-      else forget(key)
-    }
-    for (const key of arrivedWithProfile) {
-      const data = dataForTracked(key)
-      if (data) emit(enterNow, true, 'onEnterScene', (cb) => cb(data))
-      else forget(key)
-    }
-    for (const key of renamed) {
-      const data = dataForTracked(key)
-      if (!data) continue
-      for (const sub of nameChangedNow) {
-        runIsolated('onPlayerNameChanged', () => sub.cb(data))
+    if (renamed.length > 0) {
+      const nameChangedNow = [...nameChangedSubs]
+      for (const key of renamed) {
+        const data = dataForTracked(key)
+        if (!data) continue
+        for (const sub of nameChangedNow) {
+          runIsolated('onPlayerNameChanged', () => sub.cb(data))
+        }
       }
     }
   }
