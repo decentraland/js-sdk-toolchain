@@ -8,8 +8,8 @@ import { IProfile } from './message-bus-sync'
 export function fetchProfile(
   myProfile: IProfile,
   getUserData: (value: GetUserDataRequest) => Promise<GetUserDataResponse>
-) {
-  void getUserData({}).then(({ data }) => {
+): Promise<void> {
+  return getUserData({}).then(({ data }) => {
     if (data?.userId) {
       const userId = data.userId
       const networkId = componentNumberFromName(data.userId)
