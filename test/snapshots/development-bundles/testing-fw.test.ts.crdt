@@ -10,7 +10,7 @@ EVAL test/snapshots/development-bundles/testing-fw.test.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
   OPCODES ~= 84k
-  MALLOC_COUNT = 17435
+  MALLOC_COUNT = 17434
   ALIVE_OBJS_DELTA ~= 3.47k
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
@@ -61,4 +61,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 6k
   MALLOC_COUNT = -53
   ALIVE_OBJS_DELTA ~= -0.01k
-  MEMORY_USAGE_COUNT ~= 1554.99k bytes
+  MEMORY_USAGE_COUNT ~= 1554.97k bytes
