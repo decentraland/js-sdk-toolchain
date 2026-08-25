@@ -63,15 +63,25 @@ same function the preview server already uses for scene and file entity ids:
 
 ## Invariants
 
-- **The project root's id is path-only.** Per-file preview hashes are mtime-versioned
-  (`b64-<base64(path\0mtimeMs-machineId)>`), but the project directory's own entity id
-  deliberately is not, so scene identity survives edits and reloads. Deriving the realm key from a
-  content entry instead of from `b64HashingFunction(projectRoot)` would re-partition comms on
-  every file save.
-- **The path is absolute.** `workspaceFromFolders` resolves each project's `workingDirectory`
-  before it reaches any caller.
+- **The project root's id is path-only.** Today every preview id — the project's and each file's —
+  is path-only. [PR #1529](https://github.com/decentraland/js-sdk-toolchain/pull/1529) (open at
+  time of writing) would version *per-file* hashes by mtime as
+  `b64-<base64(path\0mtimeMs-machineId)>` while deliberately leaving the project directory's own
+  entity id path-only. The realm key must keep deriving from `b64HashingFunction(projectRoot)`: a
+  content- or mtime-shaped input would re-partition comms on every file save.
+- **The path is absolute, and byte-exact.** `workspaceFromFolders` resolves each project's
+  `workingDirectory` before it reaches any caller, but `path.resolve` normalizes the separator
+  style — **not** drive-letter case on Windows. `e:\dev\scene` and `E:\dev\scene` are the same
+  project and yield two different realm keys. An explorer deriving the key independently must use
+  the byte-identical path string the CLI used, casing included; when in doubt, read the scene
+  entity id off the preview server instead of re-deriving it.
 - **`machineId` is part of the input.** Two developers who check the same project out to the same
   path still get different realms.
+
+The non-overflow key is reversible base64 of an absolute path and a hostname, so it can carry a
+developer's directory layout and machine name. That is unchanged from the entity ids the preview
+server already serves locally, but once the gate below opens the same string travels as a comms
+realm — worth knowing before it leaves the machine.
 
 ## The `--pulse-realm` gate
 
