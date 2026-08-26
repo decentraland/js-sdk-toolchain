@@ -37,6 +37,7 @@ export function addSyncTransport(
   isServerFn: (request: IsServerRequest) => Promise<IsServerResponse>,
   name: string
 ) {
+  // Profile Info
   const myProfile: IProfile = {} as IProfile
   fetchProfile(myProfile!, getUserData)
 
@@ -47,7 +48,10 @@ export function addSyncTransport(
     return isServerAtom.swap(!!$.isServer)
   })
 
+  // Entity utils
   const entityDefinitions = entityUtils(engine, myProfile)
+
+  // List of MessageBuss messsages to be sent on every frame to comms
   const pendingMessageBusMessagesToSend: { data: Uint8Array[]; address: string[] }[] = []
 
   const binaryMessageBus = BinaryMessageBus((data, address) => {
@@ -62,8 +66,16 @@ export function addSyncTransport(
   const players = definePlayerHelper(engine)
 
   let stateIsSyncronized = false
+
+  /**
+   * We need to wait till 2 ticks that is when the engine is ready to send new messages.
+   * The first tick is for the client engine processing the CRDT messages,
+   * and the second one are the messages created by the main() function.
+   * So to avoid sending those messages, that all the clients have, through the network we put this validation here.
+   */
   let tick = 0
   const TRANSPORT_INITIALIZED_NUMBER = isTestEnvironment() ? 0 : 2
+  // Add Sync Transport
   const transport: Transport = {
     filter: syncFilter(engine),
     send: async (messages) => {
@@ -72,6 +84,8 @@ export function addSyncTransport(
         if (message.byteLength) {
           DEBUG_NETWORK_MESSAGES() &&
             console.log(...Array.from(serializeCrdtMessages('[NetworkMessage sent]:', message, engine)))
+
+          // Convert regular messages to network messages for broadcasting with chunking
           for (const chunk of serverValidator.convertRegularToNetworkMessage(message)) {
             binaryMessageBus.emit(CommsMessage.CRDT, chunk)
           }
@@ -84,15 +98,22 @@ export function addSyncTransport(
     type: name
   }
 
+  // Server validation setup
   const serverValidator = createServerValidator({
     engine,
     binaryMessageBus
   })
 
+  // Initialize Event Bus with registered schemas
   const eventBus = new Room(engine, binaryMessageBus, isServerAtom, isRoomReadyAtom)
-  setGlobalRoom(eventBus)
-  engine.addTransport(transport)
 
+  // Set global eventBus instance
+  setGlobalRoom(eventBus)
+
+  engine.addTransport(transport)
+  // End add sync transport
+
+  // Receive & Process CRDT_STATE
   binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, async (data, sender) => {
     DEBUG_NETWORK_MESSAGES() && console.log('[REQ_CRDT_STATE]', sender, Date.now())
     const chunks = engineToCrdt(engine)
@@ -116,6 +137,8 @@ export function addSyncTransport(
     }
     stateIsSyncronized = true
 
+    // IMPORTANT: Only mark room as ready AFTER state is synchronized
+    // This ensures comms is truly connected and working
     const realmInfo = RealmInfo.getOrNull(engine.RootEntity)
     if (realmInfo) {
       DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady] Marking room as ready after state sync')
@@ -123,6 +146,7 @@ export function addSyncTransport(
     }
   })
 
+  // received message from the network
   binaryMessageBus.on(CommsMessage.CRDT, (value, sender) => {
     const isServer = isServerAtom.getOrNull()
     DEBUG_NETWORK_MESSAGES() &&
@@ -134,16 +158,27 @@ export function addSyncTransport(
     if (isServer) {
       transport.onmessage!(serverValidator.processServerMessages(value, sender))
     } else if (sender === AUTH_SERVER_PEER_ID) {
+      // Process network messages from server and convert to regular messages
       transport.onmessage!(serverValidator.processClientMessages(value, sender))
     }
   })
 
+  // received authoritative message from server - force apply to fix invalid local state
   binaryMessageBus.on(CommsMessage.CRDT_AUTHORITATIVE, (value, sender) => {
+    // Only accept authoritative messages from authoritative server
     if (sender !== AUTH_SERVER_PEER_ID) return
+
+    // DEBUG_NETWORK_MESSAGES() &&
     console.log('[AUTHORITATIVE] Received authoritative message from server:', value.byteLength, 'bytes')
+
+    // Process authoritative messages by forcing them through normal CRDT processing
+    // but with a timestamp that's guaranteed to be accepted
     const authoritativeBuffer = serverValidator.processClientMessages(value, sender, true)
     if (authoritativeBuffer.byteLength > 0) {
+      // Apply authoritative message through normal transport, but the server's messages
+      // should be processed as authoritative with special timestamp handling
       transport.onmessage!(authoritativeBuffer)
+
       DEBUG_NETWORK_MESSAGES() && console.log('[AUTHORITATIVE] Applied server authoritative message to local state')
     }
   })
@@ -155,10 +190,12 @@ export function addSyncTransport(
     }
   })
 
+  // Asks for the REQ_CRDT_STATE when its connected to comms
   RealmInfo.onChange(engine.RootEntity, (value) => {
     const isServer = isServerAtom.getOrNull()
 
     if (!value?.isConnectedSceneRoom) {
+      // Only react when actually transitioning from ready to not ready
       if (isRoomReadyAtom.getOrNull() === true) {
         DEBUG_NETWORK_MESSAGES() && console.log('Disconnected from comms')
         isRoomReadyAtom.swap(false)
@@ -171,17 +208,28 @@ export function addSyncTransport(
     if (value?.isConnectedSceneRoom) {
       requestState()
 
+      // For servers, mark as ready immediately when connected
+      // (servers don't need to sync state from anyone)
       if (isServer && isRoomReadyAtom.getOrNull() === false) {
         DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady] Server marking room as ready')
         isRoomReadyAtom.swap(true)
       }
+      // For clients, room will be marked ready after receiving CRDT state (above)
     }
   })
 
   let requestingState = false
   let elapsedTimeSinceRequest = 0
-  const STATE_REQUEST_RETRY_INTERVAL = 2.0
+  const STATE_REQUEST_RETRY_INTERVAL = 2.0 // seconds
 
+  /**
+   * Why we have to request the state if we have a server that can send us the state when we joined?
+   * The thing is that when the server detects a new JOIN_PARTICIPANT on livekit room, it sends automatically the state to that peer.
+   * But in unity, it takes more time, so that message is not being delivered to the client.
+   * So instead, when we are finally connected to the room, we request the state, and then the server answers with the state :)
+   *
+   * If no response is received within 2 seconds, the request is automatically retried.
+   */
   function requestState() {
     if (isServerAtom.getOrNull()) return
     if (RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom && !requestingState) {
@@ -192,6 +240,7 @@ export function addSyncTransport(
     }
   }
 
+  // System to retry state request if no response is received within the retry interval
   engine.addSystem((dt: number) => {
     if (requestingState && !stateIsSyncronized) {
       elapsedTimeSinceRequest += dt
