@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=311.3k bytes
+SCENE_COMPILED_JS_SIZE_PROD=311.5k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -8,7 +8,7 @@ EVAL test/snapshots/production-bundles/cubes.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
   OPCODES ~= 129k
-  MALLOC_COUNT = 21602
+  MALLOC_COUNT = 21603
   ALIVE_OBJS_DELTA ~= 5.29k
 CALL onStart()
   OPCODES ~= 0k
@@ -562,7 +562,7 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x2b4 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   Scene: PUT_COMPONENT e=0x2b5 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   Scene: PUT_COMPONENT e=0x2b6 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  OPCODES ~= 1001k
+  OPCODES ~= 1002k
   MALLOC_COUNT = 6214
   ALIVE_OBJS_DELTA ~= 1.83k
 CALL onUpdate(0.1)
@@ -1651,4 +1651,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 725k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1549.38k bytes
+  MEMORY_USAGE_COUNT ~= 1549.76k bytes
