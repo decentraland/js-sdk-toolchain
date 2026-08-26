@@ -2757,6 +2757,7 @@ export namespace PBColor4 {
 // @public (undocumented)
 export interface PBEngineInfo {
     frameNumber: number;
+    sceneHidden: boolean;
     tickNumber: number;
     totalRuntime: number;
 }
