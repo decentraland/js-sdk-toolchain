@@ -31,7 +31,11 @@ export function createAssetLoadLoadingStateSystem(engine: IEngine): AssetLoadLoa
   >()
 
   function registerAssetLoadLoadingStateEntity(entity: Entity, callback: AssetLoadLoadingStateSystemCallback) {
-    entitiesCallbackAssetLoadLoadingStateMap.set(entity, { callback: callback, lastLoadingStateLength: 0 })
+    const existing = entitiesCallbackAssetLoadLoadingStateMap.get(entity)
+    entitiesCallbackAssetLoadLoadingStateMap.set(entity, {
+      callback: callback,
+      lastLoadingStateLength: existing?.lastLoadingStateLength ?? 0
+    })
   }
 
   function removeAssetLoadLoadingStateEntity(entity: Entity) {
@@ -39,7 +43,7 @@ export function createAssetLoadLoadingStateSystem(engine: IEngine): AssetLoadLoa
   }
 
   // @internal
-  engine.addSystem(function EventSystem() {
+  engine.addSystem(function AssetLoadEventSystem() {
     const garbageEntries = []
     for (const [entity, data] of entitiesCallbackAssetLoadLoadingStateMap) {
       if (engine.getEntityState(entity) === EntityState.Removed) {
