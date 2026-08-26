@@ -33,6 +33,35 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
       changed: boolean
     }
   >()
+  const observedTweens = new Set<Entity>()
+
+  function serializeTween(tween: PBTween): Uint8Array {
+    const buffer = new ReadWriteByteBuffer(new Uint8Array(256), 0, 0)
+    Tween.schema.serialize(tween, buffer)
+    return buffer.toCopiedBinary()
+  }
+
+  function updateTweenCache(entity: Entity, tween: PBTween): boolean {
+    const currentTween = serializeTween(tween)
+    const tweenCache = cache.get(entity)
+    if (tweenCache && dataCompare(currentTween, tweenCache.tween) === 0) return false
+
+    cache.set(entity, {
+      tween: currentTween,
+      completed: false,
+      changed: true
+    })
+    return true
+  }
+
+  function observeTween(entity: Entity) {
+    if (observedTweens.has(entity)) return
+    observedTweens.add(entity)
+    Tween.onChange(entity, (tween) => {
+      if (tween) updateTweenCache(entity, tween)
+      else cache.delete(entity)
+    })
+  }
   function isCompleted(entity: Entity) {
     const tweenState = TweenState.getOrNull(entity)
     const tween = Tween.getOrNull(entity)
@@ -59,28 +88,38 @@ export function createTweenSystem(engine: IEngine): TweenSystem {
       return true
     }
     if (!currentTween || !prevTween) return false
-    const currentBuff = new ReadWriteByteBuffer()
-    Tween.schema.serialize(currentTween, currentBuff)
-    const compareResult = dataCompare(currentBuff.toBinary(), prevTween)
+    let isDirty = false
+    for (const dirtyEntity of Tween.dirtyIterator()) {
+      if (dirtyEntity === entity) {
+        isDirty = true
+        break
+      }
+    }
+    if (!isDirty) return false
+
+    const compareResult = dataCompare(serializeTween(currentTween), prevTween)
     return compareResult !== 0
   }
 
   // System to manage cache (needed for tweenSystem.tweenCompleted() to work)
   engine.addSystem(() => {
+    const dirtyTweens = new Set(Tween.dirtyIterator())
+
+    for (const entity of dirtyTweens) {
+      if (!Tween.has(entity)) cache.delete(entity)
+    }
+
     for (const [entity, tween] of engine.getEntitiesWith(Tween)) {
-      if (tweenChanged(entity)) {
-        const buffer = new ReadWriteByteBuffer()
-        Tween.schema.serialize(tween, buffer)
-        cache.set(entity, {
-          tween: buffer.toBinary(),
-          completed: false,
-          changed: true
-        })
+      observeTween(entity)
+      const tweenCache = cache.get(entity)
+      if (!tweenCache || (dirtyTweens.has(entity) && updateTweenCache(entity, tween))) {
         continue
       }
-      const tweenCache = cache.get(entity)
       if (tweenCache) {
-        tweenCache.changed = false
+        if (tweenCache.changed) {
+          tweenCache.changed = false
+          continue
+        }
         if (isCompleted(entity)) {
           // set the tween completed to avoid calling this again for the same tween
           tweenCache.completed = true
