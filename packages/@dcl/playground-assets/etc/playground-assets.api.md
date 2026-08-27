@@ -5333,6 +5333,7 @@ export type Transport = {
     onmessage?(message: Uint8Array): void;
     filter(message: Omit<TransportMessage, 'messageBuffer'>): boolean;
     type?: string;
+    allowReservedEntities?: boolean;
 };
 
 // @public (undocumented)
