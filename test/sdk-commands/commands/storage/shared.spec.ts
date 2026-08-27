@@ -62,7 +62,16 @@ describe('storage/shared: validateWorkspaceAndWorld', () => {
 
     const res = await validateWorkspaceAndWorld(components, 'root', LOCAL)
 
-    expect(res).toEqual({ worldName: undefined, baseParcel: '0,0', parcels: [] })
+    expect(res).toEqual({ worldName: undefined, baseParcel: '0,0', parcels: ['0,0'] })
+  })
+
+  it('treats a lookalike localhost host as remote (exact-hostname match)', async () => {
+    const components = await initComponents()
+    mockSceneJson({ scene: {} })
+
+    await expect(validateWorkspaceAndWorld(components, 'root', 'https://localhost.evil.com')).rejects.toMatchObject({
+      name: 'STORAGE_MISSING_LOCATION'
+    })
   })
 })
 
