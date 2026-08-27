@@ -67,7 +67,7 @@ export async function wireRouter(components: PreviewComponents, workspace: Works
   })
 
   setupRealmAndComms(components, router, localSceneParcels)
-  await setupEcs6Endpoints(components, router, workspace)
+  await setupEcs6Endpoints(components, router, workspace, !!dataLayer)
 
   components.server.setContext(components)
   components.server.use(router.allowedMethods())

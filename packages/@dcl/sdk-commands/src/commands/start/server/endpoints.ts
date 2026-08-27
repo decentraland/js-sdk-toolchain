@@ -26,7 +26,8 @@ type LambdasWearable = Wearable & {
 export async function setupEcs6Endpoints(
   components: CliComponents,
   router: Router<PreviewComponents>,
-  workspace: Workspace
+  workspace: Workspace,
+  stableContentIds = false
 ) {
   const catalystUrl = new URL(await getCatalystBaseUrl(components))
 
@@ -188,13 +189,14 @@ export async function setupEcs6Endpoints(
 
   // TODO: get workspace scenes & wearables...
 
-  await serveFolders(components, router, workspace)
+  await serveFolders(components, router, workspace, stableContentIds)
 }
 
 async function serveFolders(
   components: Pick<CliComponents, 'fs' | 'logger' | 'fetch' | 'config'>,
   router: Router<PreviewComponents>,
-  workspace: Workspace
+  workspace: Workspace,
+  stableContentIds = false
 ) {
   const catalystUrl = await getCatalystBaseUrl(components)
 
@@ -218,7 +220,7 @@ async function serveFolders(
         const entity = await fakeEntityV3FromProject(
           components,
           baseProject,
-          previewHashingFunction(components, baseProject)
+          previewHashingFunction(components, baseProject, stableContentIds)
         )
 
         if (!entity) return { status: 404 }
@@ -258,7 +260,7 @@ async function serveFolders(
       pointers && typeof pointers === 'string' ? [pointers as string] : (pointers as string[])
     )
 
-    const resultEntities = await getSceneJson(components, workspace, Array.from(requestedPointers))
+    const resultEntities = await getSceneJson(components, workspace, Array.from(requestedPointers), stableContentIds)
 
     const remote = await fetchEntityByPointer(
       components,
@@ -407,14 +409,15 @@ async function serveWearable(
 async function getSceneJson(
   components: Pick<CliComponents, 'fs' | 'logger'>,
   workspace: Workspace,
-  pointers: string[]
+  pointers: string[],
+  stableContentIds = false
 ): Promise<Entity[]> {
   const requestedPointers = new Set<string>(pointers)
   const resultEntities: Entity[] = []
 
   const allDeployments = await Promise.all(
     workspace.projects.map((project) =>
-      fakeEntityV3FromProject(components, project, previewHashingFunction(components, project))
+      fakeEntityV3FromProject(components, project, previewHashingFunction(components, project, stableContentIds))
     )
   )
 
@@ -438,9 +441,13 @@ async function getSceneJson(
 // Preview ids for a project's files embed each file's mtime, so the id — and every client cache
 // key derived from it — changes whenever the file changes. The project directory's own id (the
 // scene/entity id) stays path-only: the scene identity must be stable across edits.
-function previewHashingFunction(components: Pick<CliComponents, 'fs'>, project: ProjectUnion) {
+function previewHashingFunction(
+  components: Pick<CliComponents, 'fs'>,
+  project: ProjectUnion,
+  stableContentIds = false
+) {
   return async (filePath: string) =>
-    filePath === project.workingDirectory
+    stableContentIds || filePath === project.workingDirectory
       ? b64HashingFunction(filePath)
       : b64ContentVersionedHashingFunction(filePath, (await components.fs.stat(filePath)).mtimeMs)
 }
