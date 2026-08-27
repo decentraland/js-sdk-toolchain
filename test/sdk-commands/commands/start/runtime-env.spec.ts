@@ -1,17 +1,18 @@
 import {
   loadServerStorage,
-  saveServerStorage,
   setEnvValue,
   setWorldValue,
   setPlayerValue,
   getPlayerValue
 } from '../../../../packages/@dcl/sdk-commands/src/commands/start/server/runtime-env'
 
+const BASE_DIR = '/project'
+
 /**
- * In-memory stand-in for the `.runtime-data/` directory that runtime-env reads and
- * writes. Async fns yield at each `await`, so concurrent read-modify-write cycles
- * interleave exactly as they would on Node's event loop. runtime-env derives the
- * storage path from its own package location, so it is learned from the first access.
+ * In-memory stand-in for the project's `.runtime-data/` directory that runtime-env
+ * reads and writes. Async fns yield at each `await`, so concurrent read-modify-write
+ * cycles interleave exactly as they would on Node's event loop. The storage path is
+ * learned from the first access.
  */
 function makeComponents(initialFile?: string) {
   const files = new Map<string, string>()
@@ -47,10 +48,10 @@ describe('runtime-env concurrent write safety', () => {
     const { components } = makeComponents(JSON.stringify({ env: {}, world: {}, players: { '0xabc': {} } }))
 
     const keys = Array.from({ length: 20 }, (_, i) => `k${i}`)
-    await Promise.all(keys.map((key, i) => setPlayerValue(components, '0xabc', key, i)))
+    await Promise.all(keys.map((key, i) => setPlayerValue(components, BASE_DIR, '0xabc', key, i)))
 
     for (let i = 0; i < keys.length; i++) {
-      expect(await getPlayerValue(components, '0xabc', keys[i])).toBe(i)
+      expect(await getPlayerValue(components, BASE_DIR, '0xabc', keys[i])).toBe(i)
     }
   })
 
@@ -58,14 +59,14 @@ describe('runtime-env concurrent write safety', () => {
     const { components, readMain } = makeComponents(JSON.stringify({ env: {}, world: {}, players: {} }))
 
     await Promise.all([
-      setEnvValue(components, 'FOO', 'bar'),
-      setWorldValue(components, 'score', 42),
-      setPlayerValue(components, '0xabc', 'coins', 7)
+      setEnvValue(components, BASE_DIR, 'FOO', 'bar'),
+      setWorldValue(components, BASE_DIR, '60,-9', 'score', 42),
+      setPlayerValue(components, BASE_DIR, '0xabc', 'coins', 7)
     ])
 
     const stored = JSON.parse(readMain()!)
     expect(stored.env).toEqual({ FOO: 'bar' })
-    expect(stored.world).toEqual({ score: 42 })
+    expect(stored.world).toEqual({ '60,-9': { score: 42 } })
     expect(stored.players).toEqual({ '0xabc': { coins: 7 } })
   })
 })
@@ -74,7 +75,7 @@ describe('runtime-env atomic writes', () => {
   it('writes a temp file and renames it over the target', async () => {
     const { components, fs, readMain } = makeComponents()
 
-    await setEnvValue(components, 'FOO', 'bar')
+    await setEnvValue(components, BASE_DIR, 'FOO', 'bar')
 
     const writtenPath: string = fs.writeFile.mock.calls[0][0]
     expect(writtenPath).toMatch(/server-storage\.json\..+/)
@@ -87,11 +88,11 @@ describe('runtime-env default isolation', () => {
   it('does not leak state between default (no-file) loads', async () => {
     const { components } = makeComponents()
 
-    const a = await loadServerStorage(components)
+    const a = await loadServerStorage(components, BASE_DIR)
     a.env.LEAK = 'yes'
     a.players.someone = { x: 1 }
 
-    const b = await loadServerStorage(components)
+    const b = await loadServerStorage(components, BASE_DIR)
     expect(b.env).toEqual({})
     expect(b.players).toEqual({})
   })
