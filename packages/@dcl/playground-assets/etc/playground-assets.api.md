@@ -5372,6 +5372,9 @@ export namespace ScrollPositionValue {
 }
 
 // @public
+export type ScrollVisibleType = 'horizontal' | 'vertical' | 'both' | 'hidden';
+
+// @public
 export function setCompositeProvider(engine: IEngine, provider: CompositeProvider): void;
 
 // @public
@@ -6020,6 +6023,7 @@ export interface UiTransformProps {
     // (undocumented)
     borderWidth?: Partial<Position> | PositionUnit;
     display?: DisplayType;
+    elementId?: string;
     flex?: number;
     flexBasis?: number;
     flexDirection?: FlexDirectionType;
@@ -6039,6 +6043,8 @@ export interface UiTransformProps {
     pointerFilter?: PointerFilterType;
     position?: Partial<Position> | PositionShorthand;
     positionType?: PositionType;
+    scrollPosition?: PBVector2 | string;
+    scrollVisible?: ScrollVisibleType;
     width?: PositionUnit | 'auto';
     zIndex?: number;
 }

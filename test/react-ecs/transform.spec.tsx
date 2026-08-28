@@ -11,7 +11,7 @@ import {
   PointerFilterMode,
   PBUiTransform
 } from '../../packages/@dcl/ecs'
-import { components } from '../../packages/@dcl/ecs/src'
+import { components, ShowScrollBar } from '../../packages/@dcl/ecs/src'
 import {
   BorderRadius,
   Position,
@@ -672,5 +672,31 @@ describe('UiTransform React Ecs', () => {
     expect(getUiTransform(rootDivEntity)).toMatchObject({
       opacity: 1
     })
+  })
+
+  it('should parse scroll props', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiTransform = components.UiTransform(engine)
+    const byElementId = (id: string) =>
+      Array.from(engine.getEntitiesWith(UiTransform)).find(([, transform]) => transform.elementId === id)![1]
+
+    const ui = () => (
+      <UiEntity
+        uiTransform={{ overflow: 'scroll', elementId: 'list', scrollPosition: 'item-3', scrollVisible: 'vertical' }}
+      >
+        <UiEntity uiTransform={{ elementId: 'item-3', scrollPosition: { x: 10, y: 20 } }} />
+      </UiEntity>
+    )
+
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
+    await engine.update(1)
+    expect(byElementId('list')).toMatchObject({
+      scrollPosition: { value: { $case: 'reference', reference: 'item-3' } },
+      scrollVisible: ShowScrollBar.SSB_ONLY_VERTICAL
+    })
+    expect(byElementId('item-3')).toMatchObject({
+      scrollPosition: { value: { $case: 'position', position: { x: 10, y: 20 } } }
+    })
+    expect(byElementId('item-3').scrollVisible).toBeUndefined()
   })
 })

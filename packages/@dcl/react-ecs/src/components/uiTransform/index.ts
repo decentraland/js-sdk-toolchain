@@ -7,6 +7,8 @@ import {
   getOverflow,
   getPointerFilter,
   getPositionType,
+  getScrollPosition,
+  getScrollVisible,
   parseBorderColor,
   parseBorderRadius,
   parseBorderWidth,
@@ -102,6 +104,8 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     borderRadius,
     borderWidth,
     borderColor,
+    scrollPosition,
+    scrollVisible,
     ...otherProps
   } = props
 
@@ -130,6 +134,8 @@ export function parseUiTransform(props: UiTransformProps = {}): PBUiTransform {
     ...(flexWrap && getFlexWrap(flexWrap)),
     ...(borderRadius && parseBorderRadius(borderRadius)),
     ...(borderWidth && parseBorderWidth(borderWidth)),
-    ...(borderColor && parseBorderColor(borderColor))
+    ...(borderColor && parseBorderColor(borderColor)),
+    ...(scrollPosition && getScrollPosition(scrollPosition)),
+    ...(scrollVisible && getScrollVisible(scrollVisible))
   }
 }
