@@ -103,4 +103,19 @@ describe('Generated MeshCollider ProtoBuf', () => {
     })
     expect(ColliderLayer.CL_PLAYER | ColliderLayer.CL_MAIN_PLAYER).toBe(12)
   })
+
+  it('should set a gltf mesh collider', () => {
+    const newEngine = Engine()
+    const entity = newEngine.addEntity()
+    const MeshCollider = components.MeshCollider(newEngine)
+
+    MeshCollider.setGltfMesh(entity, 'models/test.glb', 'someGltfMeshName', [
+      ColliderLayer.CL_POINTER,
+      ColliderLayer.CL_PHYSICS
+    ])
+    expect(MeshCollider.get(entity)).toStrictEqual({
+      collisionMask: ColliderLayer.CL_POINTER | ColliderLayer.CL_PHYSICS,
+      mesh: { $case: 'gltf', gltf: { gltfSrc: 'models/test.glb', name: 'someGltfMeshName' } }
+    })
+  })
 })
