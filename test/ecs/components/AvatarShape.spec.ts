@@ -1,4 +1,5 @@
 ﻿import { Engine, components } from '../../../packages/@dcl/ecs/src'
+import { ReadWriteByteBuffer } from '../../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { testComponentSerialization } from './assertion'
 
 describe('Generated AvatarShape ProtoBuf', () => {
@@ -18,7 +19,8 @@ describe('Generated AvatarShape ProtoBuf', () => {
       expressionTriggerTimestamp: 0,
       talking: true,
       emotes: [],
-      showOnlyWearables: false
+      showOnlyWearables: false,
+      forceRender: []
     })
 
     testComponentSerialization(AvatarShape, {
@@ -33,7 +35,21 @@ describe('Generated AvatarShape ProtoBuf', () => {
       expressionTriggerTimestamp: 1,
       talking: false,
       emotes: [],
-      showOnlyWearables: false
+      showOnlyWearables: false,
+      forceRender: ['hands_wear']
     })
+  })
+
+  it('serializes an omitted forceRender as an empty list', () => {
+    const newEngine = Engine()
+    const AvatarShape = components.AvatarShape(newEngine)
+    const entity = newEngine.addEntity()
+
+    AvatarShape.create(entity, { id: 'test', wearables: [], emotes: [] })
+    expect(AvatarShape.get(entity).forceRender).toBeUndefined()
+
+    const buffer = new ReadWriteByteBuffer()
+    AvatarShape.schema.serialize(AvatarShape.get(entity), buffer)
+    expect(AvatarShape.schema.deserialize(buffer).forceRender).toStrictEqual([])
   })
 })
