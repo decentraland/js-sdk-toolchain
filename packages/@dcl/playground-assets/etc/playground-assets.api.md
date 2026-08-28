@@ -5876,6 +5876,7 @@ export interface UiBackgroundProps {
     textureMode?: TextureMode;
     textureSlices?: BorderRect | undefined;
     uvs?: number[];
+    videoTexture?: UiVideoTexture;
 }
 
 // @public
@@ -6046,6 +6047,16 @@ export interface UiTransformProps {
     scrollVisible?: ScrollVisibleType;
     width?: PositionUnit | 'auto';
     zIndex?: number;
+}
+
+// @public
+export interface UiVideoTexture {
+    // (undocumented)
+    filterMode?: TextureFilterType;
+    // (undocumented)
+    videoPlayerEntity: Entity;
+    // (undocumented)
+    wrapMode?: TextureWrapType;
 }
 
 // @public (undocumented)
