@@ -5011,6 +5011,8 @@ export type RaycastSystemOptions = {
     queryType: RaycastQueryType;
     continuous?: boolean | undefined;
     collisionMask?: number | undefined;
+    shape?: RaycastShape | undefined;
+    includeWorld?: boolean | undefined;
 };
 
 // @public (undocumented)

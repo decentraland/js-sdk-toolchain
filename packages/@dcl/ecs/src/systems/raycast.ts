@@ -1,5 +1,5 @@
 import * as components from '../components'
-import { ColliderLayer, RaycastQueryType, PBRaycastResult } from '../components'
+import { ColliderLayer, RaycastQueryType, RaycastShape, PBRaycastResult } from '../components'
 import { DeepReadonlyObject, Entity, IEngine } from '../engine'
 import { Vector3 } from '../components/generated/pb/decentraland/common/vectors.gen'
 import { EntityState } from '../engine/entity'
@@ -26,6 +26,10 @@ export type RaycastSystemOptions = {
   queryType: RaycastQueryType
   continuous?: boolean | undefined
   collisionMask?: number | undefined
+  /** shape to sweep along the ray, default RS_RAY (a point) */
+  shape?: RaycastShape | undefined
+  /** include colliders from other scenes, default false */
+  includeWorld?: boolean | undefined
 }
 
 export type LocalDirectionRaycastSystemOptions = {
@@ -197,7 +201,9 @@ export function createRaycastSystem(engine: IEngine): RaycastSystem {
     queryType: RaycastQueryType.RQT_HIT_FIRST,
     continuous: false,
     originOffset: { x: 0, y: 0, z: 0 },
-    collisionMask: ColliderLayer.CL_PHYSICS
+    collisionMask: ColliderLayer.CL_PHYSICS,
+    shape: RaycastShape.RS_RAY,
+    includeWorld: false
   }
   const getLocalDirectionRaycastDefaultOptions = (
     options: Partial<LocalDirectionRaycastOptions> = {}
@@ -256,6 +262,8 @@ export function createRaycastSystem(engine: IEngine): RaycastSystem {
       raycast.direction = raycastValue.directionRawValue
       raycast.continuous = raycastValue.continuous
       raycast.queryType = raycastValue.queryType
+      raycast.shape = raycastValue.shape
+      raycast.includeWorld = raycastValue.includeWorld
 
       entitiesCallbackResultMap.set(entity, { callback: callback })
     }
