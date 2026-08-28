@@ -24,6 +24,9 @@ export type EntityComponents = {
   onMouseUp: Callback
   onMouseEnter: Callback
   onMouseLeave: Callback
+  onMouseDrag: Callback
+  onMouseDragLocked: Callback
+  onMouseDragEnd: Callback
 }
 
 /**

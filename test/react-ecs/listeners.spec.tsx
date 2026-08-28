@@ -1,5 +1,5 @@
 import { Entity } from '../../packages/@dcl/ecs'
-import { components, PointerEventType } from '../../packages/@dcl/ecs/src'
+import { components, PBPointerEventsResult, PointerEventType } from '../../packages/@dcl/ecs/src'
 import { ReactEcs, UiEntity } from '../../packages/@dcl/react-ecs/src'
 import { createTestPointerDownCommand } from '../ecs/events/utils'
 import { setupEngine } from './utils'
@@ -235,5 +235,184 @@ describe('Ui MouseLeave React Ecs', () => {
     mouseLeaveEvent()
     await engine.update(1)
     expect(counter).toBe(8888)
+  })
+})
+
+describe('Ui onMouseDrag React Ecs', () => {
+  const { engine, uiRenderer } = setupEngine()
+
+  const PointerEventsResult = components.PointerEventsResult(engine)
+  const uiEntity = ((engine.addEntity() as number) + 1) as Entity
+  let fakeCounter = 0
+  const dragEvent = () => {
+    PointerEventsResult.addValue(
+      uiEntity,
+      createTestPointerDownCommand(uiEntity, fakeCounter + 1, PointerEventType.PET_DRAG)
+    )
+    fakeCounter += 1
+  }
+  let counter = 0
+  let onMouseDrag: (() => void) | undefined = () => {
+    counter++
+  }
+
+  const ui = () => <UiEntity uiTransform={{ width: 100 }} onMouseDrag={onMouseDrag} />
+  uiRenderer.setUiRenderer(ui)
+
+  it('the counter should be 0 at the beginning', async () => {
+    expect(counter).toBe(0)
+    await engine.update(1)
+  })
+
+  it('a PET_DRAG event calls onMouseDrag and increments the counter', async () => {
+    dragEvent()
+    await engine.update(1)
+    expect(counter).toBe(1)
+  })
+
+  it('after removing the onMouseDrag handler the counter no longer increments', async () => {
+    onMouseDrag = undefined
+    await engine.update(1)
+    dragEvent()
+    await engine.update(1)
+    expect(counter).toBe(1)
+  })
+
+  it('a replaced onMouseDrag callback is the one that gets called', async () => {
+    onMouseDrag = () => {
+      counter = 8888
+    }
+    await engine.update(1)
+    dragEvent()
+    await engine.update(1)
+    expect(counter).toBe(8888)
+  })
+})
+
+describe('Ui onMouseDragLocked React Ecs', () => {
+  const { engine, uiRenderer } = setupEngine()
+
+  const PointerEventsResult = components.PointerEventsResult(engine)
+  const uiEntity = ((engine.addEntity() as number) + 1) as Entity
+  let fakeCounter = 0
+  const dragEvent = () => {
+    PointerEventsResult.addValue(
+      uiEntity,
+      createTestPointerDownCommand(uiEntity, fakeCounter + 1, PointerEventType.PET_DRAG_LOCKED)
+    )
+    fakeCounter += 1
+  }
+  let counter = 0
+  let onMouseDragLocked: (() => void) | undefined = () => {
+    counter++
+  }
+
+  const ui = () => <UiEntity uiTransform={{ width: 100 }} onMouseDragLocked={onMouseDragLocked} />
+  uiRenderer.setUiRenderer(ui)
+
+  it('the counter should be 0 at the beginning', async () => {
+    expect(counter).toBe(0)
+    await engine.update(1)
+  })
+
+  it('a PET_DRAG_LOCKED event calls onMouseDragLocked and increments the counter', async () => {
+    dragEvent()
+    await engine.update(1)
+    expect(counter).toBe(1)
+  })
+
+  it('after removing the onMouseDragLocked handler the counter no longer increments', async () => {
+    onMouseDragLocked = undefined
+    await engine.update(1)
+    dragEvent()
+    await engine.update(1)
+    expect(counter).toBe(1)
+  })
+
+  it('a replaced onMouseDragLocked callback is the one that gets called', async () => {
+    onMouseDragLocked = () => {
+      counter = 8888
+    }
+    await engine.update(1)
+    dragEvent()
+    await engine.update(1)
+    expect(counter).toBe(8888)
+  })
+})
+
+describe('Ui onMouseDragEnd React Ecs', () => {
+  const { engine, uiRenderer } = setupEngine()
+
+  const PointerEventsResult = components.PointerEventsResult(engine)
+  const uiEntity = ((engine.addEntity() as number) + 1) as Entity
+  let fakeCounter = 0
+  const dragEvent = () => {
+    PointerEventsResult.addValue(
+      uiEntity,
+      createTestPointerDownCommand(uiEntity, fakeCounter + 1, PointerEventType.PET_DRAG_END)
+    )
+    fakeCounter += 1
+  }
+  let counter = 0
+  let onMouseDragEnd: (() => void) | undefined = () => {
+    counter++
+  }
+
+  const ui = () => <UiEntity uiTransform={{ width: 100 }} onMouseDragEnd={onMouseDragEnd} />
+  uiRenderer.setUiRenderer(ui)
+
+  it('the counter should be 0 at the beginning', async () => {
+    expect(counter).toBe(0)
+    await engine.update(1)
+  })
+
+  it('a PET_DRAG_END event calls onMouseDragEnd and increments the counter', async () => {
+    dragEvent()
+    await engine.update(1)
+    expect(counter).toBe(1)
+  })
+
+  it('after removing the onMouseDragEnd handler the counter no longer increments', async () => {
+    onMouseDragEnd = undefined
+    await engine.update(1)
+    dragEvent()
+    await engine.update(1)
+    expect(counter).toBe(1)
+  })
+
+  it('a replaced onMouseDragEnd callback is the one that gets called', async () => {
+    onMouseDragEnd = () => {
+      counter = 8888
+    }
+    await engine.update(1)
+    dragEvent()
+    await engine.update(1)
+    expect(counter).toBe(8888)
+  })
+})
+
+describe('Ui listener callbacks receive the pointer event', () => {
+  const { engine, uiRenderer } = setupEngine()
+  const PointerEventsResult = components.PointerEventsResult(engine)
+  const uiEntity = ((engine.addEntity() as number) + 1) as Entity
+  let received: PBPointerEventsResult | undefined
+  const ui = () => (
+    <UiEntity
+      uiTransform={{ width: 100 }}
+      onMouseDrag={(event) => {
+        received = event
+      }}
+    />
+  )
+  uiRenderer.setUiRenderer(ui)
+
+  it('passes the PointerEventsResult that fired the handler', async () => {
+    await engine.update(1)
+    const command = createTestPointerDownCommand(uiEntity, 1, PointerEventType.PET_DRAG)
+    PointerEventsResult.addValue(uiEntity, command)
+    await engine.update(1)
+    expect(received).toBeDefined()
+    expect(received?.state).toBe(PointerEventType.PET_DRAG)
+    expect(received?.hit).toStrictEqual(command.hit)
   })
 })
