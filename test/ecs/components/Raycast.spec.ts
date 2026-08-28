@@ -1,4 +1,4 @@
-﻿import { Engine, components, RaycastQueryType } from '../../../packages/@dcl/ecs/src'
+﻿import { Engine, components, RaycastQueryType, RaycastShape } from '../../../packages/@dcl/ecs/src'
 import { Vector3 } from '../../../packages/@dcl/sdk/math'
 import { testComponentSerialization } from './assertion'
 
@@ -14,7 +14,9 @@ describe('Generated Raycast ProtoBuf', () => {
       timestamp: 0,
       direction: { $case: 'globalDirection', globalDirection: Vector3.Forward() },
       maxDistance: 100,
-      queryType: RaycastQueryType.RQT_HIT_FIRST
+      queryType: RaycastQueryType.RQT_HIT_FIRST,
+      shape: RaycastShape.RS_RAY,
+      includeWorld: false
     })
 
     testComponentSerialization(Raycast, {
@@ -24,7 +26,9 @@ describe('Generated Raycast ProtoBuf', () => {
       timestamp: 0,
       direction: { $case: 'globalTarget', globalTarget: Vector3.Forward() },
       maxDistance: Infinity,
-      queryType: RaycastQueryType.RQT_HIT_FIRST
+      queryType: RaycastQueryType.RQT_HIT_FIRST,
+      shape: RaycastShape.RS_RAY,
+      includeWorld: false
     })
 
     testComponentSerialization(Raycast, {
@@ -34,7 +38,9 @@ describe('Generated Raycast ProtoBuf', () => {
       timestamp: 0,
       direction: { $case: 'localDirection', localDirection: Vector3.Forward() },
       maxDistance: Infinity,
-      queryType: RaycastQueryType.RQT_HIT_FIRST
+      queryType: RaycastQueryType.RQT_HIT_FIRST,
+      shape: RaycastShape.RS_RAY,
+      includeWorld: false
     })
   })
 })
