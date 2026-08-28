@@ -5043,7 +5043,9 @@ export type RaycastSystemOptions = {
 export interface ReactBasedUiSystem {
     addUiRenderer(entity: Entity, ui: UiComponent, options?: UiRendererOptions): void;
     destroy(): void;
+    removeTextureRenderer(entity: Entity): void;
     removeUiRenderer(entity: Entity): void;
+    setTextureRenderer(entity: Entity, ui: UiComponent): void;
     setUiRenderer(ui: UiComponent, options?: UiRendererOptions): void;
 }
 
