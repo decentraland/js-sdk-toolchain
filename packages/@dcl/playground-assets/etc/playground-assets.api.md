@@ -474,7 +474,7 @@ export interface ByteBuffer {
 }
 
 // @public
-export type Callback = () => void;
+export type Callback = (event: PBPointerEventsResult) => void;
 
 // @public (undocumented)
 export const CameraLayer: LastWriteWinElementSetComponentDefinition<PBCameraLayer>;
@@ -1278,6 +1278,9 @@ export type EntityComponents = {
     onMouseUp: Callback;
     onMouseEnter: Callback;
     onMouseLeave: Callback;
+    onMouseDrag: Callback;
+    onMouseDragLocked: Callback;
+    onMouseDragEnd: Callback;
 };
 
 // @public (undocumented)
@@ -1901,6 +1904,9 @@ export type Listeners = {
     onMouseUp?: Callback;
     onMouseEnter?: Callback;
     onMouseLeave?: Callback;
+    onMouseDrag?: Callback;
+    onMouseDragLocked?: Callback;
+    onMouseDragEnd?: Callback;
 };
 
 // @public (undocumented)
@@ -4679,6 +4685,18 @@ export interface PointerEventsSystem {
     }, cb: EventSystemCallback): void;
     // @deprecated (undocumented)
     onPointerDown(entity: Entity, cb: EventSystemCallback, opts?: Partial<EventSystemOptions>): void;
+    onPointerDrag(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
+    onPointerDragEnd(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
+    onPointerDragLocked(pointerData: {
+        entity: Entity;
+        opts?: Partial<EventSystemOptions>;
+    }, cb: EventSystemCallback): void;
     onPointerHoverEnter(pointerData: {
         entity: Entity;
         opts?: Partial<EventSystemOptions>;
@@ -4710,6 +4728,9 @@ export interface PointerEventsSystem {
         opts?: Partial<EventSystemOptions>;
     }, cb: EventSystemCallback): void;
     removeOnPointerDown(entity: Entity): void;
+    removeOnPointerDrag(entity: Entity): void;
+    removeOnPointerDragEnd(entity: Entity): void;
+    removeOnPointerDragLocked(entity: Entity): void;
     removeOnPointerHoverEnter(entity: Entity): void;
     removeOnPointerHoverLeave(entity: Entity): void;
     removeOnPointerUp(entity: Entity): void;
