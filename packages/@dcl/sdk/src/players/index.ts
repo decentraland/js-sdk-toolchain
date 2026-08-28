@@ -19,6 +19,7 @@ type GetPlayerDataRes = {
   avatar?: PBAvatarBase
   wearables: PBAvatarEquippedData['wearableUrns']
   emotes: PBAvatarEquippedData['emoteUrns']
+  forceRender: PBAvatarEquippedData['forceRender']
   position: TransformType['position'] | undefined
 }
 
@@ -94,6 +95,7 @@ export function definePlayerHelper(engine: IEngine) {
         avatar: avatarData ?? undefined,
         wearables: wearablesData?.wearableUrns ?? [],
         emotes: wearablesData?.emoteUrns ?? [],
+        forceRender: wearablesData?.forceRender ?? [],
         position: Transform.getOrNull(userEntity)?.position
       }
     }

@@ -5,6 +5,11 @@ import { AudioSourceComponentDefinitionExtended, defineAudioSourceComponent } fr
 import { AudioAnalysisComponentDefinitionExtended, defineAudioAnalysisComponent } from './extended/AudioAnalysis'
 import type { AudioAnalysisView } from './extended/AudioAnalysis'
 import { defineMaterialComponent, MaterialComponentDefinitionExtended } from './extended/Material'
+import {
+  AvatarEquippedDataComponentDefinitionExtended,
+  defineAvatarEquippedDataComponent
+} from './extended/AvatarEquippedData'
+import { AvatarShapeComponentDefinitionExtended, defineAvatarShapeComponent } from './extended/AvatarShape'
 import { defineMeshColliderComponent, MeshColliderComponentDefinitionExtended } from './extended/MeshCollider'
 import { defineMeshRendererComponent, MeshRendererComponentDefinitionExtended } from './extended/MeshRenderer'
 import { defineTweenComponent, TweenComponentDefinitionExtended } from './extended/Tween'
@@ -67,6 +72,14 @@ export const MeshRenderer: LwwComponentGetter<MeshRendererComponentDefinitionExt
 /* @__PURE__ */
 export const MeshCollider: LwwComponentGetter<MeshColliderComponentDefinitionExtended> = (engine) =>
   defineMeshColliderComponent(engine)
+
+/* @__PURE__ */
+export const AvatarShape: LwwComponentGetter<AvatarShapeComponentDefinitionExtended> = (engine) =>
+  defineAvatarShapeComponent(engine)
+
+/* @__PURE__ */
+export const AvatarEquippedData: LwwComponentGetter<AvatarEquippedDataComponentDefinitionExtended> = (engine) =>
+  defineAvatarEquippedDataComponent(engine)
 
 /* @__PURE__ */
 export const Tween: LwwComponentGetter<TweenComponentDefinitionExtended> = (engine) => defineTweenComponent(engine)

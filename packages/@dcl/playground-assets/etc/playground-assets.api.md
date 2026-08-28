@@ -220,8 +220,18 @@ export const AvatarBase: LastWriteWinElementSetComponentDefinition<PBAvatarBase>
 // @public (undocumented)
 export const AvatarEmoteCommand: GrowOnlyValueSetComponentDefinition<PBAvatarEmoteCommand>;
 
+// Warning: (ae-missing-release-tag) "AvatarEquippedData" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const AvatarEquippedData: LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>;
+export const AvatarEquippedData: AvatarEquippedDataComponentDefinitionExtended;
+
+// @public (undocumented)
+export type AvatarEquippedDataComponentDefinitionExtended = LastWriteWinElementSetComponentDefinition<AvatarEquippedDataType>;
+
+// @public
+export type AvatarEquippedDataType = Omit<PBAvatarEquippedData, 'forceRender'> & {
+    forceRender?: string[] | undefined;
+};
 
 // @public (undocumented)
 export const AvatarLocomotionSettings: LastWriteWinElementSetComponentDefinition<PBAvatarLocomotionSettings>;
@@ -248,8 +258,18 @@ export const AvatarMovement: LastWriteWinElementSetComponentDefinition<PBAvatarM
 // @public (undocumented)
 export const AvatarMovementInfo: LastWriteWinElementSetComponentDefinition<PBAvatarMovementInfo>;
 
+// Warning: (ae-missing-release-tag) "AvatarShape" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+//
 // @public (undocumented)
-export const AvatarShape: LastWriteWinElementSetComponentDefinition<PBAvatarShape>;
+export const AvatarShape: AvatarShapeComponentDefinitionExtended;
+
+// @public (undocumented)
+export type AvatarShapeComponentDefinitionExtended = LastWriteWinElementSetComponentDefinition<AvatarShapeType>;
+
+// @public
+export type AvatarShapeType = Omit<PBAvatarShape, 'forceRender'> & {
+    forceRender?: string[] | undefined;
+};
 
 // @public (undocumented)
 export interface AvatarTexture {

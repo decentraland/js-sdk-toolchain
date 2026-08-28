@@ -15,7 +15,15 @@ function exportComponent(component: Component) {
   return `export * from './pb/decentraland/sdk/components/${component.componentFile}.gen'`
 }
 
-const GROWN_ONLY_COMPONENTS = ['PointerEventsResult', 'VideoEvent', 'AvatarEmoteCommand', 'AudioEvent', 'TriggerAreaResult', 'AssetLoadLoadingState', 'ExplorerUiEventsResult']
+const GROWN_ONLY_COMPONENTS = [
+  'PointerEventsResult',
+  'VideoEvent',
+  'AvatarEmoteCommand',
+  'AudioEvent',
+  'TriggerAreaResult',
+  'AssetLoadLoadingState',
+  'ExplorerUiEventsResult'
+]
 function isGrowOnlyValueSet(component: Component): boolean {
   return GROWN_ONLY_COMPONENTS.includes(component.componentPascalName)
 }
@@ -36,7 +44,15 @@ function defineComponentDecl(component: Component) {
   }
 }
 
-const skipExposeGlobally: string[] = ['Animator', 'MeshRenderer', 'MeshCollider', 'Material', 'Tween']
+const skipExposeGlobally: string[] = [
+  'Animator',
+  'MeshRenderer',
+  'MeshCollider',
+  'Material',
+  'Tween',
+  'AvatarShape',
+  'AvatarEquippedData'
+]
 function defineGlobalComponentDecl(component: Component) {
   if (skipExposeGlobally.includes(component.componentPascalName)) return ''
   if (isGrowOnlyValueSet(component)) {
