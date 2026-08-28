@@ -142,6 +142,20 @@ export interface ReactBasedUiSystem {
    * @param entity - The entity whose UI renderer should be removed
    */
   removeUiRenderer(entity: Entity): void
+  /**
+   * Render a UI tree to a texture. The tree is rooted at `entity`, which must carry a UiCanvas
+   * describing the texture; the result can be sampled through `TextureUnion.uiTexture`. Replaces
+   * any texture renderer already set on the entity, and is torn down when the entity is removed.
+   *
+   * @param entity - The UiCanvas entity the UI tree hangs from
+   * @param ui - The UI component to render
+   */
+  setTextureRenderer(entity: Entity, ui: UiComponent): void
+  /**
+   * Remove a texture renderer previously set with setTextureRenderer(), destroying its entities.
+   * @param entity - The UiCanvas entity the renderer was set on
+   */
+  removeTextureRenderer(entity: Entity): void
 }
 
 /**
@@ -152,6 +166,18 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
   let uiComponent: UiComponent | undefined = undefined
   let mainOptions: UiRendererOptions | undefined = undefined
   const additionalRenderers = new Map<Entity, { ui: UiComponent; options?: UiRendererOptions }>()
+  // UI trees rendered to a texture, keyed by their UiCanvas entity. Each needs its own reconciler
+  // because the root parent is a per-reconciler property.
+  const textureRenderers = new Map<Entity, { renderer: ReturnType<typeof createReconciler>; ui: UiComponent }>()
+
+  function destroyTextureRenderer(entity: Entity) {
+    const entry = textureRenderers.get(entity)
+    if (!entry) return
+    textureRenderers.delete(entity)
+    for (const uiEntity of entry.renderer.getEntities()) {
+      engine.removeEntity(uiEntity)
+    }
+  }
   const UiCanvasInformation = ecsComponents.UiCanvasInformation(engine)
 
   // Unique owner to prevent other UI systems resetting this scale factor.
@@ -282,6 +308,14 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
     } else {
       renderer.update(null)
     }
+
+    for (const [entity, entry] of textureRenderers) {
+      if (engine.getEntityState(entity) === EntityState.Removed) {
+        destroyTextureRenderer(entity)
+      } else {
+        entry.renderer.update(React.createElement(entry.ui as any))
+      }
+    }
   }
 
   function UiScaleSystem() {
@@ -348,6 +382,9 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
       for (const entity of renderer.getEntities()) {
         engine.removeEntity(entity)
       }
+      for (const entity of textureRenderers.keys()) {
+        destroyTextureRenderer(entity)
+      }
     },
     setUiRenderer(ui: UiComponent, options?: UiRendererOptions) {
       uiComponent = ui
@@ -358,6 +395,13 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
     },
     removeUiRenderer(entity: Entity) {
       additionalRenderers.delete(entity)
+    },
+    setTextureRenderer(entity: Entity, ui: UiComponent) {
+      destroyTextureRenderer(entity)
+      textureRenderers.set(entity, { renderer: createReconciler(engine, pointerSystem, entity), ui })
+    },
+    removeTextureRenderer(entity: Entity) {
+      destroyTextureRenderer(entity)
     }
   }
 }
