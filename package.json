@@ -9,7 +9,7 @@
     "@babel/plugin-transform-modules-commonjs": "^7.28.5",
     "@babel/plugin-transform-react-jsx": "^7.28.5",
     "@babel/preset-typescript": "^7.28.5",
-    "@dcl/protocol": "1.0.0-32863591307.commit-0b3d285",
+    "@dcl/protocol": "1.0.0-33247403125.commit-6e4ee4a",
     "@dcl/quickjs-emscripten": "^0.21.0-3680274614.commit-1808aa1",
     "@dcl/ts-proto": "1.153.0",
     "@types/fs-extra": "^9.0.12",

@@ -44,6 +44,16 @@ export interface MeshColliderComponentDefinitionExtended
    * @param colliderMask - the set of layer where the collider reacts, default: Physics and Pointer
    */
   setSphere(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void
+
+  /**
+   * @public
+   * Set a mesh from inside a gltf in the MeshCollider component
+   * @param entity - entity to create or replace the MeshCollider component
+   * @param source - the path to the gltf
+   * @param meshName - the name of the mesh in the gltf (see GltfContainerLoadingState.meshNames)
+   * @param colliderMask - the set of layer where the collider reacts, default: Physics and Pointer
+   */
+  setGltfMesh(entity: Entity, source: string, meshName: string, colliderLayers?: ColliderLayer | ColliderLayer[]): void
 }
 
 export function defineMeshColliderComponent(
@@ -87,6 +97,17 @@ export function defineMeshColliderComponent(
     setSphere(entity: Entity, colliderLayers?: ColliderLayer | ColliderLayer[]): void {
       theComponent.createOrReplace(entity, {
         mesh: { $case: 'sphere', sphere: {} },
+        collisionMask: getCollisionMask(colliderLayers)
+      })
+    },
+    setGltfMesh(
+      entity: Entity,
+      source: string,
+      meshName: string,
+      colliderLayers?: ColliderLayer | ColliderLayer[]
+    ): void {
+      theComponent.createOrReplace(entity, {
+        mesh: { $case: 'gltf', gltf: { gltfSrc: source, name: meshName } },
         collisionMask: getCollisionMask(colliderLayers)
       })
     }
