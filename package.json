@@ -9,7 +9,7 @@
     "@babel/plugin-transform-modules-commonjs": "^7.28.5",
     "@babel/plugin-transform-react-jsx": "^7.28.5",
     "@babel/preset-typescript": "^7.28.5",
-    "@dcl/protocol": "https://sdk-team-cdn.decentraland.org/@dcl/protocol/branch//dcl-protocol-1.0.0-33189663741.commit-641dbdf.tgz",
+    "@dcl/protocol": "1.0.0-33421599964.commit-0e82dcd",
     "@dcl/quickjs-emscripten": "^0.21.0-3680274614.commit-1808aa1",
     "@dcl/ts-proto": "1.153.0",
     "@types/fs-extra": "^9.0.12",
