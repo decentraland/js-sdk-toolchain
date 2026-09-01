@@ -229,23 +229,29 @@ function processObservables() {
     switch (eventName) {
       case 'playerClicked': {
         subscribePlayerClick()
+        break
       }
       case 'onEnterScene':
       case 'playerConnected': {
         subscribeEnterScene()
+        break
       }
       case 'onLeaveScene':
       case 'playerDisconnected': {
         subscribeLeaveScene()
+        break
       }
       case 'onRealmChanged': {
         subscribeRealmChange()
+        break
       }
       case 'playerExpression': {
         subscribePlayerExpression()
+        break
       }
       case 'profileChanged': {
         subscribeProfileChange()
+        break
       }
     }
     subscriptions.add(eventName)
@@ -300,7 +306,7 @@ function processObservables() {
     const playerEntities = new Set<Entity>()
     engine.addSystem(() => {
       for (const [entity] of engine.getEntitiesWith(PlayerIdentityData)) {
-        if (playerEntities.has(entity)) return
+        if (playerEntities.has(entity)) continue
         playerEntities.add(entity)
 
         PointerEventsResult.onChange(entity, (data) => {

@@ -9,9 +9,10 @@ import { PreviewComponents } from '../types'
 import { fetchEntityByPointer } from '../../../logic/catalyst-requests'
 import { CliComponents } from '../../../components'
 import {
+  b64ContentVersionedHashingFunction,
+  b64HashDecodingFunction,
   b64HashingFunction,
   getProjectPublishableFilesWithHashes,
-  machineId,
   projectFilesToContentMappings
 } from '../../../logic/project-files'
 import { getCatalystBaseUrl, getInstalledPackageVersion } from '../../../logic/config'
@@ -199,9 +200,9 @@ async function serveFolders(
 
   router.get('/content/contents/:hash', async (ctx, next) => {
     if (ctx.params.hash && ctx.params.hash.startsWith('b64-')) {
-      const decoded = Buffer.from(ctx.params.hash.replace(/^b64-/, ''), 'base64').toString('utf8')
-      // Strip the machineId suffix that was added during encoding
-      const fullPath = path.resolve(decoded.slice(0, -(machineId.length + 1)))
+      // Strips the machineId suffix that was added during encoding and, for content-versioned
+      // ids, the embedded mtime — the server always serves the file's current bytes.
+      const fullPath = path.resolve(b64HashDecodingFunction(ctx.params.hash))
 
       // find a project that we are talking about. NOTE: this filter is not exhaustive
       //   relative paths should be used instead
@@ -214,7 +215,11 @@ async function serveFolders(
 
       if (path.resolve(fullPath) === path.resolve(baseProject.workingDirectory)) {
         // if we are talking about the root directory, then we must return the json of the entity
-        const entity = await fakeEntityV3FromProject(components, baseProject, async ($) => b64HashingFunction($))
+        const entity = await fakeEntityV3FromProject(
+          components,
+          baseProject,
+          previewHashingFunction(components, baseProject)
+        )
 
         if (!entity) return { status: 404 }
 
@@ -409,7 +414,7 @@ async function getSceneJson(
 
   const allDeployments = await Promise.all(
     workspace.projects.map((project) =>
-      fakeEntityV3FromProject(components, project, async ($) => b64HashingFunction($))
+      fakeEntityV3FromProject(components, project, previewHashingFunction(components, project))
     )
   )
 
@@ -428,6 +433,16 @@ async function getSceneJson(
   }
 
   return resultEntities
+}
+
+// Preview ids for a project's files embed each file's mtime, so the id — and every client cache
+// key derived from it — changes whenever the file changes. The project directory's own id (the
+// scene/entity id) stays path-only: the scene identity must be stable across edits.
+function previewHashingFunction(components: Pick<CliComponents, 'fs'>, project: ProjectUnion) {
+  return async (filePath: string) =>
+    filePath === project.workingDirectory
+      ? b64HashingFunction(filePath)
+      : b64ContentVersionedHashingFunction(filePath, (await components.fs.stat(filePath)).mtimeMs)
 }
 
 async function fakeEntityV3FromProject(
