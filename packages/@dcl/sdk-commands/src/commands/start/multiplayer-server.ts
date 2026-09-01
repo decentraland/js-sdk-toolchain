@@ -11,10 +11,9 @@ const HAMMURABI_PACKAGE = '@dcl/hammurabi-server'
 const HAMMURABI_VERSION = 'next'
 
 const BEVY_PACKAGE = '@dcl-regenesislabs/bevy-headless-server'
-// `latest` moves only when someone dispatches bevy-explorer's publish-headless
-// workflow with dist_tag=latest — engine pushes to main land on `next` and cannot
-// change what previews run. DCL_SERVER_PACKAGE overrides for local builds.
-const BEVY_VERSION = 'latest'
+// Zone Pulse test build: the Pulse-capable engine (bevy-explorer #1137) is only published
+// on `next` — `latest` still predates it. DCL_SERVER_PACKAGE overrides for local builds.
+const BEVY_VERSION = 'next'
 
 // The bevy server exits with this when it can never run here (unsupported platform,
 // missing binary, bad arguments). We fail the preview loudly instead of retrying:
@@ -164,6 +163,13 @@ export function startMultiplayerServer(
   // (scene_runner::renderer_context) and real warnings. An explicit RUST_LOG wins.
   if (engine === 'bevy' && !env.RUST_LOG) {
     env.RUST_LOG = 'warn,scene_runner::renderer_context=info'
+  }
+
+  // Zone Pulse test build: point the engine's Pulse listener at the same zone instance the
+  // web client is sent to (see bevyUrl in index.ts); the server side speaks ENet, hence :7777.
+  // An explicit PULSE_SERVER wins; the engine's own default is the production server.
+  if (engine === 'bevy' && !env.PULSE_SERVER) {
+    env.PULSE_SERVER = 'pulse-server.decentraland.zone:7777'
   }
 
   // Bevy output goes through the line filter below; hammurabi keeps the terminal directly.

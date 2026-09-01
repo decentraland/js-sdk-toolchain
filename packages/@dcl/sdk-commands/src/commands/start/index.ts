@@ -260,9 +260,12 @@ export async function main(options: Options) {
       const sortedURLs = availableURLs.sort((a, _b) => {
         return a.toLowerCase().includes('localhost') || a.includes('127.0.0.1') || a.includes('0.0.0.0') ? -1 : 1
       })
-      const bevyUrl = `https://decentraland.org/bevy-web/?preview=true&realm=${
+      // Zone Pulse test build: the client and the auth server must target the SAME Pulse
+      // instance for presence to flow, so this pairs with the PULSE_SERVER env set on the
+      // server process in multiplayer-server.ts (web speaks WebTransport, hence :7743).
+      const bevyUrl = `https://decentraland.zone/bevy-web/?preview=true&realm=${
         new URL(sortedURLs[0]).origin
-      }&position=${baseCoords.x},${baseCoords.y}`
+      }&position=${baseCoords.x},${baseCoords.y}&pulseServer=pulse-server.decentraland.zone:7743`
       if (bevyWeb) {
         components.logger.log('Available on:\n')
         components.logger.log(`    ${bevyUrl}`)
@@ -271,7 +274,7 @@ export async function main(options: Options) {
           'Chromium-based browsers require permission for websites to reach localhost (Local Network Access).\n' +
             'When the browser asks to access apps on your device, click "Allow".\n' +
             'If the scene never loads and no prompt appears, enable it manually and reload:\n' +
-            '  chrome://settings/content/siteDetails?site=https%3A%2F%2Fdecentraland.org\n' +
+            '  chrome://settings/content/siteDetails?site=https%3A%2F%2Fdecentraland.zone\n' +
             '  → "Apps on device" (Chrome 145+) or "Local network access" (Chrome 142-144) → Allow'
         )
       }
