@@ -108,21 +108,35 @@ async function extractGltfDependencies(
 }
 
 /**
- * Builds the destination path following Creator Hub conventions
+ * Builds the destination path following Creator Hub conventions.
+ *
+ * Destinations are keyed by file name, so two assets called the same thing in
+ * different source folders would land on top of each other. `claimedPaths`
+ * carries the ones already handed out so later assets get a suffix instead of
+ * replacing an earlier one.
  */
-function getDestinationPath(sceneRoot: string, originalPath: string): string {
+function getDestinationPath(sceneRoot: string, originalPath: string, claimedPaths: Set<string>): string {
   const fileName = path.basename(originalPath)
   const extension = path.extname(originalPath)
   const assetType = getAssetType(extension)
+  const baseName = path.basename(originalPath, extension)
 
-  if (assetType === 'Models') {
-    // Models get their own folder: assets/scene/Models/{modelName}/file.glb
-    const modelName = path.basename(originalPath, extension)
-    return path.join(sceneRoot, 'assets', 'scene', 'Models', modelName, fileName)
+  const buildPath = (suffix: string) =>
+    assetType === 'Models'
+      ? // Models get their own folder: assets/scene/Models/{modelName}/file.glb
+        path.join(sceneRoot, 'assets', 'scene', 'Models', `${baseName}${suffix}`, fileName)
+      : // Other assets go directly in type folder: assets/scene/Images/file.png
+        path.join(sceneRoot, 'assets', 'scene', assetType, `${baseName}${suffix}${extension}`)
+
+  let attempt = 1
+  let destination = buildPath('')
+  while (claimedPaths.has(destination)) {
+    attempt++
+    destination = buildPath(`-${attempt}`)
   }
 
-  // Other assets go directly in type folder: assets/scene/Images/file.png
-  return path.join(sceneRoot, 'assets', 'scene', assetType, fileName)
+  claimedPaths.add(destination)
+  return destination
 }
 
 /**
@@ -231,6 +245,7 @@ export async function migrateAssets(
 
   // Step 2: copy files to new locations
   const pathMapping = new Map<string, string>()
+  const claimedPaths = new Set<string>()
 
   for (const originalPath of assetPaths) {
     const absoluteOriginalPath = path.isAbsolute(originalPath) ? originalPath : path.join(sceneRoot, originalPath)
@@ -241,7 +256,7 @@ export async function migrateAssets(
     }
 
     const assetType = getAssetType(path.extname(originalPath))
-    const newAbsolutePath = getDestinationPath(sceneRoot, originalPath)
+    const newAbsolutePath = getDestinationPath(sceneRoot, originalPath, claimedPaths)
     const newRelativePath = path.relative(sceneRoot, newAbsolutePath)
 
     await fs.mkdir(path.dirname(newAbsolutePath), { recursive: true })
@@ -267,6 +282,9 @@ export async function migrateAssets(
         if (await fs.fileExists(depOriginalPath)) {
           const depNewPath = path.join(path.dirname(newAbsolutePath), depFileName)
 
+          // A glTF may point at its textures and buffers through a subfolder,
+          // which does not exist yet under the model's new home.
+          await fs.mkdir(path.dirname(depNewPath), { recursive: true })
           await fs.copyFile(depOriginalPath, depNewPath)
 
           const depOriginalRelative = path.join(path.dirname(originalPath), depFileName)
