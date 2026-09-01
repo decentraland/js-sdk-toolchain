@@ -26,7 +26,7 @@ export function createAssetLoadLoadingStateSystem(engine: IEngine): AssetLoadLoa
     Entity,
     {
       callback: AssetLoadLoadingStateSystemCallback
-      lastLoadingStateLength: number
+      lastConsumedTimestamp: number
     }
   >()
 
@@ -34,7 +34,8 @@ export function createAssetLoadLoadingStateSystem(engine: IEngine): AssetLoadLoa
     const existing = entitiesCallbackAssetLoadLoadingStateMap.get(entity)
     entitiesCallbackAssetLoadLoadingStateMap.set(entity, {
       callback: callback,
-      lastLoadingStateLength: existing?.lastLoadingStateLength ?? 0
+      // -1 rather than 0, so a first event stamped 0 still counts as new.
+      lastConsumedTimestamp: existing?.lastConsumedTimestamp ?? -1
     })
   }
 
@@ -53,19 +54,29 @@ export function createAssetLoadLoadingStateSystem(engine: IEngine): AssetLoadLoa
 
       const loadingState = assetLoadLoadingStateComponent.get(entity)
 
-      if (loadingState.size === 0 || loadingState.size === data.lastLoadingStateLength) continue
+      if (loadingState.size === 0) continue
 
-      // Get last added values (can be multiple per tick, just not for the same asset)
-      const lastValues = Array.from(loadingState.values()).slice(data.lastLoadingStateLength)
+      // Tracked by timestamp rather than by how many values are stored: the
+      // set drops its oldest value once it is full, so its size stops growing
+      // and every later event looked like nothing had happened.
+      let lastConsumedTimestamp = data.lastConsumedTimestamp
 
-      lastValues.forEach((value) => {
+      for (const value of loadingState.values()) {
+        if (value.timestamp <= data.lastConsumedTimestamp) continue
+
         data.callback(value)
-      })
 
-      entitiesCallbackAssetLoadLoadingStateMap.set(entity, {
-        callback: data.callback,
-        lastLoadingStateLength: loadingState.size
-      })
+        if (value.timestamp > lastConsumedTimestamp) {
+          lastConsumedTimestamp = value.timestamp
+        }
+      }
+
+      if (lastConsumedTimestamp !== data.lastConsumedTimestamp) {
+        entitiesCallbackAssetLoadLoadingStateMap.set(entity, {
+          callback: data.callback,
+          lastConsumedTimestamp
+        })
+      }
     }
 
     // Clean up garbage entries
