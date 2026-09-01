@@ -459,6 +459,17 @@ export async function executeSceneCode(
 
   const crdtState = await getMainCrdtFile(components, crdtFilePath)
   const { engine, transport } = initEngine()
+
+  // The scene's own engine is handed this state through crdtGetState, but CRDT
+  // never echoes a received message back to the transport it came from, so the
+  // engine capturing the result would only ever see what the scene itself
+  // creates. Seed it here too, before the scene runs, or every entity already
+  // in main.crdt is dropped when the file is written back.
+  if (crdtState.length) {
+    transport.onmessage!(crdtState)
+    await engine.update(0)
+  }
+
   const restoreRequire = setupRequireHook(engine, transport, crdtState)
 
   try {
