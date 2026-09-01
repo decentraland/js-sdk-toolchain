@@ -50,6 +50,15 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
   const receivedMessages: ReceiveMessage[] = []
   // Messages already processed by the engine but that we need to broadcast to other transports.
   const broadcastMessages: ReceiveMessage[] = []
+  // Network entities deleted while processing the current batch, keyed the way
+  // an inbound message identifies them. Deleting an entity drops its
+  // NetworkEntity component, and sendMessages still has to resolve the same
+  // message afterwards to convert it for the renderer.
+  const networkEntitiesDeletedThisTick = new Map<string, Entity>()
+
+  function networkEntityKey(networkId: number, entityId: Entity) {
+    return `${networkId}:${entityId}`
+  }
 
   /**
    *
@@ -125,6 +134,11 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
           return { entityId, network }
         }
       }
+
+      const deletedEntityId = networkEntitiesDeletedThisTick.get(networkEntityKey(msg.networkId!, msg.entityId))
+      if (deletedEntityId !== undefined) {
+        return { entityId: deletedEntityId }
+      }
     }
 
     return { entityId: msg.entityId }
@@ -137,6 +151,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
   async function receiveMessages() {
     const messagesToProcess = getMessages(receivedMessages)
     const entitiesShouldBeCleaned: Entity[] = []
+    networkEntitiesDeletedThisTick.clear()
 
     for (const msg of messagesToProcess) {
       let { entityId, network } = findNetworkId(msg)
@@ -147,6 +162,9 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         NetworkEntity.createOrReplace(entityId, network)
       }
       if (msg.type === CrdtMessageType.DELETE_ENTITY || msg.type === CrdtMessageType.DELETE_ENTITY_NETWORK) {
+        if (msg.type === CrdtMessageType.DELETE_ENTITY_NETWORK) {
+          networkEntitiesDeletedThisTick.set(networkEntityKey(msg.networkId, msg.entityId), entityId)
+        }
         entitiesShouldBeCleaned.push(entityId)
         broadcastMessages.push(msg)
       } else {
