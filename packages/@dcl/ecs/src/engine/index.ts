@@ -249,6 +249,10 @@ function preEngine(options?: IEngineOptions): PreEngine {
     return systems.getSystems()
   }
 
+  function isSystemActive(fn: SystemFn) {
+    return systems.isActive(fn)
+  }
+
   function componentsIter() {
     return componentsDefinition.values()
   }
@@ -275,6 +279,7 @@ function preEngine(options?: IEngineOptions): PreEngine {
     removeEntityWithChildren,
     addSystem,
     getSystems,
+    isSystemActive,
     removeSystem,
     defineComponent,
     defineComponentFromSchema,
@@ -313,7 +318,12 @@ export function Engine(options?: IEngineOptions): IEngine {
 
   async function update(dt: number) {
     await crdtSystem.receiveMessages()
-    for (const system of partialEngine.getSystems()) {
+    // A system that removes one (itself included) splices the array this loop
+    // is walking, which shifts the rest past the cursor and skips one. Walk a
+    // snapshot instead, and leave out whatever was removed while the tick ran.
+    for (const system of [...partialEngine.getSystems()]) {
+      if (!partialEngine.isSystemActive(system.fn)) continue
+
       const ret: unknown | Promise<unknown> = system.fn(dt)
       checkNotThenable(
         ret,

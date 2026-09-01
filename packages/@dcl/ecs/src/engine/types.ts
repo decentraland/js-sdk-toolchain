@@ -66,6 +66,8 @@ export type PreEngine = Pick<
   | 'getEntitiesByTag'
 > & {
   getSystems: () => SystemItem[]
+  /** Whether a system is still registered, which the update loop checks per tick. */
+  isSystemActive: (fn: SystemFn) => boolean
 }
 
 /**
