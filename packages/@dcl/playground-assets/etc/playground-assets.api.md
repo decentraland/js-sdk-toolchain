@@ -1269,6 +1269,7 @@ export type EventSystemOptions = {
     showHighlight?: boolean;
     maxPlayerDistance?: number;
     priority?: number;
+    maxCameraDistance?: number;
 };
 
 // @public
@@ -3485,7 +3486,9 @@ export namespace PBPointerEvents_Entry {
 export interface PBPointerEvents_Info {
     button?: InputAction | undefined;
     hoverText?: string | undefined;
+    maxCameraDistance?: number | undefined;
     maxDistance?: number | undefined;
+    // @deprecated (undocumented)
     maxPlayerDistance?: number | undefined;
     priority?: number | undefined;
     showFeedback?: boolean | undefined;
