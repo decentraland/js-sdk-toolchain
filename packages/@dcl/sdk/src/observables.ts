@@ -223,38 +223,51 @@ export async function pollEvents(sendBatch: (body: ManyEntityAction) => Promise<
 const SDK7ComponentsObservable = processObservables()
 function processObservables() {
   const subscriptions = new Set<keyof IEvents>()
+  // Which underlying listeners are already installed. Some of them serve two
+  // event names, and tracking installation by name alone installed the listener
+  // a second time, so both observables were notified twice per event.
+  const installedListeners = new Set<string>()
+
+  function installListener(name: string, install: () => void) {
+    if (installedListeners.has(name)) return
+    installedListeners.add(name)
+    install()
+  }
 
   function subscribe(eventName: keyof IEvents) {
     if (subscriptions.has(eventName)) return
+    // Recorded before installing, because the listeners read this to decide
+    // which observables to notify.
+    subscriptions.add(eventName)
+
     switch (eventName) {
       case 'playerClicked': {
-        subscribePlayerClick()
+        installListener('playerClick', subscribePlayerClick)
         break
       }
       case 'onEnterScene':
       case 'playerConnected': {
-        subscribeEnterScene()
+        installListener('enterScene', subscribeEnterScene)
         break
       }
       case 'onLeaveScene':
       case 'playerDisconnected': {
-        subscribeLeaveScene()
+        installListener('leaveScene', subscribeLeaveScene)
         break
       }
       case 'onRealmChanged': {
-        subscribeRealmChange()
+        installListener('realmChange', subscribeRealmChange)
         break
       }
       case 'playerExpression': {
-        subscribePlayerExpression()
+        installListener('playerExpression', subscribePlayerExpression)
         break
       }
       case 'profileChanged': {
-        subscribeProfileChange()
+        installListener('profileChange', subscribeProfileChange)
         break
       }
     }
-    subscriptions.add(eventName)
   }
   /**
    * PLAYER ENTER/CONNECTED observable
