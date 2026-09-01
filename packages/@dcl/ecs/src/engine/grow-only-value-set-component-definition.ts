@@ -1,12 +1,18 @@
 import { ISchema } from '../schemas'
 import { ReadWriteByteBuffer } from '../serialization/ByteBuffer'
-import { AppendValueMessageBody, AppendValueOperation, CrdtMessageType } from '../serialization/crdt'
-import { ComponentType, GrowOnlyValueSetComponentDefinition } from './component'
+import {
+  AppendValueMessageBody,
+  AppendValueOperation,
+  CrdtMessageType,
+  ProcessMessageResultType
+} from '../serialization/crdt'
+import { ComponentType, GrowOnlyValueSetComponentDefinition, ValidateCallback } from './component'
 import { __DEV__ } from '../runtime/invariant'
 import { Entity } from './entity'
 import { DeepReadonly, DeepReadonlySet } from './readonly'
 
 const emptyReadonlySet = freezeSet(new Set())
+const __GLOBAL_ENTITY = '__GLOBAL_ENTITY' as any as Entity
 
 function frozenError() {
   throw new Error('The set is frozen')
@@ -50,6 +56,7 @@ export function createValueSetComponentDefinitionFromSchema<T>(
   const dirtyIterator = new Set<Entity>()
   const queuedCommands: AppendValueMessageBody[] = []
   const onChangeCallbacks = new Map<Entity, ((data: T | undefined) => void)[]>()
+  const validateCallbacks = new Map<Entity, ValidateCallback<T>>()
 
   // only sort the array if the latest (N) element has a timestamp <= N-1
   function shouldSort(row: InternalDatastructure) {
@@ -111,8 +118,11 @@ export function createValueSetComponentDefinitionFromSchema<T>(
     has(entity: Entity): boolean {
       return data.has(entity)
     },
-    entityDeleted(entity: Entity): void {
+    entityDeleted(entity: Entity, markAsDirty: boolean): void {
       data.delete(entity)
+      if (markAsDirty) {
+        // For grow-only sets, we don't need to mark as dirty since deletion doesn't generate CRDT messages
+      }
     },
     get(entity: Entity): DeepReadonlySet<T> {
       const values = data.get(entity)
@@ -180,6 +190,47 @@ export function createValueSetComponentDefinitionFromSchema<T>(
       for (const cb of cbs) {
         cb(value)
       }
+    },
+    __dry_run_updateFromCrdt(_body) {
+      return ProcessMessageResultType.StateUpdatedData
+    },
+    validateBeforeChange(entityOrCb: Entity | ValidateCallback<T>, cb?: ValidateCallback<T>): void {
+      if (arguments.length === 1) {
+        // Second overload: just callback (global validation)
+        validateCallbacks.set(__GLOBAL_ENTITY, entityOrCb as ValidateCallback<T>)
+      } else {
+        if (cb) {
+          validateCallbacks.set(entityOrCb as Entity, cb)
+        }
+      }
+    },
+    __run_validateBeforeChange(entity, newValue, senderAddress, createdBy): boolean {
+      const cb = entity && validateCallbacks.get(entity)
+      const globalCb = validateCallbacks.get(__GLOBAL_ENTITY)
+      const currentValue = [...this.get(entity).values()]
+
+      const value = { entity, currentValue: currentValue as T, newValue, senderAddress, createdBy }
+
+      const globalResult = globalCb?.(value) ?? true
+      const entityResult = (globalResult && cb?.(value)) ?? true
+
+      return globalResult && entityResult
+    },
+    getCrdtState(entity: Entity): { data: Uint8Array; timestamp: number } | null {
+      const row = data.get(entity)
+      if (!row || row.raw.length === 0) {
+        return null
+      }
+
+      // For GrowOnlySet, we need to return the complete CRDT messages for all values
+      // This is complex because GrowOnlySet uses APPEND messages, not a single PUT
+      // For now, return null to indicate this component type doesn't support simple corrections
+      return null
+    },
+    __forceUpdateFromCrdt(_msg) {
+      // GrowOnlySet doesn't support authoritative corrections in the same way as LWW
+      // since it uses APPEND_VALUE messages instead of PUT_COMPONENT messages
+      return [null, undefined]
     }
   }
 
