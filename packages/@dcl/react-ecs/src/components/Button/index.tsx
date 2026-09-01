@@ -35,7 +35,16 @@ function getButtonProps(props: UiButtonProps) {
  */
 /* @__PURE__ */
 export function Button(props: UiButtonProps) {
-  const { uiTransform, uiBackground, onMouseDown, onMouseUp, onMouseEnter, onMouseLeave, ...otherProps } = props
+  const {
+    uiTransform,
+    uiBackground,
+    uiInputBinding,
+    onMouseDown,
+    onMouseUp,
+    onMouseEnter,
+    onMouseLeave,
+    ...otherProps
+  } = props
   const buttonProps = getButtonProps(props)
   const uiBackgroundProps = parseUiBackground({
     ...buttonProps.uiBackground,
@@ -69,6 +78,7 @@ export function Button(props: UiButtonProps) {
       uiTransform={uiTransformProps}
       uiText={textProps}
       uiBackground={uiBackgroundProps}
+      uiInputBinding={uiInputBinding}
     />
   )
 }
