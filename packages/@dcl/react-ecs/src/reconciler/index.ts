@@ -161,14 +161,20 @@ export function createReconciler(
   ) {
     const componentId = getComponentId[componentName]
 
-    const onChangeExists = 'onChange' in props
-    const onSubmitExists = 'onSubmit' in props
+    // Worked on a copy from here on. On the create path this object is React's
+    // own props, and deleting keys from it makes the next diff believe they
+    // were never set, so a listener dropped on the very next render is never
+    // seen as removed and keeps firing.
+    const nextProps = { ...props } as Partial<EngineComponents[K]>
+
+    const onChangeExists = 'onChange' in nextProps
+    const onSubmitExists = 'onSubmit' in nextProps
     const entityState = changeEvents.get(instance.entity)?.get(componentId)
     const onChange = onChangeExists
-      ? (props['onChange'] as OnChangeState['onChangeCallback'])
+      ? (nextProps['onChange'] as OnChangeState['onChangeCallback'])
       : entityState?.onChangeCallback
     const onSubmit = onSubmitExists
-      ? (props['onSubmit'] as OnChangeState['onSubmitCallback'])
+      ? (nextProps['onSubmit'] as OnChangeState['onSubmitCallback'])
       : entityState?.onSubmitCallback
 
     if (onChangeExists || onSubmitExists) {
@@ -176,8 +182,8 @@ export function createReconciler(
         onChangeCallback: onChange,
         onSubmitCallback: onSubmit
       })
-      delete (props as any).onChange
-      delete (props as any).onSubmit
+      delete (nextProps as any).onChange
+      delete (nextProps as any).onSubmit
     }
 
     // Prevent keystroke drops: when React echoes back the same value the renderer
@@ -185,24 +191,31 @@ export function createReconciler(
     // This avoids sending a stale value that overwrites what the user is currently typing.
     if (
       componentName === 'uiInput' &&
-      'value' in props &&
+      'value' in nextProps &&
       lastInputResultValues.has(instance.entity) &&
-      (props as any).value === lastInputResultValues.get(instance.entity)
+      (nextProps as any).value === lastInputResultValues.get(instance.entity)
     ) {
-      delete (props as any).value
+      delete (nextProps as any).value
     }
 
     // We check if there is any key pending to be changed to avoid updating the existing component
-    if (!Object.keys(props).length) {
+    if (!Object.keys(nextProps).length) {
       return
     }
     const ComponentDef = engine.getComponent(componentId) as components.LastWriteWinElementSetComponentDefinition<
       EngineComponents[K]
     >
     const component = ComponentDef.getMutableOrNull(instance.entity) || ComponentDef.create(instance.entity)
-    for (const key in props) {
+    for (const key in nextProps) {
       const keyProp = key as keyof EngineComponents[K]
-      component[keyProp] = props[keyProp]!
+      component[keyProp] = nextProps[keyProp]!
+    }
+
+    // A value the scene actually pushed becomes the baseline the echo check
+    // compares against. Leaving the renderer's older value in place meant a
+    // later push back to it looked like an echo and was dropped.
+    if (componentName === 'uiInput' && 'value' in nextProps) {
+      lastInputResultValues.set(instance.entity, (nextProps as any).value)
     }
   }
 
