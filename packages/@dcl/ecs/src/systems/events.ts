@@ -207,12 +207,30 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     ProximityEnter,
     ProximityLeave
   }
-  type EventMapType = Map<EventType, { cb: EventSystemCallback; opts: EventSystemOptions }>
+  type EventMapType = Map<string, { cb: EventSystemCallback; opts: EventSystemOptions; eventType: EventType }>
 
   const eventsMap = new Map<Entity, EventMapType>()
 
   function getEvent(entity: Entity) {
     return eventsMap.get(entity) || eventsMap.set(entity, new Map()).get(entity)!
+  }
+
+  // A cursor handler and a proximity handler are separate registrations that
+  // produce separate PointerEvents entries, so they need separate slots here
+  // too. Keying on the event type alone made onProximityDown evict whatever
+  // onPointerDown had left.
+  function eventKey(type: EventType, interactionType: InteractionType) {
+    return `${type}:${interactionType}`
+  }
+
+  function setEvent(
+    entity: Entity,
+    type: EventType,
+    cb: EventSystemCallback,
+    opts: EventSystemOptions,
+    interactionType: InteractionType = InteractionType.CURSOR
+  ) {
+    getEvent(entity).set(eventKey(type, interactionType), { cb, opts, eventType: type })
   }
 
   function setPointerEvent(
@@ -246,14 +264,19 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
   ) {
     const pointerEvent = PointerEvents.getMutableOrNull(entity)
     if (!pointerEvent) return
-    pointerEvent.pointerEvents = pointerEvent.pointerEvents.filter(
+
+    // One registration pushed one entry, so drop one. Removing every match
+    // would also take out an entry another registration owns, since onClick and
+    // onPointerDown both describe themselves as PET_DOWN.
+    const index = pointerEvent.pointerEvents.findIndex(
       (pointer) =>
-        !(
-          pointer.eventInfo?.button === button &&
-          pointer.eventType === type &&
-          pointer.interactionType === interactionType
-        )
+        pointer.eventInfo?.button === button &&
+        pointer.eventType === type &&
+        pointer.interactionType === interactionType
     )
+    if (index === -1) return
+
+    pointerEvent.pointerEvents = pointerEvent.pointerEvents.filter((_, current) => current !== index)
   }
 
   function getPointerEvent(eventType: EventType) {
@@ -273,13 +296,18 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
 
   function removeEvent(entity: Entity, type: EventType, interactionType: InteractionType = InteractionType.CURSOR) {
     const event = getEvent(entity)
-    const pointerEvent = event.get(type)
+    const key = eventKey(type, interactionType)
+    const pointerEvent = event.get(key)
 
-    if (pointerEvent?.opts.hoverText) {
-      removePointerEvent(entity, getPointerEvent(type), pointerEvent.opts.button)
+    // Every registration adds an entry, not only the ones carrying a hoverText,
+    // so every removal has to take one away. Gating on hoverText left the
+    // renderer showing an interaction whose callback was already gone, and made
+    // re-registering grow the component by one entry each time.
+    if (pointerEvent) {
+      removePointerEvent(entity, getPointerEvent(type), pointerEvent.opts.button, interactionType)
     }
 
-    event.delete(type)
+    event.delete(key)
   }
 
   engine.addSystem(function PointerEventSystem() {
@@ -289,7 +317,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
         continue
       }
 
-      for (const [eventType, { cb, opts }] of event) {
+      for (const [, { cb, opts, eventType }] of event) {
         if (eventType === EventType.Click) {
           const command = inputSystem.getClick(opts.button, entity)
           if (command)
@@ -321,7 +349,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     const { entity, opts } = data
     const options = getDefaultOpts(opts)
     removeEvent(entity, EventType.Down)
-    getEvent(entity).set(EventType.Down, { cb, opts: options })
+    setEvent(entity, EventType.Down, cb, options)
     setPointerEvent(entity, PointerEventType.PET_DOWN, options)
   }
 
@@ -333,7 +361,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     const { entity, opts } = data
     const options = getDefaultOpts(opts)
     removeEvent(entity, EventType.Up)
-    getEvent(entity).set(EventType.Up, { cb, opts: options })
+    setEvent(entity, EventType.Up, cb, options)
     setPointerEvent(entity, PointerEventType.PET_UP, options)
   }
 
@@ -342,7 +370,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     const { entity, opts } = data
     const options = getDefaultOpts(opts)
     removeEvent(entity, EventType.HoverEnter)
-    getEvent(entity).set(EventType.HoverEnter, { cb, opts: options })
+    setEvent(entity, EventType.HoverEnter, cb, options)
     setPointerEvent(entity, PointerEventType.PET_HOVER_ENTER, options)
   }
 
@@ -351,7 +379,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     const { entity, opts } = data
     const options = getDefaultOpts(opts)
     removeEvent(entity, EventType.HoverLeave)
-    getEvent(entity).set(EventType.HoverLeave, { cb, opts: options })
+    setEvent(entity, EventType.HoverLeave, cb, options)
     setPointerEvent(entity, PointerEventType.PET_HOVER_LEAVE, options)
   }
 
@@ -360,7 +388,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     const { entity, opts } = data
     const options = getDefaultOpts(opts)
     removeEvent(entity, EventType.Down, InteractionType.PROXIMITY)
-    getEvent(entity).set(EventType.Down, { cb, opts: options })
+    setEvent(entity, EventType.Down, cb, options, InteractionType.PROXIMITY)
     setPointerEvent(entity, PointerEventType.PET_DOWN, options, InteractionType.PROXIMITY)
   }
 
@@ -369,7 +397,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     const { entity, opts } = data
     const options = getDefaultOpts(opts)
     removeEvent(entity, EventType.Up, InteractionType.PROXIMITY)
-    getEvent(entity).set(EventType.Up, { cb, opts: options })
+    setEvent(entity, EventType.Up, cb, options, InteractionType.PROXIMITY)
     setPointerEvent(entity, PointerEventType.PET_UP, options, InteractionType.PROXIMITY)
   }
 
@@ -378,7 +406,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     const { entity, opts } = data
     const options = getDefaultOpts(opts)
     removeEvent(entity, EventType.ProximityEnter, InteractionType.PROXIMITY)
-    getEvent(entity).set(EventType.ProximityEnter, { cb, opts: options })
+    setEvent(entity, EventType.ProximityEnter, cb, options, InteractionType.PROXIMITY)
     setPointerEvent(entity, PointerEventType.PET_PROXIMITY_ENTER, options, InteractionType.PROXIMITY)
   }
 
@@ -387,7 +415,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     const { entity, opts } = data
     const options = getDefaultOpts(opts)
     removeEvent(entity, EventType.ProximityLeave, InteractionType.PROXIMITY)
-    getEvent(entity).set(EventType.ProximityLeave, { cb, opts: options })
+    setEvent(entity, EventType.ProximityLeave, cb, options, InteractionType.PROXIMITY)
     setPointerEvent(entity, PointerEventType.PET_PROXIMITY_LEAVE, options, InteractionType.PROXIMITY)
   }
 
@@ -435,7 +463,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
       removeEvent(entity, EventType.Click)
 
       // Set new event
-      getEvent(entity).set(EventType.Click, { cb, opts: options })
+      setEvent(entity, EventType.Click, cb, options)
       setPointerEvent(entity, PointerEventType.PET_DOWN, options)
     },
 
