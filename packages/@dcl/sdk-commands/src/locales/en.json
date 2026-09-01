@@ -79,6 +79,9 @@
       "build_failed": "Failed to build the scene: {{error}}",
       "bundle_not_found": "Could not find the bundled scene at {{bundlePath}}",
       "execution_failed": "Failed to execute scene code: {{error}}"
+    },
+    "pack_smart_wearable": {
+      "zip_failed": "Failed to create the smart wearable zip file: {{error}}"
     }
   }
 }

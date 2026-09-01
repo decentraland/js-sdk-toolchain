@@ -1,5 +1,6 @@
 import path from 'path'
 import archiver from 'archiver'
+import i18next from 'i18next'
 
 import { CliComponents } from '../../components'
 import { declareArgs } from '../../logic/args'
@@ -9,6 +10,7 @@ import { printCurrentProjectStarting } from '../../logic/beautiful-logs'
 import { getValidWorkspace } from '../../logic/workspace-validations'
 import { Result } from 'arg'
 import { buildScene } from '../build'
+import { CliError } from '../../logic/error'
 
 interface Options {
   args: Result<typeof args>
@@ -85,11 +87,18 @@ Please try to remove unneccessary files and/or reduce the files size, you can ig
   try {
     await zipProject(
       options.components.fs,
-      files.map(($) => $.absolutePath.replace(project.workingDirectory + path.sep, '')),
+      files.map(($) => ({
+        absolutePath: $.absolutePath,
+        // Zip entries are posix paths regardless of the host.
+        name: path.relative(project.workingDirectory, $.absolutePath).split(path.sep).join('/')
+      })),
       packDir
     )
   } catch (e) {
-    options.components.logger.error('Error creating zip file', (e as any).message)
+    throw new CliError(
+      'PACK_SMART_WEARABLE_ZIP_FAILED',
+      i18next.t('errors.pack_smart_wearable.zip_failed', { error: (e as Error).message })
+    )
   }
 
   options.components.analytics.track('Pack smart wearable', {
@@ -98,7 +107,9 @@ Please try to remove unneccessary files and/or reduce the files size, you can ig
   options.components.logger.log('Smart wearable packed successfully.')
 }
 
-function zipProject(fs: CliComponents['fs'], files: string[], target: string) {
+type FileToZip = { absolutePath: string; name: string }
+
+function zipProject(fs: CliComponents['fs'], files: FileToZip[], target: string) {
   const output = fs.createWriteStream(target)
   const archive = archiver('zip')
 
@@ -118,8 +129,10 @@ function zipProject(fs: CliComponents['fs'], files: string[], target: string) {
     archive.pipe(output)
 
     for (const file of files) {
-      if (file === '') continue
-      archive.file(file, { name: file })
+      if (file.name === '') continue
+      // archiver resolves a relative source against process.cwd(), which is not
+      // the project unless the command happens to be run from inside it.
+      archive.file(file.absolutePath, { name: file.name })
     }
 
     return archive.finalize()

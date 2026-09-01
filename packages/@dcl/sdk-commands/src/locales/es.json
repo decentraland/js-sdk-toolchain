@@ -79,6 +79,9 @@
       "build_failed": "Error al construir la escena: {{error}}",
       "bundle_not_found": "No se pudo encontrar la escena empaquetada en {{bundlePath}}",
       "execution_failed": "Error al ejecutar el código de la escena: {{error}}"
+    },
+    "pack_smart_wearable": {
+      "zip_failed": "No se pudo crear el archivo zip del smart wearable: {{error}}"
     }
   }
 }

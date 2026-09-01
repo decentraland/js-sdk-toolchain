@@ -63,6 +63,8 @@ export type CliErrorName =
   // Workspace validations errors
   | 'WORKSPACE_VALIDATIONS_INVALID_WORKSPACE_JSON'
   | 'WORKSPACE_VALIDATIONS_INVALID_WORKSPACE_JSON_READ'
+  // Pack smart wearable errors
+  | 'PACK_SMART_WEARABLE_ZIP_FAILED'
   // Code to composite errors
   | 'CODE_TO_COMPOSITE_BUILD_FAILED'
   | 'CODE_TO_COMPOSITE_BUNDLE_NOT_FOUND'
