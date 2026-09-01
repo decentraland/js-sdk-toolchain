@@ -39,7 +39,7 @@ export function help(options: Options) {
   Usage: 'sdk-commands storage [subcommand] [action] [KEY] [options]'
     Manages server-side storage including environment variables, scene storage, and player storage.
     This data is stored in Decentraland's remote storage service, not in the local filesystem.
-    Requires a scene.json with worldConfiguration.name in the project directory.
+    Uses the scene.json in the project directory: worldConfiguration.name for a World, or the scene's base parcel for a Genesis City scene.
 
     Subcommands:
       env       Manage environment variables

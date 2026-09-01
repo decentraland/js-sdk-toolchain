@@ -18,9 +18,17 @@ import { StorageInfo, LinkerOptions, StorageType } from './types'
 
 const STORAGE_SERVER_ORG = 'https://storage.decentraland.org'
 
-/**
- * Validates workspace and extracts world configuration for server-side storage operations
- */
+/** True when the storage target is a local development server. Matches by exact hostname so a lookalike host (localhost.evil.com) is not treated as local. */
+export const isLocalStorageTarget = (baseURL: string): boolean => {
+  try {
+    const { hostname } = new URL(baseURL)
+    return hostname === 'localhost' || hostname === '127.0.0.1'
+  } catch {
+    return false
+  }
+}
+
+/** Validates the workspace and resolves the storage target (local server, a World, or a Genesis City scene by its base parcel). */
 export const validateWorkspaceAndWorld = async (
   components: CliComponents,
   projectRoot: string,
@@ -28,21 +36,22 @@ export const validateWorkspaceAndWorld = async (
 ): Promise<{ worldName: string | undefined; baseParcel: string; parcels: string[] }> => {
   await getValidWorkspace(components, projectRoot)
 
-  const isLocalTarget = baseURL.includes('localhost') || baseURL.includes('127.0.0.1')
   const sceneJson = await getValidSceneJson(components, projectRoot)
 
   const worldName = sceneJson.worldConfiguration?.name
-  if (!worldName && !isLocalTarget) {
+  const baseParcel = sceneJson.scene?.base
+
+  if (!isLocalStorageTarget(baseURL) && !worldName && !baseParcel) {
     throw new CliError(
-      'STORAGE_MISSING_WORLD',
-      'scene.json must have worldConfiguration.name defined to use storage on remote servers'
+      'STORAGE_MISSING_LOCATION',
+      'scene.json must define worldConfiguration.name (World) or scene.base (Genesis City parcel) to use storage on remote servers'
     )
   }
 
-  const baseParcel = sceneJson.scene?.base || '0,0'
-  const parcels = sceneJson.scene?.parcels || ['0,0']
+  const resolvedBaseParcel = baseParcel ?? '0,0'
+  const parcels = sceneJson.scene?.parcels ?? [resolvedBaseParcel]
 
-  return { worldName, baseParcel, parcels }
+  return { worldName, baseParcel: resolvedBaseParcel, parcels }
 }
 
 /**
@@ -117,13 +126,14 @@ export const setupStorageCommand = async (
   // Get base URL
   const baseURL = getStorageBaseUrl(targetArg)
 
-  // Validate workspace and world
   const { worldName, baseParcel, parcels } = await validateWorkspaceAndWorld(components, projectRoot, baseURL)
 
-  if (worldName) {
+  if (isLocalStorageTarget(baseURL)) {
+    logger.info('Local development mode (no world configuration required)')
+  } else if (worldName) {
     logger.info(`World: ${worldName}`)
   } else {
-    logger.info(`Local development mode (no world configuration required)`)
+    logger.info(`Genesis City scene at parcel ${baseParcel}`)
   }
 
   return { baseURL, worldName, baseParcel, parcels }
@@ -330,6 +340,6 @@ export const createStorageInfo = (
     parcels,
     skipValidations: true,
     debug: !!process.env.DEBUG,
-    isWorld: true
+    isWorld: !!worldName
   }
 }

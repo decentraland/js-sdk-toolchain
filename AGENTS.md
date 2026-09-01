@@ -93,6 +93,7 @@ Asset-packs injection is gated behind `isEditorScene` (requires `assets/scene/ma
 
 - A newer local npm rewrites committed lockfiles with `"peer": true` / `"dev": true` metadata churn during installs (root and per-package lockfiles). Revert lockfile changes unrelated to your dependency change before committing.
 - `make format` runs prettier over the whole repo, including paths CI's `make lint` does not check (`test/`, `scripts/`, dot-files), where HEAD may carry drift — a blind `make format` can dirty dozens of unrelated files. Check your own files, revert the rest.
+- `make lint` (`scripts/lint-packages.ts`) hard-fails only on an ESLint *crash* (exit 2); it treats ESLint exit 1 — how real lint violations surface — as "warnings" and still prints "✅ All packages linted successfully!" (exit 0). A green `make lint` can hide errors: scan its output for `error` / `✖ N problems` on the files you changed, don't trust the exit code.
 - **PR base branch:** this repo runs long-lived integration branches (e.g. `auth-server`) that are far ahead of `main`. Open a PR against the branch your feature branch was cut from, not `main` — targeting `main` sweeps in hundreds of unrelated files. Find the real base with `git branch -a --contains HEAD~` or by checking which branch gives a clean `git diff <base>...HEAD`; when working from `auth-server`, point the PR at `auth-server`.
 
 ## Code conventions
