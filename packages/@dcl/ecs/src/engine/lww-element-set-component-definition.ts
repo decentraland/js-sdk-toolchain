@@ -183,7 +183,8 @@ export function createGetCrdtMessagesForLww(
   dirtyIterator: Set<Entity>,
   schema: Pick<ISchema<any>, 'serialize'>,
   data: Map<Entity, unknown>,
-  lastSentData: Map<Entity, Uint8Array>
+  lastSentData: Map<Entity, Uint8Array>,
+  entitiesPendingDeletion: Set<Entity>
 ) {
   return function* () {
     const writeBuffer = new ReadWriteByteBuffer()
@@ -224,6 +225,14 @@ export function createGetCrdtMessagesForLww(
         }
 
         yield msg
+
+        // The entity itself is gone and its id is never handed out again, so
+        // nothing will ever need this timestamp to resolve a conflict. Holding
+        // it kept one entry per entity the scene ever deleted, and made every
+        // state dump re-announce a tombstone for it.
+        if (entitiesPendingDeletion.delete(entity)) {
+          timestamps.delete(entity)
+        }
       }
     }
     dirtyIterator.clear()
@@ -242,6 +251,9 @@ export function createComponentDefinitionFromSchema<T>(
   const dirtyIterator = new Set<Entity>()
   const timestamps = new Map<Entity, number>()
   const lastSentData = new Map<Entity, Uint8Array>()
+  // Entities removed wholesale whose delete has not been broadcast yet. Only
+  // ever holds what the next flush will drain.
+  const entitiesPendingDeletion = new Set<Entity>()
   const onChangeCallbacks = new Map<Entity, ((data: T | undefined) => void)[]>()
 
   return {
@@ -268,10 +280,17 @@ export function createComponentDefinitionFromSchema<T>(
       return component || null
     },
     entityDeleted(entity: Entity, markAsDirty: boolean): void {
-      if (data.delete(entity) && markAsDirty) {
-        dirtyIterator.add(entity)
-      }
+      const hadComponent = data.delete(entity)
       lastSentData.delete(entity)
+
+      if (hadComponent && markAsDirty) {
+        dirtyIterator.add(entity)
+        // Released once the delete has been broadcast, see the generator above.
+        entitiesPendingDeletion.add(entity)
+        return
+      }
+
+      timestamps.delete(entity)
     },
     getOrNull(entity: Entity): DeepReadonly<T> | null {
       const component = data.get(entity)
@@ -337,7 +356,15 @@ export function createComponentDefinitionFromSchema<T>(
         yield entity
       }
     },
-    getCrdtUpdates: createGetCrdtMessagesForLww(componentId, timestamps, dirtyIterator, schema, data, lastSentData),
+    getCrdtUpdates: createGetCrdtMessagesForLww(
+      componentId,
+      timestamps,
+      dirtyIterator,
+      schema,
+      data,
+      lastSentData,
+      entitiesPendingDeletion
+    ),
     updateFromCrdt: createUpdateLwwFromCrdt(componentId, timestamps, schema, data, lastSentData),
     dumpCrdtStateToBuffer: createDumpLwwFunctionFromCrdt(componentId, timestamps, schema, data),
     onChange(entity, cb) {

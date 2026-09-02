@@ -16,6 +16,7 @@ export const int8Component = (engine: IEngine) => {
   const timestamps = new Map<Entity, number>()
   const dirtyIterator = new Set<Entity>()
   const lastSentData = new Map<Entity, Uint8Array>()
+  const entitiesPendingDeletion = new Set<Entity>()
   const schema: ISchema<number> = {
     serialize(value: number, builder: ByteBuffer): void {
       builder.writeInt8(value)
@@ -92,7 +93,15 @@ export const int8Component = (engine: IEngine) => {
         yield entity
       }
     },
-    getCrdtUpdates: createGetCrdtMessagesForLww(ID, timestamps, dirtyIterator, schema, data, lastSentData),
+    getCrdtUpdates: createGetCrdtMessagesForLww(
+      ID,
+      timestamps,
+      dirtyIterator,
+      schema,
+      data,
+      lastSentData,
+      entitiesPendingDeletion
+    ),
     setTestTimestamp(entity: Entity, timestamp: number) {
       timestamps.set(entity, (timestamps.get(entity) || 0) + timestamp)
     },
