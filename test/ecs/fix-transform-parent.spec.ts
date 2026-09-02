@@ -41,3 +41,29 @@ describe('when two transforms are given a parent in the same batch', () => {
     expect(parents).toEqual([100, 200])
   })
 })
+
+describe('when the transform is only present as the message payload', () => {
+  let fixed: Uint8Array
+
+  beforeEach(() => {
+    const payload = new ReadWriteByteBuffer()
+    TransformSchema.serialize(transformAt(3), payload)
+    const message = { data: payload.toBinary() } as ReceiveMessage
+
+    fixed = fixTransformParent(message, undefined, 300 as Entity)
+  })
+
+  it('should read the transform out of it', () => {
+    expect(positionOf(fixed)).toBe(3)
+  })
+
+  it('should give it the parent it was asked for', () => {
+    expect(TransformSchema.deserialize(new ReadWriteByteBuffer(fixed)).parent).toBe(300)
+  })
+})
+
+describe('when there is no transform to fix', () => {
+  it('should say so rather than write something empty', () => {
+    expect(() => fixTransformParent({} as ReceiveMessage, undefined, 400 as Entity)).toThrow('Invalid parent transform')
+  })
+})

@@ -64,7 +64,6 @@ export function localMessageToNetwork(
 }
 
 const buffer = new ReadWriteByteBuffer()
-/* istanbul ignore next */
 export function fixTransformParent(
   message: ReceiveMessage,
   transformValue?: TransformType,
