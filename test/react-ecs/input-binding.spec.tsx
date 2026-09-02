@@ -79,10 +79,12 @@ describe('when every component is given a uiInputBinding', () => {
     expect(binding.actions).toEqual([InputAction.IA_JUMP])
   })
 
-  it('should keep the binding out of the text component', () => {
-    const [, text] = Array.from(engine.getEntitiesWith(UiText))[0]
+  it('should keep the binding out of every text component', () => {
+    // Both Label and Button render a UiText, so checking only the first would miss a
+    // regression in the other one.
+    const texts = Array.from(engine.getEntitiesWith(UiText)).map(([, text]) => 'uiInputBinding' in text)
 
-    expect('uiInputBinding' in text).toBe(false)
+    expect(texts).toEqual([false, false])
   })
 
   it('should keep the binding out of the input component', () => {
@@ -112,6 +114,31 @@ describe('when a component is given no uiInputBinding', () => {
   })
 
   it('should attach no binding', () => {
+    expect(Array.from(engine.getEntitiesWith(UiInputBinding))).toHaveLength(0)
+  })
+})
+
+describe('when a disabled Button is given a uiInputBinding', () => {
+  let engine: ReturnType<typeof setupEngine>['engine']
+  let UiInputBinding: ReturnType<typeof components.UiInputBinding>
+
+  beforeEach(async () => {
+    const setup = setupEngine()
+    engine = setup.engine
+    UiInputBinding = components.UiInputBinding(engine)
+
+    setup.uiRenderer.setUiRenderer(
+      () => (
+        <UiEntity uiTransform={{ width: 100 }}>
+          <Button value="a button" disabled uiInputBinding={BINDING} />
+        </UiEntity>
+      ),
+      WHOLE_SCREEN
+    )
+    await engine.update(1)
+  })
+
+  it('should not bind the action, the same way it drops its mouse handlers', () => {
     expect(Array.from(engine.getEntitiesWith(UiInputBinding))).toHaveLength(0)
   })
 })

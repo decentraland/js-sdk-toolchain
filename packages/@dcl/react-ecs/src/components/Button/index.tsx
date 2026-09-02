@@ -78,7 +78,9 @@ export function Button(props: UiButtonProps) {
       uiTransform={uiTransformProps}
       uiText={textProps}
       uiBackground={uiBackgroundProps}
-      uiInputBinding={uiInputBinding}
+      // A disabled button drops its mouse handlers, so it must not stay reachable
+      // through a held input action either.
+      uiInputBinding={!!props.disabled ? undefined : uiInputBinding}
     />
   )
 }
