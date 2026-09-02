@@ -6,6 +6,7 @@ import { colors } from '../../components/log'
 import { PreviewComponents } from './types'
 import { ProjectUnion } from '../../logic/project-validations'
 import { isElectronEnvironment, getSpawnEnv, findNpxCliJs, getNpxBin } from './utils'
+import { pulseRealmArgs } from '../../logic/lsd-realm'
 
 const HAMMURABI_PACKAGE = '@dcl/hammurabi-server'
 const HAMMURABI_VERSION = 'next'
@@ -150,7 +151,7 @@ export function startMultiplayerServer(
     `Starting ${colors.bold('Multiplayer Server')} (${engine}) with realm: ${colors.bold(realm)}`
   )
 
-  const npxArgs = ['--yes', pkg, `--realm=${realm}`]
+  const npxArgs = ['--yes', pkg, `--realm=${realm}`, ...pulseRealmArgs(workingDir)]
   const npxCliJs = findNpxCliJs()
 
   // In Electron, override npm_config_prefix because npm derives its prefix from process.execPath,
