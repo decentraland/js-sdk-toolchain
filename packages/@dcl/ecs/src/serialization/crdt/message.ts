@@ -55,6 +55,15 @@ const readers: Record<number, MessageReader | undefined> = {
   // Released SDKs declare this message four bytes shorter than the sixteen they write,
   // so its legacy length is accepted alongside the correct one. `bodyLength` still keeps
   // the read itself inside the chunk.
+  //
+  // This one exception is knowingly ambiguous. A frame declaring twelve bytes and really
+  // holding only twelve, followed by another message, is indistinguishable on the wire
+  // from a legacy peer's sixteen-byte write, so the reader takes the legacy reading and
+  // consumes four bytes of whatever follows. The trade is deliberate: peers on released
+  // SDKs are real and their deletes have to keep working, while a twelve-byte frame is
+  // malformed either way. It resolves itself as those peers update, because #1595 makes
+  // the writer declare the sixteen bytes it writes and the exact branch takes over.
+  // `crdt-malformed-message.spec.ts` pins the behaviour.
   [CrdtMessageType.DELETE_ENTITY_NETWORK]: reader(
     DeleteEntityNetwork.MESSAGE_HEADER_LENGTH,
     false,

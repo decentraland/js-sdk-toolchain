@@ -286,6 +286,42 @@ describe('when reading a network entity delete that declares the length released
     })
   })
 
+  describe('and another frame follows it immediately', () => {
+    let buffer: ReadWriteByteBuffer
+    let following: Uint8Array
+
+    beforeEach(() => {
+      // Only twelve real bytes, exactly what the header declares, and then a whole
+      // entity delete behind it. This is indistinguishable on the wire from a legacy
+      // peer writing sixteen bytes while declaring twelve, so the reader takes the
+      // legacy reading: it consumes sixteen and eats the first four bytes of what
+      // follows. Pinned here so the trade-off is visible rather than surprising.
+      const legacyFrame = craftFrame(CrdtMessageType.DELETE_ENTITY_NETWORK, declaredByReleasedSdks)
+      const writer = new ReadWriteByteBuffer()
+      DeleteEntity.write(777 as Entity, writer)
+      following = writer.toBinary()
+      buffer = new ReadWriteByteBuffer(concat(legacyFrame, following), 0)
+    })
+
+    it('should read the delete with a network id taken from the next frame', () => {
+      expect(readMessage(buffer)).toMatchObject({ type: CrdtMessageType.DELETE_ENTITY_NETWORK })
+    })
+
+    it('should consume sixteen bytes rather than the twelve it declared', () => {
+      readMessage(buffer)
+
+      expect(buffer.currentReadOffset()).toBe(bytesReleasedSdksWrite)
+    })
+
+    it('should leave the following frame short by those four bytes', () => {
+      readMessage(buffer)
+
+      // What is left is the tail of the delete that followed, so it no longer parses
+      // as a message of its own.
+      expect(buffer.remainingBytes()).toBe(following.byteLength - 4)
+    })
+  })
+
   describe('and the chunk ends where the declared length says', () => {
     let buffer: ReadWriteByteBuffer
 
