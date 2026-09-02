@@ -158,3 +158,69 @@ describe('when a model points at a texture inside a subfolder', () => {
     expect(existsSync(path.join(sceneRoot, 'assets/scene/Models/house/data/house.bin'))).toBe(true)
   })
 })
+
+describe('when a model points at a dependency outside its own folder', () => {
+  let sceneRoot: string
+  let engine: ReturnType<typeof Engine>
+  let logger: ReturnType<typeof makeLogger>
+  let migrate: () => Promise<number>
+
+  beforeEach(() => {
+    sceneRoot = path.resolve(REPO_ROOT, 'tmp/asset-migrator-traversal')
+    rmSync(sceneRoot, { recursive: true, force: true })
+    // The dependency URI walks out of the model's folder. It is scene data, so a
+    // hostile or simply broken glTF can carry this.
+    writeFile(
+      path.join(sceneRoot, 'models/house.gltf'),
+      JSON.stringify({
+        asset: { version: '2.0' },
+        images: [{ uri: '../../secrets/id_rsa.png' }],
+        buffers: [{ uri: 'data/house.bin', byteLength: 4 }]
+      })
+    )
+    writeFile(path.join(sceneRoot, 'models/data/house.bin'), 'BIN')
+    writeFile(path.resolve(sceneRoot, '../secrets/id_rsa.png'), 'PRIVATE')
+
+    engine = Engine()
+    const GltfContainer = components.GltfContainer(engine)
+    GltfContainer.create(engine.addEntity(), { src: 'models/house.gltf' })
+
+    logger = makeLogger()
+    migrate = () => migrateAssets({ fs: createFsComponent(), logger } as any, makeProject(sceneRoot), engine as any)
+  })
+
+  afterEach(() => {
+    rmSync(sceneRoot, { recursive: true, force: true })
+    rmSync(path.resolve(sceneRoot, '../secrets'), { recursive: true, force: true })
+    jest.restoreAllMocks()
+  })
+
+  it('should finish the migration instead of throwing', async () => {
+    await expect(migrate()).resolves.toEqual(expect.any(Number))
+  })
+
+  it('should not follow the dependency out of the model folder', async () => {
+    await migrate()
+
+    // Joining the uri onto the model's new home lands here, two levels above it.
+    expect(existsSync(path.join(sceneRoot, 'assets/scene/secrets/id_rsa.png'))).toBe(false)
+  })
+
+  it('should leave the file it pointed at untouched', async () => {
+    await migrate()
+
+    expect(readFileSync(path.resolve(sceneRoot, '../secrets/id_rsa.png'), 'utf8')).toBe('PRIVATE')
+  })
+
+  it('should say which dependency it skipped', async () => {
+    await migrate()
+
+    expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining('resolves outside the model folder'))
+  })
+
+  it('should still copy the dependency that stays inside', async () => {
+    await migrate()
+
+    expect(existsSync(path.join(sceneRoot, 'assets/scene/Models/house/data/house.bin'))).toBe(true)
+  })
+})
