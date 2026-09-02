@@ -122,7 +122,14 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
    * It's a mapping Network -> to Local
    * If it's not a network message, return the entityId received by the message
    */
-  function findNetworkId(msg: { entityId: Entity; networkId?: number }): {
+  function findNetworkId(
+    msg: { entityId: Entity; networkId?: number },
+    // The mapping of an entity deleted earlier in this tick is retained for one purpose
+    // only: converting that delete for the renderer, after the cleanup has already taken
+    // the NetworkEntity away. Resolving anything else through it would target an entity
+    // that is gone, so callers have to opt in.
+    allowDeletedThisTick = false
+  ): {
     entityId: Entity
     network?: INetowrkEntityType
   } {
@@ -135,9 +142,11 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         }
       }
 
-      const deletedEntityId = networkEntitiesDeletedThisTick.get(networkEntityKey(msg.networkId!, msg.entityId))
-      if (deletedEntityId !== undefined) {
-        return { entityId: deletedEntityId }
+      if (allowDeletedThisTick) {
+        const deletedEntityId = networkEntitiesDeletedThisTick.get(networkEntityKey(msg.networkId!, msg.entityId))
+        if (deletedEntityId !== undefined) {
+          return { entityId: deletedEntityId }
+        }
       }
     }
 
@@ -303,7 +312,19 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
             continue
           }
         }
-        const { entityId } = findNetworkId(message)
+        // The entity behind this pair was deleted earlier in the same tick. Only the
+        // delete itself still needs its retained mapping; forwarding any other message
+        // addressed to that pair would have the receiver apply an update after the
+        // delete and leave its state ahead of the engine's.
+        if (
+          networkUtils.isNetworkMessage(message) &&
+          message.type !== CrdtMessageType.DELETE_ENTITY_NETWORK &&
+          networkEntitiesDeletedThisTick.has(networkEntityKey(message.networkId, message.entityId))
+        ) {
+          continue
+        }
+
+        const { entityId } = findNetworkId(message, message.type === CrdtMessageType.DELETE_ENTITY_NETWORK)
 
         const transformNeedsFix =
           'componentId' in message &&

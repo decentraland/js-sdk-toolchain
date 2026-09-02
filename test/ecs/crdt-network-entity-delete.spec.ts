@@ -100,3 +100,95 @@ describe('when a peer deletes a network entity whose id collides with a live loc
     expect(Transform.has(localEntity)).toBe(true)
   })
 })
+
+describe('when a stale network update arrives in the same batch behind the delete', () => {
+  let engine: ReturnType<typeof Engine>
+  let Transform: ReturnType<typeof components.Transform>
+  let NetworkEntity: ReturnType<typeof components.NetworkEntity>
+  let rendererMessages: CrdtMessage[]
+  let mappedEntity: Entity
+
+  beforeEach(async () => {
+    engine = Engine()
+    Transform = components.Transform(engine)
+    NetworkEntity = components.NetworkEntity(engine)
+    rendererMessages = []
+
+    const renderer: Transport = {
+      type: 'renderer',
+      filter: () => true,
+      send: async (message) => {
+        for (const chunk of Array.isArray(message) ? message : [message]) {
+          rendererMessages.push(...readAll(chunk))
+        }
+      }
+    }
+    const network: Transport = { type: 'network', filter: () => true, send: async () => {} }
+    engine.addTransport(renderer)
+    engine.addTransport(network)
+
+    const transformData = new ReadWriteByteBuffer()
+    Transform.schema.serialize(
+      {
+        position: { x: 1, y: 2, z: 3 },
+        rotation: { x: 0, y: 0, z: 0, w: 1 },
+        scale: { x: 1, y: 1, z: 1 },
+        parent: 0 as Entity
+      } as any,
+      transformData
+    )
+
+    // The peer announces its entity so this engine maps it.
+    const put = new ReadWriteByteBuffer()
+    PutNetworkComponentOperation.write(
+      PEER_ENTITY,
+      1,
+      Transform.componentId,
+      PEER_NETWORK_ID,
+      transformData.toBinary(),
+      put
+    )
+    network.onmessage!(put.toBinary())
+    await engine.update(1)
+
+    mappedEntity = Array.from(engine.getEntitiesWith(NetworkEntity))[0][0]
+    rendererMessages = []
+
+    // One chunk holding the delete and then a stale update for the same pair.
+    const del = new ReadWriteByteBuffer()
+    DeleteEntityNetwork.write(PEER_ENTITY, PEER_NETWORK_ID, del)
+    const stale = new ReadWriteByteBuffer()
+    PutNetworkComponentOperation.write(
+      PEER_ENTITY,
+      2,
+      Transform.componentId,
+      PEER_NETWORK_ID,
+      transformData.toBinary(),
+      stale
+    )
+    const deleteBytes = del.toBinary()
+    const staleBytes = stale.toBinary()
+    const chunk = new Uint8Array(deleteBytes.byteLength + staleBytes.byteLength)
+    chunk.set(deleteBytes, 0)
+    chunk.set(staleBytes, deleteBytes.byteLength)
+
+    network.onmessage!(chunk)
+    await engine.update(1)
+  })
+
+  it('should tell the renderer to delete the mapped entity', () => {
+    expect(
+      rendererMessages.some(
+        (message) => message.type === CrdtMessageType.DELETE_ENTITY && message.entityId === mappedEntity
+      )
+    ).toBe(true)
+  })
+
+  it('should not send the renderer an update for the entity it just deleted', () => {
+    expect(
+      rendererMessages.some(
+        (message) => message.type === CrdtMessageType.PUT_COMPONENT && message.entityId === mappedEntity
+      )
+    ).toBe(false)
+  })
+})
