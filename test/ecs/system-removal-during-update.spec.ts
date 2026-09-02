@@ -66,22 +66,61 @@ describe('when a system is added while the tick is running', () => {
     engine = Engine()
     order = []
 
+    const added = () => order.push('added')
+    let registered = false
+
     engine.addSystem(() => {
       order.push('first')
-      engine.addSystem(() => order.push('added'), 250)
+      if (!registered) {
+        registered = true
+        engine.addSystem(added, 250)
+      }
     }, 300)
     engine.addSystem(() => order.push('second'), 200)
 
     await engine.update(1)
   })
 
-  it('should leave the systems that were already scheduled running', () => {
-    expect(order).toEqual(['first', 'second'])
+  // `main()` runs from a startup system, so everything a scene registers in it is
+  // added mid-tick. Holding those back to the second frame would change what a
+  // scene puts on screen on its first one.
+  it('should run it in the same tick, at its own priority', () => {
+    expect(order).toEqual(['first', 'added', 'second'])
   })
 
-  it('should run the new one from the next tick', async () => {
+  it('should keep running it on later ticks', async () => {
     await engine.update(1)
 
-    expect(order).toEqual(['first', 'second', 'first', 'added', 'second'])
+    expect(order).toEqual(['first', 'added', 'second', 'first', 'added', 'second'])
+  })
+})
+
+describe('when the same system is removed and added again within one tick', () => {
+  let engine: ReturnType<typeof Engine>
+  let order: string[]
+
+  beforeEach(async () => {
+    engine = Engine()
+    order = []
+
+    const moved = () => order.push('moved')
+
+    engine.addSystem(() => {
+      order.push('first')
+      engine.removeSystem(moved)
+      engine.addSystem(moved, 100)
+    }, 300)
+    engine.addSystem(moved, 200)
+    engine.addSystem(() => order.push('last'), 150)
+
+    await engine.update(1)
+  })
+
+  it('should run it exactly once', () => {
+    expect(order.filter((entry) => entry === 'moved')).toEqual(['moved'])
+  })
+
+  it('should run it at the priority it was given the second time', () => {
+    expect(order).toEqual(['first', 'last', 'moved'])
   })
 })

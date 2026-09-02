@@ -318,17 +318,30 @@ export function Engine(options?: IEngineOptions): IEngine {
 
   async function update(dt: number) {
     await crdtSystem.receiveMessages()
-    // A system that removes one (itself included) splices the array this loop
-    // is walking, which shifts the rest past the cursor and skips one. Walk a
-    // snapshot instead, and leave out whatever was removed while the tick ran.
-    for (const system of [...partialEngine.getSystems()]) {
-      if (!partialEngine.isSystemActive(system.fn)) continue
+    // A system that removes one (itself included) splices the array this loop is
+    // walking, which shifts the rest past the cursor and skips one. Rather than
+    // walking the array directly, keep a ledger of what already ran this tick and
+    // repeatedly take the highest-priority system that has not run and is still
+    // registered. Removal can no longer skip anything, nothing runs twice, and a
+    // system registered mid-tick still runs in this tick -- which matters because
+    // `main()` is itself invoked from a startup system, so everything a scene adds
+    // in `main()` would otherwise be held back to the second frame.
+    const executed = new Set<SystemFn>()
 
-      const ret: unknown | Promise<unknown> = system.fn(dt)
+    while (true) {
+      const next = partialEngine
+        .getSystems()
+        .find((system) => !executed.has(system.fn) && partialEngine.isSystemActive(system.fn))
+
+      if (!next) break
+
+      executed.add(next.fn)
+
+      const ret: unknown | Promise<unknown> = next.fn(dt)
       checkNotThenable(
         ret,
         `A system (${
-          system.name || 'anonymous'
+          next.name || 'anonymous'
         }) returned a thenable. Systems cannot be async functions. Documentation: https://dcl.gg/sdk/sync-systems`
       )
     }

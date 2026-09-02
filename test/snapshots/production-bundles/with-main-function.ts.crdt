@@ -8,7 +8,7 @@ EVAL test/snapshots/production-bundles/with-main-function.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
   OPCODES ~= 78k
-  MALLOC_COUNT = 15111
+  MALLOC_COUNT = 15113
   ALIVE_OBJS_DELTA ~= 3.35k
 CALL onStart()
   OPCODES ~= 0k
@@ -16,15 +16,11 @@ CALL onStart()
   ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  Scene: PUT_COMPONENT e=0x200 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  OPCODES ~= 6k
-  MALLOC_COUNT = 85
-  ALIVE_OBJS_DELTA ~= 0.03k
-CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x201 c=1041 t=1 data={"src":"test.glb"}
-  OPCODES ~= 5k
-  MALLOC_COUNT = 14
-  ALIVE_OBJS_DELTA ~= 0.00k
+  Scene: PUT_COMPONENT e=0x200 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
+  OPCODES ~= 9k
+  MALLOC_COUNT = 99
+  ALIVE_OBJS_DELTA ~= 0.03k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x202 c=1041 t=1 data={"src":"test.glb"}
   OPCODES ~= 5k
@@ -35,4 +31,9 @@ CALL onUpdate(0.1)
   OPCODES ~= 5k
   MALLOC_COUNT = 13
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1111.85k bytes
+CALL onUpdate(0.1)
+  Scene: PUT_COMPONENT e=0x204 c=1041 t=1 data={"src":"test.glb"}
+  OPCODES ~= 5k
+  MALLOC_COUNT = 13
+  ALIVE_OBJS_DELTA ~= 0.00k
+  MEMORY_USAGE_COUNT ~= 1112.40k bytes
