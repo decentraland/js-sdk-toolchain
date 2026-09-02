@@ -3,6 +3,7 @@ import {
   CrdtMessageHeader,
   CrdtMessageProtocol,
   CrdtMessageType,
+  EntityState,
   IEngine,
   PutComponentOperation,
   PutNetworkComponentOperation,
@@ -80,6 +81,14 @@ export function engineToCrdt(engine: IEngine): Uint8Array[] {
       continue
     }
     itComponentDefinition.dumpCrdtStateToBuffer(crdtBuffer, (entity) => {
+      // A removed entity keeps its NetworkEntity: the engine holds it back so
+      // the deletion can still be forwarded to the sync transport. Selecting on
+      // the component alone therefore sent a joining peer the state of entities
+      // that are gone, and they created them locally as though they were new.
+      if (engine.getEntityState(entity) === EntityState.Removed) {
+        return false
+      }
+
       const isNetworkEntity = NetworkEntity.has(entity)
       return isNetworkEntity
     })
