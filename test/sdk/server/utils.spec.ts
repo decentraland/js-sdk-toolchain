@@ -76,3 +76,32 @@ describe('wrapSignedFetch', () => {
     expect(status).toBeUndefined()
   })
 })
+
+describe('wrapSignedFetch 404 handling', () => {
+  beforeEach(() => {
+    mockSignedFetch.mockReset()
+  })
+
+  it('returns the status tuple for a 404 without logging an error', async () => {
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    mockSignedFetch.mockResolvedValue({ ok: false, status: 404, statusText: 'Not Found', body: '{"error":"Not Found"}' })
+
+    const [error, data, status] = await wrapSignedFetch({ url: 'https://storage.test/values/missing-key' })
+
+    expect(error).toBe('404 Not Found')
+    expect(data).toBeNull()
+    expect(status).toBe(404)
+    expect(errorSpy).not.toHaveBeenCalled()
+  })
+
+  it('still logs other failure statuses', async () => {
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    mockSignedFetch.mockResolvedValue({ ok: false, status: 500, statusText: 'Server Error', body: '' })
+
+    const [error, , status] = await wrapSignedFetch({ url: 'https://storage.test/values/k' })
+
+    expect(error).toBe('500 Server Error')
+    expect(status).toBe(500)
+    expect(errorSpy).toHaveBeenCalledTimes(1)
+  })
+})
