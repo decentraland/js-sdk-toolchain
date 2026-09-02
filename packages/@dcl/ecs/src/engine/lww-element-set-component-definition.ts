@@ -274,19 +274,19 @@ export function createComponentDefinitionFromSchema<T>(
       lastSentData.delete(entity)
     },
     getOrNull(entity: Entity): DeepReadonly<T> | null {
-      const component = data.get(entity)
-      return component ? deepReadonly(component) : null
+      // Presence, not truthiness: a component defined from a primitive schema
+      // can legitimately hold 0, false or an empty string.
+      if (!data.has(entity)) return null
+      return deepReadonly(data.get(entity) as T)
     },
     get(entity: Entity): DeepReadonly<T> {
-      const component = data.get(entity)
-      if (!component) {
+      if (!data.has(entity)) {
         throw new Error(`[getFrom] Component ${componentName} for entity #${entity} not found`)
       }
-      return deepReadonly(component)
+      return deepReadonly(data.get(entity) as T)
     },
     create(entity: Entity, value?: T): T {
-      const component = data.get(entity)
-      if (component) {
+      if (data.has(entity)) {
         throw new Error(`[create] Component ${componentName} for ${entity} already exists`)
       }
       const usedValue =

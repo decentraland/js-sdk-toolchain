@@ -42,6 +42,18 @@ export type DeepReadonly<T> = T extends ReadonlyPrimitive
 /**
  * @internal
  */
-export function deepReadonly<T extends Record<string, unknown>>(val: T): DeepReadonly<T> {
-  return Object.freeze({ ...val }) as DeepReadonly<T>
+export function deepReadonly<T>(val: T): DeepReadonly<T> {
+  // A component can be defined straight from a primitive or array schema, not
+  // only from a Map, which is why this is no longer constrained to an object.
+  // Spreading those threw the value away: a number came back as {}, an array
+  // as an object keyed by index.
+  if (val === null || typeof val !== 'object') {
+    return val as DeepReadonly<T>
+  }
+
+  if (Array.isArray(val)) {
+    return Object.freeze([...val]) as DeepReadonly<T>
+  }
+
+  return Object.freeze({ ...(val as Record<string, unknown>) }) as DeepReadonly<T>
 }
