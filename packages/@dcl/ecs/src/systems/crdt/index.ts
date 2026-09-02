@@ -22,6 +22,22 @@ import {
 import { INetowrkEntityType } from '../../components/types'
 import * as networkUtils from '../../serialization/crdt/network/utils'
 
+/**
+ * Whether a component's schema can read this payload without running off the end. Used as
+ * a trust boundary for CRDT input from peers: a payload that fails here is dropped before
+ * it can allocate an entity or mutate a component. Deserialize has no side effects, so the
+ * value it produces is discarded and read again when the message is actually applied.
+ */
+function payloadIsReadable(component: ComponentDefinition<unknown>, data: Uint8Array | undefined): boolean {
+  if (!data) return false
+  try {
+    component.schema.deserialize(new ReadWriteByteBuffer(data))
+    return true
+  } catch {
+    return false
+  }
+}
+
 // NetworkMessages can only have a MAX_SIZE of 12kb. So we need to send it in chunks.
 export const LIVEKIT_MAX_SIZE = 12
 
@@ -140,6 +156,22 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
 
     for (const msg of messagesToProcess) {
       let { entityId, network } = findNetworkId(msg)
+
+      // A peer can send a component payload this schema cannot read (a truncated buffer,
+      // say). Drop it here, before anything mutates: no network entity is allocated for a
+      // message we are going to discard, and the apply path below can then trust its input
+      // instead of guarding every read. Only these three carry a payload to deserialize.
+      if (
+        msg.type === CrdtMessageType.PUT_COMPONENT ||
+        msg.type === CrdtMessageType.PUT_COMPONENT_NETWORK ||
+        msg.type === CrdtMessageType.APPEND_VALUE
+      ) {
+        const component = engine.getComponentOrNull(msg.componentId)
+        if (component && !payloadIsReadable(component, msg.data)) {
+          continue
+        }
+      }
+
       // We receive a new Entity. Create the localEntity and map it to the NetworkEntity component
       if (networkUtils.isNetworkMessage(msg) && !network) {
         entityId = engine.addEntity()
@@ -172,17 +204,9 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
           ) {
             msg.data = networkUtils.fixTransformParent(msg)
           }
-          let conflictMessage: ReturnType<typeof component.updateFromCrdt>[0]
-          let value: ReturnType<typeof component.updateFromCrdt>[1]
-          try {
-            ;[conflictMessage, value] = component.updateFromCrdt({ ...msg, entityId })
-          } catch {
-            // The component's schema could not read this message's payload (a peer sent
-            // a truncated or otherwise invalid buffer). The component left its state
-            // untouched, so we drop just this message: the rest of the batch, and the
-            // scene, keep running instead of the whole tick aborting.
-            continue
-          }
+          // The payload was validated at the top of the loop, so this only throws on a
+          // genuine engine bug now, which should surface rather than be swallowed.
+          const [conflictMessage, value] = component.updateFromCrdt({ ...msg, entityId })
           if (!conflictMessage) {
             // Add message to transport queue to be processed by others transports
             broadcastMessages.push(msg)

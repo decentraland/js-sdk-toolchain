@@ -4,6 +4,7 @@ import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { AppendValueOperation } from '../../packages/@dcl/ecs/src/serialization/crdt/appendValue'
 import { PutComponentOperation } from '../../packages/@dcl/ecs/src/serialization/crdt/putComponent'
+import { PutNetworkComponentOperation } from '../../packages/@dcl/ecs/src/serialization/crdt/network/putComponentNetwork'
 import { Transport } from '../../packages/@dcl/ecs/src/systems/crdt/types'
 
 /**
@@ -21,6 +22,18 @@ function craftShortPut(entity: Entity, componentId: number, timestamp: number, d
 function craftShortAppend(entity: Entity, componentId: number, timestamp: number, dataBytes: number): Uint8Array {
   const buffer = new ReadWriteByteBuffer()
   AppendValueOperation.write(entity, timestamp, componentId, new Uint8Array(dataBytes), buffer)
+  return buffer.toBinary()
+}
+
+function craftShortNetworkPut(
+  entity: Entity,
+  componentId: number,
+  networkId: number,
+  timestamp: number,
+  dataBytes: number
+): Uint8Array {
+  const buffer = new ReadWriteByteBuffer()
+  PutNetworkComponentOperation.write(entity, timestamp, componentId, networkId, new Uint8Array(dataBytes), buffer)
   return buffer.toBinary()
 }
 
@@ -207,5 +220,118 @@ describe('when a peer appends a grow-only value whose payload is too short for t
     await engine.update(1)
 
     expect(Array.from(GrowOnly.get(entity))).toEqual([])
+  })
+})
+
+describe('when a peer sends a malformed network component update for an unseen network entity', () => {
+  let engine: ReturnType<typeof Engine>
+  let Transform: ReturnType<typeof components.Transform>
+  let NetworkEntity: ReturnType<typeof components.NetworkEntity>
+  let source: Transport
+  let sink: Transport
+  let sinkReceived: number
+
+  beforeEach(() => {
+    engine = Engine()
+    Transform = components.Transform(engine)
+    NetworkEntity = components.NetworkEntity(engine)
+    sinkReceived = 0
+    source = { send: async () => {}, filter: () => true, type: 'network' }
+    sink = {
+      send: async (messages) => {
+        for (const message of [messages].flat()) {
+          sinkReceived += message.byteLength
+        }
+      },
+      filter: () => true,
+      type: 'network'
+    }
+    engine.addTransport(source)
+    engine.addTransport(sink)
+    source.onmessage!(craftShortNetworkPut(7 as Entity, Transform.componentId, 123, 1, 4))
+  })
+
+  it('should let the engine finish the update instead of throwing out of the tick', async () => {
+    await expect(engine.update(1)).resolves.toBeUndefined()
+  })
+
+  it('should not allocate a network entity mapping for it', async () => {
+    await engine.update(1)
+
+    expect(Array.from(engine.getEntitiesWith(NetworkEntity))).toEqual([])
+  })
+
+  it('should not relay the dropped message to the other transport', async () => {
+    await engine.update(1)
+
+    expect(sinkReceived).toBe(0)
+  })
+})
+
+describe('when a peer sends more than one malformed network component update', () => {
+  let engine: ReturnType<typeof Engine>
+  let Transform: ReturnType<typeof components.Transform>
+  let NetworkEntity: ReturnType<typeof components.NetworkEntity>
+  let transport: Transport
+
+  beforeEach(() => {
+    engine = Engine()
+    Transform = components.Transform(engine)
+    NetworkEntity = components.NetworkEntity(engine)
+    transport = { send: async () => {}, filter: () => false }
+    engine.addTransport(transport)
+    transport.onmessage!(craftShortNetworkPut(7 as Entity, Transform.componentId, 123, 1, 4))
+    transport.onmessage!(craftShortNetworkPut(8 as Entity, Transform.componentId, 124, 1, 4))
+  })
+
+  it('should not accumulate ghost network entities', async () => {
+    await engine.update(1)
+
+    expect(Array.from(engine.getEntitiesWith(NetworkEntity))).toEqual([])
+  })
+})
+
+describe('when a peer sends a well-formed network component update for an unseen network entity', () => {
+  let engine: ReturnType<typeof Engine>
+  let Transform: ReturnType<typeof components.Transform>
+  let NetworkEntity: ReturnType<typeof components.NetworkEntity>
+  let transport: Transport
+  let networkId: number
+  let remoteEntity: Entity
+  let position: { x: number; y: number; z: number }
+
+  beforeEach(() => {
+    engine = Engine()
+    Transform = components.Transform(engine)
+    NetworkEntity = components.NetworkEntity(engine)
+    transport = { send: async () => {}, filter: () => false }
+    engine.addTransport(transport)
+    networkId = 123
+    remoteEntity = 7 as Entity
+    position = { x: 4, y: 5, z: 6 }
+
+    const data = new ReadWriteByteBuffer()
+    Transform.schema.serialize(
+      { position, rotation: { x: 0, y: 0, z: 0, w: 1 }, scale: { x: 1, y: 1, z: 1 }, parent: 0 as Entity },
+      data
+    )
+    const buffer = new ReadWriteByteBuffer()
+    PutNetworkComponentOperation.write(remoteEntity, 1, Transform.componentId, networkId, data.toBinary(), buffer)
+    transport.onmessage!(buffer.toBinary())
+  })
+
+  it('should allocate exactly one network entity mapping for it', async () => {
+    await engine.update(1)
+
+    expect(Array.from(engine.getEntitiesWith(NetworkEntity)).map(([, value]) => value)).toEqual([
+      { entityId: remoteEntity, networkId }
+    ])
+  })
+
+  it('should apply the component to the mapped local entity', async () => {
+    await engine.update(1)
+
+    const [localEntity] = Array.from(engine.getEntitiesWith(NetworkEntity))[0]
+    expect(Transform.getOrNull(localEntity)?.position).toEqual(position)
   })
 })
