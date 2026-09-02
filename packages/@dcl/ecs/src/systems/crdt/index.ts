@@ -172,7 +172,17 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
           ) {
             msg.data = networkUtils.fixTransformParent(msg)
           }
-          const [conflictMessage, value] = component.updateFromCrdt({ ...msg, entityId })
+          let conflictMessage: ReturnType<typeof component.updateFromCrdt>[0]
+          let value: ReturnType<typeof component.updateFromCrdt>[1]
+          try {
+            ;[conflictMessage, value] = component.updateFromCrdt({ ...msg, entityId })
+          } catch {
+            // The component's schema could not read this message's payload (a peer sent
+            // a truncated or otherwise invalid buffer). The component left its state
+            // untouched, so we drop just this message: the rest of the batch, and the
+            // scene, keep running instead of the whole tick aborting.
+            continue
+          }
           if (!conflictMessage) {
             // Add message to transport queue to be processed by others transports
             broadcastMessages.push(msg)
