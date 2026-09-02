@@ -279,14 +279,32 @@ export function createComponentDefinitionFromSchema<T>(
       lastSentData.delete(entity)
       return component || null
     },
-    entityDeleted(entity: Entity, markAsDirty: boolean): void {
+    entityDeleted(entity: Entity, markAsDirty: boolean, entityRemoved = true): void {
       const hadComponent = data.delete(entity)
       lastSentData.delete(entity)
+
+      // Dropping the timestamp is only safe when the entity itself is gone, which is
+      // what makes it redundant: the DELETE_ENTITY covers every component on it and the
+      // id is never handed out again. The three named static entities are purged but the
+      // container refuses to release them, so no DELETE_ENTITY is emitted for them and
+      // their component tombstones still have to be announced to late joiners.
+      if (!entityRemoved) {
+        if (hadComponent && markAsDirty) {
+          dirtyIterator.add(entity)
+        }
+        return
+      }
 
       if (hadComponent && markAsDirty) {
         dirtyIterator.add(entity)
         // Released once the delete has been broadcast, see the generator above.
         entitiesPendingDeletion.add(entity)
+        return
+      }
+
+      // A repeat delete before the queued DELETE_COMPONENT is flushed must not drop the
+      // timestamp: that message still needs it to stay ahead of what peers already saw.
+      if (entitiesPendingDeletion.has(entity)) {
         return
       }
 
