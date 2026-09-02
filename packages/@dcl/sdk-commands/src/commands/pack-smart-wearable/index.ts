@@ -84,6 +84,26 @@ Please try to remove unneccessary files and/or reduce the files size, you can ig
   }
   options.components.logger.info(packDir)
 
+  // File discovery follows symlinks, so a link inside the project can point at anything
+  // this user can read and would be archived under a harmless-looking entry name. Compare
+  // the resolved paths against the resolved project root and refuse rather than silently
+  // shipping someone else's file inside the wearable.
+  const projectRoot = await options.components.fs.realpath(project.workingDirectory)
+  const escaping: string[] = []
+  for (const file of files) {
+    const realPath = await options.components.fs.realpath(file.absolutePath).catch(() => file.absolutePath)
+    const relative = path.relative(projectRoot, realPath)
+    if (relative === '' || relative.startsWith('..') || path.isAbsolute(relative)) {
+      escaping.push(path.relative(project.workingDirectory, file.absolutePath))
+    }
+  }
+  if (escaping.length > 0) {
+    throw new CliError(
+      'PACK_SMART_WEARABLE_ESCAPES_PROJECT',
+      i18next.t('errors.pack_smart_wearable.escapes_project', { files: escaping.join(', ') })
+    )
+  }
+
   try {
     await zipProject(
       options.components.fs,
@@ -95,9 +115,11 @@ Please try to remove unneccessary files and/or reduce the files size, you can ig
       packDir
     )
   } catch (e) {
+    // A rejection is not guaranteed to carry an Error: a dependency can reject with a
+    // string or a plain object, and reading `.message` off that reported "undefined".
     throw new CliError(
       'PACK_SMART_WEARABLE_ZIP_FAILED',
-      i18next.t('errors.pack_smart_wearable.zip_failed', { error: (e as Error).message })
+      i18next.t('errors.pack_smart_wearable.zip_failed', { error: e instanceof Error ? e.message : String(e) })
     )
   }
 
@@ -116,6 +138,14 @@ function zipProject(fs: CliComponents['fs'], files: FileToZip[], target: string)
   return new Promise<void>((resolve, reject) => {
     output.on('close', () => {
       resolve()
+    })
+
+    // Most write failures reach us here rather than through `archive`: a full disk, a
+    // read-only or missing directory, a revoked permission. Without this the command
+    // either reported success on a zip that was never written or hung, because
+    // 'close' never arrives on a stream that failed.
+    output.on('error', (err) => {
+      reject(err)
     })
 
     archive.on('warning', (err) => {

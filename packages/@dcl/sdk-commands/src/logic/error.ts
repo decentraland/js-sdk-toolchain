@@ -65,13 +65,18 @@ export type CliErrorName =
   | 'WORKSPACE_VALIDATIONS_INVALID_WORKSPACE_JSON_READ'
   // Pack smart wearable errors
   | 'PACK_SMART_WEARABLE_ZIP_FAILED'
+  | 'PACK_SMART_WEARABLE_ESCAPES_PROJECT'
   // Code to composite errors
   | 'CODE_TO_COMPOSITE_BUILD_FAILED'
   | 'CODE_TO_COMPOSITE_BUNDLE_NOT_FOUND'
   | 'CODE_TO_COMPOSITE_EXECUTION_FAILED'
 
 export class CliError<T extends CliErrorName> extends Error {
-  constructor(public name: T = 'CliError' as T, public message: string = '', public stack?: string) {
+  constructor(
+    public name: T = 'CliError' as T,
+    public message: string = '',
+    public stack?: string
+  ) {
     super()
   }
 }
