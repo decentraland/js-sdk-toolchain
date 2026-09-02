@@ -60,9 +60,13 @@ export function createReconciler(
   // Store the onChange callbacks to be runned every time a Result has changed
   const changeEvents = new Map<Entity, Map<number, OnChangeState | undefined>>()
   const clickEvents = new Map<Entity, Map<PointerEventType, Callback>>()
-  // Track the last value reported by the renderer for each input entity,
-  // so we can avoid echoing it back and causing keystroke drops.
-  const lastInputResultValues = new Map<Entity, string | undefined>()
+  // The value each input entity is believed to already hold, used to suppress echoes
+  // that would drop keystrokes. It is source-neutral on purpose: the renderer's reported
+  // value seeds it, and a value the scene itself writes replaces it, because otherwise a
+  // scene pushing a field back to what the renderer last reported looked like an echo and
+  // was swallowed. Read it as "what the field is already showing", not "what the renderer
+  // last said".
+  const knownInputValues = new Map<Entity, string | undefined>()
   // Initialize components
   const UiTransform = components.UiTransform(engine)
   const UiText = components.UiText(engine)
@@ -126,10 +130,10 @@ export function createReconciler(
         update.component === 'onMouseDown'
           ? pointerEvents.onPointerDown
           : update.component === 'onMouseUp'
-          ? pointerEvents.onPointerUp
-          : update.component === 'onMouseEnter'
-          ? pointerEvents.onPointerHoverEnter
-          : update.component === 'onMouseLeave' && pointerEvents.onPointerHoverLeave
+            ? pointerEvents.onPointerUp
+            : update.component === 'onMouseEnter'
+              ? pointerEvents.onPointerHoverEnter
+              : update.component === 'onMouseLeave' && pointerEvents.onPointerHoverLeave
 
       if (pointerEventSystem) {
         pointerEventSystem(
@@ -192,8 +196,8 @@ export function createReconciler(
     if (
       componentName === 'uiInput' &&
       'value' in nextProps &&
-      lastInputResultValues.has(instance.entity) &&
-      (nextProps as any).value === lastInputResultValues.get(instance.entity)
+      knownInputValues.has(instance.entity) &&
+      (nextProps as any).value === knownInputValues.get(instance.entity)
     ) {
       delete (nextProps as any).value
     }
@@ -215,7 +219,7 @@ export function createReconciler(
     // compares against. Leaving the renderer's older value in place meant a
     // later push back to it looked like an echo and was dropped.
     if (componentName === 'uiInput' && 'value' in nextProps) {
-      lastInputResultValues.set(instance.entity, (nextProps as any).value)
+      knownInputValues.set(instance.entity, (nextProps as any).value)
     }
   }
 
@@ -223,7 +227,7 @@ export function createReconciler(
     entities.delete(instance.entity)
     changeEvents.delete(instance.entity)
     clickEvents.delete(instance.entity)
-    lastInputResultValues.delete(instance.entity)
+    knownInputValues.delete(instance.entity)
     engine.removeEntity(instance.entity)
     for (const child of instance._child) {
       removeChildEntity(child)
@@ -291,7 +295,7 @@ export function createReconciler(
         componentId === UiDropdown.componentId ? UiDropdownResult.componentId : UiInputResult.componentId
       engine.getComponent<PBUiInputResult | PBUiDropdownResult>(resultComponentId).onChange(entity, (value) => {
         if (resultComponentId === UiInputResult.componentId) {
-          lastInputResultValues.set(entity, value?.value as string | undefined)
+          knownInputValues.set(entity, value?.value as string | undefined)
         }
         if ((value as PBUiInputResult)?.isSubmit) {
           const onSubmit = changeEvents.get(entity)?.get(componentId)?.onSubmitCallback
