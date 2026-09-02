@@ -260,12 +260,16 @@ export function createComponentDefinitionFromSchema<T>(
       return data.has(entity)
     },
     deleteFrom(entity: Entity, markAsDirty = true): T | null {
+      // Presence, not truthiness: a component defined from a primitive schema can
+      // legitimately hold 0, false or an empty string, and deleting one must still
+      // return the value that was there.
+      const had = data.has(entity)
       const component = data.get(entity)
       if (data.delete(entity) && markAsDirty) {
         dirtyIterator.add(entity)
       }
       lastSentData.delete(entity)
-      return component || null
+      return had ? (component as T) : null
     },
     entityDeleted(entity: Entity, markAsDirty: boolean): void {
       if (data.delete(entity) && markAsDirty) {
@@ -304,20 +308,21 @@ export function createComponentDefinitionFromSchema<T>(
       return usedValue!
     },
     getMutableOrNull(entity: Entity): T | null {
-      const component = data.get(entity)
-      if (!component) {
+      // Presence, not truthiness, so a falsy primitive value is still mutable.
+      if (!data.has(entity)) {
         return null
       }
       dirtyIterator.add(entity)
-      return component
+      return data.get(entity) as T
     },
     getOrCreateMutable(entity: Entity, value?: T): T {
-      const component = data.get(entity)
-      if (!component) {
+      // Presence, not truthiness: a stored 0/false/'' must not be treated as absent,
+      // which would send this through create() and throw "already exists".
+      if (!data.has(entity)) {
         return this.create(entity, value)
       } else {
         dirtyIterator.add(entity)
-        return component
+        return data.get(entity) as T
       }
     },
     getMutable(entity: Entity): T {

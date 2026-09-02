@@ -17,7 +17,7 @@ export type DeepReadonlyObject<T> = {
 /**
  * @public
  */
-export type ReadonlyPrimitive = number | string | number[] | string[] | boolean | boolean[]
+export type ReadonlyPrimitive = number | string | boolean
 
 /**
  * @public
@@ -32,12 +32,12 @@ export type ReadonlyComponentSchema<T extends [ComponentDefinition<unknown>, ...
 export type DeepReadonly<T> = T extends ReadonlyPrimitive
   ? T
   : T extends Array<infer K>
-  ? ReadonlyArray<DeepReadonly<K>>
-  : T extends Map<infer K, infer V>
-  ? DeepReadonlyMap<K, V>
-  : T extends Set<infer M>
-  ? DeepReadonlySet<M>
-  : DeepReadonlyObject<T>
+    ? ReadonlyArray<DeepReadonly<K>>
+    : T extends Map<infer K, infer V>
+      ? DeepReadonlyMap<K, V>
+      : T extends Set<infer M>
+        ? DeepReadonlySet<M>
+        : DeepReadonlyObject<T>
 
 /**
  * @internal
