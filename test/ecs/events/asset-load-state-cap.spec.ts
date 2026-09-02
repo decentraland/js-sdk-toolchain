@@ -84,3 +84,77 @@ describe('when a tick brings no new loading state', () => {
     expect(callback).toHaveBeenCalledTimes(1)
   })
 })
+
+describe('when two loading states share a timestamp but arrive in different ticks', () => {
+  let engine: ReturnType<typeof Engine>
+  let AssetLoadLoadingState: ReturnType<typeof components.AssetLoadLoadingState>
+  let entity: Entity
+  let callback: jest.Mock
+
+  beforeEach(async () => {
+    engine = Engine()
+    AssetLoadLoadingState = components.AssetLoadLoadingState(engine)
+    const system = createAssetLoadLoadingStateSystem(engine)
+
+    entity = engine.addEntity()
+    callback = jest.fn()
+    system.registerAssetLoadLoadingStateEntity(entity, callback)
+
+    AssetLoadLoadingState.addValue(entity, { asset: 'a', currentState: LoadingState.LOADING, timestamp: 1 })
+    await engine.update(1)
+
+    // The set allows several values at one timestamp, so this is a new event even
+    // though its timestamp matches the one already delivered.
+    AssetLoadLoadingState.addValue(entity, { asset: 'b', currentState: LoadingState.LOADING, timestamp: 1 })
+    await engine.update(1)
+  })
+
+  it('should deliver both of them', () => {
+    expect(callback).toHaveBeenCalledTimes(2)
+  })
+
+  it('should not deliver either of them twice', async () => {
+    await engine.update(1)
+
+    expect(callback).toHaveBeenCalledTimes(2)
+  })
+})
+
+describe('when several loading states share a timestamp within one tick', () => {
+  let engine: ReturnType<typeof Engine>
+  let AssetLoadLoadingState: ReturnType<typeof components.AssetLoadLoadingState>
+  let entity: Entity
+  let callback: jest.Mock
+
+  beforeEach(async () => {
+    engine = Engine()
+    AssetLoadLoadingState = components.AssetLoadLoadingState(engine)
+    const system = createAssetLoadLoadingStateSystem(engine)
+
+    entity = engine.addEntity()
+    callback = jest.fn()
+    system.registerAssetLoadLoadingStateEntity(entity, callback)
+
+    for (const asset of ['a', 'b', 'c']) {
+      AssetLoadLoadingState.addValue(entity, { asset, currentState: LoadingState.LOADING, timestamp: 4 })
+    }
+    await engine.update(1)
+  })
+
+  it('should deliver every one of them', () => {
+    expect(callback).toHaveBeenCalledTimes(3)
+  })
+
+  it('should not repeat them on the next tick', async () => {
+    await engine.update(1)
+
+    expect(callback).toHaveBeenCalledTimes(3)
+  })
+
+  it('should still deliver a later event at a higher timestamp', async () => {
+    AssetLoadLoadingState.addValue(entity, { asset: 'd', currentState: LoadingState.LOADING, timestamp: 5 })
+    await engine.update(1)
+
+    expect(callback).toHaveBeenCalledTimes(4)
+  })
+})
