@@ -120,10 +120,27 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
     const hasNetworkId = 'networkId' in msg
 
     if (hasNetworkId) {
+      // A removed entity keeps its NetworkEntity so its deletion can still be
+      // forwarded, which means a sync id that has been reused matches both the old
+      // tombstone and its live replacement. Prefer the live one, so updates for a
+      // reused id reach the replacement instead of being dropped by the removed
+      // guard. Fall back to the tombstone when that is the only match, so an update
+      // for a genuinely deleted entity is still skipped rather than resurrecting it
+      // under a fresh local id.
+      let removedMatch: { entityId: Entity; network: INetowrkEntityType } | undefined
+
       for (const [entityId, network] of engine.getEntitiesWith(NetworkEntity)) {
         if (network.networkId === msg.networkId && network.entityId === msg.entityId) {
+          if (engine.entityContainer.getEntityState(entityId) === EntityState.Removed) {
+            removedMatch = removedMatch ?? { entityId, network }
+            continue
+          }
           return { entityId, network }
         }
+      }
+
+      if (removedMatch) {
+        return removedMatch
       }
     }
 
