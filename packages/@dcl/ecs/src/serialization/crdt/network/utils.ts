@@ -83,5 +83,9 @@ export function fixTransformParent(
   const newTransform = { ...transform, parent }
 
   TransformSchema.serialize(newTransform, buffer)
-  return buffer.toBinary()
+
+  // A copy, not the view toBinary hands out: the buffer is shared between calls
+  // and reset by each one, so two transforms fixed in the same batch would both
+  // end up showing the bytes of whichever was serialized last.
+  return buffer.toCopiedBinary()
 }
