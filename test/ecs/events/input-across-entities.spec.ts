@@ -1,8 +1,8 @@
-import * as components from '../../packages/@dcl/ecs/src/components'
-import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
-import { createInputSystem, IInputSystem } from '../../packages/@dcl/ecs/src/engine/input'
-import { InputAction, PointerEventType } from '../../packages/@dcl/ecs/src'
-import { createTestPointerDownCommand } from './events/utils'
+import * as components from '../../../packages/@dcl/ecs/src/components'
+import { Engine, Entity } from '../../../packages/@dcl/ecs/src/engine'
+import { createInputSystem, IInputSystem } from '../../../packages/@dcl/ecs/src/engine/input'
+import { InputAction, PointerEventType } from '../../../packages/@dcl/ecs/src'
+import { createTestPointerDownCommand } from './utils'
 
 describe('when two entities report input in the same frame and the later one is older', () => {
   let engine: ReturnType<typeof Engine>
