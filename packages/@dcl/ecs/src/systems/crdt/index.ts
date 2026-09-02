@@ -2,18 +2,13 @@ import { Entity, EntityState } from '../../engine/entity'
 import type { ComponentDefinition } from '../../engine'
 import type { PreEngine } from '../../engine/types'
 import { ReadWriteByteBuffer } from '../../serialization/ByteBuffer'
-import {
-  AppendValueOperation,
-  CrdtMessageProtocol,
-  DeleteComponentNetwork,
-  DeleteEntityNetwork
-} from '../../serialization/crdt'
+import { AppendValueOperation, CrdtMessageProtocol } from '../../serialization/crdt'
 import { DeleteComponent } from '../../serialization/crdt/deleteComponent'
 import { DeleteEntity } from '../../serialization/crdt/deleteEntity'
 import { PutComponentOperation } from '../../serialization/crdt/putComponent'
-import { CrdtMessageType, CrdtMessageHeader, CrdtMessage } from '../../serialization/crdt/types'
+import { readMessage } from '../../serialization/crdt/message'
+import { CrdtMessageType, CrdtMessageHeader } from '../../serialization/crdt/types'
 import { ReceiveMessage, Transport } from './types'
-import { PutNetworkComponentOperation } from '../../serialization/crdt/network/putComponentNetwork'
 import {
   NetworkEntity as defineNetworkEntity,
   NetworkParent as defineNetworkParent,
@@ -68,32 +63,18 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
       let header: CrdtMessageHeader | null
       while ((header = CrdtMessageProtocol.getHeader(buffer))) {
         const offset = buffer.currentReadOffset()
-        let message: CrdtMessage | undefined = undefined
-        if (header.type === CrdtMessageType.DELETE_COMPONENT) {
-          message = DeleteComponent.read(buffer)!
-        } else if (header.type === CrdtMessageType.DELETE_COMPONENT_NETWORK) {
-          message = DeleteComponentNetwork.read(buffer)!
-        } else if (header.type === CrdtMessageType.PUT_COMPONENT) {
-          message = PutComponentOperation.read(buffer)!
-        } else if (header.type === CrdtMessageType.PUT_COMPONENT_NETWORK) {
-          message = PutNetworkComponentOperation.read(buffer)!
-        } else if (header.type === CrdtMessageType.DELETE_ENTITY) {
-          message = DeleteEntity.read(buffer)!
-        } else if (header.type === CrdtMessageType.DELETE_ENTITY_NETWORK) {
-          message = DeleteEntityNetwork.read(buffer)!
-        } else if (header.type === CrdtMessageType.APPEND_VALUE) {
-          message = AppendValueOperation.read(buffer)!
-          // Unknown message, we skip it
-        } else {
-          // consume the message
-          buffer.incrementReadOffset(header.length)
-        }
+        const message = readMessage(buffer)
         if (message) {
           receivedMessages.push({
             ...message,
             transportId,
             messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
           })
+        } else {
+          // Either a type this reader does not know or a frame too short for the type it
+          // claims. Skipping it by its declared length keeps the rest of the chunk readable,
+          // and `getHeader` has already checked that length reaches past the header.
+          buffer.incrementReadOffset(header.length)
         }
       }
     }
