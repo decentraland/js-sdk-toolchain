@@ -4,6 +4,7 @@ import { Entity } from '../../packages/@dcl/ecs/src/engine/entity'
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { CrdtMessageProtocol } from '../../packages/@dcl/ecs/src/serialization/crdt'
 import { readMessage } from '../../packages/@dcl/ecs/src/serialization/crdt/message'
+import { DeleteEntity } from '../../packages/@dcl/ecs/src/serialization/crdt/deleteEntity'
 import { PutComponentOperation } from '../../packages/@dcl/ecs/src/serialization/crdt/putComponent'
 import { CRDT_MESSAGE_HEADER_LENGTH, CrdtMessageType } from '../../packages/@dcl/ecs/src/serialization/crdt/types'
 import { Transport } from '../../packages/@dcl/ecs/src/systems/crdt/types'
@@ -185,6 +186,52 @@ describe('when reading a component update that announces more data than its fram
   })
 })
 
+describe('when reading a fixed-size message whose header declares more than its frame', () => {
+  let buffer: ReadWriteByteBuffer
+
+  beforeEach(() => {
+    const overDeclared = CRDT_MESSAGE_HEADER_LENGTH + DeleteEntity.MESSAGE_HEADER_LENGTH + 8
+    buffer = new ReadWriteByteBuffer(craftFrame(CrdtMessageType.DELETE_ENTITY, overDeclared), 0)
+  })
+
+  it('should not read a message from it', () => {
+    expect(readMessage(buffer)).toBe(null)
+  })
+
+  it('should leave the read offset untouched so the caller skips the whole declared frame', () => {
+    readMessage(buffer)
+
+    expect(buffer.currentReadOffset()).toBe(0)
+  })
+})
+
+describe('when reading a component update whose header declares more than its data fills', () => {
+  let buffer: ReadWriteByteBuffer
+
+  beforeEach(() => {
+    const padding = 8
+    const data = new Uint8Array([1, 2, 3])
+    const writer = new ReadWriteByteBuffer()
+    PutComponentOperation.write(512 as Entity, 1, 1, data, writer)
+    const message = writer.toBinary()
+    // Eight real bytes of padding, declared as part of the frame, but the announced
+    // data length still covers only the three real data bytes.
+    const framed = new Uint8Array(message.byteLength + padding)
+    framed.set(message, 0)
+    buffer = new ReadWriteByteBuffer(withUint32At(framed, 0, message.byteLength + padding), 0)
+  })
+
+  it('should not read a message from it', () => {
+    expect(readMessage(buffer)).toBe(null)
+  })
+
+  it('should leave the read offset untouched', () => {
+    readMessage(buffer)
+
+    expect(buffer.currentReadOffset()).toBe(0)
+  })
+})
+
 describe('when reading a component update whose data exactly fills its frame', () => {
   let buffer: ReadWriteByteBuffer
   let entity: Entity
@@ -313,6 +360,56 @@ describe('when a transport delivers a header-only entity delete followed by a va
   })
 
   it('should still apply the update that follows the malformed message', async () => {
+    transport.onmessage!(chunk)
+    await engine.update(1)
+
+    expect(Transform.getOrNull(entity)?.position).toEqual({ x: 1, y: 2, z: 3 })
+  })
+})
+
+describe('when a transport delivers an over-declared entity delete followed by a valid component update', () => {
+  let engine: ReturnType<typeof Engine>
+  let transport: Transport
+  let Transform: ReturnType<typeof components.Transform>
+  let entity: Entity
+  let chunk: Uint8Array
+
+  beforeEach(() => {
+    engine = Engine()
+    Transform = components.Transform(engine)
+    transport = { send: async () => {}, filter: () => false }
+    engine.addTransport(transport)
+    entity = 512 as Entity
+
+    // An entity delete whose header claims eight bytes of padding beyond its real frame.
+    const padding = 8
+    const overDeclared = craftFrame(
+      CrdtMessageType.DELETE_ENTITY,
+      CRDT_MESSAGE_HEADER_LENGTH + DeleteEntity.MESSAGE_HEADER_LENGTH + padding,
+      CRDT_MESSAGE_HEADER_LENGTH + DeleteEntity.MESSAGE_HEADER_LENGTH + padding
+    )
+
+    const data = new ReadWriteByteBuffer()
+    Transform.schema.serialize(
+      {
+        position: { x: 1, y: 2, z: 3 },
+        rotation: { x: 0, y: 0, z: 0, w: 1 },
+        scale: { x: 1, y: 1, z: 1 },
+        parent: 0 as Entity
+      },
+      data
+    )
+    const update = new ReadWriteByteBuffer()
+    PutComponentOperation.write(entity, 1, Transform.componentId, data.toBinary(), update)
+    // The valid update sits exactly at the over-declared frame's boundary.
+    chunk = concat(overDeclared, update.toBinary())
+  })
+
+  it('should not throw from the transport', () => {
+    expect(() => transport.onmessage!(chunk)).not.toThrow()
+  })
+
+  it('should apply the valid update that sits at the declared boundary', async () => {
     transport.onmessage!(chunk)
     await engine.update(1)
 
