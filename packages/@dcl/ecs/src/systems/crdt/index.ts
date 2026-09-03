@@ -50,6 +50,15 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
   const receivedMessages: ReceiveMessage[] = []
   // Messages already processed by the engine but that we need to broadcast to other transports.
   const broadcastMessages: ReceiveMessage[] = []
+  // Network entities deleted while processing the current batch, keyed the way
+  // an inbound message identifies them. Deleting an entity drops its
+  // NetworkEntity component, and sendMessages still has to resolve the same
+  // message afterwards to convert it for the renderer.
+  const networkEntitiesDeletedThisTick = new Map<string, Entity>()
+
+  function networkEntityKey(networkId: number, entityId: Entity) {
+    return `${networkId}:${entityId}`
+  }
 
   /**
    *
@@ -113,7 +122,14 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
    * It's a mapping Network -> to Local
    * If it's not a network message, return the entityId received by the message
    */
-  function findNetworkId(msg: { entityId: Entity; networkId?: number }): {
+  function findNetworkId(
+    msg: { entityId: Entity; networkId?: number },
+    // The mapping of an entity deleted earlier in this tick is retained for one purpose
+    // only: converting that delete for the renderer, after the cleanup has already taken
+    // the NetworkEntity away. Resolving anything else through it would target an entity
+    // that is gone, so callers have to opt in.
+    allowDeletedThisTick = false
+  ): {
     entityId: Entity
     network?: INetowrkEntityType
   } {
@@ -123,6 +139,13 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
       for (const [entityId, network] of engine.getEntitiesWith(NetworkEntity)) {
         if (network.networkId === msg.networkId && network.entityId === msg.entityId) {
           return { entityId, network }
+        }
+      }
+
+      if (allowDeletedThisTick) {
+        const deletedEntityId = networkEntitiesDeletedThisTick.get(networkEntityKey(msg.networkId!, msg.entityId))
+        if (deletedEntityId !== undefined) {
+          return { entityId: deletedEntityId }
         }
       }
     }
@@ -137,6 +160,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
   async function receiveMessages() {
     const messagesToProcess = getMessages(receivedMessages)
     const entitiesShouldBeCleaned: Entity[] = []
+    networkEntitiesDeletedThisTick.clear()
 
     for (const msg of messagesToProcess) {
       let { entityId, network } = findNetworkId(msg)
@@ -147,6 +171,9 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
         NetworkEntity.createOrReplace(entityId, network)
       }
       if (msg.type === CrdtMessageType.DELETE_ENTITY || msg.type === CrdtMessageType.DELETE_ENTITY_NETWORK) {
+        if (msg.type === CrdtMessageType.DELETE_ENTITY_NETWORK) {
+          networkEntitiesDeletedThisTick.set(networkEntityKey(msg.networkId, msg.entityId), entityId)
+        }
         entitiesShouldBeCleaned.push(entityId)
         broadcastMessages.push(msg)
       } else {
@@ -285,7 +312,19 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
             continue
           }
         }
-        const { entityId } = findNetworkId(message)
+        // The entity behind this pair was deleted earlier in the same tick. Only the
+        // delete itself still needs its retained mapping; forwarding any other message
+        // addressed to that pair would have the receiver apply an update after the
+        // delete and leave its state ahead of the engine's.
+        if (
+          networkUtils.isNetworkMessage(message) &&
+          message.type !== CrdtMessageType.DELETE_ENTITY_NETWORK &&
+          networkEntitiesDeletedThisTick.has(networkEntityKey(message.networkId, message.entityId))
+        ) {
+          continue
+        }
+
+        const { entityId } = findNetworkId(message, message.type === CrdtMessageType.DELETE_ENTITY_NETWORK)
 
         const transformNeedsFix =
           'componentId' in message &&
