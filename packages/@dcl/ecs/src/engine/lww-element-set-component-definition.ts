@@ -130,13 +130,17 @@ export function createUpdateLwwFromCrdt(
     switch (action) {
       case ProcessMessageResultType.StateUpdatedData:
       case ProcessMessageResultType.StateUpdatedTimestamp: {
-        timestamps.set(entity, msg.timestamp)
-
         if (msg.type === CrdtMessageType.PUT_COMPONENT || msg.type === CrdtMessageType.PUT_COMPONENT_NETWORK) {
-          const buf = new ReadWriteByteBuffer(msg.data!)
-          data.set(entity, schema.deserialize(buf))
+          // Deserialize before touching any state. A peer can send a payload this
+          // schema cannot read (a truncated buffer, say), and deserialize then throws.
+          // Reading it first leaves timestamps and data untouched on failure, so the
+          // caller can drop the message and a later well-formed update still wins.
+          const value = schema.deserialize(new ReadWriteByteBuffer(msg.data!))
+          timestamps.set(entity, msg.timestamp)
+          data.set(entity, value)
           lastSentData.set(entity, new Uint8Array(msg.data!))
         } else {
+          timestamps.set(entity, msg.timestamp)
           data.delete(entity)
           lastSentData.delete(entity)
         }
