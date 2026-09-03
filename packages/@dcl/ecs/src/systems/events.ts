@@ -22,8 +22,10 @@ export type EventSystemOptions = {
   maxDistance?: number
   showFeedback?: boolean
   showHighlight?: boolean
+  /** @deprecated use `maxDistance` instead (same semantics: distance from the player) */
   maxPlayerDistance?: number
   priority?: number
+  maxCameraDistance?: number
 }
 
 export const getDefaultOpts = (opts: Partial<EventSystemOptions> = {}): EventSystemOptions => ({
@@ -229,7 +231,8 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
         hoverText: opts.hoverText,
         maxDistance: opts.maxDistance,
         maxPlayerDistance: opts.maxPlayerDistance,
-        priority: opts.priority
+        priority: opts.priority,
+        maxCameraDistance: opts.maxCameraDistance
       },
       interactionType: interactionType ?? InteractionType.CURSOR
     })
