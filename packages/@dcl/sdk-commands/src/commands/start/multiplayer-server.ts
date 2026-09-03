@@ -11,9 +11,11 @@ const HAMMURABI_PACKAGE = '@dcl/hammurabi-server'
 const HAMMURABI_VERSION = 'next'
 
 const BEVY_PACKAGE = '@dcl-regenesislabs/bevy-headless-server'
-// Zone Pulse test build: the Pulse-capable engine (bevy-explorer #1137) is only published
-// on `next` — `latest` still predates it. DCL_SERVER_PACKAGE overrides for local builds.
-const BEVY_VERSION = 'next'
+// Zone Pulse test build: exact pin on the bevy-explorer #1137 merge (a2abfe6d) — the
+// Pulse-capable engine. Deliberately NOT the floating `next` tag: engines past #1134 sign
+// gatekeeper requests in a format comms-gatekeeper-local rejects (401), and a moving tag
+// re-broke the rig overnight. DCL_SERVER_PACKAGE overrides for local builds.
+const BEVY_VERSION = '0.1.0-33416687486.commit-a2abfe6'
 
 // The bevy server exits with this when it can never run here (unsupported platform,
 // missing binary, bad arguments). We fail the preview loudly instead of retrying:
