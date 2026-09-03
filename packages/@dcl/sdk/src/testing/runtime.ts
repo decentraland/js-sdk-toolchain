@@ -63,7 +63,14 @@ export function createTestRuntime(testingModule: TestingModule, engine: IEngine)
       console.log('⏱️ yield function')
       // if the value is a function, schedule it to be called on the next frame
       nextTickFuture.push(() => {
-        scheduleValue(value(), env)
+        // This runs from the coroutine system, so a throw that is not turned
+        // into a failure here escapes into engine.update instead and the test
+        // is never reported at all.
+        try {
+          scheduleValue(value(), env)
+        } catch (err) {
+          env.reject(err)
+        }
       })
       return
     } else if (typeof value === 'undefined' || value === null) {
@@ -133,7 +140,10 @@ export function createTestRuntime(testingModule: TestingModule, engine: IEngine)
           .logTestResult({
             name: entry.name,
             ok: false,
-            error: err.toString(),
+            // A test can reject with anything, undefined included, and this
+            // runs after `resolved` is set, so throwing here would strand the
+            // whole run: no result for this test and no next one scheduled.
+            error: String(err),
             stack: err && typeof err === 'object' && err.stack,
             totalFrames: currentFrameCounter - initialFrame,
             totalTime: currentFrameTime - startTime
