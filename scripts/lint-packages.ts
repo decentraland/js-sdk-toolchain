@@ -32,14 +32,10 @@ for (const pkg of packages) {
         cwd: process.cwd()
       })
       console.log(`✅ ${pkg} - No issues found\n`)
-    } catch (error: any) {
-      // Check if it's just warnings (exit code 1) vs actual errors (exit code 2)
-      if (error.status === 1) {
-        console.log(`⚠️  ${pkg} - Linting completed with warnings\n`)
-      } else {
-        console.log(`❌ ${pkg} - Linting failed\n`)
-        hasErrors = true
-      }
+    } catch (_error: unknown) {
+      // ESLint exits non-zero for lint violations as well as configuration/runtime failures.
+      console.log(`❌ ${pkg} - Linting failed\n`)
+      hasErrors = true
     }
   } else {
     console.log(`⚠️  ${pkg} - Package not found, skipping\n`)
