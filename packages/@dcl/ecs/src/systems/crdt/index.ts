@@ -50,6 +50,8 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
   const receivedMessages: ReceiveMessage[] = []
   // Messages already processed by the engine but that we need to broadcast to other transports.
   const broadcastMessages: ReceiveMessage[] = []
+  // Latched so a peer flooding unseen network ids cannot also flood the console.
+  let reportedEntityExhaustion = false
 
   /**
    *
@@ -142,7 +144,25 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
       let { entityId, network } = findNetworkId(msg)
       // We receive a new Entity. Create the localEntity and map it to the NetworkEntity component
       if (networkUtils.isNetworkMessage(msg) && !network) {
-        entityId = engine.addEntity()
+        // A peer decides how many distinct (networkId, entityId) pairs it announces, and
+        // each unseen pair takes a local entity here. The container throws once its range
+        // is exhausted, and that throw used to leave `receiveMessages` and reject
+        // `engine.update`, so a peer could stop the scene with nothing but well-formed
+        // messages. Run out quietly instead and drop the message: the entity cannot be
+        // represented locally, so there is nothing to apply it to.
+        try {
+          entityId = engine.addEntity()
+        } catch (err) {
+          if (!reportedEntityExhaustion) {
+            reportedEntityExhaustion = true
+            console.error(
+              'Ran out of local entities while mapping entities announced over the network. ' +
+                'Further network entities will be ignored for the rest of this session.',
+              err
+            )
+          }
+          continue
+        }
         network = { entityId: msg.entityId, networkId: msg.networkId }
         NetworkEntity.createOrReplace(entityId, network)
       }
