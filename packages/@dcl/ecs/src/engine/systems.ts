@@ -13,6 +13,9 @@ export type SystemItem = {
 
 export function SystemContainer() {
   const systems: SystemItem[] = []
+  // Mirrors `systems` for membership checks: the update loop walks a snapshot,
+  // so it needs to know whether a system was removed while the tick ran.
+  const activeSystems = new Set<SystemFn>()
 
   function sort() {
     // TODO: systems with the same priority should always have the same stable order
@@ -32,6 +35,7 @@ export function SystemContainer() {
       priority,
       name: systemName
     })
+    activeSystems.add(fn)
     // TODO: replace this sort by an insertion in the right place
     sort()
   }
@@ -49,7 +53,8 @@ export function SystemContainer() {
       return false
     }
 
-    systems.splice(index, 1)
+    const [removed] = systems.splice(index, 1)
+    activeSystems.delete(removed.fn)
     sort()
     return true
   }
@@ -59,6 +64,9 @@ export function SystemContainer() {
     remove,
     getSystems() {
       return systems
+    },
+    isActive(fn: SystemFn) {
+      return activeSystems.has(fn)
     }
   }
 }
