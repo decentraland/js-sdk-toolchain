@@ -60,9 +60,13 @@ export function createReconciler(
   // Store the onChange callbacks to be runned every time a Result has changed
   const changeEvents = new Map<Entity, Map<number, OnChangeState | undefined>>()
   const clickEvents = new Map<Entity, Map<PointerEventType, Callback>>()
-  // Track the last value reported by the renderer for each input entity,
-  // so we can avoid echoing it back and causing keystroke drops.
-  const lastInputResultValues = new Map<Entity, string | undefined>()
+  // The value each input entity is believed to already hold, used to suppress echoes
+  // that would drop keystrokes. It is source-neutral on purpose: the renderer's reported
+  // value seeds it, and a value the scene itself writes replaces it, because otherwise a
+  // scene pushing a field back to what the renderer last reported looked like an echo and
+  // was swallowed. Read it as "what the field is already showing", not "what the renderer
+  // last said".
+  const knownInputValues = new Map<Entity, string | undefined>()
   // Initialize components
   const UiTransform = components.UiTransform(engine)
   const UiText = components.UiText(engine)
@@ -126,10 +130,10 @@ export function createReconciler(
         update.component === 'onMouseDown'
           ? pointerEvents.onPointerDown
           : update.component === 'onMouseUp'
-          ? pointerEvents.onPointerUp
-          : update.component === 'onMouseEnter'
-          ? pointerEvents.onPointerHoverEnter
-          : update.component === 'onMouseLeave' && pointerEvents.onPointerHoverLeave
+            ? pointerEvents.onPointerUp
+            : update.component === 'onMouseEnter'
+              ? pointerEvents.onPointerHoverEnter
+              : update.component === 'onMouseLeave' && pointerEvents.onPointerHoverLeave
 
       if (pointerEventSystem) {
         pointerEventSystem(
@@ -161,14 +165,20 @@ export function createReconciler(
   ) {
     const componentId = getComponentId[componentName]
 
-    const onChangeExists = 'onChange' in props
-    const onSubmitExists = 'onSubmit' in props
+    // Worked on a copy from here on. On the create path this object is React's
+    // own props, and deleting keys from it makes the next diff believe they
+    // were never set, so a listener dropped on the very next render is never
+    // seen as removed and keeps firing.
+    const nextProps = { ...props } as Partial<EngineComponents[K]>
+
+    const onChangeExists = 'onChange' in nextProps
+    const onSubmitExists = 'onSubmit' in nextProps
     const entityState = changeEvents.get(instance.entity)?.get(componentId)
     const onChange = onChangeExists
-      ? (props['onChange'] as OnChangeState['onChangeCallback'])
+      ? (nextProps['onChange'] as OnChangeState['onChangeCallback'])
       : entityState?.onChangeCallback
     const onSubmit = onSubmitExists
-      ? (props['onSubmit'] as OnChangeState['onSubmitCallback'])
+      ? (nextProps['onSubmit'] as OnChangeState['onSubmitCallback'])
       : entityState?.onSubmitCallback
 
     if (onChangeExists || onSubmitExists) {
@@ -176,8 +186,8 @@ export function createReconciler(
         onChangeCallback: onChange,
         onSubmitCallback: onSubmit
       })
-      delete (props as any).onChange
-      delete (props as any).onSubmit
+      delete (nextProps as any).onChange
+      delete (nextProps as any).onSubmit
     }
 
     // Prevent keystroke drops: when React echoes back the same value the renderer
@@ -185,24 +195,31 @@ export function createReconciler(
     // This avoids sending a stale value that overwrites what the user is currently typing.
     if (
       componentName === 'uiInput' &&
-      'value' in props &&
-      lastInputResultValues.has(instance.entity) &&
-      (props as any).value === lastInputResultValues.get(instance.entity)
+      'value' in nextProps &&
+      knownInputValues.has(instance.entity) &&
+      (nextProps as any).value === knownInputValues.get(instance.entity)
     ) {
-      delete (props as any).value
+      delete (nextProps as any).value
     }
 
     // We check if there is any key pending to be changed to avoid updating the existing component
-    if (!Object.keys(props).length) {
+    if (!Object.keys(nextProps).length) {
       return
     }
     const ComponentDef = engine.getComponent(componentId) as components.LastWriteWinElementSetComponentDefinition<
       EngineComponents[K]
     >
     const component = ComponentDef.getMutableOrNull(instance.entity) || ComponentDef.create(instance.entity)
-    for (const key in props) {
+    for (const key in nextProps) {
       const keyProp = key as keyof EngineComponents[K]
-      component[keyProp] = props[keyProp]!
+      component[keyProp] = nextProps[keyProp]!
+    }
+
+    // A value the scene actually pushed becomes the baseline the echo check
+    // compares against. Leaving the renderer's older value in place meant a
+    // later push back to it looked like an echo and was dropped.
+    if (componentName === 'uiInput' && 'value' in nextProps) {
+      knownInputValues.set(instance.entity, (nextProps as any).value)
     }
   }
 
@@ -210,7 +227,7 @@ export function createReconciler(
     entities.delete(instance.entity)
     changeEvents.delete(instance.entity)
     clickEvents.delete(instance.entity)
-    lastInputResultValues.delete(instance.entity)
+    knownInputValues.delete(instance.entity)
     engine.removeEntity(instance.entity)
     for (const child of instance._child) {
       removeChildEntity(child)
@@ -278,7 +295,7 @@ export function createReconciler(
         componentId === UiDropdown.componentId ? UiDropdownResult.componentId : UiInputResult.componentId
       engine.getComponent<PBUiInputResult | PBUiDropdownResult>(resultComponentId).onChange(entity, (value) => {
         if (resultComponentId === UiInputResult.componentId) {
-          lastInputResultValues.set(entity, value?.value as string | undefined)
+          knownInputValues.set(entity, value?.value as string | undefined)
         }
         if ((value as PBUiInputResult)?.isSubmit) {
           const onSubmit = changeEvents.get(entity)?.get(componentId)?.onSubmitCallback
