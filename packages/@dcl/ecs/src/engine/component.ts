@@ -60,7 +60,7 @@ export interface BaseComponent<T> {
    * the component from the entity.
    * @param entity - Entity ID that was deleted.
    */
-  entityDeleted(entity: Entity, markAsDirty: boolean): void
+  entityDeleted(entity: Entity, markAsDirty: boolean, entityRemoved?: boolean): void
 
   // </ SYSTEM INTERFACE METHODS>
 

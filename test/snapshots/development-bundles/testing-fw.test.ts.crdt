@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=622.2k bytes
+SCENE_COMPILED_JS_SIZE_PROD=622.8k bytes
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -10,8 +10,8 @@ EVAL test/snapshots/development-bundles/testing-fw.test.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
   OPCODES ~= 84k
-  MALLOC_COUNT = 17436
-  ALIVE_OBJS_DELTA ~= 3.47k
+  MALLOC_COUNT = 17579
+  ALIVE_OBJS_DELTA ~= 3.49k
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=1 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
@@ -42,7 +42,7 @@ CALL onUpdate(0.1)
   Scene: DELETE_COMPONENT e=0x0 c=1 t=4 data=null
   Scene: DELETE_ENTITY e=0x200
   OPCODES ~= 10k
-  MALLOC_COUNT = -78
+  MALLOC_COUNT = -80
   ALIVE_OBJS_DELTA ~= -0.03k
 CALL onUpdate(0.1)
   LOG: ["⏱️ yield"]
@@ -61,4 +61,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 6k
   MALLOC_COUNT = -53
   ALIVE_OBJS_DELTA ~= -0.01k
-  MEMORY_USAGE_COUNT ~= 1555.76k bytes
+  MEMORY_USAGE_COUNT ~= 1558.52k bytes

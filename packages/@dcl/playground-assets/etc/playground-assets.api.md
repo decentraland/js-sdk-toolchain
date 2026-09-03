@@ -258,7 +258,7 @@ export interface BaseComponent<T> {
     // (undocumented)
     readonly componentType: ComponentType;
     dumpCrdtStateToBuffer(buffer: ByteBuffer, filterEntity?: (entity: Entity) => boolean): void;
-    entityDeleted(entity: Entity, markAsDirty: boolean): void;
+    entityDeleted(entity: Entity, markAsDirty: boolean, entityRemoved?: boolean): void;
     get(entity: Entity): any;
     getCrdtUpdates(): Iterable<CrdtMessageBody>;
     has(entity: Entity): boolean;

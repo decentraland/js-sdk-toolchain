@@ -71,7 +71,9 @@ function preEngine(options?: IEngineOptions): PreEngine {
       // We still need the NetworkEntity to forward this message to the SyncTransport.
       // If we remove it then we can't notify the other users which entity was deleted.
       if (component.componentName === 'core-schema::Network-Entity') continue
-      component.entityDeleted(entity, true)
+      // `released` is false for the named static entities: they are purged but keep their
+      // ids, so no DELETE_ENTITY follows and their component tombstones must be retained.
+      component.entityDeleted(entity, true, released)
     }
 
     return released
