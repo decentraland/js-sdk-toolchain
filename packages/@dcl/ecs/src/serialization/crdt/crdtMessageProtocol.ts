@@ -16,6 +16,13 @@ export namespace CrdtMessageProtocol {
     }
 
     const messageLength = buf.getUint32(buf.currentReadOffset())
+    // Readers skip a message they don't understand by advancing `length` bytes.
+    // A length below the header size never advances them, so the same bytes
+    // would be re-read forever.
+    if (messageLength < CRDT_MESSAGE_HEADER_LENGTH) {
+      return false
+    }
+
     if (rem < messageLength) {
       return false
     }
