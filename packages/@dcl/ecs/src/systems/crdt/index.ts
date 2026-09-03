@@ -50,6 +50,8 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
   const receivedMessages: ReceiveMessage[] = []
   // Messages already processed by the engine but that we need to broadcast to other transports.
   const broadcastMessages: ReceiveMessage[] = []
+  // Latched per engine so a per-tick append cannot flood the console.
+  let reportedUnsyncableAppend = false
 
   /**
    *
@@ -328,6 +330,22 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
           const networkData = NetworkEntity.getOrNull(message.entityId)
           // If it has networkData convert the message to PUT_NETWORK_COMPONENT.
           if (networkData) {
+            // There is no APPEND_VALUE_NETWORK, so an append on a synced entity has no way
+            // to carry the peer's entity id and localMessageToNetwork writes nothing for
+            // it. The value is kept locally and simply never reaches the other players.
+            // Nothing can be sent until the protocol grows the message type, so say it
+            // once instead of losing the append in silence.
+            if (message.type === CrdtMessageType.APPEND_VALUE && !reportedUnsyncableAppend) {
+              reportedUnsyncableAppend = true
+              const name =
+                ('componentId' in message && engine.getComponentOrNull(message.componentId)?.componentName) ||
+                'a grow-only component'
+              console.error(
+                `Values appended to a grow-only value set on a synced entity are not sent to other players: ` +
+                  `${name} on entity ${message.entityId} stays local. ` +
+                  `Use a last-write-wins component for state that has to be shared.`
+              )
+            }
             networkUtils.localMessageToNetwork(message, networkData, buffer, transportBuffer)
             // Iterate the next message
             continue
