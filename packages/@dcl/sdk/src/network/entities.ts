@@ -1,5 +1,6 @@
 import {
   Entity,
+  EntityState,
   IEngine,
   NetworkEntity as _NetworkEntity,
   INetowrkEntity,
@@ -41,8 +42,14 @@ export function entityUtils(engine: IEngine, profile: IProfile) {
       networkValue.networkId = 0
       networkValue.entityId = entityEnumId as Entity
 
-      // Check if this enum is already used
-      for (const [_, network] of engine.getEntitiesWith(NetworkEntity)) {
+      // Check if this enum is already used. Entities that were removed keep
+      // their NetworkEntity so their deletion can still be forwarded, so they
+      // have to be skipped here or an id could never be used a second time.
+      for (const [entity, network] of engine.getEntitiesWith(NetworkEntity)) {
+        if (engine.getEntityState(entity) === EntityState.Removed) {
+          continue
+        }
+
         if (network.networkId === networkValue.networkId && network.entityId === networkValue.entityId) {
           throw new Error('syncEntity failed because the id provided is already in use')
         }
