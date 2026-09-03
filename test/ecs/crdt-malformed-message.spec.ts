@@ -320,6 +320,15 @@ describe('when reading a network entity delete that declares the length released
       // as a message of its own.
       expect(buffer.remainingBytes()).toBe(following.byteLength - 4)
     })
+
+    it('should not read anything more out of the chunk', () => {
+      readMessage(buffer)
+
+      // The stolen bytes shift the next length field onto what was a type value, always
+      // below the header size, so the reader refuses it rather than resynchronising.
+      // Everything behind the legacy frame is lost, not only the four bytes it took.
+      expect(readMessage(buffer)).toBe(null)
+    })
   })
 
   describe('and the chunk ends where the declared length says', () => {
@@ -478,5 +487,109 @@ describe('when a transport delivers a component update that announces more data 
     transport.onmessage!(chunk)
 
     await expect(engine.update(1)).resolves.toBeUndefined()
+  })
+})
+
+describe('when a transport delivers a legacy-length network delete ahead of valid messages', () => {
+  let engine: ReturnType<typeof Engine>
+  let transport: Transport
+  let Transform: ReturnType<typeof components.Transform>
+  let entity: Entity
+  let chunk: Uint8Array
+
+  beforeEach(() => {
+    engine = Engine()
+    Transform = components.Transform(engine)
+    transport = { send: async () => {}, filter: () => false }
+    engine.addTransport(transport)
+    entity = 512 as Entity
+
+    // A frame declaring the legacy twelve and holding only twelve. The reader cannot tell
+    // it from a released peer's sixteen-byte write, so it takes the legacy reading.
+    const legacyFrame = craftFrame(CrdtMessageType.DELETE_ENTITY_NETWORK, CRDT_MESSAGE_HEADER_LENGTH + 4)
+
+    const data = new ReadWriteByteBuffer()
+    Transform.schema.serialize(
+      {
+        position: { x: 1, y: 2, z: 3 },
+        rotation: { x: 0, y: 0, z: 0, w: 1 },
+        scale: { x: 1, y: 1, z: 1 },
+        parent: 0 as Entity
+      },
+      data
+    )
+    const update = new ReadWriteByteBuffer()
+    PutComponentOperation.write(entity, 1, Transform.componentId, data.toBinary(), update)
+    chunk = concat(legacyFrame, update.toBinary())
+  })
+
+  it('should not throw from the transport', () => {
+    expect(() => transport.onmessage!(chunk)).not.toThrow()
+  })
+
+  it('should drop the valid update behind it', async () => {
+    transport.onmessage!(chunk)
+    await engine.update(1)
+
+    // This is the documented cost of the legacy allowance: the four stolen bytes push the
+    // next length field onto a type value, the reader refuses it, and the rest of the
+    // chunk goes with it. Only a malformed sender produces such a frame.
+    expect(Transform.getOrNull(entity)).toBe(null)
+  })
+})
+
+describe('when a transport delivers a frame that over-declares its length with nothing behind it', () => {
+  let engine: ReturnType<typeof Engine>
+  let transport: Transport
+  let Transform: ReturnType<typeof components.Transform>
+  let entity: Entity
+  let chunk: Uint8Array
+
+  beforeEach(() => {
+    engine = Engine()
+    Transform = components.Transform(engine)
+    transport = { send: async () => {}, filter: () => false }
+    engine.addTransport(transport)
+    entity = 512 as Entity
+
+    // An entity delete that claims eight bytes more than it holds, with a valid update
+    // immediately after rather than the padding the claim implies.
+    const lying = new ReadWriteByteBuffer()
+    DeleteEntity.write(777 as Entity, lying)
+    const lyingBytes = lying.toBinary()
+    new DataView(lyingBytes.buffer, lyingBytes.byteOffset).setUint32(
+      0,
+      CRDT_MESSAGE_HEADER_LENGTH + DeleteEntity.MESSAGE_HEADER_LENGTH + 8,
+      true
+    )
+
+    const data = new ReadWriteByteBuffer()
+    Transform.schema.serialize(
+      {
+        position: { x: 1, y: 2, z: 3 },
+        rotation: { x: 0, y: 0, z: 0, w: 1 },
+        scale: { x: 1, y: 1, z: 1 },
+        parent: 0 as Entity
+      },
+      data
+    )
+    const update = new ReadWriteByteBuffer()
+    PutComponentOperation.write(entity, 1, Transform.componentId, data.toBinary(), update)
+    chunk = concat(lyingBytes, update.toBinary())
+  })
+
+  it('should not throw from the transport', () => {
+    expect(() => transport.onmessage!(chunk)).not.toThrow()
+  })
+
+  it('should drop the update the false length overlaps', async () => {
+    transport.onmessage!(chunk)
+    await engine.update(1)
+
+    // The other side of trusting the declared length. Before this change the reader
+    // advanced by what it had consumed, so it happened to find this update; now it obeys
+    // the header and skips into the middle of it. The reverse case, where the padding the
+    // header claims is really there, is the one that used to desync and now does not.
+    expect(Transform.getOrNull(entity)).toBe(null)
   })
 })
