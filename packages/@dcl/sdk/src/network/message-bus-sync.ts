@@ -115,6 +115,7 @@ export function addSyncTransport(
 
   // Receive & Process CRDT_STATE
   binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, async (data, sender) => {
+    if (isServerAtom.getOrNull() === false) return
     DEBUG_NETWORK_MESSAGES() && console.log('[REQ_CRDT_STATE]', sender, Date.now())
     const chunks = engineToCrdt(engine)
     if (chunks.length === 0) {
@@ -137,8 +138,6 @@ export function addSyncTransport(
     }
     stateIsSyncronized = true
 
-    // IMPORTANT: Only mark room as ready AFTER state is synchronized
-    // This ensures comms is truly connected and working
     const realmInfo = RealmInfo.getOrNull(engine.RootEntity)
     if (realmInfo) {
       DEBUG_NETWORK_MESSAGES() && console.log('[isRoomReady] Marking room as ready after state sync')
