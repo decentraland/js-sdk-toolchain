@@ -29,7 +29,7 @@ import { Result } from 'arg'
 import { startValidations } from '../../logic/project-validations'
 import { runExplorerAlpha } from './explorer-alpha'
 import { getLanUrl } from './utils'
-import { spawnAuthServer } from './multiplayer-server'
+import { spawnAuthServer, waitForServerReady } from './multiplayer-server'
 
 interface Options {
   args: Result<typeof args>
@@ -71,6 +71,7 @@ export const args = declareArgs({
   '--multi-instance': Boolean,
   '--asset-bundles': Boolean,
   '--no-client': Boolean,
+  '--no-server': Boolean,
   '--mcp': Boolean,
   '--mcp-port': Number
 })
@@ -102,6 +103,7 @@ export async function help(options: Options) {
       --multi-instance                  Allow running multiple Explorer instances simultaneously.
       --asset-bundles                   Preview with optimized asset bundles (forwarded as local-ab=true in the deep link; the Desktop Explorer converts the scene's assets itself).
       --no-client                       Suppress every auto-launch (desktop Explorer deeplink, browser open, mobile QR). The file watcher still notifies a desktop Explorer if it connects on its own — useful when an external tool owns the Explorer process.
+      --no-server                       Do not spawn the Multiplayer Server. Use it when another preview of this project already runs one: two servers for the same scene fight over the scene room.
       --mcp                             Enable the MCP server in the Explorer (forwarded as a deep link parameter).
       --mcp-port                        Port for the MCP server in the Explorer (forwarded as a deep link parameter).
 
@@ -135,6 +137,7 @@ export async function main(options: Options) {
   const withDataLayer = options.args['--data-layer']
   const isHub = !!options.args['--hub']
   const skipClient = !!options.args['--no-client']
+  const skipServer = !!options.args['--no-server']
   const bevyWeb = !!options.args['--bevy-web']
   const isMobile = !!options.args['--mobile']
   const explorerAlpha = !bevyWeb
@@ -224,21 +227,9 @@ export async function main(options: Options) {
       }
       await startComponents()
 
-      // Start the multiplayer server if needed (kept outside the components object to avoid lifecycle management)
       const project = workspace.projects[0]
-      if (project) {
-        const realm = `http://localhost:${port}`
-        const multiplayerServer = spawnAuthServer(components, project, realm)
-
-        if (multiplayerServer) {
-          const cleanup = () => {
-            if (!multiplayerServer.killed) {
-              multiplayerServer.kill('SIGTERM')
-            }
-          }
-          components.signaler.programClosed.then(cleanup).catch(() => {})
-        }
-      }
+      const multiplayerServerReady =
+        project && !skipServer ? spawnAuthServer(components, project, `http://localhost:${port}`) : undefined
 
       const networkInterfaces = os.networkInterfaces()
       const availableURLs: string[] = []
@@ -276,6 +267,11 @@ export async function main(options: Options) {
         )
       }
       components.logger.log('\nPress CTRL+C to exit\n')
+
+      const launchesClient = !skipClient && !isMobile && (explorerAlpha || openBrowser)
+      if (multiplayerServerReady && launchesClient) {
+        await waitForServerReady(components, multiplayerServerReady)
+      }
 
       if (explorerAlpha && !isMobile && !skipClient) {
         const realm = new URL(sortedURLs[0]).origin
