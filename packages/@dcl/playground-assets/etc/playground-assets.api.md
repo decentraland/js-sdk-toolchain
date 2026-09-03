@@ -4721,7 +4721,7 @@ export type ReadOnlyGrowOnlyValueSetComponentDefinition<T> = Omit<GrowOnlyValueS
 export type ReadOnlyLastWriteWinElementSetComponentDefinition<T> = Omit<LastWriteWinElementSetComponentDefinition<T>, 'create' | 'createOrReplace' | 'deleteFrom' | 'getMutable' | 'getMutableOrNull' | 'getOrCreateMutable'>;
 
 // @public (undocumented)
-export type ReadonlyPrimitive = number | string | number[] | string[] | boolean | boolean[];
+export type ReadonlyPrimitive = number | string | boolean;
 
 // @public (undocumented)
 export const RealmInfo: LastWriteWinElementSetComponentDefinition<PBRealmInfo>;
