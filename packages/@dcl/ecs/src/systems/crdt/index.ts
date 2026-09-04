@@ -1,4 +1,4 @@
-import { Entity, EntityState } from '../../engine/entity'
+import { Entity, EntityRangeExhaustedError, EntityState } from '../../engine/entity'
 import type { ComponentDefinition } from '../../engine'
 import type { PreEngine } from '../../engine/types'
 import { ReadWriteByteBuffer } from '../../serialization/ByteBuffer'
@@ -50,6 +50,9 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
   const receivedMessages: ReceiveMessage[] = []
   // Messages already processed by the engine but that we need to broadcast to other transports.
   const broadcastMessages: ReceiveMessage[] = []
+  // Latched so a peer flooding unseen network ids cannot also flood the console. Cleared
+  // once an allocation succeeds again, so a later exhaustion is still reported.
+  let reportedEntityExhaustion = false
 
   /**
    *
@@ -142,7 +145,24 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
       let { entityId, network } = findNetworkId(msg)
       // We receive a new Entity. Create the localEntity and map it to the NetworkEntity component
       if (networkUtils.isNetworkMessage(msg) && !network) {
-        entityId = engine.addEntity()
+        // A peer chooses how many distinct pairs it announces, so this allocation is
+        // driven by remote input and can exhaust the range.
+        try {
+          entityId = engine.addEntity()
+          reportedEntityExhaustion = false
+        } catch (err) {
+          if (!(err instanceof EntityRangeExhaustedError)) throw err
+
+          if (!reportedEntityExhaustion) {
+            reportedEntityExhaustion = true
+            console.error(
+              'Ran out of local entities while mapping entities announced over the network. ' +
+                'These entities are ignored until entities are freed and numbers can be recycled.',
+              err
+            )
+          }
+          continue
+        }
         network = { entityId: msg.entityId, networkId: msg.networkId }
         NetworkEntity.createOrReplace(entityId, network)
       }

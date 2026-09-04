@@ -108,6 +108,13 @@ export type IEntityContainer = {
  * read one number; this runs on every inbound CRDT message. `entity & MAX_U16` already lands
  * in [0, 65535], so the `>>> 0` fromEntityId applies is a no-op here.
  */
+/**
+ * Thrown when the entity range is used up and no number can be recycled. Distinguishable
+ * from an allocator bug so callers that handle exhaustion do not also swallow one.
+ * @public
+ */
+export class EntityRangeExhaustedError extends Error {}
+
 function isReservedEntity(entity: Entity, reservedStaticEntities: number): boolean {
   return (entity & MAX_U16) < reservedStaticEntities
 }
@@ -128,7 +135,7 @@ export function createEntityContainer(opts?: { reservedStaticEntities: number })
 
   function generateNewEntity(): Entity {
     if (entityCounter > MAX_ENTITY_NUMBER - 1) {
-      throw new Error(`It fails trying to generate an entity out of range ${MAX_ENTITY_NUMBER}.`)
+      throw new EntityRangeExhaustedError(`It fails trying to generate an entity out of range ${MAX_ENTITY_NUMBER}.`)
     }
 
     const entityNumber = entityCounter++
