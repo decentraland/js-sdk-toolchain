@@ -79,6 +79,14 @@
       "build_failed": "Failed to build the scene: {{error}}",
       "bundle_not_found": "Could not find the bundled scene at {{bundlePath}}",
       "execution_failed": "Failed to execute scene code: {{error}}"
+    },
+    "world_permissions": {
+      "missing_world": "World name is required. Use --world <name>",
+      "missing_address": "At least one address is required. Use --address <wallet>",
+      "invalid_address": "Invalid Ethereum address: {{address}}",
+      "invalid_parcel": "Invalid parcel format: \"{{parcel}}\". Expected \"x,y\" (e.g. \"0,0\")",
+      "fetch_failed": "Failed to fetch world permissions: {{error}}",
+      "grant_failed": "Failed to grant permissions: {{error}}"
     }
   }
 }
