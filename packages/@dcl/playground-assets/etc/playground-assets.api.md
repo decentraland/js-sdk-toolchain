@@ -1237,6 +1237,10 @@ export interface EntityPropTypes extends Listeners {
     uiTransform?: UiTransformProps;
 }
 
+// @public
+export class EntityRangeExhaustedError extends Error {
+}
+
 // @public (undocumented)
 export enum EntityState {
     Removed = 2,
