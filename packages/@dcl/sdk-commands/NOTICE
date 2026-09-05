@@ -1,0 +1,29 @@
+Third-Party Software Notices
+============================
+
+This package includes the following third-party dependencies that carry
+attribution or notice requirements beyond the MIT license.
+
+
+sharp — High performance Node.js image processing
+--------------------------------------------------
+Version: 0.34.x
+License: Apache-2.0
+Copyright (c) 2013 Lovell Fuller and contributors
+https://sharp.pixelplumbing.com
+
+
+libvips — Image processing library (bundled via @img/sharp-libvips-*)
+---------------------------------------------------------------------
+Version: 8.16.x
+License: LGPL-3.0-or-later
+Copyright (c) 1991-2023 The libvips Authors
+https://www.libvips.org
+
+libvips is distributed under the GNU Lesser General Public License v3.0
+or later. The full text of the license is available at:
+https://www.gnu.org/licenses/lgpl-3.0.html
+
+In compliance with LGPL-3.0, libvips is provided as a pre-built shared
+library that can be replaced by the end user. Source code and build
+instructions are available at: https://github.com/libvips/libvips
