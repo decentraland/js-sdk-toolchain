@@ -97,6 +97,20 @@ function getInitialCrdtState(): Uint8Array[] {
 }
 
 /**
+ * Mirrors the `OpenExplorerUiResult` enum of the RestrictedActions API. The explorer exposes
+ * it as a runtime value, but nothing on this side generates one, so the mock spells it out.
+ */
+const OPEN_EXPLORER_UI_RESULT = {
+  UNSPECIFIED: 0,
+  OPENED: 1,
+  WAS_ALREADY_OPEN: 2,
+  REJECTED_NOT_CURRENT_SCENE: 3,
+  REJECTED_FEATURE_DISABLED: 4,
+  REJECTED_NO_USER_GESTURE: 5,
+  UNRECOGNIZED: -1
+} as const
+
+/**
  * Creates pre-defined mocks for critical ~system modules.
  *
  * These modules are runtime-specific and don't exist in Node.js.
@@ -210,7 +224,16 @@ function createCriticalModuleMocks(engine: IEngine, transport: Transport, crdtSt
       openExternalUrl: async () => ({ success: false }),
       openNftDialog: async () => ({ success: false }),
       setCommunicationsAdapter: async () => ({ success: false }),
-      triggerSceneEmote: async () => ({ success: false })
+      triggerSceneEmote: async () => ({ success: false }),
+      copyToClipboard: async () => ({}),
+      stopEmote: async () => ({ success: false }),
+      // The auto-mock proxy answers an unknown property with a function, so an enum read
+      // through it yields `undefined` for every member — and `undefined === undefined`
+      // then makes a verdict comparison pass by accident.
+      OpenExplorerUiResult: OPEN_EXPLORER_UI_RESULT,
+      // There is no explorer UI here at all, which is what this verdict says. Answering
+      // OPENED instead would leave a scene awaiting the panel's close blocked forever.
+      openExplorerUi: async () => ({ openResult: OPEN_EXPLORER_UI_RESULT.REJECTED_FEATURE_DISABLED })
     },
 
     '~system/CommsApi': {
