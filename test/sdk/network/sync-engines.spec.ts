@@ -128,8 +128,8 @@ describe('Network Parenting', () => {
   let entityCache: Entity
   const buffer = new ReadWriteByteBuffer()
   it('should get the engines ready', async () => {
-    componentsA.EngineInfo.create(engineA.RootEntity, { tickNumber: 400, frameNumber: 400, totalRuntime: 1 })
-    componentsB.EngineInfo.create(engineB.RootEntity, { tickNumber: 400, frameNumber: 400, totalRuntime: 1 })
+    componentsA.EngineInfo.create(engineA.RootEntity, { tickNumber: 400, frameNumber: 400, totalRuntime: 1, sceneHidden: false })
+    componentsB.EngineInfo.create(engineB.RootEntity, { tickNumber: 400, frameNumber: 400, totalRuntime: 1, sceneHidden: false })
     // Dance of sync
     await tick()
     await tick()

@@ -8,6 +8,54 @@ import { AuthChain } from '@dcl/crypto'
 
 import { CliComponents } from '../components'
 
+const STRIPPED_REQUEST_HEADERS = new Set([
+  'connection',
+  'content-length',
+  'keep-alive',
+  'proxy-authenticate',
+  'proxy-authorization',
+  'te',
+  'trailer',
+  'transfer-encoding',
+  'upgrade'
+])
+
+export function forwardedHeaders(
+  request: IHttpServerComponent.IRequest,
+  overrides: Record<string, string>
+): Record<string, string> {
+  const overriddenNames = new Set(Object.keys(overrides).map((name) => name.toLowerCase()))
+  const forwarded: Record<string, string> = {}
+
+  for (const [key, value] of request.headers) {
+    const name = key.toLowerCase()
+    if (STRIPPED_REQUEST_HEADERS.has(name) || overriddenNames.has(name)) continue
+    forwarded[name] = value
+  }
+
+  return { ...forwarded, ...overrides }
+}
+
+/**
+ * Builds the headers returned to the linker-dapp client from a proxied fetch response.
+ *
+ * undici transparently decompresses the body but leaves the upstream `content-encoding` and
+ * `content-length` in place; forwarding them would make the client re-decode an already-decoded
+ * body or truncate it at the wrong length, so both are dropped and the framing is recomputed
+ * downstream.
+ */
+export function proxiedResponseHeaders(headers: Headers): Record<string, string> {
+  const result: Record<string, string> = {}
+
+  for (const [key, value] of headers) {
+    const name = key.toLowerCase()
+    if (['content-encoding', 'content-length'].includes(name)) continue
+    result[name] = value
+  }
+
+  return result
+}
+
 /**
  * Set common routes to use on Linker dApp
  * @param components Server components
@@ -23,8 +71,6 @@ export function setRoutes<T extends { [key: string]: any }>(
   const router = new Router()
   const linkerDapp = dirname(require.resolve('@dcl/linker-dapp/package.json'))
 
-  // Dispatcher used by the /auth proxy below to skip TLS verification, mirroring the
-  // previous `new https.Agent({ rejectUnauthorized: false })` behavior with native fetch.
   const insecureDispatcher = new Agent({ connect: { rejectUnauthorized: false } })
 
   router.get(mainRoute, async () => ({
@@ -48,46 +94,29 @@ export function setRoutes<T extends { [key: string]: any }>(
     }
   })
 
-  /* This route acts as a proxy to handle the auth flow with the Decentraland auth dApp,
-   * because this latest one validates the communication be on the same domain.
-   */
   router.get('/auth/(.*)', async (ctx): Promise<IHttpServerComponent.IResponse> => {
     try {
       const domain = 'decentraland.org'
       const url = `https://${domain}${ctx.url.pathname}${ctx.url.search}`
 
-      // Forward the incoming request to the Decentraland auth endpoint.
-      const resp = await components.fetch.fetch(url, {
-        method: ctx.request.method, // Ensure the correct method (GET in this case).
-        headers: {
-          ...ctx.request.headers,
-          Host: domain,
-          Referer: url,
-          Origin: url
-        }, // Forward headers for proper proxy behavior.
-        body: ctx.request.body as any, // Forward request body if necessary.
-        duplex: 'half', // Required by native fetch when streaming a request body.
-        dispatcher: insecureDispatcher // Skip TLS verification.
+      const response = await components.fetch.fetch(url, {
+        method: ctx.request.method,
+        headers: forwardedHeaders(ctx.request, {
+          host: domain,
+          referer: url,
+          origin: url
+        }),
+        body: ctx.request.body as any,
+        duplex: 'half',
+        dispatcher: insecureDispatcher
       })
 
-      // undici decompresses the body but leaves content-encoding / content-length in
-      // place; forwarding them would make the client re-decode or truncate the body.
-      // The headers on a fetch() Response are immutable (mutating them throws
-      // `TypeError: immutable`), so build a filtered copy instead of deleting in place.
-      const headers: Record<string, string> = {}
-      for (const [key, value] of resp.headers) {
-        const name = key.toLowerCase()
-        if (name === 'content-encoding' || name === 'content-length') continue
-        headers[key] = value
-      }
+      const responseHeaders = proxiedResponseHeaders(response.headers)
 
-      // Return the proxied response, including body, status, and headers.
-      // `resp.body` is a web ReadableStream; convert it to a Node stream so the
-      // http-server can pipe it (it only handles Node streams / Buffers / strings).
       return {
-        body: resp.body ? Readable.fromWeb(resp.body as any) : undefined,
-        status: resp.status,
-        headers
+        body: response.body ? Readable.fromWeb(response.body as any) : undefined,
+        status: response.status,
+        headers: responseHeaders
       }
     } catch (error) {
       return {

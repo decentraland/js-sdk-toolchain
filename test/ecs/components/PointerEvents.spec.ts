@@ -18,6 +18,7 @@ describe('Generated OnPointerDown ProtoBuf', () => {
             showHighlight: true,
             maxPlayerDistance: 10,
             priority: 1,
+            maxCameraDistance: 12
           },
           interactionType: InteractionType.CURSOR
         }
@@ -35,7 +36,8 @@ describe('Generated OnPointerDown ProtoBuf', () => {
             showFeedback: false,
             showHighlight: false,
             maxPlayerDistance: 7,
-            priority: 2
+            priority: 2,
+            maxCameraDistance: 3
           },
           interactionType: InteractionType.CURSOR
         }

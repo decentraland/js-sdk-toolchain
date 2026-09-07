@@ -42,7 +42,8 @@ export function createVideoEventsSystem(engine: IEngine): VideoEventsSystem {
   function registerVideoEventsEntity(entity: Entity, callback: VideoEventsSystemCallback) {
     // video event component is not added here because the renderer adds it
     // to every entity with a VideoPlayer component
-    entitiesCallbackVideoStateMap.set(entity, { callback: callback })
+    const existing = entitiesCallbackVideoStateMap.get(entity)
+    entitiesCallbackVideoStateMap.set(entity, { callback: callback, lastVideoState: existing?.lastVideoState })
   }
 
   function removeVideoEventsEntity(entity: Entity) {
@@ -54,7 +55,7 @@ export function createVideoEventsSystem(engine: IEngine): VideoEventsSystem {
   }
 
   // @internal
-  engine.addSystem(function EventSystem() {
+  engine.addSystem(function VideoEventSystem() {
     for (const [entity, data] of entitiesCallbackVideoStateMap) {
       const videoPlayer = videoPlayerComponent.getOrNull(entity)
       if (engine.getEntityState(entity) === EntityState.Removed || !videoPlayer) {

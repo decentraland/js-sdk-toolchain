@@ -8,7 +8,7 @@ import { ByteBuffer } from '../serialization/ByteBuffer'
 import { crdtSceneSystem, OnChangeFunction } from '../systems/crdt'
 import { ComponentDefinition } from './component'
 import { createComponentDefinitionFromSchema } from './lww-element-set-component-definition'
-import { Entity, createEntityContainer } from './entity'
+import { Entity, EntityState, EntityUtils, createEntityContainer } from './entity'
 import { ReadonlyComponentSchema } from './readonly'
 import { SystemItem, SystemContainer, SystemFn, SYSTEMS_REGULAR_PRIORITY } from './systems'
 import type {
@@ -28,6 +28,9 @@ export * from './input'
 export * from './readonly'
 export * from './types'
 export { Entity, ByteBuffer, SystemItem, OnChangeFunction }
+
+/** RootEntity 0, PlayerEntity 1, CameraEntity 2 — see the engineInstance fields below. */
+const NAMED_STATIC_ENTITIES = 3
 
 function preEngine(options?: IEngineOptions): PreEngine {
   const entityContainer = options?.entityContainer ?? createEntityContainer()
@@ -49,6 +52,20 @@ function preEngine(options?: IEngineOptions): PreEngine {
     return entity
   }
   function removeEntity(entity: Entity) {
+    // The renderer streams the avatar range and drops the scene's deletes there, so purging
+    // locally is permanent: a one-shot component like PlayerIdentityData is never re-sent, and
+    // the entity is left as a moving Transform with no identity. The three named static
+    // entities are reserved too, but the renderer DOES apply scene deletes on them — that is
+    // how InputModifier.deleteFrom(engine.PlayerEntity) clears an input lock — so they must
+    // still be purged. Asking the container keeps this in step with whether it releases the
+    // id, including for a custom container with a different reserved range.
+    const [entityNumber] = EntityUtils.fromEntityId(entity)
+    const isAvatarEntity =
+      entityNumber >= NAMED_STATIC_ENTITIES && entityContainer.getEntityState(entity) === EntityState.Reserved
+
+    const released = entityContainer.removeEntity(entity)
+    if (isAvatarEntity) return released
+
     for (const [, component] of componentsDefinition) {
       // TODO: hack for the moment.
       // We still need the NetworkEntity to forward this message to the SyncTransport.
@@ -57,7 +74,7 @@ function preEngine(options?: IEngineOptions): PreEngine {
       component.entityDeleted(entity, true)
     }
 
-    return entityContainer.removeEntity(entity)
+    return released
   }
 
   function removeEntityWithChildren(entity: Entity) {
@@ -337,7 +354,12 @@ export function Engine(options?: IEngineOptions): IEngine {
     PlayerEntity: 1 as Entity,
     CameraEntity: 2 as Entity,
 
-    getEntityState: partialEngine.entityContainer.getEntityState,
+    // Delegated, not aliased. A detached `entityContainer.getEntityState` reference binds
+    // `this` to the engine, so a custom IEntityContainer that uses `this` silently reports the
+    // wrong state through the public API while the engine itself, which calls the container
+    // directly, reports the right one. Harmless for the built-in closure-based container, but
+    // removeEntity now classifies through getEntityState, so the two must never diverge.
+    getEntityState: (entity: Entity) => partialEngine.entityContainer.getEntityState(entity),
     addTransport: crdtSystem.addTransport,
 
     entityContainer: partialEngine.entityContainer

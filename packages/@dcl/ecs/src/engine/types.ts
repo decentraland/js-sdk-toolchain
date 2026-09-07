@@ -92,12 +92,19 @@ export interface IEngine {
    * @public
    * Remove all components of an entity
    * @param entity - entity
+   * @returns whether the entity id was released for reuse. Ids in the renderer-reserved range
+   *   are never released, at any version. Components are still purged for
+   *   RootEntity/PlayerEntity/CameraEntity, but not for the avatar range.
    */
-  removeEntity(entity: Entity): void
+  removeEntity(entity: Entity): boolean
 
   /**
    * Remove all components of each entity in the tree made with Transform parenting
    * @param entity - the root entity of the tree
+   *
+   * May complete only partially and does not report it: nodes in the renderer-reserved range
+   * are refused by `removeEntity`, so a reserved node anywhere in the tree survives while its
+   * descendants are removed — leaving its `Transform.parent` pointing at a removed entity.
    */
   removeEntityWithChildren(entity: Entity): void
 

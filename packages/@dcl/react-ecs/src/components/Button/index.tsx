@@ -56,8 +56,13 @@ export function Button(props: UiButtonProps) {
   })
 
   if (!!props.disabled) {
-    if (textProps.color) textProps.color.a /= 2
-    if (uiBackgroundProps && uiBackgroundProps.color) uiBackgroundProps.color.a /= 2
+    // Both objects are shallow copies, so their colors are still the caller's.
+    // Dimming them in place would halve the alpha of whatever the scene holds,
+    // again on every render, until the color it passed in is fully transparent.
+    if (textProps.color) textProps.color = { ...textProps.color, a: textProps.color.a / 2 }
+    if (uiBackgroundProps && uiBackgroundProps.color) {
+      uiBackgroundProps.color = { ...uiBackgroundProps.color, a: uiBackgroundProps.color.a / 2 }
+    }
   }
 
   return (
