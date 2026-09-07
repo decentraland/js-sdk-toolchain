@@ -108,7 +108,9 @@ export function getEntityMapping(
   { entityMapping }: InstanceCompositeOptions
 ): Entity {
   const existingEntity = mappedEntities.get(compositeEntity)
-  if (existingEntity) {
+  // RootEntity is 0, so a mapping onto it is falsy. Testing the value here made
+  // an already-mapped entity look unmapped and allocated a second one.
+  if (existingEntity !== undefined) {
     return existingEntity
   }
 
@@ -160,7 +162,7 @@ export function instanceComposite(
   // First entity that I want to map, the root entity from the composite to the target entity in the engine
   // If there is no `rootEntity` passed, we assign one from `getNextAvailableEntity`
   const compositeRootEntity = rootEntity ?? getCompositeEntity(0)
-  if (rootEntity) {
+  if (rootEntity !== undefined) {
     mappedEntities.set(0 as Entity, rootEntity)
   }
 

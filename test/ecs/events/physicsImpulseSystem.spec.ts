@@ -15,7 +15,12 @@ describe('Physics impulse helper system should', () => {
 
     let tickNumber = 0
     async function tick(dt = 1) {
-      EngineInfo.createOrReplace(engine.RootEntity, { tickNumber: ++tickNumber, frameNumber: tickNumber, totalRuntime: 0 })
+      EngineInfo.createOrReplace(engine.RootEntity, {
+        tickNumber: ++tickNumber,
+        frameNumber: tickNumber,
+        totalRuntime: 0,
+        sceneHidden: false
+      })
       await engine.update(dt)
     }
 
