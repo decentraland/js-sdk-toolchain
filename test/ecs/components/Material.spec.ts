@@ -35,9 +35,9 @@ describe('Generated Material ProtoBuf', () => {
     const newEngine = Engine()
     const Material = components.Material(newEngine)
 
-    testComponentSerialization(
-      Material,
-      createPbrMaterial({
+    testComponentSerialization(Material, {
+      gltf: undefined,
+      ...createPbrMaterial({
         texture: {
           tex: {
             $case: 'avatarTexture',
@@ -63,11 +63,11 @@ describe('Generated Material ProtoBuf', () => {
         bumpTexture: undefined,
         emissiveTexture: undefined
       })
-    )
+    })
 
-    testComponentSerialization(
-      Material,
-      createPbrMaterial({
+    testComponentSerialization(Material, {
+      gltf: undefined,
+      ...createPbrMaterial({
         albedoColor: { r: 0, g: 1, b: 1, a: 1 },
         alphaTest: 1,
         alphaTexture: undefined,
@@ -115,18 +115,18 @@ describe('Generated Material ProtoBuf', () => {
         specularIntensity: 0,
         transparencyMode: MaterialTransparencyMode.MTM_ALPHA_BLEND
       })
-    )
+    })
 
-    testComponentSerialization(
-      Material,
-      createUnlitMaterial({
+    testComponentSerialization(Material, {
+      gltf: undefined,
+      ...createUnlitMaterial({
         castShadows: true,
         diffuseColor: { r: 0, g: 1, b: 1, a: 1 },
         alphaTexture: undefined,
         alphaTest: undefined,
         texture: undefined
       })
-    )
+    })
   })
 
   it('should test all helper cases', () => {

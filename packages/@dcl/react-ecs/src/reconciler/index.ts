@@ -5,7 +5,8 @@ import {
   PointerEventsSystem,
   PointerEventType,
   PBUiInputResult,
-  PBUiDropdownResult
+  PBUiDropdownResult,
+  PBPointerEventsResult
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import Reconciler, { HostConfig } from 'react-reconciler'
@@ -37,7 +38,10 @@ function getPointerEnum(pointerKey: keyof Listeners): PointerEventType {
     onMouseDown: PointerEventType.PET_DOWN,
     onMouseUp: PointerEventType.PET_UP,
     onMouseEnter: PointerEventType.PET_HOVER_ENTER,
-    onMouseLeave: PointerEventType.PET_HOVER_LEAVE
+    onMouseLeave: PointerEventType.PET_HOVER_LEAVE,
+    onMouseDrag: PointerEventType.PET_DRAG,
+    onMouseDragLocked: PointerEventType.PET_DRAG_LOCKED,
+    onMouseDragEnd: PointerEventType.PET_DRAG_END
   }
   return pointers[pointerKey]
 }
@@ -53,7 +57,10 @@ export function createReconciler(
     IEngine,
     'getComponent' | 'addEntity' | 'removeEntity' | 'defineComponentFromSchema' | 'getEntitiesWith'
   >,
-  pointerEvents: PointerEventsSystem
+  pointerEvents: PointerEventsSystem,
+  // When set, every entity this reconciler creates is parented to it -- a UiCanvas on the root
+  // entity then renders the tree to a texture instead of the screen.
+  rootEntity?: Entity
 ) {
   // Store all the entities so when we destroy the UI we can also destroy them
   const entities = new Set<Entity>()
@@ -71,6 +78,7 @@ export function createReconciler(
   const UiInputResult = components.UiInputResult(engine)
   const UiDropdown = components.UiDropdown(engine)
   const UiDropdownResult = components.UiDropdownResult(engine)
+  const Transform = components.Transform(engine)
   const UiInputBinding = components.UiInputBinding(engine)
 
   // Component ID Helper
@@ -85,9 +93,9 @@ export function createReconciler(
     uiInputBinding: UiInputBinding.componentId
   }
 
-  function pointerEventCallback(entity: Entity, pointerEvent: PointerEventType) {
+  function pointerEventCallback(entity: Entity, pointerEvent: PointerEventType, event: PBPointerEventsResult) {
     const callback = clickEvents.get(entity)?.get(pointerEvent)
-    if (callback) callback()
+    if (callback) callback(event)
     return
   }
 
@@ -97,7 +105,18 @@ export function createReconciler(
 
   function upsertListener(
     instance: Instance,
-    update: Changes<keyof Pick<Listeners, 'onMouseDown' | 'onMouseUp' | 'onMouseEnter' | 'onMouseLeave'>>
+    update: Changes<
+      keyof Pick<
+        Listeners,
+        | 'onMouseDown'
+        | 'onMouseUp'
+        | 'onMouseEnter'
+        | 'onMouseLeave'
+        | 'onMouseDrag'
+        | 'onMouseDragLocked'
+        | 'onMouseDragEnd'
+      >
+    >
   ) {
     if (update.type === 'delete' || !update.props) {
       clickEvents.get(instance.entity)?.delete(getPointerEnum(update.component))
@@ -109,6 +128,12 @@ export function createReconciler(
         pointerEvents.removeOnPointerHoverEnter(instance.entity)
       } else if (update.component === 'onMouseLeave') {
         pointerEvents.removeOnPointerHoverLeave(instance.entity)
+      } else if (update.component === 'onMouseDrag') {
+        pointerEvents.removeOnPointerDrag(instance.entity)
+      } else if (update.component === 'onMouseDragLocked') {
+        pointerEvents.removeOnPointerDragLocked(instance.entity)
+      } else if (update.component === 'onMouseDragEnd') {
+        pointerEvents.removeOnPointerDragEnd(instance.entity)
       }
       return
     }
@@ -126,10 +151,16 @@ export function createReconciler(
         update.component === 'onMouseDown'
           ? pointerEvents.onPointerDown
           : update.component === 'onMouseUp'
-          ? pointerEvents.onPointerUp
-          : update.component === 'onMouseEnter'
-          ? pointerEvents.onPointerHoverEnter
-          : update.component === 'onMouseLeave' && pointerEvents.onPointerHoverLeave
+            ? pointerEvents.onPointerUp
+            : update.component === 'onMouseEnter'
+              ? pointerEvents.onPointerHoverEnter
+              : update.component === 'onMouseLeave'
+                ? pointerEvents.onPointerHoverLeave
+                : update.component === 'onMouseDrag'
+                  ? pointerEvents.onPointerDrag
+                  : update.component === 'onMouseDragLocked'
+                    ? pointerEvents.onPointerDragLocked
+                    : update.component === 'onMouseDragEnd' && pointerEvents.onPointerDragEnd
 
       if (pointerEventSystem) {
         pointerEventSystem(
@@ -142,7 +173,7 @@ export function createReconciler(
               showFeedback: true
             }
           },
-          () => pointerEventCallback(instance.entity, pointerEvent)
+          (event) => pointerEventCallback(instance.entity, pointerEvent, event)
         )
       }
     }
@@ -309,6 +340,9 @@ export function createReconciler(
 
     createInstance(type: Type, props: Props): Instance {
       const entity = engine.addEntity()
+      if (rootEntity !== undefined) {
+        Transform.createOrReplace(entity, { parent: rootEntity })
+      }
       entities.add(entity)
       const instance: Instance = {
         entity,

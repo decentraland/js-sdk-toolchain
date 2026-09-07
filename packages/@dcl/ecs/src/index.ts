@@ -29,6 +29,8 @@ import {
   MaterialComponentDefinitionExtended,
   MeshColliderComponentDefinitionExtended,
   MeshRendererComponentDefinitionExtended,
+  AvatarShapeComponentDefinitionExtended,
+  AvatarEquippedDataComponentDefinitionExtended,
   TransformComponentExtended,
   AnimatorComponentDefinitionExtended,
   AudioSourceComponentDefinitionExtended,
@@ -57,6 +59,9 @@ export const AudioStream: AudioStreamComponentDefinitionExtended = /* @__PURE__*
 export const Material: MaterialComponentDefinitionExtended = /* @__PURE__*/ components.Material(engine)
 export const MeshRenderer: MeshRendererComponentDefinitionExtended = /* @__PURE__*/ components.MeshRenderer(engine)
 export const MeshCollider: MeshColliderComponentDefinitionExtended = /* @__PURE__*/ components.MeshCollider(engine)
+export const AvatarShape: AvatarShapeComponentDefinitionExtended = /* @__PURE__*/ components.AvatarShape(engine)
+export const AvatarEquippedData: AvatarEquippedDataComponentDefinitionExtended =
+  /* @__PURE__*/ components.AvatarEquippedData(engine)
 export const Name: NameComponent = components.Name(engine)
 export const Tags: TagsComponentDefinitionExtended = components.Tags(engine)
 export const Tween: TweenComponentDefinitionExtended = /* @__PURE__*/ components.Tween(engine)

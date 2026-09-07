@@ -4,6 +4,11 @@ export type { AudioAnalysisComponentDefinitionExtended, AudioAnalysisView } from
 export type { AudioStreamComponentDefinitionExtended } from './extended/AudioStream'
 export type { MeshRendererComponentDefinitionExtended } from './extended/MeshRenderer'
 export type { MeshColliderComponentDefinitionExtended } from './extended/MeshCollider'
+export type { AvatarShapeComponentDefinitionExtended, AvatarShapeType } from './extended/AvatarShape'
+export type {
+  AvatarEquippedDataComponentDefinitionExtended,
+  AvatarEquippedDataType
+} from './extended/AvatarEquippedData'
 export type {
   TextureHelper,
   MaterialComponentDefinitionExtended,

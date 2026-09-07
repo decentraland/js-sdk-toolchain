@@ -35,6 +35,15 @@ export function getTexture(props: UiBackgroundProps): PBUiBackground['texture'] 
       }
     }
   }
+
+  if (props.videoTexture) {
+    return {
+      tex: {
+        $case: 'videoTexture',
+        videoTexture: parseTexture(props.videoTexture)
+      }
+    }
+  }
   return undefined
 }
 
