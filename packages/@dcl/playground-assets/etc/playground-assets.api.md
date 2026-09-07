@@ -258,6 +258,9 @@ export const AvatarMovement: LastWriteWinElementSetComponentDefinition<PBAvatarM
 // @public (undocumented)
 export const AvatarMovementInfo: LastWriteWinElementSetComponentDefinition<PBAvatarMovementInfo>;
 
+// @public (undocumented)
+export const AvatarNametag: LastWriteWinElementSetComponentDefinition<PBAvatarNametag>;
+
 // Warning: (ae-missing-release-tag) "AvatarShape" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
 // @public (undocumented)
@@ -774,6 +777,7 @@ export const componentDefinitionByName: {
     "core::AvatarModifierArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>>;
     "core::AvatarMovement": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarMovement>>;
     "core::AvatarMovementInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarMovementInfo>>;
+    "core::AvatarNametag": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarNametag>>;
     "core::AvatarShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarShape>>;
     "core::Billboard": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBBillboard>>;
     "core::CameraLayer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraLayer>>;
@@ -2817,6 +2821,22 @@ export namespace PBAvatarMovementInfo {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarMovementInfo;
     // (undocumented)
     export function encode(message: PBAvatarMovementInfo, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAvatarNametag {
+    backgroundColor?: PBColor3 | undefined;
+    borderColor?: PBColor3 | undefined;
+    label: string;
+    labelColor?: PBColor3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBAvatarNametag {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarNametag;
+    // (undocumented)
+    export function encode(message: PBAvatarNametag, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
