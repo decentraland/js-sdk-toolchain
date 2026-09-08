@@ -232,6 +232,9 @@ export const enum AvatarModifierType {
 }
 
 // @public (undocumented)
+export const AvatarNametag: LastWriteWinElementSetComponentDefinition<PBAvatarNametag>;
+
+// @public (undocumented)
 export const AvatarShape: LastWriteWinElementSetComponentDefinition<PBAvatarShape>;
 
 // @public (undocumented)
@@ -729,6 +732,7 @@ export const componentDefinitionByName: {
     "core::AvatarEquippedData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarEquippedData>>;
     "core::AvatarLocomotionSettings": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarLocomotionSettings>>;
     "core::AvatarModifierArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarModifierArea>>;
+    "core::AvatarNametag": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarNametag>>;
     "core::AvatarShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBAvatarShape>>;
     "core::Billboard": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBBillboard>>;
     "core::CameraMode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraMode>>;
@@ -1277,6 +1281,7 @@ export type EventSystemOptions = {
     showHighlight?: boolean;
     maxPlayerDistance?: number;
     priority?: number;
+    maxCameraDistance?: number;
 };
 
 // @public
@@ -2660,6 +2665,22 @@ export namespace PBAvatarModifierArea {
 }
 
 // @public (undocumented)
+export interface PBAvatarNametag {
+    backgroundColor?: PBColor3 | undefined;
+    borderColor?: PBColor3 | undefined;
+    label: string;
+    labelColor?: PBColor3 | undefined;
+}
+
+// @public (undocumented)
+export namespace PBAvatarNametag {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarNametag;
+    // (undocumented)
+    export function encode(message: PBAvatarNametag, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBAvatarShape {
     bodyShape?: string | undefined;
     emotes: string[];
@@ -3493,7 +3514,9 @@ export namespace PBPointerEvents_Entry {
 export interface PBPointerEvents_Info {
     button?: InputAction | undefined;
     hoverText?: string | undefined;
+    maxCameraDistance?: number | undefined;
     maxDistance?: number | undefined;
+    // @deprecated (undocumented)
     maxPlayerDistance?: number | undefined;
     priority?: number | undefined;
     showFeedback?: boolean | undefined;

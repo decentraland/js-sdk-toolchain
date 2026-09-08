@@ -109,6 +109,23 @@ export const b64HashingFunction = (str: string) => {
   const unique = `${str}-${machineId}`
   return 'b64-' + Buffer.from(unique).toString('base64')
 }
+
+// Content-versioned variant for preview file ids: embeds the file's mtime so the id — and any URL
+// or client cache key derived from it — changes whenever the file changes, while staying decodable
+// back to the path. NUL separates the path from the version; file paths cannot contain NUL bytes.
+export const b64ContentVersionedHashingFunction = (str: string, mtimeMs: number) => {
+  const unique = `${str}\u0000${Math.trunc(mtimeMs)}-${machineId}`
+  return 'b64-' + Buffer.from(unique).toString('base64')
+}
+
+// Decodes a `b64-` preview id back to its absolute path, stripping the machineId suffix and, when
+// present, the NUL-separated mtime version segment. Accepts both plain and content-versioned ids.
+export const b64HashDecodingFunction = (hash: string) => {
+  const decoded = Buffer.from(hash.replace(/^b64-/, ''), 'base64').toString('utf8')
+  const withoutMachineId = decoded.slice(0, -(machineId.length + 1))
+  const versionSeparator = withoutMachineId.indexOf('\u0000')
+  return versionSeparator === -1 ? withoutMachineId : withoutMachineId.slice(0, versionSeparator)
+}
 // export const ipfsHashingFunction = async (str: string) => hashV1(Buffer.from(str, 'utf8'))
 
 interface PackageJson {
