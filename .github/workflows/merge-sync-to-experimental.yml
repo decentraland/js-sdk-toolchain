@@ -1,0 +1,146 @@
+name: Merge sync PR into experimental
+
+# The repo allows only squash merges, and squashing the sync PR would drop main's
+# commits and freeze the merge base. This lands it as a real merge commit instead;
+# GitHub closes the sync PR as merged once its commits are reachable from experimental.
+on:
+  workflow_dispatch:
+
+# Shared with sync-main-to-experimental.yml: see the note there.
+concurrency:
+  group: chore-sync-branch
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  # Dispatching CI on experimental once the merge lands; see the Publish step.
+  actions: write
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Merge chore/sync into experimental
+        id: merge
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          git fetch --no-tags --force --prune origin
+
+          if ! git rev-parse --verify --quiet refs/remotes/origin/chore/sync >/dev/null; then
+            echo "::error::chore/sync does not exist on the remote; there is no sync to land."
+            exit 1
+          fi
+
+          if git merge-base --is-ancestor origin/chore/sync origin/experimental; then
+            echo "experimental already contains chore/sync; nothing to merge."
+            # It is fully merged, so a leftover branch is only a failed cleanup.
+            git push origin --delete chore/sync || true
+            # This path cleans up but publishes nothing, so say so: it is also where a
+            # re-run lands after a run whose merge succeeded and whose dispatch failed.
+            echo "::warning::Nothing was merged, so CI was not dispatched. If a previous run merged but failed to publish, run the CI workflow against experimental yourself."
+            exit 0
+          fi
+
+          PR_NUMBER="$(gh pr list --base experimental --head chore/sync --state open --json number --jq '.[0].number // empty')"
+
+          # The sync PR is opened as a draft so it cannot be squashed. Take it out of
+          # draft before the merge lands, so GitHub applies its normal
+          # merged-by-reachability handling to it.
+          if [ -n "$PR_NUMBER" ]; then
+            gh pr ready "$PR_NUMBER" \
+              || echo "::warning::Could not mark PR #$PR_NUMBER ready; it may close as Closed rather than Merged."
+          fi
+
+          MERGE_MESSAGE="chore: sync main to experimental${PR_NUMBER:+ (#$PR_NUMBER)}"
+
+          # experimental requires signed commits, so the merge is created server-side:
+          # GitHub signs what the API authors, while a merge commit made on the runner is
+          # unsigned and its push is rejected. --no-ff is implicit — the API always
+          # records a merge commit.
+          if MERGE_OUT="$(gh api -X POST "repos/$GITHUB_REPOSITORY/merges" \
+                            -f base=experimental \
+                            -f head=chore/sync \
+                            -f commit_message="$MERGE_MESSAGE" 2>&1)"; then
+            echo "Merged chore/sync into experimental."
+          else
+            echo "$MERGE_OUT"
+            case "$MERGE_OUT" in
+              *"Merge conflict"*|*"merge conflict"*)
+                echo "::error::chore/sync does not merge cleanly into experimental. Resolve it on chore/sync, push, and re-run this workflow."
+                exit 1
+                ;;
+              *)
+                echo "::error::The merges API refused to write to experimental. That endpoint honours branch protection, so this usually means the github-actions bot is not allowed to push to experimental. Allow it to bypass the pull-request requirement on that branch (Settings -> Branches -> experimental), or land the merge by hand with a signed commit, since experimental requires one: git checkout experimental && git merge --no-ff -S origin/chore/sync && git push origin experimental (needs commit signing configured locally), then re-run this workflow to publish and clean up."
+                exit 1
+                ;;
+            esac
+          fi
+
+          # Signals the Publish step below. The no-op and merge-failure paths never
+          # reach here, so neither dispatches a pointless build.
+          echo "merged=true" >> "$GITHUB_OUTPUT"
+
+          # A PR closed by a push is not covered by delete_branch_on_merge, so remove the
+          # now fully-merged branch here: the sync job treats an existing chore/sync as a
+          # sync still in flight. Deleting a head branch also closes its PR, so wait for
+          # GitHub to register the merge first — otherwise the PR reads Closed, not Merged.
+          STATE=""
+          if [ -n "$PR_NUMBER" ]; then
+            for _ in $(seq 1 10); do
+              STATE="$(gh pr view "$PR_NUMBER" --json state --jq .state)"
+              [ "$STATE" = "MERGED" ] && break
+              sleep 3
+            done
+            if [ "$STATE" != "MERGED" ]; then
+              echo "::warning::PR #$PR_NUMBER still reads $STATE, so chore/sync is left in place rather than closing the PR unmerged. Re-run this workflow to clean it up."
+              exit 0
+            fi
+          fi
+
+          # Non-fatal: experimental is already merged, so a failed cleanup is not a
+          # failed sync. The no-op path above finishes the job on any later run.
+          git push origin --delete chore/sync \
+            || echo "::warning::Could not delete chore/sync; re-run this workflow to clean it up."
+
+      # The merge above is written with GITHUB_TOKEN, and GitHub does not start
+      # workflows from events that token creates. So the CI run that publishes the
+      # @experimental npm tag never fires on its own — experimental silently keeps
+      # serving whatever the last human-pushed merge published.
+      # A separate step rather than a line in the merge script: that script exits 0
+      # on the "PR did not register as merged" path, which must still publish.
+      - name: Publish experimental
+        if: steps.merge.outputs.merged == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          # GitHub reads the workflow_dispatch trigger from the target ref, and the
+          # merge above may be the push that first puts it on experimental. Retry
+          # while GitHub indexes the ref, rather than failing the whole sync on a race.
+          for attempt in $(seq 1 5); do
+            if gh workflow run ci.yml --ref experimental; then
+              echo "Dispatched CI against experimental; its build job republishes the @experimental npm tag."
+              exit 0
+            fi
+            echo "Dispatch attempt $attempt failed; retrying."
+            sleep 5
+          done
+
+          echo "::error::experimental was merged, but starting CI failed, so the @experimental npm tag is now behind the branch. Recover by running the CI workflow manually against experimental."
+          exit 1
