@@ -135,6 +135,10 @@ export type WaitOptions<C extends readonly AnyChannel[]> = {
   /**
    * Bounds the wait, in milliseconds. No default: panels can legitimately stay open for
    * minutes. On expiry the promise resolves (never rejects) with `$case: 'timedOut'`.
+   *
+   * @remarks Without it, a session ends only on an event. An explorer that opens a panel
+   * and then emits no `closed` — a crash, or a cancellation path that skips it — leaves
+   * the promise pending for the rest of the scene's life.
    */
   timeoutMs?: number
 }
@@ -200,7 +204,7 @@ type Attribution = 'yes' | 'no' | 'ambiguous'
  * (`event` in 1220, `status` in 1221) and of any message added later.
  */
 function caseOf(event: CorrelatedEvent): string | undefined {
-  for (const key in event) {
+  for (const key of Object.keys(event)) {
     const value = (event as unknown as Record<string, unknown>)[key]
     if (value && typeof value === 'object' && typeof (value as { $case?: unknown }).$case === 'string') {
       return (value as { $case: string }).$case

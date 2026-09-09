@@ -125,13 +125,13 @@ describe('openExplorerUiAndWait', () => {
   }
 
   /** Feed a renderer -> scene APPEND_VALUE for the event, then process it. */
-  async function inject<T extends CorrelatedEvent>(ch: Channel<string, T>, event: T) {
+  async function inject<T extends CorrelatedEvent>(ch: Channel<string, T>, event: T, dt = 0) {
     const body = new ReadWriteByteBuffer()
     ch.component.schema.serialize(event, body)
     const message = new ReadWriteByteBuffer()
     AppendValueOperation.write(engine.RootEntity, event.timestamp, ch.component.componentId, body.toBinary(), message)
     transport.onmessage!(message.toBinary())
-    await engine.update(0)
+    await engine.update(dt)
   }
 
   const uiEvent = (
@@ -408,6 +408,35 @@ describe('openExplorerUiAndWait', () => {
         $case: 'timedOut',
         events: [{ channel: 'explorerUi', event: uiEvent(ExplorerUi.EU_SETTINGS, 10, id, 'opened') }]
       })
+      expect(timeoutSystemAbsent()).toBe(true)
+    })
+
+    it('lets the close win over a timeout that expires in the same tick', async () => {
+      opens()
+      const openExplorerUiAndWait = makeHelper()
+
+      const wait = openExplorerUiAndWait({ ui: ExplorerUi.EU_MAP }, { timeoutMs: 1000 })
+      await flush()
+
+      // One update both delivers the close and overshoots the timeout. `update` drains the
+      // incoming messages before it runs any system, so the session is already settled by
+      // the time the timeout system looks at it.
+      await inject(ExplorerUiEvents, uiEvent(ExplorerUi.EU_MAP, 10, mintedId(), 'closed'), 5)
+
+      expect((await wait).$case).toBe('closed')
+      expect(timeoutSystemAbsent()).toBe(true)
+    })
+
+    it('treats a zero timeout as expiring on the next tick, not as no timeout', async () => {
+      opens()
+      const openExplorerUiAndWait = makeHelper()
+
+      const wait = openExplorerUiAndWait({ ui: ExplorerUi.EU_MAP }, { timeoutMs: 0 })
+      await flush()
+
+      await engine.update(0)
+
+      expect((await wait).$case).toBe('timedOut')
       expect(timeoutSystemAbsent()).toBe(true)
     })
 
