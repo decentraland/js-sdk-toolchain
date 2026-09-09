@@ -85,7 +85,10 @@ jobs:
       - name: Discard broken snapshots
         id: snapshot_guard
         run: |
-          set -uo pipefail
+          # -e so a failing checkout/clean stops the run rather than letting the broken
+          # snapshots it was meant to remove reach the commit below. The greps that are
+          # allowed to find nothing are guarded individually.
+          set -euo pipefail
 
           # An ERR! line means the QuickJS eval threw mid-run, so the snapshot captured a
           # truncated scene and would mask real regressions. Keeping the committed
@@ -102,8 +105,19 @@ jobs:
           fi
 
       - name: Commit and push the sync branch
+        env:
+          REGEN_OUTCOME: ${{ steps.regen.outcome }}
         run: |
           set -euo pipefail
+
+          # A regeneration that stopped partway leaves a half-applied protocol bump —
+          # lockfiles rewritten, generated sources not. Drop all of it and keep only the
+          # merge; the PR says the pin and snapshots are stale. Ignored paths such as
+          # node_modules survive: no -x on the clean.
+          if [ "$REGEN_OUTCOME" = "failure" ]; then
+            git checkout -- .
+            git clean -fdq .
+          fi
 
           git add -A .
           git commit -m "chore: update protocol and snapshots" || echo "Nothing regenerated to commit"

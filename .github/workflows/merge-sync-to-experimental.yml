@@ -85,7 +85,7 @@ jobs:
                 exit 1
                 ;;
               *)
-                echo "::error::The merges API refused to write to experimental. That endpoint honours branch protection, so this usually means the github-actions bot is not allowed to push to experimental. Allow it to bypass the pull-request requirement on that branch (Settings -> Branches -> experimental), or land the merge by hand: git checkout experimental && git merge --no-ff origin/chore/sync && git push origin experimental, then re-run this workflow to publish and clean up."
+                echo "::error::The merges API refused to write to experimental. That endpoint honours branch protection, so this usually means the github-actions bot is not allowed to push to experimental. Allow it to bypass the pull-request requirement on that branch (Settings -> Branches -> experimental), or land the merge by hand with a signed commit, since experimental requires one: git checkout experimental && git merge --no-ff -S origin/chore/sync && git push origin experimental (needs commit signing configured locally), then re-run this workflow to publish and clean up."
                 exit 1
                 ;;
             esac
