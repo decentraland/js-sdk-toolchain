@@ -1,4 +1,8 @@
 on:
+  # An extra entry point; the push trigger below is unchanged. For workflows like
+  # merge-sync-to-experimental.yml, whose merge is written with GITHUB_TOKEN: GitHub
+  # starts no workflow from that token's events, and workflow_dispatch is the exception.
+  workflow_dispatch:
   push:
     branches:
       - main
