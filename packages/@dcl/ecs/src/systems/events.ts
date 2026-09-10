@@ -276,7 +276,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     )
     if (index === -1) return
 
-    pointerEvent.pointerEvents = pointerEvent.pointerEvents.filter((_, current) => current !== index)
+    pointerEvent.pointerEvents.splice(index, 1)
   }
 
   function getPointerEvent(eventType: EventType) {
