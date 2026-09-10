@@ -259,21 +259,41 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
   function removePointerEvent(
     entity: Entity,
     type: PointerEventType,
-    button: InputAction,
+    opts: EventSystemOptions,
     interactionType: InteractionType = InteractionType.CURSOR
   ) {
     const pointerEvent = PointerEvents.getMutableOrNull(entity)
     if (!pointerEvent) return
 
-    // One registration pushed one entry, so drop one. Removing every match
-    // would also take out an entry another registration owns, since onClick and
-    // onPointerDown both describe themselves as PET_DOWN.
-    const index = pointerEvent.pointerEvents.findIndex(
+    type Entry = (typeof pointerEvent.pointerEvents)[number]
+    const sameSlot = (pointer: Entry) => pointer.eventType === type && pointer.interactionType === interactionType
+
+    // onClick and onPointerDown both describe themselves as PET_DOWN, so the event
+    // type and button alone do not say which registration an entry belongs to. Match
+    // everything the entry was built from, or removing one handler can take the
+    // other's descriptor and leave the renderer advertising the wrong interaction.
+    let index = pointerEvent.pointerEvents.findIndex(
       (pointer) =>
-        pointer.eventInfo?.button === button &&
-        pointer.eventType === type &&
-        pointer.interactionType === interactionType
+        sameSlot(pointer) &&
+        pointer.eventInfo?.button === opts.button &&
+        pointer.eventInfo?.hoverText === opts.hoverText &&
+        pointer.eventInfo?.showFeedback === opts.showFeedback &&
+        pointer.eventInfo?.showHighlight === opts.showHighlight &&
+        pointer.eventInfo?.maxDistance === opts.maxDistance &&
+        pointer.eventInfo?.maxPlayerDistance === opts.maxPlayerDistance &&
+        pointer.eventInfo?.priority === opts.priority &&
+        pointer.eventInfo?.maxCameraDistance === opts.maxCameraDistance
     )
+
+    // The entry can come back from the renderer with proto defaults in place of the
+    // undefined fields it was written with, which no exact match survives. Falling
+    // back to the button keeps a stale descriptor from outliving its handler; with
+    // one registration per slot, which is the ordinary case, it is the same entry.
+    if (index === -1) {
+      index = pointerEvent.pointerEvents.findIndex(
+        (pointer) => sameSlot(pointer) && pointer.eventInfo?.button === opts.button
+      )
+    }
     if (index === -1) return
 
     pointerEvent.pointerEvents.splice(index, 1)
@@ -304,7 +324,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     // renderer showing an interaction whose callback was already gone, and made
     // re-registering grow the component by one entry each time.
     if (pointerEvent) {
-      removePointerEvent(entity, getPointerEvent(type), pointerEvent.opts.button, interactionType)
+      removePointerEvent(entity, getPointerEvent(type), pointerEvent.opts, interactionType)
     }
 
     event.delete(key)

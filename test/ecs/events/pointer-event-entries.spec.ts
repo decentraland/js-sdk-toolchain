@@ -142,3 +142,67 @@ describe('when an entity carries both an onClick and an onPointerDown for the sa
     expect(ctx.PointerEvents.get(entity).pointerEvents).toHaveLength(1)
   })
 })
+
+describe('when a click and a pointer down are registered on the same button', () => {
+  let engine: ReturnType<typeof Engine>
+  let PointerEvents: ReturnType<typeof components.PointerEvents>
+  let pointerEvents: PointerEventsSystem
+  let entity: Entity
+
+  const descriptors = () =>
+    (PointerEvents.getOrNull(entity)?.pointerEvents ?? []).map((pointer) => pointer.eventInfo?.hoverText)
+
+  beforeEach(() => {
+    engine = Engine()
+    PointerEvents = components.PointerEvents(engine)
+    pointerEvents = createPointerEventsSystem(engine, createInputSystem(engine))
+    entity = engine.addEntity()
+  })
+
+  describe('and the pointer down was registered first', () => {
+    beforeEach(() => {
+      // Both describe themselves as PET_DOWN on the same button, so only the rest of
+      // the descriptor tells the two entries apart.
+      pointerEvents.onPointerDown({ entity, opts: { button: InputAction.IA_POINTER, hoverText: 'down' } }, () => {})
+      pointerEvents.onClick({ entity, opts: { button: InputAction.IA_POINTER, hoverText: 'click' } }, () => {})
+    })
+
+    it('should leave the pointer down descriptor behind when the click is removed', () => {
+      pointerEvents.removeOnClick(entity)
+
+      expect(descriptors()).toEqual(['down'])
+    })
+
+    it('should leave the click descriptor behind when the pointer down is removed', () => {
+      pointerEvents.removeOnPointerDown(entity)
+
+      expect(descriptors()).toEqual(['click'])
+    })
+  })
+
+  describe('and the click was registered first', () => {
+    beforeEach(() => {
+      pointerEvents.onClick({ entity, opts: { button: InputAction.IA_POINTER, hoverText: 'click' } }, () => {})
+      pointerEvents.onPointerDown({ entity, opts: { button: InputAction.IA_POINTER, hoverText: 'down' } }, () => {})
+    })
+
+    it('should still leave the pointer down descriptor behind when the click is removed', () => {
+      pointerEvents.removeOnClick(entity)
+
+      expect(descriptors()).toEqual(['down'])
+    })
+  })
+
+  describe('and both were registered with identical options', () => {
+    beforeEach(() => {
+      pointerEvents.onPointerDown({ entity, opts: { button: InputAction.IA_POINTER } }, () => {})
+      pointerEvents.onClick({ entity, opts: { button: InputAction.IA_POINTER } }, () => {})
+    })
+
+    it('should drop exactly one entry, since the two are indistinguishable', () => {
+      pointerEvents.removeOnClick(entity)
+
+      expect(PointerEvents.getOrNull(entity)?.pointerEvents.length).toBe(1)
+    })
+  })
+})
