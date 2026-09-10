@@ -98,3 +98,58 @@ describe('FsInterface', () => {
     })
   })
 })
+
+describe('FsInterface editor write tracking', () => {
+  const os = require('os') as typeof import('os')
+  const nodeFs = require('fs') as typeof import('fs')
+  const fs = createFsComponent()
+
+  let project: string
+  beforeEach(() => {
+    project = nodeFs.mkdtempSync(path.join(os.tmpdir(), 'dcl-data-layer-fs-'))
+  })
+  afterEach(() => {
+    nodeFs.rmSync(project, { recursive: true, force: true })
+  })
+
+  test('marks scene data it writes or removes, and the folders it creates, so the notifier can skip them', async () => {
+    const marked: string[] = []
+    const tracker = {
+      markEditorWrite: (p: string) => marked.push(p),
+      markRebuildOutputs: jest.fn(),
+      isEditorWrite: jest.fn()
+    }
+    const fsInterface = createFileSystemInterfaceFromFsComponent({ fs }, project, tracker)
+
+    await fsInterface.writeFile('assets/scene/main.composite', Buffer.from('{}'))
+    await fsInterface.writeFile('assets/models/tree.glb', Buffer.from('glb'))
+    await fsInterface.rm('assets/models/tree.glb')
+    await fsInterface.rmdir('assets/models')
+
+    expect(marked).toEqual([
+      path.join(project, 'assets/scene'),
+      path.join(project, 'assets'),
+      path.join(project, 'assets/scene/main.composite'),
+      path.join(project, 'assets/models'),
+      path.join(project, 'assets/models/tree.glb'),
+      path.join(project, 'assets/models/tree.glb'),
+      path.join(project, 'assets/models')
+    ])
+  })
+
+  test('does not mark scene source it writes: that changes the compiled scene and must hot-reload', async () => {
+    const tracker = { markEditorWrite: jest.fn(), markRebuildOutputs: jest.fn(), isEditorWrite: jest.fn() }
+    const fsInterface = createFileSystemInterfaceFromFsComponent({ fs }, project, tracker)
+
+    await fsInterface.writeFile('src/ui/root.tsx', Buffer.from('export {}'))
+    await fsInterface.rm('src/ui/root.tsx')
+
+    expect(tracker.markEditorWrite).not.toHaveBeenCalled()
+  })
+
+  test('works without a tracker', async () => {
+    const fsInterface = createFileSystemInterfaceFromFsComponent({ fs }, project)
+    await fsInterface.writeFile('assets/scene/main.composite', Buffer.from('{}'))
+    expect(await fsInterface.existFile('assets/scene/main.composite')).toBe(true)
+  })
+})

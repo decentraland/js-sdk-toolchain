@@ -19,6 +19,7 @@ import { getAllComposites, type Script } from './composite'
 import { isEditorScene } from './project-validations'
 import { watch } from 'chokidar'
 import { debounce } from './debounce'
+import { EditorWriteTracker } from './editor-write-tracker'
 
 export type BundleComponents = Pick<CliComponents, 'logger' | 'fs'>
 
@@ -42,6 +43,10 @@ export type CompileOptions = {
 
   ignoreComposite: boolean
   customEntryPoint: boolean
+
+  // watch mode only: lets the rebuild outputs inherit the origin of the change that
+  // triggered them, so an editor autosave does not read as a code change downstream
+  writeTracker?: EditorWriteTracker
 }
 
 const MAX_STEP = 2
@@ -303,7 +308,14 @@ export async function bundleSingleProject(components: BundleComponents, options:
       ignoreInitial: true
     })
 
+    // Every rebuild rewrites main.crdt (via the composite loader) and the bundle. Mark
+    // them BEFORE rebuilding so the notifier's watcher can never see the write first.
+    const rebuildOutputs = [path.resolve(options.outputFile), path.join(options.workingDirectory, 'main.crdt')]
+    let pendingTriggers: string[] = []
     const debouncedRebuild = debounce(async () => {
+      const triggers = pendingTriggers
+      pendingTriggers = []
+      options.writeTracker?.markRebuildOutputs(triggers, rebuildOutputs)
       try {
         await context.rebuild()
         printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
@@ -317,6 +329,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
       // Rebuild for TypeScript, JavaScript, and composite files
       if (/\.(ts|tsx|js|jsx|composite)$/.test(filePath)) {
         printProgressInfo(components.logger, `File ${filePath} changed, rebuilding...`)
+        pendingTriggers.push(path.resolve(options.workingDirectory, filePath))
         debouncedRebuild()
       }
     })

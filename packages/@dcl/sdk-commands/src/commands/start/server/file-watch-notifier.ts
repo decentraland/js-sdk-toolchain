@@ -12,6 +12,7 @@ import {
   UpdateModelType
 } from '@dcl/protocol/out-js/decentraland/sdk/development/local_development.gen'
 import { debounce } from '../../../logic/debounce'
+import { EditorWriteTracker } from '../../../logic/editor-write-tracker'
 
 /**
  * This function gets file modification events and sends them to all the connected
@@ -20,12 +21,20 @@ import { debounce } from '../../../logic/debounce'
 export async function wireFileWatcherToWebSockets(
   components: Pick<PreviewComponents, 'fs' | 'ws' | 'logger'>,
   projectRoot: string,
-  projectKind: ProjectUnion['kind']
+  projectKind: ProjectUnion['kind'],
+  editorWrites?: EditorWriteTracker
 ) {
   const ignored = await getDCLIgnorePatterns(components, projectRoot)
   const sceneId = b64HashingFunction(projectRoot)
 
-  chokidar
+  const notifySceneChanged = debounce((file: string) => {
+    updateScene(sceneId, file)
+    // Legacy JSON protocol: still the only one Bevy and Godot explorers understand.
+    // Remove once both consume the protobuf WsSceneMessage.
+    __LEGACY__updateScene(projectRoot, sceneUpdateClients, projectKind)
+  }, 800)
+
+  return chokidar
     .watch(path.resolve(projectRoot), {
       atomic: false,
       ignored,
@@ -35,15 +44,13 @@ export async function wireFileWatcherToWebSockets(
     .on('unlink', (file: string) => {
       removeModel(sceneId, file)
     })
-    .on(
-      'all',
-      debounce(async (_, file) => {
-        updateScene(sceneId, file)
-        // Legacy JSON protocol: still the only one Bevy and Godot explorers understand.
-        // Remove once both consume the protobuf WsSceneMessage.
-        __LEGACY__updateScene(projectRoot, sceneUpdateClients, projectKind)
-      }, 800)
-    )
+    .on('all', (_, file) => {
+      // A write by the editor's own data layer (`--data-layer` autosave) or the
+      // rebuild it triggered is not a code change: the editor already shows that edit
+      // live, and a SCENE_UPDATE would make it reload the whole scene mid-edit.
+      if (editorWrites?.isEditorWrite(path.resolve(projectRoot, file))) return
+      notifySceneChanged(file)
+    })
 }
 
 function isGLTFModel(file: string) {
