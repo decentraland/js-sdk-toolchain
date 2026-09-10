@@ -206,3 +206,49 @@ describe('when a click and a pointer down are registered on the same button', ()
     })
   })
 })
+
+describe('when two different handlers are registered on one entity and one is removed', () => {
+  /** Every registration the system exposes, with the removal that pairs with it. */
+  const HANDLERS = [
+    ['onClick', 'removeOnClick'],
+    ['onPointerDown', 'removeOnPointerDown'],
+    ['onPointerUp', 'removeOnPointerUp'],
+    ['onPointerHoverEnter', 'removeOnPointerHoverEnter'],
+    ['onPointerHoverLeave', 'removeOnPointerHoverLeave'],
+    ['onProximityDown', 'removeOnProximityDown'],
+    ['onProximityUp', 'removeOnProximityUp'],
+    ['onProximityEnter', 'removeOnProximityEnter'],
+    ['onProximityLeave', 'removeOnProximityLeave']
+  ] as const
+
+  let mismatches: string[]
+
+  beforeEach(() => {
+    mismatches = []
+
+    for (const [kept] of HANDLERS) {
+      for (const [dropped, remove] of HANDLERS) {
+        if (kept === dropped) continue
+
+        const engine = Engine()
+        const PointerEvents = components.PointerEvents(engine)
+        const system = createPointerEventsSystem(engine, createInputSystem(engine)) as any
+        const entity = engine.addEntity()
+
+        // Same button on purpose: the button is what used to be relied on to tell two
+        // registrations apart, and onClick and onPointerDown share a PET_DOWN slot.
+        system[kept]({ entity, opts: { button: InputAction.IA_POINTER, hoverText: kept } }, () => {})
+        system[dropped]({ entity, opts: { button: InputAction.IA_POINTER, hoverText: dropped } }, () => {})
+        system[remove](entity)
+
+        const left = (PointerEvents.getOrNull(entity)?.pointerEvents ?? []).map((p) => p.eventInfo?.hoverText)
+        if (!left.includes(kept)) mismatches.push(`${remove} took ${kept}'s descriptor`)
+        if (left.includes(dropped)) mismatches.push(`${remove} left ${dropped}'s descriptor behind`)
+      }
+    }
+  })
+
+  it('should leave the other handler its descriptor and take only its own', () => {
+    expect(mismatches).toEqual([])
+  })
+})
