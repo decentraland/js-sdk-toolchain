@@ -272,7 +272,7 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     // type and button alone do not say which registration an entry belongs to. Match
     // everything the entry was built from, or removing one handler can take the
     // other's descriptor and leave the renderer advertising the wrong interaction.
-    let index = pointerEvent.pointerEvents.findIndex(
+    const index = pointerEvent.pointerEvents.findIndex(
       (pointer) =>
         sameSlot(pointer) &&
         pointer.eventInfo?.button === opts.button &&
@@ -285,15 +285,6 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
         pointer.eventInfo?.maxCameraDistance === opts.maxCameraDistance
     )
 
-    // The entry can come back from the renderer with proto defaults in place of the
-    // undefined fields it was written with, which no exact match survives. Falling
-    // back to the button keeps a stale descriptor from outliving its handler; with
-    // one registration per slot, which is the ordinary case, it is the same entry.
-    if (index === -1) {
-      index = pointerEvent.pointerEvents.findIndex(
-        (pointer) => sameSlot(pointer) && pointer.eventInfo?.button === opts.button
-      )
-    }
     if (index === -1) return
 
     pointerEvent.pointerEvents.splice(index, 1)
