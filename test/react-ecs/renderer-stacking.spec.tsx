@@ -53,15 +53,28 @@ describe('UI renderer stacking', () => {
     expect(UiTransform.get(roots.get(200)!)).toMatchObject({ parent: CANVAS_ROOT_ENTITY, rightOf: roots.get(100) })
   })
 
-  it('stacks the main renderer where it was registered, not always first', async () => {
+  it('stacks the main renderer first among renderers first rendered in the same tick', async () => {
     const { engine, uiRenderer } = setupEngine()
 
+    // Registered after an additional renderer, but rendered in the same tick: the
+    // main UI still goes at the back, as its entities were always created first.
     uiRenderer.addUiRenderer(engine.addEntity(), () => <UiEntity uiTransform={{ width: 100 }} />, WHOLE_SCREEN)
     uiRenderer.setUiRenderer(() => <UiEntity uiTransform={{ width: 200 }} />, WHOLE_SCREEN)
     uiRenderer.addUiRenderer(engine.addEntity(), () => <UiEntity uiTransform={{ width: 300 }} />, WHOLE_SCREEN)
     await engine.update(1)
 
-    expect(stackingOrder(engine)).toEqual([100, 200, 300])
+    expect(stackingOrder(engine)).toEqual([200, 100, 300])
+  })
+
+  it('stacks the main renderer on top when it first renders in a later tick', async () => {
+    const { engine, uiRenderer } = setupEngine()
+
+    uiRenderer.addUiRenderer(engine.addEntity(), () => <UiEntity uiTransform={{ width: 100 }} />, WHOLE_SCREEN)
+    await engine.update(1)
+    uiRenderer.setUiRenderer(() => <UiEntity uiTransform={{ width: 200 }} />, WHOLE_SCREEN)
+    await engine.update(1)
+
+    expect(stackingOrder(engine)).toEqual([100, 200])
   })
 
   it('stacks the main renderer first when it was registered first', async () => {
@@ -79,6 +92,7 @@ describe('UI renderer stacking', () => {
     const replaced = engine.addEntity()
 
     uiRenderer.addUiRenderer(replaced, () => <UiEntity uiTransform={{ width: 100 }} />, WHOLE_SCREEN)
+    await engine.update(1)
     uiRenderer.setUiRenderer(() => <UiEntity uiTransform={{ width: 200 }} />, WHOLE_SCREEN)
     uiRenderer.addUiRenderer(engine.addEntity(), () => <UiEntity uiTransform={{ width: 300 }} />, WHOLE_SCREEN)
     await engine.update(1)

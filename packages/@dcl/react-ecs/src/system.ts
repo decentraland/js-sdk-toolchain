@@ -51,7 +51,8 @@ export type UiRendererOptions = {
   /**
    * Stacking order of this renderer's UI relative to the other renderers (the main
    * one and every `addUiRenderer`). Higher values render in front. When omitted,
-   * renderers stack in registration order, the last registered one on top.
+   * renderers stack in the order they first render, later ones on top; among those
+   * first rendered in the same tick the main UI goes at the back.
    *
    * It is applied to the renderer's root container entity, so it only orders whole
    * renderers against each other; elements inside a renderer keep their own `zIndex`.
@@ -160,15 +161,16 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
   const renderer = createReconciler(engine, pointerSystem)
   let uiComponent: UiComponent | undefined = undefined
   let mainOptions: UiRendererOptions | undefined = undefined
-  const additionalRenderers = new Map<Entity, { ui: UiComponent; options?: UiRendererOptions; order: number }>()
+  const additionalRenderers = new Map<Entity, { ui: UiComponent; options?: UiRendererOptions; order?: number }>()
 
-  // Renderers are laid out in registration order (later registered on top), which
-  // is what the stacking was before it was explicit. Each renderer gets a sequence
-  // number when first registered and keeps it when replaced; the Map iterates in
-  // insertion order, so it is already sorted by `order` and only the main renderer
-  // has to be slotted in.
+  // Renderers are laid out in the order they first render, later ones on top, with
+  // the main UI first among those first rendered in the same tick. That is the order
+  // their entities were created in before the stacking was explicit, so scenes that
+  // set no zIndex keep the stacking they had. A renderer gets its sequence number the
+  // first time it renders and keeps it when replaced; the Map iterates in insertion
+  // order, so it is already sorted by `order` and only the main UI has to be slotted in.
   let nextOrder = 0
-  let mainOrder = 0
+  let mainOrder: number | undefined = undefined
   const UiCanvasInformation = ecsComponents.UiCanvasInformation(engine)
 
   // Unique owner to prevent other UI systems resetting this scale factor.
@@ -288,6 +290,7 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
 
   function ReactBasedUiSystem() {
     const components: React.ReactNode[] = []
+    if (uiComponent !== undefined && mainOrder === undefined) mainOrder = nextOrder++
     let mainPushed = uiComponent === undefined
 
     const entitiesToRemove: Entity[] = []
@@ -297,14 +300,15 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
         entitiesToRemove.push(entity)
         continue
       }
-      // The main UI goes right before the first renderer registered after it.
-      if (!mainPushed && mainOrder < entry.order) {
+      if (entry.order === undefined) entry.order = nextOrder++
+      // The main UI goes right before the first renderer that rendered after it.
+      if (!mainPushed && mainOrder! < entry.order) {
         components.push(wrapWithScreenInset(uiComponent!, mainOptions, '__main__'))
         mainPushed = true
       }
       components.push(wrapWithScreenInset(entry.ui, entry.options, `__entity_${entity}__`))
     }
-    // Main UI registered last (or alone): it goes on top.
+    // Main UI first rendered after every other renderer (or alone): it goes on top.
     if (!mainPushed) {
       components.push(wrapWithScreenInset(uiComponent!, mainOptions, '__main__'))
     }
@@ -388,15 +392,12 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
       }
     },
     setUiRenderer(ui: UiComponent, options?: UiRendererOptions) {
-      // A replacement keeps its place in the stacking order.
-      if (uiComponent === undefined) mainOrder = nextOrder++
       uiComponent = ui
       mainOptions = options
     },
     addUiRenderer(entity: Entity, ui: UiComponent, options?: UiRendererOptions) {
       // A replacement keeps its place in the stacking order.
-      const order = additionalRenderers.get(entity)?.order ?? nextOrder++
-      additionalRenderers.set(entity, { ui, options, order })
+      additionalRenderers.set(entity, { ui, options, order: additionalRenderers.get(entity)?.order })
     },
     removeUiRenderer(entity: Entity) {
       additionalRenderers.delete(entity)
