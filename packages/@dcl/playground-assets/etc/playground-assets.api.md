@@ -5289,13 +5289,19 @@ export const enum TransitionMode {
 // @public (undocumented)
 export type Transport = {
     send(message: Uint8Array | Uint8Array[]): Promise<void>;
-    onmessage?(message: Uint8Array): void;
+    onmessage?(message: Uint8Array, sender?: TransportSender): void;
     filter(message: Omit<TransportMessage, 'messageBuffer'>): boolean;
     type?: string;
 };
 
 // @public (undocumented)
 export type TransportMessage = Omit<ReceiveMessage, 'data'>;
+
+// @public
+export type TransportSender = {
+    address: string;
+    networkId: number;
+};
 
 // Warning: (ae-missing-release-tag) "TriggerArea" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //

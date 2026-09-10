@@ -23,6 +23,16 @@ export type TransportMessage = Omit<ReceiveMessage, 'data'>
 
 /**
  * @public
+ * Who a transport attests a chunk of messages came from. Transports that cannot
+ * attest to an origin leave it out.
+ */
+export type TransportSender = {
+  address: string
+  networkId: number
+}
+
+/**
+ * @public
  */
 export type Transport = {
   /**
@@ -30,7 +40,11 @@ export type Transport = {
    *  For Renderer & Other transports we send a single Uint8Array
    */
   send(message: Uint8Array | Uint8Array[]): Promise<void>
-  onmessage?(message: Uint8Array): void
+  /**
+   * Network messages name their own owner, so without a `sender` the engine has to
+   * take that name at face value.
+   */
+  onmessage?(message: Uint8Array, sender?: TransportSender): void
   filter(message: Omit<TransportMessage, 'messageBuffer'>): boolean
   type?: string
 }

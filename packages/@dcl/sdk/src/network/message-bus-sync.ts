@@ -4,7 +4,7 @@ import { type SendBinaryRequest, type SendBinaryResponse } from '~system/Communi
 import { syncFilter } from './filter'
 import { engineToCrdt } from './state'
 import { BinaryMessageBus, CommsMessage, decodeString, encodeString } from './binary-message-bus'
-import { fetchProfile } from './utils'
+import { fetchProfile, senderIdentity } from './utils'
 import { entityUtils } from './entities'
 import { GetUserDataRequest, GetUserDataResponse } from '~system/UserIdentity'
 import { definePlayerHelper } from '../players'
@@ -77,6 +77,8 @@ export function addSyncTransport(
     const { sender, data } = decodeCRDTState(value)
     if (sender !== myProfile.userId) return
     DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength / 1024, 'KB')
+    // A join snapshot is one peer relaying the whole scene, every other peer's
+    // entities included, so its contents cannot be attributed to whoever sent it.
     transport.onmessage!(data)
     stateIsSyncronized = true
   })
@@ -91,10 +93,10 @@ export function addSyncTransport(
   })
 
   // Process CRDT messages here
-  binaryMessageBus.on(CommsMessage.CRDT, (value) => {
+  binaryMessageBus.on(CommsMessage.CRDT, (value, sender) => {
     DEBUG_NETWORK_MESSAGES() &&
       console.log(Array.from(serializeCrdtMessages('[NetworkMessage received]:', value, engine)))
-    transport.onmessage!(value)
+    transport.onmessage!(value, senderIdentity(sender))
   })
 
   async function requestState(retryCount: number = 1) {

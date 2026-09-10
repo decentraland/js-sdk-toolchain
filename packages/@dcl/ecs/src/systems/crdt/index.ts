@@ -12,7 +12,7 @@ import { DeleteComponent } from '../../serialization/crdt/deleteComponent'
 import { DeleteEntity } from '../../serialization/crdt/deleteEntity'
 import { PutComponentOperation } from '../../serialization/crdt/putComponent'
 import { CrdtMessageType, CrdtMessageHeader, CrdtMessage } from '../../serialization/crdt/types'
-import { ReceiveMessage, Transport } from './types'
+import { ReceiveMessage, Transport, TransportSender } from './types'
 import { PutNetworkComponentOperation } from '../../serialization/crdt/network/putComponentNetwork'
 import {
   NetworkEntity as defineNetworkEntity,
@@ -24,6 +24,10 @@ import * as networkUtils from '../../serialization/crdt/network/utils'
 
 // NetworkMessages can only have a MAX_SIZE of 12kb. So we need to send it in chunks.
 export const LIVEKIT_MAX_SIZE = 12
+
+// Entities that every client announces under the same id share this networkId, so it
+// names a namespace instead of an owner.
+const SHARED_NETWORK_ID = 0
 
 /**
  * @public
@@ -62,7 +66,7 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
      * Component Operation Messages at messages queue
      * @param chunkMessage A chunk of binary messages
      */
-    return function parseChunkMessage(chunkMessage: Uint8Array) {
+    return function parseChunkMessage(chunkMessage: Uint8Array, sender?: TransportSender) {
       const buffer = new ReadWriteByteBuffer(chunkMessage)
 
       let header: CrdtMessageHeader | null
@@ -89,11 +93,14 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
           buffer.incrementReadOffset(header.length)
         }
         if (message) {
-          receivedMessages.push({
+          const receivedMessage: ReceiveMessage = {
             ...message,
             transportId,
             messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
-          })
+          }
+          if (!sender || senderMayCreate(receivedMessage, sender)) {
+            receivedMessages.push(receivedMessage)
+          }
         }
       }
     }
@@ -128,6 +135,24 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
     }
 
     return { entityId: msg.entityId }
+  }
+
+  /**
+   * Every network message we cannot match to a known entity makes the engine spend
+   * a local entity on the name it carries, and nothing in the message proves the
+   * peer was entitled to spend one. Transports that know who sent a chunk let us
+   * ask, and a peer may only spend from the id space its own networkId names.
+   *
+   * Writing to an entity that already exists stays open to everyone, because that
+   * is what syncEntity is for: whoever placed the door is not the only one allowed
+   * to open it.
+   */
+  function senderMayCreate(msg: ReceiveMessage, sender: TransportSender): boolean {
+    if (!networkUtils.isNetworkMessage(msg) || findNetworkId(msg).network) return true
+
+    // The shared namespace holds the entities every client registers for itself
+    // during main(), so an unknown one is never something to take on faith.
+    return msg.networkId !== SHARED_NETWORK_ID && msg.networkId === sender.networkId
   }
 
   /**

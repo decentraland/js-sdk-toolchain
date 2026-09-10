@@ -1,5 +1,5 @@
 export type { SystemFn, SYSTEMS_REGULAR_PRIORITY } from '../engine/systems'
-export type { TransportMessage, ReceiveMessage, Transport } from '../systems/crdt/types'
+export type { TransportMessage, ReceiveMessage, Transport, TransportSender } from '../systems/crdt/types'
 export { TransformType, TransformComponent } from '../components/manual/Transform'
 export * from '../engine/component'
 export * from '../schemas/typing'
