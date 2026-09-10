@@ -22,6 +22,7 @@ import { wireRouter } from './server/routes'
 import { createWsComponent } from './server/ws'
 import { b64HashingFunction } from '../../logic/project-files'
 import { DataLayer, createDataLayer } from './data-layer/rpc'
+import { createEditorWriteTracker } from '../../logic/editor-write-tracker'
 import { createExitSignalComponent } from '../../components/exit-signal'
 import { getValidWorkspace } from '../../logic/workspace-validations'
 import { printCurrentProjectStarting, printProgressInfo, printWarning } from '../../logic/beautiful-logs'
@@ -140,6 +141,11 @@ export async function main(options: Options) {
 
   const workspace = await getValidWorkspace(options.components, workingDirectory)
 
+  // With a data layer the editor saves through THIS process, so its own autosaves
+  // (and the rebuilds they trigger) can be told apart from IDE edits and kept out of
+  // the hot-reload notifications — otherwise every gizmo drag can reload the scene.
+  const editorWrites = withDataLayer ? createEditorWriteTracker() : undefined
+
   /* istanbul ignore if */
   if (workspace.projects.length > 1)
     printWarning(options.components.logger, 'Support for multiple projects is still experimental.')
@@ -151,7 +157,13 @@ export async function main(options: Options) {
       // first run `npm run build`, this can be disabled with --skip-build
       // then start the embedded compiler, this can be disabled with --no-watch
       if (watch || build) {
-        await buildScene({ ...options, args: { '--dir': project.workingDirectory, '--watch': watch, _: [] } }, project)
+        await buildScene(
+          { ...options, args: { '--dir': project.workingDirectory, '--watch': watch, _: [] } },
+          project,
+          {
+            writeTracker: editorWrites
+          }
+        )
         await startValidations(options.components, project.workingDirectory)
       }
 
@@ -206,7 +218,7 @@ export async function main(options: Options) {
       if (withDataLayer) {
         try {
           const projectWorkingDir = workspace.projects[0]?.workingDirectory || workingDirectory
-          dataLayer = await createDataLayer(components, projectWorkingDir)
+          dataLayer = await createDataLayer(components, projectWorkingDir, editorWrites)
         } catch (e: unknown) {
           components.logger.error(e as Error)
         }
@@ -215,7 +227,7 @@ export async function main(options: Options) {
       await wireRouter(components, workspace, dataLayer)
       if (watch) {
         for (const project of workspace.projects) {
-          await wireFileWatcherToWebSockets(components, project.workingDirectory, project.kind)
+          await wireFileWatcherToWebSockets(components, project.workingDirectory, project.kind, editorWrites)
         }
       }
       await startComponents()

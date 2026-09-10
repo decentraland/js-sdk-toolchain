@@ -4,7 +4,7 @@ import { declareArgs } from '../../logic/args'
 import { installDependencies, needsDependencies, SceneProject, WearableProject } from '../../logic/project-validations'
 import { getBaseCoords } from '../../logic/scene-validations'
 import { b64HashingFunction } from '../../logic/project-files'
-import { bundleProject } from '../../logic/bundle'
+import { bundleProject, CompileOptions } from '../../logic/bundle'
 import { printCurrentProjectStarting } from '../../logic/beautiful-logs'
 import { getValidWorkspace } from '../../logic/workspace-validations'
 import { Result } from 'arg'
@@ -56,7 +56,11 @@ export async function main(options: Options) {
   }
 }
 
-export async function buildScene(options: Options, project: SceneProject | WearableProject) {
+export async function buildScene(
+  options: Options,
+  project: SceneProject | WearableProject,
+  bundleOptions: Pick<CompileOptions, 'writeTracker'> = {}
+) {
   const canInstall = !options.args['--skip-install']
 
   if (canInstall) {
@@ -76,7 +80,8 @@ export async function buildScene(options: Options, project: SceneProject | Weara
       production: !!options.args['--production'],
       emitDeclaration: !!options.args['--emitDeclaration'],
       ignoreComposite: !!options.args['--ignoreComposite'],
-      customEntryPoint: !!options.args['--customEntryPoint']
+      customEntryPoint: !!options.args['--customEntryPoint'],
+      ...bundleOptions
     },
     project.scene
   )

@@ -1,6 +1,7 @@
 import { FileSystemInterface } from '@dcl/inspector'
 import path from 'path'
 import { CliComponents } from '../../../components'
+import { EditorWriteTracker } from '../../../logic/editor-write-tracker'
 
 /**
  * Convert paths to posix stlye
@@ -10,10 +11,25 @@ export function pathToPosix(value: string): string {
   return value.replace(/\\/g, '/')
 }
 
+/**
+ * Source the editor writes (e.g. UI Designer roots under `src/ui/`) changes the compiled
+ * scene, so it must hot-reload exactly like a hand edit. Everything else the data layer
+ * writes (composite, generated entity names, imported assets) is already reflected live.
+ */
+function isSceneSourceFile(projectWorkingDirectory: string, absolutePath: string): boolean {
+  const relative = path.relative(projectWorkingDirectory, absolutePath)
+  return relative === 'src' || relative.startsWith(`src${path.sep}`)
+}
+
 export function createFileSystemInterfaceFromFsComponent(
   { fs }: Pick<CliComponents, 'fs'>,
-  projectWorkingDirectory: string = process.cwd()
+  projectWorkingDirectory: string = process.cwd(),
+  writeTracker?: EditorWriteTracker
 ): FileSystemInterface {
+  const markEditorWrite = (absolutePath: string) => {
+    if (!isSceneSourceFile(projectWorkingDirectory, absolutePath)) writeTracker?.markEditorWrite(absolutePath)
+  }
+
   return {
     dirname(value: string): string {
       return pathToPosix(path.dirname(value))
@@ -35,17 +51,27 @@ export function createFileSystemInterfaceFromFsComponent(
     async writeFile(filePath: string, content: Buffer): Promise<void> {
       const resolvedPath = path.isAbsolute(filePath) ? filePath : path.resolve(projectWorkingDirectory, filePath)
       const folder = path.dirname(resolvedPath)
-      if (!(await fs.directoryExists(folder))) {
+      const missingFolders: string[] = []
+      for (let dir = folder; !(await fs.directoryExists(dir)); dir = path.dirname(dir)) {
+        if (dir === path.dirname(dir)) break
+        missingFolders.push(dir)
+      }
+      if (missingFolders.length > 0) {
+        // the watcher reports each new folder as its own event, so mark them too
+        missingFolders.forEach(markEditorWrite)
         await fs.mkdir(folder, { recursive: true })
       }
+      markEditorWrite(resolvedPath)
       await fs.writeFile(resolvedPath, content as Uint8Array)
     },
     async rm(filePath: string) {
       const resolvedPath = path.isAbsolute(filePath) ? filePath : path.resolve(projectWorkingDirectory, filePath)
+      markEditorWrite(resolvedPath)
       await fs.rm(resolvedPath)
     },
     async rmdir(dirPath: string) {
       const resolvedPath = path.isAbsolute(dirPath) ? dirPath : path.resolve(projectWorkingDirectory, dirPath)
+      markEditorWrite(resolvedPath)
       await fs.rm(resolvedPath, { recursive: true })
     },
     async readdir(dirPath: string): Promise<{ name: string; isDirectory: boolean }[]> {

@@ -4,6 +4,7 @@ import * as codegen from '@dcl/rpc/dist/codegen'
 
 import { CliComponents } from '../../../components'
 import { createFileSystemInterfaceFromFsComponent } from './fs'
+import { EditorWriteTracker } from '../../../logic/editor-write-tracker'
 
 export type DataLayer = {
   rpcServer: RpcServer<DataLayerContext>
@@ -12,9 +13,10 @@ export type DataLayer = {
 
 export async function createDataLayer(
   components: Pick<CliComponents, 'fs' | 'logger'>,
-  workingDirectory: string
+  workingDirectory: string,
+  writeTracker?: EditorWriteTracker
 ): Promise<DataLayer> {
-  const fs = createFileSystemInterfaceFromFsComponent({ fs: components.fs }, workingDirectory)
+  const fs = createFileSystemInterfaceFromFsComponent({ fs: components.fs }, workingDirectory, writeTracker)
   const dataLayerHost = await createDataLayerHost(fs)
   const context: DataLayerContext = {
     fs,
