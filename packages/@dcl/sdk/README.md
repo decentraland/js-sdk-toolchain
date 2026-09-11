@@ -58,8 +58,34 @@ GltfContainer.create(entity, {
 On a client using the synchronization transport, `engine.removeEntity(entity)` requests
 server approval for a synchronized entity and returns `false` while its ID remains in use.
 Its components, local state, and references stay intact until the authoritative server
-accepts the deletion. A rejected request leaves the entity unchanged. Calling
-`removeEntity` again retries the request, including after a lost acceptance response.
+accepts the deletion. A rejected request leaves the entity unchanged. The SDK retries
+unanswered requests every second and stops after ten seconds of engine update time.
+Repeated calls while a request is pending share that attempt. Calling `removeEntity`
+after a rejection or timeout starts a new attempt.
+
+Scenes can optionally observe the outcome without changing how they remove entities:
+
+```ts
+import { engine } from '@dcl/sdk/ecs'
+import { onEntityRemovalResult } from '@dcl/sdk/network'
+
+const unsubscribe = onEntityRemovalResult(({ entity, requestId, status }) => {
+  console.log('Removal attempt', entity, requestId, status)
+})
+
+engine.removeEntity(entity)
+// Call unsubscribe() when the listener is no longer needed.
+```
+
+The listener receives one result per attempt: `accepted` after local removal,
+`rejected` when the server refuses the request, or `timeout` when confirmation does
+not arrive in time. A timeout means the outcome is unknown: an authoritative deletion
+can still arrive later. Results are emitted only for client requests to remove
+synchronized entities. Listener failures are isolated from networking.
+
+Clients and the authoritative server must both use an SDK supporting these request
+and result messages. An older server ignores the new request and the client times out.
+The transport interface and CRDT operation formats are unchanged.
 
 `removeEntityWithChildren` requests approval for each synchronized entity in the tree;
 validators can accept or reject them independently. Unsynchronized entities and entities
@@ -77,6 +103,14 @@ The hook coordinates local removal and is not an authorization boundary. The ser
 still validates peer deletion requests, and the synchronization transport only accepts
 network deletions from the authoritative server. Incoming CRDT deletions bypass these
 handlers, so a local handler cannot veto an authoritative deletion.
+
+Results are accepted only from the authoritative server and matched to the pending
+session, request, and entity identity. Server replay tracking is bounded per peer:
+eight sessions, each retaining a window of 128 request IDs. Older requests cannot
+run validators again, but can still recover an acceptance for an already deleted
+identity. An authoritative deletion also supersedes a cached rejection for that
+identity. Leaving the room clears that peer's tracking; deduplication does not
+provide permanent exactly-once execution across reconnects.
 
 ### Components
 

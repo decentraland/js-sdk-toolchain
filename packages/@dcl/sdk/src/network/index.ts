@@ -27,11 +27,13 @@ const {
   getFirstChild,
   isStateSyncronized,
   binaryMessageBus,
+  onEntityRemovalResult,
   eventBus
 } = addSyncTransport(engine, sendBinary, getUserData, isServerApi, 'network')
 
 // Re-export the room messaging system
 export { registerMessages, getRoom } from './events'
+export type { EntityRemovalResult } from './entity-removal'
 
 export {
   getFirstChild,
@@ -43,5 +45,6 @@ export {
   removeParent,
   isStateSyncronized,
   binaryMessageBus,
+  onEntityRemovalResult,
   eventBus
 }

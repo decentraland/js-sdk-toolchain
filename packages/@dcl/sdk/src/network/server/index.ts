@@ -11,7 +11,10 @@ import {
 import * as components from '@dcl/ecs/dist/components'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { createVersionGSet } from '@dcl/ecs/dist/systems/crdt/gset'
+import { DeleteEntity } from '@dcl/ecs/dist/serialization/crdt/deleteEntity'
+import { DeleteEntityNetwork } from '@dcl/ecs/dist/serialization/crdt/network/deleteEntityNetwork'
 import { CommsMessage } from '../binary-message-bus'
+import { EntityRemovalRequest, EntityRemovalResponse, encodeEntityRemovalResponse } from '../entity-removal-protocol'
 import { chunkCrdtMessages } from '../chunking'
 import * as utils from './utils'
 import { AUTH_SERVER_PEER_ID, DEBUG_NETWORK_MESSAGES } from '../message-bus-sync'
@@ -24,6 +27,14 @@ import {
 } from '@dcl/ecs/dist/engine/component'
 
 export const LIVEKIT_MAX_SIZE = 12
+
+const MAX_REMOVAL_SESSIONS_PER_PEER = 8
+const MAX_REMOVAL_RESULTS_PER_SESSION = 128
+
+type RemovalSession = {
+  highestRequestId: number
+  results: Map<number, EntityRemovalResponse>
+}
 
 export interface ServerValidationConfig {
   engine: IEngine
@@ -39,6 +50,7 @@ export function createServerValidator(config: ServerValidationConfig) {
   const NetworkParent = components.NetworkParent(engine)
   const removedEntities = new Map<number, ReturnType<typeof createVersionGSet>>()
   const removedSharedEntities = new Set<Entity>()
+  const removalSessions = new Map<string, Map<string, RemovalSession>>()
 
   function wasRemoved(message: { networkId: number; entityId: Entity }): boolean {
     if (message.networkId === 0) return removedSharedEntities.has(message.entityId)
@@ -72,7 +84,7 @@ export function createServerValidator(config: ServerValidationConfig) {
     )
   }
 
-  function findExistingNetworkEntity(message: utils.NetworkMessage): Entity | null {
+  function findExistingNetworkEntity(message: { networkId: number; entityId: Entity }): Entity | null {
     // Look for existing network entity mapping (don't create new ones)
     for (const [entityId, networkData] of engine.getEntitiesWith(NetworkEntity)) {
       if (networkData.networkId === message.networkId && networkData.entityId === message.entityId) {
@@ -245,7 +257,103 @@ export function createServerValidator(config: ServerValidationConfig) {
     }
   }
 
+  function sendRemovalResult(response: EntityRemovalResponse, sender: string): void {
+    binaryMessageBus.emit(CommsMessage.ENTITY_REMOVAL_RESULT, encodeEntityRemovalResponse(response), [sender])
+  }
+
+  function processEntityRemovalRequest(request: EntityRemovalRequest, sender: string): Uint8Array {
+    const empty = new Uint8Array()
+    if (!sender || sender === AUTH_SERVER_PEER_ID) return empty
+
+    let sessions = removalSessions.get(sender)
+    if (!sessions) {
+      sessions = new Map()
+      removalSessions.set(sender, sessions)
+    }
+    const sessionKey = `${request.sessionIdHigh}:${request.sessionIdLow}`
+    let session = sessions.get(sessionKey)
+    if (!session) {
+      if (sessions.size >= MAX_REMOVAL_SESSIONS_PER_PEER) {
+        sendRemovalResult({ ...request, status: wasRemoved(request) ? 'accepted' : 'rejected' }, sender)
+        return empty
+      }
+      session = { highestRequestId: -1, results: new Map() }
+      sessions.set(sessionKey, session)
+    }
+
+    const previous = session.results.get(request.requestId)
+    if (previous) {
+      const sameEntity = previous.networkId === request.networkId && previous.entityId === request.entityId
+      const response: EntityRemovalResponse = sameEntity
+        ? { ...previous, status: wasRemoved(request) ? 'accepted' : previous.status }
+        : { ...request, status: 'rejected' }
+      sendRemovalResult(response, sender)
+      return empty
+    }
+    // Unseen IDs may arrive out of order within the window; older IDs cannot be revalidated.
+    if (request.requestId <= session.highestRequestId - MAX_REMOVAL_RESULTS_PER_SESSION) {
+      sendRemovalResult({ ...request, status: wasRemoved(request) ? 'accepted' : 'rejected' }, sender)
+      return empty
+    }
+    session.highestRequestId = Math.max(session.highestRequestId, request.requestId)
+    for (const requestId of session.results.keys()) {
+      if (requestId <= session.highestRequestId - MAX_REMOVAL_RESULTS_PER_SESSION) {
+        session.results.delete(requestId)
+      }
+    }
+
+    let status: EntityRemovalResponse['status'] = 'rejected'
+    let regularBytes = empty
+    let broadcast: utils.NetworkMessage | null = null
+    if (wasRemoved(request)) {
+      status = 'accepted'
+    } else {
+      const entity = findExistingNetworkEntity(request)
+      if (entity !== null) {
+        const regularBuffer = new ReadWriteByteBuffer()
+        DeleteEntity.write(entity, regularBuffer)
+        const regularMessage: utils.RegularMessage = {
+          type: CrdtMessageType.DELETE_ENTITY,
+          entityId: entity,
+          length: regularBuffer.currentWriteOffset(),
+          messageBuffer: regularBuffer.toBinary()
+        }
+        let allowed = false
+        try {
+          allowed = validateMessagePermissions(regularMessage, sender, entity)
+        } catch {
+          allowed = false
+        }
+        if (allowed) {
+          status = 'accepted'
+          markRemoved(request)
+          regularBytes = regularMessage.messageBuffer
+          const networkBuffer = new ReadWriteByteBuffer()
+          DeleteEntityNetwork.write(request.entityId, request.networkId, networkBuffer)
+          broadcast = {
+            type: CrdtMessageType.DELETE_ENTITY_NETWORK,
+            entityId: request.entityId,
+            networkId: request.networkId,
+            length: networkBuffer.getUint32(0),
+            messageBuffer: networkBuffer.toBinary()
+          }
+        }
+      }
+    }
+
+    const response: EntityRemovalResponse = { ...request, status }
+    session.results.set(request.requestId, response)
+    if (broadcast) broadcastBatchedMessages([broadcast], sender)
+    sendRemovalResult(response, sender)
+    return regularBytes
+  }
+
   return {
+    processEntityRemovalRequest,
+    // Replay protection lasts for the peer's room lifetime; reconnects use a new session nonce.
+    forgetPeer: (sender: string): void => {
+      removalSessions.delete(sender)
+    },
     findExistingNetworkEntity,
     // transform Network messages to CRDT Common Messages.
     processClientMessages: function processClientMessages(value: Uint8Array, sender: string, forceCorrections = false) {
