@@ -8,6 +8,7 @@ jest.mock(
   { virtual: true }
 )
 
+import { getActionEvents } from '@dcl/inspector/node_modules/@dcl/asset-packs/dist/events'
 import { runScripts } from '../../../packages/@dcl/sdk-commands/src/logic/runtime-script'
 import { IEngine, Entity, EntityState } from '../../../packages/@dcl/ecs/dist'
 
@@ -270,6 +271,62 @@ describe('runtime-script', () => {
         runScripts(mockEngine, scripts)
 
         expect(constructorSpy).toHaveBeenCalledWith('', entity, 10, 'red')
+      })
+    })
+
+    describe('action params', () => {
+      it('should resolve an unwired optional action param to undefined so guards work', () => {
+        const entity = 512 as Entity
+        const startSpy = jest.fn()
+        // the editor seeds an unassigned ActionCallback as this truthy placeholder
+        const params = { onReachEnd: { type: 'action', value: { entity: 0, action: '' } } }
+
+        ;(mockEngine.getEntityState as jest.Mock).mockReturnValue(EntityState.UsedEntity)
+
+        const scripts = [
+          {
+            entity,
+            path: 'test-script.ts',
+            priority: 0,
+            layout: JSON.stringify({ params }),
+            module: { start: startSpy }
+          }
+        ]
+
+        runScripts(mockEngine, scripts)
+
+        expect(startSpy).toHaveBeenCalledWith('', entity, undefined)
+      })
+
+      it('should resolve a wired action param to a callable that emits the action', () => {
+        const entity = 512 as Entity
+        const targetEntity = 517 as Entity
+        const startSpy = jest.fn()
+        const params = { onReachEnd: { type: 'action', value: { entity: targetEntity, action: 'Play' } } }
+
+        ;(mockEngine.getEntityState as jest.Mock).mockReturnValue(EntityState.UsedEntity)
+
+        const scripts = [
+          {
+            entity,
+            path: 'test-script.ts',
+            priority: 0,
+            layout: JSON.stringify({ params }),
+            module: { start: startSpy }
+          }
+        ]
+
+        runScripts(mockEngine, scripts)
+
+        const [, , onReachEnd] = startSpy.mock.calls[0]
+        expect(typeof onReachEnd).toBe('function')
+
+        const emitSpy = jest.fn()
+        ;(getActionEvents as jest.Mock).mockReturnValue({ emit: emitSpy })
+        onReachEnd()
+
+        expect(getActionEvents).toHaveBeenCalledWith(targetEntity)
+        expect(emitSpy).toHaveBeenCalledWith('Play', {})
       })
     })
 
