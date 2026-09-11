@@ -50,8 +50,10 @@ export function createPhysicsForceHelper(engine: IEngine): PhysicsForceHelper {
       if (!Vector3.equals(current.vector, lastWrittenForceVector)) {
         console.error(
           'PBPhysicsCombinedForce was modified externally.',
-          'Expected:', lastWrittenForceVector,
-          'Found:', current.vector,
+          'Expected:',
+          lastWrittenForceVector,
+          'Found:',
+          current.vector,
           '-- overwriting with local state.'
         )
       }
