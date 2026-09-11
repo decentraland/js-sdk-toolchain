@@ -58,7 +58,13 @@ export function createServerValidator(config: ServerValidationConfig) {
     return null
   }
 
-  function findOrCreateNetworkEntity(message: utils.NetworkMessage, sender: string, isServer: boolean): Entity {
+  // Every peer draws from the same 65k range, so a peer announcing entities faster
+  // than they are freed drains it for everyone. Running out is not an error to raise
+  // per message: it means every later announcement is refused too, so it is said once,
+  // and not from behind a debug flag.
+  let reportedEntityExhaustion = false
+
+  function findOrCreateNetworkEntity(message: utils.NetworkMessage, sender: string, isServer: boolean): Entity | null {
     // Look for existing network entity mapping first
     const existingEntity = findExistingNetworkEntity(message)
 
@@ -66,8 +72,25 @@ export function createServerValidator(config: ServerValidationConfig) {
       return existingEntity
     }
 
-    // Create new entity and network mapping
-    const newEntityId = engine.addEntity()
+    // Create new entity and network mapping. `addEntity` throws only when the range is
+    // drained, which used to escape this function: the server swallowed it in its own
+    // per-message catch, and the client, which has none, rejected engine.update and
+    // took the whole tick with it.
+    let newEntityId: Entity
+    try {
+      newEntityId = engine.addEntity()
+    } catch (error) {
+      if (!reportedEntityExhaustion) {
+        reportedEntityExhaustion = true
+        console.error(
+          'Ran out of entities while mapping entities announced over the network. ' +
+            'These announcements are ignored until entities are freed and their numbers recycled.',
+          error
+        )
+      }
+      return null
+    }
+
     NetworkEntity.createOrReplace(newEntityId, {
       networkId: message.networkId,
       entityId: message.entityId
@@ -227,6 +250,7 @@ export function createServerValidator(config: ServerValidationConfig) {
 
           // Find or create network entity mapping
           const localEntityId = findOrCreateNetworkEntity(networkMessage, sender, false)
+          if (localEntityId === null) continue
 
           // Convert network message to regular message or correction message
           const regularMessage = convertNetworkToRegularMessage(networkMessage, localEntityId, forceCorrections)
@@ -253,6 +277,7 @@ export function createServerValidator(config: ServerValidationConfig) {
             const networkMessage = message as utils.NetworkMessage
             // 1. Find or create network entity mapping
             const localEntityId = findOrCreateNetworkEntity(networkMessage, sender, true)
+            if (localEntityId === null) continue
 
             // 2. Convert network message to regular message and collect for local application
             const regularMessage = convertNetworkToRegularMessage(networkMessage, localEntityId)
