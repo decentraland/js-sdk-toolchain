@@ -79,54 +79,52 @@ export function getElectronNpm(): string | null {
   return null
 }
 
-/**
- * Attempts to find npx-cli.js on disk. Works in both regular Node.js and Electron.
- *
- * Tries three strategies:
- * 1. Derive from process.execPath (standard Node.js installs, nvm, etc.)
- * 2. Look alongside the npm binary found on PATH
- * 3. Look inside Electron's app.asar.unpacked bundled npm (e.g. Creator Hub)
- *
- * Returns the absolute path to npx-cli.js, or null if not found.
- */
-export function findNpxCliJs(): string | null {
-  const execDir = path.dirname(process.execPath)
+type NpxLookup = {
+  execPath?: string
+  pathEnv?: string
+  npmBin?: string
+  resourcesPath?: string
+}
 
-  // Strategy 1: Derive from process.execPath
-  // Unix:    {prefix}/bin/node  -> {prefix}/lib/node_modules/npm/bin/npx-cli.js
-  // Windows: {prefix}/node.exe  -> {prefix}/node_modules/npm/bin/npx-cli.js
-  const execPathCandidates = [
-    path.join(execDir, '..', 'lib', 'node_modules', 'npm', 'bin', 'npx-cli.js'),
-    path.join(execDir, 'node_modules', 'npm', 'bin', 'npx-cli.js')
+function npxCliUnderNodeDir(nodeDir: string): string[] {
+  return [
+    path.join(nodeDir, 'node_modules', 'npm', 'bin', 'npx-cli.js'),
+    path.join(nodeDir, '..', 'lib', 'node_modules', 'npm', 'bin', 'npx-cli.js')
   ]
+}
 
-  for (const candidate of execPathCandidates) {
-    if (fs.existsSync(candidate)) {
-      return candidate
-    }
+function npxCliBesideNpm(npmPath: string): string | null {
+  try {
+    return path.join(path.dirname(fs.realpathSync(npmPath)), 'npx-cli.js')
+  } catch {
+    return null
   }
+}
 
-  // Strategy 2: Find npx-cli.js next to npm on PATH
-  const npmPath =
-    process.env.PATH?.split(path.delimiter)
-      .map((dir) => path.join(dir, npmBin))
-      .find((npm) => fs.existsSync(npm)) || npmBin
+/**
+ * Absolute path to npm's `npx-cli.js`, resolved from the running node, from every npm on PATH
+ * (Windows layout, unix `lib` layout, or an `npm` symlink into the npm package), or from the npm
+ * unpacked next to an Electron host. Null when no npm install is reachable.
+ */
+export function findNpxCliJs({
+  execPath = process.execPath,
+  pathEnv = process.env.PATH ?? '',
+  npmBin: npm = npmBin,
+  resourcesPath = (process as any).resourcesPath as string | undefined
+}: NpxLookup = {}): string | null {
+  const npmPaths = pathEnv
+    .split(path.delimiter)
+    .filter(Boolean)
+    .map((dir) => path.join(dir, npm))
+    .filter((candidate) => fs.existsSync(candidate))
 
-  if (fs.existsSync(npmPath)) {
-    const npxCliJs = path.join(path.dirname(npmPath), 'npx-cli.js')
-    if (fs.existsSync(npxCliJs)) {
-      return npxCliJs
-    }
-  }
-
-  // Strategy 3: Look in Electron's app.asar.unpacked bundled npm
-  const resourcesPath = (process as any).resourcesPath as string | undefined
+  const candidates = [
+    ...npxCliUnderNodeDir(path.dirname(execPath)),
+    ...npmPaths.flatMap((npmPath) => npxCliUnderNodeDir(path.dirname(npmPath))),
+    ...npmPaths.map(npxCliBesideNpm).filter((candidate): candidate is string => !!candidate)
+  ]
   if (resourcesPath) {
-    const npxCliJs = path.join(resourcesPath, 'app.asar.unpacked', 'node_modules', 'npm', 'bin', 'npx-cli.js')
-    if (fs.existsSync(npxCliJs)) {
-      return npxCliJs
-    }
+    candidates.push(path.join(resourcesPath, 'app.asar.unpacked', 'node_modules', 'npm', 'bin', 'npx-cli.js'))
   }
-
-  return null
+  return candidates.find((candidate) => fs.existsSync(candidate)) ?? null
 }

@@ -7,6 +7,11 @@ import {
 } from '../../../../packages/@dcl/sdk-commands/src/commands/start/multiplayer-server'
 
 jest.mock('child_process', () => ({ spawn: jest.fn() }))
+jest.mock('../../../../packages/@dcl/sdk-commands/src/commands/start/utils', () => ({
+  ...jest.requireActual('../../../../packages/@dcl/sdk-commands/src/commands/start/utils'),
+  findNpxCliJs: jest.fn(() => '/node/npx-cli.js')
+}))
+import { findNpxCliJs } from '../../../../packages/@dcl/sdk-commands/src/commands/start/utils'
 
 type FakeChild = EventEmitter & { stdout: PassThrough; stderr: PassThrough; kill: jest.Mock; killed: boolean }
 
@@ -56,6 +61,31 @@ describe('multiplayer-server', () => {
     it('should forward the position to the server process', () => {
       const args: string[] = (spawn as jest.Mock).mock.calls[0][1]
       expect(args).toEqual(expect.arrayContaining(['--realm=http://localhost:8000', '--position=12,-3']))
+    })
+  })
+
+  describe('when npx-cli.js cannot be found on Windows', () => {
+    let platform: PropertyDescriptor
+
+    beforeEach(() => {
+      platform = Object.getOwnPropertyDescriptor(process, 'platform')!
+      Object.defineProperty(process, 'platform', { value: 'win32' })
+      ;(findNpxCliJs as jest.Mock).mockReturnValueOnce(null)
+      startMultiplayerServer(components as any, '/scene', 'http://localhost:8000', 'bevy')
+    })
+
+    afterEach(() => {
+      Object.defineProperty(process, 'platform', platform)
+    })
+
+    it('should run npx through the shell because Windows cannot spawn a .cmd directly', () => {
+      const [bin, , options] = (spawn as jest.Mock).mock.calls[0]
+      expect(bin).toBe('npx')
+      expect(options.shell).toBe(true)
+    })
+
+    it('should warn that npx was not found next to node', () => {
+      expect(logged()).toContain('npx')
     })
   })
 
