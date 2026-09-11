@@ -89,6 +89,32 @@ describe('multiplayer-server', () => {
     })
   })
 
+  describe('when npx-cli.js cannot be found on Windows and an argument carries shell metacharacters', () => {
+    let platform: PropertyDescriptor
+    let previous: string | undefined
+    let start: () => unknown
+
+    beforeEach(() => {
+      platform = Object.getOwnPropertyDescriptor(process, 'platform')!
+      Object.defineProperty(process, 'platform', { value: 'win32' })
+      previous = process.env.DCL_SERVER_PACKAGE
+      process.env.DCL_SERVER_PACKAGE = 'pkg@latest & calc.exe'
+      ;(findNpxCliJs as jest.Mock).mockReturnValueOnce(null)
+      start = () => startMultiplayerServer(components as any, '/scene', 'http://localhost:8000', 'bevy')
+    })
+
+    afterEach(() => {
+      Object.defineProperty(process, 'platform', platform)
+      if (previous === undefined) delete process.env.DCL_SERVER_PACKAGE
+      else process.env.DCL_SERVER_PACKAGE = previous
+    })
+
+    it('should refuse to spawn instead of handing the argument to the shell', () => {
+      expect(start).toThrow(/shell/)
+      expect(spawn).not.toHaveBeenCalled()
+    })
+  })
+
   describe('when the user overrides RUST_LOG', () => {
     let previous: string | undefined
 
