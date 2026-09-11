@@ -20,6 +20,10 @@ npm install @dcl/sdk
 
 ## Quick Start
 
+The recommended way to create a Decentraland scene is the [Creator Hub](https://decentraland.org/download/creator-hub), the official desktop app for creating, previewing, and publishing scenes. It manages this SDK for you and adds a visual editor on top.
+
+From the command line:
+
 1. Create a new scene:
 
 ```bash
@@ -31,6 +35,16 @@ npx @dcl/sdk-commands init
 ```bash
 npm start
 ```
+
+## Using AI coding assistants
+
+If you build scenes with an AI coding assistant (Claude Code, Cursor, GitHub Copilot, and others), install the official [Decentraland SDK Skills](https://github.com/decentraland/sdk-skills) first. They teach your agent verified SDK7 patterns for every topic: scene creation, 3D models, interactivity, UI, multiplayer, deployment, and more.
+
+```bash
+npx skills add decentraland/sdk-skills
+```
+
+See [Vibe Coding with AI](https://docs.decentraland.org/creator/scenes-sdk7/getting-started/vibe-coding) for the full guide.
 
 ## Usage
 
