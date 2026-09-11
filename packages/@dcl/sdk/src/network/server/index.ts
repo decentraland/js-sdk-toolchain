@@ -116,9 +116,22 @@ export function createServerValidator(config: ServerValidationConfig) {
     }
 
     if (message.type === CrdtMessageType.PUT_COMPONENT || message.type === CrdtMessageType.DELETE_COMPONENT) {
-      const component = engine.getComponent(message.componentId) as InternalBaseComponent<unknown>
-      const buf = 'data' in message ? new ReadWriteByteBuffer(message.data) : null
-      const value = buf ? component.schema.deserialize(buf) : null
+      // Both the component id and the payload bytes are chosen by the peer. An id this
+      // engine does not define, or a payload the schema cannot read, used to throw from
+      // here into the caller's catch, which skipped the message silently and without the
+      // correction an invalid message is supposed to send back.
+      const component = engine.getComponentOrNull(message.componentId) as InternalBaseComponent<unknown> | null
+      if (!component) return false
+
+      let value: unknown = null
+      if ('data' in message) {
+        try {
+          value = component.schema.deserialize(new ReadWriteByteBuffer(message.data))
+        } catch {
+          return false
+        }
+      }
+
       const dryRunCRDT = component.__dry_run_updateFromCrdt(message)
       const validCRDT = [
         ProcessMessageResultType.StateUpdatedData,
@@ -257,8 +270,11 @@ export function createServerValidator(config: ServerValidationConfig) {
             // 2. Convert network message to regular message and collect for local application
             const regularMessage = convertNetworkToRegularMessage(networkMessage, localEntityId)
 
-            // 3. Basic permission validation
-            if (!validateMessagePermissions(regularMessage as any, sender, localEntityId)) {
+            // 3. Basic permission validation.
+            // Conversion returns null when the message cannot be read — a payload the
+            // schema rejects, say. Passing that on dereferenced null and threw into the
+            // catch below, which dropped the message without answering the sender.
+            if (!regularMessage || !validateMessagePermissions(regularMessage as any, sender, localEntityId)) {
               // Send correction back to sender with server's authoritative state
               sendCorrectionToSender(networkMessage, sender, localEntityId)
               continue
