@@ -82,20 +82,21 @@ export function addSyncTransport(
    */
   let tick = 0
   const TRANSPORT_INITIALIZED_NUMBER = isTestEnvironment() ? 0 : 2
+  engine.addEntityRemovalHandler((entity) => {
+    if (
+      isServerAtom.getOrNull() === true ||
+      engine.getEntityState(entity) !== EntityState.UsedEntity ||
+      !NetworkEntity.has(entity)
+    ) {
+      return false
+    }
+    pendingEntityRemovals.add(entity)
+    return true
+  })
+
   // Add Sync Transport
   const transport: Transport = {
     filter: syncFilter(engine),
-    requestEntityRemoval(entity) {
-      if (
-        isServerAtom.getOrNull() === true ||
-        engine.getEntityState(entity) !== EntityState.UsedEntity ||
-        !NetworkEntity.has(entity)
-      ) {
-        return false
-      }
-      pendingEntityRemovals.add(entity)
-      return true
-    },
     send: async (messages) => {
       if (tick <= TRANSPORT_INITIALIZED_NUMBER) tick++
       for (const message of tick > TRANSPORT_INITIALIZED_NUMBER ? [messages].flat() : []) {

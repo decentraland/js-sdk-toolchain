@@ -47,6 +47,7 @@ export type PreEngine = Pick<
   IEngine,
   | 'addEntity'
   | 'removeEntity'
+  | 'addEntityRemovalHandler'
   | 'removeEntityWithChildren'
   | 'addSystem'
   | 'removeSystem'
@@ -95,9 +96,17 @@ export interface IEngine {
    * @returns whether the entity id was released for reuse. Ids in the renderer-reserved range
    *   are never released, at any version. Components are still purged for
    *   RootEntity/PlayerEntity/CameraEntity, but not for the avatar range.
-   *   A transport may defer removal and return false until an authoritative deletion arrives.
+   *   A removal handler may defer removal; this method returns false while the entity remains in use.
    */
   removeEntity(entity: Entity): boolean
+
+  /**
+   * @alpha
+   * Register a handler that returns true to defer local entity removal before any state is cleared.
+   * Handlers run in registration order until one defers. Incoming CRDT deletions bypass them.
+   * @returns a function that unregisters the handler
+   */
+  addEntityRemovalHandler(handler: (entity: Entity) => boolean): () => void
 
   /**
    * Remove all components of each entity in the tree made with Transform parenting

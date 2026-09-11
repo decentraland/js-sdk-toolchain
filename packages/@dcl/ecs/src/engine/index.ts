@@ -32,10 +32,11 @@ export { Entity, ByteBuffer, SystemItem, OnChangeFunction }
 /** RootEntity 0, PlayerEntity 1, CameraEntity 2 — see the engineInstance fields below. */
 const NAMED_STATIC_ENTITIES = 3
 
-function preEngine(options: IEngineOptions | undefined, requestEntityRemoval: (entity: Entity) => boolean): PreEngine {
+function preEngine(options?: IEngineOptions): PreEngine {
   const entityContainer = options?.entityContainer ?? createEntityContainer()
   const componentsDefinition = new Map<number, ComponentDefinition<unknown>>()
   const systems = SystemContainer()
+  const entityRemovalHandlers = new Set<(entity: Entity) => boolean>()
 
   let sealed = false
 
@@ -52,7 +53,9 @@ function preEngine(options: IEngineOptions | undefined, requestEntityRemoval: (e
     return entity
   }
   function removeEntity(entity: Entity) {
-    if (requestEntityRemoval(entity)) return false
+    for (const handler of entityRemovalHandlers) {
+      if (handler(entity)) return false
+    }
 
     // The renderer streams the avatar range and drops the scene's deletes there, so purging
     // locally is permanent: a one-shot component like PlayerIdentityData is never re-sent, and
@@ -84,6 +87,13 @@ function preEngine(options: IEngineOptions | undefined, requestEntityRemoval: (e
       { removeEntity, defineComponentFromSchema, getEntitiesWith, defineComponent },
       entity
     )
+  }
+
+  function addEntityRemovalHandler(handler: (entity: Entity) => boolean): () => void {
+    entityRemovalHandlers.add(handler)
+    return () => {
+      entityRemovalHandlers.delete(handler)
+    }
   }
 
   function registerComponentDefinition(
@@ -273,6 +283,7 @@ function preEngine(options: IEngineOptions | undefined, requestEntityRemoval: (e
 
   return {
     addEntity,
+    addEntityRemovalHandler,
     removeEntity,
     removeEntityWithChildren,
     addSystem,
@@ -300,7 +311,7 @@ function preEngine(options: IEngineOptions | undefined, requestEntityRemoval: (e
  * @deprecated Prevent manual usage prefer "engine" for scene development
  */
 export function Engine(options?: IEngineOptions): IEngine {
-  const partialEngine = preEngine(options, (entity) => crdtSystem.requestEntityRemoval(entity))
+  const partialEngine = preEngine(options)
   const onChangeFunction: OnChangeFunction = (entity, operation, component, componentValue) => {
     if (operation === CrdtMessageType.DELETE_ENTITY) {
       for (const component of partialEngine.componentsIter()) {
@@ -333,6 +344,7 @@ export function Engine(options?: IEngineOptions): IEngine {
   const engineInstance: IEngine = {
     _id: Date.now(),
     addEntity: partialEngine.addEntity,
+    addEntityRemovalHandler: partialEngine.addEntityRemovalHandler,
     removeEntity: partialEngine.removeEntity,
     removeEntityWithChildren: partialEngine.removeEntityWithChildren,
     addSystem: partialEngine.addSystem,

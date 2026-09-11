@@ -259,8 +259,6 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
   }
 
   return {
-    requestEntityRemoval: (entity: Entity): boolean =>
-      transports.some((transport) => transport.requestEntityRemoval?.(entity) === true),
     sendMessages,
     receiveMessages,
     addTransport

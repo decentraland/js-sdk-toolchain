@@ -1490,6 +1490,8 @@ export interface ICreatedByType {
 // @public (undocumented)
 export interface IEngine {
     addEntity(): Entity;
+    // @alpha
+    addEntityRemovalHandler(handler: (entity: Entity) => boolean): () => void;
     addSystem(system: SystemFn, priority?: number, name?: string): void;
     // @alpha (undocumented)
     addTransport(transport: Transport): void;
@@ -5333,7 +5335,6 @@ export type Transport = {
     send(message: Uint8Array | Uint8Array[]): Promise<void>;
     onmessage?(message: Uint8Array): void;
     filter(message: Omit<TransportMessage, 'messageBuffer'>): boolean;
-    requestEntityRemoval?(entity: Entity): boolean;
     type?: string;
     allowReservedEntities?: boolean;
 };

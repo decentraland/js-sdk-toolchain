@@ -5,36 +5,29 @@ import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/B
 import { DeleteEntity } from '../../packages/@dcl/ecs/src/serialization/crdt/deleteEntity'
 import { Transport } from '../../packages/@dcl/ecs/src/systems/crdt/types'
 
-describe('when a transport handles entity removal requests', () => {
+describe('when the engine has an entity removal handler', () => {
   let engine: IEngine
   let entity: Entity
   let Transform: ReturnType<typeof components.Transform>
-  let transport: Transport
-  let requestEntityRemoval: jest.Mock<boolean, [Entity]>
+  let removalHandler: jest.Mock<boolean, [Entity]>
 
   beforeEach(() => {
     engine = Engine()
     entity = engine.addEntity()
     Transform = components.Transform(engine)
     Transform.create(entity, { position: { x: 1, y: 2, z: 3 } })
-    requestEntityRemoval = jest.fn<boolean, [Entity]>().mockReturnValue(true)
-    transport = {
-      type: 'network',
-      filter: () => false,
-      send: jest.fn().mockResolvedValue(undefined),
-      requestEntityRemoval
-    }
+    removalHandler = jest.fn<boolean, [Entity]>().mockReturnValue(true)
   })
 
   afterEach(() => {
     jest.resetAllMocks()
   })
 
-  describe('and the transport defers removal', () => {
+  describe('and the handler defers removal', () => {
     let removed: boolean
 
     beforeEach(async () => {
-      engine.addTransport(transport)
+      engine.addEntityRemovalHandler(removalHandler)
       removed = engine.removeEntity(entity)
       await engine.update(1)
     })
@@ -52,14 +45,21 @@ describe('when a transport handles entity removal requests', () => {
     })
 
     it('should request removal of the original entity', () => {
-      expect(requestEntityRemoval).toHaveBeenCalledWith(entity)
+      expect(removalHandler).toHaveBeenCalledWith(entity)
     })
 
     describe('and the server later sends an accepted deletion', () => {
       let deletion: ReadWriteByteBuffer
+      let transport: Transport
 
       beforeEach(async () => {
-        requestEntityRemoval.mockClear()
+        removalHandler.mockClear()
+        transport = {
+          type: 'network',
+          filter: () => false,
+          send: jest.fn().mockResolvedValue(undefined)
+        }
+        engine.addTransport(transport)
         deletion = new ReadWriteByteBuffer()
         DeleteEntity.write(entity, deletion)
         transport.onmessage!(deletion.toBinary())
@@ -75,17 +75,17 @@ describe('when a transport handles entity removal requests', () => {
       })
 
       it('should not request permission again for the accepted deletion', () => {
-        expect(requestEntityRemoval).not.toHaveBeenCalled()
+        expect(removalHandler).not.toHaveBeenCalled()
       })
     })
   })
 
-  describe('and the transport does not handle the request', () => {
+  describe('and the handler does not defer removal', () => {
     let removed: boolean
 
     beforeEach(async () => {
-      requestEntityRemoval.mockReturnValue(false)
-      engine.addTransport(transport)
+      removalHandler.mockReturnValue(false)
+      engine.addEntityRemovalHandler(removalHandler)
       removed = engine.removeEntity(entity)
       await engine.update(1)
     })
@@ -99,10 +99,8 @@ describe('when a transport handles entity removal requests', () => {
     })
   })
 
-  describe('and the transport has no removal hook', () => {
+  describe('and no removal handler is registered', () => {
     beforeEach(async () => {
-      delete transport.requestEntityRemoval
-      engine.addTransport(transport)
       engine.removeEntity(entity)
       await engine.update(1)
     })
@@ -112,17 +110,17 @@ describe('when a transport handles entity removal requests', () => {
     })
   })
 
-  describe('and the scene captures removeEntity before adding the transport', () => {
+  describe('and the scene captures removeEntity before registering the handler', () => {
     let removeEntity: IEngine['removeEntity']
 
     beforeEach(() => {
       removeEntity = engine.removeEntity
-      engine.addTransport(transport)
+      engine.addEntityRemovalHandler(removalHandler)
       removeEntity(entity)
     })
 
-    it('should honor the newly installed removal hook', () => {
-      expect(requestEntityRemoval).toHaveBeenCalledWith(entity)
+    it('should honor the newly registered removal handler', () => {
+      expect(removalHandler).toHaveBeenCalledWith(entity)
     })
 
     it('should retain the original entity state', () => {
@@ -143,13 +141,13 @@ describe('when a transport handles entity removal requests', () => {
       NetworkEntity.create(child, { networkId: 7, entityId: child })
       NetworkParent.create(child, { networkId: 7, entityId: entity })
       Transform.create(child)
-      engine.addTransport(transport)
+      engine.addEntityRemovalHandler(removalHandler)
       engine.removeEntityWithChildren(entity)
       await engine.update(1)
     })
 
     it('should request removal of the network child', () => {
-      expect(requestEntityRemoval).toHaveBeenCalledWith(child)
+      expect(removalHandler).toHaveBeenCalledWith(child)
     })
 
     it('should retain the network child component', () => {
@@ -166,12 +164,12 @@ describe('when a transport handles entity removal requests', () => {
       NetworkParent = components.NetworkParent(engine)
       NetworkEntity.create(entity, { networkId: 7, entityId: entity })
       NetworkParent.create(entity, { networkId: 7, entityId: entity })
-      engine.addTransport(transport)
+      engine.addEntityRemovalHandler(removalHandler)
       engine.removeEntityWithChildren(entity)
     })
 
     it('should request removal only once', () => {
-      expect(requestEntityRemoval.mock.calls).toEqual([[entity]])
+      expect(removalHandler.mock.calls).toEqual([[entity]])
     })
   })
 
@@ -189,12 +187,12 @@ describe('when a transport handles entity removal requests', () => {
       NetworkParent.create(entity, { networkId: 7, entityId: child })
       NetworkParent.create(child, { networkId: 7, entityId: entity })
       Transform.create(child)
-      engine.addTransport(transport)
+      engine.addEntityRemovalHandler(removalHandler)
       engine.removeEntityWithChildren(entity)
     })
 
     it('should request removal of each entity only once', () => {
-      expect(requestEntityRemoval.mock.calls).toEqual([[entity], [child]])
+      expect(removalHandler.mock.calls).toEqual([[entity], [child]])
     })
   })
 
@@ -204,17 +202,17 @@ describe('when a transport handles entity removal requests', () => {
     beforeEach(async () => {
       child = engine.addEntity()
       Transform.create(child, { parent: entity })
-      engine.addTransport(transport)
+      engine.addEntityRemovalHandler(removalHandler)
       engine.removeEntityWithChildren(entity)
       await engine.update(1)
     })
 
     it('should request removal for the parent', () => {
-      expect(requestEntityRemoval).toHaveBeenCalledWith(entity)
+      expect(removalHandler).toHaveBeenCalledWith(entity)
     })
 
     it('should request removal for the child', () => {
-      expect(requestEntityRemoval).toHaveBeenCalledWith(child)
+      expect(removalHandler).toHaveBeenCalledWith(child)
     })
 
     it('should retain the parent component', () => {
@@ -223,6 +221,77 @@ describe('when a transport handles entity removal requests', () => {
 
     it('should preserve the child relationship while awaiting acceptance', () => {
       expect(Transform.get(child).parent).toBe(entity)
+    })
+  })
+
+  describe('and the scene unregisters the removal handler', () => {
+    let unregister: () => void
+
+    beforeEach(() => {
+      unregister = engine.addEntityRemovalHandler(removalHandler)
+      unregister()
+      unregister()
+      engine.removeEntity(entity)
+    })
+
+    it('should stop invoking the handler', () => {
+      expect(removalHandler).not.toHaveBeenCalled()
+    })
+
+    it('should remove the entity immediately', () => {
+      expect(Transform.has(entity)).toBe(false)
+    })
+  })
+
+  describe('and multiple removal handlers are registered', () => {
+    let otherHandler: jest.Mock<boolean, [Entity]>
+    let unregisterFirst: () => void
+
+    beforeEach(() => {
+      removalHandler.mockReturnValue(false)
+      otherHandler = jest.fn<boolean, [Entity]>().mockReturnValue(true)
+      unregisterFirst = engine.addEntityRemovalHandler(removalHandler)
+      engine.addEntityRemovalHandler(otherHandler)
+    })
+
+    describe('and a later handler defers the removal', () => {
+      beforeEach(() => {
+        engine.removeEntity(entity)
+      })
+
+      it('should consult the later handler after the first allows removal', () => {
+        expect(otherHandler).toHaveBeenCalledWith(entity)
+      })
+
+      it('should preserve the entity if any handler defers removal', () => {
+        expect(Transform.has(entity)).toBe(true)
+      })
+    })
+
+    describe('and the first handler is unregistered', () => {
+      beforeEach(() => {
+        unregisterFirst()
+        engine.removeEntity(entity)
+      })
+
+      it('should continue honoring the remaining handler', () => {
+        expect(otherHandler).toHaveBeenCalledWith(entity)
+      })
+
+      it('should retain the entity while the remaining handler defers removal', () => {
+        expect(Transform.has(entity)).toBe(true)
+      })
+    })
+
+    describe('and all handlers allow local removal', () => {
+      beforeEach(() => {
+        otherHandler.mockReturnValue(false)
+        engine.removeEntity(entity)
+      })
+
+      it('should remove the component immediately', () => {
+        expect(Transform.has(entity)).toBe(false)
+      })
     })
   })
 })
