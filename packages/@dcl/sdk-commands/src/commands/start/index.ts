@@ -21,6 +21,7 @@ import { wireFileWatcherToWebSockets } from './server/file-watch-notifier'
 import { wireRouter } from './server/routes'
 import { createWsComponent } from './server/ws'
 import { b64HashingFunction } from '../../logic/project-files'
+import { lsdRealmKey } from '../../logic/lsd-realm'
 import { DataLayer, createDataLayer } from './data-layer/rpc'
 import { createExitSignalComponent } from '../../components/exit-signal'
 import { getValidWorkspace } from '../../logic/workspace-validations'
@@ -260,9 +261,12 @@ export async function main(options: Options) {
       const sortedURLs = availableURLs.sort((a, _b) => {
         return a.toLowerCase().includes('localhost') || a.includes('127.0.0.1') || a.includes('0.0.0.0') ? -1 : 1
       })
-      const bevyUrl = `https://decentraland.org/bevy-web/?preview=true&realm=${
+      // Zone Pulse test build: the client and the auth server must target the SAME Pulse
+      // instance for presence to flow, so this pairs with the PULSE_SERVER env set on the
+      // server process in multiplayer-server.ts (web speaks WebTransport, hence :7743).
+      const bevyUrl = `https://decentraland.zone/bevy-web/?preview=true&realm=${
         new URL(sortedURLs[0]).origin
-      }&position=${baseCoords.x},${baseCoords.y}`
+      }&position=${baseCoords.x},${baseCoords.y}&pulseServer=pulse-server.decentraland.zone:7743`
       if (bevyWeb) {
         components.logger.log('Available on:\n')
         components.logger.log(`    ${bevyUrl}`)
@@ -271,7 +275,7 @@ export async function main(options: Options) {
           'Chromium-based browsers require permission for websites to reach localhost (Local Network Access).\n' +
             'When the browser asks to access apps on your device, click "Allow".\n' +
             'If the scene never loads and no prompt appears, enable it manually and reload:\n' +
-            '  chrome://settings/content/siteDetails?site=https%3A%2F%2Fdecentraland.org\n' +
+            '  chrome://settings/content/siteDetails?site=https%3A%2F%2Fdecentraland.zone\n' +
             '  → "Apps on device" (Chrome 145+) or "Local network access" (Chrome 142-144) → Allow'
         )
       }
@@ -283,7 +287,10 @@ export async function main(options: Options) {
       }
 
       if (isMobile && !skipClient && lanUrl) {
-        const deepLink = `decentraland://open?preview=${lanUrl}&position=${baseCoords.x},${baseCoords.y}`
+        // Zone Pulse test build: point mobile clients at the same zone Pulse instance and the
+        // same LSD realm key the server derives (see bevyUrl above for the web equivalent).
+        const pulseRealm = encodeURIComponent(lsdRealmKey(workspace.projects[0].workingDirectory))
+        const deepLink = `decentraland://open?preview=${lanUrl}&position=${baseCoords.x},${baseCoords.y}&pulse-realm=${pulseRealm}&pulse-server=pulse-server.decentraland.zone:7777`
         QRCode.toString(deepLink, { type: 'terminal', small: true }, (err, qr) => {
           if (!err) {
             components.logger.log(colors.bold('\nScan to preview on mobile: \n'))
