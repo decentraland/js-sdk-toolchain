@@ -10,6 +10,7 @@ import { setupEcs6Endpoints } from './endpoints'
 import { setupStorageEndpoints } from './storage-service'
 import { setupRealmAndComms } from './realm'
 import { getLanUrl } from '../utils'
+import { lsdRealmKey } from '../../../logic/lsd-realm'
 
 export const sceneUpdateClients = new Set<WebSocket>()
 export async function wireRouter(components: PreviewComponents, workspace: Workspace, dataLayer?: DataLayer) {
@@ -52,7 +53,9 @@ export async function wireRouter(components: PreviewComponents, workspace: Works
     }
 
     const [x, y] = baseParcel.split(',')
-    const deepLink = `decentraland://open?preview=${lanUrl}&position=${x},${y}`
+    // Zone Pulse test build: same zone Pulse endpoint + LSD realm key as the terminal QR
+    const pulseRealm = encodeURIComponent(lsdRealmKey(workspace.projects[0].workingDirectory))
+    const deepLink = `decentraland://open?preview=${lanUrl}&position=${x},${y}&pulse-realm=${pulseRealm}&pulse-server=pulse-server.decentraland.zone:7777`
     const qrDataUrl = await QRCode.toDataURL(deepLink)
 
     return {

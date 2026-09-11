@@ -21,6 +21,7 @@ import { wireFileWatcherToWebSockets } from './server/file-watch-notifier'
 import { wireRouter } from './server/routes'
 import { createWsComponent } from './server/ws'
 import { b64HashingFunction } from '../../logic/project-files'
+import { lsdRealmKey } from '../../logic/lsd-realm'
 import { DataLayer, createDataLayer } from './data-layer/rpc'
 import { createExitSignalComponent } from '../../components/exit-signal'
 import { getValidWorkspace } from '../../logic/workspace-validations'
@@ -286,7 +287,10 @@ export async function main(options: Options) {
       }
 
       if (isMobile && !skipClient && lanUrl) {
-        const deepLink = `decentraland://open?preview=${lanUrl}&position=${baseCoords.x},${baseCoords.y}`
+        // Zone Pulse test build: point mobile clients at the same zone Pulse instance and the
+        // same LSD realm key the server derives (see bevyUrl above for the web equivalent).
+        const pulseRealm = encodeURIComponent(lsdRealmKey(workspace.projects[0].workingDirectory))
+        const deepLink = `decentraland://open?preview=${lanUrl}&position=${baseCoords.x},${baseCoords.y}&pulse-realm=${pulseRealm}&pulse-server=pulse-server.decentraland.zone:7777`
         QRCode.toString(deepLink, { type: 'terminal', small: true }, (err, qr) => {
           if (!err) {
             components.logger.log(colors.bold('\nScan to preview on mobile: \n'))
