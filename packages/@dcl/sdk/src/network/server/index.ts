@@ -112,13 +112,24 @@ export function createServerValidator(config: ServerValidationConfig) {
     }
 
     if (message.type === CrdtMessageType.DELETE_ENTITY) {
-      // TODO: how to handle this case ?
+      const owner = CreatedBy.getOrNull(message.entityId)?.address ?? AUTH_SERVER_PEER_ID
+
+      for (const definition of engine.componentsIter()) {
+        if (!definition.has(message.entityId)) continue
+
+        const component = definition as unknown as InternalBaseComponent<unknown>
+        if (!component.__run_validateBeforeChange(message.entityId, undefined, sender, owner)) {
+          return false
+        }
+      }
+
+      return true
     }
 
     if (message.type === CrdtMessageType.PUT_COMPONENT || message.type === CrdtMessageType.DELETE_COMPONENT) {
       const component = engine.getComponent(message.componentId) as InternalBaseComponent<unknown>
       const buf = 'data' in message ? new ReadWriteByteBuffer(message.data) : null
-      const value = buf ? component.schema.deserialize(buf) : null
+      const value = buf ? component.schema.deserialize(buf) : undefined
       const dryRunCRDT = component.__dry_run_updateFromCrdt(message)
       const validCRDT = [
         ProcessMessageResultType.StateUpdatedData,
