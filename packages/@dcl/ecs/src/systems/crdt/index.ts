@@ -6,9 +6,16 @@ import { AppendValueOperation, CrdtMessageProtocol } from '../../serialization/c
 import { DeleteComponent } from '../../serialization/crdt/deleteComponent'
 import { DeleteEntity } from '../../serialization/crdt/deleteEntity'
 import { PutComponentOperation } from '../../serialization/crdt/putComponent'
-import { AuthoritativePutComponentOperation } from '../../serialization/crdt/authoritativePutComponent'
-import { CrdtMessageType, CrdtMessageHeader, CrdtMessage } from '../../serialization/crdt/types'
+import { readMessage } from '../../serialization/crdt/message'
+import { CrdtMessageType, CrdtMessageHeader } from '../../serialization/crdt/types'
 import { ReceiveMessage, Transport } from './types'
+
+// Handled by the server layer (`@dcl/sdk/network/server`), never by the engine.
+const NETWORK_MESSAGE_TYPES: ReadonlySet<number> = new Set([
+  CrdtMessageType.PUT_COMPONENT_NETWORK,
+  CrdtMessageType.DELETE_COMPONENT_NETWORK,
+  CrdtMessageType.DELETE_ENTITY_NETWORK
+])
 
 /**
  * @public
@@ -50,27 +57,21 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
       let header: CrdtMessageHeader | null
       while ((header = CrdtMessageProtocol.getHeader(buffer))) {
         const offset = buffer.currentReadOffset()
-        let message: CrdtMessage | undefined = undefined
-        if (header.type === CrdtMessageType.DELETE_COMPONENT) {
-          message = DeleteComponent.read(buffer)!
-        } else if (header.type === CrdtMessageType.PUT_COMPONENT) {
-          message = PutComponentOperation.read(buffer)!
-        } else if (header.type === CrdtMessageType.AUTHORITATIVE_PUT_COMPONENT) {
-          message = AuthoritativePutComponentOperation.read(buffer)!
-        } else if (header.type === CrdtMessageType.DELETE_ENTITY) {
-          message = DeleteEntity.read(buffer)!
-        } else if (header.type === CrdtMessageType.APPEND_VALUE) {
-          message = AppendValueOperation.read(buffer)!
-        } else {
-          // Unknown message, we skip it (including NETWORK messages)
-          buffer.incrementReadOffset(header.length)
-        }
+        // Network messages are the server layer's business, so the engine leaves them
+        // unread, exactly as before.
+        const message = NETWORK_MESSAGE_TYPES.has(header.type) ? null : readMessage(buffer)
         if (message) {
           receivedMessages.push({
             ...message,
             transportId,
             messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
           })
+        } else {
+          // A network message, a type this reader does not know, or a frame too short for
+          // the type it claims. Skipping by the declared length keeps the rest of the
+          // chunk readable, and `getHeader` has already checked that the length reaches
+          // past the header.
+          buffer.incrementReadOffset(header.length)
         }
       }
     }
