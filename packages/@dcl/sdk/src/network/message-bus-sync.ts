@@ -128,9 +128,13 @@ export function addSyncTransport(
     }
   })
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, async (data, sender) => {
+    // Anyone in the room can send this. Clearing the in-flight request before knowing
+    // who sent it let an unprivileged peer cancel the retry, so the client stopped
+    // asking and the state never arrived.
+    if (isServerAtom.getOrNull() || sender !== AUTH_SERVER_PEER_ID) return
+
     requestingState = false
     elapsedTimeSinceRequest = 0
-    if (isServerAtom.getOrNull() || sender !== AUTH_SERVER_PEER_ID) return
     DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength / 1024, 'KB')
     if (data.byteLength > 0) {
       transport.onmessage!(serverValidator.processClientMessages(data, sender))
