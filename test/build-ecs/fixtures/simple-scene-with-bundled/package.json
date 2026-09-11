@@ -11,7 +11,8 @@
     "start": "dcl start",
     "build": "sdk-commands build",
     "build-prod": "sdk-commands build --production",
-    "watch": "sdk-commands build --watch"
+    "watch": "sdk-commands build --watch",
+    "server-logs": "sdk-commands sdk-server-logs"
   },
   "devDependencies": {
     "@dcl/ecs": "file:../../../../packages/@dcl/ecs",

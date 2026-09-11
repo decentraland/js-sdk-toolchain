@@ -29,6 +29,7 @@ import { Result } from 'arg'
 import { startValidations } from '../../logic/project-validations'
 import { runExplorerAlpha } from './explorer-alpha'
 import { getLanUrl } from './utils'
+import { spawnAuthServer } from './multiplayer-server'
 
 interface Options {
   args: Result<typeof args>
@@ -175,9 +176,12 @@ export async function main(options: Options) {
       const config = createRecordConfigComponent({
         HTTP_SERVER_PORT: port.toString(),
         HTTP_SERVER_HOST: '0.0.0.0',
+        // the embedded comms server (RoomsComponent/LinearProtocol) logs every
+        // connect/disconnect at DEBUG; LOG_LEVEL=DEBUG in the env re-enables it
+        LOG_LEVEL: 'INFO',
         ...process.env
       })
-      const logs = await createConsoleLogComponent({})
+      const logs = await createConsoleLogComponent({ config })
       const ws = await createWsComponent({ logs })
       const server = await createServerComponent<PreviewComponents>({ config, ws: ws.ws, logs }, { cors: {} })
       const rooms = await createRoomsComponent({
@@ -219,6 +223,22 @@ export async function main(options: Options) {
         }
       }
       await startComponents()
+
+      // Start the multiplayer server if needed (kept outside the components object to avoid lifecycle management)
+      const project = workspace.projects[0]
+      if (project) {
+        const realm = `http://localhost:${port}`
+        const multiplayerServer = spawnAuthServer(components, project, realm)
+
+        if (multiplayerServer) {
+          const cleanup = () => {
+            if (!multiplayerServer.killed) {
+              multiplayerServer.kill('SIGTERM')
+            }
+          }
+          components.signaler.programClosed.then(cleanup).catch(() => {})
+        }
+      }
 
       const networkInterfaces = os.networkInterfaces()
       const availableURLs: string[] = []

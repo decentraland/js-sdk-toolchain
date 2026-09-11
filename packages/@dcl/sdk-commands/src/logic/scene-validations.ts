@@ -11,6 +11,14 @@ import { getPublishableFiles } from './project-files'
 import { printWarning } from './beautiful-logs'
 import { concurrentMap } from './promise-utils'
 
+/**
+ * Extended Scene type that includes the authoritativeMultiplayer flag for
+ * enabling Authoritative Server integration.
+ */
+export type SceneWithMultiplayer = Scene & {
+  authoritativeMultiplayer?: boolean
+}
+
 export interface IFile {
   path: string
   content: Buffer
@@ -125,10 +133,10 @@ export async function getValidSceneJson(
   components: Pick<CliComponents, 'fs' | 'logger'>,
   projectRoot: string,
   opts?: { log?: boolean }
-): Promise<Scene> {
+): Promise<SceneWithMultiplayer> {
   try {
     const sceneJsonRaw = await components.fs.readFile(getSceneFilePath(projectRoot), 'utf8')
-    const sceneJson = JSON.parse(sceneJsonRaw) as Scene
+    const sceneJson = JSON.parse(sceneJsonRaw) as SceneWithMultiplayer
     assertValidScene(components, sceneJson, opts)
     return sceneJson
   } catch (err: any) {

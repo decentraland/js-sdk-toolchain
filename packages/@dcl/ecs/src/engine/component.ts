@@ -1,6 +1,11 @@
 import { ISchema } from '../schemas'
 import { ByteBuffer } from '../serialization/ByteBuffer'
-import { CrdtMessageBody, DeleteComponentMessageBody, PutComponentMessageBody } from '../serialization/crdt'
+import {
+  CrdtMessageBody,
+  DeleteComponentMessageBody,
+  ProcessMessageResultType,
+  PutComponentMessageBody
+} from '../serialization/crdt'
 import { Entity } from './entity'
 import { DeepReadonly, DeepReadonlySet } from './readonly'
 
@@ -38,6 +43,14 @@ export interface BaseComponent<T> {
    * @public
    */
   updateFromCrdt(body: CrdtMessageBody): [null | ConflictResolutionMessage, T | undefined]
+  /**
+   * @internal
+   */
+  __forceUpdateFromCrdt(body: CrdtMessageBody): [null, T | undefined]
+  /**
+   * @internal
+   */
+  __dry_run_updateFromCrdt(body: CrdtMessageBody): ProcessMessageResultType
 
   /**
    * This function returns an iterable with all the CRDT updates that need to be
@@ -104,7 +117,86 @@ export interface BaseComponent<T> {
    * If the value is undefined, the component was deleted.
    */
   onChange(entity: Entity, cb: (value: T | undefined) => void): void
+
+  /**
+   * @public
+   *
+   */
+  validateBeforeChange(entity: Entity, cb: ValidateCallback<T>): void
+  validateBeforeChange(cb: ValidateCallback<T>): void
+  /**
+   * @internal
+   */
+  __run_validateBeforeChange(entity: Entity, newValue: T | undefined, senderAddress: string, createdBy: string): boolean
+
+  /**
+   * Get the CRDT state for an entity (serialized data and timestamp)
+   * @param entity - Entity to get the CRDT state for
+   * @returns Object with serialized data and timestamp, or null if entity doesn't have the component
+   * @public
+   */
+  getCrdtState(entity: Entity): { data: Uint8Array; timestamp: number } | null
 }
+
+/**
+ * Internal component interface that exposes all internal methods for SDK use
+ * This is not exposed to users, only for internal SDK operations
+ */
+export interface InternalBaseComponent<T> extends BaseComponent<T> {
+  // This interface inherits all methods from BaseComponent but makes the internal methods
+  // more accessible for SDK internal use. The main difference is that this interface
+  // is marked as @internal and can be used within the SDK package without exposing
+  // internal methods to end users.
+
+  // All the internal methods are already available through inheritance:
+  // - __forceUpdateFromCrdt
+  // - __dry_run_updateFromCrdt
+  // - __onChangeCallbacks
+  // - __run_validateBeforeChange
+  // - dirtyIterator
+  // - iterator
+
+  /**
+   * @public
+   * Force update component state regardless of timestamp - used for server authoritative messages
+   */
+  __forceUpdateFromCrdt(body: CrdtMessageBody): [null, T | undefined]
+
+  /**
+   * @public
+   * Dry run update to check if a CRDT message would be accepted without actually applying it
+   */
+  __dry_run_updateFromCrdt(body: CrdtMessageBody): ProcessMessageResultType
+
+  /**
+   * @public
+   * Get the iterator to every entity has the component
+   */
+  iterator(): Iterable<[Entity, any]>
+
+  /**
+   * @public
+   */
+  dirtyIterator(): Iterable<Entity>
+
+  /**
+   * @public
+   */
+  __onChangeCallbacks(entity: Entity, value: T): void
+
+  /**
+   * @public
+   */
+  __run_validateBeforeChange(entity: Entity, newValue: T | undefined, senderAddress: string, createdBy: string): boolean
+}
+
+export type ValidateCallback<T> = (value: {
+  entity: Entity // The entity being validated
+  currentValue: T | undefined // Current value of the component (undefined if component doesn't exist)
+  newValue: T | undefined // New value being set (undefined if component is being deleted)
+  senderAddress: string // Peer address/sender of the change
+  createdBy: string // Address of the user who created the change
+}) => boolean
 
 /**
  * @public
@@ -211,6 +303,14 @@ export interface GrowOnlyValueSetComponentDefinition<T> extends BaseComponent<T>
    * @returns
    */
   get(entity: Entity): DeepReadonlySet<T>
+
+  /**
+   * Get the CRDT state for an entity (serialized data and timestamp)
+   * @param entity - Entity to get the CRDT state for
+   * @returns Object with serialized data and timestamp, or null if entity doesn't have the component
+   * @internal
+   */
+  getCrdtState(entity: Entity): { data: Uint8Array; timestamp: number } | null
 }
 
 /**
