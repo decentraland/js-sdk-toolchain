@@ -214,8 +214,6 @@ describe('when reading a component update whose header declares more than its da
     const writer = new ReadWriteByteBuffer()
     PutComponentOperation.write(512 as Entity, 1, 1, data, writer)
     const message = writer.toBinary()
-    // Eight real bytes of padding, declared as part of the frame, but the announced
-    // data length still covers only the three real data bytes.
     const framed = new Uint8Array(message.byteLength + padding)
     framed.set(message, 0)
     buffer = new ReadWriteByteBuffer(withUint32At(framed, 0, message.byteLength + padding), 0)
@@ -291,11 +289,6 @@ describe('when reading a network entity delete that declares the length released
     let following: Uint8Array
 
     beforeEach(() => {
-      // Only twelve real bytes, exactly what the header declares, and then a whole
-      // entity delete behind it. This is indistinguishable on the wire from a legacy
-      // peer writing sixteen bytes while declaring twelve, so the reader takes the
-      // legacy reading: it consumes sixteen and eats the first four bytes of what
-      // follows. Pinned here so the trade-off is visible rather than surprising.
       const legacyFrame = craftFrame(CrdtMessageType.DELETE_ENTITY_NETWORK, declaredByReleasedSdks)
       const writer = new ReadWriteByteBuffer()
       DeleteEntity.write(777 as Entity, writer)
@@ -315,18 +308,11 @@ describe('when reading a network entity delete that declares the length released
 
     it('should leave the following frame short by those four bytes', () => {
       readMessage(buffer)
-
-      // What is left is the tail of the delete that followed, so it no longer parses
-      // as a message of its own.
       expect(buffer.remainingBytes()).toBe(following.byteLength - 4)
     })
 
     it('should not read anything more out of the chunk', () => {
       readMessage(buffer)
-
-      // The stolen bytes shift the next length field onto what was a type value, always
-      // below the header size, so the reader refuses it rather than resynchronising.
-      // Everything behind the legacy frame is lost, not only the four bytes it took.
       expect(readMessage(buffer)).toBe(null)
     })
   })
@@ -425,8 +411,6 @@ describe('when a transport delivers an over-declared entity delete followed by a
     transport = { send: async () => {}, filter: () => false }
     engine.addTransport(transport)
     entity = 512 as Entity
-
-    // An entity delete whose header claims eight bytes of padding beyond its real frame.
     const padding = 8
     const overDeclared = craftFrame(
       CrdtMessageType.DELETE_ENTITY,
@@ -446,7 +430,6 @@ describe('when a transport delivers an over-declared entity delete followed by a
     )
     const update = new ReadWriteByteBuffer()
     PutComponentOperation.write(entity, 1, Transform.componentId, data.toBinary(), update)
-    // The valid update sits exactly at the over-declared frame's boundary.
     chunk = concat(overDeclared, update.toBinary())
   })
 
@@ -503,9 +486,6 @@ describe('when a transport delivers a legacy-length network delete ahead of vali
     transport = { send: async () => {}, filter: () => false }
     engine.addTransport(transport)
     entity = 512 as Entity
-
-    // A frame declaring the legacy twelve and holding only twelve. The engine never reads
-    // network messages here, so it skips this one by the length it declares.
     const legacyFrame = craftFrame(CrdtMessageType.DELETE_ENTITY_NETWORK, CRDT_MESSAGE_HEADER_LENGTH + 4)
 
     const data = new ReadWriteByteBuffer()
@@ -530,12 +510,6 @@ describe('when a transport delivers a legacy-length network delete ahead of vali
   it('should still apply the valid update behind it', async () => {
     transport.onmessage!(chunk)
     await engine.update(1)
-
-    // This frame really is twelve bytes, so skipping its declared twelve lands on the
-    // message behind it. That does not generalise: DeleteEntityNetwork.write declares
-    // twelve and emits sixteen, and skipping a real one by its declaration lands four
-    // bytes short. The SDK ingress reads network frames rather than skipping them and
-    // handles both — see test/sdk/network/server/malformed-network-frame.spec.ts.
     expect(Transform.getOrNull(entity)).not.toBe(null)
   })
 })
@@ -553,9 +527,6 @@ describe('when a transport delivers a frame that over-declares its length with n
     transport = { send: async () => {}, filter: () => false }
     engine.addTransport(transport)
     entity = 512 as Entity
-
-    // An entity delete that claims eight bytes more than it holds, with a valid update
-    // immediately after rather than the padding the claim implies.
     const lying = new ReadWriteByteBuffer()
     DeleteEntity.write(777 as Entity, lying)
     const lyingBytes = lying.toBinary()
@@ -587,11 +558,6 @@ describe('when a transport delivers a frame that over-declares its length with n
   it('should drop the update the false length overlaps', async () => {
     transport.onmessage!(chunk)
     await engine.update(1)
-
-    // The other side of trusting the declared length. Before this change the reader
-    // advanced by what it had consumed, so it happened to find this update; now it obeys
-    // the header and skips into the middle of it. The reverse case, where the padding the
-    // header claims is really there, is the one that used to desync and now does not.
     expect(Transform.getOrNull(entity)).toBe(null)
   })
 })

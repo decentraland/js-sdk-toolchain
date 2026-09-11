@@ -12,7 +12,6 @@ import { createServerValidator } from '../../../../packages/@dcl/sdk/network/ser
 const NETWORK_ID = 7
 const PEER = 'peer'
 
-/** A frame declaring `length` for `type` and carrying nothing after the header. */
 function headerOnlyFrame(type: CrdtMessageType, length: number): Uint8Array {
   const buf = new ReadWriteByteBuffer()
   buf.writeUint32(length)

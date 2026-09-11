@@ -35,10 +35,7 @@ export type RegularMessage = (
 ) & {
   messageBuffer: Uint8Array
 }
-// The types this parser has always returned. readMessage also understands
-// APPEND_VALUE, which was skipped here before and is still skipped, because
-// chunkCrdtMessages re-emits whatever comes back and would start carrying appends
-// it currently drops.
+// APPEND_VALUE is excluded because chunkCrdtMessages forwards every returned message.
 const HANDLED_MESSAGE_TYPES: ReadonlySet<number> = new Set([
   CrdtMessageType.DELETE_COMPONENT_NETWORK,
   CrdtMessageType.PUT_COMPONENT_NETWORK,
@@ -56,11 +53,6 @@ export function readMessages(data: Uint8Array): (NetworkMessage | RegularMessage
   while ((header = CrdtMessageProtocol.getHeader(buffer))) {
     const offset = buffer.currentReadOffset()
 
-    // This reads straight off a peer's bytes, so a frame is checked against the type it
-    // claims before any reader touches it. readMessage returns null without moving the
-    // cursor when it does not hold, and the frame is skipped by its declared length —
-    // the readers used to be called on faith and ran off the end of the chunk, which
-    // threw out of processClientMessages and took the tick with it.
     const message = HANDLED_MESSAGE_TYPES.has(header.type) ? readMessage(buffer) : null
 
     if (message) {

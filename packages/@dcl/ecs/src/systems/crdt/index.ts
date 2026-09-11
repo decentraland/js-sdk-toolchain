@@ -57,8 +57,6 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
       let header: CrdtMessageHeader | null
       while ((header = CrdtMessageProtocol.getHeader(buffer))) {
         const offset = buffer.currentReadOffset()
-        // Network messages are the server layer's business, so the engine leaves them
-        // unread, exactly as before.
         const message = NETWORK_MESSAGE_TYPES.has(header.type) ? null : readMessage(buffer)
         if (message) {
           receivedMessages.push({
@@ -67,10 +65,6 @@ export function crdtSceneSystem(engine: PreEngine, onProcessEntityComponentChang
             messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
           })
         } else {
-          // A network message, a type this reader does not know, or a frame too short for
-          // the type it claims. Skipping by the declared length keeps the rest of the
-          // chunk readable, and `getHeader` has already checked that the length reaches
-          // past the header.
           buffer.incrementReadOffset(header.length)
         }
       }
