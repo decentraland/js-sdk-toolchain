@@ -128,9 +128,6 @@ export function addSyncTransport(
     }
   })
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, async (data, sender) => {
-    // Anyone in the room can send this. Clearing the in-flight request before knowing
-    // who sent it let an unprivileged peer cancel the retry, so the client stopped
-    // asking and the state never arrived.
     if (isServerAtom.getOrNull() || sender !== AUTH_SERVER_PEER_ID) return
 
     requestingState = false
