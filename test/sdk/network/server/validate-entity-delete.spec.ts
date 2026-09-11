@@ -4,6 +4,7 @@ import { IEngine, Transport } from '../../../../packages/@dcl/ecs/src'
 import * as components from '../../../../packages/@dcl/ecs/src/components'
 import { ReadWriteByteBuffer } from '../../../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { PutNetworkComponentOperation } from '../../../../packages/@dcl/ecs/src/serialization/crdt/network/putComponentNetwork'
+import { DeleteComponentNetwork } from '../../../../packages/@dcl/ecs/src/serialization/crdt/network/deleteComponentNetwork'
 import { DeleteEntityNetwork } from '../../../../packages/@dcl/ecs/src/serialization/crdt/network/deleteEntityNetwork'
 import { createServerValidator } from '../../../../packages/@dcl/sdk/network/server'
 import { CommsMessage } from '../../../../packages/@dcl/sdk/network/binary-message-bus'
@@ -71,7 +72,6 @@ describe('when a peer asks the server to delete a synced entity', () => {
       binaryMessageBus: { emit: (type: number) => relayed.push(type), on: () => {} } as any
     })
 
-    // The owner creates it, so CreatedBy records them.
     await feed(announce(), OWNER)
     localEntity = Array.from(engine.getEntitiesWith(NetworkEntity))[0][0]
     relayed = []
@@ -90,7 +90,7 @@ describe('when a peer asks the server to delete a synced entity', () => {
   describe('and the scene refuses deletes from anyone but the creator', () => {
     beforeEach(() => {
       Transform.validateBeforeChange(
-        ({ newValue, senderAddress, createdBy }: any) => newValue !== undefined || senderAddress === createdBy
+        ({ newValue, senderAddress, createdBy }) => newValue !== undefined || senderAddress === createdBy
       )
     })
 
@@ -108,6 +108,26 @@ describe('when a peer asks the server to delete a synced entity', () => {
       })
     })
 
+    describe('and another peer removes the protected component before deleting the entity', () => {
+      let removal: ReadWriteByteBuffer
+
+      beforeEach(async () => {
+        removal = new ReadWriteByteBuffer()
+        DeleteComponentNetwork.write(REMOTE_ENTITY as Entity, Transform.componentId, 100, NETWORK_ID, removal)
+        await feed(removal.toBinary(), OTHER)
+        relayed = []
+        await feed(deletion(), OTHER)
+      })
+
+      it('should refuse the non-owner entity deletion', () => {
+        expect(relayed.filter((type) => type === CommsMessage.CRDT)).toEqual([])
+      })
+
+      it('should retain the protected component', () => {
+        expect(Transform.has(localEntity)).toBe(true)
+      })
+    })
+
     describe('and the peer that created it asks', () => {
       beforeEach(async () => {
         await feed(deletion(), OWNER)
@@ -122,7 +142,7 @@ describe('when a peer asks the server to delete a synced entity', () => {
   describe('and the scene allows anyone to take it while it is unheld', () => {
     beforeEach(async () => {
       Transform.validateBeforeChange(
-        ({ newValue, currentValue }: any) => newValue !== undefined || (currentValue as any)?.position.x === 1
+        ({ newValue, currentValue }) => newValue !== undefined || currentValue?.position.x === 1
       )
       await feed(deletion(), OTHER)
     })

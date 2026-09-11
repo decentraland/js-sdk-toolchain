@@ -112,9 +112,6 @@ export function createServerValidator(config: ServerValidationConfig) {
     }
 
     if (message.type === CrdtMessageType.DELETE_ENTITY) {
-      // A delete takes every component at once, so each one holding data for the entity
-      // gets a say, with `undefined` standing for the value about to go. Any refusal
-      // refuses the delete; a scene that registers none keeps today's behaviour.
       const owner = CreatedBy.getOrNull(message.entityId)?.address ?? AUTH_SERVER_PEER_ID
 
       for (const definition of engine.componentsIter()) {
@@ -132,7 +129,7 @@ export function createServerValidator(config: ServerValidationConfig) {
     if (message.type === CrdtMessageType.PUT_COMPONENT || message.type === CrdtMessageType.DELETE_COMPONENT) {
       const component = engine.getComponent(message.componentId) as InternalBaseComponent<unknown>
       const buf = 'data' in message ? new ReadWriteByteBuffer(message.data) : null
-      const value = buf ? component.schema.deserialize(buf) : null
+      const value = buf ? component.schema.deserialize(buf) : undefined
       const dryRunCRDT = component.__dry_run_updateFromCrdt(message)
       const validCRDT = [
         ProcessMessageResultType.StateUpdatedData,
