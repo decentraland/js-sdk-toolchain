@@ -112,7 +112,30 @@ export function createServerValidator(config: ServerValidationConfig) {
     }
 
     if (message.type === CrdtMessageType.DELETE_ENTITY) {
-      // TODO: how to handle this case ?
+      // A delete takes every component at once, so every component holding data for the
+      // entity gets a say, with `undefined` standing for the value about to go. Any one
+      // of them refusing refuses the delete.
+      //
+      // Routing it through the same per-component hook as a write is what lets a scene
+      // answer "may this be removed" per case, instead of the protocol imposing one
+      // rule. Owner-only would forbid picking up an item someone else dropped; allowing
+      // everyone is what lets any peer delete anything today. The scene knows which it
+      // wants, and it already has `createdBy` and `senderAddress` to decide with.
+      //
+      // A scene that registers no validator keeps today's behaviour and the delete is
+      // allowed, so this wiring changes nothing on its own.
+      const owner = CreatedBy.getOrNull(message.entityId)?.address ?? AUTH_SERVER_PEER_ID
+
+      for (const definition of engine.componentsIter()) {
+        if (!definition.has(message.entityId)) continue
+
+        const component = definition as unknown as InternalBaseComponent<unknown>
+        if (!component.__run_validateBeforeChange(message.entityId, undefined, sender, owner)) {
+          return false
+        }
+      }
+
+      return true
     }
 
     if (message.type === CrdtMessageType.PUT_COMPONENT || message.type === CrdtMessageType.DELETE_COMPONENT) {
