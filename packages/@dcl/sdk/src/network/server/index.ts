@@ -116,10 +116,6 @@ export function createServerValidator(config: ServerValidationConfig) {
     }
 
     if (message.type === CrdtMessageType.PUT_COMPONENT || message.type === CrdtMessageType.DELETE_COMPONENT) {
-      // Both the component id and the payload bytes are chosen by the peer. An id this
-      // engine does not define, or a payload the schema cannot read, used to throw from
-      // here into the caller's catch, which skipped the message silently and without the
-      // correction an invalid message is supposed to send back.
       const component = engine.getComponentOrNull(message.componentId) as InternalBaseComponent<unknown> | null
       if (!component) return false
 
@@ -271,9 +267,6 @@ export function createServerValidator(config: ServerValidationConfig) {
             const regularMessage = convertNetworkToRegularMessage(networkMessage, localEntityId)
 
             // 3. Basic permission validation.
-            // Conversion returns null when the message cannot be read — a payload the
-            // schema rejects, say. Passing that on dereferenced null and threw into the
-            // catch below, which dropped the message without answering the sender.
             if (!regularMessage || !validateMessagePermissions(regularMessage as any, sender, localEntityId)) {
               // Send correction back to sender with server's authoritative state
               sendCorrectionToSender(networkMessage, sender, localEntityId)
