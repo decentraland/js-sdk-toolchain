@@ -1,4 +1,8 @@
 on:
+  # An extra entry point; the push trigger below is unchanged. For workflows like
+  # merge-sync-to-experimental.yml, whose merge is written with GITHUB_TOKEN: GitHub
+  # starts no workflow from that token's events, and workflow_dispatch is the exception.
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -257,7 +261,8 @@ jobs:
           echo "Verifying dependency packages are published at version $VERSION"
 
           PACKAGES=("@dcl/js-runtime" "@dcl/ecs" "@dcl/react-ecs" "@dcl/sdk-commands")
-          MAX_RETRIES=6
+          # npm may take a few minutes to serve a freshly published version (provenance + large tarballs, @dcl/ecs especially)
+          MAX_RETRIES=30
           RETRY_DELAY=10
 
           for PKG in "${PACKAGES[@]}"; do
