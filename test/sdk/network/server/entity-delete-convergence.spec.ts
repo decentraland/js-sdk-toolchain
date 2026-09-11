@@ -413,7 +413,7 @@ describe('when a client requests deletion through its synchronization transport'
       beforeEach(async () => {
         dropServerResponse = false
         requester.engine.removeEntity(requesterEntity)
-        await tick()
+        await tick(20)
       })
 
       it('should accept the retry without recreating the deleted entity', () => {

@@ -1,5 +1,6 @@
-import { IEngine, Transport, RealmInfo, Entity, EntityState, CrdtMessageType } from '@dcl/ecs'
+import { IEngine, Transport, RealmInfo, EntityState, CrdtMessageType } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
+import { SYSTEMS_REGULAR_PRIORITY } from '@dcl/ecs/dist/engine/systems'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { DeleteEntityNetwork } from '@dcl/ecs/dist/serialization/crdt/network/deleteEntityNetwork'
 import type { SendBinaryRequest, SendBinaryResponse } from '~system/CommunicationsController'
@@ -11,6 +12,13 @@ import { fetchProfile } from './utils'
 import { entityUtils } from './entities'
 import { createServerValidator } from './server'
 import { readMessages } from './server/utils'
+import { createEntityRemovalClient } from './entity-removal'
+import {
+  EntityRemovalRequest,
+  encodeEntityRemovalRequest,
+  decodeEntityRemovalRequest,
+  decodeEntityRemovalResponse
+} from './entity-removal-protocol'
 import type { GetUserDataRequest, GetUserDataResponse } from '~system/UserIdentity'
 import { definePlayerHelper } from '../players'
 import { serializeCrdtMessages } from '../internal/transports/logger'
@@ -48,8 +56,8 @@ export function addSyncTransport(
   const isServerAtom = Atom<boolean>()
   const isRoomReadyAtom = Atom<boolean>(false)
   const NetworkEntity = components.NetworkEntity(engine)
-  const pendingEntityRemovals = new Set<Entity>()
   const pendingServerRemovals: { data: Uint8Array; sender: string }[] = []
+  const pendingServerRequests: { request: EntityRemovalRequest; sender: string }[] = []
 
   void isServerFn({}).then(($: IsServerResponse) => {
     return isServerAtom.swap(!!$.isServer)
@@ -82,18 +90,6 @@ export function addSyncTransport(
    */
   let tick = 0
   const TRANSPORT_INITIALIZED_NUMBER = isTestEnvironment() ? 0 : 2
-  engine.addEntityRemovalHandler((entity) => {
-    if (
-      isServerAtom.getOrNull() === true ||
-      engine.getEntityState(entity) !== EntityState.UsedEntity ||
-      !NetworkEntity.has(entity)
-    ) {
-      return false
-    }
-    pendingEntityRemovals.add(entity)
-    return true
-  })
-
   // Add Sync Transport
   const transport: Transport = {
     filter: syncFilter(engine),
@@ -110,23 +106,12 @@ export function addSyncTransport(
           }
         }
       }
-      const isServer = isServerAtom.getOrNull()
-      if (isServer !== null && tick > TRANSPORT_INITIALIZED_NUMBER) {
-        for (const entity of pendingEntityRemovals) {
-          const network = NetworkEntity.getOrNull(entity)
-          if (!network || engine.getEntityState(entity) !== EntityState.UsedEntity) continue
-          if (isServer) {
-            engine.removeEntity(entity)
-          } else {
-            const buffer = new ReadWriteByteBuffer()
-            DeleteEntityNetwork.write(network.entityId, network.networkId, buffer)
-            binaryMessageBus.emit(CommsMessage.CRDT, buffer.toBinary(), [AUTH_SERVER_PEER_ID])
-          }
-        }
-        pendingEntityRemovals.clear()
-      }
+      if (tick > TRANSPORT_INITIALIZED_NUMBER) entityRemovals.flush(isServerAtom.getOrNull())
       for (const request of pendingServerRemovals.splice(0)) {
         transport.onmessage!(serverValidator.processServerMessages(request.data, request.sender))
+      }
+      for (const { request, sender } of pendingServerRequests.splice(0)) {
+        transport.onmessage!(serverValidator.processEntityRemovalRequest(request, sender))
       }
       const peerMessages = getMessagesToSend()
       const response = await sendBinary({ data: [], peerData: peerMessages })
@@ -139,6 +124,38 @@ export function addSyncTransport(
   const serverValidator = createServerValidator({
     engine,
     binaryMessageBus
+  })
+
+  const entityRemovals = createEntityRemovalClient(
+    engine,
+    (request) =>
+      binaryMessageBus.emit(CommsMessage.REQUEST_ENTITY_REMOVAL, encodeEntityRemovalRequest(request), [
+        AUTH_SERVER_PEER_ID
+      ]),
+    (request) => {
+      const buffer = new ReadWriteByteBuffer()
+      DeleteEntityNetwork.write(request.entityId, request.networkId, buffer)
+      transport.onmessage!(serverValidator.processClientMessages(buffer.toBinary(), AUTH_SERVER_PEER_ID))
+    }
+  )
+  engine.addEntityRemovalHandler((entity) => {
+    const network = NetworkEntity.getOrNull(entity)
+    if (isServerAtom.getOrNull() === true || engine.getEntityState(entity) !== EntityState.UsedEntity || !network)
+      return false
+    entityRemovals.request(entity, network)
+    return true
+  })
+  engine.addSystem(entityRemovals.update, SYSTEMS_REGULAR_PRIORITY + 1)
+
+  binaryMessageBus.on(CommsMessage.REQUEST_ENTITY_REMOVAL, (data, sender) => {
+    if (isServerAtom.getOrNull() !== true) return
+    const request = decodeEntityRemovalRequest(data)
+    if (request) pendingServerRequests.push({ request, sender })
+  })
+  binaryMessageBus.on(CommsMessage.ENTITY_REMOVAL_RESULT, (data, sender) => {
+    if (sender !== AUTH_SERVER_PEER_ID || isServerAtom.getOrNull() === true) return
+    const response = decodeEntityRemovalResponse(data)
+    if (response) entityRemovals.receive(response)
   })
 
   // Initialize Event Bus with registered schemas
@@ -300,6 +317,7 @@ export function addSyncTransport(
   })
 
   players.onLeaveScene((userId) => {
+    serverValidator.forgetPeer(userId)
     DEBUG_NETWORK_MESSAGES() && console.log('[onLeaveScene]', userId)
   })
 
@@ -313,6 +331,7 @@ export function addSyncTransport(
     isStateSyncronized,
     binaryMessageBus,
     eventBus,
+    onEntityRemovalResult: entityRemovals.onEntityRemovalResult,
     isRoomReadyAtom
   }
 }
