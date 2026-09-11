@@ -1,6 +1,7 @@
 import {
   IEngine,
   Entity,
+  EntityUtils,
   CrdtMessageType,
   CrdtMessageBody,
   ProcessMessageResultType,
@@ -9,6 +10,7 @@ import {
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
+import { createVersionGSet } from '@dcl/ecs/dist/systems/crdt/gset'
 import { CommsMessage } from '../binary-message-bus'
 import { chunkCrdtMessages } from '../chunking'
 import * as utils from './utils'
@@ -35,6 +37,29 @@ export function createServerValidator(config: ServerValidationConfig) {
   const NetworkEntity = components.NetworkEntity(engine)
   const CreatedBy = components.CreatedBy(engine)
   const NetworkParent = components.NetworkParent(engine)
+  const removedEntities = new Map<number, ReturnType<typeof createVersionGSet>>()
+  const removedSharedEntities = new Set<Entity>()
+
+  function wasRemoved(message: { networkId: number; entityId: Entity }): boolean {
+    if (message.networkId === 0) return removedSharedEntities.has(message.entityId)
+    const [number, version] = EntityUtils.fromEntityId(message.entityId)
+    return removedEntities.get(message.networkId)?.has(number, version) ?? false
+  }
+
+  function markRemoved(message: { networkId: number; entityId: Entity }): void {
+    // Shared enum IDs are independent constants, not versioned ECS IDs.
+    if (message.networkId === 0) {
+      removedSharedEntities.add(message.entityId)
+      return
+    }
+    const [number, version] = EntityUtils.fromEntityId(message.entityId)
+    let versions = removedEntities.get(message.networkId)
+    if (!versions) {
+      versions = createVersionGSet()
+      removedEntities.set(message.networkId, versions)
+    }
+    versions.addTo(number, version)
+  }
 
   // Type guard to check if component supports corrections (both LWW and GrowOnlySet)
   function supportsCorrections<T>(
@@ -181,7 +206,6 @@ export function createServerValidator(config: ServerValidationConfig) {
     try {
       // Only handle component messages (PUT/DELETE), not entity deletion
       if (networkMessage.type === CrdtMessageType.DELETE_ENTITY_NETWORK) {
-        DEBUG_NETWORK_MESSAGES() && console.log('[AUTHORITATIVE] Cannot send authoritative message for entity deletion')
         return
       }
 
@@ -236,8 +260,18 @@ export function createServerValidator(config: ServerValidationConfig) {
         if (utils.isNetworkMessage(message)) {
           const networkMessage = message as utils.NetworkMessage
 
+          if (networkMessage.type === CrdtMessageType.DELETE_ENTITY_NETWORK) {
+            markRemoved(networkMessage)
+          } else if (wasRemoved(networkMessage)) {
+            continue
+          }
+
           // Find or create network entity mapping
-          const localEntityId = findOrCreateNetworkEntity(networkMessage, sender, false)
+          const localEntityId =
+            networkMessage.type === CrdtMessageType.DELETE_ENTITY_NETWORK
+              ? findExistingNetworkEntity(networkMessage)
+              : findOrCreateNetworkEntity(networkMessage, sender, false)
+          if (localEntityId === null) continue
 
           // Convert network message to regular message or correction message
           const regularMessage = convertNetworkToRegularMessage(networkMessage, localEntityId, forceCorrections)
@@ -262,8 +296,22 @@ export function createServerValidator(config: ServerValidationConfig) {
           // Only process network messages in server message handler
           if (utils.isNetworkMessage(message)) {
             const networkMessage = message as utils.NetworkMessage
+            if (wasRemoved(networkMessage)) {
+              if (
+                networkMessage.type === CrdtMessageType.DELETE_ENTITY_NETWORK &&
+                sender &&
+                sender !== AUTH_SERVER_PEER_ID
+              ) {
+                binaryMessageBus.emit(CommsMessage.CRDT, networkMessage.messageBuffer, [sender])
+              }
+              continue
+            }
             // 1. Find or create network entity mapping
-            const localEntityId = findOrCreateNetworkEntity(networkMessage, sender, true)
+            const localEntityId =
+              networkMessage.type === CrdtMessageType.DELETE_ENTITY_NETWORK
+                ? findExistingNetworkEntity(networkMessage)
+                : findOrCreateNetworkEntity(networkMessage, sender, true)
+            if (localEntityId === null) continue
 
             // 2. Convert network message to regular message and collect for local application
             const regularMessage = convertNetworkToRegularMessage(networkMessage, localEntityId)
@@ -276,6 +324,9 @@ export function createServerValidator(config: ServerValidationConfig) {
             }
 
             // 4. Collect valid message for batched broadcasting
+            if (networkMessage.type === CrdtMessageType.DELETE_ENTITY_NETWORK) {
+              markRemoved(networkMessage)
+            }
             messagesToBroadcast.push(networkMessage)
 
             if (regularMessage?.messageBuffer.byteLength) {
@@ -300,6 +351,9 @@ export function createServerValidator(config: ServerValidationConfig) {
         const networkData = NetworkEntity.getOrNull(message.entityId)
 
         if (networkData && !utils.isNetworkMessage(message)) {
+          if (message.type === CrdtMessageType.DELETE_ENTITY) {
+            markRemoved(networkData)
+          }
           utils.localMessageToNetwork(message, networkData, groupedBuffer)
         }
       }

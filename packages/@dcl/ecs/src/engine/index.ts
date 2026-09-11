@@ -32,7 +32,7 @@ export { Entity, ByteBuffer, SystemItem, OnChangeFunction }
 /** RootEntity 0, PlayerEntity 1, CameraEntity 2 — see the engineInstance fields below. */
 const NAMED_STATIC_ENTITIES = 3
 
-function preEngine(options?: IEngineOptions): PreEngine {
+function preEngine(options: IEngineOptions | undefined, requestEntityRemoval: (entity: Entity) => boolean): PreEngine {
   const entityContainer = options?.entityContainer ?? createEntityContainer()
   const componentsDefinition = new Map<number, ComponentDefinition<unknown>>()
   const systems = SystemContainer()
@@ -52,6 +52,8 @@ function preEngine(options?: IEngineOptions): PreEngine {
     return entity
   }
   function removeEntity(entity: Entity) {
+    if (requestEntityRemoval(entity)) return false
+
     // The renderer streams the avatar range and drops the scene's deletes there, so purging
     // locally is permanent: a one-shot component like PlayerIdentityData is never re-sent, and
     // the entity is left as a moving Transform with no identity. The three named static
@@ -298,7 +300,7 @@ function preEngine(options?: IEngineOptions): PreEngine {
  * @deprecated Prevent manual usage prefer "engine" for scene development
  */
 export function Engine(options?: IEngineOptions): IEngine {
-  const partialEngine = preEngine(options)
+  const partialEngine = preEngine(options, (entity) => crdtSystem.requestEntityRemoval(entity))
   const onChangeFunction: OnChangeFunction = (entity, operation, component, componentValue) => {
     if (operation === CrdtMessageType.DELETE_ENTITY) {
       for (const component of partialEngine.componentsIter()) {

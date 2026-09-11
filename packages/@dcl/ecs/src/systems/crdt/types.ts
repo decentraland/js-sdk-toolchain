@@ -1,4 +1,5 @@
 import { CrdtMessageBody, CrdtNetworkMessageBody } from '../../serialization/crdt/types'
+import { Entity } from '../../engine/entity'
 
 /**
  * @public
@@ -32,6 +33,11 @@ export type Transport = {
   send(message: Uint8Array | Uint8Array[]): Promise<void>
   onmessage?(message: Uint8Array): void
   filter(message: Omit<TransportMessage, 'messageBuffer'>): boolean
+  /**
+   * Return true to defer local removal until this transport delivers an accepted DELETE_ENTITY.
+   * Called before components or the entity ID are removed; inbound deletions bypass this hook.
+   */
+  requestEntityRemoval?(entity: Entity): boolean
   type?: string
   /**
    * Whether this transport is allowed to mutate reserved-range entities

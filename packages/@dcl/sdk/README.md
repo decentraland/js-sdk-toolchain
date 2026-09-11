@@ -53,6 +53,20 @@ GltfContainer.create(entity, {
 
 ## Features
 
+### Removing synchronized entities
+
+On a client using the synchronization transport, `engine.removeEntity(entity)` requests
+server approval for a synchronized entity and returns `false` while its ID remains in use.
+Its components, local state, and references stay intact until the authoritative server
+accepts the deletion. A rejected request leaves the entity unchanged. Calling
+`removeEntity` again retries the request, including after a lost acceptance response.
+
+`removeEntityWithChildren` requests approval for each synchronized entity in the tree;
+validators can accept or reject them independently. Unsynchronized entities and entities
+removed by the server are removed immediately. Accepted network identities cannot be
+recreated by delayed updates; a new incarnation must use a newer entity version or a new
+network identity.
+
 ### Components
 
 - Transform

@@ -95,6 +95,7 @@ export interface IEngine {
    * @returns whether the entity id was released for reuse. Ids in the renderer-reserved range
    *   are never released, at any version. Components are still purged for
    *   RootEntity/PlayerEntity/CameraEntity, but not for the avatar range.
+   *   A transport may defer removal and return false until an authoritative deletion arrives.
    */
   removeEntity(entity: Entity): boolean
 

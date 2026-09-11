@@ -1,4 +1,7 @@
-import { IEngine, Transport, RealmInfo } from '@dcl/ecs'
+import { IEngine, Transport, RealmInfo, Entity, EntityState, CrdtMessageType } from '@dcl/ecs'
+import * as components from '@dcl/ecs/dist/components'
+import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
+import { DeleteEntityNetwork } from '@dcl/ecs/dist/serialization/crdt/network/deleteEntityNetwork'
 import type { SendBinaryRequest, SendBinaryResponse } from '~system/CommunicationsController'
 
 import { syncFilter } from './filter'
@@ -7,6 +10,7 @@ import { BinaryMessageBus, CommsMessage } from './binary-message-bus'
 import { fetchProfile } from './utils'
 import { entityUtils } from './entities'
 import { createServerValidator } from './server'
+import { readMessages } from './server/utils'
 import type { GetUserDataRequest, GetUserDataResponse } from '~system/UserIdentity'
 import { definePlayerHelper } from '../players'
 import { serializeCrdtMessages } from '../internal/transports/logger'
@@ -43,6 +47,9 @@ export function addSyncTransport(
 
   const isServerAtom = Atom<boolean>()
   const isRoomReadyAtom = Atom<boolean>(false)
+  const NetworkEntity = components.NetworkEntity(engine)
+  const pendingEntityRemovals = new Set<Entity>()
+  const pendingServerRemovals: { data: Uint8Array; sender: string }[] = []
 
   void isServerFn({}).then(($: IsServerResponse) => {
     return isServerAtom.swap(!!$.isServer)
@@ -78,6 +85,17 @@ export function addSyncTransport(
   // Add Sync Transport
   const transport: Transport = {
     filter: syncFilter(engine),
+    requestEntityRemoval(entity) {
+      if (
+        isServerAtom.getOrNull() === true ||
+        engine.getEntityState(entity) !== EntityState.UsedEntity ||
+        !NetworkEntity.has(entity)
+      ) {
+        return false
+      }
+      pendingEntityRemovals.add(entity)
+      return true
+    },
     send: async (messages) => {
       if (tick <= TRANSPORT_INITIALIZED_NUMBER) tick++
       for (const message of tick > TRANSPORT_INITIALIZED_NUMBER ? [messages].flat() : []) {
@@ -90,6 +108,24 @@ export function addSyncTransport(
             binaryMessageBus.emit(CommsMessage.CRDT, chunk)
           }
         }
+      }
+      const isServer = isServerAtom.getOrNull()
+      if (isServer !== null && tick > TRANSPORT_INITIALIZED_NUMBER) {
+        for (const entity of pendingEntityRemovals) {
+          const network = NetworkEntity.getOrNull(entity)
+          if (!network || engine.getEntityState(entity) !== EntityState.UsedEntity) continue
+          if (isServer) {
+            engine.removeEntity(entity)
+          } else {
+            const buffer = new ReadWriteByteBuffer()
+            DeleteEntityNetwork.write(network.entityId, network.networkId, buffer)
+            binaryMessageBus.emit(CommsMessage.CRDT, buffer.toBinary(), [AUTH_SERVER_PEER_ID])
+          }
+        }
+        pendingEntityRemovals.clear()
+      }
+      for (const request of pendingServerRemovals.splice(0)) {
+        transport.onmessage!(serverValidator.processServerMessages(request.data, request.sender))
       }
       const peerMessages = getMessagesToSend()
       const response = await sendBinary({ data: [], peerData: peerMessages })
@@ -156,7 +192,16 @@ export function addSyncTransport(
         isServer
       )
     if (isServer) {
-      transport.onmessage!(serverValidator.processServerMessages(value, sender))
+      const updates = new ReadWriteByteBuffer()
+      for (const message of readMessages(value)) {
+        if (message.type === CrdtMessageType.DELETE_ENTITY_NETWORK) {
+          // Validate after the next receive phase has applied this batch's component updates.
+          pendingServerRemovals.push({ data: message.messageBuffer, sender })
+        } else {
+          updates.writeBuffer(message.messageBuffer, false)
+        }
+      }
+      transport.onmessage!(serverValidator.processServerMessages(updates.toBinary(), sender))
     } else if (sender === AUTH_SERVER_PEER_ID) {
       // Process network messages from server and convert to regular messages
       transport.onmessage!(serverValidator.processClientMessages(value, sender))

@@ -275,8 +275,12 @@ export function getComponentEntityTree<T>(
 /* istanbul ignore next */
 function removeNetworkEntityChildrens(
   engine: Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema' | 'removeEntity' | 'defineComponent'>,
-  parent: Entity
+  parent: Entity,
+  visited: Set<Entity> = new Set()
 ): void {
+  if (visited.has(parent)) return
+  visited.add(parent)
+
   const NetworkParent = components.NetworkParent(engine)
   const NetworkEntity = components.NetworkEntity(engine)
 
@@ -288,7 +292,7 @@ function removeNetworkEntityChildrens(
   if (network) {
     for (const [entity, parent] of engine.getEntitiesWith(NetworkParent)) {
       if (parent.entityId === network.entityId && parent.networkId === network.networkId) {
-        removeNetworkEntityChildrens(engine, entity)
+        removeNetworkEntityChildrens(engine, entity, visited)
       }
     }
   }

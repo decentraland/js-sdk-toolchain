@@ -5333,6 +5333,7 @@ export type Transport = {
     send(message: Uint8Array | Uint8Array[]): Promise<void>;
     onmessage?(message: Uint8Array): void;
     filter(message: Omit<TransportMessage, 'messageBuffer'>): boolean;
+    requestEntityRemoval?(entity: Entity): boolean;
     type?: string;
     allowReservedEntities?: boolean;
 };
