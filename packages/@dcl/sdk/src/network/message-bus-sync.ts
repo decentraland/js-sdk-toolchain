@@ -115,6 +115,11 @@ export function addSyncTransport(
 
   // Receive & Process CRDT_STATE
   binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, async (data, sender) => {
+    // The RES handler drops anything not from the authoritative server, so a client
+    // answering dumps its whole scene for a recipient that discards it. The atom
+    // resolves asynchronously; a request that beats it is covered by the retry.
+    if (!isServerAtom.getOrNull()) return
+
     DEBUG_NETWORK_MESSAGES() && console.log('[REQ_CRDT_STATE]', sender, Date.now())
     const chunks = engineToCrdt(engine)
     if (chunks.length === 0) {
