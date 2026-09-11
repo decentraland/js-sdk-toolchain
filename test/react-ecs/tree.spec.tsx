@@ -40,12 +40,12 @@ describe('RectEcs UI ✨', () => {
     })
     expect(getUi(childEntity)).toMatchObject({
       parent: entityA,
-      rightOf: undefined,
+      rightOf: 0,
       width: 222.1
     })
     expect(getUi(entityA)).toMatchObject({
       parent: rootEntity,
-      rightOf: undefined,
+      rightOf: 0,
       width: 222
     })
     expect(getUi(entityB)).toMatchObject({
@@ -99,7 +99,7 @@ describe('RectEcs UI ✨', () => {
     })
     expect(getUi(entityA)).toMatchObject({
       parent: rootEntity,
-      rightOf: undefined,
+      rightOf: 0,
       width: 888
     })
     expect(getUi(entityB)).toMatchObject({
@@ -117,7 +117,7 @@ describe('RectEcs UI ✨', () => {
     // Entity added must be the first element.
     expect(getUi(entityAdded)).toMatchObject({
       parent: rootEntity,
-      rightOf: undefined,
+      rightOf: 0,
       width: 333
     })
 
@@ -146,7 +146,7 @@ describe('RectEcs UI ✨', () => {
     })
     expect(getUi(entityA)).toMatchObject({
       parent: rootEntity,
-      rightOf: undefined,
+      rightOf: 0,
       width: 888
     })
     expect(getUi(entityB)).toMatchObject({
@@ -185,7 +185,7 @@ describe('RectEcs UI ✨', () => {
 
     expect(getUi(entityA)).toMatchObject({
       parent: rootEntity,
-      rightOf: undefined,
+      rightOf: 0,
       width: 888
     })
     expect(getUi(entityB)).toMatchObject({
@@ -219,7 +219,7 @@ describe('RectEcs UI ✨', () => {
     // Entity A doesn't have to change
     expect(getUi(entityA)).toMatchObject({
       parent: rootEntity,
-      rightOf: undefined,
+      rightOf: 0,
       width: 888
     })
 
@@ -234,7 +234,7 @@ describe('RectEcs UI ✨', () => {
     })
     expect(getUi(entityA)).toMatchObject({
       parent: rootEntity,
-      rightOf: undefined,
+      rightOf: 0,
       width: 888
     })
     expect(getUi(entityB)).toMatchObject({
@@ -278,7 +278,7 @@ describe('RectEcs UI ✨', () => {
     })
     expect(getUi(entityA)).toMatchObject({
       parent: rootEntity,
-      rightOf: undefined,
+      rightOf: 0,
       width: 888
     })
     expect(getUi(entityB)).toMatchObject({
@@ -308,7 +308,7 @@ describe('RectEcs UI ✨', () => {
     })
     expect(getUi(entityA)).toMatchObject({
       parent: rootEntity,
-      rightOf: undefined,
+      rightOf: 0,
       width: 888
     })
 
@@ -327,7 +327,7 @@ describe('RectEcs UI ✨', () => {
     })
     expect(getUi(entityA)).toMatchObject({
       parent: rootEntity,
-      rightOf: undefined,
+      rightOf: 0,
       width: 888
     })
     expect(UiTransform.getOrNull(entityAdded)).toBe(null)
@@ -382,12 +382,12 @@ describe('RectEcs UI ✨', () => {
     })
     expect(getUi(addedEntitiyA)).toMatchObject({
       parent: entityRootAdded,
-      rightOf: undefined,
+      rightOf: 0,
       width: 333.1
     })
     expect(getUi(addedAChildEntity)).toMatchObject({
       parent: addedEntitiyA,
-      rightOf: undefined,
+      rightOf: 0,
       width: 333.11
     })
     expect(getUi(addedEntityB)).toMatchObject({
@@ -411,7 +411,7 @@ describe('RectEcs UI ✨', () => {
     // Entity A doesn't have to change
     expect(getUi(entityA)).toMatchObject({
       parent: rootEntity,
-      rightOf: undefined,
+      rightOf: 0,
       width: 888
     })
 
@@ -458,7 +458,7 @@ describe('RectEcs UI ✨', () => {
 
     expect(getUi(entityA)).toMatchObject({
       parent: rootEntity,
-      rightOf: undefined,
+      rightOf: 0,
       width: 1
     })
     expect(getUi(entityB)).toMatchObject({
@@ -485,7 +485,7 @@ describe('RectEcs UI ✨', () => {
 
     expect(getUi(entityA)).toMatchObject({
       parent: rootEntity,
-      rightOf: undefined,
+      rightOf: 0,
       width: 1
     })
     expect(getUi(entityB)).toMatchObject({
@@ -549,7 +549,7 @@ describe('RectEcs UI ✨', () => {
     })
     expect(getUi(newEntity)).toMatchObject({
       parent: rootEntity,
-      rightOf: undefined,
+      rightOf: 0,
       width: 8
     })
   })
@@ -581,7 +581,7 @@ describe('RectEcs UI ✨', () => {
 
     expect(getUi(entityA)).toMatchObject({
       parent: rootEntity,
-      rightOf: undefined,
+      rightOf: 0,
       width: 1
     })
     expect(getUi(entityB)).toMatchObject({
@@ -600,12 +600,12 @@ describe('RectEcs UI ✨', () => {
 
     await engine.update(1)
     expect(getUi(entityA).rightOf).toBe(entityB)
-    expect(getUi(entityB).rightOf).toBe(undefined)
+    expect(getUi(entityB).rightOf).toBe(0)
 
     uiEntities = [...uiEntities]
     await engine.update(1)
     expect(getUi(entityA).rightOf).toBe(entityB)
-    expect(getUi(entityB).rightOf).toBe(undefined)
+    expect(getUi(entityB).rightOf).toBe(0)
     uiEntities = [
       { id: 3, value: 3 },
       { id: 1, value: 1 },
@@ -621,14 +621,14 @@ describe('RectEcs UI ✨', () => {
      * B => 514
      */
     const entityC = ((rootEntity as number) + 1) as Entity
-    expect(getUi(entityC).rightOf).toBe(undefined)
+    expect(getUi(entityC).rightOf).toBe(0)
     expect(getUi(entityA).rightOf).toBe(entityC)
     expect(getUi(entityB).rightOf).toBe(entityA)
 
     uiEntities.unshift({ id: 4, value: 4 })
     await engine.update(1)
     const entityD = ((entityC as number) + 1) as Entity
-    expect(getUi(entityD).rightOf).toBe(undefined)
+    expect(getUi(entityD).rightOf).toBe(0)
     expect(getUi(entityC).rightOf).toBe(entityD)
     expect(getUi(entityA).rightOf).toBe(entityC)
     expect(getUi(entityB).rightOf).toBe(entityA)
@@ -636,7 +636,7 @@ describe('RectEcs UI ✨', () => {
     uiEntities = [uiEntities[0], uiEntities[1], { id: 5, value: 5 }, ...uiEntities.slice(2)]
     await engine.update(1)
     const entityE = ((entityD as number) + 1) as Entity
-    expect(getUi(entityD).rightOf).toBe(undefined)
+    expect(getUi(entityD).rightOf).toBe(0)
     expect(getUi(entityC).rightOf).toBe(entityD)
     expect(getUi(entityE).rightOf).toBe(entityC)
     expect(getUi(entityA).rightOf).toBe(entityE)
@@ -676,7 +676,7 @@ describe('RectEcs UI ✨', () => {
     await engine.update(1)
 
     // Initial order: A → B → C
-    expect(getUi(entityA).rightOf).toBe(undefined)
+    expect(getUi(entityA).rightOf).toBe(0)
     expect(getUi(entityB).rightOf).toBe(entityA)
     expect(getUi(entityC).rightOf).toBe(entityB)
 
@@ -689,7 +689,7 @@ describe('RectEcs UI ✨', () => {
     await engine.update(1)
 
     // Expected order: B → A → C
-    expect(getUi(entityB).rightOf).toBe(undefined)
+    expect(getUi(entityB).rightOf).toBe(0)
     expect(getUi(entityA).rightOf).toBe(entityB)
     expect(getUi(entityC).rightOf).toBe(entityA)
 
@@ -733,7 +733,7 @@ describe('RectEcs UI ✨', () => {
     await engine.update(1)
 
     // Initial order: A → B → C → D
-    expect(getUi(entityA).rightOf).toBe(undefined)
+    expect(getUi(entityA).rightOf).toBe(0)
     expect(getUi(entityB).rightOf).toBe(entityA)
     expect(getUi(entityC).rightOf).toBe(entityB)
     expect(getUi(entityD).rightOf).toBe(entityC)
@@ -750,7 +750,7 @@ describe('RectEcs UI ✨', () => {
     await engine.update(1)
 
     // Expected order: C → A → D → B
-    expect(getUi(entityC).rightOf).toBe(undefined)
+    expect(getUi(entityC).rightOf).toBe(0)
     expect(getUi(entityA).rightOf).toBe(entityC)
     expect(getUi(entityD).rightOf).toBe(entityA)
     expect(getUi(entityB).rightOf).toBe(entityD)
@@ -819,7 +819,7 @@ describe('RectEcs UI ✨', () => {
       { id: 5, value: 500 }
     ]
     await engine.update(1)
-    expect(getUi(entityB).rightOf).toBe(undefined)
+    expect(getUi(entityB).rightOf).toBe(0)
     expect(getUi(entityA).rightOf).toBe(entityB)
     verifyCyclesFree()
 
@@ -832,7 +832,7 @@ describe('RectEcs UI ✨', () => {
       { id: 1, value: 100 }
     ]
     await engine.update(1)
-    expect(getUi(entityE).rightOf).toBe(undefined)
+    expect(getUi(entityE).rightOf).toBe(0)
     expect(getUi(entityD).rightOf).toBe(entityE)
     expect(getUi(entityC).rightOf).toBe(entityD)
     expect(getUi(entityB).rightOf).toBe(entityC)
@@ -848,7 +848,7 @@ describe('RectEcs UI ✨', () => {
       { id: 5, value: 500 }
     ]
     await engine.update(1)
-    expect(getUi(entityA).rightOf).toBe(undefined)
+    expect(getUi(entityA).rightOf).toBe(0)
     expect(getUi(entityB).rightOf).toBe(entityA)
     expect(getUi(entityC).rightOf).toBe(entityB)
     expect(getUi(entityD).rightOf).toBe(entityC)
