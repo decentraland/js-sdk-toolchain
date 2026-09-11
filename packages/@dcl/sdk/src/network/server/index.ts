@@ -58,10 +58,6 @@ export function createServerValidator(config: ServerValidationConfig) {
     return null
   }
 
-  // Every peer draws from the same 65k range, so a peer announcing entities faster
-  // than they are freed drains it for everyone. Running out is not an error to raise
-  // per message: it means every later announcement is refused too, so it is said once,
-  // and not from behind a debug flag.
   let reportedEntityExhaustion = false
 
   function findOrCreateNetworkEntity(message: utils.NetworkMessage, sender: string, isServer: boolean): Entity | null {
@@ -72,10 +68,6 @@ export function createServerValidator(config: ServerValidationConfig) {
       return existingEntity
     }
 
-    // Create new entity and network mapping. `addEntity` throws only when the range is
-    // drained, which used to escape this function: the server swallowed it in its own
-    // per-message catch, and the client, which has none, rejected engine.update and
-    // took the whole tick with it.
     let newEntityId: Entity
     try {
       newEntityId = engine.addEntity()
