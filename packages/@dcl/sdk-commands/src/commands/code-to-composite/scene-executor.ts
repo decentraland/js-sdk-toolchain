@@ -437,6 +437,35 @@ async function bundle(components: Pick<CliComponents, 'fs' | 'logger'>, project:
  *
  * The returned engine can then be used to generate composite/CRDT files.
  */
+/**
+ * Builds the engine that captures the scene's state and seeds it with whatever
+ * `main.crdt` already holds.
+ *
+ * The scene's own engine is handed that state through `crdtGetState`, but CRDT never
+ * echoes a received message back to the transport it came from, so this engine would
+ * otherwise only ever see what the scene itself creates and every entity already in
+ * `main.crdt` would be dropped when the file is written back.
+ *
+ * Exported so that seeding can be covered on its own: executing the bundle needs a
+ * `require` hook that jest's module registry bypasses.
+ *
+ * @internal
+ */
+export async function seedCaptureEngine(
+  components: Pick<CliComponents, 'fs' | 'logger'>,
+  crdtFilePath: string
+): Promise<{ engine: IEngine; transport: Transport; crdtState: Uint8Array }> {
+  const crdtState = await getMainCrdtFile(components, crdtFilePath)
+  const { engine, transport } = initEngine()
+
+  if (crdtState.length) {
+    transport.onmessage!(crdtState)
+    await engine.update(0)
+  }
+
+  return { engine, transport, crdtState }
+}
+
 export async function executeSceneCode(
   components: Pick<CliComponents, 'fs' | 'logger'>,
   project: SceneProject,
@@ -457,8 +486,8 @@ export async function executeSceneCode(
 
   logger.log('Executing scene code to capture engine state...')
 
-  const crdtState = await getMainCrdtFile(components, crdtFilePath)
-  const { engine, transport } = initEngine()
+  const { engine, transport, crdtState } = await seedCaptureEngine(components, crdtFilePath)
+
   const restoreRequire = setupRequireHook(engine, transport, crdtState)
 
   try {
