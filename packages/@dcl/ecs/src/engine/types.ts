@@ -104,6 +104,8 @@ export interface IEngine {
    * @alpha
    * Register a handler that returns true to defer local entity removal before any state is cleared.
    * Handlers run in registration order until one defers. Incoming CRDT deletions bypass them.
+   * Handlers must be synchronous, fast, and non-throwing; exceptions propagate to the caller.
+   * This hook coordinates local removal, not authorization. Server validation remains required.
    * @returns a function that unregisters the handler
    */
   addEntityRemovalHandler(handler: (entity: Entity) => boolean): () => void

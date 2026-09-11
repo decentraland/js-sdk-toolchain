@@ -67,6 +67,17 @@ removed by the server are removed immediately. Accepted network identities canno
 recreated by delayed updates; a new incarnation must use a newer entity version or a new
 network identity.
 
+The SDK registers its approval callback with `engine.addEntityRemovalHandler()`. Handlers
+run synchronously before local state is cleared and must be fast and non-throwing.
+A slow or throwing handler can disrupt the engine tick; one that always defers can
+prevent local cleanup, including on the server. Use the returned unregister function
+when a handler is no longer needed.
+
+The hook coordinates local removal and is not an authorization boundary. The server
+still validates peer deletion requests, and the synchronization transport only accepts
+network deletions from the authoritative server. Incoming CRDT deletions bypass these
+handlers, so a local handler cannot veto an authoritative deletion.
+
 ### Components
 
 - Transform
