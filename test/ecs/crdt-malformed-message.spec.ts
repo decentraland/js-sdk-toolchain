@@ -531,10 +531,11 @@ describe('when a transport delivers a legacy-length network delete ahead of vali
     transport.onmessage!(chunk)
     await engine.update(1)
 
-    // The engine skips network messages by their declared length instead of reading them,
-    // so the legacy ambiguity costs nothing here: the cursor lands exactly on the message
-    // that follows. On a build whose engine reads network messages, this frame consumes
-    // four bytes of the next one and the rest of the chunk is lost.
+    // This frame really is twelve bytes, so skipping its declared twelve lands on the
+    // message behind it. That does not generalise: DeleteEntityNetwork.write declares
+    // twelve and emits sixteen, and skipping a real one by its declaration lands four
+    // bytes short. The SDK ingress reads network frames rather than skipping them and
+    // handles both — see test/sdk/network/server/malformed-network-frame.spec.ts.
     expect(Transform.getOrNull(entity)).not.toBe(null)
   })
 })
