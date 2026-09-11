@@ -1,10 +1,10 @@
-import { Engine } from '../../../packages/@dcl/ecs/src/engine'
-import { Entity } from '../../../packages/@dcl/ecs/src/engine/entity'
-import { IEngine, Transport } from '../../../packages/@dcl/ecs/src'
-import * as components from '../../../packages/@dcl/ecs/src/components'
-import { ReadWriteByteBuffer } from '../../../packages/@dcl/ecs/src/serialization/ByteBuffer'
-import { PutNetworkComponentOperation } from '../../../packages/@dcl/ecs/src/serialization/crdt/network/putComponentNetwork'
-import { createServerValidator } from '../../../packages/@dcl/sdk/network/server'
+import { Engine } from '../../../../packages/@dcl/ecs/src/engine'
+import { Entity } from '../../../../packages/@dcl/ecs/src/engine/entity'
+import { IEngine, Transport } from '../../../../packages/@dcl/ecs/src'
+import * as components from '../../../../packages/@dcl/ecs/src/components'
+import { ReadWriteByteBuffer } from '../../../../packages/@dcl/ecs/src/serialization/ByteBuffer'
+import { PutNetworkComponentOperation } from '../../../../packages/@dcl/ecs/src/serialization/crdt/network/putComponentNetwork'
+import { createServerValidator } from '../../../../packages/@dcl/sdk/network/server'
 
 const NETWORK_ID = 7
 const AUTH_SERVER = 'authoritative-server'
