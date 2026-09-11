@@ -115,9 +115,7 @@ export function addSyncTransport(
 
   // Receive & Process CRDT_STATE
   binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, async (data, sender) => {
-    // The RES handler drops anything not from the authoritative server, so a client
-    // answering dumps its whole scene for a recipient that discards it. The atom
-    // resolves asynchronously; a request that beats it is covered by the retry.
+    // Requests arriving before role resolution are recovered by the requester's retry.
     if (!isServerAtom.getOrNull()) return
 
     DEBUG_NETWORK_MESSAGES() && console.log('[REQ_CRDT_STATE]', sender, Date.now())
