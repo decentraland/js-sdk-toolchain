@@ -143,9 +143,6 @@ export function createServerValidator(config: ServerValidationConfig) {
       const definition = engine.getComponentOrNull(message.componentId)
       if (!definition) return false
 
-      // NOT_SYNC_COMPONENTS is applied when sending and was never checked on the way in,
-      // so a peer could push a component no honest client ever sends — UI, engine or
-      // realm state, another player's results — and have the server relay it to the room.
       if (!shouldSyncComponent(definition)) return false
 
       const component = definition as unknown as InternalBaseComponent<unknown>
