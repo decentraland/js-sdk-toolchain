@@ -55,7 +55,7 @@ beforeAll(async () => {
 })
 
 type OpenExplorerUiResultType = import('~system/RestrictedActions').OpenExplorerUiResult
-type OpenBody = { ui: ExplorerUi; requestId?: number; purchase?: { urn: string } }
+type OpenBody = { ui: ExplorerUi; requestId?: number; itemPurchase?: { urn: string } }
 type OpenFn = jest.Mock<Promise<{ openResult: OpenExplorerUiResultType }>, [OpenBody]>
 
 /** The wire value that means "this explorer did not echo request_id". */
@@ -187,13 +187,13 @@ describe('openExplorerUiAndWait', () => {
       opens()
       const openExplorerUiAndWait = makeHelper()
 
-      void openExplorerUiAndWait({ ui: ExplorerUi.EU_ITEM_PURCHASE, purchase: { urn: 'urn:decentraland:item' } })
+      void openExplorerUiAndWait({ ui: ExplorerUi.EU_ITEM_PURCHASE, itemPurchase: { urn: 'urn:decentraland:item' } })
       await flush()
 
       expect(openFn).toHaveBeenCalledWith({
         ui: ExplorerUi.EU_ITEM_PURCHASE,
         requestId: 1,
-        purchase: { urn: 'urn:decentraland:item' }
+        itemPurchase: { urn: 'urn:decentraland:item' }
       })
     })
 
@@ -262,7 +262,7 @@ describe('openExplorerUiAndWait', () => {
       opens()
       const openExplorerUiAndWait = makeHelper()
 
-      const wait = openExplorerUiAndWait({ ui: ExplorerUi.EU_ITEM_PURCHASE, purchase: { urn: 'urn:x' } })
+      const wait = openExplorerUiAndWait({ ui: ExplorerUi.EU_ITEM_PURCHASE, itemPurchase: { urn: 'urn:x' } })
       await flush()
 
       await inject(ExplorerUiEvents, uiEvent(ExplorerUi.EU_ITEM_PURCHASE, 10, UNCORRELATED, 'closed'))
@@ -461,7 +461,7 @@ describe('openExplorerUiAndWait', () => {
       const openExplorerUiAndWait = makeHelper()
 
       const wait = openExplorerUiAndWait(
-        { ui: ExplorerUi.EU_ITEM_PURCHASE, purchase: { urn: 'urn:item' } },
+        { ui: ExplorerUi.EU_ITEM_PURCHASE, itemPurchase: { urn: 'urn:item' } },
         { collect: [ExplorerUiEvents, ItemPurchase], until: variant(ItemPurchase, 'purchased') }
       )
       await flush()
@@ -483,7 +483,7 @@ describe('openExplorerUiAndWait', () => {
       const openExplorerUiAndWait = makeHelper()
 
       const wait = openExplorerUiAndWait(
-        { ui: ExplorerUi.EU_ITEM_PURCHASE, purchase: { urn: 'urn:item' } },
+        { ui: ExplorerUi.EU_ITEM_PURCHASE, itemPurchase: { urn: 'urn:item' } },
         { collect: [ExplorerUiEvents, ItemPurchase] }
       )
       await flush()

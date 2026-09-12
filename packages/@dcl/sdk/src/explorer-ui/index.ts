@@ -148,8 +148,8 @@ export type WaitOptions<C extends readonly AnyChannel[]> = {
  * @public
  */
 export type OpenExplorerUiRequest =
-  | { ui: Exclude<ExplorerUi, ExplorerUi.EU_ITEM_PURCHASE>; purchase?: undefined }
-  | { ui: ExplorerUi.EU_ITEM_PURCHASE; purchase: { urn: string } }
+  | { ui: Exclude<ExplorerUi, ExplorerUi.EU_ITEM_PURCHASE>; itemPurchase?: undefined }
+  | { ui: ExplorerUi.EU_ITEM_PURCHASE; itemPurchase: { urn: string } }
 
 /**
  * Signature of {@link openExplorerUiAndWait}. The second overload is the shorthand for
@@ -174,7 +174,7 @@ const TIMEOUT_SYSTEM_PRIORITY = Number.MIN_SAFE_INTEGER
 type OpenExplorerUiFn = (body: {
   ui: ExplorerUi
   requestId?: number
-  purchase?: { urn: string }
+  itemPurchase?: { urn: string }
 }) => Promise<{ openResult: OpenExplorerUiResult }>
 
 type CollectedEvent = { channel: string; event: CorrelatedEvent }
@@ -201,7 +201,7 @@ type Attribution = 'yes' | 'no' | 'ambiguous'
 /**
  * ts-proto renders a `oneof` as a single wrapper property `{ $case, [$case]: value }`.
  * Finding it by shape keeps the helper independent of the field name each message chose
- * (`event` in 1220, `status` in 1221) and of any message added later.
+ * (`event` in 1220, `status` in 1222) and of any message added later.
  */
 function caseOf(event: CorrelatedEvent): string | undefined {
   for (const key of Object.keys(event)) {
@@ -363,7 +363,7 @@ export function create(deps: {
     request: OpenExplorerUiRequest | Exclude<ExplorerUi, ExplorerUi.EU_ITEM_PURCHASE>,
     options?: WaitOptions<readonly AnyChannel[]>
   ): Promise<WaitOutcome<never[]>> {
-    const { ui, purchase } = typeof request === 'number' ? { ui: request, purchase: undefined } : request
+    const { ui, itemPurchase } = typeof request === 'number' ? { ui: request, itemPurchase: undefined } : request
     const requestId = nextRequestId++
 
     const collect = options?.collect ?? []
@@ -406,7 +406,7 @@ export function create(deps: {
     if (session.timeoutMs !== undefined) ensureTimeoutSystem()
 
     try {
-      const { openResult } = await openExplorerUiFn({ ui, requestId, purchase })
+      const { openResult } = await openExplorerUiFn({ ui, requestId, itemPurchase })
       // Nothing was opened by this call, so no event carrying our id is coming.
       if (openResult !== OpenExplorerUiResult.OPENED) {
         settleSession(session, { $case: 'notOpened', openResult })
