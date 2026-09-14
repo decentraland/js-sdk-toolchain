@@ -5,7 +5,7 @@ import { printProgressInfo, printWarning } from '../../logic/beautiful-logs'
 import { colors } from '../../components/log'
 import { PreviewComponents } from './types'
 import { ProjectUnion } from '../../logic/project-validations'
-import { isElectronEnvironment, getSpawnEnv, findNpxCliJs, getNpxBin } from './utils'
+import { isElectronEnvironment, getSpawnEnv, findNpxBin, findNpxCliJs } from './utils'
 import { getBaseCoords } from '../../logic/scene-validations'
 import { future } from '../../logic/future'
 
@@ -58,7 +58,6 @@ const TRACING_PREFIX = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})\.\d+Z\s+(INFO|WAR
 const HEARTBEAT_LINE = /^\[headless\] alive:/
 const SCENE_ROOM_JOINED_LINE = /added scene channel/
 const SERVER_READY_TIMEOUT_MS = 120_000
-// eslint-disable-next-line no-control-regex
 const ANSI_CODES = /\u001b\[[0-9;]*m/g
 
 const ENGINE_NOISE = [
@@ -148,13 +147,17 @@ export function startMultiplayerServer(
   const npxArgs = ['--yes', pkg, `--realm=${realm}`]
   if (position) npxArgs.push(`--position=${position.x},${position.y}`)
   const npxCliJs = findNpxCliJs()
-  const useShell = !npxCliJs && process.platform === 'win32'
+  const npxPath = npxCliJs ? null : findNpxBin()
+  if (!npxCliJs && !npxPath) {
+    throw new Error('npx-cli.js and npx were not found in a trusted location')
+  }
+  const useShell = !!npxPath && process.platform === 'win32'
   if (useShell) {
     const unsafe = npxArgs.find((arg) => CMD_METACHARACTERS.test(arg))
     if (unsafe) throw new Error(`refusing to run npx through the shell with argument ${JSON.stringify(unsafe)}`)
     printWarning(
       components.logger,
-      `npx-cli.js not found next to ${process.execPath} or any npm on PATH; running ${getNpxBin()} through the shell`
+      `npx-cli.js not found next to ${process.execPath} or any npm on PATH; running ${npxPath} through the shell`
     )
   }
 
@@ -170,7 +173,7 @@ export function startMultiplayerServer(
 
   const serverProcess = npxCliJs
     ? spawn(process.execPath, [npxCliJs, ...npxArgs], { cwd: workingDir, shell: false, stdio, env })
-    : spawn(getNpxBin(), useShell ? npxArgs.map((arg) => `"${arg}"`) : npxArgs, {
+    : spawn(npxPath!, useShell ? npxArgs.map((arg) => `"${arg}"`) : npxArgs, {
         cwd: workingDir,
         shell: useShell,
         stdio,
@@ -272,6 +275,11 @@ export function spawnAuthServer(
       engine,
       getBaseCoords(project.scene)
     )
+    void components.signaler.programClosed
+      .then(() => {
+        if (!server.child.killed) server.child.kill('SIGTERM')
+      })
+      .catch(() => {})
     if (engine === 'bevy') {
       server.child.on('close', (code) => {
         if (code !== EXIT_UNAVAILABLE) return

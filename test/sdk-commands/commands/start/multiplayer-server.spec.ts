@@ -2,6 +2,7 @@ import { EventEmitter } from 'events'
 import { PassThrough } from 'stream'
 import { spawn } from 'child_process'
 import {
+  spawnAuthServer,
   startMultiplayerServer,
   waitForServerReady
 } from '../../../../packages/@dcl/sdk-commands/src/commands/start/multiplayer-server'
@@ -9,9 +10,10 @@ import {
 jest.mock('child_process', () => ({ spawn: jest.fn() }))
 jest.mock('../../../../packages/@dcl/sdk-commands/src/commands/start/utils', () => ({
   ...jest.requireActual('../../../../packages/@dcl/sdk-commands/src/commands/start/utils'),
+  findNpxBin: jest.fn(() => '/node/npx.cmd'),
   findNpxCliJs: jest.fn(() => '/node/npx-cli.js')
 }))
-import { findNpxCliJs } from '../../../../packages/@dcl/sdk-commands/src/commands/start/utils'
+import { findNpxBin, findNpxCliJs } from '../../../../packages/@dcl/sdk-commands/src/commands/start/utils'
 
 type FakeChild = EventEmitter & { stdout: PassThrough; stderr: PassThrough; kill: jest.Mock; killed: boolean }
 
@@ -44,17 +46,24 @@ describe('multiplayer-server', () => {
   let components: {
     logger: { log: jest.Mock; info: jest.Mock; warn: jest.Mock; error: jest.Mock }
     analytics: { track: jest.Mock }
+    signaler: { programClosed: Promise<void> }
   }
   let stdoutWrite: jest.SpyInstance
   let stderrWrite: jest.SpyInstance
   let logged: () => string
+  let closePreview: () => void
 
   beforeEach(() => {
     child = createFakeChild()
     ;(spawn as jest.Mock).mockReturnValue(child)
     components = {
       logger: { log: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn() },
-      analytics: { track: jest.fn() }
+      analytics: { track: jest.fn() },
+      signaler: {
+        programClosed: new Promise((resolve) => {
+          closePreview = resolve
+        })
+      }
     }
     logged = () => components.logger.log.mock.calls.flat().join('\n')
     stdoutWrite = jest.spyOn(process.stdout, 'write').mockImplementation(() => true)
@@ -92,9 +101,9 @@ describe('multiplayer-server', () => {
       restorePlatform()
     })
 
-    it('should run npx through the shell because Windows cannot spawn a .cmd directly', () => {
+    it('should run the absolute npx path through the shell because Windows cannot spawn a .cmd directly', () => {
       const [bin, , options] = (spawn as jest.Mock).mock.calls[0]
-      expect(bin).toMatch(/^npx(\.cmd)?$/)
+      expect(bin).toBe('/node/npx.cmd')
       expect(options.shell).toBe(true)
     })
 
@@ -131,6 +140,22 @@ describe('multiplayer-server', () => {
     it('should hand the quoted path to the shell instead of refusing it', () => {
       const args: string[] = (spawn as jest.Mock).mock.calls[0][1]
       expect(args).toContain('"C:\\Program Files (x86)\\bevy\\server.tgz"')
+    })
+  })
+
+  describe('when the preview lifecycle ends', () => {
+    beforeEach(() => {
+      spawnAuthServer(
+        components as any,
+        { workingDirectory: '/scene', scene: { scene: { base: '0,0' } } } as any,
+        'http://localhost:8000'
+      )
+      closePreview()
+    })
+
+    it('should terminate the multiplayer server', async () => {
+      await Promise.resolve()
+      expect(child.kill).toHaveBeenCalledWith('SIGTERM')
     })
   })
 

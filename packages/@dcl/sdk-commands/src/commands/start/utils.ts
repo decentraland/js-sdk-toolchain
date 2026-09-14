@@ -82,6 +82,7 @@ type NpxLookup = {
   execPath?: string
   pathEnv?: string
   npmBin?: string
+  npxBin?: string
   resourcesPath?: string
 }
 
@@ -126,5 +127,14 @@ export function findNpxCliJs({
     ...npmPaths.flatMap((npmPath) => npxCliUnderNodeDir(path.dirname(npmPath))),
     ...npmPaths.map(npxCliBesideNpm).filter((candidate): candidate is string => !!candidate)
   ]
+  return candidates.find((candidate) => fs.existsSync(candidate)) ?? null
+}
+
+export function findNpxBin({ pathEnv = process.env.PATH ?? '', npxBin: npx = npxBin }: NpxLookup = {}): string | null {
+  const candidates = pathEnv
+    .split(path.delimiter)
+    .filter(path.isAbsolute)
+    .map((dir) => path.join(dir, npx))
+
   return candidates.find((candidate) => fs.existsSync(candidate)) ?? null
 }

@@ -1,7 +1,7 @@
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
-import { findNpxCliJs } from '../../../../packages/@dcl/sdk-commands/src/commands/start/utils'
+import { findNpxBin, findNpxCliJs } from '../../../../packages/@dcl/sdk-commands/src/commands/start/utils'
 
 function touch(file: string) {
   fs.mkdirSync(path.dirname(file), { recursive: true })
@@ -129,6 +129,30 @@ describe('findNpxCliJs', () => {
 
     it('should return null', () => {
       expect(findNpxCliJs({ execPath, pathEnv: path.join(root, 'shims'), npmBin: 'npm' })).toBeNull()
+    })
+  })
+
+  describe('when npx is available from an absolute PATH entry', () => {
+    let npx: string
+    let pathEnv: string
+
+    beforeEach(() => {
+      npx = touch(path.join(root, 'nodejs', 'npx.cmd'))
+      pathEnv = path.join(root, 'nodejs')
+    })
+
+    it('should return its absolute path', () => {
+      expect(findNpxBin({ pathEnv, npxBin: 'npx.cmd' })).toBe(npx)
+    })
+  })
+
+  describe('when npx is only reachable through a relative PATH entry', () => {
+    beforeEach(() => {
+      touch(path.join(root, 'npx.cmd'))
+    })
+
+    it('should not resolve it', () => {
+      expect(findNpxBin({ pathEnv: '.', npxBin: 'npx.cmd' })).toBeNull()
     })
   })
 })
