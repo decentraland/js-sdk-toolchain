@@ -84,6 +84,22 @@ describe('findNpxCliJs', () => {
     })
   })
 
+  describe('when running inside Electron with no node on PATH', () => {
+    let execPath: string
+    let npxCli: string
+    let resourcesPath: string
+
+    beforeEach(() => {
+      execPath = touch(path.join(root, 'App', 'Creator Hub.exe'))
+      resourcesPath = path.join(root, 'App', 'resources')
+      npxCli = touch(path.join(resourcesPath, 'app.asar.unpacked', 'node_modules', 'npm', 'bin', 'npx-cli.js'))
+    })
+
+    it('should find the npm unpacked from the asar', () => {
+      expect(findNpxCliJs({ execPath, pathEnv: '', npmBin: 'npm.cmd', resourcesPath })).toBe(npxCli)
+    })
+  })
+
   describe('when no npm install is reachable', () => {
     let execPath: string
 
