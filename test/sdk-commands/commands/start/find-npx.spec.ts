@@ -100,6 +100,26 @@ describe('findNpxCliJs', () => {
     })
   })
 
+  describe('when running inside Electron and the OS also has npm on PATH', () => {
+    let execPath: string
+    let bundled: string
+    let resourcesPath: string
+    let pathEnv: string
+
+    beforeEach(() => {
+      execPath = touch(path.join(root, 'App', 'Creator Hub.exe'))
+      resourcesPath = path.join(root, 'App', 'resources')
+      bundled = touch(path.join(resourcesPath, 'app.asar.unpacked', 'node_modules', 'npm', 'bin', 'npx-cli.js'))
+      touch(path.join(root, 'nodejs', 'npm.cmd'))
+      touch(path.join(root, 'nodejs', 'node_modules', 'npm', 'bin', 'npx-cli.js'))
+      pathEnv = path.join(root, 'nodejs')
+    })
+
+    it('should prefer the npm shipped with the app over the one installed on the OS', () => {
+      expect(findNpxCliJs({ execPath, pathEnv, npmBin: 'npm.cmd', resourcesPath })).toBe(bundled)
+    })
+  })
+
   describe('when no npm install is reachable', () => {
     let execPath: string
 

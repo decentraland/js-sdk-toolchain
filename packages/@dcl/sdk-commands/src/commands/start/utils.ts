@@ -102,9 +102,9 @@ function npxCliBesideNpm(npmPath: string): string | null {
 }
 
 /**
- * Absolute path to npm's `npx-cli.js`, resolved from the running node, from every npm on PATH
- * (Windows layout, unix `lib` layout, or an `npm` symlink into the npm package), or from the npm
- * unpacked next to an Electron host. Null when no npm install is reachable.
+ * Absolute path to npm's `npx-cli.js`: the npm an Electron host ships first, then the running
+ * node's own npm, then every npm on PATH (Windows layout, unix `lib` layout, or an `npm` symlink
+ * into the npm package). Null when no npm install is reachable.
  */
 export function findNpxCliJs({
   execPath = process.execPath,
@@ -118,13 +118,14 @@ export function findNpxCliJs({
     .map((dir) => path.join(dir, npm))
     .filter((candidate) => fs.existsSync(candidate))
 
+  const bundledByElectron = resourcesPath
+    ? [path.join(resourcesPath, 'app.asar.unpacked', 'node_modules', 'npm', 'bin', 'npx-cli.js')]
+    : []
   const candidates = [
+    ...bundledByElectron,
     ...npxCliUnderNodeDir(path.dirname(execPath)),
     ...npmPaths.flatMap((npmPath) => npxCliUnderNodeDir(path.dirname(npmPath))),
     ...npmPaths.map(npxCliBesideNpm).filter((candidate): candidate is string => !!candidate)
   ]
-  if (resourcesPath) {
-    candidates.push(path.join(resourcesPath, 'app.asar.unpacked', 'node_modules', 'npm', 'bin', 'npx-cli.js'))
-  }
   return candidates.find((candidate) => fs.existsSync(candidate)) ?? null
 }
