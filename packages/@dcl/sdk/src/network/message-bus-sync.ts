@@ -113,9 +113,8 @@ export function addSyncTransport(
   engine.addTransport(transport)
   // End add sync transport
 
-  // Receive & Process CRDT_STATE
   binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, async (data, sender) => {
-    if (isServerAtom.getOrNull() === false) return
+    if (!isServerAtom.getOrNull()) return
     DEBUG_NETWORK_MESSAGES() && console.log('[REQ_CRDT_STATE]', sender, Date.now())
     const chunks = engineToCrdt(engine)
     if (chunks.length === 0) {
