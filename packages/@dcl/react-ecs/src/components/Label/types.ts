@@ -18,6 +18,8 @@ export interface UiLabelProps {
   font?: UiFontType | undefined
   /** Behaviour when text reached. @defaultValue 'wrap' */
   textWrap?: UiTextWrapType | undefined
+  /** A font file in the scene, or a Google Fonts family name; `font` is the fallback. @defaultValue undefined */
+  fontSrc?: string | undefined
 }
 
 /**
