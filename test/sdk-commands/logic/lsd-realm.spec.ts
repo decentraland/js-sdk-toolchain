@@ -5,9 +5,7 @@ import path from 'path'
 import {
   PULSE_MAX_REALM_LENGTH,
   lsdPreviewSceneId,
-  lsdRealmKey,
-  pulseRealmArgs,
-  pulseRealmEnabled
+  lsdRealmKey
 } from '../../../packages/@dcl/sdk-commands/src/logic/lsd-realm'
 import { b64HashingFunction, machineId } from '../../../packages/@dcl/sdk-commands/src/logic/project-files'
 
@@ -77,48 +75,5 @@ describe('LSD Pulse realm key', () => {
       expect(boundary.firstHashed).toMatch(/^lsd:sha256:[0-9a-f]{64}$/)
       expect(boundary.firstHashed.length).toBeLessThanOrEqual(PULSE_MAX_REALM_LENGTH)
     })
-  })
-})
-
-describe('the --pulse-realm gate', () => {
-  const original = process.env.DCL_SERVER_PULSE_REALM
-
-  afterEach(() => {
-    if (original === undefined) delete process.env.DCL_SERVER_PULSE_REALM
-    else process.env.DCL_SERVER_PULSE_REALM = original
-  })
-
-  it('is off unless opted into', () => {
-    delete process.env.DCL_SERVER_PULSE_REALM
-    expect(pulseRealmEnabled()).toBe(false)
-
-    process.env.DCL_SERVER_PULSE_REALM = ''
-    expect(pulseRealmEnabled()).toBe(false)
-  })
-
-  it('accepts 1/true, case-insensitively', () => {
-    for (const value of ['1', 'true', 'TRUE', 'True']) {
-      process.env.DCL_SERVER_PULSE_REALM = value
-      expect(pulseRealmEnabled()).toBe(true)
-    }
-  })
-
-  it('treats any other value as off', () => {
-    for (const value of ['0', 'false', 'yes', 'no']) {
-      process.env.DCL_SERVER_PULSE_REALM = value
-      expect(pulseRealmEnabled()).toBe(false)
-    }
-  })
-
-  it('contributes no arguments while gated off', () => {
-    delete process.env.DCL_SERVER_PULSE_REALM
-
-    expect(pulseRealmArgs(PROJECT_ROOT)).toEqual([])
-  })
-
-  it('contributes one flag when enabled', () => {
-    process.env.DCL_SERVER_PULSE_REALM = '1'
-
-    expect(pulseRealmArgs(PROJECT_ROOT)).toEqual([`--pulse-realm=${lsdRealmKey(PROJECT_ROOT)}`])
   })
 })

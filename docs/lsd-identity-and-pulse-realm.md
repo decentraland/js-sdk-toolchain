@@ -80,32 +80,16 @@ same function the preview server already uses for scene and file entity ids:
 
 The non-overflow key is reversible base64 of an absolute path and a hostname, so it can carry a
 developer's directory layout and machine name. That is unchanged from the entity ids the preview
-server already serves locally, but once the gate below opens the same string travels as a comms
-realm — worth knowing before it leaves the machine.
+server already serves locally, but the same string travels as a comms realm — worth knowing
+before it leaves the machine.
 
-## The `--pulse-realm` gate
+## Who derives it
 
-`sdk-commands start` passes the realm to the spawned preview engine as `--pulse-realm=<key>`,
-identically for bevy and the hammurabi opt-out. It is **off by default**:
-
-```bash
-DCL_SERVER_PULSE_REALM=1 npm start
-```
-
-Two upstream reasons:
-
-- bevy-headless has no Pulse transport in server mode. `src/bin/headless.rs` never mentions Pulse,
-  and `crates/comms/src/pulse/plugin.rs` notes that a multi-tenant server "stays on LiveKit for
-  now". Tracked at
-  [decentraland/sdk-multiplayer-server#132](https://github.com/decentraland/sdk-multiplayer-server/issues/132).
-- Today the headless binary silently ignores unknown arguments, but
-  [bevy-explorer#1030](https://github.com/decentraland/bevy-explorer/pull/1030) makes it exit 2 on
-  them. Passing the flag unconditionally would break every preview on the default engine the day
-  that ships.
-
-**To flip the default on** once a bevy-headless release declares support: set
-`PULSE_REALM_DEFAULT = true` in `logic/lsd-realm.ts`. `DCL_SERVER_PULSE_REALM=0` remains the
-opt-out.
+`sdk-commands` passes no realm flag to the spawned preview engine. Since
+[bevy-explorer#1137](https://github.com/decentraland/bevy-explorer/pull/1137) the engine derives
+the key itself from the preview server's `b64-` scene entity id — the client and the server-mode
+Pulse listener compute the same string independently — so the spawn needs no `--pulse-realm`
+argument and a client pointed at the same preview lands in the same partition unprompted.
 
 ## Parcel bounds
 
