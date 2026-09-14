@@ -19,8 +19,7 @@ const EXIT_UNAVAILABLE = 78
 
 type ServerEngine = 'bevy' | 'hammurabi'
 
-const SHELL_METACHARACTERS = /[&|<>^%"'`$;()!]/
-const quoteForShell = (arg: string) => (/\s/.test(arg) ? `"${arg}"` : arg)
+const CMD_METACHARACTERS = /[&|<>^%"!\r\n]/
 
 const DEFAULT_ENGINE: ServerEngine = 'bevy'
 
@@ -151,7 +150,7 @@ export function startMultiplayerServer(
   const npxCliJs = findNpxCliJs()
   const useShell = !npxCliJs && process.platform === 'win32'
   if (useShell) {
-    const unsafe = npxArgs.find((arg) => SHELL_METACHARACTERS.test(arg))
+    const unsafe = npxArgs.find((arg) => CMD_METACHARACTERS.test(arg))
     if (unsafe) throw new Error(`refusing to run npx through the shell with argument ${JSON.stringify(unsafe)}`)
     printWarning(
       components.logger,
@@ -171,7 +170,12 @@ export function startMultiplayerServer(
 
   const serverProcess = npxCliJs
     ? spawn(process.execPath, [npxCliJs, ...npxArgs], { cwd: workingDir, shell: false, stdio, env })
-    : spawn(getNpxBin(), npxArgs.map(quoteForShell), { cwd: workingDir, shell: useShell, stdio, env })
+    : spawn(getNpxBin(), useShell ? npxArgs.map((arg) => `"${arg}"`) : npxArgs, {
+        cwd: workingDir,
+        shell: useShell,
+        stdio,
+        env
+      })
 
   const ready = engine === 'bevy' ? future<boolean>() : undefined
   if (ready) {

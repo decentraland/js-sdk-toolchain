@@ -24,6 +24,21 @@ function createFakeChild(): FakeChild {
   return child
 }
 
+function setPlatform(value: NodeJS.Platform): () => void {
+  const previous = Object.getOwnPropertyDescriptor(process, 'platform')!
+  Object.defineProperty(process, 'platform', { value })
+  return () => Object.defineProperty(process, 'platform', previous)
+}
+
+function setEnv(name: string, value: string): () => void {
+  const previous = process.env[name]
+  process.env[name] = value
+  return () => {
+    if (previous === undefined) delete process.env[name]
+    else process.env[name] = previous
+  }
+}
+
 describe('multiplayer-server', () => {
   let child: FakeChild
   let components: {
@@ -65,23 +80,31 @@ describe('multiplayer-server', () => {
   })
 
   describe('when npx-cli.js cannot be found on Windows', () => {
-    let platform: PropertyDescriptor
+    let restorePlatform: () => void
 
     beforeEach(() => {
-      platform = Object.getOwnPropertyDescriptor(process, 'platform')!
-      Object.defineProperty(process, 'platform', { value: 'win32' })
+      restorePlatform = setPlatform('win32')
       ;(findNpxCliJs as jest.Mock).mockReturnValueOnce(null)
       startMultiplayerServer(components as any, '/scene', 'http://localhost:8000', 'bevy')
     })
 
     afterEach(() => {
-      Object.defineProperty(process, 'platform', platform)
+      restorePlatform()
     })
 
     it('should run npx through the shell because Windows cannot spawn a .cmd directly', () => {
       const [bin, , options] = (spawn as jest.Mock).mock.calls[0]
-      expect(bin).toBe('npx')
+      expect(bin).toMatch(/^npx(\.cmd)?$/)
       expect(options.shell).toBe(true)
+    })
+
+    it('should quote every argument so cmd.exe passes each one through whole', () => {
+      const args: string[] = (spawn as jest.Mock).mock.calls[0][1]
+      expect(args).toEqual([
+        '"--yes"',
+        '"@dcl-regenesislabs/bevy-headless-server@latest"',
+        '"--realm=http://localhost:8000"'
+      ])
     })
 
     it('should warn that npx was not found next to node', () => {
@@ -89,24 +112,43 @@ describe('multiplayer-server', () => {
     })
   })
 
+  describe('when npx-cli.js cannot be found on Windows and the package override is a path with spaces and parentheses', () => {
+    let restorePlatform: () => void
+    let restoreEnv: () => void
+
+    beforeEach(() => {
+      restorePlatform = setPlatform('win32')
+      restoreEnv = setEnv('DCL_SERVER_PACKAGE', 'C:\\Program Files (x86)\\bevy\\server.tgz')
+      ;(findNpxCliJs as jest.Mock).mockReturnValueOnce(null)
+      startMultiplayerServer(components as any, '/scene', 'http://localhost:8000', 'bevy')
+    })
+
+    afterEach(() => {
+      restorePlatform()
+      restoreEnv()
+    })
+
+    it('should hand the quoted path to the shell instead of refusing it', () => {
+      const args: string[] = (spawn as jest.Mock).mock.calls[0][1]
+      expect(args).toContain('"C:\\Program Files (x86)\\bevy\\server.tgz"')
+    })
+  })
+
   describe('when npx-cli.js cannot be found on Windows and an argument carries shell metacharacters', () => {
-    let platform: PropertyDescriptor
-    let previous: string | undefined
+    let restorePlatform: () => void
+    let restoreEnv: () => void
     let start: () => unknown
 
     beforeEach(() => {
-      platform = Object.getOwnPropertyDescriptor(process, 'platform')!
-      Object.defineProperty(process, 'platform', { value: 'win32' })
-      previous = process.env.DCL_SERVER_PACKAGE
-      process.env.DCL_SERVER_PACKAGE = 'pkg@latest & calc.exe'
+      restorePlatform = setPlatform('win32')
+      restoreEnv = setEnv('DCL_SERVER_PACKAGE', 'pkg@latest & calc.exe')
       ;(findNpxCliJs as jest.Mock).mockReturnValueOnce(null)
       start = () => startMultiplayerServer(components as any, '/scene', 'http://localhost:8000', 'bevy')
     })
 
     afterEach(() => {
-      Object.defineProperty(process, 'platform', platform)
-      if (previous === undefined) delete process.env.DCL_SERVER_PACKAGE
-      else process.env.DCL_SERVER_PACKAGE = previous
+      restorePlatform()
+      restoreEnv()
     })
 
     it('should refuse to spawn instead of handing the argument to the shell', () => {
@@ -115,18 +157,39 @@ describe('multiplayer-server', () => {
     })
   })
 
-  describe('when the user overrides RUST_LOG', () => {
-    let previous: string | undefined
+  describe('when npx-cli.js cannot be found on a unix platform and the package override has spaces', () => {
+    let restorePlatform: () => void
+    let restoreEnv: () => void
 
     beforeEach(() => {
-      previous = process.env.RUST_LOG
-      process.env.RUST_LOG = 'error'
+      restorePlatform = setPlatform('linux')
+      restoreEnv = setEnv('DCL_SERVER_PACKAGE', '/opt/bevy server/server.tgz')
+      ;(findNpxCliJs as jest.Mock).mockReturnValueOnce(null)
       startMultiplayerServer(components as any, '/scene', 'http://localhost:8000', 'bevy')
     })
 
     afterEach(() => {
-      if (previous === undefined) delete process.env.RUST_LOG
-      else process.env.RUST_LOG = previous
+      restorePlatform()
+      restoreEnv()
+    })
+
+    it('should pass the path to npx verbatim because no shell parses it', () => {
+      const [, args, options] = (spawn as jest.Mock).mock.calls[0]
+      expect(args).toContain('/opt/bevy server/server.tgz')
+      expect(options.shell).toBe(false)
+    })
+  })
+
+  describe('when the user overrides RUST_LOG', () => {
+    let restoreEnv: () => void
+
+    beforeEach(() => {
+      restoreEnv = setEnv('RUST_LOG', 'error')
+      startMultiplayerServer(components as any, '/scene', 'http://localhost:8000', 'bevy')
+    })
+
+    afterEach(() => {
+      restoreEnv()
     })
 
     it('should keep the comms warnings the readiness check depends on', () => {
