@@ -139,22 +139,25 @@ export function createInputSystem(engine: IEngine): IInputSystem {
       const arrayCommands = Array.from(commands)
       for (let i = arrayCommands.length - 1; i >= 0; i--) {
         const command = arrayCommands[i]
+
+        // Commands are kept sorted by timestamp, so this one and every one
+        // below it belongs to a frame that was already accounted for. Stopping
+        // on the button state instead would end this entity's whole loop over
+        // a button another entity had already reported this frame.
+        if (command.timestamp <= globalState.previousFrameMaxTimestamp) {
+          break
+        }
+
         if (command.timestamp > maxTimestamp) {
           maxTimestamp = command.timestamp
         }
 
-        if (command.timestamp > globalState.previousFrameMaxTimestamp) {
-          globalState.thisFrameCommands.push(command)
-        }
+        globalState.thisFrameCommands.push(command)
 
         if (command.state === PointerEventType.PET_UP || command.state === PointerEventType.PET_DOWN) {
           const prevCommand = globalState.buttonState.get(command.button)
           if (!prevCommand || command.timestamp > prevCommand.timestamp) {
             globalState.buttonState.set(command.button, command)
-          } else {
-            // since we are iterating a descending array, we can early finish the
-            // loop
-            break
           }
         }
       }

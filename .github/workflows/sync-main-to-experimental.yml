@@ -5,67 +5,203 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+# Shared with merge-sync-to-experimental.yml: both workflows mutate chore/sync, and
+# interleaving them either rejects this push or recreates a branch that one just
+# deleted. One group serializes every writer.
+concurrency:
+  group: chore-sync-branch
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   sync:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write
-      pull-requests: write
-
     steps:
-      - name: Check out code
+      - name: Check out the code
         uses: actions/checkout@v4
         with:
+          # full history, otherwise the merges below have no common ancestor
           fetch-depth: 0
 
-      - name: Configure Git
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 24.16.0
+          cache: 'npm'
+
+      - name: Configure git identity
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config pull.rebase false  # Always merge, never rebase
 
-      - name: Sync main into experimental branch
+      - name: Create or update sync branch
+        run: |
+          set -euo pipefail
+
+          git fetch --no-tags --force --prune origin
+
+          # An existing chore/sync is a sync still in flight: keep it, so commits
+          # arriving on main accumulate on it and a manual conflict resolution pushed
+          # to it survives. The branch is deleted when its PR merges, so the next sync
+          # starts from experimental again.
+          BASE=origin/experimental
+          if git rev-parse --verify --quiet refs/remotes/origin/chore/sync >/dev/null; then
+            BASE=origin/chore/sync
+          fi
+          git checkout -B chore/sync "$BASE"
+
+          # chore/sync must be experimental + main: anything that only exists on
+          # experimental has to survive the sync. No -X theirs — resolving conflicts in
+          # main's favour silently drops experimental-only code. A conflict stops the run
+          # instead, and the resolution pushed to chore/sync is reused by later runs.
+          for REF in origin/experimental origin/main; do
+            if ! git merge -m "chore: merge $REF into chore/sync" "$REF"; then
+              git merge --abort || true
+              echo "::error::Merging $REF into chore/sync failed. To recover: branch chore/sync off experimental (or check out the existing one), merge main into it, resolve, push it, and open a PR against experimental. Later runs merge on top of that resolution."
+              exit 1
+            fi
+          done
+
+      # Non-fatal on purpose: a regeneration that fails on a transient npm/protocol
+      # hiccup must not stop main's commits from reaching the sync PR. The guard below
+      # keeps a half-finished regeneration from being committed, and the PR says so.
+      - name: Update protocol and regenerate snapshots
+        id: regen
         continue-on-error: true
         run: |
-          BRANCH_NAME="chore/sync"
-          git checkout -B $BRANCH_NAME origin/experimental
+          # Explicit: the step must stop at the first failing target so its outcome is
+          # recorded, rather than building on top of a half-applied protocol bump.
+          set -e
 
-          # Merge main changes into experimental, preferring main changes on conflicts
-          git fetch origin main
-          git merge -X theirs origin/main --no-edit || echo "Merge completed (conflicts auto-resolved in favor of main)"
-
-          # Run required update steps
-          make update-protocol 'experimental'
+          make update-protocol
           make install
           make build
           make update-snapshots
 
-      - name: Commit and push changes in experimental
+      - name: Discard broken snapshots
+        id: snapshot_guard
         run: |
-          BRANCH_NAME="chore/sync"
-          # Commit if there are changes
-          git add -A .
-          git commit --no-edit -m "updated protocol and snapshots" || echo "No changes to commit"
+          # -e so a failing checkout/clean stops the run rather than letting the broken
+          # snapshots it was meant to remove reach the commit below. The greps that are
+          # allowed to find nothing are guarded individually.
+          set -euo pipefail
 
-          # Push (force to keep PR updated)
-          git push --force --set-upstream origin $BRANCH_NAME
+          # An ERR! line means the QuickJS eval threw mid-run, so the snapshot captured a
+          # truncated scene and would mask real regressions. Keeping the committed
+          # snapshot is strictly better than committing that.
+          if grep -rlq "ERR!" test/snapshots/ 2>/dev/null; then
+            grep -rln "ERR!" test/snapshots/ || true
+            git checkout -- test/snapshots/
+            # checkout restores tracked files; a brand-new broken snapshot is untracked.
+            git clean -fdq test/snapshots/
+            echo "broken=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::Regenerated snapshots contained ERR! traces and were discarded; the sync PR keeps the previous ones."
+          else
+            echo "broken=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push the sync branch
+        env:
+          REGEN_OUTCOME: ${{ steps.regen.outcome }}
+        run: |
+          set -euo pipefail
+
+          # A regeneration that stopped partway leaves a half-applied protocol bump —
+          # lockfiles rewritten, generated sources not. Drop all of it and keep only the
+          # merge; the PR says the pin and snapshots are stale. Ignored paths such as
+          # node_modules survive: no -x on the clean.
+          if [ "$REGEN_OUTCOME" = "failure" ]; then
+            git checkout -- .
+            git clean -fdq .
+          fi
+
+          git add -A .
+          git commit -m "chore: update protocol and snapshots" || echo "Nothing regenerated to commit"
+
+          # Push whenever the recomputed branch differs from the remote, so a stale
+          # chore/sync can never stay the head of an open PR. Skip it when there is
+          # nothing to propose either, so a no-op run does not leave a branch behind
+          # that later runs would read as a sync in flight.
+          REMOTE_HEAD="$(git rev-parse --verify --quiet refs/remotes/origin/chore/sync || echo absent)"
+          if [ "$(git rev-parse HEAD)" = "$REMOTE_HEAD" ] \
+             || git merge-base --is-ancestor HEAD origin/experimental; then
+            echo "Nothing to push: chore/sync is current, or experimental already contains it."
+          else
+            git push --force-with-lease origin chore/sync
+          fi
 
       - name: Create or update PR
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REGEN_OUTCOME: ${{ steps.regen.outcome }}
+          SNAPSHOTS_BROKEN: ${{ steps.snapshot_guard.outputs.broken }}
+          # Backticks here are data, not shell source: they reach gh through the
+          # variable and are never re-evaluated.
+          PR_BODY: |
+            :crown: *An automated PR to keep experimental in sync with main, with protocol updates, build and snapshots*
+
+            **This PR is a draft on purpose: it is landed by a workflow, not by a button.**
+
+            ### How to land it
+
+            1. Test the packages published by the **build** job on this PR — the CI comment
+               below carries the `npm install` URLs and the `/changerealm` link.
+            2. Go to **Actions -> Merge sync PR into experimental -> Run workflow**, from
+               `main`.
+            3. That workflow marks this PR ready, merges `chore/sync` into `experimental`
+               as a real merge commit, dispatches CI on `experimental` so the
+               `@experimental` npm tag is republished, and this PR closes as **Merged**.
+
+            Further commits on `main` are merged onto this same branch while the PR is
+            open, so it stays current on its own.
+
+            > [!IMPORTANT]
+            > Do not take this PR out of draft in order to squash it. Squash is the only
+            > merge this repo allows, and squashing replaces `main`'s commits with a single
+            > new one: `main` stops being an ancestor of `experimental`, the merge base
+            > freezes, and every later sync re-applies changes `experimental` already has,
+            > conflicting within a couple of runs.
+            >
+            > If it does get squashed, restore the ancestry with
+            > `git merge -s ours origin/main` on `experimental`.
         run: |
-          PR_NUMBER=$(gh pr list --base experimental --head chore/sync --state open --json number --jq '.[0].number')
+          set -euo pipefail
+
+          # gh pr create fails with "No commits between ..." when nothing is ahead.
+          # The tree check also covers a net-zero round of main changes, where commits
+          # exist but there is nothing left to propose.
+          if git merge-base --is-ancestor HEAD origin/experimental \
+             || git diff --quiet origin/experimental HEAD; then
+            echo "experimental already has everything chore/sync would propose."
+            exit 0
+          fi
+
+          NOTE=""
+          if [ "$REGEN_OUTCOME" = "failure" ]; then
+            NOTE="$NOTE"$'\n\n> [!WARNING]\n> `make update-protocol` / `make update-snapshots` failed on this run, so the protocol pin and snapshots on this branch may be stale. Check the workflow log before landing.'
+          fi
+          if [ "$SNAPSHOTS_BROKEN" = "true" ]; then
+            NOTE="$NOTE"$'\n\n> [!WARNING]\n> Regenerated snapshots contained `ERR!` traces and were discarded. Fix the scene-load failure (usually a missing mock in `test/snapshots.spec.ts`) and re-run this workflow.'
+          fi
+
+          PR_NUMBER="$(gh pr list --base experimental --head chore/sync --state open --json number --jq '.[0].number // empty')"
 
           if [ -n "$PR_NUMBER" ]; then
-            echo "PR #$PR_NUMBER already exists, adding comment..."
-            gh pr comment $PR_NUMBER --body "🔄 Updated with latest changes from **main** on $(date -u '+%Y-%m-%d %H:%M UTC')"
+            echo "PR #$PR_NUMBER already exists, adding a comment..."
+            gh pr comment "$PR_NUMBER" --body "🔄 Updated with latest changes from **main** on $(date -u '+%Y-%m-%d %H:%M UTC')${NOTE}"
           else
             echo "Creating new PR..."
+            # --draft: squash is the only merge the repo allows, and squashing this PR
+            # breaks the ancestry. A draft has no merge button at all.
             gh pr create \
+              --draft \
               --base experimental \
               --head chore/sync \
               --title "chore: sync main to experimental" \
-              --body ":crown: *Automated PR to keep experimental in sync with main (with protocol updates, build & snapshots)*" \
+              --body "${PR_BODY}${NOTE}" \
               --label "auto-pr"
           fi

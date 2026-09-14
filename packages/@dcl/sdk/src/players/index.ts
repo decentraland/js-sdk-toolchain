@@ -92,8 +92,11 @@ export function definePlayerHelper(engine: IEngine) {
         isGuest: !!playerData?.isGuest,
         userId: playerData?.address ?? '',
         avatar: avatarData ?? undefined,
-        wearables: wearablesData?.wearableUrns ?? [],
-        emotes: wearablesData?.emoteUrns ?? [],
+        // Component reads come back deeply readonly, so these are copied rather than
+        // aliased: the public Player type promises plain mutable arrays, and handing
+        // out the component's own frozen array would throw on any caller that writes.
+        wearables: [...(wearablesData?.wearableUrns ?? [])],
+        emotes: [...(wearablesData?.emoteUrns ?? [])],
         position: Transform.getOrNull(userEntity)?.position
       }
     }
