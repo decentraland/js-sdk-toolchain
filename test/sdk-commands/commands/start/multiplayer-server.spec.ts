@@ -307,6 +307,33 @@ describe('multiplayer-server', () => {
     })
   })
 
+  describe('when the hammurabi server writes output', () => {
+    beforeEach(() => {
+      startMultiplayerServer(components as any, '/scene', 'http://localhost:8000', 'hammurabi')
+    })
+
+    it('should pipe stdout and stderr so the isolated-vm server logs can be forwarded to the host', () => {
+      const options = (spawn as jest.Mock).mock.calls[0][2]
+      expect(options.stdio).toEqual(['inherit', 'pipe', 'pipe'])
+    })
+
+    it('should forward a stdout line to the host stdout tagged as [Server]', async () => {
+      child.stdout.write('hello from hammurabi\n')
+      await new Promise((resolve) => setImmediate(resolve))
+      const written = stdoutWrite.mock.calls.map((call) => String(call[0])).join('')
+      expect(written).toContain('[Server]')
+      expect(written).toContain('hello from hammurabi')
+    })
+
+    it('should forward a stderr line to the host stderr tagged as [Server]', async () => {
+      child.stderr.write('boom from hammurabi\n')
+      await new Promise((resolve) => setImmediate(resolve))
+      const written = stderrWrite.mock.calls.map((call) => String(call[0])).join('')
+      expect(written).toContain('[Server]')
+      expect(written).toContain('boom from hammurabi')
+    })
+  })
+
   describe('waitForServerReady', () => {
     beforeEach(() => {
       jest.useFakeTimers()

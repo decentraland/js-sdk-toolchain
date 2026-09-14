@@ -80,11 +80,7 @@ function localTime(utcTimestamp: string): string {
   return isNaN(date.getTime()) ? '' : colors.dim(date.toTimeString().slice(0, 8)) + ' '
 }
 
-/**
- * Forwards a bevy child stream line by line, tagged `[Server]` to stand apart from
- * the preview CLI's own output, dropping the tracing prefix (warnings yellow,
- * errors red) and the periodic `[headless] alive:` heartbeat.
- */
+/** Forwards a server child stream to `sink`, line by line, tagged `[Server]` and ANSI-cleaned. */
 function forwardEngineLogs(source: Readable | null, sink: NodeJS.WriteStream) {
   if (!source) return
   const serverTag = colors.greenBright('[Server]') + ' '
@@ -168,7 +164,7 @@ export function startMultiplayerServer(
     env.RUST_LOG = 'warn,scene_runner::renderer_context=info'
   }
 
-  const stdio: StdioOptions = engine === 'bevy' ? ['inherit', 'pipe', 'pipe'] : 'inherit'
+  const stdio: StdioOptions = ['inherit', 'pipe', 'pipe']
 
   const serverProcess = npxCliJs
     ? spawn(process.execPath, [npxCliJs, ...npxArgs], { cwd: workingDir, shell: false, stdio, env })
