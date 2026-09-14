@@ -6,6 +6,7 @@ import { colors } from '../../components/log'
 import { PreviewComponents } from './types'
 import { ProjectUnion } from '../../logic/project-validations'
 import { isElectronEnvironment, getSpawnEnv, findNpxCliJs, getNpxBin } from './utils'
+import { engineEnvArgs } from './dcl-env'
 
 const HAMMURABI_PACKAGE = '@dcl/hammurabi-server'
 const HAMMURABI_VERSION = 'next'
@@ -141,7 +142,8 @@ export function startMultiplayerServer(
   components: Pick<CliComponents, 'logger' | 'analytics'>,
   workingDir: string,
   realm: string,
-  engine: ServerEngine = DEFAULT_ENGINE
+  engine: ServerEngine = DEFAULT_ENGINE,
+  engineArgs: string[] = []
 ): ChildProcess {
   const pkg = packageSpec(engine)
 
@@ -150,7 +152,7 @@ export function startMultiplayerServer(
     `Starting ${colors.bold('Multiplayer Server')} (${engine}) with realm: ${colors.bold(realm)}`
   )
 
-  const npxArgs = ['--yes', pkg, `--realm=${realm}`]
+  const npxArgs = ['--yes', pkg, `--realm=${realm}`, ...engineArgs]
   const npxCliJs = findNpxCliJs()
 
   // In Electron, override npm_config_prefix because npm derives its prefix from process.execPath,
@@ -231,11 +233,19 @@ export function startMultiplayerServer(
 export function spawnAuthServer(
   components: PreviewComponents,
   project: ProjectUnion,
-  realm: string
+  realm: string,
+  dclenv: string = 'org'
 ): ChildProcess | undefined {
   const engine = selectedEngine()
   try {
-    const child = startMultiplayerServer(components, project.workingDirectory, realm, engine)
+    // hammurabi knows nothing of base domains; env args are a bevy-engine concept
+    const child = startMultiplayerServer(
+      components,
+      project.workingDirectory,
+      realm,
+      engine,
+      engine === 'bevy' ? engineEnvArgs(dclenv) : []
+    )
     if (engine === 'bevy') {
       child.on('close', (code) => {
         if (code !== EXIT_UNAVAILABLE) return

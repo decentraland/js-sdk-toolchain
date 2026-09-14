@@ -91,6 +91,11 @@ the key itself from the preview server's `b64-` scene entity id — the client a
 Pulse listener compute the same string independently — so the spawn needs no `--pulse-realm`
 argument and a client pointed at the same preview lands in the same partition unprompted.
 
+The one place the key is *stated* rather than derived: the mobile preview deep link carries
+`pulse-realm=<key>` (and, under `--dclenv zone`, the zone `pulse-server=` endpoint) so a
+phone-side explorer can join the partition without re-deriving it —
+`commands/start/dcl-env.ts`.
+
 ## Parcel bounds
 
 Pulse's `FieldValidator` disconnects peers that report invalid parcel indices, so a scene outside
