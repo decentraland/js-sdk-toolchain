@@ -254,6 +254,19 @@ describe('multiplayer-server', () => {
     })
   })
 
+  describe('when the bevy server emits a process error before joining the scene room', () => {
+    let ready: Promise<boolean> | undefined
+
+    beforeEach(() => {
+      ready = startMultiplayerServer(components as any, '/scene', 'http://localhost:8000', 'bevy').ready
+      child.emit('error', new Error('spawn npx ENOENT'))
+    })
+
+    it('should resolve ready as false', async () => {
+      await expect(ready).resolves.toBe(false)
+    })
+  })
+
   describe('when starting the hammurabi server', () => {
     let ready: Promise<boolean> | undefined
 

@@ -191,6 +191,7 @@ export function startMultiplayerServer(
 
   serverProcess.on('error', (error) => {
     printWarning(components.logger, `Multiplayer Server process error: ${error.message}`)
+    ready?.resolve(false)
   })
 
   const cleanup = () => {

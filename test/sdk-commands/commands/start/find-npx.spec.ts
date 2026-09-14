@@ -132,6 +132,22 @@ describe('findNpxCliJs', () => {
     })
   })
 
+  describe('when npm is only reachable through a relative PATH entry', () => {
+    let execPath: string
+    let pathEnv: string
+
+    beforeEach(() => {
+      execPath = touch(path.join(root, 'shims', 'node.exe'))
+      touch(path.join(root, 'npm.cmd'))
+      touch(path.join(root, 'npx-cli.js'))
+      pathEnv = path.relative(process.cwd(), root)
+    })
+
+    it('should not resolve npx-cli.js', () => {
+      expect(findNpxCliJs({ execPath, pathEnv, npmBin: 'npm.cmd' })).toBeNull()
+    })
+  })
+
   describe('when npx is available from an absolute PATH entry', () => {
     let npx: string
     let pathEnv: string

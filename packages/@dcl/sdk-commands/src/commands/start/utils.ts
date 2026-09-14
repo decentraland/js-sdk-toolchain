@@ -44,40 +44,6 @@ export function getSpawnEnv(): { [key: string]: string } {
   return process.env as { [key: string]: string }
 }
 
-/**
- * Gets the npm binary name (npm or npm.cmd on Windows)
- */
-export function getNpmBin(): string {
-  return npmBin
-}
-
-/**
- * Gets the npx binary name (npx or npx.cmd on Windows)
- */
-export function getNpxBin(): string {
-  return npxBin
-}
-
-/**
- * Gets the npm-cli.js path in Electron environment, or null if not found
- * Should only be called when isElectronEnvironment() returns true
- */
-export function getElectronNpm(): string | null {
-  const npmPath =
-    process.env.PATH?.split(path.delimiter)
-      .map((dir) => path.join(dir, npmBin))
-      .find((npm) => fs.existsSync(npm)) || npmBin
-
-  if (fs.existsSync(npmPath)) {
-    const npmCliJs = path.join(path.dirname(npmPath), 'npm-cli.js')
-    if (fs.existsSync(npmCliJs)) {
-      return npmCliJs
-    }
-  }
-
-  return null
-}
-
 type NpxLookup = {
   execPath?: string
   pathEnv?: string
@@ -114,7 +80,7 @@ export function findNpxCliJs({
 }: NpxLookup = {}): string | null {
   const npmPaths = pathEnv
     .split(path.delimiter)
-    .filter(Boolean)
+    .filter(path.isAbsolute)
     .map((dir) => path.join(dir, npm))
     .filter((candidate) => fs.existsSync(candidate))
 
