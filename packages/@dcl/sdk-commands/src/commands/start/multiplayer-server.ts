@@ -6,15 +6,17 @@ import { colors } from '../../components/log'
 import { PreviewComponents } from './types'
 import { ProjectUnion } from '../../logic/project-validations'
 import { isElectronEnvironment, getSpawnEnv, findNpxCliJs, getNpxBin } from './utils'
+import { engineEnvArgs } from './dcl-env'
 
 const HAMMURABI_PACKAGE = '@dcl/hammurabi-server'
 const HAMMURABI_VERSION = 'next'
 
 const BEVY_PACKAGE = '@dcl-regenesislabs/bevy-headless-server'
-// `latest` moves only when someone dispatches bevy-explorer's publish-headless
-// workflow with dist_tag=latest — engine pushes to main land on `next` and cannot
-// change what previews run. DCL_SERVER_PACKAGE overrides for local builds.
-const BEVY_VERSION = 'latest'
+// Exact pin: previews move engines only when someone edits this line — a floating tag
+// re-resolves without warning. The pinned build must accept --base-domain and forward
+// --preview-gatekeeper through its launcher (bevy-explorer#1260). DCL_SERVER_PACKAGE
+// overrides for local builds.
+const BEVY_VERSION = '0.1.0-34847389047.commit-7546497'
 
 // The bevy server exits with this when it can never run here (unsupported platform,
 // missing binary, bad arguments). We fail the preview loudly instead of retrying:
@@ -141,7 +143,8 @@ export function startMultiplayerServer(
   components: Pick<CliComponents, 'logger' | 'analytics'>,
   workingDir: string,
   realm: string,
-  engine: ServerEngine = DEFAULT_ENGINE
+  engine: ServerEngine = DEFAULT_ENGINE,
+  engineArgs: string[] = []
 ): ChildProcess {
   const pkg = packageSpec(engine)
 
@@ -150,7 +153,7 @@ export function startMultiplayerServer(
     `Starting ${colors.bold('Multiplayer Server')} (${engine}) with realm: ${colors.bold(realm)}`
   )
 
-  const npxArgs = ['--yes', pkg, `--realm=${realm}`]
+  const npxArgs = ['--yes', pkg, `--realm=${realm}`, ...engineArgs]
   const npxCliJs = findNpxCliJs()
 
   // In Electron, override npm_config_prefix because npm derives its prefix from process.execPath,
@@ -231,11 +234,19 @@ export function startMultiplayerServer(
 export function spawnAuthServer(
   components: PreviewComponents,
   project: ProjectUnion,
-  realm: string
+  realm: string,
+  dclenv: string = 'org'
 ): ChildProcess | undefined {
   const engine = selectedEngine()
   try {
-    const child = startMultiplayerServer(components, project.workingDirectory, realm, engine)
+    // hammurabi knows nothing of base domains; env args are a bevy-engine concept
+    const child = startMultiplayerServer(
+      components,
+      project.workingDirectory,
+      realm,
+      engine,
+      engine === 'bevy' ? engineEnvArgs(dclenv) : []
+    )
     if (engine === 'bevy') {
       child.on('close', (code) => {
         if (code !== EXIT_UNAVAILABLE) return
