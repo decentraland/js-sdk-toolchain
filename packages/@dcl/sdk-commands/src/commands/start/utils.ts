@@ -2,7 +2,6 @@ import * as os from 'os'
 import fs from 'fs'
 import path from 'path'
 
-// Platform-aware binary names
 const npmBin = /^win/.test(process.platform) ? 'npm.cmd' : 'npm'
 const npxBin = /^win/.test(process.platform) ? 'npx.cmd' : 'npx'
 

@@ -13,14 +13,8 @@ const HAMMURABI_PACKAGE = '@dcl/hammurabi-server'
 const HAMMURABI_VERSION = 'next'
 
 const BEVY_PACKAGE = '@dcl-regenesislabs/bevy-headless-server'
-// `latest` moves only when someone dispatches bevy-explorer's publish-headless
-// workflow with dist_tag=latest — engine pushes to main land on `next` and cannot
-// change what previews run. DCL_SERVER_PACKAGE overrides for local builds.
 const BEVY_VERSION = 'latest'
 
-// The bevy server exits with this when it can never run here (unsupported platform,
-// missing binary, bad arguments). We fail the preview loudly instead of retrying:
-// a silent fallback would hide broken bevy installs from the people shipping them.
 const EXIT_UNAVAILABLE = 78
 
 type ServerEngine = 'bevy' | 'hammurabi'
@@ -61,21 +55,13 @@ function registerProcessCleanup(cleanup: () => void): () => void {
   }
 }
 
-// `2026-08-11T14:28:33.522058Z  INFO scene_runner::renderer_context: ` — the
-// timestamp/level/target prefix the bevy engine's tracing puts on every line
 const TRACING_PREFIX = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})\.\d+Z\s+(INFO|WARN|ERROR|DEBUG|TRACE)\s+[\w:]+:\s?/
 const HEARTBEAT_LINE = /^\[headless\] alive:/
 const SCENE_ROOM_JOINED_LINE = /added scene channel/
 const SERVER_READY_TIMEOUT_MS = 120_000
-// The engine colors its output even when piped, so lines arrive wrapped in ANSI
-// escapes and must be stripped before the prefix regex can match.
 // eslint-disable-next-line no-control-regex
 const ANSI_CODES = /\u001b\[[0-9;]*m/g
 
-// Engine-internal noise in local preview: the asset pipeline hunts dot-prefixed
-// processed gltf paths the preview server never has (repeated on every scene
-// composition), and the headless build's expected gizmo/asset-loader startup
-// complaints about the renderer it deliberately doesn't have
 const ENGINE_NOISE = [
   /^failed to process gltf/,
   /^Path not found: \$ipfs/,
@@ -83,18 +69,14 @@ const ENGINE_NOISE = [
   /^Could not find an asset loader matching: .* Path: Some\("embedded:\/\//
 ]
 
-// `[[0, 0] 3.33] ` — parcel coords + scene clock the engine prepends to every
-// scene log line; redundant in a single-scene preview
 const SCENE_CONTEXT = /^\[\[-?\d+, -?\d+\] \d+\.\d+\] /
 
-// color alone conveys the level; the LOG/WARN/ERROR words are dropped
 function colorByLevel(level: string | undefined, message: string): string {
   if (level === 'WARN') return colors.yellow(message)
   if (level === 'ERROR') return colors.redBright(message)
   return message
 }
 
-// engine timestamps are UTC ISO with microseconds; show local wall-clock instead
 function localTime(utcTimestamp: string): string {
   const date = new Date(utcTimestamp + 'Z')
   return isNaN(date.getTime()) ? '' : colors.dim(date.toTimeString().slice(0, 8)) + ' '
