@@ -56,8 +56,8 @@ function registerProcessCleanup(cleanup: () => void): () => void {
 
 const TRACING_PREFIX = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})\.\d+Z\s+(INFO|WARN|ERROR|DEBUG|TRACE)\s+[\w:]+:\s?/
 const HEARTBEAT_LINE = /^\[headless\] alive:/
-const SCENE_ROOM_JOINED_LINE = /\[headless\] scene room connected|added scene channel/
-const SERVER_READY_TIMEOUT_MS = 120_000
+export const SERVER_READY_GRACE_MS = 1_500
+const SERVER_READY_TIMEOUT_MS = 10_000
 const ANSI_CODES = /\u001b\[[0-9;]*m/g
 
 const ENGINE_NOISE = [
@@ -85,13 +85,12 @@ function localTime(utcTimestamp: string): string {
  * the preview CLI's own output, dropping the tracing prefix (warnings yellow,
  * errors red) and the periodic `[headless] alive:` heartbeat.
  */
-function forwardEngineLogs(source: Readable | null, sink: NodeJS.WriteStream, onLine: (line: string) => void) {
+function forwardEngineLogs(source: Readable | null, sink: NodeJS.WriteStream) {
   if (!source) return
   const serverTag = colors.greenBright('[Server]') + ' '
   const writeClean = (raw: string) => {
     const line = raw.replace(ANSI_CODES, '')
     if (!line.trim()) return
-    onLine(line)
     if (HEARTBEAT_LINE.test(line)) return
     const match = line.match(TRACING_PREFIX)
     if (!match) {
@@ -123,8 +122,8 @@ function forwardEngineLogs(source: Readable | null, sink: NodeJS.WriteStream, on
 
 export type MultiplayerServer = {
   child: ChildProcess
-  /** bevy only: true once the server joined the scene room, false if it exited first. */
-  ready?: Promise<boolean>
+  /** true once the process survived the startup grace window, false if it errored or exited first. */
+  ready: Promise<boolean>
 }
 
 /**
@@ -165,8 +164,8 @@ export function startMultiplayerServer(
     ? { ...getSpawnEnv(), npm_config_prefix: workingDir }
     : { ...getSpawnEnv() }
 
-  if (engine === 'bevy') {
-    env.RUST_LOG = env.RUST_LOG ? `${env.RUST_LOG},comms=warn` : 'warn,scene_runner::renderer_context=info'
+  if (engine === 'bevy' && !env.RUST_LOG) {
+    env.RUST_LOG = 'warn,scene_runner::renderer_context=info'
   }
 
   const stdio: StdioOptions = engine === 'bevy' ? ['inherit', 'pipe', 'pipe'] : 'inherit'
@@ -180,18 +179,20 @@ export function startMultiplayerServer(
         env
       })
 
-  const ready = engine === 'bevy' ? future<boolean>() : undefined
-  if (ready) {
-    const onLine = (line: string) => {
-      if (SCENE_ROOM_JOINED_LINE.test(line)) ready.resolve(true)
-    }
-    forwardEngineLogs(serverProcess.stdout, process.stdout, onLine)
-    forwardEngineLogs(serverProcess.stderr, process.stderr, onLine)
-  }
+  forwardEngineLogs(serverProcess.stdout, process.stdout)
+  forwardEngineLogs(serverProcess.stderr, process.stderr)
+
+  const ready = future<boolean>()
+  let graceTimer: NodeJS.Timeout | undefined
+
+  serverProcess.on('spawn', () => {
+    graceTimer = setTimeout(() => ready.resolve(true), SERVER_READY_GRACE_MS)
+  })
 
   serverProcess.on('error', (error) => {
+    clearTimeout(graceTimer)
     printWarning(components.logger, `Multiplayer Server process error: ${error.message}`)
-    ready?.resolve(false)
+    ready.resolve(false)
   })
 
   const cleanup = () => {
@@ -204,7 +205,8 @@ export function startMultiplayerServer(
 
   serverProcess.on('close', (code, signal) => {
     removeCleanup()
-    ready?.resolve(false)
+    clearTimeout(graceTimer)
+    ready.resolve(false)
     if (code !== 0 && code !== null) {
       components.analytics.track('Multiplayer server exited', {
         engine,
@@ -224,13 +226,13 @@ export function startMultiplayerServer(
   return { child: serverProcess, ready }
 }
 
-/** Waits for the server to join the scene room, exit, or time out. */
+/** Waits for the server process to come up, fail, or time out. */
 export async function waitForServerReady(
   components: Pick<CliComponents, 'logger'>,
   ready: Promise<boolean>,
   timeoutMs: number = SERVER_READY_TIMEOUT_MS
 ): Promise<void> {
-  printProgressInfo(components.logger, 'Waiting for the Multiplayer Server to join the scene room...')
+  printProgressInfo(components.logger, 'Waiting for the Multiplayer Server to start...')
   let timer: NodeJS.Timeout | undefined
   const timeout = new Promise<'timeout'>((resolve) => {
     timer = setTimeout(() => resolve('timeout'), timeoutMs)
@@ -260,7 +262,7 @@ export async function waitForServerReady(
  * @param components - Preview components including logger
  * @param project - The project to start the multiplayer server for
  * @param realm - The realm URL to pass to the server
- * @returns The readiness promise when the server output is observable, undefined otherwise
+ * @returns The readiness promise, or undefined when the server could not be spawned
  */
 export function spawnAuthServer(
   components: PreviewComponents,

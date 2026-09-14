@@ -2,6 +2,7 @@ import { EventEmitter } from 'events'
 import { PassThrough } from 'stream'
 import { spawn } from 'child_process'
 import {
+  SERVER_READY_GRACE_MS,
   spawnAuthServer,
   startMultiplayerServer,
   waitForServerReady
@@ -217,18 +218,24 @@ describe('multiplayer-server', () => {
       restoreEnv()
     })
 
-    it('should keep the comms warnings the readiness check depends on', () => {
+    it('should pass the user value through untouched', () => {
       const env: Record<string, string> = (spawn as jest.Mock).mock.calls[0][2].env
-      expect(env.RUST_LOG).toBe('error,comms=warn')
+      expect(env.RUST_LOG).toBe('error')
     })
   })
 
-  describe('when the bevy server prints the scene-room-connected marker', () => {
-    let ready: Promise<boolean> | undefined
+  describe('when the server process survives the startup grace window', () => {
+    let ready: Promise<boolean>
 
     beforeEach(() => {
+      jest.useFakeTimers()
       ready = startMultiplayerServer(components as any, '/scene', 'http://localhost:8000', 'bevy').ready
-      child.stdout.write('[headless] scene room connected: bafkrei\n')
+      child.emit('spawn')
+      jest.advanceTimersByTime(SERVER_READY_GRACE_MS)
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
     })
 
     it('should resolve ready as true', async () => {
@@ -236,25 +243,19 @@ describe('multiplayer-server', () => {
     })
   })
 
-  describe('when the bevy server predates the marker and only logs the tracing line', () => {
-    let ready: Promise<boolean> | undefined
+  describe('when the server process exits before the grace window elapses', () => {
+    let ready: Promise<boolean>
 
     beforeEach(() => {
+      jest.useFakeTimers()
       ready = startMultiplayerServer(components as any, '/scene', 'http://localhost:8000', 'bevy').ready
-      child.stdout.write('2026-08-11T14:28:33.522058Z  WARN comms: added scene channel SetCurrentScene { .. }\n')
-    })
-
-    it('should still resolve ready as true from the fallback signal', async () => {
-      await expect(ready).resolves.toBe(true)
-    })
-  })
-
-  describe('when the bevy server exits before joining the scene room', () => {
-    let ready: Promise<boolean> | undefined
-
-    beforeEach(() => {
-      ready = startMultiplayerServer(components as any, '/scene', 'http://localhost:8000', 'bevy').ready
+      child.emit('spawn')
       child.emit('close', 1, null)
+      jest.advanceTimersByTime(SERVER_READY_GRACE_MS)
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
     })
 
     it('should resolve ready as false', async () => {
@@ -267,12 +268,19 @@ describe('multiplayer-server', () => {
     })
   })
 
-  describe('when the bevy server emits a process error before joining the scene room', () => {
-    let ready: Promise<boolean> | undefined
+  describe('when the server process emits an error before the grace window elapses', () => {
+    let ready: Promise<boolean>
 
     beforeEach(() => {
+      jest.useFakeTimers()
       ready = startMultiplayerServer(components as any, '/scene', 'http://localhost:8000', 'bevy').ready
+      child.emit('spawn')
       child.emit('error', new Error('spawn npx ENOENT'))
+      jest.advanceTimersByTime(SERVER_READY_GRACE_MS)
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
     })
 
     it('should resolve ready as false', async () => {
@@ -281,14 +289,21 @@ describe('multiplayer-server', () => {
   })
 
   describe('when starting the hammurabi server', () => {
-    let ready: Promise<boolean> | undefined
+    let ready: Promise<boolean>
 
     beforeEach(() => {
+      jest.useFakeTimers()
       ready = startMultiplayerServer(components as any, '/scene', 'http://localhost:8000', 'hammurabi').ready
+      child.emit('spawn')
+      jest.advanceTimersByTime(SERVER_READY_GRACE_MS)
     })
 
-    it('should expose no readiness because its output is not observable', () => {
-      expect(ready).toBeUndefined()
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    it('should resolve ready as true because liveness does not depend on observable output', async () => {
+      await expect(ready).resolves.toBe(true)
     })
   })
 
