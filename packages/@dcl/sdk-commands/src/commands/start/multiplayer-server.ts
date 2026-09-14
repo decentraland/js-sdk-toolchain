@@ -12,10 +12,11 @@ const HAMMURABI_PACKAGE = '@dcl/hammurabi-server'
 const HAMMURABI_VERSION = 'next'
 
 const BEVY_PACKAGE = '@dcl-regenesislabs/bevy-headless-server'
-// `latest` moves only when someone dispatches bevy-explorer's publish-headless
-// workflow with dist_tag=latest — engine pushes to main land on `next` and cannot
-// change what previews run. DCL_SERVER_PACKAGE overrides for local builds.
-const BEVY_VERSION = 'latest'
+// Exact pin: previews move engines only when someone edits this line — a floating tag
+// re-resolves without warning. The pinned build must accept --base-domain and forward
+// --preview-gatekeeper through its launcher (bevy-explorer#1260). DCL_SERVER_PACKAGE
+// overrides for local builds.
+const BEVY_VERSION = '0.1.0-34847389047.commit-7546497'
 
 // The bevy server exits with this when it can never run here (unsupported platform,
 // missing binary, bad arguments). We fail the preview loudly instead of retrying:
