@@ -56,7 +56,7 @@ function registerProcessCleanup(cleanup: () => void): () => void {
 
 const TRACING_PREFIX = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})\.\d+Z\s+(INFO|WARN|ERROR|DEBUG|TRACE)\s+[\w:]+:\s?/
 const HEARTBEAT_LINE = /^\[headless\] alive:/
-const SCENE_ROOM_JOINED_LINE = /added scene channel/
+const SCENE_ROOM_JOINED_LINE = /\[headless\] scene room connected|added scene channel/
 const SERVER_READY_TIMEOUT_MS = 120_000
 const ANSI_CODES = /\u001b\[[0-9;]*m/g
 

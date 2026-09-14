@@ -223,7 +223,20 @@ describe('multiplayer-server', () => {
     })
   })
 
-  describe('when the bevy server logs that it joined the scene room', () => {
+  describe('when the bevy server prints the scene-room-connected marker', () => {
+    let ready: Promise<boolean> | undefined
+
+    beforeEach(() => {
+      ready = startMultiplayerServer(components as any, '/scene', 'http://localhost:8000', 'bevy').ready
+      child.stdout.write('[headless] scene room connected: bafkrei\n')
+    })
+
+    it('should resolve ready as true', async () => {
+      await expect(ready).resolves.toBe(true)
+    })
+  })
+
+  describe('when the bevy server predates the marker and only logs the tracing line', () => {
     let ready: Promise<boolean> | undefined
 
     beforeEach(() => {
@@ -231,7 +244,7 @@ describe('multiplayer-server', () => {
       child.stdout.write('2026-08-11T14:28:33.522058Z  WARN comms: added scene channel SetCurrentScene { .. }\n')
     })
 
-    it('should resolve ready as true', async () => {
+    it('should still resolve ready as true from the fallback signal', async () => {
       await expect(ready).resolves.toBe(true)
     })
   })
