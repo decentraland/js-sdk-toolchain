@@ -2,6 +2,14 @@ import * as os from 'os'
 import fs from 'fs'
 import path from 'path'
 
+declare global {
+  namespace NodeJS {
+    interface Process {
+      resourcesPath?: string
+    }
+  }
+}
+
 const npmBin = /^win/.test(process.platform) ? 'npm.cmd' : 'npm'
 const npxBin = /^win/.test(process.platform) ? 'npx.cmd' : 'npx'
 
@@ -76,7 +84,7 @@ export function findNpxCliJs({
   execPath = process.execPath,
   pathEnv = process.env.PATH ?? '',
   npmBin: npm = npmBin,
-  resourcesPath = (process as any).resourcesPath as string | undefined
+  resourcesPath = process.resourcesPath
 }: NpxLookup = {}): string | null {
   const npmPaths = pathEnv
     .split(path.delimiter)

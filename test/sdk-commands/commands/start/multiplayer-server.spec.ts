@@ -2,7 +2,6 @@ import { EventEmitter } from 'events'
 import { PassThrough } from 'stream'
 import { spawn } from 'child_process'
 import {
-  SERVER_READY_GRACE_MS,
   spawnAuthServer,
   startMultiplayerServer,
   waitForServerReady
@@ -14,7 +13,7 @@ jest.mock('../../../../packages/@dcl/sdk-commands/src/commands/start/utils', () 
   findNpxBin: jest.fn(() => '/node/npx.cmd'),
   findNpxCliJs: jest.fn(() => '/node/npx-cli.js')
 }))
-import { findNpxBin, findNpxCliJs } from '../../../../packages/@dcl/sdk-commands/src/commands/start/utils'
+import { findNpxCliJs } from '../../../../packages/@dcl/sdk-commands/src/commands/start/utils'
 
 type FakeChild = EventEmitter & { stdout: PassThrough; stderr: PassThrough; kill: jest.Mock; killed: boolean }
 
@@ -104,7 +103,7 @@ describe('multiplayer-server', () => {
 
     it('should run the absolute npx path through the shell because Windows cannot spawn a .cmd directly', () => {
       const [bin, , options] = (spawn as jest.Mock).mock.calls[0]
-      expect(bin).toBe('/node/npx.cmd')
+      expect(bin).toBe('"/node/npx.cmd"')
       expect(options.shell).toBe(true)
     })
 
@@ -231,7 +230,7 @@ describe('multiplayer-server', () => {
       jest.useFakeTimers()
       ready = startMultiplayerServer(components as any, '/scene', 'http://localhost:8000', 'bevy').ready
       child.emit('spawn')
-      jest.advanceTimersByTime(SERVER_READY_GRACE_MS)
+      jest.runOnlyPendingTimers()
     })
 
     afterEach(() => {
@@ -251,7 +250,7 @@ describe('multiplayer-server', () => {
       ready = startMultiplayerServer(components as any, '/scene', 'http://localhost:8000', 'bevy').ready
       child.emit('spawn')
       child.emit('close', 1, null)
-      jest.advanceTimersByTime(SERVER_READY_GRACE_MS)
+      jest.runOnlyPendingTimers()
     })
 
     afterEach(() => {
@@ -276,7 +275,7 @@ describe('multiplayer-server', () => {
       ready = startMultiplayerServer(components as any, '/scene', 'http://localhost:8000', 'bevy').ready
       child.emit('spawn')
       child.emit('error', new Error('spawn npx ENOENT'))
-      jest.advanceTimersByTime(SERVER_READY_GRACE_MS)
+      jest.runOnlyPendingTimers()
     })
 
     afterEach(() => {
@@ -295,7 +294,7 @@ describe('multiplayer-server', () => {
       jest.useFakeTimers()
       ready = startMultiplayerServer(components as any, '/scene', 'http://localhost:8000', 'hammurabi').ready
       child.emit('spawn')
-      jest.advanceTimersByTime(SERVER_READY_GRACE_MS)
+      jest.runOnlyPendingTimers()
     })
 
     afterEach(() => {

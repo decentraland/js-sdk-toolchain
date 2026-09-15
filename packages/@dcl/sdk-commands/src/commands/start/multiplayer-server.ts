@@ -57,7 +57,7 @@ function registerProcessCleanup(cleanup: () => void): () => void {
 
 const TRACING_PREFIX = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})\.\d+Z\s+(INFO|WARN|ERROR|DEBUG|TRACE)\s+[\w:]+:\s?/
 const HEARTBEAT_LINE = /^\[headless\] alive:/
-export const SERVER_READY_GRACE_MS = 1_500
+const SERVER_READY_GRACE_MS = 1_500
 const SERVER_READY_TIMEOUT_MS = 10_000
 const ANSI_CODES = /\u001b\[[0-9;]*m/g
 
@@ -170,7 +170,7 @@ export function startMultiplayerServer(
 
   const serverProcess = npxCliJs
     ? spawn(process.execPath, [npxCliJs, ...npxArgs], { cwd: workingDir, shell: false, stdio, env })
-    : spawn(npxPath!, useShell ? npxArgs.map((arg) => `"${arg}"`) : npxArgs, {
+    : spawn(useShell ? `"${npxPath!}"` : npxPath!, useShell ? npxArgs.map((arg) => `"${arg}"`) : npxArgs, {
         cwd: workingDir,
         shell: useShell,
         stdio,
@@ -214,7 +214,7 @@ export function startMultiplayerServer(
       printWarning(
         components.logger,
         `Multiplayer Server exited with code ${code}. The preview keeps running without it, ` +
-          `but clients wait for state sync (isStateSyncronized stays false) until a server joins the scene room.`
+          `but clients wait for state sync (\`isStateSyncronized()\` stays false) until a server joins the scene room.`
       )
     } else if (signal && signal !== 'SIGTERM' && signal !== 'SIGINT') {
       printWarning(components.logger, `Multiplayer Server terminated by signal ${signal}`)
