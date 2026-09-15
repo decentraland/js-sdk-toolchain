@@ -11,6 +11,7 @@ import * as components from '@dcl/ecs/dist/components'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 import { CommsMessage } from '../binary-message-bus'
 import { chunkCrdtMessages } from '../chunking'
+import { shouldSyncComponent } from '../state'
 import * as utils from './utils'
 import { AUTH_SERVER_PEER_ID, DEBUG_NETWORK_MESSAGES } from '../message-bus-sync'
 import { type BinaryMessageBus } from '../binary-message-bus'
@@ -116,7 +117,11 @@ export function createServerValidator(config: ServerValidationConfig) {
     }
 
     if (message.type === CrdtMessageType.PUT_COMPONENT || message.type === CrdtMessageType.DELETE_COMPONENT) {
-      const component = engine.getComponent(message.componentId) as InternalBaseComponent<unknown>
+      const definition = engine.getComponent(message.componentId)
+
+      if (!shouldSyncComponent(definition)) return false
+
+      const component = definition as unknown as InternalBaseComponent<unknown>
       const buf = 'data' in message ? new ReadWriteByteBuffer(message.data) : null
       const value = buf ? component.schema.deserialize(buf) : null
       const dryRunCRDT = component.__dry_run_updateFromCrdt(message)
