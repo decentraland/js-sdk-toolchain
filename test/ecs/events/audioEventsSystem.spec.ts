@@ -221,4 +221,53 @@ describe('Audio events helper system should', () => {
 
     expect(audioEventsSystem.hasAudioEventsEntity(audioSourceEntity)).toBe(false)
   })
+
+  it('runs playback callbacks on position reports even when the state does not change', async () => {
+    const fn = jest.fn()
+    const audioSourceEntity = engine.addEntity()
+    audioSourceComponent.create(audioSourceEntity)
+    audioEventsSystem.registerAudioPlaybackEntity(audioSourceEntity, fn)
+    // simulate the renderer reporting the start of playback, then two periodic position reports
+    audioEventComponent.addValue(audioSourceEntity, { state: MediaState.MS_PLAYING, timestamp: 1, tickNumber: 1, currentOffset: 0.02 })
+    await engine.update(1)
+    audioEventComponent.addValue(audioSourceEntity, { state: MediaState.MS_PLAYING, timestamp: 2, tickNumber: 16, currentOffset: 0.52 })
+    await engine.update(1)
+    audioEventComponent.addValue(audioSourceEntity, { state: MediaState.MS_PLAYING, timestamp: 3, tickNumber: 31, currentOffset: 1.02 })
+    await engine.update(1)
+    await engine.update(1)
+    expect(fn).toHaveBeenCalledTimes(3)
+    expect(fn).toHaveBeenLastCalledWith(expect.objectContaining({ tickNumber: 31, currentOffset: 1.02 }))
+  })
+
+  it('does not run state callbacks on position-only reports', async () => {
+    const fn = jest.fn()
+    const audioSourceEntity = engine.addEntity()
+    audioSourceComponent.create(audioSourceEntity)
+    audioEventsSystem.registerAudioEventsEntity(audioSourceEntity, fn)
+    audioEventComponent.addValue(audioSourceEntity, { state: MediaState.MS_PLAYING, timestamp: 1, tickNumber: 1, currentOffset: 0 })
+    await engine.update(1)
+    audioEventComponent.addValue(audioSourceEntity, { state: MediaState.MS_PLAYING, timestamp: 2, tickNumber: 16, currentOffset: 0.5 })
+    await engine.update(1)
+    expect(fn).toHaveBeenCalledTimes(1)
+  })
+
+  it('returns the latest report that carries a playback position', async () => {
+    const audioSourceEntity = engine.addEntity()
+    audioSourceComponent.create(audioSourceEntity)
+    audioEventComponent.addValue(audioSourceEntity, { state: MediaState.MS_LOADING, timestamp: 1 })
+    audioEventComponent.addValue(audioSourceEntity, { state: MediaState.MS_PLAYING, timestamp: 2, tickNumber: 4, currentOffset: 0.1, clipLength: 64 })
+    audioEventComponent.addValue(audioSourceEntity, { state: MediaState.MS_PAUSED, timestamp: 3 })
+    await engine.update(1)
+    expect(audioEventsSystem.getAudioPlayback(audioSourceEntity)).toEqual(expect.objectContaining({ tickNumber: 4, currentOffset: 0.1, clipLength: 64 }))
+    expect(audioEventsSystem.getAudioState(audioSourceEntity)?.state).toBe(MediaState.MS_PAUSED)
+  })
+
+  it('returns undefined when no report carried a playback position', async () => {
+    const audioSourceEntity = engine.addEntity()
+    audioSourceComponent.create(audioSourceEntity)
+    audioEventComponent.addValue(audioSourceEntity, { state: MediaState.MS_LOADING, timestamp: 1 })
+    await engine.update(1)
+    expect(audioEventsSystem.getAudioPlayback(audioSourceEntity)).toBeUndefined()
+  })
 })
+
