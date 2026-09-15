@@ -5,25 +5,22 @@ import { printProgressInfo, printWarning } from '../../logic/beautiful-logs'
 import { colors } from '../../components/log'
 import { PreviewComponents } from './types'
 import { ProjectUnion } from '../../logic/project-validations'
-import { isElectronEnvironment, getSpawnEnv, findNpxCliJs, getNpxBin } from './utils'
+import { isElectronEnvironment, getSpawnEnv, findNpxBin, findNpxCliJs } from './utils'
+import { getBaseCoords } from '../../logic/scene-validations'
+import { future } from '../../logic/future'
 import { engineEnvArgs } from './dcl-env'
 
 const HAMMURABI_PACKAGE = '@dcl/hammurabi-server'
 const HAMMURABI_VERSION = 'next'
 
 const BEVY_PACKAGE = '@dcl-regenesislabs/bevy-headless-server'
-// Exact pin: previews move engines only when someone edits this line — a floating tag
-// re-resolves without warning. The pinned build must accept --base-domain and forward
-// --preview-gatekeeper through its launcher (bevy-explorer#1260). DCL_SERVER_PACKAGE
-// overrides for local builds.
 const BEVY_VERSION = '0.1.0-34847389047.commit-7546497'
 
-// The bevy server exits with this when it can never run here (unsupported platform,
-// missing binary, bad arguments). We fail the preview loudly instead of retrying:
-// a silent fallback would hide broken bevy installs from the people shipping them.
 const EXIT_UNAVAILABLE = 78
 
 type ServerEngine = 'bevy' | 'hammurabi'
+
+const CMD_METACHARACTERS = /[&|<>^%"!\r\n]/
 
 const DEFAULT_ENGINE: ServerEngine = 'bevy'
 
@@ -58,19 +55,12 @@ function registerProcessCleanup(cleanup: () => void): () => void {
   }
 }
 
-// `2026-08-11T14:28:33.522058Z  INFO scene_runner::renderer_context: ` — the
-// timestamp/level/target prefix the bevy engine's tracing puts on every line
 const TRACING_PREFIX = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})\.\d+Z\s+(INFO|WARN|ERROR|DEBUG|TRACE)\s+[\w:]+:\s?/
 const HEARTBEAT_LINE = /^\[headless\] alive:/
-// The engine colors its output even when piped, so lines arrive wrapped in ANSI
-// escapes and must be stripped before the prefix regex can match.
-// eslint-disable-next-line no-control-regex
+const SERVER_READY_GRACE_MS = 1_500
+const SERVER_READY_TIMEOUT_MS = 10_000
 const ANSI_CODES = /\u001b\[[0-9;]*m/g
 
-// Engine-internal noise in local preview: the asset pipeline hunts dot-prefixed
-// processed gltf paths the preview server never has (repeated on every scene
-// composition), and the headless build's expected gizmo/asset-loader startup
-// complaints about the renderer it deliberately doesn't have
 const ENGINE_NOISE = [
   /^failed to process gltf/,
   /^Path not found: \$ipfs/,
@@ -78,28 +68,20 @@ const ENGINE_NOISE = [
   /^Could not find an asset loader matching: .* Path: Some\("embedded:\/\//
 ]
 
-// `[[0, 0] 3.33] ` — parcel coords + scene clock the engine prepends to every
-// scene log line; redundant in a single-scene preview
 const SCENE_CONTEXT = /^\[\[-?\d+, -?\d+\] \d+\.\d+\] /
 
-// color alone conveys the level; the LOG/WARN/ERROR words are dropped
 function colorByLevel(level: string | undefined, message: string): string {
   if (level === 'WARN') return colors.yellow(message)
   if (level === 'ERROR') return colors.redBright(message)
   return message
 }
 
-// engine timestamps are UTC ISO with microseconds; show local wall-clock instead
 function localTime(utcTimestamp: string): string {
   const date = new Date(utcTimestamp + 'Z')
   return isNaN(date.getTime()) ? '' : colors.dim(date.toTimeString().slice(0, 8)) + ' '
 }
 
-/**
- * Forwards a bevy child stream line by line, tagged `[Server]` to stand apart from
- * the preview CLI's own output, dropping the tracing prefix (warnings yellow,
- * errors red) and the periodic `[headless] alive:` heartbeat.
- */
+/** Forwards a server child stream to `sink`, line by line, tagged `[Server]` and ANSI-cleaned. */
 function forwardEngineLogs(source: Readable | null, sink: NodeJS.WriteStream) {
   if (!source) return
   const serverTag = colors.greenBright('[Server]') + ' '
@@ -109,7 +91,6 @@ function forwardEngineLogs(source: Readable | null, sink: NodeJS.WriteStream) {
     if (HEARTBEAT_LINE.test(line)) return
     const match = line.match(TRACING_PREFIX)
     if (!match) {
-      // launcher lines ([headless] realm=...): the [Server] tag replaces their own
       sink.write(serverTag + line.replace(/^\[headless\] /, '') + '\n')
       return
     }
@@ -136,6 +117,12 @@ function forwardEngineLogs(source: Readable | null, sink: NodeJS.WriteStream) {
   })
 }
 
+export type MultiplayerServer = {
+  child: ChildProcess
+  /** true once the process survived the startup grace window, false if it errored or exited first. */
+  ready: Promise<boolean>
+}
+
 /**
  * Starts the Multiplayer Server process using npx to install and run in one step
  */
@@ -144,8 +131,9 @@ export function startMultiplayerServer(
   workingDir: string,
   realm: string,
   engine: ServerEngine = DEFAULT_ENGINE,
-  engineArgs: string[] = []
-): ChildProcess {
+  engineArgs: string[] = [],
+  position?: { x: number; y: number }
+): MultiplayerServer {
   const pkg = packageSpec(engine)
 
   printProgressInfo(
@@ -154,40 +142,57 @@ export function startMultiplayerServer(
   )
 
   const npxArgs = ['--yes', pkg, `--realm=${realm}`, ...engineArgs]
+  if (position) npxArgs.push(`--position=${position.x},${position.y}`)
   const npxCliJs = findNpxCliJs()
+  const npxPath = npxCliJs ? null : findNpxBin()
+  if (!npxCliJs && !npxPath) {
+    throw new Error('npx-cli.js and npx were not found in a trusted location')
+  }
+  const useShell = !!npxPath && process.platform === 'win32'
+  if (useShell) {
+    const unsafe = npxArgs.find((arg) => CMD_METACHARACTERS.test(arg))
+    if (unsafe) throw new Error(`refusing to run npx through the shell with argument ${JSON.stringify(unsafe)}`)
+    printWarning(
+      components.logger,
+      `npx-cli.js not found next to ${process.execPath} or any npm on PATH; running ${npxPath} through the shell`
+    )
+  }
 
-  // In Electron, override npm_config_prefix because npm derives its prefix from process.execPath,
-  // which points to the Electron Helper binary. This causes npm to look for a `lib/` directory
-  // inside the Helper bundle, which doesn't exist (ENOENT).
   const env: { [key: string]: string } = isElectronEnvironment()
     ? { ...getSpawnEnv(), npm_config_prefix: workingDir }
     : { ...getSpawnEnv() }
 
-  // Quiet the bevy engine's internal tracing chatter while keeping scene logs
-  // (scene_runner::renderer_context) and real warnings. An explicit RUST_LOG wins.
   if (engine === 'bevy' && !env.RUST_LOG) {
     env.RUST_LOG = 'warn,scene_runner::renderer_context=info'
   }
 
-  // Bevy output goes through the line filter below; hammurabi keeps the terminal directly.
-  const stdio: StdioOptions = engine === 'bevy' ? ['inherit', 'pipe', 'pipe'] : 'inherit'
+  const stdio: StdioOptions = ['inherit', 'pipe', 'pipe']
 
-  // If npx-cli.js was found, run it directly via process.execPath (node in regular env,
-  // Electron Helper with ELECTRON_RUN_AS_NODE=1 in Electron). Otherwise fall back to npx binary.
   const serverProcess = npxCliJs
     ? spawn(process.execPath, [npxCliJs, ...npxArgs], { cwd: workingDir, shell: false, stdio, env })
-    : spawn(getNpxBin(), npxArgs, { cwd: workingDir, shell: false, stdio, env })
+    : spawn(useShell ? `"${npxPath!}"` : npxPath!, useShell ? npxArgs.map((arg) => `"${arg}"`) : npxArgs, {
+        cwd: workingDir,
+        shell: useShell,
+        stdio,
+        env
+      })
 
-  if (engine === 'bevy') {
-    forwardEngineLogs(serverProcess.stdout, process.stdout)
-    forwardEngineLogs(serverProcess.stderr, process.stderr)
-  }
+  forwardEngineLogs(serverProcess.stdout, process.stdout)
+  forwardEngineLogs(serverProcess.stderr, process.stderr)
 
-  serverProcess.on('error', (error) => {
-    printWarning(components.logger, `Multiplayer Server process error: ${error.message}`)
+  const ready = future<boolean>()
+  let graceTimer: NodeJS.Timeout | undefined
+
+  serverProcess.on('spawn', () => {
+    graceTimer = setTimeout(() => ready.resolve(true), SERVER_READY_GRACE_MS)
   })
 
-  // Register cleanup handlers
+  serverProcess.on('error', (error) => {
+    clearTimeout(graceTimer)
+    printWarning(components.logger, `Multiplayer Server process error: ${error.message}`)
+    ready.resolve(false)
+  })
+
   const cleanup = () => {
     if (!serverProcess.killed) {
       serverProcess.kill('SIGTERM')
@@ -198,23 +203,49 @@ export function startMultiplayerServer(
 
   serverProcess.on('close', (code, signal) => {
     removeCleanup()
+    clearTimeout(graceTimer)
+    ready.resolve(false)
     if (code !== 0 && code !== null) {
-      // report abnormal exits (including bevy's exit-78 "can't run here") so we can
-      // tell from telemetry when the server is failing on users' machines
       components.analytics.track('Multiplayer server exited', {
         engine,
         exitCode: code,
         unavailable: code === EXIT_UNAVAILABLE
       })
-      printWarning(components.logger, `Multiplayer Server exited with code ${code}`)
+      printWarning(
+        components.logger,
+        `Multiplayer Server exited with code ${code}. The preview keeps running without it, ` +
+          `but clients wait for state sync (\`isStateSyncronized()\` stays false) until a server joins the scene room.`
+      )
     } else if (signal && signal !== 'SIGTERM' && signal !== 'SIGINT') {
-      // SIGTERM/SIGINT are our own shutdown; anything else (SIGSEGV, SIGKILL/OOM)
-      // means the engine died out from under the preview
       printWarning(components.logger, `Multiplayer Server terminated by signal ${signal}`)
     }
   })
 
-  return serverProcess
+  return { child: serverProcess, ready }
+}
+
+/** Waits for the server process to come up, fail, or time out. */
+export async function waitForServerReady(
+  components: Pick<CliComponents, 'logger'>,
+  ready: Promise<boolean>,
+  timeoutMs: number = SERVER_READY_TIMEOUT_MS
+): Promise<void> {
+  printProgressInfo(components.logger, 'Waiting for the Multiplayer Server to start...')
+  let timer: NodeJS.Timeout | undefined
+  const timeout = new Promise<'timeout'>((resolve) => {
+    timer = setTimeout(() => resolve('timeout'), timeoutMs)
+  })
+  const result = await Promise.race([ready, timeout])
+  clearTimeout(timer)
+  if (result === true) {
+    printProgressInfo(components.logger, `${colors.bold('Multiplayer Server')} is ready`)
+    return
+  }
+  const reason = result === 'timeout' ? `is not ready after ${timeoutMs / 1000}s` : 'is not running'
+  printWarning(
+    components.logger,
+    `Multiplayer Server ${reason}. Opening the client anyway; state sync completes once a server joins the scene room.`
+  )
 }
 
 /**
@@ -229,26 +260,31 @@ export function startMultiplayerServer(
  * @param components - Preview components including logger
  * @param project - The project to start the multiplayer server for
  * @param realm - The realm URL to pass to the server
- * @returns The ChildProcess if started, undefined otherwise
+ * @returns The readiness promise, or undefined when the server could not be spawned
  */
 export function spawnAuthServer(
   components: PreviewComponents,
   project: ProjectUnion,
   realm: string,
   dclenv: string = 'org'
-): ChildProcess | undefined {
+): Promise<boolean> | undefined {
   const engine = selectedEngine()
   try {
-    // hammurabi knows nothing of base domains; env args are a bevy-engine concept
-    const child = startMultiplayerServer(
+    const server = startMultiplayerServer(
       components,
       project.workingDirectory,
       realm,
       engine,
-      engine === 'bevy' ? engineEnvArgs(dclenv) : []
+      engine === 'bevy' ? engineEnvArgs(dclenv) : [],
+      getBaseCoords(project.scene)
     )
+    void components.signaler.programClosed
+      .then(() => {
+        if (!server.child.killed) server.child.kill('SIGTERM')
+      })
+      .catch(() => {})
     if (engine === 'bevy') {
-      child.on('close', (code) => {
+      server.child.on('close', (code) => {
         if (code !== EXIT_UNAVAILABLE) return
         const { logger } = components
         logger.error(
@@ -257,11 +293,10 @@ export function spawnAuthServer(
         )
         logger.error(`To run the preview with the hammurabi server instead:`)
         logger.error(`  DCL_SERVER_ENGINE=hammurabi npm start`)
-        // flush the 'Multiplayer server exited' event before killing the preview
         void components.analytics.stop().finally(() => process.exit(EXIT_UNAVAILABLE))
       })
     }
-    return child
+    return server.ready
   } catch (error: any) {
     printWarning(components.logger, `Failed to start Multiplayer Server: ${error.message}`)
     return undefined
