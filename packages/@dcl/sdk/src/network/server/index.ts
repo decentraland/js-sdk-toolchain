@@ -116,9 +116,18 @@ export function createServerValidator(config: ServerValidationConfig) {
     }
 
     if (message.type === CrdtMessageType.PUT_COMPONENT || message.type === CrdtMessageType.DELETE_COMPONENT) {
-      const component = engine.getComponent(message.componentId) as InternalBaseComponent<unknown>
-      const buf = 'data' in message ? new ReadWriteByteBuffer(message.data) : null
-      const value = buf ? component.schema.deserialize(buf) : null
+      const component = engine.getComponentOrNull(message.componentId) as InternalBaseComponent<unknown> | null
+      if (!component) return false
+
+      let value: unknown = null
+      if ('data' in message) {
+        try {
+          value = component.schema.deserialize(new ReadWriteByteBuffer(message.data))
+        } catch {
+          return false
+        }
+      }
+
       const dryRunCRDT = component.__dry_run_updateFromCrdt(message)
       const validCRDT = [
         ProcessMessageResultType.StateUpdatedData,
@@ -257,8 +266,8 @@ export function createServerValidator(config: ServerValidationConfig) {
             // 2. Convert network message to regular message and collect for local application
             const regularMessage = convertNetworkToRegularMessage(networkMessage, localEntityId)
 
-            // 3. Basic permission validation
-            if (!validateMessagePermissions(regularMessage as any, sender, localEntityId)) {
+            // 3. Basic permission validation.
+            if (!regularMessage || !validateMessagePermissions(regularMessage as any, sender, localEntityId)) {
               // Send correction back to sender with server's authoritative state
               sendCorrectionToSender(networkMessage, sender, localEntityId)
               continue
