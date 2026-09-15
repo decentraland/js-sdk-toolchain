@@ -5528,6 +5528,7 @@ export type UiRendererOptions = {
     virtualWidth?: number;
     virtualHeight?: number;
     screenInset?: UiScreenInset;
+    zIndex?: number;
 };
 
 // @public
