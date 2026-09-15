@@ -11,12 +11,11 @@ import { AppendValueOperation } from '../../../packages/@dcl/ecs/src/serializati
 import { DeleteEntity } from '../../../packages/@dcl/ecs/src/serialization/crdt/deleteEntity'
 import { ReadWriteByteBuffer } from '../../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 import { Transport } from '../../../packages/@dcl/ecs/src/systems/crdt/types'
-// Type-only: erased at runtime, so it does not evaluate the `~system` mock
-// factory before `mockOpenExplorerUi` is initialized.
+// Type-only: erased at runtime, so it does not evaluate the `~system` mock factory before
+// `mockOpenExplorerUi` is initialized.
 import type { Channel, CorrelatedEvent, WaitOutcome } from '../../../packages/@dcl/sdk/src/explorer-ui'
 
-// The helper imports from `~system/RestrictedActions`, which jest cannot
-// resolve on its own; this virtual mock provides the module and the enum values.
+// Jest cannot resolve `~system/RestrictedActions` on its own, so the module is virtual.
 const mockOpenExplorerUi = jest.fn()
 
 jest.mock(
@@ -38,7 +37,7 @@ jest.mock(
 
 type HelperModule = typeof import('../../../packages/@dcl/sdk/src/explorer-ui')
 
-// Imported lazily so the helper resolves `~system/RestrictedActions` against the mock above.
+// Imported lazily so the helper resolves `~system/RestrictedActions` against the virtual mock.
 let create: HelperModule['create']
 let channel: HelperModule['channel']
 let variant: HelperModule['variant']
@@ -119,7 +118,7 @@ describe('openExplorerUiAndWait', () => {
     openFn.mockResolvedValue({ openResult: verdict })
   }
 
-  /** The request_id the helper minted for the nth call — the tests never guess it. */
+  /** The request_id the helper minted for the nth call, so that no test has to guess it. */
   function mintedId(call = 0): number {
     return openFn.mock.calls[call][0].requestId!
   }
@@ -163,8 +162,8 @@ describe('openExplorerUiAndWait', () => {
           : { $case: 'failed', failed: {} }
   })
 
-  // The engine has no getSystems; removeSystem returns false when the system
-  // is absent. Only call where absence is expected — a true return removes it.
+  // The engine exposes no getSystems, so absence is read off removeSystem. Call this only
+  // where absence is expected, because a true return means the system was removed.
   function timeoutSystemAbsent() {
     return engine.removeSystem(EXPLORER_UI_WAIT_TIMEOUT_SYSTEM) === false
   }
@@ -250,7 +249,6 @@ describe('openExplorerUiAndWait', () => {
       })
       await flush()
 
-      // Uncorrelated and for a different panel: not ours.
       await inject(ExplorerUiEvents, uiEvent(ExplorerUi.EU_PLACES, 10, UNCORRELATED, 'closed'))
       expect(settled).toBe(false)
 
@@ -419,8 +417,8 @@ describe('openExplorerUiAndWait', () => {
       await flush()
 
       // One update both delivers the close and overshoots the timeout. `update` drains the
-      // incoming messages before it runs any system, so the session is already settled by
-      // the time the timeout system looks at it.
+      // incoming messages before it runs any system, so the session is already settled when
+      // the timeout system looks at it.
       await inject(ExplorerUiEvents, uiEvent(ExplorerUi.EU_MAP, 10, mintedId(), 'closed'), 5)
 
       expect((await wait).$case).toBe('closed')
@@ -522,8 +520,6 @@ describe('openExplorerUiAndWait', () => {
       opens()
       const openExplorerUiAndWait = makeHelper()
 
-      // A scene that re-wraps a component the SDK already exports must not get the event twice,
-      // and the close must still be recognised as the terminal.
       const rewrapped = channel('explorerUi', ExplorerUiEvents.component)
       const wait = openExplorerUiAndWait({ ui: ExplorerUi.EU_MAP }, { collect: [rewrapped] })
       await flush()
@@ -556,8 +552,6 @@ describe('openExplorerUiAndWait', () => {
       const wait = openExplorerUiAndWait({ ui: ExplorerUi.EU_PLACES }, { collect: [ExplorerUiEvents] })
       await flush()
 
-      // The session is armed before the RPC resolves, which is what removes the need
-      // to replay the accumulated value set once it does.
       const id = mintedId()
       await inject(ExplorerUiEvents, uiEvent(ExplorerUi.EU_PLACES, 10, id, 'opened'))
       await inject(ExplorerUiEvents, uiEvent(ExplorerUi.EU_PLACES, 11, id, 'closed'))

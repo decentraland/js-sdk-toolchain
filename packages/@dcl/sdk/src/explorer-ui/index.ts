@@ -10,36 +10,23 @@ import {
 } from '@dcl/ecs'
 import { openExplorerUi, OpenExplorerUiResult } from '~system/RestrictedActions'
 
-// Re-exported so one `@dcl/sdk/explorer-ui` import covers the whole flow.
 export { ExplorerUi, OpenExplorerUiResult }
 
-/**
- * The wire value of `request_id` that means "not correlated". The explorer echoes the
- * id of the call that produced an event; `0` is what an explorer that predates the
- * echo, or a user-initiated action, leaves behind.
- */
+// What an explorer that does not echo request_id, or a user-initiated action, leaves on the wire.
 const UNCORRELATED = 0
 
-/**
- * Panels that can be on screen alongside another panel. An uncorrelated event cannot be
- * attributed to a call by its `ui` field alone once two panels coexist, so for these
- * correlation is mandatory.
- */
+// Panels that can be on screen next to another panel. The `ui` field alone cannot attribute
+// their events, so an event on one of these panels must carry a request_id.
 const CONCURRENT_PANELS: readonly ExplorerUi[] = [ExplorerUi.EU_ITEM_PURCHASE]
 
-/**
- * The shape every event this helper waits on shares: `timestamp` orders events,
- * `requestId` says which call produced them.
- * @public
- */
+/** @public */
 export type CorrelatedEvent = {
   timestamp: number
   requestId: number
 }
 
 /**
- * A named stream of events this helper can collect and stop on. Wrap any grow-only
- * result component with {@link channel} — new components need no SDK release.
+ * A named stream of events that this helper can collect and stop on.
  * @public
  */
 export type Channel<N extends string = string, T extends CorrelatedEvent = CorrelatedEvent> = {
@@ -51,8 +38,7 @@ export type Channel<N extends string = string, T extends CorrelatedEvent = Corre
 export type AnyChannel = Channel<string, any>
 
 /**
- * Wraps a grow-only result component as a {@link Channel}. The name is the tag that
- * appears on every collected element, so keep it stable and unique within a scene.
+ * Wraps a grow-only result component as a {@link Channel}. The name must be unique within a scene.
  * @public
  */
 export function channel<N extends string, T extends CorrelatedEvent>(
@@ -62,7 +48,7 @@ export function channel<N extends string, T extends CorrelatedEvent>(
   return { name, component }
 }
 
-/** Panel lifecycle events: a panel was opened, a panel was closed. @public */
+/** Panel lifecycle events: opened and closed. @public */
 export const ExplorerUiEvents: Channel<'explorerUi', PBExplorerUiEventsResult> = /* @__PURE__ */ channel(
   'explorerUi',
   ExplorerUiEventsResult
@@ -75,27 +61,19 @@ export const ItemPurchase: Channel<'itemPurchase', PBExplorerItemPurchaseResult>
 )
 
 /**
- * The `$case` names of a channel's event union — `'opened' | 'closed'` for
- * {@link ExplorerUiEvents}, `'purchased' | 'dismissed' | 'failed'` for {@link ItemPurchase}.
+ * The `$case` names of a channel's event union.
  * @public
  */
 export type CaseOf<C extends AnyChannel> =
   C extends Channel<any, infer T> ? Extract<T[keyof T], { $case: string }>['$case'] : never
 
-/**
- * One `$case` of a channel, produced by {@link variant}. Used as a stop condition that is
- * narrower than "any event on this channel".
- * @public
- */
+/** @public */
 export type Variant<C extends AnyChannel = AnyChannel, K extends string = string> = {
   readonly channel: C
   readonly $case: K
 }
 
-/**
- * Narrows a channel to a single `$case`, e.g. `variant(ItemPurchase, 'purchased')`.
- * @public
- */
+/** @public */
 export function variant<C extends AnyChannel, K extends CaseOf<C>>(ch: C, $case: K): Variant<C, K> {
   return { channel: ch, $case }
 }
@@ -106,18 +84,17 @@ export function variant<C extends AnyChannel, K extends CaseOf<C>>(ch: C, $case:
  */
 export type StopCondition = AnyChannel | Variant
 
-/** One collected event, tagged with the channel it came from. @public */
+/** @public */
 export type Collected<C> = C extends Channel<infer N, infer T> ? { channel: N; event: T } : never
 
 /**
  * How the wait ended.
- * - `closed`: the panel this call opened was closed. The natural terminal.
+ * - `closed`: the panel this call opened was closed.
  * - `matched`: `until` fired first, so the panel may still be on screen.
- * - `notOpened`: this call did not open anything; `openResult` says why.
+ * - `notOpened`: this call did not open anything. `openResult` says why.
  * - `timedOut`: `timeoutMs` elapsed first.
  *
- * `$case` says *why the wait stopped*, not *what was seen* — `events` always holds
- * everything collected, the event that stopped the wait included.
+ * `events` always holds everything collected, the event that stopped the wait included.
  * @public
  */
 export type WaitOutcome<C extends readonly AnyChannel[]> =
@@ -128,32 +105,26 @@ export type WaitOutcome<C extends readonly AnyChannel[]> =
 
 /** @public */
 export type WaitOptions<C extends readonly AnyChannel[]> = {
-  /** Channels whose events land in `events`. Defaults to none — the outcome alone. */
+  /** Channels whose events land in `events`. Defaults to none. */
   collect?: C
   /** Stops the wait early. The panel closing always stops it regardless. */
   until?: StopCondition
   /**
-   * Bounds the wait, in milliseconds. No default: panels can legitimately stay open for
-   * minutes. On expiry the promise resolves (never rejects) with `$case: 'timedOut'`.
-   *
-   * @remarks Without it, a session ends only on an event. An explorer that opens a panel
-   * and then emits no `closed` — a crash, or a cancellation path that skips it — leaves
-   * the promise pending for the rest of the scene's life.
+   * Bounds the wait, in milliseconds. On expiry the promise resolves with `$case: 'timedOut'`.
+   * No default, because a panel can stay open for minutes. Without it, an explorer that opens
+   * a panel and then emits no `closed` leaves the promise pending for the scene's whole life.
    */
   timeoutMs?: number
 }
 
-/**
- * Which panel to open, and the parameters that panel requires.
- * @public
- */
+/** @public */
 export type OpenExplorerUiRequest =
   | { ui: Exclude<ExplorerUi, ExplorerUi.EU_ITEM_PURCHASE>; itemPurchase?: undefined }
   | { ui: ExplorerUi.EU_ITEM_PURCHASE; itemPurchase: { urn: string } }
 
 /**
- * Signature of {@link openExplorerUiAndWait}. The second overload is the shorthand for
- * panels that take no parameters, so a dynamically computed `ui` needs no narrowing.
+ * Signature of {@link openExplorerUiAndWait}. The second overload takes a bare `ui`, so a
+ * computed panel value needs no narrowing.
  * @public
  */
 export interface OpenExplorerUiAndWait {
@@ -167,8 +138,8 @@ export interface OpenExplorerUiAndWait {
 /** @internal exposed for tests */
 export const EXPLORER_UI_WAIT_TIMEOUT_SYSTEM = 'explorer-ui-wait-timeout'
 
-// Lowest priority sorts this system last, so removing itself mid-tick splices
-// the last element of the array the engine is iterating and skips no one.
+// Lowest priority sorts this system last, so when it removes itself mid-tick it splices the
+// last element of the array the engine is iterating and skips no other system.
 const TIMEOUT_SYSTEM_PRIORITY = Number.MIN_SAFE_INTEGER
 
 type OpenExplorerUiFn = (body: {
@@ -182,7 +153,6 @@ type CollectedEvent = { channel: string; event: CorrelatedEvent }
 type Session = {
   requestId: number
   ui: ExplorerUi
-  /** True for panels that can coexist with another one — see {@link CONCURRENT_PANELS}. */
   correlationRequired: boolean
   collect: ReadonlySet<string>
   watched: ReadonlySet<string>
@@ -195,14 +165,11 @@ type Session = {
   fail: (error: Error) => void
 }
 
-/** Whether an event can be attributed to a session. */
 type Attribution = 'yes' | 'no' | 'ambiguous'
 
-/**
- * ts-proto renders a `oneof` as a single wrapper property `{ $case, [$case]: value }`.
- * Finding it by shape keeps the helper independent of the field name each message chose
- * (`event` in 1220, `status` in 1222) and of any message added later.
- */
+// ts-proto renders a `oneof` as one wrapper property `{ $case, [$case]: value }`. Finding that
+// property by shape keeps the helper independent of the name each message gave it: `event` on
+// one message, `status` on another.
 function caseOf(event: CorrelatedEvent): string | undefined {
   for (const key of Object.keys(event)) {
     const value = (event as unknown as Record<string, unknown>)[key]
@@ -213,17 +180,11 @@ function caseOf(event: CorrelatedEvent): string | undefined {
   return undefined
 }
 
-/** Splits a stop condition into the channel it watches and the `$case` it narrows to. */
 function normalizeStop(stop: StopCondition): { channel: AnyChannel; $case: string | undefined } {
   return '$case' in stop ? { channel: stop.channel, $case: stop.$case } : { channel: stop, $case: undefined }
 }
 
-/**
- * @internal
- * Test seam: builds the helper against an explicit engine, RPC and lifecycle channel.
- * The lifecycle channel is a parameter because it decides when a session ends, and tests
- * run on their own engine instance. Production code uses {@link openExplorerUiAndWait}.
- */
+/** @internal test seam. The production instance is {@link openExplorerUiAndWait}. */
 export function create(deps: {
   engine: IEngine
   openExplorerUi: OpenExplorerUiFn
@@ -233,11 +194,9 @@ export function create(deps: {
   const root = engineInstance.RootEntity
 
   const sessions = new Map<number, Session>()
-  // Keyed by name, because the name is what identifies a stream everywhere else: it tags
-  // every collected element and it is what `collect` and `until` are matched on. Two
-  // wrappers around the same component therefore arm one listener, not two.
+  // Keyed by name, so two wrappers around the same component arm one listener, not two.
   const armed = new Map<string, GrowOnlyValueSetComponentDefinition<any>>()
-  // Starts at 1: 0 is the wire's "uncorrelated", so a minted id never collides with it.
+  // Starts at 1 so a minted id never collides with UNCORRELATED.
   let nextRequestId = 1
   let timeoutSystemAdded = false
 
@@ -256,8 +215,8 @@ export function create(deps: {
     const name = ch.name
     // onChange has no unsubscribe, so one listener per channel lives for the engine's lifetime.
     ch.component.onChange(root, (value: CorrelatedEvent | undefined) => {
-      // undefined is delivered on DELETE_ENTITY. The incoming CRDT path delivers each
-      // appended element on its own, so `value` is one event, not the whole set.
+      // `undefined` arrives on DELETE_ENTITY. Otherwise `value` is one appended element,
+      // not the whole set.
       if (value) deliver(name, value)
     })
   }
@@ -265,16 +224,15 @@ export function create(deps: {
   function attribute(session: Session, name: string, event: CorrelatedEvent): Attribution {
     if (event.requestId === session.requestId) return 'yes'
     if (event.requestId !== UNCORRELATED) return 'no'
-    // The explorer did not echo request_id. Only the lifecycle channel carries a second
-    // discriminator, `ui`, and it identifies a session only while panels cannot coexist.
-    // A second call for the same panel is answered WAS_ALREADY_OPEN, so at most one
-    // session per non-concurrent panel is ever live.
+    // Only the lifecycle channel carries a second discriminator, `ui`, and it identifies a
+    // session only while panels cannot coexist. A second call for the same panel is answered
+    // WAS_ALREADY_OPEN, so at most one session per non-concurrent panel is ever live.
     if (session.correlationRequired || name !== explorerUiEvents.name) return 'ambiguous'
     return (event as PBExplorerUiEventsResult).ui === session.ui ? 'yes' : 'no'
   }
 
   function deliver(name: string, event: CorrelatedEvent) {
-    // Settling deletes from `sessions` mid-iteration, which a Map tolerates; nothing adds.
+    // Settling deletes from `sessions` mid-iteration, which a Map tolerates. Nothing adds.
     for (const session of sessions.values()) {
       if (!session.watched.has(name)) continue
       const attribution = attribute(session, name, event)
@@ -296,8 +254,8 @@ export function create(deps: {
   function accept(session: Session, name: string, event: CorrelatedEvent) {
     if (session.collect.has(name)) session.events.push({ channel: name, event })
 
-    // The panel closing is terminal and wins over `until`, which only ever stops earlier:
-    // reporting `matched` here would suggest the panel is still on screen.
+    // The close is terminal and wins over `until`, because `matched` would tell the caller
+    // that the panel is still on screen.
     if (name === explorerUiEvents.name && caseOf(event) === 'closed') {
       settleSession(session, { $case: 'closed', events: session.events as never[] })
       return
@@ -375,8 +333,8 @@ export function create(deps: {
     watched.add(explorerUiEvents.name)
     if (stop) watched.add(stop.channel.name)
 
-    // Armed before the RPC: events can land while it is in flight, and a listener that is
-    // already up is what makes replaying the accumulated set unnecessary.
+    // Armed before the RPC, because events can land while the RPC is in flight. A listener
+    // that is already up is what makes replaying the accumulated set unnecessary.
     arm(explorerUiEvents)
     for (const ch of collect) arm(ch)
     if (stop) arm(stop.channel)
@@ -407,40 +365,33 @@ export function create(deps: {
 
     try {
       const { openResult } = await openExplorerUiFn({ ui, requestId, itemPurchase })
-      // Nothing was opened by this call, so no event carrying our id is coming.
+      // This call opened nothing, so no event carrying this request id is coming.
       if (openResult !== OpenExplorerUiResult.OPENED) {
         settleSession(session, { $case: 'notOpened', openResult })
       }
     } catch (error) {
-      // Routed through the session rather than rethrown, so the failure has a single
-      // path out and `outcome` is never left dangling and unobserved.
+      // Routed through the session rather than rethrown, so that `outcome` is never left
+      // pending and unobserved.
       failSession(session, error as Error)
     }
 
     return outcome
   }
 
-  // The single cast in the file: the implementation takes both argument forms and is
-  // blind to `collect`, while callers see the two overloads that relate them.
+  // The implementation takes both argument forms and is blind to `collect`. The cast is what
+  // gives callers the two overloads that relate them.
   return { openExplorerUiAndWait: openExplorerUiAndWait as OpenExplorerUiAndWait }
 }
 
 const helper = /* @__PURE__ */ create({ engine, openExplorerUi, explorerUiEvents: ExplorerUiEvents })
 
 /**
- * Opens an explorer panel and waits for the session it started.
+ * Opens an explorer panel and waits for the session it started. The wait ends when the panel
+ * closes. See {@link WaitOptions} to collect events, to stop earlier or to bound the wait.
  *
- * The wait ends when the panel closes; `until` can stop it earlier and `timeoutMs` can
- * bound it. Events named in `collect` are gathered along the way, each tagged with its
- * channel, so a single call covers chains such as "purchased, then closed".
- *
- * Open goes through the `openExplorerUi` RPC; everything else is observed on grow-only
- * result components — event driven, no polling. Each call mints a `request_id` that the
- * explorer echoes back, which is what keeps concurrent sessions apart.
- *
- * The promise never rejects on lifecycle grounds; see {@link WaitOutcome}. It does reject
- * when an event cannot be attributed to a call at all — an explorer too old to echo
- * `request_id` paired with a panel that can coexist with another one.
+ * Every lifecycle outcome resolves, see {@link WaitOutcome}. The promise rejects only when an
+ * event cannot be attributed to a call at all: an explorer too old to echo `request_id`
+ * paired with a panel that can coexist with another one.
  *
  * @public
  */

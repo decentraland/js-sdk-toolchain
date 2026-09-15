@@ -96,10 +96,7 @@ function getInitialCrdtState(): Uint8Array[] {
   return [addPlayerEntityTransform(), addUICanvasOnRootEntity(), addCameraMode()]
 }
 
-/**
- * Mirrors the `OpenExplorerUiResult` enum of the RestrictedActions API. The explorer exposes
- * it as a runtime value, but nothing on this side generates one, so the mock spells it out.
- */
+/** Mirrors the `OpenExplorerUiResult` enum of the RestrictedActions API, which nothing here generates. */
 const OPEN_EXPLORER_UI_RESULT = {
   UNSPECIFIED: 0,
   OPENED: 1,
@@ -227,12 +224,10 @@ function createCriticalModuleMocks(engine: IEngine, transport: Transport, crdtSt
       triggerSceneEmote: async () => ({ success: false }),
       copyToClipboard: async () => ({}),
       stopEmote: async () => ({ success: false }),
-      // The auto-mock proxy answers an unknown property with a function, so an enum read
-      // through it yields `undefined` for every member — and `undefined === undefined`
-      // then makes a verdict comparison pass by accident.
+      // Without this entry the auto-mock proxy answers every member with `undefined`, and a
+      // verdict comparison then passes by accident.
       OpenExplorerUiResult: OPEN_EXPLORER_UI_RESULT,
-      // There is no explorer UI here at all, which is what this verdict says. Answering
-      // OPENED instead would leave a scene awaiting the panel's close blocked forever.
+      // Answering OPENED would block a scene that waits for the panel to close forever.
       openExplorerUi: async () => ({ openResult: OPEN_EXPLORER_UI_RESULT.REJECTED_FEATURE_DISABLED })
     },
 
