@@ -92,7 +92,14 @@ export function createReconciler(
   }
 
   function updateTree(instance: Instance, props: Partial<{ rightOf: Entity; parent: Entity }>) {
-    upsertComponent(instance, props as { rightOf: number; parent: number }, 'uiTransform')
+    // `rightOf` is a required int32 where 0 means "first sibling". A missing left
+    // neighbour is written as 0 so the first child of any parent (the canvas root
+    // included) serializes the same way as an explicit `rightOf: 0`.
+    upsertComponent(
+      instance,
+      { ...props, rightOf: props.rightOf ?? 0 } as { rightOf: number; parent: number },
+      'uiTransform'
+    )
   }
 
   function upsertListener(
@@ -126,10 +133,10 @@ export function createReconciler(
         update.component === 'onMouseDown'
           ? pointerEvents.onPointerDown
           : update.component === 'onMouseUp'
-          ? pointerEvents.onPointerUp
-          : update.component === 'onMouseEnter'
-          ? pointerEvents.onPointerHoverEnter
-          : update.component === 'onMouseLeave' && pointerEvents.onPointerHoverLeave
+            ? pointerEvents.onPointerUp
+            : update.component === 'onMouseEnter'
+              ? pointerEvents.onPointerHoverEnter
+              : update.component === 'onMouseLeave' && pointerEvents.onPointerHoverLeave
 
       if (pointerEventSystem) {
         pointerEventSystem(
@@ -218,7 +225,6 @@ export function createReconciler(
   }
 
   function appendChild(parent: Instance, child: Instance): void {
-    if (!child || !Object.keys(parent).length) return
     const isReorder = parent._child.find((c) => c.entity === child.entity)
     // If its a reorder its seems that its a mutation of an array with key prop
     // We need to move the child to the end of the array
@@ -264,6 +270,40 @@ export function createReconciler(
     }
 
     removeChildEntity(child)
+  }
+
+  function insertBefore(parentInstance: Instance, child: Instance, beforeChild: Instance): void {
+    // Handle reorder: if child already exists in this parent, remove it from its old position
+    // and fix up the old neighbor's rightOf before inserting at the new position.
+    const existingIndex = parentInstance._child.findIndex((c) => c.entity === child.entity)
+    if (existingIndex !== -1) {
+      // If beforeChild.rightOf already points to child, child is already in the correct
+      // position in the rightOf chain. Setting child.rightOf = beforeChild.rightOf would
+      // produce a self-cycle (child.rightOf = child.entity).
+      if (beforeChild.rightOf === child.entity) {
+        return
+      }
+      const oldNextSibling = parentInstance._child[existingIndex + 1]
+      if (oldNextSibling) {
+        oldNextSibling.rightOf = child.rightOf
+        updateTree(oldNextSibling, { rightOf: oldNextSibling.rightOf })
+      }
+      parentInstance._child.splice(existingIndex, 1)
+    }
+
+    const beforeChildIndex = parentInstance._child.findIndex((c) => c.entity === beforeChild.entity)
+    parentInstance._child = [
+      ...parentInstance._child.slice(0, beforeChildIndex),
+      child,
+      ...parentInstance._child.slice(beforeChildIndex)
+    ]
+
+    child.rightOf = beforeChild.rightOf
+    beforeChild.rightOf = child.entity
+    child.parent = parentInstance.entity
+
+    updateTree(child, { rightOf: child.rightOf, parent: child.parent })
+    updateTree(beforeChild, { rightOf: beforeChild.rightOf })
   }
 
   function updateOnChange(entity: Entity, componentId: number, state?: OnChangeState) {
@@ -338,6 +378,7 @@ export function createReconciler(
     appendChild,
     appendChildToContainer: appendChild,
     appendInitialChild: appendChild,
+    insertInContainerBefore: insertBefore,
 
     removeChild: removeChild,
 
@@ -367,47 +408,22 @@ export function createReconciler(
         }
       }
     },
-    insertBefore(parentInstance: Instance, child: Instance, beforeChild: Instance): void {
-      // Handle reorder: if child already exists in this parent, remove it from its old position
-      // and fix up the old neighbor's rightOf before inserting at the new position.
-      const existingIndex = parentInstance._child.findIndex((c) => c.entity === child.entity)
-      if (existingIndex !== -1) {
-        // If beforeChild.rightOf already points to child, child is already in the correct
-        // position in the rightOf chain. Setting child.rightOf = beforeChild.rightOf would
-        // produce a self-cycle (child.rightOf = child.entity).
-        if (beforeChild.rightOf === child.entity) {
-          return
-        }
-        const oldNextSibling = parentInstance._child[existingIndex + 1]
-        if (oldNextSibling) {
-          oldNextSibling.rightOf = child.rightOf
-          updateTree(oldNextSibling, { rightOf: oldNextSibling.rightOf })
-        }
-        parentInstance._child.splice(existingIndex, 1)
-      }
-
-      const beforeChildIndex = parentInstance._child.findIndex((c) => c.entity === beforeChild.entity)
-      parentInstance._child = [
-        ...parentInstance._child.slice(0, beforeChildIndex),
-        child,
-        ...parentInstance._child.slice(beforeChildIndex)
-      ]
-
-      child.rightOf = beforeChild.rightOf
-      beforeChild.rightOf = child.entity
-      child.parent = parentInstance.entity
-
-      updateTree(child, { rightOf: child.rightOf, parent: child.parent })
-      updateTree(beforeChild, { rightOf: beforeChild.rightOf })
-    },
-    removeChildFromContainer(parenInstance: Instance, child: Instance) {
-      removeChildEntity(child)
-    }
+    insertBefore,
+    removeChildFromContainer: removeChild
   }
 
   const reconciler = Reconciler(hostConfig)
+  // The container is a real Instance standing in for the canvas root, so
+  // top-level elements get the same parent/rightOf bookkeeping as any other
+  // sibling group. It is never rendered itself.
+  const containerInstance: Instance = {
+    entity: CANVAS_ROOT_ENTITY as Entity,
+    _child: [],
+    parent: undefined,
+    rightOf: undefined
+  }
   const root: Container = reconciler.createContainer(
-    {},
+    containerInstance,
     0,
     null,
     false,
