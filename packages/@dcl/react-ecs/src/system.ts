@@ -12,7 +12,7 @@ import {
   setScreenInsetArea,
   setUiScaleFactor
 } from './components/utils'
-import { InteractableArea, ScreenInsetArea } from './components'
+import { InteractableArea, ScreenInsetArea, UiEntity } from './components'
 import { isMobile } from './platform'
 
 // react-ecs compiles with `types: []` (no runtime typings), so the console
@@ -48,6 +48,16 @@ export type UiRendererOptions = {
    * can use different insets simultaneously.
    */
   screenInset?: UiScreenInset
+  /**
+   * Stacking order of this renderer's UI relative to the other renderers (the main
+   * one and every `addUiRenderer`). Higher values render in front. When omitted,
+   * renderers stack in the order they first render, later ones on top; among those
+   * first rendered in the same tick the main UI goes at the back.
+   *
+   * It is applied to the renderer's root container entity, so it only orders whole
+   * renderers against each other; elements inside a renderer keep their own `zIndex`.
+   */
+  zIndex?: number
 }
 
 type VirtualSize = {
@@ -151,7 +161,16 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
   const renderer = createReconciler(engine, pointerSystem)
   let uiComponent: UiComponent | undefined = undefined
   let mainOptions: UiRendererOptions | undefined = undefined
-  const additionalRenderers = new Map<Entity, { ui: UiComponent; options?: UiRendererOptions }>()
+  const additionalRenderers = new Map<Entity, { ui: UiComponent; options?: UiRendererOptions; order?: number }>()
+
+  // Renderers are laid out in the order they first render, later ones on top, with
+  // the main UI first among those first rendered in the same tick. That is the order
+  // their entities were created in before the stacking was explicit, so scenes that
+  // set no zIndex keep the stacking they had. A renderer gets its sequence number the
+  // first time it renders and keeps it when replaced; the Map iterates in insertion
+  // order, so it is already sorted by `order` and only the main UI has to be slotted in.
+  let nextOrder = 0
+  let mainOrder: number | undefined = undefined
   const UiCanvasInformation = ecsComponents.UiCanvasInformation(engine)
 
   // Unique owner to prevent other UI systems resetting this scale factor.
@@ -236,39 +255,62 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
   /**
    * Wraps a renderer's component in a container positioned within the selected
    * screen inset area. `'none'` adds no wrapper, leaving the UI on the whole
-   * screen. Applied per renderer, so each renderer can use a different inset.
+   * screen, unless a `zIndex` needs a root entity to live on. Applied per
+   * renderer, so each renderer can use a different inset.
    */
-  function wrapWithScreenInset(ui: UiComponent, inset: UiScreenInset | undefined, key: string): React.ReactNode {
+  function wrapWithScreenInset(ui: UiComponent, options: UiRendererOptions | undefined, key: string): React.ReactNode {
+    const zIndex = options?.zIndex
+    // Only forward a provided zIndex: `{ zIndex: undefined }` would override the
+    // transform parser default and change what is written for every renderer.
+    const wrapperProps = zIndex === undefined ? { key } : { key, uiTransform: { zIndex } }
+
     // An omitted inset is resolved to DEFAULT_SCREEN_INSET ('device') before the
     // switch, so it lands on `case 'device'`. Only an explicit 'none' reaches the
     // `default` clause below — the two are unrelated despite sharing a name.
-    switch (inset ?? DEFAULT_SCREEN_INSET) {
+    switch (options?.screenInset ?? DEFAULT_SCREEN_INSET) {
       case 'device':
-        return React.createElement(ScreenInsetArea as any, { key }, React.createElement(ui as any))
+        return React.createElement(ScreenInsetArea as any, wrapperProps, React.createElement(ui as any))
       case 'interactable':
-        return React.createElement(InteractableArea as any, { key }, React.createElement(ui as any))
+        return React.createElement(InteractableArea as any, wrapperProps, React.createElement(ui as any))
       // 'none' — the whole screen, no wrapper entity
       default:
-        return React.createElement(ui as any, { key })
+        if (zIndex === undefined) return React.createElement(ui as any, { key })
+        // A whole-screen container: absolutely positioned on every edge so it
+        // fills the canvas, with the zIndex the renderer is stacked by.
+        return React.createElement(
+          UiEntity as any,
+          {
+            key,
+            uiTransform: { positionType: 'absolute', position: { top: 0, left: 0, right: 0, bottom: 0 }, zIndex }
+          },
+          React.createElement(ui as any)
+        )
     }
   }
 
   function ReactBasedUiSystem() {
     const components: React.ReactNode[] = []
-
-    // Add main UI component
-    if (uiComponent) {
-      components.push(wrapWithScreenInset(uiComponent, mainOptions?.screenInset, '__main__'))
-    }
+    if (uiComponent !== undefined && mainOrder === undefined) mainOrder = nextOrder++
+    let mainPushed = uiComponent === undefined
 
     const entitiesToRemove: Entity[] = []
     for (const [entity, entry] of additionalRenderers) {
       // Check for entity-based cleanup
       if (engine.getEntityState(entity) === EntityState.Removed) {
         entitiesToRemove.push(entity)
-      } else {
-        components.push(wrapWithScreenInset(entry.ui, entry.options?.screenInset, `__entity_${entity}__`))
+        continue
       }
+      if (entry.order === undefined) entry.order = nextOrder++
+      // The main UI goes right before the first renderer that rendered after it.
+      if (!mainPushed && mainOrder! < entry.order) {
+        components.push(wrapWithScreenInset(uiComponent!, mainOptions, '__main__'))
+        mainPushed = true
+      }
+      components.push(wrapWithScreenInset(entry.ui, entry.options, `__entity_${entity}__`))
+    }
+    // Main UI first rendered after every other renderer (or alone): it goes on top.
+    if (!mainPushed) {
+      components.push(wrapWithScreenInset(uiComponent!, mainOptions, '__main__'))
     }
 
     // Entity-based cleanup
@@ -354,7 +396,8 @@ export function createReactBasedUiSystem(engine: IEngine, pointerSystem: Pointer
       mainOptions = options
     },
     addUiRenderer(entity: Entity, ui: UiComponent, options?: UiRendererOptions) {
-      additionalRenderers.set(entity, { ui, options })
+      // A replacement keeps its place in the stacking order.
+      additionalRenderers.set(entity, { ui, options, order: additionalRenderers.get(entity)?.order })
     },
     removeUiRenderer(entity: Entity) {
       additionalRenderers.delete(entity)
