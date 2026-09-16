@@ -58,6 +58,28 @@ export function createServerValidator(config: ServerValidationConfig) {
     return null
   }
 
+  /**
+   * What a message can be judged on before an entity is spent mapping it. Anything
+   * needing the local entity — the CRDT dry run, the scene's own validator — still
+   * happens in validateMessagePermissions afterwards.
+   */
+  function peerMessageIsEligible(message: utils.NetworkMessage): boolean {
+    if (!('componentId' in message)) return true
+
+    const definition = engine.getComponentOrNull(message.componentId)
+    if (!definition) return false
+
+    if ('data' in message) {
+      try {
+        definition.schema.deserialize(new ReadWriteByteBuffer(message.data))
+      } catch {
+        return false
+      }
+    }
+
+    return true
+  }
+
   function findOrCreateNetworkEntity(message: utils.NetworkMessage, sender: string, isServer: boolean): Entity {
     // Look for existing network entity mapping first
     const existingEntity = findExistingNetworkEntity(message)
@@ -260,6 +282,15 @@ export function createServerValidator(config: ServerValidationConfig) {
           // Only process network messages in server message handler
           if (utils.isNetworkMessage(message)) {
             const networkMessage = message as utils.NetworkMessage
+
+            // 0. Refuse what is already unusable before an entity is spent on it. A peer
+            // sending unique (networkId, entityId) pairs it knows will be refused would
+            // otherwise drain the range one refusal at a time. A pair already mapped takes
+            // the normal path, so its sender still gets the correction it is owed.
+            if (findExistingNetworkEntity(networkMessage) === null && !peerMessageIsEligible(networkMessage)) {
+              continue
+            }
+
             // 1. Find or create network entity mapping
             const localEntityId = findOrCreateNetworkEntity(networkMessage, sender, true)
 
