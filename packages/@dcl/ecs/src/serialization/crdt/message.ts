@@ -13,6 +13,10 @@ import { DeleteEntityNetwork } from './network/deleteEntityNetwork'
 type MessageReader = {
   /** Bytes the reader consumes after the CRDT header, before any trailing data buffer. */
   bodyLength: number
+  /**
+   * A shorter length a released writer is known to declare for this type, still accepted
+   * so peers on those builds keep working. The writer here declares its real length.
+   */
   legacyDeclaredLength?: number
   /** Whether the last field of the body is the length of a data buffer that follows it. */
   hasData: boolean

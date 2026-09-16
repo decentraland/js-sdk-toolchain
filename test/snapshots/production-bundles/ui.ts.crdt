@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=433.2k bytes
+SCENE_COMPILED_JS_SIZE_PROD=434.1k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -8,9 +8,9 @@ EVAL test/snapshots/production-bundles/ui.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
-  OPCODES ~= 83k
-  MALLOC_COUNT = 23705
-  ALIVE_OBJS_DELTA ~= 4.78k
+  OPCODES ~= 84k
+  MALLOC_COUNT = 23752
+  ALIVE_OBJS_DELTA ~= 4.80k
 CALL onStart()
   OPCODES ~= 0k
   MALLOC_COUNT = -39
@@ -66,4 +66,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 80k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1982.78k bytes
+  MEMORY_USAGE_COUNT ~= 1984.70k bytes
