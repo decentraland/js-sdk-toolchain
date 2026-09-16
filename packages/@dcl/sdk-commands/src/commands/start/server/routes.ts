@@ -10,9 +10,15 @@ import { setupEcs6Endpoints } from './endpoints'
 import { setupStorageEndpoints } from './storage-service'
 import { setupRealmAndComms } from './realm'
 import { getLanUrl } from '../utils'
+import { lsdDeepLinkPulseParams } from '../dcl-env'
 
 export const sceneUpdateClients = new Set<WebSocket>()
-export async function wireRouter(components: PreviewComponents, workspace: Workspace, dataLayer?: DataLayer) {
+export async function wireRouter(
+  components: PreviewComponents,
+  workspace: Workspace,
+  dataLayer?: DataLayer,
+  dclenv: string = 'org'
+) {
   const router = new Router<PreviewComponents>()
 
   if (dataLayer) {
@@ -52,7 +58,11 @@ export async function wireRouter(components: PreviewComponents, workspace: Works
     }
 
     const [x, y] = baseParcel.split(',')
-    const deepLink = `decentraland://open?preview=${lanUrl}&position=${x},${y}`
+    // same Pulse params as the terminal QR in start/index.ts
+    const deepLink = `decentraland://open?preview=${lanUrl}&position=${x},${y}${lsdDeepLinkPulseParams(
+      workspace.projects[0].workingDirectory,
+      dclenv
+    )}`
     const qrDataUrl = await QRCode.toDataURL(deepLink)
 
     return {

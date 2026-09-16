@@ -8,15 +8,13 @@ import { ProjectUnion } from '../../logic/project-validations'
 import { isElectronEnvironment, getSpawnEnv, findNpxBin, findNpxCliJs } from './utils'
 import { getBaseCoords } from '../../logic/scene-validations'
 import { future } from '../../logic/future'
+import { engineEnvArgs } from './dcl-env'
 
 const HAMMURABI_PACKAGE = '@dcl/hammurabi-server'
 const HAMMURABI_VERSION = 'next'
 
 const BEVY_PACKAGE = '@dcl-regenesislabs/bevy-headless-server'
-// `latest` moves only when someone dispatches bevy-explorer's publish-headless
-// workflow with dist_tag=latest — engine pushes to main land on `next` and cannot
-// change what previews run. DCL_SERVER_PACKAGE overrides for local builds.
-const BEVY_VERSION = 'latest'
+const BEVY_VERSION = '0.1.0-35098753248.commit-508acb8'
 
 const EXIT_UNAVAILABLE = 78
 
@@ -133,6 +131,7 @@ export function startMultiplayerServer(
   workingDir: string,
   realm: string,
   engine: ServerEngine = DEFAULT_ENGINE,
+  engineArgs: string[] = [],
   position?: { x: number; y: number }
 ): MultiplayerServer {
   const pkg = packageSpec(engine)
@@ -142,7 +141,7 @@ export function startMultiplayerServer(
     `Starting ${colors.bold('Multiplayer Server')} (${engine}) with realm: ${colors.bold(realm)}`
   )
 
-  const npxArgs = ['--yes', pkg, `--realm=${realm}`]
+  const npxArgs = ['--yes', pkg, `--realm=${realm}`, ...engineArgs]
   if (position) npxArgs.push(`--position=${position.x},${position.y}`)
   const npxCliJs = findNpxCliJs()
   const npxPath = npxCliJs ? null : findNpxBin()
@@ -266,7 +265,8 @@ export async function waitForServerReady(
 export function spawnAuthServer(
   components: PreviewComponents,
   project: ProjectUnion,
-  realm: string
+  realm: string,
+  dclenv: string = 'org'
 ): Promise<boolean> | undefined {
   const engine = selectedEngine()
   try {
@@ -275,6 +275,7 @@ export function spawnAuthServer(
       project.workingDirectory,
       realm,
       engine,
+      engine === 'bevy' ? engineEnvArgs(dclenv) : [],
       getBaseCoords(project.scene)
     )
     void components.signaler.programClosed
