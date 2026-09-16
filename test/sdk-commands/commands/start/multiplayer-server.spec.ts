@@ -79,7 +79,7 @@ describe('multiplayer-server', () => {
 
   describe('when starting the bevy server with a scene position', () => {
     beforeEach(() => {
-      startMultiplayerServer(components as any, '/scene', 'http://localhost:8000', 'bevy', { x: 12, y: -3 })
+      startMultiplayerServer(components as any, '/scene', 'http://localhost:8000', 'bevy', [], { x: 12, y: -3 })
     })
 
     it('should forward the position to the server process', () => {
@@ -111,7 +111,7 @@ describe('multiplayer-server', () => {
       const args: string[] = (spawn as jest.Mock).mock.calls[0][1]
       expect(args).toEqual([
         '"--yes"',
-        '"@dcl-regenesislabs/bevy-headless-server@latest"',
+        '"@dcl-regenesislabs/bevy-headless-server@0.1.0-34847389047.commit-7546497"',
         '"--realm=http://localhost:8000"'
       ])
     })

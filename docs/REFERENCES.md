@@ -23,6 +23,7 @@ Curated map of every doc in this repo. Use this as the entry point when looking 
 | [world-transform-no-caching.md](world-transform-no-caching.md) | Why world-space transforms are computed lazily (not cached) and what that means for system authors. |
 | [on-demand-composite-loading.md](on-demand-composite-loading.md) | Runtime composite instantiation via `engine.addEntityFromComposite(src, options)`. The provider abstraction and pre-registration flow. |
 | [material-getflat-api.md](material-getflat-api.md) | Material `getFlat` API: reading a fully-resolved material descriptor instead of the discriminated union. |
+| [lsd-identity-and-pulse-realm.md](lsd-identity-and-pulse-realm.md) | Local Scene Development identity: the preview scene id and the Pulse realm key derived from it. Cross-repo contract — unity-explorer and bevy-explorer derive the same strings independently. |
 
 ## Guides (how-to)
 
