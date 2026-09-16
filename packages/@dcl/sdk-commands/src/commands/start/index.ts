@@ -29,6 +29,7 @@ import { Result } from 'arg'
 import { startValidations } from '../../logic/project-validations'
 import { runExplorerAlpha } from './explorer-alpha'
 import { getLanUrl } from './utils'
+import { spawnAuthServer, waitForServerReady } from './multiplayer-server'
 
 interface Options {
   args: Result<typeof args>
@@ -70,6 +71,7 @@ export const args = declareArgs({
   '--multi-instance': Boolean,
   '--asset-bundles': Boolean,
   '--no-client': Boolean,
+  '--no-server': Boolean,
   '--mcp': Boolean,
   '--mcp-port': Number
 })
@@ -101,6 +103,7 @@ export async function help(options: Options) {
       --multi-instance                  Allow running multiple Explorer instances simultaneously.
       --asset-bundles                   Preview with optimized asset bundles (forwarded as local-ab=true in the deep link; the Desktop Explorer converts the scene's assets itself).
       --no-client                       Suppress every auto-launch (desktop Explorer deeplink, browser open, mobile QR). The file watcher still notifies a desktop Explorer if it connects on its own — useful when an external tool owns the Explorer process.
+      --no-server                       Do not spawn the Multiplayer Server. Use it when another preview of this project already runs one: two servers for the same scene fight over the scene room.
       --mcp                             Enable the MCP server in the Explorer (forwarded as a deep link parameter).
       --mcp-port                        Port for the MCP server in the Explorer (forwarded as a deep link parameter).
 
@@ -134,6 +137,7 @@ export async function main(options: Options) {
   const withDataLayer = options.args['--data-layer']
   const isHub = !!options.args['--hub']
   const skipClient = !!options.args['--no-client']
+  const skipServer = !!options.args['--no-server']
   const bevyWeb = !!options.args['--bevy-web']
   const isMobile = !!options.args['--mobile']
   const explorerAlpha = !bevyWeb
@@ -175,9 +179,12 @@ export async function main(options: Options) {
       const config = createRecordConfigComponent({
         HTTP_SERVER_PORT: port.toString(),
         HTTP_SERVER_HOST: '0.0.0.0',
+        // the embedded comms server (RoomsComponent/LinearProtocol) logs every
+        // connect/disconnect at DEBUG; LOG_LEVEL=DEBUG in the env re-enables it
+        LOG_LEVEL: 'INFO',
         ...process.env
       })
-      const logs = await createConsoleLogComponent({})
+      const logs = await createConsoleLogComponent({ config })
       const ws = await createWsComponent({ logs })
       const server = await createServerComponent<PreviewComponents>({ config, ws: ws.ws, logs }, { cors: {} })
       const rooms = await createRoomsComponent({
@@ -220,6 +227,10 @@ export async function main(options: Options) {
       }
       await startComponents()
 
+      const project = workspace.projects[0]
+      const multiplayerServerReady =
+        project && !skipServer ? spawnAuthServer(components, project, `http://localhost:${port}`) : undefined
+
       const networkInterfaces = os.networkInterfaces()
       const availableURLs: string[] = []
 
@@ -256,6 +267,11 @@ export async function main(options: Options) {
         )
       }
       components.logger.log('\nPress CTRL+C to exit\n')
+
+      const launchesClient = !skipClient && !isMobile && (explorerAlpha || openBrowser)
+      if (multiplayerServerReady && launchesClient) {
+        await waitForServerReady(components, multiplayerServerReady)
+      }
 
       if (explorerAlpha && !isMobile && !skipClient) {
         const realm = new URL(sortedURLs[0]).origin

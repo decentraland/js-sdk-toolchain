@@ -17,6 +17,9 @@ export enum CrdtMessageType {
   DELETE_COMPONENT_NETWORK = 6,
   DELETE_ENTITY_NETWORK = 7,
 
+  // Server authoritative operation - forces component state regardless of timestamp
+  AUTHORITATIVE_PUT_COMPONENT = 8,
+
   MAX_MESSAGE_TYPE
 }
 
@@ -57,6 +60,24 @@ export type PutComponentMessageBody = {
 export type PutNetworkComponentMessageBody = Omit<PutComponentMessageBody, 'type'> & {
   type: CrdtMessageType.PUT_COMPONENT_NETWORK
   networkId: number
+}
+
+/**
+ * Server authoritative message - identical to PutComponentMessageBody but with forced processing
+ * Min. length = header (8 bytes) + 16 bytes = 24 bytes
+ *
+ * @param entity - Uint32 number of the entity
+ * @param componentId - Uint32 number of id
+ * @param timestamp - Uint32 Lamport timestamp (server's authoritative timestamp)
+ * @param data - Uint8[] data of component => length(4 bytes) + block of bytes[0..length-1]
+ * @public
+ */
+export type AuthoritativePutComponentMessageBody = {
+  type: CrdtMessageType.AUTHORITATIVE_PUT_COMPONENT
+  entityId: Entity
+  componentId: number
+  timestamp: number
+  data: Uint8Array
 }
 
 /**
@@ -133,6 +154,10 @@ export type PutComponentMessage = CrdtMessageHeader & PutComponentMessageBody
 /**
  * @public
  */
+export type AuthoritativePutComponentMessage = CrdtMessageHeader & AuthoritativePutComponentMessageBody
+/**
+ * @public
+ */
 export type PutNetworkComponentMessage = CrdtMessageHeader & PutNetworkComponentMessageBody
 /**
  * @public
@@ -156,6 +181,7 @@ export type DeleteEntityNetworkMessage = CrdtMessageHeader & DeleteEntityNetwork
  */
 export type CrdtMessage =
   | PutComponentMessage
+  | AuthoritativePutComponentMessage
   | DeleteComponentMessage
   | AppendValueMessage
   | DeleteEntityMessage
@@ -177,6 +203,7 @@ export type CrdtNetworkMessageBody =
  */
 export type CrdtMessageBody =
   | PutComponentMessageBody
+  | AuthoritativePutComponentMessageBody
   | DeleteComponentMessageBody
   | DeleteEntityMessageBody
   | AppendValueMessageBody
