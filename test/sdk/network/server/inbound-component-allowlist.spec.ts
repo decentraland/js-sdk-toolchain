@@ -77,6 +77,18 @@ describe('when a peer sends a component the scene never synchronises', () => {
     })
   })
 
+  describe('and it names entities the server has never seen', () => {
+    beforeEach(async () => {
+      for (let i = 0; i < 25; i++) {
+        await feed(chunk(1000 + i, UiTransform.componentId, serialized(UiTransform, UiTransform.schema.create())))
+      }
+    })
+
+    it('should spend no entities on them', () => {
+      expect(Array.from(engine.getEntitiesWith(NetworkEntity))).toEqual([])
+    })
+  })
+
   describe('and it is a component the scene does synchronise', () => {
     beforeEach(async () => {
       await feed(
