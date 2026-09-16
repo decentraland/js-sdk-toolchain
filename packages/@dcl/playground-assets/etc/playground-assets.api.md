@@ -100,13 +100,16 @@ export const AudioEvent: GrowOnlyValueSetComponentDefinition<PBAudioEvent>;
 
 // @public (undocumented)
 export interface AudioEventsSystem {
+    getAudioPlayback(entity: Entity): DeepReadonlyObject<PBAudioEvent> | undefined;
     getAudioState(entity: Entity): DeepReadonlyObject<PBAudioEvent> | undefined;
     // (undocumented)
     hasAudioEventsEntity(entity: Entity): boolean;
-    // (undocumented)
     registerAudioEventsEntity(entity: Entity, callback: AudioEventsSystemCallback): void;
+    registerAudioPlaybackEntity(entity: Entity, callback: AudioEventsSystemCallback): void;
     // (undocumented)
     removeAudioEventsEntity(entity: Entity): void;
+    // (undocumented)
+    removeAudioPlaybackEntity(entity: Entity): void;
 }
 
 // @public
@@ -730,7 +733,7 @@ export const componentDefinitionByName: {
     "core::CameraMode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraMode>>;
     "core::CameraModeArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraModeArea>>;
     "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
-    "core::ExplorerItemPurchaseResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBExplorerItemPurchaseResult>>;
+    "core::ExplorerItemPurchaseResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBExplorerItemPurchaseResult>>;
     "core::ExplorerUiEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBExplorerUiEventsResult>>;
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
@@ -1286,7 +1289,7 @@ export type ExcludeUndefined<T> = {
 export const executeTask: (task: Task<unknown>) => void;
 
 // @public (undocumented)
-export const ExplorerItemPurchaseResult: GrowOnlyValueSetComponentDefinition<PBExplorerItemPurchaseResult>;
+export const ExplorerItemPurchaseResult: LastWriteWinElementSetComponentDefinition<PBExplorerItemPurchaseResult>;
 
 // @public (undocumented)
 export const enum ExplorerUi {
@@ -2506,8 +2509,11 @@ export const enum PBAudioAnalysisMode {
 
 // @public (undocumented)
 export interface PBAudioEvent {
+    clipLength?: number | undefined;
+    currentOffset?: number | undefined;
     // (undocumented)
     state: MediaState;
+    tickNumber?: number | undefined;
     timestamp: number;
 }
 
