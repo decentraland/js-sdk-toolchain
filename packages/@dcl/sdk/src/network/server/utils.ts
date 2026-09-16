@@ -1,4 +1,5 @@
 import { Entity } from '@dcl/ecs/dist/engine'
+import { readMessage } from '@dcl/ecs/dist/serialization/crdt/message'
 import { CrdtMessageProtocol, NetworkParent } from '@dcl/ecs'
 import { ReceiveMessage } from '@dcl/ecs/dist/runtime/types'
 import { ReceiveNetworkMessage } from '@dcl/ecs/dist/systems/crdt/types'
@@ -26,54 +27,41 @@ import { DeleteEntityNetwork } from '@dcl/ecs/dist/serialization/crdt/network/de
 import { TransformSchema, COMPONENT_ID as TransformComponentId } from '@dcl/ecs/dist/components/manual/Transform'
 
 export type NetworkMessage = (
-  | PutNetworkComponentMessage
-  | DeleteComponentNetworkMessage
-  | DeleteEntityNetworkMessage
+  PutNetworkComponentMessage | DeleteComponentNetworkMessage | DeleteEntityNetworkMessage
 ) & { messageBuffer: Uint8Array }
 
 export type RegularMessage = (
-  | PutComponentMessage
-  | AuthoritativePutComponentMessage
-  | DeleteComponentMessage
-  | DeleteEntityMessage
+  PutComponentMessage | AuthoritativePutComponentMessage | DeleteComponentMessage | DeleteEntityMessage
 ) & {
   messageBuffer: Uint8Array
 }
+// APPEND_VALUE is excluded because chunkCrdtMessages forwards every returned message.
+const HANDLED_MESSAGE_TYPES: ReadonlySet<number> = new Set([
+  CrdtMessageType.DELETE_COMPONENT_NETWORK,
+  CrdtMessageType.PUT_COMPONENT_NETWORK,
+  CrdtMessageType.DELETE_ENTITY_NETWORK,
+  CrdtMessageType.PUT_COMPONENT,
+  CrdtMessageType.AUTHORITATIVE_PUT_COMPONENT,
+  CrdtMessageType.DELETE_COMPONENT,
+  CrdtMessageType.DELETE_ENTITY
+])
+
 export function readMessages(data: Uint8Array): (NetworkMessage | RegularMessage)[] {
   const buffer = new ReadWriteByteBuffer(data)
   const messages: (NetworkMessage | RegularMessage)[] = []
   let header: CrdtMessageHeader | null
   while ((header = CrdtMessageProtocol.getHeader(buffer))) {
     const offset = buffer.currentReadOffset()
-    let message: CrdtMessage | undefined = undefined
 
-    // Network messages
-    if (header.type === CrdtMessageType.DELETE_COMPONENT_NETWORK) {
-      message = DeleteComponentNetwork.read(buffer)!
-    } else if (header.type === CrdtMessageType.PUT_COMPONENT_NETWORK) {
-      message = PutNetworkComponentOperation.read(buffer)!
-    } else if (header.type === CrdtMessageType.DELETE_ENTITY_NETWORK) {
-      message = DeleteEntityNetwork.read(buffer)!
-    }
-    // Regular messages
-    else if (header.type === CrdtMessageType.PUT_COMPONENT) {
-      message = PutComponentOperation.read(buffer)!
-    } else if (header.type === CrdtMessageType.AUTHORITATIVE_PUT_COMPONENT) {
-      message = AuthoritativePutComponentOperation.read(buffer)!
-    } else if (header.type === CrdtMessageType.DELETE_COMPONENT) {
-      message = DeleteComponent.read(buffer)!
-    } else if (header.type === CrdtMessageType.DELETE_ENTITY) {
-      message = DeleteEntity.read(buffer)!
-    } else {
-      // consume unknown messages
-      buffer.incrementReadOffset(header.length)
-    }
+    const message = HANDLED_MESSAGE_TYPES.has(header.type) ? readMessage(buffer) : null
 
     if (message) {
       messages.push({
         ...message,
         messageBuffer: buffer.buffer().subarray(offset, buffer.currentReadOffset())
-      })
+      } as NetworkMessage | RegularMessage)
+    } else {
+      buffer.incrementReadOffset(header.length)
     }
   }
   return messages

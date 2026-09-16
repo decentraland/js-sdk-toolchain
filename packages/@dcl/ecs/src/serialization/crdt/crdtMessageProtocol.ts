@@ -16,6 +16,11 @@ export namespace CrdtMessageProtocol {
     }
 
     const messageLength = buf.getUint32(buf.currentReadOffset())
+    // A zero-length frame would keep skip-based parsers on the same bytes forever.
+    if (messageLength < CRDT_MESSAGE_HEADER_LENGTH) {
+      return false
+    }
+
     if (rem < messageLength) {
       return false
     }
