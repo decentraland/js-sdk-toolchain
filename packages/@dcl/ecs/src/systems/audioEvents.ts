@@ -51,15 +51,17 @@ export interface AudioEventsSystem {
    */
   getAudioState(entity: Entity): DeepReadonlyObject<PBAudioEvent> | undefined
   /**
-   * Run `callback` once per scene frame with the newest report for the entity, including the playback-position
-   * reports the renderer writes while a clip plays (`tickNumber` and `currentOffset`). It is skipped on frames
-   * where no new report arrived. A renderer sampling faster than the scene ticks appends several reports per
-   * frame; the callback receives the freshest, which is the one to align against.
+   * Run `callback` once per scene frame with the newest playback-position report for the entity, already
+   * resolved against the scene clock at the tick the renderer sampled it in. It is skipped on frames where no
+   * new position arrived. A renderer sampling faster than the scene ticks appends several reports per frame;
+   * the callback receives the freshest, which is the one to align against.
    *
    * Use this to align gameplay with the audio that is actually heard: the renderer starts a clip some
-   * milliseconds after being asked to, so compare `currentOffset` with the scene clock at `tickNumber`.
+   * milliseconds after being asked to. See {@link AudioPlaybackSample} for what the values mean and what
+   * accuracy to expect. Reports that carry no position never reach it; use `registerAudioEventsEntity` for
+   * media-state changes.
    */
-  registerAudioPlaybackEntity(entity: Entity, callback: AudioEventsSystemCallback): void
+  registerAudioPlaybackEntity(entity: Entity, callback: AudioPlaybackSampleCallback): void
   removeAudioPlaybackEntity(entity: Entity): void
   /**
    * Returns the latest report that carries a playback position (`currentOffset`), or undefined when the
@@ -67,17 +69,6 @@ export interface AudioEventsSystem {
    * @param entity - Entity with an AudioSource or AudioStream
    */
   getAudioPlayback(entity: Entity): DeepReadonlyObject<PBAudioEvent> | undefined
-  /**
-   * Same delivery as `registerAudioPlaybackEntity`, with the report already resolved against the scene clock at
-   * the tick it was sampled in. This is the form most scenes want, because comparing against the clock at that
-   * tick keeps the time the report spent in transit out of the result.
-   *
-   * See {@link AudioPlaybackSample} for what the two numbers mean and what accuracy to expect. When the report's
-   * tick predates the short history the system keeps, the current scene clock is used instead; a report is never
-   * dropped for want of a matching tick.
-   */
-  registerAudioPlaybackSampleEntity(entity: Entity, callback: AudioPlaybackSampleCallback): void
-  removeAudioPlaybackSampleEntity(entity: Entity): void
   /**
    * The scene clock (seconds, from accumulated delta time) recorded in the given tick, or undefined if that tick
    * is older than the history window or has not happened yet. Lets a scene resolve video reports the same way.
@@ -101,13 +92,6 @@ export function createAudioEventsSystem(engine: IEngine): AudioEventsSystem {
     }
   >()
   const entitiesCallbackPlaybackMap = new Map<
-    Entity,
-    {
-      callback: AudioEventsSystemCallback
-      lastReport?: string
-    }
-  >()
-  const entitiesCallbackSampleMap = new Map<
     Entity,
     {
       callback: AudioPlaybackSampleCallback
@@ -150,20 +134,12 @@ export function createAudioEventsSystem(engine: IEngine): AudioEventsSystem {
     return entitiesCallbackAudioStateMap.has(entity)
   }
 
-  function registerAudioPlaybackEntity(entity: Entity, callback: AudioEventsSystemCallback) {
+  function registerAudioPlaybackEntity(entity: Entity, callback: AudioPlaybackSampleCallback) {
     entitiesCallbackPlaybackMap.set(entity, { callback: callback })
   }
 
   function removeAudioPlaybackEntity(entity: Entity) {
     entitiesCallbackPlaybackMap.delete(entity)
-  }
-
-  function registerAudioPlaybackSampleEntity(entity: Entity, callback: AudioPlaybackSampleCallback) {
-    entitiesCallbackSampleMap.set(entity, { callback: callback })
-  }
-
-  function removeAudioPlaybackSampleEntity(entity: Entity) {
-    entitiesCallbackSampleMap.delete(entity)
   }
 
   function hasAudioComponent(entity: Entity) {
@@ -208,21 +184,6 @@ export function createAudioEventsSystem(engine: IEngine): AudioEventsSystem {
       }
 
       const lastValue = latestReport(entity)
-      if (lastValue === undefined) continue
-      const key = reportKey(lastValue)
-      if (data.lastReport === key) continue
-
-      data.callback(lastValue)
-      entitiesCallbackPlaybackMap.set(entity, { callback: data.callback, lastReport: key })
-    }
-
-    for (const [entity, data] of entitiesCallbackSampleMap) {
-      if (engine.getEntityState(entity) === EntityState.Removed || !hasAudioComponent(entity)) {
-        removeAudioPlaybackSampleEntity(entity)
-        continue
-      }
-
-      const lastValue = latestReport(entity)
       if (lastValue === undefined || lastValue.currentOffset === undefined || lastValue.tickNumber === undefined)
         continue
       const key = reportKey(lastValue)
@@ -232,7 +193,7 @@ export function createAudioEventsSystem(engine: IEngine): AudioEventsSystem {
       // already recorded. When it is not, the current clock is the closest the scene has: resolving to it keeps
       // the report flowing, where looking the tick up after marking it seen would drop it for good.
       const sceneTimeAtTick = sceneTimeByTick.get(lastValue.tickNumber) ?? sceneTime
-      entitiesCallbackSampleMap.set(entity, { callback: data.callback, lastReport: key })
+      entitiesCallbackPlaybackMap.set(entity, { callback: data.callback, lastReport: key })
       data.callback({ report: lastValue, sceneTime: sceneTimeAtTick, offset: lastValue.currentOffset })
     }
   })
@@ -250,7 +211,7 @@ export function createAudioEventsSystem(engine: IEngine): AudioEventsSystem {
     getAudioState(entity: Entity) {
       return latestReport(entity)
     },
-    registerAudioPlaybackEntity(entity: Entity, callback: AudioEventsSystemCallback) {
+    registerAudioPlaybackEntity(entity: Entity, callback: AudioPlaybackSampleCallback) {
       registerAudioPlaybackEntity(entity, callback)
     },
     removeAudioPlaybackEntity(entity: Entity) {
@@ -262,12 +223,6 @@ export function createAudioEventsSystem(engine: IEngine): AudioEventsSystem {
         if (values[index].currentOffset !== undefined) return values[index]
       }
       return undefined
-    },
-    registerAudioPlaybackSampleEntity(entity: Entity, callback: AudioPlaybackSampleCallback) {
-      registerAudioPlaybackSampleEntity(entity, callback)
-    },
-    removeAudioPlaybackSampleEntity(entity: Entity) {
-      removeAudioPlaybackSampleEntity(entity)
     },
     getSceneTimeAtTick(tickNumber: number) {
       return sceneTimeByTick.get(tickNumber)
