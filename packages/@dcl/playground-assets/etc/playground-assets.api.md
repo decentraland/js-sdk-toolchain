@@ -106,14 +106,11 @@ export interface AudioEventsSystem {
     // (undocumented)
     hasAudioEventsEntity(entity: Entity): boolean;
     registerAudioEventsEntity(entity: Entity, callback: AudioEventsSystemCallback): void;
-    registerAudioPlaybackEntity(entity: Entity, callback: AudioEventsSystemCallback): void;
-    registerAudioPlaybackSampleEntity(entity: Entity, callback: AudioPlaybackSampleCallback): void;
+    registerAudioPlaybackEntity(entity: Entity, callback: AudioPlaybackSampleCallback): void;
     // (undocumented)
     removeAudioEventsEntity(entity: Entity): void;
     // (undocumented)
     removeAudioPlaybackEntity(entity: Entity): void;
-    // (undocumented)
-    removeAudioPlaybackSampleEntity(entity: Entity): void;
 }
 
 // @public

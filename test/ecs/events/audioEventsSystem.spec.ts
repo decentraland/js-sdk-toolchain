@@ -253,7 +253,9 @@ describe('Audio events helper system should', () => {
     await engine.update(1)
     await engine.update(1)
     expect(fn).toHaveBeenCalledTimes(3)
-    expect(fn).toHaveBeenLastCalledWith(expect.objectContaining({ tickNumber: 31, currentOffset: 1.02 }))
+    expect(fn).toHaveBeenLastCalledWith(
+      expect.objectContaining({ report: expect.objectContaining({ tickNumber: 31 }), offset: 1.02 })
+    )
   })
 
   it('does not run state callbacks on position-only reports', async () => {
@@ -312,7 +314,7 @@ describe('Audio events helper system should', () => {
       fn = jest.fn()
       audioSourceEntity = engine.addEntity()
       audioSourceComponent.create(audioSourceEntity)
-      audioEventsSystem.registerAudioPlaybackSampleEntity(audioSourceEntity, fn)
+      audioEventsSystem.registerAudioPlaybackEntity(audioSourceEntity, fn)
       // three ticks of 0.1 s each: tick 1 at 0.1 s, tick 2 at 0.2 s, tick 3 at 0.3 s
       for (const tick of [1, 2, 3]) {
         engineInfoComponent.createOrReplace(engine.RootEntity, {
@@ -325,7 +327,7 @@ describe('Audio events helper system should', () => {
       }
     })
     afterEach(() => {
-      audioEventsSystem.removeAudioPlaybackSampleEntity(audioSourceEntity)
+      audioEventsSystem.removeAudioPlaybackEntity(audioSourceEntity)
     })
 
     it('should record the scene clock for each tick', () => {
