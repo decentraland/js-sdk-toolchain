@@ -354,15 +354,38 @@ describe('Audio events helper system should', () => {
       )
     })
 
-    it('should skip a report whose tick is not in the history', async () => {
-      audioEventComponent.addValue(audioSourceEntity, {
-        state: MediaState.MS_PLAYING,
-        timestamp: 1,
-        tickNumber: 999,
-        currentOffset: 0.05
+    describe('and every report names a tick the history never recorded', () => {
+      let clockBeforeReports: number
+      beforeEach(async () => {
+        clockBeforeReports = audioEventsSystem.getSceneTimeAtTick(3)!
+        // A renderer stamping a tick the scene never sees must not silence the feature: it would drop
+        // every sample, not just one, because a report is marked as seen once it has been examined.
+        for (const [timestamp, currentOffset] of [
+          [1, 0.05],
+          [2, 0.15]
+        ]) {
+          audioEventComponent.addValue(audioSourceEntity, {
+            state: MediaState.MS_PLAYING,
+            timestamp,
+            tickNumber: 900 + timestamp,
+            currentOffset
+          })
+          await engine.update(0.1)
+        }
       })
-      await engine.update(0.1)
-      expect(fn).not.toHaveBeenCalled()
+
+      it('should deliver every report instead of dropping it', () => {
+        expect(fn).toHaveBeenCalledTimes(2)
+      })
+
+      it('should fall back to the scene clock of the frame that received each report', () => {
+        const elapsed = fn.mock.calls.map((call) => Number((call[0].sceneTime - clockBeforeReports).toFixed(2)))
+        expect(elapsed).toEqual([0.1, 0.2])
+      })
+
+      it('should still carry the position the renderer sampled', () => {
+        expect(fn.mock.calls.map((call) => call[0].offset)).toEqual([0.05, 0.15])
+      })
     })
 
     it('should skip state-only reports', async () => {
