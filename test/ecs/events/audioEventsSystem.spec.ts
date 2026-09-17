@@ -4,7 +4,8 @@ import {
   Engine,
   IEngine,
   AudioEventsSystem,
-  MediaState
+  MediaState,
+  Entity
 } from '../../../packages/@dcl/ecs/src'
 
 describe('Audio events helper system should', () => {
@@ -13,6 +14,7 @@ describe('Audio events helper system should', () => {
   const audioEventComponent = components.AudioEvent(engine)
   const audioSourceComponent = components.AudioSource(engine)
   const audioStreamComponent = components.AudioStream(engine)
+  const engineInfoComponent = components.EngineInfo(engine)
 
   it('gets the latest state of an audio source', async () => {
     const audioSourceEntity = engine.addEntity()
@@ -228,11 +230,26 @@ describe('Audio events helper system should', () => {
     audioSourceComponent.create(audioSourceEntity)
     audioEventsSystem.registerAudioPlaybackEntity(audioSourceEntity, fn)
     // simulate the renderer reporting the start of playback, then two periodic position reports
-    audioEventComponent.addValue(audioSourceEntity, { state: MediaState.MS_PLAYING, timestamp: 1, tickNumber: 1, currentOffset: 0.02 })
+    audioEventComponent.addValue(audioSourceEntity, {
+      state: MediaState.MS_PLAYING,
+      timestamp: 1,
+      tickNumber: 1,
+      currentOffset: 0.02
+    })
     await engine.update(1)
-    audioEventComponent.addValue(audioSourceEntity, { state: MediaState.MS_PLAYING, timestamp: 2, tickNumber: 16, currentOffset: 0.52 })
+    audioEventComponent.addValue(audioSourceEntity, {
+      state: MediaState.MS_PLAYING,
+      timestamp: 2,
+      tickNumber: 16,
+      currentOffset: 0.52
+    })
     await engine.update(1)
-    audioEventComponent.addValue(audioSourceEntity, { state: MediaState.MS_PLAYING, timestamp: 3, tickNumber: 31, currentOffset: 1.02 })
+    audioEventComponent.addValue(audioSourceEntity, {
+      state: MediaState.MS_PLAYING,
+      timestamp: 3,
+      tickNumber: 31,
+      currentOffset: 1.02
+    })
     await engine.update(1)
     await engine.update(1)
     expect(fn).toHaveBeenCalledTimes(3)
@@ -244,9 +261,19 @@ describe('Audio events helper system should', () => {
     const audioSourceEntity = engine.addEntity()
     audioSourceComponent.create(audioSourceEntity)
     audioEventsSystem.registerAudioEventsEntity(audioSourceEntity, fn)
-    audioEventComponent.addValue(audioSourceEntity, { state: MediaState.MS_PLAYING, timestamp: 1, tickNumber: 1, currentOffset: 0 })
+    audioEventComponent.addValue(audioSourceEntity, {
+      state: MediaState.MS_PLAYING,
+      timestamp: 1,
+      tickNumber: 1,
+      currentOffset: 0
+    })
     await engine.update(1)
-    audioEventComponent.addValue(audioSourceEntity, { state: MediaState.MS_PLAYING, timestamp: 2, tickNumber: 16, currentOffset: 0.5 })
+    audioEventComponent.addValue(audioSourceEntity, {
+      state: MediaState.MS_PLAYING,
+      timestamp: 2,
+      tickNumber: 16,
+      currentOffset: 0.5
+    })
     await engine.update(1)
     expect(fn).toHaveBeenCalledTimes(1)
   })
@@ -255,10 +282,18 @@ describe('Audio events helper system should', () => {
     const audioSourceEntity = engine.addEntity()
     audioSourceComponent.create(audioSourceEntity)
     audioEventComponent.addValue(audioSourceEntity, { state: MediaState.MS_LOADING, timestamp: 1 })
-    audioEventComponent.addValue(audioSourceEntity, { state: MediaState.MS_PLAYING, timestamp: 2, tickNumber: 4, currentOffset: 0.1, clipLength: 64 })
+    audioEventComponent.addValue(audioSourceEntity, {
+      state: MediaState.MS_PLAYING,
+      timestamp: 2,
+      tickNumber: 4,
+      currentOffset: 0.1,
+      clipLength: 64
+    })
     audioEventComponent.addValue(audioSourceEntity, { state: MediaState.MS_PAUSED, timestamp: 3 })
     await engine.update(1)
-    expect(audioEventsSystem.getAudioPlayback(audioSourceEntity)).toEqual(expect.objectContaining({ tickNumber: 4, currentOffset: 0.1, clipLength: 64 }))
+    expect(audioEventsSystem.getAudioPlayback(audioSourceEntity)).toEqual(
+      expect.objectContaining({ tickNumber: 4, currentOffset: 0.1, clipLength: 64 })
+    )
     expect(audioEventsSystem.getAudioState(audioSourceEntity)?.state).toBe(MediaState.MS_PAUSED)
   })
 
@@ -269,5 +304,71 @@ describe('Audio events helper system should', () => {
     await engine.update(1)
     expect(audioEventsSystem.getAudioPlayback(audioSourceEntity)).toBeUndefined()
   })
-})
 
+  describe('when reports are resolved against the scene clock', () => {
+    let fn: jest.Mock
+    let audioSourceEntity: Entity
+    beforeEach(async () => {
+      fn = jest.fn()
+      audioSourceEntity = engine.addEntity()
+      audioSourceComponent.create(audioSourceEntity)
+      audioEventsSystem.registerAudioPlaybackSampleEntity(audioSourceEntity, fn)
+      // three ticks of 0.1 s each: tick 1 at 0.1 s, tick 2 at 0.2 s, tick 3 at 0.3 s
+      for (const tick of [1, 2, 3]) {
+        engineInfoComponent.createOrReplace(engine.RootEntity, {
+          frameNumber: tick,
+          totalRuntime: tick / 10,
+          tickNumber: tick,
+          sceneHidden: false
+        })
+        await engine.update(0.1)
+      }
+    })
+    afterEach(() => {
+      audioEventsSystem.removeAudioPlaybackSampleEntity(audioSourceEntity)
+    })
+
+    it('should record the scene clock for each tick', () => {
+      const t1 = audioEventsSystem.getSceneTimeAtTick(1)!
+      const t3 = audioEventsSystem.getSceneTimeAtTick(3)!
+      expect(t3 - t1).toBeCloseTo(0.2)
+    })
+
+    it('should resolve a late report against the clock at the tick it was sampled in', async () => {
+      // sampled at tick 2 (scene clock 0.2 s), delivered two ticks later
+      audioEventComponent.addValue(audioSourceEntity, {
+        state: MediaState.MS_PLAYING,
+        timestamp: 1,
+        tickNumber: 2,
+        currentOffset: 0.05
+      })
+      engineInfoComponent.createOrReplace(engine.RootEntity, {
+        frameNumber: 4,
+        totalRuntime: 0.4,
+        tickNumber: 4,
+        sceneHidden: false
+      })
+      await engine.update(0.1)
+      expect(fn).toHaveBeenCalledWith(
+        expect.objectContaining({ sceneTime: audioEventsSystem.getSceneTimeAtTick(2), offset: 0.05 })
+      )
+    })
+
+    it('should skip a report whose tick is not in the history', async () => {
+      audioEventComponent.addValue(audioSourceEntity, {
+        state: MediaState.MS_PLAYING,
+        timestamp: 1,
+        tickNumber: 999,
+        currentOffset: 0.05
+      })
+      await engine.update(0.1)
+      expect(fn).not.toHaveBeenCalled()
+    })
+
+    it('should skip state-only reports', async () => {
+      audioEventComponent.addValue(audioSourceEntity, { state: MediaState.MS_PLAYING, timestamp: 1 })
+      await engine.update(0.1)
+      expect(fn).not.toHaveBeenCalled()
+    })
+  })
+})
