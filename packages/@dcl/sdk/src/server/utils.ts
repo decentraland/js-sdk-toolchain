@@ -58,7 +58,12 @@ export async function wrapSignedFetch<T = unknown>(signedFetchBody: SignedFetchR
 
   if (!response.ok) {
     const errorMessage = `${response.status} ${response.statusText}`
-    console.error(`Error in ${signedFetchBody.url} endpoint`, { response })
+    // 404 is a first-class outcome for storage/env lookups (key not created yet),
+    // not a failure: every caller branches on the status and treats it as absent.
+    // Logging it as ERROR printed one line per new visitor per missing key.
+    if (response.status !== 404) {
+      console.error(`Error in ${signedFetchBody.url} endpoint`, { response })
+    }
     return [errorMessage, null, response.status]
   }
 
