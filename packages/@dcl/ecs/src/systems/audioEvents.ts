@@ -10,10 +10,18 @@ import { SYSTEMS_REGULAR_PRIORITY } from '../engine/systems'
 export type AudioEventsSystemCallback = (event: DeepReadonlyObject<PBAudioEvent>) => void
 
 /**
- * A playback report resolved against the scene's own clock: `sceneTime` is the value of the scene clock (seconds
- * since the scene started, from the engine's accumulated delta time) in the tick the renderer sampled the position.
- * `offset` is `currentOffset` in seconds. Comparing the two gives how far the audible clip runs behind (positive)
- * or ahead of the scene clock, independent of how long the report took to arrive.
+ * A playback report resolved against the scene's own clock. `sceneTime` is the scene clock (seconds since the
+ * scene started, from the engine's accumulated delta time) in the tick the renderer sampled the position, so it
+ * does not depend on how long the report took to arrive. `offset` is `currentOffset` in seconds.
+ *
+ * `sceneTime - offset` is the scene clock at which the clip effectively began, not a lag. To get the lag, compare
+ * it against the moment the scene believes it started the clip: `(sceneTime - songStart) - offset`, positive when
+ * the audible clip runs behind the scene.
+ *
+ * Accuracy is bounded by how often the renderer samples its playhead and by the renderer's output latency, which
+ * is the gap between the decoder position reported here and the moment a sample leaves the speaker. The latter is
+ * typically tens of milliseconds and roughly constant per device, so a scene needing finer alignment than a tick
+ * should calibrate it once rather than expect it here.
  * @public
  */
 export type AudioPlaybackSample = {
@@ -43,10 +51,13 @@ export interface AudioEventsSystem {
    */
   getAudioState(entity: Entity): DeepReadonlyObject<PBAudioEvent> | undefined
   /**
-   * Run `callback` for every report the renderer writes, including the periodic playback-position reports it
-   * emits while a clip plays (`tickNumber` and `currentOffset`). Use this to align gameplay with the audio that
-   * is actually heard: the renderer starts a clip some milliseconds after being asked to, so compare
-   * `currentOffset` with the scene clock at `tickNumber`.
+   * Run `callback` once per scene frame with the newest report for the entity, including the playback-position
+   * reports the renderer writes while a clip plays (`tickNumber` and `currentOffset`). It is skipped on frames
+   * where no new report arrived. A renderer sampling faster than the scene ticks appends several reports per
+   * frame; the callback receives the freshest, which is the one to align against.
+   *
+   * Use this to align gameplay with the audio that is actually heard: the renderer starts a clip some
+   * milliseconds after being asked to, so compare `currentOffset` with the scene clock at `tickNumber`.
    */
   registerAudioPlaybackEntity(entity: Entity, callback: AudioEventsSystemCallback): void
   removeAudioPlaybackEntity(entity: Entity): void
@@ -57,10 +68,13 @@ export interface AudioEventsSystem {
    */
   getAudioPlayback(entity: Entity): DeepReadonlyObject<PBAudioEvent> | undefined
   /**
-   * Run `callback` for every position report, already resolved against the scene clock at the report's tick.
-   * This is the form most scenes want: `sample.sceneTime - sample.offset` is the audio lag, with the report's
-   * transport delay cancelled out by construction. Reports whose tick is no longer in the short history the
-   * system keeps (about three seconds) are skipped.
+   * Same delivery as `registerAudioPlaybackEntity`, with the report already resolved against the scene clock at
+   * the tick it was sampled in. This is the form most scenes want, because comparing against the clock at that
+   * tick keeps the time the report spent in transit out of the result.
+   *
+   * See {@link AudioPlaybackSample} for what the two numbers mean and what accuracy to expect. When the report's
+   * tick predates the short history the system keeps, the current scene clock is used instead; a report is never
+   * dropped for want of a matching tick.
    */
   registerAudioPlaybackSampleEntity(entity: Entity, callback: AudioPlaybackSampleCallback): void
   removeAudioPlaybackSampleEntity(entity: Entity): void
@@ -213,10 +227,12 @@ export function createAudioEventsSystem(engine: IEngine): AudioEventsSystem {
         continue
       const key = reportKey(lastValue)
       if (data.lastReport === key) continue
-      entitiesCallbackSampleMap.set(entity, { callback: data.callback, lastReport: key })
 
-      const sceneTimeAtTick = sceneTimeByTick.get(lastValue.tickNumber)
-      if (sceneTimeAtTick === undefined) continue
+      // A renderer publishes EngineInfo and the reports sampled in that tick together, so the tick is normally
+      // already recorded. When it is not, the current clock is the closest the scene has: resolving to it keeps
+      // the report flowing, where looking the tick up after marking it seen would drop it for good.
+      const sceneTimeAtTick = sceneTimeByTick.get(lastValue.tickNumber) ?? sceneTime
+      entitiesCallbackSampleMap.set(entity, { callback: data.callback, lastReport: key })
       data.callback({ report: lastValue, sceneTime: sceneTimeAtTick, offset: lastValue.currentOffset })
     }
   })
