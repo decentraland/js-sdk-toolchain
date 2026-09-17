@@ -2,11 +2,29 @@ import * as components from '../components'
 import { DeepReadonlyObject, Entity, IEngine } from '../engine'
 import { PBAudioEvent } from '../components'
 import { EntityState } from '../engine/entity'
+import { SYSTEMS_REGULAR_PRIORITY } from '../engine/systems'
 
 /**
  * @public
  */
 export type AudioEventsSystemCallback = (event: DeepReadonlyObject<PBAudioEvent>) => void
+
+/**
+ * A playback report resolved against the scene's own clock: `sceneTime` is the value of the scene clock (seconds
+ * since the scene started, from the engine's accumulated delta time) in the tick the renderer sampled the position.
+ * `offset` is `currentOffset` in seconds. Comparing the two gives how far the audible clip runs behind (positive)
+ * or ahead of the scene clock, independent of how long the report took to arrive.
+ * @public
+ */
+export type AudioPlaybackSample = {
+  report: DeepReadonlyObject<PBAudioEvent>
+  sceneTime: number
+  offset: number
+}
+/**
+ * @public
+ */
+export type AudioPlaybackSampleCallback = (sample: AudioPlaybackSample) => void
 
 /**
  * @public
@@ -38,6 +56,19 @@ export interface AudioEventsSystem {
    * @param entity - Entity with an AudioSource or AudioStream
    */
   getAudioPlayback(entity: Entity): DeepReadonlyObject<PBAudioEvent> | undefined
+  /**
+   * Run `callback` for every position report, already resolved against the scene clock at the report's tick.
+   * This is the form most scenes want: `sample.sceneTime - sample.offset` is the audio lag, with the report's
+   * transport delay cancelled out by construction. Reports whose tick is no longer in the short history the
+   * system keeps (about three seconds) are skipped.
+   */
+  registerAudioPlaybackSampleEntity(entity: Entity, callback: AudioPlaybackSampleCallback): void
+  removeAudioPlaybackSampleEntity(entity: Entity): void
+  /**
+   * The scene clock (seconds, from accumulated delta time) recorded in the given tick, or undefined if that tick
+   * is older than the history window or has not happened yet. Lets a scene resolve video reports the same way.
+   */
+  getSceneTimeAtTick(tickNumber: number): number | undefined
 }
 
 /**
@@ -62,6 +93,34 @@ export function createAudioEventsSystem(engine: IEngine): AudioEventsSystem {
       lastReport?: string
     }
   >()
+  const entitiesCallbackSampleMap = new Map<
+    Entity,
+    {
+      callback: AudioPlaybackSampleCallback
+      lastReport?: string
+    }
+  >()
+
+  // Scene clock per tick. A report says where the clip was at tick N but reaches the scene a few ticks later, so
+  // the scene clock must be looked up at N, not read when the report is processed. Kept for a few seconds.
+  const TICK_HISTORY = 128
+  const sceneTimeByTick = new Map<number, number>()
+  let sceneTime = 0
+  const engineInfo = components.EngineInfo(engine)
+  engine.addSystem(
+    function AudioEventsClockSystem(dt: number) {
+      sceneTime += dt
+      const tick = engineInfo.getOrNull(engine.RootEntity)?.tickNumber
+      if (tick === undefined) return
+      sceneTimeByTick.set(tick, sceneTime)
+      if (sceneTimeByTick.size > TICK_HISTORY) {
+        const oldest = sceneTimeByTick.keys().next().value
+        if (oldest !== undefined) sceneTimeByTick.delete(oldest)
+      }
+    },
+    // Runs before the report delivery below so the current tick's clock exists when a report for it arrives
+    SYSTEMS_REGULAR_PRIORITY + 1
+  )
 
   function registerAudioEventsEntity(entity: Entity, callback: AudioEventsSystemCallback) {
     // audio event component is not added here because the renderer adds it
@@ -83,6 +142,14 @@ export function createAudioEventsSystem(engine: IEngine): AudioEventsSystem {
 
   function removeAudioPlaybackEntity(entity: Entity) {
     entitiesCallbackPlaybackMap.delete(entity)
+  }
+
+  function registerAudioPlaybackSampleEntity(entity: Entity, callback: AudioPlaybackSampleCallback) {
+    entitiesCallbackSampleMap.set(entity, { callback: callback })
+  }
+
+  function removeAudioPlaybackSampleEntity(entity: Entity) {
+    entitiesCallbackSampleMap.delete(entity)
   }
 
   function hasAudioComponent(entity: Entity) {
@@ -134,6 +201,24 @@ export function createAudioEventsSystem(engine: IEngine): AudioEventsSystem {
       data.callback(lastValue)
       entitiesCallbackPlaybackMap.set(entity, { callback: data.callback, lastReport: key })
     }
+
+    for (const [entity, data] of entitiesCallbackSampleMap) {
+      if (engine.getEntityState(entity) === EntityState.Removed || !hasAudioComponent(entity)) {
+        removeAudioPlaybackSampleEntity(entity)
+        continue
+      }
+
+      const lastValue = latestReport(entity)
+      if (lastValue === undefined || lastValue.currentOffset === undefined || lastValue.tickNumber === undefined)
+        continue
+      const key = reportKey(lastValue)
+      if (data.lastReport === key) continue
+      entitiesCallbackSampleMap.set(entity, { callback: data.callback, lastReport: key })
+
+      const sceneTimeAtTick = sceneTimeByTick.get(lastValue.tickNumber)
+      if (sceneTimeAtTick === undefined) continue
+      data.callback({ report: lastValue, sceneTime: sceneTimeAtTick, offset: lastValue.currentOffset })
+    }
   })
 
   return {
@@ -161,6 +246,15 @@ export function createAudioEventsSystem(engine: IEngine): AudioEventsSystem {
         if (values[index].currentOffset !== undefined) return values[index]
       }
       return undefined
+    },
+    registerAudioPlaybackSampleEntity(entity: Entity, callback: AudioPlaybackSampleCallback) {
+      registerAudioPlaybackSampleEntity(entity, callback)
+    },
+    removeAudioPlaybackSampleEntity(entity: Entity) {
+      removeAudioPlaybackSampleEntity(entity)
+    },
+    getSceneTimeAtTick(tickNumber: number) {
+      return sceneTimeByTick.get(tickNumber)
     }
   }
 }
