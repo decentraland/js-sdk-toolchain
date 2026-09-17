@@ -9,24 +9,28 @@ describe('Generated ExplorerUiEventsResult ProtoBuf', () => {
     testSchemaSerializationIdentity(ExplorerUiEventsResult.schema, {
       ui: ExplorerUi.EU_MAP,
       timestamp: 10,
+      requestId: 0,
       event: { $case: 'opened', opened: {} }
     })
 
     testSchemaSerializationIdentity(ExplorerUiEventsResult.schema, {
       ui: ExplorerUi.EU_MAP,
       timestamp: 20,
+      requestId: 0,
       event: { $case: 'closed', closed: {} }
     })
 
     testSchemaSerializationIdentity(ExplorerUiEventsResult.schema, {
       ui: ExplorerUi.EU_SETTINGS,
       timestamp: 30,
+      requestId: 0,
       event: { $case: 'opened', opened: {} }
     })
 
     testSchemaSerializationIdentity(ExplorerUiEventsResult.schema, {
       ui: ExplorerUi.EU_EVENTS,
       timestamp: 40,
+      requestId: 0,
       event: undefined
     })
 
@@ -51,6 +55,7 @@ describe('Generated ExplorerUiEventsResult ProtoBuf', () => {
       testSchemaSerializationIdentity(ExplorerUiEventsResult.schema, {
         ui,
         timestamp: ui + 1,
+        requestId: 0,
         event: { $case: 'opened', opened: {} }
       })
     }
@@ -64,17 +69,19 @@ describe('Generated ExplorerUiEventsResult ProtoBuf', () => {
     ExplorerUiEventsResult.addValue(entity, {
       ui: ExplorerUi.EU_BACKPACK,
       timestamp: 1,
+      requestId: 0,
       event: { $case: 'opened', opened: {} }
     })
     ExplorerUiEventsResult.addValue(entity, {
       ui: ExplorerUi.EU_BACKPACK,
       timestamp: 2,
+      requestId: 0,
       event: { $case: 'closed', closed: {} }
     })
 
     expect(Array.from(ExplorerUiEventsResult.get(entity))).toEqual([
-      { ui: ExplorerUi.EU_BACKPACK, timestamp: 1, event: { $case: 'opened', opened: {} } },
-      { ui: ExplorerUi.EU_BACKPACK, timestamp: 2, event: { $case: 'closed', closed: {} } }
+      { ui: ExplorerUi.EU_BACKPACK, timestamp: 1, requestId: 0, event: { $case: 'opened', opened: {} } },
+      { ui: ExplorerUi.EU_BACKPACK, timestamp: 2, requestId: 0, event: { $case: 'closed', closed: {} } }
     ])
   })
 })
