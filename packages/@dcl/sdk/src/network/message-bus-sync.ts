@@ -12,7 +12,8 @@ import { definePlayerHelper } from '../players'
 import { serializeCrdtMessages } from '../internal/transports/logger'
 import { IsServerRequest, IsServerResponse } from '~system/EngineApi'
 import { Atom } from '../atom'
-import { setGlobalRoom, Room } from './events/implementation'
+import { setGlobalRoom, Room, getEventRegistry } from './events/implementation'
+import { CLOCK_SYNC_MESSAGES, createClockSync } from './clock-sync'
 
 export type IProfile = { networkId: number; userId: string }
 // user that we asked for the inital crdt state
@@ -109,6 +110,12 @@ export function addSyncTransport(
 
   // Set global eventBus instance
   setGlobalRoom(eventBus)
+
+  // Built-in clock synchronization rides on the room with reserved message names
+  Object.assign(getEventRegistry(), CLOCK_SYNC_MESSAGES)
+  const clockSync = createClockSync(eventBus as unknown as Room<typeof CLOCK_SYNC_MESSAGES>, () =>
+    isServerAtom.getOrNull()
+  )
 
   engine.addTransport(transport)
   // End add sync transport
@@ -242,6 +249,7 @@ export function addSyncTransport(
 
   // System to retry state request if no response is received within the retry interval
   engine.addSystem((dt: number) => {
+    clockSync.update()
     if (requestingState && !stateIsSyncronized) {
       elapsedTimeSinceRequest += dt
       if (elapsedTimeSinceRequest >= STATE_REQUEST_RETRY_INTERVAL) {
@@ -255,6 +263,7 @@ export function addSyncTransport(
 
   players.onLeaveScene((userId) => {
     DEBUG_NETWORK_MESSAGES() && console.log('[onLeaveScene]', userId)
+    clockSync.forgetPlayer(userId)
   })
 
   function isStateSyncronized() {
@@ -267,6 +276,7 @@ export function addSyncTransport(
     isStateSyncronized,
     binaryMessageBus,
     eventBus,
-    isRoomReadyAtom
+    isRoomReadyAtom,
+    clockSync
   }
 }
