@@ -55,7 +55,8 @@ export type UiRendererOptions = {
    * first rendered in the same tick the main UI goes at the back.
    *
    * It is applied to the renderer's root container entity, so it only orders whole
-   * renderers against each other; elements inside a renderer keep their own `zIndex`.
+   * renderers against each other; a renderer zIndex of 0 is interpreted as "unset"
+   * (positional order); elements inside a renderer keep their own `zIndex`.
    */
   zIndex?: number
 }
