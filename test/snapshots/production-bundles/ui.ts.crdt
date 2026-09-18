@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=433.5k bytes
+SCENE_COMPILED_JS_SIZE_PROD=433.9k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -6,14 +6,16 @@ SCENE_COMPILED_JS_SIZE_PROD=433.5k bytes
 EVAL test/snapshots/production-bundles/ui.js
   REQUIRE: ~system/Runtime
   REQUIRE: ~system/EngineApi
+  SUBSCRIBE-TO: localeChanged
+  REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
   OPCODES ~= 91k
-  MALLOC_COUNT = 23246
-  ALIVE_OBJS_DELTA ~= 4.72k
+  MALLOC_COUNT = 23326
+  ALIVE_OBJS_DELTA ~= 4.74k
 CALL onStart()
   OPCODES ~= 0k
-  MALLOC_COUNT = -39
+  MALLOC_COUNT = -51
   ALIVE_OBJS_DELTA ~= -0.01k
 CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
@@ -66,4 +68,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 81k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1988.39k bytes
+  MEMORY_USAGE_COUNT ~= 1991.24k bytes
