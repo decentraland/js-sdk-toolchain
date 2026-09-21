@@ -27,6 +27,15 @@ describe('player storage', () => {
   })
 
   describe('getValues', () => {
+    it('should reject when the request fails', async () => {
+      const playerStorage = createPlayerStorage()
+      mockWrapSignedFetch.mockResolvedValue(['Server error', null])
+
+      await expect(playerStorage.getValues(address)).rejects.toThrow(
+        `Failed to get player storage values for '${address}': Server error`
+      )
+    })
+
     it('should request /players/:address/values and return entries when no prefix is passed', async () => {
       const playerStorage = createPlayerStorage()
       const data = [
@@ -80,15 +89,6 @@ describe('player storage', () => {
         url: `${baseUrl}/players/${encodeURIComponent(address)}/values?prefix=inv-&limit=5&offset=10`
       })
       expect(result).toEqual({ data: [], pagination: { offset: 10, total: 0 } })
-    })
-
-    it('should return empty array when the request fails', async () => {
-      const playerStorage = createPlayerStorage()
-      mockWrapSignedFetch.mockResolvedValue(['Error', null])
-
-      const result = await playerStorage.getValues(address)
-
-      expect(result).toEqual({ data: [], pagination: { offset: 0, total: 0 } })
     })
   })
 
@@ -288,6 +288,27 @@ describe('player storage', () => {
       expect(await playerStorage.get(address, 'missing')).toBeNull()
 
       expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
+    })
+
+    it('should reject a failed read rather than resolve null like a missing key', async () => {
+      const playerStorage = createPlayerStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce(['500 Internal Server Error', null, 500])
+
+      await expect(playerStorage.get(address, 'seeds')).rejects.toThrow(
+        `Failed to get player storage value 'seeds' for '${address}': 500 Internal Server Error`
+      )
+    })
+
+    it('should not cache a failed read', async () => {
+      const playerStorage = createPlayerStorage()
+
+      mockWrapSignedFetch.mockResolvedValueOnce(['network down', null])
+      await expect(playerStorage.get(address, 'seeds')).rejects.toThrow('network down')
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 3 }, 200])
+      expect(await playerStorage.get(address, 'seeds')).toBe(3)
+
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
     })
 
     it('should serve null from the negative cache after a successful delete', async () => {

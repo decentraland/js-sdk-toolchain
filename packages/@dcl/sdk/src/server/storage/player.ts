@@ -29,6 +29,7 @@ export interface IPlayerStorage {
    * @param key - The key to retrieve
    * @param options - Optional { fresh } to bypass the read cache
    * @returns A promise that resolves to the parsed JSON value, or null if not found
+   * @throws Error if the read fails, so a failure is never mistaken for a missing key
    */
   get<T = unknown>(address: string, key: string, options?: GetOptions): Promise<T | null>
 
@@ -56,6 +57,7 @@ export interface IPlayerStorage {
    * @param address - The player's wallet address
    * @param options - Optional { prefix, limit, offset } for filtering and pagination.
    * @returns A promise that resolves to { data, pagination: { offset, total } } for pagination UI
+   * @throws Error if the read fails, so a failure is never mistaken for an empty page
    */
   getValues(address: string, options?: GetValuesOptions): Promise<GetValuesResult>
 }
@@ -175,8 +177,7 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
               if (isOwner) cache.setAbsent(ck)
               return null
             }
-            console.error(`Failed to get player storage value '${key}' for '${address}': ${error}`)
-            return null
+            throw new Error(`Failed to get player storage value '${key}' for '${address}': ${error}`)
           }
 
           if (data && data.value !== undefined) {
@@ -257,8 +258,7 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       const [error, response] = await wrapSignedFetch<GetValuesResult>({ url })
 
       if (error) {
-        console.error(`Failed to get player storage values for '${address}': ${error}`)
-        return { data: [], pagination: { offset: 0, total: 0 } }
+        throw new Error(`Failed to get player storage values for '${address}': ${error}`)
       }
 
       const data = response?.data ?? []

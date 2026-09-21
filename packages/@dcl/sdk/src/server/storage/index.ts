@@ -56,6 +56,10 @@ const createStorage = (): IStorage => {
  * - Use Storage.player.get/set/delete/getValues for player-scoped storage
  * - Use Storage.configure to change module-wide defaults (e.g. skipIfUnchanged, cacheReads)
  *
+ * A read that fails throws, so a failure is never returned as a missing key or an
+ * empty page; only a confirmed 404 resolves to null. Writes report failure through
+ * their boolean result and are not retried.
+ *
  * Reads are cached by default: get() serves values known from a network
  * round-trip within the last cacheMaxAgeMs (including confirmed "not found"
  * results) without hitting the service, and concurrent gets for the same key

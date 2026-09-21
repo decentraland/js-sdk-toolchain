@@ -82,13 +82,11 @@ describe('scene storage', () => {
       expect(result).toEqual({ data: [], pagination: { offset: 10, total: 0 } })
     })
 
-    it('should return empty array when the request fails', async () => {
+    it('should reject when the request fails', async () => {
       const storage = createSceneStorage()
       mockWrapSignedFetch.mockResolvedValue(['Server error', null])
 
-      const result = await storage.getValues()
-
-      expect(result).toEqual({ data: [], pagination: { offset: 0, total: 0 } })
+      await expect(storage.getValues()).rejects.toThrow('Failed to get storage values: Server error')
     })
   })
 
@@ -190,7 +188,7 @@ describe('scene storage', () => {
       const storage = createSceneStorage()
       mockWrapSignedFetch.mockResolvedValueOnce(['Server error', null])
 
-      expect(await storage.get('player-state')).toBeNull()
+      await expect(storage.get('player-state')).rejects.toThrow('Server error')
 
       mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
       await storage.set('player-state', null, { skipIfUnchanged: true })
@@ -525,14 +523,14 @@ describe('scene storage', () => {
       const storage = createSceneStorage()
 
       mockWrapSignedFetch.mockResolvedValueOnce(['500 Internal Server Error', null, 500])
-      expect(await storage.get('key')).toBeNull()
+      await expect(storage.get('key')).rejects.toThrow('500 Internal Server Error')
 
       mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 1 }, 200])
       expect(await storage.get('key')).toBe(1)
 
       // Statusless transport errors are not cached either.
       mockWrapSignedFetch.mockResolvedValueOnce(['network down', null])
-      expect(await storage.get('other')).toBeNull()
+      await expect(storage.get('other')).rejects.toThrow('network down')
 
       mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 2 }, 200])
       expect(await storage.get('other')).toBe(2)
@@ -635,6 +633,36 @@ describe('scene storage', () => {
       expect(await storage.get('key')).toBeNull()
 
       expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should reject a failed read rather than resolve null like a missing key', async () => {
+      const storage = createSceneStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce(['500 Internal Server Error', null, 500])
+
+      await expect(storage.get('leaderboard')).rejects.toThrow(
+        "Failed to get storage value 'leaderboard': 500 Internal Server Error"
+      )
+    })
+
+    it('should resolve null only for a confirmed 404', async () => {
+      const storage = createSceneStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce(['404 Not Found', null, 404])
+
+      expect(await storage.get('leaderboard')).toBeNull()
+    })
+
+    it('should reject every get joined to one failed request', async () => {
+      const storage = createSceneStorage()
+      const request = deferred<[string, null, number]>()
+      mockWrapSignedFetch.mockReturnValueOnce(request.promise)
+
+      const first = storage.get('key')
+      const second = storage.get('key')
+      request.resolve(['500 Internal Server Error', null, 500])
+
+      await expect(first).rejects.toThrow('500 Internal Server Error')
+      await expect(second).rejects.toThrow('500 Internal Server Error')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
     })
 
     it('should cache a stored null as a positive entry', async () => {

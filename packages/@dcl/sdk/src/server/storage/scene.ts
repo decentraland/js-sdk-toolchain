@@ -28,6 +28,7 @@ export interface ISceneStorage {
    * @param key - The key to retrieve
    * @param options - Optional { fresh } to bypass the read cache
    * @returns A promise that resolves to the parsed JSON value, or null if not found
+   * @throws Error if the read fails, so a failure is never mistaken for a missing key
    */
   get<T = unknown>(key: string, options?: GetOptions): Promise<T | null>
 
@@ -51,6 +52,7 @@ export interface ISceneStorage {
    * Supports pagination via limit and offset.
    * @param options - Optional { prefix, limit, offset } for filtering and pagination.
    * @returns A promise that resolves to { data, pagination: { offset, total } } for pagination UI
+   * @throws Error if the read fails, so a failure is never mistaken for an empty page
    */
   getValues(options?: GetValuesOptions): Promise<GetValuesResult>
 }
@@ -162,8 +164,7 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
               if (isOwner) cache.setAbsent(key)
               return null
             }
-            console.error(`Failed to get storage value '${key}': ${error}`)
-            return null
+            throw new Error(`Failed to get storage value '${key}': ${error}`)
           }
 
           if (data && data.value !== undefined) {
@@ -239,8 +240,7 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
       const [error, response] = await wrapSignedFetch<GetValuesResult>({ url })
 
       if (error) {
-        console.error(`Failed to get storage values: ${error}`)
-        return { data: [], pagination: { offset: 0, total: 0 } }
+        throw new Error(`Failed to get storage values: ${error}`)
       }
 
       const data = response?.data ?? []
