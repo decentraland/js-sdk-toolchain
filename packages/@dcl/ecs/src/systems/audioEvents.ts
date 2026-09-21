@@ -41,7 +41,7 @@ export interface AudioEventsSystem {
   removeAudioEventsEntity(entity: Entity): void
   /**
    * Run `callback` every time the media state of the entity's audio changes (loading, ready, playing, ...).
-   * Periodic playback-position reports that keep the same state do not trigger it; see `registerAudioPlaybackEntity`.
+   * Playback-position reports that keep the same state do not trigger it; see `registerAudioPlaybackEntity`.
    */
   registerAudioEventsEntity(entity: Entity, callback: AudioEventsSystemCallback): void
   hasAudioEventsEntity(entity: Entity): boolean
@@ -60,6 +60,11 @@ export interface AudioEventsSystem {
    * milliseconds after being asked to. See {@link AudioPlaybackSample} for what the values mean and what
    * accuracy to expect. Reports that carry no position never reach it; use `registerAudioEventsEntity` for
    * media-state changes.
+   *
+   * The source has to ask for the reports: set `reportPlaybackPosition: true` on its `AudioSource`, or this
+   * callback never runs. Position reports are written far more often than state changes, so they are opt-in
+   * and a scene pays for them only where it needs them. Renderers that do not implement the reports never
+   * run it either, so keep a fallback rather than blocking on it.
    */
   registerAudioPlaybackEntity(entity: Entity, callback: AudioPlaybackSampleCallback): void
   removeAudioPlaybackEntity(entity: Entity): void
