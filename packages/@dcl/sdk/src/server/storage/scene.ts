@@ -37,13 +37,18 @@ export interface ISceneStorage {
    * @param key - The key to store the value under
    * @param value - The value to store (will be JSON serialized)
    * @param options - Optional { skipIfUnchanged } to skip the network write when the value is already stored
+   * @throws TypeError if the value cannot be JSON-serialized (undefined, a function,
+   * a symbol, a circular reference); those cannot round-trip through the service
    */
   set<T = unknown>(key: string, value: T, options?: SetOptions): Promise<boolean>
 
   /**
    * Deletes a value from scene storage in the Server Side Storage service.
    * @param key - The key to delete
-   * @returns A promise that resolves to true if deleted, false if not found
+   * @returns A promise that resolves to true once the delete is applied, or
+   * false only when the service confirmed the key was already absent (404).
+   * The delete is idempotent, so true is the usual answer for a missing key.
+   * @throws Error if the delete fails, so a failure is never reported as an absence
    */
   delete(key: string): Promise<boolean>
 
@@ -76,7 +81,14 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
   const writes = createWriteQueue()
 
   async function executeSet(key: string, body: string): Promise<boolean> {
-    const baseUrl = await getStorageServerUrl()
+    let baseUrl: string
+    try {
+      baseUrl = await getStorageServerUrl()
+    } catch (error) {
+      cache.delete(key)
+      console.error(`Failed to set storage value '${key}': ${error}`)
+      return false
+    }
     const url = `${baseUrl}/values/${encodeURIComponent(key)}`
 
     const [error] = await wrapSignedFetch({
@@ -123,9 +135,14 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
 
     if (error) {
       // A 404 still confirms the key is absent server-side.
-      if (status === 404) cache.setAbsent(key)
-      console.error(`Failed to delete storage value '${key}': ${error}`)
-      return false
+      if (status === 404) {
+        cache.setAbsent(key)
+        return false
+      }
+      // The DELETE may have reached the server, so the cached body is no
+      // longer reliable — the same reasoning executeSet applies to a failed PUT.
+      cache.delete(key)
+      throw new Error(`Failed to delete storage value '${key}': ${error}`)
     }
 
     cache.setAbsent(key)
@@ -192,6 +209,12 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
       assertIsServer(MODULE_NAME)
 
       const body = JSON.stringify({ value })
+      // JSON.stringify omits undefined, functions and symbols, collapsing the
+      // payload to "{}" — which the service rejects, and which would otherwise
+      // cache as a value-less entry that get() reads back as undefined.
+      if (body === '{}') {
+        throw new TypeError(`Storage.set('${key}'): value must be JSON-serializable. Use delete() to remove a key.`)
+      }
       const skipIfUnchanged = options?.skipIfUnchanged ?? config.skipIfUnchanged
 
       // Dedup against confirmed state only while no write is pending — a
@@ -200,6 +223,12 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
       if (skipIfUnchanged && writes.pending(key) === undefined && cache.get(key)?.body === body) {
         return true
       }
+
+      // Invalidate at issue time, as delete() does: until the PUT lands the
+      // stored value is neither the old one nor reliably the new one, and a
+      // read served from either would not reflect the caller's own write.
+      cache.delete(key)
+      inflightGets.delete(key)
 
       return writes.enqueue(key, body, (b) => executeSet(key, b as string), skipIfUnchanged)
     },
@@ -238,7 +267,14 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
       const query = parts.join('&')
       const url = query ? `${baseUrl}/values?${query}` : `${baseUrl}/values`
 
-      const [error, response] = await wrapSignedFetch<GetValuesResult>({ url })
+      const watcher = cache.watch()
+      let error: string | null
+      let response: GetValuesResult | null
+      try {
+        ;[error, response] = await wrapSignedFetch<GetValuesResult>({ url })
+      } finally {
+        watcher.stop()
+      }
 
       if (error) {
         throw new Error(`Failed to get storage values: ${error}`)
@@ -257,7 +293,12 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
       // make it non-authoritative). A page larger than cacheMaxEntries churns
       // the cache; entries repopulate lazily.
       for (const entry of data) {
-        if (entry.value !== undefined && !writes.isPending(entry.key) && cache.get(entry.key) === undefined) {
+        if (typeof entry?.key !== 'string' || entry.value === undefined) continue
+        // watcher.mutated covers the window this snapshot cannot see: a write
+        // that failed mid-flight deletes its entry precisely because the value
+        // is unknown, and re-seeding it here would restore the stale one.
+        if (watcher.mutated(entry.key) || writes.isPending(entry.key) || inflightGets.has(entry.key)) continue
+        if (cache.get(entry.key) === undefined) {
           cache.set(entry.key, { body: JSON.stringify({ value: entry.value }) })
         }
       }

@@ -29,6 +29,23 @@ export interface ValueCache {
   /** Stores a confirmed-absent (negative) entry, replacing any value entry. */
   setAbsent(key: string): void
   delete(key: string): void
+  /**
+   * Starts recording which keys are mutated from now on. A page read issued
+   * before a per-key write cannot tell that its snapshot went stale, because
+   * an absent entry looks the same whether the key was never cached or was
+   * just invalidated by a failed write. Watching bridges that gap.
+   */
+  watch(): CacheWatcher
+}
+
+/**
+ * Records keys mutated since it was created, so a reader that started earlier
+ * can refuse to seed them. Always stop() it, or it keeps collecting.
+ * @internal
+ */
+export interface CacheWatcher {
+  mutated(key: string): boolean
+  stop(): void
 }
 
 /**
@@ -37,8 +54,14 @@ export interface ValueCache {
  */
 export function createValueCache(config: StorageConfigState): ValueCache {
   const entries = new Map<string, CacheEntry & { storedAt: number }>()
+  const watchers = new Set<Set<string>>()
+
+  function noteMutation(key: string): void {
+    for (const seen of watchers) seen.add(key)
+  }
 
   function insert(key: string, entry: CacheEntry): void {
+    noteMutation(key)
     // Delete + re-insert moves refreshed keys to the end of the Map's
     // insertion order, so eviction below drops the least-recently-written.
     entries.delete(key)
@@ -86,7 +109,19 @@ export function createValueCache(config: StorageConfigState): ValueCache {
     },
 
     delete(key: string): void {
+      noteMutation(key)
       entries.delete(key)
+    },
+
+    watch(): CacheWatcher {
+      const seen = new Set<string>()
+      watchers.add(seen)
+      return {
+        mutated: (key: string) => seen.has(key),
+        stop: () => {
+          watchers.delete(seen)
+        }
+      }
     }
   }
 }

@@ -40,6 +40,8 @@ export interface IPlayerStorage {
    * @param value - The value to store (will be JSON serialized)
    * @param options - Optional { skipIfUnchanged } to skip the network write when the value is already stored
    * @returns A promise that resolves to true if successful, false otherwise
+   * @throws TypeError if the value cannot be JSON-serialized (undefined, a function,
+   * a symbol, a circular reference); those cannot round-trip through the service
    */
   set<T = unknown>(address: string, key: string, value: T, options?: SetOptions): Promise<boolean>
 
@@ -47,7 +49,10 @@ export interface IPlayerStorage {
    * Deletes a value from a player's storage in the Server Side Storage service.
    * @param address - The player's wallet address
    * @param key - The key to delete
-   * @returns A promise that resolves to true if deleted, false if not found
+   * @returns A promise that resolves to true once the delete is applied, or
+   * false only when the service confirmed the key was already absent (404).
+   * The delete is idempotent, so true is the usual answer for a missing key.
+   * @throws Error if the delete fails, so a failure is never reported as an absence
    */
   delete(address: string, key: string): Promise<boolean>
 
@@ -87,7 +92,14 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
   const writes = createWriteQueue()
 
   async function executeSet(address: string, key: string, ck: string, body: string): Promise<boolean> {
-    const baseUrl = await getStorageServerUrl()
+    let baseUrl: string
+    try {
+      baseUrl = await getStorageServerUrl()
+    } catch (error) {
+      cache.delete(ck)
+      console.error(`Failed to set player storage value '${key}' for '${address}': ${error}`)
+      return false
+    }
     const url = `${baseUrl}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
 
     const [error] = await wrapSignedFetch({
@@ -134,9 +146,14 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
 
     if (error) {
       // A 404 still confirms the key is absent server-side.
-      if (status === 404) cache.setAbsent(ck)
-      console.error(`Failed to delete player storage value '${key}' for '${address}': ${error}`)
-      return false
+      if (status === 404) {
+        cache.setAbsent(ck)
+        return false
+      }
+      // The DELETE may have reached the server, so the cached body is no
+      // longer reliable — the same reasoning executeSet applies to a failed PUT.
+      cache.delete(ck)
+      throw new Error(`Failed to delete player storage value '${key}' for '${address}': ${error}`)
     }
 
     cache.setAbsent(ck)
@@ -206,6 +223,14 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
 
       const ck = cacheKey(address, key)
       const body = JSON.stringify({ value })
+      // JSON.stringify omits undefined, functions and symbols, collapsing the
+      // payload to "{}" — which the service rejects, and which would otherwise
+      // cache as a value-less entry that get() reads back as undefined.
+      if (body === '{}') {
+        throw new TypeError(
+          `Storage.player.set('${address}', '${key}'): value must be JSON-serializable. Use delete() to remove a key.`
+        )
+      }
       const skipIfUnchanged = options?.skipIfUnchanged ?? config.skipIfUnchanged
 
       // Dedup against confirmed state only while no write is pending — a
@@ -214,6 +239,12 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       if (skipIfUnchanged && writes.pending(ck) === undefined && cache.get(ck)?.body === body) {
         return true
       }
+
+      // Invalidate at issue time, as delete() does: until the PUT lands the
+      // stored value is neither the old one nor reliably the new one, and a
+      // read served from either would not reflect the caller's own write.
+      cache.delete(ck)
+      inflightGets.delete(ck)
 
       return writes.enqueue(ck, body, (b) => executeSet(address, key, ck, b as string), skipIfUnchanged)
     },
@@ -256,7 +287,14 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
         ? `${baseUrl}/players/${encodeURIComponent(address)}/values?${query}`
         : `${baseUrl}/players/${encodeURIComponent(address)}/values`
 
-      const [error, response] = await wrapSignedFetch<GetValuesResult>({ url })
+      const watcher = cache.watch()
+      let error: string | null
+      let response: GetValuesResult | null
+      try {
+        ;[error, response] = await wrapSignedFetch<GetValuesResult>({ url })
+      } finally {
+        watcher.stop()
+      }
 
       if (error) {
         throw new Error(`Failed to get player storage values for '${address}': ${error}`)
@@ -275,8 +313,13 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       // make it non-authoritative). A page larger than cacheMaxEntries churns
       // the cache; entries repopulate lazily.
       for (const entry of data) {
+        if (typeof entry?.key !== 'string' || entry.value === undefined) continue
         const ck = cacheKey(address, entry.key)
-        if (entry.value !== undefined && !writes.isPending(ck) && cache.get(ck) === undefined) {
+        // watcher.mutated covers the window this snapshot cannot see: a write
+        // that failed mid-flight deletes its entry precisely because the value
+        // is unknown, and re-seeding it here would restore the stale one.
+        if (watcher.mutated(ck) || writes.isPending(ck) || inflightGets.has(ck)) continue
+        if (cache.get(ck) === undefined) {
           cache.set(ck, { body: JSON.stringify({ value: entry.value }) })
         }
       }

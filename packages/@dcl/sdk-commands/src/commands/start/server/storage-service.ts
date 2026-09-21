@@ -39,8 +39,28 @@ export function setupStorageEndpoints(
     if (!ctx.params.address) {
       return { status: 400, body: { message: 'Address is required' } }
     }
+    // The deployed service lowercases the address in every handler before it
+    // reaches storage. Keying on the raw path segment here would make preview
+    // case-sensitive, so a scene that works deployed loses data locally.
+    ctx.params.address = ctx.params.address.toLowerCase()
     return next()
   }
+
+  /**
+   * Reads a storage PUT body the way the deployed service does: the payload must be
+   * an object carrying `value`. Without this, `JSON.stringify({ value: undefined })`
+   * arrives as `{}`, destructures to undefined and silently erases the key here while
+   * the deployed service rejects it outright.
+   */
+  function readValueFromBody(bodyText: string): { ok: true; value: unknown } | { ok: false } {
+    const parsed = JSON.parse(bodyText)
+    if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed) || !('value' in parsed)) {
+      return { ok: false }
+    }
+    return { ok: true, value: (parsed as { value: unknown }).value }
+  }
+
+  const invalidBody = { status: 400, body: { message: 'Invalid JSON body' } }
 
   // Environment variables endpoints (/env/:key)
   router.get('/env/:key', withKeyValidation, async (ctx) => {
@@ -118,10 +138,10 @@ export function setupStorageEndpoints(
     const { key } = ctx.params
 
     try {
-      const bodyText = await ctx.request.text()
-      const { value } = JSON.parse(bodyText)
-      await setWorldValue(components, key, value)
-      return { body: JSON.stringify({ value }) }
+      const parsed = readValueFromBody(await ctx.request.text())
+      if (!parsed.ok) return invalidBody
+      await setWorldValue(components, key, parsed.value)
+      return { body: JSON.stringify({ value: parsed.value }) }
     } catch (error) {
       components.logger.error(`Failed to set storage value '${key}': ${error}`)
       return { status: 500, body: { message: `Failed to set storage value '${key}'` } }
@@ -180,12 +200,12 @@ export function setupStorageEndpoints(
     const { address, key } = ctx.params
 
     try {
-      const bodyText = await ctx.request.text()
-      const { value } = JSON.parse(bodyText)
+      const parsed = readValueFromBody(await ctx.request.text())
+      if (!parsed.ok) return invalidBody
 
-      await setPlayerValue(components, address, key, value)
+      await setPlayerValue(components, address, key, parsed.value)
 
-      return { body: JSON.stringify({ value }) }
+      return { body: JSON.stringify({ value: parsed.value }) }
     } catch (error) {
       components.logger.error(`Failed to set player storage value '${key}' for '${address}': ${error}`)
       return { status: 500, body: { message: `Failed to set player storage value '${key}' for '${address}'` } }

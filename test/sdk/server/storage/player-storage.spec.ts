@@ -164,6 +164,22 @@ describe('player storage', () => {
     })
   })
 
+  describe('set value serialization', () => {
+    it('should reject undefined rather than send a payload the service refuses', async () => {
+      const playerStorage = createPlayerStorage()
+
+      await expect(playerStorage.set(address, 'seeds', undefined)).rejects.toThrow('value must be JSON-serializable')
+      expect(mockWrapSignedFetch).not.toHaveBeenCalled()
+    })
+
+    it('should still store a legitimate null', async () => {
+      const playerStorage = createPlayerStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+
+      expect(await playerStorage.set(address, 'seeds', null)).toBe(true)
+    })
+  })
+
   describe('get and set interplay', () => {
     it('should populate the cache from get so an unchanged write is skipped', async () => {
       const playerStorage = createPlayerStorage()
@@ -178,6 +194,22 @@ describe('player storage', () => {
   })
 
   describe('delete', () => {
+    it('should reject a failed delete rather than report it as a confirmed absence', async () => {
+      const playerStorage = createPlayerStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce(['500 Internal Server Error', null, 500])
+
+      await expect(playerStorage.delete(address, 'seeds')).rejects.toThrow(
+        `Failed to delete player storage value 'seeds' for '${address}': 500 Internal Server Error`
+      )
+    })
+
+    it('should still resolve false for a confirmed 404', async () => {
+      const playerStorage = createPlayerStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce(['404 Not Found', null, 404])
+
+      expect(await playerStorage.delete(address, 'seeds')).toBe(false)
+    })
+
     it('should invalidate the cache so a later identical set writes again', async () => {
       const playerStorage = createPlayerStorage()
       mockWrapSignedFetch.mockResolvedValue([null, {}])

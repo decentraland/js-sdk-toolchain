@@ -89,6 +89,41 @@ describe('scene storage', () => {
       await expect(storage.getValues()).rejects.toThrow('Failed to get storage values: Server error')
     })
 
+    it('should not re-seed a key that a failed write invalidated while the page was in flight', async () => {
+      const storage = createSceneStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'v1' }, 200])
+      expect(await storage.get('k')).toBe('v1')
+
+      const page = deferred<[null, { data: Array<{ key: string; value: string }> }]>()
+      mockWrapSignedFetch.mockReturnValueOnce(page.promise)
+      const listing = storage.getValues()
+      await flush()
+
+      // The PUT fails, so the stored value is unknown and the entry is dropped.
+      mockWrapSignedFetch.mockResolvedValueOnce(['500 Internal Server Error', null, 500])
+      expect(await storage.set('k', 'v2')).toBe(false)
+
+      page.resolve([null, { data: [{ key: 'k', value: 'v1' }] }])
+      await listing
+
+      // Without the guard the page re-seeds 'v1' and this write is skipped as unchanged.
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+      expect(await storage.set('k', 'v1')).toBe(true)
+      expect(mockWrapSignedFetch).toHaveBeenLastCalledWith(
+        expect.objectContaining({ init: expect.objectContaining({ method: 'PUT' }) })
+      )
+    })
+
+    it('should skip entries that carry no usable key or value', async () => {
+      const storage = createSceneStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { data: [{ value: 'orphan' }, { key: 'good', value: 1 }] }])
+
+      await storage.getValues()
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'network' }, 200])
+      expect(await storage.get('undefined')).toBe('network')
+    })
+
     it('should reject a successful response whose data is not a list', async () => {
       const storage = createSceneStorage()
       mockWrapSignedFetch.mockResolvedValue([null, {}, 200])
@@ -217,13 +252,47 @@ describe('scene storage', () => {
       expect(mockWrapSignedFetch).toHaveBeenCalledTimes(3)
     })
 
+    it('should reject a failed delete rather than report it as a confirmed absence', async () => {
+      const storage = createSceneStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce(['500 Internal Server Error', null, 500])
+
+      await expect(storage.delete('key')).rejects.toThrow(
+        "Failed to delete storage value 'key': 500 Internal Server Error"
+      )
+    })
+
+    it('should still resolve false for a confirmed 404', async () => {
+      const storage = createSceneStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce(['404 Not Found', null, 404])
+
+      expect(await storage.delete('key')).toBe(false)
+    })
+
+    it('should not serve a value cached during an in-flight delete that then fails', async () => {
+      const storage = createSceneStorage()
+      const deleteCall = deferred<[string, null, number]>()
+      mockWrapSignedFetch.mockReturnValueOnce(deleteCall.promise)
+
+      const deleting = storage.delete('key')
+      await flush()
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'stale' }, 200])
+      expect(await storage.get('key')).toBe('stale')
+
+      deleteCall.resolve(['500 Internal Server Error', null, 500])
+      await expect(deleting).rejects.toThrow('500 Internal Server Error')
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'fresh' }, 200])
+      expect(await storage.get('key')).toBe('fresh')
+    })
+
     it('should invalidate the cache even when the delete request fails', async () => {
       const storage = createSceneStorage()
       mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
       await storage.set('score', 42, { skipIfUnchanged: true })
 
       mockWrapSignedFetch.mockResolvedValueOnce(['Server error', null])
-      expect(await storage.delete('score')).toBe(false)
+      await expect(storage.delete('score')).rejects.toThrow('Server error')
 
       mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
       await storage.set('score', 42, { skipIfUnchanged: true })
@@ -437,6 +506,84 @@ describe('scene storage', () => {
 
       expect(await storage.get('a')).toBeNull()
       expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+  })
+
+  describe('set value serialization', () => {
+    it('should reject undefined rather than send a payload the service refuses', async () => {
+      const storage = createSceneStorage()
+
+      await expect(storage.set('key', undefined)).rejects.toThrow(
+        "Storage.set('key'): value must be JSON-serializable. Use delete() to remove a key."
+      )
+      expect(mockWrapSignedFetch).not.toHaveBeenCalled()
+    })
+
+    it('should reject a function, which serializes to the same empty payload', async () => {
+      const storage = createSceneStorage()
+
+      await expect(storage.set('key', () => undefined)).rejects.toThrow('must be JSON-serializable')
+    })
+
+    it('should reject a circular value', async () => {
+      const storage = createSceneStorage()
+      const circular: Record<string, unknown> = {}
+      circular.self = circular
+
+      await expect(storage.set('key', circular)).rejects.toThrow(TypeError)
+    })
+
+    it('should still store a legitimate null', async () => {
+      const storage = createSceneStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+
+      expect(await storage.set('key', null)).toBe(true)
+      expect(mockWrapSignedFetch).toHaveBeenCalledWith(
+        expect.objectContaining({ init: expect.objectContaining({ body: '{"value":null}' }) })
+      )
+    })
+  })
+
+  describe('read-your-own-writes', () => {
+    it('should not serve the previous value from cache while the write is in flight', async () => {
+      const storage = createSceneStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+      await storage.set('key', 'v1')
+
+      const put = deferred<[null, object]>()
+      mockWrapSignedFetch.mockReturnValueOnce(put.promise)
+      const writing = storage.set('key', 'v2')
+      await flush()
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'v2' }, 200])
+      expect(await storage.get('key')).toBe('v2')
+
+      put.resolve([null, {}])
+      await writing
+    })
+
+    it('should not let a fresh read join a request issued before the caller wrote', async () => {
+      const storage = createSceneStorage()
+      const firstGet = deferred<[null, { value: string }, number]>()
+      mockWrapSignedFetch.mockReturnValueOnce(firstGet.promise)
+
+      const reading = storage.get('key')
+      await flush()
+
+      const put = deferred<[null, object]>()
+      mockWrapSignedFetch.mockReturnValueOnce(put.promise)
+      const writing = storage.set('key', 'v2')
+      await flush()
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'v2' }, 200])
+      const fresh = storage.get('key', { fresh: true })
+
+      firstGet.resolve([null, { value: 'v1' }, 200])
+      put.resolve([null, {}])
+      await reading
+      await writing
+
+      expect(await fresh).toBe('v2')
     })
   })
 

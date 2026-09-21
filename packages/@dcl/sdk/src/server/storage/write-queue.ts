@@ -8,6 +8,7 @@ interface PendingOp {
   execute: (body: string | null) => Promise<boolean>
   promise: Promise<boolean>
   resolve: (result: boolean) => void
+  reject: (error: unknown) => void
 }
 
 interface KeyState {
@@ -43,6 +44,9 @@ export interface WriteQueue {
    * to the queued one joins it; `joinActive` additionally allows joining an
    * identical in-flight op (only valid for dedup-tolerant callers, since that
    * op was issued before this call).
+   *
+   * Rejects with whatever the executor threw. A superseded caller follows the
+   * superseding op's outcome, rejection included.
    */
   enqueue(
     key: string,
@@ -61,21 +65,24 @@ export function createWriteQueue(): WriteQueue {
 
   function makeOp(body: string | null, execute: PendingOp['execute']): PendingOp {
     let resolve!: (result: boolean) => void
-    const promise = new Promise<boolean>((r) => (resolve = r))
-    return { body, execute, promise, resolve }
+    let reject!: (error: unknown) => void
+    const promise = new Promise<boolean>((res, rej) => {
+      resolve = res
+      reject = rej
+    })
+    return { body, execute, promise, resolve, reject }
   }
 
   async function drain(key: string, state: KeyState): Promise<void> {
     for (;;) {
       const op = state.active
-      let result = false
       try {
-        result = await op.execute(op.body)
-      } catch {
-        // Executors report failures via their boolean result; a throw is
-        // unexpected but must not wedge the queue.
+        op.resolve(await op.execute(op.body))
+      } catch (error) {
+        // An executor that throws reports a failure it refuses to express as
+        // `false` — delete() does this so a failure is never read as an absence.
+        op.reject(error)
       }
-      op.resolve(result)
 
       if (state.queued) {
         state.active = state.queued
