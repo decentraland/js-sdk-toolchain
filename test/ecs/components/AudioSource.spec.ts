@@ -14,7 +14,8 @@ describe('Generated AudioSource ProtoBuf', () => {
       pitch: 1,
       audioClipUrl: 'FakeUrl',
       currentTime: 1,
-      global: true
+      global: true,
+      reportPlaybackPosition: true
     })
 
     testComponentSerialization(AudioSource, {
@@ -24,7 +25,8 @@ describe('Generated AudioSource ProtoBuf', () => {
       pitch: 0,
       audioClipUrl: 'FakeUrl2',
       currentTime: 0,
-      global: false
+      global: false,
+      reportPlaybackPosition: false
     })
   })
 

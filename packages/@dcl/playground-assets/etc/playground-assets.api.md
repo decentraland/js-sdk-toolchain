@@ -2544,6 +2544,7 @@ export interface PBAudioSource {
     loop?: boolean | undefined;
     pitch?: number | undefined;
     playing?: boolean | undefined;
+    reportPlaybackPosition?: boolean | undefined;
     volume?: number | undefined;
 }
 
