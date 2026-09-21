@@ -167,17 +167,18 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
             throw new Error(`Failed to get storage value '${key}': ${error}`)
           }
 
-          if (data && data.value !== undefined) {
-            // Same serialization shape as set()'s PUT body, so a read followed by
-            // an unchanged write can be skipped.
-            const body = JSON.stringify({ value: data.value })
-            if (isOwner) cache.set(key, { body })
-            return data.value
+          // A 2xx carrying no value is a service or proxy fault, not an absent key:
+          // wrapSignedFetch parses an empty body as {}, so returning null here would
+          // read as a confirmed absence and invite an overwrite.
+          if (!data || data.value === undefined) {
+            throw new Error(`Failed to get storage value '${key}': response carried no value`)
           }
 
-          // 200 with a missing value is ambiguous: neither a confirmed value
-          // nor a confirmed absence, so cache nothing.
-          return null
+          // Same serialization shape as set()'s PUT body, so a read followed by
+          // an unchanged write can be skipped.
+          const body = JSON.stringify({ value: data.value })
+          if (isOwner) cache.set(key, { body })
+          return data.value
         } finally {
           if (inflightGets.get(key) === inflight) inflightGets.delete(key)
         }
@@ -243,7 +244,10 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
         throw new Error(`Failed to get storage values: ${error}`)
       }
 
-      const data = response?.data ?? []
+      const data = response?.data
+      if (!Array.isArray(data)) {
+        throw new Error('Failed to get storage values: response carried no data array')
+      }
 
       // Seed the per-key cache so subsequent get()/set() on returned keys can
       // skip the network. Only keys with no live entry and no pending write

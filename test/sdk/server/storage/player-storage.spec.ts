@@ -36,6 +36,15 @@ describe('player storage', () => {
       )
     })
 
+    it('should reject a successful response whose data is not a list', async () => {
+      const playerStorage = createPlayerStorage()
+      mockWrapSignedFetch.mockResolvedValue([null, {}, 200])
+
+      await expect(playerStorage.getValues(address)).rejects.toThrow(
+        `Failed to get player storage values for '${address}': response carried no data array`
+      )
+    })
+
     it('should request /players/:address/values and return entries when no prefix is passed', async () => {
       const playerStorage = createPlayerStorage()
       const data = [
@@ -297,6 +306,20 @@ describe('player storage', () => {
       await expect(playerStorage.get(address, 'seeds')).rejects.toThrow(
         `Failed to get player storage value 'seeds' for '${address}': 500 Internal Server Error`
       )
+    })
+
+    it('should reject a 200 response with a missing value and not cache it', async () => {
+      const playerStorage = createPlayerStorage()
+      mockWrapSignedFetch.mockResolvedValue([null, {}, 200])
+
+      await expect(playerStorage.get(address, 'seeds')).rejects.toThrow(
+        `Failed to get player storage value 'seeds' for '${address}': response carried no value`
+      )
+      await expect(playerStorage.get(address, 'seeds')).rejects.toThrow(
+        `Failed to get player storage value 'seeds' for '${address}': response carried no value`
+      )
+
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
     })
 
     it('should not cache a failed read', async () => {

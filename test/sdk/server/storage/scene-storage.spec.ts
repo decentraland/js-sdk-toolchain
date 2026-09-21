@@ -88,6 +88,13 @@ describe('scene storage', () => {
 
       await expect(storage.getValues()).rejects.toThrow('Failed to get storage values: Server error')
     })
+
+    it('should reject a successful response whose data is not a list', async () => {
+      const storage = createSceneStorage()
+      mockWrapSignedFetch.mockResolvedValue([null, {}, 200])
+
+      await expect(storage.getValues()).rejects.toThrow('Failed to get storage values: response carried no data array')
+    })
   })
 
   describe('set', () => {
@@ -625,12 +632,12 @@ describe('scene storage', () => {
       expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
     })
 
-    it('should not cache a 200 response with a missing value', async () => {
+    it('should reject a 200 response with a missing value and not cache it', async () => {
       const storage = createSceneStorage()
       mockWrapSignedFetch.mockResolvedValue([null, {}, 200])
 
-      expect(await storage.get('key')).toBeNull()
-      expect(await storage.get('key')).toBeNull()
+      await expect(storage.get('key')).rejects.toThrow("Failed to get storage value 'key': response carried no value")
+      await expect(storage.get('key')).rejects.toThrow("Failed to get storage value 'key': response carried no value")
 
       expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
     })
