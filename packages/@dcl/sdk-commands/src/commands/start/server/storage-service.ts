@@ -39,28 +39,26 @@ export function setupStorageEndpoints(
     if (!ctx.params.address) {
       return { status: 400, body: { message: 'Address is required' } }
     }
-    // The deployed service lowercases the address in every handler before it
-    // reaches storage. Keying on the raw path segment here would make preview
-    // case-sensitive, so a scene that works deployed loses data locally.
+    // The deployed service lowercases addresses; keying on the raw segment would make preview case-sensitive.
     ctx.params.address = ctx.params.address.toLowerCase()
     return next()
   }
 
-  /**
-   * Reads a storage PUT body the way the deployed service does: the payload must be
-   * an object carrying `value`. Without this, `JSON.stringify({ value: undefined })`
-   * arrives as `{}`, destructures to undefined and silently erases the key here while
-   * the deployed service rejects it outright.
-   */
+  /** Same contract as the deployed service: the body must be an object carrying `value`. */
   function readValueFromBody(bodyText: string): { ok: true; value: unknown } | { ok: false } {
-    const parsed = JSON.parse(bodyText)
+    let parsed: unknown
+    try {
+      parsed = JSON.parse(bodyText)
+    } catch {
+      return { ok: false }
+    }
     if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed) || !('value' in parsed)) {
       return { ok: false }
     }
     return { ok: true, value: (parsed as { value: unknown }).value }
   }
 
-  const invalidBody = { status: 400, body: { message: 'Invalid JSON body' } }
+  const invalidBody = () => ({ status: 400, body: { message: 'Invalid JSON body' } })
 
   // Environment variables endpoints (/env/:key)
   router.get('/env/:key', withKeyValidation, async (ctx) => {
@@ -139,7 +137,7 @@ export function setupStorageEndpoints(
 
     try {
       const parsed = readValueFromBody(await ctx.request.text())
-      if (!parsed.ok) return invalidBody
+      if (!parsed.ok) return invalidBody()
       await setWorldValue(components, key, parsed.value)
       return { body: JSON.stringify({ value: parsed.value }) }
     } catch (error) {
@@ -201,7 +199,7 @@ export function setupStorageEndpoints(
 
     try {
       const parsed = readValueFromBody(await ctx.request.text())
-      if (!parsed.ok) return invalidBody
+      if (!parsed.ok) return invalidBody()
 
       await setPlayerValue(components, address, key, parsed.value)
 

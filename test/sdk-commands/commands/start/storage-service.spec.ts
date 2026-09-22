@@ -129,3 +129,38 @@ describe('when a storage PUT body carries a legitimate null', () => {
     expect(JSON.parse(read.body)).toEqual({ value: null })
   })
 })
+
+describe('when a storage PUT body is not valid JSON at all', () => {
+  let harness: ReturnType<typeof captureRoutes>
+
+  beforeEach(() => {
+    harness = captureRoutes()
+  })
+
+  describe('and it targets a scene key', () => {
+    let response: any
+
+    beforeEach(async () => {
+      response = await harness.call('PUT /values/:key', { params: { key: 'plants' }, ...body('not json') })
+    })
+
+    it('should reject it with a 400 rather than a 500, as the deployed service does', () => {
+      expect(response).toEqual({ status: 400, body: { message: 'Invalid JSON body' } })
+    })
+  })
+
+  describe('and it targets a player key', () => {
+    let response: any
+
+    beforeEach(async () => {
+      response = await harness.call('PUT /players/:address/values/:key', {
+        params: { address: '0xabc', key: 'seeds' },
+        ...body('{"value": ')
+      })
+    })
+
+    it('should reject it with a 400', () => {
+      expect(response).toEqual({ status: 400, body: { message: 'Invalid JSON body' } })
+    })
+  })
+})
