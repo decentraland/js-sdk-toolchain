@@ -12,6 +12,7 @@ import {
 } from '@dcl/ecs'
 import { ManyEntityAction, SendBatchResponse, subscribe } from '~system/EngineApi'
 import players from './players'
+import { localeChangedEvents } from './internal/language-events'
 
 /// --- EVENTS ---
 
@@ -47,6 +48,11 @@ export interface IEvents {
   comms: {
     sender: string
     message: string
+  }
+
+  /** Triggered when the player switches the client language. `locale` is a BCP-47 tag */
+  localeChanged: {
+    locale: string
   }
 
   /**
@@ -213,6 +219,10 @@ export async function pollEvents(sendBatch: (body: ManyEntityAction) => Promise<
       switch (e.generic.eventId) {
         case 'comms': {
           onCommsMessage.notifyObservers(data as IEvents['comms'])
+          break
+        }
+        case 'localeChanged': {
+          localeChangedEvents.notifyObservers(data as IEvents['localeChanged'])
           break
         }
       }
