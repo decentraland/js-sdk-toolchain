@@ -62,7 +62,9 @@ const createStorage = (): IStorage => {
  * resolves false only for a confirmed 404. set() reports failure through its boolean
  * result, and throws only for a value that cannot be JSON-serialized. A write that a
  * newer write to the same key supersedes before it is sent settles from that write's
- * outcome under these same rules. Nothing is retried — that is the caller's to decide.
+ * outcome under these same rules. A read issued while a write to its key is in flight
+ * waits for that write to land, so it reflects it. Nothing is retried — that is the
+ * caller's to decide.
  *
  * Reads are cached by default: get() serves values known from a network
  * round-trip within the last cacheMaxAgeMs (including confirmed "not found"

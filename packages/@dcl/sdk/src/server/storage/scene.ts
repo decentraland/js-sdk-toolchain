@@ -25,6 +25,9 @@ export interface ISceneStorage {
    * "not found" results. Concurrent gets for the same key share one request.
    * Out-of-band writers (e.g. CLI storage commands) may not be visible for up to
    * cacheMaxAgeMs — pass { fresh: true } to force a network read.
+   * A read issued while a write to the same key is in flight waits for that
+   * write to land first, so it never answers with a value older than what the
+   * caller has already written. Writes issued after the read are not awaited.
    * @param key - The key to retrieve
    * @param options - Optional { fresh } to bypass the read cache
    * @returns A promise that resolves to the parsed JSON value, or null if not found
@@ -158,6 +161,10 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
   return {
     async get<T = unknown>(key: string, options?: GetOptions): Promise<T | null> {
       assertIsServer(MODULE_NAME)
+
+      // A write issued before this read lands first, so the read reflects it: from the
+      // cache that write fills, or from the server once it has applied the write.
+      if (writes.isPending(key)) await writes.settled(key)
 
       if (config.cacheReads && !options?.fresh) {
         const entry = cache.get(key)

@@ -298,22 +298,22 @@ describe('scene storage', () => {
       await expect(storage.delete('key')).rejects.toThrow("Failed to delete storage value 'key': Error: realm down")
     })
 
-    it('should not serve a value cached during an in-flight delete that then fails', async () => {
+    it('should read from the network once the delete it waited for fails', async () => {
       const storage = createSceneStorage()
       const deleteCall = deferred<[string, null, number]>()
       mockWrapSignedFetch.mockReturnValueOnce(deleteCall.promise)
-
       const deleting = storage.delete('key')
       await flush()
 
-      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'stale' }, 200])
-      expect(await storage.get('key')).toBe('stale')
+      const reading = storage.get('key')
+      await flush()
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
 
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'still there' }, 200])
       deleteCall.resolve(['500 Internal Server Error', null, 500])
       await expect(deleting).rejects.toThrow('500 Internal Server Error')
-
-      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'fresh' }, 200])
-      expect(await storage.get('key')).toBe('fresh')
+      expect(await reading).toBe('still there')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
     })
 
     it('should invalidate the cache even when the delete request fails', async () => {
@@ -489,29 +489,6 @@ describe('scene storage', () => {
   })
 
   describe('getValues seeding race guard', () => {
-    it('should not seed a key whose write was already in flight when the listing started', async () => {
-      const storage = createSceneStorage()
-      const put = deferred<[null, object]>()
-      mockWrapSignedFetch.mockImplementationOnce(() => put.promise)
-      const setting = storage.set('a', 'new')
-      await flush()
-
-      const list = deferred<[null, { data: Array<{ key: string; value: unknown }> }]>()
-      mockWrapSignedFetch.mockImplementationOnce(() => list.promise)
-      const listing = storage.getValues()
-      await flush()
-      list.resolve([null, { data: [{ key: 'a', value: 'stale' }] }])
-      await listing
-
-      // The write is still in flight, so the page must not stand in for it: the read goes to the network.
-      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'new' }, 200])
-      expect(await storage.get('a')).toBe('new')
-      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(3)
-
-      put.resolve([null, {}])
-      expect(await setting).toBe(true)
-    })
-
     it('should not let a page overwrite per-key state confirmed while the list was in flight', async () => {
       const storage = createSceneStorage()
       const list = deferred<[null, { data: Array<{ key: string; value: unknown }> }]>()
@@ -614,7 +591,7 @@ describe('scene storage', () => {
   })
 
   describe('read-your-own-writes', () => {
-    it('should not serve the previous value from cache while the write is in flight', async () => {
+    it('should answer a read issued during a write from that write once it lands, without a network read', async () => {
       const storage = createSceneStorage()
       mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
       await storage.set('key', 'v1')
@@ -624,11 +601,15 @@ describe('scene storage', () => {
       const writing = storage.set('key', 'v2')
       await flush()
 
-      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'v2' }, 200])
-      expect(await storage.get('key')).toBe('v2')
+      const reading = storage.get('key')
+      await flush()
+      // The read is parked behind the write: no GET has been issued.
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
 
       put.resolve([null, {}])
-      await writing
+      expect(await writing).toBe(true)
+      expect(await reading).toBe('v2')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
     })
 
     it('should not let a fresh read join a request issued before the caller wrote', async () => {
@@ -657,144 +638,114 @@ describe('scene storage', () => {
   })
 
   describe('queued writes and the cache', () => {
-    it('should not cache a read that started during a write and was answered after it completed', async () => {
-      const storage = createSceneStorage()
-      const put = deferred<[null, object]>()
-      mockWrapSignedFetch.mockImplementationOnce(() => put.promise)
-      const writing = storage.set('k', 'v2')
-      await flush()
-
-      const read = deferred<[null, { value: string }, number]>()
-      mockWrapSignedFetch.mockImplementationOnce(() => read.promise)
-      const reading = storage.get('k')
-      await flush()
-
-      put.resolve([null, {}])
-      expect(await writing).toBe(true)
-      // The server answered the read before applying the write, and the response arrives late.
-      read.resolve([null, { value: 'v1' }, 200])
-      expect(await reading).toBe('v1')
-
-      // v2 landed and is cached; the late v1 must not have replaced it.
-      expect(await storage.get('k')).toBe('v2')
-      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
-    })
-
-    it('should not cache a completed write while a newer write to the same key is queued', async () => {
+    it('should answer a read issued while a write is queued behind another from the queued write, without a network read', async () => {
       const storage = createSceneStorage()
       const firstPut = deferred<[null, object]>()
       mockWrapSignedFetch.mockReturnValueOnce(firstPut.promise)
-
       const first = storage.set('k', 'v1')
       await flush()
       const secondPut = deferred<[null, object]>()
       mockWrapSignedFetch.mockReturnValueOnce(secondPut.promise)
       const second = storage.set('k', 'v2')
 
+      const reading = storage.get('k')
       firstPut.resolve([null, {}])
-      await first
-
-      // v2 is still in flight: a read must go to the network, not serve v1 from cache.
-      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'v2' }, 200])
-      expect(await storage.get('k')).toBe('v2')
+      expect(await first).toBe(true)
+      await flush()
+      // v1 landed and v2 is in flight: the read is still parked and issued no GET.
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
 
       secondPut.resolve([null, {}])
-      await second
+      expect(await second).toBe(true)
+      expect(await reading).toBe('v2')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
     })
 
-    it('should not cache an absence for a completed delete while a newer set to the same key is queued', async () => {
+    it('should answer a read issued while a set is queued behind a delete from the set, without a network read', async () => {
       const storage = createSceneStorage()
       const del = deferred<[null, object]>()
       mockWrapSignedFetch.mockReturnValueOnce(del.promise)
-
       const deleting = storage.delete('k')
       await flush()
       const put = deferred<[null, object]>()
       mockWrapSignedFetch.mockReturnValueOnce(put.promise)
       const writing = storage.set('k', 'v')
 
+      const reading = storage.get('k')
       del.resolve([null, {}])
-      await deleting
-
-      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'v' }, 200])
-      expect(await storage.get('k')).toBe('v')
-
+      expect(await deleting).toBe(true)
       put.resolve([null, {}])
-      await writing
+      expect(await writing).toBe(true)
+      expect(await reading).toBe('v')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
     })
 
-    it('should not cache a read answered while a write to the key is in flight', async () => {
+    it('should not wait for a write issued after the read, nor let the late answer overwrite that write', async () => {
       const storage = createSceneStorage()
-      const put2 = deferred<[null, object]>()
-      mockWrapSignedFetch.mockImplementationOnce(() => put2.promise)
-      const second = storage.set('k', 'v2')
-      await flush()
-      const third = storage.set('k', 'v3')
+      const putA = deferred<[null, object]>()
+      const putB = deferred<[null, object]>()
+      const read = deferred<[null, { value: string }, number]>()
+      mockWrapSignedFetch.mockImplementation((req: { init?: { method?: string; body?: string } }) => {
+        if (req.init?.method !== 'PUT') return read.promise
+        return req.init.body === JSON.stringify({ value: 'a' }) ? putA.promise : putB.promise
+      })
 
-      // The server answers the read before it applied v2.
+      const writingA = storage.set('k', 'a')
+      await flush()
+      const reading = storage.get('k') // parked behind a
+      await flush()
+      const writingB = storage.set('k', 'b') // issued after the read, so not awaited by it
+
+      putA.resolve([null, {}])
+      expect(await writingA).toBe(true)
+      await flush()
+      // a landed and b is in flight: the read went to the network instead of waiting for b.
+      expect(mockWrapSignedFetch.mock.calls.map((call) => call[0].init?.method ?? 'GET')).toEqual(['PUT', 'PUT', 'GET'])
+
+      putB.resolve([null, {}])
+      expect(await writingB).toBe(true)
+      // The server answered the read before applying b; the late answer must not replace b.
+      read.resolve([null, { value: 'a' }, 200])
+      expect(await reading).toBe('a')
+      expect(await storage.get('k')).toBe('b')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(3)
+    })
+
+    it('should read from the network once the write it waited for fails', async () => {
+      const storage = createSceneStorage()
+      const put = deferred<[string, null, number]>()
+      mockWrapSignedFetch.mockReturnValueOnce(put.promise)
+      const writing = storage.set('k', 'v2')
+      await flush()
+
+      const reading = storage.get('k')
+      await flush()
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
+
       mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'v1' }, 200])
-      expect(await storage.get('k')).toBe('v1')
-
-      const put3 = deferred<[null, object]>()
-      mockWrapSignedFetch.mockImplementationOnce(() => put3.promise)
-      put2.resolve([null, {}])
-      await second
-      await flush()
-
-      // v2 landed and v3 is in flight: the read must reach the network rather than serve v1.
-      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'v2' }, 200])
-      expect(await storage.get('k')).toBe('v2')
-
-      put3.resolve([null, {}])
-      await third
+      put.resolve(['500 Internal Server Error', null, 500])
+      expect(await writing).toBe(false)
+      expect(await reading).toBe('v1')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
     })
 
-    it('should not cache an absence answered while a write to the key is in flight', async () => {
+    it('should answer a read issued during a delete with null once it lands, without a network read', async () => {
       const storage = createSceneStorage()
-      const put2 = deferred<[null, object]>()
-      mockWrapSignedFetch.mockImplementationOnce(() => put2.promise)
-      const second = storage.set('k', 'v2')
-      await flush()
-      const third = storage.set('k', 'v3')
-
-      mockWrapSignedFetch.mockResolvedValueOnce(['404 Not Found', null, 404])
-      expect(await storage.get('k')).toBeNull()
-
-      const put3 = deferred<[null, object]>()
-      mockWrapSignedFetch.mockImplementationOnce(() => put3.promise)
-      put2.resolve([null, {}])
-      await second
-      await flush()
-
-      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'v2' }, 200])
-      expect(await storage.get('k')).toBe('v2')
-
-      put3.resolve([null, {}])
-      await third
-    })
-
-    it('should not cache a read answered while a delete of the key is in flight', async () => {
-      const storage = createSceneStorage()
-      const del = deferred<[null, object]>()
-      mockWrapSignedFetch.mockImplementationOnce(() => del.promise)
-      const deleting = storage.delete('k')
-      await flush()
-      const writing = storage.set('k', 'w')
-
       mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'old' }, 200])
       expect(await storage.get('k')).toBe('old')
 
-      const put = deferred<[null, object]>()
-      mockWrapSignedFetch.mockImplementationOnce(() => put.promise)
-      del.resolve([null, {}])
-      await deleting
+      const del = deferred<[null, object]>()
+      mockWrapSignedFetch.mockReturnValueOnce(del.promise)
+      const deleting = storage.delete('k')
       await flush()
+      const reading = storage.get('k')
+      await flush()
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
 
-      mockWrapSignedFetch.mockResolvedValueOnce(['404 Not Found', null, 404])
-      expect(await storage.get('k')).toBeNull()
-
-      put.resolve([null, {}])
-      await writing
+      del.resolve([null, {}])
+      expect(await deleting).toBe(true)
+      expect(await reading).toBeNull()
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
     })
   })
 

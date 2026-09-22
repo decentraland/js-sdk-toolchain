@@ -338,46 +338,55 @@ describe('player storage', () => {
   })
 
   describe('queued writes and the cache', () => {
-    it('should not cache a read that started during a write and was answered after it completed', async () => {
+    it('should not wait for a write issued after the read, nor let the late answer overwrite that write', async () => {
       const playerStorage = createPlayerStorage()
-      const put = deferred<[null, object]>()
-      mockWrapSignedFetch.mockImplementationOnce(() => put.promise)
-      const writing = playerStorage.set(address, 'k', 'v2')
-      await flush()
-
+      const putA = deferred<[null, object]>()
+      const putB = deferred<[null, object]>()
       const read = deferred<[null, { value: string }, number]>()
-      mockWrapSignedFetch.mockImplementationOnce(() => read.promise)
+      mockWrapSignedFetch.mockImplementation((req: { init?: { method?: string; body?: string } }) => {
+        if (req.init?.method !== 'PUT') return read.promise
+        return req.init.body === JSON.stringify({ value: 'a' }) ? putA.promise : putB.promise
+      })
+
+      const writingA = playerStorage.set(address, 'k', 'a')
+      await flush()
       const reading = playerStorage.get(address, 'k')
       await flush()
+      const writingB = playerStorage.set(address, 'k', 'b')
 
-      put.resolve([null, {}])
-      expect(await writing).toBe(true)
-      read.resolve([null, { value: 'v1' }, 200])
-      expect(await reading).toBe('v1')
+      putA.resolve([null, {}])
+      expect(await writingA).toBe(true)
+      await flush()
+      expect(mockWrapSignedFetch.mock.calls.map((call) => call[0].init?.method ?? 'GET')).toEqual(['PUT', 'PUT', 'GET'])
 
-      expect(await playerStorage.get(address, 'k')).toBe('v2')
-      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+      putB.resolve([null, {}])
+      expect(await writingB).toBe(true)
+      read.resolve([null, { value: 'a' }, 200])
+      expect(await reading).toBe('a')
+      expect(await playerStorage.get(address, 'k')).toBe('b')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(3)
     })
 
-    it('should not cache a completed write while a newer write to the same key is queued', async () => {
+    it('should answer a read issued while a write is queued behind another from the queued write, without a network read', async () => {
       const playerStorage = createPlayerStorage()
       const firstPut = deferred<[null, object]>()
       mockWrapSignedFetch.mockReturnValueOnce(firstPut.promise)
-
       const first = playerStorage.set(address, 'k', 'v1')
       await flush()
       const secondPut = deferred<[null, object]>()
       mockWrapSignedFetch.mockReturnValueOnce(secondPut.promise)
       const second = playerStorage.set(address, 'k', 'v2')
 
+      const reading = playerStorage.get(address, 'k')
       firstPut.resolve([null, {}])
-      await first
-
-      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'v2' }, 200])
-      expect(await playerStorage.get(address, 'k')).toBe('v2')
+      expect(await first).toBe(true)
+      await flush()
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
 
       secondPut.resolve([null, {}])
-      await second
+      expect(await second).toBe(true)
+      expect(await reading).toBe('v2')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
     })
 
     it('should reject every get joined to one failed request', async () => {
@@ -394,28 +403,21 @@ describe('player storage', () => {
       expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
     })
 
-    it('should not cache a read answered while a write to the key is in flight', async () => {
+    it('should answer a read issued during a write from that write once it lands, without a network read', async () => {
       const playerStorage = createPlayerStorage()
-      const put2 = deferred<[null, object]>()
-      mockWrapSignedFetch.mockImplementationOnce(() => put2.promise)
-      const second = playerStorage.set(address, 'k', 'v2')
-      await flush()
-      const third = playerStorage.set(address, 'k', 'v3')
-
-      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'v1' }, 200])
-      expect(await playerStorage.get(address, 'k')).toBe('v1')
-
-      const put3 = deferred<[null, object]>()
-      mockWrapSignedFetch.mockImplementationOnce(() => put3.promise)
-      put2.resolve([null, {}])
-      await second
+      const put = deferred<[null, object]>()
+      mockWrapSignedFetch.mockReturnValueOnce(put.promise)
+      const writing = playerStorage.set(address, 'k', 'v2')
       await flush()
 
-      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'v2' }, 200])
-      expect(await playerStorage.get(address, 'k')).toBe('v2')
+      const reading = playerStorage.get(address, 'k')
+      await flush()
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
 
-      put3.resolve([null, {}])
-      await third
+      put.resolve([null, {}])
+      expect(await writing).toBe(true)
+      expect(await reading).toBe('v2')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
     })
   })
 

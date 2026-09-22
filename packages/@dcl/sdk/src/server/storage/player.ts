@@ -25,6 +25,9 @@ export interface IPlayerStorage {
    * "not found" results. Concurrent gets for the same player and key share one
    * request. Out-of-band writers (e.g. CLI storage commands) may not be visible
    * for up to cacheMaxAgeMs — pass { fresh: true } to force a network read.
+   * A read issued while a write to the same key is in flight waits for that
+   * write to land first, so it never answers with a value older than what the
+   * caller has already written. Writes issued after the read are not awaited.
    * @param address - The player's wallet address
    * @param key - The key to retrieve
    * @param options - Optional { fresh } to bypass the read cache
@@ -171,6 +174,10 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       assertIsServer(MODULE_NAME)
 
       const ck = cacheKey(address, key)
+
+      // A write issued before this read lands first, so the read reflects it: from the
+      // cache that write fills, or from the server once it has applied the write.
+      if (writes.isPending(ck)) await writes.settled(ck)
 
       if (config.cacheReads && !options?.fresh) {
         const entry = cache.get(ck)

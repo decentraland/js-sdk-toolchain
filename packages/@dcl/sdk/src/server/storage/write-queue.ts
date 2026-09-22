@@ -50,6 +50,13 @@ export interface WriteQueue {
   /** True while any write for the key is in flight or queued. */
   isPending(key: string): boolean
   /**
+   * Resolves once the writes pending for the key at the time of the call have
+   * settled: the in-flight op and, when one is queued behind it, that op too.
+   * Writes issued afterwards are not awaited, so a steady stream of writes
+   * cannot starve a waiter. Never rejects.
+   */
+  settled(key: string): Promise<void>
+  /**
    * Issues a write. If one is in flight, the new op is queued — replacing any
    * already-queued op, which never runs and settles from this op's outcome
    * under its own contract (see settleSuperseded). An op identical to the
@@ -136,6 +143,17 @@ export function createWriteQueue(): WriteQueue {
 
     isPending(key: string): boolean {
       return keys.has(key)
+    },
+
+    async settled(key: string): Promise<void> {
+      const state = keys.get(key)
+      if (!state) return
+      const queued = state.queued
+      await state.active.promise.catch(() => undefined)
+      // The queued op is awaited only if it actually started; a newer write that
+      // superseded it is a different op, issued after this call.
+      const next = keys.get(key)
+      if (next && queued && next.active === queued) await next.active.promise.catch(() => undefined)
     },
 
     enqueue(key: string, body: string | null, execute: PendingOp['execute'], joinActive: boolean): Promise<boolean> {
