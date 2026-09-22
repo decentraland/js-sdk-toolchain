@@ -11,6 +11,7 @@ import {
   getWorldValue,
   setWorldValue,
   deleteWorldValue,
+  getPlayerStorage,
   getPlayerValue,
   setPlayerValue,
   deletePlayerValue
@@ -165,8 +166,7 @@ export function setupStorageEndpoints(
     const limitParam = ctx.url.searchParams.get('limit')
     const offsetParam = ctx.url.searchParams.get('offset')
 
-    const storage = await loadServerStorage(components)
-    const playerData = storage.players[address] ?? {}
+    const playerData = await getPlayerStorage(components, address)
     let entries = Object.entries(playerData).map(([key, value]) => ({ key, value }))
 
     if (prefix !== null && prefix !== '') {

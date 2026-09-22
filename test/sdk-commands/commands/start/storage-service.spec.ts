@@ -60,10 +60,11 @@ describe('when a storage PUT body omits the value field', () => {
     harness = captureRoutes()
   })
 
-  describe('and it targets a scene key', () => {
+  describe('and it targets a scene key that already holds a value', () => {
     let response: any
 
     beforeEach(async () => {
+      await harness.call('PUT /values/:key', { params: { key: 'plants' }, ...body(JSON.stringify({ value: [1, 2] })) })
       response = await harness.call('PUT /values/:key', { params: { key: 'plants' }, ...body('{}') })
     })
 
@@ -71,10 +72,10 @@ describe('when a storage PUT body omits the value field', () => {
       expect(response).toEqual({ status: 400, body: { message: 'Invalid JSON body' } })
     })
 
-    it('should leave the key absent rather than erase it silently', async () => {
+    it('should keep the stored value rather than erase it', async () => {
       const read = await harness.call('GET /values/:key', { params: { key: 'plants' } })
 
-      expect(read.status).toBe(404)
+      expect(read).toEqual({ body: JSON.stringify({ value: [1, 2] }) })
     })
   })
 
@@ -161,6 +162,85 @@ describe('when a storage PUT body is not valid JSON at all', () => {
 
     it('should reject it with a 400', () => {
       expect(response).toEqual({ status: 400, body: { message: 'Invalid JSON body' } })
+    })
+  })
+})
+
+describe('when a key or address is named like an Object.prototype property', () => {
+  let harness: ReturnType<typeof captureRoutes>
+
+  beforeEach(() => {
+    harness = captureRoutes()
+  })
+
+  describe('and the scene key was never written', () => {
+    it('should answer 404 for a key named constructor', async () => {
+      const read = await harness.call('GET /values/:key', { params: { key: 'constructor' } })
+
+      expect(read.status).toBe(404)
+    })
+
+    it('should answer 404 for a key named __proto__', async () => {
+      const read = await harness.call('GET /values/:key', { params: { key: '__proto__' } })
+
+      expect(read.status).toBe(404)
+    })
+  })
+
+  describe('and a value is stored under a scene key named __proto__', () => {
+    beforeEach(async () => {
+      await harness.call('PUT /values/:key', {
+        params: { key: '__proto__' },
+        ...body(JSON.stringify({ value: { hp: 1 } }))
+      })
+    })
+
+    it('should read it back under that key', async () => {
+      const read = await harness.call('GET /values/:key', { params: { key: '__proto__' } })
+
+      expect(read).toEqual({ body: JSON.stringify({ value: { hp: 1 } }) })
+    })
+
+    it('should not expose its fields under other keys', async () => {
+      const read = await harness.call('GET /values/:key', { params: { key: 'hp' } })
+
+      expect(read.status).toBe(404)
+    })
+
+    it('should list it as an ordinary entry', async () => {
+      const list = await harness.call('GET /values', { url: new URL('http://localhost/values') })
+
+      expect(JSON.parse(list.body).data).toEqual([{ key: '__proto__', value: { hp: 1 } }])
+    })
+  })
+
+  describe('and a player address is named __proto__', () => {
+    beforeEach(async () => {
+      await harness.call('PUT /players/:address/values/:key', {
+        params: { address: '__proto__', key: 'hp' },
+        ...body(JSON.stringify({ value: 1 }))
+      })
+    })
+
+    it('should not pollute Object.prototype', () => {
+      expect(({} as Record<string, unknown>).hp).toBeUndefined()
+    })
+
+    it('should read the value back for that address', async () => {
+      const read = await harness.call('GET /players/:address/values/:key', {
+        params: { address: '__proto__', key: 'hp' }
+      })
+
+      expect(read).toEqual({ body: JSON.stringify({ value: 1 }) })
+    })
+
+    it('should list it under that address', async () => {
+      const list = await harness.call('GET /players/:address/values', {
+        params: { address: '__proto__' },
+        url: new URL('http://localhost/players/__proto__/values')
+      })
+
+      expect(JSON.parse(list.body).data).toEqual([{ key: 'hp', value: 1 }])
     })
   })
 })

@@ -24,6 +24,21 @@ function createDefaultStorage(): ServerStorage {
   }
 }
 
+/**
+ * Own-property access for the JSON-backed buckets. Plain indexing would resolve a
+ * key such as `constructor`, `toString` or `__proto__` through Object.prototype,
+ * and assigning `__proto__` would swap the bucket's prototype instead of storing.
+ */
+const hasOwn = (record: object, key: string): boolean => Object.prototype.hasOwnProperty.call(record, key)
+
+function getOwn<T>(record: Record<string, T>, key: string): T | undefined {
+  return hasOwn(record, key) ? record[key] : undefined
+}
+
+function setOwn<T>(record: Record<string, T>, key: string, value: T): void {
+  Object.defineProperty(record, key, { value, enumerable: true, configurable: true, writable: true })
+}
+
 let writeQueue: Promise<unknown> = Promise.resolve()
 
 /**
@@ -185,7 +200,7 @@ export async function setEnvValue(
 ): Promise<void> {
   return serialize(async () => {
     const storage = await loadServerStorage(components)
-    storage.env[key] = value
+    setOwn(storage.env, key, value)
     await saveServerStorage(components, storage)
   })
 }
@@ -197,7 +212,7 @@ export async function setEnvValue(
 export async function deleteEnvValue(components: Pick<CliComponents, 'fs' | 'logger'>, key: string): Promise<boolean> {
   return serialize(async () => {
     const storage = await loadServerStorage(components)
-    if (!(key in storage.env)) {
+    if (!hasOwn(storage.env, key)) {
       return false
     }
     delete storage.env[key]
@@ -224,7 +239,18 @@ export async function getWorldValue(
   key: string
 ): Promise<unknown | undefined> {
   const storage = await loadServerStorage(components)
-  return storage.world[key]
+  return getOwn(storage.world, key)
+}
+
+/**
+ * Gets all storage data for a player, empty when the player has none.
+ */
+export async function getPlayerStorage(
+  components: Pick<CliComponents, 'fs' | 'logger'>,
+  address: string
+): Promise<Record<string, unknown>> {
+  const storage = await loadServerStorage(components)
+  return getOwn(storage.players, address) ?? {}
 }
 
 /**
@@ -237,7 +263,7 @@ export async function setWorldValue(
 ): Promise<void> {
   return serialize(async () => {
     const storage = await loadServerStorage(components)
-    storage.world[key] = value
+    setOwn(storage.world, key, value)
     await saveServerStorage(components, storage)
   })
 }
@@ -252,7 +278,7 @@ export async function deleteWorldValue(
 ): Promise<boolean> {
   return serialize(async () => {
     const storage = await loadServerStorage(components)
-    if (!(key in storage.world)) {
+    if (!hasOwn(storage.world, key)) {
       return false
     }
     delete storage.world[key]
@@ -270,7 +296,8 @@ export async function getPlayerValue(
   key: string
 ): Promise<unknown | undefined> {
   const storage = await loadServerStorage(components)
-  return storage.players[address]?.[key]
+  const bucket = getOwn(storage.players, address)
+  return bucket ? getOwn(bucket, key) : undefined
 }
 
 /**
@@ -284,10 +311,12 @@ export async function setPlayerValue(
 ): Promise<void> {
   return serialize(async () => {
     const storage = await loadServerStorage(components)
-    if (!storage.players[address]) {
-      storage.players[address] = {}
+    let bucket = getOwn(storage.players, address)
+    if (!bucket) {
+      bucket = {}
+      setOwn(storage.players, address, bucket)
     }
-    storage.players[address][key] = value
+    setOwn(bucket, key, value)
     await saveServerStorage(components, storage)
   })
 }
@@ -303,10 +332,11 @@ export async function deletePlayerValue(
 ): Promise<boolean> {
   return serialize(async () => {
     const storage = await loadServerStorage(components)
-    if (!storage.players[address] || !(key in storage.players[address])) {
+    const bucket = getOwn(storage.players, address)
+    if (!bucket || !hasOwn(bucket, key)) {
       return false
     }
-    delete storage.players[address][key]
+    delete bucket[key]
     await saveServerStorage(components, storage)
     return true
   })
