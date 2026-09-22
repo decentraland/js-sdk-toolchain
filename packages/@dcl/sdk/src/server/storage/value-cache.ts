@@ -29,18 +29,12 @@ export interface ValueCache {
   /** Stores a confirmed-absent (negative) entry, replacing any value entry. */
   setAbsent(key: string): void
   delete(key: string): void
-  /**
-   * Starts recording which keys are mutated from now on. A page read issued
-   * before a per-key write cannot tell that its snapshot went stale, because
-   * an absent entry looks the same whether the key was never cached or was
-   * just invalidated by a failed write. Watching bridges that gap.
-   */
+  /** Starts recording mutated keys, so a read issued earlier can tell its snapshot went stale. */
   watch(): CacheWatcher
 }
 
 /**
- * Records keys mutated since it was created, so a reader that started earlier
- * can refuse to seed them. Always stop() it, or it keeps collecting.
+ * Keys mutated since the watch started. Always stop() it, or it keeps collecting.
  * @internal
  */
 export interface CacheWatcher {

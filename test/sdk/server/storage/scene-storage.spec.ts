@@ -21,7 +21,7 @@ describe('scene storage', () => {
   const baseUrl = 'https://storage.test'
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
     mockGetStorageServerUrl.mockResolvedValue(baseUrl)
   })
 
@@ -584,6 +584,51 @@ describe('scene storage', () => {
       await writing
 
       expect(await fresh).toBe('v2')
+    })
+  })
+
+  describe('queued writes and the cache', () => {
+    it('should not cache a completed write while a newer write to the same key is queued', async () => {
+      const storage = createSceneStorage()
+      const firstPut = deferred<[null, object]>()
+      mockWrapSignedFetch.mockReturnValueOnce(firstPut.promise)
+
+      const first = storage.set('k', 'v1')
+      await flush()
+      const secondPut = deferred<[null, object]>()
+      mockWrapSignedFetch.mockReturnValueOnce(secondPut.promise)
+      const second = storage.set('k', 'v2')
+
+      firstPut.resolve([null, {}])
+      await first
+
+      // v2 is still in flight: a read must go to the network, not serve v1 from cache.
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'v2' }, 200])
+      expect(await storage.get('k')).toBe('v2')
+
+      secondPut.resolve([null, {}])
+      await second
+    })
+
+    it('should not cache an absence for a completed delete while a newer set to the same key is queued', async () => {
+      const storage = createSceneStorage()
+      const del = deferred<[null, object]>()
+      mockWrapSignedFetch.mockReturnValueOnce(del.promise)
+
+      const deleting = storage.delete('k')
+      await flush()
+      const put = deferred<[null, object]>()
+      mockWrapSignedFetch.mockReturnValueOnce(put.promise)
+      const writing = storage.set('k', 'v')
+
+      del.resolve([null, {}])
+      await deleting
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'v' }, 200])
+      expect(await storage.get('k')).toBe('v')
+
+      put.resolve([null, {}])
+      await writing
     })
   })
 

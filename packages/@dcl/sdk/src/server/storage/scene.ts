@@ -114,7 +114,8 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
       return false
     }
 
-    cache.set(key, { body })
+    // A newer write may be queued behind this one; caching this body would serve it until that lands.
+    if (writes.pending(key) === body) cache.set(key, { body })
     return true
   }
 
@@ -136,16 +137,15 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
     if (error) {
       // A 404 still confirms the key is absent server-side.
       if (status === 404) {
-        cache.setAbsent(key)
+        if (writes.pending(key) === null) cache.setAbsent(key)
         return false
       }
-      // The DELETE may have reached the server, so the cached body is no
-      // longer reliable — the same reasoning executeSet applies to a failed PUT.
+      // The DELETE may have reached the server, so the cached body is unreliable.
       cache.delete(key)
       throw new Error(`Failed to delete storage value '${key}': ${error}`)
     }
 
-    cache.setAbsent(key)
+    if (writes.pending(key) === null) cache.setAbsent(key)
     return true
   }
 
@@ -184,10 +184,9 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
             throw new Error(`Failed to get storage value '${key}': ${error}`)
           }
 
-          // A 2xx carrying no value is a service or proxy fault, not an absent key:
-          // wrapSignedFetch parses an empty body as {}, so returning null here would
-          // read as a confirmed absence and invite an overwrite.
+          // wrapSignedFetch parses an empty 2xx body as {}: a missing value is a fault, not an absence.
           if (!data || data.value === undefined) {
+            console.error(`Failed to get storage value '${key}': response carried no value`)
             throw new Error(`Failed to get storage value '${key}': response carried no value`)
           }
 
@@ -209,9 +208,7 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
       assertIsServer(MODULE_NAME)
 
       const body = JSON.stringify({ value })
-      // JSON.stringify omits undefined, functions and symbols, collapsing the
-      // payload to "{}" — which the service rejects, and which would otherwise
-      // cache as a value-less entry that get() reads back as undefined.
+      // undefined, functions and symbols serialize to "{}", which cannot round-trip.
       if (body === '{}') {
         throw new TypeError(`Storage.set('${key}'): value must be JSON-serializable. Use delete() to remove a key.`)
       }
@@ -224,9 +221,7 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
         return true
       }
 
-      // Invalidate at issue time, as delete() does: until the PUT lands the
-      // stored value is neither the old one nor reliably the new one, and a
-      // read served from either would not reflect the caller's own write.
+      // Until the PUT lands, neither the old nor the new value can be served for this key.
       cache.delete(key)
       inflightGets.delete(key)
 
@@ -282,6 +277,7 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
 
       const data = response?.data
       if (!Array.isArray(data)) {
+        console.error('Failed to get storage values: response carried no data array')
         throw new Error('Failed to get storage values: response carried no data array')
       }
 
@@ -294,9 +290,7 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
       // the cache; entries repopulate lazily.
       for (const entry of data) {
         if (typeof entry?.key !== 'string' || entry.value === undefined) continue
-        // watcher.mutated covers the window this snapshot cannot see: a write
-        // that failed mid-flight deletes its entry precisely because the value
-        // is unknown, and re-seeding it here would restore the stale one.
+        // A key mutated while the page was in flight must not be re-seeded from the snapshot.
         if (watcher.mutated(entry.key) || writes.isPending(entry.key) || inflightGets.has(entry.key)) continue
         if (cache.get(entry.key) === undefined) {
           cache.set(entry.key, { body: JSON.stringify({ value: entry.value }) })

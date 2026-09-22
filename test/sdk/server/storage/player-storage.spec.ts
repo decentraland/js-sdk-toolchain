@@ -22,7 +22,7 @@ describe('player storage', () => {
   const address = '0x1234567890123456789012345678901234567890'
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
     mockGetStorageServerUrl.mockResolvedValue(baseUrl)
   })
 
@@ -223,14 +223,16 @@ describe('player storage', () => {
     })
   })
 
-  describe('write serialization', () => {
-    function deferred<T>() {
-      let resolve!: (value: T) => void
-      const promise = new Promise<T>((r) => (resolve = r))
-      return { promise, resolve }
-    }
-    const flush = () => new Promise((r) => setTimeout(r, 0))
+  function deferred<T>() {
+    let resolve!: (value: T) => void
+    const promise = new Promise<T>((r) => (resolve = r))
+    return { promise, resolve }
+  }
 
+  /** Lets queued executors advance to their network call. */
+  const flush = () => new Promise((r) => setTimeout(r, 0))
+
+  describe('write serialization', () => {
     it('should serialize overlapping sets per player key and coalesce to the latest value', async () => {
       const playerStorage = createPlayerStorage()
       const firstPut = deferred<[null, object]>()
@@ -292,13 +294,44 @@ describe('player storage', () => {
     })
   })
 
-  describe('get read caching', () => {
-    function deferred<T>() {
-      let resolve!: (value: T) => void
-      const promise = new Promise<T>((r) => (resolve = r))
-      return { promise, resolve }
-    }
+  describe('queued writes and the cache', () => {
+    it('should not cache a completed write while a newer write to the same key is queued', async () => {
+      const playerStorage = createPlayerStorage()
+      const firstPut = deferred<[null, object]>()
+      mockWrapSignedFetch.mockReturnValueOnce(firstPut.promise)
 
+      const first = playerStorage.set(address, 'k', 'v1')
+      await flush()
+      const secondPut = deferred<[null, object]>()
+      mockWrapSignedFetch.mockReturnValueOnce(secondPut.promise)
+      const second = playerStorage.set(address, 'k', 'v2')
+
+      firstPut.resolve([null, {}])
+      await first
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'v2' }, 200])
+      expect(await playerStorage.get(address, 'k')).toBe('v2')
+
+      secondPut.resolve([null, {}])
+      await second
+    })
+
+    it('should reject every get joined to one failed request', async () => {
+      const playerStorage = createPlayerStorage()
+      const request = deferred<[string, null, number]>()
+      mockWrapSignedFetch.mockReturnValueOnce(request.promise)
+
+      const first = playerStorage.get(address, 'seeds')
+      const second = playerStorage.get(address, 'seeds')
+      request.resolve(['500 Internal Server Error', null, 500])
+
+      await expect(first).rejects.toThrow('500 Internal Server Error')
+      await expect(second).rejects.toThrow('500 Internal Server Error')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('get read caching', () => {
     it('should serve a repeated get from cache', async () => {
       const playerStorage = createPlayerStorage()
       mockWrapSignedFetch.mockResolvedValueOnce([null, { value: { hp: 100 } }, 200])

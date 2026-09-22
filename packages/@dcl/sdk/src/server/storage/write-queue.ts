@@ -79,8 +79,7 @@ export function createWriteQueue(): WriteQueue {
       try {
         op.resolve(await op.execute(op.body))
       } catch (error) {
-        // An executor that throws reports a failure it refuses to express as
-        // `false` — delete() does this so a failure is never read as an absence.
+        // A throw is a failure the executor refuses to express as `false`.
         op.reject(error)
       }
 
