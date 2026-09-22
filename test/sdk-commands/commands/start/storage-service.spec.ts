@@ -244,3 +244,181 @@ describe('when a key or address is named like an Object.prototype property', () 
     })
   })
 })
+
+describe('when a storage key is deleted', () => {
+  let harness: ReturnType<typeof captureRoutes>
+
+  beforeEach(() => {
+    harness = captureRoutes()
+  })
+
+  describe('and the scene key was never written', () => {
+    let response: any
+
+    beforeEach(async () => {
+      response = await harness.call('DELETE /values/:key', { params: { key: 'plants' } })
+    })
+
+    it('should answer 204, as the deployed service does', () => {
+      expect(response).toEqual({ status: 204 })
+    })
+  })
+
+  describe('and the scene key holds a value', () => {
+    let response: any
+
+    beforeEach(async () => {
+      await harness.call('PUT /values/:key', { params: { key: 'plants' }, ...body(JSON.stringify({ value: 1 })) })
+      response = await harness.call('DELETE /values/:key', { params: { key: 'plants' } })
+    })
+
+    it('should answer 204', () => {
+      expect(response).toEqual({ status: 204 })
+    })
+
+    it('should leave the key absent', async () => {
+      const read = await harness.call('GET /values/:key', { params: { key: 'plants' } })
+
+      expect(read.status).toBe(404)
+    })
+  })
+
+  describe('and the scene key is named constructor', () => {
+    let response: any
+
+    beforeEach(async () => {
+      response = await harness.call('DELETE /values/:key', { params: { key: 'constructor' } })
+    })
+
+    it('should answer 204 and leave Object.prototype alone', () => {
+      expect([response, typeof {}.constructor]).toEqual([{ status: 204 }, 'function'])
+    })
+  })
+
+  describe('and the player key was never written', () => {
+    let response: any
+
+    beforeEach(async () => {
+      response = await harness.call('DELETE /players/:address/values/:key', {
+        params: { address: '0xabc', key: 'seeds' }
+      })
+    })
+
+    it('should answer 204, as the deployed service does', () => {
+      expect(response).toEqual({ status: 204 })
+    })
+  })
+
+  describe('and the player key holds a value', () => {
+    let response: any
+
+    beforeEach(async () => {
+      await harness.call('PUT /players/:address/values/:key', {
+        params: { address: '0xabc', key: 'seeds' },
+        ...body(JSON.stringify({ value: 3 }))
+      })
+      response = await harness.call('DELETE /players/:address/values/:key', {
+        params: { address: '0xABC', key: 'seeds' }
+      })
+    })
+
+    it('should answer 204 regardless of the address casing', () => {
+      expect(response).toEqual({ status: 204 })
+    })
+
+    it('should leave the key absent', async () => {
+      const read = await harness.call('GET /players/:address/values/:key', {
+        params: { address: '0xabc', key: 'seeds' }
+      })
+
+      expect(read.status).toBe(404)
+    })
+  })
+
+  describe('and the player address is named __proto__', () => {
+    let response: any
+
+    beforeEach(async () => {
+      response = await harness.call('DELETE /players/:address/values/:key', {
+        params: { address: '__proto__', key: 'hp' }
+      })
+    })
+
+    it('should answer 204 and leave Object.prototype alone', () => {
+      expect([response, ({} as Record<string, unknown>).hp]).toEqual([{ status: 204 }, undefined])
+    })
+  })
+})
+
+describe('when a storage listing is filtered', () => {
+  let harness: ReturnType<typeof captureRoutes>
+
+  beforeEach(async () => {
+    harness = captureRoutes()
+    for (const [key, value] of [
+      ['plant:1', 1],
+      ['plant:2', 2],
+      ['box:1', 3]
+    ] as const) {
+      await harness.call('PUT /values/:key', { params: { key }, ...body(JSON.stringify({ value })) })
+    }
+    await harness.call('PUT /players/:address/values/:key', {
+      params: { address: '0xabc', key: 'seed:1' },
+      ...body(JSON.stringify({ value: 'a' }))
+    })
+    await harness.call('PUT /players/:address/values/:key', {
+      params: { address: '0xabc', key: 'coin' },
+      ...body(JSON.stringify({ value: 'b' }))
+    })
+  })
+
+  describe('and a prefix is passed for scene keys', () => {
+    let page: any
+
+    beforeEach(async () => {
+      const response = await harness.call('GET /values', { url: new URL('http://localhost/values?prefix=plant:') })
+      page = JSON.parse(response.body)
+    })
+
+    it('should return only the keys with that prefix, in insertion order', () => {
+      expect(page.data.map((entry: { key: string }) => entry.key)).toEqual(['plant:1', 'plant:2'])
+    })
+
+    it('should report the filtered total', () => {
+      expect(page.pagination).toEqual({ offset: 0, total: 2 })
+    })
+  })
+
+  describe('and limit and offset are passed for scene keys', () => {
+    let page: any
+
+    beforeEach(async () => {
+      const response = await harness.call('GET /values', { url: new URL('http://localhost/values?limit=1&offset=1') })
+      page = JSON.parse(response.body)
+    })
+
+    it('should return the requested slice', () => {
+      expect(page.data).toEqual([{ key: 'plant:2', value: 2 }])
+    })
+
+    it('should report the offset and the unfiltered total', () => {
+      expect(page.pagination).toEqual({ offset: 1, total: 3 })
+    })
+  })
+
+  describe('and a prefix is passed for player keys with the address in another casing', () => {
+    let page: any
+
+    beforeEach(async () => {
+      const response = await harness.call('GET /players/:address/values', {
+        params: { address: '0xABC' },
+        url: new URL('http://localhost/players/0xABC/values?prefix=seed:')
+      })
+      page = JSON.parse(response.body)
+    })
+
+    it("should return only that player's keys with the prefix", () => {
+      expect(page).toEqual({ data: [{ key: 'seed:1', value: 'a' }], pagination: { offset: 0, total: 1 } })
+    })
+  })
+})

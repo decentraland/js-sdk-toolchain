@@ -109,8 +109,11 @@ describe('scene storage', () => {
       // Without the guard the page re-seeds 'v1' and this write is skipped as unchanged.
       mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
       expect(await storage.set('k', 'v1')).toBe(true)
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(4)
       expect(mockWrapSignedFetch).toHaveBeenLastCalledWith(
-        expect.objectContaining({ init: expect.objectContaining({ method: 'PUT' }) })
+        expect.objectContaining({
+          init: expect.objectContaining({ method: 'PUT', body: JSON.stringify({ value: 'v1' }) })
+        })
       )
     })
 
@@ -139,6 +142,20 @@ describe('scene storage', () => {
   })
 
   describe('set', () => {
+    it('should return false and log, sending nothing, when the storage URL cannot be resolved', async () => {
+      const storage = createSceneStorage()
+      const error = jest.spyOn(console, 'error').mockImplementation(() => {})
+      mockGetStorageServerUrl.mockRejectedValueOnce(new Error('realm down'))
+
+      try {
+        expect(await storage.set('key', 1)).toBe(false)
+        expect(mockWrapSignedFetch).not.toHaveBeenCalled()
+        expect(error).toHaveBeenCalledWith("Failed to set storage value 'key': Error: realm down")
+      } finally {
+        error.mockRestore()
+      }
+    })
+
     it('should skip the PUT for an unchanged value by default', async () => {
       const storage = createSceneStorage()
       mockWrapSignedFetch.mockResolvedValue([null, {}])
@@ -324,6 +341,22 @@ describe('scene storage', () => {
   const flush = () => new Promise((r) => setTimeout(r, 0))
 
   describe('write serialization', () => {
+    it('should fold a write identical to the queued one into it, still issuing two PUTs', async () => {
+      const storage = createSceneStorage()
+      const firstPut = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => firstPut.promise)
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+
+      const first = storage.set('key', 1)
+      await flush()
+      const second = storage.set('key', 2)
+      const third = storage.set('key', 2)
+      firstPut.resolve([null, {}])
+
+      expect(await Promise.all([first, second, third])).toEqual([true, true, true])
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
     it('should hold a second set for a key until the in-flight PUT lands, preserving issue order', async () => {
       const storage = createSceneStorage()
       const firstPut = deferred<[null, object]>()
@@ -456,6 +489,29 @@ describe('scene storage', () => {
   })
 
   describe('getValues seeding race guard', () => {
+    it('should not seed a key whose write was already in flight when the listing started', async () => {
+      const storage = createSceneStorage()
+      const put = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put.promise)
+      const setting = storage.set('a', 'new')
+      await flush()
+
+      const list = deferred<[null, { data: Array<{ key: string; value: unknown }> }]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => list.promise)
+      const listing = storage.getValues()
+      await flush()
+      list.resolve([null, { data: [{ key: 'a', value: 'stale' }] }])
+      await listing
+
+      // The write is still in flight, so the page must not stand in for it: the read goes to the network.
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'new' }, 200])
+      expect(await storage.get('a')).toBe('new')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(3)
+
+      put.resolve([null, {}])
+      expect(await setting).toBe(true)
+    })
+
     it('should not let a page overwrite per-key state confirmed while the list was in flight', async () => {
       const storage = createSceneStorage()
       const list = deferred<[null, { data: Array<{ key: string; value: unknown }> }]>()
@@ -601,6 +657,29 @@ describe('scene storage', () => {
   })
 
   describe('queued writes and the cache', () => {
+    it('should not cache a read that started during a write and was answered after it completed', async () => {
+      const storage = createSceneStorage()
+      const put = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put.promise)
+      const writing = storage.set('k', 'v2')
+      await flush()
+
+      const read = deferred<[null, { value: string }, number]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => read.promise)
+      const reading = storage.get('k')
+      await flush()
+
+      put.resolve([null, {}])
+      expect(await writing).toBe(true)
+      // The server answered the read before applying the write, and the response arrives late.
+      read.resolve([null, { value: 'v1' }, 200])
+      expect(await reading).toBe('v1')
+
+      // v2 landed and is cached; the late v1 must not have replaced it.
+      expect(await storage.get('k')).toBe('v2')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
     it('should not cache a completed write while a newer write to the same key is queued', async () => {
       const storage = createSceneStorage()
       const firstPut = deferred<[null, object]>()

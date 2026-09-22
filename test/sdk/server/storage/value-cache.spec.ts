@@ -1,5 +1,9 @@
 import { createStorageConfig, DEFAULT_STORAGE_CONFIG } from '../../../../packages/@dcl/sdk/src/server/storage/constants'
-import { createValueCache } from '../../../../packages/@dcl/sdk/src/server/storage/value-cache'
+import {
+  CacheWatcher,
+  createValueCache,
+  ValueCache
+} from '../../../../packages/@dcl/sdk/src/server/storage/value-cache'
 
 describe('createValueCache', () => {
   it('roundtrips set/get and delete removes entries', () => {
@@ -190,6 +194,82 @@ describe('createValueCache', () => {
       cache.delete('a')
 
       expect(cache.get('a')).toBeUndefined()
+    })
+  })
+  describe('when a watcher is started', () => {
+    let cache: ValueCache
+    let watcher: CacheWatcher
+
+    beforeEach(() => {
+      cache = createValueCache(createStorageConfig())
+      cache.set('before', { body: 'b0' })
+      watcher = cache.watch()
+    })
+
+    afterEach(() => {
+      watcher.stop()
+    })
+
+    it('should not report a key mutated before it started', () => {
+      expect(watcher.mutated('before')).toBe(false)
+    })
+
+    it('should report a key set after it started', () => {
+      cache.set('a', { body: 'b1' })
+
+      expect(watcher.mutated('a')).toBe(true)
+    })
+
+    it('should report a key marked absent after it started', () => {
+      cache.setAbsent('a')
+
+      expect(watcher.mutated('a')).toBe(true)
+    })
+
+    it('should report a key deleted after it started, even one the cache never held', () => {
+      cache.delete('a')
+
+      expect(watcher.mutated('a')).toBe(true)
+    })
+
+    it('should not report a key nobody touched', () => {
+      cache.set('a', { body: 'b1' })
+
+      expect(watcher.mutated('other')).toBe(false)
+    })
+
+    describe('and it is stopped', () => {
+      beforeEach(() => {
+        cache.set('while-watching', { body: 'b1' })
+        watcher.stop()
+        cache.set('after-stop', { body: 'b2' })
+      })
+
+      it('should keep what it recorded while watching', () => {
+        expect(watcher.mutated('while-watching')).toBe(true)
+      })
+
+      it('should not record mutations made after it stopped', () => {
+        expect(watcher.mutated('after-stop')).toBe(false)
+      })
+    })
+
+    describe('and a second watcher starts later', () => {
+      let later: CacheWatcher
+
+      beforeEach(() => {
+        cache.set('first-only', { body: 'b1' })
+        later = cache.watch()
+        cache.set('both', { body: 'b2' })
+      })
+
+      afterEach(() => {
+        later.stop()
+      })
+
+      it('should record only what happened after its own start', () => {
+        expect([later.mutated('first-only'), later.mutated('both')]).toEqual([false, true])
+      })
     })
   })
 })

@@ -27,6 +27,33 @@ describe('player storage', () => {
   })
 
   describe('getValues', () => {
+    it('should not re-seed a key that a failed write invalidated while the page was in flight', async () => {
+      const playerStorage = createPlayerStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'v1' }, 200])
+      expect(await playerStorage.get(address, 'k')).toBe('v1')
+
+      const page = deferred<[null, { data: Array<{ key: string; value: string }> }]>()
+      mockWrapSignedFetch.mockReturnValueOnce(page.promise)
+      const listing = playerStorage.getValues(address)
+      await flush()
+
+      mockWrapSignedFetch.mockResolvedValueOnce(['500 Internal Server Error', null, 500])
+      expect(await playerStorage.set(address, 'k', 'v2')).toBe(false)
+
+      page.resolve([null, { data: [{ key: 'k', value: 'v1' }] }])
+      await listing
+
+      // Without the guard the page re-seeds 'v1' and this write is skipped as unchanged.
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+      expect(await playerStorage.set(address, 'k', 'v1')).toBe(true)
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(4)
+      expect(mockWrapSignedFetch).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          init: expect.objectContaining({ method: 'PUT', body: JSON.stringify({ value: 'v1' }) })
+        })
+      )
+    })
+
     it('should reject when the request fails', async () => {
       const playerStorage = createPlayerStorage()
       mockWrapSignedFetch.mockResolvedValue(['Server error', null])
@@ -102,6 +129,22 @@ describe('player storage', () => {
   })
 
   describe('set', () => {
+    it('should return false and log, sending nothing, when the storage URL cannot be resolved', async () => {
+      const playerStorage = createPlayerStorage()
+      const error = jest.spyOn(console, 'error').mockImplementation(() => {})
+      mockGetStorageServerUrl.mockRejectedValueOnce(new Error('realm down'))
+
+      try {
+        expect(await playerStorage.set(address, 'key', 1)).toBe(false)
+        expect(mockWrapSignedFetch).not.toHaveBeenCalled()
+        expect(error).toHaveBeenCalledWith(
+          `Failed to set player storage value 'key' for '${address}': Error: realm down`
+        )
+      } finally {
+        error.mockRestore()
+      }
+    })
+
     it('should skip the PUT for an unchanged value by default', async () => {
       const playerStorage = createPlayerStorage()
       mockWrapSignedFetch.mockResolvedValue([null, {}])
@@ -295,6 +338,27 @@ describe('player storage', () => {
   })
 
   describe('queued writes and the cache', () => {
+    it('should not cache a read that started during a write and was answered after it completed', async () => {
+      const playerStorage = createPlayerStorage()
+      const put = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put.promise)
+      const writing = playerStorage.set(address, 'k', 'v2')
+      await flush()
+
+      const read = deferred<[null, { value: string }, number]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => read.promise)
+      const reading = playerStorage.get(address, 'k')
+      await flush()
+
+      put.resolve([null, {}])
+      expect(await writing).toBe(true)
+      read.resolve([null, { value: 'v1' }, 200])
+      expect(await reading).toBe('v1')
+
+      expect(await playerStorage.get(address, 'k')).toBe('v2')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
     it('should not cache a completed write while a newer write to the same key is queued', async () => {
       const playerStorage = createPlayerStorage()
       const firstPut = deferred<[null, object]>()
