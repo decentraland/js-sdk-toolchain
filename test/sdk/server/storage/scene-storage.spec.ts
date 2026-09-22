@@ -114,14 +114,20 @@ describe('scene storage', () => {
       )
     })
 
-    it('should skip entries that carry no usable key or value', async () => {
+    it('should skip entries that carry no usable key or value and still seed the rest of the page', async () => {
       const storage = createSceneStorage()
-      mockWrapSignedFetch.mockResolvedValueOnce([null, { data: [{ value: 'orphan' }, { key: 'good', value: 1 }] }])
+      mockWrapSignedFetch.mockResolvedValueOnce([
+        null,
+        { data: [null, { value: 'orphan' }, { key: 'novalue' }, { key: 'good', value: 1 }] }
+      ])
 
       await storage.getValues()
 
+      // 'good' was seeded and is served locally; 'novalue' was not and reads from the network.
       mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'network' }, 200])
-      expect(await storage.get('undefined')).toBe('network')
+      expect(await storage.get('good')).toBe(1)
+      expect(await storage.get('novalue')).toBe('network')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
     })
 
     it('should reject a successful response whose data is not a list', async () => {
@@ -266,6 +272,13 @@ describe('scene storage', () => {
       mockWrapSignedFetch.mockResolvedValueOnce(['404 Not Found', null, 404])
 
       expect(await storage.delete('key')).toBe(false)
+    })
+
+    it('should reject with the storage error prefix when the storage URL cannot be resolved', async () => {
+      const storage = createSceneStorage()
+      mockGetStorageServerUrl.mockRejectedValueOnce(new Error('realm down'))
+
+      await expect(storage.delete('key')).rejects.toThrow("Failed to delete storage value 'key': Error: realm down")
     })
 
     it('should not serve a value cached during an in-flight delete that then fails', async () => {
@@ -629,6 +642,175 @@ describe('scene storage', () => {
 
       put.resolve([null, {}])
       await writing
+    })
+
+    it('should not cache a read answered while a write to the key is in flight', async () => {
+      const storage = createSceneStorage()
+      const put2 = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put2.promise)
+      const second = storage.set('k', 'v2')
+      await flush()
+      const third = storage.set('k', 'v3')
+
+      // The server answers the read before it applied v2.
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'v1' }, 200])
+      expect(await storage.get('k')).toBe('v1')
+
+      const put3 = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put3.promise)
+      put2.resolve([null, {}])
+      await second
+      await flush()
+
+      // v2 landed and v3 is in flight: the read must reach the network rather than serve v1.
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'v2' }, 200])
+      expect(await storage.get('k')).toBe('v2')
+
+      put3.resolve([null, {}])
+      await third
+    })
+
+    it('should not cache an absence answered while a write to the key is in flight', async () => {
+      const storage = createSceneStorage()
+      const put2 = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put2.promise)
+      const second = storage.set('k', 'v2')
+      await flush()
+      const third = storage.set('k', 'v3')
+
+      mockWrapSignedFetch.mockResolvedValueOnce(['404 Not Found', null, 404])
+      expect(await storage.get('k')).toBeNull()
+
+      const put3 = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put3.promise)
+      put2.resolve([null, {}])
+      await second
+      await flush()
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'v2' }, 200])
+      expect(await storage.get('k')).toBe('v2')
+
+      put3.resolve([null, {}])
+      await third
+    })
+
+    it('should not cache a read answered while a delete of the key is in flight', async () => {
+      const storage = createSceneStorage()
+      const del = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => del.promise)
+      const deleting = storage.delete('k')
+      await flush()
+      const writing = storage.set('k', 'w')
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'old' }, 200])
+      expect(await storage.get('k')).toBe('old')
+
+      const put = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put.promise)
+      del.resolve([null, {}])
+      await deleting
+      await flush()
+
+      mockWrapSignedFetch.mockResolvedValueOnce(['404 Not Found', null, 404])
+      expect(await storage.get('k')).toBeNull()
+
+      put.resolve([null, {}])
+      await writing
+    })
+  })
+
+  describe('superseded writes', () => {
+    it('should resolve a set superseded by a delete to false when the DELETE fails, never reject it', async () => {
+      const storage = createSceneStorage()
+      const put1 = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put1.promise)
+      const first = storage.set('k', 'a')
+      await flush()
+      const second = storage.set('k', 'b')
+      const deleting = storage.delete('k')
+
+      mockWrapSignedFetch.mockResolvedValueOnce(['500 Internal Server Error', null, 500])
+      put1.resolve([null, {}])
+      await Promise.allSettled([first, second, deleting])
+
+      expect(await first).toBe(true)
+      expect(await second).toBe(false)
+      await expect(deleting).rejects.toThrow('500 Internal Server Error')
+    })
+
+    it('should resolve a set superseded by a delete to true once the key is confirmed absent', async () => {
+      const storage = createSceneStorage()
+      const put1 = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put1.promise)
+      const first = storage.set('k', 'a')
+      await flush()
+      const second = storage.set('k', 'b')
+      const deleting = storage.delete('k')
+
+      mockWrapSignedFetch.mockResolvedValueOnce(['404 Not Found', null, 404])
+      put1.resolve([null, {}])
+      await Promise.allSettled([first, second, deleting])
+
+      expect(await first).toBe(true)
+      expect(await second).toBe(true)
+      expect(await deleting).toBe(false)
+    })
+
+    it('should reject a delete superseded by a set when the PUT fails, instead of reporting a confirmed absence', async () => {
+      const storage = createSceneStorage()
+      const put1 = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put1.promise)
+      const first = storage.set('k', 'a')
+      await flush()
+      const deleting = storage.delete('k')
+      const third = storage.set('k', 'c')
+
+      mockWrapSignedFetch.mockResolvedValueOnce(['500 Internal Server Error', null, 500])
+      put1.resolve([null, {}])
+      await Promise.allSettled([first, deleting, third])
+
+      expect(await first).toBe(true)
+      expect(await third).toBe(false)
+      await expect(deleting).rejects.toThrow("Failed to delete storage value 'k': the write that superseded it failed")
+    })
+
+    it('should resolve a delete superseded by a set to true once the PUT lands', async () => {
+      const storage = createSceneStorage()
+      const put1 = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put1.promise)
+      const first = storage.set('k', 'a')
+      await flush()
+      const deleting = storage.delete('k')
+      const third = storage.set('k', 'c')
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+      put1.resolve([null, {}])
+      await Promise.allSettled([first, deleting, third])
+
+      expect(await first).toBe(true)
+      expect(await third).toBe(true)
+      expect(await deleting).toBe(true)
+    })
+
+    it('should carry the outcome through a chain of supersessions', async () => {
+      const storage = createSceneStorage()
+      const put1 = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put1.promise)
+      const first = storage.set('k', 'a')
+      await flush()
+      const deleting = storage.delete('k') // queued
+      const second = storage.set('k', 'b') // supersedes the delete
+      const deletingAgain = storage.delete('k') // supersedes the set
+
+      mockWrapSignedFetch.mockResolvedValueOnce(['500 Internal Server Error', null, 500])
+      put1.resolve([null, {}])
+      await Promise.allSettled([first, deleting, second, deletingAgain])
+
+      expect(await first).toBe(true)
+      expect(await second).toBe(false)
+      // The first delete only learns that the set which superseded it did not apply.
+      await expect(deleting).rejects.toThrow("Failed to delete storage value 'k': the write that superseded it failed")
+      await expect(deletingAgain).rejects.toThrow('500 Internal Server Error')
     })
   })
 

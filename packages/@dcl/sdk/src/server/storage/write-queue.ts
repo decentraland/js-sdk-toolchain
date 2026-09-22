@@ -1,4 +1,16 @@
 /**
+ * Rejection of a superseded delete whose superseding write failed: the key's state
+ * is unknown, and a delete's `false` is reserved for a confirmed absence.
+ * @internal
+ */
+export class SupersededWriteFailed extends Error {
+  constructor() {
+    super('the write that superseded it failed')
+    this.name = 'SupersededWriteFailed'
+  }
+}
+
+/**
  * A pending write operation. `body` is the serialized PUT payload, or null
  * for a DELETE. Callers coalesced into the op share its promise.
  * @internal
@@ -14,7 +26,7 @@ interface PendingOp {
 interface KeyState {
   /** The op currently on the network. */
   active: PendingOp
-  /** At most one queued op; later writes replace its payload (latest wins). */
+  /** At most one queued op; a later write replaces it (latest wins). */
   queued?: PendingOp
 }
 
@@ -39,14 +51,13 @@ export interface WriteQueue {
   isPending(key: string): boolean
   /**
    * Issues a write. If one is in flight, the new op is queued — replacing any
-   * already-queued op, whose callers then follow this op's outcome (their
-   * value was superseded before it could ever be observed). An op identical
-   * to the queued one joins it; `joinActive` additionally allows joining an
+   * already-queued op, which never runs and settles from this op's outcome
+   * under its own contract (see settleSuperseded). An op identical to the
+   * queued one joins it; `joinActive` additionally allows joining an
    * identical in-flight op (only valid for dedup-tolerant callers, since that
    * op was issued before this call).
    *
-   * Rejects with whatever the executor threw. A superseded caller follows the
-   * superseding op's outcome, rejection included.
+   * Rejects with whatever the executor threw.
    */
   enqueue(
     key: string,
@@ -71,6 +82,29 @@ export function createWriteQueue(): WriteQueue {
       reject = rej
     })
     return { body, execute, promise, resolve, reject }
+  }
+
+  /**
+   * A superseded op never reaches the network, so it settles from the op that
+   * replaced it. "Applied" means the chain left the key in its issued state: a
+   * PUT that returned true, or a DELETE that resolved (a 404 still leaves the
+   * key absent). Each op reports that under its own contract: a set resolves
+   * the boolean and never rejects; a delete resolves true when applied and
+   * rejects otherwise. Chains compose, because the mapping preserves "applied".
+   */
+  function settleSuperseded(superseded: PendingOp, by: PendingOp): void {
+    by.promise.then(
+      (result) => {
+        const applied = by.body === null || result
+        if (superseded.body !== null) superseded.resolve(applied)
+        else if (applied) superseded.resolve(true)
+        else superseded.reject(new SupersededWriteFailed())
+      },
+      (error) => {
+        if (superseded.body === null) superseded.reject(error)
+        else superseded.resolve(false)
+      }
+    )
   }
 
   async function drain(key: string, state: KeyState): Promise<void> {
@@ -118,11 +152,11 @@ export function createWriteQueue(): WriteQueue {
       if (state.queued) {
         // A queued op has not started, so it is issued "after" this caller
         // either way: join it when identical, supersede it otherwise.
-        if (state.queued.body !== body) {
-          state.queued.body = body
-          state.queued.execute = execute
-        }
-        return state.queued.promise
+        if (state.queued.body === body) return state.queued.promise
+        const op = makeOp(body, execute)
+        settleSuperseded(state.queued, op)
+        state.queued = op
+        return op.promise
       }
 
       if (joinActive && state.active.body === body) {

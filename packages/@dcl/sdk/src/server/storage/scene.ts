@@ -10,7 +10,7 @@ import {
   StorageConfigState
 } from './constants'
 import { createValueCache } from './value-cache'
-import { createWriteQueue } from './write-queue'
+import { createWriteQueue, SupersededWriteFailed } from './write-queue'
 
 /**
  * Scene-scoped storage interface for key-value pairs from the Server Side Storage service.
@@ -120,7 +120,13 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
   }
 
   async function executeDelete(key: string): Promise<boolean> {
-    const baseUrl = await getStorageServerUrl()
+    let baseUrl: string
+    try {
+      baseUrl = await getStorageServerUrl()
+    } catch (error) {
+      cache.delete(key)
+      throw new Error(`Failed to delete storage value '${key}': ${error}`)
+    }
     const url = `${baseUrl}/values/${encodeURIComponent(key)}`
 
     const [error, , status] = await wrapSignedFetch({
@@ -173,12 +179,13 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
 
           const [error, data, status] = await wrapSignedFetch<{ value: T }>({ url })
 
-          const isOwner = inflightGets.get(key) === inflight
+          // A response that lands while a write is pending may predate that write; the write refreshes the cache when it completes.
+          const cacheable = inflightGets.get(key) === inflight && !writes.isPending(key)
 
           if (error) {
             // A confirmed 404 is a first-class "absent" outcome, not a failure.
             if (status === 404) {
-              if (isOwner) cache.setAbsent(key)
+              if (cacheable) cache.setAbsent(key)
               return null
             }
             throw new Error(`Failed to get storage value '${key}': ${error}`)
@@ -193,7 +200,7 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
           // Same serialization shape as set()'s PUT body, so a read followed by
           // an unchanged write can be skipped.
           const body = JSON.stringify({ value: data.value })
-          if (isOwner) cache.set(key, { body })
+          if (cacheable) cache.set(key, { body })
           return data.value
         } finally {
           if (inflightGets.get(key) === inflight) inflightGets.delete(key)
@@ -237,7 +244,14 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
       cache.delete(key)
       inflightGets.delete(key)
 
-      return writes.enqueue(key, null, () => executeDelete(key), true)
+      return writes
+        .enqueue(key, null, () => executeDelete(key), true)
+        .catch((error: unknown) => {
+          if (error instanceof SupersededWriteFailed) {
+            throw new Error(`Failed to delete storage value '${key}': ${error.message}`)
+          }
+          throw error
+        })
     },
 
     async getValues(options?: GetValuesOptions): Promise<GetValuesResult> {

@@ -10,7 +10,7 @@ import {
   StorageConfigState
 } from './constants'
 import { createValueCache } from './value-cache'
-import { createWriteQueue } from './write-queue'
+import { createWriteQueue, SupersededWriteFailed } from './write-queue'
 
 /**
  * Player-scoped storage interface for key-value pairs from the Server Side Storage service.
@@ -131,7 +131,13 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
   }
 
   async function executeDelete(address: string, key: string, ck: string): Promise<boolean> {
-    const baseUrl = await getStorageServerUrl()
+    let baseUrl: string
+    try {
+      baseUrl = await getStorageServerUrl()
+    } catch (error) {
+      cache.delete(ck)
+      throw new Error(`Failed to delete player storage value '${key}' for '${address}': ${error}`)
+    }
     const url = `${baseUrl}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
 
     const [error, , status] = await wrapSignedFetch({
@@ -186,12 +192,13 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
 
           const [error, data, status] = await wrapSignedFetch<{ value: T }>({ url })
 
-          const isOwner = inflightGets.get(ck) === inflight
+          // A response that lands while a write is pending may predate that write; the write refreshes the cache when it completes.
+          const cacheable = inflightGets.get(ck) === inflight && !writes.isPending(ck)
 
           if (error) {
             // A confirmed 404 is a first-class "absent" outcome, not a failure.
             if (status === 404) {
-              if (isOwner) cache.setAbsent(ck)
+              if (cacheable) cache.setAbsent(ck)
               return null
             }
             throw new Error(`Failed to get player storage value '${key}' for '${address}': ${error}`)
@@ -206,7 +213,7 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
           // Same serialization shape as set()'s PUT body, so a read followed by
           // an unchanged write can be skipped.
           const body = JSON.stringify({ value: data.value })
-          if (isOwner) cache.set(ck, { body })
+          if (cacheable) cache.set(ck, { body })
           return data.value
         } finally {
           if (inflightGets.get(ck) === inflight) inflightGets.delete(ck)
@@ -255,7 +262,14 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       cache.delete(ck)
       inflightGets.delete(ck)
 
-      return writes.enqueue(ck, null, () => executeDelete(address, key, ck), true)
+      return writes
+        .enqueue(ck, null, () => executeDelete(address, key, ck), true)
+        .catch((error: unknown) => {
+          if (error instanceof SupersededWriteFailed) {
+            throw new Error(`Failed to delete player storage value '${key}' for '${address}': ${error.message}`)
+          }
+          throw error
+        })
     },
 
     async getValues(address: string, options?: GetValuesOptions): Promise<GetValuesResult> {

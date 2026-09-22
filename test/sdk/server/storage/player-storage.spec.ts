@@ -329,6 +329,81 @@ describe('player storage', () => {
       await expect(second).rejects.toThrow('500 Internal Server Error')
       expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
     })
+
+    it('should not cache a read answered while a write to the key is in flight', async () => {
+      const playerStorage = createPlayerStorage()
+      const put2 = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put2.promise)
+      const second = playerStorage.set(address, 'k', 'v2')
+      await flush()
+      const third = playerStorage.set(address, 'k', 'v3')
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'v1' }, 200])
+      expect(await playerStorage.get(address, 'k')).toBe('v1')
+
+      const put3 = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put3.promise)
+      put2.resolve([null, {}])
+      await second
+      await flush()
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'v2' }, 200])
+      expect(await playerStorage.get(address, 'k')).toBe('v2')
+
+      put3.resolve([null, {}])
+      await third
+    })
+  })
+
+  describe('superseded writes', () => {
+    it('should resolve a set superseded by a delete to false when the DELETE fails, never reject it', async () => {
+      const playerStorage = createPlayerStorage()
+      const put1 = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put1.promise)
+      const first = playerStorage.set(address, 'k', 'a')
+      await flush()
+      const second = playerStorage.set(address, 'k', 'b')
+      const deleting = playerStorage.delete(address, 'k')
+
+      mockWrapSignedFetch.mockResolvedValueOnce(['500 Internal Server Error', null, 500])
+      put1.resolve([null, {}])
+      await Promise.allSettled([first, second, deleting])
+
+      expect(await first).toBe(true)
+      expect(await second).toBe(false)
+      await expect(deleting).rejects.toThrow('500 Internal Server Error')
+    })
+
+    it('should reject a delete superseded by a set when the PUT fails, naming the player key', async () => {
+      const playerStorage = createPlayerStorage()
+      const put1 = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put1.promise)
+      const first = playerStorage.set(address, 'k', 'a')
+      await flush()
+      const deleting = playerStorage.delete(address, 'k')
+      const third = playerStorage.set(address, 'k', 'c')
+
+      mockWrapSignedFetch.mockResolvedValueOnce(['500 Internal Server Error', null, 500])
+      put1.resolve([null, {}])
+      await Promise.allSettled([first, deleting, third])
+
+      expect(await first).toBe(true)
+      expect(await third).toBe(false)
+      await expect(deleting).rejects.toThrow(
+        `Failed to delete player storage value 'k' for '${address}': the write that superseded it failed`
+      )
+    })
+  })
+
+  describe('delete when the storage URL cannot be resolved', () => {
+    it('should reject with the storage error prefix', async () => {
+      const playerStorage = createPlayerStorage()
+      mockGetStorageServerUrl.mockRejectedValueOnce(new Error('realm down'))
+
+      await expect(playerStorage.delete(address, 'key')).rejects.toThrow(
+        `Failed to delete player storage value 'key' for '${address}': Error: realm down`
+      )
+    })
   })
 
   describe('get read caching', () => {
