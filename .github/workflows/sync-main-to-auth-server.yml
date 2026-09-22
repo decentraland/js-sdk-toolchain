@@ -1,11 +1,11 @@
-name: Sync main to experimental
+name: Sync main to auth-server
 
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
 
-# Shared with merge-sync-to-experimental.yml: both workflows mutate chore/sync, and
+# Shared with merge-sync-to-auth-server.yml: both workflows mutate chore/sync, and
 # interleaving them either rejects this push or recreates a branch that one just
 # deleted. One group serializes every writer.
 concurrency:
@@ -47,21 +47,21 @@ jobs:
           # An existing chore/sync is a sync still in flight: keep it, so commits
           # arriving on main accumulate on it and a manual conflict resolution pushed
           # to it survives. The branch is deleted when its PR merges, so the next sync
-          # starts from experimental again.
-          BASE=origin/experimental
+          # starts from auth-server again.
+          BASE=origin/auth-server
           if git rev-parse --verify --quiet refs/remotes/origin/chore/sync >/dev/null; then
             BASE=origin/chore/sync
           fi
           git checkout -B chore/sync "$BASE"
 
-          # chore/sync must be experimental + main: anything that only exists on
-          # experimental has to survive the sync. No -X theirs — resolving conflicts in
-          # main's favour silently drops experimental-only code. A conflict stops the run
+          # chore/sync must be auth-server + main: anything that only exists on
+          # auth-server has to survive the sync. No -X theirs — resolving conflicts in
+          # main's favour silently drops auth-server-only code. A conflict stops the run
           # instead, and the resolution pushed to chore/sync is reused by later runs.
-          for REF in origin/experimental origin/main; do
+          for REF in origin/auth-server origin/main; do
             if ! git merge -m "chore: merge $REF into chore/sync" "$REF"; then
               git merge --abort || true
-              echo "::error::Merging $REF into chore/sync failed. To recover: branch chore/sync off experimental (or check out the existing one), merge main into it, resolve, push it, and open a PR against experimental. Later runs merge on top of that resolution."
+              echo "::error::Merging $REF into chore/sync failed. To recover: branch chore/sync off auth-server (or check out the existing one), merge main into it, resolve, push it, and open a PR against auth-server. Later runs merge on top of that resolution."
               exit 1
             fi
           done
@@ -128,8 +128,8 @@ jobs:
           # that later runs would read as a sync in flight.
           REMOTE_HEAD="$(git rev-parse --verify --quiet refs/remotes/origin/chore/sync || echo absent)"
           if [ "$(git rev-parse HEAD)" = "$REMOTE_HEAD" ] \
-             || git merge-base --is-ancestor HEAD origin/experimental; then
-            echo "Nothing to push: chore/sync is current, or experimental already contains it."
+             || git merge-base --is-ancestor HEAD origin/auth-server; then
+            echo "Nothing to push: chore/sync is current, or auth-server already contains it."
           else
             git push --force-with-lease origin chore/sync
           fi
@@ -142,41 +142,47 @@ jobs:
           # Backticks here are data, not shell source: they reach gh through the
           # variable and are never re-evaluated.
           PR_BODY: |
-            :crown: *An automated PR to keep experimental in sync with main, with protocol updates, build and snapshots*
+            :crown: *An automated PR to keep auth-server in sync with main, with protocol updates, build and snapshots*
 
             **This PR is a draft on purpose: it is landed by a workflow, not by a button.**
+            **It still needs an approving review — the workflow merges this PR, so branch
+            protection is enforced against it.**
 
             ### How to land it
 
             1. Test the packages published by the **build** job on this PR — the CI comment
                below carries the `npm install` URLs and the `/changerealm` link.
-            2. Go to **Actions -> Merge sync PR into experimental -> Run workflow**, from
+            2. Approve this PR. `auth-server` requires one approving review, and the
+               workflow below merges the PR itself, so it cannot land without one.
+            3. Go to **Actions -> Merge sync PR into auth-server -> Run workflow**, from
                `main`.
-            3. That workflow marks this PR ready, merges `chore/sync` into `experimental`
-               as a real merge commit, dispatches CI on `experimental` so the
-               `@experimental` npm tag is republished, and this PR closes as **Merged**.
+            4. That workflow marks this PR ready, merges it into `auth-server` as a real
+               merge commit, deletes `chore/sync`, and dispatches CI on `auth-server` so
+               the `@auth-server` npm tag is republished.
 
             Further commits on `main` are merged onto this same branch while the PR is
-            open, so it stays current on its own.
+            open, so it stays current on its own. An approval carries over to those
+            updates — `auth-server` does not dismiss stale reviews — so you only need to
+            approve again if this PR is closed and a new one opens.
 
             > [!IMPORTANT]
-            > Do not take this PR out of draft in order to squash it. Squash is the only
-            > merge this repo allows, and squashing replaces `main`'s commits with a single
-            > new one: `main` stops being an ancestor of `experimental`, the merge base
-            > freezes, and every later sync re-applies changes `experimental` already has,
+            > Do not take this PR out of draft in order to squash it. Squash is still
+            > offered in the merge dropdown, and squashing replaces `main`'s commits with a
+            > single new one: `main` stops being an ancestor of `auth-server`, the merge base
+            > freezes, and every later sync re-applies changes `auth-server` already has,
             > conflicting within a couple of runs.
             >
             > If it does get squashed, restore the ancestry with
-            > `git merge -s ours origin/main` on `experimental`.
+            > `git merge -s ours origin/main` on `auth-server`.
         run: |
           set -euo pipefail
 
           # gh pr create fails with "No commits between ..." when nothing is ahead.
           # The tree check also covers a net-zero round of main changes, where commits
           # exist but there is nothing left to propose.
-          if git merge-base --is-ancestor HEAD origin/experimental \
-             || git diff --quiet origin/experimental HEAD; then
-            echo "experimental already has everything chore/sync would propose."
+          if git merge-base --is-ancestor HEAD origin/auth-server \
+             || git diff --quiet origin/auth-server HEAD; then
+            echo "auth-server already has everything chore/sync would propose."
             exit 0
           fi
 
@@ -188,20 +194,20 @@ jobs:
             NOTE="$NOTE"$'\n\n> [!WARNING]\n> Regenerated snapshots contained `ERR!` traces and were discarded. Fix the scene-load failure (usually a missing mock in `test/snapshots.spec.ts`) and re-run this workflow.'
           fi
 
-          PR_NUMBER="$(gh pr list --base experimental --head chore/sync --state open --json number --jq '.[0].number // empty')"
+          PR_NUMBER="$(gh pr list --base auth-server --head chore/sync --state open --json number --jq '.[0].number // empty')"
 
           if [ -n "$PR_NUMBER" ]; then
             echo "PR #$PR_NUMBER already exists, adding a comment..."
             gh pr comment "$PR_NUMBER" --body "🔄 Updated with latest changes from **main** on $(date -u '+%Y-%m-%d %H:%M UTC')${NOTE}"
           else
             echo "Creating new PR..."
-            # --draft: squash is the only merge the repo allows, and squashing this PR
-            # breaks the ancestry. A draft has no merge button at all.
+            # --draft: squashing this PR breaks the ancestry, and squash is offered in
+            # the merge dropdown. A draft has no merge button at all.
             gh pr create \
               --draft \
-              --base experimental \
+              --base auth-server \
               --head chore/sync \
-              --title "chore: sync main to experimental" \
+              --title "chore: sync main to auth-server" \
               --body "${PR_BODY}${NOTE}" \
               --label "auto-pr"
           fi
