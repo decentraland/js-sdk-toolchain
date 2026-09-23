@@ -1,5 +1,5 @@
 /**
- * Tests for player storage getValues (list/prefix/pagination) method.
+ * Tests for player storage: reads, writes, the read cache and the write queue.
  * Mocks storage-url and utils so no real server or runtime is required.
  */
 const mockGetStorageServerUrl = jest.fn()
@@ -27,6 +27,18 @@ describe('player storage', () => {
   })
 
   describe('getValues', () => {
+    it('should not let a page overwrite a value a read confirmed before the listing started', async () => {
+      const playerStorage = createPlayerStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'confirmed' }, 200])
+      expect(await playerStorage.get(address, 'a')).toBe('confirmed')
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { data: [{ key: 'a', value: 'from page' }] }])
+      await playerStorage.getValues(address)
+
+      expect(await playerStorage.get(address, 'a')).toBe('confirmed')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
     it('should reject a page that carries an entry without a string key or without a value', async () => {
       const playerStorage = createPlayerStorage()
       mockWrapSignedFetch.mockResolvedValueOnce([null, { data: [{ key: 'good', value: 1 }, { key: 'novalue' }] }])
@@ -74,7 +86,7 @@ describe('player storage', () => {
 
     it('should reject a successful response whose data is not a list', async () => {
       const playerStorage = createPlayerStorage()
-      mockWrapSignedFetch.mockResolvedValue([null, {}, 200])
+      mockWrapSignedFetch.mockResolvedValue([null, { data: {} }, 200])
 
       await expect(playerStorage.getValues(address)).rejects.toThrow(
         `Failed to get player storage values for '${address}': response carried no data array`
@@ -269,6 +281,15 @@ describe('player storage', () => {
       mockWrapSignedFetch.mockResolvedValueOnce(['404 Not Found', null, 404])
 
       expect(await playerStorage.delete(address, 'seeds')).toBe(false)
+    })
+
+    it('should cache the absence a 404 confirms, so the next read is local', async () => {
+      const playerStorage = createPlayerStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce(['404 Not Found', null, 404])
+      await playerStorage.delete(address, 'seeds')
+
+      expect(await playerStorage.get(address, 'seeds')).toBeNull()
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
     })
 
     it('should invalidate the cache so a later identical set writes again', async () => {

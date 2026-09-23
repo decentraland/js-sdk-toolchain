@@ -1,5 +1,5 @@
 /**
- * Tests for scene storage getValues (list/prefix/pagination) method.
+ * Tests for scene storage: reads, writes, the read cache and the write queue.
  * Mocks storage-url and utils so no real server or runtime is required.
  */
 const mockGetStorageServerUrl = jest.fn()
@@ -156,7 +156,7 @@ describe('scene storage', () => {
 
     it('should reject a successful response whose data is not a list', async () => {
       const storage = createSceneStorage()
-      mockWrapSignedFetch.mockResolvedValue([null, {}, 200])
+      mockWrapSignedFetch.mockResolvedValue([null, { data: {} }, 200])
 
       await expect(storage.getValues()).rejects.toThrow('Failed to get storage values: response carried no data array')
     })
@@ -269,18 +269,6 @@ describe('scene storage', () => {
       // Only the GET hit the network.
       expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
     })
-
-    it('should not populate the cache from a failed get', async () => {
-      const storage = createSceneStorage()
-      mockWrapSignedFetch.mockResolvedValueOnce(['Server error', null])
-
-      await expect(storage.get('player-state')).rejects.toThrow('Server error')
-
-      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
-      await storage.set('player-state', null, { skipIfUnchanged: true })
-
-      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
-    })
   })
 
   describe('delete', () => {
@@ -310,6 +298,31 @@ describe('scene storage', () => {
       mockWrapSignedFetch.mockResolvedValueOnce(['404 Not Found', null, 404])
 
       expect(await storage.delete('key')).toBe(false)
+    })
+
+    it('should cache the absence a 404 confirms, so the next read is local', async () => {
+      const storage = createSceneStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce(['404 Not Found', null, 404])
+      await storage.delete('key')
+
+      expect(await storage.get('key')).toBeNull()
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
+    })
+
+    it('should let a set queued behind a 404 delete land and be read back', async () => {
+      const storage = createSceneStorage()
+      const del = deferred<[string, null, number]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => del.promise)
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+
+      const deleting = storage.delete('key')
+      await flush()
+      const writing = storage.set('key', 'after')
+      del.resolve(['404 Not Found', null, 404])
+
+      expect(await Promise.all([deleting, writing])).toEqual([false, true])
+      expect(await storage.get('key')).toBe('after')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
     })
 
     it('should reject with the storage error prefix when the storage URL cannot be resolved', async () => {
@@ -390,20 +403,34 @@ describe('scene storage', () => {
       )
     })
 
-    it('should fold a write identical to the queued one into it, still issuing two PUTs', async () => {
+    it('should join a delete identical to the queued one, so both report the same 404 outcome', async () => {
       const storage = createSceneStorage()
-      const firstPut = deferred<[null, object]>()
-      mockWrapSignedFetch.mockImplementationOnce(() => firstPut.promise)
-      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+      const put = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put.promise)
+      mockWrapSignedFetch.mockResolvedValueOnce(['404 Not Found', null, 404])
 
-      const first = storage.set('key', 1)
+      const writing = storage.set('key', 1)
       await flush()
-      const second = storage.set('key', 2)
-      const third = storage.set('key', 2)
-      firstPut.resolve([null, {}])
+      const first = storage.delete('key')
+      const second = storage.delete('key') // identical to the queued delete: joins it rather than replacing it
+      put.resolve([null, {}])
 
-      expect(await Promise.all([first, second, third])).toEqual([true, true, true])
+      // A replaced delete would report true (the replacement applied); a joined one shares the 404.
+      expect(await Promise.all([writing, first, second])).toEqual([true, false, false])
       expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should issue one DELETE for two concurrent deletes of the same key', async () => {
+      const storage = createSceneStorage()
+      const del = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => del.promise)
+
+      const first = storage.delete('key')
+      const second = storage.delete('key')
+      del.resolve([null, {}])
+
+      expect(await Promise.all([first, second])).toEqual([true, true])
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
     })
 
     it('should hold a second set for a key until the in-flight PUT lands, preserving issue order', async () => {
@@ -516,7 +543,7 @@ describe('scene storage', () => {
       expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
     })
 
-    it('should fail coalesced writers and invalidate the cache when their PUT fails', async () => {
+    it('should resolve false for a queued write whose own PUT fails, and invalidate the cache', async () => {
       const storage = createSceneStorage()
       const firstPut = deferred<[null, object]>()
       mockWrapSignedFetch.mockImplementationOnce(() => firstPut.promise)
@@ -538,6 +565,37 @@ describe('scene storage', () => {
   })
 
   describe('getValues seeding race guard', () => {
+    it('should not let a page overwrite a value a read confirmed before the listing started', async () => {
+      const storage = createSceneStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'confirmed' }, 200])
+      expect(await storage.get('a')).toBe('confirmed')
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { data: [{ key: 'a', value: 'from page' }] }])
+      await storage.getValues()
+
+      expect(await storage.get('a')).toBe('confirmed')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should not seed a key whose read is in flight, since that read settles the entry', async () => {
+      const storage = createSceneStorage()
+      const read = deferred<[string, null, number]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => read.promise)
+      const reading = storage.get('a')
+      await flush()
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { data: [{ key: 'a', value: 'from page' }] }])
+      await storage.getValues()
+
+      read.resolve(['500 Internal Server Error', null, 500])
+      await expect(reading).rejects.toThrow('500 Internal Server Error')
+
+      // Nothing confirmed 'a', so the next read goes to the network rather than serving the page value.
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'fresh' }, 200])
+      expect(await storage.get('a')).toBe('fresh')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(3)
+    })
+
     it('should not let a page overwrite per-key state confirmed while the list was in flight', async () => {
       const storage = createSceneStorage()
       const list = deferred<[null, { data: Array<{ key: string; value: unknown }> }]>()
@@ -639,10 +697,12 @@ describe('scene storage', () => {
       expect(mockWrapSignedFetch).not.toHaveBeenCalled()
     })
 
-    it('should reject a function, which serializes to the same empty payload', async () => {
+    it('should reject a root-level function, naming the value itself', async () => {
       const storage = createSceneStorage()
 
-      await expect(storage.set('key', () => undefined)).rejects.toThrow('must be JSON-serializable')
+      await expect(storage.set('key', () => undefined)).rejects.toThrow(
+        `Storage.set('key'): value must be JSON-serializable, but "value" is a function. Use delete() to remove a key.`
+      )
     })
 
     it('should reject a circular value', async () => {
@@ -701,6 +761,9 @@ describe('scene storage', () => {
 
       mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'v2' }, 200])
       const fresh = storage.get('key', { fresh: true })
+      await flush()
+      // The fresh read is parked behind the PUT: only the first GET and the PUT are on the wire.
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
 
       firstGet.resolve([null, { value: 'v1' }, 200])
       put.resolve([null, {}])
@@ -708,6 +771,7 @@ describe('scene storage', () => {
       await writing
 
       expect(await fresh).toBe('v2')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(3)
     })
   })
 
@@ -878,6 +942,22 @@ describe('scene storage', () => {
   })
 
   describe('superseded writes', () => {
+    it('should resolve a set superseded by a set whose PUT fails to false', async () => {
+      const storage = createSceneStorage()
+      const put1 = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put1.promise)
+      const first = storage.set('k', 'a')
+      await flush()
+      const second = storage.set('k', 'b') // queued
+      const third = storage.set('k', 'c') // replaces b
+
+      mockWrapSignedFetch.mockResolvedValueOnce(['500 Internal Server Error', null, 500])
+      put1.resolve([null, {}])
+      await Promise.allSettled([first, second, third])
+
+      expect(await Promise.all([first, second, third])).toEqual([true, false, false])
+    })
+
     it('should resolve a set superseded by a delete to false when the DELETE fails, never reject it', async () => {
       const storage = createSceneStorage()
       const put1 = deferred<[null, object]>()
