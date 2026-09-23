@@ -1,6 +1,10 @@
 import { Engine, Entity } from '../../packages/@dcl/ecs/src/engine'
 import { Schemas } from '../../packages/@dcl/ecs/src/schemas'
-import { CrdtMessageType, PutComponentMessageBody, DeleteComponentMessageBody } from '../../packages/@dcl/ecs/src/serialization/crdt/types'
+import {
+  CrdtMessageType,
+  PutComponentMessageBody,
+  DeleteComponentMessageBody
+} from '../../packages/@dcl/ecs/src/serialization/crdt/types'
 import { ReadWriteByteBuffer } from '../../packages/@dcl/ecs/src/serialization/ByteBuffer'
 
 const PositionSchema = {
@@ -146,7 +150,7 @@ describe('CRDT message suppression for unchanged mutables', () => {
     expect((changeMessages[0] as PutComponentMessageBody).timestamp).toBe(2)
   })
 
-  it('should update snapshot after receiving remote CRDT update', () => {
+  it('should re-emit local state after receiving a remote CRDT update', () => {
     const engine = Engine()
     const entity = engine.addEntity()
     const Position = engine.defineComponent('position-test-7', PositionSchema)
@@ -167,10 +171,10 @@ describe('CRDT message suppression for unchanged mutables', () => {
       timestamp: 10
     })
 
-    // getMutable without change after remote update
     Position.getMutable(entity)
     const messages = Array.from(Position.getCrdtUpdates())
-    expect(messages).toHaveLength(0)
+    expect(messages).toHaveLength(1)
+    expect(messages[0].type).toBe(CrdtMessageType.PUT_COMPONENT)
   })
 
   it('should correctly handle multiple getMutable calls per tick', () => {
