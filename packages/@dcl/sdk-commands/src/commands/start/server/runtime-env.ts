@@ -111,6 +111,14 @@ const LOCK_TIMEOUT_MS = 30_000
 const LOCK_RETRY_MS = 20
 /** A lock file whose owner cannot be read is taken over only once it is this old. */
 const UNREADABLE_LOCK_MS = 30_000
+/** A dead owner's lock is only taken over once it is this old, so one that just changed hands is left alone. */
+const MIN_TAKEOVER_AGE_MS = 2_000
+
+/** The token of the lock file this process holds, checked before every commit. */
+let heldLockToken: string | undefined
+
+/** The lock was taken from this process while it held it; nothing was written. */
+export class StoreLockLostError extends Error {}
 
 const randomToken = () => Math.random().toString(36).slice(2, 10)
 
@@ -167,9 +175,11 @@ async function withLockFile<T>(components: Pick<CliComponents, 'fs' | 'logger'>,
     if (Date.now() > deadline) throw new Error(`Timed out waiting for the ${SERVER_STORAGE_FILE} lock`)
     await new Promise((resolve) => setTimeout(resolve, LOCK_RETRY_MS))
   }
+  heldLockToken = token
   try {
     return await task()
   } finally {
+    heldLockToken = undefined
     if ((await readLock(components, lockPath).catch(() => undefined)) === token) {
       await components.fs.unlink(lockPath).catch(() => undefined)
     }
@@ -177,13 +187,15 @@ async function withLockFile<T>(components: Pick<CliComponents, 'fs' | 'logger'>,
 }
 
 async function isAbandoned(components: Pick<CliComponents, 'fs'>, lockPath: string, holder: string): Promise<boolean> {
-  const pid = Number(holder.split(':')[0])
-  if (Number.isInteger(pid) && pid > 0) return !isAlive(pid)
+  let age: number
   try {
-    return Date.now() - (await components.fs.stat(lockPath)).mtimeMs > UNREADABLE_LOCK_MS
+    age = Date.now() - (await components.fs.stat(lockPath)).mtimeMs
   } catch {
     return false
   }
+  const pid = Number(holder.split(':')[0])
+  if (Number.isInteger(pid) && pid > 0) return age > MIN_TAKEOVER_AGE_MS && !isAlive(pid)
+  return age > UNREADABLE_LOCK_MS
 }
 
 /** Moving the lock aside is atomic; if a newer owner's lock moved instead, it goes back. */
@@ -268,6 +280,12 @@ export async function saveServerStorage(
   await ensureRuntimeDir(components)
   const tmpPath = `${storagePath()}.${process.pid}.${randomToken()}.tmp`
   await components.fs.writeFile(tmpPath, JSON.stringify(data, null, 2))
+  // Fencing: a lock displaced by a concurrent takeover must not commit. Only the instant between
+  // this check and the rename is left unguarded, since the filesystem has no compare-and-rename.
+  if (heldLockToken !== undefined && (await readLock(components, `${storagePath()}.lock`)) !== heldLockToken) {
+    await components.fs.unlink(tmpPath).catch(() => undefined)
+    throw new StoreLockLostError(`The ${SERVER_STORAGE_FILE} lock was taken over during the write; nothing was saved`)
+  }
   await components.fs.rename(tmpPath, storagePath())
 }
 
