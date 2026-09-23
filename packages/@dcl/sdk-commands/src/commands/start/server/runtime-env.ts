@@ -74,7 +74,7 @@ function mergePlayerBuckets(players: Record<string, unknown>): Record<string, Re
   return merged
 }
 
-let writeQueue: Promise<unknown> = Promise.resolve()
+let storeLock: Promise<unknown> = Promise.resolve()
 
 /**
  * Serializes read-modify-write cycles against server-storage.json. The entire
@@ -82,9 +82,9 @@ let writeQueue: Promise<unknown> = Promise.resolve()
  * snapshot would otherwise lose one update, and two concurrent saves would interleave
  * their writes into a corrupt file.
  */
-function serialize<T>(task: () => Promise<T>): Promise<T> {
-  const run = writeQueue.then(task, task)
-  writeQueue = run.then(
+function withStoreLock<T>(task: () => Promise<T>): Promise<T> {
+  const run = storeLock.then(task, task)
+  storeLock = run.then(
     () => undefined,
     () => undefined
   )
@@ -105,35 +105,50 @@ async function ensureRuntimeDir(components: Pick<CliComponents, 'fs' | 'logger'>
   }
 }
 
-/**
- * Loads all server-side storage data from server-storage.json.
- */
-export async function loadServerStorage(components: Pick<CliComponents, 'fs' | 'logger'>): Promise<ServerStorage> {
-  const storagePath = path.join(RUNTIME_DATA_DIR, SERVER_STORAGE_FILE)
+const storagePath = () => path.join(RUNTIME_DATA_DIR, SERVER_STORAGE_FILE)
 
-  // Only a confirmed missing file is an empty store. Any other failure propagates, so the
-  // route answers 500 and no write can overwrite a store that could not be read.
-  if (!(await components.fs.fileExists(storagePath))) {
-    return createDefaultStorage()
-  }
+/** The store as read, or `null` when the file exists but does not hold a JSON object. */
+async function readStore(components: Pick<CliComponents, 'fs'>): Promise<ServerStorage | null> {
+  if (!(await components.fs.fileExists(storagePath()))) return createDefaultStorage()
 
-  const content = await components.fs.readFile(storagePath, 'utf-8')
-  let parsed: Partial<ServerStorage>
+  let parsed: unknown
   try {
-    parsed = JSON.parse(content)
+    parsed = JSON.parse(await components.fs.readFile(storagePath(), 'utf-8'))
   } catch (error) {
-    // Starting over would let the next write erase the file; keep it for recovery.
-    const asidePath = `${storagePath}.corrupt-${Date.now()}`
-    components.logger.error(`${SERVER_STORAGE_FILE} is not valid JSON (${error}); moving it to ${asidePath}`)
-    await components.fs.rename(storagePath, asidePath)
-    return createDefaultStorage()
+    if (!(error instanceof SyntaxError)) throw error
+    return null
   }
+  if (!isPlainObject(parsed)) return null
 
   return {
     env: bucket<string>(parsed.env),
     world: bucket<unknown>(parsed.world),
     players: mergePlayerBuckets(bucket<unknown>(parsed.players))
   }
+}
+
+/** Loads the store while holding the store lock, setting a corrupt file aside so it is kept for recovery. */
+async function loadStoreLocked(components: Pick<CliComponents, 'fs' | 'logger'>): Promise<ServerStorage> {
+  const storage = await readStore(components)
+  if (storage) return storage
+
+  const asidePath = `${storagePath()}.corrupt-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+  components.logger.error(`${SERVER_STORAGE_FILE} does not hold a JSON object; moving it to ${asidePath}`)
+  try {
+    await components.fs.rename(storagePath(), asidePath)
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException)?.code !== 'ENOENT') throw error
+  }
+  return createDefaultStorage()
+}
+
+/**
+ * Loads all server-side storage data from server-storage.json. Only a missing file is an empty
+ * store; a corrupt one is set aside under the store lock, and any other read failure throws,
+ * so a write never overwrites a store it could not read.
+ */
+export async function loadServerStorage(components: Pick<CliComponents, 'fs' | 'logger'>): Promise<ServerStorage> {
+  return (await readStore(components)) ?? withStoreLock(() => loadStoreLocked(components))
 }
 
 /**
@@ -144,16 +159,9 @@ export async function saveServerStorage(
   data: ServerStorage
 ): Promise<void> {
   await ensureRuntimeDir(components)
-  const storagePath = path.join(RUNTIME_DATA_DIR, SERVER_STORAGE_FILE)
-
-  try {
-    const tmpPath = `${storagePath}.tmp`
-    await components.fs.writeFile(tmpPath, JSON.stringify(data, null, 2))
-    await components.fs.rename(tmpPath, storagePath)
-  } catch (error) {
-    components.logger.error(`Failed to save ${SERVER_STORAGE_FILE}: ${error}`)
-    throw error
-  }
+  const tmpPath = `${storagePath()}.tmp`
+  await components.fs.writeFile(tmpPath, JSON.stringify(data, null, 2))
+  await components.fs.rename(tmpPath, storagePath())
 }
 
 /**
@@ -167,37 +175,27 @@ export async function loadEnvFile(
   const envMap = new Map<string, string>()
   const envPath = path.join(projectDirectory, '.env')
 
-  try {
-    const exists = await components.fs.fileExists(envPath)
-    if (!exists) {
-      return envMap
+  // Only a missing file means no variables; a failed read throws rather than reading as empty.
+  if (!(await components.fs.fileExists(envPath))) {
+    return envMap
+  }
+
+  const content = await components.fs.readFile(envPath, 'utf-8')
+  for (const line of content.split('\n')) {
+    const trimmed = line.trim()
+    if (!trimmed || trimmed.startsWith('#')) {
+      continue
     }
 
-    const content = await components.fs.readFile(envPath, 'utf-8')
-    const lines = content.split('\n')
-
-    for (const line of lines) {
-      const trimmed = line.trim()
-      // Skip empty lines and comments
-      if (!trimmed || trimmed.startsWith('#')) {
-        continue
+    const equalIndex = trimmed.indexOf('=')
+    if (equalIndex > 0) {
+      const key = trimmed.slice(0, equalIndex).trim()
+      let value = trimmed.slice(equalIndex + 1).trim()
+      if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+        value = value.slice(1, -1)
       }
-
-      const equalIndex = trimmed.indexOf('=')
-      if (equalIndex > 0) {
-        const key = trimmed.slice(0, equalIndex).trim()
-        let value = trimmed.slice(equalIndex + 1).trim()
-
-        // Remove surrounding quotes if present
-        if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
-          value = value.slice(1, -1)
-        }
-
-        envMap.set(key, value)
-      }
+      envMap.set(key, value)
     }
-  } catch (error) {
-    components.logger.error(`Failed to load .env file: ${error}`)
   }
 
   return envMap
@@ -238,8 +236,8 @@ export async function setEnvValue(
   key: string,
   value: string
 ): Promise<void> {
-  return serialize(async () => {
-    const storage = await loadServerStorage(components)
+  return withStoreLock(async () => {
+    const storage = await loadStoreLocked(components)
     setOwn(storage.env, key, value)
     await saveServerStorage(components, storage)
   })
@@ -250,8 +248,8 @@ export async function setEnvValue(
  * Returns true if key existed and was deleted, false otherwise.
  */
 export async function deleteEnvValue(components: Pick<CliComponents, 'fs' | 'logger'>, key: string): Promise<boolean> {
-  return serialize(async () => {
-    const storage = await loadServerStorage(components)
+  return withStoreLock(async () => {
+    const storage = await loadStoreLocked(components)
     if (!hasOwn(storage.env, key)) {
       return false
     }
@@ -301,8 +299,8 @@ export async function setWorldValue(
   key: string,
   value: unknown
 ): Promise<void> {
-  return serialize(async () => {
-    const storage = await loadServerStorage(components)
+  return withStoreLock(async () => {
+    const storage = await loadStoreLocked(components)
     setOwn(storage.world, key, value)
     await saveServerStorage(components, storage)
   })
@@ -316,8 +314,8 @@ export async function deleteWorldValue(
   components: Pick<CliComponents, 'fs' | 'logger'>,
   key: string
 ): Promise<boolean> {
-  return serialize(async () => {
-    const storage = await loadServerStorage(components)
+  return withStoreLock(async () => {
+    const storage = await loadStoreLocked(components)
     if (!hasOwn(storage.world, key)) {
       return false
     }
@@ -349,8 +347,8 @@ export async function setPlayerValue(
   key: string,
   value: unknown
 ): Promise<void> {
-  return serialize(async () => {
-    const storage = await loadServerStorage(components)
+  return withStoreLock(async () => {
+    const storage = await loadStoreLocked(components)
     const lowercased = address.toLowerCase()
     let values = getOwn(storage.players, lowercased)
     if (!values) {
@@ -371,8 +369,8 @@ export async function deletePlayerValue(
   address: string,
   key: string
 ): Promise<boolean> {
-  return serialize(async () => {
-    const storage = await loadServerStorage(components)
+  return withStoreLock(async () => {
+    const storage = await loadStoreLocked(components)
     const values = getOwn(storage.players, address.toLowerCase())
     if (!values || !hasOwn(values, key)) {
       return false

@@ -38,6 +38,7 @@ function captureRoutes(options: { initialStore?: string } = {}) {
     }),
     rename: jest.fn(async (from: string, to: string) => {
       if (renameGate) await renameGate
+      if (!files.has(from)) throw Object.assign(new Error(`ENOENT: no such file, rename '${from}'`), { code: 'ENOENT' })
       files.set(to, files.get(from)!)
       files.delete(from)
     })
@@ -1021,11 +1022,153 @@ describe('when the store holds player buckets saved under mixed-case addresses',
   })
 })
 
+describe('when a read of a corrupt store is overtaken by a write that recovers it', () => {
+  let harness: ReturnType<typeof captureRoutes>
+
+  beforeEach(async () => {
+    harness = captureRoutes({ initialStore: '{not json' })
+    let releaseRead!: () => void
+    const readHeld = new Promise<void>((resolve) => (releaseRead = resolve))
+    harness.fs.readFile.mockImplementationOnce(async () => {
+      await readHeld
+      return '{not json'
+    })
+
+    const reading = harness.call('GET /values/:key', { params: { key: 'k' } }) // holds the corrupt content
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await harness.call('PUT /values/:key', { params: { key: 'k' }, ...json(7) }) // sets it aside and saves
+    releaseRead()
+    await reading
+  })
+
+  it('should keep the acknowledged write in the live store', () => {
+    expect(harness.savedStore()?.world).toEqual({ k: 7 })
+  })
+
+  it('should set only the corrupt content aside', () => {
+    const asides = [...harness.files.entries()].filter(([filePath]) => filePath.includes('.corrupt-'))
+
+    expect(asides.map(([, content]) => content)).toEqual(['{not json'])
+  })
+})
+
+describe('when two reads are the first to find a corrupt store', () => {
+  let responses: any[]
+
+  beforeEach(async () => {
+    const harness = captureRoutes({ initialStore: '{not json' })
+    responses = await Promise.all([
+      harness.call('GET /values/:key', { params: { key: 'k' } }),
+      harness.call('GET /values/:key', { params: { key: 'k' } })
+    ])
+  })
+
+  it('should answer both with 404 rather than failing the second', () => {
+    expect(responses.map((response) => response.status)).toEqual([404, 404])
+  })
+})
+
+describe('when the store file holds JSON that is not an object', () => {
+  let harness: ReturnType<typeof captureRoutes>
+  let read: any
+
+  beforeEach(async () => {
+    harness = captureRoutes({ initialStore: 'null' })
+    read = await harness.call('GET /values/:key', { params: { key: 'k' } })
+  })
+
+  it('should treat it as corrupt and answer 404', () => {
+    expect(read.status).toBe(404)
+  })
+
+  it('should set it aside so later requests work', async () => {
+    const response = await harness.call('PUT /values/:key', { params: { key: 'k' }, ...json(1) })
+
+    expect([response.status ?? 200, harness.savedStore()?.world]).toEqual([200, { k: 1 }])
+  })
+})
+
+describe('when the project .env file cannot be read', () => {
+  let response: any
+
+  beforeEach(async () => {
+    const harness = captureRoutes()
+    harness.files.set('/project/.env', 'API_URL=x')
+    harness.fs.readFile.mockImplementation(async (filePath: string) => {
+      if (filePath.endsWith('.env')) throw new Error('EIO')
+      return harness.files.get(filePath) ?? ''
+    })
+    response = await harness.call('GET /env/:key', { params: { key: 'API_URL' } })
+  })
+
+  it('should answer 500 rather than report the variable as missing', () => {
+    expect(response).toEqual({ status: 500, body: { message: "Failed to get environment variable 'API_URL'" } })
+  })
+})
+
+describe('when the project has a .env file', () => {
+  let harness: ReturnType<typeof captureRoutes>
+
+  beforeEach(() => {
+    harness = captureRoutes()
+    harness.files.set(
+      '/project/.env',
+      ['# comment', '', 'QUOTED="a b"', "SINGLE='c'", 'PLAIN = d ', 'SHARED=file'].join('\n')
+    )
+  })
+
+  it('should strip surrounding double quotes', async () => {
+    expect(await harness.call('GET /env/:key', { params: { key: 'QUOTED' } })).toEqual({
+      body: JSON.stringify({ value: 'a b' })
+    })
+  })
+
+  it('should strip surrounding single quotes', async () => {
+    expect(await harness.call('GET /env/:key', { params: { key: 'SINGLE' } })).toEqual({
+      body: JSON.stringify({ value: 'c' })
+    })
+  })
+
+  it('should trim the key and the value', async () => {
+    expect(await harness.call('GET /env/:key', { params: { key: 'PLAIN' } })).toEqual({
+      body: JSON.stringify({ value: 'd' })
+    })
+  })
+
+  it('should ignore comment lines', async () => {
+    expect((await harness.call('GET /env/:key', { params: { key: '# comment' } })).status).toBe(404)
+  })
+
+  describe('and a runtime value is set for a key the file also defines', () => {
+    beforeEach(async () => {
+      await harness.call('PUT /env/:key', { params: { key: 'SHARED' }, ...json('runtime') })
+    })
+
+    it('should serve the runtime value', async () => {
+      expect(await harness.call('GET /env/:key', { params: { key: 'SHARED' } })).toEqual({
+        body: JSON.stringify({ value: 'runtime' })
+      })
+    })
+  })
+})
+
 describe('when the store file holds buckets that are not objects', () => {
   let harness: ReturnType<typeof captureRoutes>
 
   beforeEach(() => {
-    harness = captureRoutes({ initialStore: JSON.stringify({ world: 5, players: { [ADDRESS]: 7 }, env: [] }) })
+    harness = captureRoutes({ initialStore: JSON.stringify({ world: [1, 2], players: { [ADDRESS]: null }, env: [] }) })
+  })
+
+  it('should answer 404 for a key of a player whose bucket is not an object', async () => {
+    const read = await harness.call('GET /players/:address/values/:key', { params: { address: ADDRESS, key: '0' } })
+
+    expect(read.status).toBe(404)
+  })
+
+  it('should write a scene value into a fresh bucket rather than the array', async () => {
+    await harness.call('PUT /values/:key', { params: { key: 'k' }, ...json(1) })
+
+    expect(harness.savedStore()?.world).toEqual({ k: 1 })
   })
 
   it('should list the scene keys as empty', async () => {
