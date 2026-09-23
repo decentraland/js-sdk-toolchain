@@ -118,19 +118,54 @@ const jsonSize = (value: unknown) => Buffer.byteLength(JSON.stringify(value), 'u
 
 let storeLock: Promise<unknown> = Promise.resolve()
 
+/** A lock file older than this is taken to belong to a preview process that died holding it. */
+const STALE_LOCK_MS = 10_000
+const LOCK_TIMEOUT_MS = 15_000
+const LOCK_RETRY_MS = 20
+
 /**
- * Serializes read-modify-write cycles against server-storage.json. The entire
- * load→mutate→save must run under one lock: two handlers that each load the same
- * snapshot would otherwise lose one update, and two concurrent saves would interleave
- * their writes into a corrupt file.
+ * Serializes read-modify-write cycles against server-storage.json. The store is shared by every
+ * preview process using this sdk-commands installation, so the lock is a file created exclusively
+ * next to the store, queued behind an in-process chain so this process asks for it once at a time.
  */
-function withStoreLock<T>(task: () => Promise<T>): Promise<T> {
-  const run = storeLock.then(task, task)
+function withStoreLock<T>(components: Pick<CliComponents, 'fs' | 'logger'>, task: () => Promise<T>): Promise<T> {
+  const locked = () => withLockFile(components, task)
+  const run = storeLock.then(locked, locked)
   storeLock = run.then(
     () => undefined,
     () => undefined
   )
   return run
+}
+
+async function withLockFile<T>(components: Pick<CliComponents, 'fs' | 'logger'>, task: () => Promise<T>): Promise<T> {
+  await ensureRuntimeDir(components)
+  const lockPath = `${storagePath()}.lock`
+  const deadline = Date.now() + LOCK_TIMEOUT_MS
+  for (;;) {
+    try {
+      await components.fs.writeFile(lockPath, String(process.pid), { flag: 'wx' })
+      break
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException)?.code !== 'EEXIST') throw error
+    }
+    try {
+      if (Date.now() - (await components.fs.stat(lockPath)).mtimeMs > STALE_LOCK_MS) {
+        components.logger.warn(`Removing a stale ${SERVER_STORAGE_FILE} lock`)
+        await components.fs.unlink(lockPath)
+        continue
+      }
+    } catch {
+      continue // released between the attempt and the check
+    }
+    if (Date.now() > deadline) throw new Error(`Timed out waiting for the ${SERVER_STORAGE_FILE} lock`)
+    await new Promise((resolve) => setTimeout(resolve, LOCK_RETRY_MS))
+  }
+  try {
+    return await task()
+  } finally {
+    await components.fs.unlink(lockPath).catch(() => undefined)
+  }
 }
 
 /**
@@ -190,7 +225,7 @@ async function loadStoreLocked(components: Pick<CliComponents, 'fs' | 'logger'>)
  * so a write never overwrites a store it could not read.
  */
 export async function loadServerStorage(components: Pick<CliComponents, 'fs' | 'logger'>): Promise<ServerStorage> {
-  return (await readStore(components)) ?? withStoreLock(() => loadStoreLocked(components))
+  return (await readStore(components)) ?? withStoreLock(components, () => loadStoreLocked(components))
 }
 
 /**
@@ -201,7 +236,8 @@ export async function saveServerStorage(
   data: ServerStorage
 ): Promise<void> {
   await ensureRuntimeDir(components)
-  const tmpPath = `${storagePath()}.tmp`
+  // Unique per process and write, so concurrent previews never rename each other's file.
+  const tmpPath = `${storagePath()}.${process.pid}.${Math.random().toString(36).slice(2, 10)}.tmp`
   await components.fs.writeFile(tmpPath, JSON.stringify(data, null, 2))
   await components.fs.rename(tmpPath, storagePath())
 }
@@ -278,7 +314,7 @@ export async function setEnvValue(
   key: string,
   value: string
 ): Promise<void> {
-  return withStoreLock(async () => {
+  return withStoreLock(components, async () => {
     const storage = await loadStoreLocked(components)
     assertWithinLimits(storage.env, key, value, STORAGE_LIMITS.env, byteSize)
     setOwn(storage.env, key, value)
@@ -291,7 +327,7 @@ export async function setEnvValue(
  * Returns true if key existed and was deleted, false otherwise.
  */
 export async function deleteEnvValue(components: Pick<CliComponents, 'fs' | 'logger'>, key: string): Promise<boolean> {
-  return withStoreLock(async () => {
+  return withStoreLock(components, async () => {
     const storage = await loadStoreLocked(components)
     if (!hasOwn(storage.env, key)) {
       return false
@@ -342,7 +378,7 @@ export async function setWorldValue(
   key: string,
   value: unknown
 ): Promise<void> {
-  return withStoreLock(async () => {
+  return withStoreLock(components, async () => {
     const storage = await loadStoreLocked(components)
     assertWithinLimits(storage.world, key, value, STORAGE_LIMITS.world, jsonSize)
     setOwn(storage.world, key, value)
@@ -358,7 +394,7 @@ export async function deleteWorldValue(
   components: Pick<CliComponents, 'fs' | 'logger'>,
   key: string
 ): Promise<boolean> {
-  return withStoreLock(async () => {
+  return withStoreLock(components, async () => {
     const storage = await loadStoreLocked(components)
     if (!hasOwn(storage.world, key)) {
       return false
@@ -391,7 +427,7 @@ export async function setPlayerValue(
   key: string,
   value: unknown
 ): Promise<void> {
-  return withStoreLock(async () => {
+  return withStoreLock(components, async () => {
     const storage = await loadStoreLocked(components)
     const lowercased = address.toLowerCase()
     let values = getOwn(storage.players, lowercased)
@@ -414,7 +450,7 @@ export async function deletePlayerValue(
   address: string,
   key: string
 ): Promise<boolean> {
-  return withStoreLock(async () => {
+  return withStoreLock(components, async () => {
     const storage = await loadStoreLocked(components)
     const values = getOwn(storage.players, address.toLowerCase())
     if (!values || !hasOwn(values, key)) {

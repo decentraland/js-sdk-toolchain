@@ -15,6 +15,7 @@ import {
  */
 function makeComponents(initialFile?: string) {
   const files = new Map<string, string>()
+  const mtimes = new Map<string, number>()
   let mainPath = ''
   const learn = (filePath: string) => {
     if (filePath.endsWith('.tmp')) return
@@ -29,8 +30,19 @@ function makeComponents(initialFile?: string) {
     readFile: jest.fn(async (filePath: string) => files.get(filePath) ?? ''),
     directoryExists: jest.fn(async () => true),
     mkdir: jest.fn(async () => undefined),
-    writeFile: jest.fn(async (filePath: string, content: string) => {
+    writeFile: jest.fn(async (filePath: string, content: string, options?: { flag?: string }) => {
+      if (options?.flag === 'wx' && files.has(filePath)) {
+        throw Object.assign(new Error(`EEXIST: file already exists, open '${filePath}'`), { code: 'EEXIST' })
+      }
       files.set(filePath, content)
+      mtimes.set(filePath, Date.now())
+    }),
+    stat: jest.fn(async (filePath: string) => {
+      if (!files.has(filePath)) throw Object.assign(new Error(`ENOENT: ${filePath}`), { code: 'ENOENT' })
+      return { mtimeMs: mtimes.get(filePath) ?? Date.now() }
+    }),
+    unlink: jest.fn(async (filePath: string) => {
+      if (!files.delete(filePath)) throw Object.assign(new Error(`ENOENT: ${filePath}`), { code: 'ENOENT' })
     }),
     rename: jest.fn(async (from: string, to: string) => {
       files.set(to, files.get(from)!)
@@ -76,8 +88,10 @@ describe('runtime-env atomic writes', () => {
 
     await setEnvValue(components, 'FOO', 'bar')
 
-    const writtenPath: string = fs.writeFile.mock.calls[0][0]
-    expect(writtenPath).toMatch(/server-storage\.json\..+/)
+    const writtenPath: string = fs.writeFile.mock.calls
+      .map((call: unknown[]) => call[0] as string)
+      .find((p: string) => p.endsWith('.tmp'))!
+    expect(writtenPath).toMatch(/server-storage\.json\..+\.tmp$/)
     expect(fs.rename).toHaveBeenCalledWith(writtenPath, expect.stringMatching(/server-storage\.json$/))
     expect(JSON.parse(readMain()!).env).toEqual({ FOO: 'bar' })
   })
@@ -94,5 +108,115 @@ describe('runtime-env default isolation', () => {
     const b = await loadServerStorage(components)
     expect(b.env).toEqual({})
     expect(b.players).toEqual({})
+  })
+})
+
+describe('when two preview processes share one store', () => {
+  let first: ReturnType<typeof makeComponents>
+  let second: ReturnType<typeof makeComponents>
+
+  beforeEach(() => {
+    first = makeComponents(JSON.stringify({ env: {}, world: {}, players: {} }))
+    second = makeComponents()
+  })
+
+  describe('and the other process holds the lock', () => {
+    let writing: Promise<void>
+    let settled: boolean
+
+    beforeEach(async () => {
+      await loadServerStorage(first.components) // learn the store path
+      const lockPath = `${first.fs.fileExists.mock.calls[0][0]}.lock`
+      await first.fs.writeFile(lockPath, '999999', { flag: 'wx' })
+      settled = false
+      writing = setWorldValue(first.components, 'k', 1).then(() => {
+        settled = true
+      })
+      await new Promise((resolve) => setTimeout(resolve, 60))
+    })
+
+    afterEach(async () => {
+      await first.fs.unlink(`${first.fs.fileExists.mock.calls[0][0]}.lock`).catch(() => undefined)
+      await writing.catch(() => undefined)
+    })
+
+    it('should wait for it instead of writing', () => {
+      expect(settled).toBe(false)
+    })
+
+    describe('and the lock is released', () => {
+      beforeEach(async () => {
+        const lockPath = `${first.fs.fileExists.mock.calls[0][0]}.lock`
+        await first.fs.unlink(lockPath)
+        await writing
+      })
+
+      it('should write once it gets the lock', () => {
+        expect(JSON.parse(first.readMain()!).world).toEqual({ k: 1 })
+      })
+
+      it('should release the lock afterwards', () => {
+        expect(first.fs.unlink).toHaveBeenLastCalledWith(expect.stringMatching(/server-storage\.json\.lock$/))
+      })
+    })
+  })
+
+  describe('and a stale lock was left behind by a process that died', () => {
+    beforeEach(async () => {
+      await loadServerStorage(first.components)
+      const lockPath = `${first.fs.fileExists.mock.calls[0][0]}.lock`
+      await first.fs.writeFile(lockPath, '999999', { flag: 'wx' })
+      const now = Date.now()
+      jest.spyOn(Date, 'now').mockReturnValue(now + 60_000)
+      await setWorldValue(first.components, 'k', 2)
+    })
+
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+
+    it('should take it over and write', () => {
+      expect(JSON.parse(first.readMain()!).world).toEqual({ k: 2 })
+    })
+  })
+
+  describe('and each process writes different keys concurrently', () => {
+    let readMain: () => string | undefined
+
+    beforeEach(async () => {
+      // Two copies of the module are two processes: each has its own in-process lock chain, and
+      // only the lock file on the shared store can keep them from clobbering each other.
+      const shared = makeComponents(JSON.stringify({ env: {}, world: {}, players: {} }))
+      readMain = shared.readMain
+      let processA!: typeof import('../../../../packages/@dcl/sdk-commands/src/commands/start/server/runtime-env')
+      let processB!: typeof import('../../../../packages/@dcl/sdk-commands/src/commands/start/server/runtime-env')
+      await jest.isolateModulesAsync(async () => {
+        processA = await import('../../../../packages/@dcl/sdk-commands/src/commands/start/server/runtime-env')
+      })
+      await jest.isolateModulesAsync(async () => {
+        processB = await import('../../../../packages/@dcl/sdk-commands/src/commands/start/server/runtime-env')
+      })
+      await Promise.all(
+        Array.from({ length: 10 }, (_, i) => (i % 2 ? processA : processB).setWorldValue(shared.components, `k${i}`, i))
+      )
+    })
+
+    it('should keep every acknowledged write', () => {
+      expect(Object.keys(JSON.parse(readMain()!).world).sort()).toEqual(
+        Array.from({ length: 10 }, (_, i) => `k${i}`).sort()
+      )
+    })
+  })
+
+  describe('and both save at once', () => {
+    beforeEach(async () => {
+      await Promise.all([setWorldValue(first.components, 'a', 1), setWorldValue(second.components, 'b', 2)])
+    })
+
+    it('should give each save its own temporary file', () => {
+      const tmp = (c: ReturnType<typeof makeComponents>) =>
+        c.fs.writeFile.mock.calls.map((call: unknown[]) => call[0] as string).filter((p: string) => p.endsWith('.tmp'))
+      expect(new Set([...tmp(first), ...tmp(second)]).size).toBe(2)
+    })
   })
 })

@@ -20,6 +20,7 @@ function captureRoutes(options: { initialStore?: string } = {}) {
   const router = { get: record('GET'), put: record('PUT'), delete: record('DELETE') }
 
   const files = new Map<string, string>()
+  const mtimes = new Map<string, number>()
   let storePath = ''
   let renameGate: Promise<void> | undefined
   const fs = {
@@ -33,8 +34,19 @@ function captureRoutes(options: { initialStore?: string } = {}) {
     readFile: jest.fn(async (filePath: string) => files.get(filePath) ?? ''),
     directoryExists: jest.fn(async () => true) as jest.Mock<Promise<boolean>, [string]>,
     mkdir: jest.fn(async () => undefined),
-    writeFile: jest.fn(async (filePath: string, content: string) => {
+    writeFile: jest.fn(async (filePath: string, content: string, options?: { flag?: string }) => {
+      if (options?.flag === 'wx' && files.has(filePath)) {
+        throw Object.assign(new Error(`EEXIST: file already exists, open '${filePath}'`), { code: 'EEXIST' })
+      }
       files.set(filePath, content)
+      mtimes.set(filePath, Date.now())
+    }),
+    stat: jest.fn(async (filePath: string) => {
+      if (!files.has(filePath)) throw Object.assign(new Error(`ENOENT: ${filePath}`), { code: 'ENOENT' })
+      return { mtimeMs: mtimes.get(filePath) ?? Date.now() }
+    }),
+    unlink: jest.fn(async (filePath: string) => {
+      if (!files.delete(filePath)) throw Object.assign(new Error(`ENOENT: ${filePath}`), { code: 'ENOENT' })
     }),
     rename: jest.fn(async (from: string, to: string) => {
       if (renameGate) await renameGate
@@ -64,6 +76,8 @@ function captureRoutes(options: { initialStore?: string } = {}) {
     fs,
     logger,
     files,
+    /** How many times the store was saved (a temporary file written, then renamed over it). */
+    saves: () => fs.writeFile.mock.calls.filter(([filePath]: [string]) => filePath.endsWith('.tmp')).length,
     /** The store as last saved, parsed. */
     savedStore() {
       const entry = [...files.entries()].find(([filePath]) => filePath.endsWith('server-storage.json'))
@@ -482,7 +496,7 @@ describe('when a storage key is deleted', () => {
     })
 
     it('should not rewrite the store for a no-op', () => {
-      expect(harness.fs.writeFile).not.toHaveBeenCalled()
+      expect(harness.saves()).toBe(0)
     })
   })
 
@@ -543,7 +557,7 @@ describe('when a storage key is deleted', () => {
     })
 
     it('should treat it as a missing key and not rewrite the store', () => {
-      expect(harness.fs.writeFile).not.toHaveBeenCalled()
+      expect(harness.saves()).toBe(0)
     })
   })
 
@@ -914,7 +928,7 @@ describe('when the store cannot be read', () => {
     })
 
     it('should not overwrite the store it could not read', () => {
-      expect(harness.fs.writeFile).toHaveBeenCalledTimes(1)
+      expect(harness.saves()).toBe(1)
     })
 
     it('should still hold the earlier value once reads work again', async () => {
@@ -1306,7 +1320,7 @@ describe('when a value exceeds its namespace size limit', () => {
     })
 
     it('should not store it', () => {
-      expect(harness.fs.writeFile).not.toHaveBeenCalled()
+      expect(harness.saves()).toBe(0)
     })
   })
 
@@ -1479,13 +1493,13 @@ describe('when a delete targets a key that does not exist', () => {
   it('should not rewrite the store for a missing environment variable', async () => {
     await harness.call('DELETE /env/:key', { params: { key: 'MISSING' } })
 
-    expect(harness.fs.writeFile).not.toHaveBeenCalled()
+    expect(harness.saves()).toBe(0)
   })
 
   it('should not rewrite the store for a missing key of an existing player', async () => {
     await harness.call('DELETE /players/:address/values/:key', { params: { address: ADDRESS, key: 'missing' } })
 
-    expect(harness.fs.writeFile).not.toHaveBeenCalled()
+    expect(harness.saves()).toBe(0)
   })
 })
 
