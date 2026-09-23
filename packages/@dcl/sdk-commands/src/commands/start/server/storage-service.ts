@@ -100,14 +100,19 @@ export function setupStorageEndpoints(
   router.get('/env/:key', withKeyValidation, async (ctx) => {
     const { key } = ctx.params
 
-    const envVars = await getMergedEnv(components, workspace.projects[0].workingDirectory)
-    const value = envVars.get(key)
+    try {
+      const envVars = await getMergedEnv(components, workspace.projects[0].workingDirectory)
+      const value = envVars.get(key)
 
-    if (value === undefined) {
-      return { status: 404, body: { message: `Environment variable '${key}' not found` } }
+      if (value === undefined) {
+        return { status: 404, body: { message: `Environment variable '${key}' not found` } }
+      }
+
+      return { body: JSON.stringify({ value }) }
+    } catch (error) {
+      components.logger.error(`Failed to get environment variable '${key}': ${error}`)
+      return { status: 500, body: { message: `Failed to get environment variable '${key}'` } }
     }
-
-    return { body: JSON.stringify({ value }) }
   })
 
   router.put('/env/:key', withKeyValidation, async (ctx) => {
@@ -139,22 +144,32 @@ export function setupStorageEndpoints(
 
   // Scene Storage list endpoint (GET /values, optional ?prefix=&limit=&offset=)
   router.get('/values', async (ctx) => {
-    const world = await getWorldStorage(components)
-    return listPage(
-      Object.entries(world).map(([key, value]) => ({ key, value })),
-      ctx.url.searchParams
-    )
+    try {
+      const world = await getWorldStorage(components)
+      return listPage(
+        Object.entries(world).map(([key, value]) => ({ key, value })),
+        ctx.url.searchParams
+      )
+    } catch (error) {
+      components.logger.error(`Failed to list storage values: ${error}`)
+      return { status: 500, body: { message: 'Failed to list storage values' } }
+    }
   })
 
   // Scene Storage endpoints (/values/:key)
   router.get('/values/:key', withKeyValidation, async (ctx) => {
     const { key } = ctx.params
 
-    const value = await getWorldValue(components, key)
-    if (value === undefined) {
-      return { status: 404, body: { message: `Storage key '${key}' not found` } }
+    try {
+      const value = await getWorldValue(components, key)
+      if (value === undefined) {
+        return { status: 404, body: { message: `Storage key '${key}' not found` } }
+      }
+      return { body: JSON.stringify({ value }) }
+    } catch (error) {
+      components.logger.error(`Failed to get storage value '${key}': ${error}`)
+      return { status: 500, body: { message: `Failed to get storage value '${key}'` } }
     }
-    return { body: JSON.stringify({ value }) }
   })
 
   router.put('/values/:key', withKeyValidation, async (ctx) => {
@@ -186,24 +201,36 @@ export function setupStorageEndpoints(
 
   // Player Storage list endpoint (GET /players/:address/values, optional ?prefix=&limit=&offset=)
   router.get('/players/:address/values', withAddressValidation, async (ctx) => {
-    const playerData = await getPlayerStorage(components, ctx.params.address)
-    return listPage(
-      Object.entries(playerData).map(([key, value]) => ({ key, value })),
-      ctx.url.searchParams
-    )
+    const { address } = ctx.params
+
+    try {
+      const playerData = await getPlayerStorage(components, address)
+      return listPage(
+        Object.entries(playerData).map(([key, value]) => ({ key, value })),
+        ctx.url.searchParams
+      )
+    } catch (error) {
+      components.logger.error(`Failed to list player storage values for '${address}': ${error}`)
+      return { status: 500, body: { message: `Failed to list player storage values for '${address}'` } }
+    }
   })
 
   // Player Storage endpoints (/players/:address/values/:key)
   router.get('/players/:address/values/:key', withAddressValidation, withKeyValidation, async (ctx) => {
     const { address, key } = ctx.params
 
-    const value = await getPlayerValue(components, address, key)
+    try {
+      const value = await getPlayerValue(components, address, key)
 
-    if (value === undefined) {
-      return { status: 404, body: { message: `Player storage key '${key}' not found for '${address}'` } }
+      if (value === undefined) {
+        return { status: 404, body: { message: `Player storage key '${key}' not found for '${address}'` } }
+      }
+
+      return { body: JSON.stringify({ value }) }
+    } catch (error) {
+      components.logger.error(`Failed to get player storage value '${key}' for '${address}': ${error}`)
+      return { status: 500, body: { message: `Failed to get player storage value '${key}' for '${address}'` } }
     }
-
-    return { body: JSON.stringify({ value }) }
   })
 
   router.put('/players/:address/values/:key', withAddressValidation, withKeyValidation, async (ctx) => {

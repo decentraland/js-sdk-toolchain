@@ -84,35 +84,29 @@ async function ensureRuntimeDir(components: Pick<CliComponents, 'fs' | 'logger'>
 export async function loadServerStorage(components: Pick<CliComponents, 'fs' | 'logger'>): Promise<ServerStorage> {
   const storagePath = path.join(RUNTIME_DATA_DIR, SERVER_STORAGE_FILE)
 
-  try {
-    const exists = await components.fs.fileExists(storagePath)
-    if (!exists) {
-      return createDefaultStorage()
-    }
-
-    const content = await components.fs.readFile(storagePath, 'utf-8')
-    let parsed: Partial<ServerStorage>
-    try {
-      parsed = JSON.parse(content)
-    } catch (error) {
-      // Starting over would let the next write erase the file; keep it for recovery.
-      const asidePath = `${storagePath}.corrupt-${Date.now()}`
-      components.logger.error(`${SERVER_STORAGE_FILE} is not valid JSON (${error}); moved to ${asidePath}`)
-      await components.fs.rename(storagePath, asidePath)
-      return createDefaultStorage()
-    }
-
-    const players = bucket<unknown>(parsed.players)
-    return {
-      env: bucket<string>(parsed.env),
-      world: bucket<unknown>(parsed.world),
-      players: Object.fromEntries(
-        Object.entries(players).map(([address, values]) => [address, bucket<unknown>(values)])
-      )
-    }
-  } catch (error) {
-    components.logger.error(`Failed to load ${SERVER_STORAGE_FILE}: ${error}`)
+  // Only a confirmed missing file is an empty store. Any other failure propagates, so the
+  // route answers 500 and no write can overwrite a store that could not be read.
+  if (!(await components.fs.fileExists(storagePath))) {
     return createDefaultStorage()
+  }
+
+  const content = await components.fs.readFile(storagePath, 'utf-8')
+  let parsed: Partial<ServerStorage>
+  try {
+    parsed = JSON.parse(content)
+  } catch (error) {
+    // Starting over would let the next write erase the file; keep it for recovery.
+    const asidePath = `${storagePath}.corrupt-${Date.now()}`
+    components.logger.error(`${SERVER_STORAGE_FILE} is not valid JSON (${error}); moving it to ${asidePath}`)
+    await components.fs.rename(storagePath, asidePath)
+    return createDefaultStorage()
+  }
+
+  const players = bucket<unknown>(parsed.players)
+  return {
+    env: bucket<string>(parsed.env),
+    world: bucket<unknown>(parsed.world),
+    players: Object.fromEntries(Object.entries(players).map(([address, values]) => [address, bucket<unknown>(values)]))
   }
 }
 

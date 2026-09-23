@@ -841,6 +841,96 @@ describe('when persisting the store fails', () => {
   })
 })
 
+describe('when the store cannot be read', () => {
+  let harness: ReturnType<typeof captureRoutes>
+
+  beforeEach(async () => {
+    harness = captureRoutes()
+    await harness.call('PUT /values/:key', { params: { key: 'keep' }, ...json(1) })
+  })
+
+  describe('and a scene value is requested', () => {
+    let response: any
+
+    beforeEach(async () => {
+      harness.fs.readFile.mockRejectedValueOnce(new Error('EIO'))
+      response = await harness.call('GET /values/:key', { params: { key: 'keep' } })
+    })
+
+    it('should answer 500 rather than report the key as missing', () => {
+      expect(response).toEqual({ status: 500, body: { message: "Failed to get storage value 'keep'" } })
+    })
+
+    it('should log the failure', () => {
+      expect(harness.logger.error).toHaveBeenCalledWith(expect.stringContaining('EIO'))
+    })
+  })
+
+  describe('and the scene keys are listed', () => {
+    let response: any
+
+    beforeEach(async () => {
+      harness.fs.readFile.mockRejectedValueOnce(new Error('EIO'))
+      response = await harness.call('GET /values', listing('/values'))
+    })
+
+    it('should answer 500 rather than an empty page', () => {
+      expect(response.status).toBe(500)
+    })
+  })
+
+  describe('and a player value is requested', () => {
+    let response: any
+
+    beforeEach(async () => {
+      harness.fs.fileExists.mockRejectedValueOnce(new Error('EACCES'))
+      response = await harness.call('GET /players/:address/values/:key', { params: { address: ADDRESS, key: 'seeds' } })
+    })
+
+    it('should answer 500 when even the existence check fails', () => {
+      expect(response.status).toBe(500)
+    })
+  })
+
+  describe('and a write follows the failed read', () => {
+    let response: any
+
+    beforeEach(async () => {
+      harness.fs.readFile.mockRejectedValueOnce(new Error('EIO'))
+      response = await harness.call('PUT /values/:key', { params: { key: 'other' }, ...json(2) })
+    })
+
+    it('should answer 500', () => {
+      expect(response.status).toBe(500)
+    })
+
+    it('should not overwrite the store it could not read', () => {
+      expect(harness.fs.writeFile).toHaveBeenCalledTimes(1)
+    })
+
+    it('should still hold the earlier value once reads work again', async () => {
+      const read = await harness.call('GET /values/:key', { params: { key: 'keep' } })
+
+      expect(read).toEqual({ body: JSON.stringify({ value: 1 }) })
+    })
+  })
+})
+
+describe('when the store file is corrupt and cannot be moved aside', () => {
+  let harness: ReturnType<typeof captureRoutes>
+  let response: any
+
+  beforeEach(async () => {
+    harness = captureRoutes({ initialStore: '{not json' })
+    harness.fs.rename.mockRejectedValueOnce(new Error('EPERM'))
+    response = await harness.call('GET /values/:key', { params: { key: 'keep' } })
+  })
+
+  it('should answer 500 rather than treat the store as empty', () => {
+    expect(response.status).toBe(500)
+  })
+})
+
 describe('when the store file on disk is corrupt', () => {
   let harness: ReturnType<typeof captureRoutes>
   let read: any
