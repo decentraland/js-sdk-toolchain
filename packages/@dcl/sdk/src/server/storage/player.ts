@@ -10,6 +10,7 @@ import {
   StorageConfigState
 } from './constants'
 import { createValueCache } from './value-cache'
+import { serializeStorageValue } from './serialize'
 import { createWriteQueue, SupersededWriteFailed } from './write-queue'
 
 /**
@@ -42,9 +43,12 @@ export interface IPlayerStorage {
    * @param key - The key to store the value under
    * @param value - The value to store (will be JSON serialized)
    * @param options - Optional { skipIfUnchanged } to skip the network write when the value is already stored
-   * @returns A promise that resolves to true if successful, false otherwise
-   * @throws TypeError if the value cannot be JSON-serialized (undefined, a function,
-   * a symbol, a circular reference); those cannot round-trip through the service
+   * @returns A promise that resolves to true once the value is stored, or once a
+   * newer write to the same key, issued before this one was sent, took its place
+   * and landed (rapid writes coalesce). false when the write failed.
+   * @throws TypeError if the value is undefined, a function or a symbol, contains a
+   * function or a symbol at any depth, or is circular. Undefined properties inside
+   * the value are dropped, as JSON.stringify does.
    */
   set<T = unknown>(address: string, key: string, value: T, options?: SetOptions): Promise<boolean>
 
@@ -52,9 +56,11 @@ export interface IPlayerStorage {
    * Deletes a value from a player's storage in the Server Side Storage service.
    * @param address - The player's wallet address
    * @param key - The key to delete
-   * @returns A promise that resolves to true once the delete is applied, or
-   * false only when the service confirmed the key was already absent (404).
-   * The delete is idempotent, so true is the usual answer for a missing key.
+   * @returns A promise that resolves to true once the delete is applied, or once a
+   * newer write to the key, issued before this one was sent, took its place and
+   * landed (rapid writes coalesce). false only when the service confirmed the key
+   * was already absent (404); the delete is idempotent, so true is the usual
+   * answer for a missing key.
    * @throws Error if the delete fails, so a failure is never reported as an absence
    */
   delete(address: string, key: string): Promise<boolean>
@@ -175,8 +181,7 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
 
       const ck = cacheKey(address, key)
 
-      // A write issued before this read lands first, so the read reflects it: from the
-      // cache that write fills, or from the server once it has applied the write.
+      // Writes issued before this read land first, so the read reflects them.
       if (writes.isPending(ck)) await writes.settled(ck)
 
       if (config.cacheReads && !options?.fresh) {
@@ -235,13 +240,7 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       assertIsServer(MODULE_NAME)
 
       const ck = cacheKey(address, key)
-      const body = JSON.stringify({ value })
-      // undefined, functions and symbols serialize to "{}", which cannot round-trip.
-      if (body === '{}') {
-        throw new TypeError(
-          `Storage.player.set('${address}', '${key}'): value must be JSON-serializable. Use delete() to remove a key.`
-        )
-      }
+      const body = serializeStorageValue(value, `Storage.player.set('${address}', '${key}')`)
       const skipIfUnchanged = options?.skipIfUnchanged ?? config.skipIfUnchanged
 
       // Dedup against confirmed state only while no write is pending — a
@@ -321,6 +320,10 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
         console.error(`Failed to get player storage values for '${address}': response carried no data array`)
         throw new Error(`Failed to get player storage values for '${address}': response carried no data array`)
       }
+      if (data.some((entry) => typeof entry?.key !== 'string' || entry.value === undefined)) {
+        console.error(`Failed to get player storage values for '${address}': response carried a malformed entry`)
+        throw new Error(`Failed to get player storage values for '${address}': response carried a malformed entry`)
+      }
 
       // Seed the per-key cache so subsequent get()/set() on returned keys can
       // skip the network. Only keys with no live entry and no pending write
@@ -330,7 +333,6 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       // make it non-authoritative). A page larger than cacheMaxEntries churns
       // the cache; entries repopulate lazily.
       for (const entry of data) {
-        if (typeof entry?.key !== 'string' || entry.value === undefined) continue
         const ck = cacheKey(address, entry.key)
         // A key mutated while the page was in flight must not be re-seeded from the snapshot.
         if (watcher.mutated(ck) || writes.isPending(ck) || inflightGets.has(ck)) continue

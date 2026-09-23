@@ -10,6 +10,7 @@ import {
   StorageConfigState
 } from './constants'
 import { createValueCache } from './value-cache'
+import { serializeStorageValue } from './serialize'
 import { createWriteQueue, SupersededWriteFailed } from './write-queue'
 
 /**
@@ -40,17 +41,23 @@ export interface ISceneStorage {
    * @param key - The key to store the value under
    * @param value - The value to store (will be JSON serialized)
    * @param options - Optional { skipIfUnchanged } to skip the network write when the value is already stored
-   * @throws TypeError if the value cannot be JSON-serialized (undefined, a function,
-   * a symbol, a circular reference); those cannot round-trip through the service
+   * @returns A promise that resolves to true once the value is stored, or once a
+   * newer write to the same key, issued before this one was sent, took its place
+   * and landed (rapid writes coalesce). false when the write failed.
+   * @throws TypeError if the value is undefined, a function or a symbol, contains a
+   * function or a symbol at any depth, or is circular. Undefined properties inside
+   * the value are dropped, as JSON.stringify does.
    */
   set<T = unknown>(key: string, value: T, options?: SetOptions): Promise<boolean>
 
   /**
    * Deletes a value from scene storage in the Server Side Storage service.
    * @param key - The key to delete
-   * @returns A promise that resolves to true once the delete is applied, or
-   * false only when the service confirmed the key was already absent (404).
-   * The delete is idempotent, so true is the usual answer for a missing key.
+   * @returns A promise that resolves to true once the delete is applied, or once a
+   * newer write to the key, issued before this one was sent, took its place and
+   * landed (rapid writes coalesce). false only when the service confirmed the key
+   * was already absent (404); the delete is idempotent, so true is the usual
+   * answer for a missing key.
    * @throws Error if the delete fails, so a failure is never reported as an absence
    */
   delete(key: string): Promise<boolean>
@@ -162,8 +169,7 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
     async get<T = unknown>(key: string, options?: GetOptions): Promise<T | null> {
       assertIsServer(MODULE_NAME)
 
-      // A write issued before this read lands first, so the read reflects it: from the
-      // cache that write fills, or from the server once it has applied the write.
+      // Writes issued before this read land first, so the read reflects them.
       if (writes.isPending(key)) await writes.settled(key)
 
       if (config.cacheReads && !options?.fresh) {
@@ -221,11 +227,7 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
     async set<T = unknown>(key: string, value: T, options?: SetOptions): Promise<boolean> {
       assertIsServer(MODULE_NAME)
 
-      const body = JSON.stringify({ value })
-      // undefined, functions and symbols serialize to "{}", which cannot round-trip.
-      if (body === '{}') {
-        throw new TypeError(`Storage.set('${key}'): value must be JSON-serializable. Use delete() to remove a key.`)
-      }
+      const body = serializeStorageValue(value, `Storage.set('${key}')`)
       const skipIfUnchanged = options?.skipIfUnchanged ?? config.skipIfUnchanged
 
       // Dedup against confirmed state only while no write is pending — a
@@ -301,6 +303,10 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
         console.error('Failed to get storage values: response carried no data array')
         throw new Error('Failed to get storage values: response carried no data array')
       }
+      if (data.some((entry) => typeof entry?.key !== 'string' || entry.value === undefined)) {
+        console.error('Failed to get storage values: response carried a malformed entry')
+        throw new Error('Failed to get storage values: response carried a malformed entry')
+      }
 
       // Seed the per-key cache so subsequent get()/set() on returned keys can
       // skip the network. Only keys with no live entry and no pending write
@@ -310,7 +316,6 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
       // make it non-authoritative). A page larger than cacheMaxEntries churns
       // the cache; entries repopulate lazily.
       for (const entry of data) {
-        if (typeof entry?.key !== 'string' || entry.value === undefined) continue
         // A key mutated while the page was in flight must not be re-seeded from the snapshot.
         if (watcher.mutated(entry.key) || writes.isPending(entry.key) || inflightGets.has(entry.key)) continue
         if (cache.get(entry.key) === undefined) {

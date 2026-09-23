@@ -27,6 +27,15 @@ describe('player storage', () => {
   })
 
   describe('getValues', () => {
+    it('should reject a page that carries an entry without a string key or without a value', async () => {
+      const playerStorage = createPlayerStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { data: [{ key: 'good', value: 1 }, { key: 'novalue' }] }])
+
+      await expect(playerStorage.getValues(address)).rejects.toThrow(
+        `Failed to get player storage values for '${address}': response carried a malformed entry`
+      )
+    })
+
     it('should not re-seed a key that a failed write invalidated while the page was in flight', async () => {
       const playerStorage = createPlayerStorage()
       mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'v1' }, 200])
@@ -208,6 +217,15 @@ describe('player storage', () => {
   })
 
   describe('set value serialization', () => {
+    it('should reject a nested function rather than persist the value without it', async () => {
+      const playerStorage = createPlayerStorage()
+
+      await expect(playerStorage.set(address, 'key', { callback: () => 1 })).rejects.toThrow(
+        `Storage.player.set('${address}', 'key'): value must be JSON-serializable, but "callback" is a function. Use delete() to remove a key.`
+      )
+      expect(mockWrapSignedFetch).not.toHaveBeenCalled()
+    })
+
     it('should reject undefined rather than send a payload the service refuses', async () => {
       const playerStorage = createPlayerStorage()
 

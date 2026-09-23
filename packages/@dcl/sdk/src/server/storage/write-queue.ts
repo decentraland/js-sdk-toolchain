@@ -58,8 +58,7 @@ export interface WriteQueue {
   settled(key: string): Promise<void>
   /**
    * Issues a write. If one is in flight, the new op is queued — replacing any
-   * already-queued op, which never runs and settles from this op's outcome
-   * under its own contract (see settleSuperseded). An op identical to the
+   * already-queued op, which coalesces into this one (see settleSuperseded). An op identical to the
    * queued one joins it; `joinActive` additionally allows joining an
    * identical in-flight op (only valid for dedup-tolerant callers, since that
    * op was issued before this call).
@@ -92,12 +91,10 @@ export function createWriteQueue(): WriteQueue {
   }
 
   /**
-   * A superseded op never reaches the network, so it settles from the op that
-   * replaced it. "Applied" means the chain left the key in its issued state: a
-   * PUT that returned true, or a DELETE that resolved (a 404 still leaves the
-   * key absent). Each op reports that under its own contract: a set resolves
-   * the boolean and never rejects; a delete resolves true when applied and
-   * rejects otherwise. Chains compose, because the mapping preserves "applied".
+   * A superseded op never reaches the network: it coalesces into the op that
+   * replaced it and resolves true when that op lands, so rapid writes to one key
+   * report one outcome instead of spurious failures. Only a failure is reported in
+   * the superseded op's own terms: a set resolves false, a delete rejects.
    */
   function settleSuperseded(superseded: PendingOp, by: PendingOp): void {
     by.promise.then(
@@ -150,8 +147,7 @@ export function createWriteQueue(): WriteQueue {
       if (!state) return
       const queued = state.queued
       await state.active.promise.catch(() => undefined)
-      // The queued op is awaited only if it actually started; a newer write that
-      // superseded it is a different op, issued after this call.
+      // A superseded queued op never starts; its replacement was issued after this call.
       const next = keys.get(key)
       if (next && queued && next.active === queued) await next.active.promise.catch(() => undefined)
     },

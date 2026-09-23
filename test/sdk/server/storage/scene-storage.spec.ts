@@ -117,20 +117,34 @@ describe('scene storage', () => {
       )
     })
 
-    it('should skip entries that carry no usable key or value and still seed the rest of the page', async () => {
+    it('should reject a page that carries an entry without a string key', async () => {
       const storage = createSceneStorage()
       mockWrapSignedFetch.mockResolvedValueOnce([
         null,
-        { data: [null, { value: 'orphan' }, { key: 'novalue' }, { key: 'good', value: 1 }] }
+        { data: [{ key: 'good', value: 1 }, { value: 'orphan' }, null] }
       ])
 
-      await storage.getValues()
+      await expect(storage.getValues()).rejects.toThrow(
+        'Failed to get storage values: response carried a malformed entry'
+      )
+    })
 
-      // 'good' was seeded and is served locally; 'novalue' was not and reads from the network.
+    it('should reject a page that carries an entry without a value, seeding none of it', async () => {
+      const storage = createSceneStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { data: [{ key: 'good', value: 1 }, { key: 'novalue' }] }])
+
+      await expect(storage.getValues()).rejects.toThrow('response carried a malformed entry')
+
+      // Validation runs before seeding, so 'good' was not cached either.
       mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'network' }, 200])
-      expect(await storage.get('good')).toBe(1)
-      expect(await storage.get('novalue')).toBe('network')
-      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+      expect(await storage.get('good')).toBe('network')
+    })
+
+    it('should accept a stored null as an entry value', async () => {
+      const storage = createSceneStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { data: [{ key: 'k', value: null }] }])
+
+      expect((await storage.getValues()).data).toEqual([{ key: 'k', value: null }])
     })
 
     it('should reject a successful response whose data is not a list', async () => {
@@ -556,6 +570,31 @@ describe('scene storage', () => {
   })
 
   describe('set value serialization', () => {
+    it('should reject a nested function rather than persist the value without it', async () => {
+      const storage = createSceneStorage()
+
+      await expect(storage.set('key', { callback: () => 1 })).rejects.toThrow(
+        `Storage.set('key'): value must be JSON-serializable, but "callback" is a function. Use delete() to remove a key.`
+      )
+      expect(mockWrapSignedFetch).not.toHaveBeenCalled()
+    })
+
+    it('should reject a nested symbol, naming where it sits', async () => {
+      const storage = createSceneStorage()
+
+      await expect(storage.set('key', { items: [1, Symbol('x')] })).rejects.toThrow('"1" is a symbol')
+    })
+
+    it('should drop an undefined property, as JSON does, rather than reject the value', async () => {
+      const storage = createSceneStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+
+      expect(await storage.set('key', { kept: 1, dropped: undefined })).toBe(true)
+      expect(mockWrapSignedFetch).toHaveBeenCalledWith(
+        expect.objectContaining({ init: expect.objectContaining({ body: '{"value":{"kept":1}}' }) })
+      )
+    })
+
     it('should reject undefined rather than send a payload the service refuses', async () => {
       const storage = createSceneStorage()
 
