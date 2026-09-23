@@ -45,8 +45,8 @@ export interface IPlayerStorage {
    * @param options - Optional { skipIfUnchanged } to skip the network write when the value is already stored
    * @returns true once stored, or once a newer write that replaced this one lands
    * (rapid writes coalesce); false if the write, or its replacement, fails
-   * @throws TypeError if the value is or contains a function or a symbol, is
-   * undefined, or is circular; anything else is serialized as JSON.stringify does
+   * @throws TypeError if the value is undefined or circular, or is or contains a function, a
+   * symbol, a non-finite number, a Map or a Set; anything else is serialized as JSON.stringify does
    */
   set<T = unknown>(address: string, key: string, value: T, options?: SetOptions): Promise<boolean>
 

@@ -671,6 +671,28 @@ describe('scene storage', () => {
   })
 
   describe('set value serialization', () => {
+    it.each([
+      ['NaN', NaN, 'the value is the non-finite number NaN'],
+      ['Infinity', Infinity, 'the value is the non-finite number Infinity'],
+      ['a nested -Infinity', { score: -Infinity }, '"score" is the non-finite number -Infinity'],
+      ['a Map', new Map([['a', 1]]), 'the value is a Map'],
+      ['a nested Set', { tags: new Set(['a']) }, '"tags" is a Set']
+    ])('should reject %s rather than store it changed', async (_label, value, reason) => {
+      const storage = createSceneStorage()
+
+      await expect(storage.set('key', value)).rejects.toThrow(
+        `Storage.set('key'): value must be JSON-serializable, but ${reason}`
+      )
+    })
+
+    it('should send nothing for a value it rejects', async () => {
+      const storage = createSceneStorage()
+
+      await storage.set('key', { hp: NaN }).catch(() => undefined)
+
+      expect(mockWrapSignedFetch).not.toHaveBeenCalled()
+    })
+
     it('should reject a nested function rather than persist the value without it', async () => {
       const storage = createSceneStorage()
 

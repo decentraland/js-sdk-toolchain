@@ -253,6 +253,19 @@ describe('player storage', () => {
   })
 
   describe('set value serialization', () => {
+    it.each([
+      ['NaN', NaN, 'the value is the non-finite number NaN'],
+      ['a nested Infinity', { score: Infinity }, '"score" is the non-finite number Infinity'],
+      ['a Set', new Set([1]), 'the value is a Set']
+    ])('should reject %s rather than store it changed', async (_label, value, reason) => {
+      const playerStorage = createPlayerStorage()
+
+      await expect(playerStorage.set(address, 'key', value)).rejects.toThrow(
+        `Storage.player.set('${address}', 'key'): value must be JSON-serializable, but ${reason}`
+      )
+      expect(mockWrapSignedFetch).not.toHaveBeenCalled()
+    })
+
     it('should reject a nested function rather than persist the value without it', async () => {
       const playerStorage = createPlayerStorage()
 
