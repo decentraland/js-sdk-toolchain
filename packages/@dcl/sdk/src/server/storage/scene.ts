@@ -27,11 +27,8 @@ export interface ISceneStorage {
    * "not found" results. Concurrent gets for the same key share one request.
    * Out-of-band writers (e.g. CLI storage commands) may not be visible for up to
    * cacheMaxAgeMs — pass { fresh: true } to force a network read.
-   * A read issued while a write to the same key is in flight first waits for the
-   * writes pending at that moment (the in-flight one and one queued behind it, or
-   * the write that replaced the queued one), so it never answers with a value older
-   * than one the caller wrote before the read. Writes issued after the read are
-   * not awaited beyond that.
+   * A read first waits for writes to the same key that were pending when it was
+   * issued, so it reflects every write issued before it.
    * @param key - The key to retrieve
    * @param options - Optional { fresh } to bypass the read cache
    * @returns A promise that resolves to the parsed JSON value, or null if not found
@@ -44,26 +41,19 @@ export interface ISceneStorage {
    * @param key - The key to store the value under
    * @param value - The value to store (will be JSON serialized)
    * @param options - Optional { skipIfUnchanged } to skip the network write when the value is already stored
-   * @returns A promise that resolves to true once the value is stored, or once a
-   * newer write to the same key, issued before this one was sent, took its place
-   * and landed (rapid writes coalesce). false when the write, or the write that
-   * took its place, failed.
-   * @throws TypeError if the value is undefined, a function or a symbol, contains a
-   * function or a symbol value at any depth, or is circular. Everything else follows
-   * JSON.stringify: undefined properties are dropped in objects and become null in
-   * arrays, symbol keys are dropped, Map, Set and non-finite numbers become {} and null.
+   * @returns true once stored, or once a newer write that replaced this one lands
+   * (rapid writes coalesce); false if the write, or its replacement, fails
+   * @throws TypeError if the value is or contains a function or a symbol, is
+   * undefined, or is circular; anything else is serialized as JSON.stringify does
    */
   set<T = unknown>(key: string, value: T, options?: SetOptions): Promise<boolean>
 
   /**
    * Deletes a value from scene storage in the Server Side Storage service.
    * @param key - The key to delete
-   * @returns A promise that resolves to true once the delete is applied, or once a
-   * newer write to the key, issued before this one was sent, took its place and
-   * landed (rapid writes coalesce). false only when the service confirmed the key
-   * was already absent (404).
-   * @throws Error if the delete fails, or a write that replaced it before it was sent failed, so a
-   * failure is never reported as an absence
+   * @returns true once applied, or once a newer write that replaced it lands;
+   * false only for a confirmed 404
+   * @throws Error if the delete, or its replacement, fails; a failure is never reported as absence
    */
   delete(key: string): Promise<boolean>
 
