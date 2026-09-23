@@ -1,0 +1,129 @@
+name: Merge sync PR into auth-server
+
+# Squashing the sync PR would drop main's commits and freeze the merge base, and squash
+# is still offered in the PR's merge dropdown. This lands the PR as a real merge commit
+# instead, which is also the only write auth-server's branch protection accepts.
+on:
+  workflow_dispatch:
+
+# Shared with sync-main-to-auth-server.yml: see the note there.
+concurrency:
+  group: chore-sync-branch
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  # Dispatching CI on auth-server once the merge lands; see the Publish step.
+  actions: write
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Merge chore/sync into auth-server
+        id: merge
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          git fetch --no-tags --force --prune origin
+
+          if ! git rev-parse --verify --quiet refs/remotes/origin/chore/sync >/dev/null; then
+            echo "::error::chore/sync does not exist on the remote; there is no sync to land."
+            exit 1
+          fi
+
+          if git merge-base --is-ancestor origin/chore/sync origin/auth-server; then
+            echo "auth-server already contains chore/sync; nothing to merge."
+            # It is fully merged, so a leftover branch is only a failed cleanup.
+            git push origin --delete chore/sync || true
+            # This path cleans up but publishes nothing, so say so: it is also where a
+            # re-run lands after a run whose merge succeeded and whose dispatch failed.
+            echo "::warning::Nothing was merged, so CI was not dispatched. If a previous run merged but failed to publish, run the CI workflow against auth-server yourself."
+            exit 0
+          fi
+
+          PR_NUMBER="$(gh pr list --base auth-server --head chore/sync --state open --json number --jq '.[0].number // empty')"
+
+          # The merge goes through the PR itself: auth-server only accepts writes that
+          # arrive as a pull-request merge, so without one there is nothing to land. The
+          # sync workflow opens it; a missing PR means that workflow has not run, or its
+          # PR was closed by hand.
+          if [ -z "$PR_NUMBER" ]; then
+            echo "::error::No open PR from chore/sync into auth-server. Run the 'Sync main to auth-server' workflow first, or reopen the PR it created."
+            exit 1
+          fi
+
+          # The sync PR is opened as a draft so nobody squashes it from the UI, and a
+          # draft cannot be merged at all. Take it out of draft first.
+          gh pr ready "$PR_NUMBER" \
+            || echo "::warning::Could not mark PR #$PR_NUMBER ready; the merge below will refuse it as a draft."
+
+          # --merge, never --squash: squashing replaces main's commits with a single new
+          # one and freezes the merge base. GitHub authors the merge server-side, so it
+          # comes out signed if auth-server ever starts requiring signatures.
+          if MERGE_OUT="$(gh pr merge "$PR_NUMBER" --merge --delete-branch \
+                            --subject "chore: sync main to auth-server (#$PR_NUMBER)" 2>&1)"; then
+            echo "Merged PR #$PR_NUMBER into auth-server."
+          else
+            echo "$MERGE_OUT"
+            case "$MERGE_OUT" in
+              *"approving review"*|*"review is required"*)
+                echo "::error::PR #$PR_NUMBER has no approving review and auth-server requires one. Approve the sync PR, then re-run this workflow."
+                exit 1
+                ;;
+              *"not mergeable"*|*"Merge conflict"*|*"merge conflict"*)
+                echo "::error::chore/sync does not merge cleanly into auth-server. Resolve it on chore/sync, push, and re-run this workflow."
+                exit 1
+                ;;
+              *)
+                echo "::error::Merging PR #$PR_NUMBER was refused. Merging through the PR needs 'Allow merge commits' enabled on the repository, and the github-actions bot needs write access to auth-server. Otherwise land it by hand from an account that bypasses protection: git checkout auth-server && git merge --no-ff origin/chore/sync && git push origin auth-server (add -S if the branch requires signed commits), then re-run this workflow to publish and clean up."
+                exit 1
+                ;;
+            esac
+          fi
+
+          # Signals the Publish step below. The no-op and merge-failure paths never
+          # reach here, so neither dispatches a pointless build.
+          echo "merged=true" >> "$GITHUB_OUTPUT"
+
+      # The merge above is written with GITHUB_TOKEN, and GitHub does not start
+      # workflows from events that token creates. So the CI run that publishes the
+      # @auth-server npm tag never fires on its own — auth-server silently keeps
+      # serving whatever the last human-pushed merge published.
+      # A separate step rather than a line in the merge script: that script exits 0
+      # on the "PR did not register as merged" path, which must still publish.
+      - name: Publish auth-server
+        if: steps.merge.outputs.merged == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          # GitHub reads the workflow_dispatch trigger from the target ref, and the
+          # merge above may be the push that first puts it on auth-server. Retry
+          # while GitHub indexes the ref, rather than failing the whole sync on a race.
+          for attempt in $(seq 1 5); do
+            if gh workflow run ci.yml --ref auth-server; then
+              echo "Dispatched CI against auth-server; its build job republishes the @auth-server npm tag."
+              exit 0
+            fi
+            echo "Dispatch attempt $attempt failed; retrying."
+            sleep 5
+          done
+
+          echo "::error::auth-server was merged, but starting CI failed, so the @auth-server npm tag is now behind the branch. Recover by running the CI workflow manually against auth-server."
+          exit 1

@@ -1,0 +1,202 @@
+name: Sync main to auth-server
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+# Shared with merge-sync-to-auth-server.yml: both workflows mutate chore/sync, and
+# interleaving them either rejects this push or recreates a branch that one just
+# deleted. One group serializes every writer.
+concurrency:
+  group: chore-sync-branch
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+        with:
+          # full history, otherwise the merges below have no common ancestor
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 24.16.0
+          cache: 'npm'
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config pull.rebase false  # Always merge, never rebase
+
+      - name: Create or update sync branch
+        run: |
+          set -euo pipefail
+
+          git fetch --no-tags --force --prune origin
+
+          # An existing chore/sync is a sync still in flight: keep it, so commits
+          # arriving on main accumulate on it and a manual conflict resolution pushed
+          # to it survives. The branch is deleted when its PR merges, so the next sync
+          # starts from auth-server again.
+          BASE=origin/auth-server
+          if git rev-parse --verify --quiet refs/remotes/origin/chore/sync >/dev/null; then
+            BASE=origin/chore/sync
+          fi
+          git checkout -B chore/sync "$BASE"
+
+          # -X settles conflicting hunks without reporting them, so list the conflicted
+          # files before each merge. The PR names them: a change from main that lost a
+          # conflict is dropped silently.
+          RESOLVED_LIST="$RUNNER_TEMP/auto-resolved.txt"
+          : > "$RESOLVED_LIST"
+          conflicted_files() {
+            # Line 1 is the merged tree; the conflicted paths follow, up to a blank line.
+            { git merge-tree --write-tree --name-only HEAD "$1" || true; } \
+              | sed -n '2,/^$/p' | sed '/^$/d'
+          }
+
+          # chore/sync is auth-server + main, and where the two conflict auth-server wins,
+          # whichever way the merge runs: -X theirs while merging auth-server in, -X ours
+          # while merging main. Changes from main that do not conflict still land.
+          # Snapshots can come out of this as a patchwork of both sides; the next step
+          # regenerates them.
+          for STEP in "origin/auth-server theirs" "origin/main ours"; do
+            read -r REF SIDE <<< "$STEP"
+            conflicted_files "$REF" >> "$RESOLVED_LIST"
+            if ! git merge -X "$SIDE" -m "chore: merge $REF into chore/sync" "$REF"; then
+              git merge --abort || true
+              echo "::error::Merging $REF into chore/sync hit a conflict that favouring auth-server cannot settle, typically a file deleted on one side and changed on the other. To recover: check out chore/sync (or branch it off auth-server), merge main into it, resolve, push it, and re-run this workflow. Later runs merge on top of that resolution."
+              exit 1
+            fi
+          done
+
+      # Fatal on purpose: the sync PR is never created or updated without freshly
+      # regenerated snapshots, since the merges above can leave them a patchwork of both
+      # branches. update-snapshots runs the whole test suite, so a failing test also
+      # stops the run; a transient npm/protocol failure only needs a re-run.
+      - name: Update protocol and regenerate snapshots
+        run: |
+          set -e
+
+          make update-protocol
+          make install
+          make build
+          make update-snapshots
+
+      - name: Reject broken snapshots
+        run: |
+          set -uo pipefail
+
+          # An ERR! line means the QuickJS eval threw mid-run, so the snapshot captured a
+          # truncated scene and would mask real regressions. Falling back to the previous
+          # snapshots would push ones that were never regenerated, so stop instead.
+          if grep -rln "ERR!" test/snapshots/; then
+            echo "::error::Regenerated snapshots contain ERR! traces (files above). Fix the scene-load failure, usually a missing mock in test/snapshots.spec.ts, and re-run this workflow."
+            exit 1
+          fi
+
+      - name: Commit and push the sync branch
+        run: |
+          set -euo pipefail
+
+          git add -A .
+          git commit -m "chore: update protocol and snapshots" || echo "Nothing regenerated to commit"
+
+          # Push whenever the recomputed branch differs from the remote, so a stale
+          # chore/sync can never stay the head of an open PR. Skip it when there is
+          # nothing to propose either, so a no-op run does not leave a branch behind
+          # that later runs would read as a sync in flight.
+          REMOTE_HEAD="$(git rev-parse --verify --quiet refs/remotes/origin/chore/sync || echo absent)"
+          if [ "$(git rev-parse HEAD)" = "$REMOTE_HEAD" ] \
+             || git merge-base --is-ancestor HEAD origin/auth-server; then
+            echo "Nothing to push: chore/sync is current, or auth-server already contains it."
+          else
+            git push --force-with-lease origin chore/sync
+          fi
+
+      - name: Create or update PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Backticks here are data, not shell source: they reach gh through the
+          # variable and are never re-evaluated.
+          PR_BODY: |
+            :crown: *An automated PR to keep auth-server in sync with main, with protocol updates, build and snapshots*
+
+            **This PR is a draft on purpose: it is landed by a workflow, not by a button.**
+            **It still needs an approving review — the workflow merges this PR, so branch
+            protection is enforced against it.**
+
+            ### How to land it
+
+            1. Test the packages published by the **build** job on this PR — the CI comment
+               below carries the `npm install` URLs and the `/changerealm` link.
+            2. Approve this PR. `auth-server` requires one approving review, and the
+               workflow below merges the PR itself, so it cannot land without one.
+            3. Go to **Actions -> Merge sync PR into auth-server -> Run workflow**, from
+               `main`.
+            4. That workflow marks this PR ready, merges it into `auth-server` as a real
+               merge commit, deletes `chore/sync`, and dispatches CI on `auth-server` so
+               the `@auth-server` npm tag is republished.
+
+            Further commits on `main` are merged onto this same branch while the PR is
+            open, so it stays current on its own. Where `main` and `auth-server` conflict,
+            `auth-server`'s side is kept, and snapshots are regenerated on every update.
+            An approval carries over to those updates — `auth-server` does not dismiss
+            stale reviews — so you only need to approve again if this PR is closed and a
+            new one opens.
+
+            > [!IMPORTANT]
+            > Do not take this PR out of draft in order to squash it. Squash is still
+            > offered in the merge dropdown, and squashing replaces `main`'s commits with a
+            > single new one: `main` stops being an ancestor of `auth-server`, the merge base
+            > freezes, and every later sync re-applies changes `auth-server` already has,
+            > conflicting within a couple of runs.
+            >
+            > If it does get squashed, restore the ancestry with
+            > `git merge -s ours origin/main` on `auth-server`.
+        run: |
+          set -euo pipefail
+
+          # gh pr create fails with "No commits between ..." when nothing is ahead.
+          # The tree check also covers a net-zero round of main changes, where commits
+          # exist but there is nothing left to propose.
+          if git merge-base --is-ancestor HEAD origin/auth-server \
+             || git diff --quiet origin/auth-server HEAD; then
+            echo "auth-server already has everything chore/sync would propose."
+            exit 0
+          fi
+
+          # Snapshots are left out: they were regenerated, so no side of them survived.
+          NOTE=""
+          RESOLVED="$(grep -v '^test/snapshots/' "$RUNNER_TEMP/auto-resolved.txt" | sort -u || true)"
+          if [ -n "$RESOLVED" ]; then
+            NOTE=$'\n\n> [!NOTE]\n> Conflicts in these files were resolved in favour of `auth-server`, so any conflicting change from `main` in them was dropped. Check them before approving:\n'"$(sed 's/^/> - `/; s/$/`/' <<< "$RESOLVED")"
+          fi
+
+          PR_NUMBER="$(gh pr list --base auth-server --head chore/sync --state open --json number --jq '.[0].number // empty')"
+
+          if [ -n "$PR_NUMBER" ]; then
+            echo "PR #$PR_NUMBER already exists, adding a comment..."
+            gh pr comment "$PR_NUMBER" --body "🔄 Updated with latest changes from **main** on $(date -u '+%Y-%m-%d %H:%M UTC')${NOTE}"
+          else
+            echo "Creating new PR..."
+            # --draft: squashing this PR breaks the ancestry, and squash is offered in
+            # the merge dropdown. A draft has no merge button at all.
+            gh pr create \
+              --draft \
+              --base auth-server \
+              --head chore/sync \
+              --title "chore: sync main to auth-server" \
+              --body "${PR_BODY}${NOTE}" \
+              --label "auto-pr"
+          fi
