@@ -76,8 +76,7 @@ export interface ISceneStorage {
 export const createSceneStorage = (config: StorageConfigState = createStorageConfig()): ISceneStorage => {
   const cache = createValueCache(config)
   // Each in-flight GET is tracked by a wrapper object whose identity marks
-  // ownership: a write drops the wrapper when it lands, detaching the pending
-  // GET so its stale response cannot overwrite the newer cache entry.
+  // ownership: a landed write detaches the pending GET so its stale response is not cached.
   const inflightGets = new Map<string, { promise: Promise<unknown> }>()
   // Writes to the same key are serialized (and rapid ones coalesced to the
   // latest value) so the service commits them in issue order — overlapping

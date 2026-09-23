@@ -24,7 +24,7 @@ import {
 const MAX_KEY_LENGTH = 255
 /** At most this many entries per page; also the fallback for a missing or invalid limit. */
 const MAX_PAGE_SIZE = 100
-/** Offsets past this are capped, as in the deployed service's pagination helper. */
+/** The deployed pagination helper caps offsets here. */
 const MAX_OFFSET = 100000
 /** Slack the deployed service allows on top of the per-value limit for the request envelope. */
 const BODY_ENVELOPE_SLACK_BYTES = 1024
@@ -35,10 +35,7 @@ const LONE_SURROGATE = /[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[
 
 type Response = IHttpServerComponent.IResponse
 
-/**
- * Code-point order. The deployed service orders by its database collation, which can place
- * mixed-case, punctuation and non-ASCII keys differently.
- */
+/** The deployed service orders by its database collation, which can differ for non-ASCII and mixed case. */
 function compareByCodePoint(a: string, b: string): number {
   const left = [...a]
   const right = [...b]
@@ -60,8 +57,6 @@ function hasLoneSurrogate(value: unknown): boolean {
 
 /**
  * Sets up storage-related endpoints for environment variables, scene storage, and player storage.
- * Everything a scene can observe follows the deployed world-storage-service, so a scene behaves
- * the same in preview and deployed.
  */
 export function setupStorageEndpoints(
   components: CliComponents,
@@ -81,7 +76,6 @@ export function setupStorageEndpoints(
   const withAddressValidation: IHttpServerComponent.IRequestHandler<
     IHttpServerComponent.PathAwareContext<PreviewComponents, string>
   > = async (ctx, next) => {
-    // The deployed service lowercases the address before validating it.
     const address = (ctx.params.address ?? '').toLowerCase()
     if (!ADDRESS_PATTERN.test(address)) {
       return { status: 400, body: { message: 'Invalid player address' } }
@@ -98,7 +92,7 @@ export function setupStorageEndpoints(
     return { status: 500, body: { message: `Failed to ${what}` } }
   }
 
-  /** Same contract as the deployed service: the body must be an object carrying `value` and nothing else. */
+  /** The body must be exactly `{ value }`. */
   function readValueFromBody(bodyText: string): { ok: true; value: unknown } | { ok: false } {
     let parsed: unknown
     try {
@@ -112,7 +106,6 @@ export function setupStorageEndpoints(
     return { ok: true, value: (parsed as { value: unknown }).value }
   }
 
-  /** Reads and validates a PUT body, or answers the rejection the deployed service gives. */
   async function readPut(
     ctx: { request: { text(): Promise<string> } },
     limits: StorageLimits,
@@ -176,7 +169,7 @@ export function setupStorageEndpoints(
   router.put('/env/:key', withKeyValidation, async (ctx) => {
     const { key } = ctx.params
     try {
-      // The deployed service accepts only a string here, and stores NUL in env values.
+      // Env values are strings, and may contain NUL.
       const put = await readPut(ctx, STORAGE_LIMITS.env, { stringOnly: true, allowNul: true })
       if ('response' in put) return put.response
       return write(`set environment variable '${key}'`, () => setEnvValue(components, key, put.value as string), {

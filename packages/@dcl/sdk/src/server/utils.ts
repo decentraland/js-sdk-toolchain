@@ -54,7 +54,6 @@ export async function wrapSignedFetch<T = unknown>(signedFetchBody: SignedFetchR
   try {
     response = await signedFetch(signedFetchBody)
   } catch (error) {
-    // Whatever was thrown, including a string, undefined or an Error with no message, is a failure.
     console.error(`Error in ${signedFetchBody.url} endpoint`, { error })
     return [errorMessage(error, 'signedFetch failed'), null, undefined]
   }

@@ -80,12 +80,10 @@ export interface IPlayerStorage {
 export const createPlayerStorage = (config: StorageConfigState = createStorageConfig()): IPlayerStorage => {
   const cache = createValueCache(config)
   // Each in-flight GET is tracked by a wrapper object whose identity marks
-  // ownership: a write drops the wrapper when it lands, detaching the pending
-  // GET so its stale response cannot overwrite the newer cache entry.
+  // ownership: a landed write detaches the pending GET so its stale response is not cached.
   const inflightGets = new Map<string, { promise: Promise<unknown> }>()
 
-  // Addresses are case-insensitive, so mixed-case callers share one entry; the
-  // JSON pair is unambiguous whatever characters the address or key contain.
+  // Lowercased so checksummed callers share an entry; a JSON pair cannot collide.
   const cacheKey = (address: string, key: string) => JSON.stringify([address.toLowerCase(), key])
 
   // Writes to the same player key are serialized (and rapid ones coalesced to

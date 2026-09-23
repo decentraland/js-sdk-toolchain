@@ -48,22 +48,15 @@ export interface WriteQueue {
   /** True while any write for the key is in flight or queued. */
   isPending(key: string): boolean
   /**
-   * Resolves once the writes pending for the key at the time of the call have
-   * settled: the in-flight op and, when one was queued behind it, the op that
-   * runs next (that write, or the write that replaced it). At most two ops are
-   * awaited, so a steady stream of writes cannot starve a waiter. Never rejects.
+   * Resolves once the in-flight op settles and, if one was queued at call time,
+   * the op that runs next. At most two, so writes cannot starve a waiter. Never rejects.
    */
   settled(key: string): Promise<void>
   /**
-   * Issues a write. If one is in flight, the new op is queued, replacing any
-   * already-queued op, which coalesces into this one (see settleSuperseded). An
-   * op identical to the queued one joins it; `joinActive` additionally allows
-   * joining an identical in-flight op (only valid for dedup-tolerant callers,
-   * since that op was issued before this call).
-   *
-   * Rejects with the executor's error. A replaced delete rejects with the
-   * replacement's error, or with SupersedingWriteFailed when the replacing set
-   * did not apply; a replaced set never rejects and resolves false instead.
+   * Issues a write, queued behind any in-flight one and replacing any queued one
+   * (see settleSuperseded). An identical queued op is joined; `joinActive` also
+   * joins an identical in-flight op, which only dedup-tolerant callers may do.
+   * Rejects with the executor's error; see settleSuperseded for replaced ops.
    */
   enqueue(
     key: string,
@@ -91,9 +84,8 @@ export function createWriteQueue(): WriteQueue {
   }
 
   /**
-   * A superseded op never reaches the network: it coalesces into the op that
-   * replaced it and resolves true when that op lands. Only a failure is reported
-   * in the superseded op's own terms: a set resolves false, a delete rejects.
+   * A replaced op resolves true when its replacement lands. On failure a set
+   * resolves false and a delete rejects, in its own terms.
    */
   function settleSuperseded(superseded: PendingOp, by: PendingOp): void {
     by.promise.then(
