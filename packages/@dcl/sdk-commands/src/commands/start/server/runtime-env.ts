@@ -24,6 +24,14 @@ function createDefaultStorage(): ServerStorage {
   }
 }
 
+const isPlainObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+
+/** A bucket read from disk, or an empty one when the file holds something else there. */
+function bucket<T>(value: unknown): Record<string, T> {
+  return isPlainObject(value) ? (value as Record<string, T>) : {}
+}
+
 /**
  * Own-property access for the JSON-backed buckets. Plain indexing would resolve a
  * key such as `constructor`, `toString` or `__proto__` through Object.prototype,
@@ -83,12 +91,24 @@ export async function loadServerStorage(components: Pick<CliComponents, 'fs' | '
     }
 
     const content = await components.fs.readFile(storagePath, 'utf-8')
-    const parsed = JSON.parse(content) as Partial<ServerStorage>
+    let parsed: Partial<ServerStorage>
+    try {
+      parsed = JSON.parse(content)
+    } catch (error) {
+      // Starting over would let the next write erase the file; keep it for recovery.
+      const asidePath = `${storagePath}.corrupt-${Date.now()}`
+      components.logger.error(`${SERVER_STORAGE_FILE} is not valid JSON (${error}); moved to ${asidePath}`)
+      await components.fs.rename(storagePath, asidePath)
+      return createDefaultStorage()
+    }
 
+    const players = bucket<unknown>(parsed.players)
     return {
-      env: parsed.env ?? {},
-      world: parsed.world ?? {},
-      players: parsed.players ?? {}
+      env: bucket<string>(parsed.env),
+      world: bucket<unknown>(parsed.world),
+      players: Object.fromEntries(
+        Object.entries(players).map(([address, values]) => [address, bucket<unknown>(values)])
+      )
     }
   } catch (error) {
     components.logger.error(`Failed to load ${SERVER_STORAGE_FILE}: ${error}`)
@@ -250,7 +270,7 @@ export async function getPlayerStorage(
   address: string
 ): Promise<Record<string, unknown>> {
   const storage = await loadServerStorage(components)
-  return getOwn(storage.players, address) ?? {}
+  return getOwn(storage.players, address.toLowerCase()) ?? {}
 }
 
 /**
@@ -296,8 +316,8 @@ export async function getPlayerValue(
   key: string
 ): Promise<unknown | undefined> {
   const storage = await loadServerStorage(components)
-  const bucket = getOwn(storage.players, address)
-  return bucket ? getOwn(bucket, key) : undefined
+  const values = getOwn(storage.players, address.toLowerCase())
+  return values ? getOwn(values, key) : undefined
 }
 
 /**
@@ -311,12 +331,13 @@ export async function setPlayerValue(
 ): Promise<void> {
   return serialize(async () => {
     const storage = await loadServerStorage(components)
-    let bucket = getOwn(storage.players, address)
-    if (!bucket) {
-      bucket = {}
-      setOwn(storage.players, address, bucket)
+    const lowercased = address.toLowerCase()
+    let values = getOwn(storage.players, lowercased)
+    if (!values) {
+      values = {}
+      setOwn(storage.players, lowercased, values)
     }
-    setOwn(bucket, key, value)
+    setOwn(values, key, value)
     await saveServerStorage(components, storage)
   })
 }
@@ -332,11 +353,11 @@ export async function deletePlayerValue(
 ): Promise<boolean> {
   return serialize(async () => {
     const storage = await loadServerStorage(components)
-    const bucket = getOwn(storage.players, address)
-    if (!bucket || !hasOwn(bucket, key)) {
+    const values = getOwn(storage.players, address.toLowerCase())
+    if (!values || !hasOwn(values, key)) {
       return false
     }
-    delete bucket[key]
+    delete values[key]
     await saveServerStorage(components, storage)
     return true
   })
