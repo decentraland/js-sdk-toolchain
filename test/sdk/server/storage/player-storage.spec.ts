@@ -27,6 +27,32 @@ describe('player storage', () => {
   })
 
   describe('getValues', () => {
+    it('should reject with the storage prefix when the storage URL cannot be resolved', async () => {
+      const playerStorage = createPlayerStorage()
+      mockGetStorageServerUrl.mockRejectedValueOnce(new Error('realm down'))
+
+      await expect(playerStorage.getValues(address)).rejects.toThrow(
+        `Failed to get player storage values for '${address}': realm down`
+      )
+    })
+
+    it('should not seed a key whose read is in flight, since that read settles the entry', async () => {
+      const playerStorage = createPlayerStorage()
+      const read = deferred<[string, null, number]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => read.promise)
+      const reading = playerStorage.get(address, 'a')
+      await flush()
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { data: [{ key: 'a', value: 'from page' }] }])
+      await playerStorage.getValues(address)
+      read.resolve(['500 Internal Server Error', null, 500])
+      await expect(reading).rejects.toThrow('500 Internal Server Error')
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'fresh' }, 200])
+      expect(await playerStorage.get(address, 'a')).toBe('fresh')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(3)
+    })
+
     it('should not let a page overwrite a value a read confirmed before the listing started', async () => {
       const playerStorage = createPlayerStorage()
       mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'confirmed' }, 200])
@@ -125,14 +151,14 @@ describe('player storage', () => {
     it('should request /players/:address/values?limit=...&offset=... when limit and offset are passed', async () => {
       const playerStorage = createPlayerStorage()
       const data = [{ key: 'score', value: 100 }]
-      mockWrapSignedFetch.mockResolvedValue([null, { data, pagination: { offset: 10, total: 1 } }])
+      mockWrapSignedFetch.mockResolvedValue([null, { data, pagination: { offset: 0, total: 1 } }])
 
       const result = await playerStorage.getValues(address, { limit: 10, offset: 10 })
 
       expect(mockWrapSignedFetch).toHaveBeenCalledWith({
         url: `${baseUrl}/players/${encodeURIComponent(address)}/values?limit=10&offset=10`
       })
-      expect(result).toEqual({ data, pagination: { offset: 10, total: 1 } })
+      expect(result).toEqual({ data, pagination: { offset: 0, total: 1 } })
     })
 
     it('should request /players/:address/values?prefix=...&limit=...&offset=... when prefix, limit and offset are passed', async () => {
@@ -183,7 +209,7 @@ describe('player storage', () => {
     })
 
     it('should skip the PUT for an unchanged value when skipIfUnchanged is passed', async () => {
-      const playerStorage = createPlayerStorage()
+      const playerStorage = createPlayerStorage(createStorageConfig({ skipIfUnchanged: false }))
       mockWrapSignedFetch.mockResolvedValue([null, {}])
 
       expect(await playerStorage.set(address, 'score', 42, { skipIfUnchanged: true })).toBe(true)
@@ -313,6 +339,58 @@ describe('player storage', () => {
   const flush = () => new Promise((r) => setTimeout(r, 0))
 
   describe('write serialization', () => {
+    it('should not join the in-flight PUT when skipIfUnchanged is false', async () => {
+      const playerStorage = createPlayerStorage()
+      const put = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put.promise)
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+
+      const first = playerStorage.set(address, 'key', 7)
+      const second = playerStorage.set(address, 'key', 7, { skipIfUnchanged: false })
+      await flush()
+      put.resolve([null, {}])
+
+      expect(await Promise.all([first, second])).toEqual([true, true])
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should not skip an unchanged write as a duplicate while a newer write to the key is still pending', async () => {
+      const playerStorage = createPlayerStorage()
+      const put1 = deferred<[null, object]>()
+      const put2 = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put1.promise).mockImplementationOnce(() => put2.promise)
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+
+      const first = playerStorage.set(address, 'key', 1)
+      await flush()
+      const second = playerStorage.set(address, 'key', 2)
+      put1.resolve([null, {}])
+      expect(await first).toBe(true)
+      await flush()
+
+      const third = playerStorage.set(address, 'key', 1, { skipIfUnchanged: true })
+      put2.resolve([null, {}])
+      expect(await Promise.all([second, third])).toEqual([true, true])
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(3)
+    })
+
+    it('should drop the landed value when the queued write behind it fails', async () => {
+      const playerStorage = createPlayerStorage()
+      const put1 = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put1.promise)
+      mockWrapSignedFetch.mockResolvedValueOnce(['500 Internal Server Error', null, 500])
+
+      const first = playerStorage.set(address, 'key', 1)
+      await flush()
+      const second = playerStorage.set(address, 'key', 2)
+      put1.resolve([null, {}])
+      expect(await Promise.all([first, second])).toEqual([true, false])
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+      expect(await playerStorage.set(address, 'key', 1, { skipIfUnchanged: true })).toBe(true)
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(3)
+    })
+
     it('should serialize overlapping sets per player key and coalesce to the latest value', async () => {
       const playerStorage = createPlayerStorage()
       const firstPut = deferred<[null, object]>()

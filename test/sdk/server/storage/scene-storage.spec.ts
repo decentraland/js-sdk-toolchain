@@ -66,14 +66,22 @@ describe('scene storage', () => {
     it('should request /values?limit=...&offset=... when limit and offset are passed', async () => {
       const storage = createSceneStorage()
       const data = [{ key: 'a', value: 1 }]
-      mockWrapSignedFetch.mockResolvedValue([null, { data, pagination: { offset: 10, total: 1 } }])
+      mockWrapSignedFetch.mockResolvedValue([null, { data, pagination: { offset: 0, total: 1 } }])
 
       const result = await storage.getValues({ limit: 10, offset: 10 })
 
       expect(mockWrapSignedFetch).toHaveBeenCalledWith({
         url: `${baseUrl}/values?limit=10&offset=10`
       })
-      expect(result).toEqual({ data, pagination: { offset: 10, total: 1 } })
+      // The server's own pagination wins over the request.
+      expect(result).toEqual({ data, pagination: { offset: 0, total: 1 } })
+    })
+
+    it('should fall back to the requested offset and the page length when the server omits pagination', async () => {
+      const storage = createSceneStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { data: [{ key: 'a', value: 1 }] }])
+
+      expect((await storage.getValues({ offset: 10 })).pagination).toEqual({ offset: 10, total: 1 })
     })
 
     it('should request /values?prefix=...&limit=...&offset=... when prefix, limit and offset are passed', async () => {
@@ -196,7 +204,7 @@ describe('scene storage', () => {
     })
 
     it('should skip the PUT for an unchanged value when skipIfUnchanged is passed', async () => {
-      const storage = createSceneStorage()
+      const storage = createSceneStorage(createStorageConfig({ skipIfUnchanged: false }))
       mockWrapSignedFetch.mockResolvedValue([null, {}])
 
       expect(await storage.set('score', 42, { skipIfUnchanged: true })).toBe(true)
@@ -557,9 +565,9 @@ describe('scene storage', () => {
       expect(await first).toBe(true)
       expect(await second).toBe(false)
 
-      // The failed flush invalidated the entry, so the retry hits the network.
+      // 1 landed and was cached; 2's failure must drop it, so an unchanged-looking set of 1 is still sent.
       mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
-      expect(await storage.set('key', 2)).toBe(true)
+      expect(await storage.set('key', 1, { skipIfUnchanged: true })).toBe(true)
       expect(mockWrapSignedFetch).toHaveBeenCalledTimes(3)
     })
   })
@@ -623,7 +631,7 @@ describe('scene storage', () => {
       expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
     })
 
-    it('should not seed keys whose write is still pending when the page lands', async () => {
+    it('should not seed a key written while the page was in flight', async () => {
       const storage = createSceneStorage()
       const list = deferred<[null, { data: Array<{ key: string; value: unknown }> }]>()
       const put = deferred<[null, object]>()
@@ -711,6 +719,7 @@ describe('scene storage', () => {
       circular.self = circular
 
       await expect(storage.set('key', circular)).rejects.toThrow(TypeError)
+      expect(mockWrapSignedFetch).not.toHaveBeenCalled()
     })
 
     it('should still store a legitimate null', async () => {
@@ -776,6 +785,59 @@ describe('scene storage', () => {
   })
 
   describe('queued writes and the cache', () => {
+    it('should drop the landed value when the queued write behind it cannot resolve the storage URL', async () => {
+      const storage = createSceneStorage()
+      const put1 = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put1.promise)
+      mockGetStorageServerUrl.mockResolvedValueOnce(baseUrl).mockRejectedValueOnce(new Error('realm down'))
+
+      const first = storage.set('key', 1)
+      await flush()
+      const second = storage.set('key', 2)
+      put1.resolve([null, {}])
+      expect(await Promise.all([first, second])).toEqual([true, false])
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'server' }, 200])
+      expect(await storage.get('key')).toBe('server')
+    })
+
+    it('should drop the landed value when the delete queued behind it fails', async () => {
+      const storage = createSceneStorage()
+      const put = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put.promise)
+      mockWrapSignedFetch.mockResolvedValueOnce(['500 Internal Server Error', null, 500])
+
+      const writing = storage.set('key', 1)
+      await flush()
+      const deleting = storage.delete('key')
+      put.resolve([null, {}])
+      await Promise.allSettled([writing, deleting])
+      await expect(deleting).rejects.toThrow('500 Internal Server Error')
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'server' }, 200])
+      expect(await storage.get('key')).toBe('server')
+    })
+
+    it('should read from the network when the queued delete it waited for fails', async () => {
+      const storage = createSceneStorage()
+      const put = deferred<[null, object]>()
+      const del = deferred<[string, null, number]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => put.promise).mockImplementationOnce(() => del.promise)
+
+      const writing = storage.set('key', 1)
+      await flush()
+      const deleting = storage.delete('key')
+      const reading = storage.get('key') // parked behind both
+      put.resolve([null, {}])
+      await writing
+      await flush()
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 'server' }, 200])
+      del.resolve(['500 Internal Server Error', null, 500])
+      await expect(deleting).rejects.toThrow('500 Internal Server Error')
+      expect(await reading).toBe('server')
+    })
+
     it('should also wait for the write that replaced the queued one, then answer from it without a network read', async () => {
       const storage = createSceneStorage()
       const put1 = deferred<[null, object]>()
@@ -1057,6 +1119,45 @@ describe('scene storage', () => {
   })
 
   describe('get read caching', () => {
+    it('should not let a detached read that answers 404 overwrite a write that landed meanwhile', async () => {
+      const storage = createSceneStorage()
+      const read = deferred<[string, null, number]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => read.promise)
+      const reading = storage.get('key')
+      await flush()
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+      expect(await storage.set('key', 'new')).toBe(true)
+      read.resolve(['404 Not Found', null, 404])
+      expect(await reading).toBeNull()
+
+      expect(await storage.get('key')).toBe('new')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should keep a newer in-flight read joinable after a detached one finishes', async () => {
+      const storage = createSceneStorage()
+      const readA = deferred<[null, { value: string }, number]>()
+      const readB = deferred<[null, { value: string }, number]>()
+      mockWrapSignedFetch.mockImplementationOnce(() => readA.promise)
+      const a = storage.get('key')
+      await flush()
+
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+      await storage.set('key', 'new') // detaches A
+      mockWrapSignedFetch.mockImplementationOnce(() => readB.promise)
+      const b = storage.get('key', { fresh: true })
+      await flush()
+
+      readA.resolve([null, { value: 'old' }, 200])
+      await a
+      const c = storage.get('key', { fresh: true }) // must join B, not issue a fourth request
+      readB.resolve([null, { value: 'new' }, 200])
+
+      expect(await Promise.all([b, c])).toEqual(['new', 'new'])
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(3)
+    })
+
     it('should reject with the storage prefix when the storage URL cannot be resolved', async () => {
       const storage = createSceneStorage()
       mockGetStorageServerUrl.mockRejectedValueOnce(new Error('realm down'))

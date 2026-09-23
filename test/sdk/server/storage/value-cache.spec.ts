@@ -83,7 +83,7 @@ describe('createValueCache', () => {
     expect(cache.get('a')).toBeUndefined()
   })
 
-  it('falls back to the default bound when cacheMaxEntries is not finite', () => {
+  it('falls back to the default bound when cacheMaxEntries is NaN', () => {
     const cache = createValueCache(createStorageConfig({ cacheMaxEntries: NaN }))
 
     // Eviction must not be silently disabled: the default bound (512) applies.
@@ -96,7 +96,7 @@ describe('createValueCache', () => {
     expect(cache.get('key-512')?.body).toBe('b512')
   })
 
-  it('falls back to the default max age when cacheMaxAgeMs is not finite', () => {
+  it('falls back to the default max age when cacheMaxAgeMs is NaN', () => {
     const cache = createValueCache(createStorageConfig({ cacheMaxAgeMs: NaN }))
     const nowSpy = jest.spyOn(Date, 'now')
 
