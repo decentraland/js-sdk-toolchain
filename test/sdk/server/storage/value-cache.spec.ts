@@ -196,6 +196,31 @@ describe('createValueCache', () => {
       expect(cache.get('a')).toBeUndefined()
     })
   })
+  describe('when a bound is set to Infinity', () => {
+    let cache: ValueCache
+    let now: jest.SpyInstance<number, []>
+
+    beforeEach(() => {
+      now = jest.spyOn(Date, 'now').mockReturnValue(1_000)
+      cache = createValueCache(createStorageConfig({ cacheMaxAgeMs: Infinity, cacheMaxEntries: Infinity }))
+      for (let i = 0; i < 600; i++) cache.set(`k${i}`, { body: `b${i}` })
+    })
+
+    afterEach(() => {
+      now.mockRestore()
+    })
+
+    it('should keep every entry instead of evicting past the default bound', () => {
+      expect(cache.get('k0')?.body).toBe('b0')
+    })
+
+    it('should never expire an entry', () => {
+      now.mockReturnValue(1_000 + 365 * 24 * 3_600_000)
+
+      expect(cache.get('k599')?.body).toBe('b599')
+    })
+  })
+
   describe('when a watcher is started', () => {
     let cache: ValueCache
     let watcher: CacheWatcher

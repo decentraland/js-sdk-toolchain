@@ -63,7 +63,7 @@ export function createValueCache(config: StorageConfigState): ValueCache {
 
     // Guard against misconfiguration: a negative bound would loop forever on
     // an empty map, and a NaN bound would silently disable eviction.
-    const maxEntries = Number.isFinite(config.cacheMaxEntries)
+    const maxEntries = !Number.isNaN(config.cacheMaxEntries)
       ? Math.max(0, config.cacheMaxEntries)
       : DEFAULT_STORAGE_CONFIG.cacheMaxEntries
 
@@ -80,9 +80,7 @@ export function createValueCache(config: StorageConfigState): ValueCache {
       // Guard against misconfiguration, mirroring cacheMaxEntries: a NaN
       // bound would silently disable expiry (NaN comparisons are false).
       // Negative values need no guard — they just expire everything.
-      const maxAgeMs = Number.isFinite(config.cacheMaxAgeMs)
-        ? config.cacheMaxAgeMs
-        : DEFAULT_STORAGE_CONFIG.cacheMaxAgeMs
+      const maxAgeMs = !Number.isNaN(config.cacheMaxAgeMs) ? config.cacheMaxAgeMs : DEFAULT_STORAGE_CONFIG.cacheMaxAgeMs
 
       // Lazy max-age expiry: storedAt is never refreshed on hits, so the age
       // bounds the time since the last actual network confirmation.
