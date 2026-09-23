@@ -12,7 +12,8 @@ describe('Generated AvatarBase ProtoBuf', () => {
       eyesColor: Color3.Black(),
       hairColor: Color3.Magenta(),
       bodyShapeUrn: 'boedo-shape-urn',
-      name: 'boedo-casla'
+      name: 'boedo-casla',
+      talking: true
     })
   })
 })
