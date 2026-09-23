@@ -11,7 +11,7 @@ import {
 } from './constants'
 import { createValueCache } from './value-cache'
 import { errorMessage } from './error-message'
-import { serializeStorageValue } from './serialize'
+import { assertStorageKey, serializeStorageValue } from './serialize'
 import { createWriteQueue, SupersedingWriteFailed } from './write-queue'
 
 /**
@@ -33,6 +33,7 @@ export interface ISceneStorage {
    * @param options - Optional { fresh } to bypass the read cache
    * @returns A promise that resolves to the parsed JSON value, or null if not found
    * @throws Error if the read fails, so a failure is never mistaken for a missing key
+   * @throws TypeError if the key is invalid
    */
   get<T = unknown>(key: string, options?: GetOptions): Promise<T | null>
 
@@ -43,8 +44,11 @@ export interface ISceneStorage {
    * @param options - Optional { skipIfUnchanged } to skip the network write when the value is already stored
    * @returns true once stored, or once a newer write that replaced this one lands
    * (rapid writes coalesce); false if the write, or its replacement, fails
-   * @throws TypeError if the value is undefined or circular, or is or contains a function, a
-   * symbol, a non-finite number, a Map or a Set; anything else is serialized as JSON.stringify does
+   * @throws TypeError if the key is invalid, or the value cannot be stored unchanged: undefined,
+   * circular, a BigInt, or containing a function, a symbol, a non-finite number, an undefined array
+   * element or hole, a Map, Set, typed array or other built-in with no JSON form, or text with an
+   * unpaired surrogate or a NUL character. An undefined object property is dropped; a Date is
+   * stored as its ISO string and a class instance as its own enumerable data.
    */
   set<T = unknown>(key: string, value: T, options?: SetOptions): Promise<boolean>
 
@@ -54,6 +58,7 @@ export interface ISceneStorage {
    * @returns true once applied, or once a newer write that replaced it lands;
    * false only for a confirmed 404
    * @throws Error if the delete, or its replacement, fails; a failure is never reported as absence
+   * @throws TypeError if the key is invalid
    */
   delete(key: string): Promise<boolean>
 
@@ -160,6 +165,7 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
   return {
     async get<T = unknown>(key: string, options?: GetOptions): Promise<T | null> {
       assertIsServer(MODULE_NAME)
+      assertStorageKey(key, 'Storage.get()')
 
       if (writes.isPending(key)) await writes.settled(key)
 
@@ -220,6 +226,7 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
 
     async set<T = unknown>(key: string, value: T, options?: SetOptions): Promise<boolean> {
       assertIsServer(MODULE_NAME)
+      assertStorageKey(key, 'Storage.set()')
 
       const body = serializeStorageValue(value, `Storage.set('${key}')`)
       const skipIfUnchanged = options?.skipIfUnchanged ?? config.skipIfUnchanged
@@ -236,6 +243,7 @@ export const createSceneStorage = (config: StorageConfigState = createStorageCon
 
     async delete(key: string): Promise<boolean> {
       assertIsServer(MODULE_NAME)
+      assertStorageKey(key, 'Storage.delete()')
 
       return writes
         .enqueue(key, null, () => executeDelete(key), true)

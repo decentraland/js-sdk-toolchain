@@ -671,6 +671,93 @@ describe('scene storage', () => {
   })
 
   describe('set value serialization', () => {
+    const hole = [1, , 3] // eslint-disable-line no-sparse-arrays
+    it.each([
+      ['an undefined array element', [1, undefined], '"1" is undefined or a hole in an array'],
+      ['a sparse array hole', hole, '"1" is undefined or a hole in an array'],
+      ['a RegExp', /a/, 'the value is a RegExp, which has no JSON form'],
+      ['an Error', { e: new Error('x') }, '"e" is an Error, which has no JSON form'],
+      ['a WeakMap', new WeakMap(), 'the value is a WeakMap, which has no JSON form'],
+      ['a Promise', { p: Promise.resolve(1) }, '"p" is a Promise, which has no JSON form'],
+      ['an ArrayBuffer', new ArrayBuffer(2), 'the value is an ArrayBuffer, which has no JSON form'],
+      ['a typed array', { bytes: new Uint8Array([1]) }, '"bytes" is a Uint8Array, which has no JSON form'],
+      ['a DataView', new DataView(new ArrayBuffer(1)), 'the value is a DataView, which has no JSON form'],
+      [
+        'a nested toJSON returning undefined',
+        { a: { toJSON: () => undefined } },
+        '"a" has a toJSON() that returns undefined'
+      ],
+      ['an unpaired surrogate', { name: 'a\ud800' }, '"name" contains an unpaired surrogate or a NUL character'],
+      ['a NUL character', 'a\u0000b', 'the value contains an unpaired surrogate or a NUL character'],
+      ['a key with a NUL character', { ['a\u0000']: 1 }, 'is a key with an unpaired surrogate or a NUL character']
+    ])('should reject %s rather than store it changed', async (_label, value, reason) => {
+      const storage = createSceneStorage()
+
+      await expect(storage.set('key', value)).rejects.toThrow(reason)
+    })
+
+    it.each([
+      ['a BigInt', { n: BigInt(1) }, 'BigInt'],
+      [
+        'a circular value',
+        (() => {
+          const c: Record<string, unknown> = {}
+          c.self = c
+          return c
+        })(),
+        'circular'
+      ],
+      [
+        'nesting deeper than the engine stack',
+        (() => {
+          const root: Record<string, unknown> = {}
+          let at = root
+          for (let i = 0; i < 20000; i++) {
+            const next = {}
+            at.n = next
+            at = next
+          }
+          return root
+        })(),
+        'call stack'
+      ]
+    ])('should report %s as a prefixed TypeError', async (_label, value, cause) => {
+      const storage = createSceneStorage()
+      const failure = await storage.set('key', value).catch((error: unknown) => error)
+
+      expect([failure instanceof TypeError, String((failure as Error).message)]).toEqual([
+        true,
+        expect.stringMatching(
+          new RegExp(`^Storage\\.set\\('key'\\): value must be JSON-serializable \\(.*${cause}`, 'i')
+        )
+      ])
+    })
+
+    it.each([
+      ['an undefined object property', { kept: 1, dropped: undefined }, '{"value":{"kept":1}}'],
+      ['a Date', { at: new Date(0) }, '{"value":{"at":"1970-01-01T00:00:00.000Z"}}'],
+      [
+        'a class instance',
+        new (class Pet {
+          name = 'rex'
+          bark() {
+            return 1
+          }
+        })(),
+        '{"value":{"name":"rex"}}'
+      ],
+      ['a paired surrogate', '\ud83d\ude00', JSON.stringify({ value: '\ud83d\ude00' })]
+    ])('should store %s as documented', async (_label, value, body) => {
+      const storage = createSceneStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+
+      await storage.set('key', value)
+
+      expect(mockWrapSignedFetch).toHaveBeenCalledWith(
+        expect.objectContaining({ init: expect.objectContaining({ body }) })
+      )
+    })
+
     it.each([
       ['NaN', NaN, 'the value is the non-finite number NaN'],
       ['Infinity', Infinity, 'the value is the non-finite number Infinity'],
@@ -1427,5 +1514,24 @@ describe('scene storage', () => {
 
       expect(mockWrapSignedFetch).toHaveBeenCalledTimes(1)
     })
+  })
+
+  describe('when a key cannot address a storage entry', () => {
+    it.each([[''], ['.'], ['..'], ['a\ud800'], ['a\u0000']])(
+      'should reject %j in get(), set() and delete() before sending',
+      async (key) => {
+        const storage = createSceneStorage()
+        const outcomes = await Promise.all(
+          [storage.get(key), storage.set(key, 1), storage.delete(key)].map((p) =>
+            p.then(
+              () => 'resolved',
+              (e: unknown) => (e instanceof TypeError ? 'TypeError' : 'Error')
+            )
+          )
+        )
+
+        expect([outcomes, mockWrapSignedFetch.mock.calls.length]).toEqual([['TypeError', 'TypeError', 'TypeError'], 0])
+      }
+    )
   })
 })

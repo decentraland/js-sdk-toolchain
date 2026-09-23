@@ -254,6 +254,17 @@ describe('player storage', () => {
 
   describe('set value serialization', () => {
     it.each([
+      ['an undefined array element', [undefined], '"0" is undefined or a hole in an array'],
+      ['a typed array', new Uint8Array([1]), 'the value is a Uint8Array, which has no JSON form'],
+      ['an unpaired surrogate', 'a\udc00', 'the value contains an unpaired surrogate or a NUL character']
+    ])('should reject %s rather than store it changed', async (_label, value, reason) => {
+      const playerStorage = createPlayerStorage()
+
+      await expect(playerStorage.set(address, 'key', value)).rejects.toThrow(reason)
+      expect(mockWrapSignedFetch).not.toHaveBeenCalled()
+    })
+
+    it.each([
       ['NaN', NaN, 'the value is the non-finite number NaN'],
       ['a nested Infinity', { score: Infinity }, '"score" is the non-finite number Infinity'],
       ['a Set', new Set([1]), 'the value is a Set']
@@ -775,6 +786,42 @@ describe('player storage', () => {
       mockWrapSignedFetch.mockResolvedValueOnce([null, { value: 2 }, 200])
       expect(await playerStorage.get(otherAddress, 'a')).toBe(2)
       expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+  })
+
+  describe('when an address or key cannot address a player entry', () => {
+    it.each([['..'], ['.'], [''], ['not-an-address'], ['0x123']])(
+      'should reject the address %j in every method before sending',
+      async (bad) => {
+        const playerStorage = createPlayerStorage()
+        const calls = [
+          playerStorage.get(bad, 'k'),
+          playerStorage.set(bad, 'k', 1),
+          playerStorage.delete(bad, 'k'),
+          playerStorage.getValues(bad)
+        ]
+        const outcomes = await Promise.all(
+          calls.map((p) =>
+            p.then(
+              () => 'resolved',
+              (e: unknown) => (e instanceof TypeError ? 'TypeError' : 'Error')
+            )
+          )
+        )
+
+        // '..' would otherwise resolve /players/../values/k to the scene's own /values/k.
+        expect([outcomes, mockWrapSignedFetch.mock.calls.length]).toEqual([
+          ['TypeError', 'TypeError', 'TypeError', 'TypeError'],
+          0
+        ])
+      }
+    )
+
+    it.each([[''], ['..'], ['a\ud800']])('should reject the key %j before sending', async (key) => {
+      const playerStorage = createPlayerStorage()
+
+      await expect(playerStorage.set(address, key, 1)).rejects.toThrow(TypeError)
+      expect(mockWrapSignedFetch).not.toHaveBeenCalled()
     })
   })
 })

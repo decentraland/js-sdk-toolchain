@@ -11,7 +11,7 @@ import {
 } from './constants'
 import { createValueCache } from './value-cache'
 import { errorMessage } from './error-message'
-import { serializeStorageValue } from './serialize'
+import { assertPlayerAddress, assertStorageKey, serializeStorageValue } from './serialize'
 import { createWriteQueue, SupersedingWriteFailed } from './write-queue'
 
 /**
@@ -34,6 +34,7 @@ export interface IPlayerStorage {
    * @param options - Optional { fresh } to bypass the read cache
    * @returns A promise that resolves to the parsed JSON value, or null if not found
    * @throws Error if the read fails, so a failure is never mistaken for a missing key
+   * @throws TypeError if the address or key is invalid
    */
   get<T = unknown>(address: string, key: string, options?: GetOptions): Promise<T | null>
 
@@ -45,8 +46,11 @@ export interface IPlayerStorage {
    * @param options - Optional { skipIfUnchanged } to skip the network write when the value is already stored
    * @returns true once stored, or once a newer write that replaced this one lands
    * (rapid writes coalesce); false if the write, or its replacement, fails
-   * @throws TypeError if the value is undefined or circular, or is or contains a function, a
-   * symbol, a non-finite number, a Map or a Set; anything else is serialized as JSON.stringify does
+   * @throws TypeError if the address or key is invalid, or the value cannot be stored unchanged: undefined,
+   * circular, a BigInt, or containing a function, a symbol, a non-finite number, an undefined array
+   * element or hole, a Map, Set, typed array or other built-in with no JSON form, or text with an
+   * unpaired surrogate or a NUL character. An undefined object property is dropped; a Date is
+   * stored as its ISO string and a class instance as its own enumerable data.
    */
   set<T = unknown>(address: string, key: string, value: T, options?: SetOptions): Promise<boolean>
 
@@ -57,6 +61,7 @@ export interface IPlayerStorage {
    * @returns true once applied, or once a newer write that replaced it lands;
    * false only for a confirmed 404
    * @throws Error if the delete, or its replacement, fails; a failure is never reported as absence
+   * @throws TypeError if the address or key is invalid
    */
   delete(address: string, key: string): Promise<boolean>
 
@@ -67,6 +72,7 @@ export interface IPlayerStorage {
    * @param options - Optional { prefix, limit, offset } for filtering and pagination.
    * @returns A promise that resolves to { data, pagination: { offset, total } } for pagination UI
    * @throws Error if the read fails, so a failure is never mistaken for an empty page
+   * @throws TypeError if the address is invalid
    */
   getValues(address: string, options?: GetValuesOptions): Promise<GetValuesResult>
 }
@@ -168,6 +174,8 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
   return {
     async get<T = unknown>(address: string, key: string, options?: GetOptions): Promise<T | null> {
       assertIsServer(MODULE_NAME)
+      assertPlayerAddress(address, 'Storage.player.get()')
+      assertStorageKey(key, 'Storage.player.get()')
 
       const ck = cacheKey(address, key)
 
@@ -230,6 +238,8 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
 
     async set<T = unknown>(address: string, key: string, value: T, options?: SetOptions): Promise<boolean> {
       assertIsServer(MODULE_NAME)
+      assertPlayerAddress(address, 'Storage.player.set()')
+      assertStorageKey(key, 'Storage.player.set()')
 
       const ck = cacheKey(address, key)
       const body = serializeStorageValue(value, `Storage.player.set('${address}', '${key}')`)
@@ -247,6 +257,8 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
 
     async delete(address: string, key: string): Promise<boolean> {
       assertIsServer(MODULE_NAME)
+      assertPlayerAddress(address, 'Storage.player.delete()')
+      assertStorageKey(key, 'Storage.player.delete()')
 
       const ck = cacheKey(address, key)
 
@@ -262,6 +274,7 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
 
     async getValues(address: string, options?: GetValuesOptions): Promise<GetValuesResult> {
       assertIsServer(MODULE_NAME)
+      assertPlayerAddress(address, 'Storage.player.getValues()')
 
       const { prefix, limit, offset } = options ?? {}
       let baseUrl: string
