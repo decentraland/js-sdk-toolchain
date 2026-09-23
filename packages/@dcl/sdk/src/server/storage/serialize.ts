@@ -1,5 +1,6 @@
 const LONE_SURROGATE = /[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/
 const UNSTORABLE_TEXT = /\u0000/
+const MAX_KEY_LENGTH = 255
 
 /** Raised from inside the replacer, so it is not mistaken for an engine error. */
 class UnstorableValueError extends TypeError {}
@@ -80,6 +81,10 @@ export function assertStorageKey(key: unknown, callSite: string): void {
   }
   if (LONE_SURROGATE.test(key) || UNSTORABLE_TEXT.test(key)) {
     throw new TypeError(`${callSite}: key must not contain an unpaired surrogate or a NUL character.`)
+  }
+  // The service stores keys in varchar(255) columns and counts characters, not UTF-16 units.
+  if ([...key].length > MAX_KEY_LENGTH) {
+    throw new TypeError(`${callSite}: key must be at most ${MAX_KEY_LENGTH} characters.`)
   }
 }
 

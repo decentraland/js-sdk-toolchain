@@ -1534,4 +1534,35 @@ describe('scene storage', () => {
       }
     )
   })
+
+  describe('when a key is at the service length limit', () => {
+    it('should accept 255 characters, counting an astral character as one', async () => {
+      const storage = createSceneStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+
+      expect(await storage.set('\u{1F600}'.repeat(255), 1)).toBe(true)
+    })
+
+    it('should reject 256 characters in get(), set() and delete() before sending', async () => {
+      const storage = createSceneStorage()
+      const key = 'k'.repeat(256)
+      const outcomes = await Promise.all(
+        [storage.get(key), storage.set(key, 1), storage.delete(key)].map((p) =>
+          p.then(
+            () => 'resolved',
+            (e: unknown) => (e instanceof TypeError ? (e as Error).message : 'Error')
+          )
+        )
+      )
+
+      expect([outcomes, mockWrapSignedFetch.mock.calls.length]).toEqual([
+        [
+          'Storage.get(): key must be at most 255 characters.',
+          'Storage.set(): key must be at most 255 characters.',
+          'Storage.delete(): key must be at most 255 characters.'
+        ],
+        0
+      ])
+    })
+  })
 })

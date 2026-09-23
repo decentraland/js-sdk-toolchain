@@ -824,4 +824,22 @@ describe('player storage', () => {
       expect(mockWrapSignedFetch).not.toHaveBeenCalled()
     })
   })
+
+  describe('when a key is at the service length limit', () => {
+    it('should accept 255 characters', async () => {
+      const playerStorage = createPlayerStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+
+      expect(await playerStorage.set(address, 'k'.repeat(255), 1)).toBe(true)
+    })
+
+    it('should reject 256 characters before sending', async () => {
+      const playerStorage = createPlayerStorage()
+
+      await expect(playerStorage.set(address, '\u{1F600}'.repeat(256), 1)).rejects.toThrow(
+        'Storage.player.set(): key must be at most 255 characters.'
+      )
+      expect(mockWrapSignedFetch).not.toHaveBeenCalled()
+    })
+  })
 })
