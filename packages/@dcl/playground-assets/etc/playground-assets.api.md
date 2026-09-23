@@ -1554,6 +1554,9 @@ export interface IEvents {
         sender: string;
         message: string;
     };
+    localeChanged: {
+        locale: string;
+    };
     onEnterScene: {
         userId: string;
     };

@@ -1,12 +1,11 @@
 on:
   # An extra entry point; the push trigger below is unchanged. For workflows like
-  # merge-sync-to-experimental.yml, whose merge is written with GITHUB_TOKEN: GitHub
+  # merge-sync-to-auth-server.yml, whose merge is written with GITHUB_TOKEN: GitHub
   # starts no workflow from that token's events, and workflow_dispatch is the exception.
   workflow_dispatch:
   push:
     branches:
       - main
-      - experimental
       - auth-server
   pull_request:
   release:
@@ -14,7 +13,7 @@ on:
       - created
 
 env:
-  BRANCH_TAG: ${{ github.ref_name == 'experimental' && 'experimental' || github.ref_name == 'auth-server' && 'auth-server' || '' }}
+  BRANCH_TAG: ${{ github.ref_name == 'auth-server' && 'auth-server' || '' }}
 
 name: CI
 jobs:
@@ -140,7 +139,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.SDK_TEAM_AWS_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SDK_TEAM_AWS_SECRET }}
-
 
       - name: publish @dcl/ecs package
         uses: decentraland/oddish-action@master

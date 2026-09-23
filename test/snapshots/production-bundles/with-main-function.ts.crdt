@@ -8,7 +8,7 @@ EVAL test/snapshots/production-bundles/with-main-function.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
   OPCODES ~= 71k
-  MALLOC_COUNT = 15394
+  MALLOC_COUNT = 15402
   ALIVE_OBJS_DELTA ~= 3.39k
 CALL onStart()
   OPCODES ~= 0k
@@ -36,4 +36,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 4k
   MALLOC_COUNT = 13
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1108.03k bytes
+  MEMORY_USAGE_COUNT ~= 1108.37k bytes
