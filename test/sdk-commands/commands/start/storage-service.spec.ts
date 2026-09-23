@@ -31,7 +31,10 @@ function captureRoutes(options: { initialStore?: string } = {}) {
       }
       return files.has(filePath)
     }),
-    readFile: jest.fn(async (filePath: string) => files.get(filePath) ?? ''),
+    readFile: jest.fn(async (filePath: string) => {
+      if (!files.has(filePath)) throw Object.assign(new Error(`ENOENT: ${filePath}`), { code: 'ENOENT' })
+      return files.get(filePath)!
+    }),
     directoryExists: jest.fn(async () => true) as jest.Mock<Promise<boolean>, [string]>,
     mkdir: jest.fn(async () => undefined),
     writeFile: jest.fn(async (filePath: string, content: string, options?: { flag?: string }) => {

@@ -27,16 +27,11 @@ function createDefaultStorage(): ServerStorage {
 const isPlainObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
 
-/** A bucket read from disk, or an empty one when the file holds something else there. */
 function bucket<T>(value: unknown): Record<string, T> {
   return isPlainObject(value) ? (value as Record<string, T>) : {}
 }
 
-/**
- * Own-property access for the JSON-backed buckets. Plain indexing would resolve a
- * key such as `constructor`, `toString` or `__proto__` through Object.prototype,
- * and assigning `__proto__` would swap the bucket's prototype instead of storing.
- */
+// Plain indexing would resolve `constructor` or `__proto__` through Object.prototype.
 const hasOwn = (record: object, key: string): boolean => Object.prototype.hasOwnProperty.call(record, key)
 
 function getOwn<T>(record: Record<string, T>, key: string): T | undefined {
@@ -47,11 +42,7 @@ function setOwn<T>(record: Record<string, T>, key: string, value: T): void {
   Object.defineProperty(record, key, { value, enumerable: true, configurable: true, writable: true })
 }
 
-/**
- * Merges every casing of an address into its lowercase bucket, since older previews stored
- * checksummed keys. On a key both hold, the lowercase bucket wins. The next save persists the
- * merged form.
- */
+/** Older previews stored checksummed addresses; the lowercase bucket wins a conflicting key. */
 function mergePlayerBuckets(players: Record<string, unknown>): Record<string, Record<string, unknown>> {
   const merged: Record<string, Record<string, unknown>> = {}
   const addresses = Object.keys(players)
@@ -73,23 +64,21 @@ function mergePlayerBuckets(players: Record<string, unknown>): Record<string, Re
   return merged
 }
 
-/** A namespace's size limits, in UTF-8 bytes of the stored form of a value. */
 export interface StorageLimits {
   maxValueSizeBytes: number
   maxTotalSizeBytes: number
 }
 
-/** The deployed service's default limits: per value, and in total per world (env, world) or per player. */
+/** The deployed service's defaults, in bytes; totals are per world, or per player. */
 export const STORAGE_LIMITS: Record<'env' | 'world' | 'player', StorageLimits> = {
   env: { maxValueSizeBytes: 10240, maxTotalSizeBytes: 262144 },
   world: { maxValueSizeBytes: 524288, maxTotalSizeBytes: 10485760 },
   player: { maxValueSizeBytes: 102400, maxTotalSizeBytes: 1048576 }
 }
 
-/** Thrown when a write would exceed a namespace's size limits. */
 export class StorageLimitExceededError extends Error {}
 
-/** Env values are measured as the raw string, as the deployed service stores them. */
+/** Env values are stored raw, not as JSON. */
 const byteSize = (value: unknown) => Buffer.byteLength(String(value), 'utf-8')
 
 function assertWithinLimits(
@@ -118,16 +107,33 @@ const jsonSize = (value: unknown) => Buffer.byteLength(JSON.stringify(value), 'u
 
 let storeLock: Promise<unknown> = Promise.resolve()
 
-/** A lock file older than this is taken to belong to a preview process that died holding it. */
-const STALE_LOCK_MS = 10_000
-const LOCK_TIMEOUT_MS = 15_000
+const LOCK_TIMEOUT_MS = 30_000
 const LOCK_RETRY_MS = 20
+/** A lock file whose owner cannot be read is taken over only once it is this old. */
+const UNREADABLE_LOCK_MS = 30_000
 
-/**
- * Serializes read-modify-write cycles against server-storage.json. The store is shared by every
- * preview process using this sdk-commands installation, so the lock is a file created exclusively
- * next to the store, queued behind an in-process chain so this process asks for it once at a time.
- */
+const randomToken = () => Math.random().toString(36).slice(2, 10)
+
+/** EPERM means the process exists but belongs to another user. */
+function isAlive(pid: number): boolean {
+  try {
+    process.kill(pid, 0)
+    return true
+  } catch (error) {
+    return (error as NodeJS.ErrnoException)?.code === 'EPERM'
+  }
+}
+
+async function readLock(components: Pick<CliComponents, 'fs'>, lockPath: string): Promise<string | undefined> {
+  try {
+    return await components.fs.readFile(lockPath, 'utf-8')
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException)?.code === 'ENOENT') return undefined
+    throw error
+  }
+}
+
+/** The store is shared by every preview process using this sdk-commands installation. */
 function withStoreLock<T>(components: Pick<CliComponents, 'fs' | 'logger'>, task: () => Promise<T>): Promise<T> {
   const locked = () => withLockFile(components, task)
   const run = storeLock.then(locked, locked)
@@ -138,25 +144,25 @@ function withStoreLock<T>(components: Pick<CliComponents, 'fs' | 'logger'>, task
   return run
 }
 
+/** The lock holds `<pid>:<token>`: only its creator releases it, and only a dead owner's is taken over. */
 async function withLockFile<T>(components: Pick<CliComponents, 'fs' | 'logger'>, task: () => Promise<T>): Promise<T> {
   await ensureRuntimeDir(components)
   const lockPath = `${storagePath()}.lock`
+  const token = `${process.pid}:${randomToken()}`
   const deadline = Date.now() + LOCK_TIMEOUT_MS
   for (;;) {
     try {
-      await components.fs.writeFile(lockPath, String(process.pid), { flag: 'wx' })
+      await components.fs.writeFile(lockPath, token, { flag: 'wx' })
       break
     } catch (error) {
       if ((error as NodeJS.ErrnoException)?.code !== 'EEXIST') throw error
     }
-    try {
-      if (Date.now() - (await components.fs.stat(lockPath)).mtimeMs > STALE_LOCK_MS) {
-        components.logger.warn(`Removing a stale ${SERVER_STORAGE_FILE} lock`)
-        await components.fs.unlink(lockPath)
-        continue
-      }
-    } catch {
-      continue // released between the attempt and the check
+    const holder = await readLock(components, lockPath)
+    if (holder === undefined) continue
+    if (await isAbandoned(components, lockPath, holder)) {
+      components.logger.warn(`Taking over a ${SERVER_STORAGE_FILE} lock held by a process that is no longer running`)
+      await takeOver(components, lockPath, holder)
+      continue
     }
     if (Date.now() > deadline) throw new Error(`Timed out waiting for the ${SERVER_STORAGE_FILE} lock`)
     await new Promise((resolve) => setTimeout(resolve, LOCK_RETRY_MS))
@@ -164,8 +170,36 @@ async function withLockFile<T>(components: Pick<CliComponents, 'fs' | 'logger'>,
   try {
     return await task()
   } finally {
-    await components.fs.unlink(lockPath).catch(() => undefined)
+    if ((await readLock(components, lockPath).catch(() => undefined)) === token) {
+      await components.fs.unlink(lockPath).catch(() => undefined)
+    }
   }
+}
+
+async function isAbandoned(components: Pick<CliComponents, 'fs'>, lockPath: string, holder: string): Promise<boolean> {
+  const pid = Number(holder.split(':')[0])
+  if (Number.isInteger(pid) && pid > 0) return !isAlive(pid)
+  try {
+    return Date.now() - (await components.fs.stat(lockPath)).mtimeMs > UNREADABLE_LOCK_MS
+  } catch {
+    return false
+  }
+}
+
+/** Moving the lock aside is atomic; if a newer owner's lock moved instead, it goes back. */
+async function takeOver(components: Pick<CliComponents, 'fs'>, lockPath: string, observed: string): Promise<void> {
+  const aside = `${lockPath}.${randomToken()}.stale`
+  try {
+    await components.fs.rename(lockPath, aside)
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException)?.code === 'ENOENT') return
+    throw error
+  }
+  const moved = await readLock(components, aside)
+  if (moved !== undefined && moved !== observed) {
+    await components.fs.writeFile(lockPath, moved, { flag: 'wx' }).catch(() => undefined)
+  }
+  await components.fs.unlink(aside).catch(() => undefined)
 }
 
 /**
@@ -204,7 +238,7 @@ async function readStore(components: Pick<CliComponents, 'fs'>): Promise<ServerS
   }
 }
 
-/** Loads the store while holding the store lock, setting a corrupt file aside so it is kept for recovery. */
+/** The caller holds the store lock. A corrupt file is kept aside for recovery. */
 async function loadStoreLocked(components: Pick<CliComponents, 'fs' | 'logger'>): Promise<ServerStorage> {
   const storage = await readStore(components)
   if (storage) return storage
@@ -219,11 +253,7 @@ async function loadStoreLocked(components: Pick<CliComponents, 'fs' | 'logger'>)
   return createDefaultStorage()
 }
 
-/**
- * Loads all server-side storage data from server-storage.json. Only a missing file is an empty
- * store; a corrupt one is set aside under the store lock, and any other read failure throws,
- * so a write never overwrites a store it could not read.
- */
+/** Only a missing file is an empty store; any other read failure throws. */
 export async function loadServerStorage(components: Pick<CliComponents, 'fs' | 'logger'>): Promise<ServerStorage> {
   return (await readStore(components)) ?? withStoreLock(components, () => loadStoreLocked(components))
 }
@@ -236,8 +266,7 @@ export async function saveServerStorage(
   data: ServerStorage
 ): Promise<void> {
   await ensureRuntimeDir(components)
-  // Unique per process and write, so concurrent previews never rename each other's file.
-  const tmpPath = `${storagePath()}.${process.pid}.${Math.random().toString(36).slice(2, 10)}.tmp`
+  const tmpPath = `${storagePath()}.${process.pid}.${randomToken()}.tmp`
   await components.fs.writeFile(tmpPath, JSON.stringify(data, null, 2))
   await components.fs.rename(tmpPath, storagePath())
 }
@@ -253,7 +282,6 @@ export async function loadEnvFile(
   const envMap = new Map<string, string>()
   const envPath = path.join(projectDirectory, '.env')
 
-  // Only a missing file means no variables; a failed read throws rather than reading as empty.
   if (!(await components.fs.fileExists(envPath))) {
     return envMap
   }
