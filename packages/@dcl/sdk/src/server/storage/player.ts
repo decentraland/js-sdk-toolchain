@@ -10,6 +10,7 @@ import {
   StorageConfigState
 } from './constants'
 import { createValueCache } from './value-cache'
+import { errorMessage } from './error-message'
 import { serializeStorageValue } from './serialize'
 import { createWriteQueue, SupersedingWriteFailed } from './write-queue'
 
@@ -63,9 +64,9 @@ export interface IPlayerStorage {
    * @returns A promise that resolves to true once the delete is applied, or once a
    * newer write to the key, issued before this one was sent, took its place and
    * landed (rapid writes coalesce). false only when the service confirmed the key
-   * was already absent (404); the delete is idempotent, so true is the usual
-   * answer for a missing key.
-   * @throws Error if the delete fails, so a failure is never reported as an absence
+   * was already absent (404).
+   * @throws Error if the delete fails, or a write that replaced it before it was sent failed, so a
+   * failure is never reported as an absence
    */
   delete(address: string, key: string): Promise<boolean>
 
@@ -89,14 +90,13 @@ export interface IPlayerStorage {
 export const createPlayerStorage = (config: StorageConfigState = createStorageConfig()): IPlayerStorage => {
   const cache = createValueCache(config)
   // Each in-flight GET is tracked by a wrapper object whose identity marks
-  // ownership: set()/delete() drop the wrapper, detaching the pending GET so
-  // its stale response cannot overwrite the newer cache entry.
+  // ownership: a write drops the wrapper when it lands, detaching the pending
+  // GET so its stale response cannot overwrite the newer cache entry.
   const inflightGets = new Map<string, { promise: Promise<unknown> }>()
 
-  // Ethereum addresses are case-insensitive (checksum casing only), so
-  // mixed-case callers must share the same cache entry. The NUL separator
-  // cannot appear in an address, making the pair unambiguous.
-  const cacheKey = (address: string, key: string) => `${address.toLowerCase()}\u0000${key}`
+  // Addresses are case-insensitive, so mixed-case callers share one entry; the
+  // JSON pair is unambiguous whatever characters the address or key contain.
+  const cacheKey = (address: string, key: string) => JSON.stringify([address.toLowerCase(), key])
 
   // Writes to the same player key are serialized (and rapid ones coalesced to
   // the latest value) so the service commits them in issue order — overlapping
@@ -110,7 +110,7 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       baseUrl = await getStorageServerUrl()
     } catch (error) {
       cache.delete(ck)
-      console.error(`Failed to set player storage value '${key}' for '${address}': ${error}`)
+      console.error(`Failed to set player storage value '${key}' for '${address}': ${errorMessage(error)}`)
       return false
     }
     const url = `${baseUrl}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
@@ -134,7 +134,6 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       // The PUT may have reached the server, so the cached body is no
       // longer reliable.
       cache.delete(ck)
-      console.error(`Failed to set player storage value '${key}' for '${address}': ${error}`)
       return false
     }
 
@@ -148,7 +147,7 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       baseUrl = await getStorageServerUrl()
     } catch (error) {
       cache.delete(ck)
-      throw new Error(`Failed to delete player storage value '${key}' for '${address}': ${error}`)
+      throw new Error(`Failed to delete player storage value '${key}' for '${address}': ${errorMessage(error)}`)
     }
     const url = `${baseUrl}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
 
@@ -171,7 +170,7 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       }
       // The DELETE may have reached the server, so the cached body is unreliable.
       cache.delete(ck)
-      throw new Error(`Failed to delete player storage value '${key}' for '${address}': ${error}`)
+      throw new Error(`Failed to delete player storage value '${key}' for '${address}': ${errorMessage(error)}`)
     }
 
     cache.setAbsent(ck)
@@ -205,7 +204,7 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
           try {
             baseUrl = await getStorageServerUrl()
           } catch (error) {
-            throw new Error(`Failed to get player storage value '${key}' for '${address}': ${error}`)
+            throw new Error(`Failed to get player storage value '${key}' for '${address}': ${errorMessage(error)}`)
           }
           const url = `${baseUrl}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
 
@@ -219,14 +218,12 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
               if (isOwner) cache.setAbsent(ck)
               return null
             }
-            throw new Error(`Failed to get player storage value '${key}' for '${address}': ${error}`)
+            throw new Error(`Failed to get player storage value '${key}' for '${address}': ${errorMessage(error)}`)
           }
 
           // wrapSignedFetch parses an empty 2xx body as {}: a missing value is a fault, not an absence.
           if (!data || data.value === undefined) {
-            const message = `Failed to get player storage value '${key}' for '${address}': response carried no value`
-            console.error(message)
-            throw new Error(message)
+            throw new Error(`Failed to get player storage value '${key}' for '${address}': response carried no value`)
           }
 
           // Same serialization shape as set()'s PUT body, so a read followed by
@@ -257,10 +254,6 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
         return true
       }
 
-      // Reads must not serve the outgoing value while the write is pending.
-      cache.delete(ck)
-      inflightGets.delete(ck)
-
       return writes.enqueue(ck, body, (b) => executeSet(address, key, ck, b as string), skipIfUnchanged)
     },
 
@@ -268,10 +261,6 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       assertIsServer(MODULE_NAME)
 
       const ck = cacheKey(address, key)
-
-      // Reads must not serve the doomed value while the delete is pending.
-      cache.delete(ck)
-      inflightGets.delete(ck)
 
       return writes
         .enqueue(ck, null, () => executeDelete(address, key, ck), true)
@@ -291,7 +280,7 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       try {
         baseUrl = await getStorageServerUrl()
       } catch (error) {
-        throw new Error(`Failed to get player storage values for '${address}': ${error}`)
+        throw new Error(`Failed to get player storage values for '${address}': ${errorMessage(error)}`)
       }
       const parts: string[] = []
 
@@ -317,19 +306,15 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       watcher.stop()
 
       if (error) {
-        throw new Error(`Failed to get player storage values for '${address}': ${error}`)
+        throw new Error(`Failed to get player storage values for '${address}': ${errorMessage(error)}`)
       }
 
       const data = response?.data
       if (!Array.isArray(data)) {
-        const message = `Failed to get player storage values for '${address}': response carried no data array`
-        console.error(message)
-        throw new Error(message)
+        throw new Error(`Failed to get player storage values for '${address}': response carried no data array`)
       }
       if (data.some((entry) => typeof entry?.key !== 'string' || entry.value === undefined)) {
-        const message = `Failed to get player storage values for '${address}': response carried a malformed entry`
-        console.error(message)
-        throw new Error(message)
+        throw new Error(`Failed to get player storage values for '${address}': response carried a malformed entry`)
       }
 
       // Seed the per-key cache so subsequent get()/set() on returned keys can
@@ -349,8 +334,8 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
 
       const requestedOffset = offset ?? 0
       const pagination = {
-        offset: response?.pagination?.offset ?? requestedOffset,
-        total: response?.pagination?.total ?? data.length
+        offset: response!.pagination?.offset ?? requestedOffset,
+        total: response!.pagination?.total ?? data.length
       }
 
       return { data, pagination }

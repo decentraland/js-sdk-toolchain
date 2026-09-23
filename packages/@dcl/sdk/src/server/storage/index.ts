@@ -57,11 +57,12 @@ const createStorage = (): IStorage => {
  * - Use Storage.configure to change module-wide defaults (e.g. skipIfUnchanged, cacheReads)
  *
  * A failure is never reported as absence. A read that fails throws; get() resolves
- * null only for a confirmed 404 or a stored JSON null, and getValues() returns an
- * empty page only for a genuinely empty listing. A delete that fails throws, and
- * resolves false only for a confirmed 404. set() reports failure through its boolean
- * result, and throws for a value that cannot be JSON-serialized. A read issued while
- * writes to its key are pending waits for them, so it reflects them. Nothing is
+ * null only for a confirmed absence (a 404, or a delete that landed) or a stored
+ * JSON null, and getValues() returns an empty page only for a genuinely empty
+ * listing. A delete that fails throws, and resolves false only for a confirmed 404.
+ * set() reports failure through its boolean result, and throws for a value that
+ * cannot be JSON-serialized. A get() issued while writes to its key are pending
+ * waits for them, so it reflects them; getValues() does not wait. Nothing is
  * retried — that is the caller's to decide.
  *
  * Reads are cached by default: get() serves values known from a network
@@ -69,8 +70,8 @@ const createStorage = (): IStorage => {
  * results) without hitting the service, and concurrent gets for the same key
  * share one request. Overlapping writes to the same key are serialized so the
  * service commits them in issue order, and rapid writes coalesce to the
- * latest value; every set()/delete() resolves once its value (or the newer
- * value that superseded it) is durably applied. By default (skipIfUnchanged)
+ * latest value; a set()/delete() settles once its own write, or the newer
+ * write that replaced it, lands or fails. By default (skipIfUnchanged)
  * an unchanged set is skipped, but only when a previous confirmed round-trip
  * proved the exact value is already stored. Out-of-band writers (e.g. CLI storage commands)
  * may not be visible for up to cacheMaxAgeMs; use get(key, { fresh: true })

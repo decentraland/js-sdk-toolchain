@@ -1,5 +1,6 @@
 import { signedFetch, SignedFetchRequest } from '~system/SignedFetch'
 import { isServer } from '../network'
+import { errorMessage } from './storage/error-message'
 
 /**
  * Validates that the code is running on a server-side scene.
@@ -39,15 +40,6 @@ export async function tryCatch<T, E = Error>(promise: Promise<T>): Promise<Resul
   } catch (error) {
     return [error as E, null]
   }
-}
-
-/**
- * The message of a thrown value, or `fallback` when it carries none.
- * @internal
- */
-export function errorMessage(error: unknown, fallback: string): string {
-  const message = error instanceof Error ? error.message : typeof error === 'string' ? error : ''
-  return message || fallback
 }
 
 /**

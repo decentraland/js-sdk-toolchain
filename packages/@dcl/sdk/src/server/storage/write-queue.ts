@@ -11,8 +11,7 @@ export class SupersedingWriteFailed extends Error {
 
 /**
  * A pending write operation. `body` is the serialized PUT payload, or null
- * for a DELETE. Callers coalesced into the op share its promise.
- * @internal
+ * for a DELETE. Callers that join the op share its promise.
  */
 interface PendingOp {
   body: string | null
@@ -56,13 +55,15 @@ export interface WriteQueue {
    */
   settled(key: string): Promise<void>
   /**
-   * Issues a write. If one is in flight, the new op is queued — replacing any
-   * already-queued op, which coalesces into this one (see settleSuperseded). An op identical to the
-   * queued one joins it; `joinActive` additionally allows joining an
-   * identical in-flight op (only valid for dedup-tolerant callers, since that
-   * op was issued before this call).
+   * Issues a write. If one is in flight, the new op is queued, replacing any
+   * already-queued op, which coalesces into this one (see settleSuperseded). An
+   * op identical to the queued one joins it; `joinActive` additionally allows
+   * joining an identical in-flight op (only valid for dedup-tolerant callers,
+   * since that op was issued before this call).
    *
-   * Rejects with whatever the executor threw.
+   * Rejects with the executor's error. A replaced delete rejects with the
+   * replacement's error, or with SupersedingWriteFailed when the replacing set
+   * did not apply; a replaced set never rejects and resolves false instead.
    */
   enqueue(
     key: string,

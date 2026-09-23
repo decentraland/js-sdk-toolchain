@@ -158,9 +158,7 @@ describe('player storage', () => {
       try {
         expect(await playerStorage.set(address, 'key', 1)).toBe(false)
         expect(mockWrapSignedFetch).not.toHaveBeenCalled()
-        expect(error).toHaveBeenCalledWith(
-          `Failed to set player storage value 'key' for '${address}': Error: realm down`
-        )
+        expect(error).toHaveBeenCalledWith(`Failed to set player storage value 'key' for '${address}': realm down`)
       } finally {
         error.mockRestore()
       }
@@ -558,7 +556,7 @@ describe('player storage', () => {
       mockGetStorageServerUrl.mockRejectedValueOnce(new Error('realm down'))
 
       await expect(playerStorage.delete(address, 'key')).rejects.toThrow(
-        `Failed to delete player storage value 'key' for '${address}': Error: realm down`
+        `Failed to delete player storage value 'key' for '${address}': realm down`
       )
     })
   })
@@ -569,7 +567,7 @@ describe('player storage', () => {
       mockGetStorageServerUrl.mockRejectedValueOnce(new Error('realm down'))
 
       await expect(playerStorage.get(address, 'key')).rejects.toThrow(
-        `Failed to get player storage value 'key' for '${address}': Error: realm down`
+        `Failed to get player storage value 'key' for '${address}': realm down`
       )
     })
 

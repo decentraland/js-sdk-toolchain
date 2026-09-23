@@ -40,7 +40,7 @@ export interface SetOptions {
   /**
    * When true, skips the network write if the serialized value matches the
    * last value known to be stored for this key (from a previous successful
-   * set() or get()). Overrides the configured default. Default: true.
+   * set(), get() or getValues()). Overrides the configured default. Default: true.
    */
   skipIfUnchanged?: boolean
 }

@@ -5,10 +5,13 @@
  * @internal
  */
 export function serializeStorageValue(value: unknown, callSite: string): string {
-  const body = JSON.stringify({ value }, (property, item) => {
+  const envelope = { value }
+  const body = JSON.stringify(envelope, function (this: unknown, property, item) {
     if (typeof item === 'function' || typeof item === 'symbol') {
+      // At the root the replacer sees the envelope's `value` property; name the value itself instead.
+      const where = this === envelope ? 'the value' : `"${property}"`
       throw new TypeError(
-        `${callSite}: value must be JSON-serializable, but "${property}" is a ${typeof item}. Use delete() to remove a key.`
+        `${callSite}: value must be JSON-serializable, but ${where} is a ${typeof item}. Use delete() to remove a key.`
       )
     }
     return item

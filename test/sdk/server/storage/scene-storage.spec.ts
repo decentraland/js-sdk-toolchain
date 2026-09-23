@@ -30,7 +30,7 @@ describe('scene storage', () => {
       const storage = createSceneStorage()
       mockGetStorageServerUrl.mockRejectedValueOnce(new Error('realm down'))
 
-      await expect(storage.getValues()).rejects.toThrow('Failed to get storage values: Error: realm down')
+      await expect(storage.getValues()).rejects.toThrow('Failed to get storage values: realm down')
     })
 
     it('should request /values and return entries when no prefix is passed', async () => {
@@ -171,7 +171,7 @@ describe('scene storage', () => {
       try {
         expect(await storage.set('key', 1)).toBe(false)
         expect(mockWrapSignedFetch).not.toHaveBeenCalled()
-        expect(error).toHaveBeenCalledWith("Failed to set storage value 'key': Error: realm down")
+        expect(error).toHaveBeenCalledWith("Failed to set storage value 'key': realm down")
       } finally {
         error.mockRestore()
       }
@@ -329,7 +329,7 @@ describe('scene storage', () => {
       const storage = createSceneStorage()
       mockGetStorageServerUrl.mockRejectedValueOnce(new Error('realm down'))
 
-      await expect(storage.delete('key')).rejects.toThrow("Failed to delete storage value 'key': Error: realm down")
+      await expect(storage.delete('key')).rejects.toThrow("Failed to delete storage value 'key': realm down")
     })
 
     it('should read from the network once the delete it waited for fails', async () => {
@@ -701,7 +701,7 @@ describe('scene storage', () => {
       const storage = createSceneStorage()
 
       await expect(storage.set('key', () => undefined)).rejects.toThrow(
-        `Storage.set('key'): value must be JSON-serializable, but "value" is a function. Use delete() to remove a key.`
+        `Storage.set('key'): value must be JSON-serializable, but the value is a function. Use delete() to remove a key.`
       )
     })
 
@@ -1061,7 +1061,7 @@ describe('scene storage', () => {
       const storage = createSceneStorage()
       mockGetStorageServerUrl.mockRejectedValueOnce(new Error('realm down'))
 
-      await expect(storage.get('key')).rejects.toThrow("Failed to get storage value 'key': Error: realm down")
+      await expect(storage.get('key')).rejects.toThrow("Failed to get storage value 'key': realm down")
     })
 
     it('should serve a repeated get from cache with fresh objects per hit', async () => {
