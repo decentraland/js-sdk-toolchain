@@ -1,12 +1,11 @@
 /**
- * Rejection of a superseded delete whose superseding write failed: the key's state
- * is unknown, and a delete's `false` is reserved for a confirmed absence.
+ * Rejection of a superseded delete when the write that replaced it did not apply.
  * @internal
  */
-export class SupersededWriteFailed extends Error {
+export class SupersedingWriteFailed extends Error {
   constructor() {
-    super('the write that superseded it failed')
-    this.name = 'SupersededWriteFailed'
+    super('a write that replaced it did not apply')
+    this.name = 'SupersedingWriteFailed'
   }
 }
 
@@ -92,9 +91,8 @@ export function createWriteQueue(): WriteQueue {
 
   /**
    * A superseded op never reaches the network: it coalesces into the op that
-   * replaced it and resolves true when that op lands, so rapid writes to one key
-   * report one outcome instead of spurious failures. Only a failure is reported in
-   * the superseded op's own terms: a set resolves false, a delete rejects.
+   * replaced it and resolves true when that op lands. Only a failure is reported
+   * in the superseded op's own terms: a set resolves false, a delete rejects.
    */
   function settleSuperseded(superseded: PendingOp, by: PendingOp): void {
     by.promise.then(
@@ -102,7 +100,7 @@ export function createWriteQueue(): WriteQueue {
         const applied = by.body === null || result
         if (superseded.body !== null) superseded.resolve(applied)
         else if (applied) superseded.resolve(true)
-        else superseded.reject(new SupersededWriteFailed())
+        else superseded.reject(new SupersedingWriteFailed())
       },
       (error) => {
         if (superseded.body === null) superseded.reject(error)
@@ -117,7 +115,6 @@ export function createWriteQueue(): WriteQueue {
       try {
         op.resolve(await op.execute(op.body))
       } catch (error) {
-        // A throw is a failure the executor refuses to express as `false`.
         op.reject(error)
       }
 

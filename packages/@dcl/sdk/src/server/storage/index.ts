@@ -60,11 +60,9 @@ const createStorage = (): IStorage => {
  * null only for a confirmed 404 or a stored JSON null, and getValues() returns an
  * empty page only for a genuinely empty listing. A delete that fails throws, and
  * resolves false only for a confirmed 404. set() reports failure through its boolean
- * result, and throws only for a value that cannot be JSON-serialized. A write that a
- * newer write to the same key supersedes before it is sent coalesces into it and
- * reports its outcome. A read issued while a write to its key is in flight
- * waits for that write to land, so it reflects it. Nothing is retried — that is the
- * caller's to decide.
+ * result, and throws for a value that cannot be JSON-serialized. A read issued while
+ * writes to its key are pending waits for them, so it reflects them. Nothing is
+ * retried — that is the caller's to decide.
  *
  * Reads are cached by default: get() serves values known from a network
  * round-trip within the last cacheMaxAgeMs (including confirmed "not found"

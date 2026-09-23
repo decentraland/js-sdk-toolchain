@@ -383,9 +383,34 @@ describe('player storage', () => {
       expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
     })
 
-    it('should not wait for a write issued after the read, nor let the late answer overwrite that write', async () => {
+    it('should answer a read parked behind a landed write from it, even with a later write already in flight', async () => {
       const playerStorage = createPlayerStorage()
       const putA = deferred<[null, object]>()
+      const putB = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementation((req: { init?: { method?: string; body?: string } }) =>
+        req.init?.body === JSON.stringify({ value: 'a' }) ? putA.promise : putB.promise
+      )
+
+      const writingA = playerStorage.set(address, 'k', 'a')
+      await flush()
+      const reading = playerStorage.get(address, 'k')
+      await flush()
+      const writingB = playerStorage.set(address, 'k', 'b')
+
+      putA.resolve([null, {}])
+      expect(await writingA).toBe(true)
+      expect(await reading).toBe('a')
+      expect(mockWrapSignedFetch.mock.calls.map((call) => call[0].init?.method ?? 'GET')).toEqual(['PUT', 'PUT'])
+
+      putB.resolve([null, {}])
+      expect(await writingB).toBe(true)
+      expect(await playerStorage.get(address, 'k')).toBe('b')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should not wait for a write issued after the read, nor let the late answer overwrite that write', async () => {
+      const playerStorage = createPlayerStorage()
+      const putA = deferred<[string, null, number]>()
       const putB = deferred<[null, object]>()
       const read = deferred<[null, { value: string }, number]>()
       mockWrapSignedFetch.mockImplementation((req: { init?: { method?: string; body?: string } }) => {
@@ -399,15 +424,15 @@ describe('player storage', () => {
       await flush()
       const writingB = playerStorage.set(address, 'k', 'b')
 
-      putA.resolve([null, {}])
-      expect(await writingA).toBe(true)
+      putA.resolve(['500 Internal Server Error', null, 500])
+      expect(await writingA).toBe(false)
       await flush()
       expect(mockWrapSignedFetch.mock.calls.map((call) => call[0].init?.method ?? 'GET')).toEqual(['PUT', 'PUT', 'GET'])
 
       putB.resolve([null, {}])
       expect(await writingB).toBe(true)
-      read.resolve([null, { value: 'a' }, 200])
-      expect(await reading).toBe('a')
+      read.resolve([null, { value: 'old' }, 200])
+      expect(await reading).toBe('old')
       expect(await playerStorage.get(address, 'k')).toBe('b')
       expect(mockWrapSignedFetch).toHaveBeenCalledTimes(3)
     })
@@ -501,7 +526,7 @@ describe('player storage', () => {
       expect(await first).toBe(true)
       expect(await third).toBe(false)
       await expect(deleting).rejects.toThrow(
-        `Failed to delete player storage value 'k' for '${address}': the write that superseded it failed`
+        `Failed to delete player storage value 'k' for '${address}': a write that replaced it did not apply`
       )
     })
   })
@@ -518,6 +543,15 @@ describe('player storage', () => {
   })
 
   describe('get read caching', () => {
+    it('should reject with the storage prefix when the storage URL cannot be resolved', async () => {
+      const playerStorage = createPlayerStorage()
+      mockGetStorageServerUrl.mockRejectedValueOnce(new Error('realm down'))
+
+      await expect(playerStorage.get(address, 'key')).rejects.toThrow(
+        `Failed to get player storage value 'key' for '${address}': Error: realm down`
+      )
+    })
+
     it('should serve a repeated get from cache', async () => {
       const playerStorage = createPlayerStorage()
       mockWrapSignedFetch.mockResolvedValueOnce([null, { value: { hp: 100 } }, 200])

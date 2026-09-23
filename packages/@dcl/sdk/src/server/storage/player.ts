@@ -11,7 +11,7 @@ import {
 } from './constants'
 import { createValueCache } from './value-cache'
 import { serializeStorageValue } from './serialize'
-import { createWriteQueue, SupersededWriteFailed } from './write-queue'
+import { createWriteQueue, SupersedingWriteFailed } from './write-queue'
 
 /**
  * Player-scoped storage interface for key-value pairs from the Server Side Storage service.
@@ -47,10 +47,12 @@ export interface IPlayerStorage {
    * @param options - Optional { skipIfUnchanged } to skip the network write when the value is already stored
    * @returns A promise that resolves to true once the value is stored, or once a
    * newer write to the same key, issued before this one was sent, took its place
-   * and landed (rapid writes coalesce). false when the write failed.
+   * and landed (rapid writes coalesce). false when the write, or the write that
+   * took its place, failed.
    * @throws TypeError if the value is undefined, a function or a symbol, contains a
-   * function or a symbol at any depth, or is circular. Undefined properties inside
-   * the value are dropped, as JSON.stringify does.
+   * function or a symbol value at any depth, or is circular. Everything else follows
+   * JSON.stringify: undefined properties are dropped in objects and become null in
+   * arrays, symbol keys are dropped, Map, Set and non-finite numbers become {} and null.
    */
   set<T = unknown>(address: string, key: string, value: T, options?: SetOptions): Promise<boolean>
 
@@ -136,8 +138,7 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       return false
     }
 
-    // A newer write may be queued behind this one; caching this body would serve it until that lands.
-    if (writes.pending(ck) === body) cache.set(ck, { body })
+    cache.set(ck, { body })
     return true
   }
 
@@ -165,7 +166,7 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
     if (error) {
       // A 404 still confirms the key is absent server-side.
       if (status === 404) {
-        if (writes.pending(ck) === null) cache.setAbsent(ck)
+        cache.setAbsent(ck)
         return false
       }
       // The DELETE may have reached the server, so the cached body is unreliable.
@@ -173,7 +174,7 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       throw new Error(`Failed to delete player storage value '${key}' for '${address}': ${error}`)
     }
 
-    if (writes.pending(ck) === null) cache.setAbsent(ck)
+    cache.setAbsent(ck)
     return true
   }
 
@@ -183,7 +184,6 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
 
       const ck = cacheKey(address, key)
 
-      // Writes issued before this read land first, so the read reflects them.
       if (writes.isPending(ck)) await writes.settled(ck)
 
       if (config.cacheReads && !options?.fresh) {
@@ -201,18 +201,22 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       const inflight = {} as { promise: Promise<T | null> }
       inflight.promise = (async () => {
         try {
-          const baseUrl = await getStorageServerUrl()
+          let baseUrl: string
+          try {
+            baseUrl = await getStorageServerUrl()
+          } catch (error) {
+            throw new Error(`Failed to get player storage value '${key}' for '${address}': ${error}`)
+          }
           const url = `${baseUrl}/players/${encodeURIComponent(address)}/values/${encodeURIComponent(key)}`
 
           const [error, data, status] = await wrapSignedFetch<{ value: T }>({ url })
 
-          // A response that lands while a write is pending may predate that write; the write refreshes the cache when it completes.
-          const cacheable = inflightGets.get(ck) === inflight && !writes.isPending(ck)
+          const isOwner = inflightGets.get(ck) === inflight
 
           if (error) {
             // A confirmed 404 is a first-class "absent" outcome, not a failure.
             if (status === 404) {
-              if (cacheable) cache.setAbsent(ck)
+              if (isOwner) cache.setAbsent(ck)
               return null
             }
             throw new Error(`Failed to get player storage value '${key}' for '${address}': ${error}`)
@@ -220,14 +224,15 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
 
           // wrapSignedFetch parses an empty 2xx body as {}: a missing value is a fault, not an absence.
           if (!data || data.value === undefined) {
-            console.error(`Failed to get player storage value '${key}' for '${address}': response carried no value`)
-            throw new Error(`Failed to get player storage value '${key}' for '${address}': response carried no value`)
+            const message = `Failed to get player storage value '${key}' for '${address}': response carried no value`
+            console.error(message)
+            throw new Error(message)
           }
 
           // Same serialization shape as set()'s PUT body, so a read followed by
           // an unchanged write can be skipped.
           const body = JSON.stringify({ value: data.value })
-          if (cacheable) cache.set(ck, { body })
+          if (isOwner) cache.set(ck, { body })
           return data.value
         } finally {
           if (inflightGets.get(ck) === inflight) inflightGets.delete(ck)
@@ -252,7 +257,7 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
         return true
       }
 
-      // Until the PUT lands, neither the old nor the new value can be served for this key.
+      // Reads must not serve the outgoing value while the write is pending.
       cache.delete(ck)
       inflightGets.delete(ck)
 
@@ -264,16 +269,14 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
 
       const ck = cacheKey(address, key)
 
-      // Invalidate immediately — even while the DELETE waits behind other
-      // writes, reads must not serve the doomed value, and a stale
-      // "unchanged" skip would lose a future write.
+      // Reads must not serve the doomed value while the delete is pending.
       cache.delete(ck)
       inflightGets.delete(ck)
 
       return writes
         .enqueue(ck, null, () => executeDelete(address, key, ck), true)
         .catch((error: unknown) => {
-          if (error instanceof SupersededWriteFailed) {
+          if (error instanceof SupersedingWriteFailed) {
             throw new Error(`Failed to delete player storage value '${key}' for '${address}': ${error.message}`)
           }
           throw error
@@ -284,7 +287,12 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       assertIsServer(MODULE_NAME)
 
       const { prefix, limit, offset } = options ?? {}
-      const baseUrl = await getStorageServerUrl()
+      let baseUrl: string
+      try {
+        baseUrl = await getStorageServerUrl()
+      } catch (error) {
+        throw new Error(`Failed to get player storage values for '${address}': ${error}`)
+      }
       const parts: string[] = []
 
       if (!!prefix) {
@@ -305,13 +313,8 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
         : `${baseUrl}/players/${encodeURIComponent(address)}/values`
 
       const watcher = cache.watch()
-      let error: string | null
-      let response: GetValuesResult | null
-      try {
-        ;[error, response] = await wrapSignedFetch<GetValuesResult>({ url })
-      } finally {
-        watcher.stop()
-      }
+      const [error, response] = await wrapSignedFetch<GetValuesResult>({ url })
+      watcher.stop()
 
       if (error) {
         throw new Error(`Failed to get player storage values for '${address}': ${error}`)
@@ -319,12 +322,14 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
 
       const data = response?.data
       if (!Array.isArray(data)) {
-        console.error(`Failed to get player storage values for '${address}': response carried no data array`)
-        throw new Error(`Failed to get player storage values for '${address}': response carried no data array`)
+        const message = `Failed to get player storage values for '${address}': response carried no data array`
+        console.error(message)
+        throw new Error(message)
       }
       if (data.some((entry) => typeof entry?.key !== 'string' || entry.value === undefined)) {
-        console.error(`Failed to get player storage values for '${address}': response carried a malformed entry`)
-        throw new Error(`Failed to get player storage values for '${address}': response carried a malformed entry`)
+        const message = `Failed to get player storage values for '${address}': response carried a malformed entry`
+        console.error(message)
+        throw new Error(message)
       }
 
       // Seed the per-key cache so subsequent get()/set() on returned keys can
@@ -336,7 +341,6 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
       // the cache; entries repopulate lazily.
       for (const entry of data) {
         const ck = cacheKey(address, entry.key)
-        // A key mutated while the page was in flight must not be re-seeded from the snapshot.
         if (watcher.mutated(ck) || writes.isPending(ck) || inflightGets.has(ck)) continue
         if (cache.get(ck) === undefined) {
           cache.set(ck, { body: JSON.stringify({ value: entry.value }) })
