@@ -677,6 +677,34 @@ describe('scene storage', () => {
   })
 
   describe('queued writes and the cache', () => {
+    it('should also wait for the write that replaced the queued one, then answer from it without a network read', async () => {
+      const storage = createSceneStorage()
+      const put1 = deferred<[null, object]>()
+      const put3 = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementation((req: { init?: { method?: string; body?: string } }) => {
+        if (req.init?.method !== 'PUT') return Promise.resolve([null, { value: 'v1' }, 200])
+        return req.init.body === JSON.stringify({ value: 'v1' }) ? put1.promise : put3.promise
+      })
+
+      const first = storage.set('k', 'v1')
+      await flush()
+      const second = storage.set('k', 'v2') // queued
+      const reading = storage.get('k') // parked behind v1 and v2
+      await flush()
+      const third = storage.set('k', 'v3') // replaces the queued v2 after the read was issued
+
+      put1.resolve([null, {}])
+      expect(await first).toBe(true)
+      await flush()
+      // v1 landed and v3 is in flight in place of v2: the read stays parked and issues no GET.
+      expect(mockWrapSignedFetch.mock.calls.map((call) => call[0].init?.method ?? 'GET')).toEqual(['PUT', 'PUT'])
+
+      put3.resolve([null, {}])
+      expect(await Promise.all([second, third])).toEqual([true, true])
+      expect(await reading).toBe('v3')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
     it('should answer a read issued while a write is queued behind another from the queued write, without a network read', async () => {
       const storage = createSceneStorage()
       const firstPut = deferred<[null, object]>()

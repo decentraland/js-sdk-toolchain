@@ -356,6 +356,33 @@ describe('player storage', () => {
   })
 
   describe('queued writes and the cache', () => {
+    it('should also wait for the write that replaced the queued one, then answer from it without a network read', async () => {
+      const playerStorage = createPlayerStorage()
+      const put1 = deferred<[null, object]>()
+      const put3 = deferred<[null, object]>()
+      mockWrapSignedFetch.mockImplementation((req: { init?: { method?: string; body?: string } }) => {
+        if (req.init?.method !== 'PUT') return Promise.resolve([null, { value: 'v1' }, 200])
+        return req.init.body === JSON.stringify({ value: 'v1' }) ? put1.promise : put3.promise
+      })
+
+      const first = playerStorage.set(address, 'k', 'v1')
+      await flush()
+      const second = playerStorage.set(address, 'k', 'v2')
+      const reading = playerStorage.get(address, 'k')
+      await flush()
+      const third = playerStorage.set(address, 'k', 'v3')
+
+      put1.resolve([null, {}])
+      expect(await first).toBe(true)
+      await flush()
+      expect(mockWrapSignedFetch.mock.calls.map((call) => call[0].init?.method ?? 'GET')).toEqual(['PUT', 'PUT'])
+
+      put3.resolve([null, {}])
+      expect(await Promise.all([second, third])).toEqual([true, true])
+      expect(await reading).toBe('v3')
+      expect(mockWrapSignedFetch).toHaveBeenCalledTimes(2)
+    })
+
     it('should not wait for a write issued after the read, nor let the late answer overwrite that write', async () => {
       const playerStorage = createPlayerStorage()
       const putA = deferred<[null, object]>()

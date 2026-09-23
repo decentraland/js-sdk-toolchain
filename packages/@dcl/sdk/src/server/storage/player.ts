@@ -26,9 +26,11 @@ export interface IPlayerStorage {
    * "not found" results. Concurrent gets for the same player and key share one
    * request. Out-of-band writers (e.g. CLI storage commands) may not be visible
    * for up to cacheMaxAgeMs — pass { fresh: true } to force a network read.
-   * A read issued while a write to the same key is in flight waits for that
-   * write to land first, so it never answers with a value older than what the
-   * caller has already written. Writes issued after the read are not awaited.
+   * A read issued while a write to the same key is in flight first waits for the
+   * writes pending at that moment (the in-flight one and one queued behind it, or
+   * the write that replaced the queued one), so it never answers with a value older
+   * than one the caller wrote before the read. Writes issued after the read are
+   * not awaited beyond that.
    * @param address - The player's wallet address
    * @param key - The key to retrieve
    * @param options - Optional { fresh } to bypass the read cache
