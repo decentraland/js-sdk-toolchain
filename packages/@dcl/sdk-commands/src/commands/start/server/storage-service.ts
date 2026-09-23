@@ -14,17 +14,49 @@ import {
   getPlayerStorage,
   getPlayerValue,
   setPlayerValue,
-  deletePlayerValue
+  deletePlayerValue,
+  STORAGE_LIMITS,
+  StorageLimitExceededError,
+  StorageLimits
 } from './runtime-env'
 
 /** Keys live in varchar(255) columns on the deployed service. */
 const MAX_KEY_LENGTH = 255
-/** The deployed service serves at most this many entries per page, and falls back to it for a missing or invalid limit. */
+/** At most this many entries per page; also the fallback for a missing or invalid limit. */
 const MAX_PAGE_SIZE = 100
-/** Postgres jsonb cannot store NUL; the deployed service rejects a serialized value carrying one (an unescaped \u0000 escape). */
+/** Offsets past this are capped, as in the deployed service's pagination helper. */
+const MAX_OFFSET = 100000
+/** Slack the deployed service allows on top of the per-value limit for the request envelope. */
+const BODY_ENVELOPE_SLACK_BYTES = 1024
+const ADDRESS_PATTERN = /^0x[a-f0-9]{40}$/
+/** A `\u0000` escape in JSON.stringify output that is not an escaped backslash followed by the text `u0000`. */
 const NUL_ESCAPE = /(?<!\\)(?:\\\\)*\\u0000/
+const LONE_SURROGATE = /[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/
 
-type ListEntry = { key: string; value: unknown }
+type Response = IHttpServerComponent.IResponse
+
+/**
+ * Code-point order. The deployed service orders by its database collation, which can place
+ * mixed-case, punctuation and non-ASCII keys differently.
+ */
+function compareByCodePoint(a: string, b: string): number {
+  const left = [...a]
+  const right = [...b]
+  for (let i = 0; i < Math.min(left.length, right.length); i++) {
+    const difference = left[i].codePointAt(0)! - right[i].codePointAt(0)!
+    if (difference !== 0) return difference
+  }
+  return left.length - right.length
+}
+
+function hasLoneSurrogate(value: unknown): boolean {
+  if (typeof value === 'string') return LONE_SURROGATE.test(value)
+  if (Array.isArray(value)) return value.some(hasLoneSurrogate)
+  if (value !== null && typeof value === 'object') {
+    return Object.entries(value).some(([key, item]) => LONE_SURROGATE.test(key) || hasLoneSurrogate(item))
+  }
+  return false
+}
 
 /**
  * Sets up storage-related endpoints for environment variables, scene storage, and player storage.
@@ -49,16 +81,24 @@ export function setupStorageEndpoints(
   const withAddressValidation: IHttpServerComponent.IRequestHandler<
     IHttpServerComponent.PathAwareContext<PreviewComponents, string>
   > = async (ctx, next) => {
-    // The deployed service lowercases the address, then requires a 20-byte hex address.
+    // The deployed service lowercases the address before validating it.
     const address = (ctx.params.address ?? '').toLowerCase()
-    if (!/^0x[a-f0-9]{40}$/.test(address)) {
+    if (!ADDRESS_PATTERN.test(address)) {
       return { status: 400, body: { message: 'Invalid player address' } }
     }
     ctx.params.address = address
     return next()
   }
 
-  /** Same contract as the deployed service: the body must be an object carrying `value`. */
+  const badRequest = (message: string): Response => ({ status: 400, body: { message } })
+  const invalidBody = () => badRequest('Invalid JSON body')
+
+  function serverError(what: string, error: unknown): Response {
+    components.logger.error(`Failed to ${what}: ${error}`)
+    return { status: 500, body: { message: `Failed to ${what}` } }
+  }
+
+  /** Same contract as the deployed service: the body must be an object carrying `value` and nothing else. */
   function readValueFromBody(bodyText: string): { ok: true; value: unknown } | { ok: false } {
     let parsed: unknown
     try {
@@ -66,28 +106,53 @@ export function setupStorageEndpoints(
     } catch {
       return { ok: false }
     }
-    if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed) || !('value' in parsed)) {
-      return { ok: false }
-    }
+    if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) return { ok: false }
+    const keys = Object.keys(parsed)
+    if (keys.length !== 1 || keys[0] !== 'value') return { ok: false }
     return { ok: true, value: (parsed as { value: unknown }).value }
   }
 
-  const invalidBody = () => ({ status: 400, body: { message: 'Invalid JSON body' } })
+  /** Reads and validates a PUT body, or answers the rejection the deployed service gives. */
+  async function readPut(
+    ctx: { request: { text(): Promise<string> } },
+    limits: StorageLimits,
+    options: { stringOnly?: boolean; allowNul?: boolean } = {}
+  ): Promise<{ value: unknown } | { response: Response }> {
+    const bodyText = await ctx.request.text()
+    if (Buffer.byteLength(bodyText, 'utf-8') > limits.maxValueSizeBytes + BODY_ENVELOPE_SLACK_BYTES) {
+      return { response: { status: 413, body: { message: 'Request body is too large' } } }
+    }
+    const parsed = readValueFromBody(bodyText)
+    if (!parsed.ok || (options.stringOnly && typeof parsed.value !== 'string')) return { response: invalidBody() }
+    if (!options.allowNul && NUL_ESCAPE.test(JSON.stringify(parsed.value))) {
+      return { response: badRequest('Values must not contain the \\u0000 (NUL) character') }
+    }
+    if (hasLoneSurrogate(parsed.value)) return { response: badRequest('Values must not contain unpaired surrogates') }
+    return { value: parsed.value }
+  }
 
-  const containsNul = (value: unknown) => NUL_ESCAPE.test(JSON.stringify(value))
-  const invalidValue = () => ({ status: 400, body: { message: 'Values must not contain the \\u0000 (NUL) character' } })
+  async function write(what: string, store: () => Promise<void>, success: Response): Promise<Response> {
+    try {
+      await store()
+      return success
+    } catch (error) {
+      if (error instanceof StorageLimitExceededError) return badRequest(error.message)
+      return serverError(what, error)
+    }
+  }
 
-  function listPage(entries: ListEntry[], searchParams: URLSearchParams) {
+  function listPage(values: Record<string, unknown>, searchParams: URLSearchParams): Response {
     const prefix = searchParams.get('prefix')
-    const matching = (prefix ? entries.filter((entry) => entry.key.startsWith(prefix)) : entries).sort((a, b) =>
-      a.key < b.key ? -1 : a.key > b.key ? 1 : 0
-    )
+    const matching = Object.entries(values)
+      .filter(([key]) => !prefix || key.startsWith(prefix))
+      .sort(([a], [b]) => compareByCodePoint(a, b))
+      .map(([key, value]) => ({ key, value }))
     const requestedLimit = parseInt(searchParams.get('limit') ?? '', 10)
     const limit =
       Number.isNaN(requestedLimit) || requestedLimit <= 0 || requestedLimit > MAX_PAGE_SIZE
         ? MAX_PAGE_SIZE
         : requestedLimit
-    const offset = Math.max(0, parseInt(searchParams.get('offset') ?? '', 10) || 0)
+    const offset = Math.min(MAX_OFFSET, Math.max(0, parseInt(searchParams.get('offset') ?? '', 10) || 0))
     return {
       body: JSON.stringify({
         data: matching.slice(offset, offset + limit),
@@ -99,166 +164,122 @@ export function setupStorageEndpoints(
   // Environment variables endpoints (/env/:key)
   router.get('/env/:key', withKeyValidation, async (ctx) => {
     const { key } = ctx.params
-
     try {
-      const envVars = await getMergedEnv(components, workspace.projects[0].workingDirectory)
-      const value = envVars.get(key)
-
-      if (value === undefined) {
-        return { status: 404, body: { message: `Environment variable '${key}' not found` } }
-      }
-
+      const value = (await getMergedEnv(components, workspace.projects[0].workingDirectory)).get(key)
+      if (value === undefined) return { status: 404, body: { message: `Environment variable '${key}' not found` } }
       return { body: JSON.stringify({ value }) }
     } catch (error) {
-      components.logger.error(`Failed to get environment variable '${key}': ${error}`)
-      return { status: 500, body: { message: `Failed to get environment variable '${key}'` } }
+      return serverError(`get environment variable '${key}'`, error)
     }
   })
 
   router.put('/env/:key', withKeyValidation, async (ctx) => {
     const { key } = ctx.params
-
     try {
-      const parsed = readValueFromBody(await ctx.request.text())
-      // The deployed service only accepts a string here.
-      if (!parsed.ok || typeof parsed.value !== 'string') return invalidBody()
-      await setEnvValue(components, key, parsed.value)
-      return { status: 204 }
+      // The deployed service accepts only a string here, and stores NUL in env values.
+      const put = await readPut(ctx, STORAGE_LIMITS.env, { stringOnly: true, allowNul: true })
+      if ('response' in put) return put.response
+      return write(`set environment variable '${key}'`, () => setEnvValue(components, key, put.value as string), {
+        status: 204
+      })
     } catch (error) {
-      components.logger.error(`Failed to set environment variable '${key}': ${error}`)
-      return { status: 500, body: { message: `Failed to set environment variable '${key}'` } }
+      return serverError(`set environment variable '${key}'`, error)
     }
   })
 
   router.delete('/env/:key', withKeyValidation, async (ctx) => {
     const { key } = ctx.params
-
-    try {
-      await deleteEnvValue(components, key)
-      return { status: 204 }
-    } catch (error) {
-      components.logger.error(`Failed to delete environment variable '${key}': ${error}`)
-      return { status: 500, body: { message: `Failed to delete environment variable '${key}'` } }
-    }
+    return write(`delete environment variable '${key}'`, () => deleteEnvValue(components, key).then(() => {}), {
+      status: 204
+    })
   })
 
   // Scene Storage list endpoint (GET /values, optional ?prefix=&limit=&offset=)
   router.get('/values', async (ctx) => {
     try {
-      const world = await getWorldStorage(components)
-      return listPage(
-        Object.entries(world).map(([key, value]) => ({ key, value })),
-        ctx.url.searchParams
-      )
+      return listPage(await getWorldStorage(components), ctx.url.searchParams)
     } catch (error) {
-      components.logger.error(`Failed to list storage values: ${error}`)
-      return { status: 500, body: { message: 'Failed to list storage values' } }
+      return serverError('list storage values', error)
     }
   })
 
   // Scene Storage endpoints (/values/:key)
   router.get('/values/:key', withKeyValidation, async (ctx) => {
     const { key } = ctx.params
-
     try {
       const value = await getWorldValue(components, key)
-      if (value === undefined) {
-        return { status: 404, body: { message: `Storage key '${key}' not found` } }
-      }
+      if (value === undefined) return { status: 404, body: { message: `Storage key '${key}' not found` } }
       return { body: JSON.stringify({ value }) }
     } catch (error) {
-      components.logger.error(`Failed to get storage value '${key}': ${error}`)
-      return { status: 500, body: { message: `Failed to get storage value '${key}'` } }
+      return serverError(`get storage value '${key}'`, error)
     }
   })
 
   router.put('/values/:key', withKeyValidation, async (ctx) => {
     const { key } = ctx.params
-
     try {
-      const parsed = readValueFromBody(await ctx.request.text())
-      if (!parsed.ok) return invalidBody()
-      if (containsNul(parsed.value)) return invalidValue()
-      await setWorldValue(components, key, parsed.value)
-      return { body: JSON.stringify({ value: parsed.value }) }
+      const put = await readPut(ctx, STORAGE_LIMITS.world)
+      if ('response' in put) return put.response
+      return write(`set storage value '${key}'`, () => setWorldValue(components, key, put.value), {
+        body: JSON.stringify({ value: put.value })
+      })
     } catch (error) {
-      components.logger.error(`Failed to set storage value '${key}': ${error}`)
-      return { status: 500, body: { message: `Failed to set storage value '${key}'` } }
+      return serverError(`set storage value '${key}'`, error)
     }
   })
 
   router.delete('/values/:key', withKeyValidation, async (ctx) => {
     const { key } = ctx.params
-
-    try {
-      await deleteWorldValue(components, key)
-      return { status: 204 }
-    } catch (error) {
-      components.logger.error(`Failed to delete storage value '${key}': ${error}`)
-      return { status: 500, body: { message: `Failed to delete storage value '${key}'` } }
-    }
+    return write(`delete storage value '${key}'`, () => deleteWorldValue(components, key).then(() => {}), {
+      status: 204
+    })
   })
 
   // Player Storage list endpoint (GET /players/:address/values, optional ?prefix=&limit=&offset=)
   router.get('/players/:address/values', withAddressValidation, async (ctx) => {
     const { address } = ctx.params
-
     try {
-      const playerData = await getPlayerStorage(components, address)
-      return listPage(
-        Object.entries(playerData).map(([key, value]) => ({ key, value })),
-        ctx.url.searchParams
-      )
+      return listPage(await getPlayerStorage(components, address), ctx.url.searchParams)
     } catch (error) {
-      components.logger.error(`Failed to list player storage values for '${address}': ${error}`)
-      return { status: 500, body: { message: `Failed to list player storage values for '${address}'` } }
+      return serverError(`list player storage values for '${address}'`, error)
     }
   })
 
   // Player Storage endpoints (/players/:address/values/:key)
   router.get('/players/:address/values/:key', withAddressValidation, withKeyValidation, async (ctx) => {
     const { address, key } = ctx.params
-
     try {
       const value = await getPlayerValue(components, address, key)
-
       if (value === undefined) {
         return { status: 404, body: { message: `Player storage key '${key}' not found for '${address}'` } }
       }
-
       return { body: JSON.stringify({ value }) }
     } catch (error) {
-      components.logger.error(`Failed to get player storage value '${key}' for '${address}': ${error}`)
-      return { status: 500, body: { message: `Failed to get player storage value '${key}' for '${address}'` } }
+      return serverError(`get player storage value '${key}' for '${address}'`, error)
     }
   })
 
   router.put('/players/:address/values/:key', withAddressValidation, withKeyValidation, async (ctx) => {
     const { address, key } = ctx.params
-
     try {
-      const parsed = readValueFromBody(await ctx.request.text())
-      if (!parsed.ok) return invalidBody()
-      if (containsNul(parsed.value)) return invalidValue()
-
-      await setPlayerValue(components, address, key, parsed.value)
-
-      return { body: JSON.stringify({ value: parsed.value }) }
+      const put = await readPut(ctx, STORAGE_LIMITS.player)
+      if ('response' in put) return put.response
+      return write(
+        `set player storage value '${key}' for '${address}'`,
+        () => setPlayerValue(components, address, key, put.value),
+        { body: JSON.stringify({ value: put.value }) }
+      )
     } catch (error) {
-      components.logger.error(`Failed to set player storage value '${key}' for '${address}': ${error}`)
-      return { status: 500, body: { message: `Failed to set player storage value '${key}' for '${address}'` } }
+      return serverError(`set player storage value '${key}' for '${address}'`, error)
     }
   })
 
   router.delete('/players/:address/values/:key', withAddressValidation, withKeyValidation, async (ctx) => {
     const { address, key } = ctx.params
-
-    try {
-      await deletePlayerValue(components, address, key)
-      return { status: 204 }
-    } catch (error) {
-      components.logger.error(`Failed to delete player storage value '${key}' for '${address}': ${error}`)
-      return { status: 500, body: { message: `Failed to delete player storage value '${key}' for '${address}'` } }
-    }
+    return write(
+      `delete player storage value '${key}' for '${address}'`,
+      () => deletePlayerValue(components, address, key).then(() => {}),
+      { status: 204 }
+    )
   })
 }

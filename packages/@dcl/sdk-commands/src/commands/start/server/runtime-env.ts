@@ -48,10 +48,9 @@ function setOwn<T>(record: Record<string, T>, key: string, value: T): void {
 }
 
 /**
- * Older previews keyed a player's bucket by the address as the scene sent it, often
- * checksummed, while reads and writes use the lowercase form. Buckets are merged under
- * it here; on a key both hold, the lowercase bucket wins, since it is the one current
- * previews have been writing. The next save persists the merged form.
+ * Merges every casing of an address into its lowercase bucket, since older previews stored
+ * checksummed keys. On a key both hold, the lowercase bucket wins. The next save persists the
+ * merged form.
  */
 function mergePlayerBuckets(players: Record<string, unknown>): Record<string, Record<string, unknown>> {
   const merged: Record<string, Record<string, unknown>> = {}
@@ -73,6 +72,49 @@ function mergePlayerBuckets(players: Record<string, unknown>): Record<string, Re
   }
   return merged
 }
+
+/** A namespace's size limits, in UTF-8 bytes of the stored form of a value. */
+export interface StorageLimits {
+  maxValueSizeBytes: number
+  maxTotalSizeBytes: number
+}
+
+/** The deployed service's default limits: per value, and in total per world (env, world) or per player. */
+export const STORAGE_LIMITS: Record<'env' | 'world' | 'player', StorageLimits> = {
+  env: { maxValueSizeBytes: 10240, maxTotalSizeBytes: 262144 },
+  world: { maxValueSizeBytes: 524288, maxTotalSizeBytes: 10485760 },
+  player: { maxValueSizeBytes: 102400, maxTotalSizeBytes: 1048576 }
+}
+
+/** Thrown when a write would exceed a namespace's size limits. */
+export class StorageLimitExceededError extends Error {}
+
+/** Env values are measured as the raw string, as the deployed service stores them. */
+const byteSize = (value: unknown) => Buffer.byteLength(String(value), 'utf-8')
+
+function assertWithinLimits(
+  values: Record<string, unknown>,
+  key: string,
+  value: unknown,
+  limits: StorageLimits,
+  measure: (value: unknown) => number
+): void {
+  const size = measure(value)
+  if (size > limits.maxValueSizeBytes) {
+    throw new StorageLimitExceededError(
+      `Value size (${size} bytes) exceeds the maximum allowed size (${limits.maxValueSizeBytes} bytes)`
+    )
+  }
+  const total = Object.values(values).reduce<number>((sum, stored) => sum + measure(stored), 0)
+  const existing = hasOwn(values, key) ? measure(values[key]) : 0
+  if (total - existing + size > limits.maxTotalSizeBytes) {
+    throw new StorageLimitExceededError(
+      `Total storage size would exceed the maximum allowed (${limits.maxTotalSizeBytes} bytes)`
+    )
+  }
+}
+
+const jsonSize = (value: unknown) => Buffer.byteLength(JSON.stringify(value), 'utf-8')
 
 let storeLock: Promise<unknown> = Promise.resolve()
 
@@ -238,6 +280,7 @@ export async function setEnvValue(
 ): Promise<void> {
   return withStoreLock(async () => {
     const storage = await loadStoreLocked(components)
+    assertWithinLimits(storage.env, key, value, STORAGE_LIMITS.env, byteSize)
     setOwn(storage.env, key, value)
     await saveServerStorage(components, storage)
   })
@@ -301,6 +344,7 @@ export async function setWorldValue(
 ): Promise<void> {
   return withStoreLock(async () => {
     const storage = await loadStoreLocked(components)
+    assertWithinLimits(storage.world, key, value, STORAGE_LIMITS.world, jsonSize)
     setOwn(storage.world, key, value)
     await saveServerStorage(components, storage)
   })
@@ -355,6 +399,7 @@ export async function setPlayerValue(
       values = {}
       setOwn(storage.players, lowercased, values)
     }
+    assertWithinLimits(values, key, value, STORAGE_LIMITS.player, jsonSize)
     setOwn(values, key, value)
     await saveServerStorage(components, storage)
   })

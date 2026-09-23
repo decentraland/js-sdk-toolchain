@@ -31,7 +31,7 @@ function captureRoutes(options: { initialStore?: string } = {}) {
       return files.has(filePath)
     }),
     readFile: jest.fn(async (filePath: string) => files.get(filePath) ?? ''),
-    directoryExists: jest.fn(async () => true),
+    directoryExists: jest.fn(async () => true) as jest.Mock<Promise<boolean>, [string]>,
     mkdir: jest.fn(async () => undefined),
     writeFile: jest.fn(async (filePath: string, content: string) => {
       files.set(filePath, content)
@@ -241,7 +241,10 @@ describe('when a value contains a NUL character', () => {
     })
 
     it('should reject it with a 400', () => {
-      expect(response.status).toBe(400)
+      expect(response).toEqual({
+        status: 400,
+        body: { message: 'Values must not contain the \\u0000 (NUL) character' }
+      })
     })
   })
 
@@ -297,7 +300,7 @@ describe('when a storage key is outside the allowed length', () => {
     })
 
     it('should reject it with a 400', () => {
-      expect(response.status).toBe(400)
+      expect(response).toEqual({ status: 400, body: { message: 'Key must be between 1 and 255 characters' } })
     })
   })
 })
@@ -571,7 +574,7 @@ describe('when a storage key is deleted', () => {
       })
     })
 
-    it('should answer 204 regardless of the address casing', () => {
+    it('should accept a checksummed address', () => {
       expect(response).toEqual({ status: 204 })
     })
 
@@ -1184,5 +1187,332 @@ describe('when the store file holds buckets that are not objects', () => {
     })
 
     expect(response).toEqual({ body: JSON.stringify({ value: 1 }) })
+  })
+})
+
+describe('when a PUT body carries more than the value field', () => {
+  let response: any
+
+  beforeEach(async () => {
+    const harness = captureRoutes()
+    response = await harness.call('PUT /values/:key', { params: { key: 'k' }, ...body('{"value":1,"extra":2}') })
+  })
+
+  it('should reject it with a 400, as the deployed service does', () => {
+    expect(response).toEqual({ status: 400, body: { message: 'Invalid JSON body' } })
+  })
+})
+
+describe('when a PUT body is the JSON literal null', () => {
+  let response: any
+
+  beforeEach(async () => {
+    const harness = captureRoutes()
+    response = await harness.call('PUT /values/:key', { params: { key: 'k' }, ...body('null') })
+  })
+
+  it('should reject it with a 400 rather than a 500', () => {
+    expect(response).toEqual({ status: 400, body: { message: 'Invalid JSON body' } })
+  })
+})
+
+describe('when a value carries a NUL character after an escaped backslash', () => {
+  let response: any
+
+  beforeEach(async () => {
+    const harness = captureRoutes()
+    response = await harness.call('PUT /values/:key', { params: { key: 'k' }, ...json('\\\u0000') })
+  })
+
+  it('should still reject it', () => {
+    expect(response.status).toBe(400)
+  })
+})
+
+describe('when a value carries an unpaired surrogate', () => {
+  let harness: ReturnType<typeof captureRoutes>
+
+  beforeEach(() => {
+    harness = captureRoutes()
+  })
+
+  it('should reject a lone high surrogate with a 400', async () => {
+    const response = await harness.call('PUT /values/:key', { params: { key: 'k' }, ...json({ name: 'a\ud800' }) })
+
+    expect(response).toEqual({ status: 400, body: { message: 'Values must not contain unpaired surrogates' } })
+  })
+
+  it('should accept a properly paired surrogate', async () => {
+    const response = await harness.call('PUT /values/:key', { params: { key: 'k' }, ...json('\ud83d\ude00') })
+
+    expect(response).toEqual({ body: JSON.stringify({ value: '\ud83d\ude00' }) })
+  })
+})
+
+describe('when a key is made of astral characters', () => {
+  let harness: ReturnType<typeof captureRoutes>
+
+  beforeEach(() => {
+    harness = captureRoutes()
+  })
+
+  it('should accept 255 of them, counting characters rather than UTF-16 units', async () => {
+    const response = await harness.call('PUT /values/:key', { params: { key: '\u{1F600}'.repeat(255) }, ...json(1) })
+
+    expect(response).toEqual({ body: JSON.stringify({ value: 1 }) })
+  })
+
+  it('should reject 256 of them', async () => {
+    const response = await harness.call('GET /values/:key', { params: { key: '\u{1F600}'.repeat(256) } })
+
+    expect(response.status).toBe(400)
+  })
+})
+
+describe('when a player key is longer than 255 characters', () => {
+  let response: any
+
+  beforeEach(async () => {
+    const harness = captureRoutes()
+    response = await harness.call('GET /players/:address/values/:key', {
+      params: { address: ADDRESS, key: 'k'.repeat(256) }
+    })
+  })
+
+  it('should reject it with a 400', () => {
+    expect(response).toEqual({ status: 400, body: { message: 'Key must be between 1 and 255 characters' } })
+  })
+})
+
+describe('when a value exceeds its namespace size limit', () => {
+  let harness: ReturnType<typeof captureRoutes>
+
+  beforeEach(() => {
+    harness = captureRoutes()
+  })
+
+  describe('and it is a scene value just over 512 KB', () => {
+    let response: any
+
+    beforeEach(async () => {
+      response = await harness.call('PUT /values/:key', { params: { key: 'k' }, ...json('a'.repeat(524288)) })
+    })
+
+    it('should reject it with a 400 naming the limit, as the deployed service does', () => {
+      expect(response).toEqual({
+        status: 400,
+        body: { message: 'Value size (524290 bytes) exceeds the maximum allowed size (524288 bytes)' }
+      })
+    })
+
+    it('should not store it', () => {
+      expect(harness.fs.writeFile).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('and the request body is larger than the limit plus the envelope slack', () => {
+    let response: any
+
+    beforeEach(async () => {
+      response = await harness.call('PUT /players/:address/values/:key', {
+        params: { address: ADDRESS, key: 'k' },
+        ...json('a'.repeat(102400 + 2048))
+      })
+    })
+
+    it('should answer 413 before parsing it', () => {
+      expect(response).toEqual({ status: 413, body: { message: 'Request body is too large' } })
+    })
+  })
+
+  describe('and it is an environment value over 10 KB', () => {
+    let response: any
+
+    beforeEach(async () => {
+      response = await harness.call('PUT /env/:key', { params: { key: 'K' }, ...json('a'.repeat(10241)) })
+    })
+
+    it('should reject it with a 400', () => {
+      expect(response.status).toBe(400)
+    })
+  })
+})
+
+describe('when a player would exceed the 1 MB total', () => {
+  let harness: ReturnType<typeof captureRoutes>
+  let responses: any[]
+
+  beforeEach(async () => {
+    harness = captureRoutes()
+    responses = []
+    for (let i = 0; i < 11; i++) {
+      responses.push(
+        await harness.call('PUT /players/:address/values/:key', {
+          params: { address: ADDRESS, key: `k${i}` },
+          ...json('a'.repeat(100000))
+        })
+      )
+    }
+  })
+
+  it('should accept the writes that fit', () => {
+    expect(responses.slice(0, 10).every((response) => response.status === undefined)).toBe(true)
+  })
+
+  it('should reject the write that crosses the total with a 400', () => {
+    expect(responses[10]).toEqual({
+      status: 400,
+      body: { message: 'Total storage size would exceed the maximum allowed (1048576 bytes)' }
+    })
+  })
+
+  it('should still accept overwriting an existing key with a same-sized value', async () => {
+    const response = await harness.call('PUT /players/:address/values/:key', {
+      params: { address: ADDRESS, key: 'k0' },
+      ...json('b'.repeat(100000))
+    })
+
+    expect(response.status).toBeUndefined()
+  })
+})
+
+describe('when a listing is ordered and paged at the edges', () => {
+  let harness: ReturnType<typeof captureRoutes>
+
+  beforeEach(async () => {
+    harness = captureRoutes()
+    for (const key of ['\uffff', '\u{1F600}', 'é', 'a', 'B', '_x']) {
+      await harness.call('PUT /values/:key', { params: { key }, ...json(1) })
+    }
+  })
+
+  it('should order by code point, placing astral characters after the BMP', async () => {
+    const page = JSON.parse((await harness.call('GET /values', listing('/values'))).body)
+
+    expect(page.data.map((entry: { key: string }) => entry.key)).toEqual(['B', '_x', 'a', 'é', '\uffff', '\u{1F600}'])
+  })
+
+  it('should cap an oversized offset at 100000', async () => {
+    const page = JSON.parse(
+      (await harness.call('GET /values', listing('/values', '?offset=99999999999999999999'))).body
+    )
+
+    expect(page.pagination.offset).toBe(100000)
+  })
+})
+
+describe('when the store fails on a route not otherwise exercised', () => {
+  let harness: ReturnType<typeof captureRoutes>
+
+  beforeEach(async () => {
+    harness = captureRoutes()
+    await harness.call('PUT /values/:key', { params: { key: 'k' }, ...json(1) })
+    await harness.call('PUT /players/:address/values/:key', { params: { address: ADDRESS, key: 'k' }, ...json(1) })
+    await harness.call('PUT /env/:key', { params: { key: 'K' }, ...json('v') })
+  })
+
+  it('should answer 500 from GET /env/:key', async () => {
+    harness.fs.readFile.mockRejectedValueOnce(new Error('EIO'))
+
+    expect(await harness.call('GET /env/:key', { params: { key: 'K' } })).toEqual({
+      status: 500,
+      body: { message: "Failed to get environment variable 'K'" }
+    })
+  })
+
+  it('should answer 500 from PUT /env/:key', async () => {
+    harness.fs.writeFile.mockRejectedValueOnce(new Error('disk full'))
+
+    expect(await harness.call('PUT /env/:key', { params: { key: 'K' }, ...json('w') })).toEqual({
+      status: 500,
+      body: { message: "Failed to set environment variable 'K'" }
+    })
+  })
+
+  it('should answer 500 from DELETE /env/:key', async () => {
+    harness.fs.writeFile.mockRejectedValueOnce(new Error('disk full'))
+
+    expect(await harness.call('DELETE /env/:key', { params: { key: 'K' } })).toEqual({
+      status: 500,
+      body: { message: "Failed to delete environment variable 'K'" }
+    })
+  })
+
+  it('should answer 500 from DELETE /values/:key', async () => {
+    harness.fs.writeFile.mockRejectedValueOnce(new Error('disk full'))
+
+    expect(await harness.call('DELETE /values/:key', { params: { key: 'k' } })).toEqual({
+      status: 500,
+      body: { message: "Failed to delete storage value 'k'" }
+    })
+  })
+
+  it('should answer 500 from the player listing', async () => {
+    harness.fs.readFile.mockRejectedValueOnce(new Error('EIO'))
+
+    expect(
+      await harness.call(
+        'GET /players/:address/values',
+        listing(`/players/${ADDRESS}/values`, '', { address: ADDRESS })
+      )
+    ).toEqual({ status: 500, body: { message: `Failed to list player storage values for '${ADDRESS}'` } })
+  })
+
+  it('should answer 500 from a player PUT', async () => {
+    harness.fs.writeFile.mockRejectedValueOnce(new Error('disk full'))
+
+    expect(
+      await harness.call('PUT /players/:address/values/:key', { params: { address: ADDRESS, key: 'k' }, ...json(2) })
+    ).toEqual({ status: 500, body: { message: `Failed to set player storage value 'k' for '${ADDRESS}'` } })
+  })
+})
+
+describe('when a delete targets a key that does not exist', () => {
+  let harness: ReturnType<typeof captureRoutes>
+
+  beforeEach(async () => {
+    harness = captureRoutes()
+    await harness.call('PUT /players/:address/values/:key', { params: { address: ADDRESS, key: 'kept' }, ...json(1) })
+    harness.fs.writeFile.mockClear()
+  })
+
+  it('should not rewrite the store for a missing environment variable', async () => {
+    await harness.call('DELETE /env/:key', { params: { key: 'MISSING' } })
+
+    expect(harness.fs.writeFile).not.toHaveBeenCalled()
+  })
+
+  it('should not rewrite the store for a missing key of an existing player', async () => {
+    await harness.call('DELETE /players/:address/values/:key', { params: { address: ADDRESS, key: 'missing' } })
+
+    expect(harness.fs.writeFile).not.toHaveBeenCalled()
+  })
+})
+
+describe('when the runtime data directory does not exist yet', () => {
+  let harness: ReturnType<typeof captureRoutes>
+
+  beforeEach(async () => {
+    harness = captureRoutes()
+    harness.fs.directoryExists.mockResolvedValue(false)
+    await harness.call('PUT /values/:key', { params: { key: 'k' }, ...json(1) })
+  })
+
+  it('should create it before saving', () => {
+    expect(harness.fs.mkdir).toHaveBeenCalledWith(expect.stringContaining('.runtime-data'), { recursive: true })
+  })
+})
+
+describe('when a corrupt store disappears before it can be set aside', () => {
+  let response: any
+
+  beforeEach(async () => {
+    const harness = captureRoutes({ initialStore: '{not json' })
+    harness.fs.rename.mockRejectedValueOnce(Object.assign(new Error('ENOENT'), { code: 'ENOENT' }))
+    response = await harness.call('GET /values/:key', { params: { key: 'k' } })
+  })
+
+  it('should treat the store as empty rather than fail', () => {
+    expect(response.status).toBe(404)
   })
 })
