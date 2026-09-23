@@ -47,6 +47,33 @@ function setOwn<T>(record: Record<string, T>, key: string, value: T): void {
   Object.defineProperty(record, key, { value, enumerable: true, configurable: true, writable: true })
 }
 
+/**
+ * Older previews keyed a player's bucket by the address as the scene sent it, often
+ * checksummed, while reads and writes use the lowercase form. Buckets are merged under
+ * it here; on a key both hold, the lowercase bucket wins, since it is the one current
+ * previews have been writing. The next save persists the merged form.
+ */
+function mergePlayerBuckets(players: Record<string, unknown>): Record<string, Record<string, unknown>> {
+  const merged: Record<string, Record<string, unknown>> = {}
+  const addresses = Object.keys(players)
+  const lowercaseFirst = [
+    ...addresses.filter((address) => address === address.toLowerCase()),
+    ...addresses.filter((address) => address !== address.toLowerCase())
+  ]
+  for (const address of lowercaseFirst) {
+    const target = address.toLowerCase()
+    let values = getOwn(merged, target)
+    if (!values) {
+      values = {}
+      setOwn(merged, target, values)
+    }
+    for (const [key, value] of Object.entries(bucket<unknown>(getOwn(players, address)))) {
+      if (!hasOwn(values, key)) setOwn(values, key, value)
+    }
+  }
+  return merged
+}
+
 let writeQueue: Promise<unknown> = Promise.resolve()
 
 /**
@@ -102,11 +129,10 @@ export async function loadServerStorage(components: Pick<CliComponents, 'fs' | '
     return createDefaultStorage()
   }
 
-  const players = bucket<unknown>(parsed.players)
   return {
     env: bucket<string>(parsed.env),
     world: bucket<unknown>(parsed.world),
-    players: Object.fromEntries(Object.entries(players).map(([address, values]) => [address, bucket<unknown>(values)]))
+    players: mergePlayerBuckets(bucket<unknown>(parsed.players))
   }
 }
 

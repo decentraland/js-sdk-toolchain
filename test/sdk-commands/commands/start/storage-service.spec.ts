@@ -63,6 +63,11 @@ function captureRoutes(options: { initialStore?: string } = {}) {
     fs,
     logger,
     files,
+    /** The store as last saved, parsed. */
+    savedStore() {
+      const entry = [...files.entries()].find(([filePath]) => filePath.endsWith('server-storage.json'))
+      return entry ? JSON.parse(entry[1]) : undefined
+    },
     /** Holds every save (the store's atomic rename) until the returned function is called. */
     holdSaves() {
       let release!: () => void
@@ -958,6 +963,61 @@ describe('when the store file on disk is corrupt', () => {
     const response = await harness.call('PUT /values/:key', { params: { key: 'other' }, ...json(2) })
 
     expect(response).toEqual({ body: JSON.stringify({ value: 2 }) })
+  })
+})
+
+describe('when the store holds player buckets saved under mixed-case addresses', () => {
+  const checksummed = '0x1234567890ABCDEF1234567890abcdef12345678'
+  let harness: ReturnType<typeof captureRoutes>
+
+  beforeEach(() => {
+    harness = captureRoutes({
+      initialStore: JSON.stringify({
+        players: { [checksummed]: { seeds: 1, coins: 2 }, [ADDRESS]: { coins: 5 } }
+      })
+    })
+  })
+
+  it('should read a value saved under the mixed-case address through the lowercase one', async () => {
+    const read = await harness.call('GET /players/:address/values/:key', { params: { address: ADDRESS, key: 'seeds' } })
+
+    expect(read).toEqual({ body: JSON.stringify({ value: 1 }) })
+  })
+
+  it('should prefer the lowercase bucket on a key both hold', async () => {
+    const read = await harness.call('GET /players/:address/values/:key', { params: { address: ADDRESS, key: 'coins' } })
+
+    expect(read).toEqual({ body: JSON.stringify({ value: 5 }) })
+  })
+
+  it('should list the merged bucket under the lowercase address', async () => {
+    const page = JSON.parse(
+      (
+        await harness.call(
+          'GET /players/:address/values',
+          listing(`/players/${ADDRESS}/values`, '', { address: ADDRESS })
+        )
+      ).body
+    )
+
+    expect(page.data).toEqual([
+      { key: 'coins', value: 5 },
+      { key: 'seeds', value: 1 }
+    ])
+  })
+
+  describe('and a write follows', () => {
+    beforeEach(async () => {
+      await harness.call('PUT /players/:address/values/:key', { params: { address: ADDRESS, key: 'hp' }, ...json(9) })
+    })
+
+    it('should persist a single lowercase bucket', () => {
+      expect(Object.keys(harness.savedStore().players)).toEqual([ADDRESS])
+    })
+
+    it('should keep the migrated values alongside the new one', () => {
+      expect(harness.savedStore().players[ADDRESS]).toEqual({ coins: 5, seeds: 1, hp: 9 })
+    })
   })
 })
 
