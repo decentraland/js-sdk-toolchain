@@ -75,4 +75,75 @@ describe('wrapSignedFetch', () => {
     expect(data).toBeNull()
     expect(status).toBeUndefined()
   })
+
+  describe('when the fetch fails without a usable Error', () => {
+    const url = 'https://storage.test/values/k'
+
+    describe('and it rejects with a string', () => {
+      let result: unknown
+
+      beforeEach(async () => {
+        mockSignedFetch.mockRejectedValueOnce('network down')
+        result = await wrapSignedFetch({ url })
+      })
+
+      it('should report the string as the error, never as a success', () => {
+        expect(result).toEqual(['network down', null, undefined])
+      })
+    })
+
+    describe('and it rejects with an Error that has no message', () => {
+      let result: unknown
+
+      beforeEach(async () => {
+        mockSignedFetch.mockRejectedValueOnce(new Error(''))
+        result = await wrapSignedFetch({ url })
+      })
+
+      it('should report a generic error', () => {
+        expect(result).toEqual(['signedFetch failed', null, undefined])
+      })
+    })
+
+    describe('and it rejects with undefined', () => {
+      let result: unknown
+
+      beforeEach(async () => {
+        mockSignedFetch.mockRejectedValueOnce(undefined)
+        result = await wrapSignedFetch({ url })
+      })
+
+      it('should resolve an error tuple rather than reject', () => {
+        expect(result).toEqual(['signedFetch failed', null, undefined])
+      })
+    })
+
+    describe('and it throws synchronously', () => {
+      let result: unknown
+
+      beforeEach(async () => {
+        mockSignedFetch.mockImplementationOnce(() => {
+          throw new Error('bad request shape')
+        })
+        result = await wrapSignedFetch({ url })
+      })
+
+      it('should resolve an error tuple rather than reject', () => {
+        expect(result).toEqual(['bad request shape', null, undefined])
+      })
+    })
+
+    describe('and it resolves with no response', () => {
+      let result: unknown
+
+      beforeEach(async () => {
+        mockSignedFetch.mockResolvedValueOnce(undefined)
+        result = await wrapSignedFetch({ url })
+      })
+
+      it('should report it as an error', () => {
+        expect(result).toEqual(['signedFetch returned no response', null, undefined])
+      })
+    })
+  })
 })
