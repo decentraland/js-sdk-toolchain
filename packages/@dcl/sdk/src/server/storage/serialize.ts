@@ -28,7 +28,6 @@ export function serializeStorageValue(value: unknown, callSite: string): string 
     })
   } catch (error) {
     if (error instanceof UnstorableValueError) throw error
-    // BigInt, a circular value, or nesting deeper than the engine's stack.
     const cause = error instanceof Error ? error.message.split('\n')[0] : String(error)
     throw new TypeError(`${callSite}: value must be JSON-serializable (${cause}). Use delete() to remove a key.`)
   }
@@ -82,7 +81,7 @@ export function assertStorageKey(key: unknown, callSite: string): void {
   if (LONE_SURROGATE.test(key) || UNSTORABLE_TEXT.test(key)) {
     throw new TypeError(`${callSite}: key must not contain an unpaired surrogate or a NUL character.`)
   }
-  // The service stores keys in varchar(255) columns and counts characters, not UTF-16 units.
+  // Counted in characters, as the service counts them.
   if ([...key].length > MAX_KEY_LENGTH) {
     throw new TypeError(`${callSite}: key must be at most ${MAX_KEY_LENGTH} characters.`)
   }

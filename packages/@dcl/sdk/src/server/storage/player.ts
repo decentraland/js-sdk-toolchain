@@ -89,7 +89,7 @@ export const createPlayerStorage = (config: StorageConfigState = createStorageCo
   // ownership: a landed write detaches the pending GET so its stale response is not cached.
   const inflightGets = new Map<string, { promise: Promise<unknown> }>()
 
-  // Lowercased so checksummed callers share an entry; a JSON pair cannot collide.
+  // Lowercased so checksummed callers share an entry.
   const cacheKey = (address: string, key: string) => JSON.stringify([address.toLowerCase(), key])
 
   // Writes to the same player key are serialized (and rapid ones coalesced to

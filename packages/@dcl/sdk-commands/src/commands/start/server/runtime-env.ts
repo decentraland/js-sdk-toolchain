@@ -280,8 +280,7 @@ export async function saveServerStorage(
   await ensureRuntimeDir(components)
   const tmpPath = `${storagePath()}.${process.pid}.${randomToken()}.tmp`
   await components.fs.writeFile(tmpPath, JSON.stringify(data, null, 2))
-  // Fencing: a lock displaced by a concurrent takeover must not commit. Only the instant between
-  // this check and the rename is left unguarded, since the filesystem has no compare-and-rename.
+  // Fence: a save whose lock was taken over must not commit.
   if (heldLockToken !== undefined && (await readLock(components, `${storagePath()}.lock`)) !== heldLockToken) {
     await components.fs.unlink(tmpPath).catch(() => undefined)
     throw new StoreLockLostError(`The ${SERVER_STORAGE_FILE} lock was taken over during the write; nothing was saved`)
