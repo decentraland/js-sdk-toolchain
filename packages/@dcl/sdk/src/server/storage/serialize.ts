@@ -2,8 +2,16 @@ const LONE_SURROGATE = /[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[
 const UNSTORABLE_TEXT = /\u0000/
 const MAX_KEY_LENGTH = 255
 
+/**
+ * JSON.stringify always writes NUL as `\u0000` and an unpaired surrogate as a `\udXXX` escape (ES2019),
+ * while paired surrogates stay raw; an escaped backslash in front means the text is literal.
+ */
+const ESCAPED_UNSTORABLE_TEXT = /(?<!\\)(?:\\\\)*\\u(?:0000|d[89a-f][0-9a-f]{2})/i
+
 /** Raised from inside the replacer, so it is not mistaken for an engine error. */
 class UnstorableValueError extends TypeError {}
+
+type Reason = (holder: Record<string, unknown>, property: string, item: unknown) => string | undefined
 
 /**
  * The `{ value }` PUT body. Rejects, at any depth, what JSON would drop or change: functions,
@@ -13,15 +21,27 @@ class UnstorableValueError extends TypeError {}
  * @internal
  */
 export function serializeStorageValue(value: unknown, callSite: string): string {
+  const body = stringify(value, callSite, fastReason)
+  // Text is checked once on the output; only a rejection pays for locating the offending item.
+  if (ESCAPED_UNSTORABLE_TEXT.test(body)) {
+    stringify(value, callSite, unstorable)
+    throw new TypeError(`${callSite}: value must not contain an unpaired surrogate or a NUL character.`)
+  }
+  if (body === '{}') {
+    throw new TypeError(`${callSite}: value must be JSON-serializable. Use delete() to remove a key.`)
+  }
+  return body
+}
+
+function stringify(value: unknown, callSite: string, reason: Reason): string {
   const envelope = { value }
-  let body: string | undefined
   try {
-    body = JSON.stringify(envelope, function (this: Record<string, unknown>, property, item) {
-      const where = this === envelope ? 'the value' : `"${property}"`
-      const reason = unstorable(this, property, item)
-      if (reason) {
+    return JSON.stringify(envelope, function (this: Record<string, unknown>, property, item) {
+      const why = reason(this, property, item)
+      if (why) {
+        const where = this === envelope ? 'the value' : `"${property}"`
         throw new UnstorableValueError(
-          `${callSite}: value must be JSON-serializable, but ${where} ${reason}. Use delete() to remove a key.`
+          `${callSite}: value must be JSON-serializable, but ${where} ${why}. Use delete() to remove a key.`
         )
       }
       return item
@@ -31,28 +51,45 @@ export function serializeStorageValue(value: unknown, callSite: string): string 
     const cause = error instanceof Error ? error.message.split('\n')[0] : String(error)
     throw new TypeError(`${callSite}: value must be JSON-serializable (${cause}). Use delete() to remove a key.`)
   }
-  if (body === '{}') {
-    throw new TypeError(`${callSite}: value must be JSON-serializable. Use delete() to remove a key.`)
-  }
-  return body
 }
 
-function unstorable(holder: Record<string, unknown>, property: string, item: unknown): string | undefined {
-  if (typeof item === 'function' || typeof item === 'symbol') return `is a ${typeof item}`
-  if (typeof item === 'number' && !Number.isFinite(item)) return `is the non-finite number ${item}`
-  if (item === undefined) {
-    if (Array.isArray(holder)) return 'is undefined or a hole in an array'
-    if (holder[property] !== undefined) return 'has a toJSON() that returns undefined'
+/** Everything but the text checks, with plain objects and arrays skipping the built-in check. */
+function fastReason(holder: Record<string, unknown>, property: string, item: unknown): string | undefined {
+  switch (typeof item) {
+    case 'function':
+    case 'symbol':
+      return `is a ${typeof item}`
+    case 'number':
+      return Number.isFinite(item) ? undefined : `is the non-finite number ${item}`
+    case 'undefined':
+      if (Array.isArray(holder)) return 'is undefined or a hole in an array'
+      return holder[property] !== undefined ? 'has a toJSON() that returns undefined' : undefined
+    case 'object': {
+      if (item === null || Array.isArray(item)) return undefined
+      const prototype = Object.getPrototypeOf(item)
+      return prototype === Object.prototype || prototype === null ? undefined : builtInReason(item)
+    }
+    default:
+      return undefined
   }
+}
+
+/** Every check, per item: used to name the item a text rejection comes from. */
+function unstorable(holder: Record<string, unknown>, property: string, item: unknown): string | undefined {
+  const fast = fastReason(holder, property, item)
+  if (fast) return fast
   if (typeof item === 'string' && (LONE_SURROGATE.test(item) || UNSTORABLE_TEXT.test(item))) {
     return 'contains an unpaired surrogate or a NUL character'
   }
   if (!Array.isArray(holder) && (LONE_SURROGATE.test(property) || UNSTORABLE_TEXT.test(property))) {
     return 'is a key with an unpaired surrogate or a NUL character'
   }
-  const builtIn = builtInName(item)
-  if (builtIn) return `is ${/^[AEIO]/.test(builtIn) ? 'an' : 'a'} ${builtIn}, which has no JSON form`
   return undefined
+}
+
+function builtInReason(item: unknown): string | undefined {
+  const builtIn = builtInName(item)
+  return builtIn ? `is ${/^[AEIO]/.test(builtIn) ? 'an' : 'a'} ${builtIn}, which has no JSON form` : undefined
 }
 
 function builtInName(item: unknown): string | undefined {

@@ -671,6 +671,13 @@ describe('scene storage', () => {
   })
 
   describe('set value serialization', () => {
+    it('should accept text that merely spells out \\u0000, and paired surrogates', async () => {
+      const storage = createSceneStorage()
+      mockWrapSignedFetch.mockResolvedValueOnce([null, {}])
+
+      expect(await storage.set('key', { note: 'literal \\u0000 and \\ud800 text', emoji: '\u{1F600}' })).toBe(true)
+    })
+
     const hole = [1, , 3] // eslint-disable-line no-sparse-arrays
     it.each([
       ['an undefined array element', [1, undefined], '"1" is undefined or a hole in an array'],
