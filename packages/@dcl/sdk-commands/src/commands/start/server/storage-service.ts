@@ -70,6 +70,10 @@ export function setupStorageEndpoints(
     if (!key || [...key].length > MAX_KEY_LENGTH) {
       return { status: 400, body: { message: `Key must be between 1 and ${MAX_KEY_LENGTH} characters` } }
     }
+    // Same rule as the SDK: these keys cannot be addressed by path, or stored by the deployed service.
+    if (key === '.' || key === '..' || key.includes('\u0000') || LONE_SURROGATE.test(key)) {
+      return { status: 400, body: { message: 'Invalid key' } }
+    }
     return next()
   }
 
@@ -169,7 +173,6 @@ export function setupStorageEndpoints(
   router.put('/env/:key', withKeyValidation, async (ctx) => {
     const { key } = ctx.params
     try {
-      // Env values are strings, and may contain NUL.
       const put = await readPut(ctx, STORAGE_LIMITS.env, { stringOnly: true, allowNul: true })
       if ('response' in put) return put.response
       return write(`set environment variable '${key}'`, () => setEnvValue(components, key, put.value as string), {

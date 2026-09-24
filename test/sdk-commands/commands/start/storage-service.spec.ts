@@ -1533,3 +1533,32 @@ describe('when a corrupt store disappears before it can be set aside', () => {
     expect(response.status).toBe(404)
   })
 })
+
+describe('when a key cannot be addressed or stored', () => {
+  let harness: ReturnType<typeof captureRoutes>
+
+  beforeEach(() => {
+    harness = captureRoutes()
+  })
+
+  it.each([['.'], ['..'], ['a\u0000b'], ['a\ud800']])(
+    'should reject a PUT to %j with a 400 and store nothing',
+    async (key) => {
+      const response = await harness.call('PUT /values/:key', { params: { key }, ...json(1) })
+
+      expect([response, harness.saves()]).toEqual([{ status: 400, body: { message: 'Invalid key' } }, 0])
+    }
+  )
+
+  it.each([['..'], ['a\u0000']])('should reject a player GET for %j with a 400', async (key) => {
+    const response = await harness.call('GET /players/:address/values/:key', { params: { address: ADDRESS, key } })
+
+    expect(response).toEqual({ status: 400, body: { message: 'Invalid key' } })
+  })
+
+  it('should still accept a key that merely contains dots', async () => {
+    const response = await harness.call('PUT /values/:key', { params: { key: 'a.b..c' }, ...json(1) })
+
+    expect(response).toEqual({ body: JSON.stringify({ value: 1 }) })
+  })
+})
