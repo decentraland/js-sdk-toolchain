@@ -22,16 +22,20 @@ function captureRoutes(options: { initialStore?: string } = {}) {
   const files = new Map<string, string>()
   const mtimes = new Map<string, number>()
   let storePath = ''
+  const learn = (filePath: string) => {
+    if (storePath || !filePath.endsWith('server-storage.json')) return
+    storePath = filePath
+    if (options.initialStore !== undefined) files.set(filePath, options.initialStore)
+  }
   let renameGate: Promise<void> | undefined
   const fs = {
+    // Like the real component: any access failure answers false rather than throwing.
     fileExists: jest.fn(async (filePath: string) => {
-      if (!storePath && filePath.endsWith('server-storage.json')) {
-        storePath = filePath
-        if (options.initialStore !== undefined) files.set(filePath, options.initialStore)
-      }
+      learn(filePath)
       return files.has(filePath)
     }),
     readFile: jest.fn(async (filePath: string) => {
+      learn(filePath)
       if (!files.has(filePath)) throw Object.assign(new Error(`ENOENT: ${filePath}`), { code: 'ENOENT' })
       return files.get(filePath)!
     }),
@@ -905,16 +909,40 @@ describe('when the store cannot be read', () => {
     })
   })
 
-  describe('and a player value is requested', () => {
-    let response: any
+  describe('and the existing store is not readable by this process', () => {
+    let read: any
+    let write: any
+    let before: string | undefined
+    let savesBefore: number
 
     beforeEach(async () => {
-      harness.fs.fileExists.mockRejectedValueOnce(new Error('EACCES'))
-      response = await harness.call('GET /players/:address/values/:key', { params: { address: ADDRESS, key: 'seeds' } })
+      const storeFile = [...harness.files.keys()].find((p) => p.endsWith('server-storage.json'))!
+      before = harness.files.get(storeFile)
+      savesBefore = harness.saves()
+      const denied = Object.assign(new Error(`EACCES: permission denied, open '${storeFile}'`), { code: 'EACCES' })
+      harness.fs.fileExists.mockImplementation(
+        async (filePath: string) => !filePath.endsWith('server-storage.json') && harness.files.has(filePath)
+      )
+      const readFile = harness.fs.readFile.getMockImplementation()!
+      harness.fs.readFile.mockImplementation(async (filePath: string) => {
+        if (filePath.endsWith('server-storage.json')) throw denied
+        return readFile(filePath)
+      })
+      read = await harness.call('GET /players/:address/values/:key', { params: { address: ADDRESS, key: 'seeds' } })
+      write = await harness.call('PUT /values/:key', { params: { key: 'other' }, ...json(2) })
     })
 
-    it('should answer 500 when even the existence check fails', () => {
-      expect(response.status).toBe(500)
+    it('should answer 500 to a read rather than report the key as missing', () => {
+      expect(read.status).toBe(500)
+    })
+
+    it('should answer 500 to a write', () => {
+      expect(write.status).toBe(500)
+    })
+
+    it('should leave the store it could not read untouched', () => {
+      const storeFile = [...harness.files.keys()].find((p) => p.endsWith('server-storage.json'))!
+      expect([harness.saves() - savesBefore, harness.files.get(storeFile)]).toEqual([0, before])
     })
   })
 

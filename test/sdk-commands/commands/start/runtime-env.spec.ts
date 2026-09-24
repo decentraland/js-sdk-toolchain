@@ -18,7 +18,7 @@ function makeComponents(initialFile?: string) {
   const mtimes = new Map<string, number>()
   let mainPath = ''
   const learn = (filePath: string) => {
-    if (filePath.endsWith('.tmp')) return
+    if (!filePath.endsWith('server-storage.json')) return
     mainPath = filePath
     if (initialFile !== undefined && !files.has(filePath)) files.set(filePath, initialFile)
   }
@@ -28,6 +28,7 @@ function makeComponents(initialFile?: string) {
       return files.has(filePath)
     }),
     readFile: jest.fn(async (filePath: string) => {
+      learn(filePath)
       if (!files.has(filePath)) throw Object.assign(new Error(`ENOENT: ${filePath}`), { code: 'ENOENT' })
       return files.get(filePath)!
     }),
@@ -54,7 +55,14 @@ function makeComponents(initialFile?: string) {
     })
   }
   const logger = { debug: jest.fn(), error: jest.fn(), info: jest.fn(), log: jest.fn(), warn: jest.fn() }
-  return { components: { fs, logger } as any, fs, logger, files, readMain: () => files.get(mainPath) }
+  return {
+    components: { fs, logger } as any,
+    fs,
+    logger,
+    files,
+    storePath: () => mainPath,
+    readMain: () => files.get(mainPath)
+  }
 }
 
 describe('runtime-env concurrent write safety', () => {
@@ -123,7 +131,7 @@ describe('when two preview processes share one store', () => {
   beforeEach(async () => {
     store = makeComponents(JSON.stringify({ env: {}, world: {}, players: {} }))
     await loadServerStorage(store.components) // learn the store path
-    lockPath = `${store.fs.fileExists.mock.calls[0][0]}.lock`
+    lockPath = `${store.storePath()}.lock`
   })
 
   afterEach(() => {

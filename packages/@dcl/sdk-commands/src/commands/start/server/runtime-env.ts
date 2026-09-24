@@ -232,11 +232,18 @@ const storagePath = () => path.join(RUNTIME_DATA_DIR, SERVER_STORAGE_FILE)
 
 /** The store as read, or `null` when the file exists but does not hold a JSON object. */
 async function readStore(components: Pick<CliComponents, 'fs'>): Promise<ServerStorage | null> {
-  if (!(await components.fs.fileExists(storagePath()))) return createDefaultStorage()
+  // fileExists() answers false for any access failure, so only ENOENT from the read itself means absent.
+  let content: string
+  try {
+    content = await components.fs.readFile(storagePath(), 'utf-8')
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException)?.code === 'ENOENT') return createDefaultStorage()
+    throw error
+  }
 
   let parsed: unknown
   try {
-    parsed = JSON.parse(await components.fs.readFile(storagePath(), 'utf-8'))
+    parsed = JSON.parse(content)
   } catch (error) {
     if (!(error instanceof SyntaxError)) throw error
     return null
@@ -299,11 +306,13 @@ export async function loadEnvFile(
   const envMap = new Map<string, string>()
   const envPath = path.join(projectDirectory, '.env')
 
-  if (!(await components.fs.fileExists(envPath))) {
-    return envMap
+  let content: string
+  try {
+    content = await components.fs.readFile(envPath, 'utf-8')
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException)?.code === 'ENOENT') return envMap
+    throw error
   }
-
-  const content = await components.fs.readFile(envPath, 'utf-8')
   for (const line of content.split('\n')) {
     const trimmed = line.trim()
     if (!trimmed || trimmed.startsWith('#')) {
