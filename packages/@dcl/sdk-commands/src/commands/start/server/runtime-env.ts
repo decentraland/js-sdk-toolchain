@@ -109,15 +109,11 @@ let storeLock: Promise<unknown> = Promise.resolve()
 
 const LOCK_TIMEOUT_MS = 30_000
 const LOCK_RETRY_MS = 20
-/** A lock file whose owner cannot be read is taken over only once it is this old. */
-const UNREADABLE_LOCK_MS = 30_000
-/** A dead owner's lock is only taken over once it is this old, so one that just changed hands is left alone. */
-const MIN_TAKEOVER_AGE_MS = 2_000
 
 /** The token of the lock file this process holds, checked before every commit. */
 let heldLockToken: string | undefined
 
-/** The lock was taken from this process while it held it; nothing was written. */
+/** The lock was removed or replaced while this process held it; nothing was written. */
 export class StoreLockLostError extends Error {}
 
 const randomToken = () => Math.random().toString(36).slice(2, 10)
@@ -152,7 +148,11 @@ function withStoreLock<T>(components: Pick<CliComponents, 'fs' | 'logger'>, task
   return run
 }
 
-/** The lock holds `<pid>:<token>`: only its creator releases it, and only a dead owner's is taken over. */
+/**
+ * The lock holds `<pid>:<token>` and only its creator releases it. It is never taken over: without an
+ * atomic compare-and-remove, a takeover could revoke a live owner. A lock left by a crashed preview
+ * has to be deleted by hand.
+ */
 async function withLockFile<T>(components: Pick<CliComponents, 'fs' | 'logger'>, task: () => Promise<T>): Promise<T> {
   await ensureRuntimeDir(components)
   const lockPath = `${storagePath()}.lock`
@@ -167,12 +167,15 @@ async function withLockFile<T>(components: Pick<CliComponents, 'fs' | 'logger'>,
     }
     const holder = await readLock(components, lockPath)
     if (holder === undefined) continue
-    if (await isAbandoned(components, lockPath, holder)) {
-      components.logger.warn(`Taking over a ${SERVER_STORAGE_FILE} lock held by a process that is no longer running`)
-      await takeOver(components, lockPath, holder)
-      continue
+    const pid = Number(holder.split(':')[0])
+    if (Number.isInteger(pid) && pid > 0 && !isAlive(pid)) {
+      throw new Error(
+        `${lockPath} is held by process ${pid}, which is no longer running. Delete it once no preview is running.`
+      )
     }
-    if (Date.now() > deadline) throw new Error(`Timed out waiting for the ${SERVER_STORAGE_FILE} lock`)
+    if (Date.now() > deadline) {
+      throw new Error(`Timed out waiting for ${lockPath}. If no preview is running, delete it.`)
+    }
     await new Promise((resolve) => setTimeout(resolve, LOCK_RETRY_MS))
   }
   heldLockToken = token
@@ -184,34 +187,6 @@ async function withLockFile<T>(components: Pick<CliComponents, 'fs' | 'logger'>,
       await components.fs.unlink(lockPath).catch(() => undefined)
     }
   }
-}
-
-async function isAbandoned(components: Pick<CliComponents, 'fs'>, lockPath: string, holder: string): Promise<boolean> {
-  let age: number
-  try {
-    age = Date.now() - (await components.fs.stat(lockPath)).mtimeMs
-  } catch {
-    return false
-  }
-  const pid = Number(holder.split(':')[0])
-  if (Number.isInteger(pid) && pid > 0) return age > MIN_TAKEOVER_AGE_MS && !isAlive(pid)
-  return age > UNREADABLE_LOCK_MS
-}
-
-/** Moving the lock aside is atomic; if a newer owner's lock moved instead, it goes back. */
-async function takeOver(components: Pick<CliComponents, 'fs'>, lockPath: string, observed: string): Promise<void> {
-  const aside = `${lockPath}.${randomToken()}.stale`
-  try {
-    await components.fs.rename(lockPath, aside)
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException)?.code === 'ENOENT') return
-    throw error
-  }
-  const moved = await readLock(components, aside)
-  if (moved !== undefined && moved !== observed) {
-    await components.fs.writeFile(lockPath, moved, { flag: 'wx' }).catch(() => undefined)
-  }
-  await components.fs.unlink(aside).catch(() => undefined)
 }
 
 /**
@@ -287,10 +262,12 @@ export async function saveServerStorage(
   await ensureRuntimeDir(components)
   const tmpPath = `${storagePath()}.${process.pid}.${randomToken()}.tmp`
   await components.fs.writeFile(tmpPath, JSON.stringify(data, null, 2))
-  // Fence: a save whose lock was taken over must not commit.
+  // Fence: a save whose lock was removed or replaced must not commit.
   if (heldLockToken !== undefined && (await readLock(components, `${storagePath()}.lock`)) !== heldLockToken) {
     await components.fs.unlink(tmpPath).catch(() => undefined)
-    throw new StoreLockLostError(`The ${SERVER_STORAGE_FILE} lock was taken over during the write; nothing was saved`)
+    throw new StoreLockLostError(
+      `The ${SERVER_STORAGE_FILE} lock was removed or replaced during the write; nothing was saved`
+    )
   }
   await components.fs.rename(tmpPath, storagePath())
 }

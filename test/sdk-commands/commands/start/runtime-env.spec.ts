@@ -191,57 +191,57 @@ describe('when two preview processes share one store', () => {
     })
   })
 
-  describe('and the lock was left by a process that is no longer running', () => {
-    beforeEach(async () => {
-      await store.fs.writeFile(lockPath, GONE, { flag: 'wx' })
-      jest.spyOn(Date, 'now').mockReturnValue(Date.now() + 5_000) // older than the takeover minimum
-      await setWorldValue(store.components, 'k', 2)
-    })
-
-    it('should take it over and write', () => {
-      expect(JSON.parse(store.readMain()!).world).toEqual({ k: 2 })
-    })
-
-    it('should leave no lock or set-aside file behind', () => {
-      expect([...store.files.keys()].filter((p) => p.includes('.lock'))).toEqual([])
-    })
-  })
-
-  describe('and another process takes over the abandoned lock just before this one does', () => {
-    let writing: Promise<void>
-    let settled: boolean
+  describe('and a running process holds the lock past the wait timeout', () => {
+    let failure: string
 
     beforeEach(async () => {
-      await store.fs.writeFile(lockPath, GONE, { flag: 'wx' })
-      jest.spyOn(Date, 'now').mockReturnValue(Date.now() + 5_000)
-      const rename = store.fs.rename.getMockImplementation()!
-      store.fs.rename.mockImplementationOnce(async (from: string, to: string) => {
-        // Between this process reading the dead owner and moving the lock aside, the other one takes it.
-        store.files.set(lockPath, RUNNING)
-        return rename(from, to)
-      })
-      settled = false
-      writing = setWorldValue(store.components, 'k', 3).then(() => {
-        settled = true
-      })
-      await new Promise((resolve) => setTimeout(resolve, 60))
+      await store.fs.writeFile(lockPath, RUNNING, { flag: 'wx' })
+      const start = Date.now()
+      let calls = 0
+      jest.spyOn(Date, 'now').mockImplementation(() => (calls++ === 0 ? start : start + 31_000)) // the deadline, then past it
+      failure = await setWorldValue(store.components, 'k', 3).then(
+        () => 'resolved',
+        (error: Error) => error.message
+      )
     })
 
-    afterEach(async () => {
-      await store.fs.unlink(lockPath).catch(() => undefined)
-      await writing.catch(() => undefined)
+    it('should fail, naming the lock file and how to recover', () => {
+      expect(failure).toBe(`Timed out waiting for ${lockPath}. If no preview is running, delete it.`)
     })
 
-    it("should put the other process's lock back rather than keep it", () => {
+    it('should leave the running owner its lock', () => {
       expect(store.files.get(lockPath)).toBe(RUNNING)
     })
+  })
 
-    it('should wait for that process instead of writing alongside it', () => {
-      expect(settled).toBe(false)
+  describe('and the lock was left by a process that is no longer running', () => {
+    let failure: string
+
+    beforeEach(async () => {
+      await store.fs.writeFile(lockPath, GONE, { flag: 'wx' })
+      jest.spyOn(Date, 'now').mockReturnValue(Date.now() + 60_000) // however old it is
+      failure = await setWorldValue(store.components, 'k', 2).then(
+        () => 'resolved',
+        (error: Error) => error.message
+      )
+    })
+
+    it('should fail at once, naming the lock file and how to recover', () => {
+      expect(failure).toBe(
+        `${lockPath} is held by process 2147483646, which is no longer running. Delete it once no preview is running.`
+      )
+    })
+
+    it('should leave the lock in place rather than take it over', () => {
+      expect(store.files.get(lockPath)).toBe(GONE)
+    })
+
+    it('should not write the store', () => {
+      expect(JSON.parse(store.readMain()!).world).toEqual({})
     })
   })
 
-  describe("and a takeover displaces this process's lock while it is saving", () => {
+  describe('and the lock is replaced while this process is saving', () => {
     let outcome: unknown
 
     beforeEach(async () => {
@@ -249,7 +249,7 @@ describe('when two preview processes share one store', () => {
       const writeFile = store.fs.writeFile.getMockImplementation()!
       store.fs.writeFile.mockImplementation(async (filePath: string, content: string, options?: { flag?: string }) => {
         await writeFile(filePath, content, options)
-        // Mid-save, a contender moves this lock aside and a third process takes the vacant path.
+        // Mid-save, the lock file is removed and another process takes the vacant path.
         if (filePath.endsWith('.tmp')) store.files.set(lockPath, RUNNING)
       })
       outcome = await setWorldValue(store.components, 'k', 4).catch((error: Error) => error.constructor.name)
@@ -269,32 +269,6 @@ describe('when two preview processes share one store', () => {
 
     it('should leave no temporary file behind', () => {
       expect([...store.files.keys()].filter((p) => p.endsWith('.tmp'))).toEqual([])
-    })
-  })
-
-  describe("and a dead owner's lock changed hands moments ago", () => {
-    let settled: boolean
-    let writing: Promise<void>
-
-    beforeEach(async () => {
-      await store.fs.writeFile(lockPath, GONE, { flag: 'wx' }) // fresh: younger than the takeover minimum
-      settled = false
-      writing = setWorldValue(store.components, 'k', 5).then(
-        () => {
-          settled = true
-        },
-        () => undefined
-      )
-      await new Promise((resolve) => setTimeout(resolve, 60))
-    })
-
-    afterEach(async () => {
-      await store.fs.unlink(lockPath).catch(() => undefined)
-      await writing
-    })
-
-    it('should not take it over yet', () => {
-      expect([settled, store.files.get(lockPath)]).toEqual([false, GONE])
     })
   })
 
