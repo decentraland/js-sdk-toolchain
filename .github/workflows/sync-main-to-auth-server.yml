@@ -83,12 +83,13 @@ jobs:
       # Fatal on purpose: the sync PR is never created or updated without freshly
       # regenerated snapshots, since the merges above can leave them a patchwork of both
       # branches. update-snapshots runs the whole test suite, so a failing test also
-      # stops the run; a transient npm/protocol failure only needs a re-run.
-      - name: Update protocol and regenerate snapshots
+      # stops the run; a transient npm failure only needs a re-run.
+      # No protocol bump: auth-server uses main's @dcl/protocol pin, which the merge
+      # above already brings in.
+      - name: Regenerate snapshots
         run: |
           set -e
 
-          make update-protocol
           make install
           make build
           make update-snapshots
@@ -110,7 +111,7 @@ jobs:
           set -euo pipefail
 
           git add -A .
-          git commit -m "chore: update protocol and snapshots" || echo "Nothing regenerated to commit"
+          git commit -m "chore: regenerate snapshots" || echo "Nothing regenerated to commit"
 
           # Push whenever the recomputed branch differs from the remote, so a stale
           # chore/sync can never stay the head of an open PR. Skip it when there is
@@ -130,7 +131,7 @@ jobs:
           # Backticks here are data, not shell source: they reach gh through the
           # variable and are never re-evaluated.
           PR_BODY: |
-            :crown: *An automated PR to keep auth-server in sync with main, with protocol updates, build and snapshots*
+            :crown: *An automated PR to keep auth-server in sync with main, with build and regenerated snapshots*
 
             **This PR is a draft on purpose: it is landed by a workflow, not by a button.**
             **It still needs an approving review — the workflow merges this PR, so branch
