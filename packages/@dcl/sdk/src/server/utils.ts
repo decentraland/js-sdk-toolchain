@@ -1,5 +1,6 @@
 import { signedFetch, SignedFetchRequest } from '~system/SignedFetch'
 import { isServer } from '../network'
+import { errorMessage } from './storage/error-message'
 
 /**
  * Validates that the code is running on a server-side scene.
@@ -42,18 +43,24 @@ export async function tryCatch<T, E = Error>(promise: Promise<T>): Promise<Resul
 }
 
 /**
- * Wraps signedFetch with automatic error handling and JSON parsing.
+ * Wraps signedFetch with automatic error handling and JSON parsing. Never rejects.
  * Returns a FetchResult tuple with parsed JSON data or error message and status code.
  *
  * @param signedFetchBody - The signedFetch request configuration
  * @returns A tuple of [error, null, statusCode?] on failure or [null, data, statusCode] on success
  */
 export async function wrapSignedFetch<T = unknown>(signedFetchBody: SignedFetchRequest): Promise<FetchResult<T>> {
-  const [error, response] = await tryCatch(signedFetch(signedFetchBody))
-
-  if (error) {
+  let response: Awaited<ReturnType<typeof signedFetch>> | undefined
+  try {
+    response = await signedFetch(signedFetchBody)
+  } catch (error) {
     console.error(`Error in ${signedFetchBody.url} endpoint`, { error })
-    return [error.message, null, undefined]
+    return [errorMessage(error, 'signedFetch failed'), null, undefined]
+  }
+
+  if (!response) {
+    console.error(`Error in ${signedFetchBody.url} endpoint: no response`)
+    return ['signedFetch returned no response', null, undefined]
   }
 
   if (!response.ok) {

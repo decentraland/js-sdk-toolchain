@@ -56,7 +56,7 @@ describe('Storage singleton', () => {
     expect(mockWrapSignedFetch).toHaveBeenCalledTimes(4)
   })
 
-  it('scene and player caches are isolated for the same key and value', async () => {
+  it('issues each scope its own PUT for the same key and value', async () => {
     const Storage = await loadStorage()
 
     await Storage.set('score', 42)
@@ -103,5 +103,22 @@ describe('Storage singleton', () => {
     await Storage.player.get(address, 'score')
     await Storage.player.get(address, 'score')
     expect(mockWrapSignedFetch).toHaveBeenCalledTimes(4)
+  })
+
+  it('routes Storage.delete to scene storage', async () => {
+    const Storage = await loadStorage()
+
+    expect(await Storage.delete('score')).toBe(true)
+    expect(mockWrapSignedFetch).toHaveBeenCalledWith(
+      expect.objectContaining({ url: `${baseUrl}/values/score`, init: expect.objectContaining({ method: 'DELETE' }) })
+    )
+  })
+
+  it('routes Storage.getValues to the scene listing', async () => {
+    const Storage = await loadStorage()
+    mockWrapSignedFetch.mockResolvedValue([null, { data: [{ key: 'a', value: 1 }] }, 200])
+
+    expect((await Storage.getValues({ prefix: 'a' })).data).toEqual([{ key: 'a', value: 1 }])
+    expect(mockWrapSignedFetch).toHaveBeenCalledWith({ url: `${baseUrl}/values?prefix=a` })
   })
 })

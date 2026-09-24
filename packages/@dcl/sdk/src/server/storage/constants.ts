@@ -40,7 +40,7 @@ export interface SetOptions {
   /**
    * When true, skips the network write if the serialized value matches the
    * last value known to be stored for this key (from a previous successful
-   * set() or get()). Overrides the configured default. Default: true.
+   * set(), get() or getValues()). Overrides the configured default. Default: true.
    */
   skipIfUnchanged?: boolean
 }
@@ -67,7 +67,8 @@ export interface StorageOptions {
   /**
    * Max cache entries per scope (scene / player) before oldest entries are
    * evicted. Entries hold the serialized value body, so memory scales with
-   * value size — this bounds entry count, not bytes. Default: 512.
+   * value size — this bounds entry count, not bytes. Infinity removes the bound.
+   * Default: 512.
    */
   cacheMaxEntries?: number
   /**
@@ -75,7 +76,7 @@ export interface StorageOptions {
    * staleness and write-dedup trust; older entries are treated as unknown.
    * The default is deliberately short so out-of-band writers (CLI storage
    * commands, dashboards) become visible within a minute, while still
-   * absorbing hot per-frame reads. Default: 60000 (1 minute).
+   * absorbing hot per-frame reads. Infinity never expires. Default: 60000 (1 minute).
    */
   cacheMaxAgeMs?: number
 }

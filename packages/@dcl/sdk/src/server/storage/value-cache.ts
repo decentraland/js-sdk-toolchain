@@ -29,6 +29,17 @@ export interface ValueCache {
   /** Stores a confirmed-absent (negative) entry, replacing any value entry. */
   setAbsent(key: string): void
   delete(key: string): void
+  /** Starts recording mutated keys, so a read issued earlier can tell its snapshot went stale. */
+  watch(): CacheWatcher
+}
+
+/**
+ * Keys mutated since the watch started. Always stop() it, or it keeps collecting.
+ * @internal
+ */
+export interface CacheWatcher {
+  mutated(key: string): boolean
+  stop(): void
 }
 
 /**
@@ -37,8 +48,14 @@ export interface ValueCache {
  */
 export function createValueCache(config: StorageConfigState): ValueCache {
   const entries = new Map<string, CacheEntry & { storedAt: number }>()
+  const watchers = new Set<Set<string>>()
+
+  function noteMutation(key: string): void {
+    for (const seen of watchers) seen.add(key)
+  }
 
   function insert(key: string, entry: CacheEntry): void {
+    noteMutation(key)
     // Delete + re-insert moves refreshed keys to the end of the Map's
     // insertion order, so eviction below drops the least-recently-written.
     entries.delete(key)
@@ -46,7 +63,7 @@ export function createValueCache(config: StorageConfigState): ValueCache {
 
     // Guard against misconfiguration: a negative bound would loop forever on
     // an empty map, and a NaN bound would silently disable eviction.
-    const maxEntries = Number.isFinite(config.cacheMaxEntries)
+    const maxEntries = !Number.isNaN(config.cacheMaxEntries)
       ? Math.max(0, config.cacheMaxEntries)
       : DEFAULT_STORAGE_CONFIG.cacheMaxEntries
 
@@ -63,9 +80,7 @@ export function createValueCache(config: StorageConfigState): ValueCache {
       // Guard against misconfiguration, mirroring cacheMaxEntries: a NaN
       // bound would silently disable expiry (NaN comparisons are false).
       // Negative values need no guard — they just expire everything.
-      const maxAgeMs = Number.isFinite(config.cacheMaxAgeMs)
-        ? config.cacheMaxAgeMs
-        : DEFAULT_STORAGE_CONFIG.cacheMaxAgeMs
+      const maxAgeMs = !Number.isNaN(config.cacheMaxAgeMs) ? config.cacheMaxAgeMs : DEFAULT_STORAGE_CONFIG.cacheMaxAgeMs
 
       // Lazy max-age expiry: storedAt is never refreshed on hits, so the age
       // bounds the time since the last actual network confirmation.
@@ -86,7 +101,19 @@ export function createValueCache(config: StorageConfigState): ValueCache {
     },
 
     delete(key: string): void {
+      noteMutation(key)
       entries.delete(key)
+    },
+
+    watch(): CacheWatcher {
+      const seen = new Set<string>()
+      watchers.add(seen)
+      return {
+        mutated: (key: string) => seen.has(key),
+        stop: () => {
+          watchers.delete(seen)
+        }
+      }
     }
   }
 }

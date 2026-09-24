@@ -15,9 +15,10 @@ import {
  */
 function makeComponents(initialFile?: string) {
   const files = new Map<string, string>()
+  const mtimes = new Map<string, number>()
   let mainPath = ''
   const learn = (filePath: string) => {
-    if (filePath.endsWith('.tmp')) return
+    if (!filePath.endsWith('server-storage.json')) return
     mainPath = filePath
     if (initialFile !== undefined && !files.has(filePath)) files.set(filePath, initialFile)
   }
@@ -26,11 +27,26 @@ function makeComponents(initialFile?: string) {
       learn(filePath)
       return files.has(filePath)
     }),
-    readFile: jest.fn(async (filePath: string) => files.get(filePath) ?? ''),
+    readFile: jest.fn(async (filePath: string) => {
+      learn(filePath)
+      if (!files.has(filePath)) throw Object.assign(new Error(`ENOENT: ${filePath}`), { code: 'ENOENT' })
+      return files.get(filePath)!
+    }),
     directoryExists: jest.fn(async () => true),
     mkdir: jest.fn(async () => undefined),
-    writeFile: jest.fn(async (filePath: string, content: string) => {
+    writeFile: jest.fn(async (filePath: string, content: string, options?: { flag?: string }) => {
+      if (options?.flag === 'wx' && files.has(filePath)) {
+        throw Object.assign(new Error(`EEXIST: file already exists, open '${filePath}'`), { code: 'EEXIST' })
+      }
       files.set(filePath, content)
+      mtimes.set(filePath, Date.now())
+    }),
+    stat: jest.fn(async (filePath: string) => {
+      if (!files.has(filePath)) throw Object.assign(new Error(`ENOENT: ${filePath}`), { code: 'ENOENT' })
+      return { mtimeMs: mtimes.get(filePath) ?? Date.now() }
+    }),
+    unlink: jest.fn(async (filePath: string) => {
+      if (!files.delete(filePath)) throw Object.assign(new Error(`ENOENT: ${filePath}`), { code: 'ENOENT' })
     }),
     rename: jest.fn(async (from: string, to: string) => {
       files.set(to, files.get(from)!)
@@ -39,7 +55,14 @@ function makeComponents(initialFile?: string) {
     })
   }
   const logger = { debug: jest.fn(), error: jest.fn(), info: jest.fn(), log: jest.fn(), warn: jest.fn() }
-  return { components: { fs, logger } as any, fs, logger, readMain: () => files.get(mainPath) }
+  return {
+    components: { fs, logger } as any,
+    fs,
+    logger,
+    files,
+    storePath: () => mainPath,
+    readMain: () => files.get(mainPath)
+  }
 }
 
 describe('runtime-env concurrent write safety', () => {
@@ -76,8 +99,10 @@ describe('runtime-env atomic writes', () => {
 
     await setEnvValue(components, 'FOO', 'bar')
 
-    const writtenPath: string = fs.writeFile.mock.calls[0][0]
-    expect(writtenPath).toMatch(/server-storage\.json\..+/)
+    const writtenPath: string = fs.writeFile.mock.calls
+      .map((call: unknown[]) => call[0] as string)
+      .find((p: string) => p.endsWith('.tmp'))!
+    expect(writtenPath).toMatch(/server-storage\.json\..+\.tmp$/)
     expect(fs.rename).toHaveBeenCalledWith(writtenPath, expect.stringMatching(/server-storage\.json$/))
     expect(JSON.parse(readMain()!).env).toEqual({ FOO: 'bar' })
   })
@@ -94,5 +119,195 @@ describe('runtime-env default isolation', () => {
     const b = await loadServerStorage(components)
     expect(b.env).toEqual({})
     expect(b.players).toEqual({})
+  })
+})
+
+describe('when two preview processes share one store', () => {
+  const RUNNING = `${process.pid}:other`
+  const GONE = '2147483646:gone' // no such process
+  let store: ReturnType<typeof makeComponents>
+  let lockPath: string
+
+  beforeEach(async () => {
+    store = makeComponents(JSON.stringify({ env: {}, world: {}, players: {} }))
+    await loadServerStorage(store.components) // learn the store path
+    lockPath = `${store.storePath()}.lock`
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  describe('and a running process holds the lock', () => {
+    let writing: Promise<void>
+    let settled: boolean
+
+    beforeEach(async () => {
+      await store.fs.writeFile(lockPath, RUNNING, { flag: 'wx' })
+      settled = false
+      writing = setWorldValue(store.components, 'k', 1).then(
+        () => {
+          settled = true
+        },
+        () => undefined // a waiter may give up once the timeout passes; it never writes alongside the owner
+      )
+      await new Promise((resolve) => setTimeout(resolve, 60))
+    })
+
+    afterEach(async () => {
+      await store.fs.unlink(lockPath).catch(() => undefined)
+      await writing.catch(() => undefined)
+    })
+
+    it('should wait for it instead of writing', () => {
+      expect(settled).toBe(false)
+    })
+
+    describe('and it has held the lock far longer than a save takes', () => {
+      beforeEach(async () => {
+        const now = Date.now()
+        jest.spyOn(Date, 'now').mockReturnValue(now + 60_000)
+        await new Promise((resolve) => setTimeout(resolve, 60))
+      })
+
+      it('should keep waiting, since the owner is still running', () => {
+        expect([settled, store.files.get(lockPath)]).toEqual([false, RUNNING])
+      })
+    })
+
+    describe('and it releases the lock', () => {
+      beforeEach(async () => {
+        await store.fs.unlink(lockPath)
+        await writing
+      })
+
+      it('should write once it gets the lock', () => {
+        expect(JSON.parse(store.readMain()!).world).toEqual({ k: 1 })
+      })
+
+      it('should release its own lock afterwards', () => {
+        expect(store.files.has(lockPath)).toBe(false)
+      })
+    })
+  })
+
+  describe('and a running process holds the lock past the wait timeout', () => {
+    let failure: string
+
+    beforeEach(async () => {
+      await store.fs.writeFile(lockPath, RUNNING, { flag: 'wx' })
+      const start = Date.now()
+      let calls = 0
+      jest.spyOn(Date, 'now').mockImplementation(() => (calls++ === 0 ? start : start + 31_000)) // the deadline, then past it
+      failure = await setWorldValue(store.components, 'k', 3).then(
+        () => 'resolved',
+        (error: Error) => error.message
+      )
+    })
+
+    it('should fail, naming the lock file and how to recover', () => {
+      expect(failure).toBe(`Timed out waiting for ${lockPath}. If no preview is running, delete it.`)
+    })
+
+    it('should leave the running owner its lock', () => {
+      expect(store.files.get(lockPath)).toBe(RUNNING)
+    })
+  })
+
+  describe('and the lock was left by a process that is no longer running', () => {
+    let failure: string
+
+    beforeEach(async () => {
+      await store.fs.writeFile(lockPath, GONE, { flag: 'wx' })
+      jest.spyOn(Date, 'now').mockReturnValue(Date.now() + 60_000) // however old it is
+      failure = await setWorldValue(store.components, 'k', 2).then(
+        () => 'resolved',
+        (error: Error) => error.message
+      )
+    })
+
+    it('should fail at once, naming the lock file and how to recover', () => {
+      expect(failure).toBe(
+        `${lockPath} is held by process 2147483646, which is no longer running. Delete it once no preview is running.`
+      )
+    })
+
+    it('should leave the lock in place rather than take it over', () => {
+      expect(store.files.get(lockPath)).toBe(GONE)
+    })
+
+    it('should not write the store', () => {
+      expect(JSON.parse(store.readMain()!).world).toEqual({})
+    })
+  })
+
+  describe('and the lock is replaced while this process is saving', () => {
+    let outcome: unknown
+
+    beforeEach(async () => {
+      await setWorldValue(store.components, 'before', 1)
+      const writeFile = store.fs.writeFile.getMockImplementation()!
+      store.fs.writeFile.mockImplementation(async (filePath: string, content: string, options?: { flag?: string }) => {
+        await writeFile(filePath, content, options)
+        // Mid-save, the lock file is removed and another process takes the vacant path.
+        if (filePath.endsWith('.tmp')) store.files.set(lockPath, RUNNING)
+      })
+      outcome = await setWorldValue(store.components, 'k', 4).catch((error: Error) => error.constructor.name)
+    })
+
+    it('should fail the write rather than commit without the lock', () => {
+      expect(outcome).toBe('StoreLockLostError')
+    })
+
+    it('should leave the store as the lock holder last saved it', () => {
+      expect(JSON.parse(store.readMain()!).world).toEqual({ before: 1 })
+    })
+
+    it('should not release the lock the other process now holds', () => {
+      expect(store.files.get(lockPath)).toBe(RUNNING)
+    })
+
+    it('should leave no temporary file behind', () => {
+      expect([...store.files.keys()].filter((p) => p.endsWith('.tmp'))).toEqual([])
+    })
+  })
+
+  describe('and each process writes different keys concurrently', () => {
+    beforeEach(async () => {
+      // Two copies of the module are two processes: each has its own in-process lock chain, and
+      // only the lock file on the shared store can keep them from clobbering each other.
+      let processA!: typeof import('../../../../packages/@dcl/sdk-commands/src/commands/start/server/runtime-env')
+      let processB!: typeof import('../../../../packages/@dcl/sdk-commands/src/commands/start/server/runtime-env')
+      await jest.isolateModulesAsync(async () => {
+        processA = await import('../../../../packages/@dcl/sdk-commands/src/commands/start/server/runtime-env')
+      })
+      await jest.isolateModulesAsync(async () => {
+        processB = await import('../../../../packages/@dcl/sdk-commands/src/commands/start/server/runtime-env')
+      })
+      await Promise.all(
+        Array.from({ length: 10 }, (_, i) => (i % 2 ? processA : processB).setWorldValue(store.components, `k${i}`, i))
+      )
+    })
+
+    it('should keep every acknowledged write', () => {
+      expect(Object.keys(JSON.parse(store.readMain()!).world).sort()).toEqual(
+        Array.from({ length: 10 }, (_, i) => `k${i}`).sort()
+      )
+    })
+  })
+
+  describe('and both save at once', () => {
+    let other: ReturnType<typeof makeComponents>
+
+    beforeEach(async () => {
+      other = makeComponents()
+      await Promise.all([setWorldValue(store.components, 'a', 1), setWorldValue(other.components, 'b', 2)])
+    })
+
+    it('should give each save its own temporary file', () => {
+      const tmp = (c: ReturnType<typeof makeComponents>) =>
+        c.fs.writeFile.mock.calls.map((call: unknown[]) => call[0] as string).filter((p: string) => p.endsWith('.tmp'))
+      expect(new Set([...tmp(store), ...tmp(other)]).size).toBe(2)
+    })
   })
 })
