@@ -9,6 +9,7 @@ import {
 } from '@dcl/ecs'
 import * as components from '@dcl/ecs/dist/components'
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
+import { DeleteComponentNetwork } from '@dcl/ecs/dist/serialization/crdt/network/deleteComponentNetwork'
 import { CommsMessage } from '../binary-message-bus'
 import { chunkCrdtMessages } from '../chunking'
 import * as utils from './utils'
@@ -204,6 +205,21 @@ export function createServerValidator(config: ServerValidationConfig) {
           console.log(
             `[AUTHORITATIVE] Sent authoritative message to ${sender} for entity ${localEntityId} component ${networkMessage.componentId} with timestamp ${networkMessage.timestamp}`
           )
+      } else if (
+        networkMessage.type === CrdtMessageType.PUT_COMPONENT_NETWORK &&
+        component.componentType === ComponentType.LastWriteWinElementSet
+      ) {
+        // The server has no value to restore, so remove the one the sender applied. The delete
+        // must be newer than the rejected write: at the same timestamp the sender's data wins.
+        const correctionBuffer = new ReadWriteByteBuffer()
+        DeleteComponentNetwork.write(
+          networkMessage.entityId,
+          networkMessage.componentId,
+          networkMessage.timestamp + 1,
+          networkMessage.networkId,
+          correctionBuffer
+        )
+        binaryMessageBus.emit(CommsMessage.CRDT_AUTHORITATIVE, correctionBuffer.toBinary(), [sender])
       }
     } catch (error) {
       DEBUG_NETWORK_MESSAGES() && console.error('Error sending correction:', error)
