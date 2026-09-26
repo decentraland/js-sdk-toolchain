@@ -227,6 +227,7 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
     },
     deployEntity,
     deleteScenesFromWorldPayload,
+    options.args['--target'],
     targetContent,
     multiScene
   )
