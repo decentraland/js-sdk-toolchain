@@ -753,6 +753,7 @@ export const componentDefinitionByName: {
     "core::Raycast": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycast>>;
     "core::RaycastResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycastResult>>;
     "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
+    "core::Skybox": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSkybox>>;
     "core::SkyboxTime": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSkyboxTime>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
     "core::TouchScreenControls": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTouchScreenControls>>;
@@ -3751,6 +3752,20 @@ export namespace PBRealmInfo {
 }
 
 // @public (undocumented)
+export interface PBSkybox {
+    reflectionMap?: TextureUnion | undefined;
+    skyboxTexture?: TextureUnion | undefined;
+}
+
+// @public (undocumented)
+export namespace PBSkybox {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBSkybox;
+    // (undocumented)
+    export function encode(message: PBSkybox, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBSkyboxTime {
     fixedTime: number;
     transitionMode?: TransitionMode | undefined;
@@ -5037,6 +5052,9 @@ export interface SetMoveRotateScaleParams extends MoveRotateScaleModeParams {
     duration: number;
     easingFunction?: EasingFunction;
 }
+
+// @public (undocumented)
+export const Skybox: LastWriteWinElementSetComponentDefinition<PBSkybox>;
 
 // @public (undocumented)
 export const SkyboxTime: LastWriteWinElementSetComponentDefinition<PBSkyboxTime>;
