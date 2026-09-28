@@ -744,7 +744,7 @@ export const componentDefinitionByName: {
     "core::CameraMode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraMode>>;
     "core::CameraModeArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraModeArea>>;
     "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
-    "core::ExplorerItemPurchaseResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBExplorerItemPurchaseResult>>;
+    "core::ExplorerItemPurchaseResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBExplorerItemPurchaseResult>>;
     "core::ExplorerUiEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBExplorerUiEventsResult>>;
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
     "core::GltfContainerLoadingState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainerLoadingState>>;
@@ -1300,7 +1300,7 @@ export type ExcludeUndefined<T> = {
 export const executeTask: (task: Task<unknown>) => void;
 
 // @public (undocumented)
-export const ExplorerItemPurchaseResult: LastWriteWinElementSetComponentDefinition<PBExplorerItemPurchaseResult>;
+export const ExplorerItemPurchaseResult: GrowOnlyValueSetComponentDefinition<PBExplorerItemPurchaseResult>;
 
 // @public (undocumented)
 export const enum ExplorerUi {
