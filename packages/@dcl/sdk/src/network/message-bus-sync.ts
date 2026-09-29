@@ -115,6 +115,9 @@ export function addSyncTransport(
 
   // Receive & Process CRDT_STATE
   binaryMessageBus.on(CommsMessage.REQ_CRDT_STATE, async (data, sender) => {
+    // Requests arriving before role resolution are recovered by the requester's retry.
+    if (!isServerAtom.getOrNull()) return
+
     DEBUG_NETWORK_MESSAGES() && console.log('[REQ_CRDT_STATE]', sender, Date.now())
     const chunks = engineToCrdt(engine)
     if (chunks.length === 0) {
