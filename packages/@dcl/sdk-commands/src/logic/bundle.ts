@@ -299,7 +299,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
   if (options.watch) {
     // Instead of using esbuild's watch, we create our own watcher
     const watcher = watch(path.resolve(options.workingDirectory), {
-      ignored: ['**/dist/**', '**/*.crdt', '**/*.d.ts', path.resolve(options.outputFile)],
+      ignored: ['**/node_modules/**', '**/dist/**', '**/*.crdt', '**/*.d.ts', path.resolve(options.outputFile)],
       ignoreInitial: true
     })
 
