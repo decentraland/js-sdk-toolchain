@@ -184,7 +184,10 @@ jobs:
             NOTE=$'\n\n> [!NOTE]\n> Conflicts in these files were resolved in favour of `auth-server`, so any conflicting change from `main` in them was dropped. Check them before approving:\n'"$(sed 's/^/> - `/; s/$/`/' <<< "$RESOLVED")"
           fi
 
-          PR_NUMBER="$(gh pr list --base auth-server --head chore/sync --state open --json number --jq '.[0].number // empty')"
+          # --head matches the ref name alone, so a fork branch also called chore/sync matches too.
+          PR_NUMBER="$(gh pr list --base auth-server --head chore/sync --state open \
+                         --json number,isCrossRepository \
+                         --jq 'map(select(.isCrossRepository | not)) | .[0].number // empty')"
 
           if [ -n "$PR_NUMBER" ]; then
             echo "PR #$PR_NUMBER already exists, adding a comment..."
