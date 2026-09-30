@@ -101,6 +101,7 @@ describe('Generated Skybox ProtoBuf', () => {
         color: multiKeyGradient()
       },
       skyColors: {
+        rim: undefined,
         zenith: multiKeyGradient(),
         horizon: multiKeyGradient(),
         nadir: multiKeyGradient()
@@ -109,6 +110,7 @@ describe('Generated Skybox ProtoBuf', () => {
         color: multiKeyGradient()
       },
       clouds: {
+        color: undefined,
         opacity: 0.8,
         speed: 0.02
       },
@@ -134,6 +136,7 @@ describe('Generated Skybox ProtoBuf', () => {
         color: singleKeyGradient()
       },
       skyColors: {
+        rim: undefined,
         zenith: singleKeyGradient(),
         horizon: singleKeyGradient(),
         nadir: singleKeyGradient()
@@ -158,6 +161,7 @@ describe('Generated Skybox ProtoBuf', () => {
         color: { keys: [] }
       },
       skyColors: {
+        rim: undefined,
         zenith: { keys: [] },
         horizon: undefined,
         nadir: undefined
@@ -179,6 +183,7 @@ describe('Generated Skybox ProtoBuf', () => {
       skyColors: undefined,
       fog: undefined,
       clouds: {
+        color: undefined,
         opacity: undefined,
         speed: 0.05
       },
@@ -221,6 +226,30 @@ describe('Generated Skybox ProtoBuf', () => {
     })
   })
 
+  it('should serialize/deserialize Skybox with a rim gradient and a clouds color gradient', () => {
+    const newEngine = Engine()
+    const Skybox = components.Skybox(newEngine)
+
+    testComponentSerialization<PBSkybox>(Skybox, {
+      reflectionMap: undefined,
+      skyboxTexture: undefined,
+      sun: undefined,
+      skyColors: {
+        zenith: undefined,
+        horizon: undefined,
+        nadir: undefined,
+        rim: { keys: [{ time: 0.3, color: { r: 3.5, g: 0.9, b: 0, a: 1 } }] }
+      },
+      fog: undefined,
+      clouds: {
+        opacity: undefined,
+        speed: undefined,
+        color: { keys: [{ time: 0, color: { r: 1, g: 0.5, b: 0.2, a: 1 } }, { time: 1, color: { r: 0.2, g: 0.2, b: 0.4, a: 1 } }] }
+      },
+      stars: undefined
+    })
+  })
+
   it('should serialize/deserialize Skybox combining both textures with the new procedural groups', () => {
     const newEngine = Engine()
     const Skybox = components.Skybox(newEngine)
@@ -259,6 +288,7 @@ describe('Generated Skybox ProtoBuf', () => {
         color: { keys: [{ time: 0.9, color: { r: 0.3, g: 0.3, b: 0.4, a: 1 } }] }
       },
       clouds: {
+        color: undefined,
         opacity: 0.6,
         speed: 0.01
       },

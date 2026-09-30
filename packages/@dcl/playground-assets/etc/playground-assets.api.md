@@ -3800,6 +3800,7 @@ export namespace PBSkybox {
 
 // @public (undocumented)
 export interface PBSkybox_Clouds {
+    color?: ColorGradient | undefined;
     opacity?: number | undefined;
     speed?: number | undefined;
 }
@@ -3829,6 +3830,7 @@ export namespace PBSkybox_Fog {
 export interface PBSkybox_SkyColors {
     horizon?: ColorGradient | undefined;
     nadir?: ColorGradient | undefined;
+    rim?: ColorGradient | undefined;
     zenith?: ColorGradient | undefined;
 }
 
