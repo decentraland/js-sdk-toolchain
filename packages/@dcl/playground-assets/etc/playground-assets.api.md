@@ -3803,6 +3803,7 @@ export interface PBSkybox_Clouds {
     color?: ColorGradient | undefined;
     opacity?: number | undefined;
     speed?: number | undefined;
+    texture?: TextureUnion | undefined;
 }
 
 // @public (undocumented)

@@ -112,7 +112,8 @@ describe('Generated Skybox ProtoBuf', () => {
       clouds: {
         color: undefined,
         opacity: 0.8,
-        speed: 0.02
+        speed: 0.02,
+        texture: undefined
       },
       stars: {
         brightness: 5.1
@@ -185,7 +186,8 @@ describe('Generated Skybox ProtoBuf', () => {
       clouds: {
         color: undefined,
         opacity: undefined,
-        speed: 0.05
+        speed: 0.05,
+        texture: undefined
       },
       stars: undefined
     })
@@ -244,8 +246,93 @@ describe('Generated Skybox ProtoBuf', () => {
       clouds: {
         opacity: undefined,
         speed: undefined,
-        color: { keys: [{ time: 0, color: { r: 1, g: 0.5, b: 0.2, a: 1 } }, { time: 1, color: { r: 0.2, g: 0.2, b: 0.4, a: 1 } }] }
+        color: { keys: [{ time: 0, color: { r: 1, g: 0.5, b: 0.2, a: 1 } }, { time: 1, color: { r: 0.2, g: 0.2, b: 0.4, a: 1 } }] },
+        texture: undefined
       },
+      stars: undefined
+    })
+  })
+
+  it('should serialize/deserialize Skybox with clouds.texture set to a file texture', () => {
+    const newEngine = Engine()
+    const Skybox = components.Skybox(newEngine)
+
+    testComponentSerialization<PBSkybox>(Skybox, {
+      reflectionMap: undefined,
+      skyboxTexture: undefined,
+      sun: undefined,
+      skyColors: undefined,
+      fog: undefined,
+      clouds: {
+        opacity: undefined,
+        speed: undefined,
+        color: undefined,
+        texture: {
+          tex: {
+            $case: 'texture',
+            texture: {
+              src: 'images/clouds.png',
+              wrapMode: undefined,
+              filterMode: undefined,
+              offset: undefined,
+              tiling: undefined
+            }
+          }
+        }
+      },
+      stars: undefined
+    })
+  })
+
+  it('should serialize/deserialize Skybox with clouds.texture set to a video texture', () => {
+    const newEngine = Engine()
+    const Skybox = components.Skybox(newEngine)
+
+    testComponentSerialization<PBSkybox>(Skybox, {
+      reflectionMap: undefined,
+      skyboxTexture: undefined,
+      sun: undefined,
+      skyColors: undefined,
+      fog: undefined,
+      clouds: {
+        opacity: undefined,
+        speed: undefined,
+        color: undefined,
+        texture: {
+          tex: {
+            $case: 'videoTexture',
+            videoTexture: {
+              videoPlayerEntity: 512,
+              wrapMode: undefined,
+              filterMode: undefined
+            }
+          }
+        }
+      },
+      stars: undefined
+    })
+  })
+
+  it('should serialize/deserialize Skybox with skyboxTexture set to a video texture', () => {
+    const newEngine = Engine()
+    const Skybox = components.Skybox(newEngine)
+
+    testComponentSerialization<PBSkybox>(Skybox, {
+      reflectionMap: undefined,
+      skyboxTexture: {
+        tex: {
+          $case: 'videoTexture',
+          videoTexture: {
+            videoPlayerEntity: 256,
+            wrapMode: TextureWrapMode.TWM_CLAMP,
+            filterMode: undefined
+          }
+        }
+      },
+      sun: undefined,
+      skyColors: undefined,
+      fog: undefined,
+      clouds: undefined,
       stars: undefined
     })
   })
@@ -290,7 +377,8 @@ describe('Generated Skybox ProtoBuf', () => {
       clouds: {
         color: undefined,
         opacity: 0.6,
-        speed: 0.01
+        speed: 0.01,
+        texture: undefined
       },
       stars: {
         brightness: 3
