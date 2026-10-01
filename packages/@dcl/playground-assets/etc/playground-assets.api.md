@@ -100,13 +100,17 @@ export const AudioEvent: GrowOnlyValueSetComponentDefinition<PBAudioEvent>;
 
 // @public (undocumented)
 export interface AudioEventsSystem {
+    getAudioPlayback(entity: Entity): DeepReadonlyObject<PBAudioEvent> | undefined;
     getAudioState(entity: Entity): DeepReadonlyObject<PBAudioEvent> | undefined;
+    getSceneTimeAtTick(tickNumber: number): number | undefined;
     // (undocumented)
     hasAudioEventsEntity(entity: Entity): boolean;
-    // (undocumented)
     registerAudioEventsEntity(entity: Entity, callback: AudioEventsSystemCallback): void;
+    registerAudioPlaybackEntity(entity: Entity, callback: AudioPlaybackSampleCallback): void;
     // (undocumented)
     removeAudioEventsEntity(entity: Entity): void;
+    // (undocumented)
+    removeAudioPlaybackEntity(entity: Entity): void;
 }
 
 // @public
@@ -114,6 +118,16 @@ export const audioEventsSystem: AudioEventsSystem;
 
 // @public (undocumented)
 export type AudioEventsSystemCallback = (event: DeepReadonlyObject<PBAudioEvent>) => void;
+
+// @public
+export type AudioPlaybackSample = {
+    report: DeepReadonlyObject<PBAudioEvent>;
+    sceneTime: number;
+    offset: number;
+};
+
+// @public (undocumented)
+export type AudioPlaybackSampleCallback = (sample: AudioPlaybackSample) => void;
 
 // Warning: (ae-missing-release-tag) "AudioSource" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
 //
@@ -2506,8 +2520,11 @@ export const enum PBAudioAnalysisMode {
 
 // @public (undocumented)
 export interface PBAudioEvent {
+    clipLength?: number | undefined;
+    currentOffset?: number | undefined;
     // (undocumented)
     state: MediaState;
+    tickNumber?: number | undefined;
     timestamp: number;
 }
 
@@ -2527,6 +2544,7 @@ export interface PBAudioSource {
     loop?: boolean | undefined;
     pitch?: number | undefined;
     playing?: boolean | undefined;
+    reportPlaybackPosition?: boolean | undefined;
     volume?: number | undefined;
 }
 
