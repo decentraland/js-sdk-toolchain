@@ -29,6 +29,7 @@ import { LinkerResponse } from '../../linker-dapp/routes'
 import { analyticsFeatures } from './analytics-features'
 import { getInstalledPackageVersion } from '../../logic/config'
 import { drainResponse } from '../../logic/fetch'
+import { uploadDeployment } from './upload'
 
 interface Options {
   args: Result<typeof args>
@@ -38,10 +39,6 @@ interface Options {
 interface ProgrammaticDeployResult {
   finish: () => Promise<void>
   stop: () => Promise<void>
-}
-
-interface DeployResponse {
-  message?: string
 }
 
 export const args = declareArgs({
@@ -335,18 +332,7 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
     const sceneUrl = `${domain}/?NETWORK=${network}&position=${position}${worldRealm}`
 
     try {
-      const response = (await client.deploy(deployData, {
-        timeout: 600000
-      })) as any
-
-      let responseData
-
-      if (response.status !== 200) {
-        responseData = await response.text()
-        throw new Error(responseData)
-      }
-
-      responseData = (await response.json()) as DeployResponse
+      const responseData = await uploadDeployment(options.components, client, deployData)
 
       if (responseData.message) {
         printProgressInfo(options.components.logger, responseData.message)
