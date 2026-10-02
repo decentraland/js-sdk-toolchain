@@ -56,13 +56,18 @@ jobs:
             exit 0
           fi
 
-          PR_NUMBER="$(gh pr list --base auth-server --head chore/sync --state open --json number --jq '.[0].number // empty')"
+          # --head matches the ref name alone, so a fork branch also called chore/sync matches too.
+          SYNC_PR="$(gh pr list --base auth-server --head chore/sync --state open \
+                       --json number,isCrossRepository,headRefOid \
+                       --jq 'map(select(.isCrossRepository | not)) | .[0] // empty | "\(.number) \(.headRefOid)"')"
+          PR_NUMBER=""; PR_HEAD_SHA=""
+          read -r PR_NUMBER PR_HEAD_SHA <<<"$SYNC_PR"
 
           # The merge goes through the PR itself: auth-server only accepts writes that
           # arrive as a pull-request merge, so without one there is nothing to land. The
           # sync workflow opens it; a missing PR means that workflow has not run, or its
           # PR was closed by hand.
-          if [ -z "$PR_NUMBER" ]; then
+          if [ -z "$PR_NUMBER" ] || [ -z "$PR_HEAD_SHA" ]; then
             echo "::error::No open PR from chore/sync into auth-server. Run the 'Sync main to auth-server' workflow first, or reopen the PR it created."
             exit 1
           fi
@@ -76,6 +81,7 @@ jobs:
           # one and freezes the merge base. GitHub authors the merge server-side, so it
           # comes out signed if auth-server ever starts requiring signatures.
           if MERGE_OUT="$(gh pr merge "$PR_NUMBER" --merge --delete-branch \
+                            --match-head-commit "$PR_HEAD_SHA" \
                             --subject "chore: sync main to auth-server (#$PR_NUMBER)" 2>&1)"; then
             echo "Merged PR #$PR_NUMBER into auth-server."
           else
@@ -83,6 +89,10 @@ jobs:
             case "$MERGE_OUT" in
               *"approving review"*|*"review is required"*)
                 echo "::error::PR #$PR_NUMBER has no approving review and auth-server requires one. Approve the sync PR, then re-run this workflow."
+                exit 1
+                ;;
+              *"Head branch was modified"*)
+                echo "::error::chore/sync moved after this run read it (expected $PR_HEAD_SHA). Re-run this workflow to merge the current head."
                 exit 1
                 ;;
               *"not mergeable"*|*"Merge conflict"*|*"merge conflict"*)
