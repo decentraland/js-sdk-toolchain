@@ -79,11 +79,42 @@ export async function wireRouter(
 
   setupRealmAndComms(components, router, localSceneParcels)
   setupStorageEndpoints(components, router, workspace)
+  setupBadgesProxy(components, router)
   await setupEcs6Endpoints(components, router, workspace)
 
   components.server.setContext(components)
   components.server.use(router.allowedMethods())
   components.server.use(router.middleware())
+}
+
+const HOP_BY_HOP_HEADERS = new Set(['host', 'content-length', 'connection', 'keep-alive', 'transfer-encoding', 'upgrade'])
+
+// The award is ADR-44 signed over method + path, so the path is forwarded byte-identical.
+function setupBadgesProxy(components: PreviewComponents, router: Router<PreviewComponents>) {
+  const badgesServerUrl = process.env.BADGES_SERVER_URL?.replace(/\/+$/, '')
+  if (!badgesServerUrl) return
+
+  router.put('/badges/:badgeId/awards/:player', async (ctx) => {
+    const headers: Record<string, string> = {}
+    ctx.request.headers.forEach((value, key) => {
+      if (!HOP_BY_HOP_HEADERS.has(key.toLowerCase())) headers[key] = value
+    })
+    try {
+      const res = await components.fetch.fetch(`${badgesServerUrl}${ctx.url.pathname}${ctx.url.search}`, {
+        method: 'PUT',
+        headers,
+        body: Buffer.from(await ctx.request.arrayBuffer())
+      })
+      return {
+        status: res.status,
+        headers: { 'content-type': res.headers.get('content-type') || 'application/json' },
+        body: Buffer.from(await res.arrayBuffer())
+      }
+    } catch (err: any) {
+      components.logger.error(`Badges proxy to ${badgesServerUrl} failed: ${err.message}`)
+      return { status: 502, body: { ok: false, error: 'Badges server unreachable' } }
+    }
+  })
 }
 
 const initWsConnection = (ws: WebSocket, clients: Set<WebSocket>) => {
