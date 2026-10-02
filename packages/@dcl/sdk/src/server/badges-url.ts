@@ -1,9 +1,20 @@
-import { getRealm } from '~system/Runtime'
+import { getRealm, getSceneInformation } from '~system/Runtime'
 
 const BADGES_SERVER_ORG = 'https://badges.decentraland.org'
 const BADGES_SERVER_ZONE = 'https://badges.decentraland.zone'
 
 type BadgesTarget = { serverUrl: string; world: string }
+
+// Preview reports realmName "LocalPreview"; the delegation is bound to scene.json's world.
+async function getPreviewWorldName(): Promise<string | undefined> {
+  try {
+    const { metadataJson } = await getSceneInformation({})
+    const name = JSON.parse(metadataJson)?.worldConfiguration?.name
+    return typeof name === 'string' && name ? name.toLowerCase() : undefined
+  } catch {
+    return undefined
+  }
+}
 
 async function resolveBadgesTarget(): Promise<BadgesTarget> {
   const { realmInfo } = await getRealm({})
@@ -14,7 +25,7 @@ async function resolveBadgesTarget(): Promise<BadgesTarget> {
 
   // The world name is what the scene's delegation claim is bound to; the badges
   // service checks the award path's world against it.
-  const world = realmInfo.realmName
+  const world = (realmInfo.isPreview && (await getPreviewWorldName())) || realmInfo.realmName
   if (!world) {
     throw new Error('Unable to retrieve the realm name')
   }
@@ -38,7 +49,8 @@ let memoized: Promise<BadgesTarget> | null = null
 /**
  * Resolves the badges service base URL and the world this scene runs in.
  *
- * - If `isPreview` is true, the URL is the realm's baseUrl (localhost)
+ * - If `isPreview` is true, the URL is the realm's baseUrl (localhost) and the
+ *   world is scene.json's `worldConfiguration.name` (falling back to the realm name)
  * - If the realm's baseUrl contains `.zone`, badges.decentraland.zone
  * - Otherwise badges.decentraland.org (production)
  *

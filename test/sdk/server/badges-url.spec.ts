@@ -1,13 +1,16 @@
 const mockGetRealm = jest.fn()
+const mockGetSceneInformation = jest.fn()
 
 jest.mock('~system/Runtime', () => ({
-  getRealm: mockGetRealm
+  getRealm: mockGetRealm,
+  getSceneInformation: mockGetSceneInformation
 }))
 
 describe('getBadgesTarget', () => {
   beforeEach(() => {
     jest.resetModules()
     mockGetRealm.mockReset()
+    mockGetSceneInformation.mockReset()
   })
 
   async function loadModule() {
@@ -18,10 +21,36 @@ describe('getBadgesTarget', () => {
     mockGetRealm.mockResolvedValue({ realmInfo })
   }
 
-  it('returns the realm baseUrl and world in preview mode', async () => {
-    mockRealm({ isPreview: true, baseUrl: 'http://localhost:8000', realmName: 'boedo.dcl.eth' })
+  function mockSceneMetadata(metadata: unknown) {
+    mockGetSceneInformation.mockResolvedValue({ urn: '', content: [], metadataJson: JSON.stringify(metadata), baseUrl: '' })
+  }
+
+  it('returns the realm baseUrl and the scene.json world (lowercased) in preview mode', async () => {
+    mockRealm({ isPreview: true, baseUrl: 'http://localhost:8000', realmName: 'LocalPreview' })
+    mockSceneMetadata({ worldConfiguration: { name: 'Boedo.dcl.eth' } })
     const { getBadgesTarget } = await loadModule()
     expect(await getBadgesTarget()).toEqual({ serverUrl: 'http://localhost:8000', world: 'boedo.dcl.eth' })
+  })
+
+  it('falls back to the realm name in preview mode when scene.json has no world', async () => {
+    mockRealm({ isPreview: true, baseUrl: 'http://localhost:8000', realmName: 'LocalPreview' })
+    mockSceneMetadata({})
+    const { getBadgesTarget } = await loadModule()
+    expect((await getBadgesTarget()).world).toBe('LocalPreview')
+  })
+
+  it('falls back to the realm name in preview mode when scene information fails', async () => {
+    mockRealm({ isPreview: true, baseUrl: 'http://localhost:8000', realmName: 'LocalPreview' })
+    mockGetSceneInformation.mockRejectedValue(new Error('unavailable'))
+    const { getBadgesTarget } = await loadModule()
+    expect((await getBadgesTarget()).world).toBe('LocalPreview')
+  })
+
+  it('does not read scene information outside preview', async () => {
+    mockRealm({ isPreview: false, baseUrl: 'https://realm.decentraland.org', realmName: 'boedo.dcl.eth' })
+    const { getBadgesTarget } = await loadModule()
+    expect((await getBadgesTarget()).world).toBe('boedo.dcl.eth')
+    expect(mockGetSceneInformation).not.toHaveBeenCalled()
   })
 
   it('returns the .zone badges server for staging realms', async () => {

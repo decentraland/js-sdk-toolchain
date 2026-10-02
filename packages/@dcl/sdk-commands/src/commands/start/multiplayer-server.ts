@@ -270,12 +270,15 @@ export function spawnAuthServer(
 ): Promise<boolean> | undefined {
   const engine = selectedEngine()
   try {
+    const engineArgs = engine === 'bevy' ? engineEnvArgs(dclenv) : []
+    // bevy only signs badge awards whose origin matches --badges exactly; the preview proxies them on
+    if (engine === 'bevy' && process.env.BADGES_SERVER_URL) engineArgs.push(`--badges=${realm}`)
     const server = startMultiplayerServer(
       components,
       project.workingDirectory,
       realm,
       engine,
-      engine === 'bevy' ? engineEnvArgs(dclenv) : [],
+      engineArgs,
       getBaseCoords(project.scene)
     )
     void components.signaler.programClosed

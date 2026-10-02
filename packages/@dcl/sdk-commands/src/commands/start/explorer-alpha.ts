@@ -117,6 +117,10 @@ async function runApp(
     if (mcpPort !== undefined) {
       params.set('mcp-port', String(mcpPort))
     }
+    const badgesServerUrl = process.env.BADGES_SERVER_URL
+    if (badgesServerUrl) {
+      params.set('badges-url', badgesServerUrl)
+    }
 
     // Forward any params placed after a standalone `--` verbatim into the deep link.
     // Only fill in params that aren't already covered by a declared flag/default, so
