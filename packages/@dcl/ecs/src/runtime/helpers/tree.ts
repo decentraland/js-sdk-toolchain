@@ -313,6 +313,16 @@ export function removeEntityWithChildren(
     return removeNetworkEntityChildrens(engine, entity)
   }
 
+  // The tree is built from Transform entities, so a root without one would remove nothing.
+  // RootEntity (0) is left alone: every entity without a parent counts as its child.
+  if (entity !== (0 as Entity) && !Transform.has(entity)) {
+    for (const child of getEntitiesWithParent(engine, entity)) {
+      removeEntityWithChildren(engine, child)
+    }
+    engine.removeEntity(entity)
+    return
+  }
+
   for (const ent of getComponentEntityTree(engine, entity, Transform)) {
     engine.removeEntity(ent)
   }
