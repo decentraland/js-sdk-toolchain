@@ -665,6 +665,34 @@ export type Color4Type = {
 };
 
 // @public (undocumented)
+export interface ColorGradient {
+    // (undocumented)
+    keys: ColorKey[];
+}
+
+// @public (undocumented)
+export namespace ColorGradient {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): ColorGradient;
+    // (undocumented)
+    export function encode(message: ColorGradient, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface ColorKey {
+    color: PBColor4 | undefined;
+    time: number;
+}
+
+// @public (undocumented)
+export namespace ColorKey {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): ColorKey;
+    // (undocumented)
+    export function encode(message: ColorKey, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface ColorRange {
     // (undocumented)
     end: PBColor4 | undefined;
@@ -753,6 +781,7 @@ export const componentDefinitionByName: {
     "core::Raycast": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycast>>;
     "core::RaycastResult": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRaycastResult>>;
     "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
+    "core::Skybox": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSkybox>>;
     "core::SkyboxTime": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSkyboxTime>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
     "core::TouchScreenControls": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTouchScreenControls>>;
@@ -3751,6 +3780,106 @@ export namespace PBRealmInfo {
 }
 
 // @public (undocumented)
+export interface PBSkybox {
+    clouds?: PBSkybox_Clouds | undefined;
+    fog?: PBSkybox_Fog | undefined;
+    reflectionMap?: TextureUnion | undefined;
+    skyboxTexture?: TextureUnion | undefined;
+    skyColors?: PBSkybox_SkyColors | undefined;
+    stars?: PBSkybox_Stars | undefined;
+    sun?: PBSkybox_Sun | undefined;
+}
+
+// @public (undocumented)
+export namespace PBSkybox {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBSkybox;
+    // (undocumented)
+    export function encode(message: PBSkybox, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBSkybox_Clouds {
+    // (undocumented)
+    color?: ColorGradient | undefined;
+    opacity?: number | undefined;
+    speed?: number | undefined;
+    texture?: TextureUnion | undefined;
+}
+
+// @public (undocumented)
+export namespace PBSkybox_Clouds {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBSkybox_Clouds;
+    // (undocumented)
+    export function encode(message: PBSkybox_Clouds, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBSkybox_Fog {
+    // (undocumented)
+    color?: ColorGradient | undefined;
+    density?: number | undefined;
+    // (undocumented)
+    endDistance?: number | undefined;
+    startDistance?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBSkybox_Fog {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBSkybox_Fog;
+    // (undocumented)
+    export function encode(message: PBSkybox_Fog, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBSkybox_SkyColors {
+    // (undocumented)
+    horizon?: ColorGradient | undefined;
+    // (undocumented)
+    nadir?: ColorGradient | undefined;
+    rim?: ColorGradient | undefined;
+    // (undocumented)
+    zenith?: ColorGradient | undefined;
+}
+
+// @public (undocumented)
+export namespace PBSkybox_SkyColors {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBSkybox_SkyColors;
+    // (undocumented)
+    export function encode(message: PBSkybox_SkyColors, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBSkybox_Stars {
+    brightness?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBSkybox_Stars {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBSkybox_Stars;
+    // (undocumented)
+    export function encode(message: PBSkybox_Stars, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBSkybox_Sun {
+    color?: ColorGradient | undefined;
+    visible?: boolean | undefined;
+}
+
+// @public (undocumented)
+export namespace PBSkybox_Sun {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBSkybox_Sun;
+    // (undocumented)
+    export function encode(message: PBSkybox_Sun, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBSkyboxTime {
     fixedTime: number;
     transitionMode?: TransitionMode | undefined;
@@ -5037,6 +5166,9 @@ export interface SetMoveRotateScaleParams extends MoveRotateScaleModeParams {
     duration: number;
     easingFunction?: EasingFunction;
 }
+
+// @public (undocumented)
+export const Skybox: LastWriteWinElementSetComponentDefinition<PBSkybox>;
 
 // @public (undocumented)
 export const SkyboxTime: LastWriteWinElementSetComponentDefinition<PBSkyboxTime>;
