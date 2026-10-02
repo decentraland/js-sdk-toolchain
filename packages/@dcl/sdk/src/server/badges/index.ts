@@ -1,3 +1,4 @@
+import { sendBadgeAwarded } from '../../network/internal-messages'
 import { getBadgesServerUrl } from '../badges-url'
 import { assertIsServer, wrapSignedFetch } from '../utils'
 
@@ -67,6 +68,7 @@ export const Badges: IBadges = {
       return false
     }
 
+    if (status === 201) void sendBadgeAwarded(address, badgeId)
 
     return true
   }

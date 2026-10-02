@@ -15,6 +15,10 @@ jest.mock('../../../../packages/@dcl/sdk/src/server/utils', () => ({
   wrapSignedFetch: (req: unknown) => mockWrapSignedFetch(req)
 }))
 
+jest.mock('../../../../packages/@dcl/sdk/src/network/internal-messages', () => ({
+  sendBadgeAwarded: jest.fn()
+}))
+
 import { Badges } from '../../../../packages/@dcl/sdk/src/server/badges'
 
 describe('Badges.award', () => {
