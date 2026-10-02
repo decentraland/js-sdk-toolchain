@@ -1,3 +1,4 @@
+import { sendBadgeAwarded } from '../../network/internal-messages'
 import { getBadgesTarget } from '../badges-url'
 import { assertIsServer, wrapSignedFetch } from '../utils'
 
@@ -66,6 +67,8 @@ export const Badges: IBadges = {
       console.error(`[${MODULE_NAME}] award of '${badgeId}' to ${address} rejected (${status ?? 'network'}): ${error}`)
       return false
     }
+
+    if (status === 201) void sendBadgeAwarded(address, badgeId)
 
     return true
   }
