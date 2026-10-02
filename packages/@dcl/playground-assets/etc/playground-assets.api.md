@@ -3817,6 +3817,10 @@ export namespace PBSkybox_Clouds {
 // @public (undocumented)
 export interface PBSkybox_Fog {
     color?: ColorGradient | undefined;
+    density?: number | undefined;
+    // (undocumented)
+    endDistance?: number | undefined;
+    startDistance?: number | undefined;
 }
 
 // @public (undocumented)

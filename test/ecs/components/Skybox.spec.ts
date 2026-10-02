@@ -107,7 +107,10 @@ describe('Generated Skybox ProtoBuf', () => {
         nadir: multiKeyGradient()
       },
       fog: {
-        color: multiKeyGradient()
+        color: multiKeyGradient(),
+        density: 0.02,
+        startDistance: undefined,
+        endDistance: undefined
       },
       clouds: {
         color: undefined,
@@ -143,7 +146,10 @@ describe('Generated Skybox ProtoBuf', () => {
         nadir: singleKeyGradient()
       },
       fog: {
-        color: singleKeyGradient()
+        color: singleKeyGradient(),
+        density: undefined,
+        startDistance: undefined,
+        endDistance: undefined
       },
       clouds: undefined,
       stars: undefined
@@ -189,6 +195,46 @@ describe('Generated Skybox ProtoBuf', () => {
         speed: 0.05,
         texture: undefined
       },
+      stars: undefined
+    })
+  })
+
+  it('should serialize/deserialize Skybox with fog with only density set (color undefined)', () => {
+    const newEngine = Engine()
+    const Skybox = components.Skybox(newEngine)
+
+    testComponentSerialization<PBSkybox>(Skybox, {
+      reflectionMap: undefined,
+      skyboxTexture: undefined,
+      sun: undefined,
+      skyColors: undefined,
+      fog: {
+        color: undefined,
+        density: 0.0005,
+        startDistance: undefined,
+        endDistance: undefined
+      },
+      clouds: undefined,
+      stars: undefined
+    })
+  })
+
+  it('should serialize/deserialize Skybox with fog with only linear range set', () => {
+    const newEngine = Engine()
+    const Skybox = components.Skybox(newEngine)
+
+    testComponentSerialization<PBSkybox>(Skybox, {
+      reflectionMap: undefined,
+      skyboxTexture: undefined,
+      sun: undefined,
+      skyColors: undefined,
+      fog: {
+        color: undefined,
+        density: undefined,
+        startDistance: 10,
+        endDistance: 80
+      },
+      clouds: undefined,
       stars: undefined
     })
   })
@@ -372,7 +418,10 @@ describe('Generated Skybox ProtoBuf', () => {
       },
       skyColors: undefined,
       fog: {
-        color: { keys: [{ time: 0.9, color: { r: 0.3, g: 0.3, b: 0.4, a: 1 } }] }
+        color: { keys: [{ time: 0.9, color: { r: 0.3, g: 0.3, b: 0.4, a: 1 } }] },
+        density: undefined,
+        startDistance: undefined,
+        endDistance: undefined
       },
       clouds: {
         color: undefined,
