@@ -31,6 +31,13 @@ type QueuedMessage<T extends EventSchemaRegistry = EventSchemaRegistry> = {
   }
 }[keyof T]
 
+/** Message names the SDK uses for its own room traffic; scenes cannot register or clear them. */
+export const INTERNAL_EVENT_PREFIX = '__dcl:'
+
+export function isInternalEventType(eventType: unknown): boolean {
+  return typeof eventType === 'string' && eventType.startsWith(INTERNAL_EVENT_PREFIX)
+}
+
 export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
   private listeners = new Map<keyof T, Set<EventCallback<any>>>()
   private binaryMessageBus: any
@@ -162,7 +169,10 @@ export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
     if (eventType) {
       this.listeners.delete(eventType)
     } else {
-      this.listeners.clear()
+      // The SDK's own `__dcl:` listeners survive a user's clear-all
+      for (const key of [...this.listeners.keys()]) {
+        if (!isInternalEventType(key)) this.listeners.delete(key)
+      }
     }
   }
 
@@ -243,6 +253,11 @@ export function setGlobalRoom(roomInstance: Room): void {
  * @returns Typed room instance for your registered messages
  */
 export function registerMessages<T extends EventSchemaRegistry>(messages: T): Room<T> {
+  for (const key of Object.keys(messages)) {
+    if (isInternalEventType(key)) {
+      throw new Error(`Message name '${key}' is reserved: the '${INTERNAL_EVENT_PREFIX}' prefix belongs to the SDK`)
+    }
+  }
   Object.assign(globalEventRegistry, messages)
   if (!globalRoom) {
     throw new Error('Room not initialized. Make sure the SDK network transport is initialized.')

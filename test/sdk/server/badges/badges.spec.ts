@@ -15,8 +15,10 @@ jest.mock('../../../../packages/@dcl/sdk/src/server/utils', () => ({
   wrapSignedFetch: (req: unknown) => mockWrapSignedFetch(req)
 }))
 
+const mockSendBadgeAwarded = jest.fn()
+
 jest.mock('../../../../packages/@dcl/sdk/src/network/internal-messages', () => ({
-  sendBadgeAwarded: jest.fn()
+  sendBadgeAwarded: (address: string, badgeId: string) => mockSendBadgeAwarded(address, badgeId)
 }))
 
 import { Badges } from '../../../../packages/@dcl/sdk/src/server/badges'
@@ -43,6 +45,18 @@ describe('Badges.award', () => {
       url: `https://badges.test/badges/${badge}/awards/${player.toLowerCase()}`,
       init: { method: 'PUT', headers: { 'content-type': 'application/json' }, body: '{}' }
     })
+  })
+
+  it('hints the player on a new award (201) but not on a repeat (200)', async () => {
+    mockWrapSignedFetch.mockResolvedValue([null, { ok: true }, 201])
+    expect(await Badges.award(player, badge)).toBe(true)
+    expect(mockSendBadgeAwarded).toHaveBeenCalledTimes(1)
+    expect(mockSendBadgeAwarded).toHaveBeenCalledWith(player, badge)
+
+    mockSendBadgeAwarded.mockClear()
+    mockWrapSignedFetch.mockResolvedValue([null, { ok: true }, 200])
+    expect(await Badges.award(player, badge)).toBe(true)
+    expect(mockSendBadgeAwarded).not.toHaveBeenCalled()
   })
 
   it('asserts it is running on the server before doing anything', async () => {

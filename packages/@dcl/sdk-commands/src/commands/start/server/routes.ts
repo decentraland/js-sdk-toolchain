@@ -11,6 +11,7 @@ import { setupStorageEndpoints } from './storage-service'
 import { setupRealmAndComms } from './realm'
 import { getLanUrl } from '../utils'
 import { lsdDeepLinkPulseParams } from '../dcl-env'
+import { getBadgesServerUrl } from '../badges-server-url'
 
 export const sceneUpdateClients = new Set<WebSocket>()
 export async function wireRouter(
@@ -87,17 +88,28 @@ export async function wireRouter(
   components.server.use(router.middleware())
 }
 
-const HOP_BY_HOP_HEADERS = new Set(['host', 'content-length', 'connection', 'keep-alive', 'transfer-encoding', 'upgrade'])
+// Only what the badges service needs to verify the award: the ADR-44 signature headers,
+// the delegation claim and the body type. Nothing else from the engine's request (cookies,
+// origin, user agent) crosses the proxy.
+const FORWARDED_HEADER_PREFIX = 'x-identity-'
+const FORWARDED_HEADERS = new Set(['x-authoritative-scope', 'content-type'])
 
 // The award is ADR-44 signed over method + path, so the path is forwarded byte-identical.
 function setupBadgesProxy(components: PreviewComponents, router: Router<PreviewComponents>) {
-  const badgesServerUrl = process.env.BADGES_SERVER_URL?.replace(/\/+$/, '')
-  if (!badgesServerUrl) return
+  const badgesServerUrl = getBadgesServerUrl()
 
   router.put('/badges/:badgeId/awards/:player', async (ctx) => {
+    if (!badgesServerUrl) {
+      return {
+        status: 501,
+        body: { ok: false, error: 'Badge awards are not proxied in this preview: set BADGES_SERVER_URL to a badges service' }
+      }
+    }
+
     const headers: Record<string, string> = {}
     ctx.request.headers.forEach((value, key) => {
-      if (!HOP_BY_HOP_HEADERS.has(key.toLowerCase())) headers[key] = value
+      const name = key.toLowerCase()
+      if (name.startsWith(FORWARDED_HEADER_PREFIX) || FORWARDED_HEADERS.has(name)) headers[name] = value
     })
     try {
       const res = await components.fetch.fetch(`${badgesServerUrl}${ctx.url.pathname}${ctx.url.search}`, {
@@ -110,8 +122,8 @@ function setupBadgesProxy(components: PreviewComponents, router: Router<PreviewC
         headers: { 'content-type': res.headers.get('content-type') || 'application/json' },
         body: Buffer.from(await res.arrayBuffer())
       }
-    } catch (err: any) {
-      components.logger.error(`Badges proxy to ${badgesServerUrl} failed: ${err.message}`)
+    } catch (err) {
+      components.logger.error(`Badges proxy to ${badgesServerUrl} failed: ${err instanceof Error ? err.message : String(err)}`)
       return { status: 502, body: { ok: false, error: 'Badges server unreachable' } }
     }
   })

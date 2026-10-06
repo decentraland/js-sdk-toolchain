@@ -15,13 +15,22 @@ async function resolveBadgesServerUrl(): Promise<string> {
     return realmInfo.baseUrl
   }
 
-  // Staging / testing environment
-  if (realmInfo.baseUrl.includes('.zone')) {
+  // Staging / testing environment: a `.decentraland.zone` realm, matched on the hostname
+  if (isZoneHost(realmInfo.baseUrl)) {
     return BADGES_SERVER_ZONE
   }
 
   // Production environment
   return BADGES_SERVER_ORG
+}
+
+function isZoneHost(baseUrl: string): boolean {
+  try {
+    const host = new URL(baseUrl).hostname
+    return host === 'decentraland.zone' || host.endsWith('.decentraland.zone')
+  } catch {
+    return false
+  }
 }
 
 let memoizedUrl: Promise<string> | null = null
@@ -30,7 +39,7 @@ let memoizedUrl: Promise<string> | null = null
  * Determines the badges service base URL based on the current realm.
  *
  * - If `isPreview` is true, uses the realm's baseUrl (localhost)
- * - If the realm's baseUrl contains `.zone`, uses badges.decentraland.zone
+ * - If the realm's host is under `decentraland.zone`, uses badges.decentraland.zone
  * - Otherwise, uses badges.decentraland.org (production)
  *
  * The realm never changes mid-session, so the result is memoized; a failed

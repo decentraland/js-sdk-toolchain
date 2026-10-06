@@ -1,6 +1,7 @@
 import { Result } from 'arg'
 import { args as startArgs } from '.'
 import { CliComponents } from '../../components'
+import { getBadgesServerUrl } from './badges-server-url'
 
 const isWindows = /^win/.test(process.platform)
 
@@ -117,7 +118,7 @@ async function runApp(
     if (mcpPort !== undefined) {
       params.set('mcp-port', String(mcpPort))
     }
-    const badgesServerUrl = process.env.BADGES_SERVER_URL
+    const badgesServerUrl = getBadgesServerUrl()
     if (badgesServerUrl) {
       params.set('badges-url', badgesServerUrl)
     }

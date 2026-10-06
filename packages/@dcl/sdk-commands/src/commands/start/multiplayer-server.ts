@@ -9,6 +9,7 @@ import { isElectronEnvironment, getSpawnEnv, findNpxBin, findNpxCliJs } from './
 import { getBaseCoords } from '../../logic/scene-validations'
 import { future } from '../../logic/future'
 import { engineEnvArgs } from './dcl-env'
+import { getBadgesServerUrl } from './badges-server-url'
 
 const HAMMURABI_PACKAGE = '@dcl/hammurabi-server'
 const HAMMURABI_VERSION = 'next'
@@ -272,7 +273,7 @@ export function spawnAuthServer(
   try {
     const engineArgs = engine === 'bevy' ? engineEnvArgs(dclenv) : []
     // bevy only signs badge awards whose origin matches --badges exactly; the preview proxies them on
-    if (engine === 'bevy' && process.env.BADGES_SERVER_URL) engineArgs.push(`--badges=${realm}`)
+    if (engine === 'bevy' && getBadgesServerUrl()) engineArgs.push(`--badges=${realm}`)
     const server = startMultiplayerServer(
       components,
       project.workingDirectory,
