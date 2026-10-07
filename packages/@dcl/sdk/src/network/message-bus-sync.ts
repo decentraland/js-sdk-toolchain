@@ -110,7 +110,7 @@ export function addSyncTransport(
 
   // Set global eventBus instance
   setGlobalRoom(eventBus)
-  installInternalMessages(eventBus)
+  installInternalMessages(binaryMessageBus, isServerAtom, AUTH_SERVER_PEER_ID)
 
   engine.addTransport(transport)
   // End add sync transport
