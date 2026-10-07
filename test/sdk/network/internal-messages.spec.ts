@@ -3,7 +3,7 @@ const mockCheckAwards = jest.fn()
 // No mock file exists for ~system/Badges under test/__mocks__, hence virtual
 jest.mock('~system/Badges', () => ({ checkAwards: (body: unknown) => mockCheckAwards(body) }), { virtual: true })
 
-import { Schemas } from '@dcl/ecs'
+import { Schemas } from '../../../packages/@dcl/ecs/dist'
 import { CommsMessage } from '../../../packages/@dcl/sdk/src/network/binary-message-bus'
 import { decodeEvent } from '../../../packages/@dcl/sdk/src/network/events/protocol'
 import { installInternalMessages, sendBadgeAwarded } from '../../../packages/@dcl/sdk/src/network/internal-messages'
