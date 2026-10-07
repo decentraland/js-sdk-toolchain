@@ -3,10 +3,15 @@ import * as dclCompiler from '../../../../packages/@dcl/sdk-commands/src/logic/b
 import * as build from '../../../../packages/@dcl/sdk-commands/src/commands/build/index'
 import { initComponents } from '../../../../packages/@dcl/sdk-commands/src/components'
 import {
+  compositeLoader,
   getScriptImportName,
   generateInitializeScriptsModule
 } from '../../../../packages/@dcl/sdk-commands/src/logic/bundle'
 import { createFsComponent } from '../../../../packages/@dcl/sdk-commands/src/components/fs'
+import esbuild from '../../../../packages/@dcl/sdk-commands/node_modules/esbuild'
+import fs from 'fs'
+import os from 'os'
+import path from 'path'
 
 afterEach(() => {
   jest.clearAllMocks()
@@ -286,6 +291,89 @@ describe('bundle script utilities', () => {
       expect(moduleReferenceCount).toBe(3)
 
       expect(result.watchFiles).toEqual(['/test/project/src/scripts/movePlayer.ts'])
+    })
+
+    it('should boot asset-packs in editor scenes', async () => {
+      const compositeData = { scripts: new Map(), compositeLines: [], watchFiles: [], withErrors: false }
+
+      const result = await generateInitializeScriptsModule(mockComponents, '/test/project', compositeData, {
+        editorScene: true
+      })
+
+      expect(result.contents).toContain("import { initAssetPacks } from '@dcl/asset-packs/dist/scene-entrypoint'")
+      expect(result.contents).toContain('initAssetPacks(engine, { syncEntity }, players)')
+    })
+
+    it('should not boot asset-packs in scenes with scripts that are not editor scenes', async () => {
+      const compositeData = {
+        scripts: new Map([['src/scripts/test.ts', [{ entity: 512, path: 'src/scripts/test.ts', priority: 0 }]]]),
+        compositeLines: [],
+        watchFiles: [],
+        withErrors: false
+      }
+
+      const result = await generateInitializeScriptsModule(mockComponents, '/test/project', compositeData)
+
+      expect(result.contents).not.toContain('initAssetPacks(')
+    })
+  })
+
+  describe('compositeLoader', () => {
+    let workingDirectory: string
+
+    const writeMainComposite = (componentNames: string[]) =>
+      fs.writeFileSync(
+        path.join(workingDirectory, 'assets', 'scene', 'main.composite'),
+        JSON.stringify({
+          version: 1,
+          components: componentNames.map((name) => ({
+            name,
+            jsonSchema: { type: 'object', properties: {}, serializationType: 'map' },
+            data: {}
+          }))
+        })
+      )
+
+    beforeEach(() => {
+      workingDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'composite-loader-'))
+      fs.mkdirSync(path.join(workingDirectory, 'assets', 'scene'), { recursive: true })
+    })
+
+    afterEach(() => {
+      fs.rmSync(workingDirectory, { recursive: true, force: true })
+    })
+
+    it('should boot asset-packs once a running scene becomes an editor scene', async () => {
+      const components = {
+        fs: createFsComponent(),
+        logger: { log: jest.fn(), info: jest.fn(), error: jest.fn(), debug: jest.fn(), warn: jest.fn() }
+      }
+      writeMainComposite(['core::Transform'])
+      const context = await esbuild.context({
+        bundle: true,
+        write: false,
+        format: 'esm',
+        absWorkingDir: workingDirectory,
+        external: ['@dcl/*'],
+        logLevel: 'silent',
+        plugins: [compositeLoader(components as any, { workingDirectory, ignoreComposite: false } as any)],
+        stdin: {
+          contents: "import { _initializeScripts } from '~sdk/script-utils'\n_initializeScripts(undefined)",
+          resolveDir: workingDirectory,
+          loader: 'ts'
+        }
+      })
+
+      try {
+        const before = await context.rebuild()
+        writeMainComposite(['core::Transform', 'asset-packs::Actions'])
+        const after = await context.rebuild()
+
+        expect(before.outputFiles![0].text).not.toContain('initAssetPacks(')
+        expect(after.outputFiles![0].text).toContain('initAssetPacks(')
+      } finally {
+        await context.dispose()
+      }
     })
   })
 })
