@@ -30,6 +30,26 @@ describe('getBadgesServerUrl', () => {
     expect(await getBadgesServerUrl()).toBe('https://badges.decentraland.zone')
   })
 
+  it('matches .zone on the host only, with a port or a path present', async () => {
+    mockRealm({ isPreview: false, baseUrl: 'https://realm.decentraland.zone:443/some/path' })
+    const { getBadgesServerUrl } = await loadModule()
+    expect(await getBadgesServerUrl()).toBe('https://badges.decentraland.zone')
+  })
+
+  it('is not fooled by look-alike hosts or .zone elsewhere in the URL', async () => {
+    for (const baseUrl of [
+      'https://decentraland.zone.evil.com',
+      'https://realm.decentraland.zone.attacker.net',
+      'https://evil.com/?next=realm.decentraland.zone',
+      'https://evil.com/realm.decentraland.zone'
+    ]) {
+      jest.resetModules()
+      mockRealm({ isPreview: false, baseUrl })
+      const { getBadgesServerUrl } = await loadModule()
+      expect(await getBadgesServerUrl()).toBe('https://badges.decentraland.org')
+    }
+  })
+
   it('returns the .org badges server for production realms', async () => {
     mockRealm({ isPreview: false, baseUrl: 'https://realm.decentraland.org' })
     const { getBadgesServerUrl } = await loadModule()

@@ -167,7 +167,7 @@ export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
    */
   clear<K extends keyof T>(eventType?: K): void {
     if (eventType) {
-      this.listeners.delete(eventType)
+      if (!isInternalEventType(eventType)) this.listeners.delete(eventType)
     } else {
       // The SDK's own `__dcl:` listeners survive a user's clear-all
       for (const key of [...this.listeners.keys()]) {

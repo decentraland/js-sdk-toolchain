@@ -15,6 +15,9 @@ export function getBadgesServerUrl(env: NodeJS.ProcessEnv = process.env): string
   } catch {
     throw new Error(`BADGES_SERVER_URL is not a valid URL: ${raw}`)
   }
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    throw new Error(`BADGES_SERVER_URL must be an http(s) URL: ${raw}`)
+  }
   if ((url.pathname !== '/' && url.pathname !== '') || url.search || url.hash) {
     throw new Error(`BADGES_SERVER_URL must be an origin with no path, query or fragment: ${raw}`)
   }

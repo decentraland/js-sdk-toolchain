@@ -24,13 +24,13 @@ async function resolveBadgesServerUrl(): Promise<string> {
   return BADGES_SERVER_ORG
 }
 
+// The scene runtime has no `URL`, so the host is cut out by hand: scheme, then everything
+// up to the first `/`, `:`, `?` or `#`.
+const HOST_PATTERN = /^[a-z][a-z0-9+.-]*:\/\/([^/:?#]+)/i
+
 function isZoneHost(baseUrl: string): boolean {
-  try {
-    const host = new URL(baseUrl).hostname
-    return host === 'decentraland.zone' || host.endsWith('.decentraland.zone')
-  } catch {
-    return false
-  }
+  const host = HOST_PATTERN.exec(baseUrl)?.[1]?.toLowerCase()
+  return host === 'decentraland.zone' || (host?.endsWith('.decentraland.zone') ?? false)
 }
 
 let memoizedUrl: Promise<string> | null = null
