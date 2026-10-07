@@ -24,7 +24,8 @@ describe('reserved __dcl: message names', () => {
   })
 
   it('room.clear() keeps the SDK listeners, with or without an explicit name', () => {
-    const room = new Room({} as any, {}, fakeAtom, fakeAtom)
+    // The constructor subscribes to CUSTOM_EVENT on the bus; nothing is ever emitted here.
+    const room = new Room({} as any, { on: () => undefined }, fakeAtom, fakeAtom)
     const internal = `${INTERNAL_EVENT_PREFIX}badgeAwarded`
     room.onMessage(internal as any, () => undefined)
     room.onMessage('ping' as any, () => undefined)
