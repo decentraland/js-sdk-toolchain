@@ -79,7 +79,7 @@ An `ERR!` line means the QuickJS eval threw mid-execution (commonly a missing mo
 
 **Anti-pattern:** committing snapshots containing `ERR! Error: Unknown module ...`, `ERR! TypeError: ... is not a function`, or any other `ERR!` trace. Treat them as broken artifacts — fix the mock (or the underlying scene-load failure), regenerate, and re-verify before committing.
 
-`make update-snapshots` exits non-zero whenever it rewrote a snapshot: `test/snapshots.spec.ts` writes the new `.crdt`, then still asserts it against the old content — that is how CI's `UPDATE_SNAPSHOTS=true make test` catches uncommitted snapshots. A failing exit after a regeneration is expected; re-run `make test` to confirm the new snapshots pass. Never gate automation on its exit code (see the "Regenerate snapshots" step in `.github/workflows/sync-main-to-auth-server.yml`).
+`make update-snapshots` exits non-zero whenever it rewrote a snapshot: `test/snapshots.spec.ts` (`.crdt` files) and `test/ecs/composite.spec.ts` (`test/ecs/composites/*.scene-snapshot.json`) both write the new snapshot, then still assert it against the old content — that is how CI's `UPDATE_SNAPSHOTS=true make test` catches uncommitted snapshots. A failing exit after a regeneration is expected; re-run `make test` to confirm the new snapshots pass. Never gate automation on its exit code (see the "Regenerate snapshots" step in `.github/workflows/sync-main-to-auth-server.yml`).
 
 ### Bumping `@dcl/inspector` (the vehicle for `@dcl/asset-packs`)
 

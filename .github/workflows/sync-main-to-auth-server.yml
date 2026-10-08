@@ -94,7 +94,7 @@ jobs:
 
           make install
           make build
-          UPDATE_SNAPSHOTS=true make test-file FILE=test/snapshots.spec.ts || true
+          UPDATE_SNAPSHOTS=true make test-file FILE="test/snapshots.spec.ts test/ecs/composite.spec.ts" || true
           make test
 
       - name: Reject broken snapshots
