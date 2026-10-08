@@ -82,8 +82,10 @@ jobs:
 
       # Fatal on purpose: the sync PR is never created or updated without freshly
       # regenerated snapshots, since the merges above can leave them a patchwork of both
-      # branches. update-snapshots runs the whole test suite, so a failing test also
-      # stops the run; a transient npm failure only needs a re-run.
+      # branches. The regeneration pass exits non-zero whenever a snapshot changed, so
+      # its result is ignored; make test then runs the whole suite against the fresh
+      # snapshots, so a failing test still stops the run. A transient npm failure only
+      # needs a re-run.
       # No protocol bump: auth-server uses main's @dcl/protocol pin, which the merge
       # above already brings in.
       - name: Regenerate snapshots
@@ -92,7 +94,8 @@ jobs:
 
           make install
           make build
-          make update-snapshots
+          UPDATE_SNAPSHOTS=true make test-file FILE=test/snapshots.spec.ts || true
+          make test
 
       - name: Reject broken snapshots
         run: |
