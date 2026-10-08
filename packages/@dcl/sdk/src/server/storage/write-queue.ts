@@ -1,0 +1,174 @@
+/**
+ * Rejection of a superseded delete when the write that replaced it did not apply.
+ * @internal
+ */
+export class SupersedingWriteFailed extends Error {
+  constructor() {
+    super('a write that replaced it did not apply')
+    this.name = 'SupersedingWriteFailed'
+  }
+}
+
+/**
+ * A pending write operation. `body` is the serialized PUT payload, or null
+ * for a DELETE. Callers that join the op share its promise.
+ */
+interface PendingOp {
+  body: string | null
+  execute: (body: string | null) => Promise<boolean>
+  promise: Promise<boolean>
+  resolve: (result: boolean) => void
+  reject: (error: unknown) => void
+}
+
+interface KeyState {
+  /** The op currently on the network. */
+  active: PendingOp
+  /** At most one queued op; a later write replaces it (latest wins). */
+  queued?: PendingOp
+}
+
+/**
+ * Serializes writes per key so the service commits them in issue order.
+ * Overlapping PUTs from the single scene server would otherwise race: the
+ * server keeps whichever request it processes last, while the local cache
+ * keeps whichever response arrives last — either can disagree with the last
+ * set() issued. With at most one in-flight op per key and a single queued
+ * "latest value" slot, the server's final state always matches the last
+ * write issued, and N rapid writes collapse into at most 2 network calls.
+ * @internal
+ */
+export interface WriteQueue {
+  /**
+   * Body of the latest issued write for the key (the queued op if present,
+   * else the in-flight one): a string for a PUT, null for a DELETE,
+   * undefined when no write is pending.
+   */
+  pending(key: string): string | null | undefined
+  /** True while any write for the key is in flight or queued. */
+  isPending(key: string): boolean
+  /**
+   * Resolves once the in-flight op settles and, if one was queued at call time,
+   * the op that runs next. At most two, so writes cannot starve a waiter. Never rejects.
+   */
+  settled(key: string): Promise<void>
+  /**
+   * Issues a write, queued behind any in-flight one and replacing any queued one
+   * (see settleSuperseded). An identical queued op is joined; `joinActive` also
+   * joins an identical in-flight op, which only dedup-tolerant callers may do.
+   * Rejects with the executor's error; see settleSuperseded for replaced ops.
+   */
+  enqueue(
+    key: string,
+    body: string | null,
+    execute: (body: string | null) => Promise<boolean>,
+    joinActive: boolean
+  ): Promise<boolean>
+}
+
+/**
+ * Creates the per-key write serializer shared by a storage scope.
+ * @internal
+ */
+export function createWriteQueue(): WriteQueue {
+  const keys = new Map<string, KeyState>()
+
+  function makeOp(body: string | null, execute: PendingOp['execute']): PendingOp {
+    let resolve!: (result: boolean) => void
+    let reject!: (error: unknown) => void
+    const promise = new Promise<boolean>((res, rej) => {
+      resolve = res
+      reject = rej
+    })
+    return { body, execute, promise, resolve, reject }
+  }
+
+  /**
+   * A replaced op resolves true when its replacement lands. On failure a set
+   * resolves false and a delete rejects, in its own terms.
+   */
+  function settleSuperseded(superseded: PendingOp, by: PendingOp): void {
+    by.promise.then(
+      (result) => {
+        const applied = by.body === null || result
+        if (superseded.body !== null) superseded.resolve(applied)
+        else if (applied) superseded.resolve(true)
+        else superseded.reject(new SupersedingWriteFailed())
+      },
+      (error) => {
+        if (superseded.body === null) superseded.reject(error)
+        else superseded.resolve(false)
+      }
+    )
+  }
+
+  async function drain(key: string, state: KeyState): Promise<void> {
+    for (;;) {
+      const op = state.active
+      try {
+        op.resolve(await op.execute(op.body))
+      } catch (error) {
+        op.reject(error)
+      }
+
+      if (state.queued) {
+        state.active = state.queued
+        state.queued = undefined
+      } else {
+        keys.delete(key)
+        return
+      }
+    }
+  }
+
+  return {
+    pending(key: string): string | null | undefined {
+      const state = keys.get(key)
+      if (!state) return undefined
+      return (state.queued ?? state.active).body
+    },
+
+    isPending(key: string): boolean {
+      return keys.has(key)
+    },
+
+    async settled(key: string): Promise<void> {
+      const state = keys.get(key)
+      if (!state) return
+      const hadQueued = state.queued !== undefined
+      await state.active.promise.catch(() => undefined)
+      // drain() promotes the queued op (or its replacement) in place before this resumes.
+      if (hadQueued) await state.active.promise.catch(() => undefined)
+    },
+
+    enqueue(key: string, body: string | null, execute: PendingOp['execute'], joinActive: boolean): Promise<boolean> {
+      const state = keys.get(key)
+
+      if (!state) {
+        const op = makeOp(body, execute)
+        const newState: KeyState = { active: op }
+        keys.set(key, newState)
+        void drain(key, newState)
+        return op.promise
+      }
+
+      if (state.queued) {
+        // A queued op has not started, so it is issued "after" this caller
+        // either way: join it when identical, supersede it otherwise.
+        if (state.queued.body === body) return state.queued.promise
+        const op = makeOp(body, execute)
+        settleSuperseded(state.queued, op)
+        state.queued = op
+        return op.promise
+      }
+
+      if (joinActive && state.active.body === body) {
+        return state.active.promise
+      }
+
+      const op = makeOp(body, execute)
+      state.queued = op
+      return op.promise
+    }
+  }
+}

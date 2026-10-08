@@ -20,7 +20,5 @@
       "parent": 512
     }
   },
-  "core-schema::Network-Entity": {},
-  "core-schema::Network-Parent": {},
   "composite::root": {}
 }
