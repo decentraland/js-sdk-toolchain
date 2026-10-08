@@ -96,6 +96,17 @@ function getInitialCrdtState(): Uint8Array[] {
   return [addPlayerEntityTransform(), addUICanvasOnRootEntity(), addCameraMode()]
 }
 
+/** Mirrors the `OpenExplorerUiResult` enum of the RestrictedActions API, which nothing here generates. */
+const OPEN_EXPLORER_UI_RESULT = {
+  UNSPECIFIED: 0,
+  OPENED: 1,
+  WAS_ALREADY_OPEN: 2,
+  REJECTED_NOT_CURRENT_SCENE: 3,
+  REJECTED_FEATURE_DISABLED: 4,
+  REJECTED_NO_USER_GESTURE: 5,
+  UNRECOGNIZED: -1
+} as const
+
 /**
  * Creates pre-defined mocks for critical ~system modules.
  *
@@ -210,7 +221,14 @@ function createCriticalModuleMocks(engine: IEngine, transport: Transport, crdtSt
       openExternalUrl: async () => ({ success: false }),
       openNftDialog: async () => ({ success: false }),
       setCommunicationsAdapter: async () => ({ success: false }),
-      triggerSceneEmote: async () => ({ success: false })
+      triggerSceneEmote: async () => ({ success: false }),
+      copyToClipboard: async () => ({}),
+      stopEmote: async () => ({ success: false }),
+      // Without this entry the auto-mock proxy answers every member with `undefined`, and a
+      // verdict comparison then passes by accident.
+      OpenExplorerUiResult: OPEN_EXPLORER_UI_RESULT,
+      // Answering OPENED would block a scene that waits for the panel to close forever.
+      openExplorerUi: async () => ({ openResult: OPEN_EXPLORER_UI_RESULT.REJECTED_FEATURE_DISABLED })
     },
 
     '~system/CommsApi': {

@@ -158,9 +158,7 @@ export async function startValidations(components: Pick<CliComponents, 'spawner'
  * `generateInitializeScriptsModule`) and does not require the `initAssetPacks` runtime.
  * Only Action/Trigger/State and similar runtime components need `initAssetPacks`.
  *
- * NOTE: This value is baked into the esbuild stdin at context-creation time and is
- * NOT re-evaluated during watch-mode rebuilds. If a scene's editor status changes
- * (e.g. a smart item is added for the first time), the watch process must be restarted.
+ * Evaluated on every (re)build when `~sdk/script-utils` is generated.
  */
 export async function isEditorScene(components: Pick<CliComponents, 'fs'>, workingDirectory: string): Promise<boolean> {
   const mainCompositePath = path.resolve(workingDirectory, 'assets', 'scene', 'main.composite')

@@ -65,7 +65,7 @@ function toSafeModulePath(filePath: string): string {
   return JSON.stringify(unixPath)
 }
 
-function getEntrypointCode(entrypointPath: string, forceCustomExport: boolean, isEditorScene: boolean = false) {
+function getEntrypointCode(entrypointPath: string, forceCustomExport: boolean) {
   const safeEntrypointPath = toSafeModulePath(entrypointPath)
   if (forceCustomExport) return `;"use strict";export * from ${safeEntrypointPath}`
 
@@ -76,17 +76,9 @@ import { engine, NetworkEntity } from '@dcl/sdk/ecs'
 import * as sdk from '@dcl/sdk'
 import { compositeProvider } from '@dcl/sdk/composite-provider'
 import { compositeFromLoader } from '~sdk/all-composites'
-import { _initializeScripts } from '~sdk/script-utils'
+import { _initializeScripts, _initializeAssetPacks } from '~sdk/script-utils'
 
-${
-  isEditorScene &&
-  `
-import { syncEntity } from '@dcl/sdk/network'
-import players from '@dcl/sdk/players'
-import { initAssetPacks } from '@dcl/asset-packs/dist/scene-entrypoint'
-initAssetPacks(engine, { syncEntity }, players)
-`
-}
+_initializeAssetPacks()
 
 if ((entrypoint as any).main !== undefined) {
   function _INTERNAL_startup_system() {
@@ -213,7 +205,6 @@ type SingleProjectOptions = CompileOptions & {
 
 export async function bundleSingleProject(components: BundleComponents, options: SingleProjectOptions) {
   printProgressStep(components.logger, `Bundling file ${colors.bold(options.entrypoint)}`, 1, MAX_STEP)
-  const editorScene = await isEditorScene(components, options.workingDirectory)
 
   // Pre-compute composite data so we can inject maxCompositeEntity via esbuild define.
   // This must happen before the esbuild context is created because the define values
@@ -332,9 +323,9 @@ export async function bundleSingleProject(components: BundleComponents, options:
     logOverride: {
       'import-is-undefined': 'silent'
     },
-    plugins: [compositeLoader(components, options, editorScene)],
+    plugins: [compositeLoader(components, options)],
     stdin: {
-      contents: getEntrypointCode(options.entrypoint, options.customEntryPoint, editorScene),
+      contents: getEntrypointCode(options.entrypoint, options.customEntryPoint),
       resolveDir: path.dirname(options.entrypoint),
       sourcefile: path.basename(options.entrypoint) + '.entry-point.ts',
       loader: 'ts'
@@ -345,7 +336,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
   if (options.watch) {
     // Instead of using esbuild's watch, we create our own watcher
     const watcher = watch(path.resolve(options.workingDirectory), {
-      ignored: ['**/dist/**', '**/*.crdt', '**/*.d.ts', path.resolve(options.outputFile)],
+      ignored: ['**/node_modules/**', '**/dist/**', '**/*.crdt', '**/*.d.ts', path.resolve(options.outputFile)],
       ignoreInitial: true
     })
 
@@ -464,11 +455,7 @@ function runTypeChecker(components: BundleComponents, options: CompileOptions) {
   return typeCheckerFuture
 }
 
-function compositeLoader(
-  components: BundleComponents,
-  options: SingleProjectOptions,
-  editorScene: boolean
-): esbuild.Plugin {
+export function compositeLoader(components: BundleComponents, options: SingleProjectOptions): esbuild.Plugin {
   let shouldReload = true
   let compositeData: Awaited<ReturnType<typeof getAllComposites>> | null = null
 
@@ -541,7 +528,7 @@ function compositeLoader(
           components,
           options.workingDirectory,
           compositeData,
-          { editorScene }
+          { editorScene: await isEditorScene(components, options.workingDirectory) }
         )
 
         return {
@@ -681,6 +668,7 @@ async function updateSdkTypeDeclarations(
  */
 function generateScriptStubModuleContent(): string {
   return `
+${ASSET_PACKS_NOOP}
 export function _initializeScripts(_engine) {}
 
 export function getScriptInstance(_entity, _scriptPath) {
@@ -702,11 +690,29 @@ export function callScriptMethod(entity, scriptPath, methodName, ..._args) {
 `
 }
 
+const ASSET_PACKS_BOOT = `
+import { engine } from '@dcl/sdk/ecs'
+import { syncEntity } from '@dcl/sdk/network'
+import players from '@dcl/sdk/players'
+import { initAssetPacks } from '@dcl/asset-packs/dist/scene-entrypoint'
+export function _initializeAssetPacks() {
+  initAssetPacks(engine, { syncEntity }, players)
+}
+`
+
+const ASSET_PACKS_NOOP = 'export function _initializeAssetPacks() {}'
+
 /**
  * Generates the virtual module content with script initialization and helper functions
  */
-function generateVirtualModuleContent(runtimeImports: string, runtimeCode: string, scriptsArray: string): string {
+function generateVirtualModuleContent(
+  runtimeImports: string,
+  runtimeCode: string,
+  scriptsArray: string,
+  editorScene: boolean
+): string {
   return `
+${editorScene ? ASSET_PACKS_BOOT : ASSET_PACKS_NOOP}
 ${runtimeImports}
 
 ${runtimeCode}
@@ -739,7 +745,7 @@ export async function generateInitializeScriptsModule(
   // default empty implementation if no scripts
   if (!hasScripts) {
     return {
-      contents: generateVirtualModuleContent('', runtimeCode, '[]'),
+      contents: generateVirtualModuleContent('', runtimeCode, '[]', !!opts?.editorScene),
       watchFiles: []
     }
   }
@@ -757,7 +763,12 @@ export async function generateInitializeScriptsModule(
   )
 
   // Step 3: Generate virtual module content
-  const contents = generateVirtualModuleContent(scriptData.runtimeImports, runtimeCode, scriptData.scriptsArray)
+  const contents = generateVirtualModuleContent(
+    scriptData.runtimeImports,
+    runtimeCode,
+    scriptData.scriptsArray,
+    !!opts?.editorScene
+  )
 
   return { contents, watchFiles: scriptData.watchFiles }
 }

@@ -79,6 +79,8 @@ An `ERR!` line means the QuickJS eval threw mid-execution (commonly a missing mo
 
 **Anti-pattern:** committing snapshots containing `ERR! Error: Unknown module ...`, `ERR! TypeError: ... is not a function`, or any other `ERR!` trace. Treat them as broken artifacts — fix the mock (or the underlying scene-load failure), regenerate, and re-verify before committing.
 
+`make update-snapshots` exits non-zero whenever it rewrote a snapshot: `test/snapshots.spec.ts` (`.crdt` files) and `test/ecs/composite.spec.ts` (`test/ecs/composites/*.scene-snapshot.json`) both write the new snapshot, then still assert it against the old content — that is how CI's `UPDATE_SNAPSHOTS=true make test` catches uncommitted snapshots. A failing exit after a regeneration is expected; re-run `make test` to confirm the new snapshots pass. Never gate automation on its exit code (see the "Regenerate snapshots" step in `.github/workflows/sync-main-to-auth-server.yml`).
+
 ### Bumping `@dcl/inspector` (the vehicle for `@dcl/asset-packs`)
 
 `@dcl/asset-packs` is not a direct dependency of this repo — it ships nested inside `@dcl/inspector`, and `packages/@dcl/sdk-commands/src/logic/bundle.ts` resolves it from the inspector's `node_modules`. To bump (prior art: commits `04270ca5`, `8b6bd63d`):
@@ -110,6 +112,10 @@ Asset-packs injection is gated behind `isEditorScene` (requires `assets/scene/ma
 ## Spec & planning conventions
 
 This repo uses the **`/plan-plus:*` plugin** for multi-phase feature work. New designs land under `docs/specs/<feature>/` with `plan.md`, per-phase files, and a `learnings/` sidecar. Whether these directories ship as part of PR diffs is a per-PR judgment call — add `docs/specs/` to `.gitignore` if your team prefers keeping them as local-only audit trails.
+
+## Learnings
+
+- [docs/agent-learnings/auth-server-reserved-entities.md](docs/agent-learnings/auth-server-reserved-entities.md) — tests that inject CRDT messages on `RootEntity` need `allowReservedEntities: true` on their transport, or they hang on the auth-server sync.
 
 ## Shell safety
 
